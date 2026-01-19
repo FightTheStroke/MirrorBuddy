@@ -1,112 +1,162 @@
 /**
- * COPPA Verification API
+ * API Route: COPPA Parental Consent Verification
  *
- * POST - Verify parental consent with code
- * DELETE - Deny parental consent
+ * POST /api/coppa/verify - Verify parental consent with code
+ * GET /api/coppa/verify - Check consent status
+ *
+ * COPPA compliance for children under 13
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { logger } from "@/lib/logger";
 import {
   verifyParentalConsent,
-  denyParentalConsent,
+  denyParentalConsentByCode,
+  checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
-import { logger } from "@/lib/logger";
-import { getClientIdentifier } from "@/lib/rate-limit";
 import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
-const log = logger.child({ module: "api-coppa-verify" });
+const VerifySchema = z.object({
+  code: z.string().length(6),
+  action: z.enum(["approve", "deny"]).default("approve"),
+});
 
 /**
- * POST /api/coppa/verify - Verify parental consent
- *
- * Body: { verificationCode: string }
+ * GET /api/coppa/verify
+ * Check COPPA consent status for the current user
  */
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+export async function GET() {
+  const auth = await validateAuth();
+  if (!auth.authenticated || !auth.userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const body = await request.json();
-    const { verificationCode } = body;
-
-    if (!verificationCode || typeof verificationCode !== "string") {
-      return NextResponse.json(
-        { error: "Verification code is required" },
-        { status: 400 },
-      );
-    }
-
-    // Normalize code (uppercase, trim)
-    const normalizedCode = verificationCode.trim().toUpperCase();
-
-    if (normalizedCode.length !== 6) {
-      return NextResponse.json(
-        { error: "Invalid verification code format" },
-        { status: 400 },
-      );
-    }
-
-    const ipAddress = getClientIdentifier(request);
-    const result = await verifyParentalConsent(normalizedCode, ipAddress);
-
-    if (!result.success) {
-      log.warn("COPPA verification failed", {
-        error: result.error,
-        ipAddress,
-      });
-      return NextResponse.json({ error: result.error }, { status: 400 });
-    }
-
-    log.info("COPPA consent verified", { userId: result.userId });
+    const status = await checkCoppaStatus(auth.userId);
 
     return NextResponse.json({
       success: true,
-      message: "Parental consent verified successfully",
+      coppa: {
+        requiresConsent: status.requiresConsent,
+        consentGranted: status.consentGranted,
+        consentPending: status.consentPending,
+        age: status.age,
+      },
     });
   } catch (error) {
-    log.error("Failed to verify consent", { error: String(error) });
-    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
+    logger.error("COPPA status check error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to check COPPA status" },
+      { status: 500 },
+    );
   }
 }
 
 /**
- * DELETE /api/coppa/verify - Deny parental consent
+ * POST /api/coppa/verify
+ * Verify or deny parental consent with verification code
  *
- * Requires authentication - the user requesting denial
+ * Note: No CSRF required - code-based verification from email link
  */
-export async function DELETE(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: auth.error }, { status: 401 });
+export async function POST(request: NextRequest) {
+  // Rate limit COPPA verification attempts (5 per hour - email costs, strict)
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await checkRateLimitAsync(
+    `coppa:verify:${clientId}`,
+    RATE_LIMITS.COPPA,
+  );
+  if (!rateLimitResult.success) {
+    logger.warn("COPPA verification rate limited", { clientId });
+    return rateLimitResponse(rateLimitResult);
   }
 
   try {
-    const result = await denyParentalConsent(auth.userId);
+    const body = await request.json();
 
-    if (!result.success) {
+    const parseResult = VerifySchema.safeParse(body);
+    if (!parseResult.success) {
       return NextResponse.json(
-        { error: "Failed to deny consent" },
-        { status: 500 },
+        { error: "Invalid request", details: parseResult.error.issues },
+        { status: 400 },
       );
     }
 
-    log.info("COPPA consent denied by parent", { userId: auth.userId });
+    const { code, action } = parseResult.data;
 
-    return NextResponse.json({
-      success: true,
-      message: "Parental consent denied",
-    });
+    // Get IP address for audit logging
+    const ipAddress =
+      request.headers.get("x-forwarded-for")?.split(",")[0] ||
+      request.headers.get("x-real-ip") ||
+      "unknown";
+
+    if (action === "approve") {
+      const result = await verifyParentalConsent(code, ipAddress);
+
+      if (!result.success) {
+        return NextResponse.json(
+          {
+            error: result.error,
+            message: getErrorMessage(result.error || "Unknown error"),
+          },
+          { status: 400 },
+        );
+      }
+
+      logger.info("COPPA consent verified", {
+        userId: result.userId,
+        ipAddress,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message:
+          "Consenso confermato! Il tuo bambino può ora accedere a MirrorBuddy.",
+        userId: result.userId,
+      });
+    } else {
+      // Deny action - directly deny without granting first
+      const result = await denyParentalConsentByCode(code, ipAddress);
+
+      if (!result.success) {
+        return NextResponse.json(
+          {
+            error: result.error,
+            message: getErrorMessage(result.error || "Unknown error"),
+          },
+          { status: 400 },
+        );
+      }
+
+      logger.info("COPPA consent denied by parent", {
+        userId: result.userId,
+        ipAddress,
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: "Consenso negato. L'account verrà limitato.",
+      });
+    }
   } catch (error) {
-    log.error("Failed to deny consent", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to deny consent" },
-      { status: 500 },
-    );
+    logger.error("COPPA verification error", { error: String(error) });
+    return NextResponse.json({ error: "Verification failed" }, { status: 500 });
+  }
+}
+
+function getErrorMessage(error: string): string {
+  switch (error) {
+    case "Invalid verification code":
+      return "Codice di verifica non valido. Controlla il codice ricevuto via email.";
+    case "Verification code expired":
+      return "Il codice di verifica è scaduto. Richiedi un nuovo codice.";
+    default:
+      return "Si è verificato un errore. Riprova più tardi.";
   }
 }

@@ -12,48 +12,45 @@
  * - pageSize: Optional page size (default: 50)
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 import {
   listDriveFiles,
   searchDriveFiles,
   getDriveFolderPath,
   toDriveFileUI,
-} from '@/lib/google';
-import { logger } from '@/lib/logger';
+} from "@/lib/google";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
-  const folderId = searchParams.get('folderId') || 'root';
-  const search = searchParams.get('search');
-  const pageToken = searchParams.get('pageToken') || undefined;
-  const pageSize = parseInt(searchParams.get('pageSize') || '50', 10);
+  // Security: Get userId from authenticated session only
+  const { userId, errorResponse } = await requireAuthenticatedUser();
+  if (errorResponse) return errorResponse;
 
-  if (!userId) {
-    return NextResponse.json(
-      { error: 'userId is required' },
-      { status: 400 }
-    );
-  }
+  const { searchParams } = new URL(request.url);
+  const folderId = searchParams.get("folderId") || "root";
+  const search = searchParams.get("search");
+  const pageToken = searchParams.get("pageToken") || undefined;
+  const pageSize = parseInt(searchParams.get("pageSize") || "50", 10);
 
   try {
     // If search query provided, search across Drive
     // Otherwise, list files in folder
     const result = search
-      ? await searchDriveFiles(userId, search, { pageSize, pageToken })
-      : await listDriveFiles(userId, { folderId, pageSize, pageToken });
+      ? await searchDriveFiles(userId!, search, { pageSize, pageToken })
+      : await listDriveFiles(userId!, { folderId, pageSize, pageToken });
 
     if (!result) {
       return NextResponse.json(
-        { error: 'Failed to fetch files. Please reconnect Google Drive.' },
-        { status: 401 }
+        { error: "Failed to fetch files. Please reconnect Google Drive." },
+        { status: 401 },
       );
     }
 
     // Get breadcrumbs for folder navigation (skip for search)
     const breadcrumbs = search
       ? []
-      : await getDriveFolderPath(userId, folderId);
+      : await getDriveFolderPath(userId!, folderId);
 
     // Convert to UI format
     const files = result.files.map(toDriveFileUI);
@@ -64,12 +61,15 @@ export async function GET(request: NextRequest) {
       nextPageToken: result.nextPageToken,
       hasMore: !!result.nextPageToken,
     });
-
   } catch (error) {
-    logger.error('Google Drive files list failed', { userId, folderId, search }, error);
+    logger.error(
+      "Google Drive files list failed",
+      { userId, folderId, search },
+      error,
+    );
     return NextResponse.json(
-      { error: 'Failed to list files' },
-      { status: 500 }
+      { error: "Failed to list files" },
+      { status: 500 },
     );
   }
 }

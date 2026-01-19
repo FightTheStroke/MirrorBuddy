@@ -5,25 +5,20 @@
  * Returns the current Google account connection status for a user.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import type { GoogleConnectionStatus } from '@/lib/google';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import type { GoogleConnectionStatus } from "@/lib/google";
+import { logger } from "@/lib/logger";
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
-
-  if (!userId) {
-    return NextResponse.json(
-      { error: 'userId is required' },
-      { status: 400 }
-    );
-  }
+  // Security: Get userId from authenticated session only
+  const { userId, errorResponse } = await requireAuthenticatedUser();
+  if (errorResponse) return errorResponse;
 
   try {
     const account = await prisma.googleAccount.findUnique({
-      where: { userId },
+      where: { userId: userId! },
       select: {
         isConnected: true,
         email: true,
@@ -59,12 +54,11 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json(status);
-
   } catch (error) {
-    logger.error('Google status check failed', { userId }, error);
+    logger.error("Google status check failed", { userId }, error);
     return NextResponse.json(
-      { error: 'Failed to get status' },
-      { status: 500 }
+      { error: "Failed to get status" },
+      { status: 500 },
     );
   }
 }

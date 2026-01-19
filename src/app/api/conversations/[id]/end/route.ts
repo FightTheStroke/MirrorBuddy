@@ -13,6 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
@@ -47,22 +48,19 @@ export async function POST(request: NextRequest, context: RouteParams) {
       );
     }
 
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const { id: conversationId } = await context.params;
     const body = await request.json();
-    const { userId, reason = "explicit" } = body;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 },
-      );
-    }
+    const { reason = "explicit" } = body;
 
     // Verify conversation exists and belongs to user
     const conversation = await prisma.conversation.findFirst({
       where: {
         id: conversationId,
-        userId,
+        userId: userId!,
       },
     });
 
@@ -141,7 +139,7 @@ export async function POST(request: NextRequest, context: RouteParams) {
         const parentNoteId = await generateAndSaveParentNote(
           {
             sessionId: conversationId,
-            userId,
+            userId: userId!,
             maestroId: conversation.maestroId,
             maestroName,
             subject,
@@ -201,21 +199,16 @@ export async function POST(request: NextRequest, context: RouteParams) {
  */
 export async function GET(request: NextRequest, context: RouteParams) {
   try {
-    const { id: conversationId } = await context.params;
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 },
-      );
-    }
+    const { id: conversationId } = await context.params;
 
     const conversation = await prisma.conversation.findFirst({
       where: {
         id: conversationId,
-        userId,
+        userId: userId!,
       },
       select: {
         id: true,

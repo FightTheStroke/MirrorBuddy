@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-import type { DiagramRequest } from '@/types';
+import { useEffect, useRef, useState } from "react";
+import { motion } from "framer-motion";
+import DOMPurify from "dompurify";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import type { DiagramRequest } from "@/types";
 
 // Mermaid type for ref - avoids static import that bundles the library
 type MermaidAPI = {
@@ -15,24 +16,24 @@ type MermaidAPI = {
 // Mermaid configuration
 const MERMAID_CONFIG = {
   startOnLoad: false,
-  theme: 'dark',
+  theme: "dark",
   themeVariables: {
-    primaryColor: '#3b82f6',
-    primaryTextColor: '#f1f5f9',
-    primaryBorderColor: '#64748b',
-    lineColor: '#64748b',
-    secondaryColor: '#1e293b',
-    tertiaryColor: '#0f172a',
-    background: '#1e293b',
-    mainBkg: '#1e293b',
-    nodeBorder: '#64748b',
-    clusterBkg: '#0f172a',
-    clusterBorder: '#334155',
-    titleColor: '#f1f5f9',
-    edgeLabelBackground: '#1e293b',
+    primaryColor: "#3b82f6",
+    primaryTextColor: "#f1f5f9",
+    primaryBorderColor: "#64748b",
+    lineColor: "#64748b",
+    secondaryColor: "#1e293b",
+    tertiaryColor: "#0f172a",
+    background: "#1e293b",
+    mainBkg: "#1e293b",
+    nodeBorder: "#64748b",
+    clusterBkg: "#0f172a",
+    clusterBorder: "#334155",
+    titleColor: "#f1f5f9",
+    edgeLabelBackground: "#1e293b",
   },
   flowchart: {
-    curve: 'basis',
+    curve: "basis",
     padding: 20,
   },
   sequence: {
@@ -69,7 +70,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         // Lazy load mermaid library with race condition protection
         if (!mermaidRef.current) {
           if (!loadingPromiseRef.current) {
-            loadingPromiseRef.current = import('mermaid').then((module) => {
+            loadingPromiseRef.current = import("mermaid").then((module) => {
               module.default.initialize(MERMAID_CONFIG);
               return module.default;
             });
@@ -78,7 +79,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         }
 
         // Clear previous content
-        containerRef.current.innerHTML = '';
+        containerRef.current.innerHTML = "";
 
         // Generate unique ID
         const id = `mermaid-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
@@ -87,13 +88,18 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         const { svg } = await mermaidRef.current.render(id, request.code);
 
         if (containerRef.current) {
-          containerRef.current.innerHTML = svg;
+          // Sanitize SVG to prevent XSS attacks
+          const sanitizedSvg = DOMPurify.sanitize(svg, {
+            USE_PROFILES: { svg: true, svgFilters: true },
+            ADD_TAGS: ["use"],
+          });
+          containerRef.current.innerHTML = sanitizedSvg;
           setRendered(true);
         }
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         setError(errorMsg);
-        logger.error('Mermaid render error', { error: String(err) });
+        logger.error("Mermaid render error", { error: String(err) });
       } finally {
         setIsLoading(false);
       }
@@ -107,14 +113,16 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800',
-        className
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800",
+        className,
       )}
     >
       {/* Title */}
       {request.title && (
         <div className="px-4 py-2 border-b border-slate-700 bg-slate-800/50">
-          <h3 className="text-sm font-medium text-slate-200">{request.title}</h3>
+          <h3 className="text-sm font-medium text-slate-200">
+            {request.title}
+          </h3>
         </div>
       )}
 
@@ -128,8 +136,9 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
           <div
             ref={containerRef}
             className={cn(
-              'flex justify-center items-center min-h-[200px]',
-              (isLoading || !rendered) && 'animate-pulse bg-slate-700/50 rounded-lg'
+              "flex justify-center items-center min-h-[200px]",
+              (isLoading || !rendered) &&
+                "animate-pulse bg-slate-700/50 rounded-lg",
             )}
           />
         )}
@@ -152,28 +161,43 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
 export const diagramTemplates = {
   flowchart: (steps: string[]) => `
 flowchart TD
-${steps.map((step, i) => `    S${i}["${step}"]`).join('\n')}
-${steps.slice(0, -1).map((_, i) => `    S${i} --> S${i + 1}`).join('\n')}
+${steps.map((step, i) => `    S${i}["${step}"]`).join("\n")}
+${steps
+  .slice(0, -1)
+  .map((_, i) => `    S${i} --> S${i + 1}`)
+  .join("\n")}
 `,
 
-  sequence: (actors: string[], messages: Array<{ from: string; to: string; text: string }>) => `
+  sequence: (
+    actors: string[],
+    messages: Array<{ from: string; to: string; text: string }>,
+  ) => `
 sequenceDiagram
-${actors.map(a => `    participant ${a}`).join('\n')}
-${messages.map(m => `    ${m.from}->>+${m.to}: ${m.text}`).join('\n')}
+${actors.map((a) => `    participant ${a}`).join("\n")}
+${messages.map((m) => `    ${m.from}->>+${m.to}: ${m.text}`).join("\n")}
 `,
 
   // Mind maps use MarkMap - see markmap-renderer.tsx and ADR 0001
 
-  classDiagram: (classes: Array<{ name: string; attributes: string[]; methods: string[] }>) => `
+  classDiagram: (
+    classes: Array<{ name: string; attributes: string[]; methods: string[] }>,
+  ) => `
 classDiagram
-${classes.map(c => `    class ${c.name} {
-${c.attributes.map(a => `        ${a}`).join('\n')}
-${c.methods.map(m => `        ${m}()`).join('\n')}
-    }`).join('\n')}
+${classes
+  .map(
+    (c) => `    class ${c.name} {
+${c.attributes.map((a) => `        ${a}`).join("\n")}
+${c.methods.map((m) => `        ${m}()`).join("\n")}
+    }`,
+  )
+  .join("\n")}
 `,
 
-  stateDiagram: (states: string[], transitions: Array<{ from: string; to: string; label?: string }>) => `
+  stateDiagram: (
+    states: string[],
+    transitions: Array<{ from: string; to: string; label?: string }>,
+  ) => `
 stateDiagram-v2
-${transitions.map(t => `    ${t.from} --> ${t.to}${t.label ? `: ${t.label}` : ''}`).join('\n')}
+${transitions.map((t) => `    ${t.from} --> ${t.to}${t.label ? `: ${t.label}` : ""}`).join("\n")}
 `,
 };

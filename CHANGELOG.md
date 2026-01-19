@@ -5,6 +5,64 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1-beta] - 2026-01-19 - Security Audit Hardening (ADR 0060)
+
+### Security
+
+#### Authorization Hardening
+
+- **Session-Only Auth**: All 14+ API routes now validate userId from signed session cookie only
+- **requireAuthenticatedUser()**: New helper rejects userId from request params/body
+
+#### OAuth Security (RFC 7636)
+
+- **PKCE Implementation**: code_verifier/code_challenge with SHA-256
+- **Signed State**: HMAC-SHA256 signature with 10-minute expiry
+- **Token Encryption**: AES-256-GCM encryption at rest for OAuth tokens
+
+#### Rate Limiting
+
+- **Login**: 5 requests per 15 minutes (brute force prevention)
+- **Password Change**: 3 requests per 15 minutes
+- **OAuth**: 10 requests per minute
+- **Invite Requests**: 3 requests per hour (public endpoint)
+- **COPPA Verification**: 5 requests per hour
+
+#### XSS Prevention
+
+- **DOMPurify**: SVG sanitization for Mermaid diagram output
+
+#### COPPA Compliance
+
+- **Email Verification**: 6-digit codes via RESEND for parental consent
+- **Age Gating**: Children under 13 require verified parental consent
+
+#### GDPR Compliance
+
+- **Unified Deletion**: Single `executeUserDataDeletion()` for all 20+ tables
+- **Token Revocation**: Google OAuth tokens revoked before database deletion
+- **Breach Protocol**: `docs/security/DATA-BREACH-PROTOCOL.md` runbook
+
+### Added
+
+- `src/lib/security/encryption.ts` - AES-256-GCM token encryption
+- `src/lib/email/templates/coppa-templates.ts` - Parental consent emails
+- `docs/security/DATA-BREACH-PROTOCOL.md` - GDPR Art. 33/34 runbook
+- `docs/adr/0060-security-audit-hardening.md` - Architecture decision record
+
+### Changed
+
+- `src/lib/auth/session-auth.ts` - Added requireAuthenticatedUser helper
+- `src/lib/google/oauth.ts` - PKCE, signed state, token encryption
+- `src/lib/rate-limit.ts` - Auth-specific rate limit configs
+- `src/lib/compliance/coppa-service.ts` - Email verification integration
+
+### Breaking Changes
+
+- **Required**: `TOKEN_ENCRYPTION_KEY` environment variable (32+ characters)
+
+---
+
 ## [1.0.0-beta] - 2026-01-18 - MVP Beta Release
 
 ### Added
@@ -53,6 +111,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 #### Web Vitals Analytics (Plan 053 - W1/W2)
+
 - **Real-time Collection (F-01)**: Core Web Vitals (LCP, CLS, INP, TTFB, FCP) with userId for debugging
 - **Consent Integration (F-02)**: Analytics only collected with explicit user consent via Zustand store
 - **API Endpoint (F-03)**: POST `/api/metrics/web-vitals` with rate limiting (60 req/min)
@@ -62,6 +121,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Data Retention (F-07)**: 90-day retention policy, 30-day for user-tagged data
 
 #### Terms of Service (Plan 053 - W3)
+
 - **ToS Page (F-11)**: Simple Italian ToS at `/terms` with TL;DR summary
 - **Acceptance Modal (F-12)**: Non-dismissible WCAG compliant modal on first login
 - **Database Model (F-13)**: TosAcceptance with versioning and audit trail (IP, userAgent)
@@ -69,16 +129,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Admin Panel (F-15)**: `/admin/tos` to view acceptances by user/version/date
 
 #### Legal Documents (Plan 053 - W4)
+
 - **Privacy Policy (F-16)**: 14-section page at `/privacy` including Web Vitals disclosure
 - **Cookie Policy (F-17)**: Detailed cookie list at `/cookies` with management instructions
 - **Re-consent System (F-18)**: Automatic re-consent when ToS/Privacy version changes
 
 ### Security
+
 - **CSRF Protection**: ToS POST endpoint protected with CSRF token validation
 - **Rate Limiting**: 10 req/min on ToS POST to prevent abuse
 - **Audit Trail**: ToS acceptance logged with sanitized IP and userAgent
 
 ---
+
 ## [0.7.0] - 2025-01-18 - Security Hardening Release
 
 ### Security

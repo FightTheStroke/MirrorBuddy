@@ -11,3 +11,8 @@ export {
   CSRF_TOKEN_HEADER,
   CSRF_TOKEN_COOKIE,
 } from "./csrf";
+export {
+  encryptToken,
+  decryptToken,
+  isEncryptionConfigured,
+} from "./encryption";

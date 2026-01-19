@@ -8,11 +8,17 @@
  * @see https://www.ftc.gov/legal-library/browse/rules/childrens-online-privacy-protection-rule-coppa
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { randomBytes } from 'crypto';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { sendEmail, isEmailConfigured } from "@/lib/email";
+import {
+  getParentalConsentRequestTemplate,
+  getParentalConsentConfirmationTemplate,
+} from "@/lib/email/templates/coppa-templates";
+import { randomBytes } from "crypto";
 
-const log = logger.child({ module: 'coppa' });
+const log = logger.child({ module: "coppa" });
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
 /** COPPA age threshold */
 export const COPPA_AGE_THRESHOLD = 13;
@@ -81,7 +87,7 @@ export async function checkCoppaStatus(userId: string): Promise<CoppaStatus> {
     const consentPending = Boolean(
       consent?.verificationSentAt &&
       consent?.verificationExpiresAt &&
-      new Date(consent.verificationExpiresAt) > new Date()
+      new Date(consent.verificationExpiresAt) > new Date(),
     );
 
     return {
@@ -91,7 +97,7 @@ export async function checkCoppaStatus(userId: string): Promise<CoppaStatus> {
       age,
     };
   } catch (error) {
-    log.error('Failed to check COPPA status', { userId, error: String(error) });
+    log.error("Failed to check COPPA status", { userId, error: String(error) });
     // Fail safe: require consent on error for under-13
     return {
       requiresConsent: true,
@@ -106,21 +112,32 @@ export async function checkCoppaStatus(userId: string): Promise<CoppaStatus> {
  * Generate verification code
  */
 function generateVerificationCode(): string {
-  return randomBytes(3).toString('hex').toUpperCase(); // 6 char code
+  return randomBytes(3).toString("hex").toUpperCase(); // 6 char code
 }
 
 /**
  * Request parental consent for a user
- * Initiates the consent flow by creating a consent record and generating a code
+ * Initiates the consent flow by creating a consent record and sending verification email
  */
 export async function requestParentalConsent(
   userId: string,
   age: number,
-  parentEmail: string
-): Promise<{ verificationCode: string; expiresAt: Date }> {
+  parentEmail: string,
+  childName?: string,
+): Promise<{ verificationCode: string; expiresAt: Date; emailSent: boolean }> {
   const verificationCode = generateVerificationCode();
   const now = new Date();
   const expiresAt = new Date(now.getTime() + VERIFICATION_EXPIRY_MS);
+
+  // Get child name from profile if not provided
+  let resolvedName: string = childName || "";
+  if (!resolvedName) {
+    const profile = await prisma.profile.findUnique({
+      where: { userId },
+      select: { name: true },
+    });
+    resolvedName = profile?.name || "il tuo bambino";
+  }
 
   await prisma.coppaConsent.upsert({
     where: { userId },
@@ -143,13 +160,49 @@ export async function requestParentalConsent(
     },
   });
 
-  log.info('Parental consent requested', {
+  // Send verification email to parent
+  let emailSent = false;
+  if (isEmailConfigured()) {
+    const verificationUrl = `${APP_URL}/coppa/verify?code=${verificationCode}`;
+    const template = getParentalConsentRequestTemplate({
+      childName: resolvedName,
+      childAge: age,
+      parentEmail,
+      verificationCode,
+      verificationUrl,
+      expiresAt,
+    });
+
+    const result = await sendEmail({
+      to: template.to,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    emailSent = result.success;
+    if (!result.success) {
+      log.error("Failed to send COPPA verification email", {
+        userId,
+        parentEmail,
+        error: result.error,
+      });
+    }
+  } else {
+    log.warn("Email not configured, COPPA verification email not sent", {
+      userId,
+      parentEmail,
+    });
+  }
+
+  log.info("Parental consent requested", {
     userId,
     age,
     expiresAt: expiresAt.toISOString(),
+    emailSent,
   });
 
-  return { verificationCode, expiresAt };
+  return { verificationCode, expiresAt, emailSent };
 }
 
 /**
@@ -157,7 +210,7 @@ export async function requestParentalConsent(
  */
 export async function verifyParentalConsent(
   verificationCode: string,
-  ipAddress?: string
+  ipAddress?: string,
 ): Promise<{ success: boolean; error?: string; userId?: string }> {
   try {
     const consent = await prisma.coppaConsent.findFirst({
@@ -165,13 +218,14 @@ export async function verifyParentalConsent(
       select: {
         id: true,
         userId: true,
+        parentEmail: true,
         verificationExpiresAt: true,
         consentGranted: true,
       },
     });
 
     if (!consent) {
-      return { success: false, error: 'Invalid verification code' };
+      return { success: false, error: "Invalid verification code" };
     }
 
     if (consent.consentGranted) {
@@ -182,7 +236,7 @@ export async function verifyParentalConsent(
       consent.verificationExpiresAt &&
       new Date(consent.verificationExpiresAt) < new Date()
     ) {
-      return { success: false, error: 'Verification code expired' };
+      return { success: false, error: "Verification code expired" };
     }
 
     // Grant consent
@@ -196,20 +250,101 @@ export async function verifyParentalConsent(
       },
     });
 
-    log.info('Parental consent granted', { userId: consent.userId });
+    log.info("Parental consent granted", { userId: consent.userId });
+
+    // Send confirmation email to parent
+    if (isEmailConfigured() && consent.parentEmail) {
+      const profile = await prisma.profile.findUnique({
+        where: { userId: consent.userId },
+        select: { name: true },
+      });
+      const childName = profile?.name || "il tuo bambino";
+
+      const template = getParentalConsentConfirmationTemplate({
+        childName,
+        parentEmail: consent.parentEmail,
+      });
+
+      const result = await sendEmail({
+        to: template.to,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      });
+
+      if (!result.success) {
+        log.warn("Failed to send COPPA confirmation email", {
+          userId: consent.userId,
+          error: result.error,
+        });
+      }
+    }
 
     return { success: true, userId: consent.userId };
   } catch (error) {
-    log.error('Failed to verify parental consent', { error: String(error) });
-    return { success: false, error: 'Verification failed' };
+    log.error("Failed to verify parental consent", { error: String(error) });
+    return { success: false, error: "Verification failed" };
   }
 }
 
 /**
- * Deny parental consent (parent declines)
+ * Deny parental consent by verification code (parent declines via email link)
+ * This function denies consent WITHOUT granting it first, ensuring the parent's
+ * denial is honored immediately and atomically.
+ */
+export async function denyParentalConsentByCode(
+  verificationCode: string,
+  ipAddress?: string,
+): Promise<{ success: boolean; error?: string; userId?: string }> {
+  try {
+    const consent = await prisma.coppaConsent.findFirst({
+      where: { verificationCode },
+      select: {
+        id: true,
+        userId: true,
+        verificationExpiresAt: true,
+        consentGranted: true,
+      },
+    });
+
+    if (!consent) {
+      return { success: false, error: "Invalid verification code" };
+    }
+
+    if (
+      consent.verificationExpiresAt &&
+      new Date(consent.verificationExpiresAt) < new Date()
+    ) {
+      return { success: false, error: "Verification code expired" };
+    }
+
+    // Deny consent directly - no granting first
+    await prisma.coppaConsent.update({
+      where: { id: consent.id },
+      data: {
+        consentGranted: false,
+        consentDeniedAt: new Date(),
+        parentIpAddress: ipAddress,
+        verificationCode: null, // Clear code after use
+      },
+    });
+
+    log.info("Parental consent denied via code", { userId: consent.userId });
+
+    return { success: true, userId: consent.userId };
+  } catch (error) {
+    log.error("Failed to deny parental consent by code", {
+      error: String(error),
+    });
+    return { success: false, error: "Denial failed" };
+  }
+}
+
+/**
+ * Deny parental consent by userId (admin action)
  */
 export async function denyParentalConsent(
-  userId: string
+  userId: string,
 ): Promise<{ success: boolean }> {
   try {
     await prisma.coppaConsent.update({
@@ -221,10 +356,10 @@ export async function denyParentalConsent(
       },
     });
 
-    log.info('Parental consent denied', { userId });
+    log.info("Parental consent denied", { userId });
     return { success: true };
   } catch (error) {
-    log.error('Failed to deny consent', { userId, error: String(error) });
+    log.error("Failed to deny consent", { userId, error: String(error) });
     return { success: false };
   }
 }
