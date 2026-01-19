@@ -5,11 +5,11 @@
 // Analyzes study patterns, tool usage, and learning independence
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { DEFAULT_METHOD_PROGRESS } from '@/lib/method-progress/types';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { DEFAULT_METHOD_PROGRESS } from "@/lib/method-progress/types";
 import {
   calculateStreakConsistency,
   calculateStudyTimeDistribution,
@@ -22,22 +22,12 @@ import {
   calculateXpGrowthRate,
   determineImprovementTrend,
   calculateWeeklyActivity,
-} from './helpers';
-import type { AutonomyMetrics } from './types';
+} from "./helpers";
+import type { AutonomyMetrics } from "./types";
 
 export async function GET(request: NextRequest) {
   try {
-    // Check for userId in query params (for method progress fetch)
-    const { searchParams } = new URL(request.url);
-    const queryUserId = searchParams.get('userId');
-
-    // If userId is provided, return method progress data
-    if (queryUserId) {
-      const result = await getMethodProgress(queryUserId);
-      return NextResponse.json(result);
-    }
-
-    // Otherwise, get userId from cookies for autonomy metrics
+    // Security: Always get userId from authenticated session, never from query params
     const auth = await validateAuth();
     if (!auth.authenticated) {
       return NextResponse.json({ error: auth.error }, { status: 401 });
@@ -45,24 +35,42 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     // Fetch all relevant data in parallel
-    const [progress, sessions, flashcards, quizResults, _learnings, methodProgress] = await Promise.all([
+    const [
+      progress,
+      sessions,
+      flashcards,
+      quizResults,
+      _learnings,
+      methodProgress,
+    ] = await Promise.all([
       prisma.progress.findUnique({ where: { userId } }),
       prisma.studySession.findMany({
-        where: { userId, startedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-        orderBy: { startedAt: 'desc' },
+        where: {
+          userId,
+          startedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
+        orderBy: { startedAt: "desc" },
       }),
       prisma.flashcardProgress.findMany({ where: { userId } }),
       prisma.quizResult.findMany({
-        where: { userId, completedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) } },
-        orderBy: { completedAt: 'desc' },
+        where: {
+          userId,
+          completedAt: { gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) },
+        },
+        orderBy: { completedAt: "desc" },
       }),
       prisma.learning.findMany({ where: { userId } }),
       prisma.methodProgress.findUnique({ where: { userId } }),
     ]);
 
     // Calculate data quality based on available data
-    const dataPoints = [sessions.length, flashcards.length, quizResults.length].filter(n => n > 0).length;
-    const dataQuality: 'high' | 'medium' | 'low' = dataPoints >= 3 ? 'high' : dataPoints >= 2 ? 'medium' : 'low';
+    const dataPoints = [
+      sessions.length,
+      flashcards.length,
+      quizResults.length,
+    ].filter((n) => n > 0).length;
+    const dataQuality: "high" | "medium" | "low" =
+      dataPoints >= 3 ? "high" : dataPoints >= 2 ? "medium" : "low";
 
     // Calculate self-regulation metrics
     const streakConsistency = calculateStreakConsistency(progress);
@@ -76,12 +84,15 @@ export async function GET(request: NextRequest) {
 
     // Calculate learning patterns
     const avgSessionDuration = calculateAverageSessionDuration(sessions);
-    const questionsPerSession = sessions.length > 0
-      ? Math.round(sessions.reduce((sum, s) => sum + s.questions, 0) / sessions.length)
-      : 0;
+    const questionsPerSession =
+      sessions.length > 0
+        ? Math.round(
+            sessions.reduce((sum, s) => sum + s.questions, 0) / sessions.length,
+          )
+        : 0;
     const preferredStudyTime = determinePreferredStudyTime(sessions);
-    const uniqueSubjects = new Set(sessions.map(s => s.subject)).size;
-    const uniqueMaestros = new Set(sessions.map(s => s.maestroId)).size;
+    const uniqueSubjects = new Set(sessions.map((s) => s.subject)).size;
+    const uniqueMaestros = new Set(sessions.map((s) => s.maestroId)).size;
 
     // Calculate growth indicators
     const xpGrowthRate = calculateXpGrowthRate(sessions);
@@ -90,12 +101,12 @@ export async function GET(request: NextRequest) {
 
     // Calculate overall independence score (weighted average)
     const independenceScore = Math.round(
-      (streakConsistency * 0.25) +
-      (studyTimeDistribution * 0.2) +
-      (taskCompletionRate * 0.15) +
-      (flashcardRetention * 0.15) +
-      (averageQuizScore * 0.15) +
-      (Math.min(uniqueMaestros * 10, 100) * 0.1)
+      streakConsistency * 0.25 +
+        studyTimeDistribution * 0.2 +
+        taskCompletionRate * 0.15 +
+        flashcardRetention * 0.15 +
+        averageQuizScore * 0.15 +
+        Math.min(uniqueMaestros * 10, 100) * 0.1,
     );
 
     // Calculate weekly activity
@@ -134,26 +145,38 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(metrics);
   } catch (error) {
-    logger.error('Autonomy metrics GET error', { error: String(error) });
+    logger.error("Autonomy metrics GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to calculate autonomy metrics' },
-      { status: 500 }
+      { error: "Failed to calculate autonomy metrics" },
+      { status: 500 },
     );
   }
 }
 
 // ============================================================================
 // POST: Save Method Progress (Issue #28)
+// Security: userId is taken from authenticated session, not request body
 // ============================================================================
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { userId, mindMaps, flashcards, selfAssessment, helpBehavior, methodTransfer, events, autonomyScore } = body;
-
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
+    // Security: Get userId from authenticated session only
+    const auth = await validateAuth();
+    if (!auth.authenticated) {
+      return NextResponse.json({ error: auth.error }, { status: 401 });
     }
+    const userId = auth.userId!;
+
+    const body = await request.json();
+    const {
+      mindMaps,
+      flashcards,
+      selfAssessment,
+      helpBehavior,
+      methodTransfer,
+      events,
+      autonomyScore,
+    } = body;
 
     // Upsert method progress
     const methodProgress = await prisma.methodProgress.upsert({
@@ -161,25 +184,44 @@ export async function POST(request: NextRequest) {
       create: {
         userId,
         mindMaps: JSON.stringify(mindMaps || DEFAULT_METHOD_PROGRESS.mindMaps),
-        flashcards: JSON.stringify(flashcards || DEFAULT_METHOD_PROGRESS.flashcards),
-        selfAssessment: JSON.stringify(selfAssessment || DEFAULT_METHOD_PROGRESS.selfAssessment),
-        helpBehavior: JSON.stringify(helpBehavior || DEFAULT_METHOD_PROGRESS.helpBehavior),
-        methodTransfer: JSON.stringify(methodTransfer || DEFAULT_METHOD_PROGRESS.methodTransfer),
+        flashcards: JSON.stringify(
+          flashcards || DEFAULT_METHOD_PROGRESS.flashcards,
+        ),
+        selfAssessment: JSON.stringify(
+          selfAssessment || DEFAULT_METHOD_PROGRESS.selfAssessment,
+        ),
+        helpBehavior: JSON.stringify(
+          helpBehavior || DEFAULT_METHOD_PROGRESS.helpBehavior,
+        ),
+        methodTransfer: JSON.stringify(
+          methodTransfer || DEFAULT_METHOD_PROGRESS.methodTransfer,
+        ),
         events: JSON.stringify(events || []),
         autonomyScore: autonomyScore || 0,
       },
       update: {
         mindMaps: JSON.stringify(mindMaps || DEFAULT_METHOD_PROGRESS.mindMaps),
-        flashcards: JSON.stringify(flashcards || DEFAULT_METHOD_PROGRESS.flashcards),
-        selfAssessment: JSON.stringify(selfAssessment || DEFAULT_METHOD_PROGRESS.selfAssessment),
-        helpBehavior: JSON.stringify(helpBehavior || DEFAULT_METHOD_PROGRESS.helpBehavior),
-        methodTransfer: JSON.stringify(methodTransfer || DEFAULT_METHOD_PROGRESS.methodTransfer),
+        flashcards: JSON.stringify(
+          flashcards || DEFAULT_METHOD_PROGRESS.flashcards,
+        ),
+        selfAssessment: JSON.stringify(
+          selfAssessment || DEFAULT_METHOD_PROGRESS.selfAssessment,
+        ),
+        helpBehavior: JSON.stringify(
+          helpBehavior || DEFAULT_METHOD_PROGRESS.helpBehavior,
+        ),
+        methodTransfer: JSON.stringify(
+          methodTransfer || DEFAULT_METHOD_PROGRESS.methodTransfer,
+        ),
         events: JSON.stringify(events || []),
         autonomyScore: autonomyScore || 0,
       },
     });
 
-    logger.info('Method progress saved', { userId, autonomyScore: methodProgress.autonomyScore });
+    logger.info("Method progress saved", {
+      userId,
+      autonomyScore: methodProgress.autonomyScore,
+    });
 
     return NextResponse.json({
       success: true,
@@ -190,10 +232,10 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Method progress POST error', { error: String(error) });
+    logger.error("Method progress POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to save method progress' },
-      { status: 500 }
+      { error: "Failed to save method progress" },
+      { status: 500 },
     );
   }
 }
@@ -233,10 +275,10 @@ export async function getMethodProgress(userId: string) {
       },
     };
   } catch (error) {
-    logger.error('Get method progress error', { error: String(error), userId });
+    logger.error("Get method progress error", { error: String(error), userId });
     return {
       success: false,
-      error: 'Failed to fetch method progress',
+      error: "Failed to fetch method progress",
     };
   }
 }

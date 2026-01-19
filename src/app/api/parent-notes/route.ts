@@ -5,14 +5,15 @@
  * Part of Session Summary & Unified Archive feature.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 import {
   getRecentParentNotes,
   markParentNoteViewed,
   getUnreadParentNotesCount,
-} from '@/lib/session/parent-note-generator';
-import { prisma } from '@/lib/db';
+} from "@/lib/session/parent-note-generator";
+import { prisma } from "@/lib/db";
 
 /**
  * GET /api/parent-notes
@@ -27,27 +28,23 @@ import { prisma } from '@/lib/db';
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const limit = parseInt(searchParams.get('limit') || '10', 10);
-    const unreadOnly = searchParams.get('unreadOnly') === 'true';
-    const countOnly = searchParams.get('countOnly') === 'true';
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
-      );
-    }
+    const { searchParams } = new URL(request.url);
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
+    const unreadOnly = searchParams.get("unreadOnly") === "true";
+    const countOnly = searchParams.get("countOnly") === "true";
 
     // If just counting unread
     if (countOnly) {
-      const count = await getUnreadParentNotesCount(userId);
+      const count = await getUnreadParentNotesCount(userId!);
       return NextResponse.json({ unreadCount: count });
     }
 
     // Get notes
-    let notes = await getRecentParentNotes(userId, limit);
+    let notes = await getRecentParentNotes(userId!, limit);
 
     // Filter to unread only if requested
     if (unreadOnly) {
@@ -60,10 +57,10 @@ export async function GET(request: NextRequest) {
       unreadCount: notes.filter((n) => !n.viewedAt).length,
     });
   } catch (error) {
-    logger.error('Failed to get parent notes', { error: String(error) });
+    logger.error("Failed to get parent notes", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get parent notes' },
-      { status: 500 }
+      { error: "Failed to get parent notes" },
+      { status: 500 },
     );
   }
 }
@@ -84,12 +81,12 @@ export async function PATCH(request: NextRequest) {
 
     if (!noteId) {
       return NextResponse.json(
-        { error: 'noteId is required' },
-        { status: 400 }
+        { error: "noteId is required" },
+        { status: 400 },
       );
     }
 
-    if (action === 'markViewed') {
+    if (action === "markViewed") {
       await markParentNoteViewed(noteId);
 
       return NextResponse.json({
@@ -100,14 +97,14 @@ export async function PATCH(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { error: 'Invalid action. Supported: markViewed' },
-      { status: 400 }
+      { error: "Invalid action. Supported: markViewed" },
+      { status: 400 },
     );
   } catch (error) {
-    logger.error('Failed to update parent note', { error: String(error) });
+    logger.error("Failed to update parent note", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to update parent note' },
-      { status: 500 }
+      { error: "Failed to update parent note" },
+      { status: 500 },
     );
   }
 }
@@ -123,43 +120,44 @@ export async function PATCH(request: NextRequest) {
  */
 export async function DELETE(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { noteId, userId } = body;
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    if (!noteId || !userId) {
+    const body = await request.json();
+    const { noteId } = body;
+
+    if (!noteId) {
       return NextResponse.json(
-        { error: 'noteId and userId are required' },
-        { status: 400 }
+        { error: "noteId is required" },
+        { status: 400 },
       );
     }
 
     // Verify ownership
     const note = await prisma.parentNote.findFirst({
-      where: { id: noteId, userId },
+      where: { id: noteId, userId: userId! },
     });
 
     if (!note) {
-      return NextResponse.json(
-        { error: 'Note not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Note not found" }, { status: 404 });
     }
 
     await prisma.parentNote.delete({
       where: { id: noteId },
     });
 
-    logger.info('Parent note deleted', { noteId, userId });
+    logger.info("Parent note deleted", { noteId, userId });
 
     return NextResponse.json({
       success: true,
       deleted: true,
     });
   } catch (error) {
-    logger.error('Failed to delete parent note', { error: String(error) });
+    logger.error("Failed to delete parent note", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete parent note' },
-      { status: 500 }
+      { error: "Failed to delete parent note" },
+      { status: 500 },
     );
   }
 }

@@ -6,25 +6,21 @@
  * Token is refreshed automatically if expired.
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getValidAccessToken } from '@/lib/google/oauth';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { getValidAccessToken } from "@/lib/google/oauth";
 
 export async function GET(request: NextRequest) {
-  const userId = request.nextUrl.searchParams.get('userId');
+  // Security: Get userId from authenticated session only
+  const { userId, errorResponse } = await requireAuthenticatedUser();
+  if (errorResponse) return errorResponse;
 
-  if (!userId) {
-    return NextResponse.json(
-      { error: 'userId is required' },
-      { status: 400 }
-    );
-  }
-
-  const accessToken = await getValidAccessToken(userId);
+  const accessToken = await getValidAccessToken(userId!);
 
   if (!accessToken) {
     return NextResponse.json(
-      { error: 'Not connected to Google Drive' },
-      { status: 401 }
+      { error: "Not connected to Google Drive" },
+      { status: 401 },
     );
   }
 

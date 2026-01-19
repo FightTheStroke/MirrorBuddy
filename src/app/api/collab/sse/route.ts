@@ -4,9 +4,10 @@
 // Part of Phase 8: Multi-User Collaboration
 // ============================================================================
 
-import { NextRequest } from 'next/server';
-import { logger } from '@/lib/logger';
-import { nanoid } from 'nanoid';
+import { NextRequest } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
+import { nanoid } from "nanoid";
 
 // ============================================================================
 // TYPES
@@ -49,7 +50,7 @@ export function registerCollabClient(
   clientId: string,
   roomId: string,
   userId: string,
-  controller: ReadableStreamDefaultController<Uint8Array>
+  controller: ReadableStreamDefaultController<Uint8Array>,
 ): void {
   collabClients.set(clientId, {
     id: clientId,
@@ -59,7 +60,7 @@ export function registerCollabClient(
     createdAt: Date.now(),
   });
 
-  logger.info('Collab SSE client registered', {
+  logger.info("Collab SSE client registered", {
     clientId,
     roomId,
     userId,
@@ -74,7 +75,7 @@ export function unregisterCollabClient(clientId: string): void {
   const client = collabClients.get(clientId);
   if (client) {
     collabClients.delete(clientId);
-    logger.info('Collab SSE client unregistered', {
+    logger.info("Collab SSE client unregistered", {
       clientId,
       roomId: client.roomId,
       totalClients: collabClients.size,
@@ -87,7 +88,7 @@ export function unregisterCollabClient(clientId: string): void {
  */
 export function broadcastCollabEvent(
   event: CollabSSEEvent,
-  excludeUserId?: string
+  excludeUserId?: string,
 ): void {
   const eventString = `data: ${JSON.stringify(event)}\n\n`;
   const eventBytes = new TextEncoder().encode(eventString);
@@ -102,7 +103,7 @@ export function broadcastCollabEvent(
       client.controller.enqueue(eventBytes);
       deliveredCount++;
     } catch (error) {
-      logger.warn('Failed to send to collab SSE client', {
+      logger.warn("Failed to send to collab SSE client", {
         clientId: client.id,
         error: String(error),
       });
@@ -110,7 +111,7 @@ export function broadcastCollabEvent(
     }
   });
 
-  logger.debug('Collab event broadcast', {
+  logger.debug("Collab event broadcast", {
     eventType: event.type,
     roomId: event.roomId,
     deliveredTo: deliveredCount,
@@ -148,7 +149,7 @@ export function cleanupStaleCollabClients(): number {
   });
 
   if (cleanedCount > 0) {
-    logger.info('Cleaned up stale collab SSE clients', { cleanedCount });
+    logger.info("Cleaned up stale collab SSE clients", { cleanedCount });
   }
 
   return cleanedCount;
@@ -159,51 +160,61 @@ export function cleanupStaleCollabClients(): number {
 // ============================================================================
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
-  const roomId = searchParams.get('roomId');
-  const userId = searchParams.get('userId');
+  // Security: Get userId from authenticated session only
+  const { userId, errorResponse } = await requireAuthenticatedUser();
+  if (errorResponse) return errorResponse;
 
-  if (!roomId || !userId) {
-    return new Response(
-      JSON.stringify({ error: 'roomId and userId are required' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
+  const { searchParams } = new URL(request.url);
+  const roomId = searchParams.get("roomId");
+
+  if (!roomId) {
+    return new Response(JSON.stringify({ error: "roomId is required" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 
   // Validate IDs
-  if (!/^[a-zA-Z0-9_-]{1,64}$/.test(roomId) || !/^[a-zA-Z0-9_-]{1,64}$/.test(userId)) {
+  if (
+    !/^[a-zA-Z0-9_-]{1,64}$/.test(roomId) ||
+    !/^[a-zA-Z0-9_-]{1,64}$/.test(userId!)
+  ) {
     return new Response(
-      JSON.stringify({ error: 'Invalid roomId or userId format' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: "Invalid roomId or userId format" }),
+      { status: 400, headers: { "Content-Type": "application/json" } },
     );
   }
 
   const clientId = nanoid();
   let heartbeatInterval: NodeJS.Timeout | null = null;
+  const finalUserId = userId!;
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       // Register client
-      registerCollabClient(clientId, roomId, userId, controller);
+      registerCollabClient(clientId, roomId, finalUserId, controller);
 
       // Send initial connection event
       const connectEvent = `data: ${JSON.stringify({
-        type: 'connected',
+        type: "connected",
         clientId,
         roomId,
-        userId,
+        userId: finalUserId,
         timestamp: Date.now(),
       })}\n\n`;
       controller.enqueue(new TextEncoder().encode(connectEvent));
 
       // Broadcast user joined to others
-      broadcastCollabEvent({
-        type: 'user:online',
-        roomId,
-        userId,
-        timestamp: Date.now(),
-        data: { clientId },
-      }, userId);
+      broadcastCollabEvent(
+        {
+          type: "user:online",
+          roomId,
+          userId: finalUserId,
+          timestamp: Date.now(),
+          data: { clientId },
+        },
+        finalUserId,
+      );
 
       // Setup heartbeat
       heartbeatInterval = setInterval(() => {
@@ -225,13 +236,16 @@ export async function GET(request: NextRequest) {
       }
 
       // Broadcast user offline to others
-      broadcastCollabEvent({
-        type: 'user:offline',
-        roomId,
-        userId,
-        timestamp: Date.now(),
-        data: { clientId },
-      }, userId);
+      broadcastCollabEvent(
+        {
+          type: "user:offline",
+          roomId,
+          userId: finalUserId,
+          timestamp: Date.now(),
+          data: { clientId },
+        },
+        finalUserId,
+      );
 
       unregisterCollabClient(clientId);
     },
@@ -239,10 +253,10 @@ export async function GET(request: NextRequest) {
 
   return new Response(stream, {
     headers: {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache, no-transform',
-      'Connection': 'keep-alive',
-      'X-Accel-Buffering': 'no',
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
     },
   });
 }

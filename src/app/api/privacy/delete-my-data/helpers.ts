@@ -1,16 +1,20 @@
 /**
  * GDPR Delete My Data helpers
+ *
+ * Comprehensive GDPR Article 17 - Right to Erasure implementation.
+ * Deletes ALL user data across all tables with audit logging.
  */
 
-import { Prisma } from '@prisma/client';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { Prisma } from "@prisma/client";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { disconnectGoogleAccount } from "@/lib/google";
 
-const log = logger.child({ module: 'gdpr-delete' });
+const log = logger.child({ module: "gdpr-delete" });
 
 /**
  * Execute complete user data deletion
- * Uses only models that exist in the current schema
+ * Comprehensive deletion of ALL user data for GDPR compliance
  */
 export async function executeUserDataDeletion(userId: string) {
   const deletedData = {
@@ -19,125 +23,143 @@ export async function executeUserDataDeletion(userId: string) {
     materials: 0,
     progress: 0,
     settings: 0,
+    googleAccount: 0,
+    coppaConsent: 0,
+    profile: 0,
+    onboarding: 0,
   };
 
+  // Step 1: Revoke Google OAuth tokens BEFORE deleting from DB
+  // This ensures we can still access the tokens for revocation
+  try {
+    await disconnectGoogleAccount(userId);
+    deletedData.googleAccount = 1;
+    log.info("Google account disconnected", { userId: userId.slice(0, 8) });
+  } catch (err) {
+    log.warn("Google account disconnect failed (may not exist)", {
+      error: String(err),
+    });
+  }
+
+  // Step 2: Delete all user data in transaction
   await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
-    // 1. Delete messages (child of conversations)
+    // Delete messages (child of conversations)
     const msgResult = await tx.message.deleteMany({
       where: { conversation: { userId } },
     });
     deletedData.messages = msgResult.count;
 
-    // 2. Delete conversations
+    // Delete conversations
     const convResult = await tx.conversation.deleteMany({
       where: { userId },
     });
     deletedData.conversations = convResult.count;
 
-    // 3. Delete materials (learning resources)
+    // Delete materials (learning resources)
     const matResult = await tx.material.deleteMany({
       where: { userId },
     });
     deletedData.materials = matResult.count;
 
-    // 4. Delete progress records
+    // Delete progress records
     const progressResult = await tx.progress.deleteMany({
       where: { userId },
     });
     deletedData.progress = progressResult.count;
 
-    // 5. Delete flashcard progress
-    await tx.flashcardProgress.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete flashcard progress (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete flashcard progress
+    await safeDeleteMany(tx.flashcardProgress, { userId }, "flashcardProgress");
 
-    // 6. Delete quiz results
-    await tx.quizResult.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete quiz results (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete quiz results
+    await safeDeleteMany(tx.quizResult, { userId }, "quizResult");
 
-    // 7. Delete study sessions
-    await tx.studySession.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete study sessions (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete study sessions
+    await safeDeleteMany(tx.studySession, { userId }, "studySession");
 
-    // 8. Delete settings
+    // Delete settings
     const settingsResult = await tx.settings.deleteMany({
       where: { userId },
     });
     deletedData.settings = settingsResult.count;
 
-    // 9. Delete accessibility settings
-    await tx.accessibilitySettings.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete accessibility settings (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete accessibility settings
+    await safeDeleteMany(tx.accessibilitySettings, { userId }, "accessibility");
 
-    // 10. Delete notifications
-    await tx.notification.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete notifications (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete notifications
+    await safeDeleteMany(tx.notification, { userId }, "notification");
 
-    // 11. Delete telemetry events
-    await tx.telemetryEvent.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete telemetry events (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete telemetry events
+    await safeDeleteMany(tx.telemetryEvent, { userId }, "telemetry");
 
-    // 12. Delete parent notes
-    await tx.parentNote.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete parent notes (optional table)', {
-        error: String(err),
-      });
-    });
+    // Delete parent notes
+    await safeDeleteMany(tx.parentNote, { userId }, "parentNote");
 
-    // 13. Delete collections and tags
-    await tx.materialTag.deleteMany({
-      where: { material: { userId } },
-    }).catch((err) => {
-      log.error('Failed to delete material tags (optional table)', {
-        error: String(err),
+    // Delete collections and tags
+    await tx.materialTag
+      .deleteMany({
+        where: { material: { userId } },
+      })
+      .catch(() => {
+        /* Optional table */
       });
-    });
 
-    await tx.collection.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete collections (optional table)', {
-        error: String(err),
-      });
-    });
+    await safeDeleteMany(tx.collection, { userId }, "collection");
+    await safeDeleteMany(tx.tag, { userId }, "tag");
 
-    await tx.tag.deleteMany({
-      where: { userId },
-    }).catch((err) => {
-      log.error('Failed to delete tags (optional table)', {
-        error: String(err),
+    // Delete COPPA consent records
+    const coppaResult = await tx.coppaConsent
+      .deleteMany({
+        where: { userId },
+      })
+      .catch(() => ({ count: 0 }));
+    deletedData.coppaConsent = coppaResult.count;
+
+    // Delete profile
+    const profileResult = await tx.profile
+      .deleteMany({
+        where: { userId },
+      })
+      .catch(() => ({ count: 0 }));
+    deletedData.profile = profileResult.count;
+
+    // Delete onboarding state
+    const onboardingResult = await tx.onboardingState
+      .deleteMany({
+        where: { userId },
+      })
+      .catch(() => ({ count: 0 }));
+    deletedData.onboarding = onboardingResult.count;
+
+    // Delete Google account record (tokens already revoked above)
+    await tx.googleAccount
+      .deleteMany({
+        where: { userId },
+      })
+      .catch(() => {
+        /* May not exist */
       });
+
+    // Delete learnings
+    await safeDeleteMany(tx.learning, { userId }, "learning");
+
+    // Delete pomodoro stats
+    await safeDeleteMany(tx.pomodoroStats, { userId }, "pomodoroStats");
+
+    // Delete calendar events
+    await safeDeleteMany(tx.calendarEvent, { userId }, "calendarEvent");
+
+    // Delete HTML snippets
+    await safeDeleteMany(tx.htmlSnippet, { userId }, "htmlSnippet");
+
+    // Delete homework sessions
+    await safeDeleteMany(tx.homeworkSession, { userId }, "homeworkSession");
+
+    // Delete push subscriptions
+    await safeDeleteMany(tx.pushSubscription, { userId }, "pushSubscription");
+
+    // Finally, delete the user record itself
+    await tx.user.deleteMany({
+      where: { id: userId },
     });
   });
 
@@ -145,8 +167,29 @@ export async function executeUserDataDeletion(userId: string) {
     success: true,
     deletedData,
     message:
-      'All your personal data has been permanently deleted. Thank you for using MirrorBuddy.',
+      "All your personal data has been permanently deleted. Thank you for using MirrorBuddy.",
   };
+}
+
+/**
+ * Safe delete helper for optional tables
+ */
+async function safeDeleteMany(
+  model: {
+    deleteMany: (args: {
+      where: { userId: string };
+    }) => Promise<{ count: number }>;
+  },
+  where: { userId: string },
+  tableName: string,
+): Promise<number> {
+  try {
+    const result = await model.deleteMany({ where });
+    return result.count;
+  } catch (err) {
+    log.debug(`Safe delete skipped for ${tableName}`, { error: String(err) });
+    return 0;
+  }
 }
 
 /**
@@ -174,10 +217,10 @@ export async function getUserDataSummary(userId: string) {
  * Logs to file since AuditLog model doesn't exist in schema yet
  */
 export function logDeletionAudit(userId: string, reason?: string): void {
-  log.info('GDPR deletion audit', {
-    action: 'GDPR_DATA_DELETION',
-    anonymizedUserId: userId.slice(0, 8) + '***',
-    reason: reason || 'user_request',
+  log.info("GDPR deletion audit", {
+    action: "GDPR_DATA_DELETION",
+    anonymizedUserId: userId.slice(0, 8) + "***",
+    reason: reason || "user_request",
     timestamp: new Date().toISOString(),
   });
 }

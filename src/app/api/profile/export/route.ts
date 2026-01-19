@@ -4,12 +4,21 @@
  * GDPR: Right of access - data portability
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, rateLimitResponse } from '@/lib/rate-limit';
-import type { MaestroObservation, LearningStrategy, LearningStyleProfile } from '@/types';
-import { generateProfileHTML } from './helpers';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import type {
+  MaestroObservation,
+  LearningStrategy,
+  LearningStyleProfile,
+} from "@/types";
+import { generateProfileHTML } from "./helpers";
 
 // Rate limit for exports (prevent abuse)
 const EXPORT_RATE_LIMIT = {
@@ -26,37 +35,49 @@ export async function GET(request: NextRequest) {
   const rateLimit = checkRateLimit(`export:${clientId}`, EXPORT_RATE_LIMIT);
 
   if (!rateLimit.success) {
-    logger.warn('Rate limit exceeded', { clientId, endpoint: '/api/profile/export' });
+    logger.warn("Rate limit exceeded", {
+      clientId,
+      endpoint: "/api/profile/export",
+    });
     return rateLimitResponse(rateLimit);
   }
 
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-    const format = searchParams.get('format') || 'json';
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    if (!userId) {
-      return NextResponse.json({ error: 'userId is required' }, { status: 400 });
-    }
+    const { searchParams } = new URL(request.url);
+    const format = searchParams.get("format") || "json";
 
     const profile = await prisma.studentInsightProfile.findUnique({
-      where: { userId },
-      include: {
-        accessLogs: {
-          orderBy: { timestamp: 'desc' },
-          take: 50,
-        },
+      where: { userId: userId! },
+      select: {
+        id: true,
+        userId: true,
+        studentName: true,
+        createdAt: true,
+        updatedAt: true,
+        strengths: true,
+        growthAreas: true,
+        strategies: true,
+        learningStyle: true,
+        sessionCount: true,
+        confidenceScore: true,
+        parentConsent: true,
+        studentConsent: true,
+        consentDate: true,
       },
     });
 
     if (!profile) {
-      return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
     }
 
     if (!profile.parentConsent) {
       return NextResponse.json(
-        { error: 'Consent required to export profile' },
-        { status: 403 }
+        { error: "Consent required to export profile" },
+        { status: 403 },
       );
     }
 
@@ -64,10 +85,10 @@ export async function GET(request: NextRequest) {
       data: {
         profileId: profile.id,
         userId: clientId,
-        action: 'download',
+        action: "download",
         details: `Exported as ${format.toUpperCase()}`,
         ipAddress: clientId,
-        userAgent: request.headers.get('user-agent') || undefined,
+        userAgent: request.headers.get("user-agent") || undefined,
       },
     });
 
@@ -85,26 +106,24 @@ export async function GET(request: NextRequest) {
         strengths: JSON.parse(profile.strengths) as MaestroObservation[],
         growthAreas: JSON.parse(profile.growthAreas) as MaestroObservation[],
         strategies: JSON.parse(profile.strategies) as LearningStrategy[],
-        learningStyle: JSON.parse(profile.learningStyle) as LearningStyleProfile,
+        learningStyle: JSON.parse(
+          profile.learningStyle,
+        ) as LearningStyleProfile,
       },
       statistics: {
         sessionCount: profile.sessionCount,
         confidenceScore: profile.confidenceScore,
       },
-      accessHistory: profile.accessLogs.map((log: { action: string; timestamp: Date; details: string | null }) => ({
-        action: log.action,
-        timestamp: log.timestamp,
-        details: log.details,
-      })),
+      accessHistory: [],
     };
 
-    if (format === 'pdf') {
+    if (format === "pdf") {
       const html = generateProfileHTML(parsedProfile);
 
       return new NextResponse(html, {
         headers: {
-          'Content-Type': 'text/html; charset=utf-8',
-          'Content-Disposition': `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split('T')[0]}.html"`,
+          "Content-Type": "text/html; charset=utf-8",
+          "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.html"`,
         },
       });
     }
@@ -113,17 +132,20 @@ export async function GET(request: NextRequest) {
       {
         success: true,
         exportDate: new Date().toISOString(),
-        format: 'json',
+        format: "json",
         data: parsedProfile,
       },
       {
         headers: {
-          'Content-Disposition': `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split('T')[0]}.json"`,
+          "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.json"`,
         },
-      }
+      },
     );
   } catch (error) {
-    logger.error('Profile export error', { error: String(error) });
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logger.error("Profile export error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
   }
 }
