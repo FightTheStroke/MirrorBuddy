@@ -9,7 +9,6 @@ import {
   MessageSquare,
   LogIn,
   UserPlus,
-  Beaker,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -73,17 +72,23 @@ export function QuickStart({
         <div className="flex flex-col items-center gap-6">
           {/* Beta Access Section */}
           <div className="w-full p-5 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border border-purple-200 dark:border-purple-800/50">
-            <div className="flex items-center justify-center gap-2 mb-3">
+            <div className="flex items-center justify-center gap-2 mb-2">
               <div className="px-2 py-1 bg-purple-100 dark:bg-purple-800/50 rounded-full">
                 <span className="text-xs font-semibold text-purple-700 dark:text-purple-300">
                   BETA PRIVATA
                 </span>
               </div>
             </div>
-            <p className="text-center text-sm text-gray-600 dark:text-gray-300 mb-4">
-              MirrorBuddy e in beta ad invito. Accesso completo a tutti i
-              Maestri, strumenti e funzionalita.
+            <p className="text-center text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              Accesso su invito
             </p>
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <li>22 Maestri AI</li>
+              <li>&bull;</li>
+              <li>Tutti gli strumenti</li>
+              <li>&bull;</li>
+              <li>Progressi salvati</li>
+            </ul>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/login" className="w-full sm:w-auto">
                 <Button
@@ -119,14 +124,22 @@ export function QuickStart({
           {/* Demo Section - Simplified */}
           <div className="w-full p-5 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-gray-200 dark:border-gray-700">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Beaker className="w-4 h-4 text-gray-500" aria-hidden="true" />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                Demo senza registrazione
-              </span>
+              <div className="px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded-full">
+                <span className="text-xs font-semibold text-gray-600 dark:text-gray-300">
+                  PROVALO SUBITO
+                </span>
+              </div>
             </div>
-            <p className="text-center text-xs text-gray-500 dark:text-gray-400 mb-4">
-              10 messaggi &bull; 3 Maestri &bull; Strumenti base
+            <p className="text-center text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+              Demo gratuita senza registrazione
             </p>
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-gray-500 dark:text-gray-400 mb-4">
+              <li>3 Maestri AI</li>
+              <li>&bull;</li>
+              <li>10 messaggi</li>
+              <li>&bull;</li>
+              <li>Strumenti base</li>
+            </ul>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Button
