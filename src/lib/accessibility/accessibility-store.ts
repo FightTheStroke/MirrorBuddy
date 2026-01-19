@@ -26,6 +26,7 @@ import {
   browserPrefsToSettings,
 } from "./browser-detection";
 import { trackProfileActivation, trackReset } from "./a11y-telemetry";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 export type {
   AccessibilitySettings,
@@ -57,6 +58,7 @@ interface AccessibilityStore {
   adhdSessionState: ADHDSessionState;
   adhdTimeRemaining: number;
   adhdSessionProgress: number;
+  isAuthenticated: boolean; // Track if user is logged in for DB sync
 
   // Context switching
   setContext: (context: AccessibilityContext) => void;
@@ -66,6 +68,11 @@ interface AccessibilityStore {
   loadFromCookie: () => void;
   saveToCookie: () => void;
   applyBrowserPreferences: () => void;
+
+  // Database persistence (for authenticated users)
+  setAuthenticated: (isAuth: boolean) => void;
+  loadFromDatabase: () => Promise<void>;
+  saveToDatabase: () => Promise<void>;
 
   // Settings actions
   updateSettings: (updates: Partial<AccessibilitySettings>) => void;
@@ -114,6 +121,7 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
     adhdSessionState: "idle",
     adhdTimeRemaining: defaultADHDConfig.workDuration,
     adhdSessionProgress: 0,
+    isAuthenticated: false,
 
     // Context switching
     setContext: (context) => set({ currentContext: context }),
@@ -161,14 +169,70 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
       }
     },
 
+    // Database persistence
+    setAuthenticated: (isAuth) => set({ isAuthenticated: isAuth }),
+
+    loadFromDatabase: async () => {
+      try {
+        const response = await fetch("/api/user/accessibility");
+        if (response.ok) {
+          const data = await response.json();
+          // Map DB fields to store settings (exclude id, userId, timestamps)
+          const {
+            id: _id,
+            userId: _userId,
+            createdAt: _createdAt,
+            updatedAt: _updatedAt,
+            adhdConfig: dbAdhdConfig,
+            adhdStats: dbAdhdStats,
+            ...dbSettings
+          } = data;
+
+          set((state) => ({
+            settings: { ...state.settings, ...dbSettings },
+            isAuthenticated: true,
+            adhdConfig: dbAdhdConfig
+              ? { ...state.adhdConfig, ...JSON.parse(dbAdhdConfig) }
+              : state.adhdConfig,
+            adhdStats: dbAdhdStats
+              ? { ...state.adhdStats, ...JSON.parse(dbAdhdStats) }
+              : state.adhdStats,
+          }));
+        }
+      } catch {
+        // Silent fail - use cookie/defaults
+      }
+    },
+
+    saveToDatabase: async () => {
+      const state = get();
+      if (!state.isAuthenticated) return;
+
+      try {
+        await csrfFetch("/api/user/accessibility", {
+          method: "PUT",
+          body: JSON.stringify({
+            ...state.settings,
+            adhdConfig: JSON.stringify(state.adhdConfig),
+            adhdStats: JSON.stringify(state.adhdStats),
+          }),
+        });
+      } catch {
+        // Silent fail - cookie is backup
+      }
+    },
+
     // Settings actions
     updateSettings: (updates) => {
       set((state) => ({
         settings: { ...state.settings, ...updates },
         activeProfile: null, // Clear profile when manually changing settings
       }));
-      // Auto-save to cookie
-      setTimeout(() => get().saveToCookie(), 0);
+      // Auto-save to cookie (always) and database (if authenticated)
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
     },
 
     updateParentSettings: (updates) =>
@@ -182,6 +246,8 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         activeProfile: null,
       });
       clearA11yCookie();
+      // Reset in database too
+      setTimeout(() => get().saveToDatabase(), 0);
       trackReset();
     },
 
@@ -196,7 +262,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyDyslexiaProfile(state.settings),
         activeProfile: "dyslexia",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("dyslexia");
     },
 
@@ -205,7 +274,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyADHDProfile(state.settings),
         activeProfile: "adhd",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("adhd");
     },
 
@@ -214,7 +286,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyVisualImpairmentProfile(state.settings),
         activeProfile: "visual",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("visual");
     },
 
@@ -223,7 +298,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyMotorImpairmentProfile(state.settings),
         activeProfile: "motor",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("motor");
     },
 
@@ -232,7 +310,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyAutismProfile(state.settings),
         activeProfile: "autism",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("autism");
     },
 
@@ -241,7 +322,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyAuditoryImpairmentProfile(state.settings),
         activeProfile: "auditory",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("auditory");
     },
 
@@ -250,7 +334,10 @@ export const useAccessibilityStore = create<AccessibilityStore>()(
         settings: profiles.applyCerebralPalsyProfile(state.settings),
         activeProfile: "cerebral",
       }));
-      setTimeout(() => get().saveToCookie(), 0);
+      setTimeout(() => {
+        get().saveToCookie();
+        get().saveToDatabase();
+      }, 0);
       trackProfileActivation("cerebral");
     },
 
