@@ -66,26 +66,43 @@ export async function GET(request: Request) {
       _count: true,
     });
 
-    // Get daily metrics
-    // Note: Prisma uses camelCase column names, must quote in raw SQL
-    const dailyMetrics = await prisma.$queryRaw<
-      Array<{
-        date: string;
-        sessions: number;
-        totalCost: number;
-        totalTokens: number;
-      }>
-    >`
-      SELECT
-        DATE("createdAt") as date,
-        COUNT(*)::int as sessions,
-        COALESCE(SUM("costEur"), 0)::float as "totalCost",
-        COALESCE(SUM("tokensIn" + "tokensOut"), 0)::int as "totalTokens"
-      FROM "SessionMetrics"
-      WHERE "createdAt" >= ${startDate}
-      GROUP BY DATE("createdAt")
-      ORDER BY date DESC
-    `;
+    // Get daily metrics using Prisma groupBy instead of raw SQL for portability
+    const dailyGrouped = await prisma.sessionMetrics.groupBy({
+      by: ["createdAt"],
+      where: { createdAt: { gte: startDate } },
+      _count: true,
+      _sum: { costEur: true, tokensIn: true, tokensOut: true },
+    });
+
+    // Aggregate by date
+    const dailyMetricsMap = new Map<
+      string,
+      { sessions: number; totalCost: number; totalTokens: number }
+    >();
+    for (const row of dailyGrouped) {
+      const dateKey = row.createdAt.toISOString().split("T")[0];
+      const existing = dailyMetricsMap.get(dateKey) || {
+        sessions: 0,
+        totalCost: 0,
+        totalTokens: 0,
+      };
+      dailyMetricsMap.set(dateKey, {
+        sessions: existing.sessions + row._count,
+        totalCost: existing.totalCost + (row._sum.costEur || 0),
+        totalTokens:
+          existing.totalTokens +
+          (row._sum.tokensIn || 0) +
+          (row._sum.tokensOut || 0),
+      });
+    }
+    const dailyMetrics = Array.from(dailyMetricsMap.entries()).map(
+      ([date, data]) => ({
+        date,
+        sessions: data.sessions,
+        totalCost: data.totalCost,
+        totalTokens: data.totalTokens,
+      }),
+    );
 
     // Get cost stats with P95
     const costStats = await getCostStats(startDate, new Date());
