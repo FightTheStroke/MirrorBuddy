@@ -2,10 +2,11 @@
 // STORE SYNC HOOK - Initialize and auto-sync stores with server
 // ============================================================================
 
-import { useSettingsStore } from './settings-store';
-import { useProgressStore } from './progress-store';
-import { useConversationStore } from './conversation-store';
-import { useLearningsStore } from './learnings-store';
+import { useSettingsStore } from "./settings-store";
+import { useProgressStore } from "./progress-store";
+import { useConversationStore } from "./conversation-store";
+import { useLearningsStore } from "./learnings-store";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
 /**
  * Initialize all stores by loading data from server
@@ -13,7 +14,7 @@ import { useLearningsStore } from './learnings-store';
  */
 export async function initializeStores() {
   // Ensure user exists (creates cookie if needed)
-  await fetch('/api/user');
+  await fetch("/api/user");
 
   // Load data from server
   await Promise.all([
@@ -21,6 +22,7 @@ export async function initializeStores() {
     useProgressStore.getState().loadFromServer(),
     useConversationStore.getState().loadFromServer(),
     useLearningsStore.getState().loadFromServer(),
+    useAccessibilityStore.getState().loadFromDatabase(),
   ]);
 }
 
