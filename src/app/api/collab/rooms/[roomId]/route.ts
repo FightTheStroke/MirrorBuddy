@@ -4,9 +4,10 @@
  * Part of Phase 8: Multi-User Collaboration
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
-import { getRoom, getRoomState, closeRoom } from '@/lib/collab/mindmap-room';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
+import { getRoom, getRoomState, closeRoom } from "@/lib/collab/mindmap-room";
 import {
   validateRoomExists,
   handleJoinAction,
@@ -15,7 +16,7 @@ import {
   handleUpdateNodeAction,
   handleDeleteNodeAction,
   handleMoveNodeAction,
-} from './helpers';
+} from "./helpers";
 
 interface RouteParams {
   params: Promise<{ roomId: string }>;
@@ -24,20 +25,14 @@ interface RouteParams {
 /**
  * GET /api/collab/rooms/[roomId] - Get room state
  */
-export async function GET(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function GET(request: NextRequest, { params }: RouteParams) {
   const { roomId } = await params;
 
   try {
     const state = getRoomState(roomId);
 
     if (!state) {
-      return NextResponse.json(
-        { error: 'Room not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
     return NextResponse.json({
@@ -48,14 +43,14 @@ export async function GET(
       version: state.version,
     });
   } catch (error) {
-    logger.error('Failed to get room state', {
+    logger.error("Failed to get room state", {
       roomId,
       error: String(error),
     });
 
     return NextResponse.json(
-      { error: 'Failed to get room', message: String(error) },
-      { status: 500 }
+      { error: "Failed to get room", message: String(error) },
+      { status: 500 },
     );
   }
 }
@@ -63,10 +58,7 @@ export async function GET(
 /**
  * POST /api/collab/rooms/[roomId] - Join room or perform action
  */
-export async function POST(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function POST(request: NextRequest, { params }: RouteParams) {
   const { roomId } = await params;
 
   try {
@@ -81,46 +73,53 @@ export async function POST(
     let result;
 
     switch (action) {
-      case 'join':
+      case "join":
         result = handleJoinAction(roomId, user);
         break;
 
-      case 'leave':
+      case "leave":
         result = handleLeaveAction(roomId, user);
-        logger.info('User left room via API', {
+        logger.info("User left room via API", {
           roomId,
           userId: (user as { id?: string })?.id,
         });
         break;
 
-      case 'add_node':
+      case "add_node":
         result = handleAddNodeAction(roomId, user, node, parentId);
         break;
 
-      case 'update_node':
+      case "update_node":
         result = handleUpdateNodeAction(roomId, user, nodeId, changes);
         break;
 
-      case 'delete_node':
+      case "delete_node":
         result = handleDeleteNodeAction(roomId, user, nodeId);
         break;
 
-      case 'move_node':
+      case "move_node":
         result = handleMoveNodeAction(roomId, user, nodeId, newParentId);
         break;
 
       default:
         return NextResponse.json(
           {
-            error: 'Invalid action',
-            validActions: ['join', 'leave', 'add_node', 'update_node', 'delete_node', 'move_node'],
+            error: "Invalid action",
+            validActions: [
+              "join",
+              "leave",
+              "add_node",
+              "update_node",
+              "delete_node",
+              "move_node",
+            ],
           },
-          { status: 400 }
+          { status: 400 },
         );
     }
 
-    if (action === 'join') {
-      logger.info('User joined room via API', {
+    if (action === "join") {
+      logger.info("User joined room via API", {
         roomId,
         userId: (user as { id?: string })?.id,
       });
@@ -128,14 +127,14 @@ export async function POST(
 
     return result.response;
   } catch (error) {
-    logger.error('Failed to perform room action', {
+    logger.error("Failed to perform room action", {
       roomId,
       error: String(error),
     });
 
     return NextResponse.json(
-      { error: 'Failed to perform action', message: String(error) },
-      { status: 500 }
+      { error: "Failed to perform action", message: String(error) },
+      { status: 500 },
     );
   }
 }
@@ -143,29 +142,17 @@ export async function POST(
 /**
  * DELETE /api/collab/rooms/[roomId] - Close room (host only)
  */
-export async function DELETE(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+export async function DELETE(request: NextRequest, { params }: RouteParams) {
   const { roomId } = await params;
 
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get('userId');
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'userId query parameter is required' },
-        { status: 400 }
-      );
-    }
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
     const room = getRoom(roomId);
     if (!room) {
-      return NextResponse.json(
-        { error: 'Room not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
     const participants = Array.from(room.participants.values());
@@ -173,28 +160,28 @@ export async function DELETE(
 
     if (!isHost) {
       return NextResponse.json(
-        { error: 'Only host can close room' },
-        { status: 403 }
+        { error: "Only host can close room" },
+        { status: 403 },
       );
     }
 
     closeRoom(roomId);
 
-    logger.info('Room closed via API', {
+    logger.info("Room closed via API", {
       roomId,
       hostId: userId,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Failed to close room', {
+    logger.error("Failed to close room", {
       roomId,
       error: String(error),
     });
 
     return NextResponse.json(
-      { error: 'Failed to close room', message: String(error) },
-      { status: 500 }
+      { error: "Failed to close room", message: String(error) },
+      { status: 500 },
     );
   }
 }

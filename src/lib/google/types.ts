@@ -41,11 +41,15 @@ export interface StoredGoogleAccount {
   lastUsedAt: Date;
 }
 
-// OAuth state for CSRF protection
+// OAuth state for CSRF protection with PKCE
 export interface OAuthState {
   userId: string;
   returnUrl?: string;
   nonce: string;
+  /** PKCE code verifier - stored in state, used during token exchange */
+  codeVerifier: string;
+  /** Timestamp when state was created (for expiry check) */
+  createdAt: number;
 }
 
 // Connection status for UI

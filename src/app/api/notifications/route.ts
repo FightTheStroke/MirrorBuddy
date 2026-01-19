@@ -9,6 +9,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 import {
   checkRateLimit,
   getClientIdentifier,
@@ -46,11 +47,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const { searchParams } = new URL(request.url);
 
-    // Validate query parameters
+    // Validate query parameters (unreadOnly and limit only, userId comes from session)
     const queryValidation = GetNotificationsQuerySchema.safeParse({
-      userId: searchParams.get("userId"),
+      userId,
       unreadOnly: searchParams.get("unreadOnly"),
       limit: searchParams.get("limit"),
     });
@@ -65,16 +70,13 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const {
-      userId,
-      unreadOnly: unreadOnlyParam,
-      limit: limitParam,
-    } = queryValidation.data;
+    const { unreadOnly: unreadOnlyParam, limit: limitParam } =
+      queryValidation.data;
     const unreadOnly = unreadOnlyParam === "true";
     const limit = limitParam ? parseInt(limitParam, 10) : 50;
 
-    const notifications = await getNotifications(userId, unreadOnly, limit);
-    const unreadCount = await getUnreadCount(userId);
+    const notifications = await getNotifications(userId!, unreadOnly, limit);
+    const unreadCount = await getUnreadCount(userId!);
 
     return NextResponse.json({
       success: true,
@@ -112,10 +114,17 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const body = await request.json();
 
-    // Validate request body
-    const validation = CreateNotificationSchema.safeParse(body);
+    // Validate request body (remove userId from body validation, use session userId)
+    const validation = CreateNotificationSchema.safeParse({
+      ...body,
+      userId,
+    });
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -127,7 +136,6 @@ export async function POST(request: NextRequest) {
     }
 
     const {
-      userId,
       type,
       title,
       message,
@@ -140,7 +148,7 @@ export async function POST(request: NextRequest) {
       melissaVoice,
     } = validation.data;
 
-    const notification = await createNotification(userId, {
+    const notification = await createNotification(userId!, {
       type,
       title,
       message,
@@ -198,10 +206,17 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const body = await request.json();
 
-    // Validate request body
-    const validation = UpdateNotificationsSchema.safeParse(body);
+    // Validate request body (use session userId instead of body userId)
+    const validation = UpdateNotificationsSchema.safeParse({
+      ...body,
+      userId,
+    });
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -212,10 +227,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { userId, notificationIds, markAllRead } = validation.data;
+    const { notificationIds, markAllRead } = validation.data;
 
     if (markAllRead) {
-      await markNotificationsAsRead(userId);
+      await markNotificationsAsRead(userId!);
       return NextResponse.json({
         success: true,
         message: "All notifications marked as read",
@@ -230,7 +245,7 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    await markNotificationsAsRead(userId, notificationIds);
+    await markNotificationsAsRead(userId!, notificationIds);
     return NextResponse.json({
       success: true,
       message: "Notifications marked as read",
@@ -264,11 +279,15 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const { searchParams } = new URL(request.url);
 
-    // Validate query parameters
+    // Validate query parameters (id and dismissAll only, userId comes from session)
     const queryValidation = DeleteNotificationsQuerySchema.safeParse({
-      userId: searchParams.get("userId"),
+      userId,
       id: searchParams.get("id"),
       dismissAll: searchParams.get("dismissAll"),
     });
@@ -283,15 +302,12 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const {
-      userId,
-      id: notificationId,
-      dismissAll: dismissAllParam,
-    } = queryValidation.data;
+    const { id: notificationId, dismissAll: dismissAllParam } =
+      queryValidation.data;
     const dismissAll = dismissAllParam === "true";
 
     if (dismissAll) {
-      await dismissNotifications(userId);
+      await dismissNotifications(userId!);
       return NextResponse.json({
         success: true,
         message: "All notifications dismissed",
@@ -299,7 +315,7 @@ export async function DELETE(request: NextRequest) {
     }
 
     if (notificationId) {
-      await dismissNotifications(userId, notificationId);
+      await dismissNotifications(userId!, notificationId);
       return NextResponse.json({
         success: true,
         message: "Notification dismissed",
