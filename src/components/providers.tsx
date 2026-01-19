@@ -6,7 +6,6 @@ import { ThemeProvider } from "next-themes";
 import { AccessibilityProvider } from "@/components/accessibility";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
-import { ParentAccessButton } from "@/components/navigation/parent-access-button";
 import { CookieConsentWall } from "@/components/consent";
 import { TosGateProvider } from "@/components/tos/tos-gate-provider";
 import {
@@ -114,24 +113,15 @@ function StoreInitializer() {
   return null;
 }
 
-// Pages where parent access button should NOT appear
-const PARENT_ACCESS_EXCLUDED_PATHS = [
-  "/", // Home page has its own button in sidebar
-  "/landing",
+// Pages where consent is handled inline (in footer) or not needed
+// Legal pages MUST be accessible without accepting cookies (GDPR requirement)
+const INLINE_CONSENT_PATHS = [
   "/welcome",
+  "/landing",
+  "/privacy",
+  "/cookies",
+  "/terms",
 ];
-
-function ConditionalParentAccess() {
-  const pathname = usePathname();
-  const shouldHide = PARENT_ACCESS_EXCLUDED_PATHS.some((p) =>
-    p === "/" ? pathname === "/" : pathname?.startsWith(p),
-  );
-  if (shouldHide) return null;
-  return <ParentAccessButton />;
-}
-
-// Pages where consent is handled inline (in footer) instead of blocking wall
-const INLINE_CONSENT_PATHS = ["/welcome", "/landing"];
 
 /**
  * Conditional Cookie Consent - skips blocking wall on welcome page
@@ -173,7 +163,6 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
             {children}
             <ToastContainer />
             <IOSInstallBanner />
-            <ConditionalParentAccess />
           </TosGateProvider>
         </ConditionalCookieConsent>
       </AccessibilityProvider>

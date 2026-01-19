@@ -4,14 +4,15 @@
 // NOTE: This file is server-only - do not import in client code
 // ============================================================================
 
-import webpush from 'web-push';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import webpush from "web-push";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 // Configure web-push with VAPID keys (lazy initialization to avoid build failures)
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
-const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@mirrorbuddyedu.com';
+const vapidSubject =
+  process.env.VAPID_SUBJECT || "mailto:info@fightthestroke.org";
 
 let vapidConfigured = false;
 
@@ -25,7 +26,7 @@ function ensureVapidConfigured(): boolean {
     vapidConfigured = true;
     return true;
   } catch (error) {
-    logger.error('[Push] VAPID configuration failed', { error: String(error) });
+    logger.error("[Push] VAPID configuration failed", { error: String(error) });
     return false;
   }
 }
@@ -51,10 +52,10 @@ export interface PushPayload {
  */
 export async function sendPushToSubscription(
   subscription: { endpoint: string; p256dh: string; auth: string },
-  payload: PushPayload
+  payload: PushPayload,
 ): Promise<boolean> {
   if (!ensureVapidConfigured()) {
-    logger.warn('[Push] Cannot send - VAPID keys not configured or invalid');
+    logger.warn("[Push] Cannot send - VAPID keys not configured or invalid");
     return false;
   }
 
@@ -72,13 +73,13 @@ export async function sendPushToSubscription(
       JSON.stringify({
         title: payload.title,
         body: payload.body,
-        icon: payload.icon || '/icons/notification.png',
-        badge: payload.badge || '/icons/badge.png',
+        icon: payload.icon || "/icons/notification.png",
+        badge: payload.badge || "/icons/badge.png",
         tag: payload.tag,
-        data: { url: payload.url || '/' },
+        data: { url: payload.url || "/" },
         requireInteraction: payload.requireInteraction || false,
         actions: payload.actions || [],
-      })
+      }),
     );
     return true;
   } catch (error) {
@@ -86,12 +87,12 @@ export async function sendPushToSubscription(
 
     // Handle expired/invalid subscriptions
     if (err.statusCode === 410 || err.statusCode === 404) {
-      logger.info('[Push] Subscription expired, removing', {
-        endpoint: subscription.endpoint.slice(0, 50)
+      logger.info("[Push] Subscription expired, removing", {
+        endpoint: subscription.endpoint.slice(0, 50),
       });
       await removeExpiredSubscription(subscription.endpoint);
     } else {
-      logger.error('[Push] Send failed', {
+      logger.error("[Push] Send failed", {
         error: String(error),
         endpoint: subscription.endpoint.slice(0, 50),
       });
@@ -106,7 +107,7 @@ export async function sendPushToSubscription(
  */
 export async function sendPushToUser(
   userId: string,
-  payload: PushPayload
+  payload: PushPayload,
 ): Promise<number> {
   const subscriptions = await prisma.pushSubscription.findMany({
     where: { userId },
@@ -122,16 +123,16 @@ export async function sendPushToUser(
     subscriptions.map(async (sub) => {
       const success = await sendPushToSubscription(
         { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
-        payload
+        payload,
       );
       if (success) successCount++;
-    })
+    }),
   );
 
-  logger.info('[Push] Sent to user', {
+  logger.info("[Push] Sent to user", {
     userId,
     total: subscriptions.length,
-    success: successCount
+    success: successCount,
   });
 
   return successCount;
@@ -147,8 +148,8 @@ async function removeExpiredSubscription(endpoint: string): Promise<void> {
     });
   } catch (error) {
     // Ignore if already deleted
-    logger.debug('[Push] Could not delete expired subscription', {
-      error: String(error)
+    logger.debug("[Push] Could not delete expired subscription", {
+      error: String(error),
     });
   }
 }

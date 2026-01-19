@@ -67,7 +67,7 @@ export function BudgetExhaustedBanner({
             </a>
             <span className="text-slate-600">|</span>
             <a
-              href="mailto:support@mirrorbuddy.com"
+              href="mailto:info@fightthestroke.org"
               className="text-blue-400 hover:text-blue-300"
             >
               Contattaci
