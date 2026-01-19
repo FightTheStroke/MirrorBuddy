@@ -19,6 +19,7 @@ import {
   requestParentalConsent,
   checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
+import { CookieSigningError } from "@/lib/auth/cookie-signing";
 
 // Zod schema for input validation
 const OnboardingDataSchema = z.object({
@@ -117,19 +118,33 @@ export async function GET() {
         | "superiore";
     }
 
-    const hasExistingData = Boolean(existingData.name);
+    // Credentialed users (with password) are considered to have completed onboarding
+    // They went through the invite system and don't need the welcome flow
+    const isCredentialedUser = Boolean(user.passwordHash);
+    const hasExistingData = Boolean(existingData.name) || isCredentialedUser;
+
+    // For credentialed users without explicit onboarding state, treat as completed
+    const effectiveOnboardingState = user.onboarding
+      ? {
+          hasCompletedOnboarding:
+            user.onboarding.hasCompletedOnboarding || isCredentialedUser,
+          onboardingCompletedAt: user.onboarding.onboardingCompletedAt,
+          currentStep: user.onboarding.currentStep,
+          isReplayMode: user.onboarding.isReplayMode,
+        }
+      : isCredentialedUser
+        ? {
+            hasCompletedOnboarding: true,
+            onboardingCompletedAt: null,
+            currentStep: "ready",
+            isReplayMode: false,
+          }
+        : null;
 
     return NextResponse.json({
       hasExistingData,
       data: hasExistingData ? existingData : null,
-      onboardingState: user.onboarding
-        ? {
-            hasCompletedOnboarding: user.onboarding.hasCompletedOnboarding,
-            onboardingCompletedAt: user.onboarding.onboardingCompletedAt,
-            currentStep: user.onboarding.currentStep,
-            isReplayMode: user.onboarding.isReplayMode,
-          }
-        : null,
+      onboardingState: effectiveOnboardingState,
     });
   } catch (error) {
     logger.error("Onboarding API GET error", { error: String(error) });
@@ -180,25 +195,40 @@ export async function POST(request: NextRequest) {
 
     // Create user if doesn't exist
     if (!userId) {
+      logger.info("Creating new user for onboarding");
       const user = await prisma.user.create({
         data: {},
       });
       userId = user.id;
+      logger.info("User created", { userId });
 
       // Set cookie for new user
-      const { signCookieValue } = await import("@/lib/auth/cookie-signing");
-      const signedCookie = signCookieValue(user.id);
-      const cookieStore = await cookies();
-      cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-        maxAge: 60 * 60 * 24 * 365,
-        path: "/",
-      });
+      try {
+        const { signCookieValue } = await import("@/lib/auth/cookie-signing");
+        const signedCookie = signCookieValue(user.id);
+        const cookieStore = await cookies();
+        cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 365,
+          path: "/",
+        });
+        logger.info("User cookie set successfully", { userId });
+      } catch (cookieError) {
+        logger.error("Failed to set user cookie", {
+          userId,
+          error: String(cookieError),
+        });
+        throw cookieError;
+      }
     }
 
     // Upsert onboarding state
+    logger.info("Upserting onboarding state", {
+      userId,
+      hasCompletedOnboarding,
+    });
     const onboardingState = await prisma.onboardingState.upsert({
       where: { userId },
       create: {
@@ -216,6 +246,7 @@ export async function POST(request: NextRequest) {
         ...(hasCompletedOnboarding && { onboardingCompletedAt: new Date() }),
       },
     });
+    logger.info("Onboarding state upserted", { userId });
 
     // Sync to profile if we have name
     if (data?.name) {
@@ -302,6 +333,17 @@ export async function POST(request: NextRequest) {
     if (isDatabaseNotInitialized(error)) {
       return NextResponse.json(
         { error: "Database not initialized" },
+        { status: 503 },
+      );
+    }
+
+    if (error instanceof CookieSigningError) {
+      logger.error("Session secret configuration error", {
+        code: error.code,
+        message: error.message,
+      });
+      return NextResponse.json(
+        { error: "Server configuration error" },
         { status: 503 },
       );
     }
