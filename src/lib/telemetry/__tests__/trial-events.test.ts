@@ -26,6 +26,8 @@ vi.mock("../telemetry-store", () => ({
 import {
   trackTrialStart,
   trackTrialChat,
+  trackTrialVoice,
+  trackTrialTool,
   trackTrialLimitHit,
   trackFeatureAttempted,
   trackBetaCtaShown,
@@ -95,6 +97,105 @@ describe("Trial Events Telemetry", () => {
           progressPercent: 100,
         },
       );
+    });
+  });
+
+  describe("trackTrialVoice", () => {
+    it("tracks voice session with duration and remaining", () => {
+      trackTrialVoice("visitor-123", 60, 240);
+
+      expect(mockTrackEvent).toHaveBeenCalledWith(
+        "conversation",
+        "trial_voice",
+        "visitor-123",
+        60,
+        {
+          remainingSeconds: 240,
+          progressPercent: 20,
+        },
+      );
+    });
+
+    it("calculates progress percentage correctly at limit", () => {
+      trackTrialVoice("visitor-123", 300, 0);
+
+      expect(mockTrackEvent).toHaveBeenCalledWith(
+        "conversation",
+        "trial_voice",
+        "visitor-123",
+        300,
+        {
+          remainingSeconds: 0,
+          progressPercent: 100,
+        },
+      );
+    });
+
+    it("does not track when consent not given", () => {
+      vi.mocked(hasAnalyticsConsent).mockReturnValue(false);
+
+      trackTrialVoice("visitor-123", 60, 240);
+
+      expect(mockTrackEvent).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("trackTrialTool", () => {
+    it("tracks tool usage with name and counts", () => {
+      trackTrialTool("visitor-123", "mindmap", 3, 7);
+
+      expect(mockTrackEvent).toHaveBeenCalledWith(
+        "conversation",
+        "trial_tool",
+        "mindmap",
+        3,
+        {
+          visitorId: "visitor-123",
+          remainingTools: 7,
+          progressPercent: 30,
+        },
+      );
+    });
+
+    it("tracks different tool types", () => {
+      const tools = ["mindmap", "summary", "flashcard", "quiz"];
+
+      for (const tool of tools) {
+        vi.clearAllMocks();
+        trackTrialTool("visitor-123", tool, 1, 9);
+
+        expect(mockTrackEvent).toHaveBeenCalledWith(
+          "conversation",
+          "trial_tool",
+          tool,
+          1,
+          expect.objectContaining({ remainingTools: 9 }),
+        );
+      }
+    });
+
+    it("calculates progress percentage correctly at limit", () => {
+      trackTrialTool("visitor-123", "quiz", 10, 0);
+
+      expect(mockTrackEvent).toHaveBeenCalledWith(
+        "conversation",
+        "trial_tool",
+        "quiz",
+        10,
+        {
+          visitorId: "visitor-123",
+          remainingTools: 0,
+          progressPercent: 100,
+        },
+      );
+    });
+
+    it("does not track when consent not given", () => {
+      vi.mocked(hasAnalyticsConsent).mockReturnValue(false);
+
+      trackTrialTool("visitor-123", "mindmap", 1, 9);
+
+      expect(mockTrackEvent).not.toHaveBeenCalled();
     });
   });
 

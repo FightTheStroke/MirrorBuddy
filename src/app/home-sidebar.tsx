@@ -24,6 +24,12 @@ interface TrialStatus {
   chatsUsed: number;
   chatsRemaining: number;
   maxChats: number;
+  voiceSecondsUsed: number;
+  voiceSecondsRemaining: number;
+  maxVoiceSeconds: number;
+  toolsUsed: number;
+  toolsRemaining: number;
+  maxTools: number;
 }
 
 interface HomeSidebarProps {
@@ -104,8 +110,14 @@ export function HomeSidebar({
               </span>
             )}
             <TrialStatusIndicator
-              chatCount={trialStatus.chatsUsed}
+              chatsUsed={trialStatus.chatsUsed}
               maxChats={trialStatus.maxChats}
+              voiceSecondsUsed={trialStatus.voiceSecondsUsed}
+              maxVoiceSeconds={trialStatus.maxVoiceSeconds}
+              toolsUsed={trialStatus.toolsUsed}
+              maxTools={trialStatus.maxTools}
+              showVoice={true}
+              showTools={true}
               className={cn(!open && "justify-center")}
             />
             {open && (

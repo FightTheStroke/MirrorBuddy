@@ -9,6 +9,7 @@ import {
   getOrCreateTrialSession,
   checkTrialLimits,
   incrementUsage,
+  TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 
 const log = logger.child({ module: "api/chat/trial-handler" });
@@ -18,6 +19,30 @@ export interface TrialCheckResult {
   sessionId?: string;
   reason?: string;
   chatsRemaining?: number;
+  toolsRemaining?: number;
+}
+
+/**
+ * Get trial session for current request
+ * Returns null if user is authenticated or no visitor ID
+ */
+export async function getTrialSession(
+  isAuthenticated: boolean,
+): Promise<{ sessionId: string } | null> {
+  if (isAuthenticated) return null;
+
+  const cookieStore = await cookies();
+  const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+
+  if (!visitorId) return null;
+
+  const headersList = await headers();
+  const forwarded = headersList.get("x-forwarded-for");
+  const realIp = headersList.get("x-real-ip");
+  const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
+
+  const session = await getOrCreateTrialSession(ip, visitorId);
+  return { sessionId: session.id };
 }
 
 /**
@@ -72,13 +97,23 @@ export async function checkTrialForAnonymous(
     return {
       allowed: true,
       sessionId: session.id,
-      chatsRemaining: Math.max(0, 10 - session.chatsUsed),
+      chatsRemaining: Math.max(0, TRIAL_LIMITS.CHAT - session.chatsUsed),
+      toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
     };
   } catch (error) {
     log.error("Trial check failed", { error: String(error) });
     // On error, allow access (graceful degradation)
     return { allowed: true };
   }
+}
+
+/**
+ * Check trial limits for tool usage
+ */
+export async function checkTrialToolLimit(
+  sessionId: string,
+): Promise<{ allowed: boolean; reason?: string }> {
+  return checkTrialLimits(sessionId, "tool");
 }
 
 /**
@@ -92,5 +127,21 @@ export async function incrementTrialUsage(sessionId: string): Promise<void> {
     });
   } catch (error) {
     log.error("Failed to increment trial usage", { error: String(error) });
+  }
+}
+
+/**
+ * Increment trial tool usage after successful tool call
+ */
+export async function incrementTrialToolUsage(
+  sessionId: string,
+): Promise<void> {
+  try {
+    await incrementUsage(sessionId, "tool");
+    log.debug("Trial tool usage incremented", {
+      sessionId: sessionId.slice(0, 8),
+    });
+  } catch (error) {
+    log.error("Failed to increment trial tool usage", { error: String(error) });
   }
 }

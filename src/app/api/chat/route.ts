@@ -44,7 +44,12 @@ import {
 } from "./budget-handler";
 import { buildAllContexts } from "./context-builders";
 import { processToolCalls, buildToolChoice } from "./tool-handler";
-import { checkTrialForAnonymous, incrementTrialUsage } from "./trial-handler";
+import {
+  checkTrialForAnonymous,
+  incrementTrialUsage,
+  incrementTrialToolUsage,
+  checkTrialToolLimit,
+} from "./trial-handler";
 
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
@@ -235,11 +240,39 @@ export async function POST(request: NextRequest) {
 
       // Handle tool calls
       if (result.tool_calls && result.tool_calls.length > 0) {
+        // Check trial tool limits for anonymous users
+        if (trialSessionId && !userId) {
+          const toolLimitCheck = await checkTrialToolLimit(trialSessionId);
+          if (!toolLimitCheck.allowed) {
+            const response = NextResponse.json(
+              {
+                error: "Trial tool limit reached",
+                code: "TRIAL_TOOL_LIMIT_REACHED",
+                message:
+                  "Hai raggiunto il limite di strumenti gratuiti. Richiedi un invito beta per continuare!",
+                toolsRemaining: 0,
+              },
+              { status: 403 },
+            );
+            response.headers.set("X-Request-ID", getRequestId(request));
+            return response;
+          }
+        }
+
         const toolCallRefs = await processToolCalls(result.tool_calls, {
           maestroId,
           conversationId,
           userId,
         });
+
+        // Track tool usage for trial users
+        if (trialSessionId && !userId) {
+          for (const toolRef of toolCallRefs) {
+            if (toolRef.status === "completed") {
+              await incrementTrialToolUsage(trialSessionId);
+            }
+          }
+        }
 
         const response = NextResponse.json({
           content: result.content || "",
@@ -252,6 +285,16 @@ export async function POST(request: NextRequest) {
           hasMemory: contexts.hasMemory,
           hasToolContext: contexts.hasToolContext,
           hasRAG: contexts.hasRAG,
+          // Trial info for tool usage
+          trial: trialSessionId
+            ? {
+                toolsRemaining: Math.max(
+                  0,
+                  (trialCheck.toolsRemaining ?? 10) -
+                    toolCallRefs.filter((t) => t.status === "completed").length,
+                ),
+              }
+            : undefined,
         });
         response.headers.set("X-Request-ID", getRequestId(request));
         return response;

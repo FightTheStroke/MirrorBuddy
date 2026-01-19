@@ -21,11 +21,20 @@ We implement trial mode with the following architecture:
 
 ### Trial Limits (Per Session)
 
-- Chat messages: 10
-- Documents: 1
-- Maestri (AI agents): 3
-- Coach sessions: 1
-- Tools: whitelist only (no expensive integrations)
+| Resource            | Limit | Notes                                           |
+| ------------------- | ----- | ----------------------------------------------- |
+| Chat messages       | 10    | Text-only conversations                         |
+| Voice minutes       | 5     | 300 seconds total, counted separately from chat |
+| Tool calls          | 10    | Mind map, summary, flashcards, quiz, etc.       |
+| Documents           | 1     | PDF/image upload                                |
+| Maestri (AI agents) | 3     | Randomly assigned at session start              |
+| Coach sessions      | 1     | Study method conversations                      |
+
+**Tracking**:
+
+- Voice and chat are tracked separately (voice does not consume chat quota)
+- Each tool invocation (e.g., generating a mind map) counts as 1 tool call
+- Limits checked before and after each operation
 
 ### Global Budget Cap
 

@@ -33,7 +33,7 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 **State** (`src/lib/stores/`): Zustand + REST APIs - NO localStorage (ADR 0015)
 
-**Trial Mode** (`src/lib/trial/`): Anonymous sessions, 3 chat limit, budget control - ADR 0056
+**Trial Mode** (`src/lib/trial/`): Anonymous sessions (10 chats, 5 min voice, 10 tools), budget control - ADR 0056
 
 **Invite System** (`src/lib/invite/`): Admin-approved beta access, email notifications - ADR 0057
 

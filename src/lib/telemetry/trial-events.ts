@@ -101,7 +101,7 @@ export function trackTrialChat(
  */
 export function trackTrialLimitHit(
   visitorId: string,
-  limitType: "chat" | "document" | "maestro" | "coach" | "tool",
+  limitType: "chat" | "document" | "maestro" | "coach" | "tool" | "voice",
 ): void {
   if (!hasAnalyticsConsent()) return;
 
@@ -109,6 +109,44 @@ export function trackTrialLimitHit(
     .getState()
     .trackEvent("navigation", "trial_limit_hit", visitorId, undefined, {
       limitType,
+    });
+}
+
+/**
+ * Track trial voice session
+ */
+export function trackTrialVoice(
+  visitorId: string,
+  durationSeconds: number,
+  remainingSeconds: number,
+): void {
+  if (!hasAnalyticsConsent()) return;
+
+  useTelemetryStore
+    .getState()
+    .trackEvent("conversation", "trial_voice", visitorId, durationSeconds, {
+      remainingSeconds,
+      progressPercent: Math.round(((300 - remainingSeconds) / 300) * 100),
+    });
+}
+
+/**
+ * Track trial tool usage
+ */
+export function trackTrialTool(
+  visitorId: string,
+  toolName: string,
+  toolsUsed: number,
+  remainingTools: number,
+): void {
+  if (!hasAnalyticsConsent()) return;
+
+  useTelemetryStore
+    .getState()
+    .trackEvent("conversation", "trial_tool", toolName, toolsUsed, {
+      visitorId,
+      remainingTools,
+      progressPercent: Math.round((toolsUsed / 10) * 100),
     });
 }
 

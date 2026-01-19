@@ -6,9 +6,19 @@ import { trackTrialStart } from "@/lib/telemetry/trial-events";
 interface TrialStatus {
   isTrialMode: boolean;
   isLoading: boolean;
+  // Chat limits
   chatsUsed: number;
   chatsRemaining: number;
   maxChats: number;
+  // Voice limits
+  voiceSecondsUsed: number;
+  voiceSecondsRemaining: number;
+  maxVoiceSeconds: number;
+  // Tool limits
+  toolsUsed: number;
+  toolsRemaining: number;
+  maxTools: number;
+  // Session info
   visitorId?: string;
 }
 
@@ -20,9 +30,18 @@ function getInitialStatus(): TrialStatus {
   return {
     isTrialMode: false,
     isLoading: true,
+    // Chat
     chatsUsed: 0,
     chatsRemaining: 10,
     maxChats: 10,
+    // Voice (5 min = 300 sec)
+    voiceSecondsUsed: 0,
+    voiceSecondsRemaining: 300,
+    maxVoiceSeconds: 300,
+    // Tools
+    toolsUsed: 0,
+    toolsRemaining: 10,
+    maxTools: 10,
   };
 }
 
@@ -52,12 +71,18 @@ export function useTrialStatus(): TrialStatus {
               chatsUsed: 0,
               chatsRemaining: 10,
               maxChats: 10,
+              voiceSecondsUsed: 0,
+              voiceSecondsRemaining: 300,
+              maxVoiceSeconds: 300,
+              toolsUsed: 0,
+              toolsRemaining: 10,
+              maxTools: 10,
             });
             return;
           }
         }
 
-        // User is trial - fetch trial session for chat counts
+        // User is trial - fetch trial session for all limits
         const res = await fetch("/api/trial/session");
         if (res.ok && isMounted) {
           const data = await res.json();
@@ -72,9 +97,19 @@ export function useTrialStatus(): TrialStatus {
           setStatus({
             isTrialMode: true,
             isLoading: false,
+            // Chat
             chatsUsed: data.chatsUsed || 0,
             chatsRemaining: data.chatsRemaining ?? 10,
-            maxChats: 10,
+            maxChats: data.maxChats ?? 10,
+            // Voice
+            voiceSecondsUsed: data.voiceSecondsUsed || 0,
+            voiceSecondsRemaining: data.voiceSecondsRemaining ?? 300,
+            maxVoiceSeconds: data.maxVoiceSeconds ?? 300,
+            // Tools
+            toolsUsed: data.toolsUsed || 0,
+            toolsRemaining: data.toolsRemaining ?? 10,
+            maxTools: data.maxTools ?? 10,
+            // Session
             visitorId,
           });
         } else if (isMounted) {
@@ -85,6 +120,12 @@ export function useTrialStatus(): TrialStatus {
             chatsUsed: 0,
             chatsRemaining: 10,
             maxChats: 10,
+            voiceSecondsUsed: 0,
+            voiceSecondsRemaining: 300,
+            maxVoiceSeconds: 300,
+            toolsUsed: 0,
+            toolsRemaining: 10,
+            maxTools: 10,
           });
         }
       } catch {
@@ -96,6 +137,12 @@ export function useTrialStatus(): TrialStatus {
             chatsUsed: 0,
             chatsRemaining: 10,
             maxChats: 10,
+            voiceSecondsUsed: 0,
+            voiceSecondsRemaining: 300,
+            maxVoiceSeconds: 300,
+            toolsUsed: 0,
+            toolsRemaining: 10,
+            maxTools: 10,
           });
         }
       }

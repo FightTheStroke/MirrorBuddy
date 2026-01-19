@@ -193,6 +193,24 @@ Open http://localhost:3000 and start learning.
 
 ---
 
+## Trial Mode
+
+Try MirrorBuddy instantly without creating an account. Trial mode provides limited access to evaluate the platform:
+
+| Resource      | Limit     | Description                               |
+| ------------- | --------- | ----------------------------------------- |
+| Chat messages | 10        | Text conversations with Maestri           |
+| Voice time    | 5 minutes | Voice sessions with AI tutors             |
+| Tool calls    | 10        | Mind maps, summaries, flashcards, quizzes |
+| Documents     | 1         | PDF/image upload for homework help        |
+| Maestri       | 3         | Randomly assigned AI tutors               |
+
+**Anti-abuse protection:** Trial sessions are tracked by IP hash + cookie to prevent repeated trials via incognito browsing.
+
+**→ Technical details: [docs/adr/0056-trial-mode-architecture.md](docs/adr/0056-trial-mode-architecture.md)**
+
+---
+
 ## Architecture
 
 **Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
@@ -303,16 +321,16 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 
 ## Documentation
 
-| Document | Description |
-|----------|-------------|
-| [FEATURES.md](FEATURES.md) | Comprehensive feature documentation |
-| [SETUP.md](SETUP.md) | Installation and configuration guide |
-| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md) | Production deployment guide |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Common issues and solutions |
-| [ARCHITECTURE.md](ARCHITECTURE.md) | Technical architecture details |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution guidelines |
-| [CLAUDE.md](CLAUDE.md) | Developer quick reference |
-| [backend/.env.example](backend/.env.example) | Azure Cost API configuration |
+| Document                                     | Description                          |
+| -------------------------------------------- | ------------------------------------ |
+| [FEATURES.md](FEATURES.md)                   | Comprehensive feature documentation  |
+| [SETUP.md](SETUP.md)                         | Installation and configuration guide |
+| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)   | Production deployment guide          |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)     | Common issues and solutions          |
+| [ARCHITECTURE.md](ARCHITECTURE.md)           | Technical architecture details       |
+| [CONTRIBUTING.md](CONTRIBUTING.md)           | Contribution guidelines              |
+| [CLAUDE.md](CLAUDE.md)                       | Developer quick reference            |
+| [backend/.env.example](backend/.env.example) | Azure Cost API configuration         |
 
 ---
 

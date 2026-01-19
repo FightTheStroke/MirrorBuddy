@@ -8,19 +8,14 @@ Successfully implemented accessibility runtime adaptations in TypeScript for the
 
 ### Core Implementation
 
-1. **`accessibility.ts`** (937 lines)
-   - Complete TypeScript implementation of all a11y_* functions from C header
+1. **`accessibility/`** (modular)
+   - Complete TypeScript implementation of all a11y\_\* functions from C header
    - Support for 5 conditions: Dyslexia, Dyscalculia, ADHD, Cerebral Palsy, Autism
    - 40+ accessibility adaptation functions
    - Full TypeScript type safety with enums and interfaces
+   - Modular structure: dyslexia.ts, dyscalculia.ts, adhd.ts, motor.ts, autism.ts, core.ts
 
-2. **`useEducationAccessibility.ts`** (212 lines)
-   - React hooks for easy integration
-   - 5 specialized hooks: `useEducationAccessibility`, `useDyslexiaFormatting`, `useMathAccessibility`, `useADHDSession`, `useMotorAccessibility`
-   - Automatic integration with existing AccessibilityProvider
-   - Profile mapping from Zustand store
-
-3. **`index.ts`**
+2. **`index.ts`**
    - Export aggregator for all education modules
    - Clean import paths
 
@@ -133,27 +128,29 @@ Successfully implemented accessibility runtime adaptations in TypeScript for the
 
 ## Integration
 
-### With Existing AccessibilityProvider
+### Direct Import Pattern
 
-✅ Automatic integration via Zustand store
-✅ Settings mapping:
-  - `dyslexiaFont` → `profile.dyslexia`
-  - `adhdMode` → `profile.adhd`
-  - `ttsEnabled` → `profile.ttsEnabled`
-  - `highContrast` → `profile.highContrast`
-  - `reducedMotion` → `profile.reduceMotion`
-
-### React Hooks
+Functions are imported directly from the modular accessibility library:
 
 ```typescript
-// Main hook
-const { profile, adaptContent, getCSS, formatNumber } = useEducationAccessibility();
-
-// Specialized hooks
-const { syllabifyText, shouldSyllabify } = useDyslexiaFormatting();
-const { formatNumber, shouldDisableTimer } = useMathAccessibility();
-const { start, stop, timeRemaining } = useADHDSession();
-const { getAdjustedTimeout, shouldUseVoice } = useMotorAccessibility();
+// Direct imports from accessibility modules
+import { formatNumberColored } from "@/lib/education/accessibility/dyscalculia";
+import {
+  syllabifyText,
+  formatForDyslexia,
+} from "@/lib/education/accessibility/dyslexia";
+import {
+  limitBulletPoints,
+  getSessionDuration,
+} from "@/lib/education/accessibility/adhd";
+import {
+  shouldAvoidMetaphors,
+  shouldReduceMotion,
+} from "@/lib/education/accessibility/autism";
+import {
+  getAdjustedTimeout,
+  shouldUseVoiceInput,
+} from "@/lib/education/accessibility/motor";
 ```
 
 ## Italian Language Support
@@ -172,6 +169,7 @@ Soft hyphens (`\u00AD`) inserted at syllable breaks.
 ### UI Text
 
 All UI messages, labels, and examples in Italian:
+
 - "Prenditi tutto il tempo che ti serve!" (no timer)
 - "È ora di fare una pausa!" (break reminder)
 - "Ben fatto! Continua così!" (celebration)
@@ -222,14 +220,14 @@ Ready for integration testing:
 
 Perfect 1:1 mapping from C implementation:
 
-| C Function | TypeScript Function |
-|------------|---------------------|
-| `a11y_get_font()` | `a11yGetFont()` |
-| `a11y_get_line_spacing()` | `a11yGetLineSpacing()` |
-| `a11y_format_number_colored()` | `formatNumberColored()` |
-| `a11y_limit_bullets()` | `limitBulletPoints()` |
+| C Function                      | TypeScript Function      |
+| ------------------------------- | ------------------------ |
+| `a11y_get_font()`               | `a11yGetFont()`          |
+| `a11y_get_line_spacing()`       | `a11yGetLineSpacing()`   |
+| `a11y_format_number_colored()`  | `formatNumberColored()`  |
+| `a11y_limit_bullets()`          | `limitBulletPoints()`    |
 | `a11y_get_timeout_multiplier()` | `getTimeoutMultiplier()` |
-| etc. | etc. |
+| etc.                            | etc.                     |
 
 ## Usage in Production
 
@@ -247,6 +245,7 @@ function MyComponent() {
 ### Advanced Integration
 
 See example components:
+
 - `/examples/AccessibleLessonExample.tsx`
 - `/examples/MathVisualizationExample.tsx`
 
@@ -286,7 +285,7 @@ See example components:
 
 ## Summary
 
-✅ **Complete implementation** of all a11y_* functions from C header
+✅ **Complete implementation** of all a11y\_\* functions from C header
 ✅ **5 conditions supported** with severity levels
 ✅ **40+ functions** implemented
 ✅ **5 React hooks** for easy integration

@@ -53,13 +53,37 @@
     },
     {
       "id": 3,
-      "title": "Limits Hit",
+      "title": "Chat Limits Hit",
       "type": "stat",
-      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 0 },
       "targets": [
         {
-          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\"}",
-          "legendFormat": "Limit Hit"
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"chat\"}",
+          "legendFormat": "Chat Limit"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Voice Limits Hit",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"voice\"}",
+          "legendFormat": "Voice Limit"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Tool Limits Hit",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 0 },
+      "targets": [
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"tool\"}",
+          "legendFormat": "Tool Limit"
         }
       ]
     },
@@ -227,6 +251,145 @@
           "legendFormat": "Engaged/hour"
         }
       ]
+    },
+    {
+      "id": 13,
+      "title": "Voice Usage (minutes)",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 20 },
+      "targets": [
+        {
+          "expr": "trial_voice_seconds_total{instance=\"mirrorbuddy\"} / 60",
+          "legendFormat": "Total Minutes"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "min",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 100 },
+              { "color": "red", "value": 500 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 14,
+      "title": "Tool Calls",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 20 },
+      "targets": [
+        {
+          "expr": "trial_tool_calls_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Total Calls"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 500 },
+              { "color": "red", "value": 1000 }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 15,
+      "title": "Resource Usage by Type",
+      "type": "piechart",
+      "gridPos": { "h": 8, "w": 6, "x": 12, "y": 20 },
+      "targets": [
+        {
+          "expr": "trial_chats_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Chats"
+        },
+        {
+          "expr": "trial_voice_seconds_total{instance=\"mirrorbuddy\"} / 60",
+          "legendFormat": "Voice (min)"
+        },
+        {
+          "expr": "trial_tool_calls_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Tools"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right"
+        }
+      }
+    },
+    {
+      "id": 16,
+      "title": "Limit Hit Breakdown",
+      "type": "bargauge",
+      "gridPos": { "h": 8, "w": 6, "x": 18, "y": 20 },
+      "targets": [
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"chat\"}",
+          "legendFormat": "Chat"
+        },
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"voice\"}",
+          "legendFormat": "Voice"
+        },
+        {
+          "expr": "trial_limit_hit_total{instance=\"mirrorbuddy\",limit_type=\"tool\"}",
+          "legendFormat": "Tool"
+        }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal"
+      }
+    },
+    {
+      "id": 17,
+      "title": "Voice/Tool Usage Over Time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 28 },
+      "targets": [
+        {
+          "expr": "rate(trial_voice_seconds_total{instance=\"mirrorbuddy\"}[1h]) / 60",
+          "legendFormat": "Voice min/hour"
+        },
+        {
+          "expr": "rate(trial_tool_calls_total{instance=\"mirrorbuddy\"}[1h])",
+          "legendFormat": "Tools/hour"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "title": "Avg Resource Usage per Trial",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 12, "x": 12, "y": 28 },
+      "targets": [
+        {
+          "expr": "trial_chats_total{instance=\"mirrorbuddy\"} / trial_started_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Avg Chats"
+        },
+        {
+          "expr": "trial_voice_seconds_total{instance=\"mirrorbuddy\"} / 60 / trial_started_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Avg Voice (min)"
+        },
+        {
+          "expr": "trial_tool_calls_total{instance=\"mirrorbuddy\"} / trial_started_total{instance=\"mirrorbuddy\"}",
+          "legendFormat": "Avg Tools"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none"
+      }
     }
   ],
   "refresh": "30s",
