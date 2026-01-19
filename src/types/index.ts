@@ -4,11 +4,7 @@
 // ============================================================================
 
 // Content types
-export type {
-  MaestroVoice,
-  Subject,
-  Maestro,
-} from './content';
+export type { MaestroVoice, Subject, Maestro } from "./content";
 
 // Voice session types
 export type {
@@ -19,7 +15,7 @@ export type {
   Emotion,
   TranscriptEntry,
   AudioLevels,
-} from './voice';
+} from "./voice";
 
 // Education types
 export type {
@@ -33,7 +29,7 @@ export type {
   FlashcardDeck,
   HomeworkStep,
   Homework,
-} from './education';
+} from "./education";
 
 // Gamification types
 export type {
@@ -48,7 +44,7 @@ export type {
   SeasonName,
   Season,
   SeasonHistory,
-} from './gamification';
+} from "./gamification";
 
 // User types
 export type {
@@ -58,7 +54,7 @@ export type {
   Theme,
   AIProvider,
   Settings,
-} from './user';
+} from "./user";
 
 // Conversation types
 export type {
@@ -67,7 +63,7 @@ export type {
   ChatMessageType,
   ChatMessage,
   Conversation,
-} from './conversation';
+} from "./conversation";
 
 // Character types
 export type {
@@ -79,7 +75,7 @@ export type {
   BuddyProfile,
   SupportCharacter,
   CharacterType,
-} from './characters';
+} from "./characters";
 
 // Parent dashboard types
 export type {
@@ -88,7 +84,18 @@ export type {
   LearningStrategy,
   LearningStyleProfile,
   StudentInsights,
-} from './parent';
+} from "./parent";
+
+// Parent dashboard activity types
+export type {
+  WeeklyStats,
+  StudySessionSummary,
+  SubjectBreakdown,
+  QuizSubjectStats,
+  QuizStats,
+  StreakInfo,
+  ParentDashboardActivity,
+} from "./parent-dashboard";
 
 // Ambient audio types
 export type {
@@ -97,7 +104,7 @@ export type {
   AudioPlaybackState,
   AudioLayer,
   AmbientAudioState,
-} from './audio';
+} from "./audio";
 
 // Tool types
 export type {
@@ -150,14 +157,14 @@ export type {
   FormulaRequest,
   CodeExecutionRequest,
   VisualizationRequest,
-} from './tools';
+} from "./tools";
 
 export {
   CHAT_TOOL_DEFINITIONS,
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
   toToolCallRef,
-} from './tools';
+} from "./tools";
 
 export type {
   AdaptiveDifficultyMode,
@@ -166,7 +173,7 @@ export type {
   AdaptiveSignalInput,
   AdaptiveProfile,
   AdaptiveContext,
-} from './adaptive-difficulty';
+} from "./adaptive-difficulty";
 
 // Learning Path types
 export type {
@@ -178,4 +185,4 @@ export type {
   LearningPath,
   TopicProgressUpdate,
   LearningPathProgress,
-} from './learning-path';
+} from "./learning-path";
