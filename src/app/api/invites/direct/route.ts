@@ -54,15 +54,23 @@ export async function POST(request: NextRequest) {
   try {
     const body: DirectInviteBody = await request.json();
 
-    // Validate email
-    if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+    // Validate email with safe linear-time check (no nested quantifiers)
+    const rawEmail = body.email?.trim().toLowerCase() || "";
+    if (
+      !rawEmail ||
+      rawEmail.length > 254 ||
+      !rawEmail.includes("@") ||
+      rawEmail.indexOf("@") === 0 ||
+      rawEmail.indexOf("@") !== rawEmail.lastIndexOf("@") ||
+      !rawEmail.substring(rawEmail.indexOf("@") + 1).includes(".")
+    ) {
       return NextResponse.json(
         { error: "Invalid email format" },
         { status: 400 },
       );
     }
 
-    const email = body.email.toLowerCase().trim();
+    const email = rawEmail;
 
     // Check for existing user
     const existingUser = await prisma.user.findFirst({
