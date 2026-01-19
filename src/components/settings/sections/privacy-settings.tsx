@@ -1,10 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Shield, BarChart3 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Shield, BarChart3, LogOut, User } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import {
   getConsent,
   saveConsent,
@@ -13,11 +15,19 @@ import {
 
 // Privacy Settings
 export function PrivacySettings() {
+  const router = useRouter();
   const [version, setVersion] = useState<{
     version: string;
     buildTime: string;
     environment: string;
   } | null>(null);
+  // Use lazy initialization to check auth state
+  const [isAuthenticated] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const userId = getUserIdFromCookie();
+    return !!userId;
+  });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   // Use lazy initialization to read consent from localStorage
   const [analyticsEnabled, setAnalyticsEnabled] = useState(() => {
     if (typeof window === "undefined") return true;
@@ -32,6 +42,25 @@ export function PrivacySettings() {
       .catch(() => null);
   }, []);
 
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await csrfFetch("/api/auth/logout", { method: "POST" });
+      // Clear local storage
+      const keysToRemove: string[] = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key?.startsWith("mirrorbuddy")) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach((key) => localStorage.removeItem(key));
+      router.push("/login");
+    } catch {
+      setIsLoggingOut(false);
+    }
+  };
+
   const handleAnalyticsToggle = async () => {
     const newValue = !analyticsEnabled;
     setAnalyticsEnabled(newValue);
@@ -41,6 +70,33 @@ export function PrivacySettings() {
 
   return (
     <div className="space-y-6">
+      {/* Account Section - shows when authenticated */}
+      {isAuthenticated && (
+        <Card data-testid="user-menu">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <User className="w-5 h-5 text-blue-500" />
+              Account
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
+              Sei connesso al tuo account MirrorBuddy.
+            </p>
+            <Button
+              variant="outline"
+              data-testid="logout-button"
+              className="w-full"
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {isLoggingOut ? "Disconnessione..." : "Disconnetti"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -131,6 +187,7 @@ export function PrivacySettings() {
             <button
               type="button"
               role="switch"
+              aria-label="Toggle analytics"
               aria-checked={analyticsEnabled}
               onClick={handleAnalyticsToggle}
               className={`relative w-11 h-6 rounded-full transition-colors ${

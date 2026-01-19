@@ -61,7 +61,9 @@ export default async function RootLayout({
     <html lang="it" suppressHydrationWarning>
       <body className={`${inter.className} antialiased`}>
         <Providers nonce={nonce}>
-          <main id="main-content">{children}</main>
+          <main id="main-content" data-testid="main-content">
+            {children}
+          </main>
         </Providers>
       </body>
     </html>

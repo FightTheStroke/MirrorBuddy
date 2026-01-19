@@ -37,6 +37,7 @@ export function TrialStatusIndicator({
 
   return (
     <div
+      data-testid="trial-status"
       className={`flex items-center gap-2 px-3 py-1.5 rounded-full ${bgClass} ${className}`}
     >
       <MessageCircle className={`w-4 h-4 ${colorClass}`} />
