@@ -16,6 +16,7 @@ import {
 } from "@/lib/stores";
 import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { initializeTelemetry } from "@/lib/telemetry";
+import { ActivityTracker } from "@/lib/telemetry/use-activity-tracker";
 import { migrateSessionStorageKey } from "@/lib/storage/migrate-session-key";
 
 // Debug logger - captures all browser errors to file (dev only)
@@ -146,6 +147,7 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
           <TosGateProvider>
             <StoreInitializer />
             <AccentColorApplier />
+            <ActivityTracker />
             {children}
             <ToastContainer />
             <IOSInstallBanner />
