@@ -45,8 +45,6 @@ export default function LoginPage() {
 
       if (data.user?.mustChangePassword) {
         router.push("/change-password");
-      } else if (data.user?.role === "ADMIN") {
-        router.push("/admin");
       } else {
         router.push("/");
       }
