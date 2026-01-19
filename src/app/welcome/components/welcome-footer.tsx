@@ -64,9 +64,9 @@ export function WelcomeFooter() {
         </div>
 
         {/* AI Disclaimer */}
-        <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800/50">
-          <Bot className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-          <span className="text-sm text-blue-800 dark:text-blue-200">
+        <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-700">
+          <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" />
+          <span className="text-sm text-blue-900 dark:text-blue-100">
             Creato con AI - le risposte possono contenere errori
           </span>
         </div>
@@ -82,7 +82,7 @@ export function WelcomeFooter() {
               <span className="text-green-600 dark:text-green-400">
                 {badge.icon}
               </span>
-              <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-100">
                 {badge.label}
               </span>
             </div>

@@ -126,7 +126,8 @@ test.describe("Trial Mode Flow", () => {
     } else {
       // If indicator isn't visible, the home page loaded correctly without it
       // This can happen if the trial mode check doesn't trigger the indicator
-      await expect(page.locator("text=Professori")).toBeVisible();
+      // Use h1 to verify home page loaded (Professori text appears in multiple elements)
+      await expect(page.locator("h1")).toBeVisible();
     }
   });
 
