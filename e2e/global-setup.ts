@@ -83,6 +83,16 @@ async function globalSetup() {
               version: 0,
             }),
           },
+          {
+            name: "mirrorbuddy-consent",
+            value: JSON.stringify({
+              version: "1.0",
+              acceptedAt: new Date().toISOString(),
+              essential: true,
+              analytics: true,
+              marketing: false,
+            }),
+          },
         ],
       },
     ],
