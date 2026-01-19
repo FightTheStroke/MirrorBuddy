@@ -8,7 +8,7 @@
 
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
-import { createHmac, randomBytes } from "crypto";
+import { createHash, randomBytes } from "crypto";
 import { encryptToken, decryptToken } from "@/lib/security";
 import { GOOGLE_OAUTH_ENDPOINTS, getGoogleOAuthConfig } from "./config";
 import type {
@@ -40,7 +40,7 @@ export function generateCodeVerifier(): string {
  * Uses SHA-256 hash of the verifier, base64url encoded
  */
 export function generateCodeChallenge(verifier: string): string {
-  const hash = createHmac("sha256", verifier).digest();
+  const hash = createHash("sha256").update(verifier).digest();
   return hash.toString("base64url");
 }
 
