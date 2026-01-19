@@ -60,17 +60,17 @@ export function WelcomeFooter() {
       aria-label="Footer con informazioni legali e consenso cookie"
     >
       <div className="max-w-4xl mx-auto px-4 py-8">
-        {/* Cookie Consent */}
-        <div className="mb-8">
-          <InlineConsent />
-        </div>
-
         {/* AI Disclaimer */}
         <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-700">
           <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" />
           <span className="text-sm text-blue-900 dark:text-blue-100">
             Creato con AI - le risposte possono contenere errori
           </span>
+        </div>
+
+        {/* Cookie Consent - centered below AI disclaimer */}
+        <div className="mb-6 flex justify-center">
+          <InlineConsent />
         </div>
 
         {/* Compliance Badges */}
