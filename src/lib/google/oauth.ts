@@ -8,7 +8,7 @@
 
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
-import { createHash, randomBytes } from "crypto";
+import { createHash, createHmac, randomBytes } from "crypto";
 import { encryptToken, decryptToken } from "@/lib/security";
 import { GOOGLE_OAUTH_ENDPOINTS, getGoogleOAuthConfig } from "./config";
 import type {
