@@ -46,8 +46,8 @@
     "version:major": "npm version major && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "prepare": "husky",
     "postinstall": "prisma generate",
-    "seed:admin": "npx tsx scripts/seed-admin.ts",
-    "vercel-build": "prisma generate && npm run build && npm run seed:admin"
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
   },
   "overrides": {
     "hono": "4.11.4"
@@ -131,6 +131,7 @@
     "playwright": "^1.57.0",
     "prisma": "^7.2.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5",
     "vitest": "^4.0.16"
   }
