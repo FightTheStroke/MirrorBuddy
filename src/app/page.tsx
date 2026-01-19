@@ -166,6 +166,7 @@ export default function Home() {
         sessionsThisWeek={sessionsThisWeek}
         totalStudyMinutes={totalStudyMinutes}
         questionsAsked={questionsAsked}
+        trialStatus={trialStatus}
       />
 
       <HomeSidebar

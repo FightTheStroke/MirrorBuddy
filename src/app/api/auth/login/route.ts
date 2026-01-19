@@ -25,23 +25,29 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(rateLimitResult);
     }
 
-    const { username, password } = await request.json();
+    const { username, email, password } = await request.json();
+
+    // Accept either email or username (email preferred)
+    const identifier = email || username;
 
     if (
-      !username ||
-      typeof username !== "string" ||
+      !identifier ||
+      typeof identifier !== "string" ||
       !password ||
       typeof password !== "string"
     ) {
-      log.warn("Login attempt: invalid input", { username });
+      log.warn("Login attempt: invalid input", { identifier });
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 },
       );
     }
 
-    const user = await prisma.user.findUnique({
-      where: { username },
+    // Try email first, then username
+    const user = await prisma.user.findFirst({
+      where: {
+        OR: [{ email: identifier }, { username: identifier }],
+      },
       select: {
         id: true,
         username: true,
@@ -53,7 +59,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!user) {
-      log.warn("Login attempt: user not found", { username });
+      log.warn("Login attempt: user not found", { identifier });
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 },
