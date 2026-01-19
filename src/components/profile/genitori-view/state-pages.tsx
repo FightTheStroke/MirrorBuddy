@@ -17,10 +17,8 @@ import { cn } from "@/lib/utils";
 export function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
-      <Loader2 className="h-8 w-8 animate-spin text-accent-themed" />
-      <p className="text-slate-600 dark:text-slate-400">
-        Caricamento profilo...
-      </p>
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="text-muted-foreground">Caricamento profilo...</p>
     </div>
   );
 }
@@ -33,10 +31,12 @@ interface ErrorStateProps {
 export function ErrorState({ error, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center gap-4 text-center py-8">
-      <AlertCircle className="h-12 w-12 text-red-500" />
+      <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
+        <AlertCircle className="h-7 w-7 text-destructive" />
+      </div>
       <div>
-        <h3 className="font-semibold text-lg">Errore</h3>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">{error}</p>
+        <h3 className="font-semibold text-lg text-foreground">Errore</h3>
+        <p className="text-muted-foreground mt-1">{error}</p>
       </div>
       <Button onClick={onRetry}>
         <RefreshCw className="h-4 w-4 mr-2" />
@@ -61,24 +61,20 @@ export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
         "rounded-xl p-4 mb-6 border",
         highContrast
           ? "bg-yellow-400/10 border-yellow-400"
-          : "bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 border-indigo-200 dark:border-indigo-800",
+          : "bg-primary/5 border-primary/20",
       )}
     >
       <div className="flex items-start gap-4">
         <div
           className={cn(
-            "shrink-0 p-2 rounded-lg",
-            highContrast
-              ? "bg-yellow-400 text-black"
-              : "bg-indigo-100 dark:bg-indigo-900/50",
+            "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center",
+            highContrast ? "bg-yellow-400 text-black" : "bg-card shadow-sm",
           )}
         >
           <Sparkles
             className={cn(
               "h-5 w-5",
-              highContrast
-                ? "text-black"
-                : "text-indigo-600 dark:text-indigo-400",
+              highContrast ? "text-black" : "text-primary",
             )}
           />
         </div>
@@ -86,9 +82,7 @@ export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
           <h2
             className={cn(
               "font-semibold",
-              highContrast
-                ? "text-yellow-400"
-                : "text-indigo-900 dark:text-indigo-100",
+              highContrast ? "text-yellow-400" : "text-foreground",
             )}
           >
             Benvenuto nell&apos;Area Genitori
@@ -96,9 +90,7 @@ export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
           <p
             className={cn(
               "text-sm mt-1",
-              highContrast
-                ? "text-yellow-200"
-                : "text-indigo-700 dark:text-indigo-300",
+              highContrast ? "text-yellow-200" : "text-muted-foreground",
             )}
           >
             Questa dashboard si popolerà automaticamente quando lo studente
@@ -116,13 +108,15 @@ interface NeedsConsentStateProps {
 
 export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
   return (
-    <Card>
+    <Card className="border-border">
       <CardHeader className="text-center pb-2">
-        <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
-          <Shield className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+        <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+          <Shield className="h-7 w-7 text-primary" />
         </div>
-        <CardTitle>Consenso per il Dashboard Genitori</CardTitle>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
+        <CardTitle className="text-foreground">
+          Consenso per il Dashboard Genitori
+        </CardTitle>
+        <p className="text-sm text-muted-foreground mt-2">
           Per visualizzare le osservazioni dei Professori, abbiamo bisogno del
           tuo consenso.
         </p>
@@ -139,15 +133,15 @@ export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
 
 export function DeletionPendingState() {
   return (
-    <Card>
+    <Card className="border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-amber-600">
+        <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
           <Trash2 className="h-5 w-5" />
           Cancellazione Richiesta
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           I dati verranno eliminati entro 30 giorni, come previsto dal GDPR.
         </p>
       </CardContent>
