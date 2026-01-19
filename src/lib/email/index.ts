@@ -77,7 +77,8 @@ export async function sendEmail(
     };
   }
 
-  const from = options.from || "MirrorBuddy <noreply@mirrorbuddy.app>";
+  const from =
+    options.from || "MirrorBuddy <noreply@donotreply.mirrorbuddy.org>";
 
   try {
     const { data, error } = await client.emails.send({
