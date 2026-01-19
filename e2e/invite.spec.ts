@@ -146,9 +146,16 @@ test.describe("Beta Invite System", () => {
 
     test("should open reject modal with reason field", async ({ page }) => {
       await page.goto("/admin/invites");
+      await page.waitForLoadState("networkidle");
+
+      // Wait for the invite list to load
+      await expect(page.locator("text=User One")).toBeVisible();
 
       // Click reject button
       await page.locator("button:has-text('Rifiuta')").first().click();
+
+      // Wait for modal animation
+      await page.waitForTimeout(300);
 
       // Should show modal
       await expect(page.locator("text=Motivo del rifiuto")).toBeVisible();

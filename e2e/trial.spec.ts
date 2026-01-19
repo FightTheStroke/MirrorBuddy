@@ -7,6 +7,9 @@
 import { test, expect } from "@playwright/test";
 
 test.describe("Trial Mode Flow", () => {
+  // Start fresh without global storageState (no pre-set consent/auth)
+  test.use({ storageState: undefined });
+
   test.beforeEach(async ({ context }) => {
     // Clear all cookies and localStorage for fresh trial
     await context.clearCookies();
