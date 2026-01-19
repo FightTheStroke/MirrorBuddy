@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowRight, MessageCircle, BookOpen, Users } from "lucide-react";
+import Link from "next/link";
+import {
+  ArrowRight,
+  MessageCircle,
+  BookOpen,
+  Users,
+  UserPlus,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface TrialOnboardingProps {
@@ -111,10 +118,22 @@ export function TrialOnboarding({ onComplete }: TrialOnboardingProps) {
         </div>
 
         {/* Footer */}
-        <div className="px-8 pb-6">
+        <div className="px-8 pb-6 space-y-3">
           <p className="text-xs text-center text-slate-400">
             Nessuna carta di credito richiesta. Prova gratuita.
           </p>
+          <div className="flex justify-center">
+            <Link href="/invite/request">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="text-xs text-purple-600 dark:text-purple-400"
+              >
+                <UserPlus className="w-3 h-3 mr-1" />
+                Vuoi l&apos;accesso completo? Richiedi la beta
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </div>

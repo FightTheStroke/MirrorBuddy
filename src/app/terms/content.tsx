@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 export function TermsContent() {
   return (
@@ -54,7 +54,43 @@ export function TermsContent() {
         </div>
       </Section>
 
-      <Section number={4} title="Se qualcosa va storto">
+      <Section number={4} title="I Professori AI">
+        <p>
+          MirrorBuddy include professori virtuali ispirati a figure storiche e
+          contemporanee. Ecco cosa devi sapere:
+        </p>
+        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 mb-2">
+            Scopo puramente educativo
+          </p>
+          <p className="text-slate-700">
+            I professori AI sono creati esclusivamente per scopi educativi e di
+            dimostrazione. Non rappresentano le persone reali e non sono
+            affiliati o approvati da esse.
+          </p>
+        </div>
+        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 mb-2">
+            I professori possono cambiare
+          </p>
+          <p className="text-slate-700">
+            La lista dei professori disponibili potrebbe variare nel tempo.
+            Alcuni potrebbero essere sostituiti o rimossi.
+          </p>
+        </div>
+        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 mb-2">
+            Versione dimostrativa
+          </p>
+          <p className="text-slate-700">
+            Questa versione serve a dimostrare le potenzialita della
+            piattaforma. In futuro, ogni studente potra creare i propri
+            professori personalizzati, scegliendo liberamente nomi e avatar.
+          </p>
+        </div>
+      </Section>
+
+      <Section number={5} title="Se qualcosa va storto">
         <p>
           MirrorBuddy è gratuito e fatto con il cuore. Non possiamo essere
           responsabili se:
@@ -71,12 +107,12 @@ export function TermsContent() {
         </p>
       </Section>
 
-      <Section number={5} title="Ti chiediamo di...">
+      <Section number={6} title="Ti chiediamo di...">
         <p>Per far funzionare tutto bene, ti chiediamo di:</p>
         <ul>
           <li>
-            <strong>Usare MirrorBuddy con rispetto</strong> - verso l&apos;app
-            e verso gli altri
+            <strong>Usare MirrorBuddy con rispetto</strong> - verso l&apos;app e
+            verso gli altri
           </li>
           <li>
             <strong>Non provare a &quot;fregare&quot; l&apos;AI</strong> - non
@@ -92,7 +128,7 @@ export function TermsContent() {
         </ul>
       </Section>
 
-      <Section number={6} title="Per i genitori e tutori">
+      <Section number={7} title="Per i genitori e tutori">
         <p>Se tuo figlio ha meno di 14 anni:</p>
         <ul>
           <li>
@@ -113,12 +149,16 @@ export function TermsContent() {
         </ul>
       </Section>
 
-      <Section number={7} title="I tuoi dati">
+      <Section number={8} title="I tuoi dati">
         <p>
-          Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la{' '}
-          <a href="/privacy" className="text-blue-600 hover:text-blue-700 underline">
+          Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la{" "}
+          <a
+            href="/privacy"
+            className="text-blue-600 hover:text-blue-700 underline"
+          >
             Privacy Policy completa
-          </a>.
+          </a>
+          .
         </p>
         <p>In breve:</p>
         <ul>
@@ -129,7 +169,7 @@ export function TermsContent() {
         </ul>
       </Section>
 
-      <Section number={8} title="Possiamo bloccarti?">
+      <Section number={9} title="Possiamo bloccarti?">
         <p>Sì, ma solo se:</p>
         <ul>
           <li>Abusi del servizio</li>
@@ -142,7 +182,7 @@ export function TermsContent() {
         </p>
       </Section>
 
-      <Section number={9} title="Modifiche a questi termini">
+      <Section number={10} title="Modifiche a questi termini">
         <p>Se cambiamo questi termini:</p>
         <ul>
           <li>Ti avviseremo</li>
@@ -151,7 +191,7 @@ export function TermsContent() {
         </ul>
       </Section>
 
-      <Section number={10} title="Legge e tribunale">
+      <Section number={11} title="Legge e tribunale">
         <p>Questi termini seguono la legge italiana.</p>
         <p>
           Se proprio non riusciamo a risolvere un problema parlando, il
@@ -174,8 +214,13 @@ function Section({
   const headingId = `section-${number}`;
   return (
     <section className="mb-8" aria-labelledby={headingId}>
-      <h2 id={headingId} className="text-2xl font-bold text-slate-900 mb-4 flex items-baseline gap-3">
-        <span className="text-blue-600" aria-hidden="true">{number}.</span>
+      <h2
+        id={headingId}
+        className="text-2xl font-bold text-slate-900 mb-4 flex items-baseline gap-3"
+      >
+        <span className="text-blue-600" aria-hidden="true">
+          {number}.
+        </span>
         {title}
       </h2>
       <div className="space-y-4">{children}</div>

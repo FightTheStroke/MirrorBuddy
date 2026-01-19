@@ -1,26 +1,35 @@
-'use client';
+"use client";
 
-import { Sparkles, Heart, GraduationCap, Palette } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { CharacterSelector } from './character-selector';
-import { ColorPicker, ColorPreview } from './color-picker';
-import { BORDER_COLORS, COACHES, BUDDIES } from './character-settings-data';
+import { Sparkles, Heart, GraduationCap, Palette } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { CharacterSelector } from "./character-selector";
+import { ColorPicker, ColorPreview } from "./color-picker";
+import { BORDER_COLORS, COACHES, BUDDIES } from "./character-settings-data";
 
 interface CharacterSettingsProps {
   profile: {
-    preferredCoach?: 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij';
-    preferredBuddy?: 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia';
+    preferredCoach?:
+      | "melissa"
+      | "roberto"
+      | "chiara"
+      | "andrea"
+      | "favij"
+      | "laura";
+    preferredBuddy?: "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta";
     coachBorderColor?: string;
     buddyBorderColor?: string;
   };
-  onUpdate: (updates: Partial<CharacterSettingsProps['profile']>) => void;
+  onUpdate: (updates: Partial<CharacterSettingsProps["profile"]>) => void;
 }
 
-export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps) {
-  const selectedCoach = profile.preferredCoach || 'melissa';
-  const selectedBuddy = profile.preferredBuddy || 'mario';
-  const coachData = COACHES.find(c => c.id === selectedCoach);
-  const buddyData = BUDDIES.find(b => b.id === selectedBuddy);
+export function CharacterSettings({
+  profile,
+  onUpdate,
+}: CharacterSettingsProps) {
+  const selectedCoach = profile.preferredCoach || "melissa";
+  const selectedBuddy = profile.preferredBuddy || "mario";
+  const coachData = COACHES.find((c) => c.id === selectedCoach);
+  const buddyData = BUDDIES.find((b) => b.id === selectedBuddy);
 
   return (
     <div className="space-y-8">
@@ -31,7 +40,8 @@ export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps)
             Il Tuo Coach di Apprendimento
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare autonomo
+            Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare
+            autonomo
           </p>
         </CardHeader>
         <CardContent>
@@ -40,7 +50,13 @@ export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps)
             selectedId={selectedCoach}
             onSelect={(id) =>
               onUpdate({
-                preferredCoach: id as 'melissa' | 'roberto' | 'chiara' | 'andrea' | 'favij',
+                preferredCoach: id as
+                  | "melissa"
+                  | "roberto"
+                  | "chiara"
+                  | "andrea"
+                  | "favij"
+                  | "laura",
               })
             }
             title=""
@@ -56,7 +72,8 @@ export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps)
             Il Tuo MirrorBuddy
           </CardTitle>
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Il buddy e un amico della tua eta che capisce le tue difficolta e ti supporta
+            Il buddy e un amico della tua eta che capisce le tue difficolta e ti
+            supporta
           </p>
         </CardHeader>
         <CardContent>
@@ -65,7 +82,13 @@ export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps)
             selectedId={selectedBuddy}
             onSelect={(id) =>
               onUpdate({
-                preferredBuddy: id as 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia',
+                preferredBuddy: id as
+                  | "mario"
+                  | "noemi"
+                  | "enea"
+                  | "bruno"
+                  | "sofia"
+                  | "marta",
               })
             }
             title=""
@@ -122,8 +145,9 @@ export function CharacterSettings({ profile, onUpdate }: CharacterSettingsProps)
               Il Triangolo del Supporto
             </h4>
             <p className="text-sm text-amber-700 dark:text-amber-300 mt-1">
-              Il coach ti insegna il metodo, il buddy ti supporta emotivamente, e i Professori ti spiegano le materie.
-              Insieme formano il tuo team di apprendimento personalizzato!
+              Il coach ti insegna il metodo, il buddy ti supporta emotivamente,
+              e i Professori ti spiegano le materie. Insieme formano il tuo team
+              di apprendimento personalizzato!
             </p>
           </div>
         </div>

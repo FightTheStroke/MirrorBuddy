@@ -1,11 +1,13 @@
 "use client";
 
-import { ChevronUp, ChevronDown } from "lucide-react";
+import Link from "next/link";
+import { ChevronUp, ChevronDown, LogIn, UserPlus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActiveMaestroAvatar } from "@/components/conversation";
+import { TrialStatusIndicator } from "@/components/trial";
 import type { View } from "@/app/types";
 
 interface NavItem {
@@ -16,6 +18,13 @@ interface NavItem {
   avatar?: string;
 }
 
+interface TrialStatus {
+  isTrialMode: boolean;
+  chatsUsed: number;
+  chatsRemaining: number;
+  maxChats: number;
+}
+
 interface HomeSidebarProps {
   open: boolean;
   onToggle: () => void;
@@ -24,6 +33,7 @@ interface HomeSidebarProps {
   navItems: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
+  trialStatus?: TrialStatus;
 }
 
 export function HomeSidebar({
@@ -34,6 +44,7 @@ export function HomeSidebar({
   navItems,
   hasNewInsights,
   onParentAccess,
+  trialStatus,
 }: HomeSidebarProps) {
   return (
     <aside
@@ -79,6 +90,48 @@ export function HomeSidebar({
           )}
         </Button>
       </div>
+
+      {/* Trial Status Indicator */}
+      {trialStatus?.isTrialMode && (
+        <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex flex-col gap-2">
+            {open && (
+              <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                Modalità Prova
+              </span>
+            )}
+            <TrialStatusIndicator
+              chatCount={trialStatus.chatsUsed}
+              maxChats={trialStatus.maxChats}
+              className={cn(!open && "justify-center")}
+            />
+            {open && (
+              <div className="flex flex-col gap-1 mt-2">
+                <Link href="/login">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-xs"
+                  >
+                    <LogIn className="w-3 h-3 mr-2" />
+                    Accedi
+                  </Button>
+                </Link>
+                <Link href="/invite/request">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
+                  >
+                    <UserPlus className="w-3 h-3 mr-2" />
+                    Richiedi accesso
+                  </Button>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Navigation */}
       <nav
