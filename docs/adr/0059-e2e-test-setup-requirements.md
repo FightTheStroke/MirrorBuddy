@@ -85,13 +85,13 @@ Document all E2E test setup requirements and update this ADR when new blocking c
 - Clear checklist for adding new "wall" components
 - Reduced time spent on recurring CI issues
 
-## Comprehensive Local Testing Suite
+---
 
-### Overview
+## Local Testing Strategy
 
-Before pushing to CI or creating a release, developers should run the full local test suite to catch issues early. MirrorBuddy provides multiple testing phases:
+### Standard Testing Phases
 
-### Testing Phases
+Before pushing to CI or creating a release, developers should run the appropriate test suite:
 
 | Phase            | Command                   | Purpose              | Wall bypass?   |
 | ---------------- | ------------------------- | -------------------- | -------------- |
@@ -117,54 +117,96 @@ Before pushing to CI or creating a release, developers should run the full local
 
 **Global setup** (`e2e/global-setup.ts`) bypasses walls via localStorage. Update when adding new walls.
 
-### Local Testing Instructions
+---
 
-#### Quick Smoke Test (5 min)
+## Comprehensive Local Testing Suite
 
-```bash
-npm run dev              # Terminal 1: Start server
-npm run test -- --grep "smoke"  # Terminal 2: Quick smoke only
-```
+**Added**: 2026-01-19 | **Context**: Full UI/navigation/security testing before release
 
-#### Full Local Test Suite (15 min)
+### Overview
 
-```bash
-npm run dev              # Terminal 1: Keep server running
-npm run typecheck        # Terminal 2
-npm run lint
-npm run test:unit
-npm run test             # E2E - uses global-setup.ts walls
-./scripts/perf-check.sh
-```
+A comprehensive local-only test suite that validates navigation, UI consistency, performance, and security. Runs unattended and generates actionable HTML reports.
 
-#### Pre-push Check (Recommended, 30 min)
+### Quick Start
 
 ```bash
-npm run pre-push         # Simulates Vercel pipeline (~45s)
+# Basic run (required tests)
+./scripts/full-local-test.sh
+
+# Full run with visual regression and bundle analysis
+./scripts/full-local-test.sh --visual --bundle
 ```
 
-#### Full Release Gate (CI simulation, 45+ min)
+### Test Phases
 
-```bash
-npm run release:gate     # Blocks on any failure
-# - Phase 0: Pre-release checks
-# - Phase 1: TypeScript rigor (@ts-ignore, any)
-# - Phase 2: Unit tests + coverage
-# - Phase 3: E2E tests (uses walls)
-# - Phase 4: Performance gates
-# - Phase 5: File size limits
-# - Phase 6: Plan sanity
+| Phase | Description                     | Duration | Blocking |
+| ----- | ------------------------------- | -------- | -------- |
+| 1     | Route inventory validation      | ~5s      | Yes      |
+| 2     | Trial UI audit (24 routes)      | ~2min    | Yes      |
+| 3     | Admin UI audit (7 routes)       | ~1min    | Yes      |
+| 4     | Settings interactions           | ~30s     | Yes      |
+| 5     | Visual regression               | ~2min    | Optional |
+| 6     | Lighthouse (4 routes)           | ~3min    | Yes      |
+| 7     | Bundle analysis                 | ~1min    | Optional |
+| 8     | Security scan (npm audit + ZAP) | ~2min    | Yes      |
+
+### Thresholds
+
+| Metric                  | Limit   | Source               |
+| ----------------------- | ------- | -------------------- |
+| Lighthouse Performance  | ≥ 90%   | lighthouserc.js      |
+| Lighthouse LCP          | < 2.5s  | lighthouserc.js      |
+| Lighthouse CLS          | < 0.1   | lighthouserc.js      |
+| Bundle main (gzip)      | < 250KB | check-bundle-size.ts |
+| Bundle chunks (gzip)    | < 100KB | check-bundle-size.ts |
+| npm audit high/critical | 0       | security-scan.sh     |
+| Console errors          | 0       | trial-ui.spec.ts     |
+
+### Key Files
+
+```
+scripts/
+├── full-local-test.sh          # Main orchestrator
+├── full-local-test-helpers.sh  # Helper functions
+├── generate-route-inventory.ts # Route discovery
+├── generate-test-report.ts     # HTML report generator
+├── check-bundle-size.ts        # Bundle size validation
+└── security-scan.sh            # npm audit + OWASP ZAP
+
+e2e/full-ui-audit/
+├── trial-ui.spec.ts            # Trial mode navigation
+├── admin-ui.spec.ts            # Admin mode navigation
+├── settings.spec.ts            # Settings interactions
+└── visual-regression.spec.ts   # Screenshot comparison
+
+e2e/fixtures/
+├── auth-fixtures.ts            # Trial/admin page fixtures
+└── auth-fixtures-helpers.ts    # Cookie signing, storage
 ```
 
-### Test Coverage & Thresholds
+### Integration with Release Process
 
-- **Unit tests**: 80% coverage target
-- **E2E tests**: 24 spec files, 100+ scenarios
-- **Accessibility**: axe-core audit on selected pages
-- **Performance**: Bundle size, N+1 patterns, lazy loading gates
-- **File size**: Max 250 lines/file enforcement
+Optional in `app-release-manager` Phase 1.5:
 
-### Wall Component Requirements (F-16 Acceptance)
+1. Agent asks: "Vuoi eseguire il full local test? (~15-20min) [si/no]"
+2. If yes: runs `./scripts/full-local-test.sh`
+3. If fails: blocks release, attempts auto-fix
+4. Report saved to `reports/full-local-test-YYYYMMDD.html`
+
+### NOT for CI
+
+This suite is local-only by design:
+
+- Requires app running on localhost:3000
+- Visual regression needs human baseline approval
+- OWASP ZAP requires Docker
+- ~15-20 min runtime too long for CI feedback loop
+
+Use `npm run release:gate` for CI-appropriate checks.
+
+---
+
+## Wall Component Requirements (F-16 Acceptance)
 
 When adding new "wall" components:
 
@@ -172,10 +214,3 @@ When adding new "wall" components:
 2. Test E2E suite passes: `npm run test`
 3. Verify no "white dots" (unresolved threads) in code reviews
 4. Add wall type to ADR 0059 checklist (this file)
-
-### CI/CD Integration
-
-- **PR checks**: Pre-push + lint + typecheck + build
-- **Full CI**: Release gate phases 0-6
-- **Manual override**: Add skip-checks comment only for emergencies
-- **Performance**: Non-blocking warnings in v0.7, blocking in v1.0

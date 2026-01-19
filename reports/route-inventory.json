@@ -1,0 +1,195 @@
+{
+  "generatedAt": "2026-01-19T21:09:01.003Z",
+  "totalRoutes": 31,
+  "expectedRoutes": 31,
+  "routes": [
+    {
+      "path": "/",
+      "filePath": "src/app/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T20:21:53.710Z"
+    },
+    {
+      "path": "/admin",
+      "filePath": "src/app/admin/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T14:34:33.494Z"
+    },
+    {
+      "path": "/admin/analytics",
+      "filePath": "src/app/admin/analytics/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T19:07:10.717Z"
+    },
+    {
+      "path": "/admin/invites",
+      "filePath": "src/app/admin/invites/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T10:27:00.960Z"
+    },
+    {
+      "path": "/admin/tos",
+      "filePath": "src/app/admin/tos/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-18T19:06:10.026Z"
+    },
+    {
+      "path": "/admin/users",
+      "filePath": "src/app/admin/users/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-18T18:23:49.740Z"
+    },
+    {
+      "path": "/archivio",
+      "filePath": "src/app/archivio/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.111Z"
+    },
+    {
+      "path": "/astuccio",
+      "filePath": "src/app/astuccio/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-13T08:56:15.448Z"
+    },
+    {
+      "path": "/change-password",
+      "filePath": "src/app/change-password/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-18T20:52:26.681Z"
+    },
+    {
+      "path": "/chart",
+      "filePath": "src/app/chart/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.112Z"
+    },
+    {
+      "path": "/cookies",
+      "filePath": "src/app/cookies/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T18:36:38.019Z"
+    },
+    {
+      "path": "/demo",
+      "filePath": "src/app/demo/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.113Z"
+    },
+    {
+      "path": "/diagram",
+      "filePath": "src/app/diagram/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.113Z"
+    },
+    {
+      "path": "/flashcard",
+      "filePath": "src/app/flashcard/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-13T08:56:15.448Z"
+    },
+    {
+      "path": "/formula",
+      "filePath": "src/app/formula/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.113Z"
+    },
+    {
+      "path": "/homework",
+      "filePath": "src/app/homework/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-13T08:56:15.448Z"
+    },
+    {
+      "path": "/invite/request",
+      "filePath": "src/app/invite/request/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T07:19:46.622Z"
+    },
+    {
+      "path": "/landing",
+      "filePath": "src/app/landing/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-18T20:34:04.452Z"
+    },
+    {
+      "path": "/login",
+      "filePath": "src/app/login/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T20:22:03.370Z"
+    },
+    {
+      "path": "/mindmap",
+      "filePath": "src/app/mindmap/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-13T08:56:15.449Z"
+    },
+    {
+      "path": "/pdf",
+      "filePath": "src/app/pdf/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.115Z"
+    },
+    {
+      "path": "/privacy",
+      "filePath": "src/app/privacy/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T18:36:38.019Z"
+    },
+    {
+      "path": "/quiz",
+      "filePath": "src/app/quiz/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-13T08:56:15.449Z"
+    },
+    {
+      "path": "/search",
+      "filePath": "src/app/search/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.115Z"
+    },
+    {
+      "path": "/study-kit",
+      "filePath": "src/app/study-kit/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T10:35:48.335Z"
+    },
+    {
+      "path": "/summary",
+      "filePath": "src/app/summary/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.116Z"
+    },
+    {
+      "path": "/supporti",
+      "filePath": "src/app/supporti/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.118Z"
+    },
+    {
+      "path": "/terms",
+      "filePath": "src/app/terms/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-19T18:36:38.020Z"
+    },
+    {
+      "path": "/timeline",
+      "filePath": "src/app/timeline/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.119Z"
+    },
+    {
+      "path": "/webcam",
+      "filePath": "src/app/webcam/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-10T10:29:35.119Z"
+    },
+    {
+      "path": "/welcome",
+      "filePath": "src/app/welcome/page.tsx",
+      "exists": true,
+      "lastModified": "2026-01-06T15:37:25.656Z"
+    }
+  ],
+  "missingRoutes": [],
+  "unexpectedRoutes": []
+}
