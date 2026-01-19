@@ -2,7 +2,7 @@
  * Email templates for the beta invite system
  */
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@mirrorbuddy.app";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "info@fightthestroke.org";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
 export interface InviteRequestData {

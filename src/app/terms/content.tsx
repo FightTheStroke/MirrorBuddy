@@ -2,7 +2,7 @@
 
 export function TermsContent() {
   return (
-    <div className="prose prose-slate max-w-none prose-headings:text-slate-900 prose-p:text-slate-700 prose-p:leading-relaxed prose-li:text-slate-700">
+    <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">
       <Section number={1} title="Cos'è MirrorBuddy">
         <p>
           MirrorBuddy è un&apos;app gratuita che usa l&apos;intelligenza
@@ -25,29 +25,29 @@ export function TermsContent() {
 
       <Section number={3} title="Cosa NON possiamo promettere">
         <p>Siamo onesti: MirrorBuddy ha dei limiti.</p>
-        <div className="pl-4 border-l-2 border-amber-400 bg-amber-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-amber-900 mb-2">
+        <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
             Non siamo una scuola
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             MirrorBuddy aiuta a studiare, ma non sostituisce insegnanti e
             scuola.
           </p>
         </div>
-        <div className="pl-4 border-l-2 border-amber-400 bg-amber-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-amber-900 mb-2">
+        <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
             L&apos;AI può sbagliare
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             L&apos;intelligenza artificiale è brava ma non perfetta. Controlla
             sempre le risposte importanti con un adulto o un libro.
           </p>
         </div>
-        <div className="pl-4 border-l-2 border-amber-400 bg-amber-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-amber-900 mb-2">
+        <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
             È un servizio gratuito in beta
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             Facciamo del nostro meglio, ma il servizio potrebbe non funzionare
             sempre o cambiare.
           </p>
@@ -59,30 +59,30 @@ export function TermsContent() {
           MirrorBuddy include professori virtuali ispirati a figure storiche e
           contemporanee. Ecco cosa devi sapere:
         </p>
-        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-blue-900 mb-2">
+        <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
             Scopo puramente educativo
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             I professori AI sono creati esclusivamente per scopi educativi e di
             dimostrazione. Non rappresentano le persone reali e non sono
             affiliati o approvati da esse.
           </p>
         </div>
-        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-blue-900 mb-2">
+        <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
             I professori possono cambiare
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             La lista dei professori disponibili potrebbe variare nel tempo.
             Alcuni potrebbero essere sostituiti o rimossi.
           </p>
         </div>
-        <div className="pl-4 border-l-2 border-blue-400 bg-blue-50 p-4 rounded-r-lg my-4">
-          <p className="font-semibold text-blue-900 mb-2">
+        <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
+          <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
             Versione dimostrativa
           </p>
-          <p className="text-slate-700">
+          <p className="text-slate-700 dark:text-gray-300">
             Questa versione serve a dimostrare le potenzialita della
             piattaforma. In futuro, ogni studente potra creare i propri
             professori personalizzati, scegliendo liberamente nomi e avatar.
@@ -101,7 +101,7 @@ export function TermsContent() {
           <li>Non passi un esame (studiare resta fondamentale!)</li>
           <li>Succede qualcosa mentre usi l&apos;app</li>
         </ul>
-        <p className="text-slate-600 italic">
+        <p className="text-slate-600 dark:text-gray-400 italic">
           Questo non significa che non ci importa - ci importa moltissimo! Ma
           legalmente dobbiamo proteggerci per poter continuare ad aiutare.
         </p>
@@ -216,9 +216,9 @@ function Section({
     <section className="mb-8" aria-labelledby={headingId}>
       <h2
         id={headingId}
-        className="text-2xl font-bold text-slate-900 mb-4 flex items-baseline gap-3"
+        className="text-2xl font-bold text-slate-900 dark:text-white mb-4 flex items-baseline gap-3"
       >
-        <span className="text-blue-600" aria-hidden="true">
+        <span className="text-blue-600 dark:text-blue-400" aria-hidden="true">
           {number}.
         </span>
         {title}
