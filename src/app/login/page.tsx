@@ -7,8 +7,11 @@ import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface LoginResponse {
-  success: boolean;
-  mustChangePassword?: boolean;
+  user?: {
+    id: string;
+    role: string;
+    mustChangePassword: boolean;
+  };
   error?: string;
 }
 
@@ -40,7 +43,7 @@ export default function LoginPage() {
         return;
       }
 
-      if (data.mustChangePassword) {
+      if (data.user?.mustChangePassword) {
         router.push("/change-password");
       } else {
         router.push("/");

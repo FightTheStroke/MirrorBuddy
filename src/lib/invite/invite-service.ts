@@ -39,6 +39,13 @@ export interface RejectInviteResult {
   error?: string;
 }
 
+export interface BulkOperationResult {
+  success: boolean;
+  processed: number;
+  failed: number;
+  errors: Array<{ requestId: string; error: string }>;
+}
+
 /**
  * Notify admin of new beta request
  */
@@ -304,4 +311,104 @@ export async function getInvites(status?: "PENDING" | "APPROVED" | "REJECTED") {
     where: status ? { status } : undefined,
     orderBy: { createdAt: "desc" },
   });
+}
+
+/**
+ * Bulk approve multiple invite requests
+ * Processes up to MAX_BATCH_SIZE requests with concurrency limit
+ */
+const MAX_BATCH_SIZE = 50;
+const CONCURRENCY_LIMIT = 5;
+
+export async function bulkApproveInvites(
+  requestIds: string[],
+  adminUserId: string,
+): Promise<BulkOperationResult> {
+  const ids = requestIds.slice(0, MAX_BATCH_SIZE);
+  const errors: Array<{ requestId: string; error: string }> = [];
+  let processed = 0;
+
+  // Process in chunks to avoid overwhelming email service
+  for (let i = 0; i < ids.length; i += CONCURRENCY_LIMIT) {
+    const chunk = ids.slice(i, i + CONCURRENCY_LIMIT);
+    const results = await Promise.allSettled(
+      chunk.map((id) => approveInviteRequest(id, adminUserId)),
+    );
+
+    results.forEach((result, idx) => {
+      const requestId = chunk[idx];
+      if (result.status === "fulfilled" && result.value.success) {
+        processed++;
+      } else {
+        const error =
+          result.status === "rejected"
+            ? String(result.reason)
+            : result.value.error || "Unknown error";
+        errors.push({ requestId, error });
+      }
+    });
+  }
+
+  logger.info("Bulk approve completed", {
+    total: ids.length,
+    processed,
+    failed: errors.length,
+    adminUserId,
+  });
+
+  return {
+    success: errors.length === 0,
+    processed,
+    failed: errors.length,
+    errors,
+  };
+}
+
+/**
+ * Bulk reject multiple invite requests
+ * Processes up to MAX_BATCH_SIZE requests with concurrency limit
+ */
+export async function bulkRejectInvites(
+  requestIds: string[],
+  adminUserId: string,
+  reason?: string,
+): Promise<BulkOperationResult> {
+  const ids = requestIds.slice(0, MAX_BATCH_SIZE);
+  const errors: Array<{ requestId: string; error: string }> = [];
+  let processed = 0;
+
+  // Process in chunks to avoid overwhelming email service
+  for (let i = 0; i < ids.length; i += CONCURRENCY_LIMIT) {
+    const chunk = ids.slice(i, i + CONCURRENCY_LIMIT);
+    const results = await Promise.allSettled(
+      chunk.map((id) => rejectInviteRequest(id, adminUserId, reason)),
+    );
+
+    results.forEach((result, idx) => {
+      const requestId = chunk[idx];
+      if (result.status === "fulfilled" && result.value.success) {
+        processed++;
+      } else {
+        const error =
+          result.status === "rejected"
+            ? String(result.reason)
+            : result.value.error || "Unknown error";
+        errors.push({ requestId, error });
+      }
+    });
+  }
+
+  logger.info("Bulk reject completed", {
+    total: ids.length,
+    processed,
+    failed: errors.length,
+    adminUserId,
+  });
+
+  return {
+    success: errors.length === 0,
+    processed,
+    failed: errors.length,
+    errors,
+  };
 }

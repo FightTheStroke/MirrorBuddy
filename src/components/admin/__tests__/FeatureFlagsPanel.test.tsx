@@ -4,112 +4,131 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { FeatureFlagsPanel } from "../FeatureFlagsPanel";
 
-// Mock csrfFetch to avoid CSRF token fetching in tests
+// Mock csrfFetch
 const mockCsrfFetch = vi.fn();
 vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));
 
-// Mock the hooks
-vi.mock("@/lib/hooks/use-feature-flags", () => ({
-  useFeatureFlags: vi.fn(() => ({
-    flags: [
-      {
-        id: "voice_realtime",
-        name: "Real-time Voice",
-        description: "WebSocket-based voice",
-        status: "enabled",
-        enabledPercentage: 100,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-      {
-        id: "rag_enabled",
-        name: "RAG Retrieval",
-        description: "Semantic search",
-        status: "enabled",
-        enabledPercentage: 50,
-        killSwitch: false,
-        updatedAt: new Date(),
-      },
-      {
-        id: "pdf_export",
-        name: "PDF Export",
-        description: "Accessible PDF generation",
-        status: "disabled",
-        enabledPercentage: 100,
-        killSwitch: true,
-        updatedAt: new Date(),
-      },
-    ],
-    globalKillSwitch: false,
-    degradationState: {
-      level: "none",
-      activeRules: [],
-      degradedFeatures: new Map(),
-      since: new Date(),
-    },
-    refresh: vi.fn(),
-    isLoading: false,
-  })),
-}));
+// Mock fetch globally
+const mockFetch = vi.fn();
 
 describe("FeatureFlagsPanel", () => {
+  const mockFlags = [
+    {
+      id: "voice_realtime",
+      name: "Real-time Voice",
+      description: "WebSocket-based voice",
+      status: "enabled",
+      enabledPercentage: 100,
+      killSwitch: false,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "rag_enabled",
+      name: "RAG Retrieval",
+      description: "Semantic search",
+      status: "enabled",
+      enabledPercentage: 50,
+      killSwitch: false,
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: "pdf_export",
+      name: "PDF Export",
+      description: "Accessible PDF generation",
+      status: "disabled",
+      enabledPercentage: 100,
+      killSwitch: true,
+      updatedAt: new Date().toISOString(),
+    },
+  ];
+
   beforeEach(() => {
     vi.clearAllMocks();
+    global.fetch = mockFetch;
+    mockFetch.mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          flags: mockFlags,
+          globalKillSwitch: false,
+          degradation: { level: "none", affectedFeatures: [] },
+        }),
+    });
     mockCsrfFetch.mockResolvedValue({
       ok: true,
       json: () => Promise.resolve({ success: true }),
     });
   });
 
-  it("renders feature flags list", () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("renders feature flags list after loading", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("Real-time Voice")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Real-time Voice")).toBeInTheDocument();
+    });
     expect(screen.getByText("RAG Retrieval")).toBeInTheDocument();
     expect(screen.getByText("PDF Export")).toBeInTheDocument();
   });
 
-  it("shows feature count in header", () => {
+  it("shows feature count in header", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("Feature Flags (3)")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Feature Flags (3)")).toBeInTheDocument();
+    });
   });
 
-  it("displays rollout percentage for partial rollouts", () => {
+  it("displays rollout percentage for partial rollouts", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("50% rollout")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("50% rollout")).toBeInTheDocument();
+    });
   });
 
-  it("shows healthy status when no degradation", () => {
+  it("shows healthy status when no degradation", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("Healthy")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Healthy")).toBeInTheDocument();
+    });
     expect(screen.getByText("All systems operational")).toBeInTheDocument();
   });
 
-  it("displays Enable button for killed features", () => {
+  it("displays Enable button for killed features", async () => {
     render(<FeatureFlagsPanel />);
 
-    const enableButtons = screen.getAllByRole("button", { name: "Enable" });
-    expect(enableButtons.length).toBe(1); // pdf_export has killSwitch: true
+    await waitFor(() => {
+      const enableButtons = screen.getAllByRole("button", { name: "Enable" });
+      expect(enableButtons.length).toBe(1);
+    });
   });
 
-  it("displays Disable button for active features", () => {
+  it("displays Disable button for active features", async () => {
     render(<FeatureFlagsPanel />);
 
-    const disableButtons = screen.getAllByRole("button", { name: "Disable" });
-    expect(disableButtons.length).toBe(2); // voice and rag are active
+    await waitFor(() => {
+      const disableButtons = screen.getAllByRole("button", { name: "Disable" });
+      expect(disableButtons.length).toBe(2);
+    });
   });
 
   it("calls API when toggling feature kill-switch", async () => {
     render(<FeatureFlagsPanel />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Real-time Voice")).toBeInTheDocument();
+    });
 
     const disableButtons = screen.getAllByRole("button", { name: "Disable" });
     fireEvent.click(disableButtons[0]);
@@ -124,17 +143,23 @@ describe("FeatureFlagsPanel", () => {
     });
   });
 
-  it("shows global kill-switch button", () => {
+  it("shows global kill-switch button", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(
-      screen.getByRole("button", { name: "Global Kill-Switch" }),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: "Global Kill-Switch" }),
+      ).toBeInTheDocument();
+    });
   });
 
   it("calls callback on flag update", async () => {
     const onFlagUpdate = vi.fn();
     render(<FeatureFlagsPanel onFlagUpdate={onFlagUpdate} />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Real-time Voice")).toBeInTheDocument();
+    });
 
     const disableButtons = screen.getAllByRole("button", { name: "Disable" });
     fireEvent.click(disableButtons[0]);
@@ -146,65 +171,90 @@ describe("FeatureFlagsPanel", () => {
 });
 
 describe("FeatureFlagsPanel loading state", () => {
-  it("shows loading skeleton when loading", async () => {
-    const { useFeatureFlags } = await import("@/lib/hooks/use-feature-flags");
-    (useFeatureFlags as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-      flags: [],
-      globalKillSwitch: false,
-      degradationState: { level: "none", degradedFeatures: new Map() },
-      refresh: vi.fn(),
-      isLoading: true,
-    });
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn().mockImplementation(
+      () =>
+        new Promise(() => {
+          // Never resolves - keeps loading state
+        }),
+    );
+  });
 
+  it("shows loading skeleton when loading", () => {
     render(<FeatureFlagsPanel />);
 
-    // Should show loading skeleton (animate-pulse class)
     const skeleton = document.querySelector(".animate-pulse");
     expect(skeleton).toBeInTheDocument();
   });
 });
 
 describe("FeatureFlagsPanel degraded state", () => {
-  it("shows degradation warning when system degraded", async () => {
-    const { useFeatureFlags } = await import("@/lib/hooks/use-feature-flags");
-    (useFeatureFlags as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-      flags: [],
-      globalKillSwitch: false,
-      degradationState: {
-        level: "partial",
-        activeRules: [],
-        degradedFeatures: new Map(),
-        since: new Date(),
-      },
-      refresh: vi.fn(),
-      isLoading: false,
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          flags: [],
+          globalKillSwitch: false,
+          degradation: { level: "partial", affectedFeatures: ["voice"] },
+        }),
     });
+  });
 
+  it("shows degradation warning when system degraded", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("Partial")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Partial")).toBeInTheDocument();
+    });
   });
 });
 
 describe("FeatureFlagsPanel global kill-switch", () => {
-  it("shows critical status when global kill-switch active", async () => {
-    const { useFeatureFlags } = await import("@/lib/hooks/use-feature-flags");
-    (useFeatureFlags as ReturnType<typeof vi.fn>).mockReturnValueOnce({
-      flags: [],
-      globalKillSwitch: true,
-      degradationState: { level: "none", degradedFeatures: new Map() },
-      refresh: vi.fn(),
-      isLoading: false,
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: () =>
+        Promise.resolve({
+          flags: [],
+          globalKillSwitch: true,
+          degradation: { level: "none", affectedFeatures: [] },
+        }),
     });
+  });
 
+  it("shows critical status when global kill-switch active", async () => {
     render(<FeatureFlagsPanel />);
 
-    expect(screen.getByText("Critical")).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText("Critical")).toBeInTheDocument();
+    });
     expect(
       screen.getByText("All features disabled via global kill-switch"),
     ).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Reactivate All" }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("FeatureFlagsPanel error handling", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    global.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 500,
+    });
+  });
+
+  it("shows error message when fetch fails", async () => {
+    render(<FeatureFlagsPanel />);
+
+    await waitFor(() => {
+      expect(screen.getByText("Failed to fetch flags")).toBeInTheDocument();
+    });
   });
 });

@@ -19,6 +19,7 @@ import { useProgressStore, useSettingsStore } from "@/lib/stores";
 import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { useParentInsightsIndicator } from "@/lib/hooks/use-parent-insights-indicator";
 import { useTrialStatus } from "@/lib/hooks/use-trial-status";
+import { useTrialToasts } from "@/lib/hooks/use-trial-toasts";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import { cn } from "@/lib/utils";
 import type { Maestro, ToolType } from "@/types";
@@ -30,6 +31,7 @@ import { AstuccioView } from "@/app/astuccio/components/astuccio-view";
 import { CharacterChatView } from "@/components/conversation";
 import { LazySettingsView } from "@/components/settings";
 import { LazyProgressView } from "@/components/progress";
+import { TrialHomeBanner } from "@/components/trial";
 import { HomeHeader } from "./home-header";
 import { HomeSidebar } from "./home-sidebar";
 import { COACH_INFO, BUDDY_INFO } from "./home-constants";
@@ -83,6 +85,7 @@ export default function Home() {
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const trialStatus = useTrialStatus();
+  useTrialToasts(trialStatus);
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -189,6 +192,15 @@ export default function Home() {
           sidebarOpen ? "ml-64" : "ml-20",
         )}
       >
+        {/* Trial mode banner */}
+        {trialStatus.isTrialMode && !trialStatus.isLoading && (
+          <TrialHomeBanner
+            chatsRemaining={trialStatus.chatsRemaining}
+            maxChats={trialStatus.maxChats}
+            visitorId={trialStatus.visitorId}
+          />
+        )}
+
         <motion.div
           key={currentView}
           initial={{ opacity: 0, y: 20 }}
