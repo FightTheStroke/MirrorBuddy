@@ -45,7 +45,9 @@
     "version:minor": "npm version minor && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "version:major": "npm version major && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "prepare": "husky",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "seed:admin": "npx tsx scripts/seed-admin.ts",
+    "vercel-build": "prisma generate && npm run build && npm run seed:admin"
   },
   "overrides": {
     "hono": "4.11.4"
