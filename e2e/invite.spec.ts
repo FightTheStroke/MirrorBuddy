@@ -115,10 +115,10 @@ test.describe("Beta Invite System", () => {
       // Should show the page title
       await expect(page.locator("h1")).toContainText("Richieste Beta");
 
-      // Should show tabs
-      await expect(page.locator("text=In attesa")).toBeVisible();
-      await expect(page.locator("text=Approvate")).toBeVisible();
-      await expect(page.locator("text=Rifiutate")).toBeVisible();
+      // Should show tabs (use first() as text may appear in multiple places)
+      await expect(page.locator("text=In attesa").first()).toBeVisible();
+      await expect(page.locator("text=Approvate").first()).toBeVisible();
+      await expect(page.locator("text=Rifiutate").first()).toBeVisible();
     });
 
     test("should show invite details", async ({ page }) => {
@@ -135,9 +135,13 @@ test.describe("Beta Invite System", () => {
     }) => {
       await page.goto("/admin/invites");
 
-      // Should show action buttons for pending invites
-      await expect(page.locator("button:has-text('Approva')")).toBeVisible();
-      await expect(page.locator("button:has-text('Rifiuta')")).toBeVisible();
+      // Should show action buttons for pending invites (use first() as multiple may exist)
+      await expect(
+        page.locator("button:has-text('Approva')").first(),
+      ).toBeVisible();
+      await expect(
+        page.locator("button:has-text('Rifiuta')").first(),
+      ).toBeVisible();
     });
 
     test("should open reject modal with reason field", async ({ page }) => {
@@ -237,8 +241,8 @@ test.describe("Beta Invite System", () => {
       // Should show the invite
       await expect(page.locator("text=New User")).toBeVisible();
 
-      // Click approve
-      await page.locator("button:has-text('Approva')").click();
+      // Click approve (use first() in case multiple buttons exist)
+      await page.locator("button:has-text('Approva')").first().click();
 
       // Should call the approve API
       // (verified by the mock being called)
