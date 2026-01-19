@@ -67,6 +67,7 @@ export async function GET(request: Request) {
     });
 
     // Get daily metrics
+    // Note: Prisma uses camelCase column names, must quote in raw SQL
     const dailyMetrics = await prisma.$queryRaw<
       Array<{
         date: string;
@@ -76,13 +77,13 @@ export async function GET(request: Request) {
       }>
     >`
       SELECT
-        DATE(created_at) as date,
+        DATE("createdAt") as date,
         COUNT(*)::int as sessions,
-        COALESCE(SUM(cost_eur), 0)::float as "totalCost",
-        COALESCE(SUM(tokens_in + tokens_out), 0)::int as "totalTokens"
-      FROM session_metrics
-      WHERE created_at >= ${startDate}
-      GROUP BY DATE(created_at)
+        COALESCE(SUM("costEur"), 0)::float as "totalCost",
+        COALESCE(SUM("tokensIn" + "tokensOut"), 0)::int as "totalTokens"
+      FROM "SessionMetrics"
+      WHERE "createdAt" >= ${startDate}
+      GROUP BY DATE("createdAt")
       ORDER BY date DESC
     `;
 
