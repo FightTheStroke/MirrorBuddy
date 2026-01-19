@@ -7,20 +7,20 @@
  * F-13: Terms of Service tracking with versioning and audit trail
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 import {
   checkRateLimit,
   RATE_LIMITS,
   rateLimitResponse,
   getClientIdentifier,
-} from '@/lib/rate-limit';
-import { requireCSRF } from '@/lib/security/csrf';
-import { TOS_VERSION } from '@/app/terms/page';
+} from "@/lib/rate-limit";
+import { requireCSRF } from "@/lib/security/csrf";
+import { TOS_VERSION } from "@/lib/tos/constants";
 
-const log = logger.child({ module: 'api/tos' });
+const log = logger.child({ module: "api/tos" });
 
 /**
  * GET /api/tos
@@ -34,19 +34,16 @@ const log = logger.child({ module: 'api/tos' });
 export async function GET(_request: NextRequest) {
   const auth = await validateAuth();
   if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Rate limit: 60 req/min (same as general API)
-  const rateLimit = checkRateLimit(
-    `tos:${auth.userId}`,
-    RATE_LIMITS.GENERAL,
-  );
+  const rateLimit = checkRateLimit(`tos:${auth.userId}`, RATE_LIMITS.GENERAL);
 
   if (!rateLimit.success) {
-    log.warn('Rate limit exceeded', {
+    log.warn("Rate limit exceeded", {
       userId: auth.userId,
-      endpoint: '/api/tos',
+      endpoint: "/api/tos",
     });
     return rateLimitResponse(rateLimit);
   }
@@ -79,7 +76,7 @@ export async function GET(_request: NextRequest) {
         },
       },
       orderBy: {
-        acceptedAt: 'desc',
+        acceptedAt: "desc",
       },
     });
 
@@ -90,12 +87,12 @@ export async function GET(_request: NextRequest) {
       previousVersion: previousAcceptance?.version,
     });
   } catch (error) {
-    log.error('ToS check error', {
+    log.error("ToS check error", {
       userId: auth.userId,
       error: String(error),
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }
@@ -115,24 +112,24 @@ export async function GET(_request: NextRequest) {
 export async function POST(request: NextRequest) {
   // Validate CSRF token
   if (!requireCSRF(request)) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
   const auth = await validateAuth();
   if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   // Rate limit: 10 req/min (prevent abuse, ToS acceptance is rare)
-  const rateLimit = checkRateLimit(
-    `tos:post:${auth.userId}`,
-    { maxRequests: 10, windowMs: 60 * 1000 },
-  );
+  const rateLimit = checkRateLimit(`tos:post:${auth.userId}`, {
+    maxRequests: 10,
+    windowMs: 60 * 1000,
+  });
 
   if (!rateLimit.success) {
-    log.warn('Rate limit exceeded', {
+    log.warn("Rate limit exceeded", {
       userId: auth.userId,
-      endpoint: 'POST /api/tos',
+      endpoint: "POST /api/tos",
     });
     return rateLimitResponse(rateLimit);
   }
@@ -142,19 +139,19 @@ export async function POST(request: NextRequest) {
     const { version } = body;
 
     // Validate version
-    if (!version || typeof version !== 'string') {
+    if (!version || typeof version !== "string") {
       return NextResponse.json(
-        { error: 'Version is required' },
+        { error: "Version is required" },
         { status: 400 },
       );
     }
 
     // Get client info for audit trail
     const ipAddress = getClientIdentifier(request);
-    const userAgent = request.headers.get('user-agent') || undefined;
+    const userAgent = request.headers.get("user-agent") || undefined;
 
     // Extract only last segment of IP for privacy
-    const ipLastSegment = ipAddress.split('.').pop() || undefined;
+    const ipLastSegment = ipAddress.split(".").pop() || undefined;
 
     // Upsert acceptance (idempotent - safe to call multiple times)
     const acceptance = await prisma.tosAcceptance.upsert({
@@ -178,7 +175,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    log.info('ToS accepted', {
+    log.info("ToS accepted", {
       userId: auth.userId,
       version,
       acceptedAt: acceptance.acceptedAt,
@@ -189,12 +186,12 @@ export async function POST(request: NextRequest) {
       acceptedAt: acceptance.acceptedAt,
     });
   } catch (error) {
-    log.error('ToS acceptance error', {
+    log.error("ToS acceptance error", {
       userId: auth.userId,
       error: String(error),
     });
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 },
     );
   }

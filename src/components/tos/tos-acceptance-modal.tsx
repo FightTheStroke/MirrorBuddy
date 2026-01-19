@@ -6,7 +6,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
-import { TOS_VERSION } from "@/app/terms/page";
+import { TOS_VERSION } from "@/lib/tos/constants";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { logger } from "@/lib/logger";
 
