@@ -99,7 +99,9 @@ async function adminFixture(
   use: (value: Page) => Promise<void>,
 ) {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
-  const adminSessionId = "admin-test-session-" + Date.now();
+  // Add random component to prevent collision when parallel workers start at same millisecond
+  const randomSuffix = Math.random().toString(36).substring(2, 11);
+  const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
   const signedCookie = signCookieValue(adminSessionId);
 
   // Set storage state before navigation
