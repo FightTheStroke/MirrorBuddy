@@ -46,6 +46,19 @@ const PUBLIC_ROUTES = [
   "/sitemap",
 ];
 
+// UUID v4 regex for visitor ID validation
+const UUID_V4_REGEX =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+/**
+ * Validate that a visitor ID is a valid UUID v4 format
+ * This prevents trivial cookie forgery (e.g., "fake123")
+ */
+function isValidVisitorId(visitorId: string | undefined): boolean {
+  if (!visitorId) return false;
+  return UUID_V4_REGEX.test(visitorId);
+}
+
 // Static file extensions to skip
 const STATIC_EXTENSIONS = [
   ".ico",
@@ -194,7 +207,8 @@ export function proxy(request: NextRequest) {
   const userCookie = request.cookies.get("mirrorbuddy-user-id");
   const visitorCookie = request.cookies.get("mirrorbuddy-visitor-id");
   const isAuthenticated = !!userCookie?.value;
-  const hasTrialSession = !!visitorCookie?.value;
+  // Validate visitor ID is a proper UUID v4 (prevents trivial forgery)
+  const hasTrialSession = isValidVisitorId(visitorCookie?.value);
 
   // Note: Real-time activity tracking moved to client-side (database-backed)
   // for serverless compatibility. See src/lib/telemetry/use-activity-tracker.ts
