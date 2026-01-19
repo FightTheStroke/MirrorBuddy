@@ -44,6 +44,31 @@ model User {
   // Knowledge Graph (Wave 3)
   concepts Concept[]
 
+  // Content Domain - Materials, Collections, Tags
+  materials         Material[]
+  collections       Collection[]
+  tags              Tag[]
+  createdTools      CreatedTool[]
+  studyKits         StudyKit[]
+  contentEmbeddings ContentEmbedding[]
+
+  // Learning Path Domain
+  learningPaths LearningPath[]
+  topicAttempts TopicAttempt[]
+
+  // Scheduling Domain
+  notifications     Notification[]
+  studySchedules    StudySchedule[]
+  scheduledSessions ScheduledSession[]
+  customReminders   CustomReminder[]
+
+  // Insights Domain
+  parentNotes ParentNote[]
+
+  // Education Domain (additional)
+  sessionMetrics SessionMetrics[]
+  methodProgress MethodProgress?
+
   // Google Drive Integration (ADR 0038)
   googleAccount GoogleAccount?
 

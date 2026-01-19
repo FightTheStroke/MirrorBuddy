@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Send, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 
@@ -189,6 +190,18 @@ export default function InviteRequestPage() {
           Riceverai una email di conferma e, se approvato, le credenziali di
           accesso.
         </p>
+
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
+          <p className="text-sm text-slate-600 dark:text-slate-400 text-center mb-3">
+            Hai gia un account?
+          </p>
+          <Link href="/login" className="block">
+            <Button variant="outline" className="w-full">
+              <LogIn className="w-4 h-4 mr-2" />
+              Accedi
+            </Button>
+          </Link>
+        </div>
       </div>
     </div>
   );

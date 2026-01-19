@@ -6,6 +6,7 @@
 model ContentEmbedding {
   id     String @id @default(cuid())
   userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Source content reference
   sourceType String

@@ -61,6 +61,7 @@ model ProfileAccessLog {
 model ParentNote {
   id        String @id @default(cuid())
   userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   sessionId String
   maestroId String
   subject   String

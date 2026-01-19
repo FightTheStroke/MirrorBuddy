@@ -123,6 +123,7 @@ model SessionMetrics {
   id        String @id @default(cuid())
   sessionId String @unique
   userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Session outcome (V1Plan FASE 2 definitions)
   outcome String @default("unknown") // success | dropped | stuck_loop | abandoned
@@ -158,6 +159,7 @@ model SessionMetrics {
 model MethodProgress {
   id     String @id @default(cuid())
   userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Skill progress (JSON stored)
   mindMaps       String @default("{}")
