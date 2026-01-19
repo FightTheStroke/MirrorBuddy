@@ -15,10 +15,27 @@ import {
 } from "@/lib/auth/password";
 import { verifyCookieValue } from "@/lib/auth/cookie-signing";
 import { requireCSRF } from "@/lib/security/csrf";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 const log = logger.child({ module: "auth/change-password" });
 
 export async function POST(request: NextRequest) {
+  // Rate limit password change attempts (3 per 15 minutes - very strict)
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await checkRateLimitAsync(
+    `auth:password:${clientId}`,
+    RATE_LIMITS.AUTH_PASSWORD,
+  );
+  if (!rateLimitResult.success) {
+    log.warn("Password change rate limited", { clientId });
+    return rateLimitResponse(rateLimitResult);
+  }
+
   // CSRF validation
   if (!requireCSRF(request)) {
     return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });

@@ -1,14 +1,19 @@
 // ============================================================================
 // API ROUTE: User data export and deletion (GDPR compliance)
 // GET: Export all user data from database
-// DELETE: Delete all user data from database
+// DELETE: Deprecated - redirects to /api/privacy/delete-my-data
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import {
+  executeUserDataDeletion,
+  logDeletionAudit,
+} from "@/app/api/privacy/delete-my-data/helpers";
+import { cookies } from "next/headers";
 
 /**
  * GET /api/user/data - Export all user data (GDPR portability)
@@ -46,7 +51,7 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Format for export
@@ -77,45 +82,79 @@ export async function GET() {
       data: exportData,
     });
   } catch (error) {
-    logger.error('Export user data error', { error: String(error) });
+    logger.error("Export user data error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to export user data' },
-      { status: 500 }
+      { error: "Failed to export user data" },
+      { status: 500 },
     );
   }
 }
 
+interface DeleteRequestBody {
+  /** Confirmation that user understands deletion is irreversible */
+  confirmDeletion: boolean;
+  /** Optional reason for deletion (for analytics) */
+  reason?: string;
+}
+
 /**
  * DELETE /api/user/data - Delete all user data (GDPR erasure)
+ *
+ * SECURITY: Requires CSRF token and explicit confirmation
+ * Uses the comprehensive GDPR deletion logic from /api/privacy/delete-my-data
  */
-export async function DELETE() {
+export async function DELETE(request: NextRequest) {
+  // CSRF validation required for destructive operations
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ success: true, message: 'No user data to delete' });
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const userId = auth.userId!;
+    const userId = auth.userId;
 
-    // Delete user and all related data (cascades configured in schema)
-    await prisma.user.delete({
-      where: { id: userId },
-    }).catch(() => {
-      // User may not exist - that's fine
+    // Require explicit confirmation
+    let body: DeleteRequestBody;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Request body required with confirmDeletion: true" },
+        { status: 400 },
+      );
+    }
+
+    if (!body.confirmDeletion) {
+      return NextResponse.json(
+        { error: "Deletion must be explicitly confirmed" },
+        { status: 400 },
+      );
+    }
+
+    logger.info("GDPR deletion via /api/user/data", {
+      userId: userId.slice(0, 8),
+      reason: body.reason || "not provided",
     });
 
-    // Clear the user cookie
+    // Execute comprehensive deletion (same logic as /api/privacy/delete-my-data)
+    const result = await executeUserDataDeletion(userId);
+
+    // Audit log
+    logDeletionAudit(userId, body.reason);
+
+    // Clear user cookie
     const cookieStore = await cookies();
-    cookieStore.delete('mirrorbuddy-user-id');
+    cookieStore.delete("mirrorbuddy-user-id");
 
-    return NextResponse.json({
-      success: true,
-      message: 'All user data has been deleted',
-    });
+    return NextResponse.json(result);
   } catch (error) {
-    logger.error('Delete user data error', { error: String(error) });
+    logger.error("Delete user data error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete user data' },
-      { status: 500 }
+      { error: "Failed to delete user data" },
+      { status: 500 },
     );
   }
 }

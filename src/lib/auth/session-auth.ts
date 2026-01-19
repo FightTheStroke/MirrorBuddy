@@ -195,3 +195,33 @@ export async function validateAdminAuth(): Promise<AdminAuthResult> {
 
 // Rate limiting is in @/lib/rate-limit with Redis support
 // Import directly from there for full functionality
+
+/**
+ * Require authenticated user or return 401 response
+ * Security: NEVER trust userId from query params or request body
+ * Always use this helper to get userId from the validated session
+ *
+ * @returns userId string if authenticated, null if not (caller should return the error response)
+ */
+export async function requireAuthenticatedUser(): Promise<{
+  userId: string | null;
+  errorResponse: Response | null;
+}> {
+  const auth = await validateAuth();
+
+  if (!auth.authenticated || !auth.userId) {
+    const { NextResponse } = await import("next/server");
+    return {
+      userId: null,
+      errorResponse: NextResponse.json(
+        { error: auth.error || "Authentication required" },
+        { status: 401 },
+      ),
+    };
+  }
+
+  return {
+    userId: auth.userId,
+    errorResponse: null,
+  };
+}

@@ -321,6 +321,41 @@ export function getRateLimitIdentifier(
  * Rate limit configs for different endpoint types
  */
 export const RATE_LIMITS = {
+  // ========== AUTH ENDPOINTS (Strict - Prevent brute force) ==========
+
+  /** Login attempts: 5 per 15 minutes (very strict) */
+  AUTH_LOGIN: {
+    maxRequests: 5,
+    windowMs: 15 * 60 * 1000,
+  },
+  /** Password changes: 3 per 15 minutes (very strict) */
+  AUTH_PASSWORD: {
+    maxRequests: 3,
+    windowMs: 15 * 60 * 1000,
+  },
+  /** OAuth flows: 10 per minute */
+  AUTH_OAUTH: {
+    maxRequests: 10,
+    windowMs: 60 * 1000,
+  },
+  /** General auth operations: 30 per minute */
+  AUTH_GENERAL: {
+    maxRequests: 30,
+    windowMs: 60 * 1000,
+  },
+  /** Invite requests: 3 per hour (public endpoint, strict) */
+  INVITE_REQUEST: {
+    maxRequests: 3,
+    windowMs: 60 * 60 * 1000,
+  },
+  /** COPPA verification: 5 per hour (email costs, strict) */
+  COPPA: {
+    maxRequests: 5,
+    windowMs: 60 * 60 * 1000,
+  },
+
+  // ========== API ENDPOINTS ==========
+
   /** Chat API: 60 requests per minute (expensive AI calls) */
   CHAT: {
     maxRequests: 60,

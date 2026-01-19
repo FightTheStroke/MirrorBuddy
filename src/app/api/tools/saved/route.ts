@@ -27,14 +27,15 @@ import {
   validateDeleteToolInput,
 } from "./helpers";
 import { requireCSRF } from "@/lib/security/csrf";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 
 /**
  * GET /api/tools/saved
  *
  * Get user's saved tools with optional filtering.
+ * Security: userId is taken from authenticated session, not query params
  *
  * Query params:
- * - userId: Required user ID
  * - type: Filter by tool type
  * - maestroId: Filter by maestro
  * - bookmarked: Filter bookmarked only
@@ -44,23 +45,19 @@ import { requireCSRF } from "@/lib/security/csrf";
  */
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const userId = searchParams.get("userId");
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    if (!userId) {
-      return NextResponse.json(
-        { error: "userId is required" },
-        { status: 400 },
-      );
-    }
+    const { searchParams } = new URL(request.url);
 
     if (searchParams.get("stats") === "true") {
-      const stats = await getToolStats(userId);
+      const stats = await getToolStats(userId!);
       return NextResponse.json({ stats });
     }
 
     const filter = buildGetToolsFilter(searchParams);
-    const tools = await getUserTools(userId, filter);
+    const tools = await getUserTools(userId!, filter);
 
     return NextResponse.json({
       tools,
@@ -80,6 +77,7 @@ export async function GET(request: NextRequest) {
  * POST /api/tools/saved
  *
  * Save a new tool.
+ * Security: userId is taken from authenticated session, not request body
  */
 export async function POST(request: NextRequest) {
   try {
@@ -90,6 +88,10 @@ export async function POST(request: NextRequest) {
         { status: 403 },
       );
     }
+
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
     const body = await request.json();
     const validation = validateSaveToolInput(body);
@@ -102,7 +104,7 @@ export async function POST(request: NextRequest) {
     }
 
     const params: SaveToolParams = {
-      userId: validation.data.userId,
+      userId: userId!, // Security: Use session userId, ignore body userId
       type: validation.data.type,
       title: validation.data.title,
       topic: validation.data.topic,
@@ -116,7 +118,7 @@ export async function POST(request: NextRequest) {
 
     logger.info("Tool saved", {
       toolId: tool.id,
-      userId: validation.data?.userId,
+      userId: userId,
       type: validation.data?.type,
       title: validation.data?.title,
     });
@@ -132,6 +134,7 @@ export async function POST(request: NextRequest) {
  * PATCH /api/tools/saved
  *
  * Update a saved tool (rating, bookmark, view count).
+ * Security: userId is taken from authenticated session, not request body
  */
 export async function PATCH(request: NextRequest) {
   try {
@@ -143,6 +146,10 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const body = await request.json();
     const validation = validatePatchToolInput(body);
 
@@ -153,23 +160,21 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
-    const { userId, toolId, action, rating } = validation.data;
+    const { toolId, action, rating } = validation.data;
     let result;
 
     switch (action) {
       case "rate":
-        // rating is guaranteed by validatePatchToolInput when action is 'rate'
-        // but TypeScript doesn't understand this discriminated union
-        result = await updateToolRating(toolId, userId, rating ?? 0);
+        result = await updateToolRating(toolId, userId!, rating ?? 0);
         break;
 
       case "bookmark":
-        result = await toggleBookmark(toolId, userId);
+        result = await toggleBookmark(toolId, userId!);
         break;
 
       case "view":
-        await incrementViewCount(toolId, userId);
-        result = await getToolById(toolId, userId);
+        await incrementViewCount(toolId, userId!);
+        result = await getToolById(toolId, userId!);
         break;
     }
 
@@ -191,6 +196,7 @@ export async function PATCH(request: NextRequest) {
  * DELETE /api/tools/saved
  *
  * Delete a saved tool.
+ * Security: userId is taken from authenticated session, not request body
  */
 export async function DELETE(request: NextRequest) {
   try {
@@ -202,6 +208,10 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
+
     const body = await request.json();
     const validation = validateDeleteToolInput(body);
 
@@ -212,8 +222,8 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    const { userId, toolId } = validation.data;
-    const deleted = await deleteTool(toolId, userId);
+    const { toolId } = validation.data;
+    const deleted = await deleteTool(toolId, userId!);
 
     if (!deleted) {
       return NextResponse.json({ error: "Tool not found" }, { status: 404 });

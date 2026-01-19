@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 interface InviteRequestBody {
   name: string;
@@ -12,6 +18,17 @@ interface InviteRequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    // Rate limit invite requests (3 per hour - public endpoint, strict)
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await checkRateLimitAsync(
+      `invite:request:${clientId}`,
+      RATE_LIMITS.INVITE_REQUEST,
+    );
+    if (!rateLimitResult.success) {
+      logger.warn("Invite request rate limited", { clientId });
+      return rateLimitResponse(rateLimitResult);
+    }
+
     const body = (await request.json()) as InviteRequestBody;
     const { name, email, motivation, trialSessionId } = body;
 

@@ -4,11 +4,12 @@
 // Issue: Unified archive access for Maestri tools
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { isPostgreSQL } from '@/lib/db/database-utils';
-import { Prisma } from '@prisma/client';
+import { NextRequest, NextResponse } from "next/server";
+import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { isPostgreSQL } from "@/lib/db/database-utils";
+import { Prisma } from "@prisma/client";
 
 interface SearchParams {
   query?: string;
@@ -20,17 +21,18 @@ interface SearchParams {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json() as SearchParams;
-    const { query, toolType, subject, userId, limit = 10 } = body;
+    // Security: Get userId from authenticated session only
+    const { userId, errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-    // Build where clause
+    const body = (await request.json()) as SearchParams;
+    const { query, toolType, subject, limit = 10 } = body;
+
+    // Build where clause (use session userId, not body userId)
     const where: Record<string, unknown> = {
-      status: 'active',
+      status: "active",
+      userId,
     };
-
-    if (userId) {
-      where.userId = userId;
-    }
 
     if (toolType) {
       where.toolType = toolType;
@@ -58,22 +60,24 @@ export async function POST(request: NextRequest) {
         conditions.push(Prisma.sql`subject = ${subject}`);
       }
 
-      const whereClause = Prisma.join(conditions, ' AND ');
+      const whereClause = Prisma.join(conditions, " AND ");
 
       // Execute full-text search query with ranking
-      const materials = await prisma.$queryRaw<Array<{
-        id: string;
-        toolId: string;
-        toolType: string;
-        title: string;
-        subject: string | null;
-        preview: string | null;
-        maestroId: string | null;
-        createdAt: Date;
-        isBookmarked: boolean;
-        userRating: number | null;
-        rank: number;
-      }>>`
+      const materials = await prisma.$queryRaw<
+        Array<{
+          id: string;
+          toolId: string;
+          toolType: string;
+          title: string;
+          subject: string | null;
+          preview: string | null;
+          maestroId: string | null;
+          createdAt: Date;
+          isBookmarked: boolean;
+          userRating: number | null;
+          rank: number;
+        }>
+      >`
         SELECT
           id,
           "toolId",
@@ -92,7 +96,7 @@ export async function POST(request: NextRequest) {
         LIMIT ${Math.min(limit, 20)}
       `;
 
-      logger.info('Materials search completed (PostgreSQL full-text)', {
+      logger.info("Materials search completed (PostgreSQL full-text)", {
         query,
         toolType,
         subject,
@@ -108,17 +112,19 @@ export async function POST(request: NextRequest) {
 
     // SQLite fallback - search in title and searchableText
     // Note: PostgreSQL full-text search uses searchableTextVector derived from searchableText
-    const orConditions = query ? [
-      { title: { contains: query, mode: 'insensitive' as const } },
-      { searchableText: { contains: query, mode: 'insensitive' as const } },
-    ] : undefined;
+    const orConditions = query
+      ? [
+          { title: { contains: query, mode: "insensitive" as const } },
+          { searchableText: { contains: query, mode: "insensitive" as const } },
+        ]
+      : undefined;
 
     const materials = await prisma.material.findMany({
       where: {
         ...where,
         ...(orConditions ? { OR: orConditions } : {}),
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: "desc" },
       take: Math.min(limit, 20), // Cap at 20
       select: {
         id: true,
@@ -134,7 +140,7 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    logger.info('Materials search completed (SQLite fallback)', {
+    logger.info("Materials search completed (SQLite fallback)", {
       query,
       toolType,
       subject,
@@ -147,27 +153,38 @@ export async function POST(request: NextRequest) {
       totalFound: materials.length,
     });
   } catch (error) {
-    logger.error('Material search failed', { error: String(error) });
+    logger.error("Material search failed", { error: String(error) });
     return NextResponse.json(
-      { success: false, error: 'Search failed', materials: [] },
-      { status: 500 }
+      { success: false, error: "Search failed", materials: [] },
+      { status: 500 },
     );
   }
 }
 
 // GET for simple queries
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const query = searchParams.get('q') || undefined;
-  const toolType = searchParams.get('type') || undefined;
-  const subject = searchParams.get('subject') || undefined;
-  const userId = searchParams.get('userId') || undefined;
-  const limit = parseInt(searchParams.get('limit') || '10', 10);
+  try {
+    // Security: Validate authentication first (userId will be used indirectly in POST)
+    const { errorResponse } = await requireAuthenticatedUser();
+    if (errorResponse) return errorResponse;
 
-  // Reuse POST logic
-  const mockRequest = {
-    json: async () => ({ query, toolType, subject, userId, limit }),
-  } as NextRequest;
+    const searchParams = request.nextUrl.searchParams;
+    const query = searchParams.get("q") || undefined;
+    const toolType = searchParams.get("type") || undefined;
+    const subject = searchParams.get("subject") || undefined;
+    const limit = parseInt(searchParams.get("limit") || "10", 10);
 
-  return POST(mockRequest);
+    // Reuse POST logic with session userId (POST will call requireAuthenticatedUser again)
+    const mockRequest = {
+      json: async () => ({ query, toolType, subject, limit }),
+    } as NextRequest;
+
+    return POST(mockRequest);
+  } catch (error) {
+    logger.error("Materials search GET failed", { error: String(error) });
+    return NextResponse.json(
+      { success: false, error: "Search failed", materials: [] },
+      { status: 500 },
+    );
+  }
 }

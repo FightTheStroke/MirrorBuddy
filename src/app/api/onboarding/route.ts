@@ -14,6 +14,11 @@ import { prisma, isDatabaseNotInitialized } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { cookies } from "next/headers";
 import { requireCSRF } from "@/lib/security/csrf";
+import {
+  COPPA_AGE_THRESHOLD,
+  requestParentalConsent,
+  checkCoppaStatus,
+} from "@/lib/compliance/coppa-service";
 
 // Zod schema for input validation
 const OnboardingDataSchema = z.object({
@@ -22,6 +27,8 @@ const OnboardingDataSchema = z.object({
   schoolLevel: z.enum(["elementare", "media", "superiore"]).optional(),
   learningDifferences: z.array(z.string()).optional(),
   gender: z.enum(["male", "female", "other"]).optional(),
+  // COPPA: Required for children under 13
+  parentEmail: z.string().email().optional(),
 });
 
 const PostBodySchema = z.object({
@@ -37,6 +44,7 @@ interface OnboardingData {
   schoolLevel?: "elementare" | "media" | "superiore";
   learningDifferences?: string[];
   gender?: "male" | "female" | "other";
+  parentEmail?: string;
 }
 
 /**
@@ -227,6 +235,57 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    // COPPA Compliance: Trigger parental consent for children under 13
+    let coppaStatus = null;
+    if (data?.age && data.age < COPPA_AGE_THRESHOLD) {
+      // Check if consent already granted
+      const existingStatus = await checkCoppaStatus(userId);
+
+      if (!existingStatus.consentGranted && !existingStatus.consentPending) {
+        // Require parent email for children under 13
+        if (!data.parentEmail) {
+          return NextResponse.json(
+            {
+              error: "Parent email required",
+              message:
+                "Per legge (COPPA), i minori di 13 anni necessitano del consenso dei genitori. " +
+                "Fornisci l'email di un genitore per la verifica.",
+              requiresParentEmail: true,
+              coppaRequired: true,
+            },
+            { status: 400 },
+          );
+        }
+
+        // Initiate COPPA consent flow
+        const consentResult = await requestParentalConsent(
+          userId,
+          data.age,
+          data.parentEmail,
+          data.name,
+        );
+
+        coppaStatus = {
+          consentRequired: true,
+          consentPending: true,
+          emailSent: consentResult.emailSent,
+          expiresAt: consentResult.expiresAt.toISOString(),
+        };
+
+        logger.info("COPPA consent initiated", {
+          userId,
+          age: data.age,
+          emailSent: consentResult.emailSent,
+        });
+      } else {
+        coppaStatus = {
+          consentRequired: true,
+          consentGranted: existingStatus.consentGranted,
+          consentPending: existingStatus.consentPending,
+        };
+      }
+    }
+
     logger.info("Onboarding state saved", { userId, hasCompletedOnboarding });
 
     return NextResponse.json({
@@ -235,6 +294,7 @@ export async function POST(request: NextRequest) {
         hasCompletedOnboarding: onboardingState.hasCompletedOnboarding,
         currentStep: onboardingState.currentStep,
       },
+      ...(coppaStatus && { coppa: coppaStatus }),
     });
   } catch (error) {
     logger.error("Onboarding API POST error", { error: String(error) });
