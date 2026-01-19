@@ -196,6 +196,9 @@ export function proxy(request: NextRequest) {
   const isAuthenticated = !!userCookie?.value;
   const hasTrialSession = !!visitorCookie?.value;
 
+  // Note: Real-time activity tracking moved to client-side (database-backed)
+  // for serverless compatibility. See src/lib/telemetry/use-activity-tracker.ts
+
   // Auth public routes - allow without auth but add CSP
   if (AUTH_PUBLIC_ROUTES.some((r) => pathname.startsWith(r))) {
     return finalizeResponse(
