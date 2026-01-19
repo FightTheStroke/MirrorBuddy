@@ -114,7 +114,7 @@ function StoreInitializer() {
 }
 
 // Pages where parent access button should NOT appear
-const EXCLUDED_PATHS = [
+const PARENT_ACCESS_EXCLUDED_PATHS = [
   "/", // Home page has its own button in sidebar
   "/landing",
   "/welcome",
@@ -122,11 +122,33 @@ const EXCLUDED_PATHS = [
 
 function ConditionalParentAccess() {
   const pathname = usePathname();
-  const shouldHide = EXCLUDED_PATHS.some((p) =>
+  const shouldHide = PARENT_ACCESS_EXCLUDED_PATHS.some((p) =>
     p === "/" ? pathname === "/" : pathname?.startsWith(p),
   );
   if (shouldHide) return null;
   return <ParentAccessButton />;
+}
+
+// Pages where consent is handled inline (in footer) instead of blocking wall
+const INLINE_CONSENT_PATHS = ["/welcome", "/landing"];
+
+/**
+ * Conditional Cookie Consent - skips blocking wall on welcome page
+ * Welcome page has inline consent in footer (WelcomeFooter component)
+ */
+function ConditionalCookieConsent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const useInlineConsent = INLINE_CONSENT_PATHS.some((p) =>
+    pathname?.startsWith(p),
+  );
+
+  // On welcome/landing pages, skip blocking wall (consent is in footer)
+  if (useInlineConsent) {
+    return <>{children}</>;
+  }
+
+  // On all other pages, use the blocking consent wall
+  return <CookieConsentWall>{children}</CookieConsentWall>;
 }
 
 export function Providers({ children, nonce: _nonce }: ProvidersProps) {
@@ -142,7 +164,7 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
       value={{ light: "light", dark: "dark" }}
     >
       <AccessibilityProvider>
-        <CookieConsentWall>
+        <ConditionalCookieConsent>
           <TosGateProvider>
             <StoreInitializer />
             <AccentColorApplier />
@@ -151,7 +173,7 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
             <IOSInstallBanner />
             <ConditionalParentAccess />
           </TosGateProvider>
-        </CookieConsentWall>
+        </ConditionalCookieConsent>
       </AccessibilityProvider>
     </ThemeProvider>
   );

@@ -1,4 +1,5 @@
 export { CookieConsentWall } from "./cookie-consent-wall";
+export { InlineConsent } from "./inline-consent";
 export {
   hasConsent,
   getConsent,
