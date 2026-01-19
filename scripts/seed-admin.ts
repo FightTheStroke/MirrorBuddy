@@ -75,21 +75,18 @@ async function seedAdmin(): Promise<void> {
     if (existingAdmin) {
       console.log(`✅ Admin user already exists (ID: ${existingAdmin.id})`);
 
-      // Update password if different
-      if (existingAdmin.passwordHash) {
-        const isSame = await bcrypt.compare(
-          password,
-          existingAdmin.passwordHash,
-        );
-        if (!isSame) {
-          const newHash = await bcrypt.hash(password, SALT_ROUNDS);
-          await prisma.user.update({
-            where: { id: existingAdmin.id },
-            data: { passwordHash: newHash },
-          });
-          console.log("🔄 Admin password updated");
-        }
-      }
+      // Always update password when ADMIN_PASSWORD is provided
+      // This ensures password changes are applied on redeploy
+      const newHash = await bcrypt.hash(password, SALT_ROUNDS);
+      await prisma.user.update({
+        where: { id: existingAdmin.id },
+        data: {
+          passwordHash: newHash,
+          email, // Ensure email is also up to date
+          role: "ADMIN", // Ensure role is ADMIN
+        },
+      });
+      console.log("🔄 Admin password synchronized");
 
       return;
     }
