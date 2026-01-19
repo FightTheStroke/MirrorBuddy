@@ -34,6 +34,8 @@ import type {
   SessionMetricsData,
   ExternalServicesData,
 } from "./types";
+import type { A11yStatsData } from "@/app/api/dashboard/a11y-stats/route";
+import { A11yStatsWidget } from "./components/a11y-stats-widget";
 
 type DashboardData = {
   tokenUsage: TokenUsageData | null;
@@ -43,6 +45,7 @@ type DashboardData = {
   safetyEvents: SafetyEventsData | null;
   sessionMetrics: SessionMetricsData | null;
   externalServices: ExternalServicesData | null;
+  a11yStats: A11yStatsData | null;
 };
 
 export default function AdminAnalyticsPage() {
@@ -57,6 +60,7 @@ export default function AdminAnalyticsPage() {
     safetyEvents: null,
     sessionMetrics: null,
     externalServices: null,
+    a11yStats: null,
   });
 
   const fetchData = useCallback(async (isRefresh = false) => {
@@ -74,6 +78,7 @@ export default function AdminAnalyticsPage() {
         safetyRes,
         sessionRes,
         extServRes,
+        a11yRes,
       ] = await Promise.all([
         fetch("/api/dashboard/token-usage?days=7"),
         fetch("/api/dashboard/voice-metrics?days=7"),
@@ -82,6 +87,7 @@ export default function AdminAnalyticsPage() {
         fetch("/api/dashboard/safety-events?days=7"),
         fetch("/api/dashboard/session-metrics?days=7"),
         fetch("/api/dashboard/external-services"),
+        fetch("/api/dashboard/a11y-stats?days=7"),
       ]);
 
       const [
@@ -92,6 +98,7 @@ export default function AdminAnalyticsPage() {
         safetyData,
         sessionData,
         extServData,
+        a11yData,
       ] = await Promise.all([
         tokenRes.ok ? tokenRes.json() : null,
         voiceRes.ok ? voiceRes.json() : null,
@@ -100,6 +107,7 @@ export default function AdminAnalyticsPage() {
         safetyRes.ok ? safetyRes.json() : null,
         sessionRes.ok ? sessionRes.json() : null,
         extServRes.ok ? extServRes.json() : null,
+        a11yRes.ok ? a11yRes.json() : null,
       ]);
 
       setData({
@@ -110,6 +118,7 @@ export default function AdminAnalyticsPage() {
         safetyEvents: safetyData,
         sessionMetrics: sessionData,
         externalServices: extServData,
+        a11yStats: a11yData,
       });
     } catch (err) {
       setError(
@@ -683,6 +692,9 @@ export default function AdminAnalyticsPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Accessibility Stats */}
+          <A11yStatsWidget data={data.a11yStats} />
         </div>
       </main>
     </div>

@@ -3,7 +3,10 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "next-themes";
-import { AccessibilityProvider } from "@/components/accessibility";
+import {
+  AccessibilityProvider,
+  A11yInstantAccess,
+} from "@/components/accessibility";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
 import { CookieConsentWall } from "@/components/consent";
@@ -155,6 +158,7 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
       value={{ light: "light", dark: "dark" }}
     >
       <AccessibilityProvider>
+        <A11yInstantAccess />
         <ConditionalCookieConsent>
           <TosGateProvider>
             <StoreInitializer />

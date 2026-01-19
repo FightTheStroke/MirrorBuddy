@@ -1,21 +1,31 @@
-'use client';
+"use client";
 
-import { create } from 'zustand';
+import { create } from "zustand";
 import type {
   AccessibilitySettings,
   ADHDSessionState,
   ADHDSessionConfig,
   ADHDSessionStats,
   AccessibilityContext,
-} from './accessibility-store/types';
-import * as profiles from './accessibility-store/profiles';
-import * as adhdActions from './accessibility-store/adhd-actions';
-import * as helpers from './accessibility-store/helpers';
+} from "./accessibility-store/types";
+import * as profiles from "./accessibility-store/profiles";
+import * as adhdActions from "./accessibility-store/adhd-actions";
+import * as helpers from "./accessibility-store/helpers";
 import {
   defaultAccessibilitySettings,
   defaultADHDConfig,
   defaultADHDStats,
-} from './accessibility-store/defaults';
+} from "./accessibility-store/defaults";
+import {
+  getA11yCookie,
+  setA11yCookie,
+  clearA11yCookie,
+} from "./a11y-cookie-storage";
+import {
+  detectBrowserPreferences,
+  browserPrefsToSettings,
+} from "./browser-detection";
+import { trackProfileActivation, trackReset } from "./a11y-telemetry";
 
 export type {
   AccessibilitySettings,
@@ -23,14 +33,25 @@ export type {
   ADHDSessionConfig,
   ADHDSessionStats,
   AccessibilityContext,
-} from './accessibility-store/types';
+} from "./accessibility-store/types";
 
+// Profile ID type for tracking active profile
+export type A11yProfileId =
+  | "dyslexia"
+  | "adhd"
+  | "visual"
+  | "motor"
+  | "autism"
+  | "auditory"
+  | "cerebral"
+  | null;
 
 // Store interface
 interface AccessibilityStore {
   settings: AccessibilitySettings;
   parentSettings: AccessibilitySettings; // Separate settings for parent dashboard
   currentContext: AccessibilityContext;
+  activeProfile: A11yProfileId; // Currently active profile preset
   adhdConfig: ADHDSessionConfig;
   adhdStats: ADHDSessionStats;
   adhdSessionState: ADHDSessionState;
@@ -40,6 +61,11 @@ interface AccessibilityStore {
   // Context switching
   setContext: (context: AccessibilityContext) => void;
   getActiveSettings: () => AccessibilitySettings;
+
+  // Cookie persistence
+  loadFromCookie: () => void;
+  saveToCookie: () => void;
+  applyBrowserPreferences: () => void;
 
   // Settings actions
   updateSettings: (updates: Partial<AccessibilitySettings>) => void;
@@ -79,131 +105,205 @@ interface AccessibilityStore {
 
 export const useAccessibilityStore = create<AccessibilityStore>()(
   (set, get) => ({
-      settings: defaultAccessibilitySettings,
-      parentSettings: defaultAccessibilitySettings,
-      currentContext: 'student' as AccessibilityContext,
-      adhdConfig: defaultADHDConfig,
-      adhdStats: defaultADHDStats,
-      adhdSessionState: 'idle',
-      adhdTimeRemaining: defaultADHDConfig.workDuration,
-      adhdSessionProgress: 0,
+    settings: defaultAccessibilitySettings,
+    parentSettings: defaultAccessibilitySettings,
+    currentContext: "student" as AccessibilityContext,
+    activeProfile: null,
+    adhdConfig: defaultADHDConfig,
+    adhdStats: defaultADHDStats,
+    adhdSessionState: "idle",
+    adhdTimeRemaining: defaultADHDConfig.workDuration,
+    adhdSessionProgress: 0,
 
-      // Context switching
-      setContext: (context) => set({ currentContext: context }),
+    // Context switching
+    setContext: (context) => set({ currentContext: context }),
 
-      getActiveSettings: () => {
-        const state = get();
-        return state.currentContext === 'parent' ? state.parentSettings : state.settings;
-      },
+    getActiveSettings: () => {
+      const state = get();
+      return state.currentContext === "parent"
+        ? state.parentSettings
+        : state.settings;
+    },
 
-      // Settings actions
-      updateSettings: (updates) =>
+    // Cookie persistence
+    loadFromCookie: () => {
+      const cookie = getA11yCookie();
+      if (cookie) {
         set((state) => ({
-          settings: { ...state.settings, ...updates },
-        })),
+          settings: { ...state.settings, ...cookie.overrides },
+          activeProfile: cookie.activeProfile as A11yProfileId,
+        }));
+      }
+    },
 
-      updateParentSettings: (updates) =>
+    saveToCookie: () => {
+      const state = get();
+      setA11yCookie({
+        activeProfile: state.activeProfile,
+        overrides: state.settings,
+      });
+    },
+
+    applyBrowserPreferences: () => {
+      const cookie = getA11yCookie();
+      // Only apply if we haven't already applied browser preferences
+      if (cookie?.browserDetectedApplied) return;
+
+      const prefs = detectBrowserPreferences();
+      const settings = browserPrefsToSettings(prefs);
+
+      if (Object.keys(settings).length > 0) {
         set((state) => ({
-          parentSettings: { ...state.parentSettings, ...updates },
-        })),
+          settings: { ...state.settings, ...settings },
+        }));
+        // Mark as applied so we don't override user changes
+        setA11yCookie({ browserDetectedApplied: true });
+      }
+    },
 
-      resetSettings: () =>
-        set({
-          settings: defaultAccessibilitySettings,
-        }),
+    // Settings actions
+    updateSettings: (updates) => {
+      set((state) => ({
+        settings: { ...state.settings, ...updates },
+        activeProfile: null, // Clear profile when manually changing settings
+      }));
+      // Auto-save to cookie
+      setTimeout(() => get().saveToCookie(), 0);
+    },
 
-      resetParentSettings: () =>
-        set({
-          parentSettings: defaultAccessibilitySettings,
-        }),
+    updateParentSettings: (updates) =>
+      set((state) => ({
+        parentSettings: { ...state.parentSettings, ...updates },
+      })),
 
-      // Profile presets (delegated to profiles module)
-      applyDyslexiaProfile: () =>
-        set((state) => ({
-          settings: profiles.applyDyslexiaProfile(state.settings),
-        })),
+    resetSettings: () => {
+      set({
+        settings: defaultAccessibilitySettings,
+        activeProfile: null,
+      });
+      clearA11yCookie();
+      trackReset();
+    },
 
-      applyADHDProfile: () =>
-        set((state) => ({
-          settings: profiles.applyADHDProfile(state.settings),
-        })),
+    resetParentSettings: () =>
+      set({
+        parentSettings: defaultAccessibilitySettings,
+      }),
 
-      applyVisualImpairmentProfile: () =>
-        set((state) => ({
-          settings: profiles.applyVisualImpairmentProfile(state.settings),
-        })),
+    // Profile presets (delegated to profiles module)
+    applyDyslexiaProfile: () => {
+      set((state) => ({
+        settings: profiles.applyDyslexiaProfile(state.settings),
+        activeProfile: "dyslexia",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("dyslexia");
+    },
 
-      applyMotorImpairmentProfile: () =>
-        set((state) => ({
-          settings: profiles.applyMotorImpairmentProfile(state.settings),
-        })),
+    applyADHDProfile: () => {
+      set((state) => ({
+        settings: profiles.applyADHDProfile(state.settings),
+        activeProfile: "adhd",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("adhd");
+    },
 
-      applyAutismProfile: () =>
-        set((state) => ({
-          settings: profiles.applyAutismProfile(state.settings),
-        })),
+    applyVisualImpairmentProfile: () => {
+      set((state) => ({
+        settings: profiles.applyVisualImpairmentProfile(state.settings),
+        activeProfile: "visual",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("visual");
+    },
 
-      applyAuditoryImpairmentProfile: () =>
-        set((state) => ({
-          settings: profiles.applyAuditoryImpairmentProfile(state.settings),
-        })),
+    applyMotorImpairmentProfile: () => {
+      set((state) => ({
+        settings: profiles.applyMotorImpairmentProfile(state.settings),
+        activeProfile: "motor",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("motor");
+    },
 
-      applyCerebralPalsyProfile: () =>
-        set((state) => ({
-          settings: profiles.applyCerebralPalsyProfile(state.settings),
-        })),
+    applyAutismProfile: () => {
+      set((state) => ({
+        settings: profiles.applyAutismProfile(state.settings),
+        activeProfile: "autism",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("autism");
+    },
 
-      // ADHD actions (delegated to adhdActions module)
-      updateADHDConfig: (updates) =>
-        set((state) => ({
-          adhdConfig: { ...state.adhdConfig, ...updates },
-        })),
+    applyAuditoryImpairmentProfile: () => {
+      set((state) => ({
+        settings: profiles.applyAuditoryImpairmentProfile(state.settings),
+        activeProfile: "auditory",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("auditory");
+    },
 
-      startADHDSession: () =>
-        set((state) => adhdActions.startADHDSession(state)),
+    applyCerebralPalsyProfile: () => {
+      set((state) => ({
+        settings: profiles.applyCerebralPalsyProfile(state.settings),
+        activeProfile: "cerebral",
+      }));
+      setTimeout(() => get().saveToCookie(), 0);
+      trackProfileActivation("cerebral");
+    },
 
-      pauseADHDSession: () => {
-        // Timer pause handled externally
-      },
+    // ADHD actions (delegated to adhdActions module)
+    updateADHDConfig: (updates) =>
+      set((state) => ({
+        adhdConfig: { ...state.adhdConfig, ...updates },
+      })),
 
-      resumeADHDSession: () => {
-        // Timer resume handled externally
-      },
+    startADHDSession: () => set((state) => adhdActions.startADHDSession(state)),
 
-      stopADHDSession: () =>
-        set((state) => adhdActions.stopADHDSession(state)),
+    pauseADHDSession: () => {
+      // Timer pause handled externally
+    },
 
-      completeADHDSession: () => {
-        const state = get();
-        set(adhdActions.completeADHDSession(state));
-      },
+    resumeADHDSession: () => {
+      // Timer resume handled externally
+    },
 
-      startADHDBreak: (isLongBreak = false) =>
-        set((state) => adhdActions.startADHDBreak(state, isLongBreak)),
+    stopADHDSession: () => set((state) => adhdActions.stopADHDSession(state)),
 
-      tickADHDTimer: () =>
-        set((state) => adhdActions.tickADHDTimer(state)),
+    completeADHDSession: () => {
+      const state = get();
+      set(adhdActions.completeADHDSession(state));
+    },
 
-      resetADHDStats: () =>
-        set({
-          adhdStats: defaultADHDStats,
-        }),
+    startADHDBreak: (isLongBreak = false) =>
+      set((state) => adhdActions.startADHDBreak(state, isLongBreak)),
 
-      // Helpers (delegated to helpers module)
-      getLineSpacing: () => helpers.getLineSpacing(get().settings),
+    tickADHDTimer: () => set((state) => adhdActions.tickADHDTimer(state)),
 
-      getFontSizeMultiplier: () => helpers.getFontSizeMultiplier(get().settings),
+    resetADHDStats: () =>
+      set({
+        adhdStats: defaultADHDStats,
+      }),
 
-      getLetterSpacing: () => helpers.getLetterSpacing(get().settings),
+    // Helpers (delegated to helpers module)
+    getLineSpacing: () => helpers.getLineSpacing(get().settings),
 
-      shouldAnimate: () => helpers.shouldAnimate(get().settings),
+    getFontSizeMultiplier: () => helpers.getFontSizeMultiplier(get().settings),
 
-      getAnimationDuration: (baseDuration = 0.3) => helpers.getAnimationDuration(get().settings, baseDuration),
+    getLetterSpacing: () => helpers.getLetterSpacing(get().settings),
 
-      getFormattedTimeRemaining: () => adhdActions.formatTimeRemaining(get().adhdTimeRemaining),
+    shouldAnimate: () => helpers.shouldAnimate(get().settings),
 
-      getCompletionRate: () => adhdActions.getCompletionRate(get().adhdStats),
-    })
+    getAnimationDuration: (baseDuration = 0.3) =>
+      helpers.getAnimationDuration(get().settings, baseDuration),
+
+    getFormattedTimeRemaining: () =>
+      adhdActions.formatTimeRemaining(get().adhdTimeRemaining),
+
+    getCompletionRate: () => adhdActions.getCompletionRate(get().adhdStats),
+  }),
 );
 
 // Export default settings for SSR

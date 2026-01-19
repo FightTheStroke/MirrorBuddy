@@ -59,6 +59,24 @@ async function globalSetup() {
         secure: false,
         sameSite: "Lax",
       },
+      {
+        // Accessibility settings bypass (ADR 0060)
+        name: "mirrorbuddy-a11y",
+        value: encodeURIComponent(
+          JSON.stringify({
+            version: "1",
+            activeProfile: null,
+            overrides: {},
+            browserDetectedApplied: true,
+          }),
+        ),
+        domain: "localhost",
+        path: "/",
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: "Lax",
+      },
     ],
     origins: [
       {

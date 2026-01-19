@@ -59,6 +59,12 @@ export function CookiesContent() {
               purpose: "Salva le tue scelte sui cookie",
               duration: "1 anno",
             },
+            {
+              name: "mirrorbuddy-a11y",
+              purpose:
+                "Preferenze di accessibilità (font, contrasto, movimento)",
+              duration: "90 giorni",
+            },
           ]}
         />
       </Section>
