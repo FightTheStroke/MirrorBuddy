@@ -13,6 +13,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
 import { metricsStore } from "@/lib/observability/metrics-store";
+import {
+  activeUsersStore,
+  type UserType,
+} from "@/lib/observability/active-users-store";
 
 const REQUEST_ID_HEADER = "x-request-id";
 const RESPONSE_TIME_HEADER = "x-response-time";
@@ -195,6 +199,15 @@ export function proxy(request: NextRequest) {
   const visitorCookie = request.cookies.get("mirrorbuddy-visitor-id");
   const isAuthenticated = !!userCookie?.value;
   const hasTrialSession = !!visitorCookie?.value;
+
+  // Track active user for real-time metrics
+  const userType: UserType = isAuthenticated
+    ? "logged"
+    : hasTrialSession
+      ? "trial"
+      : "anonymous";
+  const userIdentifier = userCookie?.value || visitorCookie?.value || requestId;
+  activeUsersStore.recordActivity(userIdentifier, userType, route);
 
   // Auth public routes - allow without auth but add CSP
   if (AUTH_PUBLIC_ROUTES.some((r) => pathname.startsWith(r))) {

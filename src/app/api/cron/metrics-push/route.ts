@@ -13,6 +13,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { metricsStore } from "@/lib/observability/metrics-store";
+import { activeUsersStore } from "@/lib/observability/active-users-store";
 import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
 import { generateBusinessMetrics } from "@/app/api/metrics/business-metrics";
 import { generateSLIMetrics } from "@/app/api/metrics/sli-metrics";
@@ -132,6 +133,68 @@ async function collectAllMetrics(): Promise<MetricSample[]> {
     }
   } catch (err) {
     log.warn("Failed to collect behavioral metrics", { error: String(err) });
+  }
+
+  // 4. Real-time active users (from in-memory store)
+  try {
+    const activeUsers = activeUsersStore.getActiveUsers();
+
+    // Total active users by type
+    samples.push(
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "total" },
+        value: activeUsers.total,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "logged" },
+        value: activeUsers.logged,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "trial" },
+        value: activeUsers.trial,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_realtime_active_users",
+        labels: { ...instanceLabels, user_type: "anonymous" },
+        value: activeUsers.anonymous,
+        timestamp: now,
+      },
+    );
+
+    // Active users by route (top 10)
+    const routeEntries = Object.entries(activeUsers.byRoute)
+      .map(([route, counts]) => ({
+        route,
+        total: counts.logged + counts.trial + counts.anonymous,
+        ...counts,
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
+
+    for (const entry of routeEntries) {
+      samples.push({
+        name: "mirrorbuddy_realtime_active_users_by_route",
+        labels: { ...instanceLabels, route: entry.route },
+        value: entry.total,
+        timestamp: now,
+      });
+    }
+
+    log.debug("Collected realtime active users", {
+      total: activeUsers.total,
+      logged: activeUsers.logged,
+      trial: activeUsers.trial,
+    });
+  } catch (err) {
+    log.warn("Failed to collect realtime active users", {
+      error: String(err),
+    });
   }
 
   return samples;
