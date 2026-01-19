@@ -2,13 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Loader2,
-  RefreshCw,
-  AlertCircle,
-  ArrowLeft,
-} from "lucide-react";
-import Link from "next/link";
+import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
 import { SummaryStats } from "./components/summary-stats";
 import { Filters } from "./components/filters";
 import { AcceptancesTable } from "./components/acceptances-table";
@@ -86,15 +80,13 @@ export default function AdminTosPage() {
         const result = await response.json();
         setData(result);
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch data"
-        );
+        setError(err instanceof Error ? err.message : "Failed to fetch data");
       } finally {
         setLoading(false);
         setRefreshing(false);
       }
     },
-    [page, versionFilter, sortBy, sortOrder]
+    [page, versionFilter, sortBy, sortOrder],
   );
 
   useEffect(() => {
@@ -103,7 +95,7 @@ export default function AdminTosPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950 flex items-center justify-center">
+      <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
           <p className="text-slate-600 dark:text-slate-400">
@@ -115,39 +107,23 @@ export default function AdminTosPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center gap-4">
-          <Link href="/admin/analytics">
-            <Button variant="ghost" size="sm" className="gap-2">
-              <ArrowLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Back</span>
-            </Button>
-          </Link>
-          <div className="flex-1">
-            <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-100">
-              Terms of Service Acceptances
-            </h1>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
-              Admin panel for ToS compliance tracking
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => fetchData(true)}
-            disabled={refreshing}
-          >
-            <RefreshCw
-              className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
-        </div>
-      </header>
+    <div className="max-w-7xl mx-auto">
+      {/* Toolbar */}
+      <div className="flex items-center justify-end mb-6">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fetchData(true)}
+          disabled={refreshing}
+        >
+          <RefreshCw
+            className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+          />
+          Refresh
+        </Button>
+      </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div>
         {error && (
           <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
             <AlertCircle className="h-5 w-5 text-red-500" />
@@ -181,7 +157,7 @@ export default function AdminTosPage() {
             />
           </>
         )}
-      </main>
+      </div>
     </div>
   );
 }

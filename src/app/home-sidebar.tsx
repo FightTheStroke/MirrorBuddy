@@ -1,13 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronUp, ChevronDown, LogIn, UserPlus } from "lucide-react";
+import { ChevronUp, ChevronDown, LogIn, UserPlus, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActiveMaestroAvatar } from "@/components/conversation";
 import { TrialStatusIndicator } from "@/components/trial";
+import { useAdminStatus } from "@/lib/hooks/use-admin-status";
 import type { View } from "@/app/types";
 
 interface NavItem {
@@ -46,6 +47,8 @@ export function HomeSidebar({
   onParentAccess,
   trialStatus,
 }: HomeSidebarProps) {
+  const { isAdmin } = useAdminStatus();
+
   return (
     <aside
       className={cn(
@@ -221,8 +224,28 @@ export function HomeSidebar({
         />
       </div>
 
-      {/* Parent Access Button */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      {/* Bottom Buttons */}
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-2">
+        {/* Admin Access Button - only visible to admins */}
+        {isAdmin && (
+          <Link href="/admin">
+            <button
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
+                "bg-amber-100 dark:bg-amber-900/40 hover:bg-amber-200 dark:hover:bg-amber-800/50",
+                "border border-amber-200 dark:border-amber-700 text-amber-700 dark:text-amber-300",
+                "text-sm font-medium transition-all duration-200",
+                "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2",
+              )}
+              aria-label="Dashboard amministratore"
+            >
+              <Shield className="w-4 h-4" />
+              {open && <span>Admin Dashboard</span>}
+            </button>
+          </Link>
+        )}
+
+        {/* Parent Access Button */}
         <button
           onClick={onParentAccess}
           className={cn(

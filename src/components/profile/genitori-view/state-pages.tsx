@@ -2,26 +2,41 @@
  * State page components for GenitoriView
  */
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2, AlertCircle, RefreshCw, Shield, Trash2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Loader2,
+  AlertCircle,
+  RefreshCw,
+  Shield,
+  Trash2,
+  Sparkles,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export function LoadingState() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
-      <Loader2 className="h-8 w-8 animate-spin text-accent-themed" />
-      <p className="text-slate-600 dark:text-slate-400">Caricamento profilo...</p>
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      <p className="text-muted-foreground">Caricamento profilo...</p>
     </div>
   );
 }
 
-export function ErrorState({ error, onRetry }: { error: string | null; onRetry: () => void }) {
+interface ErrorStateProps {
+  error: string | null;
+  onRetry: () => void;
+}
+
+export function ErrorState({ error, onRetry }: ErrorStateProps) {
   return (
     <div className="flex flex-col items-center gap-4 text-center py-8">
-      <AlertCircle className="h-12 w-12 text-red-500" />
+      <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
+        <AlertCircle className="h-7 w-7 text-destructive" />
+      </div>
       <div>
-        <h3 className="font-semibold text-lg">Errore</h3>
-        <p className="text-slate-600 dark:text-slate-400 mt-1">{error}</p>
+        <h3 className="font-semibold text-lg text-foreground">Errore</h3>
+        <p className="text-muted-foreground mt-1">{error}</p>
       </div>
       <Button onClick={onRetry}>
         <RefreshCw className="h-4 w-4 mr-2" />
@@ -31,46 +46,80 @@ export function ErrorState({ error, onRetry }: { error: string | null; onRetry: 
   );
 }
 
-interface NoProfileStateProps {
-  onGenerate: () => void;
-  isGenerating: boolean;
-  error: string | null;
+interface WelcomeBannerProps {
+  highContrast?: boolean;
 }
 
-export function NoProfileState({ onGenerate, isGenerating, error }: NoProfileStateProps) {
+/**
+ * Welcome banner shown when no profile data exists yet.
+ * Displays above the empty dashboard to explain the current state.
+ */
+export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <div className="w-5 h-5 text-accent-themed">✓</div>
-          Nessun Profilo Disponibile
-        </CardTitle>
-        <CardDescription>
-          Per creare il profilo, è necessario prima interagire con i Professori.
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        <Button onClick={onGenerate} disabled={isGenerating}>
-          {isGenerating ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <RefreshCw className="h-4 w-4 mr-2" />}
-          Genera Profilo
-        </Button>
-        {error && <p className="text-sm text-red-500">{error}</p>}
-      </CardContent>
-    </Card>
+    <div
+      className={cn(
+        "rounded-xl p-4 mb-6 border",
+        highContrast
+          ? "bg-yellow-400/10 border-yellow-400"
+          : "bg-primary/5 border-primary/20",
+      )}
+    >
+      <div className="flex items-start gap-4">
+        <div
+          className={cn(
+            "shrink-0 w-10 h-10 rounded-xl flex items-center justify-center",
+            highContrast ? "bg-yellow-400 text-black" : "bg-card shadow-sm",
+          )}
+        >
+          <Sparkles
+            className={cn(
+              "h-5 w-5",
+              highContrast ? "text-black" : "text-primary",
+            )}
+          />
+        </div>
+        <div>
+          <h2
+            className={cn(
+              "font-semibold",
+              highContrast ? "text-yellow-400" : "text-foreground",
+            )}
+          >
+            Benvenuto nell&apos;Area Genitori
+          </h2>
+          <p
+            className={cn(
+              "text-sm mt-1",
+              highContrast ? "text-yellow-200" : "text-muted-foreground",
+            )}
+          >
+            Questa dashboard si popolerà automaticamente quando lo studente
+            inizierà a studiare con i Maestri. Intanto, ecco come apparirà!
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }
 
-export function NeedsConsentState({ onConsent }: { onConsent: () => void }) {
+interface NeedsConsentStateProps {
+  onConsent: () => void;
+}
+
+export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
   return (
-    <Card>
+    <Card className="border-border">
       <CardHeader className="text-center pb-2">
-        <div className="mx-auto w-14 h-14 rounded-full bg-gradient-to-br from-indigo-100 to-purple-100 dark:from-indigo-900/30 dark:to-purple-900/30 flex items-center justify-center mb-4">
-          <Shield className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+        <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+          <Shield className="h-7 w-7 text-primary" />
         </div>
-        <CardTitle>Consenso per il Dashboard Genitori</CardTitle>
-        <CardDescription>
-          Per visualizzare le osservazioni dei Professori, abbiamo bisogno del tuo consenso.
-        </CardDescription>
+        <CardTitle className="text-foreground">
+          Consenso per il Dashboard Genitori
+        </CardTitle>
+        <p className="text-sm text-muted-foreground mt-2">
+          Per visualizzare le osservazioni dei Professori, abbiamo bisogno del
+          tuo consenso.
+        </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button onClick={onConsent} className="w-full">
@@ -84,15 +133,15 @@ export function NeedsConsentState({ onConsent }: { onConsent: () => void }) {
 
 export function DeletionPendingState() {
   return (
-    <Card>
+    <Card className="border-border">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-amber-600">
+        <CardTitle className="flex items-center gap-2 text-amber-600 dark:text-amber-400">
           <Trash2 className="h-5 w-5" />
           Cancellazione Richiesta
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <p className="text-slate-600 dark:text-slate-400">
+        <p className="text-muted-foreground">
           I dati verranno eliminati entro 30 giorni, come previsto dal GDPR.
         </p>
       </CardContent>

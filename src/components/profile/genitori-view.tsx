@@ -8,7 +8,9 @@ import { type DiaryEntry } from "./teacher-diary";
 import { ProgressTimeline } from "./progress-timeline";
 import { ParentProfessorChat } from "./parent-professor-chat";
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/ui/page-header";
 import {
+  Users,
   RefreshCw,
   FileJson,
   FileText,
@@ -28,7 +30,11 @@ import type {
   PageState,
   LearningEntry,
 } from "./genitori-view/types";
-import { DEMO_USER_ID, MAESTRO_NAMES } from "./genitori-view/constants";
+import {
+  DEMO_USER_ID,
+  MAESTRO_NAMES,
+  EMPTY_ACTIVITY,
+} from "./genitori-view/constants";
 import {
   fetchConsentStatus,
   fetchProfile,
@@ -40,12 +46,11 @@ import {
 import {
   LoadingState,
   ErrorState,
-  NoProfileState,
   NeedsConsentState,
   DeletionPendingState,
+  WelcomeBanner,
 } from "./genitori-view/state-pages";
 import {
-  ParentHeader,
   ActivityOverview,
   RecentSessionsList,
   StreakCalendar,
@@ -241,40 +246,13 @@ export function GenitoriView() {
   const studentName = insights?.studentName || "lo studente";
 
   return (
-    <div className="space-y-6">
-      <div
-        className={cn(
-          "rounded-xl shadow-sm border p-6",
-          highContrast
-            ? "bg-black border-yellow-400"
-            : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
-        )}
-      >
-        {pageState === "loading" && <LoadingState />}
-        {pageState === "error" && (
-          <ErrorState error={error} onRetry={() => window.location.reload()} />
-        )}
-        {pageState === "no-profile" && (
-          <NoProfileState
-            onGenerate={handleGenerateProfile}
-            isGenerating={isGenerating}
-            error={error}
-          />
-        )}
-        {pageState === "needs-consent" && (
-          <NeedsConsentState onConsent={handleGiveConsentClick} />
-        )}
-        {pageState === "deletion-pending" && <DeletionPendingState />}
-
-        {pageState === "ready" && (
-          <>
-            <ParentHeader
-              studentName={studentName}
-              highContrast={highContrast}
-              className="mb-6"
-            />
-
-            <div className="flex items-center justify-between gap-3 mb-6">
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <PageHeader
+          icon={Users}
+          title="Area Genitori"
+          rightContent={
+            pageState === "ready" && (
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -295,41 +273,116 @@ export function GenitoriView() {
                   Report
                 </Button>
               </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGenerateProfile}
-                  disabled={isGenerating}
-                >
-                  {isGenerating ? (
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  ) : (
-                    <RefreshCw className="h-4 w-4 mr-2" />
+            )
+          }
+        />
+
+        {pageState === "loading" && <LoadingState />}
+        {pageState === "error" && (
+          <ErrorState error={error} onRetry={() => window.location.reload()} />
+        )}
+        {pageState === "needs-consent" && (
+          <NeedsConsentState onConsent={handleGiveConsentClick} />
+        )}
+        {pageState === "deletion-pending" && <DeletionPendingState />}
+
+        {(pageState === "ready" || pageState === "no-profile") && (
+          <>
+            {pageState === "no-profile" && (
+              <WelcomeBanner highContrast={highContrast} />
+            )}
+
+            {/* Student info + actions bar */}
+            <div
+              className={cn(
+                "flex items-center justify-between gap-4 p-4 rounded-xl border mb-6",
+                highContrast
+                  ? "bg-black border-yellow-400"
+                  : "bg-muted/50 border-border",
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <div
+                  className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center",
+                    highContrast
+                      ? "bg-yellow-400 text-black"
+                      : "bg-card shadow-sm",
                   )}
-                  Aggiorna
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleRequestDeletionClick}
-                  className="text-red-500 hover:text-red-700"
                 >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Cancella
-                </Button>
+                  <Users
+                    className={cn(
+                      "w-5 h-5",
+                      highContrast ? "text-black" : "text-muted-foreground",
+                    )}
+                  />
+                </div>
+                <div>
+                  <p
+                    className={cn(
+                      "text-sm font-medium",
+                      highContrast ? "text-yellow-400" : "text-foreground",
+                    )}
+                  >
+                    Studente: {studentName}
+                  </p>
+                  <p
+                    className={cn(
+                      "text-xs",
+                      highContrast
+                        ? "text-yellow-200"
+                        : "text-muted-foreground",
+                    )}
+                  >
+                    Panoramica delle attività di studio
+                  </p>
+                </div>
               </div>
+              {pageState === "ready" && (
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateProfile}
+                    disabled={isGenerating}
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    ) : (
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                    )}
+                    Aggiorna
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleRequestDeletionClick}
+                    className="text-destructive hover:text-destructive/80"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Cancella
+                  </Button>
+                </div>
+              )}
             </div>
 
             {meta && meta.confidenceScore < 0.5 && (
               <div
                 className={cn(
-                  "rounded-lg p-3 mb-6 border",
+                  "rounded-xl p-4 mb-6 border flex items-center gap-3",
                   highContrast
                     ? "bg-yellow-400/10 border-yellow-400"
                     : "bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800",
                 )}
               >
+                <AlertCircle
+                  className={cn(
+                    "h-5 w-5 shrink-0",
+                    highContrast
+                      ? "text-yellow-400"
+                      : "text-amber-600 dark:text-amber-400",
+                  )}
+                />
                 <p
                   className={cn(
                     "text-sm",
@@ -351,45 +404,47 @@ export function GenitoriView() {
               highContrast={highContrast}
             >
               {{
-                panoramica: activity ? (
-                  <div className="space-y-6">
-                    <ActivityOverview
-                      stats={activity.weeklyStats}
-                      highContrast={highContrast}
-                    />
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                      <RecentSessionsList
-                        sessions={activity.recentSessions}
+                panoramica: (() => {
+                  const data = activity || EMPTY_ACTIVITY;
+                  return (
+                    <div className="space-y-6">
+                      <ActivityOverview
+                        stats={data.weeklyStats}
                         highContrast={highContrast}
                       />
-                      <StreakCalendar
-                        streak={activity.streak}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <RecentSessionsList
+                          sessions={data.recentSessions}
+                          highContrast={highContrast}
+                        />
+                        <StreakCalendar
+                          streak={data.streak}
+                          highContrast={highContrast}
+                        />
+                      </div>
+                    </div>
+                  );
+                })(),
+                progressi: (() => {
+                  const data = activity || EMPTY_ACTIVITY;
+                  return (
+                    <div className="space-y-6">
+                      <SubjectsStudied
+                        subjects={data.subjectBreakdown}
                         highContrast={highContrast}
+                      />
+                      <QuizPerformance
+                        stats={data.quizStats}
+                        highContrast={highContrast}
+                      />
+                      {insights && <ParentDashboard insights={insights} />}
+                      <ProgressTimeline
+                        entries={diaryEntries}
+                        studentName={studentName}
                       />
                     </div>
-                  </div>
-                ) : (
-                  <LoadingState />
-                ),
-                progressi: activity ? (
-                  <div className="space-y-6">
-                    <SubjectsStudied
-                      subjects={activity.subjectBreakdown}
-                      highContrast={highContrast}
-                    />
-                    <QuizPerformance
-                      stats={activity.quizStats}
-                      highContrast={highContrast}
-                    />
-                    {insights && <ParentDashboard insights={insights} />}
-                    <ProgressTimeline
-                      entries={diaryEntries}
-                      studentName={studentName}
-                    />
-                  </div>
-                ) : (
-                  <LoadingState />
-                ),
+                  );
+                })(),
                 osservazioni: (
                   <TeacherObservationsSection
                     entries={diaryEntries}
@@ -437,22 +492,20 @@ export function GenitoriView() {
                 "mt-6 p-4 rounded-xl border",
                 highContrast
                   ? "bg-black border-yellow-400"
-                  : "bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700",
+                  : "bg-muted/50 border-border",
               )}
             >
               <div className="flex items-start gap-3">
                 <AlertCircle
                   className={cn(
-                    "h-4 w-4 mt-0.5",
-                    highContrast ? "text-yellow-400" : "text-slate-500",
+                    "h-4 w-4 mt-0.5 shrink-0",
+                    highContrast ? "text-yellow-400" : "text-muted-foreground",
                   )}
                 />
                 <p
                   className={cn(
                     "text-xs",
-                    highContrast
-                      ? "text-yellow-200"
-                      : "text-slate-600 dark:text-slate-400",
+                    highContrast ? "text-yellow-200" : "text-muted-foreground",
                   )}
                 >
                   <strong>Disclaimer AI:</strong> Le osservazioni sono generate

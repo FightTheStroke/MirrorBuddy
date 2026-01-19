@@ -2,26 +2,65 @@
  * Feature Flags Admin Panel
  *
  * V1Plan FASE 2.0.6: Admin UI for feature flag management
+ * Uses API endpoint instead of direct imports to avoid server/client boundary issues
  */
 
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useFeatureFlags } from "@/lib/hooks/use-feature-flags";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import type { FeatureFlag, KnownFeatureFlag } from "@/lib/feature-flags/types";
+
+interface DegradationState {
+  level: "none" | "partial" | "severe";
+  affectedFeatures: string[];
+}
+
+interface FeatureFlagsApiResponse {
+  flags: FeatureFlag[];
+  globalKillSwitch: boolean;
+  degradation?: DegradationState;
+}
 
 interface FeatureFlagsPanelProps {
   onFlagUpdate?: (featureId: string, enabled: boolean) => void;
 }
 
 export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
-  const { flags, globalKillSwitch, degradationState, refresh, isLoading } =
-    useFeatureFlags();
+  const [flags, setFlags] = useState<FeatureFlag[]>([]);
+  const [globalKillSwitch, setGlobalKillSwitch] = useState(false);
+  const [degradationState, setDegradationState] = useState<DegradationState>({
+    level: "none",
+    affectedFeatures: [],
+  });
+  const [isLoading, setIsLoading] = useState(true);
   const [updating, setUpdating] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  const fetchFlags = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/feature-flags?health=true");
+      if (!response.ok) throw new Error("Failed to fetch flags");
+      const data: FeatureFlagsApiResponse = await response.json();
+      setFlags(data.flags);
+      setGlobalKillSwitch(data.globalKillSwitch);
+      if (data.degradation) {
+        setDegradationState(data.degradation);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchFlags();
+    const interval = setInterval(fetchFlags, 30000);
+    return () => clearInterval(interval);
+  }, [fetchFlags]);
 
   const handleToggleKillSwitch = useCallback(
     async (featureId: KnownFeatureFlag, currentKillSwitch: boolean) => {
@@ -44,7 +83,7 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
           throw new Error("Failed to update flag");
         }
 
-        refresh();
+        await fetchFlags();
         onFlagUpdate?.(featureId, currentKillSwitch);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -52,7 +91,7 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
         setUpdating(null);
       }
     },
-    [refresh, onFlagUpdate],
+    [fetchFlags, onFlagUpdate],
   );
 
   const handleGlobalKillSwitch = useCallback(async () => {
@@ -75,13 +114,13 @@ export function FeatureFlagsPanel({ onFlagUpdate }: FeatureFlagsPanelProps) {
         throw new Error("Failed to toggle global kill-switch");
       }
 
-      refresh();
+      await fetchFlags();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unknown error");
     } finally {
       setUpdating(null);
     }
-  }, [globalKillSwitch, refresh]);
+  }, [globalKillSwitch, fetchFlags]);
 
   if (isLoading) {
     return (
