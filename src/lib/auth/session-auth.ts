@@ -82,24 +82,45 @@ export async function validateAuth(): Promise<AuthResult> {
         process.env.E2E_TESTS === "1" ||
         process.env.NODE_ENV !== "production"
       ) {
-        // Use upsert to handle race conditions in parallel E2E tests
-        // Multiple test workers may try to create the same user simultaneously
-        const created = await prisma.user.upsert({
-          where: { id: userId },
-          update: {}, // User exists, no updates needed
-          create: {
-            id: userId,
-            profile: { create: {} },
-            settings: { create: {} },
-            progress: { create: {} },
-          },
-          select: { id: true },
-        });
+        // E2E/dev mode: auto-create test users
+        // Use try-catch to handle race conditions where concurrent requests
+        // may try to create the same user simultaneously
+        try {
+          const created = await prisma.user.create({
+            data: {
+              id: userId,
+              profile: { create: {} },
+              settings: { create: {} },
+              progress: { create: {} },
+            },
+            select: { id: true },
+          });
 
-        return {
-          authenticated: true,
-          userId: created.id,
-        };
+          return {
+            authenticated: true,
+            userId: created.id,
+          };
+        } catch (createError) {
+          // P2002 = unique constraint violation (user was created by another request)
+          if (
+            createError instanceof Error &&
+            createError.message.includes("Unique constraint")
+          ) {
+            // User was created by another concurrent request, fetch and return
+            const existingUser = await prisma.user.findUnique({
+              where: { id: userId },
+              select: { id: true },
+            });
+            if (existingUser) {
+              return {
+                authenticated: true,
+                userId: existingUser.id,
+              };
+            }
+          }
+          // Re-throw other errors
+          throw createError;
+        }
       }
 
       return {
