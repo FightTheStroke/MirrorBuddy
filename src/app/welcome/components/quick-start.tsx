@@ -1,8 +1,17 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { ArrowRight, Settings, Mic, MousePointer, SkipForward } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from "framer-motion";
+import Link from "next/link";
+import {
+  ArrowRight,
+  Settings,
+  Mic,
+  MousePointer,
+  SkipForward,
+  LogIn,
+  UserPlus,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface QuickStartProps {
   isReturningUser: boolean;
@@ -99,6 +108,38 @@ export function QuickStart({
             <SkipForward className="w-4 h-4" aria-hidden="true" />
             Salta intro e inizia subito
           </button>
+
+          {/* Authentication options */}
+          <div className="w-full mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-center text-sm text-gray-600 dark:text-gray-400 mb-3">
+              Hai già un account?
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <Link href="/login">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-blue-600 dark:text-blue-400"
+                >
+                  <LogIn className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Accedi
+                </Button>
+              </Link>
+              <span className="hidden sm:inline text-gray-300 dark:text-gray-600">
+                |
+              </span>
+              <Link href="/invite/request">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-purple-600 dark:text-purple-400"
+                >
+                  <UserPlus className="w-4 h-4 mr-2" aria-hidden="true" />
+                  Richiedi accesso beta
+                </Button>
+              </Link>
+            </div>
+          </div>
         </div>
       )}
 

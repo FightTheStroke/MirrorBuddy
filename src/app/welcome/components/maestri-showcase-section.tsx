@@ -138,6 +138,18 @@ export function MaestriShowcaseSection() {
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
         ← Scorri per vedere tutti i professori →
       </p>
+
+      {/* Disclaimer */}
+      <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 max-w-2xl mx-auto">
+        I professori AI sono creati a scopo educativo e dimostrativo. In futuro
+        ogni studente potra creare i propri professori personalizzati.{" "}
+        <a
+          href="/terms#section-4"
+          className="underline hover:text-gray-600 dark:hover:text-gray-400"
+        >
+          Scopri di piu
+        </a>
+      </p>
     </motion.section>
   );
 }

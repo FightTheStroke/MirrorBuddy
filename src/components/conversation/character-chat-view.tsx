@@ -1,37 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { AnimatePresence } from 'framer-motion';
-import { ToolPanel } from '@/components/tools/tool-panel';
-import { ConversationSidebar } from './conversation-drawer';
-import { getCharacterInfo } from './character-chat-view/utils/character-utils';
-import { useCharacterChat } from './character-chat-view/hooks/use-character-chat';
-import { MessagesList } from './character-chat-view/components/messages-list';
-import { ChatInput } from './character-chat-view/components/chat-input';
-import { useVoiceSession } from '@/lib/hooks/use-voice-session';
-import { useTTS } from '@/components/accessibility';
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AnimatePresence } from "framer-motion";
+import { ToolPanel } from "@/components/tools/tool-panel";
+import { ConversationSidebar } from "./conversation-drawer";
+import { getCharacterInfo } from "./character-chat-view/utils/character-utils";
+import { useCharacterChat } from "./character-chat-view/hooks/use-character-chat";
+import { MessagesList } from "./character-chat-view/components/messages-list";
+import { ChatInput } from "./character-chat-view/components/chat-input";
+import { useVoiceSession } from "@/lib/hooks/use-voice-session";
+import { useTTS } from "@/components/accessibility";
 import {
   CharacterHeader,
   CharacterVoicePanel,
   characterInfoToUnified,
   type VoiceState,
   type HeaderActions,
-} from '@/components/character';
+} from "@/components/character";
 
 interface CharacterChatViewProps {
   characterId:
-    | 'melissa'
-    | 'roberto'
-    | 'chiara'
-    | 'andrea'
-    | 'favij'
-    | 'mario'
-    | 'noemi'
-    | 'enea'
-    | 'bruno'
-    | 'sofia';
-  characterType: 'coach' | 'buddy';
+    | "melissa"
+    | "roberto"
+    | "chiara"
+    | "andrea"
+    | "favij"
+    | "laura"
+    | "mario"
+    | "noemi"
+    | "enea"
+    | "bruno"
+    | "sofia"
+    | "marta";
+  characterType: "coach" | "buddy";
 }
 
 export function CharacterChatView({
@@ -40,7 +42,11 @@ export function CharacterChatView({
 }: CharacterChatViewProps) {
   const router = useRouter();
   const character = getCharacterInfo(characterId, characterType);
-  const unifiedCharacter = characterInfoToUnified(character, characterId, characterType);
+  const unifiedCharacter = characterInfoToUnified(
+    character,
+    characterId,
+    characterType,
+  );
   const [isToolMinimized, setIsToolMinimized] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const { speak: _speak, stop: stopTTS, enabled: ttsEnabled } = useTTS();
@@ -79,7 +85,7 @@ export function CharacterChatView({
   } = voiceSession;
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
@@ -115,7 +121,7 @@ export function CharacterChatView({
     onOpenHistory: handleOpenHistory,
   };
 
-  const hasActiveTool = activeTool && activeTool.status !== 'error';
+  const hasActiveTool = activeTool && activeTool.status !== "error";
 
   return (
     <div className="flex gap-4 h-[calc(100vh-8rem)]">
@@ -155,7 +161,7 @@ export function CharacterChatView({
             tool={activeTool}
             maestro={{
               name: character.name,
-              avatar: character.avatar || '/avatars/default.jpg',
+              avatar: character.avatar || "/avatars/default.jpg",
               color: character.themeColor,
             }}
             onClose={() => setActiveTool(null)}

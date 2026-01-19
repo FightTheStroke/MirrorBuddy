@@ -18,6 +18,7 @@ import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { useProgressStore, useSettingsStore } from "@/lib/stores";
 import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { useParentInsightsIndicator } from "@/lib/hooks/use-parent-insights-indicator";
+import { useTrialStatus } from "@/lib/hooks/use-trial-status";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import { cn } from "@/lib/utils";
 import type { Maestro, ToolType } from "@/types";
@@ -81,6 +82,7 @@ export default function Home() {
   } = useProgressStore();
   const { studentProfile } = useSettingsStore();
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
+  const trialStatus = useTrialStatus();
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -177,6 +179,7 @@ export default function Home() {
           markAsViewed();
           handleViewChange("genitori");
         }}
+        trialStatus={trialStatus}
       />
 
       <main
