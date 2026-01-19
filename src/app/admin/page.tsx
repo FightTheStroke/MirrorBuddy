@@ -1,107 +1,198 @@
 "use client";
 
-import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   UserPlus,
   Users,
-  BarChart3,
-  FileText,
-  Shield,
-  ArrowRight,
+  Activity,
+  AlertTriangle,
+  ChevronDown,
+  RefreshCw,
+  Loader2,
+  ExternalLink,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { KpiCard } from "@/components/admin/kpi-card";
+import { CostPanel } from "@/components/admin/CostPanel";
+import { FeatureFlagsPanel } from "@/components/admin/FeatureFlagsPanel";
+import { SLOMonitoringPanel } from "@/components/admin/SLOMonitoringPanel";
+import { cn } from "@/lib/utils";
 
-interface AdminCard {
-  title: string;
-  description: string;
-  href: string;
-  icon: React.ReactNode;
-  color: string;
+const GRAFANA_DASHBOARD_URL = "https://mirrorbuddy.grafana.net/d/dashboard/";
+
+interface AdminCounts {
+  pendingInvites: number;
+  totalUsers: number;
+  activeUsers24h: number;
+  systemAlerts: number;
 }
 
-const ADMIN_SECTIONS: AdminCard[] = [
-  {
-    title: "Richieste Beta",
-    description: "Gestisci le richieste di invito alla beta privata",
-    href: "/admin/invites",
-    icon: <UserPlus className="w-6 h-6" />,
-    color: "bg-purple-500",
-  },
-  {
-    title: "Utenti",
-    description: "Visualizza e gestisci gli utenti registrati",
-    href: "/admin/users",
-    icon: <Users className="w-6 h-6" />,
-    color: "bg-blue-500",
-  },
-  {
-    title: "Analytics",
-    description: "Metriche di utilizzo e performance",
-    href: "/admin/analytics",
-    icon: <BarChart3 className="w-6 h-6" />,
-    color: "bg-emerald-500",
-  },
-  {
-    title: "Termini di Servizio",
-    description: "Gestisci le versioni dei ToS",
-    href: "/admin/tos",
-    icon: <FileText className="w-6 h-6" />,
-    color: "bg-amber-500",
-  },
-];
+interface CollapsibleSectionProps {
+  title: string;
+  defaultOpen?: boolean;
+  children: React.ReactNode;
+}
+
+function CollapsibleSection({
+  title,
+  defaultOpen = false,
+  children,
+}: CollapsibleSectionProps) {
+  const [isOpen, setIsOpen] = useState(defaultOpen);
+
+  return (
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+      >
+        <span className="font-medium text-slate-900 dark:text-white">
+          {title}
+        </span>
+        <ChevronDown
+          className={cn(
+            "h-5 w-5 text-slate-500 transition-transform",
+            isOpen && "rotate-180",
+          )}
+        />
+      </button>
+      {isOpen && (
+        <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+          {children}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function AdminDashboardPage() {
+  const [counts, setCounts] = useState<AdminCounts | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchCounts = async (isRefresh = false) => {
+    if (isRefresh) setRefreshing(true);
+    setError(null);
+
+    try {
+      const response = await fetch("/api/admin/counts");
+      if (!response.ok) throw new Error("Failed to fetch counts");
+      const data = await response.json();
+      setCounts(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error loading data");
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCounts();
+    const interval = setInterval(() => fetchCounts(), 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-24">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
+          <p className="text-slate-600 dark:text-slate-400">
+            Loading dashboard...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-8">
-          <div className="p-2 bg-slate-900 dark:bg-white rounded-lg">
-            <Shield className="w-6 h-6 text-white dark:text-slate-900" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Admin Dashboard
-            </h1>
-            <p className="text-sm text-slate-600 dark:text-slate-400">
-              Gestione MirrorBuddy
-            </p>
-          </div>
-        </div>
+    <div className="max-w-6xl mx-auto">
+      {/* Toolbar */}
+      <div className="flex items-center justify-end gap-2 mb-6">
+        <Button variant="outline" size="sm" asChild>
+          <a
+            href={GRAFANA_DASHBOARD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Grafana
+          </a>
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => fetchCounts(true)}
+          disabled={refreshing}
+        >
+          <RefreshCw
+            className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")}
+          />
+          Aggiorna
+        </Button>
+      </div>
 
-        {/* Cards Grid */}
-        <div className="grid gap-4 sm:grid-cols-2">
-          {ADMIN_SECTIONS.map((section) => (
-            <Link
-              key={section.href}
-              href={section.href}
-              className="group block bg-white dark:bg-slate-800 rounded-xl p-5 shadow-sm hover:shadow-md transition-all border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
-            >
-              <div className="flex items-start gap-4">
-                <div
-                  className={`${section.color} p-3 rounded-lg text-white shrink-0`}
-                >
-                  {section.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="font-semibold text-slate-900 dark:text-white">
-                      {section.title}
-                    </h2>
-                    <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300 group-hover:translate-x-1 transition-all" />
-                  </div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                    {section.description}
-                  </p>
-                </div>
-              </div>
-            </Link>
-          ))}
+      {/* Error */}
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
         </div>
+      )}
 
-        {/* Footer info */}
-        <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-500">
-          <p>MirrorBuddy Admin Panel</p>
-        </div>
+      {/* KPI Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <KpiCard
+          title="Richieste Beta"
+          value={counts?.pendingInvites ?? 0}
+          subValue="In attesa di approvazione"
+          icon={UserPlus}
+          href="/admin/invites"
+          badge={counts?.pendingInvites}
+          badgeColor="amber"
+          color="purple"
+        />
+        <KpiCard
+          title="Utenti Totali"
+          value={counts?.totalUsers ?? 0}
+          subValue="Utenti registrati"
+          icon={Users}
+          href="/admin/users"
+          color="blue"
+        />
+        <KpiCard
+          title="Utenti Attivi"
+          value={counts?.activeUsers24h ?? 0}
+          subValue="Nelle ultime 24 ore"
+          icon={Activity}
+          href="/admin/analytics"
+          color="green"
+        />
+        <KpiCard
+          title="Alert Sistema"
+          value={counts?.systemAlerts ?? 0}
+          subValue="Eventi critici non risolti"
+          icon={AlertTriangle}
+          badge={counts?.systemAlerts}
+          badgeColor={counts?.systemAlerts ? "red" : "green"}
+          color={counts?.systemAlerts ? "red" : "green"}
+        />
+      </div>
+
+      {/* Collapsible Panels */}
+      <div className="space-y-4">
+        <CollapsibleSection title="Cost Monitoring" defaultOpen={false}>
+          <CostPanel />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Feature Flags" defaultOpen={false}>
+          <FeatureFlagsPanel />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="SLO Monitoring" defaultOpen={false}>
+          <SLOMonitoringPanel />
+        </CollapsibleSection>
       </div>
     </div>
   );
