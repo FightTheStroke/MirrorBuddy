@@ -17,7 +17,7 @@ export type {
   JailbreakCategory,
   JailbreakDetection,
   ConversationContext,
-} from './types';
+} from "./types";
 
 // Patterns
 export {
@@ -29,10 +29,15 @@ export {
   AUTHORITY_PATTERNS,
   BUILDUP_PATTERNS,
   OBVIOUS_JAILBREAK_PATTERNS,
-} from './patterns';
+  PROMPT_LEAKING_PATTERNS,
+  SYSTEM_FORGERY_PATTERNS,
+  CODE_INJECTION_PATTERNS,
+  OUTPUT_HIJACKING_PATTERNS,
+  CRESCENDO_PATTERNS,
+} from "./patterns";
 
 // Utils
-export { detectEncoding, calculateThreatScore } from './utils';
+export { detectEncoding, calculateThreatScore } from "./utils";
 
 // Core functions
 export {
@@ -40,4 +45,4 @@ export {
   isObviousJailbreak,
   getJailbreakResponse,
   buildContext,
-} from './detector';
+} from "./detector";

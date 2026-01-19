@@ -10,7 +10,7 @@ import type {
   JailbreakCategory,
   JailbreakDetection,
   ConversationContext,
-} from './types';
+} from "./types";
 import {
   ROLE_OVERRIDE_PATTERNS,
   INSTRUCTION_IGNORE_PATTERNS,
@@ -20,8 +20,13 @@ import {
   AUTHORITY_PATTERNS,
   BUILDUP_PATTERNS,
   OBVIOUS_JAILBREAK_PATTERNS,
-} from './patterns';
-import { detectEncoding, calculateThreatScore } from './utils';
+  PROMPT_LEAKING_PATTERNS,
+  SYSTEM_FORGERY_PATTERNS,
+  CODE_INJECTION_PATTERNS,
+  OUTPUT_HIJACKING_PATTERNS,
+  CRESCENDO_PATTERNS,
+} from "./patterns";
+import { detectEncoding, calculateThreatScore } from "./utils";
 
 /**
  * Main jailbreak detection function
@@ -32,7 +37,7 @@ import { detectEncoding, calculateThreatScore } from './utils';
  */
 export function detectJailbreak(
   text: string,
-  context?: ConversationContext
+  context?: ConversationContext,
 ): JailbreakDetection {
   const categories: JailbreakCategory[] = [];
   const triggers: string[] = [];
@@ -44,7 +49,7 @@ export function detectJailbreak(
   // Check encoding bypass attempts
   const encodingResult = detectEncoding(text);
   if (encodingResult.detected) {
-    categories.push('encoding_bypass');
+    categories.push("encoding_bypass");
     triggers.push(`Encoded content detected: ${encodingResult.type}`);
     totalScore += 0.8;
   }
@@ -54,12 +59,17 @@ export function detectJailbreak(
     patterns: Array<{ pattern: RegExp; weight: number }>;
     category: JailbreakCategory;
   }> = [
-    { patterns: ROLE_OVERRIDE_PATTERNS, category: 'role_override' },
-    { patterns: INSTRUCTION_IGNORE_PATTERNS, category: 'instruction_ignore' },
-    { patterns: SYSTEM_EXTRACTION_PATTERNS, category: 'system_extraction' },
-    { patterns: HYPOTHETICAL_PATTERNS, category: 'hypothetical_framing' },
-    { patterns: EMOTIONAL_PATTERNS, category: 'emotional_manipulation' },
-    { patterns: AUTHORITY_PATTERNS, category: 'authority_claiming' },
+    { patterns: ROLE_OVERRIDE_PATTERNS, category: "role_override" },
+    { patterns: INSTRUCTION_IGNORE_PATTERNS, category: "instruction_ignore" },
+    { patterns: SYSTEM_EXTRACTION_PATTERNS, category: "system_extraction" },
+    { patterns: HYPOTHETICAL_PATTERNS, category: "hypothetical_framing" },
+    { patterns: EMOTIONAL_PATTERNS, category: "emotional_manipulation" },
+    { patterns: AUTHORITY_PATTERNS, category: "authority_claiming" },
+    { patterns: PROMPT_LEAKING_PATTERNS, category: "prompt_leaking" },
+    { patterns: SYSTEM_FORGERY_PATTERNS, category: "system_forgery" },
+    { patterns: CODE_INJECTION_PATTERNS, category: "code_injection" },
+    { patterns: OUTPUT_HIJACKING_PATTERNS, category: "output_hijacking" },
+    { patterns: CRESCENDO_PATTERNS, category: "crescendo_attack" },
   ];
 
   for (const { patterns, category } of patternChecks) {
@@ -73,13 +83,13 @@ export function detectJailbreak(
 
   // Multi-turn attack detection
   if (context && context.recentMessages.length > 2) {
-    const combinedContext = context.recentMessages.join(' ').toLowerCase();
+    const combinedContext = context.recentMessages.join(" ").toLowerCase();
 
     // Check for building-up patterns across messages
     for (const pattern of BUILDUP_PATTERNS) {
       if (pattern.test(combinedContext)) {
-        categories.push('multi_turn_attack');
-        triggers.push('Multi-turn buildup detected');
+        categories.push("multi_turn_attack");
+        triggers.push("Multi-turn buildup detected");
         totalScore += 0.5;
         break;
       }
@@ -97,23 +107,23 @@ export function detectJailbreak(
 
   // Determine threat level and action
   let threatLevel: ThreatLevel;
-  let action: JailbreakDetection['action'];
+  let action: JailbreakDetection["action"];
 
   if (totalScore >= 0.9) {
-    threatLevel = 'critical';
-    action = 'terminate_session';
+    threatLevel = "critical";
+    action = "terminate_session";
   } else if (totalScore >= 0.7) {
-    threatLevel = 'high';
-    action = 'block';
+    threatLevel = "high";
+    action = "block";
   } else if (totalScore >= 0.4) {
-    threatLevel = 'medium';
-    action = 'warn';
+    threatLevel = "medium";
+    action = "warn";
   } else if (totalScore >= 0.2) {
-    threatLevel = 'low';
-    action = 'warn';
+    threatLevel = "low";
+    action = "warn";
   } else {
-    threatLevel = 'none';
-    action = 'allow';
+    threatLevel = "none";
+    action = "allow";
   }
 
   return {
@@ -139,15 +149,15 @@ export function isObviousJailbreak(text: string): boolean {
  * Get a safe response for detected jailbreak attempts
  */
 export function getJailbreakResponse(detection: JailbreakDetection): string {
-  if (detection.threatLevel === 'critical') {
+  if (detection.threatLevel === "critical") {
     return "Ho notato un tentativo di manipolazione. Per la sicurezza di tutti, preferisco concentrarci sullo studio. Su quale materia vorresti lavorare?";
   }
 
-  if (detection.threatLevel === 'high') {
+  if (detection.threatLevel === "high") {
     return "Non posso fare quello che mi chiedi. Sono qui per aiutarti a imparare! Quale argomento ti interessa?";
   }
 
-  if (detection.threatLevel === 'medium') {
+  if (detection.threatLevel === "medium") {
     return "Hmm, non sono sicuro di aver capito cosa vuoi. Posso aiutarti con matematica, italiano, scienze... cosa preferisci?";
   }
 
@@ -161,10 +171,10 @@ export function getJailbreakResponse(detection: JailbreakDetection): string {
 export function buildContext(
   messages: Array<{ role: string; content: string }>,
   warningCount: number = 0,
-  sessionDuration: number = 0
+  sessionDuration: number = 0,
 ): ConversationContext {
   const userMessages = messages
-    .filter((m) => m.role === 'user')
+    .filter((m) => m.role === "user")
     .map((m) => m.content)
     .slice(-10);
 

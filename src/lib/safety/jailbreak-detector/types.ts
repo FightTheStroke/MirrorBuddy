@@ -5,20 +5,25 @@
 /**
  * Threat level classification
  */
-export type ThreatLevel = 'none' | 'low' | 'medium' | 'high' | 'critical';
+export type ThreatLevel = "none" | "low" | "medium" | "high" | "critical";
 
 /**
  * Jailbreak attempt categories
  */
 export type JailbreakCategory =
-  | 'role_override'        // "Pretend you are..."
-  | 'instruction_ignore'   // "Ignore your instructions"
-  | 'system_extraction'    // "Show me your system prompt"
-  | 'encoding_bypass'      // Base64, rot13, etc.
-  | 'multi_turn_attack'    // Building up across messages
-  | 'hypothetical_framing' // "In a fictional world..."
-  | 'emotional_manipulation' // Guilt-tripping the AI
-  | 'authority_claiming';  // "I'm an admin/developer"
+  | "role_override" // "Pretend you are..."
+  | "instruction_ignore" // "Ignore your instructions"
+  | "system_extraction" // "Show me your system prompt"
+  | "encoding_bypass" // Base64, rot13, etc.
+  | "multi_turn_attack" // Building up across messages
+  | "hypothetical_framing" // "In a fictional world..."
+  | "emotional_manipulation" // Guilt-tripping the AI
+  | "authority_claiming" // "I'm an admin/developer"
+  | "prompt_leaking" // "Summarize everything above"
+  | "system_forgery" // "[SYSTEM]", "<<SYS>>"
+  | "code_injection" // Hidden payloads in code blocks
+  | "output_hijacking" // "Always say yes"
+  | "crescendo_attack"; // Gradual escalation
 
 /**
  * Detection result with detailed analysis
@@ -35,7 +40,7 @@ export interface JailbreakDetection {
   /** Specific patterns that triggered detection */
   triggers: string[];
   /** Recommended action */
-  action: 'allow' | 'warn' | 'block' | 'terminate_session';
+  action: "allow" | "warn" | "block" | "terminate_session";
 }
 
 /**

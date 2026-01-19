@@ -124,6 +124,51 @@ jobs:
           fi
           echo "No secrets detected"
 
+  # Lane 2b: LLM Safety Tests (critical - must always pass)
+  llm-safety-tests:
+    name: LLM Safety Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Run jailbreak detector tests
+        run: npm run test:unit -- jailbreak-detector --reporter=verbose
+
+      - name: Run content filter tests
+        run: npm run test:unit -- content-filter --reporter=verbose
+
+      - name: Run safety tests
+        run: npm run test:unit -- safety.test --reporter=verbose
+
+      - name: Verify critical pattern coverage
+        run: |
+          echo "Verifying LLM safety test coverage..."
+          PATTERNS=$(grep -c "pattern:" src/lib/safety/jailbreak-detector/patterns.ts || echo "0")
+          TESTS=$(grep -c "it\|test(" src/lib/safety/__tests__/jailbreak-detector.test.ts || echo "0")
+          echo "Pattern definitions: $PATTERNS"
+          echo "Test cases: $TESTS"
+          if [ "$TESTS" -lt 80 ]; then
+            echo "WARNING: Less than 80 test cases for jailbreak detection"
+          fi
+          echo "LLM Safety tests verified successfully"
+
   # Lane 3: Unit Tests (runs in parallel with build)
   unit-tests:
     name: Unit Tests
