@@ -82,8 +82,12 @@ export async function validateAuth(): Promise<AuthResult> {
         process.env.E2E_TESTS === "1" ||
         process.env.NODE_ENV !== "production"
       ) {
-        const created = await prisma.user.create({
-          data: {
+        // Use upsert to handle race conditions in parallel E2E tests
+        // Multiple test workers may try to create the same user simultaneously
+        const created = await prisma.user.upsert({
+          where: { id: userId },
+          update: {}, // User exists, no updates needed
+          create: {
             id: userId,
             profile: { create: {} },
             settings: { create: {} },
