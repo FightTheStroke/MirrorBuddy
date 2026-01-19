@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Shield, Bot, Lock, AlertTriangle } from "lucide-react";
+import { Shield, Bot, Lock, AlertTriangle, Github } from "lucide-react";
 import { InlineConsent } from "@/components/consent/inline-consent";
+
+const GITHUB_REPO_URL = "https://github.com/robdll/mirrorbuddy";
 
 interface ComplianceBadge {
   icon: React.ReactNode;
@@ -105,9 +107,23 @@ export function WelcomeFooter() {
           ))}
         </nav>
 
+        {/* Open Source Badge */}
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <a
+            href={GITHUB_REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
+            aria-label="Vedi il codice sorgente su GitHub"
+          >
+            <Github className="w-5 h-5" aria-hidden="true" />
+            <span className="text-sm font-medium">Open Source</span>
+          </a>
+        </div>
+
         {/* Copyright */}
         <p className="text-center text-xs text-gray-500 dark:text-gray-500">
-          © {currentYear} MirrorBuddy. Tutti i diritti riservati.
+          © {currentYear} MirrorBuddy. Progetto open source su GitHub.
         </p>
       </div>
     </motion.footer>

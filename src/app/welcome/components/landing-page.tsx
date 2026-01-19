@@ -8,7 +8,6 @@ import { MaestriShowcaseSection } from "./maestri-showcase-section";
 import { SupportSection } from "./support-section";
 import { FeaturesSection } from "./features-section";
 import { QuickStart } from "./quick-start";
-import { TrialLimitsBanner } from "./trial-limits-banner";
 import { WelcomeFooter } from "./welcome-footer";
 import type { ExistingUserData } from "../types";
 
@@ -93,9 +92,6 @@ export function LandingPage({
           <MaestriShowcaseSection />
           <SupportSection />
           <FeaturesSection />
-
-          {/* Trial Limits Banner - shows limitations before CTA */}
-          {!isReturningUser && <TrialLimitsBanner />}
 
           <QuickStart
             isReturningUser={isReturningUser}
