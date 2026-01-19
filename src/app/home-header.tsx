@@ -1,18 +1,28 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
+import Link from "next/link";
 import {
   Flame,
   Coins,
   BookOpen,
   Clock,
   Star,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { NotificationBell } from '@/components/notifications/notification-bell';
-import { PomodoroHeaderWidget } from '@/components/pomodoro';
-import { AmbientAudioHeaderWidget } from '@/components/ambient-audio';
-import { CalculatorHeaderWidget } from '@/components/calculator';
+  Gift,
+  MessageCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { NotificationBell } from "@/components/notifications/notification-bell";
+import { PomodoroHeaderWidget } from "@/components/pomodoro";
+import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
+import { CalculatorHeaderWidget } from "@/components/calculator";
+
+interface TrialStatus {
+  isTrialMode: boolean;
+  chatsUsed: number;
+  chatsRemaining: number;
+  maxChats: number;
+}
 
 interface HomeHeaderProps {
   sidebarOpen: boolean;
@@ -25,6 +35,7 @@ interface HomeHeaderProps {
   sessionsThisWeek: number;
   totalStudyMinutes: number;
   questionsAsked: number;
+  trialStatus?: TrialStatus;
 }
 
 export function HomeHeader({
@@ -38,6 +49,7 @@ export function HomeHeader({
   sessionsThisWeek,
   totalStudyMinutes,
   questionsAsked,
+  trialStatus,
 }: HomeHeaderProps) {
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
@@ -46,8 +58,8 @@ export function HomeHeader({
   return (
     <header
       className={cn(
-        'fixed top-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300',
-        sidebarOpen ? 'left-64' : 'left-20'
+        "fixed top-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300",
+        sidebarOpen ? "left-64" : "left-20",
       )}
     >
       {/* Level + MirrorBucks Progress */}
@@ -57,9 +69,15 @@ export function HomeHeader({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 text-sm">
-            <span className="font-bold text-slate-900 dark:text-white">Lv.{seasonLevel}</span>
-            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">{seasonName}</span>
-            <span className="text-xs text-slate-500">{mbInLevel}/{mbNeeded} MB</span>
+            <span className="font-bold text-slate-900 dark:text-white">
+              Lv.{seasonLevel}
+            </span>
+            <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
+              {seasonName}
+            </span>
+            <span className="text-xs text-slate-500">
+              {mbInLevel}/{mbNeeded} MB
+            </span>
           </div>
           <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-36">
             <motion.div
@@ -75,33 +93,73 @@ export function HomeHeader({
       {/* Quick Stats */}
       <div className="flex items-center gap-4 text-sm">
         <div className="flex items-center gap-1.5" title="Streak">
-          <Flame className={cn("w-4 h-4", streak.current > 0 ? "text-orange-500" : "text-slate-400")} />
-          <span className={cn("font-semibold", streak.current > 0 ? "text-orange-500" : "text-slate-500")}>
+          <Flame
+            className={cn(
+              "w-4 h-4",
+              streak.current > 0 ? "text-orange-500" : "text-slate-400",
+            )}
+          />
+          <span
+            className={cn(
+              "font-semibold",
+              streak.current > 0 ? "text-orange-500" : "text-slate-500",
+            )}
+          >
             {streak.current}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5" title="Sessioni questa settimana">
+        <div
+          className="flex items-center gap-1.5"
+          title="Sessioni questa settimana"
+        >
           <BookOpen className="w-4 h-4 text-accent-themed" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300">{sessionsThisWeek}</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {sessionsThisWeek}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5" title="Tempo di studio">
           <Clock className="w-4 h-4 text-green-500" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300">{studyTimeStr}</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {studyTimeStr}
+          </span>
         </div>
 
         <div className="flex items-center gap-1.5" title="Domande fatte">
           <Star className="w-4 h-4 text-purple-500" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300">{questionsAsked}</span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {questionsAsked}
+          </span>
         </div>
 
         {/* Streak bonus badge */}
         {streak.current >= 3 && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
-            <Flame className="w-3 h-3" />
-            +{Math.min(streak.current * 10, 50)}% MB
+            <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}%
+            MB
           </div>
+        )}
+
+        {/* Trial mode badge */}
+        {trialStatus?.isTrialMode && (
+          <Link
+            href="/invite/request"
+            className={cn(
+              "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
+              trialStatus.chatsRemaining <= 3
+                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40"
+                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40",
+            )}
+            title="Clicca per richiedere accesso completo"
+          >
+            <Gift className="w-3.5 h-3.5" />
+            <span>Trial</span>
+            <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
+              <MessageCircle className="w-3 h-3" />
+              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
+            </span>
+          </Link>
         )}
       </div>
 
