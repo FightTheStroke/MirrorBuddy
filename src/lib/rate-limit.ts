@@ -183,7 +183,8 @@ export function checkRateLimit(
     };
   }
 
-  if (process.env.E2E_TESTS === "1") {
+  // Skip rate limiting in E2E tests and development mode
+  if (process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "development") {
     const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
@@ -221,8 +222,8 @@ export async function checkRateLimitAsync(
     };
   }
 
-  // Skip in E2E tests
-  if (process.env.E2E_TESTS === "1") {
+  // Skip rate limiting in E2E tests and development mode
+  if (process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "development") {
     const resetTime = Date.now() + config.windowMs;
     return {
       success: true,
