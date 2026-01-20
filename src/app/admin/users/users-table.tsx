@@ -1,14 +1,22 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { AlertCircle, RotateCcw, Lock, Unlock } from 'lucide-react';
+import { useCallback, useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  AlertCircle,
+  RotateCcw,
+  Lock,
+  Unlock,
+  Trash2,
+  ArchiveRestore,
+} from "lucide-react";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface User {
   id: string;
   username: string | null;
   email: string | null;
-  role: 'USER' | 'ADMIN';
+  role: "USER" | "ADMIN";
   disabled: boolean;
   createdAt: Date;
 }
@@ -17,16 +25,41 @@ interface UsersTableProps {
   users: User[];
 }
 
-type FilterTab = 'all' | 'active' | 'disabled';
+interface DeletedUserBackup {
+  userId: string;
+  email: string | null;
+  username: string | null;
+  role: "USER" | "ADMIN";
+  deletedAt: string;
+  purgeAt: string;
+  deletedBy: string;
+  reason: string | null;
+}
+
+type FilterTab = "all" | "active" | "disabled" | "trash";
 
 export function UsersTable({ users }: UsersTableProps) {
-  const [filter, setFilter] = useState<FilterTab>('all');
+  const [filter, setFilter] = useState<FilterTab>("all");
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [deletedBackups, setDeletedBackups] = useState<DeletedUserBackup[]>([]);
+
+  const loadTrash = useCallback(async () => {
+    try {
+      const response = await fetch("/api/admin/users/trash");
+      if (!response.ok) {
+        throw new Error("Failed to load deleted users");
+      }
+      const data = await response.json();
+      setDeletedBackups(data.backups || []);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    }
+  }, []);
 
   const filteredUsers = users.filter((user) => {
-    if (filter === 'active') return !user.disabled;
-    if (filter === 'disabled') return user.disabled;
+    if (filter === "active") return !user.disabled;
+    if (filter === "disabled") return user.disabled;
     return true;
   });
 
@@ -35,50 +68,116 @@ export function UsersTable({ users }: UsersTableProps) {
     setError(null);
 
     try {
-      const response = await fetch(`/api/admin/users/${userId}/reset-password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
+      const response = await fetch(
+        `/api/admin/users/${userId}/reset-password`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+        },
+      );
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || 'Failed to reset password');
+        setError(data.error || "Failed to reset password");
         return;
       }
 
       alert(`Password reset link sent to ${username}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(null);
     }
   };
 
-  const handleToggleDisable = async (userId: string, currentDisabled: boolean) => {
+  const handleToggleDisable = async (
+    userId: string,
+    currentDisabled: boolean,
+  ) => {
     setIsLoading(userId);
     setError(null);
 
     try {
       const response = await fetch(`/api/admin/users/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ disabled: !currentDisabled }),
       });
 
       if (!response.ok) {
         const data = await response.json();
-        setError(data.error || 'Failed to update user');
+        setError(data.error || "Failed to update user");
         return;
       }
 
       // Trigger page reload to show updated data
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
       setIsLoading(null);
     }
   };
+
+  const handleDeleteUser = async (userId: string) => {
+    setIsLoading(userId);
+    setError(null);
+
+    try {
+      if (!window.confirm("Confermi la cancellazione completa dell’utente?")) {
+        return;
+      }
+      const response = await csrfFetch(`/api/admin/users/${userId}`, {
+        method: "DELETE",
+        body: JSON.stringify({ reason: "admin_delete" }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || "Failed to delete user");
+        return;
+      }
+
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(null);
+    }
+  };
+
+  const handleRestoreUser = async (userId: string) => {
+    setIsLoading(userId);
+    setError(null);
+
+    try {
+      const response = await csrfFetch(
+        `/api/admin/users/trash/${userId}/restore`,
+        {
+          method: "POST",
+        },
+      );
+
+      if (!response.ok) {
+        const data = await response.json();
+        setError(data.error || "Failed to restore user");
+        return;
+      }
+
+      await loadTrash();
+      window.location.reload();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred");
+    } finally {
+      setIsLoading(null);
+    }
+  };
+
+  useEffect(() => {
+    if (filter === "trash") {
+      void loadTrash();
+    }
+  }, [filter, loadTrash]);
 
   return (
     <div>
@@ -95,120 +194,225 @@ export function UsersTable({ users }: UsersTableProps) {
 
       {/* Filter Tabs */}
       <div className="flex gap-2 mb-6 border-b border-slate-200">
-        {(['all', 'active', 'disabled'] as const).map((tab) => (
+        {(["all", "active", "disabled", "trash"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setFilter(tab)}
             className={`px-4 py-2 text-sm font-medium transition-colors ${
               filter === tab
-                ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-slate-600 hover:text-slate-900'
+                ? "text-blue-600 border-b-2 border-blue-600"
+                : "text-slate-600 hover:text-slate-900"
             }`}
-            aria-current={filter === tab ? 'page' : undefined}
+            aria-current={filter === tab ? "page" : undefined}
           >
-            {tab.charAt(0).toUpperCase() + tab.slice(1)} ({filteredUsers.length})
+            {tab === "trash"
+              ? `Cestino (${deletedBackups.length})`
+              : `${tab.charAt(0).toUpperCase() + tab.slice(1)} (${filteredUsers.length})`}
           </button>
         ))}
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto border border-slate-200 rounded-lg">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-100 border-b border-slate-200">
-              <th className="px-6 py-3 text-left font-semibold text-slate-900">Username</th>
-              <th className="px-6 py-3 text-left font-semibold text-slate-900">Email</th>
-              <th className="px-6 py-3 text-left font-semibold text-slate-900">Role</th>
-              <th className="px-6 py-3 text-left font-semibold text-slate-900">Status</th>
-              <th className="px-6 py-3 text-left font-semibold text-slate-900">Created</th>
-              <th className="px-6 py-3 text-left font-semibold text-slate-900" scope="col">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
-              >
-                <td className="px-6 py-4 text-slate-900 font-medium">
-                  {user.username || '—'}
-                </td>
-                <td className="px-6 py-4 text-slate-600">{user.email || '—'}</td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      user.role === 'ADMIN'
-                        ? 'bg-amber-100 text-amber-800'
-                        : 'bg-slate-100 text-slate-800'
-                    }`}
-                  >
-                    {user.role}
-                  </span>
-                </td>
-                <td className="px-6 py-4">
-                  <span
-                    className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                      user.disabled
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}
-                    aria-label={user.disabled ? 'User disabled' : 'User active'}
-                  >
-                    {user.disabled ? 'Disabled' : 'Active'}
-                  </span>
-                </td>
-                <td className="px-6 py-4 text-slate-600">
-                  {new Date(user.createdAt).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
+      {filter === "trash" ? (
+        <div className="overflow-x-auto border border-slate-200 rounded-lg">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="bg-slate-100 border-b border-slate-200">
+                <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                  Username
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                  Email
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                  Deleted
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                  Purge
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {deletedBackups.map((backup) => (
+                <tr
+                  key={backup.userId}
+                  className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
+                >
+                  <td className="px-6 py-4 text-slate-900 font-medium">
+                    {backup.username || "—"}
+                  </td>
+                  <td className="px-6 py-4 text-slate-600">
+                    {backup.email || "—"}
+                  </td>
+                  <td className="px-6 py-4 text-slate-600">
+                    {new Date(backup.deletedAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4 text-slate-600">
+                    {new Date(backup.purgeAt).toLocaleDateString()}
+                  </td>
+                  <td className="px-6 py-4">
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleResetPassword(user.id, user.username || user.email || user.id)}
-                      disabled={isLoading === user.id}
-                      aria-label={`Reset password for ${user.username || user.email}`}
+                      onClick={() => handleRestoreUser(backup.userId)}
+                      disabled={isLoading === backup.userId}
                       className="text-xs"
                     >
-                      <RotateCcw className="w-3 h-3 mr-1" />
-                      Reset
+                      <ArchiveRestore className="w-3 h-3 mr-1" />
+                      Ripristina
                     </Button>
-                    <Button
-                      size="sm"
-                      variant={user.disabled ? 'default' : 'outline'}
-                      onClick={() => handleToggleDisable(user.id, user.disabled)}
-                      disabled={isLoading === user.id}
-                      aria-label={
-                        user.disabled ? `Enable user ${user.username}` : `Disable user ${user.username}`
-                      }
-                      className="text-xs"
-                    >
-                      {user.disabled ? (
-                        <>
-                          <Unlock className="w-3 h-3 mr-1" />
-                          Enable
-                        </>
-                      ) : (
-                        <>
-                          <Lock className="w-3 h-3 mr-1" />
-                          Disable
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {filteredUsers.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-slate-600">No users found</p>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {deletedBackups.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-slate-600">Nessun utente nel cestino</p>
+            </div>
+          )}
         </div>
+      ) : (
+        <>
+          {/* Table */}
+          <div className="overflow-x-auto border border-slate-200 rounded-lg">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="bg-slate-100 border-b border-slate-200">
+                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                    Username
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                    Role
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                    Status
+                  </th>
+                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
+                    Created
+                  </th>
+                  <th
+                    className="px-6 py-3 text-left font-semibold text-slate-900"
+                    scope="col"
+                  >
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    <td className="px-6 py-4 text-slate-900 font-medium">
+                      {user.username || "—"}
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {user.email || "—"}
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          user.role === "ADMIN"
+                            ? "bg-amber-100 text-amber-800"
+                            : "bg-slate-100 text-slate-800"
+                        }`}
+                      >
+                        {user.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
+                          user.disabled
+                            ? "bg-red-100 text-red-800"
+                            : "bg-green-100 text-green-800"
+                        }`}
+                        aria-label={
+                          user.disabled ? "User disabled" : "User active"
+                        }
+                      >
+                        {user.disabled ? "Disabled" : "Active"}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-slate-600">
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() =>
+                            handleResetPassword(
+                              user.id,
+                              user.username || user.email || user.id,
+                            )
+                          }
+                          disabled={isLoading === user.id}
+                          aria-label={`Reset password for ${user.username || user.email}`}
+                          className="text-xs"
+                        >
+                          <RotateCcw className="w-3 h-3 mr-1" />
+                          Reset
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant={user.disabled ? "default" : "outline"}
+                          onClick={() =>
+                            handleToggleDisable(user.id, user.disabled)
+                          }
+                          disabled={isLoading === user.id}
+                          aria-label={
+                            user.disabled
+                              ? `Enable user ${user.username}`
+                              : `Disable user ${user.username}`
+                          }
+                          className="text-xs"
+                        >
+                          {user.disabled ? (
+                            <>
+                              <Unlock className="w-3 h-3 mr-1" />
+                              Enable
+                            </>
+                          ) : (
+                            <>
+                              <Lock className="w-3 h-3 mr-1" />
+                              Disable
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDeleteUser(user.id)}
+                          disabled={isLoading === user.id}
+                          aria-label={`Delete user ${user.username}`}
+                          className="text-xs text-red-600"
+                        >
+                          <Trash2 className="w-3 h-3 mr-1" />
+                          Delete
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {filteredUsers.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-slate-600">No users found</p>
+            </div>
+          )}
+        </>
       )}
     </div>
   );

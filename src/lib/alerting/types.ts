@@ -65,6 +65,7 @@ export interface GoNoGoResult {
   passedCount: number;
   failedCount: number;
   requiredFailures: number;
+  score: number; // 0-100 percentage of checks passed
   timestamp: Date;
   overrideReason?: string;
   overrideBy?: string;

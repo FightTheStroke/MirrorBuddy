@@ -310,9 +310,17 @@ export async function getPendingInvites() {
 /**
  * Get all invites with optional status filter
  */
-export async function getInvites(status?: "PENDING" | "APPROVED" | "REJECTED") {
+export async function getInvites(
+  status?: "PENDING" | "APPROVED" | "REJECTED",
+  isDirect?: boolean,
+  reviewedBy?: string,
+) {
   return prisma.inviteRequest.findMany({
-    where: status ? { status } : undefined,
+    where: {
+      ...(status ? { status } : {}),
+      ...(isDirect === undefined ? {} : { isDirect }),
+      ...(reviewedBy ? { reviewedBy } : {}),
+    },
     orderBy: { createdAt: "desc" },
   });
 }

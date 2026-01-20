@@ -13,8 +13,18 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const connectionString =
-  process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
+const isE2E = process.env.E2E_TESTS === "1";
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+const connectionString = isE2E
+  ? (() => {
+      if (!testDatabaseUrl) {
+        throw new Error(
+          "TEST_DATABASE_URL must be set when E2E_TESTS=1 to avoid using production data.",
+        );
+      }
+      return testDatabaseUrl;
+    })()
+  : process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
 
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted

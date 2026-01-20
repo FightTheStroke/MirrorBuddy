@@ -44,6 +44,7 @@ const mockInvites: InviteRequest[] = [
     reviewedAt: "2026-01-14T10:00:00Z",
     rejectionReason: "Not eligible",
     generatedUsername: null,
+    isDirect: true,
   },
 ];
 
@@ -188,6 +189,21 @@ describe("InvitesTable", () => {
     expect(
       screen.getByText("Motivo rifiuto: Not eligible"),
     ).toBeInTheDocument();
+  });
+
+  it("shows direct invite label when isDirect is true", () => {
+    render(
+      <InvitesTable
+        invites={mockInvites}
+        selectedIds={new Set()}
+        onSelectionChange={vi.fn()}
+      />,
+    );
+
+    const expandButton = screen.getByText("User Three").closest("button");
+    fireEvent.click(expandButton!);
+
+    expect(screen.getByText("Invito diretto admin")).toBeInTheDocument();
   });
 
   it("hides checkboxes when showCheckboxes is false", () => {

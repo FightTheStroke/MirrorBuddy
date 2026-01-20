@@ -123,10 +123,9 @@ export default defineConfig({
         DIRECT_URL: process.env.TEST_DIRECT_URL,
       }),
       E2E_TESTS: "1",
-      // Session secret for cookie signing (required for cookie-signing.spec.ts)
-      SESSION_SECRET:
-        process.env.SESSION_SECRET ||
-        "e2e-test-session-secret-32-characters-min",
+      // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
+      // Always use test secret for E2E to ensure cookie signatures match
+      SESSION_SECRET: "e2e-test-session-secret-32-characters-min",
       // CRON_SECRET for data-retention tests (ensures 401 when missing auth header)
       CRON_SECRET: "e2e-test-cron-secret",
       // Enable Ollama provider flag to bypass /landing redirect (no actual Ollama needed)

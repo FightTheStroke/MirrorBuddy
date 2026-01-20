@@ -16,6 +16,7 @@ export interface InviteRequest {
   reviewedAt: string | null;
   rejectionReason: string | null;
   generatedUsername: string | null;
+  isDirect?: boolean | null;
 }
 
 interface InvitesTableProps {
@@ -201,6 +202,12 @@ function InviteRow({
             <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap ml-6">
               {invite.motivation}
             </p>
+
+            {invite.isDirect && (
+              <p className="mt-3 ml-6 text-sm text-indigo-600 dark:text-indigo-400">
+                Invito diretto admin
+              </p>
+            )}
 
             {invite.generatedUsername && (
               <p className="mt-3 ml-6 text-sm text-green-600 dark:text-green-400">

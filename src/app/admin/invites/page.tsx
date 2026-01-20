@@ -12,7 +12,7 @@ import { BulkActionBar } from "@/components/admin/bulk-action-bar";
 import { DirectInviteModal } from "@/components/admin/direct-invite-modal";
 import { cn } from "@/lib/utils";
 
-type TabStatus = "PENDING" | "APPROVED" | "REJECTED" | "ALL";
+type TabStatus = "PENDING" | "APPROVED" | "REJECTED" | "ALL" | "DIRECT";
 
 export default function AdminInvitesPage() {
   const [invites, setInvites] = useState<InviteRequest[]>([]);
@@ -30,10 +30,16 @@ export default function AdminInvitesPage() {
     setError(null);
 
     try {
+      const adminResponse = await fetch("/api/admin/session");
+      const adminData = adminResponse.ok ? await adminResponse.json() : null;
+      const adminId = adminData?.userId as string | undefined;
+
       const url =
         activeTab === "ALL"
           ? "/api/invites"
-          : `/api/invites?status=${activeTab}`;
+          : activeTab === "DIRECT"
+            ? `/api/invites?isDirect=true${adminId ? `&reviewedBy=${adminId}` : ""}`
+            : `/api/invites?status=${activeTab}`;
       const response = await fetch(url);
 
       if (!response.ok) {
@@ -114,6 +120,7 @@ export default function AdminInvitesPage() {
     },
     { status: "APPROVED", label: "Approvate" },
     { status: "REJECTED", label: "Rifiutate" },
+    { status: "DIRECT", label: "Diretti (miei)" },
     { status: "ALL", label: "Tutte" },
   ];
 

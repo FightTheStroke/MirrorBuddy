@@ -29,18 +29,29 @@ export async function GET(request: NextRequest) {
     const settings = await getOrCompute(
       `a11y:${userId}`,
       async () => {
-        let a11ySettings = await prisma.accessibilitySettings.findUnique({
-          where: { userId },
-        });
-
-        if (!a11ySettings) {
-          // Create default settings
-          a11ySettings = await prisma.accessibilitySettings.create({
-            data: { userId },
+        // Use upsert with retry to handle race condition when multiple requests
+        // try to create settings for the same user simultaneously.
+        // Even upsert can fail under extreme concurrency due to non-atomic check.
+        try {
+          const a11ySettings = await prisma.accessibilitySettings.upsert({
+            where: { userId },
+            update: {}, // No update needed, just return existing
+            create: { userId },
           });
+          return a11ySettings;
+        } catch (error) {
+          // If unique constraint violation, fetch the existing record
+          if (
+            error instanceof Error &&
+            error.message.includes("Unique constraint")
+          ) {
+            const existing = await prisma.accessibilitySettings.findUnique({
+              where: { userId },
+            });
+            if (existing) return existing;
+          }
+          throw error;
         }
-
-        return a11ySettings;
       },
       { ttl: CACHE_TTL.SETTINGS },
     );

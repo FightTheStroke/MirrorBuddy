@@ -18,8 +18,12 @@ export async function GET(request: NextRequest) {
       | "APPROVED"
       | "REJECTED"
       | null;
+    const isDirectParam = searchParams.get("isDirect");
+    const isDirect =
+      isDirectParam === null ? undefined : isDirectParam === "true";
+    const reviewedBy = searchParams.get("reviewedBy") || undefined;
 
-    const invites = await getInvites(status || undefined);
+    const invites = await getInvites(status || undefined, isDirect, reviewedBy);
 
     return NextResponse.json({ invites });
   } catch (error) {

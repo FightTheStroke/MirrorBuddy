@@ -17,6 +17,7 @@ import {
   markExpiredDataForDeletion,
   executeScheduledDeletions,
 } from "@/lib/privacy/data-retention-service";
+import { purgeExpiredUserBackups } from "@/lib/admin/user-trash-service";
 
 const log = logger.child({ module: "cron-data-retention" });
 
@@ -137,6 +138,18 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       const errorMsg = error instanceof Error ? error.message : String(error);
       log.error("Failed to execute scheduled deletions", { error: errorMsg });
       response.summary.errors.push(`Deletion execution: ${errorMsg}`);
+    }
+
+    // Phase 3: Purge expired user backups (30-day retention)
+    try {
+      const purged = await purgeExpiredUserBackups();
+      if (purged > 0) {
+        log.info("User backups purged", { purged });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      log.error("Failed to purge user backups", { error: errorMsg });
+      response.summary.errors.push(`Backup purge: ${errorMsg}`);
     }
 
     // Set duration
