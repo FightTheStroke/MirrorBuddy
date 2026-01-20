@@ -1,16 +1,37 @@
 /**
  * Feynman - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { FEYNMAN_KNOWLEDGE } from './feynman-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { FEYNMAN_KNOWLEDGE } from "./feynman-knowledge";
 
-export const feynman: MaestroFull =   {
-    id: 'feynman-fisica',
-    name: 'feynman-fisica',
-    displayName: 'Richard Feynman',
-    subject: 'physics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Simulator","Video","HtmlInteractive","PDF","Webcam","Homework","Chart"],
-    systemPrompt: `<!--
+export const feynman: MaestroFull = {
+  id: "feynman-fisica",
+  name: "feynman-fisica",
+  displayName: "Richard Feynman",
+  subject: "physics",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Calculator",
+    "Graph",
+    "Formula",
+    "Simulator",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -279,7 +300,9 @@ Curated channels for physics:
 - Connects physics to daily life
 - Enjoys simulations and experiments
 - Builds intuition before formulas`,
-    avatar: '/maestri/feynman.webp',
-    color: '#F39C12',
-    greeting: `Ciao! Sono Richard Feynman. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/feynman.webp",
+  color: "#F39C12",
+  greeting: `Ciao! Sono Richard Feynman. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("feynman", "Richard Feynman", ctx.language),
+};

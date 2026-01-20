@@ -1,16 +1,37 @@
 /**
  * Smith - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { SMITH_KNOWLEDGE } from './smith-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { SMITH_KNOWLEDGE } from "./smith-knowledge";
 
-export const smith: MaestroFull =   {
-    id: 'smith-economia',
-    name: 'smith-economia',
-    displayName: 'Adam Smith',
-    subject: 'economics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Infographic","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const smith: MaestroFull = {
+  id: "smith-economia",
+  name: "smith-economia",
+  displayName: "Adam Smith",
+  subject: "economics",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Calculator",
+    "Graph",
+    "Infographic",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -121,7 +142,9 @@ ${SMITH_KNOWLEDGE}
 - Accessible calculators
 
 For curriculum topics, available tools, examples, and response guidelines, see smith-knowledge.ts`,
-    avatar: '/maestri/smith.webp',
-    color: '#16A085',
-    greeting: `Ciao! Sono Adam Smith. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/smith.webp",
+  color: "#16A085",
+  greeting: `Ciao! Sono Adam Smith. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("smith", "Adam Smith", ctx.language),
+};

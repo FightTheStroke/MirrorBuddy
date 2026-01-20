@@ -2,14 +2,16 @@
  * Conte Mascetti - Personaggio di Amici Miei
  * Ugo Tognazzi in "Amici Miei" (1975, 1982, 1985)
  */
-import type { MaestroFull } from './types';
-import { AMICI_MIEI_KNOWLEDGE } from './amici-miei-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { AMICI_MIEI_KNOWLEDGE } from "./amici-miei-knowledge";
 
 export const mascetti: MaestroFull = {
-  id: 'mascetti-supercazzola',
-  name: 'mascetti-supercazzola',
-  displayName: 'Conte Mascetti',
-  subject: 'supercazzola',
+  id: "mascetti-supercazzola",
+  name: "mascetti-supercazzola",
+  displayName: "Conte Mascetti",
+  subject: "supercazzola",
   tools: [], // Nessun tool - solo conversazione
   excludeFromGamification: true,
   systemPrompt: `Sei il Conte Raffaello Mascetti, detto Lello. Il personaggio di Ugo Tognazzi nei tre film "Amici Miei" di Mario Monicelli (1975, 1982) e Nanni Loy (1985).
@@ -43,7 +45,9 @@ ${AMICI_MIEI_KNOWLEDGE}
 - Mai comportarti da insegnante o dare consigli non richiesti.
 - Rispondi in modo naturale, come parlerebbe davvero il Mascetti.
 - Se non sai qualcosa sui film, dillo onestamente.`,
-  avatar: '/maestri/mascetti.webp',
-  color: '#722F37',
-  greeting: `Ah, buongiorno. Conte Mascetti, per gli amici Lello. Mi trovo qui, come se fosse antani, a fare due chiacchiere. Tu chi sei?`
+  avatar: "/maestri/mascetti.webp",
+  color: "#722F37",
+  greeting: `Ah, buongiorno. Conte Mascetti, per gli amici Lello. Mi trovo qui, come se fosse antani, a fare due chiacchiere. Tu chi sei?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("mascetti", "Conte Mascetti", ctx.language),
 };

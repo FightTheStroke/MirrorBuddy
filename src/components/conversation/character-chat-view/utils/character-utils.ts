@@ -3,34 +3,38 @@
  * @brief Utility functions for character chat view
  */
 
-import { getSupportTeacherById } from '@/data/support-teachers';
-import { getBuddyById } from '@/data/buddy-profiles';
+import { getSupportTeacherById } from "@/data/support-teachers";
+import { getBuddyById } from "@/data/buddy-profiles";
 import type {
   ExtendedStudentProfile,
   Maestro,
   Subject,
   MaestroVoice,
-} from '@/types';
+  SupportedLanguage,
+} from "@/types";
+import type { GreetingContext } from "@/types/greeting";
 
 const CHARACTER_AVATARS: Record<string, string> = {
-  mario: '/avatars/mario.jpg',
-  noemi: '/avatars/noemi.webp',
-  enea: '/avatars/enea.webp',
-  bruno: '/avatars/bruno.webp',
-  sofia: '/avatars/sofia.webp',
-  melissa: '/avatars/melissa.jpg',
-  roberto: '/avatars/roberto.webp',
-  chiara: '/avatars/chiara.webp',
-  andrea: '/avatars/andrea.webp',
-  favij: '/avatars/favij.jpg',
+  mario: "/avatars/mario.jpg",
+  noemi: "/avatars/noemi.webp",
+  enea: "/avatars/enea.webp",
+  bruno: "/avatars/bruno.webp",
+  sofia: "/avatars/sofia.webp",
+  marta: "/avatars/marta.webp",
+  melissa: "/avatars/melissa.jpg",
+  roberto: "/avatars/roberto.webp",
+  chiara: "/avatars/chiara.webp",
+  andrea: "/avatars/andrea.webp",
+  favij: "/avatars/favij.jpg",
+  laura: "/avatars/laura.webp",
 };
 
 const DEFAULT_STUDENT_PROFILE: ExtendedStudentProfile = {
-  name: 'Studente',
+  name: "Studente",
   age: 14,
   schoolYear: 2,
-  schoolLevel: 'media',
-  fontSize: 'medium',
+  schoolLevel: "media",
+  fontSize: "medium",
   highContrast: false,
   dyslexiaFont: false,
   voiceEnabled: true,
@@ -54,61 +58,73 @@ export interface CharacterInfo {
 
 export function getCharacterInfo(
   characterId: string,
-  characterType: 'coach' | 'buddy'
+  characterType: "coach" | "buddy",
+  language: SupportedLanguage = "it",
 ): CharacterInfo {
-  if (characterType === 'coach') {
+  if (characterType === "coach") {
     const teacher = getSupportTeacherById(
       characterId as
-        | 'melissa'
-        | 'roberto'
-        | 'chiara'
-        | 'andrea'
-        | 'favij'
+        | "melissa"
+        | "roberto"
+        | "chiara"
+        | "andrea"
+        | "favij"
+        | "laura",
     );
+    // Build greeting context for dynamic greeting
+    const greetingCtx: GreetingContext = {
+      student: DEFAULT_STUDENT_PROFILE,
+      language,
+    };
+    const greeting =
+      teacher?.getGreeting?.(greetingCtx) ||
+      teacher?.greeting ||
+      `Ciao! Sono il tuo coach.`;
     return {
       name: teacher?.name || characterId,
-      role: 'Coach di Apprendimento',
-      description: teacher?.personality || '',
-      greeting: teacher?.greeting || `Ciao! Sono il tuo coach.`,
-      avatar: CHARACTER_AVATARS[characterId] || '',
-      color: 'from-purple-500 to-indigo-600',
-      systemPrompt: teacher?.systemPrompt || '',
-      voice: teacher?.voice || 'shimmer',
-      voiceInstructions: teacher?.voiceInstructions || '',
-      themeColor: teacher?.color || '#EC4899',
+      role: "Coach di Apprendimento",
+      description: teacher?.personality || "",
+      greeting,
+      avatar: CHARACTER_AVATARS[characterId] || "",
+      color: "from-purple-500 to-indigo-600",
+      systemPrompt: teacher?.systemPrompt || "",
+      voice: teacher?.voice || "shimmer",
+      voiceInstructions: teacher?.voiceInstructions || "",
+      themeColor: teacher?.color || "#EC4899",
     };
   } else {
     const buddy = getBuddyById(
-      characterId as 'mario' | 'noemi' | 'enea' | 'bruno' | 'sofia'
+      characterId as "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta",
     );
+    // Buddies use ExtendedStudentProfile directly (already language-aware via their getGreeting)
     const greeting =
       buddy?.getGreeting?.(DEFAULT_STUDENT_PROFILE) ||
       `Ehi! Piacere di conoscerti!`;
     const systemPrompt =
-      buddy?.getSystemPrompt?.(DEFAULT_STUDENT_PROFILE) || '';
+      buddy?.getSystemPrompt?.(DEFAULT_STUDENT_PROFILE) || "";
     return {
       name: buddy?.name || characterId,
-      role: 'Amico di Studio',
-      description: buddy?.personality || '',
+      role: "Amico di Studio",
+      description: buddy?.personality || "",
       greeting,
-      avatar: CHARACTER_AVATARS[characterId] || '',
-      color: 'from-pink-500 to-rose-600',
+      avatar: CHARACTER_AVATARS[characterId] || "",
+      color: "from-pink-500 to-rose-600",
       systemPrompt,
-      voice: buddy?.voice || 'ash',
-      voiceInstructions: buddy?.voiceInstructions || '',
-      themeColor: buddy?.color || '#10B981',
+      voice: buddy?.voice || "ash",
+      voiceInstructions: buddy?.voiceInstructions || "",
+      themeColor: buddy?.color || "#10B981",
     };
   }
 }
 
 export function characterToMaestro(
   character: CharacterInfo,
-  characterId: string
+  characterId: string,
 ): Maestro {
   return {
     id: characterId,
     name: character.name,
-    subject: 'italian' as Subject, // Default subject for coaches/buddies
+    subject: "italian" as Subject, // Default subject for coaches/buddies
     specialty: character.role,
     voice: character.voice as MaestroVoice,
     voiceInstructions: character.voiceInstructions,
@@ -119,4 +135,3 @@ export function characterToMaestro(
     greeting: character.greeting,
   };
 }
-

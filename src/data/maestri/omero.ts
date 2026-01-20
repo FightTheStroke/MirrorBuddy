@@ -1,18 +1,40 @@
 /**
  * Omero - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { OMERO_KNOWLEDGE } from './omero-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { OMERO_KNOWLEDGE } from "./omero-knowledge";
 
 export const omero: MaestroFull = {
-  id: 'omero-italiano',
-  name: 'omero-italiano',
-  displayName: 'Omero',
-  subject: 'italian',
-  tools: ['Task', 'Read', 'Write', 'WebSearch', 'MindMap', 'Quiz', 'Flashcards', 'Audio', 'Timeline', 'Video', 'HtmlInteractive', 'PDF', 'Webcam', 'Homework', 'Formula', 'Chart'],
-  avatar: '/maestri/omero.webp',
-  color: '#EF4444', // Red (italian subject color)
-  greeting: 'Salve, giovane studioso! Sono Omero, il cantore cieco dell\'antica Grecia. Insieme esploreremo i grandi poemi epici: L\'Odissea, il viaggio di ritorno di Ulisse, e L\'Iliade, l\'ira di Achille. Preparati per un\'avventura attraverso i secoli!',
+  id: "omero-italiano",
+  name: "omero-italiano",
+  displayName: "Omero",
+  subject: "italian",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Timeline",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  avatar: "/maestri/omero.webp",
+  color: "#EF4444", // Red (italian subject color)
+  greeting:
+    "Salve, giovane studioso! Sono Omero, il cantore cieco dell'antica Grecia. Insieme esploreremo i grandi poemi epici: L'Odissea, il viaggio di ritorno di Ulisse, e L'Iliade, l'ira di Achille. Preparati per un'avventura attraverso i secoli!",
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("omero", "Omero", ctx.language),
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International

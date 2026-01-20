@@ -18,6 +18,8 @@ import {
   type VoiceState,
   type HeaderActions,
 } from "@/components/character";
+import { useSettingsStore } from "@/lib/stores";
+import type { SupportedLanguage } from "@/types";
 
 interface CharacterChatViewProps {
   characterId:
@@ -41,7 +43,10 @@ export function CharacterChatView({
   characterType,
 }: CharacterChatViewProps) {
   const router = useRouter();
-  const character = getCharacterInfo(characterId, characterType);
+  const language = useSettingsStore(
+    (state) => state.appearance.language,
+  ) as SupportedLanguage;
+  const character = getCharacterInfo(characterId, characterType, language);
   const unifiedCharacter = characterInfoToUnified(
     character,
     characterId,

@@ -3,13 +3,21 @@
  * Quick routes, greetings, system prompts, and character switching suggestions.
  */
 
-import type { CharacterType, ExtendedStudentProfile, SupportCharacter } from '@/types';
-import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher, BuddyProfile } from '@/types';
-import { injectSafetyGuardrails } from '@/lib/safety';
-import { routeToCharacter } from './routing';
-import type { RoutingResult } from './types';
-import { getMaestroForSubject, getCoachForStudent, getBuddyForStudent } from './selection';
+import type {
+  CharacterType,
+  ExtendedStudentProfile,
+  SupportCharacter,
+} from "@/types";
+import type { MaestroFull } from "@/data/maestri";
+import type { SupportTeacher, BuddyProfile } from "@/types";
+import { injectSafetyGuardrails } from "@/lib/safety";
+import { routeToCharacter } from "./routing";
+import type { RoutingResult } from "./types";
+import {
+  getMaestroForSubject,
+  getCoachForStudent,
+  getBuddyForStudent,
+} from "./selection";
 
 /**
  * Quick route based on message only (uses default student profile).
@@ -17,11 +25,11 @@ import { getMaestroForSubject, getCoachForStudent, getBuddyForStudent } from './
  */
 export function quickRoute(message: string): RoutingResult {
   const defaultProfile: ExtendedStudentProfile = {
-    name: 'Student',
+    name: "Student",
     age: 14,
     schoolYear: 2,
-    schoolLevel: 'superiore',
-    fontSize: 'medium',
+    schoolLevel: "superiore",
+    fontSize: "medium",
     highContrast: false,
     dyslexiaFont: false,
     voiceEnabled: false,
@@ -41,19 +49,19 @@ export function quickRoute(message: string): RoutingResult {
  */
 export function getCharacterGreeting(
   result: RoutingResult,
-  studentProfile: ExtendedStudentProfile
+  studentProfile: ExtendedStudentProfile,
 ): string {
   const { character, characterType } = result;
 
   switch (characterType) {
-    case 'maestro':
+    case "maestro":
       return (character as MaestroFull).greeting;
-    case 'coach':
+    case "coach":
       return (character as SupportTeacher).greeting;
-    case 'buddy':
+    case "buddy":
       return (character as BuddyProfile).getGreeting(studentProfile);
     default:
-      return 'Ciao! Come posso aiutarti?';
+      return "Ciao! Come posso aiutarti?";
   }
 }
 
@@ -64,26 +72,28 @@ export function getCharacterGreeting(
  */
 export function getCharacterSystemPrompt(
   result: RoutingResult,
-  studentProfile: ExtendedStudentProfile
+  studentProfile: ExtendedStudentProfile,
 ): string {
   const { character, characterType } = result;
 
   switch (characterType) {
-    case 'maestro':
+    case "maestro":
       // CRITICAL FIX: Inject safety guardrails into Maestri prompts
       // Previously, maestri were deployed WITHOUT safety - this fixes Issue #30
+      // ADR 0064: Pass characterId for automatic formal/informal address detection
       return injectSafetyGuardrails((character as MaestroFull).systemPrompt, {
-        role: 'maestro',
+        role: "maestro",
+        characterId: (character as MaestroFull).id,
         additionalNotes: `Sei ${(character as MaestroFull).name}, parla nel tuo stile storico.`,
       });
-    case 'coach':
+    case "coach":
       // Coach already has safety injected in support-teachers.ts
       return (character as SupportTeacher).systemPrompt;
-    case 'buddy':
+    case "buddy":
       // Buddy already has safety injected in buddy-profiles.ts
       return (character as BuddyProfile).getSystemPrompt(studentProfile);
     default:
-      return '';
+      return "";
   }
 }
 
@@ -95,22 +105,22 @@ export function suggestCharacterSwitch(
   currentType: CharacterType,
   suggestedType: CharacterType,
   profile: ExtendedStudentProfile,
-  reason: string
+  reason: string,
 ): { character: SupportCharacter | MaestroFull; message: string } {
   let character: SupportCharacter | MaestroFull;
   let message: string;
 
   switch (suggestedType) {
-    case 'maestro':
+    case "maestro":
       // This would need a subject - defaulting to math for now
-      character = getMaestroForSubject('mathematics')!;
+      character = getMaestroForSubject("mathematics")!;
       message = `${reason} Vuoi parlare con un Professore?`;
       break;
-    case 'coach':
+    case "coach":
       character = getCoachForStudent(profile);
       message = `${reason} ${(character as SupportTeacher).name} può aiutarti!`;
       break;
-    case 'buddy':
+    case "buddy":
       character = getBuddyForStudent(profile);
       message = `${reason} ${(character as BuddyProfile).name} ti capisce!`;
       break;

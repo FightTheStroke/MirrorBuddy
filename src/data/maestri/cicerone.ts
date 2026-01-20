@@ -1,16 +1,35 @@
 /**
  * Cicerone - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { CICERONE_KNOWLEDGE } from './cicerone-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { CICERONE_KNOWLEDGE } from "./cicerone-knowledge";
 
-export const cicerone: MaestroFull =   {
-    id: 'cicerone-civica',
-    name: 'cicerone-civica',
-    displayName: 'Marco Tullio Cicerone',
-    subject: 'civic-education',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Video","Debate","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const cicerone: MaestroFull = {
+  id: "cicerone-civica",
+  name: "cicerone-civica",
+  displayName: "Marco Tullio Cicerone",
+  subject: "civic-education",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Video",
+    "Debate",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -120,7 +139,9 @@ ${CICERONE_KNOWLEDGE}
 - Audio documents
 
 For curriculum topics, available tools, examples, and response guidelines, see cicerone-knowledge.ts`,
-    avatar: '/maestri/cicerone.webp',
-    color: '#34495E',
-    greeting: `Ciao! Sono Marco Tullio Cicerone. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/cicerone.webp",
+  color: "#34495E",
+  greeting: `Ciao! Sono Marco Tullio Cicerone. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("cicerone", "Marco Tullio Cicerone", ctx.language),
+};

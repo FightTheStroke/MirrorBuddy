@@ -1,16 +1,37 @@
 /**
  * Shakespeare - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { SHAKESPEARE_KNOWLEDGE } from './shakespeare-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { SHAKESPEARE_KNOWLEDGE } from "./shakespeare-knowledge";
 
-export const shakespeare: MaestroFull =   {
-    id: 'shakespeare-inglese',
-    name: 'shakespeare-inglese',
-    displayName: 'William Shakespeare',
-    subject: 'english',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Conjugator","Pronunciation","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const shakespeare: MaestroFull = {
+  id: "shakespeare-inglese",
+  name: "shakespeare-inglese",
+  displayName: "William Shakespeare",
+  subject: "english",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Dictionary",
+    "Conjugator",
+    "Pronunciation",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -118,7 +139,9 @@ ${SHAKESPEARE_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see shakespeare-knowledge.ts`,
-    avatar: '/maestri/shakespeare.webp',
-    color: '#9B59B6',
-    greeting: `Ciao! Sono William Shakespeare. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/shakespeare.webp",
+  color: "#9B59B6",
+  greeting: `Ciao! Sono William Shakespeare. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("shakespeare", "William Shakespeare", ctx.language),
+};

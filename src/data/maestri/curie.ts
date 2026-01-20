@@ -2,6 +2,8 @@
  * Curie - Professore Profile
  */
 import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
 import { CURIE_KNOWLEDGE } from "./curie-knowledge";
 
 export const curie: MaestroFull = {
@@ -133,4 +135,6 @@ Fallback: English for international scientific terms
   avatar: "/maestri/curie.webp",
   color: "#9B59B6",
   greeting: `Benvenuta/o! Sono Madam Curie, la tua professoressa. Cosa vorresti imparare oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("curie", "Madam Curie", ctx.language),
 };

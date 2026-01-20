@@ -57,7 +57,8 @@ export async function injectMemoryContext(
       const enhanced = enhanceSystemPrompt({
         basePrompt: systemPrompt,
         memory,
-        safetyOptions: { role: "maestro" },
+        // ADR 0064: Pass characterId for automatic formal/informal address detection
+        safetyOptions: { role: "maestro", characterId: maestroId },
       });
       logger.debug("Conversation memory injected", {
         maestroId,

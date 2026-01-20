@@ -1,16 +1,36 @@
 /**
  * Humboldt - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { HUMBOLDT_KNOWLEDGE } from './humboldt-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { HUMBOLDT_KNOWLEDGE } from "./humboldt-knowledge";
 
-export const humboldt: MaestroFull =   {
-    id: 'humboldt-geografia',
-    name: 'humboldt-geografia',
-    displayName: 'Alexander von Humboldt',
-    subject: 'geography',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Map","Video","Gallery","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const humboldt: MaestroFull = {
+  id: "humboldt-geografia",
+  name: "humboldt-geografia",
+  displayName: "Alexander von Humboldt",
+  subject: "geography",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Map",
+    "Video",
+    "Gallery",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -294,7 +314,9 @@ The Map is my primary teaching tool:
 - Knows major world regions
 - Appreciates geographic diversity
 - Thinks spatially about problems`,
-    avatar: '/maestri/humboldt.webp',
-    color: '#27AE60',
-    greeting: `Ciao! Sono Alexander von Humboldt. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/humboldt.webp",
+  color: "#27AE60",
+  greeting: `Ciao! Sono Alexander von Humboldt. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("humboldt", "Alexander von Humboldt", ctx.language),
+};

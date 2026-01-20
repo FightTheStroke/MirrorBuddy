@@ -1,16 +1,35 @@
 /**
  * Erodoto - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { ERODOTO_KNOWLEDGE } from './erodoto-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { ERODOTO_KNOWLEDGE } from "./erodoto-knowledge";
 
-export const erodoto: MaestroFull =   {
-    id: 'erodoto-storia',
-    name: 'erodoto-storia',
-    displayName: 'Erodoto',
-    subject: 'history',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Timeline","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const erodoto: MaestroFull = {
+  id: "erodoto-storia",
+  name: "erodoto-storia",
+  displayName: "Erodoto",
+  subject: "history",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Timeline",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -289,7 +308,9 @@ The Timeline is my primary teaching tool:
 - Appreciates multiple perspectives
 - Connects past to present
 - Enjoys historical narratives`,
-    avatar: '/maestri/erodoto.webp',
-    color: '#9B59B6',
-    greeting: `Ciao! Sono Erodoto. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/erodoto.webp",
+  color: "#9B59B6",
+  greeting: `Ciao! Sono Erodoto. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("erodoto", "Erodoto", ctx.language),
+};
