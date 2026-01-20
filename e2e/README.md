@@ -29,16 +29,17 @@ e2e/
 
 ## Test Categories
 
-| Category          | Files                                                | F-xx                   | Description                                       |
-| ----------------- | ---------------------------------------------------- | ---------------------- | ------------------------------------------------- |
-| **Accessibility** | `accessibility.spec.ts`                              | F-09,17,18,19,20       | WCAG 2.1 AA, axe-core, keyboard nav, DSA profiles |
-| **Admin**         | `admin.spec.ts`, `admin-sidebar.spec.ts`             | F-01-05,07,10,12,13,34 | Login, routes, sidebar navigation                 |
-| **Auth**          | `auth.spec.ts`, `auth-system.spec.ts`                | F-12                   | Session management, protected routes              |
-| **Security**      | `csrf-protection.spec.ts`, `cookie-signing.spec.ts`  | F-11,14,15,16          | CSRF tokens, cookie security                      |
-| **Trial**         | `trial.spec.ts`                                      | F-07,09,34             | GDPR compliance, trial limits, route audit        |
-| **ToS**           | `tos.spec.ts`                                        | F-12                   | API, modal UI, accessibility                      |
-| **Navigation**    | `navigation-and-buttons.spec.ts`                     | F-01-05                | Button clicks, sidebar navigation                 |
-| **API**           | `api-backend.spec.ts`, `critical-api-routes.spec.ts` | F-06,08                | Endpoint validation                               |
+| Category          | Files                                                                                                 | F-xx                   | Description                                       |
+| ----------------- | ----------------------------------------------------------------------------------------------------- | ---------------------- | ------------------------------------------------- |
+| **Accessibility** | `accessibility.spec.ts`                                                                               | F-09,17,18,19,20       | WCAG 2.1 AA, axe-core, keyboard nav, DSA profiles |
+| **Admin**         | `admin.spec.ts`, `admin-sidebar.spec.ts`                                                              | F-01-05,07,10,12,13,34 | Login, routes, sidebar navigation                 |
+| **Auth**          | `auth.spec.ts`, `auth-system.spec.ts`                                                                 | F-12                   | Session management, protected routes              |
+| **Compliance**    | `compliance.spec.ts`, `legal-ai-act.spec.ts`, `legal-data-privacy.spec.ts`, `gdpr-compliance.spec.ts` | F-01-06,16             | EU AI Act, GDPR Art.20, COPPA, L.132/2025         |
+| **Security**      | `csrf-protection.spec.ts`, `cookie-signing.spec.ts`                                                   | F-11,14,15,16          | CSRF tokens, cookie security                      |
+| **Trial**         | `trial.spec.ts`                                                                                       | F-07,09,34             | GDPR compliance, trial limits, route audit        |
+| **ToS**           | `tos.spec.ts`                                                                                         | F-12                   | API, modal UI, accessibility                      |
+| **Navigation**    | `navigation-and-buttons.spec.ts`                                                                      | F-01-05                | Button clicks, sidebar navigation                 |
+| **API**           | `api-backend.spec.ts`, `critical-api-routes.spec.ts`                                                  | F-06,08                | Endpoint validation                               |
 
 ## Consolidated Files (ADR 0059)
 
@@ -149,7 +150,7 @@ Max 250 lines per file. Split large test suites:
 
 ## CI vs Local Tests
 
-**23/27 tests run in CI**, 4 are local-only (auto-skipped via `test.skip`):
+**26/30 tests run in CI**, 4 are local-only (auto-skipped via `test.skip`):
 
 | Local-Only Test                  | Reason                   | Run Command               |
 | -------------------------------- | ------------------------ | ------------------------- |
