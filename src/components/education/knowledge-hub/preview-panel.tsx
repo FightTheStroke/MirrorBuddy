@@ -27,9 +27,9 @@ export function PreviewPanel({
           initial={{ width: 0, opacity: 0 }}
           animate={{ width: 320, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
-          className="flex-shrink-0 bg-white dark:bg-slate-800 border-l border-slate-200 dark:border-slate-700 overflow-hidden"
+          className="flex-shrink-0 bg-white dark:bg-slate-800 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 overflow-hidden w-full lg:w-80"
         >
-          <div className="p-4 w-80">
+          <div className="p-4 w-full lg:w-80">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-slate-900 dark:text-white">
                 Anteprima

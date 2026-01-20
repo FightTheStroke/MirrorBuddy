@@ -187,10 +187,10 @@ export function ConversationSidebar({
           animate={{ width: 280, opacity: 1 }}
           exit={{ width: 0, opacity: 0 }}
           transition={{ duration: 0.2, ease: "easeInOut" }}
-          className="h-full flex-shrink-0 overflow-hidden rounded-2xl"
+          className="h-full flex-shrink-0 overflow-hidden rounded-2xl w-full sm:max-w-[280px]"
           style={gradientStyle}
         >
-          <div className="w-[280px] h-full flex flex-col text-white p-4">
+          <div className="w-full sm:max-w-[280px] h-full flex flex-col text-white p-4">
             {/* Delete Confirmation */}
             {showDeleteConfirm && (
               <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center p-4 rounded-2xl">

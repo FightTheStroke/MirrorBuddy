@@ -162,6 +162,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 > **Branch**: `main` | **Plan**: `docs/plans/MirrorBuddyGamification-Main.md`
 
+### Changed
+
+- **Mobile UX**: Responsive home sidebar/header, chat/voice layouts, tool panels, knowledge hub, and page headers for mobile screens.
+
 ### Added (Jan 17 - V1 Enterprise Ready Plan 49)
 
 #### W0: Grafana Cloud Observability
