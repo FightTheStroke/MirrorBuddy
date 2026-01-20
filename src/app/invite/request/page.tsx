@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 
@@ -49,9 +50,14 @@ export default function InviteRequestPage() {
       }
 
       setFormState("success");
-    } catch {
+    } catch (error) {
+      logger.error("Invite request failed", { error: String(error) });
+      const message =
+        error instanceof Error && /csrf/i.test(error.message)
+          ? "Sessione scaduta. Ricarica la pagina e riprova."
+          : "Errore di connessione. Riprova.";
       setFormState("error");
-      setErrorMessage("Errore di connessione. Riprova.");
+      setErrorMessage(message);
     }
   };
 

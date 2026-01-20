@@ -35,7 +35,11 @@ function getResendClient(): Resend | null {
  * Check if email service is configured
  */
 export function isEmailConfigured(): boolean {
-  return !!process.env.RESEND_API_KEY;
+  const configured = !!process.env.RESEND_API_KEY;
+  if (!configured) {
+    log.warn("Email disabled: RESEND_API_KEY missing");
+  }
+  return configured;
 }
 
 /**

@@ -86,13 +86,13 @@ export async function POST(request: NextRequest) {
       hasTrialSession: !!trialSessionId,
     });
 
-    // Send notifications (non-blocking)
-    import("@/lib/invite/invite-service").then(
-      ({ notifyAdminNewRequest, sendRequestConfirmation }) => {
-        notifyAdminNewRequest(inviteRequest.id);
-        sendRequestConfirmation(inviteRequest.id);
-      },
-    );
+    // Send notifications (await to ensure delivery in serverless)
+    const { notifyAdminNewRequest, sendRequestConfirmation } =
+      await import("@/lib/invite/invite-service");
+    await Promise.all([
+      notifyAdminNewRequest(inviteRequest.id),
+      sendRequestConfirmation(inviteRequest.id),
+    ]);
 
     return NextResponse.json(
       {

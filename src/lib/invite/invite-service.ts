@@ -9,7 +9,7 @@
  */
 
 import { prisma } from "@/lib/db";
-import { sendEmail } from "@/lib/email";
+import { sendEmail, isEmailConfigured } from "@/lib/email";
 import { hashPassword, generateRandomPassword } from "@/lib/auth/password";
 import { logger } from "@/lib/logger";
 import {
@@ -88,6 +88,10 @@ export async function sendRequestConfirmation(
   requestId: string,
 ): Promise<void> {
   try {
+    if (!isEmailConfigured()) {
+      return;
+    }
+
     const request = await prisma.inviteRequest.findUnique({
       where: { id: requestId },
     });
