@@ -29,6 +29,8 @@ export default defineConfig({
 
   // Global setup: sets onboarding as completed
   globalSetup: path.join(__dirname, "e2e", "global-setup.ts"),
+  // Global teardown: cleans up test users after all tests
+  globalTeardown: path.join(__dirname, "e2e", "global-teardown.ts"),
 
   // Visual regression threshold for screenshot comparisons
   expect: {
