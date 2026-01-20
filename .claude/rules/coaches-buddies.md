@@ -35,9 +35,10 @@
 
 **IMPORTANT**: Update ALL locations or the character won't appear in UI.
 
-### Files to Update (5 locations)
+### Files to Update (8 locations)
 
 1. **Create data file**: `src/data/support-teachers/{name}.ts`
+   - Include `getGreeting()` for dynamic language-aware greeting (ADR 0064)
 2. **Export from index**: `src/data/support-teachers/support-teachers.ts`
    - Add import
    - Add to `CoachId` type
@@ -54,6 +55,7 @@
    - Add to `preferredCoach` type in `ExtendedStudentProfile`
 7. **Update chat view**: `src/components/conversation/character-chat-view.tsx`
    - Add to `characterId` type union
+8. **Formality**: Coaches always use informal (tu) - no FORMAL_PROFESSORS update needed
 
 ### Avatar
 
@@ -72,18 +74,22 @@ npm run build
 Same process as coach, but in buddy locations:
 
 1. **Create data file**: `src/data/buddy-profiles/{name}.ts`
+   - Include `getGreeting()` for dynamic language-aware greeting (ADR 0064)
 2. **Export from index**: `src/data/buddy-profiles/buddy-profiles.ts`
 3. **Add to settings UI**: `character-settings-data.ts` → `BUDDIES` array
 4. **Add to settings types**: `character-settings.tsx` → `preferredBuddy` type
 5. **Add to home constants**: `home-constants.ts` → `BUDDY_INFO`
 6. **Update types**: `settings-types.ts` → `preferredBuddy` type
 7. **Update chat view**: `character-chat-view.tsx` → `characterId` type
+8. **Formality**: Buddies always use informal (tu) - no FORMAL_PROFESSORS update needed
 
 ## Data Structures
 
 ### Coach (SupportTeacher)
 
 ```typescript
+import { generateCoachGreeting } from "@/lib/greeting";
+
 export const COACH_NAME: SupportTeacher = {
   id: "name",
   name: "Name",
@@ -95,10 +101,13 @@ export const COACH_NAME: SupportTeacher = {
   voice: "sage" | "alloy" | "echo" | "shimmer",
   voiceInstructions: "Voice character description...",
   systemPrompt: injectSafetyGuardrails(corePrompt, { role: "coach" }),
-  greeting: "Ciao! Sono...",
+  greeting: "Ciao! Sono...", // Fallback
+  getGreeting: (ctx) => generateCoachGreeting("Name", ctx.language), // Dynamic (ADR 0064)
   avatar: "/avatars/name.webp",
   color: "#hexcolor",
 };
+
+// NOTE: Coaches always use informal address (tu) - no FORMAL_PROFESSORS update needed
 ```
 
 ### Buddy (BuddyProfile)

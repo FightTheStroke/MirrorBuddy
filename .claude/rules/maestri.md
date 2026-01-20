@@ -49,10 +49,25 @@ interface MaestroFull {
   systemPrompt: string; // Full prompt including embedded knowledge
   avatar: string; // `/maestri/${id}.png`
   color: string; // Subject-based color
-  greeting: string; // Initial greeting message
+  greeting: string; // Static fallback greeting
+  getGreeting?: (ctx: GreetingContext) => string; // Dynamic language-aware greeting (ADR 0064)
   excludeFromGamification?: boolean; // true for Amici
 }
 ```
+
+## Formal vs Informal Address (ADR 0064)
+
+Professors use formal (Lei) or informal (tu) based on historical era:
+
+| Register          | Professors                                                                                                                                                | Era                 |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
+| **Formal (Lei)**  | Manzoni, Shakespeare, Galileo, Darwin, Curie, Leonardo, Euclide, Mozart, Socrate, Cicerone, Erodoto, Smith, Humboldt, Ippocrate, Lovelace, Cassese, Omero | Pre-20th century    |
+| **Informal (tu)** | Feynman, Chris, Simone, Alex Pina                                                                                                                         | Modern/Contemporary |
+
+When adding a new maestro:
+
+- **Historical figure (pre-1900)**: Add to `FORMAL_PROFESSORS` in `src/lib/greeting/templates/index.ts`
+- **Modern figure**: No action needed (defaults to informal)
 
 ## Usage Pattern
 
@@ -87,10 +102,14 @@ const name = SUBJECT_NAMES["mathematics"]; // "Matematica"
    - Use template: `cp templates/knowledge-template.ts {name}-knowledge.ts`
    - Max 200 lines, verified sources only
 2. **Create maestro file**: `src/data/maestri/{name}.ts`
+   - Include `getGreeting()` for dynamic language-aware greeting
 3. **Export from index**: Add to `src/data/maestri/index.ts`
 4. **Add avatar**: `public/maestri/{name}.png`
 5. **Add subject mapping**: If new subject, add to `SUBJECT_NAMES`
-6. **Run tests**: `npm run test`
+6. **Set formality (ADR 0064)**:
+   - Historical figure → Add to `FORMAL_PROFESSORS` in `src/lib/greeting/templates/index.ts`
+   - Modern figure → No action (defaults to informal)
+7. **Run tests**: `npm run test:unit -- formality && npm run test`
 
 ### Maestro Example (Teaching)
 
@@ -98,6 +117,7 @@ const name = SUBJECT_NAMES["mathematics"]; // "Matematica"
 // src/data/maestri/newton.ts
 import type { MaestroFull } from "./types";
 import { NEWTON_KNOWLEDGE } from "./newton-knowledge";
+import { generateMaestroGreeting } from "@/lib/greeting";
 
 export const newton: MaestroFull = {
   id: "newton-physics",
@@ -117,8 +137,13 @@ ${NEWTON_KNOWLEDGE}
 [Subject-specific pedagogy]`,
   avatar: "/maestri/newton.png",
   color: "#4B5563",
-  greeting: "Buongiorno! Sono Isaac Newton...",
+  greeting: "Buongiorno! Sono Isaac Newton...", // Fallback
+  getGreeting: (ctx) =>
+    generateMaestroGreeting("newton", "Isaac Newton", ctx.language),
 };
+
+// IMPORTANT: Newton is historical (17th century) → Add to FORMAL_PROFESSORS
+// in src/lib/greeting/templates/index.ts for Lei address
 ```
 
 ### Amico Example (Non-Teaching)
