@@ -1,13 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useState, useMemo } from "react";
-import { Button } from "@/components/ui/button";
-import { AlertCircle, ArchiveRestore } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { UsersBulkActions } from "./users-bulk-actions";
 import { UsersSearch } from "./users-search";
 import { UsersTrashToolbar } from "./users-trash-toolbar";
 import { UsersTableRow } from "./users-table-row";
+import { UsersTrashRow } from "./users-trash-row";
 
 interface User {
   id: string;
@@ -196,26 +196,12 @@ export function UsersTable({ users }: { users: User[] }) {
           <tbody>
             {filter === "trash"
               ? deletedBackups.map((b) => (
-                  <tr key={b.userId} className="border-b hover:bg-slate-50">
-                    <td className="px-4 py-3">{b.username || "—"}</td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {b.email || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {new Date(b.deletedAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleAction(b.userId, "restore")}
-                        disabled={isLoading === b.userId}
-                      >
-                        <ArchiveRestore className="w-3 h-3 mr-1" />
-                        Ripristina
-                      </Button>
-                    </td>
-                  </tr>
+                  <UsersTrashRow
+                    key={b.userId}
+                    backup={b}
+                    isLoading={isLoading === b.userId}
+                    onRestore={() => handleAction(b.userId, "restore")}
+                  />
                 ))
               : filteredUsers.map((user) => (
                   <UsersTableRow
