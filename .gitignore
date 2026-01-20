@@ -95,3 +95,6 @@ audit-report.txt
 
 # Local analysis notes
 Plan20Jan.md
+
+# Supabase CLI local state
+supabase/.temp/

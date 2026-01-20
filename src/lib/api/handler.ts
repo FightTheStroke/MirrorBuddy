@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 
-type HandlerFn = (req: NextRequest) => Promise<NextResponse>;
+type HandlerFn = (req: NextRequest) => Promise<Response>;
 
 interface ApiErrorResponse {
   error: string;
@@ -23,7 +23,7 @@ interface ApiErrorResponse {
  * });
  */
 export function apiHandler(fn: HandlerFn): HandlerFn {
-  return async (req: NextRequest): Promise<NextResponse> => {
+  return async (req: NextRequest): Promise<Response> => {
     const startTime = Date.now();
     const { pathname } = req.nextUrl;
     const method = req.method;
