@@ -35,7 +35,8 @@ test.describe("Login/Logout Authentication Flow", () => {
     await page.waitForTimeout(1000);
 
     // Expect error message to appear (Italian: "Credenziali non valide" or similar)
-    await expect(page.locator('[role="alert"]')).toBeVisible();
+    // Use .first() to avoid strict mode violation (Next.js route announcer also has role="alert")
+    await expect(page.locator('[role="alert"]').first()).toBeVisible();
     await expect(
       page.locator("text=/non valide|invalid|errore|incorrect|unauthorized/i"),
     ).toBeVisible();
