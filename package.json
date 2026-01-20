@@ -41,6 +41,7 @@
     "pre-push": "./scripts/pre-push-vercel.sh",
     "pre-release": "./scripts/pre-release-check.sh",
     "release:gate": "./scripts/release-gate.sh",
+    "release:brutal": "./scripts/release-brutal.sh",
     "build:analyze": "ANALYZE=true npm run build",
     "check:bundle": "tsx scripts/check-bundle-size.ts",
     "version:patch": "npm version patch && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
