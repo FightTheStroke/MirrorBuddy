@@ -17,7 +17,16 @@ export {
   getTotalClientCount,
   cleanupStaleClients,
   HEARTBEAT_INTERVAL_MS,
-} from './tool-events';
+} from "./tool-events";
+
+// SSE client store (Redis in prod, memory in dev)
+export {
+  type SSEClientMetadata,
+  type SSEClientStore,
+  getSSEStore,
+  getInstanceId,
+  isLocalClient,
+} from "./redis-sse-store";
 
 // Tool state management
 export {
@@ -40,4 +49,4 @@ export {
   getActiveToolStates,
   cleanupOldTools,
   getToolStateStats,
-} from './tool-state';
+} from "./tool-state";
