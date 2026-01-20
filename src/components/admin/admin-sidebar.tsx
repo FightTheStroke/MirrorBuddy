@@ -9,8 +9,8 @@ import {
   BarChart3,
   FileText,
   Settings,
-  ChevronLeft,
-  ChevronRight,
+  PanelLeftClose,
+  PanelLeftOpen,
   Home,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -141,13 +141,13 @@ export function AdminSidebar({
           variant="ghost"
           size="icon-sm"
           onClick={onToggle}
-          className="text-slate-500"
+          className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
           aria-label={open ? "Comprimi menu" : "Espandi menu"}
         >
           {open ? (
-            <ChevronLeft className="h-4 w-4" />
+            <PanelLeftClose className="h-5 w-5" />
           ) : (
-            <ChevronRight className="h-4 w-4" />
+            <PanelLeftOpen className="h-5 w-5" />
           )}
         </Button>
       </div>
