@@ -30,10 +30,10 @@ test.describe("Login/Logout Authentication Flow", () => {
     await page.fill('input[type="password"]', "wrongpassword123");
     await page.click('button[type="submit"]');
 
-    // Expect error message to appear
+    // Expect error message to appear (Italian: "Credenziali non valide" or similar)
     await expect(page.locator('[role="alert"]')).toBeVisible();
     await expect(
-      page.locator("text=/invalid|incorrect|unauthorized/i"),
+      page.locator("text=/non valide|invalid|errore|incorrect|unauthorized/i"),
     ).toBeVisible();
 
     // Should stay on login page

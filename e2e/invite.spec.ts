@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { signCookieValue } from "./fixtures/auth-fixtures-helpers";
 
 test.describe("Beta Invite System", () => {
   test.describe("Beta Request Form", () => {
@@ -60,10 +61,14 @@ test.describe("Beta Invite System", () => {
   test.describe("Admin Invites Page", () => {
     test.beforeEach(async ({ page }) => {
       // Mock admin authentication using Playwright's cookie API
+      // IMPORTANT: Cookie must be signed for session-auth.ts validation
+      const adminSessionId = `admin-test-session-${Date.now()}`;
+      const signedCookie = signCookieValue(adminSessionId);
+
       await page.context().addCookies([
         {
           name: "mirrorbuddy-user-id",
-          value: "admin-test-id",
+          value: signedCookie,
           domain: "localhost",
           path: "/",
           sameSite: "Lax",
@@ -221,10 +226,14 @@ test.describe("Beta Invite System", () => {
   test.describe("Invite Approval Flow", () => {
     test("should approve invite and show success", async ({ page }) => {
       // Mock admin authentication using Playwright's cookie API
+      // IMPORTANT: Cookie must be signed for session-auth.ts validation
+      const adminSessionId = `admin-approval-session-${Date.now()}`;
+      const signedCookie = signCookieValue(adminSessionId);
+
       await page.context().addCookies([
         {
           name: "mirrorbuddy-user-id",
-          value: "admin-test-id",
+          value: signedCookie,
           domain: "localhost",
           path: "/",
           sameSite: "Lax",
