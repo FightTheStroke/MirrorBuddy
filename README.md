@@ -43,6 +43,19 @@
 
 ---
 
+## Compliance
+
+<p align="center">
+  <a href="docs/compliance/AI-POLICY.md"><img src="https://img.shields.io/badge/EU%20AI%20Act-Compliant-blue?style=flat-square" alt="EU AI Act Compliant"></a>
+  <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/GDPR-Compliant-green?style=flat-square" alt="GDPR Compliant"></a>
+  <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/COPPA-Verified-orange?style=flat-square" alt="COPPA Verified"></a>
+  <a href="docs/compliance/AI-LITERACY.md"><img src="https://img.shields.io/badge/WCAG%202.1-AA-purple?style=flat-square" alt="WCAG 2.1 AA"></a>
+</p>
+
+MirrorBuddy complies with **EU AI Act (2024/1689)**, **Italian Law 132/2025**, **GDPR**, and **COPPA** requirements. See our [compliance documentation](docs/compliance/) for details.
+
+---
+
 ## The Manifesto
 
 **Every child deserves an education that fits them—not the other way around.**
