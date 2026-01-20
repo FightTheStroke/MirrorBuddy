@@ -100,7 +100,8 @@ async function adminFixture(
 ) {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
   // Add random component to prevent collision when parallel workers start at same millisecond
-  const randomSuffix = Math.random().toString(36).substring(2, 11);
+  // Using crypto.randomUUID() for cryptographically secure randomness (CodeQL requirement)
+  const randomSuffix = crypto.randomUUID().replace(/-/g, "").substring(0, 9);
   const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
   const signedCookie = signCookieValue(adminSessionId);
 
