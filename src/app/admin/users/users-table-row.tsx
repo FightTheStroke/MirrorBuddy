@@ -74,6 +74,7 @@ export function UsersTableRow({
             onClick={onToggle}
             disabled={isLoading}
             className="text-xs"
+            aria-label={user.disabled ? "Enable user" : "Disable user"}
           >
             {user.disabled ? (
               <Unlock className="w-3 h-3" />
@@ -87,6 +88,7 @@ export function UsersTableRow({
             onClick={onDelete}
             disabled={isLoading}
             className="text-xs text-red-600"
+            aria-label="Delete user"
           >
             <Trash2 className="w-3 h-3" />
           </Button>

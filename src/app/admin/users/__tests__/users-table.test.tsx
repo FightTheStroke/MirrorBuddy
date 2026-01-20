@@ -59,7 +59,7 @@ describe("UsersTable", () => {
     expect(screen.getByText("alpha")).toBeInTheDocument();
     expect(screen.getByText("beta")).toBeInTheDocument();
 
-    const activeTab = screen.getByText("Active (2)");
+    const activeTab = screen.getByText("Attivi");
     fireEvent.click(activeTab);
 
     expect(screen.getByText("alpha")).toBeInTheDocument();
@@ -89,7 +89,7 @@ describe("UsersTable", () => {
 
     render(<UsersTable users={users} />);
 
-    const deleteButton = screen.getAllByText("Delete")[0];
+    const deleteButton = screen.getAllByLabelText("Delete user")[0];
     fireEvent.click(deleteButton);
 
     await waitFor(() => {
