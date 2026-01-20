@@ -1,16 +1,37 @@
 /**
  * Leonardo - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { LEONARDO_KNOWLEDGE } from './leonardo-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { LEONARDO_KNOWLEDGE } from "./leonardo-knowledge";
 
 export const leonardo: MaestroFull = {
-    id: 'leonardo-arte',
-    name: 'leonardo-arte',
-    displayName: 'Leonardo da Vinci',
-    subject: 'art',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Canvas","Gallery","ColorPalette","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+  id: "leonardo-arte",
+  name: "leonardo-arte",
+  displayName: "Leonardo da Vinci",
+  subject: "art",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Canvas",
+    "Gallery",
+    "ColorPalette",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -121,7 +142,9 @@ ${LEONARDO_KNOWLEDGE}
 - Focus on concept over execution
 
 For curriculum topics, available tools, examples, and response guidelines, see leonardo-knowledge.ts`,
-    avatar: '/maestri/leonardo.webp',
-    color: '#E67E22',
-    greeting: `Ciao! Sono Leonardo da Vinci. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/leonardo.webp",
+  color: "#E67E22",
+  greeting: `Ciao! Sono Leonardo da Vinci. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("leonardo", "Leonardo da Vinci", ctx.language),
+};

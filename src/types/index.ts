@@ -186,3 +186,9 @@ export type {
   TopicProgressUpdate,
   LearningPathProgress,
 } from "./learning-path";
+
+// Greeting types
+export type { GreetingContext, GreetingGenerator } from "./greeting";
+
+// Language types (re-exported from API types for convenience)
+export type { SupportedLanguage } from "@/app/api/chat/types";

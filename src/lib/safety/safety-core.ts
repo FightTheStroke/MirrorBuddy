@@ -4,6 +4,8 @@
  * Extracted from safety-prompts.ts
  */
 
+import { isFormalProfessor } from "@/lib/greeting/templates";
+
 // Core safety prompt - defined inline
 export const SAFETY_CORE_PROMPT = `
 # REGOLE DI SICUREZZA NON NEGOZIABILI
@@ -184,11 +186,15 @@ RICORDA: La sicurezza dello studente viene PRIMA di tutto, anche prima di essere
 
 export interface SafetyInjectionOptions {
   /** Character role: determines additional context */
-  role: 'maestro' | 'coach' | 'buddy';
+  role: "maestro" | "coach" | "buddy";
   /** Whether to include anti-cheating guidelines (default: true for maestro/coach) */
   includeAntiCheating?: boolean;
   /** Additional character-specific safety notes */
   additionalNotes?: string;
+  /** Character ID for automatic formality detection */
+  characterId?: string;
+  /** Override auto-detection: force formal (Lei) or informal (tu) address */
+  formalAddress?: boolean;
 }
 
 /**
@@ -197,15 +203,27 @@ export interface SafetyInjectionOptions {
  */
 export function injectSafetyGuardrails(
   characterPrompt: string,
-  options: SafetyInjectionOptions
+  options: SafetyInjectionOptions,
 ): string {
-  const { role, includeAntiCheating = role !== 'buddy', additionalNotes } = options;
+  const {
+    role,
+    includeAntiCheating = role !== "buddy",
+    additionalNotes,
+    characterId,
+    formalAddress,
+  } = options;
+
+  // Determine formality: explicit override > auto-detection
+  // Coaches and buddies are always informal
+  const shouldUseFormalAddress =
+    role === "maestro" &&
+    (formalAddress ?? (characterId ? isFormalProfessor(characterId) : false));
 
   // Build role-specific section
-  let roleSection = '';
+  let roleSection = "";
 
   switch (role) {
-    case 'maestro':
+    case "maestro":
       roleSection = `
 ## RUOLO SPECIFICO: MAESTRO (Tutore Storico)
 - Sei un personaggio storico che insegna la sua materia
@@ -215,7 +233,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case 'coach':
+    case "coach":
       roleSection = `
 ## RUOLO SPECIFICO: COACH (Docente di Sostegno)
 - Sei un adulto responsabile, ma giovane e accessibile
@@ -225,7 +243,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case 'buddy':
+    case "buddy":
       roleSection = `
 ## RUOLO SPECIFICO: BUDDY (Compagno di Studio)
 - Sei un PARI, non un adulto. Mantieni un tono amichevole e generazionale
@@ -249,6 +267,51 @@ ${roleSection}`;
 - Guida lo studente a trovare la risposta da solo
 - Usa domande maieutiche: "Cosa pensi che succeda se...?"
 - Celebra il processo, non solo il risultato
+`;
+  }
+
+  // Add formality section for formal professors
+  if (shouldUseFormalAddress) {
+    fullPrompt += `
+## REGISTRO FORMALE (Lei)
+IMPORTANTE: Come personaggio storico rispettabile, usi il registro FORMALE con lo studente.
+
+**Il tuo modo di rivolgerti allo studente**:
+- Usa "Lei" NON "tu": "Come posso esserLe utile?", "Lei cosa ne pensa?"
+- Usa forme verbali formali: "Mi dica", "Prego, continui"
+- Titoli di cortesia quando appropriato
+
+**Cosa ti aspetti dallo studente**:
+- Accetta sia "Lei" che "tu" dallo studente (sono giovani, possono non saperlo)
+- Se lo studente usa "tu", NON correggerlo bruscamente
+- Puoi occasionalmente ricordare gentilmente: "Si ricordi che ai miei tempi ci si dava del Lei..."
+
+**Esempi di frasi formali**:
+- "Buongiorno! Come posso esserLe utile oggi?"
+- "Interessante osservazione. Mi permetta di spiegarLe..."
+- "Lei ha ragione a porsi questa domanda."
+- "Si concentri su questo passaggio..."
+
+**NON**:
+- NON usare "tu" o forme informali
+- NON essere freddo o distaccato - formale ma accogliente
+- NON essere rigido - la formalità è rispettosa, non intimidatoria
+`;
+  } else if (role === "maestro") {
+    // Informal maestros get explicit permission to use "tu"
+    fullPrompt += `
+## REGISTRO INFORMALE (Tu)
+Sei un professore moderno e accessibile. Usi il "tu" con lo studente.
+
+**Il tuo modo di rivolgerti allo studente**:
+- Usa "tu" in modo naturale: "Come ti posso aiutare?", "Tu cosa ne pensi?"
+- Mantieni un tono amichevole ma rispettoso del tuo ruolo di insegnante
+- Puoi usare espressioni colloquiali appropriate all'età dello studente
+
+**Esempi**:
+- "Ciao! Come posso aiutarti oggi?"
+- "Interessante! Dimmi di più..."
+- "Hai ragione a farti questa domanda."
 `;
   }
 
@@ -278,10 +341,10 @@ ${characterPrompt}
  */
 export function hasSafetyGuardrails(prompt: string): boolean {
   const requiredPatterns = [
-    'REGOLE DI SICUREZZA NON NEGOZIABILI',
-    'CONTENUTI PROIBITI',
-    'PROTEZIONE PRIVACY',
-    'PROMPT INJECTION',
+    "REGOLE DI SICUREZZA NON NEGOZIABILI",
+    "CONTENUTI PROIBITI",
+    "PROTEZIONE PRIVACY",
+    "PROMPT INJECTION",
   ];
 
   return requiredPatterns.every((pattern) => prompt.includes(pattern));

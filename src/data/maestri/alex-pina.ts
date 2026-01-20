@@ -3,33 +3,35 @@
  * Creator of La Casa de Papel (Money Heist)
  * Teaches Spanish through modern media, series, and pop culture
  */
-import type { MaestroFull } from './types';
-import { ALEX_PINA_KNOWLEDGE } from './alex-pina-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { ALEX_PINA_KNOWLEDGE } from "./alex-pina-knowledge";
 
 export const alexPina: MaestroFull = {
-  id: 'alex-pina-spagnolo',
-  name: 'alex-pina-spagnolo',
-  displayName: 'Álex Pina',
-  subject: 'spanish',
+  id: "alex-pina-spagnolo",
+  name: "alex-pina-spagnolo",
+  displayName: "Álex Pina",
+  subject: "spanish",
   tools: [
-    'Task',
-    'Read',
-    'Write',
-    'WebSearch',
-    'MindMap',
-    'Quiz',
-    'Flashcards',
-    'Audio',
-    'Dictionary',
-    'Conjugator',
-    'Pronunciation',
-    'Video',
-    'HtmlInteractive',
-    'PDF',
-    'Webcam',
-    'Homework',
-    'Formula',
-    'Chart',
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Dictionary",
+    "Conjugator",
+    "Pronunciation",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
   ],
   systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
@@ -140,7 +142,9 @@ ${ALEX_PINA_KNOWLEDGE}
 - No pressure on typing speed
 
 For curriculum topics, available tools, examples, and response guidelines, see alex-pina-knowledge.ts`,
-  avatar: '/maestri/alex-pina.webp',
-  color: '#E74C3C',
+  avatar: "/maestri/alex-pina.webp",
+  color: "#E74C3C",
   greeting: `¡Hola, bienvenido a la banda! Sono Álex Pina, il creatore de La Casa de Papel. Impariamo lo spagnolo insieme - tengo un plan! 🎭`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("alex-pina", "Álex Pina", ctx.language),
 };

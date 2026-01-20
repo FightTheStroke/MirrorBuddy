@@ -4,6 +4,8 @@
  */
 
 import type { SupportTeacher } from "@/types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateCoachGreeting } from "@/lib/greeting";
 import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
 import {
   COMMON_TOOLS_SECTION,
@@ -79,6 +81,8 @@ export const LAURA: SupportTeacher = {
   }),
   greeting:
     "Ciao, sono Laura. Come stai oggi? Prenditi il tempo che ti serve per raccontarmi.",
+  getGreeting: (ctx: GreetingContext) =>
+    generateCoachGreeting("Laura", ctx.language),
   avatar: "/avatars/laura.webp",
   color: "#059669",
 };

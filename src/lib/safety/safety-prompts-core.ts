@@ -3,13 +3,23 @@
  * Central module for child-safe AI guardrails
  *
  * CRITICAL: This module MUST be used by ALL AI characters:
- * - All 16 Maestri (historical tutors)
- * - All 5 Coaches (learning method coaches)
+ * - All 22 Maestri (historical tutors + amici)
+ * - All 6 Coaches (learning method coaches)
  * - Mario/Maria (peer buddies)
  * - Any future character
  *
  * Related: #30 Safety Guardrails Issue
+ * Related: ADR 0064 - Formal/Informal Address for Professors
  */
+
+import { isFormalProfessor } from "@/lib/greeting/templates";
+import {
+  FORMAL_ADDRESS_SECTION,
+  INFORMAL_ADDRESS_SECTION,
+} from "./formality-templates";
+
+// Re-export crisis detection from dedicated module
+export { containsCrisisKeywords, CRISIS_RESPONSE } from "./crisis-detection";
 
 /**
  * Core safety system prompt that MUST be injected into every character.
@@ -194,11 +204,15 @@ RICORDA: La sicurezza dello studente viene PRIMA di tutto, anche prima di essere
 
 export interface SafetyInjectionOptions {
   /** Character role: determines additional context */
-  role: 'maestro' | 'coach' | 'buddy';
+  role: "maestro" | "coach" | "buddy";
   /** Whether to include anti-cheating guidelines (default: true for maestro/coach) */
   includeAntiCheating?: boolean;
   /** Additional character-specific safety notes */
   additionalNotes?: string;
+  /** Character ID for automatic formality detection (ADR 0064) */
+  characterId?: string;
+  /** Override auto-detection: force formal (Lei) or informal (tu) address */
+  formalAddress?: boolean;
 }
 
 /**
@@ -230,15 +244,27 @@ export interface SafetyInjectionOptions {
  */
 export function injectSafetyGuardrails(
   characterPrompt: string,
-  options: SafetyInjectionOptions
+  options: SafetyInjectionOptions,
 ): string {
-  const { role, includeAntiCheating = role !== 'buddy', additionalNotes } = options;
+  const {
+    role,
+    includeAntiCheating = role !== "buddy",
+    additionalNotes,
+    characterId,
+    formalAddress,
+  } = options;
+
+  // Determine formality: explicit override > auto-detection
+  // Coaches and buddies are always informal
+  const shouldUseFormalAddress =
+    role === "maestro" &&
+    (formalAddress ?? (characterId ? isFormalProfessor(characterId) : false));
 
   // Build role-specific section
-  let roleSection = '';
+  let roleSection = "";
 
   switch (role) {
-    case 'maestro':
+    case "maestro":
       roleSection = `
 ## RUOLO SPECIFICO: MAESTRO (Tutore Storico)
 - Sei un personaggio storico che insegna la sua materia
@@ -248,7 +274,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case 'coach':
+    case "coach":
       roleSection = `
 ## RUOLO SPECIFICO: COACH (Docente di Sostegno)
 - Sei un adulto responsabile, ma giovane e accessibile
@@ -258,7 +284,7 @@ export function injectSafetyGuardrails(
 `;
       break;
 
-    case 'buddy':
+    case "buddy":
       roleSection = `
 ## RUOLO SPECIFICO: BUDDY (Compagno di Studio)
 - Sei un PARI, non un adulto. Mantieni un tono amichevole e generazionale
@@ -283,6 +309,14 @@ ${roleSection}`;
 - Usa domande maieutiche: "Cosa pensi che succeda se...?"
 - Celebra il processo, non solo il risultato
 `;
+  }
+
+  // Add formality section for formal professors (ADR 0064)
+  if (shouldUseFormalAddress) {
+    fullPrompt += FORMAL_ADDRESS_SECTION;
+  } else if (role === "maestro") {
+    // Informal maestros get explicit permission to use "tu"
+    fullPrompt += INFORMAL_ADDRESS_SECTION;
   }
 
   if (additionalNotes) {
@@ -314,49 +348,11 @@ ${characterPrompt}
  */
 export function hasSafetyGuardrails(prompt: string): boolean {
   const requiredPatterns = [
-    'REGOLE DI SICUREZZA NON NEGOZIABILI',
-    'CONTENUTI PROIBITI',
-    'PROTEZIONE PRIVACY',
-    'PROMPT INJECTION',
+    "REGOLE DI SICUREZZA NON NEGOZIABILI",
+    "CONTENUTI PROIBITI",
+    "PROTEZIONE PRIVACY",
+    "PROMPT INJECTION",
   ];
 
   return requiredPatterns.every((pattern) => prompt.includes(pattern));
 }
-
-/**
- * Quick check if content mentions self-harm or crisis topics.
- * Used for priority routing to appropriate responses.
- */
-export function containsCrisisKeywords(text: string): boolean {
-  const lowerText = text.toLowerCase();
-  const crisisPatterns = [
-    'voglio morire',
-    'non voglio vivere',
-    'farmi del male',
-    'suicidio',
-    'ammazzarmi',
-    'voglio ammazzar', // catches "mi voglio ammazzare"
-    'tagliarm',
-    'nessuno mi vuole',
-    'nessuno mi ama',
-    'sarebbe meglio se non esistessi',
-    'mi odio',
-    'mi faccio schifo',
-  ];
-
-  return crisisPatterns.some((pattern) => lowerText.includes(pattern));
-}
-
-/**
- * Crisis response template for all characters.
- * Use this when containsCrisisKeywords returns true.
- */
-export const CRISIS_RESPONSE = `Mi preoccupo per te e quello che stai provando è importante.
-
-Per favore, parla con un adulto di fiducia - un genitore, un insegnante, o un counselor scolastico.
-
-Se hai bisogno di parlare con qualcuno subito:
-- Telefono Azzurro: 19696
-- Telefono Amico: 02 2327 2327
-
-Vuoi che studiamo qualcosa insieme per distrarti un po'?`;

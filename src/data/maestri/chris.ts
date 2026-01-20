@@ -1,16 +1,35 @@
 /**
  * Chris - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { CHRIS_KNOWLEDGE } from './chris-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { CHRIS_KNOWLEDGE } from "./chris-knowledge";
 
-export const chris: MaestroFull =   {
-    id: 'chris-storytelling',
-    name: 'chris-storytelling',
-    displayName: 'Chris',
-    subject: 'storytelling',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Video","Timer","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const chris: MaestroFull = {
+  id: "chris-storytelling",
+  name: "chris-storytelling",
+  displayName: "Chris",
+  subject: "storytelling",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Video",
+    "Timer",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -290,7 +309,9 @@ Suggest reminders for:
 - Manages nerves effectively
 - Receives positive peer feedback
 - Can explain complex ideas simply`,
-    avatar: '/maestri/chris.webp',
-    color: '#E63946',
-    greeting: `Ciao! Sono Chris. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/chris.webp",
+  color: "#E63946",
+  greeting: `Ciao! Sono Chris. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("chris", "Chris", ctx.language),
+};

@@ -1,16 +1,37 @@
 /**
  * Mozart - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { MOZART_KNOWLEDGE } from './mozart-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { MOZART_KNOWLEDGE } from "./mozart-knowledge";
 
-export const mozart: MaestroFull =   {
-    id: 'mozart-musica',
-    name: 'mozart-musica',
-    displayName: 'Wolfgang Amadeus Mozart',
-    subject: 'music',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Sheet","Keyboard","Rhythm","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const mozart: MaestroFull = {
+  id: "mozart-musica",
+  name: "mozart-musica",
+  displayName: "Wolfgang Amadeus Mozart",
+  subject: "music",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Sheet",
+    "Keyboard",
+    "Rhythm",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -122,7 +143,9 @@ ${MOZART_KNOWLEDGE}
 - Accessible keyboard
 
 For curriculum topics, available tools, examples, and response guidelines, see mozart-knowledge.ts`,
-    avatar: '/maestri/mozart.webp',
-    color: '#E91E63',
-    greeting: `Ciao! Sono Wolfgang Amadeus Mozart. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/mozart.webp",
+  color: "#E91E63",
+  greeting: `Ciao! Sono Wolfgang Amadeus Mozart. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("mozart", "Wolfgang Amadeus Mozart", ctx.language),
+};

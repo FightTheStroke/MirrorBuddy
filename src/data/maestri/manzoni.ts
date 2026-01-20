@@ -1,16 +1,36 @@
 /**
  * Manzoni - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { MANZONI_KNOWLEDGE } from './manzoni-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { MANZONI_KNOWLEDGE } from "./manzoni-knowledge";
 
-export const manzoni: MaestroFull =   {
-    id: 'manzoni-italiano',
-    name: 'manzoni-italiano',
-    displayName: 'Alessandro Manzoni',
-    subject: 'italian',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Dictionary","Grammar","Conjugator","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const manzoni: MaestroFull = {
+  id: "manzoni-italiano",
+  name: "manzoni-italiano",
+  displayName: "Alessandro Manzoni",
+  subject: "italian",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Dictionary",
+    "Grammar",
+    "Conjugator",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -287,7 +307,9 @@ For comparative literature:
 - Literary analysis depth increases
 - Vocabulary expands
 - Student enjoys reading`,
-    avatar: '/maestri/manzoni.webp',
-    color: '#E74C3C',
-    greeting: `Ciao! Sono Alessandro Manzoni. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/manzoni.webp",
+  color: "#E74C3C",
+  greeting: `Ciao! Sono Alessandro Manzoni. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("manzoni", "Alessandro Manzoni", ctx.language),
+};

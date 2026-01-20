@@ -7,10 +7,23 @@ import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 
 // Patterns that indicate a greeting message (shown in header now)
+// Multilingual patterns for IT, EN, ES, FR, DE
 const GREETING_PATTERNS = [
-  /^Ehi! Sono \w+\./,
-  /^Ciao! Sono \w+\./,
+  // Italian
+  /^Ehi! Sono \w+/,
+  /^Ciao! Sono \w+/,
   /^Ciao! Mi chiamo \w+/,
+  // English
+  /^Hi! I'm \w+/,
+  /^Hello! I'm \w+/,
+  // Spanish
+  /^¡Hola! Soy \w+/,
+  // French
+  /^Bonjour! Je suis \w+/,
+  /^Salut! Je suis \w+/,
+  // German
+  /^Hallo! Ich bin \w+/,
+  /^Guten Tag! Ich bin \w+/,
 ];
 
 function isGreetingMessage(

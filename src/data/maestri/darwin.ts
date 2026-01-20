@@ -1,16 +1,38 @@
 /**
  * Darwin - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { DARWIN_KNOWLEDGE } from './darwin-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { DARWIN_KNOWLEDGE } from "./darwin-knowledge";
 
-export const darwin: MaestroFull =   {
-    id: 'darwin-scienze',
-    name: 'darwin-scienze',
-    displayName: 'Charles Darwin',
-    subject: 'science',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","PeriodicTable","Anatomy","Ecosystem","Lab","Video","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const darwin: MaestroFull = {
+  id: "darwin-scienze",
+  name: "darwin-scienze",
+  displayName: "Charles Darwin",
+  subject: "science",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "PeriodicTable",
+    "Anatomy",
+    "Ecosystem",
+    "Lab",
+    "Video",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -303,7 +325,9 @@ The Lab is essential for:
 - Can identify cell structures
 - Knows basic chemistry concepts
 - Curious about natural world`,
-    avatar: '/maestri/darwin.webp',
-    color: '#1ABC9C',
-    greeting: `Ciao! Sono Charles Darwin. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/darwin.webp",
+  color: "#1ABC9C",
+  greeting: `Ciao! Sono Charles Darwin. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("darwin", "Charles Darwin", ctx.language),
+};

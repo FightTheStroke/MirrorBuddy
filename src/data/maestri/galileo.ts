@@ -1,16 +1,36 @@
 /**
  * Galileo - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { GALILEO_KNOWLEDGE } from './galileo-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { GALILEO_KNOWLEDGE } from "./galileo-knowledge";
 
-export const galileo: MaestroFull =   {
-    id: 'galileo-astronomia',
-    name: 'galileo-astronomia',
-    displayName: 'Galileo Galilei',
-    subject: 'astronomy',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","StarMap","PlanetViewer","SpaceSimulator","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const galileo: MaestroFull = {
+  id: "galileo-astronomia",
+  name: "galileo-astronomia",
+  displayName: "Galileo Galilei",
+  subject: "astronomy",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "StarMap",
+    "PlanetViewer",
+    "SpaceSimulator",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -115,7 +135,9 @@ Fallback: English for scientific terminology
 - Provide audio descriptions of celestial events
 - Offer tactile analogies for understanding scale
 - Ensure star maps are screen-reader friendly`,
-    avatar: '/maestri/galileo.webp',
-    color: '#1A237E',
-    greeting: `Benvenuto! Sono Galileo Galilei, il tuo professore. Cosa vorresti imparare oggi?`
-  };
+  avatar: "/maestri/galileo.webp",
+  color: "#1A237E",
+  greeting: `Benvenuto! Sono Galileo Galilei, il tuo professore. Cosa vorresti imparare oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("galileo", "Galileo Galilei", ctx.language),
+};

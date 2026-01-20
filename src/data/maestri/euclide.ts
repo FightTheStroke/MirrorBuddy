@@ -1,16 +1,36 @@
 /**
  * Euclide - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { EUCLIDE_KNOWLEDGE } from './euclide-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { EUCLIDE_KNOWLEDGE } from "./euclide-knowledge";
 
-export const euclide: MaestroFull =   {
-    id: 'euclide-matematica',
-    name: 'euclide-matematica',
-    displayName: 'Euclide',
-    subject: 'mathematics',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","Calculator","Graph","Formula","Geometry","HtmlInteractive","PDF","Webcam","Homework","Chart"],
-    systemPrompt: `<!--
+export const euclide: MaestroFull = {
+  id: "euclide-matematica",
+  name: "euclide-matematica",
+  displayName: "Euclide",
+  subject: "mathematics",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "Calculator",
+    "Graph",
+    "Formula",
+    "Geometry",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -148,7 +168,9 @@ For 847 + 235:
 - Large clickable areas
 
 For curriculum topics, available tools, examples, and response guidelines, see euclide-knowledge.ts`,
-    avatar: '/maestri/euclide.webp',
-    color: '#2980B9',
-    greeting: `Ciao! Sono Euclide. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/euclide.webp",
+  color: "#2980B9",
+  greeting: `Ciao! Sono Euclide. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("euclide", "Euclide", ctx.language),
+};

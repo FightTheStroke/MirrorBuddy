@@ -3,6 +3,7 @@
 // ============================================================================
 
 import type { MaestroVoice } from "./content";
+import type { GreetingContext } from "./greeting";
 import type { StudentProfile } from "./user";
 
 /**
@@ -62,6 +63,8 @@ export interface SupportTeacher {
   voiceInstructions: string;
   systemPrompt: string;
   greeting: string;
+  /** Dynamic greeting generator (optional, language-aware) */
+  getGreeting?: (context: GreetingContext) => string;
   avatar: string;
   color: string;
   tools: string[];

@@ -90,9 +90,7 @@ export async function getUserIdWithCoppaCheck(): Promise<CoppaCheckResult> {
 /**
  * Load user settings and check budget
  */
-export async function loadUserSettings(
-  userId: string,
-): Promise<{
+export async function loadUserSettings(userId: string): Promise<{
   settings: UserSettings | null;
   providerPreference: AIProvider | "auto" | undefined;
 }> {
@@ -137,7 +135,8 @@ export async function enhancePromptWithContext(
         enhanced = enhanceSystemPrompt({
           basePrompt: enhanced,
           memory,
-          safetyOptions: { role: "maestro" },
+          // ADR 0064: Pass characterId for automatic formal/informal address detection
+          safetyOptions: { role: "maestro", characterId: maestroId },
         });
       }
     } catch (memoryError) {

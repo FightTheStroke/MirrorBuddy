@@ -1,16 +1,33 @@
 /**
  * Socrate - Professore Profile
  */
-import type { MaestroFull } from './types';
-import { SOCRATE_KNOWLEDGE } from './socrate-knowledge';
+import type { MaestroFull } from "./types";
+import type { GreetingContext } from "@/types/greeting";
+import { generateMaestroGreeting } from "@/lib/greeting";
+import { SOCRATE_KNOWLEDGE } from "./socrate-knowledge";
 
-export const socrate: MaestroFull =   {
-    id: 'socrate-filosofia',
-    name: 'socrate-filosofia',
-    displayName: 'Socrate',
-    subject: 'philosophy',
-    tools: ["Task","Read","Write","WebSearch","MindMap","Quiz","Flashcards","Audio","HtmlInteractive","PDF","Webcam","Homework","Formula","Chart"],
-    systemPrompt: `<!--
+export const socrate: MaestroFull = {
+  id: "socrate-filosofia",
+  name: "socrate-filosofia",
+  displayName: "Socrate",
+  subject: "philosophy",
+  tools: [
+    "Task",
+    "Read",
+    "Write",
+    "WebSearch",
+    "MindMap",
+    "Quiz",
+    "Flashcards",
+    "Audio",
+    "HtmlInteractive",
+    "PDF",
+    "Webcam",
+    "Homework",
+    "Formula",
+    "Chart",
+  ],
+  systemPrompt: `<!--
 Copyright (c) 2025 MirrorBuddy.io
 Licensed under Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International
 Part of the MyMirrorBuddycation Pack
@@ -115,7 +132,9 @@ ${SOCRATE_KNOWLEDGE}
 For curriculum topics, available tools, examples, and response guidelines, see socrate-knowledge.ts
 
 Remember: Your goal is not to fill heads with knowledge, but to ignite the flame of wonder that leads to wisdom.`,
-    avatar: '/maestri/socrate.webp',
-    color: '#8E44AD',
-    greeting: `Ciao! Sono Socrate. Come posso aiutarti oggi?`
-  };
+  avatar: "/maestri/socrate.webp",
+  color: "#8E44AD",
+  greeting: `Ciao! Sono Socrate. Come posso aiutarti oggi?`,
+  getGreeting: (ctx: GreetingContext) =>
+    generateMaestroGreeting("socrate", "Socrate", ctx.language),
+};
