@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { prisma, isDatabaseNotInitialized } from "@/lib/db";
-import { logger as baseLogger } from "@/lib/logger";
-
-export const logger = baseLogger.child({ module: "onboarding-api" });
+import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { CookieSigningError } from "@/lib/auth/cookie-signing";
@@ -14,40 +12,16 @@ import {
   checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
 
-const OnboardingDataSchema = z.object({
-  name: z.string().min(2).max(50),
-  age: z.number().int().min(6).max(19).optional(),
-  schoolLevel: z.enum(["elementare", "media", "superiore"]).optional(),
-  learningDifferences: z.array(z.string()).optional(),
-  gender: z.enum(["male", "female", "other"]).optional(),
-  parentEmail: z.string().email().optional(),
-});
+import { PostBodySchema, emptyResponse } from "./types";
+import { buildExistingData, buildEffectiveState } from "./helpers";
 
-export const PostBodySchema = z.object({
-  data: OnboardingDataSchema.optional(),
-  hasCompletedOnboarding: z.boolean().optional(),
-  currentStep: z.string().optional(),
-  isReplayMode: z.boolean().optional(),
-});
-
-interface OnboardingData {
-  name: string;
-  age?: number;
-  schoolLevel?: "elementare" | "media" | "superiore";
-  learningDifferences?: string[];
-  gender?: "male" | "female" | "other";
-  parentEmail?: string;
-}
+export { PostBodySchema } from "./types";
 
 export async function GET() {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
-      return NextResponse.json({
-        hasExistingData: false,
-        data: null,
-        onboardingState: null,
-      });
+      return NextResponse.json(emptyResponse);
     }
     const userId = auth.userId!;
 
@@ -60,66 +34,18 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({
-        hasExistingData: false,
-        data: null,
-        onboardingState: null,
-      });
+      return NextResponse.json(emptyResponse);
     }
 
-    const existingData: OnboardingData = {
-      name: "",
-    };
-
-    if (user.onboarding?.data) {
-      try {
-        const onboardingData = JSON.parse(
-          user.onboarding.data,
-        ) as OnboardingData;
-        if (onboardingData.name) existingData.name = onboardingData.name;
-        if (onboardingData.age) existingData.age = onboardingData.age;
-        if (onboardingData.schoolLevel)
-          existingData.schoolLevel = onboardingData.schoolLevel;
-        if (onboardingData.learningDifferences)
-          existingData.learningDifferences = onboardingData.learningDifferences;
-        if (onboardingData.gender) existingData.gender = onboardingData.gender;
-      } catch {
-        // Invalid JSON, ignore
-      }
-    }
-
-    if (!existingData.name && user.profile?.name) {
-      existingData.name = user.profile.name;
-    }
-    if (!existingData.age && user.profile?.age) {
-      existingData.age = user.profile.age;
-    }
-    if (!existingData.schoolLevel && user.profile?.schoolLevel) {
-      existingData.schoolLevel = user.profile.schoolLevel as
-        | "elementare"
-        | "media"
-        | "superiore";
-    }
+    const existingData = buildExistingData(user.onboarding?.data, user.profile);
 
     const isCredentialedUser = Boolean(user.passwordHash);
     const hasExistingData = Boolean(existingData.name) || isCredentialedUser;
 
-    const effectiveOnboardingState = user.onboarding
-      ? {
-          hasCompletedOnboarding:
-            user.onboarding.hasCompletedOnboarding || isCredentialedUser,
-          onboardingCompletedAt: user.onboarding.onboardingCompletedAt,
-          currentStep: user.onboarding.currentStep,
-          isReplayMode: user.onboarding.isReplayMode,
-        }
-      : isCredentialedUser
-        ? {
-            hasCompletedOnboarding: true,
-            onboardingCompletedAt: null,
-            currentStep: "ready",
-            isReplayMode: false,
-          }
-        : null;
+    const effectiveOnboardingState = buildEffectiveState(
+      user.onboarding,
+      isCredentialedUser,
+    );
 
     return NextResponse.json({
       hasExistingData,
