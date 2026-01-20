@@ -49,8 +49,17 @@ test.describe("Admin Mode UI Audit", () => {
       }
     });
 
-    // Set up localStorage bypasses for TOS/consent walls before navigating
-    // This allows testing the actual login flow without modal interference
+    // Mock /api/tos to return accepted: true (bypasses TOS modal)
+    // TosGateProvider calls this API to check TOS status
+    await page.route("/api/tos", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      });
+    });
+
+    // Set up localStorage/sessionStorage bypasses for consent walls
     await page.context().addInitScript(() => {
       localStorage.setItem(
         "mirrorbuddy-consent",
@@ -62,13 +71,9 @@ test.describe("Admin Mode UI Audit", () => {
           marketing: false,
         }),
       );
-      localStorage.setItem(
-        "mirrorbuddy-tos-accepted",
-        JSON.stringify({
-          version: "1.0",
-          acceptedAt: new Date().toISOString(),
-        }),
-      );
+      // Also set sessionStorage for TOS cache (TosGateProvider checks this)
+      sessionStorage.setItem("tos_accepted", "true");
+      sessionStorage.setItem("tos_accepted_version", "1.0");
     });
 
     await page.goto("/login");
