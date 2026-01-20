@@ -3,4 +3,4 @@
 // Reusable patterns for Next.js API routes
 // ============================================================================
 
-export { apiHandler, apiHandlerWithErrors } from "./handler";
+export { apiHandler, apiHandlerWithErrors, createHandler } from "./handler";

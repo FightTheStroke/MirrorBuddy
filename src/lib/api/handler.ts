@@ -4,9 +4,15 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
+import { z, ZodError } from "zod";
 import { logger } from "@/lib/logger";
 
 type HandlerFn = (req: NextRequest) => Promise<Response>;
+
+interface CreateHandlerOptions {
+  errorMessage?: string;
+  onValidationError?: (error: ZodError) => void;
+}
 
 interface ApiErrorResponse {
   error: string;
@@ -58,6 +64,33 @@ export function apiHandler(fn: HandlerFn): HandlerFn {
       return NextResponse.json(errorResponse, { status: 500 });
     }
   };
+}
+
+/**
+ * Wrap API handlers with Zod body validation.
+ */
+export function createHandler<T extends z.ZodTypeAny>(
+  schema: T,
+  handler: (req: NextRequest, data: z.infer<T>) => Promise<Response>,
+  options?: CreateHandlerOptions,
+): HandlerFn {
+  return apiHandler(async (req: NextRequest) => {
+    const body = await req.json();
+    const parseResult = schema.safeParse(body);
+
+    if (!parseResult.success) {
+      options?.onValidationError?.(parseResult.error);
+      return NextResponse.json(
+        {
+          error: options?.errorMessage ?? "Invalid request data",
+          details: parseResult.error.issues,
+        },
+        { status: 400 },
+      );
+    }
+
+    return handler(req, parseResult.data);
+  });
 }
 
 /**
