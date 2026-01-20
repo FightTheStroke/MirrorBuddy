@@ -3,7 +3,8 @@
 // Runs when the Next.js server starts
 // Used to initialize:
 // 1. OpenTelemetry SDK with Azure App Insights
-// 2. WebSocket proxy for Azure Realtime API (deprecated)
+// 2. Prometheus Push Service for Grafana Cloud metrics
+// 3. WebSocket proxy for Azure Realtime API (deprecated)
 //
 // @deprecated WebSocket proxy is deprecated. Use WebRTC transport instead.
 // Set VOICE_TRANSPORT=webrtc in environment to enable WebRTC.
@@ -24,6 +25,11 @@ export async function register() {
     if (sdk) {
       startOpenTelemetry(sdk);
     }
+
+    // Start Prometheus Push Service for Grafana Cloud
+    // Pushes metrics every GRAFANA_CLOUD_PUSH_INTERVAL seconds (default: 60)
+    const { prometheusPushService } = await import("@/lib/observability");
+    prometheusPushService.start();
 
     // Start WebSocket proxy (deprecated)
     const { startRealtimeProxy } = await import("@/server/realtime-proxy");

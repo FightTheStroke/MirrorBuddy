@@ -80,8 +80,15 @@ class PrometheusPushService {
 
   /**
    * Start the periodic push
+   * NOTE: Disabled in development to avoid unnecessary Grafana Cloud costs
    */
   start(): void {
+    // Skip in development - use local /api/metrics endpoint instead
+    if (process.env.NODE_ENV !== "production") {
+      logger.info("Grafana Cloud push disabled in development (cost savings)");
+      return;
+    }
+
     if (!this.config) {
       if (!this.initialize()) return;
     }
