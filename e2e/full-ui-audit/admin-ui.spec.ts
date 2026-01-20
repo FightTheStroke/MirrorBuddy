@@ -86,8 +86,9 @@ test.describe("Admin Mode UI Audit", () => {
         await page.waitForTimeout(300);
 
         // Now click the accept button - it should be enabled after checkbox is checked
+        // Button text is "Accetto" (not "Accetta")
         const acceptButton = page.locator("button").filter({
-          hasText: /Accetta|Conferma|Accept/i,
+          hasText: /Accett[ao]|Conferma|Accept/i,
         });
         // Wait for button to become enabled (disabled={!accepted})
         await expect(acceptButton).toBeEnabled({ timeout: 2000 });
