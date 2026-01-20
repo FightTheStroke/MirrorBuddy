@@ -1,5 +1,9 @@
 import fs from "fs";
 import path from "path";
+import { config } from "dotenv";
+
+// Load .env file
+config();
 
 interface CheckResult {
   name: string;
@@ -186,7 +190,7 @@ async function runChecks(): Promise<void> {
   // Additional environment checks for compliance
   const additionalEnvChecks = [
     { name: "DATABASE_URL", critical: true },
-    { name: "NEXTAUTH_SECRET", critical: true },
+    { name: "SESSION_SECRET", critical: true },
   ];
 
   for (const check of additionalEnvChecks) {
