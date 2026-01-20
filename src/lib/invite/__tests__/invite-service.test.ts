@@ -33,6 +33,7 @@ vi.mock("@/lib/db", () => ({
 // Mock email
 vi.mock("@/lib/email", () => ({
   sendEmail: vi.fn().mockResolvedValue({ success: true }),
+  isEmailConfigured: vi.fn().mockReturnValue(true),
 }));
 
 // Mock password
@@ -58,10 +59,12 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 import { prisma } from "@/lib/db";
+import { isEmailConfigured, sendEmail } from "@/lib/email";
 
 describe("Invite Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(isEmailConfigured).mockReturnValue(true);
   });
 
   describe("getPendingInvites", () => {
@@ -134,7 +137,6 @@ describe("Invite Service", () => {
         mockRequest as never,
       );
 
-      const { sendEmail } = await import("@/lib/email");
       const { notifyAdminNewRequest } = await import("../invite-service");
 
       await notifyAdminNewRequest("req-123");
@@ -145,12 +147,57 @@ describe("Invite Service", () => {
     it("should not send email if request not found", async () => {
       vi.mocked(prisma.inviteRequest.findUnique).mockResolvedValue(null);
 
-      const { sendEmail } = await import("@/lib/email");
       const { notifyAdminNewRequest } = await import("../invite-service");
 
       await notifyAdminNewRequest("invalid-id");
 
       expect(sendEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe("sendRequestConfirmation", () => {
+    it("should skip when email is not configured", async () => {
+      const mockRequest = {
+        id: "req-456",
+        name: "Test User",
+        email: "test@example.com",
+        motivation: "I want to learn",
+        trialSessionId: null,
+      };
+
+      vi.mocked(prisma.inviteRequest.findUnique).mockResolvedValue(
+        mockRequest as never,
+      );
+
+      const { sendRequestConfirmation } = await import("../invite-service");
+
+      vi.mocked(isEmailConfigured).mockReturnValue(false);
+
+      await sendRequestConfirmation("req-456");
+
+      expect(prisma.inviteRequest.findUnique).not.toHaveBeenCalled();
+      expect(sendEmail).not.toHaveBeenCalled();
+    });
+
+    it("should send confirmation when email is configured", async () => {
+      const mockRequest = {
+        id: "req-789",
+        name: "Test User",
+        email: "test@example.com",
+        motivation: "I want to learn",
+        trialSessionId: null,
+      };
+
+      vi.mocked(prisma.inviteRequest.findUnique).mockResolvedValue(
+        mockRequest as never,
+      );
+
+      const { sendRequestConfirmation } = await import("../invite-service");
+
+      await sendRequestConfirmation("req-789");
+
+      expect(prisma.inviteRequest.findUnique).toHaveBeenCalled();
+      expect(sendEmail).toHaveBeenCalled();
     });
   });
 

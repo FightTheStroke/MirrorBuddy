@@ -5,6 +5,7 @@ import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 interface BetaRequestFormProps {
   visitorId?: string;
@@ -90,9 +91,15 @@ export function BetaRequestForm({
       setState("success");
       onSuccess?.();
     } catch (error) {
+      logger.error("Invite request failed", { error: String(error) });
+      const message =
+        error instanceof Error && /csrf/i.test(error.message)
+          ? "Sessione scaduta. Ricarica la pagina e riprova."
+          : error instanceof Error
+            ? error.message
+            : "Errore durante l'invio";
       setErrors({
-        general:
-          error instanceof Error ? error.message : "Errore durante l'invio",
+        general: message,
       });
       setState("error");
     }
