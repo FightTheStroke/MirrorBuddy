@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await hashPassword(temporaryPassword);
     const displayName = body.name?.trim() || email.split("@")[0];
 
-    // Create user in transaction
+    // Create user + invite record in transaction
     const user = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
@@ -108,6 +108,31 @@ export async function POST(request: NextRequest) {
           settings: {
             create: {},
           },
+        },
+      });
+
+      await tx.inviteRequest.upsert({
+        where: { email },
+        update: {
+          name: displayName,
+          motivation: "Invito diretto admin",
+          status: "APPROVED",
+          reviewedAt: new Date(),
+          reviewedBy: auth.userId,
+          generatedUsername: username,
+          createdUserId: newUser.id,
+          isDirect: true,
+        },
+        create: {
+          name: displayName,
+          email,
+          motivation: "Invito diretto admin",
+          status: "APPROVED",
+          reviewedAt: new Date(),
+          reviewedBy: auth.userId,
+          generatedUsername: username,
+          createdUserId: newUser.id,
+          isDirect: true,
         },
       });
 

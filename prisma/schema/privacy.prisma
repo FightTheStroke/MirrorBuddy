@@ -57,6 +57,23 @@ model UserPrivacyPreferences {
   @@index([userId])
 }
 
+// Admin-managed trash/restore backups (30-day retention)
+model DeletedUserBackup {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  email     String?
+  username  String?
+  role      UserRole
+  backup    Json
+  deletedAt DateTime @default(now())
+  purgeAt   DateTime
+  deletedBy String
+  reason    String?
+
+  @@index([deletedAt])
+  @@index([purgeAt])
+}
+
 // F-13: Terms of Service Acceptance Tracking
 // Tracks user acceptance of ToS with versioning and audit trail
 model TosAcceptance {

@@ -20,6 +20,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Signed State**: HMAC-SHA256 signature with 10-minute expiry
 - **Token Encryption**: AES-256-GCM encryption at rest for OAuth tokens
 
+### Added
+
+- **Admin Invites**: Direct invite list filtered to the admin who sent them
+- **Admin User Trash**: Delete users with 30-day backup retention and restore from admin dashboard
+- **Retention Cron**: Purge expired user backups as part of daily retention job
+
 #### Rate Limiting
 
 - **Login**: 5 requests per 15 minutes (brute force prevention)
@@ -56,6 +62,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/lib/google/oauth.ts` - PKCE, signed state, token encryption
 - `src/lib/rate-limit.ts` - Auth-specific rate limit configs
 - `src/lib/compliance/coppa-service.ts` - Email verification integration
+
+### Added
+
+- **E2E Test DB Safety**: Require `TEST_DATABASE_URL` for Playwright runs and dedicated test DB routing
 
 ### Breaking Changes
 

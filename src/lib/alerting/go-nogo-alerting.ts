@@ -294,6 +294,8 @@ export function runGoNoGoChecks(): GoNoGoResult {
   const requiredFailures = checks.filter(
     (c) => c.required && c.status === "fail",
   ).length;
+  const score =
+    checks.length > 0 ? Math.round((passedCount / checks.length) * 100) : 0;
 
   let decision: GoNoGoDecision = "go";
   if (requiredFailures > 0) {
@@ -308,6 +310,7 @@ export function runGoNoGoChecks(): GoNoGoResult {
     passedCount,
     failedCount,
     requiredFailures,
+    score,
     timestamp: now,
   };
 

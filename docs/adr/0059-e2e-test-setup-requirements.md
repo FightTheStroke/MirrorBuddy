@@ -60,6 +60,15 @@ localStorage: [
 ]
 ```
 
+### Database Safety (E2E)
+
+E2E tests must never run against production. A dedicated test database is required.
+
+- Set `TEST_DATABASE_URL` (and optional `TEST_DIRECT_URL`) before `npm run test`.
+- The app will throw if `E2E_TESTS=1` and `TEST_DATABASE_URL` is missing.
+- Playwright webServer passes only the test DB URLs to the app.
+- Local default: `postgresql://<user>@localhost:5432/mirrorbuddy_test` with `CREATE EXTENSION vector;`.
+
 ## Architecture Notes
 
 1. **Onboarding store hydration**: Uses `/api/onboarding` API, NOT localStorage. The localStorage onboarding entry is for Zustand persistence compatibility.

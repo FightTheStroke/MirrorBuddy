@@ -104,7 +104,7 @@ describe("Invite Service", () => {
       const result = await getInvites();
 
       expect(prisma.inviteRequest.findMany).toHaveBeenCalledWith({
-        where: undefined,
+        where: {},
         orderBy: { createdAt: "desc" },
       });
       expect(result).toEqual(mockInvites);
@@ -118,6 +118,30 @@ describe("Invite Service", () => {
 
       expect(prisma.inviteRequest.findMany).toHaveBeenCalledWith({
         where: { status: "APPROVED" },
+        orderBy: { createdAt: "desc" },
+      });
+    });
+
+    it("should filter by direct invite flag when provided", async () => {
+      vi.mocked(prisma.inviteRequest.findMany).mockResolvedValue([]);
+
+      const { getInvites } = await import("../invite-service");
+      await getInvites(undefined, true);
+
+      expect(prisma.inviteRequest.findMany).toHaveBeenCalledWith({
+        where: { isDirect: true },
+        orderBy: { createdAt: "desc" },
+      });
+    });
+
+    it("should filter by reviewer when provided", async () => {
+      vi.mocked(prisma.inviteRequest.findMany).mockResolvedValue([]);
+
+      const { getInvites } = await import("../invite-service");
+      await getInvites(undefined, undefined, "admin-123");
+
+      expect(prisma.inviteRequest.findMany).toHaveBeenCalledWith({
+        where: { reviewedBy: "admin-123" },
         orderBy: { createdAt: "desc" },
       });
     });

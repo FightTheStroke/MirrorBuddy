@@ -178,7 +178,11 @@ export async function initializeFlags(): Promise<void> {
     });
   } catch (error) {
     // Fallback to in-memory defaults if DB unavailable
-    logger.error("Failed to load flags from DB, using defaults", undefined, error);
+    logger.error(
+      "Failed to load flags from DB, using defaults",
+      undefined,
+      error,
+    );
     initializeFlagsSync();
   }
 }
@@ -288,21 +292,29 @@ export async function updateFlag(
   // Update cache immediately
   flagCache.set(featureId, updated);
 
-  // Persist to DB
+  // Persist to DB (upsert for robustness when record doesn't exist yet)
   try {
-    await prisma.featureFlag.update({
+    const dbData = {
+      status: updated.status,
+      enabledPercentage: updated.enabledPercentage,
+      killSwitch: updated.killSwitch,
+      killSwitchReason: update.killSwitch
+        ? (update.metadata?.reason as string)
+        : null,
+      metadata: updated.metadata
+        ? JSON.parse(JSON.stringify(updated.metadata))
+        : undefined,
+      updatedBy: update.updatedBy,
+    };
+
+    await prisma.featureFlag.upsert({
       where: { id: featureId },
-      data: {
-        status: updated.status,
-        enabledPercentage: updated.enabledPercentage,
-        killSwitch: updated.killSwitch,
-        killSwitchReason: update.killSwitch
-          ? (update.metadata?.reason as string)
-          : null,
-        metadata: updated.metadata
-          ? JSON.parse(JSON.stringify(updated.metadata))
-          : undefined,
-        updatedBy: update.updatedBy,
+      update: dbData,
+      create: {
+        id: featureId,
+        name: updated.name,
+        description: updated.description,
+        ...dbData,
       },
     });
   } catch (error) {

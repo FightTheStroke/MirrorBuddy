@@ -8,6 +8,9 @@
  */
 
 import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import "dotenv/config";
 
 const TEST_USER_PREFIXES = [
   "e2e-test-user-",
@@ -22,13 +25,27 @@ async function globalTeardown() {
     return;
   }
 
-  // Skip cleanup if DATABASE_URL is not set (local dev without DB)
-  if (!process.env.DATABASE_URL) {
-    console.log("E2E cleanup skipped (no DATABASE_URL)");
-    return;
+  const connectionString = process.env.TEST_DATABASE_URL;
+  if (!connectionString) {
+    throw new Error(
+      "TEST_DATABASE_URL is required for E2E cleanup to avoid production writes.",
+    );
   }
 
-  const prisma = new PrismaClient();
+  const isProduction =
+    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
+
+  let ssl: { rejectUnauthorized: boolean; ca?: string } | undefined;
+  if (supabaseCaCert) {
+    ssl = { rejectUnauthorized: true, ca: supabaseCaCert };
+  } else if (isProduction) {
+    ssl = { rejectUnauthorized: false };
+  }
+
+  const pool = new Pool({ connectionString, ssl });
+  const adapter = new PrismaPg(pool);
+  const prisma = new PrismaClient({ adapter });
 
   try {
     console.log("E2E Teardown: Cleaning up test users...");
@@ -61,8 +78,8 @@ async function globalTeardown() {
       console.log(`E2E Teardown complete: ${totalDeleted} test users removed`);
     }
   } catch (error) {
-    // Don't fail the test run if cleanup fails
-    console.error("E2E Teardown warning: cleanup failed", error);
+    console.error("E2E Teardown failed", error);
+    throw error;
   } finally {
     await prisma.$disconnect();
   }
