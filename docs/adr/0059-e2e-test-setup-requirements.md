@@ -174,10 +174,11 @@ scripts/
 └── security-scan.sh            # npm audit + OWASP ZAP
 
 e2e/full-ui-audit/
-├── trial-ui.spec.ts            # Trial mode navigation
-├── admin-ui.spec.ts            # Admin mode navigation
-├── settings.spec.ts            # Settings interactions
-└── visual-regression.spec.ts   # Screenshot comparison
+├── trial-ui.spec.ts                    # Trial mode navigation
+├── admin-ui.spec.ts                    # Admin mode navigation
+├── admin-sidebar-navigation.spec.ts    # Admin sidebar CLICK tests
+├── settings.spec.ts                    # Settings interactions
+└── visual-regression.spec.ts           # Screenshot comparison
 
 e2e/fixtures/
 ├── auth-fixtures.ts            # Trial/admin page fixtures
@@ -214,3 +215,50 @@ When adding new "wall" components:
 2. Test E2E suite passes: `npm run test`
 3. Verify no "white dots" (unresolved threads) in code reviews
 4. Add wall type to ADR 0059 checklist (this file)
+
+---
+
+## Admin Sidebar Navigation Tests
+
+**Added**: 2026-01-20 | **Context**: Catch navigation bugs like `/home` instead of `/`
+
+### Problem Solved
+
+Previous E2E tests verified admin pages existed but never **clicked** sidebar links. This missed bugs where:
+
+- `href="/home"` instead of `href="/"` (real bug fixed 2026-01-19)
+- Links pointing to non-existent routes (e.g., `/admin/settings`)
+- Navigation redirecting unexpectedly
+
+### Test Coverage
+
+**File**: `e2e/full-ui-audit/admin-sidebar-navigation.spec.ts`
+
+| Test ID | Description                                    | Bug Type Caught             |
+| ------- | ---------------------------------------------- | --------------------------- |
+| F-01    | Click each sidebar link, verify route          | Wrong href, missing routes  |
+| F-02    | No 404 responses during navigation             | Broken links, missing pages |
+| F-03    | "Torna all'app" navigates to `/` (not `/home`) | **THE /home BUG**           |
+| F-04    | Sidebar collapse/expand toggle                 | UI state bugs               |
+| F-05    | Admin logo links to dashboard                  | Navigation regression       |
+
+### Key Implementation Details
+
+1. **Click-based testing**: Uses actual `click()` instead of `goto()` to test real user navigation
+2. **Modal bypass**: Mocks `/api/tos` and sets localStorage to prevent consent walls blocking clicks
+3. **Force clicks**: Uses `{ force: true }` to bypass HMR overlay in dev mode
+4. **Navigation wait**: Uses `waitForURL()` with `Promise.all` for reliable navigation detection
+
+### Known Issues
+
+- `/admin/settings` route doesn't exist but sidebar has "Impostazioni" link (TODO: create page or remove link)
+
+### Running the Tests
+
+```bash
+# Run only admin sidebar tests
+npx playwright test admin-sidebar-navigation.spec.ts --project=chromium
+
+# Run with UI for debugging
+npx playwright test admin-sidebar-navigation.spec.ts --ui
+```
