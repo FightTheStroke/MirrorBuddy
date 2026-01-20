@@ -17,15 +17,15 @@ DATABASE_URL=postgresql://user@localhost:5432/mirrorbuddy
 
 ## Key Models
 
-| Model | Purpose |
-|-------|---------|
-| **User** | Profile, Settings, Progress (1:1) |
-| **StudySession** | Learning sessions with XP |
-| **FlashcardProgress** | FSRS spaced repetition state |
-| **Conversation** → Messages | Chat history per maestro |
-| **ContentEmbedding** | Vector embeddings for RAG (pgvector) |
-| **MaterialEdge** | Knowledge graph relationships |
-| **Concept** | Extracted concepts from materials |
+| Model                       | Purpose                              |
+| --------------------------- | ------------------------------------ |
+| **User**                    | Profile, Settings, Progress (1:1)    |
+| **StudySession**            | Learning sessions with XP            |
+| **FlashcardProgress**       | FSRS spaced repetition state         |
+| **Conversation** → Messages | Chat history per maestro             |
+| **ContentEmbedding**        | Vector embeddings for RAG (pgvector) |
+| **MaterialEdge**            | Knowledge graph relationships        |
+| **Concept**                 | Extracted concepts from materials    |
 
 ## Vector Storage (pgvector)
 
@@ -43,6 +43,7 @@ model ContentEmbedding {
 ```
 
 Similarity search:
+
 ```sql
 SELECT *, 1 - (vector <=> $1) as similarity
 FROM "ContentEmbedding"
@@ -53,24 +54,26 @@ LIMIT 10;
 
 ## Data Persistence
 
-| Data Type | Storage |
-|-----------|---------|
-| User settings | `/api/user/settings` |
-| Progress | `/api/progress` |
-| Materials | `/api/materials` |
-| Conversations | `/api/conversations` |
-| Embeddings | `/api/materials` (auto-indexed) |
-| Session ID | `sessionStorage` |
-| Device cache | `localStorage` (OK) |
+| Data Type     | Storage                         |
+| ------------- | ------------------------------- |
+| User settings | `/api/user/settings`            |
+| Progress      | `/api/progress`                 |
+| Materials     | `/api/materials`                |
+| Conversations | `/api/conversations`            |
+| Embeddings    | `/api/materials` (auto-indexed) |
+| Session ID    | `sessionStorage`                |
+| Device cache  | `localStorage` (OK)             |
 
 ## Commands
 
 ```bash
-npx prisma generate  # Generate client
-npx prisma db push   # Sync schema to PostgreSQL
-npx prisma studio    # GUI browser
-npx prisma migrate   # Create migration
+npx prisma generate       # Generate client (after schema changes)
+npx prisma migrate dev    # Create + apply migration (LOCAL ONLY)
+npx prisma migrate deploy # Apply migrations (CI/Production)
+npx prisma studio         # GUI browser
 ```
+
+**CRITICAL**: Never use `db push` on tracked databases. See ADR 0052.
 
 ## References
 
