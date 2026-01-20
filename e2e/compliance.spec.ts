@@ -23,7 +23,7 @@ test.describe("Compliance Pages - Accessibility", () => {
 
   test("terms of service page is accessible", async ({ page }) => {
     await page.goto("/terms");
-    await expect(page).toHaveTitle(/terms|condizioni/i);
+    await expect(page).toHaveTitle(/terms|condizioni|termini/i);
 
     const mainContent = page.getByRole("main");
     const isVisible = await mainContent.isVisible().catch(() => false);
