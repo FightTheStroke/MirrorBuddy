@@ -15,11 +15,7 @@ import {
   exportComplianceAudit,
   clearComplianceBuffer,
 } from "../compliance-audit-service";
-import type {
-  ComplianceAuditEntry,
-  ComplianceOutcome,
-  RegulatoryContext,
-} from "../compliance-audit-types";
+// Types are used implicitly for type checking in tests
 
 describe("Compliance Audit Service (F-07)", () => {
   beforeEach(() => {

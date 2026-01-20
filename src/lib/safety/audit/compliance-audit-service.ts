@@ -594,7 +594,7 @@ export function clearComplianceBuffer(): void {
 
 function generateComplianceSummary(
   stats: ComplianceAuditStats,
-  totalEntries: number,
+  _totalEntries: number,
 ): string {
   let summary = `## Compliance Audit Summary\n`;
   summary += `**Period**: ${stats.periodStart} to ${stats.periodEnd}\n`;

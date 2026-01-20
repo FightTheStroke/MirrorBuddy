@@ -8,7 +8,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { GET } from "../route";
-import * as helpers from "../helpers";
 
 // Mock the auth module
 vi.mock("@/lib/auth/session-auth", () => ({
@@ -34,7 +33,7 @@ vi.mock("@/lib/tracing", () => ({
     warn: vi.fn(),
     error: vi.fn(),
   }),
-  getRequestId: (req: NextRequest) => "test-request-id",
+  getRequestId: (_req: NextRequest) => "test-request-id",
 }));
 
 describe("GDPR Data Export API", () => {

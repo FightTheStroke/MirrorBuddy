@@ -10,7 +10,7 @@
  * - Database storage
  */
 
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   initializeEscalationService,
   escalateCrisisDetected,
@@ -25,7 +25,7 @@ import {
   getEscalationConfig,
   clearEscalationBuffer,
 } from "../escalation-service";
-import type { EscalationEvent } from "../types";
+// EscalationEvent type used implicitly in tests
 
 describe("Escalation Service - F-06 Human Escalation Pathway", () => {
   beforeEach(() => {

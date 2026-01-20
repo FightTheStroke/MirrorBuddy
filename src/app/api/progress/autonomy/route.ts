@@ -25,7 +25,7 @@ import {
 } from "./helpers";
 import type { AutonomyMetrics } from "./types";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     // Security: Always get userId from authenticated session, never from query params
     const auth = await validateAuth();

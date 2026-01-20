@@ -10,17 +10,7 @@ import type { EscalationEvent, EscalationTrigger } from "./types";
 
 const log = logger.child({ module: "admin-notifier" });
 
-/**
- * Sanitize content for email (no PII, truncated)
- */
-function sanitizeContent(text: string, maxLength = 200): string {
-  if (!text) return "";
-  let sanitized = text.replace(/[\r\n]+/g, " ").trim();
-  if (sanitized.length > maxLength) {
-    sanitized = sanitized.substring(0, maxLength) + "...";
-  }
-  return sanitized;
-}
+// sanitizeContent removed - using inline sanitization in buildEmailHtml
 
 /**
  * Get trigger-specific email details

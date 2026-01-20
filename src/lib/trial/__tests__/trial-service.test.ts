@@ -27,9 +27,6 @@ import { prisma } from "@/lib/db";
 import {
   getOrCreateTrialSession,
   checkTrialLimits,
-  incrementUsage,
-  addVoiceSeconds,
-  getTrialStatus,
   TRIAL_LIMITS,
 } from "../trial-service";
 
