@@ -83,12 +83,17 @@ export async function validateAuth(): Promise<AuthResult> {
         process.env.NODE_ENV !== "production"
       ) {
         // E2E/dev mode: auto-create test users
+        // Check if this is an admin session (indicated by mirrorbuddy-admin cookie)
+        const adminCookie = cookieStore.get("mirrorbuddy-admin");
+        const isAdminSession = !!adminCookie;
+
         // Use try-catch to handle race conditions where concurrent requests
         // may try to create the same user simultaneously
         try {
           const created = await prisma.user.create({
             data: {
               id: userId,
+              role: isAdminSession ? "ADMIN" : "USER",
               profile: { create: {} },
               settings: { create: {} },
               progress: { create: {} },
