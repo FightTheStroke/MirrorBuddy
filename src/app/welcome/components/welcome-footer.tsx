@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Shield, Bot, Lock, AlertTriangle, Github } from "lucide-react";
+import { Shield, Bot, Lock, AlertTriangle, Github, Brain } from "lucide-react";
 import { InlineConsent } from "@/components/consent/inline-consent";
 
 const GITHUB_REPO_URL = "https://github.com/robdll/mirrorbuddy";
@@ -20,14 +20,19 @@ const COMPLIANCE_BADGES: ComplianceBadge[] = [
     description: "Conforme al regolamento europeo",
   },
   {
+    icon: <Brain className="w-4 h-4" />,
+    label: "AI Act",
+    description: "EU 2024/1689",
+  },
+  {
     icon: <Lock className="w-4 h-4" />,
     label: "COPPA",
     description: "Protezione minori",
   },
   {
     icon: <AlertTriangle className="w-4 h-4" />,
-    label: "Anti-hijacking",
-    description: "Controlli di sicurezza AI",
+    label: "L.132/2025",
+    description: "Legge italiana sull'IA",
   },
 ];
 
@@ -37,6 +42,7 @@ const LEGAL_LINKS = [
   { href: "/cookies", label: "Cookie Policy" },
   { href: "/ai-transparency", label: "Trasparenza AI" },
   { href: "/ai-policy", label: "Politica AI" },
+  { href: "/compliance", label: "Compliance" },
 ];
 
 /**
