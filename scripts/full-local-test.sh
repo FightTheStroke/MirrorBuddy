@@ -111,7 +111,7 @@ fi
 # PHASE 6: VISUAL REGRESSION
 echo -e "${BLUE}[6/10] Visual regression tests...${NC}"
 if [ "$VISUAL" = true ]; then
-  if npx playwright test --grep "@visual" > "$TEMP_DIR/visual.log" 2>&1; then
+  if VISUAL_REGRESSION=1 npx playwright test e2e/full-ui-audit/visual-regression.spec.ts > "$TEMP_DIR/visual.log" 2>&1; then
     echo -e "${GREEN}✓ Visual regression passed${NC}"
     RESULTS+=("✓ Visual regression")
   else
