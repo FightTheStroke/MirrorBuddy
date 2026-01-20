@@ -15,35 +15,29 @@ test.describe("Trial Mode Flow", () => {
     await context.clearCookies();
   });
 
-  test("Cookie consent wall blocks access until accepted", async ({ page }) => {
+  test("Legal pages accessible without blocking consent wall (GDPR)", async ({
+    page,
+  }) => {
     // Clear consent
     await page.addInitScript(() => {
       localStorage.removeItem("mirrorbuddy-consent");
     });
 
-    // Navigate to a public route that shows consent wall
-    // Note: "/" redirects to /welcome via middleware for unauthenticated users
-    // Use /terms which is public and shows blocking consent wall
+    // Legal pages (/terms, /privacy, /cookies) use inline consent (footer)
+    // NOT blocking consent wall - this is a GDPR requirement
+    // Users must be able to read privacy/terms BEFORE accepting cookies
     await page.goto("/terms");
     await page.waitForLoadState("networkidle");
 
-    // Consent wall should be visible (blocking the terms content)
-    await expect(page.locator("text=Privacy e Cookie")).toBeVisible();
-    await expect(page.locator("text=Accetta e continua")).toBeVisible();
-
-    // Terms content should not be visible (consent wall blocks it)
-    await expect(
-      page.locator("text=Termini di Servizio di MirrorBuddy"),
-    ).not.toBeVisible();
-
-    // Accept consent
-    await page.click("text=Accetta e continua");
-
-    // Consent wall should disappear and terms should be visible
-    await expect(page.locator("text=Privacy e Cookie")).not.toBeVisible();
+    // Terms content should be immediately visible (no blocking wall)
     await expect(
       page.locator("text=Termini di Servizio di MirrorBuddy"),
     ).toBeVisible();
+
+    // Inline consent mechanism should be available (in footer or via floating button)
+    // The floating a11y button provides access to settings including consent
+    const a11yButton = page.locator('button[aria-label*="accessibilità"]');
+    await expect(a11yButton).toBeVisible();
   });
 
   test("Trial status indicator shows remaining chats", async ({
@@ -198,38 +192,31 @@ test.describe("Trial Mode Flow", () => {
     }
   });
 
-  test("Privacy page is accessible from consent wall", async ({ page }) => {
-    // Clear consent
+  test("Privacy page is accessible without prior consent (GDPR)", async ({
+    page,
+  }) => {
+    // Clear consent - user hasn't accepted yet
     await page.addInitScript(() => {
       localStorage.removeItem("mirrorbuddy-consent");
     });
 
-    // Navigate to terms page which shows consent wall
-    // (/ redirects to /welcome via middleware for unauthenticated users)
-    await page.goto("/terms");
-    await page.waitForLoadState("networkidle");
-
-    // Verify the privacy link has correct attributes in consent wall
-    const privacyLink = page.locator('a:has-text("Privacy Policy")');
-    await expect(privacyLink).toBeVisible();
-    await expect(privacyLink).toHaveAttribute("href", /\/privacy/);
-    await expect(privacyLink).toHaveAttribute("target", "_blank");
-
-    // Navigate directly to privacy page to verify it loads
+    // Privacy page must be accessible without blocking consent wall
+    // This is a GDPR requirement - users must read privacy before accepting
     await page.goto("/privacy");
     await page.waitForLoadState("networkidle");
 
-    // Accept consent first (consent wall will show)
-    const acceptButton = page.locator("text=Accetta e continua");
-    if (await acceptButton.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await acceptButton.click();
-      await page.waitForTimeout(300);
-    }
-
-    // Now privacy page content should be visible (actual title: "Privacy Policy di MirrorBuddy")
+    // Privacy content should be immediately visible (no blocking wall)
     await expect(
       page.locator("text=Privacy Policy di MirrorBuddy"),
     ).toBeVisible();
+
+    // The terms page should link to privacy
+    await page.goto("/terms");
+    await page.waitForLoadState("networkidle");
+
+    // Verify privacy link exists in terms page
+    const privacyLink = page.locator('a[href*="/privacy"]').first();
+    await expect(privacyLink).toBeVisible();
   });
 
   test("Cookie policy page is accessible", async ({ page }) => {
@@ -249,9 +236,12 @@ test.describe("Trial Mode Flow", () => {
 
     await page.goto("/cookies");
 
-    // Cookie policy should be visible
-    await expect(page.locator("text=Cookie Policy")).toBeVisible();
-    await expect(page.locator("text=Cookie Essenziali")).toBeVisible();
+    // Cookie policy should be visible (use heading to avoid multiple matches)
+    await expect(
+      page.getByRole("heading", { name: /Cookie Policy/i }).first(),
+    ).toBeVisible();
+    // Use first() to avoid strict mode violation - text appears multiple times
+    await expect(page.locator("text=Cookie Essenziali").first()).toBeVisible();
   });
 
   // Skip: /settings is not a route - settings is a view within the main app at /

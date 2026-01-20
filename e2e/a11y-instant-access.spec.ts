@@ -59,7 +59,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
   });
 
@@ -82,7 +82,10 @@ test.describe("A11y Instant Access - Quick Panel", () => {
     ];
 
     for (const profile of profiles) {
-      const profileBtn = page.locator(`button:has-text("${profile}")`);
+      // Use aria-label for exact match to avoid "Motorio" matching "Motorio+"
+      const profileBtn = page.locator(
+        `button[aria-label="Attiva profilo ${profile}"]`,
+      );
       await expect(profileBtn).toBeVisible();
     }
   });
@@ -96,7 +99,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
 
     await page.keyboard.press("Escape");
@@ -112,7 +115,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
 
     // Click outside
@@ -177,8 +180,8 @@ test.describe("A11y Instant Access - Profile Activation", () => {
     // Close panel
     await page.keyboard.press("Escape");
 
-    // Check for active indicator (green dot)
-    const indicator = button.locator(".bg-green-500");
+    // Check for active indicator (green dot with bg-green-400 class)
+    const indicator = button.locator(".bg-green-400");
     await expect(indicator).toBeVisible();
   });
 
@@ -269,7 +272,7 @@ test.describe("A11y Instant Access - Keyboard Navigation", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
   });
 
