@@ -7,7 +7,6 @@
 
 import { logger } from "@/lib/logger";
 import { notifyAdmin } from "./admin-notifier";
-import { storeEscalationEvent } from "./db-storage";
 import {
   trackJailbreakAttempt,
   clearSessionTracking,
@@ -21,6 +20,20 @@ import type {
   EscalationConfig,
 } from "./types";
 import { DEFAULT_ESCALATION_CONFIG } from "./types";
+
+/**
+ * Lazy import for DB storage (server-only)
+ */
+async function storeEscalationEvent(
+  event: EscalationEvent,
+  storeInDb: boolean,
+): Promise<void> {
+  if (typeof window !== "undefined" || !storeInDb) {
+    return;
+  }
+  const { storeEscalationEvent: store } = await import("./db-storage");
+  return store(event, storeInDb);
+}
 
 const log = logger.child({ module: "escalation-service" });
 
@@ -71,6 +84,36 @@ function hashSessionId(sessionId: string): string {
 }
 
 /**
+ * Sanitize content snippet to remove PII
+ * Redacts: email addresses, phone numbers, names patterns
+ */
+function sanitizeContentSnippet(
+  content: string | undefined,
+  maxLength = 200,
+): string | undefined {
+  if (!content) return undefined;
+
+  // Redact email addresses
+  let sanitized = content.replace(
+    /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/gi,
+    "[EMAIL_REDACTED]",
+  );
+
+  // Redact phone numbers (various formats)
+  sanitized = sanitized.replace(
+    /\b(?:\+?1[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}\b/g,
+    "[PHONE_REDACTED]",
+  );
+
+  // Truncate to max length
+  if (sanitized.length > maxLength) {
+    sanitized = sanitized.substring(0, maxLength - 3) + "...";
+  }
+
+  return sanitized;
+}
+
+/**
  * Create an escalation event
  */
 function createEscalationEvent(
@@ -116,7 +159,7 @@ export async function escalateCrisisDetected(
     metadata: {
       reason: "Crisis keywords detected (self-harm, suicide ideation)",
       contextType: "user_input",
-      contentSnippet: options.contentSnippet,
+      contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       confidence: 1.0,
     },
   });
@@ -145,7 +188,7 @@ export async function escalateRepeatedJailbreak(
     metadata: {
       reason: `${attemptCount} jailbreak attempts (threshold: ${escalationConfig.jailbreakThreshold})`,
       contextType: "user_input",
-      contentSnippet: options.contentSnippet,
+      contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       jailbreakAttemptCount: attemptCount,
     },
   });
@@ -178,7 +221,7 @@ export async function escalateSevereContentFilter(
     metadata: {
       reason: `Critical filter violation: ${filterCategory}`,
       contextType: "user_input",
-      contentSnippet: options.contentSnippet,
+      contentSnippet: sanitizeContentSnippet(options.contentSnippet),
       confidence: options.confidence || 0.95,
     },
   });
@@ -237,6 +280,13 @@ export function getRecentEscalations(limitMinutes = 60): EscalationEvent[] {
  */
 export function getUnresolvedEscalations(): EscalationEvent[] {
   return escalationBuffer.filter((e) => !e.resolved);
+}
+
+/**
+ * Clear all escalation buffer (for testing only)
+ */
+export function clearEscalationBuffer(): void {
+  escalationBuffer.length = 0;
 }
 
 /**

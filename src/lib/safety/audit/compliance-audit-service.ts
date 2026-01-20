@@ -79,7 +79,9 @@ export function recordComplianceEvent(
     severity,
     regulatoryContext,
     userContext,
-    eventDetails: options.eventDetails || {},
+    eventDetails: options.eventDetails
+      ? sanitizeEventDetails(options.eventDetails)
+      : {},
     mitigationApplied,
     outcome,
     maestroId: options.maestroId,
@@ -429,6 +431,30 @@ function anonymizeUserId(userId: string): string {
   );
 }
 
+/**
+ * Sanitize event details to remove PII fields (GDPR compliance)
+ */
+function sanitizeEventDetails(
+  details: Record<string, unknown>,
+): Record<string, unknown> {
+  const piiFields = ["userId", "email", "name", "phone", "address", "ip"];
+  const sanitized: Record<string, unknown> = {};
+
+  for (const [key, value] of Object.entries(details)) {
+    if (piiFields.includes(key.toLowerCase())) {
+      // Redact PII fields
+      sanitized[key] = "[REDACTED]";
+    } else if (typeof value === "string" && key.toLowerCase().includes("id")) {
+      // Anonymize any *Id fields that might contain user identifiers
+      sanitized[key] = anonymizeUserId(value);
+    } else {
+      sanitized[key] = value;
+    }
+  }
+
+  return sanitized;
+}
+
 function buildRegulatoryContext(
   eventType: ComplianceAuditEntry["eventType"],
   override?: Partial<RegulatoryContext>,
@@ -557,6 +583,13 @@ function flushComplianceBuffer(): void {
   });
   // In production, this would write to persistent storage (database)
   // For now, entries remain in buffer for retrieval
+}
+
+/**
+ * Clear compliance buffer (for testing only)
+ */
+export function clearComplianceBuffer(): void {
+  complianceBuffer.length = 0;
 }
 
 function generateComplianceSummary(

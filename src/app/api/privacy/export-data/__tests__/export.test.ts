@@ -17,7 +17,7 @@ vi.mock("@/lib/auth/session-auth", () => ({
 
 // Mock the helpers
 vi.mock("../helpers", async (importOriginal) => {
-  const actual = await importOriginal();
+  const actual = (await importOriginal()) as Record<string, unknown>;
   return {
     ...actual,
     canUserExport: vi.fn(),

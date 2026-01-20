@@ -87,25 +87,21 @@ export {
   type SafetyMetrics,
 } from "./monitoring";
 
-// Human Escalation Pathway (F-06 - AI Act Article 14)
-export {
-  initializeEscalationService,
-  escalateCrisisDetected,
-  escalateRepeatedJailbreak,
-  escalateSevereContentFilter,
-  trackJailbreakAttempt,
-  getJailbreakAttemptCount,
-  clearSessionEscalations,
-  resolveEscalation,
-  getRecentEscalations,
-  getUnresolvedEscalations,
-  getEscalationConfig,
-  type EscalationEvent,
-  type EscalationTrigger,
-  type EscalationSeverity,
-  type EscalationMetadata,
-  type EscalationConfig,
-} from "./escalation";
+// ============================================================================
+// SERVER-ONLY MODULES - Import directly when needed (not via barrel export)
+// ============================================================================
+// Human Escalation (F-06 - AI Act Article 14):
+//   import { escalateCrisisDetected, ... } from '@/lib/safety/escalation';
+//
+// DB queries:
+//   import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';
+// ============================================================================
 
-// Server-only DB functions - import directly when needed:
-// import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';
+// Re-export types only (no runtime code)
+export type {
+  EscalationEvent,
+  EscalationTrigger,
+  EscalationSeverity,
+  EscalationMetadata,
+  EscalationConfig,
+} from "./escalation/types";
