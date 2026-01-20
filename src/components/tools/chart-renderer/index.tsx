@@ -3,24 +3,46 @@
  * Renders various chart types using Recharts
  */
 
-'use client';
+"use client";
 
-import { useMemo } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo } from "react";
+import { useTheme } from "next-themes";
+import { motion } from "framer-motion";
 import {
-  LineChart, Line, BarChart, Bar, AreaChart, Area,
-  ScatterChart, Scatter, PieChart, Pie, Cell,
-  XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
-} from 'recharts';
-import { cn } from '@/lib/utils';
-import type { ChartRequest } from '@/types';
-import { ChartRendererProps, defaultColors, tooltipStyle, legendStyle } from './types';
-import { AccessibleChartTable, AccessiblePieTable } from './accessible-table';
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  AreaChart,
+  Area,
+  ScatterChart,
+  Scatter,
+  PieChart,
+  Pie,
+  Cell,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import { cn } from "@/lib/utils";
+import type { ChartRequest } from "@/types";
+import {
+  ChartRendererProps,
+  defaultColors,
+  getTooltipStyle,
+  legendStyle,
+  getGridColor,
+  getAxisColor,
+} from "./types";
+import { AccessibleChartTable, AccessiblePieTable } from "./accessible-table";
 
-export { type ChartRendererProps } from './types';
+export { type ChartRendererProps } from "./types";
 
 function transformChartData(request: ChartRequest) {
-  if (request.type === 'pie' || request.type === 'doughnut') {
+  if (request.type === "pie" || request.type === "doughnut") {
     return request.data.labels.map((label, index) => ({
       name: label,
       value: request.data.datasets[0]?.data[index] || 0,
@@ -37,81 +59,142 @@ function transformChartData(request: ChartRequest) {
 }
 
 export function ChartRenderer({ request, className }: ChartRendererProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const chartData = useMemo(() => transformChartData(request), [request]);
-  const commonProps = { data: chartData, margin: { top: 5, right: 30, left: 20, bottom: 5 } };
+  const commonProps = {
+    data: chartData,
+    margin: { top: 5, right: 30, left: 20, bottom: 5 },
+  };
+  const tooltipStyle = getTooltipStyle(isDark);
+  const gridColor = getGridColor(isDark);
+  const axisColor = getAxisColor(isDark);
 
   const renderChart = () => {
     switch (request.type) {
-      case 'line':
+      case "line":
         return (
-          <LineChart {...commonProps} aria-label={request.title || 'Line chart'}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
-            <YAxis stroke="#94a3b8" fontSize={12} />
+          <LineChart
+            {...commonProps}
+            aria-label={request.title || "Line chart"}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+            <XAxis dataKey="name" stroke={axisColor} fontSize={12} />
+            <YAxis stroke={axisColor} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
-              <Line key={dataset.label} type="monotone" dataKey={dataset.label}
-                stroke={dataset.color || defaultColors[index % defaultColors.length]} strokeWidth={2}
-                dot={{ fill: dataset.color || defaultColors[index % defaultColors.length] }} />
+              <Line
+                key={dataset.label}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={
+                  dataset.color || defaultColors[index % defaultColors.length]
+                }
+                strokeWidth={2}
+                dot={{
+                  fill:
+                    dataset.color ||
+                    defaultColors[index % defaultColors.length],
+                }}
+              />
             ))}
           </LineChart>
         );
 
-      case 'area':
+      case "area":
         return (
-          <AreaChart {...commonProps} aria-label={request.title || 'Area chart'}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
-            <YAxis stroke="#94a3b8" fontSize={12} />
+          <AreaChart
+            {...commonProps}
+            aria-label={request.title || "Area chart"}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+            <XAxis dataKey="name" stroke={axisColor} fontSize={12} />
+            <YAxis stroke={axisColor} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
-              <Area key={dataset.label} type="monotone" dataKey={dataset.label}
-                stroke={dataset.color || defaultColors[index % defaultColors.length]}
-                fill={dataset.color || defaultColors[index % defaultColors.length]} fillOpacity={0.6} />
+              <Area
+                key={dataset.label}
+                type="monotone"
+                dataKey={dataset.label}
+                stroke={
+                  dataset.color || defaultColors[index % defaultColors.length]
+                }
+                fill={
+                  dataset.color || defaultColors[index % defaultColors.length]
+                }
+                fillOpacity={0.6}
+              />
             ))}
           </AreaChart>
         );
 
-      case 'bar':
+      case "bar":
         return (
-          <BarChart {...commonProps} aria-label={request.title || 'Bar chart'}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
-            <YAxis stroke="#94a3b8" fontSize={12} />
+          <BarChart {...commonProps} aria-label={request.title || "Bar chart"}>
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+            <XAxis dataKey="name" stroke={axisColor} fontSize={12} />
+            <YAxis stroke={axisColor} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
-              <Bar key={dataset.label} dataKey={dataset.label}
-                fill={dataset.color || defaultColors[index % defaultColors.length]} radius={[8, 8, 0, 0]} />
+              <Bar
+                key={dataset.label}
+                dataKey={dataset.label}
+                fill={
+                  dataset.color || defaultColors[index % defaultColors.length]
+                }
+                radius={[8, 8, 0, 0]}
+              />
             ))}
           </BarChart>
         );
 
-      case 'scatter':
+      case "scatter":
         return (
-          <ScatterChart {...commonProps} aria-label={request.title || 'Scatter chart'}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-            <XAxis dataKey="name" stroke="#94a3b8" fontSize={12} />
-            <YAxis stroke="#94a3b8" fontSize={12} />
+          <ScatterChart
+            {...commonProps}
+            aria-label={request.title || "Scatter chart"}
+          >
+            <CartesianGrid strokeDasharray="3 3" stroke={gridColor} />
+            <XAxis dataKey="name" stroke={axisColor} fontSize={12} />
+            <YAxis stroke={axisColor} fontSize={12} />
             <Tooltip contentStyle={tooltipStyle} />
             <Legend wrapperStyle={legendStyle} />
             {request.data.datasets.map((dataset, index) => (
-              <Scatter key={dataset.label} name={dataset.label} dataKey={dataset.label}
-                fill={dataset.color || defaultColors[index % defaultColors.length]} />
+              <Scatter
+                key={dataset.label}
+                name={dataset.label}
+                dataKey={dataset.label}
+                fill={
+                  dataset.color || defaultColors[index % defaultColors.length]
+                }
+              />
             ))}
           </ScatterChart>
         );
 
-      case 'pie':
+      case "pie":
         return (
-          <PieChart aria-label={request.title || 'Pie chart'}>
-            <Pie data={chartData} cx="50%" cy="50%" labelLine={false}
-              label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-              outerRadius={100} fill="#8884d8" dataKey="value">
+          <PieChart aria-label={request.title || "Pie chart"}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) =>
+                `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+              }
+              outerRadius={100}
+              fill="#8884d8"
+              dataKey="value"
+            >
               {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={defaultColors[index % defaultColors.length]}
+                />
               ))}
             </Pie>
             <Tooltip contentStyle={tooltipStyle} />
@@ -119,14 +202,27 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
           </PieChart>
         );
 
-      case 'doughnut':
+      case "doughnut":
         return (
-          <PieChart aria-label={request.title || 'Doughnut chart'}>
-            <Pie data={chartData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} labelLine={false}
-              label={({ name, percent }) => `${name}: ${((percent || 0) * 100).toFixed(0)}%`}
-              fill="#8884d8" dataKey="value">
+          <PieChart aria-label={request.title || "Doughnut chart"}>
+            <Pie
+              data={chartData}
+              cx="50%"
+              cy="50%"
+              innerRadius={60}
+              outerRadius={100}
+              labelLine={false}
+              label={({ name, percent }) =>
+                `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+              }
+              fill="#8884d8"
+              dataKey="value"
+            >
               {chartData.map((_, index) => (
-                <Cell key={`cell-${index}`} fill={defaultColors[index % defaultColors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={defaultColors[index % defaultColors.length]}
+                />
               ))}
             </Pie>
             <Tooltip contentStyle={tooltipStyle} />
@@ -139,18 +235,39 @@ export function ChartRenderer({ request, className }: ChartRendererProps) {
     }
   };
 
-  const isPieType = request.type === 'pie' || request.type === 'doughnut';
+  const isPieType = request.type === "pie" || request.type === "doughnut";
 
   return (
-    <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
-      className={cn('rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-slate-800', className)}>
-      {request.title && <h3 className="text-lg font-bold text-slate-200 mb-4">{request.title}</h3>}
-      <ResponsiveContainer width="100%" height={300}>{renderChart()}</ResponsiveContainer>
-      {isPieType ? <AccessiblePieTable request={request} /> : <AccessibleChartTable request={request} />}
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className={cn(
+        "rounded-xl border border-slate-200 dark:border-slate-700 p-4 bg-white dark:bg-slate-800",
+        className,
+      )}
+    >
+      {request.title && (
+        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-200 mb-4">
+          {request.title}
+        </h3>
+      )}
+      <ResponsiveContainer width="100%" height={300}>
+        {renderChart()}
+      </ResponsiveContainer>
+      {isPieType ? (
+        <AccessiblePieTable request={request} />
+      ) : (
+        <AccessibleChartTable request={request} />
+      )}
     </motion.div>
   );
 }
 
 export function DoughnutRenderer({ request, className }: ChartRendererProps) {
-  return <ChartRenderer request={{ ...request, type: 'doughnut' }} className={className} />;
+  return (
+    <ChartRenderer
+      request={{ ...request, type: "doughnut" }}
+      className={className}
+    />
+  );
 }

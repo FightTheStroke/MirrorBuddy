@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
 import DOMPurify from "dompurify";
 import { cn } from "@/lib/utils";
@@ -13,27 +14,44 @@ type MermaidAPI = {
   render: (id: string, code: string) => Promise<{ svg: string }>;
 };
 
-// Mermaid configuration
-const MERMAID_CONFIG = {
+// Mermaid configuration - theme-aware
+type MermaidTheme = "default" | "dark" | "neutral" | "forest" | "base";
+const getMermaidConfig = (isDark: boolean) => ({
   startOnLoad: false,
-  theme: "dark",
-  themeVariables: {
-    primaryColor: "#3b82f6",
-    primaryTextColor: "#f1f5f9",
-    primaryBorderColor: "#64748b",
-    lineColor: "#64748b",
-    secondaryColor: "#1e293b",
-    tertiaryColor: "#0f172a",
-    background: "#1e293b",
-    mainBkg: "#1e293b",
-    nodeBorder: "#64748b",
-    clusterBkg: "#0f172a",
-    clusterBorder: "#334155",
-    titleColor: "#f1f5f9",
-    edgeLabelBackground: "#1e293b",
-  },
+  theme: (isDark ? "dark" : "default") as MermaidTheme,
+  themeVariables: isDark
+    ? {
+        primaryColor: "#3b82f6",
+        primaryTextColor: "#f1f5f9",
+        primaryBorderColor: "#64748b",
+        lineColor: "#64748b",
+        secondaryColor: "#1e293b",
+        tertiaryColor: "#0f172a",
+        background: "#1e293b",
+        mainBkg: "#1e293b",
+        nodeBorder: "#64748b",
+        clusterBkg: "#0f172a",
+        clusterBorder: "#334155",
+        titleColor: "#f1f5f9",
+        edgeLabelBackground: "#1e293b",
+      }
+    : {
+        primaryColor: "#3b82f6",
+        primaryTextColor: "#1e293b",
+        primaryBorderColor: "#94a3b8",
+        lineColor: "#94a3b8",
+        secondaryColor: "#f1f5f9",
+        tertiaryColor: "#ffffff",
+        background: "#ffffff",
+        mainBkg: "#f8fafc",
+        nodeBorder: "#cbd5e1",
+        clusterBkg: "#f1f5f9",
+        clusterBorder: "#e2e8f0",
+        titleColor: "#1e293b",
+        edgeLabelBackground: "#ffffff",
+      },
   flowchart: {
-    curve: "basis",
+    curve: "basis" as const,
     padding: 20,
   },
   sequence: {
@@ -43,7 +61,7 @@ const MERMAID_CONFIG = {
     noteMargin: 10,
     messageMargin: 35,
   },
-} as const;
+});
 
 interface DiagramRendererProps {
   request: DiagramRequest;
@@ -51,12 +69,15 @@ interface DiagramRendererProps {
 }
 
 export function DiagramRenderer({ request, className }: DiagramRendererProps) {
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === "dark";
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const mermaidRef = useRef<MermaidAPI | null>(null);
   const loadingPromiseRef = useRef<Promise<MermaidAPI> | null>(null);
+  const lastThemeRef = useRef<boolean | null>(null);
 
   useEffect(() => {
     const renderDiagram = async () => {
@@ -68,14 +89,19 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         setIsLoading(true);
 
         // Lazy load mermaid library with race condition protection
-        if (!mermaidRef.current) {
-          if (!loadingPromiseRef.current) {
+        // Re-initialize if theme changed
+        const themeChanged =
+          lastThemeRef.current !== null && lastThemeRef.current !== isDark;
+        if (!mermaidRef.current || themeChanged) {
+          if (!loadingPromiseRef.current || themeChanged) {
             loadingPromiseRef.current = import("mermaid").then((module) => {
-              module.default.initialize(MERMAID_CONFIG);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              module.default.initialize(getMermaidConfig(isDark) as any);
               return module.default;
             });
           }
           mermaidRef.current = await loadingPromiseRef.current;
+          lastThemeRef.current = isDark;
         }
 
         // Clear previous content
@@ -106,21 +132,21 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
     };
 
     renderDiagram();
-  }, [request.code]);
+  }, [request.code, isDark]);
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
       className={cn(
-        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800",
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
         className,
       )}
     >
       {/* Title */}
       {request.title && (
-        <div className="px-4 py-2 border-b border-slate-700 bg-slate-800/50">
-          <h3 className="text-sm font-medium text-slate-200">
+        <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50">
+          <h3 className="text-sm font-medium text-slate-800 dark:text-slate-200">
             {request.title}
           </h3>
         </div>
@@ -129,7 +155,7 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
       {/* Diagram */}
       <div className="p-4">
         {error ? (
-          <div className="p-4 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
+          <div className="p-4 rounded-lg bg-red-100 dark:bg-red-900/20 border border-red-300 dark:border-red-800 text-red-600 dark:text-red-400 text-sm">
             <strong>Diagram Error:</strong> {error}
           </div>
         ) : (
@@ -138,18 +164,18 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
             className={cn(
               "flex justify-center items-center min-h-[200px]",
               (isLoading || !rendered) &&
-                "animate-pulse bg-slate-700/50 rounded-lg",
+                "animate-pulse bg-slate-200 dark:bg-slate-700/50 rounded-lg",
             )}
           />
         )}
       </div>
 
       {/* Source code toggle */}
-      <details className="border-t border-slate-700">
-        <summary className="px-4 py-2 text-xs text-slate-400 cursor-pointer hover:bg-slate-700/50">
+      <details className="border-t border-slate-200 dark:border-slate-700">
+        <summary className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50">
           View source
         </summary>
-        <pre className="p-4 text-xs text-slate-400 overflow-x-auto bg-slate-900/50">
+        <pre className="p-4 text-xs text-slate-600 dark:text-slate-400 overflow-x-auto bg-slate-100 dark:bg-slate-900/50">
           {request.code}
         </pre>
       </details>

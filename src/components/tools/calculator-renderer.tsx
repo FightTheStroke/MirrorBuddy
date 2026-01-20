@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import type { CalculatorData, CalculatorStep } from '@/types';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import type { CalculatorData, CalculatorStep } from "@/types";
 
 interface CalculatorRendererProps {
   data: CalculatorData;
@@ -12,7 +12,7 @@ interface CalculatorRendererProps {
 
 export function CalculatorRenderer({
   data,
-  className
+  className,
 }: CalculatorRendererProps) {
   const [expandedSteps, setExpandedSteps] = useState(true);
 
@@ -21,30 +21,31 @@ export function CalculatorRenderer({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800',
-        className
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-800",
+        className,
       )}
     >
       {/* Expression and Result */}
       <div className="p-6 space-y-4">
         {/* Expression */}
-        <div className="text-slate-400 text-sm font-mono">
+        <div className="text-slate-600 dark:text-slate-400 text-sm font-mono">
           {data.expression}
         </div>
 
         {/* Result */}
         <div className="flex items-center justify-center min-h-[60px]">
           <div className="text-4xl font-bold text-emerald-400">
-            {typeof data.result === 'number'
-              ? data.result.toLocaleString('it-IT', { maximumFractionDigits: 10 })
-              : String(data.result)
-            }
+            {typeof data.result === "number"
+              ? data.result.toLocaleString("it-IT", {
+                  maximumFractionDigits: 10,
+                })
+              : String(data.result)}
           </div>
         </div>
 
         {/* LaTeX formula if available */}
         {data.latex && (
-          <div className="text-slate-300 text-center text-sm font-mono">
+          <div className="text-slate-700 dark:text-slate-300 text-center text-sm font-mono">
             {data.latex}
           </div>
         )}
@@ -52,21 +53,25 @@ export function CalculatorRenderer({
 
       {/* Step-by-step breakdown */}
       {data.steps && data.steps.length > 0 && (
-        <div className="border-t border-slate-700">
+        <div className="border-t border-slate-200 dark:border-slate-700">
           <button
             type="button"
             onClick={() => setExpandedSteps(!expandedSteps)}
-            className="w-full px-4 py-3 flex items-center justify-between bg-slate-800/50 hover:bg-slate-800/70 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-800/70 transition-colors"
             aria-expanded={expandedSteps}
-            aria-label={expandedSteps ? 'Nascondi passaggi di calcolo' : 'Mostra passaggi di calcolo'}
+            aria-label={
+              expandedSteps
+                ? "Nascondi passaggi di calcolo"
+                : "Mostra passaggi di calcolo"
+            }
           >
-            <span className="text-sm font-medium text-slate-300">
+            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
               Passaggi di calcolo ({data.steps.length})
             </span>
             <svg
               className={cn(
-                'w-5 h-5 text-slate-400 transition-transform',
-                expandedSteps ? 'rotate-180' : ''
+                "w-5 h-5 text-slate-500 dark:text-slate-400 transition-transform",
+                expandedSteps ? "rotate-180" : "",
               )}
               fill="none"
               viewBox="0 0 24 24"
@@ -93,8 +98,10 @@ export function CalculatorRenderer({
 
       {/* Description */}
       {data.description && (
-        <div className="px-4 py-3 border-t border-slate-700 bg-slate-800/50">
-          <p className="text-sm text-slate-400">{data.description}</p>
+        <div className="px-4 py-3 border-t border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800/50">
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            {data.description}
+          </p>
         </div>
       )}
     </motion.div>
@@ -108,20 +115,22 @@ interface CalculatorStepItemProps {
 
 function CalculatorStepItem({ step }: CalculatorStepItemProps) {
   return (
-    <div className="p-3 rounded-lg bg-slate-900/50 border border-slate-700">
+    <div className="p-3 rounded-lg bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700">
       {/* Step number and description */}
       <div className="flex items-start gap-3 mb-2">
         <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold">
           {step.stepNumber}
         </div>
         <div className="flex-1">
-          <p className="text-sm text-slate-300">{step.description}</p>
+          <p className="text-sm text-slate-700 dark:text-slate-300">
+            {step.description}
+          </p>
         </div>
       </div>
 
       {/* Expression */}
       <div className="ml-9 space-y-2">
-        <div className="text-sm font-mono text-slate-400">
+        <div className="text-sm font-mono text-slate-600 dark:text-slate-400">
           {step.expression}
         </div>
 
@@ -138,10 +147,10 @@ function CalculatorStepItem({ step }: CalculatorStepItemProps) {
 
         {/* Result */}
         <div className="text-base font-semibold text-emerald-400">
-          = {typeof step.result === 'number'
-            ? step.result.toLocaleString('it-IT', { maximumFractionDigits: 10 })
-            : String(step.result)
-          }
+          ={" "}
+          {typeof step.result === "number"
+            ? step.result.toLocaleString("it-IT", { maximumFractionDigits: 10 })
+            : String(step.result)}
         </div>
       </div>
     </div>
