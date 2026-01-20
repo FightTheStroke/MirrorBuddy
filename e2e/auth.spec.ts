@@ -26,9 +26,13 @@ test.describe("Login/Logout Authentication Flow", () => {
     await page.goto("/login");
 
     // Fill form with invalid credentials (login uses email field)
-    await page.fill("input#email", "invaliduser");
+    // Use valid email format to pass browser validation, but non-existent user
+    await page.fill("input#email", "nonexistent@test.com");
     await page.fill('input[type="password"]', "wrongpassword123");
     await page.click('button[type="submit"]');
+
+    // Wait for API response
+    await page.waitForTimeout(1000);
 
     // Expect error message to appear (Italian: "Credenziali non valide" or similar)
     await expect(page.locator('[role="alert"]')).toBeVisible();
