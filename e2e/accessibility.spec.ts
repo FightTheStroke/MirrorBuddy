@@ -1,10 +1,22 @@
 /**
- * Accessibility Tests - WCAG 2.1 AA Compliance
+ * E2E Tests: Accessibility - Consolidated
  *
- * Comprehensive automated accessibility testing for MirrorBuddy.
- * Uses axe-core for WCAG 2.1 AA validation on all main pages.
+ * Comprehensive WCAG 2.1 AA compliance and accessibility feature testing.
+ * Includes axe-core validation, keyboard navigation, screen reader support,
+ * and the instant accessibility panel feature (ADR 0060).
+ *
+ * Test scenarios:
+ * - WCAG: axe-core validation on 13 main pages
+ * - Keyboard: Tab navigation, focus indicators, skip links, escape handling
+ * - Screen Reader: Heading hierarchy, alt text, labels, ARIA roles
+ * - Instant Access: Floating button, quick panel, 7 DSA profile presets
+ * - Persistence: Cookie storage, settings reload
  *
  * Run: npx playwright test e2e/accessibility.spec.ts
+ *
+ * Consolidated from:
+ * - accessibility.spec.ts (WCAG and core a11y tests)
+ * - a11y-instant-access.spec.ts (instant access feature tests)
  */
 
 import { test, expect } from "@playwright/test";
@@ -34,6 +46,10 @@ const SKIP_RULES: string[] = [
   "color-contrast",
 ];
 
+// ============================================================================
+// WCAG 2.1 AA COMPLIANCE
+// ============================================================================
+
 test.describe("WCAG 2.1 AA Compliance", () => {
   for (const page of PAGES_TO_TEST) {
     test(`${page.name} (${page.path}) passes axe-core`, async ({
@@ -41,8 +57,6 @@ test.describe("WCAG 2.1 AA Compliance", () => {
     }) => {
       await playwrightPage.goto(page.path);
       await playwrightPage.waitForLoadState("networkidle");
-
-      // Wait for dynamic content to load
       await playwrightPage.waitForTimeout(500);
 
       const results = await new AxeBuilder({ page: playwrightPage })
@@ -50,7 +64,6 @@ test.describe("WCAG 2.1 AA Compliance", () => {
         .disableRules(SKIP_RULES)
         .analyze();
 
-      // Log violations for debugging
       if (results.violations.length > 0) {
         console.log(`\n=== Accessibility violations on ${page.path} ===`);
         for (const violation of results.violations) {
@@ -75,19 +88,21 @@ test.describe("WCAG 2.1 AA Compliance", () => {
   }
 });
 
+// ============================================================================
+// KEYBOARD NAVIGATION
+// ============================================================================
+
 test.describe("Keyboard Navigation", () => {
   test("can navigate homepage with keyboard only", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Tab through interactive elements
     const focusableSelector =
       'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
     const focusableCount = await page.locator(focusableSelector).count();
 
     expect(focusableCount).toBeGreaterThan(0);
 
-    // Verify first Tab moves focus to a focusable element
     await page.keyboard.press("Tab");
     const firstFocused = await page.evaluate(
       () => document.activeElement?.tagName,
@@ -96,12 +111,10 @@ test.describe("Keyboard Navigation", () => {
       firstFocused,
     );
 
-    // Tab through several elements to verify focus moves
     for (let i = 0; i < Math.min(5, focusableCount - 1); i++) {
       await page.keyboard.press("Tab");
     }
 
-    // Verify focus is still on a focusable element
     const currentFocused = await page.evaluate(
       () => document.activeElement?.tagName,
     );
@@ -112,11 +125,9 @@ test.describe("Keyboard Navigation", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Find first link/button
     const firstInteractive = page.locator("a, button").first();
     await firstInteractive.focus();
 
-    // Check that focus is visible (outline or ring)
     const styles = await firstInteractive.evaluate((el) => {
       const computed = window.getComputedStyle(el);
       return {
@@ -126,7 +137,6 @@ test.describe("Keyboard Navigation", () => {
       };
     });
 
-    // Either outline or box-shadow should indicate focus
     const hasFocusIndicator =
       (styles.outlineWidth !== "0px" && styles.outline !== "none") ||
       styles.boxShadow !== "none";
@@ -138,53 +148,41 @@ test.describe("Keyboard Navigation", () => {
     await page.goto("/astuccio");
     await page.waitForLoadState("networkidle");
 
-    // Dismiss any existing overlays (modal, a11y panel, etc.)
-    // Try multiple times as some overlays may need multiple dismissals
     for (let i = 0; i < 3; i++) {
       await page.keyboard.press("Escape");
       await page.waitForTimeout(200);
     }
 
-    // Check if there's still an overlay blocking interactions
     const overlay = page.locator('[data-state="open"].fixed.inset-0');
     if (await overlay.isVisible({ timeout: 1000 }).catch(() => false)) {
-      // Overlay won't close - skip test (page may be in modal state from auth/onboarding)
       return;
     }
 
-    // Try to find a tool card button (exclude the floating a11y button)
     const toolCard = page
       .locator('button:not([aria-label*="accessibilità"])')
       .filter({ hasText: /PDF|Webcam|Chart|Formula|Summary/i })
       .first();
 
     if (!(await toolCard.isVisible({ timeout: 3000 }).catch(() => false))) {
-      // No tool cards found, skip this test
       return;
     }
 
-    // Use force click to bypass any remaining overlay issues
     await toolCard.click({ force: true });
     await page.waitForTimeout(500);
 
-    // Check if a dialog opened
     const dialog = page.locator('[role="dialog"], [aria-modal="true"]');
     const isDialogVisible = await dialog.isVisible().catch(() => false);
 
     if (!isDialogVisible) {
-      // No dialog opened from the click, skip assertion
       return;
     }
 
-    // Try to close with Escape
     await page.keyboard.press("Escape");
     await page.waitForTimeout(500);
 
-    // Check if closed
     let stillVisible = await dialog.isVisible().catch(() => false);
 
     if (stillVisible) {
-      // Try clicking the close button if present
       const closeButton = dialog.locator(
         'button[aria-label*="close"], button[aria-label*="chiudi"], [data-dismiss]',
       );
@@ -196,14 +194,11 @@ test.describe("Keyboard Navigation", () => {
     }
 
     if (stillVisible) {
-      // Try clicking outside as last resort
       await page.mouse.click(10, 10);
       await page.waitForTimeout(300);
       stillVisible = await dialog.isVisible().catch(() => false);
     }
 
-    // If dialog is still visible after all attempts, it might be a non-dismissible dialog
-    // Just verify the page is still interactive.
     if (stillVisible) {
       const pageTitle = await page.title();
       expect(pageTitle.length).toBeGreaterThan(0);
@@ -212,8 +207,6 @@ test.describe("Keyboard Navigation", () => {
 
   test("skip link available for keyboard users", async ({ page }) => {
     await page.goto("/");
-
-    // Press Tab - first element should be skip link (if exists)
     await page.keyboard.press("Tab");
 
     const activeElement = await page.evaluate(() => {
@@ -224,7 +217,6 @@ test.describe("Keyboard Navigation", () => {
       };
     });
 
-    // Check if skip link exists (common patterns)
     const isSkipLink =
       activeElement.text.includes("skip") ||
       activeElement.text.includes("salta") ||
@@ -232,7 +224,6 @@ test.describe("Keyboard Navigation", () => {
       activeElement.href.includes("#main") ||
       activeElement.href.includes("#content");
 
-    // This is a soft check - log warning if no skip link
     if (!isSkipLink) {
       console.warn(
         "No skip link found - consider adding one for keyboard users",
@@ -240,6 +231,10 @@ test.describe("Keyboard Navigation", () => {
     }
   });
 });
+
+// ============================================================================
+// SCREEN READER SUPPORT
+// ============================================================================
 
 test.describe("Screen Reader Support", () => {
   test("page has proper heading hierarchy", async ({ page }) => {
@@ -254,11 +249,9 @@ test.describe("Screen Reader Support", () => {
       }));
     });
 
-    // Should have at least one h1
     const h1Count = headings.filter((h) => h.level === 1).length;
     expect(h1Count, "Page should have exactly one h1").toBe(1);
 
-    // Heading levels should not skip (e.g., h1 -> h3)
     let prevLevel = 0;
     for (const heading of headings) {
       if (heading.level > prevLevel + 1 && prevLevel !== 0) {
@@ -277,11 +270,7 @@ test.describe("Screen Reader Support", () => {
     const imagesWithoutAlt = await page.evaluate(() => {
       const images = document.querySelectorAll("img");
       return Array.from(images)
-        .filter((img) => {
-          // Decorative images can have empty alt=""
-          // But missing alt attribute is a violation
-          return !img.hasAttribute("alt");
-        })
+        .filter((img) => !img.hasAttribute("alt"))
         .map((img) => img.src.substring(0, 100));
     });
 
@@ -304,7 +293,6 @@ test.describe("Screen Reader Support", () => {
           const ariaLabelledBy = input.getAttribute("aria-labelledby");
           const hasLabel = id && document.querySelector(`label[for="${id}"]`);
           const isHidden = input.getAttribute("type") === "hidden";
-
           return !isHidden && !ariaLabel && !ariaLabelledBy && !hasLabel;
         })
         .map((input) => `${input.tagName}#${input.id || "(no-id)"}`);
@@ -328,7 +316,6 @@ test.describe("Screen Reader Support", () => {
           const ariaLabel = btn.getAttribute("aria-label");
           const ariaLabelledBy = btn.getAttribute("aria-labelledby");
           const title = btn.getAttribute("title");
-
           return !text && !ariaLabel && !ariaLabelledBy && !title;
         })
         .map((btn) => btn.outerHTML.substring(0, 100));
@@ -344,7 +331,6 @@ test.describe("Screen Reader Support", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Check for common ARIA landmarks
     const landmarks = await page.evaluate(() => {
       return {
         main: !!document.querySelector('main, [role="main"]'),
@@ -357,22 +343,23 @@ test.describe("Screen Reader Support", () => {
   });
 });
 
+// ============================================================================
+// COLOR AND CONTRAST
+// ============================================================================
+
 test.describe("Color and Contrast", () => {
   test("respects prefers-reduced-motion", async ({ page }) => {
-    // Emulate reduced motion preference
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Check that animations are disabled
     const hasMotion = await page.evaluate(() => {
-      const elements = document.querySelectorAll("*");
-      for (const el of elements) {
-        const style = window.getComputedStyle(el);
+      const elements = Array.from(document.querySelectorAll("*"));
+      for (let i = 0; i < elements.length; i++) {
+        const style = window.getComputedStyle(elements[i]);
         const animation = style.animation;
         const transition = style.transition;
 
-        // If there are animations/transitions, they should be instant
         if (
           (animation && animation !== "none" && !animation.includes("0s")) ||
           (transition && transition !== "none" && !transition.includes("0s"))
@@ -383,7 +370,6 @@ test.describe("Color and Contrast", () => {
       return false;
     });
 
-    // Soft check - log warning but don't fail (CSS may handle this differently)
     if (hasMotion) {
       console.warn(
         "Some animations may still be active with prefers-reduced-motion",
@@ -392,19 +378,258 @@ test.describe("Color and Contrast", () => {
   });
 });
 
+// ============================================================================
+// INSTANT ACCESS FEATURE (ADR 0060)
+// ============================================================================
+
+test.describe("Instant Access - Floating Button", () => {
+  test("floating button visible and WCAG compliant size", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await expect(button).toBeVisible();
+
+    const box = await button.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(44);
+    expect(box?.height).toBeGreaterThanOrEqual(44);
+  });
+
+  test("floating button visible on legal pages", async ({ page }) => {
+    const legalPages = ["/privacy", "/termini", "/cookies"];
+
+    for (const path of legalPages) {
+      await page.goto(path);
+      await page.waitForLoadState("networkidle");
+
+      const button = page.locator('button[aria-label*="accessibilità"]');
+      await expect(button).toBeVisible({ timeout: 5000 });
+    }
+  });
+
+  test("button has proper ARIA attributes", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await expect(button).toHaveAttribute("aria-expanded", "false");
+    await expect(button).toHaveAttribute("aria-controls");
+  });
+});
+
+test.describe("Instant Access - Quick Panel", () => {
+  test("clicking button opens panel with 7 profiles", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const panel = page
+      .locator('[role="dialog"]')
+      .filter({ hasText: "Accessibilità" });
+    await expect(panel).toBeVisible();
+
+    // Check for all 7 profile presets
+    const profiles = [
+      "Dislessia",
+      "ADHD",
+      "Visivo",
+      "Motorio",
+      "Autismo",
+      "Uditivo",
+      "Motorio+",
+    ];
+
+    for (const profile of profiles) {
+      const profileBtn = page.locator(
+        `button[aria-label="Attiva profilo ${profile}"]`,
+      );
+      await expect(profileBtn).toBeVisible();
+    }
+  });
+
+  test("Escape key closes panel", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const panel = page
+      .locator('[role="dialog"]')
+      .filter({ hasText: "Accessibilità" });
+    await expect(panel).toBeVisible();
+
+    await page.keyboard.press("Escape");
+    await expect(panel).not.toBeVisible();
+  });
+
+  test("clicking outside closes panel", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const panel = page
+      .locator('[role="dialog"]')
+      .filter({ hasText: "Accessibilità" });
+    await expect(panel).toBeVisible();
+
+    await page.mouse.click(10, 10);
+    await expect(panel).not.toBeVisible();
+  });
+});
+
+test.describe("Instant Access - Profile Activation", () => {
+  test("selecting dyslexia profile changes font", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
+    await dyslexiaBtn.click();
+    await page.waitForTimeout(300);
+
+    const body = page.locator("body");
+    const fontFamily = await body.evaluate(
+      (el) => window.getComputedStyle(el).fontFamily,
+    );
+    expect(fontFamily).toContain("OpenDyslexic");
+  });
+
+  test("active profile shows indicator on floating button", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const adhBtn = page.locator('button:has-text("ADHD")');
+    await adhBtn.click();
+
+    await page.keyboard.press("Escape");
+
+    const indicator = button.locator(".bg-green-400");
+    await expect(indicator).toBeVisible();
+  });
+
+  test("reset button clears profile", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
+    await dyslexiaBtn.click();
+
+    const resetBtn = page.locator('button:has-text("Ripristina")');
+    await resetBtn.click();
+    await page.waitForTimeout(300);
+
+    const body = page.locator("body");
+    const fontFamily = await body.evaluate(
+      (el) => window.getComputedStyle(el).fontFamily,
+    );
+    expect(fontFamily).not.toContain("OpenDyslexic");
+  });
+});
+
+test.describe("Instant Access - Cookie Persistence", () => {
+  test("settings persist after page refresh", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
+    await dyslexiaBtn.click();
+    await page.waitForTimeout(500);
+
+    await page.reload();
+    await page.waitForLoadState("networkidle");
+
+    const body = page.locator("body");
+    const fontFamily = await body.evaluate(
+      (el) => window.getComputedStyle(el).fontFamily,
+    );
+    expect(fontFamily).toContain("OpenDyslexic");
+  });
+
+  test("a11y cookie is set with correct name", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    const visualBtn = page.locator('button:has-text("Visivo")');
+    await visualBtn.click();
+    await page.waitForTimeout(500);
+
+    const cookies = await page.context().cookies();
+    const a11yCookie = cookies.find((c) => c.name === "mirrorbuddy-a11y");
+    expect(a11yCookie).toBeDefined();
+  });
+});
+
+test.describe("Instant Access - Panel Keyboard Navigation", () => {
+  test("can open panel with keyboard", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.focus();
+    await page.keyboard.press("Enter");
+
+    const panel = page
+      .locator('[role="dialog"]')
+      .filter({ hasText: "Accessibilità" });
+    await expect(panel).toBeVisible();
+  });
+
+  test("focus trap keeps focus within panel", async ({ page }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+
+    const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.click();
+
+    for (let i = 0; i < 20; i++) {
+      await page.keyboard.press("Tab");
+    }
+
+    const activeElement = await page.evaluate(() => {
+      const el = document.activeElement;
+      const panel = document.querySelector('[role="dialog"]');
+      return panel?.contains(el);
+    });
+
+    expect(activeElement).toBe(true);
+  });
+});
+
+// ============================================================================
+// DSA PROFILE SUPPORT
+// ============================================================================
+
 test.describe("DSA Profile Support", () => {
   test("dyslexia font toggle works", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    // Check if accessibility settings are accessible
-    // This tests that the profile system is functional
     const body = page.locator("body");
     const initialFont = await body.evaluate(
       (el) => window.getComputedStyle(el).fontFamily,
     );
 
-    // Font should be readable (not empty)
     expect(initialFont.length).toBeGreaterThan(0);
   });
 });
