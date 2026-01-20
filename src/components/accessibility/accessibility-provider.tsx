@@ -41,14 +41,25 @@ export function AccessibilityProvider({
 
     // Dyslexia font
     if (settings.dyslexiaFont) {
+      html.classList.add("dyslexia-font");
       body.classList.add("dyslexia-font");
+      body.style.fontFamily =
+        "OpenDyslexic, 'Comic Sans MS', 'Trebuchet MS', sans-serif";
       if (settings.extraLetterSpacing) {
+        html.classList.add("dyslexia-spacing");
         body.classList.add("dyslexia-spacing");
       }
       if (settings.increasedLineHeight) {
+        html.classList.add("dyslexia-line-height");
         body.classList.add("dyslexia-line-height");
       }
     } else {
+      body.style.fontFamily = "";
+      html.classList.remove(
+        "dyslexia-font",
+        "dyslexia-spacing",
+        "dyslexia-line-height",
+      );
       body.classList.remove(
         "dyslexia-font",
         "dyslexia-spacing",

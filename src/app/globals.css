@@ -6,7 +6,9 @@
 /* OpenDyslexic font for dyslexia support */
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');
+  src: url('/fonts/OpenDyslexic-Regular.woff2') format('woff2'),
+       url('/fonts/OpenDyslexic-Regular.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff');
   font-weight: 400;
   font-style: normal;
   font-display: optional; /* Fallback gracefully if CDN unavailable (e.g., in tests) */
@@ -14,7 +16,9 @@
 
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff');
+  src: url('/fonts/OpenDyslexic-Bold.woff2') format('woff2'),
+       url('/fonts/OpenDyslexic-Bold.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff');
   font-weight: 700;
   font-style: normal;
   font-display: optional; /* Fallback gracefully if CDN unavailable (e.g., in tests) */
@@ -22,8 +26,19 @@
 
 @font-face {
   font-family: 'OpenDyslexic';
-  src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Italic.woff') format('woff');
+  src: url('/fonts/OpenDyslexic-Italic.woff2') format('woff2'),
+       url('/fonts/OpenDyslexic-Italic.woff') format('woff'),
+       url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Italic.woff') format('woff');
   font-weight: 400;
+  font-style: italic;
+  font-display: optional; /* Fallback gracefully if CDN unavailable (e.g., in tests) */
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/fonts/OpenDyslexic-Bold-Italic.woff2') format('woff2'),
+       url('/fonts/OpenDyslexic-Bold-Italic.woff') format('woff');
+  font-weight: 700;
   font-style: italic;
   font-display: optional; /* Fallback gracefully if CDN unavailable (e.g., in tests) */
 }
@@ -265,7 +280,9 @@ body {
 /* === ACCESSIBILITY STYLES === */
 
 /* Dyslexia-friendly text */
-.dyslexia-font {
+.dyslexia-font,
+.dyslexia-font body,
+.dyslexia-font * {
   font-family: 'OpenDyslexic', 'Comic Sans MS', 'Trebuchet MS', sans-serif !important;
 }
 
