@@ -130,9 +130,10 @@ test.describe("Beta Invite System", () => {
       await page.goto("/admin/invites");
 
       // Mock returns pending invites by default
-      await expect(page.locator("text=User One")).toBeVisible();
-      await expect(page.locator("text=user1@test.com")).toBeVisible();
-      await expect(page.locator("text=I love learning!")).toBeVisible();
+      // Use first() to handle strict mode when text appears in multiple places
+      await expect(page.locator("text=User One").first()).toBeVisible();
+      await expect(page.locator("text=user1@test.com").first()).toBeVisible();
+      await expect(page.locator("text=I love learning!").first()).toBeVisible();
     });
 
     test("should have approve and reject buttons for pending invites", async ({
@@ -275,8 +276,8 @@ test.describe("Beta Invite System", () => {
 
       await page.goto("/admin/invites");
 
-      // Should show the invite
-      await expect(page.locator("text=New User")).toBeVisible();
+      // Should show the invite (use first() as text may appear multiple times)
+      await expect(page.locator("text=New User").first()).toBeVisible();
 
       // Click approve (use first() in case multiple buttons exist)
       await page.locator("button:has-text('Approva')").first().click();

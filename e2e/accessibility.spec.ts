@@ -138,10 +138,19 @@ test.describe("Keyboard Navigation", () => {
     await page.goto("/astuccio");
     await page.waitForLoadState("networkidle");
 
-    // Try to find and click a button that might open a dialog
-    const toolCard = page.locator('[role="button"], button').first();
+    // First, close any existing modal/overlay by pressing Escape
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(300);
+
+    // Try to find a tool card button (exclude the floating a11y button)
+    // Tool cards have specific structure in the astuccio page
+    const toolCard = page
+      .locator('button:not([aria-label*="accessibilità"])')
+      .filter({ hasText: /PDF|Webcam|Chart|Formula|Summary/i })
+      .first();
+
     if (!(await toolCard.isVisible({ timeout: 3000 }).catch(() => false))) {
-      // No interactive elements found, skip this test
+      // No tool cards found, skip this test
       return;
     }
 
