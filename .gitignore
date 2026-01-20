@@ -92,3 +92,6 @@ REPO-HYGIENE-PLAN.md
 audit-report.txt
 .env*.local
 .security-reports/
+
+# Local analysis notes
+Plan20Jan.md
