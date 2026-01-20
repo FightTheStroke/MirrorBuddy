@@ -49,8 +49,49 @@ test.describe("Admin Mode UI Audit", () => {
       }
     });
 
+    // Set up localStorage bypasses for TOS/consent walls before navigating
+    // This allows testing the actual login flow without modal interference
+    await page.context().addInitScript(() => {
+      localStorage.setItem(
+        "mirrorbuddy-consent",
+        JSON.stringify({
+          version: "1.0",
+          acceptedAt: new Date().toISOString(),
+          essential: true,
+          analytics: false,
+          marketing: false,
+        }),
+      );
+      localStorage.setItem(
+        "mirrorbuddy-tos-accepted",
+        JSON.stringify({
+          version: "1.0",
+          acceptedAt: new Date().toISOString(),
+        }),
+      );
+    });
+
     await page.goto("/login");
     await page.waitForLoadState("networkidle");
+
+    // Dismiss any TOS modal if still present (belt-and-suspenders)
+    const tosModal = page
+      .locator('[role="dialog"]')
+      .filter({ hasText: /Termini di Servizio/i });
+    if (await tosModal.isVisible({ timeout: 1000 }).catch(() => false)) {
+      // Click the TOS checkbox and accept
+      const tosCheckbox = page.locator('#tos-checkbox, [id*="tos-checkbox"]');
+      if (await tosCheckbox.isVisible().catch(() => false)) {
+        await tosCheckbox.click();
+      }
+      const acceptButton = page
+        .locator("button")
+        .filter({ hasText: /Accetta|Conferma|Accept/i });
+      if (await acceptButton.isVisible().catch(() => false)) {
+        await acceptButton.click();
+        await page.waitForTimeout(500);
+      }
+    }
 
     // Verify login form elements exist
     await expect(page.locator("form").first()).toBeVisible();
