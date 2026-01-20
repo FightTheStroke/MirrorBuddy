@@ -54,18 +54,35 @@ export function HomeSidebar({
   trialStatus,
 }: HomeSidebarProps) {
   const { isAdmin } = useAdminStatus();
+  const handleViewChange = async (view: View) => {
+    await onViewChange(view);
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      onToggle();
+    }
+  };
 
   return (
-    <aside
-      className={cn(
-        "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
-        open ? "w-64" : "w-20",
+    <>
+      {open && (
+        <div
+          className="fixed inset-0 bg-black/40 z-30 lg:hidden"
+          onClick={onToggle}
+          aria-hidden="true"
+        />
       )}
-    >
+      <aside
+        className={cn(
+          "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
+          "w-72 max-w-[85vw] lg:max-w-none lg:w-64",
+          open
+            ? "translate-x-0 lg:w-64"
+            : "-translate-x-full lg:translate-x-0 lg:w-20",
+        )}
+      >
       {/* Logo - clickable to return home */}
       <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
         <button
-          onClick={() => onViewChange("maestri")}
+          onClick={() => handleViewChange("maestri")}
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
           aria-label="Torna alla home"
         >
@@ -163,7 +180,7 @@ export function HomeSidebar({
           return (
             <button
               key={item.id}
-              onClick={() => onViewChange(item.id)}
+              onClick={() => handleViewChange(item.id)}
               className={cn(
                 "w-full flex items-center gap-3 rounded-xl transition-all",
                 // Collapsed: center content, minimal padding
@@ -232,7 +249,7 @@ export function HomeSidebar({
       {/* Active Maestro Avatar */}
       <div className="px-4 mb-2">
         <ActiveMaestroAvatar
-          onReturnToMaestro={() => onViewChange("maestro-session")}
+          onReturnToMaestro={() => handleViewChange("maestro-session")}
         />
       </div>
 
@@ -279,5 +296,6 @@ export function HomeSidebar({
         </button>
       </div>
     </aside>
+    </>
   );
 }

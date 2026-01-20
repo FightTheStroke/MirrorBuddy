@@ -32,7 +32,7 @@ export function KnowledgeHubSidebar({
     <>
       {/* Sidebar Panel */}
       {shouldShowSidebar && (
-        <div className="w-64 flex-shrink-0 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
+        <div className="w-full lg:w-64 flex-shrink-0 bg-white dark:bg-slate-800 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 overflow-y-auto">
           <SidebarNavigation
             collections={collections}
             selectedCollectionId={selectedCollectionId}
@@ -51,7 +51,7 @@ export function KnowledgeHubSidebar({
         <button
           onClick={onToggleCollapse}
           className={cn(
-            'absolute left-0 top-1/2 -translate-y-1/2 z-10',
+            'absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden lg:flex',
             'p-1 rounded-r-lg',
             'bg-white dark:bg-slate-800 border border-l-0 border-slate-200 dark:border-slate-700',
             'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',

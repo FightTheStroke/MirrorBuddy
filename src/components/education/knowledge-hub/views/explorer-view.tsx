@@ -141,9 +141,9 @@ export function ExplorerView({
   };
 
   return (
-    <div className={cn('flex gap-4 h-full', className)}>
+    <div className={cn('flex flex-col lg:flex-row gap-4 h-full', className)}>
       {/* Folder tree sidebar */}
-      <div className="w-64 flex-shrink-0 border-r border-slate-200 dark:border-slate-700 pr-4 overflow-y-auto">
+      <div className="w-full lg:w-64 flex-shrink-0 border-b lg:border-b-0 lg:border-r border-slate-200 dark:border-slate-700 pr-0 lg:pr-4 overflow-y-auto">
         <div className="space-y-1">
           {/* All materials option */}
           <button

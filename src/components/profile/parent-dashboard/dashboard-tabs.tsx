@@ -66,7 +66,7 @@ export function DashboardTabs({
     >
       <TabsList
         className={cn(
-          "grid w-full grid-cols-5 mb-6",
+          "grid w-full grid-cols-3 sm:grid-cols-5 mb-6",
           highContrast && "bg-black border border-yellow-400",
         )}
       >

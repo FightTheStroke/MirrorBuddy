@@ -73,16 +73,16 @@ export function CalendarView({
 
   return (
     <div className={cn('p-4', className)}>
-      <div className="flex gap-6">
+      <div className="flex flex-col lg:flex-row gap-6">
         {/* Calendar grid */}
         <div className="flex-1">
           {/* Header */}
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div className="flex items-center justify-center sm:justify-start gap-2">
               <Button variant="ghost" size="icon" onClick={goToPrevMonth} aria-label="Mese precedente">
                 <ChevronLeft className="w-5 h-5" />
               </Button>
-              <h2 className="text-lg font-semibold min-w-[200px] text-center">
+              <h2 className="text-lg font-semibold min-w-[140px] text-center">
                 {MONTHS[currentDate.month]} {currentDate.year}
               </h2>
               <Button variant="ghost" size="icon" onClick={goToNextMonth} aria-label="Mese successivo">
@@ -151,13 +151,13 @@ export function CalendarView({
 
         {/* Selected day materials */}
         <AnimatePresence mode="wait">
-          {selectedDay && (
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 20 }}
-              className="w-80 flex-shrink-0 border-l border-slate-200 dark:border-slate-700 pl-6"
-            >
+            {selectedDay && (
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                className="w-full lg:w-80 flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 pt-4 lg:pt-0 lg:pl-6"
+              >
               <h3 className="font-semibold mb-4">
                 {selectedDay.date.getDate()} {MONTHS[selectedDay.date.getMonth()]}
               </h3>

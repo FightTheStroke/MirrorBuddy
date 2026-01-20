@@ -86,8 +86,8 @@ export function ConversationContent({
 
   return (
     <div className={cn(
-      "flex gap-4",
-      isVoiceActive ? "flex-1 min-w-0 flex-col" : "w-full h-full flex-col"
+      "flex flex-col lg:flex-row gap-4",
+      isVoiceActive ? "flex-1 min-w-0" : "w-full h-full"
     )}>
       {/* Main content area */}
       <div className={cn(
@@ -179,4 +179,3 @@ export function ConversationContent({
     </div>
   );
 }
-
