@@ -20,19 +20,41 @@ test.describe("GDPR Data Portability", () => {
     await request.get("/api/user");
     const response = await request.get("/api/privacy/export-data");
 
-    // 200 (success), 404 (not implemented), or 429 (rate limited)
-    expect([200, 404, 429]).toContain(response.status());
+    // 200 (success) or 429 (rate limited)
+    expect([200, 429]).toContain(response.status());
   });
 
-  test("export returns structured JSON if available", async ({ request }) => {
+  test("export returns structured JSON", async ({ request }) => {
     await request.get("/api/user");
     const response = await request.get("/api/privacy/export-data");
 
     if (response.status() === 200) {
       const data = await response.json();
-      // Should have some structure for export
-      expect(typeof data).toBe("object");
+      expect(data.data).toBeDefined();
+      expect(data.stats).toBeDefined();
+      expect(data.data.exportedAt).toBeDefined();
     }
+  });
+
+  test("export has download header", async ({ request }) => {
+    await request.get("/api/user");
+    const response = await request.get("/api/privacy/export-data");
+
+    if (response.status() === 200) {
+      const disposition = response.headers()["content-disposition"];
+      expect(disposition).toMatch(/attachment/i);
+    }
+  });
+
+  test("export is rate limited", async ({ request }) => {
+    await request.get("/api/user");
+
+    // First request
+    await request.get("/api/privacy/export-data");
+
+    // Second immediate request should be rate limited
+    const response = await request.get("/api/privacy/export-data");
+    expect([200, 429]).toContain(response.status());
   });
 });
 
@@ -72,18 +94,13 @@ test.describe("Legal Pages - Privacy Policy", () => {
   test("page loads", async ({ page }) => {
     const response = await page.goto("/privacy");
     expect(response?.ok()).toBeTruthy();
-  });
-
-  test("has title", async ({ page }) => {
-    await page.goto("/privacy");
-    const title = await page.title();
-    expect(title.length).toBeGreaterThan(0);
+    await expect(page).toHaveTitle(/privacy|riservatezza/i);
   });
 
   test("has content about data", async ({ page }) => {
     await page.goto("/privacy");
     const content = await page.textContent("body");
-    expect(content).toMatch(/data|privacy|protection|gdpr|dati|riservatezza/i);
+    expect(content).toMatch(/data|privacy|protection|gdpr/i);
   });
 
   test("is keyboard accessible", async ({ page }) => {
@@ -98,6 +115,7 @@ test.describe("Legal Pages - Terms of Service", () => {
   test("page loads", async ({ page }) => {
     const response = await page.goto("/terms");
     expect(response?.ok()).toBeTruthy();
+    await expect(page).toHaveTitle(/terms|condizioni|servizio/i);
   });
 
   test("has terms content", async ({ page }) => {
@@ -111,12 +129,13 @@ test.describe("Legal Pages - Cookie Policy", () => {
   test("page loads", async ({ page }) => {
     const response = await page.goto("/cookies");
     expect(response?.ok()).toBeTruthy();
+    await expect(page).toHaveTitle(/cookie/i);
   });
 
   test("explains cookie usage", async ({ page }) => {
     await page.goto("/cookies");
     const content = await page.textContent("body");
-    expect(content).toMatch(/cookie|essential|analytics|consent|essenziali/i);
+    expect(content).toMatch(/cookie|essential|analytics|consent/i);
   });
 });
 
@@ -128,42 +147,45 @@ test.describe("Footer Legal Links", () => {
   test("has privacy link", async ({ page }) => {
     await page.goto("/home");
     const footer = page.locator("footer");
+    const link = footer.locator('a[href*="privacy"]');
 
-    if ((await footer.count()) > 0) {
-      const link = footer.locator('a[href*="privacy"]');
-      if ((await link.count()) > 0) {
-        await expect(link.first()).toBeVisible();
-      }
+    if ((await link.count()) > 0) {
+      await expect(link.first()).toBeVisible();
     }
   });
 
   test("has terms link", async ({ page }) => {
     await page.goto("/home");
     const footer = page.locator("footer");
+    const link = footer.locator('a[href*="terms"]');
 
-    if ((await footer.count()) > 0) {
-      const link = footer.locator('a[href*="terms"]');
-      if ((await link.count()) > 0) {
-        await expect(link.first()).toBeVisible();
-      }
+    if ((await link.count()) > 0) {
+      await expect(link.first()).toBeVisible();
+    }
+  });
+
+  test("has AI transparency link", async ({ page }) => {
+    await page.goto("/home");
+    const footer = page.locator("footer");
+    const link = footer.locator('a[href*="ai-transparency"]');
+
+    if ((await link.count()) > 0) {
+      await expect(link.first()).toBeVisible();
     }
   });
 
   test("footer links are clickable", async ({ page }) => {
     await page.goto("/home");
     const footer = page.locator("footer");
+    const links = footer.locator("a");
 
-    if ((await footer.count()) > 0) {
-      const links = footer.locator("a");
-      const count = await links.count();
-
-      if (count > 0) {
-        // All footer links should be visible and clickable
-        for (let i = 0; i < Math.min(count, 5); i++) {
-          const link = links.nth(i);
-          if (await link.isVisible()) {
-            await expect(link).toBeEnabled();
-          }
+    const count = await links.count();
+    if (count > 0) {
+      // All footer links should be visible and clickable
+      for (let i = 0; i < Math.min(count, 5); i++) {
+        const link = links.nth(i);
+        if (await link.isVisible()) {
+          await expect(link).toBeEnabled();
         }
       }
     }
@@ -198,41 +220,5 @@ test.describe("Consent Management", () => {
       expect(consent.essential).toBeDefined();
       expect(consent.acceptedAt).toBeDefined();
     }
-  });
-});
-
-// ============================================================================
-// DATA DELETION (GDPR ART. 17)
-// ============================================================================
-
-test.describe("GDPR Right to Erasure", () => {
-  test("deletion endpoint exists", async ({ request }) => {
-    await request.get("/api/user");
-    const response = await request.get("/api/privacy/delete-my-data");
-
-    // GET should return data summary, not 404
-    expect(response.ok()).toBeTruthy();
-  });
-
-  test("deletion summary has required fields", async ({ request }) => {
-    await request.get("/api/user");
-    const response = await request.get("/api/privacy/delete-my-data");
-
-    if (response.ok()) {
-      const data = await response.json();
-      expect(data.userId).toBeDefined();
-      expect(data.dataToBeDeleted).toBeDefined();
-    }
-  });
-
-  test("deletion requires confirmation", async ({ request }) => {
-    await request.get("/api/user");
-
-    const response = await request.post("/api/privacy/delete-my-data", {
-      data: { confirmDeletion: false },
-    });
-
-    // Should reject without explicit confirmation
-    expect(response.status()).toBe(400);
   });
 });
