@@ -347,7 +347,7 @@ After consolidation, these files were removed:
 
 ### Overview
 
-Of 27 E2E test files, **23 run in CI** and **4 are local-only**. Local-only tests use `test.skip()` patterns to auto-skip in CI environments.
+Of 30 E2E test files, **26 run in CI** and **4 are local-only**. Local-only tests use `test.skip()` patterns to auto-skip in CI environments.
 
 ### Local-Only Tests (4 files)
 
@@ -358,7 +358,7 @@ Of 27 E2E test files, **23 run in CI** and **4 are local-only**. Local-only test
 | `maestro-conversation.spec.ts`            | Requires Azure OpenAI             | `test.skip(!!process.env.CI, 'Azure OpenAI not available in CI')`    |
 | `full-ui-audit/visual-regression.spec.ts` | Human baseline approval           | `test.skip(!process.env.VISUAL_REGRESSION, ...)`                     |
 
-### CI-Compatible Tests (23 files)
+### CI-Compatible Tests (26 files)
 
 All other tests are CI-compatible because they:
 
@@ -367,16 +367,16 @@ All other tests are CI-compatible because they:
 3. **Filter non-critical errors** via `IGNORE_ERRORS` patterns
 4. **No external dependencies** beyond the running Next.js app
 
-| Category       | Files                                                     | CI Status |
-| -------------- | --------------------------------------------------------- | --------- |
-| **Core**       | accessibility, auth, auth-system, navigation-and-buttons  | ✅        |
-| **Admin**      | admin, admin-sidebar, admin-dashboard                     | ✅        |
-| **Security**   | cookie-signing, csrf-protection, debug-endpoints-security | ✅        |
-| **Compliance** | gdpr-compliance, tos, cron-data-retention                 | ✅        |
-| **Features**   | trial, invite, google-drive, tools-api                    | ✅        |
-| **API**        | api-backend, critical-api-routes, maestri-data            | ✅        |
-| **Smoke**      | full-app-smoke                                            | ✅        |
-| **UI Audit**   | settings, style-consistency                               | ✅        |
+| Category       | Files                                                                                   | CI Status |
+| -------------- | --------------------------------------------------------------------------------------- | --------- |
+| **Core**       | accessibility, auth, auth-system, navigation-and-buttons                                | ✅        |
+| **Admin**      | admin, admin-sidebar, admin-dashboard                                                   | ✅        |
+| **Security**   | cookie-signing, csrf-protection, debug-endpoints-security                               | ✅        |
+| **Compliance** | gdpr-compliance, compliance, legal-ai-act, legal-data-privacy, tos, cron-data-retention | ✅        |
+| **Features**   | trial, invite, google-drive, tools-api                                                  | ✅        |
+| **API**        | api-backend, critical-api-routes, maestri-data                                          | ✅        |
+| **Smoke**      | full-app-smoke                                                                          | ✅        |
+| **UI Audit**   | settings, style-consistency                                                             | ✅        |
 
 ### CI Skip Pattern
 

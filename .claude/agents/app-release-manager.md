@@ -232,7 +232,7 @@ Before release, ALL must be checked:
 - [ ] TypeScript: 0 errors
 - [ ] ESLint: 0 errors, 0 warnings
 - [ ] Test coverage: ≥80%
-- [ ] E2E tests (CI): 23/23 pass
+- [ ] E2E tests (CI): 26/26 pass (includes compliance tests)
 - [ ] Files >250 lines: 0
 
 ### Local-Only Tests (Minor/Major releases)
@@ -254,8 +254,11 @@ Before release, ALL must be checked:
 ### Compliance
 
 - [ ] COPPA: Parental consent enforced for under-13
-- [ ] GDPR: Data export/delete functional
+- [ ] GDPR: Data export/delete functional (`legal-data-privacy.spec.ts`)
 - [ ] WCAG 2.1 AA: Accessibility audit passes
+- [ ] EU AI Act: AI transparency page accessible (`legal-ai-act.spec.ts`)
+- [ ] L.132/2025: Italian AI law compliance (`legal-ai-act.spec.ts`)
+- [ ] Legal pages: Privacy, Terms, Cookies accessible (`compliance.spec.ts`)
 
 ### Performance
 
@@ -265,12 +268,13 @@ Before release, ALL must be checked:
 
 ### Testing Coverage
 
-**CI Tests (23 files - automatic)**:
+**CI Tests (26 files - automatic)**:
 
 - [ ] Auth OAuth: Tests exist and pass
 - [ ] Cron jobs: Tests exist and pass
 - [ ] `/api/chat/stream`: Tests exist
 - [ ] `/api/realtime/start`: Tests exist
+- [ ] Compliance: `compliance.spec.ts`, `legal-ai-act.spec.ts`, `legal-data-privacy.spec.ts` pass
 
 **Local-Only Tests (4 files - manual)**:
 
