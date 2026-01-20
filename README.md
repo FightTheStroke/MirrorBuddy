@@ -46,8 +46,9 @@
 ## Compliance
 
 <p align="center">
-  <a href="docs/compliance/AI-POLICY.md"><img src="https://img.shields.io/badge/EU%20AI%20Act-Compliant-blue?style=flat-square" alt="EU AI Act Compliant"></a>
-  <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/GDPR-Compliant-green?style=flat-square" alt="GDPR Compliant"></a>
+  <a href="docs/compliance/AI-POLICY.md"><img src="https://img.shields.io/badge/EU%20AI%20Act-2024%2F1689-blue?style=flat-square" alt="EU AI Act 2024/1689"></a>
+  <a href="docs/compliance/AI-RISK-MANAGEMENT.md"><img src="https://img.shields.io/badge/L.132%2F2025-Italy%20AI%20Law-green?style=flat-square" alt="Italian Law 132/2025"></a>
+  <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/GDPR-Compliant-blue?style=flat-square" alt="GDPR Compliant"></a>
   <a href="docs/compliance/DPIA.md"><img src="https://img.shields.io/badge/COPPA-Verified-orange?style=flat-square" alt="COPPA Verified"></a>
   <a href="docs/compliance/AI-LITERACY.md"><img src="https://img.shields.io/badge/WCAG%202.1-AA-purple?style=flat-square" alt="WCAG 2.1 AA"></a>
 </p>
