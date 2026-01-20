@@ -62,7 +62,12 @@ test.describe("Beta Invite System", () => {
     test.beforeEach(async ({ page }) => {
       // Mock admin authentication using Playwright's cookie API
       // IMPORTANT: Cookie must be signed for session-auth.ts validation
-      const adminSessionId = `admin-test-session-${Date.now()}`;
+      // Add random component to prevent collision when parallel workers start at same millisecond
+      const randomSuffix = crypto
+        .randomUUID()
+        .replace(/-/g, "")
+        .substring(0, 9);
+      const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
       const signedCookie = signCookieValue(adminSessionId);
 
       await page.context().addCookies([
@@ -240,7 +245,12 @@ test.describe("Beta Invite System", () => {
     test("should approve invite and show success", async ({ page }) => {
       // Mock admin authentication using Playwright's cookie API
       // IMPORTANT: Cookie must be signed for session-auth.ts validation
-      const adminSessionId = `admin-approval-session-${Date.now()}`;
+      // Add random component to prevent collision when parallel workers start at same millisecond
+      const randomSuffix2 = crypto
+        .randomUUID()
+        .replace(/-/g, "")
+        .substring(0, 9);
+      const adminSessionId = `admin-approval-session-${Date.now()}-${randomSuffix2}`;
       const signedCookie = signCookieValue(adminSessionId);
 
       await page.context().addCookies([
