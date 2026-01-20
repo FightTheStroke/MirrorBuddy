@@ -75,21 +75,26 @@ test.describe("Admin Mode UI Audit", () => {
     await page.waitForLoadState("networkidle");
 
     // Dismiss any TOS modal if still present (belt-and-suspenders)
-    const tosModal = page
-      .locator('[role="dialog"]')
-      .filter({ hasText: /Termini di Servizio/i });
-    if (await tosModal.isVisible({ timeout: 1000 }).catch(() => false)) {
-      // Click the TOS checkbox and accept
-      const tosCheckbox = page.locator('#tos-checkbox, [id*="tos-checkbox"]');
-      if (await tosCheckbox.isVisible().catch(() => false)) {
-        await tosCheckbox.click();
-      }
-      const acceptButton = page
-        .locator("button")
-        .filter({ hasText: /Accetta|Conferma|Accept/i });
-      if (await acceptButton.isVisible().catch(() => false)) {
+    // Wait longer and use more robust selectors for CI environment
+    const tosModal = page.locator('[role="dialog"]');
+    if (await tosModal.isVisible({ timeout: 3000 }).catch(() => false)) {
+      // Check if this is a TOS modal by looking for the checkbox
+      const tosCheckbox = page.locator('input#tos-checkbox[type="checkbox"]');
+      if (await tosCheckbox.isVisible({ timeout: 1000 }).catch(() => false)) {
+        // Click the checkbox with force to bypass any overlay issues
+        await tosCheckbox.click({ force: true });
+        await page.waitForTimeout(300);
+
+        // Now click the accept button - it should be enabled after checkbox is checked
+        const acceptButton = page.locator("button").filter({
+          hasText: /Accetta|Conferma|Accept/i,
+        });
+        // Wait for button to become enabled (disabled={!accepted})
+        await expect(acceptButton).toBeEnabled({ timeout: 2000 });
         await acceptButton.click();
         await page.waitForTimeout(500);
+        // Wait for modal to close
+        await expect(tosModal).not.toBeVisible({ timeout: 3000 });
       }
     }
 
