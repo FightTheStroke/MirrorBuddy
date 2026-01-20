@@ -173,16 +173,22 @@ scripts/
 ├── check-bundle-size.ts        # Bundle size validation
 └── security-scan.sh            # npm audit + OWASP ZAP
 
-e2e/full-ui-audit/
-├── trial-ui.spec.ts                    # Trial mode navigation
-├── admin-ui.spec.ts                    # Admin mode navigation
-├── admin-sidebar-navigation.spec.ts    # Admin sidebar CLICK tests
-├── settings.spec.ts                    # Settings interactions
-└── visual-regression.spec.ts           # Screenshot comparison
+e2e/
+├── trial.spec.ts               # Trial mode + GDPR (consolidated)
+├── admin.spec.ts               # Admin login + routes (consolidated)
+├── admin-sidebar.spec.ts       # Admin sidebar CLICK tests (consolidated)
+├── admin-helpers.ts            # Shared admin utilities
+├── accessibility.spec.ts       # WCAG + instant access (consolidated)
+├── tos.spec.ts                 # ToS API + UI (consolidated)
+└── fixtures/
+    ├── auth-fixtures.ts        # Trial/admin page fixtures
+    └── auth-fixtures-helpers.ts # Cookie signing, storage
 
-e2e/fixtures/
-├── auth-fixtures.ts            # Trial/admin page fixtures
-└── auth-fixtures-helpers.ts    # Cookie signing, storage
+e2e/full-ui-audit/
+├── trial-ui-helpers.ts         # Trial UI helpers (shared)
+├── settings.spec.ts            # Settings interactions
+├── style-consistency.spec.ts   # Style validation
+└── visual-regression.spec.ts   # Screenshot comparison
 ```
 
 ### Integration with Release Process
@@ -232,7 +238,7 @@ Previous E2E tests verified admin pages existed but never **clicked** sidebar li
 
 ### Test Coverage
 
-**File**: `e2e/full-ui-audit/admin-sidebar-navigation.spec.ts`
+**File**: `e2e/admin-sidebar.spec.ts` (consolidated)
 
 | Test ID | Description                                    | Bug Type Caught             |
 | ------- | ---------------------------------------------- | --------------------------- |
@@ -257,8 +263,159 @@ Previous E2E tests verified admin pages existed but never **clicked** sidebar li
 
 ```bash
 # Run only admin sidebar tests
-npx playwright test admin-sidebar-navigation.spec.ts --project=chromium
+npx playwright test admin-sidebar.spec.ts --project=chromium
 
 # Run with UI for debugging
-npx playwright test admin-sidebar-navigation.spec.ts --ui
+npx playwright test admin-sidebar.spec.ts --ui
 ```
+
+---
+
+## Test Suite Consolidation
+
+**Added**: 2026-01-20 | **Context**: Reduce file count, improve maintainability
+
+### Consolidation Summary
+
+Reduced test files from ~30 to ~28 while maintaining full coverage:
+
+| Consolidated File       | Source Files                                           | Lines | Benefit                     |
+| ----------------------- | ------------------------------------------------------ | ----- | --------------------------- |
+| `tos.spec.ts`           | tos-acceptance.spec.ts + tos-modal-interaction.spec.ts | ~250  | Unified ToS testing         |
+| `trial.spec.ts`         | trial.spec.ts + trial-ui.spec.ts                       | ~360  | GDPR + route audit together |
+| `accessibility.spec.ts` | accessibility.spec.ts + a11y-instant-access.spec.ts    | ~640  | Single a11y file            |
+| `admin.spec.ts`         | admin-ui.spec.ts (partial)                             | ~230  | Login + route audit         |
+| `admin-sidebar.spec.ts` | admin-sidebar-navigation.spec.ts                       | ~240  | Click-based navigation      |
+
+### New Helper Files
+
+| File                                | Purpose                                                    |
+| ----------------------------------- | ---------------------------------------------------------- |
+| `admin-helpers.ts`                  | Shared constants, types, utility functions for admin tests |
+| `full-ui-audit/trial-ui-helpers.ts` | Shared helpers for trial UI audit                          |
+
+### Consolidation Guidelines
+
+1. **Max 250 lines/file**: Split if exceeding
+2. **Extract helpers**: Shared constants and functions go to `*-helpers.ts`
+3. **Preserve F-xx references**: All requirement IDs kept in consolidated files
+4. **Document sources**: Header comments list original files
+
+### Architecture Pattern
+
+```typescript
+// Consolidated file header
+/**
+ * E2E Tests: {Feature} - Consolidated
+ *
+ * {Description}
+ * F-xx: {Requirement references}
+ *
+ * Run: npx playwright test e2e/{feature}.spec.ts
+ *
+ * Consolidated from:
+ * - {original-file-1.spec.ts}
+ * - {original-file-2.spec.ts}
+ */
+
+// Imports
+import { test, expect } from "./fixtures/auth-fixtures";
+import { IGNORE_ERRORS, helpers } from "./{feature}-helpers";
+
+// Sections organized by F-xx groups
+test.describe("{Feature} - {Category}", () => {
+  test("F-xx: {test name}", async ({ page }) => { ... });
+});
+```
+
+### Deleted Files
+
+After consolidation, these files were removed:
+
+- `e2e/tos-acceptance.spec.ts`
+- `e2e/tos-modal-interaction.spec.ts`
+- `e2e/a11y-instant-access.spec.ts`
+- `e2e/full-ui-audit/trial-ui.spec.ts`
+- `e2e/full-ui-audit/admin-ui.spec.ts`
+- `e2e/full-ui-audit/admin-sidebar-navigation.spec.ts`
+
+---
+
+## CI vs Local Test Classification
+
+**Added**: 2026-01-20 | **Context**: Clear distinction between CI-compatible and local-only tests
+
+### Overview
+
+Of 27 E2E test files, **23 run in CI** and **4 are local-only**. Local-only tests use `test.skip()` patterns to auto-skip in CI environments.
+
+### Local-Only Tests (4 files)
+
+| File                                      | Reason                            | Skip Pattern                                                         |
+| ----------------------------------------- | --------------------------------- | -------------------------------------------------------------------- |
+| `voice-api.spec.ts`                       | WebSocket proxy on localhost:3001 | `test.skip(!!process.env.CI, 'WebSocket proxy not available in CI')` |
+| `chat-tools-integration.spec.ts`          | Requires Azure OpenAI or Ollama   | `test.skip(!!process.env.CI, 'AI provider not available in CI')`     |
+| `maestro-conversation.spec.ts`            | Requires Azure OpenAI             | `test.skip(!!process.env.CI, 'Azure OpenAI not available in CI')`    |
+| `full-ui-audit/visual-regression.spec.ts` | Human baseline approval           | `test.skip(!process.env.VISUAL_REGRESSION, ...)`                     |
+
+### CI-Compatible Tests (23 files)
+
+All other tests are CI-compatible because they:
+
+1. **Mock external APIs** using `page.route()` for API responses
+2. **Use fallback env vars** (e.g., `process.env.ADMIN_EMAIL || "admin@example.com"`)
+3. **Filter non-critical errors** via `IGNORE_ERRORS` patterns
+4. **No external dependencies** beyond the running Next.js app
+
+| Category       | Files                                                     | CI Status |
+| -------------- | --------------------------------------------------------- | --------- |
+| **Core**       | accessibility, auth, auth-system, navigation-and-buttons  | ✅        |
+| **Admin**      | admin, admin-sidebar, admin-dashboard                     | ✅        |
+| **Security**   | cookie-signing, csrf-protection, debug-endpoints-security | ✅        |
+| **Compliance** | gdpr-compliance, tos, cron-data-retention                 | ✅        |
+| **Features**   | trial, invite, google-drive, tools-api                    | ✅        |
+| **API**        | api-backend, critical-api-routes, maestri-data            | ✅        |
+| **Smoke**      | full-app-smoke                                            | ✅        |
+| **UI Audit**   | settings, style-consistency                               | ✅        |
+
+### CI Skip Pattern
+
+For tests requiring external services, use this pattern:
+
+```typescript
+// At the top of test.describe() or test file
+test.skip(!!process.env.CI, "Reason why this cannot run in CI");
+
+// For feature-flagged tests
+test.skip(!process.env.FEATURE_FLAG, "Set FEATURE_FLAG=1 to enable");
+```
+
+### GitHub Actions CI Environment
+
+GitHub Actions automatically sets `process.env.CI=true`. Tests with `test.skip(!!process.env.CI, ...)` will be skipped automatically.
+
+### Running Local-Only Tests
+
+```bash
+# Voice API tests (requires WebSocket proxy running)
+npm run dev  # Terminal 1: Start app
+npm run ws-proxy  # Terminal 2: Start WebSocket proxy
+npx playwright test voice-api.spec.ts  # Terminal 3: Run tests
+
+# AI integration tests (requires Azure OpenAI or Ollama)
+# Ensure AZURE_OPENAI_* env vars are set
+npx playwright test chat-tools-integration.spec.ts
+npx playwright test maestro-conversation.spec.ts
+
+# Visual regression (requires human baseline approval)
+VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts --update-snapshots
+```
+
+### Adding New Tests
+
+When creating tests that require external services:
+
+1. Add `test.skip(!!process.env.CI, 'Description')` at the start
+2. Document the dependency in the file header
+3. Add to the "Local-Only Tests" table in this ADR
+4. Provide local run instructions in file comments

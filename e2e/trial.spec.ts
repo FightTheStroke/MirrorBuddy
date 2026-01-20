@@ -1,76 +1,124 @@
 /**
- * E2E TESTS: Trial Mode Flow
- * Tests trial limits, consent wall, and upgrade prompts
+ * E2E Tests: Trial Mode - Consolidated
+ *
+ * Comprehensive trial mode testing combining flow, UI audit, and GDPR compliance.
  * F-07: Trial Mode Tests
+ *
+ * Test scenarios:
+ * - GDPR: Legal pages accessible without blocking consent wall
+ * - Flow: Trial status indicator, limit modal, consent management
+ * - Audit: All public routes navigation, button clickability, error tracking
+ *
+ * Run: npx playwright test e2e/trial.spec.ts
+ *
+ * Consolidated from:
+ * - trial.spec.ts (GDPR and flow tests)
+ * - full-ui-audit/trial-ui.spec.ts (route audit tests)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/auth-fixtures";
+import {
+  PUBLIC_ROUTES,
+  checkButtonsClickable,
+  generateReport,
+  type RouteError,
+} from "./full-ui-audit/trial-ui-helpers";
 
-test.describe("Trial Mode Flow", () => {
-  // Start fresh without global storageState (no pre-set consent/auth)
-  test.use({ storageState: undefined });
+// Errors to ignore (CSP violations, expected 401s, etc.)
+const IGNORE_CONSOLE_ERRORS = [
+  /Content Security Policy/i,
+  /inline script/i,
+  /nonce.*required/i,
+  /401.*Unauthorized/i,
+  /Failed to fetch/i,
+  /ToS check error/i,
+  /ResizeObserver loop/i,
+  /Download the React DevTools/i,
+  /favicon\.ico/i,
+  /429.*Too Many Requests/i,
+  /net::ERR_/i,
+  /hydrat/i,
+  /WebSocket/i,
+];
 
-  test.beforeEach(async ({ context }) => {
-    // Clear all cookies and localStorage for fresh trial
-    await context.clearCookies();
-  });
+// ============================================================================
+// GDPR COMPLIANCE (F-07)
+// ============================================================================
 
-  test("Legal pages accessible without blocking consent wall (GDPR)", async ({
-    page,
+test.describe("Trial Mode - GDPR Compliance", () => {
+  test("legal pages accessible without blocking consent wall", async ({
+    trialPage,
   }) => {
-    // Clear consent
-    await page.addInitScript(() => {
+    // Clear consent - simulate user who hasn't accepted yet
+    await trialPage.addInitScript(() => {
       localStorage.removeItem("mirrorbuddy-consent");
     });
 
-    // Legal pages (/terms, /privacy, /cookies) use inline consent (footer)
-    // NOT blocking consent wall - this is a GDPR requirement
+    // Legal pages (/terms, /privacy, /cookies) must be accessible
+    // WITHOUT blocking consent wall - this is a GDPR requirement
     // Users must be able to read privacy/terms BEFORE accepting cookies
-    await page.goto("/terms");
-    await page.waitForLoadState("networkidle");
+    await trialPage.goto("/terms");
+    await trialPage.waitForLoadState("networkidle");
 
     // Terms content should be immediately visible (no blocking wall)
     await expect(
-      page.locator("text=Termini di Servizio di MirrorBuddy"),
+      trialPage.locator("text=Termini di Servizio di MirrorBuddy"),
     ).toBeVisible();
 
-    // Inline consent mechanism should be available (in footer or via floating button)
-    // The floating a11y button provides access to settings including consent
-    const a11yButton = page.locator('button[aria-label*="accessibilità"]');
+    // Inline consent mechanism should be available (floating a11y button)
+    const a11yButton = trialPage.locator('button[aria-label*="accessibilità"]');
     await expect(a11yButton).toBeVisible();
   });
 
-  test("Trial status indicator shows remaining chats", async ({
-    page,
-    context,
+  test("privacy page accessible without prior consent", async ({
+    trialPage,
   }) => {
-    // Set consent and onboarding to bypass walls
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        "mirrorbuddy-consent",
-        JSON.stringify({
-          version: "1.0",
-          acceptedAt: new Date().toISOString(),
-          essential: true,
-          analytics: true,
-          marketing: false,
-        }),
-      );
-      localStorage.setItem(
-        "mirrorbuddy-onboarding",
-        JSON.stringify({
-          state: {
-            hasCompletedOnboarding: true,
-            onboardingCompletedAt: new Date().toISOString(),
-            currentStep: "ready",
-            data: { name: "Test", age: 12, schoolLevel: "media" },
-          },
-          version: 0,
-        }),
-      );
+    // Clear consent - user hasn't accepted yet
+    await trialPage.addInitScript(() => {
+      localStorage.removeItem("mirrorbuddy-consent");
     });
 
-    // Add trial session cookie to bypass middleware auth check
+    // Privacy page must be accessible without blocking consent wall
+    await trialPage.goto("/privacy");
+    await trialPage.waitForLoadState("networkidle");
+
+    // Privacy content should be immediately visible
+    await expect(
+      trialPage.locator("text=Privacy Policy di MirrorBuddy"),
+    ).toBeVisible();
+
+    // Navigate to terms and verify privacy link exists
+    await trialPage.goto("/terms");
+    await trialPage.waitForLoadState("networkidle");
+
+    const privacyLink = trialPage.locator('a[href*="/privacy"]').first();
+    await expect(privacyLink).toBeVisible();
+  });
+
+  test("cookie policy page accessible", async ({ trialPage }) => {
+    await trialPage.goto("/cookies");
+    await trialPage.waitForLoadState("networkidle");
+
+    // Cookie policy should be visible
+    await expect(
+      trialPage.getByRole("heading", { name: /Cookie Policy/i }).first(),
+    ).toBeVisible();
+    await expect(
+      trialPage.locator("text=Cookie Essenziali").first(),
+    ).toBeVisible();
+  });
+});
+
+// ============================================================================
+// TRIAL STATUS & LIMITS (F-07)
+// ============================================================================
+
+test.describe("Trial Mode - Status & Limits", () => {
+  test("trial status indicator shows remaining chats", async ({
+    trialPage,
+    context,
+  }) => {
+    // Add trial session cookie
     await context.addCookies([
       {
         name: "mirrorbuddy-trial-session",
@@ -82,7 +130,7 @@ test.describe("Trial Mode Flow", () => {
     ]);
 
     // Mock trial session API to return trial mode status
-    await page.route("**/api/trial/session", (route) => {
+    await trialPage.route("**/api/trial/session", (route) => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -97,7 +145,7 @@ test.describe("Trial Mode Flow", () => {
     });
 
     // Mock onboarding API to prevent redirect
-    await page.route("**/api/user/onboarding", (route) => {
+    await trialPage.route("**/api/user/onboarding", (route) => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -108,52 +156,25 @@ test.describe("Trial Mode Flow", () => {
       });
     });
 
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await trialPage.goto("/");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Trial indicator should show remaining chats (component shows remaining/max)
-    const trialIndicator = page.locator("[data-testid='trial-status']");
+    // Trial indicator should show remaining chats
+    const trialIndicator = trialPage.locator("[data-testid='trial-status']");
 
-    // Wait for the indicator to appear (may need time to render after API response)
     if (await trialIndicator.isVisible({ timeout: 5000 }).catch(() => false)) {
       await expect(trialIndicator).toContainText("10");
     } else {
-      // If indicator isn't visible, the home page loaded correctly without it
-      // This can happen if the trial mode check doesn't trigger the indicator
-      // Use h1 to verify home page loaded (Professori text appears in multiple elements)
-      await expect(page.locator("h1")).toBeVisible();
+      // Home page loaded correctly even without indicator
+      await expect(trialPage.locator("h1")).toBeVisible();
     }
   });
 
-  test("Limit reached modal appears when trial exhausted", async ({ page }) => {
-    // Set consent and onboarding completed
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        "mirrorbuddy-consent",
-        JSON.stringify({
-          version: "1.0",
-          acceptedAt: new Date().toISOString(),
-          essential: true,
-          analytics: true,
-          marketing: false,
-        }),
-      );
-      localStorage.setItem(
-        "mirrorbuddy-onboarding",
-        JSON.stringify({
-          state: {
-            hasCompletedOnboarding: true,
-            onboardingCompletedAt: new Date().toISOString(),
-            currentStep: "ready",
-            data: { name: "Test", age: 12, schoolLevel: "media" },
-          },
-          version: 0,
-        }),
-      );
-    });
-
+  test("limit reached modal appears when trial exhausted", async ({
+    trialPage,
+  }) => {
     // Mock trial session at limit
-    await page.route("**/api/trial/session", (route) => {
+    await trialPage.route("**/api/trial/session", (route) => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -165,155 +186,176 @@ test.describe("Trial Mode Flow", () => {
       });
     });
 
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await trialPage.goto("/");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Navigate to coach chat (first nav item with avatar)
-    const coachButton = page
+    // Navigate to coach chat
+    const coachButton = trialPage
       .locator("button")
       .filter({ hasText: /Melissa|Roberto|Chiara/i })
       .first();
+
     if (await coachButton.isVisible()) {
       await coachButton.click();
-      await page.waitForTimeout(500);
+      await trialPage.waitForTimeout(500);
 
-      // Try to send message (should trigger modal if trial check is in place)
-      const chatInput = page.locator("[data-testid='chat-input']");
+      // Try to send message
+      const chatInput = trialPage.locator("[data-testid='chat-input']");
       if (await chatInput.isVisible()) {
         await chatInput.fill("Test message");
-        await page.click("[data-testid='send-button']");
+        await trialPage.click("[data-testid='send-button']");
 
-        // Modal should appear (if trial limit enforcement is active)
-        const modal = page.locator("text=Hai esaurito i messaggi");
+        // Modal should appear if trial limit enforcement is active
+        const modal = trialPage.locator("text=Hai esaurito i messaggi");
         if (await modal.isVisible({ timeout: 3000 }).catch(() => false)) {
-          await expect(page.locator("text=Richiedi accesso")).toBeVisible();
+          await expect(
+            trialPage.locator("text=Richiedi accesso"),
+          ).toBeVisible();
         }
       }
     }
   });
 
-  test("Privacy page is accessible without prior consent (GDPR)", async ({
-    page,
+  test("trial mode restrictions are in place", async ({ trialPage }) => {
+    await trialPage.goto("/", { waitUntil: "domcontentloaded" });
+    await trialPage.waitForLoadState("networkidle").catch(() => {});
+
+    // Check that page loaded with content
+    const visibleContent = trialPage
+      .locator("main:visible, [role='main']:visible, #__next > div:visible")
+      .first();
+    const pageHasContent = await visibleContent.isVisible().catch(() => false);
+
+    const hasTextContent = await trialPage
+      .locator("body")
+      .innerText()
+      .then((t) => t.length > 100)
+      .catch(() => false);
+
+    const trialIndicator = trialPage.locator('[data-testid="trial-status"]');
+    const hasTrialIndicator = await trialIndicator
+      .isVisible()
+      .catch(() => false);
+
+    const trialMessage = trialPage
+      .locator("text=/trial|prova|demo|benvenuto|welcome/i")
+      .first();
+    const hasTrialMessage = await trialMessage.isVisible().catch(() => false);
+
+    // At least one indicator of working app should be visible
+    expect(
+      pageHasContent || hasTextContent || hasTrialIndicator || hasTrialMessage,
+    ).toBeTruthy();
+  });
+});
+
+// ============================================================================
+// ROUTE AUDIT (F-09, F-34)
+// ============================================================================
+
+test.describe("Trial Mode - Route Audit", () => {
+  test.setTimeout(120000);
+
+  test("all public routes accessible without critical errors", async ({
+    trialPage,
   }) => {
-    // Clear consent - user hasn't accepted yet
-    await page.addInitScript(() => {
-      localStorage.removeItem("mirrorbuddy-consent");
+    const errors: RouteError[] = [];
+    const consoleErrors: string[] = [];
+
+    // Listen for console errors
+    trialPage.on("console", (msg) => {
+      if (msg.type() === "error") {
+        const text = msg.text();
+        if (!IGNORE_CONSOLE_ERRORS.some((pattern) => pattern.test(text))) {
+          consoleErrors.push(`[${msg.type()}] ${text}`);
+        }
+      }
     });
 
-    // Privacy page must be accessible without blocking consent wall
-    // This is a GDPR requirement - users must read privacy before accepting
-    await page.goto("/privacy");
-    await page.waitForLoadState("networkidle");
+    // Test each public route
+    for (const route of PUBLIC_ROUTES) {
+      consoleErrors.length = 0;
 
-    // Privacy content should be immediately visible (no blocking wall)
-    await expect(
-      page.locator("text=Privacy Policy di MirrorBuddy"),
-    ).toBeVisible();
+      try {
+        if (trialPage.isClosed()) break;
 
-    // The terms page should link to privacy
-    await page.goto("/terms");
-    await page.waitForLoadState("networkidle");
+        const response = await trialPage.goto(`http://localhost:3000${route}`, {
+          waitUntil: "domcontentloaded",
+          timeout: 15000,
+        });
 
-    // Verify privacy link exists in terms page
-    const privacyLink = page.locator('a[href*="/privacy"]').first();
-    await expect(privacyLink).toBeVisible();
-  });
+        // F-09: Check for 404 errors
+        if (response?.status() === 404) {
+          errors.push({
+            route,
+            type: "404",
+            message: "Route returned 404 Not Found",
+            severity: "critical",
+          });
+          continue;
+        }
 
-  test("Cookie policy page is accessible", async ({ page }) => {
-    // Set consent to access app
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        "mirrorbuddy-consent",
-        JSON.stringify({
-          version: "1.0",
-          acceptedAt: new Date().toISOString(),
-          essential: true,
-          analytics: true,
-          marketing: false,
-        }),
-      );
-    });
+        await trialPage
+          .waitForLoadState("networkidle", { timeout: 3000 })
+          .catch(() => {});
 
-    await page.goto("/cookies");
+        // F-05: Check for console errors
+        if (consoleErrors.length > 0) {
+          errors.push({
+            route,
+            type: "console_error",
+            message: `Console errors: ${consoleErrors.join("; ")}`,
+            severity: "warning",
+          });
+        }
 
-    // Cookie policy should be visible (use heading to avoid multiple matches)
-    await expect(
-      page.getByRole("heading", { name: /Cookie Policy/i }).first(),
-    ).toBeVisible();
-    // Use first() to avoid strict mode violation - text appears multiple times
-    await expect(page.locator("text=Cookie Essenziali").first()).toBeVisible();
-  });
+        // F-04: Check buttons are clickable
+        if (!trialPage.isClosed()) {
+          await checkButtonsClickable(trialPage, route, errors);
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        const severity =
+          errorMessage.includes("closed") || errorMessage.includes("Target")
+            ? "warning"
+            : "critical";
 
-  // Skip: /settings is not a route - settings is a view within the main app at /
-  // This test would require authenticated access and clicking the settings nav item
-  test.skip("Analytics toggle in settings works", async ({ page, context }) => {
-    // Set consent
-    await page.addInitScript(() => {
-      localStorage.setItem(
-        "mirrorbuddy-consent",
-        JSON.stringify({
-          version: "1.0",
-          acceptedAt: new Date().toISOString(),
-          essential: true,
-          analytics: true,
-          marketing: false,
-        }),
-      );
-      // Set onboarding complete to prevent redirect
-      localStorage.setItem(
-        "mirrorbuddy-onboarding",
-        JSON.stringify({
-          state: {
-            hasCompletedOnboarding: true,
-            onboardingCompletedAt: new Date().toISOString(),
-            currentStep: "ready",
-            data: { name: "Test", age: 12, schoolLevel: "media" },
-          },
-          version: 0,
-        }),
-      );
-    });
-
-    // Add auth cookie to access settings
-    await context.addCookies([
-      {
-        name: "mirrorbuddy-user-id",
-        value: "test-user-id",
-        domain: "localhost",
-        path: "/",
-        sameSite: "Lax",
-      },
-    ]);
-
-    // Navigate to settings
-    await page.goto("/settings");
-    await page.waitForLoadState("networkidle");
-
-    // Find analytics toggle (may be in a privacy section)
-    const toggle = page.locator("[aria-label='Toggle analytics']");
-
-    // Wait for page to fully render
-    if (await toggle.isVisible({ timeout: 5000 }).catch(() => false)) {
-      // Should be enabled by default
-      await expect(toggle).toHaveAttribute("aria-checked", "true");
-
-      // Toggle off
-      await toggle.click();
-
-      // Should be disabled
-      await expect(toggle).toHaveAttribute("aria-checked", "false");
-
-      // Verify localStorage updated
-      const consent = await page.evaluate(() =>
-        JSON.parse(localStorage.getItem("mirrorbuddy-consent") || "{}"),
-      );
-      expect(consent.analytics).toBe(false);
-    } else {
-      // If toggle not found, check that settings page loaded correctly
-      // The toggle might be in a different section or require scrolling
-      await expect(page.locator("h1, h2")).toContainText(
-        /impostazioni|settings/i,
-      );
+        errors.push({
+          route,
+          type: "navigation_error",
+          message: `Navigation ${severity === "warning" ? "interrupted" : "failed"}: ${errorMessage}`,
+          severity,
+        });
+      }
     }
+
+    // Generate report
+    const report = generateReport(errors);
+    console.log("\n" + report);
+
+    // F-34: Assert zero critical errors
+    const criticalErrors = errors.filter((e) => e.severity === "critical");
+    expect(
+      criticalErrors,
+      `Found ${criticalErrors.length} critical error(s):\n${criticalErrors.map((e) => `  - ${e.route}: ${e.message}`).join("\n")}`,
+    ).toHaveLength(0);
+  });
+
+  test("basic navigation between public routes", async ({ trialPage }) => {
+    // Start at home
+    await trialPage.goto("/", { waitUntil: "domcontentloaded" });
+
+    // Navigate to landing (may redirect to /welcome)
+    await trialPage.goto("/landing", { waitUntil: "domcontentloaded" });
+    expect(trialPage.url()).toMatch(/\/(landing|welcome)/);
+
+    // Navigate to astuccio
+    await trialPage.goto("/astuccio", { waitUntil: "domcontentloaded" });
+    await expect(trialPage).toHaveURL(/\/astuccio/);
+
+    // Navigate to privacy
+    await trialPage.goto("/privacy", { waitUntil: "domcontentloaded" });
+    await expect(trialPage).toHaveURL(/\/privacy/);
   });
 });

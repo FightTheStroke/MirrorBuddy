@@ -95,9 +95,45 @@ This script verifies (no agent tokens needed):
 
 ---
 
-## PHASE 1.5: COMPREHENSIVE LOCAL TESTING (OPTIONAL)
+## PHASE 1.5: LOCAL-ONLY TESTS (MANDATORY FOR FULL RELEASES)
 
-**ALWAYS ask:** "Vuoi eseguire il full local test? (~15-20min) [si/no]"
+**4 test files are skipped in CI** because they require external services. Before a release, these MUST be validated locally.
+
+### Local-Only Test Checklist
+
+| Test                             | Requires                         | Command   | Status |
+| -------------------------------- | -------------------------------- | --------- | ------ |
+| `voice-api.spec.ts`              | WebSocket proxy (localhost:3001) | See below | [ ]    |
+| `chat-tools-integration.spec.ts` | Azure OpenAI or Ollama           | See below | [ ]    |
+| `maestro-conversation.spec.ts`   | Azure OpenAI                     | See below | [ ]    |
+| `visual-regression.spec.ts`      | Human baseline approval          | See below | [ ]    |
+
+### Run Commands
+
+```bash
+# 1. Voice API (requires WebSocket proxy running)
+# Terminal 1: npm run dev
+# Terminal 2: npm run ws-proxy
+# Terminal 3:
+npx playwright test e2e/voice-api.spec.ts --project=chromium
+
+# 2. AI Integration Tests (requires Azure OpenAI configured)
+# Verify AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_DEPLOYMENT in .env
+npx playwright test e2e/chat-tools-integration.spec.ts --project=chromium
+npx playwright test e2e/maestro-conversation.spec.ts --project=chromium
+
+# 3. Visual Regression (requires baseline approval)
+VISUAL_REGRESSION=1 npx playwright test e2e/full-ui-audit/visual-regression.spec.ts --project=chromium
+# If new baselines: add --update-snapshots
+```
+
+### When to Skip
+
+- **Patch release** (bug fix only): Local-only tests can be skipped if change doesn't affect voice/AI
+- **Minor/Major release**: ALL local-only tests MUST pass
+- **Any voice/AI changes**: Relevant tests MUST pass
+
+### Full Local Test Suite (Optional but Recommended)
 
 ```bash
 ./scripts/full-local-test.sh  # Runs lint, typecheck, build, unit+E2E tests, perf, file size
@@ -105,7 +141,7 @@ This script verifies (no agent tokens needed):
 
 **Output:** `reports/full-local-test-YYYYMMDD-HHMMSS.md`
 
-**If fails:** BLOCK (F-37). Agent auto-fixes (F-38), re-runs. User decline = skip to Phase 2.
+**If fails:** BLOCK (F-37). Agent auto-fixes (F-38), re-runs.
 
 ---
 
@@ -172,16 +208,17 @@ See **`app-release-manager-execution.md`** for:
 
 ## QUICK REFERENCE
 
-| Phase | Command/Check                                        | Blocking   |
-| ----- | ---------------------------------------------------- | ---------- |
-| 0     | `./scripts/auto-version.sh` (version analysis)       | No         |
-| 1     | `npm run release:gate`                               | Yes        |
-| 1.5   | `./scripts/full-local-test.sh` (optional)            | If enabled |
-| 2     | Security validation (CSP, CSRF, cookies, rate-limit) | Yes        |
-| 3     | COPPA compliance (parental consent)                  | Yes        |
-| 4     | Education validation (safety, GDPR, WCAG)            | Yes        |
-| 5     | Testing gaps (auth, cron, critical APIs)             | Yes        |
-| 6     | `gh release create`                                  | -          |
+| Phase | Command/Check                                        | Blocking    |
+| ----- | ---------------------------------------------------- | ----------- |
+| 0     | `./scripts/auto-version.sh` (version analysis)       | No          |
+| 1     | `npm run release:gate`                               | Yes         |
+| 1.5a  | Local-only tests (voice, AI, visual)                 | Minor/Major |
+| 1.5b  | `./scripts/full-local-test.sh` (comprehensive)       | Recommended |
+| 2     | Security validation (CSP, CSRF, cookies, rate-limit) | Yes         |
+| 3     | COPPA compliance (parental consent)                  | Yes         |
+| 4     | Education validation (safety, GDPR, WCAG)            | Yes         |
+| 5     | Testing gaps (auth, cron, critical APIs)             | Yes         |
+| 6     | `gh release create`                                  | -           |
 
 ---
 
@@ -192,12 +229,18 @@ Before release, ALL must be checked:
 ### Build & Quality
 
 - [ ] `npm run release:gate` passes (0 errors, 0 warnings)
-- [ ] Full local test (optional): if enabled, passes with 0 failures
 - [ ] TypeScript: 0 errors
 - [ ] ESLint: 0 errors, 0 warnings
 - [ ] Test coverage: ≥80%
-- [ ] E2E tests: 100% pass
+- [ ] E2E tests (CI): 23/23 pass
 - [ ] Files >250 lines: 0
+
+### Local-Only Tests (Minor/Major releases)
+
+- [ ] `voice-api.spec.ts`: WebSocket tests pass (or N/A for non-voice changes)
+- [ ] `chat-tools-integration.spec.ts`: AI tool tests pass (or N/A)
+- [ ] `maestro-conversation.spec.ts`: AI conversation tests pass (or N/A)
+- [ ] `visual-regression.spec.ts`: Screenshots match baselines (or N/A)
 
 ### Security
 
@@ -222,10 +265,18 @@ Before release, ALL must be checked:
 
 ### Testing Coverage
 
-- [ ] Auth OAuth: Tests exist
-- [ ] Cron jobs: Tests exist
+**CI Tests (23 files - automatic)**:
+
+- [ ] Auth OAuth: Tests exist and pass
+- [ ] Cron jobs: Tests exist and pass
 - [ ] `/api/chat/stream`: Tests exist
 - [ ] `/api/realtime/start`: Tests exist
-- [ ] Chat tools integration: E2E tests pass (`e2e/chat-tools-integration.spec.ts`)
 
-**RULE: No proof = BLOCKED.**
+**Local-Only Tests (4 files - manual)**:
+
+- [ ] Voice API: `npx playwright test voice-api.spec.ts` passes
+- [ ] Chat tools: `npx playwright test chat-tools-integration.spec.ts` passes
+- [ ] Maestro conv: `npx playwright test maestro-conversation.spec.ts` passes
+- [ ] Visual reg: `VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts` passes
+
+**RULE: No proof = BLOCKED. Show test output, not "tests pass".**
