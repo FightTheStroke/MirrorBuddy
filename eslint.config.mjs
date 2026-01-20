@@ -19,11 +19,47 @@ const eslintConfig = defineConfig([
       // Warning-level checks (existing codebase has many valid patterns)
       "security/detect-non-literal-fs-filename": "warn",
       "security/detect-non-literal-require": "warn",
-      "security/detect-object-injection": "warn",
+      "security/detect-object-injection": "off", // Too many false positives on obj[key]
       "security/detect-possible-timing-attacks": "warn",
-      "security/detect-unsafe-regex": "warn", // Content filters use complex regex
+      "security/detect-unsafe-regex": "warn",
       "security/detect-child-process": "warn",
       "security/detect-non-literal-regexp": "warn",
+    },
+  },
+  // Scripts, e2e, tests, public - not production code or controlled paths
+  {
+    files: [
+      "scripts/**/*.ts",
+      "e2e/**/*.ts",
+      "**/*.spec.ts",
+      "**/*.test.ts",
+      "**/__tests__/**/*.ts",
+      "public/**/*.js",
+      "src/lib/storage/**/*.ts", // Local storage with controlled paths
+    ],
+    rules: {
+      "security/detect-non-literal-fs-filename": "off",
+      "security/detect-non-literal-regexp": "off",
+    },
+  },
+  // Safety/content filter patterns - intentionally complex regex for security
+  {
+    files: [
+      "src/lib/safety/**/*patterns*.ts",
+      "src/lib/safety/jailbreak-*.ts",
+      "src/lib/safety/output-sanitizer-*.ts",
+      "src/lib/safety/versioning/*.ts",
+      "src/lib/safety/escalation/*.ts",
+      "src/lib/ai/intent-detection/**/*.ts",
+      "src/lib/ai/handoff-manager/**/*.ts",
+      "src/lib/education/frustration-detection/**/*.ts",
+      "src/lib/privacy/anonymization-service.ts",
+      "src/lib/rag/hybrid-retrieval.ts",
+      "src/components/tools/webcam-capture/hooks/use-webcam-capture.ts",
+    ],
+    rules: {
+      "security/detect-unsafe-regex": "off", // Intentional: security patterns
+      "security/detect-non-literal-regexp": "off", // Dynamic regex from controlled sources
     },
   },
   // Override default ignores of eslint-config-next.

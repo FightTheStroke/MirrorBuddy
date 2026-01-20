@@ -10,7 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 import { getValidAccessToken } from "@/lib/google/oauth";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // Security: Get userId from authenticated session only
   const { userId, errorResponse } = await requireAuthenticatedUser();
   if (errorResponse) return errorResponse;

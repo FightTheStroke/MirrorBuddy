@@ -8,12 +8,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import {
-  checkAbuse,
-  incrementAbuseScore,
-  isSessionBlocked,
-  ABUSE_THRESHOLD,
-} from "../anti-abuse";
+import { ABUSE_THRESHOLD } from "../anti-abuse";
 
 // Reset module state between tests
 beforeEach(() => {

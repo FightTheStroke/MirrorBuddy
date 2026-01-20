@@ -26,7 +26,7 @@ const PAGES_TO_TEST = [
 ];
 
 // Expected CSS custom properties (from globals.css)
-const EXPECTED_CSS_VARS = {
+const _EXPECTED_CSS_VARS = {
   light: {
     "--background": "0 0% 100%",
     "--foreground": "222.2 84% 4.9%",
@@ -41,7 +41,7 @@ const EXPECTED_CSS_VARS = {
 };
 
 // Font expectations
-const EXPECTED_FONTS = {
+const _EXPECTED_FONTS = {
   default: "Inter",
   dyslexia: "OpenDyslexic",
   fallbacks: ["ui-sans-serif", "system-ui", "sans-serif"],

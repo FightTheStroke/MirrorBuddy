@@ -104,7 +104,7 @@ test.describe("Compliance Pages - Keyboard Navigation", () => {
     const links = await page.locator("a").count();
     if (links > 0) {
       await page.keyboard.press("Tab");
-      const focused = await page.evaluate(() => {
+      await page.evaluate(() => {
         const el = document.activeElement;
         return el?.tagName === "A";
       });

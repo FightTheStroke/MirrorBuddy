@@ -41,7 +41,6 @@ const log = logger.child({ module: "escalation-service" });
  * In-memory buffer of escalation events
  */
 const escalationBuffer: EscalationEvent[] = [];
-const BUFFER_FLUSH_SIZE = 10;
 
 /**
  * Active escalation configuration

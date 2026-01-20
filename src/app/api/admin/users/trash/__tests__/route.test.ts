@@ -55,7 +55,10 @@ describe("admin users trash API", () => {
   });
 
   it("returns deleted user backups", async () => {
-    const response = await GET();
+    const request = new NextRequest("http://localhost/api/admin/users/trash");
+    const routeContext = { params: Promise.resolve({}) };
+
+    const response = await GET(request, routeContext);
     const body = await response.json();
 
     expect(body.backups).toHaveLength(1);
@@ -66,8 +69,9 @@ describe("admin users trash API", () => {
     const request = new NextRequest(
       "http://localhost/api/admin/users/trash?before=2026-02-02T00:00:00Z",
     );
+    const routeContext = { params: Promise.resolve({}) };
 
-    const response = await DELETE(request);
+    const response = await DELETE(request, routeContext);
     const body = await response.json();
 
     expect(body.success).toBe(true);

@@ -11,7 +11,7 @@ import { prisma } from "@/lib/db";
 import type { GoogleConnectionStatus } from "@/lib/google";
 import { logger } from "@/lib/logger";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   // Security: Get userId from authenticated session only
   const { userId, errorResponse } = await requireAuthenticatedUser();
   if (errorResponse) return errorResponse;

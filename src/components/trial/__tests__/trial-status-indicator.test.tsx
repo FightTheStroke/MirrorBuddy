@@ -182,7 +182,7 @@ describe("TrialStatusIndicator", () => {
 
   describe("multiple indicators", () => {
     it("renders all three indicators when enabled", () => {
-      const { container } = render(
+      render(
         <TrialStatusIndicator
           chatsUsed={5}
           showVoice={true}
