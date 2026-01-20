@@ -15,6 +15,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { getAppVersion } from "@/lib/version";
+import { prometheusPushService } from "@/lib/observability";
 
 /** Secret for health endpoint auth (optional) */
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
@@ -106,6 +107,7 @@ interface DetailedHealth {
     ai: AICheck;
     memory: MemoryCheck;
     safety: SafetyCheck;
+    grafana: GrafanaCheck;
   };
   build: BuildInfo;
 }
@@ -134,6 +136,12 @@ interface SafetyCheck {
   jailbreakDetector: boolean;
   ageGating: boolean;
   outputSanitizer: boolean;
+}
+
+interface GrafanaCheck {
+  configured: boolean;
+  active: boolean;
+  pushUrl?: string;
 }
 
 interface BuildInfo {
@@ -198,6 +206,18 @@ function checkSafety(): SafetyCheck {
   };
 }
 
+function checkGrafana(): GrafanaCheck {
+  const configured = prometheusPushService.isConfigured();
+  const active = prometheusPushService.isActive();
+  return {
+    configured,
+    active,
+    pushUrl: process.env.GRAFANA_CLOUD_PROMETHEUS_URL
+      ? process.env.GRAFANA_CLOUD_PROMETHEUS_URL.replace(/\/\/.*@/, "//***@")
+      : undefined,
+  };
+}
+
 function formatUptime(seconds: number): string {
   const d = Math.floor(seconds / 86400);
   const h = Math.floor((seconds % 86400) / 3600);
@@ -228,8 +248,9 @@ export async function GET(request: NextRequest) {
   const ai = checkAI();
   const memory = checkMemory();
   const safety = checkSafety();
+  const grafana = checkGrafana();
 
-  const checks = { database, ai, memory, safety };
+  const checks = { database, ai, memory, safety, grafana };
   const uptimeSeconds = Math.round((Date.now() - startTime) / 1000);
 
   const hasFailure = database.status === "fail" || memory.status === "fail";
