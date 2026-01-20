@@ -80,6 +80,10 @@ model User {
 
   // Terms of Service (F-13)
   tosAcceptances TosAcceptance[]
+
+  // Compliance & Audit (F-08)
+  auditEntriesAsSubject ComplianceAuditEntry[]
+  auditEntriesAsAdmin    ComplianceAuditEntry[] @relation("AdminAuditLog")
 }
 
 model Profile {
