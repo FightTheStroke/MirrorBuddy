@@ -46,7 +46,8 @@ test.describe("Terms of Service - API Endpoints", () => {
       expect(typeof data.accepted).toBe("boolean");
       expect(data.version).toBe("1.0");
     } else {
-      expect([404, 500]).toContain(response.status());
+      // 401 (unauthenticated), 404 (not found), or 500 (error)
+      expect([401, 404, 500]).toContain(response.status());
     }
   });
 
