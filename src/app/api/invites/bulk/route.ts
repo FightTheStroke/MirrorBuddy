@@ -15,6 +15,7 @@ import {
   bulkApproveInvites,
   bulkRejectInvites,
 } from "@/lib/invite/invite-service";
+import { logger } from "@/lib/logger";
 
 interface BulkRequestBody {
   action: "approve" | "reject";
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Bulk invite operation failed:", error);
+    logger.error("Bulk invite operation failed", undefined, error);
     return NextResponse.json(
       { error: "Failed to process bulk operation" },
       { status: 500 },

@@ -11,6 +11,7 @@
 import { NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 export async function GET() {
   const auth = await validateAdminAuth();
@@ -66,7 +67,7 @@ export async function GET() {
       systemAlerts: criticalSafetyEvents,
     });
   } catch (error) {
-    console.error("Failed to fetch admin counts:", error);
+    logger.error("Failed to fetch admin counts", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch counts" },
       { status: 500 },
