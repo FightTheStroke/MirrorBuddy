@@ -145,10 +145,22 @@ test.describe("Admin Sidebar Navigation", () => {
         continue;
       }
 
-      // Click the link (force: true to bypass any dev overlays like HMR)
-      await sidebarLink.click({ force: true });
+      // Click the link and wait for URL to change to expected route
+      // Use Promise.all to catch navigation that starts immediately
+      const expectedPath = navItem.href;
+      await Promise.all([
+        adminPage.waitForURL(
+          (url) =>
+            navItem.exact
+              ? url.pathname === expectedPath
+              : url.pathname.startsWith(expectedPath),
+          { timeout: 10000 },
+        ),
+        sidebarLink.click({ force: true }),
+      ]).catch(() => {
+        // Navigation may have failed - we'll check below
+      });
       await adminPage.waitForLoadState("networkidle");
-      await adminPage.waitForTimeout(500); // Wait for any redirects
 
       // Close any modals that appeared after navigation
       await closeOpenDialogs(adminPage);
@@ -420,9 +432,20 @@ test.describe("Admin Sidebar Navigation", () => {
         .first();
 
       if (await link.isVisible({ timeout: 1000 }).catch(() => false)) {
-        await link.click({ force: true });
+        // Wait for URL to change after click
+        await Promise.all([
+          adminPage.waitForURL(
+            (url) =>
+              navItem.exact
+                ? url.pathname === navItem.href
+                : url.pathname.startsWith(navItem.href),
+            { timeout: 10000 },
+          ),
+          link.click({ force: true }),
+        ]).catch(() => {
+          // Navigation may have failed
+        });
         await adminPage.waitForLoadState("networkidle");
-        await adminPage.waitForTimeout(300);
         // Close any modals after navigation
         await closeOpenDialogs(adminPage);
       }
