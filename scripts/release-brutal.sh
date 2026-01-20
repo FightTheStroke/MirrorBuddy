@@ -70,16 +70,19 @@ npm run build > /tmp/release-build.log 2>&1 && pass "build" || fail "build" "\`\
 npm run test:coverage > /tmp/release-unit.log 2>&1 && pass "unit" || fail "unit" "\`\`\`\n$(grep -E 'FAIL|Error|failed' /tmp/release-unit.log | head -10)\n\`\`\`"
 
 npm run test > /tmp/release-e2e.log 2>&1
+E2E_EXIT=$?
 # Strip ANSI codes for reliable parsing
 E2E_CLEAN=$(cat /tmp/release-e2e.log | sed 's/\x1b\[[0-9;]*m//g' | sed 's/\x1b\[[0-9]*[A-Z]//g')
-E2E_PASSED=$(echo "$E2E_CLEAN" | grep -oE '[0-9]+ passed' | tail -1 | grep -oE '[0-9]+')
-E2E_FAILED=$(echo "$E2E_CLEAN" | grep -oE '[0-9]+ failed' | tail -1 | grep -oE '[0-9]+')
+E2E_PASSED=$(echo "$E2E_CLEAN" | /usr/bin/grep -oE '[0-9]+ passed' | tail -1 | /usr/bin/grep -oE '[0-9]+')
+E2E_FAILED=$(echo "$E2E_CLEAN" | /usr/bin/grep -oE '[0-9]+ failed' | tail -1 | /usr/bin/grep -oE '[0-9]+')
 E2E_FAILED=${E2E_FAILED:-0}
-if [ "$E2E_FAILED" -eq 0 ] 2>/dev/null; then
+E2E_PASSED=${E2E_PASSED:-0}
+# Must have passed > 0 AND failed = 0 AND exit code 0
+if [ "$E2E_EXIT" -eq 0 ] && [ "$E2E_PASSED" -gt 0 ] && [ "$E2E_FAILED" -eq 0 ] 2>/dev/null; then
   pass "e2e"
 else
-  FAILED_TESTS=$(echo "$E2E_CLEAN" | grep -E "^\s+[0-9]+\)" | head -10)
-  fail "e2e" "**Summary**: $E2E_PASSED passed, $E2E_FAILED failed\n\n**Failed tests**:\n\`\`\`\n$FAILED_TESTS\n\`\`\`"
+  FAILED_TESTS=$(echo "$E2E_CLEAN" | /usr/bin/grep -E "^\s+[0-9]+\)|Error:" | head -10)
+  fail "e2e" "**Exit**: $E2E_EXIT, **Passed**: $E2E_PASSED, **Failed**: $E2E_FAILED\n\n\`\`\`\n$FAILED_TESTS\n\`\`\`"
 fi
 
 # =============================================================================

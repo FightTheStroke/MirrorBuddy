@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
+import { config } from "dotenv";
+
+// Load .env file for TEST_DATABASE_URL
+config();
 
 /**
  * MirrorBuddy E2E Test Configuration
@@ -12,6 +16,13 @@ import path from "path";
  */
 delete process.env.NO_COLOR;
 delete process.env.FORCE_COLOR;
+
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+if (!testDatabaseUrl) {
+  throw new Error(
+    "TEST_DATABASE_URL must be set for E2E tests to avoid hitting production.",
+  );
+}
 
 // Configure screenshot comparison settings
 export const screenshotComparisonOptions = {
@@ -105,11 +116,12 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      // Pass through database URLs if set in environment
-      ...(process.env.DATABASE_URL && {
-        DATABASE_URL: process.env.DATABASE_URL,
+      ...(process.env.TEST_DATABASE_URL && {
+        DATABASE_URL: process.env.TEST_DATABASE_URL,
       }),
-      ...(process.env.DIRECT_URL && { DIRECT_URL: process.env.DIRECT_URL }),
+      ...(process.env.TEST_DIRECT_URL && {
+        DIRECT_URL: process.env.TEST_DIRECT_URL,
+      }),
       E2E_TESTS: "1",
       // Session secret for cookie signing (required for cookie-signing.spec.ts)
       SESSION_SECRET:
