@@ -59,7 +59,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
   });
 
@@ -96,7 +96,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
 
     await page.keyboard.press("Escape");
@@ -112,7 +112,7 @@ test.describe("A11y Instant Access - Quick Panel", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
 
     // Click outside
@@ -269,7 +269,7 @@ test.describe("A11y Instant Access - Keyboard Navigation", () => {
 
     const panel = page
       .locator('[role="dialog"]')
-      .filter({ hasText: "Impostazioni Accessibilità" });
+      .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
   });
 
