@@ -102,10 +102,19 @@ export async function validateAuth(): Promise<AuthResult> {
           };
         } catch (createError) {
           // P2002 = unique constraint violation (user was created by another request)
-          if (
+          // Check for both Prisma error code and various message formats
+          const isPrismaP2002 =
+            createError &&
+            typeof createError === "object" &&
+            "code" in createError &&
+            createError.code === "P2002";
+          const isUniqueConstraintMessage =
             createError instanceof Error &&
-            createError.message.includes("Unique constraint")
-          ) {
+            (createError.message.includes("Unique constraint") ||
+              createError.message.includes("unique constraint") ||
+              createError.message.includes("duplicate key"));
+
+          if (isPrismaP2002 || isUniqueConstraintMessage) {
             // User was created by another concurrent request, fetch and return
             const existingUser = await prisma.user.findUnique({
               where: { id: userId },
