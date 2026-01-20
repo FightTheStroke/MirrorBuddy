@@ -225,6 +225,36 @@ jobs:
             [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
           done
 
+  # Lane 4b: Migration Consistency (fast, runs in parallel)
+  migrations:
+    name: Migration Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check migration naming convention
+        run: |
+          echo "Checking migration folder naming..."
+          INVALID=$(ls prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
+          if [ -n "$INVALID" ]; then
+            echo "ERROR: Migration folders must be named YYYYMMDDHHMMSS_name"
+            echo "Invalid migrations found:"
+            echo "$INVALID"
+            exit 1
+          fi
+          echo "All migrations correctly named"
+
+      - name: Verify migration.sql exists
+        run: |
+          echo "Checking each migration has migration.sql..."
+          for dir in prisma/migrations/[0-9]*/; do
+            if [ ! -f "${dir}migration.sql" ]; then
+              echo "ERROR: Missing migration.sql in $dir"
+              exit 1
+            fi
+          done
+          echo "All migrations have migration.sql files"
+
   # Lane 5: Code Quality (fast, runs in parallel)
   quality:
     name: Code Quality
@@ -329,9 +359,10 @@ jobs:
       - name: Setup database
         run: |
           npx prisma generate
-          npx prisma db push
+          npx prisma migrate deploy
         env:
           DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
