@@ -17,9 +17,9 @@ export {
   containsCrisisKeywords,
   CRISIS_RESPONSE,
   type SafetyInjectionOptions,
-} from './safety-prompts-core';
+} from "./safety-prompts-core";
 
-export { IT_CONTENT_PATTERNS } from './safety-patterns';
+export { IT_CONTENT_PATTERNS } from "./safety-patterns";
 
 export {
   filterInput,
@@ -30,7 +30,7 @@ export {
   type FilterResult,
   type FilterSeverity,
   type FilterAction,
-} from './content-filter-core';
+} from "./content-filter-core";
 
 export {
   sanitizeOutput,
@@ -39,7 +39,7 @@ export {
   StreamingSanitizer,
   type SanitizeResult,
   type SanitizeCategory,
-} from './output-sanitizer';
+} from "./output-sanitizer";
 
 export {
   detectJailbreak,
@@ -50,7 +50,7 @@ export {
   type JailbreakCategory,
   type ThreatLevel,
   type ConversationContext,
-} from './jailbreak-detector';
+} from "./jailbreak-detector";
 
 export {
   checkAgeGate,
@@ -63,7 +63,7 @@ export {
   type TopicSensitivity,
   type ContentTopic,
   type AgeGateResult,
-} from './age-gating';
+} from "./age-gating";
 
 export {
   logSafetyEvent,
@@ -85,7 +85,23 @@ export {
   type EventSeverity,
   type SafetyEvent,
   type SafetyMetrics,
-} from './monitoring';
+} from "./monitoring";
 
-// Server-only DB functions - import directly when needed:
-// import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';
+// ============================================================================
+// SERVER-ONLY MODULES - Import directly when needed (not via barrel export)
+// ============================================================================
+// Human Escalation (F-06 - AI Act Article 14):
+//   import { escalateCrisisDetected, ... } from '@/lib/safety/escalation';
+//
+// DB queries:
+//   import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';
+// ============================================================================
+
+// Re-export types only (no runtime code)
+export type {
+  EscalationEvent,
+  EscalationTrigger,
+  EscalationSeverity,
+  EscalationMetadata,
+  EscalationConfig,
+} from "./escalation/types";

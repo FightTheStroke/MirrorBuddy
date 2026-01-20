@@ -2,14 +2,12 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { PrivacyContent } from "./content";
-import { PrivacyContentExtended } from "./content-extended";
-import { PrivacyContentAI } from "./content-ai";
+import { AITransparencyContent } from "./content";
 
-export const PRIVACY_VERSION = "1.2";
-const LAST_UPDATED = "20 Gennaio 2025";
+const AI_TRANSPARENCY_VERSION = "1.0";
+const LAST_UPDATED = "20 Gennaio 2026";
 
-export default function PrivacyPage() {
+export default function AITransparencyPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
       {/* Navigation */}
@@ -35,10 +33,10 @@ export default function PrivacyPage() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Privacy Policy di MirrorBuddy
+              Trasparenza sull&apos;Intelligenza Artificiale
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-gray-400">
-              <span>Versione {PRIVACY_VERSION}</span>
+              <span>Versione {AI_TRANSPARENCY_VERSION}</span>
               <span>•</span>
               <span>Ultimo aggiornamento: {LAST_UPDATED}</span>
             </div>
@@ -61,53 +59,90 @@ export default function PrivacyPage() {
                   ✓
                 </span>
                 <span>
-                  Raccogliamo solo i dati necessari (email, chat, progressi)
+                  MirrorBuddy usa IA (Azure OpenAI) per insegnare, non per
+                  decidere
                 </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Non vendiamo MAI i tuoi dati a nessuno</span>
+                <span>
+                  I 22 Maestri IA hanno conoscenze verificate e controllate
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Puoi cancellare tutto quando vuoi</span>
+                <span>
+                  Gli insegnanti vedono sempre tutte le chat e possono
+                  intervenire
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>I dati restano in Europa (GDPR)</span>
+                <span>
+                  Puoi rifiutare l&apos;IA quando vuoi, senza conseguenze
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Web Vitals opzionali - puoi disattivarli</span>
+                <span>
+                  Rispettiamo il GDPR e la legge italiana sulla privacy
+                </span>
               </li>
             </ul>
           </section>
 
           {/* Main Sections */}
-          <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">
-            <PrivacyContent />
-            <PrivacyContentExtended />
-            <PrivacyContentAI />
-          </div>
+          <AITransparencyContent />
+
+          {/* Links Section */}
+          <section className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
+              Documenti Correlati
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Link
+                href="/privacy"
+                className="block p-4 rounded-lg border border-slate-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
+                  Privacy Policy
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-gray-400">
+                  Come proteggiamo i tuoi dati
+                </p>
+              </Link>
+              <Link
+                href="/terms"
+                className="block p-4 rounded-lg border border-slate-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
+              >
+                <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
+                  Termini di Servizio
+                </h3>
+                <p className="text-sm text-slate-600 dark:text-gray-400">
+                  Le regole d&apos;uso di MirrorBuddy
+                </p>
+              </Link>
+            </div>
+          </section>
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
             <p className="text-slate-600 dark:text-gray-400 text-center">
-              Domande sulla privacy? Scrivici:{" "}
+              Domande sull&apos;IA in MirrorBuddy? Scrivici:{" "}
               <a
-                href="mailto:info@fightthestroke.org"
+                href="mailto:compliance@mirrorbuddy.it"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
-                aria-label="Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
+                aria-label="Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
               >
-                info@fightthestroke.org
+                compliance@mirrorbuddy.it
               </a>
             </p>
           </footer>

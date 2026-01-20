@@ -1,0 +1,39 @@
+// ============================================================================
+// COMPLIANCE & AUDIT DOMAIN
+// Regulatory audit logs for inspectors (L.132 Art.3 - Italy)
+// ============================================================================
+
+// F-08: Compliance Audit Entry
+// Tracks all compliance-related events for regulatory inspection
+model ComplianceAuditEntry {
+  id        String   @id @default(cuid())
+
+  // Event classification
+  eventType String   // e.g., "data_access", "data_export", "consent_change", "deletion_request", "user_creation", "user_deletion", "admin_action"
+  severity  String   // "info", "warning", "critical"
+
+  // Event description and context
+  description String
+  details     String? // JSON-serialized additional data
+
+  // User and actor information
+  userId      String? // User the event is about (nullable for system events)
+  user        User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  adminId     String? // Admin who performed the action (if applicable)
+  admin       User?   @relation("AdminAuditLog", fields: [adminId], references: [id], onDelete: SetNull)
+
+  // Audit metadata
+  ipAddress   String?
+  userAgent   String?
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+
+  @@index([eventType])
+  @@index([severity])
+  @@index([userId])
+  @@index([adminId])
+  @@index([createdAt])
+  @@map("compliance_audit_entries")
+}

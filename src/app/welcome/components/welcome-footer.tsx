@@ -35,6 +35,8 @@ const LEGAL_LINKS = [
   { href: "/privacy", label: "Privacy Policy" },
   { href: "/terms", label: "Termini di Servizio" },
   { href: "/cookies", label: "Cookie Policy" },
+  { href: "/ai-transparency", label: "Trasparenza AI" },
+  { href: "/ai-policy", label: "Politica AI" },
 ];
 
 /**

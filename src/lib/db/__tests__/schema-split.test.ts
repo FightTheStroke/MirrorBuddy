@@ -28,6 +28,7 @@ const EXPECTED_SCHEMA_FILES = [
   "insights.prisma", // StudentInsightProfile, ParentNote
   "rag.prisma", // ContentEmbedding, MaterialEdge, Concept
   "privacy.prisma", // UserPrivacyPreferences (GDPR compliance)
+  "compliance.prisma", // Compliance audit logging (AI Act, L.132)
   "trial.prisma", // TrialSession (anonymous trial mode)
   "invite.prisma", // InviteRequest (beta invite system)
 ];
