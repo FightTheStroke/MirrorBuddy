@@ -231,6 +231,49 @@ vercel --prod
 
 **Prevention**: Always use `printf '%s'` when piping to `vercel env add`.
 
+### Database Migrations (CRITICAL)
+
+**NEVER use `prisma db push` on production or CI databases.**
+
+| Command                 | Use Case                                   | Tracking                              |
+| ----------------------- | ------------------------------------------ | ------------------------------------- |
+| `prisma migrate dev`    | Local development, creates migration files | ✅ Creates `_prisma_migrations` table |
+| `prisma migrate deploy` | CI/Production deployment                   | ✅ Reads `_prisma_migrations` table   |
+| `prisma db push`        | Schema prototyping only                    | ❌ NO migration tracking              |
+
+**What happens if you use `db push`**:
+
+1. Schema is applied correctly
+2. BUT `_prisma_migrations` table is NOT created
+3. Future `migrate deploy` fails with "migrations not applied"
+4. Drift between migration files and actual schema
+
+**Migration file requirements**:
+
+- Folder name: `YYYYMMDDHHMMSS_description` (e.g., `20260120120000_add_users`)
+- SQL file: `migration.sql` (not `001_something.sql`)
+- Both are enforced by CI
+
+**CI Pipeline** (`.github/workflows/ci.yml`):
+
+1. `migrations` job validates naming convention and file structure
+2. E2E tests use `prisma migrate deploy` (not `db push`)
+
+**Recovery if `db push` was used**:
+
+```bash
+# Baseline existing schema (marks all migrations as applied)
+npx prisma migrate resolve --applied 20260110181126_init
+npx prisma migrate resolve --applied 20260115095200_feature_name
+# ... repeat for all migration folders
+```
+
+**Prevention**:
+
+- `scripts/pre-push-vercel.sh` checks migration naming (Phase 0)
+- CI `migrations` job blocks invalid migration structure
+- Always use `migrate deploy` in Vercel build command
+
 ### Supabase Integration
 
 Vercel automatically adds these when Supabase integration is enabled:
