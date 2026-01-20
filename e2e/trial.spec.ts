@@ -257,7 +257,8 @@ test.describe("Trial Mode Flow", () => {
     await expect(
       page.getByRole("heading", { name: /Cookie Policy/i }).first(),
     ).toBeVisible();
-    await expect(page.locator("text=Cookie Essenziali")).toBeVisible();
+    // Use first() to avoid strict mode violation - text appears multiple times
+    await expect(page.locator("text=Cookie Essenziali").first()).toBeVisible();
   });
 
   // Skip: /settings is not a route - settings is a view within the main app at /
