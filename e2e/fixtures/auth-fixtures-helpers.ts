@@ -96,7 +96,9 @@ export function getAdminStorageState() {
   const adminEmail = process.env.ADMIN_EMAIL || "admin@example.com";
 
   // Create a test session ID (in real scenario, this would come from login)
-  const adminSessionId = "admin-test-session-" + Date.now();
+  // Add random component to prevent collision when parallel workers start at same millisecond
+  const randomSuffix = crypto.randomUUID().replace(/-/g, "").substring(0, 9);
+  const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
 
   // Sign the admin session cookie
   const signedCookie = signCookieValue(adminSessionId);
