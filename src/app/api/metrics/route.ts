@@ -11,6 +11,7 @@ import { metricsStore } from "@/lib/observability/metrics-store";
 import { generateSLIMetrics } from "./sli-metrics";
 import { generateBehavioralMetrics } from "./behavioral-metrics";
 import { generateBusinessMetrics } from "./business-metrics";
+import { generateSecurityMetrics } from "./security-metrics";
 import { generateExternalServiceMetrics } from "@/lib/metrics/external-service-metrics";
 
 interface MetricLine {
@@ -207,6 +208,10 @@ export async function GET() {
     // BUSINESS METRICS: User engagement, conversion, retention, maestri usage
     const businessMetrics = await generateBusinessMetrics();
     metrics.push(...businessMetrics);
+
+    // SECURITY METRICS: SSL status, env validation, security events
+    const securityMetrics = await generateSecurityMetrics();
+    metrics.push(...securityMetrics);
 
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);

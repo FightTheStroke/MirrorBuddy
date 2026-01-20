@@ -12,16 +12,21 @@
 
 export async function register() {
   // Only run on server (not in Edge runtime or browser)
-  if (process.env.NEXT_RUNTIME === 'nodejs') {
-    // Initialize OpenTelemetry first (must run before any other code)
-    const { initializeOpenTelemetry, startOpenTelemetry } = await import('@/lib/telemetry/otel');
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    // Validate environment variables first (fail-fast)
+    const { validateEnv } = await import("@/lib/env");
+    validateEnv();
+
+    // Initialize OpenTelemetry (must run before any other code)
+    const { initializeOpenTelemetry, startOpenTelemetry } =
+      await import("@/lib/telemetry/otel");
     const sdk = initializeOpenTelemetry();
     if (sdk) {
       startOpenTelemetry(sdk);
     }
 
     // Start WebSocket proxy (deprecated)
-    const { startRealtimeProxy } = await import('@/server/realtime-proxy');
+    const { startRealtimeProxy } = await import("@/server/realtime-proxy");
     startRealtimeProxy();
   }
 }
