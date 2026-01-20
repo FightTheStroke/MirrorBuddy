@@ -8,6 +8,7 @@ import "server-only";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool, PoolConfig } from "pg";
+import { logger } from "@/lib/logger";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -45,10 +46,18 @@ function buildSslConfig(): PoolConfig["ssl"] {
     };
   }
 
-  // Production without CA cert: encrypt only, skip verification
-  // This is required because Supabase's CA isn't in Node.js trust store
-  // To enable full verification: set SUPABASE_CA_CERT env variable
+  // Production REQUIRES CA cert for secure SSL verification
+  // Supabase's pooler CA isn't in Node.js trust store, so we must provide it
+  // Download from: Supabase Dashboard → Database Settings → SSL Configuration
   if (isProduction) {
+    // During Next.js build, db.ts is imported but not connected
+    // The env validation in instrumentation.ts will catch this at runtime
+    // Here we log a critical warning and use encrypted-only mode as fallback
+    logger.error("[SECURITY] SUPABASE_CA_CERT not set in production", {
+      issue: "ssl_verification_disabled",
+      severity: "critical",
+      action: "Set SUPABASE_CA_CERT environment variable",
+    });
     return {
       rejectUnauthorized: false,
     };

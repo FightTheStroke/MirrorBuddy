@@ -6,8 +6,9 @@
 import { NextResponse } from "next/server";
 import { getCacheControlHeader, CACHE_TTL } from "@/lib/cache";
 import { getAppVersion } from "@/lib/version";
+import { apiHandler } from "@/lib/api";
 
-export async function GET() {
+export const GET = apiHandler(async () => {
   const version = getAppVersion();
   const buildTime = process.env.BUILD_TIME || new Date().toISOString();
 
@@ -27,4 +28,4 @@ export async function GET() {
   response.headers.set("Cache-Control", cacheControl);
 
   return response;
-}
+});
