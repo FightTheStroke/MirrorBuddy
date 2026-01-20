@@ -196,7 +196,10 @@ export async function buildUserBackup(
     prisma.userActivity.findMany({ where: { identifier: userId } }),
   ]);
 
-  const toJson = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T;
+  const toJson = <T>(value: T): T =>
+    value === undefined
+      ? (null as T)
+      : (JSON.parse(JSON.stringify(value)) as T);
 
   return {
     user: toJson(user),
