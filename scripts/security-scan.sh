@@ -88,7 +88,9 @@ run_zap_scan() {
 
   echo -e "${GREEN}✓ OWASP ZAP available, running passive scan...${NC}"
 
-  # Run ZAP passive scan
+  # Run ZAP passive scan (using default baseline policy)
+  # Note: -p is for progress file tracking, not policy selection
+  # Policy selection in baseline scans uses -c for config files
   docker run --rm \
     --network host \
     -v "$REPORT_DIR":/zap/wrk \
@@ -96,7 +98,6 @@ run_zap_scan() {
     -t http://localhost:3000 \
     -J /zap/wrk/zap-report.json \
     -r /zap/wrk/zap-baseline.html \
-    -p /zap/policies/api-minimal.policy \
     2>&1 | grep -E "PASS|FAIL|Alert" || true
 
   # Parse ZAP report for high alerts
