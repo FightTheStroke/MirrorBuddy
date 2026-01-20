@@ -22,6 +22,12 @@ async function globalTeardown() {
     return;
   }
 
+  // Skip cleanup if DATABASE_URL is not set (local dev without DB)
+  if (!process.env.DATABASE_URL) {
+    console.log("E2E cleanup skipped (no DATABASE_URL)");
+    return;
+  }
+
   const prisma = new PrismaClient();
 
   try {
