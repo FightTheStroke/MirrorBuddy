@@ -82,20 +82,59 @@ export async function validateAuth(): Promise<AuthResult> {
         process.env.E2E_TESTS === "1" ||
         process.env.NODE_ENV !== "production"
       ) {
-        const created = await prisma.user.create({
-          data: {
-            id: userId,
-            profile: { create: {} },
-            settings: { create: {} },
-            progress: { create: {} },
-          },
-          select: { id: true },
-        });
+        // E2E/dev mode: auto-create test users
+        // Check if this is an admin session (indicated by mirrorbuddy-admin cookie)
+        const adminCookie = cookieStore.get("mirrorbuddy-admin");
+        const isAdminSession = !!adminCookie;
 
-        return {
-          authenticated: true,
-          userId: created.id,
-        };
+        // Use try-catch to handle race conditions where concurrent requests
+        // may try to create the same user simultaneously
+        try {
+          const created = await prisma.user.create({
+            data: {
+              id: userId,
+              role: isAdminSession ? "ADMIN" : "USER",
+              profile: { create: {} },
+              settings: { create: {} },
+              progress: { create: {} },
+            },
+            select: { id: true },
+          });
+
+          return {
+            authenticated: true,
+            userId: created.id,
+          };
+        } catch (createError) {
+          // P2002 = unique constraint violation (user was created by another request)
+          // Check for both Prisma error code and various message formats
+          const isPrismaP2002 =
+            createError &&
+            typeof createError === "object" &&
+            "code" in createError &&
+            createError.code === "P2002";
+          const isUniqueConstraintMessage =
+            createError instanceof Error &&
+            (createError.message.includes("Unique constraint") ||
+              createError.message.includes("unique constraint") ||
+              createError.message.includes("duplicate key"));
+
+          if (isPrismaP2002 || isUniqueConstraintMessage) {
+            // User was created by another concurrent request, fetch and return
+            const existingUser = await prisma.user.findUnique({
+              where: { id: userId },
+              select: { id: true },
+            });
+            if (existingUser) {
+              return {
+                authenticated: true,
+                userId: existingUser.id,
+              };
+            }
+          }
+          // Re-throw other errors
+          throw createError;
+        }
       }
 
       return {

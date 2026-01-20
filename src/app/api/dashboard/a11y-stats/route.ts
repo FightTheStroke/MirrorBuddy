@@ -6,6 +6,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 export interface A11yStatsData {
   period: { days: number; startDate: string };
@@ -97,7 +98,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error fetching a11y stats:", error);
+    logger.error("Error fetching a11y stats", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch accessibility stats" },
       { status: 500 },

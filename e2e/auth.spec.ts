@@ -15,9 +15,9 @@ test.describe("Login/Logout Authentication Flow", () => {
   test("Login page renders with form", async ({ page }) => {
     await page.goto("/login");
 
-    // Check form elements exist (login uses username field, not email)
+    // Check form elements exist (login uses email field, not email)
     await expect(page.locator("form")).toBeVisible();
-    await expect(page.locator("input#username")).toBeVisible();
+    await expect(page.locator("input#email")).toBeVisible();
     await expect(page.locator('input[type="password"]')).toBeVisible();
     await expect(page.locator('button[type="submit"]')).toBeVisible();
   });
@@ -25,15 +25,20 @@ test.describe("Login/Logout Authentication Flow", () => {
   test("Login with invalid credentials shows error", async ({ page }) => {
     await page.goto("/login");
 
-    // Fill form with invalid credentials (login uses username field)
-    await page.fill("input#username", "invaliduser");
+    // Fill form with invalid credentials (login uses email field)
+    // Use valid email format to pass browser validation, but non-existent user
+    await page.fill("input#email", "nonexistent@test.com");
     await page.fill('input[type="password"]', "wrongpassword123");
     await page.click('button[type="submit"]');
 
-    // Expect error message to appear
-    await expect(page.locator('[role="alert"]')).toBeVisible();
+    // Wait for API response
+    await page.waitForTimeout(1000);
+
+    // Expect error message to appear (Italian: "Credenziali non valide" or similar)
+    // Use .first() to avoid strict mode violation (Next.js route announcer also has role="alert")
+    await expect(page.locator('[role="alert"]').first()).toBeVisible();
     await expect(
-      page.locator("text=/invalid|incorrect|unauthorized/i"),
+      page.locator("text=/non valide|invalid|errore|incorrect|unauthorized/i"),
     ).toBeVisible();
 
     // Should stay on login page
@@ -48,14 +53,14 @@ test.describe("Login/Logout Authentication Flow", () => {
     // In CI, test user is created via prisma seed or fixture
     // Skip if no test user environment is configured
     const testUser = {
-      username: process.env.TEST_USER_USERNAME || "testuser",
+      email: process.env.TEST_USER_EMAIL || "test@example.com",
       password: process.env.TEST_USER_PASSWORD || "TestPassword123!",
     };
 
     await page.goto("/login");
 
-    // Fill form with valid credentials (login uses username field)
-    await page.fill("input#username", testUser.username);
+    // Fill form with valid credentials (login uses email field)
+    await page.fill("input#email", testUser.email);
     await page.fill('input[type="password"]', testUser.password);
     await page.click('button[type="submit"]');
 
