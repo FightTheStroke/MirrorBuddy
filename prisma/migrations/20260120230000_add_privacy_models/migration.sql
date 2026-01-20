@@ -1,3 +1,9 @@
+-- CreateEnum: UserRole (F-26: Role-based access control)
+CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
+
+-- CreateEnum: InviteStatus (Beta invite system)
+CREATE TYPE "InviteStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
+
 -- CreateTable
 CREATE TABLE "CoppaConsent" (
     "id" TEXT NOT NULL,
