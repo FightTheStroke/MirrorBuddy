@@ -3,7 +3,7 @@
 icon: public/logo-brain.png
 
 AI-powered educational platform for students with learning differences.
-20 AI "Maestros" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
+22 AI "Maestri" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
 
 ---
 
@@ -33,7 +33,7 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 **State** (`src/lib/stores/`): Zustand + REST APIs - NO localStorage (ADR 0015)
 
-**Trial Mode** (`src/lib/trial/`): Anonymous sessions (10 chats, 5 min voice, 10 tools), budget control - ADR 0056
+**Trial Mode** (`src/lib/trial/`): Anonymous sessions (10 chats, 5 min voice, 10 tools, 3 maestri, 1 doc), budget control - ADR 0056
 
 **Invite System** (`src/lib/invite/`): Admin-approved beta access, email notifications - ADR 0057
 
@@ -47,11 +47,13 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 ADMIN_EMAIL=admin@example.com     # Admin access control
 TRIAL_BUDGET_LIMIT_EUR=100        # Monthly trial budget
 RESEND_API_KEY=re_xxx             # Email notifications
+TOKEN_ENCRYPTION_KEY=xxx          # 32+ chars for AES-256-GCM (ADR 0060)
+SUPABASE_CA_CERT=xxx              # SSL cert for production (ADR 0063)
 ```
 
 ## Modular Rules (auto-loaded)
 
-`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md
+`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md
 
 ## On-Demand Docs
 
@@ -61,6 +63,7 @@ Load with `@docs/claude/<name>.md`:
 **Voice**: voice-api | ambient-audio | onboarding
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator | gamification
 **Beta**: trial-mode (ADR 0056) | invite-system (ADR 0057) | observability-kpis (ADR 0058)
+**Compliance**: e2e-setup (ADR 0059) | security-hardening (ADR 0060) | instant-a11y (ADR 0060) | admin-redesign (ADR 0061) | ai-compliance (ADR 0062) | supabase-ssl (ADR 0063)
 **Characters**: buddies | coaches | adding-maestri
 
 ## Setup Docs (one-time)
