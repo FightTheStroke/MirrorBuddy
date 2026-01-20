@@ -107,6 +107,14 @@ const PUBLIC_DOCUMENTS: ComplianceDocument[] = [
 
 const TECHNICAL_DOCUMENTS: ComplianceDocument[] = [
   {
+    title: "DPIA",
+    description:
+      "Valutazione d'impatto sulla protezione dei dati (GDPR Art. 35)",
+    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/DPIA.md",
+    icon: <Shield className="w-5 h-5" />,
+    isExternal: true,
+  },
+  {
     title: "Model Card",
     description:
       "Specifiche tecniche del sistema AI, performance e limitazioni",

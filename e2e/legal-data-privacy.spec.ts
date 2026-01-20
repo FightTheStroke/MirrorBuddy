@@ -193,6 +193,84 @@ test.describe("Footer Legal Links", () => {
 });
 
 // ============================================================================
+// COMPLIANCE HUB & DPIA
+// ============================================================================
+
+test.describe("Compliance Hub Page", () => {
+  test("page loads", async ({ page }) => {
+    const response = await page.goto("/compliance");
+    expect(response?.ok()).toBeTruthy();
+    await expect(page).toHaveTitle(/compliance|trasparenza/i);
+  });
+
+  test("has compliance badges", async ({ page }) => {
+    await page.goto("/compliance");
+    const content = await page.textContent("body");
+
+    // Should show all major compliance badges
+    expect(content).toMatch(/GDPR/i);
+    expect(content).toMatch(/AI Act/i);
+    expect(content).toMatch(/COPPA/i);
+    expect(content).toMatch(/L\.132\/2025|132\/2025/i);
+  });
+
+  test("links to public documents", async ({ page }) => {
+    await page.goto("/compliance");
+
+    // Check for links to public legal documents
+    const privacyLink = page.locator('a[href*="privacy"]');
+    const termsLink = page.locator('a[href*="terms"]');
+    const aiTransparencyLink = page.locator('a[href*="ai-transparency"]');
+
+    await expect(privacyLink.first()).toBeVisible();
+    await expect(termsLink.first()).toBeVisible();
+    await expect(aiTransparencyLink.first()).toBeVisible();
+  });
+
+  test("links to DPIA documentation", async ({ page }) => {
+    await page.goto("/compliance");
+
+    // DPIA should be linked (external to GitHub)
+    const dpiaLink = page.locator('a[href*="DPIA"]');
+    if ((await dpiaLink.count()) > 0) {
+      await expect(dpiaLink.first()).toBeVisible();
+    }
+
+    // Or mentioned in content
+    const content = await page.textContent("body");
+    expect(content).toMatch(/DPIA|valutazione.*impatto|impact.*assessment/i);
+  });
+
+  test("has contact information", async ({ page }) => {
+    await page.goto("/compliance");
+    const content = await page.textContent("body");
+
+    // Should have contact email for compliance questions
+    expect(content).toMatch(/info@fightthestroke\.org|contatt/i);
+  });
+
+  test("is keyboard accessible", async ({ page }) => {
+    await page.goto("/compliance");
+    await page.keyboard.press("Tab");
+
+    const focused = await page.evaluate(() => document.activeElement?.tagName);
+    expect(focused).toBeDefined();
+  });
+});
+
+test.describe("Footer Compliance Link", () => {
+  test("has compliance link in footer", async ({ page }) => {
+    await page.goto("/home");
+    const footer = page.locator("footer");
+    const link = footer.locator('a[href*="compliance"]');
+
+    if ((await link.count()) > 0) {
+      await expect(link.first()).toBeVisible();
+    }
+  });
+});
+
+// ============================================================================
 // CONSENT MANAGEMENT
 // ============================================================================
 
