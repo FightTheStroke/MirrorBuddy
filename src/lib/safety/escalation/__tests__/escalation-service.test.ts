@@ -23,11 +23,15 @@ import {
   getUnresolvedEscalations,
   resolveEscalation,
   getEscalationConfig,
+  clearEscalationBuffer,
 } from "../escalation-service";
 import type { EscalationEvent } from "../types";
 
 describe("Escalation Service - F-06 Human Escalation Pathway", () => {
   beforeEach(() => {
+    // Clear buffer between tests for isolation
+    clearEscalationBuffer();
+
     // Initialize with test config
     initializeEscalationService({
       jailbreakThreshold: 2, // Lower for testing
@@ -47,7 +51,7 @@ describe("Escalation Service - F-06 Human Escalation Pathway", () => {
       expect(event.trigger).toBe("crisis_detected");
       expect(event.severity).toBe("critical");
       expect(event.anonymizedUserId).toBe("user_123");
-      expect(event.sessionHash).toBe("hash_session_45");
+      expect(event.sessionHash).toBe("hash_session_456");
       expect(event.maestroId).toBe("galileo");
       expect(event.metadata.reason).toContain("Crisis keywords");
       expect(event.metadata.confidence).toBe(1.0);
@@ -163,7 +167,8 @@ describe("Escalation Service - F-06 Human Escalation Pathway", () => {
       const after = getUnresolvedEscalations().length;
 
       expect(after).toBe(before + 1);
-      expect(after).toContain(event.id);
+      const unresolved = getUnresolvedEscalations();
+      expect(unresolved.map((e) => e.id)).toContain(event.id);
     });
 
     it("should mark escalation as resolved", async () => {
@@ -174,7 +179,14 @@ describe("Escalation Service - F-06 Human Escalation Pathway", () => {
 
       await resolveEscalation(eventId, "Contacted parent");
 
-      const updated = getUnresolvedEscalations().find((e) => e.id === eventId);
+      // Should no longer be in unresolved list
+      const unresolved = getUnresolvedEscalations().find(
+        (e) => e.id === eventId,
+      );
+      expect(unresolved).toBeUndefined();
+
+      // Should be updated in recent escalations
+      const updated = getRecentEscalations().find((e) => e.id === eventId);
       expect(updated?.resolved).toBe(true);
       expect(updated?.adminNotes).toBe("Contacted parent");
       expect(updated?.resolvedAt).toBeDefined();

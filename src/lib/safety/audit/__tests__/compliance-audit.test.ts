@@ -13,6 +13,7 @@ import {
   getComplianceEntries,
   getComplianceStatistics,
   exportComplianceAudit,
+  clearComplianceBuffer,
 } from "../compliance-audit-service";
 import type {
   ComplianceAuditEntry,
@@ -21,6 +22,11 @@ import type {
 } from "../compliance-audit-types";
 
 describe("Compliance Audit Service (F-07)", () => {
+  beforeEach(() => {
+    // Clear buffer between tests for isolation
+    clearComplianceBuffer();
+  });
+
   describe("recordComplianceEvent", () => {
     it("should record a compliance event with required fields", () => {
       const entryId = recordComplianceEvent("content_filtered", {
@@ -326,7 +332,8 @@ describe("Compliance Audit Service (F-07)", () => {
       const exportData = exportComplianceAudit(periodStart, periodEnd, "admin");
 
       expect(exportData.metadata).toBeDefined();
-      expect(exportData.metadata.exportedBy).toMatch(/^\*{3}$/);
+      // anonymizeUserId keeps first N chars + "***" (where N = anonymizationKeyLength, default 8)
+      expect(exportData.metadata.exportedBy).toMatch(/^.{1,8}\*{3}$/);
       expect(exportData.metadata.periodStart).toBe(periodStart);
       expect(exportData.metadata.periodEnd).toBe(periodEnd);
     });
