@@ -144,9 +144,9 @@ export const StudentSummaryEditor = forwardRef<StudentSummaryEditorHandle, Stude
         </div>
 
         {/* Main */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {showSidebar && (
-            <motion.div initial={{ width: 0 }} animate={{ width: 200 }} className="flex-shrink-0 w-[200px] border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 overflow-y-auto">
+            <motion.div initial={{ width: 0 }} animate={{ width: 200 }} className="flex-shrink-0 w-full md:w-[200px] border-b md:border-b-0 md:border-r border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 overflow-y-auto">
               <div className="p-3 space-y-2">
                 <p className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-3">Struttura</p>
                 {summaryData.sections.map((section) => (

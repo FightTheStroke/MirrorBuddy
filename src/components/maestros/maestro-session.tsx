@@ -174,7 +174,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
 
       {/* Normal chat view */}
       <div className={cn(
-        'flex gap-4 h-[calc(100vh-8rem)]',
+        'flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]',
         isToolFullscreen && 'opacity-0 pointer-events-none'
       )}>
         {/* Main Chat Area */}

@@ -74,11 +74,11 @@ export function CharacterVoicePanel({
   const buttonBgMuted = 'bg-red-500/60 hover:bg-red-500/70';
   const iconColor = 'text-white';
 
-  return (
-    <div
-      className="relative w-64 sm:w-72 flex flex-col p-4 sm:p-5 rounded-2xl h-full min-h-[120px] text-white"
-      style={gradientStyle}
-    >
+    return (
+      <div
+        className="relative w-full sm:w-72 lg:w-64 flex flex-col p-4 sm:p-5 rounded-2xl h-full min-h-[120px] text-white"
+        style={gradientStyle}
+      >
       {/* Top bar: Always render both buttons */}
       <div className="flex items-center justify-between mb-4">
         <Button

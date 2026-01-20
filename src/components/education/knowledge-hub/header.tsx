@@ -25,14 +25,14 @@ export function KnowledgeHubHeader({
   onClearSearch,
 }: HeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 px-4 py-3 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         <h1 className="text-xl font-semibold text-slate-900 dark:text-white">
           Knowledge Hub
         </h1>
 
         {/* View Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-700 rounded-lg">
+        <div className="flex items-center gap-1 p-1 bg-slate-100 dark:bg-slate-700 rounded-lg overflow-x-auto scrollbar-hide">
           {VIEW_OPTIONS.map((option) => (
             <Button
               key={option.id}
@@ -55,7 +55,7 @@ export function KnowledgeHubHeader({
       </div>
 
       {/* Search */}
-      <div className="relative w-64">
+      <div className="relative w-full lg:w-64">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
         <input
           type="text"

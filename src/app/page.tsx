@@ -67,6 +67,7 @@ export default function Home() {
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth < 1024) setSidebarOpen(false);
+      else setSidebarOpen(true);
     };
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -160,6 +161,7 @@ export default function Home() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
       <HomeHeader
         sidebarOpen={sidebarOpen}
+        onMenuClick={() => setSidebarOpen(true)}
         seasonLevel={seasonLevel}
         mbInLevel={mbInLevel}
         mbNeeded={MB_PER_LEVEL}
@@ -188,8 +190,8 @@ export default function Home() {
 
       <main
         className={cn(
-          "min-h-screen transition-all duration-300 p-8 pt-20",
-          sidebarOpen ? "ml-64" : "ml-20",
+          "min-h-screen transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
+          sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
       >
         {/* Trial mode banner */}

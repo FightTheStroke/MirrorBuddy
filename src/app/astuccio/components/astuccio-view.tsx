@@ -119,7 +119,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
   // Show Study Kit view if selected
   if (state.dialogState === 'study_kit') {
     return (
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
         <button
           onClick={handleDialogClose}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
@@ -132,7 +132,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
   }
 
   return (
-    <div className="container mx-auto px-4 max-w-7xl">
+    <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
       <PageHeader icon={PencilRuler} title="Astuccio" />
 
       <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-10">
@@ -159,10 +159,10 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
               <div className={cn(
                 'grid gap-4',
                 tools.length === 1
-                  ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
                   : tools.length <= 3
-                    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                    : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-4'
+                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+                    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
               )}>
                 {tools.map((tool, index) => (
                   <motion.div

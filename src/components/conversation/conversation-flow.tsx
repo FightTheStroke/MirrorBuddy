@@ -169,7 +169,7 @@ export function ConversationFlow() {
   return (
     <div className={cn(
       "relative h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden",
-      isVoiceActive ? "flex flex-row" : "flex flex-col"
+      isVoiceActive ? "flex flex-col lg:flex-row" : "flex flex-col"
     )}>
       <ConversationContent
         activeCharacter={activeCharacter}
