@@ -124,7 +124,7 @@ export function CharacterChatView({
   const hasActiveTool = activeTool && activeTool.status !== "error";
 
   return (
-    <div className="flex gap-4 h-[calc(100vh-8rem)]">
+    <div className="flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]">
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header always visible */}
@@ -156,7 +156,7 @@ export function CharacterChatView({
       </div>
 
       {hasActiveTool && (
-        <div className="w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+        <div className="w-full lg:w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
           <ToolPanel
             tool={activeTool}
             maestro={{

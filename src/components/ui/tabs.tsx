@@ -40,14 +40,16 @@ interface TabsListProps {
 
 export function TabsList({ children, className }: TabsListProps) {
   return (
-    <div
-      role="tablist"
-      className={cn(
-        'inline-flex h-10 items-center justify-center rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
-        className
-      )}
-    >
-      {children}
+    <div className="max-w-full overflow-x-auto scrollbar-hide">
+      <div
+        role="tablist"
+        className={cn(
+          'inline-flex h-10 items-center justify-start rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-slate-800 dark:text-slate-400 whitespace-nowrap',
+          className
+        )}
+      >
+        {children}
+      </div>
     </div>
   );
 }

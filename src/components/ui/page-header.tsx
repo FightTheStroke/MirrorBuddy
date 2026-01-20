@@ -29,7 +29,7 @@ export function PageHeader({ icon: Icon, title, rightContent, className }: PageH
       )}>
         <div className="flex items-center gap-3">
           <Icon className="w-8 h-8 text-primary" aria-hidden="true" />
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
             {title}
           </h1>
         </div>

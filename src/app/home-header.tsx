@@ -10,6 +10,7 @@ import {
   Star,
   Gift,
   MessageCircle,
+  Menu,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
@@ -26,6 +27,7 @@ interface TrialStatus {
 
 interface HomeHeaderProps {
   sidebarOpen: boolean;
+  onMenuClick?: () => void;
   seasonLevel: number;
   mbInLevel: number;
   mbNeeded: number;
@@ -40,6 +42,7 @@ interface HomeHeaderProps {
 
 export function HomeHeader({
   sidebarOpen,
+  onMenuClick,
   seasonLevel,
   mbInLevel,
   mbNeeded,
@@ -59,11 +62,18 @@ export function HomeHeader({
     <header
       className={cn(
         "fixed top-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300",
-        sidebarOpen ? "left-64" : "left-20",
+        sidebarOpen ? "lg:left-64" : "lg:left-20",
       )}
     >
       {/* Level + MirrorBucks Progress */}
-      <div className="flex items-center gap-3 min-w-[240px]">
+      <div className="flex items-center gap-3 min-w-0">
+        <button
+          onClick={onMenuClick}
+          className="lg:hidden flex items-center justify-center h-8 w-8 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
+          aria-label="Apri menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
           <Coins className="w-4 h-4 text-white" />
         </div>
@@ -79,7 +89,7 @@ export function HomeHeader({
               {mbInLevel}/{mbNeeded} MB
             </span>
           </div>
-          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-36">
+          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-24 sm:w-36">
             <motion.div
               className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
               initial={{ width: 0 }}
@@ -91,7 +101,7 @@ export function HomeHeader({
       </div>
 
       {/* Quick Stats */}
-      <div className="flex items-center gap-4 text-sm">
+      <div className="hidden md:flex items-center gap-4 text-sm">
         <div className="flex items-center gap-1.5" title="Streak">
           <Flame
             className={cn(
@@ -164,7 +174,7 @@ export function HomeHeader({
       </div>
 
       {/* Right section: calculator + ambient audio + pomodoro + notifications + version */}
-      <div className="flex items-center gap-3">
+      <div className="hidden lg:flex items-center gap-3">
         <CalculatorHeaderWidget />
         <AmbientAudioHeaderWidget />
         <PomodoroHeaderWidget />

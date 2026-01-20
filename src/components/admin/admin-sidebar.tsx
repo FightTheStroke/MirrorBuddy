@@ -80,6 +80,11 @@ export function AdminSidebar({
   systemAlerts = 0,
 }: AdminSidebarProps) {
   const pathname = usePathname();
+  const handleItemClick = () => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) {
+      onToggle();
+    }
+  };
 
   const getNavItems = (): NavItem[] => {
     return NAV_ITEMS.map((item) => {
@@ -105,7 +110,10 @@ export function AdminSidebar({
       className={cn(
         "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r",
         "border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
-        open ? "w-64" : "w-20",
+        "w-72 max-w-[85vw] lg:max-w-none lg:w-64",
+        open
+          ? "translate-x-0 lg:w-64"
+          : "-translate-x-full lg:translate-x-0 lg:w-20",
       )}
     >
       {/* Logo */}
@@ -155,6 +163,7 @@ export function AdminSidebar({
             <Link
               key={item.id}
               href={item.href}
+              onClick={handleItemClick}
               className={cn(
                 "flex items-center gap-3 rounded-xl transition-all relative",
                 open ? "px-4 py-3" : "justify-center px-2 py-3",
@@ -197,6 +206,7 @@ export function AdminSidebar({
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
             )}
             aria-label="Torna all'app"
+            onClick={handleItemClick}
           >
             <Home className="w-4 h-4" />
             {open && <span>Torna all&apos;app</span>}

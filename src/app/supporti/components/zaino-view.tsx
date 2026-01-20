@@ -60,7 +60,7 @@ export function ZainoView({
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 max-w-7xl">
+        <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
           <PageHeader icon={Backpack} title="Zaino" />
           <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
@@ -82,7 +82,7 @@ export function ZainoView({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 max-w-7xl">
+      <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
         <PageHeader icon={Backpack} title="Zaino" />
 
         <div className="mb-6">

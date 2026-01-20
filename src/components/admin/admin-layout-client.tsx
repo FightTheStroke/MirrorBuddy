@@ -50,16 +50,20 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
         setMobileMenuOpen(false);
+        setSidebarOpen(true);
+      } else {
+        setSidebarOpen(false);
       }
     };
 
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Desktop Sidebar */}
+      {/* Sidebar */}
       <div className="hidden lg:block">
         <AdminSidebar
           open={sidebarOpen}
@@ -68,25 +72,21 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
           systemAlerts={counts.systemAlerts}
         />
       </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {mobileMenuOpen && (
-        <>
+      <div className="lg:hidden">
+        {mobileMenuOpen && (
           <div
-            className="fixed inset-0 bg-black/50 z-30 lg:hidden"
+            className="fixed inset-0 bg-black/50 z-30"
             onClick={() => setMobileMenuOpen(false)}
             aria-hidden="true"
           />
-          <div className="lg:hidden">
-            <AdminSidebar
-              open={true}
-              onToggle={() => setMobileMenuOpen(false)}
-              pendingInvites={counts.pendingInvites}
-              systemAlerts={counts.systemAlerts}
-            />
-          </div>
-        </>
-      )}
+        )}
+        <AdminSidebar
+          open={mobileMenuOpen}
+          onToggle={() => setMobileMenuOpen(false)}
+          pendingInvites={counts.pendingInvites}
+          systemAlerts={counts.systemAlerts}
+        />
+      </div>
 
       {/* Main Content */}
       <div

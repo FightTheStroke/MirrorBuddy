@@ -99,14 +99,14 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative">
+        <div className="relative w-full sm:w-auto">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="text"
             placeholder="Cerca..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-40 pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+            className="w-full sm:w-40 pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
             aria-label="Cerca professore o materia"
           />
         </div>
@@ -145,7 +145,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
       </div>
 
       {/* Grid - compact cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
         {filteredMaestri.map((maestro, index) => (
           <MaestroCard key={maestro.id} maestro={maestro} onSelect={handleSelect} index={index} />
         ))}
