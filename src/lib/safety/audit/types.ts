@@ -3,28 +3,39 @@
  * Part of Ethical Design Hardening (F-07, F-08)
  *
  * Types for safety deployment audit and knowledge base auditing.
+ * Compliance audit types in compliance-audit-types.ts
  */
 
 /**
  * Types of safety-related events to audit
  */
 export type SafetyAuditEventType =
-  | 'content_filtered'        // Content was filtered
-  | 'guardrail_triggered'     // Guardrail blocked content
-  | 'safety_config_changed'   // Safety config modified
-  | 'knowledge_base_updated'  // Maestro knowledge updated
-  | 'prompt_injection_attempt'// Prompt injection detected
-  | 'rate_limit_triggered'    // Rate limit hit
-  | 'user_reported_issue'     // User reported safety issue
-  | 'false_positive_logged';  // User indicated false positive
+  | "content_filtered" // Content was filtered
+  | "guardrail_triggered" // Guardrail blocked content
+  | "safety_config_changed" // Safety config modified
+  | "knowledge_base_updated" // Maestro knowledge updated
+  | "prompt_injection_attempt" // Prompt injection detected
+  | "rate_limit_triggered" // Rate limit hit
+  | "user_reported_issue" // User reported safety issue
+  | "false_positive_logged"; // User indicated false positive
+
+/**
+ * Regulatory compliance indicators
+ */
+export interface ComplianceIndicators {
+  aiAct?: boolean; // EU AI Act (2024) relevant
+  gdpr?: boolean; // GDPR data processing
+  coppa?: boolean; // COPPA compliance
+  italianL132Art4?: boolean; // Italian education regulation
+}
 
 /**
  * Audit severity for logging priority
  */
-export type AuditSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type AuditSeverity = "low" | "medium" | "high" | "critical";
 
 /**
- * Safety audit log entry
+ * Safety audit log entry with compliance support
  */
 export interface SafetyAuditEntry {
   /** Unique entry ID */
@@ -45,6 +56,12 @@ export interface SafetyAuditEntry {
   metadata: SafetyAuditMetadata;
   /** Hash of original content (for verification) */
   contentHash?: string;
+  /** Regulatory compliance indicators for audit trail */
+  complianceIndicators?: ComplianceIndicators;
+  /** Age group for regulatory classification */
+  ageGroup?: "child" | "teen" | "adult" | "unknown";
+  /** Outcome of the event (blocked, modified, escalated, allowed) */
+  outcome?: "blocked" | "modified" | "escalated" | "allowed" | "monitored";
 }
 
 /**
@@ -72,15 +89,15 @@ export interface KnowledgeBaseAuditEntry {
   /** Maestro ID */
   maestroId: string;
   /** Type of audit */
-  auditType: 'safety_scan' | 'content_review' | 'update_verification';
+  auditType: "safety_scan" | "content_review" | "update_verification";
   /** Timestamp */
   timestamp: Date;
   /** Audit results */
   results: KnowledgeAuditResult;
   /** Auditor (system or human) */
-  auditor: 'system' | 'human';
+  auditor: "system" | "human";
   /** Status */
-  status: 'passed' | 'failed' | 'needs_review';
+  status: "passed" | "failed" | "needs_review";
 }
 
 /**
@@ -105,12 +122,12 @@ export interface KnowledgeAuditResult {
 export interface KnowledgeAuditIssue {
   /** Issue type */
   type:
-    | 'inappropriate_content'
-    | 'factual_error'
-    | 'outdated_info'
-    | 'bias_detected'
-    | 'missing_citation'
-    | 'harmful_pattern';
+    | "inappropriate_content"
+    | "factual_error"
+    | "outdated_info"
+    | "bias_detected"
+    | "missing_citation"
+    | "harmful_pattern";
   /** Severity */
   severity: AuditSeverity;
   /** Location in knowledge base */
