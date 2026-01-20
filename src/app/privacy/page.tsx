@@ -3,9 +3,11 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { PrivacyContent } from "./content";
+import { PrivacyContentExtended } from "./content-extended";
+import { PrivacyContentAI } from "./content-ai";
 
-export const PRIVACY_VERSION = "1.1";
-const LAST_UPDATED = "18 Gennaio 2025";
+export const PRIVACY_VERSION = "1.2";
+const LAST_UPDATED = "20 Gennaio 2025";
 
 export default function PrivacyPage() {
   return (
@@ -90,7 +92,11 @@ export default function PrivacyPage() {
           </section>
 
           {/* Main Sections */}
-          <PrivacyContent />
+          <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">
+            <PrivacyContent />
+            <PrivacyContentExtended />
+            <PrivacyContentAI />
+          </div>
 
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
