@@ -210,7 +210,11 @@ test.describe("Trial Mode Flow", () => {
     await page.waitForLoadState("networkidle");
 
     // Verify the privacy link has correct attributes in consent wall
-    const privacyLink = page.locator('a:has-text("Privacy Policy")');
+    // Use exact text match to avoid matching "Privacy Policy completa" in terms content
+    const privacyLink = page.getByRole("link", {
+      name: "Privacy Policy",
+      exact: true,
+    });
     await expect(privacyLink).toBeVisible();
     await expect(privacyLink).toHaveAttribute("href", /\/privacy/);
     await expect(privacyLink).toHaveAttribute("target", "_blank");
@@ -249,8 +253,10 @@ test.describe("Trial Mode Flow", () => {
 
     await page.goto("/cookies");
 
-    // Cookie policy should be visible
-    await expect(page.locator("text=Cookie Policy")).toBeVisible();
+    // Cookie policy should be visible (use heading to avoid multiple matches)
+    await expect(
+      page.getByRole("heading", { name: /Cookie Policy/i }).first(),
+    ).toBeVisible();
     await expect(page.locator("text=Cookie Essenziali")).toBeVisible();
   });
 
