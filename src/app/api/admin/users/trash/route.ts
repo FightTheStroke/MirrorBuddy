@@ -38,9 +38,19 @@ export const DELETE = withAdmin(async (request: NextRequest) => {
   try {
     const { searchParams } = new URL(request.url);
     const before = searchParams.get("before");
+    const all = searchParams.get("all") === "true";
+
+    // Empty entire trash if all=true
+    if (all) {
+      const result = await prisma.deletedUserBackup.deleteMany({});
+      logger.info("Trash emptied completely", { deleted: result.count });
+      return NextResponse.json({ success: true, deleted: result.count });
+    }
+
+    // Otherwise require before param for selective purge
     if (!before) {
       return NextResponse.json(
-        { error: "before query param required" },
+        { error: "before query param required (or use all=true)" },
         { status: 400 },
       );
     }

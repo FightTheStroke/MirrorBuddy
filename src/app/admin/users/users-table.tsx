@@ -1,16 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  AlertCircle,
-  RotateCcw,
-  Lock,
-  Unlock,
-  Trash2,
-  ArchiveRestore,
-} from "lucide-react";
+import { AlertCircle, ArchiveRestore } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { UsersBulkActions } from "./users-bulk-actions";
+import { UsersSearch } from "./users-search";
+import { UsersTrashToolbar } from "./users-trash-toolbar";
+import { UsersTableRow } from "./users-table-row";
 
 interface User {
   id: string;
@@ -21,399 +18,235 @@ interface User {
   createdAt: Date;
 }
 
-interface UsersTableProps {
-  users: User[];
-}
-
 interface DeletedUserBackup {
   userId: string;
   email: string | null;
   username: string | null;
-  role: "USER" | "ADMIN";
   deletedAt: string;
-  purgeAt: string;
-  deletedBy: string;
-  reason: string | null;
 }
 
 type FilterTab = "all" | "active" | "disabled" | "trash";
 
-export function UsersTable({ users }: UsersTableProps) {
+export function UsersTable({ users }: { users: User[] }) {
   const [filter, setFilter] = useState<FilterTab>("all");
+  const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [deletedBackups, setDeletedBackups] = useState<DeletedUserBackup[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
 
   const loadTrash = useCallback(async () => {
     try {
-      const response = await fetch("/api/admin/users/trash");
-      if (!response.ok) {
-        throw new Error("Failed to load deleted users");
-      }
-      const data = await response.json();
-      setDeletedBackups(data.backups || []);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      const res = await fetch("/api/admin/users/trash");
+      if (res.ok) setDeletedBackups((await res.json()).backups || []);
+    } catch {
+      setError("Failed to load trash");
     }
   }, []);
 
-  const filteredUsers = users.filter((user) => {
-    if (filter === "active") return !user.disabled;
-    if (filter === "disabled") return user.disabled;
-    return true;
-  });
+  useEffect(() => {
+    if (filter === "trash") void loadTrash();
+  }, [filter, loadTrash]);
 
-  const handleResetPassword = async (userId: string, username: string) => {
-    setIsLoading(userId);
-    setError(null);
-
-    try {
-      const response = await fetch(
-        `/api/admin/users/${userId}/reset-password`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-        },
+  const filteredUsers = useMemo(() => {
+    let result = users;
+    if (filter === "active") result = users.filter((u) => !u.disabled);
+    else if (filter === "disabled") result = users.filter((u) => u.disabled);
+    if (search) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (u) =>
+          u.email?.toLowerCase().includes(q) ||
+          u.username?.toLowerCase().includes(q),
       );
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || "Failed to reset password");
-        return;
-      }
-
-      alert(`Password reset link sent to ${username}`);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(null);
     }
-  };
+    return result;
+  }, [users, filter, search]);
 
-  const handleToggleDisable = async (
+  const handleAction = async (
     userId: string,
-    currentDisabled: boolean,
+    action: "toggle" | "delete" | "restore",
+    currentDisabled?: boolean,
   ) => {
     setIsLoading(userId);
     setError(null);
-
     try {
-      const response = await fetch(`/api/admin/users/${userId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ disabled: !currentDisabled }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || "Failed to update user");
-        return;
-      }
-
-      // Trigger page reload to show updated data
-      window.location.reload();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(null);
-    }
-  };
-
-  const handleDeleteUser = async (userId: string) => {
-    setIsLoading(userId);
-    setError(null);
-
-    try {
-      if (!window.confirm("Confermi la cancellazione completa dell’utente?")) {
-        return;
-      }
-      const response = await csrfFetch(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-        body: JSON.stringify({ reason: "admin_delete" }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || "Failed to delete user");
-        return;
-      }
-
-      window.location.reload();
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
-    } finally {
-      setIsLoading(null);
-    }
-  };
-
-  const handleRestoreUser = async (userId: string) => {
-    setIsLoading(userId);
-    setError(null);
-
-    try {
-      const response = await csrfFetch(
-        `/api/admin/users/trash/${userId}/restore`,
-        {
+      if (action === "toggle") {
+        await fetch(`/api/admin/users/${userId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ disabled: !currentDisabled }),
+        });
+      } else if (action === "delete") {
+        if (!confirm("Confermi eliminazione?")) return;
+        await csrfFetch(`/api/admin/users/${userId}`, {
+          method: "DELETE",
+          body: JSON.stringify({ reason: "admin_delete" }),
+        });
+      } else if (action === "restore") {
+        await csrfFetch(`/api/admin/users/trash/${userId}/restore`, {
           method: "POST",
-        },
-      );
-
-      if (!response.ok) {
-        const data = await response.json();
-        setError(data.error || "Failed to restore user");
-        return;
+        });
+        await loadTrash();
       }
-
-      await loadTrash();
       window.location.reload();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred");
+      setError(err instanceof Error ? err.message : "Error");
     } finally {
       setIsLoading(null);
     }
   };
 
-  useEffect(() => {
-    if (filter === "trash") {
-      void loadTrash();
-    }
-  }, [filter, loadTrash]);
+  const toggleSelect = (id: string) =>
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+
+  const toggleSelectAll = () =>
+    setSelectedIds(
+      selectedIds.size === filteredUsers.length
+        ? new Set()
+        : new Set(filteredUsers.map((u) => u.id)),
+    );
+
+  const tabs: { key: FilterTab; label: string }[] = [
+    { key: "all", label: "Tutti" },
+    { key: "active", label: "Attivi" },
+    { key: "disabled", label: "Disabilitati" },
+    { key: "trash", label: "Cestino" },
+  ];
 
   return (
     <div>
       {error && (
-        <div
-          className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3"
-          role="alert"
-          aria-live="polite"
-        >
-          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-600" />
           <p className="text-red-700 text-sm">{error}</p>
         </div>
       )}
 
-      {/* Filter Tabs */}
-      <div className="flex gap-2 mb-6 border-b border-slate-200">
-        {(["all", "active", "disabled", "trash"] as const).map((tab) => (
+      <div className="flex gap-2 mb-4 border-b border-slate-200">
+        {tabs.map((tab) => (
           <button
-            key={tab}
-            onClick={() => setFilter(tab)}
-            className={`px-4 py-2 text-sm font-medium transition-colors ${
-              filter === tab
+            key={tab.key}
+            onClick={() => {
+              setFilter(tab.key);
+              setSelectedIds(new Set());
+            }}
+            className={`px-4 py-2 text-sm font-medium ${
+              filter === tab.key
                 ? "text-blue-600 border-b-2 border-blue-600"
                 : "text-slate-600 hover:text-slate-900"
             }`}
-            aria-current={filter === tab ? "page" : undefined}
           >
-            {tab === "trash"
-              ? `Cestino (${deletedBackups.length})`
-              : `${tab.charAt(0).toUpperCase() + tab.slice(1)} (${filteredUsers.length})`}
+            {tab.label}
+            {tab.key === "trash" ? ` (${deletedBackups.length})` : ""}
+            {tab.key === "all" ? ` (${users.length})` : ""}
           </button>
         ))}
       </div>
 
-      {filter === "trash" ? (
-        <div className="overflow-x-auto border border-slate-200 rounded-lg">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-100 border-b border-slate-200">
-                <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                  Username
+      {filter !== "trash" && (
+        <UsersSearch value={search} onChange={setSearch} />
+      )}
+      {filter === "trash" && (
+        <UsersTrashToolbar
+          count={deletedBackups.length}
+          onEmptyComplete={loadTrash}
+        />
+      )}
+
+      <div className="overflow-x-auto border border-slate-200 rounded-lg">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-100 border-b border-slate-200">
+              {filter !== "trash" && (
+                <th className="px-3 py-3 w-10">
+                  <input
+                    type="checkbox"
+                    checked={
+                      selectedIds.size === filteredUsers.length &&
+                      filteredUsers.length > 0
+                    }
+                    onChange={toggleSelectAll}
+                    className="rounded"
+                  />
                 </th>
-                <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                  Deleted
-                </th>
-                <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                  Purge
-                </th>
-                <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {deletedBackups.map((backup) => (
-                <tr
-                  key={backup.userId}
-                  className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
-                >
-                  <td className="px-6 py-4 text-slate-900 font-medium">
-                    {backup.username || "—"}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {backup.email || "—"}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {new Date(backup.deletedAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-slate-600">
-                    {new Date(backup.purgeAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleRestoreUser(backup.userId)}
-                      disabled={isLoading === backup.userId}
-                      className="text-xs"
-                    >
-                      <ArchiveRestore className="w-3 h-3 mr-1" />
-                      Ripristina
-                    </Button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {deletedBackups.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-slate-600">Nessun utente nel cestino</p>
-            </div>
-          )}
-        </div>
-      ) : (
-        <>
-          {/* Table */}
-          <div className="overflow-x-auto border border-slate-200 rounded-lg">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-100 border-b border-slate-200">
-                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                    Username
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                    Role
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left font-semibold text-slate-900">
-                    Created
-                  </th>
-                  <th
-                    className="px-6 py-3 text-left font-semibold text-slate-900"
-                    scope="col"
-                  >
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredUsers.map((user) => (
-                  <tr
-                    key={user.id}
-                    className="border-b border-slate-200 hover:bg-slate-50 transition-colors"
-                  >
-                    <td className="px-6 py-4 text-slate-900 font-medium">
-                      {user.username || "—"}
+              )}
+              <th className="px-4 py-3 text-left font-semibold">Username</th>
+              <th className="px-4 py-3 text-left font-semibold">Email</th>
+              {filter !== "trash" && (
+                <>
+                  <th className="px-4 py-3 text-left font-semibold">Role</th>
+                  <th className="px-4 py-3 text-left font-semibold">Status</th>
+                </>
+              )}
+              <th className="px-4 py-3 text-left font-semibold">
+                {filter === "trash" ? "Eliminato" : "Creato"}
+              </th>
+              <th className="px-4 py-3 text-left font-semibold">Azioni</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filter === "trash"
+              ? deletedBackups.map((b) => (
+                  <tr key={b.userId} className="border-b hover:bg-slate-50">
+                    <td className="px-4 py-3">{b.username || "—"}</td>
+                    <td className="px-4 py-3 text-slate-600">
+                      {b.email || "—"}
                     </td>
-                    <td className="px-6 py-4 text-slate-600">
-                      {user.email || "—"}
+                    <td className="px-4 py-3 text-slate-600">
+                      {new Date(b.deletedAt).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                          user.role === "ADMIN"
-                            ? "bg-amber-100 text-amber-800"
-                            : "bg-slate-100 text-slate-800"
-                        }`}
+                    <td className="px-4 py-3">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleAction(b.userId, "restore")}
+                        disabled={isLoading === b.userId}
                       >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                          user.disabled
-                            ? "bg-red-100 text-red-800"
-                            : "bg-green-100 text-green-800"
-                        }`}
-                        aria-label={
-                          user.disabled ? "User disabled" : "User active"
-                        }
-                      >
-                        {user.disabled ? "Disabled" : "Active"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-slate-600">
-                      {new Date(user.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            handleResetPassword(
-                              user.id,
-                              user.username || user.email || user.id,
-                            )
-                          }
-                          disabled={isLoading === user.id}
-                          aria-label={`Reset password for ${user.username || user.email}`}
-                          className="text-xs"
-                        >
-                          <RotateCcw className="w-3 h-3 mr-1" />
-                          Reset
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant={user.disabled ? "default" : "outline"}
-                          onClick={() =>
-                            handleToggleDisable(user.id, user.disabled)
-                          }
-                          disabled={isLoading === user.id}
-                          aria-label={
-                            user.disabled
-                              ? `Enable user ${user.username}`
-                              : `Disable user ${user.username}`
-                          }
-                          className="text-xs"
-                        >
-                          {user.disabled ? (
-                            <>
-                              <Unlock className="w-3 h-3 mr-1" />
-                              Enable
-                            </>
-                          ) : (
-                            <>
-                              <Lock className="w-3 h-3 mr-1" />
-                              Disable
-                            </>
-                          )}
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDeleteUser(user.id)}
-                          disabled={isLoading === user.id}
-                          aria-label={`Delete user ${user.username}`}
-                          className="text-xs text-red-600"
-                        >
-                          <Trash2 className="w-3 h-3 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
+                        <ArchiveRestore className="w-3 h-3 mr-1" />
+                        Ripristina
+                      </Button>
                     </td>
                   </tr>
+                ))
+              : filteredUsers.map((user) => (
+                  <UsersTableRow
+                    key={user.id}
+                    user={user}
+                    isSelected={selectedIds.has(user.id)}
+                    isLoading={isLoading === user.id}
+                    onSelect={() => toggleSelect(user.id)}
+                    onToggle={() =>
+                      handleAction(user.id, "toggle", user.disabled)
+                    }
+                    onDelete={() => handleAction(user.id, "delete")}
+                  />
                 ))}
-              </tbody>
-            </table>
+          </tbody>
+        </table>
+        {filter !== "trash" && filteredUsers.length === 0 && (
+          <div className="text-center py-8 text-slate-500">
+            Nessun utente trovato
           </div>
+        )}
+        {filter === "trash" && deletedBackups.length === 0 && (
+          <div className="text-center py-8 text-slate-500">Cestino vuoto</div>
+        )}
+      </div>
 
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-slate-600">No users found</p>
-            </div>
-          )}
-        </>
-      )}
+      <UsersBulkActions
+        selectedIds={selectedIds}
+        onClearSelection={() => setSelectedIds(new Set())}
+        onActionComplete={() => window.location.reload()}
+      />
     </div>
   );
 }
