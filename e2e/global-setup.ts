@@ -7,7 +7,7 @@
 
 import path from "path";
 import fs from "fs";
-import { createHmac } from "crypto";
+import { createHmac, randomUUID } from "crypto";
 
 const STORAGE_STATE_PATH = path.join(__dirname, ".auth", "storage-state.json");
 
@@ -31,8 +31,13 @@ async function globalSetup() {
     fs.mkdirSync(authDir, { recursive: true });
   }
 
+  // Generate unique test user ID per run to avoid conflicts with stale data
+  // All workers share this ID (loaded from storage-state.json)
+  const randomSuffix = randomUUID().replace(/-/g, "").substring(0, 9);
+  const testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
+
   // Sign the test user cookie
-  const signedCookie = signCookieValue("test-user");
+  const signedCookie = signCookieValue(testUserId);
 
   // Create storage state with onboarding completed
   const storageState = {
@@ -51,7 +56,7 @@ async function globalSetup() {
       {
         // Client-readable cookie (not signed, for JS access)
         name: "mirrorbuddy-user-id-client",
-        value: "test-user",
+        value: testUserId,
         domain: "localhost",
         path: "/",
         expires: -1,
