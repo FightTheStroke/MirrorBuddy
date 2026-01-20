@@ -28,9 +28,24 @@ echo ""
 START_TIME=$(date +%s)
 
 # =============================================================================
+# PHASE 0: MIGRATION CONSISTENCY CHECK
+# =============================================================================
+echo -e "${BLUE}[0/5] Checking migration consistency...${NC}"
+
+# Verify all migrations are named correctly (with timestamp)
+INVALID_MIGRATIONS=$(ls prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
+if [ -n "$INVALID_MIGRATIONS" ]; then
+    echo -e "${RED}✗ Invalid migration folder names (must be YYYYMMDDHHMMSS_name):${NC}"
+    echo "$INVALID_MIGRATIONS"
+    echo -e "${YELLOW}Fix: Rename to include timestamp, e.g., 20260120120000_my_migration${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Migration naming OK${NC}"
+
+# =============================================================================
 # PHASE 1: SIMULATE FRESH PRISMA (like Vercel)
 # =============================================================================
-echo -e "${BLUE}[1/4] Simulating Vercel fresh Prisma...${NC}"
+echo -e "${BLUE}[1/5] Simulating Vercel fresh Prisma...${NC}"
 
 # Delete cached Prisma client to simulate Vercel's fresh build
 rm -rf node_modules/.prisma 2>/dev/null || true
@@ -46,7 +61,7 @@ echo -e "${GREEN}✓ Prisma generated fresh${NC}"
 # =============================================================================
 # PHASE 2: PARALLEL CHECKS (lint + typecheck + audit)
 # =============================================================================
-echo -e "${BLUE}[2/4] Parallel checks (lint, typecheck, audit)...${NC}"
+echo -e "${BLUE}[2/5] Parallel checks (lint, typecheck, audit)...${NC}"
 
 (
     npm run lint > "$TEMP_DIR/lint.log" 2>&1
@@ -110,7 +125,7 @@ fi
 # =============================================================================
 # PHASE 3: BUILD (like Vercel)
 # =============================================================================
-echo -e "${BLUE}[3/4] Production build (fresh Prisma)...${NC}"
+echo -e "${BLUE}[3/5] Production build (fresh Prisma)...${NC}"
 
 if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
     echo -e "${RED}✗ Build failed${NC}"
@@ -122,7 +137,7 @@ echo -e "${GREEN}✓ Build passed${NC}"
 # =============================================================================
 # PHASE 4: QUALITY CHECKS (CI parity)
 # =============================================================================
-echo -e "${BLUE}[4/4] Quality checks...${NC}"
+echo -e "${BLUE}[4/5] Quality checks...${NC}"
 
 # CSRF Check: Ensure client-side POST/PUT/DELETE use csrfFetch (ADR 0053)
 # ESLint already catches this, but explicit check provides clear error message

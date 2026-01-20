@@ -12,6 +12,7 @@ type HandlerFn = (req: NextRequest) => Promise<Response>;
 interface CreateHandlerOptions {
   errorMessage?: string;
   onValidationError?: (error: ZodError) => void;
+  onInvalidJson?: (error: unknown) => Response;
 }
 
 interface ApiErrorResponse {
@@ -75,7 +76,15 @@ export function createHandler<T extends z.ZodTypeAny>(
   options?: CreateHandlerOptions,
 ): HandlerFn {
   return apiHandler(async (req: NextRequest) => {
-    const body = await req.json();
+    let body: unknown;
+    try {
+      body = await req.json();
+    } catch (error) {
+      if (options?.onInvalidJson) {
+        return options.onInvalidJson(error);
+      }
+      throw error;
+    }
     const parseResult = schema.safeParse(body);
 
     if (!parseResult.success) {
