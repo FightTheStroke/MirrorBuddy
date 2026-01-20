@@ -139,6 +139,8 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 
 **WCAG 2.1 AA:** Dyslexia (OpenDyslexic, spacing, TTS) | Dyscalculia (visual numbers) | ADHD (focus mode, breaks) | Autism (predictable layouts) | Cerebral Palsy (large targets, keyboard, voice)
 
+**Instant Accessibility (ADR 0060):** Floating button for quick profile switching with 90-day cookie persistence and automatic OS preference detection.
+
 ---
 
 ## Safety & Privacy by Design
@@ -170,13 +172,18 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 - **Session Throttling**: Gradual escalation from warnings to timeouts
 - **Audit Trail**: Anonymized logging for safety monitoring
 
-### Security Hardening
+### Security Hardening (ADR 0060)
 
+- **OAuth PKCE**: RFC 7636 code_verifier/code_challenge with SHA-256
+- **Token Encryption**: AES-256-GCM encryption at rest for OAuth tokens
+- **Rate Limiting**: Auth-specific (5/15min login, 3/15min password change)
+- **SVG Sanitization**: DOMPurify for Mermaid diagram output
+- **COPPA Verification**: 6-digit email codes for parental consent
 - **Unicode Normalization**: Prevents Cyrillic/Greek homoglyph attacks
 - **Configuration Versioning**: Rollback safety settings with history
 - **Knowledge Base Auditing**: Content validation before embedding
 
-**→ Technical details: [docs/adr/0004-safety-guardrails.md](docs/adr/0004-safety-guardrails.md) | [docs/adr/0008-parent-dashboard-gdpr.md](docs/adr/0008-parent-dashboard-gdpr.md)**
+**→ Technical details: [docs/adr/0004-safety-guardrails.md](docs/adr/0004-safety-guardrails.md) | [docs/adr/0008-parent-dashboard-gdpr.md](docs/adr/0008-parent-dashboard-gdpr.md) | [docs/adr/0060-security-audit-hardening.md](docs/adr/0060-security-audit-hardening.md)**
 
 ---
 
@@ -221,7 +228,9 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 
 **Anti-abuse protection:** Trial sessions are tracked by IP hash + cookie to prevent repeated trials via incognito browsing.
 
-**→ Technical details: [docs/adr/0056-trial-mode-architecture.md](docs/adr/0056-trial-mode-architecture.md)**
+**Admin Features (ADR 0061):** Collapsible sidebar, bulk invite actions, direct invite creation, real-time KPI dashboard.
+
+**→ Technical details: [docs/adr/0056-trial-mode-architecture.md](docs/adr/0056-trial-mode-architecture.md) | [docs/adr/0061-admin-section-redesign.md](docs/adr/0061-admin-section-redesign.md)**
 
 ---
 

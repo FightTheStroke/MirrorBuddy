@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > Technical overview of the MirrorBuddy platform architecture
-> Last updated: 2026-01-18
+> Last updated: 20 Gennaio 2026, 11:30 CET
 
 ---
 
@@ -134,7 +134,7 @@ src/
 │   ├── observability/# Prometheus push to Grafana
 │   └── tools/        # Tool handlers & plugins
 ├── data/
-│   ├── maestri/      # 20 AI maestro definitions (modular)
+│   ├── maestri/      # 22 AI Maestri definitions (modular)
 │   ├── buddy-profiles/
 │   └── support-teachers/
 ├── hooks/            # 20+ React hooks
@@ -142,7 +142,7 @@ src/
 └── middleware.ts
 
 prisma/schema/        # PostgreSQL + pgvector schema
-docs/adr/             # 51+ Architecture Decision Records
+docs/adr/             # 65+ Architecture Decision Records
 ```
 
 ---
@@ -191,8 +191,18 @@ docs/adr/             # 51+ Architecture Decision Records
 Anonymous users can try MirrorBuddy without registration:
 
 ```
-Trial User → Fingerprint ID → 3 Chat Messages → Soft Limit (reminder) → Hard Limit (CTA) → Beta Request
+Trial User → Fingerprint ID → 10 Chat Messages → Soft Limit (reminder) → Hard Limit (CTA) → Beta Request
 ```
+
+**Limits:**
+
+| Resource      | Limit | Description                               |
+| ------------- | ----- | ----------------------------------------- |
+| Chat messages | 10    | Text conversations with Maestri           |
+| Voice time    | 5 min | Voice sessions with AI tutors             |
+| Tool calls    | 10    | Mind maps, summaries, flashcards, quizzes |
+| Documents     | 1     | PDF/image upload for homework help        |
+| Maestri       | 3     | Randomly assigned AI tutors               |
 
 **Components:**
 
@@ -240,6 +250,44 @@ flowchart LR
 ```
 
 **Session Auth:** `src/lib/auth/session-auth.ts` - Cookie-based sessions with `validateSessionAuth()` and `validateAdminAuth()`.
+
+### Security Hardening (ADR 0060)
+
+- **OAuth PKCE**: RFC 7636 code_verifier/code_challenge with SHA-256
+- **Token Encryption**: AES-256-GCM at rest (requires `TOKEN_ENCRYPTION_KEY`)
+- **Rate Limiting**: Auth-specific limits (5/15min login, 3/15min password)
+- **SVG Sanitization**: DOMPurify for Mermaid diagrams
+- **COPPA Verification**: 6-digit email codes for parental consent
+
+### Instant Accessibility (ADR 0060)
+
+Floating accessibility button for quick profile switching:
+
+- `src/components/accessibility/a11y-floating-button.tsx` - 44x44px trigger
+- `src/components/accessibility/a11y-quick-panel.tsx` - Settings panel
+- `src/lib/accessibility/a11y-cookie-storage.ts` - 90-day persistence
+
+### Admin Section Redesign (ADR 0061)
+
+- Collapsible sidebar with mobile responsiveness
+- Bulk invite actions (approve/reject multiple)
+- Direct invite creation
+- KPI dashboard with real-time metrics
+
+### AI Compliance Framework (ADR 0062)
+
+Three-tier compliance: Mandatory (DPIA, AI Policy, Risk Register) → Enhanced (Model Card, Bias Audit) → Observability (Dashboard)
+
+- `docs/compliance/` - DPIA, AI Policy, Risk Management docs
+- `src/lib/compliance/` - Services for COPPA, oversight, bias auditing
+
+### Supabase SSL (ADR 0063)
+
+Production requires explicit CA certificate for pooler connections:
+
+- `SUPABASE_CA_CERT` env var required in production
+- Fail-fast if missing (no silent fallback)
+- Development allows `rejectUnauthorized: false` with warning
 
 ---
 

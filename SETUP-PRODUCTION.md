@@ -2,6 +2,8 @@
 
 Step-by-step guide for deploying MirrorBuddy to production on Vercel with Azure OpenAI, Supabase, Upstash, and Resend.
 
+> Last updated: 20 Gennaio 2026, 11:30 CET
+
 See [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md) for architecture decisions.
 
 ---
@@ -9,6 +11,7 @@ See [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md) for architectur
 ## Prerequisites
 
 Create accounts and have credentials ready:
+
 - **Vercel** - hosting (free tier OK for preview)
 - **Supabase** - PostgreSQL database with pgvector
 - **Upstash** - Redis for rate limiting
@@ -33,12 +36,14 @@ Create accounts and have credentials ready:
      - `DIRECT_URL` (direct, port 5432, for migrations)
    - These will be set in Vercel
 
-3. **SSL Configuration (Recommended)**
+3. **SSL Configuration (Required for Production)** - See [ADR 0063](docs/adr/0063-supabase-ssl-certificate-requirements.md)
    - Settings → Database → SSL Configuration
    - Download CA certificate (PEM format)
    - Save for Vercel environment as `SUPABASE_CA_CERT`
+   - **IMPORTANT**: Production will fail-fast if this is missing
 
 4. **Enable pgvector**
+
    ```sql
    -- Run in Supabase SQL Editor
    CREATE EXTENSION IF NOT EXISTS vector;
@@ -87,6 +92,7 @@ Create accounts and have credentials ready:
    - Tier: Standard (S0)
 
 2. **Deploy Models**
+
    ```bash
    az cognitiveservices account deployment create \
      --name {resource-name} --resource-group {rg-name} \
@@ -158,7 +164,10 @@ Create accounts and have credentials ready:
    # Security
    vercel env add SESSION_SECRET production --sensitive <<< "$(openssl rand -hex 32)"
    vercel env add CRON_SECRET production --sensitive <<< "$(openssl rand -hex 32)"
+   vercel env add TOKEN_ENCRYPTION_KEY production --sensitive <<< "$(openssl rand -hex 32)"
    ```
+
+   > **Breaking Change (v0.8.0)**: `TOKEN_ENCRYPTION_KEY` is required for OAuth token encryption (AES-256-GCM). See [ADR 0060](docs/adr/0060-security-audit-hardening.md).
 
 3. **Deploy**
    ```bash
@@ -170,12 +179,14 @@ Create accounts and have credentials ready:
 ## Step 6: Post-Deploy Verification
 
 1. **Health Check**
+
    ```bash
    curl https://mirrorbuddy.vercel.app/api/health
    # Expected: {"status":"ok","timestamp":"..."}
    ```
 
 2. **Database Migrations**
+
    ```bash
    # Vercel console or via Supabase
    npx prisma migrate deploy

@@ -33,14 +33,14 @@ Instead, please report vulnerabilities through one of these channels:
 
 ### Response Timeline
 
-| Action | Timeline |
-|--------|----------|
-| Initial acknowledgment | Within 48 hours |
-| Preliminary assessment | Within 5 business days |
-| Status update | Every 7 days until resolved |
-| Fix deployment (critical) | Within 72 hours |
-| Fix deployment (high) | Within 14 days |
-| Fix deployment (medium/low) | Within 30 days |
+| Action                      | Timeline                    |
+| --------------------------- | --------------------------- |
+| Initial acknowledgment      | Within 48 hours             |
+| Preliminary assessment      | Within 5 business days      |
+| Status update               | Every 7 days until resolved |
+| Fix deployment (critical)   | Within 72 hours             |
+| Fix deployment (high)       | Within 14 days              |
+| Fix deployment (medium/low) | Within 30 days              |
 
 ## Security Measures
 
@@ -48,22 +48,41 @@ Instead, please report vulnerabilities through one of these channels:
 
 - **Student Data**: All personally identifiable information (PII) is encrypted at rest and in transit
 - **GDPR Compliance**: Full compliance with GDPR for EU users, including data export and deletion rights
+- **Unified Deletion**: Single `executeUserDataDeletion()` for all 20+ tables with audit trail
+- **Token Revocation**: Google OAuth tokens revoked before database deletion
 - **Data Minimization**: We collect only data necessary for educational functionality
 - **No Third-Party Sharing**: Student data is never sold or shared with third parties for advertising
+- **COPPA Compliance**: Email verification (6-digit codes) for parental consent of children under 13
+- **Data Breach Protocol**: Documented runbook at `docs/security/DATA-BREACH-PROTOCOL.md`
 
-### Authentication & Authorization
+### Authentication & Authorization (ADR 0060)
 
 - Secure session management with httpOnly cookies
 - Role-based access control (RBAC)
-- Rate limiting on all API endpoints
-- CSRF protection on all forms
+- **OAuth PKCE** (RFC 7636): code_verifier/code_challenge with SHA-256
+- **Signed State**: HMAC-SHA256 signature with 10-minute expiry
+- **Token Encryption**: AES-256-GCM encryption at rest for OAuth tokens
+- CSRF protection with cookie signing (HMAC-SHA256)
+
+### Rate Limiting
+
+| Endpoint           | Limit        | Purpose                     |
+| ------------------ | ------------ | --------------------------- |
+| Login              | 5 req/15 min | Brute force prevention      |
+| Password Change    | 3 req/15 min | Account takeover prevention |
+| OAuth              | 10 req/min   | Token abuse prevention      |
+| Invite Requests    | 3 req/hour   | Public endpoint protection  |
+| COPPA Verification | 5 req/hour   | Email abuse prevention      |
+| General API        | 60 req/min   | DDoS mitigation             |
 
 ### Infrastructure
 
 - HTTPS enforced on all endpoints
-- Content Security Policy (CSP) headers
+- Content Security Policy (CSP) headers with nonces for inline scripts
 - XSS protection headers
+- **SVG Sanitization**: DOMPurify for Mermaid diagram output
 - SQL injection prevention through parameterized queries (Prisma ORM)
+- **Supabase SSL**: Explicit CA certificate verification in production (ADR 0063)
 
 ### AI Safety
 
@@ -130,6 +149,20 @@ We appreciate security researchers who help keep MirrorBuddy safe. With your per
 - General inquiries: info@convergio.io
 - Privacy concerns: privacy@convergio.io
 
+## Regulatory Compliance
+
+MirrorBuddy complies with multiple regulatory frameworks:
+
+| Regulation                | Scope                      | Documentation                           |
+| ------------------------- | -------------------------- | --------------------------------------- |
+| **EU AI Act** (2024/1689) | High-risk AI in education  | `docs/compliance/AI-POLICY.md`          |
+| **Italian L.132/2025**    | National AI implementation | `docs/compliance/AI-RISK-MANAGEMENT.md` |
+| **GDPR**                  | Data protection            | `docs/compliance/DPIA.md`               |
+| **COPPA**                 | Children's privacy (US)    | COPPA service in `src/lib/compliance/`  |
+| **WCAG 2.1 AA**           | Accessibility              | 7 DSA profiles                          |
+
+See [ADR 0062](docs/adr/0062-ai-compliance-framework.md) for the full compliance framework.
+
 ---
 
-*Last updated: December 2025*
+_Last updated: 20 Gennaio 2026, 11:30 CET_

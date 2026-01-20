@@ -1,5 +1,7 @@
 # Compliance Audit Implementation Summary
 
+> Last updated: 20 Gennaio 2026, 11:30 CET
+
 ## F-07 Verification: Safety Events Logging per Audit Compliance (L.132 Art.4)
 
 ### Overview
@@ -123,6 +125,18 @@ Added exports for:
 - `index.ts` exports all compliance types and functions
 - Clean separation of concerns
 - Backward compatible with existing audit system
+
+### Related Documentation
+
+This audit implementation is part of the broader AI Compliance Framework. See [ADR 0062](docs/adr/0062-ai-compliance-framework.md) for the three-tier compliance structure:
+
+| Tier              | Components                                                                                                                         | Purpose                |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| **Mandatory**     | [DPIA](docs/compliance/DPIA.md), [AI Policy](docs/compliance/AI-POLICY.md), [Risk Register](docs/compliance/AI-RISK-MANAGEMENT.md) | Legal requirements     |
+| **Enhanced**      | [Model Card](docs/compliance/MODEL-CARD.md), [Bias Audit](docs/compliance/BIAS-AUDIT-REPORT.md)                                    | Best practices         |
+| **Observability** | Compliance Dashboard, KPIs                                                                                                         | Operational monitoring |
+
+This F-07 implementation provides the **audit trail** component that supports all three tiers.
 
 ### Regulatory Compliance Features
 
@@ -251,3 +265,7 @@ const audit = exportComplianceAudit("2024-01-01", "2024-01-31", "admin-user");
 
 - `src/lib/safety/audit/index.ts` - Added compliance exports
 - `src/lib/safety/audit/types.ts` - Enhanced SafetyAuditEntry
+
+---
+
+**See also:** [ADR 0062](docs/adr/0062-ai-compliance-framework.md) | [SECURITY.md](SECURITY.md) | [docs/compliance/](docs/compliance/)
