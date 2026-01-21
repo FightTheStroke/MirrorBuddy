@@ -20,10 +20,28 @@ config();
 delete process.env.NO_COLOR;
 delete process.env.FORCE_COLOR;
 
-const testDatabaseUrl = process.env.TEST_DATABASE_URL;
-if (!testDatabaseUrl) {
+// CRITICAL: Validate test database URL to prevent production contamination
+const testDatabaseUrl =
+  process.env.TEST_DATABASE_URL ||
+  "postgresql://roberdan@localhost:5432/mirrorbuddy_test";
+
+// PRODUCTION BLOCKER: Reject production Supabase URLs
+if (testDatabaseUrl.includes("supabase.com")) {
   throw new Error(
-    "TEST_DATABASE_URL must be set for E2E tests to avoid hitting production.",
+    `❌ BLOCKED: E2E tests attempted to use production Supabase database!\n` +
+      `TEST_DATABASE_URL must be a local test database, not: ${testDatabaseUrl}\n` +
+      `Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test`,
+  );
+}
+
+// Also check DATABASE_URL doesn't leak into tests
+if (
+  process.env.DATABASE_URL &&
+  process.env.DATABASE_URL.includes("supabase.com")
+) {
+  console.warn(
+    "⚠️  WARNING: DATABASE_URL contains production Supabase URL. " +
+      "E2E tests will use TEST_DATABASE_URL instead to prevent data corruption.",
   );
 }
 
@@ -161,21 +179,13 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      // CRITICAL: Pass database URLs unconditionally to avoid fallback to OS user
-      // In CI, TEST_DATABASE_URL/DATABASE_URL are set with explicit postgres:postgres credentials
-      // Without this, Next.js would use fallback connection strings which may use OS user 'root'
-      DATABASE_URL:
-        process.env.TEST_DATABASE_URL ||
-        process.env.DATABASE_URL ||
-        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
-      TEST_DATABASE_URL:
-        process.env.TEST_DATABASE_URL ||
-        process.env.DATABASE_URL ||
-        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
+      // CRITICAL: Use ONLY test database - NEVER fallback to production DATABASE_URL
+      // This prevents accidental contamination of production Supabase database
+      DATABASE_URL: testDatabaseUrl,
+      TEST_DATABASE_URL: testDatabaseUrl,
       DIRECT_URL:
         process.env.TEST_DIRECT_URL ||
-        process.env.DIRECT_URL ||
-        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
+        "postgresql://roberdan@localhost:5432/mirrorbuddy_test",
       E2E_TESTS: "1",
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match
