@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect } from "react";
+import { logger } from "@/lib/logger";
 
 /**
  * Admin dashboard counts structure
@@ -124,14 +125,14 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
           retryCount++;
           const backoff = BACKOFF_BASE * Math.pow(2, retryCount - 1);
 
-          console.log(
+          logger.info(
             `[useAdminCountsSSE] Connection error. Retry ${retryCount}/${MAX_RETRIES} in ${backoff}ms`,
           );
 
           retryTimeout = setTimeout(connect, backoff);
         } else {
           // F-07: After 3 retries → permanent error state
-          console.error(
+          logger.error(
             "[useAdminCountsSSE] Max retries reached. Connection failed.",
           );
           setStatus("error");
