@@ -6,6 +6,7 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { CookieSigningError } from "@/lib/auth/cookie-signing";
+import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 import {
   COPPA_AGE_THRESHOLD,
   requestParentalConsent,
@@ -95,6 +96,13 @@ export async function POST(
       });
       userId = user.id;
       logger.info("User created", { userId });
+
+      // Trigger admin counts update (non-blocking)
+      calculateAndPublishAdminCounts("user-signup").catch((err) =>
+        logger.warn("Failed to publish admin counts on user signup", {
+          error: String(err),
+        }),
+      );
 
       try {
         const { signCookieValue } = await import("@/lib/auth/cookie-signing");
