@@ -1,9 +1,9 @@
 -- CreateEnum: InviteStatus (F-20: Invite request system)
-DO $ BEGIN
+DO $$ BEGIN
     CREATE TYPE "InviteStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 EXCEPTION
     WHEN duplicate_object THEN null;
-END $;
+END $$;
 
 -- CreateTable: InviteRequest (F-20: Beta invite system)
 CREATE TABLE IF NOT EXISTS "InviteRequest" (
