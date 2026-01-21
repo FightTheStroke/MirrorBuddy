@@ -16,11 +16,28 @@ const globalForPrisma = globalThis as unknown as {
 
 const isE2E = process.env.E2E_TESTS === "1";
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+
+// DEBUG: Log environment variables when db.ts loads (E2E only)
+if (isE2E) {
+  logger.info("[db.ts] E2E_TESTS=1, checking environment variables", {
+    hasTestDatabaseUrl: !!testDatabaseUrl,
+    hasDatabaseUrl: !!process.env.DATABASE_URL,
+    testDatabaseUrlSet: testDatabaseUrl ? "SET" : "MISSING",
+    databaseUrlSet: process.env.DATABASE_URL ? "SET" : "MISSING",
+  });
+}
+
 const connectionString = isE2E
   ? (() => {
       if (!testDatabaseUrl) {
         throw new Error(
           "TEST_DATABASE_URL must be set when E2E_TESTS=1 to avoid using production data.",
+        );
+      }
+      // Validate that connection string has credentials
+      if (!testDatabaseUrl.includes("@")) {
+        throw new Error(
+          `TEST_DATABASE_URL missing credentials (no '@' found): ${testDatabaseUrl}`,
         );
       }
       return testDatabaseUrl;
