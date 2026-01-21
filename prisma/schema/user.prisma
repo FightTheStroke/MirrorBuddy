@@ -22,6 +22,9 @@ model User {
   mustChangePassword Boolean  @default(false)
   disabled           Boolean  @default(false)
 
+  // F-17: Test data isolation
+  isTestData Boolean @default(false)
+
   profile           Profile?
   settings          Settings?
   progress          Progress?
