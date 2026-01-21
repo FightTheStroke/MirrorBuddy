@@ -83,7 +83,7 @@ export function HomeSidebar({
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => handleViewChange("maestri")}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 h-11 hover:opacity-80 transition-opacity"
             aria-label="Torna alla home"
           >
             <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
@@ -104,7 +104,7 @@ export function HomeSidebar({
           </button>
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             onClick={onToggle}
             className="text-slate-500"
             aria-label={open ? "Chiudi menu" : "Apri menu"}
