@@ -1,13 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import { Smartphone, Monitor } from 'lucide-react';
-import { useWebcamCapture } from './webcam-capture/hooks/use-webcam-capture';
-import { WebcamHeader } from './webcam-capture/components/webcam-header';
-import { WebcamPreview } from './webcam-capture/components/webcam-preview';
-import { WebcamControls } from './webcam-capture/components/webcam-controls';
-import { isContinuityCamera as _isContinuityCamera, type CameraDevice } from './webcam-capture/utils/camera-utils';
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import { Smartphone, Monitor } from "lucide-react";
+import { useWebcamCapture } from "./webcam-capture/hooks/use-webcam-capture";
+import { WebcamHeader } from "./webcam-capture/components/webcam-header";
+import { WebcamPreview } from "./webcam-capture/components/webcam-preview";
+import { WebcamControls } from "./webcam-capture/components/webcam-controls";
+import {
+  isContinuityCamera as _isContinuityCamera,
+  type CameraDevice,
+} from "./webcam-capture/utils/camera-utils";
 
 interface WebcamCaptureProps {
   purpose: string;
@@ -64,7 +67,7 @@ export function WebcamCapture({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
     >
       <Card className="w-full max-w-2xl bg-slate-900 border-slate-700 text-white overflow-hidden">
         <WebcamHeader
