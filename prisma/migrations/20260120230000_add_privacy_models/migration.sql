@@ -7,7 +7,16 @@ CREATE TYPE "InviteStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 -- AlterTable: Add role column to User table (F-26: Role-based access control)
 ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" "UserRole" NOT NULL DEFAULT 'USER';
 
--- CreateIndex: Add index for role column
+-- AlterTable: Add internal auth columns to User table (Plan 052)
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "username" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "email" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "passwordHash" TEXT;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "mustChangePassword" BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "disabled" BOOLEAN NOT NULL DEFAULT false;
+
+-- CreateIndex: Add unique constraints and indexes for auth fields
+CREATE UNIQUE INDEX IF NOT EXISTS "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX IF NOT EXISTS "User_email_key" ON "User"("email");
 CREATE INDEX IF NOT EXISTS "User_role_idx" ON "User"("role");
 
 -- CreateTable: UserActivity (for activity tracking)
