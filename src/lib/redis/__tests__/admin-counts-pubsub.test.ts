@@ -6,11 +6,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   publishAdminCounts,
   getLatestAdminCounts,
+} from "../admin-counts-storage";
+import {
   subscribeToAdminCounts,
   broadcastAdminCounts,
   getSubscriberCount,
-  type AdminCounts,
-} from "../admin-counts-pubsub";
+} from "../admin-counts-subscriber";
+import { type AdminCounts } from "../admin-counts-types";
 
 // Mock Redis
 vi.mock("../index", () => ({

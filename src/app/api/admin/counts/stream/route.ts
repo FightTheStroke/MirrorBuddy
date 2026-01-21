@@ -8,11 +8,9 @@
 
 import { NextRequest } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
-import {
-  subscribeToAdminCounts,
-  getLatestAdminCounts,
-  type AdminCounts,
-} from "@/lib/redis/admin-counts-pubsub";
+import { getLatestAdminCounts } from "@/lib/redis/admin-counts-storage";
+import { subscribeToAdminCounts } from "@/lib/redis/admin-counts-subscriber";
+import { type AdminCounts } from "@/lib/redis/admin-counts-types";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 
