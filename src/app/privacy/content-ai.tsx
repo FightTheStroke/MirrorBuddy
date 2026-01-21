@@ -4,7 +4,7 @@ import { Section } from "./section";
 
 export function PrivacyContentAI() {
   return (
-    <Section number={15} title="Trattamento mediante Intelligenza Artificiale">
+    <Section number={16} title="Trattamento mediante Intelligenza Artificiale">
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
         Quali sistemi AI usiamo
       </h3>

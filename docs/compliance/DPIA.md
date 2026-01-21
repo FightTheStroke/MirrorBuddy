@@ -79,6 +79,21 @@ See `docs/compliance/DPIA-risks.md` for detailed 12-risk matrix with likelihood�
 
 **Risk verdict**: ACCEPTABLE with planned mitigations (human escalation pathway + complete COPPA email verification in Q1 2026).
 
+### 5.1 External Services Risk Assessment
+
+Per GDPR Article 35(7), this assessment evaluates risks arising from data processing by third-party processors. See `docs/compliance/DPIA-SERVICES.md` for detailed risk analysis.
+
+**Summary**: All 5 primary processors (Supabase, Azure OpenAI, Vercel, Resend, Upstash Redis) assessed with residual risk ratings:
+- **EU-only processors** (Supabase, Azure OpenAI): 🟢 NEGLIGIBLE risk
+- **Extra-EU with SCCs** (Vercel, Resend): 🟡 LOW risk (mitigated via Standard Contractual Clauses + technical safeguards)
+- **Pseudonymized data** (Upstash Redis): 🟢 VERY LOW risk (hashed IDs, 1-hour TTL)
+
+**Overall External Services Risk**: 🟡 **LOW** - All processors compliant with GDPR Chapter V (Articles 44-50). No high-risk or non-compliant transfers identified.
+
+**Supervisory Authority Consultation**: Not required per GDPR Article 36 - residual risks are low and adequately mitigated.
+
+**Full Analysis**: `docs/compliance/DPIA-SERVICES.md` | **Audit Reference**: `docs/compliance/SERVICE-COMPLIANCE-AUDIT-2026-01.md` (21 January 2026)
+
 ---
 
 ## 6. Mitigation Measures
@@ -133,6 +148,7 @@ See `docs/compliance/DPIA-risks.md` for detailed 12-risk matrix with likelihood�
 See supporting documents:
 
 - `docs/compliance/DPIA-risks.md` - Detailed 12-risk matrix with scores
+- `docs/compliance/DPIA-SERVICES.md` - External services risk assessment (Vercel, Supabase, Azure, Resend, Upstash)
 - `docs/compliance/DPIA-appendices.md` - Data flow diagram, reference files, regulatory citations
 - `docs/compliance/GDPR.md` - General GDPR compliance framework
 

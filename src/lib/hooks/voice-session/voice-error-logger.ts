@@ -12,19 +12,24 @@ import { logger } from '@/lib/logger';
 export function getDeviceInfo(): Record<string, string | number | boolean> {
   try {
     const ua = navigator.userAgent;
-    const isIOS = /iPad|iPhone|iPod/.test(ua);
-    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
-    const isChrome = /Chrome/.test(ua);
-    const isFirefox = /Firefox/.test(ua);
+    const isIOS = /iPad|iPhone|iPod/u.test(ua);
+    const isSafari = /Safari/u.test(ua) && !/Chrome/u.test(ua);
+    const isChrome = /Chrome/u.test(ua);
+    const isFirefox = /Firefox/u.test(ua);
 
     // iOS version detection
-    let iosVersion = null;
+    let iosVersion: string | null = null;
     if (isIOS) {
-      const match = ua.match(/OS (\d+)_?(\d+)?/);
+      // eslint-disable-next-line security/detect-unsafe-regex -- Safe: matches "OS 17_1" pattern only
+      const match = ua.match(/OS (\d+)_?(\d+)?/u);
       if (match) {
         iosVersion = `${match[1]}.${match[2] || '0'}`;
       }
     }
+
+    const navWithDevice = navigator as Navigator & {
+      deviceMemory?: number;
+    };
 
     return {
       userAgent: ua,
@@ -35,7 +40,7 @@ export function getDeviceInfo(): Record<string, string | number | boolean> {
       iosVersion: iosVersion || 'unknown',
       platform: navigator.platform || 'unknown',
       hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
-      deviceMemory: (navigator as any).deviceMemory || 'unknown',
+      deviceMemory: navWithDevice.deviceMemory || 'unknown',
       maxTouchPoints: navigator.maxTouchPoints || 0,
       language: navigator.language || 'unknown',
       onLine: navigator.onLine,
@@ -51,12 +56,15 @@ export function getDeviceInfo(): Record<string, string | number | boolean> {
  */
 export function getWebRTCCapabilities(): Record<string, boolean> {
   try {
+    const windowWithWebkit = window as Window & {
+      webkitAudioContext?: typeof AudioContext;
+    };
     return {
       RTCPeerConnection: !!window.RTCPeerConnection,
       getUserMedia: !!navigator.mediaDevices?.getUserMedia,
       mediaDevices: !!navigator.mediaDevices,
       RTCDataChannel: !!window.RTCDataChannel,
-      AudioContext: !!window.AudioContext || !!(window as any).webkitAudioContext,
+      AudioContext: !!window.AudioContext || !!windowWithWebkit.webkitAudioContext,
       WebRTC: !!window.RTCPeerConnection && !!navigator.mediaDevices?.getUserMedia,
     };
   } catch (error) {
@@ -65,121 +73,15 @@ export function getWebRTCCapabilities(): Record<string, boolean> {
   }
 }
 
-/**
- * Check microphone permissions status
- */
-export async function checkMicrophonePermissions(): Promise<
-  Record<string, string | boolean | null>
-> {
-  try {
-    if (!navigator.permissions?.query) {
-      return {
-        permissionsAPI: false,
-        status: 'Permissions API not supported',
-      };
-    }
 
-    const permissionStatus = await navigator.permissions.query({
-      name: 'microphone' as any,
-    });
-
-    return {
-      permissionsAPI: true,
-      status: permissionStatus.state, // 'granted', 'denied', 'prompt'
-      canTry: permissionStatus.state !== 'denied',
-    };
-  } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to check microphone permissions', {}, error);
-    return {
-      permissionsAPI: false,
-      status: 'Error checking permissions',
-      error: String(error),
-    };
-  }
-}
-
-/**
- * Probe audio context state and audio device availability
- */
-export function getAudioContextInfo(): Record<string, string | number | boolean | null> {
-  try {
-    // Try to create a test context
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    if (!AudioContextClass) {
-      return {
-        audioContextAvailable: false,
-        status: 'AudioContext not available',
-      };
-    }
-
-    const testContext = new AudioContextClass();
-    const info = {
-      audioContextAvailable: true,
-      state: testContext.state, // 'suspended', 'running', 'closed'
-      sampleRate: testContext.sampleRate,
-      baseLatency: testContext.baseLatency,
-      outputLatency: (testContext as any).outputLatency || 'unknown',
-      maxChannelCount: (testContext as any).maxChannelCount || 'unknown',
-      destinationChannels: testContext.destination?.maxChannelCount || 'unknown',
-    };
-
-    // Attempt to resume if suspended (especially on iOS)
-    if (testContext.state === 'suspended') {
-      testContext.resume().catch(() => {
-        // Ignore resume errors during diagnostics
-      });
-    }
-
-    testContext.close();
-    return info;
-  } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to get audio context info', {}, error);
-    return {
-      audioContextAvailable: false,
-      error: String(error),
-    };
-  }
-}
-
-/**
- * Probe available audio input/output devices
- */
-export async function getAudioDevices(): Promise<
-  Record<string, number | Record<string, string>[] | string>
-> {
-  try {
-    if (!navigator.mediaDevices?.enumerateDevices) {
-      return {
-        available: false,
-        status: 'enumerateDevices not available',
-      };
-    }
-
-    const devices = await navigator.mediaDevices.enumerateDevices();
-    const audioInputs = devices.filter(d => d.kind === 'audioinput');
-    const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
-
-    return {
-      available: true,
-      audioInputCount: audioInputs.length,
-      audioOutputCount: audioOutputs.length,
-      audioInputs: audioInputs.map(d => ({
-        deviceId: d.deviceId || 'unknown',
-        label: d.label || 'Microphone',
-      })),
-      audioOutputs: audioOutputs.map(d => ({
-        deviceId: d.deviceId || 'unknown',
-        label: d.label || 'Speaker',
-      })),
-    };
-  } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to enumerate audio devices', {}, error);
-    return {
-      available: false,
-      error: String(error),
-    };
-  }
-}
+// Diagnostics functions moved to voice-diagnostics.ts to maintain file size
+export {
+  getAudioContextInfo,
+  getAudioDevices,
+  checkMicrophonePermissions,
+  logVoiceDiagnosticsReport,
+  logMediaStreamTracks,
+} from './voice-diagnostics';
 
 /**
  * Log WebRTC connection state changes
@@ -306,78 +208,6 @@ export function logDataChannelStateChange(
   }
 }
 
-/**
- * Log comprehensive voice connection diagnostics report
- */
-export async function logVoiceDiagnosticsReport(): Promise<void> {
-  try {
-    const deviceInfo = getDeviceInfo();
-    const webrtcCaps = getWebRTCCapabilities();
-    const audioContextInfo = getAudioContextInfo();
-    const audioDevices = await getAudioDevices();
-    const micPerms = await checkMicrophonePermissions();
-
-    const report = {
-      timestamp: new Date().toISOString(),
-      component: 'voice-diagnostics',
-      deviceInfo,
-      webrtcCapabilities: webrtcCaps,
-      audioContextInfo,
-      audioDevices,
-      microphonePermissions: micPerms,
-    };
-
-    logger.info('[VoiceSession] Diagnostics Report', report);
-
-    // Also log to console for immediate visibility during debugging
-    if (process.env.NODE_ENV !== 'production') {
-      console.group('🎤 Voice Diagnostics Report');
-      console.table(deviceInfo);
-      console.table(webrtcCaps);
-      console.table(audioContextInfo);
-      console.log('Audio Devices:', audioDevices);
-      console.log('Microphone Permissions:', micPerms);
-      console.groupEnd();
-    }
-  } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to generate diagnostics report', {}, error);
-  }
-}
-
-/**
- * Log media stream track info
- */
-export function logMediaStreamTracks(
-  stream: MediaStream,
-  label: string = 'MediaStream',
-): void {
-  try {
-    const audioTracks = stream.getAudioTracks();
-    const videoTracks = stream.getVideoTracks();
-
-    const context = {
-      component: 'voice-media-stream',
-      streamLabel: label,
-      audioTrackCount: audioTracks.length,
-      videoTrackCount: videoTracks.length,
-      audioTracks: audioTracks.map(t => ({
-        enabled: t.enabled,
-        readyState: t.readyState,
-        label: t.label,
-      })),
-      videoTracks: videoTracks.map(t => ({
-        enabled: t.enabled,
-        readyState: t.readyState,
-        label: t.label,
-      })),
-      timestamp: new Date().toISOString(),
-    };
-
-    logger.debug('[VoiceSession] MediaStream tracks', context);
-  } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to log media stream tracks', {}, error);
-  }
-}
 
 /**
  * Log WebRTC offer/answer SDP exchange details
