@@ -224,12 +224,45 @@ vercel --prod
 
 **Historical incidents**:
 
-| Date       | Variables Affected        | Impact                       |
-| ---------- | ------------------------- | ---------------------------- |
-| 2026-01-18 | All GRAFANA*CLOUD*\* vars | Metrics push 401 for 2 hours |
-| 2026-01-18 | CRON_SECRET               | Build failed "whitespace"    |
+| Date       | Variables Affected                                                                                                                                                      | Impact                                                              |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| 2026-01-18 | All GRAFANA*CLOUD*\* vars                                                                                                                                               | Metrics push 401 for 2 hours                                        |
+| 2026-01-18 | CRON_SECRET                                                                                                                                                             | Build failed "whitespace"                                           |
+| 2026-01-21 | 18 vars with `\n`: All Azure, Google, Redis, VAPID, Resend, NEXTAUTH_URL. Empty: SESSION_SECRET, DATABASE_URL, DIRECT_URL, AZURE_OPENAI_API_KEY, AZURE_REALTIME_API_KEY | Redis rate limit fallback to memory, potential auth failures in app |
 
-**Prevention**: Always use `printf '%s'` when piping to `vercel env add`.
+**Prevention**:
+
+- Always use `printf '%s'` when piping to `vercel env add`
+- Use `scripts/fix-vercel-env-vars.sh` to bulk-fix corrupted variables
+- Use `scripts/verify-vercel-env.sh` to verify all variables are clean
+
+**Bulk fix script** (`scripts/fix-vercel-env-vars.sh`):
+
+```bash
+# Fix all variables with trailing \n
+./scripts/fix-vercel-env-vars.sh
+
+# Dry-run to preview changes
+./scripts/fix-vercel-env-vars.sh --dry-run
+
+# Fix specific variable
+./scripts/fix-vercel-env-vars.sh --var SESSION_SECRET
+
+# Verify all variables are clean
+./scripts/verify-vercel-env.sh
+```
+
+**Code-level defense** - All Redis client initialization now uses `.trim()`:
+
+```typescript
+// src/lib/rate-limit.ts, redis-sse-store.ts, budget-cap.ts
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!.trim(),
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!.trim(),
+});
+```
+
+This prevents whitespace issues even if env vars are corrupted on Vercel.
 
 ### Database Migrations (CRITICAL)
 
