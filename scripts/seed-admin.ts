@@ -22,7 +22,8 @@ const SALT_ROUNDS = 12;
 // Build Prisma client with pg adapter (same as src/lib/db.ts)
 function createPrismaClient(): PrismaClient {
   const connectionString =
-    process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
   const isProduction =
     process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
