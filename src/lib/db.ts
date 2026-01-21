@@ -25,7 +25,8 @@ const connectionString = isE2E
       }
       return testDatabaseUrl;
     })()
-  : process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
+  : process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted
