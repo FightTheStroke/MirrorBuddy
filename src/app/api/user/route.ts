@@ -9,6 +9,7 @@ import { prisma, isDatabaseNotInitialized } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
+import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
 export async function GET() {
   try {
@@ -46,6 +47,13 @@ export async function GET() {
         progress: true,
       },
     });
+
+    // Trigger admin counts update (non-blocking)
+    calculateAndPublishAdminCounts("user-signup").catch((err) =>
+      logger.warn("Failed to publish admin counts on user signup", {
+        error: String(err),
+      }),
+    );
 
     // Set cookies (1 year expiry)
     const signedCookie = signCookieValue(user.id);
