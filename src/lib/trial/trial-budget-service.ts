@@ -5,6 +5,13 @@
  * when budget changes occur (F-06: trial budget push).
  *
  * Wraps budget-cap functions and adds publish triggers.
+ *
+ * INTEGRATION STATUS:
+ * - [x] /api/chat: Integrated - increments on trial user chat completion
+ * - [ ] /api/chat/stream: Ready for integration (streaming endpoint)
+ * - [ ] /api/trial/voice: Ready for integration (voice endpoint)
+ *
+ * See INTEGRATION-GUIDE.md for usage examples.
  */
 
 import {
