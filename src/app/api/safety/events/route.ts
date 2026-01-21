@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 import type {
   SafetyEventType,
   EventSeverity,
@@ -49,6 +50,9 @@ export async function POST(request: NextRequest) {
         resolution: category ?? null,
       },
     });
+
+    // Trigger admin counts push (F-32: non-blocking, rate-limited per event type)
+    triggerAdminCountsUpdate("safety");
 
     return NextResponse.json({ success: true });
   } catch (error) {

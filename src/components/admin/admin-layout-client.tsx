@@ -1,14 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useAdminCountsSSE } from "@/hooks/use-admin-counts-sse";
 import { AdminSidebar } from "./admin-sidebar";
 import { AdminHeader } from "./admin-header";
 import { cn } from "@/lib/utils";
-
-interface AdminCounts {
-  pendingInvites: number;
-  systemAlerts: number;
-}
 
 interface AdminLayoutClientProps {
   children: React.ReactNode;
@@ -16,34 +12,10 @@ interface AdminLayoutClientProps {
 
 export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [counts, setCounts] = useState<AdminCounts>({
-    pendingInvites: 0,
-    systemAlerts: 0,
-  });
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  // Fetch counts for badges
-  useEffect(() => {
-    const fetchCounts = async () => {
-      try {
-        const response = await fetch("/api/admin/counts");
-        if (response.ok) {
-          const data = await response.json();
-          setCounts({
-            pendingInvites: data.pendingInvites || 0,
-            systemAlerts: data.systemAlerts || 0,
-          });
-        }
-      } catch {
-        // Silently fail - badges will show 0
-      }
-    };
-
-    fetchCounts();
-    // Refresh every 30 seconds
-    const interval = setInterval(fetchCounts, 30000);
-    return () => clearInterval(interval);
-  }, []);
+  // SSE hook for real-time admin counts
+  const { counts, status, error } = useAdminCountsSSE();
 
   // Close mobile menu on resize
   useEffect(() => {
@@ -63,6 +35,18 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      {/* Connection Status Indicators */}
+      {status === "reconnecting" && (
+        <div className="bg-yellow-50 dark:bg-yellow-950/30 border-b border-yellow-200 dark:border-yellow-900 px-4 py-2 text-sm text-yellow-800 dark:text-yellow-200">
+          Reconnecting to admin data stream...
+        </div>
+      )}
+      {status === "error" && (
+        <div className="bg-red-50 dark:bg-red-950/30 border-b border-red-200 dark:border-red-900 px-4 py-2 text-sm text-red-800 dark:text-red-200">
+          {error || "Connection failed. Please refresh the page."}
+        </div>
+      )}
+
       {/* Sidebar */}
       <div className="hidden lg:block">
         <AdminSidebar

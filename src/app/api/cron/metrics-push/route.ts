@@ -1,21 +1,22 @@
 /**
- * Metrics Push Cron Job Handler
- * Pushes ALL metrics (business + technical) to Grafana Cloud every minute
+ * Metrics Push Cron Job Handler (Every 5 Minutes)
+ * Pushes LIGHT metrics (HTTP/SLI + real-time active users) to Grafana Cloud
  *
- * Scheduled via Vercel Cron (* * * * * = every minute)
+ * Scheduled via Vercel Cron: every 5 minutes
  * Required env vars:
  *   - GRAFANA_CLOUD_PROMETHEUS_URL
  *   - GRAFANA_CLOUD_PROMETHEUS_USER
  *   - GRAFANA_CLOUD_API_KEY
  *   - CRON_SECRET (for authentication)
+ *
+ * F-05b: HTTP/SLI metrics collected every 5 minutes
+ * Note: Heavy metrics (business + behavioral) are handled by business-metrics-daily cron
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import { metricsStore } from "@/lib/observability/metrics-store";
-import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
-import { generateBusinessMetrics } from "@/app/api/metrics/business-metrics";
 import { generateSLIMetrics } from "@/app/api/metrics/sli-metrics";
 
 const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
@@ -59,9 +60,9 @@ function verifyCronSecret(request: NextRequest): boolean {
 }
 
 /**
- * Collect all metrics samples for push (HTTP + Business + Behavioral)
+ * Collect light metrics samples for push (HTTP/SLI + real-time active users)
  */
-async function collectAllMetrics(): Promise<MetricSample[]> {
+async function collectLightMetrics(): Promise<MetricSample[]> {
   const samples: MetricSample[] = [];
   const now = Date.now();
 
@@ -107,37 +108,7 @@ async function collectAllMetrics(): Promise<MetricSample[]> {
     );
   }
 
-  // 2. Business metrics (DAU, retention, maestri usage)
-  try {
-    const businessMetrics = await generateBusinessMetrics();
-    for (const m of businessMetrics) {
-      samples.push({
-        name: m.name,
-        labels: { ...m.labels, env },
-        value: m.value,
-        timestamp: now,
-      });
-    }
-  } catch (err) {
-    log.warn("Failed to collect business metrics", { error: String(err) });
-  }
-
-  // 3. Behavioral metrics (session health, safety, cost)
-  try {
-    const behavioralMetrics = await generateBehavioralMetrics();
-    for (const m of behavioralMetrics) {
-      samples.push({
-        name: m.name,
-        labels: { ...m.labels, env },
-        value: m.value,
-        timestamp: now,
-      });
-    }
-  } catch (err) {
-    log.warn("Failed to collect behavioral metrics", { error: String(err) });
-  }
-
-  // 4. Real-time active users (from database - serverless safe)
+  // 2. Real-time active users (from database - serverless safe)
   try {
     const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
 
@@ -300,8 +271,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(response, { status: 200 });
     }
 
-    // Collect and push metrics (includes business + behavioral + HTTP)
-    const samples = await collectAllMetrics();
+    // Collect and push light metrics (HTTP/SLI + real-time active users)
+    const samples = await collectLightMetrics();
 
     if (samples.length === 0) {
       response.status = "skipped";

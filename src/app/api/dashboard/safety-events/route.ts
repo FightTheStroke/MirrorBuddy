@@ -13,6 +13,7 @@ import {
 } from "@/lib/safety/monitoring/db-queries";
 import { logger } from "@/lib/logger";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 
 export async function GET(request: Request) {
   try {
@@ -118,6 +119,9 @@ export async function POST(request: Request) {
     }
 
     await resolveSafetyEvent(eventId, resolvedBy, resolution);
+
+    // Trigger admin counts push (F-32: non-blocking, rate-limited per event type)
+    triggerAdminCountsUpdate("safety");
 
     return NextResponse.json({ success: true });
   } catch (error) {
