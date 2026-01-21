@@ -19,6 +19,7 @@ import {
   BarChart3,
   BookOpen,
   Globe,
+  Keyboard,
 } from 'lucide-react';
 
 export interface ToolConfig {
@@ -165,6 +166,16 @@ export const CREATE_TOOLS: Record<string, ToolConfig> = {
     icon: BarChart3,
     category: 'create',
     requiresMaestro: true,
+  },
+  typing: {
+    type: 'typing',
+    route: '/typing',
+    functionName: 'typing_tutor',
+    label: 'Impara a Digitare',
+    description: 'Impara a digitare con lezioni progressive e accessibilità DSA',
+    icon: Keyboard,
+    category: 'create',
+    requiresMaestro: false,
   },
 };
 

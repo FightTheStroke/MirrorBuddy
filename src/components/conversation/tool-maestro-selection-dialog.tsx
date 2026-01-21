@@ -5,16 +5,16 @@
  * Fixes Issue #97 - ensures tools are created with the correct maestro, not always Melissa.
  */
 
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { getAllMaestri, SUBJECT_NAMES } from '@/data/maestri';
-import type { MaestroFull } from '@/data/maestri';
-import type { ToolType } from '@/types/tools';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getAllMaestri, SUBJECT_NAMES } from "@/data/maestri";
+import type { MaestroFull } from "@/data/maestri";
+import type { ToolType } from "@/types/tools";
+import { cn } from "@/lib/utils";
 
 interface ToolMaestroSelectionDialogProps {
   isOpen: boolean;
@@ -24,21 +24,22 @@ interface ToolMaestroSelectionDialogProps {
 }
 
 const TOOL_NAMES: Record<ToolType, string> = {
-  mindmap: 'Mappa Mentale',
-  quiz: 'Quiz',
-  flashcard: 'Flashcard',
-  summary: 'Riassunto',
-  demo: 'Demo Interattiva',
-  diagram: 'Diagramma',
-  timeline: 'Linea del Tempo',
-  formula: 'Formula',
-  calculator: 'Calcolatrice',
-  chart: 'Grafico',
-  search: 'Ricerca',
-  webcam: 'Foto',
-  pdf: 'PDF',
-  homework: 'Compiti',
-  'study-kit': 'Study Kit',
+  mindmap: "Mappa Mentale",
+  quiz: "Quiz",
+  flashcard: "Flashcard",
+  summary: "Riassunto",
+  demo: "Demo Interattiva",
+  diagram: "Diagramma",
+  timeline: "Linea del Tempo",
+  formula: "Formula",
+  calculator: "Calcolatrice",
+  chart: "Grafico",
+  search: "Ricerca",
+  webcam: "Foto",
+  pdf: "PDF",
+  typing: "Impara a Digitare",
+  homework: "Compiti",
+  "study-kit": "Study Kit",
 };
 
 export function ToolMaestroSelectionDialog({
@@ -47,7 +48,7 @@ export function ToolMaestroSelectionDialog({
   onSelect,
   onClose,
 }: ToolMaestroSelectionDialogProps) {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const maestri = getAllMaestri();
 
   const filteredMaestri = maestri.filter((maestro) => {
@@ -91,7 +92,8 @@ export function ToolMaestroSelectionDialog({
                   Scegli il Professore
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  Chi dovrebbe creare {TOOL_NAMES[toolType] || 'questo strumento'}?
+                  Chi dovrebbe creare{" "}
+                  {TOOL_NAMES[toolType] || "questo strumento"}?
                 </p>
               </div>
               <Button
@@ -125,11 +127,11 @@ export function ToolMaestroSelectionDialog({
                   key={maestro.id}
                   onClick={() => handleSelect(maestro)}
                   className={cn(
-                    'flex items-center gap-3 p-4 rounded-xl border-2 transition-all',
-                    'border-slate-200 dark:border-slate-700',
-                    'hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-800',
-                    'focus:outline-none focus:ring-2 focus:ring-accent-themed',
-                    'text-left'
+                    "flex items-center gap-3 p-4 rounded-xl border-2 transition-all",
+                    "border-slate-200 dark:border-slate-700",
+                    "hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-800",
+                    "focus:outline-none focus:ring-2 focus:ring-accent-themed",
+                    "text-left",
                   )}
                 >
                   {/* Avatar */}
