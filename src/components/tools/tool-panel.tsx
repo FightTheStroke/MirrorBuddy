@@ -198,7 +198,7 @@ export function ToolPanel({
           !embedded &&
             "rounded-xl shadow-xl border border-slate-200 dark:border-slate-700",
           "flex flex-col overflow-hidden",
-          embedded ? "h-full" : isMinimized ? "h-16" : "h-[70vh]",
+          embedded ? "h-full" : isMinimized ? "h-16" : "h-[60vh] md:h-[70vh]",
         )}
       >
         {/* Header */}
@@ -235,6 +235,7 @@ export function ToolPanel({
                 size="icon"
                 onClick={onToggleMinimize}
                 aria-label={isMinimized ? "Espandi" : "Minimizza"}
+                className="h-11 w-11"
               >
                 {isMinimized ? (
                   <Maximize2 className="w-4 h-4" />
@@ -248,6 +249,7 @@ export function ToolPanel({
               size="icon"
               onClick={onClose}
               aria-label="Chiudi"
+              className="h-11 w-11"
             >
               <X className="w-4 h-4" />
             </Button>
