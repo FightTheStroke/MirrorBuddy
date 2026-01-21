@@ -11,11 +11,33 @@
  */
 
 import { prisma } from "@/lib/db";
-import { publishAdminCounts } from "@/lib/redis/admin-counts-storage";
-import { type AdminCounts } from "@/lib/redis/admin-counts-types";
+import { publishAdminCounts, type AdminCounts } from "./admin-counts-pubsub";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "publish-admin-counts" });
+
+// ============================================================================
+// RATE LIMITING (F-32)
+// ============================================================================
+
+/**
+ * Rate limiter state for admin counts publication.
+ * In-memory tracking of last publish timestamp per event type.
+ * Resets on cold start - this is acceptable as we only need local rate limiting.
+ *
+ * Map<eventType, lastPublishTimestamp>
+ * Example: { "invite": 1234567890, "safety": 1234567900 }
+ */
+const lastPublishTimestamp: Map<string, number> = new Map();
+const RATE_LIMIT_MS = 60000; // 1 minute
+
+/**
+ * Clear rate limiter state (for testing purposes only)
+ * @internal
+ */
+export function clearRateLimiterState(): void {
+  lastPublishTimestamp.clear();
+}
 
 // ============================================================================
 // TYPES
@@ -44,16 +66,44 @@ export interface AdminCountsResult {
  * Gracefully handles Redis failures - function returns success even if
  * publishing fails, allowing API routes to continue normally.
  *
+ * F-32: Rate limiting - max 1 push/min per event type
+ * If rate limit is exceeded, returns early without publishing and logs at debug level.
+ *
+ * @param eventType - Event source type for rate limiting (default: "manual")
+ *                    Examples: "invite", "safety", "user", "manual"
  * @returns Promise<AdminCountsResult> with success flag, counts, and timing
  */
-export async function calculateAndPublishAdminCounts(): Promise<AdminCountsResult> {
+export async function calculateAndPublishAdminCounts(
+  eventType: string = "manual",
+): Promise<AdminCountsResult> {
   const startTime = Date.now();
 
   try {
-    log.debug("Starting admin counts calculation");
+    // Rate limiting check (F-32)
+    const now = Date.now();
+    const lastPublish = lastPublishTimestamp.get(eventType) ?? 0;
+    const timeSinceLastPublish = now - lastPublish;
 
-    const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    if (timeSinceLastPublish < RATE_LIMIT_MS) {
+      const cooldownMs = RATE_LIMIT_MS - timeSinceLastPublish;
+      log.debug("Rate limited admin counts publish", {
+        eventType,
+        cooldownMs,
+        timeSinceLastPublish,
+      });
+      return {
+        success: true,
+        duration: 0,
+      };
+    }
+
+    // Update timestamp for this event type
+    lastPublishTimestamp.set(eventType, now);
+
+    log.debug("Starting admin counts calculation", { eventType });
+
+    const nowDate = new Date();
+    const yesterday = new Date(nowDate.getTime() - 24 * 60 * 60 * 1000);
 
     // Run all database queries in parallel for performance
     // Same logic as GET /api/admin/counts endpoint
@@ -100,7 +150,7 @@ export async function calculateAndPublishAdminCounts(): Promise<AdminCountsResul
       totalUsers,
       activeUsers24h,
       systemAlerts: criticalSafetyEvents,
-      timestamp: now.toISOString(),
+      timestamp: nowDate.toISOString(),
     };
 
     // Publish to Redis pub/sub
@@ -110,6 +160,7 @@ export async function calculateAndPublishAdminCounts(): Promise<AdminCountsResul
     const duration = Date.now() - startTime;
 
     log.info("Admin counts calculated and published successfully", {
+      eventType,
       duration,
       counts: {
         pendingInvites,
@@ -130,6 +181,7 @@ export async function calculateAndPublishAdminCounts(): Promise<AdminCountsResul
 
     // Log error but don't throw - graceful degradation
     log.error("Failed to calculate and publish admin counts", {
+      eventType,
       error: errorMessage,
       duration,
     });
@@ -152,12 +204,19 @@ export async function calculateAndPublishAdminCounts(): Promise<AdminCountsResul
  * - DELETE /api/admin/users/:id (after user deletion)
  * - Other admin mutation endpoints
  *
+ * F-32: Supports rate limiting by event type
+ *
+ * @param eventType - Event source type for rate limiting (default: "manual")
+ *
  * Non-blocking: Returns immediately without waiting for publication to complete
  */
-export function triggerAdminCountsUpdate(): void {
+export function triggerAdminCountsUpdate(eventType: string = "manual"): void {
   // Fire and forget - don't await
-  calculateAndPublishAdminCounts().catch((error) => {
-    log.error("Unhandled error in async admin counts trigger", { error });
+  calculateAndPublishAdminCounts(eventType).catch((error) => {
+    log.error("Unhandled error in async admin counts trigger", {
+      eventType,
+      error,
+    });
   });
 }
 

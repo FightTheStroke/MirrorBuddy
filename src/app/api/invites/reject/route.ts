@@ -37,8 +37,8 @@ export async function POST(request: Request) {
       hasReason: !!reason,
     });
 
-    // Trigger admin counts push (F-06, F-27: non-blocking)
-    calculateAndPublishAdminCounts().catch((err) =>
+    // Trigger admin counts push (F-06, F-27, F-32: non-blocking, rate-limited per event type)
+    calculateAndPublishAdminCounts("invite").catch((err) =>
       logger.warn("Failed to publish admin counts on invite rejection", {
         error: String(err),
       }),

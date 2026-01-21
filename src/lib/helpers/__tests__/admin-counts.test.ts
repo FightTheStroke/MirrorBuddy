@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import {
   calculateAndPublishAdminCounts,
   triggerAdminCountsUpdate,
+  clearRateLimiterState,
 } from "../publish-admin-counts";
 import {
   publishAdminCounts,
@@ -284,11 +285,13 @@ describe("admin-counts-pubsub", () => {
 describe("publish-admin-counts helper", () => {
   beforeEach(() => {
     clearAdminCountsSubscribers();
+    clearRateLimiterState();
     vi.clearAllMocks();
   });
 
   afterEach(() => {
     clearAdminCountsSubscribers();
+    clearRateLimiterState();
   });
 
   describe("calculateAndPublishAdminCounts", () => {
@@ -383,6 +386,83 @@ describe("publish-admin-counts helper", () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       expect(callback).toHaveBeenCalled();
+    });
+  });
+
+  // ========================================================================
+  // RATE LIMITING TESTS (F-32)
+  // ========================================================================
+
+  describe("rate limiting (F-32)", () => {
+    it("allows first publish for event type", async () => {
+      vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(5);
+      vi.mocked(prisma.user.count).mockResolvedValueOnce(100);
+      vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([]);
+      vi.mocked(prisma.safetyEvent.count).mockResolvedValueOnce(0);
+
+      const result = await calculateAndPublishAdminCounts("invite");
+
+      expect(result.success).toBe(true);
+      expect(result.counts).toBeDefined();
+      expect(result.duration).toBeGreaterThanOrEqual(0);
+    });
+
+    it("rate limits subsequent publishes within 60s window", async () => {
+      vi.mocked(prisma.inviteRequest.count).mockResolvedValue(5);
+      vi.mocked(prisma.user.count).mockResolvedValue(100);
+      vi.mocked(prisma.userActivity.groupBy).mockResolvedValue([]);
+      vi.mocked(prisma.safetyEvent.count).mockResolvedValue(0);
+
+      // First publish should succeed
+      const result1 = await calculateAndPublishAdminCounts("invite");
+      expect(result1.success).toBe(true);
+      expect(result1.counts).toBeDefined();
+
+      // Second publish immediately after should be rate limited
+      const result2 = await calculateAndPublishAdminCounts("invite");
+      expect(result2.success).toBe(true); // Still returns success
+      expect(result2.counts).toBeUndefined(); // But no counts published
+      expect(result2.duration).toBe(0); // No time spent
+
+      // Database queries should only be called once (first publish)
+      expect(vi.mocked(prisma.inviteRequest.count)).toHaveBeenCalledTimes(1);
+    });
+
+    it("allows different event types to publish independently", async () => {
+      vi.mocked(prisma.inviteRequest.count).mockResolvedValue(5);
+      vi.mocked(prisma.user.count).mockResolvedValue(100);
+      vi.mocked(prisma.userActivity.groupBy).mockResolvedValue([]);
+      vi.mocked(prisma.safetyEvent.count).mockResolvedValue(0);
+
+      // First invite event
+      const result1 = await calculateAndPublishAdminCounts("invite");
+      expect(result1.success).toBe(true);
+      expect(result1.counts).toBeDefined();
+
+      // Safety event should NOT be rate limited (different event type)
+      const result2 = await calculateAndPublishAdminCounts("safety");
+      expect(result2.success).toBe(true);
+      expect(result2.counts).toBeDefined();
+
+      // Database queries should be called twice (once per event type)
+      expect(vi.mocked(prisma.inviteRequest.count)).toHaveBeenCalledTimes(2);
+    });
+
+    it("uses 'manual' as default event type", async () => {
+      vi.mocked(prisma.inviteRequest.count).mockResolvedValueOnce(5);
+      vi.mocked(prisma.user.count).mockResolvedValueOnce(100);
+      vi.mocked(prisma.userActivity.groupBy).mockResolvedValueOnce([]);
+      vi.mocked(prisma.safetyEvent.count).mockResolvedValueOnce(0);
+
+      // First call without event type
+      const result1 = await calculateAndPublishAdminCounts();
+      expect(result1.success).toBe(true);
+      expect(result1.counts).toBeDefined();
+
+      // Second call without event type should be rate limited
+      const result2 = await calculateAndPublishAdminCounts();
+      expect(result2.success).toBe(true);
+      expect(result2.counts).toBeUndefined();
     });
   });
 });

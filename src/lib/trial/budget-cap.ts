@@ -1,7 +1,7 @@
 import { Redis } from "@upstash/redis";
 import { logger } from "@/lib/logger";
 
-interface MonthlyBudgetData {
+export interface MonthlyBudgetData {
   used: number;
   limit: number;
   currency: "EUR";
