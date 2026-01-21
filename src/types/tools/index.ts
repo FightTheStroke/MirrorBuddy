@@ -62,6 +62,14 @@ export type {
   PDFData,
   // Webcam
   WebcamData,
+  // Typing
+  TypingLesson,
+  TypingProgress,
+  TypingStats,
+  KeyboardLayout,
+  TypingHandMode,
+  TypingLevel,
+  LessonResult,
 } from './tool-data-types';
 
 export {
