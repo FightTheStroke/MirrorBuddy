@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export interface DyslexiaSettings {
   openDyslexicFont: boolean;
@@ -25,14 +25,19 @@ export function DyslexiaA11y({
   };
 
   return (
-    <div className={cn(
-      'space-y-6',
-      settings.openDyslexicFont && 'font-[OpenDyslexic]'
-    )}>
+    <div
+      className={cn(
+        "space-y-6",
+        settings.openDyslexicFont && "font-[OpenDyslexic]",
+      )}
+    >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Accessibilità per Dislessia</h3>
+        <h3 className="text-lg font-semibold mb-4">
+          Accessibilità per Dislessia
+        </h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni ottimizzate per utenti con dislessia o difficoltà di lettura.
+          Impostazioni ottimizzate per utenti con dislessia o difficoltà di
+          lettura.
         </p>
       </div>
 
@@ -41,18 +46,18 @@ export function DyslexiaA11y({
           title="Font OpenDyslexic"
           description="Font specializzato per facilitare la lettura"
           enabled={settings.openDyslexicFont}
-          onToggle={() => toggleSetting('openDyslexicFont')}
+          onToggle={() => toggleSetting("openDyslexicFont")}
         />
 
         <SettingCard
           title="Spacing extra tra lettere"
           description="Aumenta lo spazio tra le lettere per migliore leggibilità"
           enabled={settings.extraLetterSpacing}
-          onToggle={() => toggleSetting('extraLetterSpacing')}
+          onToggle={() => toggleSetting("extraLetterSpacing")}
         >
           {settings.extraLetterSpacing && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <p className="text-sm" style={{ letterSpacing: '0.15em' }}>
+              <p className="text-sm" style={{ letterSpacing: "0.15em" }}>
                 Testo con spacing extra tra le lettere
               </p>
             </div>
@@ -63,13 +68,14 @@ export function DyslexiaA11y({
           title="Altezza riga aumentata"
           description="Aumenta l'interlinea per ridurre la fatica visiva"
           enabled={settings.increasedLineHeight}
-          onToggle={() => toggleSetting('increasedLineHeight')}
+          onToggle={() => toggleSetting("increasedLineHeight")}
         >
           {settings.increasedLineHeight && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
-              <p className="text-sm" style={{ lineHeight: '1.8' }}>
-                Testo con altezza riga aumentata per migliorare la leggibilità.
-                Ogni riga ha più spazio verticale tra di essa.
+              <p className="text-sm" style={{ lineHeight: "1.8" }}>
+                Testo con altezza riga aumentata per migliorare la
+                leggibilit&agrave;. Ogni riga ha pi&ugrave; spazio verticale tra
+                di essa.
               </p>
             </div>
           )}
@@ -79,14 +85,14 @@ export function DyslexiaA11y({
           title="Testi brevi (chunks)"
           description="Divide il testo in sezioni più corte per facilitare la comprensione"
           enabled={settings.shortTextChunks}
-          onToggle={() => toggleSetting('shortTextChunks')}
+          onToggle={() => toggleSetting("shortTextChunks")}
         />
 
         <SettingCard
           title="Feedback audio"
           description="Legge ad alta voce ogni tasto premuto"
           enabled={settings.audioFeedback}
-          onToggle={() => toggleSetting('audioFeedback')}
+          onToggle={() => toggleSetting("audioFeedback")}
         />
       </div>
 
@@ -95,14 +101,14 @@ export function DyslexiaA11y({
           onClick={() => setShowInfo(!showInfo)}
           className="text-sm text-primary hover:underline"
         >
-          {showInfo ? 'Nascondi info dislessia' : 'Mostra info dislessia'}
+          {showInfo ? "Nascondi info dislessia" : "Mostra info dislessia"}
         </button>
 
         {showInfo && (
           <p className="text-sm mt-2 text-muted-foreground">
-            Queste impostazioni sono basate sulle raccomandazioni della British Dyslexia
-            Association e dell'International Dyslexia Association per migliorare
-            l'accessibilità per utenti con dislessia.
+            Queste impostazioni sono basate sulle raccomandazioni della British
+            Dyslexia Association e dell&apos;International Dyslexia Association
+            per migliorare l&apos;accessibilit&agrave; per utenti con dislessia.
           </p>
         )}
       </div>
@@ -118,12 +124,20 @@ interface SettingCardProps {
   children?: React.ReactNode;
 }
 
-function SettingCard({ title, description, enabled, onToggle, children }: SettingCardProps) {
+function SettingCard({
+  title,
+  description,
+  enabled,
+  onToggle,
+  children,
+}: SettingCardProps) {
   return (
-    <div className={cn(
-      'p-4 border rounded-lg transition-colors',
-      enabled ? 'bg-card border-primary/50' : 'bg-muted/30 border-border'
-    )}>
+    <div
+      className={cn(
+        "p-4 border rounded-lg transition-colors",
+        enabled ? "bg-card border-primary/50" : "bg-muted/30 border-border",
+      )}
+    >
       <div className="flex items-start justify-between mb-2">
         <div className="flex-1">
           <h4 className="font-semibold">{title}</h4>
@@ -132,17 +146,17 @@ function SettingCard({ title, description, enabled, onToggle, children }: Settin
         <button
           onClick={onToggle}
           className={cn(
-            'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-            'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
-            enabled ? 'bg-primary' : 'bg-muted'
+            "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+            "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
+            enabled ? "bg-primary" : "bg-muted",
           )}
           role="switch"
           aria-checked={enabled}
         >
           <span
             className={cn(
-              'inline-block h-4 w-4 transform rounded-full bg-white transition-transform',
-              enabled ? 'translate-x-6' : 'translate-x-1'
+              "inline-block h-4 w-4 transform rounded-full bg-white transition-transform",
+              enabled ? "translate-x-6" : "translate-x-1",
             )}
           />
         </button>
