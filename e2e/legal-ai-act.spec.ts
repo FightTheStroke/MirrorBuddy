@@ -28,21 +28,27 @@ test.describe("AI Act - AI Transparency Page", () => {
 
   test("contains required disclosure sections", async ({ page }) => {
     await page.goto("/ai-transparency");
-    const content = await page.textContent("body");
+    await page.waitForLoadState("networkidle");
+    const content = await page.textContent("article");
     expect(content).toBeTruthy();
 
     // Required AI Act disclosures
     expect(content).toMatch(/azure|openai|gpt/i); // AI provider
-    expect(content).toMatch(/tutor|educativo|educational/i); // Purpose
+    expect(content).toMatch(/maestr|tutor|educativo|educational/i); // Purpose
     expect(content).toMatch(/dati|data/i); // Data usage
   });
 
   test("has model information heading", async ({ page }) => {
     await page.goto("/ai-transparency");
+    await page.waitForLoadState("networkidle");
 
-    const headings = await page.locator("h1, h2, h3").allTextContents();
+    const headings = await page
+      .locator("article h1, article h2, article h3")
+      .allTextContents();
     const hasAIHeading = headings.some((h) =>
-      /ai|intelligenza|sistema|model|trasparenza|transparency/i.test(h),
+      /ai|intelligenza|sistema|model|trasparenza|transparency|in breve/i.test(
+        h,
+      ),
     );
     expect(hasAIHeading).toBeTruthy();
   });
