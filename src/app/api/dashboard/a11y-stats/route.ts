@@ -34,11 +34,13 @@ export async function GET(request: Request) {
     startDate.setDate(startDate.getDate() - days);
     startDate.setHours(0, 0, 0, 0);
 
+    // F-06: Exclude test data from accessibility statistics
     // Query accessibility events
     const events = await prisma.telemetryEvent.findMany({
       where: {
         category: "accessibility",
         timestamp: { gte: startDate },
+        isTestData: false,
       },
       select: {
         action: true,

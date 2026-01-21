@@ -16,7 +16,6 @@ import {
   checkLayoutStability,
   checkSpacingConsistency,
   checkComponentRendering,
-  ADMIN_VISUAL_ROUTES,
 } from "./admin-visual-regression-helpers";
 
 // ============================================================================

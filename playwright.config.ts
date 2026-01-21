@@ -11,6 +11,9 @@ config();
  *
  * Environment: Clears color env vars to ensure consistent test output.
  * DATABASE_URL: Optional - tests use mock data when not provided.
+ * PRODUCTION BLOCKING: global-setup.ts enforces NODE_ENV !== "production" (F-03)
+ *   E2E tests are blocked in production to prevent real user data corruption.
+ *   If tests attempt to run in production, global-setup.ts will throw an error.
  *
  * Visual Regression: Configure with expect.toHaveScreenshot() for consistency testing
  */

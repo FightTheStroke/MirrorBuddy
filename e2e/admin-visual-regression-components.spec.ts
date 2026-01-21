@@ -10,10 +10,7 @@
  */
 
 import { test, expect } from "./fixtures/auth-fixtures";
-import {
-  waitForPageReady,
-  ADMIN_VISUAL_ROUTES,
-} from "./admin-visual-regression-helpers";
+import { waitForPageReady } from "./admin-visual-regression-helpers";
 
 // ============================================================================
 // COMPONENT CONSISTENCY TESTS

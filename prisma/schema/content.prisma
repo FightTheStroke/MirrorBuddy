@@ -45,6 +45,9 @@ model Material {
   // Study Kit integration
   sourceStudyKitId String?
 
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

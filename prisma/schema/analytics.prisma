@@ -19,6 +19,9 @@ model TelemetryEvent {
   sessionId String
   userId    String?
 
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
   createdAt DateTime @default(now())
 
   @@index([userId])

@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { RefreshCw, Loader2, Download, AlertCircle } from "lucide-react";
+import {
+  RefreshCw,
+  Loader2,
+  Download,
+  AlertCircle,
+  Shield,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 import { SafetyOverviewCards } from "./components/safety-overview-cards";
 import { SafetyEventsTable } from "./components/safety-events-table";
 import { SafetyEscalations } from "./components/safety-escalations";
@@ -70,10 +77,8 @@ export default function AdminSafetyPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-          <p className="text-slate-600 dark:text-slate-400">
-            Loading safety dashboard...
-          </p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading safety dashboard...</p>
         </div>
       </div>
     );
@@ -81,28 +86,23 @@ export default function AdminSafetyPage() {
 
   return (
     <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            AI Safety Dashboard
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Real-time monitoring of AI system health and safety events
-          </p>
-        </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-        >
-          <RefreshCw
-            className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")}
-          />
-          Refresh
-        </Button>
-      </div>
+      <PageHeader
+        icon={Shield}
+        title="AI Safety Dashboard"
+        rightContent={
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+          >
+            <RefreshCw
+              className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")}
+            />
+            Refresh
+          </Button>
+        }
+      />
 
       {/* Error Alert */}
       {error && (
