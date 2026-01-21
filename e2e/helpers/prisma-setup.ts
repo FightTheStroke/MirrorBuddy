@@ -18,7 +18,7 @@ function createTestPrismaClient(): PrismaClient {
   const connectionString =
     process.env.TEST_DATABASE_URL ||
     process.env.DATABASE_URL ||
-    "postgresql://localhost:5432/mirrorbuddy";
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
   const isProduction =
     process.env.NODE_ENV === "production" || process.env.VERCEL === "1";

@@ -162,6 +162,7 @@ export default defineConfig({
     env: {
       ...(process.env.TEST_DATABASE_URL && {
         DATABASE_URL: process.env.TEST_DATABASE_URL,
+        TEST_DATABASE_URL: process.env.TEST_DATABASE_URL,
       }),
       ...(process.env.TEST_DIRECT_URL && {
         DIRECT_URL: process.env.TEST_DIRECT_URL,
