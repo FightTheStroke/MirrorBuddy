@@ -34,6 +34,7 @@ import type {
 } from "./types";
 import type { A11yStatsData } from "@/app/api/dashboard/a11y-stats/route";
 import { A11yStatsWidget } from "./components/a11y-stats-widget";
+import { ResetStatsButton } from "./components/reset-stats-button";
 
 type DashboardData = {
   tokenUsage: TokenUsageData | null;
@@ -143,9 +144,7 @@ export default function AdminAnalyticsPage() {
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">
-            Loading analytics...
-          </p>
+          <p className="text-muted-foreground">Loading analytics...</p>
         </div>
       </div>
     );
@@ -155,20 +154,21 @@ export default function AdminAnalyticsPage() {
     <div className="max-w-7xl mx-auto">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-muted-foreground">
-          Last 7 days
-        </p>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fetchData(true)}
-          disabled={refreshing}
-        >
-          <RefreshCw
-            className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
-          />
-          Refresh
-        </Button>
+        <p className="text-sm text-muted-foreground">Last 7 days</p>
+        <div className="flex gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchData(true)}
+            disabled={refreshing}
+          >
+            <RefreshCw
+              className={`h-4 w-4 mr-2 ${refreshing ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+          <ResetStatsButton />
+        </div>
       </div>
 
       <div>
@@ -274,7 +274,9 @@ export default function AdminAnalyticsPage() {
                     {data.sessionMetrics?.cost.p95PerSession.toFixed(3) ??
                       "0.000"}
                   </p>
-                  <p className="text-xs text-muted-foreground">P95 per Session</p>
+                  <p className="text-xs text-muted-foreground">
+                    P95 per Session
+                  </p>
                 </div>
                 <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-primary">
@@ -378,7 +380,9 @@ export default function AdminAnalyticsPage() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Voice Sessions</p>
+                  <p className="text-xs text-muted-foreground">
+                    Voice Sessions
+                  </p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.voice.totalSessions ?? 0}
                   </p>
@@ -389,7 +393,9 @@ export default function AdminAnalyticsPage() {
                   </p>
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">TTS Generations</p>
+                  <p className="text-xs text-muted-foreground">
+                    TTS Generations
+                  </p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.tts.totalGenerations ?? 0}
                   </p>
@@ -399,7 +405,9 @@ export default function AdminAnalyticsPage() {
                   </p>
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Realtime Sessions</p>
+                  <p className="text-xs text-muted-foreground">
+                    Realtime Sessions
+                  </p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.realtime.totalSessions ?? 0}
                   </p>
@@ -409,7 +417,9 @@ export default function AdminAnalyticsPage() {
                   </p>
                 </div>
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-xs text-muted-foreground">Total Voice Minutes</p>
+                  <p className="text-xs text-muted-foreground">
+                    Total Voice Minutes
+                  </p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.voice.totalMinutes.toFixed(0) ?? 0}
                   </p>

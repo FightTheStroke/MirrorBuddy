@@ -17,6 +17,24 @@ const globalForPrisma = globalThis as unknown as {
 
 const isE2E = process.env.E2E_TESTS === "1";
 const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+const isProduction =
+  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+
+// CRITICAL SAFETY CHECK: Block Supabase URLs in development/test
+// This prevents accidental contamination of production database
+if (
+  !isProduction &&
+  process.env.DATABASE_URL &&
+  isSupabaseUrl(process.env.DATABASE_URL)
+) {
+  throw new Error(
+    `❌ SECURITY BLOCK: DATABASE_URL contains production Supabase URL in non-production environment!\n` +
+      `NODE_ENV: ${process.env.NODE_ENV}, VERCEL: ${process.env.VERCEL}\n` +
+      `To run E2E tests: Set E2E_TESTS=1 and TEST_DATABASE_URL=postgresql://localhost:5432/test\n` +
+      `To run dev server: Remove Supabase URL from .env or set NODE_ENV=production\n` +
+      `This safety check prevents accidental production database writes during development/testing.`,
+  );
+}
 
 // DEBUG: Log environment variables when db.ts loads (E2E only)
 if (isE2E) {
@@ -58,8 +76,6 @@ const connectionString = isE2E
 // Supabase uses a CA certificate that must be explicitly trusted
 // Download from: Supabase Dashboard → Database Settings → SSL Configuration
 const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-const isProduction =
-  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
