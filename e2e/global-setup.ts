@@ -71,7 +71,12 @@ async function globalSetup() {
           JSON.stringify({
             version: "1",
             activeProfile: null,
-            overrides: {},
+            overrides: {
+              dyslexiaFont: false,
+              highContrast: false,
+              largeText: false,
+              reducedMotion: false,
+            },
             browserDetectedApplied: true,
           }),
         ),
