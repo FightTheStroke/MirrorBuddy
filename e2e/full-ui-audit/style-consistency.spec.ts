@@ -60,15 +60,17 @@ test.describe("Style Consistency - Fonts", () => {
         return window.getComputedStyle(body).fontFamily;
       });
 
-      // Should contain Inter (or fallback system fonts)
+      // Should contain Inter (or OpenDyslexic if a11y enabled, or fallback system fonts)
+      // The accessibility system may apply OpenDyslexic based on browser settings
       const hasExpectedFont =
         fontFamily.toLowerCase().includes("inter") ||
+        fontFamily.toLowerCase().includes("opendyslexic") ||
         fontFamily.includes("ui-sans-serif") ||
         fontFamily.includes("system-ui");
 
       expect(
         hasExpectedFont,
-        `${page.name} should use Inter font, got: ${fontFamily}`,
+        `${page.name} should use Inter or OpenDyslexic font, got: ${fontFamily}`,
       ).toBe(true);
     });
   }
