@@ -9,8 +9,7 @@ import {
 } from "@/components/accessibility";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
-import { CookieConsentWall } from "@/components/consent";
-import { TosGateProvider } from "@/components/tos/tos-gate-provider";
+import { UnifiedConsentWall } from "@/components/consent";
 import {
   useSettingsStore,
   initializeStores,
@@ -116,33 +115,38 @@ function StoreInitializer() {
   return null;
 }
 
-// Pages where consent is handled inline (in footer) or not needed
+// Pages where unified consent wall should be skipped
 // Legal pages MUST be accessible without accepting cookies (GDPR requirement)
-const INLINE_CONSENT_PATHS = [
+const PUBLIC_PATHS = [
   "/welcome",
   "/landing",
   "/privacy",
   "/cookies",
   "/terms",
+  "/ai-transparency",
+  "/legal/data-request",
 ];
 
 /**
- * Conditional Cookie Consent - skips blocking wall on welcome page
- * Welcome page has inline consent in footer (WelcomeFooter component)
+ * Conditional Unified Consent - DB-first TOS + Cookie consent
+ * Skips blocking wall on public/legal pages (GDPR requirement)
+ * Uses UnifiedConsentWall which handles both TOS and Cookie consent
  */
-function ConditionalCookieConsent({ children }: { children: React.ReactNode }) {
+function ConditionalUnifiedConsent({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
-  const useInlineConsent = INLINE_CONSENT_PATHS.some((p) =>
-    pathname?.startsWith(p),
-  );
+  const isPublicPath = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
 
-  // On welcome/landing pages, skip blocking wall (consent is in footer)
-  if (useInlineConsent) {
+  // On public/legal pages, skip blocking wall (users must access legal docs)
+  if (isPublicPath) {
     return <>{children}</>;
   }
 
-  // On all other pages, use the blocking consent wall
-  return <CookieConsentWall>{children}</CookieConsentWall>;
+  // On all other pages, use the unified consent wall (TOS + Cookie)
+  return <UnifiedConsentWall>{children}</UnifiedConsentWall>;
 }
 
 export function Providers({ children, nonce: _nonce }: ProvidersProps) {
@@ -159,16 +163,14 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
     >
       <AccessibilityProvider>
         <A11yInstantAccess />
-        <ConditionalCookieConsent>
-          <TosGateProvider>
-            <StoreInitializer />
-            <AccentColorApplier />
-            <ActivityTracker />
-            {children}
-            <ToastContainer />
-            <IOSInstallBanner />
-          </TosGateProvider>
-        </ConditionalCookieConsent>
+        <ConditionalUnifiedConsent>
+          <StoreInitializer />
+          <AccentColorApplier />
+          <ActivityTracker />
+          {children}
+          <ToastContainer />
+          <IOSInstallBanner />
+        </ConditionalUnifiedConsent>
       </AccessibilityProvider>
     </ThemeProvider>
   );

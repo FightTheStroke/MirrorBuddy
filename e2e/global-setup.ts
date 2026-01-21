@@ -123,13 +123,20 @@ async function globalSetup() {
             }),
           },
           {
-            name: "mirrorbuddy-consent",
+            // Unified consent (TOS + Cookie) - matches unified-consent-storage.ts
+            name: "mirrorbuddy-unified-consent",
             value: JSON.stringify({
               version: "1.0",
-              acceptedAt: new Date().toISOString(),
-              essential: true,
-              analytics: true,
-              marketing: false,
+              tos: {
+                accepted: true,
+                version: "1.0",
+                acceptedAt: new Date().toISOString(),
+              },
+              cookies: {
+                essential: true,
+                analytics: true,
+                acceptedAt: new Date().toISOString(),
+              },
             }),
           },
         ],
