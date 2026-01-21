@@ -98,3 +98,6 @@ Plan20Jan.md
 
 # Supabase CLI local state
 supabase/.temp/
+
+# Local documentation archives (not tracked)
+docs/.archive/
