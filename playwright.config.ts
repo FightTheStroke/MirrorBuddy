@@ -93,8 +93,9 @@ export default defineConfig({
             "**/auth-system.spec.ts", // Requires session/auth setup
             "**/critical-api-routes.spec.ts", // Requires proper API environment
             "**/maestri-data.spec.ts", // Requires full UI rendering
+            "**/mobile/**", // Exclude mobile tests from desktop project
           ]
-        : "**/cookie-signing.spec.ts",
+        : ["**/cookie-signing.spec.ts", "**/mobile/**"],
     },
     {
       // Cookie-signing tests need to run without storage state to test fresh cookies
@@ -107,10 +108,50 @@ export default defineConfig({
       // Skip in CI - requires session management
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
+    // Mobile viewport projects for responsive design testing (ADR 0064)
+    {
+      name: "iphone-se",
+      use: {
+        ...devices["iPhone SE"],
+        // iPhone SE 2022: 375px × 667px (16:9)
+      },
+      testMatch: "**/mobile/**/*.spec.ts",
+    },
+    {
+      name: "iphone-13",
+      use: {
+        ...devices["iPhone 13"],
+        // iPhone 13: 390px × 844px (19.5:9)
+      },
+      testMatch: "**/mobile/**/*.spec.ts",
+    },
+    {
+      name: "pixel-7",
+      use: {
+        ...devices["Pixel 7"],
+        // Pixel 7: 412px × 915px (19.5:9)
+      },
+      testMatch: "**/mobile/**/*.spec.ts",
+    },
+    {
+      name: "ipad-mini",
+      use: {
+        ...devices["iPad Mini"],
+        // iPad Mini: 768px × 1024px (4:3) portrait
+      },
+      testMatch: "**/mobile/**/*.spec.ts",
+    },
+    {
+      name: "ipad-landscape",
+      use: {
+        ...devices["iPad Mini landscape"],
+        // iPad Mini landscape: 1024px × 768px (4:3)
+      },
+      testMatch: "**/mobile/**/*.spec.ts",
+    },
     // Other browsers disabled - only testing API/backend, not cross-browser UI
     // Re-enable if needed:
     // { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    // { name: 'Mobile Chrome', use: { ...devices['Pixel 5'] } },
   ],
 
   webServer: {
