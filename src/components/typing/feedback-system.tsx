@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
-import type { KeyMappingResult } from '@/lib/typing/key-mapping-engine';
+import { useState, useCallback } from "react";
+import { cn } from "@/lib/utils";
+import type { KeyMappingResult } from "@/lib/typing/key-mapping-engine";
 
 export interface FeedbackConfig {
   enableAudio: boolean;
@@ -26,22 +26,12 @@ export function FeedbackSystem({
   onHint,
 }: FeedbackSystemProps) {
   const [showHint, setShowHint] = useState(false);
-  const [errorFlash, setErrorFlash] = useState(false);
 
   const handleShowHint = useCallback(() => {
     setShowHint(true);
     onHint?.();
     setTimeout(() => setShowHint(false), 2000);
   }, [onHint]);
-
-  useCallback(() => {
-    if (!result) return;
-
-    if (!result.correct && !result.isBackspace) {
-      setErrorFlash(true);
-      setTimeout(() => setErrorFlash(false), 200);
-    }
-  }, [result]);
 
   if (!result) {
     return null;
@@ -50,14 +40,16 @@ export function FeedbackSystem({
   return (
     <div className="space-y-2">
       {config.enableVisual && (
-        <div className={cn(
-          'p-4 rounded-lg transition-all duration-200',
-          result.correct && result.actual
-            ? 'bg-green-500/10 border border-green-500/30'
-            : result.isBackspace
-              ? 'bg-muted/50 border border-muted'
-              : 'bg-red-500/10 border border-red-500/30'
-        )}>
+        <div
+          className={cn(
+            "p-4 rounded-lg transition-all duration-200",
+            result.correct && result.actual
+              ? "bg-green-500/10 border border-green-500/30"
+              : result.isBackspace
+                ? "bg-muted/50 border border-muted"
+                : "bg-red-500/10 border border-red-500/30",
+          )}
+        >
           <div className="flex items-center gap-4">
             {result.isBackspace ? (
               <span className="text-muted-foreground">Backspace</span>
@@ -85,7 +77,10 @@ export function FeedbackSystem({
 
           {showHint && !result.correct && config.enableHints && (
             <div className="mt-2 text-sm text-muted-foreground">
-              Hint: Press <kbd className="px-2 py-1 bg-muted rounded">{result.expected}</kbd>
+              Hint: Press{" "}
+              <kbd className="px-2 py-1 bg-muted rounded">
+                {result.expected}
+              </kbd>
             </div>
           )}
         </div>
@@ -100,11 +95,7 @@ export function FeedbackSystem({
       )}
 
       {config.enableAudio && !result.correct && !result.isBackspace && (
-        <audio
-          src="/sounds/keystroke-error.mp3"
-          autoPlay
-          className="hidden"
-        />
+        <audio src="/sounds/keystroke-error.mp3" autoPlay className="hidden" />
       )}
     </div>
   );
@@ -116,7 +107,7 @@ export function useFeedback() {
 
   const showFeedback = useCallback((result: KeyMappingResult) => {
     setFeedback(result);
-    
+
     if (!result.correct && !result.isBackspace) {
       setShowHint(true);
       setTimeout(() => setShowHint(false), 2000);

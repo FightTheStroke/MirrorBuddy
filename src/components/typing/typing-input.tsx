@@ -1,9 +1,12 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useCallback } from 'react';
-import { useTypingStore } from '@/lib/stores';
-import { createKeyMappingEngine, type KeyMappingResult } from '@/lib/typing/key-mapping-engine';
-import type { TypingLesson } from '@/types/tools';
+import { useEffect, useRef, useCallback } from "react";
+import { useTypingStore } from "@/lib/stores";
+import {
+  createKeyMappingEngine,
+  type KeyMappingResult,
+} from "@/lib/typing/key-mapping-engine";
+import type { TypingLesson } from "@/types/tools";
 
 interface TypingInputProps {
   lesson: TypingLesson;
@@ -23,16 +26,19 @@ export function TypingInput({
   disabled = false,
 }: TypingInputProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const engineRef = useRef<ReturnType<typeof createKeyMappingEngine> | null>(null);
-  const focusTimeoutRef = useRef<NodeJS.Timeout>();
+  const engineRef = useRef<ReturnType<typeof createKeyMappingEngine> | null>(
+    null,
+  );
+  const focusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const { currentLesson, startLesson, endLesson, recordKeystroke } = useTypingStore();
+  const { currentLesson, startLesson, endLesson, recordKeystroke } =
+    useTypingStore();
 
   useEffect(() => {
     if (isActive && !disabled) {
       engineRef.current = createKeyMappingEngine(lesson.text);
       startLesson(lesson);
-      
+
       focusTimeoutRef.current = setTimeout(() => {
         inputRef.current?.focus();
       }, 100);
@@ -45,29 +51,32 @@ export function TypingInput({
     }
   }, [isActive, lesson, startLesson, disabled]);
 
-  const handleKeyDown = useCallback((event: KeyboardEvent) => {
-    if (!isActive || disabled || !engineRef.current) return;
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent) => {
+      if (!isActive || disabled || !engineRef.current) return;
 
-    event.preventDefault();
+      event.preventDefault();
 
-    const mappedKey = engineRef.current.mapKey(event);
-    if (!mappedKey) return;
+      const mappedKey = engineRef.current.mapKey(event);
+      if (!mappedKey) return;
 
-    const result = engineRef.current.validateKey(mappedKey);
-    recordKeystroke(mappedKey, result.expected);
+      const result = engineRef.current.validateKey(mappedKey);
+      recordKeystroke(mappedKey, result.expected);
 
-    if (onKeystroke) {
-      onKeystroke(result);
-    }
+      if (onKeystroke) {
+        onKeystroke(result);
+      }
 
-    if (!result.correct && !result.isBackspace) {
-      onError?.();
-    }
+      if (!result.correct && !result.isBackspace) {
+        onError?.();
+      }
 
-    if (engineRef.current.isComplete()) {
-      onComplete?.();
-    }
-  }, [isActive, disabled, recordKeystroke, onKeystroke, onComplete, onError]);
+      if (engineRef.current.isComplete()) {
+        onComplete?.();
+      }
+    },
+    [isActive, disabled, recordKeystroke, onKeystroke, onComplete, onError],
+  );
 
   useEffect(() => {
     if (!isActive || disabled) return;
@@ -76,11 +85,11 @@ export function TypingInput({
       handleKeyDown(e);
     };
 
-    window.addEventListener('keydown', handleKeyDownGlobal);
+    window.addEventListener("keydown", handleKeyDownGlobal);
     inputRef.current?.focus();
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDownGlobal);
+      window.removeEventListener("keydown", handleKeyDownGlobal);
     };
   }, [isActive, disabled, handleKeyDown]);
 

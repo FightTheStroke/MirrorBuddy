@@ -1,56 +1,57 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createWPMCalculator } from '@/lib/typing/wpm-calculator';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { createWPMCalculator } from "@/lib/typing/wpm-calculator";
+import { cn } from "@/lib/utils";
+
+const GAME_SENTENCES = [
+  "La gatta salta sul muro.",
+  "Il cane corre nel parco.",
+  "Mangiare una mela ogni giorno.",
+  "Il sole splende luminoso.",
+  "La penna scrive bene.",
+];
 
 interface AccuracyGameProps {
   onGameEnd: (score: number, accuracy: number) => void;
 }
 
 export function AccuracyGame({ onGameEnd }: AccuracyGameProps) {
-  const [sentences, setSentences] = useState<string[]>([]);
+  const [sentences] = useState<string[]>(() =>
+    shuffle([...GAME_SENTENCES]).slice(0, 5),
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [typedText, setTypedText] = useState('');
+  const [typedText, setTypedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [score, setScore] = useState(0);
 
-  const GAME_SENTENCES = [
-    'La gatta salta sul muro.',
-    'Il cane corre nel parco.',
-    'Mangiare una mela ogni giorno.',
-    'Il sole splende luminoso.',
-    'La penna scrive bene.',
-  ];
-
   const wpmCalc = createWPMCalculator();
 
-  useEffect(() => {
-    setSentences(shuffle([...GAME_SENTENCES]).slice(0, 5));
-  }, []);
+  const endGame = () => {
+    setIsComplete(true);
+    wpmCalc.finish();
+    const accuracy = wpmCalc.getAccuracy();
+    setScore((currentScore) => {
+      onGameEnd(currentScore, accuracy);
+      return currentScore;
+    });
+  };
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setTypedText(value);
 
     if (value === sentences[currentIndex]) {
-      setScore(score + 20);
+      setScore((prev) => prev + 20);
       wpmCalc.recordKeystroke(true);
-      setTypedText('');
+      setTypedText("");
 
       if (currentIndex >= sentences.length - 1) {
         endGame();
       } else {
-        setCurrentIndex(currentIndex + 1);
+        setCurrentIndex((prev) => prev + 1);
       }
     }
-  };
-
-  const endGame = () => {
-    setIsComplete(true);
-    wpmCalc.finish();
-    const accuracy = wpmCalc.getAccuracy();
-    onGameEnd(score, accuracy);
   };
 
   return (
@@ -80,12 +81,12 @@ export function AccuracyGame({ onGameEnd }: AccuracyGameProps) {
               <div
                 key={index}
                 className={cn(
-                  'p-4 border rounded-lg',
+                  "p-4 border rounded-lg",
                   index === currentIndex
-                    ? 'bg-primary/20 border-primary'
+                    ? "bg-primary/20 border-primary"
                     : index < currentIndex
-                      ? 'bg-green-500/10 border-green-500/30'
-                      : 'bg-muted/30 border-border'
+                      ? "bg-green-500/10 border-green-500/30"
+                      : "bg-muted/30 border-border",
                 )}
               >
                 {index === currentIndex ? (
