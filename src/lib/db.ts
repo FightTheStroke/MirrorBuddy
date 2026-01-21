@@ -9,6 +9,7 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool, PoolConfig } from "pg";
 import { logger } from "@/lib/logger";
+import { isSupabaseUrl } from "@/lib/utils/url-validation";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -35,7 +36,7 @@ const connectionString = isE2E
         );
       }
       // CRITICAL: Block production Supabase URLs in E2E tests
-      if (testDatabaseUrl.includes("supabase.com")) {
+      if (isSupabaseUrl(testDatabaseUrl)) {
         throw new Error(
           `❌ BLOCKED: E2E test attempted to use production Supabase database!\n` +
             `TEST_DATABASE_URL must be a local test database, not: ${testDatabaseUrl}\n` +

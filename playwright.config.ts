@@ -1,6 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 import { config } from "dotenv";
+import { isSupabaseUrl } from "./src/lib/utils/url-validation";
 
 // Load .env file for TEST_DATABASE_URL
 config();
@@ -26,7 +27,7 @@ const testDatabaseUrl =
   "postgresql://roberdan@localhost:5432/mirrorbuddy_test";
 
 // PRODUCTION BLOCKER: Reject production Supabase URLs
-if (testDatabaseUrl.includes("supabase.com")) {
+if (isSupabaseUrl(testDatabaseUrl)) {
   throw new Error(
     `❌ BLOCKED: E2E tests attempted to use production Supabase database!\n` +
       `TEST_DATABASE_URL must be a local test database, not: ${testDatabaseUrl}\n` +
@@ -35,10 +36,7 @@ if (testDatabaseUrl.includes("supabase.com")) {
 }
 
 // Also check DATABASE_URL doesn't leak into tests
-if (
-  process.env.DATABASE_URL &&
-  process.env.DATABASE_URL.includes("supabase.com")
-) {
+if (process.env.DATABASE_URL && isSupabaseUrl(process.env.DATABASE_URL)) {
   console.warn(
     "⚠️  WARNING: DATABASE_URL contains production Supabase URL. " +
       "E2E tests will use TEST_DATABASE_URL instead to prevent data corruption.",
