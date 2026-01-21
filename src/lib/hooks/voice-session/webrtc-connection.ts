@@ -15,6 +15,15 @@ import type {
   AzureSDPResponse,
 } from "./webrtc-types";
 import { ICE_SERVERS } from "./webrtc-types";
+import {
+  logConnectionStateChange,
+  logICEConnectionStateChange,
+  logDataChannelStateChange,
+  logMediaStreamTracks,
+  logMicrophonePermissionRequest,
+  logSDPExchange,
+  logVoiceError,
+} from "./voice-error-logger";
 
 // Re-export types for backwards compatibility
 export type {
@@ -80,6 +89,10 @@ export class WebRTCConnection {
 
   private async getUserMedia(): Promise<MediaStream> {
     if (!navigator.mediaDevices?.getUserMedia) {
+      logVoiceError(
+        'MicrophoneNotAvailable',
+        'getUserMedia not available - HTTPS/localhost required',
+      );
       throw new Error(
         "Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.",
       );
@@ -92,12 +105,32 @@ export class WebRTCConnection {
     if (this.config.preferredMicrophoneId) {
       audioConstraints.deviceId = { ideal: this.config.preferredMicrophoneId };
     }
-    return navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    try {
+      logger.debug('[WebRTC] Requesting microphone access...', {
+        preferredMicrophoneId: this.config.preferredMicrophoneId,
+      });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: audioConstraints,
+      });
+      logMicrophonePermissionRequest('granted', { deviceId: this.config.preferredMicrophoneId });
+      logMediaStreamTracks(stream, 'getUserMedia result');
+      return stream;
+    } catch (error) {
+      const err = error as DOMException;
+      if (err.name === 'NotAllowedError') {
+        logMicrophonePermissionRequest('denied', { errorName: err.name });
+      } else {
+        logMicrophonePermissionRequest('error', { errorName: err.name, message: err.message });
+      }
+      throw error;
+    }
   }
 
   private createPeerConnection(): RTCPeerConnection {
+    logger.debug('[WebRTC] Creating peer connection');
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
     pc.onconnectionstatechange = () => {
+      logConnectionStateChange(pc.connectionState, this.config.maestro.id);
       this.config.onConnectionStateChange?.(pc.connectionState);
       if (
         pc.connectionState === "failed" ||
@@ -107,6 +140,7 @@ export class WebRTCConnection {
       }
     };
     pc.oniceconnectionstatechange = () => {
+      logICEConnectionStateChange(pc.iceConnectionState, this.config.maestro.id);
       this.config.onICEConnectionStateChange?.(pc.iceConnectionState);
     };
     pc.onicecandidate = (event) => {

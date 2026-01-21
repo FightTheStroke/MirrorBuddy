@@ -7,6 +7,7 @@
  * Services monitored:
  *   - Vercel: bandwidth, builds, functions
  *   - Supabase: database, connections, storage
+ *   - Azure OpenAI: TPM, RPM (F-02)
  *
  * Metrics format:
  *   - service_limit_usage_percentage{service, metric}
@@ -16,6 +17,7 @@
 import { logger } from "@/lib/logger";
 import { getVercelLimits } from "./vercel-limits";
 import { getSupabaseLimits } from "./supabase-limits";
+import { getAzureOpenAILimits } from "./azure-openai-limits";
 
 export interface ServiceLimitMetricSample {
   name: string;
@@ -78,6 +80,13 @@ export async function collectServiceLimitsSamples(
   // Collect Supabase metrics
   const supabaseSamples = await collectSupabaseLimits(instanceLabels, timestamp);
   samples.push(...supabaseSamples);
+
+  // Collect Azure OpenAI metrics (F-02)
+  const azureOpenAISamples = await collectAzureOpenAILimits(
+    instanceLabels,
+    timestamp,
+  );
+  samples.push(...azureOpenAISamples);
 
   return samples;
 }
@@ -172,6 +181,58 @@ async function collectSupabaseLimits(
     logger.debug("Collected Supabase metrics", { count: samples.length });
   } catch (error) {
     logger.warn("Failed to collect Supabase metrics", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  return samples;
+}
+
+/**
+ * Collect Azure OpenAI limits metrics (TPM, RPM) - F-02
+ */
+async function collectAzureOpenAILimits(
+  instanceLabels: Record<string, string>,
+  timestamp: number,
+): Promise<ServiceLimitMetricSample[]> {
+  const samples: ServiceLimitMetricSample[] = [];
+
+  try {
+    const limits = await getAzureOpenAILimits();
+
+    if (limits.error) {
+      logger.debug("Skipping Azure OpenAI metrics", { error: limits.error });
+      return samples;
+    }
+
+    samples.push(
+      ...createLimitMetrics(
+        instanceLabels,
+        "azure_openai",
+        "chat_tpm",
+        {
+          used: limits.tpm.used,
+          limit: limits.tpm.limit,
+          percent: limits.tpm.usagePercent,
+        },
+        timestamp,
+      ),
+      ...createLimitMetrics(
+        instanceLabels,
+        "azure_openai",
+        "chat_rpm",
+        {
+          used: limits.rpm.used,
+          limit: limits.rpm.limit,
+          percent: limits.rpm.usagePercent,
+        },
+        timestamp,
+      ),
+    );
+
+    logger.debug("Collected Azure OpenAI metrics", { count: samples.length });
+  } catch (error) {
+    logger.warn("Failed to collect Azure OpenAI metrics", {
       error: error instanceof Error ? error.message : String(error),
     });
   }
