@@ -1,0 +1,158 @@
+/**
+ * Mobile Responsive Layout Tests
+ * Verifies responsive design across mobile viewports
+ * Tests apply to all mobile device projects (iPhone SE, iPhone 13, Pixel 7, iPad)
+ */
+
+import { test, expect } from "./fixtures";
+
+test.describe("Mobile Responsive Layout", () => {
+  test.beforeEach(async ({ page }) => {
+    // Navigate to home page
+    await page.goto("/");
+    // Wait for app to load
+    await page.waitForSelector('main, [role="main"]');
+  });
+
+  test("header should be visible and properly sized", async ({
+    page,
+    mobile,
+  }) => {
+    const header = page.locator("header").first();
+    await expect(header).toBeVisible();
+
+    // Header should not exceed viewport width
+    const box = await header.boundingBox();
+    expect(box).not.toBeNull();
+    const viewportWidth = await mobile.getViewportWidth();
+    expect(box!.width).toBeLessThanOrEqual(viewportWidth);
+  });
+
+  test("header menu button should meet touch target minimum", async ({
+    page,
+    mobile,
+  }) => {
+    const menuButton = page.locator('button[aria-label="Apri menu"]').first();
+
+    // Should be visible on mobile
+    await expect(menuButton).toBeVisible();
+
+    // Should meet WCAG 2.5.5 minimum (44px × 44px)
+    await mobile.verifyTouchTarget(menuButton);
+  });
+
+  test("notification bell should meet touch target minimum", async ({
+    page,
+    mobile,
+  }) => {
+    const bellButton = page.locator('button[aria-label*="Notifiche"]').first();
+
+    // Should be visible (may be hidden on very small mobile)
+    const isVisible = await bellButton.isVisible();
+    if (isVisible) {
+      await mobile.verifyTouchTarget(bellButton);
+    }
+  });
+
+  test("sidebar should open and close correctly", async ({ page, mobile }) => {
+    // Open sidebar
+    await mobile.openMobileSidebar();
+
+    // Sidebar should be visible
+    const sidebar = page.locator("aside").first();
+    await expect(sidebar).toBeVisible();
+
+    // Overlay should be present
+    const overlay = page.locator(".fixed.inset-0.bg-black\\/40");
+    await expect(overlay).toBeVisible();
+
+    // Close sidebar
+    await mobile.closeMobileSidebar();
+
+    // Overlay should be gone
+    await expect(overlay).not.toBeVisible();
+  });
+
+  test("sidebar logo button should meet touch target minimum", async ({
+    page,
+    mobile,
+  }) => {
+    // Open sidebar first
+    await mobile.openMobileSidebar();
+
+    const logoButton = page
+      .locator('button[aria-label="Torna alla home"]')
+      .first();
+    await expect(logoButton).toBeVisible();
+
+    // Should meet touch target minimum (44px height)
+    await mobile.verifyTouchTarget(logoButton);
+  });
+
+  test("sidebar toggle button should meet touch target minimum", async ({
+    page,
+    mobile,
+  }) => {
+    // Open sidebar first
+    await mobile.openMobileSidebar();
+
+    const toggleButton = page
+      .locator(
+        'button[aria-label="Chiudi menu"], button[aria-label="Apri menu"]',
+      )
+      .last();
+    await expect(toggleButton).toBeVisible();
+
+    // Should meet touch target minimum
+    await mobile.verifyTouchTarget(toggleButton);
+  });
+
+  test("main content area should be accessible", async ({ page }) => {
+    const main = page.locator('main, [role="main"]');
+    await expect(main).toBeVisible();
+
+    // Main should have content
+    const box = await main.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThan(0);
+    expect(box!.height).toBeGreaterThan(0);
+  });
+
+  test("page should have proper document structure", async ({ page }) => {
+    // Should have header
+    await expect(page.locator("header").first()).toBeVisible();
+
+    // Should have main content
+    await expect(page.locator('main, [role="main"]')).toBeVisible();
+
+    // Should have sidebar
+    const sidebar = page.locator("aside").first();
+    const sidebarCount = await sidebar.count();
+    expect(sidebarCount).toBeGreaterThan(0);
+  });
+
+  test("no horizontal scroll should be present", async ({ page }) => {
+    // Check body scroll width vs client width
+    const hasHorizontalScroll = await page.evaluate(() => {
+      return document.body.scrollWidth > document.body.clientWidth;
+    });
+
+    expect(hasHorizontalScroll).toBe(false);
+  });
+
+  test("all interactive elements should be keyboard accessible", async ({
+    page,
+    mobile: _mobile,
+  }) => {
+    // Press Tab to navigate through interactive elements
+    await page.keyboard.press("Tab");
+
+    // At least one element should have focus
+    const focusedElement = await page.evaluate(() => {
+      return document.activeElement?.tagName;
+    });
+
+    expect(focusedElement).toBeTruthy();
+    expect(["BUTTON", "A", "INPUT"]).toContain(focusedElement);
+  });
+});
