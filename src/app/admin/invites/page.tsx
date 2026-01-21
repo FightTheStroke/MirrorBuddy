@@ -164,8 +164,8 @@ export default function AdminInvitesPage() {
             className={cn(
               "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
               activeTab === tab.status
-                ? "bg-indigo-600 text-white"
-                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700",
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-muted-foreground hover:bg-accent",
             )}
           >
             {tab.label}
@@ -195,7 +195,7 @@ export default function AdminInvitesPage() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
         </div>
       )}
 
@@ -215,9 +215,9 @@ export default function AdminInvitesPage() {
           {pendingInvites.map((invite) => (
             <div
               key={invite.id}
-              className="flex items-center justify-between p-3 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700"
+              className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
             >
-              <span className="text-sm text-slate-700 dark:text-slate-300">
+              <span className="text-sm text-foreground">
                 {invite.name} ({invite.email})
               </span>
               <div className="flex gap-2">
@@ -268,13 +268,13 @@ export default function AdminInvitesPage() {
       {/* Reject Modal */}
       {showRejectModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-white dark:bg-slate-800 rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-4">
+          <div className="bg-card rounded-xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-semibold text-foreground mb-4">
               Rifiuta richiesta
             </h3>
             <label
               htmlFor="reject-reason"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2"
+              className="block text-sm font-medium text-foreground mb-2"
             >
               Motivo del rifiuto
             </label>
@@ -283,7 +283,7 @@ export default function AdminInvitesPage() {
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Opzionale"
-              className="w-full p-3 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-white"
+              className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
               rows={3}
             />
             <div className="flex gap-3 mt-4">

@@ -12,6 +12,7 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   Home,
+  Activity,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -58,6 +59,12 @@ const NAV_ITEMS: NavItem[] = [
     label: "Analytics",
     href: "/admin/analytics",
     icon: BarChart3,
+  },
+  {
+    id: "service-limits",
+    label: "Service Limits",
+    href: "/admin/service-limits",
+    icon: Activity,
   },
   {
     id: "tos",
