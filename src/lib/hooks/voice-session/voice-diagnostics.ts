@@ -3,23 +3,27 @@
 // Comprehensive voice connection diagnostics and device probing
 // ============================================================================
 
-import { logger } from '@/lib/logger';
-import { getDeviceInfo, getWebRTCCapabilities } from './voice-error-logger';
+import { logger } from "@/lib/logger";
+import { getDeviceInfo, getWebRTCCapabilities } from "./voice-error-logger";
 
 /**
  * Probe audio context state and audio device availability
  */
-export function getAudioContextInfo(): Record<string, string | number | boolean | null> {
+export function getAudioContextInfo(): Record<
+  string,
+  string | number | boolean | null
+> {
   try {
     // Try to create a test context
     const windowWithWebkit = window as Window & {
       webkitAudioContext?: typeof AudioContext;
     };
-    const AudioContextClass = window.AudioContext || windowWithWebkit.webkitAudioContext;
+    const AudioContextClass =
+      window.AudioContext || windowWithWebkit.webkitAudioContext;
     if (!AudioContextClass) {
       return {
         audioContextAvailable: false,
-        status: 'AudioContext not available',
+        status: "AudioContext not available",
       };
     }
 
@@ -33,13 +37,14 @@ export function getAudioContextInfo(): Record<string, string | number | boolean 
       state: testContext.state, // 'suspended', 'running', 'closed'
       sampleRate: testContext.sampleRate,
       baseLatency: testContext.baseLatency,
-      outputLatency: contextWithExtended.outputLatency || 'unknown',
-      maxChannelCount: contextWithExtended.maxChannelCount || 'unknown',
-      destinationChannels: testContext.destination?.maxChannelCount || 'unknown',
+      outputLatency: contextWithExtended.outputLatency || "unknown",
+      maxChannelCount: contextWithExtended.maxChannelCount || "unknown",
+      destinationChannels:
+        testContext.destination?.maxChannelCount || "unknown",
     };
 
     // Attempt to resume if suspended (especially on iOS)
-    if (testContext.state === 'suspended') {
+    if (testContext.state === "suspended") {
       testContext.resume().catch(() => {
         // Ignore resume errors during diagnostics
       });
@@ -48,7 +53,11 @@ export function getAudioContextInfo(): Record<string, string | number | boolean 
     testContext.close();
     return info;
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to get audio context info', {}, error);
+    logger.error(
+      "[VoiceErrorLogger] Failed to get audio context info",
+      {},
+      error,
+    );
     return {
       audioContextAvailable: false,
       error: String(error),
@@ -64,29 +73,33 @@ export async function getAudioDevices(): Promise<Record<string, unknown>> {
     if (!navigator.mediaDevices?.enumerateDevices) {
       return {
         available: false,
-        status: 'enumerateDevices not available',
+        status: "enumerateDevices not available",
       };
     }
 
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const audioInputs = devices.filter(d => d.kind === 'audioinput');
-    const audioOutputs = devices.filter(d => d.kind === 'audiooutput');
+    const audioInputs = devices.filter((d) => d.kind === "audioinput");
+    const audioOutputs = devices.filter((d) => d.kind === "audiooutput");
 
     return {
       available: true,
       audioInputCount: audioInputs.length,
       audioOutputCount: audioOutputs.length,
-      audioInputs: audioInputs.map(d => ({
-        deviceId: d.deviceId || 'unknown',
-        label: d.label || 'Microphone',
+      audioInputs: audioInputs.map((d) => ({
+        deviceId: d.deviceId || "unknown",
+        label: d.label || "Microphone",
       })),
-      audioOutputs: audioOutputs.map(d => ({
-        deviceId: d.deviceId || 'unknown',
-        label: d.label || 'Speaker',
+      audioOutputs: audioOutputs.map((d) => ({
+        deviceId: d.deviceId || "unknown",
+        label: d.label || "Speaker",
       })),
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to enumerate audio devices', {}, error);
+    logger.error(
+      "[VoiceErrorLogger] Failed to enumerate audio devices",
+      {},
+      error,
+    );
     return {
       available: false,
       error: String(error),
@@ -104,24 +117,28 @@ export async function checkMicrophonePermissions(): Promise<
     if (!navigator.permissions?.query) {
       return {
         permissionsAPI: false,
-        status: 'Permissions API not supported',
+        status: "Permissions API not supported",
       };
     }
 
     const permissionStatus = await navigator.permissions.query({
-      name: 'microphone' as PermissionName,
+      name: "microphone" as PermissionName,
     });
 
     return {
       permissionsAPI: true,
       status: permissionStatus.state, // 'granted', 'denied', 'prompt'
-      canTry: permissionStatus.state !== 'denied',
+      canTry: permissionStatus.state !== "denied",
     };
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to check microphone permissions', {}, error);
+    logger.error(
+      "[VoiceErrorLogger] Failed to check microphone permissions",
+      {},
+      error,
+    );
     return {
       permissionsAPI: false,
-      status: 'Error checking permissions',
+      status: "Error checking permissions",
       error: String(error),
     };
   }
@@ -140,7 +157,7 @@ export async function logVoiceDiagnosticsReport(): Promise<void> {
 
     const report = {
       timestamp: new Date().toISOString(),
-      component: 'voice-diagnostics',
+      component: "voice-diagnostics",
       deviceInfo,
       webrtcCapabilities: webrtcCaps,
       audioContextInfo,
@@ -148,20 +165,24 @@ export async function logVoiceDiagnosticsReport(): Promise<void> {
       microphonePermissions: micPerms,
     };
 
-    logger.info('[VoiceSession] Diagnostics Report', report);
+    logger.info("[VoiceSession] Diagnostics Report", report);
 
     // Also log to console for immediate visibility during debugging
-    if (process.env.NODE_ENV !== 'production') {
-      console.group('🎤 Voice Diagnostics Report');
-      console.table(deviceInfo);
-      console.table(webrtcCaps);
-      console.table(audioContextInfo);
-      console.log('Audio Devices:', audioDevices);
-      console.log('Microphone Permissions:', micPerms);
-      console.groupEnd();
+    if (process.env.NODE_ENV !== "production") {
+      logger.debug("🎤 Voice Diagnostics Report", {
+        deviceInfo,
+        webrtcCaps,
+        audioContextInfo,
+        audioDevices,
+        micPerms,
+      });
     }
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to generate diagnostics report', {}, error);
+    logger.error(
+      "[VoiceErrorLogger] Failed to generate diagnostics report",
+      {},
+      error,
+    );
   }
 }
 
@@ -170,23 +191,23 @@ export async function logVoiceDiagnosticsReport(): Promise<void> {
  */
 export function logMediaStreamTracks(
   stream: MediaStream,
-  label: string = 'MediaStream',
+  label: string = "MediaStream",
 ): void {
   try {
     const audioTracks = stream.getAudioTracks();
     const videoTracks = stream.getVideoTracks();
 
     const context = {
-      component: 'voice-media-stream',
+      component: "voice-media-stream",
       streamLabel: label,
       audioTrackCount: audioTracks.length,
       videoTrackCount: videoTracks.length,
-      audioTracks: audioTracks.map(t => ({
+      audioTracks: audioTracks.map((t) => ({
         enabled: t.enabled,
         readyState: t.readyState,
         label: t.label,
       })),
-      videoTracks: videoTracks.map(t => ({
+      videoTracks: videoTracks.map((t) => ({
         enabled: t.enabled,
         readyState: t.readyState,
         label: t.label,
@@ -194,8 +215,12 @@ export function logMediaStreamTracks(
       timestamp: new Date().toISOString(),
     };
 
-    logger.debug('[VoiceSession] MediaStream tracks', context);
+    logger.debug("[VoiceSession] MediaStream tracks", context);
   } catch (error) {
-    logger.error('[VoiceErrorLogger] Failed to log media stream tracks', {}, error);
+    logger.error(
+      "[VoiceErrorLogger] Failed to log media stream tracks",
+      {},
+      error,
+    );
   }
 }
