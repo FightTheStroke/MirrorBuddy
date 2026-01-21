@@ -80,7 +80,7 @@ export function VoicePanel({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       className={cn(
-        "w-64 flex flex-col items-center justify-center gap-4 p-4 rounded-2xl",
+        "w-28 sm:w-64 flex flex-col items-center justify-center gap-4 p-4 rounded-2xl",
         backgroundClass,
       )}
       style={backgroundStyle}
@@ -97,13 +97,13 @@ export function VoicePanel({
             width={80}
             height={80}
             className={cn(
-              "rounded-full border-4 object-cover transition-colors duration-300",
+              "w-16 h-16 sm:w-20 sm:h-20 rounded-full border-4 object-cover transition-colors duration-300",
               isConnected ? "border-white" : "border-white/50",
               isSpeaking && "border-white shadow-lg shadow-white/30",
             )}
           />
         ) : (
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center text-white text-3xl font-bold">
             {character.name.charAt(0)}
           </div>
         )}
@@ -175,7 +175,7 @@ export function VoicePanel({
                 }}
                 transition={{ duration: 0.06, ease: "easeOut" }}
                 className={cn(
-                  "w-2 rounded-full",
+                  "w-3 rounded-full",
                   isSpeaking
                     ? "bg-gradient-to-t from-white/60 to-white"
                     : isListening && !isMuted
@@ -188,7 +188,7 @@ export function VoicePanel({
         </div>
       )}
 
-      <div className="flex items-center gap-3 mt-2">
+      <div className="flex items-center gap-4 mt-2">
         <AudioDeviceSelector compact />
 
         {isConnected && (
