@@ -4,20 +4,18 @@ import { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, AlertCircle } from "lucide-react";
-import type { ServiceLimitsResponse } from "@/app/api/admin/service-limits/route";
+import { Loader2, RefreshCw, AlertCircle, Server, Database, Mail, Brain, HardDrive } from "lucide-react";
+import type { ServiceLimitsResponse, ServiceLimit } from "@/app/api/admin/service-limits/route";
+import { ServiceLimitCard, type ServiceMetric } from "@/components/admin/service-limit-card";
+import { getRecommendation, getServiceKey } from "@/lib/admin/service-recommendations";
 
 export default function ServiceLimitsPage() {
   const [initialLoading, setInitialLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<ServiceLimitsResponse | null>(null);
-  const [secondsAgo, setSecondsAgo] = useState<number | null>(null);
 
   const fetchData = useCallback(async (isRefresh = false) => {
     if (isRefresh) {
@@ -34,7 +32,6 @@ export default function ServiceLimitsPage() {
 
       const result = await response.json();
       setData(result);
-      setSecondsAgo(0);
     } catch (err) {
       setError(
         err instanceof Error
@@ -49,27 +46,14 @@ export default function ServiceLimitsPage() {
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    const autoRefreshInterval = setInterval(() => {
-      fetchData(true);
+    // Auto-refresh every 30 seconds
+    const interval = setInterval(() => {
+      fetchData(false);
     }, 30000);
 
-    return () => clearInterval(autoRefreshInterval);
+    return () => clearInterval(interval);
   }, [fetchData]);
-
-  // Update relative time display every second
-  useEffect(() => {
-    if (secondsAgo === null) return;
-
-    const timerInterval = setInterval(() => {
-      setSecondsAgo((prev) => (prev !== null ? prev + 1 : null));
-    }, 1000);
-
-    return () => clearInterval(timerInterval);
-  }, [secondsAgo]);
 
   if (initialLoading) {
     return (
@@ -97,11 +81,11 @@ export default function ServiceLimitsPage() {
       </div>
 
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-3">
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            {data?.timestamp && secondsAgo !== null
-              ? `Last updated: ${secondsAgo === 0 ? "just now" : `${secondsAgo} second${secondsAgo !== 1 ? "s" : ""} ago`}`
+            {data?.timestamp
+              ? `Last updated: ${new Date(data.timestamp).toLocaleString()}`
               : "No data"}
           </p>
           {refreshing && (
@@ -134,73 +118,101 @@ export default function ServiceLimitsPage() {
         </div>
       )}
 
-      {/* Service Cards Grid - Will be implemented in T3-02 */}
+      {/* Service Cards Grid */}
       {data && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Placeholder cards - actual implementation in T3-02 */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Vercel</CardTitle>
-              <CardDescription>
-                Bandwidth, build minutes, function invocations
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500">
-                Service cards will be implemented in T3-02
-              </p>
-            </CardContent>
-          </Card>
+          {/* Vercel Card */}
+          <ServiceLimitCard
+            serviceName="Vercel"
+            icon={<Server className="h-5 w-5 text-white" />}
+            metrics={[
+              convertToMetric("Bandwidth", data.vercel.bandwidth),
+              convertToMetric("Build Minutes", data.vercel.buildMinutes),
+              convertToMetric("Function Invocations", data.vercel.functionInvocations),
+            ]}
+            recommendation={getRecommendation(
+              getServiceKey("vercel"),
+              getWorstStatus([
+                data.vercel.bandwidth,
+                data.vercel.buildMinutes,
+                data.vercel.functionInvocations,
+              ])
+            )}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Supabase</CardTitle>
-              <CardDescription>
-                Database size, storage, connections
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500">
-                Service cards will be implemented in T3-02
-              </p>
-            </CardContent>
-          </Card>
+          {/* Supabase Card */}
+          <ServiceLimitCard
+            serviceName="Supabase"
+            icon={<Database className="h-5 w-5 text-white" />}
+            metrics={[
+              convertToMetric("Database Size", data.supabase.databaseSize),
+              convertToMetric("Storage", data.supabase.storage),
+              convertToMetric("Connections", data.supabase.connections),
+            ]}
+            recommendation={getRecommendation(
+              getServiceKey("supabase"),
+              getWorstStatus([
+                data.supabase.databaseSize,
+                data.supabase.storage,
+                data.supabase.connections,
+              ])
+            )}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Resend</CardTitle>
-              <CardDescription>Email quota monitoring</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500">
-                Service cards will be implemented in T3-02
-              </p>
-            </CardContent>
-          </Card>
+          {/* Resend Card */}
+          <ServiceLimitCard
+            serviceName="Resend"
+            icon={<Mail className="h-5 w-5 text-white" />}
+            metrics={[
+              convertToMetric("Emails Today", data.resend.emailsToday),
+              convertToMetric("Emails This Month", data.resend.emailsThisMonth),
+            ]}
+            recommendation={getRecommendation(
+              getServiceKey("resend"),
+              getWorstStatus([
+                data.resend.emailsToday,
+                data.resend.emailsThisMonth,
+              ])
+            )}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Azure OpenAI</CardTitle>
-              <CardDescription>Token and request rate limits</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500">
-                Service cards will be implemented in T3-02
-              </p>
-            </CardContent>
-          </Card>
+          {/* Azure OpenAI Card */}
+          <ServiceLimitCard
+            serviceName="Azure OpenAI"
+            icon={<Brain className="h-5 w-5 text-white" />}
+            metrics={[
+              convertToMetric("Chat TPM", data.azureOpenAI.chatTPM),
+              convertToMetric("Chat RPM", data.azureOpenAI.chatRPM),
+              convertToMetric("Embedding TPM", data.azureOpenAI.embeddingTPM),
+              convertToMetric("TTS RPM", data.azureOpenAI.ttsRPM),
+            ]}
+            recommendation={getRecommendation(
+              getServiceKey("azure"),
+              getWorstStatus([
+                data.azureOpenAI.chatTPM,
+                data.azureOpenAI.chatRPM,
+                data.azureOpenAI.embeddingTPM,
+                data.azureOpenAI.ttsRPM,
+              ])
+            )}
+          />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Redis KV</CardTitle>
-              <CardDescription>Storage and command limits</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-slate-500">
-                Service cards will be implemented in T3-02
-              </p>
-            </CardContent>
-          </Card>
+          {/* Redis KV Card */}
+          <ServiceLimitCard
+            serviceName="Redis KV"
+            icon={<HardDrive className="h-5 w-5 text-white" />}
+            metrics={[
+              convertToMetric("Storage", data.redis.storage),
+              convertToMetric("Commands Per Day", data.redis.commandsPerDay),
+            ]}
+            recommendation={getRecommendation(
+              getServiceKey("redis"),
+              getWorstStatus([
+                data.redis.storage,
+                data.redis.commandsPerDay,
+              ])
+            )}
+          />
         </div>
       )}
 
@@ -216,4 +228,44 @@ export default function ServiceLimitsPage() {
       )}
     </div>
   );
+}
+
+/**
+ * Convert API ServiceLimit to ServiceMetric for display
+ */
+function convertToMetric(name: string, limit: ServiceLimit): ServiceMetric {
+  return {
+    name,
+    usage: limit.usage,
+    limit: limit.limit,
+    percentage: limit.percentage,
+    status: limit.status === "ok" ? "ok" : limit.status === "warning" ? "warning" : limit.status === "critical" ? "critical" : "emergency",
+    unit: limit.unit || "",
+    period: limit.period,
+  };
+}
+
+/**
+ * Get worst status from array of service limits
+ */
+function getWorstStatus(limits: ServiceLimit[]): ServiceMetric["status"] {
+  const statusPriority = {
+    ok: 0,
+    warning: 1,
+    critical: 2,
+    emergency: 3,
+  };
+
+  let worstStatus: ServiceMetric["status"] = "ok";
+  let worstPriority = 0;
+
+  for (const limit of limits) {
+    const priority = statusPriority[limit.status as keyof typeof statusPriority] || 0;
+    if (priority > worstPriority) {
+      worstPriority = priority;
+      worstStatus = limit.status as ServiceMetric["status"];
+    }
+  }
+
+  return worstStatus;
 }
