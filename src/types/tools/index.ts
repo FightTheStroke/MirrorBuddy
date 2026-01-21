@@ -12,12 +12,12 @@ export type {
   ToolCall,
   ToolResult,
   ToolCallRef,
-} from './tool-types';
+} from "./tool-types";
 
-export { toToolCallRef, functionNameToToolType } from './tool-types';
+export { toToolCallRef, functionNameToToolType } from "./tool-types";
 
 // OpenAI function definitions
-export { CHAT_TOOL_DEFINITIONS } from './tool-schemas';
+export { CHAT_TOOL_DEFINITIONS } from "./tool-schemas";
 
 // Tool-specific data types
 export type {
@@ -62,14 +62,25 @@ export type {
   PDFData,
   // Webcam
   WebcamData,
-} from './tool-data-types';
+  // Typing
+  TypingLesson,
+  TypingProgress,
+  TypingStats,
+  KeyboardLayout,
+  KeyboardLayoutConfig,
+  TypingHandMode,
+  TypingLevel,
+  LessonKey,
+  LessonResult,
+  KeyConfig,
+} from "./tool-data-types";
 
 export {
   SUMMARY_STRUCTURE_TEMPLATE,
   createEmptyStudentSummary,
   countWords,
   calculateSummaryWordCount,
-} from './tool-data-types';
+} from "./tool-data-types";
 
 // Tool request types
 export type {
@@ -81,4 +92,4 @@ export type {
   FormulaRequest,
   CodeExecutionRequest,
   VisualizationRequest,
-} from './tool-request-types';
+} from "./tool-request-types";

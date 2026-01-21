@@ -14,42 +14,42 @@ import {
   FileText,
   Bookmark,
   BookmarkCheck,
-} from 'lucide-react';
-import type { ToolType } from '@/types/tools';
+} from "lucide-react";
+import type { ToolType } from "@/types/tools";
 
 // ============================================================================
 // Types
 // ============================================================================
 
-export type FilterType = 'all' | 'bookmarked' | ToolType;
-export type SortBy = 'date' | 'type' | 'rating' | 'views';
-export type ViewMode = 'grid' | 'list';
+export type FilterType = "all" | "bookmarked" | ToolType;
+export type SortBy = "date" | "type" | "rating" | "views";
+export type ViewMode = "grid" | "list";
 
 // ============================================================================
 // Italian subject labels
 // ============================================================================
 
 export const SUBJECT_LABELS: Record<string, string> = {
-  matematica: 'Matematica',
-  italiano: 'Italiano',
-  storia: 'Storia',
-  geografia: 'Geografia',
-  scienze: 'Scienze',
-  fisica: 'Fisica',
-  chimica: 'Chimica',
-  arte: 'Arte',
-  musica: 'Musica',
-  filosofia: 'Filosofia',
-  latino: 'Latino',
-  greco: 'Greco',
-  inglese: 'Inglese',
-  francese: 'Francese',
-  spagnolo: 'Spagnolo',
-  tedesco: 'Tedesco',
-  educazione_fisica: 'Educazione Fisica',
-  informatica: 'Informatica',
-  economia: 'Economia',
-  diritto: 'Diritto',
+  matematica: "Matematica",
+  italiano: "Italiano",
+  storia: "Storia",
+  geografia: "Geografia",
+  scienze: "Scienze",
+  fisica: "Fisica",
+  chimica: "Chimica",
+  arte: "Arte",
+  musica: "Musica",
+  filosofia: "Filosofia",
+  latino: "Latino",
+  greco: "Greco",
+  inglese: "Inglese",
+  francese: "Francese",
+  spagnolo: "Spagnolo",
+  tedesco: "Tedesco",
+  educazione_fisica: "Educazione Fisica",
+  informatica: "Informatica",
+  economia: "Economia",
+  diritto: "Diritto",
 };
 
 // ============================================================================
@@ -57,10 +57,10 @@ export const SUBJECT_LABELS: Record<string, string> = {
 // ============================================================================
 
 export const SORT_OPTIONS: { value: SortBy; label: string }[] = [
-  { value: 'date', label: 'Data' },
-  { value: 'type', label: 'Tipo' },
-  { value: 'rating', label: 'Valutazione' },
-  { value: 'views', label: 'Visualizzazioni' },
+  { value: "date", label: "Data" },
+  { value: "type", label: "Tipo" },
+  { value: "rating", label: "Valutazione" },
+  { value: "views", label: "Visualizzazioni" },
 ];
 
 // ============================================================================
@@ -82,7 +82,8 @@ export const TOOL_ICONS: Record<ToolType, typeof Brain> = {
   webcam: Camera,
   pdf: FileText,
   homework: FileText,
-  'study-kit': BookmarkCheck,
+  typing: FileText,
+  "study-kit": BookmarkCheck,
 };
 
 // ============================================================================
@@ -90,36 +91,41 @@ export const TOOL_ICONS: Record<ToolType, typeof Brain> = {
 // ============================================================================
 
 export const TOOL_LABELS: Record<ToolType, string> = {
-  mindmap: 'Mappe Mentali',
-  quiz: 'Quiz',
-  flashcard: 'Flashcard',
-  demo: 'Demo',
-  search: 'Ricerche',
-  diagram: 'Diagrammi',
-  timeline: 'Timeline',
-  summary: 'Riassunti',
-  formula: 'Formule',
-  calculator: 'Calcolatrici',
-  chart: 'Grafici',
-  webcam: 'Foto',
-  pdf: 'PDF',
-  homework: 'Compiti',
-  'study-kit': 'Study Kit',
+  mindmap: "Mappe Mentali",
+  quiz: "Quiz",
+  flashcard: "Flashcard",
+  demo: "Demo",
+  search: "Ricerche",
+  diagram: "Diagrammi",
+  timeline: "Timeline",
+  summary: "Riassunti",
+  formula: "Formule",
+  calculator: "Calcolatrici",
+  chart: "Grafici",
+  webcam: "Foto",
+  typing: "Digitazione",
+  pdf: "PDF",
+  homework: "Compiti",
+  "study-kit": "Study Kit",
 };
 
 // ============================================================================
 // Filter tabs
 // ============================================================================
 
-export const FILTER_TABS: { value: FilterType; label: string; icon?: typeof Bookmark }[] = [
-  { value: 'all', label: 'Tutti' },
-  { value: 'bookmarked', label: 'Preferiti', icon: BookmarkCheck },
-  { value: 'mindmap', label: 'Mappe' },
-  { value: 'quiz', label: 'Quiz' },
-  { value: 'flashcard', label: 'Flashcard' },
-  { value: 'summary', label: 'Riassunti' },
-  { value: 'demo', label: 'Demo' },
-  { value: 'homework', label: 'Compiti' },
-  { value: 'webcam', label: 'Foto' },
-  { value: 'pdf', label: 'PDF' },
+export const FILTER_TABS: {
+  value: FilterType;
+  label: string;
+  icon?: typeof Bookmark;
+}[] = [
+  { value: "all", label: "Tutti" },
+  { value: "bookmarked", label: "Preferiti", icon: BookmarkCheck },
+  { value: "mindmap", label: "Mappe" },
+  { value: "quiz", label: "Quiz" },
+  { value: "flashcard", label: "Flashcard" },
+  { value: "summary", label: "Riassunti" },
+  { value: "demo", label: "Demo" },
+  { value: "homework", label: "Compiti" },
+  { value: "webcam", label: "Foto" },
+  { value: "pdf", label: "PDF" },
 ];

@@ -12,6 +12,7 @@ export { useHTMLSnippetsStore } from './html-snippets-store';
 export { useCalendarStore } from './calendar-store';
 export { useUIStore } from './ui-store';
 export { useConsentStore } from './consent-store';
+export { useTypingStore } from './typing-store';
 
 // Re-export sync utilities
 export { initializeStores, setupAutoSync } from './use-store-sync';

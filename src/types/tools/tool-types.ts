@@ -20,7 +20,8 @@ export type ToolType =
   | 'pdf'          // PDF caricato
   | 'homework'     // Compiti con metodo maieutico
   | 'study-kit'    // Bulk PDF processing with study materials
-  | 'calculator';  // Calcolatrice scientifica con supporto dyscalculia
+  | 'calculator'   // Calcolatrice scientifica con supporto dyscalculia
+  | 'typing';      // Typing tutor con accessibilità DSA
 
 /**
  * Tool state for real-time UI updates
@@ -138,6 +139,7 @@ export function functionNameToToolType(functionName: string): ToolType {
     'capture_webcam': 'webcam',
     'homework_help': 'homework',
     'study_kit': 'study-kit',
+    'typing_tutor': 'typing',
   };
   return map[functionName] || (functionName as ToolType);
 }

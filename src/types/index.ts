@@ -148,6 +148,14 @@ export type {
   CalculatorStep,
   CalculatorData,
   CalculatorEventType,
+  // Typing
+  TypingLesson,
+  TypingProgress,
+  TypingStats,
+  KeyboardLayout,
+  TypingHandMode,
+  TypingLevel,
+  LessonResult,
   // Tool requests
   QuizRequest,
   FlashcardDeckRequest,

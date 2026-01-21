@@ -92,6 +92,7 @@ export function useMaestroSessionLogic({
         formula: `Ciao! Vuoi lavorare con le formule. Quale formula matematica o scientifica vuoi esplorare?`,
         calculator: `Ciao! Vuoi fare dei calcoli? Dimmi l'espressione matematica da calcolare!`,
         chart: `Ciao! Creiamo un grafico insieme. Quali dati vuoi visualizzare?`,
+        typing: `Ciao! Vuoi imparare a digitare? Ti aiuterò a migliorare la tua velocità e precisione con la tastiera!`,
         "study-kit": `Ciao! Creiamo materiali di studio completi. Carica un PDF per iniziare!`,
       };
 
