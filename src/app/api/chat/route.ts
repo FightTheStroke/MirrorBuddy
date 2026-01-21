@@ -50,6 +50,8 @@ import {
   incrementTrialToolUsage,
   checkTrialToolLimit,
 } from "./trial-handler";
+import { incrementTrialBudgetWithPublish } from "@/lib/trial/trial-budget-service";
+import { TOKEN_COST_PER_UNIT } from "./stream/helpers";
 
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
@@ -329,9 +331,20 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Increment trial usage for anonymous users (ADR 0056)
+      // Increment trial usage and budget for anonymous users (ADR 0056, F-06)
       if (trialSessionId && !userId) {
         await incrementTrialUsage(trialSessionId);
+
+        // Also increment trial budget to track cumulative cost (F-06: admin counts push)
+        if (result.usage?.total_tokens) {
+          const estimatedCost = result.usage.total_tokens * TOKEN_COST_PER_UNIT;
+          incrementTrialBudgetWithPublish(estimatedCost).catch((err) => {
+            log.debug("Trial budget publish failed (non-blocking)", {
+              error: String(err),
+              cost: estimatedCost,
+            });
+          });
+        }
       }
 
       const response = NextResponse.json({
