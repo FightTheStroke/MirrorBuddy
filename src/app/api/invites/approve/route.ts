@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { approveInviteRequest } from "@/lib/invite/invite-service";
 import { logger } from "@/lib/logger";
+import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
 export async function POST(request: Request) {
   try {
@@ -32,6 +33,13 @@ export async function POST(request: Request) {
       adminId: auth.userId,
       newUserId: result.userId,
     });
+
+    // Trigger admin counts push (F-06, F-27: non-blocking)
+    calculateAndPublishAdminCounts().catch((err) =>
+      logger.warn("Failed to publish admin counts on invite approval", {
+        error: String(err),
+      }),
+    );
 
     return NextResponse.json({
       success: true,
