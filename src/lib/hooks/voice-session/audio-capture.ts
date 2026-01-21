@@ -7,6 +7,7 @@
 
 import { useCallback } from "react";
 import { logger } from "@/lib/logger";
+import { logAudioContextState } from "./voice-error-logger";
 
 export interface AudioCaptureRefs {
   captureContextRef: React.MutableRefObject<AudioContext | null>;
@@ -36,11 +37,26 @@ export function useStartAudioCapture(
 
     // Lazily create AudioContext for input level visualization (WebRTC mode)
     if (!refs.captureContextRef.current) {
-      // eslint-disable-next-line react-hooks/immutability -- Lazy initialization
-      refs.captureContextRef.current = new AudioContext();
-      logger.debug(
-        "[VoiceSession] Created AudioContext for input level monitoring",
-      );
+      try {
+        // eslint-disable-next-line react-hooks/immutability -- Lazy initialization
+        refs.captureContextRef.current = new AudioContext();
+        const context = refs.captureContextRef.current;
+        logAudioContextState(context.state, {
+          sampleRate: context.sampleRate,
+          baseLatency: context.baseLatency,
+        });
+        logger.debug(
+          "[VoiceSession] Created AudioContext for input level monitoring",
+          { state: context.state },
+        );
+      } catch (error) {
+        logger.error(
+          "[VoiceSession] Failed to create AudioContext",
+          { error: String(error) },
+          error,
+        );
+        return;
+      }
     }
 
     const context = refs.captureContextRef.current;

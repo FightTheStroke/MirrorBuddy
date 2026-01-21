@@ -5,7 +5,7 @@ import { Section } from "./section";
 export function PrivacyContentExtended() {
   return (
     <>
-      <Section number={9} title="I tuoi diritti">
+      <Section number={10} title="I tuoi diritti">
         <p>Puoi sempre:</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
@@ -38,7 +38,7 @@ export function PrivacyContentExtended() {
         </p>
       </Section>
 
-      <Section number={10} title="Cookie e Analytics">
+      <Section number={11} title="Cookie e Analytics">
         <p>Usiamo cookie di due tipi:</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
@@ -53,7 +53,7 @@ export function PrivacyContentExtended() {
         <p>Niente cookie pubblicitari o di tracciamento. Mai.</p>
       </Section>
 
-      <Section number={11} title="Se sei minorenne">
+      <Section number={12} title="Se sei minorenne">
         <p>Se hai meno di 14 anni:</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>I tuoi genitori devono darti il permesso di usare MirrorBuddy</li>
@@ -66,7 +66,7 @@ export function PrivacyContentExtended() {
         </p>
       </Section>
 
-      <Section number={12} title="Sicurezza">
+      <Section number={13} title="Sicurezza">
         <p>Per proteggere i tuoi dati:</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>Connessione HTTPS crittografata</li>
@@ -77,7 +77,7 @@ export function PrivacyContentExtended() {
         <p>Nessun sistema è perfetto al 100%, ma facciamo del nostro meglio.</p>
       </Section>
 
-      <Section number={13} title="Modifiche a questa policy">
+      <Section number={14} title="Modifiche a questa policy">
         <p>Se cambiamo questa Privacy Policy:</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>Ti avviseremo via email</li>
@@ -86,7 +86,7 @@ export function PrivacyContentExtended() {
         </ul>
       </Section>
 
-      <Section number={14} title="Domande">
+      <Section number={15} title="Domande">
         <p>
           Non hai capito qualcosa? Vuoi saperne di più? Scrivi a:{" "}
           <a
