@@ -1,37 +1,59 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { createWPMCalculator } from '@/lib/typing/wpm-calculator';
-import { cn } from '@/lib/utils';
+import { useState, useEffect } from "react";
+import { createWPMCalculator } from "@/lib/typing/wpm-calculator";
+import { cn } from "@/lib/utils";
+
+const GAME_WORDS = [
+  "velocita",
+  "tempo",
+  "veloce",
+  "corsa",
+  "scatto",
+  "rapido",
+  "sprint",
+  "lampo",
+  "turbo",
+  "record",
+  "meta",
+  "arrivo",
+  "pronto",
+  "partenza",
+  "finale",
+  "gara",
+  "competizione",
+];
 
 interface SpeedGameProps {
   onGameEnd: (score: number, wpm: number) => void;
 }
 
 export function SpeedGame({ onGameEnd }: SpeedGameProps) {
-  const [words, setWords] = useState<string[]>([]);
+  const [words] = useState<string[]>(() =>
+    shuffle([...GAME_WORDS]).slice(0, 10),
+  );
   const [currentIndex, setCurrentIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(60);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [typedText, setTypedText] = useState('');
+  const [typedText, setTypedText] = useState("");
   const [score, setScore] = useState(0);
 
   const wpmCalc = createWPMCalculator();
 
-  const GAME_WORDS = [
-    'velocita', 'tempo', 'veloce', 'corsa', 'scatto', 'rapido',
-    'sprint', 'lampo', 'turbo', 'record', 'meta', 'arrivo',
-    'pronto', 'partenza', 'finale', 'gara', 'competizione',
-  ];
-
-  useEffect(() => {
-    setWords(shuffle([...GAME_WORDS]).slice(0, 10));
-  }, []);
+  const endGame = () => {
+    setIsPlaying(false);
+    wpmCalc.finish();
+    const wpm = wpmCalc.getWPM();
+    setScore((currentScore) => {
+      onGameEnd(currentScore, wpm);
+      return currentScore;
+    });
+  };
 
   useEffect(() => {
     if (!isPlaying || timeLeft <= 0) return;
-    
-    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+
+    const timer = setTimeout(() => setTimeLeft((prev) => prev - 1), 1000);
     return () => clearTimeout(timer);
   }, [isPlaying, timeLeft]);
 
@@ -40,29 +62,24 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
     setTypedText(value);
 
     if (value === words[currentIndex]) {
-      setScore(score + 10);
-      setTypedText('');
-      setCurrentIndex(currentIndex + 1);
+      setScore((prev) => prev + 10);
+      setTypedText("");
       wpmCalc.recordKeystroke(true);
 
-      if (currentIndex >= words.length - 1) {
-        endGame();
-      }
+      setCurrentIndex((prevIndex) => {
+        if (prevIndex >= words.length - 1) {
+          endGame();
+        }
+        return prevIndex + 1;
+      });
     }
-  };
-
-  const endGame = () => {
-    setIsPlaying(false);
-    wpmCalc.finish();
-    const wpm = wpmCalc.getWPM();
-    onGameEnd(score, wpm);
   };
 
   const startGame = () => {
     setIsPlaying(true);
     setCurrentIndex(0);
     setScore(0);
-    setTypedText('');
+    setTypedText("");
     setTimeLeft(60);
     wpmCalc.reset();
   };
@@ -94,7 +111,9 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
             </div>
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
               <div className="text-sm text-muted-foreground">Parole</div>
-              <div className="text-2xl font-bold">{currentIndex}/{words.length}</div>
+              <div className="text-2xl font-bold">
+                {currentIndex}/{words.length}
+              </div>
             </div>
           </div>
 
@@ -103,12 +122,12 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
               <div
                 key={index}
                 className={cn(
-                  'p-3 border rounded-lg text-center text-lg',
+                  "p-3 border rounded-lg text-center text-lg",
                   index === currentIndex
-                    ? 'bg-primary/20 border-primary'
+                    ? "bg-primary/20 border-primary"
                     : index < currentIndex
-                      ? 'bg-green-500/10 border-green-500/30 opacity-50'
-                      : 'bg-muted/30 border-border'
+                      ? "bg-green-500/10 border-green-500/30 opacity-50"
+                      : "bg-muted/30 border-border",
                 )}
               >
                 {index === currentIndex ? (

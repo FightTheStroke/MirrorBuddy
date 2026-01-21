@@ -1,55 +1,59 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import type { Subject } from '@/types';
-import type { ToolType } from '@/types/tools';
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import type { Subject } from "@/types";
+import type { ToolType } from "@/types/tools";
 
 const SUBJECT_LABELS: Record<string, string> = {
-  mathematics: 'Matematica',
-  physics: 'Fisica',
-  chemistry: 'Chimica',
-  biology: 'Biologia',
-  history: 'Storia',
-  geography: 'Geografia',
-  italian: 'Italiano',
-  english: 'Inglese',
-  art: 'Arte',
-  music: 'Musica',
-  civics: 'Educazione Civica',
-  economics: 'Economia',
-  computerScience: 'Informatica',
-  health: 'Salute',
-  philosophy: 'Filosofia',
-  internationalLaw: 'Diritto Internazionale',
-  storytelling: 'Storytelling',
-  astronomy: 'Astronomia',
-  'computer-science': 'Informatica',
-  'civic-education': 'Educazione Civica',
-  science: 'Scienze',
-  'physical-education': 'Educazione Fisica',
+  mathematics: "Matematica",
+  physics: "Fisica",
+  chemistry: "Chimica",
+  biology: "Biologia",
+  history: "Storia",
+  geography: "Geografia",
+  italian: "Italiano",
+  english: "Inglese",
+  art: "Arte",
+  music: "Musica",
+  civics: "Educazione Civica",
+  economics: "Economia",
+  computerScience: "Informatica",
+  health: "Salute",
+  philosophy: "Filosofia",
+  internationalLaw: "Diritto Internazionale",
+  storytelling: "Storytelling",
+  astronomy: "Astronomia",
+  "computer-science": "Informatica",
+  "civic-education": "Educazione Civica",
+  science: "Scienze",
+  "physical-education": "Educazione Fisica",
 };
 
 const TOOL_LABELS: Record<ToolType, string> = {
-  mindmap: 'Mappa Mentale',
-  quiz: 'Quiz',
-  flashcard: 'Flashcard',
-  summary: 'Riassunto',
-  demo: 'Demo Interattiva',
-  diagram: 'Diagramma',
-  timeline: 'Linea del Tempo',
-  formula: 'Formula',
-  calculator: 'Calcolatrice',
-  chart: 'Grafico',
-  search: 'Ricerca',
-  webcam: 'Foto',
-  pdf: 'PDF',
-  homework: 'Compiti',
-  'study-kit': 'Study Kit',
+  mindmap: "Mappa Mentale",
+  quiz: "Quiz",
+  flashcard: "Flashcard",
+  summary: "Riassunto",
+  demo: "Demo Interattiva",
+  diagram: "Diagramma",
+  timeline: "Linea del Tempo",
+  formula: "Formula",
+  calculator: "Calcolatrice",
+  chart: "Grafico",
+  search: "Ricerca",
+  webcam: "Foto",
+  pdf: "PDF",
+  homework: "Compiti",
+  typing: "Impara a Digitare",
+  "study-kit": "Study Kit",
 };
 
 const getSubjectLabel = (subject: string): string => {
-  return SUBJECT_LABELS[subject] || subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, ' ');
+  return (
+    SUBJECT_LABELS[subject] ||
+    subject.charAt(0).toUpperCase() + subject.slice(1).replace(/-/g, " ")
+  );
 };
 
 interface SubjectSelectionStepProps {
@@ -81,9 +85,9 @@ export function SubjectSelectionStep({
             key={subject}
             onClick={() => onSubjectSelect(subject)}
             className={cn(
-              'p-3 text-sm rounded-lg border-2 transition-all font-medium',
-              'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700',
-              'hover:border-accent-themed hover:bg-accent-themed/10'
+              "p-3 text-sm rounded-lg border-2 transition-all font-medium",
+              "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
+              "hover:border-accent-themed hover:bg-accent-themed/10",
             )}
           >
             {getSubjectLabel(subject)}

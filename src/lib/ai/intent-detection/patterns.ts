@@ -1,5 +1,5 @@
-import type { Subject, ToolType } from '@/types';
-import type { EmotionalIndicator } from './types';
+import type { Subject, ToolType } from "@/types";
+import type { EmotionalIndicator } from "./types";
 
 export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
   mathematics: [
@@ -170,15 +170,13 @@ export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   timeline: [],
   summary: [],
   formula: [],
-  calculator: [
-    /\b(calcol[ao]|calcolatrice)\b/i,
-    /\b(quanto\s+fa)\b/i,
-  ],
+  calculator: [/\b(calcol[ao]|calcolatrice)\b/i, /\b(quanto\s+fa)\b/i],
   chart: [],
   pdf: [],
   homework: [],
   webcam: [],
-  'study-kit': [],
+  typing: [],
+  "study-kit": [],
 };
 
 export const CRISIS_PATTERNS: RegExp[] = [
@@ -187,4 +185,3 @@ export const CRISIS_PATTERNS: RegExp[] = [
   /\b(nessuno\s+mi\s+vuole|nessuno\s+mi\s+ama|sarebbe\s+meglio\s+se\s+non\s+esistessi)\b/i,
   /\b(mi\s+odio|mi\s+faccio\s+schifo)\b/i,
 ];
-

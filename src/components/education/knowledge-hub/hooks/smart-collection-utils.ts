@@ -3,14 +3,14 @@
  * Date helpers and collection constants
  */
 
-import type { ToolType } from '@/types/tools';
+import type { ToolType } from "@/types/tools";
 
 /**
  * Default sort: newest first
  */
 export const defaultSort = (
   a: { createdAt: string | Date },
-  b: { createdAt: string | Date }
+  b: { createdAt: string | Date },
 ) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
 
 /**
@@ -58,40 +58,41 @@ export const daysAgo = (days: number): Date => {
  * Type labels for all tool types
  */
 export const TYPE_LABELS: Record<ToolType, string> = {
-  mindmap: 'Mappe Mentali',
-  quiz: 'Quiz',
-  flashcard: 'Flashcard',
-  summary: 'Riassunti',
-  demo: 'Demo',
-  diagram: 'Diagrammi',
-  timeline: 'Timeline',
-  formula: 'Formule',
-  calculator: 'Calcolatrici',
-  chart: 'Grafici',
-  pdf: 'PDF',
-  webcam: 'Immagini',
-  homework: 'Compiti',
-  search: 'Ricerche',
-  'study-kit': 'Study Kit',
+  mindmap: "Mappe Mentali",
+  quiz: "Quiz",
+  flashcard: "Flashcard",
+  summary: "Riassunti",
+  demo: "Demo",
+  diagram: "Diagrammi",
+  timeline: "Timeline",
+  formula: "Formule",
+  calculator: "Calcolatrici",
+  chart: "Grafici",
+  pdf: "PDF",
+  webcam: "Immagini",
+  homework: "Compiti",
+  search: "Ricerche",
+  typing: "Digitazione",
+  "study-kit": "Study Kit",
 };
 
 /**
  * All available tool types
  */
 export const AVAILABLE_TYPES: ToolType[] = [
-  'mindmap',
-  'quiz',
-  'flashcard',
-  'summary',
-  'demo',
-  'diagram',
-  'timeline',
-  'formula',
-  'calculator',
-  'chart',
-  'pdf',
-  'webcam',
-  'homework',
-  'search',
-  'study-kit',
+  "mindmap",
+  "quiz",
+  "flashcard",
+  "summary",
+  "demo",
+  "diagram",
+  "timeline",
+  "formula",
+  "calculator",
+  "chart",
+  "pdf",
+  "webcam",
+  "homework",
+  "search",
+  "study-kit",
 ];

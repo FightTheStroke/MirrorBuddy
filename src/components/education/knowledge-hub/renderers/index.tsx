@@ -143,6 +143,7 @@ export const RENDERER_LABELS: Record<ToolType, string> = {
   webcam: "Immagine",
   homework: "Compiti",
   search: "Ricerca",
+  typing: "Impara a Digitare",
   "study-kit": "Study Kit",
 };
 
@@ -162,5 +163,6 @@ export const RENDERER_ICONS: Record<ToolType, string> = {
   webcam: "image",
   homework: "book-open",
   search: "search",
+  typing: "keyboard",
   "study-kit": "book-open",
 };

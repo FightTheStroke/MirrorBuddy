@@ -1,48 +1,53 @@
-'use client';
+"use client";
 
 /**
  * ToolMaestroSelectionDialog - Modal for selecting subject/professore before entering tool focus mode
  * Shows subject selection, then professore selection for that subject
  */
 
-import { useState, useCallback, useEffect, useRef } from 'react';
-import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, BookOpen, ArrowLeft, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SubjectSelectionStep } from './components/subject-selection-step';
-import { MaestroSelectionStep } from './components/maestro-selection-step';
-import { getMaestriBySubject, getAllSubjects, maestri as allMaestri } from '@/data';
-import type { Subject, Maestro } from '@/types';
-import type { ToolType } from '@/types/tools';
+import { useState, useCallback, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { GraduationCap, BookOpen, ArrowLeft, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SubjectSelectionStep } from "./components/subject-selection-step";
+import { MaestroSelectionStep } from "./components/maestro-selection-step";
+import {
+  getMaestriBySubject,
+  getAllSubjects,
+  maestri as allMaestri,
+} from "@/data";
+import type { Subject, Maestro } from "@/types";
+import type { ToolType } from "@/types/tools";
 
 // Tool type labels in Italian
 const TOOL_LABELS: Record<ToolType, string> = {
-  mindmap: 'Mappa Mentale',
-  quiz: 'Quiz',
-  flashcard: 'Flashcard',
-  summary: 'Riassunto',
-  demo: 'Demo Interattiva',
-  diagram: 'Diagramma',
-  timeline: 'Linea del Tempo',
-  formula: 'Formula',
-  calculator: 'Calcolatrice',
-  chart: 'Grafico',
-  search: 'Ricerca',
-  webcam: 'Foto',
-  pdf: 'PDF',
-  homework: 'Compiti',
-  'study-kit': 'Study Kit',
+  mindmap: "Mappa Mentale",
+  quiz: "Quiz",
+  flashcard: "Flashcard",
+  summary: "Riassunto",
+  demo: "Demo Interattiva",
+  diagram: "Diagramma",
+  timeline: "Linea del Tempo",
+  formula: "Formula",
+  calculator: "Calcolatrice",
+  chart: "Grafico",
+  search: "Ricerca",
+  webcam: "Foto",
+  pdf: "PDF",
+  homework: "Compiti",
+  typing: "Impara a Digitare",
+  "study-kit": "Study Kit",
 };
 
 interface ToolMaestroSelectionDialogProps {
   isOpen: boolean;
   toolType: ToolType;
-  onConfirm: (maestro: Maestro, mode: 'voice' | 'chat') => void;
+  onConfirm: (maestro: Maestro, mode: "voice" | "chat") => void;
   onClose: () => void;
 }
 
-type Step = 'subject' | 'maestro';
+type Step = "subject" | "maestro";
 
 export function ToolMaestroSelectionDialog({
   isOpen,
@@ -50,7 +55,7 @@ export function ToolMaestroSelectionDialog({
   onConfirm,
   onClose,
 }: ToolMaestroSelectionDialogProps) {
-  const [step, setStep] = useState<Step>('subject');
+  const [step, setStep] = useState<Step>("subject");
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [_selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -70,16 +75,17 @@ export function ToolMaestroSelectionDialog({
 
     // Handle Escape key
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         e.preventDefault();
         onClose();
       }
 
       // Focus trap - keep focus within dialog
-      if (e.key === 'Tab' && dialogRef.current) {
-        const focusableElements = dialogRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+      if (e.key === "Tab" && dialogRef.current) {
+        const focusableElements =
+          dialogRef.current.querySelectorAll<HTMLElement>(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+          );
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -93,56 +99,64 @@ export function ToolMaestroSelectionDialog({
       }
     };
 
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener("keydown", handleKeyDown);
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener("keydown", handleKeyDown);
       // Restore focus when dialog closes
       previousFocusRef.current?.focus();
     };
   }, [isOpen, onClose]);
-  const availableMaestri = selectedSubject ? getMaestriBySubject(selectedSubject) : [];
+  const availableMaestri = selectedSubject
+    ? getMaestriBySubject(selectedSubject)
+    : [];
 
   const toolLabel = TOOL_LABELS[toolType] || toolType;
 
-  const handleSubjectSelect = useCallback((subject: Subject) => {
-    setSelectedSubject(subject);
-    const maestri = getMaestriBySubject(subject);
-    if (maestri.length === 1) {
-      // Auto-select if only one maestro and confirm immediately with chat mode
-      setSelectedMaestro(maestri[0]);
-      onConfirm(maestri[0], 'chat');
+  const handleSubjectSelect = useCallback(
+    (subject: Subject) => {
+      setSelectedSubject(subject);
+      const maestri = getMaestriBySubject(subject);
+      if (maestri.length === 1) {
+        // Auto-select if only one maestro and confirm immediately with chat mode
+        setSelectedMaestro(maestri[0]);
+        onConfirm(maestri[0], "chat");
+        // Reset state
+        setStep("subject");
+        setSelectedSubject(null);
+        setSelectedMaestro(null);
+      } else if (maestri.length > 1) {
+        setStep("maestro");
+      } else {
+        // No maestro for this subject, show all maestri
+        setStep("maestro");
+      }
+    },
+    [onConfirm],
+  );
+
+  const handleMaestroSelect = useCallback(
+    (maestro: Maestro) => {
+      setSelectedMaestro(maestro);
+      // Confirm immediately with chat mode
+      onConfirm(maestro, "chat");
       // Reset state
-      setStep('subject');
+      setStep("subject");
       setSelectedSubject(null);
       setSelectedMaestro(null);
-    } else if (maestri.length > 1) {
-      setStep('maestro');
-    } else {
-      // No maestro for this subject, show all maestri
-      setStep('maestro');
-    }
-  }, [onConfirm]);
-
-  const handleMaestroSelect = useCallback((maestro: Maestro) => {
-    setSelectedMaestro(maestro);
-    // Confirm immediately with chat mode
-    onConfirm(maestro, 'chat');
-    // Reset state
-    setStep('subject');
-    setSelectedSubject(null);
-    setSelectedMaestro(null);
-  }, [onConfirm]);
+    },
+    [onConfirm],
+  );
 
   const handleBack = useCallback(() => {
-    if (step === 'maestro') {
-      setStep('subject');
+    if (step === "maestro") {
+      setStep("subject");
       setSelectedSubject(null);
     }
   }, [step]);
 
   const handleClose = useCallback(() => {
-    setStep('subject');
+    setStep("subject");
     setSelectedSubject(null);
     setSelectedMaestro(null);
     onClose();
@@ -150,7 +164,7 @@ export function ToolMaestroSelectionDialog({
 
   if (!isOpen) return null;
 
-  if (typeof document === 'undefined') return null;
+  if (typeof document === "undefined") return null;
 
   return createPortal(
     <AnimatePresence>
@@ -176,11 +190,15 @@ export function ToolMaestroSelectionDialog({
           {/* Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
             <div className="flex items-center gap-2">
-              {step === 'subject' && <BookOpen className="h-5 w-5 text-accent-themed" />}
-              {step === 'maestro' && <GraduationCap className="h-5 w-5 text-accent-themed" />}
+              {step === "subject" && (
+                <BookOpen className="h-5 w-5 text-accent-themed" />
+              )}
+              {step === "maestro" && (
+                <GraduationCap className="h-5 w-5 text-accent-themed" />
+              )}
               <h2 id="dialog-title" className="text-lg font-semibold">
-                {step === 'subject' && `Crea ${toolLabel} - Scegli Materia`}
-                {step === 'maestro' && `Crea ${toolLabel} - Scegli Professore`}
+                {step === "subject" && `Crea ${toolLabel} - Scegli Materia`}
+                {step === "maestro" && `Crea ${toolLabel} - Scegli Professore`}
               </h2>
             </div>
             <button
@@ -195,7 +213,7 @@ export function ToolMaestroSelectionDialog({
           {/* Content */}
           <div className="flex-1 overflow-y-auto p-4">
             <AnimatePresence mode="wait">
-              {step === 'subject' && (
+              {step === "subject" && (
                 <SubjectSelectionStep
                   toolType={toolType}
                   subjects={allSubjects}
@@ -203,7 +221,7 @@ export function ToolMaestroSelectionDialog({
                 />
               )}
 
-              {step === 'maestro' && (
+              {step === "maestro" && (
                 <MaestroSelectionStep
                   selectedSubject={selectedSubject}
                   availableMaestri={availableMaestri}
@@ -215,7 +233,7 @@ export function ToolMaestroSelectionDialog({
           </div>
 
           {/* Footer with back button */}
-          {step === 'maestro' && (
+          {step === "maestro" && (
             <div className="p-4 border-t border-slate-200 dark:border-slate-700">
               <Button variant="outline" onClick={handleBack} className="w-full">
                 <ArrowLeft className="mr-2 h-4 w-4" />
@@ -226,6 +244,6 @@ export function ToolMaestroSelectionDialog({
         </motion.div>
       </motion.div>
     </AnimatePresence>,
-    document.body
+    document.body,
   );
 }
