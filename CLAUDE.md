@@ -45,11 +45,12 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 ## Beta Environment Variables
 
 ```bash
-ADMIN_EMAIL=admin@example.com     # Admin access control
-TRIAL_BUDGET_LIMIT_EUR=100        # Monthly trial budget
-RESEND_API_KEY=re_xxx             # Email notifications
-TOKEN_ENCRYPTION_KEY=xxx          # 32+ chars for AES-256-GCM (ADR 0060)
-SUPABASE_CA_CERT=xxx              # SSL cert for production (ADR 0063)
+ADMIN_EMAIL=admin@example.com             # Admin access control
+TRIAL_BUDGET_LIMIT_EUR=100                # Monthly trial budget
+PROTECTED_USERS=email1@example.com,...    # Whitelist for test data cleanup (Plan 063)
+RESEND_API_KEY=re_xxx                     # Email notifications
+TOKEN_ENCRYPTION_KEY=xxx                  # 32+ chars for AES-256-GCM (ADR 0060)
+SUPABASE_CA_CERT=xxx                      # SSL cert for production (ADR 0063)
 ```
 
 ## Modular Rules (auto-loaded)
