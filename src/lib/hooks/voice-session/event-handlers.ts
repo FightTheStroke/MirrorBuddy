@@ -41,7 +41,7 @@ export interface EventHandlerDeps extends Omit<ToolHandlerParams, "event"> {
       }
     | undefined
   >;
-  startAudioCapture: () => void;
+  startAudioCapture: () => Promise<void>;
   playNextChunk: () => void;
   scheduleQueuedChunks: () => void;
 }
@@ -73,7 +73,8 @@ export function useHandleServerEvent(deps: EventHandlerDeps) {
           // eslint-disable-next-line react-hooks/immutability -- refs are mutable by design
           deps.sessionReadyRef.current = true;
           logger.debug("[VoiceSession] Starting audio capture...");
-          deps.startAudioCapture();
+          // Fire and forget - AudioContext resume is best-effort
+          void deps.startAudioCapture();
 
           // Schedule multiple greeting attempts with increasing delays
           // sendGreeting() has internal guard (greetingSentRef) - only first success sends

@@ -31,10 +31,25 @@ export const CHUNK_GAP_TOLERANCE = 0.02;
 // ============================================================================
 
 /**
- * Connection timeout - max time to wait for proxy.ready event
- * If the backend (Azure) doesn't connect within this time, fail the connection
+ * Detect if the user is on a mobile device
+ * Priority 1 Fix: Mobile detection for timeout adjustment
+ * Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 3
  */
-export const CONNECTION_TIMEOUT_MS = 15000; // 15 seconds
+export function isMobileDevice(): boolean {
+  if (typeof window === "undefined" || typeof navigator === "undefined") {
+    return false;
+  }
+  return /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+}
+
+/**
+ * Connection timeout - max time to wait for WebRTC connection
+ * Priority 1 Fix: Increased timeout for mobile networks (15s → 60s)
+ * Mobile networks have higher latency and need more time to establish connection
+ * Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 3
+ */
+export const CONNECTION_TIMEOUT_MS = 15000; // 15 seconds (desktop default)
+export const CONNECTION_TIMEOUT_MOBILE_MS = 60000; // 60 seconds (mobile)
 
 /**
  * Idle timeout - close connection after no activity
@@ -84,4 +99,14 @@ export function calculateBackoffDelay(attempt: number): number {
   const exponentialDelay = Math.min(maxDelay, baseDelay * Math.pow(2, attempt));
   const jitter = 1 + (Math.random() * 2 - 1) * jitterFactor;
   return Math.round(exponentialDelay * jitter);
+}
+
+/**
+ * Get connection timeout based on device type
+ * Mobile devices get longer timeout due to higher network latency
+ */
+export function getConnectionTimeout(): number {
+  return isMobileDevice()
+    ? CONNECTION_TIMEOUT_MOBILE_MS
+    : CONNECTION_TIMEOUT_MS;
 }

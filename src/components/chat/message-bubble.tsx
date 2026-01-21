@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { Copy, Check, User } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { ChatMessage, Maestro } from '@/types';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Copy, Check, User } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { ChatMessage, Maestro } from "@/types";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -31,14 +31,14 @@ export function MessageBubble({
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       className={cn(
-        'flex gap-3',
-        message.role === 'user' ? 'justify-end' : 'justify-start'
+        "flex gap-3",
+        message.role === "user" ? "justify-end" : "justify-start",
       )}
     >
       {/* Avatar for assistant */}
-      {message.role === 'assistant' && (
+      {message.role === "assistant" && (
         <div
-          className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
+          className="w-7 h-7 xs:w-8 xs:h-8 rounded-full overflow-hidden flex-shrink-0"
           style={{ boxShadow: `0 0 0 2px ${maestro.color}` }}
         >
           <Image
@@ -54,15 +54,15 @@ export function MessageBubble({
       {/* Message bubble */}
       <div
         className={cn(
-          'max-w-[80%] rounded-2xl px-4 py-3 relative group',
-          message.role === 'user'
+          "max-w-[80%] rounded-2xl px-4 py-3 relative group",
+          message.role === "user"
             ? highContrast
-              ? 'bg-yellow-400 text-black'
-              : 'bg-accent-themed text-white'
+              ? "bg-yellow-400 text-black"
+              : "bg-accent-themed text-white"
             : highContrast
-              ? 'bg-gray-900 text-white border border-gray-700'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',
-          dyslexiaFont && 'tracking-wide'
+              ? "bg-gray-900 text-white border border-gray-700"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
+          dyslexiaFont && "tracking-wide",
         )}
         style={{ lineHeight: lineSpacing }}
       >
@@ -72,10 +72,10 @@ export function MessageBubble({
         <button
           onClick={() => onCopy(message.content, message.id)}
           className={cn(
-            'absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity',
+            "absolute -right-2 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 p-1.5 rounded-full transition-opacity",
             highContrast
-              ? 'bg-yellow-400 text-black'
-              : 'bg-white dark:bg-slate-700 shadow-md'
+              ? "bg-yellow-400 text-black"
+              : "bg-white dark:bg-slate-700 shadow-md",
           )}
           title="Copia messaggio"
         >
@@ -88,16 +88,16 @@ export function MessageBubble({
       </div>
 
       {/* Avatar for user */}
-      {message.role === 'user' && (
+      {message.role === "user" && (
         <div
           className={cn(
-            'w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0',
+            "w-7 h-7 xs:w-8 xs:h-8 rounded-full flex items-center justify-center flex-shrink-0",
             highContrast
-              ? 'bg-yellow-400 text-black'
-              : 'bg-accent-themed text-white'
+              ? "bg-yellow-400 text-black"
+              : "bg-accent-themed text-white",
           )}
         >
-          <User className="w-4 h-4" />
+          <User className="w-3.5 h-3.5 xs:w-4 xs:h-4" />
         </div>
       )}
     </motion.div>
