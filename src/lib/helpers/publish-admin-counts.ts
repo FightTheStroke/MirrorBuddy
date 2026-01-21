@@ -11,7 +11,8 @@
  */
 
 import { prisma } from "@/lib/db";
-import { publishAdminCounts, type AdminCounts } from "./admin-counts-pubsub";
+import { publishAdminCounts } from "@/lib/redis/admin-counts-storage";
+import { type AdminCounts } from "@/lib/redis/admin-counts-types";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "publish-admin-counts" });
