@@ -11,22 +11,21 @@
  * Tested: 18 Jan 2026 - metrics visible in Grafana Cloud
  */
 
-import { metricsStore } from "./metrics-store";
-import { getFunnelMetrics, getConversionRates } from "./funnel-metrics";
 import { logger } from "@/lib/logger";
+import { collectServiceLimitsSamples } from "./service-limits-metrics";
+import { collectHttpMetrics, type MetricSample } from "./http-metrics-collector";
+import {
+  collectFunnelMetrics,
+  collectBudgetMetrics,
+  collectAbuseMetrics,
+  collectConversionMetrics,
+} from "./funnel-metrics-collectors";
 
 interface PushConfig {
   url: string;
   user: string;
   apiKey: string;
   intervalSeconds: number;
-}
-
-interface MetricSample {
-  name: string;
-  labels: Record<string, string>;
-  value: number;
-  timestamp: number;
 }
 
 /**
@@ -138,7 +137,7 @@ class PrometheusPushService {
       throw new Error("Push service not initialized");
     }
 
-    const samples = this.collectSamples();
+    const samples = await this.collectSamples();
     if (samples.length === 0) {
       logger.debug("No metrics to push");
       return;
@@ -166,255 +165,31 @@ class PrometheusPushService {
   /**
    * Collect all metrics as samples
    */
-  private collectSamples(): MetricSample[] {
+  private async collectSamples(): Promise<MetricSample[]> {
     const samples: MetricSample[] = [];
     const now = Date.now();
-    const summary = metricsStore.getMetricsSummary();
 
-    // Add instance label to all metrics
-    // env=production for real data, env=test for test script
+    // Instance labels for all metrics
     const instanceLabels = {
       instance: "mirrorbuddy",
       env: process.env.NODE_ENV === "production" ? "production" : "development",
     };
 
-    // Route-level metrics
-    for (const [rawRoute, metrics] of Object.entries(summary.routes)) {
-      // Sanitize route: only allow alphanumeric, slashes, hyphens, underscores
-      // This prevents any injection in Influx Line Protocol
-      const route = rawRoute.replace(/[^a-zA-Z0-9/_-]/g, "_");
-      const routeLabels = { ...instanceLabels, route };
-
-      samples.push(
-        {
-          name: "http_requests_total",
-          labels: routeLabels,
-          value: metrics.count,
-          timestamp: now,
-        },
-        {
-          name: "http_request_duration_seconds_p50",
-          labels: routeLabels,
-          value: metrics.p50LatencyMs / 1000,
-          timestamp: now,
-        },
-        {
-          name: "http_request_duration_seconds_p95",
-          labels: routeLabels,
-          value: metrics.p95LatencyMs / 1000,
-          timestamp: now,
-        },
-        {
-          name: "http_request_duration_seconds_p99",
-          labels: routeLabels,
-          value: metrics.p99LatencyMs / 1000,
-          timestamp: now,
-        },
-        {
-          name: "http_request_errors_total",
-          labels: routeLabels,
-          value: metrics.errorCount,
-          timestamp: now,
-        },
-        {
-          name: "http_request_error_rate",
-          labels: routeLabels,
-          value: metrics.errorRate,
-          timestamp: now,
-        },
-      );
-
-      // Error breakdown by status
-      for (const [status, count] of Object.entries(metrics.errors)) {
-        samples.push({
-          name: "http_request_errors_by_status",
-          labels: { ...routeLabels, status_code: status },
-          value: count,
-          timestamp: now,
-        });
-      }
-    }
-
-    // Overall metrics
+    // Collect all metric types
     samples.push(
-      {
-        name: "http_requests_total_all",
-        labels: instanceLabels,
-        value: summary.totalRequests,
-        timestamp: now,
-      },
-      {
-        name: "http_errors_total_all",
-        labels: instanceLabels,
-        value: summary.totalErrors,
-        timestamp: now,
-      },
-      {
-        name: "http_error_rate_all",
-        labels: instanceLabels,
-        value: summary.overallErrorRate,
-        timestamp: now,
-      },
+      ...collectHttpMetrics(instanceLabels, now),
+      ...collectFunnelMetrics(instanceLabels, now),
+      ...collectBudgetMetrics(instanceLabels, now),
+      ...collectAbuseMetrics(instanceLabels, now),
+      ...collectConversionMetrics(instanceLabels, now),
     );
 
-    // Funnel metrics
-    const funnel = getFunnelMetrics();
-    const rates = getConversionRates();
-
-    // Trial funnel
-    samples.push(
-      {
-        name: "trial_started_total",
-        labels: instanceLabels,
-        value: funnel.trial.started,
-        timestamp: now,
-      },
-      {
-        name: "trial_engaged_total",
-        labels: instanceLabels,
-        value: funnel.trial.engaged,
-        timestamp: now,
-      },
-      {
-        name: "trial_limit_hit_total",
-        labels: instanceLabels,
-        value: funnel.trial.limitHit,
-        timestamp: now,
-      },
-      {
-        name: "trial_beta_requested_total",
-        labels: instanceLabels,
-        value: funnel.trial.betaRequested,
-        timestamp: now,
-      },
+    // Service limits metrics (F-21) - async collection
+    const serviceLimitsSamples = await collectServiceLimitsSamples(
+      instanceLabels,
+      now,
     );
-
-    // Invite funnel
-    samples.push(
-      {
-        name: "invite_requested_total",
-        labels: instanceLabels,
-        value: funnel.invite.requested,
-        timestamp: now,
-      },
-      {
-        name: "invite_approved_total",
-        labels: instanceLabels,
-        value: funnel.invite.approved,
-        timestamp: now,
-      },
-      {
-        name: "invite_rejected_total",
-        labels: instanceLabels,
-        value: funnel.invite.rejected,
-        timestamp: now,
-      },
-      {
-        name: "invite_first_login_total",
-        labels: instanceLabels,
-        value: funnel.invite.firstLogin,
-        timestamp: now,
-      },
-      {
-        name: "invite_active_total",
-        labels: instanceLabels,
-        value: funnel.invite.active,
-        timestamp: now,
-      },
-    );
-
-    // Budget metrics
-    samples.push(
-      {
-        name: "budget_used_eur",
-        labels: instanceLabels,
-        value: funnel.budget.usedEur,
-        timestamp: now,
-      },
-      {
-        name: "budget_limit_eur",
-        labels: instanceLabels,
-        value: funnel.budget.limitEur,
-        timestamp: now,
-      },
-      {
-        name: "budget_projected_monthly_eur",
-        labels: instanceLabels,
-        value: funnel.budget.projectedMonthlyEur,
-        timestamp: now,
-      },
-      {
-        name: "budget_usage_percent",
-        labels: instanceLabels,
-        value:
-          funnel.budget.limitEur > 0
-            ? (funnel.budget.usedEur / funnel.budget.limitEur) * 100
-            : 0,
-        timestamp: now,
-      },
-    );
-
-    // Abuse metrics
-    samples.push(
-      {
-        name: "abuse_flagged_total",
-        labels: instanceLabels,
-        value: funnel.abuse.flaggedSessions,
-        timestamp: now,
-      },
-      {
-        name: "abuse_blocked_total",
-        labels: instanceLabels,
-        value: funnel.abuse.blockedSessions,
-        timestamp: now,
-      },
-      {
-        name: "abuse_score_total",
-        labels: instanceLabels,
-        value: funnel.abuse.totalAbuseScore,
-        timestamp: now,
-      },
-    );
-
-    // Conversion rates
-    samples.push(
-      {
-        name: "conversion_trial_to_engaged",
-        labels: instanceLabels,
-        value: rates.trialToEngaged,
-        timestamp: now,
-      },
-      {
-        name: "conversion_engaged_to_limit",
-        labels: instanceLabels,
-        value: rates.engagedToLimit,
-        timestamp: now,
-      },
-      {
-        name: "conversion_limit_to_request",
-        labels: instanceLabels,
-        value: rates.limitToRequest,
-        timestamp: now,
-      },
-      {
-        name: "conversion_request_to_approved",
-        labels: instanceLabels,
-        value: rates.requestToApproved,
-        timestamp: now,
-      },
-      {
-        name: "conversion_approved_to_login",
-        labels: instanceLabels,
-        value: rates.approvedToLogin,
-        timestamp: now,
-      },
-      {
-        name: "conversion_login_to_active",
-        labels: instanceLabels,
-        value: rates.loginToActive,
-        timestamp: now,
-      },
-    );
+    samples.push(...serviceLimitsSamples);
 
     return samples;
   }
