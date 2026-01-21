@@ -145,6 +145,9 @@ model SessionMetrics {
   incidentSeverity  String? // S0 | S1 | S2 | S3 (highest in session)
   jailbreakAttempts Int     @default(0)
 
+  // F-17: Test data isolation
+  isTestData Boolean @default(false)
+
   // Timestamps
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
