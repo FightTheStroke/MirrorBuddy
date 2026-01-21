@@ -35,20 +35,21 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "User ID required" }, { status: 401 });
     }
 
-    // Get flashcard review data - FILTERED BY USER
+    // F-06: Get flashcard review data - FILTERED BY USER AND EXCLUDE TEST DATA
     const [totalCards, reviews, cardsByState] = await Promise.all([
-      // Total flashcards for this user
+      // Total flashcards for this user (exclude test data)
       prisma.flashcardProgress.count({
-        where: { userId },
+        where: { userId, isTestData: false },
       }),
 
-      // Reviews in period for this user (from telemetry)
+      // Reviews in period for this user from telemetry (F-06: exclude test data)
       prisma.telemetryEvent.findMany({
         where: {
           userId,
           category: "flashcard",
           action: "review",
           timestamp: { gte: startDate },
+          isTestData: false,
         },
         select: {
           value: true,
@@ -57,10 +58,10 @@ export async function GET(request: Request) {
         },
       }),
 
-      // Cards by state for this user
+      // Cards by state for this user (exclude test data)
       prisma.flashcardProgress.groupBy({
         by: ["state"],
-        where: { userId },
+        where: { userId, isTestData: false },
         _count: { _all: true },
       }),
     ]);
@@ -98,12 +99,13 @@ export async function GET(request: Request) {
       dailyReviews[day] = (dailyReviews[day] || 0) + 1;
     }
 
-    // Cards due today for this user
+    // F-06: Cards due today for this user (exclude test data)
     const now = new Date();
     const cardsDueToday = await prisma.flashcardProgress.count({
       where: {
         userId,
         nextReview: { lte: now },
+        isTestData: false,
       },
     });
 

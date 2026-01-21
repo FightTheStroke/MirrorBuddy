@@ -30,6 +30,7 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    // F-06: Exclude test data from token usage statistics
     // Get token usage from telemetry events
     const tokenEvents = await prisma.telemetryEvent.findMany({
       where: {
@@ -38,6 +39,7 @@ export async function GET(request: Request) {
           in: ["chat_completion", "voice_transcription", "tts_generation"],
         },
         timestamp: { gte: startDate },
+        isTestData: false,
       },
       select: {
         action: true,

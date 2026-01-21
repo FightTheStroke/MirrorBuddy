@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { User, Mail, FileText, ChevronDown, ChevronUp } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
+import { StatusBadge } from "@/components/ui/status-badge";
 import { cn } from "@/lib/utils";
 
 export interface InviteRequest {
@@ -186,7 +187,7 @@ function InviteRow({
         </button>
 
         {/* Status badge */}
-        <StatusBadge status={invite.status} />
+        <InviteStatusBadge status={invite.status} />
       </div>
 
       {/* Expanded content */}
@@ -227,31 +228,20 @@ function InviteRow({
   );
 }
 
-function StatusBadge({ status }: { status: InviteRequest["status"] }) {
-  const styles = {
-    PENDING:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-    APPROVED:
-      "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
-    REJECTED: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
-  };
-
+function InviteStatusBadge({ status }: { status: InviteRequest["status"] }) {
   const labels = {
     PENDING: "In attesa",
     APPROVED: "Approvata",
     REJECTED: "Rifiutata",
   };
 
-  return (
-    <span
-      className={cn(
-        "px-2.5 py-1 text-xs font-medium rounded-full",
-        styles[status],
-      )}
-    >
-      {labels[status]}
-    </span>
-  );
+  const variants = {
+    PENDING: "pending" as const,
+    APPROVED: "approved" as const,
+    REJECTED: "rejected" as const,
+  };
+
+  return <StatusBadge variant={variants[status]}>{labels[status]}</StatusBadge>;
 }
 
 export default InvitesTable;

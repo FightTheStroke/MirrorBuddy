@@ -215,10 +215,11 @@ export async function generateBehavioralMetrics(): Promise<MetricLine[]> {
 /**
  * Calculate session statistics from StudySession table
  * Uses schema fields: duration (seconds), questions (as proxy for turns), endedAt
+ * F-06: Excludes test data (isTestData = false)
  */
 async function getSessionStats(from: Date, to: Date): Promise<SessionStats> {
   const sessions = await prisma.studySession.findMany({
-    where: { startedAt: { gte: from, lte: to } },
+    where: { startedAt: { gte: from, lte: to }, isTestData: false },
     select: {
       id: true,
       startedAt: true,
@@ -281,12 +282,14 @@ async function getSessionStats(from: Date, to: Date): Promise<SessionStats> {
 
 /**
  * Calculate safety statistics from TelemetryEvent
+ * F-06: Excludes test data (isTestData = false)
  */
 async function getSafetyStats(from: Date, to: Date): Promise<SafetyStats> {
   const events = await prisma.telemetryEvent.findMany({
     where: {
       timestamp: { gte: from, lte: to },
       category: { in: ["safety", "moderation", "security"] },
+      isTestData: false,
     },
     select: { action: true, label: true },
   });

@@ -1,6 +1,7 @@
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
+import { Users } from "lucide-react";
 import { UsersTable } from "./users-table";
 
 interface User {
@@ -33,6 +34,12 @@ export default async function AdminUsersPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
+      <div className="flex items-center gap-3 mb-6">
+        <Users className="w-8 h-8 text-primary" aria-hidden="true" />
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
+          Gestione Utenti
+        </h1>
+      </div>
       <UsersTable users={users} />
     </div>
   );

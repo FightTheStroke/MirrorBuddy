@@ -51,6 +51,7 @@ function createMockConversation(overrides: {
     studentId: null,
     markedForDeletion: false,
     markedForDeletionAt: null,
+    isTestData: false,
   };
 }
 

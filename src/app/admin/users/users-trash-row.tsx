@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { TableCell } from "@/components/ui/table";
 import { ArchiveRestore } from "lucide-react";
 
 interface DeletedUserBackup {
@@ -22,13 +23,15 @@ export function UsersTrashRow({
   onRestore,
 }: UsersTrashRowProps) {
   return (
-    <tr className="border-b hover:bg-slate-50">
-      <td className="px-4 py-3">{backup.username || "—"}</td>
-      <td className="px-4 py-3 text-slate-600">{backup.email || "—"}</td>
-      <td className="px-4 py-3 text-slate-600">
+    <tr className="border-b hover:bg-accent">
+      <TableCell>{backup.username || "—"}</TableCell>
+      <TableCell className="text-muted-foreground">
+        {backup.email || "—"}
+      </TableCell>
+      <TableCell className="text-muted-foreground">
         {new Date(backup.deletedAt).toLocaleDateString()}
-      </td>
-      <td className="px-4 py-3">
+      </TableCell>
+      <TableCell>
         <Button
           size="sm"
           variant="outline"
@@ -38,7 +41,7 @@ export function UsersTrashRow({
           <ArchiveRestore className="w-3 h-3 mr-1" />
           Ripristina
         </Button>
-      </td>
+      </TableCell>
     </tr>
   );
 }

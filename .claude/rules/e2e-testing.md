@@ -1,5 +1,29 @@
 # E2E Testing Rules - MirrorBuddy
 
+## Production Safety Guard (F-03)
+
+**CRITICAL SAFETY FEATURE**: E2E tests are automatically blocked in production environments.
+
+`e2e/global-setup.ts` enforces a NODE_ENV check at function entry:
+
+```typescript
+if (process.env.NODE_ENV === "production") {
+  throw new Error(
+    "CRITICAL SAFETY ERROR: E2E tests are blocked in production...",
+  );
+}
+```
+
+**Why this matters**: E2E tests create test users, delete sessions, corrupt data, and would cause real user data loss if run in production.
+
+**Valid environments for testing**:
+
+- `NODE_ENV=development` (local)
+- `NODE_ENV=test` (test suite)
+- `NODE_ENV=staging` (staging server)
+
+**In production**: Tests will always fail with clear error message. No workarounds. No exceptions.
+
 ## Global Setup Requirements (ADR 0059)
 
 `e2e/global-setup.ts` MUST bypass all "wall" components:
