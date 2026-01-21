@@ -1,0 +1,77 @@
+{
+  "timestamp": "2026-01-21T21:20:19.120Z",
+  "branch": "main",
+  "commit": "edc95788",
+  "routes": {
+    "/api/admin/counts": {
+      "invocations": 306,
+      "p75_duration_s": 18,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0001224
+    },
+    "/api/cron/metrics-push": {
+      "invocations": 777,
+      "p75_duration_s": 12,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0003108
+    },
+    "/api/conversations": {
+      "invocations": 83,
+      "p75_duration_s": 10,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000332
+    },
+    "/api/user": {
+      "invocations": 51,
+      "p75_duration_s": 19,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000204
+    },
+    "/api/telemetry/activity": {
+      "invocations": 60,
+      "p75_duration_s": 16,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.000024
+    },
+    "/welcome": {
+      "invocations": 78,
+      "p75_duration_s": 13,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000312
+    },
+    "/api/onboarding": {
+      "invocations": 45,
+      "p75_duration_s": 11,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.000018
+    },
+    "/api/realtime/token": {
+      "invocations": 123,
+      "p75_duration_s": 8,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000492
+    },
+    "/api/user/accessibility": {
+      "invocations": 34,
+      "p75_duration_s": 9,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000136
+    },
+    "/": {
+      "invocations": 156,
+      "p75_duration_s": 7,
+      "error_rate": 0,
+      "estimated_cost_usd": 0.0000624
+    }
+  },
+  "totals": {
+    "invocations_per_day": 1713,
+    "estimated_cpu_seconds": 21.48,
+    "estimated_daily_cost_usd": 0.00069
+  },
+  "metadata": {
+    "script_version": "1.0.0",
+    "captured_by": "measure-vercel-baseline.ts",
+    "notes": "Baseline metrics for tracking optimization progress (polling → SSE push)"
+  }
+}
