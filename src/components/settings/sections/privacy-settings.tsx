@@ -2,16 +2,27 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Shield, BarChart3, LogOut, User } from "lucide-react";
+import {
+  Shield,
+  BarChart3,
+  LogOut,
+  User,
+  FileText,
+  Cookie,
+  CheckCircle,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import {
-  getConsent,
-  saveConsent,
-  syncConsentToServer,
-} from "@/lib/consent/consent-storage";
+  getUnifiedConsent,
+  saveUnifiedConsent,
+  syncUnifiedConsentToServer,
+  clearUnifiedConsent,
+  type UnifiedConsentData,
+} from "@/lib/consent/unified-consent-storage";
+import { updateConsentSnapshot } from "@/lib/consent/consent-store";
 
 // Privacy Settings
 export function PrivacySettings() {
@@ -28,11 +39,17 @@ export function PrivacySettings() {
     return !!userId;
   });
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  // Use lazy initialization to read consent from localStorage
+  // Use lazy initialization to read unified consent from localStorage
+  const [consentData, setConsentData] = useState<UnifiedConsentData | null>(
+    () => {
+      if (typeof window === "undefined") return null;
+      return getUnifiedConsent();
+    },
+  );
   const [analyticsEnabled, setAnalyticsEnabled] = useState(() => {
     if (typeof window === "undefined") return true;
-    const consent = getConsent();
-    return consent?.analytics ?? true;
+    const consent = getUnifiedConsent();
+    return consent?.cookies.analytics ?? true;
   });
 
   useEffect(() => {
@@ -64,8 +81,17 @@ export function PrivacySettings() {
   const handleAnalyticsToggle = async () => {
     const newValue = !analyticsEnabled;
     setAnalyticsEnabled(newValue);
-    const consent = saveConsent(newValue);
-    await syncConsentToServer(consent);
+    const consent = saveUnifiedConsent(newValue);
+    setConsentData(consent);
+    await syncUnifiedConsentToServer(consent);
+  };
+
+  const handleReviewConsents = () => {
+    // Clear consent to trigger wall again
+    clearUnifiedConsent();
+    updateConsentSnapshot(false);
+    // Reload to show consent wall
+    window.location.reload();
   };
 
   return (
@@ -96,6 +122,86 @@ export function PrivacySettings() {
           </CardContent>
         </Card>
       )}
+
+      {/* Consent Management Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="w-5 h-5 text-blue-500" />
+            Consensi e Termini
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {consentData ? (
+            <>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Stato dei tuoi consensi e termini accettati.
+              </p>
+
+              {/* TOS Status */}
+              <div className="flex items-start gap-3 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    Termini di Servizio
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Accettati il{" "}
+                    {new Date(consentData.tos.acceptedAt).toLocaleDateString(
+                      "it-IT",
+                      {
+                        day: "numeric",
+                        month: "long",
+                        year: "numeric",
+                      },
+                    )}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                    Versione: {consentData.tos.version}
+                  </p>
+                </div>
+              </div>
+
+              {/* Cookie Status */}
+              <div className="flex items-start gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <Cookie className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">
+                    Cookie e Privacy
+                  </p>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Accettati il{" "}
+                    {new Date(
+                      consentData.cookies.acceptedAt,
+                    ).toLocaleDateString("it-IT", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+                    Cookie essenziali: ✓ | Cookie analitici:{" "}
+                    {consentData.cookies.analytics ? "✓" : "✗"}
+                  </p>
+                </div>
+              </div>
+
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={handleReviewConsents}
+              >
+                Rivedi e modifica consensi
+              </Button>
+            </>
+          ) : (
+            <p className="text-sm text-amber-600 dark:text-amber-400">
+              Nessun consenso trovato. Riceverai la richiesta al prossimo
+              accesso.
+            </p>
+          )}
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
