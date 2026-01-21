@@ -62,6 +62,11 @@ const isProduction =
 
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
+  // E2E Tests: NO SSL (local PostgreSQL in CI doesn't support SSL)
+  if (isE2E) {
+    return undefined;
+  }
+
   // REQUIRED for Supabase: The pooler uses a CA not in Node's default trust store
   // Without the CA cert, SSL verification will fail with "self-signed certificate"
   if (supabaseCaCert) {
