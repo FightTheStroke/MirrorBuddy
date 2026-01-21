@@ -125,6 +125,8 @@ export default defineConfig({
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // Mobile viewport projects for responsive design testing (ADR 0064)
+    // DISABLED IN CI: Mobile tests add 5x overhead (5 projects × same tests)
+    // Run locally: npx playwright test --project=iphone-13
     {
       name: "iphone-se",
       use: {
@@ -132,6 +134,7 @@ export default defineConfig({
         // iPhone SE 2022: 375px × 667px (16:9)
       },
       testMatch: "**/mobile/**/*.spec.ts",
+      ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
       name: "iphone-13",
@@ -140,6 +143,7 @@ export default defineConfig({
         // iPhone 13: 390px × 844px (19.5:9)
       },
       testMatch: "**/mobile/**/*.spec.ts",
+      ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
       name: "pixel-7",
@@ -148,6 +152,7 @@ export default defineConfig({
         // Pixel 7: 412px × 915px (19.5:9)
       },
       testMatch: "**/mobile/**/*.spec.ts",
+      ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
       name: "ipad-mini",
@@ -156,6 +161,7 @@ export default defineConfig({
         // iPad Mini: 768px × 1024px (4:3) portrait
       },
       testMatch: "**/mobile/**/*.spec.ts",
+      ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
       name: "ipad-landscape",
@@ -164,6 +170,7 @@ export default defineConfig({
         // iPad Mini landscape: 1024px × 768px (4:3)
       },
       testMatch: "**/mobile/**/*.spec.ts",
+      ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // Other browsers disabled - only testing API/backend, not cross-browser UI
     // Re-enable if needed:
