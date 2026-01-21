@@ -34,6 +34,14 @@ const connectionString = isE2E
           "TEST_DATABASE_URL must be set when E2E_TESTS=1 to avoid using production data.",
         );
       }
+      // CRITICAL: Block production Supabase URLs in E2E tests
+      if (testDatabaseUrl.includes("supabase.com")) {
+        throw new Error(
+          `❌ BLOCKED: E2E test attempted to use production Supabase database!\n` +
+            `TEST_DATABASE_URL must be a local test database, not: ${testDatabaseUrl}\n` +
+            `This prevents accidental contamination of production data.`,
+        );
+      }
       // Validate that connection string has credentials
       if (!testDatabaseUrl.includes("@")) {
         throw new Error(

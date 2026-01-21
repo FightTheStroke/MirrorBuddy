@@ -6,7 +6,8 @@
 import { z } from "zod";
 
 const isProduction =
-  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+  (process.env.NODE_ENV === "production" || process.env.VERCEL === "1") &&
+  process.env.E2E_TESTS !== "1";
 
 // Base schema - required in all environments
 const baseEnvSchema = z.object({
