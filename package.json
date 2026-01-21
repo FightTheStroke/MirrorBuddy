@@ -53,7 +53,8 @@
     "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
   },
   "overrides": {
-    "hono": "4.11.4"
+    "hono": "4.11.4",
+    "tmp": "0.2.5"
   },
   "dependencies": {
     "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.32",
@@ -107,7 +108,7 @@
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.11.0",
-    "@lhci/cli": "^0.14.0",
+    "@lhci/cli": "^0.15.1",
     "@next/bundle-analyzer": "^16.1.1",
     "@playwright/test": "^1.57.0",
     "@prisma/client": "^7.2.0",
