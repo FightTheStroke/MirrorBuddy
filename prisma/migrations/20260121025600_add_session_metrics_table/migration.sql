@@ -26,7 +26,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS "session_metrics_sessionId_key" ON "session_me
 CREATE INDEX IF NOT EXISTS "session_metrics_userId_idx" ON "session_metrics"("userId");
 
 -- AddForeignKey (conditional for idempotency)
-DO $
+DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'User') THEN
         IF NOT EXISTS (
@@ -39,4 +39,4 @@ BEGIN
             ON DELETE CASCADE ON UPDATE CASCADE;
         END IF;
     END IF;
-END $;
+END $$;
