@@ -78,7 +78,68 @@ test.describe("Beta Invite System", () => {
           path: "/",
           sameSite: "Lax",
         },
+        {
+          // Client-readable cookie (for JS access)
+          name: "mirrorbuddy-user-id-client",
+          value: adminSessionId,
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
+        {
+          // Accessibility settings bypass (ADR 0060)
+          name: "mirrorbuddy-a11y",
+          value: encodeURIComponent(
+            JSON.stringify({
+              version: "1",
+              activeProfile: null,
+              overrides: {
+                dyslexiaFont: false,
+                highContrast: false,
+                largeText: false,
+                reducedMotion: false,
+              },
+              browserDetectedApplied: true,
+            }),
+          ),
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
       ]);
+
+      // Set localStorage for onboarding and consent bypass
+      await page.addInitScript(() => {
+        localStorage.setItem(
+          "mirrorbuddy-onboarding",
+          JSON.stringify({
+            state: {
+              hasCompletedOnboarding: true,
+              onboardingCompletedAt: new Date().toISOString(),
+              currentStep: "ready",
+              isReplayMode: false,
+              data: {
+                name: "Admin User",
+                age: 25,
+                schoolLevel: "universita",
+                learningDifferences: [],
+                gender: "other",
+              },
+            },
+            version: 0,
+          }),
+        );
+        localStorage.setItem(
+          "mirrorbuddy-consent",
+          JSON.stringify({
+            version: "1.0",
+            acceptedAt: new Date().toISOString(),
+            essential: true,
+            analytics: true,
+            marketing: false,
+          }),
+        );
+      });
 
       // Mock the invites API
       await page.route("/api/invites*", async (route) => {
@@ -261,7 +322,68 @@ test.describe("Beta Invite System", () => {
           path: "/",
           sameSite: "Lax",
         },
+        {
+          // Client-readable cookie (for JS access)
+          name: "mirrorbuddy-user-id-client",
+          value: adminSessionId,
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
+        {
+          // Accessibility settings bypass (ADR 0060)
+          name: "mirrorbuddy-a11y",
+          value: encodeURIComponent(
+            JSON.stringify({
+              version: "1",
+              activeProfile: null,
+              overrides: {
+                dyslexiaFont: false,
+                highContrast: false,
+                largeText: false,
+                reducedMotion: false,
+              },
+              browserDetectedApplied: true,
+            }),
+          ),
+          domain: "localhost",
+          path: "/",
+          sameSite: "Lax",
+        },
       ]);
+
+      // Set localStorage for onboarding and consent bypass
+      await page.addInitScript(() => {
+        localStorage.setItem(
+          "mirrorbuddy-onboarding",
+          JSON.stringify({
+            state: {
+              hasCompletedOnboarding: true,
+              onboardingCompletedAt: new Date().toISOString(),
+              currentStep: "ready",
+              isReplayMode: false,
+              data: {
+                name: "Admin User",
+                age: 25,
+                schoolLevel: "universita",
+                learningDifferences: [],
+                gender: "other",
+              },
+            },
+            version: 0,
+          }),
+        );
+        localStorage.setItem(
+          "mirrorbuddy-consent",
+          JSON.stringify({
+            version: "1.0",
+            acceptedAt: new Date().toISOString(),
+            essential: true,
+            analytics: true,
+            marketing: false,
+          }),
+        );
+      });
 
       // Mock invites list
       await page.route("/api/invites?status=PENDING", async (route) => {
