@@ -6,7 +6,11 @@
     },
     {
       "path": "/api/cron/metrics-push",
-      "schedule": "* * * * *"
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/cron/business-metrics-daily",
+      "schedule": "0 3 * * *"
     }
   ]
 }
