@@ -385,6 +385,18 @@ test.describe("Beta Invite System", () => {
         );
       });
 
+      // Mock ToS acceptance status to prevent modal from blocking UI
+      await page.route("/api/tos", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            accepted: true,
+            version: "1.0",
+          }),
+        });
+      });
+
       // Mock invites list
       await page.route("/api/invites?status=PENDING", async (route) => {
         await route.fulfill({
