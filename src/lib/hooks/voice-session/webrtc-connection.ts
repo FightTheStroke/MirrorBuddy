@@ -15,6 +15,15 @@ import type {
   AzureSDPResponse,
 } from "./webrtc-types";
 import { ICE_SERVERS } from "./webrtc-types";
+import {
+  logConnectionStateChange,
+  logICEConnectionStateChange,
+  logDataChannelStateChange,
+  logMediaStreamTracks,
+  logMicrophonePermissionRequest,
+  logSDPExchange,
+  logVoiceError,
+} from "./voice-error-logger";
 
 // Re-export types for backwards compatibility
 export type {
@@ -37,16 +46,29 @@ export class WebRTCConnection {
   }
 
   async connect(): Promise<WebRTCConnectionResult> {
+    const startTime = Date.now();
+    logger.info("[WebRTC] Connection sequence starting...", {
+      maestroId: this.config.maestro.id,
+    });
     try {
+      logger.debug("[WebRTC] Step 1: Getting ephemeral token...");
       const token = await this.getEphemeralToken();
+      logger.debug("[WebRTC] Step 2: Requesting microphone access...");
       this.mediaStream = await this.getUserMedia();
+      logger.debug("[WebRTC] Step 3: Creating peer connection...");
       this.peerConnection = this.createPeerConnection();
+      logger.debug("[WebRTC] Step 4: Adding audio tracks...");
       this.addAudioTracks();
+      logger.debug("[WebRTC] Step 5: Creating data channel...");
       this.createDataChannel(); // Must be BEFORE offer per Azure docs
+      logger.debug("[WebRTC] Step 6: Creating SDP offer...");
       const offer = await this.createOffer();
+      logger.debug("[WebRTC] Step 7: Exchanging SDP...");
       await this.exchangeSDP(token, offer);
+      logger.debug("[WebRTC] Step 8: Waiting for connection...");
       await this.waitForConnection();
-      logger.debug("[WebRTC] Connection established");
+      const connectionTime = Date.now() - startTime;
+      logger.info("[WebRTC] Connection established", { connectionTime });
       return {
         peerConnection: this.peerConnection,
         mediaStream: this.mediaStream,
@@ -57,6 +79,8 @@ export class WebRTCConnection {
       this.cleanup();
       const message =
         error instanceof Error ? error.message : "Unknown WebRTC error";
+      const connectionTime = Date.now() - startTime;
+      logVoiceError('WebRTCConnectionFailed', message, { connectionTime });
       logger.error("[WebRTC] Connection failed", { errorDetails: message });
       this.config.onError?.(new Error(message));
       throw error;
@@ -80,6 +104,10 @@ export class WebRTCConnection {
 
   private async getUserMedia(): Promise<MediaStream> {
     if (!navigator.mediaDevices?.getUserMedia) {
+      logVoiceError(
+        'MicrophoneNotAvailable',
+        'getUserMedia not available - HTTPS/localhost required',
+      );
       throw new Error(
         "Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.",
       );
@@ -92,12 +120,32 @@ export class WebRTCConnection {
     if (this.config.preferredMicrophoneId) {
       audioConstraints.deviceId = { ideal: this.config.preferredMicrophoneId };
     }
-    return navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+    try {
+      logger.debug('[WebRTC] Requesting microphone access...', {
+        preferredMicrophoneId: this.config.preferredMicrophoneId,
+      });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: audioConstraints,
+      });
+      logMicrophonePermissionRequest('granted', { deviceId: this.config.preferredMicrophoneId });
+      logMediaStreamTracks(stream, 'getUserMedia result');
+      return stream;
+    } catch (error) {
+      const err = error as DOMException;
+      if (err.name === 'NotAllowedError') {
+        logMicrophonePermissionRequest('denied', { errorName: err.name });
+      } else {
+        logMicrophonePermissionRequest('error', { errorName: err.name, message: err.message });
+      }
+      throw error;
+    }
   }
 
   private createPeerConnection(): RTCPeerConnection {
+    logger.debug('[WebRTC] Creating peer connection');
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
     pc.onconnectionstatechange = () => {
+      logConnectionStateChange(pc.connectionState, this.config.maestro.id);
       this.config.onConnectionStateChange?.(pc.connectionState);
       if (
         pc.connectionState === "failed" ||
@@ -107,6 +155,7 @@ export class WebRTCConnection {
       }
     };
     pc.oniceconnectionstatechange = () => {
+      logICEConnectionStateChange(pc.iceConnectionState, this.config.maestro.id);
       this.config.onICEConnectionStateChange?.(pc.iceConnectionState);
     };
     pc.onicecandidate = (event) => {
@@ -133,12 +182,17 @@ export class WebRTCConnection {
 
   private attachDataChannel(channel: RTCDataChannel): void {
     this.dataChannel = channel;
-    channel.onopen = () => this.config.onDataChannelOpen?.();
+    channel.onopen = () => {
+      logDataChannelStateChange('open', channel.label);
+      this.config.onDataChannelOpen?.();
+    };
     channel.onclose = () => {
+      logDataChannelStateChange('closed', channel.label);
       this.dataChannel = null;
       this.config.onDataChannelClose?.();
     };
     channel.onerror = (event) => {
+      logVoiceError('DataChannelError', event.error?.message || 'Unknown error');
       logger.error("[WebRTC] Data channel error", {
         errorDetails: event.error,
       });
@@ -146,7 +200,8 @@ export class WebRTCConnection {
     channel.onmessage = (event) => {
       try {
         this.config.onDataChannelMessage?.(JSON.parse(event.data));
-      } catch {
+      } catch (error) {
+        logVoiceError('DataChannelParseError', `Failed to parse: ${String(error)}`);
         logger.error("[WebRTC] Failed to parse message");
       }
     };
@@ -173,14 +228,18 @@ export class WebRTCConnection {
 
   private async createOffer(): Promise<RTCSessionDescriptionInit> {
     if (!this.peerConnection) throw new Error("PeerConnection not initialized");
+    logger.debug('[WebRTC] Creating offer...');
     const offer = await this.peerConnection.createOffer({
       offerToReceiveAudio: true,
     });
+    logSDPExchange('offer', offer.sdp?.length || 0);
     await this.peerConnection.setLocalDescription(offer);
     if (this.peerConnection.iceGatheringState !== "complete") {
+      logger.debug('[WebRTC] Waiting for ICE gathering to complete...');
       await new Promise<void>((resolve) => {
         const checkState = () => {
           if (this.peerConnection!.iceGatheringState === "complete") {
+            logger.debug('[WebRTC] ICE gathering complete');
             this.peerConnection!.removeEventListener(
               "icegatheringstatechange",
               checkState,
@@ -201,10 +260,17 @@ export class WebRTCConnection {
     token: string,
     offer: RTCSessionDescriptionInit,
   ): Promise<void> {
+    logger.debug('[WebRTC] Exchanging SDP with server...');
     const configResponse = await fetch("/api/realtime/token");
-    if (!configResponse.ok) throw new Error("Failed to get Azure config");
+    if (!configResponse.ok) {
+      logVoiceError('ConfigFetchFailed', `Status: ${configResponse.status}`);
+      throw new Error("Failed to get Azure config");
+    }
     const { webrtcEndpoint } = await configResponse.json();
-    if (!webrtcEndpoint) throw new Error("WebRTC endpoint not configured");
+    if (!webrtcEndpoint) {
+      logVoiceError('WebRTCEndpointMissing', 'Endpoint not configured');
+      throw new Error("WebRTC endpoint not configured");
+    }
     const response = await fetch(webrtcEndpoint, {
       method: "POST",
       headers: {
@@ -215,16 +281,23 @@ export class WebRTCConnection {
     });
     if (!response.ok) {
       const errorText = await response.text();
+      logVoiceError('SDPExchangeFailed', `Status: ${response.status}`, {
+        statusText: response.statusText,
+        errorDetails: errorText.substring(0, 200),
+      });
       throw new Error(`SDP exchange failed: ${response.status} - ${errorText}`);
     }
+    const answerSdp = await response.text();
+    logSDPExchange('answer', answerSdp.length);
     const answer: AzureSDPResponse = {
-      sdp: await response.text(),
+      sdp: answerSdp,
       type: "answer",
     };
     if (!this.peerConnection) throw new Error("PeerConnection not initialized");
     await this.peerConnection.setRemoteDescription(
       new RTCSessionDescription(answer),
     );
+    logger.debug('[WebRTC] Remote description set successfully');
   }
 
   private async waitForConnection(): Promise<void> {

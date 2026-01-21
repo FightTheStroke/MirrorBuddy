@@ -2,17 +2,35 @@
 
 ## Health Endpoints
 
-| Endpoint | Purpose | Use Case |
-|----------|---------|----------|
-| `GET /api/health` | Basic health | Load balancers, k8s probes |
-| `GET /api/health/detailed` | Full metrics | Dashboards, debugging |
-| `GET /api/metrics` | Prometheus format | Grafana scraping |
+| Endpoint                        | Purpose                 | Use Case                   |
+| ------------------------------- | ----------------------- | -------------------------- |
+| `GET /api/health`               | Basic health            | Load balancers, k8s probes |
+| `GET /api/health/detailed`      | Full metrics            | Dashboards, debugging      |
+| `GET /api/metrics`              | Prometheus format       | Grafana scraping           |
+| `GET /api/admin/service-limits` | External service quotas | Admin monitoring           |
+
+## Service Limits Monitoring
+
+**Dashboard**: `/admin/service-limits` (admin-only)
+
+Monitors real-time usage across 5 external services:
+
+- Vercel (bandwidth, builds, functions)
+- Supabase (database, storage, connections)
+- Resend (email quota)
+- Azure OpenAI (TPM, RPM)
+- Redis KV (storage, commands)
+
+**Alert thresholds**: Warning (≥80%) | Critical (≥95%)
+
+**Reference**: docs/operations/RUNBOOK.md - Service Limits Monitoring section
 
 ## Grafana Cloud
 
 **Dashboard**: https://mirrorbuddy.grafana.net/d/dashboard/
 
 **Environment variables** (in `.env`):
+
 ```bash
 GRAFANA_CLOUD_PROMETHEUS_URL=https://...
 GRAFANA_CLOUD_PROMETHEUS_USER=...
@@ -25,11 +43,11 @@ GRAFANA_CLOUD_API_KEY=...
 
 ## Runbooks
 
-| Document | Purpose |
-|----------|---------|
-| `docs/operations/SLI-SLO.md` | Service level definitions |
-| `docs/operations/RUNBOOK.md` | Incident response |
-| `docs/operations/RUNBOOK-PROCEDURES.md` | Maintenance procedures |
+| Document                                | Purpose                   |
+| --------------------------------------- | ------------------------- |
+| `docs/operations/SLI-SLO.md`            | Service level definitions |
+| `docs/operations/RUNBOOK.md`            | Incident response         |
+| `docs/operations/RUNBOOK-PROCEDURES.md` | Maintenance procedures    |
 
 ## Observability Stack
 

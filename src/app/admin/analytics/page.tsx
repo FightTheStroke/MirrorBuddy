@@ -142,8 +142,8 @@ export default function AdminAnalyticsPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-          <p className="text-slate-600 dark:text-slate-400">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">
             Loading analytics...
           </p>
         </div>
@@ -155,7 +155,7 @@ export default function AdminAnalyticsPage() {
     <div className="max-w-7xl mx-auto">
       {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
-        <p className="text-sm text-slate-500 dark:text-slate-400">
+        <p className="text-sm text-muted-foreground">
           Last 7 days
         </p>
         <Button
@@ -262,29 +262,29 @@ export default function AdminAnalyticsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-emerald-600">
                     €{data.sessionMetrics?.cost.totalEur.toFixed(2) ?? "0.00"}
                   </p>
-                  <p className="text-xs text-slate-500">Total Cost</p>
+                  <p className="text-xs text-muted-foreground">Total Cost</p>
                 </div>
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-blue-600">
                     €
                     {data.sessionMetrics?.cost.p95PerSession.toFixed(3) ??
                       "0.000"}
                   </p>
-                  <p className="text-xs text-slate-500">P95 per Session</p>
+                  <p className="text-xs text-muted-foreground">P95 per Session</p>
                 </div>
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                  <p className="text-2xl font-bold text-indigo-600">
+                <div className="text-center p-3 bg-muted rounded-lg">
+                  <p className="text-2xl font-bold text-primary">
                     {formatNumber(data.sessionMetrics?.tokens.total ?? 0)}
                   </p>
-                  <p className="text-xs text-slate-500">Total Tokens</p>
+                  <p className="text-xs text-muted-foreground">Total Tokens</p>
                 </div>
               </div>
               <div className="space-y-2">
-                <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                <p className="text-sm font-medium text-muted-foreground">
                   Session Outcomes
                 </p>
                 {data.sessionMetrics?.outcomes &&
@@ -312,8 +312,8 @@ export default function AdminAnalyticsPage() {
                     ),
                   )}
               </div>
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-xs text-slate-500">
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs text-muted-foreground">
                   Pricing: €
                   {data.sessionMetrics?.cost.pricing.textPer1kTokens ?? 0.002}
                   /1K tokens • €
@@ -328,7 +328,7 @@ export default function AdminAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Coins className="h-5 w-5 text-indigo-500" />
+                <Coins className="h-5 w-5 text-primary" />
                 Token Usage
               </CardTitle>
               <CardDescription>
@@ -341,13 +341,13 @@ export default function AdminAnalyticsPage() {
                   ([action, stats]) => (
                     <div
                       key={action}
-                      className="flex items-center justify-between py-2 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                      className="flex items-center justify-between py-2 border-b border-border last:border-0"
                     >
                       <div>
-                        <p className="font-medium text-sm text-slate-900 dark:text-slate-100">
+                        <p className="font-medium text-sm text-foreground">
                           {action}
                         </p>
-                        <p className="text-xs text-slate-500">
+                        <p className="text-xs text-muted-foreground">
                           {stats.count} calls
                         </p>
                       </div>
@@ -377,8 +377,8 @@ export default function AdminAnalyticsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                  <p className="text-xs text-slate-500">Voice Sessions</p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">Voice Sessions</p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.voice.totalSessions ?? 0}
                   </p>
@@ -388,8 +388,8 @@ export default function AdminAnalyticsPage() {
                     min avg
                   </p>
                 </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                  <p className="text-xs text-slate-500">TTS Generations</p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">TTS Generations</p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.tts.totalGenerations ?? 0}
                   </p>
@@ -398,8 +398,8 @@ export default function AdminAnalyticsPage() {
                     chars
                   </p>
                 </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                  <p className="text-xs text-slate-500">Realtime Sessions</p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">Realtime Sessions</p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.realtime.totalSessions ?? 0}
                   </p>
@@ -408,8 +408,8 @@ export default function AdminAnalyticsPage() {
                     min
                   </p>
                 </div>
-                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                  <p className="text-xs text-slate-500">Total Voice Minutes</p>
+                <div className="p-3 bg-muted rounded-lg">
+                  <p className="text-xs text-muted-foreground">Total Voice Minutes</p>
                   <p className="text-xl font-bold">
                     {data.voiceMetrics?.voice.totalMinutes.toFixed(0) ?? 0}
                   </p>
@@ -438,28 +438,28 @@ export default function AdminAnalyticsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-blue-600">
                     {data.fsrsStats?.summary.totalCards ?? 0}
                   </p>
-                  <p className="text-xs text-slate-500">Total Cards</p>
+                  <p className="text-xs text-muted-foreground">Total Cards</p>
                 </div>
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-green-600">
                     {data.fsrsStats?.summary.accuracy ?? 0}%
                   </p>
-                  <p className="text-xs text-slate-500">Accuracy</p>
+                  <p className="text-xs text-muted-foreground">Accuracy</p>
                 </div>
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-amber-600">
                     {data.fsrsStats?.summary.cardsDueToday ?? 0}
                   </p>
-                  <p className="text-xs text-slate-500">Due Today</p>
+                  <p className="text-xs text-muted-foreground">Due Today</p>
                 </div>
               </div>
               {data.fsrsStats?.stateDistribution && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                  <p className="text-sm font-medium text-muted-foreground">
                     Card States
                   </p>
                   {Object.entries(data.fsrsStats.stateDistribution).map(
@@ -468,7 +468,7 @@ export default function AdminAnalyticsPage() {
                         key={state}
                         className="flex items-center justify-between text-sm"
                       >
-                        <span className="capitalize text-slate-600 dark:text-slate-400">
+                        <span className="capitalize text-muted-foreground">
                           {state}
                         </span>
                         <span className="font-mono">{count}</span>
@@ -493,29 +493,29 @@ export default function AdminAnalyticsPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-3 gap-4">
-                <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold">
                     {data.safetyEvents?.summary.totalEvents ?? 0}
                   </p>
-                  <p className="text-xs text-slate-500">Total</p>
+                  <p className="text-xs text-muted-foreground">Total</p>
                 </div>
                 <div className="text-center p-3 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                   <p className="text-2xl font-bold text-amber-600">
                     {data.safetyEvents?.summary.unresolvedCount ?? 0}
                   </p>
-                  <p className="text-xs text-slate-500">Unresolved</p>
+                  <p className="text-xs text-muted-foreground">Unresolved</p>
                 </div>
                 <div className="text-center p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
                   <p className="text-2xl font-bold text-red-600">
                     {data.safetyEvents?.summary.criticalCount ?? 0}
                   </p>
-                  <p className="text-xs text-slate-500">Critical</p>
+                  <p className="text-xs text-muted-foreground">Critical</p>
                 </div>
               </div>
               {data.safetyEvents?.bySeverity &&
                 Object.keys(data.safetyEvents.bySeverity).length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <p className="text-sm font-medium text-muted-foreground">
                       By Severity
                     </p>
                     {Object.entries(data.safetyEvents.bySeverity).map(
@@ -546,15 +546,15 @@ export default function AdminAnalyticsPage() {
               {data.safetyEvents?.recentEvents &&
                 data.safetyEvents.recentEvents.length > 0 && (
                   <div className="space-y-2">
-                    <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                    <p className="text-sm font-medium text-muted-foreground">
                       Recent Events
                     </p>
                     {data.safetyEvents.recentEvents.slice(0, 5).map((event) => (
                       <div
                         key={event.id}
-                        className="flex items-center justify-between text-xs py-1 border-b border-slate-100 dark:border-slate-800"
+                        className="flex items-center justify-between text-xs py-1 border-b border-border"
                       >
-                        <span className="text-slate-600 dark:text-slate-400">
+                        <span className="text-muted-foreground">
                           {event.type}
                         </span>
                         <span
@@ -632,12 +632,12 @@ export default function AdminAnalyticsPage() {
                 Object.entries(data.externalServices.byService).map(
                   ([service, metrics]) => (
                     <div key={service} className="space-y-2">
-                      <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                      <p className="text-sm font-medium text-foreground">
                         {service}
                       </p>
                       {metrics.map((m, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-muted rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
                                 m.status === "exceeded"
@@ -653,7 +653,7 @@ export default function AdminAnalyticsPage() {
                               }}
                             />
                           </div>
-                          <span className="text-xs text-slate-500 w-24 text-right">
+                          <span className="text-xs text-muted-foreground w-24 text-right">
                             {m.metric}
                           </span>
                           <span className="text-xs font-mono w-16 text-right">
@@ -664,8 +664,8 @@ export default function AdminAnalyticsPage() {
                     </div>
                   ),
                 )}
-              <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-                <p className="text-xs text-slate-500">
+              <div className="pt-2 border-t border-border">
+                <p className="text-xs text-muted-foreground">
                   Quotas: Azure{" "}
                   {data.externalServices?.quotas.azureOpenAI.chatTpm.toLocaleString()}{" "}
                   TPM • Drive{" "}

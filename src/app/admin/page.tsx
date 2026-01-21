@@ -41,23 +41,23 @@ function CollapsibleSection({
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden">
+    <div className="border border-border rounded-2xl overflow-hidden">
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between p-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+        className="w-full flex items-center justify-between p-6 bg-card hover:bg-accent transition-colors"
       >
-        <span className="font-medium text-slate-900 dark:text-white">
+        <span className="font-medium text-foreground">
           {title}
         </span>
         <ChevronDown
           className={cn(
-            "h-5 w-5 text-slate-500 transition-transform",
+            "h-5 w-5 text-muted-foreground transition-transform",
             isOpen && "rotate-180",
           )}
         />
       </button>
       {isOpen && (
-        <div className="p-4 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
+        <div className="p-6 border-t border-border bg-muted">
           {children}
         </div>
       )}
@@ -98,8 +98,8 @@ export default function AdminDashboardPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-          <p className="text-slate-600 dark:text-slate-400">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">
             Loading dashboard...
           </p>
         </div>

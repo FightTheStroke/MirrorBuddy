@@ -4,8 +4,8 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { CookiesContent } from "./content";
 
-export const COOKIES_VERSION = "1.0";
-const LAST_UPDATED = "18 Gennaio 2025";
+export const COOKIES_VERSION = "1.1";
+const LAST_UPDATED = "21 Gennaio 2025";
 
 export default function CookiesPage() {
   return (
@@ -58,7 +58,9 @@ export default function CookiesPage() {
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Usiamo pochissimi cookie, solo quelli utili</span>
+                <span>
+                  Solo 4 cookie essenziali (autenticazione e accessibilità)
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
@@ -70,13 +72,17 @@ export default function CookiesPage() {
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Cookie analytics solo se li accetti</span>
+                <span>
+                  Nessun cookie analytics installato (metriche lato server)
+                </span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Puoi disattivarli quando vuoi</span>
+                <span>
+                  I sub-responsabili (Vercel, Azure, Supabase) non usano cookie
+                </span>
               </li>
             </ul>
           </section>

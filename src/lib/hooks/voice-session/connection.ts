@@ -14,6 +14,8 @@ import { handleWebRTCTrack } from "./webrtc-handlers";
 import type { ConnectionRefs } from "./connection-types";
 import { getHeartbeatIntervalWithJitter } from "./constants";
 import { isWebRTCSupported } from "./webrtc-support";
+import { getDeviceInfo, getWebRTCCapabilities } from "./voice-error-logger";
+import { logVoiceDiagnosticsReport } from "./voice-diagnostics";
 
 // Pre-stringified heartbeat message to avoid JSON.stringify on every beat
 const HEARTBEAT_MESSAGE = JSON.stringify({
@@ -80,12 +82,22 @@ export function useConnect(
           sessionId: refs.sessionIdRef.current,
         });
 
-        // Check if WebRTC is supported
+        // Check if WebRTC is supported and log diagnostics
         const webrtcSupported = isWebRTCSupported();
+        const deviceInfo = getDeviceInfo();
+        const capabilities = getWebRTCCapabilities();
+        logger.info("[VoiceSession] Diagnostics", {
+          webrtcSupported,
+          deviceInfo,
+          capabilities,
+        });
+
         if (!webrtcSupported) {
           const errorMsg =
             "WebRTC non supportato dal browser. Aggiorna il browser o usa Chrome/Firefox/Safari.";
-          logger.error("[VoiceSession] WebRTC not supported");
+          logger.error("[VoiceSession] WebRTC not supported", { capabilities });
+          // Log full diagnostics report for debugging
+          await logVoiceDiagnosticsReport();
           setConnectionState("error");
           options.onStateChange?.("error");
           options.onError?.(new Error(errorMsg));
