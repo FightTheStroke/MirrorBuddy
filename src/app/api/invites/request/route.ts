@@ -7,6 +7,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
 interface InviteRequestBody {
   name: string;
@@ -85,6 +86,13 @@ export async function POST(request: NextRequest) {
       email: inviteRequest.email,
       hasTrialSession: !!trialSessionId,
     });
+
+    // Trigger admin counts push (F-06, F-27: non-blocking)
+    calculateAndPublishAdminCounts().catch((err) =>
+      logger.warn("Failed to publish admin counts on invite request", {
+        error: String(err),
+      }),
+    );
 
     // Send notifications (await to ensure delivery in serverless)
     const { notifyAdminNewRequest, sendRequestConfirmation } =
