@@ -4,6 +4,28 @@ CREATE TYPE "UserRole" AS ENUM ('USER', 'ADMIN');
 -- CreateEnum: InviteStatus (Beta invite system)
 CREATE TYPE "InviteStatus" AS ENUM ('PENDING', 'APPROVED', 'REJECTED');
 
+-- AlterTable: Add role column to User table (F-26: Role-based access control)
+ALTER TABLE "User" ADD COLUMN IF NOT EXISTS "role" "UserRole" NOT NULL DEFAULT 'USER';
+
+-- CreateIndex: Add index for role column
+CREATE INDEX IF NOT EXISTS "User_role_idx" ON "User"("role");
+
+-- CreateTable: UserActivity (for activity tracking)
+CREATE TABLE IF NOT EXISTS "UserActivity" (
+    "id" TEXT NOT NULL,
+    "identifier" TEXT NOT NULL,
+    "userType" TEXT NOT NULL,
+    "route" TEXT NOT NULL,
+    "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "UserActivity_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateIndex
+CREATE INDEX IF NOT EXISTS "UserActivity_timestamp_idx" ON "UserActivity"("timestamp");
+CREATE INDEX IF NOT EXISTS "UserActivity_userType_timestamp_idx" ON "UserActivity"("userType", "timestamp");
+CREATE INDEX IF NOT EXISTS "UserActivity_identifier_timestamp_idx" ON "UserActivity"("identifier", "timestamp");
+
 -- CreateTable
 CREATE TABLE "CoppaConsent" (
     "id" TEXT NOT NULL,
