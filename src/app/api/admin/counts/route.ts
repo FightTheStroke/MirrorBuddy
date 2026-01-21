@@ -25,6 +25,7 @@ export async function GET() {
     const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
     // Run all queries in parallel for performance
+    // F-06: Exclude test data from statistics (isTestData = false)
     const [
       pendingInvites,
       totalUsers,
@@ -36,10 +37,13 @@ export async function GET() {
         where: { status: "PENDING" },
       }),
 
-      // Total users
-      prisma.user.count(),
+      // Total users (F-06: exclude test data)
+      prisma.user.count({
+        where: { isTestData: false },
+      }),
 
       // Active users in last 24h (distinct user identifiers from UserActivity)
+      // Note: UserActivity doesn't have isTestData field, filtered at application level instead
       prisma.userActivity.groupBy({
         by: ["identifier"],
         where: {

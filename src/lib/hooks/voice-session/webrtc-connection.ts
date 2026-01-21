@@ -7,7 +7,7 @@
 
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
-import { CONNECTION_TIMEOUT_MS } from "./constants";
+import { getConnectionTimeout } from "./constants";
 import type {
   WebRTCConnectionConfig,
   WebRTCConnectionResult,
@@ -112,14 +112,34 @@ export class WebRTCConnection {
         "Il microfono non è disponibile. Assicurati di usare HTTPS o localhost.",
       );
     }
-    const audioConstraints: MediaTrackConstraints = {
-      echoCancellation: true,
-      noiseSuppression: true,
-      autoGainControl: true,
-    };
+
+    // Priority 1 Fix: Minimal iOS Audio Constraints (Safari iOS compatibility)
+    // Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 2
+    // iOS Safari has limited constraint support - simplify for compatibility
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    const audioConstraints: MediaTrackConstraints = isMobile
+      ? {
+          // iOS-compatible minimal constraints
+          echoCancellation: true,
+          noiseSuppression: true,
+          // Omit autoGainControl, sampleRate, channelCount for iOS compatibility
+        }
+      : {
+          // Desktop: full constraint set
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        };
+
     if (this.config.preferredMicrophoneId) {
       audioConstraints.deviceId = { ideal: this.config.preferredMicrophoneId };
     }
+
+    logger.debug(
+      `[WebRTC] getUserMedia constraints (${isMobile ? "mobile" : "desktop"})`,
+      { constraints: audioConstraints },
+    );
+
     try {
       logger.debug('[WebRTC] Requesting microphone access...', {
         preferredMicrophoneId: this.config.preferredMicrophoneId,
@@ -307,9 +327,11 @@ export class WebRTCConnection {
         return;
       }
       const pc = this.peerConnection;
+      const timeoutMs = getConnectionTimeout();
+      logger.debug(`[WebRTC] Connection timeout set to ${timeoutMs}ms`);
       this.connectionTimeout = setTimeout(
-        () => reject(new Error("Connection timeout")),
-        CONNECTION_TIMEOUT_MS,
+        () => reject(new Error(`Connection timeout after ${timeoutMs}ms`)),
+        timeoutMs,
       );
       const checkConnection = () => {
         if (pc.connectionState === "connected") {

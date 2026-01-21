@@ -98,6 +98,8 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
         <AdminHeader
           onMenuClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           sidebarOpen={sidebarOpen}
+          pendingInvites={counts.pendingInvites}
+          systemAlerts={counts.systemAlerts}
         />
         <main className="p-4 md:p-6">{children}</main>
       </div>

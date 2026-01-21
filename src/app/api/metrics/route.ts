@@ -28,6 +28,7 @@ export async function GET() {
     const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
     const dayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
+    // F-06: Exclude test data from all metrics
     // Fetch aggregated metrics from database
     const [
       totalUsers,
@@ -39,75 +40,89 @@ export async function GET() {
       errorCount,
       avgResponseTime,
     ] = await Promise.all([
-      // Total users
-      prisma.user.count(),
+      // Total users (F-06: exclude test data)
+      prisma.user.count({
+        where: { isTestData: false },
+      }),
 
-      // Active users in last hour (unique userIds in events)
+      // Active users in last hour (F-06: exclude test data)
       prisma.telemetryEvent
         .findMany({
-          where: { timestamp: { gte: hourAgo }, userId: { not: null } },
+          where: {
+            timestamp: { gte: hourAgo },
+            userId: { not: null },
+            isTestData: false,
+          },
           select: { userId: true },
           distinct: ["userId"],
         })
         .then((r) => r.length),
 
-      // Active users in last 24 hours
+      // Active users in last 24 hours (F-06: exclude test data)
       prisma.telemetryEvent
         .findMany({
-          where: { timestamp: { gte: dayAgo }, userId: { not: null } },
+          where: {
+            timestamp: { gte: dayAgo },
+            userId: { not: null },
+            isTestData: false,
+          },
           select: { userId: true },
           distinct: ["userId"],
         })
         .then((r) => r.length),
 
-      // Sessions in last hour
+      // Sessions in last hour (F-06: exclude test data)
       prisma.telemetryEvent.count({
         where: {
           category: "navigation",
           action: "session_started",
           timestamp: { gte: hourAgo },
+          isTestData: false,
         },
       }),
 
-      // Sessions in last 24 hours
+      // Sessions in last 24 hours (F-06: exclude test data)
       prisma.telemetryEvent.count({
         where: {
           category: "navigation",
           action: "session_started",
           timestamp: { gte: dayAgo },
+          isTestData: false,
         },
       }),
 
-      // Event counts by category (last hour)
+      // Event counts by category (last hour, F-06: exclude test data)
       prisma.telemetryEvent.groupBy({
         by: ["category"],
-        where: { timestamp: { gte: hourAgo } },
+        where: { timestamp: { gte: hourAgo }, isTestData: false },
         _count: true,
       }),
 
-      // Error count (last hour)
+      // Error count (last hour, F-06: exclude test data)
       prisma.telemetryEvent.count({
         where: {
           category: "error",
           timestamp: { gte: hourAgo },
+          isTestData: false,
         },
       }),
 
-      // Average API response time (last hour)
+      // Average API response time (last hour, F-06: exclude test data)
       prisma.telemetryEvent.aggregate({
         where: {
           category: "performance",
           action: "api_response",
           timestamp: { gte: hourAgo },
+          isTestData: false,
         },
         _avg: { value: true },
       }),
     ]);
 
-    // Fetch maestro usage metrics
+    // F-06: Fetch maestro usage metrics (exclude test data)
     const maestroUsage = await prisma.studySession.groupBy({
       by: ["maestroId"],
-      where: { startedAt: { gte: dayAgo } },
+      where: { startedAt: { gte: dayAgo }, isTestData: false },
       _count: true,
     });
 

@@ -59,6 +59,12 @@ export default async function RootLayout({
 
   return (
     <html lang="it" suppressHydrationWarning>
+      <head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+        />
+      </head>
       <body className={`${inter.className} antialiased`}>
         <Providers nonce={nonce}>
           <main id="main-content" data-testid="main-content">

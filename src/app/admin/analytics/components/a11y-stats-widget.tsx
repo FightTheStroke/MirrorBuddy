@@ -33,7 +33,7 @@ const PROFILE_COLORS: Record<string, string> = {
   motor: "bg-green-500",
   autism: "bg-teal-500",
   auditory: "bg-rose-500",
-  cerebral: "bg-indigo-500",
+  cerebral: "bg-primary",
 };
 
 interface A11yStatsWidgetProps {
@@ -62,40 +62,40 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
       <CardContent className="space-y-4">
         {/* Summary stats */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+          <div className="text-center p-3 bg-muted rounded-lg">
             <p className="text-2xl font-bold text-violet-600">
               {data.summary.totalActivations}
             </p>
-            <p className="text-xs text-slate-500">Profile Activations</p>
+            <p className="text-xs text-muted-foreground">Profile Activations</p>
           </div>
-          <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+          <div className="text-center p-3 bg-muted rounded-lg">
             <p className="text-2xl font-bold text-blue-600">
               {data.summary.uniqueSessions}
             </p>
-            <p className="text-xs text-slate-500">Unique Sessions</p>
+            <p className="text-xs text-muted-foreground">Unique Sessions</p>
           </div>
-          <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-            <p className="text-2xl font-bold text-slate-600">
+          <div className="text-center p-3 bg-muted rounded-lg">
+            <p className="text-2xl font-bold text-foreground">
               {data.summary.resetCount}
             </p>
-            <p className="text-xs text-slate-500">Resets</p>
+            <p className="text-xs text-muted-foreground">Resets</p>
           </div>
         </div>
 
         {/* Profile distribution */}
         {totalProfiles > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            <p className="text-sm font-medium text-muted-foreground">
               Profile Distribution
             </p>
-            <div className="flex h-4 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800">
+            <div className="flex h-4 rounded-full overflow-hidden bg-muted">
               {Object.entries(data.byProfile).map(([profile, count]) => {
                 const percentage = (count / totalProfiles) * 100;
                 if (percentage === 0) return null;
                 return (
                   <div
                     key={profile}
-                    className={`${PROFILE_COLORS[profile] ?? "bg-gray-500"} transition-all`}
+                    className={`${PROFILE_COLORS[profile] ?? "bg-muted0"} transition-all`}
                     style={{ width: `${percentage}%` }}
                     title={`${PROFILE_LABELS[profile] ?? profile}: ${count} (${percentage.toFixed(1)}%)`}
                   />
@@ -111,12 +111,14 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
                     className="flex items-center gap-1 text-xs"
                   >
                     <div
-                      className={`w-2 h-2 rounded-full ${PROFILE_COLORS[profile] ?? "bg-gray-500"}`}
+                      className={`w-2 h-2 rounded-full ${PROFILE_COLORS[profile] ?? "bg-muted0"}`}
                     />
-                    <span className="text-slate-600 dark:text-slate-400">
+                    <span className="text-muted-foreground">
                       {PROFILE_LABELS[profile] ?? profile}
                     </span>
-                    <span className="font-mono text-slate-500">{count}</span>
+                    <span className="font-mono text-muted-foreground">
+                      {count}
+                    </span>
                   </div>
                 ))}
             </div>
@@ -126,7 +128,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {/* Toggle usage */}
         {Object.keys(data.byToggle).length > 0 && (
           <div className="space-y-2">
-            <p className="text-sm font-medium text-slate-600 dark:text-slate-400">
+            <p className="text-sm font-medium text-muted-foreground">
               Most Used Toggles
             </p>
             {Object.entries(data.byToggle)
@@ -137,9 +139,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
                   key={toggle}
                   className="flex items-center justify-between text-sm"
                 >
-                  <span className="text-slate-600 dark:text-slate-400">
-                    {toggle}
-                  </span>
+                  <span className="text-muted-foreground">{toggle}</span>
                   <span className="font-mono">{count}</span>
                 </div>
               ))}
@@ -150,7 +150,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {totalProfiles === 0 &&
           Object.keys(data.byToggle).length === 0 &&
           data.summary.resetCount === 0 && (
-            <p className="text-sm text-slate-500 text-center py-4">
+            <p className="text-sm text-muted-foreground text-center py-4">
               No accessibility events recorded yet
             </p>
           )}

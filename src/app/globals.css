@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Custom breakpoints for mobile-first design */
+@custom-media --xs (width >= 375px);
+
 /* Enable class-based dark mode for next-themes compatibility */
 @custom-variant dark (&:where(.dark, .dark *));
 

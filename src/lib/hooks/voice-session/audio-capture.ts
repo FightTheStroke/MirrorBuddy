@@ -29,13 +29,15 @@ export function useStartAudioCapture(
   refs: AudioCaptureRefs,
   setInputLevel: (value: number) => void,
 ) {
-  return useCallback(() => {
+  return useCallback(async () => {
     if (!refs.mediaStreamRef.current) {
       logger.warn("[VoiceSession] Cannot start capture: missing media stream");
       return;
     }
 
-    // Lazily create AudioContext for input level visualization (WebRTC mode)
+    // Priority 1 Fix: AudioContext User Gesture Compliance (iOS Safari)
+    // Create AudioContext lazily in user gesture handler (not on page load)
+    // Ref: docs/voice-mobile-investigation-report.md - Priority 1, Item 1
     if (!refs.captureContextRef.current) {
       try {
         // eslint-disable-next-line react-hooks/immutability -- Lazy initialization
@@ -49,6 +51,16 @@ export function useStartAudioCapture(
           "[VoiceSession] Created AudioContext for input level monitoring",
           { state: context.state },
         );
+
+        // Resume immediately after creation (iOS Safari requirement)
+        if (context.state === "suspended") {
+          try {
+            await context.resume();
+            logger.debug("[VoiceSession] AudioContext resumed after creation");
+          } catch (err) {
+            logger.warn("[VoiceSession] Failed to resume AudioContext", { err });
+          }
+        }
       } catch (error) {
         logger.error(
           "[VoiceSession] Failed to create AudioContext",

@@ -27,9 +27,10 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
-    // Get aggregate session metrics
+    // F-06: Exclude test data from statistics
+    // Get aggregate session metrics (only real data)
     const aggregates = await prisma.sessionMetrics.aggregate({
-      where: { createdAt: { gte: startDate } },
+      where: { createdAt: { gte: startDate }, isTestData: false },
       _sum: {
         turnCount: true,
         tokensIn: true,
@@ -49,27 +50,29 @@ export async function GET(request: Request) {
       _count: true,
     });
 
-    // Get outcome distribution
+    // Get outcome distribution (F-06: exclude test data)
     const outcomes = await prisma.sessionMetrics.groupBy({
       by: ["outcome"],
-      where: { createdAt: { gte: startDate } },
+      where: { createdAt: { gte: startDate }, isTestData: false },
       _count: true,
     });
 
-    // Get severity distribution
+    // Get severity distribution (F-06: exclude test data)
     const severities = await prisma.sessionMetrics.groupBy({
       by: ["incidentSeverity"],
       where: {
         createdAt: { gte: startDate },
         incidentSeverity: { not: null },
+        isTestData: false,
       },
       _count: true,
     });
 
     // Get daily metrics using Prisma groupBy instead of raw SQL for portability
+    // F-06: exclude test data
     const dailyGrouped = await prisma.sessionMetrics.groupBy({
       by: ["createdAt"],
-      where: { createdAt: { gte: startDate } },
+      where: { createdAt: { gte: startDate }, isTestData: false },
       _count: true,
       _sum: { costEur: true, tokensIn: true, tokensOut: true },
     });

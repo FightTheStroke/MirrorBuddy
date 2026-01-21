@@ -30,13 +30,15 @@ export async function GET(request: Request) {
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - days);
 
+    // F-06: Exclude test data from voice metrics statistics
     // Get voice-related events from telemetry
     const [voiceEvents, ttsEvents, realtimeEvents] = await Promise.all([
-      // Voice input/transcription events
+      // Voice input/transcription events (exclude test data)
       prisma.telemetryEvent.findMany({
         where: {
           category: "voice",
           timestamp: { gte: startDate },
+          isTestData: false,
         },
         select: {
           action: true,
@@ -44,23 +46,25 @@ export async function GET(request: Request) {
           timestamp: true,
         },
       }),
-      // TTS events
+      // TTS events (exclude test data)
       prisma.telemetryEvent.findMany({
         where: {
           category: "ai",
           action: "tts_generation",
           timestamp: { gte: startDate },
+          isTestData: false,
         },
         select: {
           value: true,
           timestamp: true,
         },
       }),
-      // Realtime session events
+      // Realtime session events (exclude test data)
       prisma.telemetryEvent.findMany({
         where: {
           category: "realtime",
           timestamp: { gte: startDate },
+          isTestData: false,
         },
         select: {
           action: true,

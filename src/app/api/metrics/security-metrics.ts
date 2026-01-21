@@ -53,13 +53,14 @@ export async function generateSecurityMetrics(): Promise<MetricLine[]> {
     });
   }
 
-  // Database-tracked security events (persistent across deploys)
+  // F-06: Database-tracked security events (persistent across deploys, exclude test data)
   try {
     const securityEvents = await prisma.telemetryEvent.groupBy({
       by: ["action"],
       where: {
         category: "security",
         timestamp: { gte: dayAgo },
+        isTestData: false,
       },
       _count: true,
     });

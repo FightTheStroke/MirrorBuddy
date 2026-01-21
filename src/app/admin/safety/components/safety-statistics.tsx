@@ -29,9 +29,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-red-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Blocked
-                </span>
+                <span className="text-sm text-muted-foreground">Blocked</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.blockedCount}
@@ -40,9 +38,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Modified
-                </span>
+                <span className="text-sm text-muted-foreground">Modified</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.modifiedCount}
@@ -51,9 +47,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-orange-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Escalated
-                </span>
+                <span className="text-sm text-muted-foreground">Escalated</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.escalatedCount}
@@ -62,9 +56,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Monitored
-                </span>
+                <span className="text-sm text-muted-foreground">Monitored</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.monitoredCount}
@@ -73,9 +65,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Allowed
-                </span>
+                <span className="text-sm text-muted-foreground">Allowed</span>
               </div>
               <span className="font-mono font-bold">
                 {statistics.mitigationMetrics.allowedCount}
@@ -99,7 +89,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
         <CardContent>
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="text-sm font-medium text-muted-foreground">
                 EU AI Act
               </span>
               <span className="font-mono font-bold">
@@ -107,7 +97,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="text-sm font-medium text-muted-foreground">
                 GDPR
               </span>
               <span className="font-mono font-bold">
@@ -115,7 +105,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="text-sm font-medium text-muted-foreground">
                 COPPA
               </span>
               <span className="font-mono font-bold">
@@ -123,7 +113,7 @@ export function SafetyStatistics({ statistics }: SafetyStatisticsProps) {
               </span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+              <span className="text-sm font-medium text-muted-foreground">
                 Italian L.132 Art.4
               </span>
               <span className="font-mono font-bold">

@@ -85,15 +85,15 @@ export function UsersBulkActions({
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
-      <div className="flex items-center gap-3 px-4 py-3 bg-slate-900 text-white rounded-xl shadow-xl">
+      <div className="flex items-center gap-3 px-4 py-3 bg-popover text-popover-foreground border border-border rounded-xl shadow-xl">
         <span className="text-sm font-medium">{count} selezionati</span>
-        <div className="h-4 w-px bg-slate-700" />
+        <div className="h-4 w-px bg-border" />
         <Button
           size="sm"
           variant="ghost"
           onClick={handleBulkEnable}
           disabled={isLoading}
-          className="text-white hover:bg-slate-800"
+          className="hover:bg-accent"
         >
           <Unlock className="w-4 h-4 mr-1" />
           Abilita
@@ -103,7 +103,7 @@ export function UsersBulkActions({
           variant="ghost"
           onClick={handleBulkDisable}
           disabled={isLoading}
-          className="text-white hover:bg-slate-800"
+          className="hover:bg-accent"
         >
           <Lock className="w-4 h-4 mr-1" />
           Disabilita
@@ -113,17 +113,17 @@ export function UsersBulkActions({
           variant="ghost"
           onClick={handleBulkDelete}
           disabled={isLoading}
-          className="text-red-400 hover:bg-red-900/50"
+          className="text-destructive hover:bg-destructive/10"
         >
           <Trash2 className="w-4 h-4 mr-1" />
           Elimina
         </Button>
-        <div className="h-4 w-px bg-slate-700" />
+        <div className="h-4 w-px bg-border" />
         <Button
           size="sm"
           variant="ghost"
           onClick={onClearSelection}
-          className="text-slate-400 hover:bg-slate-800"
+          className="hover:bg-accent"
         >
           <X className="w-4 h-4" />
         </Button>

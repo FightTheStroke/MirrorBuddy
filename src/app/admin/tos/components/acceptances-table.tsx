@@ -69,46 +69,43 @@ export function AcceptancesTable({
       <CardContent>
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="border-b border-slate-200 dark:border-slate-700">
+            <thead className="border-b border-border">
               <tr>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   User
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   Email
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   Version
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   Accepted At
                 </th>
-                <th className="px-4 py-3 text-left text-sm font-medium text-slate-600 dark:text-slate-400">
+                <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                   IP (Last Segment)
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
               {acceptances.map((acceptance) => (
-                <tr
-                  key={acceptance.id}
-                  className="hover:bg-slate-50 dark:hover:bg-slate-800/50"
-                >
-                  <td className="px-4 py-3 text-sm text-slate-900 dark:text-slate-100">
+                <tr key={acceptance.id} className="hover:bg-accent">
+                  <td className="px-4 py-3 text-sm text-foreground">
                     {acceptance.user.profile?.name || "—"}
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {acceptance.user.googleAccount?.email || "—"}
                   </td>
                   <td className="px-4 py-3 text-sm">
-                    <span className="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded">
+                    <span className="px-2 py-1 bg-primary/10 text-primary rounded">
                       v{acceptance.version}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">
+                  <td className="px-4 py-3 text-sm text-muted-foreground">
                     {formatDate(acceptance.acceptedAt)}
                   </td>
-                  <td className="px-4 py-3 text-sm font-mono text-slate-500 dark:text-slate-500">
+                  <td className="px-4 py-3 text-sm font-mono text-muted-foreground dark:text-muted-foreground">
                     {acceptance.ipAddress || "—"}
                   </td>
                 </tr>
@@ -118,7 +115,7 @@ export function AcceptancesTable({
         </div>
 
         {/* Pagination */}
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">
           <Button
             variant="outline"
             size="sm"
@@ -129,7 +126,7 @@ export function AcceptancesTable({
             Previous
           </Button>
 
-          <p className="text-sm text-slate-600 dark:text-slate-400">
+          <p className="text-sm text-muted-foreground">
             Page {pagination.page} of {pagination.totalPages}
           </p>
 

@@ -1,7 +1,10 @@
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import { MessageBubble, CharacterAvatar } from './index';
-import type { ActiveCharacter, FlowMessage } from '@/lib/stores/conversation-flow-store';
+import { motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
+import { MessageBubble, CharacterAvatar } from "./index";
+import type {
+  ActiveCharacter,
+  FlowMessage,
+} from "@/lib/stores/conversation-flow-store";
 
 interface ChatLayoutProps {
   messages: FlowMessage[];
@@ -18,16 +21,22 @@ export function ChatLayout({
 }: ChatLayoutProps) {
   return (
     <div
-      className="flex-1 overflow-y-auto p-4"
+      className="flex-1 overflow-y-auto p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       role="log"
       aria-live="polite"
       aria-label="Messaggi della conversazione"
+      style={{
+        scrollBehavior: "smooth",
+        WebkitOverflowScrolling: "touch",
+      }}
     >
       {messages.map((message) => (
         <MessageBubble
           key={message.id}
           message={message}
-          activeCharacter={message.role === 'assistant' ? activeCharacter : null}
+          activeCharacter={
+            message.role === "assistant" ? activeCharacter : null
+          }
         />
       ))}
       {isLoading && activeCharacter && (
@@ -46,4 +55,3 @@ export function ChatLayout({
     </div>
   );
 }
-
