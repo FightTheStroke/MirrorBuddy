@@ -4,17 +4,42 @@
 
 `e2e/global-setup.ts` MUST bypass all "wall" components:
 
-| Wall Component    | localStorage Key         | Required |
-| ----------------- | ------------------------ | -------- |
-| CookieConsentWall | `mirrorbuddy-consent`    | Yes      |
-| OnboardingStore   | `mirrorbuddy-onboarding` | Yes      |
-| TosGateProvider   | (inside consent)         | N/A      |
+| Wall Component    | localStorage Key         | API Mock Required    |
+| ----------------- | ------------------------ | -------------------- |
+| CookieConsentWall | `mirrorbuddy-consent`    | No                   |
+| OnboardingStore   | `mirrorbuddy-onboarding` | No                   |
+| TosGateProvider   | `mirrorbuddy-consent`    | **Yes - `/api/tos`** |
+
+### TosGateProvider Special Case
+
+TosGateProvider checks **both** localStorage AND calls `GET /api/tos` on mount.
+
+**In test-specific contexts** (e.g., admin tests with manual auth setup):
+
+```typescript
+// Mock ToS acceptance status to prevent modal from blocking UI
+await page.route("/api/tos", async (route) => {
+  await route.fulfill({
+    status: 200,
+    contentType: "application/json",
+    body: JSON.stringify({
+      accepted: true,
+      version: "1.0",
+    }),
+  });
+});
+```
+
+**Why needed**: Without this mock, TosGateProvider receives `{accepted: false}` from the API, shows the ToS modal overlay, and blocks all pointer events on the page.
+
+**Symptom**: Test timeout with error "element intercepts pointer events" showing ToS modal heading.
 
 ## When Adding New "Wall" Components
 
 1. Update `e2e/global-setup.ts` localStorage array
 2. Add the bypass key and valid JSON value
-3. Run E2E tests locally before pushing
+3. **If component calls APIs on mount**: Mock those endpoints in tests
+4. Run E2E tests locally before pushing
 
 ## Common Failure Patterns
 
