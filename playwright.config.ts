@@ -160,13 +160,21 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 120000,
     env: {
-      ...(process.env.TEST_DATABASE_URL && {
-        DATABASE_URL: process.env.TEST_DATABASE_URL,
-        TEST_DATABASE_URL: process.env.TEST_DATABASE_URL,
-      }),
-      ...(process.env.TEST_DIRECT_URL && {
-        DIRECT_URL: process.env.TEST_DIRECT_URL,
-      }),
+      // CRITICAL: Pass database URLs unconditionally to avoid fallback to OS user
+      // In CI, TEST_DATABASE_URL/DATABASE_URL are set with explicit postgres:postgres credentials
+      // Without this, Next.js would use fallback connection strings which may use OS user 'root'
+      DATABASE_URL:
+        process.env.TEST_DATABASE_URL ||
+        process.env.DATABASE_URL ||
+        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
+      TEST_DATABASE_URL:
+        process.env.TEST_DATABASE_URL ||
+        process.env.DATABASE_URL ||
+        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
+      DIRECT_URL:
+        process.env.TEST_DIRECT_URL ||
+        process.env.DIRECT_URL ||
+        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test",
       E2E_TESTS: "1",
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match

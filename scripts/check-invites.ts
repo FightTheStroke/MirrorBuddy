@@ -6,7 +6,8 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
 
 const connectionString =
-  process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
+  process.env.DATABASE_URL ||
+  "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
 const pool = new Pool({
   connectionString,

@@ -33,7 +33,8 @@ import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
  */
 function createPrismaClient(): PrismaClient {
   const connectionString =
-    process.env.DATABASE_URL || "postgresql://localhost:5432/mirrorbuddy";
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
   const isProduction =
     process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
