@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   UserPlus,
   Users,
@@ -17,15 +17,9 @@ import { CostPanel } from "@/components/admin/CostPanel";
 import { FeatureFlagsPanel } from "@/components/admin/FeatureFlagsPanel";
 import { SLOMonitoringPanel } from "@/components/admin/SLOMonitoringPanel";
 import { cn } from "@/lib/utils";
+import { useAdminCountsSSE } from "@/hooks/use-admin-counts-sse";
 
 const GRAFANA_DASHBOARD_URL = "https://mirrorbuddy.grafana.net/d/dashboard/";
-
-interface AdminCounts {
-  pendingInvites: number;
-  totalUsers: number;
-  activeUsers24h: number;
-  systemAlerts: number;
-}
 
 interface CollapsibleSectionProps {
   title: string;
@@ -46,9 +40,7 @@ function CollapsibleSection({
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between p-6 bg-card hover:bg-accent transition-colors"
       >
-        <span className="font-medium text-foreground">
-          {title}
-        </span>
+        <span className="font-medium text-foreground">{title}</span>
         <ChevronDown
           className={cn(
             "h-5 w-5 text-muted-foreground transition-transform",
@@ -57,51 +49,35 @@ function CollapsibleSection({
         />
       </button>
       {isOpen && (
-        <div className="p-6 border-t border-border bg-muted">
-          {children}
-        </div>
+        <div className="p-6 border-t border-border bg-muted">{children}</div>
       )}
     </div>
   );
 }
 
 export default function AdminDashboardPage() {
-  const [counts, setCounts] = useState<AdminCounts | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { counts, status, error } = useAdminCountsSSE();
 
-  const fetchCounts = async (isRefresh = false) => {
-    if (isRefresh) setRefreshing(true);
-    setError(null);
-
-    try {
-      const response = await fetch("/api/admin/counts");
-      if (!response.ok) throw new Error("Failed to fetch counts");
-      const data = await response.json();
-      setCounts(data);
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Error loading data");
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
+  // Handle manual refresh (re-establish SSE connection)
+  const handleManualRefresh = async () => {
+    setIsRefreshing(true);
+    // Trigger a manual page reload to re-establish SSE connection
+    // In a more sophisticated implementation, we could implement a refresh signal
+    // via postMessage or similar mechanism, but page reload ensures fresh state
+    setTimeout(() => {
+      setIsRefreshing(false);
+      window.location.reload();
+    }, 500);
   };
 
-  useEffect(() => {
-    fetchCounts();
-    const interval = setInterval(() => fetchCounts(), 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  if (loading) {
+  // Show loading state while connecting
+  if (status === "idle" || status === "connecting") {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">
-            Loading dashboard...
-          </p>
+          <p className="text-muted-foreground">Loading dashboard...</p>
         </div>
       </div>
     );
@@ -109,6 +85,22 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="max-w-6xl mx-auto">
+      {/* Connection Status Indicators */}
+      {status === "reconnecting" && (
+        <div className="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+          <p className="text-sm text-yellow-700 dark:text-yellow-300">
+            Reconnecting to admin data stream...
+          </p>
+        </div>
+      )}
+      {status === "error" && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+          <p className="text-sm text-red-700 dark:text-red-300">
+            {error || "Connection failed. Please refresh the page."}
+          </p>
+        </div>
+      )}
+
       {/* Toolbar */}
       <div className="flex items-center justify-end gap-2 mb-6">
         <Button variant="outline" size="sm" asChild>
@@ -124,38 +116,31 @@ export default function AdminDashboardPage() {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => fetchCounts(true)}
-          disabled={refreshing}
+          onClick={handleManualRefresh}
+          disabled={isRefreshing}
         >
           <RefreshCw
-            className={cn("h-4 w-4 mr-2", refreshing && "animate-spin")}
+            className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")}
           />
           Aggiorna
         </Button>
       </div>
 
-      {/* Error */}
-      {error && (
-        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-        </div>
-      )}
-
       {/* KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <KpiCard
           title="Richieste Beta"
-          value={counts?.pendingInvites ?? 0}
+          value={counts.pendingInvites}
           subValue="In attesa di approvazione"
           icon={UserPlus}
           href="/admin/invites"
-          badge={counts?.pendingInvites}
+          badge={counts.pendingInvites}
           badgeColor="amber"
           color="purple"
         />
         <KpiCard
           title="Utenti Totali"
-          value={counts?.totalUsers ?? 0}
+          value={counts.totalUsers}
           subValue="Utenti registrati"
           icon={Users}
           href="/admin/users"
@@ -163,7 +148,7 @@ export default function AdminDashboardPage() {
         />
         <KpiCard
           title="Utenti Attivi"
-          value={counts?.activeUsers24h ?? 0}
+          value={counts.activeUsers24h}
           subValue="Nelle ultime 24 ore"
           icon={Activity}
           href="/admin/analytics"
@@ -171,12 +156,12 @@ export default function AdminDashboardPage() {
         />
         <KpiCard
           title="Alert Sistema"
-          value={counts?.systemAlerts ?? 0}
+          value={counts.systemAlerts}
           subValue="Eventi critici non risolti"
           icon={AlertTriangle}
-          badge={counts?.systemAlerts}
-          badgeColor={counts?.systemAlerts ? "red" : "green"}
-          color={counts?.systemAlerts ? "red" : "green"}
+          badge={counts.systemAlerts}
+          badgeColor={counts.systemAlerts ? "red" : "green"}
+          color={counts.systemAlerts ? "red" : "green"}
         />
       </div>
 
