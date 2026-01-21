@@ -97,10 +97,8 @@ export default function AdminTosPage() {
     return (
       <div className="flex items-center justify-center py-24">
         <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
-          <p className="text-slate-600 dark:text-slate-400">
-            Loading ToS acceptances...
-          </p>
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Loading ToS acceptances...</p>
         </div>
       </div>
     );

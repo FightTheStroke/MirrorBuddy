@@ -22,10 +22,10 @@ export function SummaryStats({
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-sm font-medium text-muted-foreground">
                 Total Acceptances
               </p>
-              <p className="text-2xl font-bold mt-1 text-slate-900 dark:text-slate-100">
+              <p className="text-2xl font-bold mt-1 text-foreground">
                 {totalAcceptances}
               </p>
             </div>
@@ -40,10 +40,10 @@ export function SummaryStats({
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-sm font-medium text-muted-foreground">
                 Unique Users
               </p>
-              <p className="text-2xl font-bold mt-1 text-slate-900 dark:text-slate-100">
+              <p className="text-2xl font-bold mt-1 text-foreground">
                 {uniqueUsers}
               </p>
             </div>
@@ -58,18 +58,15 @@ export function SummaryStats({
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+              <p className="text-sm font-medium text-muted-foreground">
                 Versions
               </p>
-              <p className="text-2xl font-bold mt-1 text-slate-900 dark:text-slate-100">
+              <p className="text-2xl font-bold mt-1 text-foreground">
                 {Object.keys(versionCounts).length}
               </p>
               <div className="mt-2 space-y-1">
                 {Object.entries(versionCounts).map(([version, count]) => (
-                  <p
-                    key={version}
-                    className="text-xs text-slate-500 dark:text-slate-400"
-                  >
+                  <p key={version} className="text-xs text-muted-foreground">
                     v{version}: {count}
                   </p>
                 ))}

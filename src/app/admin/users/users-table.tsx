@@ -3,6 +3,15 @@
 import { useCallback, useEffect, useState, useMemo } from "react";
 import { AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableEmpty,
+} from "@/components/ui/table";
 import { UsersBulkActions } from "./users-bulk-actions";
 import { UsersSearch } from "./users-search";
 import { UsersTrashToolbar } from "./users-trash-toolbar";
@@ -115,59 +124,46 @@ export function UsersTable({ users }: { users: User[] }) {
         : new Set(filteredUsers.map((u) => u.id)),
     );
 
-  const tabs: { key: FilterTab; label: string }[] = [
-    { key: "all", label: "Tutti" },
-    { key: "active", label: "Attivi" },
-    { key: "disabled", label: "Disabilitati" },
-    { key: "trash", label: "Cestino" },
-  ];
-
   return (
     <div>
       {error && (
-        <div className="mb-4 bg-red-50 border border-red-200 rounded-lg p-3 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 text-red-600" />
-          <p className="text-red-700 text-sm">{error}</p>
+        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-3 flex items-center gap-2">
+          <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
+          <p className="text-red-700 dark:text-red-300 text-sm">{error}</p>
         </div>
       )}
 
-      <div className="flex gap-2 mb-4 border-b border-slate-200">
-        {tabs.map((tab) => (
-          <button
-            key={tab.key}
-            onClick={() => {
-              setFilter(tab.key);
-              setSelectedIds(new Set());
-            }}
-            className={`px-4 py-2 text-sm font-medium ${
-              filter === tab.key
-                ? "text-blue-600 border-b-2 border-blue-600"
-                : "text-slate-600 hover:text-slate-900"
-            }`}
-          >
-            {tab.label}
-            {tab.key === "trash" ? ` (${deletedBackups.length})` : ""}
-            {tab.key === "all" ? ` (${users.length})` : ""}
-          </button>
-        ))}
-      </div>
+      <Tabs
+        value={filter}
+        onValueChange={(value) => {
+          setFilter(value as FilterTab);
+          setSelectedIds(new Set());
+        }}
+      >
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">Tutti ({users.length})</TabsTrigger>
+          <TabsTrigger value="active">Attivi</TabsTrigger>
+          <TabsTrigger value="disabled">Disabilitati</TabsTrigger>
+          <TabsTrigger value="trash">
+            Cestino ({deletedBackups.length})
+          </TabsTrigger>
+        </TabsList>
 
-      {filter !== "trash" && (
-        <UsersSearch value={search} onChange={setSearch} />
-      )}
-      {filter === "trash" && (
-        <UsersTrashToolbar
-          count={deletedBackups.length}
-          onEmptyComplete={loadTrash}
-        />
-      )}
+        {filter !== "trash" && (
+          <UsersSearch value={search} onChange={setSearch} />
+        )}
+        {filter === "trash" && (
+          <UsersTrashToolbar
+            count={deletedBackups.length}
+            onEmptyComplete={loadTrash}
+          />
+        )}
 
-      <div className="overflow-x-auto border border-slate-200 rounded-lg">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-100 border-b border-slate-200">
+        <Table>
+          <TableHeader>
+            <TableRow>
               {filter !== "trash" && (
-                <th className="px-3 py-3 w-10">
+                <TableHead className="w-10">
                   <input
                     type="checkbox"
                     checked={
@@ -177,23 +173,23 @@ export function UsersTable({ users }: { users: User[] }) {
                     onChange={toggleSelectAll}
                     className="rounded"
                   />
-                </th>
+                </TableHead>
               )}
-              <th className="px-4 py-3 text-left font-semibold">Username</th>
-              <th className="px-4 py-3 text-left font-semibold">Email</th>
+              <TableHead>Username</TableHead>
+              <TableHead>Email</TableHead>
               {filter !== "trash" && (
                 <>
-                  <th className="px-4 py-3 text-left font-semibold">Role</th>
-                  <th className="px-4 py-3 text-left font-semibold">Status</th>
+                  <TableHead>Role</TableHead>
+                  <TableHead>Status</TableHead>
                 </>
               )}
-              <th className="px-4 py-3 text-left font-semibold">
+              <TableHead>
                 {filter === "trash" ? "Eliminato" : "Creato"}
-              </th>
-              <th className="px-4 py-3 text-left font-semibold">Azioni</th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+              <TableHead>Azioni</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {filter === "trash"
               ? deletedBackups.map((b) => (
                   <UsersTrashRow
@@ -216,23 +212,22 @@ export function UsersTable({ users }: { users: User[] }) {
                     onDelete={() => handleAction(user.id, "delete")}
                   />
                 ))}
-          </tbody>
-        </table>
+          </TableBody>
+        </Table>
+
         {filter !== "trash" && filteredUsers.length === 0 && (
-          <div className="text-center py-8 text-slate-500">
-            Nessun utente trovato
-          </div>
+          <TableEmpty>Nessun utente trovato</TableEmpty>
         )}
         {filter === "trash" && deletedBackups.length === 0 && (
-          <div className="text-center py-8 text-slate-500">Cestino vuoto</div>
+          <TableEmpty>Cestino vuoto</TableEmpty>
         )}
-      </div>
 
-      <UsersBulkActions
-        selectedIds={selectedIds}
-        onClearSelection={() => setSelectedIds(new Set())}
-        onActionComplete={() => window.location.reload()}
-      />
+        <UsersBulkActions
+          selectedIds={selectedIds}
+          onClearSelection={() => setSelectedIds(new Set())}
+          onActionComplete={() => window.location.reload()}
+        />
+      </Tabs>
     </div>
   );
 }

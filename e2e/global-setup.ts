@@ -25,6 +25,17 @@ function signCookieValue(value: string): string {
 }
 
 async function globalSetup() {
+  // ENVIRONMENT GUARD: Block tests in production (F-03)
+  // E2E tests MUST never run in production - they corrupt real user data
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CRITICAL SAFETY ERROR: E2E tests are blocked in production environment.\n" +
+        "E2E tests would corrupt real user data, delete sessions, and cause data loss.\n" +
+        "Set NODE_ENV=development or NODE_ENV=test to run tests.\n" +
+        "Contact DevOps if you believe this is incorrect.",
+    );
+  }
+
   // Ensure .auth directory exists
   const authDir = path.dirname(STORAGE_STATE_PATH);
   if (!fs.existsSync(authDir)) {

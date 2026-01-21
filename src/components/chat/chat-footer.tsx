@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { Send } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import React from 'react';
+import { Send } from "lucide-react";
+import { cn } from "@/lib/utils";
+import React from "react";
 
 interface ChatFooterProps {
   input: string;
@@ -32,26 +32,26 @@ export function ChatFooter({
   return (
     <footer
       className={cn(
-        'border-t p-4',
+        "border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]",
         highContrast
-          ? 'border-yellow-400 bg-black'
-          : 'border-slate-200 dark:border-slate-700'
+          ? "border-yellow-400 bg-black"
+          : "border-slate-200 dark:border-slate-700",
       )}
     >
-      <form onSubmit={onSubmit} className="flex gap-3">
+      <form onSubmit={onSubmit} className="flex gap-3 items-end">
         <textarea
           ref={inputRef}
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder="Scrivi un messaggio..."
-          rows={1}
+          rows={3}
           className={cn(
-            'flex-1 resize-none rounded-xl px-4 py-3 focus:outline-none focus:ring-2',
+            "flex-1 resize-none rounded-xl px-4 py-3 min-h-[120px] md:min-h-0 md:rows-1 focus:outline-none focus:ring-2",
             highContrast
-              ? 'bg-gray-900 text-white border-2 border-yellow-400 focus:ring-yellow-400'
-              : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-blue-500',
-            dyslexiaFont && 'tracking-wide'
+              ? "bg-gray-900 text-white border-2 border-yellow-400 focus:ring-yellow-400"
+              : "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:ring-blue-500",
+            dyslexiaFont && "tracking-wide",
           )}
           style={{ lineHeight: lineSpacing }}
           disabled={isLoading}
@@ -62,10 +62,10 @@ export function ChatFooter({
           type="submit"
           disabled={!input.trim() || isLoading}
           className={cn(
-            'px-4 py-3 rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed',
+            "h-11 w-11 flex items-center justify-center rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-shrink-0",
             highContrast
-              ? 'bg-yellow-400 text-black hover:bg-yellow-300'
-              : 'bg-accent-themed text-white hover:brightness-110'
+              ? "bg-yellow-400 text-black hover:bg-yellow-300"
+              : "bg-accent-themed text-white hover:brightness-110",
           )}
           style={{ backgroundColor: input.trim() ? maestroColor : undefined }}
           aria-label="Invia messaggio"
@@ -74,11 +74,11 @@ export function ChatFooter({
         </button>
       </form>
 
-      {/* Hint */}
+      {/* Hint - hide on mobile */}
       <p
         className={cn(
-          'text-xs mt-2 text-center',
-          highContrast ? 'text-gray-500' : 'text-slate-400'
+          "text-xs mt-2 text-center hidden md:block",
+          highContrast ? "text-gray-500" : "text-slate-400",
         )}
       >
         Premi Invio per inviare, Shift+Invio per andare a capo

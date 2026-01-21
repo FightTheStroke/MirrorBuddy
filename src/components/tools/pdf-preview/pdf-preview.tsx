@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Card } from '@/components/ui/card';
-import type { ProcessedPage } from '@/lib/pdf';
-import { usePDFPreview } from './use-pdf-preview';
-import { PDFPreviewHeader } from './pdf-preview-header';
-import { PDFPreviewContent } from './pdf-preview-content';
-import { PDFPreviewFooter } from './pdf-preview-footer';
+import { motion } from "framer-motion";
+import { Card } from "@/components/ui/card";
+import type { ProcessedPage } from "@/lib/pdf";
+import { usePDFPreview } from "./use-pdf-preview";
+import { PDFPreviewHeader } from "./pdf-preview-header";
+import { PDFPreviewContent } from "./pdf-preview-content";
+import { PDFPreviewFooter } from "./pdf-preview-footer";
 
 interface PDFPreviewProps {
   file: File;
@@ -48,7 +48,7 @@ export function PDFPreview({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
     >
       <Card className="w-full max-w-4xl max-h-[90vh] bg-slate-900 border-slate-700 text-white overflow-hidden flex flex-col">
         <PDFPreviewHeader
@@ -79,7 +79,7 @@ export function PDFPreview({
           onTogglePageSelection={togglePageSelection}
         />
 
-        {viewMode === 'preview' && (
+        {viewMode === "preview" && (
           <PDFPreviewFooter
             selectedCount={selectedPages.size}
             allowMultiSelect={allowMultiSelect}

@@ -29,6 +29,9 @@ model Conversation {
   isParentMode Boolean @default(false)
   studentId    String?
 
+  // F-17: Test data isolation
+  isTestData Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -54,6 +57,9 @@ model Message {
   // Optional metadata
   toolCalls  String?
   tokenCount Int?
+
+  // F-17: Test data isolation
+  isTestData Boolean @default(false)
 
   createdAt DateTime @default(now())
 

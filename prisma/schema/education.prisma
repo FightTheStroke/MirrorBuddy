@@ -23,6 +23,9 @@ model FlashcardProgress {
   lastReview DateTime?
   nextReview DateTime?
 
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -49,6 +52,9 @@ model QuizResult {
 
   // Detailed answers as JSON
   answers String @default("[]")
+
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
 
   completedAt DateTime @default(now())
 
@@ -113,6 +119,9 @@ model StudySession {
   // Tools created during session
   materials Material[]
 
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
   @@index([userId])
   @@index([maestroId])
   @@index([startedAt])
@@ -144,6 +153,9 @@ model SessionMetrics {
   refusalCorrect    Int     @default(0)
   incidentSeverity  String? // S0 | S1 | S2 | S3 (highest in session)
   jailbreakAttempts Int     @default(0)
+
+  // F-17: Test data isolation
+  isTestData Boolean @default(false)
 
   // Timestamps
   createdAt DateTime @default(now())

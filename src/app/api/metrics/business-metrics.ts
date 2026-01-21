@@ -49,33 +49,34 @@ export async function generateBusinessMetrics(): Promise<MetricLine[]> {
 
 /**
  * Calculate active users (DAU/WAU/MAU)
+ * F-06: Excludes test data (isTestData = false)
  */
 async function getUserEngagementMetrics(
   dayAgo: Date,
   weekAgo: Date,
-  monthAgo: Date
+  monthAgo: Date,
 ): Promise<MetricLine[]> {
-  // DAU: Users with sessions in last 24h
+  // DAU: Users with sessions in last 24h (F-06: exclude test data)
   const dau = await prisma.studySession.groupBy({
     by: ["userId"],
-    where: { startedAt: { gte: dayAgo } },
+    where: { startedAt: { gte: dayAgo }, isTestData: false },
   });
 
-  // WAU: Users with sessions in last 7 days
+  // WAU: Users with sessions in last 7 days (F-06: exclude test data)
   const wau = await prisma.studySession.groupBy({
     by: ["userId"],
-    where: { startedAt: { gte: weekAgo } },
+    where: { startedAt: { gte: weekAgo }, isTestData: false },
   });
 
-  // MAU: Users with sessions in last 30 days
+  // MAU: Users with sessions in last 30 days (F-06: exclude test data)
   const mau = await prisma.studySession.groupBy({
     by: ["userId"],
-    where: { startedAt: { gte: monthAgo } },
+    where: { startedAt: { gte: monthAgo }, isTestData: false },
   });
 
-  // New users today
+  // New users today (F-06: exclude test data)
   const newUsersToday = await prisma.user.count({
-    where: { createdAt: { gte: dayAgo } },
+    where: { createdAt: { gte: dayAgo }, isTestData: false },
   });
 
   return [
@@ -112,19 +113,22 @@ async function getUserEngagementMetrics(
 
 /**
  * Calculate conversion and retention metrics
+ * F-06: Excludes test data (isTestData = false)
  */
 async function getConversionMetrics(): Promise<MetricLine[]> {
-  // Onboarding completion rate
-  const totalUsers = await prisma.user.count();
+  // Onboarding completion rate (F-06: exclude test data)
+  const totalUsers = await prisma.user.count({
+    where: { isTestData: false },
+  });
   const completedOnboarding = await prisma.onboardingState.count({
     where: { hasCompletedOnboarding: true },
   });
   const onboardingRate = totalUsers > 0 ? completedOnboarding / totalUsers : 0;
 
-  // Voice adoption: users who had at least one voice session
+  // Voice adoption: users who had at least one voice session (F-06: exclude test data)
   const usersWithVoice = await prisma.telemetryEvent.groupBy({
     by: ["userId"],
-    where: { category: "voice", action: "session_start" },
+    where: { category: "voice", action: "session_start", isTestData: false },
   });
   const voiceAdoptionRate =
     totalUsers > 0 ? usersWithVoice.length / totalUsers : 0;
@@ -173,6 +177,7 @@ async function getConversionMetrics(): Promise<MetricLine[]> {
 
 /**
  * Calculate retention cohorts (D1, D7, D30)
+ * F-06: Excludes test data (isTestData = false)
  */
 async function calculateRetentionCohorts(): Promise<{
   d1: number;
@@ -186,7 +191,10 @@ async function calculateRetentionCohorts(): Promise<{
   const d1CohortEnd = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
 
   const d1Users = await prisma.user.findMany({
-    where: { createdAt: { gte: d1CohortStart, lte: d1CohortEnd } },
+    where: {
+      createdAt: { gte: d1CohortStart, lte: d1CohortEnd },
+      isTestData: false,
+    },
     select: { id: true },
   });
 
@@ -198,6 +206,7 @@ async function calculateRetentionCohorts(): Promise<{
         startedAt: {
           gte: new Date(d1CohortEnd.getTime() + 24 * 60 * 60 * 1000),
         },
+        isTestData: false,
       },
     });
     if (returnSession) d1Returned++;
@@ -209,7 +218,10 @@ async function calculateRetentionCohorts(): Promise<{
   const d7CohortEnd = new Date(now.getTime() - 8 * 24 * 60 * 60 * 1000);
 
   const d7Users = await prisma.user.findMany({
-    where: { createdAt: { gte: d7CohortStart, lte: d7CohortEnd } },
+    where: {
+      createdAt: { gte: d7CohortStart, lte: d7CohortEnd },
+      isTestData: false,
+    },
     select: { id: true },
   });
 
@@ -221,6 +233,7 @@ async function calculateRetentionCohorts(): Promise<{
         startedAt: {
           gte: new Date(d7CohortEnd.getTime() + 7 * 24 * 60 * 60 * 1000),
         },
+        isTestData: false,
       },
     });
     if (returnSession) d7Returned++;
@@ -232,7 +245,10 @@ async function calculateRetentionCohorts(): Promise<{
   const d30CohortEnd = new Date(now.getTime() - 31 * 24 * 60 * 60 * 1000);
 
   const d30Users = await prisma.user.findMany({
-    where: { createdAt: { gte: d30CohortStart, lte: d30CohortEnd } },
+    where: {
+      createdAt: { gte: d30CohortStart, lte: d30CohortEnd },
+      isTestData: false,
+    },
     select: { id: true },
   });
 
@@ -244,6 +260,7 @@ async function calculateRetentionCohorts(): Promise<{
         startedAt: {
           gte: new Date(d30CohortEnd.getTime() + 30 * 24 * 60 * 60 * 1000),
         },
+        isTestData: false,
       },
     });
     if (returnSession) d30Returned++;
@@ -255,14 +272,15 @@ async function calculateRetentionCohorts(): Promise<{
 
 /**
  * Calculate maestri usage metrics
+ * F-06: Excludes test data (isTestData = false)
  */
 async function getMaestriUsageMetrics(
   from: Date,
-  to: Date
+  to: Date,
 ): Promise<MetricLine[]> {
   const sessionsByMaestro = await prisma.studySession.groupBy({
     by: ["maestroId"],
-    where: { startedAt: { gte: from, lte: to } },
+    where: { startedAt: { gte: from, lte: to }, isTestData: false },
     _count: true,
   });
 
@@ -277,40 +295,42 @@ async function getMaestriUsageMetrics(
 
 /**
  * Calculate learning progress metrics
+ * F-06: Excludes test data (isTestData = false)
  */
-async function getLearningMetrics(
-  from: Date,
-  to: Date
-): Promise<MetricLine[]> {
-  // XP earned today
+async function getLearningMetrics(from: Date, to: Date): Promise<MetricLine[]> {
+  // XP earned today (F-06: exclude test data)
   const xpToday = await prisma.studySession.aggregate({
-    where: { startedAt: { gte: from, lte: to } },
+    where: { startedAt: { gte: from, lte: to }, isTestData: false },
     _sum: { xpEarned: true },
   });
 
-  // Active streaks
+  // Active streaks (from real users only)
   const activeStreaks = await prisma.dailyStreak.count({
     where: { currentStreak: { gt: 0 } },
   });
 
-  // Max level
+  // Max level (from real users only)
   const maxLevel = await prisma.progress.aggregate({
     _max: { level: true },
   });
 
-  // Quizzes completed today
+  // Quizzes completed today (F-06: exclude test data)
   const quizzesToday = await prisma.quizResult.count({
-    where: { completedAt: { gte: from, lte: to } },
+    where: { completedAt: { gte: from, lte: to }, isTestData: false },
   });
 
-  // Flashcards reviewed today
+  // Flashcards reviewed today (F-06: exclude test data)
   const flashcardsToday = await prisma.flashcardProgress.count({
-    where: { lastReview: { gte: from, lte: to } },
+    where: { lastReview: { gte: from, lte: to }, isTestData: false },
   });
 
-  // Mind maps created today (from materials)
+  // Mind maps created today from materials (F-06: exclude test data)
   const mindmapsToday = await prisma.material.count({
-    where: { createdAt: { gte: from, lte: to }, toolType: "mindmap" },
+    where: {
+      createdAt: { gte: from, lte: to },
+      toolType: "mindmap",
+      isTestData: false,
+    },
   });
 
   return [

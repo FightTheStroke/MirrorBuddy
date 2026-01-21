@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useNotificationStore } from '@/lib/stores/notification-store';
-import { NotificationItem } from './notification-item';
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Bell, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useNotificationStore } from "@/lib/stores/notification-store";
+import { NotificationItem } from "./notification-item";
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,21 +34,21 @@ export function NotificationBell() {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Close on escape
   useEffect(() => {
     function handleEscape(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setIsOpen(false);
       }
     }
 
     if (isOpen) {
-      document.addEventListener('keydown', handleEscape);
-      return () => document.removeEventListener('keydown', handleEscape);
+      document.addEventListener("keydown", handleEscape);
+      return () => document.removeEventListener("keydown", handleEscape);
     }
   }, [isOpen]);
 
@@ -58,12 +58,12 @@ export function NotificationBell() {
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          'relative p-2 rounded-lg transition-colors',
-          'hover:bg-gray-100 dark:hover:bg-gray-800',
-          'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900',
-          isOpen && 'bg-gray-100 dark:bg-gray-800'
+          "relative h-11 w-11 flex items-center justify-center rounded-lg transition-colors",
+          "hover:bg-gray-100 dark:hover:bg-gray-800",
+          "focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900",
+          isOpen && "bg-gray-100 dark:bg-gray-800",
         )}
-        aria-label={`Notifiche${unreadCount > 0 ? ` (${unreadCount} non lette)` : ''}`}
+        aria-label={`Notifiche${unreadCount > 0 ? ` (${unreadCount} non lette)` : ""}`}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -74,7 +74,7 @@ export function NotificationBell() {
             animate={{ scale: 1 }}
             className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
           >
-            {unreadCount > 99 ? '99+' : unreadCount}
+            {unreadCount > 99 ? "99+" : unreadCount}
           </motion.span>
         )}
       </button>

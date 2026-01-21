@@ -31,13 +31,13 @@ export function SafetyEscalations({ escalations }: SafetyEscalationsProps) {
           {escalations.slice(0, 10).map((escalation) => (
             <div
               key={escalation.id}
-              className="p-3 bg-white dark:bg-slate-800 rounded-lg border border-amber-200 dark:border-amber-800 flex items-center justify-between"
+              className="p-3 bg-card rounded-lg border border-amber-200 dark:border-amber-800 flex items-center justify-between"
             >
               <div className="flex-1">
-                <p className="font-medium text-slate-900 dark:text-white capitalize">
+                <p className="font-medium text-foreground capitalize">
                   {escalation.trigger.replace(/_/g, " ")}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <p className="text-xs text-muted-foreground mt-1">
                   {new Date(escalation.timestamp).toLocaleString()}
                 </p>
               </div>

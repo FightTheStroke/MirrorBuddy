@@ -2,13 +2,15 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight, Menu } from "lucide-react";
+import { ChevronRight, Menu, Bell, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 interface AdminHeaderProps {
   onMenuClick?: () => void;
   sidebarOpen?: boolean;
+  pendingInvites?: number;
+  systemAlerts?: number;
 }
 
 const SECTION_TITLES: Record<string, string> = {
@@ -23,6 +25,8 @@ const SECTION_TITLES: Record<string, string> = {
 export function AdminHeader({
   onMenuClick,
   sidebarOpen: _sidebarOpen,
+  pendingInvites = 0,
+  systemAlerts = 0,
 }: AdminHeaderProps) {
   const pathname = usePathname();
 
@@ -47,37 +51,37 @@ export function AdminHeader({
     <header
       className={cn(
         "h-14 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800",
-        "flex items-center justify-between px-4 sticky top-0 z-30",
+        "flex items-center justify-between px-3 sm:px-4 sticky top-0 z-30",
       )}
     >
-      <div className="flex items-center gap-4">
-        {/* Mobile menu button */}
+      <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+        {/* Mobile menu button - WCAG 44px minimum */}
         <Button
           variant="ghost"
-          size="icon-sm"
+          size="icon"
           onClick={onMenuClick}
-          className="lg:hidden text-slate-500"
+          className="lg:hidden text-slate-500 h-11 w-11 shrink-0"
           aria-label="Toggle menu"
         >
           <Menu className="h-5 w-5" />
         </Button>
 
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="hidden sm:block">
+        <nav aria-label="Breadcrumb" className="hidden sm:block min-w-0">
           <ol className="flex items-center gap-1 text-sm">
             {breadcrumbs.map((crumb, index) => (
-              <li key={crumb.href} className="flex items-center gap-1">
+              <li key={crumb.href} className="flex items-center gap-1 min-w-0">
                 {index > 0 && (
-                  <ChevronRight className="h-4 w-4 text-slate-400" />
+                  <ChevronRight className="h-4 w-4 text-slate-400 shrink-0" />
                 )}
                 {index === breadcrumbs.length - 1 ? (
-                  <span className="font-medium text-slate-900 dark:text-white">
+                  <span className="font-medium text-slate-900 dark:text-white truncate">
                     {crumb.label}
                   </span>
                 ) : (
                   <Link
                     href={crumb.href}
-                    className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
+                    className="text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 truncate"
                   >
                     {crumb.label}
                   </Link>
@@ -87,10 +91,41 @@ export function AdminHeader({
           </ol>
         </nav>
 
-        {/* Mobile title */}
-        <h1 className="sm:hidden font-semibold text-slate-900 dark:text-white">
+        {/* Mobile title - responsive sizing */}
+        <h1 className="sm:hidden font-semibold text-base text-slate-900 dark:text-white truncate">
           {currentTitle}
         </h1>
+      </div>
+
+      {/* Stats badges - visible on mobile when sidebar is closed */}
+      <div className="flex items-center gap-2 shrink-0">
+        {/* Pending invites badge */}
+        {pendingInvites > 0 && (
+          <Link
+            href="/admin/invites"
+            className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
+            aria-label={`${pendingInvites} richieste beta in attesa`}
+          >
+            <UserPlus className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
+              {pendingInvites > 99 ? "99+" : pendingInvites}
+            </span>
+          </Link>
+        )}
+
+        {/* System alerts badge */}
+        {systemAlerts > 0 && (
+          <Link
+            href="/admin"
+            className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
+            aria-label={`${systemAlerts} alert di sistema`}
+          >
+            <Bell className="h-4 w-4 text-red-600 dark:text-red-400" />
+            <span className="text-xs font-bold text-red-700 dark:text-red-300">
+              {systemAlerts > 99 ? "99+" : systemAlerts}
+            </span>
+          </Link>
+        )}
       </div>
     </header>
   );
