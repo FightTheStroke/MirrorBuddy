@@ -48,7 +48,11 @@ function getRandomItems<T>(arr: T[], count: number): T[] {
   return shuffled.slice(0, Math.min(count, arr.length));
 }
 
-export async function getOrCreateTrialSession(ip: string, visitorId: string) {
+export async function getOrCreateTrialSession(
+  ip: string,
+  visitorId: string,
+  userId?: string,
+) {
   const ipHash = hashIp(ip);
 
   let session = await prisma.trialSession.findFirst({
@@ -58,7 +62,27 @@ export async function getOrCreateTrialSession(ip: string, visitorId: string) {
   });
 
   if (!session) {
-    const maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
+    let maestri: string[];
+
+    // F-03: If userId provided, try to use user-selected maestri
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { selectedMaestri: true },
+      });
+
+      if (user && user.selectedMaestri.length > 0) {
+        // Use user's selected maestri (take up to MAESTRI_COUNT)
+        maestri = user.selectedMaestri.slice(0, TRIAL_LIMITS.MAESTRI_COUNT);
+      } else {
+        // Fallback to random if user has no selections
+        maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
+      }
+    } else {
+      // Backward compatibility: no userId provided, use random
+      maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
+    }
+
     const coach = getRandomItems(COACHES, 1)[0];
 
     session = await prisma.trialSession.create({

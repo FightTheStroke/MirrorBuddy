@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
     const userId = coppaCheck.userId;
 
     // Trial limit check for anonymous users (ADR 0056)
-    const trialCheck = await checkTrialForAnonymous(!!userId);
+    const trialCheck = await checkTrialForAnonymous(!!userId, userId);
     if (!trialCheck.allowed) {
       const response = NextResponse.json(
         {
