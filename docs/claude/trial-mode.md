@@ -10,13 +10,24 @@ MirrorBuddy trial mode allows anonymous users to evaluate the platform without c
 | Voice time    | 5 minutes (300 seconds) | `TRIAL_LIMITS.VOICE_SECONDS` |
 | Tool calls    | 10                      | `TRIAL_LIMITS.TOOLS`         |
 | Documents     | 1                       | `TRIAL_LIMITS.DOCS`          |
-| Maestri       | 3                       | `TRIAL_LIMITS.MAESTRI_COUNT` |
 
 **Key behavior:**
 
 - Voice and chat are tracked separately (voice does not consume chat quota)
 - Each tool invocation (mind map, summary, flashcard, quiz) counts as 1 tool call
 - Limits checked before and after each operation
+- **No maestri restrictions** - users can talk to any of the 22 maestri/amici
+
+**Note on Maestri Limit Removal:**
+
+Previously, we restricted trial users to 3 maestri. This was removed because:
+
+- It was confusing and overly restrictive
+- Time-based limits (voice, chat, tools) are more effective
+- Users should explore freely to evaluate the platform
+- The "select 3 maestri" UI appeared at wrong times and was buggy
+
+The `selectedMaestri` field remains in the database for legacy compatibility but is unused.
 
 ## Key Files
 
