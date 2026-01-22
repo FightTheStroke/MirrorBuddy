@@ -43,7 +43,8 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["euclide","galileo","darwin"]',
+      assignedMaestri:
+        '["euclide-matematica","galileo-astronomia","darwin-scienze"]',
       assignedCoach: "melissa",
     };
 
@@ -66,7 +67,7 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 100,
       toolsUsed: 1,
-      assignedMaestri: '["mozart","socrate","omero"]',
+      assignedMaestri: '["mozart-musica","socrate-filosofia","omero-italiano"]',
       assignedCoach: "laura",
     };
 
@@ -91,7 +92,7 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["curie","feynman","darwin"]',
+      assignedMaestri: '["curie-chimica","feynman-fisica","darwin-scienze"]',
       assignedCoach: "melissa",
     };
 
@@ -117,7 +118,8 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["euclide","galileo","darwin"]',
+      assignedMaestri:
+        '["euclide-matematica","galileo-astronomia","darwin-scienze"]',
       assignedCoach: "laura",
     };
 
@@ -132,7 +134,12 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
 
   it("F-03: uses user-selected maestri when userId provided and user has selections", async () => {
     const userId = "user-123";
-    const userSelectedMaestri = ["euclide", "curie", "feynman", "galileo"];
+    const userSelectedMaestri = [
+      "euclide-matematica",
+      "curie-chimica",
+      "feynman-fisica",
+      "galileo-astronomia",
+    ];
 
     vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
     vi.mocked(prisma.user.findUnique).mockResolvedValue({
@@ -148,7 +155,8 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["euclide","curie","feynman"]',
+      assignedMaestri:
+        '["euclide-matematica","curie-chimica","feynman-fisica"]',
       assignedCoach: "melissa",
     };
 
@@ -166,7 +174,11 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
     const maestri = JSON.parse(maestriJson);
 
     expect(maestri).toHaveLength(3);
-    expect(maestri).toEqual(["euclide", "curie", "feynman"]);
+    expect(maestri).toEqual([
+      "euclide-matematica",
+      "curie-chimica",
+      "feynman-fisica",
+    ]);
   });
 
   it("F-03: uses random maestri when userId provided but user has no selections", async () => {
@@ -186,7 +198,7 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["darwin","mozart","socrate"]',
+      assignedMaestri: '["darwin-scienze","mozart-musica","socrate-filosofia"]',
       assignedCoach: "laura",
     };
 
@@ -225,7 +237,7 @@ describe("getOrCreateTrialSession - Maestri Selection (F-03)", () => {
       docsUsed: 0,
       voiceSecondsUsed: 0,
       toolsUsed: 0,
-      assignedMaestri: '["leonardo","manzoni","ippocrate"]',
+      assignedMaestri: '["leonardo-arte","manzoni-italiano","ippocrate-corpo"]',
       assignedCoach: "melissa",
     };
 
