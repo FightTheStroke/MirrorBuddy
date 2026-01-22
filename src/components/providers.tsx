@@ -16,10 +16,10 @@ import {
   setupAutoSync,
 } from "@/lib/stores";
 import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { initializeTelemetry } from "@/lib/telemetry";
 import { ActivityTracker } from "@/lib/telemetry/use-activity-tracker";
 import { migrateSessionStorageKey } from "@/lib/storage/migrate-session-key";
-import { MaestriSelectionProvider } from "@/components/onboarding/maestri-selection-provider";
 
 // Debug logger - captures all browser errors to file (dev only)
 import "@/lib/client-error-logger";
@@ -130,8 +130,10 @@ const PUBLIC_PATHS = [
 
 /**
  * Conditional Unified Consent - DB-first TOS + Cookie consent
- * Skips blocking wall on public/legal pages (GDPR requirement)
- * Uses UnifiedConsentWall which handles both TOS and Cookie consent
+ * Skips blocking wall on:
+ * - Public/legal pages (GDPR requirement)
+ * - Before onboarding is completed (so user can see landing/welcome)
+ * Shows wall only when user has completed onboarding and is using the app
  */
 function ConditionalUnifiedConsent({
   children,
@@ -139,6 +141,8 @@ function ConditionalUnifiedConsent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { hasCompletedOnboarding, isHydrated } = useOnboardingStore();
+
   const isPublicPath = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
 
   // On public/legal pages, skip blocking wall (users must access legal docs)
@@ -146,7 +150,26 @@ function ConditionalUnifiedConsent({
     return <>{children}</>;
   }
 
-  // On all other pages, use the unified consent wall (TOS + Cookie)
+  // Wait for onboarding state to hydrate before showing consent wall
+  if (!isHydrated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 mx-auto border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+          <p className="text-sm text-slate-600 dark:text-slate-400">
+            Caricamento...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // If onboarding not completed, skip consent wall (let onboarding redirect happen)
+  if (!hasCompletedOnboarding) {
+    return <>{children}</>;
+  }
+
+  // User has completed onboarding and is using the app - show consent wall
   return <UnifiedConsentWall>{children}</UnifiedConsentWall>;
 }
 
@@ -165,14 +188,12 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
       <AccessibilityProvider>
         <A11yInstantAccess />
         <ConditionalUnifiedConsent>
-          <MaestriSelectionProvider>
-            <StoreInitializer />
-            <AccentColorApplier />
-            <ActivityTracker />
-            {children}
-            <ToastContainer />
-            <IOSInstallBanner />
-          </MaestriSelectionProvider>
+          <StoreInitializer />
+          <AccentColorApplier />
+          <ActivityTracker />
+          {children}
+          <ToastContainer />
+          <IOSInstallBanner />
         </ConditionalUnifiedConsent>
       </AccessibilityProvider>
     </ThemeProvider>

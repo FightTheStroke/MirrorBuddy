@@ -216,7 +216,7 @@ describe("Trial Service Usage", () => {
 
       const result = await getTrialStatus(sessionId);
 
-      expect(result?.assignedMaestri).toEqual(maestri);
+      // Maestri restrictions removed - only coach is assigned
       expect(result?.assignedCoach).toBe("laura");
     });
 

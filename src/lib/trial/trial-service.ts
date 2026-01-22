@@ -1,42 +1,21 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
 
-// Real maestri IDs from src/data/maestri/index.ts
-const MAESTRI = [
-  "leonardo-arte",
-  "galileo-astronomia",
-  "curie-chimica",
-  "cicerone-civica",
-  "lovelace-informatica",
-  "smith-economia",
-  "shakespeare-inglese",
-  "humboldt-geografia",
-  "erodoto-storia",
-  "manzoni-italiano",
-  "euclide-matematica",
-  "mozart-musica",
-  "socrate-filosofia",
-  "ippocrate-corpo",
-  "feynman-fisica",
-  "darwin-scienze",
-  "chris-storytelling",
-  "omero-italiano",
-  "alex-pina-spagnolo",
-  "simone-sport",
-  "cassese-diritto",
-  // Excluded from trial: mascetti-supercazzola (amico, not maestro)
-];
-
 // Available coaches from src/data/coaches/
 const COACHES = ["melissa", "laura"];
 
-// Trial limits
+/**
+ * Trial limits
+ *
+ * NOTE: Previously included MAESTRI_COUNT limit (3 maestri).
+ * Removed because it didn't work well - users should be able to talk to any maestro.
+ * Time-based limits (voice, chat, tools) are more effective.
+ */
 export const TRIAL_LIMITS = {
   CHAT: 10, // 10 text chat messages
-  VOICE_SECONDS: 300, // 5 minutes = 300 seconds
+  VOICE_SECONDS: 300, // 5 minutes = 300 seconds total
   TOOLS: 10, // 10 tool uses (mindmap, summary, etc.)
   DOCS: 1, // 1 document upload
-  MAESTRI_COUNT: 3, // 3 assigned maestri
 } as const;
 
 function hashIp(ip: string): string {
@@ -51,7 +30,7 @@ function getRandomItems<T>(arr: T[], count: number): T[] {
 export async function getOrCreateTrialSession(
   ip: string,
   visitorId: string,
-  userId?: string,
+  _userId?: string, // Kept for API compatibility but unused
 ) {
   const ipHash = hashIp(ip);
 
@@ -62,26 +41,6 @@ export async function getOrCreateTrialSession(
   });
 
   if (!session) {
-    // F-03: Use user-selected maestri if available
-    let maestri: string[];
-    if (userId) {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { selectedMaestri: true },
-      });
-
-      if (user?.selectedMaestri && user.selectedMaestri.length > 0) {
-        // Use first 3 from user's selections
-        maestri = user.selectedMaestri.slice(0, TRIAL_LIMITS.MAESTRI_COUNT);
-      } else {
-        // Fallback to random if user has no selections
-        maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
-      }
-    } else {
-      // No userId provided - use random (backward compatibility)
-      maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
-    }
-
     const coach = getRandomItems(COACHES, 1)[0];
 
     session = await prisma.trialSession.create({
@@ -92,7 +51,8 @@ export async function getOrCreateTrialSession(
         docsUsed: 0,
         voiceSecondsUsed: 0,
         toolsUsed: 0,
-        assignedMaestri: JSON.stringify(maestri),
+        // No maestri restrictions - users can talk to any maestro
+        assignedMaestri: JSON.stringify([]), // Empty array (legacy field)
         assignedCoach: coach,
       },
     });
@@ -205,19 +165,6 @@ export async function addVoiceSeconds(
   return session.voiceSecondsUsed;
 }
 
-export async function assignRandomMaestri(
-  sessionId: string,
-): Promise<string[]> {
-  const maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
-
-  await prisma.trialSession.update({
-    where: { id: sessionId },
-    data: { assignedMaestri: JSON.stringify(maestri) },
-  });
-
-  return maestri;
-}
-
 export async function getTrialStatus(sessionId: string) {
   const session = await prisma.trialSession.findUnique({
     where: { id: sessionId },
@@ -254,8 +201,7 @@ export async function getTrialStatus(sessionId: string) {
     totalDocsUsed: session.docsUsed,
     maxDocs: TRIAL_LIMITS.DOCS,
 
-    // Assigned characters
-    assignedMaestri: JSON.parse(session.assignedMaestri) as string[],
+    // Assigned coach (maestri restrictions removed - users can talk to any maestro)
     assignedCoach: session.assignedCoach,
   };
 }
