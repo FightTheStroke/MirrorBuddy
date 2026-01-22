@@ -74,9 +74,38 @@ const connectionString = isE2E
 
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted
-// Download from: Supabase Dashboard → Database Settings → SSL Configuration
-// Setup: Run ./scripts/setup-ssl-certificate.sh for guided setup (ADR 0067)
-const supabaseCaCert = process.env.SUPABASE_CA_CERT;
+// Certificate bundle stored in repository: config/aws-rds-ca-bundle.pem (ADR 0067)
+// Contains AWS RDS root + intermediate certificates for all regions
+
+import fs from "fs";
+import path from "path";
+
+function loadSupabaseCertificate(): string | undefined {
+  // Priority 1: Load from file in repository (no size limits)
+  const certPath = path.join(process.cwd(), "config", "aws-rds-ca-bundle.pem");
+
+  if (fs.existsSync(certPath)) {
+    try {
+      return fs.readFileSync(certPath, "utf-8");
+    } catch (error) {
+      logger.warn("[SSL] Failed to read certificate file", {
+        path: certPath,
+        error: String(error),
+      });
+    }
+  }
+
+  // Priority 2: Fallback to environment variable (for backwards compatibility)
+  const envCert = process.env.SUPABASE_CA_CERT;
+  if (envCert) {
+    // Certificate in env var uses '|' as newline separator
+    return envCert.split("|").join("\n");
+  }
+
+  return undefined;
+}
+
+const supabaseCaCert = loadSupabaseCertificate();
 
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
@@ -89,12 +118,10 @@ function buildSslConfig(): PoolConfig["ssl"] {
   if (isProduction) {
     // If full certificate chain is provided, enable full SSL verification
     if (supabaseCaCert) {
-      // Certificate stored in env var with '|' as newline separator
-      // (for compatibility with single-line .env files)
-      const certContent = supabaseCaCert.split("|").join("\n");
-
       // Count certificates in chain (should be ≥2: root + intermediate)
-      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
+      // AWS RDS bundle contains 108 certificates for all regions
+      const certCount = (supabaseCaCert.match(/BEGIN CERTIFICATE/g) || [])
+        .length;
 
       if (certCount >= 2) {
         logger.info(
@@ -107,7 +134,7 @@ function buildSslConfig(): PoolConfig["ssl"] {
 
         return {
           rejectUnauthorized: true,
-          ca: certContent,
+          ca: supabaseCaCert,
         };
       } else {
         logger.warn(
