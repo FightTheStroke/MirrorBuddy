@@ -46,8 +46,7 @@ export default function LoginPage() {
       if (data.user?.mustChangePassword) {
         router.push("/change-password");
       } else {
-        // Force full page reload to ensure cookie is available for hydration
-        window.location.href = "/";
+        router.push("/");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Errore di connessione");
