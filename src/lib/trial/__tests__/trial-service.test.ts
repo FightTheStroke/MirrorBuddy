@@ -37,7 +37,7 @@ describe("Trial Service", () => {
       expect(TRIAL_LIMITS.VOICE_SECONDS).toBe(300);
       expect(TRIAL_LIMITS.TOOLS).toBe(10);
       expect(TRIAL_LIMITS.DOCS).toBe(1);
-      expect(TRIAL_LIMITS.MAESTRI_COUNT).toBe(3);
+      // MAESTRI_COUNT removed - users can talk to any maestro
     });
   });
 
@@ -143,11 +143,11 @@ describe("Trial Service", () => {
 
       expect(prisma.trialSession.create).toHaveBeenCalled();
 
-      // Verify the call arguments contain 3 maestri
+      // Verify maestri restrictions removed (empty array)
       const createCall = vi.mocked(prisma.trialSession.create).mock.calls[0][0];
       const maestriJson = createCall.data.assignedMaestri as string;
       const maestri = JSON.parse(maestriJson);
-      expect(maestri).toHaveLength(TRIAL_LIMITS.MAESTRI_COUNT);
+      expect(maestri).toHaveLength(0); // No maestri restrictions
     });
   });
 });

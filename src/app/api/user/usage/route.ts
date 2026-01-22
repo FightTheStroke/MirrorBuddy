@@ -31,17 +31,12 @@ interface VoiceUsage extends ResourceUsage {
   unit: string;
 }
 
-interface MaestriUsage {
-  selected: number;
-  limit: number;
-}
-
 interface UsageResponse {
   chat: ResourceUsage;
   voice: VoiceUsage;
   tools: ResourceUsage;
   docs: ResourceUsage;
-  maestri: MaestriUsage;
+  // Maestri restrictions removed - users can talk to any maestro
 }
 
 /**
@@ -113,10 +108,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
         limit: status.maxDocs,
         percentage: (status.totalDocsUsed / status.maxDocs) * 100,
       },
-      maestri: {
-        selected: status.assignedMaestri.length,
-        limit: TRIAL_LIMITS.MAESTRI_COUNT,
-      },
+      // Maestri restrictions removed - users can talk to any maestro
     };
 
     // Log successful retrieval
