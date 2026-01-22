@@ -23,12 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### SSL Certificate Setup (ADR 0067) - ✅ Implemented
 
-- **Repository-Based Certificates**: AWS RDS Global Bundle stored in `config/aws-rds-ca-bundle.pem` (108 certificates, 165KB)
-- **No Environment Variable Limits**: Bypasses Vercel 64KB env var limit by loading from file
-- **Full SSL Verification Enabled**: Production now uses `rejectUnauthorized: true` by default
-- **Automatic Loading**: `src/lib/db.ts` loads certificate from repository, fallback to env var for compatibility
-- **Version Controlled**: Certificate bundle committed to repository, consistent across all environments
-- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` updated with implementation details
+- **Environment Variable Configuration**: AWS RDS EU-WEST-1 certificates stored in `SUPABASE_CA_CERT` (3 certificates, 4.6KB)
+- **Full SSL Verification Enabled**: Production now uses `rejectUnauthorized: true` with complete certificate chain
+- **Smart Certificate Loading**: `src/lib/db.ts` loads from env var with pipe-separator format (`|` instead of newlines)
+- **Regional Optimization**: EU-WEST-1 bundle (3 certs: RSA2048, RSA4096, ECC384) instead of global bundle (108 certs)
+- **Self-Signed Root Filtering**: Avoided PostgreSQL "self-signed certificate in chain" error by using regional bundle
+- **Production Verified**: Health endpoint shows 72ms database latency with SSL verification active
+- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with setup instructions
 
 ### Changed
 
@@ -47,10 +48,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **SSL**:
 
-- `src/lib/db.ts` - Repository-based certificate loading with smart fallback (lines 75-150)
-- `config/aws-rds-ca-bundle.pem` - AWS RDS Global Bundle (108 certificates, 165KB)
-- `scripts/setup-ssl-certificate.sh` - Interactive setup wizard (deprecated, now automated)
-- `docs/operations/SSL-CERTIFICATE-SETUP.md` - Implementation documentation
+- `src/lib/db.ts` - Environment variable certificate loading with pipe-separator format and certificate chain validation
+- `SUPABASE_CA_CERT` - Production env var with 3 EU-WEST-1 certificates (4.6KB)
+- Health endpoint verified: 72ms latency with full SSL verification enabled
+- `docs/operations/SSL-CERTIFICATE-SETUP.md` - Setup documentation
 
 **Monitoring**:
 
