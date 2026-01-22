@@ -11,14 +11,13 @@ import { logger } from "@/lib/logger";
 // Configure web-push with VAPID keys (lazy initialization to avoid build failures)
 const vapidPublicKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY;
-const vapidSubject =
-  process.env.VAPID_SUBJECT || "mailto:info@fightthestroke.org";
+const vapidSubject = process.env.VAPID_SUBJECT;
 
 let vapidConfigured = false;
 
 function ensureVapidConfigured(): boolean {
   if (vapidConfigured) return true;
-  if (!vapidPublicKey || !vapidPrivateKey) {
+  if (!vapidPublicKey || !vapidPrivateKey || !vapidSubject) {
     return false;
   }
   try {

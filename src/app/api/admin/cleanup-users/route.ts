@@ -14,9 +14,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
-
-// Users to NEVER delete
-const PROTECTED_EMAILS = ["roberdan@gmail.com", "francesca@fightthestroke.org"];
+import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
 
 export async function DELETE(request: NextRequest) {
   const auth = await validateAdminAuth();
@@ -31,9 +29,12 @@ export async function DELETE(request: NextRequest) {
   const isDryRun = request.nextUrl.searchParams.get("dryRun") === "true";
 
   try {
+    // Get protected emails from environment variable
+    const protectedEmails = getProtectedUsers();
+
     // Find protected users
     const protectedUsers = await prisma.user.findMany({
-      where: { email: { in: PROTECTED_EMAILS } },
+      where: { email: { in: protectedEmails } },
       select: { id: true, email: true },
     });
 
@@ -69,7 +70,7 @@ export async function DELETE(request: NextRequest) {
     logger.warn("Admin cleanup: deleting all users except protected", {
       adminId: auth.userId,
       usersToDelete,
-      protectedEmails: PROTECTED_EMAILS,
+      protectedEmails,
     });
 
     // 1. Clean UserActivity
@@ -79,7 +80,7 @@ export async function DELETE(request: NextRequest) {
 
     // 2. Clean InviteRequests
     const inviteResult = await prisma.inviteRequest.deleteMany({
-      where: { email: { notIn: PROTECTED_EMAILS } },
+      where: { email: { notIn: protectedEmails } },
     });
 
     // 3. Delete users (cascade handles related records)
@@ -105,7 +106,7 @@ export async function DELETE(request: NextRequest) {
         inviteRequests: inviteResult.count,
       },
       remainingUsers,
-      protectedEmails: PROTECTED_EMAILS,
+      protectedEmails,
     });
   } catch (error) {
     logger.error("Admin cleanup failed", { error: String(error) });

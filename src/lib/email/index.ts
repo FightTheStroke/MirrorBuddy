@@ -81,8 +81,15 @@ export async function sendEmail(
     };
   }
 
-  const from =
-    options.from || "MirrorBuddy <noreply@donotreply.mirrorbuddy.org>";
+  const from = options.from || process.env.FROM_EMAIL;
+
+  if (!from) {
+    log.error("FROM_EMAIL not configured");
+    return {
+      success: false,
+      error: "FROM_EMAIL environment variable not configured",
+    };
+  }
 
   try {
     const { data, error } = await client.emails.send({
