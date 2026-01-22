@@ -32,27 +32,28 @@ import { logger } from "@/lib/logger";
 import { POST } from "../route";
 
 const VALID_MAESTRI = [
-  "leonardo",
-  "galileo",
-  "curie",
-  "cicerone",
-  "lovelace",
-  "smith",
-  "shakespeare",
-  "humboldt",
-  "erodoto",
-  "manzoni",
-  "euclide",
-  "mozart",
-  "socrate",
-  "ippocrate",
-  "feynman",
-  "darwin",
-  "chris",
-  "omero",
-  "alexPina",
-  "simone",
-  "cassese",
+  "leonardo-arte-arte",
+  "galileo-astronomia-astronomia",
+  "curie-chimica",
+  "cicerone-civica",
+  "lovelace-informatica",
+  "smith-economia",
+  "shakespeare-inglese",
+  "humboldt-geografia",
+  "erodoto-storia",
+  "manzoni-italiano",
+  "euclide-matematica-matematica",
+  "mozart-musica",
+  "socrate-filosofia",
+  "ippocrate-corpo",
+  "feynman-fisica",
+  "darwin-scienze-scienze",
+  "chris-storytelling",
+  "omero-italiano",
+  "alex-pina-spagnolo",
+  "simone-sport",
+  "cassese-diritto",
+  "mascetti-supercazzola",
 ];
 
 describe("POST /api/user/preferences/maestri", () => {
@@ -70,7 +71,7 @@ describe("POST /api/user/preferences/maestri", () => {
       "http://localhost/api/user/preferences/maestri",
       {
         method: "POST",
-        body: JSON.stringify({ maestriIds: ["euclide"] }),
+        body: JSON.stringify({ maestriIds: ["euclide-matematica"] }),
       },
     );
 
@@ -83,7 +84,11 @@ describe("POST /api/user/preferences/maestri", () => {
 
   it("accepts valid maestri selection", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide", "galileo", "darwin"];
+    const maestriIds = [
+      "euclide-matematica",
+      "galileo-astronomia",
+      "darwin-scienze",
+    ];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -112,7 +117,7 @@ describe("POST /api/user/preferences/maestri", () => {
 
   it("accepts 1 maestro", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide"];
+    const maestriIds = ["euclide-matematica"];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -138,7 +143,11 @@ describe("POST /api/user/preferences/maestri", () => {
 
   it("accepts 3 maestri (at limit)", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide", "galileo", "darwin"];
+    const maestriIds = [
+      "euclide-matematica",
+      "galileo-astronomia",
+      "darwin-scienze",
+    ];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -190,7 +199,7 @@ describe("POST /api/user/preferences/maestri", () => {
 
   it("logs successful update", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide", "galileo"];
+    const maestriIds = ["euclide-matematica", "galileo-astronomia"];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -234,7 +243,7 @@ describe("POST /api/user/preferences/maestri", () => {
       "http://localhost/api/user/preferences/maestri",
       {
         method: "POST",
-        body: JSON.stringify({ maestriIds: ["euclide"] }),
+        body: JSON.stringify({ maestriIds: ["euclide-matematica"] }),
       },
     );
 
