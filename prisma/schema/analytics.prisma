@@ -102,8 +102,12 @@ model UserActivity {
   route      String   // Normalized route path
   timestamp  DateTime @default(now())
 
+  // F-06: Test data isolation (ADR 0065)
+  isTestData Boolean  @default(false)
+
   @@index([timestamp])
   @@index([userType, timestamp])
   @@index([identifier, timestamp])
+  @@index([isTestData, timestamp])
 }
 

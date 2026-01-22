@@ -112,13 +112,14 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
   try {
     const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
 
-    // Get unique user count per type
+    // Get unique user count per type (F-06: exclude test data via isTestData flag)
     const uniqueByType = await prisma.$queryRaw<
       Array<{ userType: string; count: bigint }>
     >`
       SELECT "userType", COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
+        AND "isTestData" = false
       GROUP BY "userType"
     `;
 
@@ -162,13 +163,30 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       },
     );
 
-    // Active users by route (top 10)
+    // F-06: Dedicated trial session metrics
+    samples.push(
+      {
+        name: "mirrorbuddy_trial_sessions_active",
+        labels: instanceLabels,
+        value: counts.trial,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_trial_to_total_ratio",
+        labels: instanceLabels,
+        value: total > 0 ? counts.trial / total : 0,
+        timestamp: now,
+      },
+    );
+
+    // Active users by route (top 10, F-06: exclude test data via isTestData flag)
     const routeCounts = await prisma.$queryRaw<
       Array<{ route: string; count: bigint }>
     >`
       SELECT route, COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
+        AND "isTestData" = false
       GROUP BY route
       ORDER BY count DESC
       LIMIT 10
@@ -306,12 +324,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-// Allow GET for manual testing in development
+// Vercel Cron uses GET by default
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-  }
-
-  log.warn("GET request to metrics-push in development mode");
   return POST(request);
 }
