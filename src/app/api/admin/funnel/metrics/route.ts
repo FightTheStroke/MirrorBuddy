@@ -76,24 +76,56 @@ export async function GET(request: Request) {
       };
     });
 
-    // Get unique visitor/user counts
-    const uniqueVisitors = await prisma.funnelEvent.findMany({
-      where: {
-        stage: "VISITOR",
-        createdAt: { gte: startDate },
-        isTestData: false,
-      },
-      distinct: ["visitorId", "userId"],
-    });
+    // Get unique visitor/user counts (count visitorId and userId separately to avoid double-counting)
+    const [uniqueVisitorIds, uniqueUserIds] = await Promise.all([
+      prisma.funnelEvent.findMany({
+        where: {
+          stage: "VISITOR",
+          createdAt: { gte: startDate },
+          isTestData: false,
+          visitorId: { not: null },
+        },
+        distinct: ["visitorId"],
+        select: { visitorId: true },
+      }),
+      prisma.funnelEvent.findMany({
+        where: {
+          stage: "VISITOR",
+          createdAt: { gte: startDate },
+          isTestData: false,
+          userId: { not: null },
+          visitorId: null, // Only count userId if no visitorId (converted users)
+        },
+        distinct: ["userId"],
+        select: { userId: true },
+      }),
+    ]);
+    const uniqueVisitors = [...uniqueVisitorIds, ...uniqueUserIds];
 
-    const uniqueConverted = await prisma.funnelEvent.findMany({
-      where: {
-        stage: "ACTIVE",
-        createdAt: { gte: startDate },
-        isTestData: false,
-      },
-      distinct: ["visitorId", "userId"],
-    });
+    const [convertedVisitorIds, convertedUserIds] = await Promise.all([
+      prisma.funnelEvent.findMany({
+        where: {
+          stage: "ACTIVE",
+          createdAt: { gte: startDate },
+          isTestData: false,
+          visitorId: { not: null },
+        },
+        distinct: ["visitorId"],
+        select: { visitorId: true },
+      }),
+      prisma.funnelEvent.findMany({
+        where: {
+          stage: "ACTIVE",
+          createdAt: { gte: startDate },
+          isTestData: false,
+          userId: { not: null },
+          visitorId: null,
+        },
+        distinct: ["userId"],
+        select: { userId: true },
+      }),
+    ]);
+    const uniqueConverted = [...convertedVisitorIds, ...convertedUserIds];
 
     const response: FunnelMetricsResponse = {
       stages,

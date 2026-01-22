@@ -394,5 +394,12 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
 // Vercel Cron uses GET by default
 export async function GET(request: NextRequest): Promise<NextResponse> {
+  // Verify cron secret for production security
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized - invalid or missing CRON_SECRET" },
+      { status: 401 },
+    );
+  }
   return POST(request);
 }
