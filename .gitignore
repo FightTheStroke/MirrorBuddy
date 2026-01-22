@@ -105,3 +105,7 @@ supabase/.temp/
 
 # Local documentation archives (not tracked)
 docs/.archive/
+
+# Environment files (production secrets)
+.env.production
+.env.vercel
