@@ -114,43 +114,46 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: SSL configuration with certificate chain support (ADR 0067)
+  // Production: SSL configuration (ADR 0067)
   if (isProduction) {
     // If full certificate chain is provided, enable full SSL verification
     if (supabaseCaCert) {
-      // Count certificates in chain (should be ≥2: root + intermediate)
-      // AWS RDS bundle contains 108 certificates for all regions
-      const certCount = (supabaseCaCert.match(/BEGIN CERTIFICATE/g) || [])
-        .length;
+      const certContent =
+        typeof supabaseCaCert === "string" ? supabaseCaCert : "";
+      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
 
-      // TEMPORARY: SSL verification disabled due to self-signed cert error
-      // AWS RDS bundle contains self-signed root CAs which PostgreSQL rejects
-      // Error: "self-signed certificate in certificate chain"
-      // TODO: Filter self-signed roots or use Supabase-specific certificate
-      logger.warn(
-        "[SSL] Certificate bundle available but verification disabled",
-        {
-          certificates: certCount,
-          reason: "self-signed certificates in chain",
-          action: "Filter self-signed roots from bundle",
-          adr: "0067",
-        },
-      );
-    } else {
-      logger.warn(
-        "[SSL] No certificate chain provided, disabling verification",
-        {
-          issue: "SUPABASE_CA_CERT not set",
-          action: "Run ./scripts/setup-ssl-certificate.sh",
-          adr: "0067",
-        },
-      );
+      if (certCount >= 2) {
+        logger.info(
+          "[SSL] Full certificate chain provided, enabling verification",
+          {
+            certificates: certCount,
+            adr: "0067",
+          },
+        );
+        return {
+          rejectUnauthorized: true,
+          ca: certContent,
+        };
+      } else {
+        logger.warn(
+          "[SSL] Incomplete certificate chain, using system root CAs",
+          {
+            certificates: certCount,
+            expected: ">=2 (root + intermediate)",
+          },
+        );
+      }
     }
 
-    // Fallback: Disable SSL verification (connection still encrypted)
-    // Security Impact: Medium - TLS encryption active, but server not authenticated
+    // Fallback: Use system root CAs
+    logger.info("[SSL] Using system root CAs for verification", {
+      mode: "verify-full",
+      adr: "0067",
+    });
+
     return {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
+      // No 'ca' parameter - uses system root CAs
     };
   }
 
