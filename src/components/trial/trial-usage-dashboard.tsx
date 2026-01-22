@@ -4,16 +4,11 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 interface TrialUsageData {
-  chatsUsed: number;
-  chatsLimit: number;
-  docsUsed: number;
-  docsLimit: number;
-  voiceSecondsUsed: number;
-  voiceSecondsLimit: number;
-  toolsUsed: number;
-  toolsLimit: number;
-  maestriSelected: number;
-  maestriLimit: number;
+  chat: { used: number; limit: number; percentage: number };
+  voice: { used: number; limit: number; percentage: number; unit: string };
+  tools: { used: number; limit: number; percentage: number };
+  docs: { used: number; limit: number; percentage: number };
+  maestri: { selected: number; limit: number };
 }
 
 interface ResourceMetric {
@@ -72,35 +67,35 @@ export function TrialUsageDashboard() {
   const resources: Record<string, ResourceMetric> = {
     chats: {
       label: "Chat Sessions",
-      used: data.chatsUsed,
-      limit: data.chatsLimit,
-      percentage: Math.round((data.chatsUsed / data.chatsLimit) * 100),
+      used: data.chat.used,
+      limit: data.chat.limit,
+      percentage: Math.round(data.chat.percentage),
     },
     docs: {
       label: "Documents",
-      used: data.docsUsed,
-      limit: data.docsLimit,
-      percentage: Math.round((data.docsUsed / data.docsLimit) * 100),
+      used: data.docs.used,
+      limit: data.docs.limit,
+      percentage: Math.round(data.docs.percentage),
     },
     voice: {
       label: "Voice Time (minutes)",
-      used: Math.round(data.voiceSecondsUsed / 60),
-      limit: Math.round(data.voiceSecondsLimit / 60),
-      percentage: Math.round(
-        (data.voiceSecondsUsed / data.voiceSecondsLimit) * 100,
-      ),
+      used: Math.floor(data.voice.used / 60),
+      limit: Math.floor(data.voice.limit / 60),
+      percentage: Math.round(data.voice.percentage),
     },
     tools: {
       label: "Tools Used",
-      used: data.toolsUsed,
-      limit: data.toolsLimit,
-      percentage: Math.round((data.toolsUsed / data.toolsLimit) * 100),
+      used: data.tools.used,
+      limit: data.tools.limit,
+      percentage: Math.round(data.tools.percentage),
     },
     maestri: {
       label: "Maestri",
-      used: data.maestriSelected,
-      limit: data.maestriLimit,
-      percentage: Math.round((data.maestriSelected / data.maestriLimit) * 100),
+      used: data.maestri.selected,
+      limit: data.maestri.limit,
+      percentage: Math.round(
+        (data.maestri.selected / data.maestri.limit) * 100,
+      ),
     },
   };
 
@@ -180,13 +175,12 @@ export function TrialUsageDashboard() {
           Trial Limits
         </h3>
         <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
-          <li>• {data.chatsLimit} chat sessions per month</li>
-          <li>• {data.docsLimit} document per month</li>
+          <li>• {data.chat.limit} chat sessions per month</li>
+          <li>• {data.docs.limit} document per month</li>
           <li>
-            • {Math.round(data.voiceSecondsLimit / 60)} minutes of voice per
-            month
+            • {Math.floor(data.voice.limit / 60)} minutes of voice per month
           </li>
-          <li>• {data.toolsLimit} total tool uses per month</li>
+          <li>• {data.tools.limit} total tool uses per month</li>
         </ul>
       </div>
     </div>
