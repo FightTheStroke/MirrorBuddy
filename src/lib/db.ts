@@ -122,27 +122,12 @@ function buildSslConfig(): PoolConfig["ssl"] {
         typeof supabaseCaCert === "string" ? supabaseCaCert : "";
       const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
 
-      if (certCount >= 2) {
-        logger.info(
-          "[SSL] Full certificate chain provided, enabling verification",
-          {
-            certificates: certCount,
-            adr: "0067",
-          },
-        );
-        return {
-          rejectUnauthorized: true,
-          ca: certContent,
-        };
-      } else {
-        logger.warn(
-          "[SSL] Incomplete certificate chain, using system root CAs",
-          {
-            certificates: certCount,
-            expected: ">=2 (root + intermediate)",
-          },
-        );
-      }
+      // HOTFIX: Disable SSL verification (self-signed cert issue persists)
+      logger.warn("[SSL] Certificate available but verification disabled", {
+        certificates: certCount,
+        reason: "self-signed certificate in certificate chain error",
+        action: "TODO: Use correct Supabase certificate",
+      });
     }
 
     // Fallback: Disable strict SSL verification
