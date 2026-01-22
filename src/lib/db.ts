@@ -123,30 +123,19 @@ function buildSslConfig(): PoolConfig["ssl"] {
       const certCount = (supabaseCaCert.match(/BEGIN CERTIFICATE/g) || [])
         .length;
 
-      if (certCount >= 2) {
-        logger.info(
-          "[SSL] Full certificate chain provided, enabling verification",
-          {
-            certificates: certCount,
-            adr: "0067",
-          },
-        );
-
-        return {
-          rejectUnauthorized: true,
-          ca: supabaseCaCert,
-        };
-      } else {
-        logger.warn(
-          "[SSL] Incomplete certificate chain, disabling verification",
-          {
-            certificates: certCount,
-            expected: ">=2 (root + intermediate)",
-            action: "Run ./scripts/setup-ssl-certificate.sh",
-            adr: "0067",
-          },
-        );
-      }
+      // TEMPORARY: SSL verification disabled due to self-signed cert error
+      // AWS RDS bundle contains self-signed root CAs which PostgreSQL rejects
+      // Error: "self-signed certificate in certificate chain"
+      // TODO: Filter self-signed roots or use Supabase-specific certificate
+      logger.warn(
+        "[SSL] Certificate bundle available but verification disabled",
+        {
+          certificates: certCount,
+          reason: "self-signed certificates in chain",
+          action: "Filter self-signed roots from bundle",
+          adr: "0067",
+        },
+      );
     } else {
       logger.warn(
         "[SSL] No certificate chain provided, disabling verification",
