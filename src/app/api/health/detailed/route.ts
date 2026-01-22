@@ -16,6 +16,7 @@ import { prisma } from "@/lib/db";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { getAppVersion } from "@/lib/version";
 import { prometheusPushService } from "@/lib/observability";
+import { getPoolMetrics, getPoolUtilization } from "@/lib/metrics/pool-metrics";
 
 /** Secret for health endpoint auth (optional) */
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
@@ -115,7 +116,13 @@ interface DetailedHealth {
 interface DatabaseCheck {
   status: "pass" | "warn" | "fail";
   latencyMs: number;
-  connectionPool?: { active: number; idle: number };
+  connectionPool?: {
+    total: number; // Total pool size (active + idle)
+    active: number; // Connections executing queries
+    idle: number; // Connections available for reuse
+    waiting: number; // Requests waiting for connection
+    utilization: number; // Utilization percentage (0-100)
+  };
 }
 
 interface AICheck {
@@ -155,9 +162,21 @@ async function checkDatabase(): Promise<DatabaseCheck> {
   try {
     await prisma.$queryRaw`SELECT 1`;
     const latency = Date.now() - start;
+
+    // Get connection pool statistics (ADR 0067)
+    const poolStats = getPoolMetrics();
+    const poolUtilization = getPoolUtilization();
+
     return {
       status: latency < 100 ? "pass" : "warn",
       latencyMs: latency,
+      connectionPool: {
+        total: poolStats.total,
+        active: poolStats.active,
+        idle: poolStats.idle,
+        waiting: poolStats.waiting,
+        utilization: poolUtilization,
+      },
     };
   } catch {
     return { status: "fail", latencyMs: Date.now() - start };

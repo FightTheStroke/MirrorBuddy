@@ -75,6 +75,7 @@ const connectionString = isE2E
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted
 // Download from: Supabase Dashboard → Database Settings → SSL Configuration
+// Setup: Run ./scripts/setup-ssl-certificate.sh for guided setup (ADR 0067)
 const supabaseCaCert = process.env.SUPABASE_CA_CERT;
 
 // Build SSL configuration
@@ -84,28 +85,54 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: TEMPORARY - Disable SSL verification (ADR 0065)
-  // TODO: Get full certificate chain (root + intermediate) from Supabase
-  //
-  // Current Issue:
-  // - The intermediate cert in SUPABASE_CA_CERT is incomplete (missing root CA)
-  // - Vercel serverless doesn't have Supabase root CA in system trust store
-  // - This causes SSL verification to fail with UNABLE_TO_VERIFY_LEAF_SIGNATURE
-  //
-  // Solution (to implement):
-  // 1. Download full certificate chain from Supabase Dashboard → Database Settings → SSL
-  // 2. Include both root CA and intermediate certificates in SUPABASE_CA_CERT
-  // 3. Format: PEM format, concatenated (root + intermediate)
-  // 4. Update this code to enable rejectUnauthorized: true
-  // 5. Test connection in production before deploying
-  //
-  // Security Impact: Medium - connection is still encrypted (TLS), but not authenticating server
+  // Production: SSL configuration with certificate chain support (ADR 0067)
   if (isProduction) {
-    logger.warn("[TEMP] SSL verification disabled - need full cert chain", {
-      issue: "missing_root_ca_in_vercel_trust_store",
-      action: "Get root + intermediate certs from Supabase",
-      adr: "0065",
-    });
+    // If full certificate chain is provided, enable full SSL verification
+    if (supabaseCaCert) {
+      // Certificate stored in env var with '|' as newline separator
+      // (for compatibility with single-line .env files)
+      const certContent = supabaseCaCert.split("|").join("\n");
+
+      // Count certificates in chain (should be ≥2: root + intermediate)
+      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
+
+      if (certCount >= 2) {
+        logger.info(
+          "[SSL] Full certificate chain provided, enabling verification",
+          {
+            certificates: certCount,
+            adr: "0067",
+          },
+        );
+
+        return {
+          rejectUnauthorized: true,
+          ca: certContent,
+        };
+      } else {
+        logger.warn(
+          "[SSL] Incomplete certificate chain, disabling verification",
+          {
+            certificates: certCount,
+            expected: ">=2 (root + intermediate)",
+            action: "Run ./scripts/setup-ssl-certificate.sh",
+            adr: "0067",
+          },
+        );
+      }
+    } else {
+      logger.warn(
+        "[SSL] No certificate chain provided, disabling verification",
+        {
+          issue: "SUPABASE_CA_CERT not set",
+          action: "Run ./scripts/setup-ssl-certificate.sh",
+          adr: "0067",
+        },
+      );
+    }
+
+    // Fallback: Disable SSL verification (connection still encrypted)
+    // Security Impact: Medium - TLS encryption active, but server not authenticated
     return {
       rejectUnauthorized: false,
     };
@@ -148,6 +175,10 @@ export const prisma =
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
+
+// Export pool for monitoring/metrics (ADR 0067)
+// Allows observability layer to track connection pool statistics
+export { pool as dbPool };
 
 /**
  * Check if an error is due to missing database tables (not initialized)
