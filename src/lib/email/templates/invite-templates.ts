@@ -11,6 +11,11 @@ export interface InviteRequestData {
   motivation: string;
   trialSessionId?: string;
   requestId: string;
+  trialStats?: {
+    chatsUsed: number;
+    voiceMinutesUsed: number;
+    toolsUsed: number;
+  };
 }
 
 export interface InviteApprovalData {
@@ -42,6 +47,28 @@ export function getAdminNotificationTemplate(data: InviteRequestData): {
 
   const adminUrl = `${APP_URL}/admin/invites`;
 
+  const trialUsageHtml = data.trialStats
+    ? `
+  <div style="background: #fef3c7; border-radius: 8px; padding: 16px; margin: 20px 0;">
+    <p style="margin: 0 0 12px 0;"><strong>Utilizzo Trial:</strong></p>
+    <ul style="margin: 0; padding-left: 20px;">
+      <li>Chat: ${data.trialStats.chatsUsed}/10</li>
+      <li>Voce: ${data.trialStats.voiceMinutesUsed}/5 min</li>
+      <li>Tool: ${data.trialStats.toolsUsed}/10</li>
+    </ul>
+  </div>
+  `
+    : "";
+
+  const trialUsageText = data.trialStats
+    ? `
+Trial Usage:
+- Chat: ${data.trialStats.chatsUsed}/10
+- Voce: ${data.trialStats.voiceMinutesUsed}/5 min
+- Tool: ${data.trialStats.toolsUsed}/10
+`
+    : "";
+
   return {
     to: ADMIN_EMAIL,
     subject: `[MirrorBuddy] Nuova richiesta beta da ${data.name}`,
@@ -60,6 +87,8 @@ export function getAdminNotificationTemplate(data: InviteRequestData): {
     <p style="margin: 0 0 8px 0;"><strong>Email:</strong> ${escapeHtml(data.email)}</p>
     ${data.trialSessionId ? `<p style="margin: 0 0 8px 0;"><strong>Trial Session:</strong> ${escapeHtml(data.trialSessionId)}</p>` : ""}
   </div>
+
+  ${trialUsageHtml}
 
   <div style="margin: 20px 0;">
     <p style="margin: 0 0 8px 0;"><strong>Motivazione:</strong></p>
@@ -84,7 +113,7 @@ Nuova richiesta beta per MirrorBuddy
 Nome: ${data.name}
 Email: ${data.email}
 ${data.trialSessionId ? `Trial Session: ${data.trialSessionId}` : ""}
-
+${trialUsageText}
 Motivazione:
 ${data.motivation}
 

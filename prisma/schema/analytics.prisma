@@ -102,8 +102,43 @@ model UserActivity {
   route      String   // Normalized route path
   timestamp  DateTime @default(now())
 
+  // F-06: Test data isolation (ADR 0065)
+  isTestData Boolean  @default(false)
+
   @@index([timestamp])
   @@index([userType, timestamp])
   @@index([identifier, timestamp])
+  @@index([isTestData, timestamp])
+}
+
+// ============================================================================
+// FUNNEL EVENT TRACKING - Tracks user journey through conversion funnel
+// Separate from TelemetryEvent for clean funnel queries (Plan 069)
+// ============================================================================
+
+model FunnelEvent {
+  id        String   @id @default(cuid())
+
+  // User identification (one of these required)
+  visitorId String?  // For trial users (before signup)
+  userId    String?  // For authenticated users
+
+  // Funnel data
+  stage     String   // VISITOR | TRIAL_START | TRIAL_ENGAGED | LIMIT_HIT | BETA_REQUEST | APPROVED | FIRST_LOGIN | ACTIVE | CHURNED
+  fromStage String?  // Previous stage (null for first event)
+
+  // Context
+  metadata  Json?    // Extra data (e.g., maestro used, feature triggered)
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
+  @@index([visitorId, createdAt])
+  @@index([userId, createdAt])
+  @@index([stage, createdAt])
+  @@index([isTestData, createdAt])
 }
 
