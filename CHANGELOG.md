@@ -32,6 +32,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production Ready**: Successfully tested with PostgreSQL 17.6 on Supabase
 - **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with implementation details
 
+#### Conversion Funnel Dashboard (ADR 0068)
+
+- **Admin Dashboard**: New `/admin/funnel` page with conversion funnel visualization
+  - KPI cards: Total visitors, conversion rate, active users
+  - Funnel bar chart with stage-to-stage conversion rates
+  - Users table with search, pagination, and stage filtering
+  - User drill-down modal with timeline and usage metrics
+  - Inline admin actions: Send invite, Approve, Block
+- **FunnelEvent Model**: New analytics model for tracking user journey
+  - Stages: VISITOR → TRIAL_START → TRIAL_ENGAGED → LIMIT_HIT → BETA_REQUEST → APPROVED → FIRST_LOGIN → ACTIVE → CHURNED
+  - Test data isolation via `isTestData` flag (ADR 0065)
+- **Funnel APIs**:
+  - `GET /api/admin/funnel/metrics` - Aggregate funnel metrics
+  - `GET /api/admin/funnel/users` - Paginated user listing with filters
+  - `GET /api/admin/funnel/user/[id]` - Individual user drill-down
+- **Email Automation**: Trial nurturing cron job (`/api/cron/trial-nurturing`)
+  - 70% usage nudge email
+  - 7-day inactivity reminder
+  - Deduplication via FunnelEvent metadata
+- **Grafana Integration**: Funnel metrics pushed to Grafana Cloud
+  - `mirrorbuddy_funnel_stage_count` - Users per stage
+  - `mirrorbuddy_funnel_conversion_rate` - Stage conversion rates
+- **Documentation**: `docs/operations/CRON-JOBS.md` with all cron job documentation
+
 ### Changed
 
 #### Database Performance Optimization (ADR 0067)
