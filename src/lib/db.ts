@@ -114,53 +114,19 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: SSL configuration (ADR 0067)
+  // Production: SSL configuration with system root CAs (ADR 0067)
   if (isProduction) {
-    // If full certificate chain is provided, enable full SSL verification
-    if (supabaseCaCert) {
-      const certContent =
-        typeof supabaseCaCert === "string" ? supabaseCaCert : "";
-      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
-
-      if (certCount >= 2) {
-        logger.info(
-          "[SSL] Full certificate chain provided, enabling verification",
-          {
-            certificates: certCount,
-            adr: "0067",
-          },
-        );
-        return {
-          rejectUnauthorized: true,
-          ca: certContent,
-        };
-      } else {
-        logger.warn(
-          "[SSL] Incomplete certificate chain, disabling verification",
-          {
-            certificates: certCount,
-            expected: ">=2 (root + intermediate)",
-            action: "Provide full AWS RDS certificate chain",
-          },
-        );
-      }
-    }
-
-    // Fallback: Disable strict SSL verification
-    // Supabase pgbouncer (port 6543) uses certificates incompatible with system root CAs
-    // Connection is still encrypted with TLS, but server certificate is not verified
-    logger.warn(
-      "[SSL] No CA certificate provided, disabling strict verification",
-      {
-        mode: "require-without-verify",
-        security: "TLS encryption active, but server not authenticated",
-        action: "Add certificate to config/aws-rds-ca-bundle.pem",
-        adr: "0067",
-      },
-    );
+    // Use system root CAs instead of custom certificate bundle
+    // Node.js and Vercel environments include Amazon Root CA by default
+    // This avoids issues with self-signed certificates in AWS RDS bundles
+    logger.info("[SSL] Enabling SSL verification with system root CAs", {
+      mode: "verify-full",
+      adr: "0067",
+    });
 
     return {
-      rejectUnauthorized: false,
+      rejectUnauthorized: true,
+      // No 'ca' parameter - uses system root CAs (includes Amazon Root CA)
     };
   }
 
