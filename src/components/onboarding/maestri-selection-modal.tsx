@@ -55,16 +55,11 @@ export function MaestriSelectionModal({
     setError(null);
 
     try {
-      // Extract name part from maestro IDs (e.g., "leonardo-art" -> "leonardo")
-      const maestriNames = selectedIds.map((id) => {
-        const parts = id.split("-");
-        return parts[0];
-      });
-
+      // Send full maestro IDs (e.g., "leonardo-arte", "euclide-matematica")
       const response = await csrfFetch("/api/user/preferences/maestri", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ maestriIds: maestriNames }),
+        body: JSON.stringify({ maestriIds: selectedIds }),
       });
 
       if (!response.ok) {
