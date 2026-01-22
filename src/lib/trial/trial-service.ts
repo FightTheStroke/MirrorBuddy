@@ -3,28 +3,28 @@ import crypto from "crypto";
 
 // Real maestri IDs from src/data/maestri/index.ts
 const MAESTRI = [
-  "leonardo",
-  "galileo",
-  "curie",
-  "cicerone",
-  "lovelace",
-  "smith",
-  "shakespeare",
-  "humboldt",
-  "erodoto",
-  "manzoni",
-  "euclide",
-  "mozart",
-  "socrate",
-  "ippocrate",
-  "feynman",
-  "darwin",
-  "chris",
-  "omero",
-  "alexPina",
-  "simone",
-  "cassese",
-  // Excluded from trial: mascetti (amico, not maestro)
+  "leonardo-arte",
+  "galileo-astronomia",
+  "curie-chimica",
+  "cicerone-civica",
+  "lovelace-informatica",
+  "smith-economia",
+  "shakespeare-inglese",
+  "humboldt-geografia",
+  "erodoto-storia",
+  "manzoni-italiano",
+  "euclide-matematica",
+  "mozart-musica",
+  "socrate-filosofia",
+  "ippocrate-corpo",
+  "feynman-fisica",
+  "darwin-scienze",
+  "chris-storytelling",
+  "omero-italiano",
+  "alex-pina-spagnolo",
+  "simone-sport",
+  "cassese-diritto",
+  // Excluded from trial: mascetti-supercazzola (amico, not maestro)
 ];
 
 // Available coaches from src/data/coaches/
@@ -62,24 +62,23 @@ export async function getOrCreateTrialSession(
   });
 
   if (!session) {
+    // F-03: Use user-selected maestri if available
     let maestri: string[];
-
-    // F-03: If userId provided, try to use user-selected maestri
     if (userId) {
       const user = await prisma.user.findUnique({
         where: { id: userId },
         select: { selectedMaestri: true },
       });
 
-      if (user && user.selectedMaestri.length > 0) {
-        // Use user's selected maestri (take up to MAESTRI_COUNT)
+      if (user?.selectedMaestri && user.selectedMaestri.length > 0) {
+        // Use first 3 from user's selections
         maestri = user.selectedMaestri.slice(0, TRIAL_LIMITS.MAESTRI_COUNT);
       } else {
         // Fallback to random if user has no selections
         maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
       }
     } else {
-      // Backward compatibility: no userId provided, use random
+      // No userId provided - use random (backward compatibility)
       maestri = getRandomItems(MAESTRI, TRIAL_LIMITS.MAESTRI_COUNT);
     }
 

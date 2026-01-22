@@ -10,29 +10,30 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 
-// MAESTRI constant from trial-service.ts
+// MAESTRI constant - Full IDs matching data/maestri definitions
 const MAESTRI = [
-  "leonardo",
-  "galileo",
-  "curie",
-  "cicerone",
-  "lovelace",
-  "smith",
-  "shakespeare",
-  "humboldt",
-  "erodoto",
-  "manzoni",
-  "euclide",
-  "mozart",
-  "socrate",
-  "ippocrate",
-  "feynman",
-  "darwin",
-  "chris",
-  "omero",
-  "alexPina",
-  "simone",
-  "cassese",
+  "leonardo-arte",
+  "galileo-astronomia",
+  "curie-chimica",
+  "cicerone-civica",
+  "lovelace-informatica",
+  "smith-economia",
+  "shakespeare-inglese",
+  "humboldt-geografia",
+  "erodoto-storia",
+  "manzoni-italiano",
+  "euclide-matematica",
+  "mozart-musica",
+  "socrate-filosofia",
+  "ippocrate-corpo",
+  "feynman-fisica",
+  "darwin-scienze",
+  "chris-storytelling",
+  "omero-italiano",
+  "alex-pina-spagnolo",
+  "simone-sport",
+  "cassese-diritto",
+  "mascetti-supercazzola",
 ];
 
 const MAX_MAESTRI = 3;
