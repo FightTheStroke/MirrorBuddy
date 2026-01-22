@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-01-22
+
+### Changed
+
+#### Database Performance Optimization (ADR 0067)
+
+- **Health Check Threshold**: Increased from 500ms to 1000ms to accommodate Vercel serverless cold starts (300-800ms typical)
+- **Connection Pool Configuration**: Explicit pg Pool settings optimized for serverless (max: 5, min: 0, idleTimeout: 30s)
+- **SSL Documentation**: Enhanced comments documenting certificate chain issue and resolution steps
+
+### Technical Details
+
+- `src/app/api/health/route.ts` - Updated database latency threshold to eliminate false "degraded" warnings
+- `src/lib/db.ts` - Explicit Pool configuration with serverless-optimized parameters
+- `src/lib/db.ts` - Comprehensive SSL certificate chain documentation
+- `docs/adr/0067-database-performance-optimization-serverless.md` - Full architecture decision record
+
+### Performance Impact
+
+- **Cold start latency**: Unchanged (745ms typical)
+- **Health check status**: Now correctly reports "healthy" on cold start
+- **Connection efficiency**: Reduced idle connections, optimized for stateless serverless functions
+
+---
+
 ## [0.8.0] - 2026-01-19 - Beta Release with Security Hardening (ADR 0060)
 
 ### Security
