@@ -60,12 +60,36 @@ export async function notifyAdminNewRequest(requestId: string): Promise<void> {
       return;
     }
 
+    // Fetch trial session data if available
+    let trialStats:
+      | {
+          chatsUsed: number;
+          voiceMinutesUsed: number;
+          toolsUsed: number;
+        }
+      | undefined;
+
+    if (request.trialSessionId) {
+      const trialSession = await prisma.trialSession.findUnique({
+        where: { id: request.trialSessionId },
+      });
+
+      if (trialSession) {
+        trialStats = {
+          chatsUsed: trialSession.chatsUsed,
+          voiceMinutesUsed: Math.round(trialSession.voiceSecondsUsed / 60),
+          toolsUsed: trialSession.toolsUsed,
+        };
+      }
+    }
+
     const template = getAdminNotificationTemplate({
       name: request.name,
       email: request.email,
       motivation: request.motivation,
       trialSessionId: request.trialSessionId || undefined,
       requestId: request.id,
+      trialStats,
     });
 
     await sendEmail({
