@@ -25,6 +25,7 @@ export const ADMIN_IGNORE_ERRORS = [
 export const ADMIN_ROUTES = [
   "/admin",
   "/admin/analytics",
+  "/admin/funnel",
   "/admin/invites",
   "/admin/tos",
   "/admin/users",
@@ -35,6 +36,7 @@ export const ADMIN_ROUTES = [
 // NOTE: /admin/settings doesn't exist yet - link in sidebar but page missing
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", exact: true },
+  { label: "Funnel", href: "/admin/funnel", exact: false },
   { label: "Richieste Beta", href: "/admin/invites", exact: false },
   { label: "Utenti", href: "/admin/users", exact: false },
   { label: "Analytics", href: "/admin/analytics", exact: false },
