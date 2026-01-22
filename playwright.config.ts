@@ -21,27 +21,45 @@ config();
 delete process.env.NO_COLOR;
 delete process.env.FORCE_COLOR;
 
-// CRITICAL: Validate test database URL to prevent production contamination
-const testDatabaseUrl =
-  process.env.TEST_DATABASE_URL ||
-  "postgresql://roberdan@localhost:5432/mirrorbuddy_test";
+// ============================================================================
+// CRITICAL PRODUCTION GUARDS - NEVER REMOVE THESE CHECKS
+// ============================================================================
 
-// PRODUCTION BLOCKER: Reject production Supabase URLs
+// GUARD #1: TEST_DATABASE_URL must be set and local
+const testDatabaseUrl = process.env.TEST_DATABASE_URL;
+
+if (!testDatabaseUrl || testDatabaseUrl.trim() === "") {
+  throw new Error(
+    `🚨 BLOCKED: TEST_DATABASE_URL is not set!\n` +
+      `E2E tests require an explicit local test database.\n` +
+      `Add to .env: TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test\n` +
+      `NEVER use production DATABASE_URL for tests.`,
+  );
+}
+
+// GUARD #2: TEST_DATABASE_URL must NOT be Supabase
 if (isSupabaseUrl(testDatabaseUrl)) {
   throw new Error(
-    `❌ BLOCKED: E2E tests attempted to use production Supabase database!\n` +
-      `TEST_DATABASE_URL must be a local test database, not: ${testDatabaseUrl}\n` +
+    `🚨 BLOCKED: TEST_DATABASE_URL points to production Supabase!\n` +
+      `TEST_DATABASE_URL: ${testDatabaseUrl}\n` +
+      `E2E tests MUST use a local PostgreSQL database.\n` +
       `Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test`,
   );
 }
 
-// Also check DATABASE_URL doesn't leak into tests
+// GUARD #3: DATABASE_URL must NOT leak into test environment
 if (process.env.DATABASE_URL && isSupabaseUrl(process.env.DATABASE_URL)) {
-  console.warn(
-    "⚠️  WARNING: DATABASE_URL contains production Supabase URL. " +
-      "E2E tests will use TEST_DATABASE_URL instead to prevent data corruption.",
+  // This is expected in .env, but we OVERRIDE it in webServer.env below
+  console.log(
+    "⚠️  DATABASE_URL contains production Supabase URL.\n" +
+      "   This will be OVERRIDDEN with TEST_DATABASE_URL in test webServer.\n" +
+      "   If you see test data in production, THIS OVERRIDE FAILED.",
   );
 }
+
+// GUARD #4: Fallback safety (should never be reached if .env is correct)
+const finalTestDb =
+  testDatabaseUrl || "postgresql://roberdan@localhost:5432/mirrorbuddy_test";
 
 // Configure screenshot comparison settings
 export const screenshotComparisonOptions = {
@@ -184,14 +202,14 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 90000,
     env: {
-      // CRITICAL: Use ONLY test database - NEVER fallback to production DATABASE_URL
+      // CRITICAL: OVERRIDE DATABASE_URL with test database
       // This prevents accidental contamination of production Supabase database
-      DATABASE_URL: testDatabaseUrl,
-      TEST_DATABASE_URL: testDatabaseUrl,
-      DIRECT_URL:
-        process.env.TEST_DIRECT_URL ||
-        "postgresql://roberdan@localhost:5432/mirrorbuddy_test",
+      // BOTH values set to same test DB to ensure no fallback to production
+      DATABASE_URL: finalTestDb,
+      TEST_DATABASE_URL: finalTestDb,
+      DIRECT_URL: process.env.TEST_DIRECT_URL || finalTestDb, // Same DB for direct connection
       E2E_TESTS: "1",
+      NODE_ENV: "test", // Explicit test environment
       // Session secret for cookie signing - MUST match global-setup.ts E2E_SESSION_SECRET
       // Always use test secret for E2E to ensure cookie signatures match
       SESSION_SECRET: "e2e-test-session-secret-32-characters-min",

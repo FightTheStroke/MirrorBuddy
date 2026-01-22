@@ -25,16 +25,52 @@ function signCookieValue(value: string): string {
 }
 
 async function globalSetup() {
-  // ENVIRONMENT GUARD: Block tests in production (F-03)
-  // E2E tests MUST never run in production - they corrupt real user data
+  // PRODUCTION BLOCKER #1: Block if NODE_ENV is production
   if (process.env.NODE_ENV === "production") {
     throw new Error(
-      "CRITICAL SAFETY ERROR: E2E tests are blocked in production environment.\n" +
+      "🚨 CRITICAL SAFETY ERROR: E2E tests are blocked in production environment.\n" +
         "E2E tests would corrupt real user data, delete sessions, and cause data loss.\n" +
         "Set NODE_ENV=development or NODE_ENV=test to run tests.\n" +
         "Contact DevOps if you believe this is incorrect.",
     );
   }
+
+  // PRODUCTION BLOCKER #2: Block if DATABASE_URL contains Supabase production
+  const dbUrl = process.env.DATABASE_URL || "";
+  const testDbUrl = process.env.TEST_DATABASE_URL || "";
+
+  if (dbUrl.includes("supabase.com") || dbUrl.includes("supabase.co")) {
+    throw new Error(
+      "🚨 BLOCKED: E2E tests attempted to use production Supabase DATABASE_URL!\n" +
+        `DATABASE_URL: ${dbUrl.substring(0, 50)}...\n` +
+        "E2E tests MUST use a local test database.\n" +
+        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test\n" +
+        "and ensure DATABASE_URL is overridden in playwright.config.ts webServer.env",
+    );
+  }
+
+  if (testDbUrl.includes("supabase.com") || testDbUrl.includes("supabase.co")) {
+    throw new Error(
+      "🚨 BLOCKED: TEST_DATABASE_URL contains production Supabase URL!\n" +
+        `TEST_DATABASE_URL: ${testDbUrl.substring(0, 50)}...\n` +
+        "E2E tests MUST use a local test database.\n" +
+        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
+    );
+  }
+
+  // PRODUCTION BLOCKER #3: Require TEST_DATABASE_URL to be set
+  if (!testDbUrl || testDbUrl.trim() === "") {
+    throw new Error(
+      "🚨 BLOCKED: TEST_DATABASE_URL is not set!\n" +
+        "E2E tests require an explicit test database.\n" +
+        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
+    );
+  }
+
+  console.log(
+    "✅ Production guards passed. Using test database:",
+    testDbUrl.substring(0, 50),
+  );
 
   // Ensure .auth directory exists
   const authDir = path.dirname(STORAGE_STATE_PATH);
