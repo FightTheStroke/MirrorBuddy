@@ -12,6 +12,8 @@ interface TrialUsageData {
   voiceSecondsLimit: number;
   toolsUsed: number;
   toolsLimit: number;
+  maestriSelected: number;
+  maestriLimit: number;
 }
 
 interface ResourceMetric {
@@ -29,7 +31,7 @@ export function TrialUsageDashboard() {
   useEffect(() => {
     async function fetchUsage() {
       try {
-        const response = await fetch("/api/trial/usage");
+        const response = await fetch("/api/user/usage");
         if (!response.ok) throw new Error("Failed to fetch trial usage");
         const usageData = await response.json();
         setData(usageData);
@@ -94,6 +96,12 @@ export function TrialUsageDashboard() {
       limit: data.toolsLimit,
       percentage: Math.round((data.toolsUsed / data.toolsLimit) * 100),
     },
+    maestri: {
+      label: "Maestri",
+      used: data.maestriSelected,
+      limit: data.maestriLimit,
+      percentage: Math.round((data.maestriSelected / data.maestriLimit) * 100),
+    },
   };
 
   // Check if any resource has >= 80% usage
@@ -101,14 +109,13 @@ export function TrialUsageDashboard() {
 
   // Helper to determine progress bar color
   const getProgressColor = (percentage: number): string => {
-    if (percentage >= 90) return "bg-red-500";
-    if (percentage >= 80) return "bg-orange-500";
-    if (percentage >= 50) return "bg-yellow-500";
+    if (percentage > 90) return "bg-red-500";
+    if (percentage >= 70) return "bg-yellow-500";
     return "bg-green-500";
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" data-testid="trial-usage-dashboard">
       <div>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Your Trial Usage
