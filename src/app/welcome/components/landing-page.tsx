@@ -3,11 +3,11 @@ import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { useRouter } from "next/navigation";
-import { HeroSection } from "./hero-section";
-import { MaestriShowcaseSection } from "./maestri-showcase-section";
+import { HeroSectionV3 } from "./hero-section-v3";
+import { QuickStartVerticalV2 } from "./quick-start-vertical-v2";
+import { MaestriShowcaseSectionV2 } from "./maestri-showcase-section-v2";
 import { SupportSection } from "./support-section";
 import { FeaturesSection } from "./features-section";
-import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
 import type { ExistingUserData } from "../types";
 
@@ -85,15 +85,14 @@ export function LandingPage({
           transition={{ duration: 0.6 }}
           className="w-full flex-1 flex flex-col items-center justify-center"
         >
-          <HeroSection
+          {/* Hero Section with Beta Badge */}
+          <HeroSectionV3
             userName={existingUserData?.name}
             isReturningUser={isReturningUser}
           />
-          <MaestriShowcaseSection />
-          <SupportSection />
-          <FeaturesSection />
 
-          <QuickStart
+          {/* Quick Start - Login/Trial BEFORE Maestri */}
+          <QuickStartVerticalV2
             isReturningUser={isReturningUser}
             onStartWithVoice={handleStartWithOnboarding}
             onStartWithoutVoice={handleStartWithOnboarding}
@@ -102,6 +101,15 @@ export function LandingPage({
               isReturningUser ? handleStartWithOnboarding : undefined
             }
           />
+
+          {/* Maestri Showcase - No duplications */}
+          <MaestriShowcaseSectionV2 />
+
+          {/* Support Section */}
+          <SupportSection />
+
+          {/* Features Section */}
+          <FeaturesSection />
         </motion.div>
 
         {/* Welcome Footer with consent, legal, badges */}

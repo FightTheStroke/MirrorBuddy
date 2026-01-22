@@ -43,6 +43,7 @@ const LEGAL_LINKS = [
   { href: "/ai-transparency", label: "Trasparenza AI" },
   { href: "/ai-policy", label: "Politica AI" },
   { href: "/compliance", label: "Compliance" },
+  { href: "/contatti", label: "Contatti" },
 ];
 
 /**
