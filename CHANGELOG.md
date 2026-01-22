@@ -23,13 +23,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### SSL Certificate Setup (ADR 0067) - ✅ Implemented
 
-- **Environment Variable Configuration**: AWS RDS EU-WEST-1 certificates stored in `SUPABASE_CA_CERT` (3 certificates, 4.6KB)
+- **Repository-Based Certificates**: Supabase certificate chain stored in `config/supabase-chain.pem` (2 certificates: intermediate + root CA)
+- **Root Cause Solution**: Full certificate chain (Supabase Intermediate 2021 CA + Supabase Root 2021 CA) required for proper SSL verification
 - **Full SSL Verification Enabled**: Production now uses `rejectUnauthorized: true` with complete certificate chain
-- **Smart Certificate Loading**: `src/lib/db.ts` loads from env var with pipe-separator format (`|` instead of newlines)
-- **Regional Optimization**: EU-WEST-1 bundle (3 certs: RSA2048, RSA4096, ECC384) instead of global bundle (108 certs)
-- **Self-Signed Root Filtering**: Avoided PostgreSQL "self-signed certificate in chain" error by using regional bundle
-- **Production Verified**: Health endpoint shows 72ms database latency with SSL verification active
-- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with setup instructions
+- **Certificate Extraction Script**: `scripts/extract-supabase-cert.ts` extracts certificates directly from live Supabase connection
+- **Automated Testing**: `scripts/test-final-ssl.ts` verifies SSL verification with full certificate chain
+- **No Environment Variable Limits**: Bypasses Vercel 64KB env var limit by loading from repository file
+- **Production Ready**: Successfully tested with PostgreSQL 17.6 on Supabase
+- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with implementation details
 
 ### Changed
 

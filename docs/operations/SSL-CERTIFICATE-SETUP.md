@@ -7,9 +7,10 @@
 ## Current Status
 
 **SSL Verification**: ✅ Enabled (`rejectUnauthorized: true`)
-**Certificate Bundle**: AWS RDS Global Bundle (108 certificates)
-**Location**: `config/aws-rds-ca-bundle.pem` (committed in repository)
+**Certificate Chain**: Supabase Intermediate 2021 CA + Supabase Root 2021 CA (2 certificates)
+**Location**: `config/supabase-chain.pem` (committed in repository)
 **Security Impact**: Production-ready - Full server authentication enabled
+**Last Updated**: 2026-01-22 - Root cause solution implemented
 
 ## Problem
 
@@ -20,100 +21,90 @@ Supabase uses a certificate chain that requires explicit trust:
 
 Without the full chain, SSL verification fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`.
 
-## Solution: AWS RDS Certificate Bundle (Repository-Based)
+## Solution: Supabase Certificate Chain (Repository-Based)
 
 ### Implementation
 
-The SSL certificate bundle is now stored directly in the repository at `config/aws-rds-ca-bundle.pem`.
+The SSL certificate chain is stored directly in the repository at `config/supabase-chain.pem`.
 
 **Benefits**:
 
-- No Vercel environment variable size limits (was 64KB, bundle is 165KB)
+- No Vercel environment variable size limits (chain is 2.7KB)
 - Version controlled and consistent across all environments
-- Automatic updates when bundle is refreshed
-- No manual setup required for new deployments
+- Automatic deployment with no manual configuration
+- Extracted directly from live Supabase connection
+- Contains only required certificates (intermediate + root)
 
-**Certificate Source**: AWS RDS Global Bundle
+**Certificate Source**: Extracted from Supabase Connection
 
-- Contains 108 root + intermediate certificates
-- Covers all AWS regions (including eu-west-1 where Supabase runs)
+- Contains 2 certificates:
+  1. **Supabase Intermediate 2021 CA** (signed by Supabase Root 2021 CA)
+  2. **Supabase Root 2021 CA** (self-signed root CA)
+- Valid until 2033
+- Extracted using: `npm run extract-cert` (see `scripts/extract-supabase-cert.ts`)
 - Public certificates, safe to commit to repository
-- Downloaded from: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
-### Manual Setup
+### Automated Setup (Recommended)
 
-#### Step 1: Download Certificate Chain
+The certificate chain is already included in the repository at `config/supabase-chain.pem`. No manual setup is required.
 
-1. Login to [Supabase Dashboard](https://supabase.com/dashboard)
-2. Navigate to: **Project → Settings → Database**
-3. Scroll to **Connection Info** section
-4. Click **SSL Configuration** tab
-5. Download the **full certificate chain** (root + intermediate)
-
-**Expected format**: PEM format, concatenated certificates
-
-#### Step 2: Store Certificate in Environment Variable
-
-**For Local Development** (`.env`):
+**To verify the certificate**:
 
 ```bash
-# Full certificate chain (root + intermediate)
-# Use | as newline separator for single-line compatibility
-SUPABASE_CA_CERT="-----BEGIN CERTIFICATE-----|MII...|-----END CERTIFICATE-----|-----BEGIN CERTIFICATE-----|MII...|-----END CERTIFICATE-----"
+# View certificate details
+openssl x509 -in config/supabase-chain.pem -noout -text | head -20
+
+# Check validity dates
+openssl x509 -in config/supabase-chain.pem -noout -dates
+
+# Test SSL connection locally
+npm run test-ssl
 ```
 
-**For Vercel Production**:
+### Manual Certificate Regeneration (If Needed)
+
+If Supabase rotates their certificates or you need to regenerate the chain:
+
+#### Step 1: Extract Certificate Chain from Live Connection
 
 ```bash
-# Option 1: Via CLI
-vercel env add SUPABASE_CA_CERT production
-# Paste certificate content when prompted (with actual newlines)
+# Set DATABASE_URL to production Supabase connection string
+export DATABASE_URL='postgresql://...'
 
-# Option 2: Via Dashboard
-# 1. Go to: https://vercel.com/fightthestroke/mirrorbuddy/settings/environment-variables
-# 2. Add/Edit: SUPABASE_CA_CERT
-# 3. Value: Paste certificate content (preserve newlines)
-# 4. Environment: Production
-# 5. Save
+# Extract certificate chain
+npm run extract-cert
+# or: npx tsx scripts/extract-supabase-cert.ts
+
+# This will create/update: config/supabase-chain.pem
 ```
 
-#### Step 3: Verify Certificate
-
-The code automatically validates the certificate:
-
-```typescript
-// src/lib/db.ts:91-109
-const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
-
-if (certCount >= 2) {
-  // Full chain detected, enable SSL verification
-  return {
-    rejectUnauthorized: true,
-    ca: certContent,
-  };
-} else {
-  // Incomplete chain, fallback to disabled verification
-  logger.warn("Incomplete certificate chain");
-}
-```
-
-**Expected**: Certificate count ≥ 2 (root + intermediate)
-
-#### Step 4: Deploy and Verify
+#### Step 2: Verify Certificate Chain
 
 ```bash
+# Test the extracted certificate
+npm run test-ssl
+# or: npx tsx scripts/test-final-ssl.ts
+
+# Expected output:
+# ✅ Connection successful with SSL verification enabled!
+# Database: PostgreSQL 17.6
+```
+
+#### Step 3: Commit and Deploy
+
+```bash
+# Add the updated certificate to git
+git add config/supabase-chain.pem
+
+# Commit with descriptive message
+git commit -m "chore(ssl): update Supabase certificate chain"
+
 # Deploy to production
 git push origin main
 
-# Wait for deployment to complete (~2 minutes)
-
-# Verify SSL is enabled (check logs)
+# Verify in production
 vercel logs mirrorbuddy --prod | grep "\[SSL\]"
-# Expected: "[SSL] Full certificate chain provided, enabling verification"
-
-# Test connection
-curl https://mirrorbuddy.vercel.app/api/health
-# Expected: "status": "healthy"
+# Expected: "[SSL] Certificate chain loaded, enabling SSL verification"
 ```
 
 ## Verification
@@ -274,24 +265,38 @@ Supabase certificates typically valid for 1-2 years.
 
 ## Changelog
 
-**2026-01-22** (Latest - Repository-Based Implementation):
+**2026-01-22** (Latest - Root Cause Solution):
 
-- ✅ **IMPLEMENTED**: AWS RDS Global Bundle stored in repository
-- ✅ Certificate location: `config/aws-rds-ca-bundle.pem` (108 certificates)
-- ✅ Updated `src/lib/db.ts` with file-based loading (no env var limits)
-- ✅ SSL verification enabled by default in production
+- ✅ **ROOT CAUSE SOLVED**: Extracted Supabase certificate chain from live connection
+- ✅ Certificate location: `config/supabase-chain.pem` (2 certificates: intermediate + root)
+- ✅ **Key Insight**: Full chain (intermediate + root CA) required for verification
+  - NO certificate: "self-signed certificate in certificate chain" ❌
+  - ONLY intermediate: "unable to get issuer certificate" ❌
+  - Intermediate + Root: SSL verification successful ✅
+- ✅ Automated extraction script: `scripts/extract-supabase-cert.ts`
+- ✅ Automated testing script: `scripts/test-final-ssl.ts`
+- ✅ Updated `src/lib/db.ts` to load from repository file
+- ✅ SSL verification enabled in production (`rejectUnauthorized: true`)
 - ✅ No manual setup required for new deployments
+- ✅ No environment variable size limits
+
+**2026-01-22** (Intermediate Attempts):
+
+- ⚠️ Tried AWS RDS Global Bundle (108 certs) - Too large for env vars (165KB > 64KB limit)
+- ⚠️ Tried AWS RDS EU-WEST-1 Bundle (3 certs) - Wrong certificates (AWS not Supabase)
+- ⚠️ Tried repository-based AWS bundle - "self-signed certificate in certificate chain" error
+- ⚠️ Tried system root CAs only - Still got "self-signed certificate" error
+- ⚠️ Tried intermediate only - "unable to get issuer certificate" error
 
 **2026-01-22** (Initial):
 
-- Created setup script (`scripts/setup-ssl-certificate.sh`)
-- Updated code to support full certificate chain
-- Added automatic certificate validation
-- Documented setup process
+- Created investigation and testing scripts
+- Documented the certificate verification problem
+- Identified root cause: Need full Supabase certificate chain
 
 ---
 
 **Maintained by**: Engineering Team
 **Last Updated**: 2026-01-22
-**Status**: ✅ Implemented and Active
-**Next Review**: Annually (certificate bundle updates)
+**Status**: ✅ Implemented and Verified
+**Next Review**: 2033 (certificate expiration) or when Supabase rotates certificates
