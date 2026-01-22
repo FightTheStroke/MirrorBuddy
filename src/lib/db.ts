@@ -84,25 +84,13 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // REQUIRED for Supabase: The pooler uses a CA not in Node's default trust store
-  // Without the CA cert, SSL verification will fail with "self-signed certificate"
-  if (supabaseCaCert) {
-    // SECURE: Full certificate verification with Supabase CA
+  // Production: Use system CA trust store
+  // Supabase certificates chain to a root CA that's in the system trust store
+  // By NOT providing a custom 'ca' option, Node.js uses system CAs + server-provided intermediate certs
+  if (isProduction) {
     return {
       rejectUnauthorized: true,
-      ca: supabaseCaCert,
-    };
-  }
-
-  // Production: Temporarily disable SSL verification for debugging
-  // TODO: Fix SSL certificate chain issue (ADR 0063)
-  if (isProduction) {
-    logger.warn("[TEMP] SSL verification disabled for debugging", {
-      issue: "certificate_chain_incomplete",
-      action: "Need to add root + intermediate certs",
-    });
-    return {
-      rejectUnauthorized: false,
+      // No 'ca' option = use system trust store
     };
   }
 
@@ -111,14 +99,8 @@ function buildSslConfig(): PoolConfig["ssl"] {
 }
 
 // Create pg Pool with SSL configuration
-// Remove sslmode from connection string - we manage SSL explicitly via ssl option
-const cleanConnectionString = connectionString.replace(
-  /[?&]sslmode=[^&]*/g,
-  "",
-);
-
 const pool = new Pool({
-  connectionString: cleanConnectionString,
+  connectionString,
   ssl: buildSslConfig(),
 });
 
