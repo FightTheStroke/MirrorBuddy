@@ -75,7 +75,8 @@ const connectionString = isE2E
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted
 // Download from: Supabase Dashboard → Database Settings → SSL Configuration
-const supabaseCaCert = process.env.SUPABASE_CA_CERT;
+// Convert escaped \n to real newlines (handles both formats: literal \n and real newlines)
+const supabaseCaCert = process.env.SUPABASE_CA_CERT?.replace(/\\n/g, "\n");
 
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
