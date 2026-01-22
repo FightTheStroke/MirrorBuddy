@@ -84,14 +84,27 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: TEMPORARY - Disable SSL verification
+  // Production: TEMPORARY - Disable SSL verification (ADR 0065)
   // TODO: Get full certificate chain (root + intermediate) from Supabase
-  // The intermediate cert in SUPABASE_CA_CERT is incomplete - missing root CA
-  // Vercel serverless doesn't have Supabase root CA in system trust store
+  //
+  // Current Issue:
+  // - The intermediate cert in SUPABASE_CA_CERT is incomplete (missing root CA)
+  // - Vercel serverless doesn't have Supabase root CA in system trust store
+  // - This causes SSL verification to fail with UNABLE_TO_VERIFY_LEAF_SIGNATURE
+  //
+  // Solution (to implement):
+  // 1. Download full certificate chain from Supabase Dashboard → Database Settings → SSL
+  // 2. Include both root CA and intermediate certificates in SUPABASE_CA_CERT
+  // 3. Format: PEM format, concatenated (root + intermediate)
+  // 4. Update this code to enable rejectUnauthorized: true
+  // 5. Test connection in production before deploying
+  //
+  // Security Impact: Medium - connection is still encrypted (TLS), but not authenticating server
   if (isProduction) {
     logger.warn("[TEMP] SSL verification disabled - need full cert chain", {
       issue: "missing_root_ca_in_vercel_trust_store",
       action: "Get root + intermediate certs from Supabase",
+      adr: "0065",
     });
     return {
       rejectUnauthorized: false,
@@ -112,9 +125,15 @@ function cleanConnectionString(url: string): string {
   return cleaned;
 }
 
+// Connection pool configuration optimized for Vercel serverless (ADR 0065)
+// Serverless functions are stateless and short-lived, so we minimize idle connections
 const pool = new Pool({
   connectionString: cleanConnectionString(connectionString),
   ssl: buildSslConfig(),
+  max: 5, // Maximum 5 concurrent connections per serverless instance
+  min: 0, // No idle connections (serverless cold start every time)
+  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+  connectionTimeoutMillis: 10000, // Timeout after 10 seconds if unable to connect
 });
 
 const adapter = new PrismaPg(pool);
