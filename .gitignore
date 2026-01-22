@@ -83,6 +83,9 @@ __pycache__/
 # Internal legal documents (confidential)
 docs/legal/
 
+# Business plan documents (confidential, financial data)
+docs/busplan/
+
 # Local audit notes
 fallo17.md
 plan17.md

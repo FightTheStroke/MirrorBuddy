@@ -2,7 +2,11 @@
  * Email templates for the beta invite system
  */
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "info@fightthestroke.org";
+if (!process.env.ADMIN_EMAIL) {
+  throw new Error("ADMIN_EMAIL environment variable is required");
+}
+
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
 export interface InviteRequestData {
