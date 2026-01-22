@@ -135,11 +135,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       if (usagePercent < USAGE_THRESHOLD) continue;
 
       // Check if already sent nudge via funnel event
+      // Use string_contains for JSON field filtering (Prisma PostgreSQL)
       const alreadyNudged = await prisma.funnelEvent.findFirst({
         where: {
           visitorId: session.visitorId,
           stage: "LIMIT_HIT",
-          metadata: { path: ["emailSent"], equals: true },
+          metadata: {
+            string_contains: '"emailSent":true',
+          },
         },
       });
 
@@ -215,10 +218,13 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     for (const session of inactiveTrials) {
       // Check if already sent reminder
+      // Use string_contains for JSON field filtering (Prisma PostgreSQL)
       const alreadyReminded = await prisma.funnelEvent.findFirst({
         where: {
           visitorId: session.visitorId,
-          metadata: { path: ["inactivityReminder"], equals: true },
+          metadata: {
+            string_contains: '"inactivityReminder":true',
+          },
         },
       });
 
