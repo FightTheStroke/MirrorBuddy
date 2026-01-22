@@ -10,6 +10,9 @@ export async function GET() {
   return NextResponse.json({
     length: cert.length,
     firstChars: cert.substring(0, 50),
+    lastChars: cert.substring(cert.length - 50),
+    hasBegin: cert.includes("-----BEGIN CERTIFICATE-----"),
+    hasEnd: cert.includes("-----END CERTIFICATE-----"),
     hasBackslashN: cert.includes("\\n"),
     hasRealNewline: cert.includes("\n"),
     matchCount: (cert.match(/\\n/g) || []).length,

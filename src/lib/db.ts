@@ -75,8 +75,7 @@ const connectionString = isE2E
 // Configure SSL for Supabase connection
 // Supabase uses a CA certificate that must be explicitly trusted
 // Download from: Supabase Dashboard → Database Settings → SSL Configuration
-// Convert escaped \n to real newlines (handles both formats: literal \n and real newlines)
-const supabaseCaCert = process.env.SUPABASE_CA_CERT?.replace(/\\n/g, "\n");
+const supabaseCaCert = process.env.SUPABASE_CA_CERT;
 
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
@@ -95,17 +94,12 @@ function buildSslConfig(): PoolConfig["ssl"] {
     };
   }
 
-  // Production REQUIRES CA cert for secure SSL verification
-  // Supabase's pooler CA isn't in Node.js trust store, so we must provide it
-  // Download from: Supabase Dashboard → Database Settings → SSL Configuration
+  // Production: Temporarily disable SSL verification for debugging
+  // TODO: Fix SSL certificate chain issue (ADR 0063)
   if (isProduction) {
-    // During Next.js build, db.ts is imported but not connected
-    // The env validation in instrumentation.ts will catch this at runtime
-    // Here we log a critical warning and use encrypted-only mode as fallback
-    logger.error("[SECURITY] SUPABASE_CA_CERT not set in production", {
-      issue: "ssl_verification_disabled",
-      severity: "critical",
-      action: "Set SUPABASE_CA_CERT environment variable",
+    logger.warn("[TEMP] SSL verification disabled for debugging", {
+      issue: "certificate_chain_incomplete",
+      action: "Need to add root + intermediate certs",
     });
     return {
       rejectUnauthorized: false,
