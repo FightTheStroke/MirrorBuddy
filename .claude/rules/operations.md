@@ -41,6 +41,19 @@ GRAFANA_CLOUD_API_KEY=...
 
 **Implementation**: `src/lib/observability/prometheus-push-service.ts`
 
+## Cron Jobs
+
+Configured in `vercel.json`, documented in `docs/operations/CRON-JOBS.md`.
+
+| Job                      | Schedule       | Purpose                     |
+| ------------------------ | -------------- | --------------------------- |
+| `metrics-push`           | _/5 _ \* \* \* | SLI/HTTP metrics to Grafana |
+| `business-metrics-daily` | 0 3 \* \* \*   | Daily KPIs to Grafana       |
+| `data-retention`         | 0 3 \* \* \*   | GDPR data cleanup           |
+| `trial-nurturing`        | 0 9 \* \* \*   | Trial user email automation |
+
+**Test locally**: `curl -H "Authorization: Bearer $CRON_SECRET" http://localhost:3000/api/cron/{job}`
+
 ## Runbooks
 
 | Document                                | Purpose                   |
@@ -48,6 +61,7 @@ GRAFANA_CLOUD_API_KEY=...
 | `docs/operations/SLI-SLO.md`            | Service level definitions |
 | `docs/operations/RUNBOOK.md`            | Incident response         |
 | `docs/operations/RUNBOOK-PROCEDURES.md` | Maintenance procedures    |
+| `docs/operations/CRON-JOBS.md`          | Cron job documentation    |
 
 ## Observability Stack
 
