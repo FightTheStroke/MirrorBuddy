@@ -103,14 +103,17 @@ function buildSslConfig(): PoolConfig["ssl"] {
 }
 
 // Create pg Pool with SSL configuration
-// Remove any sslmode parameter from connection string - we manage SSL explicitly via ssl option
-const cleanConnectionString = connectionString.replace(
-  /[?&]sslmode=[^&]*/g,
-  "",
-);
+// Remove sslmode parameter from connection string - we manage SSL explicitly via ssl option
+function cleanConnectionString(url: string): string {
+  // Remove sslmode=value (and its delimiter)
+  let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
+  // Clean up any trailing ? or & or double delimiters
+  cleaned = cleaned.replace(/[?&]$/, "").replace(/[?&]{2,}/g, "?");
+  return cleaned;
+}
 
 const pool = new Pool({
-  connectionString: cleanConnectionString,
+  connectionString: cleanConnectionString(connectionString),
   ssl: buildSslConfig(),
 });
 
