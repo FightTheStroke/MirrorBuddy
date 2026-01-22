@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/business-metrics-daily",
       "schedule": "0 3 * * *"
+    },
+    {
+      "path": "/api/cron/trial-nurturing",
+      "schedule": "0 9 * * *"
     }
   ]
 }

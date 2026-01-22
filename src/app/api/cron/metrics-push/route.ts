@@ -218,6 +218,74 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     });
   }
 
+  // 3. Funnel metrics (Plan 069, F-10)
+  try {
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+    // Get counts per stage
+    const stageCounts = await prisma.funnelEvent.groupBy({
+      by: ["stage"],
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        isTestData: false,
+      },
+      _count: { _all: true },
+    });
+
+    for (const sc of stageCounts) {
+      samples.push({
+        name: "mirrorbuddy_funnel_stage_count",
+        labels: { ...instanceLabels, stage: sc.stage },
+        value: sc._count._all,
+        timestamp: now,
+      });
+    }
+
+    // Calculate conversion rates between stages
+    const stageOrder = [
+      "VISITOR",
+      "TRIAL_START",
+      "TRIAL_ENGAGED",
+      "LIMIT_HIT",
+      "BETA_REQUEST",
+      "APPROVED",
+      "FIRST_LOGIN",
+      "ACTIVE",
+    ];
+    const countMap = new Map(stageCounts.map((s) => [s.stage, s._count._all]));
+
+    for (let i = 1; i < stageOrder.length; i++) {
+      const prevCount = countMap.get(stageOrder[i - 1]) ?? 0;
+      const currCount = countMap.get(stageOrder[i]) ?? 0;
+      const rate = prevCount > 0 ? currCount / prevCount : 0;
+
+      samples.push({
+        name: "mirrorbuddy_funnel_conversion_rate",
+        labels: {
+          ...instanceLabels,
+          from_stage: stageOrder[i - 1],
+          to_stage: stageOrder[i],
+        },
+        value: rate,
+        timestamp: now,
+      });
+    }
+
+    // Overall funnel conversion (VISITOR → ACTIVE)
+    const visitorCount = countMap.get("VISITOR") ?? 0;
+    const activeCount = countMap.get("ACTIVE") ?? 0;
+    samples.push({
+      name: "mirrorbuddy_funnel_overall_conversion",
+      labels: instanceLabels,
+      value: visitorCount > 0 ? activeCount / visitorCount : 0,
+      timestamp: now,
+    });
+
+    log.debug("Collected funnel metrics", { stages: stageCounts.length });
+  } catch (err) {
+    log.warn("Failed to collect funnel metrics", { error: String(err) });
+  }
+
   return samples;
 }
 

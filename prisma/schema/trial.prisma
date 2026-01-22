@@ -14,10 +14,13 @@ model TrialSession {
   assignedMaestri  String   @default("[]") // JSON array of 3 maestro IDs
   assignedCoach    String?  // Single coach ID
   abuseScore       Int      @default(0)
+  email            String?  // Optional email for nurturing (F-01)
+  emailCollectedAt DateTime? // When email was provided
   createdAt        DateTime @default(now())
   lastActivityAt   DateTime @updatedAt
 
   @@index([ipHash])
   @@index([visitorId])
+  @@index([email]) // Index for email lookups (F-01)
   @@unique([ipHash, visitorId])
 }
