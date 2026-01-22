@@ -7,19 +7,58 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - 2026-01-22
 
+### Added
+
+#### Connection Pool Monitoring (ADR 0067)
+
+- **Prometheus Metrics**: 5 new metrics for pool statistics (`mirrorbuddy_db_pool_*`)
+  - `size_total`: Total pool size (active + idle)
+  - `connections_active`: Connections executing queries
+  - `connections_idle`: Idle connections available
+  - `requests_waiting`: Requests waiting for connection (pool exhaustion indicator)
+  - `utilization_percent`: Pool utilization percentage (0-100)
+- **Health Endpoint**: Extended `/api/health/detailed` with connection pool statistics
+- **Monitoring Module**: `src/lib/metrics/pool-metrics.ts` with health status checks
+- **Documentation**: `docs/operations/DATABASE-MONITORING.md` with alerts and troubleshooting
+
+#### SSL Certificate Setup (ADR 0067)
+
+- **Automated Setup Script**: `scripts/setup-ssl-certificate.sh` for guided certificate installation
+- **Full Chain Support**: Auto-detect and enable SSL verification when full certificate chain provided
+- **Certificate Validation**: Automatic count validation (≥2 certificates: root + intermediate)
+- **Graceful Fallback**: Maintains encrypted connection if certificate incomplete
+- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with step-by-step guide
+
 ### Changed
 
 #### Database Performance Optimization (ADR 0067)
 
 - **Health Check Threshold**: Increased from 500ms to 1000ms to accommodate Vercel serverless cold starts (300-800ms typical)
 - **Connection Pool Configuration**: Explicit pg Pool settings optimized for serverless (max: 5, min: 0, idleTimeout: 30s)
-- **SSL Documentation**: Enhanced comments documenting certificate chain issue and resolution steps
+- **SSL Configuration**: Smart SSL handling with certificate chain validation and detailed logging
 
 ### Technical Details
 
+**Performance**:
+
 - `src/app/api/health/route.ts` - Updated database latency threshold to eliminate false "degraded" warnings
-- `src/lib/db.ts` - Explicit Pool configuration with serverless-optimized parameters
-- `src/lib/db.ts` - Comprehensive SSL certificate chain documentation
+- `src/lib/db.ts` - Explicit Pool configuration with serverless-optimized parameters (lines 146-155)
+
+**SSL**:
+
+- `src/lib/db.ts` - Smart SSL configuration with full certificate chain support (lines 75-134)
+- `scripts/setup-ssl-certificate.sh` - Interactive setup wizard (192 lines)
+- `docs/operations/SSL-CERTIFICATE-SETUP.md` - Complete setup guide
+
+**Monitoring**:
+
+- `src/lib/metrics/pool-metrics.ts` - Pool statistics module with health checks (130 lines)
+- `src/app/api/metrics/route.ts` - Integrated pool metrics in Prometheus endpoint (lines 232-274)
+- `src/app/api/health/detailed/route.ts` - Extended database check with pool stats (lines 160-184)
+- `docs/operations/DATABASE-MONITORING.md` - Monitoring guide with alerts
+
+**Architecture**:
+
 - `docs/adr/0067-database-performance-optimization-serverless.md` - Full architecture decision record
 
 ### Performance Impact
@@ -27,6 +66,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Cold start latency**: Unchanged (745ms typical)
 - **Health check status**: Now correctly reports "healthy" on cold start
 - **Connection efficiency**: Reduced idle connections, optimized for stateless serverless functions
+- **Observability**: Real-time pool statistics via Prometheus and health endpoints
+- **Security**: Ready for full SSL verification when certificate chain installed
 
 ---
 

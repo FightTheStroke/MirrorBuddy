@@ -13,6 +13,7 @@ import { generateBehavioralMetrics } from "./behavioral-metrics";
 import { generateBusinessMetrics } from "./business-metrics";
 import { generateSecurityMetrics } from "./security-metrics";
 import { generateExternalServiceMetrics } from "@/lib/metrics/external-service-metrics";
+import { getPoolMetrics, getPoolUtilization } from "@/lib/metrics/pool-metrics";
 
 interface MetricLine {
   name: string;
@@ -227,6 +228,50 @@ export async function GET() {
     // SECURITY METRICS: SSL status, env validation, security events
     const securityMetrics = await generateSecurityMetrics();
     metrics.push(...securityMetrics);
+
+    // CONNECTION POOL METRICS (ADR 0067): Pool statistics and utilization
+    const poolStats = getPoolMetrics();
+    const poolUtilization = getPoolUtilization();
+
+    metrics.push({
+      name: "mirrorbuddy_db_pool_size_total",
+      type: "gauge",
+      help: "Total connection pool size (active + idle)",
+      labels: {},
+      value: poolStats.total,
+    });
+
+    metrics.push({
+      name: "mirrorbuddy_db_pool_connections_active",
+      type: "gauge",
+      help: "Active database connections currently executing queries",
+      labels: {},
+      value: poolStats.active,
+    });
+
+    metrics.push({
+      name: "mirrorbuddy_db_pool_connections_idle",
+      type: "gauge",
+      help: "Idle database connections available for reuse",
+      labels: {},
+      value: poolStats.idle,
+    });
+
+    metrics.push({
+      name: "mirrorbuddy_db_pool_requests_waiting",
+      type: "gauge",
+      help: "Requests waiting for an available connection (pool exhausted if > 0)",
+      labels: {},
+      value: poolStats.waiting,
+    });
+
+    metrics.push({
+      name: "mirrorbuddy_db_pool_utilization_percent",
+      type: "gauge",
+      help: "Connection pool utilization percentage (0-100)",
+      labels: {},
+      value: poolUtilization,
+    });
 
     // Format as Prometheus exposition format
     const output = formatPrometheusOutput(metrics);
