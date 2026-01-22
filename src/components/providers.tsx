@@ -19,6 +19,7 @@ import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { initializeTelemetry } from "@/lib/telemetry";
 import { ActivityTracker } from "@/lib/telemetry/use-activity-tracker";
 import { migrateSessionStorageKey } from "@/lib/storage/migrate-session-key";
+import { MaestriSelectionProvider } from "@/components/onboarding/maestri-selection-provider";
 
 // Debug logger - captures all browser errors to file (dev only)
 import "@/lib/client-error-logger";
@@ -164,12 +165,14 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
       <AccessibilityProvider>
         <A11yInstantAccess />
         <ConditionalUnifiedConsent>
-          <StoreInitializer />
-          <AccentColorApplier />
-          <ActivityTracker />
-          {children}
-          <ToastContainer />
-          <IOSInstallBanner />
+          <MaestriSelectionProvider>
+            <StoreInitializer />
+            <AccentColorApplier />
+            <ActivityTracker />
+            {children}
+            <ToastContainer />
+            <IOSInstallBanner />
+          </MaestriSelectionProvider>
         </ConditionalUnifiedConsent>
       </AccessibilityProvider>
     </ThemeProvider>

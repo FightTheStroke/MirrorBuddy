@@ -51,7 +51,11 @@ export async function POST(request: NextRequest) {
     const realIp = headersList.get("x-real-ip");
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
-    const session = await getOrCreateTrialSession(ip, visitorId);
+    const session = await getOrCreateTrialSession(
+      ip,
+      visitorId,
+      auth.userId || undefined,
+    );
 
     // Parse request body
     const body = await request.json();
@@ -127,7 +131,11 @@ export async function GET() {
     const realIp = headersList.get("x-real-ip");
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
-    const session = await getOrCreateTrialSession(ip, visitorId);
+    const session = await getOrCreateTrialSession(
+      ip,
+      visitorId,
+      auth.userId || undefined,
+    );
 
     // Check limits
     const limitCheck = await checkTrialLimits(session.id, "voice");

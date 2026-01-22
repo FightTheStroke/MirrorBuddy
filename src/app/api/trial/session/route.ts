@@ -5,6 +5,7 @@ import {
   TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 const log = logger.child({ module: "api/trial/session" });
 
@@ -16,6 +17,9 @@ const log = logger.child({ module: "api/trial/session" });
  */
 export async function POST(_request: NextRequest) {
   try {
+    // Check if user is authenticated
+    const auth = await validateAuth();
+
     // Get IP from headers
     const headersList = await headers();
     const forwarded = headersList.get("x-forwarded-for");
@@ -31,7 +35,11 @@ export async function POST(_request: NextRequest) {
     }
 
     // Create or retrieve trial session
-    const session = await getOrCreateTrialSession(ip, visitorId);
+    const session = await getOrCreateTrialSession(
+      ip,
+      visitorId,
+      auth.userId || undefined,
+    );
 
     log.info("[TrialSession] Session created/retrieved", {
       sessionId: session.id,
@@ -94,6 +102,9 @@ export async function POST(_request: NextRequest) {
  */
 export async function GET() {
   try {
+    // Check if user is authenticated
+    const auth = await validateAuth();
+
     const headersList = await headers();
     const forwarded = headersList.get("x-forwarded-for");
     const realIp = headersList.get("x-real-ip");
@@ -106,7 +117,11 @@ export async function GET() {
       return NextResponse.json({ hasSession: false });
     }
 
-    const session = await getOrCreateTrialSession(ip, visitorId);
+    const session = await getOrCreateTrialSession(
+      ip,
+      visitorId,
+      auth.userId || undefined,
+    );
 
     return NextResponse.json({
       hasSession: true,

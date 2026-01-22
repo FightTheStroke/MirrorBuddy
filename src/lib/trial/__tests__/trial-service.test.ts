@@ -1,12 +1,9 @@
 /**
- * MIRRORBUDDY - Trial Service Tests
+ * MIRRORBUDDY - Trial Service Core Tests
  *
- * Unit tests for trial session management:
- * - getOrCreateTrialSession
- * - checkTrialLimits (chat, voice, tool, doc)
- * - incrementUsage
- * - addVoiceSeconds
- * - getTrialStatus
+ * Unit tests for trial session creation:
+ * - getOrCreateTrialSession (IP hash, visitor ID, creation)
+ * - TRIAL_LIMITS configuration
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
@@ -20,15 +17,14 @@ vi.mock("@/lib/db", () => ({
       create: vi.fn(),
       update: vi.fn(),
     },
+    user: {
+      findUnique: vi.fn(),
+    },
   },
 }));
 
 import { prisma } from "@/lib/db";
-import {
-  getOrCreateTrialSession,
-  checkTrialLimits,
-  TRIAL_LIMITS,
-} from "../trial-service";
+import { getOrCreateTrialSession, TRIAL_LIMITS } from "../trial-service";
 
 describe("Trial Service", () => {
   beforeEach(() => {
@@ -152,172 +148,6 @@ describe("Trial Service", () => {
       const maestriJson = createCall.data.assignedMaestri as string;
       const maestri = JSON.parse(maestriJson);
       expect(maestri).toHaveLength(TRIAL_LIMITS.MAESTRI_COUNT);
-    });
-  });
-
-  describe("checkTrialLimits", () => {
-    const sessionId = "test-session-123";
-
-    it("returns error when session not found", async () => {
-      vi.mocked(prisma.trialSession.findUnique).mockResolvedValue(null);
-
-      const result = await checkTrialLimits(sessionId, "chat");
-
-      expect(result.allowed).toBe(false);
-      expect(result.reason).toBe("Session not found");
-    });
-
-    describe("chat limits", () => {
-      it("allows chat when under limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 5,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "chat");
-
-        expect(result.allowed).toBe(true);
-      });
-
-      it("denies chat at limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: TRIAL_LIMITS.CHAT,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "chat");
-
-        expect(result.allowed).toBe(false);
-        expect(result.reason).toContain("Limite chat");
-      });
-
-      it("denies chat when over limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: TRIAL_LIMITS.CHAT + 5,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "chat");
-
-        expect(result.allowed).toBe(false);
-      });
-    });
-
-    describe("voice limits", () => {
-      it("allows voice when under limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 100,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "voice", 60);
-
-        expect(result.allowed).toBe(true);
-      });
-
-      it("denies voice when would exceed limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 280, // 280 + 60 > 300
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "voice", 60);
-
-        expect(result.allowed).toBe(false);
-        expect(result.reason).toContain("Limite voce");
-        expect(result.reason).toContain("20 secondi"); // 300 - 280
-      });
-
-      it("allows voice exactly at remaining limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 250, // 250 + 50 = 300 (exactly at limit)
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "voice", 50);
-
-        expect(result.allowed).toBe(true);
-      });
-    });
-
-    describe("tool limits", () => {
-      it("allows tool when under limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 5,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "tool");
-
-        expect(result.allowed).toBe(true);
-      });
-
-      it("denies tool at limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: TRIAL_LIMITS.TOOLS,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "tool");
-
-        expect(result.allowed).toBe(false);
-        expect(result.reason).toContain("Limite strumenti");
-      });
-    });
-
-    describe("doc limits", () => {
-      it("allows doc when under limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "doc");
-
-        expect(result.allowed).toBe(true);
-      });
-
-      it("denies doc at limit", async () => {
-        vi.mocked(prisma.trialSession.findUnique).mockResolvedValue({
-          id: sessionId,
-          chatsUsed: 0,
-          docsUsed: TRIAL_LIMITS.DOCS,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
-        } as any);
-
-        const result = await checkTrialLimits(sessionId, "doc");
-
-        expect(result.allowed).toBe(false);
-        expect(result.reason).toContain("Limite documenti");
-      });
     });
   });
 });

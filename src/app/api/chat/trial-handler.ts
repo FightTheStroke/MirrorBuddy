@@ -28,6 +28,7 @@ export interface TrialCheckResult {
  */
 export async function getTrialSession(
   isAuthenticated: boolean,
+  userId?: string,
 ): Promise<{ sessionId: string } | null> {
   if (isAuthenticated) return null;
 
@@ -41,7 +42,7 @@ export async function getTrialSession(
   const realIp = headersList.get("x-real-ip");
   const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
-  const session = await getOrCreateTrialSession(ip, visitorId);
+  const session = await getOrCreateTrialSession(ip, visitorId, userId);
   return { sessionId: session.id };
 }
 
@@ -51,6 +52,7 @@ export async function getTrialSession(
  */
 export async function checkTrialForAnonymous(
   isAuthenticated: boolean,
+  userId?: string,
 ): Promise<TrialCheckResult> {
   // Authenticated users don't have trial limits
   if (isAuthenticated) {
@@ -76,7 +78,7 @@ export async function checkTrialForAnonymous(
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     // Get or create trial session
-    const session = await getOrCreateTrialSession(ip, visitorId);
+    const session = await getOrCreateTrialSession(ip, visitorId, userId);
 
     // Check trial limits
     const limitCheck = await checkTrialLimits(session.id, "chat");
