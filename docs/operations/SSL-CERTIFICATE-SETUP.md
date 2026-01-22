@@ -2,13 +2,14 @@
 
 **ADR**: 0067 - Database Performance Optimization
 **Date**: 2026-01-22
-**Status**: Pending Implementation
+**Status**: ✅ Implemented
 
 ## Current Status
 
-**SSL Verification**: Disabled (`rejectUnauthorized: false`)
-**Security Impact**: Medium - Connection encrypted (TLS) but server not authenticated
-**Reason**: Incomplete certificate chain (missing root CA)
+**SSL Verification**: ✅ Enabled (`rejectUnauthorized: true`)
+**Certificate Bundle**: AWS RDS Global Bundle (108 certificates)
+**Location**: `config/aws-rds-ca-bundle.pem` (committed in repository)
+**Security Impact**: Production-ready - Full server authentication enabled
 
 ## Problem
 
@@ -19,22 +20,25 @@ Supabase uses a certificate chain that requires explicit trust:
 
 Without the full chain, SSL verification fails with `UNABLE_TO_VERIFY_LEAF_SIGNATURE`.
 
-## Solution: Full Certificate Chain Setup
+## Solution: AWS RDS Certificate Bundle (Repository-Based)
 
-### Quick Start (Automated)
+### Implementation
 
-Run the guided setup script:
+The SSL certificate bundle is now stored directly in the repository at `config/aws-rds-ca-bundle.pem`.
 
-```bash
-./scripts/setup-ssl-certificate.sh
-```
+**Benefits**:
 
-The script will:
+- No Vercel environment variable size limits (was 64KB, bundle is 165KB)
+- Version controlled and consistent across all environments
+- Automatic updates when bundle is refreshed
+- No manual setup required for new deployments
 
-1. Guide you through downloading the certificate from Supabase
-2. Validate the certificate format
-3. Update local `.env` or provide Vercel command
-4. Show code changes needed
+**Certificate Source**: AWS RDS Global Bundle
+
+- Contains 108 root + intermediate certificates
+- Covers all AWS regions (including eu-west-1 where Supabase runs)
+- Public certificates, safe to commit to repository
+- Downloaded from: https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
 
 ### Manual Setup
 
@@ -270,22 +274,24 @@ Supabase certificates typically valid for 1-2 years.
 
 ## Changelog
 
-**2026-01-22**:
+**2026-01-22** (Latest - Repository-Based Implementation):
+
+- ✅ **IMPLEMENTED**: AWS RDS Global Bundle stored in repository
+- ✅ Certificate location: `config/aws-rds-ca-bundle.pem` (108 certificates)
+- ✅ Updated `src/lib/db.ts` with file-based loading (no env var limits)
+- ✅ SSL verification enabled by default in production
+- ✅ No manual setup required for new deployments
+
+**2026-01-22** (Initial):
 
 - Created setup script (`scripts/setup-ssl-certificate.sh`)
 - Updated code to support full certificate chain
 - Added automatic certificate validation
 - Documented setup process
 
-**Next Steps**:
-
-- [ ] Download full certificate chain from Supabase
-- [ ] Update `SUPABASE_CA_CERT` in Vercel production
-- [ ] Deploy and verify SSL verification enabled
-- [ ] Remove this pending status
-
 ---
 
 **Maintained by**: Engineering Team
 **Last Updated**: 2026-01-22
-**Next Review**: When certificate chain is installed
+**Status**: ✅ Implemented and Active
+**Next Review**: Annually (certificate bundle updates)
