@@ -141,27 +141,13 @@ function ConditionalUnifiedConsent({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const { hasCompletedOnboarding, isHydrated } = useOnboardingStore();
+  const { hasCompletedOnboarding } = useOnboardingStore();
 
   const isPublicPath = PUBLIC_PATHS.some((p) => pathname?.startsWith(p));
 
   // On public/legal pages, skip blocking wall (users must access legal docs)
   if (isPublicPath) {
     return <>{children}</>;
-  }
-
-  // Wait for onboarding state to hydrate before showing consent wall
-  if (!isHydrated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800">
-        <div className="text-center space-y-4">
-          <div className="w-12 h-12 mx-auto border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-          <p className="text-sm text-slate-600 dark:text-slate-400">
-            Caricamento...
-          </p>
-        </div>
-      </div>
-    );
   }
 
   // If onboarding not completed, skip consent wall (let onboarding redirect happen)
