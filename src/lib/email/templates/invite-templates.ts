@@ -2,10 +2,6 @@
  * Email templates for the beta invite system
  */
 
-if (!process.env.ADMIN_EMAIL) {
-  throw new Error("ADMIN_EMAIL environment variable is required");
-}
-
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
@@ -40,6 +36,10 @@ export function getAdminNotificationTemplate(data: InviteRequestData): {
   text: string;
   to: string;
 } {
+  if (!ADMIN_EMAIL) {
+    throw new Error("ADMIN_EMAIL environment variable is required");
+  }
+
   const adminUrl = `${APP_URL}/admin/invites`;
 
   return {
