@@ -31,7 +31,7 @@ import { AstuccioView } from "@/app/astuccio/components/astuccio-view";
 import { CharacterChatView } from "@/components/conversation";
 import { LazySettingsView } from "@/components/settings";
 import { LazyProgressView } from "@/components/progress";
-import { TrialHomeBanner } from "@/components/trial";
+import { TrialHomeBanner, TrialUsageDashboard } from "@/components/trial";
 import { HomeHeader } from "./home-header";
 import { HomeSidebar } from "./home-sidebar";
 import { COACH_INFO, BUDDY_INFO } from "./home-constants";
@@ -188,71 +188,80 @@ export default function Home() {
         trialStatus={trialStatus}
       />
 
-      <main
+      <div
         className={cn(
-          "min-h-screen transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
+          "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
           sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
       >
-        {/* Trial mode banner */}
-        {trialStatus.isTrialMode && !trialStatus.isLoading && (
-          <TrialHomeBanner
-            chatsRemaining={trialStatus.chatsRemaining}
-            maxChats={trialStatus.maxChats}
-            visitorId={trialStatus.visitorId}
-          />
-        )}
+        <main className="min-h-screen flex-1">
+          {/* Trial mode banner */}
+          {trialStatus.isTrialMode && !trialStatus.isLoading && (
+            <TrialHomeBanner
+              chatsRemaining={trialStatus.chatsRemaining}
+              maxChats={trialStatus.maxChats}
+              visitorId={trialStatus.visitorId}
+            />
+          )}
 
-        <motion.div
-          key={currentView}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          {currentView === "coach" && (
-            <CharacterChatView
-              characterId={selectedCoach}
-              characterType="coach"
-            />
-          )}
-          {currentView === "buddy" && (
-            <CharacterChatView
-              characterId={selectedBuddy}
-              characterType="buddy"
-            />
-          )}
-          {currentView === "maestri" && (
-            <MaestriGrid
-              onMaestroSelect={(maestro, mode) => {
-                setSelectedMaestro(maestro);
-                setMaestroSessionMode(mode);
-                setMaestroSessionKey((prev) => prev + 1);
-                setCurrentView("maestro-session");
-              }}
-            />
-          )}
-          {currentView === "maestro-session" && selectedMaestro && (
-            <MaestroSession
-              key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
-              maestro={selectedMaestro}
-              onClose={() => {
-                setCurrentView("maestri");
-                setRequestedToolType(undefined);
-              }}
-              initialMode={maestroSessionMode}
-              requestedToolType={requestedToolType}
-            />
-          )}
-          {currentView === "astuccio" && (
-            <AstuccioView onToolRequest={handleToolRequest} />
-          )}
-          {currentView === "supporti" && <ZainoView />}
-          {currentView === "calendar" && <LazyCalendarView />}
-          {currentView === "progress" && <LazyProgressView />}
-          {currentView === "genitori" && <LazyGenitoriView />}
-          {currentView === "settings" && <LazySettingsView />}
-        </motion.div>
-      </main>
+          <motion.div
+            key={currentView}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {currentView === "coach" && (
+              <CharacterChatView
+                characterId={selectedCoach}
+                characterType="coach"
+              />
+            )}
+            {currentView === "buddy" && (
+              <CharacterChatView
+                characterId={selectedBuddy}
+                characterType="buddy"
+              />
+            )}
+            {currentView === "maestri" && (
+              <MaestriGrid
+                onMaestroSelect={(maestro, mode) => {
+                  setSelectedMaestro(maestro);
+                  setMaestroSessionMode(mode);
+                  setMaestroSessionKey((prev) => prev + 1);
+                  setCurrentView("maestro-session");
+                }}
+              />
+            )}
+            {currentView === "maestro-session" && selectedMaestro && (
+              <MaestroSession
+                key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
+                maestro={selectedMaestro}
+                onClose={() => {
+                  setCurrentView("maestri");
+                  setRequestedToolType(undefined);
+                }}
+                initialMode={maestroSessionMode}
+                requestedToolType={requestedToolType}
+              />
+            )}
+            {currentView === "astuccio" && (
+              <AstuccioView onToolRequest={handleToolRequest} />
+            )}
+            {currentView === "supporti" && <ZainoView />}
+            {currentView === "calendar" && <LazyCalendarView />}
+            {currentView === "progress" && <LazyProgressView />}
+            {currentView === "genitori" && <LazyGenitoriView />}
+            {currentView === "settings" && <LazySettingsView />}
+          </motion.div>
+        </main>
+
+        {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
+        {trialStatus.isTrialMode && !trialStatus.isLoading && (
+          <aside className="w-80 hidden lg:block flex-shrink-0">
+            <TrialUsageDashboard />
+          </aside>
+        )}
+      </div>
     </div>
   );
 }
