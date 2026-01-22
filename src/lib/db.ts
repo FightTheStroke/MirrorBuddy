@@ -145,15 +145,22 @@ function buildSslConfig(): PoolConfig["ssl"] {
       }
     }
 
-    // Fallback: Use system root CAs
-    logger.info("[SSL] Using system root CAs for verification", {
-      mode: "verify-full",
-      adr: "0067",
-    });
+    // Fallback: Disable strict SSL verification
+    // Supabase pgbouncer (port 6543) uses certificates incompatible with system root CAs
+    // Connection is still encrypted with TLS, but server certificate is not verified
+    logger.warn(
+      "[SSL] No CA certificate provided, disabling strict verification",
+      {
+        mode: "require-without-verify",
+        security: "TLS encryption active, but server not authenticated",
+        action:
+          "Set SUPABASE_CA_CERT environment variable to enable verification",
+        adr: "0067",
+      },
+    );
 
     return {
-      rejectUnauthorized: true,
-      // No 'ca' parameter - uses system root CAs
+      rejectUnauthorized: false,
     };
   }
 
