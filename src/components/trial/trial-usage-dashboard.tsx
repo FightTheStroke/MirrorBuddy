@@ -63,15 +63,6 @@ export function TrialUsageDashboard() {
     );
   }
 
-  // Guard: data must be loaded before accessing properties
-  if (!data) {
-    return (
-      <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <p className="text-gray-600">No usage data available</p>
-      </div>
-    );
-  }
-
   // Calculate resource metrics
   const resources: Record<string, ResourceMetric> = {
     chats: {
