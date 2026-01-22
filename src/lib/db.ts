@@ -84,13 +84,17 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: Use system CA trust store
-  // Supabase certificates chain to a root CA that's in the system trust store
-  // By NOT providing a custom 'ca' option, Node.js uses system CAs + server-provided intermediate certs
+  // Production: TEMPORARY - Disable SSL verification
+  // TODO: Get full certificate chain (root + intermediate) from Supabase
+  // The intermediate cert in SUPABASE_CA_CERT is incomplete - missing root CA
+  // Vercel serverless doesn't have Supabase root CA in system trust store
   if (isProduction) {
+    logger.warn("[TEMP] SSL verification disabled - need full cert chain", {
+      issue: "missing_root_ca_in_vercel_trust_store",
+      action: "Get root + intermediate certs from Supabase",
+    });
     return {
-      rejectUnauthorized: true,
-      // No 'ca' option = use system trust store
+      rejectUnauthorized: false,
     };
   }
 
