@@ -5,10 +5,6 @@
  * These templates support the consent verification flow.
  */
 
-if (!process.env.SUPPORT_EMAIL) {
-  throw new Error("SUPPORT_EMAIL environment variable is required");
-}
-
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 const SUPPORT_EMAIL = process.env.SUPPORT_EMAIL;
 

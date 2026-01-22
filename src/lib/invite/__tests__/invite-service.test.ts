@@ -4,6 +4,10 @@
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
+// Set required env vars for email templates
+process.env.ADMIN_EMAIL = "test-admin@example.com";
+process.env.SUPPORT_EMAIL = "test-support@example.com";
+
 // Mock prisma
 vi.mock("@/lib/db", () => ({
   prisma: {
