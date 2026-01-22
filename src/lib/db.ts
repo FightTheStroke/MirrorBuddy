@@ -122,12 +122,28 @@ function buildSslConfig(): PoolConfig["ssl"] {
         typeof supabaseCaCert === "string" ? supabaseCaCert : "";
       const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
 
-      // HOTFIX: Disable SSL verification (self-signed cert issue persists)
-      logger.warn("[SSL] Certificate available but verification disabled", {
-        certificates: certCount,
-        reason: "self-signed certificate in certificate chain error",
-        action: "TODO: Use correct Supabase certificate",
-      });
+      if (certCount >= 2) {
+        logger.info(
+          "[SSL] Full certificate chain provided, enabling verification",
+          {
+            certificates: certCount,
+            adr: "0067",
+          },
+        );
+        return {
+          rejectUnauthorized: true,
+          ca: certContent,
+        };
+      } else {
+        logger.warn(
+          "[SSL] Incomplete certificate chain, disabling verification",
+          {
+            certificates: certCount,
+            expected: ">=2 (root + intermediate)",
+            action: "Provide full AWS RDS certificate chain",
+          },
+        );
+      }
     }
 
     // Fallback: Disable strict SSL verification
@@ -138,8 +154,7 @@ function buildSslConfig(): PoolConfig["ssl"] {
       {
         mode: "require-without-verify",
         security: "TLS encryption active, but server not authenticated",
-        action:
-          "Set SUPABASE_CA_CERT environment variable to enable verification",
+        action: "Add certificate to config/aws-rds-ca-bundle.pem",
         adr: "0067",
       },
     );
