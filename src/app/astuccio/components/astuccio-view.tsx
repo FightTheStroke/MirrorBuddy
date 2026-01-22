@@ -1,27 +1,28 @@
-'use client';
+"use client";
 
-import { useReducer, useCallback } from 'react';
-import { Pencil, PencilRuler, FolderUp, Globe } from 'lucide-react';
-import { motion } from 'framer-motion';
-import { ToolCard } from './tool-card';
-import { AstuccioInfoSection } from './astuccio-info-section';
-import { ToolMaestroSelectionDialog } from '@/components/education/tool-maestro-selection-dialog';
-import { StudyKitView } from '@/components/study-kit/StudyKitView';
-import type { ToolType } from '@/types/tools';
-import type { Maestro } from '@/types';
-import { cn } from '@/lib/utils';
-import { PageHeader } from '@/components/ui/page-header';
+import { useReducer, useCallback } from "react";
+import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
+import { motion } from "framer-motion";
+import { ToolCard } from "./tool-card";
+import { AstuccioInfoSection } from "./astuccio-info-section";
+import { ToolMaestroSelectionDialog } from "@/components/education/tool-maestro-selection-dialog";
+import { StudyKitView } from "@/components/study-kit/StudyKitView";
+import { TypingView } from "@/components/typing/TypingView";
+import type { ToolType } from "@/types/tools";
+import type { Maestro } from "@/types";
+import { cn } from "@/lib/utils";
+import { PageHeader } from "@/components/ui/page-header";
 import {
   TOOL_CATEGORIES,
   getToolsByCategory,
   toolRequiresMaestro,
-} from '@/lib/tools/constants';
+} from "@/lib/tools/constants";
 
 // ============================================================================
 // STATE MANAGEMENT - Unified with useReducer
 // ============================================================================
 
-type DialogState = 'closed' | 'selecting_maestro' | 'study_kit';
+type DialogState = "closed" | "selecting_maestro" | "study_kit" | "typing";
 
 interface AstuccioState {
   selectedToolType: ToolType | null;
@@ -29,32 +30,40 @@ interface AstuccioState {
 }
 
 type AstuccioAction =
-  | { type: 'SELECT_TOOL'; toolType: ToolType }
-  | { type: 'OPEN_STUDY_KIT' }
-  | { type: 'CONFIRM_MAESTRO' }
-  | { type: 'CLOSE_DIALOG' }
-  | { type: 'RESET' };
+  | { type: "SELECT_TOOL"; toolType: ToolType }
+  | { type: "OPEN_STANDALONE_TOOL"; toolType: ToolType }
+  | { type: "CONFIRM_MAESTRO" }
+  | { type: "CLOSE_DIALOG" }
+  | { type: "RESET" };
 
 const initialState: AstuccioState = {
   selectedToolType: null,
-  dialogState: 'closed',
+  dialogState: "closed",
 };
 
-function astuccioReducer(state: AstuccioState, action: AstuccioAction): AstuccioState {
+function astuccioReducer(
+  state: AstuccioState,
+  action: AstuccioAction,
+): AstuccioState {
   switch (action.type) {
-    case 'SELECT_TOOL':
+    case "SELECT_TOOL":
       return {
         selectedToolType: action.toolType,
-        dialogState: 'selecting_maestro',
+        dialogState: "selecting_maestro",
       };
-    case 'OPEN_STUDY_KIT':
+    case "OPEN_STANDALONE_TOOL":
+      // Map tool type to appropriate dialog state
+      const dialogStateMap: Record<string, DialogState> = {
+        "study-kit": "study_kit",
+        typing: "typing",
+      };
       return {
-        selectedToolType: 'study-kit',
-        dialogState: 'study_kit',
+        selectedToolType: action.toolType,
+        dialogState: dialogStateMap[action.toolType] || "closed",
       };
-    case 'CONFIRM_MAESTRO':
-    case 'CLOSE_DIALOG':
-    case 'RESET':
+    case "CONFIRM_MAESTRO":
+    case "CLOSE_DIALOG":
+    case "RESET":
       return initialState;
     default:
       return state;
@@ -72,7 +81,11 @@ const containerVariants = {
 
 const categoryVariants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] as const } },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.4, ease: [0.4, 0, 0.2, 1] as const },
+  },
 };
 
 // ============================================================================
@@ -97,27 +110,30 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
 
   const handleToolClick = useCallback((toolType: ToolType) => {
-    // Study Kit has its own flow (no maestro selection)
+    // Standalone tools have their own flow (no maestro selection)
     if (!toolRequiresMaestro(toolType)) {
-      dispatch({ type: 'OPEN_STUDY_KIT' });
+      dispatch({ type: "OPEN_STANDALONE_TOOL", toolType });
       return;
     }
-    dispatch({ type: 'SELECT_TOOL', toolType });
+    dispatch({ type: "SELECT_TOOL", toolType });
   }, []);
 
-  const handleMaestroConfirm = useCallback((maestro: Maestro, _mode: 'voice' | 'chat') => {
-    if (state.selectedToolType && onToolRequest) {
-      onToolRequest(state.selectedToolType, maestro);
-    }
-    dispatch({ type: 'CONFIRM_MAESTRO' });
-  }, [state.selectedToolType, onToolRequest]);
+  const handleMaestroConfirm = useCallback(
+    (maestro: Maestro, _mode: "voice" | "chat") => {
+      if (state.selectedToolType && onToolRequest) {
+        onToolRequest(state.selectedToolType, maestro);
+      }
+      dispatch({ type: "CONFIRM_MAESTRO" });
+    },
+    [state.selectedToolType, onToolRequest],
+  );
 
   const handleDialogClose = useCallback(() => {
-    dispatch({ type: 'CLOSE_DIALOG' });
+    dispatch({ type: "CLOSE_DIALOG" });
   }, []);
 
   // Show Study Kit view if selected
-  if (state.dialogState === 'study_kit') {
+  if (state.dialogState === "study_kit") {
     return (
       <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
         <button
@@ -131,24 +147,52 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
     );
   }
 
+  // Show Typing view if selected
+  if (state.dialogState === "typing") {
+    return (
+      <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
+        <button
+          onClick={handleDialogClose}
+          className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
+        >
+          ← Torna all&apos;Astuccio
+        </button>
+        <TypingView />
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto px-2 sm:px-4 max-w-7xl">
       <PageHeader icon={PencilRuler} title="Astuccio" />
 
-      <motion.div variants={containerVariants} initial="hidden" animate="visible" className="space-y-10">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        className="space-y-10"
+      >
         {TOOL_CATEGORIES.map((category) => {
           const CategoryIcon = CATEGORY_ICONS[category.category];
           const tools = getToolsByCategory(category.category);
 
           return (
-            <motion.section key={category.id} variants={categoryVariants} className="space-y-4">
+            <motion.section
+              key={category.id}
+              variants={categoryVariants}
+              className="space-y-4"
+            >
               <div className="flex items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm">
                   <CategoryIcon className="w-6 h-6 text-muted-foreground" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-foreground">{category.title}</h2>
-                  <p className="text-sm text-muted-foreground">{category.subtitle}</p>
+                  <h2 className="text-xl font-bold text-foreground">
+                    {category.title}
+                  </h2>
+                  <p className="text-sm text-muted-foreground">
+                    {category.subtitle}
+                  </p>
                 </div>
                 <div className="ml-auto">
                   <span className="text-sm font-medium px-3 py-1 rounded-full bg-card border text-foreground">
@@ -156,14 +200,16 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
                   </span>
                 </div>
               </div>
-              <div className={cn(
-                'grid gap-4',
-                tools.length === 1
-                  ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-                  : tools.length <= 3
-                    ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
-                    : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-              )}>
+              <div
+                className={cn(
+                  "grid gap-4",
+                  tools.length === 1
+                    ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
+                    : tools.length <= 3
+                      ? "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+                      : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
+                )}
+              >
                 {tools.map((tool, index) => (
                   <motion.div
                     key={tool.type}
@@ -189,8 +235,8 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
       <AstuccioInfoSection />
 
       <ToolMaestroSelectionDialog
-        isOpen={state.dialogState === 'selecting_maestro'}
-        toolType={state.selectedToolType ?? 'mindmap'}
+        isOpen={state.dialogState === "selecting_maestro"}
+        toolType={state.selectedToolType ?? "mindmap"}
         onConfirm={handleMaestroConfirm}
         onClose={handleDialogClose}
       />
