@@ -112,13 +112,14 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
   try {
     const windowStart = new Date(now - ACTIVITY_WINDOW_MS);
 
-    // Get unique user count per type
+    // Get unique user count per type (F-06: exclude test data via isTestData flag)
     const uniqueByType = await prisma.$queryRaw<
       Array<{ userType: string; count: bigint }>
     >`
       SELECT "userType", COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
+        AND "isTestData" = false
       GROUP BY "userType"
     `;
 
@@ -162,13 +163,30 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
       },
     );
 
-    // Active users by route (top 10)
+    // F-06: Dedicated trial session metrics
+    samples.push(
+      {
+        name: "mirrorbuddy_trial_sessions_active",
+        labels: instanceLabels,
+        value: counts.trial,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_trial_to_total_ratio",
+        labels: instanceLabels,
+        value: total > 0 ? counts.trial / total : 0,
+        timestamp: now,
+      },
+    );
+
+    // Active users by route (top 10, F-06: exclude test data via isTestData flag)
     const routeCounts = await prisma.$queryRaw<
       Array<{ route: string; count: bigint }>
     >`
       SELECT route, COUNT(DISTINCT identifier) as count
       FROM "UserActivity"
       WHERE timestamp >= ${windowStart}
+        AND "isTestData" = false
       GROUP BY route
       ORDER BY count DESC
       LIMIT 10
@@ -198,6 +216,74 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     log.warn("Failed to collect realtime active users", {
       error: String(err),
     });
+  }
+
+  // 3. Funnel metrics (Plan 069, F-10)
+  try {
+    const thirtyDaysAgo = new Date(now - 30 * 24 * 60 * 60 * 1000);
+
+    // Get counts per stage
+    const stageCounts = await prisma.funnelEvent.groupBy({
+      by: ["stage"],
+      where: {
+        createdAt: { gte: thirtyDaysAgo },
+        isTestData: false,
+      },
+      _count: { _all: true },
+    });
+
+    for (const sc of stageCounts) {
+      samples.push({
+        name: "mirrorbuddy_funnel_stage_count",
+        labels: { ...instanceLabels, stage: sc.stage },
+        value: sc._count._all,
+        timestamp: now,
+      });
+    }
+
+    // Calculate conversion rates between stages
+    const stageOrder = [
+      "VISITOR",
+      "TRIAL_START",
+      "TRIAL_ENGAGED",
+      "LIMIT_HIT",
+      "BETA_REQUEST",
+      "APPROVED",
+      "FIRST_LOGIN",
+      "ACTIVE",
+    ];
+    const countMap = new Map(stageCounts.map((s) => [s.stage, s._count._all]));
+
+    for (let i = 1; i < stageOrder.length; i++) {
+      const prevCount = countMap.get(stageOrder[i - 1]) ?? 0;
+      const currCount = countMap.get(stageOrder[i]) ?? 0;
+      const rate = prevCount > 0 ? currCount / prevCount : 0;
+
+      samples.push({
+        name: "mirrorbuddy_funnel_conversion_rate",
+        labels: {
+          ...instanceLabels,
+          from_stage: stageOrder[i - 1],
+          to_stage: stageOrder[i],
+        },
+        value: rate,
+        timestamp: now,
+      });
+    }
+
+    // Overall funnel conversion (VISITOR → ACTIVE)
+    const visitorCount = countMap.get("VISITOR") ?? 0;
+    const activeCount = countMap.get("ACTIVE") ?? 0;
+    samples.push({
+      name: "mirrorbuddy_funnel_overall_conversion",
+      labels: instanceLabels,
+      value: visitorCount > 0 ? activeCount / visitorCount : 0,
+      timestamp: now,
+    });
+
+    log.debug("Collected funnel metrics", { stages: stageCounts.length });
+  } catch (err) {
+    log.warn("Failed to collect funnel metrics", { error: String(err) });
   }
 
   return samples;
@@ -306,12 +392,14 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-// Allow GET for manual testing in development
+// Vercel Cron uses GET by default
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
+  // Verify cron secret for production security
+  if (!verifyCronSecret(request)) {
+    return NextResponse.json(
+      { error: "Unauthorized - invalid or missing CRON_SECRET" },
+      { status: 401 },
+    );
   }
-
-  log.warn("GET request to metrics-push in development mode");
   return POST(request);
 }

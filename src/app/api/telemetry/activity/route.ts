@@ -39,12 +39,17 @@ export async function POST(request: NextRequest) {
       request.headers.get("x-request-id") ||
       "unknown";
 
+    // F-06: Detect test sessions (ADR 0065)
+    // E2E tests use identifiers starting with "e2e-test-"
+    const isTestData = identifier.startsWith("e2e-test-");
+
     // Record activity in database
     await prisma.userActivity.create({
       data: {
         identifier,
         userType,
         route,
+        isTestData,
       },
     });
 

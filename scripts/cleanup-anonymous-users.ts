@@ -1,0 +1,60 @@
+/**
+ * Cleanup anonymous users (email=null) from production database
+ * These are trial sessions that never converted to real users
+ */
+
+import "dotenv/config";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+
+function createPrismaClient(): PrismaClient {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+
+  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
+  const ssl = supabaseCaCert
+    ? { rejectUnauthorized: true, ca: supabaseCaCert }
+    : { rejectUnauthorized: false };
+
+  const pool = new Pool({ connectionString, ssl });
+  const adapter = new PrismaPg(pool);
+
+  return new PrismaClient({ adapter });
+}
+
+const prisma = createPrismaClient();
+const PROTECTED_IDS = ["roberdan", "mariodanfts3k02"];
+
+async function cleanup() {
+  console.log("=== Cleaning up anonymous users ===\n");
+
+  // Count before
+  const before = await prisma.user.count({ where: { email: null } });
+  console.log(`Found ${before} users with email=null`);
+
+  if (before === 0) {
+    console.log("Nothing to clean up!");
+    await prisma.$disconnect();
+    return;
+  }
+
+  // Delete anonymous users
+  const result = await prisma.user.deleteMany({
+    where: {
+      email: null,
+      id: { notIn: PROTECTED_IDS },
+    },
+  });
+
+  console.log(`\n✓ Deleted ${result.count} anonymous users`);
+
+  // Verify
+  const after = await prisma.user.count({ where: { email: null } });
+  console.log(`Remaining users with email=null: ${after}`);
+
+  await prisma.$disconnect();
+}
+
+cleanup().catch(console.error);

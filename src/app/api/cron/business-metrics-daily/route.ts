@@ -218,14 +218,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
  * GET: Manual testing endpoint (dev only)
  * Allows manual trigger of daily metrics collection during development
  */
+// Vercel Cron uses GET by default
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json(
-      { error: "Manual testing not allowed in production" },
-      { status: 405 },
-    );
-  }
-
-  log.info("Manual GET request to daily metrics endpoint in development mode");
   return POST(request);
 }

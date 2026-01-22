@@ -189,15 +189,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   }
 }
 
-// Allow GET requests for manual triggering (in development)
-// Production should use POST only
+// Vercel Cron uses GET by default
 export async function GET(request: NextRequest): Promise<NextResponse> {
-  // In production, reject GET to enforce POST+CRON_SECRET security
-  if (process.env.NODE_ENV === "production") {
-    return NextResponse.json({ error: "Method not allowed" }, { status: 405 });
-  }
-
-  // In development, allow GET for testing (without auth requirement)
-  log.warn("GET request to cron endpoint in development mode");
   return POST(request);
 }
