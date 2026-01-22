@@ -26,7 +26,7 @@
 # misc
 .DS_Store
 *.pem
-!config/aws-rds-ca-bundle.pem  # Public CA certificates safe to commit
+!config/*.pem  # Allow config/ PEM files (public certificates)
 *.pptx
 ~$*
 

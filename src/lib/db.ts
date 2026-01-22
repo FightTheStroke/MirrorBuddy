@@ -72,21 +72,31 @@ const connectionString = isE2E
   : process.env.DATABASE_URL ||
     "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
-// Configure SSL for Supabase connection
-// Supabase uses a CA certificate that must be explicitly trusted
-// Certificate bundle stored in repository: config/aws-rds-ca-bundle.pem (ADR 0067)
-// Contains AWS RDS root + intermediate certificates for all regions
+// Configure SSL for Supabase connection (ADR 0067)
+// ROOT CAUSE SOLUTION: Use full Supabase certificate chain
+// Contains: Supabase Intermediate 2021 CA + Supabase Root 2021 CA
+// Both certificates are required for proper SSL verification
+// Without the full chain, verification fails with "unable to get issuer certificate"
 
 import fs from "fs";
 import path from "path";
 
 function loadSupabaseCertificate(): string | undefined {
-  // Priority 1: Load from file in repository (no size limits)
-  const certPath = path.join(process.cwd(), "config", "aws-rds-ca-bundle.pem");
+  // Priority 1: Load full certificate chain from repository
+  // Contains Supabase Intermediate 2021 CA + Supabase Root 2021 CA
+  // Both certificates are required for successful verification
+  const certPath = path.join(process.cwd(), "config", "supabase-chain.pem");
 
   if (fs.existsSync(certPath)) {
     try {
-      return fs.readFileSync(certPath, "utf-8");
+      const cert = fs.readFileSync(certPath, "utf-8");
+      const certCount = (cert.match(/BEGIN CERTIFICATE/g) || []).length;
+      logger.info("[SSL] Loaded certificate chain from repository", {
+        path: certPath,
+        certificates: certCount,
+        size: cert.length,
+      });
+      return cert;
     } catch (error) {
       logger.warn("[SSL] Failed to read certificate file", {
         path: certPath,
@@ -98,10 +108,12 @@ function loadSupabaseCertificate(): string | undefined {
   // Priority 2: Fallback to environment variable (for backwards compatibility)
   const envCert = process.env.SUPABASE_CA_CERT;
   if (envCert) {
+    logger.info("[SSL] Using certificate from environment variable");
     // Certificate in env var uses '|' as newline separator
     return envCert.split("|").join("\n");
   }
 
+  logger.warn("[SSL] No certificate found in repository or environment");
   return undefined;
 }
 
@@ -114,19 +126,52 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: SSL configuration with system root CAs (ADR 0067)
+  // Production: SSL configuration with Supabase certificate chain (ADR 0067)
   if (isProduction) {
-    // Use system root CAs instead of custom certificate bundle
-    // Node.js and Vercel environments include Amazon Root CA by default
-    // This avoids issues with self-signed certificates in AWS RDS bundles
-    logger.info("[SSL] Enabling SSL verification with system root CAs", {
-      mode: "verify-full",
-      adr: "0067",
-    });
+    // If certificate chain is available, enable full SSL verification
+    if (supabaseCaCert) {
+      const certContent =
+        typeof supabaseCaCert === "string" ? supabaseCaCert : "";
+
+      // Verify we have the full chain (intermediate + root)
+      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
+
+      if (certCount >= 2) {
+        logger.info(
+          "[SSL] Certificate chain loaded, enabling SSL verification",
+          {
+            certificates: certCount,
+            mode: "verify-full",
+            adr: "0067",
+          },
+        );
+        return {
+          rejectUnauthorized: true,
+          ca: certContent,
+        };
+      } else {
+        logger.warn("[SSL] Incomplete certificate chain", {
+          certificates: certCount,
+          expected: ">=2 (intermediate + root)",
+          action: "Run: npm run extract-cert to regenerate certificate chain",
+        });
+      }
+    }
+
+    // Fallback: Disable strict SSL verification
+    // Connection is still encrypted with TLS, but server certificate is not verified
+    logger.warn(
+      "[SSL] No certificate chain available, disabling strict verification",
+      {
+        mode: "require-without-verify",
+        security: "TLS encryption active, but server not authenticated",
+        action: "Add certificate chain to config/supabase-chain.pem",
+        adr: "0067",
+      },
+    );
 
     return {
-      rejectUnauthorized: true,
-      // No 'ca' parameter - uses system root CAs (includes Amazon Root CA)
+      rejectUnauthorized: false,
     };
   }
 
