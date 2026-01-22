@@ -30,27 +30,28 @@ import { logger } from "@/lib/logger";
 import { GET } from "../route";
 
 const VALID_MAESTRI = [
-  "leonardo",
-  "galileo",
-  "curie",
-  "cicerone",
-  "lovelace",
-  "smith",
-  "shakespeare",
-  "humboldt",
-  "erodoto",
-  "manzoni",
-  "euclide",
-  "mozart",
-  "socrate",
-  "ippocrate",
-  "feynman",
-  "darwin",
-  "chris",
-  "omero",
-  "alexPina",
-  "simone",
-  "cassese",
+  "leonardo-arte",
+  "galileo-astronomia",
+  "curie-chimica",
+  "cicerone-civica",
+  "lovelace-informatica",
+  "smith-economia",
+  "shakespeare-inglese",
+  "humboldt-geografia",
+  "erodoto-storia",
+  "manzoni-italiano",
+  "euclide-matematica",
+  "mozart-musica",
+  "socrate-filosofia",
+  "ippocrate-corpo",
+  "feynman-fisica",
+  "darwin-scienze",
+  "chris-storytelling",
+  "omero-italiano",
+  "alex-pina-spagnolo",
+  "simone-sport",
+  "cassese-diritto",
+  "mascetti-supercazzola",
 ];
 
 describe("GET /api/user/preferences/maestri", () => {
@@ -73,7 +74,11 @@ describe("GET /api/user/preferences/maestri", () => {
 
   it("returns user maestri with correct structure", async () => {
     const userId = "user-123";
-    const selectedMaestri = ["euclide", "galileo", "darwin"];
+    const selectedMaestri = [
+      "euclide-matematica",
+      "galileo-astronomia",
+      "darwin-scienze",
+    ];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,

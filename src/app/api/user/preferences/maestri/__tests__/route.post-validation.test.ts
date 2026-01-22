@@ -36,7 +36,12 @@ describe("POST /api/user/preferences/maestri - Validation", () => {
 
   it("rejects more than 3 maestri with 400", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide", "galileo", "darwin", "einstein"];
+    const maestriIds = [
+      "euclide-matematica",
+      "galileo-astronomia",
+      "darwin-scienze",
+      "einstein",
+    ];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -61,7 +66,7 @@ describe("POST /api/user/preferences/maestri - Validation", () => {
 
   it("rejects invalid maestri IDs with 400", async () => {
     const userId = "user-123";
-    const maestriIds = ["euclide", "invalid-maestro"];
+    const maestriIds = ["euclide-matematica", "invalid-maestro"];
 
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: true,
@@ -116,7 +121,7 @@ describe("POST /api/user/preferences/maestri - Validation", () => {
       "http://localhost/api/user/preferences/maestri",
       {
         method: "POST",
-        body: JSON.stringify({ maestriIds: "euclide" }),
+        body: JSON.stringify({ maestriIds: "euclide-matematica" }),
       },
     );
 
