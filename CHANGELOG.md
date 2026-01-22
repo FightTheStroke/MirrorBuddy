@@ -21,13 +21,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Monitoring Module**: `src/lib/metrics/pool-metrics.ts` with health status checks
 - **Documentation**: `docs/operations/DATABASE-MONITORING.md` with alerts and troubleshooting
 
-#### SSL Certificate Setup (ADR 0067)
+#### SSL Certificate Setup (ADR 0067) - ✅ Implemented
 
-- **Automated Setup Script**: `scripts/setup-ssl-certificate.sh` for guided certificate installation
-- **Full Chain Support**: Auto-detect and enable SSL verification when full certificate chain provided
-- **Certificate Validation**: Automatic count validation (≥2 certificates: root + intermediate)
-- **Graceful Fallback**: Maintains encrypted connection if certificate incomplete
-- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with step-by-step guide
+- **Repository-Based Certificates**: AWS RDS Global Bundle stored in `config/aws-rds-ca-bundle.pem` (108 certificates, 165KB)
+- **No Environment Variable Limits**: Bypasses Vercel 64KB env var limit by loading from file
+- **Full SSL Verification Enabled**: Production now uses `rejectUnauthorized: true` by default
+- **Automatic Loading**: `src/lib/db.ts` loads certificate from repository, fallback to env var for compatibility
+- **Version Controlled**: Certificate bundle committed to repository, consistent across all environments
+- **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` updated with implementation details
 
 ### Changed
 
@@ -46,9 +47,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 **SSL**:
 
-- `src/lib/db.ts` - Smart SSL configuration with full certificate chain support (lines 75-134)
-- `scripts/setup-ssl-certificate.sh` - Interactive setup wizard (192 lines)
-- `docs/operations/SSL-CERTIFICATE-SETUP.md` - Complete setup guide
+- `src/lib/db.ts` - Repository-based certificate loading with smart fallback (lines 75-150)
+- `config/aws-rds-ca-bundle.pem` - AWS RDS Global Bundle (108 certificates, 165KB)
+- `scripts/setup-ssl-certificate.sh` - Interactive setup wizard (deprecated, now automated)
+- `docs/operations/SSL-CERTIFICATE-SETUP.md` - Implementation documentation
 
 **Monitoring**:
 
@@ -67,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Health check status**: Now correctly reports "healthy" on cold start
 - **Connection efficiency**: Reduced idle connections, optimized for stateless serverless functions
 - **Observability**: Real-time pool statistics via Prometheus and health endpoints
-- **Security**: Ready for full SSL verification when certificate chain installed
+- **Security**: ✅ Full SSL verification enabled with AWS RDS certificate bundle
 
 ---
 
