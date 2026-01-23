@@ -4,36 +4,37 @@
 
 ## Modelli Disponibili (Gennaio 2026)
 
-| Modello | Versione | Stato | Costo Audio | Note |
-|---------|----------|-------|-------------|------|
-| `gpt-realtime` | 2025-08-28 | **GA** | $0.30/min | Qualità massima (ATTUALE) |
-| `gpt-realtime-mini` | 2025-12-15 | **GA** | ~$0.03-0.05/min | **90% risparmio** - RACCOMANDATO |
-| `gpt-4o-realtime-preview` | 2025-06-03 | Deprecated | - | NON usare |
+| Modello                   | Versione   | Stato      | Costo Audio     | Note                             |
+| ------------------------- | ---------- | ---------- | --------------- | -------------------------------- |
+| `gpt-realtime`            | 2025-08-28 | **GA**     | $0.30/min       | Qualità massima (ATTUALE)        |
+| `gpt-realtime-mini`       | 2025-12-15 | **GA**     | ~$0.03-0.05/min | **90% risparmio** - RACCOMANDATO |
+| `gpt-4o-realtime-preview` | 2025-06-03 | Deprecated | -               | NON usare                        |
 
 **Deployment attuale**: `gpt-4o-realtime` → modello `gpt-realtime` (GA)
 
 ### Confronto Pricing Dettagliato
 
-| Metrica | `gpt-realtime` | `gpt-realtime-mini` | Risparmio |
-|---------|----------------|---------------------|-----------|
-| Audio Input | $100/1M tokens | $10/1M tokens | 90% |
-| Audio Output | $200/1M tokens | $20/1M tokens | 90% |
-| Text Input | $5/1M tokens | $0.60/1M tokens | 88% |
-| Text Output | $20/1M tokens | $2.40/1M tokens | 88% |
-| **Costo pratico bidirezionale** | ~$0.30/min | ~$0.03-0.05/min | **80-90%** |
+| Metrica                         | `gpt-realtime` | `gpt-realtime-mini` | Risparmio  |
+| ------------------------------- | -------------- | ------------------- | ---------- |
+| Audio Input                     | $100/1M tokens | $10/1M tokens       | 90%        |
+| Audio Output                    | $200/1M tokens | $20/1M tokens       | 90%        |
+| Text Input                      | $5/1M tokens   | $0.60/1M tokens     | 88%        |
+| Text Output                     | $20/1M tokens  | $2.40/1M tokens     | 88%        |
+| **Costo pratico bidirezionale** | ~$0.30/min     | ~$0.03-0.05/min     | **80-90%** |
 
 ### Quando Usare Mini vs Standard
 
-| Use Case | Modello Consigliato | Motivo |
-|----------|---------------------|--------|
-| Tutoring educativo | **Mini** | System prompt guida la personalità |
-| Onboarding studenti | **Mini** | Conversazioni semplici |
-| Supporto emotivo (MirrorBuddy) | Standard | Richiede sfumature emotive |
-| Demo/testing | **Mini** | Risparmio costi |
+| Use Case                       | Modello Consigliato | Motivo                             |
+| ------------------------------ | ------------------- | ---------------------------------- |
+| Tutoring educativo             | **Mini**            | System prompt guida la personalità |
+| Onboarding studenti            | **Mini**            | Conversazioni semplici             |
+| Supporto emotivo (MirrorBuddy) | Standard            | Richiede sfumature emotive         |
+| Demo/testing                   | **Mini**            | Risparmio costi                    |
 
 ### Migrazione a Mini
 
 1. Deploy nuovo modello:
+
 ```bash
 az cognitiveservices account deployment create \
   --resource-group rg-virtualbpm-prod \
@@ -46,6 +47,7 @@ az cognitiveservices account deployment create \
 ```
 
 2. Aggiorna `.env.local`:
+
 ```bash
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
 ```
@@ -57,15 +59,18 @@ AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime-mini
 As of January 2026, MirrorBuddy uses WebRTC for voice by default.
 
 ### Configuration
+
 Set `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket` for fallback.
 
 ### Architecture
+
 - Client fetches ephemeral token from `/api/realtime/ephemeral-token`
 - Direct SDP exchange with Azure Realtime API
 - Audio via native WebRTC tracks
 - JSON events via RTCDataChannel
 
 ### Benefits
+
 - Lower latency (~200-350ms vs ~450-900ms with WebSocket)
 - Native barge-in support
 - No server-side audio proxy needed
@@ -76,10 +81,10 @@ Set `VOICE_TRANSPORT=webrtc` (default) or `VOICE_TRANSPORT=websocket` for fallba
 
 ### Modelli Disponibili nel Realtime API
 
-| Modello | Stato | Note |
-|---------|-------|------|
-| `whisper-1` | **Supportato** | Unico modello funzionante |
-| `gpt-4o-transcribe` | **NON supportato** | Solo via `/audio` endpoint separato |
+| Modello                  | Stato              | Note                                |
+| ------------------------ | ------------------ | ----------------------------------- |
+| `whisper-1`              | **Supportato**     | Unico modello funzionante           |
+| `gpt-4o-transcribe`      | **NON supportato** | Solo via `/audio` endpoint separato |
 | `gpt-4o-mini-transcribe` | **NON supportato** | Solo via `/audio` endpoint separato |
 
 > **IMPORTANTE**: Il Realtime API supporta SOLO `whisper-1` per la trascrizione.
@@ -101,8 +106,8 @@ Whisper-1 supporta un parametro `prompt` con **lista di keyword** (non frasi):
 
 ```typescript
 const transcriptionPrompts = {
-  it: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze...',
-  en: 'MirrorBuddy, teacher, math, English, history, geography, science...',
+  it: "MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze...",
+  en: "MirrorBuddy, teacher, math, English, history, geography, science...",
   // ... altre lingue
 };
 ```
@@ -122,11 +127,11 @@ Il modello riceve l'audio originale e lo interpreta correttamente.
 
 ## Session Config Ottimale (Issue #61)
 
-Hardcoded in `session-config.ts` - NON modificabili dall'utente:
+Configurato in `session-config.ts` con **valori adattivi** per profili DSA (ADR-0069):
 
 ```typescript
 {
-  input_audio_noise_reduction: { type: 'near_field' },
+  input_audio_noise_reduction: { type: vadConfig.noise_reduction },
   input_audio_transcription: {
     model: 'whisper-1',
     language: 'it',  // da settings
@@ -134,15 +139,53 @@ Hardcoded in `session-config.ts` - NON modificabili dall'utente:
   },
   turn_detection: {
     type: 'server_vad',
-    threshold: 0.6,
-    prefix_padding_ms: 300,
-    silence_duration_ms: 700,
+    threshold: vadConfig.threshold,
+    prefix_padding_ms: vadConfig.prefix_padding_ms,
+    silence_duration_ms: vadConfig.silence_duration_ms,
     create_response: true,
     interrupt_response: true,  // false per onboarding
   },
   temperature: 0.8,
 }
 ```
+
+## Adaptive VAD for DSA Profiles (ADR-0069)
+
+VAD (Voice Activity Detection) parameters are automatically adjusted based on the user's accessibility profile to reduce interruptions during speech.
+
+### Profile Configurations
+
+| Profile  | Threshold | Silence (ms) | Prefix (ms) | Noise Reduction |
+| -------- | --------- | ------------ | ----------- | --------------- |
+| Default  | 0.6       | 700          | 300         | near_field      |
+| Dyslexia | 0.55      | 1500         | 400         | near_field      |
+| ADHD     | 0.6       | 1800         | 350         | far_field       |
+| Autism   | 0.5       | 1400         | 500         | near_field      |
+| Motor    | 0.45      | 2000         | 600         | far_field       |
+| Visual   | 0.6       | 700          | 300         | near_field      |
+| Auditory | 0.55      | 900          | 350         | far_field       |
+| Cerebral | 0.4       | 2500         | 700         | far_field       |
+
+### How It Works
+
+1. System reads `activeProfile` from accessibility store
+2. `getAdaptiveVadConfig()` returns profile-specific settings
+3. Settings are applied to Azure Realtime API `turn_detection`
+4. Logs show active profile for debugging
+
+### User Control
+
+- `adaptiveVadEnabled` setting (default: `true`)
+- When disabled, falls back to default 700ms configuration
+- Stored in accessibility settings (cookie + database)
+
+### Key Files
+
+| File                                                 | Role                |
+| ---------------------------------------------------- | ------------------- |
+| `src/lib/hooks/voice-session/adaptive-vad.ts`        | Profile definitions |
+| `src/lib/hooks/voice-session/session-config.ts`      | Integration point   |
+| `src/lib/accessibility/accessibility-store/types.ts` | Settings type       |
 
 ## Conversation Context Injection (ADR 0035)
 
@@ -180,12 +223,12 @@ User loads old conversation → clicks voice →
 
 ### Key Files
 
-| File | Role |
-|------|------|
-| `src/lib/hooks/voice-session/types.ts` | `initialMessages` in ConnectionInfo |
-| `src/lib/hooks/voice-session/session-config.ts` | Injection logic after session.update |
-| `src/components/maestros/use-maestro-voice-connection.ts` | Formats messages for Maestri |
-| `src/components/conversation/character-chat-view/hooks/use-character-chat/index.ts` | Formats for Coach/Buddy |
+| File                                                                                | Role                                 |
+| ----------------------------------------------------------------------------------- | ------------------------------------ |
+| `src/lib/hooks/voice-session/types.ts`                                              | `initialMessages` in ConnectionInfo  |
+| `src/lib/hooks/voice-session/session-config.ts`                                     | Injection logic after session.update |
+| `src/components/maestros/use-maestro-voice-connection.ts`                           | Formats messages for Maestri         |
+| `src/components/conversation/character-chat-view/hooks/use-character-chat/index.ts` | Formats for Coach/Buddy              |
 
 ### Limitations
 
@@ -198,25 +241,26 @@ User loads old conversation → clicks voice →
 
 Azure ha DUE formati con **event names DIVERSI**:
 
-| Evento | Preview API | GA API |
-|--------|-------------|--------|
-| Audio | `response.audio.delta` | `response.output_audio.delta` |
+| Evento     | Preview API                       | GA API                                   |
+| ---------- | --------------------------------- | ---------------------------------------- |
+| Audio      | `response.audio.delta`            | `response.output_audio.delta`            |
 | Transcript | `response.audio_transcript.delta` | `response.output_audio_transcript.delta` |
 
 Il codice in `use-voice-session.ts` ascolta ENTRAMBI (linee 575-616).
 
 ## File Critici
 
-| File | Responsabilità |
-|------|----------------|
-| `src/lib/hooks/use-voice-session.ts` | Hook principale |
-| `src/server/realtime-proxy.ts` | WebSocket proxy |
-| `src/app/test-voice/page.tsx` | Pagina debug |
-| `docs/AZURE_REALTIME_API.md` | Documentazione API |
+| File                                 | Responsabilità     |
+| ------------------------------------ | ------------------ |
+| `src/lib/hooks/use-voice-session.ts` | Hook principale    |
+| `src/server/realtime-proxy.ts`       | WebSocket proxy    |
+| `src/app/test-voice/page.tsx`        | Pagina debug       |
+| `docs/AZURE_REALTIME_API.md`         | Documentazione API |
 
 ## Requisito HTTPS per Microfono
 
 `navigator.mediaDevices.getUserMedia()` richiede **secure context**:
+
 - `localhost:3000` / `127.0.0.1:3000` → OK
 - `https://...` → OK
 - `http://192.168.x.x:3000` → **NON FUNZIONA**

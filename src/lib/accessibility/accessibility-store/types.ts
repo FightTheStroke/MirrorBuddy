@@ -30,13 +30,16 @@ export interface AccessibilitySettings {
   colorBlindMode: boolean;
   keyboardNavigation: boolean;
 
+  // Voice accessibility (ADR-0069)
+  adaptiveVadEnabled: boolean; // Adjust voice turn detection for DSA profiles
+
   // Custom colors
   customBackgroundColor: string;
   customTextColor: string;
 }
 
 // ADHD session state
-export type ADHDSessionState = 'idle' | 'working' | 'breakTime' | 'completed';
+export type ADHDSessionState = "idle" | "working" | "breakTime" | "completed";
 
 // ADHD session configuration
 export interface ADHDSessionConfig {
@@ -64,4 +67,4 @@ export interface ADHDSessionStats {
 }
 
 // Accessibility context
-export type AccessibilityContext = 'student' | 'parent';
+export type AccessibilityContext = "student" | "parent";
