@@ -95,8 +95,11 @@ export function DiagramRenderer({ request, className }: DiagramRendererProps) {
         if (!mermaidRef.current || themeChanged) {
           if (!loadingPromiseRef.current || themeChanged) {
             loadingPromiseRef.current = import("mermaid").then((module) => {
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
-              module.default.initialize(getMermaidConfig(isDark) as any);
+              module.default.initialize(
+                getMermaidConfig(isDark) as Parameters<
+                  typeof module.default.initialize
+                >[0],
+              );
               return module.default;
             });
           }

@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { FUNNEL_STAGES, type FunnelStage } from "@/lib/funnel";
+import { FUNNEL_STAGES } from "@/lib/funnel";
 
 export const dynamic = "force-dynamic";
 

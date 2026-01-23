@@ -556,6 +556,15 @@ test.describe("Instant Access - Cookie Persistence", () => {
     await page.reload();
     await page.waitForLoadState("networkidle");
 
+    // Wait for accessibility store to hydrate and apply font
+    await page.waitForFunction(
+      () =>
+        window
+          .getComputedStyle(document.body)
+          .fontFamily.includes("OpenDyslexic"),
+      { timeout: 5000 },
+    );
+
     const body = page.locator("body");
     const fontFamily = await body.evaluate(
       (el) => window.getComputedStyle(el).fontFamily,

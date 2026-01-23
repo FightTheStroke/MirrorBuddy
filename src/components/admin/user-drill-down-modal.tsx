@@ -63,7 +63,7 @@ interface UserDrilldownModalProps {
   userId: string | null;
   open: boolean;
   onClose: () => void;
-  onAction?: (action: string, userId: string) => void;
+  _onAction?: (action: string, userId: string) => void;
 }
 
 const STAGE_COLORS: Record<string, string> = {
@@ -82,7 +82,7 @@ export function UserDrilldownModal({
   userId,
   open,
   onClose,
-  onAction,
+  _onAction,
 }: UserDrilldownModalProps) {
   const [data, setData] = useState<UserDrilldownData | null>(null);
   const [loading, setLoading] = useState(false);

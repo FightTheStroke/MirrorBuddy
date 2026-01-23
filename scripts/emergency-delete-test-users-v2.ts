@@ -54,7 +54,7 @@ async function emergencyCleanup() {
 
   const result = await prisma.$transaction(async () => {
     // Delete users - CASCADE should handle related data
-    const userIdsString = userIds.map((id) => `'${id}'`).join(",");
+    const _userIdsString = userIds.map((id) => `'${id}'`).join(",");
 
     // Execute raw DELETE with CASCADE (if schema has ON DELETE CASCADE)
     // Otherwise we need to manually delete related records first

@@ -1,13 +1,13 @@
-'use client';
+"use client";
 
-import { useTypingStore } from '@/lib/stores';
+import { useTypingStore } from "@/lib/stores";
 
 export function ProgressTracker() {
   const { progress } = useTypingStore();
 
   if (!progress) return null;
 
-  const { stats, currentLevel, lessons } = progress;
+  const { stats, currentLevel: _currentLevel, lessons: _lessons } = progress;
 
   return (
     <div className="space-y-4">
@@ -15,8 +15,16 @@ export function ProgressTracker() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <StatCard label="WPM Migliore" value={stats.bestWPM} suffix=" WPM" />
-        <StatCard label="WPM Medio" value={Math.round(stats.averageWPM)} suffix=" WPM" />
-        <StatCard label="Precisione" value={Math.round(stats.totalAccuracy)} suffix="%" />
+        <StatCard
+          label="WPM Medio"
+          value={Math.round(stats.averageWPM)}
+          suffix=" WPM"
+        />
+        <StatCard
+          label="Precisione"
+          value={Math.round(stats.totalAccuracy)}
+          suffix="%"
+        />
         <StatCard label="Lezioni" value={stats.totalLessonsCompleted} />
       </div>
 
@@ -65,12 +73,13 @@ interface StatCardProps {
   suffix?: string;
 }
 
-function StatCard({ label, value, suffix = '' }: StatCardProps) {
+function StatCard({ label, value, suffix = "" }: StatCardProps) {
   return (
     <div className="p-3 bg-muted/30 border border-border rounded-lg">
       <div className="text-xs text-muted-foreground mb-1">{label}</div>
       <div className="text-xl font-bold">
-        {value}{suffix}
+        {value}
+        {suffix}
       </div>
     </div>
   );

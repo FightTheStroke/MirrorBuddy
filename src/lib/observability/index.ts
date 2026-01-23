@@ -5,8 +5,8 @@
  * for use across the application.
  */
 
-export { metricsStore } from './metrics-store';
-export { prometheusPushService } from './prometheus-push-service';
+export { metricsStore } from "./metrics-store";
+export { prometheusPushService } from "./prometheus-push-service";
 
 // Threshold logic (F-07, F-25)
 export {
@@ -18,22 +18,22 @@ export {
   THRESHOLDS,
   type AlertStatus,
   type MetricWithStatus,
-} from './threshold-logic';
+} from "./threshold-logic";
 
 // Service limits (F-18: every limit monitored)
 export {
   getVercelLimits,
   clearVercelLimitsCache,
   type VercelLimits,
-} from './vercel-limits';
+} from "./vercel-limits";
 export {
   getSupabaseLimits,
   isResourceStressed,
   getStressReport,
   type SupabaseLimits,
   type ResourceMetric,
-} from './supabase-limits';
-// TODO: Add when implemented in future tasks
+} from "./supabase-limits";
+// Additional service limits - exports available when modules are implemented:
 // export { getResendLimits, ... } from './resend-limits';
 // export { getAzureOpenAILimits, ... } from './azure-openai-limits';
 // export { getRedisLimits, ... } from './redis-limits';
@@ -43,4 +43,4 @@ export type {
   ErrorDataPoint,
   RouteMetrics,
   MetricsSummary,
-} from './metrics-store';
+} from "./metrics-store";
