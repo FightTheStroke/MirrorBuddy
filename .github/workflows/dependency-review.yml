@@ -20,4 +20,9 @@ jobs:
         with:
           fail-on-severity: high
           comment-summary-in-pr: always
-          deny-licenses: GPL-3.0, AGPL-3.0
+          # Allowlist of licenses compatible with Apache-2.0 (MirrorBuddy license)
+          # Using allow-licenses instead of deprecated deny-licenses (removed in v5)
+          allow-licenses: >-
+            MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD,
+            Unlicense, CC0-1.0, CC-BY-3.0, CC-BY-4.0, MPL-2.0,
+            Python-2.0, BlueOak-1.0.0, Zlib
