@@ -1,6 +1,6 @@
 /**
  * @fileoverview Unit tests for Adaptive VAD configuration
- * ADR-0065: Adaptive VAD for Accessibility Profiles
+ * ADR-0069: Adaptive VAD for Accessibility Profiles
  */
 
 import { describe, it, expect } from "vitest";

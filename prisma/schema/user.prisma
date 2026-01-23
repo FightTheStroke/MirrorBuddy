@@ -213,6 +213,9 @@ model AccessibilitySettings {
   colorBlindMode     Boolean @default(false)
   keyboardNavigation Boolean @default(true)
 
+  // Voice accessibility (ADR-0069)
+  adaptiveVadEnabled Boolean @default(true)
+
   // Custom colors
   customBackgroundColor String @default("#ffffff")
   customTextColor       String @default("#000000")

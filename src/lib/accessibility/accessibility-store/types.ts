@@ -30,7 +30,7 @@ export interface AccessibilitySettings {
   colorBlindMode: boolean;
   keyboardNavigation: boolean;
 
-  // Voice accessibility (ADR-0065)
+  // Voice accessibility (ADR-0069)
   adaptiveVadEnabled: boolean; // Adjust voice turn detection for DSA profiles
 
   // Custom colors
