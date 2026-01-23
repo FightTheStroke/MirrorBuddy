@@ -50,6 +50,26 @@ export function PrivacyContentExtended() {
             (puoi disattivarli)
           </li>
         </ul>
+        <p className="mt-4">
+          <strong>Vercel Analytics:</strong> Utilizziamo Vercel Analytics per
+          monitorare le prestazioni del sito. Questo servizio:
+        </p>
+        <ul className="text-slate-700 dark:text-gray-300 space-y-2">
+          <li>
+            <strong>Non usa cookie</strong> - nessun tracciamento tra sessioni
+          </li>
+          <li>
+            <strong>Dati aggregati e anonimi</strong> - non identifichiamo i
+            singoli utenti
+          </li>
+          <li>
+            <strong>Conforme GDPR</strong> - i dati restano in Europa
+          </li>
+          <li>
+            <strong>Solo metriche tecniche</strong> - pagine visitate, tempi di
+            caricamento, dispositivo (tipo, non identificativo)
+          </li>
+        </ul>
         <p>Niente cookie pubblicitari o di tracciamento. Mai.</p>
       </Section>
 
