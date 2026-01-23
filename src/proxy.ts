@@ -129,7 +129,7 @@ function hasAnyProvider(): boolean {
 function buildCSPHeader(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' cdn.jsdelivr.net cdnjs.cloudflare.com`,
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'sha256-AFK2Qzme0imYZWkSbggGEVDkZ0w4laI+emR+IUHdlk8=' cdn.jsdelivr.net cdnjs.cloudflare.com`,
     "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
