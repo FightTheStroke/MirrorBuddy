@@ -34,10 +34,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Production Ready**: Successfully tested with PostgreSQL 17.6 on Supabase
 - **Documentation**: `docs/operations/SSL-CERTIFICATE-SETUP.md` with implementation details
 
+#### Admin Settings Page
+
+- **New `/admin/settings` page** with system configuration overview:
+  - Trial Budget card: displays `TRIAL_BUDGET_LIMIT_EUR` (read-only)
+  - Protected Users card: lists whitelist from `PROTECTED_USERS` env var
+  - System Info card: version, NODE_ENV, Node.js version, build date
+- Resolves known issue from ADR 0059 (sidebar link to non-existent page)
+
 #### Conversion Funnel Dashboard (ADR 0068)
 
-- **Admin Dashboard**: New `/admin/funnel` page with conversion funnel visualization
-  - KPI cards: Total visitors, conversion rate, active users
+- **Funnel integrated into main `/admin` dashboard** as collapsible section:
+  - Summary KPIs: Unique Visitors, Converted, Conversion Rate
   - Funnel bar chart with stage-to-stage conversion rates
   - Users table with search, pagination, and stage filtering
   - User drill-down modal with timeline and usage metrics

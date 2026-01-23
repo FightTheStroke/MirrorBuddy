@@ -266,7 +266,7 @@ Previous E2E tests verified admin pages existed but never **clicked** sidebar li
 
 ### Known Issues
 
-- `/admin/settings` route doesn't exist but sidebar has "Impostazioni" link (TODO: create page or remove link)
+_None currently._
 
 ### Running the Tests
 

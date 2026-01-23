@@ -45,12 +45,15 @@ Implement a comprehensive conversion funnel system with:
 
 ### 3. Dashboard UI
 
-- `/admin/funnel` page with:
-  - KPI cards (visitors, conversion rate, active users)
+- Funnel section integrated into main `/admin` dashboard (collapsible):
+  - Summary KPIs (Unique Visitors, Converted, Conversion Rate)
   - Funnel visualization (bar chart with conversion rates)
   - Users table with stage filtering and search
   - Drill-down modal with timeline and usage metrics
   - Inline admin actions (invite, approve, block)
+
+> **Note**: Originally planned as separate `/admin/funnel` page, but moved to main dashboard
+> for better discoverability and consolidated admin experience (Plan 72, 2026-01-23).
 
 ### 4. Grafana Integration
 
@@ -109,7 +112,7 @@ Implement a comprehensive conversion funnel system with:
 
 ### Dashboard
 
-- `src/app/admin/funnel/page.tsx`
+- `src/app/admin/page.tsx` (FunnelSection integrated)
 - `src/components/admin/funnel-chart.tsx`
 - `src/components/admin/funnel-users-table.tsx`
 - `src/components/admin/user-drill-down-modal.tsx`
