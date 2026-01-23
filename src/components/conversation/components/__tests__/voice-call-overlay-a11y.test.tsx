@@ -186,13 +186,9 @@ describe("VoiceCallOverlay Accessibility Toggle", () => {
       expect(screen.getByTestId("dot-matrix-visualizer")).toBeInTheDocument();
     });
 
-    it("shows static CharacterAvatar (no pulsing motion wrapper)", () => {
+    it("shows static CharacterAvatar", () => {
       render(<VoiceCallOverlay character={mockCharacter} onEnd={vi.fn()} />);
       expect(screen.getByTestId("character-avatar")).toBeInTheDocument();
-      // Should NOT have the pulsing motion wrapper
-      expect(
-        screen.queryByTestId("pulsing-avatar-wrapper"),
-      ).not.toBeInTheDocument();
     });
   });
 
@@ -208,10 +204,13 @@ describe("VoiceCallOverlay Accessibility Toggle", () => {
       ).not.toBeInTheDocument();
     });
 
-    it("shows CharacterAvatar with pulsing motion wrapper", () => {
+    it("shows static CharacterAvatar without any animation", () => {
       render(<VoiceCallOverlay character={mockCharacter} onEnd={vi.fn()} />);
       expect(screen.getByTestId("character-avatar")).toBeInTheDocument();
-      expect(screen.getByTestId("pulsing-avatar-wrapper")).toBeInTheDocument();
+      // Should NOT have any animation wrapper - respects prefers-reduced-motion
+      expect(
+        screen.queryByTestId("pulsing-avatar-wrapper"),
+      ).not.toBeInTheDocument();
     });
   });
 

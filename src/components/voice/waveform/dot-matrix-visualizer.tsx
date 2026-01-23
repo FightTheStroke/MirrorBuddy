@@ -33,6 +33,8 @@ export function DotMatrixVisualizer({
   const previousLevelsRef = useRef<number[][]>([]);
   const prefersReducedMotion = useRef(false);
   const drawRef = useRef<(() => void) | null>(null);
+  // Reuse frequency data buffer to avoid GC pressure (Vercel optimization)
+  const frequencyDataRef = useRef<Uint8Array | null>(null);
 
   // Check for reduced motion preference
   useEffect(() => {
@@ -87,11 +89,17 @@ export function DotMatrixVisualizer({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Get frequency data if analyser available
+    // Get frequency data if analyser available (reuse buffer to avoid GC)
     let frequencyData: Uint8Array<ArrayBuffer> | null = null;
     if (analyser && isActive) {
-      const buffer = new ArrayBuffer(analyser.frequencyBinCount);
-      frequencyData = new Uint8Array(buffer);
+      // Allocate or resize buffer only when needed
+      if (
+        !frequencyDataRef.current ||
+        frequencyDataRef.current.length !== analyser.frequencyBinCount
+      ) {
+        frequencyDataRef.current = new Uint8Array(analyser.frequencyBinCount);
+      }
+      frequencyData = frequencyDataRef.current as Uint8Array<ArrayBuffer>;
       analyser.getByteFrequencyData(frequencyData);
     }
 
