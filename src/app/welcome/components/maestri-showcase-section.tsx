@@ -6,6 +6,8 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { maestri, SUBJECT_NAMES } from "@/data/maestri";
 
+const DISPLAY_COUNT = 5;
+
 /**
  * Shuffle array using Fisher-Yates algorithm
  */
@@ -24,13 +26,16 @@ function shuffleArray<T>(array: T[]): T[] {
  * THE PRIMARY VALUE PROPOSITION of MirrorBuddy:
  * Learn WITH the greatest minds in history, not just ABOUT them.
  *
- * Shows all professors in a scrollable horizontal carousel with random order.
+ * Shows 5 random professors in a scrollable horizontal carousel.
  */
 export function MaestriShowcaseSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Randomize professor order on each render (page refresh)
-  const shuffledMaestri = useMemo(() => shuffleArray(maestri), []);
+  // Randomize and pick 5 professors
+  const displayedMaestri = useMemo(
+    () => shuffleArray(maestri).slice(0, DISPLAY_COUNT),
+    [],
+  );
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -68,8 +73,8 @@ export function MaestriShowcaseSection() {
         </h2>
 
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {shuffledMaestri.length} menti straordinarie della storia diventano i
-          tuoi professori personali.
+          {maestri.length} menti straordinarie della storia diventano i tuoi
+          professori personali.
         </p>
       </motion.div>
 
@@ -93,7 +98,7 @@ export function MaestriShowcaseSection() {
           role="region"
           aria-label="Carosello professori - usa le frecce per navigare"
         >
-          {shuffledMaestri.map((maestro, i) => (
+          {displayedMaestri.map((maestro, i) => (
             <motion.div
               key={maestro.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -147,7 +152,7 @@ export function MaestriShowcaseSection() {
 
       {/* Scroll hint for mobile */}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
-        ← Scorri per vedere tutti i professori →
+        ← Scorri per vedere i professori →
       </p>
 
       {/* Disclaimer */}

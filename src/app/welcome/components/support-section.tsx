@@ -19,6 +19,8 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
+const DISPLAY_COUNT = 5;
+
 interface SupportMember {
   id: string;
   name: string;
@@ -31,13 +33,13 @@ interface SupportMember {
 /**
  * Support Section - Coaches and Buddies Carousel
  *
- * Shows all coaches and buddies in a single horizontal carousel.
+ * Shows 5 random coaches and buddies in a horizontal carousel.
  * Coaches help with study methods, Buddies provide peer emotional support.
  */
 export function SupportSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Get all coaches and buddies, combine and shuffle
+  // Get all coaches and buddies, combine, shuffle and pick 5
   const supportMembers = useMemo(() => {
     const coaches = getAllSupportTeachers();
     const buddies = getAllBuddies();
@@ -61,7 +63,7 @@ export function SupportSection() {
       })),
     ];
 
-    return shuffleArray(members);
+    return shuffleArray(members).slice(0, DISPLAY_COUNT);
   }, []);
 
   const scroll = (direction: "left" | "right") => {
@@ -73,9 +75,6 @@ export function SupportSection() {
       });
     }
   };
-
-  const coachCount = supportMembers.filter((m) => m.role === "coach").length;
-  const buddyCount = supportMembers.filter((m) => m.role === "buddy").length;
 
   return (
     <motion.section
@@ -102,8 +101,7 @@ export function SupportSection() {
           </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {coachCount} Coach per il metodo di studio e {buddyCount} Buddy per il
-          supporto emotivo
+          Coach per il metodo di studio e Buddy per il supporto emotivo
         </p>
       </motion.div>
 

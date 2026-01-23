@@ -8,7 +8,6 @@ interface TrialUsageData {
   voice: { used: number; limit: number; percentage: number; unit: string };
   tools: { used: number; limit: number; percentage: number };
   docs: { used: number; limit: number; percentage: number };
-  maestri: { selected: number; limit: number };
 }
 
 interface ResourceMetric {
@@ -88,14 +87,6 @@ export function TrialUsageDashboard() {
       used: data.tools.used,
       limit: data.tools.limit,
       percentage: Math.round(data.tools.percentage),
-    },
-    maestri: {
-      label: "Maestri",
-      used: data.maestri.selected,
-      limit: data.maestri.limit,
-      percentage: Math.round(
-        (data.maestri.selected / data.maestri.limit) * 100,
-      ),
     },
   };
 
