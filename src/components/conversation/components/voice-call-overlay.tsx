@@ -1,24 +1,23 @@
-'use client';
+"use client";
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion } from 'framer-motion';
-import { Mic, MicOff, PhoneOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
-import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
-import { useVoiceSession } from '@/lib/hooks/use-voice-session';
-import { CharacterAvatar } from './character-avatar';
-import { CharacterRoleBadge } from './character-role-badge';
-import { AudioDeviceSelector } from './audio-device-selector';
-import {
-  getUserId,
-  activeCharacterToMaestro,
-} from './voice-call-helpers';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion } from "framer-motion";
+import { Mic, MicOff, PhoneOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
+import { useVoiceSession } from "@/lib/hooks/use-voice-session";
+import { CharacterAvatar } from "./character-avatar";
+import { CharacterRoleBadge } from "./character-role-badge";
+import { AudioDeviceSelector } from "./audio-device-selector";
+import { DotMatrixVisualizer } from "@/components/voice/waveform";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { getUserId, activeCharacterToMaestro } from "./voice-call-helpers";
 
 interface VoiceConnectionInfo {
-  provider: 'azure';
+  provider: "azure";
   proxyPort: number;
   configured: boolean;
 }
@@ -39,7 +38,8 @@ export function VoiceCallOverlay({
   onEnd,
   onSessionIdChange,
 }: VoiceCallOverlayProps) {
-  const [connectionInfo, setConnectionInfo] = useState<VoiceConnectionInfo | null>(null);
+  const [connectionInfo, setConnectionInfo] =
+    useState<VoiceConnectionInfo | null>(null);
   const [configError, setConfigError] = useState<string | null>(null);
   const hasAttemptedConnection = useRef(false);
 
@@ -47,14 +47,18 @@ export function VoiceCallOverlay({
   const conversationIdRef = useRef<string | null>(null);
   const savedMessagesRef = useRef<Set<string>>(new Set());
 
+  // Accessibility: check if we should show dot matrix or simple avatar pulse
+  const shouldAnimate = useAccessibilityStore((state) => state.shouldAnimate);
+  const showDotMatrix = shouldAnimate();
+
   const voiceSession = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
-      logger.error('Voice call error', { message });
-      setConfigError(message || 'Errore di connessione vocale');
+      logger.error("Voice call error", { message });
+      setConfigError(message || "Errore di connessione vocale");
     },
     onTranscript: (role, text) => {
-      logger.debug('Voice transcript', { role, text: text.substring(0, 100) });
+      logger.debug("Voice transcript", { role, text: text.substring(0, 100) });
     },
   });
 
@@ -66,6 +70,7 @@ export function VoiceCallOverlay({
     isMuted,
     transcript,
     inputLevel,
+    outputAnalyser,
     connectionState,
     connect,
     disconnect,
@@ -84,8 +89,8 @@ export function VoiceCallOverlay({
 
     const createConversation = async () => {
       try {
-        const response = await csrfFetch('/api/conversations', {
-          method: 'POST',
+        const response = await csrfFetch("/api/conversations", {
+          method: "POST",
           body: JSON.stringify({
             maestroId: character.id,
             title: `Sessione vocale con ${character.name}`,
@@ -94,10 +99,15 @@ export function VoiceCallOverlay({
         if (response.ok) {
           const data = await response.json();
           conversationIdRef.current = data.id;
-          logger.debug('[VoiceCallOverlay] Conversation created for memory persistence', { conversationId: data.id });
+          logger.debug(
+            "[VoiceCallOverlay] Conversation created for memory persistence",
+            { conversationId: data.id },
+          );
         }
       } catch (error) {
-        logger.error('[VoiceCallOverlay] Failed to create conversation', { error: String(error) });
+        logger.error("[VoiceCallOverlay] Failed to create conversation", {
+          error: String(error),
+        });
       }
     };
 
@@ -114,16 +124,21 @@ export function VoiceCallOverlay({
         if (savedMessagesRef.current.has(messageKey)) continue;
 
         try {
-          await csrfFetch(`/api/conversations/${conversationIdRef.current}/messages`, {
-            method: 'POST',
-            body: JSON.stringify({
-              role: entry.role,
-              content: entry.content,
-            }),
-          });
+          await csrfFetch(
+            `/api/conversations/${conversationIdRef.current}/messages`,
+            {
+              method: "POST",
+              body: JSON.stringify({
+                role: entry.role,
+                content: entry.content,
+              }),
+            },
+          );
           savedMessagesRef.current.add(messageKey);
         } catch (error) {
-          logger.error('[VoiceCallOverlay] Failed to save message', { error: String(error) });
+          logger.error("[VoiceCallOverlay] Failed to save message", {
+            error: String(error),
+          });
         }
       }
     };
@@ -136,7 +151,7 @@ export function VoiceCallOverlay({
     async function fetchConnectionInfo() {
       try {
         // Check cache first (valid for browser session)
-        const cached = sessionStorage.getItem('voice-connection-info');
+        const cached = sessionStorage.getItem("voice-connection-info");
         if (cached) {
           try {
             const data = JSON.parse(cached);
@@ -147,32 +162,36 @@ export function VoiceCallOverlay({
             }
           } catch {
             // Invalid cache, fetch fresh
-            sessionStorage.removeItem('voice-connection-info');
+            sessionStorage.removeItem("voice-connection-info");
           }
         }
 
         // Fetch from API
-        const response = await fetch('/api/realtime/token');
+        const response = await fetch("/api/realtime/token");
         const data = await response.json();
 
         if (response.status === 429) {
-          logger.warn('Rate limit exceeded for voice token', { retryAfter: data.retryAfter });
-          setConfigError('Troppe richieste. Riprova tra qualche secondo.');
+          logger.warn("Rate limit exceeded for voice token", {
+            retryAfter: data.retryAfter,
+          });
+          setConfigError("Troppe richieste. Riprova tra qualche secondo.");
           return;
         }
 
         if (data.error) {
-          logger.error('Voice API error', { error: data.error });
-          setConfigError(data.message || 'Servizio vocale non configurato');
+          logger.error("Voice API error", { error: data.error });
+          setConfigError(data.message || "Servizio vocale non configurato");
           return;
         }
 
         // Cache for session
-        sessionStorage.setItem('voice-connection-info', JSON.stringify(data));
+        sessionStorage.setItem("voice-connection-info", JSON.stringify(data));
         setConnectionInfo(data as VoiceConnectionInfo);
       } catch (error) {
-        logger.error('Failed to get voice connection info', { error: String(error) });
-        setConfigError('Impossibile connettersi al servizio vocale');
+        logger.error("Failed to get voice connection info", {
+          error: String(error),
+        });
+        setConfigError("Impossibile connettersi al servizio vocale");
       }
     }
     fetchConnectionInfo();
@@ -182,20 +201,25 @@ export function VoiceCallOverlay({
   useEffect(() => {
     const startConnection = async () => {
       if (hasAttemptedConnection.current) return;
-      if (!connectionInfo || isConnected || connectionState !== 'idle') return;
+      if (!connectionInfo || isConnected || connectionState !== "idle") return;
 
       hasAttemptedConnection.current = true;
 
       try {
         // Convert character to Maestro-compatible interface
         const maestroLike = activeCharacterToMaestro(character);
-        await connect(maestroLike, { ...connectionInfo, characterType: character.type });
+        await connect(maestroLike, {
+          ...connectionInfo,
+          characterType: character.type,
+        });
       } catch (error) {
-        logger.error('Voice connection failed', { error: String(error) });
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        logger.error("Voice connection failed", { error: String(error) });
+        if (error instanceof DOMException && error.name === "NotAllowedError") {
+          setConfigError(
+            "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
+          );
         } else {
-          setConfigError('Errore di connessione vocale');
+          setConfigError("Errore di connessione vocale");
         }
       }
     };
@@ -212,17 +236,22 @@ export function VoiceCallOverlay({
       const userId = getUserId();
       if (userId) {
         try {
-          const response = await csrfFetch(`/api/conversations/${conversationIdRef.current}/end`, {
-            method: 'POST',
-            body: JSON.stringify({ userId, reason: 'explicit' }),
-          });
+          const response = await csrfFetch(
+            `/api/conversations/${conversationIdRef.current}/end`,
+            {
+              method: "POST",
+              body: JSON.stringify({ userId, reason: "explicit" }),
+            },
+          );
           if (response.ok) {
-            logger.info('[VoiceCallOverlay] Conversation ended with summary', {
+            logger.info("[VoiceCallOverlay] Conversation ended with summary", {
               conversationId: conversationIdRef.current,
             });
           }
         } catch (error) {
-          logger.error('[VoiceCallOverlay] Failed to end conversation', { error: String(error) });
+          logger.error("[VoiceCallOverlay] Failed to end conversation", {
+            error: String(error),
+          });
         }
       }
     }
@@ -233,11 +262,11 @@ export function VoiceCallOverlay({
   // Status text
   const getStatusText = () => {
     if (configError) return configError;
-    if (connectionState === 'connecting') return 'Connessione in corso...';
+    if (connectionState === "connecting") return "Connessione in corso...";
     if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
-    if (isConnected && isListening) return 'In ascolto...';
-    if (isConnected) return 'Connesso';
-    return 'Avvio chiamata...';
+    if (isConnected && isListening) return "In ascolto...";
+    if (isConnected) return "Connesso";
+    return "Avvio chiamata...";
   };
 
   return (
@@ -247,20 +276,41 @@ export function VoiceCallOverlay({
       exit={{ opacity: 0 }}
       className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm"
     >
-      <motion.div
-        animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
-        transition={{ repeat: Infinity, duration: 2 }}
-      >
-        <CharacterAvatar character={character} size="xl" showStatus isActive={isConnected} />
-      </motion.div>
+      {/* Avatar: always static - animations are handled by DotMatrixVisualizer below */}
+      <CharacterAvatar
+        character={character}
+        size="xl"
+        showStatus
+        isActive={isConnected}
+      />
 
-      <h3 className="mt-4 text-xl font-semibold text-white">{character.name}</h3>
+      <h3 className="mt-4 text-xl font-semibold text-white">
+        {character.name}
+      </h3>
       <CharacterRoleBadge type={character.type} />
 
-      <p className={cn(
-        "mt-2 text-sm",
-        configError ? "text-red-400" : "text-slate-300"
-      )}>
+      {/* Dot Matrix Audio Visualizer - only shown when animations are enabled */}
+      {showDotMatrix && (
+        <div className="mt-6">
+          <DotMatrixVisualizer
+            analyser={outputAnalyser}
+            isActive={isConnected && isSpeaking}
+            isSpeaking={isSpeaking}
+            color={character.color || "#22d3ee"}
+            rows={8}
+            cols={12}
+            dotSize={6}
+            gap={6}
+          />
+        </div>
+      )}
+
+      <p
+        className={cn(
+          "mt-2 text-sm",
+          configError ? "text-red-400" : "text-slate-300",
+        )}
+      >
         {getStatusText()}
       </p>
 
@@ -270,12 +320,12 @@ export function VoiceCallOverlay({
           <span
             className="w-2 h-2 rounded-full animate-pulse"
             style={{
-              backgroundColor: inputLevel > 0.1 ? '#22c55e' : '#64748b',
-              transform: `scale(${1 + inputLevel * 2})`
+              backgroundColor: inputLevel > 0.1 ? "#22c55e" : "#64748b",
+              transform: `scale(${1 + inputLevel * 2})`,
             }}
           />
           <span className="text-xs text-green-400">
-            {isMuted ? 'Microfono disattivato' : 'In ascolto'}
+            {isMuted ? "Microfono disattivato" : "In ascolto"}
           </span>
         </div>
       )}
@@ -285,17 +335,22 @@ export function VoiceCallOverlay({
         <div className="mt-4 max-w-md px-4 py-2 bg-slate-800/50 rounded-lg max-h-40 overflow-y-auto">
           <div className="space-y-2">
             {transcript.slice(-3).map((entry, i) => (
-              <div key={i} className={cn(
-                "text-xs px-2 py-1 rounded",
-                entry.role === 'assistant'
-                  ? "bg-slate-700/50 text-slate-200"
-                  : "text-slate-500 italic"
-              )}>
-                {entry.role === 'assistant' && (
-                  <span className="font-medium text-slate-400 mr-1">{character.name}:</span>
+              <div
+                key={i}
+                className={cn(
+                  "text-xs px-2 py-1 rounded",
+                  entry.role === "assistant"
+                    ? "bg-slate-700/50 text-slate-200"
+                    : "text-slate-500 italic",
+                )}
+              >
+                {entry.role === "assistant" && (
+                  <span className="font-medium text-slate-400 mr-1">
+                    {character.name}:
+                  </span>
                 )}
                 {entry.content.substring(0, 120)}
-                {entry.content.length > 120 && '...'}
+                {entry.content.length > 120 && "..."}
               </div>
             ))}
           </div>
@@ -312,20 +367,20 @@ export function VoiceCallOverlay({
 
         {isConnected && (
           <Button
-            variant={isMuted ? 'destructive' : 'outline'}
+            variant={isMuted ? "destructive" : "outline"}
             size="lg"
             onClick={toggleMute}
-            aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+            aria-label={isMuted ? "Attiva microfono" : "Disattiva microfono"}
           >
-            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            {isMuted ? (
+              <MicOff className="w-5 h-5" />
+            ) : (
+              <Mic className="w-5 h-5" />
+            )}
           </Button>
         )}
 
-        <Button
-          variant="destructive"
-          size="lg"
-          onClick={handleEndCall}
-        >
+        <Button variant="destructive" size="lg" onClick={handleEndCall}>
           <PhoneOff className="w-5 h-5 mr-2" />
           Termina chiamata
         </Button>
