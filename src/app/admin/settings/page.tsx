@@ -1,13 +1,7 @@
 "use client";
 
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-} from "@/components/ui/card";
 import { TrialBudgetCard } from "./components/trial-budget-card";
+import { SystemInfoCard } from "./components/system-info-card";
 
 export default function AdminSettingsPage() {
   return (
@@ -27,17 +21,8 @@ export default function AdminSettingsPage() {
         {/* Trial Budget Card */}
         <TrialBudgetCard />
 
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle>Placeholder 2</CardTitle>
-            <CardDescription>Settings will be added here</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className="text-sm text-muted-foreground">
-              This section is ready for configuration options.
-            </p>
-          </CardContent>
-        </Card>
+        {/* System Info Card */}
+        <SystemInfoCard />
       </div>
     </div>
   );
