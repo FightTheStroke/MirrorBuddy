@@ -125,11 +125,19 @@ function hasAnyProvider(): boolean {
 
 /**
  * Build CSP header with nonce for script security
+ * Next.js automatically applies nonce to its inline scripts when it detects
+ * 'nonce-{value}' in the CSP header during dynamic rendering.
+ *
+ * 'strict-dynamic' allows scripts loaded by trusted scripts to execute.
+ * 'unsafe-inline' is ignored by browsers when nonce is present, but provides
+ * fallback for older browsers.
  */
 function buildCSPHeader(nonce: string): string {
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'sha256-AFK2Qzme0imYZWkSbggGEVDkZ0w4laI+emR+IUHdlk8=' cdn.jsdelivr.net cdnjs.cloudflare.com`,
+    // 'unsafe-inline' ignored when nonce present (fallback for old browsers)
+    // 'strict-dynamic' allows dynamically loaded scripts from trusted scripts
+    `script-src 'self' 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic'`,
     "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
@@ -158,6 +166,11 @@ export function proxy(request: NextRequest) {
   const trackMetrics = shouldTrackMetrics(pathname);
   const route = trackMetrics ? normalizeRoute(pathname) : pathname;
 
+  // Generate nonce for CSP - do this early so it's available for all paths
+  // Next.js extracts nonce from request headers to apply to inline scripts
+  const nonce = generateNonce();
+  requestHeaders.set(CSP_NONCE_HEADER, nonce);
+
   // Skip static files - no CSP needed, but add request ID
   if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
     const response = NextResponse.next({
@@ -166,9 +179,6 @@ export function proxy(request: NextRequest) {
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
   }
-
-  // Generate nonce for CSP
-  const nonce = generateNonce();
 
   // Helper to finalize response with metrics
   const finalizeResponse = (response: NextResponse, statusCode?: number) => {
@@ -259,7 +269,14 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all routes except _next/static, _next/image, and static files
-    "/((?!_next/static|_next/image|favicon.ico).*)",
+    // Match all routes except static files, excluding prefetch requests
+    // Prefetch requests don't need CSP nonce processing
+    {
+      source: "/((?!_next/static|_next/image|favicon.ico).*)",
+      missing: [
+        { type: "header", key: "next-router-prefetch" },
+        { type: "header", key: "purpose", value: "prefetch" },
+      ],
+    },
   ],
 };

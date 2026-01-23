@@ -7,8 +7,8 @@ describe("CSP Nonce Generation", () => {
       const nonce = generateNonce();
       expect(nonce).toBeDefined();
       expect(typeof nonce).toBe("string");
-      // Base64 encoded 16 bytes = 24 chars (with padding)
-      expect(nonce.length).toBeGreaterThanOrEqual(22);
+      // UUID (36 chars) encoded as base64 = 48 chars
+      expect(nonce.length).toBeGreaterThanOrEqual(40);
     });
 
     it("generates valid base64 characters only", () => {
@@ -28,14 +28,15 @@ describe("CSP Nonce Generation", () => {
     it("generates nonces of consistent length", () => {
       const lengths = Array.from({ length: 50 }, () => generateNonce().length);
       const uniqueLengths = new Set(lengths);
-      // All should be same length (24 for 16 random bytes in base64)
+      // All should be same length (48 for UUID in base64)
       expect(uniqueLengths.size).toBe(1);
     });
   });
 
   describe("CSP_NONCE_HEADER constant", () => {
-    it("exports the correct header name", () => {
-      expect(CSP_NONCE_HEADER).toBe("x-csp-nonce");
+    it("exports the correct header name for Next.js", () => {
+      // Next.js looks for 'x-nonce' to auto-apply to inline scripts
+      expect(CSP_NONCE_HEADER).toBe("x-nonce");
     });
 
     it("is a string constant", () => {
