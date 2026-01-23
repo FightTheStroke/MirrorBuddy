@@ -222,6 +222,8 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 90000,
     env: {
+      // Override PORT to ensure Next.js starts on 3000 (may differ in .env)
+      PORT: "3000",
       // CRITICAL: OVERRIDE DATABASE_URL with test database
       // This prevents accidental contamination of production Supabase database
       // BOTH values set to same test DB to ensure no fallback to production
