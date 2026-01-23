@@ -7,7 +7,8 @@
 import { test, expect } from "./fixtures";
 
 test.describe("Mobile Responsive Layout", () => {
-  test.beforeEach(async ({ page }) => {
+  // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
+  test.beforeEach(async ({ page, mobile: _mobile }) => {
     // Navigate to home page
     await page.goto("/");
     // Wait for app to load
@@ -32,6 +33,13 @@ test.describe("Mobile Responsive Layout", () => {
     page,
     mobile,
   }) => {
+    // Skip on large viewports where hamburger menu is hidden (lg:hidden)
+    const viewportWidth = await mobile.getViewportWidth();
+    if (viewportWidth >= 1024) {
+      test.skip();
+      return;
+    }
+
     const menuButton = page.locator('button[aria-label="Apri menu"]').first();
 
     // Should be visible on mobile
@@ -55,6 +63,13 @@ test.describe("Mobile Responsive Layout", () => {
   });
 
   test("sidebar should open and close correctly", async ({ page, mobile }) => {
+    // Skip on large viewports where sidebar is always visible (no mobile overlay)
+    const viewportWidth = await mobile.getViewportWidth();
+    if (viewportWidth >= 1024) {
+      test.skip();
+      return;
+    }
+
     // Open sidebar
     await mobile.openMobileSidebar();
 
@@ -77,6 +92,13 @@ test.describe("Mobile Responsive Layout", () => {
     page,
     mobile,
   }) => {
+    // Skip on large viewports where sidebar is always visible
+    const viewportWidth = await mobile.getViewportWidth();
+    if (viewportWidth >= 1024) {
+      test.skip();
+      return;
+    }
+
     // Open sidebar first
     await mobile.openMobileSidebar();
 
@@ -93,6 +115,13 @@ test.describe("Mobile Responsive Layout", () => {
     page,
     mobile,
   }) => {
+    // Skip on large viewports where mobile toggle doesn't exist
+    const viewportWidth = await mobile.getViewportWidth();
+    if (viewportWidth >= 1024) {
+      test.skip();
+      return;
+    }
+
     // Open sidebar first
     await mobile.openMobileSidebar();
 
@@ -108,7 +137,8 @@ test.describe("Mobile Responsive Layout", () => {
   });
 
   test("main content area should be accessible", async ({ page }) => {
-    const main = page.locator('main, [role="main"]');
+    // Use first() to handle nested main elements in the page structure
+    const main = page.locator('main, [role="main"]').first();
     await expect(main).toBeVisible();
 
     // Main should have content
@@ -122,8 +152,8 @@ test.describe("Mobile Responsive Layout", () => {
     // Should have header
     await expect(page.locator("header").first()).toBeVisible();
 
-    // Should have main content
-    await expect(page.locator('main, [role="main"]')).toBeVisible();
+    // Should have main content (use first() for nested main elements)
+    await expect(page.locator('main, [role="main"]').first()).toBeVisible();
 
     // Should have sidebar
     const sidebar = page.locator("aside").first();

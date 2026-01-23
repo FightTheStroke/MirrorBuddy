@@ -280,7 +280,11 @@ test.describe("Consent Management", () => {
     await page.goto("/home");
 
     const consent = await page.evaluate(() => {
-      return localStorage.getItem("mirrorbuddy-consent");
+      // Check both legacy and unified consent keys
+      return (
+        localStorage.getItem("mirrorbuddy-unified-consent") ||
+        localStorage.getItem("mirrorbuddy-consent")
+      );
     });
 
     // Consent should be set (from global-setup)
@@ -291,13 +295,19 @@ test.describe("Consent Management", () => {
     await page.goto("/home");
 
     const consent = await page.evaluate(() => {
-      const raw = localStorage.getItem("mirrorbuddy-consent");
+      // Check both legacy and unified consent keys
+      const raw =
+        localStorage.getItem("mirrorbuddy-unified-consent") ||
+        localStorage.getItem("mirrorbuddy-consent");
       return raw ? JSON.parse(raw) : null;
     });
 
     if (consent) {
-      expect(consent.essential).toBeDefined();
-      expect(consent.acceptedAt).toBeDefined();
+      // Unified consent has nested structure: { cookies: { essential, acceptedAt } }
+      // Legacy consent has flat structure: { essential, acceptedAt }
+      const cookies = consent.cookies || consent;
+      expect(cookies.essential).toBeDefined();
+      expect(cookies.acceptedAt).toBeDefined();
     }
   });
 });
