@@ -22,8 +22,10 @@ const isProduction =
 
 // CRITICAL SAFETY CHECK: Block Supabase URLs in development/test
 // This prevents accidental contamination of production database
+// Exception: E2E tests override DATABASE_URL with TEST_DATABASE_URL
 if (
   !isProduction &&
+  !isE2E &&
   process.env.DATABASE_URL &&
   isSupabaseUrl(process.env.DATABASE_URL)
 ) {
