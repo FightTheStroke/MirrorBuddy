@@ -6,8 +6,8 @@ import { PrivacyContent } from "./content";
 import { PrivacyContentExtended } from "./content-extended";
 import { PrivacyContentAI } from "./content-ai";
 
-export const PRIVACY_VERSION = "1.2";
-const LAST_UPDATED = "20 Gennaio 2025";
+export const PRIVACY_VERSION = "1.3";
+const LAST_UPDATED = "23 Gennaio 2026";
 
 export default function PrivacyPage() {
   return (
