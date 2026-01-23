@@ -276,27 +276,13 @@ export function VoiceCallOverlay({
       exit={{ opacity: 0 }}
       className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm"
     >
-      {/* Avatar: pulse animation for reduced motion, static otherwise */}
-      {showDotMatrix ? (
-        <CharacterAvatar
-          character={character}
-          size="xl"
-          showStatus
-          isActive={isConnected}
-        />
-      ) : (
-        <motion.div
-          animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <CharacterAvatar
-            character={character}
-            size="xl"
-            showStatus
-            isActive={isConnected}
-          />
-        </motion.div>
-      )}
+      {/* Avatar: always static - animations are handled by DotMatrixVisualizer below */}
+      <CharacterAvatar
+        character={character}
+        size="xl"
+        showStatus
+        isActive={isConnected}
+      />
 
       <h3 className="mt-4 text-xl font-semibold text-white">
         {character.name}
