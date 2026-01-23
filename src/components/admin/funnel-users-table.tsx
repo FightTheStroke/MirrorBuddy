@@ -18,7 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Search, User, Eye } from "lucide-react";
-import { FUNNEL_STAGES, FunnelStage } from "@/lib/funnel";
+import { FUNNEL_STAGES } from "@/lib/funnel";
 
 interface FunnelUser {
   id: string;

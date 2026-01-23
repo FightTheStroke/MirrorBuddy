@@ -99,7 +99,7 @@ export function InlineConsent({
             Utilizziamo cookie essenziali per il funzionamento.{" "}
             <Link
               href="/cookies"
-              className="text-blue-600 dark:text-blue-400 hover:underline"
+              className="text-blue-600 dark:text-blue-400 underline hover:no-underline"
             >
               Scopri di più
             </Link>
@@ -108,8 +108,12 @@ export function InlineConsent({
       </div>
 
       <div className="flex items-center justify-between">
-        <label className="flex items-center gap-2 cursor-pointer">
+        <label
+          htmlFor="inline-consent-analytics"
+          className="flex items-center gap-2 cursor-pointer"
+        >
           <input
+            id="inline-consent-analytics"
             type="checkbox"
             checked={analyticsEnabled}
             onChange={(e) => setAnalyticsEnabled(e.target.checked)}

@@ -145,13 +145,17 @@ export default defineConfig({
     // Mobile viewport projects for responsive design testing (ADR 0064)
     // DISABLED IN CI: Mobile tests add 5x overhead (5 projects × same tests)
     // Run locally: npx playwright test --project=iphone-13
+    // NOTE: Device-specific tests match only their target devices; responsive-layout runs on all
     {
       name: "iphone-se",
       use: {
         ...devices["iPhone SE"],
         // iPhone SE 2022: 375px × 667px (16:9)
       },
-      testMatch: "**/mobile/**/*.spec.ts",
+      testMatch: [
+        "**/mobile/iphone.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -160,7 +164,10 @@ export default defineConfig({
         ...devices["iPhone 13"],
         // iPhone 13: 390px × 844px (19.5:9)
       },
-      testMatch: "**/mobile/**/*.spec.ts",
+      testMatch: [
+        "**/mobile/iphone.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -169,7 +176,10 @@ export default defineConfig({
         ...devices["Pixel 7"],
         // Pixel 7: 412px × 915px (19.5:9)
       },
-      testMatch: "**/mobile/**/*.spec.ts",
+      testMatch: [
+        "**/mobile/android.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -178,7 +188,10 @@ export default defineConfig({
         ...devices["iPad Mini"],
         // iPad Mini: 768px × 1024px (4:3) portrait
       },
-      testMatch: "**/mobile/**/*.spec.ts",
+      testMatch: [
+        "**/mobile/ipad.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -187,7 +200,10 @@ export default defineConfig({
         ...devices["iPad Mini landscape"],
         // iPad Mini landscape: 1024px × 768px (4:3)
       },
-      testMatch: "**/mobile/**/*.spec.ts",
+      testMatch: [
+        "**/mobile/ipad.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // Other browsers disabled - only testing API/backend, not cross-browser UI

@@ -14,7 +14,6 @@ import { cookies, headers } from "next/headers";
 import {
   getOrCreateTrialSession,
   getTrialStatus,
-  TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";

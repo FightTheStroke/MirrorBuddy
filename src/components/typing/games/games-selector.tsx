@@ -1,34 +1,37 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import type { KeyboardLayout } from '@/types/tools';
+import { useState } from "react";
+import type { KeyboardLayout } from "@/types/tools";
 
 interface GamesSelectorProps {
   layout: KeyboardLayout;
-  onSelectGame: (game: 'speed' | 'accuracy' | 'exploration') => void;
+  onSelectGame: (game: "speed" | "accuracy" | "exploration") => void;
 }
 
-export function GamesSelector({ layout, onSelectGame }: GamesSelectorProps) {
-  const [completedGames, setCompletedGames] = useState<string[]>([]);
+export function GamesSelector({
+  layout: _layout,
+  onSelectGame,
+}: GamesSelectorProps) {
+  const [completedGames] = useState<string[]>([]);
 
   const games = [
     {
-      id: 'speed',
-      title: 'Speed Game',
-      description: 'Digita velocemente per accumulare punti',
-      icon: '⚡',
+      id: "speed",
+      title: "Speed Game",
+      description: "Digita velocemente per accumulare punti",
+      icon: "⚡",
     },
     {
-      id: 'accuracy',
-      title: 'Accuracy Game',
-      description: 'Massimizza la precisione per guadagnare punti',
-      icon: '🎯',
+      id: "accuracy",
+      title: "Accuracy Game",
+      description: "Massimizza la precisione per guadagnare punti",
+      icon: "🎯",
     },
     {
-      id: 'exploration',
-      title: 'Keyboard Exploration',
-      description: 'Trova i tasti colorati per scoprire la tastiera',
-      icon: '⌨️',
+      id: "exploration",
+      title: "Keyboard Exploration",
+      description: "Trova i tasti colorati per scoprire la tastiera",
+      icon: "⌨️",
     },
   ] as const;
 
@@ -46,7 +49,7 @@ export function GamesSelector({ layout, onSelectGame }: GamesSelectorProps) {
             <div className="text-4xl mb-3">{game.icon}</div>
             <h4 className="font-semibold mb-2">{game.title}</h4>
             <p className="text-sm text-muted-foreground">{game.description}</p>
-            
+
             {completedGames.includes(game.id) && (
               <div className="mt-3 text-xs text-green-600 dark:text-green-400">
                 ✓ Completato

@@ -31,8 +31,12 @@ export function TypingInput({
   );
   const focusTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
 
-  const { currentLesson, startLesson, endLesson, recordKeystroke } =
-    useTypingStore();
+  const {
+    currentLesson: _currentLesson,
+    startLesson,
+    endLesson: _endLesson,
+    recordKeystroke,
+  } = useTypingStore();
 
   useEffect(() => {
     if (isActive && !disabled) {

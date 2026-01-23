@@ -127,10 +127,10 @@ export async function PATCH(request: NextRequest) {
 async function getTypingProgress(
   _userId: string,
 ): Promise<TypingProgress | null> {
-  // TODO: Implement database query
+  // Stub: returns null until TypingProgress schema is added to Prisma
   return null;
 }
 
 async function saveTypingProgress(_progress: TypingProgress): Promise<void> {
-  // TODO: Implement database save
+  // Stub: no-op until TypingProgress schema is added to Prisma
 }

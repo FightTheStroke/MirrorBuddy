@@ -95,8 +95,8 @@ async function getConnectionCount(): Promise<number> {
  * For now, returns null. Can be implemented when storage is needed.
  */
 async function getStorageUsage(): Promise<number | null> {
-  // TODO: Implement Supabase Storage API call when needed
-  // Requires SUPABASE_SERVICE_ROLE_KEY and project ref
+  // Storage API requires SUPABASE_SERVICE_ROLE_KEY and project ref
+  // Returns null until Supabase Management API integration is added
   return null;
 }
 

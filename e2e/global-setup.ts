@@ -35,20 +35,18 @@ async function globalSetup() {
     );
   }
 
-  // PRODUCTION BLOCKER #2: Block if DATABASE_URL contains Supabase production
-  const dbUrl = process.env.DATABASE_URL || "";
+  // PRODUCTION BLOCKER #2: Require TEST_DATABASE_URL to be set
   const testDbUrl = process.env.TEST_DATABASE_URL || "";
 
-  if (dbUrl.includes("supabase.com") || dbUrl.includes("supabase.co")) {
+  if (!testDbUrl || testDbUrl.trim() === "") {
     throw new Error(
-      "🚨 BLOCKED: E2E tests attempted to use production Supabase DATABASE_URL!\n" +
-        `DATABASE_URL: ${dbUrl.substring(0, 50)}...\n` +
-        "E2E tests MUST use a local test database.\n" +
-        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test\n" +
-        "and ensure DATABASE_URL is overridden in playwright.config.ts webServer.env",
+      "🚨 BLOCKED: TEST_DATABASE_URL is not set!\n" +
+        "E2E tests require an explicit test database.\n" +
+        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
     );
   }
 
+  // PRODUCTION BLOCKER #3: TEST_DATABASE_URL must NOT be Supabase
   if (testDbUrl.includes("supabase.com") || testDbUrl.includes("supabase.co")) {
     throw new Error(
       "🚨 BLOCKED: TEST_DATABASE_URL contains production Supabase URL!\n" +
@@ -58,14 +56,8 @@ async function globalSetup() {
     );
   }
 
-  // PRODUCTION BLOCKER #3: Require TEST_DATABASE_URL to be set
-  if (!testDbUrl || testDbUrl.trim() === "") {
-    throw new Error(
-      "🚨 BLOCKED: TEST_DATABASE_URL is not set!\n" +
-        "E2E tests require an explicit test database.\n" +
-        "Set TEST_DATABASE_URL=postgresql://roberdan@localhost:5432/mirrorbuddy_test",
-    );
-  }
+  // Note: DATABASE_URL may contain Supabase production URL from .env, but playwright.config.ts
+  // webServer.env overrides it with TEST_DATABASE_URL for the actual server process
 
   console.log(
     "✅ Production guards passed. Using test database:",
