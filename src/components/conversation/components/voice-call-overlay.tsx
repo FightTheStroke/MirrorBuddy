@@ -13,6 +13,7 @@ import { CharacterAvatar } from "./character-avatar";
 import { CharacterRoleBadge } from "./character-role-badge";
 import { AudioDeviceSelector } from "./audio-device-selector";
 import { DotMatrixVisualizer } from "@/components/voice/waveform";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { getUserId, activeCharacterToMaestro } from "./voice-call-helpers";
 
 interface VoiceConnectionInfo {
@@ -45,6 +46,10 @@ export function VoiceCallOverlay({
   // C-2 FIX: Track conversation for memory persistence
   const conversationIdRef = useRef<string | null>(null);
   const savedMessagesRef = useRef<Set<string>>(new Set());
+
+  // Accessibility: check if we should show dot matrix or simple avatar pulse
+  const shouldAnimate = useAccessibilityStore((state) => state.shouldAnimate);
+  const showDotMatrix = shouldAnimate();
 
   const voiceSession = useVoiceSession({
     onError: (error) => {
@@ -271,31 +276,48 @@ export function VoiceCallOverlay({
       exit={{ opacity: 0 }}
       className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-gradient-to-b from-slate-900/95 to-slate-800/95 backdrop-blur-sm"
     >
-      <CharacterAvatar
-        character={character}
-        size="xl"
-        showStatus
-        isActive={isConnected}
-      />
+      {/* Avatar: pulse animation for reduced motion, static otherwise */}
+      {showDotMatrix ? (
+        <CharacterAvatar
+          character={character}
+          size="xl"
+          showStatus
+          isActive={isConnected}
+        />
+      ) : (
+        <motion.div
+          animate={{ scale: isSpeaking ? [1, 1.05, 1] : 1 }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <CharacterAvatar
+            character={character}
+            size="xl"
+            showStatus
+            isActive={isConnected}
+          />
+        </motion.div>
+      )}
 
       <h3 className="mt-4 text-xl font-semibold text-white">
         {character.name}
       </h3>
       <CharacterRoleBadge type={character.type} />
 
-      {/* Dot Matrix Audio Visualizer */}
-      <div className="mt-6">
-        <DotMatrixVisualizer
-          analyser={outputAnalyser}
-          isActive={isConnected && isSpeaking}
-          isSpeaking={isSpeaking}
-          color={character.color || "#22d3ee"}
-          rows={8}
-          cols={12}
-          dotSize={6}
-          gap={6}
-        />
-      </div>
+      {/* Dot Matrix Audio Visualizer - only shown when animations are enabled */}
+      {showDotMatrix && (
+        <div className="mt-6">
+          <DotMatrixVisualizer
+            analyser={outputAnalyser}
+            isActive={isConnected && isSpeaking}
+            isSpeaking={isSpeaking}
+            color={character.color || "#22d3ee"}
+            rows={8}
+            cols={12}
+            dotSize={6}
+            gap={6}
+          />
+        </div>
+      )}
 
       <p
         className={cn(
