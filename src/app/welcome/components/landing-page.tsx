@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -9,6 +12,7 @@ import { SupportSection } from "./support-section";
 import { FeaturesSection } from "./features-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
+import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
 import type { ExistingUserData } from "../types";
 
 interface LandingPageProps {
@@ -22,6 +26,15 @@ export function LandingPage({
 }: LandingPageProps) {
   const router = useRouter();
   const isReturningUser = Boolean(existingUserData?.name);
+  const hasTrackedVisit = useRef(false);
+
+  // Track VISITOR funnel event on page load (once)
+  useEffect(() => {
+    if (!hasTrackedVisit.current && !isReturningUser) {
+      hasTrackedVisit.current = true;
+      trackWelcomeVisit();
+    }
+  }, [isReturningUser]);
 
   // Create trial session via API before granting access
   const createTrialSession = async () => {
@@ -44,6 +57,10 @@ export function LandingPage({
   // Handle skip - create trial session and go to app
   const handleSkip = async () => {
     logger.info("[WelcomePage] Skip clicked, creating trial session");
+
+    // Track TRIAL_START funnel event
+    await trackTrialStartClick();
+
     await createTrialSession();
 
     try {
@@ -89,9 +106,6 @@ export function LandingPage({
             userName={existingUserData?.name}
             isReturningUser={isReturningUser}
           />
-          <MaestriShowcaseSection />
-          <SupportSection />
-          <FeaturesSection />
 
           <QuickStart
             isReturningUser={isReturningUser}
@@ -102,6 +116,10 @@ export function LandingPage({
               isReturningUser ? handleStartWithOnboarding : undefined
             }
           />
+
+          <MaestriShowcaseSection />
+          <SupportSection />
+          <FeaturesSection />
         </motion.div>
 
         {/* Welcome Footer with consent, legal, badges */}
