@@ -72,7 +72,7 @@ export default async function RootLayout({
             {children}
           </main>
         </Providers>
-        <Analytics nonce={nonce} />
+        <Analytics />
       </body>
     </html>
   );

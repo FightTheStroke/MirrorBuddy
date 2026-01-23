@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
+import { useBlobUrl } from '@/lib/tools/use-blob-url';
 
 interface DemoSandboxProps {
   data?: {
@@ -21,18 +22,22 @@ export function DemoSandbox(props: DemoSandboxProps) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [key, setKey] = useState(0);
 
-  const demoData = data || { 
-    html: '<div class="p-8 text-center"><h2 class="text-2xl font-bold mb-4">Demo Interattiva</h2><p>Seleziona un maestro per creare una demo</p></div>' 
+  const demoData = data || {
+    html: '<div class="p-8 text-center"><h2 class="text-2xl font-bold mb-4">Demo Interattiva</h2><p>Seleziona un maestro per creare una demo</p></div>'
   };
   const title = demoData.title || 'Simulazione Interattiva';
 
   // Use shared HTML builder for consistency
-  const fullHtml = buildDemoHTML({
+  const fullHtml = useMemo(() => buildDemoHTML({
     html: demoData.html || '',
     css: demoData.css || '',
     js: demoData.js || '',
     code: demoData.code,
-  });
+  }), [demoData.html, demoData.css, demoData.js, demoData.code]);
+
+  // Use blob URL instead of srcDoc to bypass parent CSP restrictions
+  // This allows inline scripts to execute in the sandboxed iframe
+  const blobUrl = useBlobUrl(fullHtml + key); // Include key to force refresh
 
   const handleRefresh = () => {
     setKey(prev => prev + 1);
@@ -54,15 +59,14 @@ export function DemoSandbox(props: DemoSandboxProps) {
         <iframe
           key={key}
           ref={iframeRef}
-          srcDoc={fullHtml}
+          src={blobUrl}
           sandbox={getDemoSandboxPermissions()}
           className="w-full h-full border-0"
           title="Demo interattiva"
           allow={getDemoAllowPermissions()}
           style={{ minHeight: '400px', width: '100%', height: '100%' }}
           onLoad={() => {
-            // Scripts execute automatically via srcDoc
-            logger.debug('DemoSandbox iframe loaded');
+            logger.debug('DemoSandbox iframe loaded via blob URL');
           }}
         />
       </div>
