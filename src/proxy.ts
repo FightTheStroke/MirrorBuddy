@@ -134,7 +134,7 @@ function buildCSPHeader(nonce: string): string {
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
     "media-src 'self' data: blob:",
-    "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434",
+    "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434 https://va.vercel-scripts.com https://vitals.vercel-insights.com",
     "worker-src 'self' blob:",
     "frame-src 'self'",
     "object-src 'none'",
