@@ -253,6 +253,9 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     get inputAnalyser() {
       return refs.analyserRef.current;
     },
+    get outputAnalyser() {
+      return refs.playbackAnalyserRef.current;
+    },
     get sessionId() {
       return refs.sessionIdRef.current;
     },
