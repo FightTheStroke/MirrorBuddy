@@ -8,6 +8,7 @@
 import { useCallback } from "react";
 import { logger } from "@/lib/logger";
 import { useSettingsStore } from "@/lib/stores";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { Maestro } from "@/types";
 import { VOICE_TOOLS, TOOL_USAGE_INSTRUCTIONS } from "@/lib/voice";
 import {
@@ -23,6 +24,10 @@ import {
   buildLanguageInstruction,
   buildCharacterInstruction,
 } from "./session-constants";
+import {
+  getAdaptiveVadConfig,
+  formatVadConfigForLogging,
+} from "./adaptive-vad";
 
 // Re-export useSendGreeting from dedicated module
 export { useSendGreeting } from "./send-greeting";
@@ -64,6 +69,18 @@ export function useSendSessionConfig(
 
     const appearance = useSettingsStore.getState().appearance;
     const userLanguage = appearance?.language || "it";
+
+    // Get accessibility settings for adaptive VAD (ADR-0065)
+    const a11yState = useAccessibilityStore.getState();
+    const activeProfile = a11yState.activeProfile;
+    const adaptiveVadEnabled = a11yState.settings.adaptiveVadEnabled;
+    const vadConfig = getAdaptiveVadConfig(activeProfile, adaptiveVadEnabled);
+
+    logger.info("[VoiceSession] Adaptive VAD config", {
+      activeProfile: activeProfile ?? "none",
+      adaptiveVadEnabled,
+      config: formatVadConfigForLogging(vadConfig, activeProfile),
+    });
 
     // Language teacher detection
     const isLanguageTeacher =
@@ -152,7 +169,7 @@ export function useSendSessionConfig(
         input_audio_format: "pcm16",
         output_audio_format: "pcm16",
         input_audio_noise_reduction: {
-          type: options.noiseReductionType || "near_field",
+          type: options.noiseReductionType || vadConfig.noise_reduction,
         },
         input_audio_transcription: {
           model: "whisper-1",
@@ -170,9 +187,9 @@ export function useSendSessionConfig(
         },
         turn_detection: {
           type: "server_vad",
-          threshold: 0.6,
-          prefix_padding_ms: 300,
-          silence_duration_ms: 700,
+          threshold: vadConfig.threshold,
+          prefix_padding_ms: vadConfig.prefix_padding_ms,
+          silence_duration_ms: vadConfig.silence_duration_ms,
           create_response: true,
           interrupt_response: !options.disableBargeIn,
         },

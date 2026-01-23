@@ -3,11 +3,12 @@ export {
   defaultAccessibilitySettings,
   defaultADHDConfig,
   defaultADHDStats,
-} from './accessibility-store';
+} from "./accessibility-store";
 
 export type {
   AccessibilitySettings,
   ADHDSessionState,
   ADHDSessionConfig,
   ADHDSessionStats,
-} from './accessibility-store';
+  A11yProfileId,
+} from "./accessibility-store";
