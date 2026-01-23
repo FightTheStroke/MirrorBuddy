@@ -12,15 +12,34 @@ interface HeroSectionProps {
  * Hero Section for MirrorBuddy Welcome Page
  *
  * Displays:
- * - MirrorBuddy logo
+ * - MirrorBuddy logo with Beta Privata sticker badge
  * - Personalized welcome message (new vs returning user)
- * - MirrorBuddy branding and value proposition
- *
- * Part of Wave 3: Welcome Experience Enhancement
+ * - Value proposition with accessibility features
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   return (
-    <div className="text-center max-w-3xl mx-auto">
+    <div className="text-center max-w-4xl mx-auto relative">
+      {/* BETA PRIVATA - Overlay Sticker Style */}
+      <motion.div
+        initial={{ scale: 0, rotate: -15 }}
+        animate={{ scale: 1, rotate: -12 }}
+        transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
+        className="absolute -top-4 -right-4 md:-right-12 z-10"
+        aria-label="Beta Privata - Accesso su invito"
+      >
+        <div className="relative">
+          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900 transform rotate-[-12deg] hover:rotate-[-8deg] transition-transform duration-300">
+            <div className="flex flex-col items-center gap-1">
+              <span className="text-xs font-bold tracking-wider uppercase">
+                Beta Privata
+              </span>
+              <span className="text-[10px] opacity-90">Accesso su invito</span>
+            </div>
+          </div>
+          <div className="absolute inset-0 bg-purple-600/20 blur-xl -z-10 rounded-2xl" />
+        </div>
+      </motion.div>
+
       {/* MirrorBuddy Logo */}
       <motion.div
         initial={{ scale: 0.8, opacity: 0 }}
@@ -61,16 +80,6 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             >
               Pronto per la tua prossima avventura di apprendimento?
             </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto"
-            >
-              I tuoi 17 Maestri storici - da Socrate a Einstein, da Leonardo a
-              Marie Curie - ti aspettano per continuare il tuo viaggio di
-              apprendimento.
-            </motion.p>
           </>
         ) : (
           <>
@@ -89,43 +98,82 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-2xl text-gray-700 dark:text-gray-200 mb-4 font-semibold"
+              className="text-2xl md:text-3xl text-gray-700 dark:text-gray-200 mb-8 font-semibold"
             >
-              La scuola che vorrei: dove ogni studente trova il suo modo di
-              imparare
+              Impara{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
+                CON i Grandi Professori
+              </span>
+              , qualunque sia il tuo stile
             </motion.p>
-            <motion.div
+            <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 dark:text-gray-300 mb-8 max-w-2xl mx-auto space-y-4"
+              className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10"
             >
-              <p className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-                Impara{" "}
-                <strong className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                  CON i più grandi
-                </strong>
-                , non solo su di loro
-              </p>
-              <p className="text-base">
-                Studia matematica{" "}
-                <strong className="text-blue-600 dark:text-blue-400">
-                  con Euclide
-                </strong>
-                , fisica{" "}
-                <strong className="text-purple-600 dark:text-purple-400">
-                  con Feynman
-                </strong>
-                , chimica{" "}
-                <strong className="text-pink-600 dark:text-pink-400">
-                  con Marie Curie
-                </strong>
-                . 17 Maestri storici ti accompagnano personalmente.
-              </p>
-            </motion.div>
+              Studia matematica{" "}
+              <strong className="text-blue-600 dark:text-blue-400">
+                con Euclide
+              </strong>
+              , fisica{" "}
+              <strong className="text-purple-600 dark:text-purple-400">
+                con Feynman
+              </strong>
+              , chimica{" "}
+              <strong className="text-pink-600 dark:text-pink-400">
+                con Marie Curie
+              </strong>
+              . 22 Maestri storici ti accompagnano personalmente.
+            </motion.p>
+            <AccessibilityFeatures />
           </>
         )}
       </div>
     </div>
+  );
+}
+
+function AccessibilityFeatures() {
+  const features = [
+    { icon: "📖", label: "Font leggibili" },
+    { icon: "🗺️", label: "Mappe mentali" },
+    { icon: "🔊", label: "Sintesi vocale" },
+    { icon: "🎯", label: "Quiz adattivi" },
+  ];
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.4 }}
+      className="max-w-3xl mx-auto"
+    >
+      <div className="relative overflow-hidden p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-xl">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
+        <div className="relative z-10">
+          <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
+            <span aria-hidden="true">♿</span>
+            Progettato per tutti gli stili di apprendimento
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {features.map((feature, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-2 p-3 bg-white/70 dark:bg-gray-800/70 rounded-xl backdrop-blur-sm"
+              >
+                <span className="text-2xl" aria-hidden="true">
+                  {feature.icon}
+                </span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  {feature.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </motion.div>
   );
 }
