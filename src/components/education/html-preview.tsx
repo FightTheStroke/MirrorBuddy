@@ -13,6 +13,7 @@ import { logger } from '@/lib/logger';
 import { Button } from '@/components/ui/button';
 import { autoSaveMaterial } from '@/lib/hooks/use-saved-materials';
 import { buildDemoHTML, getDemoSandboxPermissions, getDemoAllowPermissions } from '@/lib/tools/demo-html-builder';
+import { useBlobUrl } from '@/lib/tools/use-blob-url';
 import { cn } from '@/lib/utils';
 
 interface HTMLPreviewProps {
@@ -40,9 +41,12 @@ export function HTMLPreview({
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Use shared HTML builder for consistency across all demo renderers
-  const iframeSrcDoc = useMemo(() => {
+  const fullHtml = useMemo(() => {
     return buildDemoHTML({ code, html: '', css: '', js: '' });
   }, [code]);
+
+  // Use blob URL instead of srcDoc to bypass parent CSP restrictions
+  const blobUrl = useBlobUrl(fullHtml);
 
   const handleSave = async () => {
     if (saving) return;
@@ -111,12 +115,11 @@ export function HTMLPreview({
           title={title}
           className="w-full h-full min-h-[400px] bg-white"
           sandbox={getDemoSandboxPermissions()}
-          srcDoc={iframeSrcDoc}
+          src={blobUrl}
           allow={getDemoAllowPermissions()}
           style={{ width: '100%', height: '100%', minHeight: '400px' }}
           onLoad={() => {
-            // Scripts execute automatically via srcDoc
-            logger.debug('HtmlPreview iframe loaded');
+            logger.debug('HtmlPreview iframe loaded via blob URL');
           }}
         />
       </div>

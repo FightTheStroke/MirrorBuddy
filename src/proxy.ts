@@ -136,7 +136,7 @@ function buildCSPHeader(nonce: string): string {
     "media-src 'self' data: blob:",
     "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434 https://va.vercel-scripts.com https://vitals.vercel-insights.com",
     "worker-src 'self' blob:",
-    "frame-src 'self'",
+    "frame-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",
