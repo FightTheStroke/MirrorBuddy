@@ -26,7 +26,7 @@ export const defaultAccessibilitySettings: AccessibilitySettings = {
   fontSize: 1.0,
   colorBlindMode: false,
   keyboardNavigation: true,
-  adaptiveVadEnabled: true, // ADR-0065: Enabled by default for DSA support
+  adaptiveVadEnabled: true, // ADR-0069: Enabled by default for DSA support
   customBackgroundColor: "#ffffff",
   customTextColor: "#000000",
 };

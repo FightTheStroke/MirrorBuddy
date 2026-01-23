@@ -70,7 +70,7 @@ export function useSendSessionConfig(
     const appearance = useSettingsStore.getState().appearance;
     const userLanguage = appearance?.language || "it";
 
-    // Get accessibility settings for adaptive VAD (ADR-0065)
+    // Get accessibility settings for adaptive VAD (ADR-0069)
     const a11yState = useAccessibilityStore.getState();
     const activeProfile = a11yState.activeProfile;
     const adaptiveVadEnabled = a11yState.settings.adaptiveVadEnabled;

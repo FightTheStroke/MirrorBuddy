@@ -1,7 +1,7 @@
 // ============================================================================
 // ADAPTIVE VAD CONFIGURATION
 // Profile-aware Voice Activity Detection settings for DSA students
-// ADR-0065: Adaptive VAD for Accessibility Profiles
+// ADR-0069: Adaptive VAD for Accessibility Profiles
 // ============================================================================
 
 import type { A11yProfileId } from "@/lib/accessibility";
