@@ -286,6 +286,85 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     log.warn("Failed to collect funnel metrics", { error: String(err) });
   }
 
+  // 4. Churn metrics (Plan 069)
+  try {
+    const churnCutoff = new Date(now - 14 * 24 * 60 * 60 * 1000); // 14 days
+
+    // Get latest stage per user to determine churn
+    const latestStages = await prisma.$queryRaw<
+      Array<{ stage: string; last_activity: Date; is_churned: boolean }>
+    >`
+      WITH latest AS (
+        SELECT
+          COALESCE(visitor_id, user_id) as user_key,
+          stage,
+          MAX(created_at) as last_activity
+        FROM "FunnelEvent"
+        WHERE is_test_data = false
+        GROUP BY COALESCE(visitor_id, user_id), stage
+        HAVING MAX(created_at) = (
+          SELECT MAX(fe2.created_at)
+          FROM "FunnelEvent" fe2
+          WHERE COALESCE(fe2.visitor_id, fe2.user_id) = COALESCE("FunnelEvent".visitor_id, "FunnelEvent".user_id)
+        )
+      )
+      SELECT
+        stage,
+        last_activity,
+        (last_activity < ${churnCutoff} AND stage NOT IN ('ACTIVE', 'FIRST_LOGIN')) as is_churned
+      FROM latest
+    `;
+
+    const totalUsers = latestStages.length;
+    const churnedUsers = latestStages.filter((u) => u.is_churned).length;
+    const churnRate = totalUsers > 0 ? churnedUsers / totalUsers : 0;
+
+    samples.push(
+      {
+        name: "mirrorbuddy_funnel_total_users",
+        labels: instanceLabels,
+        value: totalUsers,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_funnel_churned_users",
+        labels: instanceLabels,
+        value: churnedUsers,
+        timestamp: now,
+      },
+      {
+        name: "mirrorbuddy_funnel_churn_rate",
+        labels: instanceLabels,
+        value: churnRate,
+        timestamp: now,
+      },
+    );
+
+    // Churn by stage
+    const churnByStage = new Map<string, { total: number; churned: number }>();
+    for (const user of latestStages) {
+      if (!churnByStage.has(user.stage)) {
+        churnByStage.set(user.stage, { total: 0, churned: 0 });
+      }
+      const data = churnByStage.get(user.stage)!;
+      data.total++;
+      if (user.is_churned) data.churned++;
+    }
+
+    for (const [stage, data] of churnByStage) {
+      samples.push({
+        name: "mirrorbuddy_funnel_stage_churn_rate",
+        labels: { ...instanceLabels, stage },
+        value: data.total > 0 ? data.churned / data.total : 0,
+        timestamp: now,
+      });
+    }
+
+    log.debug("Collected churn metrics", { totalUsers, churnedUsers });
+  } catch (err) {
+    log.warn("Failed to collect churn metrics", { error: String(err) });
+  }
+
   return samples;
 }
 
