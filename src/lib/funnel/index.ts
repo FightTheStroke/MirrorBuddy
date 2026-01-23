@@ -6,20 +6,9 @@
 
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
+import { FUNNEL_STAGES, type FunnelStage } from "./constants";
 
-export const FUNNEL_STAGES = [
-  "VISITOR",
-  "TRIAL_START",
-  "TRIAL_ENGAGED",
-  "LIMIT_HIT",
-  "BETA_REQUEST",
-  "APPROVED",
-  "FIRST_LOGIN",
-  "ACTIVE",
-  "CHURNED",
-] as const;
-
-export type FunnelStage = (typeof FUNNEL_STAGES)[number];
+export { FUNNEL_STAGES, type FunnelStage };
 
 interface RecordFunnelEventParams {
   visitorId?: string;

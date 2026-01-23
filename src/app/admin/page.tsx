@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   UserPlus,
   Users,
@@ -16,10 +16,33 @@ import { KpiCard } from "@/components/admin/kpi-card";
 import { CostPanel } from "@/components/admin/CostPanel";
 import { FeatureFlagsPanel } from "@/components/admin/FeatureFlagsPanel";
 import { SLOMonitoringPanel } from "@/components/admin/SLOMonitoringPanel";
+import { FunnelChart } from "@/components/admin/funnel-chart";
+import { FunnelUsersTable } from "@/components/admin/funnel-users-table";
+import { UserDrilldownModal } from "@/components/admin/user-drill-down-modal";
 import { cn } from "@/lib/utils";
 import { useAdminCountsSSE } from "@/hooks/use-admin-counts-sse";
 
 const GRAFANA_DASHBOARD_URL = "https://mirrorbuddy.grafana.net/d/dashboard/";
+
+interface StageMetrics {
+  stage: string;
+  count: number;
+  conversionRate: number | null;
+  avgTimeFromPrevious: number | null;
+}
+
+interface FunnelMetricsResponse {
+  stages: StageMetrics[];
+  totals: {
+    uniqueVisitors: number;
+    uniqueConverted: number;
+    overallConversionRate: number;
+  };
+  period: {
+    start: string;
+    end: string;
+  };
+}
 
 interface CollapsibleSectionProps {
   title: string;
@@ -51,6 +74,101 @@ function CollapsibleSection({
       {isOpen && (
         <div className="p-6 border-t border-border bg-muted">{children}</div>
       )}
+    </div>
+  );
+}
+
+function FunnelSection() {
+  const [metrics, setMetrics] = useState<FunnelMetricsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchMetrics() {
+      try {
+        const res = await fetch("/api/admin/funnel/metrics?days=30");
+        if (!res.ok) throw new Error("Failed to fetch funnel metrics");
+        const data = await res.json();
+        setMetrics(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchMetrics();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <p className="text-sm text-red-700 dark:text-red-300">Error: {error}</p>
+      </div>
+    );
+  }
+
+  if (!metrics) {
+    return (
+      <div className="p-4 text-center text-muted-foreground">
+        No funnel data available
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* Summary Stats */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 bg-card border border-border rounded-lg">
+          <div className="text-sm text-muted-foreground">Unique Visitors</div>
+          <div className="text-2xl font-semibold">
+            {metrics.totals.uniqueVisitors.toLocaleString()}
+          </div>
+        </div>
+        <div className="p-4 bg-card border border-border rounded-lg">
+          <div className="text-sm text-muted-foreground">Converted Users</div>
+          <div className="text-2xl font-semibold">
+            {metrics.totals.uniqueConverted.toLocaleString()}
+          </div>
+        </div>
+        <div className="p-4 bg-card border border-border rounded-lg">
+          <div className="text-sm text-muted-foreground">
+            Overall Conversion
+          </div>
+          <div className="text-2xl font-semibold">
+            {metrics.totals.overallConversionRate.toFixed(1)}%
+          </div>
+        </div>
+      </div>
+
+      {/* Funnel Chart */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">Conversion Funnel</h3>
+        <FunnelChart stages={metrics.stages} />
+      </div>
+
+      {/* Users Table */}
+      <div>
+        <h3 className="text-lg font-semibold mb-4">User Details</h3>
+        <FunnelUsersTable onSelectUser={setSelectedUserId} />
+      </div>
+
+      {/* User Drill-down Modal */}
+      <UserDrilldownModal
+        userId={selectedUserId}
+        open={selectedUserId !== null}
+        onClose={() => setSelectedUserId(null)}
+      />
     </div>
   );
 }
@@ -167,6 +285,10 @@ export default function AdminDashboardPage() {
 
       {/* Collapsible Panels */}
       <div className="space-y-4">
+        <CollapsibleSection title="Conversion Funnel" defaultOpen={true}>
+          <FunnelSection />
+        </CollapsibleSection>
+
         <CollapsibleSection title="Cost Monitoring" defaultOpen={false}>
           <CostPanel />
         </CollapsibleSection>
