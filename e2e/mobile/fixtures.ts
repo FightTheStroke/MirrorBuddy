@@ -74,9 +74,69 @@ export interface MobileTestHelpers {
 
 /**
  * Extended test fixture with mobile helpers
+ *
+ * IMPORTANT: This fixture mocks the /api/onboarding endpoint to return
+ * completed onboarding state. This is necessary because:
+ * 1. global-setup.ts sets localStorage with onboarding completed
+ * 2. But the app's onboarding store hydrates from the API, not localStorage
+ * 3. Without the mock, users get redirected to /welcome (not /home)
+ *
+ * See ADR 0059 for details on E2E test setup requirements.
  */
 export const test = base.extend<{ mobile: MobileTestHelpers }>({
   mobile: async ({ page }, use) => {
+    // Mock /api/onboarding to return completed onboarding state
+    // This prevents redirect to /welcome and shows the authenticated home page
+    await page.route("**/api/onboarding", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          hasExistingData: true,
+          data: {
+            name: "Test User",
+            age: 12,
+            schoolLevel: "media",
+          },
+          onboardingState: {
+            hasCompletedOnboarding: true,
+            onboardingCompletedAt: new Date().toISOString(),
+            currentStep: "ready",
+            isReplayMode: false,
+          },
+        }),
+      });
+    });
+
+    // Mock /api/tos to return TOS accepted
+    // TosGateProvider checks BOTH localStorage AND this API on mount (ADR 0059)
+    await page.route("**/api/tos", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          accepted: true,
+          version: "1.0",
+        }),
+      });
+    });
+
+    // Mock /api/user/usage to return trial usage data
+    // TrialUsageDashboard calls this on mount and crashes if data is missing
+    await page.route("**/api/user/usage", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          chat: { used: 2, limit: 10, percentage: 20 },
+          voice: { used: 60, limit: 300, percentage: 20, unit: "seconds" },
+          tools: { used: 3, limit: 10, percentage: 30 },
+          docs: { used: 0, limit: 1, percentage: 0 },
+          maestri: { selected: 1, limit: 3 },
+        }),
+      });
+    });
+
     const helpers: MobileTestHelpers = {
       verifyTouchTarget: async (locator: Locator) => {
         const box = await locator.boundingBox();
@@ -112,19 +172,22 @@ export const test = base.extend<{ mobile: MobileTestHelpers }>({
       },
 
       openMobileSidebar: async () => {
-        // Click hamburger menu button
-        const menuButton = page.locator(
-          'button[aria-label="Apri menu"], button[aria-label*="menu"]',
-        );
+        // Click hamburger menu button in header (not sidebar)
+        const menuButton = page
+          .locator("header")
+          .locator('button[aria-label="Apri menu"]');
         await menuButton.click();
         await helpers.waitForSidebarAnimation();
       },
 
       closeMobileSidebar: async () => {
-        // Click overlay to close
-        const overlay = page.locator(".fixed.inset-0.bg-black\\/40");
-        if (await overlay.isVisible()) {
-          await overlay.click();
+        // Click overlay at center-right to avoid toast/footer blocking
+        // Sidebar is 64px wide on left, so click at 80% x, 50% y of viewport
+        const viewportSize = page.viewportSize();
+        if (viewportSize) {
+          const x = viewportSize.width * 0.8; // Right side of screen
+          const y = viewportSize.height * 0.5; // Middle height
+          await page.mouse.click(x, y);
           await helpers.waitForSidebarAnimation();
         }
       },
@@ -169,6 +232,15 @@ export const test = base.extend<{ mobile: MobileTestHelpers }>({
         );
       },
     };
+
+    // Dismiss PWA install banner if present (blocks clicks at bottom of screen)
+    // Key from ios-install-banner.tsx: BANNER_DISMISSED_KEY = 'ios-install-banner-dismissed'
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        "ios-install-banner-dismissed",
+        new Date().toISOString(),
+      );
+    });
 
     await use(helpers);
   },
