@@ -8,17 +8,23 @@ interface HeroSectionProps {
   isReturningUser: boolean;
 }
 
+// Accessibility profiles matching settings (lean display)
+const ACCESSIBILITY_PROFILES = [
+  { icon: "📖", label: "Dislessia", color: "text-blue-600" },
+  { icon: "🎯", label: "ADHD", color: "text-purple-600" },
+  { icon: "🧩", label: "Autismo", color: "text-teal-600" },
+  { icon: "👁️", label: "Ipovisione", color: "text-amber-600" },
+  { icon: "🖐️", label: "Motorio", color: "text-green-600" },
+  { icon: "👂", label: "Uditivo", color: "text-rose-600" },
+  { icon: "♿", label: "Paralisi Cerebrale", color: "text-indigo-600" },
+];
+
 /**
  * Hero Section for MirrorBuddy Welcome Page
- *
- * Displays:
- * - MirrorBuddy logo with Beta Privata sticker badge
- * - Personalized welcome message (new vs returning user)
- * - Value proposition with accessibility features
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   return (
-    <div className="text-center max-w-4xl mx-auto relative">
+    <div className="text-center max-w-4xl mx-auto relative mb-8">
       {/* BETA PRIVATA - Overlay Sticker Style */}
       <motion.div
         initial={{ scale: 0, rotate: -15 }}
@@ -104,13 +110,16 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                 CON i Grandi Professori
               </span>
-              , qualunque sia il tuo stile
+              ,{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+                qualunque siano le tue abilità
+              </span>
             </motion.p>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-10"
+              className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6"
             >
               Studia matematica{" "}
               <strong className="text-blue-600 dark:text-blue-400">
@@ -124,9 +133,9 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               <strong className="text-pink-600 dark:text-pink-400">
                 con Marie Curie
               </strong>
-              . 22 Maestri storici ti accompagnano personalmente.
+              . 22 Professori storici ti accompagnano personalmente.
             </motion.p>
-            <AccessibilityFeatures />
+            <AccessibilityProfiles />
           </>
         )}
       </div>
@@ -134,14 +143,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   );
 }
 
-function AccessibilityFeatures() {
-  const features = [
-    { icon: "📖", label: "Font leggibili" },
-    { icon: "🗺️", label: "Mappe mentali" },
-    { icon: "🔊", label: "Sintesi vocale" },
-    { icon: "🎯", label: "Quiz adattivi" },
-  ];
-
+function AccessibilityProfiles() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -149,30 +151,21 @@ function AccessibilityFeatures() {
       transition={{ delay: 0.4 }}
       className="max-w-3xl mx-auto"
     >
-      <div className="relative overflow-hidden p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-xl">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
-        <div className="relative z-10">
-          <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            <span aria-hidden="true">♿</span>
-            Progettato per tutti gli stili di apprendimento
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {features.map((feature, idx) => (
-              <div
-                key={idx}
-                className="flex flex-col items-center gap-2 p-3 bg-white/70 dark:bg-gray-800/70 rounded-xl backdrop-blur-sm"
-              >
-                <span className="text-2xl" aria-hidden="true">
-                  {feature.icon}
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {feature.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+        Progettato per ogni stile di apprendimento
+      </p>
+      <div className="flex flex-wrap justify-center gap-2">
+        {ACCESSIBILITY_PROFILES.map((profile, idx) => (
+          <span
+            key={idx}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-700 text-sm"
+          >
+            <span aria-hidden="true">{profile.icon}</span>
+            <span className={`font-medium ${profile.color} dark:opacity-90`}>
+              {profile.label}
+            </span>
+          </span>
+        ))}
       </div>
     </motion.div>
   );

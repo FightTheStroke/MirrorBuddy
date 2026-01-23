@@ -10,6 +10,7 @@ import { HeroSection } from "./hero-section";
 import { MaestriShowcaseSection } from "./maestri-showcase-section";
 import { SupportSection } from "./support-section";
 import { FeaturesSection } from "./features-section";
+import { ComplianceSection } from "./compliance-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
 import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
@@ -102,11 +103,13 @@ export function LandingPage({
           transition={{ duration: 0.6 }}
           className="w-full flex-1 flex flex-col items-center justify-center"
         >
+          {/* Hero with logo, tagline, accessibility profiles */}
           <HeroSection
             userName={existingUserData?.name}
             isReturningUser={isReturningUser}
           />
 
+          {/* CTA boxes: Beta Access | Trial Mode */}
           <QuickStart
             isReturningUser={isReturningUser}
             onStartWithVoice={handleStartWithOnboarding}
@@ -117,9 +120,17 @@ export function LandingPage({
             }
           />
 
+          {/* Professors carousel */}
           <MaestriShowcaseSection />
+
+          {/* Coaches & Buddies carousel */}
           <SupportSection />
+
+          {/* Platform features */}
           <FeaturesSection />
+
+          {/* Compliance & Transparency */}
+          <ComplianceSection />
         </motion.div>
 
         {/* Welcome Footer with consent, legal, badges */}
