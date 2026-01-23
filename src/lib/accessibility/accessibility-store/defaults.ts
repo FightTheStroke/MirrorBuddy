@@ -7,7 +7,7 @@ import type {
   AccessibilitySettings,
   ADHDSessionConfig,
   ADHDSessionStats,
-} from './types';
+} from "./types";
 
 export const defaultAccessibilitySettings: AccessibilitySettings = {
   dyslexiaFont: false,
@@ -26,8 +26,9 @@ export const defaultAccessibilitySettings: AccessibilitySettings = {
   fontSize: 1.0,
   colorBlindMode: false,
   keyboardNavigation: true,
-  customBackgroundColor: '#ffffff',
-  customTextColor: '#000000',
+  adaptiveVadEnabled: true, // ADR-0069: Enabled by default for DSA support
+  customBackgroundColor: "#ffffff",
+  customTextColor: "#000000",
 };
 
 export const defaultADHDConfig: ADHDSessionConfig = {
