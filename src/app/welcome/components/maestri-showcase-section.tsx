@@ -1,10 +1,22 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
-import { maestri, subjectNames } from "@/data";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { maestri, SUBJECT_NAMES } from "@/data/maestri";
+
+/**
+ * Shuffle array using Fisher-Yates algorithm
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
 
 /**
  * Professori Showcase Section - Horizontal Carousel
@@ -12,10 +24,13 @@ import { maestri, subjectNames } from "@/data";
  * THE PRIMARY VALUE PROPOSITION of MirrorBuddy:
  * Learn WITH the greatest minds in history, not just ABOUT them.
  *
- * Shows all professors in a scrollable horizontal carousel.
+ * Shows all professors in a scrollable horizontal carousel with random order.
  */
 export function MaestriShowcaseSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Randomize professor order on each render (page refresh)
+  const shuffledMaestri = useMemo(() => shuffleArray(maestri), []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -32,36 +47,29 @@ export function MaestriShowcaseSection() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.4 }}
-      className="w-full max-w-6xl mx-auto px-4 mb-16"
+      className="w-full max-w-6xl mx-auto px-4 mb-16 mt-8"
       aria-labelledby="maestri-heading"
     >
-      {/* Section Header */}
+      {/* Section Header - Clean, no badge */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className="text-center mb-8"
       >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-full mb-4">
-          <Sparkles className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-          <span className="text-sm font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-            Il Cuore di MirrorBuddy
-          </span>
-        </div>
-
         <h2
           id="maestri-heading"
           className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          Impara{" "}
+          I tuoi{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-            CON i Grandi Professori
+            Professori
           </span>
         </h2>
 
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {maestri.length} menti straordinarie della storia diventano i tuoi
-          professori personali.
+          {shuffledMaestri.length} menti straordinarie della storia diventano i
+          tuoi professori personali.
         </p>
       </motion.div>
 
@@ -85,7 +93,7 @@ export function MaestriShowcaseSection() {
           role="region"
           aria-label="Carosello professori - usa le frecce per navigare"
         >
-          {maestri.map((maestro, i) => (
+          {shuffledMaestri.map((maestro, i) => (
             <motion.div
               key={maestro.id}
               initial={{ opacity: 0, scale: 0.9 }}
@@ -108,7 +116,7 @@ export function MaestriShowcaseSection() {
                 <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                   <Image
                     src={maestro.avatar}
-                    alt={`${maestro.name} - Professore di ${subjectNames[maestro.subject] || maestro.subject}`}
+                    alt={`${maestro.displayName} - Professore di ${SUBJECT_NAMES[maestro.subject] || maestro.subject}`}
                     width={64}
                     height={64}
                     className="w-full h-full object-cover"
@@ -118,10 +126,10 @@ export function MaestriShowcaseSection() {
 
               {/* Info */}
               <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 truncate">
-                {maestro.name}
+                {maestro.displayName}
               </h3>
               <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">
-                {subjectNames[maestro.subject] || maestro.subject}
+                {SUBJECT_NAMES[maestro.subject] || maestro.subject}
               </p>
             </motion.div>
           ))}
@@ -147,7 +155,7 @@ export function MaestriShowcaseSection() {
         I professori AI sono creati a scopo educativo e dimostrativo. In futuro
         ogni studente potra creare i propri professori personalizzati.{" "}
         <a
-          href="/terms#section-4"
+          href="/ai-transparency"
           className="underline hover:text-gray-600 dark:hover:text-gray-400"
         >
           Scopri di piu
