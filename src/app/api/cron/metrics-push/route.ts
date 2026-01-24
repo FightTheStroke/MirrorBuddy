@@ -1,6 +1,10 @@
 /**
  * Metrics Push Cron Job Handler (Every 5 Minutes)
- * Pushes LIGHT metrics (HTTP/SLI + real-time active users) to Grafana Cloud
+ * Pushes metrics to Grafana Cloud including:
+ * - HTTP/SLI metrics (latency, error rates)
+ * - Real-time active users
+ * - Funnel and churn metrics
+ * - Session health metrics (success rate, dropoff rate) - for Grafana alerts
  *
  * Scheduled via Vercel Cron: every 5 minutes
  * Required env vars:
@@ -9,8 +13,7 @@
  *   - GRAFANA_CLOUD_API_KEY
  *   - CRON_SECRET (for authentication)
  *
- * F-05b: HTTP/SLI metrics collected every 5 minutes
- * Note: Heavy metrics (business + behavioral) are handled by business-metrics-daily cron
+ * F-05b: All operational metrics collected every 5 minutes
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -18,6 +21,7 @@ import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import { metricsStore } from "@/lib/observability/metrics-store";
 import { generateSLIMetrics } from "@/app/api/metrics/sli-metrics";
+import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
 
 const ACTIVITY_WINDOW_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -363,6 +367,24 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     log.debug("Collected churn metrics", { totalUsers, churnedUsers });
   } catch (err) {
     log.warn("Failed to collect churn metrics", { error: String(err) });
+  }
+
+  // 5. Session health metrics (behavioral) - for Grafana alerts
+  try {
+    const behavioralMetrics = await generateBehavioralMetrics();
+    for (const m of behavioralMetrics) {
+      samples.push({
+        name: m.name,
+        labels: { ...m.labels, ...instanceLabels },
+        value: m.value,
+        timestamp: now,
+      });
+    }
+    log.debug("Collected behavioral metrics", {
+      count: behavioralMetrics.length,
+    });
+  } catch (err) {
+    log.warn("Failed to collect behavioral metrics", { error: String(err) });
   }
 
   return samples;
