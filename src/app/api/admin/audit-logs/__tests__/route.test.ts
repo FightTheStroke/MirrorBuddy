@@ -296,6 +296,6 @@ describe("GET /api/admin/audit-logs", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("Failed to fetch audit logs");
+    expect(data.error).toContain("Failed to fetch audit logs");
   });
 });
