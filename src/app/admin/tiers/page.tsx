@@ -1,7 +1,7 @@
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
-import { Layers, BarChart3 } from "lucide-react";
+import { Layers, BarChart3, Funnel } from "lucide-react";
 import { TiersTable } from "./tiers-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -83,6 +83,12 @@ export default async function AdminTiersPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <Link href="/admin/tiers/conversion-funnel">
+            <Button variant="outline">
+              <Funnel className="w-4 h-4 mr-2" />
+              Conversion Funnel
+            </Button>
+          </Link>
           <Link href="/admin/tiers/analytics">
             <Button variant="outline">
               <BarChart3 className="w-4 h-4 mr-2" />
