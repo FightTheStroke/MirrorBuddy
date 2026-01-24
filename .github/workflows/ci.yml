@@ -70,8 +70,10 @@ jobs:
           ls -la .next/ || echo ".next directory not found!"
           du -sh .next/ || echo "Cannot check .next size"
           rm -rf .next/cache
-          echo "After cache removal:"
-          ls -la .next/ || echo ".next directory missing after cache removal!"
+          # Remove files with colons in names (Turbopack externals) - not supported by GitHub artifact upload
+          find .next -name "*:*" -delete 2>/dev/null || true
+          echo "After cleanup:"
+          ls -la .next/ || echo ".next directory missing after cleanup!"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
