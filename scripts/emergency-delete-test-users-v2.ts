@@ -35,7 +35,6 @@ async function emergencyCleanup() {
   if (usersToDelete.length === 0) {
     console.log("✅ No test users to delete");
     await prisma.$disconnect();
-    await pool.end();
     return;
   }
 
@@ -72,7 +71,6 @@ async function emergencyCleanup() {
   );
 
   await prisma.$disconnect();
-  await pool.end();
 }
 
 emergencyCleanup().catch(console.error);

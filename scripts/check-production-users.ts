@@ -48,7 +48,6 @@ async function checkUsers() {
   );
 
   await prisma.$disconnect();
-  await pool.end();
 }
 
 checkUsers().catch(console.error);
