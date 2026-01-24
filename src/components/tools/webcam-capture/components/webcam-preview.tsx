@@ -3,11 +3,11 @@
  * @brief Webcam preview component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, SwitchCamera } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { WebcamError } from './webcam-error';
-import type { ErrorType } from '../constants';
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, SwitchCamera } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { WebcamError } from "./webcam-error";
+import type { ErrorType } from "../constants";
 
 interface WebcamPreviewProps {
   videoRef: React.RefObject<HTMLVideoElement | null>;
@@ -61,7 +61,7 @@ export function WebcamPreview({
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 z-10 bg-black">
               <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-              <p className="text-slate-400 text-sm">Avvio fotocamera...</p>
+              <p className="text-slate-300 text-sm">Avvio fotocamera...</p>
             </div>
           )}
 
@@ -72,8 +72,8 @@ export function WebcamPreview({
             muted
             className={
               capturedImage || isLoading
-                ? 'invisible'
-                : 'w-full h-full object-cover'
+                ? "invisible"
+                : "w-full h-full object-cover"
             }
           />
 
@@ -130,7 +130,7 @@ export function WebcamPreview({
                   initial={{ scale: 1.5, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
                   exit={{ scale: 0.5, opacity: 0 }}
-                  transition={{ type: 'spring', damping: 15, stiffness: 300 }}
+                  transition={{ type: "spring", damping: 15, stiffness: 300 }}
                   className="text-center"
                 >
                   <div className="text-8xl font-bold text-white drop-shadow-lg">
@@ -180,4 +180,3 @@ export function WebcamPreview({
     </div>
   );
 }
-

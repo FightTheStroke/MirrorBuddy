@@ -3,9 +3,9 @@
  * @brief Webcam controls component
  */
 
-import { Camera, Check, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { TIMER_OPTIONS, type TimerOption } from '../constants';
+import { Camera, Check, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { TIMER_OPTIONS, type TimerOption } from "../constants";
 
 interface WebcamControlsProps {
   showTimer: boolean;
@@ -47,10 +47,10 @@ export function WebcamControls({
                     flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all
                     ${
                       selectedTimer === opt.value
-                        ? 'bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+                        ? "bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30"
+                        : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
                     }
-                    ${countdown !== null ? 'opacity-50 cursor-not-allowed' : ''}
+                    ${countdown !== null ? "opacity-50 cursor-not-allowed" : ""}
                   `}
                   aria-label={`Timer ${opt.label}`}
                 >
@@ -69,7 +69,7 @@ export function WebcamControls({
               className="bg-blue-600 hover:bg-blue-700 px-8 h-14 text-lg"
             >
               <Camera className="w-6 h-6 mr-2" />
-              {countdown !== null ? 'In corso...' : 'Scatta foto'}
+              {countdown !== null ? "In corso..." : "Scatta foto"}
             </Button>
           </div>
         </>
@@ -79,7 +79,7 @@ export function WebcamControls({
             onClick={onRetake}
             variant="outline"
             size="lg"
-            className="border-slate-600 h-14 px-6"
+            className="border-slate-300 dark:border-slate-600 h-14 px-6"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
             Riprova
@@ -97,4 +97,3 @@ export function WebcamControls({
     </div>
   );
 }
-
