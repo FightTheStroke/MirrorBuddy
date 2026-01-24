@@ -1,28 +1,11 @@
 /**
  * Cleanup anonymous users (email=null) from production database
  * These are trial sessions that never converted to real users
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
-
-function createPrismaClient(): PrismaClient {
-  const connectionString =
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
-
-  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-  const ssl = supabaseCaCert
-    ? { rejectUnauthorized: true, ca: supabaseCaCert }
-    : { rejectUnauthorized: false };
-
-  const pool = new Pool({ connectionString, ssl });
-  const adapter = new PrismaPg(pool);
-
-  return new PrismaClient({ adapter });
-}
+import { createPrismaClient } from "../src/lib/ssl-config";
 
 const prisma = createPrismaClient();
 const PROTECTED_IDS = ["roberdan", "mariodanfts3k02"];

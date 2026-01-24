@@ -20,39 +20,12 @@
  * - Prevents running in production (NODE_ENV=production)
  *
  * WARNING: This script is DESTRUCTIVE. Always run with --dry-run first.
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { createPrismaClient } from "../src/lib/ssl-config";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
-
-/**
- * Creates a Prisma client with proper SSL configuration
- */
-function createPrismaClient(): PrismaClient {
-  const connectionString =
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
-
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-
-  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-
-  let ssl: { rejectUnauthorized: boolean; ca?: string } | undefined;
-  if (supabaseCaCert) {
-    ssl = { rejectUnauthorized: true, ca: supabaseCaCert };
-  } else if (isProduction) {
-    ssl = { rejectUnauthorized: false };
-  }
-
-  const pool = new Pool({ connectionString, ssl });
-  const adapter = new PrismaPg(pool);
-
-  return new PrismaClient({ adapter });
-}
 
 const prisma = createPrismaClient();
 

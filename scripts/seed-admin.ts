@@ -10,39 +10,13 @@
  * - ADMIN_PASSWORD: Admin password (min 8 chars)
  *
  * Plan 052: Internal auth system
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { createPrismaClient } from "../src/lib/ssl-config";
 import bcrypt from "bcrypt";
 
 const SALT_ROUNDS = 12;
-
-// Build Prisma client with pg adapter (same as src/lib/db.ts)
-function createPrismaClient(): PrismaClient {
-  const connectionString =
-    process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
-
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-
-  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-
-  // Build SSL config
-  let ssl: { rejectUnauthorized: boolean; ca?: string } | undefined;
-  if (supabaseCaCert) {
-    ssl = { rejectUnauthorized: true, ca: supabaseCaCert };
-  } else if (isProduction) {
-    ssl = { rejectUnauthorized: false };
-  }
-
-  const pool = new Pool({ connectionString, ssl });
-  const adapter = new PrismaPg(pool);
-
-  return new PrismaClient({ adapter });
-}
 
 async function seedAdmin(): Promise<void> {
   const email = process.env.ADMIN_EMAIL;

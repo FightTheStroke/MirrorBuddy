@@ -10,24 +10,14 @@ import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool } from "pg";
+import { getSSLConfig } from "../prisma/ssl-config";
 
 function createPrismaClient(): PrismaClient {
   const connectionString =
     process.env.DATABASE_URL ||
     "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
-  const isProduction =
-    process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-
-  const supabaseCaCert = process.env.SUPABASE_CA_CERT;
-
-  let ssl: { rejectUnauthorized: boolean; ca?: string } | undefined;
-  if (supabaseCaCert) {
-    ssl = { rejectUnauthorized: true, ca: supabaseCaCert };
-  } else if (isProduction) {
-    ssl = { rejectUnauthorized: false };
-  }
-
+  const ssl = getSSLConfig();
   const pool = new Pool({ connectionString, ssl });
   const adapter = new PrismaPg(pool);
 

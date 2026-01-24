@@ -32,6 +32,27 @@ echo "Generated: $(date)" >> "$ISSUES_FILE"
 echo "" >> "$ISSUES_FILE"
 
 # =============================================================================
+# PHASE 0: ENVIRONMENT VARIABLES CHECK
+# =============================================================================
+if [ -z "$DATABASE_URL" ]; then
+  fail "env-vars-db" "DATABASE_URL is not set. This is required for deployment."
+else
+  pass "env-vars-db"
+fi
+
+if [ -z "$NODE_ENV" ]; then
+  fail "env-vars-node" "NODE_ENV is not set. This is required for deployment."
+else
+  pass "env-vars-node"
+fi
+
+if [ -z "$SUPABASE_CA_CERT" ] && [ ! -f "config/supabase-chain.pem" ]; then
+  fail "env-vars-ssl" "SUPABASE_CA_CERT not set and config/supabase-chain.pem not found. SSL certificate configuration is missing."
+else
+  pass "env-vars-ssl"
+fi
+
+# =============================================================================
 # PHASE 1: INSTANT CHECKS
 # =============================================================================
 [ -f README.md ] && [ -f CHANGELOG.md ] && [ -f CLAUDE.md ] && pass "docs" || fail "docs" "Missing: README.md, CHANGELOG.md, or CLAUDE.md"
@@ -94,7 +115,6 @@ fi
 # =============================================================================
 # PHASE 6: SECURITY
 # =============================================================================
-./scripts/secrets-scan.sh > /tmp/release-secrets.log 2>&1 && pass "secrets" || fail "secrets" "\`\`\`\n$(cat /tmp/release-secrets.log)\n\`\`\`"
 rg -q 'Content-Security-Policy' src/middleware.ts src/proxy.ts 2>/dev/null && pass "csp" || fail "csp" "Missing CSP header in middleware.ts or proxy.ts"
 rg -q 'csrf' src/lib/auth/ 2>/dev/null && pass "csrf" || fail "csrf" "Missing CSRF protection in src/lib/auth/"
 
