@@ -4,11 +4,25 @@
  *
  * Shows all identifiers in UserActivity that don't have a User record.
  * These are likely test data or stale trial sessions.
- * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import "dotenv/config";
-import { createPrismaClient } from "../src/lib/ssl-config";
+import { PrismaClient } from "@prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { Pool } from "pg";
+import { getSSLConfig } from "../prisma/ssl-config";
+
+function createPrismaClient(): PrismaClient {
+  const connectionString =
+    process.env.DATABASE_URL ||
+    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+
+  const ssl = getSSLConfig();
+  const pool = new Pool({ connectionString, ssl });
+  const adapter = new PrismaPg(pool);
+
+  return new PrismaClient({ adapter });
+}
 
 const prisma = createPrismaClient();
 
