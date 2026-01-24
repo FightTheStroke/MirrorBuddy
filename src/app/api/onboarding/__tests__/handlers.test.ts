@@ -46,10 +46,12 @@ vi.mock("@/lib/auth/cookie-signing", () => ({
   signCookieValue: vi.fn(() => ({ signed: "signed-value", raw: "raw-value" })),
 }));
 
+// Track cookies that are set
+const mockCookiesSet = vi.fn();
 vi.mock("next/headers", () => ({
   cookies: vi.fn(() =>
     Promise.resolve({
-      set: vi.fn(),
+      set: (...args: unknown[]) => mockCookiesSet(...args),
     }),
   ),
 }));
@@ -174,6 +176,69 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
 
     // Verify assignBaseTier was not called for existing users
     expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
+  });
+
+  it("should set both httpOnly and client-readable cookies for new user", async () => {
+    const { validateAuth } = await import("@/lib/auth/session-auth");
+    vi.mocked(validateAuth).mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
+
+    const mockUser = {
+      id: "user-cookie-test",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockUserCreate.mockResolvedValue(mockUser);
+    mockAssignBaseTierToNewUser.mockResolvedValue({
+      id: "sub-123",
+      tierId: "tier-base-123",
+    });
+    mockOnboardingStateUpsert.mockResolvedValue({
+      userId: mockUser.id,
+      hasCompletedOnboarding: false,
+      currentStep: "welcome",
+    });
+
+    const mockRequest = {
+      headers: new Headers({ "x-csrf-token": "valid-token" }),
+    } as NextRequest;
+
+    const requestData = {
+      data: {
+        name: "Cookie Test User",
+        age: 15,
+        schoolLevel: "superiore" as const,
+      },
+      hasCompletedOnboarding: false,
+      currentStep: "welcome" as const,
+      isReplayMode: false,
+    };
+
+    await POST(mockRequest, requestData);
+
+    // CRITICAL: Both cookies must be set
+    const cookieCalls = mockCookiesSet.mock.calls;
+    const cookieNames = cookieCalls.map((call) => call[0]);
+
+    expect(cookieNames).toContain("mirrorbuddy-user-id");
+    expect(cookieNames).toContain("mirrorbuddy-user-id-client");
+
+    // Verify httpOnly cookie is signed
+    const httpOnlyCall = cookieCalls.find(
+      (call) => call[0] === "mirrorbuddy-user-id",
+    );
+    expect(httpOnlyCall?.[1]).toBe("signed-value");
+    expect(httpOnlyCall?.[2]?.httpOnly).toBe(true);
+
+    // Verify client cookie is user id (not signed)
+    const clientCall = cookieCalls.find(
+      (call) => call[0] === "mirrorbuddy-user-id-client",
+    );
+    expect(clientCall?.[1]).toBe("user-cookie-test");
+    expect(clientCall?.[2]?.httpOnly).toBe(false);
   });
 
   it("should handle missing Base tier gracefully", async () => {
