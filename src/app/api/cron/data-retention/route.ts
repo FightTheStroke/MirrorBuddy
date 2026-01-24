@@ -16,6 +16,7 @@ import { logger } from "@/lib/logger";
 import {
   markExpiredDataForDeletion,
   executeScheduledDeletions,
+  applyDefaultRetentionSystemWide,
 } from "@/lib/privacy/data-retention-service";
 import { purgeExpiredUserBackups } from "@/lib/admin/user-trash-service";
 
@@ -26,6 +27,9 @@ interface CronResponse {
   timestamp: string;
   duration_ms: number;
   summary: {
+    default_retention: {
+      conversations_marked: number;
+    };
     marked_for_deletion: {
       conversations: number;
       embeddings: number;
@@ -71,6 +75,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     timestamp: new Date().toISOString(),
     duration_ms: 0,
     summary: {
+      default_retention: { conversations_marked: 0 },
       marked_for_deletion: { conversations: 0, embeddings: 0 },
       executed_deletions: { conversations: 0, messages: 0, embeddings: 0 },
       users_processed: 0,
@@ -87,7 +92,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     log.info("Data retention cron job started");
 
-    // Phase 1: Find users with retention policies and mark expired data
+    // Phase 0: Apply default retention to ALL users (GDPR Art. 5)
+    // This ensures conversations older than default TTL are marked for deletion
+    // regardless of whether users have custom policies
+    try {
+      const defaultResult = await applyDefaultRetentionSystemWide();
+      response.summary.default_retention.conversations_marked =
+        defaultResult.conversationsMarked;
+
+      if (defaultResult.conversationsMarked > 0) {
+        log.info("Default retention applied system-wide", {
+          conversationsMarked: defaultResult.conversationsMarked,
+        });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      log.error("Failed to apply default retention", { error: errorMsg });
+      response.summary.errors.push(`Default retention: ${errorMsg}`);
+    }
+
+    // Phase 1: Find users with CUSTOM retention policies (shorter TTL than default)
+    // These users want data deleted sooner than the default 365 days
     const usersWithPolicies = await prisma.userPrivacyPreferences.findMany({
       where: {
         customRetention: { not: null },
@@ -167,8 +192,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     log.info("Data retention cron completed successfully", {
       duration_ms: response.duration_ms,
+      default_marked: response.summary.default_retention.conversations_marked,
       users_processed: response.summary.users_processed,
-      marked_conversations: response.summary.marked_for_deletion.conversations,
+      custom_marked: response.summary.marked_for_deletion.conversations,
       deleted_conversations: response.summary.executed_deletions.conversations,
     });
 
