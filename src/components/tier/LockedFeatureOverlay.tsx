@@ -54,7 +54,6 @@ interface LockedFeatureOverlayProps {
  */
 export function LockedFeatureOverlay({
   tier,
-  _feature,
   children,
   onUpgrade,
   className,

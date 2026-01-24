@@ -42,7 +42,7 @@ describe("GET /api/admin/subscriptions", () => {
     );
 
     const response = await GET(request);
-    const _data = await response.json();
+    const data = await response.json();
 
     expect(response.status).toBe(401);
     expect(data.error).toBe("Unauthorized");
@@ -60,7 +60,7 @@ describe("GET /api/admin/subscriptions", () => {
     );
 
     const response = await GET(request);
-    const _data = await response.json();
+    const data = await response.json();
 
     expect(response.status).toBe(401);
     expect(data.error).toBe("Unauthorized");
@@ -100,7 +100,7 @@ describe("GET /api/admin/subscriptions", () => {
     );
 
     const response = await GET(request);
-    const _data = await response.json();
+    const data = await response.json();
 
     expect(response.status).toBe(200);
     expect(Array.isArray(data)).toBe(true);
@@ -128,9 +128,10 @@ describe("GET /api/admin/subscriptions", () => {
     );
 
     const response = await GET(request);
-    const _data = await response.json();
+    const data = await response.json();
 
     expect(response.status).toBe(200);
+    expect(Array.isArray(data)).toBe(true);
     expect(prisma.userSubscription.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
         where: expect.objectContaining({
@@ -206,7 +207,7 @@ describe("GET /api/admin/subscriptions", () => {
     );
 
     const response = await GET(request);
-    const _data = await response.json();
+    const data = await response.json();
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Failed to list subscriptions");
