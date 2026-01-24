@@ -215,30 +215,52 @@ export async function collectTierMetrics(
     });
   }
 
-  // Query: Tier upgrades
-  // TODO: In production, parse changes JSON to determine upgrade vs downgrade
-  // For now, we use two separate counts as a simplified approach
-  const upgradeCount = await prisma.tierAuditLog.count({
-    where: {
-      action: "TIER_CHANGE",
-      // In production: filter where changes.newTier.sortOrder > changes.oldTier.sortOrder
-    },
+  // Query: Tier changes and classify as upgrades/downgrades
+  // Parse changes JSON to determine direction based on tier sortOrder
+  const tierChanges = await prisma.tierAuditLog.findMany({
+    where: { action: "TIER_CHANGE" },
+    select: { changes: true },
   });
+
+  // Build sortOrder map from tier definitions
+  const tiersWithSortOrder = await prisma.tierDefinition.findMany({
+    select: { id: true, sortOrder: true },
+  });
+  const sortOrderMap = new Map<string, number>();
+  for (const tier of tiersWithSortOrder) {
+    sortOrderMap.set(tier.id, tier.sortOrder);
+  }
+
+  let upgradeCount = 0;
+  let downgradeCount = 0;
+
+  for (const log of tierChanges) {
+    const changes = log.changes as {
+      from: { tierId: string } | null;
+      to: { tierId: string };
+    } | null;
+
+    if (!changes?.from || !changes?.to) {
+      // New subscription (from is null) - not an upgrade/downgrade
+      continue;
+    }
+
+    const fromSortOrder = sortOrderMap.get(changes.from.tierId) ?? 0;
+    const toSortOrder = sortOrderMap.get(changes.to.tierId) ?? 0;
+
+    if (toSortOrder > fromSortOrder) {
+      upgradeCount++;
+    } else if (toSortOrder < fromSortOrder) {
+      downgradeCount++;
+    }
+    // Equal sortOrder = lateral move, not counted
+  }
 
   samples.push({
     name: "mirrorbuddy_tier_upgrades_total",
     labels: instanceLabels,
     value: upgradeCount,
     timestamp,
-  });
-
-  // Query: Tier downgrades
-  // TODO: In production, parse changes JSON to determine downgrade
-  const downgradeCount = await prisma.tierAuditLog.count({
-    where: {
-      action: "TIER_CHANGE",
-      // In production: filter where changes.newTier.sortOrder < changes.oldTier.sortOrder
-    },
   });
 
   samples.push({

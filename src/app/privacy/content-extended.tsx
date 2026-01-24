@@ -71,17 +71,32 @@ export function PrivacyContentExtended() {
           </li>
         </ul>
         <p className="mt-4">
-          <strong>Sentry (Error Tracking):</strong> Utilizziamo Sentry per
-          monitorare e correggere errori tecnici. Questo servizio:
+          <strong>Sentry (Monitoraggio Errori e Performance):</strong>{" "}
+          Utilizziamo Sentry per monitorare errori tecnici e performance
+          dell&apos;applicazione. Questo servizio:
         </p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
-            <strong>Cattura solo errori tecnici</strong> - stack trace, browser,
+            <strong>Cattura errori tecnici</strong> - stack trace, browser,
             pagina dove è avvenuto l&apos;errore
           </li>
           <li>
-            <strong>Nessun dato personale</strong> - non raccoglie email, nomi o
-            contenuti delle chat
+            <strong>Performance tracing</strong> - tempi di risposta delle API,
+            latenza delle richieste (dati tecnici aggregati)
+          </li>
+          <li>
+            <strong>AI monitoring</strong> - metriche tecniche delle chiamate AI
+            (numero di token, latenza, modello usato) - nessun contenuto delle
+            conversazioni
+          </li>
+          <li>
+            <strong>Session Replay (solo su errore)</strong> - se si verifica un
+            errore, registra una replica anonimizzata della sessione (tutto il
+            testo mascherato, media bloccati)
+          </li>
+          <li>
+            <strong>Nessun dato personale identificativo</strong> - non
+            raccoglie email, nomi, o contenuti delle tue conversazioni
           </li>
           <li>
             <strong>Server in Europa</strong> - i dati restano nell&apos;UE
