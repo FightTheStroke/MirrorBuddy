@@ -53,6 +53,7 @@ flowchart TB
     subgraph Observability["Observability"]
         Metrics[Prometheus Push]
         Grafana[Grafana Cloud]
+        Sentry[Sentry Error Tracking]
     end
 
     UI --> Stores
@@ -74,6 +75,9 @@ flowchart TB
 
     API --> Metrics
     Metrics --> Grafana
+
+    UI --> Sentry
+    API --> Sentry
 ```
 
 ## Overview
