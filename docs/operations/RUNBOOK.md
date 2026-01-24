@@ -422,6 +422,78 @@ curl -H "Cookie: [session]" https://[domain]/api/admin/service-limits | jq
 - Fallback to Ollama if Azure rate-limited
 - Scale down background jobs
 
+## Sentry Error Tracking
+
+### Overview
+
+Real-time client and server error tracking via Sentry.
+
+- **Dashboard**: https://sentry.io (external)
+- **Admin Widget**: `/admin` > Sentry Errors section
+- **API**: `GET /api/admin/sentry/issues`
+
+### Environment Variables
+
+```bash
+# Client/server DSN (required)
+NEXT_PUBLIC_SENTRY_DSN=https://xxx@xxx.ingest.us.sentry.io/xxx
+
+# Source maps upload (CI only)
+SENTRY_AUTH_TOKEN=sntrys_xxxxx
+SENTRY_ORG=fightthestroke
+SENTRY_PROJECT=mirrorbuddy
+```
+
+### Grafana Integration
+
+To add Sentry data source to Grafana Cloud:
+
+1. **Install Sentry plugin** in Grafana Cloud:
+   - Go to: Grafana Cloud > Administration > Plugins
+   - Search "Sentry" > Install `grafana-sentry-datasource`
+
+2. **Configure datasource**:
+   - Go to: Connections > Data Sources > Add data source
+   - Select "Sentry"
+   - Enter Organization slug: `fightthestroke`
+   - Auth Token: Create at Sentry > Settings > Auth Tokens (scopes: `project:read`, `event:read`)
+
+3. **Add panel to dashboard**:
+   - Open dashboard > Add panel
+   - Select "Sentry" datasource
+   - Query type: "Issues"
+   - Filter: `is:unresolved`
+
+### Alert on Errors
+
+Create Grafana alert for high error rate:
+
+```yaml
+# In Grafana > Alerting > Alert Rules
+condition: count(sentry_issues{is_unresolved=true}) > 5
+for: 5m
+labels:
+  severity: warning
+annotations:
+  summary: "High unresolved error count in Sentry"
+```
+
+### Investigation Workflow
+
+1. **Check admin dashboard**: `/admin` > Sentry Errors
+2. **Click issue** → Opens Sentry with full stack trace
+3. **Use source maps** → Readable code locations
+4. **Check user count** → Prioritize by impact
+5. **Resolve in Sentry** → Mark as resolved when fixed
+
+### CSP Configuration
+
+Sentry is allowed in CSP (`src/proxy.ts`):
+
+```typescript
+connect-src: 'self' ... https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io
+```
+
 ## Related Documents
 
 - [RUNBOOK-PROCEDURES.md](./RUNBOOK-PROCEDURES.md) - Maintenance & recovery
@@ -429,7 +501,8 @@ curl -H "Cookie: [session]" https://[domain]/api/admin/service-limits | jq
 - [ALERT-TESTING-GUIDE.md](./ALERT-TESTING-GUIDE.md) - Testing service limit alerts
 - [ADR 0037](../adr/0037-deferred-production-items.md) - Known limitations
 - [ADR 0047](../adr/0047-grafana-cloud-observability.md) - Grafana Cloud architecture
+- [ADR 0070](../adr/0070-sentry-error-tracking.md) - Sentry integration
 
 ---
 
-_Version 2.2 | January 2026 | Added Service Limits Monitoring section_
+_Version 2.3 | January 2026 | Added Sentry Error Tracking section_
