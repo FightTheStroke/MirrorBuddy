@@ -32,6 +32,27 @@ echo "Generated: $(date)" >> "$ISSUES_FILE"
 echo "" >> "$ISSUES_FILE"
 
 # =============================================================================
+# PHASE 0: ENVIRONMENT VARIABLES CHECK
+# =============================================================================
+if [ -z "$DATABASE_URL" ]; then
+  fail "env-vars-db" "DATABASE_URL is not set. This is required for deployment."
+else
+  pass "env-vars-db"
+fi
+
+if [ -z "$NODE_ENV" ]; then
+  fail "env-vars-node" "NODE_ENV is not set. This is required for deployment."
+else
+  pass "env-vars-node"
+fi
+
+if [ -z "$SUPABASE_CA_CERT" ] && [ ! -f "config/supabase-chain.pem" ]; then
+  fail "env-vars-ssl" "SUPABASE_CA_CERT not set and config/supabase-chain.pem not found. SSL certificate configuration is missing."
+else
+  pass "env-vars-ssl"
+fi
+
+# =============================================================================
 # PHASE 1: INSTANT CHECKS
 # =============================================================================
 [ -f README.md ] && [ -f CHANGELOG.md ] && [ -f CLAUDE.md ] && pass "docs" || fail "docs" "Missing: README.md, CHANGELOG.md, or CLAUDE.md"

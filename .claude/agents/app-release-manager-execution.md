@@ -6,6 +6,37 @@ model: opus-4.5
 
 # Execution Phases - Reference
 
+## PHASE 3: PRE-FLIGHT VERCEL CHECKS
+
+Before running release script:
+
+```bash
+# Verify Vercel environment variables are set
+./scripts/verify-vercel-env.sh
+# Must pass all checks (vars, permissions, staging)
+```
+
+**Required Vercel env vars**:
+
+- `VERCEL_TOKEN` - Deployment auth
+- `VERCEL_PROJECT_ID` - Project identifier
+- `VERCEL_ORG_ID` - Organization identifier
+- `SUPABASE_CA_CERT` - SSL certificate (ADR 0063)
+
+**SSL Certificate Check**:
+
+```bash
+# Verify SUPABASE_CA_CERT exists and is valid
+if [ -z "$SUPABASE_CA_CERT" ]; then
+  echo "ERROR: SUPABASE_CA_CERT not set"
+  exit 1
+fi
+```
+
+**Outcome**: If any check fails, STOP and fix before proceeding.
+
+---
+
 ## MANUAL VALIDATION (after script passes)
 
 ### Student Safety (P0)
