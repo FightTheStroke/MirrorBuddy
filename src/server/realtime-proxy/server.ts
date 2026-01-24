@@ -63,7 +63,32 @@ export function startRealtimeProxy(): void {
   }
 
   // #85: Bind to localhost only - prevents external access to unauthenticated WebSocket
-  wss = new WebSocketServer({ port: WS_PROXY_PORT, host: "127.0.0.1" });
+  try {
+    wss = new WebSocketServer({ port: WS_PROXY_PORT, host: "127.0.0.1" });
+  } catch (error) {
+    // Handle port already in use (e.g., multiple Next.js workers)
+    if ((error as NodeJS.ErrnoException).code === "EADDRINUSE") {
+      logger.info(
+        `WebSocket proxy port ${WS_PROXY_PORT} already in use - another worker likely owns it`,
+      );
+      wss = null;
+      return;
+    }
+    throw error;
+  }
+
+  // Handle async binding errors (EADDRINUSE can also be emitted as event)
+  wss.on("error", (error: Error) => {
+    if ((error as NodeJS.ErrnoException).code === "EADDRINUSE") {
+      logger.info(
+        `WebSocket proxy port ${WS_PROXY_PORT} already in use - another worker likely owns it`,
+      );
+      wss = null;
+      return;
+    }
+    logger.error("WebSocket server error", { error: error.message });
+  });
+
   const safeUrl = config.wsUrl.replace(/key=[^&]+/gi, "key=***");
   logger.info(
     `WebSocket proxy started on 127.0.0.1:${WS_PROXY_PORT} (${config.provider.toUpperCase()})`,
@@ -231,10 +256,6 @@ export function startRealtimeProxy(): void {
     clientWs.on("pong", () => {
       handlePong(conn);
     });
-  });
-
-  wss.on("error", (error: Error) => {
-    logger.error("WebSocket server error", { error: error.message });
   });
 }
 
