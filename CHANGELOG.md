@@ -20,6 +20,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Release gate integration**: Part of `release-brutal.sh` security phase
 - **Modes**: Normal (critical=blocking), `--strict` (warnings=blocking), `--json`
 
+#### Vercel Environment Validation (Plan 074)
+
+- **scripts/verify-vercel-env.sh**: Pre-release environment validation script
+- **Release Manager Update**: Added Phase 0 env vars check to `release-brutal.sh`
+- **Documentation**: Updated app-release-manager.md with Vercel Validation section
+
+### Fixed
+
+#### Unified SSL Configuration (Plan 074)
+
+- **Shared SSL Utility**: Created `src/lib/ssl-config.ts` for consistent SSL configuration across all scripts
+- **14 Scripts Updated**: All database scripts now use the shared utility instead of duplicated SSL logic
+- **Certificate Loading**: Scripts now properly load certificate from `config/supabase-chain.pem` (was only checking env var)
+- **Unit Tests**: Added 7 tests for SSL configuration utility
+- **ADR 0067 Updated**: Documented the unified SSL solution
+
 #### Sentry Error Tracking
 
 - **@sentry/nextjs SDK**: Client, server, and edge runtime error tracking

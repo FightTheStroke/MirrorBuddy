@@ -274,8 +274,51 @@ ssl: {
 - **0058**: Observability KPIs (monitoring framework)
 - **0047**: Grafana Cloud observability (metrics dashboard)
 
+## Plan 074 Update: Unified SSL Configuration (2026-01-24)
+
+### Problem Identified
+
+Multiple scripts (`scripts/*.ts` and `prisma/seed.ts`) had duplicated SSL configuration logic that was inconsistent with `src/lib/db.ts`. The main db.ts properly loads certificates from `config/supabase-chain.pem`, but seed scripts only checked the environment variable.
+
+### Solution Implemented
+
+Created `src/lib/ssl-config.ts` - a shared utility for all scripts:
+
+```typescript
+import { createPrismaClient } from "../src/lib/ssl-config";
+const prisma = createPrismaClient();
+```
+
+**Features**:
+
+1. **Unified SSL logic**: Same certificate loading as db.ts (file → env var → fallback)
+2. **Certificate chain validation**: Verifies 2+ certificates in chain
+3. **Environment detection**: Production vs development mode
+4. **Logging**: Consistent SSL status logging across all scripts
+
+### Files Updated
+
+- `src/lib/ssl-config.ts` - NEW: Shared SSL utility
+- `src/lib/__tests__/ssl-config.test.ts` - NEW: 7 unit tests
+- `prisma/seed.ts` - Uses shared utility
+- `scripts/seed-admin.ts` - Uses shared utility
+- `scripts/cleanup-*.ts` (6 files) - Uses shared utility
+- `scripts/check-*.ts` (2 files) - Uses shared utility
+- `scripts/get-db-*.ts` (2 files) - Uses shared utility
+- `scripts/emergency-*.ts` (2 files) - Uses shared utility
+- `scripts/reset-db-users.ts` - Uses shared utility
+- `scripts/list-orphan-identifiers.ts` - Uses shared utility
+
+### Benefits
+
+1. **Single source of truth**: All SSL configuration in one place
+2. **Consistent behavior**: All scripts use same certificate loading logic
+3. **Easier maintenance**: SSL changes need only update one file
+4. **Better testing**: Utility has dedicated unit tests
+
 ---
 
 **Signed-off**: Engineering Team
 **Reviewed**: 2026-01-22
+**Updated**: 2026-01-24 (Plan 074)
 **Next Review**: 2026-04-22 (3 months)
