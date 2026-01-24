@@ -73,7 +73,26 @@ export class TierService {
         this.featureCache.set(tier.id, features);
       }
 
-      // Check if feature exists and is enabled
+      // For registered users, check for admin feature overrides
+      if (userId) {
+        const subscription = await this.getUserSubscription(userId);
+        if (subscription?.overrideFeatures) {
+          const overrides = subscription.overrideFeatures as Record<
+            string,
+            unknown
+          >;
+          // Check if this specific feature has an override
+          if (featureKey in overrides) {
+            const overrideValue = overrides[featureKey];
+            if (typeof overrideValue === "boolean") {
+              return overrideValue;
+            }
+            return Boolean(overrideValue);
+          }
+        }
+      }
+
+      // Check if feature exists and is enabled in tier
       if (!(featureKey in features)) {
         return false;
       }

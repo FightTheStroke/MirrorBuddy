@@ -33,6 +33,7 @@ interface FeatureRow {
   isBoolean?: boolean;
 }
 
+// Feature keys must match those in tier-seed.ts (camelCase)
 const FEATURE_ROWS: FeatureRow[] = [
   {
     name: "Daily Messages",
@@ -51,18 +52,28 @@ const FEATURE_ROWS: FeatureRow[] = [
     getValue: (tier) => tier.docsLimitTotal,
   },
   {
+    name: "Voice Chat",
+    getValue: (tier) => tier.features?.voice ?? false,
+    isBoolean: true,
+  },
+  {
+    name: "Mind Maps",
+    getValue: (tier) => tier.features?.mindMaps ?? false,
+    isBoolean: true,
+  },
+  {
     name: "Video Vision",
-    getValue: (tier) => tier.features?.videovision ?? false,
+    getValue: (tier) => tier.features?.videoVision ?? false,
     isBoolean: true,
   },
   {
-    name: "PDF Export",
-    getValue: (tier) => tier.features?.pdfexport ?? false,
+    name: "Parent Dashboard",
+    getValue: (tier) => tier.features?.parentDashboard ?? false,
     isBoolean: true,
   },
   {
-    name: "Advanced Features",
-    getValue: (tier) => tier.features?.advancedfeatures ?? false,
+    name: "Priority Support",
+    getValue: (tier) => tier.features?.prioritySupport ?? false,
     isBoolean: true,
   },
 ];
