@@ -11,8 +11,11 @@ test.describe("Mobile Responsive Layout", () => {
   test.beforeEach(async ({ page, mobile: _mobile }) => {
     // Navigate to home page
     await page.goto("/");
-    // Wait for app to load
-    await page.waitForSelector('main, [role="main"]');
+    // Wait for hydration to complete - loading screen shows "Caricamento..."
+    // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
+    await page.waitForSelector('button:has-text("Professori")', {
+      timeout: 15000,
+    });
   });
 
   test("header should be visible and properly sized", async ({

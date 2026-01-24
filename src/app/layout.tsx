@@ -68,9 +68,9 @@ export default async function RootLayout({
       </head>
       <body className={`${inter.className} antialiased`}>
         <Providers nonce={nonce}>
-          <main id="main-content" data-testid="main-content">
+          <div id="main-content" data-testid="main-content">
             {children}
-          </main>
+          </div>
         </Providers>
         <Analytics />
       </body>

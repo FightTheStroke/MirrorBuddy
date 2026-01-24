@@ -10,7 +10,11 @@ test.describe("Android Pixel 7 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
   test.beforeEach(async ({ page, mobile: _mobile }) => {
     await page.goto("/");
-    await page.waitForSelector('main, [role="main"]');
+    // Wait for hydration to complete - loading screen shows "Caricamento..."
+    // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
+    await page.waitForSelector('button:has-text("Professori")', {
+      timeout: 15000,
+    });
   });
 
   test("voice panel should be less than 30% of viewport width", async ({
