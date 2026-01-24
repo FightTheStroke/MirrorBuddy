@@ -5,11 +5,11 @@
  * so they appear in Supporti/Archives.
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { generateSearchableText } from '@/lib/search/searchable-text';
-import { indexMaterial } from '@/lib/rag/retrieval-service';
-import type { ToolType } from '@/types/tools';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { generateSearchableText } from "@/lib/search/searchable-text";
+import { indexMaterial } from "@/lib/rag/retrieval-service";
+import type { ToolType } from "@/types/tools";
 
 interface StudyKitData {
   id: string;
@@ -28,7 +28,7 @@ interface StudyKitData {
  */
 export async function saveMaterialsFromStudyKit(
   userId: string,
-  studyKit: StudyKitData
+  studyKit: StudyKitData,
 ): Promise<{ created: number; updated: number }> {
   const materials: Array<{
     userId: string;
@@ -48,10 +48,10 @@ export async function saveMaterialsFromStudyKit(
     materials.push({
       userId,
       toolId: `sk-summary-${studyKit.id}`,
-      toolType: 'summary',
+      toolType: "summary",
       title: `${studyKit.title} - Riassunto`,
       content: JSON.stringify(content),
-      searchableText: generateSearchableText('summary', content),
+      searchableText: generateSearchableText("summary", content),
       subject: studyKit.subject || undefined,
       sourceStudyKitId: studyKit.id,
       preview: studyKit.summary.substring(0, 200),
@@ -64,13 +64,13 @@ export async function saveMaterialsFromStudyKit(
     materials.push({
       userId,
       toolId: `sk-mindmap-${studyKit.id}`,
-      toolType: 'mindmap',
+      toolType: "mindmap",
       title: `${studyKit.title} - Mappa Mentale`,
       content: studyKit.mindmap,
-      searchableText: generateSearchableText('mindmap', parsed),
+      searchableText: generateSearchableText("mindmap", parsed),
       subject: studyKit.subject || undefined,
       sourceStudyKitId: studyKit.id,
-      preview: parsed.title || parsed.topic || 'Mappa mentale',
+      preview: parsed.title || parsed.topic || "Mappa mentale",
     });
   }
 
@@ -80,13 +80,13 @@ export async function saveMaterialsFromStudyKit(
     materials.push({
       userId,
       toolId: `sk-demo-${studyKit.id}`,
-      toolType: 'demo',
+      toolType: "demo",
       title: `${studyKit.title} - Demo Interattiva`,
       content: studyKit.demo,
-      searchableText: generateSearchableText('demo', parsed),
+      searchableText: generateSearchableText("demo", parsed),
       subject: studyKit.subject || undefined,
       sourceStudyKitId: studyKit.id,
-      preview: parsed.title || parsed.description || 'Demo interattiva',
+      preview: parsed.title || parsed.description || "Demo interattiva",
     });
   }
 
@@ -97,10 +97,10 @@ export async function saveMaterialsFromStudyKit(
     materials.push({
       userId,
       toolId: `sk-quiz-${studyKit.id}`,
-      toolType: 'quiz',
+      toolType: "quiz",
       title: `${studyKit.title} - Quiz`,
       content: studyKit.quiz,
-      searchableText: generateSearchableText('quiz', parsed),
+      searchableText: generateSearchableText("quiz", parsed),
       subject: studyKit.subject || undefined,
       sourceStudyKitId: studyKit.id,
       preview: `${questionCount} domande`,
@@ -112,11 +112,13 @@ export async function saveMaterialsFromStudyKit(
   }
 
   // Get existing toolIds in a single query to track created vs updated
+  const toolIdsToCheck = materials.map((m) => m.toolId);
+  const existingMaterials = await prisma.material.findMany({
+    where: { toolId: { in: toolIdsToCheck } },
+    select: { toolId: true },
+  });
   const existingToolIds = new Set(
-    (await prisma.material.findMany({
-      where: { toolId: { in: materials.map(m => m.toolId) } },
-      select: { toolId: true },
-    })).map(m => m.toolId)
+    existingMaterials.map((m: { toolId: string }) => m.toolId),
   );
 
   // Batch upsert all materials in a single transaction (N+1 fix)
@@ -132,14 +134,16 @@ export async function saveMaterialsFromStudyKit(
           preview: material.preview,
           updatedAt: new Date(),
         },
-      })
-    )
+      }),
+    ),
   );
 
-  const created = materials.filter(m => !existingToolIds.has(m.toolId)).length;
-  const updated = materials.filter(m => existingToolIds.has(m.toolId)).length;
+  const created = materials.filter(
+    (m) => !existingToolIds.has(m.toolId),
+  ).length;
+  const updated = materials.filter((m) => existingToolIds.has(m.toolId)).length;
 
-  logger.info('Synced Study Kit materials', {
+  logger.info("Synced Study Kit materials", {
     studyKitId: studyKit.id,
     created,
     updated,
@@ -154,13 +158,13 @@ export async function saveMaterialsFromStudyKit(
  * Called when a Study Kit is deleted.
  */
 export async function deleteMaterialsFromStudyKit(
-  studyKitId: string
+  studyKitId: string,
 ): Promise<number> {
   const result = await prisma.material.deleteMany({
     where: { sourceStudyKitId: studyKitId },
   });
 
-  logger.info('Deleted Study Kit materials', {
+  logger.info("Deleted Study Kit materials", {
     studyKitId,
     count: result.count,
   });
@@ -174,24 +178,24 @@ export async function deleteMaterialsFromStudyKit(
  */
 export async function indexStudyKitContent(
   userId: string,
-  studyKit: StudyKitData
+  studyKit: StudyKitData,
 ): Promise<{ chunksIndexed: number }> {
   if (!studyKit.originalText) {
-    logger.debug('No original text to index', { studyKitId: studyKit.id });
+    logger.debug("No original text to index", { studyKitId: studyKit.id });
     return { chunksIndexed: 0 };
   }
 
   try {
     const result = await indexMaterial({
       userId,
-      sourceType: 'studykit',
+      sourceType: "studykit",
       sourceId: studyKit.id,
       content: studyKit.originalText,
       subject: studyKit.subject || undefined,
-      tags: ['study-kit', studyKit.title],
+      tags: ["study-kit", studyKit.title],
     });
 
-    logger.info('Indexed Study Kit content for RAG', {
+    logger.info("Indexed Study Kit content for RAG", {
       studyKitId: studyKit.id,
       chunksIndexed: result.chunksIndexed,
       totalTokens: result.totalTokens,
@@ -199,7 +203,7 @@ export async function indexStudyKitContent(
 
     return { chunksIndexed: result.chunksIndexed };
   } catch (error) {
-    logger.error('Failed to index Study Kit content', {
+    logger.error("Failed to index Study Kit content", {
       studyKitId: studyKit.id,
       error: String(error),
     });

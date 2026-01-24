@@ -4,10 +4,11 @@
 // Part of Session Summary & Unified Archive feature
 // ============================================================================
 
-import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
-import type { MaestroEvaluation } from './maestro-evaluation';
+import { chatCompletion, getActiveProvider } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/db";
+import type { ParentNote as PrismaParentNote } from "@prisma/client";
+import type { MaestroEvaluation } from "./maestro-evaluation";
 
 interface SessionInfo {
   sessionId: string;
@@ -32,7 +33,7 @@ export interface ParentNote {
  */
 export async function generateParentNote(
   session: SessionInfo,
-  evaluation: MaestroEvaluation
+  evaluation: MaestroEvaluation,
 ): Promise<ParentNote> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -63,7 +64,8 @@ Rispondi SOLO con JSON valido:
   "suggestions": ["<suggerimento pratico per casa>"] o null
 }`;
 
-  const topicsStr = session.topics.length > 0 ? session.topics.join(', ') : session.subject;
+  const topicsStr =
+    session.topics.length > 0 ? session.topics.join(", ") : session.subject;
 
   const userPrompt = `Genera una nota per i genitori su questa sessione:
 
@@ -78,13 +80,13 @@ ${session.summary}
 Valutazione del maestro:
 - Punteggio: ${evaluation.score}/10
 - Commento: ${evaluation.feedback}
-- Punti di forza: ${evaluation.strengths.join(', ') || 'nessuno specifico'}
-- Aree di miglioramento: ${evaluation.areasToImprove.join(', ') || 'nessuna specifica'}`;
+- Punti di forza: ${evaluation.strengths.join(", ") || "nessuno specifico"}
+- Aree di miglioramento: ${evaluation.areasToImprove.join(", ") || "nessuna specifica"}`;
 
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
     );
 
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
@@ -92,25 +94,30 @@ Valutazione del maestro:
       const parsed = JSON.parse(jsonMatch[0]) as ParentNote;
       return {
         summary: parsed.summary || session.summary,
-        highlights: Array.isArray(parsed.highlights) ? parsed.highlights.slice(0, 3) : [],
-        concerns: Array.isArray(parsed.concerns) && parsed.concerns.length > 0
-          ? parsed.concerns.slice(0, 2)
-          : null,
-        suggestions: Array.isArray(parsed.suggestions) && parsed.suggestions.length > 0
-          ? parsed.suggestions.slice(0, 2)
-          : null,
+        highlights: Array.isArray(parsed.highlights)
+          ? parsed.highlights.slice(0, 3)
+          : [],
+        concerns:
+          Array.isArray(parsed.concerns) && parsed.concerns.length > 0
+            ? parsed.concerns.slice(0, 2)
+            : null,
+        suggestions:
+          Array.isArray(parsed.suggestions) && parsed.suggestions.length > 0
+            ? parsed.suggestions.slice(0, 2)
+            : null,
       };
     }
   } catch (error) {
-    logger.error('Failed to generate parent note', { error: String(error) });
+    logger.error("Failed to generate parent note", { error: String(error) });
   }
 
   // Fallback note
   return {
     summary: `Il tuo bambino ha partecipato a una sessione di ${session.duration} minuti con ${session.maestroName}. Hanno lavorato su: ${topicsStr}.`,
-    highlights: evaluation.strengths.length > 0
-      ? evaluation.strengths
-      : ['Ha partecipato attivamente alla sessione'],
+    highlights:
+      evaluation.strengths.length > 0
+        ? evaluation.strengths
+        : ["Ha partecipato attivamente alla sessione"],
     concerns: null,
     suggestions: null,
   };
@@ -133,13 +140,13 @@ export async function hasParentConsent(userId: string): Promise<boolean> {
  */
 export async function saveParentNote(
   session: SessionInfo,
-  note: ParentNote
+  note: ParentNote,
 ): Promise<string | null> {
   // Check GDPR consent before saving (ADR 0008)
   const hasConsent = await hasParentConsent(session.userId);
 
   if (!hasConsent) {
-    logger.info('Parent note skipped - no parent consent', {
+    logger.info("Parent note skipped - no parent consent", {
       userId: session.userId,
       sessionId: session.sessionId,
     });
@@ -160,7 +167,7 @@ export async function saveParentNote(
     },
   });
 
-  logger.info('Parent note saved', {
+  logger.info("Parent note saved", {
     noteId: parentNote.id,
     sessionId: session.sessionId,
   });
@@ -174,13 +181,13 @@ export async function saveParentNote(
  */
 export async function generateAndSaveParentNote(
   session: SessionInfo,
-  evaluation: MaestroEvaluation
+  evaluation: MaestroEvaluation,
 ): Promise<string | null> {
   // Check consent first (ADR 0008)
   const hasConsent = await hasParentConsent(session.userId);
 
   if (!hasConsent) {
-    logger.info('Parent note generation skipped - no parent consent', {
+    logger.info("Parent note generation skipped - no parent consent", {
       userId: session.userId,
       sessionId: session.sessionId,
     });
@@ -197,7 +204,7 @@ export async function generateAndSaveParentNote(
  */
 export async function getRecentParentNotes(
   userId: string,
-  limit: number = 10
+  limit: number = 10,
 ): Promise<
   Array<{
     id: string;
@@ -215,11 +222,11 @@ export async function getRecentParentNotes(
 > {
   const notes = await prisma.parentNote.findMany({
     where: { userId },
-    orderBy: { generatedAt: 'desc' },
+    orderBy: { generatedAt: "desc" },
     take: limit,
   });
 
-  return notes.map((note) => ({
+  return notes.map((note: PrismaParentNote) => ({
     id: note.id,
     sessionId: note.sessionId,
     maestroId: note.maestroId,
@@ -228,7 +235,9 @@ export async function getRecentParentNotes(
     summary: note.summary,
     highlights: JSON.parse(note.highlights) as string[],
     concerns: note.concerns ? (JSON.parse(note.concerns) as string[]) : null,
-    suggestions: note.suggestions ? (JSON.parse(note.suggestions) as string[]) : null,
+    suggestions: note.suggestions
+      ? (JSON.parse(note.suggestions) as string[])
+      : null,
     generatedAt: note.generatedAt,
     viewedAt: note.viewedAt,
   }));
@@ -247,7 +256,9 @@ export async function markParentNoteViewed(noteId: string): Promise<void> {
 /**
  * Get unread parent notes count
  */
-export async function getUnreadParentNotesCount(userId: string): Promise<number> {
+export async function getUnreadParentNotesCount(
+  userId: string,
+): Promise<number> {
   return prisma.parentNote.count({
     where: {
       userId,
