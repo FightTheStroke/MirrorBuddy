@@ -18,6 +18,7 @@ vi.mock("@/lib/db", () => ({
     },
     tierAuditLog: {
       count: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
@@ -61,6 +62,15 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
+
+      // Mock tierAuditLog.findMany for tier changes (returns empty array)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+
+      // Mock second tierDefinition.findMany call for sortOrder map
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 1 },
+        { id: "tier-2", sortOrder: 2 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -106,6 +116,15 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
 
+      // Mock tierAuditLog.findMany for tier changes (returns empty array)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+
+      // Mock second tierDefinition.findMany call for sortOrder map
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 1 },
+        { id: "tier-2", sortOrder: 2 },
+      ]);
+
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
       const trialWAU = samples.find(
@@ -150,6 +169,15 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
 
+      // Mock tierAuditLog.findMany for tier changes (returns empty array)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+
+      // Mock second tierDefinition.findMany call for sortOrder map
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 1 },
+        { id: "tier-2", sortOrder: 2 },
+      ]);
+
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
       const trialMAU = samples.find(
@@ -187,6 +215,14 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
 
+      // Mock tierAuditLog.findMany for tier changes (returns empty array)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+
+      // Mock second tierDefinition.findMany call for sortOrder map
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 1 },
+      ]);
+
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
       // Should include: users_by_tier, active_users_by_tier, total_active, wau, mau, dau, churned, churn_rate, upgrades, downgrades
@@ -220,6 +256,14 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
+
+      // Mock tierAuditLog.findMany for tier changes (returns empty array)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+
+      // Mock second tierDefinition.findMany call for sortOrder map
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 1 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 

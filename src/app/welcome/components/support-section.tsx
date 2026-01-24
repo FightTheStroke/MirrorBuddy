@@ -133,25 +133,25 @@ export function SupportSection() {
             return (
               <motion.div
                 key={member.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ scale: 0.95, y: 10 }}
+                animate={{ scale: 1, y: 0 }}
                 transition={{
-                  delay: 1.0 + i * 0.05,
+                  delay: 0.3 + i * 0.05,
                   type: "spring",
                   stiffness: 150,
                   damping: 15,
                 }}
                 className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all"
               >
-                {/* Role Badge */}
+                {/* Role Badge - uses high contrast colors for WCAG 2.1 AA compliance */}
                 <div
                   className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold mb-2 ${
                     isCoach
-                      ? "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400"
-                      : "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+                      ? "bg-pink-200 text-pink-950 dark:bg-pink-900/50 dark:text-pink-200"
+                      : "bg-amber-200 text-amber-950 dark:bg-amber-900/50 dark:text-amber-200"
                   }`}
                 >
-                  <RoleIcon className="w-3 h-3" />
+                  <RoleIcon className="w-3 h-3" aria-hidden="true" />
                   {isCoach ? "Coach" : "Buddy"}
                 </div>
 

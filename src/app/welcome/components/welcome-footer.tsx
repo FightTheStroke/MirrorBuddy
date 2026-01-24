@@ -60,9 +60,9 @@ export function WelcomeFooter() {
 
   return (
     <motion.footer
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 1.2 }}
+      initial={{ y: 20 }}
+      animate={{ y: 0 }}
+      transition={{ delay: 0.5 }}
       className="w-full mt-12 border-t border-gray-200 dark:border-gray-800"
       role="contentinfo"
       aria-label="Footer con informazioni legali e consenso cookie"
@@ -92,7 +92,7 @@ export function WelcomeFooter() {
               <span className="text-green-600 dark:text-green-400">
                 {badge.icon}
               </span>
-              <span className="text-xs font-medium text-gray-800 dark:text-gray-100">
+              <span className="text-xs font-medium text-gray-900 dark:text-gray-50">
                 {badge.label}
               </span>
             </div>

@@ -132,13 +132,16 @@ describe("Resend Limits API", () => {
       now.getDate(),
     );
 
-    // Mock 50 emails today
+    // Mock 50 emails today - spread across the day from start of day to now
+    const timeRange = now.getTime() - startOfDay.getTime();
+    const interval = Math.max(1000, timeRange / 51);
+
     const emailsToday = Array(50)
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
         created_at: new Date(
-          startOfDay.getTime() + i * 60000,
+          startOfDay.getTime() + (i + 1) * interval,
         ).toISOString(),
       }));
 
@@ -168,9 +171,7 @@ describe("Resend Limits API", () => {
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(
-          startOfMonth.getTime() + i * 60000,
-        ).toISOString(),
+        created_at: new Date(startOfMonth.getTime() + i * 60000).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({
@@ -207,9 +208,7 @@ describe("Resend Limits API", () => {
   it("handles network errors gracefully", async () => {
     process.env.RESEND_API_KEY = "test-key";
 
-    global.fetch = vi
-      .fn()
-      .mockRejectedValue(new Error("Network error"));
+    global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
     const limits = await getResendLimits();
 
@@ -251,13 +250,16 @@ describe("Resend Limits API", () => {
       now.getDate(),
     );
 
-    // Mock 85 emails today (85% of 100)
+    // Mock 85 emails today (85% of 100) - spread across the day from start of day to now
+    const timeRange = now.getTime() - startOfDay.getTime();
+    const interval = Math.max(1000, timeRange / 86);
+
     const emailsToday = Array(85)
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
         created_at: new Date(
-          startOfDay.getTime() + i * 60000,
+          startOfDay.getTime() + (i + 1) * interval,
         ).toISOString(),
       }));
 
@@ -284,13 +286,16 @@ describe("Resend Limits API", () => {
       now.getDate(),
     );
 
-    // Mock 70 emails today (70% of 100)
+    // Mock 70 emails today (70% of 100) - spread across the day from start of day to now
+    const timeRange = now.getTime() - startOfDay.getTime();
+    const interval = Math.max(1000, timeRange / 71);
+
     const emailsToday = Array(70)
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
         created_at: new Date(
-          startOfDay.getTime() + i * 60000,
+          startOfDay.getTime() + (i + 1) * interval,
         ).toISOString(),
       }));
 
@@ -317,13 +322,17 @@ describe("Resend Limits API", () => {
       now.getDate(),
     );
 
-    // Mock 30 emails today
+    // Mock 30 emails today - spread across the day from start of day to now
+    // This ensures all emails fall within "today" regardless of when the test runs
+    const timeRange = now.getTime() - startOfDay.getTime();
+    const interval = Math.max(1000, timeRange / 31); // At least 1 second apart, spread across available time
+
     const emailsToday = Array(30)
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
         created_at: new Date(
-          startOfDay.getTime() + i * 60000,
+          startOfDay.getTime() + (i + 1) * interval,
         ).toISOString(),
       }));
 

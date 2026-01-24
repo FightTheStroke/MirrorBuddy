@@ -11,7 +11,7 @@
 
 <p align="center">
   <a href="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml"><img src="https://github.com/FightTheStroke/MirrorBuddy/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
-  <img src="https://img.shields.io/badge/tests-5169-brightgreen" alt="Tests: 5169">
+  <img src="https://img.shields.io/badge/tests-6790-brightgreen" alt="Tests: 6790">
   <img src="https://img.shields.io/badge/e2e-229-blue" alt="E2E: 229">
   <img src="https://img.shields.io/badge/coverage-80%25-brightgreen" alt="Coverage: 80%">
   <a href="https://www.apache.org/licenses/LICENSE-2.0"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0"></a>

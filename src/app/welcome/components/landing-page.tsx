@@ -97,10 +97,13 @@ export function LandingPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
-      <div className="min-h-screen flex flex-col items-center px-4 py-12">
+      <main
+        className="min-h-screen flex flex-col items-center px-4 py-12"
+        id="main-content"
+      >
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ y: 20 }}
+          animate={{ y: 0 }}
           transition={{ duration: 0.6 }}
           className="w-full flex-1 flex flex-col items-center justify-center"
         >
@@ -141,9 +144,15 @@ export function LandingPage({
         <WelcomeFooter />
 
         {/* Decorative blurs */}
-        <div className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-300/20 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none" />
-      </div>
+        <div
+          className="absolute top-0 left-0 w-64 h-64 bg-gradient-to-br from-pink-300/20 to-transparent rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+          aria-hidden="true"
+        />
+        <div
+          className="absolute bottom-0 right-0 w-96 h-96 bg-gradient-to-tl from-purple-300/20 to-transparent rounded-full blur-3xl translate-x-1/3 translate-y-1/3 pointer-events-none"
+          aria-hidden="true"
+        />
+      </main>
     </div>
   );
 }
