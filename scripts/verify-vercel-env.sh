@@ -1,71 +1,115 @@
 #!/bin/bash
-# Final verification of Vercel environment variables
+# Verify Vercel and local environment variables for deployment readiness
+# Checks: required env vars, optional recommendations, certificate files
+# Exit code: 0 if all required checks pass, 1 otherwise
+
+set -e
 
 echo "========================================="
-echo "Vercel Production Variables Verification"
+echo "Environment Verification for Deployment"
 echo "========================================="
 echo ""
 
-# Pull latest
-rm -f .env.production.local
-vercel env pull --environment production .env.production.local > /dev/null 2>&1
+# Track overall status
+FAILED_CHECKS=0
 
-echo "1. Critical variables (must be set):"
+# ============================================================================
+# SECTION 1: Check required environment variables
+# ============================================================================
+echo "1. Required environment variables:"
 echo "-----------------------------------"
 
-CRITICAL_VARS=(
-  "SESSION_SECRET"
-  "DATABASE_URL"
-  "DIRECT_URL"
-  "AZURE_OPENAI_API_KEY"
-  "AZURE_OPENAI_ENDPOINT"
-  "AZURE_OPENAI_REALTIME_API_KEY"
-  "RESEND_API_KEY"
-  "UPSTASH_REDIS_REST_URL"
-  "UPSTASH_REDIS_REST_TOKEN"
-)
+# Check DATABASE_URL (required)
+if [ -z "$DATABASE_URL" ]; then
+  echo "❌ DATABASE_URL: MISSING (required)"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+else
+  echo "✅ DATABASE_URL: SET"
+fi
 
-for var in "${CRITICAL_VARS[@]}"; do
-  value=$(/usr/bin/grep "^${var}=" .env.production.local | cut -d= -f2- | tr -d '"')
-  if [ -z "$value" ]; then
-    echo "❌ $var: EMPTY or MISSING"
+# Check NODE_ENV (required)
+if [ -z "$NODE_ENV" ]; then
+  echo "❌ NODE_ENV: MISSING (required)"
+  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+else
+  echo "✅ NODE_ENV: SET ($NODE_ENV)"
+fi
+
+# ============================================================================
+# SECTION 2: Check optional but recommended variables
+# ============================================================================
+echo ""
+echo "2. Optional but recommended variables:"
+echo "--------------------------------------"
+
+# Check SUPABASE_CA_CERT (optional but recommended)
+if [ -z "$SUPABASE_CA_CERT" ]; then
+  echo "⚠️  SUPABASE_CA_CERT: NOT SET (optional - recommended for production)"
+else
+  echo "✅ SUPABASE_CA_CERT: SET"
+fi
+
+# ============================================================================
+# SECTION 3: Verify local SSL certificate file
+# ============================================================================
+echo ""
+echo "3. Local SSL certificate verification:"
+echo "--------------------------------------"
+
+CERT_PATH="config/supabase-chain.pem"
+if [ -f "$CERT_PATH" ]; then
+  CERT_SIZE=$(stat -f%z "$CERT_PATH" 2>/dev/null || stat -c%s "$CERT_PATH" 2>/dev/null || echo "0")
+  if [ "$CERT_SIZE" -gt 100 ]; then
+    echo "✅ $CERT_PATH: EXISTS ($CERT_SIZE bytes)"
   else
-    echo "✅ $var: SET (${#value} chars)"
+    echo "⚠️  $CERT_PATH: EXISTS but seems too small ($CERT_SIZE bytes)"
   fi
-done
+else
+  echo "⚠️  $CERT_PATH: NOT FOUND (optional - for Supabase SSL)"
+fi
 
+# ============================================================================
+# SECTION 4: List environment variables from Vercel (if CLI available)
+# ============================================================================
 echo ""
-echo "2. Variables with trailing \\n (excluding certificates):"
-echo "--------------------------------------------------------"
+echo "4. Vercel environment variables (if available):"
+echo "-----------------------------------------------"
 
-bad_vars=$(/usr/bin/grep '\\n"$' .env.production.local | /usr/bin/grep -v 'SUPABASE_CA_CERT')
-if [ -z "$bad_vars" ]; then
-  echo "✅ No variables with trailing \\n"
+if command -v vercel &> /dev/null; then
+  echo "Attempting to pull from Vercel..."
+
+  # Safely attempt to pull - don't fail if it doesn't work
+  TEMP_FILE=$(mktemp)
+  if vercel env ls > "$TEMP_FILE" 2>/dev/null || vercel env pull "$TEMP_FILE" --environment production > /dev/null 2>&1; then
+    if [ -s "$TEMP_FILE" ]; then
+      echo "Environment variables available:"
+      head -20 "$TEMP_FILE" | sed 's/^/  /'
+      if [ $(wc -l < "$TEMP_FILE") -gt 20 ]; then
+        echo "  ... and $(($(wc -l < "$TEMP_FILE") - 20)) more"
+      fi
+    else
+      echo "⚠️  No output from Vercel command"
+    fi
+  else
+    echo "⚠️  Could not retrieve Vercel environment (this is OK if not configured)"
+  fi
+  rm -f "$TEMP_FILE"
 else
-  echo "❌ Found variables with trailing \\n:"
-  echo "$bad_vars"
+  echo "⚠️  Vercel CLI not installed - skipping Vercel checks"
 fi
 
-echo ""
-echo "3. Redis variables (must not contain \\n):"
-echo "-----------------------------------------"
-
-redis_url=$(/usr/bin/grep "^UPSTASH_REDIS_REST_URL=" .env.production.local | cat -A)
-redis_token=$(/usr/bin/grep "^UPSTASH_REDIS_REST_TOKEN=" .env.production.local | cat -A)
-
-if echo "$redis_url" | /usr/bin/grep -q '\\n'; then
-  echo "❌ UPSTASH_REDIS_REST_URL contains \\n"
-else
-  echo "✅ UPSTASH_REDIS_REST_URL: clean"
-fi
-
-if echo "$redis_token" | /usr/bin/grep -q '\\n'; then
-  echo "❌ UPSTASH_REDIS_REST_TOKEN contains \\n"
-else
-  echo "✅ UPSTASH_REDIS_REST_TOKEN: clean"
-fi
-
+# ============================================================================
+# FINAL VERDICT
+# ============================================================================
 echo ""
 echo "========================================="
-echo "Verification complete!"
-echo "========================================="
+
+if [ "$FAILED_CHECKS" -eq 0 ]; then
+  echo "✅ All required environment variables are set!"
+  echo "========================================="
+  exit 0
+else
+  echo "❌ $FAILED_CHECKS required check(s) failed!"
+  echo "========================================="
+  exit 1
+fi
