@@ -31,6 +31,7 @@
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
   <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
   <a href="https://mirrorbuddy.grafana.net/d/dashboard/"><img src="https://img.shields.io/badge/Grafana-Dashboard-F46800?logo=grafana" alt="Grafana Dashboard"></a>
+  <a href="https://sentry.io"><img src="https://img.shields.io/badge/Sentry-Error%20Tracking-362D59?logo=sentry" alt="Sentry Error Tracking"></a>
 </p>
 
 <p align="center">

@@ -16,6 +16,7 @@ import { KpiCard } from "@/components/admin/kpi-card";
 import { CostPanel } from "@/components/admin/CostPanel";
 import { FeatureFlagsPanel } from "@/components/admin/FeatureFlagsPanel";
 import { SLOMonitoringPanel } from "@/components/admin/SLOMonitoringPanel";
+import { SentryErrorsPanel } from "@/components/admin/SentryErrorsPanel";
 import { FunnelChart } from "@/components/admin/funnel-chart";
 import { FunnelUsersTable } from "@/components/admin/funnel-users-table";
 import { UserDrilldownModal } from "@/components/admin/user-drill-down-modal";
@@ -299,6 +300,10 @@ export default function AdminDashboardPage() {
 
         <CollapsibleSection title="SLO Monitoring" defaultOpen={false}>
           <SLOMonitoringPanel />
+        </CollapsibleSection>
+
+        <CollapsibleSection title="Sentry Errors" defaultOpen={false}>
+          <SentryErrorsPanel />
         </CollapsibleSection>
       </div>
     </div>
