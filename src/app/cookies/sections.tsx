@@ -26,8 +26,7 @@ export function ManagementSection() {
       </p>
       <ul>
         <li>
-          <strong>Chrome</strong> - Impostazioni → Privacy e sicurezza →
-          Cookie
+          <strong>Chrome</strong> - Impostazioni → Privacy e sicurezza → Cookie
         </li>
         <li>
           <strong>Firefox</strong> - Impostazioni → Privacy → Cookie
@@ -67,9 +66,8 @@ export function ThirdPartySection() {
         pubblicità o tracciamento.
       </p>
       <p>
-        I nostri fornitori di servizi tecnici (sub-responsabili del
-        trattamento) <strong>non installano cookie sul tuo dispositivo</strong>
-        :
+        I nostri fornitori di servizi tecnici (sub-responsabili del trattamento){" "}
+        <strong>non installano cookie sul tuo dispositivo</strong>:
       </p>
       <ul>
         <li>
@@ -81,8 +79,8 @@ export function ThirdPartySection() {
           server-side, no cookie)
         </li>
         <li>
-          <strong>Azure OpenAI</strong> - intelligenza artificiale (API
-          backend, no cookie)
+          <strong>Azure OpenAI</strong> - intelligenza artificiale (API backend,
+          no cookie)
         </li>
         <li>
           <strong>Resend</strong> - invio email (servizio backend, no cookie)
@@ -90,13 +88,16 @@ export function ThirdPartySection() {
         <li>
           <strong>Upstash</strong> - cache Redis (servizio backend, no cookie)
         </li>
+        <li>
+          <strong>Sentry</strong> - monitoraggio errori e performance (usa
+          localStorage per Session Replay su errori, no cookie)
+        </li>
       </ul>
       <p className="text-sm text-slate-600 dark:text-gray-400 mt-3">
         <strong>Google Drive (opzionale):</strong> Se connetti il tuo account
         Google per salvare documenti, Google può impostare i propri cookie
         durante il processo di autenticazione OAuth. I token di accesso sono
-        crittografati e salvati nel nostro database, non nei cookie del
-        browser.
+        crittografati e salvati nel nostro database, non nei cookie del browser.
       </p>
       <p>
         Per l&apos;elenco completo dei sub-responsabili, consulta la{" "}
@@ -122,8 +123,8 @@ export function DurationSection() {
           browser
         </li>
         <li>
-          <strong>Cookie persistenti</strong> - restano fino alla scadenza
-          (max 1 anno)
+          <strong>Cookie persistenti</strong> - restano fino alla scadenza (max
+          1 anno)
         </li>
       </ul>
       <p>
