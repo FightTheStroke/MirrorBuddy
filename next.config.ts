@@ -151,4 +151,9 @@ const sentryConfig = {
   },
 };
 
-export default withSentryConfig(withBundleAnalyzer(nextConfig), sentryConfig);
+// Sentry wrapper can be disabled locally if causing build issues
+// Set DISABLE_SENTRY_BUILD=true to skip Sentry instrumentation
+const config = withBundleAnalyzer(nextConfig);
+export default process.env.DISABLE_SENTRY_BUILD === "true"
+  ? config
+  : withSentryConfig(config, sentryConfig);

@@ -127,7 +127,9 @@ fi
 # =============================================================================
 echo -e "${BLUE}[3/5] Production build (fresh Prisma)...${NC}"
 
-if ! npm run build > "$TEMP_DIR/build.log" 2>&1; then
+# Disable Sentry wrapper locally (Sentry+Turbopack bug with Next.js 16)
+# Sentry works fine on Vercel where Turbopack behaves differently
+if ! DISABLE_SENTRY_BUILD=true npm run build > "$TEMP_DIR/build.log" 2>&1; then
     echo -e "${RED}✗ Build failed${NC}"
     cat "$TEMP_DIR/build.log"
     exit 1
