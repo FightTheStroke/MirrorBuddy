@@ -49,8 +49,6 @@ describe("homework-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -126,8 +124,8 @@ describe("homework-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("text");
-      expect(result.data.exerciseType).toBe("math");
+      expect((result.data as any).sourceType).toBe("text");
+      expect((result.data as any).exerciseType).toBe("math");
     });
 
     it("returns homework data structure", async () => {
@@ -152,7 +150,7 @@ describe("homework-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("pdf");
+      expect((result.data as any).sourceType).toBe("pdf");
     });
 
     it("handles PDF as ArrayBuffer", async () => {
@@ -175,7 +173,7 @@ describe("homework-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("image");
+      expect((result.data as any).sourceType).toBe("image");
     });
 
     it("converts ArrayBuffer to data URL for images", async () => {

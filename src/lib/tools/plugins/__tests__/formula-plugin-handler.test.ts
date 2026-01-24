@@ -39,8 +39,6 @@ describe("formula-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -107,7 +105,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.latex).toBe("\\frac{a}{b}");
+      expect((result.data as any).latex).toBe("\\frac{a}{b}");
     });
 
     it("trims latex whitespace", async () => {
@@ -117,7 +115,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.latex).toBe("\\sum_{i=1}^n");
+      expect((result.data as any).latex).toBe("\\sum_{i=1}^n");
     });
 
     it("rejects invalid latex", async () => {
@@ -143,7 +141,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.description).toBe("The constant pi");
+      expect((result.data as any).description).toBe("The constant pi");
     });
 
     it("sets displayMode to block for long latex", async () => {
@@ -154,7 +152,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets displayMode to block for latex with integral", async () => {
@@ -164,7 +162,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets displayMode to block for latex with sum", async () => {
@@ -174,14 +172,14 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets displayMode to inline for short simple latex", async () => {
       const result = await formulaPlugin.handler({ latex: "x^2" }, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("inline");
+      expect((result.data as any).displayMode).toBe("inline");
     });
   });
 
@@ -195,8 +193,8 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.latex).toBe("\\alpha + \\beta");
-      expect(result.data.description).toBeUndefined();
+      expect((result.data as any).latex).toBe("\\alpha + \\beta");
+      expect((result.data as any).description).toBeUndefined();
     });
 
     it("rejects invalid latex in description", async () => {
@@ -224,7 +222,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("inline");
+      expect((result.data as any).displayMode).toBe("inline");
     });
   });
 
@@ -238,8 +236,8 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.latex).toBe("\\frac{1}{2}");
-      expect(result.data.description).toBe("One half");
+      expect((result.data as any).latex).toBe("\\frac{1}{2}");
+      expect((result.data as any).description).toBe("One half");
       expect(generateLatexFromDescription).toHaveBeenCalledWith(
         "the square root of x",
       );
@@ -288,7 +286,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.description).toBe("the square root of x");
+      expect((result.data as any).description).toBe("the square root of x");
     });
 
     it("sets displayMode based on generated latex length", async () => {
@@ -304,7 +302,7 @@ describe("formula-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("inline");
+      expect((result.data as any).displayMode).toBe("inline");
     });
   });
 

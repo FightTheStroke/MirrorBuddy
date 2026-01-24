@@ -20,8 +20,6 @@ describe("archive-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -81,8 +79,8 @@ describe("archive-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.query).toBe("mathematics");
-      expect(result.data.resultCount).toBe(2);
+      expect((result.data as any).query).toBe("mathematics");
+      expect((result.data as any).resultCount).toBe(2);
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("q=mathematics"),
         expect.any(Object),
@@ -96,7 +94,7 @@ describe("archive-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.toolType).toBe("mindmap");
+      expect((result.data as any).toolType).toBe("mindmap");
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("type=mindmap"),
         expect.any(Object),
@@ -110,7 +108,7 @@ describe("archive-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.subject).toBe("history");
+      expect((result.data as any).subject).toBe("history");
       expect(mockFetch).toHaveBeenCalledWith(
         expect.stringContaining("subject=history"),
         expect.any(Object),
@@ -124,9 +122,9 @@ describe("archive-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.query).toBe("war");
-      expect(result.data.toolType).toBe("timeline");
-      expect(result.data.subject).toBe("history");
+      expect((result.data as any).query).toBe("war");
+      expect((result.data as any).toolType).toBe("timeline");
+      expect((result.data as any).subject).toBe("history");
     });
 
     it("includes userId in search params", async () => {
@@ -154,7 +152,7 @@ describe("archive-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.createdAt).toBeDefined();
+      expect((result.data as any).createdAt).toBeDefined();
     });
   });
 
@@ -270,7 +268,7 @@ describe("archive-plugin handler", () => {
       const result = await archivePlugin.handler({ toolType }, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.toolType).toBe(toolType);
+      expect((result.data as any).toolType).toBe(toolType);
     });
   });
 });

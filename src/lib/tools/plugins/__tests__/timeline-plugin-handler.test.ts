@@ -22,8 +22,6 @@ describe("timeline-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "erodoto",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validInput = {
@@ -92,11 +90,11 @@ describe("timeline-plugin handler", () => {
       const result = await timelinePlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("World War II");
-      expect(result.data.period).toBe("1939-1945");
-      expect(result.data.events).toHaveLength(2);
-      expect(result.data.eventCount).toBe(2);
-      expect(result.data.createdAt).toBeDefined();
+      expect((result.data as any).topic).toBe("World War II");
+      expect((result.data as any).period).toBe("1939-1945");
+      expect((result.data as any).events).toHaveLength(2);
+      expect((result.data as any).eventCount).toBe(2);
+      expect((result.data as any).createdAt).toBeDefined();
     });
 
     it("creates timeline without period (optional)", async () => {
@@ -106,7 +104,7 @@ describe("timeline-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.period).toBeUndefined();
+      expect((result.data as any).period).toBeUndefined();
     });
 
     it("creates timeline with events without description", async () => {
@@ -119,7 +117,8 @@ describe("timeline-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.events[0].description).toBeUndefined();
+      const data = result.data as { events: { description?: string }[] };
+      expect(data.events[0].description).toBeUndefined();
     });
 
     it("trims all string fields", async () => {
@@ -139,11 +138,16 @@ describe("timeline-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Spaced Topic");
-      expect(result.data.period).toBe("1900-2000");
-      expect(result.data.events[0].date).toBe("1950");
-      expect(result.data.events[0].title).toBe("Event Title");
-      expect(result.data.events[0].description).toBe("Description");
+      const data = result.data as {
+        topic: string;
+        period: string;
+        events: { date: string; title: string; description: string }[];
+      };
+      expect(data.topic).toBe("Spaced Topic");
+      expect(data.period).toBe("1900-2000");
+      expect(data.events[0].date).toBe("1950");
+      expect(data.events[0].title).toBe("Event Title");
+      expect(data.events[0].description).toBe("Description");
     });
   });
 

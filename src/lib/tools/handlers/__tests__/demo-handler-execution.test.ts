@@ -30,15 +30,21 @@ const {
         }
       },
     ),
-    mockValidateCode: vi.fn(() => ({ safe: true, violations: [] })),
+    mockValidateCode: vi.fn((): { safe: boolean; violations: string[] } => ({
+      safe: true,
+      violations: [],
+    })),
     mockSanitizeHtml: vi.fn((html: string) => Promise.resolve(html)),
-    mockValidateDescription: vi.fn(() => ({ valid: true })),
-    mockGenerateDemoCode: vi.fn(() =>
-      Promise.resolve({
-        html: "<div>Demo</div>",
-        css: ".demo { color: red; }",
-        js: 'console.log("demo");',
-      }),
+    mockValidateDescription: vi.fn(
+      (): { valid: boolean; suggestions?: string[] } => ({ valid: true }),
+    ),
+    mockGenerateDemoCode: vi.fn(
+      (): Promise<{ html: string; css: string; js?: string }> =>
+        Promise.resolve({
+          html: "<div>Demo</div>",
+          css: ".demo { color: red; }",
+          js: 'console.log("demo");',
+        }),
     ),
   };
 });

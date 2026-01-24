@@ -41,8 +41,6 @@ describe("chart-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validChartInput = {
@@ -116,9 +114,9 @@ describe("chart-plugin", () => {
       const result = await chartPlugin.handler(validChartInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.title).toBe("Test Chart");
-      expect(result.data.chartType).toBe("bar");
-      expect(result.data.config).toBeDefined();
+      expect((result.data as any).title).toBe("Test Chart");
+      expect((result.data as any).chartType).toBe("bar");
+      expect((result.data as any).config).toBeDefined();
     });
 
     it("includes optional description when provided", async () => {
@@ -128,7 +126,7 @@ describe("chart-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.description).toBe("Test description");
+      expect((result.data as any).description).toBe("Test description");
     });
 
     it("includes optional dataSource when provided", async () => {
@@ -138,7 +136,7 @@ describe("chart-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.dataSource).toBe("ISTAT 2024");
+      expect((result.data as any).dataSource).toBe("ISTAT 2024");
     });
 
     it("trims title and optional fields", async () => {
@@ -153,9 +151,9 @@ describe("chart-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.title).toBe("Spaced Title");
-      expect(result.data.description).toBe("desc");
-      expect(result.data.dataSource).toBe("source");
+      expect((result.data as any).title).toBe("Spaced Title");
+      expect((result.data as any).description).toBe("desc");
+      expect((result.data as any).dataSource).toBe("source");
     });
 
     it("supports all valid chart types", async () => {

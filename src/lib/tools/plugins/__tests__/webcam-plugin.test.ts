@@ -37,8 +37,6 @@ describe("webcam-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validDataUrl =
@@ -111,12 +109,14 @@ describe("webcam-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.imageBase64).toBe(validDataUrl);
-      expect(result.data.extractedText).toBe("Extracted text from image");
-      expect(result.data.imageDescription).toBe(
+      expect((result.data as any).imageBase64).toBe(validDataUrl);
+      expect((result.data as any).extractedText).toBe(
+        "Extracted text from image",
+      );
+      expect((result.data as any).imageDescription).toBe(
         "A whiteboard with mathematical equations",
       );
-      expect(result.data.analysisTimestamp).toBeDefined();
+      expect((result.data as any).analysisTimestamp).toBeDefined();
     });
 
     it("processes raw base64 format successfully", async () => {

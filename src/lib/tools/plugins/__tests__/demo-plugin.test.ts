@@ -63,8 +63,6 @@ describe("demo-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "galileo",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -131,7 +129,7 @@ describe("demo-plugin", () => {
       });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.type).toBe("visualization"); // default
+        expect((result.data as any).type).toBe("visualization"); // default
       }
     });
 
@@ -206,7 +204,7 @@ describe("demo-plugin", () => {
       const result = DemoInputSchema.safeParse({ topic: "Test" });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.type).toBe("visualization");
+        expect((result.data as any).type).toBe("visualization");
       }
     });
   });
@@ -235,10 +233,10 @@ describe("demo-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.id).toBe("demo-test-id");
-      expect(result.data.topic).toBe("pendulum motion");
-      expect(result.data.title).toBe("Demo: pendulum motion");
-      expect(result.data.type).toBe("visualization");
+      expect((result.data as any).id).toBe("demo-test-id");
+      expect((result.data as any).topic).toBe("pendulum motion");
+      expect((result.data as any).title).toBe("Demo: pendulum motion");
+      expect((result.data as any).type).toBe("visualization");
     });
 
     it("creates demo with all optional fields", async () => {
@@ -256,8 +254,8 @@ describe("demo-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.title).toBe("Gravity Simulation");
-      expect(result.data.type).toBe("simulation");
+      expect((result.data as any).title).toBe("Gravity Simulation");
+      expect((result.data as any).type).toBe("simulation");
     });
 
     it("creates demo with experiment type", async () => {
@@ -267,7 +265,7 @@ describe("demo-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.type).toBe("experiment");
+      expect((result.data as any).type).toBe("experiment");
     });
 
     it("includes description from concept and visualization", async () => {
@@ -281,7 +279,7 @@ describe("demo-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.description).toContain("Energy conservation");
+      expect((result.data as any).description).toContain("Energy conservation");
     });
   });
 
@@ -289,6 +287,8 @@ describe("demo-plugin", () => {
     it("returns error when code generation returns null (no JSON)", async () => {
       vi.mocked(chatCompletion).mockResolvedValueOnce({
         content: "Invalid response without JSON",
+        provider: "azure",
+        model: "gpt-4",
       });
 
       const result = await demoPlugin.handler({ topic: "test" }, mockContext);
@@ -308,6 +308,8 @@ describe("demo-plugin", () => {
     it("handles malformed JSON in response", async () => {
       vi.mocked(chatCompletion).mockResolvedValueOnce({
         content: "{invalid json syntax here}",
+        provider: "azure",
+        model: "gpt-4",
       });
 
       const result = await demoPlugin.handler({ topic: "test" }, mockContext);

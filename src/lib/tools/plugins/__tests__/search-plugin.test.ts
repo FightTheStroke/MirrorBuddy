@@ -46,8 +46,6 @@ describe("search-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -119,8 +117,9 @@ describe("search-plugin", () => {
       expect(result.success).toBe(true);
       expect(performWebSearch).toHaveBeenCalledWith("pythagorean theorem");
       expect(performYouTubeSearch).toHaveBeenCalledWith("pythagorean theorem");
-      expect(result.data.results.length).toBe(2);
-      expect(result.data.searchType).toBe("all");
+      const data = result.data as { results: unknown[]; searchType: string };
+      expect(data.results.length).toBe(2);
+      expect(data.searchType).toBe("all");
     });
 
     it("performs only web search when type is web", async () => {
@@ -132,8 +131,8 @@ describe("search-plugin", () => {
       expect(result.success).toBe(true);
       expect(performWebSearch).toHaveBeenCalledWith("math history");
       expect(performYouTubeSearch).not.toHaveBeenCalled();
-      expect(result.data.searchType).toBe("web");
-      expect(result.data.searchSource).toBe("wikipedia");
+      expect((result.data as any).searchType).toBe("web");
+      expect((result.data as any).searchSource).toBe("wikipedia");
     });
 
     it("performs only YouTube search when type is youtube", async () => {
@@ -145,7 +144,7 @@ describe("search-plugin", () => {
       expect(result.success).toBe(true);
       expect(performWebSearch).not.toHaveBeenCalled();
       expect(performYouTubeSearch).toHaveBeenCalledWith("algebra tutorial");
-      expect(result.data.searchType).toBe("youtube");
+      expect((result.data as any).searchType).toBe("youtube");
     });
 
     it("explicitly handles type all", async () => {
@@ -168,10 +167,10 @@ describe("search-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.query).toBe("geometry");
-      expect(result.data.results).toBeInstanceOf(Array);
-      expect(result.data.resultCount).toBeGreaterThan(0);
-      expect(result.data.createdAt).toBeDefined();
+      expect((result.data as any).query).toBe("geometry");
+      expect((result.data as any).results).toBeInstanceOf(Array);
+      expect((result.data as any).resultCount).toBeGreaterThan(0);
+      expect((result.data as any).createdAt).toBeDefined();
     });
 
     it("trims query whitespace", async () => {
@@ -181,7 +180,7 @@ describe("search-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.query).toBe("spaced query");
+      expect((result.data as any).query).toBe("spaced query");
     });
 
     it("includes searchSource from web search", async () => {
@@ -198,7 +197,7 @@ describe("search-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.searchSource).toBe("brave");
+      expect((result.data as any).searchSource).toBe("brave");
     });
   });
 
@@ -324,7 +323,7 @@ describe("search-plugin", () => {
       const result = SearchPluginSchema.safeParse({ query: "mathematics" });
       expect(result.success).toBe(true);
       if (result.success) {
-        expect(result.data.type).toBe("all");
+        expect((result.data as any).type).toBe("all");
       }
     });
 

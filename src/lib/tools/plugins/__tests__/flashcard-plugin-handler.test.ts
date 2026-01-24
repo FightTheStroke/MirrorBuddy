@@ -16,8 +16,6 @@ describe("flashcard-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validInput = {
@@ -80,8 +78,8 @@ describe("flashcard-plugin handler", () => {
       const result = await flashcardPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Mathematics");
-      expect(result.data.cards).toHaveLength(2);
+      expect((result.data as any).topic).toBe("Mathematics");
+      expect((result.data as any).cards).toHaveLength(2);
     });
 
     it("trims topic and card content", async () => {
@@ -94,9 +92,9 @@ describe("flashcard-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Spaced Topic");
-      expect(result.data.cards[0].front).toBe("Question?");
-      expect(result.data.cards[0].back).toBe("Answer");
+      expect((result.data as any).topic).toBe("Spaced Topic");
+      expect((result.data as any).cards[0].front).toBe("Question?");
+      expect((result.data as any).cards[0].back).toBe("Answer");
     });
 
     it("handles single card", async () => {
@@ -106,7 +104,7 @@ describe("flashcard-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.cards).toHaveLength(1);
+      expect((result.data as any).cards).toHaveLength(1);
     });
 
     it("handles many cards", async () => {
@@ -121,7 +119,7 @@ describe("flashcard-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.cards).toHaveLength(20);
+      expect((result.data as any).cards).toHaveLength(20);
     });
   });
 

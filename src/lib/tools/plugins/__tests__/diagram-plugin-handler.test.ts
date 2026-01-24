@@ -22,8 +22,6 @@ describe("diagram-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "galileo",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validInput = {
@@ -86,10 +84,10 @@ describe("diagram-plugin handler", () => {
       const result = await diagramPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Algorithm Flow");
-      expect(result.data.diagramType).toBe("flowchart");
-      expect(result.data.mermaidCode).toBeDefined();
-      expect(result.data.createdAt).toBeDefined();
+      expect((result.data as any).topic).toBe("Algorithm Flow");
+      expect((result.data as any).diagramType).toBe("flowchart");
+      expect((result.data as any).mermaidCode).toBeDefined();
+      expect((result.data as any).createdAt).toBeDefined();
     });
 
     it("trims topic and mermaidCode", async () => {
@@ -103,8 +101,8 @@ describe("diagram-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Spaced Topic");
-      expect(result.data.mermaidCode).toBe("flowchart TD\n  A --> B");
+      expect((result.data as any).topic).toBe("Spaced Topic");
+      expect((result.data as any).mermaidCode).toBe("flowchart TD\n  A --> B");
     });
 
     it("uses default diagramType (flowchart) when not provided", async () => {
@@ -114,7 +112,7 @@ describe("diagram-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.diagramType).toBe("flowchart");
+      expect((result.data as any).diagramType).toBe("flowchart");
     });
   });
 
@@ -128,7 +126,7 @@ describe("diagram-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.diagramType).toBe(diagramType);
+      expect((result.data as any).diagramType).toBe(diagramType);
     });
   });
 

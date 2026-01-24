@@ -33,8 +33,6 @@ describe("mindmap-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -95,9 +93,9 @@ describe("mindmap-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.title).toBe("Test Map");
-      expect(result.data.nodes).toHaveLength(1);
-      expect(result.data.markdown).toBeDefined();
+      expect((result.data as any).title).toBe("Test Map");
+      expect((result.data as any).nodes).toHaveLength(1);
+      expect((result.data as any).markdown).toBeDefined();
     });
 
     it("creates mindmap with hierarchical nodes", async () => {
@@ -114,7 +112,7 @@ describe("mindmap-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.nodes).toHaveLength(3);
+      expect((result.data as any).nodes).toHaveLength(3);
     });
 
     it("handles parentId as empty string (treated as root)", async () => {
@@ -151,7 +149,7 @@ describe("mindmap-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.nodes[0].parentId).toBeNull();
+      expect((result.data as any).nodes[0].parentId).toBeNull();
     });
   });
 
