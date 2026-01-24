@@ -13,6 +13,7 @@ import { FeaturesSection } from "./features-section";
 import { ComplianceSection } from "./compliance-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
+import { TierComparisonSection } from "./tier-comparison-section";
 import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
 import type { ExistingUserData } from "../types";
 
@@ -119,6 +120,9 @@ export function LandingPage({
               isReturningUser ? handleStartWithOnboarding : undefined
             }
           />
+
+          {/* Tier comparison cards */}
+          <TierComparisonSection />
 
           {/* Professors carousel */}
           <MaestriShowcaseSection />

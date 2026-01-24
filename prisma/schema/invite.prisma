@@ -9,31 +9,31 @@ enum InviteStatus {
 }
 
 model InviteRequest {
-  id              String       @id @default(cuid())
-  email           String       @unique
-  name            String
-  motivation      String       @db.Text
-  trialSessionId  String?      // Optional link to trial session
-  status          InviteStatus @default(PENDING)
-  isDirect        Boolean      @default(false) // Admin direct invite
+  id             String       @id @default(cuid())
+  email          String       @unique
+  name           String
+  motivation     String       @db.Text
+  trialSessionId String? // Optional link to trial session
+  status         InviteStatus @default(PENDING)
+  isDirect       Boolean      @default(false) // Admin direct invite
 
   // Approval/rejection details
   reviewedAt      DateTime?
-  reviewedBy      String?      // Admin user ID
+  reviewedBy      String? // Admin user ID
   rejectionReason String?
 
   // Generated credentials (set on approval)
-  generatedUsername String?    @unique
-  inviteToken       String?    @unique  // One-time token for first login
+  generatedUsername String?   @unique
+  inviteToken       String?   @unique // One-time token for first login
   inviteExpiresAt   DateTime?
 
   // First login tracking
-  firstLoginAt    DateTime?
-  migratedData    Boolean   @default(false) // Did user migrate trial data?
-  createdUserId   String?   @unique         // Reference to created User
+  firstLoginAt  DateTime?
+  migratedData  Boolean   @default(false) // Did user migrate trial data?
+  createdUserId String?   @unique // Reference to created User
 
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([status])
   @@index([isDirect])

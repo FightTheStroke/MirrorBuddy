@@ -38,6 +38,8 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 **Invite System** (`src/lib/invite/`): Admin-approved beta access, email notifications - ADR 0057
 
+**Tier System** (`src/lib/tier/`): Three-tier subscription model (Trial/Base/Pro) with feature limits, usage tracking, and graceful fallbacks - ADR 0065. **TierService**: Determines effective user tier, validates subscriptions, caches configs. **Types** (`src/types/tier-types.ts`): TierName, TierLimits, TierFeatureConfig, TierPricing. **Admin UI** (`src/app/admin/tiers/`): Tier management, limits editor, analytics, conversion funnel, audit logs.
+
 **Auth** (`src/lib/auth/`): Session-based with `validateSessionAuth()`, admin via `ADMIN_EMAIL`
 
 **Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`

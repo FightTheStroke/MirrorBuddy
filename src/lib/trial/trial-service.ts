@@ -1,13 +1,17 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
+import { TierService } from "@/lib/tier/tier-service";
 
 // Available coaches from src/data/coaches/
 const COACHES = ["melissa", "laura"];
 
 /**
- * Trial limits
+ * Trial limits (DEPRECATED - for backward compatibility only)
  *
- * NOTE: Previously included MAESTRI_COUNT limit (3 maestri).
+ * NOTE: These are static fallback values. The actual limits are fetched from TierService.
+ * Use getTierLimitsForTrial() instead for runtime limit checking.
+ *
+ * Previously included MAESTRI_COUNT limit (3 maestri).
  * Removed because it didn't work well - users should be able to talk to any maestro.
  * Time-based limits (voice, chat, tools) are more effective.
  */
@@ -17,6 +21,55 @@ export const TRIAL_LIMITS = {
   TOOLS: 10, // 10 tool uses (mindmap, summary, etc.)
   DOCS: 1, // 1 document upload
 } as const;
+
+/**
+ * Internal cache for tier limits to avoid repeated DB calls
+ */
+let cachedLimits: {
+  chat: number;
+  voiceSeconds: number;
+  tools: number;
+  docs: number;
+} | null = null;
+
+/**
+ * Get trial limits from TierService
+ * Fetches limits for anonymous users (trial tier)
+ */
+async function getTierLimitsForTrial(): Promise<{
+  chat: number;
+  voiceSeconds: number;
+  tools: number;
+  docs: number;
+}> {
+  // Return cached limits if available
+  if (cachedLimits) {
+    return cachedLimits;
+  }
+
+  try {
+    const tierService = new TierService();
+    const limits = await tierService.getLimitsForUser(null); // null = anonymous/trial user
+
+    cachedLimits = {
+      chat: limits.dailyMessages,
+      voiceSeconds: limits.dailyVoiceMinutes * 60, // Convert minutes to seconds
+      tools: limits.dailyTools,
+      docs: limits.maxDocuments,
+    };
+
+    return cachedLimits;
+  } catch (error) {
+    // Fallback to hardcoded limits if TierService fails
+    console.error("Failed to fetch trial limits from TierService:", error);
+    return {
+      chat: TRIAL_LIMITS.CHAT,
+      voiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+      tools: TRIAL_LIMITS.TOOLS,
+      docs: TRIAL_LIMITS.DOCS,
+    };
+  }
+}
 
 function hashIp(ip: string): string {
   return crypto.createHash("sha256").update(ip).digest("hex");
@@ -76,30 +129,33 @@ export async function checkTrialLimits(
     return { allowed: false, reason: "Session not found" };
   }
 
+  // Fetch limits from TierService
+  const limits = await getTierLimitsForTrial();
+
   switch (action) {
     case "chat":
-      if (session.chatsUsed >= TRIAL_LIMITS.CHAT) {
+      if (session.chatsUsed >= limits.chat) {
         return {
           allowed: false,
-          reason: `Limite chat raggiunto (${TRIAL_LIMITS.CHAT})`,
+          reason: `Limite chat raggiunto (${limits.chat})`,
         };
       }
       break;
 
     case "doc":
-      if (session.docsUsed >= TRIAL_LIMITS.DOCS) {
+      if (session.docsUsed >= limits.docs) {
         return {
           allowed: false,
-          reason: `Limite documenti raggiunto (${TRIAL_LIMITS.DOCS})`,
+          reason: `Limite documenti raggiunto (${limits.docs})`,
         };
       }
       break;
 
     case "tool":
-      if (session.toolsUsed >= TRIAL_LIMITS.TOOLS) {
+      if (session.toolsUsed >= limits.tools) {
         return {
           allowed: false,
-          reason: `Limite strumenti raggiunto (${TRIAL_LIMITS.TOOLS})`,
+          reason: `Limite strumenti raggiunto (${limits.tools})`,
         };
       }
       break;
@@ -107,12 +163,11 @@ export async function checkTrialLimits(
     case "voice":
       // Check if adding these seconds would exceed limit
       const newTotal = session.voiceSecondsUsed + (voiceSeconds || 0);
-      if (newTotal > TRIAL_LIMITS.VOICE_SECONDS) {
-        const remainingSeconds =
-          TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed;
+      if (newTotal > limits.voiceSeconds) {
+        const remainingSeconds = limits.voiceSeconds - session.voiceSecondsUsed;
         return {
           allowed: false,
-          reason: `Limite voce raggiunto (${Math.floor(TRIAL_LIMITS.VOICE_SECONDS / 60)} minuti). Rimangono ${remainingSeconds} secondi.`,
+          reason: `Limite voce raggiunto (${Math.floor(limits.voiceSeconds / 60)} minuti). Rimangono ${remainingSeconds} secondi.`,
         };
       }
       break;
@@ -165,6 +220,30 @@ export async function addVoiceSeconds(
   return session.voiceSecondsUsed;
 }
 
+/**
+ * Update email for trial session
+ * @param sessionId Trial session ID
+ * @param email User email address
+ * @returns Updated trial session
+ */
+export async function updateTrialEmail(sessionId: string, email: string) {
+  const session = await prisma.trialSession.findUnique({
+    where: { id: sessionId },
+  });
+
+  if (!session) {
+    throw new Error("Session not found");
+  }
+
+  return prisma.trialSession.update({
+    where: { id: sessionId },
+    data: {
+      email,
+      emailCollectedAt: new Date(),
+    },
+  });
+}
+
 export async function getTrialStatus(sessionId: string) {
   const session = await prisma.trialSession.findUnique({
     where: { id: sessionId },
@@ -174,32 +253,35 @@ export async function getTrialStatus(sessionId: string) {
     return null;
   }
 
+  // Fetch limits from TierService
+  const limits = await getTierLimitsForTrial();
+
   const voiceSecondsRemaining = Math.max(
     0,
-    TRIAL_LIMITS.VOICE_SECONDS - session.voiceSecondsUsed,
+    limits.voiceSeconds - session.voiceSecondsUsed,
   );
 
   return {
     // Chat
-    chatsRemaining: Math.max(0, TRIAL_LIMITS.CHAT - session.chatsUsed),
+    chatsRemaining: Math.max(0, limits.chat - session.chatsUsed),
     totalChatsUsed: session.chatsUsed,
-    maxChats: TRIAL_LIMITS.CHAT,
+    maxChats: limits.chat,
 
     // Voice
     voiceSecondsRemaining,
     voiceSecondsUsed: session.voiceSecondsUsed,
-    maxVoiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
+    maxVoiceSeconds: limits.voiceSeconds,
     voiceMinutesRemaining: Math.floor(voiceSecondsRemaining / 60),
 
     // Tools
-    toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
+    toolsRemaining: Math.max(0, limits.tools - session.toolsUsed),
     totalToolsUsed: session.toolsUsed,
-    maxTools: TRIAL_LIMITS.TOOLS,
+    maxTools: limits.tools,
 
     // Docs
-    docsRemaining: Math.max(0, TRIAL_LIMITS.DOCS - session.docsUsed),
+    docsRemaining: Math.max(0, limits.docs - session.docsUsed),
     totalDocsUsed: session.docsUsed,
-    maxDocs: TRIAL_LIMITS.DOCS,
+    maxDocs: limits.docs,
 
     // Assigned coach (maestri restrictions removed - users can talk to any maestro)
     assignedCoach: session.assignedCoach,

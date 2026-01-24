@@ -4,23 +4,23 @@
 /// Stores maestro roster assignments and optional coach pairing for trial users.
 
 model TrialSession {
-  id               String   @id @default(uuid())
-  ipHash           String   // SHA256 of IP address
-  visitorId        String   // Cookie visitor ID
-  chatsUsed        Int      @default(0)
-  docsUsed         Int      @default(0)
-  voiceSecondsUsed Int      @default(0) // Total voice seconds (max 300 = 5 min)
-  toolsUsed        Int      @default(0) // Total tool calls (max 10)
-  assignedMaestri  String   @default("[]") // JSON array of 3 maestro IDs
-  assignedCoach    String?  // Single coach ID
-  abuseScore       Int      @default(0)
-  email            String?  // Optional email for nurturing (F-01)
+  id               String    @id @default(uuid())
+  ipHash           String // SHA256 of IP address
+  visitorId        String // Cookie visitor ID
+  chatsUsed        Int       @default(0)
+  docsUsed         Int       @default(0)
+  voiceSecondsUsed Int       @default(0) // Total voice seconds (max 300 = 5 min)
+  toolsUsed        Int       @default(0) // Total tool calls (max 10)
+  assignedMaestri  String    @default("[]") // JSON array of 3 maestro IDs
+  assignedCoach    String? // Single coach ID
+  abuseScore       Int       @default(0)
+  email            String? // Optional email for nurturing (F-01)
   emailCollectedAt DateTime? // When email was provided
-  createdAt        DateTime @default(now())
-  lastActivityAt   DateTime @updatedAt
+  createdAt        DateTime  @default(now())
+  lastActivityAt   DateTime  @updatedAt
 
+  @@unique([ipHash, visitorId])
   @@index([ipHash])
   @@index([visitorId])
   @@index([email]) // Index for email lookups (F-01)
-  @@unique([ipHash, visitorId])
 }

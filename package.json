@@ -50,6 +50,7 @@
     "prepare": "husky",
     "postinstall": "prisma generate",
     "seed:admin": "tsx scripts/seed-admin.ts",
+    "seed:tiers": "tsx prisma/seed-tiers.ts",
     "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
   },
   "overrides": {
@@ -142,6 +143,7 @@
     "husky": "^9.1.7",
     "jsdom": "^27.4.0",
     "lint-staged": "^16.2.7",
+    "magicast": "^0.3.5",
     "playwright": "^1.57.0",
     "prettier": "^3.5.0",
     "prisma": "^7.2.0",

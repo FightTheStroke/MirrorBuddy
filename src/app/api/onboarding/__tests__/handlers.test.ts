@@ -1,0 +1,224 @@
+/**
+ * Tests for POST /api/onboarding - User creation with Base tier subscription
+ * Plan 073: T4-07 - Update registration flow: default to Base tier
+ */
+
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { POST } from "../handlers";
+import { NextRequest } from "next/server";
+
+// Mock Prisma and helper
+const mockUserCreate = vi.fn();
+const mockOnboardingStateUpsert = vi.fn();
+const mockProfileUpsert = vi.fn();
+const mockAssignBaseTierToNewUser = vi.fn();
+
+vi.mock("@/lib/db", () => ({
+  prisma: {
+    user: {
+      create: () => mockUserCreate(),
+    },
+    onboardingState: {
+      upsert: () => mockOnboardingStateUpsert(),
+    },
+    profile: {
+      upsert: () => mockProfileUpsert(),
+    },
+  },
+  isDatabaseNotInitialized: vi.fn(() => false),
+}));
+
+vi.mock("@/lib/tier/registration-helper", () => ({
+  assignBaseTierToNewUser: (userId: string) =>
+    mockAssignBaseTierToNewUser(userId),
+}));
+
+// Mock dependencies
+vi.mock("@/lib/auth/session-auth", () => ({
+  validateAuth: vi.fn(),
+}));
+
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn(() => true),
+}));
+
+vi.mock("@/lib/auth/cookie-signing", () => ({
+  signCookieValue: vi.fn(() => ({ signed: "signed-value", raw: "raw-value" })),
+}));
+
+vi.mock("next/headers", () => ({
+  cookies: vi.fn(() =>
+    Promise.resolve({
+      set: vi.fn(),
+    }),
+  ),
+}));
+
+vi.mock("@/lib/helpers/publish-admin-counts", () => ({
+  calculateAndPublishAdminCounts: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock("@/lib/compliance/coppa-service", () => ({
+  COPPA_AGE_THRESHOLD: 13,
+  requestParentalConsent: vi.fn(() =>
+    Promise.resolve({
+      emailSent: true,
+      expiresAt: new Date(),
+    }),
+  ),
+  checkCoppaStatus: vi.fn(() =>
+    Promise.resolve({
+      consentGranted: false,
+      consentPending: false,
+    }),
+  ),
+}));
+
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+  },
+}));
+
+describe("POST /api/onboarding - Base tier assignment on registration", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("should create UserSubscription with Base tier when new user registers via onboarding", async () => {
+    const { validateAuth } = await import("@/lib/auth/session-auth");
+    vi.mocked(validateAuth).mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
+
+    const mockUser = {
+      id: "user-123",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockUserCreate.mockResolvedValue(mockUser);
+    mockAssignBaseTierToNewUser.mockResolvedValue({
+      id: "sub-123",
+      tierId: "tier-base-123",
+    });
+    mockOnboardingStateUpsert.mockResolvedValue({
+      userId: mockUser.id,
+      hasCompletedOnboarding: false,
+      currentStep: "welcome",
+    });
+
+    const mockRequest = {
+      headers: new Headers({ "x-csrf-token": "valid-token" }),
+    } as NextRequest;
+
+    const requestData = {
+      data: {
+        name: "Test User",
+        age: 15,
+        schoolLevel: "superiore" as const,
+      },
+      hasCompletedOnboarding: false,
+      currentStep: "welcome" as const,
+      isReplayMode: false,
+    };
+
+    // Call the endpoint
+    const response = await POST(mockRequest, requestData);
+    const data = await response.json();
+
+    expect(data.success).toBe(true);
+    expect(mockUserCreate).toHaveBeenCalled();
+    expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
+  });
+
+  it("should not create duplicate subscription for existing user", async () => {
+    const { validateAuth } = await import("@/lib/auth/session-auth");
+
+    const mockUser = {
+      id: "user-existing",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    vi.mocked(validateAuth).mockResolvedValue({
+      authenticated: true,
+      userId: mockUser.id,
+    });
+
+    mockOnboardingStateUpsert.mockResolvedValue({
+      userId: mockUser.id,
+      hasCompletedOnboarding: false,
+      currentStep: "profile",
+    });
+
+    const mockRequest = {
+      headers: new Headers({ "x-csrf-token": "valid-token" }),
+    } as NextRequest;
+
+    const requestData = {
+      data: {
+        name: "Existing User",
+        age: 15,
+        schoolLevel: "superiore" as const,
+      },
+      hasCompletedOnboarding: false,
+      currentStep: "profile" as const,
+      isReplayMode: false,
+    };
+
+    await POST(mockRequest, requestData);
+
+    // Verify assignBaseTier was not called for existing users
+    expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
+  });
+
+  it("should handle missing Base tier gracefully", async () => {
+    const { validateAuth } = await import("@/lib/auth/session-auth");
+    vi.mocked(validateAuth).mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
+
+    const mockUser = {
+      id: "user-456",
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    mockUserCreate.mockResolvedValue(mockUser);
+    mockAssignBaseTierToNewUser.mockResolvedValue(null); // Null indicates tier assignment failed
+    mockOnboardingStateUpsert.mockResolvedValue({
+      userId: mockUser.id,
+      hasCompletedOnboarding: false,
+      currentStep: "welcome",
+    });
+
+    const mockRequest = {
+      headers: new Headers({ "x-csrf-token": "valid-token" }),
+    } as NextRequest;
+
+    const requestData = {
+      data: {
+        name: "Test User",
+        age: 15,
+        schoolLevel: "superiore" as const,
+      },
+      hasCompletedOnboarding: false,
+      currentStep: "welcome" as const,
+      isReplayMode: false,
+    };
+
+    // Should not crash
+    const response = await POST(mockRequest, requestData);
+    const data = await response.json();
+    expect(data.success).toBe(true);
+
+    // Verify user was created even without subscription
+    expect(mockUserCreate).toHaveBeenCalled();
+    expect(mockAssignBaseTierToNewUser).toHaveBeenCalledWith(mockUser.id);
+  });
+});
