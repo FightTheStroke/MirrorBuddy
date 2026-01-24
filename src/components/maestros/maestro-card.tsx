@@ -1,34 +1,47 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { Play } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { subjectIcons } from '@/data';
-import { QuoteRotator } from './quote-rotator';
-import type { Maestro } from '@/types';
+import Image from "next/image";
+import { Play } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { subjectIcons } from "@/data";
+import { QuoteRotator } from "./quote-rotator";
+import { TierBadge } from "@/components/tier";
+import type { Maestro } from "@/types";
+import type { TierName } from "@/types/tier-types";
 
 interface MaestroCardProps {
   maestro: Maestro;
   onSelect: (maestro: Maestro) => void;
   isSelected?: boolean;
   index?: number;
+  /**
+   * Optional tier level to display on the card
+   * If provided, shows a badge indicating which tier this maestro belongs to
+   */
+  tier?: TierName;
 }
 
-export function MaestroCard({ maestro, onSelect, isSelected = false, index }: MaestroCardProps) {
+export function MaestroCard({
+  maestro,
+  onSelect,
+  isSelected = false,
+  index,
+  tier,
+}: MaestroCardProps) {
   return (
     <button
       onClick={() => onSelect(maestro)}
       className={cn(
-        'relative w-full p-4 rounded-xl text-left transition-all duration-200',
-        'bg-white dark:bg-slate-800/80',
-        'border border-slate-200 dark:border-slate-700/50',
-        'hover:shadow-lg hover:border-transparent',
-        'focus:outline-none focus:ring-2 focus:ring-offset-2',
-        isSelected && 'ring-2 ring-offset-2'
+        "relative w-full p-4 rounded-xl text-left transition-all duration-200",
+        "bg-white dark:bg-slate-800/80",
+        "border border-slate-200 dark:border-slate-700/50",
+        "hover:shadow-lg hover:border-transparent",
+        "focus:outline-none focus:ring-2 focus:ring-offset-2",
+        isSelected && "ring-2 ring-offset-2",
       )}
       style={{
-        ['--tw-ring-color' as string]: maestro.color,
-        ['--tw-ring-offset-color' as string]: 'var(--background)',
+        ["--tw-ring-color" as string]: maestro.color,
+        ["--tw-ring-offset-color" as string]: "var(--background)",
       }}
       aria-label={`Studia con il Professore ${maestro.name}`}
     >
@@ -36,7 +49,7 @@ export function MaestroCard({ maestro, onSelect, isSelected = false, index }: Ma
         {/* Avatar - compact 56x56 */}
         <div
           className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0 ring-2"
-          style={{ ['--tw-ring-color' as string]: maestro.color }}
+          style={{ ["--tw-ring-color" as string]: maestro.color }}
         >
           <Image
             src={maestro.avatar}
@@ -54,7 +67,10 @@ export function MaestroCard({ maestro, onSelect, isSelected = false, index }: Ma
             <h3 className="font-semibold text-slate-900 dark:text-white truncate">
               {maestro.name}
             </h3>
-            <span className="text-base flex-shrink-0">{subjectIcons[maestro.subject]}</span>
+            <span className="text-base flex-shrink-0">
+              {subjectIcons[maestro.subject]}
+            </span>
+            {tier && <TierBadge tier={tier} className="flex-shrink-0" />}
           </div>
           <p className="text-xs text-slate-500 dark:text-slate-400 mb-1.5 line-clamp-1">
             {maestro.specialty}
@@ -65,7 +81,10 @@ export function MaestroCard({ maestro, onSelect, isSelected = false, index }: Ma
         {/* Play indicator */}
         <div
           className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          style={{ backgroundColor: `${maestro.color}20`, color: maestro.color }}
+          style={{
+            backgroundColor: `${maestro.color}20`,
+            color: maestro.color,
+          }}
         >
           <Play className="w-4 h-4 ml-0.5" />
         </div>

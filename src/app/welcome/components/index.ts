@@ -5,3 +5,4 @@ export { MaestriStep } from "./maestri-step";
 export { ReadyStep } from "./ready-step";
 export { TrialLimitsBanner } from "./trial-limits-banner";
 export { WelcomeFooter } from "./welcome-footer";
+export { TierComparisonSection } from "./tier-comparison-section";
