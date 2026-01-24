@@ -198,5 +198,26 @@ export type {
 // Greeting types
 export type { GreetingContext, GreetingGenerator } from "./greeting";
 
+// Tier & Subscription types
+export type {
+  TierName,
+  SubscriptionStatus,
+  FeatureKey,
+  UsageType,
+  TierLimits,
+  TierAIModels,
+  TierFeatureConfig,
+  TierPricing,
+} from "./tier-types";
+
+export type {
+  UserSubscription,
+  SubscriptionUsage,
+  TierChangeRequest,
+  TrialSessionLimits,
+} from "./tier-subscription";
+
+export type { TierDefinition, EffectiveTier } from "./tier-definition";
+
 // Language types (re-exported from API types for convenience)
 export type { SupportedLanguage } from "@/app/api/chat/types";

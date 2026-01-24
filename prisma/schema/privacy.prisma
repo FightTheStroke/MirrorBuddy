@@ -23,8 +23,8 @@ model CoppaConsent {
   consentDeniedAt       DateTime?
 
   // Audit trail
-  parentIpAddress String? // IP of parent when granting consent
-  verificationMethod String @default("email") // email, in_person, phone
+  parentIpAddress    String? // IP of parent when granting consent
+  verificationMethod String  @default("email") // email, in_person, phone
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -77,16 +77,16 @@ model DeletedUserBackup {
 // F-13: Terms of Service Acceptance Tracking
 // Tracks user acceptance of ToS with versioning and audit trail
 model TosAcceptance {
-  id        String   @id @default(cuid())
-  userId    String
-  version   String   // e.g., "1.0", "1.1", "2.0"
+  id         String   @id @default(cuid())
+  userId     String
+  version    String // e.g., "1.0", "1.1", "2.0"
   acceptedAt DateTime @default(now())
 
   // Audit trail for compliance
-  ipAddress String?  // Last IP segment only for privacy
-  userAgent String?  // Browser/client info
+  ipAddress String? // Last IP segment only for privacy
+  userAgent String? // Browser/client info
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Ensure one record per user per version
   @@unique([userId, version])

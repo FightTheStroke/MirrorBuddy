@@ -31,6 +31,7 @@ const EXPECTED_SCHEMA_FILES = [
   "compliance.prisma", // Compliance audit logging (AI Act, L.132)
   "trial.prisma", // TrialSession (anonymous trial mode)
   "invite.prisma", // InviteRequest (beta invite system)
+  "tier.prisma", // TierDefinition (subscription tiers)
 ];
 
 // Expected models that should be present across all schema files
@@ -100,6 +101,10 @@ const EXPECTED_MODELS = [
   "TrialSession",
   // invite.prisma
   "InviteRequest",
+  // tier.prisma
+  "TierDefinition",
+  "UserSubscription",
+  "TierAuditLog",
 ];
 
 describe("Prisma Schema Split", () => {
@@ -211,6 +216,21 @@ describe("Prisma Schema Split", () => {
     it("should have UserPrivacyPreferences model in privacy.prisma", () => {
       const content = readFileSync(join(SCHEMA_DIR, "privacy.prisma"), "utf-8");
       expect(content).toContain("model UserPrivacyPreferences {");
+    });
+
+    it("should have TierDefinition model in tier.prisma", () => {
+      const content = readFileSync(join(SCHEMA_DIR, "tier.prisma"), "utf-8");
+      expect(content).toContain("model TierDefinition {");
+    });
+
+    it("should have UserSubscription model in tier.prisma", () => {
+      const content = readFileSync(join(SCHEMA_DIR, "tier.prisma"), "utf-8");
+      expect(content).toContain("model UserSubscription {");
+    });
+
+    it("should have TierAuditLog model in tier.prisma", () => {
+      const content = readFileSync(join(SCHEMA_DIR, "tier.prisma"), "utf-8");
+      expect(content).toContain("model TierAuditLog {");
     });
   });
 });

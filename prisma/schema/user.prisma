@@ -16,11 +16,11 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Plan 052: Internal auth (username/password)
-  username           String?  @unique // null for legacy/cookie-only users
-  email              String?  @unique // for password reset notifications
-  passwordHash       String?           // bcrypt hash, null for legacy users
-  mustChangePassword Boolean  @default(false)
-  disabled           Boolean  @default(false)
+  username           String? @unique // null for legacy/cookie-only users
+  email              String? @unique // for password reset notifications
+  passwordHash       String? // bcrypt hash, null for legacy users
+  mustChangePassword Boolean @default(false)
+  disabled           Boolean @default(false)
 
   // F-17: Test data isolation
   isTestData Boolean @default(false)
@@ -89,7 +89,7 @@ model User {
 
   // Compliance & Audit (F-08)
   auditEntriesAsSubject ComplianceAuditEntry[]
-  auditEntriesAsAdmin    ComplianceAuditEntry[] @relation("AdminAuditLog")
+  auditEntriesAsAdmin   ComplianceAuditEntry[] @relation("AdminAuditLog")
 
   // Tier Subscription System (ADR 0071)
   subscription UserSubscription?
