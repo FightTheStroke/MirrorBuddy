@@ -68,7 +68,7 @@ Vercel KV is a managed Redis service integrated with Vercel deployments.
 
 ```
 Provider: Upstash (serverless Redis)
-URL: https://special-midge-39287.upstash.io
+URL: https://<your-instance>.upstash.io
 Auth: REST API token
 Node Package: @upstash/redis v1.36.1, @upstash/ratelimit v2.0.8
 ```
