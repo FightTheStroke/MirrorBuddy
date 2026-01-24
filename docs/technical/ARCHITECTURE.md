@@ -82,17 +82,17 @@ MirrorBuddy is a Next.js 16 application providing AI tutoring for K-12 students 
 
 ### Tech Stack
 
-| Layer | Technology |
-|-------|------------|
-| Frontend | Next.js 16.1.1, React 19.2.3, TypeScript 5 |
-| Styling | Tailwind CSS 4, Radix UI |
-| State | Zustand 5.0.9 (no persist, API-synced) |
-| Database | Prisma + PostgreSQL 17 + pgvector (ADR 0028) |
-| AI | Azure OpenAI (primary), Ollama (fallback) |
-| Voice | Azure Realtime API (WebRTC) |
-| Audio | Web Audio API (procedural generation) |
-| Observability | Grafana Cloud + Prometheus push (ADR 0047) |
-| RAG | pgvector semantic search (ADR 0033) |
+| Layer         | Technology                                                          |
+| ------------- | ------------------------------------------------------------------- |
+| Frontend      | Next.js 16.1.1, React 19.2.3, TypeScript 5                          |
+| Styling       | Tailwind CSS 4, Radix UI                                            |
+| State         | Zustand 5.0.9 (no persist, API-synced)                              |
+| Database      | Prisma + PostgreSQL 17 + pgvector (ADR 0028)                        |
+| AI            | Azure OpenAI (primary), Ollama (fallback)                           |
+| Voice         | Azure Realtime API (WebRTC)                                         |
+| Audio         | Web Audio API (procedural generation)                               |
+| Observability | Grafana Cloud + Prometheus push (ADR 0047), Sentry (error tracking) |
+| RAG           | pgvector semantic search (ADR 0033)                                 |
 
 ### Directory Structure
 
@@ -176,30 +176,31 @@ flowchart LR
 
 ### 20 Maestri (18 Teaching + 2 Amici)
 
-| Maestro | Subject | Type | Voice |
-|---------|---------|------|-------|
-| Euclide | Mathematics | Maestro | coral |
-| Marie Curie | Chemistry | Maestro | shimmer |
-| Richard Feynman | Physics | Maestro | echo |
-| Galileo Galilei | Astronomy | Maestro | verse |
-| Charles Darwin | Biology/Sciences | Maestro | ballad |
-| Alessandro Manzoni | Italian Literature | Maestro | sage |
-| William Shakespeare | English | Maestro | ash |
-| Erodoto | History | Maestro | ballad |
-| Alexander von Humboldt | Geography | Maestro | echo |
-| Leonardo da Vinci | Art | Maestro | coral |
-| Wolfgang Amadeus Mozart | Music | Maestro | verse |
-| Ada Lovelace | Computer Science | Maestro | shimmer |
-| Adam Smith | Economics | Maestro | echo |
-| Socrate | Philosophy | Maestro | sage |
-| Marco Tullio Cicerone | Civic Education | Maestro | ash |
-| Ippocrate | Health | Maestro | coral |
-| Chris | Physical Education | Maestro | alloy |
-| Omero | Storytelling | Maestro | verse |
-| Alex Pina | Spanish | Maestro | coral |
-| **Mascetti** | Supercazzola | **Amico** | ballad |
+| Maestro                 | Subject            | Type      | Voice   |
+| ----------------------- | ------------------ | --------- | ------- |
+| Euclide                 | Mathematics        | Maestro   | coral   |
+| Marie Curie             | Chemistry          | Maestro   | shimmer |
+| Richard Feynman         | Physics            | Maestro   | echo    |
+| Galileo Galilei         | Astronomy          | Maestro   | verse   |
+| Charles Darwin          | Biology/Sciences   | Maestro   | ballad  |
+| Alessandro Manzoni      | Italian Literature | Maestro   | sage    |
+| William Shakespeare     | English            | Maestro   | ash     |
+| Erodoto                 | History            | Maestro   | ballad  |
+| Alexander von Humboldt  | Geography          | Maestro   | echo    |
+| Leonardo da Vinci       | Art                | Maestro   | coral   |
+| Wolfgang Amadeus Mozart | Music              | Maestro   | verse   |
+| Ada Lovelace            | Computer Science   | Maestro   | shimmer |
+| Adam Smith              | Economics          | Maestro   | echo    |
+| Socrate                 | Philosophy         | Maestro   | sage    |
+| Marco Tullio Cicerone   | Civic Education    | Maestro   | ash     |
+| Ippocrate               | Health             | Maestro   | coral   |
+| Chris                   | Physical Education | Maestro   | alloy   |
+| Omero                   | Storytelling       | Maestro   | verse   |
+| Alex Pina               | Spanish            | Maestro   | coral   |
+| **Mascetti**            | Supercazzola       | **Amico** | ballad  |
 
 **Two Character Types**:
+
 - **Maestro**: Has tools, earns XP, teaches (variable character intensity)
 - **Amico**: No tools, `excludeFromGamification: true`, 100% character always
 
@@ -207,25 +208,25 @@ flowchart LR
 
 ### 5 Learning Coaches
 
-| Coach | Personality | Voice | Best For |
-|-------|-------------|-------|----------|
+| Coach   | Personality              | Voice   | Best For                    |
+| ------- | ------------------------ | ------- | --------------------------- |
 | Melissa | Enthusiastic, young (27) | shimmer | Default, energetic students |
-| Roberto | Calm, reassuring (28) | echo | Anxious students |
-| Chiara | Organized, academic (24) | coral | Structure-seekers |
-| Andrea | Sporty, energetic (26) | sage | ADHD, movement needs |
-| Favij | Gaming, digital (29) | ballad | Tech-savvy students |
+| Roberto | Calm, reassuring (28)    | echo    | Anxious students            |
+| Chiara  | Organized, academic (24) | coral   | Structure-seekers           |
+| Andrea  | Sporty, energetic (26)   | sage    | ADHD, movement needs        |
+| Favij   | Gaming, digital (29)     | ballad  | Tech-savvy students         |
 
 **Location**: `src/data/support-teachers.ts`
 
 ### 5 Peer Buddies (MirrorBuddy v2.0)
 
-| Buddy | Personality | Voice |
-|-------|-------------|-------|
-| Mario | Friendly, ironic | echo |
-| Noemi | Empathetic, warm | shimmer |
-| Enea | Playful, cheerful | alloy |
-| Bruno | Thoughtful, introspective | sage |
-| Sofia | Creative, artistic | coral |
+| Buddy | Personality               | Voice   |
+| ----- | ------------------------- | ------- |
+| Mario | Friendly, ironic          | echo    |
+| Noemi | Empathetic, warm          | shimmer |
+| Enea  | Playful, cheerful         | alloy   |
+| Bruno | Thoughtful, introspective | sage    |
+| Sofia | Creative, artistic        | coral   |
 
 **MirrorBuddy Feature**: Buddies dynamically mirror the student's learning differences (dyslexia, ADHD, autism, etc.) so students feel understood.
 
@@ -237,15 +238,15 @@ flowchart LR
 
 ### Tool Types
 
-| Tool | Handler | Description |
-|------|---------|-------------|
-| Flashcard | `flashcard-handler.ts` | FSRS-5 spaced repetition |
-| Quiz | `quiz-handler.ts` | Multiple choice with feedback |
-| MindMap | `mindmap-handler.ts` | MarkMap visualization |
-| Summary | `summary-handler.ts` | AI-generated summaries |
-| Demo | `demo-handler.ts` | Interactive simulations |
-| Diagram | `diagram-handler.ts` | Mermaid diagrams |
-| Timeline | `timeline-handler.ts` | Historical timelines |
+| Tool      | Handler                | Description                   |
+| --------- | ---------------------- | ----------------------------- |
+| Flashcard | `flashcard-handler.ts` | FSRS-5 spaced repetition      |
+| Quiz      | `quiz-handler.ts`      | Multiple choice with feedback |
+| MindMap   | `mindmap-handler.ts`   | MarkMap visualization         |
+| Summary   | `summary-handler.ts`   | AI-generated summaries        |
+| Demo      | `demo-handler.ts`      | Interactive simulations       |
+| Diagram   | `diagram-handler.ts`   | Mermaid diagrams              |
+| Timeline  | `timeline-handler.ts`  | Historical timelines          |
 
 **Location**: `src/lib/tools/handlers/`
 
@@ -338,15 +339,15 @@ Pomodoro completed:   15 XP
 
 ### 7 Accessibility Profiles
 
-| Profile | Key Adaptations |
-|---------|-----------------|
-| Dyslexia | OpenDyslexic font, letter/line spacing |
-| ADHD | Distraction-free, Pomodoro, break reminders |
-| Visual | High contrast, large text, TTS |
-| Motor | Keyboard navigation, reduced motion |
-| Autism | Reduced motion, sensory-friendly |
-| Auditory | Visual cues, large text emphasis |
-| Cerebral Palsy | Keyboard nav, TTS, large text |
+| Profile        | Key Adaptations                             |
+| -------------- | ------------------------------------------- |
+| Dyslexia       | OpenDyslexic font, letter/line spacing      |
+| ADHD           | Distraction-free, Pomodoro, break reminders |
+| Visual         | High contrast, large text, TTS              |
+| Motor          | Keyboard navigation, reduced motion         |
+| Autism         | Reduced motion, sensory-friendly            |
+| Auditory       | Visual cues, large text emphasis            |
+| Cerebral Palsy | Keyboard nav, TTS, large text               |
 
 ### Accessibility Features
 
@@ -364,15 +365,15 @@ Pomodoro completed:   15 XP
 The accessibility system supports separate settings for parents and students:
 
 ```typescript
-type AccessibilityContext = 'student' | 'parent';
+type AccessibilityContext = "student" | "parent";
 
 interface AccessibilityStore {
-  settings: AccessibilitySettings;        // Student settings
-  parentSettings: AccessibilitySettings;  // Parent settings
-  currentContext: AccessibilityContext;   // Active context
+  settings: AccessibilitySettings; // Student settings
+  parentSettings: AccessibilitySettings; // Parent settings
+  currentContext: AccessibilityContext; // Active context
 
-  setContext: (context) => void;          // Switch context
-  getActiveSettings: () => Settings;      // Get current settings
+  setContext: (context) => void; // Switch context
+  getActiveSettings: () => Settings; // Get current settings
   updateParentSettings: (updates) => void; // Update parent settings
 }
 ```
@@ -400,6 +401,7 @@ Barge-in: Interrupt while speaking
 ```
 
 **Features**:
+
 - Real-time transcription
 - Tool execution during voice
 - Audio level monitoring
@@ -428,6 +430,7 @@ creative:    binaural_theta + forest
 ```
 
 **Pomodoro Integration**:
+
 - Auto-start with Pomodoro
 - Pause during breaks
 - Auto-duck during voice/TTS
@@ -471,17 +474,18 @@ flowchart LR
     Audio -.-> |in-memory| Audio
 ```
 
-| Store | Purpose | Sync Endpoint |
-|-------|---------|---------------|
-| useSettingsStore | Theme, AI provider, profile | `/api/user/settings`, `/api/user/profile` |
-| useProgressStore | XP, levels, streaks | `/api/progress` |
-| useVoiceSessionStore | Voice connection state | In-memory only |
-| useConversationStore | Chat history | `/api/conversations` |
-| usePomodoroStore | Timer state | `/api/progress` (on complete) |
-| useAmbientAudioStore | Audio playback | In-memory only |
-| useNotificationStore | Notifications | `/api/notifications` |
+| Store                | Purpose                     | Sync Endpoint                             |
+| -------------------- | --------------------------- | ----------------------------------------- |
+| useSettingsStore     | Theme, AI provider, profile | `/api/user/settings`, `/api/user/profile` |
+| useProgressStore     | XP, levels, streaks         | `/api/progress`                           |
+| useVoiceSessionStore | Voice connection state      | In-memory only                            |
+| useConversationStore | Chat history                | `/api/conversations`                      |
+| usePomodoroStore     | Timer state                 | `/api/progress` (on complete)             |
+| useAmbientAudioStore | Audio playback              | In-memory only                            |
+| useNotificationStore | Notifications               | `/api/notifications`                      |
 
 **Sync Pattern**:
+
 ```typescript
 // Optimistic updates with batched sync
 store.update(state) → UI updates immediately
@@ -557,25 +561,26 @@ erDiagram
 
 ### Categories
 
-| Category | Routes | Description |
-|----------|--------|-------------|
-| User | `/api/user/*` | Settings, profile, data export |
-| Progress | `/api/progress/*` | XP, sessions, autonomy |
-| Flashcards | `/api/flashcards/*` | FSRS state sync |
-| Conversations | `/api/conversations/*` | Chat history, messages |
-| Tools | `/api/tools/*` | Tool creation, SSE streaming |
-| Voice | `/api/realtime/*` | Token, status |
-| Notifications | `/api/notifications/*`, `/api/push/*` | In-app, PWA push |
-| Parent | `/api/parent-professor/*` | Dashboard, GDPR consent |
-| Telemetry | `/api/telemetry/*` | Usage analytics |
+| Category      | Routes                                | Description                    |
+| ------------- | ------------------------------------- | ------------------------------ |
+| User          | `/api/user/*`                         | Settings, profile, data export |
+| Progress      | `/api/progress/*`                     | XP, sessions, autonomy         |
+| Flashcards    | `/api/flashcards/*`                   | FSRS state sync                |
+| Conversations | `/api/conversations/*`                | Chat history, messages         |
+| Tools         | `/api/tools/*`                        | Tool creation, SSE streaming   |
+| Voice         | `/api/realtime/*`                     | Token, status                  |
+| Notifications | `/api/notifications/*`, `/api/push/*` | In-app, PWA push               |
+| Parent        | `/api/parent-professor/*`             | Dashboard, GDPR consent        |
+| Telemetry     | `/api/telemetry/*`                    | Usage analytics                |
 
 ### Auth Pattern
 
 Cookie-based session via `convergio-user-id`:
 
 ```typescript
-const userId = cookieStore.get('convergio-user-id')?.value;
-if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+const userId = cookieStore.get("convergio-user-id")?.value;
+if (!userId)
+  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 ```
 
 ---
@@ -602,31 +607,31 @@ flowchart LR
 
 ### Memory Components
 
-| Component | File | Purpose |
-|-----------|------|---------|
-| Memory Loader | `src/lib/conversation/memory-loader.ts` | Load last 3 conversations |
+| Component       | File                                      | Purpose                          |
+| --------------- | ----------------------------------------- | -------------------------------- |
+| Memory Loader   | `src/lib/conversation/memory-loader.ts`   | Load last 3 conversations        |
 | Prompt Enhancer | `src/lib/conversation/prompt-enhancer.ts` | Inject memory into system prompt |
 
 ### Memory Context Structure
 
 ```typescript
 interface ConversationMemory {
-  recentSummary: string | null;   // Last session recap
-  keyFacts: string[];              // Student preferences, decisions
-  topics: string[];                // Discussed subjects
-  lastSessionDate: Date | null;    // For relative dating
+  recentSummary: string | null; // Last session recap
+  keyFacts: string[]; // Student preferences, decisions
+  topics: string[]; // Discussed subjects
+  lastSessionDate: Date | null; // For relative dating
 }
 ```
 
 ### Token Budget
 
-| Component | Max Tokens |
-|-----------|------------|
-| Base System Prompt | ~800 |
-| Recent Summary | ~200 |
-| Key Facts (max 5) | ~100 |
-| Topics (max 10) | ~50 |
-| **Total Enhanced** | **~1150** |
+| Component          | Max Tokens |
+| ------------------ | ---------- |
+| Base System Prompt | ~800       |
+| Recent Summary     | ~200       |
+| Key Facts (max 5)  | ~100       |
+| Topics (max 10)    | ~50        |
+| **Total Enhanced** | **~1150**  |
 
 ---
 
@@ -700,7 +705,7 @@ searchableText = generateSearchableText(toolType, content);
 
 // Client-side fuzzy search with Fuse.js
 const fuse = new Fuse(materials, {
-  keys: ['title', 'subject', 'searchableText'],
+  keys: ["title", "subject", "searchableText"],
   threshold: 0.3,
   includeMatches: true,
 });
@@ -708,14 +713,14 @@ const fuse = new Fuse(materials, {
 
 ### Smart Collections
 
-| Collection | Filter |
-|------------|--------|
-| Da ripassare | Flashcards with nextReview <= now |
-| Recenti | Created in last 7 days |
-| Preferiti | isBookmarked = true |
-| Per Maestro | Group by maestroId |
-| Oggi | Created today |
-| Questa settimana | Created this week |
+| Collection       | Filter                            |
+| ---------------- | --------------------------------- |
+| Da ripassare     | Flashcards with nextReview <= now |
+| Recenti          | Created in last 7 days            |
+| Preferiti        | isBookmarked = true               |
+| Per Maestro      | Group by maestroId                |
+| Oggi             | Created today                     |
+| Questa settimana | Created this week                 |
 
 ---
 
@@ -741,10 +746,10 @@ flowchart LR
 
 ### Components
 
-| Component | Purpose |
-|-----------|---------|
+| Component                    | Purpose                              |
+| ---------------------------- | ------------------------------------ |
 | `ToolMaestroSelectionDialog` | Modal for selecting maestro and mode |
-| `focus-tool-layout.tsx` | Layout with voice integration |
+| `focus-tool-layout.tsx`      | Layout with voice integration        |
 
 ### Mode Types
 
@@ -786,14 +791,14 @@ flowchart TB
 
 ### Safety Modules
 
-| Module | Purpose |
-|--------|---------|
-| `safety-prompts.ts` | Core injection, crisis keywords |
-| `content-filter.ts` | Input filtering, blocked patterns |
-| `output-sanitizer.ts` | Output cleaning, streaming sanitizer |
-| `jailbreak-detector.ts` | Manipulation attempt detection |
-| `age-gating.ts` | Age-appropriate content (6-10, 11-13, 14-18, 18+) |
-| `monitoring.ts` | Safety event logging, session termination |
+| Module                  | Purpose                                           |
+| ----------------------- | ------------------------------------------------- |
+| `safety-prompts.ts`     | Core injection, crisis keywords                   |
+| `content-filter.ts`     | Input filtering, blocked patterns                 |
+| `output-sanitizer.ts`   | Output cleaning, streaming sanitizer              |
+| `jailbreak-detector.ts` | Manipulation attempt detection                    |
+| `age-gating.ts`         | Age-appropriate content (6-10, 11-13, 14-18, 18+) |
+| `monitoring.ts`         | Safety event logging, session termination         |
 
 **Location**: `src/lib/safety/`
 
@@ -825,24 +830,24 @@ flowchart LR
 
 ### Components
 
-| Component | File | Purpose |
-|-----------|------|---------|
+| Component         | File                               | Purpose                 |
+| ----------------- | ---------------------------------- | ----------------------- |
 | Embedding Service | `src/lib/rag/embedding-service.ts` | Azure OpenAI embeddings |
-| Retrieval Service | `src/lib/rag/retrieval-service.ts` | Similarity search |
-| Vector Store | `src/lib/rag/vector-store.ts` | pgvector queries |
-| Semantic Chunker | `src/lib/rag/semantic-chunker.ts` | Content chunking |
+| Retrieval Service | `src/lib/rag/retrieval-service.ts` | Similarity search       |
+| Vector Store      | `src/lib/rag/vector-store.ts`      | pgvector queries        |
+| Semantic Chunker  | `src/lib/rag/semantic-chunker.ts`  | Content chunking        |
 
 ### Configuration
 
 ```typescript
 // Embedding model
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
-EMBEDDING_DIMENSIONS=1536
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT = text - embedding - 3 - small;
+EMBEDDING_DIMENSIONS = 1536;
 
 // Search parameters
-MIN_SIMILARITY_THRESHOLD=0.6
-MAX_CONTEXT_MATERIALS=3
-MAX_CONTEXT_TOKENS=1500
+MIN_SIMILARITY_THRESHOLD = 0.6;
+MAX_CONTEXT_MATERIALS = 3;
+MAX_CONTEXT_TOKENS = 1500;
 ```
 
 ### Storage
@@ -872,11 +877,13 @@ flowchart LR
 ### Metric Categories
 
 **SLI/SLO Metrics**:
+
 - Session success rate, drop-off, stuck loops
 - Safety incidents (S0-S3), jailbreak blocks
 - Latency percentiles (P50/P95/P99)
 
 **Business Metrics**:
+
 - DAU/WAU/MAU, registrations
 - Onboarding completion, voice adoption
 - Retention cohorts (D1/D7/D30)
@@ -884,11 +891,11 @@ flowchart LR
 
 ### Health Endpoints
 
-| Endpoint | Purpose |
-|----------|---------|
-| `GET /api/health` | Basic health (k8s probes) |
-| `GET /api/health/detailed` | Full metrics (debugging) |
-| `GET /api/metrics` | Prometheus format (pull-based) |
+| Endpoint                   | Purpose                        |
+| -------------------------- | ------------------------------ |
+| `GET /api/health`          | Basic health (k8s probes)      |
+| `GET /api/health/detailed` | Full metrics (debugging)       |
+| `GET /api/metrics`         | Prometheus format (pull-based) |
 
 ### Push Service
 
@@ -908,25 +915,25 @@ GRAFANA_CLOUD_API_KEY=...
 
 ## Key ADRs
 
-| ADR | Title | Decision |
-|-----|-------|----------|
-| 0001 | Materials Storage | Provider-agnostic (local/Azure Blob) |
-| 0003 | Triangle of Support | 3 character types (Maestro/Coach/Buddy) |
-| 0004 | Safety Guardrails | 5-layer defense for child protection |
-| 0005 | Real-time Tools | SSE for streaming tool creation |
-| 0009 | Tool Execution | OpenAI function calling |
-| 0015 | Database-First | No localStorage, API-synced |
-| 0021 | Conversational Memory | Memory injection into system prompts |
-| 0022 | Knowledge Hub | File-manager interface for materials |
-| 0027 | Bilingual Voice | Auto language detection for language teachers |
-| 0028 | PostgreSQL Migration | PostgreSQL 17 + pgvector for semantic search |
-| 0031 | Embedded Knowledge | Character intensity dial for maestri |
-| 0033 | RAG Semantic Search | pgvector embeddings with Azure OpenAI |
-| 0034 | Chat Streaming | Native SSE for chat responses |
-| 0037 | Tool Plugin Architecture | Extensible tool system |
-| 0045 | Domain Boundaries | Barrel exports, circular import prevention |
-| 0047 | Grafana Cloud Observability | Prometheus push metrics |
-| 0051 | Claude Code Optimization | Token-efficient CLAUDE.md |
+| ADR  | Title                       | Decision                                      |
+| ---- | --------------------------- | --------------------------------------------- |
+| 0001 | Materials Storage           | Provider-agnostic (local/Azure Blob)          |
+| 0003 | Triangle of Support         | 3 character types (Maestro/Coach/Buddy)       |
+| 0004 | Safety Guardrails           | 5-layer defense for child protection          |
+| 0005 | Real-time Tools             | SSE for streaming tool creation               |
+| 0009 | Tool Execution              | OpenAI function calling                       |
+| 0015 | Database-First              | No localStorage, API-synced                   |
+| 0021 | Conversational Memory       | Memory injection into system prompts          |
+| 0022 | Knowledge Hub               | File-manager interface for materials          |
+| 0027 | Bilingual Voice             | Auto language detection for language teachers |
+| 0028 | PostgreSQL Migration        | PostgreSQL 17 + pgvector for semantic search  |
+| 0031 | Embedded Knowledge          | Character intensity dial for maestri          |
+| 0033 | RAG Semantic Search         | pgvector embeddings with Azure OpenAI         |
+| 0034 | Chat Streaming              | Native SSE for chat responses                 |
+| 0037 | Tool Plugin Architecture    | Extensible tool system                        |
+| 0045 | Domain Boundaries           | Barrel exports, circular import prevention    |
+| 0047 | Grafana Cloud Observability | Prometheus push metrics                       |
+| 0051 | Claude Code Optimization    | Token-efficient CLAUDE.md                     |
 
 **51+ ADRs total** - See `docs/adr/` for complete list
 
@@ -948,21 +955,21 @@ npx prisma db push   # Sync schema
 
 ### Key Paths
 
-| Purpose | Path |
-|---------|------|
-| Types | `src/types/index.ts` |
-| AI Providers | `src/lib/ai/providers/` |
-| RAG | `src/lib/rag/` |
-| Safety | `src/lib/safety/` |
-| FSRS | `src/lib/education/fsrs/` |
-| Accessibility | `src/lib/accessibility/` |
-| Observability | `src/lib/observability/` |
-| Maestri | `src/data/maestri/` |
-| Coaches | `src/data/support-teachers/` |
-| Buddies | `src/data/buddy-profiles/` |
-| Stores | `src/lib/stores/` |
-| API | `src/app/api/` |
-| Tools | `src/lib/tools/` |
+| Purpose       | Path                         |
+| ------------- | ---------------------------- |
+| Types         | `src/types/index.ts`         |
+| AI Providers  | `src/lib/ai/providers/`      |
+| RAG           | `src/lib/rag/`               |
+| Safety        | `src/lib/safety/`            |
+| FSRS          | `src/lib/education/fsrs/`    |
+| Accessibility | `src/lib/accessibility/`     |
+| Observability | `src/lib/observability/`     |
+| Maestri       | `src/data/maestri/`          |
+| Coaches       | `src/data/support-teachers/` |
+| Buddies       | `src/data/buddy-profiles/`   |
+| Stores        | `src/lib/stores/`            |
+| API           | `src/app/api/`               |
+| Tools         | `src/lib/tools/`             |
 
 ---
 
