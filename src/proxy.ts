@@ -133,16 +133,19 @@ function hasAnyProvider(): boolean {
  * fallback for older browsers.
  */
 function buildCSPHeader(nonce: string): string {
+  // Sentry DSN domain (supports US and EU regions)
+  const sentryDomains = "*.ingest.us.sentry.io *.ingest.de.sentry.io";
+
   return [
     "default-src 'self'",
     // 'unsafe-inline' ignored when nonce present (fallback for old browsers)
     // 'strict-dynamic' allows dynamically loaded scripts from trusted scripts
-    `script-src 'self' 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic'`,
+    `script-src 'self' 'unsafe-inline' 'nonce-${nonce}' 'strict-dynamic' va.vercel-scripts.com`,
     "style-src 'self' 'unsafe-inline' cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
     "media-src 'self' data: blob:",
-    "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434 https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+    `connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434 https://va.vercel-scripts.com https://vitals.vercel-insights.com https://${sentryDomains}`,
     "worker-src 'self' blob:",
     "frame-src 'self' blob:",
     "object-src 'none'",
