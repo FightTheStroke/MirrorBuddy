@@ -43,19 +43,22 @@ vi.mock("@/lib/logger", () => ({
 import { demoPlugin } from "../demo-plugin";
 import { chatCompletion } from "@/lib/ai/providers";
 
-// Extract schema for testing
+// Extract schema for testing - matches OpenAI function definition
 const DemoInputSchema = z.object({
-  topic: z.string().min(1).max(200),
-  type: z
-    .enum(["simulation", "visualization", "experiment"])
-    .optional()
-    .default("visualization"),
-  title: z.string().min(1).max(100).optional(),
-  concept: z.string().min(1).max(500).optional(),
-  visualization: z.string().min(1).max(500).optional(),
-  interaction: z.string().min(1).max(500).optional(),
+  title: z.string().min(1).max(100),
+  concept: z.string().min(1).max(500),
+  visualization: z.string().min(1).max(500),
+  interaction: z.string().min(1).max(500),
   wowFactor: z.string().max(200).optional(),
 });
+
+// Valid input for handler tests
+const validInput = {
+  title: "Gravity Demo",
+  concept: "Newton's laws of gravity",
+  visualization: "Falling objects with trail effects",
+  interaction: "Click to drop objects from different heights",
+};
 
 describe("demo-plugin", () => {
   const mockContext: ToolContext = {
@@ -97,15 +100,15 @@ describe("demo-plugin", () => {
       expect(demoPlugin.voiceEnabled).toBe(true);
     });
 
-    it("has voice prompt with topic placeholder", () => {
+    it("has voice prompt with concept placeholder", () => {
       const voicePrompt = demoPlugin.voicePrompt as VoicePromptConfig;
-      expect(voicePrompt.template).toContain("{topic}");
-      expect(voicePrompt.requiresContext).toContain("topic");
+      expect(voicePrompt.template).toContain("{concept}");
+      expect(voicePrompt.requiresContext).toContain("concept");
     });
 
     it("has voice feedback configuration", () => {
       const voiceFeedback = demoPlugin.voiceFeedback as VoicePromptConfig;
-      expect(voiceFeedback.template).toContain("{topic}");
+      expect(voiceFeedback.template).toContain("{concept}");
       expect(voiceFeedback.fallback).toBeDefined();
     });
 
@@ -123,89 +126,96 @@ describe("demo-plugin", () => {
   });
 
   describe("schema validation", () => {
-    it("accepts minimal valid input", () => {
-      const result = DemoInputSchema.safeParse({
-        topic: "Physics gravity",
-      });
+    it("accepts valid input with all required fields", () => {
+      const result = DemoInputSchema.safeParse(validInput);
       expect(result.success).toBe(true);
-      if (result.success) {
-        expect((result.data as any).type).toBe("visualization"); // default
-      }
     });
 
-    it("accepts full input", () => {
+    it("accepts full input with optional wowFactor", () => {
       const result = DemoInputSchema.safeParse({
-        topic: "Photosynthesis",
-        type: "simulation",
-        title: "Plant Energy",
-        concept: "How plants make food",
-        visualization: "Animated cells",
-        interaction: "Click leaves",
+        ...validInput,
         wowFactor: "Glowing particles",
       });
       expect(result.success).toBe(true);
     });
 
-    it("rejects empty topic", () => {
+    it("rejects empty title", () => {
       const result = DemoInputSchema.safeParse({
-        topic: "",
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it("rejects topic exceeding max length", () => {
-      const result = DemoInputSchema.safeParse({
-        topic: "a".repeat(201),
-      });
-      expect(result.success).toBe(false);
-    });
-
-    it("accepts all valid types", () => {
-      const validTypes = ["simulation", "visualization", "experiment"];
-      for (const type of validTypes) {
-        const result = DemoInputSchema.safeParse({ topic: "Test", type });
-        expect(result.success).toBe(true);
-      }
-    });
-
-    it("rejects invalid type", () => {
-      const result = DemoInputSchema.safeParse({
-        topic: "Test",
-        type: "invalid",
+        ...validInput,
+        title: "",
       });
       expect(result.success).toBe(false);
     });
 
     it("rejects title exceeding max length", () => {
       const result = DemoInputSchema.safeParse({
-        topic: "Test",
+        ...validInput,
         title: "a".repeat(101),
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects empty concept", () => {
+      const result = DemoInputSchema.safeParse({
+        ...validInput,
+        concept: "",
       });
       expect(result.success).toBe(false);
     });
 
     it("rejects concept exceeding max length", () => {
       const result = DemoInputSchema.safeParse({
-        topic: "Test",
+        ...validInput,
         concept: "a".repeat(501),
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects empty visualization", () => {
+      const result = DemoInputSchema.safeParse({
+        ...validInput,
+        visualization: "",
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects visualization exceeding max length", () => {
+      const result = DemoInputSchema.safeParse({
+        ...validInput,
+        visualization: "a".repeat(501),
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects empty interaction", () => {
+      const result = DemoInputSchema.safeParse({
+        ...validInput,
+        interaction: "",
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it("rejects interaction exceeding max length", () => {
+      const result = DemoInputSchema.safeParse({
+        ...validInput,
+        interaction: "a".repeat(501),
       });
       expect(result.success).toBe(false);
     });
 
     it("rejects wowFactor exceeding max length", () => {
       const result = DemoInputSchema.safeParse({
-        topic: "Test",
+        ...validInput,
         wowFactor: "a".repeat(201),
       });
       expect(result.success).toBe(false);
     });
 
-    it("applies default type when not provided", () => {
-      const result = DemoInputSchema.safeParse({ topic: "Test" });
-      expect(result.success).toBe(true);
-      if (result.success) {
-        expect((result.data as any).type).toBe("visualization");
-      }
+    it("rejects missing required fields", () => {
+      const result = DemoInputSchema.safeParse({
+        title: "Test",
+      });
+      expect(result.success).toBe(false);
     });
   });
 
@@ -226,60 +236,38 @@ describe("demo-plugin", () => {
   });
 
   describe("handler - success cases", () => {
-    it("creates demo with required topic only", async () => {
-      const result = await demoPlugin.handler(
-        { topic: "pendulum motion" },
-        mockContext,
-      );
+    it("creates demo with all required fields", async () => {
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect((result.data as any).id).toBe("demo-test-id");
-      expect((result.data as any).topic).toBe("pendulum motion");
-      expect((result.data as any).title).toBe("Demo: pendulum motion");
-      expect((result.data as any).type).toBe("visualization");
+      expect((result.data as Record<string, unknown>).id).toBe("demo-test-id");
+      expect((result.data as Record<string, unknown>).title).toBe(
+        "Gravity Demo",
+      );
     });
 
-    it("creates demo with all optional fields", async () => {
+    it("creates demo with optional wowFactor", async () => {
       const result = await demoPlugin.handler(
         {
-          topic: "gravity",
-          type: "simulation",
-          title: "Gravity Simulation",
-          concept: "Newton laws",
-          visualization: "Falling objects",
-          interaction: "Drop objects",
+          ...validInput,
           wowFactor: "Amazing effects!",
         },
         mockContext,
       );
 
       expect(result.success).toBe(true);
-      expect((result.data as any).title).toBe("Gravity Simulation");
-      expect((result.data as any).type).toBe("simulation");
-    });
-
-    it("creates demo with experiment type", async () => {
-      const result = await demoPlugin.handler(
-        { topic: "chemistry", type: "experiment" },
-        mockContext,
+      expect((result.data as Record<string, unknown>).title).toBe(
+        "Gravity Demo",
       );
-
-      expect(result.success).toBe(true);
-      expect((result.data as any).type).toBe("experiment");
     });
 
     it("includes description from concept and visualization", async () => {
-      const result = await demoPlugin.handler(
-        {
-          topic: "physics",
-          concept: "Energy conservation",
-          visualization: "Ball bouncing",
-        },
-        mockContext,
-      );
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect((result.data as any).description).toContain("Energy conservation");
+      expect((result.data as Record<string, unknown>).description).toContain(
+        "Newton's laws of gravity",
+      );
     });
   });
 
@@ -291,7 +279,7 @@ describe("demo-plugin", () => {
         model: "gpt-4",
       });
 
-      const result = await demoPlugin.handler({ topic: "test" }, mockContext);
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("Non è stato possibile generare");
@@ -300,7 +288,7 @@ describe("demo-plugin", () => {
     it("handles chatCompletion throwing an error", async () => {
       vi.mocked(chatCompletion).mockRejectedValueOnce(new Error("API error"));
 
-      const result = await demoPlugin.handler({ topic: "test" }, mockContext);
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(false);
     });
@@ -312,32 +300,32 @@ describe("demo-plugin", () => {
         model: "gpt-4",
       });
 
-      const result = await demoPlugin.handler({ topic: "test" }, mockContext);
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(false);
     });
   });
 
   describe("handler - validation errors", () => {
-    it("rejects missing topic", async () => {
+    it("rejects missing required fields", async () => {
       const result = await demoPlugin.handler({}, mockContext);
 
       expect(result.success).toBe(false);
       expect(result.error).toContain("Errore");
     });
 
-    it("rejects topic over 200 characters", async () => {
+    it("rejects title over 100 characters", async () => {
       const result = await demoPlugin.handler(
-        { topic: "a".repeat(201) },
+        { ...validInput, title: "a".repeat(101) },
         mockContext,
       );
 
       expect(result.success).toBe(false);
     });
 
-    it("rejects invalid type value", async () => {
+    it("rejects concept over 500 characters", async () => {
       const result = await demoPlugin.handler(
-        { topic: "test", type: "invalid" },
+        { ...validInput, concept: "a".repeat(501) },
         mockContext,
       );
 
@@ -351,7 +339,7 @@ describe("demo-plugin", () => {
         throw "string error";
       });
 
-      const result = await demoPlugin.handler({ topic: "test" }, mockContext);
+      const result = await demoPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
