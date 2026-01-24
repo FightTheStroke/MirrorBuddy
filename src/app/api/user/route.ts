@@ -10,6 +10,7 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
+import { assignBaseTierToNewUser } from "@/lib/tier/registration-helper";
 
 export async function GET() {
   try {
@@ -47,6 +48,9 @@ export async function GET() {
         progress: true,
       },
     });
+
+    // Assign Base tier to new user (Plan 073: T4-07)
+    await assignBaseTierToNewUser(user.id);
 
     // Trigger admin counts update (non-blocking)
     calculateAndPublishAdminCounts("user-signup").catch((err) =>

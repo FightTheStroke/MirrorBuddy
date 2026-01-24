@@ -1,8 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import Image from "next/image";
+import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TierBadge } from "@/components/tier";
+import type { TierName } from "@/types/tier-types";
 
 interface Character {
   id: string;
@@ -14,6 +16,7 @@ interface Character {
   bgColor: string;
   borderColor: string;
   activeBorder: string;
+  tier?: TierName;
 }
 
 interface CharacterSelectorProps {
@@ -48,18 +51,22 @@ export function CharacterSelector({
             key={character.id}
             onClick={() => onSelect(character.id)}
             className={cn(
-              'relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left',
+              "relative flex items-start gap-4 p-4 rounded-xl border-2 transition-all duration-200 text-left",
               character.bgColor,
               selectedId === character.id
                 ? character.activeBorder
-                : `${character.borderColor} hover:scale-[1.02]`
+                : `${character.borderColor} hover:scale-[1.02]`,
             )}
           >
             <div className="relative flex-shrink-0">
-              <div className={cn(
-                'w-16 h-16 rounded-full overflow-hidden border-2',
-                selectedId === character.id ? 'border-white shadow-lg' : 'border-slate-200 dark:border-slate-700'
-              )}>
+              <div
+                className={cn(
+                  "w-16 h-16 rounded-full overflow-hidden border-2",
+                  selectedId === character.id
+                    ? "border-white shadow-lg"
+                    : "border-slate-200 dark:border-slate-700",
+                )}
+              >
                 <Image
                   src={character.avatar}
                   alt={character.name}
@@ -76,13 +83,18 @@ export function CharacterSelector({
               )}
             </div>
             <div className="flex-1 min-w-0">
-              <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
-                {character.name}
-              </h3>
-              <p className={cn(
-                'text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent',
-                character.color
-              )}>
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="font-semibold text-lg text-slate-900 dark:text-slate-100">
+                  {character.name}
+                </h3>
+                {character.tier && <TierBadge tier={character.tier} />}
+              </div>
+              <p
+                className={cn(
+                  "text-sm font-medium bg-gradient-to-r bg-clip-text text-transparent",
+                  character.color,
+                )}
+              >
                 {character.tagline}
               </p>
               <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
