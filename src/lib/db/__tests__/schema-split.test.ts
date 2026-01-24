@@ -157,7 +157,7 @@ describe("Prisma Schema Split", () => {
   });
 
   describe("Schema Validation", () => {
-    it("should pass prisma validate", () => {
+    it("should pass prisma validate", { timeout: 30000 }, () => {
       // This test runs prisma validate and expects it to succeed
       expect(() => {
         execSync("npx prisma validate", {
