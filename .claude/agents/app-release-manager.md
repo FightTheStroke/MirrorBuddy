@@ -57,6 +57,46 @@ npx playwright test maestro-conversation.spec.ts
 VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts
 ```
 
+## Vercel Environment Validation
+
+**Before release**, validate production Vercel deployment is configured correctly (ADR 0067):
+
+### Required Environment Variables
+
+| Variable                | Purpose                                         |
+| ----------------------- | ----------------------------------------------- |
+| `AZURE_OPENAI_KEY`      | Azure OpenAI API authentication                 |
+| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL                       |
+| `DATABASE_URL`          | Production PostgreSQL connection string         |
+| `SUPABASE_CA_CERT`      | SSL certificate (base64-encoded) - **CRITICAL** |
+| `TOKEN_ENCRYPTION_KEY`  | AES-256-GCM encryption (32+ chars)              |
+| `ADMIN_EMAIL`           | Admin account email                             |
+| `RESEND_API_KEY`        | Email service API key                           |
+
+### SSL Certificate Setup
+
+Production requires SSL validation (ADR 0067):
+
+```bash
+# 1. Encode certificate for Vercel
+cat config/supabase-chain.pem | base64 | tr -d '\n'
+
+# 2. Paste output into Vercel dashboard:
+#    Settings → Environment Variables → SUPABASE_CA_CERT
+
+# 3. Verify certificate validity
+openssl x509 -in config/supabase-chain.pem -text -noout
+```
+
+### Pre-Release Checklist
+
+- [ ] All env vars set in Vercel dashboard (Settings → Environment Variables)
+- [ ] SSL certificate `SUPABASE_CA_CERT` is base64-encoded and valid
+- [ ] `release-brutal.sh` passed (compliance, security, tests)
+- [ ] Database connection test succeeds (if available)
+
+**Release BLOCKED if** any env var missing or SSL cert invalid.
+
 ## VERSION + RELEASE
 
 ```bash
