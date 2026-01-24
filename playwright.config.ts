@@ -155,6 +155,8 @@ export default defineConfig({
       use: {
         ...devices["iPhone SE"],
         // iPhone SE 2022: 375px × 667px (16:9)
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
       },
       testMatch: [
         "**/mobile/iphone.spec.ts",
@@ -167,6 +169,8 @@ export default defineConfig({
       use: {
         ...devices["iPhone 13"],
         // iPhone 13: 390px × 844px (19.5:9)
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
       },
       testMatch: [
         "**/mobile/iphone.spec.ts",
@@ -191,6 +195,8 @@ export default defineConfig({
       use: {
         ...devices["iPad Mini"],
         // iPad Mini: 768px × 1024px (4:3) portrait
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
       },
       testMatch: [
         "**/mobile/ipad.spec.ts",
@@ -203,9 +209,65 @@ export default defineConfig({
       use: {
         ...devices["iPad Mini landscape"],
         // iPad Mini landscape: 1024px × 768px (4:3)
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
       },
       testMatch: [
         "**/mobile/ipad.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
+      ...(process.env.CI && { testIgnore: "**/*" }),
+    },
+    // Samsung devices - most popular Android phones
+    {
+      name: "galaxy-s24",
+      use: {
+        ...devices["Galaxy S24"],
+        // Galaxy S24: 360px × 780px (flagship 2024)
+      },
+      testMatch: [
+        "**/mobile/android.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
+      ...(process.env.CI && { testIgnore: "**/*" }),
+    },
+    {
+      name: "galaxy-a55",
+      use: {
+        ...devices["Galaxy A55"],
+        // Galaxy A55: 412px × 915px (popular mid-range)
+      },
+      testMatch: [
+        "**/mobile/android.spec.ts",
+        "**/mobile/responsive-layout.spec.ts",
+      ],
+      ...(process.env.CI && { testIgnore: "**/*" }),
+    },
+    {
+      name: "galaxy-tab-s9",
+      use: {
+        ...devices["Galaxy Tab S9"],
+        // Galaxy Tab S9: tablet Android
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+      },
+      testMatch: [
+        "**/mobile/ipad.spec.ts", // Reuse tablet tests
+        "**/mobile/responsive-layout.spec.ts",
+      ],
+      ...(process.env.CI && { testIgnore: "**/*" }),
+    },
+    // iPhone 15 Pro - latest flagship
+    {
+      name: "iphone-15-pro",
+      use: {
+        ...devices["iPhone 15 Pro"],
+        // iPhone 15 Pro: 393px × 852px (Dynamic Island)
+        // Use Chromium on Arch Linux (WebKit has dependency issues)
+        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+      },
+      testMatch: [
+        "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
       ...(process.env.CI && { testIgnore: "**/*" }),
