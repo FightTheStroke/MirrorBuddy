@@ -14,6 +14,7 @@ import { TierComparisonTable } from "../tier-comparison-table";
 /**
  * Mock tier data matching TierDefinition schema
  */
+// Feature keys must match tier-seed.ts (camelCase)
 const mockTiers = [
   {
     id: "tier-trial",
@@ -25,9 +26,11 @@ const mockTiers = [
     toolsLimitDaily: 10,
     docsLimitTotal: 1,
     features: {
-      videovision: false,
-      pdfexport: false,
-      advancedfeatures: false,
+      voice: false,
+      mindMaps: false,
+      videoVision: false,
+      parentDashboard: false,
+      prioritySupport: false,
     },
     availableMaestri: [
       "euclide",
@@ -48,9 +51,11 @@ const mockTiers = [
     toolsLimitDaily: 50,
     docsLimitTotal: 5,
     features: {
-      videovision: true,
-      pdfexport: false,
-      advancedfeatures: false,
+      voice: true,
+      mindMaps: true,
+      videoVision: false,
+      parentDashboard: false,
+      prioritySupport: false,
     },
     availableMaestri: Array.from({ length: 15 }, (_, i) => `maestro-${i}`),
     sortOrder: 1,
@@ -65,9 +70,11 @@ const mockTiers = [
     toolsLimitDaily: 200,
     docsLimitTotal: 50,
     features: {
-      videovision: true,
-      pdfexport: true,
-      advancedfeatures: true,
+      voice: true,
+      mindMaps: true,
+      videoVision: true,
+      parentDashboard: true,
+      prioritySupport: true,
     },
     availableMaestri: Array.from({ length: 22 }, (_, i) => `maestro-${i}`),
     sortOrder: 2,
@@ -93,9 +100,11 @@ describe("TierComparisonTable", () => {
       expect(within(table).getByText("Voice Minutes")).toBeInTheDocument();
       expect(within(table).getByText("Maestri Available")).toBeInTheDocument();
       expect(within(table).getByText("Documents Limit")).toBeInTheDocument();
+      expect(within(table).getByText("Voice Chat")).toBeInTheDocument();
+      expect(within(table).getByText("Mind Maps")).toBeInTheDocument();
       expect(within(table).getByText("Video Vision")).toBeInTheDocument();
-      expect(within(table).getByText("PDF Export")).toBeInTheDocument();
-      expect(within(table).getByText("Advanced Features")).toBeInTheDocument();
+      expect(within(table).getByText("Parent Dashboard")).toBeInTheDocument();
+      expect(within(table).getByText("Priority Support")).toBeInTheDocument();
     });
 
     it("renders table cells for each tier-feature combination", () => {
