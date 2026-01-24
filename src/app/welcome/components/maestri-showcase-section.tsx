@@ -39,7 +39,8 @@ export function MaestriShowcaseSection() {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = 320;
+      // Card width (w-44 = 176px) + gap (16px) = 192px per card, scroll 2 cards
+      const scrollAmount = 384;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -109,7 +110,7 @@ export function MaestriShowcaseSection() {
                 stiffness: 150,
                 damping: 15,
               }}
-              className="flex-shrink-0 w-36 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all"
+              className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all"
             >
               {/* Avatar */}
               <div
@@ -130,10 +131,10 @@ export function MaestriShowcaseSection() {
               </div>
 
               {/* Info */}
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 truncate">
+              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 leading-tight">
                 {maestro.displayName}
               </h3>
-              <p className="text-xs font-medium text-blue-600 dark:text-blue-400 truncate">
+              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
                 {SUBJECT_NAMES[maestro.subject] || maestro.subject}
               </p>
             </motion.div>

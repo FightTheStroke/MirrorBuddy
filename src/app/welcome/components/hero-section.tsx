@@ -8,15 +8,12 @@ interface HeroSectionProps {
   isReturningUser: boolean;
 }
 
-// Accessibility profiles matching settings (lean display)
-const ACCESSIBILITY_PROFILES = [
-  { icon: "📖", label: "Dislessia", color: "text-blue-600" },
-  { icon: "🎯", label: "ADHD", color: "text-purple-600" },
-  { icon: "🧩", label: "Autismo", color: "text-teal-600" },
-  { icon: "👁️", label: "Ipovisione", color: "text-amber-600" },
-  { icon: "🖐️", label: "Motorio", color: "text-green-600" },
-  { icon: "👂", label: "Uditivo", color: "text-rose-600" },
-  { icon: "♿", label: "Paralisi Cerebrale", color: "text-indigo-600" },
+// Accessibility features - 4 key capabilities in grid
+const ACCESSIBILITY_FEATURES = [
+  { icon: "📖", label: "Font leggibili" },
+  { icon: "🗺️", label: "Mappe mentali" },
+  { icon: "🔊", label: "Sintesi vocale" },
+  { icon: "🎯", label: "Quiz adattivi" },
 ];
 
 /**
@@ -135,7 +132,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               </strong>
               . 22 Professori storici ti accompagnano personalmente.
             </motion.p>
-            <AccessibilityProfiles />
+            <AccessibilityFeatures />
           </>
         )}
       </div>
@@ -143,7 +140,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   );
 }
 
-function AccessibilityProfiles() {
+function AccessibilityFeatures() {
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -151,21 +148,30 @@ function AccessibilityProfiles() {
       transition={{ delay: 0.4 }}
       className="max-w-3xl mx-auto"
     >
-      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
-        Progettato per ogni stile di apprendimento
-      </p>
-      <div className="flex flex-wrap justify-center gap-2">
-        {ACCESSIBILITY_PROFILES.map((profile, idx) => (
-          <span
-            key={idx}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full border border-gray-200 dark:border-gray-700 text-sm"
-          >
-            <span aria-hidden="true">{profile.icon}</span>
-            <span className={`font-medium ${profile.color} dark:opacity-90`}>
-              {profile.label}
-            </span>
-          </span>
-        ))}
+      <div className="relative overflow-hidden p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-xl">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
+        <div className="relative z-10">
+          <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
+            <span aria-hidden="true">♿</span>
+            Progettato per tutti gli stili di apprendimento
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {ACCESSIBILITY_FEATURES.map((feature, idx) => (
+              <div
+                key={idx}
+                className="flex flex-col items-center gap-2 p-3 bg-white/70 dark:bg-gray-800/70 rounded-xl backdrop-blur-sm"
+              >
+                <span className="text-2xl" aria-hidden="true">
+                  {feature.icon}
+                </span>
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
+                  {feature.label}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </motion.div>
   );
