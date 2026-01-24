@@ -192,6 +192,53 @@ export async function executeScheduledDeletions(): Promise<{
 }
 
 /**
+ * Apply default retention policy to ALL conversations system-wide
+ * This marks any conversation older than DEFAULT_RETENTION_POLICY.conversationTTLDays
+ * for deletion, regardless of whether the user has a custom policy.
+ *
+ * GDPR Art. 5 requires storage limitation - data must not be kept indefinitely.
+ */
+export async function applyDefaultRetentionSystemWide(): Promise<{
+  conversationsMarked: number;
+}> {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(
+    cutoffDate.getDate() - DEFAULT_RETENTION_POLICY.conversationTTLDays,
+  );
+
+  log.info("Applying default retention policy system-wide", {
+    cutoffDate: cutoffDate.toISOString(),
+    ttlDays: DEFAULT_RETENTION_POLICY.conversationTTLDays,
+  });
+
+  try {
+    // Mark all conversations older than default TTL that aren't already marked
+    const result = await prisma.conversation.updateMany({
+      where: {
+        createdAt: { lt: cutoffDate },
+        markedForDeletion: false,
+      },
+      data: {
+        markedForDeletion: true,
+        markedForDeletionAt: new Date(),
+      },
+    });
+
+    log.info("Default retention applied system-wide", {
+      conversationsMarked: result.count,
+      cutoffDate: cutoffDate.toISOString(),
+    });
+
+    return { conversationsMarked: result.count };
+  } catch (error) {
+    log.error("Failed to apply default retention system-wide", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+/**
  * Get retention status for a user (for transparency dashboard)
  */
 export async function getUserRetentionStatus(userId: string): Promise<{
