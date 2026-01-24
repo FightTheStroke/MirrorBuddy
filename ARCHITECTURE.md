@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > Technical overview of the MirrorBuddy platform architecture
-> Last updated: 20 Gennaio 2026, 11:30 CET
+> Last updated: 24 Gennaio 2026, 15:30 CET
 
 ---
 
@@ -34,6 +34,7 @@ flowchart TB
     subgraph Observability["Observability"]
         Metrics[Prometheus Push]
         Grafana[Grafana Cloud]
+        Sentry[Sentry<br/>Error Tracking]
     end
 
     User --> UI
@@ -46,6 +47,7 @@ flowchart TB
     RAG --> DB
     API <--> DB
     API --> Metrics --> Grafana
+    API -.errors.-> Sentry
 
     style Azure fill:#0078D4,stroke:#005A9E,color:#fff,stroke-width:2px
     style Ollama fill:#77B05D,stroke:#5A8A44,color:#fff,stroke-width:2px
@@ -53,6 +55,7 @@ flowchart TB
     style DB fill:#336791,stroke:#26516D,color:#fff,stroke-width:2px
     style RAG fill:#8B5CF6,stroke:#7C3AED,color:#fff,stroke-width:2px
     style Grafana fill:#F46800,stroke:#E05400,color:#fff,stroke-width:2px
+    style Sentry fill:#362D59,stroke:#2B2347,color:#fff,stroke-width:2px
 ```
 
 ---
@@ -114,7 +117,7 @@ User Action → UI Component → Zustand Store (optimistic) → API Route → AI
 | **Mind Maps**     | MarkMap                           | Interactive mind map visualization     |
 | **Database**      | Prisma + PostgreSQL 17 + pgvector | Type-safe ORM + vector search          |
 | **Testing**       | Playwright (E2E) + Vitest (unit)  | 229 E2E, 5169+ unit tests              |
-| **Observability** | Grafana Cloud                     | Prometheus push metrics                |
+| **Observability** | Grafana Cloud + Sentry            | Metrics push + error tracking          |
 
 ---
 
@@ -319,7 +322,8 @@ WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 
 - **Dashboard:** https://mirrorbuddy.grafana.net/d/dashboard/
 - **Health:** `GET /api/health` (k8s probes), `GET /api/health/detailed` (full metrics)
-- **Metrics:** `GET /api/metrics` (Prometheus format), push every 60s to Grafana Cloud
+- **Metrics:** `GET /api/metrics` (Prometheus format), push every 5min to Grafana Cloud
+- **Errors:** Sentry for error tracking and performance monitoring
 
 ---
 
