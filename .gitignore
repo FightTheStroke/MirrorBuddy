@@ -109,3 +109,4 @@ docs/.archive/
 # Environment files (production secrets)
 .env.production
 .env.vercel
+.env.vercel.*
