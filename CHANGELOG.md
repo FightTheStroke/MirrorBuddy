@@ -9,6 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Secrets Scan (Pre-commit Security)
+
+- **scripts/secrets-scan.sh**: Detects sensitive data before commit
+  - API keys (Resend, Sentry DSN, Vercel IDs)
+  - Private keys and certificates
+  - JWT tokens, database passwords
+  - Personal usernames in scripts
+- **Pre-commit hook**: Blocks commits with critical issues
+- **Release gate integration**: Part of `release-brutal.sh` security phase
+- **Modes**: Normal (critical=blocking), `--strict` (warnings=blocking), `--json`
+
 #### Sentry Error Tracking
 
 - **@sentry/nextjs SDK**: Client, server, and edge runtime error tracking
