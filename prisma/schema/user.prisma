@@ -90,6 +90,9 @@ model User {
   // Compliance & Audit (F-08)
   auditEntriesAsSubject ComplianceAuditEntry[]
   auditEntriesAsAdmin    ComplianceAuditEntry[] @relation("AdminAuditLog")
+
+  // Tier Subscription System (ADR 0071)
+  subscription UserSubscription?
 }
 
 model Profile {
