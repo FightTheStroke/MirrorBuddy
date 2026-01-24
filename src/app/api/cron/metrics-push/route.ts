@@ -300,16 +300,16 @@ async function collectLightMetrics(): Promise<MetricSample[]> {
     >`
       WITH latest AS (
         SELECT
-          COALESCE(visitor_id, user_id) as user_key,
+          COALESCE("visitorId", "userId") as user_key,
           stage,
-          MAX(created_at) as last_activity
+          MAX("createdAt") as last_activity
         FROM "FunnelEvent"
-        WHERE is_test_data = false
-        GROUP BY COALESCE(visitor_id, user_id), stage
-        HAVING MAX(created_at) = (
-          SELECT MAX(fe2.created_at)
+        WHERE "isTestData" = false
+        GROUP BY COALESCE("visitorId", "userId"), stage
+        HAVING MAX("createdAt") = (
+          SELECT MAX(fe2."createdAt")
           FROM "FunnelEvent" fe2
-          WHERE COALESCE(fe2.visitor_id, fe2.user_id) = COALESCE("FunnelEvent".visitor_id, "FunnelEvent".user_id)
+          WHERE COALESCE(fe2."visitorId", fe2."userId") = COALESCE("FunnelEvent"."visitorId", "FunnelEvent"."userId")
         )
       )
       SELECT
