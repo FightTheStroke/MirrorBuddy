@@ -1,15 +1,10 @@
+/**
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
+ */
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { createPrismaClient } from "../src/lib/ssl-config";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
-const pool = new Pool({ connectionString });
-const adapter = new PrismaPg(pool);
-
-const prisma = new PrismaClient({ adapter });
+const prisma = createPrismaClient();
 
 async function getDbSize() {
   try {

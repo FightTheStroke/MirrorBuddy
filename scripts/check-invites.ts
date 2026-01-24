@@ -1,24 +1,10 @@
 /**
  * Quick script to check invite requests in DB
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { createPrismaClient } from "../src/lib/ssl-config";
 
-const connectionString =
-  process.env.DATABASE_URL ||
-  "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
-
-const pool = new Pool({
-  connectionString,
-  ssl:
-    process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : undefined,
-});
-
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = createPrismaClient();
 
 async function main() {
   console.log("Checking invite requests...\n");

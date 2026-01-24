@@ -1,31 +1,16 @@
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+/**
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
+ */
 import { config } from "dotenv";
+import { createPrismaClient } from "../src/lib/ssl-config";
 
-// Load .env file
 config();
 
-// Use DATABASE_URL from .env
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
+if (!process.env.DATABASE_URL) {
   throw new Error("DATABASE_URL not set");
 }
 
-// Create pg Pool (same as src/lib/db.ts)
-const pool = new Pool({
-  connectionString,
-  ssl: {
-    rejectUnauthorized: false, // Required for Supabase pooler
-  },
-});
-
-const adapter = new PrismaPg(pool);
-
-const prisma = new PrismaClient({
-  adapter,
-  log: ["error", "warn"],
-});
+const prisma = createPrismaClient();
 
 const KEEP_EMAILS = ["roberdan@fightthestroke.org", "mariodanfts@gmail.com"];
 

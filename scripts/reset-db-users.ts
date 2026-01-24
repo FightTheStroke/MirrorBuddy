@@ -5,30 +5,21 @@
  * - Mariodanfts@gmail.com (USER)
  *
  * Run with: npx tsx scripts/reset-db-users.ts
+ * Plan 074: Uses shared SSL configuration from src/lib/ssl-config.ts
  */
 
 import { config } from "dotenv";
 config({ path: ".env.local" });
 config({ path: ".env" });
 
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool } from "pg";
+import { createPrismaClient } from "../src/lib/ssl-config";
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
+if (!process.env.DATABASE_URL) {
   console.error("DATABASE_URL not set");
   process.exit(1);
 }
 
-const pool = new Pool({
-  connectionString,
-  ssl: process.env.SUPABASE_CA_CERT
-    ? { ca: process.env.SUPABASE_CA_CERT, rejectUnauthorized: true }
-    : undefined,
-});
-const adapter = new PrismaPg(pool);
-const prisma = new PrismaClient({ adapter });
+const prisma = createPrismaClient();
 
 const KEEP_EMAILS = [
   "roberdan@fightthestroke.org",
