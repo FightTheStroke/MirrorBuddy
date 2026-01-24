@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { subscriptionTelemetry } from "@/lib/analytics/subscription-telemetry";
 
 /**
  * GET /api/admin/subscriptions/[id]
@@ -126,6 +127,37 @@ export async function PUT(
       },
     });
 
+    // Emit telemetry events for status changes
+    if (status === "CANCELLED" && existingSubscription.status !== "CANCELLED") {
+      subscriptionTelemetry.track({
+        type: "subscription.cancelled",
+        userId: existingSubscription.userId,
+        tierId: updatedSubscription.tierId,
+        previousTierId: null,
+        timestamp: new Date(),
+        metadata: {
+          subscriptionId: subscriptionId,
+          previousStatus: existingSubscription.status,
+          reason: notes || "admin_action",
+        },
+      });
+    }
+
+    if (status === "EXPIRED" && existingSubscription.status !== "EXPIRED") {
+      subscriptionTelemetry.track({
+        type: "subscription.expired",
+        userId: existingSubscription.userId,
+        tierId: updatedSubscription.tierId,
+        previousTierId: null,
+        timestamp: new Date(),
+        metadata: {
+          subscriptionId: subscriptionId,
+          previousStatus: existingSubscription.status,
+          reason: notes || "manual_expiration",
+        },
+      });
+    }
+
     return NextResponse.json(updatedSubscription);
   } catch (error) {
     console.error("Error updating subscription:", error);
@@ -180,6 +212,20 @@ export async function DELETE(
           tierId: existingSubscription.tierId,
           status: existingSubscription.status,
         },
+      },
+    });
+
+    // Emit telemetry event for subscription deletion
+    subscriptionTelemetry.track({
+      type: "subscription.cancelled",
+      userId: existingSubscription.userId,
+      tierId: existingSubscription.tierId,
+      previousTierId: null,
+      timestamp: new Date(),
+      metadata: {
+        subscriptionId: subscriptionId,
+        status: existingSubscription.status,
+        reason: "admin_deletion",
       },
     });
 

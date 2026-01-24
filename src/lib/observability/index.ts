@@ -7,6 +7,7 @@
 
 export { metricsStore } from "./metrics-store";
 export { prometheusPushService } from "./prometheus-push-service";
+export { setSentryTierContext } from "./sentry-tier-context";
 
 // Threshold logic (F-07, F-25)
 export {

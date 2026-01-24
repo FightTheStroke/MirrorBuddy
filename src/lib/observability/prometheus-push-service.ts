@@ -13,7 +13,11 @@
 
 import { logger } from "@/lib/logger";
 import { collectServiceLimitsSamples } from "./service-limits-metrics";
-import { collectHttpMetrics, type MetricSample } from "./http-metrics-collector";
+import {
+  collectHttpMetrics,
+  type MetricSample,
+} from "./http-metrics-collector";
+import { collectTierMetrics } from "./tier-metrics-collector";
 import {
   collectFunnelMetrics,
   collectBudgetMetrics,
@@ -190,6 +194,10 @@ class PrometheusPushService {
       now,
     );
     samples.push(...serviceLimitsSamples);
+
+    // Tier metrics (DAU/WAU/MAU per tier) - async collection
+    const tierMetricsSamples = await collectTierMetrics(instanceLabels, now);
+    samples.push(...tierMetricsSamples);
 
     return samples;
   }
