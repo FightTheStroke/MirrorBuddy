@@ -1,0 +1,73 @@
+// ============================================================================
+// TIER SUBSCRIPTION SYSTEM - ADR 0071
+// Subscription tiers, user subscriptions, and audit logging
+// ============================================================================
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIAL
+  EXPIRED
+  CANCELLED
+  PAUSED
+}
+
+model TierDefinition {
+  id                  String   @id @default(cuid())
+  code                String   @unique
+  name                String
+  description         String?
+  chatLimitDaily      Int      @default(10)
+  voiceMinutesDaily   Int      @default(5)
+  toolsLimitDaily     Int      @default(10)
+  docsLimitTotal      Int      @default(1)
+  chatModel           String   @default("gpt-4o-mini")
+  realtimeModel       String   @default("gpt-realtime-mini")
+  features            Json     @default("{}")
+  availableMaestri    Json     @default("[]")
+  availableCoaches    Json     @default("[]")
+  availableBuddies    Json     @default("[]")
+  availableTools      Json     @default("[]")
+  stripePriceId       String?
+  monthlyPriceEur     Decimal?
+  sortOrder           Int      @default(0)
+  isActive            Boolean  @default(true)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  subscriptions UserSubscription[]
+}
+
+model UserSubscription {
+  id                   String   @id @default(cuid())
+  userId               String   @unique
+  user                 User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tierId               String
+  tier                 TierDefinition @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  overrideLimits       Json?
+  overrideFeatures     Json?
+  stripeSubscriptionId String?
+  stripeCustomerId     String?
+  status               SubscriptionStatus @default(ACTIVE)
+  startedAt            DateTime @default(now())
+  expiresAt            DateTime?
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([tierId])
+  @@index([status])
+}
+
+model TierAuditLog {
+  id        String   @id @default(cuid())
+  tierId    String?
+  userId    String?
+  adminId   String
+  action    String
+  changes   Json
+  createdAt DateTime @default(now())
+
+  @@index([tierId])
+  @@index([userId])
+  @@index([adminId])
+  @@index([createdAt])
+}
