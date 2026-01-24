@@ -19,6 +19,7 @@ const users = [
     role: "USER" as const,
     disabled: false,
     createdAt: new Date("2026-01-01T00:00:00Z"),
+    subscription: null,
   },
   {
     id: "user-2",
@@ -27,6 +28,7 @@ const users = [
     role: "ADMIN" as const,
     disabled: true,
     createdAt: new Date("2026-01-02T00:00:00Z"),
+    subscription: null,
   },
 ];
 
@@ -54,7 +56,7 @@ describe("UsersTable", () => {
   });
 
   it("renders users and filters active", () => {
-    render(<UsersTable users={users} />);
+    render(<UsersTable users={users} availableTiers={[]} />);
 
     expect(screen.getByText("alpha")).toBeInTheDocument();
     expect(screen.getByText("beta")).toBeInTheDocument();
@@ -72,7 +74,7 @@ describe("UsersTable", () => {
       json: () => Promise.resolve({ backups: mockTrash }),
     } as Response);
 
-    render(<UsersTable users={users} />);
+    render(<UsersTable users={users} availableTiers={[]} />);
 
     fireEvent.click(screen.getByText("Cestino (0)"));
 
@@ -87,7 +89,7 @@ describe("UsersTable", () => {
       json: () => Promise.resolve({}),
     });
 
-    render(<UsersTable users={users} />);
+    render(<UsersTable users={users} availableTiers={[]} />);
 
     const deleteButton = screen.getAllByLabelText("Delete user")[0];
     fireEvent.click(deleteButton);
@@ -110,7 +112,7 @@ describe("UsersTable", () => {
       json: () => Promise.resolve({}),
     });
 
-    render(<UsersTable users={users} />);
+    render(<UsersTable users={users} availableTiers={[]} />);
 
     fireEvent.click(screen.getByText("Cestino (0)"));
 

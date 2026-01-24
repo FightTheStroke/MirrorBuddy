@@ -13,3 +13,5 @@ export {
   isSubscriptionActive,
   isSubscriptionExpired,
 } from "./types";
+
+export { TierService } from "./tier-service";

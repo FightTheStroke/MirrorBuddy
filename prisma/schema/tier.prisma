@@ -11,6 +11,16 @@ enum SubscriptionStatus {
   PAUSED
 }
 
+enum TierAuditAction {
+  TIER_CREATE
+  TIER_UPDATE
+  TIER_DELETE
+  SUBSCRIPTION_CREATE
+  SUBSCRIPTION_UPDATE
+  SUBSCRIPTION_DELETE
+  TIER_CHANGE
+}
+
 model TierDefinition {
   id                  String   @id @default(cuid())
   code                String   @unique
@@ -58,13 +68,14 @@ model UserSubscription {
 }
 
 model TierAuditLog {
-  id        String   @id @default(cuid())
+  id        String          @id @default(cuid())
   tierId    String?
   userId    String?
   adminId   String
-  action    String
+  action    TierAuditAction
   changes   Json
-  createdAt DateTime @default(now())
+  notes     String?
+  createdAt DateTime        @default(now())
 
   @@index([tierId])
   @@index([userId])

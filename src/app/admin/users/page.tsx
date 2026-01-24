@@ -11,6 +11,27 @@ interface User {
   role: "USER" | "ADMIN";
   disabled: boolean;
   createdAt: Date;
+  subscription: {
+    id: string;
+    tier: {
+      id: string;
+      code: string;
+      name: string;
+      chatLimitDaily: number;
+      voiceMinutesDaily: number;
+      toolsLimitDaily: number;
+      docsLimitTotal: number;
+      features: unknown;
+    };
+    overrideLimits: unknown;
+    overrideFeatures: unknown;
+  } | null;
+}
+
+interface Tier {
+  id: string;
+  code: string;
+  name: string;
 }
 
 export default async function AdminUsersPage() {
@@ -20,17 +41,47 @@ export default async function AdminUsersPage() {
     redirect("/login");
   }
 
-  const users: User[] = await prisma.user.findMany({
-    select: {
-      id: true,
-      username: true,
-      email: true,
-      role: true,
-      disabled: true,
-      createdAt: true,
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const [users, tiers] = await Promise.all([
+    prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        role: true,
+        disabled: true,
+        createdAt: true,
+        subscription: {
+          select: {
+            id: true,
+            tier: {
+              select: {
+                id: true,
+                code: true,
+                name: true,
+                chatLimitDaily: true,
+                voiceMinutesDaily: true,
+                toolsLimitDaily: true,
+                docsLimitTotal: true,
+                features: true,
+              },
+            },
+            overrideLimits: true,
+            overrideFeatures: true,
+          },
+        },
+      },
+      orderBy: { createdAt: "desc" },
+    }) as Promise<User[]>,
+    prisma.tierDefinition.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        code: true,
+        name: true,
+      },
+      orderBy: { sortOrder: "asc" },
+    }) as Promise<Tier[]>,
+  ]);
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -40,7 +91,7 @@ export default async function AdminUsersPage() {
           Gestione Utenti
         </h1>
       </div>
-      <UsersTable users={users} />
+      <UsersTable users={users} availableTiers={tiers} />
     </div>
   );
 }
