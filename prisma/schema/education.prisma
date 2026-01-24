@@ -138,9 +138,9 @@ model SessionMetrics {
   outcome String @default("unknown") // success | dropped | stuck_loop | abandoned
 
   // Behavioral metrics
-  turnCount        Int   @default(0)
+  turnCount        Int  @default(0)
   avgTurnLatencyMs Int?
-  stuckLoopCount   Int   @default(0) // Same intent repeated 3+ times in 5 turns
+  stuckLoopCount   Int  @default(0) // Same intent repeated 3+ times in 5 turns
 
   // Cost tracking (V1Plan FASE 6)
   tokensIn     Int   @default(0)

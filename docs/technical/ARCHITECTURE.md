@@ -1,24 +1,25 @@
 # MirrorBuddy Architecture
 
 > AI-powered educational platform for students with learning differences.
-> Last updated: 2026-01-18
+> Last updated: 2026-01-24
 
 ---
 
 ## Table of Contents
 
 1. [Overview](#overview)
-2. [Core Concepts](#core-concepts)
-3. [Character System](#character-system)
-4. [Educational Tools](#educational-tools)
-5. [Gamification](#gamification)
-6. [Accessibility](#accessibility)
-7. [Audio System](#audio-system)
-8. [State Management](#state-management)
-9. [Database Schema](#database-schema)
-10. [API Routes](#api-routes)
-11. [Safety & Guardrails](#safety--guardrails)
-12. [Key ADRs](#key-adrs)
+2. [Tier Subscription System](#tier-subscription-system-adr-0071)
+3. [Core Concepts](#core-concepts)
+4. [Character System](#character-system)
+5. [Educational Tools](#educational-tools)
+6. [Gamification](#gamification)
+7. [Accessibility](#accessibility)
+8. [Audio System](#audio-system)
+9. [State Management](#state-management)
+10. [Database Schema](#database-schema)
+11. [API Routes](#api-routes)
+12. [Safety & Guardrails](#safety--guardrails)
+13. [Key ADRs](#key-adrs)
 
 ---
 
@@ -126,6 +127,203 @@ src/
 ├── hooks/                 # React hooks (20+)
 └── types/                 # TypeScript definitions (barrel export)
 ```
+
+---
+
+## Tier Subscription System (ADR 0071)
+
+### Overview
+
+Multi-tier subscription system providing feature gating and quota management:
+
+```
+Trial (Anonymous) ──┐
+                    ├─→ TierService ──→ Feature Access
+Base (Free)         │                       ↓
+Pro (Paid)          └──→ Database Models ──→ Usage Limits
+                             (3 models)       + AI Models
+```
+
+### TierService Layer
+
+Central tier logic between user requests and feature access:
+
+```typescript
+// Usage pattern
+const tierService = new TierService();
+
+// Get user's effective tier (handles fallbacks)
+const tier = await tierService.getEffectiveTier(userId);
+
+// Check single feature access
+const hasVoice = await tierService.checkFeatureAccess(userId, "voice");
+
+// Get tier limits (quotas)
+const limits = await tierService.getLimitsForUser(userId);
+
+// Get AI model for tier
+const chatModel = await tierService.getAIModelForUser(userId, "chat");
+```
+
+**Key Behaviors**:
+
+- Anonymous users (null userId) → Trial tier (10 chats, 5 min voice, limited features)
+- Registered users without subscription → Base tier (30 chats, 10 min voice)
+- Valid subscription → User's subscribed tier (Pro tier with higher limits)
+- Expired/invalid subscription → Falls back to Base tier
+- Database errors → Graceful fallback with logging
+
+### Database Models
+
+Three core Prisma models in `prisma/schema/tier.prisma`:
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    TierDefinition                           │
+├─────────────────────────────────────────────────────────────┤
+│ id: String (CUID)                                           │
+│ code: String (UNIQUE) - "trial", "base", "pro"             │
+│ name: String                                                │
+│ chatLimitDaily: Int                                         │
+│ voiceMinutesDaily: Int                                      │
+│ toolsLimitDaily: Int                                        │
+│ chatModel: String (e.g., "gpt-4o-mini")                    │
+│ realtimeModel: String (for voice)                          │
+│ features: Json (feature flags)                              │
+│ availableMaestri: Json[] (list of maestro IDs)             │
+│ availableCoaches: Json[] (coach IDs)                        │
+│ availableBuddies: Json[] (buddy IDs)                        │
+│ availableTools: Json[] (tool names)                         │
+│ monthlyPriceEur: Decimal (pricing)                         │
+│ stripePriceId: String (Stripe integration)                 │
+│ isActive: Boolean                                           │
+└─────────────────────────────────────────────────────────────┘
+                          ↓ 1:N
+┌─────────────────────────────────────────────────────────────┐
+│                   UserSubscription                          │
+├─────────────────────────────────────────────────────────────┤
+│ id: String (CUID)                                           │
+│ userId: String (UNIQUE) - Links to User model              │
+│ tierId: String (FK) - Links to TierDefinition              │
+│ status: Enum - ACTIVE | TRIAL | EXPIRED | CANCELLED        │
+│ overrideLimits: Json? (per-user limit overrides)          │
+│ overrideFeatures: Json? (per-user feature overrides)       │
+│ stripeSubscriptionId: String? (payment tracking)           │
+│ stripeCustomerId: String? (Stripe customer)                │
+│ startedAt: DateTime                                         │
+│ expiresAt: DateTime? (null = no expiry)                    │
+├─────────────────────────────────────────────────────────────┤
+│ Indexes: tierId, status                                    │
+└─────────────────────────────────────────────────────────────┘
+                          ↑
+┌─────────────────────────────────────────────────────────────┐
+│                    TierAuditLog                             │
+├─────────────────────────────────────────────────────────────┤
+│ id: String (CUID)                                           │
+│ tierId: String? (which tier was changed)                    │
+│ userId: String? (which user's subscription was affected)    │
+│ adminId: String (which admin made the change)               │
+│ action: Enum - TIER_CREATE, TIER_UPDATE, SUBSCRIPTION_*    │
+│ changes: Json (what changed)                                │
+│ notes: String? (admin notes)                                │
+├─────────────────────────────────────────────────────────────┤
+│ Indexes: tierId, userId, adminId, createdAt               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Data Flow: Feature Access Pattern
+
+```mermaid
+sequenceDiagram
+    participant User as User/Request
+    participant App as API/Component
+    participant TierSvc as TierService
+    participant DB as Database
+    participant Cache as Feature Cache
+
+    User->>App: Request (with userId)
+    App->>TierSvc: checkFeatureAccess(userId, "voice")
+    TierSvc->>Cache: Check cached features
+    alt Cache hit
+        Cache-->>TierSvc: Return feature config
+    else Cache miss
+        TierSvc->>DB: getEffectiveTier(userId)
+        DB-->>TierSvc: Subscription + TierDefinition
+        TierSvc->>Cache: Store tier features
+        Cache-->>TierSvc: Feature config
+    end
+    TierSvc->>TierSvc: Check if "voice" enabled
+    TierSvc-->>App: true/false
+    App-->>User: Allow/Deny feature
+```
+
+### API Routes
+
+Admin tier management endpoints:
+
+| Endpoint                             | Method | Purpose                            |
+| ------------------------------------ | ------ | ---------------------------------- |
+| `/api/admin/tiers`                   | GET    | List all tiers                     |
+| `/api/admin/tiers`                   | POST   | Create new tier                    |
+| `/api/admin/tiers/[id]`              | GET    | Get tier details                   |
+| `/api/admin/tiers/[id]`              | PATCH  | Update tier                        |
+| `/api/admin/tiers/[id]`              | DELETE | Delete tier                        |
+| `/api/admin/tiers/conversion-funnel` | GET    | Analytics: tier conversion metrics |
+
+### Feature Access Implementation
+
+Components use TierService to gate features:
+
+```typescript
+// In a component
+import { tierService } from "@/lib/tier/tier-service";
+
+const hasProFeature = await tierService.checkFeatureAccess(userId, "voice");
+if (!hasProFeature) {
+  return <UpgradePrompt />;
+}
+
+// In API routes
+const tier = await tierService.getEffectiveTier(userId);
+const limits = await tierService.getLimitsForUser(userId);
+
+// Check consumption against limits
+if (messagesThisMonth >= limits.chatMessagesPerMonth) {
+  return NextResponse.json({ error: "Quota exceeded" }, { status: 429 });
+}
+```
+
+### Tier Configuration
+
+Three default tiers seeded in database:
+
+**Trial** (Anonymous):
+
+- 10 chat messages/day
+- 5 minutes voice/day
+- 10 tool uses/day
+- Limited maestri (3)
+- Model: gpt-4o-mini
+
+**Base** (Free registered users):
+
+- 30 chat messages/day
+- 10 minutes voice/day
+- 30 tool uses/day
+- All maestri + coaches + buddies
+- All tools enabled
+- Model: gpt-4o-mini
+
+**Pro** (Paid subscription):
+
+- Unlimited chat messages
+- Unlimited voice time
+- Unlimited tool uses
+- Priority AI model: gpt-4o
+- Premium features enabled
+- Real-time voice model: gpt-realtime
+
+**Location**: `src/lib/seeds/tier-seed.ts`
 
 ---
 

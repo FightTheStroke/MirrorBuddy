@@ -83,11 +83,11 @@ model FeatureFlag {
 }
 
 model GlobalConfig {
-  id        String   @id @default("global")
-  killSwitch Boolean @default(false)
+  id               String   @id @default("global")
+  killSwitch       Boolean  @default(false)
   killSwitchReason String?
-  updatedAt DateTime @updatedAt
-  updatedBy String?
+  updatedAt        DateTime @updatedAt
+  updatedBy        String?
 }
 
 // ============================================================================
@@ -97,13 +97,13 @@ model GlobalConfig {
 
 model UserActivity {
   id         String   @id @default(cuid())
-  identifier String   // User ID or visitor ID
-  userType   String   // "logged" | "trial" | "anonymous"
-  route      String   // Normalized route path
+  identifier String // User ID or visitor ID
+  userType   String // "logged" | "trial" | "anonymous"
+  route      String // Normalized route path
   timestamp  DateTime @default(now())
 
   // F-06: Test data isolation (ADR 0065)
-  isTestData Boolean  @default(false)
+  isTestData Boolean @default(false)
 
   @@index([timestamp])
   @@index([userType, timestamp])
@@ -117,18 +117,18 @@ model UserActivity {
 // ============================================================================
 
 model FunnelEvent {
-  id        String   @id @default(cuid())
+  id String @id @default(cuid())
 
   // User identification (one of these required)
-  visitorId String?  // For trial users (before signup)
-  userId    String?  // For authenticated users
+  visitorId String? // For trial users (before signup)
+  userId    String? // For authenticated users
 
   // Funnel data
-  stage     String   // VISITOR | TRIAL_START | TRIAL_ENGAGED | LIMIT_HIT | BETA_REQUEST | APPROVED | FIRST_LOGIN | ACTIVE | CHURNED
-  fromStage String?  // Previous stage (null for first event)
+  stage     String // VISITOR | TRIAL_START | TRIAL_ENGAGED | LIMIT_HIT | BETA_REQUEST | APPROVED | FIRST_LOGIN | ACTIVE | CHURNED
+  fromStage String? // Previous stage (null for first event)
 
   // Context
-  metadata  Json?    // Extra data (e.g., maestro used, feature triggered)
+  metadata Json? // Extra data (e.g., maestro used, feature triggered)
 
   // Timestamps
   createdAt DateTime @default(now())
@@ -141,4 +141,3 @@ model FunnelEvent {
   @@index([stage, createdAt])
   @@index([isTestData, createdAt])
 }
-

@@ -12,6 +12,7 @@ import {
   requestParentalConsent,
   checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
+import { assignBaseTierToNewUser } from "@/lib/tier/registration-helper";
 
 import { PostBodySchema, emptyResponse } from "./types";
 import { buildExistingData, buildEffectiveState } from "./helpers";
@@ -96,6 +97,9 @@ export async function POST(
       });
       userId = user.id;
       logger.info("User created", { userId });
+
+      // Assign Base tier to new user (Plan 073: T4-07)
+      await assignBaseTierToNewUser(user.id);
 
       // Trigger admin counts update (non-blocking)
       calculateAndPublishAdminCounts("user-signup").catch((err) =>

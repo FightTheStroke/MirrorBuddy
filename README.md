@@ -235,6 +235,28 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 
 ---
 
+## Tier System
+
+MirrorBuddy offers three tiers to meet different needs:
+
+| Feature                        | Trial        | Base (Free) | Pro       |
+| ------------------------------ | ------------ | ----------- | --------- |
+| **Account**                    | Anonymous    | Free signup | Paid      |
+| **Chat messages/month**        | 10           | 50          | Unlimited |
+| **Voice sessions/month**       | 5 min        | 100 min     | Unlimited |
+| **Tools** (mind maps, quizzes) | Limited (10) | All         | All       |
+| **Maestri access**             | 3 random     | All 22      | All 22    |
+| **Flashcards (FSRS)**          | —            | ✓           | ✓         |
+| **Progress analytics**         | —            | ✓           | ✓         |
+| **Homework help (PDF/photos)** | —            | ✓           | ✓         |
+| **Parental dashboard**         | —            | ✓           | ✓         |
+| **Custom learning paths**      | —            | —           | ✓         |
+| **Priority support**           | —            | —           | ✓         |
+
+**→ See detailed tier comparison: [TIERS.md](TIERS.md)**
+
+---
+
 ## Architecture
 
 **Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector

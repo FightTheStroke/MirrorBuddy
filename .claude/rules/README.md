@@ -12,6 +12,7 @@ Modular rules auto-loaded on every Claude session.
 | e2e-testing.md     | E2E test setup, wall bypass, CI debugging       |
 | maestri.md         | 20 AI tutors, data structure, voice integration |
 | operations.md      | Health endpoints, Grafana Cloud, runbooks       |
+| tier.md            | Trial/Base/Pro tiers, TierService, features     |
 
 ## Usage
 
