@@ -67,9 +67,9 @@ export function WebcamCapture({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-2 sm:p-4"
     >
-      <Card className="w-full max-w-2xl bg-slate-900 border-slate-700 text-white overflow-hidden">
+      <Card className="w-full max-w-4xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white overflow-hidden">
         <WebcamHeader
           purpose={purpose}
           instructions={instructions}

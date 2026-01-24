@@ -3,10 +3,10 @@
  * @brief Webcam header component
  */
 
-import { Camera, X, ChevronDown, Smartphone, Loader2 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { isContinuityCamera, type CameraDevice } from '../utils/camera-utils';
+import { Camera, X, ChevronDown, Smartphone, Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { isContinuityCamera, type CameraDevice } from "../utils/camera-utils";
 
 interface WebcamHeaderProps {
   purpose: string;
@@ -42,7 +42,7 @@ export function WebcamHeader({
   getCameraIcon,
 }: WebcamHeaderProps) {
   return (
-    <div className="p-4 border-b border-slate-700 flex items-center justify-between gap-2">
+    <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-2">
       <div className="flex items-center gap-3 flex-1 min-w-0">
         <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
           <Camera className="w-5 h-5 text-blue-400" />
@@ -61,7 +61,7 @@ export function WebcamHeader({
             variant="outline"
             size="sm"
             onClick={onToggleMenu}
-            className="border-slate-600 text-sm"
+            className="border-slate-300 dark:border-slate-600 text-sm"
             disabled={isSwitchingCamera}
           >
             {isSwitchingCamera ? (
@@ -83,19 +83,19 @@ export function WebcamHeader({
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden z-50"
+                className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg overflow-hidden z-50"
               >
-                <div className="p-2 text-xs text-slate-400 border-b border-slate-700">
+                <div className="p-2 text-xs text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
                   Seleziona fotocamera
                 </div>
                 {availableCameras.map((camera) => (
                   <button
                     key={camera.deviceId}
                     onClick={() => onSwitchCamera(camera.deviceId)}
-                    className={`w-full px-3 py-2 text-left hover:bg-slate-700 transition-colors flex items-center gap-2 ${
+                    className={`w-full px-3 py-2 text-left hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors flex items-center gap-2 ${
                       selectedCameraId === camera.deviceId
-                        ? 'bg-blue-600/20 text-blue-400'
-                        : 'text-slate-300'
+                        ? "bg-blue-600/20 text-blue-600 dark:text-blue-400"
+                        : "text-slate-600 dark:text-slate-300"
                     }`}
                   >
                     {getCameraIcon(camera)}
@@ -125,4 +125,3 @@ export function WebcamHeader({
     </div>
   );
 }
-
