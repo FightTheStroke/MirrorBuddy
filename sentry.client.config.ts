@@ -13,6 +13,15 @@ Sentry.init({
   // Setting this option to true will print useful information to the console while you're setting up Sentry.
   debug: false,
 
+  // Distributed tracing: propagate trace context to these targets
+  // This connects client traces with server traces for full request visibility
+  tracePropagationTargets: [
+    "localhost",
+    /^https:\/\/mirrorbuddy\.vercel\.app/,
+    /^https:\/\/mirrorbuddy\.org/,
+    /^https:\/\/www\.mirrorbuddy\.org/,
+  ],
+
   // Replay is disabled by default - enable in production if needed
   replaysOnErrorSampleRate: 1.0,
   replaysSessionSampleRate: 0,
