@@ -17,7 +17,12 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import type { TierDefinition, UserSubscription, TierLimits } from "./types";
+import type {
+  TierDefinition,
+  UserSubscription,
+  TierLimits,
+  TierFeatures,
+} from "./types";
 import { TierCode } from "./types";
 import { createFallbackTier } from "./tier-fallbacks";
 import { transformTier } from "./tier-transformer";
@@ -117,14 +122,14 @@ export class TierService {
   }
 
   /**
-   * Get the effective tier for a user
+   * Get the effective tier for a user with admin overrides applied
    *
    * @param userId - User ID (null for anonymous users)
-   * @returns TierDefinition applicable to the user
+   * @returns TierDefinition with overrideFeatures and overrideLimits merged
    */
   async getEffectiveTier(userId: string | null): Promise<TierDefinition> {
     try {
-      // Anonymous users → Trial tier
+      // Anonymous users → Trial tier (no overrides possible)
       if (!userId) {
         return await this.getTierByCode(TierCode.TRIAL);
       }
@@ -139,8 +144,11 @@ export class TierService {
 
       // Validate subscription
       if (isSubscriptionValid(subscription)) {
-        // Valid subscription → Return subscribed tier
-        return subscription.tier!;
+        // Valid subscription → Return subscribed tier with overrides applied
+        const baseTier = subscription.tier!;
+
+        // Apply admin overrides if present
+        return this.applyOverrides(baseTier, subscription);
       }
 
       // Invalid/expired subscription → Fallback to Base tier
@@ -162,6 +170,60 @@ export class TierService {
       const fallbackCode = userId ? TierCode.BASE : TierCode.TRIAL;
       return await this.getTierByCode(fallbackCode);
     }
+  }
+
+  /**
+   * Apply subscription overrides to a tier definition
+   * Merges overrideFeatures and overrideLimits into the tier
+   */
+  private applyOverrides(
+    tier: TierDefinition,
+    subscription: UserSubscription,
+  ): TierDefinition {
+    const hasFeatureOverrides =
+      subscription.overrideFeatures &&
+      Object.keys(subscription.overrideFeatures as object).length > 0;
+    const hasLimitOverrides =
+      subscription.overrideLimits &&
+      Object.keys(subscription.overrideLimits as object).length > 0;
+
+    // No overrides, return tier as-is
+    if (!hasFeatureOverrides && !hasLimitOverrides) {
+      return tier;
+    }
+
+    // Create a new tier with overrides merged
+    const mergedTier: TierDefinition = { ...tier };
+
+    // Merge feature overrides
+    if (hasFeatureOverrides) {
+      mergedTier.features = {
+        ...tier.features,
+        ...(subscription.overrideFeatures as Partial<TierFeatures>),
+      } as TierFeatures;
+    }
+
+    // Merge limit overrides
+    if (hasLimitOverrides) {
+      const limitOverrides = subscription.overrideLimits as Record<
+        string,
+        number
+      >;
+      if (limitOverrides.chatLimitDaily !== undefined) {
+        mergedTier.chatLimitDaily = limitOverrides.chatLimitDaily;
+      }
+      if (limitOverrides.voiceMinutesDaily !== undefined) {
+        mergedTier.voiceMinutesDaily = limitOverrides.voiceMinutesDaily;
+      }
+      if (limitOverrides.toolsLimitDaily !== undefined) {
+        mergedTier.toolsLimitDaily = limitOverrides.toolsLimitDaily;
+      }
+      if (limitOverrides.docsLimitTotal !== undefined) {
+        mergedTier.docsLimitTotal = limitOverrides.docsLimitTotal;
+      }
+    }
+
+    return mergedTier;
   }
 
   /**
