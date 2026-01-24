@@ -192,9 +192,9 @@ export async function executeScheduledDeletions(): Promise<{
 }
 
 /**
- * Apply default retention policy to ALL conversations system-wide
- * This marks any conversation older than DEFAULT_RETENTION_POLICY.conversationTTLDays
- * for deletion, regardless of whether the user has a custom policy.
+ * Apply default retention policy to conversations for users WITHOUT custom policies.
+ * Users with custom retention policies are handled separately by markExpiredDataForDeletion()
+ * to respect their configured TTL (which may be longer than the default).
  *
  * GDPR Art. 5 requires storage limitation - data must not be kept indefinitely.
  */
@@ -212,11 +212,25 @@ export async function applyDefaultRetentionSystemWide(): Promise<{
   });
 
   try {
-    // Mark all conversations older than default TTL that aren't already marked
+    // Get user IDs that have custom retention policies - exclude them
+    const usersWithCustomPolicies =
+      await prisma.userPrivacyPreferences.findMany({
+        where: { customRetention: { not: null } },
+        select: { userId: true },
+      });
+    const excludedUserIds = usersWithCustomPolicies.map((u) => u.userId);
+
+    log.debug("Excluding users with custom policies from default retention", {
+      excludedCount: excludedUserIds.length,
+    });
+
+    // Mark conversations older than default TTL, excluding users with custom policies
     const result = await prisma.conversation.updateMany({
       where: {
         createdAt: { lt: cutoffDate },
         markedForDeletion: false,
+        // Exclude users who have custom retention policies
+        userId: { notIn: excludedUserIds },
       },
       data: {
         markedForDeletion: true,
@@ -227,6 +241,7 @@ export async function applyDefaultRetentionSystemWide(): Promise<{
     log.info("Default retention applied system-wide", {
       conversationsMarked: result.count,
       cutoffDate: cutoffDate.toISOString(),
+      usersExcluded: excludedUserIds.length,
     });
 
     return { conversationsMarked: result.count };
