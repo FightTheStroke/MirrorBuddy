@@ -25,6 +25,27 @@ interface User {
   role: "USER" | "ADMIN";
   disabled: boolean;
   createdAt: Date;
+  subscription: {
+    id: string;
+    tier: {
+      id: string;
+      code: string;
+      name: string;
+      chatLimitDaily: number;
+      voiceMinutesDaily: number;
+      toolsLimitDaily: number;
+      docsLimitTotal: number;
+      features: unknown;
+    };
+    overrideLimits: unknown;
+    overrideFeatures: unknown;
+  } | null;
+}
+
+interface Tier {
+  id: string;
+  code: string;
+  name: string;
 }
 
 interface DeletedUserBackup {
@@ -36,7 +57,13 @@ interface DeletedUserBackup {
 
 type FilterTab = "all" | "active" | "disabled" | "trash";
 
-export function UsersTable({ users }: { users: User[] }) {
+export function UsersTable({
+  users,
+  availableTiers,
+}: {
+  users: User[];
+  availableTiers: Tier[];
+}) {
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -180,6 +207,7 @@ export function UsersTable({ users }: { users: User[] }) {
               {filter !== "trash" && (
                 <>
                   <TableHead>Role</TableHead>
+                  <TableHead>Tier</TableHead>
                   <TableHead>Status</TableHead>
                 </>
               )}
@@ -210,6 +238,7 @@ export function UsersTable({ users }: { users: User[] }) {
                       handleAction(user.id, "toggle", user.disabled)
                     }
                     onDelete={() => handleAction(user.id, "delete")}
+                    availableTiers={availableTiers}
                   />
                 ))}
           </TableBody>
@@ -226,6 +255,8 @@ export function UsersTable({ users }: { users: User[] }) {
           selectedIds={selectedIds}
           onClearSelection={() => setSelectedIds(new Set())}
           onActionComplete={() => window.location.reload()}
+          users={users}
+          availableTiers={availableTiers}
         />
       </Tabs>
     </div>

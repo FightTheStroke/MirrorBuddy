@@ -13,6 +13,8 @@ import {
   PanelLeftOpen,
   Home,
   Activity,
+  Layers,
+  ScrollText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -53,6 +55,18 @@ const NAV_ITEMS: NavItem[] = [
     label: "Utenti",
     href: "/admin/users",
     icon: Users,
+  },
+  {
+    id: "tiers",
+    label: "Piani",
+    href: "/admin/tiers",
+    icon: Layers,
+  },
+  {
+    id: "audit-log",
+    label: "Audit Log",
+    href: "/admin/tiers/audit-log",
+    icon: ScrollText,
   },
   {
     id: "analytics",

@@ -67,6 +67,18 @@ export interface UserSubscription {
 }
 
 /**
+ * Tier audit action types
+ */
+export type TierAuditAction =
+  | "TIER_CREATE"
+  | "TIER_UPDATE"
+  | "TIER_DELETE"
+  | "SUBSCRIPTION_CREATE"
+  | "SUBSCRIPTION_UPDATE"
+  | "SUBSCRIPTION_DELETE"
+  | "TIER_CHANGE";
+
+/**
  * Tier audit log entry
  */
 export interface TierAuditLog {
@@ -74,8 +86,9 @@ export interface TierAuditLog {
   tierId: string | null;
   userId: string | null;
   adminId: string;
-  action: string;
+  action: TierAuditAction;
   changes: Record<string, unknown>;
+  notes: string | null;
   createdAt: Date;
 }
 
@@ -141,4 +154,16 @@ export function isSubscriptionExpired(subscription: UserSubscription): boolean {
   return (
     new Date() > subscription.expiresAt && subscription.status === "ACTIVE"
   );
+}
+
+/**
+ * Tier limits for user consumption tracking
+ */
+export interface TierLimits {
+  dailyMessages: number;
+  dailyVoiceMinutes: number;
+  dailyTools: number;
+  maxDocuments: number;
+  maxMaestri: number;
+  monthlyAiCalls?: number;
 }
