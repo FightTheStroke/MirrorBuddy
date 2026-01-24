@@ -17,7 +17,7 @@ vi.mock("@/lib/db", () => ({
       findMany: vi.fn(),
     },
     tierAuditLog: {
-      count: vi.fn(),
+      findMany: vi.fn(),
     },
   },
 }));
@@ -64,10 +64,24 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(2) // pro mauCount/MAU (30d)
         .mockResolvedValueOnce(1); // pro dauCount/DAU (1d)
 
-      // Mock upgrades/downgrades
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(10) // upgrades
-        .mockResolvedValueOnce(2); // downgrades
+      // Mock tier changes (with JSON parsing for upgrade/downgrade detection)
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([
+        // 10 upgrades (trial->base or base->pro)
+        ...Array(10).fill({
+          changes: { from: { tierId: "tier-1" }, to: { tierId: "tier-2" } },
+        }),
+        // 2 downgrades (pro->base or base->trial)
+        ...Array(2).fill({
+          changes: { from: { tierId: "tier-3" }, to: { tierId: "tier-2" } },
+        }),
+      ]);
+
+      // Mock second tierDefinition.findMany for sortOrder lookup
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 }, // trial
+        { id: "tier-2", sortOrder: 1 }, // base
+        { id: "tier-3", sortOrder: 2 }, // pro
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -122,9 +136,11 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(2) // dauCount/DAU (1d)
         .mockResolvedValueOnce(1); // churned (30+ days)
 
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(0)
-        .mockResolvedValueOnce(0);
+      // Mock empty tier changes
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -138,12 +154,48 @@ describe("Tier Metrics Collector", () => {
       expect(activeUsers?.value).toBe(3);
     });
 
-    it("should return upgrade/downgrade counters", async () => {
+    it("should return upgrade/downgrade counters based on sortOrder", async () => {
       mockPrisma.userSubscription.groupBy.mockResolvedValueOnce([]);
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([]);
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(15) // 15 upgrades
-        .mockResolvedValueOnce(5); // 5 downgrades
+      mockPrisma.tierDefinition.findMany
+        .mockResolvedValueOnce([]) // First call for tier codes
+        .mockResolvedValueOnce([
+          { id: "tier-trial", sortOrder: 0 },
+          { id: "tier-base", sortOrder: 1 },
+          { id: "tier-pro", sortOrder: 2 },
+        ]);
+
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([
+        // 15 upgrades (lower sortOrder -> higher sortOrder)
+        ...Array(10).fill({
+          changes: {
+            from: { tierId: "tier-trial" },
+            to: { tierId: "tier-base" },
+          },
+        }),
+        ...Array(5).fill({
+          changes: {
+            from: { tierId: "tier-base" },
+            to: { tierId: "tier-pro" },
+          },
+        }),
+        // 5 downgrades (higher sortOrder -> lower sortOrder)
+        ...Array(3).fill({
+          changes: {
+            from: { tierId: "tier-pro" },
+            to: { tierId: "tier-base" },
+          },
+        }),
+        ...Array(2).fill({
+          changes: {
+            from: { tierId: "tier-base" },
+            to: { tierId: "tier-trial" },
+          },
+        }),
+        // 2 new subscriptions (from is null) - should not count
+        ...Array(2).fill({
+          changes: { from: null, to: { tierId: "tier-trial" } },
+        }),
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -162,10 +214,10 @@ describe("Tier Metrics Collector", () => {
 
     it("should handle empty database gracefully", async () => {
       mockPrisma.userSubscription.groupBy.mockResolvedValueOnce([]);
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([]);
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(0)
-        .mockResolvedValueOnce(0);
+      mockPrisma.tierDefinition.findMany
+        .mockResolvedValueOnce([]) // First call for tier codes
+        .mockResolvedValueOnce([]); // Second call for sortOrder
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -195,9 +247,18 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(4) // mauCount
         .mockResolvedValueOnce(2) // dauCount
         .mockResolvedValueOnce(1); // churned
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(10)
-        .mockResolvedValueOnce(2);
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([
+        ...Array(10).fill({
+          changes: { from: { tierId: "tier-1" }, to: { tierId: "tier-2" } },
+        }),
+        ...Array(2).fill({
+          changes: { from: { tierId: "tier-2" }, to: { tierId: "tier-1" } },
+        }),
+      ]);
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 },
+        { id: "tier-2", sortOrder: 1 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -242,9 +303,18 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(1) // dauCount/DAU (1d)
         .mockResolvedValueOnce(1); // churned (30+ days)
 
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(10) // upgrades
-        .mockResolvedValueOnce(2); // downgrades
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([
+        ...Array(10).fill({
+          changes: { from: { tierId: "tier-1" }, to: { tierId: "tier-2" } },
+        }),
+        ...Array(2).fill({
+          changes: { from: { tierId: "tier-2" }, to: { tierId: "tier-1" } },
+        }),
+      ]);
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 },
+        { id: "tier-2", sortOrder: 1 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -281,9 +351,10 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(2) // dauCount/DAU (1d)
         .mockResolvedValueOnce(2); // churned (30+ days)
 
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(0)
-        .mockResolvedValueOnce(0);
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -311,9 +382,10 @@ describe("Tier Metrics Collector", () => {
         .mockResolvedValueOnce(0) // dauCount/DAU (1d)
         .mockResolvedValueOnce(0); // churned (30+ days)
 
-      mockPrisma.tierAuditLog.count
-        .mockResolvedValueOnce(0)
-        .mockResolvedValueOnce(0);
+      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
+      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
+        { id: "tier-1", sortOrder: 0 },
+      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 

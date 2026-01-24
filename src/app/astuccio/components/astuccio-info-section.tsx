@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Sparkles } from 'lucide-react';
+import { motion } from "framer-motion";
+import { Sparkles } from "lucide-react";
 
 export function AstuccioInfoSection() {
   return (
@@ -18,29 +18,43 @@ export function AstuccioInfoSection() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
             <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">1</span>
+              <span className="text-2xl font-bold text-blue-800 dark:text-blue-300">
+                1
+              </span>
             </div>
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Scegli lo Strumento</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
+              Scegli lo Strumento
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Seleziona lo strumento piu adatto al tuo obiettivo di apprendimento
+              Seleziona lo strumento piu adatto al tuo obiettivo di
+              apprendimento
             </p>
           </div>
           <div className="text-center">
             <div className="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-green-600 dark:text-green-400">2</span>
+              <span className="text-2xl font-bold text-green-800 dark:text-green-300">
+                2
+              </span>
             </div>
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Scegli il Maestro</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
+              Scegli il Maestro
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
               Ogni maestro ha un approccio unico per aiutarti a imparare
             </p>
           </div>
           <div className="text-center">
             <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <span className="text-2xl font-bold text-purple-600 dark:text-purple-400">3</span>
+              <span className="text-2xl font-bold text-purple-800 dark:text-purple-300">
+                3
+              </span>
             </div>
-            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">Salva nello Zaino</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
+              Salva nello Zaino
+            </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              I materiali creati vengono salvati nel tuo Zaino per riusarli quando vuoi
+              I materiali creati vengono salvati nel tuo Zaino per riusarli
+              quando vuoi
             </p>
           </div>
         </div>
@@ -56,10 +70,11 @@ export function AstuccioInfoSection() {
           <Sparkles className="w-5 h-5" /> Consiglio per Studiare
         </h3>
         <p className="text-sm text-blue-700 dark:text-blue-300">
-          Inizia con una <strong>Mappa Mentale</strong> per avere una visione d&apos;insieme,
-          poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave,
-          e infine verifica la tua preparazione con un <strong>Quiz</strong>.
-          Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!
+          Inizia con una <strong>Mappa Mentale</strong> per avere una visione
+          d&apos;insieme, poi crea delle <strong>Flashcard</strong> per
+          memorizzare i concetti chiave, e infine verifica la tua preparazione
+          con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel
+          tuo <strong>Zaino</strong>!
         </p>
       </motion.div>
     </>
