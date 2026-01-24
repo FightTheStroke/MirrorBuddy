@@ -13,21 +13,17 @@ interface FeatureDefinition {
   description: string;
 }
 
+// Feature keys must match those used in tier-seed.ts and TierService
 const FEATURE_DEFINITIONS: FeatureDefinition[] = [
   {
-    key: "video_vision",
-    label: "Video Vision",
-    description: "Enable webcam video analysis (Pro only by default)",
+    key: "chat",
+    label: "Chat",
+    description: "Enable text chat with maestri",
   },
   {
-    key: "voice_enabled",
+    key: "voice",
     label: "Voice Chat",
     description: "Enable voice conversations with maestri",
-  },
-  {
-    key: "pdf_export",
-    label: "PDF Export",
-    description: "Allow exporting conversations and summaries to PDF",
   },
   {
     key: "flashcards",
@@ -35,29 +31,29 @@ const FEATURE_DEFINITIONS: FeatureDefinition[] = [
     description: "Enable FSRS-based flashcard system for learning",
   },
   {
-    key: "mindmaps",
-    label: "Mind Maps",
-    description: "Create and interact with mind maps",
-  },
-  {
     key: "quizzes",
     label: "Quizzes",
     description: "Generate and take adaptive quizzes",
   },
   {
-    key: "homework_help",
-    label: "Homework Help",
-    description: "Enable homework assistance tool",
+    key: "mindMaps",
+    label: "Mind Maps",
+    description: "Create and interact with mind maps",
   },
   {
-    key: "formula_tool",
-    label: "Formula Tool",
-    description: "LaTeX formula rendering and editing",
+    key: "videoVision",
+    label: "Video Vision",
+    description: "Enable webcam video analysis (Pro only by default)",
   },
   {
-    key: "chart_tool",
-    label: "Chart Tool",
-    description: "Create and display charts and graphs",
+    key: "parentDashboard",
+    label: "Parent Dashboard",
+    description: "Enable parent monitoring dashboard",
+  },
+  {
+    key: "prioritySupport",
+    label: "Priority Support",
+    description: "Enable priority support access",
   },
 ];
 

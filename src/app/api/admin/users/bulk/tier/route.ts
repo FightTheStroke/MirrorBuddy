@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 interface BulkTierChangeResult {
   userId: string;
@@ -133,7 +134,12 @@ export async function POST(request: NextRequest) {
         });
         summary.successful++;
       } catch (error) {
-        console.error(`Error changing tier for user ${userId}:`, error);
+        // Use structured logging instead of format string with user input
+        logger.error(
+          "Error changing tier for user",
+          { userId },
+          error instanceof Error ? error : undefined,
+        );
         results.push({
           userId,
           success: false,

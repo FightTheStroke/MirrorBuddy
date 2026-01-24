@@ -27,9 +27,15 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "email is required" }, { status: 400 });
     }
 
-    // Basic email validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Basic email validation - simple pattern to avoid ReDoS
+    // RFC 5322 compliant validation should happen server-side with proper library
+    if (
+      typeof email !== "string" ||
+      email.length > 254 ||
+      !email.includes("@") ||
+      email.indexOf("@") === 0 ||
+      email.indexOf("@") === email.length - 1
+    ) {
       return NextResponse.json(
         { error: "Invalid email format" },
         { status: 400 },

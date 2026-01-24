@@ -205,12 +205,28 @@ export class TierService {
    * Get tier limits for a user
    *
    * @param userId - User ID (null for anonymous users)
-   * @returns TierLimits with consumption limits for the user's tier
+   * @returns TierLimits with consumption limits for the user's tier,
+   *          merged with any admin-set overrideLimits from subscription
    */
   async getLimitsForUser(userId: string | null): Promise<TierLimits> {
     try {
       const tier = await this.getEffectiveTier(userId);
-      return extractTierLimits(tier);
+      const baseLimits = extractTierLimits(tier);
+
+      // For registered users, check for admin overrides
+      if (userId) {
+        const subscription = await this.getUserSubscription(userId);
+        if (subscription?.overrideLimits) {
+          const overrides = subscription.overrideLimits as Partial<TierLimits>;
+          // Merge overrides into base limits (overrides take precedence)
+          return {
+            ...baseLimits,
+            ...overrides,
+          };
+        }
+      }
+
+      return baseLimits;
     } catch (error) {
       logger.error("Error fetching limits for user, using fallback", {
         userId,
