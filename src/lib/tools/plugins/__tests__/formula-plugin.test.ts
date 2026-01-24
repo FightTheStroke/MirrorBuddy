@@ -35,8 +35,6 @@ describe("formula-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -111,7 +109,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.latex).toBe("x^{2} + y^{2} = z^{2}");
+      expect((result.data as any).latex).toBe("x^{2} + y^{2} = z^{2}");
     });
 
     it("returns success with description input", async () => {
@@ -130,7 +128,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.description).toBe("Formula di Einstein");
+      expect((result.data as any).description).toBe("Formula di Einstein");
     });
 
     it("sets block display mode for formulas with \\int", async () => {
@@ -140,7 +138,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets block display mode for formulas with \\sum", async () => {
@@ -150,7 +148,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets block display mode for long formulas (>30 chars)", async () => {
@@ -161,7 +159,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("block");
+      expect((result.data as any).displayMode).toBe("block");
     });
 
     it("sets inline display mode for simple formulas", async () => {
@@ -171,7 +169,7 @@ describe("formula-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.displayMode).toBe("inline");
+      expect((result.data as any).displayMode).toBe("inline");
     });
   });
 

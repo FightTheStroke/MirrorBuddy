@@ -16,8 +16,6 @@ describe("summary-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "manzoni",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validInput = {
@@ -89,9 +87,9 @@ describe("summary-plugin handler", () => {
       const result = await summaryPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Italian Literature");
-      expect(result.data.sections).toHaveLength(2);
-      expect(result.data.length).toBe("medium");
+      expect((result.data as any).topic).toBe("Italian Literature");
+      expect((result.data as any).sections).toHaveLength(2);
+      expect((result.data as any).length).toBe("medium");
     });
 
     it("creates summary without length (optional)", async () => {
@@ -104,7 +102,7 @@ describe("summary-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.length).toBeUndefined();
+      expect((result.data as any).length).toBeUndefined();
     });
 
     it("creates summary without keyPoints (optional)", async () => {
@@ -117,7 +115,7 @@ describe("summary-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sections[0].keyPoints).toBeUndefined();
+      expect((result.data as any).sections[0].keyPoints).toBeUndefined();
     });
 
     it("trims all string fields", async () => {
@@ -136,10 +134,14 @@ describe("summary-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Spaced Topic");
-      expect(result.data.sections[0].title).toBe("Section Title");
-      expect(result.data.sections[0].content).toBe("Section content");
-      expect(result.data.sections[0].keyPoints?.[0]).toBe("Point 1");
+      const data = result.data as {
+        topic: string;
+        sections: { title: string; content: string; keyPoints?: string[] }[];
+      };
+      expect(data.topic).toBe("Spaced Topic");
+      expect(data.sections[0].title).toBe("Section Title");
+      expect(data.sections[0].content).toBe("Section content");
+      expect(data.sections[0].keyPoints?.[0]).toBe("Point 1");
     });
   });
 
@@ -157,7 +159,7 @@ describe("summary-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.length).toBe(length);
+      expect((result.data as any).length).toBe(length);
     });
   });
 

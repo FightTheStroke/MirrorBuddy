@@ -22,8 +22,6 @@ describe("quiz-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   const validInput = {
@@ -98,11 +96,11 @@ describe("quiz-plugin handler", () => {
       const result = await quizPlugin.handler(validInput, mockContext);
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Mathematics");
-      expect(result.data.difficulty).toBe("intermediate");
-      expect(result.data.questionCount).toBe(2);
-      expect(result.data.questions).toHaveLength(2);
-      expect(result.data.createdAt).toBeDefined();
+      expect((result.data as any).topic).toBe("Mathematics");
+      expect((result.data as any).difficulty).toBe("intermediate");
+      expect((result.data as any).questionCount).toBe(2);
+      expect((result.data as any).questions).toHaveLength(2);
+      expect((result.data as any).createdAt).toBeDefined();
     });
 
     it("trims topic and question fields", async () => {
@@ -123,10 +121,10 @@ describe("quiz-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.topic).toBe("Spaced Topic");
-      expect(result.data.questions[0].question).toBe("Question?");
-      expect(result.data.questions[0].options[0]).toBe("A");
-      expect(result.data.questions[0].explanation).toBe("Explanation");
+      expect((result.data as any).topic).toBe("Spaced Topic");
+      expect((result.data as any).questions[0].question).toBe("Question?");
+      expect((result.data as any).questions[0].options[0]).toBe("A");
+      expect((result.data as any).questions[0].explanation).toBe("Explanation");
     });
 
     it("handles questions without explanation", async () => {
@@ -141,7 +139,7 @@ describe("quiz-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.questions[0].explanation).toBeUndefined();
+      expect((result.data as any).questions[0].explanation).toBeUndefined();
     });
 
     it("uses default difficulty when not provided", async () => {
@@ -155,7 +153,7 @@ describe("quiz-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.difficulty).toBe("intermediate");
+      expect((result.data as any).difficulty).toBe("intermediate");
     });
   });
 
@@ -169,7 +167,7 @@ describe("quiz-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.difficulty).toBe(difficulty);
+      expect((result.data as any).difficulty).toBe(difficulty);
     });
   });
 

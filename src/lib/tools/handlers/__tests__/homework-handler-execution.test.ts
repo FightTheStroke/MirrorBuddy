@@ -387,7 +387,7 @@ describe("analyzeHomework", () => {
     expect(result.exerciseType).toBe("unknown");
     expect(result.problemStatement).toBe("Some problem text");
     expect(result.hints).toHaveLength(3);
-    expect(result.hints[0]).toContain("chiesto");
+    expect(result.hints?.[0]).toContain("chiesto");
   });
 
   it("falls back to defaults when chatCompletion throws", async () => {
@@ -511,7 +511,10 @@ describe("extractTextFromImage", () => {
     const { extractTextFromImage } = await import("../homework-handler");
     await extractTextFromImage("base64string");
 
-    const callArgs = mockFetch.mock.calls[0];
+    const callArgs = mockFetch.mock.calls[0] as unknown as [
+      string,
+      { body: string },
+    ];
     const body = JSON.parse(callArgs[1].body);
     expect(body.messages[0].content[1].image_url.url).toBe(
       "data:image/jpeg;base64,base64string",
@@ -525,9 +528,8 @@ describe("extractTextFromImage", () => {
 
     mockFetch.mockResolvedValueOnce({
       ok: false,
-      status: 400,
       text: () => Promise.resolve("Bad request"),
-    });
+    } as Response);
 
     const { extractTextFromImage } = await import("../homework-handler");
 
@@ -545,7 +547,7 @@ describe("extractTextFromImage", () => {
       ok: true,
       json: () =>
         Promise.resolve({
-          choices: [{ message: {} }],
+          choices: [{ message: { content: "" } }],
         }),
     });
 
@@ -573,7 +575,7 @@ describe("extractTextFromImage", () => {
     const { extractTextFromImage } = await import("../homework-handler");
     await extractTextFromImage("data:image/png;base64,xyz");
 
-    const callUrl = mockFetch.mock.calls[0][0];
+    const callUrl = (mockFetch.mock.calls[0] as unknown as [string])[0];
     expect(callUrl).toContain("gpt-4");
   });
 });

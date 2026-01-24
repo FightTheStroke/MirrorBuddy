@@ -51,8 +51,6 @@ describe("homework-plugin handler", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -67,6 +65,7 @@ describe("homework-plugin handler", () => {
     });
     vi.mocked(extractTextFromPDF).mockResolvedValue({
       text: "PDF text extracted",
+      pageCount: 1,
     });
     vi.mocked(extractTextFromImage).mockResolvedValue("Image text extracted");
   });
@@ -127,8 +126,8 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("text");
-      expect(result.data.exerciseType).toBe("algebra");
+      expect((result.data as any).sourceType).toBe("text");
+      expect((result.data as any).exerciseType).toBe("algebra");
       expect(analyzeHomework).toHaveBeenCalledWith("Solve x + 5 = 10", "text");
     });
 
@@ -139,9 +138,11 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.type).toBe("homework");
-      expect(result.data.problemStatement).toBe("Solve for x");
-      expect(result.data.hints).toEqual(["Subtract 5 from both sides"]);
+      expect((result.data as any).type).toBe("homework");
+      expect((result.data as any).problemStatement).toBe("Solve for x");
+      expect((result.data as any).hints).toEqual([
+        "Subtract 5 from both sides",
+      ]);
     });
   });
 
@@ -154,7 +155,7 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("pdf");
+      expect((result.data as any).sourceType).toBe("pdf");
       expect(extractTextFromPDF).toHaveBeenCalled();
       expect(analyzeHomework).toHaveBeenCalledWith("PDF text extracted", "pdf");
     });
@@ -167,7 +168,7 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("pdf");
+      expect((result.data as any).sourceType).toBe("pdf");
       expect(extractTextFromPDF).toHaveBeenCalled();
     });
   });
@@ -181,7 +182,7 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("image");
+      expect((result.data as any).sourceType).toBe("image");
       expect(extractTextFromImage).toHaveBeenCalledWith(dataUrl);
       expect(analyzeHomework).toHaveBeenCalledWith(
         "Image text extracted",
@@ -197,7 +198,7 @@ describe("homework-plugin handler", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.sourceType).toBe("image");
+      expect((result.data as any).sourceType).toBe("image");
       expect(extractTextFromImage).toHaveBeenCalled();
     });
   });
@@ -246,7 +247,10 @@ describe("homework-plugin handler", () => {
     });
 
     it("rejects empty PDF extraction", async () => {
-      vi.mocked(extractTextFromPDF).mockResolvedValueOnce({ text: "" });
+      vi.mocked(extractTextFromPDF).mockResolvedValueOnce({
+        text: "",
+        pageCount: 0,
+      });
 
       const result = await homeworkPlugin.handler(
         { fileType: "pdf", fileData: "data" },

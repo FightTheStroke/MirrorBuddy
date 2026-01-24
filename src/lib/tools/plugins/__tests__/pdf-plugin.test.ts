@@ -43,8 +43,6 @@ describe("pdf-plugin", () => {
     userId: "user-456",
     sessionId: "sess-789",
     maestroId: "euclide",
-    studentAge: 14,
-    studentName: "Marco",
   };
 
   beforeEach(() => {
@@ -116,10 +114,10 @@ describe("pdf-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.text).toBe("Extracted PDF text content");
-      expect(result.data.metadata.pageCount).toBe(5);
-      expect(result.data.metadata.fileName).toBe("test.pdf");
-      expect(result.data.metadata.fileSize).toBe(1024);
+      expect((result.data as any).text).toBe("Extracted PDF text content");
+      expect((result.data as any).metadata.pageCount).toBe(5);
+      expect((result.data as any).metadata.fileName).toBe("test.pdf");
+      expect((result.data as any).metadata.fileSize).toBe(1024);
     });
 
     it("handles Uint8Array buffer", async () => {
@@ -142,7 +140,7 @@ describe("pdf-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.metadata.fileName).toBe("document.pdf");
+      expect((result.data as any).metadata.fileName).toBe("document.pdf");
     });
 
     it("calculates fileSize from buffer when not provided", async () => {
@@ -153,7 +151,7 @@ describe("pdf-plugin", () => {
       );
 
       expect(result.success).toBe(true);
-      expect(result.data.metadata.fileSize).toBe(pdfContent.length);
+      expect((result.data as any).metadata.fileSize).toBe(pdfContent.length);
     });
   });
 
