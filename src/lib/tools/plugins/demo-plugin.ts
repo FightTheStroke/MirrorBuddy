@@ -15,18 +15,13 @@ import type { ToolContext, ToolResult } from "@/types/tools";
 
 /**
  * Input validation schema for demo creation
- * Supports three types of interactive visualizations
+ * Must match OpenAI function definition in schemas-utility.ts
  */
 const DemoInputSchema = z.object({
-  topic: z.string().min(1).max(200),
-  type: z
-    .enum(["simulation", "visualization", "experiment"])
-    .optional()
-    .default("visualization"),
-  title: z.string().min(1).max(100).optional(),
-  concept: z.string().min(1).max(500).optional(),
-  visualization: z.string().min(1).max(500).optional(),
-  interaction: z.string().min(1).max(500).optional(),
+  title: z.string().min(1).max(100),
+  concept: z.string().min(1).max(500),
+  visualization: z.string().min(1).max(500),
+  interaction: z.string().min(1).max(500),
   wowFactor: z.string().max(200).optional(),
 });
 
@@ -35,28 +30,16 @@ const DemoInputSchema = z.object({
  * Leverages existing demo-handler logic
  */
 async function generateDemoCode(args: {
-  topic: string;
-  type: string;
-  title?: string;
-  concept?: string;
-  visualization?: string;
-  interaction?: string;
+  title: string;
+  concept: string;
+  visualization: string;
+  interaction: string;
   wowFactor?: string;
 }) {
-  const {
-    topic,
-    type,
-    title = `Demo: ${topic}`,
-    concept = topic,
-    visualization = `Interactive visualization for ${topic}`,
-    interaction = "Click and drag to explore",
-    wowFactor,
-  } = args;
+  const { title, concept, visualization, interaction, wowFactor } = args;
 
-  const prompt = `Crea una ${type} SPETTACOLARE e INTERATTIVA per:
+  const prompt = `Crea una visualizzazione SPETTACOLARE e INTERATTIVA per:
 TITOLO: ${title}
-ARGOMENTO: ${topic}
-TIPO: ${type}
 CONCETTO: ${concept}
 VISUALIZZAZIONE: ${visualization}
 INTERAZIONE: ${interaction}
@@ -74,7 +57,7 @@ Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
 
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logger.warn(`Failed to parse demo code JSON for ${topic}`);
+      logger.warn(`Failed to parse demo code JSON for ${title}`);
       return null;
     }
 
@@ -85,7 +68,7 @@ Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
       js: code.js || "",
     };
   } catch (error) {
-    logger.error(`Failed to generate demo code for ${topic}`, undefined, error);
+    logger.error(`Failed to generate demo code for ${title}`, undefined, error);
     return null;
   }
 }
@@ -110,20 +93,11 @@ export const demoPlugin: ToolPlugin = {
   ): Promise<ToolResult> => {
     try {
       const validated = DemoInputSchema.parse(args);
-      const {
-        topic,
-        type,
-        title = `Demo: ${topic}`,
-        concept = topic,
-        visualization = `Visualizzazione per ${topic}`,
-        interaction = "Clicca e trascina per esplorare",
-        wowFactor,
-      } = validated;
+      const { title, concept, visualization, interaction, wowFactor } =
+        validated;
 
       // Generate code from description
       const code = await generateDemoCode({
-        topic,
-        type,
         title,
         concept,
         visualization,
@@ -144,8 +118,6 @@ export const demoPlugin: ToolPlugin = {
         data: {
           id: nanoid(),
           title,
-          type,
-          topic,
           html: await sanitizeHtml(code.html),
           css: code.css,
           js: code.js,
@@ -162,16 +134,16 @@ export const demoPlugin: ToolPlugin = {
   },
 
   // Voice integration for maestro system
-  // Supports dynamic template substitution with {topic}
+  // Supports dynamic template substitution with {concept}
   voicePrompt: {
-    template: "Vuoi vedere una demo interattiva su {topic}?",
-    requiresContext: ["topic"],
+    template: "Vuoi vedere una demo interattiva su {concept}?",
+    requiresContext: ["concept"],
     fallback: "Vuoi creare una demo interattiva?",
   },
 
   voiceFeedback: {
-    template: "Ecco la demo su {topic} pronta per esplorare!",
-    requiresContext: ["topic"],
+    template: "Ecco la demo su {concept} pronta per esplorare!",
+    requiresContext: ["concept"],
     fallback: "Ecco la demo pronta!",
   },
 
