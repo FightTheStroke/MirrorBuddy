@@ -94,6 +94,7 @@ fi
 # =============================================================================
 # PHASE 6: SECURITY
 # =============================================================================
+./scripts/secrets-scan.sh > /tmp/release-secrets.log 2>&1 && pass "secrets" || fail "secrets" "\`\`\`\n$(cat /tmp/release-secrets.log)\n\`\`\`"
 rg -q 'Content-Security-Policy' src/middleware.ts src/proxy.ts 2>/dev/null && pass "csp" || fail "csp" "Missing CSP header in middleware.ts or proxy.ts"
 rg -q 'csrf' src/lib/auth/ 2>/dev/null && pass "csrf" || fail "csrf" "Missing CSRF protection in src/lib/auth/"
 

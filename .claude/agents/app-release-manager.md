@@ -21,16 +21,16 @@ ZERO TOLERANCE. Script does work, agent interprets.
 
 ## CHECK CATEGORIES
 
-| Phase      | Checks                                    | Blocking |
-| ---------- | ----------------------------------------- | -------- |
-| Instant    | docs, hygiene, ts-ignore, any-type        | Yes      |
-| Static     | lint, typecheck, audit                    | Yes      |
-| Build      | build                                     | Yes      |
-| Tests      | unit, e2e                                 | Yes      |
-| Perf       | perf, filesize                            | Yes      |
-| Security   | csp, csrf, no-debug, rate-limit           | Yes      |
-| Compliance | dpia, ai-policy, privacy-page, terms-page | Yes      |
-| Plans      | plans (no `[ ]` in done/)                 | Yes      |
+| Phase      | Checks                                       | Blocking |
+| ---------- | -------------------------------------------- | -------- |
+| Instant    | docs, hygiene, ts-ignore, any-type           | Yes      |
+| Static     | lint, typecheck, audit                       | Yes      |
+| Build      | build                                        | Yes      |
+| Tests      | unit, e2e                                    | Yes      |
+| Perf       | perf, filesize                               | Yes      |
+| Security   | **secrets**, csp, csrf, no-debug, rate-limit | Yes      |
+| Compliance | dpia, ai-policy, privacy-page, terms-page    | Yes      |
+| Plans      | plans (no `[ ]` in done/)                    | Yes      |
 
 ## ON FAILURE
 
@@ -41,6 +41,7 @@ cat /tmp/release-{check_name}.log
 
 Then fix. Common fixes:
 
+- `secrets` → Move hardcoded values to .env, use process.env.VAR
 - `lint` → `npm run lint:fix`
 - `typecheck` → Fix TS errors shown in log
 - `hygiene` → Remove TODO/FIXME comments
