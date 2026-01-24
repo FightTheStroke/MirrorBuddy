@@ -18,7 +18,6 @@ vi.mock("@/lib/db", () => ({
     },
     tierAuditLog: {
       count: vi.fn(),
-      findMany: vi.fn(),
     },
   },
 }));
@@ -42,7 +41,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         { _count: { id: 8 }, tierId: "tier-2" },
       ]);
 
-      // First call: get tier codes
       mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
         { id: "tier-1", code: "trial" },
         { id: "tier-2", code: "base" },
@@ -63,14 +61,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
-
-      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-
-      // Second call: get tier sortOrder
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
-        { id: "tier-1", sortOrder: 0 },
-        { id: "tier-2", sortOrder: 1 },
-      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -95,7 +85,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         { _count: { id: 8 }, tierId: "tier-2" },
       ]);
 
-      // First call: get tier codes
       mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
         { id: "tier-1", code: "trial" },
         { id: "tier-2", code: "base" },
@@ -116,14 +105,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
-
-      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-
-      // Second call: get tier sortOrder
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
-        { id: "tier-1", sortOrder: 0 },
-        { id: "tier-2", sortOrder: 1 },
-      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -148,7 +129,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         { _count: { id: 8 }, tierId: "tier-2" },
       ]);
 
-      // First call: get tier codes
       mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
         { id: "tier-1", code: "trial" },
         { id: "tier-2", code: "base" },
@@ -169,14 +149,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
-
-      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-
-      // Second call: get tier sortOrder
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
-        { id: "tier-1", sortOrder: 0 },
-        { id: "tier-2", sortOrder: 1 },
-      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -199,7 +171,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         { _count: { id: 5 }, tierId: "tier-1" },
       ]);
 
-      // First call: get tier codes
       mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
         { id: "tier-1", code: "trial" },
       ]);
@@ -215,13 +186,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
-
-      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-
-      // Second call: get tier sortOrder
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
-        { id: "tier-1", sortOrder: 0 },
-      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 
@@ -241,7 +205,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
         { _count: { id: 5 }, tierId: "tier-1" },
       ]);
 
-      // First call: get tier codes
       mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
         { id: "tier-1", code: "trial" },
       ]);
@@ -257,13 +220,6 @@ describe("Tier Engagement Metrics (DAU/WAU/MAU)", () => {
       mockPrisma.tierAuditLog.count
         .mockResolvedValueOnce(0)
         .mockResolvedValueOnce(0);
-
-      mockPrisma.tierAuditLog.findMany.mockResolvedValueOnce([]);
-
-      // Second call: get tier sortOrder
-      mockPrisma.tierDefinition.findMany.mockResolvedValueOnce([
-        { id: "tier-1", sortOrder: 0 },
-      ]);
 
       const samples = await collectTierMetrics(instanceLabels, timestamp);
 

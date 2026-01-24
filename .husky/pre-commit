@@ -1,1 +1,7 @@
+#!/bin/sh
+
+# Run secrets scan first (fast, catches sensitive data before commit)
+./scripts/secrets-scan.sh || exit 1
+
+# Run lint-staged (formatting, linting)
 npx lint-staged
