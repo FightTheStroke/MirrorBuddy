@@ -2,7 +2,7 @@
 
 Step-by-step guide for deploying MirrorBuddy to production on Vercel with Azure OpenAI, Supabase, Upstash, and Resend.
 
-> Last updated: 20 Gennaio 2026, 11:30 CET
+> Last updated: 24 Gennaio 2026, 16:00 CET
 
 See [ADR-0052](docs/adr/0052-vercel-deployment-configuration.md) for architecture decisions.
 
@@ -18,7 +18,8 @@ Create accounts and have credentials ready:
 - **Resend** - transactional email (free tier: 100/day)
 - **Azure OpenAI** - chat, embeddings, realtime voice (paid)
 - **Azure Cost Management** (optional) - cost tracking
-- **Grafana Cloud** (optional) - observability
+- **Grafana Cloud** (optional) - metrics observability
+- **Sentry** (optional) - error tracking and performance monitoring
 
 ---
 
@@ -161,6 +162,12 @@ Create accounts and have credentials ready:
    # Resend
    vercel env add RESEND_API_KEY production --sensitive <<< "re_..."
 
+   # Sentry (optional - error tracking)
+   vercel env add SENTRY_DSN production --sensitive <<< "https://...@sentry.io/..."
+   vercel env add SENTRY_AUTH_TOKEN production --sensitive <<< "sntrys_..."
+   vercel env add SENTRY_ORG production <<< "your-org"
+   vercel env add SENTRY_PROJECT production <<< "mirrorbuddy"
+
    # Security
    vercel env add SESSION_SECRET production --sensitive <<< "$(openssl rand -hex 32)"
    vercel env add CRON_SECRET production --sensitive <<< "$(openssl rand -hex 32)"
@@ -202,9 +209,15 @@ Create accounts and have credentials ready:
    - Speak, verify response
 
 5. **Check Logs**
+
    ```bash
    vercel logs --tail
    ```
+
+6. **Verify Sentry** (if configured)
+   - Visit [sentry.io](https://sentry.io) → Projects → mirrorbuddy
+   - Generate test error: trigger a client-side error
+   - Check Issues tab for new events
 
 ---
 
@@ -219,6 +232,8 @@ Create accounts and have credentials ready:
 **Rate Limiting Issues**: Verify `UPSTASH_REDIS_REST_URL` and token are correct
 
 **Database Connection Timeout**: Check Supabase firewall, ensure pgbouncer connection pooling enabled
+
+**Sentry Not Receiving Events**: Verify `SENTRY_DSN` is correct, check browser console for Sentry init errors
 
 See [TROUBLESHOOTING.md](TROUBLESHOOTING.md) for detailed diagnostic steps.
 
