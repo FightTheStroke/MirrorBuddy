@@ -8,6 +8,10 @@ import { Save, X } from "lucide-react";
 import { BasicInfoSection } from "./basic-info-section";
 import { LimitsSection } from "./limits-section";
 import { FeaturesSection } from "./features-section";
+import { ToolsSection } from "./tools-section";
+import { MaestriSection } from "./maestri-section";
+import { CoachesSection } from "./coaches-section";
+import { BuddiesSection } from "./buddies-section";
 
 interface TierFormData {
   id?: string;
@@ -147,6 +151,34 @@ export function TierForm({ tier }: TierFormProps) {
       <FeaturesSection
         formData={{
           features: formData.features,
+        }}
+        onChange={updateFormData}
+      />
+
+      <ToolsSection
+        formData={{
+          availableTools: formData.availableTools,
+        }}
+        onChange={updateFormData}
+      />
+
+      <MaestriSection
+        formData={{
+          availableMaestri: formData.availableMaestri,
+        }}
+        onChange={updateFormData}
+      />
+
+      <CoachesSection
+        formData={{
+          availableCoaches: formData.availableCoaches,
+        }}
+        onChange={updateFormData}
+      />
+
+      <BuddiesSection
+        formData={{
+          availableBuddies: formData.availableBuddies,
         }}
         onChange={updateFormData}
       />

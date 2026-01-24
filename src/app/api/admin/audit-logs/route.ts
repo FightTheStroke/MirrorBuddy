@@ -62,9 +62,35 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Error fetching audit logs:", error);
+    // Log detailed error for debugging
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+    console.error("Error fetching audit logs:", {
+      error: errorMessage,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
+    // Check if it's a Prisma error (table doesn't exist, etc.)
+    if (
+      errorMessage.includes("does not exist") ||
+      errorMessage.includes("P2021") ||
+      errorMessage.includes("relation")
+    ) {
+      // Return empty result if table doesn't exist
+      return NextResponse.json({
+        logs: [],
+        pagination: {
+          total: 0,
+          page: 1,
+          pageSize: 50,
+          totalPages: 0,
+        },
+        warning: "Audit log table may need migration",
+      });
+    }
+
     return NextResponse.json(
-      { error: "Failed to fetch audit logs" },
+      { error: `Failed to fetch audit logs: ${errorMessage}` },
       { status: 500 },
     );
   }
