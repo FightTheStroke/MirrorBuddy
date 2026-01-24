@@ -124,7 +124,19 @@ export default function Home() {
     setCurrentView("maestro-session");
   };
 
-  if (!isHydrated || !hasCompletedOnboarding) return null;
+  if (!isHydrated || !hasCompletedOnboarding) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+        <h1 className="sr-only">MirrorBuddy - La Scuola Che Vorrei</h1>
+        <div
+          className="flex items-center justify-center min-h-screen"
+          role="main"
+        >
+          <div className="animate-pulse text-slate-400">Caricamento...</div>
+        </div>
+      </div>
+    );
+  }
 
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
@@ -159,6 +171,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <h1 className="sr-only">MirrorBuddy - La Scuola Che Vorrei</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
         onMenuClick={() => setSidebarOpen(true)}

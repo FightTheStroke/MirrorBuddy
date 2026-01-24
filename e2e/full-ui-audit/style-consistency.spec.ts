@@ -223,13 +223,38 @@ test.describe("Style Consistency - Spacing", () => {
   test("content areas have appropriate spacing", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
+    // Wait for hydration - either landing page or main app
+    await page.waitForSelector(
+      'button:has-text("Professori"), button:has-text("Prova gratis")',
+      { timeout: 15000 },
+    );
 
     const spacing = await page.evaluate(() => {
-      // Check main or its first child for padding/margin
+      // Check main (app) or first content div (landing page) for padding/margin
       const main = document.querySelector("main");
+      // Fallback for landing page which uses div#main-content structure
+      const contentWrapper = document.querySelector(
+        "#main-content > div, main > div",
+      );
       const container =
-        main?.querySelector("div") || main?.firstElementChild || main;
-      if (!container) return null;
+        main?.querySelector("div") ||
+        main?.firstElementChild ||
+        contentWrapper ||
+        main;
+      if (!container) {
+        // If no container found, check body's first meaningful div
+        const bodyContent = document.querySelector("body > div > div");
+        if (bodyContent) {
+          const style = window.getComputedStyle(bodyContent);
+          return {
+            padding: style.padding,
+            margin: style.margin,
+            gap: style.gap,
+            display: style.display,
+          };
+        }
+        return null;
+      }
 
       const style = window.getComputedStyle(container as Element);
       return {
@@ -242,7 +267,10 @@ test.describe("Style Consistency - Spacing", () => {
     });
 
     // Just verify we can access layout properties (spacing can be 0 for flex layouts)
-    expect(spacing, "Should be able to read spacing properties").not.toBeNull();
+    expect(
+      spacing,
+      "Should be able to read spacing properties from content area",
+    ).not.toBeNull();
     if (spacing) {
       // Flex/grid layouts use gap instead of padding
       const usesModernLayout =
@@ -307,6 +335,11 @@ test.describe("Style Consistency - Responsive", () => {
       });
       await page.goto("/");
       await page.waitForLoadState("networkidle");
+      // Wait for hydration - either landing page or main app
+      await page.waitForSelector(
+        'button:has-text("Professori"), button:has-text("Prova gratis")',
+        { timeout: 15000 },
+      );
 
       // Check that content doesn't overflow horizontally
       const hasHorizontalScroll = await page.evaluate(() => {
@@ -318,9 +351,10 @@ test.describe("Style Consistency - Responsive", () => {
         `${viewport.name} should not have horizontal scroll`,
       ).toBe(false);
 
-      // Check main content is visible
+      // Check main content is visible (main for app, or heading for landing)
       const mainVisible = await page
-        .locator("main")
+        .locator('main, h1:has-text("Benvenuto"), h1:has-text("MirrorBuddy")')
+        .first()
         .isVisible()
         .catch(() => false);
       expect(

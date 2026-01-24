@@ -10,7 +10,11 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
   test.beforeEach(async ({ page, mobile: _mobile }) => {
     await page.goto("/");
-    await page.waitForSelector('main, [role="main"]');
+    // Wait for hydration to complete - loading screen shows "Caricamento..."
+    // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
+    await page.waitForSelector('button:has-text("Professori")', {
+      timeout: 15000,
+    });
   });
 
   test("voice panel should be less than 30% of viewport width", async ({
@@ -69,11 +73,9 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     if (await firstMaestro.isVisible()) {
       await firstMaestro.click();
 
-      // Check for chat input
-      const chatInput = page.locator(
-        'textarea[placeholder*="scrivi"], textarea[placeholder*="Scrivi"]',
-      );
-      if (await chatInput.isVisible()) {
+      // Check for chat input - use getByPlaceholder for reliability
+      const chatInput = page.getByPlaceholder(/scrivi/i);
+      if (await chatInput.isVisible().catch(() => false)) {
         await expect(chatInput).toBeVisible();
 
         // Input should be within viewport

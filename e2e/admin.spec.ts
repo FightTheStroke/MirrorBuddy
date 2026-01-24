@@ -143,7 +143,12 @@ test.describe("Admin Mode - Route Accessibility", () => {
 
     for (const route of ADMIN_ROUTES) {
       await adminPage.goto(route);
-      await adminPage.waitForLoadState("networkidle");
+      // Use domcontentloaded instead of networkidle - SSE connections never close
+      await adminPage.waitForLoadState("domcontentloaded");
+      // Wait for main content to be visible
+      await adminPage.waitForSelector("main, [role='main']", {
+        timeout: 10000,
+      });
 
       const url = adminPage.url();
       const isRedirectedToLogin = url.includes("/login");
@@ -215,7 +220,9 @@ test.describe("Admin Mode - Route Accessibility", () => {
     });
 
     await adminPage.goto("/admin");
-    await adminPage.waitForLoadState("networkidle");
+    // Use domcontentloaded instead of networkidle - SSE connections never close
+    await adminPage.waitForLoadState("domcontentloaded");
+    await adminPage.waitForSelector("main, [role='main']", { timeout: 10000 });
 
     const chatPattern = ADMIN_IGNORE_ERRORS.find((p) =>
       p.source.includes("chat"),
