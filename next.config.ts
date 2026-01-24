@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import packageJson from "./package.json";
 import bundleAnalyzer from "@next/bundle-analyzer";
+import { withSentryConfig } from "@sentry/nextjs";
 
 // Bundle analyzer configuration (enabled via ANALYZE=true)
 const withBundleAnalyzer = bundleAnalyzer({
@@ -116,4 +117,38 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withBundleAnalyzer(nextConfig);
+// Sentry configuration options
+const sentryConfig = {
+  // For all available options, see:
+  // https://github.com/getsentry/sentry-webpack-plugin#options
+
+  org: process.env.SENTRY_ORG || "fightthestroke",
+  project: process.env.SENTRY_PROJECT || "mirrorbuddy",
+
+  // Only print logs for uploading source maps in CI
+  silent: !process.env.CI,
+
+  // Upload source maps for better error tracking
+  // Requires SENTRY_AUTH_TOKEN env var for CI uploads
+  widenClientFileUpload: true,
+
+  // Hides source maps from generated client bundles
+  hideSourceMaps: true,
+
+  // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
+  tunnelRoute: "/monitoring",
+
+  // Webpack-specific options (new API)
+  webpack: {
+    // Automatically tree-shake Sentry logger statements to reduce bundle size
+    treeshake: {
+      removeDebugLogging: true,
+    },
+    // Automatically instrument React components
+    reactComponentAnnotation: {
+      enabled: true,
+    },
+  },
+};
+
+export default withSentryConfig(withBundleAnalyzer(nextConfig), sentryConfig);

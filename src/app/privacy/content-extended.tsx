@@ -70,6 +70,28 @@ export function PrivacyContentExtended() {
             caricamento, dispositivo (tipo, non identificativo)
           </li>
         </ul>
+        <p className="mt-4">
+          <strong>Sentry (Error Tracking):</strong> Utilizziamo Sentry per
+          monitorare e correggere errori tecnici. Questo servizio:
+        </p>
+        <ul className="text-slate-700 dark:text-gray-300 space-y-2">
+          <li>
+            <strong>Cattura solo errori tecnici</strong> - stack trace, browser,
+            pagina dove è avvenuto l&apos;errore
+          </li>
+          <li>
+            <strong>Nessun dato personale</strong> - non raccoglie email, nomi o
+            contenuti delle chat
+          </li>
+          <li>
+            <strong>Server in Europa</strong> - i dati restano nell&apos;UE
+            (datacenter EU)
+          </li>
+          <li>
+            <strong>Solo per migliorare l&apos;app</strong> - ci aiuta a trovare
+            e risolvere bug velocemente
+          </li>
+        </ul>
         <p>Niente cookie pubblicitari o di tracciamento. Mai.</p>
       </Section>
 
