@@ -192,6 +192,68 @@ export async function executeScheduledDeletions(): Promise<{
 }
 
 /**
+ * Apply default retention policy to conversations for users WITHOUT custom policies.
+ * Users with custom retention policies are handled separately by markExpiredDataForDeletion()
+ * to respect their configured TTL (which may be longer than the default).
+ *
+ * GDPR Art. 5 requires storage limitation - data must not be kept indefinitely.
+ */
+export async function applyDefaultRetentionSystemWide(): Promise<{
+  conversationsMarked: number;
+}> {
+  const cutoffDate = new Date();
+  cutoffDate.setDate(
+    cutoffDate.getDate() - DEFAULT_RETENTION_POLICY.conversationTTLDays,
+  );
+
+  log.info("Applying default retention policy system-wide", {
+    cutoffDate: cutoffDate.toISOString(),
+    ttlDays: DEFAULT_RETENTION_POLICY.conversationTTLDays,
+  });
+
+  try {
+    // Get user IDs that have custom retention policies - exclude them
+    const usersWithCustomPolicies =
+      await prisma.userPrivacyPreferences.findMany({
+        where: { customRetention: { not: null } },
+        select: { userId: true },
+      });
+    const excludedUserIds = usersWithCustomPolicies.map((u) => u.userId);
+
+    log.debug("Excluding users with custom policies from default retention", {
+      excludedCount: excludedUserIds.length,
+    });
+
+    // Mark conversations older than default TTL, excluding users with custom policies
+    const result = await prisma.conversation.updateMany({
+      where: {
+        createdAt: { lt: cutoffDate },
+        markedForDeletion: false,
+        // Exclude users who have custom retention policies
+        userId: { notIn: excludedUserIds },
+      },
+      data: {
+        markedForDeletion: true,
+        markedForDeletionAt: new Date(),
+      },
+    });
+
+    log.info("Default retention applied system-wide", {
+      conversationsMarked: result.count,
+      cutoffDate: cutoffDate.toISOString(),
+      usersExcluded: excludedUserIds.length,
+    });
+
+    return { conversationsMarked: result.count };
+  } catch (error) {
+    log.error("Failed to apply default retention system-wide", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    throw error;
+  }
+}
+
+/**
  * Get retention status for a user (for transparency dashboard)
  */
 export async function getUserRetentionStatus(userId: string): Promise<{
