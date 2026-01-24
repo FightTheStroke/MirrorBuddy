@@ -41,9 +41,7 @@ const PAGES_TO_TEST = [
 
 // Known issues to skip (document why each is excluded)
 const SKIP_RULES: string[] = [
-  // TODO(a11y): Fix color contrast on astuccio page - dark text on colored backgrounds
-  // Tracked for 0.9.0 release, needed to unblock 0.8.0 beta
-  "color-contrast",
+  // All color contrast issues resolved - see astuccio-info-section.tsx
 ];
 
 // ============================================================================
