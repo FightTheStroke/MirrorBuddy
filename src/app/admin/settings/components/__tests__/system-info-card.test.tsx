@@ -52,7 +52,8 @@ describe("SystemInfoCard", () => {
 
     it("displays the build date", () => {
       render(<SystemInfoCard />);
-      expect(screen.getByText(/2026-01-23/)).toBeInTheDocument();
+      // Build date uses new Date(), so match any YYYY-MM-DD format
+      expect(screen.getByText(/\d{4}-\d{2}-\d{2}/)).toBeInTheDocument();
     });
 
     it("displays version label", () => {
