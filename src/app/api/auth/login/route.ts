@@ -100,8 +100,18 @@ export async function POST(request: NextRequest) {
       { status: 200 },
     );
 
+    // Server-side auth cookie (httpOnly, signed)
     response.cookies.set("mirrorbuddy-user-id", signed.signed, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 7 * 24 * 60 * 60,
+      path: "/",
+    });
+
+    // Client-readable cookie (for client-side userId access)
+    response.cookies.set("mirrorbuddy-user-id-client", user.id, {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       maxAge: 7 * 24 * 60 * 60,

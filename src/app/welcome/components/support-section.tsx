@@ -68,7 +68,8 @@ export function SupportSection() {
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = 280;
+      // Card width (w-44 = 176px) + gap (16px) = 192px per card, scroll 2 cards
+      const scrollAmount = 384;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
@@ -140,7 +141,7 @@ export function SupportSection() {
                   stiffness: 150,
                   damping: 15,
                 }}
-                className="flex-shrink-0 w-36 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all"
+                className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg transition-all"
               >
                 {/* Role Badge */}
                 <div
