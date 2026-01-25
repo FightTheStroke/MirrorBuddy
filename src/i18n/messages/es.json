@@ -456,6 +456,10 @@
     "privacy": {
       "title": "Privacidad"
     },
+    "ambientAudio": {
+      "title": "Audio Ambiente para Estudiar",
+      "description": "El audio ambiente puede mejorar la concentración y la efectividad del estudio. Elige entre ruido blanco, sonidos binaurales para diferentes modos de enfoque, o paisajes sonoros naturales para crear el ambiente perfecto para tu aprendizaje."
+    },
     "aiProvider": {
       "noProviderConfigured": "Ningún proveedor configurado",
       "configureAzureOpenAI": "Configure Azure OpenAI en el archivo .env o ejecute Ollama localmente.",
@@ -784,7 +788,14 @@
       "progress": "Progreso",
       "key-concepts": "Conceptos clave",
       "steps": "Pasos",
-      "no-steps-available": "No hay pasos disponibles para este tema"
+      "no-steps-available": "No hay pasos disponibles para este tema",
+      "error": "Error:",
+      "locked": "Bloqueado",
+      "unlocked": "Desbloqueado",
+      "in-progress-legend": "En progreso",
+      "completed-legend": "Completado",
+      "visual-title": "Ruta de aprendizaje",
+      "topics-completed-count": "temas completados"
     },
     "flashcards": {
       "title": "Tarjetas de aprendizaje",
@@ -835,6 +846,129 @@
     "parent-dashboard": {
       "quiz": {
         "no-quizzes": "Ningún cuestionario completado aún"
+      }
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Buscar materiales...",
+          "aria-label": "Buscar materiales",
+          "clear-aria-label": "Limpiar búsqueda",
+          "announcement": "Resultados de búsqueda para: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtros",
+          "listbox-aria-label": "Filtrar por tipo de material"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Explorador",
+          "description": "Vista de carpetas con navegación de árbol"
+        },
+        "gallery": {
+          "label": "Galería",
+          "description": "Vista de cuadrícula con vista previa grande"
+        },
+        "timeline": {
+          "label": "Línea de tiempo",
+          "description": "Vista cronológica ordenada por fecha"
+        },
+        "calendar": {
+          "label": "Calendario",
+          "description": "Vista de calendario de eventos"
+        }
+      },
+      "types": {
+        "all": "Todos",
+        "mindmap": "Mapa Mental",
+        "quiz": "Cuestionario",
+        "flashcard": "Tarjeta",
+        "summary": "Resumen",
+        "demo": "Demo",
+        "diagram": "Diagrama",
+        "timeline": "Línea de tiempo",
+        "formula": "Fórmula",
+        "calculator": "Calculadora",
+        "chart": "Gráfico",
+        "pdf": "PDF",
+        "webcam": "Foto",
+        "homework": "Tareas",
+        "search": "Búsqueda",
+        "typing": "Escritura",
+        "study-kit": "Kit de Estudio"
+      },
+      "material-menu": {
+        "open": "Abrir",
+        "duplicate": "Duplicar",
+        "move": "Mover",
+        "add-tags": "Agregar etiquetas",
+        "find-similar": "Encontrar similares",
+        "archive": "Archivar",
+        "delete": "Eliminar",
+        "aria-label": "Acciones del material"
+      },
+      "sidebar": {
+        "navigation-aria-label": "Navegación de materiales",
+        "quick-filters-title": "Filtros Rápidos",
+        "quick-filters-aria-label": "Filtros",
+        "recent": "Reciente",
+        "favorites": "Favoritos",
+        "archived": "Archivado",
+        "collections-title": "Carpetas",
+        "create-collection-aria-label": "Crear nueva carpeta",
+        "no-collections": "Sin carpetas",
+        "collections-aria-label": "Carpetas",
+        "tags-title": "Etiquetas",
+        "create-tag-aria-label": "Crear nueva etiqueta",
+        "no-tags": "Sin etiquetas",
+        "tags-aria-label": "Etiquetas"
+      },
+      "status-bar": {
+        "selected-count": "materiales seleccionados",
+        "deselect-button": "Deseleccionar",
+        "delete-button": "Eliminar"
+      },
+      "similar-materials": {
+        "title": "Materiales Similares",
+        "aria-label": "Materiales similares",
+        "close-aria-label": "Cerrar",
+        "loading": "Buscando...",
+        "error-loading": "Error al buscar materiales",
+        "no-results": "No se encontraron materiales similares.",
+        "similarity": "Similitud"
+      },
+      "renderers": {
+        "error-title": "Error de visualización",
+        "error-message-default": "No se puede mostrar este material.",
+        "error-message-with-type": "No se puede mostrar material de tipo \"{type}\".",
+        "retry-button": "Reintentar"
+      },
+      "homework": {
+        "default-title": "Tareas",
+        "due-date-label": "Fecha de vencimiento:",
+        "no-tasks": "Sin tareas"
+      },
+      "timeline": {
+        "default-title": "Línea de tiempo",
+        "no-events": "Sin eventos disponibles"
+      },
+      "explorer-view": {
+        "all-materials": "Todos los Materiales",
+        "all-materials-aria-label": "Todos los materiales",
+        "folder-aria-label": "Carpeta {name}",
+        "no-materials": "Sin materiales en esta carpeta"
+      },
+      "gallery-view": {
+        "no-materials": "No se encontraron materiales"
+      },
+      "timeline-view": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "weeks-ago": "hace {count} semanas",
+        "no-materials": "No se encontraron materiales",
+        "material-singular": "material",
+        "material-plural": "materiales"
       }
     }
   },
@@ -1566,86 +1700,6 @@
       "closeAriaLabel": "Cerrar",
       "search": "Buscar por nombre o materia...",
       "empty": "No hay profesores encontrados"
-    },
-    "knowledge-hub": {
-      "header": {
-        "search": {
-          "placeholder": "Buscar materiales...",
-          "aria-label": "Buscar materiales",
-          "clear-aria-label": "Limpiar búsqueda",
-          "announcement": "Búsqueda: {value}"
-        },
-        "filter": {
-          "aria-label": "Filtrar por tipo",
-          "listbox-aria-label": "Seleccionar tipo de material"
-        }
-      },
-      "views": {
-        "explorer": {
-          "label": "Explorar",
-          "description": "Vista de carpetas con navegación jerárquica"
-        },
-        "gallery": {
-          "label": "Galería",
-          "description": "Cuadrícula con vistas previas grandes"
-        },
-        "timeline": {
-          "label": "Cronología",
-          "description": "Materiales ordenados cronológicamente"
-        },
-        "calendar": {
-          "label": "Calendario",
-          "description": "Vista de calendario por fecha"
-        }
-      },
-      "types": {
-        "all": "Todos los tipos",
-        "mindmap": "Mapas Mentales",
-        "quiz": "Quiz",
-        "flashcard": "Tarjetas",
-        "summary": "Resúmenes",
-        "demo": "Demos",
-        "diagram": "Diagramas",
-        "timeline": "Cronologías",
-        "formula": "Fórmulas",
-        "calculator": "Calculadoras",
-        "chart": "Gráficos",
-        "pdf": "PDFs",
-        "webcam": "Imágenes",
-        "homework": "Deberes",
-        "search": "Búsquedas",
-        "typing": "Mecanografía",
-        "study-kit": "Kit de Estudio"
-      },
-      "stats": {
-        "aria-label": "Estadísticas de materiales",
-        "header-title": "Tus estadísticas",
-        "header-subtitle": "materiales totales",
-        "mindmap-label": "Mapas mentales",
-        "flashcard-label": "Tarjetas",
-        "summary-label": "Resúmenes",
-        "today-label": "Hoy:",
-        "this-week-label": "Esta semana:"
-      },
-      "toolbar": {
-        "aria-label": "Acciones para {count} elementos seleccionados",
-        "deselect-all-aria-label": "Deseleccionar todo",
-        "selected-count": "{count, plural, one {seleccionado} other {seleccionados}}",
-        "move-label": "Mover",
-        "add-tags-label": "Agregar etiquetas",
-        "archive-label": "Archivar",
-        "restore-label": "Restaurar",
-        "delete-label": "Eliminar"
-      },
-      "status-bar": {
-        "selected-count": "materiales seleccionados",
-        "deselect-button": "Deseleccionar",
-        "delete-button": "Eliminar"
-      },
-      "sidebar": {
-        "show-sidebar-aria-label": "Mostrar barra lateral",
-        "hide-sidebar-aria-label": "Ocultar barra lateral"
-      }
     }
   },
   "voice": {

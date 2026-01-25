@@ -423,7 +423,137 @@
       "progress": "Progresso",
       "key-concepts": "Concetti chiave",
       "steps": "Passaggi",
-      "no-steps-available": "Nessun passaggio disponibile per questo argomento"
+      "no-steps-available": "Nessun passaggio disponibile per questo argomento",
+      "error": "Errore:",
+      "locked": "Bloccato",
+      "unlocked": "Sbloccato",
+      "in-progress-legend": "In corso",
+      "completed-legend": "Completato",
+      "visual-title": "Percorso di Apprendimento",
+      "topics-completed-count": "argomenti completati"
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Cerca materiali...",
+          "aria-label": "Cerca materiali",
+          "clear-aria-label": "Cancella ricerca",
+          "announcement": "Risultati ricerca per: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtri",
+          "listbox-aria-label": "Filtra per tipo di materiale"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Esplora",
+          "description": "Vista a cartelle con navigazione ad albero"
+        },
+        "gallery": {
+          "label": "Galleria",
+          "description": "Vista a griglia con anteprima grande"
+        },
+        "timeline": {
+          "label": "Cronologia",
+          "description": "Vista cronologica ordinata per data"
+        },
+        "calendar": {
+          "label": "Calendario",
+          "description": "Vista calendario degli eventi"
+        }
+      },
+      "types": {
+        "all": "Tutti",
+        "mindmap": "Mappa Mentale",
+        "quiz": "Quiz",
+        "flashcard": "Flashcard",
+        "summary": "Riassunto",
+        "demo": "Demo",
+        "diagram": "Diagramma",
+        "timeline": "Linea Temporale",
+        "formula": "Formula",
+        "calculator": "Calcolatrice",
+        "chart": "Grafico",
+        "pdf": "PDF",
+        "webcam": "Foto",
+        "homework": "Compiti",
+        "search": "Ricerca",
+        "typing": "Digitazione",
+        "study-kit": "Kit Studio"
+      },
+      "material-menu": {
+        "open": "Apri",
+        "duplicate": "Duplica",
+        "move": "Sposta",
+        "add-tags": "Aggiungi tag",
+        "find-similar": "Trova simili",
+        "archive": "Archivia",
+        "delete": "Elimina",
+        "aria-label": "Azioni materiale"
+      },
+      "sidebar": {
+        "navigation-aria-label": "Navigazione materiali",
+        "quick-filters-title": "Filtri rapidi",
+        "quick-filters-aria-label": "Filtri",
+        "recent": "Recenti",
+        "favorites": "Preferiti",
+        "archived": "Archiviati",
+        "collections-title": "Cartelle",
+        "create-collection-aria-label": "Crea nuova cartella",
+        "no-collections": "Nessuna cartella",
+        "collections-aria-label": "Cartelle",
+        "tags-title": "Tag",
+        "create-tag-aria-label": "Crea nuovo tag",
+        "no-tags": "Nessun tag",
+        "tags-aria-label": "Tag"
+      },
+      "status-bar": {
+        "selected-count": "materiali selezionati",
+        "deselect-button": "Deseleziona",
+        "delete-button": "Elimina"
+      },
+      "similar-materials": {
+        "title": "Materiali simili",
+        "aria-label": "Materiali simili",
+        "close-aria-label": "Chiudi",
+        "loading": "Ricerca in corso...",
+        "error-loading": "Errore durante la ricerca",
+        "no-results": "Nessun materiale simile trovato.",
+        "similarity": "Similarità"
+      },
+      "renderers": {
+        "error-title": "Errore di visualizzazione",
+        "error-message-default": "Impossibile visualizzare questo materiale.",
+        "error-message-with-type": "Impossibile visualizzare il materiale di tipo \"{type}\".",
+        "retry-button": "Riprova"
+      },
+      "homework": {
+        "default-title": "Compiti",
+        "due-date-label": "Scadenza:",
+        "no-tasks": "Nessun compito"
+      },
+      "timeline": {
+        "default-title": "Linea del Tempo",
+        "no-events": "Nessun evento disponibile"
+      },
+      "explorer-view": {
+        "all-materials": "Tutti i Materiali",
+        "all-materials-aria-label": "Tutti i materiali",
+        "folder-aria-label": "Cartella {name}",
+        "no-materials": "Nessun materiale in questa cartella"
+      },
+      "gallery-view": {
+        "no-materials": "Nessun materiale trovato"
+      },
+      "timeline-view": {
+        "today": "Oggi",
+        "yesterday": "Ieri",
+        "weeks-ago": "{count} settimane fa",
+        "no-materials": "Nessun materiale trovato",
+        "material-singular": "materiale",
+        "material-plural": "materiali"
+      }
     }
   },
   "tier": {
@@ -1705,8 +1835,40 @@
     "notification": {
       "title": "Notifiche"
     },
+    "ambientAudio": {
+      "title": "Audio Ambientale per lo Studio",
+      "description": "L'audio ambientale può migliorare la concentrazione e l'efficacia dello studio. Scegli tra rumore bianco, binaural beats per diverse modalità di focus, o soundscapes naturali per creare l'ambiente perfetto per il tuo apprendimento.",
+      "futureVideoFeatures": "Per future funzionalità video"
+    },
     "privacy": {
-      "title": "Privacy"
+      "title": "Privacy",
+      "reviewAndModifyConsents": "Rivedi e modifica consensi",
+      "noConsentFound": "Nessun consenso trovato. Riceverai la richiesta al prossimo accesso.",
+      "privacyAndSecurity": "Privacy e Sicurezza",
+      "yourDataIsSafe": "I tuoi dati sono al sicuro. MirrorBuddy è progettato pensando alla privacy dei bambini e rispetta le normative COPPA e GDPR.",
+      "yourDataIsProtected": "I tuoi dati sono protetti",
+      "dataStoredLocally": "I dati sono memorizzati localmente sul dispositivo",
+      "noDataShared": "Nessun dato viene condiviso con terze parti",
+      "conversationsNotRecorded": "Le conversazioni non vengono registrate",
+      "deleteDataAnytime": "Puoi eliminare i tuoi dati in qualsiasi momento",
+      "deleteAllData": "Elimina tutti i miei dati",
+      "telemetryAndAnalytics": "Telemetria e Analisi",
+      "anonymousDataHelps": "I dati anonimi ci aiutano a migliorare MirrorBuddy. Nessun dato personale viene raccolto.",
+      "sendAnonymousData": "Invia dati anonimi"
+    },
+    "diagnostics": {
+      "platformHelp": "Aiuto sulla Piattaforma",
+      "helpWithConfiguration": "Hai bisogno di aiuto con la configurazione o hai problemi tecnici? Puoi chiedere al tuo Coach: conosce tutte le funzionalità di MirrorBuddy!",
+      "troubleshooting": "Risoluzione Problemi",
+      "chatNotWorking": "Chat non funziona?",
+      "chatNotWorkingDescription": "Verifica che Azure OpenAI o Ollama siano configurati. Controlla le variabili .env e i log del server.",
+      "voiceNotWorking": "Voice non funziona?",
+      "voiceNotWorkingDescription": "La voce richiede Azure OpenAI Realtime API (AZURE_OPENAI_REALTIME_*). Ollama non supporta voice.",
+      "microphoneBlocked": "Microfono bloccato?",
+      "microphoneBlockedDescription": "Clicca sull'icona del lucchetto nella barra URL del browser e abilita il permesso microfono.",
+      "audioNotHeard": "Audio non si sente?",
+      "audioNotHeardDescription": "Verifica il volume del sistema. Se usi Chrome, potrebbe bloccare l'audio autoplay - clicca prima sulla pagina.",
+      "waveformVisualization": "Visualizzazione Onda Sonora"
     },
     "aiProvider": {
       "noProviderConfigured": "Nessun provider configurato",

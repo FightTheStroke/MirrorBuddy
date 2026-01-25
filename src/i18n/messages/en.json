@@ -335,11 +335,141 @@
       "progress": "Progress",
       "key-concepts": "Key Concepts",
       "steps": "Steps",
-      "no-steps-available": "No steps available for this topic"
+      "no-steps-available": "No steps available for this topic",
+      "error": "Error:",
+      "locked": "Locked",
+      "unlocked": "Unlocked",
+      "in-progress-legend": "In Progress",
+      "completed-legend": "Completed",
+      "visual-title": "Learning Path",
+      "topics-completed-count": "topics completed"
     },
     "parent-dashboard": {
       "quiz": {
         "no-quizzes": "No quizzes completed yet"
+      }
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Search materials...",
+          "aria-label": "Search materials",
+          "clear-aria-label": "Clear search",
+          "announcement": "Search results for: {value}"
+        },
+        "filter": {
+          "aria-label": "Filters",
+          "listbox-aria-label": "Filter by material type"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Explorer",
+          "description": "Folder view with tree navigation"
+        },
+        "gallery": {
+          "label": "Gallery",
+          "description": "Grid view with large preview"
+        },
+        "timeline": {
+          "label": "Timeline",
+          "description": "Chronological view sorted by date"
+        },
+        "calendar": {
+          "label": "Calendar",
+          "description": "Calendar view of events"
+        }
+      },
+      "types": {
+        "all": "All",
+        "mindmap": "Mind Map",
+        "quiz": "Quiz",
+        "flashcard": "Flashcard",
+        "summary": "Summary",
+        "demo": "Demo",
+        "diagram": "Diagram",
+        "timeline": "Timeline",
+        "formula": "Formula",
+        "calculator": "Calculator",
+        "chart": "Chart",
+        "pdf": "PDF",
+        "webcam": "Photo",
+        "homework": "Homework",
+        "search": "Search",
+        "typing": "Typing",
+        "study-kit": "Study Kit"
+      },
+      "material-menu": {
+        "open": "Open",
+        "duplicate": "Duplicate",
+        "move": "Move",
+        "add-tags": "Add tags",
+        "find-similar": "Find similar",
+        "archive": "Archive",
+        "delete": "Delete",
+        "aria-label": "Material actions"
+      },
+      "sidebar": {
+        "navigation-aria-label": "Material navigation",
+        "quick-filters-title": "Quick Filters",
+        "quick-filters-aria-label": "Filters",
+        "recent": "Recent",
+        "favorites": "Favorites",
+        "archived": "Archived",
+        "collections-title": "Folders",
+        "create-collection-aria-label": "Create new folder",
+        "no-collections": "No folders",
+        "collections-aria-label": "Folders",
+        "tags-title": "Tags",
+        "create-tag-aria-label": "Create new tag",
+        "no-tags": "No tags",
+        "tags-aria-label": "Tags"
+      },
+      "status-bar": {
+        "selected-count": "materials selected",
+        "deselect-button": "Deselect",
+        "delete-button": "Delete"
+      },
+      "similar-materials": {
+        "title": "Similar Materials",
+        "aria-label": "Similar materials",
+        "close-aria-label": "Close",
+        "loading": "Searching...",
+        "error-loading": "Error searching materials",
+        "no-results": "No similar materials found.",
+        "similarity": "Similarity"
+      },
+      "renderers": {
+        "error-title": "Display Error",
+        "error-message-default": "Unable to display this material.",
+        "error-message-with-type": "Unable to display material of type \"{type}\".",
+        "retry-button": "Retry"
+      },
+      "homework": {
+        "default-title": "Homework",
+        "due-date-label": "Due date:",
+        "no-tasks": "No tasks"
+      },
+      "timeline": {
+        "default-title": "Timeline",
+        "no-events": "No events available"
+      },
+      "explorer-view": {
+        "all-materials": "All Materials",
+        "all-materials-aria-label": "All materials",
+        "folder-aria-label": "Folder {name}",
+        "no-materials": "No materials in this folder"
+      },
+      "gallery-view": {
+        "no-materials": "No materials found"
+      },
+      "timeline-view": {
+        "today": "Today",
+        "yesterday": "Yesterday",
+        "weeks-ago": "{count} weeks ago",
+        "no-materials": "No materials found",
+        "material-singular": "material",
+        "material-plural": "materials"
       }
     }
   },
@@ -1329,6 +1459,10 @@
     },
     "privacy": {
       "title": "Privacy"
+    },
+    "ambientAudio": {
+      "title": "Ambient Audio for Study",
+      "description": "Ambient audio can improve focus and study effectiveness. Choose from white noise, binaural beats for various focus modes, or natural soundscapes to create the perfect environment for your learning."
     },
     "aiProvider": {
       "noProviderConfigured": "No provider configured",

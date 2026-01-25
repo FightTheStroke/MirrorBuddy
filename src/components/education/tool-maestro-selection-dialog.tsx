@@ -7,6 +7,7 @@
 
 import { useState, useCallback, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, ArrowLeft, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,26 +20,6 @@ import {
 } from "@/data";
 import type { Subject, Maestro } from "@/types";
 import type { ToolType } from "@/types/tools";
-
-// Tool type labels in Italian
-const TOOL_LABELS: Record<ToolType, string> = {
-  mindmap: "Mappa Mentale",
-  quiz: "Quiz",
-  flashcard: "Flashcard",
-  summary: "Riassunto",
-  demo: "Demo Interattiva",
-  diagram: "Diagramma",
-  timeline: "Linea del Tempo",
-  formula: "Formula",
-  calculator: "Calcolatrice",
-  chart: "Grafico",
-  search: "Ricerca",
-  webcam: "Foto",
-  pdf: "PDF",
-  homework: "Compiti",
-  typing: "Impara a Digitare",
-  "study-kit": "Study Kit",
-};
 
 interface ToolMaestroSelectionDialogProps {
   isOpen: boolean;
@@ -55,6 +36,7 @@ export function ToolMaestroSelectionDialog({
   onConfirm,
   onClose,
 }: ToolMaestroSelectionDialogProps) {
+  const t = useTranslations("education");
   const [step, setStep] = useState<Step>("subject");
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [_selectedMaestro, setSelectedMaestro] = useState<Maestro | null>(null);
@@ -111,7 +93,8 @@ export function ToolMaestroSelectionDialog({
     ? getMaestriBySubject(selectedSubject)
     : [];
 
-  const toolLabel = TOOL_LABELS[toolType] || toolType;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const toolLabel = t(`tools.${toolType}` as any) || toolType;
 
   const handleSubjectSelect = useCallback(
     (subject: Subject) => {
@@ -197,14 +180,16 @@ export function ToolMaestroSelectionDialog({
                 <GraduationCap className="h-5 w-5 text-accent-themed" />
               )}
               <h2 id="dialog-title" className="text-lg font-semibold">
-                {step === "subject" && `Crea ${toolLabel} - Scegli Materia`}
-                {step === "maestro" && `Crea ${toolLabel} - Scegli Professore`}
+                {step === "subject" &&
+                  t("toolSelection.chooseSubject", { tool: toolLabel })}
+                {step === "maestro" &&
+                  t("toolSelection.chooseProfessor", { tool: toolLabel })}
               </h2>
             </div>
             <button
               onClick={handleClose}
               className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-              aria-label="Chiudi"
+              aria-label={t("toolSelection.close")}
             >
               <X className="h-5 w-5" />
             </button>
@@ -237,7 +222,7 @@ export function ToolMaestroSelectionDialog({
             <div className="p-4 border-t border-slate-200 dark:border-slate-700">
               <Button variant="outline" onClick={handleBack} className="w-full">
                 <ArrowLeft className="mr-2 h-4 w-4" />
-                Indietro
+                {t("toolSelection.back")}
               </Button>
             </div>
           )}

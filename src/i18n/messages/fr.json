@@ -389,7 +389,14 @@
       "progress": "Progression",
       "key-concepts": "Concepts clés",
       "steps": "Étapes",
-      "no-steps-available": "Aucune étape disponible pour ce sujet"
+      "no-steps-available": "Aucune étape disponible pour ce sujet",
+      "error": "Erreur :",
+      "locked": "Verrouillé",
+      "unlocked": "Déverrouillé",
+      "in-progress-legend": "En cours",
+      "completed-legend": "Complété",
+      "visual-title": "Chemin d'apprentissage",
+      "topics-completed-count": "sujets complétés"
     },
     "flashcards": {
       "title": "Cartes mémoire",
@@ -440,6 +447,129 @@
     "parent-dashboard": {
       "quiz": {
         "no-quizzes": "Aucun quiz complété pour l'instant"
+      }
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Rechercher des matériaux...",
+          "aria-label": "Rechercher des matériaux",
+          "clear-aria-label": "Effacer la recherche",
+          "announcement": "Résultats de recherche pour: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtres",
+          "listbox-aria-label": "Filtrer par type de matériau"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Explorateur",
+          "description": "Vue dossier avec navigation arborescente"
+        },
+        "gallery": {
+          "label": "Galerie",
+          "description": "Vue grille avec grand aperçu"
+        },
+        "timeline": {
+          "label": "Chronologie",
+          "description": "Vue chronologique triée par date"
+        },
+        "calendar": {
+          "label": "Calendrier",
+          "description": "Vue calendrier des événements"
+        }
+      },
+      "types": {
+        "all": "Tous",
+        "mindmap": "Carte Mentale",
+        "quiz": "Quiz",
+        "flashcard": "Flashcard",
+        "summary": "Résumé",
+        "demo": "Démo",
+        "diagram": "Diagramme",
+        "timeline": "Chronologie",
+        "formula": "Formule",
+        "calculator": "Calculatrice",
+        "chart": "Graphique",
+        "pdf": "PDF",
+        "webcam": "Photo",
+        "homework": "Devoirs",
+        "search": "Recherche",
+        "typing": "Dactylographie",
+        "study-kit": "Kit d'Étude"
+      },
+      "material-menu": {
+        "open": "Ouvrir",
+        "duplicate": "Dupliquer",
+        "move": "Déplacer",
+        "add-tags": "Ajouter des étiquettes",
+        "find-similar": "Trouver des matériaux similaires",
+        "archive": "Archiver",
+        "delete": "Supprimer",
+        "aria-label": "Actions du matériau"
+      },
+      "sidebar": {
+        "navigation-aria-label": "Navigation des matériaux",
+        "quick-filters-title": "Filtres Rapides",
+        "quick-filters-aria-label": "Filtres",
+        "recent": "Récent",
+        "favorites": "Favoris",
+        "archived": "Archivé",
+        "collections-title": "Dossiers",
+        "create-collection-aria-label": "Créer un nouveau dossier",
+        "no-collections": "Pas de dossiers",
+        "collections-aria-label": "Dossiers",
+        "tags-title": "Étiquettes",
+        "create-tag-aria-label": "Créer une nouvelle étiquette",
+        "no-tags": "Pas d'étiquettes",
+        "tags-aria-label": "Étiquettes"
+      },
+      "status-bar": {
+        "selected-count": "matériaux sélectionnés",
+        "deselect-button": "Désélectionner",
+        "delete-button": "Supprimer"
+      },
+      "similar-materials": {
+        "title": "Matériaux Similaires",
+        "aria-label": "Matériaux similaires",
+        "close-aria-label": "Fermer",
+        "loading": "Recherche en cours...",
+        "error-loading": "Erreur lors de la recherche",
+        "no-results": "Aucun matériau similaire trouvé.",
+        "similarity": "Similarité"
+      },
+      "renderers": {
+        "error-title": "Erreur d'affichage",
+        "error-message-default": "Impossible d'afficher ce matériau.",
+        "error-message-with-type": "Impossible d'afficher le matériau de type \"{type}\".",
+        "retry-button": "Réessayer"
+      },
+      "homework": {
+        "default-title": "Devoirs",
+        "due-date-label": "Date limite:",
+        "no-tasks": "Aucune tâche"
+      },
+      "timeline": {
+        "default-title": "Chronologie",
+        "no-events": "Aucun événement disponible"
+      },
+      "explorer-view": {
+        "all-materials": "Tous les Matériaux",
+        "all-materials-aria-label": "Tous les matériaux",
+        "folder-aria-label": "Dossier {name}",
+        "no-materials": "Aucun matériau dans ce dossier"
+      },
+      "gallery-view": {
+        "no-materials": "Aucun matériau trouvé"
+      },
+      "timeline-view": {
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "weeks-ago": "Il y a {count} semaines",
+        "no-materials": "Aucun matériau trouvé",
+        "material-singular": "matériau",
+        "material-plural": "matériaux"
       }
     }
   },
@@ -1429,6 +1559,10 @@
     },
     "privacy": {
       "title": "Confidentialité"
+    },
+    "ambientAudio": {
+      "title": "Audio Ambiant pour l'Étude",
+      "description": "L'audio ambiant peut améliorer la concentration et l'efficacité de l'étude. Choisissez parmi le bruit blanc, les sons binauraux pour différents modes de concentration, ou des paysages sonores naturels pour créer l'environnement parfait pour votre apprentissage."
     },
     "aiProvider": {
       "noProviderConfigured": "Aucun fournisseur configuré",
