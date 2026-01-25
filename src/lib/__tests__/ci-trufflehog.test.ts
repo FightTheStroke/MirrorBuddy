@@ -75,12 +75,14 @@ describe("CI Workflow - TruffleHog Secret Scanning (F-09)", () => {
       expect(truffleStep.with.extra_args).toContain("--only-verified");
     });
 
-    it("TruffleHog should use --fail flag", () => {
+    it("TruffleHog should NOT have --fail in extra_args (it's built-in)", () => {
+      // Note: --fail is hardcoded in the TruffleHog GitHub Action itself
+      // Adding it to extra_args causes "flag 'fail' cannot be repeated" error
       const job = ciWorkflow.jobs["secret-scanning"];
       const truffleStep = job.steps.find((s: any) =>
         s.uses?.includes("trufflesecurity/trufflehog"),
       );
-      expect(truffleStep.with.extra_args).toContain("--fail");
+      expect(truffleStep.with.extra_args).not.toContain("--fail");
     });
 
     it("TruffleHog should scan from default branch to HEAD", () => {

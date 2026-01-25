@@ -9,8 +9,8 @@ import { checkTrialForAnonymous, getTrialSession } from "../trial-handler";
 // Mock the trial service
 vi.mock("@/lib/trial/trial-service", () => ({
   getOrCreateTrialSession: vi.fn(),
-  checkTrialLimits: vi.fn(),
   incrementUsage: vi.fn(),
+  checkAndIncrementUsage: vi.fn(),
   TRIAL_LIMITS: {
     CHAT: 10,
     TOOLS: 10,
@@ -25,7 +25,7 @@ vi.mock("next/headers", () => ({
 
 import {
   getOrCreateTrialSession,
-  checkTrialLimits,
+  checkAndIncrementUsage,
 } from "@/lib/trial/trial-service";
 import { cookies, headers } from "next/headers";
 
@@ -98,7 +98,7 @@ describe("checkTrialForAnonymous", () => {
     expect(typeof result.reason).toBe("string");
   });
 
-  it("should return allowed: false when checkTrialLimits throws error", async () => {
+  it("should return allowed: false when checkAndIncrementUsage throws error", async () => {
     const mockCookies = {
       get: vi.fn().mockReturnValue({ value: "visitor-123" }),
     };
@@ -109,14 +109,17 @@ describe("checkTrialForAnonymous", () => {
     };
     (headers as any).mockResolvedValue(mockHeaders);
 
-    // First call succeeds (session created), second call (limit check) fails
+    // First call succeeds (session created), second call (atomic check) fails
     (getOrCreateTrialSession as any).mockResolvedValue({
       id: "session-123",
       chatsUsed: 5,
       toolsUsed: 3,
     });
 
-    (checkTrialLimits as any).mockRejectedValue(new Error("Redis unavailable"));
+    // F-02: Now using atomic checkAndIncrementUsage
+    (checkAndIncrementUsage as any).mockRejectedValue(
+      new Error("Redis unavailable"),
+    );
 
     // SECURITY REQUIREMENT: Fail-closed on any error in limit checking
     const result = await checkTrialForAnonymous(false);
@@ -142,16 +145,17 @@ describe("checkTrialForAnonymous", () => {
       toolsUsed: 2,
     });
 
-    (checkTrialLimits as any).mockResolvedValue({
+    // F-02: Now using atomic checkAndIncrementUsage instead of checkTrialLimits
+    (checkAndIncrementUsage as any).mockResolvedValue({
       allowed: true,
-      reason: "Within limits",
+      remaining: 6, // 10 - 3 - 1 (atomic increment)
     });
 
     const result = await checkTrialForAnonymous(false);
 
     expect(result.allowed).toBe(true);
     expect(result.sessionId).toBe("session-123");
-    expect(result.chatsRemaining).toBe(7); // 10 - 3
+    expect(result.chatsRemaining).toBe(6); // remaining from atomic operation
     expect(result.toolsRemaining).toBe(8); // 10 - 2
   });
 });
