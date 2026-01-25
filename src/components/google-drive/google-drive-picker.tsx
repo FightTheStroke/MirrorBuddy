@@ -8,6 +8,7 @@
  */
 
 import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   Folder,
   FileText,
@@ -39,6 +40,7 @@ export function GoogleDrivePicker({
   acceptedTypes,
   className,
 }: GoogleDrivePickerProps) {
+  const t = useTranslations('google-drive');
   const [searchInput, setSearchInput] = useState('');
   const [selectedFile, setSelectedFile] = useState<DriveFileUI | null>(null);
 
@@ -126,13 +128,13 @@ export function GoogleDrivePicker({
           </svg>
         </div>
         <div>
-          <h3 className="font-semibold text-lg">Connetti Google Drive</h3>
+          <h3 className="font-semibold text-lg">{t('connectButton')}</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            Collega il tuo account Google per accedere ai tuoi file
+            {t('connectPrompt')}
           </p>
         </div>
         <Button onClick={connect}>
-          Connetti Google Drive
+          {t('connectButton')}
         </Button>
       </div>
     );
@@ -160,7 +162,7 @@ export function GoogleDrivePicker({
             <Input
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
-              placeholder="Cerca file..."
+              placeholder={t('searchPlaceholder')}
               className="pl-9 pr-9"
             />
             {searchInput && (
@@ -190,7 +192,7 @@ export function GoogleDrivePicker({
               : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
           )}
         >
-          Il mio Drive
+          {t('myDrive')}
         </button>
         <button
           onClick={() => navigateToFolder('shared')}
@@ -201,7 +203,7 @@ export function GoogleDrivePicker({
               : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'
           )}
         >
-          Condivisi con me
+          {t('sharedWithMe')}
         </button>
       </div>
 
@@ -240,7 +242,7 @@ export function GoogleDrivePicker({
           </div>
         ) : filteredFiles.length === 0 ? (
           <div className="text-center p-8 text-muted-foreground">
-            Nessun file trovato
+            {t('noFilesFound')}
           </div>
         ) : (
           <div className="divide-y">
@@ -284,7 +286,7 @@ export function GoogleDrivePicker({
               ) : (
                 <RefreshCw className="w-4 h-4 mr-2" />
               )}
-              Carica altri file
+              {t('loadMore')}
             </Button>
           </div>
         )}
@@ -298,7 +300,7 @@ export function GoogleDrivePicker({
             <span className="font-medium truncate">{selectedFile.name}</span>
           </div>
           <Button onClick={handleConfirmSelect}>
-            Seleziona
+            {t('select')}
           </Button>
         </div>
       )}

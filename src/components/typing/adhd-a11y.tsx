@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface ADHDSettings {
@@ -17,19 +18,21 @@ export function ADHDA11y({
   settings: ADHDSettings;
   onSettingsChange: (settings: ADHDSettings) => void;
 }) {
+  const t = useTranslations('settings.accessibility');
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Accessibilità ADHD</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('adhdTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni per utenti con disturbo dell&apos;attenzione.
+          {t('adhdDesc')}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Pomodoro Timer"
-          description="Sessioni di lavoro con pause regolari"
+          title={t('pomodoroTimer')}
+          description={t('pomodoroDesc')}
           enabled={settings.pomodoroEnabled}
           onToggle={() =>
             onSettingsChange({
@@ -41,7 +44,7 @@ export function ADHDA11y({
           {settings.pomodoroEnabled && (
             <div className="mt-4 grid grid-cols-2 gap-4">
               <div>
-                <label className="text-sm font-medium">Lavoro (min)</label>
+                <label className="text-sm font-medium">{t('workLabel')}</label>
                 <input
                   type="number"
                   value={settings.workDuration}
@@ -57,7 +60,7 @@ export function ADHDA11y({
                 />
               </div>
               <div>
-                <label className="text-sm font-medium">Pausa (min)</label>
+                <label className="text-sm font-medium">{t('breakLabel')}</label>
                 <input
                   type="number"
                   value={settings.breakDuration}
@@ -77,8 +80,8 @@ export function ADHDA11y({
         </SettingCard>
 
         <SettingCard
-          title="Modalità senza distrazioni"
-          description="Nasconde elementi non essenziali"
+          title={t('distractionFree')}
+          description={t('distractionFreeDesc')}
           enabled={settings.distractionFreeMode}
           onToggle={() =>
             onSettingsChange({
@@ -89,8 +92,8 @@ export function ADHDA11y({
         />
 
         <SettingCard
-          title="Promemoria pause"
-          description="Avvisa quando è il momento di fare una pausa"
+          title={t('breakRemindersLabel')}
+          description={t('breakRemindersDesc')}
           enabled={settings.breakReminders}
           onToggle={() =>
             onSettingsChange({
@@ -99,6 +102,12 @@ export function ADHDA11y({
             })
           }
         />
+      </div>
+
+      <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
+        <p className="text-sm text-muted-foreground">
+          {t('adhdInfo')}
+        </p>
       </div>
     </div>
   );

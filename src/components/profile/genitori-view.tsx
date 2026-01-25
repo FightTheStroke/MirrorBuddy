@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useState, useEffect, useCallback } from "react";
 import { logger } from "@/lib/logger";
 import { cn } from "@/lib/utils";
@@ -63,6 +64,7 @@ import {
 } from "./parent-dashboard/index";
 
 export function GenitoriView() {
+  const tProfile = useTranslations("profile");
   const [pageState, setPageState] = useState<PageState>("loading");
   const [insights, setInsights] = useState<StudentInsights | null>(null);
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
@@ -93,7 +95,7 @@ export function GenitoriView() {
   }, [setContext]);
 
   const getMaestroDisplayName = (maestroId: string | null): string => {
-    if (!maestroId) return "Professore";
+    if (!maestroId) return tProfile("professorFallback");
     return MAESTRO_NAMES[maestroId.toLowerCase()] || maestroId;
   };
 

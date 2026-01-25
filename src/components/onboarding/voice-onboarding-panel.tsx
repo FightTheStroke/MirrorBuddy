@@ -163,7 +163,7 @@ export function VoiceOnboardingPanel({
       {
         key: "age",
         label: tOnboarding("checklist.ageLabel"),
-        value: data.age ? `${data.age} anni` : null,
+        value: data.age ? `${data.age} ${tOnboarding("ageYears")}` : null,
         required: false,
       },
       {

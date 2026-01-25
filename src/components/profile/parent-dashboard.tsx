@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 import {
   Star,
@@ -26,28 +27,29 @@ import { CATEGORY_LABELS } from './parent-dashboard/constants';
 import { ObservationCard } from './parent-dashboard/observation-card';
 import { StrategyCard } from './parent-dashboard/strategy-card';
 
-// Learning channel icons and labels
-const CHANNEL_CONFIG = {
-  visual: { icon: Eye, label: 'Visivo', color: 'text-blue-500' },
-  auditory: { icon: Ear, label: 'Uditivo', color: 'text-purple-500' },
-  kinesthetic: { icon: Hand, label: 'Cinestetico', color: 'text-green-500' },
-  reading_writing: { icon: FileText, label: 'Lettura/Scrittura', color: 'text-orange-500' },
-};
-
-// Time of day icons
-const TIME_CONFIG = {
-  morning: { icon: Sun, label: 'Mattina' },
-  afternoon: { icon: Sunset, label: 'Pomeriggio' },
-  evening: { icon: Moon, label: 'Sera' },
-};
-
 interface ParentDashboardProps {
   insights: StudentInsights;
 }
 
 export function ParentDashboard({ insights }: ParentDashboardProps) {
+  const t = useTranslations('parent-dashboard');
   const [expandedStrengths, setExpandedStrengths] = useState(false);
   const [expandedGrowth, setExpandedGrowth] = useState(false);
+
+  // Learning channel icons and labels (dynamic with translations)
+  const CHANNEL_CONFIG = {
+    visual: { icon: Eye, label: t('learningChannelVisual'), color: 'text-blue-500' },
+    auditory: { icon: Ear, label: t('learningChannelAuditory'), color: 'text-purple-500' },
+    kinesthetic: { icon: Hand, label: t('learningChannelKinesthetic'), color: 'text-green-500' },
+    reading_writing: { icon: FileText, label: t('learningChannelReadingWriting'), color: 'text-orange-500' },
+  };
+
+  // Time of day icons (dynamic with translations)
+  const TIME_CONFIG = {
+    morning: { icon: Sun, label: t('timeOfDayMorning') },
+    afternoon: { icon: Sunset, label: t('timeOfDayAfternoon') },
+    evening: { icon: Moon, label: t('timeOfDayEvening') },
+  };
 
   const channel = CHANNEL_CONFIG[insights.learningStyle.preferredChannel];
   const timeOfDay = TIME_CONFIG[insights.learningStyle.preferredTimeOfDay];
@@ -58,13 +60,15 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            Profilo di {insights.studentName}
+            {t('profileTitle', { name: insights.studentName })}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Ultimo aggiornamento: {insights.lastUpdated.toLocaleDateString('it-IT', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
+            {t('lastUpdated', {
+              date: insights.lastUpdated.toLocaleDateString('it-IT', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+              })
             })}
           </p>
         </div>
@@ -76,7 +80,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardContent className="p-4">
             <Clock className="h-5 w-5 text-blue-500 mb-2" />
             <p className="text-2xl font-bold text-blue-600">{insights.totalMinutes}</p>
-            <p className="text-xs text-blue-600/80">Minuti di studio</p>
+            <p className="text-xs text-blue-600/80">{t('studyMinutes')}</p>
           </CardContent>
         </Card>
 
@@ -84,7 +88,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardContent className="p-4">
             <BookOpen className="h-5 w-5 text-green-500 mb-2" />
             <p className="text-2xl font-bold text-green-600">{insights.totalSessions}</p>
-            <p className="text-xs text-green-600/80">Sessioni completate</p>
+            <p className="text-xs text-green-600/80">{t('completedSessions')}</p>
           </CardContent>
         </Card>
 
@@ -92,7 +96,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardContent className="p-4">
             <Users className="h-5 w-5 text-purple-500 mb-2" />
             <p className="text-2xl font-bold text-purple-600">{insights.maestriInteracted.length}</p>
-            <p className="text-xs text-purple-600/80">Maestri incontrati</p>
+            <p className="text-xs text-purple-600/80">{t('maestriMet')}</p>
           </CardContent>
         </Card>
 
