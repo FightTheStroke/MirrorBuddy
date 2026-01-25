@@ -393,9 +393,7 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          # NOTE: This is an intentional test credential for ephemeral CI database
-          # Not a real secret - container is isolated and destroyed after job
-          POSTGRES_PASSWORD: postgres  # gitleaks:allow gitguardian:ignore
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
@@ -428,8 +426,8 @@ jobs:
           npx prisma generate
           npx prisma migrate deploy
         env:
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}@localhost:5432/mirrorbuddy_test
 
       # Download pre-built .next from build job
       - name: Download build artifacts
@@ -460,9 +458,9 @@ jobs:
         env:
           CI: true
           CI_MOBILE_TESTS: "1"
-          TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
-          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
-          DIRECT_URL: postgresql://postgres:postgres@localhost:5432/mirrorbuddy_test
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD || 'testpass123' }}@localhost:5432/mirrorbuddy_test
 
       - name: Upload Playwright report
         if: always()
