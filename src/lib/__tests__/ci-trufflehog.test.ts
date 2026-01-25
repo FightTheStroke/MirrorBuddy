@@ -85,13 +85,16 @@ describe("CI Workflow - TruffleHog Secret Scanning (F-09)", () => {
       expect(truffleStep.with.extra_args).not.toContain("--fail");
     });
 
-    it("TruffleHog should scan from default branch to HEAD", () => {
+    it("TruffleHog should scan changed commits on push events", () => {
+      // For push events, scan from the previous commit (event.before) to
+      // the new commit (event.after). This avoids "BASE and HEAD are the same"
+      // error that occurs when using default_branch + HEAD on direct pushes.
       const job = ciWorkflow.jobs["secret-scanning"];
       const truffleStep = job.steps.find((s: any) =>
         s.uses?.includes("trufflesecurity/trufflehog"),
       );
-      expect(truffleStep.with.base).toBeDefined();
-      expect(truffleStep.with.head).toBe("HEAD");
+      expect(truffleStep.with.base).toBe("${{ github.event.before }}");
+      expect(truffleStep.with.head).toBe("${{ github.event.after }}");
     });
   });
 

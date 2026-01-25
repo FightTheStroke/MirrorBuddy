@@ -1,7 +1,16 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Flame, Coins, BookOpen, Clock, Star, Menu } from "lucide-react";
+import Link from "next/link";
+import {
+  Flame,
+  Coins,
+  BookOpen,
+  Clock,
+  Star,
+  Menu,
+  MessageCircle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PomodoroHeaderWidget } from "@/components/pomodoro";
