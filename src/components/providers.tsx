@@ -159,9 +159,7 @@ function ConditionalUnifiedConsent({
   return <UnifiedConsentWall>{children}</UnifiedConsentWall>;
 }
 
-export function Providers({ children, nonce: _nonce }: ProvidersProps) {
-  // Note: _nonce is passed through but not directly used in this component
-  // Next.js automatically applies it to hydration scripts based on CSP header
+export function Providers({ children, nonce }: ProvidersProps) {
   return (
     <ThemeProvider
       attribute="class"
@@ -170,6 +168,8 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
       disableTransitionOnChange
       // Fix #4: Explicitly map themes to class names so .light class is added
       value={{ light: "light", dark: "dark" }}
+      // CSP nonce for inline theme script (prevents flash of unstyled content)
+      nonce={nonce}
     >
       <AccessibilityProvider>
         <A11yInstantAccess />
