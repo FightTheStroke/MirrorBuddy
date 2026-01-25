@@ -18,10 +18,10 @@ const baseEnvSchema = z.object({
 });
 
 // Production-only requirements
+// Note: SUPABASE_CA_CERT is optional because we have the cert file in repo
+// (config/supabase-chain.pem). db.ts loads from file first, env var is fallback.
 const productionEnvSchema = baseEnvSchema.extend({
-  SUPABASE_CA_CERT: z
-    .string()
-    .min(1, "SUPABASE_CA_CERT is required in production"),
+  SUPABASE_CA_CERT: z.string().optional(),
   // Azure OpenAI - at least one provider must be configured
   AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: z.string().optional(),

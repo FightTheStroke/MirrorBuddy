@@ -28,11 +28,11 @@ const VALID_FEATURES: FeatureType[] = [
 ];
 
 interface RouteParams {
-  params: Promise<{ userId: string }>;
+  params: Promise<{ id: string }>;
 }
 
 /**
- * GET /api/admin/users/[userId]/feature-configs
+ * GET /api/admin/users/[id]/feature-configs
  * List all feature config overrides for a user
  */
 export async function GET(_request: NextRequest, { params }: RouteParams) {
@@ -42,7 +42,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId } = await params;
+    const { id: userId } = await params;
     const configs = await tierService.getUserFeatureConfigs(userId);
 
     return NextResponse.json({ configs });
@@ -58,7 +58,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * POST /api/admin/users/[userId]/feature-configs
+ * POST /api/admin/users/[id]/feature-configs
  * Set or update a feature config override
  *
  * Body:
@@ -77,7 +77,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId } = await params;
+    const { id: userId } = await params;
     const body = await request.json();
 
     // Validate required fields
@@ -149,7 +149,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 }
 
 /**
- * DELETE /api/admin/users/[userId]/feature-configs
+ * DELETE /api/admin/users/[id]/feature-configs
  * Remove a feature config override
  *
  * Body:
@@ -162,7 +162,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { userId } = await params;
+    const { id: userId } = await params;
     const body = await request.json();
 
     // Validate required fields
