@@ -17,6 +17,8 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PomodoroHeaderWidget } from "@/components/pomodoro";
 import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
 import { CalculatorHeaderWidget } from "@/components/calculator";
+import { TierBadge } from "@/components/tier/TierBadge";
+import type { TierName } from "@/types/tier-types";
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -38,6 +40,8 @@ interface HomeHeaderProps {
   totalStudyMinutes: number;
   questionsAsked: number;
   trialStatus?: TrialStatus;
+  userTier?: TierName;
+  isSimulatedTier?: boolean;
 }
 
 export function HomeHeader({
@@ -53,6 +57,8 @@ export function HomeHeader({
   totalStudyMinutes,
   questionsAsked,
   trialStatus,
+  userTier,
+  isSimulatedTier,
 }: HomeHeaderProps) {
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
@@ -173,8 +179,18 @@ export function HomeHeader({
         )}
       </div>
 
-      {/* Right section: calculator + ambient audio + pomodoro + notifications + version */}
+      {/* Right section: tier badge + calculator + ambient audio + pomodoro + notifications + version */}
       <div className="hidden lg:flex items-center gap-3">
+        {userTier && (
+          <div className="flex items-center gap-1">
+            <TierBadge tier={userTier} showIcon={userTier === "pro"} />
+            {isSimulatedTier && (
+              <span className="text-[10px] text-amber-500 font-medium">
+                (SIM)
+              </span>
+            )}
+          </div>
+        )}
         <CalculatorHeaderWidget />
         <AmbientAudioHeaderWidget />
         <PomodoroHeaderWidget />

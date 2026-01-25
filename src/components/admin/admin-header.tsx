@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ChevronRight, Menu, Bell, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { TierSimulator } from "./tier-simulator";
 
 interface AdminHeaderProps {
   onMenuClick?: () => void;
@@ -97,8 +98,11 @@ export function AdminHeader({
         </h1>
       </div>
 
-      {/* Stats badges - visible on mobile when sidebar is closed */}
+      {/* Stats badges and tier simulator */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* Tier simulator for admin testing */}
+        <TierSimulator />
+
         {/* Pending invites badge */}
         {pendingInvites > 0 && (
           <Link

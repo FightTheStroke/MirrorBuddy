@@ -20,6 +20,8 @@ import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { useParentInsightsIndicator } from "@/lib/hooks/use-parent-insights-indicator";
 import { useTrialStatus } from "@/lib/hooks/use-trial-status";
 import { useTrialToasts } from "@/lib/hooks/use-trial-toasts";
+import { useTierFeatures } from "@/hooks/useTierFeatures";
+import type { TierName } from "@/types/tier-types";
 import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import { cn } from "@/lib/utils";
 import type { Maestro, ToolType } from "@/types";
@@ -87,6 +89,11 @@ export default function Home() {
   const { hasNewInsights, markAsViewed } = useParentInsightsIndicator();
   const trialStatus = useTrialStatus();
   useTrialToasts(trialStatus);
+  const {
+    tier,
+    isLoading: tierLoading,
+    isSimulated: tierSimulated,
+  } = useTierFeatures();
   const {
     activeCharacter,
     conversationsByCharacter,
@@ -185,6 +192,8 @@ export default function Home() {
         totalStudyMinutes={totalStudyMinutes}
         questionsAsked={questionsAsked}
         trialStatus={trialStatus}
+        userTier={!tierLoading && tier ? (tier as TierName) : undefined}
+        isSimulatedTier={tierSimulated}
       />
 
       <HomeSidebar

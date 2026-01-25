@@ -28,6 +28,7 @@ import { useState, useEffect } from "react";
 interface TierFeaturesData {
   tier: string;
   features: Record<string, boolean>;
+  isSimulated?: boolean;
 }
 
 interface UseTierFeaturesReturn {
@@ -35,6 +36,7 @@ interface UseTierFeaturesReturn {
   isLoading: boolean;
   tier: string | undefined;
   features: Record<string, boolean>;
+  isSimulated: boolean;
 }
 
 // Global cache to share features across hook instances
@@ -61,6 +63,7 @@ export function useTierFeatures(): UseTierFeaturesReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [tier, setTier] = useState<string | undefined>();
   const [features, setFeatures] = useState<Record<string, boolean>>({});
+  const [isSimulated, setIsSimulated] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -76,6 +79,7 @@ export function useTierFeatures(): UseTierFeaturesReturn {
           if (isMounted) {
             setTier(cached.tier);
             setFeatures(cached.features);
+            setIsSimulated(cached.isSimulated ?? false);
             setIsLoading(false);
           }
           return;
@@ -88,6 +92,7 @@ export function useTierFeatures(): UseTierFeaturesReturn {
           if (isMounted) {
             setTier(undefined);
             setFeatures({});
+            setIsSimulated(false);
             setIsLoading(false);
           }
           return;
@@ -104,12 +109,14 @@ export function useTierFeatures(): UseTierFeaturesReturn {
         if (isMounted) {
           setTier(data.tier);
           setFeatures(data.features);
+          setIsSimulated(data.isSimulated ?? false);
           setIsLoading(false);
         }
       } catch (_error) {
         if (isMounted) {
           setTier(undefined);
           setFeatures({});
+          setIsSimulated(false);
           setIsLoading(false);
         }
       }
@@ -136,5 +143,6 @@ export function useTierFeatures(): UseTierFeaturesReturn {
     isLoading,
     tier,
     features,
+    isSimulated,
   };
 }
