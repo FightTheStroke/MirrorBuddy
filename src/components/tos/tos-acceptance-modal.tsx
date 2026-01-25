@@ -3,6 +3,7 @@
 import * as React from "react";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
@@ -29,6 +30,7 @@ export function TosAcceptanceModal({
 }: TosAcceptanceModalProps) {
   const [accepted, setAccepted] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const t = useTranslations("consent.tos");
 
   const handleAccept = async () => {
     if (!accepted) return;
@@ -52,10 +54,7 @@ export function TosAcceptanceModal({
         { component: "TosAcceptanceModal" },
         error,
       );
-      toast.warning(
-        "Accettazione salvata localmente",
-        "La sincronizzazione con il server è fallita. Riproveremo più tardi.",
-      );
+      toast.warning(t("toast.saved"), t("toast.saveFailed"));
       // Graceful degradation: allow user to proceed even if server save fails
       onAccept(TOS_VERSION);
     } finally {
@@ -99,15 +98,17 @@ export function TosAcceptanceModal({
           {/* Header */}
           <div className="flex flex-col space-y-2 text-center sm:text-left">
             <DialogPrimitive.Title className="text-2xl font-bold leading-none tracking-tight text-slate-900 dark:text-slate-50">
-              {isReconsent ? "Termini Aggiornati" : "Benvenuto in MirrorBuddy!"}
+              {isReconsent
+                ? t("modal.title.updated")
+                : t("modal.title.welcome")}
             </DialogPrimitive.Title>
             <DialogPrimitive.Description
               id="tos-description"
               className="text-sm text-slate-600 dark:text-slate-400"
             >
               {isReconsent
-                ? "Abbiamo aggiornato i nostri Termini di Servizio. Per continuare a usare MirrorBuddy, leggi e accetta i nuovi termini."
-                : "Prima di iniziare, leggi i nostri Termini di Servizio."}
+                ? t("modal.description.updated")
+                : t("modal.description.welcome")}
             </DialogPrimitive.Description>
           </div>
 
@@ -115,9 +116,8 @@ export function TosAcceptanceModal({
           {isReconsent && (
             <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                <strong>Cosa è cambiato:</strong> Abbiamo aggiornato le
-                informazioni sulla raccolta dati di performance (Web Vitals) e
-                la Privacy Policy. Leggi i termini completi per i dettagli.
+                <strong>{t("modal.warning.title")}</strong>{" "}
+                {t("modal.warning.description")}
               </p>
             </div>
           )}
@@ -125,34 +125,32 @@ export function TosAcceptanceModal({
           {/* TL;DR Summary */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-              In breve:
+              {t("modal.summary")}
             </h3>
             <ul className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
               <li className="flex items-start gap-2">
                 <span className="mt-1 text-green-600 dark:text-green-400">
                   ✓
                 </span>
-                <span>MirrorBuddy è gratuito, fatto per aiutare</span>
+                <span>{t("modal.points.free")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1 text-amber-600 dark:text-amber-400">
                   !
                 </span>
-                <span>Non siamo una scuola, l&apos;AI può sbagliare</span>
+                <span>{t("modal.points.aiCanErr")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1 text-blue-600 dark:text-blue-400">
                   👤
                 </span>
-                <span>
-                  Se hai meno di 14 anni, usa l&apos;app con un adulto vicino
-                </span>
+                <span>{t("modal.points.minors")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="mt-1 text-purple-600 dark:text-purple-400">
                   🤝
                 </span>
-                <span>Rispetta gli altri, noi rispettiamo te</span>
+                <span>{t("modal.points.respect")}</span>
               </li>
             </ul>
           </div>
@@ -171,7 +169,7 @@ export function TosAcceptanceModal({
                 "dark:text-blue-400 dark:hover:text-blue-300",
               )}
             >
-              Leggi i Termini completi →
+              {t("modal.link")}
             </Link>
           </div>
 
@@ -206,7 +204,7 @@ export function TosAcceptanceModal({
                 id="tos-checkbox-label"
                 className="text-sm text-slate-700 dark:text-slate-300 select-none"
               >
-                Ho letto e accetto i Termini di Servizio
+                {t("modal.checkbox")}
               </span>
             </label>
           </div>
@@ -220,11 +218,13 @@ export function TosAcceptanceModal({
               className="min-w-[120px]"
               aria-label={
                 !accepted
-                  ? "Accetta i Termini di Servizio (prima spunta la casella)"
-                  : "Accetta i Termini di Servizio"
+                  ? t("modal.buttons.disabled")
+                  : t("modal.buttons.accept")
               }
             >
-              {isSubmitting ? "Salvataggio..." : "Accetto"}
+              {isSubmitting
+                ? t("modal.buttons.submitting")
+                : t("modal.buttons.accept")}
             </Button>
           </div>
 
@@ -235,9 +235,8 @@ export function TosAcceptanceModal({
             aria-atomic="true"
             className="sr-only"
           >
-            {!accepted &&
-              "Per continuare, è necessario accettare i Termini di Servizio"}
-            {isSubmitting && "Salvataggio in corso..."}
+            {!accepted && t("modal.screenReader.required")}
+            {isSubmitting && t("modal.screenReader.submitting")}
           </div>
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>

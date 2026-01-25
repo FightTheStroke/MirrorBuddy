@@ -1,112 +1,102 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContentAI() {
+  const s16 = useTranslations("legal.privacy.section16");
+
   return (
-    <Section number={16} title="Trattamento mediante Intelligenza Artificiale">
+    <Section number={16} title={s16("title")}>
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        Quali sistemi AI usiamo
+        {s16("aiSystemsHeading")}
       </h3>
-      <p>
-        MirrorBuddy utilizza <strong>Azure OpenAI</strong> per fornire risposte
-        educative personalizzate attraverso i nostri Maestri AI. Questo è il
-        nostro provider di intelligenza artificiale di fiducia, selezionato per
-        la sua sicurezza e conformità GDPR.
-      </p>
+      <p>{s16("aiSystems")}</p>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        Quali dati elabora l&apos;AI
+        {s16("aiDataHeading")}
       </h3>
-      <p>Per darti risposte utili, il nostro sistema AI elabora:</p>
+      <p>{s16("aiDataIntro")}</p>
       <ul className="text-slate-700 dark:text-gray-300 space-y-2">
         <li>
-          <strong>I tuoi messaggi e domande</strong> - quello che scrivi quando
-          parli con un Maestro
+          <strong>{s16("aiDataItemLabels.messages")}</strong> -{" "}
+          {s16("aiDataItems.messages")}
         </li>
         <li>
-          <strong>Il contesto della conversazione</strong> - cosa hai chiesto
-          prima, per dare risposte coerenti
+          <strong>{s16("aiDataItemLabels.context")}</strong> -{" "}
+          {s16("aiDataItems.context")}
         </li>
         <li>
-          <strong>Profilo educativo anonimo</strong> - materia, livello di
-          difficoltà (non il tuo nome)
+          <strong>{s16("aiDataItemLabels.profile")}</strong> -{" "}
+          {s16("aiDataItems.profile")}
         </li>
       </ul>
       <p>
-        <strong>Non elaboriamo con AI:</strong> dati sensibili sulla salute,
-        immagini, video, informazioni personali sensibili.
+        <strong>Non elaboriamo con AI:</strong> {s16("notProcessed")}
       </p>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        Come funzionano le decisioni dell&apos;AI
+        {s16("aiDecisionsHeading")}
       </h3>
-      <p>
-        L&apos;AI di MirrorBuddy <strong>genera contenuti educativi</strong>,
-        non prende decisioni che ti riguardano legalmente. Noi non usiamo
-        algoritmi automatici per:
-      </p>
+      <p>{s16("aiDecisions")}</p>
       <ul className="text-slate-700 dark:text-gray-300 space-y-2">
-        <li>Accettare o rifiutare il tuo accesso</li>
-        <li>Determinare benefici, obblighi o diritti legali</li>
-        <li>
-          Prendere decisioni su valutazioni o risultati educativi definitivi
-        </li>
+        <li>{s16("aiDecisionsItems.access")}</li>
+        <li>{s16("aiDecisionsItems.benefits")}</li>
+        <li>{s16("aiDecisionsItems.education")}</li>
       </ul>
       <p className="text-slate-600 dark:text-gray-400 italic">
-        Tutti i giudizi importanti sulla tua educazione sono sempre fatti da
-        insegnanti e tutori umani, non da algoritmi.
+        {s16("aiDecisionsNote")}
       </p>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        I tuoi diritti su AI e automazione
+        {s16("aiRightsHeading")}
       </h3>
-      <p>Hai diritto a:</p>
+      <p>{s16("aiRightsIntro")}</p>
       <ul className="text-slate-700 dark:text-gray-300 space-y-2">
         <li>
-          <strong>Richiedere intervento umano</strong> - se una decisione AI ti
-          interessa, puoi chiedere che una persona la riveda
+          <strong>{s16("aiRightsItemLabels.humanReview")}</strong> -{" "}
+          {s16("aiRightsItems.humanReview")}
         </li>
         <li>
-          <strong>Esprimere il tuo parere</strong> - puoi dirci se una risposta
-          dell&apos;AI non è utile
+          <strong>{s16("aiRightsItemLabels.feedback")}</strong> -{" "}
+          {s16("aiRightsItems.feedback")}
         </li>
         <li>
-          <strong>Sapere quando parli con AI</strong> - è sempre chiaro che sei
-          in chat con un Maestro AI, non una persona
+          <strong>{s16("aiRightsItemLabels.transparency")}</strong> -{" "}
+          {s16("aiRightsItems.transparency")}
         </li>
         <li>
-          <strong>Opporti al trattamento</strong> - puoi chiedere di non usare
-          Azure OpenAI per le tue risposte (useremo un modello fallback)
+          <strong>{s16("aiRightsItemLabels.oppose")}</strong> -{" "}
+          {s16("aiRightsItems.oppose")}
         </li>
       </ul>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        Trasparenza e sorveglianza umana
+        {s16("transparencyHeading")}
       </h3>
-      <p>Per proteggere te e garantire qualità:</p>
+      <p>{s16("transparencyIntro")}</p>
       <ul className="text-slate-700 dark:text-gray-300 space-y-2">
         <li>
-          <strong>Revisione umana</strong> - il nostro team rivede campioni di
-          conversazioni per qualità e sicurezza
+          <strong>{s16("transparencyItemLabels.review")}</strong> -{" "}
+          {s16("transparencyItems.review")}
         </li>
         <li>
-          <strong>Monitoraggio</strong> - controlliamo che l&apos;AI non generi
-          contenuti inappropriati
+          <strong>{s16("transparencyItemLabels.monitoring")}</strong> -{" "}
+          {s16("transparencyItems.monitoring")}
         </li>
         <li>
-          <strong>Segnalazioni</strong> - puoi segnalare risposte sbagliate
-          direttamente nell&apos;app
+          <strong>{s16("transparencyItemLabels.reporting")}</strong> -{" "}
+          {s16("transparencyItems.reporting")}
         </li>
         <li>
-          <strong>Limite dei dati</strong> - eliminiamo le conversazioni AI dopo
-          30 giorni dalla richiesta
+          <strong>{s16("transparencyItemLabels.retention")}</strong> -{" "}
+          {s16("transparencyItems.retention")}
         </li>
       </ul>
 
       <h3 className="text-xl font-semibold text-slate-900 dark:text-white mt-6 mb-3">
-        Per saperne di più
+        {s16("learnMoreHeading")}
       </h3>
       <p>
         Leggi la nostra{" "}
@@ -116,8 +106,7 @@ export function PrivacyContentAI() {
         >
           AI Policy completa
         </Link>{" "}
-        per dettagli tecnici su come funziona il sistema e come proteggiamo i
-        tuoi dati durante il trattamento AI.
+        {s16("learnMoreText")}
       </p>
     </Section>
   );

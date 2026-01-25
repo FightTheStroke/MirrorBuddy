@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * Reusable components for Cookie Policy page
  */
@@ -37,12 +39,14 @@ export interface CookieInfo {
 }
 
 export function CookieTable({ cookies }: { cookies: CookieInfo[] }) {
+  const t = useTranslations("legal.cookies");
+
   return (
     <div className="overflow-x-auto my-4">
       <table
         className="min-w-full border-collapse"
         role="table"
-        aria-label="Elenco cookie"
+        aria-label={t("table.ariaLabel")}
       >
         <thead>
           <tr className="bg-slate-100 dark:bg-gray-700">
@@ -50,19 +54,19 @@ export function CookieTable({ cookies }: { cookies: CookieInfo[] }) {
               scope="col"
               className="px-4 py-3 text-left text-sm font-semibold text-slate-900 dark:text-white border border-slate-200 dark:border-gray-600"
             >
-              Nome
+              {t("table.headers.name")}
             </th>
             <th
               scope="col"
               className="px-4 py-3 text-left text-sm font-semibold text-slate-900 dark:text-white border border-slate-200 dark:border-gray-600"
             >
-              A cosa serve
+              {t("table.headers.purpose")}
             </th>
             <th
               scope="col"
               className="px-4 py-3 text-left text-sm font-semibold text-slate-900 dark:text-white border border-slate-200 dark:border-gray-600"
             >
-              Quanto dura
+              {t("table.headers.duration")}
             </th>
           </tr>
         </thead>

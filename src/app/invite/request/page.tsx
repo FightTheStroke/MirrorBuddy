@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -12,6 +13,7 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 export default function InviteRequestPage() {
   const router = useRouter();
+  const t = useTranslations("invite.request");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [motivation, setMotivation] = useState("");
@@ -45,7 +47,7 @@ export default function InviteRequestPage() {
 
       if (!response.ok) {
         setFormState("error");
-        setErrorMessage(data.error || "Errore durante l'invio");
+        setErrorMessage(data.error || t("errors.sendError"));
         return;
       }
 
@@ -54,8 +56,8 @@ export default function InviteRequestPage() {
       logger.error("Invite request failed", { error: String(error) });
       const message =
         error instanceof Error && /csrf/i.test(error.message)
-          ? "Sessione scaduta. Ricarica la pagina e riprova."
-          : "Errore di connessione. Riprova.";
+          ? t("errors.sessionExpired")
+          : t("errors.connectionError");
       setFormState("error");
       setErrorMessage(message);
     }
@@ -69,14 +71,13 @@ export default function InviteRequestPage() {
             <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Richiesta Inviata!
+            {t("successTitle")}
           </h1>
           <p className="text-slate-600 dark:text-slate-300">
-            Grazie per il tuo interesse in MirrorBuddy! Ti contatteremo presto
-            via email con le credenziali di accesso.
+            {t("successMessage")}
           </p>
           <Button onClick={() => router.push("/welcome")} className="w-full">
-            Torna alla Home
+            {t("returnHome")}
           </Button>
         </div>
       </div>
@@ -91,16 +92,15 @@ export default function InviteRequestPage() {
           className="flex items-center gap-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
-          Indietro
+          {t("backButton")}
         </button>
 
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Richiedi Accesso Beta
+            {t("title")}
           </h1>
           <p className="text-slate-600 dark:text-slate-300 mt-2">
-            MirrorBuddy e in beta privata. Compila il form per richiedere
-            l&apos;accesso.
+            {t("subtitle")}
           </p>
         </div>
 
@@ -119,7 +119,7 @@ export default function InviteRequestPage() {
               htmlFor="name"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Nome *
+              {t("nameLabel")}
             </label>
             <input
               id="name"
@@ -130,7 +130,7 @@ export default function InviteRequestPage() {
               minLength={2}
               disabled={formState === "submitting"}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder="Il tuo nome"
+              placeholder={t("namePlaceholder")}
             />
           </div>
 
@@ -139,7 +139,7 @@ export default function InviteRequestPage() {
               htmlFor="email"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Email *
+              {t("emailLabel")}
             </label>
             <input
               id="email"
@@ -149,7 +149,7 @@ export default function InviteRequestPage() {
               required
               disabled={formState === "submitting"}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              placeholder="la-tua@email.com"
+              placeholder={t("emailPlaceholder")}
             />
           </div>
 
@@ -158,7 +158,7 @@ export default function InviteRequestPage() {
               htmlFor="motivation"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Perche vuoi usare MirrorBuddy? *
+              {t("motivationLabel")}
             </label>
             <textarea
               id="motivation"
@@ -169,10 +169,10 @@ export default function InviteRequestPage() {
               rows={4}
               disabled={formState === "submitting"}
               className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 resize-none"
-              placeholder="Raccontaci un po' di te e perche sei interessato..."
+              placeholder={t("motivationPlaceholder")}
             />
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Minimo 20 caratteri
+              {t("minimumCharacters")}
             </p>
           </div>
 
@@ -182,29 +182,28 @@ export default function InviteRequestPage() {
             className="w-full"
           >
             {formState === "submitting" ? (
-              "Invio in corso..."
+              t("submitting")
             ) : (
               <>
                 <Send className="w-4 h-4 mr-2" />
-                Invia Richiesta
+                {t("submitButton")}
               </>
             )}
           </Button>
         </form>
 
         <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-          Riceverai una email di conferma e, se approvato, le credenziali di
-          accesso.
+          {t("confirmationMessage")}
         </p>
 
         <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
           <p className="text-sm text-slate-600 dark:text-slate-400 text-center mb-3">
-            Hai gia un account?
+            {t("alreadyHaveAccount")}
           </p>
           <Link href="/login" className="block">
             <Button variant="outline" className="w-full">
               <LogIn className="w-4 h-4 mr-2" />
-              Accedi
+              {t("loginButton")}
             </Button>
           </Link>
         </div>

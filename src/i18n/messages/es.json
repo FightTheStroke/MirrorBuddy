@@ -114,41 +114,70 @@
     }
   },
   "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "register": "Register",
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
-    "signOut": "Sign Out",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión",
     "email": "Email",
-    "password": "Password",
-    "confirmPassword": "Confirm Password",
-    "username": "Username",
-    "rememberMe": "Remember me",
-    "forgotPassword": "Forgot password?",
-    "resetPassword": "Reset Password",
-    "changePassword": "Change Password",
-    "newPassword": "New Password",
-    "currentPassword": "Current Password",
-    "createAccount": "Create Account",
-    "alreadyHaveAccount": "Already have an account?",
-    "dontHaveAccount": "Don't have an account?",
-    "backToLogin": "Back to Login",
-    "welcomeBack": "Welcome back!",
-    "welcome": "Welcome!",
-    "loginSuccess": "Login successful",
-    "logoutSuccess": "Logout successful",
-    "registrationSuccess": "Registration successful",
-    "invalidCredentials": "Invalid credentials",
-    "emailRequired": "Email is required",
-    "passwordRequired": "Password is required",
-    "passwordMismatch": "Passwords do not match",
-    "passwordTooShort": "Password must be at least 8 characters",
-    "emailInvalid": "Invalid email",
-    "userExists": "User already exists",
-    "userNotFound": "User not found",
-    "sessionExpired": "Session expired, please login again",
-    "unauthorized": "Unauthorized"
+    "password": {
+      "minLength": "Mínimo 8 caracteres",
+      "requiresUppercase": "Al menos una letra mayúscula",
+      "requiresLowercase": "Al menos una letra minúscula",
+      "requiresNumber": "Al menos un número",
+      "changeErrorDefault": "Error al cambiar la contraseña",
+      "connectionError": "Error de conexión. Por favor, inténtelo de nuevo.",
+      "successTitle": "¡Contraseña cambiada!",
+      "successMessage": "Tu contraseña ha sido actualizada correctamente. Serás redirigido...",
+      "pageTitle": "Cambiar contraseña",
+      "pageSubtitle": "Por tu seguridad, debes cambiar tu contraseña temporal.",
+      "currentPasswordLabel": "Contraseña actual *",
+      "currentPasswordPlaceholder": "Contraseña temporal recibida por correo",
+      "newPasswordLabel": "Nueva contraseña *",
+      "newPasswordPlaceholder": "Elige una contraseña segura",
+      "confirmPasswordLabel": "Confirmar contraseña *",
+      "confirmPasswordPlaceholder": "Repite tu nueva contraseña",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "submitButtonLoading": "Cambiando contraseña...",
+      "submitButtonText": "Cambiar contraseña"
+    },
+    "confirmPassword": "Confirmar contraseña",
+    "username": "Nombre de usuario",
+    "rememberMe": "Recuérdame",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "resetPassword": "Restablecer contraseña",
+    "changePassword": "Cambiar contraseña",
+    "newPassword": "Nueva contraseña",
+    "currentPassword": "Contraseña actual",
+    "createAccount": "Crear cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "backToLogin": "Volver a iniciar sesión",
+    "welcomeBack": "¡Bienvenido de vuelta!",
+    "welcome": "¡Bienvenido!",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutSuccess": "Cierre de sesión exitoso",
+    "registrationSuccess": "Registro exitoso",
+    "signInToAccount": "Inicia sesión en tu cuenta",
+    "yourEmail": "Tu correo electrónico",
+    "yourPassword": "Tu contraseña",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "signingIn": "Iniciando sesión...",
+    "invalidCredentials": "Credenciales inválidas",
+    "connectionError": "Error de conexión",
+    "noAccount": "¿Aún no tienes una cuenta?",
+    "requestBetaAccess": "Solicitar acceso Beta",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "emailInvalid": "Email inválido",
+    "userExists": "El usuario ya existe",
+    "userNotFound": "Usuario no encontrado",
+    "sessionExpired": "La sesión ha expirado, por favor inicie sesión nuevamente",
+    "unauthorized": "No autorizado"
   },
   "errors": {
     "generic": "An error occurred",
@@ -252,216 +281,105 @@
     "error": "Error"
   },
   "welcome": {
-    "page": {
-      "loading": "Loading...",
-      "resetConfirm": "Do you want to start over? All entered data will be deleted."
+    "welcome-form": {
+      "hello-melissa": "¡Hola! Soy Melissa",
+      "your-support-teacher": "Tu maestra de apoyo",
+      "welcome-intro": "¡Bienvenido a la Escuela que Desearía! Estoy aquí para ayudarte a estudiar de la manera que mejor funciona para ti.",
+      "dont-worry": "No te preocupes si algo te parece difícil - ¡juntos siempre encontraremos una manera de entenderlo!",
+      "what-is-your-name": "¿Cuál es tu nombre?",
+      "enter-your-name-placeholder": "Escribe tu nombre...",
+      "nice-to-meet-you": "¡Mucho gusto!",
+      "replay-mode-message": "Estás revisando el tutorial. Tus datos existentes no serán modificados.",
+      "enable-voice": "Activar voz",
+      "disable-voice": "Desactivar voz",
+      "tell-me-about-you": "¡Cuéntame un poco sobre ti, {name}!",
+      "help-personalize": "Esto me ayudará a personalizar tu experiencia",
+      "learning-differences-label": "¿Tienes alguna dificultad de aprendizaje particular? (opcional)",
+      "learning-differences-hint": "Esto nos ayuda a hacer la app más accesible para ti",
+      "school-elementary": "Primaria",
+      "school-middle": "Secundaria",
+      "school-high": "Preparatoria",
+      "collected-data": "Datos recopilados",
+      "age": "Edad",
+      "years": "años",
+      "school": "Escuela",
+      "learning-differences": "Dificultades de aprendizaje",
+      "optional": "(opcional)"
+    },
+    "trial-limits": {
+      "title": "Modo de Prueba Gratuita",
+      "subtitle": "Explora MirrorBuddy sin registro",
+      "messages": "Mensajes",
+      "messages-value": "10 por sesión",
+      "maestri": "Maestri",
+      "maestri-value": "3 disponibles",
+      "tools": "Herramientas",
+      "tools-value": "Básico",
+      "cta-question": "¿Quieres acceso completo a todos los Maestri y herramientas?",
+      "cta-button": "Solicitar acceso beta"
+    },
+    "tier-comparison": {
+      "heading": "Elige el plan perfecto para ti",
+      "subheading": "Comienza con una prueba gratuita o regístrate para desbloquear más funciones",
+      "footer-note": "Todos los planes incluyen acceso a 22 Maestri IA y herramientas de aprendizaje personalizadas"
+    },
+    "principles": {
+      "welcome-to-school": "¡Bienvenido a la Escuela que Desearía, {name}!",
+      "what-makes-us-special": "Esto es lo que nos hace especiales",
+      "accessible-learning": "Aprendizaje Accesible",
+      "accessible-learning-desc": "Caminos de aprendizaje personalizados para tus necesidades",
+      "ai-teachers": "22 Maestros IA",
+      "ai-teachers-desc": "Expertos en cada materia, siempre disponibles",
+      "your-pace": "A Tu Ritmo",
+      "your-pace-desc": "Aprende cuando quieras, durante el tiempo que quieras",
+      "no-judgment": "Sin Juzgar",
+      "no-judgment-desc": "Un espacio seguro para aprender y cometer errores",
+      "melissa-quote": "¡Recuerda: no hay preguntas estúpidas, solo mentes curiosas!",
+      "ready-to-start": "¿Listo para empezar?",
+      "how-it-works": "¿Cómo funciona?",
+      "how-it-works-desc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pídele a Euclides. ¡Para inglés, está Shakespeare! Te ayudaré a elegir al Profesor correcto para cada situación."
+    },
+    "ready": {
+      "perfect": "¡Perfecto, {name}!",
+      "ready-to-start": "¡Estás listo para comenzar tu aventura!",
+      "prepared-for-you": "¡He preparado todo para ti! Recuerda:",
+      "always-talk": "Siempre puedes hablarme - estoy aquí para ayudarte con tu método de estudio",
+      "choose-professor": "Elige un Profesor",
+      "choose-professor-desc": "para cada materia hay el experto correcto",
+      "earn-xp": "Gana XP - ¡cada lección te ayuda a subir de nivel!",
+      "back": "Atrás",
+      "lets-start": "¡Comencemos!",
+      "tutorial-end": "Fin del tutorial. ¡Haz clic en \"¡Comencemos!\" para volver a la app."
+    },
+    "quick-start": {
+      "go-to-app": "Ir a la app",
+      "update-profile": "Actualizar perfil",
+      "full-access": "ACCESO COMPLETO",
+      "free-trial": "PRUEBA GRATUITA",
+      "have-account": "¿Tienes una cuenta?",
+      "try-now": "Explora ahora",
+      "22-maestri": "22 Maestri IA",
+      "all-tools": "Todas las herramientas",
+      "unlimited-chats": "Chats ilimitados",
+      "login": "Iniciar sesión",
+      "try-free": "Prueba gratis"
     },
     "hero": {
-      "betaBadge": "Private Beta",
-      "betaSubtitle": "Invitation only",
-      "welcomeBack": "Welcome back,",
-      "welcomeBackSubtitle": "Ready for your next learning adventure?",
-      "welcomeNew": "Welcome to",
-      "tagline": "Learn",
-      "taglineWith": "WITH the Great Professors",
-      "taglineAbilities": "whatever your abilities",
-      "description": "Study mathematics <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historical professors accompany you personally.",
-      "accessibility": {
-        "title": "Designed for all learning styles",
-        "readableFonts": "Readable fonts",
-        "mindMaps": "Mind maps",
-        "textToSpeech": "Text to speech",
-        "adaptiveQuizzes": "Adaptive quizzes"
-      }
+      "title": "La Escuela que Desearía",
+      "subtitle": "Maestros IA personalizados para tus necesidades",
+      "cta": "Comienza Ahora",
+      "welcome": "Bienvenido a",
+      "learn": "Aprende",
+      "with-teachers": "CON los Grandes Profesores",
+      "any-ability": "cualquiera que sean tus habilidades",
+      "readable-fonts": "Fuentes legibles",
+      "mind-maps": "Mapas mentales",
+      "text-to-speech": "Conversión de texto a voz",
+      "adaptive-quizzes": "Cuestionarios adaptativos"
     },
-    "quickStart": {
-      "heading": "Get Started",
-      "returningUser": {
-        "goToApp": "Go to app",
-        "updateProfile": "Update profile"
-      },
-      "betaAccess": {
-        "badge": "FULL ACCESS",
-        "title": "Have an account?",
-        "feature1": "22 AI Professors",
-        "feature2": "All tools",
-        "feature3": "Saved progress",
-        "cta": "Sign In"
-      },
-      "trial": {
-        "badge": "FREE TRIAL",
-        "title": "Explore now",
-        "feature1": "3 Professors",
-        "feature2": "10 messages",
-        "feature3": "No registration",
-        "cta": "Try for free"
-      }
-    },
-    "tierComparison": {
-      "heading": "Choose the perfect plan for you",
-      "subtitle": "Start with a free trial or register to unlock more features",
-      "footer": "All plans include access to 22 AI Professors and personalized learning tools",
-      "tiers": {
-        "trial": {
-          "name": "Trial",
-          "tagline": "Explore without commitment",
-          "price": "Free",
-          "features": {
-            "maestri": "3 Professors",
-            "messages": "10 messages/day",
-            "voice": "5 minutes voice/day",
-            "noRegistration": "No registration"
-          },
-          "cta": "Try for free"
-        },
-        "base": {
-          "name": "Base",
-          "tagline": "For registered students",
-          "price": "Free",
-          "features": {
-            "maestri": "10 Professors",
-            "messages": "30 messages/day",
-            "voice": "15 minutes voice/day",
-            "savedProgress": "Saved progress"
-          },
-          "cta": "Register"
-        },
-        "pro": {
-          "name": "Pro",
-          "tagline": "Complete experience",
-          "price": "On request",
-          "badge": "Recommended",
-          "features": {
-            "maestri": "22 Professors",
-            "messagesUnlimited": "Unlimited messages",
-            "voiceUnlimited": "Unlimited voice",
-            "allTools": "All tools"
-          },
-          "cta": "Upgrade to Pro"
-        }
-      }
-    },
-    "maestri": {
-      "heading": "Your",
-      "headingHighlight": "Professors",
-      "subtitle": "{count} extraordinary minds from history become your personal professors.",
-      "scrollLeft": "Scroll left",
-      "scrollRight": "Scroll right",
-      "carouselLabel": "Professors carousel - use arrows to navigate",
-      "scrollHint": "← Scroll to see professors →",
-      "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
-      "disclaimerLink": "Learn more"
-    },
-    "support": {
-      "heading": "Always by your",
-      "headingHighlight": "side",
-      "subtitle": "Coaches for study methods and Buddies for emotional support",
-      "carouselLabel": "Coaches and buddies carousel - use arrows to navigate",
-      "scrollHint": "← Scroll to see all →",
-      "coach": "Coach",
-      "buddy": "Buddy"
-    },
-    "features": {
-      "heading": "Tools for every learning style",
-      "subtitle": "A complete, accessible platform designed for you",
-      "voiceConversation": {
-        "label": "Voice Conversation",
-        "description": "Talk with your Professors in real time"
-      },
-      "mindMaps": {
-        "label": "Mind Maps",
-        "description": "Visualize and organize concepts"
-      },
-      "flashcards": {
-        "label": "FSRS Flashcards",
-        "description": "Memorize with spaced repetition"
-      },
-      "interactiveQuizzes": {
-        "label": "Interactive Quizzes",
-        "description": "Test your knowledge"
-      },
-      "gamification": {
-        "label": "Gamification",
-        "description": "Earn XP and unlock achievements"
-      },
-      "adaptiveLearning": {
-        "label": "Adaptive Learning",
-        "description": "Adapts to your style and pace"
-      },
-      "totalAccessibility": {
-        "label": "Total Accessibility",
-        "description": "Designed for dyslexia, ADHD and everyone"
-      },
-      "integratedPlatform": {
-        "label": "Integrated Platform",
-        "description": "Everything in one place"
-      }
-    },
-    "compliance": {
-      "heading": "Compliance and",
-      "headingHighlight": "Transparency",
-      "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
-      "items": {
-        "gdpr": {
-          "label": "GDPR",
-          "description": "EU data protection and privacy"
-        },
-        "aiAct": {
-          "label": "EU AI Act",
-          "description": "AI regulation compliance"
-        },
-        "coppa": {
-          "label": "COPPA",
-          "description": "Online child protection"
-        },
-        "aiTransparency": {
-          "label": "AI Transparency",
-          "description": "AI transparency policy"
-        },
-        "openSource": {
-          "label": "Open Source",
-          "description": "Open code on GitHub"
-        },
-        "apache": {
-          "label": "Apache 2.0",
-          "description": "Open source license"
-        }
-      },
-      "footer": "MirrorBuddy is developed by <link>Fightthestroke Foundation</link>, a non-profit organization for children and families affected by cerebral palsy and pediatric stroke."
-    },
-    "footer": {
-      "aiDisclaimer": "Created with AI - responses may contain errors",
-      "compliance": {
-        "gdpr": {
-          "label": "GDPR",
-          "description": "European regulation compliant"
-        },
-        "aiAct": {
-          "label": "AI Act",
-          "description": "EU 2024/1689"
-        },
-        "coppa": {
-          "label": "COPPA",
-          "description": "Child protection"
-        },
-        "italianLaw": {
-          "label": "L.132/2025",
-          "description": "Italian AI law"
-        }
-      },
-      "legal": {
-        "privacy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "cookies": "Cookie Policy",
-        "aiTransparency": "AI Transparency",
-        "aiPolicy": "AI Policy",
-        "compliance": "Compliance"
-      },
-      "openSource": {
-        "label": "Open Source",
-        "ariaLabel": "View source code on GitHub"
-      },
-      "copyright": "© {year} MirrorBuddy. Open source project on GitHub."
+    "voice-fallback": {
+      "title": "Modo Alternativo:",
+      "message": "API Realtime de Azure no disponible. Melissa usa la API Web Speech del navegador (voz sintética, sin conversación)."
     }
   },
   "settings": {
@@ -979,87 +897,6 @@
       "flashcardsSaved": "¡Flashcards guardadas en zaino!"
     }
   },
-  "welcome": {
-    "welcome-form": {
-      "hello-melissa": "¡Hola! Soy Melissa",
-      "your-support-teacher": "Tu maestra de apoyo",
-      "welcome-intro": "¡Bienvenido a la Escuela que Desearía! Estoy aquí para ayudarte a estudiar de la manera que mejor funciona para ti.",
-      "dont-worry": "No te preocupes si algo te parece difícil - ¡juntos siempre encontraremos una manera de entenderlo!",
-      "what-is-your-name": "¿Cuál es tu nombre?",
-      "enter-your-name-placeholder": "Escribe tu nombre...",
-      "nice-to-meet-you": "¡Mucho gusto!",
-      "replay-mode-message": "Estás revisando el tutorial. Tus datos existentes no serán modificados.",
-      "enable-voice": "Activar voz",
-      "disable-voice": "Desactivar voz"
-    },
-    "trial-limits": {
-      "free-trial-mode": "Modo de Prueba Gratuita",
-      "explore-no-registration": "Explora MirrorBuddy sin registro",
-      "messages": "Mensajes",
-      "maestri": "Maestri",
-      "tools": "Herramientas",
-      "ten-per-session": "10 por sesión",
-      "three-available": "3 disponibles",
-      "base": "Base",
-      "want-full-access": "¿Quieres acceso completo?",
-      "request-beta": "Solicitar acceso beta"
-    },
-    "principles": {
-      "welcome-to-school": "¡Bienvenido a la Escuela que Desearía, {name}!",
-      "what-makes-us-special": "Esto es lo que nos hace especiales",
-      "accessible-learning": "Aprendizaje Accesible",
-      "accessible-learning-desc": "Caminos de aprendizaje personalizados para tus necesidades",
-      "ai-teachers": "22 Maestros IA",
-      "ai-teachers-desc": "Expertos en cada materia, siempre disponibles",
-      "your-pace": "A Tu Ritmo",
-      "your-pace-desc": "Aprende cuando quieras, durante el tiempo que quieras",
-      "no-judgment": "Sin Juzgar",
-      "no-judgment-desc": "Un espacio seguro para aprender y cometer errores",
-      "melissa-quote": "¡Recuerda: no hay preguntas estúpidas, solo mentes curiosas!",
-      "ready-to-start": "¿Listo para empezar?"
-    },
-    "ready": {
-      "perfect": "¡Perfecto, {name}!",
-      "ready-to-start": "¡Estás listo para comenzar tu aventura!",
-      "prepared-for-you": "¡He preparado todo para ti! Recuerda:",
-      "always-talk": "Siempre puedes hablarme - estoy aquí para ayudarte con tu método de estudio",
-      "choose-professor": "Elige un Profesor - para cada materia hay el experto correcto",
-      "earn-xp": "Gana XP - ¡cada lección te ayuda a subir de nivel!",
-      "back": "Atrás",
-      "lets-start": "¡Comencemos!",
-      "tutorial-end": "Fin del tutorial. ¡Haz clic en \"¡Comencemos!\" para volver a la app."
-    },
-    "quick-start": {
-      "go-to-app": "Ir a la app",
-      "update-profile": "Actualizar perfil",
-      "full-access": "ACCESO COMPLETO",
-      "free-trial": "PRUEBA GRATUITA",
-      "have-account": "¿Tienes una cuenta?",
-      "try-now": "Explora ahora",
-      "22-maestri": "22 Maestri IA",
-      "all-tools": "Todas las herramientas",
-      "unlimited-chats": "Chats ilimitados",
-      "login": "Iniciar sesión",
-      "try-free": "Prueba gratis"
-    },
-    "hero": {
-      "title": "La Escuela que Desearía",
-      "subtitle": "Maestros IA personalizados para tus necesidades",
-      "cta": "Comienza Ahora",
-      "welcome": "Bienvenido a",
-      "learn": "Aprende",
-      "with-teachers": "CON los Grandes Profesores",
-      "any-ability": "cualquiera que sean tus habilidades",
-      "readable-fonts": "Fuentes legibles",
-      "mind-maps": "Mapas mentales",
-      "text-to-speech": "Conversión de texto a voz",
-      "adaptive-quizzes": "Cuestionarios adaptativos"
-    },
-    "voice-fallback": {
-      "title": "Modo Alternativo:",
-      "message": "API Realtime de Azure no disponible. Melissa usa la API Web Speech del navegador (voz sintética, sin conversación)."
-    }
-  },
   "buddies": {
     "mario": {
       "personality": "Amigable, irónico, comprensivo, cercano",
@@ -1084,6 +921,477 @@
     "marta": {
       "personality": "Deportista, decidida, práctica, directa pero amable",
       "greeting": "¡Hola! Soy Marta, tengo {age} años. Me encantan las montañas y el deporte. ¿Y tú?"
+    }
+  },
+  "invite": {
+    "request": {
+      "backButton": "Volver",
+      "title": "Solicitar Acceso Beta",
+      "subtitle": "MirrorBuddy está en beta privada. Completa el formulario para solicitar acceso.",
+      "nameLabel": "Nombre *",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Email *",
+      "emailPlaceholder": "tu@email.com",
+      "motivationLabel": "¿Por qué quieres usar MirrorBuddy? *",
+      "motivationPlaceholder": "Cuéntanos un poco sobre ti y por qué te interesa...",
+      "minimumCharacters": "Mínimo 20 caracteres",
+      "submitButton": "Enviar Solicitud",
+      "submitting": "Enviando...",
+      "confirmationMessage": "Recibirás un email de confirmación y, si es aprobado, tus credenciales de acceso.",
+      "successTitle": "¡Solicitud Enviada!",
+      "successMessage": "¡Gracias por tu interés en MirrorBuddy! Pronto nos comunicaremos contigo por email con tus credenciales de acceso.",
+      "returnHome": "Volver al Inicio",
+      "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+      "loginButton": "Iniciar Sesión",
+      "errors": {
+        "sendError": "Error al enviar la solicitud",
+        "sessionExpired": "Sesión expirada. Recarga la página e intenta de nuevo.",
+        "connectionError": "Error de conexión. Por favor intenta de nuevo."
+      }
+    },
+    "form": {
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "nameRequired": "El nombre es obligatorio",
+      "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+      "emailLabel": "Email",
+      "emailPlaceholder": "tu-email@ejemplo.com",
+      "emailRequired": "El email es obligatorio",
+      "emailInvalid": "Por favor ingresa un email válido",
+      "motivationLabel": "¿Por qué quieres usar MirrorBuddy?",
+      "motivationPlaceholder": "Cuéntanos cómo planeas usar MirrorBuddy para estudiar...",
+      "motivationRequired": "Por favor cuéntanos por qué quieres usar MirrorBuddy",
+      "motivationMinLength": "Escribe al menos 20 caracteres",
+      "submitButton": "Solicitar Acceso Beta",
+      "submitting": "Enviando...",
+      "successTitle": "¡Solicitud enviada!",
+      "successMessage": "Pronto nos comunicaremos contigo por email para confirmar tu acceso beta a MirrorBuddy.",
+      "errors": {
+        "sendError": "Error al enviar la solicitud",
+        "sessionExpired": "Sesión expirada. Recarga la página e intenta de nuevo.",
+        "emailDuplicate": "Este email ya tiene una solicitud pendiente"
+      }
+    },
+    "migration": {
+      "successTitle": "¡Datos migrados!",
+      "successMessage": "Tu experiencia de prueba ha sido transferida a tu nueva cuenta.",
+      "welcomeTitle": "¡Bienvenido a MirrorBuddy!",
+      "welcomeMessage": "Tu cuenta está lista. ¡Comienza tu aventura de aprendizaje!",
+      "startButton": "Comenzar",
+      "trialFound": "¡Encontramos tu prueba!",
+      "migrateQuestion": "¿Deseas transferir los datos de tu prueba a tu nueva cuenta?",
+      "summary": "Tu prueba incluye:",
+      "chatsWithMaestri": "{count} mensajes con los Maestri",
+      "documentsAnalyzed": "{count} documentos analizados",
+      "favoriteMaestri": "Maestri favoritos: {maestri}",
+      "coach": "Coach: {name}",
+      "migrateButton": "Transferir Datos",
+      "startFresh": "Comenzar desde Cero",
+      "dataNote": "Los datos de prueba no incluyen conversaciones completas, solo preferencias y progreso.",
+      "errors": {
+        "migrationError": "Error durante la migración"
+      }
+    }
+  },
+  "legal": {
+    "terms": {
+      "backToHome": "Volver al inicio",
+      "backToHomeAriaLabel": "Volver a la página de inicio de MirrorBuddy",
+      "pageNavAriaLabel": "Navegación de la página",
+      "title": "Términos de Servicio de MirrorBuddy",
+      "version": "Versión {version}",
+      "lastUpdated": "Última actualización: {lastUpdated}",
+      "tldrHeading": "En resumen (TL;DR)",
+      "tldrItems": {
+        "free": "MirrorBuddy es gratis, hecho para ayudar",
+        "notSchool": "No somos una escuela, la IA puede cometer errores",
+        "supervised": "Úsalo con un adulto cerca si tienes menos de 18 años",
+        "respect": "Respeta a los demás, nosotros te respetamos",
+        "feedback": "¿Problemas? Escríbenos, estamos aquí para ayudar"
+      },
+      "questionsPrefix": "¿Preguntas? Escríbenos:",
+      "questionsEmail": "info@fightthestroke.org",
+      "sections": {
+        "section1": {
+          "title": "Qué es MirrorBuddy",
+          "content1": "MirrorBuddy es una aplicación gratuita que utiliza inteligencia artificial para ayudar a niños y adolescentes a estudiar.",
+          "content2": "Es un proyecto de la Fundación FightTheStroke, creado por personas que quieren hacer el aprendizaje más accesible para todos."
+        },
+        "section2": {
+          "title": "Lo que prometemos",
+          "item1": "Hacer nuestro mejor esfuerzo para crear una herramienta útil",
+          "item2": "Proteger sus datos (ver Política de privacidad)",
+          "item3": "Escuchar sus comentarios y mejorar",
+          "item4": "Ser transparente sobre cómo funciona"
+        },
+        "section3": {
+          "title": "Lo que NO podemos prometer",
+          "intro": "Seamos honestos: MirrorBuddy tiene limitaciones.",
+          "school": {
+            "heading": "No somos una escuela",
+            "content": "MirrorBuddy ayuda a estudiar, pero no reemplaza a maestros y escuelas."
+          },
+          "ai": {
+            "heading": "La IA puede cometer errores",
+            "content": "La inteligencia artificial es buena pero no perfecta. Siempre verifica respuestas importantes con un adulto o un libro."
+          },
+          "beta": {
+            "heading": "Es un servicio gratuito en versión beta",
+            "content": "Hacemos nuestro mejor esfuerzo, pero el servicio podría no funcionar siempre o podría cambiar."
+          }
+        },
+        "section4": {
+          "title": "Profesores de IA",
+          "intro": "MirrorBuddy incluye profesores virtuales inspirados en figuras históricas y contemporáneas. Esto es lo que debes saber:",
+          "educational": {
+            "heading": "Propósito puramente educativo",
+            "content": "Los profesores de IA se crean exclusivamente con fines educativos y de demostración. No representan personas reales y no están afiliados ni aprobados por ellas."
+          },
+          "changeable": {
+            "heading": "Los profesores pueden cambiar",
+            "content": "La lista de profesores disponibles puede variar con el tiempo. Algunos podrían ser reemplazados o eliminados."
+          },
+          "demo": {
+            "heading": "Versión de demostración",
+            "content": "Esta versión sirve para demostrar las capacidades de la plataforma. En el futuro, cada estudiante podrá crear sus propios profesores personalizados, eligiendo libremente nombres y avatares."
+          }
+        },
+        "section5": {
+          "title": "Si algo sale mal",
+          "intro": "MirrorBuddy es gratuito y hecho con amor. No podemos ser responsables si:",
+          "item1": "La IA da una respuesta incorrecta",
+          "item2": "El servicio no funciona por un tiempo",
+          "item3": "No pasas un examen (¡estudiar sigue siendo fundamental!)",
+          "item4": "Algo sucede mientras usas la app",
+          "note": "Esto no significa que no nos importa - ¡nos importa mucho! Pero legalmente necesitamos protegernos para continuar ayudando."
+        },
+        "section6": {
+          "title": "Te pedimos que...",
+          "intro": "Para que todo funcione bien, te pedimos que:",
+          "respect": {
+            "label": "Usa MirrorBuddy con respeto",
+            "content": "hacia la app y hacia otros"
+          },
+          "noAbuse": {
+            "label": "No intentes \"engañar\" a la IA",
+            "content": "no le hagas decir cosas malas o peligrosas"
+          },
+          "report": {
+            "label": "Repórtanos los problemas",
+            "content": "si algo anda mal, cuéntanos: info@fightthestroke.org"
+          },
+          "notShare": {
+            "label": "No compartas tu cuenta",
+            "content": "es personal"
+          }
+        },
+        "section7": {
+          "title": "Para padres y tutores",
+          "intro": "Si tu hijo tiene menos de 14 años:",
+          "responsible": {
+            "label": "Eres responsable",
+            "content": "de su uso de MirrorBuddy"
+          },
+          "supervise": {
+            "label": "Te pedimos que supervises",
+            "content": "mantente cerca mientras usa la app"
+          },
+          "check": {
+            "label": "Verifica las conversaciones",
+            "content": "puedes hacerlo en cualquier momento"
+          },
+          "contact": {
+            "label": "Habla con nosotros si tienes dudas",
+            "content": "también somos padres, entendemos"
+          }
+        },
+        "section8": {
+          "title": "Tus datos",
+          "intro": "Tratamos tus datos con respeto. Para todos los detalles, lee la",
+          "privacyLink": "Política de privacidad completa",
+          "brief": "En resumen:",
+          "item1": "Recopilamos solo lo que necesitamos",
+          "item2": "No vendemos tus datos a nadie",
+          "item3": "Puedes borrar todo cuando quieras",
+          "item4": "Los datos permanecen en Europa"
+        },
+        "section9": {
+          "title": "¿Podemos bloquearte?",
+          "intro": "Sí, pero solo si:",
+          "item1": "Abusas del servicio",
+          "item2": "Intentas dañar a otros usuarios",
+          "item3": "Violas estos términos gravemente",
+          "note": "Antes de bloquearte, intentaremos hablar contigo. No estamos aquí para castigar, estamos aquí para ayudar."
+        },
+        "section10": {
+          "title": "Cambios en estos términos",
+          "intro": "Si cambiamos estos términos:",
+          "item1": "Te notificaremos",
+          "item2": "Te pediremos que aceptes de nuevo",
+          "item3": "No cambiaremos las reglas \"en secreto\""
+        },
+        "section11": {
+          "title": "Ley y tribunal",
+          "line1": "Estos términos se rigen por la ley italiana.",
+          "line2": "Si realmente no podemos resolver un problema hablando, el tribunal competente es el de Milán."
+        }
+      }
+    },
+    "cookies": {
+      "page": {
+        "title": "Política de Cookies de MirrorBuddy",
+        "version": "1.1",
+        "lastUpdated": "21 de enero de 2025",
+        "backHome": "Volver al inicio",
+        "contactQuestion": "¿Preguntas sobre cookies? Escríbenos",
+        "contactEmail": "info@fightthestroke.org"
+      },
+      "tldr": {
+        "heading": "En breve (TL;DR)",
+        "point1": "Solo 4 cookies esenciales (autenticación y accesibilidad)",
+        "point2": "Sin cookies de publicidad o rastreo",
+        "point3": "Sin cookies de análisis instaladas (métricas del lado del servidor)",
+        "point4": "Los subprocesadores (Vercel, Azure, Supabase) no utilizan cookies"
+      },
+      "sections": {
+        "whatAreCookies": {
+          "title": "Qué son las cookies",
+          "p1": "Las cookies son pequeños archivos de texto que los sitios web guardan en su dispositivo (computadora, teléfono, tableta). Ayudan a recordar información útil, como si ya ha iniciado sesión.",
+          "p2": "Piense en las cookies como notas adhesivas que el sitio web deja en su navegador para recordarle."
+        },
+        "whichCookies": {
+          "title": "Qué cookies utilizamos",
+          "intro": "MirrorBuddy utiliza solo dos tipos de cookies",
+          "essential": "Cookies esenciales",
+          "essentialDesc": "necesarias para que funcione la aplicación",
+          "analytics": "Cookies de análisis",
+          "analyticsDesc": "nos ayudan a entender si la aplicación funciona bien",
+          "disclaimer": "NUNCA utilizamos cookies publicitarias. Nunca. No tenemos publicidad."
+        },
+        "essentialCookies": {
+          "title": "Cookies esenciales",
+          "intro": "Estas cookies son necesarias para usar MirrorBuddy. No puede desactivarlas porque sin ellas la aplicación no funcionaría.",
+          "note": "La cookie de autenticación utiliza la firma HMAC-SHA256 para prevenir la manipulación. La bandera httpOnly protege contra el acceso no autorizado de JavaScript."
+        },
+        "metricsAnalytics": {
+          "title": "Métricas y análisis",
+          "p1": "MirrorBuddy no utiliza cookies de análisis de terceros. Sus preferencias de cookies se guardan en el navegador (localStorage), no en una cookie.",
+          "h3Collection": "Cómo recopilamos métricas",
+          "p2": "Recopilamos métricas técnicas (Web Vitals) para entender si la aplicación funciona bien. Estas métricas son",
+          "serverSide": "Recopiladas del lado del servidor",
+          "serverSideDesc": "ninguna cookie de análisis instalada en su navegador",
+          "aggregated": "Agregadas y anónimas",
+          "aggregatedDesc": "no le identificamos personalmente",
+          "technicalOnly": "Solo técnicas",
+          "technicalOnlyDesc": "velocidad de carga, tipo de dispositivo, errores",
+          "gdprCompliant": "Conforme al RGPD",
+          "gdprCompliantDesc": "datos procesados según la Política de Privacidad",
+          "readMore": "Para más detalles, lea la sección \"Métricas de Rendimiento\" en la"
+        },
+        "cookieManagement": {
+          "title": "Cómo administrar cookies",
+          "inSettings": "En la configuración de MirrorBuddy",
+          "settingsDesc": "Puede administrar cookies de análisis directamente desde la aplicación. Vaya a configuración y busque la sección \"Privacidad y Cookies\".",
+          "inBrowser": "Desde su navegador",
+          "browserDesc": "También puede administrar cookies en la configuración de su navegador. Así es como en los navegadores más comunes",
+          "chromeLabel": "Chrome",
+          "chromeDesc": "Configuración → Privacidad y seguridad → Cookies",
+          "firefoxLabel": "Firefox",
+          "firefoxDesc": "Configuración → Privacidad → Cookies",
+          "safariLabel": "Safari",
+          "safariDesc": "Preferencias → Privacidad → Administrar datos del sitio web",
+          "edgeLabel": "Edge",
+          "edgeDesc": "Configuración → Cookies y permisos del sitio",
+          "warningTitle": "Advertencia",
+          "warningText": "Si bloquea todas las cookies, MirrorBuddy puede no funcionar correctamente. Recomendamos permitir al menos cookies esenciales."
+        },
+        "thirdParty": {
+          "title": "Cookies de terceros y subprocesadores",
+          "p1": "MirrorBuddy no utiliza cookies de terceros para publicidad o rastreo.",
+          "p2": "Nuestros proveedores de servicios técnicos (subprocesadores) no instalan cookies en su dispositivo",
+          "vercelLabel": "Vercel",
+          "vercelDesc": "alojamiento de aplicación (sin cookies, sin análisis instalado)",
+          "supabaseLabel": "Supabase",
+          "supabaseDesc": "base de datos PostgreSQL (comunicación del lado del servidor, sin cookies)",
+          "azureLabel": "Azure OpenAI",
+          "azureDesc": "inteligencia artificial (API backend, sin cookies)",
+          "resendLabel": "Resend",
+          "resendDesc": "envío de correo electrónico (servicio backend, sin cookies)",
+          "upstashLabel": "Upstash",
+          "upstashDesc": "caché Redis (servicio backend, sin cookies)",
+          "sentryLabel": "Sentry",
+          "sentryDesc": "monitoreo de errores y rendimiento (utiliza localStorage para Session Replay en errores, sin cookies)",
+          "googleDriveLabel": "Google Drive (opcional)",
+          "googleDriveDesc": "Si conecta su cuenta de Google para guardar documentos, Google puede establecer sus propias cookies durante la autenticación OAuth. Los tokens de acceso se cifran y se guardan en nuestra base de datos, no en cookies del navegador.",
+          "seeMore": "Para la lista completa de subprocesadores, consulte la"
+        },
+        "duration": {
+          "title": "Cuánto tiempo permanecen",
+          "intro": "Las cookies tienen duraciones diferentes",
+          "session": "Cookies de sesión",
+          "sessionDesc": "desaparecen cuando cierra el navegador",
+          "persistent": "Cookies persistentes",
+          "persistentDesc": "permanecen hasta el vencimiento (máx. 1 año)",
+          "delete": "Puede eliminar todas las cookies en cualquier momento desde la configuración de su navegador."
+        },
+        "changes": {
+          "title": "Cambios en esta política",
+          "intro": "Si cambiamos esta Política de Cookies",
+          "point1": "Actualizaremos esta página",
+          "point2": "Cambiaremos la fecha \"Última actualización\"",
+          "point3": "Si los cambios son importantes, le pediremos que acepte de nuevo"
+        },
+        "links": {
+          "title": "Enlaces útiles",
+          "intro": "Para obtener más información",
+          "privacyLabel": "Política de Privacidad",
+          "privacyDesc": "cómo manejamos sus datos",
+          "tosLabel": "Términos de Servicio",
+          "tosDesc": "las reglas de MirrorBuddy"
+        }
+      },
+      "table": {
+        "ariaLabel": "Lista de cookies",
+        "headers": {
+          "name": "Nombre",
+          "purpose": "Para qué sirve",
+          "duration": "Duración"
+        },
+        "rows": {
+          "userId": {
+            "purpose": "Autenticación: recuerda quién eres (firmado criptográficamente, httpOnly)",
+            "duration": "1 año"
+          },
+          "userIdClient": {
+            "purpose": "Copia legible de su ID para funciones del lado del cliente (sin datos sensibles)",
+            "duration": "1 año"
+          },
+          "a11y": {
+            "purpose": "Preferencias de accesibilidad (fuente, contraste, movimiento)",
+            "duration": "90 días"
+          },
+          "admin": {
+            "purpose": "Indica sesión de administrador (solo personal)",
+            "duration": "Hasta cerrar sesión"
+          }
+        }
+      }
+    }
+  },
+  "consent": {
+    "inline": {
+      "acceptedText": "Cookies aceptadas",
+      "manage": "Gestionar",
+      "acceptButton": "Aceptar cookies",
+      "info": "Información",
+      "title": "Cookies y Privacidad",
+      "description": "Utilizamos cookies esenciales para que todo funcione.",
+      "learnMore": "Saber más",
+      "analyticsLabel": "Incluir análisis",
+      "submitButton": "Aceptar"
+    },
+    "unified": {
+      "loading": "Cargando...",
+      "titleUpdated": "Términos Actualizados",
+      "titleWelcome": "¡Bienvenido a MirrorBuddy!",
+      "subtitleUpdated": "Nuestros términos han sido actualizados",
+      "subtitleWelcome": "Privacidad, cookies y términos de servicio",
+      "summaryTitle": "En resumen:",
+      "privacy": {
+        "title": "Privacidad y seguridad",
+        "description": "Sus datos están protegidos según RGPD y COPPA"
+      },
+      "cookies": {
+        "title": "Cookies esenciales",
+        "description": "Necesarias para el funcionamiento (sesiones, preferencias)"
+      },
+      "tos": {
+        "title": "Términos de servicio",
+        "description": "MirrorBuddy es gratis, la IA puede cometer errores, úsalo con un adulto si tienes menos de 14 años"
+      },
+      "links": {
+        "full": "Términos completos",
+        "privacy": "Política de Privacidad",
+        "cookies": "Política de Cookies"
+      },
+      "reconsentNotice": {
+        "lastAccepted": "Aceptado por última vez:",
+        "changed": "Qué cambió:",
+        "details": "Hemos actualizado los Términos de Servicio. Para continuar, por favor lee y acepta los nuevos términos."
+      },
+      "tosCheckbox": {
+        "label": "He leído y acepto",
+        "text": "los Términos de Servicio y el uso de cookies esenciales (requerido)"
+      },
+      "analytics": {
+        "label": "Cookies analíticas (opcional)",
+        "description": "Nos ayudan a mejorar MirrorBuddy"
+      },
+      "buttons": {
+        "disabled": "Aceptar (primero marca la casilla de términos)",
+        "accept": "Aceptar y continuar",
+        "submitting": "Guardando..."
+      },
+      "coppa": "MirrorBuddy cumple con las regulaciones RGPD y COPPA para la protección de menores.",
+      "screenReader": {
+        "required": "Debes aceptar los Términos de Servicio para continuar",
+        "submitting": "Guardando en progreso..."
+      }
+    },
+    "cookie": {
+      "title": "Privacidad y Cookies",
+      "subtitle": "MirrorBuddy respeta tu privacidad",
+      "explanation": "Para usar MirrorBuddy, debes aceptar las cookies esenciales que nos permiten:",
+      "list": {
+        "session": "Mantener tus sesiones seguras",
+        "preferences": "Guardar tus preferencias",
+        "protect": "Proteger tus datos"
+      },
+      "analytics": {
+        "label": "Cookies analíticas (opcional)",
+        "description": "Nos ayudan a mejorar MirrorBuddy",
+        "aria": "Habilitar cookies analíticas"
+      },
+      "button": "Aceptar y continuar",
+      "coppa": "MirrorBuddy cumple con las regulaciones RGPD y COPPA para la protección de menores. Tus datos están seguros con nosotros."
+    },
+    "tos": {
+      "modal": {
+        "title": {
+          "welcome": "¡Bienvenido a MirrorBuddy!",
+          "updated": "Términos Actualizados"
+        },
+        "description": {
+          "welcome": "Antes de comenzar, por favor lee nuestros Términos de Servicio.",
+          "updated": "Hemos actualizado nuestros Términos de Servicio. Para continuar usando MirrorBuddy, por favor lee y acepta los nuevos términos."
+        },
+        "warning": {
+          "title": "Qué cambió:",
+          "description": "Hemos actualizado la información sobre la recopilación de datos de rendimiento (Web Vitals) y la Política de Privacidad. Lee los términos completos para más detalles."
+        },
+        "summary": "Resumen rápido:",
+        "points": {
+          "free": "MirrorBuddy es gratis y está hecho para ayudar",
+          "aiCanErr": "No somos una escuela, la IA puede cometer errores",
+          "minors": "Si tienes menos de 14 años, usa la aplicación con un adulto cerca",
+          "respect": "Respeta a los demás, nosotros te respetamos"
+        },
+        "link": "Leer Términos Completos →",
+        "checkbox": "He leído y acepto los Términos de Servicio",
+        "buttons": {
+          "disabled": "Aceptar Términos de Servicio (marca la casilla primero)",
+          "accept": "Aceptar",
+          "submitting": "Guardando..."
+        },
+        "screenReader": {
+          "required": "Para continuar, debe aceptar los Términos de Servicio",
+          "submitting": "Guardando en progreso..."
+        }
+      },
+      "toast": {
+        "saved": "Aceptación guardada localmente",
+        "saveFailed": "La sincronización con el servidor falló. Reintentar más tarde."
+      }
     }
   }
 }

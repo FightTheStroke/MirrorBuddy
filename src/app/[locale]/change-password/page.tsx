@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -13,15 +14,9 @@ interface PasswordRequirement {
   test: (password: string) => boolean;
 }
 
-const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
-  { label: "Almeno 8 caratteri", test: (p) => p.length >= 8 },
-  { label: "Almeno una lettera maiuscola", test: (p) => /[A-Z]/.test(p) },
-  { label: "Almeno una lettera minuscola", test: (p) => /[a-z]/.test(p) },
-  { label: "Almeno un numero", test: (p) => /[0-9]/.test(p) },
-];
-
 export default function ChangePasswordPage() {
   const router = useRouter();
+  const t = useTranslations("auth.password");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -29,6 +24,13 @@ export default function ChangePasswordPage() {
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [formState, setFormState] = useState<FormState>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  const PASSWORD_REQUIREMENTS: PasswordRequirement[] = [
+    { label: t("minLength"), test: (p) => p.length >= 8 },
+    { label: t("requiresUppercase"), test: (p) => /[A-Z]/.test(p) },
+    { label: t("requiresLowercase"), test: (p) => /[a-z]/.test(p) },
+    { label: t("requiresNumber"), test: (p) => /[0-9]/.test(p) },
+  ];
 
   const passwordsMatch = newPassword === confirmPassword;
   const allRequirementsMet = PASSWORD_REQUIREMENTS.every((req) =>
@@ -62,7 +64,7 @@ export default function ChangePasswordPage() {
 
       if (!response.ok) {
         setFormState("error");
-        setErrorMessage(data.error || "Errore durante il cambio password");
+        setErrorMessage(data.error || t("changeErrorDefault"));
         return;
       }
 
@@ -71,7 +73,7 @@ export default function ChangePasswordPage() {
       setTimeout(() => router.push("/"), 2000);
     } catch {
       setFormState("error");
-      setErrorMessage("Errore di connessione. Riprova.");
+      setErrorMessage(t("connectionError"));
     }
   };
 
@@ -83,11 +85,10 @@ export default function ChangePasswordPage() {
             <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Password Cambiata!
+            {t("successTitle")}
           </h1>
           <p className="text-slate-600 dark:text-slate-300">
-            La tua password e stata aggiornata con successo. Stai per essere
-            reindirizzato...
+            {t("successMessage")}
           </p>
         </div>
       </div>
@@ -102,10 +103,10 @@ export default function ChangePasswordPage() {
             <Lock className="w-8 h-8 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Cambia Password
+            {t("pageTitle")}
           </h1>
           <p className="text-slate-600 dark:text-slate-300 mt-2">
-            Per la tua sicurezza, devi cambiare la password temporanea.
+            {t("pageSubtitle")}
           </p>
         </div>
 
@@ -125,7 +126,7 @@ export default function ChangePasswordPage() {
               htmlFor="currentPassword"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Password Attuale *
+              {t("currentPasswordLabel")}
             </label>
             <div className="relative">
               <input
@@ -136,7 +137,7 @@ export default function ChangePasswordPage() {
                 required
                 disabled={formState === "submitting"}
                 className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="Password temporanea ricevuta via email"
+                placeholder={t("currentPasswordPlaceholder")}
               />
               <button
                 type="button"
@@ -158,7 +159,7 @@ export default function ChangePasswordPage() {
               htmlFor="newPassword"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Nuova Password *
+              {t("newPasswordLabel")}
             </label>
             <div className="relative">
               <input
@@ -169,7 +170,7 @@ export default function ChangePasswordPage() {
                 required
                 disabled={formState === "submitting"}
                 className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="Scegli una password sicura"
+                placeholder={t("newPasswordPlaceholder")}
               />
               <button
                 type="button"
@@ -213,7 +214,7 @@ export default function ChangePasswordPage() {
               htmlFor="confirmPassword"
               className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
             >
-              Conferma Password *
+              {t("confirmPasswordLabel")}
             </label>
             <input
               id="confirmPassword"
@@ -227,19 +228,19 @@ export default function ChangePasswordPage() {
                   ? "border-red-500"
                   : "border-slate-300 dark:border-slate-600"
               }`}
-              placeholder="Ripeti la nuova password"
+              placeholder={t("confirmPasswordPlaceholder")}
             />
             {confirmPassword && !passwordsMatch && (
               <p className="text-xs text-red-500 mt-1">
-                Le password non coincidono
+                {t("passwordMismatch")}
               </p>
             )}
           </div>
 
           <Button type="submit" disabled={!canSubmit} className="w-full">
             {formState === "submitting"
-              ? "Cambio in corso..."
-              : "Cambia Password"}
+              ? t("submitButtonLoading")
+              : t("submitButtonText")}
           </Button>
         </form>
       </div>

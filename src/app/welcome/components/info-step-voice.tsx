@@ -1,14 +1,21 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, ArrowLeft, SkipForward, Check, Circle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
-import { LEARNING_DIFFERENCES } from './info-step-data';
-import type { Maestro, VoiceSessionHandle } from '@/types';
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  ArrowRight,
+  ArrowLeft,
+  SkipForward,
+  Check,
+  Circle,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { VoiceOnboardingPanel } from "@/components/onboarding/voice-onboarding-panel";
+import { LEARNING_DIFFERENCES } from "./info-step-data";
+import type { Maestro, VoiceSessionHandle } from "@/types";
 
 interface VoiceConnectionInfo {
-  provider: 'azure';
+  provider: "azure";
   proxyPort: number;
   configured: boolean;
 }
@@ -16,14 +23,14 @@ interface VoiceConnectionInfo {
 interface ExistingUserData {
   name: string;
   age?: number;
-  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  schoolLevel?: "elementare" | "media" | "superiore";
   learningDifferences?: string[];
 }
 
 interface InfoStepVoiceProps {
   data: {
     age?: number;
-    schoolLevel?: 'elementare' | 'media' | 'superiore';
+    schoolLevel?: "elementare" | "media" | "superiore";
     learningDifferences?: string[];
     name: string;
   };
@@ -54,13 +61,22 @@ export function InfoStepVoice({
   onContinue,
   onSkip,
 }: InfoStepVoiceProps) {
+  const t = useTranslations("welcome.welcome-form");
+
   // Check if we have enough data to show continue button
-  const hasData = data.age || data.schoolLevel || (data.learningDifferences && data.learningDifferences.length > 0);
+  const hasData =
+    data.age ||
+    data.schoolLevel ||
+    (data.learningDifferences && data.learningDifferences.length > 0);
 
   // Get readable label for school level
   const getSchoolLevelLabel = (level?: string) => {
-    if (!level) return '...';
-    return level === 'elementare' ? 'Elementare' : level === 'media' ? 'Media' : 'Superiore';
+    if (!level) return "...";
+    return level === "elementare"
+      ? t("school-elementary")
+      : level === "media"
+        ? t("school-middle")
+        : t("school-high");
   };
 
   return (
@@ -91,7 +107,9 @@ export function InfoStepVoice({
             exit={{ opacity: 0, y: -20 }}
             className="mt-4 p-4 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-lg space-y-3"
           >
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200">Dati raccolti</h3>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+              {t("collected-data")}
+            </h3>
 
             <div className="space-y-2">
               {/* Age */}
@@ -101,8 +119,14 @@ export function InfoStepVoice({
                 ) : (
                   <Circle className="w-4 h-4 text-gray-300" />
                 )}
-                <span className={data.age ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
-                  Età: {data.age ? `${data.age} anni` : '...'}
+                <span
+                  className={
+                    data.age
+                      ? "text-gray-800 dark:text-gray-200"
+                      : "text-gray-400"
+                  }
+                >
+                  {t("age")}: {data.age ? `${data.age} ${t("years")}` : "..."}
                 </span>
               </div>
 
@@ -113,34 +137,48 @@ export function InfoStepVoice({
                 ) : (
                   <Circle className="w-4 h-4 text-gray-300" />
                 )}
-                <span className={data.schoolLevel ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
-                  Scuola: {getSchoolLevelLabel(data.schoolLevel)}
+                <span
+                  className={
+                    data.schoolLevel
+                      ? "text-gray-800 dark:text-gray-200"
+                      : "text-gray-400"
+                  }
+                >
+                  {t("school")}: {getSchoolLevelLabel(data.schoolLevel)}
                 </span>
               </div>
 
               {/* Differences */}
               <div className="flex items-center gap-2 text-sm">
-                {data.learningDifferences && data.learningDifferences.length > 0 ? (
+                {data.learningDifferences &&
+                data.learningDifferences.length > 0 ? (
                   <Check className="w-4 h-4 text-green-500" />
                 ) : (
                   <Circle className="w-4 h-4 text-gray-300" />
                 )}
-                <span className={data.learningDifferences?.length ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
-                  Difficoltà: {data.learningDifferences?.length
+                <span
+                  className={
+                    data.learningDifferences?.length
+                      ? "text-gray-800 dark:text-gray-200"
+                      : "text-gray-400"
+                  }
+                >
+                  {t("learning-differences")}:{" "}
+                  {data.learningDifferences?.length
                     ? data.learningDifferences
-                        .map(d => LEARNING_DIFFERENCES.find(ld => ld.id === d)?.label)
-                        .join(', ')
-                    : '(opzionale)'}
+                        .map(
+                          (d) =>
+                            LEARNING_DIFFERENCES.find((ld) => ld.id === d)
+                              ?.label,
+                        )
+                        .join(", ")
+                    : t("optional")}
                 </span>
               </div>
             </div>
 
             <div className="flex gap-2 pt-2">
-              <Button
-                onClick={onBack}
-                variant="outline"
-                className="flex-1"
-              >
+              <Button onClick={onBack} variant="outline" className="flex-1">
                 <ArrowLeft className="mr-2 w-4 h-4" />
                 Indietro
               </Button>
@@ -172,7 +210,7 @@ export function InfoStepVoice({
 
       {isReplayMode && (
         <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-          Modalità anteprima - le modifiche non saranno salvate
+          {t("replay-mode-message")}
         </p>
       )}
     </motion.div>

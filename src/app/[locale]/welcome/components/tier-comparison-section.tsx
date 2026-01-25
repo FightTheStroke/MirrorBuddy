@@ -4,9 +4,12 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { tierCards } from "./tier-data";
 
 export function TierComparisonSection() {
+  const t = useTranslations("welcome.tier-comparison");
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -20,11 +23,10 @@ export function TierComparisonSection() {
           id="tier-comparison-heading"
           className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4"
         >
-          Scegli il piano perfetto per te
+          {t("heading")}
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          Inizia con una prova gratuita oppure registrati per sbloccare più
-          funzionalità
+          {t("subheading")}
         </p>
       </div>
 
@@ -122,10 +124,7 @@ export function TierComparisonSection() {
       </div>
 
       <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>
-          Tutti i piani includono accesso ai 22 Maestri AI e strumenti di
-          apprendimento personalizzati
-        </p>
+        <p>{t("footer-note")}</p>
       </div>
     </motion.section>
   );

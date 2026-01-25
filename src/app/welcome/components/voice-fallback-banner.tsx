@@ -1,7 +1,9 @@
-import { motion } from 'framer-motion';
-import { WifiOff } from 'lucide-react';
+import { motion } from "framer-motion";
+import { WifiOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function VoiceFallbackBanner() {
+  const t = useTranslations("welcome.voice-fallback");
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -11,11 +13,9 @@ export function VoiceFallbackBanner() {
       <div className="max-w-2xl mx-auto flex items-center gap-2 text-sm text-amber-800 dark:text-amber-200">
         <WifiOff className="w-4 h-4 flex-shrink-0" />
         <p>
-          <strong>Modalità Fallback:</strong> Azure Realtime API non disponibile.
-          Melissa usa Web Speech API del browser (voce sintetica, no conversazione).
+          <strong>{t("title")}</strong> {t("message")}
         </p>
       </div>
     </motion.div>
   );
 }
-

@@ -1,14 +1,25 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import { Rocket, ArrowLeft, PartyPopper, Sparkles, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { useSettingsStore } from '@/lib/stores';
-import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import {
+  Rocket,
+  ArrowLeft,
+  PartyPopper,
+  Sparkles,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { useSettingsStore } from "@/lib/stores";
+import {
+  useOnboardingTTS,
+  ONBOARDING_SCRIPTS,
+} from "@/lib/hooks/use-onboarding-tts";
 
 // Pre-defined sparkle offsets (avoids Math.random during render)
 const SPARKLE_OFFSETS = [5, -12, 18, -8, 15, -5];
@@ -24,8 +35,16 @@ interface ReadyStepProps {
  * Final step - saves data and redirects to main app.
  */
 export function ReadyStep(_props: ReadyStepProps) {
+  const t = useTranslations("welcome.ready");
   const router = useRouter();
-  const { data, prevStep, completeOnboarding, isReplayMode, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
+  const {
+    data,
+    prevStep,
+    completeOnboarding,
+    isReplayMode,
+    isVoiceMuted,
+    setVoiceMuted,
+  } = useOnboardingStore();
   const { updateStudentProfile } = useSettingsStore();
 
   // Auto-speak Melissa's ready message (personalized with name)
@@ -52,16 +71,16 @@ export function ReadyStep(_props: ReadyStepProps) {
       updateStudentProfile({
         name: data.name,
         age: data.age || 14,
-        schoolLevel: data.schoolLevel || 'superiore',
+        schoolLevel: data.schoolLevel || "superiore",
         learningDifferences: (data.learningDifferences || []) as Array<
-          | 'dyslexia'
-          | 'dyscalculia'
-          | 'dysgraphia'
-          | 'adhd'
-          | 'autism'
-          | 'cerebralPalsy'
-          | 'visualImpairment'
-          | 'auditoryProcessing'
+          | "dyslexia"
+          | "dyscalculia"
+          | "dysgraphia"
+          | "adhd"
+          | "autism"
+          | "cerebralPalsy"
+          | "visualImpairment"
+          | "auditoryProcessing"
         >,
       });
     }
@@ -70,7 +89,7 @@ export function ReadyStep(_props: ReadyStepProps) {
     completeOnboarding();
 
     // Navigate to main app
-    router.push('/');
+    router.push("/");
   };
 
   return (
@@ -82,20 +101,22 @@ export function ReadyStep(_props: ReadyStepProps) {
           <button
             onClick={toggleMute}
             className="absolute top-4 right-4 p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-            aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-            title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+            aria-label={isVoiceMuted ? "Attiva voce" : "Disattiva voce"}
+            title={isVoiceMuted ? "Attiva voce" : "Disattiva voce"}
           >
             {isVoiceMuted ? (
               <VolumeX className="w-5 h-5 text-white" />
             ) : (
-              <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+              <Volume2
+                className={`w-5 h-5 text-white ${isPlaying ? "animate-pulse" : ""}`}
+              />
             )}
           </button>
 
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
             className="flex justify-center mb-4"
           >
             <div className="relative">
@@ -154,7 +175,7 @@ export function ReadyStep(_props: ReadyStepProps) {
               }}
               style={{
                 left: `${15 + i * 14}%`,
-                bottom: '20%',
+                bottom: "20%",
               }}
             >
               <Sparkles className="w-4 h-4 text-yellow-300" />
@@ -178,19 +199,22 @@ export function ReadyStep(_props: ReadyStepProps) {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-pink-50 dark:bg-pink-950/30">
                 <span className="text-2xl">💬</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Puoi sempre parlarmi</strong> - sono qui per aiutarti con il metodo di studio
+                  <strong>Puoi sempre parlarmi</strong> - sono qui per aiutarti
+                  con il metodo di studio
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30">
                 <span className="text-2xl">📚</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Scegli un Professore</strong> - per ogni materia c&apos;è l&apos;esperto giusto
+                  <strong>{t("choose-professor")}</strong> -{" "}
+                  {t("choose-professor-desc")}
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">
                 <span className="text-2xl">🎮</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Guadagna XP</strong> - ogni lezione ti fa salire di livello!
+                  <strong>Guadagna XP</strong> - ogni lezione ti fa salire di
+                  livello!
                 </p>
               </div>
             </div>
@@ -224,7 +248,8 @@ export function ReadyStep(_props: ReadyStepProps) {
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Fine del tutorial. Clicca &ldquo;Iniziamo!&rdquo; per tornare all&apos;app.
+              Fine del tutorial. Clicca &ldquo;Iniziamo!&rdquo; per tornare
+              all&apos;app.
             </p>
           )}
         </div>

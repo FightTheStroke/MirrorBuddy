@@ -1,204 +1,182 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 export function TermsContent() {
+  const t = useTranslations("legal.terms.sections");
+
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">
-      <Section number={1} title="Cos'è MirrorBuddy">
-        <p>
-          MirrorBuddy è un&apos;app gratuita che usa l&apos;intelligenza
-          artificiale per aiutare bambini e ragazzi a studiare.
-        </p>
-        <p>
-          È un progetto della Fondazione FightTheStroke, fatto da persone che
-          vogliono rendere lo studio più accessibile a tutti.
-        </p>
+      <Section number={1} title={t("section1.title")}>
+        <p>{t("section1.content1")}</p>
+        <p>{t("section1.content2")}</p>
       </Section>
 
-      <Section number={2} title="Cosa promettiamo">
+      <Section number={2} title={t("section2.title")}>
         <ul>
-          <li>Fare del nostro meglio per creare uno strumento utile</li>
-          <li>Proteggere i tuoi dati (vedi Privacy Policy)</li>
-          <li>Ascoltare i tuoi feedback e migliorare</li>
-          <li>Essere trasparenti su come funziona</li>
+          <li>{t("section2.item1")}</li>
+          <li>{t("section2.item2")}</li>
+          <li>{t("section2.item3")}</li>
+          <li>{t("section2.item4")}</li>
         </ul>
       </Section>
 
-      <Section number={3} title="Cosa NON possiamo promettere">
-        <p>Siamo onesti: MirrorBuddy ha dei limiti.</p>
+      <Section number={3} title={t("section3.title")}>
+        <p>{t("section3.intro")}</p>
         <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-            Non siamo una scuola
+            {t("section3.school.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            MirrorBuddy aiuta a studiare, ma non sostituisce insegnanti e
-            scuola.
+            {t("section3.school.content")}
           </p>
         </div>
         <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-            L&apos;AI può sbagliare
+            {t("section3.ai.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            L&apos;intelligenza artificiale è brava ma non perfetta. Controlla
-            sempre le risposte importanti con un adulto o un libro.
+            {t("section3.ai.content")}
           </p>
         </div>
         <div className="pl-4 border-l-2 border-amber-400 dark:border-amber-500 bg-amber-50 dark:bg-amber-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
-            È un servizio gratuito in beta
+            {t("section3.beta.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            Facciamo del nostro meglio, ma il servizio potrebbe non funzionare
-            sempre o cambiare.
+            {t("section3.beta.content")}
           </p>
         </div>
       </Section>
 
-      <Section number={4} title="I Professori AI">
-        <p>
-          MirrorBuddy include professori virtuali ispirati a figure storiche e
-          contemporanee. Ecco cosa devi sapere:
-        </p>
+      <Section number={4} title={t("section4.title")}>
+        <p>{t("section4.intro")}</p>
         <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            Scopo puramente educativo
+            {t("section4.educational.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            I professori AI sono creati esclusivamente per scopi educativi e di
-            dimostrazione. Non rappresentano le persone reali e non sono
-            affiliati o approvati da esse.
+            {t("section4.educational.content")}
           </p>
         </div>
         <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            I professori possono cambiare
+            {t("section4.changeable.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            La lista dei professori disponibili potrebbe variare nel tempo.
-            Alcuni potrebbero essere sostituiti o rimossi.
+            {t("section4.changeable.content")}
           </p>
         </div>
         <div className="pl-4 border-l-2 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/30 p-4 rounded-r-lg my-4">
           <p className="font-semibold text-blue-900 dark:text-blue-200 mb-2">
-            Versione dimostrativa
+            {t("section4.demo.heading")}
           </p>
           <p className="text-slate-700 dark:text-gray-300">
-            Questa versione serve a dimostrare le potenzialita della
-            piattaforma. In futuro, ogni studente potra creare i propri
-            professori personalizzati, scegliendo liberamente nomi e avatar.
+            {t("section4.demo.content")}
           </p>
         </div>
       </Section>
 
-      <Section number={5} title="Se qualcosa va storto">
-        <p>
-          MirrorBuddy è gratuito e fatto con il cuore. Non possiamo essere
-          responsabili se:
-        </p>
+      <Section number={5} title={t("section5.title")}>
+        <p>{t("section5.intro")}</p>
         <ul>
-          <li>L&apos;AI dà una risposta sbagliata</li>
-          <li>Il servizio non funziona per un po&apos;</li>
-          <li>Non passi un esame (studiare resta fondamentale!)</li>
-          <li>Succede qualcosa mentre usi l&apos;app</li>
+          <li>{t("section5.item1")}</li>
+          <li>{t("section5.item2")}</li>
+          <li>{t("section5.item3")}</li>
+          <li>{t("section5.item4")}</li>
         </ul>
         <p className="text-slate-600 dark:text-gray-400 italic">
-          Questo non significa che non ci importa - ci importa moltissimo! Ma
-          legalmente dobbiamo proteggerci per poter continuare ad aiutare.
+          {t("section5.note")}
         </p>
       </Section>
 
-      <Section number={6} title="Ti chiediamo di...">
-        <p>Per far funzionare tutto bene, ti chiediamo di:</p>
+      <Section number={6} title={t("section6.title")}>
+        <p>{t("section6.intro")}</p>
         <ul>
           <li>
-            <strong>Usare MirrorBuddy con rispetto</strong> - verso l&apos;app e
-            verso gli altri
+            <strong>{t("section6.respect.label")}</strong> -{" "}
+            {t("section6.respect.content")}
           </li>
           <li>
-            <strong>Non provare a &quot;fregare&quot; l&apos;AI</strong> - non
-            farle dire cose brutte o pericolose
+            <strong>{t("section6.noAbuse.label")}</strong> -{" "}
+            {t("section6.noAbuse.content")}
           </li>
           <li>
-            <strong>Segnalarci i problemi</strong> - se qualcosa non va,
-            diccelo: info@fightthestroke.org
+            <strong>{t("section6.report.label")}</strong> -{" "}
+            {t("section6.report.content")}
           </li>
           <li>
-            <strong>Non condividere il tuo account</strong> - è personale
+            <strong>{t("section6.notShare.label")}</strong> -{" "}
+            {t("section6.notShare.content")}
           </li>
         </ul>
       </Section>
 
-      <Section number={7} title="Per i genitori e tutori">
-        <p>Se tuo figlio ha meno di 14 anni:</p>
+      <Section number={7} title={t("section7.title")}>
+        <p>{t("section7.intro")}</p>
         <ul>
           <li>
-            <strong>Sei tu il responsabile</strong> del suo utilizzo di
-            MirrorBuddy
+            <strong>{t("section7.responsible.label")}</strong> -{" "}
+            {t("section7.responsible.content")}
           </li>
           <li>
-            <strong>Ti chiediamo di supervisionare</strong> - stai vicino mentre
-            usa l&apos;app
+            <strong>{t("section7.supervise.label")}</strong> -{" "}
+            {t("section7.supervise.content")}
           </li>
           <li>
-            <strong>Controlla le conversazioni</strong> - puoi farlo quando vuoi
+            <strong>{t("section7.check.label")}</strong> -{" "}
+            {t("section7.check.content")}
           </li>
           <li>
-            <strong>Parlaci se hai dubbi</strong> - siamo genitori anche noi,
-            capiamo
+            <strong>{t("section7.contact.label")}</strong> -{" "}
+            {t("section7.contact.content")}
           </li>
         </ul>
       </Section>
 
-      <Section number={8} title="I tuoi dati">
+      <Section number={8} title={t("section8.title")}>
         <p>
-          Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la{" "}
+          {t("section8.intro")}{" "}
           <Link
             href="/privacy"
             className="text-blue-600 hover:text-blue-700 underline"
           >
-            Privacy Policy completa
+            {t("section8.privacyLink")}
           </Link>
           .
         </p>
-        <p>In breve:</p>
+        <p>{t("section8.brief")}</p>
         <ul>
-          <li>Raccogliamo solo quello che serve</li>
-          <li>Non vendiamo i tuoi dati a nessuno</li>
-          <li>Puoi cancellare tutto quando vuoi</li>
-          <li>I dati restano in Europa</li>
+          <li>{t("section8.item1")}</li>
+          <li>{t("section8.item2")}</li>
+          <li>{t("section8.item3")}</li>
+          <li>{t("section8.item4")}</li>
         </ul>
       </Section>
 
-      <Section number={9} title="Possiamo bloccarti?">
-        <p>Sì, ma solo se:</p>
+      <Section number={9} title={t("section9.title")}>
+        <p>{t("section9.intro")}</p>
         <ul>
-          <li>Abusi del servizio</li>
-          <li>Cerchi di danneggiare altri utenti</li>
-          <li>Violi questi termini in modo grave</li>
+          <li>{t("section9.item1")}</li>
+          <li>{t("section9.item2")}</li>
+          <li>{t("section9.item3")}</li>
         </ul>
-        <p>
-          Prima di bloccarti, proveremo a parlarti. Non siamo qui per punire,
-          siamo qui per aiutare.
-        </p>
+        <p>{t("section9.note")}</p>
       </Section>
 
-      <Section number={10} title="Modifiche a questi termini">
-        <p>Se cambiamo questi termini:</p>
+      <Section number={10} title={t("section10.title")}>
+        <p>{t("section10.intro")}</p>
         <ul>
-          <li>Ti avviseremo</li>
-          <li>Ti chiederemo di accettare di nuovo</li>
-          <li>Non cambieremo le regole &quot;di nascosto&quot;</li>
+          <li>{t("section10.item1")}</li>
+          <li>{t("section10.item2")}</li>
+          <li>{t("section10.item3")}</li>
         </ul>
       </Section>
 
-      <Section number={11} title="Legge e tribunale">
-        <p>Questi termini seguono la legge italiana.</p>
-        <p>
-          Se proprio non riusciamo a risolvere un problema parlando, il
-          tribunale competente è quello di Milano.
-        </p>
+      <Section number={11} title={t("section11.title")}>
+        <p>{t("section11.line1")}</p>
+        <p>{t("section11.line2")}</p>
       </Section>
     </div>
   );

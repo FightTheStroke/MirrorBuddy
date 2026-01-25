@@ -2,24 +2,19 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 
 interface HeroSectionProps {
   userName?: string;
   isReturningUser: boolean;
 }
 
-// Accessibility features - 4 key capabilities in grid
-const ACCESSIBILITY_FEATURES = [
-  { icon: "📖", label: "Font leggibili" },
-  { icon: "🗺️", label: "Mappe mentali" },
-  { icon: "🔊", label: "Sintesi vocale" },
-  { icon: "🎯", label: "Quiz adattivi" },
-];
-
 /**
  * Hero Section for MirrorBuddy Welcome Page
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
+  const t = useTranslations("welcome.hero");
+
   return (
     <div className="text-center max-w-4xl mx-auto relative mb-8">
       {/* BETA PRIVATA - Overlay Sticker Style */}
@@ -92,7 +87,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
             >
-              Benvenuto in{" "}
+              {t("welcome")}{" "}
               <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                 MirrorBuddy
               </span>
@@ -103,13 +98,13 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.2 }}
               className="text-2xl md:text-3xl text-gray-700 dark:text-gray-200 mb-8 font-semibold"
             >
-              Impara{" "}
+              {t("learn")}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                CON i Grandi Professori
+                {t("with-teachers")}
               </span>
               ,{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                qualunque siano le tue abilità
+                {t("any-ability")}
               </span>
             </motion.p>
             <motion.p
@@ -132,7 +127,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               </strong>
               . 22 Professori storici ti accompagnano personalmente.
             </motion.p>
-            <AccessibilityFeatures />
+            <AccessibilityFeatures t={t} />
           </>
         )}
       </div>
@@ -140,7 +135,19 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   );
 }
 
-function AccessibilityFeatures() {
+interface AccessibilityFeaturesProps {
+  t: ReturnType<typeof useTranslations>;
+}
+
+function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
+  // Accessibility features - 4 key capabilities in grid
+  const ACCESSIBILITY_FEATURES = [
+    { icon: "📖", label: t("readable-fonts") },
+    { icon: "🗺️", label: t("mind-maps") },
+    { icon: "🔊", label: t("text-to-speech") },
+    { icon: "🎯", label: t("adaptive-quizzes") },
+  ];
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}

@@ -1,159 +1,164 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContentExtended() {
+  const s10 = useTranslations("legal.privacy.section10");
+  const s11 = useTranslations("legal.privacy.section11");
+  const s12 = useTranslations("legal.privacy.section12");
+  const s13 = useTranslations("legal.privacy.section13");
+  const s14 = useTranslations("legal.privacy.section14");
+  const s15 = useTranslations("legal.privacy.section15");
+
   return (
     <>
-      <Section number={10} title="I tuoi diritti">
-        <p>Puoi sempre:</p>
+      <Section number={10} title={s10("title")}>
+        <p>{s10("intro")}</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
-            <strong>Vedere i tuoi dati</strong> - scarica tutto in formato JSON
+            <strong>{s10("itemLabels.access")}</strong> - {s10("items.access")}
           </li>
           <li>
-            <strong>Correggere i dati</strong> - cambia nome, email,
-            impostazioni
+            <strong>{s10("itemLabels.correct")}</strong> -{" "}
+            {s10("items.correct")}
           </li>
           <li>
-            <strong>Cancellare tutto</strong> - account e dati, via email a
-            info@fightthestroke.org
+            <strong>{s10("itemLabels.delete")}</strong> - {s10("items.delete")}
           </li>
           <li>
-            <strong>Esportare i dati</strong> - prendi una copia di tutto
+            <strong>{s10("itemLabels.export")}</strong> - {s10("items.export")}
           </li>
           <li>
-            <strong>Opporti al trattamento</strong> - puoi dire &quot;non voglio
-            che usiate i miei dati così&quot;
+            <strong>{s10("itemLabels.oppose")}</strong> - {s10("items.oppose")}
           </li>
         </ul>
         <p>
-          Per esercitare questi diritti, scrivi a:{" "}
+          {s10("exerciseRights")}{" "}
           <a
             href="mailto:info@fightthestroke.org"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            aria-label="Invia email a info@fightthestroke.org per esercitare i tuoi diritti sulla privacy"
           >
             info@fightthestroke.org
           </a>
         </p>
       </Section>
 
-      <Section number={11} title="Cookie e Analytics">
-        <p>Usiamo cookie di due tipi:</p>
+      <Section number={11} title={s11("title")}>
+        <p>{s11("intro")}</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
-            <strong>Essenziali</strong> - per farti accedere (non puoi
-            disattivarli)
+            <strong>{s11("cookieTypeLabels.essential")}</strong> -{" "}
+            {s11("cookieTypes.essential")}
           </li>
           <li>
-            <strong>Analytics</strong> - per capire come migliora l&apos;app
-            (puoi disattivarli)
+            <strong>{s11("cookieTypeLabels.analytics")}</strong> -{" "}
+            {s11("cookieTypes.analytics")}
           </li>
         </ul>
         <p className="mt-4">
-          <strong>Vercel Analytics:</strong> Utilizziamo Vercel Analytics per
-          monitorare le prestazioni del sito. Questo servizio:
+          <strong>Vercel Analytics:</strong> {s11("vercelAnalytics")}
         </p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
-            <strong>Non usa cookie</strong> - nessun tracciamento tra sessioni
+            <strong>{s11("vercelFeatureLabels.noCookies")}</strong> -{" "}
+            {s11("vercelFeatures.noCookies")}
           </li>
           <li>
-            <strong>Dati aggregati e anonimi</strong> - non identifichiamo i
-            singoli utenti
+            <strong>{s11("vercelFeatureLabels.anonymous")}</strong> -{" "}
+            {s11("vercelFeatures.anonymous")}
           </li>
           <li>
-            <strong>Conforme GDPR</strong> - i dati restano in Europa
+            <strong>{s11("vercelFeatureLabels.gdprCompliant")}</strong> -{" "}
+            {s11("vercelFeatures.gdprCompliant")}
           </li>
           <li>
-            <strong>Solo metriche tecniche</strong> - pagine visitate, tempi di
-            caricamento, dispositivo (tipo, non identificativo)
+            <strong>{s11("vercelFeatureLabels.technicalOnly")}</strong> -{" "}
+            {s11("vercelFeatures.technicalOnly")}
           </li>
         </ul>
         <p className="mt-4">
           <strong>Sentry (Monitoraggio Errori e Performance):</strong>{" "}
-          Utilizziamo Sentry per monitorare errori tecnici e performance
-          dell&apos;applicazione. Questo servizio:
+          {s11("sentry")}
         </p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
           <li>
-            <strong>Cattura errori tecnici</strong> - stack trace, browser,
-            pagina dove è avvenuto l&apos;errore
+            <strong>{s11("sentryFeatureLabels.errors")}</strong> -{" "}
+            {s11("sentryFeatures.errors")}
           </li>
           <li>
-            <strong>Performance tracing</strong> - tempi di risposta delle API,
-            latenza delle richieste (dati tecnici aggregati)
+            <strong>{s11("sentryFeatureLabels.performance")}</strong> -{" "}
+            {s11("sentryFeatures.performance")}
           </li>
           <li>
-            <strong>AI monitoring</strong> - metriche tecniche delle chiamate AI
-            (numero di token, latenza, modello usato) - nessun contenuto delle
-            conversazioni
+            <strong>{s11("sentryFeatureLabels.aiMonitoring")}</strong> -{" "}
+            {s11("sentryFeatures.aiMonitoring")}
           </li>
           <li>
-            <strong>Session Replay (solo su errore)</strong> - se si verifica un
-            errore, registra una replica anonimizzata della sessione (tutto il
-            testo mascherato, media bloccati)
+            <strong>{s11("sentryFeatureLabels.sessionReplay")}</strong> -{" "}
+            {s11("sentryFeatures.sessionReplay")}
           </li>
           <li>
-            <strong>Nessun dato personale identificativo</strong> - non
-            raccoglie email, nomi, o contenuti delle tue conversazioni
+            <strong>{s11("sentryFeatureLabels.noPii")}</strong> -{" "}
+            {s11("sentryFeatures.noPii")}
           </li>
           <li>
-            <strong>Server in Europa</strong> - i dati restano nell&apos;UE
-            (datacenter EU)
+            <strong>{s11("sentryFeatureLabels.euServers")}</strong> -{" "}
+            {s11("sentryFeatures.euServers")}
           </li>
           <li>
-            <strong>Solo per migliorare l&apos;app</strong> - ci aiuta a trovare
-            e risolvere bug velocemente
+            <strong>{s11("sentryFeatureLabels.improvement")}</strong> -{" "}
+            {s11("sentryFeatures.improvement")}
           </li>
         </ul>
-        <p>Niente cookie pubblicitari o di tracciamento. Mai.</p>
+        <p>{s11("noTracking")}</p>
       </Section>
 
-      <Section number={12} title="Se sei minorenne">
-        <p>Se hai meno di 14 anni:</p>
+      <Section number={12} title={s12("title")}>
+        <p>{s12("intro")}</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
-          <li>I tuoi genitori devono darti il permesso di usare MirrorBuddy</li>
-          <li>Devono leggere questa Privacy Policy</li>
-          <li>Possono sempre vedere cosa fai e cancellare il tuo account</li>
+          <li>{s12("items.permission")}</li>
+          <li>{s12("items.readPolicy")}</li>
+          <li>{s12("items.access")}</li>
         </ul>
         <p className="text-slate-600 dark:text-gray-400 italic">
-          Consigliamo sempre di usare MirrorBuddy con un adulto vicino,
-          soprattutto le prime volte.
+          {s12("recommendation")}
         </p>
       </Section>
 
-      <Section number={13} title="Sicurezza">
-        <p>Per proteggere i tuoi dati:</p>
+      <Section number={13} title={s13("title")}>
+        <p>{s13("intro")}</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
-          <li>Connessione HTTPS crittografata</li>
-          <li>Database protetto con password complesse</li>
-          <li>Backup giornalieri</li>
-          <li>Team ridotto con accesso ai dati</li>
+          <li>{s13("items.https")}</li>
+          <li>{s13("items.password")}</li>
+          <li>{s13("items.backups")}</li>
+          <li>{s13("items.access")}</li>
         </ul>
-        <p>Nessun sistema è perfetto al 100%, ma facciamo del nostro meglio.</p>
+        <p>{s13("disclaimer")}</p>
       </Section>
 
-      <Section number={14} title="Modifiche a questa policy">
-        <p>Se cambiamo questa Privacy Policy:</p>
+      <Section number={14} title={s14("title")}>
+        <p>{s14("intro")}</p>
         <ul className="text-slate-700 dark:text-gray-300 space-y-2">
-          <li>Ti avviseremo via email</li>
-          <li>Vedrai un banner in app</li>
-          <li>Ti chiederemo di leggere di nuovo e accettare</li>
+          <li>{s14("items.email")}</li>
+          <li>{s14("items.banner")}</li>
+          <li>{s14("items.accept")}</li>
         </ul>
       </Section>
 
-      <Section number={15} title="Domande">
+      <Section number={15} title={s15("title")}>
         <p>
-          Non hai capito qualcosa? Vuoi saperne di più? Scrivi a:{" "}
+          {s15("intro")}{" "}
           <a
             href="mailto:info@fightthestroke.org"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+            aria-label="Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
           >
             info@fightthestroke.org
           </a>
         </p>
-        <p>Siamo umani, parliamo italiano, e rispondiamo sempre.</p>
+        <p>{s15("closing")}</p>
       </Section>
     </>
   );

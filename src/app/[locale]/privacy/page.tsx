@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { PrivacyContent } from "./content";
 import { PrivacyContentExtended } from "./content-extended";
 import { PrivacyContentAI } from "./content-ai";
@@ -10,12 +11,15 @@ export const PRIVACY_VERSION = "1.4";
 const LAST_UPDATED = "24 Gennaio 2026";
 
 export default function PrivacyPage() {
+  const t = useTranslations("legal.privacy.page");
+  const tldr = useTranslations("legal.privacy.page.tldrItems");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
       {/* Navigation */}
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700 print:border-b-2"
-        aria-label="Navigazione pagina"
+        aria-label={t("pageNavigation")}
       >
         <div className="max-w-4xl mx-auto px-4 py-6">
           <Link
@@ -24,7 +28,7 @@ export default function PrivacyPage() {
             aria-label="Torna alla home page di MirrorBuddy"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Torna alla home
+            {t("backToHome")}
           </Link>
         </div>
       </nav>
@@ -35,12 +39,16 @@ export default function PrivacyPage() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              Privacy Policy di MirrorBuddy
+              {t("title")}
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-gray-400">
-              <span>Versione {PRIVACY_VERSION}</span>
+              <span>
+                {t("version")} {PRIVACY_VERSION}
+              </span>
               <span>•</span>
-              <span>Ultimo aggiornamento: {LAST_UPDATED}</span>
+              <span>
+                {t("lastUpdated")} {LAST_UPDATED}
+              </span>
             </div>
           </div>
 
@@ -53,40 +61,38 @@ export default function PrivacyPage() {
               id="tldr-heading"
               className="text-2xl font-bold text-slate-900 dark:text-white mb-4"
             >
-              In breve (TL;DR)
+              {t("tldrHeading")}
             </h2>
             <ul className="space-y-2 text-slate-700 dark:text-gray-300 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>
-                  Raccogliamo solo i dati necessari (email, chat, progressi)
-                </span>
+                <span>{tldr("dataCollection")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Non vendiamo MAI i tuoi dati a nessuno</span>
+                <span>{tldr("noDataSale")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Puoi cancellare tutto quando vuoi</span>
+                <span>{tldr("deleteAnytime")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>I dati restano in Europa (GDPR)</span>
+                <span>{tldr("europeanData")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>Web Vitals opzionali - puoi disattivarli</span>
+                <span>{tldr("optionalAnalytics")}</span>
               </li>
             </ul>
           </section>
@@ -101,11 +107,11 @@ export default function PrivacyPage() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
             <p className="text-slate-600 dark:text-gray-400 text-center">
-              Domande sulla privacy? Scrivici:{" "}
+              {t("questionText")}{" "}
               <a
                 href="mailto:info@fightthestroke.org"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
-                aria-label="Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
+                aria-label={t("questionAriaLabel")}
               >
                 info@fightthestroke.org
               </a>

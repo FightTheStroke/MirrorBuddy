@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface LoginResponse {
@@ -17,6 +18,7 @@ interface LoginResponse {
 
 export default function LoginPage() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -38,7 +40,7 @@ export default function LoginPage() {
       const data: LoginResponse = await response.json();
 
       if (!response.ok) {
-        setError(data.error || "Credenziali non valide");
+        setError(data.error || t("invalidCredentials"));
         setIsLoading(false);
         return;
       }
@@ -49,7 +51,7 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore di connessione");
+      setError(err instanceof Error ? err.message : t("connectionError"));
       setIsLoading(false);
     }
   };
@@ -66,7 +68,7 @@ export default function LoginPage() {
               MirrorBuddy
             </h1>
             <p className="text-slate-600 dark:text-slate-300 mt-2">
-              Accedi al tuo account
+              {t("signInToAccount")}
             </p>
           </div>
 
@@ -98,7 +100,7 @@ export default function LoginPage() {
                 required
                 autoComplete="email"
                 className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder="La tua email"
+                placeholder={t("yourEmail")}
               />
             </div>
 
@@ -119,14 +121,14 @@ export default function LoginPage() {
                   aria-required="true"
                   required
                   className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder="La tua password"
+                  placeholder={t("yourPassword")}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                   aria-label={
-                    showPassword ? "Nascondi password" : "Mostra password"
+                    showPassword ? t("hidePassword") : t("showPassword")
                   }
                 >
                   {showPassword ? (
@@ -144,18 +146,18 @@ export default function LoginPage() {
               className="w-full"
               aria-busy={isLoading}
             >
-              {isLoading ? "Accesso in corso..." : "Accedi"}
+              {isLoading ? t("signingIn") : t("login")}
             </Button>
           </form>
 
           <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
             <p className="text-sm text-slate-600 dark:text-slate-400 text-center mb-3">
-              Non hai ancora un account?
+              {t("noAccount")}
             </p>
             <Link href="/invite/request" className="block">
               <Button variant="outline" className="w-full">
                 <UserPlus className="w-4 h-4 mr-2" />
-                Richiedi Accesso Beta
+                {t("requestBetaAccess")}
               </Button>
             </Link>
           </div>

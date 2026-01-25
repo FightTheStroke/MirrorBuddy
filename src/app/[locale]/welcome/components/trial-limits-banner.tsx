@@ -3,28 +3,29 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { MessageSquare, Users, Wrench, Gift, ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface TrialLimit {
   icon: React.ReactNode;
-  label: string;
-  value: string;
+  labelKey: string;
+  valueKey: string;
 }
 
 const TRIAL_LIMITS: TrialLimit[] = [
   {
     icon: <MessageSquare className="w-5 h-5" />,
-    label: "Messaggi",
-    value: "10 per sessione",
+    labelKey: "messages",
+    valueKey: "messages-value",
   },
   {
     icon: <Users className="w-5 h-5" />,
-    label: "Maestri",
-    value: "3 disponibili",
+    labelKey: "maestri",
+    valueKey: "maestri-value",
   },
   {
     icon: <Wrench className="w-5 h-5" />,
-    label: "Strumenti",
-    value: "Base",
+    labelKey: "tools",
+    valueKey: "tools-value",
   },
 ];
 
@@ -39,6 +40,8 @@ const TRIAL_LIMITS: TrialLimit[] = [
  * Includes CTA to request full beta access.
  */
 export function TrialLimitsBanner() {
+  const t = useTranslations("welcome.trial-limits");
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -58,10 +61,10 @@ export function TrialLimitsBanner() {
               id="trial-banner-heading"
               className="font-semibold text-amber-900 dark:text-amber-100"
             >
-              Modalità Prova Gratuita
+              {t("title")}
             </h3>
             <p className="text-sm text-amber-700 dark:text-amber-300">
-              Esplora MirrorBuddy senza registrazione
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -77,10 +80,10 @@ export function TrialLimitsBanner() {
                 {limit.icon}
               </div>
               <span className="text-xs text-gray-600 dark:text-gray-400">
-                {limit.label}
+                {t(limit.labelKey)}
               </span>
               <span className="text-sm font-medium text-gray-900 dark:text-white">
-                {limit.value}
+                {t(limit.valueKey)}
               </span>
             </div>
           ))}
@@ -89,13 +92,13 @@ export function TrialLimitsBanner() {
         {/* CTA */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-amber-200/50 dark:border-amber-700/50">
           <p className="text-sm text-amber-800 dark:text-amber-200">
-            Vuoi accesso completo a tutti i Maestri e strumenti?
+            {t("cta-question")}
           </p>
           <Link
             href="/invite/request"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg transition-colors"
           >
-            Richiedi accesso beta
+            {t("cta-button")}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

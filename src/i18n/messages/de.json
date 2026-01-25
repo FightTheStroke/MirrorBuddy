@@ -21,8 +21,38 @@
     "login": "Anmelden",
     "register": "Registrieren",
     "email": "E-Mail",
-    "password": "Passwort",
-    "forgotPassword": "Passwort vergessen?"
+    "password": {
+      "minLength": "Mindestens 8 Zeichen",
+      "requiresUppercase": "Mindestens ein Großbuchstabe",
+      "requiresLowercase": "Mindestens ein Kleinbuchstabe",
+      "requiresNumber": "Mindestens eine Zahl",
+      "changeErrorDefault": "Fehler beim Ändern des Passworts",
+      "connectionError": "Verbindungsfehler. Bitte versuchen Sie es erneut.",
+      "successTitle": "Passwort geändert!",
+      "successMessage": "Ihr Passwort wurde erfolgreich aktualisiert. Sie werden weitergeleitet...",
+      "pageTitle": "Passwort ändern",
+      "pageSubtitle": "Für Ihre Sicherheit müssen Sie Ihr temporäres Passwort ändern.",
+      "currentPasswordLabel": "Aktuelles Passwort *",
+      "currentPasswordPlaceholder": "Temporäres Passwort per E-Mail erhalten",
+      "newPasswordLabel": "Neues Passwort *",
+      "newPasswordPlaceholder": "Wählen Sie ein sicheres Passwort",
+      "confirmPasswordLabel": "Passwort bestätigen *",
+      "confirmPasswordPlaceholder": "Wiederholen Sie Ihr neues Passwort",
+      "passwordMismatch": "Die Passwörter stimmen nicht überein",
+      "submitButtonLoading": "Wird geändert...",
+      "submitButtonText": "Passwort ändern"
+    },
+    "forgotPassword": "Passwort vergessen?",
+    "signInToAccount": "Melden Sie sich bei Ihrem Konto an",
+    "yourEmail": "Ihre E-Mail",
+    "yourPassword": "Ihr Passwort",
+    "showPassword": "Passwort anzeigen",
+    "hidePassword": "Passwort ausblenden",
+    "signingIn": "Anmeldung läuft...",
+    "invalidCredentials": "Ungültige Anmeldedaten",
+    "connectionError": "Verbindungsfehler",
+    "noAccount": "Haben Sie noch kein Konto?",
+    "requestBetaAccess": "Beta-Zugang anfordern"
   },
   "tools": {
     "categories": {
@@ -280,19 +310,37 @@
       "nice-to-meet-you": "Schön, dich kennenzulernen!",
       "replay-mode-message": "Du siehst dir das Tutorial an. Deine bestehenden Daten werden nicht geändert.",
       "enable-voice": "Sprache aktivieren",
-      "disable-voice": "Sprache deaktivieren"
+      "disable-voice": "Sprache deaktivieren",
+      "tell-me-about-you": "Erzähl mir etwas über dich, {name}!",
+      "help-personalize": "Das hilft mir, deine Erfahrung zu personalisieren",
+      "learning-differences-label": "Hast du besondere Lernunterschiede? (optional)",
+      "learning-differences-hint": "Das hilft uns, die App zugänglicher für dich zu gestalten",
+      "school-elementary": "Grundschule",
+      "school-middle": "Mittelschule",
+      "school-high": "Gymnasium",
+      "collected-data": "Erfasste Daten",
+      "age": "Alter",
+      "years": "Jahre",
+      "school": "Schule",
+      "learning-differences": "Lernunterschiede",
+      "optional": "(optional)"
     },
     "trial-limits": {
-      "free-trial-mode": "Kostenloser Testmodus",
-      "explore-no-registration": "Erkunde MirrorBuddy ohne Registrierung",
+      "title": "Kostenloser Testmodus",
+      "subtitle": "Erkunde MirrorBuddy ohne Registrierung",
       "messages": "Nachrichten",
+      "messages-value": "10 pro Sitzung",
       "maestri": "Maestri",
+      "maestri-value": "3 verfügbar",
       "tools": "Werkzeuge",
-      "ten-per-session": "10 pro Sitzung",
-      "three-available": "3 verfügbar",
-      "base": "Basis",
-      "want-full-access": "Möchtest du vollständigen Zugriff?",
-      "request-beta": "Beta-Zugriff anfordern"
+      "tools-value": "Basis",
+      "cta-question": "Möchtest du vollständigen Zugriff auf alle Maestri und Werkzeuge?",
+      "cta-button": "Beta-Zugriff anfordern"
+    },
+    "tier-comparison": {
+      "heading": "Wähle den perfekten Plan für dich",
+      "subheading": "Starte mit einer kostenlosen Testversion oder registriere dich, um mehr Funktionen freizuschalten",
+      "footer-note": "Alle Pläne beinhalten Zugang zu 22 KI-Maestri und personalisierten Lernwerkzeugen"
     },
     "principles": {
       "welcome-to-school": "Willkommen in der Schule, die ich mir wünsche, {name}!",
@@ -306,14 +354,17 @@
       "no-judgment": "Ohne Vorwürfe",
       "no-judgment-desc": "Ein sicherer Raum zum Lernen und Fehler machen",
       "melissa-quote": "Denk daran: Es gibt keine dummen Fragen, nur neugierige Köpfe!",
-      "ready-to-start": "Bereit anzufangen?"
+      "ready-to-start": "Bereit anzufangen?",
+      "how-it-works": "Wie funktioniert es?",
+      "how-it-works-desc": "Jeder Lehrer ist ein Experte in seinem Fach. Wenn du Hilfe in Mathematik brauchst, frag Euklid. Für Englisch gibt es Shakespeare! Ich helfe dir, den richtigen Lehrer für jede Situation zu wählen."
     },
     "ready": {
       "perfect": "Perfekt, {name}!",
       "ready-to-start": "Du bist bereit, dein Abenteuer zu beginnen!",
       "prepared-for-you": "Ich habe alles für dich vorbereitet! Denk dran:",
       "always-talk": "Du kannst mich immer ansprechen - ich bin hier, um dir bei deiner Lernmethode zu helfen",
-      "choose-professor": "Wähle einen Professor - für jedes Fach gibt es den richtigen Experten",
+      "choose-professor": "Wähle einen Professor",
+      "choose-professor-desc": "für jedes Fach gibt es den richtigen Experten",
       "earn-xp": "Verdiene XP - jede Lektion hilft dir, aufzusteigen!",
       "back": "Zurück",
       "lets-start": "Lass uns anfangen!",
@@ -374,6 +425,477 @@
     "marta": {
       "personality": "Sportlich, entschlossen, praktisch, direkt aber freundlich",
       "greeting": "Hallo! Ich bin Marta, ich bin {age}. Ich liebe Berge und Sport. Und du?"
+    }
+  },
+  "invite": {
+    "request": {
+      "backButton": "Zurück",
+      "title": "Beta-Zugang anfordern",
+      "subtitle": "MirrorBuddy ist in privater Beta. Füllen Sie das Formular aus, um Zugang anzufordern.",
+      "nameLabel": "Name *",
+      "namePlaceholder": "Ihr Name",
+      "emailLabel": "Email *",
+      "emailPlaceholder": "ihre@email.com",
+      "motivationLabel": "Warum möchten Sie MirrorBuddy nutzen? *",
+      "motivationPlaceholder": "Erzählen Sie uns ein wenig von sich und warum Sie interessiert sind...",
+      "minimumCharacters": "Mindestens 20 Zeichen",
+      "submitButton": "Anfrage senden",
+      "submitting": "Wird gesendet...",
+      "confirmationMessage": "Sie erhalten eine Bestätigungsemail und, falls genehmigt, Ihre Zugangsdaten.",
+      "successTitle": "Anfrage gesendet!",
+      "successMessage": "Danke für Ihr Interesse an MirrorBuddy! Wir kontaktieren Sie bald per Email mit Ihren Zugangsdaten.",
+      "returnHome": "Zur Startseite zurück",
+      "alreadyHaveAccount": "Sie haben bereits ein Konto?",
+      "loginButton": "Anmelden",
+      "errors": {
+        "sendError": "Fehler beim Senden der Anfrage",
+        "sessionExpired": "Sitzung abgelaufen. Laden Sie die Seite neu und versuchen Sie es erneut.",
+        "connectionError": "Verbindungsfehler. Bitte versuchen Sie es erneut."
+      }
+    },
+    "form": {
+      "nameLabel": "Name",
+      "namePlaceholder": "Ihr Name",
+      "nameRequired": "Name ist erforderlich",
+      "nameMinLength": "Der Name muss mindestens 2 Zeichen lang sein",
+      "emailLabel": "Email",
+      "emailPlaceholder": "ihre-email@beispiel.com",
+      "emailRequired": "Email ist erforderlich",
+      "emailInvalid": "Bitte geben Sie eine gültige Email ein",
+      "motivationLabel": "Warum möchten Sie MirrorBuddy nutzen?",
+      "motivationPlaceholder": "Erzählen Sie uns, wie Sie MirrorBuddy zum Lernen nutzen möchten...",
+      "motivationRequired": "Bitte erzählen Sie uns, warum Sie MirrorBuddy nutzen möchten",
+      "motivationMinLength": "Schreiben Sie mindestens 20 Zeichen",
+      "submitButton": "Beta-Zugang anfordern",
+      "submitting": "Wird gesendet...",
+      "successTitle": "Anfrage gesendet!",
+      "successMessage": "Wir kontaktieren Sie bald per Email, um Ihren Beta-Zugang zu MirrorBuddy zu bestätigen.",
+      "errors": {
+        "sendError": "Fehler beim Senden der Anfrage",
+        "sessionExpired": "Sitzung abgelaufen. Laden Sie die Seite neu und versuchen Sie es erneut.",
+        "emailDuplicate": "Diese Email hat bereits eine ausstehende Anfrage"
+      }
+    },
+    "migration": {
+      "successTitle": "Daten migriert!",
+      "successMessage": "Ihre Test-Erfahrung wurde in Ihr neues Konto übertragen.",
+      "welcomeTitle": "Willkommen bei MirrorBuddy!",
+      "welcomeMessage": "Ihr Konto ist bereit. Starten Sie Ihr Lernwagnis!",
+      "startButton": "Los geht's",
+      "trialFound": "Wir haben Ihren Test gefunden!",
+      "migrateQuestion": "Möchten Sie Ihre Test-Daten in Ihr neues Konto übertragen?",
+      "summary": "Ihr Test umfasst:",
+      "chatsWithMaestri": "{count} Nachrichten mit Maestri",
+      "documentsAnalyzed": "{count} analysierte Dokumente",
+      "favoriteMaestri": "Lieblings-Maestri: {maestri}",
+      "coach": "Coach: {name}",
+      "migrateButton": "Daten übertragen",
+      "startFresh": "Neu anfangen",
+      "dataNote": "Test-Daten beinhalten keine vollständigen Konversationen, nur Voreinstellungen und Fortschritt.",
+      "errors": {
+        "migrationError": "Fehler bei der Migration"
+      }
+    }
+  },
+  "consent": {
+    "inline": {
+      "acceptedText": "Cookies akzeptiert",
+      "manage": "Verwalten",
+      "acceptButton": "Cookies akzeptieren",
+      "info": "Info",
+      "title": "Cookies und Datenschutz",
+      "description": "Wir verwenden essenzielle Cookies, um alles zum Laufen zu bringen.",
+      "learnMore": "Mehr erfahren",
+      "analyticsLabel": "Analyse einschließen",
+      "submitButton": "Akzeptieren"
+    },
+    "unified": {
+      "loading": "Wird geladen...",
+      "titleUpdated": "Bedingungen Aktualisiert",
+      "titleWelcome": "Willkommen bei MirrorBuddy!",
+      "subtitleUpdated": "Unsere Bedingungen wurden aktualisiert",
+      "subtitleWelcome": "Datenschutz, Cookies und Nutzungsbedingungen",
+      "summaryTitle": "Kurz gesagt:",
+      "privacy": {
+        "title": "Datenschutz und Sicherheit",
+        "description": "Ihre Daten sind nach DSGVO und COPPA geschützt"
+      },
+      "cookies": {
+        "title": "Essenzielle Cookies",
+        "description": "Erforderlich für die Funktion (Sitzungen, Einstellungen)"
+      },
+      "tos": {
+        "title": "Nutzungsbedingungen",
+        "description": "MirrorBuddy ist kostenlos, KI kann Fehler machen, verwenden Sie es mit einem Erwachsenen, wenn Sie unter 14 Jahre alt sind"
+      },
+      "links": {
+        "full": "Vollständige Bedingungen",
+        "privacy": "Datenschutzrichtlinie",
+        "cookies": "Cookie-Richtlinie"
+      },
+      "reconsentNotice": {
+        "lastAccepted": "Zuletzt akzeptiert:",
+        "changed": "Was hat sich geändert:",
+        "details": "Wir haben die Nutzungsbedingungen aktualisiert. Bitte lesen und akzeptieren Sie die neuen Bedingungen, um fortzufahren."
+      },
+      "tosCheckbox": {
+        "label": "Ich habe gelesen und akzeptiere",
+        "text": "die Nutzungsbedingungen und die Verwendung von essentiellen Cookies (erforderlich)"
+      },
+      "analytics": {
+        "label": "Analyse-Cookies (optional)",
+        "description": "Helfen uns, MirrorBuddy zu verbessern"
+      },
+      "buttons": {
+        "disabled": "Akzeptieren (bitte aktivieren Sie zuerst das Kontrollkästchen der Bedingungen)",
+        "accept": "Akzeptieren und fortfahren",
+        "submitting": "Wird gespeichert..."
+      },
+      "coppa": "MirrorBuddy ist konform mit DSGVO- und COPPA-Bestimmungen zum Schutz von Kindern.",
+      "screenReader": {
+        "required": "Sie müssen den Nutzungsbedingungen zustimmen, um fortzufahren",
+        "submitting": "Wird gerade gespeichert..."
+      }
+    },
+    "cookie": {
+      "title": "Datenschutz und Cookies",
+      "subtitle": "MirrorBuddy respektiert Ihre Privatsphäre",
+      "explanation": "Um MirrorBuddy zu verwenden, müssen Sie essentiellen Cookies akzeptieren, die es uns ermöglichen zu:",
+      "list": {
+        "session": "Ihre Sitzungen sicher zu halten",
+        "preferences": "Ihre Einstellungen zu speichern",
+        "protect": "Ihre Daten zu schützen"
+      },
+      "analytics": {
+        "label": "Analyse-Cookies (optional)",
+        "description": "Helfen uns, MirrorBuddy zu verbessern",
+        "aria": "Analyse-Cookies aktivieren"
+      },
+      "button": "Akzeptieren und fortfahren",
+      "coppa": "MirrorBuddy ist konform mit DSGVO- und COPPA-Bestimmungen zum Schutz von Kindern. Ihre Daten sind bei uns sicher."
+    },
+    "tos": {
+      "modal": {
+        "title": {
+          "welcome": "Willkommen bei MirrorBuddy!",
+          "updated": "Bedingungen Aktualisiert"
+        },
+        "description": {
+          "welcome": "Bitte lesen Sie vor dem Start unsere Nutzungsbedingungen.",
+          "updated": "Wir haben unsere Nutzungsbedingungen aktualisiert. Um MirrorBuddy weiterhin zu nutzen, bitte lesen und akzeptieren Sie die neuen Bedingungen."
+        },
+        "warning": {
+          "title": "Was hat sich geändert:",
+          "description": "Wir haben Informationen über die Erfassung von Leistungsdaten (Web Vitals) und unsere Datenschutzrichtlinie aktualisiert. Lesen Sie die vollständigen Bedingungen für weitere Details."
+        },
+        "summary": "Kurz zusammengefasst:",
+        "points": {
+          "free": "MirrorBuddy ist kostenlos und soll helfen",
+          "aiCanErr": "Wir sind keine Schule, KI kann Fehler machen",
+          "minors": "Wenn Sie unter 14 Jahren sind, nutzen Sie die App mit einem Erwachsenen in der Nähe",
+          "respect": "Respektieren Sie andere, wir respektieren Sie"
+        },
+        "link": "Vollständige Bedingungen lesen →",
+        "checkbox": "Ich habe die Nutzungsbedingungen gelesen und akzeptiert",
+        "buttons": {
+          "disabled": "Nutzungsbedingungen akzeptieren (Kästchen zuerst ankreuzen)",
+          "accept": "Ich akzeptiere",
+          "submitting": "Wird gespeichert..."
+        },
+        "screenReader": {
+          "required": "Um fortzufahren, müssen Sie die Nutzungsbedingungen akzeptieren",
+          "submitting": "Wird gespeichert..."
+        }
+      },
+      "toast": {
+        "saved": "Akzeptanz lokal gespeichert",
+        "saveFailed": "Synchronisierung mit dem Server fehlgeschlagen. Wir versuchen es später erneut."
+      }
+    }
+  },
+  "legal": {
+    "terms": {
+      "backToHome": "Zurück zur Startseite",
+      "backToHomeAriaLabel": "Zurück zur MirrorBuddy-Startseite",
+      "pageNavAriaLabel": "Seitennavigation",
+      "title": "MirrorBuddy Nutzungsbedingungen",
+      "version": "Version {version}",
+      "lastUpdated": "Zuletzt aktualisiert: {lastUpdated}",
+      "tldrHeading": "Kurz gesagt (TL;DR)",
+      "tldrItems": {
+        "free": "MirrorBuddy ist kostenlos und soll helfen",
+        "notSchool": "Wir sind keine Schule, KI kann Fehler machen",
+        "supervised": "Nutzen Sie es mit einem Erwachsenen in der Nähe, wenn Sie unter 18 Jahren sind",
+        "respect": "Respektieren Sie andere, wir respektieren Sie",
+        "feedback": "Probleme? Schreiben Sie uns, wir sind hier zum Helfen"
+      },
+      "questionsPrefix": "Fragen? Schreiben Sie uns:",
+      "questionsEmail": "info@fightthestroke.org",
+      "sections": {
+        "section1": {
+          "title": "Was ist MirrorBuddy",
+          "content1": "MirrorBuddy ist eine kostenlose App, die künstliche Intelligenz nutzt, um Kindern und Jugendlichen beim Lernen zu helfen.",
+          "content2": "Es ist ein Projekt der FightTheStroke-Stiftung, das von Menschen geschaffen wurde, die Lernen für alle zugänglicher machen möchten."
+        },
+        "section2": {
+          "title": "Was wir versprechen",
+          "item1": "Unser Bestes geben, um ein nützliches Werkzeug zu schaffen",
+          "item2": "Ihre Daten schützen (siehe Datenschutzrichtlinie)",
+          "item3": "Ihr Feedback hören und verbessern",
+          "item4": "Transparent über die Funktionsweise sein"
+        },
+        "section3": {
+          "title": "Was wir NICHT versprechen können",
+          "intro": "Seien wir ehrlich: MirrorBuddy hat Einschränkungen.",
+          "school": {
+            "heading": "Wir sind keine Schule",
+            "content": "MirrorBuddy hilft beim Lernen, ersetzt aber keine Lehrer und Schulen."
+          },
+          "ai": {
+            "heading": "KI kann Fehler machen",
+            "content": "Künstliche Intelligenz ist gut, aber nicht perfekt. Überprüfen Sie wichtige Antworten immer bei einem Erwachsenen oder in einem Buch."
+          },
+          "beta": {
+            "heading": "Es ist ein kostenloser Beta-Service",
+            "content": "Wir geben unser Bestes, aber der Service funktioniert möglicherweise nicht immer oder kann sich ändern."
+          }
+        },
+        "section4": {
+          "title": "KI-Professoren",
+          "intro": "MirrorBuddy enthält virtuelle Professoren, die von historischen und zeitgenössischen Persönlichkeiten inspiriert sind. Hier ist, was Sie wissen sollten:",
+          "educational": {
+            "heading": "Rein pädagogischer Zweck",
+            "content": "KI-Professoren werden ausschließlich zu Bildungs- und Demonstrationszwecken erstellt. Sie repräsentieren keine echten Personen und sind nicht mit ihnen verbunden oder von ihnen genehmigt."
+          },
+          "changeable": {
+            "heading": "Professoren können sich ändern",
+            "content": "Die Liste der verfügbaren Professoren kann sich im Laufe der Zeit ändern. Einige können ersetzt oder entfernt werden."
+          },
+          "demo": {
+            "heading": "Demonstrationsversion",
+            "content": "Diese Version dient zur Demonstration der Funktionen der Plattform. In Zukunft wird jeder Student seine eigenen benutzerdefinierten Professoren erstellen können und Namen und Avatare frei wählen."
+          }
+        },
+        "section5": {
+          "title": "Wenn etwas schief geht",
+          "intro": "MirrorBuddy ist kostenlos und mit Liebe gemacht. Wir können nicht verantwortlich sein, wenn:",
+          "item1": "Die KI eine falsche Antwort gibt",
+          "item2": "Der Service eine Zeit lang nicht funktioniert",
+          "item3": "Sie eine Prüfung nicht bestehen (Lernen ist essentiell!)",
+          "item4": "Etwas während der Nutzung der App passiert",
+          "note": "Das bedeutet nicht, dass uns nicht wichtig ist - es ist uns sehr wichtig! Aber wir müssen uns rechtlich schützen, um weiterhin helfen zu können."
+        },
+        "section6": {
+          "title": "Wir bitten Sie...",
+          "intro": "Damit alles gut funktioniert, bitten wir Sie:",
+          "respect": {
+            "label": "Nutzen Sie MirrorBuddy respektvoll",
+            "content": "gegenüber der App und gegenüber anderen"
+          },
+          "noAbuse": {
+            "label": "Versuchen Sie nicht, die KI zu \"täuschen\"",
+            "content": "lassen Sie sie nicht böse oder gefährliche Dinge sagen"
+          },
+          "report": {
+            "label": "Melden Sie uns Probleme",
+            "content": "wenn etwas nicht stimmt, lassen Sie es uns wissen: info@fightthestroke.org"
+          },
+          "notShare": {
+            "label": "Geben Sie Ihr Konto nicht weiter",
+            "content": "es ist persönlich"
+          }
+        },
+        "section7": {
+          "title": "Für Eltern und Betreuer",
+          "intro": "Wenn Ihr Kind unter 14 Jahren ist:",
+          "responsible": {
+            "label": "Sie sind verantwortlich",
+            "content": "für die Nutzung von MirrorBuddy durch Ihr Kind"
+          },
+          "supervise": {
+            "label": "Wir bitten Sie zu beaufsichtigen",
+            "content": "bleiben Sie in der Nähe, während Ihr Kind die App nutzt"
+          },
+          "check": {
+            "label": "Überprüfen Sie Unterhaltungen",
+            "content": "Sie können dies jederzeit tun"
+          },
+          "contact": {
+            "label": "Sprechen Sie mit uns, wenn Sie Zweifel haben",
+            "content": "wir sind auch Eltern, wir verstehen"
+          }
+        },
+        "section8": {
+          "title": "Ihre Daten",
+          "intro": "Wir behandeln Ihre Daten respektvoll. Für alle Details lesen Sie die",
+          "privacyLink": "vollständige Datenschutzrichtlinie",
+          "brief": "Kurz gesagt:",
+          "item1": "Wir erfassen nur das, was wir benötigen",
+          "item2": "Wir verkaufen Ihre Daten nicht an niemanden",
+          "item3": "Sie können alles jederzeit löschen",
+          "item4": "Daten bleiben in Europa"
+        },
+        "section9": {
+          "title": "Können wir Sie blockieren?",
+          "intro": "Ja, aber nur wenn:",
+          "item1": "Sie den Service missbrauchen",
+          "item2": "Sie versuchen, andere Nutzer zu schaden",
+          "item3": "Sie diese Bedingungen ernsthaft verletzen",
+          "note": "Bevor wir Sie blockieren, werden wir versuchen, mit Ihnen zu sprechen. Wir sind nicht hier zum Bestrafen, wir sind hier zum Helfen."
+        },
+        "section10": {
+          "title": "Änderungen dieser Bedingungen",
+          "intro": "Wenn wir diese Bedingungen ändern:",
+          "item1": "Wir werden Sie benachrichtigen",
+          "item2": "Wir werden Sie um erneute Zustimmung bitten",
+          "item3": "Wir werden die Regeln nicht \"heimlich\" ändern"
+        },
+        "section11": {
+          "title": "Gesetz und Gericht",
+          "line1": "Diese Bedingungen folgen italienischem Recht.",
+          "line2": "Wenn wir wirklich ein Problem nicht durch Gespräche lösen können, ist das zuständige Gericht das von Mailand."
+        }
+      }
+    },
+    "cookies": {
+      "page": {
+        "title": "MirrorBuddy Cookie-Richtlinie",
+        "version": "1.1",
+        "lastUpdated": "21. Januar 2025",
+        "backHome": "Zurück zur Startseite",
+        "contactQuestion": "Fragen zu Cookies? Schreib uns",
+        "contactEmail": "info@fightthestroke.org"
+      },
+      "tldr": {
+        "heading": "Kurz gesagt (TL;DR)",
+        "point1": "Nur 4 notwendige Cookies (Authentifizierung und Barrierefreiheit)",
+        "point2": "Keine Werbe- oder Tracking-Cookies",
+        "point3": "Keine Analyse-Cookies installiert (Server-seitige Metriken)",
+        "point4": "Sub-Prozessoren (Vercel, Azure, Supabase) verwenden keine Cookies"
+      },
+      "sections": {
+        "whatAreCookies": {
+          "title": "Was sind Cookies",
+          "p1": "Cookies sind kleine Textdateien, die Websites auf Ihrem Gerät speichern (Computer, Telefon, Tablet). Sie helfen, nützliche Informationen zu merken, wie z.B. ob Sie bereits angemeldet sind.",
+          "p2": "Stellen Sie sich Cookies wie Notizblöcke vor, die die Website in Ihrem Browser hinterlässt, um sich an Sie zu erinnern."
+        },
+        "whichCookies": {
+          "title": "Welche Cookies wir verwenden",
+          "intro": "MirrorBuddy verwendet nur zwei Arten von Cookies",
+          "essential": "Notwendige Cookies",
+          "essentialDesc": "erforderlich, um die App zum Laufen zu bringen",
+          "analytics": "Analyse-Cookies",
+          "analyticsDesc": "helfen uns zu verstehen, ob die App gut funktioniert",
+          "disclaimer": "Wir verwenden NIEMALS Werbe-Cookies. Niemals. Wir haben keine Werbung."
+        },
+        "essentialCookies": {
+          "title": "Notwendige Cookies",
+          "intro": "Diese Cookies sind notwendig, um MirrorBuddy zu verwenden. Sie können sie nicht deaktivieren, da die App ohne sie nicht funktionieren würde.",
+          "note": "Das Authentifizierungs-Cookie verwendet HMAC-SHA256-Signatur zur Manipulationsprävention. Das httpOnly-Flag schützt vor unbefugtem JavaScript-Zugriff."
+        },
+        "metricsAnalytics": {
+          "title": "Metriken und Analyse",
+          "p1": "MirrorBuddy verwendet keine Cookies von Drittanbietern für Analysen. Ihre Cookie-Voreinstellungen werden im Browser (localStorage) gespeichert, nicht in einem Cookie.",
+          "h3Collection": "Wie wir Metriken erfassen",
+          "p2": "Wir erfassen technische Metriken (Web Vitals), um zu verstehen, ob die App gut funktioniert. Diese Metriken sind",
+          "serverSide": "Server-seitig erfasst",
+          "serverSideDesc": "keine Analyse-Cookies auf Ihrem Browser installiert",
+          "aggregated": "Aggregiert und anonym",
+          "aggregatedDesc": "wir identifizieren Sie nicht persönlich",
+          "technicalOnly": "Nur technisch",
+          "technicalOnlyDesc": "Ladegeschwindigkeit, Gerätetyp, Fehler",
+          "gdprCompliant": "DSGVO-konform",
+          "gdprCompliantDesc": "Daten werden gemäß Datenschutzrichtlinie verarbeitet",
+          "readMore": "Für weitere Details lesen Sie den Abschnitt \"Performance-Metriken\" in der"
+        },
+        "cookieManagement": {
+          "title": "Wie man Cookies verwaltet",
+          "inSettings": "In MirrorBuddy-Einstellungen",
+          "settingsDesc": "Sie können Analyse-Cookies direkt in der App verwalten. Gehen Sie zu Einstellungen und suchen Sie nach dem Abschnitt \"Datenschutz und Cookies\".",
+          "inBrowser": "Aus Ihrem Browser",
+          "browserDesc": "Sie können Cookies auch in Ihren Browser-Einstellungen verwalten. So geht's in den gängigsten Browsern",
+          "chromeLabel": "Chrome",
+          "chromeDesc": "Einstellungen → Datenschutz und Sicherheit → Cookies",
+          "firefoxLabel": "Firefox",
+          "firefoxDesc": "Einstellungen → Datenschutz → Cookies",
+          "safariLabel": "Safari",
+          "safariDesc": "Einstellungen → Datenschutz → Website-Daten verwalten",
+          "edgeLabel": "Edge",
+          "edgeDesc": "Einstellungen → Cookies und Website-Berechtigungen",
+          "warningTitle": "Warnung",
+          "warningText": "Wenn Sie alle Cookies blockieren, funktioniert MirrorBuddy möglicherweise nicht ordnungsgemäß. Wir empfehlen, mindestens notwendige Cookies zu aktivieren."
+        },
+        "thirdParty": {
+          "title": "Cookies von Drittanbietern und Sub-Prozessoren",
+          "p1": "MirrorBuddy verwendet keine Cookies von Drittanbietern für Werbung oder Tracking.",
+          "p2": "Unsere technischen Dienstanbieter (Sub-Prozessoren) installieren keine Cookies auf Ihrem Gerät",
+          "vercelLabel": "Vercel",
+          "vercelDesc": "Anwendungs-Hosting (keine Cookies, keine installierten Analytics)",
+          "supabaseLabel": "Supabase",
+          "supabaseDesc": "PostgreSQL-Datenbank (Server-seitige Kommunikation, keine Cookies)",
+          "azureLabel": "Azure OpenAI",
+          "azureDesc": "künstliche Intelligenz (Backend-API, keine Cookies)",
+          "resendLabel": "Resend",
+          "resendDesc": "E-Mail-Versand (Backend-Dienst, keine Cookies)",
+          "upstashLabel": "Upstash",
+          "upstashDesc": "Redis-Cache (Backend-Dienst, keine Cookies)",
+          "sentryLabel": "Sentry",
+          "sentryDesc": "Fehler- und Leistungsüberwachung (verwendet localStorage für Session Replay bei Fehlern, keine Cookies)",
+          "googleDriveLabel": "Google Drive (optional)",
+          "googleDriveDesc": "Wenn Sie Ihr Google-Konto verbinden, um Dokumente zu speichern, kann Google während der OAuth-Authentifizierung seine eigenen Cookies setzen. Zugriffstokens sind verschlüsselt und in unserer Datenbank gespeichert, nicht in Browser-Cookies.",
+          "seeMore": "Die vollständige Liste der Sub-Prozessoren finden Sie in der"
+        },
+        "duration": {
+          "title": "Wie lange sie bleiben",
+          "intro": "Cookies haben unterschiedliche Dauern",
+          "session": "Sitzungs-Cookies",
+          "sessionDesc": "verschwinden, wenn Sie den Browser schließen",
+          "persistent": "Persistente Cookies",
+          "persistentDesc": "bleiben bis zum Ablauf (max. 1 Jahr)",
+          "delete": "Sie können alle Cookies jederzeit aus Ihren Browser-Einstellungen löschen."
+        },
+        "changes": {
+          "title": "Änderungen an dieser Richtlinie",
+          "intro": "Wenn wir diese Cookie-Richtlinie ändern",
+          "point1": "Wir werden diese Seite aktualisieren",
+          "point2": "Wir werden das Datum \"Zuletzt aktualisiert\" ändern",
+          "point3": "Wenn die Änderungen wichtig sind, werden wir Sie um erneute Zustimmung bitten"
+        },
+        "links": {
+          "title": "Nützliche Links",
+          "intro": "Um mehr zu erfahren",
+          "privacyLabel": "Datenschutzrichtlinie",
+          "privacyDesc": "wie wir Ihre Daten behandeln",
+          "tosLabel": "Nutzungsbedingungen",
+          "tosDesc": "MirrorBuddy-Regeln"
+        }
+      },
+      "table": {
+        "ariaLabel": "Cookie-Liste",
+        "headers": {
+          "name": "Name",
+          "purpose": "Wofür es ist",
+          "duration": "Wie lange"
+        },
+        "rows": {
+          "userId": {
+            "purpose": "Authentifizierung: merkt sich wer Sie sind (kryptographisch signiert, httpOnly)",
+            "duration": "1 Jahr"
+          },
+          "userIdClient": {
+            "purpose": "Lesbare Kopie Ihrer ID für Client-seitige Funktionen (ohne sensible Daten)",
+            "duration": "1 Jahr"
+          },
+          "a11y": {
+            "purpose": "Barrierefreiheitseinstellungen (Schriftart, Kontrast, Bewegung)",
+            "duration": "90 Tage"
+          },
+          "admin": {
+            "purpose": "Zeigt Admin-Sitzung an (nur Personal)",
+            "duration": "Bis zum Abmelden"
+          }
+        }
+      }
     }
   }
 }

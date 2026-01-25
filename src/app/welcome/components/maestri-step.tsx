@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import {
   ArrowRight,
   ArrowLeft,
@@ -44,6 +45,7 @@ interface MaestriStepProps {
  * Highlights a few featured ones and allows scrolling through all.
  */
 export function MaestriStep(_props: MaestriStepProps) {
+  const t = useTranslations("welcome.principles");
   const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } =
     useOnboardingStore();
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -258,10 +260,7 @@ export function MaestriStep(_props: MaestriStepProps) {
           className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50"
         >
           <p className="text-gray-700 dark:text-gray-300 text-sm">
-            <strong>Come funziona?</strong> Ogni Professore è esperto nella sua
-            materia. Quando hai bisogno di aiuto con matematica, chiedi a
-            Euclide. Per l&apos;inglese, c&apos;è Shakespeare! Io ti aiuterò a
-            scegliere il Professore giusto per ogni situazione.
+            <strong>{t("how-it-works")}</strong> {t("how-it-works-desc")}
           </p>
         </motion.div>
 
