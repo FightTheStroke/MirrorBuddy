@@ -335,7 +335,19 @@
     "hero": {
       "title": "The School I'd Like",
       "subtitle": "Personalized AI teachers for your needs",
-      "cta": "Start Now"
+      "cta": "Start Now",
+      "welcome": "Welcome to",
+      "learn": "Learn",
+      "with-teachers": "WITH the Great Professors",
+      "any-ability": "whatever your abilities",
+      "readable-fonts": "Readable fonts",
+      "mind-maps": "Mind maps",
+      "text-to-speech": "Text to speech",
+      "adaptive-quizzes": "Adaptive quizzes"
+    },
+    "voice-fallback": {
+      "title": "Fallback Mode:",
+      "message": "Azure Realtime API not available. Melissa uses browser Web Speech API (synthetic voice, no conversation)."
     }
   },
   "buddies": {

@@ -1045,7 +1045,19 @@
     "hero": {
       "title": "La Escuela que Desearía",
       "subtitle": "Maestros IA personalizados para tus necesidades",
-      "cta": "Comienza Ahora"
+      "cta": "Comienza Ahora",
+      "welcome": "Bienvenido a",
+      "learn": "Aprende",
+      "with-teachers": "CON los Grandes Profesores",
+      "any-ability": "cualquiera que sean tus habilidades",
+      "readable-fonts": "Fuentes legibles",
+      "mind-maps": "Mapas mentales",
+      "text-to-speech": "Conversión de texto a voz",
+      "adaptive-quizzes": "Cuestionarios adaptativos"
+    },
+    "voice-fallback": {
+      "title": "Modo Alternativo:",
+      "message": "API Realtime de Azure no disponible. Melissa usa la API Web Speech del navegador (voz sintética, sin conversación)."
     }
   },
   "buddies": {

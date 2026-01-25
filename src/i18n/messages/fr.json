@@ -335,7 +335,19 @@
     "hero": {
       "title": "L'École que je souhaite",
       "subtitle": "Enseignants IA personnalisés pour vos besoins",
-      "cta": "Commencer Maintenant"
+      "cta": "Commencer Maintenant",
+      "welcome": "Bienvenue à",
+      "learn": "Apprenez",
+      "with-teachers": "AVEC les Grands Professeurs",
+      "any-ability": "quels que soient vos talents",
+      "readable-fonts": "Polices lisibles",
+      "mind-maps": "Cartes mentales",
+      "text-to-speech": "Synthèse vocale",
+      "adaptive-quizzes": "Questionnaires adaptatifs"
+    },
+    "voice-fallback": {
+      "title": "Mode Secours :",
+      "message": "L'API Realtime d'Azure n'est pas disponible. Mélissa utilise l'API Web Speech du navigateur (voix synthétique, pas de conversation)."
     }
   },
   "buddies": {

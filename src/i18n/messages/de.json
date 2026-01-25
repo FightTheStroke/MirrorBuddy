@@ -335,7 +335,19 @@
     "hero": {
       "title": "Die Schule, die ich mir wünsche",
       "subtitle": "Personalisierte KI-Lehrer für deine Bedürfnisse",
-      "cta": "Jetzt Starten"
+      "cta": "Jetzt Starten",
+      "welcome": "Willkommen bei",
+      "learn": "Lerne",
+      "with-teachers": "MIT den Großen Professoren",
+      "any-ability": "egal welche Fähigkeiten du hast",
+      "readable-fonts": "Lesbare Schriftarten",
+      "mind-maps": "Gedankenkarten",
+      "text-to-speech": "Sprachsynthese",
+      "adaptive-quizzes": "Adaptive Quizze"
+    },
+    "voice-fallback": {
+      "title": "Fallback-Modus:",
+      "message": "Azure Realtime API nicht verfügbar. Melissa nutzt die Web Speech API des Browsers (Sprachsynthese, keine Konversation)."
     }
   },
   "buddies": {

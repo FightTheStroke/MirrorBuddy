@@ -335,7 +335,19 @@
     "hero": {
       "title": "La Scuola Che Vorrei",
       "subtitle": "Insegnanti AI personalizzati per le tue esigenze",
-      "cta": "Inizia Ora"
+      "cta": "Inizia Ora",
+      "welcome": "Benvenuto in",
+      "learn": "Impara",
+      "with-teachers": "CON i Grandi Professori",
+      "any-ability": "qualunque siano le tue abilità",
+      "readable-fonts": "Font leggibili",
+      "mind-maps": "Mappe mentali",
+      "text-to-speech": "Sintesi vocale",
+      "adaptive-quizzes": "Quiz adattivi"
+    },
+    "voice-fallback": {
+      "title": "Modalità Fallback:",
+      "message": "Azure Realtime API non disponibile. Melissa usa Web Speech API del browser (voce sintetica, no conversazione)."
     }
   },
   "buddies": {

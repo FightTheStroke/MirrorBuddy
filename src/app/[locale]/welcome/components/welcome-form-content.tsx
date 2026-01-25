@@ -31,7 +31,7 @@ export function WelcomeFormContent({
   onContinue,
   onToggleMute,
 }: WelcomeFormContentProps) {
-  const t = useTranslations("welcome.form");
+  const t = useTranslations("welcome.welcome-form");
   const { isPlaying } = useOnboardingTTS({
     autoSpeak: !isVoiceMuted,
     text: ONBOARDING_SCRIPTS.welcome,
