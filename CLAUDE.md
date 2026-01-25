@@ -105,6 +105,30 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 
 **Parallelize** independent tool calls in single message.
 
+## i18n - Internationalization
+
+**Supported locales**: `it` (Italian, default) | `en` | `fr` | `de` | `es`
+
+**Translation workflow**:
+
+1. Add message key to appropriate namespace in `src/i18n/types.ts`
+2. Add translations to all JSON files in `src/i18n/messages/{locale}.json`
+3. Run `npm run i18n:check` to verify completeness
+4. Use hooks in components: `const t = useTranslations('namespace')`
+
+**Hook patterns**:
+
+- `useTranslations('namespace')` - Type-safe namespace access
+- `useTranslationsGlobal()` - Access all namespaces (use sparingly)
+- `useCommonTranslations()` - Quick access to common strings
+- `formatMessage(template, vars)` - Format outside components
+
+**Formality**: Formal address (Lei) for historical figures (pre-1900). See ADR 0064 and `src/lib/greeting/templates/index.ts`.
+
+**Skills**: `/localize` - Automated translation workflow
+
+**Full docs**: `src/i18n/README-LocaleProvider.md` | `src/i18n/types.ts`
+
 ## Skills
 
 | Skill              | When                      |
@@ -114,6 +138,7 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 | `/execute {id}`    | Run plan tasks            |
 | `/release`         | Release validation        |
 | `/frontend-design` | UI components             |
+| `/localize`        | Translation workflow      |
 
 ## Release Process
 
