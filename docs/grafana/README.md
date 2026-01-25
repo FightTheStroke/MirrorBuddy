@@ -54,7 +54,7 @@ grafana-cli admin import-dashboard ./tier-dashboard.json \
 
 ```bash
 curl -X POST "https://yourorg.grafana.net/api/dashboards/db" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Authorization: Bearer $GRAFANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d @tier-dashboard.json
 ```
@@ -118,7 +118,7 @@ npx tsx scripts/test-grafana-push.ts
 
    ```bash
    curl -X GET "https://yourorg.grafana.net/api/v1/query" \
-     -H "Authorization: Bearer YOUR_API_KEY" \
+     -H "Authorization: Bearer $GRAFANA_API_KEY" \
      -d 'query=mirrorbuddy_users_by_tier'
    ```
 
@@ -270,7 +270,7 @@ For locale metrics to populate correctly:
 
 ```bash
 curl -X POST "https://yourorg.grafana.net/api/dashboards/db" \
-  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Authorization: Bearer $GRAFANA_API_KEY" \
   -H "Content-Type: application/json" \
   -d @locale-dashboard.json
 ```

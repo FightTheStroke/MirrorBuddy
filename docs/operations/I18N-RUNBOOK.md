@@ -249,9 +249,9 @@ For the affected user:
 
 # OR via API (admin action)
 curl -X POST http://localhost:3000/api/admin/clear-locale-cache \
-  -H "Authorization: Bearer [admin-token]" \
+  -H "Authorization: Bearer $ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"userId": "[user-id]"}'
+  -d '{"userId": "user-id-here"}'
 
 # User refreshes page - should detect browser locale fresh
 ```
