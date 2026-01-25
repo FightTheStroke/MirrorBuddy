@@ -10,7 +10,7 @@ export {
   estimateTokens,
   type TextChunk,
   type ChunkOptions,
-} from './semantic-chunker';
+} from "./semantic-chunker";
 
 export {
   generateEmbedding,
@@ -19,7 +19,7 @@ export {
   getEmbeddingDimensions,
   cosineSimilarity,
   type EmbeddingResult,
-} from './embedding-service';
+} from "./embedding-service";
 
 export {
   storeEmbedding,
@@ -30,7 +30,7 @@ export {
   type VectorSearchResult,
   type SearchOptions,
   type DeleteOptions,
-} from './vector-store';
+} from "./vector-store";
 
 export {
   isPostgresDatabase,
@@ -44,7 +44,7 @@ export {
   type NativeSearchResult,
   type PrismaQueryClient,
   type PrismaExecuteClient,
-} from './pgvector-utils';
+} from "./pgvector-utils";
 
 export {
   findSimilarMaterials,
@@ -55,14 +55,23 @@ export {
   type FindRelatedOptions,
   type IndexMaterialInput,
   type IndexResult,
-} from './retrieval-service';
+} from "./retrieval-service";
 
 export {
   hybridSearch,
   textSimilarity,
   type HybridRetrievalResult,
   type HybridSearchOptions,
-} from './hybrid-retrieval';
+} from "./hybrid-retrieval";
+
+// Reranker for improved retrieval precision (P2 quality improvement)
+export {
+  rerank,
+  type RerankerDocument,
+  type RerankedDocument,
+  type RerankerOptions,
+  type RerankerSignals,
+} from "./reranker";
 
 // Privacy-aware embeddings (Ethical Design Hardening F-04)
 export {
@@ -72,4 +81,4 @@ export {
   anonymizeConversationForRAG,
   type PrivacyAwareEmbeddingResult,
   type PrivacyEmbeddingOptions,
-} from './privacy-aware-embedding';
+} from "./privacy-aware-embedding";

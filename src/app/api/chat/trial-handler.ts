@@ -9,7 +9,8 @@ import {
   getOrCreateTrialSession,
   checkTrialLimits,
   incrementUsage,
-  TRIAL_LIMITS,
+  checkAndIncrementUsage,
+  getTierLimitsForTrial,
 } from "@/lib/trial/trial-service";
 
 const log = logger.child({ module: "api/chat/trial-handler" });
@@ -80,32 +81,37 @@ export async function checkTrialForAnonymous(
     // Get or create trial session
     const session = await getOrCreateTrialSession(ip, visitorId, userId);
 
-    // Check trial limits
-    const limitCheck = await checkTrialLimits(session.id, "chat");
+    // F-02: Atomic check and increment to prevent race condition
+    // Uses Serializable transaction isolation - if limit reached, returns false
+    // If allowed, increments usage atomically before returning
+    const atomicResult = await checkAndIncrementUsage(session.id, "chat");
 
-    if (!limitCheck.allowed) {
-      log.info("Trial chat limit reached", {
+    if (!atomicResult.allowed) {
+      log.info("Trial chat limit reached (atomic check)", {
         sessionId: session.id.slice(0, 8),
-        chatsUsed: session.chatsUsed,
+        reason: atomicResult.reason,
       });
       return {
         allowed: false,
         sessionId: session.id,
-        reason: limitCheck.reason,
+        reason: atomicResult.reason,
         chatsRemaining: 0,
       };
     }
 
+    // Get dynamic limits from TierService
+    const limits = await getTierLimitsForTrial();
+
     return {
       allowed: true,
       sessionId: session.id,
-      chatsRemaining: Math.max(0, TRIAL_LIMITS.CHAT - session.chatsUsed),
-      toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
+      chatsRemaining: atomicResult.remaining,
+      toolsRemaining: Math.max(0, limits.tools - session.toolsUsed),
     };
   } catch (error) {
-    log.error("Trial check failed", { error: String(error) });
-    // On error, allow access (graceful degradation)
-    return { allowed: true };
+    log.warn("Trial check failed", { error: String(error) });
+    // SECURITY: On error, deny access (fail-closed principle)
+    return { allowed: false, reason: "Trial verification failed" };
   }
 }
 
@@ -120,27 +126,51 @@ export async function checkTrialToolLimit(
 
 /**
  * Increment trial chat usage after successful chat
+ *
+ * @deprecated Since F-02 fix, usage is now incremented atomically in checkTrialForAnonymous().
+ * This function is a no-op for backward compatibility. New code should not call this.
  */
 export async function incrementTrialUsage(sessionId: string): Promise<void> {
+  // F-02: No-op - increment now happens atomically in checkTrialForAnonymous()
+  // Kept for backward compatibility with existing callers
+  log.debug("incrementTrialUsage called (no-op since F-02 atomic fix)", {
+    sessionId: sessionId.slice(0, 8),
+  });
+}
+
+/**
+ * Check and increment trial tool usage atomically (F-02 fix)
+ * Returns { allowed: boolean, remaining: number } to indicate if tool use is permitted
+ */
+export async function checkAndIncrementTrialToolUsage(
+  sessionId: string,
+): Promise<{ allowed: boolean; remaining: number; reason?: string }> {
   try {
-    await incrementUsage(sessionId, "chat");
-    log.debug("Trial chat usage incremented", {
+    const result = await checkAndIncrementUsage(sessionId, "tool");
+    log.debug("Trial tool usage check+increment (atomic)", {
       sessionId: sessionId.slice(0, 8),
+      allowed: result.allowed,
+      remaining: result.remaining,
     });
+    return result;
   } catch (error) {
-    log.error("Failed to increment trial usage", { error: String(error) });
+    log.error("Failed atomic tool usage check", { error: String(error) });
+    return { allowed: false, remaining: 0, reason: "Tool check failed" };
   }
 }
 
 /**
  * Increment trial tool usage after successful tool call
+ *
+ * @deprecated Since F-02 fix, use checkAndIncrementTrialToolUsage() for atomic operations.
+ * This function still works but doesn't prevent race conditions.
  */
 export async function incrementTrialToolUsage(
   sessionId: string,
 ): Promise<void> {
   try {
     await incrementUsage(sessionId, "tool");
-    log.debug("Trial tool usage incremented", {
+    log.debug("Trial tool usage incremented (legacy)", {
       sessionId: sessionId.slice(0, 8),
     });
   } catch (error) {

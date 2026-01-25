@@ -20,11 +20,28 @@ vi.mock("@/lib/db", () => ({
     user: {
       findUnique: vi.fn(),
     },
+    $transaction: vi.fn(), // Transaction at root level
   },
 }));
 
+// Mock TierService to avoid actual DB calls
+vi.mock("@/lib/tier/tier-service", () => ({
+  TierService: vi.fn().mockImplementation(() => ({
+    getLimitsForUser: vi.fn().mockResolvedValue({
+      dailyMessages: 10,
+      dailyVoiceMinutes: 5,
+      dailyTools: 10,
+      maxDocuments: 1,
+    }),
+  })),
+}));
+
 import { prisma } from "@/lib/db";
-import { getOrCreateTrialSession, TRIAL_LIMITS } from "../trial-service";
+import {
+  getOrCreateTrialSession,
+  TRIAL_LIMITS,
+  checkAndIncrementUsage,
+} from "../trial-service";
 
 describe("Trial Service", () => {
   beforeEach(() => {
@@ -148,6 +165,95 @@ describe("Trial Service", () => {
       const maestriJson = createCall.data.assignedMaestri as string;
       const maestri = JSON.parse(maestriJson);
       expect(maestri).toHaveLength(0); // No maestri restrictions
+    });
+  });
+
+  describe("checkAndIncrementUsage - Concurrency Safety (F-02)", () => {
+    it("prevents race condition: 10 concurrent requests with limit=5 -> exactly 5 succeed", async () => {
+      const sessionId = "test-session-123";
+      const limit = 5;
+      let currentUsage = 0;
+
+      // Mock $transaction at prisma root level (not trialSession)
+      vi.mocked(prisma.$transaction as any).mockImplementation(
+        async (fn: any) => {
+          // Execute the transaction function with a mock prisma client
+          return fn({
+            trialSession: {
+              findUnique: async () => ({
+                id: sessionId,
+                chatsUsed: currentUsage,
+                docsUsed: 0,
+                voiceSecondsUsed: 0,
+                toolsUsed: 0,
+              }),
+              update: async () => {
+                // Simulate atomic increment
+                if (currentUsage < limit) {
+                  currentUsage++;
+                  return {
+                    id: sessionId,
+                    chatsUsed: currentUsage,
+                    docsUsed: 0,
+                    voiceSecondsUsed: 0,
+                    toolsUsed: 0,
+                  };
+                }
+                throw new Error("Limit exceeded");
+              },
+            },
+          });
+        },
+      );
+
+      // Launch 10 concurrent requests
+      const requests = Array.from({ length: 10 }, () =>
+        checkAndIncrementUsage(sessionId, "chat").catch((err) => ({
+          allowed: false,
+          error: err.message,
+        })),
+      );
+
+      const results = await Promise.all(requests);
+
+      // Count successes and failures
+      const successes = results.filter((r) => r.allowed === true);
+      const failures = results.filter((r) => r.allowed === false);
+
+      // CRITICAL: Exactly 5 should succeed, 5 should fail
+      expect(successes).toHaveLength(limit);
+      expect(failures).toHaveLength(10 - limit);
+      expect(currentUsage).toBe(limit);
+    });
+
+    it("returns remaining count after increment", async () => {
+      const sessionId = "test-session-456";
+      let currentUsage = 3;
+
+      vi.mocked(prisma.$transaction as any).mockImplementation(
+        async (fn: any) => {
+          return fn({
+            trialSession: {
+              findUnique: async () => ({
+                id: sessionId,
+                chatsUsed: currentUsage,
+              }),
+              update: async () => {
+                currentUsage++;
+                return {
+                  id: sessionId,
+                  chatsUsed: currentUsage,
+                };
+              },
+            },
+          });
+        },
+      );
+
+      const result = await checkAndIncrementUsage(sessionId, "chat");
+
+      expect(result.allowed).toBe(true);
+      expect(result.remaining).toBe(10 - currentUsage); // 10 = default chat limit
     });
   });
 });

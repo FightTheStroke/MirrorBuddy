@@ -5,20 +5,24 @@
  * @module rag/hybrid-retrieval
  */
 
-import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
-import { generateEmbedding } from './embedding-service';
-import { searchSimilar, type VectorSearchResult } from './vector-store';
-import { cosineSimilarity } from './embedding-service';
+import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/db";
+import { generateEmbedding } from "./embedding-service";
+import { searchSimilar, type VectorSearchResult } from "./vector-store";
+import { cosineSimilarity } from "./embedding-service";
+import { rerank } from "./reranker";
 import type {
   HybridRetrievalResult,
   HybridSearchOptions,
   KeywordSearchOptions,
   KeywordMatch,
-} from './hybrid-types';
+} from "./hybrid-types";
 
 // Re-export types
-export type { HybridRetrievalResult, HybridSearchOptions } from './hybrid-types';
+export type {
+  HybridRetrievalResult,
+  HybridSearchOptions,
+} from "./hybrid-types";
 
 /**
  * Extract keywords from query for keyword search
@@ -26,17 +30,65 @@ export type { HybridRetrievalResult, HybridSearchOptions } from './hybrid-types'
  */
 function extractKeywords(query: string): string[] {
   const stopWords = new Set([
-    'il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una',
-    'di', 'a', 'da', 'in', 'con', 'su', 'per', 'tra', 'fra',
-    'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at',
-    'to', 'for', 'of', 'with', 'by', 'from', 'is', 'are', 'was', 'were',
-    'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did',
-    'che', 'e', 'non', 'come', 'cosa', 'dove', 'quando', 'perché',
+    "il",
+    "lo",
+    "la",
+    "i",
+    "gli",
+    "le",
+    "un",
+    "uno",
+    "una",
+    "di",
+    "a",
+    "da",
+    "in",
+    "con",
+    "su",
+    "per",
+    "tra",
+    "fra",
+    "the",
+    "a",
+    "an",
+    "and",
+    "or",
+    "but",
+    "in",
+    "on",
+    "at",
+    "to",
+    "for",
+    "of",
+    "with",
+    "by",
+    "from",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "che",
+    "e",
+    "non",
+    "come",
+    "cosa",
+    "dove",
+    "quando",
+    "perché",
   ]);
 
   return query
     .toLowerCase()
-    .replace(/[^\w\s]/g, ' ')
+    .replace(/[^\w\s]/g, " ")
     .split(/\s+/)
     .filter((word) => word.length > 2 && !stopWords.has(word));
 }
@@ -44,7 +96,9 @@ function extractKeywords(query: string): string[] {
 /**
  * Perform keyword-based search on content embeddings
  */
-async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatch[]> {
+async function keywordSearch(
+  options: KeywordSearchOptions,
+): Promise<KeywordMatch[]> {
   const { userId, keywords, limit, sourceType, subject } = options;
 
   if (keywords.length === 0) {
@@ -67,15 +121,17 @@ async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatc
   }
 
   // Build keyword ILIKE conditions (OR) - PostgreSQL uses ILIKE for case-insensitive
-  const keywordConditions = keywords.map(() => `content ILIKE $${paramIndex++}`);
-  conditions.push(`(${keywordConditions.join(' OR ')})`);
+  const keywordConditions = keywords.map(
+    () => `content ILIKE $${paramIndex++}`,
+  );
+  conditions.push(`(${keywordConditions.join(" OR ")})`);
   keywords.forEach((kw) => params.push(`%${kw}%`));
 
   // Add limit parameter
   params.push(limit * 2);
   const limitParam = paramIndex;
 
-  const whereClause = conditions.join(' AND ');
+  const whereClause = conditions.join(" AND ");
 
   // Query using raw SQL for PostgreSQL
   type RawEmbedding = {
@@ -93,14 +149,14 @@ async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatc
      FROM "ContentEmbedding"
      WHERE ${whereClause}
      LIMIT $${limitParam}`,
-    ...params
+    ...params,
   )) as RawEmbedding[];
 
   // Calculate match count for each result
   return results.map((row) => {
     const contentLower = row.content.toLowerCase();
     const matchCount = keywords.reduce((count, kw) => {
-      const regex = new RegExp(kw, 'gi');
+      const regex = new RegExp(kw, "gi");
       const matches = contentLower.match(regex);
       return count + (matches ? matches.length : 0);
     }, 0);
@@ -123,7 +179,7 @@ async function keywordSearch(options: KeywordSearchOptions): Promise<KeywordMatc
  * Uses Reciprocal Rank Fusion (RRF) for score combination
  */
 export async function hybridSearch(
-  options: HybridSearchOptions
+  options: HybridSearchOptions,
 ): Promise<HybridRetrievalResult[]> {
   const {
     userId,
@@ -136,7 +192,7 @@ export async function hybridSearch(
     excludeSourceIds = [],
   } = options;
 
-  logger.debug('[HybridRetrieval] Starting hybrid search', {
+  logger.debug("[HybridRetrieval] Starting hybrid search", {
     userId,
     queryLength: query.length,
     limit,
@@ -224,12 +280,41 @@ export async function hybridSearch(
 
   // Sort by combined score and limit
   combinedResults.sort((a, b) => b.combinedScore - a.combinedScore);
-  const limited = combinedResults.slice(0, limit);
+  let limited = combinedResults.slice(0, limit);
 
-  logger.debug('[HybridRetrieval] Search complete', {
+  // Apply reranking if enabled (P2 quality improvement)
+  if (options.enableReranking && limited.length > 0) {
+    logger.debug("[HybridRetrieval] Applying reranker", {
+      candidateCount: limited.length,
+    });
+
+    const reranked = rerank(
+      query,
+      limited.map((doc) => ({
+        id: doc.id,
+        content: doc.content,
+        originalScore: doc.combinedScore,
+        metadata: { sourceType: doc.sourceType, sourceId: doc.sourceId },
+      })),
+      { topK: limit },
+    );
+
+    // Merge reranked scores back
+    const rerankedMap = new Map(reranked.map((r) => [r.id, r.rerankedScore]));
+    limited = limited
+      .map((doc) => ({
+        ...doc,
+        rerankedScore: rerankedMap.get(doc.id),
+      }))
+      .filter((doc) => doc.rerankedScore !== undefined)
+      .sort((a, b) => (b.rerankedScore ?? 0) - (a.rerankedScore ?? 0));
+  }
+
+  logger.debug("[HybridRetrieval] Search complete", {
     semanticResultCount: semanticResults.length,
     keywordResultCount: keywordResults.length,
     combinedResultCount: limited.length,
+    reranked: options.enableReranking ?? false,
   });
 
   return limited;
@@ -239,7 +324,10 @@ export async function hybridSearch(
  * Calculate similarity between two texts using embeddings
  * Useful for comparing specific content pieces
  */
-export async function textSimilarity(text1: string, text2: string): Promise<number> {
+export async function textSimilarity(
+  text1: string,
+  text2: string,
+): Promise<number> {
   const [embedding1, embedding2] = await Promise.all([
     generateEmbedding(text1),
     generateEmbedding(text2),

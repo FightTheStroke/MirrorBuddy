@@ -16,6 +16,8 @@ export interface HybridRetrievalResult {
   keywordScore: number;
   subject: string | null;
   tags: string[];
+  /** Reranked score (only present if enableReranking=true) */
+  rerankedScore?: number;
 }
 
 /**
@@ -26,10 +28,12 @@ export interface HybridSearchOptions {
   query: string;
   limit?: number;
   minScore?: number;
-  sourceType?: 'material' | 'flashcard' | 'studykit' | 'message';
+  sourceType?: "material" | "flashcard" | "studykit" | "message";
   subject?: string;
   semanticWeight?: number;
   excludeSourceIds?: string[];
+  /** Enable reranking after initial retrieval (P2 quality improvement) */
+  enableReranking?: boolean;
 }
 
 /**

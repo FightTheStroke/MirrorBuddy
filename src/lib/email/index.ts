@@ -11,6 +11,7 @@
 
 import { Resend } from "resend";
 import { logger } from "@/lib/logger";
+import { CircuitBreaker, withRetry } from "@/lib/resilience/circuit-breaker";
 
 const log = logger.child({ module: "email" });
 
@@ -29,6 +30,74 @@ function getResendClient(): Resend | null {
   }
 
   return resendClient;
+}
+
+/**
+ * Email circuit breaker - shared across all email operations
+ * Opens after 3 failures, 2-minute timeout for email operations
+ * Exported for testing purposes (to reset between tests)
+ */
+export const emailCircuitBreaker = new CircuitBreaker({
+  failureThreshold: 3,
+  timeout: 120000, // 2 minutes (email can be slow)
+  onStateChange: (from, to) => {
+    log.warn(`Email circuit breaker state change: ${from} -> ${to}`);
+  },
+});
+
+/**
+ * Determine if an email error is retryable
+ * Rate limits and server errors are retryable
+ * Invalid input and auth errors are not retryable
+ */
+function isRetryableEmailError(error: Error): boolean {
+  const errorMessage = error.message.toLowerCase();
+  const errorData = error as Error & { statusCode?: number; status?: number };
+  const statusCode = errorData?.statusCode || errorData?.status;
+
+  // Check for status codes
+  if (statusCode) {
+    // Retryable: rate limit, server errors, service unavailable
+    if (
+      statusCode === 429 ||
+      statusCode === 500 ||
+      statusCode === 503 ||
+      statusCode === 502
+    ) {
+      return true;
+    }
+    // Non-retryable: bad request, auth, forbidden, not found
+    if (
+      statusCode === 400 ||
+      statusCode === 401 ||
+      statusCode === 403 ||
+      statusCode === 404
+    ) {
+      return false;
+    }
+  }
+
+  // Check error message patterns
+  if (
+    errorMessage.includes("rate limit") ||
+    errorMessage.includes("timeout") ||
+    errorMessage.includes("server error") ||
+    errorMessage.includes("unavailable")
+  ) {
+    return true;
+  }
+
+  if (
+    errorMessage.includes("invalid") ||
+    errorMessage.includes("unauthorized") ||
+    errorMessage.includes("forbidden") ||
+    errorMessage.includes("not found")
+  ) {
+    return false;
+  }
+
+  // Default: retry unknown errors
+  return true;
 }
 
 /**
@@ -92,19 +161,38 @@ export async function sendEmail(
   }
 
   try {
-    const { data, error } = await client.emails.send({
-      from,
-      to: Array.isArray(options.to) ? options.to : [options.to],
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-      replyTo: options.replyTo,
-    });
+    // Execute with circuit breaker and retry logic
+    const data = await emailCircuitBreaker.execute(async () => {
+      return withRetry(
+        async () => {
+          const { data, error } = await client.emails.send({
+            from,
+            to: Array.isArray(options.to) ? options.to : [options.to],
+            subject: options.subject,
+            html: options.html,
+            text: options.text,
+            replyTo: options.replyTo,
+          });
 
-    if (error) {
-      log.error("Resend API error", { error, to: options.to });
-      return { success: false, error: error.message };
-    }
+          // Convert Resend error response to thrown error for retry logic
+          if (error) {
+            const err = new Error(error.message) as Error & {
+              statusCode?: number;
+            };
+            err.statusCode = (error as { statusCode?: number }).statusCode;
+            throw err;
+          }
+
+          return data;
+        },
+        {
+          maxRetries: 2,
+          baseDelayMs: 2000,
+          maxDelayMs: 10000,
+          retryableErrors: isRetryableEmailError,
+        },
+      );
+    });
 
     log.info("Email sent", { messageId: data?.id, to: options.to });
     return { success: true, messageId: data?.id };

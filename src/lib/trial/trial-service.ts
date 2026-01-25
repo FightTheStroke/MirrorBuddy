@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
-import { TierService } from "@/lib/tier/tier-service";
+import {
+  checkAndIncrementUsage,
+  getTierLimitsForTrial,
+} from "./trial-atomic-operations";
+
+// Re-export atomic operations for backward compatibility
+export { checkAndIncrementUsage, getTierLimitsForTrial };
 
 // Available coaches from src/data/coaches/
 const COACHES = ["melissa", "laura"];
@@ -21,55 +27,6 @@ export const TRIAL_LIMITS = {
   TOOLS: 10, // 10 tool uses (mindmap, summary, etc.)
   DOCS: 1, // 1 document upload
 } as const;
-
-/**
- * Internal cache for tier limits to avoid repeated DB calls
- */
-let cachedLimits: {
-  chat: number;
-  voiceSeconds: number;
-  tools: number;
-  docs: number;
-} | null = null;
-
-/**
- * Get trial limits from TierService
- * Fetches limits for anonymous users (trial tier)
- */
-async function getTierLimitsForTrial(): Promise<{
-  chat: number;
-  voiceSeconds: number;
-  tools: number;
-  docs: number;
-}> {
-  // Return cached limits if available
-  if (cachedLimits) {
-    return cachedLimits;
-  }
-
-  try {
-    const tierService = new TierService();
-    const limits = await tierService.getLimitsForUser(null); // null = anonymous/trial user
-
-    cachedLimits = {
-      chat: limits.dailyMessages,
-      voiceSeconds: limits.dailyVoiceMinutes * 60, // Convert minutes to seconds
-      tools: limits.dailyTools,
-      docs: limits.maxDocuments,
-    };
-
-    return cachedLimits;
-  } catch (error) {
-    // Fallback to hardcoded limits if TierService fails
-    console.error("Failed to fetch trial limits from TierService:", error);
-    return {
-      chat: TRIAL_LIMITS.CHAT,
-      voiceSeconds: TRIAL_LIMITS.VOICE_SECONDS,
-      tools: TRIAL_LIMITS.TOOLS,
-      docs: TRIAL_LIMITS.DOCS,
-    };
-  }
-}
 
 function hashIp(ip: string): string {
   return crypto.createHash("sha256").update(ip).digest("hex");
