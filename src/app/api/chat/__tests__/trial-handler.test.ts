@@ -11,10 +11,12 @@ vi.mock("@/lib/trial/trial-service", () => ({
   getOrCreateTrialSession: vi.fn(),
   incrementUsage: vi.fn(),
   checkAndIncrementUsage: vi.fn(),
-  TRIAL_LIMITS: {
-    CHAT: 10,
-    TOOLS: 10,
-  },
+  getTierLimitsForTrial: vi.fn().mockResolvedValue({
+    chat: 10,
+    voiceSeconds: 300,
+    tools: 10,
+    docs: 1,
+  }),
 }));
 
 // Mock Next.js server functions

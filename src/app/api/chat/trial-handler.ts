@@ -10,7 +10,7 @@ import {
   checkTrialLimits,
   incrementUsage,
   checkAndIncrementUsage,
-  TRIAL_LIMITS,
+  getTierLimitsForTrial,
 } from "@/lib/trial/trial-service";
 
 const log = logger.child({ module: "api/chat/trial-handler" });
@@ -99,11 +99,14 @@ export async function checkTrialForAnonymous(
       };
     }
 
+    // Get dynamic limits from TierService
+    const limits = await getTierLimitsForTrial();
+
     return {
       allowed: true,
       sessionId: session.id,
       chatsRemaining: atomicResult.remaining,
-      toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
+      toolsRemaining: Math.max(0, limits.tools - session.toolsUsed),
     };
   } catch (error) {
     log.warn("Trial check failed", { error: String(error) });
