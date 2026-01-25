@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback } from "react";
 import {
   Search,
   Filter,
@@ -24,13 +24,13 @@ import {
   Mic,
   Drama,
   Waves,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
-import { MaestroCard } from './maestro-card';
-import { PageHeader } from '@/components/ui/page-header';
-import { maestri, subjectNames, subjectColors, getAllSubjects } from '@/data';
-import { cn } from '@/lib/utils';
-import type { Maestro, Subject } from '@/types';
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
+import { MaestroCard } from "./maestro-card";
+import { PageHeader } from "@/components/ui/page-header";
+import { maestri, subjectNames, subjectColors, getAllSubjects } from "@/data";
+import { cn } from "@/lib/utils";
+import type { Maestro, Subject } from "@/types";
 
 // Map subjects to Lucide icon components
 const subjectLucideIcons: Record<Subject, LucideIcon> = {
@@ -56,15 +56,17 @@ const subjectLucideIcons: Record<Subject, LucideIcon> = {
   sport: Waves,
 };
 
-type SessionMode = 'voice' | 'chat';
+type SessionMode = "voice" | "chat";
 
 interface MaestriGridProps {
   onMaestroSelect?: (maestro: Maestro, mode: SessionMode) => void;
 }
 
 export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSubject, setSelectedSubject] = useState<Subject | 'all'>('all');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState<Subject | "all">(
+    "all",
+  );
 
   const subjects = getAllSubjects();
 
@@ -79,19 +81,22 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
           subjectNames[m.subject].toLowerCase().includes(query);
 
         const matchesSubject =
-          selectedSubject === 'all' || m.subject === selectedSubject;
+          selectedSubject === "all" || m.subject === selectedSubject;
 
         return matchesSearch && matchesSubject;
       })
-      .sort((a, b) => a.name.localeCompare(b.name, 'it'));
+      .sort((a, b) => a.name.localeCompare(b.name, "it"));
   }, [searchQuery, selectedSubject]);
 
   // Memoize click handler
-  const handleSelect = useCallback((maestro: Maestro) => {
-    if (onMaestroSelect) {
-      onMaestroSelect(maestro, 'voice');
-    }
-  }, [onMaestroSelect]);
+  const handleSelect = useCallback(
+    (maestro: Maestro) => {
+      if (onMaestroSelect) {
+        onMaestroSelect(maestro, "voice");
+      }
+    },
+    [onMaestroSelect],
+  );
 
   return (
     <div className="space-y-4">
@@ -99,24 +104,46 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-full sm:w-auto">
+        <div className="relative w-full sm:w-96">
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
-            type="text"
+            type="search"
             placeholder="Cerca..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full sm:w-40 pl-8 pr-3 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+            className="w-full pl-8 pr-10 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
             aria-label="Cerca professore o materia"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-11 w-11 flex items-center justify-center rounded-md hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+              aria-label="Cancella ricerca"
+              type="button"
+            >
+              <svg
+                className="w-4 h-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
+          )}
         </div>
         <button
-          onClick={() => setSelectedSubject('all')}
+          onClick={() => setSelectedSubject("all")}
           className={cn(
-            'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
-            selectedSubject === 'all'
-              ? 'bg-violet-600 text-white'
-              : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+            "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+            selectedSubject === "all"
+              ? "bg-violet-600 text-white"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700",
           )}
         >
           Tutti
@@ -129,12 +156,16 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
               key={subject}
               onClick={() => setSelectedSubject(subject)}
               className={cn(
-                'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                 isSelected
-                  ? 'text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  ? "text-white"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700",
               )}
-              style={isSelected ? { backgroundColor: subjectColors[subject] } : undefined}
+              style={
+                isSelected
+                  ? { backgroundColor: subjectColors[subject] }
+                  : undefined
+              }
               aria-pressed={isSelected}
             >
               <SubjectIcon className="w-4 h-4" aria-hidden="true" />
@@ -145,9 +176,14 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
       </div>
 
       {/* Grid - compact cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {filteredMaestri.map((maestro, index) => (
-          <MaestroCard key={maestro.id} maestro={maestro} onSelect={handleSelect} index={index} />
+          <MaestroCard
+            key={maestro.id}
+            maestro={maestro}
+            onSelect={handleSelect}
+            index={index}
+          />
         ))}
       </div>
 
@@ -163,7 +199,6 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
           </p>
         </div>
       )}
-
     </div>
   );
 }
