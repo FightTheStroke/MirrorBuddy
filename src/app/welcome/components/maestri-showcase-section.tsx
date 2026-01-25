@@ -6,36 +6,19 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { maestri, SUBJECT_NAMES } from "@/data/maestri";
 
-const DISPLAY_COUNT = 5;
-
-/**
- * Shuffle array using Fisher-Yates algorithm
- */
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
 /**
  * Professori Showcase Section - Horizontal Carousel
  *
  * THE PRIMARY VALUE PROPOSITION of MirrorBuddy:
  * Learn WITH the greatest minds in history, not just ABOUT them.
  *
- * Shows 5 random professors in a scrollable horizontal carousel.
+ * Shows ALL professors in a scrollable horizontal carousel (5 visible at a time).
  */
 export function MaestriShowcaseSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Randomize and pick 5 professors
-  const displayedMaestri = useMemo(
-    () => shuffleArray(maestri).slice(0, DISPLAY_COUNT),
-    [],
-  );
+  // Show all professors - carousel allows scrolling to see them all
+  const displayedMaestri = useMemo(() => maestri, []);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {

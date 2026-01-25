@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
+import { User, Building2 } from "lucide-react";
 
 interface SegmentedToggleProps {
   value: "individuals" | "organizations";
@@ -12,8 +13,8 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const options = [
-    { id: "individuals", label: "Individui" },
-    { id: "organizations", label: "Organizzazioni" },
+    { id: "individuals", label: "Studenti & Famiglie", icon: User },
+    { id: "organizations", label: "Scuole & Aziende", icon: Building2 },
   ] as const;
 
   const handleKeyDown = (e: React.KeyboardEvent, optionId: string) => {
@@ -69,12 +70,13 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
               role="tab"
               aria-selected={isActive}
               aria-label={`Switch to ${option.label}`}
-              className={`relative px-6 py-2 font-semibold text-sm transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
+              className={`relative flex items-center gap-2 px-6 py-2.5 font-semibold text-sm transition-all duration-200 rounded-full focus:outline-none focus:ring-2 focus:ring-purple-400 focus:ring-offset-2 dark:focus:ring-offset-gray-900 ${
                 isActive
                   ? "text-white shadow-md"
                   : "text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
               }`}
             >
+              <option.icon className="w-4 h-4" aria-hidden="true" />
               {option.label}
             </button>
           </div>

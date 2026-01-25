@@ -7,20 +7,6 @@ import { ChevronLeft, ChevronRight, Lightbulb, Heart } from "lucide-react";
 import { getAllSupportTeachers } from "@/data/support-teachers";
 import { getAllBuddies } from "@/data/buddy-profiles";
 
-/**
- * Shuffle array using Fisher-Yates algorithm
- */
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array];
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-  return shuffled;
-}
-
-const DISPLAY_COUNT = 5;
-
 interface SupportMember {
   id: string;
   name: string;
@@ -63,7 +49,7 @@ export function SupportSection() {
       })),
     ];
 
-    return shuffleArray(members).slice(0, DISPLAY_COUNT);
+    return members;
   }, []);
 
   const scroll = (direction: "left" | "right") => {
