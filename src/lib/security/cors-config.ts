@@ -26,6 +26,12 @@ export function getAllowedOrigins(): string[] {
   // Production: Parse from environment variable
   const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
   if (!allowedOriginsEnv) {
+    // F-04: Warn in production if ALLOWED_ORIGINS is not configured
+    console.warn(
+      "[CORS] WARNING: ALLOWED_ORIGINS not configured in production. " +
+        "All cross-origin requests will be blocked. " +
+        "Set ALLOWED_ORIGINS=https://yourdomain.com in environment variables.",
+    );
     return [];
   }
 
