@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ResponsiveTable } from "@/components/admin/responsive-table";
 
 interface TosAcceptance {
   id: string;
@@ -67,7 +68,7 @@ export function AcceptancesTable({
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        <ResponsiveTable>
           <table className="w-full">
             <thead className="border-b border-border">
               <tr>
@@ -112,7 +113,7 @@ export function AcceptancesTable({
               ))}
             </tbody>
           </table>
-        </div>
+        </ResponsiveTable>
 
         {/* Pagination */}
         <div className="flex items-center justify-between mt-6 pt-6 border-t border-border">

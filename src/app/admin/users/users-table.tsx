@@ -12,6 +12,7 @@ import {
   TableHead,
   TableEmpty,
 } from "@/components/ui/table";
+import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { UsersBulkActions } from "./users-bulk-actions";
 import { UsersSearch } from "./users-search";
 import { UsersTrashToolbar } from "./users-trash-toolbar";
@@ -186,63 +187,65 @@ export function UsersTable({
           />
         )}
 
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {filter !== "trash" && (
-                <TableHead className="w-10">
-                  <input
-                    type="checkbox"
-                    checked={
-                      selectedIds.size === filteredUsers.length &&
-                      filteredUsers.length > 0
-                    }
-                    onChange={toggleSelectAll}
-                    className="rounded"
-                  />
+        <ResponsiveTable caption="Users table">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                {filter !== "trash" && (
+                  <TableHead className="w-10">
+                    <input
+                      type="checkbox"
+                      checked={
+                        selectedIds.size === filteredUsers.length &&
+                        filteredUsers.length > 0
+                      }
+                      onChange={toggleSelectAll}
+                      className="rounded"
+                    />
+                  </TableHead>
+                )}
+                <TableHead>Username</TableHead>
+                <TableHead>Email</TableHead>
+                {filter !== "trash" && (
+                  <>
+                    <TableHead>Role</TableHead>
+                    <TableHead>Tier</TableHead>
+                    <TableHead>Status</TableHead>
+                  </>
+                )}
+                <TableHead>
+                  {filter === "trash" ? "Eliminato" : "Creato"}
                 </TableHead>
-              )}
-              <TableHead>Username</TableHead>
-              <TableHead>Email</TableHead>
-              {filter !== "trash" && (
-                <>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Tier</TableHead>
-                  <TableHead>Status</TableHead>
-                </>
-              )}
-              <TableHead>
-                {filter === "trash" ? "Eliminato" : "Creato"}
-              </TableHead>
-              <TableHead>Azioni</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filter === "trash"
-              ? deletedBackups.map((b) => (
-                  <UsersTrashRow
-                    key={b.userId}
-                    backup={b}
-                    isLoading={isLoading === b.userId}
-                    onRestore={() => handleAction(b.userId, "restore")}
-                  />
-                ))
-              : filteredUsers.map((user) => (
-                  <UsersTableRow
-                    key={user.id}
-                    user={user}
-                    isSelected={selectedIds.has(user.id)}
-                    isLoading={isLoading === user.id}
-                    onSelect={() => toggleSelect(user.id)}
-                    onToggle={() =>
-                      handleAction(user.id, "toggle", user.disabled)
-                    }
-                    onDelete={() => handleAction(user.id, "delete")}
-                    availableTiers={availableTiers}
-                  />
-                ))}
-          </TableBody>
-        </Table>
+                <TableHead>Azioni</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filter === "trash"
+                ? deletedBackups.map((b) => (
+                    <UsersTrashRow
+                      key={b.userId}
+                      backup={b}
+                      isLoading={isLoading === b.userId}
+                      onRestore={() => handleAction(b.userId, "restore")}
+                    />
+                  ))
+                : filteredUsers.map((user) => (
+                    <UsersTableRow
+                      key={user.id}
+                      user={user}
+                      isSelected={selectedIds.has(user.id)}
+                      isLoading={isLoading === user.id}
+                      onSelect={() => toggleSelect(user.id)}
+                      onToggle={() =>
+                        handleAction(user.id, "toggle", user.disabled)
+                      }
+                      onDelete={() => handleAction(user.id, "delete")}
+                      availableTiers={availableTiers}
+                    />
+                  ))}
+            </TableBody>
+          </Table>
+        </ResponsiveTable>
 
         {filter !== "trash" && filteredUsers.length === 0 && (
           <TableEmpty>Nessun utente trovato</TableEmpty>

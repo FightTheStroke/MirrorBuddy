@@ -18,6 +18,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ChevronLeft, ChevronRight, Search, User, Eye } from "lucide-react";
+import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { FUNNEL_STAGES } from "@/lib/funnel/constants";
 
 interface FunnelUser {
@@ -153,94 +154,96 @@ export function FunnelUsersTable({ onSelectUser }: FunnelUsersTableProps) {
 
       {/* Table */}
       <div className="border rounded-lg overflow-hidden dark:border-gray-800">
-        <table className="w-full">
-          <thead className="bg-gray-50 dark:bg-gray-800">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                User
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Stage
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">
-                Events
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">
-                Last Activity
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
-                Action
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-            {loading ? (
+        <ResponsiveTable caption="Funnel users table">
+          <table className="w-full">
+            <thead className="bg-gray-50 dark:bg-gray-800">
               <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-8 text-center text-muted-foreground"
-                >
-                  Loading...
-                </td>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  User
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  Stage
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">
+                  Events
+                </th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">
+                  Last Activity
+                </th>
+                <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">
+                  Action
+                </th>
               </tr>
-            ) : users.length === 0 ? (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-4 py-8 text-center text-muted-foreground"
-                >
-                  No users found
-                </td>
-              </tr>
-            ) : (
-              users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground" />
-                      <div>
-                        <div className="font-medium text-sm truncate max-w-[150px]">
-                          {user.email || user.id.slice(0, 12) + "..."}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {user.type}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Badge
-                      className={
-                        STAGE_BADGE_COLORS[user.currentStage] || "bg-gray-100"
-                      }
-                    >
-                      {user.currentStage}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-3 hidden md:table-cell text-sm">
-                    {user.eventsCount}
-                  </td>
-                  <td className="px-4 py-3 hidden lg:table-cell text-sm text-muted-foreground">
-                    {formatDate(user.lastActivity)}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onSelectUser(user.id)}
-                      aria-label={`View details for ${user.email || user.id}`}
-                    >
-                      <Eye className="h-4 w-4" />
-                    </Button>
+            </thead>
+            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              {loading ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-8 text-center text-muted-foreground"
+                  >
+                    Loading...
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : users.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan={5}
+                    className="px-4 py-8 text-center text-muted-foreground"
+                  >
+                    No users found
+                  </td>
+                </tr>
+              ) : (
+                users.map((user) => (
+                  <tr
+                    key={user.id}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-800/50"
+                  >
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <User className="h-4 w-4 text-muted-foreground" />
+                        <div>
+                          <div className="font-medium text-sm truncate max-w-[150px]">
+                            {user.email || user.id.slice(0, 12) + "..."}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {user.type}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Badge
+                        className={
+                          STAGE_BADGE_COLORS[user.currentStage] || "bg-gray-100"
+                        }
+                      >
+                        {user.currentStage}
+                      </Badge>
+                    </td>
+                    <td className="px-4 py-3 hidden md:table-cell text-sm">
+                      {user.eventsCount}
+                    </td>
+                    <td className="px-4 py-3 hidden lg:table-cell text-sm text-muted-foreground">
+                      {formatDate(user.lastActivity)}
+                    </td>
+                    <td className="px-4 py-3 text-right">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onSelectUser(user.id)}
+                        aria-label={`View details for ${user.email || user.id}`}
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </ResponsiveTable>
       </div>
 
       {/* Pagination */}
