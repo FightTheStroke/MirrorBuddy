@@ -319,6 +319,76 @@ Vercel automatically adds these when Supabase integration is enabled:
 **Note**: The app uses `DATABASE_URL` and `DIRECT_URL`, so these must be set
 manually pointing to the Supabase pooler/direct URLs.
 
+### Cost Optimization: Preview Builds
+
+**Problem**: Every PR push triggers a Vercel preview build, incurring costs even before
+CI passes. This can add up significantly on active projects.
+
+**Solution 1: ignoreCommand in vercel.json**
+
+```json
+{
+  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]"
+}
+```
+
+This configuration:
+
+- Returns exit 0 (skip build) when branch is NOT main
+- Returns exit 1 (build) when branch IS main
+- Prevents all preview builds on feature branches
+
+**Logic explanation**:
+
+- `$VERCEL_GIT_COMMIT_REF` = current branch name
+- When branch != "main": test succeeds (exit 0) → SKIP build
+- When branch == "main": test fails (exit 1) → BUILD
+
+**Alternative: More granular control**
+
+```json
+{
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ':!.github' || [ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]"
+}
+```
+
+This skips builds if:
+
+- No code changes (only .github changes), OR
+- Branch is not main
+
+**Solution 2: Dashboard Configuration**
+
+In Vercel Dashboard → Project Settings → Git:
+
+1. **Production Branch**: `main` (only auto-deploy main)
+2. **Auto-Deploy**: Enabled only for Production
+3. **Preview Deployments**: Can be disabled entirely
+
+**Verification**:
+
+```bash
+# Check current ignoreCommand
+cat vercel.json | jq '.ignoreCommand'
+
+# Test locally what would happen
+VERCEL_GIT_COMMIT_REF="feature/test" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "SKIP" || echo "BUILD"
+VERCEL_GIT_COMMIT_REF="main" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "SKIP" || echo "BUILD"
+```
+
+**Trade-offs**:
+
+- ✅ Saves costs on PR preview builds
+- ✅ Main branch still deploys automatically
+- ⚠️ No preview URLs for PR reviewers (must test locally)
+- ⚠️ Issues may only surface after merge to main
+
+**When to allow preview builds**:
+
+- Final review before merge (remove ignoreCommand temporarily)
+- Urgent hotfixes that need visual verification
+- Demo branches for stakeholders
+
 ## Consequences
 
 ### Positive
