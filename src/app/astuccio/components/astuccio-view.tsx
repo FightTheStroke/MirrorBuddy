@@ -182,11 +182,11 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
               variants={categoryVariants}
               className="space-y-4"
             >
-              <div className="flex items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 p-4 rounded-xl border bg-muted/50 border-border">
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-card shadow-sm flex-shrink-0">
                   <CategoryIcon className="w-6 h-6 text-muted-foreground" />
                 </div>
-                <div>
+                <div className="flex-1">
                   <h2 className="text-xl font-bold text-foreground">
                     {category.title}
                   </h2>
