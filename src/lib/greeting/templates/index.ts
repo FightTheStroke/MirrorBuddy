@@ -54,6 +54,15 @@ export const MASCETTI_GREETINGS: Record<SupportedLanguage, string> = {
   de: "Tarapìa tapiòco! Ich bin Graf Mascetti. Als wäre es antani...",
 };
 
+/** Buddy greeting templates (peer buddies, informal, age-aware) */
+export const BUDDY_GREETINGS: Record<SupportedLanguage, string> = {
+  it: "Ehi! Sono {name}. Ho {age} anni e uso MirrorBuddy come te. Come va?",
+  en: "Hey! I'm {name}. I'm {age} years old and I use MirrorBuddy just like you. How's it going?",
+  es: "¡Hola! Soy {name}. Tengo {age} años y uso MirrorBuddy como tú. ¿Qué tal?",
+  fr: "Salut! Je suis {name}. J'ai {age} ans et j'utilise MirrorBuddy comme toi. Ça va?",
+  de: "Hey! Ich bin {name}. Ich bin {age} Jahre alt und benutze MirrorBuddy genau wie du. Wie geht's?",
+};
+
 /**
  * Formal greeting templates (Lei/Sie/Vous)
  * Used for historical/classical professors who would expect formal address
@@ -92,6 +101,9 @@ export const FORMAL_PROFESSORS = [
   "lovelace", // Victorian era mathematician
   "cassese", // Distinguished international jurist
   "omero", // Ancient Greek epic poet
+  "moliere", // 17th century French playwright and dramatist
+  "goethe", // 18th-19th century German poet and writer
+  "cervantes", // 16th-17th century Spanish author
 ] as const;
 
 /**

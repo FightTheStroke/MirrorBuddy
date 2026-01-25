@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export function TermsContent() {
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">
@@ -152,12 +154,12 @@ export function TermsContent() {
       <Section number={8} title="I tuoi dati">
         <p>
           Trattiamo i tuoi dati con rispetto. Per tutti i dettagli, leggi la{" "}
-          <a
+          <Link
             href="/privacy"
             className="text-blue-600 hover:text-blue-700 underline"
           >
             Privacy Policy completa
-          </a>
+          </Link>
           .
         </p>
         <p>In breve:</p>

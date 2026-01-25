@@ -89,6 +89,8 @@ export const SUBJECT_NAMES: Record<string, string> = {
   music: "Musica",
   english: "Inglese",
   spanish: "Spagnolo",
+  french: "Francese",
+  german: "Tedesco",
   economics: "Economia",
   philosophy: "Filosofia",
   "civic-education": "Educazione Civica",

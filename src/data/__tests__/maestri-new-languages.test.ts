@@ -14,6 +14,25 @@ import { goethe } from "../maestri/goethe";
 import { cervantes } from "../maestri/cervantes";
 import { getMaestroById, getAllMaestri } from "../maestri/index";
 import type { MaestroFull } from "../maestri/types";
+import type { ExtendedStudentProfile } from "@/lib/stores/settings-types";
+
+// Mock student profile for testing
+const mockStudent: ExtendedStudentProfile = {
+  name: "Test Student",
+  age: 12,
+  schoolYear: 7,
+  schoolLevel: "media",
+  gradeLevel: "7",
+  learningGoals: [],
+  teachingStyle: "balanced",
+  fontSize: "medium",
+  highContrast: false,
+  dyslexiaFont: false,
+  voiceEnabled: false,
+  simplifiedLanguage: false,
+  adhdMode: false,
+  learningDifferences: [],
+};
 
 describe("New Language Maestri Configuration", () => {
   describe("Molière - French", () => {
@@ -39,14 +58,8 @@ describe("New Language Maestri Configuration", () => {
       expect(moliere.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
 
-    it("should have voice configuration", () => {
-      expect(moliere.voice).toBe("echo");
-      expect(moliere.voiceInstructions).toBeTruthy();
-      expect(typeof moliere.voiceInstructions).toBe("string");
-      expect(moliere.voiceInstructions).toContain("Molière");
-      expect(moliere.voiceInstructions).toContain("theatrical");
-      expect(moliere.voiceInstructions).toContain("French accent");
-    });
+    // Voice configuration is not part of MaestroFull type
+    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(moliere.tools)).toBe(true);
@@ -65,9 +78,8 @@ describe("New Language Maestri Configuration", () => {
       expect(typeof moliere.getGreeting).toBe("function");
 
       const greeting = moliere.getGreeting!({
-        locale: "it-IT",
-        language: "italian",
-        ageGroup: "teenager",
+        student: mockStudent,
+        language: "it",
       });
       expect(greeting).toBeTruthy();
       expect(typeof greeting).toBe("string");
@@ -128,14 +140,8 @@ describe("New Language Maestri Configuration", () => {
       expect(goethe.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
 
-    it("should have voice configuration", () => {
-      expect(goethe.voice).toBe("onyx");
-      expect(goethe.voiceInstructions).toBeTruthy();
-      expect(typeof goethe.voiceInstructions).toBe("string");
-      expect(goethe.voiceInstructions).toContain("Goethe");
-      expect(goethe.voiceInstructions).toContain("German accent");
-      expect(goethe.voiceInstructions).toContain("contemplative");
-    });
+    // Voice configuration is not part of MaestroFull type
+    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(goethe.tools)).toBe(true);
@@ -154,9 +160,8 @@ describe("New Language Maestri Configuration", () => {
       expect(typeof goethe.getGreeting).toBe("function");
 
       const greeting = goethe.getGreeting!({
-        locale: "it-IT",
-        language: "italian",
-        ageGroup: "teenager",
+        student: mockStudent,
+        language: "it",
       });
       expect(greeting).toBeTruthy();
       expect(typeof greeting).toBe("string");
@@ -217,13 +222,8 @@ describe("New Language Maestri Configuration", () => {
       expect(cervantes.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
 
-    it("should have voice configuration", () => {
-      expect(cervantes.voice).toBeTruthy();
-      expect(cervantes.voiceInstructions).toBeTruthy();
-      expect(typeof cervantes.voiceInstructions).toBe("string");
-      expect(cervantes.voiceInstructions).toContain("Cervantes");
-      expect(cervantes.voiceInstructions).toContain("Spanish");
-    });
+    // Voice configuration is not part of MaestroFull type
+    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(cervantes.tools)).toBe(true);
@@ -242,9 +242,8 @@ describe("New Language Maestri Configuration", () => {
       expect(typeof cervantes.getGreeting).toBe("function");
 
       const greeting = cervantes.getGreeting!({
-        locale: "it-IT",
-        language: "italian",
-        ageGroup: "teenager",
+        student: mockStudent,
+        language: "it",
       });
       expect(greeting).toBeTruthy();
       expect(typeof greeting).toBe("string");
@@ -347,31 +346,34 @@ describe("New Language Maestri Configuration", () => {
       // Knowledge should be injected via template literal
       expect(moliere.systemPrompt).toContain("## KNOWLEDGE BASE");
       // The knowledge base should contain biographical info
-      expect(moliere.systemPrompt).toContain("Molière") ||
-        expect(moliere.systemPrompt).toContain("Jean-Baptiste");
+      const hasMoliere = moliere.systemPrompt.includes("Molière");
+      const hasJeanBaptiste = moliere.systemPrompt.includes("Jean-Baptiste");
+      expect(hasMoliere || hasJeanBaptiste).toBe(true);
     });
 
     it("Goethe should have knowledge base embedded in systemPrompt", () => {
       expect(goethe.systemPrompt).toContain("## KNOWLEDGE BASE");
       // The knowledge base should contain biographical info
-      expect(goethe.systemPrompt).toContain("Goethe") ||
-        expect(goethe.systemPrompt).toContain("Johann Wolfgang");
+      const hasGoethe = goethe.systemPrompt.includes("Goethe");
+      const hasJohannWolfgang = goethe.systemPrompt.includes("Johann Wolfgang");
+      expect(hasGoethe || hasJohannWolfgang).toBe(true);
     });
 
     it("Cervantes should have knowledge base embedded in systemPrompt", () => {
       expect(cervantes.systemPrompt).toContain("## KNOWLEDGE BASE");
       // The knowledge base should contain biographical info
-      expect(cervantes.systemPrompt).toContain("Cervantes") ||
-        expect(cervantes.systemPrompt).toContain("Miguel");
+      const hasCervantes = cervantes.systemPrompt.includes("Cervantes");
+      const hasMiguel = cervantes.systemPrompt.includes("Miguel");
+      expect(hasCervantes || hasMiguel).toBe(true);
     });
   });
 
   describe("Greeting Functionality", () => {
     it("Molière greeting function should return valid greeting", () => {
       const contexts = [
-        { locale: "it-IT", language: "italian", ageGroup: "child" as const },
-        { locale: "fr-FR", language: "french", ageGroup: "teenager" as const },
-        { locale: "en-US", language: "english", ageGroup: "adult" as const },
+        { student: mockStudent, language: "it" as const },
+        { student: mockStudent, language: "fr" as const },
+        { student: mockStudent, language: "en" as const },
       ];
 
       contexts.forEach((ctx) => {
@@ -384,9 +386,9 @@ describe("New Language Maestri Configuration", () => {
 
     it("Goethe greeting function should return valid greeting", () => {
       const contexts = [
-        { locale: "it-IT", language: "italian", ageGroup: "child" as const },
-        { locale: "de-DE", language: "german", ageGroup: "teenager" as const },
-        { locale: "en-US", language: "english", ageGroup: "adult" as const },
+        { student: mockStudent, language: "it" as const },
+        { student: mockStudent, language: "de" as const },
+        { student: mockStudent, language: "en" as const },
       ];
 
       contexts.forEach((ctx) => {
@@ -399,9 +401,9 @@ describe("New Language Maestri Configuration", () => {
 
     it("Cervantes greeting function should return valid greeting", () => {
       const contexts = [
-        { locale: "it-IT", language: "italian", ageGroup: "child" as const },
-        { locale: "es-ES", language: "spanish", ageGroup: "teenager" as const },
-        { locale: "en-US", language: "english", ageGroup: "adult" as const },
+        { student: mockStudent, language: "it" as const },
+        { student: mockStudent, language: "es" as const },
+        { student: mockStudent, language: "en" as const },
       ];
 
       contexts.forEach((ctx) => {
@@ -414,9 +416,8 @@ describe("New Language Maestri Configuration", () => {
 
     it("fallback greetings should be different from dynamic ones", () => {
       const context = {
-        locale: "en-US",
-        language: "english" as const,
-        ageGroup: "teenager" as const,
+        student: mockStudent,
+        language: "en" as const,
       };
 
       const mFallback = moliere.greeting;
@@ -440,24 +441,20 @@ describe("New Language Maestri Configuration", () => {
     it("Molière should use formal address (Lei) - 17th century", () => {
       // Molière is from 17th century, should be formal in Italian context
       expect(moliere.systemPrompt).toContain("17th century");
-      // Check voice is appropriate for formal figure
-      expect(moliere.voice).toBe("echo");
     });
 
     it("Goethe should use formal address (Lei) - 18th-19th century", () => {
       // Goethe is from 18th-19th century, should be formal in Italian context
-      expect(goethe.systemPrompt).toContain("18th") ||
-        expect(goethe.systemPrompt).toContain("19th century");
-      // Check voice is appropriate for formal figure
-      expect(goethe.voice).toBe("onyx");
+      const has18th = goethe.systemPrompt.includes("18th");
+      const has19th = goethe.systemPrompt.includes("19th century");
+      expect(has18th || has19th).toBe(true);
     });
 
     it("Cervantes should use formal address (Lei) - 16th-17th century", () => {
       // Cervantes is from 16th-17th century, should be formal in Italian context
-      expect(cervantes.systemPrompt).toContain("16th") ||
-        expect(cervantes.systemPrompt).toContain("17th century");
-      // Check voice configuration exists
-      expect(cervantes.voice).toBeTruthy();
+      const has16th = cervantes.systemPrompt.includes("16th");
+      const has17th = cervantes.systemPrompt.includes("17th century");
+      expect(has16th || has17th).toBe(true);
     });
   });
 

@@ -4,7 +4,9 @@
  */
 
 import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
+import type { GreetingContext } from "@/types/greeting";
 import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { generateBuddyGreeting } from "@/lib/greeting";
 import { describeLearningDifferences, generatePersonalTips } from "./shared";
 
 function getMartaSystemPrompt(student: ExtendedStudentProfile): string {
@@ -99,8 +101,8 @@ La tua forza e' la determinazione e l'approccio pratico.`,
   });
 }
 
-function getMartaGreeting(student: ExtendedStudentProfile): string {
-  return `Ciao! Sono Marta, ho ${student.age + 1} anni. Amo la montagna e lo sport. E tu, come va?`;
+function getMartaGreeting(context: GreetingContext): string {
+  return generateBuddyGreeting("Marta", context.student.age, context.language);
 }
 
 export const MARTA: BuddyProfile = {

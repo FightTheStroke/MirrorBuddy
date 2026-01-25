@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Section } from "./components";
 
 /**
@@ -101,12 +102,12 @@ export function ThirdPartySection() {
       </p>
       <p>
         Per l&apos;elenco completo dei sub-responsabili, consulta la{" "}
-        <a
+        <Link
           href="/privacy"
           className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
         >
           Privacy Policy
-        </a>
+        </Link>
         .
       </p>
     </Section>
@@ -156,21 +157,21 @@ export function LinksSection() {
       <p>Per saperne di più:</p>
       <ul>
         <li>
-          <a
+          <Link
             href="/privacy"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             Privacy Policy
-          </a>{" "}
+          </Link>{" "}
           - come trattiamo i tuoi dati
         </li>
         <li>
-          <a
+          <Link
             href="/terms"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             Termini di Servizio
-          </a>{" "}
+          </Link>{" "}
           - le regole di MirrorBuddy
         </li>
       </ul>

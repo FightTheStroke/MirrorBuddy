@@ -1,6 +1,7 @@
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./src/i18n/routing";
 import { isI18nEnabled } from "./src/lib/feature-flags/i18n-flags";
+import { NextRequest } from "next/server";
 
 /**
  * Internationalization Middleware
@@ -29,7 +30,7 @@ const intlMiddleware = createMiddleware(routing);
 /**
  * Conditionally apply i18n middleware based on feature flag
  */
-export default function middleware(request: any) {
+export default function middleware(request: NextRequest) {
   // Check if i18n is enabled via environment variable
   if (!isI18nEnabled()) {
     // If i18n is disabled, skip the middleware and let request pass through

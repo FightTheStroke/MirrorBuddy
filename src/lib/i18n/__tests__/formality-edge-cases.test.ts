@@ -29,7 +29,9 @@ describe("Formality Rules Edge Cases & Integration", () => {
         expect(isFormalCharacter("manzoni-italian-writer", "maestro")).toBe(
           true,
         );
-        expect(isFormalCharacter("some-feynman-variant", "maestro")).toBe(false);
+        expect(isFormalCharacter("some-feynman-variant", "maestro")).toBe(
+          false,
+        );
       });
 
       it("handles mixed case character IDs", () => {
@@ -123,11 +125,11 @@ describe("Formality Rules Edge Cases & Integration", () => {
 
   describe("Professor List Integrity", () => {
     it("no professor appears in both formal and informal lists", () => {
-      const formalSet = new Set(FORMAL_PROFESSORS);
-      const informalSet = new Set(INFORMAL_PROFESSORS);
+      const _formalSet = new Set<string>(FORMAL_PROFESSORS);
+      const informalSet = new Set<string>(INFORMAL_PROFESSORS);
 
       const overlap = FORMAL_PROFESSORS.filter((prof) =>
-        informalSet.has(prof),
+        informalSet.has(prof as string),
       );
 
       expect(overlap.length).toBe(0);
@@ -212,9 +214,8 @@ describe("Formality Rules Edge Cases & Integration", () => {
       for (const lang of languages) {
         const section = FORMAL_ADDRESS_SECTIONS[lang];
         // Each section should provide multiple guidelines
-        const hasMultipleGuidelines = (
-          section.match(/[-•*]/g) || []
-        ).length >= 6;
+        const hasMultipleGuidelines =
+          (section.match(/[-•*]/g) || []).length >= 6;
         expect(hasMultipleGuidelines).toBe(true);
       }
     });

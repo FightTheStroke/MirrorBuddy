@@ -3,6 +3,7 @@
 import { useRef, useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { maestri, SUBJECT_NAMES } from "@/data/maestri";
 
@@ -160,12 +161,12 @@ export function MaestriShowcaseSection() {
       <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 max-w-2xl mx-auto">
         I professori AI sono creati a scopo educativo e dimostrativo. In futuro
         ogni studente potra creare i propri professori personalizzati.{" "}
-        <a
+        <Link
           href="/ai-transparency"
           className="underline hover:text-gray-600 dark:hover:text-gray-400"
         >
           Scopri di piu
-        </a>
+        </Link>
       </p>
     </motion.section>
   );

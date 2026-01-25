@@ -16,7 +16,6 @@ import path from "path";
 import { execSync } from "child_process";
 
 describe("Localize Skill", () => {
-  // eslint-disable-next-line no-undef
   const projectRoot =
     process.cwd?.() || "/Users/roberdan/GitHub/MirrorBuddy-i18n-multi-language";
   const messagesDir = path.join(projectRoot, "messages");
@@ -162,8 +161,11 @@ describe("Localize Skill", () => {
       const enContent = JSON.parse(fs.readFileSync(enPath, "utf-8"));
 
       // Get all keys from Italian (reference)
-      const getKeys = (obj, prefix = "") => {
-        const keys = new Set();
+      const getKeys = (
+        obj: Record<string, unknown>,
+        prefix = "",
+      ): Set<string> => {
+        const keys = new Set<string>();
         Object.entries(obj).forEach(([key, value]) => {
           const fullKey = prefix ? `${prefix}.${key}` : key;
           if (
@@ -171,7 +173,9 @@ describe("Localize Skill", () => {
             value !== null &&
             !Array.isArray(value)
           ) {
-            getKeys(value, fullKey).forEach((k) => keys.add(k));
+            getKeys(value as Record<string, unknown>, fullKey).forEach((k) =>
+              keys.add(k),
+            );
           } else {
             keys.add(fullKey);
           }

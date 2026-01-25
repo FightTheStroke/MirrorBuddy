@@ -14,6 +14,7 @@ import { ComplianceSection } from "./compliance-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
 import { TierComparisonSection } from "./tier-comparison-section";
+import { LanguageSwitcher } from "./language-switcher";
 import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
 import type { ExistingUserData } from "../types";
 
@@ -97,6 +98,11 @@ export function LandingPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
+      {/* Language Switcher - Top Right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSwitcher />
+      </div>
+
       <main
         className="min-h-screen flex flex-col items-center px-4 py-12"
         id="main-content"

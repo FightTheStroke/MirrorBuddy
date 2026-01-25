@@ -1,7 +1,7 @@
 /**
  * Metadata Tests
  *
- * Tests for locale-specific page metadata (title, description, keywords)
+ * Tests for locale-specific _page metadata (title, description, keywords)
  * F-75: Pages have localized metadata for search engines
  *
  * Tests verify that:
@@ -73,33 +73,33 @@ describe("Page Metadata (F-75)", () => {
   });
 
   describe("Required Pages Metadata", () => {
-    REQUIRED_PAGES.forEach((page) => {
-      describe(`${page} page`, () => {
+    REQUIRED_PAGES.forEach((_page) => {
+      describe(`${_page} _page`, () => {
         it(`should exist in metadata for all locales`, () => {
           LOCALES.forEach((locale) => {
             const metadata = messages[locale].metadata;
-            expect(metadata).toHaveProperty(page);
+            expect(metadata).toHaveProperty(_page);
           });
         });
 
         it(`should have required fields in all locales`, () => {
           LOCALES.forEach((locale) => {
-            const pageMetadata = (messages[locale].metadata || {})[page];
-            expect(pageMetadata).toHaveProperty("title");
-            expect(pageMetadata).toHaveProperty("description");
-            expect(pageMetadata).toHaveProperty("keywords");
+            const _pageMetadata = (messages[locale].metadata || {})[_page];
+            expect(_pageMetadata).toHaveProperty("title");
+            expect(_pageMetadata).toHaveProperty("description");
+            expect(_pageMetadata).toHaveProperty("keywords");
           });
         });
 
         it(`should have non-empty fields in all locales`, () => {
           LOCALES.forEach((locale) => {
-            const pageMetadata = (messages[locale].metadata || {})[page];
-            expect(pageMetadata.title).toBeTruthy();
-            expect(pageMetadata.title.length).toBeGreaterThan(0);
-            expect(pageMetadata.description).toBeTruthy();
-            expect(pageMetadata.description.length).toBeGreaterThan(0);
-            expect(Array.isArray(pageMetadata.keywords)).toBe(true);
-            expect(pageMetadata.keywords.length).toBeGreaterThan(0);
+            const _pageMetadata = (messages[locale].metadata || {})[_page];
+            expect(_pageMetadata.title).toBeTruthy();
+            expect(_pageMetadata.title.length).toBeGreaterThan(0);
+            expect(_pageMetadata.description).toBeTruthy();
+            expect(_pageMetadata.description.length).toBeGreaterThan(0);
+            expect(Array.isArray(_pageMetadata.keywords)).toBe(true);
+            expect(_pageMetadata.keywords.length).toBeGreaterThan(0);
           });
         });
       });
@@ -107,17 +107,17 @@ describe("Page Metadata (F-75)", () => {
   });
 
   describe("Title Format", () => {
-    REQUIRED_PAGES.forEach((page) => {
-      it(`${page} title should follow format "{PageTitle} | MirrorBuddy"`, () => {
+    REQUIRED_PAGES.forEach((_page) => {
+      it(`${_page} title should follow format "{PageTitle} | MirrorBuddy"`, () => {
         LOCALES.forEach((locale) => {
-          const title = (messages[locale].metadata || {})[page]?.title;
+          const title = (messages[locale].metadata || {})[_page]?.title;
           expect(title).toMatch(/\| MirrorBuddy$/);
         });
       });
 
-      it(`${page} title should not have trailing/leading spaces`, () => {
+      it(`${_page} title should not have trailing/leading spaces`, () => {
         LOCALES.forEach((locale) => {
-          const title = (messages[locale].metadata || {})[page]?.title;
+          const title = (messages[locale].metadata || {})[_page]?.title;
           expect(title).toBe(title?.trim());
         });
       });
@@ -125,10 +125,10 @@ describe("Page Metadata (F-75)", () => {
   });
 
   describe("Description Length", () => {
-    REQUIRED_PAGES.forEach((page) => {
-      it(`${page} description should be 150-160 characters`, () => {
+    REQUIRED_PAGES.forEach((_page) => {
+      it(`${_page} description should be 150-160 characters`, () => {
         LOCALES.forEach((locale) => {
-          const description = (messages[locale].metadata || {})[page]
+          const description = (messages[locale].metadata || {})[_page]
             ?.description;
           const length = description?.length || 0;
           expect(length).toBeGreaterThanOrEqual(150);
@@ -139,10 +139,10 @@ describe("Page Metadata (F-75)", () => {
   });
 
   describe("Keywords", () => {
-    REQUIRED_PAGES.forEach((page) => {
-      it(`${page} keywords should be an array of strings`, () => {
+    REQUIRED_PAGES.forEach((_page) => {
+      it(`${_page} keywords should be an array of strings`, () => {
         LOCALES.forEach((locale) => {
-          const keywords = (messages[locale].metadata || {})[page]?.keywords;
+          const keywords = (messages[locale].metadata || {})[_page]?.keywords;
           expect(Array.isArray(keywords)).toBe(true);
           keywords?.forEach((keyword) => {
             expect(typeof keyword).toBe("string");
@@ -151,9 +151,9 @@ describe("Page Metadata (F-75)", () => {
         });
       });
 
-      it(`${page} should have at least 3 keywords`, () => {
+      it(`${_page} should have at least 3 keywords`, () => {
         LOCALES.forEach((locale) => {
-          const keywords = (messages[locale].metadata || {})[page]?.keywords;
+          const keywords = (messages[locale].metadata || {})[_page]?.keywords;
           expect(keywords?.length).toBeGreaterThanOrEqual(3);
         });
       });
@@ -162,10 +162,10 @@ describe("Page Metadata (F-75)", () => {
 
   describe("Language-Specific Translations", () => {
     it("should have different titles for different locales", () => {
-      const firstPageTitles = REQUIRED_PAGES.map((page) => ({
-        page,
+      const firstPageTitles = REQUIRED_PAGES.map((_page) => ({
+        _page,
         titles: LOCALES.map(
-          (locale) => (messages[locale].metadata || {})[page]?.title,
+          (locale) => (messages[locale].metadata || {})[_page]?.title,
         ),
       }));
 
@@ -177,10 +177,10 @@ describe("Page Metadata (F-75)", () => {
     });
 
     it("should have different descriptions for different locales", () => {
-      const firstPageDescriptions = REQUIRED_PAGES.map((page) => ({
-        page,
+      const firstPageDescriptions = REQUIRED_PAGES.map((_page) => ({
+        _page,
         descriptions: LOCALES.map(
-          (locale) => (messages[locale].metadata || {})[page]?.description,
+          (locale) => (messages[locale].metadata || {})[_page]?.description,
         ),
       }));
 
@@ -192,7 +192,7 @@ describe("Page Metadata (F-75)", () => {
   });
 
   describe("Metadata Consistency", () => {
-    it("should have same pages across all locales", () => {
+    it("should have same _pages across all locales", () => {
       const italianPages = Object.keys(messages.it.metadata || {}).sort();
       LOCALES.forEach((locale) => {
         const localePages = Object.keys(messages[locale].metadata || {}).sort();

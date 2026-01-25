@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { AlertTriangle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -62,9 +63,9 @@ export function BudgetExhaustedBanner({
           )}
 
           <div className="flex justify-center gap-4 text-sm">
-            <a href="/privacy" className="text-blue-400 hover:text-blue-300">
+            <Link href="/privacy" className="text-blue-400 hover:text-blue-300">
               Privacy
-            </a>
+            </Link>
             <span className="text-slate-600">|</span>
             <a
               href="mailto:info@fightthestroke.org"

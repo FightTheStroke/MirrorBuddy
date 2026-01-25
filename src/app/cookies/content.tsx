@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Section, CookieTable } from "./components";
 import {
   ManagementSection,
@@ -114,12 +115,12 @@ export function CookiesContent() {
         <p>
           Per maggiori dettagli, leggi la sezione &quot;Metriche di
           Performance&quot; nella{" "}
-          <a
+          <Link
             href="/privacy"
             className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           >
             Privacy Policy
-          </a>
+          </Link>
           .
         </p>
       </Section>

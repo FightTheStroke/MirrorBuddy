@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Section } from "./section";
 
 export function PrivacyContentAI() {
@@ -109,12 +110,12 @@ export function PrivacyContentAI() {
       </h3>
       <p>
         Leggi la nostra{" "}
-        <a
+        <Link
           href="/ai-policy"
           className="text-blue-600 hover:text-blue-700 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
         >
           AI Policy completa
-        </a>{" "}
+        </Link>{" "}
         per dettagli tecnici su come funziona il sistema e come proteggiamo i
         tuoi dati durante il trattamento AI.
       </p>

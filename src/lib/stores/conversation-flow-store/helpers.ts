@@ -7,15 +7,15 @@
  * - Loading conversation messages
  */
 
-import type { CharacterType, ExtendedStudentProfile } from '@/types';
-import type { MaestroFull } from '@/data/maestri';
-import type { SupportTeacher, BuddyProfile } from '@/types';
+import type { CharacterType, ExtendedStudentProfile } from "@/types";
+import type { MaestroFull } from "@/data/maestri";
+import type { SupportTeacher, BuddyProfile } from "@/types";
 import type {
   ActiveCharacter,
   FlowMessage,
   CharacterConversation,
   ConversationFlowState,
-} from './types';
+} from "./types";
 
 // ============================================================================
 // CHARACTER HELPERS
@@ -27,18 +27,19 @@ import type {
 export function createActiveCharacter(
   character: MaestroFull | SupportTeacher | BuddyProfile,
   type: CharacterType,
-  profile: ExtendedStudentProfile
+  profile: ExtendedStudentProfile,
+  language: "it" | "en" | "es" | "fr" | "de" = "it",
 ): ActiveCharacter {
   let greeting: string;
   let systemPrompt: string;
   let voiceInstructions: string;
 
-  if (type === 'buddy') {
+  if (type === "buddy") {
     const buddy = character as BuddyProfile;
-    greeting = buddy.getGreeting(profile);
+    greeting = buddy.getGreeting({ student: profile, language });
     systemPrompt = buddy.getSystemPrompt(profile);
     voiceInstructions = buddy.voiceInstructions;
-  } else if (type === 'coach') {
+  } else if (type === "coach") {
     const coach = character as SupportTeacher;
     greeting = coach.greeting;
     systemPrompt = coach.systemPrompt;
@@ -47,7 +48,7 @@ export function createActiveCharacter(
     const maestro = character as MaestroFull;
     greeting = maestro.greeting;
     systemPrompt = maestro.systemPrompt;
-    voiceInstructions = '';
+    voiceInstructions = "";
   }
 
   return {
@@ -58,7 +59,7 @@ export function createActiveCharacter(
     greeting,
     systemPrompt,
     color: character.color,
-    voice: 'voice' in character ? character.voice : 'alloy',
+    voice: "voice" in character ? character.voice : "alloy",
     voiceInstructions,
   };
 }
@@ -71,7 +72,7 @@ export function createActiveCharacter(
  * Save current messages to character's conversation bucket.
  */
 export function saveCurrentConversation(
-  state: ConversationFlowState
+  state: ConversationFlowState,
 ): Record<string, CharacterConversation> {
   if (!state.activeCharacter || state.messages.length === 0) {
     return state.conversationsByCharacter;
@@ -98,7 +99,7 @@ export function saveCurrentConversation(
  */
 export function loadConversationMessages(
   conversationsByCharacter: Record<string, CharacterConversation>,
-  characterId: string
+  characterId: string,
 ): FlowMessage[] {
   const convo = conversationsByCharacter[characterId];
   return convo?.messages || [];

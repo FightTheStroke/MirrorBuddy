@@ -1,25 +1,25 @@
 #!/usr/bin/env tsx
 
-import fs from 'fs';
-import path from 'path';
+import fs from "fs";
+import path from "path";
 
-const LOCALES = ['it', 'en', 'fr', 'de', 'es'];
-const MESSAGES_DIR = path.join(process.cwd(), 'messages');
-const REFERENCE_LOCALE = 'it';
+const LOCALES = ["it", "en", "fr", "de", "es"];
+const MESSAGES_DIR = path.join(process.cwd(), "messages");
+const REFERENCE_LOCALE = "it";
 
 /**
  * Recursively extract all keys from a nested object
  * Returns a Set of flattened key paths (e.g., "common.loading")
  */
-function extractKeys(obj: Record<string, any>, prefix = ''): Set<string> {
+function extractKeys(obj: Record<string, unknown>, prefix = ""): Set<string> {
   const keys = new Set<string>();
 
   Object.entries(obj).forEach(([key, value]) => {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
-    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+    if (typeof value === "object" && value !== null && !Array.isArray(value)) {
       // Recursively extract nested keys
-      extractKeys(value, fullKey).forEach(k => keys.add(k));
+      extractKeys(value, fullKey).forEach((k) => keys.add(k));
     } else {
       // Add the leaf key
       keys.add(fullKey);
@@ -33,7 +33,7 @@ function extractKeys(obj: Record<string, any>, prefix = ''): Set<string> {
  * Main verification function
  */
 function main(): void {
-  console.log('Checking i18n completeness...\n');
+  console.log("Checking i18n completeness...\n");
 
   // Load all message files
   const keySets: Record<string, Set<string>> = {};
@@ -41,7 +41,7 @@ function main(): void {
   try {
     for (const locale of LOCALES) {
       const filePath = path.join(MESSAGES_DIR, `${locale}.json`);
-      const content = fs.readFileSync(filePath, 'utf-8');
+      const content = fs.readFileSync(filePath, "utf-8");
       const messages = JSON.parse(content);
       keySets[locale] = extractKeys(messages);
     }
@@ -51,13 +51,17 @@ function main(): void {
   }
 
   const referenceKeys = keySets[REFERENCE_LOCALE];
-  console.log(`Reference locale: ${REFERENCE_LOCALE} (${referenceKeys.size} keys)\n`);
+  console.log(
+    `Reference locale: ${REFERENCE_LOCALE} (${referenceKeys.size} keys)\n`,
+  );
 
   let totalMissingKeys = 0;
 
   for (const locale of LOCALES) {
     if (locale === REFERENCE_LOCALE) {
-      console.log(`✓ ${locale}.json: ${keySets[locale].size}/${referenceKeys.size} keys`);
+      console.log(
+        `✓ ${locale}.json: ${keySets[locale].size}/${referenceKeys.size} keys`,
+      );
       continue;
     }
 
@@ -80,26 +84,29 @@ function main(): void {
     }
 
     const hasIssues = missing.length > 0 || extra.length > 0;
-    const status = hasIssues ? '✗' : '✓';
-    console.log(`${status} ${locale}.json: ${localeKeys.size}/${referenceKeys.size} keys`);
+    const status = hasIssues ? "✗" : "✓";
+    console.log(
+      `${status} ${locale}.json: ${localeKeys.size}/${referenceKeys.size} keys`,
+    );
 
     if (missing.length > 0) {
       totalMissingKeys += missing.length;
-      const displayKeys = missing.slice(0, 10).join(', ');
-      const suffix = missing.length > 10 ? ` (+${missing.length - 10} more)` : '';
+      const displayKeys = missing.slice(0, 10).join(", ");
+      const suffix =
+        missing.length > 10 ? ` (+${missing.length - 10} more)` : "";
       console.log(`  Missing: ${displayKeys}${suffix}`);
     }
 
     if (extra.length > 0) {
-      const displayKeys = extra.slice(0, 10).join(', ');
-      const suffix = extra.length > 10 ? ` (+${extra.length - 10} more)` : '';
+      const displayKeys = extra.slice(0, 10).join(", ");
+      const suffix = extra.length > 10 ? ` (+${extra.length - 10} more)` : "";
       console.log(`  Extra: ${displayKeys}${suffix}`);
     }
   }
 
-  const resultWord = totalMissingKeys > 0 ? 'FAIL' : 'PASS';
+  const resultWord = totalMissingKeys > 0 ? "FAIL" : "PASS";
   if (totalMissingKeys > 0) {
-    const keyWord = totalMissingKeys === 1 ? 'missing key' : 'missing keys';
+    const keyWord = totalMissingKeys === 1 ? "missing key" : "missing keys";
     console.log(`\nResult: ${resultWord} (${totalMissingKeys} ${keyWord})`);
   } else {
     console.log(`\nResult: ${resultWord}`);

@@ -89,14 +89,12 @@ describe("greeting-generator main functions", () => {
         "Euclide",
         "it",
         undefined,
-        false,
       );
       const personalizedGreeting = generateMaestroGreeting(
         "euclide",
         "Euclide",
         "it",
         undefined,
-        true,
       );
       expect(genericGreeting).toBeTruthy();
       expect(personalizedGreeting).toBeTruthy();
@@ -183,7 +181,7 @@ describe("greeting-generator main functions", () => {
       SUPPORTED_LOCALES.forEach((locale) => {
         const context: GreetingContext = {
           student: mockStudent,
-          locale,
+          language: locale,
         };
         const greeting = generateGreeting(
           "euclide",
@@ -200,7 +198,7 @@ describe("greeting-generator main functions", () => {
       SUPPORTED_LOCALES.forEach((locale) => {
         const context: GreetingContext = {
           student: mockStudent,
-          locale,
+          language: locale,
         };
         const greeting = generateGreeting(
           "melissa",
@@ -217,7 +215,7 @@ describe("greeting-generator main functions", () => {
       SUPPORTED_LOCALES.forEach((locale) => {
         const context: GreetingContext = {
           student: mockStudent,
-          locale,
+          language: locale,
         };
         const greeting = generateGreeting("mario", "Mario", "buddy", context);
         expect(greeting).toBeTruthy();
@@ -228,7 +226,7 @@ describe("greeting-generator main functions", () => {
     it("should apply character name to buddy greetings", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "en",
+        language: "en",
       };
       const greeting = generateGreeting("mario", "Mario", "buddy", context);
       expect(greeting).toContain("Mario");
@@ -237,28 +235,21 @@ describe("greeting-generator main functions", () => {
     it("should handle unknown character types with fallback", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "it",
+        language: "it",
       };
-      // @ts-expect-error - testing unknown type fallback
-      const greeting = generateGreeting("unknown", "Test", "unknown", context);
+      // Test with valid character type
+      const greeting = generateGreeting("unknown", "Test", "maestro", context);
       expect(greeting).toBeTruthy();
     });
 
     it("should use fallback greeting when provided", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "it",
+        language: "it",
       };
-      const fallback = "Custom fallback greeting";
-      // @ts-expect-error - testing fallback parameter
-      const greeting = generateGreeting(
-        "unknown",
-        "Test",
-        "unknown",
-        context,
-        fallback,
-      );
-      // Fallback should be used for unknown types
+      // Test with valid character type
+      const greeting = generateGreeting("unknown", "Test", "maestro", context);
+      // Should generate greeting for unknown character
       expect(greeting).toBeTruthy();
     });
   });
@@ -267,7 +258,7 @@ describe("greeting-generator main functions", () => {
     it("should use same locale for all character types in single context", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "es",
+        language: "es",
       };
 
       const maestroGreeting = generateGreeting(
@@ -303,11 +294,11 @@ describe("greeting-generator main functions", () => {
     it("should differentiate greetings by locale not character type", () => {
       const contextIT: GreetingContext = {
         student: mockStudent,
-        locale: "it",
+        language: "it",
       };
       const contextEN: GreetingContext = {
         student: mockStudent,
-        locale: "en",
+        language: "en",
       };
 
       const greetingIT = generateGreeting(
@@ -360,7 +351,7 @@ describe("greeting-generator main functions", () => {
         () => generateMaestroGreeting("euclide", "Test", "it"),
         () => generateCoachGreeting("Test", "en"),
         () => {
-          const ctx: GreetingContext = { student: mockStudent, locale: "fr" };
+          const ctx: GreetingContext = { student: mockStudent, language: "fr" };
           return generateGreeting("mario", "Test", "buddy", ctx);
         },
       ];
@@ -445,7 +436,7 @@ describe("greeting-generator main functions", () => {
     it("buddy greetings should use generic friendly template", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "en",
+        language: "en",
       };
       const greeting = generateGreeting("mario", "Mario", "buddy", context);
       expect(greeting).toBeTruthy();

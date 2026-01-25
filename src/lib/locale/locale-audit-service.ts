@@ -10,7 +10,7 @@
  */
 
 import { prisma } from "@/lib/db";
-import { LocaleAuditAction } from "@prisma/client";
+import { LocaleAuditAction, Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "locale-audit" });
@@ -31,7 +31,7 @@ export async function logLocaleCreate(
   localeId: string,
   adminId: string,
   newData: LocaleConfigData,
-  notes?: string
+  notes?: string,
 ): Promise<void> {
   try {
     await prisma.localeAuditLog.create({
@@ -41,7 +41,7 @@ export async function logLocaleCreate(
         action: "LOCALE_CREATE",
         changes: {
           new: newData,
-        } as any,
+        } as unknown as Prisma.JsonObject,
         notes,
       },
     });
@@ -65,7 +65,7 @@ export async function logLocaleUpdate(
   adminId: string,
   oldData: Partial<LocaleConfigData>,
   newData: Partial<LocaleConfigData>,
-  notes?: string
+  notes?: string,
 ): Promise<void> {
   try {
     await prisma.localeAuditLog.create({
@@ -76,7 +76,7 @@ export async function logLocaleUpdate(
         changes: {
           old: oldData,
           new: newData,
-        } as any,
+        } as Prisma.JsonObject,
         notes,
       },
     });
@@ -99,7 +99,7 @@ export async function logLocaleDelete(
   localeId: string,
   adminId: string,
   deletedData: LocaleConfigData,
-  notes?: string
+  notes?: string,
 ): Promise<void> {
   try {
     await prisma.localeAuditLog.create({
@@ -109,7 +109,7 @@ export async function logLocaleDelete(
         action: "LOCALE_DELETE",
         changes: {
           old: deletedData,
-        } as any,
+        } as unknown as Prisma.JsonObject,
         notes,
       },
     });
@@ -133,14 +133,14 @@ export async function getLocaleAuditLogs(
   options?: {
     limit?: number;
     offset?: number;
-  }
+  },
 ): Promise<
   Array<{
     id: string;
     localeId: string;
     adminId: string;
     action: LocaleAuditAction;
-    changes: any;
+    changes: Prisma.JsonValue;
     notes: string | null;
     createdAt: Date;
   }>
@@ -153,7 +153,7 @@ export async function getLocaleAuditLogs(
       skip: options?.offset || 0,
     });
 
-    return logs as any;
+    return logs;
   } catch (error) {
     log.error("Failed to retrieve audit logs", { localeId, error });
     return [];
@@ -168,14 +168,14 @@ export async function getAdminAuditLogs(
   options?: {
     limit?: number;
     offset?: number;
-  }
+  },
 ): Promise<
   Array<{
     id: string;
     localeId: string;
     adminId: string;
     action: LocaleAuditAction;
-    changes: any;
+    changes: Prisma.JsonValue;
     notes: string | null;
     createdAt: Date;
   }>
@@ -188,7 +188,7 @@ export async function getAdminAuditLogs(
       skip: options?.offset || 0,
     });
 
-    return logs as any;
+    return logs;
   } catch (error) {
     log.error("Failed to retrieve admin audit logs", { adminId, error });
     return [];
@@ -204,14 +204,14 @@ export async function getAuditLogsByDateRange(
   options?: {
     limit?: number;
     offset?: number;
-  }
+  },
 ): Promise<
   Array<{
     id: string;
     localeId: string;
     adminId: string;
     action: LocaleAuditAction;
-    changes: any;
+    changes: Prisma.JsonValue;
     notes: string | null;
     createdAt: Date;
   }>
@@ -229,7 +229,7 @@ export async function getAuditLogsByDateRange(
       skip: options?.offset || 0,
     });
 
-    return logs as any;
+    return logs;
   } catch (error) {
     log.error("Failed to retrieve audit logs by date range", {
       startDate,

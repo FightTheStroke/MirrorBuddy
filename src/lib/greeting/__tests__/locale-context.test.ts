@@ -7,7 +7,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { generateGreeting, generateMaestroGreeting, generateCoachGreeting } from "../greeting-generator";
+import {
+  generateGreeting,
+  generateMaestroGreeting,
+  generateCoachGreeting,
+} from "../greeting-generator";
 import type { GreetingContext } from "@/types/greeting";
 import type { ExtendedStudentProfile } from "@/lib/stores/settings-types";
 
@@ -34,14 +38,14 @@ describe("Locale-aware greeting generation", () => {
     it("generates Italian greeting when locale is 'it'", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "it",
+        language: "it",
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euclide",
         "maestro",
-        context
+        context,
       );
 
       expect(greeting).toContain("Sono Euclide");
@@ -51,14 +55,14 @@ describe("Locale-aware greeting generation", () => {
     it("generates English greeting when locale is 'en'", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "en",
+        language: "en",
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euclid",
         "maestro",
-        context
+        context,
       );
 
       expect(greeting).toContain("Euclid");
@@ -68,14 +72,14 @@ describe("Locale-aware greeting generation", () => {
     it("generates Spanish greeting when locale is 'es'", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "es",
+        language: "es",
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euclides",
         "maestro",
-        context
+        context,
       );
 
       expect(greeting).toContain("Soy Euclides");
@@ -85,14 +89,14 @@ describe("Locale-aware greeting generation", () => {
     it("generates French greeting when locale is 'fr'", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "fr",
+        language: "fr",
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euclide",
         "maestro",
-        context
+        context,
       );
 
       expect(greeting).toContain("Je suis Euclide");
@@ -102,14 +106,14 @@ describe("Locale-aware greeting generation", () => {
     it("generates German greeting when locale is 'de'", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "de",
+        language: "de",
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euklid",
         "maestro",
-        context
+        context,
       );
 
       expect(greeting).toContain("Ich bin Euklid");
@@ -119,15 +123,10 @@ describe("Locale-aware greeting generation", () => {
     it("generates coach greeting with correct locale", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "en",
+        language: "en",
       };
 
-      const greeting = generateGreeting(
-        "melissa",
-        "Melissa",
-        "coach",
-        context
-      );
+      const greeting = generateGreeting("melissa", "Melissa", "coach", context);
 
       expect(greeting).toContain("Melissa");
       expect(greeting).toMatch(/help you learn/i);
@@ -175,14 +174,14 @@ describe("Locale-aware greeting generation", () => {
     it("uses Italian when locale is missing from context", () => {
       const context: GreetingContext = {
         student: mockStudent,
-        locale: "it", // Explicitly use Italian for fallback test
+        language: "it", // Explicitly use Italian for fallback test
       };
 
       const greeting = generateGreeting(
         "euclide",
         "Euclide",
         "maestro",
-        context
+        context,
       );
 
       // Should fall back to Italian
