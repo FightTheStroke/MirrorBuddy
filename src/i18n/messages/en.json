@@ -8,7 +8,8 @@
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
-    "close": "Close"
+    "close": "Close",
+    "retry": "Retry"
   },
   "navigation": {
     "home": "Home",
@@ -254,6 +255,20 @@
       "loadingMaterial": "Loading material...",
       "buildCancelled": "Build cancelled",
       "errorOccurred": "An error occurred"
+    },
+    "print": {
+      "successTitle": "Print started",
+      "successMessage": "The document will open in the print window.",
+      "downloadSuccessTitle": "File downloaded",
+      "downloadSuccessMessage": "The HTML file has been downloaded.",
+      "errorTitle": "Print error",
+      "errorMessage": "Unable to open the print window. Check your popup settings.",
+      "errorGenericMessage": "Unable to download the file.",
+      "ariaPrint": "Print {title}",
+      "ariaOptions": "Print options for {title}",
+      "buttonLabel": "Print",
+      "pdfOption": "Print PDF",
+      "htmlOption": "Download HTML"
     }
   },
   "education": {
@@ -1404,20 +1419,18 @@
     }
   },
   "voice": {
-    "panel": {
-      "connecting": "Connecting...",
-      "speaking": "{name} is speaking...",
-      "listening": "Listening...",
-      "connected": "Connected",
-      "startingCall": "Starting call...",
-      "mutedLabel": "Unmute microphone",
-      "unmuteLabel": "Mute microphone",
-      "muteLabel": "Mute microphone",
-      "microphoneDisabled": "Microphone muted",
-      "speakNow": "Speak now..."
-    },
-    "connectionError": "Voice connection error",
-    "microphoneUnauthorized": "Microphone not authorized. Enable the microphone in your browser settings."
+    "permission": {
+      "title": "Microphone Permission Required",
+      "subtitle": "Voice requires microphone access",
+      "enableLabel": "To enable the microphone:",
+      "steps": {
+        "lockIcon": "Click the lock icon in the address bar",
+        "findMicrophone": "Find \"Microphone\" in site settings",
+        "selectAllow": "Select \"Allow\"",
+        "reload": "Reload the page"
+      },
+      "switchToChat": "Switch to Text Chat"
+    }
   },
   "session": {
     "rating": {
@@ -1993,6 +2006,13 @@
           "description": "Comprehension check"
         }
       }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Page loading in progress",
+      "sessionLoading": "Session loading in progress",
+      "sessionLoadingText": "Loading session..."
     }
   }
 }

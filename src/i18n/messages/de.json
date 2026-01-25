@@ -8,7 +8,8 @@
     "save": "Speichern",
     "delete": "Löschen",
     "edit": "Bearbeiten",
-    "close": "Schließen"
+    "close": "Schließen",
+    "retry": "Wiederholen"
   },
   "navigation": {
     "home": "Startseite",
@@ -245,6 +246,20 @@
       "loadingMaterial": "Material wird geladen...",
       "buildCancelled": "Bau abgebrochen",
       "errorOccurred": "Ein Fehler ist aufgetreten"
+    },
+    "print": {
+      "successTitle": "Druck gestartet",
+      "successMessage": "Das Dokument wird im Druckfenster geöffnet.",
+      "downloadSuccessTitle": "Datei heruntergeladen",
+      "downloadSuccessMessage": "Die HTML-Datei wurde heruntergeladen.",
+      "errorTitle": "Druckfehler",
+      "errorMessage": "Das Druckfenster konnte nicht geöffnet werden. Überprüfen Sie Ihre Popup-Einstellungen.",
+      "errorGenericMessage": "Die Datei konnte nicht heruntergeladen werden.",
+      "ariaPrint": "{title} drucken",
+      "ariaOptions": "Druckoptionen für {title}",
+      "buttonLabel": "Drucken",
+      "pdfOption": "PDF drucken",
+      "htmlOption": "HTML herunterladen"
     }
   },
   "education": {
@@ -1395,20 +1410,18 @@
     }
   },
   "voice": {
-    "panel": {
-      "connecting": "Verbindung wird hergestellt...",
-      "speaking": "{name} spricht...",
-      "listening": "Höre zu...",
-      "connected": "Verbunden",
-      "startingCall": "Anruf wird eingeleitet...",
-      "mutedLabel": "Mikrofon aktivieren",
-      "unmuteLabel": "Mikrofon stummschalten",
-      "muteLabel": "Mikrofon stummschalten",
-      "microphoneDisabled": "Mikrofon stumm",
-      "speakNow": "Jetzt sprechen..."
-    },
-    "connectionError": "Sprachverbindungsfehler",
-    "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in Ihren Browsereinstellungen."
+    "permission": {
+      "title": "Mikrofonberechtigung Erforderlich",
+      "subtitle": "Sprachfunktion benötigt Zugriff auf das Mikrofon",
+      "enableLabel": "So aktivieren Sie das Mikrofon:",
+      "steps": {
+        "lockIcon": "Klicken Sie auf das Schlosssymbol in der Adressleiste",
+        "findMicrophone": "Suchen Sie \"Mikrofon\" in den Website-Einstellungen",
+        "selectAllow": "Wählen Sie \"Zulassen\"",
+        "reload": "Seite neu laden"
+      },
+      "switchToChat": "Zu Text-Chat wechseln"
+    }
   },
   "session": {
     "rating": {
@@ -1984,6 +1997,13 @@
           "description": "Verständnisprüfung"
         }
       }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Seite wird geladen",
+      "sessionLoading": "Sitzung wird geladen",
+      "sessionLoadingText": "Sitzung wird geladen..."
     }
   }
 }

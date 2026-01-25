@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { AlertCircle, MessageSquare } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { AlertCircle, MessageSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
 interface PermissionErrorViewProps {
   error: string;
@@ -18,6 +19,9 @@ export function PermissionErrorView({
   onSwitchToChat,
   onClose,
 }: PermissionErrorViewProps) {
+  const t = useTranslations("voice.permission");
+  const tCommon = useTranslations("common");
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <motion.div
@@ -32,8 +36,8 @@ export function PermissionErrorView({
                 <AlertCircle className="w-6 h-6 text-amber-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Permesso Microfono Richiesto</h2>
-                <p className="text-sm text-amber-300">La voce richiede accesso al microfono</p>
+                <h2 className="text-xl font-semibold">{t("title")}</h2>
+                <p className="text-sm text-amber-300">{t("subtitle")}</p>
               </div>
             </div>
 
@@ -42,12 +46,12 @@ export function PermissionErrorView({
             </div>
 
             <div className="space-y-2 mb-4">
-              <p className="text-sm text-slate-300">Per abilitare il microfono:</p>
+              <p className="text-sm text-slate-300">{t("enableLabel")}</p>
               <ol className="text-sm text-slate-400 list-decimal list-inside space-y-1">
-                <li>Clicca sull&apos;icona del lucchetto nella barra degli indirizzi</li>
-                <li>Trova &quot;Microfono&quot; nelle impostazioni del sito</li>
-                <li>Seleziona &quot;Consenti&quot;</li>
-                <li>Ricarica la pagina</li>
+                <li>{t("steps.lockIcon")}</li>
+                <li>{t("steps.findMicrophone")}</li>
+                <li>{t("steps.selectAllow")}</li>
+                <li>{t("steps.reload")}</li>
               </ol>
             </div>
 
@@ -56,7 +60,7 @@ export function PermissionErrorView({
                 onClick={onRetry}
                 className="flex-1 bg-amber-600 hover:bg-amber-700"
               >
-                Riprova
+                {tCommon("retry")}
               </Button>
               {onSwitchToChat && (
                 <Button
@@ -65,7 +69,7 @@ export function PermissionErrorView({
                   className="flex-1 border-amber-600 text-amber-400 hover:bg-amber-950"
                 >
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Usa Chat Testuale
+                  {t("switchToChat")}
                 </Button>
               )}
               <Button
@@ -73,7 +77,7 @@ export function PermissionErrorView({
                 variant="outline"
                 className="flex-1 border-slate-600"
               >
-                Chiudi
+                {tCommon("close")}
               </Button>
             </div>
           </div>

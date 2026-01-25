@@ -8,7 +8,8 @@
     "save": "Enregistrer",
     "delete": "Supprimer",
     "edit": "Modifier",
-    "close": "Fermer"
+    "close": "Fermer",
+    "retry": "Réessayer"
   },
   "navigation": {
     "home": "Accueil",
@@ -245,6 +246,20 @@
       "loadingMaterial": "Chargement du matériel...",
       "buildCancelled": "Construction annulée",
       "errorOccurred": "Une erreur s'est produite"
+    },
+    "print": {
+      "successTitle": "Impression démarrée",
+      "successMessage": "Le document s'ouvrira dans la fenêtre d'impression.",
+      "downloadSuccessTitle": "Fichier téléchargé",
+      "downloadSuccessMessage": "Le fichier HTML a été téléchargé.",
+      "errorTitle": "Erreur d'impression",
+      "errorMessage": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez vos paramètres contextuels.",
+      "errorGenericMessage": "Impossible de télécharger le fichier.",
+      "ariaPrint": "Imprimer {title}",
+      "ariaOptions": "Options d'impression pour {title}",
+      "buttonLabel": "Imprimer",
+      "pdfOption": "Imprimer PDF",
+      "htmlOption": "Télécharger HTML"
     }
   },
   "education": {
@@ -1395,20 +1410,18 @@
     }
   },
   "voice": {
-    "panel": {
-      "connecting": "Connexion en cours...",
-      "speaking": "{name} est en train de parler...",
-      "listening": "À l'écoute...",
-      "connected": "Connecté",
-      "startingCall": "Appel en cours de démarrage...",
-      "mutedLabel": "Activer le microphone",
-      "unmuteLabel": "Désactiver le microphone",
-      "muteLabel": "Désactiver le microphone",
-      "microphoneDisabled": "Microphone désactivé",
-      "speakNow": "Parlez maintenant..."
-    },
-    "connectionError": "Erreur de connexion vocale",
-    "microphoneUnauthorized": "Microphone non autorisé. Activez le microphone dans les paramètres de votre navigateur."
+    "permission": {
+      "title": "Permission Microphone Requise",
+      "subtitle": "La voix nécessite un accès au microphone",
+      "enableLabel": "Pour activer le microphone:",
+      "steps": {
+        "lockIcon": "Cliquez sur l'icône du cadenas dans la barre d'adresse",
+        "findMicrophone": "Trouvez \"Microphone\" dans les paramètres du site",
+        "selectAllow": "Sélectionnez \"Autoriser\"",
+        "reload": "Recharger la page"
+      },
+      "switchToChat": "Passer au Chat Texte"
+    }
   },
   "session": {
     "rating": {
@@ -1984,6 +1997,13 @@
           "description": "Vérification de la compréhension"
         }
       }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Chargement de la page en cours",
+      "sessionLoading": "Chargement de la session en cours",
+      "sessionLoadingText": "Chargement de la session..."
     }
   }
 }

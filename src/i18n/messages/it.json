@@ -8,7 +8,8 @@
     "save": "Salva",
     "delete": "Elimina",
     "edit": "Modifica",
-    "close": "Chiudi"
+    "close": "Chiudi",
+    "retry": "Riprova"
   },
   "navigation": {
     "home": "Home",
@@ -254,6 +255,20 @@
       "loadingMaterial": "Caricamento materiale...",
       "buildCancelled": "Costruzione annullata",
       "errorOccurred": "Si è verificato un errore"
+    },
+    "print": {
+      "successTitle": "Stampa avviata",
+      "successMessage": "Il documento si aprirà nella finestra di stampa.",
+      "downloadSuccessTitle": "File scaricato",
+      "downloadSuccessMessage": "Il file HTML è stato scaricato.",
+      "errorTitle": "Errore di stampa",
+      "errorMessage": "Impossibile aprire la finestra di stampa. Controlla le impostazioni popup.",
+      "errorGenericMessage": "Impossibile scaricare il file.",
+      "ariaPrint": "Stampa {title}",
+      "ariaOptions": "Opzioni stampa per {title}",
+      "buttonLabel": "Stampa",
+      "pdfOption": "Stampa PDF",
+      "htmlOption": "Scarica HTML"
     }
   },
   "education": {
@@ -1777,20 +1792,18 @@
     }
   },
   "voice": {
-    "panel": {
-      "connecting": "Connessione...",
-      "speaking": "{name} sta parlando...",
-      "listening": "In ascolto...",
-      "connected": "Connesso",
-      "startingCall": "Avvio chiamata...",
-      "mutedLabel": "Attiva microfono",
-      "unmuteLabel": "Disattiva microfono",
-      "muteLabel": "Disattiva microfono",
-      "microphoneDisabled": "Microfono disattivato",
-      "speakNow": "Parla ora..."
-    },
-    "connectionError": "Errore di connessione vocale",
-    "microphoneUnauthorized": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser."
+    "permission": {
+      "title": "Permesso Microfono Richiesto",
+      "subtitle": "La voce richiede accesso al microfono",
+      "enableLabel": "Per abilitare il microfono:",
+      "steps": {
+        "lockIcon": "Clicca sull'icona del lucchetto nella barra degli indirizzi",
+        "findMicrophone": "Trova \"Microfono\" nelle impostazioni del sito",
+        "selectAllow": "Seleziona \"Consenti\"",
+        "reload": "Ricarica la pagina"
+      },
+      "switchToChat": "Usa Chat Testuale"
+    }
   },
   "session": {
     "rating": {
@@ -2368,6 +2381,13 @@
           "description": "Verifica comprensione"
         }
       }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Caricamento pagina in corso",
+      "sessionLoading": "Caricamento sessione in corso",
+      "sessionLoadingText": "Caricamento sessione..."
     }
   }
 }

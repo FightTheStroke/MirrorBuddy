@@ -45,7 +45,8 @@
     "settings": "Settings",
     "profile": "Profile",
     "logout": "Logout",
-    "login": "Login"
+    "login": "Login",
+    "retry": "Reintentar"
   },
   "home": {
     "title": "La Escuela Que Quiero",
@@ -596,6 +597,20 @@
       "loadingMaterial": "Cargando material...",
       "buildCancelled": "Construcción cancelada",
       "errorOccurred": "Ocurrió un error"
+    },
+    "print": {
+      "successTitle": "Impresión iniciada",
+      "successMessage": "El documento se abrirá en la ventana de impresión.",
+      "downloadSuccessTitle": "Archivo descargado",
+      "downloadSuccessMessage": "El archivo HTML ha sido descargado.",
+      "errorTitle": "Error de impresión",
+      "errorMessage": "No se puede abrir la ventana de impresión. Verifica la configuración de ventanas emergentes.",
+      "errorGenericMessage": "No se puede descargar el archivo.",
+      "ariaPrint": "Imprimir {title}",
+      "ariaOptions": "Opciones de impresión para {title}",
+      "buttonLabel": "Imprimir",
+      "pdfOption": "Imprimir PDF",
+      "htmlOption": "Descargar HTML"
     }
   },
   "education": {
@@ -1621,20 +1636,18 @@
     }
   },
   "voice": {
-    "panel": {
-      "connecting": "Conectando...",
-      "speaking": "{name} está hablando...",
-      "listening": "Escuchando...",
-      "connected": "Conectado",
-      "startingCall": "Iniciando llamada...",
-      "mutedLabel": "Activar micrófono",
-      "unmuteLabel": "Silenciar micrófono",
-      "muteLabel": "Silenciar micrófono",
-      "microphoneDisabled": "Micrófono silenciado",
-      "speakNow": "Habla ahora..."
-    },
-    "connectionError": "Error de conexión de voz",
-    "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador."
+    "permission": {
+      "title": "Permiso de Micrófono Requerido",
+      "subtitle": "La voz requiere acceso al micrófono",
+      "enableLabel": "Para habilitar el micrófono:",
+      "steps": {
+        "lockIcon": "Haz clic en el icono de candado en la barra de direcciones",
+        "findMicrophone": "Encuentra \"Micrófono\" en la configuración del sitio",
+        "selectAllow": "Selecciona \"Permitir\"",
+        "reload": "Recarga la página"
+      },
+      "switchToChat": "Cambiar a Chat de Texto"
+    }
   },
   "session": {
     "rating": {
@@ -2173,6 +2186,13 @@
           "description": "Verificación de comprensión"
         }
       }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Página cargando",
+      "sessionLoading": "Sesión cargando",
+      "sessionLoadingText": "Cargando sesión..."
     }
   }
 }
