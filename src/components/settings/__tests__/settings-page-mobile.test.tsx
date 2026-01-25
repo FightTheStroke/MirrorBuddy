@@ -136,7 +136,7 @@ describe("SettingsPageMobile", () => {
   it("has full-width responsive layout", () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const mainDiv = container.firstChild;
+    const mainDiv = container.firstElementChild;
     expect(mainDiv?.className).toMatch(/h-screen/);
     expect(mainDiv?.className).toMatch(/flex/);
     expect(mainDiv?.className).toMatch(/flex-col/);
@@ -145,14 +145,14 @@ describe("SettingsPageMobile", () => {
   it("has dark mode support", () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const mainDiv = container.firstChild;
+    const mainDiv = container.firstElementChild;
     expect(mainDiv?.className).toMatch(/dark:/);
   });
 
   it("has safe area padding for iOS notch", () => {
     const { container } = render(<SettingsPageMobile onBack={vi.fn()} />);
 
-    const mainDiv = container.firstChild;
+    const mainDiv = container.firstElementChild;
     expect(mainDiv?.className).toMatch(/pt-\[env\(safe-area-inset-top\)\]/);
   });
 

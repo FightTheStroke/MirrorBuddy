@@ -79,3 +79,56 @@ describe("MaestriGrid - Search Bar Mobile Responsive", () => {
     expect(clearButton).toHaveClass("right-1");
   });
 });
+
+describe("MaestriGrid - Responsive Columns (F-37)", () => {
+  it("renders grid container with responsive column classes", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv).toBeInTheDocument();
+  });
+
+  it("has 1 column on xs screens (grid-cols-1)", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/grid-cols-1/);
+  });
+
+  it("has 2 columns on sm screens (sm:grid-cols-2)", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/sm:grid-cols-2/);
+  });
+
+  it("has 3 columns on md screens (md:grid-cols-3)", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/md:grid-cols-3/);
+  });
+
+  it("has 4 columns on lg+ screens (lg:grid-cols-4)", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/lg:grid-cols-4/);
+  });
+
+  it("has responsive gap - gap-3 on mobile", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/gap-3/);
+  });
+
+  it("has responsive gap - sm:gap-4 on desktop", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/sm:gap-4/);
+  });
+
+  it("displays all responsive column classes together", () => {
+    const { container } = render(<MaestriGrid />);
+    const gridDiv = container.querySelector('[class*="grid"]');
+    expect(gridDiv?.className).toMatch(/grid-cols-1/);
+    expect(gridDiv?.className).toMatch(/sm:grid-cols-2/);
+    expect(gridDiv?.className).toMatch(/md:grid-cols-3/);
+    expect(gridDiv?.className).toMatch(/lg:grid-cols-4/);
+  });
+});
