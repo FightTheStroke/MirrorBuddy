@@ -28,6 +28,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+#### Production API 500 Error (Env Validation)
+
+- **env.ts**: Made `SUPABASE_CA_CERT` optional in production schema
+  - Root cause: Zod validation ran before `db.ts` could load certificate from file
+  - Certificate file (`config/supabase-chain.pem`) has priority over env var
+  - All serverless functions were returning 500 due to validation failure at bootstrap
+- **Route conflict**: Renamed `[userId]` to `[id]` in `/api/admin/users/*/feature-configs`
+  - Next.js requires consistent dynamic segment names in the same route tree
+
 #### Unified SSL Configuration (Plan 074)
 
 - **Shared SSL Utility**: Created `src/lib/ssl-config.ts` for consistent SSL configuration across all scripts
