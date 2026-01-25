@@ -15,7 +15,12 @@
     "dashboard": "Tableau de bord",
     "settings": "Paramètres",
     "profile": "Profil",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "professors": "Professeurs",
+    "backpack": "Sac à Dos",
+    "toolcase": "Trousse",
+    "calendar": "Calendrier",
+    "progress": "Progrès"
   },
   "auth": {
     "login": "Se connecter",
@@ -1390,7 +1395,33 @@
       "auditory": "Auditif",
       "auditoryDesc": "Communication visuelle, pas de dépendance audio",
       "cerebralPalsy": "Paralysie Cérébrale",
-      "cerebralPalsyDesc": "TTS, grand texte, clavier, espacement extra"
+      "cerebralPalsyDesc": "TTS, grand texte, clavier, espacement extra",
+      "panelTitle": "Accessibilité",
+      "closePanel": "Fermer le panneau",
+      "quickProfiles": "Profils rapides",
+      "quickSettings": "Paramètres rapides",
+      "largeText": "Grand texte",
+      "highContrast": "Contraste élevé",
+      "reduceAnimations": "Réduire les animations",
+      "dyslexiaFont": "Police dyslexie",
+      "resetSettings": "Réinitialiser les paramètres",
+      "allSettings": "Tous les paramètres",
+      "closeSettings": "Fermer les paramètres",
+      "presetDyslexia": "Profil Dyslexie",
+      "presetDyslexiaDesc": "Police optimisée, espacement et TTS",
+      "presetADHD": "Profil TDAH",
+      "presetADHDDesc": "Mode focus, minuteur et pauses",
+      "presetAutism": "Profil Autisme",
+      "presetAutismDesc": "Environnement calme, pas de distractions",
+      "presetVisual": "Profil Visuel",
+      "presetVisualDesc": "Contraste élevé, grand texte, TTS",
+      "presetAuditory": "Profil Auditif",
+      "presetAuditoryDesc": "Focus sur la communication visuelle",
+      "presetMotor": "Profil Moteur",
+      "presetMotorDesc": "Navigation au clavier, pas d'animations",
+      "presetCerebral": "Paralysie Cérébrale",
+      "presetCerebralDesc": "TTS, grand texte, navigation facile",
+      "resetDefaults": "Réinitialiser aux paramètres par défaut"
     },
     "profile": {
       "personalInfoTitle": "Informations Personnelles",
@@ -1550,7 +1581,12 @@
   "supporti": {
     "pageTitle": "Cartable",
     "errorTitle": "Quelque chose s'est mal passé",
-    "reloadButton": "Recharger la page"
+    "reloadButton": "Recharger la page",
+    "allSupports": "Tous les Matériaux",
+    "favorites": "Favoris",
+    "byType": "Par Type",
+    "bySubject": "Par Matière",
+    "byProfessor": "Par Professeur"
   },
   "admin": {
     "invites": {
@@ -1764,5 +1800,21 @@
   "astuccio": {
     "backButton": "Retour à Astuccio",
     "itemCount": "{count} outils"
+  },
+  "home": {
+    "title": "L'École Que Je Veux",
+    "loading": "Chargement...",
+    "returnHome": "Retour à l'accueil",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu",
+    "trialMode": "Mode Essai",
+    "login": "Se Connecter",
+    "requestAccess": "Demander l'accès",
+    "parentArea": "Espace Parents",
+    "adminDashboard": "Tableau de Bord Admin",
+    "logout": "Se Déconnecter",
+    "season": {
+      "autumn": "Automne"
+    }
   }
 }

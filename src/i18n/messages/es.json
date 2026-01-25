@@ -48,37 +48,19 @@
     "login": "Login"
   },
   "home": {
-    "appTitle": "MirrorBuddy - The School I Want",
-    "loading": "Loading...",
-    "seasonDefault": "Autumn",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professors",
-      "astuccio": "Pencil Case",
-      "zaino": "Backpack",
-      "calendar": "Calendar",
-      "progress": "Progress",
-      "settings": "Settings"
-    },
-    "header": {
-      "openMenu": "Open menu",
-      "streak": "Streak",
-      "sessionsThisWeek": "Sessions this week",
-      "studyTime": "Study time",
-      "questionsAsked": "Questions asked",
-      "trial": "Trial",
-      "trialClickToRequest": "Click to request full access"
-    },
-    "sidebar": {
-      "backToHome": "Back to home",
-      "appName": "MirrorBuddy",
-      "closeMenu": "Close menu",
-      "trialMode": "Trial Mode",
-      "login": "Login",
-      "requestAccess": "Request Access",
-      "adminDashboard": "Admin Dashboard",
-      "adminDashboardAria": "Administrator dashboard",
-      "parentArea": "Parent Area"
+    "title": "La Escuela Que Quiero",
+    "loading": "Cargando...",
+    "returnHome": "Volver al inicio",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "trialMode": "Modo Prueba",
+    "login": "Iniciar Sesión",
+    "requestAccess": "Solicitar Acceso",
+    "parentArea": "Área de Padres",
+    "adminDashboard": "Panel de Administración",
+    "logout": "Cerrar Sesión",
+    "season": {
+      "autumn": "Otoño"
     }
   },
   "navigation": {
@@ -95,9 +77,9 @@
     "homework": "Homework",
     "documents": "Documents",
     "learningPath": "Learning Path",
-    "progress": "Progress",
+    "progress": "Progreso",
     "achievements": "Achievements",
-    "settings": "Settings",
+    "settings": "Configuración",
     "profile": "Profile",
     "admin": "Administration",
     "help": "Help",
@@ -105,13 +87,16 @@
     "about": "About",
     "privacy": "Privacy",
     "terms": "Terms of Service",
-    "calendar": "Calendar",
+    "calendar": "Calendario",
     "parentArea": "Parent Area",
     "adminDashboard": "Admin Dashboard",
     "breadcrumbs": {
       "home": "Home",
       "separator": "/"
-    }
+    },
+    "professors": "Profesores",
+    "backpack": "Mochila",
+    "toolcase": "Estuche"
   },
   "auth": {
     "login": "Iniciar sesión",
@@ -401,7 +386,33 @@
       "auditory": "Auditivo",
       "auditoryDesc": "Comunicación visual, sin dependencia de audio",
       "cerebralPalsy": "Parálisis Cerebral",
-      "cerebralPalsyDesc": "TTS, texto grande, teclado, espaciado extra"
+      "cerebralPalsyDesc": "TTS, texto grande, teclado, espaciado extra",
+      "panelTitle": "Accesibilidad",
+      "closePanel": "Cerrar panel",
+      "quickProfiles": "Perfiles rápidos",
+      "quickSettings": "Configuración rápida",
+      "largeText": "Texto grande",
+      "highContrast": "Alto contraste",
+      "reduceAnimations": "Reducir animaciones",
+      "dyslexiaFont": "Fuente dislexia",
+      "resetSettings": "Restablecer configuración",
+      "allSettings": "Todas las configuraciones",
+      "closeSettings": "Cerrar configuración",
+      "presetDyslexia": "Perfil Dislexia",
+      "presetDyslexiaDesc": "Fuente optimizada, espaciado y TTS",
+      "presetADHD": "Perfil TDAH",
+      "presetADHDDesc": "Modo de enfoque, temporizador y pausas",
+      "presetAutism": "Perfil Autismo",
+      "presetAutismDesc": "Ambiente tranquilo, sin distracciones",
+      "presetVisual": "Perfil Visual",
+      "presetVisualDesc": "Alto contraste, texto grande, TTS",
+      "presetAuditory": "Perfil Auditivo",
+      "presetAuditoryDesc": "Enfoque en comunicación visual",
+      "presetMotor": "Perfil Motor",
+      "presetMotorDesc": "Navegación por teclado, sin animaciones",
+      "presetCerebral": "Parálisis Cerebral",
+      "presetCerebralDesc": "TTS, texto grande, navegación fácil",
+      "resetDefaults": "Restablecer configuración predeterminada"
     },
     "profile": {
       "personalInfoTitle": "Información Personal",
@@ -1779,7 +1790,12 @@
   "supporti": {
     "pageTitle": "Mochila",
     "errorTitle": "Algo salió mal",
-    "reloadButton": "Recargar página"
+    "reloadButton": "Recargar página",
+    "allSupports": "Todos los Materiales",
+    "favorites": "Favoritos",
+    "byType": "Por Tipo",
+    "bySubject": "Por Materia",
+    "byProfessor": "Por Profesor"
   },
   "admin": {
     "invites": {

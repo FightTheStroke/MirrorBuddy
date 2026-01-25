@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
 import { motion } from "framer-motion";
 import {
@@ -42,6 +43,8 @@ const MB_PER_LEVEL = 1000;
 
 export default function Home() {
   const router = useRouter();
+  const t = useTranslations("home");
+  const tNav = useTranslations("navigation");
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
     useOnboardingStore();
 
@@ -133,12 +136,12 @@ export default function Home() {
   if (!isHydrated || !hasCompletedOnboarding) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-        <h1 className="sr-only">MirrorBuddy - La Scuola Che Vorrei</h1>
+        <h1 className="sr-only">MirrorBuddy - {t("title")}</h1>
         <div
           className="flex items-center justify-center min-h-screen"
           role="main"
         >
-          <div className="animate-pulse text-slate-400">Caricamento...</div>
+          <div className="animate-pulse text-slate-400">{t("loading")}</div>
         </div>
       </div>
     );
@@ -146,7 +149,7 @@ export default function Home() {
 
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
   const progressPercent = Math.min(100, (mbInLevel / MB_PER_LEVEL) * 100);
-  const seasonName = currentSeason?.name || "Autunno";
+  const seasonName = currentSeason?.name || t("season.autumn");
   const selectedCoach = studentProfile?.preferredCoach || "melissa";
   const selectedBuddy = studentProfile?.preferredBuddy || "mario";
   const coachInfo = COACH_INFO[selectedCoach];
@@ -167,17 +170,17 @@ export default function Home() {
       isChat: true,
       avatar: buddyInfo.avatar,
     },
-    { id: "maestri" as const, label: "Professori", icon: GraduationCap },
-    { id: "astuccio" as const, label: "Astuccio", icon: PencilRuler },
-    { id: "supporti" as const, label: "Zaino", icon: Backpack },
-    { id: "calendar" as const, label: "Calendario", icon: Calendar },
-    { id: "progress" as const, label: "Progressi", icon: Trophy },
-    { id: "settings" as const, label: "Impostazioni", icon: Settings },
+    { id: "maestri" as const, label: tNav("professors"), icon: GraduationCap },
+    { id: "astuccio" as const, label: tNav("toolcase"), icon: PencilRuler },
+    { id: "supporti" as const, label: tNav("backpack"), icon: Backpack },
+    { id: "calendar" as const, label: tNav("calendar"), icon: Calendar },
+    { id: "progress" as const, label: tNav("progress"), icon: Trophy },
+    { id: "settings" as const, label: tNav("settings"), icon: Settings },
   ];
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      <h1 className="sr-only">MirrorBuddy - La Scuola Che Vorrei</h1>
+      <h1 className="sr-only">MirrorBuddy - {t("title")}</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
         onMenuClick={() => setSidebarOpen(true)}

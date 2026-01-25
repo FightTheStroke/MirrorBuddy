@@ -15,7 +15,12 @@
     "dashboard": "Dashboard",
     "settings": "Settings",
     "profile": "Profile",
-    "logout": "Log out"
+    "logout": "Log out",
+    "professors": "Professors",
+    "backpack": "Backpack",
+    "toolcase": "Toolcase",
+    "calendar": "Calendar",
+    "progress": "Progress"
   },
   "auth": {
     "login": "Log in",
@@ -1399,7 +1404,33 @@
       "auditory": "Auditory",
       "auditoryDesc": "Visual communication, no audio dependency",
       "cerebralPalsy": "Cerebral Palsy",
-      "cerebralPalsyDesc": "TTS, large text, keyboard, extra spacing"
+      "cerebralPalsyDesc": "TTS, large text, keyboard, extra spacing",
+      "panelTitle": "Accessibility",
+      "closePanel": "Close panel",
+      "quickProfiles": "Quick profiles",
+      "quickSettings": "Quick settings",
+      "largeText": "Large text",
+      "highContrast": "High contrast",
+      "reduceAnimations": "Reduce animations",
+      "dyslexiaFont": "Dyslexia font",
+      "resetSettings": "Reset settings",
+      "allSettings": "All settings",
+      "closeSettings": "Close settings",
+      "presetDyslexia": "Dyslexia Profile",
+      "presetDyslexiaDesc": "Optimized font, spacing and TTS",
+      "presetADHD": "ADHD Profile",
+      "presetADHDDesc": "Focus mode, timer and breaks",
+      "presetAutism": "Autism Profile",
+      "presetAutismDesc": "Calm environment, no distractions",
+      "presetVisual": "Visual Profile",
+      "presetVisualDesc": "High contrast, large text, TTS",
+      "presetAuditory": "Auditory Profile",
+      "presetAuditoryDesc": "Focus on visual communication",
+      "presetMotor": "Motor Profile",
+      "presetMotorDesc": "Keyboard navigation, no animations",
+      "presetCerebral": "Cerebral Palsy",
+      "presetCerebralDesc": "TTS, large text, easy navigation",
+      "resetDefaults": "Reset to default settings"
     },
     "profile": {
       "personalInfoTitle": "Personal Information",
@@ -1559,7 +1590,12 @@
   "supporti": {
     "pageTitle": "Backpack",
     "errorTitle": "Something went wrong",
-    "reloadButton": "Reload page"
+    "reloadButton": "Reload page",
+    "allSupports": "All Materials",
+    "favorites": "Favorites",
+    "byType": "By Type",
+    "bySubject": "By Subject",
+    "byProfessor": "By Professor"
   },
   "admin": {
     "invites": {
@@ -1773,5 +1809,21 @@
   "astuccio": {
     "backButton": "Back to Astuccio",
     "itemCount": "{count} tools"
+  },
+  "home": {
+    "title": "The School I Want",
+    "loading": "Loading...",
+    "returnHome": "Return to home",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "trialMode": "Trial Mode",
+    "login": "Sign In",
+    "requestAccess": "Request Access",
+    "parentArea": "Parent Area",
+    "adminDashboard": "Admin Dashboard",
+    "logout": "Sign Out",
+    "season": {
+      "autumn": "Autumn"
+    }
   }
 }

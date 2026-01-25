@@ -15,7 +15,12 @@
     "dashboard": "Dashboard",
     "settings": "Impostazioni",
     "profile": "Profilo",
-    "logout": "Disconnetti"
+    "logout": "Disconnetti",
+    "professors": "Professori",
+    "backpack": "Zaino",
+    "toolcase": "Astuccio",
+    "calendar": "Calendario",
+    "progress": "Progressi"
   },
   "auth": {
     "login": "Accedi",
@@ -1777,7 +1782,33 @@
       "auditory": "Uditivo",
       "auditoryDesc": "Comunicazione visiva, no dipendenza audio",
       "cerebralPalsy": "Paralisi Cerebrale",
-      "cerebralPalsyDesc": "TTS, testo grande, tastiera, spaziatura extra"
+      "cerebralPalsyDesc": "TTS, testo grande, tastiera, spaziatura extra",
+      "panelTitle": "Accessibilità",
+      "closePanel": "Chiudi pannello",
+      "quickProfiles": "Profili rapidi",
+      "quickSettings": "Impostazioni rapide",
+      "largeText": "Testo grande",
+      "highContrast": "Alto contrasto",
+      "reduceAnimations": "Riduci animazioni",
+      "dyslexiaFont": "Font dislessia",
+      "resetSettings": "Ripristina impostazioni",
+      "allSettings": "Tutte le impostazioni",
+      "closeSettings": "Chiudi impostazioni",
+      "presetDyslexia": "Profilo Dislessia",
+      "presetDyslexiaDesc": "Font ottimizzato, spaziatura e TTS",
+      "presetADHD": "Profilo ADHD",
+      "presetADHDDesc": "Focus mode, timer e pause",
+      "presetAutism": "Profilo Autismo",
+      "presetAutismDesc": "Ambiente calmo, no distrazioni",
+      "presetVisual": "Profilo Visivo",
+      "presetVisualDesc": "Alto contrasto, testo grande, TTS",
+      "presetAuditory": "Profilo Uditivo",
+      "presetAuditoryDesc": "Focus su comunicazione visiva",
+      "presetMotor": "Profilo Motorio",
+      "presetMotorDesc": "Navigazione tastiera, no animazioni",
+      "presetCerebral": "Paralisi Cerebrale",
+      "presetCerebralDesc": "TTS, testo grande, navigazione facilitata",
+      "resetDefaults": "Ripristina impostazioni predefinite"
     },
     "profile": {
       "personalInfoTitle": "Informazioni Personali",
@@ -1937,7 +1968,12 @@
   "supporti": {
     "pageTitle": "Zaino",
     "errorTitle": "Qualcosa è andato storto",
-    "reloadButton": "Ricarica la pagina"
+    "reloadButton": "Ricarica la pagina",
+    "allSupports": "Tutti i Supporti",
+    "favorites": "Preferiti",
+    "byType": "Per Tipo",
+    "bySubject": "Per Materia",
+    "byProfessor": "Per Maestro"
   },
   "admin": {
     "invites": {
@@ -2151,5 +2187,21 @@
   "astuccio": {
     "backButton": "Torna all'Astuccio",
     "itemCount": "{count} strumenti"
+  },
+  "home": {
+    "title": "La Scuola Che Vorrei",
+    "loading": "Caricamento...",
+    "returnHome": "Torna alla home",
+    "openMenu": "Apri menu",
+    "closeMenu": "Chiudi menu",
+    "trialMode": "Modalità Prova",
+    "login": "Accedi",
+    "requestAccess": "Richiedi accesso",
+    "parentArea": "Area Genitori",
+    "adminDashboard": "Dashboard amministratore",
+    "logout": "Esci",
+    "season": {
+      "autumn": "Autunno"
+    }
   }
 }

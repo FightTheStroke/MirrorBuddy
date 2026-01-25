@@ -15,7 +15,12 @@
     "dashboard": "Dashboard",
     "settings": "Einstellungen",
     "profile": "Profil",
-    "logout": "Abmelden"
+    "logout": "Abmelden",
+    "professors": "Professoren",
+    "backpack": "Rucksack",
+    "toolcase": "Werkzeugkasten",
+    "calendar": "Kalender",
+    "progress": "Fortschritt"
   },
   "auth": {
     "login": "Anmelden",
@@ -1390,7 +1395,33 @@
       "auditory": "Gehör",
       "auditoryDesc": "Visuelle Kommunikation, keine Audioabhängigkeit",
       "cerebralPalsy": "Zerebralparese",
-      "cerebralPalsyDesc": "TTS, großer Text, Tastatur, zusätzlicher Abstand"
+      "cerebralPalsyDesc": "TTS, großer Text, Tastatur, zusätzlicher Abstand",
+      "panelTitle": "Barrierefreiheit",
+      "closePanel": "Panel schließen",
+      "quickProfiles": "Schnellprofile",
+      "quickSettings": "Schnelleinstellungen",
+      "largeText": "Großer Text",
+      "highContrast": "Hoher Kontrast",
+      "reduceAnimations": "Animationen reduzieren",
+      "dyslexiaFont": "Dyslexie-Schrift",
+      "resetSettings": "Einstellungen zurücksetzen",
+      "allSettings": "Alle Einstellungen",
+      "closeSettings": "Einstellungen schließen",
+      "presetDyslexia": "Dyslexie-Profil",
+      "presetDyslexiaDesc": "Optimierte Schrift, Abstand und TTS",
+      "presetADHD": "ADHS-Profil",
+      "presetADHDDesc": "Fokusmodus, Timer und Pausen",
+      "presetAutism": "Autismus-Profil",
+      "presetAutismDesc": "Ruhige Umgebung, keine Ablenkung",
+      "presetVisual": "Visuelles Profil",
+      "presetVisualDesc": "Hoher Kontrast, großer Text, TTS",
+      "presetAuditory": "Gehör-Profil",
+      "presetAuditoryDesc": "Fokus auf visuelle Kommunikation",
+      "presetMotor": "Motor-Profil",
+      "presetMotorDesc": "Tastaturnavigation, keine Animationen",
+      "presetCerebral": "Zerebralparese",
+      "presetCerebralDesc": "TTS, großer Text, einfache Navigation",
+      "resetDefaults": "Auf Standardeinstellungen zurücksetzen"
     },
     "profile": {
       "personalInfoTitle": "Persönliche Daten",
@@ -1550,7 +1581,12 @@
   "supporti": {
     "pageTitle": "Rucksack",
     "errorTitle": "Etwas ist schief gelaufen",
-    "reloadButton": "Seite neu laden"
+    "reloadButton": "Seite neu laden",
+    "allSupports": "Alle Materialien",
+    "favorites": "Favoriten",
+    "byType": "Nach Typ",
+    "bySubject": "Nach Fach",
+    "byProfessor": "Nach Professor"
   },
   "admin": {
     "invites": {
@@ -1764,5 +1800,21 @@
   "astuccio": {
     "backButton": "Zurück zu Astuccio",
     "itemCount": "{count} Werkzeuge"
+  },
+  "home": {
+    "title": "Die Schule, Die Ich Will",
+    "loading": "Wird geladen...",
+    "returnHome": "Zur Startseite zurückgeben",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "trialMode": "Testmodus",
+    "login": "Anmelden",
+    "requestAccess": "Zugriff anfordern",
+    "parentArea": "Elternbereich",
+    "adminDashboard": "Admin-Dashboard",
+    "logout": "Abmelden",
+    "season": {
+      "autumn": "Herbst"
+    }
   }
 }
