@@ -18,6 +18,10 @@ on:
       - 'package.json'
       - 'package-lock.json'
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   i18n-check:
     name: Validate i18n Completeness
