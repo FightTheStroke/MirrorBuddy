@@ -3,33 +3,30 @@
 // POST: Receive and store batched telemetry events
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { TelemetryCategory } from '@/lib/telemetry/types';
-
-// CORS headers for telemetry endpoint
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import type { TelemetryCategory } from "@/lib/telemetry/types";
+import { getCorsHeaders } from "@/lib/security/cors-config";
 
 // Handle CORS preflight
-export async function OPTIONS() {
+// F-04: Get CORS headers based on request origin (no wildcard in production)
+export async function OPTIONS(request: NextRequest) {
+  const requestOrigin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(requestOrigin);
   return NextResponse.json({}, { headers: corsHeaders });
 }
 
 const VALID_CATEGORIES: TelemetryCategory[] = [
-  'navigation',
-  'education',
-  'conversation',
-  'maestro',
-  'tools',
-  'accessibility',
-  'error',
-  'performance',
+  "navigation",
+  "education",
+  "conversation",
+  "maestro",
+  "tools",
+  "accessibility",
+  "error",
+  "performance",
 ];
 
 interface EventPayload {
@@ -45,7 +42,11 @@ interface EventPayload {
   }>;
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // F-04: Get CORS headers based on request origin (no wildcard in production)
+  const requestOrigin = request.headers.get("origin");
+  const corsHeaders = getCorsHeaders(requestOrigin);
+
   try {
     const auth = await validateAuth();
     const userId = auth.authenticated ? auth.userId : null;
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
     let body: EventPayload;
     try {
       const text = await request.text();
-      if (!text || text.trim() === '') {
+      if (!text || text.trim() === "") {
         return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
       }
       body = JSON.parse(text);
@@ -64,7 +65,10 @@ export async function POST(request: Request) {
     }
 
     if (!body.events || !Array.isArray(body.events)) {
-      return NextResponse.json({ error: 'Invalid events payload' }, { status: 400, headers: corsHeaders });
+      return NextResponse.json(
+        { error: "Invalid events payload" },
+        { status: 400, headers: corsHeaders },
+      );
     }
 
     // Validate and filter events
@@ -111,12 +115,15 @@ export async function POST(request: Request) {
       })),
     });
 
-    return NextResponse.json({ stored: created.count }, { headers: corsHeaders });
-  } catch (error) {
-    logger.error('Telemetry events POST error', { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to store telemetry events' },
-      { status: 500, headers: corsHeaders }
+      { stored: created.count },
+      { headers: corsHeaders },
+    );
+  } catch (error) {
+    logger.error("Telemetry events POST error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to store telemetry events" },
+      { status: 500, headers: corsHeaders },
     );
   }
 }
