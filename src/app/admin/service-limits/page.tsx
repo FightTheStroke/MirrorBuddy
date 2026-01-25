@@ -1,15 +1,30 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Card,
-  CardContent,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, AlertCircle, Server, Database, Mail, Brain, HardDrive } from "lucide-react";
-import type { ServiceLimitsResponse, ServiceLimit } from "@/app/api/admin/service-limits/route";
-import { ServiceLimitCard, type ServiceMetric } from "@/components/admin/service-limit-card";
-import { getRecommendation, getServiceKey } from "@/lib/admin/service-recommendations";
+import {
+  Loader2,
+  RefreshCw,
+  AlertCircle,
+  Server,
+  Database,
+  Mail,
+  Brain,
+  HardDrive,
+} from "lucide-react";
+import type {
+  ServiceLimitsResponse,
+  ServiceLimit,
+} from "@/app/api/admin/service-limits/route";
+import {
+  ServiceLimitCard,
+  type ServiceMetric,
+} from "@/components/admin/service-limit-card";
+import {
+  getRecommendation,
+  getServiceKey,
+} from "@/lib/admin/service-recommendations";
 
 export default function ServiceLimitsPage() {
   const [initialLoading, setInitialLoading] = useState(true);
@@ -120,7 +135,7 @@ export default function ServiceLimitsPage() {
 
       {/* Service Cards Grid */}
       {data && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {/* Vercel Card */}
           <ServiceLimitCard
             serviceName="Vercel"
@@ -128,7 +143,10 @@ export default function ServiceLimitsPage() {
             metrics={[
               convertToMetric("Bandwidth", data.vercel.bandwidth),
               convertToMetric("Build Minutes", data.vercel.buildMinutes),
-              convertToMetric("Function Invocations", data.vercel.functionInvocations),
+              convertToMetric(
+                "Function Invocations",
+                data.vercel.functionInvocations,
+              ),
             ]}
             recommendation={getRecommendation(
               getServiceKey("vercel"),
@@ -136,7 +154,7 @@ export default function ServiceLimitsPage() {
                 data.vercel.bandwidth,
                 data.vercel.buildMinutes,
                 data.vercel.functionInvocations,
-              ])
+              ]),
             )}
           />
 
@@ -155,7 +173,7 @@ export default function ServiceLimitsPage() {
                 data.supabase.databaseSize,
                 data.supabase.storage,
                 data.supabase.connections,
-              ])
+              ]),
             )}
           />
 
@@ -172,7 +190,7 @@ export default function ServiceLimitsPage() {
               getWorstStatus([
                 data.resend.emailsToday,
                 data.resend.emailsThisMonth,
-              ])
+              ]),
             )}
           />
 
@@ -193,7 +211,7 @@ export default function ServiceLimitsPage() {
                 data.azureOpenAI.chatRPM,
                 data.azureOpenAI.embeddingTPM,
                 data.azureOpenAI.ttsRPM,
-              ])
+              ]),
             )}
           />
 
@@ -207,10 +225,7 @@ export default function ServiceLimitsPage() {
             ]}
             recommendation={getRecommendation(
               getServiceKey("redis"),
-              getWorstStatus([
-                data.redis.storage,
-                data.redis.commandsPerDay,
-              ])
+              getWorstStatus([data.redis.storage, data.redis.commandsPerDay]),
             )}
           />
         </div>
@@ -239,7 +254,14 @@ function convertToMetric(name: string, limit: ServiceLimit): ServiceMetric {
     usage: limit.usage,
     limit: limit.limit,
     percentage: limit.percentage,
-    status: limit.status === "ok" ? "ok" : limit.status === "warning" ? "warning" : limit.status === "critical" ? "critical" : "emergency",
+    status:
+      limit.status === "ok"
+        ? "ok"
+        : limit.status === "warning"
+          ? "warning"
+          : limit.status === "critical"
+            ? "critical"
+            : "emergency",
     unit: limit.unit || "",
     period: limit.period,
   };
@@ -260,7 +282,8 @@ function getWorstStatus(limits: ServiceLimit[]): ServiceMetric["status"] {
   let worstPriority = 0;
 
   for (const limit of limits) {
-    const priority = statusPriority[limit.status as keyof typeof statusPriority] || 0;
+    const priority =
+      statusPriority[limit.status as keyof typeof statusPriority] || 0;
     if (priority > worstPriority) {
       worstPriority = priority;
       worstStatus = limit.status as ServiceMetric["status"];
