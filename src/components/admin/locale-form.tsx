@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
 import { LocaleFormFields } from "./locale-form-fields";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface LocaleFormData {
   id: string;
@@ -65,7 +66,7 @@ export function LocaleForm({ initialData, mode }: LocaleFormProps) {
 
       const method = mode === "create" ? "POST" : "PUT";
 
-      const response = await fetch(url, {
+      const response = await csrfFetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
