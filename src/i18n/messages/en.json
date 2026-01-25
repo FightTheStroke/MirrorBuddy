@@ -821,74 +821,27 @@
     }
   },
   "invite": {
-    "request": {
-      "backButton": "Back",
-      "title": "Request Beta Access",
-      "subtitle": "MirrorBuddy is in private beta. Fill out the form to request access.",
-      "nameLabel": "Name *",
-      "namePlaceholder": "Your name",
-      "emailLabel": "Email *",
-      "emailPlaceholder": "your@email.com",
-      "motivationLabel": "Why do you want to use MirrorBuddy? *",
-      "motivationPlaceholder": "Tell us a bit about yourself and why you're interested...",
-      "minimumCharacters": "Minimum 20 characters",
-      "submitButton": "Send Request",
-      "submitting": "Sending...",
-      "confirmationMessage": "You'll receive a confirmation email and, if approved, your login credentials.",
-      "successTitle": "Request Sent!",
-      "successMessage": "Thank you for your interest in MirrorBuddy! We'll contact you soon via email with your access credentials.",
-      "returnHome": "Return to Home",
-      "alreadyHaveAccount": "Already have an account?",
-      "loginButton": "Sign In",
-      "errors": {
-        "sendError": "Error sending request",
-        "sessionExpired": "Session expired. Reload the page and try again.",
-        "connectionError": "Connection error. Please try again."
-      }
-    },
-    "form": {
-      "nameLabel": "Name",
-      "namePlaceholder": "Your name",
-      "nameRequired": "Name is required",
-      "nameMinLength": "Name must be at least 2 characters",
-      "emailLabel": "Email",
-      "emailPlaceholder": "your-email@example.com",
-      "emailRequired": "Email is required",
-      "emailInvalid": "Please enter a valid email",
-      "motivationLabel": "Why do you want to use MirrorBuddy?",
-      "motivationPlaceholder": "Tell us how you plan to use MirrorBuddy for studying...",
-      "motivationRequired": "Please tell us why you want to use MirrorBuddy",
-      "motivationMinLength": "Write at least 20 characters",
-      "submitButton": "Request Beta Access",
-      "submitting": "Sending...",
-      "successTitle": "Request sent!",
-      "successMessage": "We'll contact you soon via email to confirm your beta access to MirrorBuddy.",
-      "errors": {
-        "sendError": "Error sending request",
-        "sessionExpired": "Session expired. Reload the page and try again.",
-        "emailDuplicate": "This email already has a pending request"
-      }
-    },
-    "migration": {
-      "successTitle": "Data migrated!",
-      "successMessage": "Your trial experience has been transferred to your new account.",
-      "welcomeTitle": "Welcome to MirrorBuddy!",
-      "welcomeMessage": "Your account is ready. Start your learning adventure!",
-      "startButton": "Get Started",
-      "trialFound": "We found your trial!",
-      "migrateQuestion": "Do you want to transfer your trial data to your new account?",
-      "summary": "Your trial includes:",
-      "chatsWithMaestri": "{count} messages with Maestri",
-      "documentsAnalyzed": "{count} documents analyzed",
-      "favoriteMaestri": "Favorite Maestri: {maestri}",
-      "coach": "Coach: {name}",
-      "migrateButton": "Transfer Data",
-      "startFresh": "Start Fresh",
-      "dataNote": "Trial data doesn't include full conversations, only preferences and progress.",
-      "errors": {
-        "migrationError": "Error during migration"
-      }
-    }
+    "backButton": "Back",
+    "pageTitle": "Request Beta Access",
+    "pageDescription": "MirrorBuddy is in private beta. Fill out the form to request access.",
+    "successTitle": "Request Sent!",
+    "successMessage": "Thank you for your interest in MirrorBuddy! We'll contact you soon via email with access credentials.",
+    "backToHome": "Back to Home",
+    "nameLabel": "Name *",
+    "namePlaceholder": "Your name",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "your-email@example.com",
+    "motivationLabel": "Why do you want to use MirrorBuddy? *",
+    "motivationPlaceholder": "Tell us a bit about yourself and why you're interested...",
+    "minimumCharacters": "Minimum 20 characters",
+    "submitButtonSubmitting": "Sending...",
+    "submitButtonText": "Send Request",
+    "confirmationText": "You will receive a confirmation email and, if approved, your access credentials.",
+    "haveAccount": "Already have an account?",
+    "loginButton": "Login",
+    "errorDefault": "Error sending request",
+    "errorSession": "Session expired. Reload the page and try again.",
+    "errorConnection": "Connection error. Please try again."
   },
   "consent": {
     "inline": {
@@ -1683,6 +1636,83 @@
       "section8Item4Title": "Italian Privacy Code",
       "section8Item4Text": "National implementation of data protection",
       "section8Para2": "MirrorBuddy is classified as a high-risk AI system because it supports the learning of minors with cognitive difficulties. Consequently, we implement strict measures for transparency, oversight, and protection."
+    }
+  },
+  "compliance": {
+    "pageTitle": "Compliance & Transparency",
+    "pageDescription": "MirrorBuddy is designed in compliance with European and Italian regulations on artificial intelligence and data protection.",
+    "complianceBadgeTitle": "Regulatory Compliance",
+    "publicDocuments": "Public Documents",
+    "technicalDocuments": "Technical Documentation",
+    "technicalDescription": "Detailed documentation available in the open source repository.",
+    "questionsTitle": "Questions about Compliance?",
+    "questionsDescription": "For questions about privacy, data protection, or AI compliance, contact us:",
+    "aiTransparency": "AI Transparency",
+    "aiTransparencyDesc": "How artificial intelligence works in MirrorBuddy and what data it uses",
+    "aiPolicy": "AI Policy",
+    "aiPolicyDesc": "Our ethical principles and safeguards for responsible AI use",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyDesc": "How we collect, use, and protect your personal data",
+    "termsOfService": "Terms of Service",
+    "termsDesc": "The conditions of use of the MirrorBuddy platform",
+    "cookiePolicy": "Cookie Policy",
+    "cookieDesc": "Which cookies we use and how to manage them",
+    "dpia": "DPIA",
+    "dpiaDesc": "Data Protection Impact Assessment (GDPR Art. 35)",
+    "modelCard": "Model Card",
+    "modelCardDesc": "Technical specifications of the AI system, performance and limitations",
+    "aiLiteracy": "AI Literacy",
+    "aiLiteracyDesc": "Educational guide on how AI works and how to use it critically",
+    "biasAudit": "Bias Audit Report",
+    "biasAuditDesc": "Fairness and non-discrimination analysis of the AI system",
+    "riskManagement": "Risk Management",
+    "riskManagementDesc": "Risk management framework and AI risk register"
+  },
+  "supporti": {
+    "pageTitle": "Backpack",
+    "errorTitle": "Something went wrong",
+    "reloadButton": "Reload page"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Unauthorized. Log in as admin.",
+      "loadingError": "Loading error",
+      "approvalError": "Error during approval",
+      "rejectionError": "Error during rejection",
+      "error": "Error",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "direct": "Direct (mine)",
+      "all": "All",
+      "directInvite": "Invite directly",
+      "refresh": "Refresh",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectRequest": "Reject request",
+      "rejectionReason": "Rejection reason",
+      "optional": "Optional",
+      "cancel": "Cancel",
+      "confirmRejection": "Confirm rejection"
+    },
+    "locales": {
+      "search": "Search by country code, name, locale or maestro...",
+      "countryCode": "Country Code",
+      "countryName": "Country Name",
+      "primaryLocale": "Primary Locale",
+      "languageMaestro": "Language Maestro",
+      "secondaryLocales": "Secondary Locales",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "edit": "Edit",
+      "notFound": "No locale configuration found",
+      "summary": "{count} of {total} configurations"
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "MirrorBuddy system configuration"
     }
   }
 }

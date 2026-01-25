@@ -904,74 +904,27 @@
     }
   },
   "invite": {
-    "request": {
-      "backButton": "Indietro",
-      "title": "Richiedi Accesso Beta",
-      "subtitle": "MirrorBuddy è in beta privata. Compila il form per richiedere l'accesso.",
-      "nameLabel": "Nome *",
-      "namePlaceholder": "Il tuo nome",
-      "emailLabel": "Email *",
-      "emailPlaceholder": "la-tua@email.com",
-      "motivationLabel": "Perché vuoi usare MirrorBuddy? *",
-      "motivationPlaceholder": "Raccontaci un po' di te e perché sei interessato...",
-      "minimumCharacters": "Minimo 20 caratteri",
-      "submitButton": "Invia Richiesta",
-      "submitting": "Invio in corso...",
-      "confirmationMessage": "Riceverai una email di conferma e, se approvato, le credenziali di accesso.",
-      "successTitle": "Richiesta Inviata!",
-      "successMessage": "Grazie per il tuo interesse in MirrorBuddy! Ti contatteremo presto via email con le credenziali di accesso.",
-      "returnHome": "Torna alla Home",
-      "alreadyHaveAccount": "Hai già un account?",
-      "loginButton": "Accedi",
-      "errors": {
-        "sendError": "Errore durante l'invio",
-        "sessionExpired": "Sessione scaduta. Ricarica la pagina e riprova.",
-        "connectionError": "Errore di connessione. Riprova."
-      }
-    },
-    "form": {
-      "nameLabel": "Nome",
-      "namePlaceholder": "Il tuo nome",
-      "nameRequired": "Il nome è obbligatorio",
-      "nameMinLength": "Il nome deve avere almeno 2 caratteri",
-      "emailLabel": "Email",
-      "emailPlaceholder": "la-tua-email@esempio.com",
-      "emailRequired": "L'email è obbligatoria",
-      "emailInvalid": "Inserisci un'email valida",
-      "motivationLabel": "Perché vuoi usare MirrorBuddy?",
-      "motivationPlaceholder": "Raccontaci come pensi di usare MirrorBuddy per studiare...",
-      "motivationRequired": "Raccontaci perché vuoi usare MirrorBuddy",
-      "motivationMinLength": "Scrivi almeno 20 caratteri",
-      "submitButton": "Richiedi accesso Beta",
-      "submitting": "Invio in corso...",
-      "successTitle": "Richiesta inviata!",
-      "successMessage": "Ti contatteremo presto via email per confermare il tuo accesso alla beta di MirrorBuddy.",
-      "errors": {
-        "sendError": "Errore durante l'invio",
-        "sessionExpired": "Sessione scaduta. Ricarica la pagina e riprova.",
-        "emailDuplicate": "Questa email ha già una richiesta in corso"
-      }
-    },
-    "migration": {
-      "successTitle": "Dati migrati!",
-      "successMessage": "La tua esperienza di prova è stata trasferita al tuo account.",
-      "welcomeTitle": "Benvenuto in MirrorBuddy!",
-      "welcomeMessage": "Il tuo account è pronto. Inizia la tua avventura di apprendimento!",
-      "startButton": "Inizia",
-      "trialFound": "Abbiamo trovato la tua prova!",
-      "migrateQuestion": "Vuoi trasferire i dati della tua prova nel nuovo account?",
-      "summary": "La tua prova include:",
-      "chatsWithMaestri": "{count} messaggi con i Maestri",
-      "documentsAnalyzed": "{count} documenti analizzati",
-      "favoriteMaestri": "Maestri preferiti: {maestri}",
-      "coach": "Coach: {name}",
-      "migrateButton": "Trasferisci dati",
-      "startFresh": "Inizia da zero",
-      "dataNote": "I dati della prova non includono le conversazioni complete, solo le preferenze e i progressi.",
-      "errors": {
-        "migrationError": "Errore durante la migrazione"
-      }
-    }
+    "backButton": "Indietro",
+    "pageTitle": "Richiedi Accesso Beta",
+    "pageDescription": "MirrorBuddy è in beta privata. Compila il form per richiedere l'accesso.",
+    "successTitle": "Richiesta Inviata!",
+    "successMessage": "Grazie per il tuo interesse in MirrorBuddy! Ti contatteremo presto via email con le credenziali di accesso.",
+    "backToHome": "Torna alla Home",
+    "nameLabel": "Nome *",
+    "namePlaceholder": "Il tuo nome",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "la-tua@email.com",
+    "motivationLabel": "Perché vuoi usare MirrorBuddy? *",
+    "motivationPlaceholder": "Raccontaci un po' di te e perché sei interessato...",
+    "minimumCharacters": "Minimo 20 caratteri",
+    "submitButtonSubmitting": "Invio in corso...",
+    "submitButtonText": "Invia Richiesta",
+    "confirmationText": "Riceverai una email di conferma e, se approvato, le credenziali di accesso.",
+    "haveAccount": "Hai già un account?",
+    "loginButton": "Accedi",
+    "errorDefault": "Errore durante l'invio",
+    "errorSession": "Sessione scaduta. Ricarica la pagina e riprova.",
+    "errorConnection": "Errore di connessione. Riprova."
   },
   "consent": {
     "inline": {
@@ -2061,6 +2014,83 @@
       "section8Item4Title": "Codice della Privacy italiano",
       "section8Item4Text": "Implementazione nazionale della protezione dati",
       "section8Para2": "MirrorBuddy è classificato come sistema IA ad alto rischio perché supporta l'apprendimento di minori con difficoltà cognitive. Di conseguenza, implementiamo misure rigorose di trasparenza, supervisione e protezione."
+    }
+  },
+  "compliance": {
+    "pageTitle": "Compliance & Trasparenza",
+    "pageDescription": "MirrorBuddy è progettato nel rispetto delle normative europee e italiane sull'intelligenza artificiale e la protezione dei dati.",
+    "complianceBadgeTitle": "Conformità Normativa",
+    "publicDocuments": "Documenti Pubblici",
+    "technicalDocuments": "Documentazione Tecnica",
+    "technicalDescription": "Documentazione dettagliata disponibile nel repository open source.",
+    "questionsTitle": "Domande sulla Compliance?",
+    "questionsDescription": "Per domande sulla privacy, protezione dei dati o compliance AI, contattaci:",
+    "aiTransparency": "Trasparenza AI",
+    "aiTransparencyDesc": "Come funziona l'intelligenza artificiale in MirrorBuddy e quali dati utilizza",
+    "aiPolicy": "Politica AI",
+    "aiPolicyDesc": "I nostri principi etici e le garanzie per l'uso responsabile dell'IA",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyDesc": "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali",
+    "termsOfService": "Termini di Servizio",
+    "termsDesc": "Le condizioni d'uso della piattaforma MirrorBuddy",
+    "cookiePolicy": "Cookie Policy",
+    "cookieDesc": "Quali cookie utilizziamo e come gestirli",
+    "dpia": "DPIA",
+    "dpiaDesc": "Valutazione d'impatto sulla protezione dei dati (GDPR Art. 35)",
+    "modelCard": "Model Card",
+    "modelCardDesc": "Specifiche tecniche del sistema AI, performance e limitazioni",
+    "aiLiteracy": "AI Literacy",
+    "aiLiteracyDesc": "Guida educativa su come funziona l'IA e come usarla criticamente",
+    "biasAudit": "Bias Audit Report",
+    "biasAuditDesc": "Analisi di fairness e non discriminazione del sistema AI",
+    "riskManagement": "Risk Management",
+    "riskManagementDesc": "Framework di gestione rischi e registro dei rischi AI"
+  },
+  "supporti": {
+    "pageTitle": "Zaino",
+    "errorTitle": "Qualcosa è andato storto",
+    "reloadButton": "Ricarica la pagina"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Non autorizzato. Effettua il login come admin.",
+      "loadingError": "Errore di caricamento",
+      "approvalError": "Errore durante l'approvazione",
+      "rejectionError": "Errore durante il rifiuto",
+      "error": "Errore",
+      "pending": "In attesa",
+      "approved": "Approvate",
+      "rejected": "Rifiutate",
+      "direct": "Diretti (miei)",
+      "all": "Tutte",
+      "directInvite": "Invita direttamente",
+      "refresh": "Aggiorna",
+      "approve": "Approva",
+      "reject": "Rifiuta",
+      "rejectRequest": "Rifiuta richiesta",
+      "rejectionReason": "Motivo del rifiuto",
+      "optional": "Opzionale",
+      "cancel": "Annulla",
+      "confirmRejection": "Conferma rifiuto"
+    },
+    "locales": {
+      "search": "Cerca per codice paese, nome, locale o maestro...",
+      "countryCode": "Codice Paese",
+      "countryName": "Nome Paese",
+      "primaryLocale": "Locale Primario",
+      "languageMaestro": "Maestro Lingua",
+      "secondaryLocales": "Locali Secondari",
+      "status": "Stato",
+      "actions": "Azioni",
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "edit": "Modifica",
+      "notFound": "Nessuna configurazione locale trovata",
+      "summary": "{count} di {total} configurazioni"
+    },
+    "settings": {
+      "title": "Impostazioni",
+      "subtitle": "Configurazione sistema MirrorBuddy"
     }
   }
 }

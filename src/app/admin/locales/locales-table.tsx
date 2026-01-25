@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Edit2, Eye, EyeOff, Globe } from "lucide-react";
 import {
   Table,
@@ -26,6 +27,7 @@ interface LocaleConfig {
 }
 
 export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
+  const t = useTranslations("admin.locales");
   const [search, setSearch] = useState("");
 
   const filteredLocales = locales.filter((locale) => {
@@ -45,7 +47,7 @@ export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
       <div className="flex items-center gap-3">
         <input
           type="text"
-          placeholder="Cerca per codice paese, nome, locale o maestro..."
+          placeholder={t("search")}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -57,13 +59,13 @@ export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Codice Paese</TableHead>
-              <TableHead>Nome Paese</TableHead>
-              <TableHead>Locale Primario</TableHead>
-              <TableHead>Maestro Lingua</TableHead>
-              <TableHead>Locali Secondari</TableHead>
-              <TableHead>Stato</TableHead>
-              <TableHead>Azioni</TableHead>
+              <TableHead>{t("countryCode")}</TableHead>
+              <TableHead>{t("countryName")}</TableHead>
+              <TableHead>{t("primaryLocale")}</TableHead>
+              <TableHead>{t("languageMaestro")}</TableHead>
+              <TableHead>{t("secondaryLocales")}</TableHead>
+              <TableHead>{t("status")}</TableHead>
+              <TableHead>{t("actions")}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,12 +113,12 @@ export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
                     {locale.enabled ? (
                       <>
                         <Eye className="w-3 h-3" />
-                        Attivo
+                        {t("active")}
                       </>
                     ) : (
                       <>
                         <EyeOff className="w-3 h-3" />
-                        Inattivo
+                        {t("inactive")}
                       </>
                     )}
                   </span>
@@ -125,7 +127,7 @@ export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
                   <Link href={`/admin/locales/${locale.id}/edit`}>
                     <Button variant="ghost" size="sm">
                       <Edit2 className="w-4 h-4 mr-1" />
-                      Modifica
+                      {t("edit")}
                     </Button>
                   </Link>
                 </TableCell>
@@ -135,13 +137,13 @@ export function LocalesTable({ locales }: { locales: LocaleConfig[] }) {
         </Table>
 
         {filteredLocales.length === 0 && (
-          <TableEmpty>Nessuna configurazione locale trovata</TableEmpty>
+          <TableEmpty>{t("notFound")}</TableEmpty>
         )}
       </div>
 
       {/* Summary */}
       <div className="text-sm text-slate-600 dark:text-slate-400">
-        {filteredLocales.length} di {locales.length} configurazioni
+        {t("summary", { count: filteredLocales.length, total: locales.length })}
       </div>
     </div>
   );

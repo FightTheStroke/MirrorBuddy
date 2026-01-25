@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Check, X, Loader2 } from "lucide-react";
 
@@ -21,6 +22,7 @@ export function PendingActions({
   onApprove,
   onReject,
 }: PendingActionsProps) {
+  const t = useTranslations("admin.invites");
   if (invites.length === 0) return null;
 
   return (
@@ -45,7 +47,7 @@ export function PendingActions({
               ) : (
                 <Check className="w-4 h-4" />
               )}
-              Approva
+              {t("approve")}
             </Button>
             <Button
               onClick={() => onReject(invite.id)}
@@ -55,7 +57,7 @@ export function PendingActions({
               className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <X className="w-4 h-4" />
-              Rifiuta
+              {t("reject")}
             </Button>
           </div>
         </div>
