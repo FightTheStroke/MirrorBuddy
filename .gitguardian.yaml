@@ -11,6 +11,9 @@ secret:
     - "playwright.config.ts"
     # CI workflow uses ephemeral test database credentials
     - ".github/workflows/ci.yml"
+    # i18n translation files contain UI labels (username, password) not secrets
+    - "messages/*.json"
+    - "messages/**/*.json"
 
   # Ignore specific patterns that are test values, not real secrets
   ignored-matches:
