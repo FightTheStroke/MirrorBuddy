@@ -125,8 +125,11 @@ const sentryConfig = {
   org: process.env.SENTRY_ORG || "fightthestroke",
   project: process.env.SENTRY_PROJECT || "mirrorbuddy",
 
-  // Only print logs for uploading source maps in CI
-  silent: !process.env.CI,
+  // ALWAYS silent to avoid 232+ warnings from source map upload
+  // The warnings are for Next.js internal files (page_client-reference-manifest.js)
+  // that don't have source maps - this is expected behavior, not an error
+  // See ADR 0067 for details
+  silent: true,
 
   // Upload source maps for better error tracking
   // Requires SENTRY_AUTH_TOKEN env var for CI uploads
@@ -137,6 +140,16 @@ const sentryConfig = {
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
   tunnelRoute: "/monitoring",
+
+  // Ignore Next.js internal manifest files that don't have source maps
+  // These files generate "could not determine a source map reference" warnings
+  sourcemaps: {
+    ignore: [
+      "**/page_client-reference-manifest.js",
+      "**/_buildManifest.js",
+      "**/_ssgManifest.js",
+    ],
+  },
 
   // Webpack-specific options (new API)
   webpack: {

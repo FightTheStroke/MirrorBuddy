@@ -100,9 +100,32 @@ Our code uses per-connection `ssl: { rejectUnauthorized: false }` which:
 - [ ] SSL certificate `SUPABASE_CA_CERT` is pipe-separated (NOT base64)
 - [ ] No `NODE_TLS_REJECT_UNAUTHORIZED` in any env
 - [ ] `release-brutal.sh` passed (compliance, security, tests)
+- [ ] Build has ZERO warnings (Sentry `silent: true` in next.config.ts)
 - [ ] Health check returns "healthy": `curl https://mirrorbuddy.vercel.app/api/health`
 
 **Release BLOCKED if** any env var missing or health check fails.
+
+### Post-Deployment Verification
+
+```bash
+# 1. Verify deployment succeeded
+vercel ls | head -5
+
+# 2. Check health endpoint
+curl -s https://mirrorbuddy.vercel.app/api/health | jq '.'
+
+# 3. Verify SSL/DB connection works
+curl -s https://mirrorbuddy.vercel.app/api/health/detailed | jq '.checks.database'
+
+# 4. Check for runtime errors in Sentry dashboard
+# https://fightthestroke.sentry.io/issues/
+```
+
+### References
+
+- `.claude/rules/vercel-deployment.md` - Full deployment guide
+- ADR 0063 - Supabase SSL Certificate Requirements
+- ADR 0067 - Database Performance Optimization (Sentry warnings fix)
 
 ## VERSION + RELEASE
 

@@ -448,6 +448,37 @@ The `.github/workflows/ci.yml` includes:
 - Check for tracked .env files
 - High/critical vulnerability audit
 
+### Sentry Source Map Warnings
+
+**Problem**: Vercel builds showed 232+ warnings from Sentry source map upload:
+
+```
+warning: could not determine a source map reference (Could not auto-detect
+referenced sourcemap for ~/app/.../page_client-reference-manifest.js)
+```
+
+**Cause**: Next.js App Router generates internal manifest files (`page_client-reference-manifest.js`, `_buildManifest.js`, `_ssgManifest.js`) that don't have source maps. Sentry was configured to print warnings in CI with `silent: !process.env.CI`.
+
+**Solution**: Updated `next.config.ts` Sentry configuration:
+
+```typescript
+const sentryConfig = {
+  // ALWAYS silent to avoid 232+ warnings from source map upload
+  silent: true,
+
+  // Ignore Next.js internal manifest files that don't have source maps
+  sourcemaps: {
+    ignore: [
+      "**/page_client-reference-manifest.js",
+      "**/_buildManifest.js",
+      "**/_ssgManifest.js",
+    ],
+  },
+};
+```
+
+**Note**: These warnings were cosmetic - source maps for actual application code still upload correctly. The manifest files are Next.js runtime internals that don't need source maps for error tracking.
+
 ### Common Deployment Failures
 
 | Error                       | Cause                                  | Fix                                             |
@@ -457,6 +488,7 @@ The `.github/workflows/ci.yml` includes:
 | `NODE_TLS_REJECT warning`   | Global env var set                     | Remove from .env, use per-connection ssl        |
 | `Seed failed`               | Missing DB env vars                    | Add ADMIN_EMAIL, ADMIN_PASSWORD to Vercel       |
 | `Prisma types stale`        | Cached .prisma                         | Run `npx prisma generate` or fresh build        |
+| 232 Sentry warnings         | Manifest files without source maps     | Set `silent: true`, add `sourcemaps.ignore`     |
 
 ---
 

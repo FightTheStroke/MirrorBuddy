@@ -106,14 +106,15 @@ function cleanConnectionString(url: string): string {
 
 ## Common Deployment Failures
 
-| Error                       | Cause              | Fix                                     |
-| --------------------------- | ------------------ | --------------------------------------- |
-| `self-signed certificate`   | Wrong SSL config   | Use `rejectUnauthorized: false`         |
-| `Database X does not exist` | sslmode conflict   | Strip sslmode, use explicit ssl         |
-| `NODE_TLS_REJECT warning`   | Global env var set | Remove NODE_TLS_REJECT_UNAUTHORIZED     |
-| `Seed failed`               | Missing env vars   | Add ADMIN_EMAIL, ADMIN_PASSWORD         |
-| `Prisma types stale`        | Cached .prisma     | Delete node_modules/.prisma, regenerate |
-| `CRON_SECRET mismatch`      | Whitespace in env  | Use `printf` not `echo` when setting    |
+| Error                       | Cause                | Fix                                         |
+| --------------------------- | -------------------- | ------------------------------------------- |
+| `self-signed certificate`   | Wrong SSL config     | Use `rejectUnauthorized: false`             |
+| `Database X does not exist` | sslmode conflict     | Strip sslmode, use explicit ssl             |
+| `NODE_TLS_REJECT warning`   | Global env var set   | Remove NODE_TLS_REJECT_UNAUTHORIZED         |
+| `Seed failed`               | Missing env vars     | Add ADMIN_EMAIL, ADMIN_PASSWORD             |
+| `Prisma types stale`        | Cached .prisma       | Delete node_modules/.prisma, regenerate     |
+| `CRON_SECRET mismatch`      | Whitespace in env    | Use `printf` not `echo` when setting        |
+| 232 Sentry warnings         | Manifest source maps | Set `silent: true` in Sentry config (fixed) |
 
 ## Vercel Build Process
 
