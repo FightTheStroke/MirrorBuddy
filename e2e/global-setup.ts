@@ -47,7 +47,20 @@ async function globalSetup() {
   }
 
   // PRODUCTION BLOCKER #3: TEST_DATABASE_URL must NOT be Supabase
-  if (testDbUrl.includes("supabase.com") || testDbUrl.includes("supabase.co")) {
+  // Extract host from PostgreSQL URL: postgresql://user:pass@HOST:port/db
+  // Use regex to extract only the host portion, not query params or other parts
+  const hostMatch = testDbUrl.match(/@([^:/?#]+)/);
+  const dbHost = hostMatch ? hostMatch[1].toLowerCase() : "";
+  // Check if host is supabase.com, supabase.co, or any subdomain
+  // Split on dots and check last 2 parts to avoid regex complexity
+  const hostParts = dbHost.split(".");
+  const domain =
+    hostParts.length >= 2
+      ? `${hostParts[hostParts.length - 2]}.${hostParts[hostParts.length - 1]}`
+      : dbHost;
+  const isSupabaseHost = domain === "supabase.com" || domain === "supabase.co";
+
+  if (isSupabaseHost) {
     throw new Error(
       "🚨 BLOCKED: TEST_DATABASE_URL contains production Supabase URL!\n" +
         `TEST_DATABASE_URL: ${testDbUrl.substring(0, 50)}...\n` +
@@ -182,3 +195,4 @@ async function globalSetup() {
 }
 
 export default globalSetup;
+// Trigger CI re-run

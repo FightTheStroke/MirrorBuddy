@@ -32,6 +32,7 @@ const EXPECTED_SCHEMA_FILES = [
   "trial.prisma", // TrialSession (anonymous trial mode)
   "invite.prisma", // InviteRequest (beta invite system)
   "tier.prisma", // TierDefinition (subscription tiers)
+  "b2b.prisma", // ContactRequest (B2B contact form submissions)
 ];
 
 // Expected models that should be present across all schema files
@@ -105,6 +106,8 @@ const EXPECTED_MODELS = [
   "TierDefinition",
   "UserSubscription",
   "TierAuditLog",
+  // b2b.prisma
+  "ContactRequest",
 ];
 
 describe("Prisma Schema Split", () => {

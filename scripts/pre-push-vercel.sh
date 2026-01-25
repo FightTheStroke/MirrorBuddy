@@ -141,8 +141,11 @@ echo -e "${GREEN}✓ Build passed${NC}"
 # =============================================================================
 echo -e "${BLUE}[4/6] Vercel environment variables...${NC}"
 
+# Skip Vercel env check in worktrees (not linked to Vercel project)
+if [ "${SKIP_VERCEL_ENV_CHECK:-}" = "1" ]; then
+    echo -e "${YELLOW}⚠ Vercel env check skipped (SKIP_VERCEL_ENV_CHECK=1)${NC}"
 # Check if vercel CLI is available
-if command -v vercel &> /dev/null; then
+elif command -v vercel &> /dev/null; then
     # Required env vars for production
     REQUIRED_VARS=(
         "DATABASE_URL"

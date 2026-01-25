@@ -22,6 +22,17 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
       if (optionId !== value) {
         onChange(optionId as "individuals" | "organizations");
       }
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+      e.preventDefault();
+      const currentIndex = options.findIndex((opt) => opt.id === value);
+      const newIndex =
+        e.key === "ArrowRight"
+          ? (currentIndex + 1) % options.length
+          : (currentIndex - 1 + options.length) % options.length;
+      onChange(options[newIndex].id);
+      // Move focus to the new active tab
+      const buttons = containerRef.current?.querySelectorAll("button");
+      buttons?.[newIndex]?.focus();
     }
   };
 
