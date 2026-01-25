@@ -280,7 +280,7 @@ describe("Enterprise Contact Page", () => {
     it("shows error message on submission failure", async () => {
       mockCsrfFetch.mockResolvedValue({
         ok: false,
-        json: async () => ({ error: "Network error" }),
+        json: async () => ({ success: false, message: "Network error" }),
       });
 
       render(<EnterpriseContactPage />);
