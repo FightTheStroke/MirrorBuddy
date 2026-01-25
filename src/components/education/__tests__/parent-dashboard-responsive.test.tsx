@@ -92,7 +92,7 @@ describe("ParentDashboard - Mobile Responsive (F-49)", () => {
       const gridDivs = container.querySelectorAll('div[class*="grid"]');
 
       // Find the 2-column layout grid
-      let mobileStackingGrid = null;
+      let mobileStackingGrid: Element | null = null;
       gridDivs.forEach((grid) => {
         const className = grid.className;
         if (className && className.includes("md:grid-cols-2")) {
@@ -104,7 +104,9 @@ describe("ParentDashboard - Mobile Responsive (F-49)", () => {
 
       // Should have grid-cols-1 for mobile (xs)
       if (mobileStackingGrid) {
-        expect(mobileStackingGrid.className).toMatch(/grid-cols-1/);
+        expect((mobileStackingGrid as Element).className).toMatch(
+          /grid-cols-1/,
+        );
       }
     });
 
@@ -113,7 +115,7 @@ describe("ParentDashboard - Mobile Responsive (F-49)", () => {
 
       const gridDivs = container.querySelectorAll('div[class*="grid"]');
 
-      let twoColumnGrid = null;
+      let twoColumnGrid: Element | null = null;
       gridDivs.forEach((grid) => {
         const className = grid.className;
         if (className && className.includes("md:grid-cols-2")) {
@@ -121,8 +123,8 @@ describe("ParentDashboard - Mobile Responsive (F-49)", () => {
         }
       });
 
-      expect(twoColumnGrid).toBeDefined();
-      expect(twoColumnGrid?.className).toMatch(/md:grid-cols-2/);
+      expect(twoColumnGrid).not.toBeNull();
+      expect(twoColumnGrid!.className).toMatch(/md:grid-cols-2/);
     });
 
     it("should have consistent gap spacing", () => {

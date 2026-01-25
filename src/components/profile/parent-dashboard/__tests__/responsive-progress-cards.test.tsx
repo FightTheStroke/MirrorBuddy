@@ -22,24 +22,28 @@ describe("QuizPerformance - Mobile Responsive (F-49)", () => {
         subjectName: "Matematica",
         attempts: 5,
         averageScore: 85,
+        bestScore: 95,
       },
       {
         subject: "physics",
         subjectName: "Fisica",
         attempts: 4,
         averageScore: 72,
+        bestScore: 88,
       },
       {
         subject: "chemistry",
         subjectName: "Chimica",
         attempts: 3,
         averageScore: 65,
+        bestScore: 78,
       },
       {
         subject: "biology",
         subjectName: "Biologia",
         attempts: 3,
         averageScore: 88,
+        bestScore: 92,
       },
     ],
   };

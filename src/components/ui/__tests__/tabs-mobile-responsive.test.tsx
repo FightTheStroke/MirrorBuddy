@@ -9,11 +9,11 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       const { container } = render(
         <Tabs value="tab1" onValueChange={() => {}}>
           <TabsList data-testid="tabs-list" className="md:hidden">
-            <TabsTrigger value="tab1" icon="users">
+            <TabsTrigger value="tab1">
               <span className="sr-only">All Users</span>
               Tutti
             </TabsTrigger>
-            <TabsTrigger value="tab2" icon="check">
+            <TabsTrigger value="tab2">
               <span className="sr-only">Active Users</span>
               Attivi
             </TabsTrigger>
@@ -33,12 +33,8 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       render(
         <Tabs value="tab1" onValueChange={() => {}}>
           <TabsList data-testid="tabs-list-desktop" className="hidden md:flex">
-            <TabsTrigger value="tab1" icon="users">
-              Tutti (5)
-            </TabsTrigger>
-            <TabsTrigger value="tab2" icon="check">
-              Attivi
-            </TabsTrigger>
+            <TabsTrigger value="tab1">Tutti (5)</TabsTrigger>
+            <TabsTrigger value="tab2">Attivi</TabsTrigger>
           </TabsList>
         </Tabs>,
       );
@@ -54,7 +50,7 @@ describe("Tabs Mobile Responsive (F-44)", () => {
         <Tabs value="tab1" onValueChange={() => {}}>
           <TabsList className="overflow-x-auto snap-x snap-mandatory md:flex-wrap">
             {Array.from({ length: 8 }).map((_, i) => (
-              <TabsTrigger key={i} value={`tab${i}`} icon="circle">
+              <TabsTrigger key={i} value={`tab${i}`}>
                 <span className="sr-only">Tab {i}</span>T{i}
               </TabsTrigger>
             ))}
@@ -88,10 +84,10 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       const { container } = render(
         <Tabs value="tab1" onValueChange={() => {}}>
           <TabsList>
-            <TabsTrigger value="tab1" icon="users" data-testid="tab1">
+            <TabsTrigger value="tab1" data-testid="tab1">
               Tab 1
             </TabsTrigger>
-            <TabsTrigger value="tab2" icon="check" data-testid="tab2">
+            <TabsTrigger value="tab2" data-testid="tab2">
               Tab 2
             </TabsTrigger>
           </TabsList>
@@ -115,7 +111,6 @@ describe("Tabs Mobile Responsive (F-44)", () => {
           <TabsList>
             <TabsTrigger
               value="tab1"
-              icon="users"
               className="md:px-3 px-2"
               data-testid="touch-target"
             >
@@ -137,10 +132,10 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       render(
         <Tabs value="tab1" onValueChange={onChange}>
           <TabsList>
-            <TabsTrigger value="tab1" data-testid="tab1" icon="users">
+            <TabsTrigger value="tab1" data-testid="tab1">
               Tab 1
             </TabsTrigger>
-            <TabsTrigger value="tab2" data-testid="tab2" icon="check">
+            <TabsTrigger value="tab2" data-testid="tab2">
               Tab 2
             </TabsTrigger>
           </TabsList>
@@ -156,10 +151,10 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       const { rerender } = render(
         <Tabs value="tab1" onValueChange={() => {}}>
           <TabsList>
-            <TabsTrigger value="tab1" data-testid="tab1" icon="users">
+            <TabsTrigger value="tab1" data-testid="tab1">
               Tab 1
             </TabsTrigger>
-            <TabsTrigger value="tab2" data-testid="tab2" icon="check">
+            <TabsTrigger value="tab2" data-testid="tab2">
               Tab 2
             </TabsTrigger>
           </TabsList>
@@ -178,10 +173,10 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       rerender(
         <Tabs value="tab2" onValueChange={() => {}}>
           <TabsList>
-            <TabsTrigger value="tab1" data-testid="tab1" icon="users">
+            <TabsTrigger value="tab1" data-testid="tab1">
               Tab 1
             </TabsTrigger>
-            <TabsTrigger value="tab2" data-testid="tab2" icon="check">
+            <TabsTrigger value="tab2" data-testid="tab2">
               Tab 2
             </TabsTrigger>
           </TabsList>
@@ -207,7 +202,6 @@ describe("Tabs Mobile Responsive (F-44)", () => {
           <TabsList>
             <TabsTrigger
               value="tab1"
-              icon="users"
               title="All Users (5)"
               data-testid="tooltip-trigger"
             >
@@ -229,7 +223,6 @@ describe("Tabs Mobile Responsive (F-44)", () => {
           <TabsList>
             <TabsTrigger
               value="tab1"
-              icon="users"
               aria-label="All Users"
               data-testid="aria-tab"
             >
@@ -249,16 +242,16 @@ describe("Tabs Mobile Responsive (F-44)", () => {
       render(
         <Tabs value="all" onValueChange={() => {}}>
           <TabsList className="md:flex-wrap overflow-x-auto snap-x md:snap-none">
-            <TabsTrigger value="all" icon="users" title="Tutti">
+            <TabsTrigger value="all" title="Tutti">
               <span className="sr-only">Tutti</span>👥
             </TabsTrigger>
-            <TabsTrigger value="active" icon="check-circle" title="Attivi">
+            <TabsTrigger value="active" title="Attivi">
               <span className="sr-only">Attivi</span>✓
             </TabsTrigger>
-            <TabsTrigger value="disabled" icon="ban" title="Disabilitati">
+            <TabsTrigger value="disabled" title="Disabilitati">
               <span className="sr-only">Disabilitati</span>🚫
             </TabsTrigger>
-            <TabsTrigger value="trash" icon="trash" title="Cestino">
+            <TabsTrigger value="trash" title="Cestino">
               <span className="sr-only">Cestino</span>🗑️
             </TabsTrigger>
           </TabsList>

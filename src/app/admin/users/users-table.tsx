@@ -171,7 +171,6 @@ export function UsersTable({
         <TabsList className="mb-4 overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none">
           <TabsTrigger
             value="all"
-            icon="users"
             title={`Tutti (${users.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
@@ -181,7 +180,6 @@ export function UsersTable({
           </TabsTrigger>
           <TabsTrigger
             value="active"
-            icon="check-circle"
             title="Attivi"
             className="min-h-11 min-w-11 md:min-w-auto"
           >
@@ -191,7 +189,6 @@ export function UsersTable({
           </TabsTrigger>
           <TabsTrigger
             value="disabled"
-            icon="ban"
             title="Disabilitati"
             className="min-h-11 min-w-11 md:min-w-auto"
           >
@@ -201,7 +198,6 @@ export function UsersTable({
           </TabsTrigger>
           <TabsTrigger
             value="trash"
-            icon="trash"
             title={`Cestino (${deletedBackups.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >

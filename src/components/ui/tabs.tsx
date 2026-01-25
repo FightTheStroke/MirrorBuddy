@@ -65,7 +65,6 @@ export function TabsList({ children, className, ...props }: TabsListProps) {
 interface TabsTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   value: string;
   children: React.ReactNode;
-  icon?: string;
 }
 
 export function TabsTrigger({
@@ -73,7 +72,6 @@ export function TabsTrigger({
   children,
   className,
   disabled,
-  icon: Icon,
   ...props
 }: TabsTriggerProps) {
   const { value: selectedValue, onValueChange } = useTabs();
@@ -95,8 +93,7 @@ export function TabsTrigger({
       data-state={isSelected ? "active" : "inactive"}
       {...props}
     >
-      {Icon && <Icon className="h-4 w-4 sm:mr-2" aria-hidden="true" />}
-      <span className={Icon ? "hidden sm:inline" : ""}>{children}</span>
+      {children}
     </button>
   );
 }
