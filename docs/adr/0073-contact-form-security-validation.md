@@ -282,6 +282,27 @@ export const metadata: Metadata = {
 - [ ] Export page metadata for SEO
 - [ ] Standardize API response format (`success`, `message`)
 
+### 11. Incomplete URL Sanitization (CodeQL)
+
+**Issue**: URL substring check `url.includes("supabase.com")` could be bypassed.
+
+**Attack Vector**: URLs like `supabase.com.evil.com` or `evil.com?redirect=supabase.com` would match incorrectly.
+
+**Solution**: Extract hostname from PostgreSQL connection string, then check domain:
+
+```typescript
+// Extract host from PostgreSQL URL: postgresql://user:pass@HOST:port/db
+const hostMatch = testDbUrl.match(/@([^:/?#]+)/);
+const dbHost = hostMatch ? hostMatch[1].toLowerCase() : "";
+const isSupabaseHost =
+  dbHost.endsWith("supabase.com") ||
+  dbHost.endsWith("supabase.co") ||
+  dbHost === "supabase.com" ||
+  dbHost === "supabase.co";
+```
+
+**Rule**: Never use simple `includes()` for security-critical URL checks. Always parse and validate the specific URL component (host, path, query).
+
 ## References
 
 - OWASP XSS Prevention Cheat Sheet
@@ -289,3 +310,4 @@ export const metadata: Metadata = {
 - OWASP Input Validation Cheat Sheet
 - ReDoS patterns: https://owasp.org/www-community/attacks/Regular_expression_Denial_of_Service_-_ReDoS
 - ARIA Authoring Practices: https://www.w3.org/WAI/ARIA/apg/patterns/tabs/
+- CodeQL js/incomplete-url-substring-sanitization
