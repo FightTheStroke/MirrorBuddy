@@ -269,6 +269,75 @@
       "flashcardsSaved": "Flashcards enregistrées dans zaino !"
     }
   },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "Bonjour ! Je suis Mélissa",
+      "your-support-teacher": "Votre enseignante de soutien",
+      "welcome-intro": "Bienvenue à l'École que je souhaite ! Je suis ici pour vous aider à étudier de la manière qui vous convient le mieux.",
+      "dont-worry": "N'ayez pas peur si quelque chose vous semble difficile - ensemble, nous trouverons toujours un moyen de le comprendre !",
+      "what-is-your-name": "Quel est votre nom ?",
+      "enter-your-name-placeholder": "Tapez votre nom...",
+      "nice-to-meet-you": "Enchanté de vous rencontrer !",
+      "replay-mode-message": "Vous consultez le didacticiel. Vos données existantes ne seront pas modifiées.",
+      "enable-voice": "Activer la voix",
+      "disable-voice": "Désactiver la voix"
+    },
+    "trial-limits": {
+      "free-trial-mode": "Mode d'essai gratuit",
+      "explore-no-registration": "Explorez MirrorBuddy sans inscription",
+      "messages": "Messages",
+      "maestri": "Maestri",
+      "tools": "Outils",
+      "ten-per-session": "10 par session",
+      "three-available": "3 disponibles",
+      "base": "Base",
+      "want-full-access": "Vous voulez un accès complet ?",
+      "request-beta": "Demander l'accès bêta"
+    },
+    "principles": {
+      "welcome-to-school": "Bienvenue à l'École que je souhaite, {name} !",
+      "what-makes-us-special": "Voici ce qui nous rend spéciaux",
+      "accessible-learning": "Apprentissage Accessible",
+      "accessible-learning-desc": "Parcours d'apprentissage personnalisés selon vos besoins",
+      "ai-teachers": "22 Enseignants IA",
+      "ai-teachers-desc": "Des experts dans chaque matière, toujours disponibles",
+      "your-pace": "À Votre Rythme",
+      "your-pace-desc": "Apprenez quand vous voulez, aussi longtemps que vous le voulez",
+      "no-judgment": "Sans Jugement",
+      "no-judgment-desc": "Un espace sûr pour apprendre et faire des erreurs",
+      "melissa-quote": "N'oublie pas : il n'y a pas de questions stupides, seulement des esprits curieux !",
+      "ready-to-start": "Prêt à commencer ?"
+    },
+    "ready": {
+      "perfect": "Parfait, {name} !",
+      "ready-to-start": "Vous êtes prêt à commencer votre aventure !",
+      "prepared-for-you": "J'ai tout préparé pour vous ! N'oubliez pas :",
+      "always-talk": "Vous pouvez toujours me parler - je suis là pour vous aider avec votre méthode d'apprentissage",
+      "choose-professor": "Choisissez un Professeur - pour chaque matière, il y a le bon expert",
+      "earn-xp": "Gagnez des XP - chaque leçon vous aide à monter de niveau !",
+      "back": "Retour",
+      "lets-start": "Commençons !",
+      "tutorial-end": "Fin du didacticiel. Cliquez sur \"Commençons !\" pour revenir à l'application."
+    },
+    "quick-start": {
+      "go-to-app": "Aller à l'app",
+      "update-profile": "Mettre à jour le profil",
+      "full-access": "ACCÈS COMPLET",
+      "free-trial": "ESSAI GRATUIT",
+      "have-account": "Avez-vous un compte ?",
+      "try-now": "Explorez maintenant",
+      "22-maestri": "22 Maestri IA",
+      "all-tools": "Tous les outils",
+      "unlimited-chats": "Chats illimités",
+      "login": "Se connecter",
+      "try-free": "Essayez gratuitement"
+    },
+    "hero": {
+      "title": "L'École que je souhaite",
+      "subtitle": "Enseignants IA personnalisés pour vos besoins",
+      "cta": "Commencer Maintenant"
+    }
+  },
   "buddies": {
     "mario": {
       "personality": "Amical, ironique, compréhensif, décontracté",

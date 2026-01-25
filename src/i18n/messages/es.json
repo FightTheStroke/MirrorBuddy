@@ -979,6 +979,75 @@
       "flashcardsSaved": "¡Flashcards guardadas en zaino!"
     }
   },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "¡Hola! Soy Melissa",
+      "your-support-teacher": "Tu maestra de apoyo",
+      "welcome-intro": "¡Bienvenido a la Escuela que Desearía! Estoy aquí para ayudarte a estudiar de la manera que mejor funciona para ti.",
+      "dont-worry": "No te preocupes si algo te parece difícil - ¡juntos siempre encontraremos una manera de entenderlo!",
+      "what-is-your-name": "¿Cuál es tu nombre?",
+      "enter-your-name-placeholder": "Escribe tu nombre...",
+      "nice-to-meet-you": "¡Mucho gusto!",
+      "replay-mode-message": "Estás revisando el tutorial. Tus datos existentes no serán modificados.",
+      "enable-voice": "Activar voz",
+      "disable-voice": "Desactivar voz"
+    },
+    "trial-limits": {
+      "free-trial-mode": "Modo de Prueba Gratuita",
+      "explore-no-registration": "Explora MirrorBuddy sin registro",
+      "messages": "Mensajes",
+      "maestri": "Maestri",
+      "tools": "Herramientas",
+      "ten-per-session": "10 por sesión",
+      "three-available": "3 disponibles",
+      "base": "Base",
+      "want-full-access": "¿Quieres acceso completo?",
+      "request-beta": "Solicitar acceso beta"
+    },
+    "principles": {
+      "welcome-to-school": "¡Bienvenido a la Escuela que Desearía, {name}!",
+      "what-makes-us-special": "Esto es lo que nos hace especiales",
+      "accessible-learning": "Aprendizaje Accesible",
+      "accessible-learning-desc": "Caminos de aprendizaje personalizados para tus necesidades",
+      "ai-teachers": "22 Maestros IA",
+      "ai-teachers-desc": "Expertos en cada materia, siempre disponibles",
+      "your-pace": "A Tu Ritmo",
+      "your-pace-desc": "Aprende cuando quieras, durante el tiempo que quieras",
+      "no-judgment": "Sin Juzgar",
+      "no-judgment-desc": "Un espacio seguro para aprender y cometer errores",
+      "melissa-quote": "¡Recuerda: no hay preguntas estúpidas, solo mentes curiosas!",
+      "ready-to-start": "¿Listo para empezar?"
+    },
+    "ready": {
+      "perfect": "¡Perfecto, {name}!",
+      "ready-to-start": "¡Estás listo para comenzar tu aventura!",
+      "prepared-for-you": "¡He preparado todo para ti! Recuerda:",
+      "always-talk": "Siempre puedes hablarme - estoy aquí para ayudarte con tu método de estudio",
+      "choose-professor": "Elige un Profesor - para cada materia hay el experto correcto",
+      "earn-xp": "Gana XP - ¡cada lección te ayuda a subir de nivel!",
+      "back": "Atrás",
+      "lets-start": "¡Comencemos!",
+      "tutorial-end": "Fin del tutorial. ¡Haz clic en \"¡Comencemos!\" para volver a la app."
+    },
+    "quick-start": {
+      "go-to-app": "Ir a la app",
+      "update-profile": "Actualizar perfil",
+      "full-access": "ACCESO COMPLETO",
+      "free-trial": "PRUEBA GRATUITA",
+      "have-account": "¿Tienes una cuenta?",
+      "try-now": "Explora ahora",
+      "22-maestri": "22 Maestri IA",
+      "all-tools": "Todas las herramientas",
+      "unlimited-chats": "Chats ilimitados",
+      "login": "Iniciar sesión",
+      "try-free": "Prueba gratis"
+    },
+    "hero": {
+      "title": "La Escuela que Desearía",
+      "subtitle": "Maestros IA personalizados para tus necesidades",
+      "cta": "Comienza Ahora"
+    }
+  },
   "buddies": {
     "mario": {
       "personality": "Amigable, irónico, comprensivo, cercano",

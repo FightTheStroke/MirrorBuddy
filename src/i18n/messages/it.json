@@ -269,6 +269,75 @@
       "flashcardsSaved": "Flashcard salvate nello zaino!"
     }
   },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "Ciao! Sono Melissa",
+      "your-support-teacher": "La tua insegnante di sostegno",
+      "welcome-intro": "Benvenuto nella Scuola Che Vorrei! Sono qui per aiutarti a studiare nel modo che funziona meglio per te.",
+      "dont-worry": "Non preoccuparti se qualcosa ti sembra difficile - insieme troveremo sempre un modo per capirlo!",
+      "what-is-your-name": "Come ti chiami?",
+      "enter-your-name-placeholder": "Scrivi il tuo nome...",
+      "nice-to-meet-you": "Piacere di conoscerti!",
+      "replay-mode-message": "Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.",
+      "enable-voice": "Attiva voce",
+      "disable-voice": "Disattiva voce"
+    },
+    "trial-limits": {
+      "free-trial-mode": "Modalità Prova Gratuita",
+      "explore-no-registration": "Esplora MirrorBuddy senza registrazione",
+      "messages": "Messaggi",
+      "maestri": "Maestri",
+      "tools": "Strumenti",
+      "ten-per-session": "10 per sessione",
+      "three-available": "3 disponibili",
+      "base": "Base",
+      "want-full-access": "Vuoi accesso completo?",
+      "request-beta": "Richiedi accesso beta"
+    },
+    "principles": {
+      "welcome-to-school": "Benvenuto nella Scuola Che Vorrei, {name}!",
+      "what-makes-us-special": "Ecco cosa ci rende speciali",
+      "accessible-learning": "Apprendimento Accessibile",
+      "accessible-learning-desc": "Percorsi di studio personalizzati per le tue esigenze",
+      "ai-teachers": "22 Insegnanti AI",
+      "ai-teachers-desc": "Esperti in ogni materia, sempre disponibili",
+      "your-pace": "Al Tuo Ritmo",
+      "your-pace-desc": "Impara quando vuoi, per il tempo che vuoi",
+      "no-judgment": "Senza Giudizio",
+      "no-judgment-desc": "Uno spazio sicuro per imparare e sbagliare",
+      "melissa-quote": "Ricordati sempre: non ci sono domande stupide, solo menti curiose!",
+      "ready-to-start": "Pronto per iniziare?"
+    },
+    "ready": {
+      "perfect": "Perfetto, {name}!",
+      "ready-to-start": "Sei pronto per iniziare la tua avventura!",
+      "prepared-for-you": "Ho preparato tutto per te! Ricorda:",
+      "always-talk": "Puoi sempre parlarmi - sono qui per aiutarti con il metodo di studio",
+      "choose-professor": "Scegli un Professore - per ogni materia c'è l'esperto giusto",
+      "earn-xp": "Guadagna XP - ogni lezione ti fa salire di livello!",
+      "back": "Indietro",
+      "lets-start": "Iniziamo!",
+      "tutorial-end": "Fine del tutorial. Clicca \"Iniziamo!\" per tornare all'app."
+    },
+    "quick-start": {
+      "go-to-app": "Vai all'app",
+      "update-profile": "Aggiorna profilo",
+      "full-access": "ACCESSO COMPLETO",
+      "free-trial": "PROVA GRATUITA",
+      "have-account": "Hai un account?",
+      "try-now": "Esplora subito",
+      "22-maestri": "22 Maestri AI",
+      "all-tools": "Tutti gli strumenti",
+      "unlimited-chats": "Chat illimitate",
+      "login": "Accedi",
+      "try-free": "Prova gratis"
+    },
+    "hero": {
+      "title": "La Scuola Che Vorrei",
+      "subtitle": "Insegnanti AI personalizzati per le tue esigenze",
+      "cta": "Inizia Ora"
+    }
+  },
   "buddies": {
     "mario": {
       "personality": "Amichevole, ironico, comprensivo, alla mano",

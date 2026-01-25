@@ -269,6 +269,75 @@
       "flashcardsSaved": "Flashcards saved to zaino!"
     }
   },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "Hello! I'm Melissa",
+      "your-support-teacher": "Your support teacher",
+      "welcome-intro": "Welcome to the School I'd Like! I'm here to help you study in the way that works best for you.",
+      "dont-worry": "Don't worry if something seems difficult - together we'll always find a way to understand it!",
+      "what-is-your-name": "What's your name?",
+      "enter-your-name-placeholder": "Type your name...",
+      "nice-to-meet-you": "Nice to meet you!",
+      "replay-mode-message": "You're reviewing the tutorial. Your existing data will not be modified.",
+      "enable-voice": "Enable voice",
+      "disable-voice": "Disable voice"
+    },
+    "trial-limits": {
+      "free-trial-mode": "Free Trial Mode",
+      "explore-no-registration": "Explore MirrorBuddy without registration",
+      "messages": "Messages",
+      "maestri": "Maestri",
+      "tools": "Tools",
+      "ten-per-session": "10 per session",
+      "three-available": "3 available",
+      "base": "Base",
+      "want-full-access": "Want full access?",
+      "request-beta": "Request beta access"
+    },
+    "principles": {
+      "welcome-to-school": "Welcome to the School I'd Like, {name}!",
+      "what-makes-us-special": "Here's what makes us special",
+      "accessible-learning": "Accessible Learning",
+      "accessible-learning-desc": "Personalized learning paths for your needs",
+      "ai-teachers": "22 AI Teachers",
+      "ai-teachers-desc": "Experts in every subject, always available",
+      "your-pace": "At Your Pace",
+      "your-pace-desc": "Learn whenever you want, for as long as you want",
+      "no-judgment": "Without Judgment",
+      "no-judgment-desc": "A safe space to learn and make mistakes",
+      "melissa-quote": "Remember: there are no stupid questions, only curious minds!",
+      "ready-to-start": "Ready to start?"
+    },
+    "ready": {
+      "perfect": "Perfect, {name}!",
+      "ready-to-start": "You're ready to start your adventure!",
+      "prepared-for-you": "I've prepared everything for you! Remember:",
+      "always-talk": "You can always talk to me - I'm here to help you with your learning method",
+      "choose-professor": "Choose a Professor - for every subject there's the right expert",
+      "earn-xp": "Earn XP - every lesson helps you level up!",
+      "back": "Back",
+      "lets-start": "Let's Go!",
+      "tutorial-end": "End of tutorial. Click \"Let's Go!\" to return to the app."
+    },
+    "quick-start": {
+      "go-to-app": "Go to app",
+      "update-profile": "Update profile",
+      "full-access": "FULL ACCESS",
+      "free-trial": "FREE TRIAL",
+      "have-account": "Have an account?",
+      "try-now": "Explore now",
+      "22-maestri": "22 AI Maestri",
+      "all-tools": "All tools",
+      "unlimited-chats": "Unlimited chats",
+      "login": "Login",
+      "try-free": "Try free"
+    },
+    "hero": {
+      "title": "The School I'd Like",
+      "subtitle": "Personalized AI teachers for your needs",
+      "cta": "Start Now"
+    }
+  },
   "buddies": {
     "mario": {
       "personality": "Friendly, ironic, understanding, down-to-earth",

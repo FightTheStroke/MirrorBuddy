@@ -269,6 +269,75 @@
       "flashcardsSaved": "Karteikarten in zaino gespeichert!"
     }
   },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "Hallo! Ich bin Melissa",
+      "your-support-teacher": "Deine Unterstützungslehrerin",
+      "welcome-intro": "Willkommen in der Schule, die ich mir wünsche! Ich bin hier, um dir beim Lernen auf die Weise zu helfen, die für dich am besten funktioniert.",
+      "dont-worry": "Mach dir keine Sorgen, wenn dir etwas schwierig erscheint - zusammen finden wir immer einen Weg, es zu verstehen!",
+      "what-is-your-name": "Wie heißt du?",
+      "enter-your-name-placeholder": "Gib deinen Namen ein...",
+      "nice-to-meet-you": "Schön, dich kennenzulernen!",
+      "replay-mode-message": "Du siehst dir das Tutorial an. Deine bestehenden Daten werden nicht geändert.",
+      "enable-voice": "Sprache aktivieren",
+      "disable-voice": "Sprache deaktivieren"
+    },
+    "trial-limits": {
+      "free-trial-mode": "Kostenloser Testmodus",
+      "explore-no-registration": "Erkunde MirrorBuddy ohne Registrierung",
+      "messages": "Nachrichten",
+      "maestri": "Maestri",
+      "tools": "Werkzeuge",
+      "ten-per-session": "10 pro Sitzung",
+      "three-available": "3 verfügbar",
+      "base": "Basis",
+      "want-full-access": "Möchtest du vollständigen Zugriff?",
+      "request-beta": "Beta-Zugriff anfordern"
+    },
+    "principles": {
+      "welcome-to-school": "Willkommen in der Schule, die ich mir wünsche, {name}!",
+      "what-makes-us-special": "Das macht uns besonders",
+      "accessible-learning": "Zugängliches Lernen",
+      "accessible-learning-desc": "Personalisierte Lernwege für deine Bedürfnisse",
+      "ai-teachers": "22 KI-Lehrer",
+      "ai-teachers-desc": "Experten in jedem Fach, immer verfügbar",
+      "your-pace": "In Deinem Tempo",
+      "your-pace-desc": "Lerne wann du möchtest, so lange du möchtest",
+      "no-judgment": "Ohne Vorwürfe",
+      "no-judgment-desc": "Ein sicherer Raum zum Lernen und Fehler machen",
+      "melissa-quote": "Denk daran: Es gibt keine dummen Fragen, nur neugierige Köpfe!",
+      "ready-to-start": "Bereit anzufangen?"
+    },
+    "ready": {
+      "perfect": "Perfekt, {name}!",
+      "ready-to-start": "Du bist bereit, dein Abenteuer zu beginnen!",
+      "prepared-for-you": "Ich habe alles für dich vorbereitet! Denk dran:",
+      "always-talk": "Du kannst mich immer ansprechen - ich bin hier, um dir bei deiner Lernmethode zu helfen",
+      "choose-professor": "Wähle einen Professor - für jedes Fach gibt es den richtigen Experten",
+      "earn-xp": "Verdiene XP - jede Lektion hilft dir, aufzusteigen!",
+      "back": "Zurück",
+      "lets-start": "Lass uns anfangen!",
+      "tutorial-end": "Ende des Tutorials. Klicke auf \"Lass uns anfangen!\", um zur App zurückzukehren."
+    },
+    "quick-start": {
+      "go-to-app": "Zur App gehen",
+      "update-profile": "Profil aktualisieren",
+      "full-access": "VOLLSTÄNDIGER ZUGRIFF",
+      "free-trial": "KOSTENLOSE TESTVERSION",
+      "have-account": "Hast du ein Konto?",
+      "try-now": "Jetzt erkunden",
+      "22-maestri": "22 KI-Maestri",
+      "all-tools": "Alle Werkzeuge",
+      "unlimited-chats": "Unbegrenzte Chats",
+      "login": "Anmelden",
+      "try-free": "Kostenlos versuchen"
+    },
+    "hero": {
+      "title": "Die Schule, die ich mir wünsche",
+      "subtitle": "Personalisierte KI-Lehrer für deine Bedürfnisse",
+      "cta": "Jetzt Starten"
+    }
+  },
   "buddies": {
     "mario": {
       "personality": "Freundlich, ironisch, verständnisvoll, locker",
