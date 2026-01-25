@@ -33,7 +33,7 @@ export function PendingActions({
           <span className="text-sm text-foreground">
             {invite.name} ({invite.email})
           </span>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               onClick={() => onApprove(invite.id)}
               disabled={processingId === invite.id}

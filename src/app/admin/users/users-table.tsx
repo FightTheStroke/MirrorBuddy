@@ -168,12 +168,48 @@ export function UsersTable({
           setSelectedIds(new Set());
         }}
       >
-        <TabsList className="mb-4">
-          <TabsTrigger value="all">Tutti ({users.length})</TabsTrigger>
-          <TabsTrigger value="active">Attivi</TabsTrigger>
-          <TabsTrigger value="disabled">Disabilitati</TabsTrigger>
-          <TabsTrigger value="trash">
-            Cestino ({deletedBackups.length})
+        <TabsList className="mb-4 overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none">
+          <TabsTrigger
+            value="all"
+            icon="users"
+            title={`Tutti (${users.length})`}
+            className="min-h-11 min-w-11 md:min-w-auto"
+          >
+            <span className="sr-only">Tutti ({users.length})</span>
+            <span className="md:hidden">👥</span>
+            <span className="hidden md:inline">Tutti ({users.length})</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="active"
+            icon="check-circle"
+            title="Attivi"
+            className="min-h-11 min-w-11 md:min-w-auto"
+          >
+            <span className="sr-only">Attivi</span>
+            <span className="md:hidden">✓</span>
+            <span className="hidden md:inline">Attivi</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="disabled"
+            icon="ban"
+            title="Disabilitati"
+            className="min-h-11 min-w-11 md:min-w-auto"
+          >
+            <span className="sr-only">Disabilitati</span>
+            <span className="md:hidden">🚫</span>
+            <span className="hidden md:inline">Disabilitati</span>
+          </TabsTrigger>
+          <TabsTrigger
+            value="trash"
+            icon="trash"
+            title={`Cestino (${deletedBackups.length})`}
+            className="min-h-11 min-w-11 md:min-w-auto"
+          >
+            <span className="sr-only">Cestino ({deletedBackups.length})</span>
+            <span className="md:hidden">🗑️</span>
+            <span className="hidden md:inline">
+              Cestino ({deletedBackups.length})
+            </span>
           </TabsTrigger>
         </TabsList>
 

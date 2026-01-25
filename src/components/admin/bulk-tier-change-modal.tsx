@@ -309,19 +309,19 @@ export function BulkTierChangeModal({
             </div>
 
             {/* Actions */}
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row mt-6">
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleClose}
-                className="flex-1"
+                className="flex-1 min-h-11 min-w-11"
                 disabled={loading}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                className="flex-1"
+                className="flex-1 min-h-11 min-w-11"
                 disabled={loading || !selectedTierId}
               >
                 {loading ? (

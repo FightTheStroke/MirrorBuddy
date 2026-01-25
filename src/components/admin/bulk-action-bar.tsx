@@ -74,13 +74,13 @@ export function BulkActionBar({
       <div className="max-w-4xl mx-auto px-4 py-3">
         {showRejectReason ? (
           // Reject reason input
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row items-center">
             <input
               type="text"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder="Motivo del rifiuto (opzionale)"
-              className="flex-1 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
+              className="flex-1 min-h-11 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
               autoFocus
             />
             <Button
@@ -91,6 +91,7 @@ export function BulkActionBar({
                 setRejectReason("");
               }}
               disabled={loading !== null}
+              className="min-h-11 min-w-11"
             >
               Annulla
             </Button>
@@ -99,6 +100,7 @@ export function BulkActionBar({
               variant="destructive"
               onClick={() => handleBulkAction("reject")}
               disabled={loading !== null}
+              className="min-h-11 min-w-11"
             >
               {loading === "reject" ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -125,13 +127,13 @@ export function BulkActionBar({
               </button>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row items-center">
               <Button
                 size="sm"
                 variant="outline"
                 onClick={() => setShowRejectReason(true)}
                 disabled={loading !== null}
-                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 min-h-11 min-w-11"
               >
                 <X className="w-4 h-4 mr-1" />
                 Rifiuta
@@ -140,6 +142,7 @@ export function BulkActionBar({
                 size="sm"
                 onClick={() => handleBulkAction("approve")}
                 disabled={loading !== null}
+                className="min-h-11 min-w-11"
               >
                 {loading === "approve" ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

@@ -33,12 +33,13 @@ export function AuditPagination({
       <p className="text-sm text-muted-foreground">
         Showing {startEntry} to {endEntry} of {pagination.total} entries
       </p>
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row">
         <Button
           variant="outline"
           size="sm"
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className="min-h-11 min-w-11"
         >
           Previous
         </Button>
@@ -47,6 +48,7 @@ export function AuditPagination({
           size="sm"
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === pagination.totalPages}
+          className="min-h-11 min-w-11"
         >
           Next
         </Button>

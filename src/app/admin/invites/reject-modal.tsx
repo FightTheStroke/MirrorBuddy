@@ -42,14 +42,18 @@ export function RejectModal({
           className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
           rows={3}
         />
-        <div className="flex gap-3 mt-4">
-          <Button onClick={onCancel} variant="outline" className="flex-1">
+        <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row mt-4">
+          <Button
+            onClick={onCancel}
+            variant="outline"
+            className="flex-1 min-h-11 min-w-11"
+          >
             Annulla
           </Button>
           <Button
             onClick={onConfirm}
             disabled={isProcessing}
-            className="flex-1 bg-red-600 hover:bg-red-700"
+            className="flex-1 min-h-11 min-w-11 bg-red-600 hover:bg-red-700"
           >
             {isProcessing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
