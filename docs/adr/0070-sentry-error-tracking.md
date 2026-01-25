@@ -59,6 +59,19 @@ const sentryDomains = "*.ingest.us.sentry.io *.ingest.de.sentry.io";
 
 Supports both US and EU Sentry regions.
 
+### Proxy Configuration (CRITICAL)
+
+The tunnel route `/monitoring` **must** be in `PUBLIC_ROUTES` in `src/proxy.ts`:
+
+```typescript
+const PUBLIC_ROUTES = [
+  // ... other routes
+  "/monitoring", // Sentry tunnel route (ADR 0070)
+];
+```
+
+Without this, the proxy redirects Sentry requests to `/welcome` and no data reaches Sentry.
+
 ### Environment Variables
 
 | Variable                 | Purpose                    | Required |
