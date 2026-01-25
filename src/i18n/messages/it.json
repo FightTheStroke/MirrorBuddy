@@ -1,0 +1,298 @@
+{
+  "common": {
+    "welcome": "Benvenuto",
+    "loading": "Caricamento...",
+    "error": "Errore",
+    "success": "Successo",
+    "cancel": "Annulla",
+    "save": "Salva",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "close": "Chiudi"
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "settings": "Impostazioni",
+    "profile": "Profilo",
+    "logout": "Disconnetti"
+  },
+  "auth": {
+    "login": "Accedi",
+    "register": "Registrati",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Password dimenticata?"
+  },
+  "tools": {
+    "categories": {
+      "upload": "Caricamento",
+      "create": "Creazione",
+      "search": "Ricerca"
+    },
+    "pdf": {
+      "label": "Carica PDF",
+      "description": "Carica un documento PDF e genera automaticamente materiali di studio"
+    },
+    "webcam": {
+      "label": "Scatta Foto",
+      "description": "Fotografa la lavagna o i tuoi appunti per generare materiali"
+    },
+    "homework": {
+      "label": "Aiuto Compiti",
+      "description": "Carica un esercizio e ricevi assistenza guidata passo-passo"
+    },
+    "studyKit": {
+      "label": "Study Kit",
+      "description": "Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz"
+    },
+    "mindmap": {
+      "label": "Mappa Mentale",
+      "description": "Visualizza i collegamenti tra concetti con mappe interattive"
+    },
+    "quiz": {
+      "label": "Quiz",
+      "description": "Verifica la tua comprensione con quiz personalizzati"
+    },
+    "flashcard": {
+      "label": "Flashcard",
+      "description": "Memorizza con flashcard intelligenti e ripetizione spaziata"
+    },
+    "demo": {
+      "label": "Demo Interattiva",
+      "description": "Esplora concetti STEM con simulazioni interattive"
+    },
+    "summary": {
+      "label": "Riassunto",
+      "description": "Genera sintesi chiare e strutturate dei concetti chiave"
+    },
+    "diagram": {
+      "label": "Diagramma",
+      "description": "Crea diagrammi di flusso e schemi visivi"
+    },
+    "timeline": {
+      "label": "Linea Temporale",
+      "description": "Organizza eventi storici o sequenze in modo visivo"
+    },
+    "formula": {
+      "label": "Formula",
+      "description": "Visualizza e comprendi formule matematiche e scientifiche"
+    },
+    "chart": {
+      "label": "Grafico",
+      "description": "Crea grafici e visualizzazioni per dati e statistiche"
+    },
+    "typing": {
+      "label": "Impara a Digitare",
+      "description": "Impara a digitare con lezioni progressive e accessibilità DSA"
+    },
+    "search": {
+      "label": "Ricerca Web",
+      "description": "Cerca informazioni, video e risorse educative sul web"
+    }
+  },
+  "tier": {
+    "names": {
+      "pro": "Pro",
+      "base": "Base",
+      "trial": "Trial"
+    },
+    "ariaLabels": {
+      "proTier": "Abbonamento tier Pro",
+      "baseTier": "Abbonamento tier Base",
+      "trialTier": "Abbonamento tier Trial",
+      "featureLocked": "Funzionalità bloccata - passa a Pro per accedere"
+    },
+    "locked": {
+      "upgradeButton": "Passa a Pro",
+      "featureOnlyInPro": "Questa funzionalità è disponibile solo in Pro"
+    },
+    "comparison": {
+      "tableHeader": "Funzionalità",
+      "noTiersAvailable": "Nessun piano disponibile",
+      "features": {
+        "dailyMessages": "Messaggi Giornalieri",
+        "voiceMinutes": "Minuti Vocali",
+        "maestriAvailable": "Maestri Disponibili",
+        "documentsLimit": "Limite Documenti",
+        "voiceChat": "Chat Vocale",
+        "mindMaps": "Mappe Mentali",
+        "videoVision": "Video Vision",
+        "parentDashboard": "Dashboard Genitori",
+        "prioritySupport": "Supporto Prioritario"
+      }
+    },
+    "upgradeModal": {
+      "triggers": {
+        "messageLimitTitle": "Limite messaggi giornalieri raggiunto",
+        "messageLimitMessage": "Hai utilizzato tutti i messaggi giornalieri. Passa a Pro per conversazioni illimitate.",
+        "voiceLimitTitle": "Limite minuti vocali raggiunto",
+        "voiceLimitMessage": "Hai raggiunto il limite giornaliero di minuti vocali. Passa a Pro per interazioni vocali illimitate.",
+        "toolLimitTitle": "Limite utilizzo strumenti raggiunto",
+        "toolLimitMessage": "Hai utilizzato tutti i crediti giornalieri per gli strumenti. Passa a Pro per accesso illimitato.",
+        "featureBlockedTitle": "Funzionalità non disponibile",
+        "featureBlockedMessage": "Questa funzionalità è disponibile solo in Pro. Passa a Pro per sbloccare le funzionalità premium.",
+        "maestroLimitTitle": "Limite Maestri raggiunto",
+        "maestroLimitMessage": "Hai raggiunto il limite di Maestri disponibili. Passa a Pro per accedere a tutti i Maestri."
+      },
+      "explanations": {
+        "trial": "Passa a Pro per accesso illimitato a tutte le funzionalità e rimuovi tutte le limitazioni del trial.",
+        "base": "Sblocca le funzionalità premium con Pro per migliorare la tua esperienza di apprendimento."
+      },
+      "missing": {
+        "title": "Cosa ti stai perdendo",
+        "unlimitedMessages": "Messaggi Illimitati",
+        "unlimitedMessagesDesc": "Nessun limite giornaliero di chat",
+        "unlimitedVoice": "Voce Illimitata",
+        "unlimitedVoiceDesc": "Parla quanto vuoi",
+        "allMaestri": "Tutti i Maestri",
+        "allMaestriDesc": "Accesso a oltre 20 tutor AI",
+        "premiumFeatures": "Funzionalità Premium",
+        "premiumFeaturesDesc": "Esportazione PDF, strumenti avanzati"
+      },
+      "buttons": {
+        "maybeLater": "Forse dopo",
+        "upgradeToPro": "Passa a Pro"
+      }
+    },
+    "upgradePrompt": {
+      "banner": {
+        "unlock": "Sblocca {feature} con MirrorBuddy Beta",
+        "fullAccess": "Accesso completo a tutti i Maestri e strumenti",
+        "requestBeta": "Richiedi Beta"
+      },
+      "sidebar": {
+        "freeTrial": "Prova gratuita",
+        "wantToContinue": "Vuoi continuare a usare {feature}?"
+      },
+      "inline": {
+        "limitedInTrial": "{feature} limitato in prova",
+        "unlock": "Sblocca"
+      }
+    },
+    "admin": {
+      "changeTier": {
+        "title": "Cambia Piano",
+        "anonymousUser": "Utente Anonimo",
+        "currentTier": "Piano Attuale",
+        "newTier": "Nuovo Piano *",
+        "selectPlaceholder": "Seleziona un piano...",
+        "notesLabel": "Note (opzionale)",
+        "notesPlaceholder": "Motivo del cambio...",
+        "changing": "Modifica in corso..."
+      }
+    }
+  },
+  "toasts": {
+    "trial": {
+      "welcome": {
+        "title": "Benvenuto in MirrorBuddy!",
+        "message": "Hai {maxChats} messaggi gratuiti. Richiedi l'accesso beta per sbloccare tutto.",
+        "action": "Richiedi accesso"
+      },
+      "warning3Left": {
+        "title": "Solo 3 messaggi rimasti",
+        "message": "Richiedi l'accesso beta per continuare senza limiti.",
+        "action": "Richiedi accesso"
+      },
+      "lastMessage": {
+        "title": "Ultimo messaggio!",
+        "message": "Questo è il tuo ultimo messaggio di prova.",
+        "action": "Richiedi accesso"
+      },
+      "exhausted": {
+        "title": "Messaggi esauriti",
+        "message": "Richiedi l'accesso beta per continuare a usare MirrorBuddy.",
+        "action": "Richiedi accesso"
+      }
+    },
+    "admin": {
+      "tierChanged": "Piano modificato con successo",
+      "tierChangeFailed": "Errore nella modifica del piano",
+      "limitOverrideSuccess": "Override aggiornati con successo",
+      "limitOverrideFailed": "Errore nell'aggiornamento degli override",
+      "noSubscription": "L'utente non ha un abbonamento",
+      "bulkTierSuccess": "Piani aggiornati con successo per {count} utenti",
+      "bulkTierFailed": "Errore nella modifica dei piani",
+      "tierSaved": "Piano salvato con successo",
+      "tierSaveFailed": "Errore nel salvataggio del piano",
+      "requiredFields": "Codice e nome sono obbligatori"
+    },
+    "pdf": {
+      "downloaded": "PDF scaricato",
+      "downloadedAndSaved": "PDF scaricato e salvato nello Zaino",
+      "exportFailed": "Errore durante l'esportazione",
+      "generationFailed": "Errore durante la generazione del percorso"
+    },
+    "quiz": {
+      "completed": "Quiz completato! +{xp} XP",
+      "masteryAchieved": "Maestria raggiunta!",
+      "keepGoing": "Continua così!"
+    },
+    "flashcard": {
+      "completed": "Sessione completata! +{xp} XP",
+      "masteryAchieved": "Maestria raggiunta!",
+      "keepGoing": "Continua così!"
+    },
+    "mindmap": {
+      "saved": "Mappa mentale salvata!",
+      "saveFailed": "Impossibile salvare la mappa mentale."
+    },
+    "pomodoro": {
+      "sessionComplete": "Pomodoro completato! +{xp} XP",
+      "focusTime": "Tempo di focus: {minutes} minuti"
+    },
+    "typing": {
+      "stickyKeysEnabled": "Tasti permanenti attivati",
+      "stickyKeysDisabled": "Tasti permanenti disattivati",
+      "stickyKeysFailed": "Errore nell'aggiornamento dei Tasti permanenti",
+      "stickyKeysInfo": "Premi un tasto alla volta per Shift, Ctrl, Alt, Command",
+      "stickyKeysActive": "Tasti permanenti attivi: {key}"
+    },
+    "googleDrive": {
+      "notReady": "Google Picker non pronto. Riprova tra qualche secondo.",
+      "notConnected": "Devi prima connettere Google Drive nelle Impostazioni.",
+      "configMissing": "Configurazione Google mancante"
+    },
+    "storage": {
+      "storageAdded": "Aggiunti {amount} MB al tuo spazio"
+    },
+    "maestro": {
+      "sessionSaved": "Conversazione salvata nello Zaino!"
+    },
+    "tos": {
+      "mustAccept": "Devi accettare i Termini di Servizio per continuare"
+    },
+    "studyKit": {
+      "printFailed": "Impossibile aprire la finestra di stampa",
+      "mindmapSaved": "Mappa mentale salvata nello zaino!",
+      "flashcardsSaved": "Flashcard salvate nello zaino!"
+    }
+  },
+  "buddies": {
+    "mario": {
+      "personality": "Amichevole, ironico, comprensivo, alla mano",
+      "greeting": "Ehi! Sono Mario. Ho {age} anni e uso MirrorBuddy come te. Come va?"
+    },
+    "noemi": {
+      "personality": "Empatica, solare, accogliente, buona ascoltatrice",
+      "greeting": "Ciao! Sono Noemi. Ho {age} anni e uso MirrorBuddy come te. Come stai?"
+    },
+    "enea": {
+      "personality": "Allegro, positivo, spiritoso, energico, empatico",
+      "greeting": "Ehi! Sono Enea, ho {age} anni. Anche io uso MirrorBuddy per studiare... beh, tra una pausa e l'altra 😄 Tu come stai?"
+    },
+    "bruno": {
+      "personality": "Riflessivo, calmo, profondo, buon ascoltatore, autentico",
+      "greeting": "Ciao. Sono Bruno, ho {age} anni. Se ti va di parlare, sono qui. Come va?"
+    },
+    "sofia": {
+      "personality": "Creativa, sognatrice, profonda, artistica, empatica",
+      "greeting": "Ciao! Sono Sofia, ho {age} anni. Mi piace leggere, disegnare... e sì, anche studiare a modo mio 📚 Tu come stai?"
+    },
+    "marta": {
+      "personality": "Sportiva, determinata, pratica, diretta ma gentile",
+      "greeting": "Ciao! Sono Marta, ho {age} anni. Amo la montagna e lo sport. E tu, come va?"
+    }
+  }
+}

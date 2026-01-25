@@ -1,0 +1,1008 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clear": "Clear",
+    "select": "Select",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "apply": "Apply",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "print": "Print",
+    "export": "Export",
+    "import": "Import",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo",
+    "help": "Help",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login"
+  },
+  "home": {
+    "appTitle": "MirrorBuddy - The School I Want",
+    "loading": "Loading...",
+    "seasonDefault": "Autumn",
+    "mirrorBucksShort": "MB",
+    "navigation": {
+      "professors": "Professors",
+      "astuccio": "Pencil Case",
+      "zaino": "Backpack",
+      "calendar": "Calendar",
+      "progress": "Progress",
+      "settings": "Settings"
+    },
+    "header": {
+      "openMenu": "Open menu",
+      "streak": "Streak",
+      "sessionsThisWeek": "Sessions this week",
+      "studyTime": "Study time",
+      "questionsAsked": "Questions asked",
+      "trial": "Trial",
+      "trialClickToRequest": "Click to request full access"
+    },
+    "sidebar": {
+      "backToHome": "Back to home",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Close menu",
+      "trialMode": "Trial Mode",
+      "login": "Login",
+      "requestAccess": "Request Access",
+      "adminDashboard": "Admin Dashboard",
+      "adminDashboardAria": "Administrator dashboard",
+      "parentArea": "Parent Area"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "chat": "Chat",
+    "maestri": "Teachers",
+    "coaches": "Coaches",
+    "buddies": "Buddies",
+    "tools": "Tools",
+    "flashcards": "Flashcards",
+    "mindmap": "Mind Map",
+    "quiz": "Quiz",
+    "homework": "Homework",
+    "documents": "Documents",
+    "learningPath": "Learning Path",
+    "progress": "Progress",
+    "achievements": "Achievements",
+    "settings": "Settings",
+    "profile": "Profile",
+    "admin": "Administration",
+    "help": "Help",
+    "support": "Support",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms of Service",
+    "calendar": "Calendar",
+    "parentArea": "Parent Area",
+    "adminDashboard": "Admin Dashboard",
+    "breadcrumbs": {
+      "home": "Home",
+      "separator": "/"
+    }
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "signOut": "Sign Out",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "username": "Username",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "resetPassword": "Reset Password",
+    "changePassword": "Change Password",
+    "newPassword": "New Password",
+    "currentPassword": "Current Password",
+    "createAccount": "Create Account",
+    "alreadyHaveAccount": "Already have an account?",
+    "dontHaveAccount": "Don't have an account?",
+    "backToLogin": "Back to Login",
+    "welcomeBack": "Welcome back!",
+    "welcome": "Welcome!",
+    "loginSuccess": "Login successful",
+    "logoutSuccess": "Logout successful",
+    "registrationSuccess": "Registration successful",
+    "invalidCredentials": "Invalid credentials",
+    "emailRequired": "Email is required",
+    "passwordRequired": "Password is required",
+    "passwordMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 8 characters",
+    "emailInvalid": "Invalid email",
+    "userExists": "User already exists",
+    "userNotFound": "User not found",
+    "sessionExpired": "Session expired, please login again",
+    "unauthorized": "Unauthorized"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "unknown": "Unknown error",
+    "network": "Network error",
+    "timeout": "Request timeout",
+    "notFound": "Not found",
+    "forbidden": "Access denied",
+    "unauthorized": "Unauthorized",
+    "serverError": "Server error",
+    "badRequest": "Bad request",
+    "validation": "Validation error",
+    "required": "This field is required",
+    "invalidFormat": "Invalid format",
+    "tooShort": "Too short",
+    "tooLong": "Too long",
+    "invalidEmail": "Invalid email",
+    "invalidUrl": "Invalid URL",
+    "invalidPhone": "Invalid phone number",
+    "invalidDate": "Invalid date",
+    "fileTooBig": "File too large",
+    "fileTypeNotAllowed": "File type not allowed",
+    "uploadFailed": "Upload failed",
+    "downloadFailed": "Download failed",
+    "saveFailed": "Save failed",
+    "deleteFailed": "Delete failed",
+    "loadFailed": "Load failed",
+    "tryAgain": "Try again",
+    "contactSupport": "Contact support"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content",
+    "skipToNavigation": "Skip to navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleMenu": "Toggle menu",
+    "openDialog": "Open dialog",
+    "closeDialog": "Close dialog",
+    "loading": "Loading",
+    "loadingComplete": "Loading complete",
+    "searchResults": "Search results",
+    "noResults": "No results",
+    "currentPage": "Current page",
+    "page": "Page",
+    "of": "of",
+    "selected": "selected",
+    "sortAscending": "Sort ascending",
+    "sortDescending": "Sort descending",
+    "expandSection": "Expand section",
+    "collapseSection": "Collapse section",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "required": "required",
+    "optional": "optional",
+    "errorMessage": "Error message",
+    "warningMessage": "Warning message",
+    "successMessage": "Success message",
+    "infoMessage": "Info message",
+    "screenReaderOnly": "Screen reader only",
+    "newWindow": "opens in new window",
+    "externalLink": "external link"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Cannot exceed {max} characters",
+    "pattern": "Invalid format",
+    "numeric": "Must be a number",
+    "url": "Please enter a valid URL",
+    "date": "Please enter a valid date",
+    "phone": "Please enter a valid phone number",
+    "password": {
+      "minLength": "Password must be at least 8 characters",
+      "requireUppercase": "Password must contain at least one uppercase letter",
+      "requireLowercase": "Password must contain at least one lowercase letter",
+      "requireNumber": "Password must contain at least one number",
+      "requireSpecial": "Password must contain at least one special character",
+      "mismatch": "Passwords do not match"
+    }
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "deleted": "Deleted",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "online": "Online",
+    "offline": "Offline",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "processing": "Processing",
+    "success": "Success",
+    "failed": "Failed",
+    "error": "Error"
+  },
+  "welcome": {
+    "page": {
+      "loading": "Loading...",
+      "resetConfirm": "Do you want to start over? All entered data will be deleted."
+    },
+    "hero": {
+      "betaBadge": "Private Beta",
+      "betaSubtitle": "Invitation only",
+      "welcomeBack": "Welcome back,",
+      "welcomeBackSubtitle": "Ready for your next learning adventure?",
+      "welcomeNew": "Welcome to",
+      "tagline": "Learn",
+      "taglineWith": "WITH the Great Professors",
+      "taglineAbilities": "whatever your abilities",
+      "description": "Study mathematics <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historical professors accompany you personally.",
+      "accessibility": {
+        "title": "Designed for all learning styles",
+        "readableFonts": "Readable fonts",
+        "mindMaps": "Mind maps",
+        "textToSpeech": "Text to speech",
+        "adaptiveQuizzes": "Adaptive quizzes"
+      }
+    },
+    "quickStart": {
+      "heading": "Get Started",
+      "returningUser": {
+        "goToApp": "Go to app",
+        "updateProfile": "Update profile"
+      },
+      "betaAccess": {
+        "badge": "FULL ACCESS",
+        "title": "Have an account?",
+        "feature1": "22 AI Professors",
+        "feature2": "All tools",
+        "feature3": "Saved progress",
+        "cta": "Sign In"
+      },
+      "trial": {
+        "badge": "FREE TRIAL",
+        "title": "Explore now",
+        "feature1": "3 Professors",
+        "feature2": "10 messages",
+        "feature3": "No registration",
+        "cta": "Try for free"
+      }
+    },
+    "tierComparison": {
+      "heading": "Choose the perfect plan for you",
+      "subtitle": "Start with a free trial or register to unlock more features",
+      "footer": "All plans include access to 22 AI Professors and personalized learning tools",
+      "tiers": {
+        "trial": {
+          "name": "Trial",
+          "tagline": "Explore without commitment",
+          "price": "Free",
+          "features": {
+            "maestri": "3 Professors",
+            "messages": "10 messages/day",
+            "voice": "5 minutes voice/day",
+            "noRegistration": "No registration"
+          },
+          "cta": "Try for free"
+        },
+        "base": {
+          "name": "Base",
+          "tagline": "For registered students",
+          "price": "Free",
+          "features": {
+            "maestri": "10 Professors",
+            "messages": "30 messages/day",
+            "voice": "15 minutes voice/day",
+            "savedProgress": "Saved progress"
+          },
+          "cta": "Register"
+        },
+        "pro": {
+          "name": "Pro",
+          "tagline": "Complete experience",
+          "price": "On request",
+          "badge": "Recommended",
+          "features": {
+            "maestri": "22 Professors",
+            "messagesUnlimited": "Unlimited messages",
+            "voiceUnlimited": "Unlimited voice",
+            "allTools": "All tools"
+          },
+          "cta": "Upgrade to Pro"
+        }
+      }
+    },
+    "maestri": {
+      "heading": "Your",
+      "headingHighlight": "Professors",
+      "subtitle": "{count} extraordinary minds from history become your personal professors.",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right",
+      "carouselLabel": "Professors carousel - use arrows to navigate",
+      "scrollHint": "← Scroll to see professors →",
+      "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
+      "disclaimerLink": "Learn more"
+    },
+    "support": {
+      "heading": "Always by your",
+      "headingHighlight": "side",
+      "subtitle": "Coaches for study methods and Buddies for emotional support",
+      "carouselLabel": "Coaches and buddies carousel - use arrows to navigate",
+      "scrollHint": "← Scroll to see all →",
+      "coach": "Coach",
+      "buddy": "Buddy"
+    },
+    "features": {
+      "heading": "Tools for every learning style",
+      "subtitle": "A complete, accessible platform designed for you",
+      "voiceConversation": {
+        "label": "Voice Conversation",
+        "description": "Talk with your Professors in real time"
+      },
+      "mindMaps": {
+        "label": "Mind Maps",
+        "description": "Visualize and organize concepts"
+      },
+      "flashcards": {
+        "label": "FSRS Flashcards",
+        "description": "Memorize with spaced repetition"
+      },
+      "interactiveQuizzes": {
+        "label": "Interactive Quizzes",
+        "description": "Test your knowledge"
+      },
+      "gamification": {
+        "label": "Gamification",
+        "description": "Earn XP and unlock achievements"
+      },
+      "adaptiveLearning": {
+        "label": "Adaptive Learning",
+        "description": "Adapts to your style and pace"
+      },
+      "totalAccessibility": {
+        "label": "Total Accessibility",
+        "description": "Designed for dyslexia, ADHD and everyone"
+      },
+      "integratedPlatform": {
+        "label": "Integrated Platform",
+        "description": "Everything in one place"
+      }
+    },
+    "compliance": {
+      "heading": "Compliance and",
+      "headingHighlight": "Transparency",
+      "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
+      "items": {
+        "gdpr": {
+          "label": "GDPR",
+          "description": "EU data protection and privacy"
+        },
+        "aiAct": {
+          "label": "EU AI Act",
+          "description": "AI regulation compliance"
+        },
+        "coppa": {
+          "label": "COPPA",
+          "description": "Online child protection"
+        },
+        "aiTransparency": {
+          "label": "AI Transparency",
+          "description": "AI transparency policy"
+        },
+        "openSource": {
+          "label": "Open Source",
+          "description": "Open code on GitHub"
+        },
+        "apache": {
+          "label": "Apache 2.0",
+          "description": "Open source license"
+        }
+      },
+      "footer": "MirrorBuddy is developed by <link>Fightthestroke Foundation</link>, a non-profit organization for children and families affected by cerebral palsy and pediatric stroke."
+    },
+    "footer": {
+      "aiDisclaimer": "Created with AI - responses may contain errors",
+      "compliance": {
+        "gdpr": {
+          "label": "GDPR",
+          "description": "European regulation compliant"
+        },
+        "aiAct": {
+          "label": "AI Act",
+          "description": "EU 2024/1689"
+        },
+        "coppa": {
+          "label": "COPPA",
+          "description": "Child protection"
+        },
+        "italianLaw": {
+          "label": "L.132/2025",
+          "description": "Italian AI law"
+        }
+      },
+      "legal": {
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie Policy",
+        "aiTransparency": "AI Transparency",
+        "aiPolicy": "AI Policy",
+        "compliance": "Compliance"
+      },
+      "openSource": {
+        "label": "Open Source",
+        "ariaLabel": "View source code on GitHub"
+      },
+      "copyright": "© {year} MirrorBuddy. Open source project on GitHub."
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "save": "Save",
+    "saving": "Saving...",
+    "saveChanges": "Save Changes",
+    "undo": "Undo",
+    "undoChanges": "Undo changes",
+    "tabs": {
+      "profile": "Profile",
+      "characters": "Characters",
+      "accessibility": "Accessibility",
+      "appearance": "Appearance",
+      "ai": "AI Provider",
+      "audio": "Audio/Video",
+      "ambientAudio": "Ambient Audio",
+      "integrations": "Integrations",
+      "notifications": "Notifications",
+      "telemetry": "Statistics",
+      "privacy": "Privacy",
+      "parents": "Parents",
+      "diagnostics": "Diagnostics"
+    },
+    "profile": {
+      "personalInfo": "Personal Information",
+      "name": "Name",
+      "namePlaceholder": "What's your name?",
+      "gradeLevel": "Education level",
+      "gradeLevelSelect": "Select...",
+      "gradeLevelPrimary": "Primary School (6-10 years)",
+      "gradeLevelMiddle": "Middle School (11-13 years)",
+      "gradeLevelHigh": "High School (14-18 years)",
+      "gradeLevelUniversity": "University",
+      "gradeLevelAdult": "Continuing Education",
+      "teachingStyle": "Professors' Style",
+      "teachingStyleDescription": "Choose how you want professors to talk to you and correct you",
+      "feedbackExample": "Feedback example:",
+      "adaptiveDifficulty": "Adaptive Difficulty",
+      "adaptiveDifficultyDescription": "Professors adapt difficulty and explanations based on signals like questions, response times, and need for repetitions.",
+      "introduction": "Introduction",
+      "introductionDescription": "Review the introduction to MirrorBuddy and discover all available features.",
+      "reviewIntroduction": "Review introduction",
+      "teachingStyles": {
+        "superEncouraging": "Super Encouraging",
+        "superEncouragingDesc": "Always positive, celebrates every small progress",
+        "superEncouragingFeedback": "Fantastic! You're doing great! Every mistake is a step towards success!",
+        "encouraging": "Encouraging",
+        "encouragingDesc": "Supportive and patient, focus on the positive",
+        "encouragingFeedback": "Great work! You're almost right, try to think for a moment...",
+        "balanced": "Balanced",
+        "balancedDesc": "Balanced mix of praise and constructive corrections",
+        "balancedFeedback": "Good attempt. There's an error here - review the concept and try again.",
+        "strict": "Strict",
+        "strictDesc": "Demanding but fair, high expectations",
+        "strictFeedback": "Wrong. You skipped a fundamental step. Go back and redo it.",
+        "brutal": "Brutal",
+        "brutalDesc": "Direct and unfiltered, constant challenge",
+        "brutalFeedback": "No. Completely wrong. You need to study more, this isn't working."
+      },
+      "adaptiveModes": {
+        "manual": "Manual",
+        "manualDesc": "Only suggestions, professor asks for confirmation",
+        "guided": "Guided",
+        "guidedDesc": "Small adjustments with clear warnings",
+        "balanced": "Balanced",
+        "balancedDesc": "Adapts pace and difficulty while maintaining stability",
+        "automatic": "Automatic",
+        "automaticDesc": "Complete real-time adaptation"
+      }
+    },
+    "appearance": {
+      "theme": "Theme",
+      "themeLight": "Light",
+      "themeDark": "Dark",
+      "themeSystem": "System",
+      "themeCurrent": "Current theme: {theme} (based on system preferences)",
+      "themeCurrentDark": "Dark",
+      "themeCurrentLight": "Light",
+      "accentColor": "Primary Color",
+      "accentColors": {
+        "blue": "Blue",
+        "green": "Green",
+        "purple": "Purple",
+        "orange": "Orange",
+        "pink": "Pink"
+      },
+      "language": "Language",
+      "languageDescription": "Select the language professors will speak to you"
+    },
+    "accessibility": {
+      "profiles": "Accessibility Profiles",
+      "profilesDescription": "Select one or more profiles to personalize the experience based on your needs.",
+      "activeFeatures": "Active features:",
+      "customizeAdvanced": "Customize advanced settings",
+      "dyslexia": "Dyslexia",
+      "dyslexiaDesc": "OpenDyslexic font, optimized spacing",
+      "adhd": "ADHD",
+      "adhdDesc": "Pomodoro timer (25/5 min), focus mode, break notifications",
+      "visual": "Visual",
+      "visualDesc": "High contrast, large text",
+      "motor": "Motor",
+      "motorDesc": "Keyboard navigation, large targets",
+      "autism": "Autism",
+      "autismDesc": "Predictable layouts, fewer stimuli",
+      "auditory": "Auditory",
+      "auditoryDesc": "Visual communication, no audio dependency",
+      "cerebralPalsy": "Cerebral Palsy",
+      "cerebralPalsyDesc": "TTS, large text, keyboard, extra spacing",
+      "features": {
+        "dyslexiaFont": "Dyslexia font",
+        "highContrast": "High contrast",
+        "largeText": "Large text",
+        "tts": "Text-to-speech",
+        "adhdMode": "ADHD mode",
+        "reducedMotion": "Reduced animations",
+        "keyboardNav": "Keyboard navigation"
+      }
+    },
+    "notifications": {
+      "title": "Notifications",
+      "types": "Notification types",
+      "enable": "Enable notifications",
+      "enableDescription": "Enable or disable all notifications",
+      "push": "Push notifications",
+      "pushGranted": "Receive notifications even when the app is closed",
+      "pushDenied": "Permission denied - check browser settings",
+      "pushDefault": "Enable browser push notifications",
+      "pushEnable": "Enable",
+      "studyReminders": "Study reminders",
+      "studyRemindersDesc": "Notifications to keep you motivated",
+      "breakReminders": "Break reminders",
+      "breakRemindersDesc": "Periodic reminders for breaks (ADHD)",
+      "achievements": "Achievements",
+      "achievementsDesc": "When you unlock new achievements",
+      "weeklyProgress": "Weekly progress",
+      "weeklyProgressDesc": "Weekly summary of activities",
+      "inApp": "In-app notifications",
+      "inAppDesc": "Visual notifications within the app",
+      "sound": "Sound",
+      "soundDesc": "Sound for notifications",
+      "streaks": "Streak alerts",
+      "streaksDesc": "Notification when you risk losing your streak",
+      "levelUp": "Level ups",
+      "levelUpDesc": "Notification when you level up",
+      "sessionEnd": "Session end",
+      "sessionEndDesc": "Summary at the end of study session",
+      "email": "Email notifications",
+      "emailDesc": "Receive summary emails"
+    },
+    "privacy": {
+      "account": "Account",
+      "accountInfo": "Your account information",
+      "logout": "Logout",
+      "loggingOut": "Logging out...",
+      "dataControl": "Data Control",
+      "dataControlDescription": "Manage your data and privacy preferences",
+      "reviewConsents": "Review consents",
+      "reviewConsentsDescription": "Modify cookie and privacy preferences",
+      "analytics": "Anonymous analytics",
+      "analyticsDescription": "Help us improve MirrorBuddy with anonymous usage data",
+      "version": "Version",
+      "versionInfo": "Version {version}",
+      "buildTime": "Built on {time}",
+      "environment": "Environment: {env}",
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy Policy",
+        "terms": "Terms of Service",
+        "cookies": "Cookie Policy",
+        "aiTransparency": "AI Transparency"
+      }
+    },
+    "parents": {
+      "title": "Parents Area",
+      "description": "Access the parent dashboard to monitor your child's progress and activities safely and respectfully of privacy (GDPR).",
+      "consentRequired": "Consent required:",
+      "consentDescription": "The parent dashboard requires consent from both the parent and the student to comply with GDPR regulations on minor data protection.",
+      "openDashboard": "Open Parent Dashboard"
+    },
+    "integrations": {
+      "title": "Integrations",
+      "googleDrive": "Google Drive",
+      "googleDriveDescription": "Connect your Google account to save materials"
+    },
+    "audio": {
+      "title": "Audio/Video Settings",
+      "microphone": "Microphone",
+      "microphoneSelect": "Select microphone",
+      "microphoneTest": "Test microphone",
+      "speaker": "Speaker",
+      "speakerSelect": "Select speaker",
+      "speakerTest": "Test speaker",
+      "camera": "Camera",
+      "cameraSelect": "Select camera",
+      "cameraTest": "Test camera",
+      "volume": "Volume",
+      "permissions": "Permissions",
+      "permissionsDescription": "Grant microphone and camera permissions to use voice features"
+    },
+    "ambientAudio": {
+      "title": "Ambient Audio",
+      "description": "Background sounds to help concentration",
+      "enable": "Enable ambient audio",
+      "volume": "Volume",
+      "sounds": {
+        "rain": "Rain",
+        "forest": "Forest",
+        "ocean": "Ocean",
+        "cafe": "Café",
+        "library": "Library"
+      }
+    },
+    "ai": {
+      "title": "AI Provider",
+      "provider": "Provider",
+      "providerDescription": "Select AI service provider",
+      "azure": "Azure OpenAI",
+      "ollama": "Ollama (Local)",
+      "status": "Status",
+      "connected": "Connected",
+      "disconnected": "Disconnected",
+      "testing": "Testing...",
+      "costs": "Costs",
+      "costsDescription": "Estimated usage costs"
+    },
+    "diagnostics": {
+      "title": "Diagnostics",
+      "description": "Test audio, video, and chat features",
+      "runTests": "Run tests",
+      "testResults": "Test results",
+      "allPassed": "All tests passed",
+      "someFailed": "Some tests failed"
+    }
+  },
+  "astuccio": {
+    "title": "Estuche",
+    "backToAstuccio": "← Volver al Estuche",
+    "toolsCount": "{count} herramientas",
+    "categories": {
+      "upload": {
+        "title": "Cargar",
+        "subtitle": "Importa tus materiales para generar ayudas de estudio"
+      },
+      "create": {
+        "title": "Crear",
+        "subtitle": "Genera materiales de estudio con la ayuda de los Profesores"
+      },
+      "search": {
+        "title": "Buscar",
+        "subtitle": "Encuentra recursos e información en la web"
+      }
+    },
+    "info": {
+      "howItWorks": "¿Cómo funciona?",
+      "step1": {
+        "title": "Elige la Herramienta",
+        "description": "Selecciona la herramienta más adecuada para tu objetivo de aprendizaje"
+      },
+      "step2": {
+        "title": "Elige el Profesor",
+        "description": "Cada profesor tiene un enfoque único para ayudarte a aprender"
+      },
+      "step3": {
+        "title": "Guardar en la Mochila",
+        "description": "Los materiales creados se guardan en tu Mochila para reutilizarlos cuando quieras"
+      },
+      "studyTip": {
+        "title": "Consejo de Estudio",
+        "description": "Comienza con un <strong>Mapa Mental</strong> para tener una visión general, luego crea <strong>Flashcards</strong> para memorizar conceptos clave, y finalmente prueba tu preparación con un <strong>Quiz</strong>. ¡Todos los materiales se guardarán en tu <strong>Mochila</strong>!"
+      }
+    }
+  },
+  "zaino": {
+    "print": {
+      "success": "Impresión iniciada",
+      "successDescription": "El documento se abrirá en la ventana de impresión.",
+      "error": "Error de impresión",
+      "errorDescription": "No se puede abrir la ventana de impresión. Comprueba la configuración de ventanas emergentes.",
+      "downloadSuccess": "Archivo descargado",
+      "downloadSuccessDescription": "El archivo HTML se ha descargado.",
+      "downloadError": "Error",
+      "downloadErrorDescription": "No se puede descargar el archivo.",
+      "ariaLabel": "Imprimir {title}",
+      "button": "Imprimir",
+      "optionsAriaLabel": "Opciones de impresión para {title}",
+      "printPdf": "Imprimir PDF",
+      "downloadHtml": "Descargar HTML"
+    }
+  },
+  "tools": {
+    "pdf": {
+      "label": "Cargar PDF",
+      "description": "Carga un documento PDF y genera automáticamente materiales de estudio"
+    },
+    "webcam": {
+      "label": "Tomar Foto",
+      "description": "Fotografía la pizarra o tus apuntes para generar materiales"
+    },
+    "homework": {
+      "label": "Ayuda con Tareas",
+      "description": "Carga un ejercicio y recibe asistencia guiada paso a paso"
+    },
+    "studyKit": {
+      "label": "Kit de Estudio",
+      "description": "Carga un PDF y genera automáticamente resúmenes, mapas, demos y cuestionarios"
+    },
+    "mindmap": {
+      "label": "Mapa Mental",
+      "description": "Visualiza las conexiones entre conceptos con mapas interactivos"
+    },
+    "quiz": {
+      "label": "Quiz",
+      "description": "Prueba tu comprensión con cuestionarios personalizados"
+    },
+    "flashcard": {
+      "label": "Flashcard",
+      "description": "Memoriza con flashcards inteligentes y repetición espaciada"
+    },
+    "demo": {
+      "label": "Demo Interactiva",
+      "description": "Explora conceptos STEM con simulaciones interactivas"
+    },
+    "summary": {
+      "label": "Resumen",
+      "description": "Genera síntesis claras y estructuradas de conceptos clave"
+    },
+    "diagram": {
+      "label": "Diagrama",
+      "description": "Crea diagramas de flujo y esquemas visuales"
+    },
+    "timeline": {
+      "label": "Línea de Tiempo",
+      "description": "Organiza eventos históricos o secuencias visualmente"
+    },
+    "formula": {
+      "label": "Fórmula",
+      "description": "Visualiza y comprende fórmulas matemáticas y científicas"
+    },
+    "chart": {
+      "label": "Gráfico",
+      "description": "Crea gráficos y visualizaciones para datos y estadísticas"
+    },
+    "typing": {
+      "label": "Aprender a Escribir",
+      "description": "Aprende a escribir con lecciones progresivas y accesibilidad DSA"
+    },
+    "search": {
+      "label": "Búsqueda Web",
+      "description": "Busca información, videos y recursos educativos en la web"
+    }
+  },
+  "chat": {
+    "input": {
+      "placeholder": "Escribe a {name}...",
+      "ariaLabel": "Escribe un mensaje a {name}",
+      "sendMessage": "Enviar mensaje",
+      "enableAudio": "Activar audio",
+      "disableAudio": "Desactivar audio",
+      "switchToText": "Cambiar a texto",
+      "switchToVoice": "Cambiar a voz"
+    },
+    "header": {
+      "backButton": "Volver",
+      "defaultDescription": "Estoy aquí para ayudarte",
+      "endCall": "Finalizar llamada",
+      "startVoiceCall": "Iniciar llamada de voz",
+      "talkToCoach": "Hablar con el Coach",
+      "talkToBuddy": "Hablar con un amigo"
+    },
+    "message": {
+      "thinking": "{name} está pensando..."
+    },
+    "tools": {
+      "mindmap": {
+        "label": "Mapa",
+        "tooltip": "Crear mapa mental"
+      },
+      "quiz": {
+        "label": "Quiz",
+        "tooltip": "Crear quiz"
+      },
+      "demo": {
+        "label": "Demo",
+        "tooltip": "Crear simulación interactiva"
+      },
+      "flashcard": {
+        "label": "Flashcard",
+        "tooltip": "Crear flashcards"
+      },
+      "summary": {
+        "label": "Resumen",
+        "tooltip": "Escribir un resumen guiado"
+      },
+      "search": {
+        "label": "Buscar",
+        "tooltip": "Buscar en web/YouTube"
+      },
+      "webcam": {
+        "label": "Foto",
+        "tooltip": "Tomar foto"
+      }
+    },
+    "history": {
+      "untitled": "Sin título",
+      "active": "Activa",
+      "messageSingular": "mensaje",
+      "messagePlural": "mensajes"
+    },
+    "inactivity": {
+      "title": "¿Sigues ahí?",
+      "description": "No hemos detectado actividad desde hace un rato. La conversación se cerrará automáticamente en:",
+      "closeWarning": "Cerrar aviso",
+      "summaryMessage": "Si cierras la conversación, generaremos un resumen automático de la sesión.",
+      "closeAndSummarize": "Cerrar y Resumir",
+      "continueStudying": "Continuar Estudiando"
+    },
+    "voice": {
+      "connectionError": "Error de conexión de voz",
+      "serviceUnavailable": "No se puede conectar al servicio de voz",
+      "microphonePermission": "Micrófono no autorizado. Habilita el micrófono en la configuración de tu navegador.",
+      "sessionTitle": "Sesión de voz con {name}",
+      "studyMethod": "Método de estudio",
+      "emotionalSupport": "Apoyo emocional"
+    },
+    "handoff": {
+      "askToSwitch": "¿Quieres hablar con {name}?",
+      "decline": "No gracias",
+      "accept": "Hablar con {name}"
+    }
+  },
+  "toasts": {
+    "trial": {
+      "welcome": {
+        "title": "¡Bienvenido a MirrorBuddy!",
+        "message": "Tienes {maxChats} mensajes gratuitos. Solicita acceso beta para desbloquear todo.",
+        "action": "Solicitar Acceso"
+      },
+      "warning3Left": {
+        "title": "Solo 3 mensajes restantes",
+        "message": "Solicita acceso beta para continuar sin límites.",
+        "action": "Solicitar Acceso"
+      },
+      "lastMessage": {
+        "title": "¡Último mensaje!",
+        "message": "Este es tu último mensaje de prueba.",
+        "action": "Solicitar Acceso"
+      },
+      "exhausted": {
+        "title": "Mensajes agotados",
+        "message": "Solicita acceso beta para continuar usando MirrorBuddy.",
+        "action": "Solicitar Acceso"
+      }
+    },
+    "admin": {
+      "tierChanged": "Plan cambiado con éxito",
+      "tierChangeFailed": "Error al cambiar el plan",
+      "limitOverrideSuccess": "Límites actualizados con éxito",
+      "limitOverrideFailed": "Error al actualizar los límites",
+      "noSubscription": "El usuario no tiene suscripción",
+      "bulkTierSuccess": "Planes actualizados con éxito para {count} usuarios",
+      "bulkTierFailed": "Error al cambiar los planes",
+      "tierSaved": "Plan guardado con éxito",
+      "tierSaveFailed": "Error al guardar el plan",
+      "requiredFields": "Código y nombre son obligatorios"
+    },
+    "pdf": {
+      "downloaded": "PDF descargado",
+      "downloadedAndSaved": "PDF descargado y guardado en Zaino",
+      "exportFailed": "Error durante la exportación",
+      "generationFailed": "Error al generar la ruta"
+    },
+    "quiz": {
+      "completed": "¡Quiz completado! +{xp} XP",
+      "masteryAchieved": "¡Maestría alcanzada!",
+      "keepGoing": "¡Sigue así!"
+    },
+    "flashcard": {
+      "completed": "¡Sesión completada! +{xp} XP",
+      "masteryAchieved": "¡Maestría alcanzada!",
+      "keepGoing": "¡Sigue así!"
+    },
+    "mindmap": {
+      "saved": "¡Mapa mental guardado!",
+      "saveFailed": "No se pudo guardar el mapa mental."
+    },
+    "pomodoro": {
+      "sessionComplete": "¡Pomodoro completado! +{xp} XP",
+      "focusTime": "Tiempo de concentración: {minutes} minutos"
+    },
+    "typing": {
+      "stickyKeysEnabled": "Teclas persistentes activadas",
+      "stickyKeysDisabled": "Teclas persistentes desactivadas",
+      "stickyKeysFailed": "Error al actualizar las teclas persistentes",
+      "stickyKeysInfo": "Presiona una tecla a la vez para Shift, Ctrl, Alt, Command",
+      "stickyKeysActive": "Teclas persistentes activas: {key}"
+    },
+    "googleDrive": {
+      "notReady": "Google Picker no está listo. Inténtalo de nuevo en unos segundos.",
+      "notConnected": "Primero debes conectar Google Drive en Configuración.",
+      "configMissing": "Configuración de Google faltante"
+    },
+    "storage": {
+      "storageAdded": "Se agregaron {amount} MB a tu espacio"
+    },
+    "maestro": {
+      "sessionSaved": "¡Conversación guardada en Zaino!"
+    },
+    "tos": {
+      "mustAccept": "Debes aceptar los Términos de Servicio para continuar"
+    },
+    "studyKit": {
+      "printFailed": "No se pudo abrir la ventana de impresión",
+      "mindmapSaved": "¡Mapa mental guardado en zaino!",
+      "flashcardsSaved": "¡Flashcards guardadas en zaino!"
+    }
+  },
+  "buddies": {
+    "mario": {
+      "personality": "Amigable, irónico, comprensivo, cercano",
+      "greeting": "¡Eh! Soy Mario. Tengo {age} años y uso MirrorBuddy como tú. ¿Cómo va?"
+    },
+    "noemi": {
+      "personality": "Empática, alegre, acogedora, buena oyente",
+      "greeting": "¡Hola! Soy Noemi. Tengo {age} años y uso MirrorBuddy como tú. ¿Cómo estás?"
+    },
+    "enea": {
+      "personality": "Alegre, positivo, ingenioso, enérgico, empático",
+      "greeting": "¡Eh! Soy Enea, tengo {age} años. También uso MirrorBuddy para estudiar... bueno, entre pausas 😄 ¿Cómo te va?"
+    },
+    "bruno": {
+      "personality": "Reflexivo, tranquilo, profundo, buen oyente, auténtico",
+      "greeting": "Hola. Soy Bruno, tengo {age} años. Si quieres hablar, estoy aquí. ¿Cómo estás?"
+    },
+    "sofia": {
+      "personality": "Creativa, soñadora, profunda, artística, empática",
+      "greeting": "¡Hola! Soy Sofia, tengo {age} años. Me gusta leer, dibujar... y sí, también estudiar a mi manera 📚 ¿Cómo estás?"
+    },
+    "marta": {
+      "personality": "Deportista, decidida, práctica, directa pero amable",
+      "greeting": "¡Hola! Soy Marta, tengo {age} años. Me encantan las montañas y el deporte. ¿Y tú?"
+    }
+  }
+}

@@ -1,0 +1,298 @@
+{
+  "common": {
+    "welcome": "Willkommen",
+    "loading": "Wird geladen...",
+    "error": "Fehler",
+    "success": "Erfolg",
+    "cancel": "Abbrechen",
+    "save": "Speichern",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "close": "Schließen"
+  },
+  "navigation": {
+    "home": "Startseite",
+    "dashboard": "Dashboard",
+    "settings": "Einstellungen",
+    "profile": "Profil",
+    "logout": "Abmelden"
+  },
+  "auth": {
+    "login": "Anmelden",
+    "register": "Registrieren",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "forgotPassword": "Passwort vergessen?"
+  },
+  "tools": {
+    "categories": {
+      "upload": "Hochladen",
+      "create": "Erstellen",
+      "search": "Suchen"
+    },
+    "pdf": {
+      "label": "PDF hochladen",
+      "description": "Laden Sie ein PDF-Dokument hoch und generieren Sie automatisch Lernmaterialien"
+    },
+    "webcam": {
+      "label": "Foto aufnehmen",
+      "description": "Fotografieren Sie die Tafel oder Ihre Notizen, um Materialien zu generieren"
+    },
+    "homework": {
+      "label": "Hausaufgabenhilfe",
+      "description": "Laden Sie eine Übung hoch und erhalten Sie schrittweise Anleitung"
+    },
+    "studyKit": {
+      "label": "Lernkit",
+      "description": "Laden Sie ein PDF hoch und generieren Sie automatisch Zusammenfassungen, Karten, Demos und Quiz"
+    },
+    "mindmap": {
+      "label": "Mindmap",
+      "description": "Visualisieren Sie Verbindungen zwischen Konzepten mit interaktiven Karten"
+    },
+    "quiz": {
+      "label": "Quiz",
+      "description": "Testen Sie Ihr Verständnis mit personalisierten Quiz"
+    },
+    "flashcard": {
+      "label": "Karteikarten",
+      "description": "Lernen Sie mit intelligenten Karteikarten und verteilter Wiederholung"
+    },
+    "demo": {
+      "label": "Interaktive Demo",
+      "description": "Erkunden Sie STEM-Konzepte mit interaktiven Simulationen"
+    },
+    "summary": {
+      "label": "Zusammenfassung",
+      "description": "Generieren Sie klare und strukturierte Zusammenfassungen wichtiger Konzepte"
+    },
+    "diagram": {
+      "label": "Diagramm",
+      "description": "Erstellen Sie Flussdiagramme und visuelle Schemata"
+    },
+    "timeline": {
+      "label": "Zeitstrahl",
+      "description": "Organisieren Sie historische Ereignisse oder Abläufe visuell"
+    },
+    "formula": {
+      "label": "Formel",
+      "description": "Visualisieren und verstehen Sie mathematische und wissenschaftliche Formeln"
+    },
+    "chart": {
+      "label": "Diagramm",
+      "description": "Erstellen Sie Diagramme und Visualisierungen für Daten und Statistiken"
+    },
+    "typing": {
+      "label": "Tippen lernen",
+      "description": "Lernen Sie mit progressiven Lektionen und DSA-Barrierefreiheit zu tippen"
+    },
+    "search": {
+      "label": "Websuche",
+      "description": "Suchen Sie nach Informationen, Videos und Bildungsressourcen im Web"
+    }
+  },
+  "tier": {
+    "names": {
+      "pro": "Pro",
+      "base": "Base",
+      "trial": "Trial"
+    },
+    "ariaLabels": {
+      "proTier": "Pro-Stufe Abonnement",
+      "baseTier": "Basis-Stufe Abonnement",
+      "trialTier": "Test-Stufe Abonnement",
+      "featureLocked": "Funktion gesperrt - auf Pro upgraden für Zugriff"
+    },
+    "locked": {
+      "upgradeButton": "Auf Pro upgraden",
+      "featureOnlyInPro": "Diese Funktion ist nur in Pro verfügbar"
+    },
+    "comparison": {
+      "tableHeader": "Funktion",
+      "noTiersAvailable": "Keine Pläne verfügbar",
+      "features": {
+        "dailyMessages": "Tägliche Nachrichten",
+        "voiceMinutes": "Sprachminuten",
+        "maestriAvailable": "Verfügbare Maestros",
+        "documentsLimit": "Dokumentenlimit",
+        "voiceChat": "Sprachchat",
+        "mindMaps": "Mindmaps",
+        "videoVision": "Video Vision",
+        "parentDashboard": "Eltern-Dashboard",
+        "prioritySupport": "Prioritärer Support"
+      }
+    },
+    "upgradeModal": {
+      "triggers": {
+        "messageLimitTitle": "Tägliches Nachrichtenlimit erreicht",
+        "messageLimitMessage": "Sie haben alle Ihre täglichen Nachrichten verwendet. Upgraden Sie auf Pro für unbegrenzte Gespräche.",
+        "voiceLimitTitle": "Sprachminuten-Limit erreicht",
+        "voiceLimitMessage": "Sie haben Ihr tägliches Sprachlimit erreicht. Upgraden Sie auf Pro für unbegrenzte Sprachinteraktionen.",
+        "toolLimitTitle": "Tool-Nutzungslimit erreicht",
+        "toolLimitMessage": "Sie haben alle Ihre täglichen Tool-Credits verwendet. Upgraden Sie auf Pro für unbegrenzten Tool-Zugriff.",
+        "featureBlockedTitle": "Funktion nicht verfügbar",
+        "featureBlockedMessage": "Diese Funktion ist nur in Pro verfügbar. Upgraden Sie, um Premium-Funktionen freizuschalten.",
+        "maestroLimitTitle": "Maestro-Limit erreicht",
+        "maestroLimitMessage": "Sie haben das Limit der verfügbaren Maestros erreicht. Upgraden Sie auf Pro, um auf alle Maestros zuzugreifen."
+      },
+      "explanations": {
+        "trial": "Upgraden Sie auf Pro für unbegrenzten Zugriff auf alle Funktionen und entfernen Sie alle Testbeschränkungen.",
+        "base": "Schalten Sie Premium-Funktionen mit Pro frei, um Ihre Lernerfahrung zu verbessern."
+      },
+      "missing": {
+        "title": "Was Ihnen entgeht",
+        "unlimitedMessages": "Unbegrenzte Nachrichten",
+        "unlimitedMessagesDesc": "Keine täglichen Chat-Limits",
+        "unlimitedVoice": "Unbegrenzte Sprache",
+        "unlimitedVoiceDesc": "Sprechen Sie so lange Sie möchten",
+        "allMaestri": "Alle Maestros",
+        "allMaestriDesc": "Zugriff auf über 20 KI-Tutoren",
+        "premiumFeatures": "Premium-Funktionen",
+        "premiumFeaturesDesc": "PDF-Export, erweiterte Tools"
+      },
+      "buttons": {
+        "maybeLater": "Vielleicht später",
+        "upgradeToPro": "Auf Pro upgraden"
+      }
+    },
+    "upgradePrompt": {
+      "banner": {
+        "unlock": "Entsperren Sie {feature} mit MirrorBuddy Beta",
+        "fullAccess": "Vollständiger Zugriff auf alle Maestros und Tools",
+        "requestBeta": "Beta anfordern"
+      },
+      "sidebar": {
+        "freeTrial": "Kostenlose Testversion",
+        "wantToContinue": "Möchten Sie {feature} weiter nutzen?"
+      },
+      "inline": {
+        "limitedInTrial": "{feature} in Testversion begrenzt",
+        "unlock": "Entsperren"
+      }
+    },
+    "admin": {
+      "changeTier": {
+        "title": "Plan ändern",
+        "anonymousUser": "Anonymer Benutzer",
+        "currentTier": "Aktueller Plan",
+        "newTier": "Neuer Plan *",
+        "selectPlaceholder": "Wählen Sie einen Plan...",
+        "notesLabel": "Notizen (optional)",
+        "notesPlaceholder": "Grund für die Änderung...",
+        "changing": "Wird geändert..."
+      }
+    }
+  },
+  "toasts": {
+    "trial": {
+      "welcome": {
+        "title": "Willkommen bei MirrorBuddy!",
+        "message": "Sie haben {maxChats} kostenlose Nachrichten. Fordern Sie Beta-Zugang an, um alles freizuschalten.",
+        "action": "Zugang anfordern"
+      },
+      "warning3Left": {
+        "title": "Nur noch 3 Nachrichten",
+        "message": "Fordern Sie Beta-Zugang an, um ohne Einschränkungen fortzufahren.",
+        "action": "Zugang anfordern"
+      },
+      "lastMessage": {
+        "title": "Letzte Nachricht!",
+        "message": "Dies ist Ihre letzte Testnachricht.",
+        "action": "Zugang anfordern"
+      },
+      "exhausted": {
+        "title": "Nachrichten aufgebraucht",
+        "message": "Fordern Sie Beta-Zugang an, um MirrorBuddy weiter zu nutzen.",
+        "action": "Zugang anfordern"
+      }
+    },
+    "admin": {
+      "tierChanged": "Plan erfolgreich geändert",
+      "tierChangeFailed": "Fehler beim Ändern des Plans",
+      "limitOverrideSuccess": "Limits erfolgreich aktualisiert",
+      "limitOverrideFailed": "Fehler beim Aktualisieren der Limits",
+      "noSubscription": "Benutzer hat kein Abonnement",
+      "bulkTierSuccess": "Pläne erfolgreich aktualisiert für {count} Benutzer",
+      "bulkTierFailed": "Fehler beim Ändern der Pläne",
+      "tierSaved": "Plan erfolgreich gespeichert",
+      "tierSaveFailed": "Fehler beim Speichern des Plans",
+      "requiredFields": "Code und Name sind erforderlich"
+    },
+    "pdf": {
+      "downloaded": "PDF heruntergeladen",
+      "downloadedAndSaved": "PDF heruntergeladen und in Zaino gespeichert",
+      "exportFailed": "Fehler beim Export",
+      "generationFailed": "Fehler beim Generieren des Pfads"
+    },
+    "quiz": {
+      "completed": "Quiz abgeschlossen! +{xp} XP",
+      "masteryAchieved": "Meisterschaft erreicht!",
+      "keepGoing": "Weiter so!"
+    },
+    "flashcard": {
+      "completed": "Sitzung abgeschlossen! +{xp} XP",
+      "masteryAchieved": "Meisterschaft erreicht!",
+      "keepGoing": "Weiter so!"
+    },
+    "mindmap": {
+      "saved": "Mind Map gespeichert!",
+      "saveFailed": "Mind Map konnte nicht gespeichert werden."
+    },
+    "pomodoro": {
+      "sessionComplete": "Pomodoro abgeschlossen! +{xp} XP",
+      "focusTime": "Fokuszeit: {minutes} Minuten"
+    },
+    "typing": {
+      "stickyKeysEnabled": "Einrasttasten aktiviert",
+      "stickyKeysDisabled": "Einrasttasten deaktiviert",
+      "stickyKeysFailed": "Fehler beim Aktualisieren der Einrasttasten",
+      "stickyKeysInfo": "Drücken Sie jeweils eine Taste für Shift, Strg, Alt, Befehl",
+      "stickyKeysActive": "Einrasttasten aktiv: {key}"
+    },
+    "googleDrive": {
+      "notReady": "Google Picker ist nicht bereit. Bitte versuchen Sie es in ein paar Sekunden erneut.",
+      "notConnected": "Sie müssen zuerst Google Drive in den Einstellungen verbinden.",
+      "configMissing": "Google-Konfiguration fehlt"
+    },
+    "storage": {
+      "storageAdded": "{amount} MB zu Ihrem Speicher hinzugefügt"
+    },
+    "maestro": {
+      "sessionSaved": "Unterhaltung in Zaino gespeichert!"
+    },
+    "tos": {
+      "mustAccept": "Sie müssen die Nutzungsbedingungen akzeptieren, um fortzufahren"
+    },
+    "studyKit": {
+      "printFailed": "Druckfenster konnte nicht geöffnet werden",
+      "mindmapSaved": "Mind Map in zaino gespeichert!",
+      "flashcardsSaved": "Karteikarten in zaino gespeichert!"
+    }
+  },
+  "buddies": {
+    "mario": {
+      "personality": "Freundlich, ironisch, verständnisvoll, locker",
+      "greeting": "Hey! Ich bin Mario. Ich bin {age} und nutze MirrorBuddy wie du. Wie geht's?"
+    },
+    "noemi": {
+      "personality": "Einfühlsam, fröhlich, einladend, gute Zuhörerin",
+      "greeting": "Hi! Ich bin Noemi. Ich bin {age} und nutze MirrorBuddy wie du. Wie geht es dir?"
+    },
+    "enea": {
+      "personality": "Fröhlich, positiv, witzig, energisch, einfühlsam",
+      "greeting": "Hey! Ich bin Enea, ich bin {age}. Ich nutze auch MirrorBuddy zum Lernen... naja, zwischen Pausen 😄 Und du?"
+    },
+    "bruno": {
+      "personality": "Nachdenklich, ruhig, tiefgründig, guter Zuhörer, authentisch",
+      "greeting": "Hallo. Ich bin Bruno, ich bin {age}. Wenn du reden möchtest, bin ich hier. Wie geht's?"
+    },
+    "sofia": {
+      "personality": "Kreativ, verträumt, tiefgründig, künstlerisch, einfühlsam",
+      "greeting": "Hi! Ich bin Sofia, ich bin {age}. Ich mag Lesen, Zeichnen... und ja, auch auf meine Art lernen 📚 Und du?"
+    },
+    "marta": {
+      "personality": "Sportlich, entschlossen, praktisch, direkt aber freundlich",
+      "greeting": "Hallo! Ich bin Marta, ich bin {age}. Ich liebe Berge und Sport. Und du?"
+    }
+  }
+}

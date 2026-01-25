@@ -1,0 +1,38 @@
+/// Locale Configuration System
+/// Maps countries to their primary languages and supported locales.
+/// Connects to language-teaching maestri for admin console.
+
+enum LocaleAuditAction {
+  LOCALE_CREATE
+  LOCALE_UPDATE
+  LOCALE_DELETE
+}
+
+model LocaleConfig {
+  id                        String   @id // Country code (e.g., "IT", "FR", "DE")
+  countryName               String   // Display name (e.g., "Italia", "France", "Germany")
+  primaryLocale             String   // Primary locale code (e.g., "it", "en", "fr")
+  primaryLanguageMaestroId  String   // Maestro ID for the primary language teacher
+  secondaryLocales          String[] // Additional supported locale codes
+  enabled                   Boolean  @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([enabled])
+  @@index([primaryLocale])
+}
+
+model LocaleAuditLog {
+  id        String              @id @default(cuid())
+  localeId  String
+  adminId   String
+  action    LocaleAuditAction
+  changes   Json
+  notes     String?
+  createdAt DateTime            @default(now())
+
+  @@index([localeId])
+  @@index([adminId])
+  @@index([createdAt])
+}

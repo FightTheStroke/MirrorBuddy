@@ -1,0 +1,62 @@
+{
+  "templating": {
+    "list": [
+      {
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": "All"
+        },
+        "definition": "it,en,fr,de,es,All",
+        "description": "Filter metrics and data by user locale/language",
+        "error": null,
+        "hide": 0,
+        "includeAll": true,
+        "label": "Locale",
+        "multi": false,
+        "name": "locale",
+        "options": [
+          {
+            "selected": false,
+            "text": "Italian",
+            "value": "it"
+          },
+          {
+            "selected": false,
+            "text": "English",
+            "value": "en"
+          },
+          {
+            "selected": false,
+            "text": "French",
+            "value": "fr"
+          },
+          {
+            "selected": false,
+            "text": "German",
+            "value": "de"
+          },
+          {
+            "selected": false,
+            "text": "Spanish",
+            "value": "es"
+          },
+          {
+            "selected": true,
+            "text": "All",
+            "value": "All"
+          }
+        ],
+        "query": "it,en,fr,de,es,All",
+        "queryValue": "",
+        "skipUrlSync": false,
+        "sort": 0,
+        "tagValuesQuery": "",
+        "tagsQuery": "",
+        "type": "custom",
+        "useTags": false
+      }
+    ]
+  },
+  "_comment": "This is a Grafana variable template for locale filtering. To use: 1. Copy the variable object from 'templating.list[0]'. 2. In your dashboard JSON, add it to the 'templating.list' array. 3. Update the dashboard via Grafana UI or API."
+}

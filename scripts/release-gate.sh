@@ -40,6 +40,18 @@ fi
 echo -e "${GREEN}✓ Repo hygiene passed${NC}"
 
 echo ""
+echo -e "${BLUE}[PHASE 0.75] i18n verification...${NC}"
+i18n_output=$(npx tsx scripts/i18n-check.ts 2>&1)
+i18n_exit=$?
+if [ $i18n_exit -ne 0 ]; then
+  echo -e "${RED}✗ BLOCKED: i18n completeness check failed${NC}"
+  echo "$i18n_output"
+  exit 1
+fi
+echo "$i18n_output" | tail -10
+echo -e "${GREEN}✓ i18n verification passed${NC}"
+
+echo ""
 echo -e "${BLUE}[PHASE 1] TypeScript rigor...${NC}"
 ts_ignore=$(rg -n "@ts-ignore|@ts-nocheck" src -g "*.ts" -g "*.tsx" 2>/dev/null || true)
 if [ -n "$ts_ignore" ]; then
@@ -153,4 +165,14 @@ echo "  3. Maestro conv:   npx playwright test maestro-conversation.spec.ts"
 echo "  4. Visual reg:     VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts"
 echo ""
 echo "See: docs/adr/0059-e2e-test-setup-requirements.md#ci-vs-local-test-classification"
+echo ""
+echo -e "${YELLOW}⚠ BEFORE RELEASE: Complete manual i18n verification steps${NC}"
+echo ""
+echo "Manual verification checklist:"
+echo "  1. All 5 locales load: it, en, fr, de, es"
+echo "  2. Language-specific maestri work: Molière (fr), Goethe (de), Cervantes (es)"
+echo "  3. Maestri character consistency test passed"
+echo "  4. Grafana locale dashboard shows all 5 locales with metrics"
+echo ""
+echo "See: docs/operations/RELEASE-CHECKLIST.md (Phase 1: i18n Verification)"
 echo ""
