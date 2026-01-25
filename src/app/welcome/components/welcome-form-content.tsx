@@ -1,12 +1,16 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { Sparkles, ArrowRight, Volume2, VolumeX } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent } from '@/components/ui/card';
-import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Sparkles, ArrowRight, Volume2, VolumeX } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  useOnboardingTTS,
+  ONBOARDING_SCRIPTS,
+} from "@/lib/hooks/use-onboarding-tts";
 
 interface WelcomeFormContentProps {
   name: string;
@@ -27,6 +31,7 @@ export function WelcomeFormContent({
   onContinue,
   onToggleMute,
 }: WelcomeFormContentProps) {
+  const t = useTranslations("welcome.welcome-form");
   const { isPlaying } = useOnboardingTTS({
     autoSpeak: !isVoiceMuted,
     text: ONBOARDING_SCRIPTS.welcome,
@@ -66,9 +71,9 @@ export function WelcomeFormContent({
             </div>
 
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1">Ciao! Sono Melissa</h1>
+              <h1 className="text-2xl font-bold mb-1">{t("hello-melissa")}</h1>
               <p className="text-pink-100 text-sm">
-                La tua insegnante di sostegno
+                {t("your-support-teacher")}
               </p>
             </div>
 
@@ -79,13 +84,15 @@ export function WelcomeFormContent({
               transition={{ delay: 0.5 }}
               onClick={onToggleMute}
               className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-              aria-label={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
-              title={isVoiceMuted ? 'Attiva voce' : 'Disattiva voce'}
+              aria-label={isVoiceMuted ? t("enable-voice") : t("disable-voice")}
+              title={isVoiceMuted ? t("enable-voice") : t("disable-voice")}
             >
               {isVoiceMuted ? (
                 <VolumeX className="w-5 h-5 text-white" />
               ) : (
-                <Volume2 className={`w-5 h-5 text-white ${isPlaying ? 'animate-pulse' : ''}`} />
+                <Volume2
+                  className={`w-5 h-5 text-white ${isPlaying ? "animate-pulse" : ""}`}
+                />
               )}
             </motion.button>
           </motion.div>
@@ -100,12 +107,10 @@ export function WelcomeFormContent({
             className="space-y-4"
           >
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              Benvenuto nella <strong>Scuola Che Vorrei</strong>! Sono qui per aiutarti
-              a studiare nel modo che funziona meglio per te.
+              {t("welcome-intro")}
             </p>
             <p className="text-gray-600 dark:text-gray-400">
-              Non preoccuparti se qualcosa ti sembra difficile - insieme troveremo
-              sempre un modo per capirlo!
+              {t("dont-worry")}
             </p>
           </motion.div>
 
@@ -120,7 +125,7 @@ export function WelcomeFormContent({
               htmlFor="student-name"
               className="block text-lg font-medium text-gray-800 dark:text-gray-200"
             >
-              Come ti chiami?
+              {t("what-is-your-name")}
             </label>
             <Input
               id="student-name"
@@ -129,9 +134,9 @@ export function WelcomeFormContent({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 onNameChange(e.target.value);
               }}
-              placeholder="Scrivi il tuo nome..."
+              placeholder={t("enter-your-name-placeholder")}
               className="text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500"
-              aria-describedby={error ? 'name-error' : undefined}
+              aria-describedby={error ? "name-error" : undefined}
               autoFocus
             />
             {error && (
@@ -152,14 +157,14 @@ export function WelcomeFormContent({
               size="lg"
               className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white py-6 text-lg font-semibold shadow-lg"
             >
-              Piacere di conoscerti!
+              {t("nice-to-meet-you")}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </motion.div>
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.
+              {t("replay-mode-message")}
             </p>
           )}
         </div>
