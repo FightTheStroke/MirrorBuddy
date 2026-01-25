@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Save } from "lucide-react";
 import Link from "next/link";
@@ -24,6 +25,7 @@ interface LocaleFormProps {
 
 export function LocaleForm({ initialData, mode }: LocaleFormProps) {
   const router = useRouter();
+  const t = useTranslations("admin.components.localeForm");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -93,16 +95,14 @@ export function LocaleForm({ initialData, mode }: LocaleFormProps) {
         <Link href="/admin/locales">
           <Button variant="ghost" size="sm">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Torna alle configurazioni
+            {t("backButton")}
           </Button>
         </Link>
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
         <h1 className="text-2xl font-bold mb-6">
-          {mode === "create"
-            ? "Nuova Configurazione Locale"
-            : "Modifica Configurazione Locale"}
+          {mode === "create" ? t("titleCreate") : t("titleEdit")}
         </h1>
 
         {error && (
@@ -124,11 +124,11 @@ export function LocaleForm({ initialData, mode }: LocaleFormProps) {
           <div className="flex items-center gap-3 pt-4 border-t border-slate-200 dark:border-slate-800">
             <Button type="submit" disabled={loading}>
               <Save className="w-4 h-4 mr-2" />
-              {loading ? "Salvataggio..." : "Salva"}
+              {loading ? t("saving") : t("save")}
             </Button>
             <Link href="/admin/locales">
               <Button type="button" variant="ghost" disabled={loading}>
-                Annulla
+                {t("cancel")}
               </Button>
             </Link>
           </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useLocale } from "@/hooks/use-locale";
 import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ function getInitialPreviewLocale(): Locale | null {
 }
 
 export function LocalePreviewSelector() {
+  const t = useTranslations("admin.components.localePreviewSelector");
   const { locale, locales, localeNames, localeFlags } = useLocale();
   const [previewLocale, setPreviewLocale] = useState<Locale | null>(
     getInitialPreviewLocale,
@@ -51,9 +53,7 @@ export function LocalePreviewSelector() {
 
   // Subscribe to preview locale changes from other tabs/windows
   useEffect(() => {
-    const handlePreviewChange = (
-      event: CustomEvent<{ locale: Locale }>,
-    ) => {
+    const handlePreviewChange = (event: CustomEvent<{ locale: Locale }>) => {
       setPreviewLocale(event.detail.locale);
       setIsPreviewActive(true);
     };
@@ -116,7 +116,7 @@ export function LocalePreviewSelector() {
           name="locale-preview"
           value={displayLocale}
           onChange={handleLocaleChange}
-          aria-label="Seleziona locale per anteprima / Preview language"
+          aria-label={`${t("previewLabel")} / Preview language`}
           className={cn(
             "px-3 py-2 rounded-lg border text-sm font-medium",
             "bg-white dark:bg-slate-800",
@@ -149,7 +149,7 @@ export function LocalePreviewSelector() {
       {isPreviewActive && (
         <button
           onClick={handleReset}
-          aria-label="Ripristina locale / Reset locale preview"
+          aria-label={`${t("resetButton")} / Reset locale preview`}
           className={cn(
             "p-2 rounded-lg border text-sm font-medium",
             "bg-white dark:bg-slate-800",
@@ -161,7 +161,7 @@ export function LocalePreviewSelector() {
             "dark:focus:ring-offset-slate-900",
             "transition-colors duration-200",
           )}
-          title="Ripristina locale corrente / Reset to current locale"
+          title={`${t("resetButton")} / Reset to current locale`}
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -170,7 +170,7 @@ export function LocalePreviewSelector() {
       {/* Info text */}
       {isPreviewActive && (
         <span className="text-xs text-amber-700 dark:text-amber-300 font-medium">
-          Anteprima
+          {t("previewLabel")}
         </span>
       )}
     </div>

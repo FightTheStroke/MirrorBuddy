@@ -1,16 +1,17 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Star, Heart, Users, GraduationCap } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { Maestro } from '@/types';
-import type { Character, CharacterRole } from './character-switcher/types';
-import { ROLE_INFO } from './character-switcher/constants';
-import { CharacterChip } from './character-switcher/components/character-chip';
-import { CharacterCard } from './character-switcher/components/character-card';
-import { SwitcherHeader } from './character-switcher/components/switcher-header';
-import { useCharacterSwitcher } from './character-switcher/hooks/use-character-switcher';
+import { motion, AnimatePresence } from "framer-motion";
+import { Star, Heart, Users, GraduationCap } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import type { Maestro } from "@/types";
+import type { Character, CharacterRole } from "./character-switcher/types";
+import { ROLE_INFO } from "./character-switcher/constants";
+import { CharacterChip } from "./character-switcher/components/character-chip";
+import { CharacterCard } from "./character-switcher/components/character-card";
+import { SwitcherHeader } from "./character-switcher/components/switcher-header";
+import { useCharacterSwitcher } from "./character-switcher/hooks/use-character-switcher";
 
 const ICON_MAP = {
   Heart,
@@ -18,8 +19,8 @@ const ICON_MAP = {
   GraduationCap,
 };
 
-export type { Character, CharacterRole } from './character-switcher/types';
-export { SUPPORT_CHARACTERS } from './character-switcher/constants';
+export type { Character, CharacterRole } from "./character-switcher/types";
+export { SUPPORT_CHARACTERS } from "./character-switcher/constants";
 
 interface CharacterSwitcherProps {
   isOpen: boolean;
@@ -40,6 +41,7 @@ export function CharacterSwitcher({
   recentCharacterIds = [],
   className,
 }: CharacterSwitcherProps) {
+  const t = useTranslations("education.characterSwitcher");
   const { settings } = useAccessibilityStore();
 
   const {
@@ -82,12 +84,12 @@ export function CharacterSwitcher({
           exit={{ y: 100, opacity: 0 }}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            'relative w-full sm:max-w-lg max-h-[85vh] overflow-hidden',
-            'rounded-t-3xl sm:rounded-2xl shadow-2xl',
+            "relative w-full sm:max-w-lg max-h-[85vh] overflow-hidden",
+            "rounded-t-3xl sm:rounded-2xl shadow-2xl",
             settings.highContrast
-              ? 'bg-black border-2 border-yellow-400'
-              : 'bg-white dark:bg-slate-900',
-            className
+              ? "bg-black border-2 border-yellow-400"
+              : "bg-white dark:bg-slate-900",
+            className,
           )}
         >
           <SwitcherHeader
@@ -99,43 +101,48 @@ export function CharacterSwitcher({
           />
 
           <div className="overflow-y-auto max-h-[60vh] p-4 space-y-6">
-            {recentCharacters.length > 0 && !searchQuery && selectedRole === 'all' && (
-              <section>
-                <h3
-                  className={cn(
-                    'text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1',
-                    settings.highContrast ? 'text-yellow-400' : 'text-slate-500'
-                  )}
-                >
-                  <Star className="w-3 h-3" />
-                  Recenti
-                </h3>
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {recentCharacters.map((character) => (
-                    <CharacterChip
-                      key={character.id}
-                      character={character}
-                      isSelected={character.id === currentCharacterId}
-                      onClick={() => handleSelect(character)}
-                    />
-                  ))}
-                </div>
-              </section>
-            )}
+            {recentCharacters.length > 0 &&
+              !searchQuery &&
+              selectedRole === "all" && (
+                <section>
+                  <h3
+                    className={cn(
+                      "text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1",
+                      settings.highContrast
+                        ? "text-yellow-400"
+                        : "text-slate-500",
+                    )}
+                  >
+                    <Star className="w-3 h-3" />
+                    {t("recent")}
+                  </h3>
+                  <div className="flex gap-2 overflow-x-auto pb-2">
+                    {recentCharacters.map((character) => (
+                      <CharacterChip
+                        key={character.id}
+                        character={character}
+                        isSelected={character.id === currentCharacterId}
+                        onClick={() => handleSelect(character)}
+                      />
+                    ))}
+                  </div>
+                </section>
+              )}
 
-            {selectedRole === 'all' ? (
+            {selectedRole === "all" ? (
               Object.entries(groupedCharacters).map(
                 ([role, characters]) =>
                   characters.length > 0 && (
                     <section key={role}>
                       <h3
                         className={cn(
-                          'text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1',
-                          ROLE_INFO[role as CharacterRole].color
+                          "text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1",
+                          ROLE_INFO[role as CharacterRole].color,
                         )}
                       >
                         {(() => {
-                          const Icon = ICON_MAP[ROLE_INFO[role as CharacterRole].iconName];
+                          const Icon =
+                            ICON_MAP[ROLE_INFO[role as CharacterRole].iconName];
                           return <Icon className="w-3 h-3" />;
                         })()}
                         {ROLE_INFO[role as CharacterRole].label}
@@ -151,7 +158,7 @@ export function CharacterSwitcher({
                         ))}
                       </div>
                     </section>
-                  )
+                  ),
               )
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -170,11 +177,11 @@ export function CharacterSwitcher({
               <div className="text-center py-8">
                 <p
                   className={cn(
-                    'text-sm',
-                    settings.highContrast ? 'text-gray-400' : 'text-slate-500'
+                    "text-sm",
+                    settings.highContrast ? "text-gray-400" : "text-slate-500",
                   )}
                 >
-                  Nessun personaggio trovato
+                  {t("noCharactersFound")}
                 </p>
               </div>
             )}

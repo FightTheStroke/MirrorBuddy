@@ -778,6 +778,82 @@
       "printFailed": "Impossibile aprire la finestra di stampa",
       "mindmapSaved": "Mappa mentale salvata nello zaino!",
       "flashcardsSaved": "Flashcard salvate nello zaino!"
+    },
+    "archive": {
+      "title": "Zaino",
+      "subtitle": "Tutti i tuoi materiali di studio salvati",
+      "searchPlaceholder": "Cerca materiali...",
+      "sortLabel": "Ordina per",
+      "gridView": "Vista griglia",
+      "listView": "Vista lista",
+      "emptyMaterials": "Nessun materiali salvato",
+      "emptyPreferred": "Nessun preferiti salvato",
+      "emptyDescription": "I materiali creati durante le tue sessioni di studio appariranno qui. Inizia una conversazione con un Professore per creare nuovi contenuti!",
+      "startConversation": "Inizia una Conversazione"
+    },
+    "characterSwitcher": {
+      "recent": "Recenti",
+      "noCharactersFound": "Nessun personaggio trovato"
+    },
+    "flashcard": {
+      "again": "Ripeti",
+      "hard": "Difficile",
+      "good": "Bene",
+      "easy": "Facile",
+      "completed": "Completato!",
+      "completedMessage": "Hai rivisto tutte le carte di oggi.",
+      "continueButton": "Continua",
+      "cardCounter": "Carta {current} di {total}",
+      "cardsReviewed": "{count} riviste",
+      "question": "Domanda",
+      "tapToFlip": "Tocca per girare",
+      "answer": "Risposta",
+      "easyQuestion": "Quanto è stato facile ricordare?",
+      "navigationHint": "Premi spazio o clicca per mostrare la risposta"
+    },
+    "mindmaps": {
+      "title": "Mappe Mentali",
+      "subtitle": "Visualizza e stampa le tue mappe create durante le lezioni",
+      "createWithProfessor": "Crea con un Professore",
+      "manualMode": "Modalità Manuale",
+      "examples": "Esempi",
+      "import": "Importa",
+      "how": "Come funzionano le Mappe Mentali?",
+      "description": "Durante le lezioni con i professori, chiedi di creare una mappa mentale su qualsiasi argomento. Le mappe appariranno qui automaticamente e potrai stamparle o scaricarle per studiare offline."
+    },
+    "subject-confirmation": {
+      "photoAlt": "Foto del compito",
+      "chooseProfessor": "Scegli un Professore",
+      "selectSubject": "Seleziona la Materia"
+    },
+    "success-metrics": {
+      "title": "Metriche di Successo",
+      "progressDescription": "Progresso di {studentName} verso l'autonomia",
+      "overallScore": "Punteggio Globale",
+      "quote": "Il nostro successo si misura quando lo studente non ha più bisogno di noi.",
+      "quoteAuthor": "— ManifestoEdu",
+      "milestones": "Traguardi",
+      "milestonesDescription": "{achieved} raggiunti, {pending} da sbloccare",
+      "upcomingMilestones": "Prossimi traguardi:"
+    },
+    "summaries": {
+      "title": "Riassunti",
+      "subtitle": "I tuoi riassunti creati durante le sessioni con Coach e Maestri",
+      "createButton": "Crea con un Professore",
+      "infoTitle": "Come creare un riassunto?",
+      "infoDescription": "Parla con un Coach o un Maestro e chiedi: \"Devo fare un riassunto su...\" Ti guideranno passo passo nella creazione di un riassunto strutturato.",
+      "loading": "Caricamento...",
+      "emptySummaries": "Nessun riassunto salvato",
+      "emptyDescription": "I riassunti creati durante le sessioni con Coach e Maestri appariranno qui. Prova a chiedere: \"Devo fare un riassunto sulla fotosintesi\"",
+      "defaultTitle": "Riassunto",
+      "mindmapSuccess": "Mappa mentale salvata!",
+      "mindmapSuccessDetail": "Creati {count} nodi da \"{topic}\".",
+      "mindmapError": "Errore",
+      "mindmapErrorDetail": "Impossibile salvare la mappa mentale.",
+      "flashcardsSuccess": "Flashcard salvate!",
+      "flashcardsSuccessDetail": "Create {count} flashcard da \"{topic}\".",
+      "flashcardsError": "Errore",
+      "flashcardsErrorDetail": "Impossibile salvare le flashcard."
     }
   },
   "welcome": {
@@ -2157,6 +2233,60 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
+    },
+    "components": {
+      "bulkActionBar": {
+        "selected": "{count} selezionat{plural}",
+        "selectedPlural": "e",
+        "selectedSingular": "a",
+        "deselect": "Deseleziona",
+        "reject": "Rifiuta",
+        "approve": "Approva",
+        "rejectReason": "Motivo del rifiuto (opzionale)",
+        "cancel": "Annulla",
+        "completedAlert": "Completato: {processed} successi, {failed} errori"
+      },
+      "directInviteModal": {
+        "titleCreate": "Invito diretto",
+        "titleSuccess": "Utente creato",
+        "successMessage": "L'utente è stato creato e riceverà un'email con le credenziali di accesso.",
+        "generatedUsername": "Username generato",
+        "copyUsername": "Copia username",
+        "close": "Chiudi",
+        "emailPlaceholder": "utente@esempio.com",
+        "nameLabel": "Nome (opzionale)",
+        "namePlaceholder": "Mario Rossi",
+        "emailHelpText": "L'utente riceverà un'email con username e password temporanea per accedere.",
+        "cancel": "Annulla",
+        "creating": "Creazione...",
+        "createUser": "Crea utente"
+      },
+      "localeForm": {
+        "backButton": "Torna alle configurazioni",
+        "titleCreate": "Nuova Configurazione Locale",
+        "titleEdit": "Modifica Configurazione Locale",
+        "saving": "Salvataggio...",
+        "save": "Salva",
+        "cancel": "Annulla"
+      },
+      "localeFormFields": {
+        "countryCodeLabel": "Codice Paese (ISO 3166-1 alpha-2) *",
+        "countryCodeHelp": "Due lettere maiuscole (es: IT, FR, DE, ES)",
+        "countryNameLabel": "Nome Paese *",
+        "countryNamePlaceholder": "Italia",
+        "primaryLocaleLabel": "Locale Primario *",
+        "primaryLocaleHelp": "Codice lingua ISO 639-1 (es: it, en, fr, de, es)",
+        "maestroLabel": "Maestro di Lingua Primario *",
+        "maestroPlaceholder": "Seleziona un maestro...",
+        "maestroHelp": "Il maestro che insegnerà la lingua primaria del paese",
+        "secondaryLocalesLabel": "Locale Secondari (opzionale)",
+        "secondaryLocalesHelp": "Separati da virgola (es: en, de, fr)",
+        "enabledLabel": "Configurazione attiva"
+      },
+      "localePreviewSelector": {
+        "previewLabel": "Anteprima",
+        "resetButton": "Ripristina locale"
+      }
     }
   },
   "contact": {
@@ -2203,5 +2333,36 @@
     "season": {
       "autumn": "Autunno"
     }
+  },
+  "ambientAudio": {
+    "title": "Audio Ambientale",
+    "mainVolume": "Volume Principale",
+    "pause": "Pausa",
+    "advancedMixer": "Mixer Avanzato",
+    "show": "Mostra",
+    "hide": "Nascondi",
+    "activeLayers": "Layer Attivi",
+    "addLayer": "Aggiungi Layer",
+    "noise": "Rumore",
+    "ambientSounds": "Suoni Ambientali",
+    "comingSoon": "(Prossimamente)",
+    "removeAllLayers": "Rimuovi Tutti i Layer",
+    "inPause": "In pausa",
+    "advancedSettings": "Impostazioni avanzate",
+    "paused": "In pausa",
+    "presets": {
+      "creative": "Creatività",
+      "rainyDay": "Pioggia"
+    }
+  },
+  "dashboard": {
+    "azureCosts": "Costi Azure",
+    "loading": "Caricamento...",
+    "notAvailable": "Non disponibile",
+    "authNotConfigured": "Autenticazione Azure non configurata",
+    "loadingError": "Errore nel caricamento dei costi",
+    "last30Days": "Ultimi 30 giorni",
+    "monthlyForecast": "Previsione mensile",
+    "topServices": "Top servizi"
   }
 }

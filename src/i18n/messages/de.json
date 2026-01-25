@@ -508,6 +508,82 @@
       "quiz": {
         "no-quizzes": "Noch keine Quizze absolviert"
       }
+    },
+    "archive": {
+      "title": "Rucksack",
+      "subtitle": "Alle deine gespeicherten Lernmaterialien",
+      "searchPlaceholder": "Materialien durchsuchen...",
+      "sortLabel": "Sortieren nach",
+      "gridView": "Gitternetzansicht",
+      "listView": "Listenansicht",
+      "emptyMaterials": "Keine Materialien gespeichert",
+      "emptyPreferred": "Keine Favoriten gespeichert",
+      "emptyDescription": "Materialien, die während deiner Lernstunden erstellt werden, erscheinen hier. Starte ein Gespräch mit einem Professor, um neuen Inhalt zu erstellen!",
+      "startConversation": "Ein Gespräch starten"
+    },
+    "characterSwitcher": {
+      "recent": "Zuletzt verwendet",
+      "noCharactersFound": "Keine Charaktere gefunden"
+    },
+    "flashcard": {
+      "again": "Nochmal",
+      "hard": "Schwierig",
+      "good": "Gut",
+      "easy": "Einfach",
+      "completed": "Fertig!",
+      "completedMessage": "Du hast alle heutigen Karten wiederholt.",
+      "continueButton": "Weiter",
+      "cardCounter": "Karte {current} von {total}",
+      "cardsReviewed": "{count} wiederholt",
+      "question": "Frage",
+      "tapToFlip": "Zum Umdrehen tippen",
+      "answer": "Antwort",
+      "easyQuestion": "Wie einfach war es zu erinnern?",
+      "navigationHint": "Leertaste drücken oder klicken, um die Antwort anzuzeigen"
+    },
+    "mindmaps": {
+      "title": "Mindmaps",
+      "subtitle": "Zeige und drucke deine während des Unterrichts erstellten Mindmaps",
+      "createWithProfessor": "Mit einem Professor erstellen",
+      "manualMode": "Manueller Modus",
+      "examples": "Beispiele",
+      "import": "Importieren",
+      "how": "Wie funktionieren Mindmaps?",
+      "description": "Während des Unterrichts mit Professoren bitte sie, eine Mindmap zu einem beliebigen Thema zu erstellen. Mindmaps erscheinen hier automatisch und du kannst sie drucken oder herunterladen, um offline zu lernen."
+    },
+    "subject-confirmation": {
+      "photoAlt": "Aufgabenfoto",
+      "chooseProfessor": "Wählen Sie einen Professor",
+      "selectSubject": "Wählen Sie ein Fach"
+    },
+    "success-metrics": {
+      "title": "Erfolgskriterien",
+      "progressDescription": "Fortschritt von {studentName} zur Autonomie",
+      "overallScore": "Gesamtpunktzahl",
+      "quote": "Unser Erfolg wird gemessen, wenn der Schüler uns nicht mehr braucht.",
+      "quoteAuthor": "— ManifestoEdu",
+      "milestones": "Meilensteine",
+      "milestonesDescription": "{achieved} erreicht, {pending} zum Freischalten",
+      "upcomingMilestones": "Kommende Meilensteine:"
+    },
+    "summaries": {
+      "title": "Zusammenfassungen",
+      "subtitle": "Ihre Zusammenfassungen, die während der Sitzungen mit Trainern und Professoren erstellt wurden",
+      "createButton": "Mit einem Professor erstellen",
+      "infoTitle": "Wie erstelle ich eine Zusammenfassung?",
+      "infoDescription": "Sprechen Sie mit einem Trainer oder Professor und fragen Sie: \"Ich muss eine Zusammenfassung zu... erstellen\" Er wird Sie Schritt für Schritt beim Erstellen einer strukturierten Zusammenfassung anleiten.",
+      "loading": "Wird geladen...",
+      "emptySummaries": "Keine Zusammenfassungen gespeichert",
+      "emptyDescription": "Zusammenfassungen, die während der Sitzungen mit Trainern und Professoren erstellt wurden, werden hier angezeigt. Versuchen Sie zu fragen: \"Ich muss eine Zusammenfassung zur Photosynthese erstellen\"",
+      "defaultTitle": "Zusammenfassung",
+      "mindmapSuccess": "Mindmap gespeichert!",
+      "mindmapSuccessDetail": "Erstellt {count} Knoten aus \"{topic}\".",
+      "mindmapError": "Fehler",
+      "mindmapErrorDetail": "Mindmap konnte nicht gespeichert werden.",
+      "flashcardsSuccess": "Karteikarten gespeichert!",
+      "flashcardsSuccessDetail": "Erstellt {count} Karteikarten aus \"{topic}\".",
+      "flashcardsError": "Fehler",
+      "flashcardsErrorDetail": "Karteikarten konnten nicht gespeichert werden."
     }
   },
   "tier": {
@@ -1770,6 +1846,58 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
+    },
+    "components": {
+      "bulkActionBar": {
+        "selected": "{count} ausgewählt",
+        "deselect": "Auswahl aufheben",
+        "reject": "Ablehnen",
+        "approve": "Genehmigen",
+        "rejectReason": "Grund für Ablehnung (optional)",
+        "cancel": "Abbrechen",
+        "completedAlert": "Abgeschlossen: {processed} erfolgreich, {failed} fehlgeschlagen"
+      },
+      "directInviteModal": {
+        "titleCreate": "Direkte Einladung",
+        "titleSuccess": "Benutzer erstellt",
+        "successMessage": "Der Benutzer wurde erstellt und erhält eine E-Mail mit Zugangsdaten.",
+        "generatedUsername": "Generierter Benutzername",
+        "copyUsername": "Benutzername kopieren",
+        "close": "Schließen",
+        "emailPlaceholder": "benutzer@beispiel.com",
+        "nameLabel": "Name (optional)",
+        "namePlaceholder": "Max Mustermann",
+        "emailHelpText": "Der Benutzer erhält eine E-Mail mit Benutzername und temporärem Passwort zum Anmelden.",
+        "cancel": "Abbrechen",
+        "creating": "Wird erstellt...",
+        "createUser": "Benutzer erstellen"
+      },
+      "localeForm": {
+        "backButton": "Zurück zu den Gebietsschemakonfigurationen",
+        "titleCreate": "Neue Gebietsschemakonfiguration",
+        "titleEdit": "Gebietsschemakonfiguration bearbeiten",
+        "saving": "Wird gespeichert...",
+        "save": "Speichern",
+        "cancel": "Abbrechen"
+      },
+      "localeFormFields": {
+        "countryCodeLabel": "Ländercode (ISO 3166-1 alpha-2) *",
+        "countryCodeHelp": "Zwei Großbuchstaben (z.B.: IT, FR, DE, ES)",
+        "countryNameLabel": "Länderbezeichnung *",
+        "countryNamePlaceholder": "Deutschland",
+        "primaryLocaleLabel": "Primäres Gebietsschema *",
+        "primaryLocaleHelp": "ISO 639-1-Sprachcode (z.B.: it, en, fr, de, es)",
+        "maestroLabel": "Primärer Sprachmeister *",
+        "maestroPlaceholder": "Wählen Sie einen Meister...",
+        "maestroHelp": "Der Meister, der die Primärsprache des Landes unterrichtet",
+        "secondaryLocalesLabel": "Sekundäre Gebietsschemata (optional)",
+        "secondaryLocalesHelp": "Durch Komma getrennt (z.B.: en, de, fr)",
+        "enabledLabel": "Konfiguration aktiv"
+      },
+      "localePreviewSelector": {
+        "previewLabel": "Vorschau",
+        "resetButton": "Gebietsschema zurücksetzen"
+      }
     }
   },
   "contact": {
@@ -1816,5 +1944,36 @@
     "season": {
       "autumn": "Herbst"
     }
+  },
+  "ambientAudio": {
+    "title": "Umgebungsaudio",
+    "mainVolume": "Hauptlautstärke",
+    "pause": "Pause",
+    "advancedMixer": "Erweiterter Mixer",
+    "show": "Anzeigen",
+    "hide": "Verbergen",
+    "activeLayers": "Aktive Ebenen",
+    "addLayer": "Ebene Hinzufügen",
+    "noise": "Rauschen",
+    "ambientSounds": "Umgebungsgeräusche",
+    "comingSoon": "(Demnächst)",
+    "removeAllLayers": "Alle Ebenen Entfernen",
+    "inPause": "Pausiert",
+    "advancedSettings": "Erweiterte Einstellungen",
+    "paused": "Pausiert",
+    "presets": {
+      "creative": "Kreativität",
+      "rainyDay": "Regnerischer Tag"
+    }
+  },
+  "dashboard": {
+    "azureCosts": "Azure-Kosten",
+    "loading": "Wird geladen...",
+    "notAvailable": "Nicht verfügbar",
+    "authNotConfigured": "Azure-Authentifizierung nicht konfiguriert",
+    "loadingError": "Fehler beim Laden der Kosten",
+    "last30Days": "Letzte 30 Tage",
+    "monthlyForecast": "Monatsprognose",
+    "topServices": "Top-Services"
   }
 }

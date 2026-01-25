@@ -517,6 +517,82 @@
         "material-singular": "material",
         "material-plural": "materials"
       }
+    },
+    "archive": {
+      "title": "Backpack",
+      "subtitle": "All your saved study materials",
+      "searchPlaceholder": "Search materials...",
+      "sortLabel": "Sort by",
+      "gridView": "Grid view",
+      "listView": "List view",
+      "emptyMaterials": "No materials saved",
+      "emptyPreferred": "No favorites saved",
+      "emptyDescription": "Materials created during your study sessions will appear here. Start a conversation with a Professor to create new content!",
+      "startConversation": "Start a Conversation"
+    },
+    "characterSwitcher": {
+      "recent": "Recent",
+      "noCharactersFound": "No characters found"
+    },
+    "flashcard": {
+      "again": "Again",
+      "hard": "Hard",
+      "good": "Good",
+      "easy": "Easy",
+      "completed": "Completed!",
+      "completedMessage": "You've reviewed all today's cards.",
+      "continueButton": "Continue",
+      "cardCounter": "Card {current} of {total}",
+      "cardsReviewed": "{count} reviewed",
+      "question": "Question",
+      "tapToFlip": "Tap to flip",
+      "answer": "Answer",
+      "easyQuestion": "How easy was it to recall?",
+      "navigationHint": "Press space or click to show the answer"
+    },
+    "mindmaps": {
+      "title": "Mind Maps",
+      "subtitle": "View and print your mind maps created during lessons",
+      "createWithProfessor": "Create with a Professor",
+      "manualMode": "Manual Mode",
+      "examples": "Examples",
+      "import": "Import",
+      "how": "How do Mind Maps work?",
+      "description": "During lessons with professors, ask them to create a mind map on any topic. Mind maps will appear here automatically and you can print or download them to study offline."
+    },
+    "subject-confirmation": {
+      "photoAlt": "Task photo",
+      "chooseProfessor": "Choose a Professor",
+      "selectSubject": "Select Subject"
+    },
+    "success-metrics": {
+      "title": "Success Metrics",
+      "progressDescription": "{studentName}'s progress towards autonomy",
+      "overallScore": "Overall Score",
+      "quote": "Our success is measured when the student no longer needs us.",
+      "quoteAuthor": "— ManifestoEdu",
+      "milestones": "Milestones",
+      "milestonesDescription": "{achieved} achieved, {pending} to unlock",
+      "upcomingMilestones": "Upcoming milestones:"
+    },
+    "summaries": {
+      "title": "Summaries",
+      "subtitle": "Your summaries created during sessions with Coaches and Professors",
+      "createButton": "Create with a Professor",
+      "infoTitle": "How to create a summary?",
+      "infoDescription": "Talk to a Coach or Professor and ask: \"I need to create a summary on...\" They will guide you step by step in creating a structured summary.",
+      "loading": "Loading...",
+      "emptySummaries": "No summaries saved",
+      "emptyDescription": "Summaries created during sessions with Coaches and Professors will appear here. Try asking: \"I need to create a summary on photosynthesis\"",
+      "defaultTitle": "Summary",
+      "mindmapSuccess": "Mind map saved!",
+      "mindmapSuccessDetail": "Created {count} nodes from \"{topic}\".",
+      "mindmapError": "Error",
+      "mindmapErrorDetail": "Unable to save mind map.",
+      "flashcardsSuccess": "Flashcards saved!",
+      "flashcardsSuccessDetail": "Created {count} flashcards from \"{topic}\".",
+      "flashcardsError": "Error",
+      "flashcardsErrorDetail": "Unable to save flashcards."
     }
   },
   "tier": {
@@ -1779,6 +1855,58 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
+    },
+    "components": {
+      "bulkActionBar": {
+        "selected": "{count} selected",
+        "deselect": "Deselect",
+        "reject": "Reject",
+        "approve": "Approve",
+        "rejectReason": "Reason for rejection (optional)",
+        "cancel": "Cancel",
+        "completedAlert": "Completed: {processed} successful, {failed} failed"
+      },
+      "directInviteModal": {
+        "titleCreate": "Direct Invite",
+        "titleSuccess": "User Created",
+        "successMessage": "The user has been created and will receive an email with access credentials.",
+        "generatedUsername": "Generated Username",
+        "copyUsername": "Copy username",
+        "close": "Close",
+        "emailPlaceholder": "user@example.com",
+        "nameLabel": "Name (optional)",
+        "namePlaceholder": "John Doe",
+        "emailHelpText": "The user will receive an email with username and temporary password to sign in.",
+        "cancel": "Cancel",
+        "creating": "Creating...",
+        "createUser": "Create User"
+      },
+      "localeForm": {
+        "backButton": "Back to locale configurations",
+        "titleCreate": "New Locale Configuration",
+        "titleEdit": "Edit Locale Configuration",
+        "saving": "Saving...",
+        "save": "Save",
+        "cancel": "Cancel"
+      },
+      "localeFormFields": {
+        "countryCodeLabel": "Country Code (ISO 3166-1 alpha-2) *",
+        "countryCodeHelp": "Two uppercase letters (e.g: IT, FR, DE, ES)",
+        "countryNameLabel": "Country Name *",
+        "countryNamePlaceholder": "Italy",
+        "primaryLocaleLabel": "Primary Locale *",
+        "primaryLocaleHelp": "ISO 639-1 language code (e.g: it, en, fr, de, es)",
+        "maestroLabel": "Primary Language Maestro *",
+        "maestroPlaceholder": "Select a maestro...",
+        "maestroHelp": "The maestro who will teach the country's primary language",
+        "secondaryLocalesLabel": "Secondary Locales (optional)",
+        "secondaryLocalesHelp": "Separated by comma (e.g: en, de, fr)",
+        "enabledLabel": "Configuration Active"
+      },
+      "localePreviewSelector": {
+        "previewLabel": "Preview",
+        "resetButton": "Reset locale"
+      }
     }
   },
   "contact": {
@@ -1825,5 +1953,36 @@
     "season": {
       "autumn": "Autumn"
     }
+  },
+  "ambientAudio": {
+    "title": "Ambient Audio",
+    "mainVolume": "Main Volume",
+    "pause": "Pause",
+    "advancedMixer": "Advanced Mixer",
+    "show": "Show",
+    "hide": "Hide",
+    "activeLayers": "Active Layers",
+    "addLayer": "Add Layer",
+    "noise": "Noise",
+    "ambientSounds": "Ambient Sounds",
+    "comingSoon": "(Coming Soon)",
+    "removeAllLayers": "Remove All Layers",
+    "inPause": "Paused",
+    "advancedSettings": "Advanced Settings",
+    "paused": "Paused",
+    "presets": {
+      "creative": "Creativity",
+      "rainyDay": "Rainy Day"
+    }
+  },
+  "dashboard": {
+    "azureCosts": "Azure Costs",
+    "loading": "Loading...",
+    "notAvailable": "Not Available",
+    "authNotConfigured": "Azure Authentication Not Configured",
+    "loadingError": "Error Loading Costs",
+    "last30Days": "Last 30 Days",
+    "monthlyForecast": "Monthly Forecast",
+    "topServices": "Top Services"
   }
 }

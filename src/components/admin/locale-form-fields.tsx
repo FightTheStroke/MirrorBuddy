@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { getLanguageMaestroOptions } from "@/lib/locale/maestri-helpers";
 
 interface LocaleFormData {
@@ -26,6 +27,7 @@ export function LocaleFormFields({
   setSecondaryLocalesInput,
   mode,
 }: LocaleFormFieldsProps) {
+  const t = useTranslations("admin.components.localeFormFields");
   const maestroOptions = getLanguageMaestroOptions();
 
   return (
@@ -36,7 +38,7 @@ export function LocaleFormFields({
           htmlFor="id"
           className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
         >
-          Codice Paese (ISO 3166-1 alpha-2) *
+          {t("countryCodeLabel")}
         </label>
         <input
           id="id"
@@ -51,9 +53,7 @@ export function LocaleFormFields({
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent disabled:bg-slate-100 dark:disabled:bg-slate-800 disabled:cursor-not-allowed font-mono"
           placeholder="IT"
         />
-        <p className="text-sm text-slate-500 mt-1">
-          Due lettere maiuscole (es: IT, FR, DE, ES)
-        </p>
+        <p className="text-sm text-slate-500 mt-1">{t("countryCodeHelp")}</p>
       </div>
 
       {/* Country Name */}
@@ -62,7 +62,7 @@ export function LocaleFormFields({
           htmlFor="countryName"
           className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
         >
-          Nome Paese *
+          {t("countryNameLabel")}
         </label>
         <input
           id="countryName"
@@ -73,7 +73,7 @@ export function LocaleFormFields({
             setFormData({ ...formData, countryName: e.target.value })
           }
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent"
-          placeholder="Italia"
+          placeholder={t("countryNamePlaceholder")}
         />
       </div>
 
@@ -83,7 +83,7 @@ export function LocaleFormFields({
           htmlFor="primaryLocale"
           className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
         >
-          Locale Primario *
+          {t("primaryLocaleLabel")}
         </label>
         <input
           id="primaryLocale"
@@ -99,9 +99,7 @@ export function LocaleFormFields({
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent font-mono"
           placeholder="it"
         />
-        <p className="text-sm text-slate-500 mt-1">
-          Codice lingua ISO 639-1 (es: it, en, fr, de, es)
-        </p>
+        <p className="text-sm text-slate-500 mt-1">{t("primaryLocaleHelp")}</p>
       </div>
 
       {/* Primary Language Maestro */}
@@ -110,7 +108,7 @@ export function LocaleFormFields({
           htmlFor="maestro"
           className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
         >
-          Maestro di Lingua Primario *
+          {t("maestroLabel")}
         </label>
         <select
           id="maestro"
@@ -124,16 +122,14 @@ export function LocaleFormFields({
           }
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent"
         >
-          <option value="">Seleziona un maestro...</option>
+          <option value="">{t("maestroPlaceholder")}</option>
           {maestroOptions.map((maestro) => (
             <option key={maestro.id} value={maestro.id}>
               {maestro.displayName} - {maestro.subjectLabel}
             </option>
           ))}
         </select>
-        <p className="text-sm text-slate-500 mt-1">
-          Il maestro che insegnerà la lingua primaria del paese
-        </p>
+        <p className="text-sm text-slate-500 mt-1">{t("maestroHelp")}</p>
       </div>
 
       {/* Secondary Locales */}
@@ -142,7 +138,7 @@ export function LocaleFormFields({
           htmlFor="secondaryLocales"
           className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300"
         >
-          Locale Secondari (opzionale)
+          {t("secondaryLocalesLabel")}
         </label>
         <input
           id="secondaryLocales"
@@ -153,7 +149,7 @@ export function LocaleFormFields({
           placeholder="en, de, fr"
         />
         <p className="text-sm text-slate-500 mt-1">
-          Separati da virgola (es: en, de, fr)
+          {t("secondaryLocalesHelp")}
         </p>
       </div>
 
@@ -172,7 +168,7 @@ export function LocaleFormFields({
           htmlFor="enabled"
           className="text-sm font-medium text-slate-700 dark:text-slate-300"
         >
-          Configurazione attiva
+          {t("enabledLabel")}
         </label>
       </div>
     </>

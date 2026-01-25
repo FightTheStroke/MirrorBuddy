@@ -990,6 +990,82 @@
         "material-singular": "material",
         "material-plural": "materiales"
       }
+    },
+    "archive": {
+      "title": "Mochila",
+      "subtitle": "Todos tus materiales de estudio guardados",
+      "searchPlaceholder": "Buscar materiales...",
+      "sortLabel": "Ordenar por",
+      "gridView": "Vista de cuadrícula",
+      "listView": "Vista de lista",
+      "emptyMaterials": "Sin materiales guardados",
+      "emptyPreferred": "Sin favoritos guardados",
+      "emptyDescription": "Los materiales creados durante tus sesiones de estudio aparecerán aquí. ¡Comienza una conversación con un Profesor para crear contenido nuevo!",
+      "startConversation": "Comenzar una conversación"
+    },
+    "characterSwitcher": {
+      "recent": "Reciente",
+      "noCharactersFound": "No se encontraron personajes"
+    },
+    "flashcard": {
+      "again": "De nuevo",
+      "hard": "Difícil",
+      "good": "Bien",
+      "easy": "Fácil",
+      "completed": "¡Completado!",
+      "completedMessage": "Has revisado todas las tarjetas de hoy.",
+      "continueButton": "Continuar",
+      "cardCounter": "Tarjeta {current} de {total}",
+      "cardsReviewed": "{count} revisadas",
+      "question": "Pregunta",
+      "tapToFlip": "Toca para girar",
+      "answer": "Respuesta",
+      "easyQuestion": "¿Qué tan fácil fue recordar?",
+      "navigationHint": "Presiona espacio o haz clic para mostrar la respuesta"
+    },
+    "mindmaps": {
+      "title": "Mapas mentales",
+      "subtitle": "Ve e imprime tus mapas mentales creados durante las lecciones",
+      "createWithProfessor": "Crear con un Profesor",
+      "manualMode": "Modo manual",
+      "examples": "Ejemplos",
+      "import": "Importar",
+      "how": "¿Cómo funcionan los mapas mentales?",
+      "description": "Durante las lecciones con profesores, pídeles que creen un mapa mental sobre cualquier tema. Los mapas mentales aparecerán aquí automáticamente y podrás imprimirlos o descargarlos para estudiar sin conexión."
+    },
+    "subject-confirmation": {
+      "photoAlt": "Foto de la tarea",
+      "chooseProfessor": "Elige un Profesor",
+      "selectSubject": "Selecciona la Asignatura"
+    },
+    "success-metrics": {
+      "title": "Métricas de éxito",
+      "progressDescription": "Progreso de {studentName} hacia la autonomía",
+      "overallScore": "Puntuación general",
+      "quote": "Nuestro éxito se mide cuando el estudiante ya no nos necesita.",
+      "quoteAuthor": "— ManifestoEdu",
+      "milestones": "Hitos",
+      "milestonesDescription": "{achieved} logrados, {pending} por desbloquear",
+      "upcomingMilestones": "Próximos hitos:"
+    },
+    "summaries": {
+      "title": "Resúmenes",
+      "subtitle": "Tus resúmenes creados durante las sesiones con Entrenadores y Profesores",
+      "createButton": "Crear con un Profesor",
+      "infoTitle": "¿Cómo crear un resumen?",
+      "infoDescription": "Habla con un Entrenador o Profesor y pregunta: \"Necesito crear un resumen sobre...\" Te guiarán paso a paso en la creación de un resumen estructurado.",
+      "loading": "Cargando...",
+      "emptySummaries": "No hay resúmenes guardados",
+      "emptyDescription": "Los resúmenes creados durante las sesiones con Entrenadores y Profesores aparecerán aquí. Intenta preguntar: \"Necesito crear un resumen sobre la fotosíntesis\"",
+      "defaultTitle": "Resumen",
+      "mindmapSuccess": "¡Mapa mental guardado!",
+      "mindmapSuccessDetail": "Creados {count} nodos de \"{topic}\".",
+      "mindmapError": "Error",
+      "mindmapErrorDetail": "No se pudo guardar el mapa mental.",
+      "flashcardsSuccess": "¡Tarjetas de estudio guardadas!",
+      "flashcardsSuccessDetail": "Creadas {count} tarjetas de estudio de \"{topic}\".",
+      "flashcardsError": "Error",
+      "flashcardsErrorDetail": "No se pudieron guardar las tarjetas de estudio."
     }
   },
   "chat": {
@@ -1979,6 +2055,58 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
+    },
+    "components": {
+      "bulkActionBar": {
+        "selected": "{count} seleccionado(s)",
+        "deselect": "Deseleccionar",
+        "reject": "Rechazar",
+        "approve": "Aprobar",
+        "rejectReason": "Motivo del rechazo (opcional)",
+        "cancel": "Cancelar",
+        "completedAlert": "Completado: {processed} exitosos, {failed} fallidos"
+      },
+      "directInviteModal": {
+        "titleCreate": "Invitación directa",
+        "titleSuccess": "Usuario creado",
+        "successMessage": "El usuario ha sido creado y recibirá un correo electrónico con las credenciales de acceso.",
+        "generatedUsername": "Nombre de usuario generado",
+        "copyUsername": "Copiar nombre de usuario",
+        "close": "Cerrar",
+        "emailPlaceholder": "usuario@ejemplo.com",
+        "nameLabel": "Nombre (opcional)",
+        "namePlaceholder": "Juan García",
+        "emailHelpText": "El usuario recibirá un correo electrónico con el nombre de usuario y contraseña temporal para iniciar sesión.",
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "createUser": "Crear usuario"
+      },
+      "localeForm": {
+        "backButton": "Volver a las configuraciones de región",
+        "titleCreate": "Nueva Configuración de Región",
+        "titleEdit": "Editar Configuración de Región",
+        "saving": "Guardando...",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "localeFormFields": {
+        "countryCodeLabel": "Código de País (ISO 3166-1 alpha-2) *",
+        "countryCodeHelp": "Dos letras mayúsculas (p.ej.: IT, FR, DE, ES)",
+        "countryNameLabel": "Nombre del País *",
+        "countryNamePlaceholder": "España",
+        "primaryLocaleLabel": "Región Primaria *",
+        "primaryLocaleHelp": "Código de idioma ISO 639-1 (p.ej.: it, en, fr, de, es)",
+        "maestroLabel": "Maestro de Idioma Principal *",
+        "maestroPlaceholder": "Seleccione un maestro...",
+        "maestroHelp": "El maestro que enseñará el idioma principal del país",
+        "secondaryLocalesLabel": "Regiones Secundarias (opcional)",
+        "secondaryLocalesHelp": "Separados por coma (p.ej.: en, de, fr)",
+        "enabledLabel": "Configuración activa"
+      },
+      "localePreviewSelector": {
+        "previewLabel": "Vista previa",
+        "resetButton": "Restablecer región"
+      }
     }
   },
   "contact": {
@@ -2005,5 +2133,36 @@
       "placeholderMessage": "Describa su mensaje..."
     },
     "backButton": "Volver al inicio"
+  },
+  "ambientAudio": {
+    "title": "Audio Ambiental",
+    "mainVolume": "Volumen Principal",
+    "pause": "Pausa",
+    "advancedMixer": "Mezclador Avanzado",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "activeLayers": "Capas Activas",
+    "addLayer": "Agregar Capa",
+    "noise": "Ruido",
+    "ambientSounds": "Sonidos Ambientales",
+    "comingSoon": "(Próximamente)",
+    "removeAllLayers": "Eliminar Todas las Capas",
+    "inPause": "En pausa",
+    "advancedSettings": "Configuración Avanzada",
+    "paused": "En pausa",
+    "presets": {
+      "creative": "Creatividad",
+      "rainyDay": "Día Lluvioso"
+    }
+  },
+  "dashboard": {
+    "azureCosts": "Costos de Azure",
+    "loading": "Cargando...",
+    "notAvailable": "No Disponible",
+    "authNotConfigured": "Autenticación de Azure No Configurada",
+    "loadingError": "Error al Cargar Costos",
+    "last30Days": "Últimos 30 Días",
+    "monthlyForecast": "Previsión Mensual",
+    "topServices": "Servicios Principales"
   }
 }

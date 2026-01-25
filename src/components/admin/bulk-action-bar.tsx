@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -19,6 +20,7 @@ export function BulkActionBar({
   onClearSelection,
   onActionComplete,
 }: BulkActionBarProps) {
+  const t = useTranslations("admin.components.bulkActionBar");
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
   const [showRejectReason, setShowRejectReason] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
@@ -45,7 +47,10 @@ export function BulkActionBar({
 
       if (result.failed > 0) {
         alert(
-          `Completato: ${result.processed} successi, ${result.failed} errori`,
+          t("completedAlert", {
+            processed: result.processed,
+            failed: result.failed,
+          }),
         );
       }
 
@@ -79,7 +84,7 @@ export function BulkActionBar({
               type="text"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Motivo del rifiuto (opzionale)"
+              placeholder={t("rejectReason")}
               className="flex-1 min-h-11 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
               autoFocus
             />
@@ -93,7 +98,7 @@ export function BulkActionBar({
               disabled={loading !== null}
               className="min-h-11 min-w-11"
             >
-              Annulla
+              {t("cancel")}
             </Button>
             <Button
               size="sm"
@@ -107,7 +112,7 @@ export function BulkActionBar({
               ) : (
                 <>
                   <X className="w-4 h-4 mr-1" />
-                  Rifiuta {selectedCount}
+                  {t("reject")} {selectedCount}
                 </>
               )}
             </Button>
@@ -117,13 +122,19 @@ export function BulkActionBar({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                {selectedCount} selezionat{selectedCount === 1 ? "a" : "e"}
+                {t("selected", {
+                  count: selectedCount,
+                  plural:
+                    selectedCount === 1
+                      ? t("selectedSingular")
+                      : t("selectedPlural"),
+                })}
               </span>
               <button
                 onClick={onClearSelection}
                 className="text-sm text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
               >
-                Deseleziona
+                {t("deselect")}
               </button>
             </div>
 
@@ -136,7 +147,7 @@ export function BulkActionBar({
                 className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 min-h-11 min-w-11"
               >
                 <X className="w-4 h-4 mr-1" />
-                Rifiuta
+                {t("reject")}
               </Button>
               <Button
                 size="sm"
@@ -149,7 +160,7 @@ export function BulkActionBar({
                 ) : (
                   <>
                     <Check className="w-4 h-4 mr-1" />
-                    Approva {selectedCount}
+                    {t("approve")} {selectedCount}
                   </>
                 )}
               </Button>

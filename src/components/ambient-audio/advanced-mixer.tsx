@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Trash2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { AUDIO_MODES } from './constants';
-import type { AudioMode, AudioLayer } from '@/types';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { AUDIO_MODES } from "./constants";
+import type { AudioMode, AudioLayer } from "@/types";
 
 interface AdvancedMixerProps {
   layers: AudioLayer[];
@@ -27,24 +28,27 @@ export function AdvancedMixer({
   onLayerVolumeChange,
   onClearLayers,
 }: AdvancedMixerProps) {
+  const t = useTranslations("ambientAudio");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
-  const noiseModesData = AUDIO_MODES.filter(m => m.category === 'noise');
-  const binauralModesData = AUDIO_MODES.filter(m => m.category === 'binaural');
-  const ambientModesData = AUDIO_MODES.filter(m => m.category === 'ambient');
+  const noiseModesData = AUDIO_MODES.filter((m) => m.category === "noise");
+  const binauralModesData = AUDIO_MODES.filter(
+    (m) => m.category === "binaural",
+  );
+  const ambientModesData = AUDIO_MODES.filter((m) => m.category === "ambient");
 
   if (!showAdvanced) {
     return (
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center justify-between">
-            <span>Mixer Avanzato</span>
+            <span>{t("advancedMixer")}</span>
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowAdvanced(true)}
             >
-              Mostra
+              {t("show")}
             </Button>
           </CardTitle>
         </CardHeader>
@@ -56,13 +60,13 @@ export function AdvancedMixer({
     <Card>
       <CardHeader>
         <CardTitle className="text-base flex items-center justify-between">
-          <span>Mixer Avanzato</span>
+          <span>{t("advancedMixer")}</span>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowAdvanced(false)}
           >
-            Nascondi
+            {t("hide")}
           </Button>
         </CardTitle>
       </CardHeader>
@@ -70,18 +74,25 @@ export function AdvancedMixer({
         {layers.length > 0 && (
           <div className="space-y-2">
             <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
-              Layer Attivi ({layers.length})
+              {t("activeLayers")} ({layers.length})
             </h4>
             {layers.map((layer) => {
-              const modeData = AUDIO_MODES.find(m => m.mode === layer.mode);
+              const modeData = AUDIO_MODES.find((m) => m.mode === layer.mode);
               return (
-                <div key={layer.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-800">
+                <div
+                  key={layer.id}
+                  className="flex items-center gap-2 p-2 rounded-lg bg-slate-100 dark:bg-slate-800"
+                >
                   <span className="text-lg">{modeData?.icon}</span>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{modeData?.label}</div>
+                    <div className="text-sm font-medium truncate">
+                      {modeData?.label}
+                    </div>
                     <Slider
                       value={[layer.volume * 100]}
-                      onValueChange={(values) => onLayerVolumeChange(layer.id, values[0] / 100)}
+                      onValueChange={(values) =>
+                        onLayerVolumeChange(layer.id, values[0] / 100)
+                      }
                       max={100}
                       step={1}
                       className="mt-1"
@@ -101,37 +112,24 @@ export function AdvancedMixer({
         )}
 
         <div className="space-y-2">
-          <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">Aggiungi Layer</h4>
+          <h4 className="text-sm font-medium text-slate-700 dark:text-slate-300">
+            {t("addLayer")}
+          </h4>
 
           <div className="space-y-1">
-            <p className="text-xs text-slate-600 dark:text-slate-400">Rumore</p>
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t("noise")}
+            </p>
             <div className="grid grid-cols-3 gap-1">
               {noiseModesData.map((m) => (
                 <Button
                   key={m.mode}
                   size="sm"
-                  variant={selectedMode === m.mode ? 'default' : 'outline'}
+                  variant={selectedMode === m.mode ? "default" : "outline"}
                   onClick={() => onModeSelect(m.mode)}
                   className="text-xs"
                 >
-                  {m.icon} {m.label.split(' ')[1]}
-                </Button>
-              ))}
-            </div>
-          </div>
-
-          <div className="space-y-1">
-            <p className="text-xs text-slate-600 dark:text-slate-400">Binaural Beats</p>
-            <div className="grid grid-cols-3 gap-1">
-              {binauralModesData.map((m) => (
-                <Button
-                  key={m.mode}
-                  size="sm"
-                  variant={selectedMode === m.mode ? 'default' : 'outline'}
-                  onClick={() => onModeSelect(m.mode)}
-                  className="text-xs"
-                >
-                  {m.icon} {m.label.split(' ')[0]}
+                  {m.icon} {m.label.split(" ")[1]}
                 </Button>
               ))}
             </div>
@@ -139,7 +137,27 @@ export function AdvancedMixer({
 
           <div className="space-y-1">
             <p className="text-xs text-slate-600 dark:text-slate-400">
-              Suoni Ambientali <span className="text-xs text-amber-600">(Prossimamente)</span>
+              Binaural Beats
+            </p>
+            <div className="grid grid-cols-3 gap-1">
+              {binauralModesData.map((m) => (
+                <Button
+                  key={m.mode}
+                  size="sm"
+                  variant={selectedMode === m.mode ? "default" : "outline"}
+                  onClick={() => onModeSelect(m.mode)}
+                  className="text-xs"
+                >
+                  {m.icon} {m.label.split(" ")[0]}
+                </Button>
+              ))}
+            </div>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              {t("ambientSounds")}{" "}
+              <span className="text-xs text-amber-600">{t("comingSoon")}</span>
             </p>
             <div className="grid grid-cols-4 gap-1">
               {ambientModesData.map((m) => (
@@ -158,7 +176,7 @@ export function AdvancedMixer({
 
           <Button onClick={onAddLayer} className="w-full" size="sm">
             <Plus className="w-4 h-4 mr-2" />
-            Aggiungi Layer
+            {t("addLayer")}
           </Button>
         </div>
 
@@ -170,7 +188,7 @@ export function AdvancedMixer({
             size="sm"
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Rimuovi Tutti i Layer
+            {t("removeAllLayers")}
           </Button>
         )}
       </CardContent>
