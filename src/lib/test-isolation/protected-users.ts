@@ -4,7 +4,7 @@
  *
  * Environment Variable: PROTECTED_USERS
  * Format: comma-separated list of email addresses
- * Example: PROTECTED_USERS=roberdan@fightthestroke.org,mariodanfts@gmail.com
+ * Example: PROTECTED_USERS=admin@example.com,tester@example.com
  *
  * @module lib/test-isolation/protected-users
  */
@@ -18,8 +18,8 @@
  *
  * @returns Array of protected email addresses (lowercase)
  * @example
- * // With PROTECTED_USERS="roberdan@fightthestroke.org,mariodanfts@gmail.com"
- * getProtectedUsers() // => ['roberdan@fightthestroke.org', 'mariodanfts@gmail.com']
+ * // With PROTECTED_USERS="admin@example.com,tester@example.com"
+ * getProtectedUsers() // => ['admin@example.com', 'tester@example.com']
  *
  * // Without PROTECTED_USERS env var
  * getProtectedUsers() // => []
@@ -45,7 +45,7 @@ export function getProtectedUsers(): string[] {
  * @param email - Email address to check (case-insensitive)
  * @returns true if the email is protected, false otherwise
  * @example
- * isProtectedUser('roberdan@fightthestroke.org') // => true (if in PROTECTED_USERS)
+ * isProtectedUser('admin@example.com') // => true (if in PROTECTED_USERS)
  * isProtectedUser('test@example.com') // => false (if not in PROTECTED_USERS)
  */
 export function isProtectedUser(email: string): boolean {

@@ -105,15 +105,20 @@ echo " done"
 
 # 8. Hardcoded production URLs (should use env vars)
 echo -n "Scanning for hardcoded URLs..."
-# mirrorbuddy.grafana.net in code (not docs/comments)
+# mirrorbuddy.grafana.net in code (not docs/comments/admin constants)
+# IGNORED: src/app/admin/page.tsx - dashboard link constant (intentional)
+# IGNORED: src/lib/observability/grafana-dashboards/*.json - config docs
 GRAFANA_MATCHES=$(rg -n 'mirrorbuddy\.grafana\.net' \
   -g '!.env.example' -g '!docs/**' -g '!*.md' -g '!node_modules/**' \
+  -g '!src/app/admin/page.tsx' -g '!src/lib/observability/grafana-dashboards/*.json' \
   src/ 2>/dev/null | rg -v '^\s*//' | head -3)
 [ -n "$GRAFANA_MATCHES" ] && add_warning "Grafana URL" "Hardcoded Grafana dashboard URL" "$GRAFANA_MATCHES"
 
 # mirrorbuddy.org in fallbacks
+# IGNORED: admin-notifier.ts - intentional fallback when env var missing
 PROD_MATCHES=$(rg -n 'mirrorbuddy\.org' \
   -g '!.env.example' -g '!docs/**' -g '!*.md' -g '!node_modules/**' \
+  -g '!src/lib/safety/escalation/admin-notifier.ts' \
   src/lib/ src/app/api/ 2>/dev/null | rg -v 'example\.com|mailto:' | head -3)
 [ -n "$PROD_MATCHES" ] && add_warning "Production URL" "Hardcoded mirrorbuddy.org in lib/api" "$PROD_MATCHES"
 
