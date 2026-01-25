@@ -5,6 +5,7 @@ import {
   logLocaleUpdate,
   logLocaleDelete,
 } from "@/lib/locale/locale-audit-service";
+import { localeConfigService } from "@/lib/locale/locale-config-service";
 
 /**
  * GET /api/admin/locales/[id]
@@ -90,10 +91,16 @@ export async function PUT(
 
     // Build change summary for audit
     const changes: Record<string, unknown> = {};
-    if (body.countryName !== undefined && body.countryName !== existing.countryName) {
+    if (
+      body.countryName !== undefined &&
+      body.countryName !== existing.countryName
+    ) {
       changes.countryName = body.countryName;
     }
-    if (body.primaryLocale !== undefined && body.primaryLocale !== existing.primaryLocale) {
+    if (
+      body.primaryLocale !== undefined &&
+      body.primaryLocale !== existing.primaryLocale
+    ) {
       changes.primaryLocale = body.primaryLocale;
     }
     if (
@@ -103,7 +110,9 @@ export async function PUT(
       changes.primaryLanguageMaestroId = body.primaryLanguageMaestroId;
     }
     if (body.secondaryLocales !== undefined) {
-      const oldLocales = JSON.stringify(existing.secondaryLocales?.sort() || []);
+      const oldLocales = JSON.stringify(
+        existing.secondaryLocales?.sort() || [],
+      );
       const newLocales = JSON.stringify((body.secondaryLocales || []).sort());
       if (oldLocales !== newLocales) {
         changes.secondaryLocales = body.secondaryLocales;
@@ -134,8 +143,11 @@ export async function PUT(
           secondaryLocales: locale.secondaryLocales,
           enabled: locale.enabled,
         },
-        `Updated fields: ${Object.keys(changes).join(", ")}`
+        `Updated fields: ${Object.keys(changes).join(", ")}`,
       );
+
+      // Invalidate cache to reflect changes immediately
+      localeConfigService.invalidateCache();
     }
 
     return NextResponse.json({ success: true, locale });
@@ -193,8 +205,11 @@ export async function DELETE(
         secondaryLocales: existing.secondaryLocales,
         enabled: existing.enabled,
       },
-      "Locale configuration deleted via API"
+      "Locale configuration deleted via API",
     );
+
+    // Invalidate cache to reflect deletion immediately
+    localeConfigService.invalidateCache();
 
     return NextResponse.json(
       { success: true, message: "Locale configuration deleted" },

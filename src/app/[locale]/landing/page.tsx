@@ -1,9 +1,14 @@
 import { redirect } from "next/navigation";
 
+interface LandingPageProps {
+  params: Promise<{ locale: string }>;
+}
+
 /**
- * /landing route - redirects to /welcome
+ * /{locale}/landing route - redirects to /{locale}/welcome
  * Kept for backwards compatibility with provider-check and proxy redirects.
  */
-export default function LandingRedirect() {
-  redirect("/welcome");
+export default async function LandingRedirect({ params }: LandingPageProps) {
+  const { locale } = await params;
+  redirect(`/${locale}/welcome`);
 }

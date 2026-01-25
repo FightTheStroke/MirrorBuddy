@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { logger } from "@/lib/logger";
 import { motion } from "framer-motion";
 import {
@@ -42,6 +42,7 @@ const MB_PER_LEVEL = 1000;
 
 export default function Home() {
   const router = useRouter();
+  const locale = useLocale();
   const t = useTranslations("home");
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
     useOnboardingStore();
@@ -52,9 +53,9 @@ export default function Home() {
 
   useEffect(() => {
     if (isHydrated && !hasCompletedOnboarding) {
-      router.push("/welcome");
+      router.push(`/${locale}/welcome`);
     }
-  }, [isHydrated, hasCompletedOnboarding, router]);
+  }, [isHydrated, hasCompletedOnboarding, router, locale]);
 
   const [currentView, setCurrentView] = useState<View>("maestri");
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -163,12 +164,28 @@ export default function Home() {
       isChat: true,
       avatar: buddyInfo.avatar,
     },
-    { id: "maestri" as const, label: t("navigation.professors"), icon: GraduationCap },
-    { id: "astuccio" as const, label: t("navigation.astuccio"), icon: PencilRuler },
+    {
+      id: "maestri" as const,
+      label: t("navigation.professors"),
+      icon: GraduationCap,
+    },
+    {
+      id: "astuccio" as const,
+      label: t("navigation.astuccio"),
+      icon: PencilRuler,
+    },
     { id: "supporti" as const, label: t("navigation.zaino"), icon: Backpack },
-    { id: "calendar" as const, label: t("navigation.calendar"), icon: Calendar },
+    {
+      id: "calendar" as const,
+      label: t("navigation.calendar"),
+      icon: Calendar,
+    },
     { id: "progress" as const, label: t("navigation.progress"), icon: Trophy },
-    { id: "settings" as const, label: t("navigation.settings"), icon: Settings },
+    {
+      id: "settings" as const,
+      label: t("navigation.settings"),
+      icon: Settings,
+    },
   ];
 
   return (

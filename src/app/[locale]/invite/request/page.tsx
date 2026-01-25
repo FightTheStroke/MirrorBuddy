@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
 import Link from "next/link";
 import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +13,7 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 export default function InviteRequestPage() {
   const router = useRouter();
+  const locale = useLocale();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [motivation, setMotivation] = useState("");
@@ -75,7 +77,10 @@ export default function InviteRequestPage() {
             Grazie per il tuo interesse in MirrorBuddy! Ti contatteremo presto
             via email con le credenziali di accesso.
           </p>
-          <Button onClick={() => router.push("/welcome")} className="w-full">
+          <Button
+            onClick={() => router.push(`/${locale}/welcome`)}
+            className="w-full"
+          >
             Torna alla Home
           </Button>
         </div>

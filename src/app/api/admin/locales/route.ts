@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { logLocaleCreate } from "@/lib/locale/locale-audit-service";
+import { localeConfigService } from "@/lib/locale/locale-config-service";
 
 /**
  * GET /api/admin/locales
@@ -64,7 +65,9 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       return NextResponse.json(
-        { error: "A locale configuration with this country code already exists" },
+        {
+          error: "A locale configuration with this country code already exists",
+        },
         { status: 409 },
       );
     }
@@ -93,8 +96,11 @@ export async function POST(request: NextRequest) {
         secondaryLocales: locale.secondaryLocales,
         enabled: locale.enabled,
       },
-      "Locale configuration created via API"
+      "Locale configuration created via API",
     );
+
+    // Invalidate cache to reflect new locale immediately
+    localeConfigService.invalidateCache();
 
     return NextResponse.json({ success: true, locale }, { status: 201 });
   } catch (error) {
