@@ -19,8 +19,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Language Detection**:
   - Browser language preference via `Accept-Language` header
   - User preference stored in database with fallback to browser default
-  - Session persistence with cookie-based tracking (`mirrorbuddy-locale`)
+  - Session persistence with cookie-based tracking (`NEXT_LOCALE`)
   - Server-side rendering with correct language on first load (SEO-optimized)
+- **Open Graph Metadata** (F-78, ADR 0079):
+  - Localized OG metadata for social media sharing (Facebook, LinkedIn, Twitter)
+  - `og:locale` with proper format (it_IT, en_US, fr_FR, de_DE, es_ES)
+  - `og:locale:alternate` for all other languages (4 alternates per page)
+  - Localized `og:title` and `og:description` for each locale
+  - Twitter Card metadata (`twitter:card`, `twitter:title`, `twitter:description`, `twitter:image`)
+  - Automatic generation via `generateMetadata()` in `[locale]/layout.tsx`
+  - Server utilities: `getLocalizedOGMetadata()` for easy integration
+  - Default metadata for all 5 languages stored in `DEFAULT_METADATA`
+  - Unit tests: 17 tests (locale codes, OG structure, Twitter Cards)
+  - E2E tests: 41 tests (5 locales × 8 tests + consistency check)
+- **Language Preference Synchronization** (F-70):
+  - Priority-based sync: User profile → Cookie → Browser → Default (it)
+  - `NEXT_LOCALE` cookie for client-side persistence (1 year validity)
+  - `useLanguageSync()` hook for React components
+  - `useLanguageSyncAfterLogin()` for post-login profile sync
+  - Cookie-to-profile sync on login for consistent experience
+  - Unit tests: 21 tests (cookie operations + sync logic)
+  - ADR 0078: Language Preference Synchronization architecture
 - **Middleware Language Detection** (`src/middleware.ts`):
   - Detects locale from URL path, cookies, browser preference (in order of priority)
   - Enforces URL-based locale routing for SEO (`/it/`, `/en/`, `/es/`, `/fr/`, `/de/`)
