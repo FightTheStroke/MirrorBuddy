@@ -70,14 +70,14 @@ export function SchoolsContactForm() {
         method: "POST",
         body: JSON.stringify({
           type: "schools",
-          name: formData.name,
-          email: formData.email,
-          role: formData.role,
-          schoolName: formData.schoolName,
-          schoolType: formData.schoolType,
-          studentCount: formData.studentCount,
-          specificNeeds: formData.specificNeeds,
-          message: formData.message,
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          role: formData.role.trim(),
+          schoolName: formData.schoolName.trim(),
+          schoolType: formData.schoolType.trim(),
+          studentCount: formData.studentCount.trim(),
+          specificNeeds: formData.specificNeeds.trim(),
+          message: formData.message.trim(),
         }),
       });
 

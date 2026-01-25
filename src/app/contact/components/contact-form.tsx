@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ContactFormFields } from "./contact-form-fields";
 import { ContactFormMessages } from "./contact-form-messages";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface FormErrors {
   name?: string;
@@ -79,10 +80,15 @@ export function ContactForm() {
     setSubmitStatus("idle");
 
     try {
-      const response = await fetch("/api/contact", {
+      const response = await csrfFetch("/api/contact", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...formData, type: "general" }),
+        body: JSON.stringify({
+          type: "general",
+          name: formData.name.trim(),
+          email: formData.email.trim().toLowerCase(),
+          subject: formData.subject.trim(),
+          message: formData.message.trim(),
+        }),
       });
 
       if (response.ok) {

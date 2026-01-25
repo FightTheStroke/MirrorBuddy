@@ -46,6 +46,37 @@ export async function POST(
       );
     }
 
+    // Validate contact type
+    const validTypes = ["general", "schools", "enterprise"] as const;
+    if (!validTypes.includes(body.type)) {
+      return NextResponse.json(
+        { success: false, message: "Invalid contact type" },
+        { status: 400 },
+      );
+    }
+
+    // Validate field lengths to prevent abuse
+    const maxLengths = {
+      name: 100,
+      email: 254,
+      subject: 200,
+      message: 5000,
+      role: 100,
+      schoolName: 200,
+      company: 200,
+      specificNeeds: 2000,
+    } as const;
+
+    for (const [field, maxLen] of Object.entries(maxLengths)) {
+      const value = body[field];
+      if (typeof value === "string" && value.length > maxLen) {
+        return NextResponse.json(
+          { success: false, message: `Field ${field} exceeds maximum length` },
+          { status: 400 },
+        );
+      }
+    }
+
     // Validate email format - using simple non-backtracking regex to avoid ReDoS
     // Matches: local@domain.tld (basic validation, server-side)
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;

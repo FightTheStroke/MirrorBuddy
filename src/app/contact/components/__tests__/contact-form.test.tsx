@@ -8,12 +8,16 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { ContactForm } from "../contact-form";
 
-// Mock fetch
-global.fetch = vi.fn();
+// Mock csrfFetch
+const mockCsrfFetch = vi.fn();
+vi.mock("@/lib/auth/csrf-client", () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
 
 describe("ContactForm", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    mockCsrfFetch.mockReset();
   });
 
   describe("Rendering", () => {
@@ -63,7 +67,7 @@ describe("ContactForm", () => {
 
     it("prevents form submission with invalid email", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockClear();
+      (mockCsrfFetch as any).mockClear();
       render(<ContactForm />);
 
       // Fill fields with invalid email
@@ -77,7 +81,7 @@ describe("ContactForm", () => {
 
       // Verify form did not submit (no fetch call)
       await waitFor(() => {
-        expect(global.fetch).not.toHaveBeenCalled();
+        expect(mockCsrfFetch).not.toHaveBeenCalled();
       });
     });
 
@@ -106,7 +110,7 @@ describe("ContactForm", () => {
   describe("Submission", () => {
     it("posts to /api/contact with form data", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({
+      (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });
@@ -121,17 +125,17 @@ describe("ContactForm", () => {
       await user.click(screen.getByRole("button", { name: /invia/i }));
 
       await waitFor(() => {
-        expect(global.fetch).toHaveBeenCalledWith(
+        expect(mockCsrfFetch).toHaveBeenCalledWith(
           "/api/contact",
           expect.any(Object),
         );
       });
 
-      const callArgs = (global.fetch as any).mock.calls[0];
+      const callArgs = mockCsrfFetch.mock.calls[0];
       const body = JSON.parse(callArgs[1].body);
 
       expect(body.name).toBe("John Doe");
-      expect(body.email).toBe("john@example.com");
+      expect(body.email).toBe("john@example.com"); // Trimmed and lowercased
       expect(body.subject).toBe("Test Subject");
       expect(body.message).toBe("Test message");
       expect(body.type).toBe("general");
@@ -139,7 +143,7 @@ describe("ContactForm", () => {
 
     it("disables submit button while submitting", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockImplementation(
+      (mockCsrfFetch as any).mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 100)),
       );
 
@@ -158,7 +162,7 @@ describe("ContactForm", () => {
 
     it("shows success message after successful submission", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({
+      (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });
@@ -179,7 +183,7 @@ describe("ContactForm", () => {
 
     it("shows error message on submission failure", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({
+      (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: false,
         status: 500,
       });
@@ -224,7 +228,7 @@ describe("ContactForm", () => {
 
     it("manages focus after submission", async () => {
       const user = userEvent.setup();
-      (global.fetch as any).mockResolvedValueOnce({
+      (mockCsrfFetch as any).mockResolvedValueOnce({
         ok: true,
         json: async () => ({ success: true }),
       });

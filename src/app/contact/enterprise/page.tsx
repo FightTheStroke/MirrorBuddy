@@ -1,5 +1,12 @@
+import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
 import { EnterpriseForm } from "@/components/contact/enterprise-form";
+
+export const metadata: Metadata = {
+  title: "Contattaci Enterprise | MirrorBuddy",
+  description:
+    "Scopri come MirrorBuddy può trasformare l'apprendimento nella tua azienda con soluzioni personalizzate e analytics avanzate.",
+};
 
 export default function EnterpriseContactPage() {
   return (

@@ -8,6 +8,19 @@ import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "contact-api" });
 
+/**
+ * Escape HTML special characters to prevent XSS in email templates
+ */
+function escapeHtml(unsafe: string | undefined | null): string {
+  if (!unsafe) return "";
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 interface ContactFormData {
   name: string;
   email: string;
@@ -81,50 +94,50 @@ function formatEmailHtml(
       <div class="content">
         <div class="field">
           <div class="label">Nome:</div>
-          <div class="value">${name}</div>
+          <div class="value">${escapeHtml(name)}</div>
         </div>
         <div class="field">
           <div class="label">Email:</div>
-          <div class="value"><a href="mailto:${email}">${email}</a></div>
+          <div class="value"><a href="mailto:${escapeHtml(email)}">${escapeHtml(email)}</a></div>
         </div>
   `;
 
-  // Add type-specific fields
+  // Add type-specific fields (all user input is escaped to prevent XSS)
   if (type === "general") {
     html += `
         <div class="field">
           <div class="label">Oggetto:</div>
-          <div class="value">${data.subject || "N/A"}</div>
+          <div class="value">${escapeHtml(data.subject as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Messaggio:</div>
-          <div class="value">${data.message || "N/A"}</div>
+          <div class="value">${escapeHtml(data.message as string) || "N/A"}</div>
         </div>
     `;
   } else if (type === "schools") {
     html += `
         <div class="field">
           <div class="label">Ruolo:</div>
-          <div class="value">${data.role || "N/A"}</div>
+          <div class="value">${escapeHtml(data.role as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Scuola:</div>
-          <div class="value">${data.schoolName || "N/A"}</div>
+          <div class="value">${escapeHtml(data.schoolName as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Tipo Scuola:</div>
-          <div class="value">${data.schoolType || "N/A"}</div>
+          <div class="value">${escapeHtml(data.schoolType as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Numero Studenti:</div>
-          <div class="value">${data.studentCount || "N/A"}</div>
+          <div class="value">${escapeHtml(data.studentCount as string) || "N/A"}</div>
         </div>
         ${
           data.specificNeeds
             ? `
         <div class="field">
           <div class="label">Esigenze Specifiche:</div>
-          <div class="value">${data.specificNeeds}</div>
+          <div class="value">${escapeHtml(data.specificNeeds as string)}</div>
         </div>
         `
             : ""
@@ -132,24 +145,24 @@ function formatEmailHtml(
     `;
   } else if (type === "enterprise") {
     const topics = Array.isArray(data.topics)
-      ? data.topics.join(", ")
-      : data.topics || "N/A";
+      ? data.topics.map((t) => escapeHtml(t)).join(", ")
+      : escapeHtml(data.topics as string) || "N/A";
     html += `
         <div class="field">
           <div class="label">Ruolo:</div>
-          <div class="value">${data.role || "N/A"}</div>
+          <div class="value">${escapeHtml(data.role as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Azienda:</div>
-          <div class="value">${data.company || "N/A"}</div>
+          <div class="value">${escapeHtml(data.company as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Settore:</div>
-          <div class="value">${data.sector || "N/A"}</div>
+          <div class="value">${escapeHtml(data.sector as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Dipendenti:</div>
-          <div class="value">${data.employeeCount || "N/A"}</div>
+          <div class="value">${escapeHtml(data.employeeCount as string) || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Temi di interesse:</div>
@@ -160,7 +173,7 @@ function formatEmailHtml(
             ? `
         <div class="field">
           <div class="label">Messaggio:</div>
-          <div class="value">${data.message}</div>
+          <div class="value">${escapeHtml(data.message as string)}</div>
         </div>
         `
             : ""
