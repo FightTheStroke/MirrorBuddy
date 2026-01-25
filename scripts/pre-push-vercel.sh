@@ -137,9 +137,46 @@ fi
 echo -e "${GREEN}✓ Build passed${NC}"
 
 # =============================================================================
-# PHASE 4: QUALITY CHECKS (CI parity)
+# PHASE 4: VERCEL ENV VARS CHECK
 # =============================================================================
-echo -e "${BLUE}[4/5] Quality checks...${NC}"
+echo -e "${BLUE}[4/6] Vercel environment variables...${NC}"
+
+# Check if vercel CLI is available
+if command -v vercel &> /dev/null; then
+    # Required env vars for production
+    REQUIRED_VARS=(
+        "DATABASE_URL"
+        "ADMIN_EMAIL"
+        "ADMIN_PASSWORD"
+        "SESSION_SECRET"
+        "CRON_SECRET"
+        "SUPABASE_CA_CERT"
+        "AZURE_OPENAI_API_KEY"
+    )
+
+    VERCEL_VARS=$(vercel env ls 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
+    MISSING_VARS=""
+
+    for var in "${REQUIRED_VARS[@]}"; do
+        if ! echo "$VERCEL_VARS" | grep -q "^$var$"; then
+            MISSING_VARS="$MISSING_VARS $var"
+        fi
+    done
+
+    if [ -n "$MISSING_VARS" ]; then
+        echo -e "${RED}✗ Missing Vercel env vars:${NC}$MISSING_VARS"
+        echo -e "${YELLOW}Add with: vercel env add <name> production${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Vercel env vars OK${NC}"
+else
+    echo -e "${YELLOW}⚠ Vercel CLI not found, skipping env check${NC}"
+fi
+
+# =============================================================================
+# PHASE 5: QUALITY CHECKS (CI parity)
+# =============================================================================
+echo -e "${BLUE}[5/6] Quality checks...${NC}"
 
 # CSRF Check: Ensure client-side POST/PUT/DELETE use csrfFetch (ADR 0053)
 # ESLint already catches this, but explicit check provides clear error message
@@ -177,6 +214,27 @@ if [ -n "$LOGS" ]; then
     exit 1
 fi
 echo -e "${GREEN}✓ No console.log${NC}"
+
+# =============================================================================
+# PHASE 6: SECRETS EXPOSURE CHECK
+# =============================================================================
+echo -e "${BLUE}[6/6] Secrets exposure check...${NC}"
+
+# Check for exposed secrets in tracked files (excluding .env which is gitignored)
+EXPOSED_SECRETS=""
+for pattern in "sk_live_" "sk_test_" "GOCSPX-" "glc_ey" "re_[A-Za-z0-9]" "eyJhbGci"; do
+    FOUND=$(git grep -l "$pattern" -- ':!.env*' ':!*.example' ':!node_modules' 2>/dev/null || true)
+    if [ -n "$FOUND" ]; then
+        EXPOSED_SECRETS="$EXPOSED_SECRETS\n$pattern found in: $FOUND"
+    fi
+done
+
+if [ -n "$EXPOSED_SECRETS" ]; then
+    echo -e "${RED}✗ Potential secrets exposed in tracked files:${NC}"
+    echo -e "$EXPOSED_SECRETS"
+    exit 1
+fi
+echo -e "${GREEN}✓ No exposed secrets${NC}"
 
 # =============================================================================
 # SUMMARY
