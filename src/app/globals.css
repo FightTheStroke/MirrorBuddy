@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 /* Custom breakpoints for mobile-first design */
+/* xs: 375px - for small phones like iPhone SE */
+@theme {
+  --breakpoint-xs: 375px;
+}
+
+/* Legacy custom media for CSS-only usage */
 @custom-media --xs (width >= 375px);
 
 /* Enable class-based dark mode for next-themes compatibility */
