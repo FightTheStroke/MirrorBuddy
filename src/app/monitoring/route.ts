@@ -4,9 +4,17 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-const SENTRY_PROJECT_IDS = [
-  "4510764469321728", // mirrorbuddy project
-];
+// Extract allowed project ID from the public DSN (already exposed in client bundle)
+function getAllowedProjectId(): string | null {
+  const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+  if (!dsn) return null;
+  try {
+    const url = new URL(dsn);
+    return url.pathname.replace("/", "");
+  } catch {
+    return null;
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -18,8 +26,9 @@ export async function POST(request: NextRequest) {
     const dsn = new URL(header.dsn);
     const projectId = dsn.pathname.replace("/", "");
 
-    // Validate project ID to prevent abuse
-    if (!SENTRY_PROJECT_IDS.includes(projectId)) {
+    // Validate project ID to prevent abuse (must match configured DSN)
+    const allowedProjectId = getAllowedProjectId();
+    if (!allowedProjectId || projectId !== allowedProjectId) {
       return NextResponse.json({ error: "Invalid project" }, { status: 403 });
     }
 
