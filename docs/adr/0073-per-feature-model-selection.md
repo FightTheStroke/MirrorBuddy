@@ -152,21 +152,37 @@ New admin page at `/admin/tiers/models` for:
 ### TierService
 
 ```typescript
-// Get model for specific feature
-async getModelForFeature(
+// Get full AI config for specific feature (PREFERRED)
+async getFeatureAIConfigForUser(
+  userId: string | null,
+  feature: FeatureType
+): Promise<{ model: string; temperature: number; maxTokens: number }>
+
+// Get model only (legacy, use getFeatureAIConfigForUser instead)
+async getModelForUserFeature(
   userId: string | null,
   feature: FeatureType
 ): Promise<string>
 ```
 
-### Usage in API Routes
+### Usage in API Routes and Library Functions
 
 ```typescript
-// Before
-const tierModel = await tierService.getAIModelForUser(userId, "chat");
+// PREFERRED: Use full AI config (model + temperature + maxTokens)
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 
-// After
-const tierModel = await tierService.getModelForFeature(userId, "mindmap");
+const aiConfig = await tierService.getFeatureAIConfigForUser(userId, "summary");
+const deploymentName = getDeploymentForModel(aiConfig.model);
+
+const result = await chatCompletion(messages, systemPrompt, {
+  temperature: aiConfig.temperature,
+  maxTokens: aiConfig.maxTokens,
+  model: deploymentName,
+});
+
+// LEGACY: Get model only (still works but less flexible)
+const tierModel = await tierService.getModelForUserFeature(userId, "mindmap");
 const deployment = getDeploymentForModel(tierModel);
 ```
 
@@ -233,18 +249,34 @@ CREATE TABLE "ModelCatalog" (...);
 - [x] `/api/conversations/[id]/summarize/route.ts` - uses `getModelForUserFeature(userId, "summary")`
 - [x] `/api/parent-professor/route.ts` - uses `getModelForUserFeature(userId, "chat")`
 
-### Library Functions Updated
+### Library Functions Updated (Using getFeatureAIConfigForUser)
 
-- [x] `src/lib/ai/summarize.ts` - All functions accept optional `{ model }` option
-- [x] `src/lib/tools/handlers/study-kit-generators/quiz.ts` - accepts optional `{ model }` option
-- [x] `src/lib/tools/handlers/study-kit-generators/mindmap.ts` - accepts optional `{ model }` option
-- [x] `src/lib/tools/handlers/study-kit-generators/summary.ts` - accepts optional `{ model }` option
-- [x] `src/lib/tools/handlers/study-kit-generators/demo.ts` - accepts optional `{ model }` option
+- [x] `src/lib/ai/summarize.ts` - All 4 functions use tierService with 'summary' feature
+  - `generateConversationSummary(messages, userId?)`
+  - `extractKeyFacts(messages, userId?)`
+  - `extractTopics(messages, userId?)`
+  - `extractLearnings(messages, maestroId, subject?, userId?)`
+- [x] `src/lib/conversation/contextual-greeting.ts` - Uses 'chat' feature
+  - `generateContextualGreeting(params)` - params includes userId
+  - `generateGoodbyeMessage(..., userId?)`
+- [x] `src/lib/session/maestro-evaluation.ts` - Uses 'chat' feature
+  - `generateMaestroEvaluation(messages, studentProfile?, userId?)`
+- [x] `src/lib/session/parent-note-generator.ts` - Uses 'chat' feature
+  - `generateParentNote(session, evaluation)` - session includes userId
+- [x] `src/lib/learning-path/path-generator.ts` - Uses 'learning_path' feature
+- [x] `src/lib/learning-path/topic-analyzer.ts` - Uses 'learning_path' feature
+- [x] `src/lib/learning-path/topic-material-generator.ts` - Uses 'learning_path' feature
+
+### Study Kit Generators (Accept model option)
+
+- [x] `src/lib/tools/handlers/study-kit-generators/quiz.ts`
+- [x] `src/lib/tools/handlers/study-kit-generators/mindmap.ts`
+- [x] `src/lib/tools/handlers/study-kit-generators/summary.ts`
+- [x] `src/lib/tools/handlers/study-kit-generators/demo.ts`
 
 ### Pending (Progressive Migration)
 
 - [ ] Update study-kit-handler to pass tier model to generators
 - [ ] `formula-handler.ts` - needs userId context for tier lookup
 - [ ] `homework-handler.ts` - needs userId context for tier lookup
-- [ ] Learning path generators - need userId context
 - [ ] Admin UI for model selection per tier
