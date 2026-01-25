@@ -1,4 +1,55 @@
 {
+  "metadata": {
+    "home": {
+      "title": "Startseite | MirrorBuddy",
+      "description": "Entdecken Sie KI-gestütztes Lernen für Schüler mit Lernbehinderungen. Personalisiertes Lernen mit 22 Maestri, Sprachinteraktion und adaptivem Schulerfolg.",
+      "keywords": ["Bildung", "KI", "Unterricht", "Lernen", "Stimme", "Maestri"]
+    },
+    "settings": {
+      "title": "Einstellungen | MirrorBuddy",
+      "description": "Personalisieren Sie Ihr Lernlebnis mit Barrierefreiheitsprofilen, Charaktereinstellungen, Datenschutzkontrollen und Kontoeinstellungen an Ihre Bedürfnisse.",
+      "keywords": [
+        "Einstellungen",
+        "Einstellungen",
+        "Barrierefreiheit",
+        "Anpassung",
+        "Datenschutz"
+      ]
+    },
+    "aiTransparency": {
+      "title": "KI-Transparenz | MirrorBuddy",
+      "description": "Erfahren Sie wie MirrorBuddy KI verantwortungsvoll nutzt, unsere Transparenzverpflichtungen und wie wir sichere KI für Schülerausbildung mit Schutzmaßnahmen.",
+      "keywords": [
+        "KI",
+        "Transparenz",
+        "Sicherheit",
+        "Compliance",
+        "verantwortungsvolle KI"
+      ]
+    },
+    "privacy": {
+      "title": "Datenschutzrichtlinie | MirrorBuddy",
+      "description": "Erfahren Sie wie MirrorBuddy Ihre Daten schützt, DSGVO respektiert, Infos sicher verwaltet und Privatsphäre mit verschlüsselter Kommunikation gewährleistet.",
+      "keywords": [
+        "Datenschutz",
+        "DSGVO",
+        "Datenschutz",
+        "Sicherheit",
+        "Compliance"
+      ]
+    },
+    "terms": {
+      "title": "Nutzungsbedingungen | MirrorBuddy",
+      "description": "Lesen Sie unsere Nutzungsbedingungen, Benutzerabkommen, akzeptable Nutzungsrichtlinien und rechtliche Informationen zur Verwendung der MirrorBuddy-Plattform.",
+      "keywords": [
+        "Bedingungen",
+        "Service",
+        "rechtlich",
+        "Vereinbarung",
+        "Richtlinien"
+      ]
+    }
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",

@@ -1,4 +1,56 @@
 {
+  "metadata": {
+    "home": {
+      "title": "Inicio | MirrorBuddy",
+      "description": "Descubre aprendizaje impulsado por IA para estudiantes con dificultades de aprendizaje. Tutorías personalizadas con 22 maestros, voz y aprendizaje aquí.",
+      "keywords": [
+        "educación",
+        "IA",
+        "tutoría",
+        "aprendizaje",
+        "voz",
+        "maestros"
+      ]
+    },
+    "settings": {
+      "title": "Configuración | MirrorBuddy",
+      "description": "Personaliza tu experiencia con perfiles de accesibilidad, preferencias de caracteres, controles de privacidad y configuración de cuenta adaptada para ti.",
+      "keywords": [
+        "configuración",
+        "preferencias",
+        "accesibilidad",
+        "personalización",
+        "privacidad"
+      ]
+    },
+    "aiTransparency": {
+      "title": "Transparencia de IA | MirrorBuddy",
+      "description": "Aprende cómo MirrorBuddy usa IA responsablemente, nuestros compromisos de transparencia y cómo garantizamos IA segura para educación de estudiantes aquí.",
+      "keywords": [
+        "IA",
+        "transparencia",
+        "seguridad",
+        "cumplimiento",
+        "IA responsable"
+      ]
+    },
+    "privacy": {
+      "title": "Política de Privacidad | MirrorBuddy",
+      "description": "Comprende cómo MirrorBuddy protege tus datos, respeta RGPD, administra información segura y garantiza privacidad con comunicaciones encriptadas seguras.",
+      "keywords": [
+        "privacidad",
+        "RGPD",
+        "protección datos",
+        "seguridad",
+        "cumplimiento"
+      ]
+    },
+    "terms": {
+      "title": "Términos de Servicio | MirrorBuddy",
+      "description": "Lee nuestros términos de servicio, acuerdos de usuario, políticas de uso aceptable e información legal para usar la plataforma educativa de MirrorBuddy.",
+      "keywords": ["términos", "servicio", "legal", "acuerdo", "políticas"]
+    }
+  },
   "common": {
     "loading": "Loading...",
     "error": "Error",
