@@ -5,3 +5,16 @@
 
 # Run lint-staged (formatting, linting)
 npx lint-staged
+
+# Run CSP validation if CSP-related files are staged
+# This catches CSP issues before they break production (saves Vercel build costs)
+if git diff --cached --name-only | grep -qE "(proxy\.ts|providers\.tsx|csp)" ; then
+  echo "📋 CSP-related files changed - running CSP validation..."
+  npm run test:unit -- csp-validation --reporter=dot 2>/dev/null
+  if [ $? -ne 0 ]; then
+    echo "❌ CSP validation failed! Fix issues before committing."
+    echo "   Run: npm run test:unit -- csp-validation"
+    exit 1
+  fi
+  echo "✅ CSP validation passed"
+fi

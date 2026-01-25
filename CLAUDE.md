@@ -157,6 +157,21 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 - Prisma for all DB operations
 - Path aliases: `@/lib/...`, `@/components/...`
 
+## CSP (Content Security Policy) - CRITICAL
+
+**Files**: `src/proxy.ts` (CSP header), `src/components/providers.tsx` (nonces)
+
+**BEFORE modifying CSP-related files**:
+
+1. Run `npm run test:unit -- csp-validation` (auto-runs on commit if files changed)
+2. Third-party providers that inject scripts MUST receive `nonce` prop (e.g., `<ThemeProvider nonce={nonce}>`)
+3. Each domain in CSP directives MUST have explicit protocol (`https://`, `wss://`, etc.)
+4. Do NOT interpolate multiple domains in template literals (each needs its own protocol)
+
+**Common failure**: Site shows "Caricamento..." forever = CSP blocking scripts. Check browser console.
+
+**Docs**: `src/lib/security/CSP-NONCE.md`
+
 ## Verification
 
 ```bash
