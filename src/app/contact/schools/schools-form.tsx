@@ -86,7 +86,7 @@ export function SchoolsContactForm() {
       if (!response.ok) {
         setFormState("error");
         setErrorMessage(
-          data.error || "Errore durante l'invio. Riprova più tardi.",
+          data.message || "Errore durante l'invio. Riprova più tardi.",
         );
         return;
       }

@@ -26,7 +26,7 @@ describe("SchoolsContactForm", () => {
     it("renders all required form fields", () => {
       render(<SchoolsContactForm />);
 
-      expect(screen.getByLabelText(/nome/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/^nome$/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/ruolo/i)).toBeInTheDocument();
       expect(screen.getByLabelText(/nome scuola/i)).toBeInTheDocument();
@@ -90,7 +90,7 @@ describe("SchoolsContactForm", () => {
       const user = userEvent.setup();
       render(<SchoolsContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "Mario Rossi");
+      await user.type(screen.getByLabelText(/^nome$/i), "Mario Rossi");
       await user.type(screen.getByLabelText(/email/i), "mario@example.com");
       await user.selectOptions(screen.getByLabelText(/ruolo/i), "docente");
       await user.type(screen.getByLabelText(/nome scuola/i), "Scuola XYZ");
@@ -120,7 +120,7 @@ describe("SchoolsContactForm", () => {
 
       render(<SchoolsContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "Mario Rossi");
+      await user.type(screen.getByLabelText(/^nome$/i), "Mario Rossi");
       await user.type(screen.getByLabelText(/email/i), "mario@example.com");
       await user.selectOptions(screen.getByLabelText(/ruolo/i), "docente");
       await user.type(screen.getByLabelText(/nome scuola/i), "Scuola XYZ");
@@ -174,7 +174,7 @@ describe("SchoolsContactForm", () => {
 
       render(<SchoolsContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "Mario Rossi");
+      await user.type(screen.getByLabelText(/^nome$/i), "Mario Rossi");
       await user.type(screen.getByLabelText(/email/i), "mario@example.com");
       await user.selectOptions(screen.getByLabelText(/ruolo/i), "docente");
       await user.type(screen.getByLabelText(/nome scuola/i), "Scuola XYZ");
@@ -202,12 +202,12 @@ describe("SchoolsContactForm", () => {
       const user = userEvent.setup();
       mockCsrfFetch.mockResolvedValueOnce({
         ok: false,
-        json: async () => ({ error: "Errore del server" }),
+        json: async () => ({ success: false, message: "Errore del server" }),
       });
 
       render(<SchoolsContactForm />);
 
-      await user.type(screen.getByLabelText(/nome/i), "Mario Rossi");
+      await user.type(screen.getByLabelText(/^nome$/i), "Mario Rossi");
       await user.type(screen.getByLabelText(/email/i), "mario@example.com");
       await user.selectOptions(screen.getByLabelText(/ruolo/i), "docente");
       await user.type(screen.getByLabelText(/nome scuola/i), "Scuola XYZ");
@@ -225,7 +225,7 @@ describe("SchoolsContactForm", () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByText(/errore durante l'invio/i)).toBeInTheDocument();
+        expect(screen.getByText(/errore del server/i)).toBeInTheDocument();
       });
     });
   });

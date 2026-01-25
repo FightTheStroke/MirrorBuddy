@@ -101,7 +101,7 @@ export function EnterpriseForm() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Errore durante l'invio");
+        throw new Error(data.message || "Errore durante l'invio");
       }
       setFormState("success");
     } catch (error) {

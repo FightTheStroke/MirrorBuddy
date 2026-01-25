@@ -12,14 +12,17 @@ interface ContactRequest {
   subject?: string;
   message?: string;
   role?: string;
+  // Schools fields
   schoolName?: string;
   schoolType?: string;
   studentCount?: string;
   specificNeeds?: string;
-  companyName?: string;
-  industry?: string;
-  employees?: string;
-  [key: string]: string | undefined;
+  // Enterprise fields
+  company?: string;
+  sector?: string;
+  employeeCount?: string;
+  topics?: string[];
+  [key: string]: string | string[] | undefined;
 }
 
 interface ContactResponse {
@@ -43,9 +46,10 @@ export async function POST(
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email)) {
+    // Validate email format - using simple non-backtracking regex to avoid ReDoS
+    // Matches: local@domain.tld (basic validation, server-side)
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(body.email) || body.email.length > 254) {
       return NextResponse.json(
         { success: false, message: "Invalid email format" },
         { status: 400 },
@@ -64,6 +68,23 @@ export async function POST(
           {
             success: false,
             message: "Missing required fields for schools contact",
+          },
+          { status: 400 },
+        );
+      }
+    } else if (body.type === "enterprise") {
+      if (
+        !body.role ||
+        !body.company ||
+        !body.sector ||
+        !body.employeeCount ||
+        !body.topics ||
+        body.topics.length === 0
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Missing required fields for enterprise contact",
           },
           { status: 400 },
         );

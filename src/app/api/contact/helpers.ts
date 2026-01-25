@@ -12,7 +12,7 @@ interface ContactFormData {
   name: string;
   email: string;
   type: "general" | "schools" | "enterprise";
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 }
 
 interface EmailResult {
@@ -25,7 +25,7 @@ interface EmailResult {
  */
 export function extractFormData(
   body: ContactFormData,
-): Record<string, string | undefined> {
+): Record<string, string | string[] | undefined> {
   const { name: _name, email: _email, type: _type, ...data } = body;
   return data;
 }
@@ -53,7 +53,7 @@ function formatEmailHtml(
   type: string,
   name: string,
   email: string,
-  data: Record<string, string | undefined>,
+  data: Record<string, string | string[] | undefined>,
 ): string {
   const typeLabel = getContactTypeLabel(type);
   const timestamp = new Date().toLocaleString("it-IT", {
@@ -131,18 +131,29 @@ function formatEmailHtml(
         }
     `;
   } else if (type === "enterprise") {
+    const topics = Array.isArray(data.topics)
+      ? data.topics.join(", ")
+      : data.topics || "N/A";
     html += `
         <div class="field">
+          <div class="label">Ruolo:</div>
+          <div class="value">${data.role || "N/A"}</div>
+        </div>
+        <div class="field">
           <div class="label">Azienda:</div>
-          <div class="value">${data.companyName || "N/A"}</div>
+          <div class="value">${data.company || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Settore:</div>
-          <div class="value">${data.industry || "N/A"}</div>
+          <div class="value">${data.sector || "N/A"}</div>
         </div>
         <div class="field">
           <div class="label">Dipendenti:</div>
-          <div class="value">${data.employees || "N/A"}</div>
+          <div class="value">${data.employeeCount || "N/A"}</div>
+        </div>
+        <div class="field">
+          <div class="label">Temi di interesse:</div>
+          <div class="value">${topics}</div>
         </div>
         ${
           data.message
@@ -176,7 +187,7 @@ export async function sendAdminNotification(
   type: string,
   name: string,
   email: string,
-  data: Record<string, string | undefined>,
+  data: Record<string, string | string[] | undefined>,
 ): Promise<EmailResult> {
   const adminEmail = process.env.ADMIN_EMAIL;
 
