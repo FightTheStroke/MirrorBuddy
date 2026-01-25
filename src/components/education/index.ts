@@ -13,6 +13,7 @@ export { HTMLSnippetsView } from "./html-snippets-view";
 export { ArchiveView } from "./archive-view";
 export { PdfInputMobile } from "./pdf-input-mobile";
 export { FormulaInputMobile } from "./formula-input-mobile";
+export { HomeworkAssistantMobile } from "./homework-assistant-mobile";
 
 // Lazy-loaded versions for performance
 export {
