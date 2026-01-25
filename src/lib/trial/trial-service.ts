@@ -1,11 +1,12 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
-
-// Re-export atomic operations for backward compatibility
-export {
+import {
   checkAndIncrementUsage,
   getTierLimitsForTrial,
 } from "./trial-atomic-operations";
+
+// Re-export atomic operations for backward compatibility
+export { checkAndIncrementUsage, getTierLimitsForTrial };
 
 // Available coaches from src/data/coaches/
 const COACHES = ["melissa", "laura"];
