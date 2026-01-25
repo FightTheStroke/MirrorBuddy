@@ -349,6 +349,11 @@ export const RATE_LIMITS = {
     maxRequests: 3,
     windowMs: 60 * 60 * 1000,
   },
+  /** Contact form submissions: 5 per hour (public endpoint, moderate) */
+  CONTACT_FORM: {
+    maxRequests: 5,
+    windowMs: 60 * 60 * 1000,
+  },
   /** COPPA verification: 5 per hour (email costs, strict) */
   COPPA: {
     maxRequests: 5,

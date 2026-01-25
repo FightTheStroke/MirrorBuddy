@@ -59,43 +59,50 @@ VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts
 
 ## Vercel Environment Validation
 
-**Before release**, validate production Vercel deployment is configured correctly (ADR 0067):
+**Before release**, validate production Vercel deployment is configured correctly (ADR 0063, 0067):
 
 ### Required Environment Variables
 
-| Variable                | Purpose                                         |
-| ----------------------- | ----------------------------------------------- |
-| `AZURE_OPENAI_KEY`      | Azure OpenAI API authentication                 |
-| `AZURE_OPENAI_ENDPOINT` | Azure OpenAI endpoint URL                       |
-| `DATABASE_URL`          | Production PostgreSQL connection string         |
-| `SUPABASE_CA_CERT`      | SSL certificate (base64-encoded) - **CRITICAL** |
-| `TOKEN_ENCRYPTION_KEY`  | AES-256-GCM encryption (32+ chars)              |
-| `ADMIN_EMAIL`           | Admin account email                             |
-| `RESEND_API_KEY`        | Email service API key                           |
+| Variable               | Purpose                                      |
+| ---------------------- | -------------------------------------------- |
+| `DATABASE_URL`         | Supabase pooler connection (?pgbouncer=true) |
+| `ADMIN_EMAIL`          | Admin account email                          |
+| `ADMIN_PASSWORD`       | Admin password (>= 8 chars)                  |
+| `SESSION_SECRET`       | 64-char hex for session signing              |
+| `CRON_SECRET`          | 64-char hex for cron auth                    |
+| `SUPABASE_CA_CERT`     | SSL cert (pipe-separated, NOT base64)        |
+| `AZURE_OPENAI_API_KEY` | Azure OpenAI authentication                  |
+| `TOKEN_ENCRYPTION_KEY` | 64-char hex for AES-256-GCM                  |
+| `RESEND_API_KEY`       | Email service API key                        |
 
-### SSL Certificate Setup
+### SSL Certificate Setup (CRITICAL)
 
-Production requires SSL validation (ADR 0067):
+**NEVER use base64**. Use pipe-separated format:
 
 ```bash
-# 1. Encode certificate for Vercel
-cat config/supabase-chain.pem | base64 | tr -d '\n'
+# Convert PEM to pipe-format for Vercel
+cat config/supabase-chain.pem | tr '\n' '|'
 
-# 2. Paste output into Vercel dashboard:
-#    Settings → Environment Variables → SUPABASE_CA_CERT
-
-# 3. Verify certificate validity
-openssl x509 -in config/supabase-chain.pem -text -noout
+# Paste output directly into Vercel env var SUPABASE_CA_CERT
 ```
+
+**NEVER use NODE_TLS_REJECT_UNAUTHORIZED=0** - this disables TLS globally for ALL connections (security nightmare).
+
+Our code uses per-connection `ssl: { rejectUnauthorized: false }` which:
+
+- ✅ Keeps TLS encryption active
+- ✅ Only affects database connection
+- ⚠️ Skips server cert verification (acceptable for Supabase managed service)
 
 ### Pre-Release Checklist
 
 - [ ] All env vars set in Vercel dashboard (Settings → Environment Variables)
-- [ ] SSL certificate `SUPABASE_CA_CERT` is base64-encoded and valid
+- [ ] SSL certificate `SUPABASE_CA_CERT` is pipe-separated (NOT base64)
+- [ ] No `NODE_TLS_REJECT_UNAUTHORIZED` in any env
 - [ ] `release-brutal.sh` passed (compliance, security, tests)
-- [ ] Database connection test succeeds (if available)
+- [ ] Health check returns "healthy": `curl https://mirrorbuddy.vercel.app/api/health`
 
-**Release BLOCKED if** any env var missing or SSL cert invalid.
+**Release BLOCKED if** any env var missing or health check fails.
 
 ## VERSION + RELEASE
 

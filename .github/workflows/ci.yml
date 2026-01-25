@@ -121,10 +121,53 @@ jobs:
 
       - name: Check for secrets
         run: |
+          echo "Scanning for API keys and secrets..."
+          FOUND=""
+
+          # OpenAI/Anthropic API keys
           if grep -rE "(sk-[a-zA-Z0-9]{32,}|AKIA[0-9A-Z]{16})" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
-            echo "Secrets found!" && exit 1
+            FOUND="$FOUND OpenAI/AWS"
+          fi
+
+          # Stripe keys
+          if grep -rE "sk_live_[a-zA-Z0-9]{24,}|sk_test_[a-zA-Z0-9]{24,}" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            FOUND="$FOUND Stripe"
+          fi
+
+          # Google OAuth secrets
+          if grep -rE "GOCSPX-[a-zA-Z0-9_-]{28,}" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            FOUND="$FOUND GoogleOAuth"
+          fi
+
+          # Grafana tokens
+          if grep -rE "glc_ey[a-zA-Z0-9_=-]{50,}" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            FOUND="$FOUND Grafana"
+          fi
+
+          # Resend API keys
+          if grep -rE "re_[a-zA-Z0-9]{20,}" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            FOUND="$FOUND Resend"
+          fi
+
+          # JWTs (likely hardcoded tokens)
+          if grep -rE "eyJhbGciOiJ[a-zA-Z0-9_=-]{100,}" --include="*.ts" --include="*.tsx" --exclude-dir=node_modules src/; then
+            FOUND="$FOUND JWT"
+          fi
+
+          if [ -n "$FOUND" ]; then
+            echo "BLOCKING: Secrets found! Types:$FOUND"
+            exit 1
           fi
           echo "No secrets detected"
+
+      - name: Check for exposed env files
+        run: |
+          # Check if any .env files are tracked (they shouldn't be)
+          if git ls-files | grep -E "^\.env$|^\.env\.local$|^\.env\.production$"; then
+            echo "BLOCKING: .env files are tracked in git!"
+            exit 1
+          fi
+          echo "No .env files tracked"
 
   # Lane 2b: LLM Safety Tests (critical - must always pass)
   llm-safety-tests:

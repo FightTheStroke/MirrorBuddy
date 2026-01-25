@@ -2,8 +2,31 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractFormData, sendAdminNotification } from "./helpers";
 import { logger } from "@/lib/logger";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 const log = logger.child({ module: "contact-api" });
+
+/**
+ * Validate email format using string parsing (ReDoS-safe alternative to regex)
+ * Checks: has exactly one @, local part non-empty, domain has dot, no spaces
+ */
+function isValidEmail(email: string): boolean {
+  if (!email || email.length > 254) return false;
+  const parts = email.split("@");
+  if (parts.length !== 2) return false;
+  const [local, domain] = parts;
+  return (
+    local.length > 0 &&
+    domain.length > 0 &&
+    domain.includes(".") &&
+    !email.includes(" ")
+  );
+}
 
 // Valid enum values for form fields (must match frontend constants)
 const VALID_SCHOOL_ROLES = ["dirigente", "docente", "segreteria", "altro"];
@@ -63,6 +86,19 @@ export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<ContactResponse>> {
   try {
+    // Rate limit contact form submissions (5 per hour - public endpoint)
+    const clientId = getClientIdentifier(request);
+    const rateLimitResult = await checkRateLimitAsync(
+      `contact:form:${clientId}`,
+      RATE_LIMITS.CONTACT_FORM,
+    );
+    if (!rateLimitResult.success) {
+      log.warn("Contact form rate limited", { clientId });
+      return rateLimitResponse(
+        rateLimitResult,
+      ) as NextResponse<ContactResponse>;
+    }
+
     const body = (await request.json()) as ContactRequest;
 
     // Validate required fields
@@ -104,10 +140,8 @@ export async function POST(
       }
     }
 
-    // Validate email format - using simple non-backtracking regex to avoid ReDoS
-    // Matches: local@domain.tld (basic validation, server-side)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(body.email) || body.email.length > 254) {
+    // Validate email format using string parsing (ReDoS-safe)
+    if (!isValidEmail(body.email)) {
       return NextResponse.json(
         { success: false, message: "Invalid email format" },
         { status: 400 },

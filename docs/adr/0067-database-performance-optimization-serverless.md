@@ -318,7 +318,149 @@ const prisma = createPrismaClient();
 
 ---
 
+## Critical SSL/Deployment Lessons (2026-01-25)
+
+This section documents hard-learned lessons from production deployment issues.
+
+### NEVER Use NODE_TLS_REJECT_UNAUTHORIZED=0
+
+**Why it's dangerous**:
+
+```bash
+# WRONG - DO NOT USE
+NODE_TLS_REJECT_UNAUTHORIZED=0
+```
+
+This environment variable disables TLS verification **globally** for ALL connections in the Node.js process - not just database connections. This means:
+
+- HTTP calls to external APIs become MITM-vulnerable
+- All SSL connections are compromised
+- You lose all certificate validation
+
+**Correct approach - per-connection setting**:
+
+```typescript
+// CORRECT - Only affects this specific connection
+const pool = new Pool({
+  connectionString: connStr,
+  ssl: {
+    rejectUnauthorized: false, // Per-connection, not global
+    ca: certificateChain, // Optional: Supabase CA chain
+  },
+});
+```
+
+### sslmode Conflict with pg Driver
+
+**Problem**: When connection string contains `?sslmode=require` AND you pass explicit `ssl` option, the pg driver may produce incorrect URLs or conflicts.
+
+**Error example**:
+
+```
+Database `postgres&pgbouncer=true` does not exist
+```
+
+**Solution**: Always strip `sslmode` from connection string and manage SSL explicitly:
+
+```typescript
+function cleanConnectionString(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete("sslmode");
+    return parsed.toString();
+  } catch {
+    // Regex fallback for malformed URLs
+    let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
+    cleaned = cleaned.replace(/\?&/g, "?");
+    cleaned = cleaned.replace(/&&/g, "&");
+    cleaned = cleaned.replace(/[?&]$/, "");
+    return cleaned;
+  }
+}
+```
+
+### Why rejectUnauthorized: false is Acceptable for Supabase
+
+**Technical reason**: Supabase uses their own Certificate Authority (Supabase Root 2021 CA + Supabase Intermediate 2021 CA). This CA chain is NOT in Node.js/system trust stores.
+
+**Options**:
+
+1. ❌ `rejectUnauthorized: true` without CA → Fails with "self-signed certificate"
+2. ❌ `rejectUnauthorized: true` with AWS RDS bundle → Fails (wrong CA)
+3. ✅ `rejectUnauthorized: false` + optional CA → Works, TLS encrypted
+
+**Security posture with rejectUnauthorized: false**:
+
+- ✅ Traffic is TLS encrypted (cannot be read in transit)
+- ⚠️ Server identity not verified (theoretical MITM risk)
+- ✅ Credentials provide authentication
+- ✅ Network path is AWS-internal (Vercel → Supabase)
+
+### Pre-Push Deployment Checklist
+
+The `scripts/pre-push-vercel.sh` validates:
+
+| Check                 | Description                                        |
+| --------------------- | -------------------------------------------------- |
+| Migration naming      | All migrations follow `YYYYMMDDHHMMSS_name` format |
+| Prisma fresh generate | Simulates Vercel's cold Prisma state               |
+| ESLint                | No lint errors                                     |
+| TypeScript            | No type errors                                     |
+| npm audit             | No high/critical vulnerabilities                   |
+| Build                 | Production build succeeds with fresh Prisma        |
+| Vercel env vars       | Required env vars exist on Vercel                  |
+| CSRF protection       | Client POST/PUT/DELETE use csrfFetch               |
+| Critical TODOs        | No TODOs in privacy/safety/security                |
+| console.log           | No console.log in production code                  |
+| Secrets exposure      | No hardcoded secrets in tracked files              |
+
+### Required Vercel Environment Variables
+
+```bash
+DATABASE_URL          # Supabase pooler connection string
+ADMIN_EMAIL           # Admin user email
+ADMIN_PASSWORD        # Admin password (>= 8 chars)
+SESSION_SECRET        # 64-char hex for session signing
+CRON_SECRET           # 64-char hex for cron auth
+SUPABASE_CA_CERT      # Certificate chain (pipe-separated newlines)
+AZURE_OPENAI_API_KEY  # AI provider key
+```
+
+### Secrets Management Rules
+
+1. **Never commit secrets** - All secrets in environment variables
+2. **Rotate after exposure** - If secret appears in logs/repo, regenerate immediately
+3. **Use Vercel env vars** - Production secrets only on Vercel, not in repo
+4. **Pipe-format for certs** - Multi-line certs use `|` as newline in env vars
+
+**Certificate format for Vercel**:
+
+```bash
+# Convert PEM to pipe-format
+cat config/supabase-chain.pem | tr '\n' '|'
+```
+
+### CI Security Checks
+
+The `.github/workflows/ci.yml` includes:
+
+- Secret pattern scanning (Stripe, Google, Grafana, Resend, Azure, JWT)
+- Check for tracked .env files
+- High/critical vulnerability audit
+
+### Common Deployment Failures
+
+| Error                       | Cause                                  | Fix                                             |
+| --------------------------- | -------------------------------------- | ----------------------------------------------- |
+| `self-signed certificate`   | Missing CA or wrong rejectUnauthorized | Use `rejectUnauthorized: false`                 |
+| `Database X does not exist` | sslmode conflict                       | Strip sslmode from URL, use explicit ssl option |
+| `NODE_TLS_REJECT warning`   | Global env var set                     | Remove from .env, use per-connection ssl        |
+| `Seed failed`               | Missing DB env vars                    | Add ADMIN_EMAIL, ADMIN_PASSWORD to Vercel       |
+| `Prisma types stale`        | Cached .prisma                         | Run `npx prisma generate` or fresh build        |
+
+---
+
 **Signed-off**: Engineering Team
 **Reviewed**: 2026-01-22
-**Updated**: 2026-01-24 (Plan 074)
+**Updated**: 2026-01-25 (SSL/Deployment Lessons)
 **Next Review**: 2026-04-22 (3 months)

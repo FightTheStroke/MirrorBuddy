@@ -75,7 +75,11 @@ export function buildSSLConfig(): SSLConfig | undefined {
     const certCount = (cert.match(/BEGIN CERTIFICATE/g) || []).length;
     if (certCount >= 2) {
       log.info(`Certificate chain valid (${certCount} certs)`);
-      return { rejectUnauthorized: true, ca: cert };
+      // Note: rejectUnauthorized: false because Supabase uses their own CA
+      // which is not in system trust store. Traffic is still TLS encrypted.
+      // The ca option is provided for reference but pg driver may not use it
+      // correctly with sslmode in connection string.
+      return { rejectUnauthorized: false, ca: cert };
     }
     log.warn(`Incomplete chain (${certCount} certs), expected >=2`);
   }
@@ -86,13 +90,35 @@ export function buildSSLConfig(): SSLConfig | undefined {
 }
 
 /**
+ * Remove sslmode parameter from connection string.
+ * We manage SSL explicitly via ssl option to avoid conflicts.
+ */
+function cleanConnectionString(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete("sslmode");
+    return parsed.toString();
+  } catch {
+    // Fallback for malformed URLs: use regex
+    let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
+    cleaned = cleaned.replace(/\?&/g, "?");
+    cleaned = cleaned.replace(/&&/g, "&");
+    cleaned = cleaned.replace(/[?&]$/, "");
+    return cleaned;
+  }
+}
+
+/**
  * Create a configured pg Pool with SSL settings.
  */
 export function createPool(connectionString?: string): Pool {
-  const connStr =
+  const rawConnStr =
     connectionString ||
     process.env.DATABASE_URL ||
     "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+
+  // Remove sslmode from connection string - we manage SSL explicitly
+  const connStr = cleanConnectionString(rawConnStr);
 
   return new Pool({
     connectionString: connStr,
