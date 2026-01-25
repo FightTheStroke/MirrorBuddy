@@ -3,10 +3,10 @@
  * @brief Empty state tips component
  */
 
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { Backpack } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { Backpack } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface EmptyStateTipsProps {
   show: boolean;
@@ -29,16 +29,15 @@ export function EmptyStateTips({ show }: EmptyStateTipsProps) {
         Il tuo Zaino è vuoto
       </h3>
       <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
-        Inizia a creare materiali di studio con i Maestri! Vai nell&apos;Astuccio
-        per scegliere uno strumento.
+        Inizia a creare materiali di studio con i Maestri! Vai
+        nell&apos;Astuccio per scegliere uno strumento.
       </p>
       <Button
-        onClick={() => router.push('/astuccio')}
-        className="bg-emerald-700 hover:bg-emerald-800 text-white"
+        onClick={() => router.push("/astuccio")}
+        className="!bg-emerald-700 hover:!bg-emerald-800 text-white"
       >
         Vai all&apos;Astuccio
       </Button>
     </motion.div>
   );
 }
-

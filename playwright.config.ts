@@ -131,6 +131,8 @@ export default defineConfig({
         "**/maestri-data.spec.ts", // Requires full UI rendering
         "**/trial-dashboard.spec.ts", // Requires proper trial state setup
         "**/test-data-cleanup.spec.ts", // Requires DB state
+        "**/tier-enforcement.spec.ts", // Requires tier seeding + /pricing page (Plan 073)
+        "**/admin-tiers.spec.ts", // Requires tier seeding (Plan 073)
         "**/mobile/**", // Mobile tests run in dedicated projects
       ],
     },
