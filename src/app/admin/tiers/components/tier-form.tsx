@@ -12,6 +12,7 @@ import { ToolsSection } from "./tools-section";
 import { MaestriSection } from "./maestri-section";
 import { CoachesSection } from "./coaches-section";
 import { BuddiesSection } from "./buddies-section";
+import { ModelsSection } from "./models-section";
 
 interface TierFormData {
   id?: string;
@@ -27,6 +28,16 @@ interface TierFormData {
   docsLimitTotal: number;
   chatModel: string;
   realtimeModel: string;
+  pdfModel: string;
+  mindmapModel: string;
+  quizModel: string;
+  flashcardsModel: string;
+  summaryModel: string;
+  formulaModel: string;
+  chartModel: string;
+  homeworkModel: string;
+  webcamModel: string;
+  demoModel: string;
   features: Record<string, unknown>;
   availableMaestri: string[];
   availableCoaches: string[];
@@ -56,6 +67,16 @@ export function TierForm({ tier }: TierFormProps) {
     docsLimitTotal: tier?.docsLimitTotal || 1,
     chatModel: tier?.chatModel || "gpt-4o-mini",
     realtimeModel: tier?.realtimeModel || "gpt-realtime-mini",
+    pdfModel: tier?.pdfModel || "gpt-4o-mini",
+    mindmapModel: tier?.mindmapModel || "gpt-4o-mini",
+    quizModel: tier?.quizModel || "gpt-4o-mini",
+    flashcardsModel: tier?.flashcardsModel || "gpt-4o-mini",
+    summaryModel: tier?.summaryModel || "gpt-4o-mini",
+    formulaModel: tier?.formulaModel || "gpt-4o-mini",
+    chartModel: tier?.chartModel || "gpt-4o-mini",
+    homeworkModel: tier?.homeworkModel || "gpt-4o-mini",
+    webcamModel: tier?.webcamModel || "gpt-4o-mini",
+    demoModel: tier?.demoModel || "gpt-4o-mini",
     features: tier?.features || {},
     availableMaestri: tier?.availableMaestri || [],
     availableCoaches: tier?.availableCoaches || [],
@@ -144,6 +165,24 @@ export function TierForm({ tier }: TierFormProps) {
           voiceMinutesDaily: formData.voiceMinutesDaily,
           toolsLimitDaily: formData.toolsLimitDaily,
           docsLimitTotal: formData.docsLimitTotal,
+        }}
+        onChange={updateFormData}
+      />
+
+      <ModelsSection
+        formData={{
+          chatModel: formData.chatModel,
+          realtimeModel: formData.realtimeModel,
+          pdfModel: formData.pdfModel,
+          mindmapModel: formData.mindmapModel,
+          quizModel: formData.quizModel,
+          flashcardsModel: formData.flashcardsModel,
+          summaryModel: formData.summaryModel,
+          formulaModel: formData.formulaModel,
+          chartModel: formData.chartModel,
+          homeworkModel: formData.homeworkModel,
+          webcamModel: formData.webcamModel,
+          demoModel: formData.demoModel,
         }}
         onChange={updateFormData}
       />

@@ -280,6 +280,9 @@ CREATE TABLE "ModelCatalog" (...);
 - [x] `src/lib/tools/handlers/formula-handler.ts` - Uses 'formula' feature
 - [x] `src/lib/tools/handlers/homework-handler.ts` - Uses 'homework' and 'webcam' features
 
-### Pending
+### Admin UI
 
-- [ ] Admin UI for model selection per tier
+- [x] `src/app/api/admin/models/route.ts` - API endpoint for ModelCatalog
+- [x] `src/app/admin/tiers/components/models-section.tsx` - Model selection UI
+- [x] Updated `tier-form.tsx` with all per-feature model fields
+- [x] Updated `[id]/edit/page.tsx` to pass model fields
