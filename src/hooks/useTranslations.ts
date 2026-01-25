@@ -55,12 +55,13 @@ export { useTranslations } from "next-intl";
  */
 export function formatMessage(
   message: string,
-  variables?: TranslationVariables
+  variables?: TranslationVariables,
 ): string {
   if (!variables) return message;
 
   let formatted = message;
   for (const [key, value] of Object.entries(variables)) {
+    // eslint-disable-next-line security/detect-non-literal-regexp
     formatted = formatted.replace(new RegExp(`{${key}}`, "g"), String(value));
   }
   return formatted;

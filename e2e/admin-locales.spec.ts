@@ -258,7 +258,7 @@ test.describe("Admin Locales Management", () => {
       // Mock POST request
       await adminPage.route("**/api/admin/locales", async (route) => {
         if (route.request().method() === "POST") {
-          const postData = route.request().postData();
+          const _postData = route.request().postData();
           await route.fulfill({
             status: 201,
             contentType: "application/json",

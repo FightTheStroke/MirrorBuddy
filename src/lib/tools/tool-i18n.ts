@@ -13,33 +13,33 @@
  * ```
  */
 
-import type { Locale } from '@/i18n/config';
-import { getTranslations } from 'next-intl/server';
+import type { Locale } from "@/i18n/config";
+import { getTranslations } from "next-intl/server";
 
 /**
  * Tool types that have translations available
  */
 export type TranslatableToolType =
-  | 'pdf'
-  | 'webcam'
-  | 'homework'
-  | 'studyKit'
-  | 'mindmap'
-  | 'quiz'
-  | 'flashcard'
-  | 'demo'
-  | 'summary'
-  | 'diagram'
-  | 'timeline'
-  | 'formula'
-  | 'chart'
-  | 'typing'
-  | 'search';
+  | "pdf"
+  | "webcam"
+  | "homework"
+  | "studyKit"
+  | "mindmap"
+  | "quiz"
+  | "flashcard"
+  | "demo"
+  | "summary"
+  | "diagram"
+  | "timeline"
+  | "formula"
+  | "chart"
+  | "typing"
+  | "search";
 
 /**
  * Tool category types
  */
-export type ToolCategory = 'upload' | 'create' | 'search';
+export type ToolCategory = "upload" | "create" | "search";
 
 /**
  * Get the localized label for a tool
@@ -50,9 +50,9 @@ export type ToolCategory = 'upload' | 'create' | 'search';
  */
 export async function getToolLabel(
   toolType: TranslatableToolType,
-  locale: Locale
+  locale: Locale,
 ): Promise<string> {
-  const t = await getTranslations({ locale, namespace: 'tools' });
+  const t = await getTranslations({ locale, namespace: "tools" });
   return t(`${toolType}.label`);
 }
 
@@ -65,9 +65,9 @@ export async function getToolLabel(
  */
 export async function getToolDescription(
   toolType: TranslatableToolType,
-  locale: Locale
+  locale: Locale,
 ): Promise<string> {
-  const t = await getTranslations({ locale, namespace: 'tools' });
+  const t = await getTranslations({ locale, namespace: "tools" });
   return t(`${toolType}.description`);
 }
 
@@ -80,9 +80,9 @@ export async function getToolDescription(
  */
 export async function getToolCategory(
   category: ToolCategory,
-  locale: Locale
+  locale: Locale,
 ): Promise<string> {
-  const t = await getTranslations({ locale, namespace: 'tools' });
+  const t = await getTranslations({ locale, namespace: "tools" });
   return t(`categories.${category}`);
 }
 
@@ -95,7 +95,7 @@ export async function getToolCategory(
  */
 export async function getToolConfig(
   toolType: TranslatableToolType,
-  locale: Locale
+  locale: Locale,
 ): Promise<{ label: string; description: string }> {
   const [label, description] = await Promise.all([
     getToolLabel(toolType, locale),
@@ -127,13 +127,13 @@ export function useToolTranslations() {
   // For now, use the async server-side functions above
 
   return {
-    getLabel: (toolType: TranslatableToolType) => {
+    getLabel: (_toolType: TranslatableToolType) => {
       // Placeholder - implement with useTranslations hook from next-intl
-      throw new Error('Use server-side getToolLabel for now');
+      throw new Error("Use server-side getToolLabel for now");
     },
-    getDescription: (toolType: TranslatableToolType) => {
+    getDescription: (_toolType: TranslatableToolType) => {
       // Placeholder - implement with useTranslations hook from next-intl
-      throw new Error('Use server-side getToolDescription for now');
+      throw new Error("Use server-side getToolDescription for now");
     },
   };
 }

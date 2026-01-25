@@ -25,14 +25,16 @@ test.describe("Locale Switching and Content Localization", () => {
 
     // Look for language selector in settings
     const languageSelector = localePage.page.locator(
-      '[data-testid="language-selector"], select[aria-label*="lingua"], [aria-label*="Lingua"]'
+      '[data-testid="language-selector"], select[aria-label*="lingua"], [aria-label*="Lingua"]',
     );
 
     // If language selector exists, switch to English
-    if (await languageSelector.isVisible({ timeout: 2000 }).catch(() => false)) {
+    if (
+      await languageSelector.isVisible({ timeout: 2000 }).catch(() => false)
+    ) {
       // Find and click English option
       const englishOption = localePage.page.locator(
-        'button:has-text("English"), option:has-text("English")'
+        'button:has-text("English"), option:has-text("English")',
       );
 
       if (await englishOption.isVisible({ timeout: 1000 }).catch(() => false)) {
@@ -84,7 +86,7 @@ test.describe("Locale Switching and Content Localization", () => {
     // Verify page is in correct locale
     const verification = await verifyPageLocale(
       localePage.page,
-      localePage.locale
+      localePage.locale,
     );
     expect(verification.isValid).toBeTruthy();
 
@@ -124,7 +126,7 @@ test.describe("Locale Switching and Content Localization", () => {
       // Verify locale persists
       const verification = await verifyPageLocale(
         localePage.page,
-        targetLocale
+        targetLocale,
       );
       expect(verification.isValid).toBeTruthy();
 
@@ -148,7 +150,7 @@ test.describe("Locale Switching and Content Localization", () => {
 
         // Verify URL contains locale
         expect(localePage.page.url()).toContain(`/${locale}/`);
-      }
+      },
     );
   });
 
@@ -159,11 +161,12 @@ test.describe("Locale Switching and Content Localization", () => {
   test("locale persists across navigation", async ({ localePage }) => {
     const targetLocale: Locale = "en";
 
-    await localePatterns.testLocalePersistence(
-      localePage.page,
-      targetLocale,
-      ["/home", "/chat", "/settings", "/home"]
-    );
+    await localePatterns.testLocalePersistence(localePage.page, targetLocale, [
+      "/home",
+      "/chat",
+      "/settings",
+      "/home",
+    ]);
   });
 
   /**
@@ -184,7 +187,7 @@ test.describe("Locale Switching and Content Localization", () => {
         localePage.page,
         from,
         to,
-        "/home"
+        "/home",
       );
     }
   });
@@ -284,11 +287,11 @@ test.describe("Locale Switching and Content Localization", () => {
 
     // Look for language-related controls
     const languageLabel = localePage.page.locator(
-      'label:has-text("Lingua"), label:has-text("Language"), [aria-label*="ingua"]'
+      'label:has-text("Lingua"), label:has-text("Language"), [aria-label*="ingua"]',
     );
 
     // Language selector should exist in settings
-    const hasLanguageControl = await languageLabel
+    const _hasLanguageControl = await languageLabel
       .isVisible({ timeout: 2000 })
       .catch(() => false);
 

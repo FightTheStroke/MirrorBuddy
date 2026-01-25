@@ -56,6 +56,7 @@ const containsItalian = (text) => {
   // Check for common Italian words
   for (const word of ITALIAN_COMMON_WORDS) {
     // Use word boundary that includes punctuation and end of string
+    // eslint-disable-next-line security/detect-non-literal-regexp
     const wordPattern = new RegExp(
       `(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`,
       "i"

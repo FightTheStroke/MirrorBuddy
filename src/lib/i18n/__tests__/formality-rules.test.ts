@@ -19,7 +19,6 @@ import {
   FORMAL_ADDRESS_SECTIONS,
   INFORMAL_ADDRESS_SECTIONS,
 } from "../formality-rules";
-import type { SupportedLanguage } from "@/app/api/chat/types";
 
 describe("Formality Rules Module - Core Tests", () => {
   describe("Character Classification", () => {

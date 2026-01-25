@@ -4,7 +4,6 @@
  * F-63: i18n can be enabled/disabled per environment
  */
 
-/* eslint-env node */
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { isI18nEnabled } from "../i18n-flags";
 

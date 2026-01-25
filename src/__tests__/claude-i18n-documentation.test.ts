@@ -8,7 +8,6 @@ import { describe, test, expect } from "vitest";
 import * as fs from "fs";
 import * as path from "path";
 
-// eslint-disable-next-line no-undef
 const claudeMdPath = path.join(process.cwd(), "CLAUDE.md");
 const claudeContent = fs.readFileSync(claudeMdPath, "utf-8");
 

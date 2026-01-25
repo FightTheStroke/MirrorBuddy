@@ -55,10 +55,10 @@ export function LocaleProvider({
       switchLocale: (newLocale: Locale) => {
         // Get current path without locale prefix
         const currentPath = window.location.pathname;
-        const pathWithoutLocale = currentPath.replace(
-          new RegExp(`^/(${locales.join("|")})`),
-          "",
-        );
+        // Static regex for locale prefix - locales are compile-time constant
+        // eslint-disable-next-line security/detect-non-literal-regexp
+        const localeRegex = new RegExp(`^/(${locales.join("|")})`);
+        const pathWithoutLocale = currentPath.replace(localeRegex, "");
 
         // Navigate to new locale path
         const newPath = `/${newLocale}${pathWithoutLocale || ""}`;
