@@ -274,9 +274,12 @@ CREATE TABLE "ModelCatalog" (...);
 - [x] `src/lib/tools/handlers/study-kit-generators/summary.ts`
 - [x] `src/lib/tools/handlers/study-kit-generators/demo.ts`
 
-### Pending (Progressive Migration)
+### Tool Handlers (Using getFeatureAIConfigForUser)
 
-- [ ] Update study-kit-handler to pass tier model to generators
-- [ ] `formula-handler.ts` - needs userId context for tier lookup
-- [ ] `homework-handler.ts` - needs userId context for tier lookup
+- [x] `src/lib/tools/handlers/study-kit-generators/process.ts` - Orchestrates generators with tier configs
+- [x] `src/lib/tools/handlers/formula-handler.ts` - Uses 'formula' feature
+- [x] `src/lib/tools/handlers/homework-handler.ts` - Uses 'homework' and 'webcam' features
+
+### Pending
+
 - [ ] Admin UI for model selection per tier
