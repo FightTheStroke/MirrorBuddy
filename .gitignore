@@ -99,6 +99,7 @@ audit-report.txt
 
 # Local analysis notes
 Plan20Jan.md
+25JanCodexPlan.md
 
 # Local database sync (machine-specific)
 scripts/sync-databases.sh
