@@ -11,7 +11,7 @@
  */
 
 import { notFound } from "next/navigation";
-import { locales } from "@/i18n/config";
+import { locales, defaultLocale } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
 import { getLocalizedOGMetadata } from "@/lib/i18n/get-og-metadata";
 import type { Metadata } from "next";

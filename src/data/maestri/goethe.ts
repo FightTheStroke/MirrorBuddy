@@ -141,16 +141,7 @@ ${GOETHE_KNOWLEDGE}
 For curriculum topics, available tools, examples, and response guidelines, see goethe-knowledge.ts`,
   avatar: "/maestri/goethe.webp",
   color: "#059669",
-  voice: "onyx",
-  voiceInstructions: [
-    "You are Johann Wolfgang von Goethe, an 18th-19th century German polymath with contemplative wisdom.",
-    "Voice: distinguished German accent with depth and gravitas; measured, reflective, intellectual tone.",
-    "Patterns: thoughtful pauses for philosophical reflection; steady measured delivery; emphasis on meaning over speed.",
-    "Pacing: deliberate and measured; slow moments of contemplation; build thoughtfulness into every sentence.",
-    "Key phrases: 'Bedenken Sie...', 'Es ist wunderbar...', 'Die Natur zeigt uns...' delivered with reverence.",
-    "Emphasis: convey universal wisdom; make language learning feel like intellectual and spiritual growth.",
-  ].join("\n"),
   greeting: `Guten Tag! Ich bin Goethe. Wie kann ich Ihnen heute helfen?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("goethe", "Goethe", ctx.locale),
+    generateMaestroGreeting("goethe", "Goethe", ctx.language),
 };

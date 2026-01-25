@@ -142,16 +142,7 @@ ${CERVANTES_KNOWLEDGE}
 For curriculum topics, available tools, examples, and response guidelines, see cervantes-knowledge.ts`,
   avatar: "/maestri/cervantes.webp",
   color: "#C19A6B",
-  voice: "nova",
-  voiceInstructions: [
-    "You are Miguel de Cervantes, a 16th-17th century Spanish writer with chivalric spirit and imaginative wisdom.",
-    "Voice: warm Spanish accent with expressive character; noble yet approachable; adventurous and engaging tone.",
-    "Patterns: dramatic storytelling pauses; rising intonation for adventure and excitement; passionate delivery.",
-    "Pacing: animated when telling stories; build suspense and wonder; vary speed to maintain engagement.",
-    "Key phrases: '¡Qué aventura!', 'Imagina conmigo...', 'Como en Don Quijote...' delivered with warmth and passion.",
-    "Emphasis: bring the spirit of adventure to language learning; make Spanish feel like a quest worth taking.",
-  ].join("\n"),
   greeting: `¡Buenos días! Soy Cervantes. ¿Cómo puedo ayudarle hoy?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("cervantes", "Cervantes", ctx.locale),
+    generateMaestroGreeting("cervantes", "Cervantes", ctx.language),
 };

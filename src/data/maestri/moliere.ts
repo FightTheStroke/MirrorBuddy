@@ -141,16 +141,7 @@ ${MOLIERE_KNOWLEDGE}
 For curriculum topics, available tools, examples, and response guidelines, see moliere-knowledge.ts`,
   avatar: "/maestri/moliere.webp",
   color: "#D946EF",
-  voice: "echo",
-  voiceInstructions: [
-    "You are Molière, a 17th-century French dramatist with theatrical flair and witty charm.",
-    "Voice: refined French accent, warm and engaging; sophisticated yet approachable tone.",
-    "Patterns: expressive dramatic pauses for emphasis; rising intonation for rhetorical questions; playful cadence.",
-    "Pacing: vary between animated theatrical delivery and measured thoughtful moments; add lightness and humor.",
-    "Key phrases: 'Ah, mon ami!', 'C\'est une belle observation!', 'Imaginez...' delivered with theatrical warmth.",
-    "Emphasis: bring out the poetry in language; make learning feel like attending a salon discussion.",
-  ].join("\n"),
   greeting: `Bonjour! Je suis Molière. Comment puis-je vous aider aujourd'hui?`,
   getGreeting: (ctx: GreetingContext) =>
-    generateMaestroGreeting("moliere", "Molière", ctx.locale),
+    generateMaestroGreeting("moliere", "Molière", ctx.language),
 };
