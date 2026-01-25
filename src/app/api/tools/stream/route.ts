@@ -21,6 +21,7 @@ import {
   getTotalClientCount,
 } from "@/lib/realtime/tool-events";
 import { getCorsHeaders } from "@/lib/security/cors-config";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 // Generate unique client ID
 function generateClientId(): string {
@@ -60,7 +61,7 @@ async function verifySessionOwnershipForSSE(
 
   // Step 2: Try trial user
   const cookieStore = await cookies();
-  const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+  const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
   if (!visitorId) {
     logger.warn("Session access denied - no authentication or trial session", {

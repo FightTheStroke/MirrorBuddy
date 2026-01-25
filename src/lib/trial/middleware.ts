@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { parse, serialize } from "cookie";
 import crypto from "crypto";
 import { logger } from "@/lib/logger";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 const log = logger.child({ module: "trial/middleware" });
 
@@ -31,13 +32,13 @@ function getOrCreateVisitorId(
   res: NextApiResponse,
 ): string {
   const cookies = parse(req.headers.cookie || "");
-  let visitorId = cookies["mirrorbuddy-visitor-id"];
+  let visitorId = cookies[VISITOR_COOKIE_NAME];
 
   if (!visitorId) {
     visitorId = crypto.randomUUID();
     res.setHeader(
       "Set-Cookie",
-      serialize("mirrorbuddy-visitor-id", visitorId, {
+      serialize(VISITOR_COOKIE_NAME, visitorId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",

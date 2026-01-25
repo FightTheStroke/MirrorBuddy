@@ -9,6 +9,10 @@ import { prisma, isDatabaseNotInitialized } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
+import {
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_CLIENT,
+} from "@/lib/auth/cookie-constants";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 import { assignBaseTierToNewUser } from "@/lib/tier/registration-helper";
 
@@ -64,7 +68,7 @@ export async function GET() {
     const cookieStore = await cookies();
 
     // Server-side auth cookie (httpOnly, signed)
-    cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
+    cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -73,7 +77,7 @@ export async function GET() {
     });
 
     // Client-readable cookie (for client-side userId access)
-    cookieStore.set("mirrorbuddy-user-id-client", user.id, {
+    cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

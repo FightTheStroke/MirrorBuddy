@@ -12,6 +12,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
+import {
+  AUTH_COOKIE_NAME,
+  VISITOR_COOKIE_NAME,
+} from "@/lib/auth/cookie-constants";
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,8 +24,8 @@ export async function POST(request: NextRequest) {
 
     // Get user identification from cookies
     const cookieStore = await cookies();
-    const userCookie = cookieStore.get("mirrorbuddy-user-id");
-    const visitorCookie = cookieStore.get("mirrorbuddy-visitor-id");
+    const userCookie = cookieStore.get(AUTH_COOKIE_NAME);
+    const visitorCookie = cookieStore.get(VISITOR_COOKIE_NAME);
 
     // Determine user type and identifier
     const isAuthenticated = !!userCookie?.value;

@@ -14,6 +14,7 @@ import {
   logDeletionAudit,
 } from "@/app/api/privacy/delete-my-data/helpers";
 import { cookies } from "next/headers";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 /**
  * GET /api/user/data - Export all user data (GDPR portability)
@@ -147,7 +148,7 @@ export async function DELETE(request: NextRequest) {
 
     // Clear user cookie
     const cookieStore = await cookies();
-    cookieStore.delete("mirrorbuddy-user-id");
+    cookieStore.delete(AUTH_COOKIE_NAME);
 
     return NextResponse.json(result);
   } catch (error) {

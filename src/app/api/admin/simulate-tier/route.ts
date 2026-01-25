@@ -14,8 +14,7 @@ import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import type { TierName } from "@/types/tier-types";
-
-const SIMULATED_TIER_COOKIE = "mirrorbuddy-simulated-tier";
+import { SIMULATED_TIER_COOKIE } from "@/lib/auth/cookie-constants";
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 /**

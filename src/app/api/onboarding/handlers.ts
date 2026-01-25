@@ -6,6 +6,10 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { CookieSigningError } from "@/lib/auth/cookie-signing";
+import {
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_CLIENT,
+} from "@/lib/auth/cookie-constants";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 import {
   COPPA_AGE_THRESHOLD,
@@ -113,7 +117,7 @@ export async function POST(
         const signedCookie = signCookieValue(user.id);
         const cookieStore = await cookies();
         // Server-side auth cookie (httpOnly, signed)
-        cookieStore.set("mirrorbuddy-user-id", signedCookie.signed, {
+        cookieStore.set(AUTH_COOKIE_NAME, signedCookie.signed, {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",
@@ -122,7 +126,7 @@ export async function POST(
         });
 
         // Client-readable cookie (for client-side userId access)
-        cookieStore.set("mirrorbuddy-user-id-client", user.id, {
+        cookieStore.set(AUTH_COOKIE_CLIENT, user.id, {
           httpOnly: false,
           secure: process.env.NODE_ENV === "production",
           sameSite: "lax",

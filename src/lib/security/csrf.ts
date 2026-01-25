@@ -1,5 +1,9 @@
 import { randomBytes, timingSafeEqual } from "crypto";
 import { NextRequest } from "next/server";
+import {
+  CSRF_TOKEN_COOKIE,
+  CSRF_TOKEN_HEADER,
+} from "@/lib/auth/cookie-constants";
 
 /**
  * CSRF Protection Utilities
@@ -14,15 +18,8 @@ import { NextRequest } from "next/server";
  * 4. Validate on mutating request: await validateCSRFToken(request)
  */
 
-/**
- * Header name for CSRF token
- */
-export const CSRF_TOKEN_HEADER = "x-csrf-token";
-
-/**
- * Cookie name for CSRF token (double-submit pattern)
- */
-export const CSRF_TOKEN_COOKIE = "csrf-token";
+// Re-export for backwards compatibility
+export { CSRF_TOKEN_COOKIE, CSRF_TOKEN_HEADER };
 
 /**
  * Generate a cryptographically secure CSRF token
@@ -44,7 +41,7 @@ export function generateCSRFToken(): string {
  */
 export function validateCSRFToken(
   request: NextRequest,
-  expectedToken: string
+  expectedToken: string,
 ): boolean {
   // Get token from header
   const headerToken = request.headers.get(CSRF_TOKEN_HEADER);

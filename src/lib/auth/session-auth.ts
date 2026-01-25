@@ -3,12 +3,18 @@
 // Reusable auth checks for API endpoints
 // Created for issues #83, #84, #85, #86
 // Updated for #013: Cryptographically signed session cookies
+// Updated for ADR 0075: Centralized cookie constants
 // ============================================================================
 
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { isSignedCookie, verifyCookieValue } from "@/lib/auth/cookie-signing";
+import {
+  AUTH_COOKIE_NAME,
+  LEGACY_AUTH_COOKIE,
+  ADMIN_COOKIE_NAME,
+} from "@/lib/auth/cookie-constants";
 
 export interface AuthResult {
   authenticated: boolean;
@@ -32,8 +38,8 @@ export async function validateAuth(): Promise<AuthResult> {
     const cookieStore = await cookies();
     // Check new cookie first, fallback to legacy cookie for existing users
     const cookieValue =
-      cookieStore.get("mirrorbuddy-user-id")?.value ||
-      cookieStore.get("convergio-user-id")?.value;
+      cookieStore.get(AUTH_COOKIE_NAME)?.value ||
+      cookieStore.get(LEGACY_AUTH_COOKIE)?.value;
 
     if (!cookieValue) {
       return {
@@ -83,8 +89,8 @@ export async function validateAuth(): Promise<AuthResult> {
         process.env.NODE_ENV !== "production"
       ) {
         // E2E/dev mode: auto-create test users
-        // Check if this is an admin session (indicated by mirrorbuddy-admin cookie)
-        const adminCookie = cookieStore.get("mirrorbuddy-admin");
+        // Check if this is an admin session (indicated by admin cookie)
+        const adminCookie = cookieStore.get(ADMIN_COOKIE_NAME);
         const isAdminSession = !!adminCookie;
 
         // Use try-catch to handle race conditions where concurrent requests

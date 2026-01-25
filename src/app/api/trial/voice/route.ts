@@ -16,6 +16,7 @@ import {
   TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 const log = logger.child({ module: "api/trial/voice" });
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
 
     // Get trial session
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
       return NextResponse.json({ error: "No trial session" }, { status: 400 });
@@ -114,7 +115,7 @@ export async function GET() {
 
     // Get trial session
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
       // No session yet - allow with full quota

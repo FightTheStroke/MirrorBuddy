@@ -17,6 +17,7 @@ import {
 } from "@/lib/trial/trial-service";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 const log = logger.child({ module: "api/user/usage" });
 
@@ -56,7 +57,7 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
 
     // Get or create visitor ID from cookie
     const cookieStore = await cookies();
-    let visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
       visitorId = crypto.randomUUID();

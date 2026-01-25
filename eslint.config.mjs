@@ -95,6 +95,51 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // ADR 0075: Block hardcoded cookie names - use constants from cookie-constants.ts
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "src/lib/auth/cookie-constants.ts", // Source of truth for cookie names
+      "src/lib/storage/migrate-session-key.ts", // sessionStorage migration, not cookies
+      "src/app/cookies/content.tsx", // Documentation page showing cookie names to users
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "Literal[value='mirrorbuddy-user-id']",
+          message: "Use AUTH_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='mirrorbuddy-user-id-client']",
+          message: "Use AUTH_COOKIE_CLIENT from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='mirrorbuddy-visitor-id']",
+          message: "Use VISITOR_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='mirrorbuddy-admin']",
+          message: "Use ADMIN_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='mirrorbuddy-simulated-tier']",
+          message: "Use SIMULATED_TIER_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='csrf-token']",
+          message: "Use CSRF_TOKEN_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='convergio-user-id']",
+          message: "Use LEGACY_AUTH_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+      ],
+    },
+  },
   // CSRF Protection: Enforce csrfFetch for client-side POST/PUT/DELETE requests
   // Only applies to client-side code (components, hooks, stores, client utils)
   // Excludes: API routes, AI providers, server utilities, scripts

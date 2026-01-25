@@ -14,6 +14,7 @@ import {
   validatePasswordStrength,
 } from "@/lib/auth/password";
 import { verifyCookieValue } from "@/lib/auth/cookie-signing";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import { requireCSRF } from "@/lib/security/csrf";
 import {
   checkRateLimitAsync,
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
   try {
     // Get user ID from signed cookie
     const cookieStore = await cookies();
-    const signedCookie = cookieStore.get("mirrorbuddy-user-id")?.value;
+    const signedCookie = cookieStore.get(AUTH_COOKIE_NAME)?.value;
 
     if (!signedCookie) {
       log.warn("Change password attempt: no session cookie");

@@ -5,14 +5,20 @@
 // 3. Injects nonce-based CSP headers for XSS protection (F-03)
 // 4. Tracks latency and errors for API routes (F-02, F-03)
 //
-// Next.js 16: middleware.ts renamed to proxy.ts
-// See: https://nextjs.org/docs/messages/middleware-to-proxy
+// Next.js 16: middleware.ts renamed to proxy.ts (December 2025)
+// - "Proxy" clarifies network boundary role (vs Express "middleware" confusion)
+// - Runs on Node.js runtime (not Edge) - more secure after CVE-2025-29927
+// See: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 // ============================================================================
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
 import { metricsStore } from "@/lib/observability/metrics-store";
+import {
+  AUTH_COOKIE_NAME,
+  VISITOR_COOKIE_NAME,
+} from "@/lib/auth/cookie-constants";
 
 const REQUEST_ID_HEADER = "x-request-id";
 const RESPONSE_TIME_HEADER = "x-response-time";
@@ -251,8 +257,8 @@ export function proxy(request: NextRequest) {
   // ==========================================================================
 
   // Check for authentication cookies
-  const userCookie = request.cookies.get("mirrorbuddy-user-id");
-  const visitorCookie = request.cookies.get("mirrorbuddy-visitor-id");
+  const userCookie = request.cookies.get(AUTH_COOKIE_NAME);
+  const visitorCookie = request.cookies.get(VISITOR_COOKIE_NAME);
   const isAuthenticated = !!userCookie?.value;
   // Validate visitor ID is a proper UUID v4 (prevents trivial forgery)
   const hasTrialSession = isValidVisitorId(visitorCookie?.value);

@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronUp, ChevronDown, LogIn, UserPlus, Shield } from "lucide-react";
+import { useRouter } from "next/navigation";
+import {
+  ChevronUp,
+  ChevronDown,
+  LogIn,
+  LogOut,
+  UserPlus,
+  Shield,
+} from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -53,11 +61,23 @@ export function HomeSidebar({
   onParentAccess,
   trialStatus,
 }: HomeSidebarProps) {
+  const router = useRouter();
   const { isAdmin } = useAdminStatus();
+
   const handleViewChange = async (view: View) => {
     await onViewChange(view);
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       onToggle();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/welcome");
+    } catch {
+      // Redirect anyway on error
+      router.push("/welcome");
     }
   };
 
@@ -291,6 +311,25 @@ export function HomeSidebar({
             </span>
             {open && <span>Area Genitori</span>}
           </button>
+
+          {/* Logout Button - only show for authenticated users (not trial) */}
+          {!trialStatus?.isTrialMode && (
+            <button
+              onClick={handleLogout}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
+                "bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/40",
+                "border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-700",
+                "text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400",
+                "text-sm font-medium transition-all duration-200",
+                "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
+              )}
+              aria-label="Esci"
+            >
+              <LogOut className="w-4 h-4" />
+              {open && <span>Esci</span>}
+            </button>
+          )}
         </div>
       </aside>
     </>

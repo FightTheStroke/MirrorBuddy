@@ -10,6 +10,7 @@ Modular rules auto-loaded on every Claude session.
 | api-patterns.md      | Next.js API routes, Prisma, error handling      |
 | coaches-buddies.md   | 6 coaches, 6 buddies, how to add new characters |
 | compliance.md        | EU AI Act, GDPR, COPPA, compliance pages        |
+| cookies.md           | Cookie constants, validateAuth, CSRF patterns   |
 | e2e-testing.md       | E2E test setup, wall bypass, CI debugging       |
 | maestri.md           | 20 AI tutors, data structure, voice integration |
 | operations.md        | Health endpoints, Grafana Cloud, runbooks       |

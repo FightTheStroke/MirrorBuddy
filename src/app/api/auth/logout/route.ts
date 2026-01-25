@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 const log = logger.child({ module: "api/auth/logout" });
 
@@ -8,7 +9,7 @@ export async function POST(_request: Request) {
     const cookieStore = await cookies();
 
     // Clear the session cookie
-    cookieStore.set("mirrorbuddy-user-id", "", {
+    cookieStore.set(AUTH_COOKIE_NAME, "", {
       maxAge: 0,
       expires: new Date(0),
       path: "/",

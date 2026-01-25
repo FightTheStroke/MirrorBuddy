@@ -5,6 +5,7 @@
 
 import { cookies, headers } from "next/headers";
 import { logger } from "@/lib/logger";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import {
   getOrCreateTrialSession,
   checkTrialLimits,
@@ -34,7 +35,7 @@ export async function getTrialSession(
   if (isAuthenticated) return null;
 
   const cookieStore = await cookies();
-  const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+  const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
   if (!visitorId) return null;
 
@@ -63,7 +64,7 @@ export async function checkTrialForAnonymous(
   try {
     // Get visitor ID from cookie
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     // No visitor cookie = no trial session yet = allow first access
     // Trial session will be created on /welcome before app access

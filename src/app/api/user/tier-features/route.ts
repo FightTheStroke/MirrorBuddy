@@ -28,8 +28,7 @@ import { tierService } from "@/lib/tier/tier-service";
 import { isAdmin } from "@/lib/auth/require-admin";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-
-const SIMULATED_TIER_COOKIE = "mirrorbuddy-simulated-tier";
+import { SIMULATED_TIER_COOKIE } from "@/lib/auth/cookie-constants";
 
 interface TierFeaturesResponse {
   tier: string;

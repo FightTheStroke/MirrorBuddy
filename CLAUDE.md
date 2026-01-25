@@ -40,7 +40,7 @@ npx lhci autorun     # Lighthouse CI (performance budgets)
 
 **Tier System** (`src/lib/tier/`): Three-tier subscription model (Trial/Base/Pro) with feature limits, usage tracking, and graceful fallbacks - ADR 0065. **TierService**: Determines effective user tier, validates subscriptions, caches configs. **Types** (`src/types/tier-types.ts`): TierName, TierLimits, TierFeatureConfig, TierPricing. **Admin UI** (`src/app/admin/tiers/`): Tier management, limits editor, analytics, conversion funnel, audit logs.
 
-**Auth** (`src/lib/auth/`): Session-based with `validateSessionAuth()`, admin via `ADMIN_EMAIL`
+**Auth** (`src/lib/auth/`): Session-based with `validateAuth()`, admin via `ADMIN_EMAIL` - Cookie constants in `cookie-constants.ts` (ADR 0075)
 
 **Key paths**: Types `src/types/index.ts` | Safety `src/lib/safety/` | FSRS `src/lib/education/fsrs.ts` | Maestros `src/data/maestri/` | PDF `src/lib/pdf-generator/`
 
@@ -75,7 +75,7 @@ npm run pre-push    # Full Vercel simulation (~60s)
 
 ## Modular Rules (auto-loaded)
 
-`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md | vercel-deployment.md
+`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md | vercel-deployment.md | tier.md | cookies.md
 
 ## On-Demand Docs
 

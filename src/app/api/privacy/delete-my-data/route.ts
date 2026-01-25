@@ -11,6 +11,7 @@ import { cookies as getCookies } from "next/headers";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import {
   executeUserDataDeletion,
   getUserDataSummary,
@@ -94,7 +95,7 @@ export async function POST(
 
     // Clear the user cookie
     const cookieStore = await getCookies();
-    cookieStore.delete("mirrorbuddy-user-id");
+    cookieStore.delete(AUTH_COOKIE_NAME);
 
     log.info("GDPR deletion completed", {
       userId: userId.slice(0, 8),

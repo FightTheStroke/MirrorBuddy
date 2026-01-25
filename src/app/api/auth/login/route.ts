@@ -4,6 +4,10 @@ import { logger } from "@/lib/logger";
 import { verifyPassword } from "@/lib/auth/password";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
 import {
+  AUTH_COOKIE_NAME,
+  AUTH_COOKIE_CLIENT,
+} from "@/lib/auth/cookie-constants";
+import {
   checkRateLimitAsync,
   getClientIdentifier,
   rateLimitResponse,
@@ -101,7 +105,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Server-side auth cookie (httpOnly, signed)
-    response.cookies.set("mirrorbuddy-user-id", signed.signed, {
+    response.cookies.set(AUTH_COOKIE_NAME, signed.signed, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -110,7 +114,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Client-readable cookie (for client-side userId access)
-    response.cookies.set("mirrorbuddy-user-id-client", user.id, {
+    response.cookies.set(AUTH_COOKIE_CLIENT, user.id, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

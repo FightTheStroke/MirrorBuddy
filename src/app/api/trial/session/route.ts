@@ -6,6 +6,7 @@ import {
 } from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 const log = logger.child({ module: "api/trial/session" });
 
@@ -28,7 +29,7 @@ export async function POST(_request: NextRequest) {
 
     // Get or create visitor ID from cookie
     const cookieStore = await cookies();
-    let visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
       visitorId = crypto.randomUUID();
@@ -73,8 +74,8 @@ export async function POST(_request: NextRequest) {
       assignedCoach: session.assignedCoach,
     });
 
-    if (!cookieStore.get("mirrorbuddy-visitor-id")) {
-      response.cookies.set("mirrorbuddy-visitor-id", visitorId, {
+    if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
+      response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -111,7 +112,7 @@ export async function GET() {
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     const cookieStore = await cookies();
-    const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+    const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
       return NextResponse.json({ hasSession: false });
