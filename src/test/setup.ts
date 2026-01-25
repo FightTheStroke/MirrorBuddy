@@ -44,3 +44,29 @@ if (typeof global.ResizeObserver === "undefined") {
     disconnect() {}
   };
 }
+
+// Polyfill Blob methods for jsdom environment
+if (typeof Blob !== "undefined") {
+  // Polyfill Blob.text() (needed for svg-generator tests)
+  if (!Blob.prototype.text) {
+    Blob.prototype.text = async function () {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsText(this);
+      });
+    };
+  }
+  // Polyfill Blob.arrayBuffer() (needed for storage tests)
+  if (!Blob.prototype.arrayBuffer) {
+    Blob.prototype.arrayBuffer = async function () {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as ArrayBuffer);
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(this);
+      });
+    };
+  }
+}
