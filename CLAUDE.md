@@ -119,7 +119,7 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
    ```
 2. **Type-check**: `npm run typecheck` (catches missing keys before commit)
 3. **Use in components**: `const t = useTranslations('namespace'); t('key', { var: value })`
-4. **Verify completeness**: `npm run i18n:validate` (ensures all 5 languages have identical structure)
+4. **Verify completeness**: `npm run i18n:check` (ensures all 5 languages have identical structure)
 
 ### Hook Patterns (Client vs Server)
 
@@ -162,7 +162,7 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 npm run dev                  # Run dev server
 # Switch languages: /it/chat → /en/chat → /fr/chat → /de/chat → /es/chat
 npm run typecheck            # Catches missing keys
-npm run i18n:validate        # Checks all 5 languages match structure
+npm run i18n:check        # Checks all 5 languages match structure
 ```
 
 **Pre-commit hook** (automatically runs):
@@ -222,6 +222,7 @@ See: `.claude/rules/maestri.md` | `docs/maestri/language-maestri.md`
 
 **Full documentation**:
 
+- i18n Guide: `docs/i18n/` (comprehensive setup, hooks, examples, migration)
 - Hooks & patterns: `src/i18n/README-LocaleProvider.md` | `.claude/rules/i18n.md`
 - Development workflow: `.claude/rules/i18n-development.md`
 - Adding professors: `docs/maestri/adding-professors.md`

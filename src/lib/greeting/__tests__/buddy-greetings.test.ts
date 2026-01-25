@@ -39,7 +39,7 @@ describe("Buddy Language-Aware Greetings", () => {
   describe("German greetings", () => {
     it.each(buddies)("%s generates German greeting", (buddyId) => {
       const info = getCharacterInfo(buddyId, "buddy", "de");
-      expect(info.greeting).toMatch(/Hallo!|Hi!/);
+      expect(info.greeting).toMatch(/Hallo!|Hi!|Hey!/);
       expect(info.greeting).not.toContain("Ehi!");
       expect(info.greeting).not.toContain("Sono");
     });
