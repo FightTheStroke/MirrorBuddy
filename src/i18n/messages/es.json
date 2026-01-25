@@ -383,236 +383,100 @@
     }
   },
   "settings": {
-    "title": "Settings",
-    "save": "Save",
-    "saving": "Saving...",
-    "saveChanges": "Save Changes",
-    "undo": "Undo",
-    "undoChanges": "Undo changes",
-    "tabs": {
-      "profile": "Profile",
-      "characters": "Characters",
-      "accessibility": "Accessibility",
-      "appearance": "Appearance",
-      "ai": "AI Provider",
-      "audio": "Audio/Video",
-      "ambientAudio": "Ambient Audio",
-      "integrations": "Integrations",
-      "notifications": "Notifications",
-      "telemetry": "Statistics",
-      "privacy": "Privacy",
-      "parents": "Parents",
-      "diagnostics": "Diagnostics"
+    "accessibility": {
+      "profilesTitle": "Perfiles de Accesibilidad",
+      "profilesDescription": "Selecciona uno o más perfiles para personalizar tu experiencia según tus necesidades.",
+      "activeFeatures": "Características activas:",
+      "customizeButton": "Personalizar configuración avanzada",
+      "dyslexia": "Dislexia",
+      "dyslexiaDesc": "Fuente OpenDyslexic, espaciado optimizado",
+      "adhd": "TDAH",
+      "adhdDesc": "Temporizador Pomodoro (25/5 min), modo de enfoque, notificaciones de pausa",
+      "visual": "Visual",
+      "visualDesc": "Alto contraste, texto grande",
+      "motor": "Motor",
+      "motorDesc": "Navegación por teclado, objetivos grandes",
+      "autism": "Autismo",
+      "autismDesc": "Diseños predecibles, menos estímulos",
+      "auditory": "Auditivo",
+      "auditoryDesc": "Comunicación visual, sin dependencia de audio",
+      "cerebralPalsy": "Parálisis Cerebral",
+      "cerebralPalsyDesc": "TTS, texto grande, teclado, espaciado extra"
     },
     "profile": {
-      "personalInfo": "Personal Information",
-      "name": "Name",
-      "namePlaceholder": "What's your name?",
-      "gradeLevel": "Education level",
-      "gradeLevelSelect": "Select...",
-      "gradeLevelPrimary": "Primary School (6-10 years)",
-      "gradeLevelMiddle": "Middle School (11-13 years)",
-      "gradeLevelHigh": "High School (14-18 years)",
-      "gradeLevelUniversity": "University",
-      "gradeLevelAdult": "Continuing Education",
-      "teachingStyle": "Professors' Style",
-      "teachingStyleDescription": "Choose how you want professors to talk to you and correct you",
-      "feedbackExample": "Feedback example:",
-      "adaptiveDifficulty": "Adaptive Difficulty",
-      "adaptiveDifficultyDescription": "Professors adapt difficulty and explanations based on signals like questions, response times, and need for repetitions.",
-      "introduction": "Introduction",
-      "introductionDescription": "Review the introduction to MirrorBuddy and discover all available features.",
-      "reviewIntroduction": "Review introduction",
-      "teachingStyles": {
-        "superEncouraging": "Super Encouraging",
-        "superEncouragingDesc": "Always positive, celebrates every small progress",
-        "superEncouragingFeedback": "Fantastic! You're doing great! Every mistake is a step towards success!",
-        "encouraging": "Encouraging",
-        "encouragingDesc": "Supportive and patient, focus on the positive",
-        "encouragingFeedback": "Great work! You're almost right, try to think for a moment...",
-        "balanced": "Balanced",
-        "balancedDesc": "Balanced mix of praise and constructive corrections",
-        "balancedFeedback": "Good attempt. There's an error here - review the concept and try again.",
-        "strict": "Strict",
-        "strictDesc": "Demanding but fair, high expectations",
-        "strictFeedback": "Wrong. You skipped a fundamental step. Go back and redo it.",
-        "brutal": "Brutal",
-        "brutalDesc": "Direct and unfiltered, constant challenge",
-        "brutalFeedback": "No. Completely wrong. You need to study more, this isn't working."
-      },
-      "adaptiveModes": {
-        "manual": "Manual",
-        "manualDesc": "Only suggestions, professor asks for confirmation",
-        "guided": "Guided",
-        "guidedDesc": "Small adjustments with clear warnings",
-        "balanced": "Balanced",
-        "balancedDesc": "Adapts pace and difficulty while maintaining stability",
-        "automatic": "Automatic",
-        "automaticDesc": "Complete real-time adaptation"
-      }
+      "personalInfoTitle": "Información Personal",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "¿Cuál es tu nombre?",
+      "gradeLevelLabel": "Nivel de Educación",
+      "teachingStyleTitle": "Estilo del Profesor",
+      "teachingStyleDescription": "Elige cómo quieres que los profesores te hablen y te corrijan",
+      "feedbackExampleTitle": "Ejemplo de retroalimentación:",
+      "adaptiveDifficultyTitle": "Dificultad Adaptativa",
+      "adaptiveDifficultyDescription": "Los profesores adaptan la dificultad y las explicaciones en función de señales como preguntas, tiempos de respuesta y necesidad de repetición.",
+      "manualMode": "Manual",
+      "manualModeDesc": "Solo sugerencias, el profesor pide confirmación",
+      "guidedMode": "Guiado",
+      "guidedModeDesc": "Pequeños ajustes con alertas claras",
+      "balancedMode": "Equilibrado",
+      "balancedModeDesc": "Adapta el ritmo y la dificultad manteniendo la estabilidad",
+      "automaticMode": "Automático",
+      "automaticModeDesc": "Adaptación completa en tiempo real",
+      "introductionTitle": "Introducción",
+      "introductionDescription": "Repasa la introducción a MirrorBuddy y descubre todas las características disponibles.",
+      "reviewIntroductionButton": "Repasa introducción",
+      "feedbackSuperEncouraging": "¡Fantástico! ¡Lo estás haciendo muy bien! ¡Cada error es un paso hacia el éxito!",
+      "feedbackEncouraging": "¡Excelente trabajo! ¡Casi aciertas, piensa un momento...",
+      "feedbackBalanced": "Buen intento. Hay un error aquí - repasa el concepto e intenta de nuevo.",
+      "feedbackStrict": "Incorrecto. Te saltaste un paso fundamental. Vuelve atrás y hazlo de nuevo.",
+      "feedbackBrutal": "No. Completamente incorrecto. Necesitas estudiar más, no llegamos ni cerca."
     },
     "appearance": {
-      "theme": "Theme",
-      "themeLight": "Light",
-      "themeDark": "Dark",
-      "themeSystem": "System",
-      "themeCurrent": "Current theme: {theme} (based on system preferences)",
-      "themeCurrentDark": "Dark",
-      "themeCurrentLight": "Light",
-      "accentColor": "Primary Color",
-      "accentColors": {
-        "blue": "Blue",
-        "green": "Green",
-        "purple": "Purple",
-        "orange": "Orange",
-        "pink": "Pink"
-      },
-      "language": "Language",
-      "languageDescription": "Select the language professors will speak to you"
+      "themeTitle": "Tema",
+      "lightTheme": "Claro",
+      "darkTheme": "Oscuro",
+      "systemTheme": "Sistema",
+      "currentThemeInfo": "Tema actual: {theme} (basado en preferencias del sistema)",
+      "accentColorTitle": "Color de Acento",
+      "blue": "Azul",
+      "green": "Verde",
+      "purple": "Púrpura",
+      "orange": "Naranja",
+      "pink": "Rosa",
+      "languageTitle": "Idioma",
+      "languageDescription": "Selecciona el idioma en el que los profesores te hablarán",
+      "italian": "Italiano",
+      "english": "English",
+      "spanish": "Español",
+      "french": "Français",
+      "german": "Deutsch"
     },
-    "accessibility": {
-      "profiles": "Accessibility Profiles",
-      "profilesDescription": "Select one or more profiles to personalize the experience based on your needs.",
-      "activeFeatures": "Active features:",
-      "customizeAdvanced": "Customize advanced settings",
-      "dyslexia": "Dyslexia",
-      "dyslexiaDesc": "OpenDyslexic font, optimized spacing",
-      "adhd": "ADHD",
-      "adhdDesc": "Pomodoro timer (25/5 min), focus mode, break notifications",
-      "visual": "Visual",
-      "visualDesc": "High contrast, large text",
-      "motor": "Motor",
-      "motorDesc": "Keyboard navigation, large targets",
-      "autism": "Autism",
-      "autismDesc": "Predictable layouts, fewer stimuli",
-      "auditory": "Auditory",
-      "auditoryDesc": "Visual communication, no audio dependency",
-      "cerebralPalsy": "Cerebral Palsy",
-      "cerebralPalsyDesc": "TTS, large text, keyboard, extra spacing",
-      "features": {
-        "dyslexiaFont": "Dyslexia font",
-        "highContrast": "High contrast",
-        "largeText": "Large text",
-        "tts": "Text-to-speech",
-        "adhdMode": "ADHD mode",
-        "reducedMotion": "Reduced animations",
-        "keyboardNav": "Keyboard navigation"
-      }
-    },
-    "notifications": {
-      "title": "Notifications",
-      "types": "Notification types",
-      "enable": "Enable notifications",
-      "enableDescription": "Enable or disable all notifications",
-      "push": "Push notifications",
-      "pushGranted": "Receive notifications even when the app is closed",
-      "pushDenied": "Permission denied - check browser settings",
-      "pushDefault": "Enable browser push notifications",
-      "pushEnable": "Enable",
-      "studyReminders": "Study reminders",
-      "studyRemindersDesc": "Notifications to keep you motivated",
-      "breakReminders": "Break reminders",
-      "breakRemindersDesc": "Periodic reminders for breaks (ADHD)",
-      "achievements": "Achievements",
-      "achievementsDesc": "When you unlock new achievements",
-      "weeklyProgress": "Weekly progress",
-      "weeklyProgressDesc": "Weekly summary of activities",
-      "inApp": "In-app notifications",
-      "inAppDesc": "Visual notifications within the app",
-      "sound": "Sound",
-      "soundDesc": "Sound for notifications",
-      "streaks": "Streak alerts",
-      "streaksDesc": "Notification when you risk losing your streak",
-      "levelUp": "Level ups",
-      "levelUpDesc": "Notification when you level up",
-      "sessionEnd": "Session end",
-      "sessionEndDesc": "Summary at the end of study session",
-      "email": "Email notifications",
-      "emailDesc": "Receive summary emails"
+    "notification": {
+      "title": "Notificaciones"
     },
     "privacy": {
-      "account": "Account",
-      "accountInfo": "Your account information",
-      "logout": "Logout",
-      "loggingOut": "Logging out...",
-      "dataControl": "Data Control",
-      "dataControlDescription": "Manage your data and privacy preferences",
-      "reviewConsents": "Review consents",
-      "reviewConsentsDescription": "Modify cookie and privacy preferences",
-      "analytics": "Anonymous analytics",
-      "analyticsDescription": "Help us improve MirrorBuddy with anonymous usage data",
-      "version": "Version",
-      "versionInfo": "Version {version}",
-      "buildTime": "Built on {time}",
-      "environment": "Environment: {env}",
-      "legal": {
-        "title": "Legal",
-        "privacy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "cookies": "Cookie Policy",
-        "aiTransparency": "AI Transparency"
-      }
+      "title": "Privacidad"
     },
-    "parents": {
-      "title": "Parents Area",
-      "description": "Access the parent dashboard to monitor your child's progress and activities safely and respectfully of privacy (GDPR).",
-      "consentRequired": "Consent required:",
-      "consentDescription": "The parent dashboard requires consent from both the parent and the student to comply with GDPR regulations on minor data protection.",
-      "openDashboard": "Open Parent Dashboard"
-    },
-    "integrations": {
-      "title": "Integrations",
-      "googleDrive": "Google Drive",
-      "googleDriveDescription": "Connect your Google account to save materials"
-    },
-    "audio": {
-      "title": "Audio/Video Settings",
-      "microphone": "Microphone",
-      "microphoneSelect": "Select microphone",
-      "microphoneTest": "Test microphone",
-      "speaker": "Speaker",
-      "speakerSelect": "Select speaker",
-      "speakerTest": "Test speaker",
-      "camera": "Camera",
-      "cameraSelect": "Select camera",
-      "cameraTest": "Test camera",
-      "volume": "Volume",
-      "permissions": "Permissions",
-      "permissionsDescription": "Grant microphone and camera permissions to use voice features"
-    },
-    "ambientAudio": {
-      "title": "Ambient Audio",
-      "description": "Background sounds to help concentration",
-      "enable": "Enable ambient audio",
-      "volume": "Volume",
-      "sounds": {
-        "rain": "Rain",
-        "forest": "Forest",
-        "ocean": "Ocean",
-        "cafe": "Café",
-        "library": "Library"
-      }
-    },
-    "ai": {
-      "title": "AI Provider",
-      "provider": "Provider",
-      "providerDescription": "Select AI service provider",
-      "azure": "Azure OpenAI",
-      "ollama": "Ollama (Local)",
-      "status": "Status",
-      "connected": "Connected",
-      "disconnected": "Disconnected",
-      "testing": "Testing...",
-      "costs": "Costs",
-      "costsDescription": "Estimated usage costs"
-    },
-    "diagnostics": {
-      "title": "Diagnostics",
-      "description": "Test audio, video, and chat features",
-      "runTests": "Run tests",
-      "testResults": "Test results",
-      "allPassed": "All tests passed",
-      "someFailed": "Some tests failed"
+    "aiProvider": {
+      "noProviderConfigured": "Ningún proveedor configurado",
+      "configureAzureOpenAI": "Configure Azure OpenAI en el archivo .env o ejecute Ollama localmente.",
+      "costConfigurationTitle": "Configuración de Costos Azure",
+      "voiceFunctionalityTitle": "Funcionalidad de Voz",
+      "voiceAvailable": "Voz disponible",
+      "voiceNotAvailable": "Voz no disponible",
+      "realtimeRequirement": "Las conversaciones de voz requieren Azure OpenAI Realtime.",
+      "webSearchTitle": "Búsqueda Web",
+      "webSearchActive": "Búsqueda Web activa",
+      "webSearchLimited": "Búsqueda Web limitada",
+      "wikipediaSource": "Los profesores utilizan Wikipedia como fuente. Para noticias e información actualizada, configure Brave Search.",
+      "selectProvider": "Haz clic para seleccionar tu proveedor preferido:",
+      "configured": "Configurado",
+      "notConfigured": "No configurado",
+      "active": "Activo:",
+      "running": "En ejecución",
+      "notActive": "Inactivo",
+      "selectionMode": "Modo de selección:",
+      "automatic": "Automático",
+      "resetAuto": "Restablecer a Auto"
     }
   },
   "astuccio": {
@@ -673,11 +537,32 @@
   "tools": {
     "pdf": {
       "label": "Cargar PDF",
-      "description": "Carga un documento PDF y genera automáticamente materiales de estudio"
+      "description": "Carga un documento PDF y genera automáticamente materiales de estudio",
+      "preview": {
+        "processing": "Procesando PDF...",
+        "close": "Cerrar",
+        "page": "Página",
+        "pages": "Páginas",
+        "selected-count": "{count, plural, one {1 página} other {{count} páginas}} seleccionada(s)",
+        "click-to-select": "(haz clic para seleccionar/deseleccionar)",
+        "cancel": "Cancelar",
+        "analyze": "Analizar",
+        "analyze-pages": "{count, plural, one {página} other {{count} páginas}}",
+        "truncated-info": "primeras mostradas",
+        "processing-error": "Error al procesar PDF."
+      }
     },
     "webcam": {
-      "label": "Tomar Foto",
-      "description": "Fotografía la pizarra o tus apuntes para generar materiales"
+      "inProgress": "En Progreso...",
+      "takePhoto": "Tomar Foto",
+      "retake": "Repetir",
+      "confirm": "Confirmar",
+      "loading": "Iniciando cámara...",
+      "capturedPhoto": "Foto Capturada",
+      "switching": "Cambiando cámara...",
+      "cancel": "Cancelar",
+      "changCamera": "Cambiar Cámara",
+      "positioning": "Posiciona el contenido en el marco"
     },
     "homework": {
       "label": "Ayuda con Tareas",
@@ -704,8 +589,29 @@
       "description": "Explora conceptos STEM con simulaciones interactivas"
     },
     "summary": {
-      "label": "Resumen",
-      "description": "Genera síntesis claras y estructuradas de conceptos clave"
+      "save": "Guardar",
+      "saved": "Guardado",
+      "exportPdf": "Exportar como PDF",
+      "convertToMindmap": "Convertir a Mapa Mental",
+      "generateFlashcards": "Generar Tarjetas de Puntos Clave",
+      "titlePlaceholder": "Título del Resumen...",
+      "wordCount": "{count} {count, plural, one {palabra} other {palabras}}",
+      "unsaved": "No Guardado",
+      "structure": "Estructura",
+      "edit": "Escribir",
+      "preview": "Vista Previa",
+      "writeHere": "Empieza a escribir aquí...",
+      "emptyContent": "Sin contenido aún. ¡Empieza a escribir!",
+      "toggleSidebar": "Ocultar",
+      "showSidebar": "Mostrar",
+      "commentsUnresolved": "{count} comentarios para leer (ver vista previa)",
+      "commentsResolved": "Todos los comentarios resueltos",
+      "incomplete": "Para completar",
+      "goodStart": "¡Buen comienzo! Continúa...",
+      "doingWell": "¡Te está yendo bien!",
+      "congratulations": "¡Felicidades!",
+      "word": "palabra",
+      "words": "palabras"
     },
     "diagram": {
       "label": "Diagrama",
@@ -724,12 +630,212 @@
       "description": "Crea gráficos y visualizaciones para datos y estadísticas"
     },
     "typing": {
-      "label": "Aprender a Escribir",
-      "description": "Aprende a escribir con lecciones progresivas y accesibilidad DSA"
+      "title": "Aprende a Escribir",
+      "description": "La herramienta \"Aprende a Escribir\" está en desarrollo.",
+      "features": "Características",
+      "recommendedLesson": "Lección recomendada:",
+      "noLesson": "Ninguna",
+      "level": "Nivel:"
     },
     "search": {
-      "label": "Búsqueda Web",
-      "description": "Busca información, videos y recursos educativos en la web"
+      "noResults": "No se encontraron resultados para \"{query}\"",
+      "resultCount": "{count} resultados para \"{query}\"",
+      "wikiOnly": "Solo Wikipedia"
+    },
+    "markmap": {
+      "error": "Error:",
+      "accessibility": {
+        "title": "Modo de accesibilidad",
+        "ariaLabel": "Activar/desactivar modo de accesibilidad"
+      },
+      "resetView": {
+        "title": "Reiniciar vista",
+        "ariaLabel": "Reiniciar vista"
+      },
+      "zoomOut": {
+        "title": "Alejar",
+        "ariaLabel": "Alejar"
+      },
+      "zoomIn": {
+        "title": "Acercar",
+        "ariaLabel": "Acercar"
+      },
+      "fullscreen": {
+        "enter": "Pantalla completa",
+        "exit": "Salir de pantalla completa",
+        "ariaLabelEnter": "Pantalla completa",
+        "ariaLabelExit": "Salir de pantalla completa"
+      },
+      "download": {
+        "title": "Descargar PNG",
+        "ariaLabel": "Descargar mapa mental como PNG"
+      },
+      "print": {
+        "title": "Imprimir",
+        "ariaLabel": "Imprimir mapa mental"
+      },
+      "mindmapDescription": "Mapa mental: {title}",
+      "interactiveMindmapDescription": "Mapa mental interactivo: {title}",
+      "instructions": "Arrastra para mover • Desplazamiento/pellizco para ampliar • Haz clic en los nodos para expandir/contraer",
+      "successMessage": "Mapa mental \"{title}\" renderizado correctamente.",
+      "interactiveRenderMessage": "Mapa mental \"{title}\" renderizado con {count} nodos."
+    },
+    "connection": {
+      "connected": "Conectado - edición por voz activa",
+      "connecting": "Conectando...",
+      "reconnecting": "Reconectando...",
+      "error": "Conexión fallida",
+      "disconnected": "Desconectado"
+    },
+    "toolPanel": {
+      "buildingTool": "Construyendo...",
+      "expand": "Expandir",
+      "minimize": "Minimizar",
+      "close": "Cerrar",
+      "errorCreating": "Error al crear la herramienta",
+      "unsupportedTool": "Tipo de herramienta no soportado: {type}",
+      "percentComplete": "{percent}% Completado..."
+    },
+    "loading": {
+      "preparing": "Preparando...",
+      "receivedChunks": "Recibidos {count} fragmentos",
+      "loadingData": "Cargando datos...",
+      "loadingMaterial": "Cargando material...",
+      "buildCancelled": "Construcción cancelada",
+      "errorOccurred": "Ocurrió un error"
+    }
+  },
+  "education": {
+    "tools": {
+      "mindmap": "Mapa Mental",
+      "quiz": "Quiz",
+      "flashcard": "Tarjetas",
+      "summary": "Resumen",
+      "demo": "Demo Interactiva",
+      "diagram": "Diagrama",
+      "timeline": "Cronología",
+      "formula": "Fórmula",
+      "calculator": "Calculadora",
+      "chart": "Gráfico",
+      "search": "Búsqueda",
+      "webcam": "Foto",
+      "pdf": "PDF",
+      "homework": "Deberes",
+      "typing": "Aprender a Escribir",
+      "study-kit": "Kit de Estudio"
+    },
+    "quiz": {
+      "title": "Quiz",
+      "subtitle": "Prueba tu conocimiento y gana XP",
+      "createWithProfessor": "Crear Quiz con un Profesor",
+      "completed": "{count} completados",
+      "loading": "Cargando quiz guardados...",
+      "yourQuizzes": "Tus Quiz",
+      "sampleQuizzes": "Quiz de Ejemplo",
+      "completed-badge": "Completado",
+      "start-button": "Iniciar Quiz",
+      "delete-confirm": "¿Estás seguro de que quieres eliminar este quiz?",
+      "delete-button": "Eliminar quiz",
+      "questions-count": "{count} preguntas",
+      "created": "Creado el {date}",
+      "comingSoon": "¡Más quiz próximamente!",
+      "comingSoonMessage": "Tus Profesores están preparando nuevos quiz para cada materia. ¡Estudia con ellos y los quiz se adaptarán a tu progreso!"
+    },
+    "quizReview": {
+      "loadingSuggestions": "Cargando sugerencias...",
+      "failedSuggestions": "No se pudieron cargar las sugerencias de repaso",
+      "suggestionsTitle": "Sugerencias de Repaso",
+      "suggestionsText": "Tu puntuación está por debajo del 60%. Te recomendamos repasar estos temas:",
+      "highPriority": "Prioridad Alta",
+      "suggestedMaterials": "Materiales Sugeridos:",
+      "needsReview": "Necesitas repasar {topic}",
+      "reviewText": "¡Repasa estos temas e intenta el quiz de nuevo para mejorar tu puntuación!"
+    },
+    "toolSelection": {
+      "chooseSubject": "Crear {tool} - Elegir Materia",
+      "chooseProfessor": "Crear {tool} - Elegir Profesor",
+      "back": "Atrás",
+      "close": "Cerrar"
+    },
+    "learning-path": {
+      "loading-path": "Cargando ruta de aprendizaje...",
+      "path-not-found": "Ruta de aprendizaje no encontrada",
+      "back": "Atrás",
+      "topics": "temas",
+      "continue-with": "Continuar con",
+      "next-topic": "Siguiente tema",
+      "continue": "Continuar",
+      "start": "Comenzar",
+      "topics-header": "Temas",
+      "loading-paths": "Cargando rutas de aprendizaje...",
+      "no-paths-created": "No hay rutas de aprendizaje creadas",
+      "no-paths-description": "¡Carga un PDF en Study Kit y genera tu primera ruta de aprendizaje progresivo!",
+      "go-to-study-kit": "Ir a Study Kit",
+      "path-singular": "ruta",
+      "path-plural": "rutas",
+      "learning-paths": "aprendizaje",
+      "completed-topics": "temas",
+      "status-completed": "Completado",
+      "status-in-progress": "En progreso",
+      "status-not-started": "No comenzado",
+      "loading-topic": "Cargando tema...",
+      "topic-not-found": "Tema no encontrado",
+      "steps-completed": "pasos completados",
+      "progress": "Progreso",
+      "key-concepts": "Conceptos clave",
+      "steps": "Pasos",
+      "no-steps-available": "No hay pasos disponibles para este tema"
+    },
+    "flashcards": {
+      "title": "Tarjetas de aprendizaje",
+      "fsrsDescription": "Sistema de repetición espaciada FSRS-5",
+      "createWithProfessor": "Crear con un Profesor",
+      "manualMode": "Modo manual",
+      "loading": "Cargando...",
+      "emptyState": "Ningún mazo creado",
+      "emptyStateDescription": "Crea tu primer mazo de tarjetas de aprendizaje para comenzar a estudiar",
+      "createDeckButton": "Crear mazo",
+      "editDeckTitle": "Editar mazo",
+      "newDeckTitle": "Nuevo mazo",
+      "deckNameLabel": "Nombre del mazo",
+      "deckNamePlaceholder": "Ej: Verbos irregulares en inglés",
+      "subjectLabel": "Asignatura",
+      "cardsLabel": "Tarjetas ({count})",
+      "cardFrontPlaceholder": "Pregunta (frente)",
+      "cardBackPlaceholder": "Respuesta (reverso)",
+      "addCardButton": "Agregar tarjeta",
+      "cancelButton": "Cancelar",
+      "saveButton": "Guardar"
+    },
+    "calendar": {
+      "title": "Calendario",
+      "newEvent": "Nuevo evento",
+      "editEvent": "Editar evento",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Ej: Examen de matemáticas",
+      "subjectLabel": "Asignatura",
+      "typeLabel": "Tipo",
+      "dateLabel": "Fecha",
+      "priorityLabel": "Prioridad",
+      "priorityLow": "Baja",
+      "priorityMedium": "Media",
+      "priorityHigh": "Alta",
+      "notesLabel": "Notas (opcional)",
+      "notesPlaceholder": "Detalles adicionales...",
+      "cancelButton": "Cancelar",
+      "addButton": "Añadir",
+      "saveButton": "Guardar",
+      "upcomingEvents": "Eventos próximos",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "daysUntil": "{daysUntil} días",
+      "emptyState": "Sin eventos programados",
+      "emptyStateSubtitle": "¡Añade exámenes y tareas!"
+    },
+    "parent-dashboard": {
+      "quiz": {
+        "no-quizzes": "Ningún cuestionario completado aún"
+      }
     }
   },
   "chat": {
@@ -1392,6 +1498,222 @@
         "saved": "Aceptación guardada localmente",
         "saveFailed": "La sincronización con el servidor falló. Reintentar más tarde."
       }
+    }
+  },
+  "conversation": {
+    "handoff": {
+      "question": "¿Quieres hablar con {name}?",
+      "decline": "No, gracias",
+      "accept": "Hablar con {name}"
+    },
+    "detail": {
+      "error": {
+        "notFound": "Conversación no encontrada",
+        "loadingFailed": "Error al cargar la conversación",
+        "unknown": "Error desconocido"
+      },
+      "loading": "Cargando conversación...",
+      "back": "Atrás",
+      "backAriaLabel": "Volver a la lista de conversaciones",
+      "defaultTitle": "Conversación con {name}",
+      "timeAt": "a las {time}",
+      "summaryLabel": "Resumen:",
+      "emptyMessages": "Sin mensajes en esta conversación"
+    },
+    "sidebar": {
+      "deleteConfirm": {
+        "title": "¿Eliminar {count} conversación{plural}?",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "deleting": "Eliminando..."
+      },
+      "title": "Historial",
+      "search": {
+        "placeholder": "Buscar..."
+      },
+      "filters": {
+        "all": "Todas",
+        "today": "Hoy",
+        "week": "7d",
+        "month": "30d"
+      },
+      "empty": "Sin conversaciones"
+    },
+    "history": {
+      "dateFormat": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "daysAgo": "hace {count} días"
+      },
+      "loading": "Cargando...",
+      "title": "Historial de conversaciones",
+      "empty": {
+        "filtered": "Sin conversación con {maestroName}",
+        "all": "No hay conversaciones"
+      }
+    },
+    "inactivity": {
+      "title": "¿Todavía estás aquí?",
+      "description": "No hemos detectado actividad hace un tiempo. La conversación se cerrará automáticamente en:",
+      "message": "Si cierras la conversación, generaremos un resumen automático de tu sesión.",
+      "closeAriaLabel": "Cerrar advertencia",
+      "closeButton": "Cerrar y Resumir",
+      "continueButton": "Continuar Aprendiendo"
+    },
+    "toolSelection": {
+      "title": "Elige un Profesor",
+      "question": "¿Quién debería crear {toolName}?",
+      "closeAriaLabel": "Cerrar",
+      "search": "Buscar por nombre o materia...",
+      "empty": "No hay profesores encontrados"
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Buscar materiales...",
+          "aria-label": "Buscar materiales",
+          "clear-aria-label": "Limpiar búsqueda",
+          "announcement": "Búsqueda: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtrar por tipo",
+          "listbox-aria-label": "Seleccionar tipo de material"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Explorar",
+          "description": "Vista de carpetas con navegación jerárquica"
+        },
+        "gallery": {
+          "label": "Galería",
+          "description": "Cuadrícula con vistas previas grandes"
+        },
+        "timeline": {
+          "label": "Cronología",
+          "description": "Materiales ordenados cronológicamente"
+        },
+        "calendar": {
+          "label": "Calendario",
+          "description": "Vista de calendario por fecha"
+        }
+      },
+      "types": {
+        "all": "Todos los tipos",
+        "mindmap": "Mapas Mentales",
+        "quiz": "Quiz",
+        "flashcard": "Tarjetas",
+        "summary": "Resúmenes",
+        "demo": "Demos",
+        "diagram": "Diagramas",
+        "timeline": "Cronologías",
+        "formula": "Fórmulas",
+        "calculator": "Calculadoras",
+        "chart": "Gráficos",
+        "pdf": "PDFs",
+        "webcam": "Imágenes",
+        "homework": "Deberes",
+        "search": "Búsquedas",
+        "typing": "Mecanografía",
+        "study-kit": "Kit de Estudio"
+      },
+      "stats": {
+        "aria-label": "Estadísticas de materiales",
+        "header-title": "Tus estadísticas",
+        "header-subtitle": "materiales totales",
+        "mindmap-label": "Mapas mentales",
+        "flashcard-label": "Tarjetas",
+        "summary-label": "Resúmenes",
+        "today-label": "Hoy:",
+        "this-week-label": "Esta semana:"
+      },
+      "toolbar": {
+        "aria-label": "Acciones para {count} elementos seleccionados",
+        "deselect-all-aria-label": "Deseleccionar todo",
+        "selected-count": "{count, plural, one {seleccionado} other {seleccionados}}",
+        "move-label": "Mover",
+        "add-tags-label": "Agregar etiquetas",
+        "archive-label": "Archivar",
+        "restore-label": "Restaurar",
+        "delete-label": "Eliminar"
+      },
+      "status-bar": {
+        "selected-count": "materiales seleccionados",
+        "deselect-button": "Deseleccionar",
+        "delete-button": "Eliminar"
+      },
+      "sidebar": {
+        "show-sidebar-aria-label": "Mostrar barra lateral",
+        "hide-sidebar-aria-label": "Ocultar barra lateral"
+      }
+    }
+  },
+  "voice": {
+    "panel": {
+      "connecting": "Conectando...",
+      "speaking": "{name} está hablando...",
+      "listening": "Escuchando...",
+      "connected": "Conectado",
+      "startingCall": "Iniciando llamada...",
+      "mutedLabel": "Activar micrófono",
+      "unmuteLabel": "Silenciar micrófono",
+      "muteLabel": "Silenciar micrófono",
+      "microphoneDisabled": "Micrófono silenciado",
+      "speakNow": "Habla ahora..."
+    },
+    "connectionError": "Error de conexión de voz",
+    "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador."
+  },
+  "session": {
+    "controls": {
+      "muteTooltip": {
+        "muted": "Activar micrófono",
+        "unmuted": "Silenciar micrófono"
+      },
+      "muteAriaLabel": {
+        "muted": "Activar micrófono",
+        "unmuted": "Silenciar micrófono"
+      },
+      "cancelResponseTooltip": "Detener respuesta",
+      "cancelResponseAriaLabel": "Detener respuesta",
+      "sendMessageTooltip": "Escribir un mensaje",
+      "sendMessageAriaLabel": "Escribir un mensaje",
+      "switchToChatTooltip": "Cambiar a chat de texto",
+      "switchToChatAriaLabel": "Cambiar a chat de texto",
+      "endSessionTooltip": "Terminar sesión",
+      "endSessionAriaLabel": "Terminar sesión",
+      "inputPlaceholder": "Escribe un mensaje...",
+      "sendButton": "Enviar"
+    }
+  },
+  "onboarding": {
+    "transcript": {
+      "conversationTitle": "Conversación con Melissa",
+      "messageSingular": "mensaje",
+      "messagePlural": "mensajes",
+      "noConversation": "La conversación aparecerá aquí...",
+      "userLabel": "Tú",
+      "conversationActive": "Conversación en curso"
+    },
+    "checklist": {
+      "nameLabel": "Nombre",
+      "ageLabel": "Edad",
+      "schoolLabel": "Escuela",
+      "schoolElementary": "Primaria",
+      "schoolMiddle": "Secundaria",
+      "schoolHigh": "Bachillerato",
+      "differencesLabel": "Dificultades",
+      "differencesCount": "indicadas"
+    }
+  },
+  "maestros": {
+    "grid": {
+      "title": "Profesores",
+      "search-placeholder": "Buscar...",
+      "search-aria-label": "Buscar profesor o materia",
+      "all-button": "Todos",
+      "empty-title": "No se encontraron profesores",
+      "empty-description": "Intenta ajustar los filtros de búsqueda"
     }
   }
 }

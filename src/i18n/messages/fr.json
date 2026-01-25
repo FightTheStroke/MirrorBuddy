@@ -62,11 +62,32 @@
     },
     "pdf": {
       "label": "Télécharger PDF",
-      "description": "Téléchargez un document PDF et générez automatiquement du matériel d'étude"
+      "description": "Téléchargez un document PDF et générez automatiquement du matériel d'étude",
+      "preview": {
+        "processing": "Traitement du PDF en cours...",
+        "close": "Fermer",
+        "page": "Page",
+        "pages": "Pages",
+        "selected-count": "{count, plural, one {1 page} other {{count} pages}} sélectionnée(s)",
+        "click-to-select": "(cliquez pour sélectionner/désélectionner)",
+        "cancel": "Annuler",
+        "analyze": "Analyser",
+        "analyze-pages": "{count, plural, one {page} other {{count} pages}}",
+        "truncated-info": "premières affichées",
+        "processing-error": "Erreur lors du traitement du PDF."
+      }
     },
     "webcam": {
-      "label": "Prendre une photo",
-      "description": "Photographiez le tableau ou vos notes pour générer du matériel"
+      "inProgress": "En Cours...",
+      "takePhoto": "Prendre une Photo",
+      "retake": "Reprendre",
+      "confirm": "Confirmer",
+      "loading": "Démarrage de la caméra...",
+      "capturedPhoto": "Photo Capturée",
+      "switching": "Changement de caméra...",
+      "cancel": "Annuler",
+      "changCamera": "Changer de Caméra",
+      "positioning": "Positionnez le contenu dans le cadre"
     },
     "homework": {
       "label": "Aide aux devoirs",
@@ -93,8 +114,29 @@
       "description": "Explorez les concepts STEM avec des simulations interactives"
     },
     "summary": {
-      "label": "Résumé",
-      "description": "Générez des synthèses claires et structurées des concepts clés"
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "exportPdf": "Exporter en PDF",
+      "convertToMindmap": "Convertir en Carte Mentale",
+      "generateFlashcards": "Générer des Cartes Mémo à partir des Points Clés",
+      "titlePlaceholder": "Titre du Résumé...",
+      "wordCount": "{count} {count, plural, one {mot} other {mots}}",
+      "unsaved": "Non Enregistré",
+      "structure": "Structure",
+      "edit": "Écrire",
+      "preview": "Aperçu",
+      "writeHere": "Commencez à écrire ici...",
+      "emptyContent": "Pas de contenu encore. Commencez à écrire!",
+      "toggleSidebar": "Masquer",
+      "showSidebar": "Afficher",
+      "commentsUnresolved": "{count} commentaires à lire (voir aperçu)",
+      "commentsResolved": "Tous les commentaires résolus",
+      "incomplete": "À Compléter",
+      "goodStart": "Bon début! Continuez...",
+      "doingWell": "Vous vous débrouillez bien!",
+      "congratulations": "Félicitations!",
+      "word": "mot",
+      "words": "mots"
     },
     "diagram": {
       "label": "Diagramme",
@@ -113,12 +155,292 @@
       "description": "Créez des graphiques et des visualisations pour les données et statistiques"
     },
     "typing": {
-      "label": "Apprendre à taper",
-      "description": "Apprenez à taper avec des leçons progressives et l'accessibilité DSA"
+      "title": "Apprendre à Taper",
+      "description": "L'outil \"Apprendre à Taper\" est en cours de développement.",
+      "features": "Caractéristiques",
+      "recommendedLesson": "Leçon recommandée:",
+      "noLesson": "Aucune",
+      "level": "Niveau:"
     },
     "search": {
-      "label": "Recherche Web",
-      "description": "Recherchez des informations, vidéos et ressources éducatives sur le web"
+      "noResults": "Aucun résultat trouvé pour \"{query}\"",
+      "resultCount": "{count} résultats pour \"{query}\"",
+      "wikiOnly": "Wikipédia Uniquement"
+    },
+    "markmap": {
+      "error": "Erreur:",
+      "accessibility": {
+        "title": "Mode accessibilité",
+        "ariaLabel": "Activer/désactiver le mode accessibilité"
+      },
+      "resetView": {
+        "title": "Réinitialiser la vue",
+        "ariaLabel": "Réinitialiser la vue"
+      },
+      "zoomOut": {
+        "title": "Réduire",
+        "ariaLabel": "Réduire"
+      },
+      "zoomIn": {
+        "title": "Agrandir",
+        "ariaLabel": "Agrandir"
+      },
+      "fullscreen": {
+        "enter": "Plein écran",
+        "exit": "Quitter le plein écran",
+        "ariaLabelEnter": "Plein écran",
+        "ariaLabelExit": "Quitter le plein écran"
+      },
+      "download": {
+        "title": "Télécharger PNG",
+        "ariaLabel": "Télécharger la carte mentale en PNG"
+      },
+      "print": {
+        "title": "Imprimer",
+        "ariaLabel": "Imprimer la carte mentale"
+      },
+      "mindmapDescription": "Carte mentale: {title}",
+      "interactiveMindmapDescription": "Carte mentale interactive: {title}",
+      "instructions": "Glisser pour déplacer • Défilement/pincement pour zoomer • Cliquer sur les nœuds pour développer/réduire",
+      "successMessage": "Carte mentale \"{title}\" rendue avec succès.",
+      "interactiveRenderMessage": "Carte mentale \"{title}\" rendue avec {count} nœuds."
+    },
+    "connection": {
+      "connected": "Connecté - modification vocale active",
+      "connecting": "Connexion en cours...",
+      "reconnecting": "Reconnexion...",
+      "error": "Connexion échouée",
+      "disconnected": "Déconnecté"
+    },
+    "toolPanel": {
+      "buildingTool": "Construction en cours...",
+      "expand": "Développer",
+      "minimize": "Minimiser",
+      "close": "Fermer",
+      "errorCreating": "Erreur lors de la création de l'outil",
+      "unsupportedTool": "Type d'outil non supporté: {type}",
+      "percentComplete": "{percent}% Complété..."
+    },
+    "loading": {
+      "preparing": "Préparation en cours...",
+      "receivedChunks": "Reçu {count} fragments",
+      "loadingData": "Chargement des données...",
+      "loadingMaterial": "Chargement du matériel...",
+      "buildCancelled": "Construction annulée",
+      "errorOccurred": "Une erreur s'est produite"
+    }
+  },
+  "education": {
+    "tools": {
+      "mindmap": "Carte Mentale",
+      "quiz": "Quiz",
+      "flashcard": "Flashcards",
+      "summary": "Résumé",
+      "demo": "Démo Interactive",
+      "diagram": "Diagramme",
+      "timeline": "Chronologie",
+      "formula": "Formule",
+      "calculator": "Calculatrice",
+      "chart": "Graphique",
+      "search": "Recherche",
+      "webcam": "Photo",
+      "pdf": "PDF",
+      "homework": "Devoirs",
+      "typing": "Apprendre à Taper",
+      "study-kit": "Kit d'Étude"
+    },
+    "quiz": {
+      "title": "Quiz",
+      "subtitle": "Testez vos connaissances et gagnez des XP",
+      "createWithProfessor": "Créer un Quiz avec un Professeur",
+      "completed": "{count} complétés",
+      "loading": "Chargement des quiz enregistrés...",
+      "yourQuizzes": "Vos Quiz",
+      "sampleQuizzes": "Quiz d'Exemple",
+      "completed-badge": "Complété",
+      "start-button": "Commencer le Quiz",
+      "delete-confirm": "Êtes-vous sûr de vouloir supprimer ce quiz?",
+      "delete-button": "Supprimer le quiz",
+      "questions-count": "{count} questions",
+      "created": "Créé le {date}",
+      "comingSoon": "Plus de quiz à venir!",
+      "comingSoonMessage": "Vos Professeurs préparent de nouveaux quiz pour chaque matière. Étudiez avec eux et les quiz s'adapteront à votre progression!"
+    },
+    "quizReview": {
+      "loadingSuggestions": "Chargement des suggestions...",
+      "failedSuggestions": "Échec du chargement des suggestions de révision",
+      "suggestionsTitle": "Suggestions de Révision",
+      "suggestionsText": "Votre score est inférieur à 60%. Nous vous recommandons de réviser ces sujets:",
+      "highPriority": "Priorité Élevée",
+      "suggestedMaterials": "Matériels Suggérés:",
+      "needsReview": "Vous avez besoin de réviser {topic}",
+      "reviewText": "Révisez ces sujets et réessayez le quiz pour améliorer votre score!"
+    },
+    "toolSelection": {
+      "chooseSubject": "Créer {tool} - Choisir le Sujet",
+      "chooseProfessor": "Créer {tool} - Choisir le Professeur",
+      "back": "Retour",
+      "close": "Fermer"
+    },
+    "knowledge-hub": {
+      "header": {
+        "search": {
+          "placeholder": "Rechercher des matériaux...",
+          "aria-label": "Rechercher des matériaux",
+          "clear-aria-label": "Effacer la recherche",
+          "announcement": "Recherche : {value}"
+        },
+        "filter": {
+          "aria-label": "Filtrer par type",
+          "listbox-aria-label": "Sélectionner le type de matériel"
+        }
+      },
+      "views": {
+        "explorer": {
+          "label": "Explorer",
+          "description": "Vue en dossiers avec navigation hiérarchique"
+        },
+        "gallery": {
+          "label": "Galerie",
+          "description": "Grille avec grands aperçus"
+        },
+        "timeline": {
+          "label": "Chronologie",
+          "description": "Matériaux organisés chronologiquement"
+        },
+        "calendar": {
+          "label": "Calendrier",
+          "description": "Vue calendrier par date"
+        }
+      },
+      "types": {
+        "all": "Tous les types",
+        "mindmap": "Cartes Mentales",
+        "quiz": "Quiz",
+        "flashcard": "Cartes Mémoire",
+        "summary": "Résumés",
+        "demo": "Démos",
+        "diagram": "Diagrammes",
+        "timeline": "Chronologies",
+        "formula": "Formules",
+        "calculator": "Calculatrices",
+        "chart": "Graphiques",
+        "pdf": "PDFs",
+        "webcam": "Images",
+        "homework": "Devoirs",
+        "search": "Recherches",
+        "typing": "Dactylographie",
+        "study-kit": "Étude Complète"
+      },
+      "stats": {
+        "aria-label": "Statistiques des matériaux",
+        "header-title": "Vos statistiques",
+        "header-subtitle": "matériaux au total",
+        "mindmap-label": "Cartes mentales",
+        "flashcard-label": "Cartes mémoire",
+        "summary-label": "Résumés",
+        "today-label": "Aujourd'hui :",
+        "this-week-label": "Cette semaine :"
+      },
+      "toolbar": {
+        "aria-label": "Actions pour {count} éléments sélectionnés",
+        "deselect-all-aria-label": "Tout désélectionner",
+        "selected-count": "{count, plural, one {sélectionné} other {sélectionnés}}",
+        "move-label": "Déplacer",
+        "add-tags-label": "Ajouter des étiquettes",
+        "archive-label": "Archiver",
+        "restore-label": "Restaurer",
+        "delete-label": "Supprimer"
+      },
+      "status-bar": {
+        "selected-count": "matériaux sélectionnés",
+        "deselect-button": "Désélectionner",
+        "delete-button": "Supprimer"
+      },
+      "sidebar": {
+        "show-sidebar-aria-label": "Afficher la barre latérale",
+        "hide-sidebar-aria-label": "Masquer la barre latérale"
+      }
+    },
+    "learning-path": {
+      "loading-path": "Chargement du parcours d'apprentissage...",
+      "path-not-found": "Parcours d'apprentissage introuvable",
+      "back": "Retour",
+      "topics": "sujets",
+      "continue-with": "Continuer avec",
+      "next-topic": "Sujet suivant",
+      "continue": "Continuer",
+      "start": "Commencer",
+      "topics-header": "Sujets",
+      "loading-paths": "Chargement des parcours d'apprentissage...",
+      "no-paths-created": "Aucun parcours d'apprentissage créé",
+      "no-paths-description": "Téléchargez un PDF dans Study Kit et générez votre premier parcours d'apprentissage progressif !",
+      "go-to-study-kit": "Aller à Study Kit",
+      "path-singular": "parcours",
+      "path-plural": "parcours",
+      "learning-paths": "d'apprentissage",
+      "completed-topics": "sujets",
+      "status-completed": "Terminé",
+      "status-in-progress": "En cours",
+      "status-not-started": "À commencer",
+      "loading-topic": "Chargement du sujet...",
+      "topic-not-found": "Sujet introuvable",
+      "steps-completed": "étapes complétées",
+      "progress": "Progression",
+      "key-concepts": "Concepts clés",
+      "steps": "Étapes",
+      "no-steps-available": "Aucune étape disponible pour ce sujet"
+    },
+    "flashcards": {
+      "title": "Cartes mémoire",
+      "fsrsDescription": "Système de répétition espacée FSRS-5",
+      "createWithProfessor": "Créer avec un Professeur",
+      "manualMode": "Mode manuel",
+      "loading": "Chargement...",
+      "emptyState": "Aucun paquet créé",
+      "emptyStateDescription": "Créez votre premier paquet de cartes mémoire pour commencer à étudier",
+      "createDeckButton": "Créer un paquet",
+      "editDeckTitle": "Modifier le paquet",
+      "newDeckTitle": "Nouveau paquet",
+      "deckNameLabel": "Nom du paquet",
+      "deckNamePlaceholder": "Ex: Verbes irréguliers anglais",
+      "subjectLabel": "Matière",
+      "cardsLabel": "Cartes ({count})",
+      "cardFrontPlaceholder": "Question (avant)",
+      "cardBackPlaceholder": "Réponse (verso)",
+      "addCardButton": "Ajouter une carte",
+      "cancelButton": "Annuler",
+      "saveButton": "Enregistrer"
+    },
+    "calendar": {
+      "title": "Calendrier",
+      "newEvent": "Nouvel événement",
+      "editEvent": "Modifier l'événement",
+      "titleLabel": "Titre",
+      "titlePlaceholder": "Ex: Contrôle de mathématiques",
+      "subjectLabel": "Matière",
+      "typeLabel": "Type",
+      "dateLabel": "Date",
+      "priorityLabel": "Priorité",
+      "priorityLow": "Basse",
+      "priorityMedium": "Moyenne",
+      "priorityHigh": "Haute",
+      "notesLabel": "Notes (optionnel)",
+      "notesPlaceholder": "Détails supplémentaires...",
+      "cancelButton": "Annuler",
+      "addButton": "Ajouter",
+      "saveButton": "Enregistrer",
+      "upcomingEvents": "Événements à venir",
+      "today": "Aujourd'hui",
+      "tomorrow": "Demain",
+      "daysUntil": "{daysUntil} jours",
+      "emptyState": "Aucun événement programmé",
+      "emptyStateSubtitle": "Ajoutez des contrôles et des devoirs!"
+    },
+    "parent-dashboard": {
+      "quiz": {
+        "no-quizzes": "Aucun quiz complété pour l'instant"
+      }
     }
   },
   "tier": {
@@ -896,6 +1218,239 @@
           }
         }
       }
+    }
+  },
+  "maestros": {
+    "grid": {
+      "title": "Professeurs",
+      "search-placeholder": "Rechercher...",
+      "search-aria-label": "Rechercher un professeur ou une matière",
+      "all-button": "Tous",
+      "empty-title": "Aucun professeur trouvé",
+      "empty-description": "Essayez d'ajuster vos filtres de recherche"
+    }
+  },
+  "conversation": {
+    "handoff": {
+      "question": "Veux-tu parler avec {name} ?",
+      "decline": "Non, merci",
+      "accept": "Parler avec {name}"
+    },
+    "detail": {
+      "error": {
+        "notFound": "Conversation introuvable",
+        "loadingFailed": "Erreur lors du chargement de la conversation",
+        "unknown": "Erreur inconnue"
+      },
+      "loading": "Chargement de la conversation...",
+      "back": "Retour",
+      "backAriaLabel": "Retour à la liste des conversations",
+      "defaultTitle": "Conversation avec {name}",
+      "timeAt": "à {time}",
+      "summaryLabel": "Résumé :",
+      "emptyMessages": "Aucun message dans cette conversation"
+    },
+    "sidebar": {
+      "deleteConfirm": {
+        "title": "Supprimer {count} conversation{plural} ?",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "deleting": "Suppression..."
+      },
+      "title": "Historique",
+      "search": {
+        "placeholder": "Rechercher..."
+      },
+      "filters": {
+        "all": "Toutes",
+        "today": "Aujourd'hui",
+        "week": "7j",
+        "month": "30j"
+      },
+      "empty": "Aucune conversation"
+    },
+    "history": {
+      "dateFormat": {
+        "today": "Aujourd'hui",
+        "yesterday": "Hier",
+        "daysAgo": "Il y a {count} jours"
+      },
+      "loading": "Chargement...",
+      "title": "Historique des conversations",
+      "empty": {
+        "filtered": "Aucune conversation avec {maestroName}",
+        "all": "Aucune conversation trouvée"
+      }
+    },
+    "inactivity": {
+      "title": "Tu es encore là ?",
+      "description": "Nous n'avons pas détecté d'activité depuis un moment. La conversation se fermera automatiquement dans :",
+      "message": "Si tu fermes la conversation, nous générerons un résumé automatique de ta session.",
+      "closeAriaLabel": "Fermer l'avertissement",
+      "closeButton": "Fermer et résumer",
+      "continueButton": "Continuer à apprendre"
+    },
+    "toolSelection": {
+      "title": "Choisir un Professeur",
+      "question": "Qui devrait créer {toolName} ?",
+      "closeAriaLabel": "Fermer",
+      "search": "Rechercher par nom ou matière...",
+      "empty": "Aucun professeur trouvé"
+    }
+  },
+  "voice": {
+    "panel": {
+      "connecting": "Connexion en cours...",
+      "speaking": "{name} est en train de parler...",
+      "listening": "À l'écoute...",
+      "connected": "Connecté",
+      "startingCall": "Appel en cours de démarrage...",
+      "mutedLabel": "Activer le microphone",
+      "unmuteLabel": "Désactiver le microphone",
+      "muteLabel": "Désactiver le microphone",
+      "microphoneDisabled": "Microphone désactivé",
+      "speakNow": "Parlez maintenant..."
+    },
+    "connectionError": "Erreur de connexion vocale",
+    "microphoneUnauthorized": "Microphone non autorisé. Activez le microphone dans les paramètres de votre navigateur."
+  },
+  "session": {
+    "controls": {
+      "muteTooltip": {
+        "muted": "Activer le microphone",
+        "unmuted": "Désactiver le microphone"
+      },
+      "muteAriaLabel": {
+        "muted": "Activer le microphone",
+        "unmuted": "Désactiver le microphone"
+      },
+      "cancelResponseTooltip": "Arrêter la réponse",
+      "cancelResponseAriaLabel": "Arrêter la réponse",
+      "sendMessageTooltip": "Écrire un message",
+      "sendMessageAriaLabel": "Écrire un message",
+      "switchToChatTooltip": "Passer au chat textuel",
+      "switchToChatAriaLabel": "Passer au chat textuel",
+      "endSessionTooltip": "Terminer la session",
+      "endSessionAriaLabel": "Terminer la session",
+      "inputPlaceholder": "Écrire un message...",
+      "sendButton": "Envoyer"
+    }
+  },
+  "onboarding": {
+    "transcript": {
+      "conversationTitle": "Conversation avec Mélissa",
+      "messageSingular": "message",
+      "messagePlural": "messages",
+      "noConversation": "La conversation apparaîtra ici...",
+      "userLabel": "Vous",
+      "conversationActive": "Conversation en cours"
+    },
+    "checklist": {
+      "nameLabel": "Nom",
+      "ageLabel": "Âge",
+      "schoolLabel": "École",
+      "schoolElementary": "Primaire",
+      "schoolMiddle": "Collège",
+      "schoolHigh": "Lycée",
+      "differencesLabel": "Difficultés",
+      "differencesCount": "indiquées"
+    }
+  },
+  "settings": {
+    "accessibility": {
+      "profilesTitle": "Profils d'accessibilité",
+      "profilesDescription": "Sélectionnez un ou plusieurs profils pour personnaliser votre expérience selon vos besoins.",
+      "activeFeatures": "Fonctionnalités actives :",
+      "customizeButton": "Personnaliser les paramètres avancés",
+      "dyslexia": "Dyslexie",
+      "dyslexiaDesc": "Police OpenDyslexic, espacement optimisé",
+      "adhd": "TDAH",
+      "adhdDesc": "Minuteur Pomodoro (25/5 min), mode focus, notifications de pause",
+      "visual": "Visuel",
+      "visualDesc": "Contraste élevé, grand texte",
+      "motor": "Moteur",
+      "motorDesc": "Navigation au clavier, grandes cibles",
+      "autism": "Autisme",
+      "autismDesc": "Dispositions prévisibles, moins de stimuli",
+      "auditory": "Auditif",
+      "auditoryDesc": "Communication visuelle, pas de dépendance audio",
+      "cerebralPalsy": "Paralysie Cérébrale",
+      "cerebralPalsyDesc": "TTS, grand texte, clavier, espacement extra"
+    },
+    "profile": {
+      "personalInfoTitle": "Informations Personnelles",
+      "nameLabel": "Nom",
+      "namePlaceholder": "Quel est ton nom ?",
+      "gradeLevelLabel": "Niveau d'études",
+      "teachingStyleTitle": "Style des Professeurs",
+      "teachingStyleDescription": "Choisissez comment vous voulez que les professeurs vous parlent et vous corrigent",
+      "feedbackExampleTitle": "Exemple de retour :",
+      "adaptiveDifficultyTitle": "Difficulté Adaptative",
+      "adaptiveDifficultyDescription": "Les professeurs adaptent la difficulté et les explications en fonction de signaux comme les questions, les délais de réponse et le besoin de répétition.",
+      "manualMode": "Manuel",
+      "manualModeDesc": "Seulement des suggestions, le professeur demande confirmation",
+      "guidedMode": "Guidé",
+      "guidedModeDesc": "Petits ajustements avec des alertes claires",
+      "balancedMode": "Équilibré",
+      "balancedModeDesc": "Adapte le rythme et la difficulté tout en maintenant la stabilité",
+      "automaticMode": "Automatique",
+      "automaticModeDesc": "Adaptation complète en temps réel",
+      "introductionTitle": "Introduction",
+      "introductionDescription": "Examinez l'introduction à MirrorBuddy et découvrez toutes les fonctionnalités disponibles.",
+      "reviewIntroductionButton": "Examiner l'introduction",
+      "feedbackSuperEncouraging": "Fantastique ! Tu te débrouilles très bien ! Chaque erreur est un pas vers le succès !",
+      "feedbackEncouraging": "Excellent travail ! Tu es presque juste, essaie de réfléchir un moment...",
+      "feedbackBalanced": "Bon essai. Il y a une erreur ici - revois le concept et réessaie.",
+      "feedbackStrict": "Faux. Tu as sauté une étape fondamentale. Retourne en arrière et refais-le.",
+      "feedbackBrutal": "Non. Complètement faux. Tu dois étudier davantage, nous n'y sommes pas du tout."
+    },
+    "appearance": {
+      "themeTitle": "Thème",
+      "lightTheme": "Clair",
+      "darkTheme": "Sombre",
+      "systemTheme": "Système",
+      "currentThemeInfo": "Thème actuel : {theme} (basé sur les préférences système)",
+      "accentColorTitle": "Couleur d'Accent",
+      "blue": "Bleu",
+      "green": "Vert",
+      "purple": "Violet",
+      "orange": "Orange",
+      "pink": "Rose",
+      "languageTitle": "Langue",
+      "languageDescription": "Sélectionnez la langue dans laquelle les professeurs vous parleront",
+      "italian": "Italiano",
+      "english": "English",
+      "spanish": "Español",
+      "french": "Français",
+      "german": "Deutsch"
+    },
+    "notification": {
+      "title": "Notifications"
+    },
+    "privacy": {
+      "title": "Confidentialité"
+    },
+    "aiProvider": {
+      "noProviderConfigured": "Aucun fournisseur configuré",
+      "configureAzureOpenAI": "Configurez Azure OpenAI dans le fichier .env ou lancez Ollama localement.",
+      "costConfigurationTitle": "Configuration des Coûts Azure",
+      "voiceFunctionalityTitle": "Fonctionnalité Voix",
+      "voiceAvailable": "Voix disponible",
+      "voiceNotAvailable": "Voix non disponible",
+      "realtimeRequirement": "Les conversations vocales nécessitent Azure OpenAI Realtime.",
+      "webSearchTitle": "Recherche Web",
+      "webSearchActive": "Recherche Web active",
+      "webSearchLimited": "Recherche Web limitée",
+      "wikipediaSource": "Les professeurs utilisent Wikipédia comme source. Pour les actualités et informations à jour, configurez Brave Search.",
+      "selectProvider": "Cliquez pour sélectionner votre fournisseur préféré:",
+      "configured": "Configuré",
+      "notConfigured": "Non configuré",
+      "active": "Actif:",
+      "running": "En cours d'exécution",
+      "notActive": "Inactif",
+      "selectionMode": "Mode de sélection:",
+      "automatic": "Automatique",
+      "resetAuto": "Réinitialiser à Auto"
     }
   }
 }
