@@ -32,7 +32,7 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const trigger = container.querySelector('button[aria-label*="Avri"]');
+      const trigger = container.querySelector('button[aria-label*="Apri"]');
       expect(trigger).toBeInTheDocument();
     });
 
@@ -148,7 +148,7 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const button = container.querySelector('button[aria-label*="Avri"]');
+      const button = container.querySelector('button[aria-label*="Apri"]');
       expect(button).toHaveClass("h-11", "w-11");
     });
 
@@ -326,7 +326,7 @@ describe("MobileAdminNav", () => {
         />,
       );
 
-      const button = container.querySelector('button[aria-label*="Avri"]');
+      const button = container.querySelector('button[aria-label*="Apri"]');
       expect(button).toHaveAttribute("aria-label");
     });
 

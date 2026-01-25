@@ -1,10 +1,13 @@
 "use client";
 
-import { useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * Hook to detect media query matches (e.g., for responsive design)
  * Useful for implementing mobile-first accordion and collapsible patterns
+ *
+ * SSR-safe: Returns false during SSR and initial hydration to avoid mismatch,
+ * then updates to the actual value after client-side mount.
  *
  * @param query - CSS media query string (e.g., "(max-width: 640px)")
  * @returns boolean indicating if the media query matches
@@ -14,9 +17,13 @@ import { useLayoutEffect, useState } from "react";
  * const isDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
  */
 export function useMediaQuery(query: string): boolean {
+  // Initialize to false for SSR consistency - prevents hydration mismatch
   const [matches, setMatches] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    // Only run on client
+    if (typeof window === "undefined") return;
+
     const mediaQueryList = window.matchMedia(query);
 
     // Set initial state from the query result

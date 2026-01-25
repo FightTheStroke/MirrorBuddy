@@ -273,9 +273,8 @@ test.describe("Parent Dashboard Charts - Desktop (1024px+)", () => {
         };
       });
 
-      // Should have 3 columns defined
-      const columnCount = (gridStyle.gridTemplateColumns.match(/\d+fr/g) || [])
-        .length;
+      // Should have at least 2-3 columns (browsers may return pixel values)
+      const columnCount = gridStyle.gridTemplateColumns.split(" ").length;
       expect(columnCount).toBeGreaterThanOrEqual(2);
     }
   });

@@ -38,21 +38,28 @@ interface TabsListProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export function TabsList({ children, className, ...props }: TabsListProps) {
+  // Separate scroll-related classes for wrapper from other classes for inner tablist
+  const scrollClasses = className
+    ?.split(" ")
+    .filter((c) => c.startsWith("overflow-") || c.startsWith("snap-"))
+    .join(" ");
+  const nonScrollClasses = className
+    ?.split(" ")
+    .filter((c) => !c.startsWith("overflow-") && !c.startsWith("snap-"))
+    .join(" ");
+
   return (
     <div
       className={cn(
         "max-w-full overflow-x-auto snap-x snap-mandatory scrollbar-hide",
-        className
-          ?.split(" ")
-          .filter((c) => c.startsWith("overflow-") || c.startsWith("snap-"))
-          .join(" "),
+        scrollClasses,
       )}
     >
       <div
         role="tablist"
         className={cn(
           "inline-flex h-10 items-center justify-start rounded-md bg-slate-100 p-1 text-slate-500 dark:bg-slate-800 dark:text-slate-400 whitespace-nowrap",
-          className,
+          nonScrollClasses,
         )}
         {...props}
       >

@@ -153,7 +153,7 @@ export function MobileAdminNav({
         size="icon"
         onClick={onOpen}
         className="fixed top-14 right-4 z-50 h-11 w-11 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-        aria-label="Avri menu di navigazione"
+        aria-label="Apri menu di navigazione"
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>

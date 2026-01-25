@@ -105,9 +105,9 @@ test.describe("Analytics Page Grid - Mobile (375px - 640px)", () => {
         };
       });
 
-      // gridTemplateColumns should have 2 columns (e.g., "1fr 1fr" or similar)
-      const columnCount = (gridStyle.gridTemplateColumns.match(/\d+fr/g) || [])
-        .length;
+      // gridTemplateColumns should have 2 columns (e.g., "1fr 1fr" or "200px 200px")
+      // Note: browsers may return pixel values instead of fr units
+      const columnCount = gridStyle.gridTemplateColumns.split(" ").length;
       expect(columnCount).toBe(2);
 
       // Check gap is present (gap-3 = 0.75rem = 12px)
