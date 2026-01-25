@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 import { Providers } from "@/components/providers";
 import { getNonce } from "@/lib/security/csp-nonce";
 import "./globals.css";
+import "@/styles/safe-area.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
