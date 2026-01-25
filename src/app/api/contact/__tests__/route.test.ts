@@ -97,9 +97,9 @@ describe("POST /api/contact", () => {
         name: "Jane Smith",
         email: "jane@school.edu",
         type: "schools" as const,
-        role: "Principal",
+        role: "dirigente",
         schoolName: "Test High School",
-        schoolType: "secondary",
+        schoolType: "secondaria-ii",
         studentCount: "500-1000",
         specificNeeds: "DSA support",
       };
@@ -110,9 +110,9 @@ describe("POST /api/contact", () => {
         name: "Jane Smith",
         email: "jane@school.edu",
         data: {
-          role: "Principal",
+          role: "dirigente",
           schoolName: "Test High School",
-          schoolType: "secondary",
+          schoolType: "secondaria-ii",
           studentCount: "500-1000",
           specificNeeds: "DSA support",
         },
@@ -142,9 +142,9 @@ describe("POST /api/contact", () => {
           name: "Jane Smith",
           email: "jane@school.edu",
           data: {
-            role: "Principal",
+            role: "dirigente",
             schoolName: "Test High School",
-            schoolType: "secondary",
+            schoolType: "secondaria-ii",
             studentCount: "500-1000",
             specificNeeds: "DSA support",
           },
@@ -253,9 +253,9 @@ describe("POST /api/contact", () => {
         name: "Jane Smith",
         email: "jane@school.edu",
         type: "schools" as const,
-        role: "Principal",
+        role: "dirigente",
         schoolName: "Test School",
-        schoolType: "primary",
+        schoolType: "primaria",
         studentCount: "100-500",
         specificNeeds: "DSA",
       };
@@ -290,7 +290,7 @@ describe("POST /api/contact", () => {
         subject: expect.stringContaining("Schools"),
       });
       expect(emailCall.html).toContain("Test School");
-      expect(emailCall.html).toContain("primary");
+      expect(emailCall.html).toContain("primaria");
       expect(emailCall.html).toContain("100-500");
     });
 

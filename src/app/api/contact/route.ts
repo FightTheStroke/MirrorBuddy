@@ -5,6 +5,33 @@ import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "contact-api" });
 
+// Valid enum values for form fields (must match frontend constants)
+const VALID_SCHOOL_ROLES = ["dirigente", "docente", "segreteria", "altro"];
+const VALID_SCHOOL_TYPES = [
+  "primaria",
+  "secondaria-i",
+  "secondaria-ii",
+  "università",
+];
+const VALID_STUDENT_COUNTS = ["100", "100-500", "500-1000", "1000+"];
+const VALID_SECTORS = [
+  "technology",
+  "finance",
+  "manufacturing",
+  "healthcare",
+  "retail",
+  "other",
+];
+const VALID_EMPLOYEE_COUNTS = ["under-50", "50-200", "200-1000", "over-1000"];
+const VALID_TOPICS = [
+  "leadership",
+  "ai-innovation",
+  "soft-skills",
+  "onboarding",
+  "compliance",
+  "other",
+];
+
 interface ContactRequest {
   name: string;
   email: string;
@@ -103,6 +130,25 @@ export async function POST(
           { status: 400 },
         );
       }
+      // Validate enum values
+      if (!VALID_SCHOOL_ROLES.includes(body.role)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid role value" },
+          { status: 400 },
+        );
+      }
+      if (!VALID_SCHOOL_TYPES.includes(body.schoolType)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid school type value" },
+          { status: 400 },
+        );
+      }
+      if (!VALID_STUDENT_COUNTS.includes(body.studentCount)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid student count value" },
+          { status: 400 },
+        );
+      }
     } else if (body.type === "enterprise") {
       if (
         !body.role ||
@@ -117,6 +163,29 @@ export async function POST(
             success: false,
             message: "Missing required fields for enterprise contact",
           },
+          { status: 400 },
+        );
+      }
+      // Validate enum values
+      if (!VALID_SECTORS.includes(body.sector)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid sector value" },
+          { status: 400 },
+        );
+      }
+      if (!VALID_EMPLOYEE_COUNTS.includes(body.employeeCount)) {
+        return NextResponse.json(
+          { success: false, message: "Invalid employee count value" },
+          { status: 400 },
+        );
+      }
+      // Validate all topics are valid
+      const invalidTopics = body.topics.filter(
+        (t) => !VALID_TOPICS.includes(t),
+      );
+      if (invalidTopics.length > 0) {
+        return NextResponse.json(
+          { success: false, message: "Invalid topic values" },
           { status: 400 },
         );
       }
