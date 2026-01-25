@@ -72,6 +72,18 @@ const PUBLIC_ROUTES = [
 
 Without this, the proxy redirects Sentry requests to `/welcome` and no data reaches Sentry.
 
+### Manual Tunnel Route (Vercel Workaround)
+
+The automatic `tunnelRoute` in `withSentryConfig` doesn't create rewrites on Vercel.
+We use a manual API route instead: `src/app/monitoring/route.ts`
+
+The route:
+
+- Receives Sentry envelope POST requests
+- Validates project ID against allowlist (prevents abuse)
+- Forwards to Sentry's ingest endpoint
+- Silently fails if Sentry is down (doesn't break the app)
+
 ### Environment Variables
 
 | Variable                 | Purpose                    | Required |
