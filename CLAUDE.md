@@ -75,7 +75,7 @@ npm run pre-push    # Full Vercel simulation (~60s)
 
 ## Modular Rules (auto-loaded)
 
-`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md | vercel-deployment.md | tier.md | cookies.md
+`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md | vercel-deployment.md | tier.md | cookies.md | i18n.md
 
 ## On-Demand Docs
 
