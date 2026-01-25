@@ -11,9 +11,11 @@
  */
 
 import { notFound } from "next/navigation";
+import { getMessages } from "next-intl/server";
 import { locales, defaultLocale } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
 import { getLocalizedOGMetadata } from "@/lib/i18n/get-og-metadata";
+import { LocaleProvider } from "@/i18n/locale-provider";
 import type { Metadata } from "next";
 
 // Type for route params
@@ -51,7 +53,14 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  return <>{children}</>;
+  // Load messages for the current locale
+  const messages = await getMessages();
+
+  return (
+    <LocaleProvider locale={locale} messages={messages}>
+      {children}
+    </LocaleProvider>
+  );
 }
 
 /**
