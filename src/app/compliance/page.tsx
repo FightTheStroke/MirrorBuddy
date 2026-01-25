@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -186,25 +187,25 @@ function DocumentCard({ doc }: { doc: ComplianceDocument }) {
 }
 
 export default function CompliancePage() {
+  const t = useTranslations("compliance");
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Compliance & Trasparenza
+            {t("page.title")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            MirrorBuddy è progettato nel rispetto delle normative europee e
-            italiane sull&apos;intelligenza artificiale e la protezione dei
-            dati.
+            {t("page.subtitle")}
           </p>
         </div>
 
         {/* Compliance Badges */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Conformità Normativa
+            {t("badges.conformity")}
           </h2>
           <div className="flex flex-wrap gap-3">
             {COMPLIANCE_BADGES.map((badge) => (
@@ -227,7 +228,7 @@ export default function CompliancePage() {
         {/* Public Documents */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Documenti Pubblici
+            {t("sections.publicDocs")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
             {PUBLIC_DOCUMENTS.map((doc) => (
@@ -239,10 +240,10 @@ export default function CompliancePage() {
         {/* Technical Documents */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Documentazione Tecnica
+            {t("sections.technicalDocs")}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Documentazione dettagliata disponibile nel repository open source.
+            {t("sections.documentation")}
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             {TECHNICAL_DOCUMENTS.map((doc) => (
@@ -257,11 +258,10 @@ export default function CompliancePage() {
                       border border-indigo-100 dark:border-indigo-800"
         >
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Domande sulla Compliance?
+            {t("contact.title")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Per domande sulla privacy, protezione dei dati o compliance AI,
-            contattaci:
+            {t("contact.text")}
           </p>
           <a
             href="mailto:info@fightthestroke.org"

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ContactFormFields } from "./contact-form-fields";
 import { ContactFormMessages } from "./contact-form-messages";
@@ -14,6 +15,7 @@ interface FormErrors {
 }
 
 export function ContactForm() {
+  const t = useTranslations("contact.form");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,21 +38,21 @@ export function ContactForm() {
     const newErrors: FormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Il nome è obbligatorio.";
+      newErrors.name = t("nameRequired");
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "L'email è obbligatoria.";
+      newErrors.email = t("emailRequired");
     } else if (!validateEmail(formData.email)) {
-      newErrors.email = "Inserisci un'email valida.";
+      newErrors.email = t("emailInvalid");
     }
 
     if (!formData.subject.trim()) {
-      newErrors.subject = "L'oggetto è obbligatorio.";
+      newErrors.subject = t("subjectRequired");
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = "Il messaggio è obbligatorio.";
+      newErrors.message = t("messageRequired");
     }
 
     setErrors(newErrors);
@@ -119,7 +121,7 @@ export function ContactForm() {
         disabled={isSubmitting}
         className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white"
       >
-        {isSubmitting ? "Invio in corso..." : "Invia messaggio"}
+        {isSubmitting ? t("submitButtonLoading") : t("submitButtonDefault")}
       </Button>
     </form>
   );

@@ -1,10 +1,13 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { ContactForm } from "./components/contact-form";
 
 export default function ContactPage() {
+  const t = useTranslations("contact");
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
       {/* Navigation */}
@@ -19,7 +22,7 @@ export default function ContactPage() {
             aria-label="Torna alla home page di MirrorBuddy"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Torna alla home
+            {t("backButton")}
           </Link>
         </div>
       </nav>
@@ -30,10 +33,10 @@ export default function ContactPage() {
           {/* Header */}
           <div className="mb-10">
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
-              Contattaci
+              {t("page.title")}
             </h1>
             <p className="text-lg text-slate-600 dark:text-gray-300">
-              Descrivi il tuo argomento e ti risponderemo il prima possibile.
+              {t("page.subtitle")}
             </p>
           </div>
 

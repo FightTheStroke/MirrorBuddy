@@ -1,6 +1,7 @@
 "use client";
 
 import { useReducer, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { ToolCard } from "./tool-card";
@@ -107,6 +108,7 @@ interface AstuccioViewProps {
 }
 
 export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
+  const t = useTranslations("astuccio");
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
 
   const handleToolClick = useCallback((toolType: ToolType) => {
@@ -140,7 +142,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
           onClick={handleDialogClose}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
         >
-          ← Torna all&apos;Astuccio
+          ← {t("backButton")}
         </button>
         <StudyKitView />
       </div>
@@ -155,7 +157,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
           onClick={handleDialogClose}
           className="mb-4 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 flex items-center gap-2"
         >
-          ← Torna all&apos;Astuccio
+          ← {t("backButton")}
         </button>
         <TypingView />
       </div>
@@ -196,7 +198,7 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
                 </div>
                 <div className="ml-auto">
                   <span className="text-sm font-medium px-3 py-1 rounded-full bg-card border text-foreground">
-                    {tools.length} strumenti
+                    {t("itemCount", { count: tools.length })}
                   </span>
                 </div>
               </div>
