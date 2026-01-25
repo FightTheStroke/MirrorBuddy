@@ -13,6 +13,7 @@ Modular rules auto-loaded on every Claude session.
 | cookies.md           | Cookie constants, validateAuth, CSRF patterns   |
 | e2e-testing.md       | E2E test setup, wall bypass, CI debugging       |
 | maestri.md           | 20 AI tutors, data structure, voice integration |
+| mobile-readiness.md  | Mobile E2E CI, touch targets, responsive rules  |
 | operations.md        | Health endpoints, Grafana Cloud, runbooks       |
 | tier.md              | Trial/Base/Pro tiers, TierService, features     |
 | vercel-deployment.md | SSL config, env vars, common deployment issues  |

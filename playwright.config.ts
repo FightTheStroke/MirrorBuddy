@@ -147,75 +147,84 @@ export default defineConfig({
       testIgnore: "**/*",
     },
     // Mobile viewport projects for responsive design testing (ADR 0064)
-    // DISABLED IN CI: Mobile tests add 5x overhead (5 projects × same tests)
-    // Run locally: npx playwright test --project=iphone-13
+    // CI STRATEGY: Run 3 core devices in CI (iPhone SE, Pixel 7, iPad Mini) for coverage
+    // Run locally for full device matrix: npx playwright test --project=iphone-13
     // NOTE: Device-specific tests match only their target devices; responsive-layout runs on all
+    //
+    // CI_MOBILE_TESTS env var controls mobile test execution:
+    // - Set by mobile-e2e CI job to enable mobile tests
+    // - Not set = mobile tests skipped (default chromium-only behavior)
     {
       name: "iphone-se",
       use: {
         ...devices["iPhone SE"],
-        // iPhone SE 2022: 375px × 667px (16:9)
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        // iPhone SE 2022: 375px × 667px (smallest modern iPhone)
+        // Use Chromium in CI for consistent cross-platform behavior
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
-      ...(process.env.CI && { testIgnore: "**/*" }),
+      // ENABLED in CI when CI_MOBILE_TESTS=1, otherwise skip
+      ...(process.env.CI &&
+        !process.env.CI_MOBILE_TESTS && { testIgnore: "**/*" }),
     },
     {
       name: "iphone-13",
       use: {
         ...devices["iPhone 13"],
         // iPhone 13: 390px × 844px (19.5:9)
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - covered by iphone-se (similar viewport)
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
       name: "pixel-7",
       use: {
         ...devices["Pixel 7"],
-        // Pixel 7: 412px × 915px (19.5:9)
+        // Pixel 7: 412px × 915px (standard Android flagship)
       },
       testMatch: [
         "**/mobile/android.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
-      ...(process.env.CI && { testIgnore: "**/*" }),
+      // ENABLED in CI when CI_MOBILE_TESTS=1
+      ...(process.env.CI &&
+        !process.env.CI_MOBILE_TESTS && { testIgnore: "**/*" }),
     },
     {
       name: "ipad-mini",
       use: {
         ...devices["iPad Mini"],
-        // iPad Mini: 768px × 1024px (4:3) portrait
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        // iPad Mini: 768px × 1024px (tablet breakpoint)
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/ipad.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
-      ...(process.env.CI && { testIgnore: "**/*" }),
+      // ENABLED in CI when CI_MOBILE_TESTS=1
+      ...(process.env.CI &&
+        !process.env.CI_MOBILE_TESTS && { testIgnore: "**/*" }),
     },
     {
       name: "ipad-landscape",
       use: {
         ...devices["iPad Mini landscape"],
         // iPad Mini landscape: 1024px × 768px (4:3)
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/ipad.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - tablet portrait (ipad-mini) is sufficient
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // Samsung devices - most popular Android phones
@@ -229,6 +238,7 @@ export default defineConfig({
         "**/mobile/android.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - covered by pixel-7
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -241,6 +251,7 @@ export default defineConfig({
         "**/mobile/android.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - same viewport as pixel-7
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     {
@@ -248,13 +259,13 @@ export default defineConfig({
       use: {
         ...devices["Galaxy Tab S9"],
         // Galaxy Tab S9: tablet Android
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/ipad.spec.ts", // Reuse tablet tests
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - covered by ipad-mini
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // iPhone 15 Pro - latest flagship
@@ -263,13 +274,13 @@ export default defineConfig({
       use: {
         ...devices["iPhone 15 Pro"],
         // iPhone 15 Pro: 393px × 852px (Dynamic Island)
-        // Use Chromium on Arch Linux (WebKit has dependency issues)
-        ...(process.env.USE_CHROMIUM_FOR_MOBILE && { browserName: "chromium" }),
+        browserName: "chromium",
       },
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
       ],
+      // Skip in CI - similar to iphone-13
       ...(process.env.CI && { testIgnore: "**/*" }),
     },
     // Other browsers disabled - only testing API/backend, not cross-browser UI
