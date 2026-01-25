@@ -118,6 +118,32 @@ export default getRequestConfig(async ({ locale }) => {
 **Deployment consideration**: Set `FEATURE_I18N_ENABLED=false` in production initially
 for gradual rollout.
 
+### 6. GitGuardian False Positives
+
+**Risk**: GitGuardian flags `messages/*.json` translation files as containing secrets.
+
+**Cause**: Translation files contain UI form labels like:
+
+```json
+{
+  "username": "Nome utente",
+  "password": "Password"
+}
+```
+
+These are **UI labels, NOT secrets**. GitGuardian's "Username Password" detector triggers on these patterns.
+
+**Solution**: `.gitguardian.yaml` updated to ignore:
+
+- `messages/*.json` and `messages/**/*.json` paths
+- Specific patterns: `"username": "` and `"password": "`
+
+**If GitGuardian still fails after merge**:
+
+1. Check GitGuardian dashboard for incident ID
+2. Mark as "False Positive" in dashboard
+3. Or add specific SHA to `ignored_matches` in `.gitguardian.yaml`
+
 ## Files Changed
 
 | File                             | Change                                      | Risk Level |
@@ -128,6 +154,7 @@ for gradual rollout.
 | `src/i18n/request.ts`            | Updated to v4.x API                         | MEDIUM     |
 | `src/app/[locale]/layout.tsx`    | Added force-dynamic                         | LOW        |
 | `prisma/schema/analytics.prisma` | Added locale field                          | MEDIUM     |
+| `.gitguardian.yaml`              | Added i18n path ignores                     | LOW        |
 
 ## Verification Checklist
 
