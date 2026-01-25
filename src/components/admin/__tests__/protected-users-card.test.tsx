@@ -26,12 +26,11 @@ describe("ProtectedUsersCard", () => {
   });
 
   it("displays multiple protected emails as list items", () => {
-    process.env.PROTECTED_USERS =
-      "roberdan@fightthestroke.org,mariodanfts@gmail.com";
+    process.env.PROTECTED_USERS = "admin@example.com,tester@example.com";
     render(<ProtectedUsersCard />);
 
-    expect(screen.getByText("roberdan@fightthestroke.org")).toBeInTheDocument();
-    expect(screen.getByText("mariodanfts@gmail.com")).toBeInTheDocument();
+    expect(screen.getByText("admin@example.com")).toBeInTheDocument();
+    expect(screen.getByText("tester@example.com")).toBeInTheDocument();
   });
 
   it("handles single email in PROTECTED_USERS", () => {
