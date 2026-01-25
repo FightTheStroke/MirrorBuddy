@@ -117,6 +117,9 @@ const nextConfig: NextConfig = {
   },
 };
 
+// Check if Sentry auth token is available for source map uploads
+const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
+
 // Sentry configuration options
 const sentryConfig = {
   // For all available options, see:
@@ -125,31 +128,49 @@ const sentryConfig = {
   org: process.env.SENTRY_ORG || "fightthestroke",
   project: process.env.SENTRY_PROJECT || "mirrorbuddy",
 
-  // ALWAYS silent to avoid 232+ warnings from source map upload
-  // The warnings are for Next.js internal files (page_client-reference-manifest.js)
-  // that don't have source maps - this is expected behavior, not an error
+  // Pass auth token explicitly to avoid "No auth token" warnings
+  // Only set if token exists to prevent warnings in Preview builds
+  ...(hasSentryToken && { authToken: process.env.SENTRY_AUTH_TOKEN }),
+
+  // ALWAYS silent to suppress all Sentry CLI output
+  // Prevents 232+ warnings from source map upload for Next.js manifest files
   // See ADR 0067 for details
   silent: true,
 
-  // Upload source maps for better error tracking
-  // Requires SENTRY_AUTH_TOKEN env var for CI uploads
-  widenClientFileUpload: true,
+  // Disable telemetry to reduce noise
+  telemetry: false,
+
+  // Skip source map upload if no auth token (Preview environments)
+  // This prevents "No auth token provided" warnings
+  sourcemaps: hasSentryToken
+    ? {
+        ignore: [
+          "**/page_client-reference-manifest.js",
+          "**/_buildManifest.js",
+          "**/_ssgManifest.js",
+        ],
+      }
+    : {
+        disable: true,
+      },
+
+  // Skip release creation if no auth token
+  release: hasSentryToken
+    ? {
+        // Auto-detect from git
+      }
+    : {
+        create: false,
+      },
+
+  // Upload source maps for better error tracking (only if token available)
+  widenClientFileUpload: hasSentryToken,
 
   // Hides source maps from generated client bundles
   hideSourceMaps: true,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
   tunnelRoute: "/monitoring",
-
-  // Ignore Next.js internal manifest files that don't have source maps
-  // These files generate "could not determine a source map reference" warnings
-  sourcemaps: {
-    ignore: [
-      "**/page_client-reference-manifest.js",
-      "**/_buildManifest.js",
-      "**/_ssgManifest.js",
-    ],
-  },
 
   // Webpack-specific options (new API)
   webpack: {

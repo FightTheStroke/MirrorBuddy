@@ -23,8 +23,9 @@ async function seedAdmin(): Promise<void> {
   const password = process.env.ADMIN_PASSWORD;
 
   if (!email || !password) {
-    console.log("⚠️  ADMIN_EMAIL or ADMIN_PASSWORD not set, skipping seed");
-    process.exit(0); // Exit cleanly, don't fail build
+    // Silent exit - env vars are optional for Preview deployments
+    // Only Production needs admin seeding
+    process.exit(0);
   }
 
   if (password.length < 8) {
