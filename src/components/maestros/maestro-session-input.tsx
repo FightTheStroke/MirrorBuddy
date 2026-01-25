@@ -1,11 +1,19 @@
-'use client';
+"use client";
 
-import { Send, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { MaestroSessionToolButtons } from './maestro-session-tool-buttons';
-import type { Maestro } from '@/types';
+import { Send, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MaestroSessionToolButtons } from "./maestro-session-tool-buttons";
+import type { Maestro } from "@/types";
 
-type ToolType = 'mindmap' | 'quiz' | 'flashcards' | 'demo' | 'search' | 'summary' | 'diagram' | 'timeline';
+type ToolType =
+  | "mindmap"
+  | "quiz"
+  | "flashcards"
+  | "demo"
+  | "search"
+  | "summary"
+  | "diagram"
+  | "timeline";
 
 interface MaestroSessionInputProps {
   maestro: Maestro;
@@ -39,7 +47,7 @@ export function MaestroSessionInput({
   onEndSession,
 }: MaestroSessionInputProps) {
   // Hide toolbar if maestro has no tools or only internal tools like web_search
-  const visibleTools = (maestro.tools || []).filter(t => t !== 'web_search');
+  const visibleTools = (maestro.tools || []).filter((t) => t !== "web_search");
   const hasVisibleTools = visibleTools.length > 0 || !maestro.tools;
 
   return (
@@ -64,11 +72,11 @@ export function MaestroSessionInput({
             sessionEnded
               ? 'Sessione terminata - Clicca "Nuova conversazione" per ricominciare'
               : isVoiceActive
-                ? 'Parla o scrivi...'
-                : `Scrivi un messaggio a ${maestro.name}...`
+                ? "Parla o scrivi..."
+                : `Scrivi un messaggio a ${maestro.displayName}...`
           }
           className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-3 sm:px-4 py-2 sm:py-3 text-sm focus:outline-none focus:ring-2"
-          style={{ '--tw-ring-color': maestro.color } as React.CSSProperties}
+          style={{ "--tw-ring-color": maestro.color } as React.CSSProperties}
           rows={1}
           disabled={isLoading || sessionEnded}
         />

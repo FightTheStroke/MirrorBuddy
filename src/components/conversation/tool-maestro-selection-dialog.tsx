@@ -54,7 +54,7 @@ export function ToolMaestroSelectionDialog({
   const filteredMaestri = maestri.filter((maestro) => {
     const query = searchQuery.toLowerCase();
     return (
-      maestro.name.toLowerCase().includes(query) ||
+      maestro.displayName.toLowerCase().includes(query) ||
       maestro.displayName.toLowerCase().includes(query) ||
       SUBJECT_NAMES[maestro.subject]?.toLowerCase().includes(query) ||
       maestro.subject.toLowerCase().includes(query)

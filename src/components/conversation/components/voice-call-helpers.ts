@@ -12,7 +12,8 @@ export function getUserId(): string | null {
 export function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
   return {
     id: character.id,
-    name: character.name,
+    name: character.id,
+    displayName: character.name,
     subject: "methodology" as Subject,
     specialty:
       character.type === "coach" ? "Metodo di studio" : "Supporto emotivo",

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================================
 // MAESTRO OVERLAY
@@ -6,19 +6,25 @@
 // Part of Phase 4: Fullscreen Layout
 // ============================================================================
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { Loader2, MessageSquare, X, Minimize2, GripVertical } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useState, useRef, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import {
+  Loader2,
+  MessageSquare,
+  X,
+  Minimize2,
+  GripVertical,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-export type MaestroStatus = 'idle' | 'thinking' | 'building' | 'speaking';
+export type MaestroStatus = "idle" | "thinking" | "building" | "speaking";
 
 export interface MaestroOverlayProps {
   maestro: {
     id: string;
-    name: string;
+    displayName: string;
     avatar: string;
     color: string;
   };
@@ -39,7 +45,7 @@ export function MaestroOverlay({
 }: MaestroOverlayProps) {
   // Use lazy initializer to set initial position based on window size
   const [position, setPosition] = useState(() => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       return {
         x: window.innerWidth - 220,
         y: window.innerHeight - 280,
@@ -53,14 +59,17 @@ export function MaestroOverlay({
   const dragStartRef = useRef({ x: 0, y: 0 });
 
   // Handle dragging
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) return;
-    setIsDragging(true);
-    dragStartRef.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
-    };
-  }, [position.x, position.y]);
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if ((e.target as HTMLElement).closest("button")) return;
+      setIsDragging(true);
+      dragStartRef.current = {
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      };
+    },
+    [position.x, position.y],
+  );
 
   useEffect(() => {
     if (!isDragging) return;
@@ -83,38 +92,38 @@ export function MaestroOverlay({
       setIsDragging(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging]);
 
   const getStatusText = () => {
     switch (status) {
-      case 'thinking':
-        return 'Sto pensando...';
-      case 'building':
-        return 'Sto costruendo...';
-      case 'speaking':
-        return 'Sto parlando...';
+      case "thinking":
+        return "Sto pensando...";
+      case "building":
+        return "Sto costruendo...";
+      case "speaking":
+        return "Sto parlando...";
       default:
-        return 'Pronto';
+        return "Pronto";
     }
   };
 
   const getStatusColor = () => {
     switch (status) {
-      case 'thinking':
-        return 'bg-amber-500';
-      case 'building':
-        return 'bg-blue-500';
-      case 'speaking':
-        return 'bg-green-500';
+      case "thinking":
+        return "bg-amber-500";
+      case "building":
+        return "bg-blue-500";
+      case "speaking":
+        return "bg-green-500";
       default:
-        return 'bg-slate-400';
+        return "bg-slate-400";
     }
   };
 
@@ -125,10 +134,7 @@ export function MaestroOverlay({
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         style={{ left: position.x, top: position.y }}
-        className={cn(
-          'fixed z-50 cursor-pointer',
-          className
-        )}
+        className={cn("fixed z-50 cursor-pointer", className)}
         onClick={() => setIsMinimized(false)}
       >
         <div
@@ -137,13 +143,18 @@ export function MaestroOverlay({
         >
           <Image
             src={maestro.avatar}
-            alt={maestro.name}
+            alt={maestro.displayName}
             fill
             className="object-cover"
           />
-          {status !== 'idle' && (
+          {status !== "idle" && (
             <div className="absolute -bottom-0.5 -right-0.5">
-              <span className={cn('w-4 h-4 rounded-full animate-pulse block', getStatusColor())} />
+              <span
+                className={cn(
+                  "w-4 h-4 rounded-full animate-pulse block",
+                  getStatusColor(),
+                )}
+              />
             </div>
           )}
         </div>
@@ -160,9 +171,9 @@ export function MaestroOverlay({
         exit={{ scale: 0.8, opacity: 0 }}
         style={{ left: position.x, top: position.y }}
         className={cn(
-          'fixed z-50 w-[200px] bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden',
-          isDragging ? 'cursor-grabbing' : 'cursor-grab',
-          className
+          "fixed z-50 w-[200px] bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 overflow-hidden",
+          isDragging ? "cursor-grabbing" : "cursor-grab",
+          className,
         )}
         onMouseDown={handleMouseDown}
       >
@@ -204,21 +215,21 @@ export function MaestroOverlay({
           >
             <Image
               src={maestro.avatar}
-              alt={maestro.name}
+              alt={maestro.displayName}
               fill
               className="object-cover"
             />
           </div>
           <h4 className="font-medium text-sm text-slate-900 dark:text-slate-100">
-            {maestro.name}
+            {maestro.displayName}
           </h4>
 
           {/* Status indicator */}
           <div className="flex items-center gap-1.5 mt-1">
-            {status !== 'idle' ? (
+            {status !== "idle" ? (
               <Loader2 className="w-3 h-3 animate-spin text-slate-500" />
             ) : (
-              <span className={cn('w-2 h-2 rounded-full', getStatusColor())} />
+              <span className={cn("w-2 h-2 rounded-full", getStatusColor())} />
             )}
             <span className="text-xs text-slate-500 dark:text-slate-400">
               {getStatusText()}

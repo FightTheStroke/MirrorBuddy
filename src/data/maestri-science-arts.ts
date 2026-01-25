@@ -11,6 +11,7 @@ export const MAESTRI_SCIENCE_ARTS: Maestro[] = [
   {
     id: "euclide",
     name: "Euclide",
+    displayName: "Prof. Euclide",
     subject: "mathematics",
     specialty: "Geometria",
     voice: "echo",
@@ -26,6 +27,7 @@ export const MAESTRI_SCIENCE_ARTS: Maestro[] = [
   {
     id: "feynman",
     name: "Feynman",
+    displayName: "Prof. Richard",
     subject: "physics",
     specialty: "Fisica",
     voice: "echo",
@@ -42,6 +44,7 @@ export const MAESTRI_SCIENCE_ARTS: Maestro[] = [
   {
     id: "galileo",
     name: "Galileo",
+    displayName: "Prof. Galileo",
     subject: "physics",
     specialty: "Astronomia e Metodo Scientifico",
     voice: "echo",
@@ -58,6 +61,7 @@ export const MAESTRI_SCIENCE_ARTS: Maestro[] = [
   {
     id: "curie",
     name: "Madam Curie",
+    displayName: "Prof.ssa Marie",
     subject: "chemistry",
     specialty: "Chimica",
     voice: "shimmer",
@@ -74,6 +78,7 @@ export const MAESTRI_SCIENCE_ARTS: Maestro[] = [
   {
     id: "darwin",
     name: "Darwin",
+    displayName: "Prof. Charles",
     subject: "biology",
     specialty: "Scienze Naturali ed Evoluzione",
     voice: "alloy",

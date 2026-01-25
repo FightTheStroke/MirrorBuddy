@@ -43,7 +43,7 @@ export function MaestroCard({
         ["--tw-ring-color" as string]: maestro.color,
         ["--tw-ring-offset-color" as string]: "var(--background)",
       }}
-      aria-label={`Studia con il Professore ${maestro.name}`}
+      aria-label={`Studia con ${maestro.displayName}`}
     >
       <div className="flex items-start gap-3">
         {/* Avatar - compact 56x56 */}
@@ -65,7 +65,7 @@ export function MaestroCard({
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
             <h3 className="font-semibold text-slate-900 dark:text-white truncate">
-              {maestro.name}
+              {maestro.displayName}
             </h3>
             <span className="text-base flex-shrink-0">
               {subjectIcons[maestro.subject]}

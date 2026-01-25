@@ -165,7 +165,7 @@ export function CharacterChatView({
           <ToolPanel
             tool={activeTool}
             maestro={{
-              name: character.name,
+              displayName: character.name,
               avatar: character.avatar || "/avatars/default.jpg",
               color: character.themeColor,
             }}

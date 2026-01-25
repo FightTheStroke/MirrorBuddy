@@ -1,20 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { X, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { GradeDisplay } from './components/grade-display';
-import { useProgressStore, type SessionGrade } from '@/lib/stores';
-import { logger } from '@/lib/logger';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { X, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { GradeDisplay } from "./components/grade-display";
+import { useProgressStore, type SessionGrade } from "@/lib/stores";
+import { logger } from "@/lib/logger";
 import {
   generateFeedback,
   generateStrengths,
   generateAreasToImprove,
-} from './helpers/grade-helpers';
-import type { Maestro } from '@/types';
+} from "./helpers/grade-helpers";
+import type { Maestro } from "@/types";
 
 interface SessionGradeProps {
   maestro: Maestro;
@@ -25,7 +25,14 @@ interface SessionGradeProps {
   onRequestGrade?: () => Promise<SessionGrade>;
 }
 
-export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, xpEarned, onClose, onRequestGrade }: SessionGradeProps) {
+export function SessionGradeDisplay({
+  maestro,
+  sessionDuration,
+  questionsAsked,
+  xpEarned,
+  onClose,
+  onRequestGrade,
+}: SessionGradeProps) {
   const [isGenerating, setIsGenerating] = useState(true);
   const [grade, setGrade] = useState<SessionGrade | null>(null);
   const { gradeCurrentSession } = useProgressStore();
@@ -43,31 +50,42 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
           gradeCurrentSession(aiGrade);
         } else {
           // Generate automatic grade based on metrics (deterministic)
-          const baseScore = Math.min(10, Math.max(1,
-            5 + // Base score
-            Math.min(2, questionsAsked * 0.5) + // Questions bonus
-            Math.min(2, sessionDuration * 0.1) + // Duration bonus
-            Math.min(0.5, (questionsAsked + sessionDuration) * 0.02) // Engagement bonus
-          ));
+          const baseScore = Math.min(
+            10,
+            Math.max(
+              1,
+              5 + // Base score
+                Math.min(2, questionsAsked * 0.5) + // Questions bonus
+                Math.min(2, sessionDuration * 0.1) + // Duration bonus
+                Math.min(0.5, (questionsAsked + sessionDuration) * 0.02), // Engagement bonus
+            ),
+          );
 
           const autoGrade: SessionGrade = {
             score: Math.round(baseScore),
-            feedback: generateFeedback(baseScore, questionsAsked, sessionDuration),
+            feedback: generateFeedback(
+              baseScore,
+              questionsAsked,
+              sessionDuration,
+            ),
             strengths: generateStrengths(questionsAsked, sessionDuration),
-            areasToImprove: generateAreasToImprove(questionsAsked, sessionDuration),
+            areasToImprove: generateAreasToImprove(
+              questionsAsked,
+              sessionDuration,
+            ),
           };
 
           setGrade(autoGrade);
           gradeCurrentSession(autoGrade);
         }
       } catch (error) {
-        logger.error('Failed to generate grade', { error: String(error) });
+        logger.error("Failed to generate grade", { error: String(error) });
         // Fallback grade
         setGrade({
           score: 7,
-          feedback: 'Buona sessione di studio!',
-          strengths: ['Impegno costante'],
-          areasToImprove: ['Continua così!'],
+          feedback: "Buona sessione di studio!",
+          strengths: ["Impegno costante"],
+          areasToImprove: ["Continua così!"],
         });
       } finally {
         setIsGenerating(false);
@@ -80,14 +98,13 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
   // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
-
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
@@ -108,15 +125,19 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
                 >
                   <Image
                     src={maestro.avatar}
-                    alt={maestro.name}
+                    alt={maestro.displayName}
                     width={48}
                     height={48}
                     className="w-full h-full object-cover"
                   />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">Valutazione Sessione</h2>
-                  <p className="text-sm text-slate-400">da {maestro.name}</p>
+                  <h2 className="text-xl font-semibold">
+                    Valutazione Sessione
+                  </h2>
+                  <p className="text-sm text-slate-400">
+                    da {maestro.displayName}
+                  </p>
                 </div>
               </div>
               <Button
@@ -137,19 +158,21 @@ export function SessionGradeDisplay({ maestro, sessionDuration, questionsAsked, 
               <div className="flex flex-col items-center gap-4 py-8">
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 >
                   <Sparkles className="w-12 h-12 text-amber-400" />
                 </motion.div>
                 <p className="text-slate-400">Il maestro sta valutando...</p>
               </div>
-            ) : grade && (
-              <GradeDisplay
-                grade={grade}
-                sessionDuration={sessionDuration}
-                questionsAsked={questionsAsked}
-                xpEarned={xpEarned}
-              />
+            ) : (
+              grade && (
+                <GradeDisplay
+                  grade={grade}
+                  sessionDuration={sessionDuration}
+                  questionsAsked={questionsAsked}
+                  xpEarned={xpEarned}
+                />
+              )
             )}
           </div>
 

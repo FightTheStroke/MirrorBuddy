@@ -169,6 +169,20 @@ if command -v vercel &> /dev/null; then
         exit 1
     fi
     echo -e "${GREEN}✓ Vercel env vars OK${NC}"
+
+    # Check for corrupted env vars (literal \n at end)
+    # This catches values incorrectly added with echo instead of printf
+    vercel env pull "$TEMP_DIR/vercel-env.txt" --environment=production > /dev/null 2>&1 || true
+    if [ -f "$TEMP_DIR/vercel-env.txt" ]; then
+        CORRUPTED_VARS=$(grep '\\n"$' "$TEMP_DIR/vercel-env.txt" | cut -d'=' -f1 || true)
+        if [ -n "$CORRUPTED_VARS" ]; then
+            echo -e "${RED}✗ Env vars with literal \\n (corrupted):${NC}"
+            echo "$CORRUPTED_VARS"
+            echo -e "${YELLOW}Fix: vercel env rm <name> production && printf '%s' 'value' | vercel env add <name> production${NC}"
+            exit 1
+        fi
+        echo -e "${GREEN}✓ No corrupted env vars${NC}"
+    fi
 else
     echo -e "${YELLOW}⚠ Vercel CLI not found, skipping env check${NC}"
 fi

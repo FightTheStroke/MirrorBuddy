@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * PROPOSTA 2: Tutto nella barra della chiamata
@@ -7,14 +7,23 @@
  * Header minimale quando non in chiamata, barra espansa quando in chiamata.
  */
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
-import { AudioVisualizer } from './components/audio-visualizer';
-import { cn } from '@/lib/utils';
-import type { Maestro } from '@/types';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import {
+  X,
+  Phone,
+  PhoneOff,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Mic,
+  MicOff,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
+import { AudioVisualizer } from "./components/audio-visualizer";
+import { cn } from "@/lib/utils";
+import type { Maestro } from "@/types";
 
 interface MaestroSessionHeaderV2Props {
   maestro: Maestro;
@@ -53,10 +62,11 @@ export function MaestroSessionHeaderV2({
 }: MaestroSessionHeaderV2Props) {
   const getStatusText = () => {
     if (configError) return configError;
-    if (isConnected && isSpeaking) return `${maestro.name} sta parlando...`;
-    if (isConnected && isListening) return 'In ascolto...';
-    if (isConnected) return 'Connesso';
-    return 'Avvio chiamata...';
+    if (isConnected && isSpeaking)
+      return `${maestro.displayName} sta parlando...`;
+    if (isConnected && isListening) return "In ascolto...";
+    if (isConnected) return "Connesso";
+    return "Avvio chiamata...";
   };
 
   return (
@@ -65,17 +75,19 @@ export function MaestroSessionHeaderV2({
       {!isVoiceActive && (
         <div
           className="flex items-start gap-2 sm:gap-4 p-2 sm:p-4 rounded-t-2xl text-white"
-          style={{ background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)` }}
+          style={{
+            background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)`,
+          }}
         >
           <motion.div
             className="relative flex-shrink-0"
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
-            transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
           >
             <Image
               src={maestro.avatar}
-              alt={maestro.name}
+              alt={maestro.displayName}
               width={56}
               height={56}
               className="w-10 h-10 sm:w-14 sm:h-14 rounded-full border-2 border-white/30 object-cover"
@@ -90,12 +102,16 @@ export function MaestroSessionHeaderV2({
 
           <div className="flex-1 min-w-0 pr-1 sm:pr-0">
             <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
-              <h2 className="text-base sm:text-xl font-bold truncate">{maestro.name}</h2>
+              <h2 className="text-base sm:text-xl font-bold truncate">
+                {maestro.displayName}
+              </h2>
               <span className="text-xs px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
                 Professore
               </span>
             </div>
-            <p className="text-xs sm:text-sm text-white/80 truncate">{maestro.specialty}</p>
+            <p className="text-xs sm:text-sm text-white/80 truncate">
+              {maestro.specialty}
+            </p>
             <p className="text-xs text-white/70 mt-1 whitespace-normal break-words line-clamp-2 sm:line-clamp-none">
               {maestro.greeting}
             </p>
@@ -107,11 +123,15 @@ export function MaestroSessionHeaderV2({
               size="icon"
               onClick={onVoiceCall}
               disabled={!!configError}
-              aria-label={configError ? `Voce non disponibile: ${configError}` : 'Avvia chiamata vocale'}
+              aria-label={
+                configError
+                  ? `Voce non disponibile: ${configError}`
+                  : "Avvia chiamata vocale"
+              }
               title={configError || undefined}
               className={cn(
-                'text-white hover:bg-white/20 transition-all h-8 w-8 sm:h-10 sm:w-10',
-                configError && 'opacity-50 cursor-not-allowed'
+                "text-white hover:bg-white/20 transition-all h-8 w-8 sm:h-10 sm:w-10",
+                configError && "opacity-50 cursor-not-allowed",
               )}
             >
               <Phone className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -123,9 +143,17 @@ export function MaestroSessionHeaderV2({
               onClick={ttsEnabled ? onStopTTS : undefined}
               disabled={!ttsEnabled}
               className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8 sm:h-10 sm:w-10"
-              aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
+              aria-label={
+                ttsEnabled
+                  ? "Disattiva lettura vocale"
+                  : "Lettura vocale disattivata"
+              }
             >
-              {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              {ttsEnabled ? (
+                <Volume2 className="w-4 h-4" />
+              ) : (
+                <VolumeX className="w-4 h-4" />
+              )}
             </Button>
 
             <Button
@@ -158,7 +186,9 @@ export function MaestroSessionHeaderV2({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           className="flex flex-col gap-3 p-3 sm:p-4 rounded-t-2xl text-white"
-          style={{ background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)` }}
+          style={{
+            background: `linear-gradient(to right, ${maestro.color}, ${maestro.color}dd)`,
+          }}
         >
           {/* Top row: Avatar, name, status */}
           <div className="flex items-center gap-3">
@@ -169,13 +199,13 @@ export function MaestroSessionHeaderV2({
             >
               <Image
                 src={maestro.avatar}
-                alt={maestro.name}
+                alt={maestro.displayName}
                 width={64}
                 height={64}
                 className={cn(
-                  'w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 object-cover transition-all',
-                  isConnected ? 'border-white shadow-lg' : 'border-white/50',
-                  isSpeaking && 'border-white shadow-lg shadow-white/30'
+                  "w-12 h-12 sm:w-16 sm:h-16 rounded-full border-4 object-cover transition-all",
+                  isConnected ? "border-white shadow-lg" : "border-white/50",
+                  isSpeaking && "border-white shadow-lg shadow-white/30",
                 )}
               />
               {isConnected && (
@@ -185,16 +215,22 @@ export function MaestroSessionHeaderV2({
 
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <h2 className="text-lg sm:text-xl font-bold truncate">{maestro.name}</h2>
+                <h2 className="text-lg sm:text-xl font-bold truncate">
+                  {maestro.displayName}
+                </h2>
                 <span className="text-xs px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap">
                   Professore
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-white/70 truncate">{maestro.specialty}</p>
-              <p className={cn(
-                "text-xs mt-1",
-                configError ? "text-red-200" : "text-white/60"
-              )}>
+              <p className="text-xs sm:text-sm text-white/70 truncate">
+                {maestro.specialty}
+              </p>
+              <p
+                className={cn(
+                  "text-xs mt-1",
+                  configError ? "text-red-200" : "text-white/60",
+                )}
+              >
                 {getStatusText()}
               </p>
             </div>
@@ -222,12 +258,14 @@ export function MaestroSessionHeaderV2({
                 variant="ghost"
                 size="sm"
                 onClick={onToggleMute}
-                aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+                aria-label={
+                  isMuted ? "Attiva microfono" : "Disattiva microfono"
+                }
                 className={cn(
-                  'rounded-full px-3 py-1.5 text-white transition-colors',
+                  "rounded-full px-3 py-1.5 text-white transition-colors",
                   isMuted
-                    ? 'bg-white/20 hover:bg-white/30'
-                    : 'bg-white/30 hover:bg-white/40'
+                    ? "bg-white/20 hover:bg-white/30"
+                    : "bg-white/30 hover:bg-white/40",
                 )}
               >
                 {isMuted ? (
@@ -263,9 +301,17 @@ export function MaestroSessionHeaderV2({
                 onClick={ttsEnabled ? onStopTTS : undefined}
                 disabled={!ttsEnabled}
                 className="hidden sm:flex text-white hover:bg-white/20 h-8 w-8"
-                aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
+                aria-label={
+                  ttsEnabled
+                    ? "Disattiva lettura vocale"
+                    : "Lettura vocale disattivata"
+                }
               >
-                {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                {ttsEnabled ? (
+                  <Volume2 className="w-4 h-4" />
+                ) : (
+                  <VolumeX className="w-4 h-4" />
+                )}
               </Button>
 
               <Button
@@ -297,7 +343,7 @@ export function MaestroSessionHeaderV2({
               aria-live="polite"
               role="status"
             >
-              {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+              {isMuted ? "Microfono disattivato" : "Parla ora..."}
             </p>
           )}
         </motion.div>

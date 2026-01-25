@@ -1,25 +1,28 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { cn } from '@/lib/utils';
-import { MaestroOverlay, type MaestroStatus } from '@/components/tools/maestro-overlay';
-import { ChatDrawer } from './fullscreen-chat-drawer';
-import { InputBar } from './fullscreen-input-bar';
-import type { FlowMessage } from '@/lib/stores/conversation-flow-store';
+import { useState, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import {
+  MaestroOverlay,
+  type MaestroStatus,
+} from "@/components/tools/maestro-overlay";
+import { ChatDrawer } from "./fullscreen-chat-drawer";
+import { InputBar } from "./fullscreen-input-bar";
+import type { FlowMessage } from "@/lib/stores/conversation-flow-store";
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
 export interface ActiveTool {
-  type: 'mindmap' | 'quiz' | 'flashcard' | 'demo';
+  type: "mindmap" | "quiz" | "flashcard" | "demo";
   id: string;
   data: unknown;
 }
 
 export interface MaestroInfo {
   id: string;
-  name: string;
+  displayName: string;
   avatar: string;
   color: string;
 }
@@ -60,26 +63,26 @@ export function FullscreenToolLayout({
   // Keyboard shortcut to toggle chat (Ctrl/Cmd + /)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+      if ((e.metaKey || e.ctrlKey) && e.key === "/") {
         e.preventDefault();
         setIsChatOpen((prev) => !prev);
       }
       // Escape to close chat
-      if (e.key === 'Escape' && isChatOpen) {
+      if (e.key === "Escape" && isChatOpen) {
         setIsChatOpen(false);
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isChatOpen]);
 
   return (
-    <div className={cn('fixed inset-0 bg-white dark:bg-slate-950', className)}>
+    <div className={cn("fixed inset-0 bg-white dark:bg-slate-950", className)}>
       {/* Tool Content Area - Full screen with bottom padding for input bar */}
       <div
         className="absolute inset-0 z-10 overflow-auto"
-        style={{ paddingBottom: '60px' }}
+        style={{ paddingBottom: "60px" }}
       >
         {children}
       </div>

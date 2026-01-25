@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { PhoneOff, Clock, Trophy } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { Maestro } from '@/types';
-import { formatTime } from './helpers';
+import Image from "next/image";
+import { PhoneOff, Clock, Trophy } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { Maestro } from "@/types";
+import { formatTime } from "./helpers";
 
 interface SessionHeaderProps {
   maestro: Maestro;
@@ -35,14 +35,14 @@ export function SessionHeader({
           >
             <Image
               src={maestro.avatar}
-              alt={maestro.name}
+              alt={maestro.displayName}
               width={48}
               height={48}
               className="w-full h-full object-cover"
             />
           </div>
           <div>
-            <h2 className="text-xl font-semibold">{maestro.name}</h2>
+            <h2 className="text-xl font-semibold">{maestro.displayName}</h2>
             <p className="text-sm text-slate-400">{maestro.specialty}</p>
           </div>
         </div>
@@ -61,13 +61,17 @@ export function SessionHeader({
         <div className="mt-4 flex items-center gap-4">
           <div className="flex items-center gap-2 px-3 py-1.5 bg-slate-800/50 rounded-lg">
             <Clock className="h-4 w-4 text-slate-400" />
-            <span className="text-sm font-mono text-slate-200">{formatTime(elapsedSeconds)}</span>
+            <span className="text-sm font-mono text-slate-200">
+              {formatTime(elapsedSeconds)}
+            </span>
           </div>
 
           <div className="flex-1 flex items-center gap-2">
             <div className="flex items-center gap-1.5">
               <Trophy className="h-4 w-4 text-amber-400" />
-              <span className="text-xs font-medium text-amber-400">Lv.{level}</span>
+              <span className="text-xs font-medium text-amber-400">
+                Lv.{level}
+              </span>
             </div>
             <div className="flex-1 h-2 bg-slate-800/50 rounded-full overflow-hidden">
               <div

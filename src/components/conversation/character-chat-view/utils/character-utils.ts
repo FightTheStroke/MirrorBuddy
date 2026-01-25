@@ -123,7 +123,8 @@ export function characterToMaestro(
 ): Maestro {
   return {
     id: characterId,
-    name: character.name,
+    name: characterId,
+    displayName: character.name,
     subject: "italian" as Subject, // Default subject for coaches/buddies
     specialty: character.role,
     voice: character.voice as MaestroVoice,

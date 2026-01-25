@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { EvaluationCard } from '@/components/chat/evaluation-card';
-import { ToolResultDisplay } from '@/components/tools';
-import { MessageBubble } from './message-bubble';
-import type { ChatMessage, ToolCall, Maestro } from '@/types';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { EvaluationCard } from "@/components/chat/evaluation-card";
+import { ToolResultDisplay } from "@/components/tools";
+import { MessageBubble } from "./message-bubble";
+import type { ChatMessage, ToolCall, Maestro } from "@/types";
 
 interface MaestroSessionMessagesProps {
   messages: ChatMessage[];
@@ -39,12 +39,12 @@ export function MaestroSessionMessages({
       aria-live="polite"
       aria-label="Messaggi della conversazione"
     >
-      {messages.map((message) => (
-        message.type === 'evaluation' && message.evaluation ? (
+      {messages.map((message) =>
+        message.type === "evaluation" && message.evaluation ? (
           <EvaluationCard
             key={message.id}
             evaluation={message.evaluation}
-            maestroName={maestro.name}
+            maestroName={maestro.displayName}
             maestroColor={maestro.color}
             className="mb-4"
           />
@@ -56,8 +56,8 @@ export function MaestroSessionMessages({
             ttsEnabled={ttsEnabled}
             speak={speak}
           />
-        )
-      ))}
+        ),
+      )}
 
       {/* Tool results inline - Skip fullscreen tools, they're rendered separately */}
       {toolCalls.map((tool) => {
@@ -69,11 +69,15 @@ export function MaestroSessionMessages({
             animate={{ opacity: 1, scale: 1 }}
             className="mb-4"
           >
-            <ToolResultDisplay 
-              toolCall={tool} 
+            <ToolResultDisplay
+              toolCall={tool}
               sessionId={voiceSessionId}
               isFullscreen={false}
-              onToggleFullscreen={onToggleToolFullscreen ? () => onToggleToolFullscreen(tool.id) : undefined}
+              onToggleFullscreen={
+                onToggleToolFullscreen
+                  ? () => onToggleToolFullscreen(tool.id)
+                  : undefined
+              }
             />
           </motion.div>
         );
@@ -89,7 +93,7 @@ export function MaestroSessionMessages({
           <div className="flex-shrink-0">
             <Image
               src={maestro.avatar}
-              alt={maestro.name}
+              alt={maestro.displayName}
               width={36}
               height={36}
               className="rounded-full object-cover"
@@ -97,9 +101,18 @@ export function MaestroSessionMessages({
           </div>
           <div className="bg-white dark:bg-slate-800 rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
             <div className="flex gap-1">
-              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2 h-2 bg-slate-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span
+                className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0ms" }}
+              />
+              <span
+                className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                style={{ animationDelay: "150ms" }}
+              />
+              <span
+                className="w-2 h-2 bg-slate-400 rounded-full animate-bounce"
+                style={{ animationDelay: "300ms" }}
+              />
             </div>
           </div>
         </motion.div>

@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { Mic, MessageSquare, Sparkles, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { subjectIcons, subjectNames } from '@/data';
-import { QuoteRotator } from './quote-rotator';
-import type { Maestro } from '@/types';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { Mic, MessageSquare, Sparkles, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { subjectIcons, subjectNames } from "@/data";
+import { QuoteRotator } from "./quote-rotator";
+import type { Maestro } from "@/types";
 
 interface MaestroCardFullProps {
   maestro: Maestro;
@@ -33,11 +33,11 @@ export function MaestroCardFull({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.95 }}
       className={cn(
-        'relative w-full max-w-md mx-auto p-6 rounded-2xl',
-        'bg-white dark:bg-slate-800/95',
-        'border border-slate-200 dark:border-slate-700/50',
-        'shadow-xl',
-        className
+        "relative w-full max-w-md mx-auto p-6 rounded-2xl",
+        "bg-white dark:bg-slate-800/95",
+        "border border-slate-200 dark:border-slate-700/50",
+        "shadow-xl",
+        className,
       )}
     >
       {/* Close button */}
@@ -55,11 +55,11 @@ export function MaestroCardFull({
       <div className="flex flex-col items-center mb-4">
         <div
           className="relative w-24 h-24 rounded-full overflow-hidden ring-4 mb-3"
-          style={{ ['--tw-ring-color' as string]: maestro.color }}
+          style={{ ["--tw-ring-color" as string]: maestro.color }}
         >
           <Image
             src={maestro.avatar}
-            alt={maestro.name}
+            alt={maestro.displayName}
             width={96}
             height={96}
             className="w-full h-full object-cover"
@@ -75,7 +75,7 @@ export function MaestroCardFull({
 
         {/* Name + Subject */}
         <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-          {maestro.name}
+          {maestro.displayName}
         </h2>
         <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
           <span>{subjectIcons[maestro.subject]}</span>

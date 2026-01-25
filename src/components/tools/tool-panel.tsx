@@ -33,7 +33,7 @@ function getUserId(): string {
 
 interface ToolPanelProps {
   tool: ToolState | null;
-  maestro: { name: string; avatar: string; color: string } | null;
+  maestro: { displayName: string; avatar: string; color: string } | null;
   onClose: () => void;
   isMinimized?: boolean;
   onToggleMinimize?: () => void;
@@ -212,14 +212,14 @@ export function ToolPanel({
             {maestro && (
               <Image
                 src={maestro.avatar}
-                alt={maestro.name}
+                alt={maestro.displayName}
                 width={32}
                 height={32}
                 className="w-8 h-8 rounded-full object-cover"
               />
             )}
             <span className="font-medium text-slate-900 dark:text-white">
-              {maestro?.name || "Tool"}
+              {maestro?.displayName || "Tool"}
             </span>
             <span className="text-sm text-slate-500 dark:text-slate-400">
               {tool.status === "building"

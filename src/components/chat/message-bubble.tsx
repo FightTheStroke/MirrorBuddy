@@ -43,7 +43,7 @@ export function MessageBubble({
         >
           <Image
             src={maestro.avatar}
-            alt={maestro.name}
+            alt={maestro.displayName}
             width={32}
             height={32}
             className="w-full h-full object-cover"

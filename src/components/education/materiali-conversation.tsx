@@ -1,18 +1,18 @@
-'use client';
+"use client";
 
-import { motion as _motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { useMaterialiConversation } from './materiali-conversation/hooks/use-materiali-conversation';
-import { ConversationHeader } from './materiali-conversation/components/conversation-header';
-import { MessagesList } from './materiali-conversation/components/messages-list';
-import { QuickActions } from './materiali-conversation/components/quick-actions';
-import { AttachmentPreview } from './materiali-conversation/components/attachment-preview';
-import { AttachmentPanel } from './materiali-conversation/components/attachment-panel';
-import { ConversationInput } from './materiali-conversation/components/conversation-input';
-import { DEFAULT_MELISSA } from './materiali-conversation/constants';
-import type { Character } from './materiali-conversation/types';
-import type { Maestro } from '@/types';
+import { motion as _motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useMaterialiConversation } from "./materiali-conversation/hooks/use-materiali-conversation";
+import { ConversationHeader } from "./materiali-conversation/components/conversation-header";
+import { MessagesList } from "./materiali-conversation/components/messages-list";
+import { QuickActions } from "./materiali-conversation/components/quick-actions";
+import { AttachmentPreview } from "./materiali-conversation/components/attachment-preview";
+import { AttachmentPanel } from "./materiali-conversation/components/attachment-panel";
+import { ConversationInput } from "./materiali-conversation/components/conversation-input";
+import { DEFAULT_MELISSA } from "./materiali-conversation/constants";
+import type { Character } from "./materiali-conversation/types";
+import type { Maestro } from "@/types";
 
 interface MaterialiConversationProps {
   character?: Character;
@@ -32,10 +32,10 @@ export function MaterialiConversation({
   const activeCharacter: Character = maestro
     ? {
         id: maestro.id,
-        name: maestro.name,
+        name: maestro.displayName,
         avatar: maestro.avatar,
         color: maestro.color,
-        role: 'maestro' as const,
+        role: "maestro" as const,
         greeting: maestro.greeting,
         systemPrompt: maestro.systemPrompt,
       }
@@ -76,9 +76,9 @@ export function MaterialiConversation({
   return (
     <div
       className={cn(
-        'flex flex-col h-full',
-        settings.highContrast ? 'bg-black' : 'bg-white dark:bg-slate-900',
-        className
+        "flex flex-col h-full",
+        settings.highContrast ? "bg-black" : "bg-white dark:bg-slate-900",
+        className,
       )}
     >
       <ConversationHeader

@@ -1,9 +1,12 @@
-import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ToolPanel } from '@/components/tools/tool-panel';
-import { CHARACTER_AVATARS } from './index';
-import type { ToolState } from '@/types/tools';
-import type { ActiveCharacter, FlowMessage } from '@/lib/stores/conversation-flow-store';
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ToolPanel } from "@/components/tools/tool-panel";
+import { CHARACTER_AVATARS } from "./index";
+import type { ToolState } from "@/types/tools";
+import type {
+  ActiveCharacter,
+  FlowMessage,
+} from "@/lib/stores/conversation-flow-store";
 
 interface ToolLayoutProps {
   activeTool: ToolState;
@@ -34,8 +37,10 @@ export function ToolLayout({
           maestro={
             activeCharacter
               ? {
-                  name: activeCharacter.name,
-                  avatar: CHARACTER_AVATARS[activeCharacter.id] || '/avatars/default.jpg',
+                  displayName: activeCharacter.name,
+                  avatar:
+                    CHARACTER_AVATARS[activeCharacter.id] ||
+                    "/avatars/default.jpg",
                   color: activeCharacter.color,
                 }
               : null
@@ -58,17 +63,17 @@ export function ToolLayout({
           <div
             key={message.id}
             className={cn(
-              'text-xs py-1 px-2 rounded mb-1',
-              message.role === 'user'
-                ? 'bg-accent-themed/10 text-right'
-                : 'bg-slate-200 dark:bg-slate-700'
+              "text-xs py-1 px-2 rounded mb-1",
+              message.role === "user"
+                ? "bg-accent-themed/10 text-right"
+                : "bg-slate-200 dark:bg-slate-700",
             )}
           >
             <span className="font-medium">
-              {message.role === 'user' ? 'Tu' : activeCharacter?.name}:
-            </span>{' '}
+              {message.role === "user" ? "Tu" : activeCharacter?.name}:
+            </span>{" "}
             {message.content.substring(0, 80)}
-            {message.content.length > 80 && '...'}
+            {message.content.length > 80 && "..."}
           </div>
         ))}
         {isLoading && (
@@ -81,4 +86,3 @@ export function ToolLayout({
     </div>
   );
 }
-

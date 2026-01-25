@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { Loader2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import type { Maestro } from '@/types';
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { Maestro } from "@/types";
 
 interface MessageLoadingProps {
   maestro: Maestro;
@@ -24,7 +24,7 @@ export function MessageLoading({ maestro, highContrast }: MessageLoadingProps) {
       >
         <Image
           src={maestro.avatar}
-          alt={maestro.name}
+          alt={maestro.displayName}
           width={32}
           height={32}
           className="w-full h-full object-cover"
@@ -32,25 +32,25 @@ export function MessageLoading({ maestro, highContrast }: MessageLoadingProps) {
       </div>
       <div
         className={cn(
-          'rounded-2xl px-4 py-3 flex items-center gap-2',
+          "rounded-2xl px-4 py-3 flex items-center gap-2",
           highContrast
-            ? 'bg-gray-900 border border-gray-700'
-            : 'bg-slate-100 dark:bg-slate-800'
+            ? "bg-gray-900 border border-gray-700"
+            : "bg-slate-100 dark:bg-slate-800",
         )}
       >
         <Loader2
           className={cn(
-            'w-4 h-4 animate-spin',
-            highContrast ? 'text-yellow-400' : 'text-blue-500'
+            "w-4 h-4 animate-spin",
+            highContrast ? "text-yellow-400" : "text-blue-500",
           )}
         />
         <span
           className={cn(
-            'text-sm',
-            highContrast ? 'text-gray-400' : 'text-slate-500'
+            "text-sm",
+            highContrast ? "text-gray-400" : "text-slate-500",
           )}
         >
-          {maestro.name} sta pensando...
+          {maestro.displayName} sta pensando...
         </span>
       </div>
     </motion.div>

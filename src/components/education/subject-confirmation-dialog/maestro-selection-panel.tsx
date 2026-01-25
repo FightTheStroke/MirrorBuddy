@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { getMaestriBySubject } from '@/data';
-import type { Subject, Maestro } from '@/types';
-import { getSubjectLabel } from './subject-selection-panel';
+import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { getMaestriBySubject } from "@/data";
+import type { Subject, Maestro } from "@/types";
+import { getSubjectLabel } from "./subject-selection-panel";
 
 interface MaestroSelectionPanelProps {
   selectedSubject: Subject;
@@ -23,8 +23,11 @@ export function MaestroSelectionPanel({
   return (
     <>
       <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">
-        Vuoi studiare <span className="font-semibold text-blue-600">{getSubjectLabel(selectedSubject)}</span> con un Professore?
-        Ti guiderà passo dopo passo.
+        Vuoi studiare{" "}
+        <span className="font-semibold text-blue-600">
+          {getSubjectLabel(selectedSubject)}
+        </span>{" "}
+        con un Professore? Ti guiderà passo dopo passo.
       </p>
 
       <div className="space-y-2 mb-6">
@@ -37,14 +40,14 @@ export function MaestroSelectionPanel({
             <div className="w-12 h-12 rounded-full overflow-hidden shadow-md flex-shrink-0">
               <Image
                 src={maestro.avatar}
-                alt={maestro.name}
+                alt={maestro.displayName}
                 width={48}
                 height={48}
                 className="w-full h-full object-cover"
               />
             </div>
             <div className="flex-1">
-              <p className="font-semibold">{maestro.name}</p>
+              <p className="font-semibold">{maestro.displayName}</p>
               <p className="text-sm text-slate-500">{maestro.specialty}</p>
             </div>
             <ArrowRight className="h-5 w-5 text-blue-500" />
@@ -71,11 +74,7 @@ export function MaestroSelectionPanel({
         </button>
       </div>
 
-      <Button
-        variant="outline"
-        onClick={onBack}
-        className="w-full"
-      >
+      <Button variant="outline" onClick={onBack} className="w-full">
         <ArrowLeft className="mr-2 h-4 w-4" />
         Torna alla selezione materia
       </Button>

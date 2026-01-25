@@ -90,7 +90,7 @@ export function useSessionEffects({
           method: "POST",
           body: JSON.stringify({
             maestroId: maestro.id,
-            title: `Sessione vocale con ${maestro.name}`,
+            title: `Sessione vocale con ${maestro.displayName}`,
           }),
         });
         if (response.ok) {
@@ -108,7 +108,7 @@ export function useSessionEffects({
     };
 
     createConversation();
-  }, [isConnected, maestro.id, maestro.name]);
+  }, [isConnected, maestro.id, maestro.displayName]);
 
   // Save transcript messages to DB for memory persistence
   useEffect(() => {

@@ -20,7 +20,8 @@ import type { ConnectionInfo } from "../voice-session/types";
 
 const mockMaestro: Maestro = {
   id: "galileo",
-  name: "Galileo",
+  name: "galileo",
+  displayName: "Galileo",
   subject: "physics",
   avatar: "/maestri/galileo.webp",
   color: "#FF6B6B",

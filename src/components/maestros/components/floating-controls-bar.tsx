@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { PhoneOff, Mic, MicOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
-import { cn } from '@/lib/utils';
-import type { Maestro } from '@/types';
+import { motion } from "framer-motion";
+import { PhoneOff, Mic, MicOff } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
+import { cn } from "@/lib/utils";
+import type { Maestro } from "@/types";
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -37,7 +37,7 @@ export function FloatingControlsBar({
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
-      transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+      transition={{ type: "spring", damping: 25, stiffness: 200 }}
       className="sticky top-0 z-20 mx-2 sm:mx-4 mt-2 mb-2"
     >
       <div
@@ -83,14 +83,14 @@ export function FloatingControlsBar({
                     opacity: style.opacity,
                     scaleY: isSpeaking || (isListening && !isMuted) ? 1 : 0.8,
                   }}
-                  transition={{ duration: 0.06, ease: 'easeOut' }}
+                  transition={{ duration: 0.06, ease: "easeOut" }}
                   className={cn(
                     "w-1.5 rounded-full",
                     isSpeaking
                       ? "bg-white"
                       : isListening && !isMuted
                         ? "bg-white/80"
-                        : "bg-white/30"
+                        : "bg-white/30",
                   )}
                 />
               );
@@ -101,16 +101,24 @@ export function FloatingControlsBar({
         {/* Status */}
         {isConnected && (
           <div className="flex items-center gap-1.5 text-xs text-white/90">
-            <div className={cn(
-              "w-2 h-2 rounded-full",
-              isSpeaking ? "bg-white animate-pulse" :
-              isListening && !isMuted ? "bg-white/80" :
-              "bg-white/50"
-            )} />
+            <div
+              className={cn(
+                "w-2 h-2 rounded-full",
+                isSpeaking
+                  ? "bg-white animate-pulse"
+                  : isListening && !isMuted
+                    ? "bg-white/80"
+                    : "bg-white/50",
+              )}
+            />
             <span className="hidden sm:inline">
-              {isSpeaking ? `${maestro.name} sta parlando` :
-               isListening && !isMuted ? 'In ascolto...' :
-               isMuted ? 'Microfono disattivato' : 'Connesso'}
+              {isSpeaking
+                ? `${maestro.displayName} sta parlando`
+                : isListening && !isMuted
+                  ? "In ascolto..."
+                  : isMuted
+                    ? "Microfono disattivato"
+                    : "Connesso"}
             </span>
           </div>
         )}
@@ -124,12 +132,12 @@ export function FloatingControlsBar({
               variant="ghost"
               size="sm"
               onClick={onToggleMute}
-              aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+              aria-label={isMuted ? "Attiva microfono" : "Disattiva microfono"}
               className={cn(
-                'rounded-full px-3 py-1.5 text-white transition-colors',
+                "rounded-full px-3 py-1.5 text-white transition-colors",
                 isMuted
-                  ? 'bg-white/20 hover:bg-white/30'
-                  : 'bg-white/30 hover:bg-white/40'
+                  ? "bg-white/20 hover:bg-white/30"
+                  : "bg-white/30 hover:bg-white/40",
               )}
             >
               {isMuted ? (

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { getMaestroById } from '@/data';
-import { useConversationFlowStore } from '@/lib/stores/conversation-flow-store';
+import Image from "next/image";
+import { motion } from "framer-motion";
+import { MessageCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { getMaestroById } from "@/data";
+import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 
 interface ActiveMaestroAvatarProps {
   onReturnToMaestro?: () => void;
@@ -24,7 +24,7 @@ export function ActiveMaestroAvatar({
   const { activeCharacter } = useConversationFlowStore();
 
   // Only show if current character is a maestro
-  if (!activeCharacter || activeCharacter.type !== 'maestro') {
+  if (!activeCharacter || activeCharacter.type !== "maestro") {
     return null;
   }
 
@@ -47,22 +47,22 @@ export function ActiveMaestroAvatar({
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.8 }}
       transition={{ duration: 0.3 }}
-      className={cn('relative', className)}
+      className={cn("relative", className)}
     >
       <button
         onClick={handleClick}
         className={cn(
-          'group relative flex items-center gap-3 w-full p-3 rounded-xl',
-          'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-          'hover:bg-slate-50 dark:hover:bg-slate-700/50',
-          'transition-all duration-200',
-          'focus:outline-none focus:ring-2 focus:ring-offset-2',
-          'focus:ring-offset-white dark:focus:ring-offset-slate-900'
+          "group relative flex items-center gap-3 w-full p-3 rounded-xl",
+          "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
+          "hover:bg-slate-50 dark:hover:bg-slate-700/50",
+          "transition-all duration-200",
+          "focus:outline-none focus:ring-2 focus:ring-offset-2",
+          "focus:ring-offset-white dark:focus:ring-offset-slate-900",
         )}
         style={{
-          ['--ring-color' as string]: maestro.color,
+          ["--ring-color" as string]: maestro.color,
         }}
-        aria-label={`Torna alla conversazione con ${maestro.name}`}
+        aria-label={`Torna alla conversazione con ${maestro.displayName}`}
       >
         {/* Avatar with green indicator */}
         <div className="relative flex-shrink-0">
@@ -72,7 +72,7 @@ export function ActiveMaestroAvatar({
           >
             <Image
               src={maestro.avatar}
-              alt={maestro.name}
+              alt={maestro.displayName}
               width={48}
               height={48}
               className="w-full h-full object-cover"
@@ -89,7 +89,7 @@ export function ActiveMaestroAvatar({
         <div className="flex-1 min-w-0 text-left">
           <div className="flex items-center gap-2">
             <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-              {maestro.name}
+              {maestro.displayName}
             </p>
             <span
               className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
