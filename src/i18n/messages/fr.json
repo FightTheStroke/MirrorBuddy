@@ -1905,5 +1905,85 @@
       "add": "Ajouter",
       "saving": "Enregistrement..."
     }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Téléchargement en cours...",
+        "processing": "Génération du matériel en cours...",
+        "success": "Kit d'étude généré avec succès !",
+        "error": "Erreur lors de la génération"
+      },
+      "processingNote": "Ce processus peut prendre quelques minutes. Vous pouvez fermer cette fenêtre et revenir plus tard.",
+      "loadAnother": "Télécharger un autre PDF"
+    },
+    "exportModal": {
+      "title": "Exporter le PDF accessible",
+      "description": "Sélectionnez un profil DSA pour optimiser le PDF",
+      "closeLabel": "Fermer",
+      "profileLabel": "Profil DSA",
+      "formatLabel": "Format de page",
+      "success": {
+        "withZaino": "PDF téléchargé et enregistré dans le Sac à dos",
+        "default": "PDF téléchargé avec succès"
+      },
+      "error": "Erreur lors de l'export",
+      "cancel": "Annuler",
+      "export": "Exporter le PDF",
+      "generating": "Génération..."
+    },
+    "list": {
+      "deleteConfirm": "Êtes-vous sûr de vouloir supprimer « {title} » ?",
+      "deleteError": "Erreur lors de la suppression. Veuillez réessayer.",
+      "status": "Statut :",
+      "filters": {
+        "all": "Tous",
+        "processing": "En cours",
+        "ready": "Prêts",
+        "error": "Erreurs"
+      },
+      "empty": {
+        "title": "Aucun kit d'étude trouvé",
+        "description": "Téléchargez un PDF pour commencer"
+      },
+      "processing": {
+        "title": "Génération en cours...",
+        "description": "Ce processus peut prendre quelques minutes"
+      },
+      "error": {
+        "title": "Génération échouée",
+        "description": "Vous pouvez supprimer ce kit d'étude et réessayer avec un autre fichier."
+      },
+      "open": "Ouvrir",
+      "delete": "Supprimer",
+      "cancel": "Annuler"
+    },
+    "view": {
+      "header": "Générateur de kit d'étude",
+      "subtitle": "Téléchargez un PDF et générez des résumés, cartes mentales, démos et quiz",
+      "newKit": "Nouveau kit d'étude",
+      "uploadTitle": "Télécharger un PDF",
+      "backToList": "Retour à la liste",
+      "back": "← Retour à la liste",
+      "myKits": "Mes kits d'étude",
+      "features": {
+        "summary": {
+          "title": "Résumé",
+          "description": "Aperçu des concepts clés"
+        },
+        "mindmap": {
+          "title": "Carte mentale",
+          "description": "Connexions de concepts"
+        },
+        "demo": {
+          "title": "Démo",
+          "description": "Simulations STEM"
+        },
+        "quiz": {
+          "title": "Quiz",
+          "description": "Vérification de la compréhension"
+        }
+      }
+    }
   }
 }

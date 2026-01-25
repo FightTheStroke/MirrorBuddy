@@ -2289,5 +2289,85 @@
       "add": "Aggiungi",
       "saving": "Salvataggio..."
     }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Caricamento in corso...",
+        "processing": "Generazione materiali in corso...",
+        "success": "Study Kit generato con successo!",
+        "error": "Errore durante la generazione"
+      },
+      "processingNote": "Questo processo può richiedere alcuni minuti. Puoi chiudere questa finestra e tornare più tardi.",
+      "loadAnother": "Carica un altro PDF"
+    },
+    "exportModal": {
+      "title": "Esporta PDF Accessibile",
+      "description": "Seleziona il profilo DSA per ottimizzare il PDF",
+      "closeLabel": "Chiudi",
+      "profileLabel": "Profilo DSA",
+      "formatLabel": "Formato pagina",
+      "success": {
+        "withZaino": "PDF scaricato e salvato nello Zaino",
+        "default": "PDF scaricato con successo"
+      },
+      "error": "Errore durante l'esportazione",
+      "cancel": "Annulla",
+      "export": "Esporta PDF",
+      "generating": "Generando..."
+    },
+    "list": {
+      "deleteConfirm": "Sei sicuro di voler eliminare \"{title}\"?",
+      "deleteError": "Errore durante l'eliminazione. Riprova.",
+      "status": "Stato:",
+      "filters": {
+        "all": "Tutti",
+        "processing": "In corso",
+        "ready": "Pronti",
+        "error": "Errori"
+      },
+      "empty": {
+        "title": "Nessuno Study Kit trovato",
+        "description": "Carica un PDF per iniziare"
+      },
+      "processing": {
+        "title": "Generazione in corso...",
+        "description": "Questo processo può richiedere alcuni minuti"
+      },
+      "error": {
+        "title": "Generazione fallita",
+        "description": "Puoi eliminare questo Study Kit e riprovare con un altro file."
+      },
+      "open": "Apri",
+      "delete": "Elimina",
+      "cancel": "Annulla"
+    },
+    "view": {
+      "header": "Study Kit Generator",
+      "subtitle": "Carica un PDF e genera riassunti, mappe, demo e quiz",
+      "newKit": "Nuovo Study Kit",
+      "uploadTitle": "Carica PDF",
+      "backToList": "Torna alla lista",
+      "back": "← Torna alla lista",
+      "myKits": "I tuoi Study Kit",
+      "features": {
+        "summary": {
+          "title": "Riassunto",
+          "description": "Sintesi dei concetti chiave"
+        },
+        "mindmap": {
+          "title": "Mappa Mentale",
+          "description": "Collegamenti tra concetti"
+        },
+        "demo": {
+          "title": "Demo",
+          "description": "Simulazioni STEM"
+        },
+        "quiz": {
+          "title": "Quiz",
+          "description": "Verifica comprensione"
+        }
+      }
+    }
   }
 }

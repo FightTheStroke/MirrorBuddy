@@ -7,6 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   FileText,
   Loader2,
@@ -29,6 +30,7 @@ interface StudyKitListProps {
 }
 
 export function StudyKitList({ onSelect, className }: StudyKitListProps) {
+  const t = useTranslations("studyKit.list");
   const [studyKits, setStudyKits] = useState<StudyKit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -66,7 +68,8 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
   }, [loadStudyKits]);
 
   const handleDelete = async (kitId: string, kitTitle: string) => {
-    if (!confirm(`Sei sicuro di voler eliminare "${kitTitle}"?`)) {
+    const confirmMsg = t("deleteConfirm", { title: kitTitle });
+    if (!confirm(confirmMsg)) {
       return;
     }
 
@@ -83,7 +86,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       setStudyKits((prev) => prev.filter((kit) => kit.id !== kitId));
     } catch (err) {
       logger.error("Failed to delete study kit", { error: String(err) });
-      alert("Errore durante l'eliminazione. Riprova.");
+      alert(t("deleteError"));
     }
   };
 
@@ -125,7 +128,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
       {/* Filters */}
       <div className="flex items-center gap-2">
         <span className="text-sm text-slate-600 dark:text-slate-400">
-          Stato:
+          {t("status")}
         </span>
         <div className="flex gap-2">
           {(["all", "processing", "ready", "error"] as const).map((status) => (
@@ -135,10 +138,10 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
               size="sm"
               onClick={() => setStatusFilter(status)}
             >
-              {status === "all" && "Tutti"}
-              {status === "processing" && "In corso"}
-              {status === "ready" && "Pronti"}
-              {status === "error" && "Errori"}
+              {status === "all" && t("filters.all")}
+              {status === "processing" && t("filters.processing")}
+              {status === "ready" && t("filters.ready")}
+              {status === "error" && t("filters.error")}
             </Button>
           ))}
         </div>
@@ -149,10 +152,10 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
         <div className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-12 text-center">
           <FileText className="w-12 h-12 text-slate-400 mx-auto mb-3" />
           <p className="text-slate-600 dark:text-slate-400">
-            Nessuno Study Kit trovato
+            {t("empty.title")}
           </p>
           <p className="text-sm text-slate-500 mt-1">
-            Carica un PDF per iniziare
+            {t("empty.description")}
           </p>
         </div>
       ) : (
@@ -211,10 +214,10 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                         <Loader2 className="w-4 h-4 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0 animate-spin" />
                         <div className="flex-1">
                           <p className="text-xs font-medium text-blue-800 dark:text-blue-300">
-                            Generazione in corso...
+                            {t("processing.title")}
                           </p>
                           <p className="text-xs text-blue-700 dark:text-blue-400 mt-1">
-                            Questo processo può richiedere alcuni minuti
+                            {t("processing.description")}
                           </p>
                         </div>
                       </div>
@@ -227,7 +230,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                         <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
                         <div className="flex-1">
                           <p className="text-xs font-medium text-red-800 dark:text-red-300">
-                            Generazione fallita
+                            {t("error.title")}
                           </p>
                           {kit.errorMessage && (
                             <p className="text-xs text-red-700 dark:text-red-400 mt-1">
@@ -235,8 +238,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                             </p>
                           )}
                           <p className="text-xs text-red-600 dark:text-red-500 mt-2">
-                            Puoi eliminare questo Study Kit e riprovare con un
-                            altro file.
+                            {t("error.description")}
                           </p>
                         </div>
                       </div>
@@ -252,7 +254,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       onClick={() => onSelect?.(kit)}
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      Apri
+                      {t("open")}
                     </Button>
                   )}
                   {kit.status === "error" && (
@@ -262,7 +264,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       onClick={() => handleDelete(kit.id, kit.title)}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Elimina
+                      {t("delete")}
                     </Button>
                   )}
                   {kit.status === "processing" && (
@@ -272,7 +274,7 @@ export function StudyKitList({ onSelect, className }: StudyKitListProps) {
                       onClick={() => handleDelete(kit.id, kit.title)}
                     >
                       <Trash2 className="w-4 h-4 mr-2" />
-                      Annulla
+                      {t("cancel")}
                     </Button>
                   )}
                 </div>

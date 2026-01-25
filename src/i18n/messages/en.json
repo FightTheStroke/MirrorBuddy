@@ -1914,5 +1914,85 @@
       "add": "Add",
       "saving": "Saving..."
     }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Upload in progress...",
+        "processing": "Generating materials...",
+        "success": "Study Kit generated successfully!",
+        "error": "Error during generation"
+      },
+      "processingNote": "This process may take a few minutes. You can close this window and come back later.",
+      "loadAnother": "Upload another PDF"
+    },
+    "exportModal": {
+      "title": "Export Accessible PDF",
+      "description": "Select a DSA profile to optimize the PDF",
+      "closeLabel": "Close",
+      "profileLabel": "DSA Profile",
+      "formatLabel": "Page format",
+      "success": {
+        "withZaino": "PDF downloaded and saved to Backpack",
+        "default": "PDF downloaded successfully"
+      },
+      "error": "Error during export",
+      "cancel": "Cancel",
+      "export": "Export PDF",
+      "generating": "Generating..."
+    },
+    "list": {
+      "deleteConfirm": "Are you sure you want to delete \"{title}\"?",
+      "deleteError": "Error during deletion. Please try again.",
+      "status": "Status:",
+      "filters": {
+        "all": "All",
+        "processing": "Processing",
+        "ready": "Ready",
+        "error": "Errors"
+      },
+      "empty": {
+        "title": "No Study Kits found",
+        "description": "Upload a PDF to get started"
+      },
+      "processing": {
+        "title": "Generation in progress...",
+        "description": "This process may take a few minutes"
+      },
+      "error": {
+        "title": "Generation failed",
+        "description": "You can delete this Study Kit and try again with another file."
+      },
+      "open": "Open",
+      "delete": "Delete",
+      "cancel": "Cancel"
+    },
+    "view": {
+      "header": "Study Kit Generator",
+      "subtitle": "Upload a PDF and generate summaries, mind maps, demos and quizzes",
+      "newKit": "New Study Kit",
+      "uploadTitle": "Upload PDF",
+      "backToList": "Back to list",
+      "back": "← Back to list",
+      "myKits": "My Study Kits",
+      "features": {
+        "summary": {
+          "title": "Summary",
+          "description": "Key concepts overview"
+        },
+        "mindmap": {
+          "title": "Mind Map",
+          "description": "Concept connections"
+        },
+        "demo": {
+          "title": "Demo",
+          "description": "STEM simulations"
+        },
+        "quiz": {
+          "title": "Quiz",
+          "description": "Comprehension check"
+        }
+      }
+    }
   }
 }

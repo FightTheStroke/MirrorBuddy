@@ -2094,5 +2094,85 @@
       "add": "Añadir",
       "saving": "Guardando..."
     }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Carga en progreso...",
+        "processing": "Generando materiales...",
+        "success": "¡Kit de estudio generado con éxito!",
+        "error": "Error durante la generación"
+      },
+      "processingNote": "Este proceso puede tomar algunos minutos. Puede cerrar esta ventana y volver más tarde.",
+      "loadAnother": "Cargar otro PDF"
+    },
+    "exportModal": {
+      "title": "Exportar PDF accesible",
+      "description": "Seleccione un perfil DSA para optimizar el PDF",
+      "closeLabel": "Cerrar",
+      "profileLabel": "Perfil DSA",
+      "formatLabel": "Formato de página",
+      "success": {
+        "withZaino": "PDF descargado y guardado en la Mochila",
+        "default": "PDF descargado con éxito"
+      },
+      "error": "Error durante la exportación",
+      "cancel": "Cancelar",
+      "export": "Exportar PDF",
+      "generating": "Generando..."
+    },
+    "list": {
+      "deleteConfirm": "¿Está seguro de que desea eliminar \"{title}\"?",
+      "deleteError": "Error al eliminar. Por favor, intente de nuevo.",
+      "status": "Estado:",
+      "filters": {
+        "all": "Todos",
+        "processing": "En progreso",
+        "ready": "Listo",
+        "error": "Errores"
+      },
+      "empty": {
+        "title": "No se encontraron kits de estudio",
+        "description": "Cargue un PDF para empezar"
+      },
+      "processing": {
+        "title": "Generación en progreso...",
+        "description": "Este proceso puede tomar algunos minutos"
+      },
+      "error": {
+        "title": "Error de generación",
+        "description": "Puede eliminar este kit de estudio e intentar nuevamente con otro archivo."
+      },
+      "open": "Abrir",
+      "delete": "Eliminar",
+      "cancel": "Cancelar"
+    },
+    "view": {
+      "header": "Generador de kit de estudio",
+      "subtitle": "Cargue un PDF y genere resúmenes, mapas mentales, demostraciones y cuestionarios",
+      "newKit": "Nuevo kit de estudio",
+      "uploadTitle": "Cargar PDF",
+      "backToList": "Volver a la lista",
+      "back": "← Volver a la lista",
+      "myKits": "Mis kits de estudio",
+      "features": {
+        "summary": {
+          "title": "Resumen",
+          "description": "Resumen de conceptos clave"
+        },
+        "mindmap": {
+          "title": "Mapa mental",
+          "description": "Conexiones de conceptos"
+        },
+        "demo": {
+          "title": "Demostración",
+          "description": "Simulaciones STEM"
+        },
+        "quiz": {
+          "title": "Cuestionario",
+          "description": "Verificación de comprensión"
+        }
+      }
+    }
   }
 }

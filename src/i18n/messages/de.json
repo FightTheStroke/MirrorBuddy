@@ -1905,5 +1905,85 @@
       "add": "Hinzufügen",
       "saving": "Speichern..."
     }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Wird hochgeladen...",
+        "processing": "Materialien werden generiert...",
+        "success": "Study Kit erfolgreich generiert!",
+        "error": "Fehler bei der Generierung"
+      },
+      "processingNote": "Dieser Vorgang kann einige Minuten dauern. Sie können dieses Fenster schließen und später zurückkommen.",
+      "loadAnother": "Andere PDF hochladen"
+    },
+    "exportModal": {
+      "title": "Barrierefreies PDF exportieren",
+      "description": "Wählen Sie ein DSA-Profil aus, um das PDF zu optimieren",
+      "closeLabel": "Schließen",
+      "profileLabel": "DSA-Profil",
+      "formatLabel": "Seitenformat",
+      "success": {
+        "withZaino": "PDF heruntergeladen und im Rucksack gespeichert",
+        "default": "PDF erfolgreich heruntergeladen"
+      },
+      "error": "Fehler beim Export",
+      "cancel": "Abbrechen",
+      "export": "PDF exportieren",
+      "generating": "Wird generiert..."
+    },
+    "list": {
+      "deleteConfirm": "Sind Sie sicher, dass Sie \"{title}\" löschen möchten?",
+      "deleteError": "Fehler beim Löschen. Bitte versuchen Sie es erneut.",
+      "status": "Status:",
+      "filters": {
+        "all": "Alle",
+        "processing": "Wird verarbeitet",
+        "ready": "Bereit",
+        "error": "Fehler"
+      },
+      "empty": {
+        "title": "Keine Study Kits gefunden",
+        "description": "Laden Sie eine PDF hoch, um zu beginnen"
+      },
+      "processing": {
+        "title": "Generierung läuft...",
+        "description": "Dieser Vorgang kann einige Minuten dauern"
+      },
+      "error": {
+        "title": "Generierung fehlgeschlagen",
+        "description": "Sie können dieses Study Kit löschen und es mit einer anderen Datei erneut versuchen."
+      },
+      "open": "Öffnen",
+      "delete": "Löschen",
+      "cancel": "Abbrechen"
+    },
+    "view": {
+      "header": "Study Kit Generator",
+      "subtitle": "Laden Sie eine PDF hoch und generieren Sie Zusammenfassungen, Mind Maps, Demos und Quizze",
+      "newKit": "Neues Study Kit",
+      "uploadTitle": "PDF hochladen",
+      "backToList": "Zurück zur Liste",
+      "back": "← Zurück zur Liste",
+      "myKits": "Meine Study Kits",
+      "features": {
+        "summary": {
+          "title": "Zusammenfassung",
+          "description": "Übersicht der Schlüsselkonzepte"
+        },
+        "mindmap": {
+          "title": "Mind Map",
+          "description": "Konzeptverbindungen"
+        },
+        "demo": {
+          "title": "Demo",
+          "description": "STEM-Simulationen"
+        },
+        "quiz": {
+          "title": "Quiz",
+          "description": "Verständnisprüfung"
+        }
+      }
+    }
   }
 }
