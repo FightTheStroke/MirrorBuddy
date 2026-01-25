@@ -1,28 +1,35 @@
 // ============================================================================
 // DEMO CODE GENERATOR
 // AI-powered code generation for interactive demonstrations
+// F-02: All tools available during conversations
 // ============================================================================
 
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
+import { chatCompletion } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 
 /**
  * Technical agent that generates SPECTACULAR HTML/CSS/JS from description
  * Creates interactive visualizations for ANY subject
+ * Uses tier-based AI config (ADR 0073)
  */
-export async function generateDemoCode(description: {
-  title: string;
-  concept: string;
-  visualization: string;
-  interaction: string;
-  wowFactor?: string;
-}): Promise<{ html: string; css: string; js: string } | null> {
+export async function generateDemoCode(
+  description: {
+    title: string;
+    concept: string;
+    visualization: string;
+    interaction: string;
+    wowFactor?: string;
+  },
+  userId?: string,
+): Promise<{ html: string; css: string; js: string } | null> {
   const prompt = `Crea una demo SPETTACOLARE e INTERATTIVA per:
 TITOLO: ${description.title}
 CONCETTO: ${description.concept}
 VISUALIZZAZIONE: ${description.visualization}
 INTERAZIONE: ${description.interaction}
-${description.wowFactor ? `WOW: ${description.wowFactor}` : ''}
+${description.wowFactor ? `WOW: ${description.wowFactor}` : ""}
 
 === ESEMPI DI DEMO PER MATERIA (ispirati a questi) ===
 
@@ -223,26 +230,37 @@ Rispondi SOLO con JSON (no markdown, no spiegazioni):
 {"html":"...","css":"...","js":"..."}`;
 
   try {
+    // Get AI config from tier (ADR 0073)
+    const aiConfig = await tierService.getFeatureAIConfigForUser(
+      userId ?? null,
+      "demo",
+    );
+    const deploymentName = getDeploymentForModel(aiConfig.model);
+
     const result = await chatCompletion(
-      [{ role: 'user', content: prompt }],
-      'Sei un generatore di codice. Rispondi SOLO con JSON valido.',
-      { temperature: 0.7, maxTokens: 4000 }
+      [{ role: "user", content: prompt }],
+      "Sei un generatore di codice. Rispondi SOLO con JSON valido.",
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      logger.warn('Failed to parse demo code JSON');
+      logger.warn("Failed to parse demo code JSON");
       return null;
     }
 
     const code = JSON.parse(jsonMatch[0]);
     return {
-      html: code.html || '',
-      css: code.css || '',
-      js: code.js || '',
+      html: code.html || "",
+      css: code.css || "",
+      js: code.js || "",
     };
   } catch (error) {
-    logger.error('Failed to generate demo code', undefined, error);
+    logger.error("Failed to generate demo code", undefined, error);
     return null;
   }
 }

@@ -53,6 +53,22 @@ vi.mock("@/lib/ai/providers", () => ({
   chatCompletion: mockChatCompletion,
 }));
 
+vi.mock("@/lib/tier/tier-service", () => ({
+  tierService: {
+    getFeatureAIConfigForUser: vi.fn(() =>
+      Promise.resolve({
+        model: "gpt-4o",
+        temperature: 0.3,
+        maxTokens: 1500,
+      }),
+    ),
+  },
+}));
+
+vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
+  getDeploymentForModel: vi.fn((model: string) => model),
+}));
+
 import {
   isLatex,
   validateLatex,

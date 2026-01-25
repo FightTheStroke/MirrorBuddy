@@ -71,6 +71,24 @@ vi.mock("@/lib/ai/providers", () => ({
   chatCompletion: mockChatCompletion,
 }));
 
+// Mock tier service (ADR 0073)
+vi.mock("@/lib/tier/tier-service", () => ({
+  tierService: {
+    getFeatureAIConfigForUser: vi.fn(() =>
+      Promise.resolve({
+        model: "gpt-4o",
+        temperature: 0.6,
+        maxTokens: 3000,
+      }),
+    ),
+  },
+}));
+
+// Mock deployment mapping
+vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
+  getDeploymentForModel: vi.fn((model: string) => model),
+}));
+
 // Mock the nested module where extractTextFromPDF is actually defined
 vi.mock("../study-kit-handler/pdf-extraction", () => ({
   extractTextFromPDF: mockExtractTextFromPDF,

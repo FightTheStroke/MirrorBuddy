@@ -3,12 +3,13 @@
 // Two-stage architecture:
 // 1. Maestro describes the demo creatively (what to visualize)
 // 2. Technical agent generates HTML/CSS/JS code
+// F-02: All tools available during conversations
 // ============================================================================
 
 import { registerToolHandler } from "../tool-executor";
 import { nanoid } from "nanoid";
 import { logger } from "@/lib/logger";
-import type { DemoData, ToolExecutionResult } from "@/types/tools";
+import type { DemoData, ToolExecutionResult, ToolContext } from "@/types/tools";
 import {
   validateCode,
   sanitizeHtml,
@@ -25,7 +26,7 @@ export { validateCode, sanitizeHtml, DANGEROUS_JS_PATTERNS };
  */
 registerToolHandler(
   "create_demo",
-  async (args): Promise<ToolExecutionResult> => {
+  async (args, context: ToolContext): Promise<ToolExecutionResult> => {
     const { title, concept, visualization, interaction, wowFactor } = args as {
       title: string;
       concept: string;
@@ -33,6 +34,7 @@ registerToolHandler(
       interaction: string;
       wowFactor?: string;
     };
+    const userId = context?.userId;
 
     // Validate required fields
     if (!title || !concept || !visualization || !interaction) {
@@ -63,13 +65,16 @@ registerToolHandler(
     });
 
     // Generate code from description using technical agent
-    const code = await generateDemoCode({
-      title,
-      concept,
-      visualization,
-      interaction,
-      wowFactor,
-    });
+    const code = await generateDemoCode(
+      {
+        title,
+        concept,
+        visualization,
+        interaction,
+        wowFactor,
+      },
+      userId,
+    );
 
     if (!code) {
       return {

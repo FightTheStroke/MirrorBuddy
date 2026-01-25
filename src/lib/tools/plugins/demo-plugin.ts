@@ -11,6 +11,8 @@ import { nanoid } from "nanoid";
 import { chatCompletion } from "@/lib/ai/providers";
 import { logger } from "@/lib/logger";
 import { sanitizeHtml } from "../handlers/demo-handler";
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import type { ToolContext, ToolResult } from "@/types/tools";
 
 /**
@@ -27,15 +29,18 @@ const DemoInputSchema = z.object({
 
 /**
  * Generate interactive demo code from description
- * Leverages existing demo-handler logic
+ * Uses tier-based AI config (ADR 0073)
  */
-async function generateDemoCode(args: {
-  title: string;
-  concept: string;
-  visualization: string;
-  interaction: string;
-  wowFactor?: string;
-}) {
+async function generateDemoCode(
+  args: {
+    title: string;
+    concept: string;
+    visualization: string;
+    interaction: string;
+    wowFactor?: string;
+  },
+  userId?: string,
+) {
   const { title, concept, visualization, interaction, wowFactor } = args;
 
   const prompt = `Crea una visualizzazione SPETTACOLARE e INTERATTIVA per:
@@ -49,10 +54,21 @@ Usa il template base con CSS e JS spettacolari (gradients, animazioni, particell
 Rispondi SOLO con JSON valido: {"html":"...","css":"...","js":"..."}`;
 
   try {
+    // Get AI config from tier (ADR 0073)
+    const aiConfig = await tierService.getFeatureAIConfigForUser(
+      userId ?? null,
+      "demo",
+    );
+    const deploymentName = getDeploymentForModel(aiConfig.model);
+
     const result = await chatCompletion(
       [{ role: "user", content: prompt }],
       "Sei un generatore di codice. Rispondi SOLO con JSON valido.",
-      { temperature: 0.7, maxTokens: 4000 },
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     const jsonMatch = result.content.match(/\{[\s\S]*\}/);
@@ -89,21 +105,25 @@ export const demoPlugin: ToolPlugin = {
   // Handler wraps demo creation logic
   handler: async (
     args: Record<string, unknown>,
-    _context: ToolContext,
+    context: ToolContext,
   ): Promise<ToolResult> => {
     try {
       const validated = DemoInputSchema.parse(args);
       const { title, concept, visualization, interaction, wowFactor } =
         validated;
+      const userId = context?.userId;
 
       // Generate code from description
-      const code = await generateDemoCode({
-        title,
-        concept,
-        visualization,
-        interaction,
-        wowFactor,
-      });
+      const code = await generateDemoCode(
+        {
+          title,
+          concept,
+          visualization,
+          interaction,
+          wowFactor,
+        },
+        userId,
+      );
 
       if (!code) {
         return {

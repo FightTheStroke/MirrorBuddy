@@ -39,7 +39,10 @@ const {
       (): { valid: boolean; suggestions?: string[] } => ({ valid: true }),
     ),
     mockGenerateDemoCode: vi.fn(
-      (): Promise<{ html: string; css: string; js?: string }> =>
+      (
+        _desc: Record<string, string>,
+        _userId?: string,
+      ): Promise<{ html: string; css: string; js?: string }> =>
         Promise.resolve({
           html: "<div>Demo</div>",
           css: ".demo { color: red; }",
@@ -225,13 +228,16 @@ describe("demo-handler execution", () => {
         wowFactor: "Amazing animation",
       });
 
-      expect(mockGenerateDemoCode).toHaveBeenCalledWith({
-        title: "Test Title",
-        concept: "Test concept",
-        visualization: "Test viz",
-        interaction: "Test interaction",
-        wowFactor: "Amazing animation",
-      });
+      expect(mockGenerateDemoCode).toHaveBeenCalledWith(
+        {
+          title: "Test Title",
+          concept: "Test concept",
+          visualization: "Test viz",
+          interaction: "Test interaction",
+          wowFactor: "Amazing animation",
+        },
+        undefined, // userId from context
+      );
     });
   });
 

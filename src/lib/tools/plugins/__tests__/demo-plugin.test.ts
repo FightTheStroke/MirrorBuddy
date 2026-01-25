@@ -40,6 +40,22 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+vi.mock("@/lib/tier/tier-service", () => ({
+  tierService: {
+    getFeatureAIConfigForUser: vi.fn(() =>
+      Promise.resolve({
+        model: "gpt-4o",
+        temperature: 0.8,
+        maxTokens: 4000,
+      }),
+    ),
+  },
+}));
+
+vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
+  getDeploymentForModel: vi.fn((model: string) => model),
+}));
+
 import { demoPlugin } from "../demo-plugin";
 import { chatCompletion } from "@/lib/ai/providers";
 
