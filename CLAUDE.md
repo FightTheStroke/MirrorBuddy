@@ -94,7 +94,25 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 | `/prompt`          | Extract F-xx requirements |
 | `/planner`         | Create wave/task plan     |
 | `/execute {id}`    | Run plan tasks            |
+| `/release`         | Release validation        |
 | `/frontend-design` | UI components             |
+
+## Release Process
+
+```bash
+/release                    # Full validation via app-release-manager
+```
+
+**What it does** (automatic):
+
+1. Build/lint/typecheck validation
+2. Unit + E2E test execution
+3. Security audit
+4. Code quality scan
+5. Auto-fix where possible
+6. Push + verify CI/Vercel
+
+**Checklist**: `.claude/templates/release-checklist.md` (reference only)
 
 ## Subagents
 
