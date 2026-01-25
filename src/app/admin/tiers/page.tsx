@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -31,6 +32,7 @@ interface Tier {
 }
 
 export default async function AdminTiersPage() {
+  const t = await getTranslations("admin.tiers.page");
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
@@ -79,7 +81,7 @@ export default async function AdminTiersPage() {
         <div className="flex items-center gap-3">
           <Layers className="w-8 h-8 text-primary" aria-hidden="true" />
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-            Gestione Piani
+            {t("title")}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -96,7 +98,7 @@ export default async function AdminTiersPage() {
             </Button>
           </Link>
           <Link href="/admin/tiers/new">
-            <Button>Nuovo Piano</Button>
+            <Button>{t("newTier")}</Button>
           </Link>
         </div>
       </div>

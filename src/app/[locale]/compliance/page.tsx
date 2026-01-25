@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import {
   Shield,
   FileText,
@@ -12,11 +13,13 @@ import {
   CheckCircle2,
 } from "lucide-react";
 
-export const metadata: Metadata = {
-  title: "Compliance & Trasparenza | MirrorBuddy",
-  description:
-    "Documentazione compliance AI Act, L.132/2025, GDPR e COPPA per MirrorBuddy",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("compliance");
+  return {
+    title: `${t("pageTitle")} | MirrorBuddy`,
+    description: t("pageDescription"),
+  };
+}
 
 interface ComplianceDocument {
   title: string;
@@ -33,118 +36,124 @@ interface ComplianceBadge {
   color: string;
 }
 
-const COMPLIANCE_BADGES: ComplianceBadge[] = [
-  {
-    name: "GDPR",
-    description: "Regolamento UE 2016/679",
-    icon: <Shield className="w-6 h-6" />,
-    color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
-  },
-  {
-    name: "AI Act",
-    description: "Regolamento UE 2024/1689",
-    icon: <Brain className="w-6 h-6" />,
-    color:
-      "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
-  },
-  {
-    name: "L.132/2025",
-    description: "Legge italiana sull'IA",
-    icon: <Scale className="w-6 h-6" />,
-    color:
-      "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
-  },
-  {
-    name: "COPPA",
-    description: "Protezione minori online",
-    icon: <Users className="w-6 h-6" />,
-    color:
-      "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
-  },
-  {
-    name: "WCAG 2.1",
-    description: "Accessibilità AA",
-    icon: <CheckCircle2 className="w-6 h-6" />,
-    color: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
-  },
-];
+function getComplianceBadges(): ComplianceBadge[] {
+  return [
+    {
+      name: "GDPR",
+      description: "Regolamento UE 2016/679",
+      icon: <Shield className="w-6 h-6" />,
+      color: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+    },
+    {
+      name: "AI Act",
+      description: "Regolamento UE 2024/1689",
+      icon: <Brain className="w-6 h-6" />,
+      color:
+        "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+    },
+    {
+      name: "L.132/2025",
+      description: "Legge italiana sull'IA",
+      icon: <Scale className="w-6 h-6" />,
+      color:
+        "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+    },
+    {
+      name: "COPPA",
+      description: "Protezione minori online",
+      icon: <Users className="w-6 h-6" />,
+      color:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300",
+    },
+    {
+      name: "WCAG 2.1",
+      description: "Accessibilità AA",
+      icon: <CheckCircle2 className="w-6 h-6" />,
+      color: "bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300",
+    },
+  ];
+}
 
-const PUBLIC_DOCUMENTS: ComplianceDocument[] = [
-  {
-    title: "Trasparenza AI",
-    description:
-      "Come funziona l'intelligenza artificiale in MirrorBuddy e quali dati utilizza",
-    href: "/ai-transparency",
-    icon: <Brain className="w-5 h-5" />,
-  },
-  {
-    title: "Politica AI",
-    description:
-      "I nostri principi etici e le garanzie per l'uso responsabile dell'IA",
-    href: "/ai-policy",
-    icon: <FileText className="w-5 h-5" />,
-  },
-  {
-    title: "Privacy Policy",
-    description:
-      "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali",
-    href: "/privacy",
-    icon: <Lock className="w-5 h-5" />,
-  },
-  {
-    title: "Termini di Servizio",
-    description: "Le condizioni d'uso della piattaforma MirrorBuddy",
-    href: "/terms",
-    icon: <FileText className="w-5 h-5" />,
-  },
-  {
-    title: "Cookie Policy",
-    description: "Quali cookie utilizziamo e come gestirli",
-    href: "/cookies",
-    icon: <Shield className="w-5 h-5" />,
-  },
-];
+function getPublicDocuments(): ComplianceDocument[] {
+  return [
+    {
+      title: "Trasparenza AI",
+      description:
+        "Come funziona l'intelligenza artificiale in MirrorBuddy e quali dati utilizza",
+      href: "/ai-transparency",
+      icon: <Brain className="w-5 h-5" />,
+    },
+    {
+      title: "Politica AI",
+      description:
+        "I nostri principi etici e le garanzie per l'uso responsabile dell'IA",
+      href: "/ai-policy",
+      icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      title: "Privacy Policy",
+      description:
+        "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali",
+      href: "/privacy",
+      icon: <Lock className="w-5 h-5" />,
+    },
+    {
+      title: "Termini di Servizio",
+      description: "Le condizioni d'uso della piattaforma MirrorBuddy",
+      href: "/terms",
+      icon: <FileText className="w-5 h-5" />,
+    },
+    {
+      title: "Cookie Policy",
+      description: "Quali cookie utilizziamo e come gestirli",
+      href: "/cookies",
+      icon: <Shield className="w-5 h-5" />,
+    },
+  ];
+}
 
-const TECHNICAL_DOCUMENTS: ComplianceDocument[] = [
-  {
-    title: "DPIA",
-    description:
-      "Valutazione d'impatto sulla protezione dei dati (GDPR Art. 35)",
-    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/DPIA.md",
-    icon: <Shield className="w-5 h-5" />,
-    isExternal: true,
-  },
-  {
-    title: "Model Card",
-    description:
-      "Specifiche tecniche del sistema AI, performance e limitazioni",
-    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/MODEL-CARD.md",
-    icon: <FileText className="w-5 h-5" />,
-    isExternal: true,
-  },
-  {
-    title: "AI Literacy",
-    description:
-      "Guida educativa su come funziona l'IA e come usarla criticamente",
-    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/AI-LITERACY.md",
-    icon: <Brain className="w-5 h-5" />,
-    isExternal: true,
-  },
-  {
-    title: "Bias Audit Report",
-    description: "Analisi di fairness e non discriminazione del sistema AI",
-    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/BIAS-AUDIT-REPORT.md",
-    icon: <AlertTriangle className="w-5 h-5" />,
-    isExternal: true,
-  },
-  {
-    title: "Risk Management",
-    description: "Framework di gestione rischi e registro dei rischi AI",
-    href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/AI-RISK-MANAGEMENT.md",
-    icon: <Shield className="w-5 h-5" />,
-    isExternal: true,
-  },
-];
+function getTechnicalDocuments(): ComplianceDocument[] {
+  return [
+    {
+      title: "DPIA",
+      description:
+        "Valutazione d'impatto sulla protezione dei dati (GDPR Art. 35)",
+      href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/DPIA.md",
+      icon: <Shield className="w-5 h-5" />,
+      isExternal: true,
+    },
+    {
+      title: "Model Card",
+      description:
+        "Specifiche tecniche del sistema AI, performance e limitazioni",
+      href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/MODEL-CARD.md",
+      icon: <FileText className="w-5 h-5" />,
+      isExternal: true,
+    },
+    {
+      title: "AI Literacy",
+      description:
+        "Guida educativa su come funziona l'IA e come usarla criticamente",
+      href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/AI-LITERACY.md",
+      icon: <Brain className="w-5 h-5" />,
+      isExternal: true,
+    },
+    {
+      title: "Bias Audit Report",
+      description: "Analisi di fairness e non discriminazione del sistema AI",
+      href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/BIAS-AUDIT-REPORT.md",
+      icon: <AlertTriangle className="w-5 h-5" />,
+      isExternal: true,
+    },
+    {
+      title: "Risk Management",
+      description: "Framework di gestione rischi e registro dei rischi AI",
+      href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/docs/compliance/AI-RISK-MANAGEMENT.md",
+      icon: <Shield className="w-5 h-5" />,
+      isExternal: true,
+    },
+  ];
+}
 
 function DocumentCard({ doc }: { doc: ComplianceDocument }) {
   const LinkComponent = doc.isExternal ? "a" : Link;
@@ -185,29 +194,32 @@ function DocumentCard({ doc }: { doc: ComplianceDocument }) {
   );
 }
 
-export default function CompliancePage() {
+export default async function CompliancePage() {
+  const t = await getTranslations("compliance");
+  const badges = getComplianceBadges();
+  const publicDocs = getPublicDocuments();
+  const technicalDocs = getTechnicalDocuments();
+
   return (
     <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-            Compliance & Trasparenza
+            {t("pageTitle")}
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-            MirrorBuddy è progettato nel rispetto delle normative europee e
-            italiane sull&apos;intelligenza artificiale e la protezione dei
-            dati.
+            {t("pageDescription")}
           </p>
         </div>
 
         {/* Compliance Badges */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Conformità Normativa
+            {t("complianceBadgeTitle")}
           </h2>
           <div className="flex flex-wrap gap-3">
-            {COMPLIANCE_BADGES.map((badge) => (
+            {badges.map((badge) => (
               <div
                 key={badge.name}
                 className={`flex items-center gap-2 px-4 py-2 rounded-full ${badge.color}`}
@@ -227,10 +239,10 @@ export default function CompliancePage() {
         {/* Public Documents */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Documenti Pubblici
+            {t("publicDocuments")}
           </h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            {PUBLIC_DOCUMENTS.map((doc) => (
+            {publicDocs.map((doc) => (
               <DocumentCard key={doc.href} doc={doc} />
             ))}
           </div>
@@ -239,13 +251,13 @@ export default function CompliancePage() {
         {/* Technical Documents */}
         <div className="mb-12">
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Documentazione Tecnica
+            {t("technicalDocuments")}
           </h2>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Documentazione dettagliata disponibile nel repository open source.
+            {t("technicalDescription")}
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
-            {TECHNICAL_DOCUMENTS.map((doc) => (
+            {technicalDocs.map((doc) => (
               <DocumentCard key={doc.href} doc={doc} />
             ))}
           </div>
@@ -257,11 +269,10 @@ export default function CompliancePage() {
                       border border-indigo-100 dark:border-indigo-800"
         >
           <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-            Domande sulla Compliance?
+            {t("questionsTitle")}
           </h2>
           <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Per domande sulla privacy, protezione dei dati o compliance AI,
-            contattaci:
+            {t("questionsDescription")}
           </p>
           <a
             href="mailto:info@fightthestroke.org"
