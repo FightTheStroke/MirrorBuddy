@@ -6,16 +6,17 @@
 // F-16: ContactRequest model for tracking B2B contact requests
 model ContactRequest {
   id        String   @id @default(cuid())
-  type      String   // general, schools, enterprise
-  name      String
-  email     String
+  type      String   @db.VarChar(50) // general, schools, enterprise
+  name      String   @db.VarChar(255)
+  email     String   @db.VarChar(254) // RFC 5321 max email length
   data      Json     // Form-specific fields (schoolName, companyName, etc.)
-  status    String   @default("pending") // pending, contacted, converted, closed
-  notes     String? // Admin notes
+  status    String   @default("pending") @db.VarChar(50) // pending, contacted, converted, closed
+  notes     String?  @db.VarChar(2000) // Admin notes
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([type])
   @@index([status])
   @@index([type, status])
+  @@index([email]) // For duplicate detection and lookups
 }
