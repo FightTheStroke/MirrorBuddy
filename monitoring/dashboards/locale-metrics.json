@@ -1,0 +1,405 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Locale metrics dashboard for i18n multi-language support. Tracks locale distribution, language switching events, and error rates per locale.",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Locale Distribution",
+      "type": "piechart",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "locale_sessions_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right"
+        },
+        "pieType": "pie"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "hideFrom": {
+              "tooltip": false,
+              "legend": false,
+              "viz": false
+            }
+          }
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Language Switching Events",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "targets": [
+        {
+          "expr": "rate(locale_switches_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m])",
+          "legendFormat": "{{locale}} switches/min"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Hz"
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "Error Rate per Locale",
+      "type": "stat",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "(rate(locale_errors_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m]) / rate(locale_requests_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m])) * 100",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Active Sessions by Locale",
+      "type": "bargauge",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "targets": [
+        {
+          "expr": "locale_active_sessions{locale=~\"$locale\",instance=\"mirrorbuddy\"}",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Locale Routing Latency (p95)",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(locale_routing_duration_seconds_bucket{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m]))",
+          "legendFormat": "{{locale}} p95"
+        }
+      ],
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "User Locale Preferences",
+      "type": "table",
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 16
+      },
+      "targets": [
+        {
+          "expr": "locale_user_preferences{locale=~\"$locale\",instance=\"mirrorbuddy\"}",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Translation Cache Hit Rate",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 24
+      },
+      "targets": [
+        {
+          "expr": "(rate(locale_translation_cache_hits_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m]) / (rate(locale_translation_cache_hits_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m]) + rate(locale_translation_cache_misses_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}[5m]))) * 100",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          },
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Locale Detection Success Rate",
+      "type": "gauge",
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 24
+      },
+      "targets": [
+        {
+          "expr": "(rate(locale_detection_successful_total{instance=\"mirrorbuddy\"}[5m]) / rate(locale_detection_attempts_total{instance=\"mirrorbuddy\"}[5m])) * 100",
+          "legendFormat": "Success Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          },
+          "max": 100
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Missing Translations by Locale",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 24
+      },
+      "targets": [
+        {
+          "expr": "locale_missing_translations_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "red",
+                "value": 50
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": 10,
+      "title": "Locale-Specific Maestri Selection",
+      "type": "stat",
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 24
+      },
+      "targets": [
+        {
+          "expr": "locale_maestri_selections_total{locale=~\"$locale\",instance=\"mirrorbuddy\"}",
+          "legendFormat": "{{locale}}"
+        }
+      ],
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      }
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["locale", "i18n", "mirrorbuddy", "multilingual"],
+  "templating": {
+    "list": [
+      {
+        "name": "locale",
+        "type": "query",
+        "label": "Locale",
+        "current": {
+          "selected": false,
+          "text": "All",
+          "value": ".*"
+        },
+        "options": [
+          {
+            "selected": true,
+            "text": "All",
+            "value": ".*"
+          }
+        ],
+        "query": "label_values(locale_sessions_total{instance=\"mirrorbuddy\"}, locale)",
+        "refresh": 1,
+        "multi": true,
+        "includeAll": true,
+        "allValue": ".*",
+        "sort": 0
+      },
+      {
+        "name": "instance",
+        "type": "constant",
+        "value": "mirrorbuddy",
+        "label": "Instance"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "10s",
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "30m",
+      "1h",
+      "2h",
+      "1d"
+    ]
+  },
+  "timezone": "browser",
+  "title": "Locale Metrics Dashboard",
+  "uid": "locale-metrics-i18n-v1",
+  "version": 1
+}
