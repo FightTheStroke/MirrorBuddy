@@ -8,6 +8,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -48,6 +49,7 @@ export function ToolMaestroSelectionDialog({
   onSelect,
   onClose,
 }: ToolMaestroSelectionDialogProps) {
+  const t = useTranslations("conversation.toolSelection");
   const [searchQuery, setSearchQuery] = useState("");
   const maestri = getAllMaestri();
 
@@ -89,18 +91,19 @@ export function ToolMaestroSelectionDialog({
             <div className="flex items-start justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-                  Scegli il Professore
+                  {t("title")}
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  Chi dovrebbe creare{" "}
-                  {TOOL_NAMES[toolType] || "questo strumento"}?
+                  {t("question", {
+                    toolName: TOOL_NAMES[toolType] || "questo strumento",
+                  })}
                 </p>
               </div>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={onClose}
-                aria-label="Chiudi"
+                aria-label={t("closeAriaLabel")}
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -113,7 +116,7 @@ export function ToolMaestroSelectionDialog({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cerca per nome o materia..."
+                placeholder={t("search")}
                 className="w-full pl-10 pr-4 py-2 bg-slate-100 dark:bg-slate-800 rounded-lg border-0 focus:ring-2 focus:ring-accent-themed outline-none text-slate-900 dark:text-white placeholder:text-slate-500"
               />
             </div>
@@ -158,7 +161,7 @@ export function ToolMaestroSelectionDialog({
 
             {filteredMaestri.length === 0 && (
               <div className="text-center py-8 text-slate-500">
-                Nessun professore trovato
+                {t("empty")}
               </div>
             )}
           </div>
