@@ -84,10 +84,28 @@ jobs:
           include-hidden-files: true
           retention-days: 1
 
-  # Lane 2: Security Audit + SBOM (runs in parallel with build)
+  # Lane 2a: Secret Scanning with TruffleHog (F-09: Entropy-based detection)
+  secret-scanning:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for accurate scanning
+
+      - name: TruffleHog OSS
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+          extra_args: --only-verified --fail
+
+  # Lane 2b: Security Audit + SBOM (runs after secret scanning)
   security:
     name: Security & SBOM
     runs-on: ubuntu-latest
+    needs: [secret-scanning]
     steps:
       - uses: actions/checkout@v4
 
@@ -119,9 +137,9 @@ jobs:
           path: sbom.json
           retention-days: 90
 
-      - name: Check for secrets
+      - name: Legacy Secret Check (Defense-in-Depth)
         run: |
-          echo "Scanning for API keys and secrets..."
+          echo "Running legacy regex-based secret scan (backup to TruffleHog)..."
           FOUND=""
 
           # OpenAI/Anthropic API keys

@@ -131,8 +131,44 @@ function hasAnyProvider(): boolean {
  * 'strict-dynamic' allows scripts loaded by trusted scripts to execute.
  * 'unsafe-inline' is ignored by browsers when nonce is present, but provides
  * fallback for older browsers.
+ *
+ * F-10: Includes Supabase, Grafana, Upstash domains
+ * F-11: Excludes localhost in production
  */
-function buildCSPHeader(nonce: string): string {
+export function buildCSPHeader(nonce: string): string {
+  // F-11: Localhost sources only in development
+  const isProduction = process.env.NODE_ENV === "production";
+  const localhostSources = isProduction
+    ? ""
+    : "ws://localhost:* wss://localhost:* http://localhost:11434";
+
+  // F-10: Required external service domains
+  const externalDomains = [
+    // Azure OpenAI
+    "https://*.openai.azure.com",
+    "wss://*.openai.azure.com",
+    "https://*.realtimeapi-preview.ai.azure.com",
+    "wss://*.realtimeapi-preview.ai.azure.com",
+    // Supabase (database, realtime)
+    "https://*.supabase.co",
+    "wss://*.supabase.co",
+    // Grafana Cloud (metrics)
+    "https://*.grafana.net",
+    // Upstash (Redis)
+    "https://*.upstash.io",
+    // Vercel (analytics)
+    "https://va.vercel-scripts.com",
+    "https://vitals.vercel-insights.com",
+    // Sentry (error tracking) - US and EU regions
+    "https://*.ingest.us.sentry.io",
+    "https://*.ingest.de.sentry.io",
+  ].join(" ");
+
+  // Build connect-src with conditional localhost
+  const connectSources = ["'self'", externalDomains, localhostSources]
+    .filter(Boolean)
+    .join(" ");
+
   return [
     "default-src 'self'",
     // 'unsafe-inline' ignored when nonce present (fallback for old browsers)
@@ -142,8 +178,7 @@ function buildCSPHeader(nonce: string): string {
     "font-src 'self' data: cdn.jsdelivr.net cdnjs.cloudflare.com fonts.cdnfonts.com",
     "img-src 'self' data: blob: cdn.jsdelivr.net cdnjs.cloudflare.com",
     "media-src 'self' data: blob:",
-    // Sentry supports US and EU regions - each domain needs https:// prefix
-    "connect-src 'self' https://*.openai.azure.com wss://*.openai.azure.com https://*.realtimeapi-preview.ai.azure.com wss://*.realtimeapi-preview.ai.azure.com ws://localhost:* wss://localhost:* http://localhost:11434 https://va.vercel-scripts.com https://vitals.vercel-insights.com https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
+    `connect-src ${connectSources}`,
     "worker-src 'self' blob:",
     "frame-src 'self' blob:",
     "object-src 'none'",
