@@ -9,6 +9,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "purge-staging-data-api" });
@@ -165,7 +166,7 @@ export async function DELETE(
       funnelEvents;
 
     // Delete in transaction (children first to avoid FK constraints)
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Delete children first
       await tx.message.deleteMany({ where: { isTestData: true } });
       await tx.flashcardProgress.deleteMany({ where: { isTestData: true } });

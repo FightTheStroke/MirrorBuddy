@@ -13,7 +13,6 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Trash2, Loader2, AlertTriangle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface StagingDataCounts {
@@ -36,7 +35,6 @@ export function PurgeStagingButton() {
   const [loading, setLoading] = useState(false);
   const [loadingCounts, setLoadingCounts] = useState(false);
   const [counts, setCounts] = useState<StagingDataCounts | null>(null);
-  const { toast } = useToast();
 
   const fetchCounts = useCallback(async () => {
     setLoadingCounts(true);
@@ -48,18 +46,15 @@ export function PurgeStagingButton() {
       const data = await res.json();
       setCounts(data);
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Failed to fetch staging data counts",
-        variant: "destructive",
-      });
+      alert(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch staging data counts",
+      );
     } finally {
       setLoadingCounts(false);
     }
-  }, [toast]);
+  }, []);
 
   // Fetch counts when dialog opens
   useEffect(() => {
@@ -82,26 +77,16 @@ export function PurgeStagingButton() {
 
       const data = await res.json();
 
-      toast({
-        title: "Success",
-        description: `Deleted ${data.deleted} staging records`,
-      });
+      alert(`Success: Deleted ${data.deleted} staging records`);
 
       // Reset counts and close dialog
       setCounts(null);
       setOpen(false);
 
       // Refresh the page to update admin dashboard
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      window.location.reload();
     } catch (error) {
-      toast({
-        title: "Error",
-        description:
-          error instanceof Error ? error.message : "Failed to purge data",
-        variant: "destructive",
-      });
+      alert(error instanceof Error ? error.message : "Failed to purge data");
     } finally {
       setLoading(false);
     }

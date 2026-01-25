@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { prisma } from "@/lib/db";
-import type { Topic } from "@prisma/client";
+import type { LearningPathTopic } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
 /**
@@ -187,7 +187,8 @@ export async function getPathProgress(pathId: string): Promise<{
   }
 
   const currentTopic = path.topics.find(
-    (t: Topic) => t.status === "in_progress" || t.status === "unlocked",
+    (t: LearningPathTopic) =>
+      t.status === "in_progress" || t.status === "unlocked",
   );
 
   return {

@@ -13,8 +13,7 @@ import { isSupabaseUrl } from "@/lib/utils/url-validation";
 import { isStagingMode } from "@/lib/environment/staging-detector";
 
 const globalForPrisma = globalThis as unknown as {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  prisma: any | undefined;
+  prisma: PrismaClient | undefined;
 };
 
 const isE2E = process.env.E2E_TESTS === "1";
@@ -261,10 +260,10 @@ const stagingExtension = basePrisma.$extends({
           MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)
         ) {
           if (Array.isArray(args.data)) {
-            args.data = args.data.map((item) => ({
+            args.data = args.data.map((item: Record<string, unknown>) => ({
               ...item,
               isTestData: true,
-            }));
+            })) as typeof args.data;
           } else {
             args.data = {
               ...args.data,
@@ -279,7 +278,9 @@ const stagingExtension = basePrisma.$extends({
 });
 
 // Export the extended client (or base client if already initialized)
-export const prisma = globalForPrisma.prisma ?? stagingExtension;
+// Type assertion is safe because $extends preserves the PrismaClient interface
+export const prisma =
+  globalForPrisma.prisma ?? (stagingExtension as unknown as PrismaClient);
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

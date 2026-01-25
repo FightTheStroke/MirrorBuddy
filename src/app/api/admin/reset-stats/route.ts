@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
 
@@ -35,32 +36,34 @@ export async function POST(request: NextRequest) {
     }
 
     // Execute reset in transaction
-    const result = await prisma.$transaction(async (tx) => {
-      // Delete all user activity data (keeps users and profiles)
-      const conversations = await tx.conversation.deleteMany({});
-      const flashcards = await tx.flashcardProgress.deleteMany({});
-      const quizResults = await tx.quizResult.deleteMany({});
-      const progress = await tx.progress.deleteMany({});
-      const gamification = await tx.userGamification.deleteMany({});
-      const learnings = await tx.learning.deleteMany({});
-      const calendarEvents = await tx.calendarEvent.deleteMany({});
-      const htmlSnippets = await tx.htmlSnippet.deleteMany({});
-      const homeworkSessions = await tx.homeworkSession.deleteMany({});
-      const notifications = await tx.notification.deleteMany({});
+    const result = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Delete all user activity data (keeps users and profiles)
+        const conversations = await tx.conversation.deleteMany({});
+        const flashcards = await tx.flashcardProgress.deleteMany({});
+        const quizResults = await tx.quizResult.deleteMany({});
+        const progress = await tx.progress.deleteMany({});
+        const gamification = await tx.userGamification.deleteMany({});
+        const learnings = await tx.learning.deleteMany({});
+        const calendarEvents = await tx.calendarEvent.deleteMany({});
+        const htmlSnippets = await tx.htmlSnippet.deleteMany({});
+        const homeworkSessions = await tx.homeworkSession.deleteMany({});
+        const notifications = await tx.notification.deleteMany({});
 
-      return {
-        conversations: conversations.count,
-        flashcards: flashcards.count,
-        quizResults: quizResults.count,
-        progress: progress.count,
-        gamification: gamification.count,
-        learnings: learnings.count,
-        calendarEvents: calendarEvents.count,
-        htmlSnippets: htmlSnippets.count,
-        homeworkSessions: homeworkSessions.count,
-        notifications: notifications.count,
-      };
-    });
+        return {
+          conversations: conversations.count,
+          flashcards: flashcards.count,
+          quizResults: quizResults.count,
+          progress: progress.count,
+          gamification: gamification.count,
+          learnings: learnings.count,
+          calendarEvents: calendarEvents.count,
+          htmlSnippets: htmlSnippets.count,
+          homeworkSessions: homeworkSessions.count,
+          notifications: notifications.count,
+        };
+      },
+    );
 
     logger.info("[reset-stats] Statistics reset successful", {
       adminId: auth.userId,

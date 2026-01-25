@@ -38,7 +38,9 @@ export async function DELETE(request: NextRequest) {
       select: { id: true, email: true },
     });
 
-    const protectedIds: string[] = protectedUsers.map((u) => u.id);
+    const protectedIds: string[] = protectedUsers.map(
+      (u: { id: string; email: string | null }) => u.id,
+    );
 
     // Count before deletion
     const totalUsers = await prisma.user.count();
@@ -55,9 +57,15 @@ export async function DELETE(request: NextRequest) {
         dryRun: true,
         totalUsers,
         usersToDelete,
-        protectedUsers: protectedUsers.map((u): string | null => u.email),
+        protectedUsers: protectedUsers.map(
+          (u: { id: string; email: string | null }): string | null => u.email,
+        ),
         sampleToDelete: sample.map(
-          (u): { id: string; email: string; createdAt: Date } => ({
+          (u: {
+            id: string;
+            email: string | null;
+            createdAt: Date;
+          }): { id: string; email: string; createdAt: Date } => ({
             id: u.id,
             email: u.email || "no-email",
             createdAt: u.createdAt,

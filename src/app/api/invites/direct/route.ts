@@ -16,6 +16,7 @@ import { hashPassword, generateRandomPassword } from "@/lib/auth/password";
 import { sendEmail } from "@/lib/email";
 import { getApprovalTemplate } from "@/lib/email/templates/invite-templates";
 import { logger } from "@/lib/logger";
+import type { Prisma } from "@prisma/client";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
@@ -93,51 +94,53 @@ export async function POST(request: NextRequest) {
     const displayName = body.name?.trim() || email.split("@")[0];
 
     // Create user + invite record in transaction
-    const user = await prisma.$transaction(async (tx) => {
-      const newUser = await tx.user.create({
-        data: {
-          username,
-          email,
-          passwordHash,
-          mustChangePassword: true,
-          profile: {
-            create: {
-              name: displayName,
+    const user = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        const newUser = await tx.user.create({
+          data: {
+            username,
+            email,
+            passwordHash,
+            mustChangePassword: true,
+            profile: {
+              create: {
+                name: displayName,
+              },
+            },
+            settings: {
+              create: {},
             },
           },
-          settings: {
-            create: {},
+        });
+
+        await tx.inviteRequest.upsert({
+          where: { email },
+          update: {
+            name: displayName,
+            motivation: "Invito diretto admin",
+            status: "APPROVED",
+            reviewedAt: new Date(),
+            reviewedBy: auth.userId,
+            generatedUsername: username,
+            createdUserId: newUser.id,
+            isDirect: true,
           },
-        },
-      });
+          create: {
+            name: displayName,
+            email,
+            motivation: "Invito diretto admin",
+            status: "APPROVED",
+            reviewedAt: new Date(),
+            reviewedBy: auth.userId,
+            generatedUsername: username,
+            createdUserId: newUser.id,
+            isDirect: true,
+          },
+        });
 
-      await tx.inviteRequest.upsert({
-        where: { email },
-        update: {
-          name: displayName,
-          motivation: "Invito diretto admin",
-          status: "APPROVED",
-          reviewedAt: new Date(),
-          reviewedBy: auth.userId,
-          generatedUsername: username,
-          createdUserId: newUser.id,
-          isDirect: true,
-        },
-        create: {
-          name: displayName,
-          email,
-          motivation: "Invito diretto admin",
-          status: "APPROVED",
-          reviewedAt: new Date(),
-          reviewedBy: auth.userId,
-          generatedUsername: username,
-          createdUserId: newUser.id,
-          isDirect: true,
-        },
-      });
-
-      return newUser;
-    });
+        return newUser;
+      },
+    );
 
     // Send welcome email
     const template = getApprovalTemplate({
