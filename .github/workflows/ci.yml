@@ -393,7 +393,9 @@ jobs:
         image: pgvector/pgvector:pg17
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          # NOTE: This is an intentional test credential for ephemeral CI database
+          # Not a real secret - container is isolated and destroyed after job
+          POSTGRES_PASSWORD: postgres  # gitleaks:allow gitguardian:ignore
           POSTGRES_DB: mirrorbuddy_test
         ports:
           - 5432:5432
