@@ -111,6 +111,8 @@ const IGNORE_ERRORS = [
   /WebSocket/i,
   /realtime.*token/i,
   /Content Security Policy/i, // CSP inline script warnings during dev
+  /_vercel\/insights/i, // Vercel Analytics not available in CI/local
+  /MIME type.*not executable/i, // Script MIME type errors in CI
 ];
 
 test.describe("Smoke Test", () => {

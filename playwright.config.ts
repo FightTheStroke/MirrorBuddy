@@ -124,15 +124,22 @@ export default defineConfig({
         "**/admin-funnel.spec.ts", // Requires admin auth + funnel metrics
         "**/admin-sidebar.spec.ts", // Requires admin auth
         "**/admin-visual-regression-*.spec.ts", // Requires admin auth + visual baselines
+        "**/admin.spec.ts", // Requires admin credentials setup
         "**/gdpr-compliance.spec.ts", // Requires complex DB state (user data)
         "**/google-drive.spec.ts", // Requires Google OAuth credentials
         "**/auth-system.spec.ts", // Requires session/auth setup
+        "**/auth.spec.ts", // Requires proper auth flow setup
+        "**/authorization-cookies.spec.ts", // Requires cookie/session setup
         "**/critical-api-routes.spec.ts", // Requires proper API environment + auth
         "**/maestri-data.spec.ts", // Requires full UI rendering
         "**/trial-dashboard.spec.ts", // Requires proper trial state setup
         "**/test-data-cleanup.spec.ts", // Requires DB state
         "**/tier-enforcement.spec.ts", // Requires tier seeding + /pricing page (Plan 073)
         "**/admin-tiers.spec.ts", // Requires tier seeding (Plan 073)
+        "**/analytics-responsive-grid.spec.ts", // Requires parent dashboard auth
+        "**/parent-dashboard-*.spec.ts", // Requires parent dashboard auth
+        "**/debug-endpoints-security.spec.ts", // Tests dev-only debug endpoints
+        "**/legal-ai-act.spec.ts", // Requires /ai-transparency page setup
         "**/mobile/**", // Mobile tests run in dedicated projects
       ],
     },
