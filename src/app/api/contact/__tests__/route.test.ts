@@ -22,6 +22,14 @@ vi.mock("@/lib/email", () => ({
   sendEmail: vi.fn(),
 }));
 
+// Mock rate limiting to always allow requests during tests
+vi.mock("@/lib/rate-limit", () => ({
+  checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true }),
+  getClientIdentifier: vi.fn().mockReturnValue("test-ip"),
+  rateLimitResponse: vi.fn(),
+  RATE_LIMITS: { CONTACT_FORM: { maxRequests: 5, windowMs: 3600000 } },
+}));
+
 const mockPrisma = prisma as unknown as {
   contactRequest: { create: ReturnType<typeof vi.fn> };
 };
