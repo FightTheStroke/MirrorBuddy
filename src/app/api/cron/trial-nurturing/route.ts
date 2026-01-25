@@ -96,6 +96,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   };
 
   try {
+    // Skip cron in non-production environments (staging/preview)
+    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+      log.info(
+        `[CRON] Skipping trial-nurturing - not production (env: ${process.env.VERCEL_ENV})`,
+      );
+      return NextResponse.json(
+        {
+          skipped: true,
+          reason: "Not production environment",
+          environment: process.env.VERCEL_ENV,
+        },
+        { status: 200 },
+      );
+    }
+
     if (!verifyCronSecret(request)) {
       log.warn("Cron request unauthorized");
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

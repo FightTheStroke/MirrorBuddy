@@ -14,6 +14,7 @@
  */
 
 import { prisma } from "@/lib/db";
+import type { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { DataRetentionPolicy, DEFAULT_RETENTION_POLICY } from "./types";
 
@@ -121,61 +122,63 @@ export async function executeScheduledDeletions(): Promise<{
 
   try {
     // Use transaction for atomic deletion across multiple models
-    const result = await prisma.$transaction(async (tx) => {
-      // Find conversations marked for deletion beyond grace period
-      const conversationsToDelete = await tx.conversation.findMany({
-        where: {
-          markedForDeletion: true,
-          markedForDeletionAt: {
-            lt: gracePeriodCutoff,
+    const result = await prisma.$transaction(
+      async (tx: Prisma.TransactionClient) => {
+        // Find conversations marked for deletion beyond grace period
+        const conversationsToDelete = await tx.conversation.findMany({
+          where: {
+            markedForDeletion: true,
+            markedForDeletionAt: {
+              lt: gracePeriodCutoff,
+            },
           },
-        },
-        select: { id: true },
-      });
+          select: { id: true },
+        });
 
-      const conversationIds = conversationsToDelete.map((c) => c.id);
+        const conversationIds = conversationsToDelete.map((c) => c.id);
 
-      if (conversationIds.length === 0) {
+        if (conversationIds.length === 0) {
+          return {
+            deletedConversations: 0,
+            deletedMessages: 0,
+            deletedEmbeddings: 0,
+          };
+        }
+
+        // Delete tool outputs (before conversation due to foreign keys)
+        await tx.toolOutput.deleteMany({
+          where: {
+            conversationId: {
+              in: conversationIds,
+            },
+          },
+        });
+
+        // Delete messages (cascaded by schema, but explicit for clarity)
+        const messagesResult = await tx.message.deleteMany({
+          where: {
+            conversationId: {
+              in: conversationIds,
+            },
+          },
+        });
+
+        // Delete conversations
+        const conversationsResult = await tx.conversation.deleteMany({
+          where: {
+            id: {
+              in: conversationIds,
+            },
+          },
+        });
+
         return {
-          deletedConversations: 0,
-          deletedMessages: 0,
-          deletedEmbeddings: 0,
+          deletedConversations: conversationsResult.count,
+          deletedMessages: messagesResult.count,
+          deletedEmbeddings: 0, // Embeddings schema pending
         };
-      }
-
-      // Delete tool outputs (before conversation due to foreign keys)
-      await tx.toolOutput.deleteMany({
-        where: {
-          conversationId: {
-            in: conversationIds,
-          },
-        },
-      });
-
-      // Delete messages (cascaded by schema, but explicit for clarity)
-      const messagesResult = await tx.message.deleteMany({
-        where: {
-          conversationId: {
-            in: conversationIds,
-          },
-        },
-      });
-
-      // Delete conversations
-      const conversationsResult = await tx.conversation.deleteMany({
-        where: {
-          id: {
-            in: conversationIds,
-          },
-        },
-      });
-
-      return {
-        deletedConversations: conversationsResult.count,
-        deletedMessages: messagesResult.count,
-        deletedEmbeddings: 0, // Embeddings schema pending
-      };
-    });
+      },
+    );
 
     log.info("Scheduled deletions executed", {
       deletedConversations: result.deletedConversations,
@@ -218,7 +221,9 @@ export async function applyDefaultRetentionSystemWide(): Promise<{
         where: { customRetention: { not: null } },
         select: { userId: true },
       });
-    const excludedUserIds = usersWithCustomPolicies.map((u) => u.userId);
+    const excludedUserIds = usersWithCustomPolicies.map(
+      (u: { userId: string }) => u.userId,
+    );
 
     log.debug("Excluding users with custom policies from default retention", {
       excludedCount: excludedUserIds.length,

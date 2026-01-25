@@ -121,16 +121,19 @@ export async function getAzureOpenAIUsage(): Promise<ExternalServiceUsage[]> {
   });
 
   // Aggregate by action
+  type AzureEvent = { action: string; value: number | null };
   const chatTokens = azureEvents
-    .filter((e) => e.action === "chat_completion")
-    .reduce((sum, e) => sum + (e.value || 0), 0);
+    .filter((e: AzureEvent) => e.action === "chat_completion")
+    .reduce((sum: number, e: AzureEvent) => sum + (e.value || 0), 0);
   const chatRequests = azureEvents.filter(
-    (e) => e.action === "chat_completion",
+    (e: AzureEvent) => e.action === "chat_completion",
   ).length;
   const embeddingTokens = azureEvents
-    .filter((e) => e.action === "embedding")
-    .reduce((sum, e) => sum + (e.value || 0), 0);
-  const ttsRequests = azureEvents.filter((e) => e.action === "tts").length;
+    .filter((e: AzureEvent) => e.action === "embedding")
+    .reduce((sum: number, e: AzureEvent) => sum + (e.value || 0), 0);
+  const ttsRequests = azureEvents.filter(
+    (e: AzureEvent) => e.action === "tts",
+  ).length;
 
   const quotas = EXTERNAL_SERVICE_QUOTAS.AZURE_OPENAI;
 

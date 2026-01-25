@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
+import type { Prisma, Learning } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import {
   generateConversationSummary,
@@ -96,11 +97,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       : summary;
 
     // Transaction: delete old messages, update conversation, save learnings
-    await prisma.$transaction(async (tx) => {
+    await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       // Delete summarized messages
       await tx.message.deleteMany({
         where: {
-          id: { in: toSummarize.map((m: (typeof toSummarize)[number]) => m.id) },
+          id: {
+            in: toSummarize.map((m: (typeof toSummarize)[number]) => m.id),
+          },
         },
       });
 
@@ -123,7 +126,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         });
 
         const existingMap = new Map(
-          existingLearnings.map((e) => [
+          existingLearnings.map((e: Learning) => [
             `${e.category}:${e.insight.slice(0, 30)}`,
             e,
           ]),

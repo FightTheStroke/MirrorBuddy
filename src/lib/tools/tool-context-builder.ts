@@ -4,9 +4,9 @@
 // Part of T2-02: Context injection for generated content
 // ============================================================================
 
-import { prisma } from '@/lib/db';
-import type { ToolType } from '@/types/tools';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import type { ToolType } from "@/types/tools";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
@@ -35,16 +35,16 @@ export interface ToolContextResult {
  */
 export async function getToolOutputs(
   userId: string,
-  conversationId: string
+  conversationId: string,
 ): Promise<ToolOutput[]> {
   try {
     const materials = await prisma.material.findMany({
       where: {
         userId,
         conversationId,
-        status: 'active',
+        status: "active",
       },
-      orderBy: { createdAt: 'asc' },
+      orderBy: { createdAt: "asc" },
       select: {
         toolId: true,
         toolType: true,
@@ -54,15 +54,23 @@ export async function getToolOutputs(
       },
     });
 
-    return materials.map((m) => ({
-      toolId: m.toolId,
-      type: m.toolType as ToolType,
-      title: m.title,
-      content: JSON.parse(m.content) as Record<string, unknown>,
-      createdAt: m.createdAt,
-    }));
+    return materials.map(
+      (m: {
+        toolId: string;
+        toolType: string;
+        title: string;
+        content: string;
+        createdAt: Date;
+      }) => ({
+        toolId: m.toolId,
+        type: m.toolType as ToolType,
+        title: m.title,
+        content: JSON.parse(m.content) as Record<string, unknown>,
+        createdAt: m.createdAt,
+      }),
+    );
   } catch (error) {
-    logger.error('Failed to retrieve tool outputs', {
+    logger.error("Failed to retrieve tool outputs", {
       userId,
       conversationId,
       error: String(error),
@@ -82,19 +90,19 @@ export function formatToolOutput(output: ToolOutput): string {
   const { type, title, content } = output;
 
   switch (type) {
-    case 'quiz':
+    case "quiz":
       return formatQuiz(title, content);
-    case 'flashcard':
+    case "flashcard":
       return formatFlashcards(title, content);
-    case 'mindmap':
+    case "mindmap":
       return formatMindmap(title, content);
-    case 'summary':
+    case "summary":
       return formatSummary(title, content);
-    case 'demo':
+    case "demo":
       return formatDemo(title, content);
-    case 'pdf':
+    case "pdf":
       return formatPDF(title, content);
-    case 'study-kit':
+    case "study-kit":
       return formatStudyKit(title, content);
     default:
       return formatGeneric(title, content);
@@ -103,7 +111,9 @@ export function formatToolOutput(output: ToolOutput): string {
 
 // Type-specific formatters
 function formatQuiz(title: string, content: Record<string, unknown>): string {
-  const questions = (content.questions as Array<{ question: string; correctAnswer: string }>) || [];
+  const questions =
+    (content.questions as Array<{ question: string; correctAnswer: string }>) ||
+    [];
   const lines = [`**Quiz: ${title}**`];
 
   questions.forEach((q, i) => {
@@ -111,10 +121,13 @@ function formatQuiz(title: string, content: Record<string, unknown>): string {
     lines.push(`   Risposta: ${q.correctAnswer}`);
   });
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
-function formatFlashcards(title: string, content: Record<string, unknown>): string {
+function formatFlashcards(
+  title: string,
+  content: Record<string, unknown>,
+): string {
   const cards = (content.cards as Array<{ front: string; back: string }>) || [];
   const lines = [`**Flashcard: ${title}**`];
 
@@ -126,10 +139,13 @@ function formatFlashcards(title: string, content: Record<string, unknown>): stri
     lines.push(`   ... e altre ${cards.length - 5} flashcard`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
-function formatMindmap(title: string, content: Record<string, unknown>): string {
+function formatMindmap(
+  title: string,
+  content: Record<string, unknown>,
+): string {
   const root = content.root as { label: string } | undefined;
   const nodes = (content.nodes as Array<{ label: string }>) || [];
 
@@ -137,18 +153,27 @@ function formatMindmap(title: string, content: Record<string, unknown>): string 
   if (root) {
     lines.push(`Concetto centrale: ${root.label}`);
   }
-  lines.push(`Concetti collegati: ${nodes.slice(0, 5).map(n => n.label).join(', ')}`);
+  lines.push(
+    `Concetti collegati: ${nodes
+      .slice(0, 5)
+      .map((n) => n.label)
+      .join(", ")}`,
+  );
 
   if (nodes.length > 5) {
     lines.push(`... e altri ${nodes.length - 5} concetti`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
-function formatSummary(title: string, content: Record<string, unknown>): string {
-  const summary = content.summary as string || '';
-  const preview = summary.length > 200 ? summary.substring(0, 200) + '...' : summary;
+function formatSummary(
+  title: string,
+  content: Record<string, unknown>,
+): string {
+  const summary = (content.summary as string) || "";
+  const preview =
+    summary.length > 200 ? summary.substring(0, 200) + "..." : summary;
 
   return `**Riassunto: ${title}**\n${preview}`;
 }
@@ -165,23 +190,29 @@ function formatDemo(title: string, content: Record<string, unknown>): string {
     lines.push(`... e altri ${steps.length - 3} passaggi`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function formatPDF(title: string, content: Record<string, unknown>): string {
-  const text = content.text as string || '';
-  const preview = text.length > 150 ? text.substring(0, 150) + '...' : text;
+  const text = (content.text as string) || "";
+  const preview = text.length > 150 ? text.substring(0, 150) + "..." : text;
 
   return `**PDF: ${title}**\n${preview}`;
 }
 
-function formatStudyKit(title: string, content: Record<string, unknown>): string {
+function formatStudyKit(
+  title: string,
+  content: Record<string, unknown>,
+): string {
   const sections = (content.sections as Array<{ title: string }>) || [];
 
-  return `**Study Kit: ${title}**\nSezioni: ${sections.map(s => s.title).join(', ')}`;
+  return `**Study Kit: ${title}**\nSezioni: ${sections.map((s) => s.title).join(", ")}`;
 }
 
-function formatGeneric(title: string, content: Record<string, unknown>): string {
+function formatGeneric(
+  title: string,
+  content: Record<string, unknown>,
+): string {
   return `**${title}**\n${JSON.stringify(content).substring(0, 100)}...`;
 }
 
@@ -195,31 +226,31 @@ function formatGeneric(title: string, content: Record<string, unknown>): string 
  */
 export async function buildToolContext(
   userId: string,
-  conversationId: string
+  conversationId: string,
 ): Promise<ToolContextResult> {
   const outputs = await getToolOutputs(userId, conversationId);
 
   if (outputs.length === 0) {
     return {
-      formattedContext: '',
+      formattedContext: "",
       toolCount: 0,
       types: [],
     };
   }
 
-  const lines = ['## Contenuti generati in questa sessione:'];
-  lines.push('');
+  const lines = ["## Contenuti generati in questa sessione:"];
+  lines.push("");
 
   outputs.forEach((output, i) => {
     lines.push(formatToolOutput(output));
     if (i < outputs.length - 1) {
-      lines.push('');
+      lines.push("");
     }
   });
 
   return {
-    formattedContext: lines.join('\n'),
+    formattedContext: lines.join("\n"),
     toolCount: outputs.length,
-    types: [...new Set(outputs.map(o => o.type))],
+    types: [...new Set(outputs.map((o) => o.type))],
   };
 }

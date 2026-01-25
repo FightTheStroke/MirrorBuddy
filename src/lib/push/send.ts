@@ -6,6 +6,7 @@
 
 import webpush from "web-push";
 import { prisma } from "@/lib/db";
+import type { PushSubscription } from "@prisma/client";
 import { logger } from "@/lib/logger";
 
 // Configure web-push with VAPID keys (lazy initialization to avoid build failures)
@@ -119,7 +120,7 @@ export async function sendPushToUser(
   let successCount = 0;
 
   await Promise.all(
-    subscriptions.map(async (sub) => {
+    subscriptions.map(async (sub: PushSubscription) => {
       const success = await sendPushToSubscription(
         { endpoint: sub.endpoint, p256dh: sub.p256dh, auth: sub.auth },
         payload,

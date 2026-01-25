@@ -1,0 +1,49 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+
+export function useUserActions() {
+  const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleAction = useCallback(
+    async (
+      userId: string,
+      action: "toggle" | "delete" | "restore",
+      currentDisabled?: boolean,
+      loadTrash?: () => Promise<void>,
+    ) => {
+      setIsLoading(userId);
+      setError(null);
+      try {
+        if (action === "toggle") {
+          await fetch(`/api/admin/users/${userId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ disabled: !currentDisabled }),
+          });
+        } else if (action === "delete") {
+          if (!confirm("Confermi eliminazione?")) return;
+          await csrfFetch(`/api/admin/users/${userId}`, {
+            method: "DELETE",
+            body: JSON.stringify({ reason: "admin_delete" }),
+          });
+        } else if (action === "restore") {
+          await csrfFetch(`/api/admin/users/trash/${userId}/restore`, {
+            method: "POST",
+          });
+          if (loadTrash) await loadTrash();
+        }
+        window.location.reload();
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error");
+      } finally {
+        setIsLoading(null);
+      }
+    },
+    [],
+  );
+
+  return { isLoading, error, handleAction };
+}
