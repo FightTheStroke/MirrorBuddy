@@ -11,6 +11,8 @@ import {
   getActiveProvider,
   type AIProvider,
 } from "@/lib/ai/providers";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { tierService } from "@/lib/tier/tier-service";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,
@@ -209,7 +211,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    const providerConfig = getActiveProvider(providerPreference);
+    // Tier-based model selection: Get appropriate model for user's tier
+    const tierModel = await tierService.getAIModelForUser(
+      userId ?? null,
+      "chat",
+    );
+    const deploymentName = getDeploymentForModel(tierModel);
+
+    log.debug("Tier-based model selected", {
+      userId: userId || "anonymous",
+      tierModel,
+      deploymentName,
+    });
+
+    const providerConfig = getActiveProvider(
+      providerPreference,
+      deploymentName,
+    );
 
     try {
       if (requestedTool) {
@@ -231,6 +249,7 @@ export async function POST(request: NextRequest) {
           : undefined,
         tool_choice: toolChoice,
         providerPreference,
+        model: deploymentName, // Tier-based model routing
       });
 
       log.debug("Chat response", {
