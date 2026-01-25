@@ -51,11 +51,14 @@ async function globalSetup() {
   // Use regex to extract only the host portion, not query params or other parts
   const hostMatch = testDbUrl.match(/@([^:/?#]+)/);
   const dbHost = hostMatch ? hostMatch[1].toLowerCase() : "";
-  const isSupabaseHost =
-    dbHost.endsWith("supabase.com") ||
-    dbHost.endsWith("supabase.co") ||
-    dbHost === "supabase.com" ||
-    dbHost === "supabase.co";
+  // Check if host is supabase.com, supabase.co, or any subdomain
+  // Split on dots and check last 2 parts to avoid regex complexity
+  const hostParts = dbHost.split(".");
+  const domain =
+    hostParts.length >= 2
+      ? `${hostParts[hostParts.length - 2]}.${hostParts[hostParts.length - 1]}`
+      : dbHost;
+  const isSupabaseHost = domain === "supabase.com" || domain === "supabase.co";
 
   if (isSupabaseHost) {
     throw new Error(
