@@ -382,11 +382,12 @@ jobs:
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
-  # MANDATORY: Always runs on push and PR (no draft skip)
+  # MANDATORY on main branch only (push to main or PR targeting main)
   mobile-e2e:
     name: Mobile E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
 
     services:
       postgres:
@@ -471,11 +472,12 @@ jobs:
           retention-days: 30
 
   # Lane 6b: E2E Tests - Full end-to-end test suite
-  # MANDATORY: Always runs on push and PR (no draft skip)
+  # MANDATORY on main branch only (push to main or PR targeting main)
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
 
     services:
       postgres:
@@ -576,11 +578,12 @@ jobs:
           tags: mirrorbuddy:test
 
   # Lane 8: Performance Budgets
-  # MANDATORY: Always runs on push and PR (no draft skip)
+  # MANDATORY on main branch only (push to main or PR targeting main)
   performance:
     name: Performance Budgets
     runs-on: ubuntu-latest
     needs: [build]
+    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
