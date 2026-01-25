@@ -54,7 +54,7 @@ export function MessageBubble({
       {/* Message bubble */}
       <div
         className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-3 relative group",
+          "max-w-[70%] xs:max-w-[85%] rounded-2xl px-4 py-3 relative group",
           message.role === "user"
             ? highContrast
               ? "bg-yellow-400 text-black"
