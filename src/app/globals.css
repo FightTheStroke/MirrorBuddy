@@ -1,6 +1,12 @@
 @import "tailwindcss";
 
 /* Custom breakpoints for mobile-first design */
+/* xs: 375px - for small phones like iPhone SE */
+@theme {
+  --breakpoint-xs: 375px;
+}
+
+/* Legacy custom media for CSS-only usage */
 @custom-media --xs (width >= 375px);
 
 /* Enable class-based dark mode for next-themes compatibility */
@@ -563,4 +569,27 @@ body {
     orphans: 3;
     widows: 3;
   }
+}
+
+/* === iOS SCROLL CONTAINMENT & ZOOM PREVENTION (F-05, F-84) === */
+
+/* Prevent iOS rubber-band bounce on scroll containers */
+.scroll-container {
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling */
+}
+
+/* Prevent iOS zoom on input focus - minimum 16px font-size requirement */
+input,
+textarea,
+select {
+  font-size: max(16px, 1rem);
+}
+
+/* Body scroll lock utility for modals and full-screen overlays */
+.scroll-lock {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
 }

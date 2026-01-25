@@ -44,7 +44,7 @@ export function MessageBubble({
       )}
       <div
         className={cn(
-          "max-w-[75%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3",
+          "max-w-[70%] xs:max-w-[85%] min-w-[120px] sm:min-w-[200px] rounded-2xl px-4 py-3",
           isUser
             ? "text-white rounded-br-md"
             : "bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md shadow-sm",

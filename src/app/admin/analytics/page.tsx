@@ -248,7 +248,7 @@ export default function AdminAnalyticsPage() {
         )}
 
         {/* Detailed Cards */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6">
           {/* Session Metrics (REAL data) */}
           <Card>
             <CardHeader>
@@ -261,7 +261,7 @@ export default function AdminAnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-emerald-600">
                     €{data.sessionMetrics?.cost.totalEur.toFixed(2) ?? "0.00"}
@@ -378,7 +378,7 @@ export default function AdminAnalyticsPage() {
               <CardDescription>Voice and TTS usage statistics</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-3 bg-muted rounded-lg">
                   <p className="text-xs text-muted-foreground">
                     Voice Sessions
@@ -447,7 +447,7 @@ export default function AdminAnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold text-blue-600">
                     {data.fsrsStats?.summary.totalCards ?? 0}
@@ -502,7 +502,7 @@ export default function AdminAnalyticsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                 <div className="text-center p-3 bg-muted rounded-lg">
                   <p className="text-2xl font-bold">
                     {data.safetyEvents?.summary.totalEvents ?? 0}

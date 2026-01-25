@@ -11,6 +11,7 @@ import { MessagesList } from "./character-chat-view/components/messages-list";
 import { ChatInput } from "./character-chat-view/components/chat-input";
 import { useVoiceSession } from "@/lib/hooks/use-voice-session";
 import { useTTS } from "@/components/accessibility";
+import { useDeviceType } from "@/hooks/use-device-type";
 import {
   CharacterHeader,
   CharacterVoicePanel,
@@ -43,6 +44,7 @@ export function CharacterChatView({
   characterType,
 }: CharacterChatViewProps) {
   const router = useRouter();
+  const { isPhone } = useDeviceType();
   const language = useSettingsStore(
     (state) => state.appearance.language,
   ) as SupportedLanguage;
@@ -129,35 +131,49 @@ export function CharacterChatView({
   const hasActiveTool = activeTool && activeTool.status !== "error";
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]">
-      {/* Main Chat Area */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header always visible */}
-        <CharacterHeader
-          character={unifiedCharacter}
-          voiceState={voiceState}
-          ttsEnabled={ttsEnabled}
-          actions={headerActions}
-        />
+    <div
+      className={`flex ${isPhone ? "flex-col" : "lg:flex-row"} gap-0 md:gap-4 ${isPhone ? "h-screen" : "h-full lg:h-[calc(100vh-8rem)]"}`}
+    >
+      {/* Main Chat Area - F-23: Mobile 65% viewport allocation */}
+      <div className={`flex flex-col min-w-0 ${isPhone ? "flex-1" : "flex-1"}`}>
+        {/* Header - Compact on mobile (≤60px) - xs: breakpoint */}
+        <div
+          className={`flex-shrink-0 ${isPhone ? "xs:max-h-[60px] overflow-hidden" : ""}`}
+        >
+          <CharacterHeader
+            character={unifiedCharacter}
+            voiceState={voiceState}
+            ttsEnabled={ttsEnabled}
+            actions={headerActions}
+          />
+        </div>
 
-        <MessagesList
-          messages={messages}
-          character={character}
-          isLoading={isLoading}
-        />
-        <div ref={messagesEndRef} />
+        {/* Messages Area - 65% viewport on mobile (F-23) */}
+        <div
+          className={`flex-1 overflow-y-auto ${isPhone ? "xs:min-h-[65vh]" : ""}`}
+        >
+          <MessagesList
+            messages={messages}
+            character={character}
+            isLoading={isLoading}
+          />
+          <div ref={messagesEndRef} />
+        </div>
 
-        <ChatInput
-          input={input}
-          onInputChange={setInput}
-          onSend={handleSend}
-          onKeyDown={handleKeyDown}
-          isLoading={isLoading}
-          character={character}
-          characterType={characterType}
-          onToolRequest={handleToolRequest}
-          activeTool={activeTool}
-        />
+        {/* Chat Input - Auto-height on mobile (flex-shrink-0 prevents squashing) */}
+        <div className="flex-shrink-0">
+          <ChatInput
+            input={input}
+            onInputChange={setInput}
+            onSend={handleSend}
+            onKeyDown={handleKeyDown}
+            isLoading={isLoading}
+            character={character}
+            characterType={characterType}
+            onToolRequest={handleToolRequest}
+            activeTool={activeTool}
+          />
+        </div>
       </div>
 
       {hasActiveTool && (

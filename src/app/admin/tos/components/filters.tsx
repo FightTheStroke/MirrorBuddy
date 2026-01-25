@@ -31,11 +31,11 @@ export function Filters({
         <CardTitle>Filters</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="flex flex-wrap gap-4">
-          <div className="flex-1 min-w-[200px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div>
             <label className="block text-sm font-medium mb-2">Version</label>
             <select
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={versionFilter}
               onChange={(e) => {
                 setVersionFilter(e.target.value);
@@ -51,10 +51,10 @@ export function Filters({
             </select>
           </div>
 
-          <div className="flex-1 min-w-[200px]">
+          <div>
             <label className="block text-sm font-medium mb-2">Sort By</label>
             <select
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
@@ -63,10 +63,10 @@ export function Filters({
             </select>
           </div>
 
-          <div className="flex-1 min-w-[200px]">
+          <div>
             <label className="block text-sm font-medium mb-2">Order</label>
             <select
-              className="w-full px-3 py-2 border rounded-lg"
+              className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
             >

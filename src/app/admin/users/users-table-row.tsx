@@ -113,7 +113,7 @@ export function UsersTableRow({
           {new Date(user.createdAt).toLocaleDateString()}
         </TableCell>
         <TableCell>
-          <div className="flex gap-1">
+          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
             <Button
               size="sm"
               variant="outline"

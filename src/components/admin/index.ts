@@ -9,3 +9,4 @@ export { FunnelChart } from "./funnel-chart";
 export { FunnelUsersTable } from "./funnel-users-table";
 export { UserDrilldownModal } from "./user-drill-down-modal";
 export { UserActions } from "./user-actions";
+export { ResponsiveTable } from "./responsive-table";

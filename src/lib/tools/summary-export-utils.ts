@@ -3,25 +3,20 @@
  * HTML generation and escaping helpers
  */
 
-import { logger } from '@/lib/logger';
-import type { SummaryData } from '@/types/tools';
+import { logger } from "@/lib/logger";
+import type { SummaryData } from "@/types/tools";
 
 /**
  * Escape HTML special characters
+ * Uses explicit replacement for consistent behavior across environments
  */
 export function escapeHtml(text: string): string {
-  const div = typeof document !== 'undefined' ? document.createElement('div') : null;
-  if (div) {
-    div.textContent = text;
-    return div.innerHTML;
-  }
-  // Server-side fallback
   return text
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 }
 
 /**
@@ -92,25 +87,25 @@ export function generateSummaryHtml(data: SummaryData): string {
       (section) => `
       <div class="section">
         <h2>${escapeHtml(section.title)}</h2>
-        ${section.content ? `<p>${escapeHtml(section.content)}</p>` : ''}
+        ${section.content ? `<p>${escapeHtml(section.content)}</p>` : ""}
         ${
           section.keyPoints && section.keyPoints.length > 0
-            ? `<ul>${section.keyPoints.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
-            : ''
+            ? `<ul>${section.keyPoints.map((p) => `<li>${escapeHtml(p)}</li>`).join("")}</ul>`
+            : ""
         }
       </div>
-    `
+    `,
     )
-    .join('');
+    .join("");
 
   const lengthLabel =
-    data.length === 'short'
-      ? 'Breve'
-      : data.length === 'medium'
-        ? 'Medio'
-        : data.length === 'long'
-          ? 'Lungo'
-          : '';
+    data.length === "short"
+      ? "Breve"
+      : data.length === "medium"
+        ? "Medio"
+        : data.length === "long"
+          ? "Lungo"
+          : "";
 
   return `
     <!DOCTYPE html>
@@ -123,10 +118,10 @@ export function generateSummaryHtml(data: SummaryData): string {
     </head>
     <body>
       <h1>${escapeHtml(data.topic)}</h1>
-      ${lengthLabel ? `<div class="meta">Riassunto ${lengthLabel}</div>` : ''}
+      ${lengthLabel ? `<div class="meta">Riassunto ${lengthLabel}</div>` : ""}
       ${sections}
       <div class="footer">
-        Generato con MirrorBuddy - ${new Date().toLocaleDateString('it-IT')}
+        Generato con MirrorBuddy - ${new Date().toLocaleDateString("it-IT")}
       </div>
     </body>
     </html>
@@ -140,10 +135,10 @@ export async function exportSummaryToPdf(data: SummaryData): Promise<void> {
   const html = generateSummaryHtml(data);
 
   // Create a new window for printing
-  const printWindow = window.open('', '_blank');
+  const printWindow = window.open("", "_blank");
   if (!printWindow) {
-    logger.error('[SummaryExport] Could not open print window');
-    throw new Error('Impossibile aprire la finestra di stampa');
+    logger.error("[SummaryExport] Could not open print window");
+    throw new Error("Impossibile aprire la finestra di stampa");
   }
 
   printWindow.document.write(html);
@@ -155,5 +150,5 @@ export async function exportSummaryToPdf(data: SummaryData): Promise<void> {
     printWindow.print();
   };
 
-  logger.info('[SummaryExport] PDF export initiated', { topic: data.topic });
+  logger.info("[SummaryExport] PDF export initiated", { topic: data.topic });
 }

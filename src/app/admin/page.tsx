@@ -221,7 +221,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Toolbar */}
-      <div className="flex items-center justify-end gap-2 mb-6">
+      <div className="flex flex-wrap items-center justify-end gap-2 mb-6">
         <Button variant="outline" size="sm" asChild>
           <a
             href={GRAFANA_DASHBOARD_URL}

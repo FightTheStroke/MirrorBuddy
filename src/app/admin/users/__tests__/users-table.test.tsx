@@ -61,7 +61,7 @@ describe("UsersTable", () => {
     expect(screen.getByText("alpha")).toBeInTheDocument();
     expect(screen.getByText("beta")).toBeInTheDocument();
 
-    const activeTab = screen.getByText("Attivi");
+    const activeTab = screen.getByRole("tab", { name: /Attivi/ });
     fireEvent.click(activeTab);
 
     expect(screen.getByText("alpha")).toBeInTheDocument();
@@ -76,7 +76,7 @@ describe("UsersTable", () => {
 
     render(<UsersTable users={users} availableTiers={[]} />);
 
-    fireEvent.click(screen.getByText("Cestino (0)"));
+    fireEvent.click(screen.getByRole("tab", { name: /Cestino/ }));
 
     await waitFor(() => {
       expect(screen.getByText("gamma")).toBeInTheDocument();
@@ -114,7 +114,7 @@ describe("UsersTable", () => {
 
     render(<UsersTable users={users} availableTiers={[]} />);
 
-    fireEvent.click(screen.getByText("Cestino (0)"));
+    fireEvent.click(screen.getByRole("tab", { name: /Cestino/ }));
 
     await waitFor(() => {
       expect(screen.getByText("gamma")).toBeInTheDocument();

@@ -86,7 +86,7 @@ export function HomeHeader({
               {mbInLevel}/{mbNeeded} MB
             </span>
           </div>
-          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-24 sm:w-36">
+          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-full xs:w-28 sm:w-36 md:w-40">
             <motion.div
               className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
               initial={{ width: 0 }}
@@ -97,7 +97,42 @@ export function HomeHeader({
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Mobile Stats - Compact version for small screens */}
+      <div className="flex md:hidden items-center gap-2 text-sm">
+        {/* Streak indicator */}
+        {streak.current > 0 && (
+          <div className="flex items-center gap-1" title="Streak">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="font-semibold text-orange-500 text-xs">
+              {streak.current}
+            </span>
+          </div>
+        )}
+
+        {/* Trial mode badge - mobile version */}
+        {trialStatus?.isTrialMode && (
+          <Link
+            href="/invite/request"
+            className={cn(
+              "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-colors",
+              trialStatus.chatsRemaining <= 3
+                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300",
+            )}
+            title="Clicca per richiedere accesso completo"
+          >
+            <MessageCircle className="w-3 h-3" />
+            <span className="font-semibold">
+              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
+            </span>
+          </Link>
+        )}
+
+        {/* Notifications bell - mobile */}
+        <NotificationBell />
+      </div>
+
+      {/* Desktop Stats - Full version for medium screens and up */}
       <div className="hidden md:flex items-center gap-4 text-sm">
         <div className="flex items-center gap-1.5" title="Streak">
           <Flame

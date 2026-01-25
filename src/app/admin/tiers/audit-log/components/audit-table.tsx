@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { ResponsiveTable } from "@/components/admin/responsive-table";
 
 interface TierAuditLog {
   id: string;
@@ -69,7 +70,7 @@ function formatChanges(changes: Record<string, unknown>) {
 export function AuditTable({ logs }: AuditTableProps) {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg overflow-hidden">
-      <div className="overflow-x-auto">
+      <ResponsiveTable caption="Audit log table">
         <table className="w-full">
           <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
             <tr>
@@ -134,7 +135,7 @@ export function AuditTable({ logs }: AuditTableProps) {
             )}
           </tbody>
         </table>
-      </div>
+      </ResponsiveTable>
     </div>
   );
 }

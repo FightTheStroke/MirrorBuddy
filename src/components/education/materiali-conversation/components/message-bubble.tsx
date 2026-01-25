@@ -3,11 +3,11 @@
  * @brief Message bubble component
  */
 
-import Image from 'next/image';
-import { FileText } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { ToolResultDisplay } from '@/components/tools';
-import type { ConversationMessage, Character } from '../types';
+import Image from "next/image";
+import { FileText } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { ToolResultDisplay } from "@/components/tools";
+import type { ConversationMessage, Character } from "../types";
 
 interface MessageBubbleProps {
   message: ConversationMessage;
@@ -27,11 +27,11 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        'flex gap-3',
-        message.role === 'user' ? 'justify-end' : 'justify-start'
+        "flex gap-3",
+        message.role === "user" ? "justify-end" : "justify-start",
       )}
     >
-      {message.role === 'assistant' && (
+      {message.role === "assistant" && (
         <div
           className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0"
           style={{ boxShadow: `0 0 0 2px ${character.color}` }}
@@ -46,7 +46,7 @@ export function MessageBubble({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 max-w-[80%]">
+      <div className="flex flex-col gap-2 max-w-[70%] xs:max-w-[85%]">
         {message.attachments && message.attachments.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {message.attachments.map((att) => (
@@ -54,7 +54,7 @@ export function MessageBubble({
                 key={att.id}
                 className="relative w-20 h-20 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700"
               >
-                {att.type === 'image' ? (
+                {att.type === "image" ? (
                   <Image
                     src={att.url}
                     alt={att.name}
@@ -74,15 +74,15 @@ export function MessageBubble({
         {message.content && (
           <div
             className={cn(
-              'rounded-2xl px-4 py-3',
-              message.role === 'user'
+              "rounded-2xl px-4 py-3",
+              message.role === "user"
                 ? highContrast
-                  ? 'bg-yellow-400 text-black'
-                  : 'bg-accent-themed text-white'
+                  ? "bg-yellow-400 text-black"
+                  : "bg-accent-themed text-white"
                 : highContrast
-                  ? 'bg-gray-900 text-white border border-gray-700'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white',
-              dyslexiaFont && 'tracking-wide'
+                  ? "bg-gray-900 text-white border border-gray-700"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
+              dyslexiaFont && "tracking-wide",
             )}
             style={{ lineHeight: lineSpacing }}
           >
@@ -101,4 +101,3 @@ export function MessageBubble({
     </div>
   );
 }
-

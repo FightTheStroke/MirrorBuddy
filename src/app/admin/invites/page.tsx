@@ -286,21 +286,21 @@ export default function AdminInvitesPage() {
               className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
               rows={3}
             />
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-wrap gap-2 sm:gap-3 mt-4">
               <Button
                 onClick={() => {
                   setShowRejectModal(null);
                   setRejectReason("");
                 }}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 min-w-20"
               >
                 Annulla
               </Button>
               <Button
                 onClick={() => handleReject(showRejectModal)}
                 disabled={processingId === showRejectModal}
-                className="flex-1 bg-red-600 hover:bg-red-700"
+                className="flex-1 min-w-20 bg-red-600 hover:bg-red-700"
               >
                 {processingId === showRejectModal ? (
                   <Loader2 className="w-4 h-4 animate-spin" />

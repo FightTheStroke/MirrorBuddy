@@ -3,7 +3,7 @@
  * @brief Chat input component
  */
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { Send, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ToolButtons } from "../../tool-buttons";
@@ -35,6 +35,27 @@ export function ChatInput({
 }: ChatInputProps) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
+  // Auto-height adjustment: grows from 1 to 4 rows, then scrolls internally
+  const adjustTextareaHeight = (textarea: HTMLTextAreaElement) => {
+    // Reset height to get accurate scrollHeight
+    textarea.style.height = "auto";
+    // Set height based on scrollHeight, capped at maxHeight (4 rows)
+    const newHeight = Math.min(textarea.scrollHeight, 120);
+    textarea.style.height = `${newHeight}px`;
+  };
+
+  const handleInput = (e: React.FormEvent<HTMLTextAreaElement>) => {
+    const textarea = e.currentTarget;
+    adjustTextareaHeight(textarea);
+  };
+
+  // Adjust height when input value changes from parent
+  useEffect(() => {
+    if (inputRef.current) {
+      adjustTextareaHeight(inputRef.current);
+    }
+  }, [input]);
+
   return (
     <div className="p-4 pb-[max(1rem,env(safe-area-inset-bottom))] bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 rounded-b-2xl">
       {characterType === "coach" && (
@@ -53,9 +74,15 @@ export function ChatInput({
           value={input}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyDown}
+          onInput={handleInput}
           placeholder={"Scrivi un messaggio a " + character.name + "..."}
-          className="flex-1 resize-none rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm min-h-[120px] md:min-h-0 focus:outline-none focus:ring-2 focus:ring-accent-themed"
-          rows={3}
+          className="flex-1 resize-none overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-accent-themed"
+          rows={1}
+          style={{
+            height: "auto",
+            minHeight: "44px",
+            maxHeight: "120px",
+          }}
           disabled={isLoading}
         />
         <Button

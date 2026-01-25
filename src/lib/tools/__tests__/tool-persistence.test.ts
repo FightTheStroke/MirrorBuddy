@@ -36,10 +36,8 @@ vi.mock("../tool-embedding", () => ({
   generateMaterialEmbeddingAsync: vi.fn(),
 }));
 
-// Mock crypto.randomUUID
-vi.mock("crypto", () => ({
-  randomUUID: vi.fn(() => "mock-uuid-1234"),
-}));
+// Note: crypto.randomUUID is used natively - no mock needed
+// Tests verify behavior independent of specific UUID values
 
 describe("tool-persistence", () => {
   const userId = "user-123";
