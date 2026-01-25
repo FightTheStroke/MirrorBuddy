@@ -479,6 +479,34 @@ const sentryConfig = {
 
 **Note**: These warnings were cosmetic - source maps for actual application code still upload correctly. The manifest files are Next.js runtime internals that don't need source maps for error tracking.
 
+### Environment-Specific Build Behavior
+
+Vercel env vars are configured for **Production only** (not Preview/Development):
+
+| Env Var             | Production | Preview    | Effect                                  |
+| ------------------- | ---------- | ---------- | --------------------------------------- |
+| `SENTRY_AUTH_TOKEN` | ✅ Set     | ❌ Not set | Source maps uploaded only in Production |
+| `ADMIN_EMAIL`       | ✅ Set     | ❌ Not set | Admin user seeded only in Production    |
+| `ADMIN_PASSWORD`    | ✅ Set     | ❌ Not set | Admin user seeded only in Production    |
+
+**Build behavior by environment**:
+
+- **Production**: Full functionality - admin seeded, source maps uploaded
+- **Preview**: Silent skip - no admin, no source maps (reduces noise, faster builds)
+
+The code detects missing tokens and silently skips operations:
+
+```typescript
+// next.config.ts
+const hasSentryToken = !!process.env.SENTRY_AUTH_TOKEN;
+sourcemaps: hasSentryToken ? { ignore: [...] } : { disable: true }
+
+// scripts/seed-admin.ts
+if (!email || !password) {
+  process.exit(0); // Silent exit for Preview
+}
+```
+
 ### Common Deployment Failures
 
 | Error                       | Cause                                  | Fix                                             |
