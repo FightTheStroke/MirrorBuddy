@@ -51,22 +51,71 @@ async function protectedFeature(userId: string | null) {
 }
 
 // Frontend - Use hooks (check useTierFeatures in src/hooks/)
-const { canUseVoice, canUseTools } = useTierFeatures(userId);
+const { hasFeature, tier, isSimulated } = useTierFeatures();
 
-if (!canUseVoice) {
+if (!hasFeature("voice")) {
   return <UpgradePrompt feature="Voice Chat" />;
+}
+
+// Check if admin is simulating a tier
+if (isSimulated) {
+  console.log("Currently simulating tier:", tier);
 }
 ```
 
 ## Admin Tier Management Routes
 
-| Route                   | Method | Purpose                   |
-| ----------------------- | ------ | ------------------------- |
-| `/api/admin/tiers`      | GET    | List all tiers            |
-| `/api/admin/tiers`      | POST   | Create new tier           |
-| `/api/admin/tiers/[id]` | PUT    | Update tier               |
-| `/api/admin/tiers/[id]` | DELETE | Delete tier               |
-| `/admin/tiers`          | UI     | Tier management dashboard |
+| Route                      | Method | Purpose                   |
+| -------------------------- | ------ | ------------------------- |
+| `/api/admin/tiers`         | GET    | List all tiers            |
+| `/api/admin/tiers`         | POST   | Create new tier           |
+| `/api/admin/tiers/[id]`    | PUT    | Update tier               |
+| `/api/admin/tiers/[id]`    | DELETE | Delete tier               |
+| `/api/admin/simulate-tier` | GET    | Check simulation status   |
+| `/api/admin/simulate-tier` | POST   | Set simulated tier        |
+| `/api/admin/simulate-tier` | DELETE | Clear simulated tier      |
+| `/admin/tiers`             | UI     | Tier management dashboard |
+
+## Admin Tier Simulation (Testing)
+
+Admins can simulate different tiers to test feature access and UI:
+
+```typescript
+// Set simulated tier (admin only)
+await csrfFetch("/api/admin/simulate-tier", {
+  method: "POST",
+  body: JSON.stringify({ tier: "trial" }), // "trial" | "base" | "pro"
+});
+
+// Clear simulation
+await csrfFetch("/api/admin/simulate-tier", { method: "DELETE" });
+
+// Check status
+const res = await fetch("/api/admin/simulate-tier");
+const { isSimulating, simulatedTier } = await res.json();
+```
+
+**How it works:**
+
+- Stored in HTTP-only cookie (`mirrorbuddy-simulated-tier`)
+- 24-hour expiry
+- Only admins can set/clear simulation
+- `useTierFeatures()` hook returns `isSimulated: boolean`
+- Header shows "(SIM)" badge when simulating
+
+**UI Location:** Admin header → Flask icon dropdown (`TierSimulator` component)
+
+## Header Tier Badge
+
+All users see their current tier in the home header:
+
+- **Trial**: Gray badge
+- **Base**: Blue badge
+- **Pro**: Purple badge with crown icon
+- When admin simulates: Shows "(SIM)" indicator
+
+Component: `src/components/tier/TierBadge.tsx`
+Location: Right side of header, before calculator widget
 
 ## Common Tier Operations
 
