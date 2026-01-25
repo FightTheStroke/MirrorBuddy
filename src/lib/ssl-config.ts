@@ -94,13 +94,18 @@ export function buildSSLConfig(): SSLConfig | undefined {
  * We manage SSL explicitly via ssl option to avoid conflicts.
  */
 function cleanConnectionString(url: string): string {
-  // Remove sslmode=value (and its delimiter)
-  let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
-  // Clean up any trailing ? or & or double delimiters
-  cleaned = cleaned.replace(/[?&]$/, "");
-  cleaned = cleaned.replace(/[?&]{2,}/g, "&");
-  cleaned = cleaned.replace(/\?&/, "?");
-  return cleaned;
+  try {
+    const parsed = new URL(url);
+    parsed.searchParams.delete("sslmode");
+    return parsed.toString();
+  } catch {
+    // Fallback for malformed URLs: use regex
+    let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
+    cleaned = cleaned.replace(/\?&/g, "?");
+    cleaned = cleaned.replace(/&&/g, "&");
+    cleaned = cleaned.replace(/[?&]$/, "");
+    return cleaned;
+  }
 }
 
 /**
