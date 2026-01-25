@@ -5,3 +5,4 @@ export { TrialOnboarding } from "./trial-onboarding";
 export { UpgradePrompt } from "./upgrade-prompt";
 export { TrialHomeBanner } from "./trial-home-banner";
 export { TrialUsageDashboard } from "./trial-usage-dashboard";
+export { TrialHeaderDropdown } from "./trial-header-dropdown";

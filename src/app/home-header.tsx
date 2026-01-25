@@ -1,23 +1,14 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import {
-  Flame,
-  Coins,
-  BookOpen,
-  Clock,
-  Star,
-  Gift,
-  MessageCircle,
-  Menu,
-} from "lucide-react";
+import { Flame, Coins, BookOpen, Clock, Star, Menu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PomodoroHeaderWidget } from "@/components/pomodoro";
 import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
 import { CalculatorHeaderWidget } from "@/components/calculator";
 import { TierBadge } from "@/components/tier/TierBadge";
+import { TrialHeaderDropdown } from "@/components/trial";
 import type { TierName } from "@/types/tier-types";
 
 interface TrialStatus {
@@ -157,25 +148,12 @@ export function HomeHeader({
           </div>
         )}
 
-        {/* Trial mode badge */}
+        {/* Trial mode dropdown */}
         {trialStatus?.isTrialMode && (
-          <Link
-            href="/invite/request"
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-              trialStatus.chatsRemaining <= 3
-                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40"
-                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40",
-            )}
-            title="Clicca per richiedere accesso completo"
-          >
-            <Gift className="w-3.5 h-3.5" />
-            <span>Trial</span>
-            <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
-              <MessageCircle className="w-3 h-3" />
-              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
-            </span>
-          </Link>
+          <TrialHeaderDropdown
+            chatsRemaining={trialStatus.chatsRemaining}
+            maxChats={trialStatus.maxChats}
+          />
         )}
       </div>
 

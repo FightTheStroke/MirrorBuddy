@@ -72,7 +72,7 @@ export function PrivacySettings() {
         }
       }
       keysToRemove.forEach((key) => localStorage.removeItem(key));
-      router.push("/login");
+      router.push("/welcome");
     } catch {
       setIsLoggingOut(false);
     }

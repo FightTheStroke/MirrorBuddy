@@ -2,20 +2,12 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import {
-  ChevronUp,
-  ChevronDown,
-  LogIn,
-  LogOut,
-  UserPlus,
-  Shield,
-} from "lucide-react";
+import { ChevronUp, ChevronDown, LogOut, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActiveMaestroAvatar } from "@/components/conversation";
-import { TrialStatusIndicator } from "@/components/trial";
 import { useAdminStatus } from "@/lib/hooks/use-admin-status";
 import type { View } from "@/app/types";
 
@@ -27,19 +19,6 @@ interface NavItem {
   avatar?: string;
 }
 
-interface TrialStatus {
-  isTrialMode: boolean;
-  chatsUsed: number;
-  chatsRemaining: number;
-  maxChats: number;
-  voiceSecondsUsed: number;
-  voiceSecondsRemaining: number;
-  maxVoiceSeconds: number;
-  toolsUsed: number;
-  toolsRemaining: number;
-  maxTools: number;
-}
-
 interface HomeSidebarProps {
   open: boolean;
   onToggle: () => void;
@@ -48,7 +27,7 @@ interface HomeSidebarProps {
   navItems: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
-  trialStatus?: TrialStatus;
+  isTrialMode?: boolean;
 }
 
 export function HomeSidebar({
@@ -59,7 +38,7 @@ export function HomeSidebar({
   navItems,
   hasNewInsights,
   onParentAccess,
-  trialStatus,
+  isTrialMode,
 }: HomeSidebarProps) {
   const router = useRouter();
   const { isAdmin } = useAdminStatus();
@@ -136,54 +115,6 @@ export function HomeSidebar({
             )}
           </Button>
         </div>
-
-        {/* Trial Status Indicator */}
-        {trialStatus?.isTrialMode && (
-          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col gap-2">
-              {open && (
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                  Modalità Prova
-                </span>
-              )}
-              <TrialStatusIndicator
-                chatsUsed={trialStatus.chatsUsed}
-                maxChats={trialStatus.maxChats}
-                voiceSecondsUsed={trialStatus.voiceSecondsUsed}
-                maxVoiceSeconds={trialStatus.maxVoiceSeconds}
-                toolsUsed={trialStatus.toolsUsed}
-                maxTools={trialStatus.maxTools}
-                showVoice={true}
-                showTools={true}
-                className={cn(!open && "justify-center")}
-              />
-              {open && (
-                <div className="flex flex-col gap-1 mt-2">
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-xs"
-                    >
-                      <LogIn className="w-3 h-3 mr-2" />
-                      Accedi
-                    </Button>
-                  </Link>
-                  <Link href="/invite/request">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
-                    >
-                      <UserPlus className="w-3 h-3 mr-2" />
-                      Richiedi accesso
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
@@ -313,7 +244,7 @@ export function HomeSidebar({
           </button>
 
           {/* Logout Button - only show for authenticated users (not trial) */}
-          {!trialStatus?.isTrialMode && (
+          {!isTrialMode && (
             <button
               onClick={handleLogout}
               className={cn(

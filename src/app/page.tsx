@@ -33,7 +33,6 @@ import { AstuccioView } from "@/app/astuccio/components/astuccio-view";
 import { CharacterChatView } from "@/components/conversation";
 import { LazySettingsView } from "@/components/settings";
 import { LazyProgressView } from "@/components/progress";
-import { TrialHomeBanner, TrialUsageDashboard } from "@/components/trial";
 import { HomeHeader } from "./home-header";
 import { HomeSidebar } from "./home-sidebar";
 import { COACH_INFO, BUDDY_INFO } from "./home-constants";
@@ -207,25 +206,16 @@ export default function Home() {
           markAsViewed();
           handleViewChange("genitori");
         }}
-        trialStatus={trialStatus}
+        isTrialMode={trialStatus.isTrialMode}
       />
 
       <div
         className={cn(
-          "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
+          "transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
           sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
       >
-        <main className="min-h-screen flex-1">
-          {/* Trial mode banner */}
-          {trialStatus.isTrialMode && !trialStatus.isLoading && (
-            <TrialHomeBanner
-              chatsRemaining={trialStatus.chatsRemaining}
-              maxChats={trialStatus.maxChats}
-              visitorId={trialStatus.visitorId}
-            />
-          )}
-
+        <main className="min-h-screen">
           <motion.div
             key={currentView}
             initial={{ opacity: 0, y: 20 }}
@@ -276,13 +266,6 @@ export default function Home() {
             {currentView === "settings" && <LazySettingsView />}
           </motion.div>
         </main>
-
-        {/* Trial usage dashboard sidebar - visible only in trial mode on lg screens */}
-        {trialStatus.isTrialMode && !trialStatus.isLoading && (
-          <aside className="w-80 hidden lg:block flex-shrink-0">
-            <TrialUsageDashboard />
-          </aside>
-        )}
       </div>
     </div>
   );

@@ -87,7 +87,7 @@ test.describe("Login/Logout Authentication Flow", () => {
     ).toBeTruthy();
   });
 
-  test("Logout clears session and redirects to login", async ({ page }) => {
+  test("Logout from settings redirects to welcome page", async ({ page }) => {
     // This test requires an authenticated session
     // Set up auth cookie to simulate logged-in user
     await page.context().addCookies([
@@ -125,8 +125,55 @@ test.describe("Login/Logout Authentication Flow", () => {
     // Click logout
     await page.click('[data-testid="logout-button"]');
 
-    // Should redirect to login (may include query params like ?redirect=...)
-    await page.waitForURL(/\/login/, { timeout: 5000 });
+    // Should redirect to welcome page (not login)
+    await page.waitForURL(/\/welcome/, { timeout: 5000 });
+    expect(page.url()).toContain("/welcome");
+
+    // Session cookie should be cleared
+    const cookies = await page.context().cookies();
+    const authCookie = cookies.find((c) => c.name === "mirrorbuddy-user-id");
+    expect(authCookie?.value || "").toBe("");
+  });
+
+  test("Logout from sidebar redirects to welcome page", async ({ page }) => {
+    // Set up auth cookie to simulate logged-in user
+    await page.context().addCookies([
+      {
+        name: "mirrorbuddy-user-id",
+        value: "test-user-id.signature",
+        domain: "localhost",
+        path: "/",
+      },
+      {
+        name: "mirrorbuddy-user-id-client",
+        value: "test-user-id",
+        domain: "localhost",
+        path: "/",
+      },
+    ]);
+
+    // Navigate to home page where sidebar is available
+    await page.goto("/home");
+    await page.waitForLoadState("networkidle");
+
+    // Find and click the logout button in sidebar (has aria-label="Esci")
+    const logoutButton = page.locator('button[aria-label="Esci"]');
+    const isLogoutVisible = await logoutButton
+      .isVisible({ timeout: 3000 })
+      .catch(() => false);
+
+    if (!isLogoutVisible) {
+      // Sidebar might be collapsed or user in trial mode (no logout shown)
+      test.skip(true, "Logout button not visible in sidebar");
+      return;
+    }
+
+    // Click logout
+    await logoutButton.click();
+
+    // Should redirect to welcome page
+    await page.waitForURL(/\/welcome/, { timeout: 5000 });
+    expect(page.url()).toContain("/welcome");
 
     // Session cookie should be cleared
     const cookies = await page.context().cookies();
