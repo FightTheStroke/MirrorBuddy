@@ -1,63 +1,80 @@
 /**
  * Demo Generation
  * Generate interactive HTML/CSS/JS demos for STEM subjects
+ * Supports per-feature model selection (ADR 0073)
  */
 
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import type { DemoData } from '@/types/tools';
+import { chatCompletion } from "@/lib/ai/providers";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { logger } from "@/lib/logger";
+import type { DemoData } from "@/types/tools";
+
+/** Options for demo generation (ADR 0073 - per-feature AI config) */
+interface DemoOptions {
+  /** AI model to use (from tier system) */
+  model?: string;
+  /** Temperature for AI responses (0-2) */
+  temperature?: number;
+  /** Maximum tokens for AI responses */
+  maxTokens?: number;
+}
 
 // STEM subjects that support demo generation
 const STEM_SUBJECTS = [
-  'matematica',
-  'fisica',
-  'chimica',
-  'biologia',
-  'scienze',
-  'informatica',
-  'mathematics',
-  'physics',
-  'chemistry',
-  'biology',
-  'science',
-  'computer',
-  'scienza',
-  'scientifico',
-  'fisico',
-  'chimico',
-  'biologico',
-  'stem',
-  's.t.e.m.',
-  'ingegneria',
-  'engineering',
-  'tecnologia',
-  'technology',
+  "matematica",
+  "fisica",
+  "chimica",
+  "biologia",
+  "scienze",
+  "informatica",
+  "mathematics",
+  "physics",
+  "chemistry",
+  "biology",
+  "science",
+  "computer",
+  "scienza",
+  "scientifico",
+  "fisico",
+  "chimico",
+  "biologico",
+  "stem",
+  "s.t.e.m.",
+  "ingegneria",
+  "engineering",
+  "tecnologia",
+  "technology",
 ];
 
 /**
  * Check if subject is STEM
  */
 export function isSTEMSubject(subject?: string): boolean {
-  const subjectLower = subject?.toLowerCase() || '';
+  const subjectLower = subject?.toLowerCase() || "";
   return STEM_SUBJECTS.some((s) => subjectLower.includes(s.toLowerCase()));
 }
 
 /**
  * Generate interactive demo from text using AI
+ * @param text - Text content to generate demo from
+ * @param title - Title for the demo
+ * @param subject - Subject context (must be STEM)
+ * @param options - Optional model from tier system (ADR 0073)
  */
 export async function generateDemo(
   text: string,
   title: string,
-  subject?: string
+  subject?: string,
+  options?: DemoOptions,
 ): Promise<DemoData | null> {
   if (!isSTEMSubject(subject)) {
-    logger.info('Skipping demo generation for non-STEM subject', {
+    logger.info("Skipping demo generation for non-STEM subject", {
       subject,
     });
     return null;
   }
 
-  logger.info('Generating demo for STEM subject', { subject, title });
+  logger.info("Generating demo for STEM subject", { subject, title });
 
   const prompt = `Crea una demo HTML/CSS/JS SPETTACOLARE per: "${title}" (${subject})
 
@@ -101,16 +118,24 @@ STRUTTURA OBBLIGATORIA:
 Rispondi SOLO con JSON valido (no markdown, no commenti):
 {"title":"...","description":"...","html":"...","css":"...","js":"..."}`;
 
+  const deploymentName = options?.model
+    ? getDeploymentForModel(options.model)
+    : undefined;
+
   const result = await chatCompletion(
-    [{ role: 'user', content: prompt }],
-    'Sei un esperto di visualizzazioni interattive. Genera SOLO JSON valido con demo spettacolari.',
-    { temperature: 0.8, maxTokens: 4000 }
+    [{ role: "user", content: prompt }],
+    "Sei un esperto di visualizzazioni interattive. Genera SOLO JSON valido con demo spettacolari.",
+    {
+      temperature: options?.temperature ?? 0.8,
+      maxTokens: options?.maxTokens ?? 4000,
+      model: deploymentName,
+    },
   );
 
   // Parse JSON response
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    logger.warn('Failed to parse demo JSON');
+    logger.warn("Failed to parse demo JSON");
     return null;
   }
 
@@ -119,12 +144,12 @@ Rispondi SOLO con JSON valido (no markdown, no commenti):
     return {
       title: demoData.title || title,
       description: demoData.description,
-      html: demoData.html || '',
-      css: demoData.css || '',
-      js: demoData.js || '',
+      html: demoData.html || "",
+      css: demoData.css || "",
+      js: demoData.js || "",
     };
   } catch (error) {
-    logger.error('Failed to parse demo JSON', undefined, error);
+    logger.error("Failed to parse demo JSON", undefined, error);
     return null;
   }
 }

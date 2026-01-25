@@ -93,6 +93,9 @@ model User {
 
   // Tier Subscription System (ADR 0071)
   subscription UserSubscription?
+
+  // User-level feature AI config overrides (ADR 0073)
+  featureConfigs UserFeatureConfig[] @relation("UserFeatureConfigs")
 }
 
 model Profile {

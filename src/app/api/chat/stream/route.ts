@@ -134,8 +134,8 @@ export async function POST(request: NextRequest) {
       return response;
     }
 
-    // Tier-based model selection for streaming
-    const tierModel = await tierService.getAIModelForUser(
+    // Tier-based model selection for streaming (ADR 0073)
+    const tierModel = await tierService.getModelForUserFeature(
       userId ?? null,
       "chat",
     );

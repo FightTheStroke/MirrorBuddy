@@ -27,6 +27,21 @@ import * as Sentry from "@sentry/nextjs";
 import { tierService } from "@/lib/tier/tier-service";
 import { prisma } from "@/lib/db";
 
+// Default per-feature model fields (ADR 0073)
+const defaultModelFields = {
+  pdfModel: "gpt-4o-mini",
+  mindmapModel: "gpt-4o-mini",
+  quizModel: "gpt-4o-mini",
+  flashcardsModel: "gpt-4o-mini",
+  summaryModel: "gpt-4o-mini",
+  formulaModel: "gpt-4o-mini",
+  chartModel: "gpt-4o-mini",
+  homeworkModel: "gpt-4o-mini",
+  webcamModel: "gpt-4o-mini",
+  demoModel: "gpt-4o-mini",
+  featureConfigs: null, // Per-feature config overrides (ADR 0073)
+};
+
 describe("setSentryTierContext", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -57,6 +72,7 @@ describe("setSentryTierContext", () => {
       docsLimitTotal: 100,
       chatModel: "gpt-4o",
       realtimeModel: "gpt-realtime",
+      ...defaultModelFields,
       features: {
         chat: true,
         voice: true,
@@ -78,7 +94,7 @@ describe("setSentryTierContext", () => {
       isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
-    } as any;
+    };
     const mockSubscription = {
       id: "sub-123",
       userId,
@@ -141,6 +157,7 @@ describe("setSentryTierContext", () => {
       docsLimitTotal: 50,
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime",
+      ...defaultModelFields,
       features: {
         chat: true,
         voice: true,
@@ -195,6 +212,7 @@ describe("setSentryTierContext", () => {
       docsLimitTotal: 50,
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime",
+      ...defaultModelFields,
       features: {
         chat: true,
         voice: true,
@@ -245,6 +263,7 @@ describe("setSentryTierContext", () => {
       docsLimitTotal: 100,
       chatModel: "gpt-4o",
       realtimeModel: "gpt-realtime",
+      ...defaultModelFields,
       features: {
         chat: true,
         voice: true,
@@ -307,6 +326,7 @@ describe("setSentryTierContext", () => {
       docsLimitTotal: 100,
       chatModel: "gpt-4o",
       realtimeModel: "gpt-realtime",
+      ...defaultModelFields,
       features: {
         chat: true,
         voice: true,

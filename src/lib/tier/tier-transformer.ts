@@ -27,8 +27,20 @@ export function transformTier(prismaTier: {
   voiceMinutesDaily: number;
   toolsLimitDaily: number;
   docsLimitTotal: number;
+  // Per-feature models (ADR 0073)
   chatModel: string;
   realtimeModel: string;
+  pdfModel: string;
+  mindmapModel: string;
+  quizModel: string;
+  flashcardsModel: string;
+  summaryModel: string;
+  formulaModel: string;
+  chartModel: string;
+  homeworkModel: string;
+  webcamModel: string;
+  demoModel: string;
+  featureConfigs: unknown;
   features: unknown;
   availableMaestri: unknown;
   availableCoaches: unknown;
@@ -57,6 +69,7 @@ export function transformTier(prismaTier: {
 
   return {
     ...prismaTier,
+    featureConfigs: prismaTier.featureConfigs as never,
     features: prismaTier.features as never,
     availableMaestri: Array.isArray(prismaTier.availableMaestri)
       ? prismaTier.availableMaestri

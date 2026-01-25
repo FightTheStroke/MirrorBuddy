@@ -27,8 +27,20 @@ export function createFallbackTier(code: TierCode): TierDefinition {
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
+      // Per-feature models (ADR 0073) - cost-effective for trial
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime-mini",
+      pdfModel: "gpt-4o-mini",
+      mindmapModel: "gpt-4o-mini",
+      quizModel: "gpt-4o-mini",
+      flashcardsModel: "gpt-4o-mini",
+      summaryModel: "gpt-4o-mini",
+      formulaModel: "gpt-4o-mini",
+      chartModel: "gpt-4o-mini",
+      homeworkModel: "gpt-4o-mini",
+      webcamModel: "gpt-4o-mini",
+      demoModel: "gpt-4o-mini",
+      featureConfigs: null, // No overrides, use DEFAULT_FEATURE_CONFIGS
       features: {
         chat: true,
         voice: true,
@@ -63,8 +75,20 @@ export function createFallbackTier(code: TierCode): TierDefinition {
     voiceMinutesDaily: 15,
     toolsLimitDaily: 30,
     docsLimitTotal: 5,
-    chatModel: "gpt-4o-mini",
-    realtimeModel: "gpt-realtime-mini",
+    // Per-feature models (ADR 0073) - education-optimized for registered users
+    chatModel: "gpt-5.2-edu",
+    realtimeModel: "gpt-realtime",
+    pdfModel: "gpt-5-mini",
+    mindmapModel: "gpt-5-mini",
+    quizModel: "gpt-5.2-edu",
+    flashcardsModel: "gpt-5-mini",
+    summaryModel: "gpt-5-mini",
+    formulaModel: "gpt-5.2-edu",
+    chartModel: "gpt-5-mini",
+    homeworkModel: "gpt-5.2-edu",
+    webcamModel: "gpt-5.2-edu",
+    demoModel: "gpt-4o-mini",
+    featureConfigs: null, // No overrides, use DEFAULT_FEATURE_CONFIGS
     features: {
       chat: true,
       voice: true,

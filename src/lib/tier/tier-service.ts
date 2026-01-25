@@ -22,6 +22,10 @@ import type {
   UserSubscription,
   TierLimits,
   TierFeatures,
+  FeatureAIConfig,
+  FeatureType,
+  UserFeatureConfig,
+  UserFeatureConfigInput,
 } from "./types";
 import { TierCode } from "./types";
 import { createFallbackTier } from "./tier-fallbacks";
@@ -30,6 +34,9 @@ import {
   isSubscriptionValid,
   extractTierLimits,
   getModelFromTier,
+  getModelForFeature,
+  getFeatureAIConfig,
+  type FeatureModelType,
 } from "./tier-helpers";
 
 export class TierService {
@@ -326,6 +333,7 @@ export class TierService {
    * @param userId - User ID (null for anonymous users)
    * @param type - Model type: 'chat', 'vision', or 'tts'
    * @returns Model name string (e.g., "gpt-4o", "gpt-4o-mini", "gpt-realtime")
+   * @deprecated Use getModelForUserFeature for per-feature selection (ADR 0073)
    */
   async getAIModelForUser(
     userId: string | null,
@@ -344,6 +352,322 @@ export class TierService {
       const fallbackCode = userId ? TierCode.BASE : TierCode.TRIAL;
       const fallbackTier = await this.getTierByCode(fallbackCode);
       return getModelFromTier(fallbackTier, type);
+    }
+  }
+
+  /**
+   * Get AI model for a specific feature based on user's tier (ADR 0073)
+   *
+   * Per-feature model selection allows fine-grained cost/quality optimization:
+   * - chat: Main conversation with Maestri
+   * - realtime: Voice/real-time interactions
+   * - pdf, mindmap, quiz, flashcards, summary, formula, chart, homework, webcam, demo
+   *
+   * @param userId - User ID (null for anonymous users)
+   * @param feature - Feature type (chat, mindmap, quiz, etc.)
+   * @returns Model name string configured for this feature in user's tier
+   */
+  async getModelForUserFeature(
+    userId: string | null,
+    feature: FeatureModelType,
+  ): Promise<string> {
+    try {
+      const tier = await this.getEffectiveTier(userId);
+      return getModelForFeature(tier, feature);
+    } catch (error) {
+      logger.error("Error fetching model for feature, using fallback", {
+        userId,
+        feature,
+        error: String(error),
+      });
+
+      const fallbackCode = userId ? TierCode.BASE : TierCode.TRIAL;
+      const fallbackTier = await this.getTierByCode(fallbackCode);
+      return getModelForFeature(fallbackTier, feature);
+    }
+  }
+
+  /**
+   * Get full AI configuration for a specific feature based on user's tier (ADR 0073)
+   *
+   * Priority order (first non-null wins):
+   * 1. User-level override (UserFeatureConfig table)
+   * 2. Tier-level config (featureConfigs JSON field)
+   * 3. Default feature config (DEFAULT_FEATURE_CONFIGS)
+   *
+   * @param userId - User ID (null for anonymous users)
+   * @param feature - Feature type (chat, mindmap, quiz, etc.)
+   * @returns Complete AI configuration for this feature
+   */
+  async getFeatureAIConfigForUser(
+    userId: string | null,
+    feature: FeatureType,
+  ): Promise<FeatureAIConfig> {
+    try {
+      // Get tier-level config as base
+      const tier = await this.getEffectiveTier(userId);
+      const tierConfig = getFeatureAIConfig(tier, feature);
+
+      // If no user, return tier config
+      if (!userId) {
+        return tierConfig;
+      }
+
+      // Check for user-level override
+      const userOverride = await this.getUserFeatureConfig(userId, feature);
+      if (!userOverride) {
+        return tierConfig;
+      }
+
+      // Check if override is expired
+      if (userOverride.expiresAt && new Date() > userOverride.expiresAt) {
+        // Override expired, clean it up asynchronously
+        this.deleteUserFeatureConfig(userId, feature, "system").catch(() => {});
+        return tierConfig;
+      }
+
+      // Merge user override with tier config (user override wins for non-null values)
+      return {
+        model: userOverride.model ?? tierConfig.model,
+        temperature: userOverride.temperature ?? tierConfig.temperature,
+        maxTokens: userOverride.maxTokens ?? tierConfig.maxTokens,
+      };
+    } catch (error) {
+      logger.error("Error fetching AI config for feature, using fallback", {
+        userId,
+        feature,
+        error: String(error),
+      });
+
+      const fallbackCode = userId ? TierCode.BASE : TierCode.TRIAL;
+      const fallbackTier = await this.getTierByCode(fallbackCode);
+      return getFeatureAIConfig(fallbackTier, feature);
+    }
+  }
+
+  /**
+   * Get user-level feature config override (ADR 0073)
+   *
+   * @param userId - User ID
+   * @param feature - Feature type
+   * @returns UserFeatureConfig if exists, null otherwise
+   */
+  async getUserFeatureConfig(
+    userId: string,
+    feature: FeatureType,
+  ): Promise<UserFeatureConfig | null> {
+    try {
+      const config = await prisma.userFeatureConfig.findUnique({
+        where: {
+          userId_feature: { userId, feature },
+        },
+      });
+
+      if (!config) {
+        return null;
+      }
+
+      return {
+        ...config,
+        feature: config.feature as FeatureType,
+        temperature: config.temperature ? Number(config.temperature) : null,
+      };
+    } catch (error) {
+      logger.error("Error fetching user feature config", {
+        userId,
+        feature,
+        error: String(error),
+      });
+      return null;
+    }
+  }
+
+  /**
+   * Get all user-level feature config overrides (admin only)
+   *
+   * @param userId - User ID
+   * @returns Array of UserFeatureConfig for all configured features
+   */
+  async getUserFeatureConfigs(userId: string): Promise<UserFeatureConfig[]> {
+    try {
+      const configs = await prisma.userFeatureConfig.findMany({
+        where: { userId },
+        orderBy: { feature: "asc" },
+      });
+
+      return configs.map((config) => ({
+        ...config,
+        feature: config.feature as FeatureType,
+        temperature: config.temperature ? Number(config.temperature) : null,
+      }));
+    } catch (error) {
+      logger.error("Error fetching user feature configs", {
+        userId,
+        error: String(error),
+      });
+      return [];
+    }
+  }
+
+  /**
+   * Set user-level feature config override (admin only, ADR 0073)
+   *
+   * @param userId - User ID
+   * @param input - Feature config to set
+   * @param adminId - Admin user ID making the change
+   * @returns Updated UserFeatureConfig
+   */
+  async setUserFeatureConfig(
+    userId: string,
+    input: UserFeatureConfigInput,
+    adminId: string,
+  ): Promise<UserFeatureConfig> {
+    try {
+      const config = await prisma.userFeatureConfig.upsert({
+        where: {
+          userId_feature: { userId, feature: input.feature },
+        },
+        create: {
+          userId,
+          feature: input.feature,
+          model: input.model,
+          temperature: input.temperature,
+          maxTokens: input.maxTokens,
+          isEnabled: input.isEnabled,
+          reason: input.reason,
+          expiresAt: input.expiresAt,
+          setBy: adminId,
+        },
+        update: {
+          model: input.model,
+          temperature: input.temperature,
+          maxTokens: input.maxTokens,
+          isEnabled: input.isEnabled,
+          reason: input.reason,
+          expiresAt: input.expiresAt,
+          setBy: adminId,
+        },
+      });
+
+      // Log audit entry
+      await prisma.tierAuditLog.create({
+        data: {
+          userId,
+          adminId,
+          action: "USER_FEATURE_CONFIG_SET",
+          changes: {
+            feature: input.feature,
+            model: input.model,
+            temperature: input.temperature,
+            maxTokens: input.maxTokens,
+            isEnabled: input.isEnabled,
+            reason: input.reason,
+            expiresAt: input.expiresAt?.toISOString(),
+          },
+          notes: input.reason,
+        },
+      });
+
+      logger.info("User feature config set", {
+        userId,
+        feature: input.feature,
+        adminId,
+      });
+
+      return {
+        ...config,
+        feature: config.feature as FeatureType,
+        temperature: config.temperature ? Number(config.temperature) : null,
+      };
+    } catch (error) {
+      logger.error("Error setting user feature config", {
+        userId,
+        feature: input.feature,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Delete user-level feature config override (admin only, ADR 0073)
+   *
+   * @param userId - User ID
+   * @param feature - Feature type to delete
+   * @param adminId - Admin user ID making the change
+   */
+  async deleteUserFeatureConfig(
+    userId: string,
+    feature: FeatureType,
+    adminId: string,
+  ): Promise<void> {
+    try {
+      await prisma.userFeatureConfig.delete({
+        where: {
+          userId_feature: { userId, feature },
+        },
+      });
+
+      // Log audit entry
+      await prisma.tierAuditLog.create({
+        data: {
+          userId,
+          adminId,
+          action: "USER_FEATURE_CONFIG_DELETE",
+          changes: { feature },
+          notes: null,
+        },
+      });
+
+      logger.info("User feature config deleted", {
+        userId,
+        feature,
+        adminId,
+      });
+    } catch (error) {
+      logger.error("Error deleting user feature config", {
+        userId,
+        feature,
+        error: String(error),
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Check if a feature is enabled for a user (includes user-level override)
+   *
+   * @param userId - User ID
+   * @param feature - Feature type
+   * @returns true if enabled, false if disabled by user override or tier
+   */
+  async isFeatureEnabledForUser(
+    userId: string | null,
+    feature: FeatureType,
+  ): Promise<boolean> {
+    try {
+      // Check user-level override first
+      if (userId) {
+        const userOverride = await this.getUserFeatureConfig(userId, feature);
+        if (userOverride && userOverride.isEnabled !== null) {
+          // Check expiration
+          if (userOverride.expiresAt && new Date() > userOverride.expiresAt) {
+            // Expired, continue to tier check
+          } else {
+            return userOverride.isEnabled;
+          }
+        }
+      }
+
+      // Fall back to tier feature check
+      return await this.checkFeatureAccess(userId, feature);
+    } catch (error) {
+      logger.error("Error checking if feature enabled", {
+        userId,
+        feature,
+        error: String(error),
+      });
+      return false;
     }
   }
 }

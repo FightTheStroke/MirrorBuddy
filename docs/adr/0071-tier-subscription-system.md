@@ -2,11 +2,15 @@
 
 ## Status
 
-Accepted
+Accepted (Extended by ADR 0073)
 
 ## Date
 
 2026-01-24
+
+## Note
+
+Per-feature model selection (pdfModel, mindmapModel, quizModel, etc.) is documented in **ADR 0073: Per-Feature Model Selection System**.
 
 ## Context
 

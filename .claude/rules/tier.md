@@ -22,8 +22,15 @@ const canUseVoice = await tierService.checkFeatureAccess(userId, "voice");
 // Get consumption limits
 const limits = await tierService.getLimitsForUser(userId);
 
-// Get AI model for user's tier
-const model = await tierService.getAIModelForUser(userId, "chat"); // "gpt-4o" or "gpt-4o-mini"
+// Get AI model for user's tier (legacy - use getModelForUserFeature)
+const model = await tierService.getAIModelForUser(userId, "chat");
+
+// Get AI model for specific feature (ADR 0073 - per-feature selection)
+const mindmapModel = await tierService.getModelForUserFeature(
+  userId,
+  "mindmap",
+);
+const quizModel = await tierService.getModelForUserFeature(userId, "quiz");
 
 // Invalidate cache after tier updates
 tierService.invalidateCache(); // All tiers
@@ -100,9 +107,31 @@ interface TierLimits {
 
 ## Database Tables
 
-- `TierDefinition` - Tier configs, features, AI models, limits
+- `TierDefinition` - Tier configs, features, AI models (per-feature), limits
 - `UserSubscription` - User subscription status, dates, tier reference
 - `TierAuditLog` - Admin audit trail of tier changes
+- `ModelCatalog` - AI model metadata (costs, capabilities, quality scores)
+
+## Per-Feature Model Selection (ADR 0073)
+
+Each tier can specify different AI models for each feature:
+
+| Feature    | Trial Model       | Base Model   | Pro Model    |
+| ---------- | ----------------- | ------------ | ------------ |
+| chat       | gpt-4o-mini       | gpt-5.2-edu  | gpt-5.2-chat |
+| realtime   | gpt-realtime-mini | gpt-realtime | gpt-realtime |
+| pdf        | gpt-4o-mini       | gpt-5-mini   | gpt-5.2-chat |
+| mindmap    | gpt-4o-mini       | gpt-5-mini   | gpt-5.2-chat |
+| quiz       | gpt-4o-mini       | gpt-5.2-edu  | gpt-5.2-chat |
+| flashcards | gpt-4o-mini       | gpt-5-mini   | gpt-5.2-chat |
+| summary    | gpt-4o-mini       | gpt-5-mini   | gpt-5.2-chat |
+| formula    | gpt-4o-mini       | gpt-5.2-edu  | gpt-5.2-chat |
+| chart      | gpt-4o-mini       | gpt-5-mini   | gpt-5.2-chat |
+| homework   | gpt-4o-mini       | gpt-5.2-edu  | gpt-5.2-chat |
+| webcam     | gpt-4o-mini       | gpt-5.2-edu  | gpt-5.2-chat |
+| demo       | gpt-4o-mini       | gpt-4o-mini  | gpt-4o-mini  |
+
+**Feature types**: `chat`, `realtime`, `pdf`, `mindmap`, `quiz`, `flashcards`, `summary`, `formula`, `chart`, `homework`, `webcam`, `demo`
 
 ## Cache Invalidation
 

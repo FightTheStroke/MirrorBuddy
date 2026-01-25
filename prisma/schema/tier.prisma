@@ -19,6 +19,8 @@ enum TierAuditAction {
   SUBSCRIPTION_UPDATE
   SUBSCRIPTION_DELETE
   TIER_CHANGE
+  USER_FEATURE_CONFIG_SET
+  USER_FEATURE_CONFIG_DELETE
 }
 
 model TierDefinition {
@@ -30,8 +32,28 @@ model TierDefinition {
   voiceMinutesDaily   Int      @default(5)
   toolsLimitDaily     Int      @default(10)
   docsLimitTotal      Int      @default(1)
+
+  // Per-feature model selection (ADR 0072)
+  // Main conversation and voice
   chatModel           String   @default("gpt-4o-mini")
   realtimeModel       String   @default("gpt-realtime-mini")
+
+  // Tool-specific models
+  pdfModel            String   @default("gpt-4o-mini")
+  mindmapModel        String   @default("gpt-4o-mini")
+  quizModel           String   @default("gpt-4o-mini")
+  flashcardsModel     String   @default("gpt-4o-mini")
+  summaryModel        String   @default("gpt-4o-mini")
+  formulaModel        String   @default("gpt-4o-mini")
+  chartModel          String   @default("gpt-4o-mini")
+  homeworkModel       String   @default("gpt-4o-mini")
+  webcamModel         String   @default("gpt-4o-mini")
+  demoModel           String   @default("gpt-4o-mini")
+
+  // Per-feature AI config overrides (ADR 0073)
+  // JSON: { "quiz": { "temperature": 0.8, "maxTokens": 2500 }, ... }
+  featureConfigs      Json     @default("{}")
+
   features            Json     @default("{}")
   availableMaestri    Json     @default("[]")
   availableCoaches    Json     @default("[]")
@@ -45,6 +67,45 @@ model TierDefinition {
   updatedAt           DateTime @updatedAt
 
   subscriptions UserSubscription[]
+  configSnapshots TierConfigSnapshot[]
+}
+
+// Model catalog with metadata for admin selection
+model ModelCatalog {
+  id              String   @id @default(cuid())
+  name            String   @unique // e.g., "gpt-5.2-edu"
+  displayName     String   // e.g., "GPT-5.2 Education"
+  provider        String   @default("azure") // azure, ollama
+  deploymentName  String   // Azure deployment name
+  category        String   // chat, realtime, embedding
+
+  // Pricing (per 1K tokens, in USD)
+  inputCostPer1k  Decimal  @default(0)
+  outputCostPer1k Decimal  @default(0)
+
+  // Capabilities
+  maxTokens       Int      @default(4096)
+  contextWindow   Int      @default(128000)
+  supportsVision  Boolean  @default(false)
+  supportsTools   Boolean  @default(true)
+  supportsJson    Boolean  @default(true)
+
+  // Quality indicators (1-5 scale)
+  qualityScore    Int      @default(3) // Overall quality
+  speedScore      Int      @default(3) // Response speed
+  educationScore  Int      @default(3) // Educational aptitude
+
+  // Recommendations
+  recommendedFor  Json     @default("[]") // ["chat", "tools", "summaries"]
+  notRecommendedFor Json   @default("[]") // ["realtime"]
+
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([category])
+  @@index([isActive])
 }
 
 model UserSubscription {
@@ -80,5 +141,59 @@ model TierAuditLog {
   @@index([tierId])
   @@index([userId])
   @@index([adminId])
+  @@index([createdAt])
+}
+
+// User-level feature AI config overrides (ADR 0073)
+// Admin can override model/temperature/maxTokens per feature per user
+model UserFeatureConfig {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation("UserFeatureConfigs", fields: [userId], references: [id], onDelete: Cascade)
+  feature         String   // Feature key: chat, quiz, mindmap, summary, etc.
+
+  // AI configuration overrides (null = use tier default)
+  model           String?  // Model override
+  temperature     Decimal? // Temperature override (0.0-2.0)
+  maxTokens       Int?     // Max tokens override
+
+  // Feature activation (null = use tier default)
+  isEnabled       Boolean? // Override feature enabled state
+
+  // Audit fields
+  setBy           String   // Admin user ID who set this override
+  reason          String?  // Why this override was set
+  expiresAt       DateTime? // Optional expiration (for A/B testing)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([userId, feature]) // One config per feature per user
+  @@index([userId])
+  @@index([feature])
+  @@index([expiresAt])
+}
+
+// Version control for tier configurations (ADR 0073)
+// Enables backup, rollback, A/B testing, and configuration history
+model TierConfigSnapshot {
+  id              String   @id @default(cuid())
+  tierId          String
+  tier            TierDefinition @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  version         Int      // Auto-increment per tier (1, 2, 3...)
+  name            String   // Human-readable version name (e.g., "v1.0", "Before GPT-5 update")
+  description     String?  // Change description/notes
+
+  // Full configuration snapshot
+  configSnapshot  Json     // Complete tier config at this point in time
+
+  // Metadata
+  createdBy       String   // Admin user ID who created this version
+  createdAt       DateTime @default(now())
+  isActive        Boolean  @default(false) // True = currently applied configuration
+  isBaseline      Boolean  @default(false) // True = protected reference version (cannot delete)
+
+  @@unique([tierId, version])
+  @@index([tierId])
+  @@index([isActive])
   @@index([createdAt])
 }

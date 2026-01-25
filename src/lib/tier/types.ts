@@ -21,6 +21,66 @@ export interface TierFeatures {
 }
 
 /**
+ * Feature types for per-feature model selection (ADR 0073)
+ */
+export type FeatureType =
+  | "chat"
+  | "realtime"
+  | "pdf"
+  | "mindmap"
+  | "quiz"
+  | "flashcards"
+  | "summary"
+  | "formula"
+  | "chart"
+  | "homework"
+  | "webcam"
+  | "demo";
+
+/**
+ * Per-feature AI configuration (ADR 0073)
+ * Allows full control over model, temperature, and maxTokens per feature
+ */
+export interface FeatureAIConfig {
+  /** AI model to use for this feature */
+  model: string;
+  /** Temperature for AI responses (0-2, default varies by feature) */
+  temperature: number;
+  /** Maximum tokens for AI responses */
+  maxTokens: number;
+}
+
+/**
+ * Default AI configurations per feature type
+ * Used when tier doesn't specify custom values
+ */
+export const DEFAULT_FEATURE_CONFIGS: Record<
+  FeatureType,
+  Omit<FeatureAIConfig, "model">
+> = {
+  chat: { temperature: 0.7, maxTokens: 2000 },
+  realtime: { temperature: 0.7, maxTokens: 4096 },
+  pdf: { temperature: 0.5, maxTokens: 4000 },
+  mindmap: { temperature: 0.7, maxTokens: 1500 },
+  quiz: { temperature: 0.7, maxTokens: 2000 },
+  flashcards: { temperature: 0.6, maxTokens: 2000 },
+  summary: { temperature: 0.5, maxTokens: 2000 },
+  formula: { temperature: 0.3, maxTokens: 1500 },
+  chart: { temperature: 0.5, maxTokens: 1500 },
+  homework: { temperature: 0.6, maxTokens: 3000 },
+  webcam: { temperature: 0.5, maxTokens: 2000 },
+  demo: { temperature: 0.8, maxTokens: 4000 },
+};
+
+/**
+ * Feature config overrides stored in tier (JSON field)
+ * Allows admin to customize temperature/maxTokens per feature per tier
+ */
+export type TierFeatureConfigs = Partial<
+  Record<FeatureType, Partial<FeatureAIConfig>>
+>;
+
+/**
  * Tier definition - subscription tier configuration
  */
 export interface TierDefinition {
@@ -32,8 +92,25 @@ export interface TierDefinition {
   voiceMinutesDaily: number;
   toolsLimitDaily: number;
   docsLimitTotal: number;
+
+  // Per-feature model selection (ADR 0073)
   chatModel: string;
   realtimeModel: string;
+  pdfModel: string;
+  mindmapModel: string;
+  quizModel: string;
+  flashcardsModel: string;
+  summaryModel: string;
+  formulaModel: string;
+  chartModel: string;
+  homeworkModel: string;
+  webcamModel: string;
+  demoModel: string;
+
+  // Per-feature AI config overrides (ADR 0073)
+  // JSON field for temperature/maxTokens customization per feature
+  featureConfigs: TierFeatureConfigs | null;
+
   features: TierFeatures;
   availableMaestri: string[];
   availableCoaches: string[];
@@ -45,6 +122,32 @@ export interface TierDefinition {
   isActive: boolean;
   createdAt: Date;
   updatedAt: Date;
+}
+
+/**
+ * Model catalog entry with metadata
+ */
+export interface ModelCatalogEntry {
+  id: string;
+  name: string;
+  displayName: string;
+  provider: string;
+  deploymentName: string;
+  category: string;
+  inputCostPer1k: number;
+  outputCostPer1k: number;
+  maxTokens: number;
+  contextWindow: number;
+  supportsVision: boolean;
+  supportsTools: boolean;
+  supportsJson: boolean;
+  qualityScore: number;
+  speedScore: number;
+  educationScore: number;
+  recommendedFor: string[];
+  notRecommendedFor: string[];
+  notes: string | null;
+  isActive: boolean;
 }
 
 /**
@@ -67,6 +170,38 @@ export interface UserSubscription {
 }
 
 /**
+ * User-level feature AI config override (ADR 0073)
+ * Admin can customize model/temperature/maxTokens per feature per user
+ */
+export interface UserFeatureConfig {
+  id: string;
+  userId: string;
+  feature: FeatureType;
+  model: string | null;
+  temperature: number | null;
+  maxTokens: number | null;
+  isEnabled: boolean | null;
+  setBy: string;
+  reason: string | null;
+  expiresAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+/**
+ * Input for creating/updating user feature config
+ */
+export interface UserFeatureConfigInput {
+  feature: FeatureType;
+  model?: string | null;
+  temperature?: number | null;
+  maxTokens?: number | null;
+  isEnabled?: boolean | null;
+  reason?: string | null;
+  expiresAt?: Date | null;
+}
+
+/**
  * Tier audit action types
  */
 export type TierAuditAction =
@@ -76,7 +211,9 @@ export type TierAuditAction =
   | "SUBSCRIPTION_CREATE"
   | "SUBSCRIPTION_UPDATE"
   | "SUBSCRIPTION_DELETE"
-  | "TIER_CHANGE";
+  | "TIER_CHANGE"
+  | "USER_FEATURE_CONFIG_SET"
+  | "USER_FEATURE_CONFIG_DELETE";
 
 /**
  * Tier audit log entry
@@ -90,6 +227,23 @@ export interface TierAuditLog {
   changes: Record<string, unknown>;
   notes: string | null;
   createdAt: Date;
+}
+
+/**
+ * Tier configuration snapshot for version control (ADR 0073)
+ * Enables backup, rollback, A/B testing, and configuration history
+ */
+export interface TierConfigSnapshot {
+  id: string;
+  tierId: string;
+  version: number;
+  name: string;
+  description: string | null;
+  configSnapshot: TierDefinition;
+  createdBy: string;
+  createdAt: Date;
+  isActive: boolean;
+  isBaseline: boolean;
 }
 
 /**

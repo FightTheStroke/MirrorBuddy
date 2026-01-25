@@ -2,6 +2,7 @@
 // API ROUTE: Parent-Professor Conversations (Issue #63)
 // POST: Create parent mode conversation with a Maestro
 // GET: List parent conversations
+// Supports per-feature model selection (ADR 0073)
 // ============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
@@ -9,6 +10,8 @@ import { validateAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { chatCompletion, getActiveProvider } from "@/lib/ai/providers";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { tierService } from "@/lib/tier/tier-service";
 import {
   generateParentModePrompt,
   getParentModeGreeting,
@@ -150,13 +153,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Get tier-based model for chat feature (ADR 0073)
+    const tierModel = await tierService.getModelForUserFeature(userId, "chat");
+    const deploymentName = getDeploymentForModel(tierModel);
+
     const result = await chatCompletion(
       messages.map((m) => ({
         ...m,
         role: m.role as "user" | "assistant" | "system",
       })),
       parentModePrompt,
-      { tool_choice: "none" }, // No tools in parent mode
+      { tool_choice: "none", model: deploymentName }, // No tools in parent mode
     );
 
     // Sanitize output

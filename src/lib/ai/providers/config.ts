@@ -16,15 +16,19 @@ export function isAzureConfigured(): boolean {
 
 /**
  * Get Azure OpenAI configuration
+ *
+ * @param modelOverride - Optional deployment name to use instead of default
  */
-export function getAzureConfig(): ProviderConfig {
+export function getAzureConfig(modelOverride?: string): ProviderConfig {
   const azureEndpoint = process.env.AZURE_OPENAI_ENDPOINT!.trim();
   const azureApiKey = process.env.AZURE_OPENAI_API_KEY!.trim();
   return {
     provider: "azure",
     endpoint: azureEndpoint.replace(/\/$/, ""),
     apiKey: azureApiKey,
-    model: (process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "gpt-4o").trim(),
+    model:
+      modelOverride?.trim() ||
+      (process.env.AZURE_OPENAI_CHAT_DEPLOYMENT || "gpt-4o").trim(),
   };
 }
 
@@ -43,10 +47,13 @@ export function getOllamaConfig(): ProviderConfig {
 /**
  * Get the active chat provider configuration
  * Priority: User preference > Azure OpenAI > Ollama
+ *
  * @param preference - User's preferred provider: 'azure', 'ollama', or 'auto'
+ * @param modelOverride - Optional Azure deployment name for tier-based routing
  */
 export function getActiveProvider(
   preference?: AIProvider | "auto",
+  modelOverride?: string,
 ): ProviderConfig | null {
   // If explicit preference for ollama, use ollama
   if (preference === "ollama") {
@@ -55,12 +62,12 @@ export function getActiveProvider(
 
   // If explicit preference for azure AND azure is configured
   if (preference === "azure" && isAzureConfigured()) {
-    return getAzureConfig();
+    return getAzureConfig(modelOverride);
   }
 
   // Auto mode (default): Azure if configured, otherwise Ollama
   if (isAzureConfigured()) {
-    return getAzureConfig();
+    return getAzureConfig(modelOverride);
   }
 
   // Fallback to Ollama (local, no API key needed)

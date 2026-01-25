@@ -3,12 +3,26 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("Seeding tier definitions...");
+  console.log("Seeding tier definitions with per-feature models (ADR 0073)...");
 
-  // Trial Tier - Free tier with limited features
+  // Trial Tier - Cost-effective gpt-4o-mini for all features
   const trial = await prisma.tierDefinition.upsert({
     where: { code: "trial" },
-    update: {},
+    update: {
+      // Per-feature models (ADR 0073) - all gpt-4o-mini for cost
+      chatModel: "gpt-4o-mini",
+      realtimeModel: "gpt-realtime-mini",
+      pdfModel: "gpt-4o-mini",
+      mindmapModel: "gpt-4o-mini",
+      quizModel: "gpt-4o-mini",
+      flashcardsModel: "gpt-4o-mini",
+      summaryModel: "gpt-4o-mini",
+      formulaModel: "gpt-4o-mini",
+      chartModel: "gpt-4o-mini",
+      homeworkModel: "gpt-4o-mini",
+      webcamModel: "gpt-4o-mini",
+      demoModel: "gpt-4o-mini",
+    },
     create: {
       code: "trial",
       name: "Trial",
@@ -17,8 +31,19 @@ async function main() {
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
+      // Per-feature models (ADR 0073) - cost-effective for trial
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime-mini",
+      pdfModel: "gpt-4o-mini",
+      mindmapModel: "gpt-4o-mini",
+      quizModel: "gpt-4o-mini",
+      flashcardsModel: "gpt-4o-mini",
+      summaryModel: "gpt-4o-mini",
+      formulaModel: "gpt-4o-mini",
+      chartModel: "gpt-4o-mini",
+      homeworkModel: "gpt-4o-mini",
+      webcamModel: "gpt-4o-mini",
+      demoModel: "gpt-4o-mini",
       features: {
         chat: true,
         voice: true,
@@ -40,10 +65,24 @@ async function main() {
     },
   });
 
-  // Base Tier - Freemium tier with most maestri
+  // Base Tier - Education-optimized models for registered users
   const base = await prisma.tierDefinition.upsert({
     where: { code: "base" },
-    update: {},
+    update: {
+      // Per-feature models (ADR 0073) - education-optimized mix
+      chatModel: "gpt-5.2-edu",
+      realtimeModel: "gpt-realtime",
+      pdfModel: "gpt-5-mini",
+      mindmapModel: "gpt-5-mini",
+      quizModel: "gpt-5.2-edu",
+      flashcardsModel: "gpt-5-mini",
+      summaryModel: "gpt-5-mini",
+      formulaModel: "gpt-5.2-edu",
+      chartModel: "gpt-5-mini",
+      homeworkModel: "gpt-5.2-edu",
+      webcamModel: "gpt-5.2-edu",
+      demoModel: "gpt-4o-mini",
+    },
     create: {
       code: "base",
       name: "Base",
@@ -52,8 +91,19 @@ async function main() {
       voiceMinutesDaily: 30,
       toolsLimitDaily: 30,
       docsLimitTotal: 5,
-      chatModel: "gpt-4o",
+      // Per-feature models (ADR 0073) - education-optimized for registered
+      chatModel: "gpt-5.2-edu",
       realtimeModel: "gpt-realtime",
+      pdfModel: "gpt-5-mini",
+      mindmapModel: "gpt-5-mini",
+      quizModel: "gpt-5.2-edu",
+      flashcardsModel: "gpt-5-mini",
+      summaryModel: "gpt-5-mini",
+      formulaModel: "gpt-5.2-edu",
+      chartModel: "gpt-5-mini",
+      homeworkModel: "gpt-5.2-edu",
+      webcamModel: "gpt-5.2-edu",
+      demoModel: "gpt-4o-mini",
       features: {
         chat: true,
         voice: true,
@@ -104,10 +154,24 @@ async function main() {
     },
   });
 
-  // Pro Tier - Paid tier with unlimited features
+  // Pro Tier - Best models for all features
   const pro = await prisma.tierDefinition.upsert({
     where: { code: "pro" },
-    update: {},
+    update: {
+      // Per-feature models (ADR 0073) - best quality for paying users
+      chatModel: "gpt-5.2-chat",
+      realtimeModel: "gpt-realtime",
+      pdfModel: "gpt-5.2-chat",
+      mindmapModel: "gpt-5.2-chat",
+      quizModel: "gpt-5.2-chat",
+      flashcardsModel: "gpt-5.2-chat",
+      summaryModel: "gpt-5.2-chat",
+      formulaModel: "gpt-5.2-chat",
+      chartModel: "gpt-5.2-chat",
+      homeworkModel: "gpt-5.2-chat",
+      webcamModel: "gpt-5.2-chat",
+      demoModel: "gpt-4o-mini",
+    },
     create: {
       code: "pro",
       name: "Pro",
@@ -117,8 +181,19 @@ async function main() {
       voiceMinutesDaily: 999999,
       toolsLimitDaily: 999999,
       docsLimitTotal: 999999,
-      chatModel: "gpt-4-turbo",
+      // Per-feature models (ADR 0073) - best quality for Pro tier
+      chatModel: "gpt-5.2-chat",
       realtimeModel: "gpt-realtime",
+      pdfModel: "gpt-5.2-chat",
+      mindmapModel: "gpt-5.2-chat",
+      quizModel: "gpt-5.2-chat",
+      flashcardsModel: "gpt-5.2-chat",
+      summaryModel: "gpt-5.2-chat",
+      formulaModel: "gpt-5.2-chat",
+      chartModel: "gpt-5.2-chat",
+      homeworkModel: "gpt-5.2-chat",
+      webcamModel: "gpt-5.2-chat",
+      demoModel: "gpt-4o-mini",
       features: {
         chat: true,
         voice: true,
@@ -202,7 +277,7 @@ async function main() {
     },
   });
 
-  console.log("Seed completed:", { trial, base, pro });
+  console.log("Tier seed completed:", { trial, base, pro });
 }
 
 main()

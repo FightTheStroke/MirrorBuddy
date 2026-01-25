@@ -1,10 +1,18 @@
 // ============================================================================
 // LLM SUMMARIZATION & LEARNING EXTRACTION
 // Used to compress conversations and extract user insights
+// Supports per-feature model selection (ADR 0073)
 // ============================================================================
 
-import { chatCompletion, getActiveProvider } from './providers';
-import { logger } from '@/lib/logger';
+import { chatCompletion, getActiveProvider } from "./providers";
+import { getDeploymentForModel } from "./providers/deployment-mapping";
+import { logger } from "@/lib/logger";
+
+/** Options for summarization functions */
+interface SummarizeOptions {
+  /** AI model to use (from tier system) */
+  model?: string;
+}
 
 interface Message {
   role: string;
@@ -18,7 +26,7 @@ interface KeyFacts {
 }
 
 interface Learning {
-  category: 'preference' | 'strength' | 'weakness' | 'interest' | 'style';
+  category: "preference" | "strength" | "weakness" | "interest" | "style";
   insight: string;
   confidence: number;
 }
@@ -26,13 +34,16 @@ interface Learning {
 /**
  * Generate a summary of conversation messages
  * Used when conversation gets too long to maintain context
+ * @param messages - Messages to summarize
+ * @param options - Optional model from tier system (ADR 0073)
  */
 export async function generateConversationSummary(
-  messages: Message[]
+  messages: Message[],
+  options?: SummarizeOptions,
 ): Promise<string> {
   const provider = getActiveProvider();
   if (!provider) {
-    throw new Error('No AI provider available for summarization');
+    throw new Error("No AI provider available for summarization");
   }
 
   const systemPrompt = `Sei un assistente che riassume conversazioni educative.
@@ -47,11 +58,16 @@ Usa un linguaggio chiaro e diretto.`;
 
   const userPrompt = `Riassumi questa conversazione:
 
-${messages.map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`).join('\n\n')}`;
+${messages.map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`).join("\n\n")}`;
+
+  const deploymentName = options?.model
+    ? getDeploymentForModel(options.model)
+    : undefined;
 
   const result = await chatCompletion(
-    [{ role: 'user', content: userPrompt }],
-    systemPrompt
+    [{ role: "user", content: userPrompt }],
+    systemPrompt,
+    { model: deploymentName },
   );
 
   return result.content;
@@ -60,8 +76,13 @@ ${messages.map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.conten
 /**
  * Extract key facts from conversation
  * Identifies decisions, preferences, and what was learned
+ * @param messages - Messages to analyze
+ * @param options - Optional model from tier system (ADR 0073)
  */
-export async function extractKeyFacts(messages: Message[]): Promise<KeyFacts> {
+export async function extractKeyFacts(
+  messages: Message[],
+  options?: SummarizeOptions,
+): Promise<KeyFacts> {
   const provider = getActiveProvider();
   if (!provider) {
     return { decisions: [], preferences: [], learned: [] };
@@ -80,13 +101,18 @@ Se non ci sono informazioni per una categoria, usa un array vuoto.
 Max 3 elementi per categoria.`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
-    .join('\n\n');
+    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
+    .join("\n\n");
+
+  const deploymentName = options?.model
+    ? getDeploymentForModel(options.model)
+    : undefined;
 
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      { model: deploymentName },
     );
 
     // Parse JSON from response
@@ -95,7 +121,7 @@ Max 3 elementi per categoria.`;
       return JSON.parse(jsonMatch[0]);
     }
   } catch (error) {
-    logger.error('Failed to extract key facts', { error: String(error) });
+    logger.error("Failed to extract key facts", { error: String(error) });
   }
 
   return { decisions: [], preferences: [], learned: [] };
@@ -104,8 +130,13 @@ Max 3 elementi per categoria.`;
 /**
  * Extract conversation topics
  * Returns list of main subjects discussed
+ * @param messages - Messages to analyze
+ * @param options - Optional model from tier system (ADR 0073)
  */
-export async function extractTopics(messages: Message[]): Promise<string[]> {
+export async function extractTopics(
+  messages: Message[],
+  options?: SummarizeOptions,
+): Promise<string[]> {
   const provider = getActiveProvider();
   if (!provider) {
     return [];
@@ -119,13 +150,18 @@ Esempio: ["Matematica - Frazioni", "Geometria - Perimetro", "Esercizi pratici"]
 Usa termini brevi e chiari.`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
-    .join('\n\n');
+    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
+    .join("\n\n");
+
+  const deploymentName = options?.model
+    ? getDeploymentForModel(options.model)
+    : undefined;
 
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      { model: deploymentName },
     );
 
     // Parse JSON array from response
@@ -134,7 +170,7 @@ Usa termini brevi e chiari.`;
       return JSON.parse(arrayMatch[0]);
     }
   } catch (error) {
-    logger.error('Failed to extract topics', { error: String(error) });
+    logger.error("Failed to extract topics", { error: String(error) });
   }
 
   return [];
@@ -143,11 +179,16 @@ Usa termini brevi e chiari.`;
 /**
  * Extract learnings about the student
  * These are cross-session insights that help personalize future interactions
+ * @param messages - Messages to analyze
+ * @param _maestroId - Maestro ID (unused but kept for API compatibility)
+ * @param _subject - Subject (unused but kept for API compatibility)
+ * @param options - Optional model from tier system (ADR 0073)
  */
 export async function extractLearnings(
   messages: Message[],
   _maestroId: string,
-  _subject?: string
+  _subject?: string,
+  options?: SummarizeOptions,
 ): Promise<Learning[]> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -176,13 +217,18 @@ Regole:
 - Se non ci sono insights chiari, rispondi con []`;
 
   const userPrompt = messages
-    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
-    .join('\n\n');
+    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
+    .join("\n\n");
+
+  const deploymentName = options?.model
+    ? getDeploymentForModel(options.model)
+    : undefined;
 
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      { model: deploymentName },
     );
 
     // Parse JSON array from response
@@ -193,15 +239,21 @@ Regole:
       return learnings
         .filter(
           (l) =>
-            ['preference', 'strength', 'weakness', 'interest', 'style'].includes(l.category) &&
+            [
+              "preference",
+              "strength",
+              "weakness",
+              "interest",
+              "style",
+            ].includes(l.category) &&
             l.insight &&
             l.confidence >= 0.3 &&
-            l.confidence <= 1
+            l.confidence <= 1,
         )
         .slice(0, 3);
     }
   } catch (error) {
-    logger.error('Failed to extract learnings', { error: String(error) });
+    logger.error("Failed to extract learnings", { error: String(error) });
   }
 
   return [];
@@ -211,18 +263,18 @@ Regole:
  * Generate a title for a conversation from its first messages
  */
 export async function generateConversationTitle(
-  messages: Message[]
+  messages: Message[],
 ): Promise<string> {
   if (messages.length === 0) {
-    return 'Nuova conversazione';
+    return "Nuova conversazione";
   }
 
   // If there's a user message, use it directly (truncated)
-  const firstUserMsg = messages.find((m) => m.role === 'user');
+  const firstUserMsg = messages.find((m) => m.role === "user");
   if (firstUserMsg) {
     const title = firstUserMsg.content.slice(0, 50);
     return title.length < firstUserMsg.content.length ? `${title}...` : title;
   }
 
-  return 'Nuova conversazione';
+  return "Nuova conversazione";
 }

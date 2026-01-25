@@ -46,6 +46,10 @@ import type { ChatCompletionResult, ToolDefinition, AIProvider } from "./types";
 
 /**
  * Perform chat completion using the active provider
+ *
+ * @param messages - Conversation messages
+ * @param systemPrompt - System prompt for the AI
+ * @param options - Optional configuration including tier-based model routing
  */
 export async function chatCompletion(
   messages: Array<{ role: string; content: string }>,
@@ -59,10 +63,12 @@ export async function chatCompletion(
       | "none"
       | { type: "function"; function: { name: string } };
     providerPreference?: AIProvider | "auto"; // #87: User's provider preference
+    model?: string; // Tier-based model override (Azure deployment name)
   },
 ): Promise<ChatCompletionResult> {
   // #87: Use user's provider preference if specified
-  const config = getActiveProvider(options?.providerPreference);
+  // Pass model override for tier-based routing
+  const config = getActiveProvider(options?.providerPreference, options?.model);
   if (!config) {
     throw new Error("No AI provider configured");
   }

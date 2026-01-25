@@ -211,8 +211,8 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Tier-based model selection: Get appropriate model for user's tier
-    const tierModel = await tierService.getAIModelForUser(
+    // Tier-based model selection: Get appropriate model for user's tier (ADR 0073)
+    const tierModel = await tierService.getModelForUserFeature(
       userId ?? null,
       "chat",
     );
