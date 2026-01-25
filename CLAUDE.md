@@ -55,9 +55,27 @@ TOKEN_ENCRYPTION_KEY=xxx                  # 32+ chars for AES-256-GCM (ADR 0060)
 SUPABASE_CA_CERT=xxx                      # SSL cert for production (ADR 0063)
 ```
 
+## Vercel Deployment (ADR 0063, 0067)
+
+**Pre-push validation** (automatic on git push):
+
+```bash
+npm run pre-push    # Full Vercel simulation (~60s)
+```
+
+**Required Vercel env vars**: DATABASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET, CRON_SECRET, SUPABASE_CA_CERT, AZURE_OPENAI_API_KEY
+
+**SSL Configuration** - CRITICAL:
+
+- **NEVER** use `NODE_TLS_REJECT_UNAUTHORIZED=0` (disables TLS globally)
+- Use per-connection `ssl: { rejectUnauthorized: false }` instead
+- Certificate format for Vercel: `cat config/supabase-chain.pem | tr '\n' '|'`
+
+**Common issues**: See `.claude/rules/vercel-deployment.md`
+
 ## Modular Rules (auto-loaded)
 
-`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md
+`.claude/rules/`: accessibility.md | api-patterns.md | maestri.md | operations.md | compliance.md | e2e-testing.md | coaches-buddies.md | vercel-deployment.md
 
 ## On-Demand Docs
 

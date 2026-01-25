@@ -4,15 +4,17 @@ Modular rules auto-loaded on every Claude session.
 
 ## Active Rules
 
-| File               | Purpose                                         |
-| ------------------ | ----------------------------------------------- |
-| accessibility.md   | 7 DSA profiles, WCAG 2.1 AA, store patterns     |
-| api-patterns.md    | Next.js API routes, Prisma, error handling      |
-| coaches-buddies.md | 6 coaches, 6 buddies, how to add new characters |
-| e2e-testing.md     | E2E test setup, wall bypass, CI debugging       |
-| maestri.md         | 20 AI tutors, data structure, voice integration |
-| operations.md      | Health endpoints, Grafana Cloud, runbooks       |
-| tier.md            | Trial/Base/Pro tiers, TierService, features     |
+| File                 | Purpose                                         |
+| -------------------- | ----------------------------------------------- |
+| accessibility.md     | 7 DSA profiles, WCAG 2.1 AA, store patterns     |
+| api-patterns.md      | Next.js API routes, Prisma, error handling      |
+| coaches-buddies.md   | 6 coaches, 6 buddies, how to add new characters |
+| compliance.md        | EU AI Act, GDPR, COPPA, compliance pages        |
+| e2e-testing.md       | E2E test setup, wall bypass, CI debugging       |
+| maestri.md           | 20 AI tutors, data structure, voice integration |
+| operations.md        | Health endpoints, Grafana Cloud, runbooks       |
+| tier.md              | Trial/Base/Pro tiers, TierService, features     |
+| vercel-deployment.md | SSL config, env vars, common deployment issues  |
 
 ## Usage
 
