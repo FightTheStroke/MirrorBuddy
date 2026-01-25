@@ -7,6 +7,7 @@ import {
   AccessibilityProvider,
   A11yInstantAccess,
 } from "@/components/accessibility";
+import { StagingBanner } from "@/components/ui/staging-banner";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
 import { UnifiedConsentWall } from "@/components/consent";
@@ -173,6 +174,7 @@ export function Providers({ children, nonce: _nonce }: ProvidersProps) {
     >
       <AccessibilityProvider>
         <A11yInstantAccess />
+        <StagingBanner />
         <ConditionalUnifiedConsent>
           <StoreInitializer />
           <AccentColorApplier />
