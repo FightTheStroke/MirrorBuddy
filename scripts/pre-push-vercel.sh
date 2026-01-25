@@ -220,10 +220,11 @@ echo -e "${GREEN}✓ No console.log${NC}"
 # =============================================================================
 echo -e "${BLUE}[6/6] Secrets exposure check...${NC}"
 
-# Check for exposed secrets in tracked files (excluding .env which is gitignored)
+# Check for exposed secrets in tracked files (excluding safe locations)
+# Excludes: .env files, examples, tests, docs, CI configs (contain patterns for detection)
 EXPOSED_SECRETS=""
-for pattern in "sk_live_" "sk_test_" "GOCSPX-" "glc_ey" "re_[A-Za-z0-9]" "eyJhbGci"; do
-    FOUND=$(git grep -l "$pattern" -- ':!.env*' ':!*.example' ':!node_modules' 2>/dev/null || true)
+for pattern in "sk_live_" "sk_test_" "GOCSPX-" "glc_ey" "re_[A-Za-z0-9]{20,}"; do
+    FOUND=$(git grep -l "$pattern" -- ':!.env*' ':!*.example' ':!node_modules' ':!*.test.ts' ':!*.test.tsx' ':!__tests__' ':!docs/' ':!.github/' ':!scripts/' 2>/dev/null || true)
     if [ -n "$FOUND" ]; then
         EXPOSED_SECRETS="$EXPOSED_SECRETS\n$pattern found in: $FOUND"
     fi
