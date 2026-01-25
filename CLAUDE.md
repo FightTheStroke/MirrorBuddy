@@ -105,29 +105,128 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 
 **Parallelize** independent tool calls in single message.
 
-## i18n - Internationalization
+## i18n - Internationalization & Multilingual Support
 
 **Supported locales**: `it` (Italian, default) | `en` | `fr` | `de` | `es`
 
-**Translation workflow**:
+**Framework**: next-intl (App Router, server-first) | **Middleware**: `src/middleware.ts` (locale detection)
 
-1. Add message key to appropriate namespace in `src/i18n/types.ts`
-2. Add translations to all JSON files in `src/i18n/messages/{locale}.json`
-3. Run `npm run i18n:check` to verify completeness
-4. Use hooks in components: `const t = useTranslations('namespace')`
+### Quick Start: Adding Translation Keys
 
-**Hook patterns**:
+1. **Add to all 5 language files** `src/i18n/messages/{locale}.json`:
+   ```json
+   { "namespace.key": "Italian text", ... }
+   ```
+2. **Type-check**: `npm run typecheck` (catches missing keys before commit)
+3. **Use in components**: `const t = useTranslations('namespace'); t('key', { var: value })`
+4. **Verify completeness**: `npm run i18n:validate` (ensures all 5 languages have identical structure)
 
-- `useTranslations('namespace')` - Type-safe namespace access
-- `useTranslationsGlobal()` - Access all namespaces (use sparingly)
-- `useCommonTranslations()` - Quick access to common strings
-- `formatMessage(template, vars)` - Format outside components
+### Hook Patterns (Client vs Server)
 
-**Formality**: Formal address (Lei) for historical figures (pre-1900). See ADR 0064 and `src/lib/greeting/templates/index.ts`.
+| Hook                      | When                          | Example                               |
+| ------------------------- | ----------------------------- | ------------------------------------- |
+| `useTranslations('ns')`   | Client component, interactive | Button clicks, form labels            |
+| `getTranslations('ns')`   | Server component, static page | Page titles, metadata                 |
+| `useTranslationsGlobal()` | Multiple namespaces needed    | Use sparingly, prefer namespaced      |
+| `useLocaleContext()`      | Need current locale           | Language switcher, locale-aware logic |
 
-**Skills**: `/localize` - Automated translation workflow
+### Adding New Language-Specific Features (Maestri, Coaches, Buddies)
 
-**Full docs**: `src/i18n/README-LocaleProvider.md` | `src/i18n/types.ts`
+**For new language maestros** (e.g., Molière for French):
+
+1. Create knowledge base: `src/data/maestri/{name}-knowledge.ts` (max 200 lines, sourced)
+2. Create maestro file: `src/data/maestri/{name}.ts` with `getGreeting()` for locale-aware greetings (ADR 0064)
+3. Add avatar: `public/maestri/{name}.png`
+4. Register: `src/data/maestri/index.ts` exports
+5. Add to `SUBJECT_NAMES` for language subject mapping
+6. **Full walkthrough**: See `docs/maestri/adding-professors.md` (includes voice profiles, formal address rules)
+
+**For coaches/buddies**: Follow `docs/coaches-buddies.md` → Update ALL 8 file locations
+
+### Formal vs Informal Address Rules (ADR 0064)
+
+| Language | Formal (Pre-1900) | Informal (Modern) | Rule                      |
+| -------- | ----------------- | ----------------- | ------------------------- |
+| Italian  | Lei (Manzoni)     | tu (Feynman)      | Historical era determines |
+| German   | Sie (Goethe)      | du (modern)       | Depends on maestro year   |
+| French   | Vous              | tu (Molière uses) | Period + pedagogy         |
+| Spanish  | Vos/tú variants   | tú (modern)       | Regional + era            |
+
+**Auto-detection**: `src/lib/greeting/templates/index.ts` maintains `FORMAL_PROFESSORS` set. Add historical figures there.
+
+### Testing Translation Completeness
+
+**Local testing**:
+
+```bash
+npm run dev                  # Run dev server
+# Switch languages: /it/chat → /en/chat → /fr/chat → /de/chat → /es/chat
+npm run typecheck            # Catches missing keys
+npm run i18n:validate        # Checks all 5 languages match structure
+```
+
+**Pre-commit hook** (automatically runs):
+
+- Detects hardcoded Italian strings in JSX/TSX (ESLint rule)
+- Verifies all translation keys exist in all languages
+- Blocks commit if incomplete
+
+**CI/CD gates** (build fails if):
+
+- Missing key in ANY language
+- Variable name mismatch across languages (`{min}` vs `{Min}`)
+- Hardcoded UI text in code
+
+### Locale Configuration & Admin
+
+**Admin UI**: `/admin/locales` (admin-only) manages:
+
+- Country → Language → Primary maestro mapping (e.g., France → French → Molière)
+- Secondary languages per region
+- Runtime locale resolution
+
+**Runtime resolution** (`LocaleConfigService`):
+
+```tsx
+// Get locale-specific maestro for user's country
+const maestro = await localeService.getPrimaryMaestro(userId);
+// Get all available languages for region
+const langs = await localeService.getSecondaryLanguages(countryCode);
+```
+
+**Caching**: Call `tierService.invalidateCache()` after admin locale updates to prevent stale configs.
+
+### Maestri by Language (22 Total: 20 Maestri + 3 Language Teachers)
+
+- **Italian base**: Euclide (math), Darwin (bio), Leonardo (art), etc.
+- **French (Molière)**: French language/literature, formal address (Lei)
+- **German (Goethe)**: German language/literature, formal address (Sie)
+- **Spanish (Cervantes)**: Spanish language/literature, informal (tú)
+
+See: `.claude/rules/maestri.md` | `docs/maestri/language-maestri.md`
+
+### Organization & Team
+
+**Teams supporting 5 languages + 3 new maestri**:
+
+- Translation: Verify all keys in messages/{locale}.json
+- Professors: Create knowledge bases, voice profiles, greetings per language
+- Admin: Configure maestro→locale→country mappings
+- Testing: E2E tests per language, formality validation
+
+**Skills & Workflows**:
+
+- `/localize` - Automated translation completion (fills missing keys, variable validation)
+- `/prompt` → `/planner` → `/execute {plan_id}` - For language features
+- Thor validation includes: i18n completeness gate, formality rules (ADR 0064), maestri registration
+
+**Full documentation**:
+
+- Hooks & patterns: `src/i18n/README-LocaleProvider.md` | `.claude/rules/i18n.md`
+- Development workflow: `.claude/rules/i18n-development.md`
+- Adding professors: `docs/maestri/adding-professors.md`
+- Language maestri specs: `docs/maestri/language-maestri.md`
+- ADR 0064: Formality rules per language | ADR 0066: i18n architecture
 
 ## Skills
 

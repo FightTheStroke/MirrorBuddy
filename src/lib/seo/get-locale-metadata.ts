@@ -4,7 +4,7 @@
  */
 
 import { headers } from "next/headers";
-import { _getHreflangMetadata, generateHreflangTags } from "./hreflang";
+import { generateHreflangTags } from "./hreflang";
 import type { Metadata } from "next";
 import type { Locale } from "./hreflang.types";
 

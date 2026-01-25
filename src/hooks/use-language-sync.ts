@@ -11,7 +11,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useSettingsStore } from "@/lib/stores/settings-store";
-import { _validateAuth } from "@/lib/auth/session-auth";
 import {
   getLanguageCookie,
   setLanguageCookie,
