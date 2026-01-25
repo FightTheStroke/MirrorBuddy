@@ -44,6 +44,7 @@ const PUBLIC_ROUTES = [
   "/manifest",
   "/robots",
   "/sitemap",
+  "/monitoring", // Sentry tunnel route (ADR 0067)
 ];
 
 // UUID v4 regex for visitor ID validation
