@@ -103,9 +103,9 @@ export async function checkTrialForAnonymous(
       toolsRemaining: Math.max(0, TRIAL_LIMITS.TOOLS - session.toolsUsed),
     };
   } catch (error) {
-    log.error("Trial check failed", { error: String(error) });
-    // On error, allow access (graceful degradation)
-    return { allowed: true };
+    log.warn("Trial check failed", { error: String(error) });
+    // SECURITY: On error, deny access (fail-closed principle)
+    return { allowed: false, reason: "Trial verification failed" };
   }
 }
 
