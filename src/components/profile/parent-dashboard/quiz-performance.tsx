@@ -1,6 +1,7 @@
 "use client";
 
 import { Trophy, Target, TrendingUp } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { QuizStats } from "@/types";
 
@@ -33,6 +34,8 @@ export function QuizPerformance({
   highContrast = false,
   className,
 }: QuizPerformanceProps) {
+  const t = useTranslations("education.parent-dashboard.quiz");
+
   if (stats.totalAttempts === 0) {
     return (
       <section
@@ -66,7 +69,7 @@ export function QuizPerformance({
               : "text-slate-500 dark:text-slate-400",
           )}
         >
-          Nessun quiz completato ancora
+          {t("no-quizzes")}
         </p>
       </section>
     );

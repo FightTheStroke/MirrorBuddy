@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * OnboardingTranscript - Collapsible conversation transcript during onboarding
@@ -9,11 +9,12 @@
  * Related: #61 Onboarding Voice Integration
  */
 
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, MessageCircle, Volume2 } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronUp, MessageCircle, Volume2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 
 export interface OnboardingTranscriptProps {
   className?: string;
@@ -24,6 +25,7 @@ export function OnboardingTranscript({
   className,
   defaultExpanded = false,
 }: OnboardingTranscriptProps) {
+  const t = useTranslations("onboarding.transcript");
   const { voiceTranscript, voiceSessionActive } = useOnboardingStore();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -52,8 +54,8 @@ export function OnboardingTranscript({
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden',
-        className
+        "bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden",
+        className,
       )}
     >
       {/* Header - always visible */}
@@ -66,11 +68,15 @@ export function OnboardingTranscript({
         <div className="flex items-center gap-2">
           <MessageCircle className="w-4 h-4 text-pink-500" />
           <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-            Conversazione con Melissa
+            {t("conversationTitle")}
           </span>
           {voiceTranscript.length > 0 && (
             <span className="text-xs text-gray-500 dark:text-gray-400">
-              ({voiceTranscript.length} {voiceTranscript.length === 1 ? 'messaggio' : 'messaggi'})
+              ({voiceTranscript.length}{" "}
+              {voiceTranscript.length === 1
+                ? t("messageSingular")
+                : t("messagePlural")}
+              )
             </span>
           )}
         </div>
@@ -87,7 +93,7 @@ export function OnboardingTranscript({
           <motion.div
             id="onboarding-transcript"
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
+            animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
@@ -97,37 +103,42 @@ export function OnboardingTranscript({
             >
               {voiceTranscript.length === 0 ? (
                 <p className="text-sm text-gray-500 dark:text-gray-400 text-center py-4">
-                  La conversazione apparirà qui...
+                  {t("noConversation")}
                 </p>
               ) : (
                 voiceTranscript.map((entry, index) => (
                   <motion.div
                     key={`${entry.timestamp}-${index}`}
-                    initial={{ opacity: 0, x: entry.role === 'user' ? 10 : -10 }}
+                    initial={{
+                      opacity: 0,
+                      x: entry.role === "user" ? 10 : -10,
+                    }}
                     animate={{ opacity: 1, x: 0 }}
                     className={cn(
-                      'flex gap-2',
-                      entry.role === 'user' ? 'justify-end' : 'justify-start'
+                      "flex gap-2",
+                      entry.role === "user" ? "justify-end" : "justify-start",
                     )}
                   >
-                    {entry.role === 'assistant' && (
+                    {entry.role === "assistant" && (
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-pink-100 dark:bg-pink-900/30 flex items-center justify-center">
                         <Volume2 className="w-3 h-3 text-pink-500" />
                       </div>
                     )}
                     <div
                       className={cn(
-                        'max-w-[80%] rounded-lg px-3 py-2 text-sm',
-                        entry.role === 'user'
-                          ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100'
-                          : 'bg-pink-100 dark:bg-pink-900/30 text-pink-900 dark:text-pink-100'
+                        "max-w-[80%] rounded-lg px-3 py-2 text-sm",
+                        entry.role === "user"
+                          ? "bg-blue-100 dark:bg-blue-900/30 text-blue-900 dark:text-blue-100"
+                          : "bg-pink-100 dark:bg-pink-900/30 text-pink-900 dark:text-pink-100",
                       )}
                     >
                       {entry.text}
                     </div>
-                    {entry.role === 'user' && (
+                    {entry.role === "user" && (
                       <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <span className="text-xs text-blue-500 font-medium">Tu</span>
+                        <span className="text-xs text-blue-500 font-medium">
+                          {t("userLabel")}
+                        </span>
                       </div>
                     )}
                   </motion.div>
@@ -146,7 +157,7 @@ export function OnboardingTranscript({
             <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
           </span>
           <span className="text-xs text-pink-600 dark:text-pink-400">
-            Conversazione in corso
+            {t("conversationActive")}
           </span>
         </div>
       )}

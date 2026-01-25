@@ -2,19 +2,27 @@
  * Connection status overlay component
  */
 
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, XCircle } from 'lucide-react';
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { Loader2, XCircle } from "lucide-react";
 
 interface ConnectionOverlayProps {
-  connectionState: 'connected' | 'connecting' | 'reconnecting' | 'error' | 'disconnected';
+  connectionState:
+    | "connected"
+    | "connecting"
+    | "reconnecting"
+    | "error"
+    | "disconnected";
 }
 
 export function ConnectionOverlay({ connectionState }: ConnectionOverlayProps) {
+  const t = useTranslations("tools.connection");
+
   return (
     <AnimatePresence>
-      {connectionState !== 'connected' && (
+      {connectionState !== "connected" && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -22,28 +30,28 @@ export function ConnectionOverlay({ connectionState }: ConnectionOverlayProps) {
           className="absolute inset-0 z-20 flex items-center justify-center bg-slate-900/80 backdrop-blur-sm"
         >
           <div className="text-center space-y-4">
-            {connectionState === 'connecting' && (
+            {connectionState === "connecting" && (
               <>
                 <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto" />
-                <p className="text-slate-400">Connessione in corso...</p>
+                <p className="text-slate-400">{t("connecting")}</p>
               </>
             )}
-            {connectionState === 'reconnecting' && (
+            {connectionState === "reconnecting" && (
               <>
                 <Loader2 className="w-8 h-8 animate-spin text-yellow-500 mx-auto" />
-                <p className="text-slate-400">Riconnessione...</p>
+                <p className="text-slate-400">{t("reconnecting")}</p>
               </>
             )}
-            {connectionState === 'error' && (
+            {connectionState === "error" && (
               <>
                 <XCircle className="w-8 h-8 text-red-500 mx-auto" />
-                <p className="text-slate-400">Connessione fallita</p>
+                <p className="text-slate-400">{t("error")}</p>
               </>
             )}
-            {connectionState === 'disconnected' && (
+            {connectionState === "disconnected" && (
               <>
                 <div className="w-8 h-8 rounded-full bg-slate-700 mx-auto" />
-                <p className="text-slate-400">Disconnesso</p>
+                <p className="text-slate-400">{t("disconnected")}</p>
               </>
             )}
           </div>

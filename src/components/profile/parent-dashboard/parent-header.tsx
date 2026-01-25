@@ -1,6 +1,7 @@
 "use client";
 
 import { Users, User } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface ParentHeaderProps {
@@ -18,6 +19,8 @@ export function ParentHeader({
   highContrast = false,
   className,
 }: ParentHeaderProps) {
+  const t = useTranslations("education.parent-dashboard.header");
+
   return (
     <header
       className={cn(
@@ -49,7 +52,7 @@ export function ParentHeader({
                 : "text-slate-900 dark:text-white",
             )}
           >
-            Dashboard Genitori
+            {t("title")}
           </h1>
           <p
             className={cn(
@@ -59,7 +62,7 @@ export function ParentHeader({
                 : "text-slate-600 dark:text-slate-400",
             )}
           >
-            Panoramica delle attività di studio
+            {t("subtitle")}
           </p>
         </div>
       </div>

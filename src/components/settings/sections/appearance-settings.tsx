@@ -1,45 +1,54 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useTheme } from 'next-themes';
-import { Sun, Moon, Laptop, Globe, Check } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
+import { useState, useEffect, useCallback } from "react";
+import { useTheme } from "next-themes";
+import { useTranslations } from "next-intl";
+import { Sun, Moon, Laptop, Globe, Check } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 // Static arrays moved outside component to prevent recreation
-const THEMES: Array<{ value: 'light' | 'dark' | 'system'; label: string; icon: React.ReactNode }> = [
-  { value: 'light', label: 'Chiaro', icon: <Sun className="w-5 h-5" /> },
-  { value: 'dark', label: 'Scuro', icon: <Moon className="w-5 h-5" /> },
-  { value: 'system', label: 'Sistema', icon: <Laptop className="w-5 h-5" /> },
+const THEMES: Array<{
+  value: "light" | "dark" | "system";
+  label: string;
+  icon: React.ReactNode;
+}> = [
+  { value: "light", label: "Chiaro", icon: <Sun className="w-5 h-5" /> },
+  { value: "dark", label: "Scuro", icon: <Moon className="w-5 h-5" /> },
+  { value: "system", label: "Sistema", icon: <Laptop className="w-5 h-5" /> },
 ];
 
 const ACCENT_COLORS = [
-  { value: 'blue', label: 'Blu', class: 'bg-blue-500' },
-  { value: 'green', label: 'Verde', class: 'bg-green-500' },
-  { value: 'purple', label: 'Viola', class: 'bg-purple-500' },
-  { value: 'orange', label: 'Arancione', class: 'bg-orange-500' },
-  { value: 'pink', label: 'Rosa', class: 'bg-pink-500' },
+  { value: "blue", label: "Blu", class: "bg-blue-500" },
+  { value: "green", label: "Verde", class: "bg-green-500" },
+  { value: "purple", label: "Viola", class: "bg-purple-500" },
+  { value: "orange", label: "Arancione", class: "bg-orange-500" },
+  { value: "pink", label: "Rosa", class: "bg-pink-500" },
 ];
 
 const LANGUAGES = [
-  { value: 'it' as const, label: 'Italiano', flag: '🇮🇹' },
-  { value: 'en' as const, label: 'English', flag: '🇬🇧' },
-  { value: 'es' as const, label: 'Español', flag: '🇪🇸' },
-  { value: 'fr' as const, label: 'Français', flag: '🇫🇷' },
-  { value: 'de' as const, label: 'Deutsch', flag: '🇩🇪' },
+  { value: "it" as const, label: "Italiano", flag: "🇮🇹" },
+  { value: "en" as const, label: "English", flag: "🇬🇧" },
+  { value: "es" as const, label: "Español", flag: "🇪🇸" },
+  { value: "fr" as const, label: "Français", flag: "🇫🇷" },
+  { value: "de" as const, label: "Deutsch", flag: "🇩🇪" },
 ];
 
 // Appearance Settings
 interface AppearanceSettingsProps {
   appearance: {
-    theme: 'light' | 'dark' | 'system';
+    theme: "light" | "dark" | "system";
     accentColor: string;
-    language: 'it' | 'en' | 'es' | 'fr' | 'de';
+    language: "it" | "en" | "es" | "fr" | "de";
   };
-  onUpdate: (updates: Partial<AppearanceSettingsProps['appearance']>) => void;
+  onUpdate: (updates: Partial<AppearanceSettingsProps["appearance"]>) => void;
 }
 
-export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsProps) {
+export function AppearanceSettings({
+  appearance,
+  onUpdate,
+}: AppearanceSettingsProps) {
+  const t = useTranslations("settings.appearance");
   const { theme: currentTheme, setTheme, resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -49,10 +58,13 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
     setMounted(true);
   }, []);
 
-  const handleThemeChange = useCallback((newTheme: 'light' | 'dark' | 'system') => {
-    setTheme(newTheme);
-    onUpdate({ theme: newTheme });
-  }, [setTheme, onUpdate]);
+  const handleThemeChange = useCallback(
+    (newTheme: "light" | "dark" | "system") => {
+      setTheme(newTheme);
+      onUpdate({ theme: newTheme });
+    },
+    [setTheme, onUpdate],
+  );
 
   // Show loading state during hydration
   if (!mounted) {
@@ -60,11 +72,11 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
       <div className="space-y-6">
         <Card>
           <CardHeader>
-            <CardTitle>Tema</CardTitle>
+            <CardTitle>{t("themeTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
-              {THEMES.map(theme => (
+              {THEMES.map((theme) => (
                 <div
                   key={theme.value}
                   className="flex flex-col items-center gap-2 p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700"
@@ -88,15 +100,15 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-3 gap-4">
-            {THEMES.map(theme => (
+            {THEMES.map((theme) => (
               <button
                 key={theme.value}
                 onClick={() => handleThemeChange(theme.value)}
                 className={cn(
-                  'flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all',
+                  "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
                   currentTheme === theme.value
-                    ? 'border-accent-themed bg-primary/10'
-                    : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                    ? "border-accent-themed bg-primary/10"
+                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
                 )}
               >
                 {theme.icon}
@@ -104,9 +116,12 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
               </button>
             ))}
           </div>
-          {currentTheme === 'system' && (
+          {currentTheme === "system" && (
             <p className="text-sm text-slate-500 mt-3">
-              Tema corrente: {resolvedTheme === 'dark' ? 'Scuro' : 'Chiaro'} (basato sulle preferenze di sistema)
+              {t("currentThemeInfo", {
+                theme:
+                  resolvedTheme === "dark" ? t("darkTheme") : t("lightTheme"),
+              })}
             </p>
           )}
         </CardContent>
@@ -114,20 +129,20 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
 
       <Card>
         <CardHeader>
-          <CardTitle>Colore Principale</CardTitle>
+          <CardTitle>{t("accentColorTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex gap-3">
-            {ACCENT_COLORS.map(color => (
+            {ACCENT_COLORS.map((color) => (
               <button
                 key={color.value}
                 onClick={() => onUpdate({ accentColor: color.value })}
                 className={cn(
-                  'w-12 h-12 rounded-full transition-transform',
+                  "w-12 h-12 rounded-full transition-transform",
                   color.class,
                   appearance.accentColor === color.value
-                    ? 'ring-4 ring-offset-2 ring-offset-background ring-slate-400 dark:ring-slate-500 scale-110'
-                    : 'hover:scale-105'
+                    ? "ring-4 ring-offset-2 ring-offset-background ring-slate-400 dark:ring-slate-500 scale-110"
+                    : "hover:scale-105",
                 )}
                 title={color.label}
               />
@@ -140,34 +155,32 @@ export function AppearanceSettings({ appearance, onUpdate }: AppearanceSettingsP
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Globe className="w-5 h-5 text-blue-500" />
-            Lingua
+            {t("languageTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-slate-500 mb-4">
-            Seleziona la lingua in cui i professori ti parleranno
+            {t("languageDescription")}
           </p>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-            {LANGUAGES.map(lang => {
-              const isSelected = (appearance.language || 'it') === lang.value;
+            {LANGUAGES.map((lang) => {
+              const isSelected = (appearance.language || "it") === lang.value;
               return (
                 <button
                   key={lang.value}
                   onClick={() => onUpdate({ language: lang.value })}
                   className={cn(
-                    'flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-medium',
-                    'focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900',
+                    "flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-medium",
+                    "focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900",
                     isSelected
-                      ? 'bg-accent-themed text-white border-accent-themed shadow-lg focus:ring-accent-themed'
-                      : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm hover:shadow-md focus:ring-accent-themed'
+                      ? "bg-accent-themed text-white border-accent-themed shadow-lg focus:ring-accent-themed"
+                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-600 hover:border-accent-themed hover:bg-slate-50 dark:hover:bg-slate-700 shadow-sm hover:shadow-md focus:ring-accent-themed",
                   )}
                   aria-pressed={isSelected}
                 >
                   <span className="text-xl">{lang.flag}</span>
                   <span className="text-sm">{lang.label}</span>
-                  {isSelected && (
-                    <Check className="w-4 h-4 ml-auto" />
-                  )}
+                  {isSelected && <Check className="w-4 h-4 ml-auto" />}
                 </button>
               );
             })}

@@ -160,7 +160,19 @@
       "features": "Caractéristiques",
       "recommendedLesson": "Leçon recommandée:",
       "noLesson": "Aucune",
-      "level": "Niveau:"
+      "level": "Niveau:",
+      "speedGame": {
+        "instructions": "Tapez des mots aussi vite que possible. Vous avez 60 secondes!",
+        "startButton": "Démarrer le Jeu",
+        "scoreLabel": "Points",
+        "wordsLabel": "Mots"
+      },
+      "lessonSelector": {
+        "title": "Leçons {level}",
+        "completed": "terminées",
+        "completedBadge": "Terminée",
+        "inProgress": "En cours"
+      }
     },
     "search": {
       "noResults": "Aucun résultat trouvé pour \"{query}\"",
@@ -1558,11 +1570,42 @@
       "title": "Notifications"
     },
     "privacy": {
-      "title": "Confidentialité"
+      "title": "Confidentialité",
+      "reviewAndModifyConsents": "Examiner et modifier les consentements",
+      "noConsentFound": "Aucun consentement trouvé. Vous recevrez la demande à la prochaine connexion.",
+      "privacyAndSecurity": "Confidentialité et Sécurité",
+      "yourDataIsSafe": "Vos données sont sûres. MirrorBuddy est conçu en tenant compte de la confidentialité des enfants et respecte les réglementations COPPA et GDPR.",
+      "yourDataIsProtected": "Vos données sont protégées",
+      "dataStoredLocally": "Les données sont stockées localement sur votre appareil",
+      "noDataShared": "Aucune donnée n'est partagée avec des tiers",
+      "conversationsNotRecorded": "Les conversations ne sont pas enregistrées",
+      "deleteDataAnytime": "Vous pouvez supprimer vos données à tout moment",
+      "deleteAllData": "Supprimer toutes mes données",
+      "telemetryAndAnalytics": "Télémétrie et Analyse",
+      "anonymousDataHelps": "Les données anonymes nous aident à améliorer MirrorBuddy. Aucune donnée personnelle n'est collectée.",
+      "sendAnonymousData": "Envoyer les données anonymes"
     },
     "ambientAudio": {
       "title": "Audio Ambiant pour l'Étude",
-      "description": "L'audio ambiant peut améliorer la concentration et l'efficacité de l'étude. Choisissez parmi le bruit blanc, les sons binauraux pour différents modes de concentration, ou des paysages sonores naturels pour créer l'environnement parfait pour votre apprentissage."
+      "description": "L'audio ambiant peut améliorer la concentration et l'efficacité de l'étude. Choisissez parmi le bruit blanc, les sons binauraux pour différents modes de concentration, ou des paysages sonores naturels pour créer l'environnement parfait pour votre apprentissage.",
+      "futureVideoFeatures": "Pour les futures fonctionnalités vidéo"
+    },
+    "diagnostics": {
+      "platformHelp": "Aide à la Plateforme",
+      "helpWithConfiguration": "Avez-vous besoin d'aide pour la configuration ou rencontrez-vous des problèmes techniques ? Vous pouvez demander à votre Coach : il connaît toutes les fonctionnalités de MirrorBuddy !",
+      "troubleshooting": "Dépannage",
+      "chatNotWorking": "Le chat ne fonctionne pas ?",
+      "chatNotWorkingDescription": "Vérifiez que Azure OpenAI ou Ollama sont configurés. Vérifiez les variables .env et les journaux du serveur.",
+      "voiceNotWorking": "La voix ne fonctionne pas ?",
+      "voiceNotWorkingDescription": "La voix nécessite l'API Azure OpenAI Realtime (AZURE_OPENAI_REALTIME_*). Ollama ne supporte pas la voix.",
+      "microphoneBlocked": "Le microphone est bloqué ?",
+      "microphoneBlockedDescription": "Cliquez sur l'icône de cadenas dans la barre d'adresse de votre navigateur et activez la permission du microphone.",
+      "audioNotHeard": "L'audio ne s'entend pas ?",
+      "audioNotHeardDescription": "Vérifiez le volume de votre système. Si vous utilisez Chrome, il peut bloquer la lecture automatique du son - cliquez d'abord sur la page.",
+      "waveformVisualization": "Visualisation de la Forme d'Onde",
+      "noMicrophoneFound": "Aucun microphone trouvé",
+      "runTest": "Exécuter le Test",
+      "retestTest": "Réessayer le Test"
     },
     "aiProvider": {
       "noProviderConfigured": "Aucun fournisseur configuré",

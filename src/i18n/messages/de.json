@@ -160,7 +160,19 @@
       "features": "Funktionen",
       "recommendedLesson": "Empfohlene Lektion:",
       "noLesson": "Keine",
-      "level": "Stufe:"
+      "level": "Stufe:",
+      "speedGame": {
+        "instructions": "Tippen Sie Wörter so schnell wie möglich. Sie haben 60 Sekunden!",
+        "startButton": "Spiel Starten",
+        "scoreLabel": "Punkte",
+        "wordsLabel": "Wörter"
+      },
+      "lessonSelector": {
+        "title": "Lektionen {level}",
+        "completed": "abgeschlossen",
+        "completedBadge": "Abgeschlossen",
+        "inProgress": "In Bearbeitung"
+      }
     },
     "search": {
       "noResults": "Keine Ergebnisse gefunden für \"{query}\"",
@@ -1558,11 +1570,42 @@
       "title": "Benachrichtigungen"
     },
     "privacy": {
-      "title": "Datenschutz"
+      "title": "Datenschutz",
+      "reviewAndModifyConsents": "Einwilligungen überprüfen und ändern",
+      "noConsentFound": "Keine Einwilligung gefunden. Sie erhalten die Anfrage bei der nächsten Anmeldung.",
+      "privacyAndSecurity": "Datenschutz und Sicherheit",
+      "yourDataIsSafe": "Ihre Daten sind sicher. MirrorBuddy wurde mit dem Schutz der Privatsphäre von Kindern entwickelt und einhält COPPA- und GDPR-Bestimmungen.",
+      "yourDataIsProtected": "Ihre Daten sind geschützt",
+      "dataStoredLocally": "Daten werden lokal auf Ihrem Gerät gespeichert",
+      "noDataShared": "Keine Daten werden an Dritte weitergegeben",
+      "conversationsNotRecorded": "Gespräche werden nicht aufgezeichnet",
+      "deleteDataAnytime": "Sie können Ihre Daten jederzeit löschen",
+      "deleteAllData": "Alle meine Daten löschen",
+      "telemetryAndAnalytics": "Telemetrie und Analytik",
+      "anonymousDataHelps": "Anonyme Daten helfen uns, MirrorBuddy zu verbessern. Keine persönlichen Daten werden erfasst.",
+      "sendAnonymousData": "Anonyme Daten senden"
     },
     "ambientAudio": {
       "title": "Umgebungsaudio zum Lernen",
-      "description": "Umgebungsaudio kann Konzentration und Lerneffektivität verbessern. Wählen Sie zwischen weißem Rauschen, binauralen Tönen für verschiedene Konzentrationsmodi oder natürlichen Soundscapes, um die perfekte Lernumgebung zu schaffen."
+      "description": "Umgebungsaudio kann Konzentration und Lerneffektivität verbessern. Wählen Sie zwischen weißem Rauschen, binauralen Tönen für verschiedene Konzentrationsmodi oder natürlichen Soundscapes, um die perfekte Lernumgebung zu schaffen.",
+      "futureVideoFeatures": "Für zukünftige Videofunktionen"
+    },
+    "diagnostics": {
+      "platformHelp": "Plattformhilfe",
+      "helpWithConfiguration": "Benötigen Sie Hilfe bei der Konfiguration oder haben Sie technische Probleme? Sie können Ihren Coach fragen: Er kennt alle Funktionen von MirrorBuddy!",
+      "troubleshooting": "Fehlerbehebung",
+      "chatNotWorking": "Chat funktioniert nicht?",
+      "chatNotWorkingDescription": "Stellen Sie sicher, dass Azure OpenAI oder Ollama konfiguriert sind. Überprüfen Sie die .env-Variablen und Serverprotokolle.",
+      "voiceNotWorking": "Voice funktioniert nicht?",
+      "voiceNotWorkingDescription": "Voice erfordert Azure OpenAI Realtime API (AZURE_OPENAI_REALTIME_*). Ollama unterstützt Voice nicht.",
+      "microphoneBlocked": "Mikrofon blockiert?",
+      "microphoneBlockedDescription": "Klicken Sie auf das Schlosssymbol in der Adressleiste Ihres Browsers und aktivieren Sie die Mikrofonberechtigung.",
+      "audioNotHeard": "Audio wird nicht gehört?",
+      "audioNotHeardDescription": "Überprüfen Sie die Systemlautstärke. Wenn Sie Chrome verwenden, kann es automatische Audiowiedergabe blockieren - klicken Sie zuerst auf die Seite.",
+      "waveformVisualization": "Wellenformvisualisierung",
+      "noMicrophoneFound": "Kein Mikrofon gefunden",
+      "runTest": "Test Ausführen",
+      "retestTest": "Test Wiederholen"
     },
     "aiProvider": {
       "noProviderConfigured": "Kein Anbieter konfiguriert",

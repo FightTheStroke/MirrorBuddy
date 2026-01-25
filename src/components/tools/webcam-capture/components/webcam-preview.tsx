@@ -3,6 +3,7 @@
  * @brief Webcam preview component
  */
 
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { Loader2, SwitchCamera } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -46,6 +47,7 @@ export function WebcamPreview({
   onCancelCountdown,
   onToggleFrontBack,
 }: WebcamPreviewProps) {
+  const t = useTranslations("tools.webcam");
   const _selectedCameraId = selectedCameraId; // Mark as unused
   return (
     <div className="relative aspect-video bg-black">
@@ -61,7 +63,7 @@ export function WebcamPreview({
           {isLoading && (
             <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 z-10 bg-black">
               <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-              <p className="text-slate-300 text-sm">Avvio fotocamera...</p>
+              <p className="text-slate-300 text-sm">{t("startingCamera")}</p>
             </div>
           )}
 
@@ -111,7 +113,9 @@ export function WebcamPreview({
               >
                 <div className="text-center">
                   <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto mb-2" />
-                  <p className="text-slate-300 text-sm">Cambio fotocamera...</p>
+                  <p className="text-slate-300 text-sm">
+                    {t("switchingCamera")}
+                  </p>
                 </div>
               </motion.div>
             )}
@@ -142,7 +146,7 @@ export function WebcamPreview({
                     onClick={onCancelCountdown}
                     className="mt-6 border-white/50 text-white hover:bg-white/20"
                   >
-                    Annulla
+                    {t("cancel")}
                   </Button>
                 </motion.div>
               </motion.div>
@@ -158,7 +162,7 @@ export function WebcamPreview({
                 size="icon"
                 onClick={onToggleFrontBack}
                 className="absolute top-4 right-4 bg-black/50 border-white/30 text-white hover:bg-black/70 z-10"
-                aria-label="Cambia fotocamera"
+                aria-label={t("switchCamera")}
               >
                 <SwitchCamera className="w-5 h-5" />
               </Button>
@@ -169,9 +173,7 @@ export function WebcamPreview({
           {!capturedImage && !isLoading && !error && countdown === null && (
             <div className="absolute inset-4 border-2 border-dashed border-white/30 rounded-lg pointer-events-none">
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 bg-black/50 px-4 py-2 rounded-full">
-                <p className="text-sm text-white/80">
-                  Posiziona il contenuto nell&apos;inquadratura
-                </p>
+                <p className="text-sm text-white/80">{t("positionContent")}</p>
               </div>
             </div>
           )}

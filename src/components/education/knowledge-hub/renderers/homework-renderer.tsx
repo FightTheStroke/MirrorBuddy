@@ -16,6 +16,7 @@
  */
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { BookOpen, CheckCircle, Circle, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
@@ -39,9 +40,10 @@ interface HomeworkData {
  * Render a homework assignment for Knowledge Hub.
  */
 export function HomeworkRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education.knowledge-hub");
   const homeworkData = data as unknown as HomeworkData;
 
-  const title = homeworkData.title || "Compiti";
+  const title = homeworkData.title || t("homework.default-title");
   const tasks = homeworkData.tasks || [];
   const completedCount = tasks.filter((t) => t.completed).length;
 
@@ -100,7 +102,7 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
       {/* Tasks */}
       <div className="p-4 space-y-2">
         {tasks.length === 0 ? (
-          <p className="text-center text-slate-500">Nessun compito</p>
+          <p className="text-center text-slate-500">{t("homework.no-tasks")}</p>
         ) : (
           tasks.map((task) => (
             <div

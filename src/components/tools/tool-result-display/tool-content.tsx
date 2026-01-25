@@ -5,6 +5,7 @@
  * Renders the appropriate tool component based on tool type
  */
 
+import { useTranslations } from "next-intl";
 import dynamic from "next/dynamic";
 import { Loader2 } from "lucide-react";
 import { DiagramRenderer } from "../diagram-renderer";
@@ -49,6 +50,8 @@ interface ToolContentProps {
 }
 
 export function ToolContent({ toolCall, sessionId }: ToolContentProps) {
+  const t = useTranslations("tools.loading");
+
   // Map function name to tool type for rendering
   const toolType =
     functionNameToToolType(toolCall.type) || (toolCall.type as ToolType);
@@ -62,7 +65,7 @@ export function ToolContent({ toolCall, sessionId }: ToolContentProps) {
       <div className="h-20 flex items-center justify-center bg-slate-200 dark:bg-slate-800/50 rounded-xl border border-slate-300 dark:border-slate-700">
         <Loader2 className="w-6 h-6 text-blue-500 animate-spin" />
         <span className="ml-2 text-sm text-slate-600 dark:text-slate-400">
-          Caricamento materiale...
+          {t("loadingMaterial")}
         </span>
       </div>
     );
@@ -82,7 +85,7 @@ export function ToolContent({ toolCall, sessionId }: ToolContentProps) {
   if (!toolData) {
     return (
       <div className="p-4 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-sm">
-        Nessun dato disponibile per questo materiale
+        {t("noData")}
       </div>
     );
   }

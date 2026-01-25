@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import {
   Shield,
   BarChart3,
@@ -25,6 +26,7 @@ import { updateConsentSnapshot } from "@/lib/consent/consent-store";
 
 // Privacy Settings
 export function PrivacySettings() {
+  const t = useTranslations("settings.privacy");
   const [version, setVersion] = useState<{
     version: string;
     buildTime: string;
@@ -191,13 +193,12 @@ export function PrivacySettings() {
                 className="w-full"
                 onClick={handleReviewConsents}
               >
-                Rivedi e modifica consensi
+                {t("reviewAndModifyConsents")}
               </Button>
             </>
           ) : (
             <p className="text-sm text-amber-600 dark:text-amber-400">
-              Nessun consenso trovato. Riceverai la richiesta al prossimo
-              accesso.
+              {t("noConsentFound")}
             </p>
           )}
         </CardContent>
@@ -221,10 +222,10 @@ export function PrivacySettings() {
               I tuoi dati sono protetti
             </h4>
             <ul className="text-sm text-green-600 dark:text-green-400 space-y-1">
-              <li>I dati sono memorizzati localmente sul dispositivo</li>
-              <li>Nessun dato viene condiviso con terze parti</li>
-              <li>Le conversazioni non vengono registrate</li>
-              <li>Puoi eliminare i tuoi dati in qualsiasi momento</li>
+              <li>{t("dataStoredLocally")}</li>
+              <li>{t("noDataShared")}</li>
+              <li>{t("conversationsNotRecorded")}</li>
+              <li>{t("deleteDataAnytime")}</li>
             </ul>
           </div>
 
@@ -262,7 +263,7 @@ export function PrivacySettings() {
               }
             }}
           >
-            Elimina tutti i miei dati
+            {t("deleteAllData")}
           </Button>
         </CardContent>
       </Card>
@@ -277,8 +278,7 @@ export function PrivacySettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            I dati anonimi ci aiutano a migliorare MirrorBuddy. Nessun dato
-            personale viene raccolto.
+            {t("anonymousDataHelps")}
           </p>
 
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">

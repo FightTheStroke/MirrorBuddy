@@ -7,8 +7,9 @@
  * WCAG 2.1 AA compliant with proper ARIA attributes.
  */
 
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Search, X, Filter, ChevronDown } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import type { ToolType } from "@/types/tools";
 
@@ -35,25 +36,29 @@ export interface SearchBarProps {
   autoFocus?: boolean;
 }
 
-const TYPE_LABELS: Record<ToolType | "all", string> = {
-  all: "Tutti i tipi",
-  mindmap: "Mappe Mentali",
-  quiz: "Quiz",
-  flashcard: "Flashcard",
-  summary: "Riassunti",
-  demo: "Demo",
-  diagram: "Diagrammi",
-  timeline: "Timeline",
-  formula: "Formule",
-  calculator: "Calcolatrici",
-  chart: "Grafici",
-  pdf: "PDF",
-  webcam: "Immagini",
-  homework: "Compiti",
-  search: "Ricerche",
-  typing: "Digitazione",
-  "study-kit": "Study Kit",
-};
+function getTypeLabels(
+  t: (key: string) => string,
+): Record<ToolType | "all", string> {
+  return {
+    all: t("types.all"),
+    mindmap: t("types.mindmap"),
+    quiz: t("types.quiz"),
+    flashcard: t("types.flashcard"),
+    summary: t("types.summary"),
+    demo: t("types.demo"),
+    diagram: t("types.diagram"),
+    timeline: t("types.timeline"),
+    formula: t("types.formula"),
+    calculator: t("types.calculator"),
+    chart: t("types.chart"),
+    pdf: t("types.pdf"),
+    webcam: t("types.webcam"),
+    homework: t("types.homework"),
+    search: t("types.search"),
+    typing: t("types.typing"),
+    "study-kit": t("types.study-kit"),
+  };
+}
 
 /**
  * Accessible search bar for Knowledge Hub materials.
@@ -61,7 +66,7 @@ const TYPE_LABELS: Record<ToolType | "all", string> = {
 export function SearchBar({
   value,
   onChange,
-  placeholder = "Cerca materiali...",
+  placeholder,
   typeFilter = "all",
   onTypeFilterChange,
   availableTypes,
@@ -70,6 +75,13 @@ export function SearchBar({
   debounceMs = 300,
   autoFocus = false,
 }: SearchBarProps) {
+  const t = useTranslations("education.knowledge-hub");
+  const typeLabels = useMemo(() => getTypeLabels(t), [t]);
+  const defaultPlaceholder = useMemo(
+    () => placeholder || t("header.search.placeholder"),
+    [placeholder, t],
+  );
+
   const [localValue, setLocalValue] = useState(value);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -163,7 +175,7 @@ export function SearchBar({
   );
 
   const types =
-    availableTypes || (Object.keys(TYPE_LABELS) as (ToolType | "all")[]);
+    availableTypes || (Object.keys(typeLabels) as (ToolType | "all")[]);
 
   return (
     <div className={cn("relative", className)}>
@@ -187,13 +199,13 @@ export function SearchBar({
           value={localValue}
           onChange={(e) => handleChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={placeholder}
+          placeholder={defaultPlaceholder}
           className={cn(
             "flex-1 bg-transparent border-none outline-none",
             "text-slate-900 dark:text-slate-100",
             "placeholder:text-slate-400",
           )}
-          aria-label="Cerca materiali"
+          aria-label={t("header.search.aria-label")}
           role="searchbox"
           autoComplete="off"
           spellCheck={false}
@@ -209,7 +221,7 @@ export function SearchBar({
               "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               "transition-colors",
             )}
-            aria-label="Cancella ricerca"
+            aria-label={t("header.search.clear-aria-label")}
           >
             <X className="w-4 h-4" />
           </button>
@@ -229,14 +241,12 @@ export function SearchBar({
                 typeFilter !== "all" &&
                   "bg-accent-themed/10 text-accent-themed",
               )}
-              aria-label="Filtra per tipo"
+              aria-label={t("header.filter.aria-label")}
               aria-expanded={isFilterOpen}
               aria-haspopup="listbox"
             >
               <Filter className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {TYPE_LABELS[typeFilter]}
-              </span>
+              <span className="hidden sm:inline">{typeLabels[typeFilter]}</span>
               <ChevronDown
                 className={cn(
                   "w-4 h-4 transition-transform",
@@ -255,7 +265,7 @@ export function SearchBar({
                   "py-1",
                 )}
                 role="listbox"
-                aria-label="Seleziona tipo materiale"
+                aria-label={t("header.filter.listbox-aria-label")}
               >
                 {types.map((type) => (
                   <button
@@ -272,7 +282,7 @@ export function SearchBar({
                     role="option"
                     aria-selected={type === typeFilter}
                   >
-                    {TYPE_LABELS[type]}
+                    {typeLabels[type]}
                   </button>
                 ))}
               </div>
@@ -288,7 +298,7 @@ export function SearchBar({
         aria-atomic="true"
         className="sr-only"
       >
-        {localValue && `Ricerca: ${localValue}`}
+        {localValue && t("header.search.announcement", { value: localValue })}
       </div>
     </div>
   );

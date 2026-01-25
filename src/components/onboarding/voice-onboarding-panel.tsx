@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * VoiceOnboardingPanel - Unified voice experience with Melissa
@@ -18,17 +18,18 @@
  * Related: #61 Onboarding Voice Integration
  */
 
-import { useEffect, useCallback, useState, useRef, useMemo } from 'react';
-import { logger } from '@/lib/logger';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import type { Maestro, VoiceSessionHandle } from '@/types';
-import type { ExistingUserDataForPrompt } from '@/lib/voice/onboarding-tools';
-import { CallButton } from './voice-onboarding-panel/call-button';
-import { ConnectingState } from './voice-onboarding-panel/connecting-state';
-import { ConnectedState } from './voice-onboarding-panel/connected-state';
+import { useEffect, useCallback, useState, useRef, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { logger } from "@/lib/logger";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import type { Maestro, VoiceSessionHandle } from "@/types";
+import type { ExistingUserDataForPrompt } from "@/lib/voice/onboarding-tools";
+import { CallButton } from "./voice-onboarding-panel/call-button";
+import { ConnectingState } from "./voice-onboarding-panel/connecting-state";
+import { ConnectedState } from "./voice-onboarding-panel/connected-state";
 
 interface VoiceConnectionInfo {
-  provider: 'azure';
+  provider: "azure";
   proxyPort: number;
   configured: boolean;
 }
@@ -37,7 +38,7 @@ export interface VoiceOnboardingPanelProps {
   className?: string;
   onFallbackToWebSpeech?: () => void;
   /** Which step we're on - affects what data we show */
-  step?: 'welcome' | 'info';
+  step?: "welcome" | "info";
   /** Voice session handle from parent - maintains single connection */
   voiceSession: VoiceSessionHandle;
   /** Connection info from parent */
@@ -51,12 +52,14 @@ export interface VoiceOnboardingPanelProps {
 export function VoiceOnboardingPanel({
   className,
   onFallbackToWebSpeech: _onFallbackToWebSpeech,
-  step = 'welcome',
+  step = "welcome",
   voiceSession,
   connectionInfo,
   onboardingMelissa,
   existingUserData: _existingUserData,
 }: VoiceOnboardingPanelProps) {
+  const tOnboarding = useTranslations("onboarding");
+  const tVoice = useTranslations("voice");
   const { data, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
   const hasInitializedRef = useRef(false);
   const hasAttemptedConnectionRef = useRef(false);
@@ -78,7 +81,7 @@ export function VoiceOnboardingPanel({
 
   // Clear transcript only on first mount of welcome step
   useEffect(() => {
-    if (!hasInitializedRef.current && step === 'welcome') {
+    if (!hasInitializedRef.current && step === "welcome") {
       hasInitializedRef.current = true;
       clearVoiceTranscript();
     }
@@ -92,27 +95,37 @@ export function VoiceOnboardingPanel({
       if (!isVoiceActive) return;
       if (hasAttemptedConnectionRef.current) return;
       if (!connectionInfo) return;
-      if (connectionState !== 'idle') return;
+      if (connectionState !== "idle") return;
 
       hasAttemptedConnectionRef.current = true;
       setConfigError(null);
 
       try {
-        logger.debug('[VoiceOnboardingPanel] Connecting to voice session...');
+        logger.debug("[VoiceOnboardingPanel] Connecting to voice session...");
         await connect(onboardingMelissa, connectionInfo);
       } catch (error) {
-        logger.error('[VoiceOnboardingPanel] Connection failed', { error: String(error) });
-        if (error instanceof DOMException && error.name === 'NotAllowedError') {
-          setConfigError('Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.');
+        logger.error("[VoiceOnboardingPanel] Connection failed", {
+          error: String(error),
+        });
+        if (error instanceof DOMException && error.name === "NotAllowedError") {
+          setConfigError(tVoice("microphoneUnauthorized"));
         } else {
-          setConfigError('Errore di connessione vocale');
+          setConfigError(tVoice("connectionError"));
         }
         hasAttemptedConnectionRef.current = false;
       }
     };
 
     startConnection();
-  }, [isVoiceActive, connectionInfo, isConnected, connectionState, connect, onboardingMelissa]);
+  }, [
+    isVoiceActive,
+    connectionInfo,
+    isConnected,
+    connectionState,
+    connect,
+    onboardingMelissa,
+    tVoice,
+  ]);
 
   const handleStartCall = useCallback(() => {
     setIsVoiceActive(true);
@@ -130,21 +143,60 @@ export function VoiceOnboardingPanel({
 
   // Memoize checklist to avoid recreation on every render
   const checklist = useMemo(() => {
-    if (step === 'welcome') {
+    if (step === "welcome") {
       return [
-        { key: 'name', label: 'Nome', value: data.name, required: true },
+        {
+          key: "name",
+          label: tOnboarding("checklist.nameLabel"),
+          value: data.name,
+          required: true,
+        },
       ];
     }
     return [
-      { key: 'name', label: 'Nome', value: data.name, required: true },
-      { key: 'age', label: 'Età', value: data.age ? `${data.age} anni` : null, required: false },
-      { key: 'school', label: 'Scuola', value: data.schoolLevel ?
-        (data.schoolLevel === 'elementare' ? 'Elementare' :
-         data.schoolLevel === 'media' ? 'Media' : 'Superiore') : null, required: false },
-      { key: 'differences', label: 'Difficoltà', value: data.learningDifferences?.length ?
-        `${data.learningDifferences.length} indicate` : null, required: false },
+      {
+        key: "name",
+        label: tOnboarding("checklist.nameLabel"),
+        value: data.name,
+        required: true,
+      },
+      {
+        key: "age",
+        label: tOnboarding("checklist.ageLabel"),
+        value: data.age ? `${data.age} anni` : null,
+        required: false,
+      },
+      {
+        key: "school",
+        label: tOnboarding("checklist.schoolLabel"),
+        value: data.schoolLevel
+          ? data.schoolLevel === "elementare"
+            ? tOnboarding("checklist.schoolElementary")
+            : data.schoolLevel === "media"
+              ? tOnboarding("checklist.schoolMiddle")
+              : tOnboarding("checklist.schoolHigh")
+          : null,
+        required: false,
+      },
+      {
+        key: "differences",
+        label: tOnboarding("checklist.differencesLabel"),
+        value: data.learningDifferences?.length
+          ? tOnboarding("checklist.differencesCount", {
+              count: data.learningDifferences.length,
+            })
+          : null,
+        required: false,
+      },
     ];
-  }, [step, data.name, data.age, data.schoolLevel, data.learningDifferences?.length]);
+  }, [
+    step,
+    data.name,
+    data.age,
+    data.schoolLevel,
+    data.learningDifferences,
+    tOnboarding,
+  ]);
 
   // If Azure is not available, show nothing (form mode will be used)
   if (!connectionInfo) {
@@ -152,12 +204,12 @@ export function VoiceOnboardingPanel({
   }
 
   // ========== NOT CONNECTED - Show call button ==========
-  if (!isConnected && (!isVoiceActive || connectionState === 'idle')) {
+  if (!isConnected && (!isVoiceActive || connectionState === "idle")) {
     return <CallButton onClick={handleStartCall} className={className} />;
   }
 
   // ========== CONNECTING ==========
-  if (isVoiceActive && !isConnected && connectionState === 'connecting') {
+  if (isVoiceActive && !isConnected && connectionState === "connecting") {
     return (
       <ConnectingState
         configError={configError}

@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Save, Download, Brain, Layers } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { SummaryData } from '@/types/tools';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { Save, Download, Brain, Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { SummaryData } from "@/types/tools";
 
 interface SummaryActionsBarProps {
   isFinalized: boolean;
@@ -24,6 +25,8 @@ export function SummaryActionsBar({
   onConvertToMindmap,
   onGenerateFlashcards,
 }: SummaryActionsBarProps) {
+  const t = useTranslations("tools.summary");
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -41,13 +44,13 @@ export function SummaryActionsBar({
               className="gap-2"
             >
               <Save className="w-4 h-4" />
-              Salva
+              {t("save")}
             </Button>
           )}
           {isFinalized && (
             <span className="text-sm text-green-600 dark:text-green-400 flex items-center gap-1">
               <Save className="w-4 h-4" />
-              Salvato
+              {t("saved")}
             </span>
           )}
         </div>
@@ -60,7 +63,7 @@ export function SummaryActionsBar({
               size="sm"
               onClick={() => onExportPdf(data)}
               className="gap-2"
-              title="Esporta come PDF"
+              title={t("exportPdf")}
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">PDF</span>
@@ -73,7 +76,7 @@ export function SummaryActionsBar({
               size="sm"
               onClick={() => onConvertToMindmap(data)}
               className="gap-2"
-              title="Converti in mappa mentale"
+              title={t("convertToMindmap")}
             >
               <Brain className="w-4 h-4" />
               <span className="hidden sm:inline">Mappa</span>
@@ -86,7 +89,7 @@ export function SummaryActionsBar({
               size="sm"
               onClick={() => onGenerateFlashcards(data)}
               className="gap-2"
-              title="Genera flashcard dai punti chiave"
+              title={t("generateFlashcards")}
             >
               <Layers className="w-4 h-4" />
               <span className="hidden sm:inline">Flashcard</span>

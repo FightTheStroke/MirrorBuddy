@@ -3,11 +3,12 @@
  * @brief Decks grid component
  */
 
-import { Plus, Layers, Loader2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { DeckCard } from './deck-card';
-import type { FlashcardDeck } from '@/types';
+import { Plus, Layers, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { DeckCard } from "./deck-card";
+import type { FlashcardDeck } from "@/types";
 
 interface DecksGridProps {
   loading: boolean;
@@ -28,13 +29,15 @@ export function DecksGrid({
   onStudy,
   onCreate,
 }: DecksGridProps) {
+  const t = useTranslations("education.flashcards");
+
   if (loading) {
     return (
       <Card className="p-12">
         <div className="text-center">
           <Loader2 className="w-16 h-16 mx-auto text-slate-400 mb-4 animate-spin" />
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            Caricamento...
+            {t("loading")}
           </h3>
         </div>
       </Card>
@@ -47,14 +50,14 @@ export function DecksGrid({
         <div className="text-center">
           <Layers className="w-16 h-16 mx-auto text-slate-400 mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            Nessun mazzo creato
+            {t("emptyState")}
           </h3>
           <p className="text-slate-600 dark:text-slate-400 mb-6">
-            Crea il tuo primo mazzo di flashcards per iniziare a studiare
+            {t("emptyStateDescription")}
           </p>
           <Button onClick={onCreate}>
             <Plus className="w-4 h-4 mr-2" />
-            Crea Mazzo
+            {t("createDeckButton")}
           </Button>
         </div>
       </Card>
@@ -76,4 +79,3 @@ export function DecksGrid({
     </div>
   );
 }
-

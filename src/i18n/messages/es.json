@@ -454,11 +454,42 @@
       "title": "Notificaciones"
     },
     "privacy": {
-      "title": "Privacidad"
+      "title": "Privacidad",
+      "reviewAndModifyConsents": "Revisar y modificar consentimientos",
+      "noConsentFound": "No se encontró consentimiento. Recibirá la solicitud en el próximo inicio de sesión.",
+      "privacyAndSecurity": "Privacidad y Seguridad",
+      "yourDataIsSafe": "Tus datos están seguros. MirrorBuddy fue diseñado pensando en la privacidad de los niños y cumple con las regulaciones COPPA y GDPR.",
+      "yourDataIsProtected": "Tus datos están protegidos",
+      "dataStoredLocally": "Los datos se almacenan localmente en tu dispositivo",
+      "noDataShared": "No se comparten datos con terceros",
+      "conversationsNotRecorded": "Las conversaciones no se graban",
+      "deleteDataAnytime": "Puedes eliminar tus datos en cualquier momento",
+      "deleteAllData": "Eliminar todos mis datos",
+      "telemetryAndAnalytics": "Telemetría y Análisis",
+      "anonymousDataHelps": "Los datos anónimos nos ayudan a mejorar MirrorBuddy. No se recopilan datos personales.",
+      "sendAnonymousData": "Enviar datos anónimos"
     },
     "ambientAudio": {
       "title": "Audio Ambiente para Estudiar",
-      "description": "El audio ambiente puede mejorar la concentración y la efectividad del estudio. Elige entre ruido blanco, sonidos binaurales para diferentes modos de enfoque, o paisajes sonoros naturales para crear el ambiente perfecto para tu aprendizaje."
+      "description": "El audio ambiente puede mejorar la concentración y la efectividad del estudio. Elige entre ruido blanco, sonidos binaurales para diferentes modos de enfoque, o paisajes sonoros naturales para crear el ambiente perfecto para tu aprendizaje.",
+      "futureVideoFeatures": "Para futuras características de video"
+    },
+    "diagnostics": {
+      "platformHelp": "Ayuda de Plataforma",
+      "helpWithConfiguration": "¿Necesitas ayuda con la configuración o tienes problemas técnicos? Puedes preguntarle a tu Coach: ¡conoce todas las características de MirrorBuddy!",
+      "troubleshooting": "Solución de Problemas",
+      "chatNotWorking": "¿El chat no funciona?",
+      "chatNotWorkingDescription": "Verifica que Azure OpenAI u Ollama estén configurados. Comprueba las variables .env y los registros del servidor.",
+      "voiceNotWorking": "¿La voz no funciona?",
+      "voiceNotWorkingDescription": "La voz requiere Azure OpenAI Realtime API (AZURE_OPENAI_REALTIME_*). Ollama no admite voz.",
+      "microphoneBlocked": "¿Micrófono bloqueado?",
+      "microphoneBlockedDescription": "Haz clic en el icono de candado en la barra de direcciones de tu navegador y habilita el permiso del micrófono.",
+      "audioNotHeard": "¿No se escucha el audio?",
+      "audioNotHeardDescription": "Comprueba el volumen del sistema. Si usas Chrome, puede bloquear la reproducción automática de audio - haz clic en la página primero.",
+      "waveformVisualization": "Visualización de Forma de Onda",
+      "noMicrophoneFound": "No se encontró micrófono",
+      "runTest": "Ejecutar Prueba",
+      "retestTest": "Reintentar Prueba"
     },
     "aiProvider": {
       "noProviderConfigured": "Ningún proveedor configurado",
@@ -639,7 +670,19 @@
       "features": "Características",
       "recommendedLesson": "Lección recomendada:",
       "noLesson": "Ninguna",
-      "level": "Nivel:"
+      "level": "Nivel:",
+      "speedGame": {
+        "instructions": "Escribe palabras lo más rápido posible. ¡Tienes 60 segundos!",
+        "startButton": "Iniciar Juego",
+        "scoreLabel": "Puntos",
+        "wordsLabel": "Palabras"
+      },
+      "lessonSelector": {
+        "title": "Lecciones {level}",
+        "completed": "completadas",
+        "completedBadge": "Completada",
+        "inProgress": "En curso"
+      }
     },
     "search": {
       "noResults": "No se encontraron resultados para \"{query}\"",

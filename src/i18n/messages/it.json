@@ -158,9 +158,30 @@
       "title": "Impara a Digitare",
       "description": "Il tool \"Impara a Digitare\" è in fase di sviluppo.",
       "features": "Caratteristiche",
+      "featureList": {
+        "progressive": "Lezioni progressive (beginner, intermediate, advanced)",
+        "multilingual": "Tastiera virtuale multi-lingua (QWERTY, AZERTY, QWERTZ, Dvorak)",
+        "singleHand": "Modalità una sola mano (destra/sinistra)",
+        "accessibility": "Accessibilità completa per 7 profili DSA",
+        "games": "Giochi divertenti per practice",
+        "tracking": "Tracking WPM e accuracy",
+        "ai": "Integrazione con Maestri AI"
+      },
       "recommendedLesson": "Lezione consigliata:",
-      "noLesson": "Nessuna",
-      "level": "Livello:"
+      "none": "Nessuna",
+      "level": "Livello:",
+      "speedGame": {
+        "instructions": "Digita le parole il più velocemente possibile. Hai 60 secondi!",
+        "startButton": "Inizia Gioco",
+        "scoreLabel": "Punti",
+        "wordsLabel": "Parole"
+      },
+      "lessonSelector": {
+        "title": "Lezioni {level}",
+        "completed": "completate",
+        "completedBadge": "Completato",
+        "inProgress": "In corso"
+      }
     },
     "search": {
       "noResults": "Nessun risultato trovato per \"{query}\"",
@@ -430,7 +451,27 @@
       "in-progress-legend": "In corso",
       "completed-legend": "Completato",
       "visual-title": "Percorso di Apprendimento",
-      "topics-completed-count": "argomenti completati"
+      "topics-completed-count": "argomenti completati",
+      "loading-path": "Caricamento percorso...",
+      "path-not-found": "Percorso non trovato",
+      "back": "Torna indietro",
+      "topics": "argomenti",
+      "continue-with": "Continua con",
+      "next-topic": "Prossimo argomento",
+      "continue": "Continua",
+      "start": "Inizia",
+      "topics-header": "Argomenti",
+      "loading-paths": "Caricamento percorsi...",
+      "no-paths-created": "Nessun percorso creato",
+      "no-paths-description": "Carica un PDF nello Study Kit e genera il tuo primo percorso di apprendimento progressivo!",
+      "go-to-study-kit": "Vai allo Study Kit",
+      "path-singular": "percorso",
+      "path-plural": "percorsi",
+      "learning-paths": "di apprendimento",
+      "completed-topics": "completati",
+      "status-completed": "Completato",
+      "status-in-progress": "In corso",
+      "status-not-started": "Da iniziare"
     },
     "knowledge-hub": {
       "header": {
@@ -1868,7 +1909,10 @@
       "microphoneBlockedDescription": "Clicca sull'icona del lucchetto nella barra URL del browser e abilita il permesso microfono.",
       "audioNotHeard": "Audio non si sente?",
       "audioNotHeardDescription": "Verifica il volume del sistema. Se usi Chrome, potrebbe bloccare l'audio autoplay - clicca prima sulla pagina.",
-      "waveformVisualization": "Visualizzazione Onda Sonora"
+      "waveformVisualization": "Visualizzazione Onda Sonora",
+      "noMicrophoneFound": "Nessun microfono trovato",
+      "runTest": "Esegui Test",
+      "retestTest": "Ripeti Test"
     },
     "aiProvider": {
       "noProviderConfigured": "Nessun provider configurato",

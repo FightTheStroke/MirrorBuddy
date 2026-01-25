@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Timeline View
@@ -7,12 +7,13 @@
  * Phase 7: Task 7.11
  */
 
-import { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { MaterialCard, type Material } from '../components/material-card';
-import type { KnowledgeHubMaterial } from './explorer-view';
+import { useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { Calendar } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { MaterialCard, type Material } from "../components/material-card";
+import type { KnowledgeHubMaterial } from "./explorer-view";
 
 /** Convert KnowledgeHubMaterial to Material for MaterialCard */
 function toMaterial(m: KnowledgeHubMaterial): Material {
@@ -20,8 +21,10 @@ function toMaterial(m: KnowledgeHubMaterial): Material {
     id: m.id,
     title: m.title,
     type: m.toolType,
-    createdAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
-    updatedAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
+    createdAt:
+      m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
+    updatedAt:
+      m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
     collectionId: m.collectionId,
     isFavorite: m.isFavorite,
     isArchived: m.isArchived,
@@ -44,34 +47,6 @@ interface TimelineGroup {
   materials: KnowledgeHubMaterial[];
 }
 
-function formatDateLabel(date: Date): string {
-  const now = new Date();
-  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const yesterday = new Date(today.getTime() - 86400000);
-  const materialDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-
-  if (materialDate.getTime() === today.getTime()) {
-    return 'Oggi';
-  }
-  if (materialDate.getTime() === yesterday.getTime()) {
-    return 'Ieri';
-  }
-
-  const diffDays = Math.floor((today.getTime() - materialDate.getTime()) / 86400000);
-  if (diffDays < 7) {
-    return date.toLocaleDateString('it-IT', { weekday: 'long' });
-  }
-  if (diffDays < 30) {
-    return `${Math.floor(diffDays / 7)} settimane fa`;
-  }
-
-  return date.toLocaleDateString('it-IT', {
-    day: 'numeric',
-    month: 'long',
-    year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined,
-  });
-}
-
 export function TimelineView({
   materials,
   onSelectMaterial,
@@ -80,6 +55,46 @@ export function TimelineView({
   onToggleMaterialSelection,
   className,
 }: TimelineViewProps) {
+  const t = useTranslations("education.knowledge-hub");
+
+  const formatDateLabel = useCallback(
+    (date: Date): string => {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const yesterday = new Date(today.getTime() - 86400000);
+      const materialDate = new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate(),
+      );
+
+      if (materialDate.getTime() === today.getTime()) {
+        return t("timeline-view.today");
+      }
+      if (materialDate.getTime() === yesterday.getTime()) {
+        return t("timeline-view.yesterday");
+      }
+
+      const diffDays = Math.floor(
+        (today.getTime() - materialDate.getTime()) / 86400000,
+      );
+      if (diffDays < 7) {
+        return date.toLocaleDateString("it-IT", { weekday: "long" });
+      }
+      if (diffDays < 30) {
+        const weeks = Math.floor(diffDays / 7);
+        return t("timeline-view.weeks-ago", { count: weeks });
+      }
+
+      return date.toLocaleDateString("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: date.getFullYear() !== now.getFullYear() ? "numeric" : undefined,
+      });
+    },
+    [t],
+  );
+
   // Group materials by date
   const groups = useMemo<TimelineGroup[]>(() => {
     const groupMap = new Map<string, KnowledgeHubMaterial[]>();
@@ -91,7 +106,7 @@ export function TimelineView({
 
     sorted.forEach((material) => {
       const date = new Date(material.createdAt);
-      const key = date.toISOString().split('T')[0]; // YYYY-MM-DD
+      const key = date.toISOString().split("T")[0]; // YYYY-MM-DD
 
       if (!groupMap.has(key)) {
         groupMap.set(key, []);
@@ -104,10 +119,10 @@ export function TimelineView({
       label: formatDateLabel(new Date(dateKey)),
       materials: mats,
     }));
-  }, [materials]);
+  }, [materials, formatDateLabel]);
 
   return (
-    <div className={cn('p-4', className)}>
+    <div className={cn("p-4", className)}>
       <AnimatePresence mode="popLayout">
         {groups.length === 0 ? (
           <motion.div
@@ -115,7 +130,7 @@ export function TimelineView({
             animate={{ opacity: 1 }}
             className="flex items-center justify-center h-64 text-slate-400"
           >
-            Nessun materiale trovato
+            {t("timeline-view.no-materials")}
           </motion.div>
         ) : (
           <div className="relative">
@@ -141,7 +156,10 @@ export function TimelineView({
                         {group.label}
                       </h3>
                       <p className="text-sm text-slate-500">
-                        {group.materials.length} material{group.materials.length !== 1 ? 'i' : 'e'}
+                        {group.materials.length}{" "}
+                        {group.materials.length !== 1
+                          ? t("timeline-view.material-plural")
+                          : t("timeline-view.material-singular")}
                       </p>
                     </div>
                   </div>
@@ -160,7 +178,8 @@ export function TimelineView({
                           onOpen={() => onSelectMaterial(material)}
                           onFindSimilar={
                             onFindSimilar
-                              ? () => onFindSimilar(material.toolId ?? material.id)
+                              ? () =>
+                                  onFindSimilar(material.toolId ?? material.id)
                               : undefined
                           }
                           isSelected={selectedMaterialIds.has(material.id)}

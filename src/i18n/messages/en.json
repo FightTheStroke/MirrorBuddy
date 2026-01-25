@@ -158,9 +158,30 @@
       "title": "Learn to Type",
       "description": "The \"Learn to Type\" tool is under development.",
       "features": "Features",
+      "featureList": {
+        "progressive": "Progressive lessons (beginner, intermediate, advanced)",
+        "multilingual": "Multi-language virtual keyboard (QWERTY, AZERTY, QWERTZ, Dvorak)",
+        "singleHand": "Single-hand mode (right/left)",
+        "accessibility": "Complete accessibility for 7 DSA profiles",
+        "games": "Fun games for practice",
+        "tracking": "WPM and accuracy tracking",
+        "ai": "Integration with AI Maestri"
+      },
       "recommendedLesson": "Recommended lesson:",
-      "noLesson": "None",
-      "level": "Level:"
+      "none": "None",
+      "level": "Level:",
+      "speedGame": {
+        "instructions": "Type words as quickly as possible. You have 60 seconds!",
+        "startButton": "Start Game",
+        "scoreLabel": "Points",
+        "wordsLabel": "Words"
+      },
+      "lessonSelector": {
+        "title": "Lessons {level}",
+        "completed": "completed",
+        "completedBadge": "Completed",
+        "inProgress": "In Progress"
+      }
     },
     "search": {
       "noResults": "No results found for \"{query}\"",
@@ -342,7 +363,27 @@
       "in-progress-legend": "In Progress",
       "completed-legend": "Completed",
       "visual-title": "Learning Path",
-      "topics-completed-count": "topics completed"
+      "topics-completed-count": "topics completed",
+      "loading-path": "Loading learning path...",
+      "path-not-found": "Learning path not found",
+      "back": "Go back",
+      "topics": "topics",
+      "continue-with": "Continue with",
+      "next-topic": "Next topic",
+      "continue": "Continue",
+      "start": "Start",
+      "topics-header": "Topics",
+      "loading-paths": "Loading learning paths...",
+      "no-paths-created": "No learning paths created yet",
+      "no-paths-description": "Upload a PDF to Study Kit and generate your first progressive learning path!",
+      "go-to-study-kit": "Go to Study Kit",
+      "path-singular": "path",
+      "path-plural": "paths",
+      "learning-paths": "learning",
+      "completed-topics": "completed",
+      "status-completed": "Completed",
+      "status-in-progress": "In Progress",
+      "status-not-started": "Not Started"
     },
     "parent-dashboard": {
       "quiz": {
@@ -1458,11 +1499,42 @@
       "title": "Notifications"
     },
     "privacy": {
-      "title": "Privacy"
+      "title": "Privacy",
+      "reviewAndModifyConsents": "Review and modify consents",
+      "noConsentFound": "No consent found. You will receive the request on next login.",
+      "privacyAndSecurity": "Privacy and Security",
+      "yourDataIsSafe": "Your data is safe. MirrorBuddy is designed with children's privacy in mind and complies with COPPA and GDPR regulations.",
+      "yourDataIsProtected": "Your data is protected",
+      "dataStoredLocally": "Data is stored locally on your device",
+      "noDataShared": "No data is shared with third parties",
+      "conversationsNotRecorded": "Conversations are not recorded",
+      "deleteDataAnytime": "You can delete your data anytime",
+      "deleteAllData": "Delete all my data",
+      "telemetryAndAnalytics": "Telemetry and Analytics",
+      "anonymousDataHelps": "Anonymous data helps us improve MirrorBuddy. No personal data is collected.",
+      "sendAnonymousData": "Send anonymous data"
     },
     "ambientAudio": {
       "title": "Ambient Audio for Study",
-      "description": "Ambient audio can improve focus and study effectiveness. Choose from white noise, binaural beats for various focus modes, or natural soundscapes to create the perfect environment for your learning."
+      "description": "Ambient audio can improve focus and study effectiveness. Choose from white noise, binaural beats for various focus modes, or natural soundscapes to create the perfect environment for your learning.",
+      "futureVideoFeatures": "For future video features"
+    },
+    "diagnostics": {
+      "platformHelp": "Platform Help",
+      "helpWithConfiguration": "Need help with configuration or having technical issues? You can ask your Coach: they know all of MirrorBuddy's features!",
+      "troubleshooting": "Troubleshooting",
+      "chatNotWorking": "Chat not working?",
+      "chatNotWorkingDescription": "Verify that Azure OpenAI or Ollama are configured. Check .env variables and server logs.",
+      "voiceNotWorking": "Voice not working?",
+      "voiceNotWorkingDescription": "Voice requires Azure OpenAI Realtime API (AZURE_OPENAI_REALTIME_*). Ollama does not support voice.",
+      "microphoneBlocked": "Microphone blocked?",
+      "microphoneBlockedDescription": "Click the lock icon in your browser's URL bar and enable microphone permission.",
+      "audioNotHeard": "Audio not heard?",
+      "audioNotHeardDescription": "Check your system volume. If using Chrome, it may block autoplay audio - click on the page first.",
+      "waveformVisualization": "Waveform Visualization",
+      "noMicrophoneFound": "No microphone found",
+      "runTest": "Run Test",
+      "retestTest": "Retry Test"
     },
     "aiProvider": {
       "noProviderConfigured": "No provider configured",

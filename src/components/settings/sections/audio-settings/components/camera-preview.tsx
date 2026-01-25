@@ -2,10 +2,12 @@
  * Camera preview component
  */
 
-'use client';
+"use client";
 
-import { Video, RefreshCw, XCircle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useTranslations } from "next-intl";
+
+import { Video, RefreshCw, XCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface CameraPreviewProps {
   preferredCameraId: string | null;
@@ -28,6 +30,8 @@ export function CameraPreview({
   onStartTest,
   onStopTest,
 }: CameraPreviewProps) {
+  const t = useTranslations("settings.ambientAudio");
+
   return (
     <div className="space-y-4">
       {/* Large video preview */}
@@ -41,7 +45,9 @@ export function CameraPreview({
         {!camTestActive && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
             <Video className="w-12 h-12 text-slate-600" />
-            <span className="text-sm text-slate-500">Clicca &quot;Testa&quot; per vedere l&apos;anteprima</span>
+            <span className="text-sm text-slate-500">
+              Clicca &quot;Testa&quot; per vedere l&apos;anteprima
+            </span>
           </div>
         )}
         {camTestActive && (
@@ -55,7 +61,7 @@ export function CameraPreview({
       {/* Controls row */}
       <div className="flex items-center gap-4">
         <select
-          value={preferredCameraId || ''}
+          value={preferredCameraId || ""}
           onChange={(e) => onCamChange(e.target.value)}
           className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
         >
@@ -66,7 +72,12 @@ export function CameraPreview({
             </option>
           ))}
         </select>
-        <Button onClick={onRefresh} variant="outline" size="sm" title="Aggiorna dispositivi">
+        <Button
+          onClick={onRefresh}
+          variant="outline"
+          size="sm"
+          title="Aggiorna dispositivi"
+        >
           <RefreshCw className="w-4 h-4" />
         </Button>
         {!camTestActive ? (
@@ -82,7 +93,7 @@ export function CameraPreview({
         )}
       </div>
       <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-        Per future funzionalità video
+        {t("futureVideoFeatures")}
       </p>
     </div>
   );

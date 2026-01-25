@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { FileText, ZoomIn, ZoomOut, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { MAX_PDF_PAGES } from '@/lib/pdf';
-import type { ViewMode } from './use-pdf-preview';
+import { useTranslations } from "next-intl";
+import { FileText, ZoomIn, ZoomOut, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MAX_PDF_PAGES } from "@/lib/pdf";
+import type { ViewMode } from "./use-pdf-preview";
 
 interface PDFPreviewHeaderProps {
   fileName: string;
@@ -26,6 +27,8 @@ export function PDFPreviewHeader({
   onZoomOut,
   onClose,
 }: PDFPreviewHeaderProps) {
+  const t = useTranslations("tools.pdf.preview");
+
   return (
     <div className="p-4 border-b border-slate-700 flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -36,10 +39,10 @@ export function PDFPreviewHeader({
           <h3 className="font-semibold">{fileName}</h3>
           {totalPages !== undefined && (
             <p className="text-sm text-slate-400">
-              {totalPages} pagin{totalPages === 1 ? 'a' : 'e'}
+              {totalPages} {totalPages === 1 ? t("page") : t("pages")}
               {truncated && (
                 <span className="text-amber-400 ml-2">
-                  (mostrate le prime {MAX_PDF_PAGES})
+                  ({t("truncated-info")} {MAX_PDF_PAGES})
                 </span>
               )}
             </p>
@@ -48,7 +51,7 @@ export function PDFPreviewHeader({
       </div>
 
       <div className="flex items-center gap-2">
-        {viewMode === 'preview' && (
+        {viewMode === "preview" && (
           <>
             <Button
               variant="outline"

@@ -10,6 +10,7 @@
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Mic, MicOff, PhoneOff } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
 import { TransportStatusIndicator } from "@/components/voice/components/TransportStatusIndicator";
@@ -55,13 +56,16 @@ export function VoicePanel({
   onToggleMute,
   onEndCall,
 }: VoicePanelProps) {
+  const t = useTranslations("voice");
+
   const getStatusText = () => {
     if (configError) return configError;
-    if (connectionState === "connecting") return "Connessione...";
-    if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
-    if (isConnected && isListening) return "In ascolto...";
-    if (isConnected) return "Connesso";
-    return "Avvio chiamata...";
+    if (connectionState === "connecting") return t("panel.connecting");
+    if (isConnected && isSpeaking)
+      return t("panel.speaking", { name: character.name });
+    if (isConnected && isListening) return t("panel.listening");
+    if (isConnected) return t("panel.connected");
+    return t("panel.startingCall");
   };
 
   const backgroundStyle = isHexColor(character.color)
@@ -196,7 +200,9 @@ export function VoicePanel({
             variant="ghost"
             size="icon"
             onClick={onToggleMute}
-            aria-label={isMuted ? "Attiva microfono" : "Disattiva microfono"}
+            aria-label={
+              isMuted ? t("panel.mutedLabel") : t("panel.unmuteLabel")
+            }
             className={cn(
               "rounded-full w-12 h-12 transition-colors",
               isMuted
@@ -224,7 +230,7 @@ export function VoicePanel({
 
       {isConnected && (
         <p className="text-xs text-white/60" aria-live="polite" role="status">
-          {isMuted ? "Microfono disattivato" : "Parla ora..."}
+          {isMuted ? t("panel.microphoneDisabled") : t("panel.speakNow")}
         </p>
       )}
     </motion.div>

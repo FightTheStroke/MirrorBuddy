@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Knowledge Hub Sidebar Navigation
@@ -7,7 +7,8 @@
  * WCAG 2.1 AA compliant with proper focus management.
  */
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   Folder,
   FolderOpen,
@@ -16,9 +17,9 @@ import {
   Star,
   Archive,
   Plus,
-} from 'lucide-react';
-import { NavItem } from './nav-item';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { NavItem } from "./nav-item";
+import { cn } from "@/lib/utils";
 
 export interface Collection {
   id: string;
@@ -78,6 +79,7 @@ export function SidebarNavigation({
   onToggleArchived,
   className,
 }: SidebarNavigationProps) {
+  const t = useTranslations("education.knowledge-hub");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpanded = useCallback((id: string) => {
@@ -118,7 +120,7 @@ export function SidebarNavigation({
         {hasChildren && isExpanded && (
           <div role="group">
             {collection.children!.map((child) =>
-              renderCollection(child, level + 1)
+              renderCollection(child, level + 1),
             )}
           </div>
         )}
@@ -128,31 +130,33 @@ export function SidebarNavigation({
 
   return (
     <nav
-      className={cn('flex flex-col gap-4 p-4', className)}
-      aria-label="Navigazione materiali"
+      className={cn("flex flex-col gap-4 p-4", className)}
+      aria-label={t("sidebar.navigation-aria-label")}
     >
       {/* Quick filters */}
       <section>
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">
-          Filtri rapidi
+          {t("sidebar.quick-filters-title")}
         </h2>
-        <div role="tree" aria-label="Filtri">
+        <div role="tree" aria-label={t("sidebar.quick-filters-aria-label")}>
           <NavItem
             icon={<Clock className="w-4 h-4" />}
-            label="Recenti"
-            isSelected={selectedCollectionId === null && selectedTagIds.length === 0}
+            label={t("sidebar.recent")}
+            isSelected={
+              selectedCollectionId === null && selectedTagIds.length === 0
+            }
             onClick={() => onSelectCollection(null)}
           />
           <NavItem
             icon={<Star className="w-4 h-4" />}
-            label="Preferiti"
-            isSelected={selectedCollectionId === 'favorites'}
-            onClick={() => onSelectCollection('favorites')}
+            label={t("sidebar.favorites")}
+            isSelected={selectedCollectionId === "favorites"}
+            onClick={() => onSelectCollection("favorites")}
           />
           {onToggleArchived && (
             <NavItem
               icon={<Archive className="w-4 h-4" />}
-              label="Archiviati"
+              label={t("sidebar.archived")}
               isSelected={showArchived}
               onClick={onToggleArchived}
             />
@@ -164,26 +168,26 @@ export function SidebarNavigation({
       <section>
         <div className="flex items-center justify-between mb-2 px-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Cartelle
+            {t("sidebar.collections-title")}
           </h2>
           {onCreateCollection && (
             <button
               onClick={onCreateCollection}
               className={cn(
-                'p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700',
-                'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
-                'focus:outline-none focus:ring-2 focus:ring-accent-themed'
+                "p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700",
+                "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300",
+                "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               )}
-              aria-label="Crea nuova cartella"
+              aria-label={t("sidebar.create-collection-aria-label")}
             >
               <Plus className="w-4 h-4" />
             </button>
           )}
         </div>
-        <div role="tree" aria-label="Cartelle">
+        <div role="tree" aria-label={t("sidebar.collections-aria-label")}>
           {collections.length === 0 ? (
             <p className="px-3 py-2 text-sm text-slate-500">
-              Nessuna cartella
+              {t("sidebar.no-collections")}
             </p>
           ) : (
             collections.map((c) => renderCollection(c))
@@ -195,37 +199,41 @@ export function SidebarNavigation({
       <section>
         <div className="flex items-center justify-between mb-2 px-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            Tag
+            {t("sidebar.tags-title")}
           </h2>
           {onCreateTag && (
             <button
               onClick={onCreateTag}
               className={cn(
-                'p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700',
-                'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300',
-                'focus:outline-none focus:ring-2 focus:ring-accent-themed'
+                "p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-700",
+                "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300",
+                "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               )}
-              aria-label="Crea nuovo tag"
+              aria-label={t("sidebar.create-tag-aria-label")}
             >
               <Plus className="w-4 h-4" />
             </button>
           )}
         </div>
-        <div className="flex flex-wrap gap-2 px-3" role="group" aria-label="Tag">
+        <div
+          className="flex flex-wrap gap-2 px-3"
+          role="group"
+          aria-label={t("sidebar.tags-aria-label")}
+        >
           {tags.length === 0 ? (
-            <p className="text-sm text-slate-500">Nessun tag</p>
+            <p className="text-sm text-slate-500">{t("sidebar.no-tags")}</p>
           ) : (
             tags.map((tag) => (
               <button
                 key={tag.id}
                 onClick={() => onToggleTag(tag.id)}
                 className={cn(
-                  'inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs',
-                  'transition-colors',
-                  'focus:outline-none focus:ring-2 focus:ring-accent-themed',
+                  "inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs",
+                  "transition-colors",
+                  "focus:outline-none focus:ring-2 focus:ring-accent-themed",
                   selectedTagIds.includes(tag.id)
-                    ? 'bg-accent-themed text-white'
-                    : 'bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                    ? "bg-accent-themed text-white"
+                    : "bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600",
                 )}
                 role="checkbox"
                 aria-checked={selectedTagIds.includes(tag.id)}
