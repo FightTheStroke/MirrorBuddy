@@ -80,7 +80,8 @@ We use a manual API route instead: `src/app/monitoring/route.ts`
 The route:
 
 - Receives Sentry envelope POST requests
-- Validates project ID against allowlist (prevents abuse)
+- Extracts allowed project ID from `NEXT_PUBLIC_SENTRY_DSN` (no hardcoding)
+- Validates incoming project ID matches configured DSN (prevents abuse)
 - Forwards to Sentry's ingest endpoint
 - Silently fails if Sentry is down (doesn't break the app)
 
