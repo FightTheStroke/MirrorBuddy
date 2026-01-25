@@ -252,8 +252,8 @@ For locale metrics to populate correctly:
 3. **Environment variables must be set**:
    ```bash
    GRAFANA_CLOUD_PROMETHEUS_URL=https://...
-   GRAFANA_CLOUD_PROMETHEUS_USER=<user_id>
-   GRAFANA_CLOUD_API_KEY=<api_key>
+   GRAFANA_CLOUD_PROMETHEUS_USER=your-user-id
+   GRAFANA_CLOUD_API_KEY=your-grafana-cloud-key
    ```
 
 ### Import to Grafana Cloud
