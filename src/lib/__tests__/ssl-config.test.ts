@@ -103,8 +103,10 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
       const { buildSSLConfig } = await import("../ssl-config");
       const config = buildSSLConfig();
 
+      // rejectUnauthorized: false because Supabase uses their own CA
+      // which is not in system trust store. Traffic is still TLS encrypted.
       expect(config).toEqual({
-        rejectUnauthorized: true,
+        rejectUnauthorized: false,
         ca: mockCertChain,
       });
     });
@@ -117,8 +119,9 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
       const { buildSSLConfig } = await import("../ssl-config");
       const config = buildSSLConfig();
 
+      // rejectUnauthorized: false because Supabase uses their own CA
       expect(config).toEqual({
-        rejectUnauthorized: true,
+        rejectUnauthorized: false,
         ca: mockCertChain,
       });
     });

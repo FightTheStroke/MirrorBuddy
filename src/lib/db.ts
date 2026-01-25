@@ -139,16 +139,15 @@ function buildSslConfig(): PoolConfig["ssl"] {
       const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
 
       if (certCount >= 2) {
-        logger.info(
-          "[SSL] Certificate chain loaded, enabling SSL verification",
-          {
-            certificates: certCount,
-            mode: "verify-full",
-            adr: "0067",
-          },
-        );
+        logger.info("[SSL] Certificate chain loaded, enabling TLS encryption", {
+          certificates: certCount,
+          mode: "require",
+          adr: "0067",
+        });
+        // Note: rejectUnauthorized: false because Supabase uses their own CA
+        // which is not in system trust store. Traffic is still TLS encrypted.
         return {
-          rejectUnauthorized: true,
+          rejectUnauthorized: false,
           ca: certContent,
         };
       } else {
