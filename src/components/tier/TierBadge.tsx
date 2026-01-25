@@ -70,7 +70,8 @@ export function TierBadge({
     md: "px-3 py-1.5 text-sm",
   };
 
-  const config = tierConfig[tier];
+  // Fallback to trial if tier is invalid/undefined (prevents TypeError)
+  const config = tierConfig[tier] ?? tierConfig.trial;
 
   return (
     <div

@@ -14,8 +14,8 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    expect(screen.getByText("Individui")).toBeInTheDocument();
-    expect(screen.getByText("Organizzazioni")).toBeInTheDocument();
+    expect(screen.getByText("Studenti & Famiglie")).toBeInTheDocument();
+    expect(screen.getByText("Scuole & Aziende")).toBeInTheDocument();
   });
 
   it("displays the correct active option when value is 'individuals'", () => {
@@ -23,7 +23,7 @@ describe("SegmentedToggle", () => {
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
     const individualsButton = screen.getByRole("tab", {
-      name: /individui/i,
+      name: /studenti.*famiglie/i,
     });
     expect(individualsButton).toHaveAttribute("aria-selected", "true");
   });
@@ -32,7 +32,7 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="organizations" onChange={onChange} />);
 
-    const orgsButton = screen.getByRole("tab", { name: /organizzazioni/i });
+    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
     expect(orgsButton).toHaveAttribute("aria-selected", "true");
   });
 
@@ -41,7 +41,7 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const orgsButton = screen.getByRole("tab", { name: /organizzazioni/i });
+    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
     await user.click(orgsButton);
 
     expect(onChange).toHaveBeenCalledWith("organizations");
@@ -53,7 +53,7 @@ describe("SegmentedToggle", () => {
     render(<SegmentedToggle value="organizations" onChange={onChange} />);
 
     const individualsButton = screen.getByRole("tab", {
-      name: /individui/i,
+      name: /studenti.*famiglie/i,
     });
     await user.click(individualsButton);
 
@@ -65,9 +65,9 @@ describe("SegmentedToggle", () => {
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
     const individualsButton = screen.getByRole("tab", {
-      name: /individui/i,
+      name: /studenti.*famiglie/i,
     });
-    const orgsButton = screen.getByRole("tab", { name: /organizzazioni/i });
+    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
 
     expect(individualsButton).toHaveAttribute("aria-selected");
     expect(orgsButton).toHaveAttribute("aria-selected");
@@ -79,9 +79,9 @@ describe("SegmentedToggle", () => {
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
     const individualsButton = screen.getByRole("tab", {
-      name: /individui/i,
+      name: /studenti.*famiglie/i,
     });
-    const orgsButton = screen.getByRole("tab", { name: /organizzazioni/i });
+    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
 
     individualsButton.focus();
     expect(individualsButton).toHaveFocus();
@@ -94,7 +94,7 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const button = screen.getByRole("tab", { name: /individui/i });
+    const button = screen.getByRole("tab", { name: /studenti.*famiglie/i });
     button.focus();
 
     // Check for focus ring or focus state styling
@@ -124,7 +124,7 @@ describe("SegmentedToggle", () => {
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
     const individualsButton = screen.getByRole("tab", {
-      name: /individui/i,
+      name: /studenti.*famiglie/i,
     });
     await user.click(individualsButton);
 

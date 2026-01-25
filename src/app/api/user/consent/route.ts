@@ -8,9 +8,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 const log = logger.child({ module: "api/user/consent" });
 
@@ -24,8 +24,9 @@ interface ConsentPayload {
 
 export async function POST(request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("mirrorbuddy-user-id")?.value;
+    // Use proper auth validation (handles signed cookies correctly)
+    const auth = await validateAuth();
+    const userId = auth.authenticated ? auth.userId : null;
 
     // Parse consent data
     const consent: ConsentPayload = await request.json();
@@ -82,8 +83,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(_request: NextRequest) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("mirrorbuddy-user-id")?.value;
+    // Use proper auth validation (handles signed cookies correctly)
+    const auth = await validateAuth();
+    const userId = auth.authenticated ? auth.userId : null;
 
     if (!userId) {
       return NextResponse.json({ consent: null });

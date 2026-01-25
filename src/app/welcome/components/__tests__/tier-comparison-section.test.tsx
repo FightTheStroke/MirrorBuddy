@@ -27,10 +27,10 @@ describe("TierComparisonSection", () => {
       // Toggle should be present
       expect(screen.getByRole("tablist")).toBeInTheDocument();
       expect(
-        screen.getByRole("tab", { name: /switch to individui/i }),
+        screen.getByRole("tab", { name: /studenti.*famiglie/i }),
       ).toBeInTheDocument();
       expect(
-        screen.getByRole("tab", { name: /switch to organizzazioni/i }),
+        screen.getByRole("tab", { name: /scuole.*aziende/i }),
       ).toBeInTheDocument();
     });
   });
@@ -78,7 +78,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
 
       fireEvent.click(organizationsTab);
@@ -97,7 +97,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -113,7 +113,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -133,7 +133,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -154,7 +154,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -168,7 +168,7 @@ describe("TierComparisonSection", () => {
       const { container } = render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -183,7 +183,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -201,7 +201,7 @@ describe("TierComparisonSection", () => {
 
       // Switch to organizations
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
       fireEvent.click(organizationsTab);
 
@@ -211,7 +211,7 @@ describe("TierComparisonSection", () => {
 
       // Switch back to individuals
       const individualsTab = screen.getByRole("tab", {
-        name: /switch to individui/i,
+        name: /studenti.*famiglie/i,
       });
       fireEvent.click(individualsTab);
 
@@ -226,10 +226,10 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const individualsTab = screen.getByRole("tab", {
-        name: /switch to individui/i,
+        name: /studenti.*famiglie/i,
       });
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
 
       // Individuals should be active by default
@@ -251,7 +251,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
 
       fireEvent.click(organizationsTab);
@@ -277,10 +277,10 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       const individualsTab = screen.getByRole("tab", {
-        name: /switch to individui/i,
+        name: /studenti.*famiglie/i,
       });
       const organizationsTab = screen.getByRole("tab", {
-        name: /switch to organizzazioni/i,
+        name: /scuole.*aziende/i,
       });
 
       // Both tabs should be keyboard accessible

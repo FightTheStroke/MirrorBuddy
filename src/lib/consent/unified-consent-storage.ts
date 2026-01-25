@@ -130,13 +130,17 @@ function migrateOldConsent(): void {
 
 /**
  * Sync consent to server (for audit trail)
+ * Uses csrfFetch for CSRF protection on POST requests
  */
 export async function syncUnifiedConsentToServer(
   consent: UnifiedConsentData,
 ): Promise<void> {
   try {
-    // Sync TOS acceptance
-    await fetch("/api/tos", {
+    // Dynamic import to avoid SSR issues
+    const { csrfFetch } = await import("@/lib/auth/csrf-client");
+
+    // Sync TOS acceptance (requires CSRF token)
+    await csrfFetch("/api/tos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -144,8 +148,8 @@ export async function syncUnifiedConsentToServer(
       }),
     });
 
-    // Sync cookie consent
-    await fetch("/api/user/consent", {
+    // Sync cookie consent (does not require CSRF but using csrfFetch is harmless)
+    await csrfFetch("/api/user/consent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
