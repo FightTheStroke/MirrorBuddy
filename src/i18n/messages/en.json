@@ -2642,5 +2642,82 @@
       "description": "Sticky Keys allows you to press modifier keys (Shift, Ctrl, Alt, Cmd) one at a time instead of holding them down.",
       "enableButton": "Enable Sticky Keys"
     }
+  },
+  "compliance": {
+    "pageTitle": "Compliance & Transparency",
+    "pageDescription": "MirrorBuddy is designed in compliance with European and Italian regulations on artificial intelligence and data protection.",
+    "complianceBadgeTitle": "Regulatory Compliance",
+    "publicDocuments": "Public Documents",
+    "technicalDocuments": "Technical Documentation",
+    "technicalDescription": "Detailed documentation available in the open source repository.",
+    "questionsTitle": "Questions about Compliance?",
+    "questionsDescription": "For questions about privacy, data protection, or AI compliance, contact us:",
+    "aiTransparency": "AI Transparency",
+    "aiTransparencyDesc": "How artificial intelligence works in MirrorBuddy and what data it uses",
+    "aiPolicy": "AI Policy",
+    "aiPolicyDesc": "Our ethical principles and safeguards for responsible AI use",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyDesc": "How we collect, use, and protect your personal data",
+    "termsOfService": "Terms of Service",
+    "termsDesc": "The conditions of use of the MirrorBuddy platform",
+    "cookiePolicy": "Cookie Policy",
+    "cookieDesc": "Which cookies we use and how to manage them",
+    "dpia": "DPIA",
+    "dpiaDesc": "Data Protection Impact Assessment (GDPR Art. 35)",
+    "modelCard": "Model Card",
+    "modelCardDesc": "Technical specifications of the AI system, performance and limitations",
+    "aiLiteracy": "AI Literacy",
+    "aiLiteracyDesc": "Educational guide on how AI works and how to use it critically",
+    "biasAudit": "Bias Audit Report",
+    "biasAuditDesc": "Fairness and non-discrimination analysis of the AI system",
+    "riskManagement": "Risk Management",
+    "riskManagementDesc": "Risk management framework and AI risk register"
+  },
+  "supporti": {
+    "pageTitle": "Backpack",
+    "errorTitle": "Something went wrong",
+    "reloadButton": "Reload page"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Unauthorized. Log in as admin.",
+      "loadingError": "Loading error",
+      "approvalError": "Error during approval",
+      "rejectionError": "Error during rejection",
+      "error": "Error",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "direct": "Direct (mine)",
+      "all": "All",
+      "directInvite": "Invite directly",
+      "refresh": "Refresh",
+      "approve": "Approve",
+      "reject": "Reject",
+      "rejectRequest": "Reject request",
+      "rejectionReason": "Rejection reason",
+      "optional": "Optional",
+      "cancel": "Cancel",
+      "confirmRejection": "Confirm rejection"
+    },
+    "locales": {
+      "search": "Search by country code, name, locale or maestro...",
+      "countryCode": "Country Code",
+      "countryName": "Country Name",
+      "primaryLocale": "Primary Locale",
+      "languageMaestro": "Language Maestro",
+      "secondaryLocales": "Secondary Locales",
+      "status": "Status",
+      "actions": "Actions",
+      "active": "Active",
+      "inactive": "Inactive",
+      "edit": "Edit",
+      "notFound": "No locale configuration found",
+      "summary": "{count} of {total} configurations"
+    },
+    "settings": {
+      "title": "Settings",
+      "subtitle": "MirrorBuddy system configuration"
+    }
   }
 }

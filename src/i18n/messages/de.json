@@ -2633,5 +2633,82 @@
       "description": "Sticky Keys ermöglicht es Ihnen, Änderungstasten (Umschalt, Strg, Alt, Cmd) einzeln zu drücken, anstatt sie gedrückt zu halten.",
       "enableButton": "Sticky Keys aktivieren"
     }
+  },
+  "compliance": {
+    "pageTitle": "Compliance und Transparenz",
+    "pageDescription": "MirrorBuddy ist so konzipiert, dass es die europäischen und italienischen Vorschriften zu künstlicher Intelligenz und Datenschutz einhält.",
+    "complianceBadgeTitle": "Behördliche Konformität",
+    "publicDocuments": "Öffentliche Dokumente",
+    "technicalDocuments": "Technische Dokumentation",
+    "technicalDescription": "Ausführliche Dokumentation im Open-Source-Repository verfügbar.",
+    "questionsTitle": "Fragen zur Compliance?",
+    "questionsDescription": "Bei Fragen zum Datenschutz, zur Datenschutz oder zur KI-Compliance kontaktieren Sie uns:",
+    "aiTransparency": "KI-Transparenz",
+    "aiTransparencyDesc": "Wie künstliche Intelligenz in MirrorBuddy funktioniert und welche Daten sie verwendet",
+    "aiPolicy": "KI-Richtlinie",
+    "aiPolicyDesc": "Unsere ethischen Prinzipien und Sicherheitsvorkehrungen für verantwortungsvolle KI-Nutzung",
+    "privacyPolicy": "Datenschutzrichtlinie",
+    "privacyPolicyDesc": "Wie wir Ihre personenbezogenen Daten erfassen, verwenden und schützen",
+    "termsOfService": "Nutzungsbedingungen",
+    "termsDesc": "Die Bedingungen für die Nutzung der MirrorBuddy-Plattform",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "cookieDesc": "Welche Cookies wir verwenden und wie Sie sie verwalten",
+    "dpia": "DPIA",
+    "dpiaDesc": "Datenschutz-Folgenabschätzung (DSGVO Art. 35)",
+    "modelCard": "Modellkarte",
+    "modelCardDesc": "Technische Spezifikationen des KI-Systems, Leistung und Einschränkungen",
+    "aiLiteracy": "KI-Alphabetisierung",
+    "aiLiteracyDesc": "Leitfaden zum Verständnis von KI und zur kritischen Nutzung",
+    "biasAudit": "Bias-Audit-Bericht",
+    "biasAuditDesc": "Fairness- und Nicht-Diskriminierungsanalyse des KI-Systems",
+    "riskManagement": "Risikomanagement",
+    "riskManagementDesc": "Risikomanagement-Framework und KI-Risikoregister"
+  },
+  "supporti": {
+    "pageTitle": "Rucksack",
+    "errorTitle": "Etwas ist schief gelaufen",
+    "reloadButton": "Seite neu laden"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Nicht autorisiert. Melden Sie sich als Administrator an.",
+      "loadingError": "Ladefehler",
+      "approvalError": "Fehler während der Genehmigung",
+      "rejectionError": "Fehler während der Ablehnung",
+      "error": "Fehler",
+      "pending": "Ausstehend",
+      "approved": "Genehmigt",
+      "rejected": "Abgelehnt",
+      "direct": "Direkt (meine)",
+      "all": "Alle",
+      "directInvite": "Direkt einladen",
+      "refresh": "Aktualisieren",
+      "approve": "Genehmigen",
+      "reject": "Ablehnen",
+      "rejectRequest": "Anfrage ablehnen",
+      "rejectionReason": "Ablehnungsgrund",
+      "optional": "Optional",
+      "cancel": "Abbrechen",
+      "confirmRejection": "Ablehnung bestätigen"
+    },
+    "locales": {
+      "search": "Nach Ländercode, Name, Locale oder Maestro suchen...",
+      "countryCode": "Ländercode",
+      "countryName": "Länder-Name",
+      "primaryLocale": "Primäres Gebietsschema",
+      "languageMaestro": "Sprach-Maestro",
+      "secondaryLocales": "Sekundäre Gebietsschemata",
+      "status": "Status",
+      "actions": "Aktionen",
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "edit": "Bearbeiten",
+      "notFound": "Keine Locale-Konfiguration gefunden",
+      "summary": "{count} von {total} Konfigurationen"
+    },
+    "settings": {
+      "title": "Einstellungen",
+      "subtitle": "MirrorBuddy-Systemkonfiguration"
+    }
   }
 }

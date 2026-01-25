@@ -3140,5 +3140,82 @@
       "description": "Sticky Keys permette di premere i tasti modificatori (Shift, Ctrl, Alt, Cmd) uno alla volta invece di tenerli premuti.",
       "enableButton": "Attiva Sticky Keys"
     }
+  },
+  "compliance": {
+    "pageTitle": "Compliance & Trasparenza",
+    "pageDescription": "MirrorBuddy è progettato nel rispetto delle normative europee e italiane sull'intelligenza artificiale e la protezione dei dati.",
+    "complianceBadgeTitle": "Conformità Normativa",
+    "publicDocuments": "Documenti Pubblici",
+    "technicalDocuments": "Documentazione Tecnica",
+    "technicalDescription": "Documentazione dettagliata disponibile nel repository open source.",
+    "questionsTitle": "Domande sulla Compliance?",
+    "questionsDescription": "Per domande sulla privacy, protezione dei dati o compliance AI, contattaci:",
+    "aiTransparency": "Trasparenza AI",
+    "aiTransparencyDesc": "Come funziona l'intelligenza artificiale in MirrorBuddy e quali dati utilizza",
+    "aiPolicy": "Politica AI",
+    "aiPolicyDesc": "I nostri principi etici e le garanzie per l'uso responsabile dell'IA",
+    "privacyPolicy": "Privacy Policy",
+    "privacyPolicyDesc": "Come raccogliamo, utilizziamo e proteggiamo i tuoi dati personali",
+    "termsOfService": "Termini di Servizio",
+    "termsDesc": "Le condizioni d'uso della piattaforma MirrorBuddy",
+    "cookiePolicy": "Cookie Policy",
+    "cookieDesc": "Quali cookie utilizziamo e come gestirli",
+    "dpia": "DPIA",
+    "dpiaDesc": "Valutazione d'impatto sulla protezione dei dati (GDPR Art. 35)",
+    "modelCard": "Model Card",
+    "modelCardDesc": "Specifiche tecniche del sistema AI, performance e limitazioni",
+    "aiLiteracy": "AI Literacy",
+    "aiLiteracyDesc": "Guida educativa su come funziona l'IA e come usarla criticamente",
+    "biasAudit": "Bias Audit Report",
+    "biasAuditDesc": "Analisi di fairness e non discriminazione del sistema AI",
+    "riskManagement": "Risk Management",
+    "riskManagementDesc": "Framework di gestione rischi e registro dei rischi AI"
+  },
+  "supporti": {
+    "pageTitle": "Zaino",
+    "errorTitle": "Qualcosa è andato storto",
+    "reloadButton": "Ricarica la pagina"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Non autorizzato. Effettua il login come admin.",
+      "loadingError": "Errore di caricamento",
+      "approvalError": "Errore durante l'approvazione",
+      "rejectionError": "Errore durante il rifiuto",
+      "error": "Errore",
+      "pending": "In attesa",
+      "approved": "Approvate",
+      "rejected": "Rifiutate",
+      "direct": "Diretti (miei)",
+      "all": "Tutte",
+      "directInvite": "Invita direttamente",
+      "refresh": "Aggiorna",
+      "approve": "Approva",
+      "reject": "Rifiuta",
+      "rejectRequest": "Rifiuta richiesta",
+      "rejectionReason": "Motivo del rifiuto",
+      "optional": "Opzionale",
+      "cancel": "Annulla",
+      "confirmRejection": "Conferma rifiuto"
+    },
+    "locales": {
+      "search": "Cerca per codice paese, nome, locale o maestro...",
+      "countryCode": "Codice Paese",
+      "countryName": "Nome Paese",
+      "primaryLocale": "Locale Primario",
+      "languageMaestro": "Maestro Lingua",
+      "secondaryLocales": "Locali Secondari",
+      "status": "Stato",
+      "actions": "Azioni",
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "edit": "Modifica",
+      "notFound": "Nessuna configurazione locale trovata",
+      "summary": "{count} di {total} configurazioni"
+    },
+    "settings": {
+      "title": "Impostazioni",
+      "subtitle": "Configurazione sistema MirrorBuddy"
+    }
   }
 }

@@ -2633,5 +2633,82 @@
       "description": "Sticky Keys vous permet d'appuyer sur les touches de modification (Maj, Ctrl, Alt, Cmd) une à la fois au lieu de les maintenir enfoncées.",
       "enableButton": "Activer Sticky Keys"
     }
+  },
+  "compliance": {
+    "pageTitle": "Conformité et Transparence",
+    "pageDescription": "MirrorBuddy est conçu en conformité avec les réglementations européennes et italiennes en matière d'intelligence artificielle et de protection des données.",
+    "complianceBadgeTitle": "Conformité Réglementaire",
+    "publicDocuments": "Documents Publics",
+    "technicalDocuments": "Documentation Technique",
+    "technicalDescription": "Documentation détaillée disponible dans le référentiel open source.",
+    "questionsTitle": "Questions sur la Conformité?",
+    "questionsDescription": "Pour des questions sur la confidentialité, la protection des données ou la conformité IA, contactez-nous:",
+    "aiTransparency": "Transparence IA",
+    "aiTransparencyDesc": "Comment fonctionne l'intelligence artificielle dans MirrorBuddy et quelles données elle utilise",
+    "aiPolicy": "Politique IA",
+    "aiPolicyDesc": "Nos principes éthiques et garanties pour une utilisation responsable de l'IA",
+    "privacyPolicy": "Politique de Confidentialité",
+    "privacyPolicyDesc": "Comment nous collectons, utilisons et protégeons vos données personnelles",
+    "termsOfService": "Conditions d'Utilisation",
+    "termsDesc": "Les conditions d'utilisation de la plateforme MirrorBuddy",
+    "cookiePolicy": "Politique sur les Cookies",
+    "cookieDesc": "Quels cookies nous utilisons et comment les gérer",
+    "dpia": "DPIA",
+    "dpiaDesc": "Analyse d'impact sur la protection des données (RGPD Art. 35)",
+    "modelCard": "Fiche Technique du Modèle",
+    "modelCardDesc": "Spécifications techniques du système IA, performances et limitations",
+    "aiLiteracy": "Littératie IA",
+    "aiLiteracyDesc": "Guide éducatif sur le fonctionnement de l'IA et comment l'utiliser de manière critique",
+    "biasAudit": "Rapport d'Audit de Biais",
+    "biasAuditDesc": "Analyse d'équité et de non-discrimination du système IA",
+    "riskManagement": "Gestion des Risques",
+    "riskManagementDesc": "Cadre de gestion des risques et registre des risques IA"
+  },
+  "supporti": {
+    "pageTitle": "Cartable",
+    "errorTitle": "Quelque chose s'est mal passé",
+    "reloadButton": "Recharger la page"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "Non autorisé. Connectez-vous en tant qu'administrateur.",
+      "loadingError": "Erreur de chargement",
+      "approvalError": "Erreur lors de l'approbation",
+      "rejectionError": "Erreur lors du rejet",
+      "error": "Erreur",
+      "pending": "En attente",
+      "approved": "Approuvées",
+      "rejected": "Rejetées",
+      "direct": "Directs (miens)",
+      "all": "Toutes",
+      "directInvite": "Inviter directement",
+      "refresh": "Actualiser",
+      "approve": "Approuver",
+      "reject": "Rejeter",
+      "rejectRequest": "Rejeter la demande",
+      "rejectionReason": "Motif du rejet",
+      "optional": "Optionnel",
+      "cancel": "Annuler",
+      "confirmRejection": "Confirmer le rejet"
+    },
+    "locales": {
+      "search": "Rechercher par code pays, nom, locale ou maestro...",
+      "countryCode": "Code Pays",
+      "countryName": "Nom du Pays",
+      "primaryLocale": "Locale Principale",
+      "languageMaestro": "Maestro de Langue",
+      "secondaryLocales": "Locales Secondaires",
+      "status": "Statut",
+      "actions": "Actions",
+      "active": "Actif",
+      "inactive": "Inactif",
+      "edit": "Modifier",
+      "notFound": "Aucune configuration locale trouvée",
+      "summary": "{count} sur {total} configurations"
+    },
+    "settings": {
+      "title": "Paramètres",
+      "subtitle": "Configuration du système MirrorBuddy"
+    }
   }
 }
