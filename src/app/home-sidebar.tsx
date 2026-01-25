@@ -82,7 +82,7 @@ export function HomeSidebar({
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => handleViewChange("maestri")}
-            className="flex items-center gap-3 h-11 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-3 h-11 min-w-11 hover:opacity-80 transition-opacity"
             aria-label="Torna alla home"
           >
             <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">

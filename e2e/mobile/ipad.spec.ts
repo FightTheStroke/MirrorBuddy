@@ -307,17 +307,13 @@ test.describe("iPad Mini Responsive UX", () => {
     // Click at exact center (like Apple Pencil tap)
     await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2);
 
-    // Wait for animation
+    // Wait for animation to complete
     await mobile.waitForSidebarAnimation();
 
-    // Sidebar might collapse rather than hide on tablet
-    // Check that the close button is no longer visible (meaning sidebar closed/collapsed)
-    const closeButtonAfter = page
-      .locator('button[aria-label="Chiudi menu"]')
-      .first();
-    const closeStillVisible = await closeButtonAfter.isVisible();
-
-    // Close button should no longer be visible after clicking it
-    expect(closeStillVisible).toBe(false);
+    // After clicking toggle, the sidebar closes and aria-label changes from "Chiudi menu" to "Apri menu"
+    // Wait for the state change to propagate
+    await expect(
+      page.locator('button[aria-label="Apri menu"]').first(),
+    ).toBeVisible({ timeout: 3000 });
   });
 });
