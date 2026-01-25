@@ -2,11 +2,16 @@ import type { NextConfig } from "next";
 import packageJson from "./package.json";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
+import createNextIntlPlugin from "next-intl/plugin";
 
 // Bundle analyzer configuration (enabled via ANALYZE=true)
 const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
+
+// Next-intl plugin for internationalization
+// Points to the i18n request config file
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   // Enable standalone output for Docker deployment
@@ -192,7 +197,8 @@ const sentryConfig = {
 
 // Sentry wrapper can be disabled locally if causing build issues
 // Set DISABLE_SENTRY_BUILD=true to skip Sentry instrumentation
-const config = withBundleAnalyzer(nextConfig);
+// Note: Order matters - withNextIntl must wrap the final config for i18n to work
+const config = withNextIntl(withBundleAnalyzer(nextConfig));
 export default process.env.DISABLE_SENTRY_BUILD === "true"
   ? config
   : withSentryConfig(config, sentryConfig);

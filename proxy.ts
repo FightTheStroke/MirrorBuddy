@@ -1,12 +1,15 @@
 import createMiddleware from "next-intl/middleware";
-import { routing } from "./src/i18n/routing";
-import { isI18nEnabled } from "./src/lib/feature-flags/i18n-flags";
+import { defineRouting } from "next-intl/routing";
 import { NextRequest } from "next/server";
 
 /**
- * Internationalization Middleware
+ * Internationalization Proxy (Next.js 16+)
  *
  * F-63: i18n can be enabled/disabled per environment
+ *
+ * NOTE: In Next.js 16, middleware.ts was renamed to proxy.ts to clarify
+ * the network boundary. This file runs on Node.js runtime (not Edge).
+ * See: https://nextjs.org/docs/messages/middleware-to-proxy
  *
  * Handles locale detection and routing with the following priority:
  * 1. User preference (from NEXT_LOCALE cookie)
@@ -15,7 +18,7 @@ import { NextRequest } from "next/server";
  *
  * Supported locales: it, en, fr, de, es
  *
- * The middleware automatically:
+ * The proxy automatically:
  * - Detects user's preferred language from Accept-Language header
  * - Stores user's locale preference in NEXT_LOCALE cookie
  * - Redirects to localized URLs (e.g., /en/home, /it/chat)
@@ -23,17 +26,38 @@ import { NextRequest } from "next/server";
  *
  * Feature Flag (FEATURE_I18N_ENABLED):
  * - true: Apply full locale routing and detection
- * - false: Pass through without i18n middleware (default to single language)
+ * - false: Pass through without i18n proxy (default to single language)
  */
+
+// Routing configuration for next-intl
+// Inlined to avoid potential file tracing issues
+const routing = defineRouting({
+  locales: ["it", "en", "fr", "de", "es"],
+  defaultLocale: "it",
+  localePrefix: "always",
+  pathnames: {},
+});
+
 const intlMiddleware = createMiddleware(routing);
 
 /**
- * Conditionally apply i18n middleware based on feature flag
+ * Check if i18n feature is enabled
  */
-export default function middleware(request: NextRequest) {
+function isI18nEnabled(): boolean {
+  const envValue = process.env.FEATURE_I18N_ENABLED;
+  if (envValue === undefined) return true;
+  const normalized = envValue.toLowerCase().trim();
+  return normalized === "true" || normalized === "1" || normalized === "yes";
+}
+
+/**
+ * Proxy function for Next.js 16+
+ * Conditionally applies i18n routing based on feature flag
+ */
+export default function proxy(request: NextRequest) {
   // Check if i18n is enabled via environment variable
   if (!isI18nEnabled()) {
-    // If i18n is disabled, skip the middleware and let request pass through
+    // If i18n is disabled, skip the proxy and let request pass through
     return undefined;
   }
 
@@ -42,9 +66,9 @@ export default function middleware(request: NextRequest) {
 }
 
 /**
- * Matcher configuration for Next.js middleware
+ * Matcher configuration for Next.js proxy
  *
- * This middleware runs on all routes EXCEPT:
+ * This proxy runs on all routes EXCEPT:
  * - API routes (/api/*)
  * - Static files (_next/static/*)
  * - Internal Next.js routes (_next/*)

@@ -87,7 +87,7 @@ export async function generateStaticParams() {
 }
 
 /**
- * Enable revalidation for dynamic metadata
- * Revalidate every hour (3600 seconds)
+ * Force dynamic rendering for all localized pages
+ * This prevents SSR issues with useTranslations and browser-only hooks
  */
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
