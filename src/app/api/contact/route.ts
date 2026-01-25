@@ -106,7 +106,7 @@ export async function POST(
 
     // Validate email format - using simple non-backtracking regex to avoid ReDoS
     // Matches: local@domain.tld (basic validation, server-side)
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(body.email) || body.email.length > 254) {
       return NextResponse.json(
         { success: false, message: "Invalid email format" },
