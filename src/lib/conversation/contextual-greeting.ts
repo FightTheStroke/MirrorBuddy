@@ -2,12 +2,15 @@
 // CONTEXTUAL GREETING GENERATOR
 // Generates personalized greetings based on previous conversation summary
 // Part of Session Summary & Unified Archive feature
+// Supports per-feature AI config (ADR 0073)
 // ============================================================================
 
-import 'server-only';
-import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { getLastConversationSummary } from './summary-generator';
+import "server-only";
+import { chatCompletion, getActiveProvider } from "@/lib/ai/providers";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { tierService } from "@/lib/tier/tier-service";
+import { logger } from "@/lib/logger";
+import { getLastConversationSummary } from "./summary-generator";
 
 interface ContextualGreetingParams {
   studentName: string;
@@ -16,6 +19,7 @@ interface ContextualGreetingParams {
   previousSummary: string;
   previousTopics: string[];
   lastSessionDate: Date | null;
+  userId?: string; // For tier-based AI config (ADR 0073)
 }
 
 interface GreetingResult {
@@ -28,7 +32,7 @@ interface GreetingResult {
  * Format time elapsed since last session in Italian
  */
 function formatTimeSince(date: Date | null): string {
-  if (!date) return '';
+  if (!date) return "";
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
@@ -51,9 +55,16 @@ function formatTimeSince(date: Date | null): string {
  * Generate a contextual greeting based on previous conversation
  */
 export async function generateContextualGreeting(
-  params: ContextualGreetingParams
+  params: ContextualGreetingParams,
 ): Promise<string> {
-  const { studentName, maestroName, previousSummary, previousTopics, lastSessionDate } = params;
+  const {
+    studentName,
+    maestroName,
+    previousSummary,
+    previousTopics,
+    lastSessionDate,
+    userId,
+  } = params;
 
   const provider = getActiveProvider();
   if (!provider) {
@@ -62,7 +73,8 @@ export async function generateContextualGreeting(
   }
 
   const timeSince = formatTimeSince(lastSessionDate);
-  const topicsStr = previousTopics.length > 0 ? previousTopics.join(', ') : 'vari argomenti';
+  const topicsStr =
+    previousTopics.length > 0 ? previousTopics.join(", ") : "vari argomenti";
 
   const systemPrompt = `Sei ${maestroName}, un maestro educativo italiano per studenti con difficoltà di apprendimento.
 Genera un saluto breve e amichevole (max 2 frasi) che:
@@ -76,7 +88,7 @@ SEMPRE riferisciti a qualcosa di specifico dalla conversazione precedente.
 Usa un tono caldo ma rispettoso.`;
 
   const userPrompt = `Studente: ${studentName}
-Ultima sessione: ${timeSince || 'non specificato'}
+Ultima sessione: ${timeSince || "non specificato"}
 Argomenti trattati: ${topicsStr}
 
 Riassunto della conversazione precedente:
@@ -84,15 +96,29 @@ ${previousSummary}
 
 Genera un saluto contestuale:`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "chat",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     return result.content.trim();
   } catch (error) {
-    logger.error('Failed to generate contextual greeting', { error: String(error) });
+    logger.error("Failed to generate contextual greeting", {
+      error: String(error),
+    });
     // Fallback
     return `Ciao ${studentName}! Riprendiamo da dove eravamo rimasti?`;
   }
@@ -106,7 +132,7 @@ export async function getGreetingForCharacter(
   userId: string,
   characterId: string,
   studentName: string,
-  maestroName: string
+  maestroName: string,
 ): Promise<GreetingResult | null> {
   const lastSummary = await getLastConversationSummary(userId, characterId);
 
@@ -121,6 +147,7 @@ export async function getGreetingForCharacter(
     previousSummary: lastSummary.summary,
     previousTopics: lastSummary.topics,
     lastSessionDate: lastSummary.lastMessageAt,
+    userId, // Pass userId for tier-based AI config (ADR 0073)
   });
 
   return {
@@ -137,14 +164,16 @@ export async function generateGoodbyeMessage(
   studentName: string,
   maestroName: string,
   sessionTopics: string[],
-  sessionDuration: number // minutes
+  sessionDuration: number, // minutes
+  userId?: string, // For tier-based AI config (ADR 0073)
 ): Promise<string> {
   const provider = getActiveProvider();
   if (!provider) {
     return `Ottimo lavoro oggi, ${studentName}! A presto!`;
   }
 
-  const topicsStr = sessionTopics.length > 0 ? sessionTopics.join(', ') : 'vari argomenti';
+  const topicsStr =
+    sessionTopics.length > 0 ? sessionTopics.join(", ") : "vari argomenti";
 
   const systemPrompt = `Sei ${maestroName}, un maestro educativo italiano.
 Genera un breve messaggio di saluto a fine sessione (max 2 frasi) che:
@@ -160,15 +189,29 @@ Argomenti: ${topicsStr}
 
 Genera un saluto di fine sessione:`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "chat",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     return result.content.trim();
   } catch (error) {
-    logger.error('Failed to generate goodbye message', { error: String(error) });
+    logger.error("Failed to generate goodbye message", {
+      error: String(error),
+    });
     return `Ottimo lavoro oggi su ${topicsStr}, ${studentName}! A presto!`;
   }
 }

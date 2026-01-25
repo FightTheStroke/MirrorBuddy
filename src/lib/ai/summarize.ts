@@ -1,18 +1,13 @@
 // ============================================================================
 // LLM SUMMARIZATION & LEARNING EXTRACTION
 // Used to compress conversations and extract user insights
-// Supports per-feature model selection (ADR 0073)
+// Supports per-feature AI config (ADR 0073)
 // ============================================================================
 
 import { chatCompletion, getActiveProvider } from "./providers";
 import { getDeploymentForModel } from "./providers/deployment-mapping";
+import { tierService } from "@/lib/tier/tier-service";
 import { logger } from "@/lib/logger";
-
-/** Options for summarization functions */
-interface SummarizeOptions {
-  /** AI model to use (from tier system) */
-  model?: string;
-}
 
 interface Message {
   role: string;
@@ -35,11 +30,11 @@ interface Learning {
  * Generate a summary of conversation messages
  * Used when conversation gets too long to maintain context
  * @param messages - Messages to summarize
- * @param options - Optional model from tier system (ADR 0073)
+ * @param userId - User ID for tier-based AI config (ADR 0073)
  */
 export async function generateConversationSummary(
   messages: Message[],
-  options?: SummarizeOptions,
+  userId?: string,
 ): Promise<string> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -60,14 +55,21 @@ Usa un linguaggio chiaro e diretto.`;
 
 ${messages.map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`).join("\n\n")}`;
 
-  const deploymentName = options?.model
-    ? getDeploymentForModel(options.model)
-    : undefined;
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "summary",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
 
   const result = await chatCompletion(
     [{ role: "user", content: userPrompt }],
     systemPrompt,
-    { model: deploymentName },
+    {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    },
   );
 
   return result.content;
@@ -77,11 +79,11 @@ ${messages.map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.conten
  * Extract key facts from conversation
  * Identifies decisions, preferences, and what was learned
  * @param messages - Messages to analyze
- * @param options - Optional model from tier system (ADR 0073)
+ * @param userId - User ID for tier-based AI config (ADR 0073)
  */
 export async function extractKeyFacts(
   messages: Message[],
-  options?: SummarizeOptions,
+  userId?: string,
 ): Promise<KeyFacts> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -104,15 +106,22 @@ Max 3 elementi per categoria.`;
     .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
     .join("\n\n");
 
-  const deploymentName = options?.model
-    ? getDeploymentForModel(options.model)
-    : undefined;
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "summary",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
     const result = await chatCompletion(
       [{ role: "user", content: userPrompt }],
       systemPrompt,
-      { model: deploymentName },
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     // Parse JSON from response
@@ -131,11 +140,11 @@ Max 3 elementi per categoria.`;
  * Extract conversation topics
  * Returns list of main subjects discussed
  * @param messages - Messages to analyze
- * @param options - Optional model from tier system (ADR 0073)
+ * @param userId - User ID for tier-based AI config (ADR 0073)
  */
 export async function extractTopics(
   messages: Message[],
-  options?: SummarizeOptions,
+  userId?: string,
 ): Promise<string[]> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -153,15 +162,22 @@ Usa termini brevi e chiari.`;
     .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
     .join("\n\n");
 
-  const deploymentName = options?.model
-    ? getDeploymentForModel(options.model)
-    : undefined;
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "summary",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
     const result = await chatCompletion(
       [{ role: "user", content: userPrompt }],
       systemPrompt,
-      { model: deploymentName },
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     // Parse JSON array from response
@@ -182,13 +198,13 @@ Usa termini brevi e chiari.`;
  * @param messages - Messages to analyze
  * @param _maestroId - Maestro ID (unused but kept for API compatibility)
  * @param _subject - Subject (unused but kept for API compatibility)
- * @param options - Optional model from tier system (ADR 0073)
+ * @param userId - User ID for tier-based AI config (ADR 0073)
  */
 export async function extractLearnings(
   messages: Message[],
   _maestroId: string,
   _subject?: string,
-  options?: SummarizeOptions,
+  userId?: string,
 ): Promise<Learning[]> {
   const provider = getActiveProvider();
   if (!provider) {
@@ -220,15 +236,22 @@ Regole:
     .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
     .join("\n\n");
 
-  const deploymentName = options?.model
-    ? getDeploymentForModel(options.model)
-    : undefined;
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "summary",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
 
   try {
     const result = await chatCompletion(
       [{ role: "user", content: userPrompt }],
       systemPrompt,
-      { model: deploymentName },
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     // Parse JSON array from response

@@ -2,11 +2,14 @@
 // MAESTRO EVALUATION
 // AI-generated evaluation of student session performance
 // Part of Session Summary & Unified Archive feature
+// Supports per-feature AI config (ADR 0073)
 // ============================================================================
 
-import { chatCompletion, getActiveProvider } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import { prisma } from '@/lib/db';
+import { chatCompletion, getActiveProvider } from "@/lib/ai/providers";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { tierService } from "@/lib/tier/tier-service";
+import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/db";
 
 interface Message {
   role: string;
@@ -33,13 +36,14 @@ export interface MaestroEvaluation {
  */
 export async function generateMaestroEvaluation(
   messages: Message[],
-  studentProfile?: StudentProfile
+  studentProfile?: StudentProfile,
+  userId?: string, // For tier-based AI config (ADR 0073)
 ): Promise<MaestroEvaluation> {
   const provider = getActiveProvider();
   if (!provider) {
     return {
       score: 5,
-      feedback: 'Valutazione non disponibile',
+      feedback: "Valutazione non disponibile",
       strengths: [],
       areasToImprove: [],
     };
@@ -48,12 +52,12 @@ export async function generateMaestroEvaluation(
   const profileInfo = studentProfile
     ? `
 Profilo studente:
-- Nome: ${studentProfile.name || 'Non specificato'}
-- Età: ${studentProfile.age || 'Non specificata'}
-- Anno scolastico: ${studentProfile.schoolYear || 'Non specificato'}
-- Livello: ${studentProfile.schoolLevel || 'Non specificato'}
+- Nome: ${studentProfile.name || "Non specificato"}
+- Età: ${studentProfile.age || "Non specificata"}
+- Anno scolastico: ${studentProfile.schoolYear || "Non specificato"}
+- Livello: ${studentProfile.schoolLevel || "Non specificato"}
 `
-    : '';
+    : "";
 
   const systemPrompt = `Sei un maestro che valuta una sessione di studio.
 Analizza la conversazione e fornisci una valutazione COSTRUTTIVA e INCORAGGIANTE.
@@ -83,17 +87,29 @@ IMPORTANTE:
 
   const conversationText = messages
     .slice(-30) // Limit to last 30 messages for evaluation
-    .map((m) => `${m.role === 'user' ? 'STUDENTE' : 'MAESTRO'}: ${m.content}`)
-    .join('\n\n');
+    .map((m) => `${m.role === "user" ? "STUDENTE" : "MAESTRO"}: ${m.content}`)
+    .join("\n\n");
 
   const userPrompt = `Valuta questa sessione di studio:
 
 ${conversationText}`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "chat",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   try {
     const result = await chatCompletion(
-      [{ role: 'user', content: userPrompt }],
-      systemPrompt
+      [{ role: "user", content: userPrompt }],
+      systemPrompt,
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     // Parse JSON from response
@@ -104,22 +120,26 @@ ${conversationText}`;
       // Validate and normalize
       return {
         score: Math.max(1, Math.min(10, Math.round(parsed.score))),
-        feedback: parsed.feedback || 'Buon lavoro!',
-        strengths: Array.isArray(parsed.strengths) ? parsed.strengths.slice(0, 3) : [],
+        feedback: parsed.feedback || "Buon lavoro!",
+        strengths: Array.isArray(parsed.strengths)
+          ? parsed.strengths.slice(0, 3)
+          : [],
         areasToImprove: Array.isArray(parsed.areasToImprove)
           ? parsed.areasToImprove.slice(0, 2)
           : [],
       };
     }
   } catch (error) {
-    logger.error('Failed to generate maestro evaluation', { error: String(error) });
+    logger.error("Failed to generate maestro evaluation", {
+      error: String(error),
+    });
   }
 
   // Fallback evaluation
   return {
     score: 6,
-    feedback: 'Hai fatto un buon lavoro in questa sessione!',
-    strengths: ['Hai partecipato attivamente'],
+    feedback: "Hai fatto un buon lavoro in questa sessione!",
+    strengths: ["Hai partecipato attivamente"],
     areasToImprove: [],
   };
 }
@@ -129,7 +149,7 @@ ${conversationText}`;
  */
 export async function saveSessionEvaluation(
   sessionId: string,
-  evaluation: MaestroEvaluation
+  evaluation: MaestroEvaluation,
 ): Promise<void> {
   await prisma.studySession.update({
     where: { id: sessionId },
@@ -141,7 +161,7 @@ export async function saveSessionEvaluation(
     },
   });
 
-  logger.info('Session evaluation saved', {
+  logger.info("Session evaluation saved", {
     sessionId,
     score: evaluation.score,
   });
@@ -153,10 +173,10 @@ export async function saveSessionEvaluation(
 export async function saveStudentRating(
   sessionId: string,
   rating: number,
-  feedback?: string
+  feedback?: string,
 ): Promise<void> {
   if (rating < 1 || rating > 5) {
-    throw new Error('Student rating must be between 1 and 5');
+    throw new Error("Student rating must be between 1 and 5");
   }
 
   await prisma.studySession.update({
@@ -167,7 +187,7 @@ export async function saveStudentRating(
     },
   });
 
-  logger.info('Student rating saved', {
+  logger.info("Student rating saved", {
     sessionId,
     rating,
   });
@@ -198,9 +218,11 @@ export async function getSessionEvaluation(sessionId: string): Promise<{
     maestro: session.maestroScore
       ? {
           score: session.maestroScore,
-          feedback: session.maestroFeedback || '',
+          feedback: session.maestroFeedback || "",
           strengths: session.strengths ? JSON.parse(session.strengths) : [],
-          areasToImprove: session.areasToImprove ? JSON.parse(session.areasToImprove) : [],
+          areasToImprove: session.areasToImprove
+            ? JSON.parse(session.areasToImprove)
+            : [],
         }
       : null,
     student: session.studentRating

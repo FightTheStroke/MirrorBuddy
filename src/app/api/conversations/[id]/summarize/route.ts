@@ -1,7 +1,7 @@
 // ============================================================================
 // API ROUTE: Conversation summarization
 // POST: Trigger LLM summarization of old messages
-// Supports per-feature model selection (ADR 0073)
+// AI config managed via tierService in called functions (ADR 0073)
 // ============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +9,6 @@ import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
 import {
   generateConversationSummary,
   extractKeyFacts,
@@ -80,23 +79,17 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       }),
     );
 
-    // Get tier-based model for summary feature (ADR 0073)
-    const summaryModel = await tierService.getModelForUserFeature(
-      userId,
-      "summary",
-    );
-    const modelOptions = { model: summaryModel };
-
     // Generate summary and extract insights in parallel
+    // Functions use tierService internally for AI config (ADR 0073)
     const [summary, keyFacts, topics, learnings] = await Promise.all([
-      generateConversationSummary(formattedMessages, modelOptions),
-      extractKeyFacts(formattedMessages, modelOptions),
-      extractTopics(formattedMessages, modelOptions),
+      generateConversationSummary(formattedMessages, userId),
+      extractKeyFacts(formattedMessages, userId),
+      extractTopics(formattedMessages, userId),
       extractLearnings(
         formattedMessages,
         conversation.maestroId,
         undefined, // subject not yet implemented
-        modelOptions,
+        userId,
       ),
     ]);
 
