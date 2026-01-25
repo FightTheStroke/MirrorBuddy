@@ -87,8 +87,8 @@ describe("Admin Button Groups - Mobile Responsive", () => {
       const buttons = container.querySelectorAll("button");
       expect(buttons.length).toBeGreaterThan(0);
       buttons.forEach((button) => {
-        // size="sm" should provide adequate height
-        expect(button).toHaveClass("h-9", "px-3");
+        // WCAG 2.5.5: minimum 44px (h-11) touch targets
+        expect(button).toHaveClass("h-11", "px-3");
       });
     });
   });
