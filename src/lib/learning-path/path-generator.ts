@@ -4,11 +4,13 @@
 // Plan 8 MVP - Wave 2: Learning Path Generation [F-11]
 // ============================================================================
 
-import { prisma } from '@/lib/db';
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import type { TopicAnalysisResult, IdentifiedTopic } from './topic-analyzer';
-import type { TopicWithRelations } from './material-linker';
+import { prisma } from "@/lib/db";
+import { chatCompletion } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import type { TopicAnalysisResult, IdentifiedTopic } from "./topic-analyzer";
+import type { TopicWithRelations } from "./material-linker";
 
 /**
  * Options for path generation
@@ -37,9 +39,9 @@ export interface GeneratedTopic {
   title: string;
   description: string;
   keyConcepts: string[];
-  difficulty: 'basic' | 'intermediate' | 'advanced';
+  difficulty: "basic" | "intermediate" | "advanced";
   order: number;
-  status: 'locked' | 'unlocked';
+  status: "locked" | "unlocked";
   estimatedMinutes: number;
   relatedMaterials: string; // JSON string
 }
@@ -50,9 +52,13 @@ export interface GeneratedTopic {
  */
 export async function generateVisualOverview(
   topics: IdentifiedTopic[],
-  title: string
+  title: string,
+  userId?: string,
 ): Promise<string> {
-  logger.info('Generating visual overview', { topicCount: topics.length, title });
+  logger.info("Generating visual overview", {
+    topicCount: topics.length,
+    title,
+  });
 
   // For 2-3 topics, use simple template
   if (topics.length <= 3) {
@@ -62,7 +68,7 @@ export async function generateVisualOverview(
   // For more topics, use AI to create a more meaningful diagram
   const topicSummary = topics
     .map((t, i) => `${i + 1}. ${t.title} (${t.estimatedDifficulty})`)
-    .join('\n');
+    .join("\n");
 
   const prompt = `Genera un diagramma Mermaid flowchart per questo percorso di studio.
 
@@ -82,27 +88,38 @@ ISTRUZIONI:
 Rispondi SOLO con il codice Mermaid, senza backticks o spiegazioni.`;
 
   try {
+    // Get AI config from tier (ADR 0073)
+    const aiConfig = await tierService.getFeatureAIConfigForUser(
+      userId ?? null,
+      "chart",
+    );
+    const deploymentName = getDeploymentForModel(aiConfig.model);
+
     const result = await chatCompletion(
-      [{ role: 'user', content: prompt }],
-      'Sei un esperto di visualizzazione dati. Genera diagrammi Mermaid puliti e leggibili.',
-      { temperature: 0.3, maxTokens: 500 }
+      [{ role: "user", content: prompt }],
+      "Sei un esperto di visualizzazione dati. Genera diagrammi Mermaid puliti e leggibili.",
+      {
+        temperature: aiConfig.temperature,
+        maxTokens: aiConfig.maxTokens,
+        model: deploymentName,
+      },
     );
 
     // Extract Mermaid code, removing any markdown fences
     const code = result.content
-      .replace(/```mermaid\n?/g, '')
-      .replace(/```\n?/g, '')
+      .replace(/```mermaid\n?/g, "")
+      .replace(/```\n?/g, "")
       .trim();
 
     // Validate it starts with flowchart
-    if (!code.startsWith('flowchart')) {
-      logger.warn('AI generated invalid Mermaid, using fallback');
+    if (!code.startsWith("flowchart")) {
+      logger.warn("AI generated invalid Mermaid, using fallback");
       return generateSimpleOverview(topics);
     }
 
     return code;
   } catch (error) {
-    logger.error('AI visual overview generation failed', undefined, error);
+    logger.error("AI visual overview generation failed", undefined, error);
     return generateSimpleOverview(topics);
   }
 }
@@ -117,7 +134,7 @@ function generateSimpleOverview(topics: IdentifiedTopic[]): string {
 
   const sortedTopics = [...topics].sort((a, b) => a.order - b.order);
 
-  let code = 'flowchart TD\n';
+  let code = "flowchart TD\n";
 
   // Add nodes
   sortedTopics.forEach((topic, index) => {
@@ -143,11 +160,11 @@ export async function createLearningPath(
   analysisResult: TopicAnalysisResult,
   topicsWithRelations: TopicWithRelations[],
   sourceStudyKitId?: string,
-  options: PathGenerationOptions = {}
+  options: PathGenerationOptions = {},
 ): Promise<GeneratedPath> {
   const { includeVisualOverview = true } = options;
 
-  logger.info('Creating learning path', {
+  logger.info("Creating learning path", {
     userId,
     title: analysisResult.documentTitle,
     topicCount: analysisResult.topics.length,
@@ -158,7 +175,8 @@ export async function createLearningPath(
   if (includeVisualOverview) {
     visualOverview = await generateVisualOverview(
       analysisResult.topics,
-      analysisResult.documentTitle
+      analysisResult.documentTitle,
+      userId,
     );
   }
 
@@ -173,22 +191,24 @@ export async function createLearningPath(
       completedTopics: 0,
       progressPercent: 0,
       estimatedMinutes: analysisResult.totalEstimatedMinutes,
-      status: 'ready',
+      status: "ready",
       visualOverview,
     },
   });
 
   // Prepare topic data for batch creation
   const topicData = topicsWithRelations.map((topicAnalysis) => {
-    const order = analysisResult.suggestedOrder.indexOf(topicAnalysis.id) + 1 || topicAnalysis.order;
-    const status = order === 1 ? 'unlocked' : 'locked';
+    const order =
+      analysisResult.suggestedOrder.indexOf(topicAnalysis.id) + 1 ||
+      topicAnalysis.order;
+    const status = order === 1 ? "unlocked" : "locked";
     const relatedMaterials = JSON.stringify(
       topicAnalysis.relatedMaterials.map((m) => ({
         id: m.id,
         title: m.title,
         toolType: m.toolType,
         relevanceScore: m.relevanceScore,
-      }))
+      })),
     );
 
     return {
@@ -210,7 +230,7 @@ export async function createLearningPath(
   // Fetch created topics to get IDs
   const createdTopics = await prisma.learningPathTopic.findMany({
     where: { pathId: path.id },
-    orderBy: { order: 'asc' },
+    orderBy: { order: "asc" },
   });
 
   // Build generated topics with actual IDs
@@ -221,15 +241,15 @@ export async function createLearningPath(
       title: topic.title,
       description: topic.description,
       keyConcepts: analysis?.keyConcepts || [],
-      difficulty: topic.difficulty as 'basic' | 'intermediate' | 'advanced',
+      difficulty: topic.difficulty as "basic" | "intermediate" | "advanced",
       order: topic.order,
-      status: topic.status as 'locked' | 'unlocked',
+      status: topic.status as "locked" | "unlocked",
       estimatedMinutes: topic.estimatedMinutes,
       relatedMaterials: topic.relatedMaterials,
     };
   });
 
-  logger.info('Learning path created', {
+  logger.info("Learning path created", {
     pathId: path.id,
     topicCount: generatedTopics.length,
   });
@@ -248,7 +268,7 @@ export async function createLearningPath(
  */
 export async function updateVisualOverview(
   pathId: string,
-  mermaidCode: string
+  mermaidCode: string,
 ): Promise<void> {
   await prisma.learningPath.update({
     where: { id: pathId },

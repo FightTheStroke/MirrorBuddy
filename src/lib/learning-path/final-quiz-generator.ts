@@ -4,9 +4,11 @@
 // Plan 8 MVP - Wave 2: Learning Path Generation [F-13]
 // ============================================================================
 
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import type { QuizData, QuizQuestion } from '@/types/tools';
+import { chatCompletion } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import type { QuizData, QuizQuestion } from "@/types/tools";
 
 /**
  * Topic summary for quiz generation
@@ -14,7 +16,7 @@ import type { QuizData, QuizQuestion } from '@/types/tools';
 export interface TopicSummary {
   title: string;
   keyConcepts: string[];
-  difficulty: 'basic' | 'intermediate' | 'advanced';
+  difficulty: "basic" | "intermediate" | "advanced";
 }
 
 /**
@@ -38,7 +40,7 @@ const DEFAULT_OPTIONS: Required<FinalQuizOptions> = {
  */
 function calculateQuestionDistribution(
   topics: TopicSummary[],
-  totalQuestions: number
+  totalQuestions: number,
 ): Map<string, number> {
   const distribution = new Map<string, number>();
 
@@ -59,7 +61,10 @@ function calculateQuestionDistribution(
       distribution.set(topic.title, remaining);
     } else {
       const weight = weights[topic.difficulty];
-      const count = Math.max(1, Math.round((weight / totalWeight) * totalQuestions));
+      const count = Math.max(
+        1,
+        Math.round((weight / totalWeight) * totalQuestions),
+      );
       distribution.set(topic.title, count);
       remaining -= count;
     }
@@ -75,11 +80,12 @@ function calculateQuestionDistribution(
 export async function generateFinalQuiz(
   pathTitle: string,
   topics: TopicSummary[],
-  options: FinalQuizOptions = {}
+  options: FinalQuizOptions = {},
+  userId?: string,
 ): Promise<QuizData> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
-  logger.info('Generating final quiz', {
+  logger.info("Generating final quiz", {
     pathTitle,
     topicCount: topics.length,
     totalQuestions: opts.totalQuestions,
@@ -100,10 +106,12 @@ export async function generateFinalQuiz(
   // Build topic summary for prompt
   const topicDetails = topics
     .map((t) => {
-      const qCount = distribution?.get(t.title) ?? Math.ceil(opts.totalQuestions / topics.length);
-      return `- ${t.title} (${t.difficulty}): ${qCount} domande\n  Concetti: ${t.keyConcepts.join(', ')}`;
+      const qCount =
+        distribution?.get(t.title) ??
+        Math.ceil(opts.totalQuestions / topics.length);
+      return `- ${t.title} (${t.difficulty}): ${qCount} domande\n  Concetti: ${t.keyConcepts.join(", ")}`;
     })
-    .join('\n');
+    .join("\n");
 
   const prompt = `Sei un tutor educativo. Crea un quiz finale di verifica per un percorso di apprendimento.
 
@@ -136,30 +144,46 @@ Rispondi SOLO con JSON valido:
   ]
 }`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "quiz",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   const result = await chatCompletion(
-    [{ role: 'user', content: prompt }],
-    'Sei un tutor educativo. Rispondi SOLO con JSON valido.',
-    { temperature: 0.7, maxTokens: 3000 }
+    [{ role: "user", content: prompt }],
+    "Sei un tutor educativo. Rispondi SOLO con JSON valido.",
+    {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    },
   );
 
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('Failed to parse final quiz JSON');
+    throw new Error("Failed to parse final quiz JSON");
   }
 
   const data = JSON.parse(jsonMatch[0]);
 
   // Validate and normalize
   const questions: QuizQuestion[] = data.questions.map(
-    (q: { question: string; options: string[]; correctIndex: number; explanation?: string }) => ({
+    (q: {
+      question: string;
+      options: string[];
+      correctIndex: number;
+      explanation?: string;
+    }) => ({
       question: String(q.question),
       options: q.options.map((o: string) => String(o)),
       correctIndex: Number(q.correctIndex),
       explanation: q.explanation ? String(q.explanation) : undefined,
-    })
+    }),
   );
 
-  logger.info('Final quiz generated', {
+  logger.info("Final quiz generated", {
     pathTitle,
     questionCount: questions.length,
   });
@@ -176,8 +200,13 @@ Rispondi SOLO con JSON valido:
  */
 export function evaluateQuizResults(
   quiz: QuizData,
-  answers: number[]
-): { score: number; passed: boolean; correctCount: number; totalCount: number } {
+  answers: number[],
+): {
+  score: number;
+  passed: boolean;
+  correctCount: number;
+  totalCount: number;
+} {
   if (quiz.questions.length === 0) {
     return { score: 100, passed: true, correctCount: 0, totalCount: 0 };
   }

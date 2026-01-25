@@ -4,9 +4,11 @@
 // Plan 8 MVP - Wave 2: Learning Path Generation [F-12]
 // ============================================================================
 
-import { chatCompletion } from '@/lib/ai/providers';
-import { logger } from '@/lib/logger';
-import type { FlashcardData, QuizData, MindmapData } from '@/types/tools';
+import { chatCompletion } from "@/lib/ai/providers";
+import { logger } from "@/lib/logger";
+import { tierService } from "@/lib/tier/tier-service";
+import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import type { FlashcardData, QuizData, MindmapData } from "@/types/tools";
 
 /**
  * Topic information for material generation
@@ -16,7 +18,7 @@ export interface TopicContext {
   description: string;
   keyConcepts: string[];
   textExcerpt: string;
-  difficulty: 'basic' | 'intermediate' | 'advanced';
+  difficulty: "basic" | "intermediate" | "advanced";
 }
 
 /**
@@ -49,15 +51,16 @@ const DEFAULT_OPTIONS: Required<MaterialGenerationOptions> = {
  */
 export async function generateTopicFlashcards(
   topic: TopicContext,
-  count: number = 5
+  count: number = 5,
+  userId?: string,
 ): Promise<FlashcardData> {
-  logger.info('Generating topic flashcards', { topic: topic.title, count });
+  logger.info("Generating topic flashcards", { topic: topic.title, count });
 
   const prompt = `Sei un tutor educativo. Crea ${count} flashcard per questo argomento.
 
 ARGOMENTO: ${topic.title}
 DESCRIZIONE: ${topic.description}
-CONCETTI CHIAVE: ${topic.keyConcepts.join(', ')}
+CONCETTI CHIAVE: ${topic.keyConcepts.join(", ")}
 DIFFICOLTÀ: ${topic.difficulty}
 
 TESTO DI RIFERIMENTO:
@@ -78,15 +81,26 @@ Rispondi SOLO con JSON valido:
   ]
 }`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "flashcards",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   const result = await chatCompletion(
-    [{ role: 'user', content: prompt }],
-    'Sei un tutor educativo. Rispondi SOLO con JSON valido.',
-    { temperature: 0.7, maxTokens: 1500 }
+    [{ role: "user", content: prompt }],
+    "Sei un tutor educativo. Rispondi SOLO con JSON valido.",
+    {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    },
   );
 
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('Failed to parse flashcards JSON');
+    throw new Error("Failed to parse flashcards JSON");
   }
 
   const data = JSON.parse(jsonMatch[0]);
@@ -105,15 +119,16 @@ Rispondi SOLO con JSON valido:
  */
 export async function generateTopicQuiz(
   topic: TopicContext,
-  questionCount: number = 3
+  questionCount: number = 3,
+  userId?: string,
 ): Promise<QuizData> {
-  logger.info('Generating topic quiz', { topic: topic.title, questionCount });
+  logger.info("Generating topic quiz", { topic: topic.title, questionCount });
 
   const prompt = `Sei un tutor educativo. Crea un mini-quiz con ${questionCount} domande su questo argomento.
 
 ARGOMENTO: ${topic.title}
 DESCRIZIONE: ${topic.description}
-CONCETTI CHIAVE: ${topic.keyConcepts.join(', ')}
+CONCETTI CHIAVE: ${topic.keyConcepts.join(", ")}
 DIFFICOLTÀ: ${topic.difficulty}
 
 TESTO DI RIFERIMENTO:
@@ -140,27 +155,43 @@ Rispondi SOLO con JSON valido:
   ]
 }`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "quiz",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   const result = await chatCompletion(
-    [{ role: 'user', content: prompt }],
-    'Sei un tutor educativo. Rispondi SOLO con JSON valido.',
-    { temperature: 0.7, maxTokens: 1500 }
+    [{ role: "user", content: prompt }],
+    "Sei un tutor educativo. Rispondi SOLO con JSON valido.",
+    {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    },
   );
 
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('Failed to parse quiz JSON');
+    throw new Error("Failed to parse quiz JSON");
   }
 
   const data = JSON.parse(jsonMatch[0]);
   return {
     topic: data.topic || topic.title,
     questions: data.questions.map(
-      (q: { question: string; options: string[]; correctIndex: number; explanation?: string }) => ({
+      (q: {
+        question: string;
+        options: string[];
+        correctIndex: number;
+        explanation?: string;
+      }) => ({
         question: String(q.question),
         options: q.options.map((o: string) => String(o)),
         correctIndex: Number(q.correctIndex),
         explanation: q.explanation ? String(q.explanation) : undefined,
-      })
+      }),
     ),
   };
 }
@@ -169,14 +200,17 @@ Rispondi SOLO con JSON valido:
  * Generate mindmap for a specific topic
  * [F-12] Materiali contestualizzati per topic
  */
-export async function generateTopicMindmap(topic: TopicContext): Promise<MindmapData> {
-  logger.info('Generating topic mindmap', { topic: topic.title });
+export async function generateTopicMindmap(
+  topic: TopicContext,
+  userId?: string,
+): Promise<MindmapData> {
+  logger.info("Generating topic mindmap", { topic: topic.title });
 
   const prompt = `Sei un tutor educativo. Crea una mappa mentale per questo argomento.
 
 ARGOMENTO: ${topic.title}
 DESCRIZIONE: ${topic.description}
-CONCETTI CHIAVE: ${topic.keyConcepts.join(', ')}
+CONCETTI CHIAVE: ${topic.keyConcepts.join(", ")}
 
 TESTO DI RIFERIMENTO:
 ${topic.textExcerpt.substring(0, 3000)}
@@ -197,26 +231,41 @@ Rispondi SOLO con JSON valido:
   ]
 }`;
 
+  // Get AI config from tier (ADR 0073)
+  const aiConfig = await tierService.getFeatureAIConfigForUser(
+    userId ?? null,
+    "mindmap",
+  );
+  const deploymentName = getDeploymentForModel(aiConfig.model);
+
   const result = await chatCompletion(
-    [{ role: 'user', content: prompt }],
-    'Sei un tutor educativo. Rispondi SOLO con JSON valido.',
-    { temperature: 0.7, maxTokens: 1000 }
+    [{ role: "user", content: prompt }],
+    "Sei un tutor educativo. Rispondi SOLO con JSON valido.",
+    {
+      temperature: aiConfig.temperature,
+      maxTokens: aiConfig.maxTokens,
+      model: deploymentName,
+    },
   );
 
   const jsonMatch = result.content.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
-    throw new Error('Failed to parse mindmap JSON');
+    throw new Error("Failed to parse mindmap JSON");
   }
 
   const data = JSON.parse(jsonMatch[0]);
   return {
     title: data.title || topic.title,
     nodes: data.nodes.map(
-      (n: { id: string | number; label: string; parentId?: string | number }) => ({
+      (n: {
+        id: string | number;
+        label: string;
+        parentId?: string | number;
+      }) => ({
         id: String(n.id),
         label: String(n.label),
         parentId: n.parentId ? String(n.parentId) : null,
-      })
+      }),
     ),
   };
 }
@@ -227,28 +276,29 @@ Rispondi SOLO con JSON valido:
  */
 export async function generateTopicMaterials(
   topic: TopicContext,
-  options: MaterialGenerationOptions = {}
+  options: MaterialGenerationOptions = {},
+  userId?: string,
 ): Promise<TopicMaterials> {
   const opts = { ...DEFAULT_OPTIONS, ...options };
 
-  logger.info('Generating all topic materials', {
+  logger.info("Generating all topic materials", {
     topic: topic.title,
     options: opts,
   });
 
   // Generate flashcards and quiz in parallel
   const [flashcards, quiz] = await Promise.all([
-    generateTopicFlashcards(topic, opts.flashcardCount),
-    generateTopicQuiz(topic, opts.quizQuestionCount),
+    generateTopicFlashcards(topic, opts.flashcardCount, userId),
+    generateTopicQuiz(topic, opts.quizQuestionCount, userId),
   ]);
 
   // Mindmap is optional
   let mindmap: MindmapData | undefined;
   if (opts.includeMindmap) {
-    mindmap = await generateTopicMindmap(topic);
+    mindmap = await generateTopicMindmap(topic, userId);
   }
 
-  logger.info('Topic materials generated', {
+  logger.info("Topic materials generated", {
     topic: topic.title,
     flashcardCount: flashcards.cards.length,
     quizQuestionCount: quiz.questions.length,
