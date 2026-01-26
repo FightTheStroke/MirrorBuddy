@@ -3,24 +3,27 @@
  *
  * Verifies that all hardcoded Italian strings in voice-panel.tsx
  * have corresponding translation keys in all 5 language files.
+ *
+ * Updated for namespace-based structure (ADR 0082)
  */
 
-import { readFileSync } from "fs";
+import { readFileSync, readdirSync } from "fs";
 import { resolve } from "path";
 import { describe, it, expect, beforeAll } from "vitest";
 
 type MessageFile = Record<string, any>;
 
 function getMessageFile(locale: string): MessageFile {
-  const path = resolve(
-    __dirname,
-    `../../..`,
-    "i18n",
-    "messages",
-    `${locale}.json`,
-  );
-  const content = readFileSync(path, "utf-8");
-  return JSON.parse(content);
+  // Load all namespace files and merge them
+  const localeDir = resolve(process.cwd(), "messages", locale);
+  const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
+
+  const merged: MessageFile = {};
+  for (const file of files) {
+    const content = readFileSync(resolve(localeDir, file), "utf-8");
+    Object.assign(merged, JSON.parse(content));
+  }
+  return merged;
 }
 
 describe("voice-panel i18n", () => {

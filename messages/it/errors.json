@@ -1,0 +1,100 @@
+{
+  "errors": {
+    "generic": "Si è verificato un errore",
+    "unknown": "Errore sconosciuto",
+    "network": "Errore di rete",
+    "timeout": "Timeout richiesta",
+    "notFound": "Non trovato",
+    "forbidden": "Accesso negato",
+    "unauthorized": "Non autorizzato",
+    "serverError": "Errore del server",
+    "badRequest": "Richiesta non valida",
+    "validation": "Errore di validazione",
+    "required": "Questo campo è obbligatorio",
+    "invalidFormat": "Formato non valido",
+    "tooShort": "Troppo corto",
+    "tooLong": "Troppo lungo",
+    "invalidEmail": "Email non valida",
+    "invalidUrl": "URL non valido",
+    "invalidPhone": "Numero di telefono non valido",
+    "invalidDate": "Data non valida",
+    "fileTooBig": "File troppo grande",
+    "fileTypeNotAllowed": "Tipo di file non consentito",
+    "uploadFailed": "Caricamento fallito",
+    "downloadFailed": "Download fallito",
+    "saveFailed": "Salvataggio fallito",
+    "deleteFailed": "Eliminazione fallita",
+    "loadFailed": "Caricamento fallito",
+    "tryAgain": "Riprova",
+    "contactSupport": "Contatta il supporto",
+    "notFoundPage": {
+      "title": "Pagina non trovata",
+      "description": "La pagina che stai cercando non esiste o è stata spostata.",
+      "backHome": "Torna alla Home"
+    }
+  },
+  "validation": {
+    "required": "Questo campo è obbligatorio",
+    "email": "Inserisci un indirizzo email valido",
+    "minLength": "Deve contenere almeno {min} caratteri",
+    "maxLength": "Non può superare {max} caratteri",
+    "pattern": "Formato non valido",
+    "numeric": "Deve essere un numero",
+    "url": "Inserisci un URL valido",
+    "date": "Inserisci una data valida",
+    "phone": "Inserisci un numero di telefono valido",
+    "password": {
+      "minLength": "La password deve contenere almeno 8 caratteri",
+      "requireUppercase": "La password deve contenere almeno una lettera maiuscola",
+      "requireLowercase": "La password deve contenere almeno una lettera minuscola",
+      "requireNumber": "La password deve contenere almeno un numero",
+      "requireSpecial": "La password deve contenere almeno un carattere speciale",
+      "mismatch": "Le password non corrispondono"
+    },
+    "add": "Aggiungi",
+    "auth": {
+      "login": "Login"
+    },
+    "back": "Indietro",
+    "breadcrumbs": {
+      "home": "Home"
+    },
+    "cancel": "Annulla",
+    "clear": "Cancella",
+    "close": "Chiudi",
+    "common": {
+      "save": "Salva"
+    },
+    "confirm": "Conferma",
+    "delete": "Elimina",
+    "edit": "Modifica",
+    "error": "Errore",
+    "errors": {
+      "notFound": "Not Found"
+    },
+    "filter": "Filtra",
+    "info": "Informazione",
+    "loading": "Caricamento...",
+    "next": "Avanti",
+    "no": "No",
+    "ok": "OK",
+    "previous": "Precedente",
+    "refresh": "Aggiorna",
+    "remove": "Rimuovi",
+    "reset": "Reimposta",
+    "save": "Salva",
+    "search": "Cerca",
+    "select": "Seleziona",
+    "sort": "Ordina",
+    "submit": "Invia",
+    "success": "Completato",
+    "warning": "Attenzione",
+    "yes": "Sì"
+  },
+  "not-found": {
+    "title": "Pagina non trovata",
+    "description": "La pagina che stai cercando non esiste o è stata spostata.",
+    "backHome": "Torna alla home",
+    "goBack": "Torna indietro"
+  }
+}

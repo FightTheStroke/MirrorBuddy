@@ -8,8 +8,24 @@
 
 import { vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-const itMessages = require("../../messages/it.json");
+import { readdirSync, readFileSync } from "fs";
+import { join } from "path";
+
+// Load all Italian namespace files and merge them (ADR 0082)
+function loadItalianMessages(): Record<string, unknown> {
+  const localeDir = join(process.cwd(), "messages", "it");
+  const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
+  const merged: Record<string, unknown> = {};
+  for (const file of files) {
+    const filePath = join(localeDir, file);
+    // eslint-disable-next-line security/detect-non-literal-fs-filename -- Safe: file is from controlled readdirSync
+    const content = readFileSync(filePath, "utf-8");
+    Object.assign(merged, JSON.parse(content));
+  }
+  return merged;
+}
+
+const itMessages = loadItalianMessages();
 
 // Mock server-only module - it throws when imported outside of server components
 // This allows testing modules that import server-only code

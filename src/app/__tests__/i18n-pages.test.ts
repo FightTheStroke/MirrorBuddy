@@ -1,9 +1,28 @@
+/**
+ * i18n Pages Translation Tests
+ *
+ * Updated for namespace-based structure (ADR 0082)
+ */
 import { describe, it, expect } from "vitest";
-import itMessages from "@/i18n/messages/it.json";
-import enMessages from "@/i18n/messages/en.json";
-import frMessages from "@/i18n/messages/fr.json";
-import deMessages from "@/i18n/messages/de.json";
-import esMessages from "@/i18n/messages/es.json";
+
+// Import namespace files for each locale
+import itCompliance from "../../../messages/it/compliance.json";
+import itTools from "../../../messages/it/tools.json";
+import enCompliance from "../../../messages/en/compliance.json";
+import enTools from "../../../messages/en/tools.json";
+import frCompliance from "../../../messages/fr/compliance.json";
+import frTools from "../../../messages/fr/tools.json";
+import deCompliance from "../../../messages/de/compliance.json";
+import deTools from "../../../messages/de/tools.json";
+import esCompliance from "../../../messages/es/compliance.json";
+import esTools from "../../../messages/es/tools.json";
+
+// Merge namespace files to simulate runtime behavior
+const itMessages = { ...itCompliance, ...itTools };
+const enMessages = { ...enCompliance, ...enTools };
+const frMessages = { ...frCompliance, ...frTools };
+const deMessages = { ...deCompliance, ...deTools };
+const esMessages = { ...esCompliance, ...esTools };
 
 describe("i18n Non-Locale Pages", () => {
   describe("Contact page translations", () => {

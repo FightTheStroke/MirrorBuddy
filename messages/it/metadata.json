@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "home": {
+      "title": "Home | MirrorBuddy",
+      "description": "Scopri l'apprendimento basato su AI per studenti con difficoltà di apprendimento. Tutoraggio personalizzato con 22 maestri, voce e apprendimento adattivo.",
+      "keywords": [
+        "educazione",
+        "AI",
+        "tutoraggio",
+        "apprendimento",
+        "voce",
+        "maestri"
+      ]
+    },
+    "settings": {
+      "title": "Impostazioni | MirrorBuddy",
+      "description": "Personalizza la tua esperienza con profili di accessibilità, preferenze di caratteri, controlli privacy e impostazioni dell'account adatte alle tue esigenze.",
+      "keywords": [
+        "impostazioni",
+        "preferenze",
+        "accessibilità",
+        "personalizzazione",
+        "privacy"
+      ]
+    },
+    "aiTransparency": {
+      "title": "Trasparenza AI | MirrorBuddy",
+      "description": "Scopri come MirrorBuddy utilizza l'AI responsabilmente, impegni di trasparenza e come garantiamo AI sicura per educazione con forti misure di protezione.",
+      "keywords": [
+        "AI",
+        "trasparenza",
+        "sicurezza",
+        "conformità",
+        "AI responsabile"
+      ]
+    },
+    "privacy": {
+      "title": "Politica sulla Privacy | MirrorBuddy",
+      "description": "Comprendi come MirrorBuddy protegge i dati, rispetta GDPR, gestisce informazioni in modo sicuro e garantisce privacy con comunicazioni crittografate qui.",
+      "keywords": [
+        "privacy",
+        "GDPR",
+        "protezione dei dati",
+        "sicurezza",
+        "conformità"
+      ]
+    },
+    "terms": {
+      "title": "Condizioni di Servizio | MirrorBuddy",
+      "description": "Leggi i nostri termini di servizio, accordi utente, politiche di uso accettabile e informazioni legali per l'utilizzo della piattaforma educativa MirrorBuddy.",
+      "keywords": ["condizioni", "servizio", "legale", "accordo", "politiche"]
+    },
+    "title": "MirrorBuddy - Il tuo compagno di studio",
+    "description": "Piattaforma educativa basata su AI per studenti con bisogni speciali",
+    "keywords": "educazione, AI, apprendimento, tutor, studenti, DSA"
+  }
+}

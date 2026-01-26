@@ -6,6 +6,20 @@ import path from "path";
 const LOCALES = ["it", "en", "fr", "de", "es"];
 const MESSAGES_DIR = path.join(process.cwd(), "messages");
 const REFERENCE_LOCALE = "it";
+const NAMESPACES = [
+  "common",
+  "auth",
+  "admin",
+  "chat",
+  "tools",
+  "settings",
+  "compliance",
+  "education",
+  "navigation",
+  "errors",
+  "welcome",
+  "metadata",
+];
 
 /**
  * Recursively extract all keys from a nested object
@@ -30,6 +44,25 @@ function extractKeys(obj: Record<string, unknown>, prefix = ""): Set<string> {
 }
 
 /**
+ * Load all namespace files for a locale and merge them
+ * Updated for namespace-based structure (ADR 0082)
+ */
+function loadLocaleMessages(locale: string): Record<string, unknown> {
+  const localeDir = path.join(MESSAGES_DIR, locale);
+  const merged: Record<string, unknown> = {};
+
+  for (const ns of NAMESPACES) {
+    const filePath = path.join(localeDir, `${ns}.json`);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      Object.assign(merged, JSON.parse(content));
+    }
+  }
+
+  return merged;
+}
+
+/**
  * Main verification function
  */
 function main(): void {
@@ -40,9 +73,7 @@ function main(): void {
 
   try {
     for (const locale of LOCALES) {
-      const filePath = path.join(MESSAGES_DIR, `${locale}.json`);
-      const content = fs.readFileSync(filePath, "utf-8");
-      const messages = JSON.parse(content);
+      const messages = loadLocaleMessages(locale);
       keySets[locale] = extractKeys(messages);
     }
   } catch (error) {
@@ -60,7 +91,7 @@ function main(): void {
   for (const locale of LOCALES) {
     if (locale === REFERENCE_LOCALE) {
       console.log(
-        `✓ ${locale}.json: ${keySets[locale].size}/${referenceKeys.size} keys`,
+        `✓ ${locale}: ${keySets[locale].size}/${referenceKeys.size} keys`,
       );
       continue;
     }
@@ -86,7 +117,7 @@ function main(): void {
     const hasIssues = missing.length > 0 || extra.length > 0;
     const status = hasIssues ? "✗" : "✓";
     console.log(
-      `${status} ${locale}.json: ${localeKeys.size}/${referenceKeys.size} keys`,
+      `${status} ${locale}: ${localeKeys.size}/${referenceKeys.size} keys`,
     );
 
     if (missing.length > 0) {

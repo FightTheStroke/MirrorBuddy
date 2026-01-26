@@ -111,15 +111,21 @@ TypeScript LSP active. **Prefer LSP over grep/glob for navigation.**
 
 **Framework**: next-intl (App Router, server-first) | **Middleware**: `src/middleware.ts` (locale detection)
 
+**Structure**: Namespace-based (`messages/{locale}/{namespace}.json`) - ADR 0082
+
+**Namespaces**: common, auth, admin, chat, tools, settings, compliance, education, navigation, errors, welcome, metadata
+
 ### Quick Start: Adding Translation Keys
 
-1. **Add to all 5 language files** `src/i18n/messages/{locale}.json`:
+1. **Add to Italian first** `messages/it/{namespace}.json`:
    ```json
-   { "namespace.key": "Italian text", ... }
+   { "myFeature": { "title": "Titolo", "description": "..." } }
    ```
-2. **Type-check**: `npm run typecheck` (catches missing keys before commit)
-3. **Use in components**: `const t = useTranslations('namespace'); t('key', { var: value })`
-4. **Verify completeness**: `npm run i18n:check` (ensures all 5 languages have identical structure)
+2. **Sync other locales**: `npx tsx scripts/i18n-sync-namespaces.ts --add-missing`
+3. **Use in components**: `const t = useTranslations('myFeature'); t('title')`
+4. **Verify**: `npx tsx scripts/i18n-sync-namespaces.ts` (ensures all locales match)
+
+**Reference**: `docs/i18n/CONTRIBUTING.md`, ADR 0082
 
 ### Hook Patterns (Client vs Server)
 
