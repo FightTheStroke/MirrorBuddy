@@ -42,8 +42,10 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       timeout: 10000,
     });
 
-    // Should show privacy policy reference
-    await expect(trialPage.getByText(/informativa privacy/i)).toBeVisible();
+    // Should show privacy policy reference (use link to be specific)
+    await expect(
+      trialPage.getByRole("link", { name: /Leggi l.informativa privacy/i }),
+    ).toBeVisible();
 
     // Should show checkbox
     await expect(trialPage.getByRole("checkbox")).toBeVisible();
