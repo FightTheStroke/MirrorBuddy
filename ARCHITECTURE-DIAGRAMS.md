@@ -11,26 +11,27 @@
 2. [Tech Stack Layers](#2-tech-stack-layers)
 3. [Database Schema](#3-database-schema)
 4. [Authentication Flow](#4-authentication-flow)
-5. [Chat Pipeline](#5-chat-pipeline)
-6. [Voice System](#6-voice-system)
-7. [Character System](#7-character-system)
-8. [Tool Execution](#8-tool-execution)
-9. [RAG System](#9-rag-system)
-10. [Tier & Subscription](#10-tier--subscription)
-11. [Trial Mode](#11-trial-mode)
-12. [Invite System](#12-invite-system)
-13. [CI/CD Pipeline](#13-cicd-pipeline)
-14. [Git Hooks](#14-git-hooks)
-15. [Cron Jobs](#15-cron-jobs)
-16. [API Routes](#16-api-routes)
-17. [Accessibility System](#17-accessibility-system)
-18. [Compliance & Safety](#18-compliance--safety)
-19. [Observability](#19-observability)
-20. [External Integrations](#20-external-integrations)
-21. [Component Structure](#21-component-structure)
-22. [State Management](#22-state-management)
-23. [Deployment Flow](#23-deployment-flow)
-24. [ADR Index](#24-adr-index)
+5. [Conversation Engine (Shared Core)](#5-conversation-engine-shared-core)
+6. [Channel: Chat (Text)](#6-channel-chat-text)
+7. [Channel: Voice (Audio)](#7-channel-voice-audio)
+8. [Character System](#8-character-system)
+9. [Tool Execution](#9-tool-execution)
+10. [RAG System](#10-rag-system)
+11. [Tier & Subscription](#11-tier--subscription)
+12. [Trial Mode](#12-trial-mode)
+13. [Invite System](#13-invite-system)
+14. [CI/CD Pipeline](#14-cicd-pipeline)
+15. [Git Hooks](#15-git-hooks)
+16. [Cron Jobs](#16-cron-jobs)
+17. [API Routes](#17-api-routes)
+18. [Accessibility System](#18-accessibility-system)
+19. [Compliance & Safety](#19-compliance--safety)
+20. [Observability](#20-observability)
+21. [External Integrations](#21-external-integrations)
+22. [Component Structure](#22-component-structure)
+23. [State Management](#23-state-management)
+24. [Deployment Flow](#24-deployment-flow)
+25. [ADR Index](#25-adr-index)
 
 ---
 
@@ -43,76 +44,127 @@ graph TB
         Mobile[Mobile Browser]
     end
 
-    subgraph "Next.js App Router"
-        Pages[Pages & Layouts]
-        API[API Routes]
-        Middleware[Middleware]
+    subgraph "Input Channels"
+        ChatUI[Chat UI<br/>Text + SSE]
+        VoiceUI[Voice UI<br/>WebRTC/WebSocket]
     end
 
-    subgraph "Core Services"
+    subgraph "Conversation Engine (Shared Core)"
+        Characters[Characters<br/>22 Maestri + 6 Coach + 6 Buddy]
+        Safety[Safety Guardrails<br/>5-layer protection]
+        Tools[Tool Orchestrator<br/>15+ tools]
+        RAG[RAG Engine<br/>Context injection]
+        Memory[Conversation Memory<br/>Unified storage]
+    end
+
+    subgraph "AI Providers"
+        AzureChat[Azure OpenAI<br/>Chat API]
+        AzureRealtime[Azure Realtime<br/>Voice API]
+        Ollama[Ollama<br/>Fallback]
+    end
+
+    subgraph "Supporting Services"
         Auth[Auth Service]
-        Chat[Chat Service]
-        Voice[Voice Service]
-        Tools[Tool Orchestrator]
         Tier[Tier Service]
         Trial[Trial Service]
-    end
-
-    subgraph "AI Layer"
-        Azure[Azure OpenAI]
-        Ollama[Ollama Fallback]
-        RAG[RAG Engine]
-        Safety[Safety Guardrails]
     end
 
     subgraph "Data Layer"
         Prisma[Prisma ORM]
         PG[(PostgreSQL + pgvector)]
         Redis[(Upstash Redis)]
-        IndexedDB[(IndexedDB)]
+        InMemCache[In-Memory Cache]
     end
 
-    subgraph "External Services"
-        Resend[Resend Email]
-        Grafana[Grafana Cloud]
-        Sentry[Sentry]
-        Vercel[Vercel Platform]
-    end
+    Browser --> ChatUI
+    Browser --> VoiceUI
+    Mobile --> ChatUI
+    Mobile --> VoiceUI
 
-    Browser --> Pages
-    Mobile --> Pages
-    Pages --> API
-    API --> Middleware
-    Middleware --> Auth
+    ChatUI --> Characters
+    VoiceUI --> Characters
 
-    Auth --> Chat
-    Auth --> Voice
-    Auth --> Tools
-    Auth --> Tier
+    Characters --> Safety
+    Safety --> RAG
+    RAG --> Tools
+    Tools --> Memory
 
-    Chat --> Azure
-    Chat --> Ollama
-    Chat --> RAG
-    Chat --> Safety
+    Characters --> AzureChat
+    Characters --> AzureRealtime
+    Characters --> Ollama
 
-    Voice --> Azure
+    Auth --> Characters
+    Tier --> Characters
+    Trial --> Characters
 
-    Tools --> Azure
-    Tools --> IndexedDB
-
+    Memory --> Prisma
+    Prisma --> PG
     RAG --> PG
 
-    Auth --> Prisma
-    Chat --> Prisma
-    Tier --> Prisma
+    %% Redis is used across the system
+    Auth --> Redis
     Trial --> Redis
-
-    Prisma --> PG
-
-    API --> Resend
-    API --> Grafana
-    API --> Sentry
+    Safety --> Redis
+    Tier --> InMemCache
 ```
+
+### Redis Usage (System-Wide)
+
+```mermaid
+graph TB
+    subgraph "Upstash Redis"
+        Redis[(Redis)]
+    end
+
+    subgraph "Rate Limiting (All Users)"
+        RL1[API Rate Limits]
+        RL2[Auth Rate Limits<br/>5/15min login]
+        RL3[Contact Form Limits]
+    end
+
+    subgraph "Trial System"
+        TB[Trial Budget Cap<br/>€100/month global]
+        TS[Trial Session Tracking]
+    end
+
+    subgraph "Admin Dashboard"
+        AC[Admin Counts Pub/Sub]
+        SSE[SSE Connection Store]
+    end
+
+    subgraph "Realtime Features"
+        TE[Tool Events]
+        RT[Realtime Session State]
+    end
+
+    subgraph "Observability"
+        SL[Service Limits Metrics]
+    end
+
+    RL1 --> Redis
+    RL2 --> Redis
+    RL3 --> Redis
+    TB --> Redis
+    TS --> Redis
+    AC --> Redis
+    SSE --> Redis
+    TE --> Redis
+    RT --> Redis
+    SL --> Redis
+```
+
+### Key Insight: Unified Conversation Engine
+
+**Chat and Voice are input/output channels, NOT separate systems.**
+
+Both channels share:
+
+- **Same Characters**: Identical personality, knowledge base, teaching style
+- **Same Safety**: 5-layer guardrails apply to both text and voice
+- **Same Tools**: Quiz, mindmap, flashcards work identically
+- **Same Conversations**: Unified storage, seamless context switching
+- **Same RAG**: User materials enhance both chat and voice responses
+- **Same Tier Limits**: Feature access rules apply uniformly
 
 ---
 
@@ -310,63 +362,129 @@ graph LR
 
 ---
 
-## 5. Chat Pipeline
+## 5. Conversation Engine (Shared Core)
+
+Chat and Voice are **input/output channels** to the same Conversation Engine.
+Everything below is shared between both modalities.
+
+### 5.1 Unified Processing Pipeline
 
 ```mermaid
-sequenceDiagram
-    participant U as User
-    participant UI as Chat UI
-    participant API as /api/chat
-    participant Safety as Safety Layer
-    participant RAG as RAG Engine
-    participant AI as Azure OpenAI
-    participant DB as Database
-
-    U->>UI: Type message
-    UI->>API: POST message
-
-    API->>Safety: Input validation
-    Safety->>Safety: Content filter
-    Safety->>Safety: Jailbreak detection
-    Safety-->>API: Validated input
-
-    API->>RAG: Get relevant context
-    RAG->>DB: Vector similarity search
-    DB-->>RAG: Top-3 materials
-    RAG-->>API: Context chunks
-
-    API->>API: Build system prompt
-    Note over API: Character + Knowledge + RAG + Safety
-
-    API->>AI: Stream completion
-
-    loop SSE Stream
-        AI-->>API: Token chunk
-        API->>Safety: Output filter
-        Safety-->>API: Sanitized chunk
-        API-->>UI: SSE event
-        UI->>UI: Render token
+graph TB
+    subgraph "Input Channels"
+        Chat[Chat Channel<br/>Text via SSE]
+        Voice[Voice Channel<br/>Audio via WebRTC]
     end
 
-    API->>DB: Save message
-    API->>DB: Update token count
+    subgraph "Conversation Engine"
+        subgraph "1. Input Processing"
+            Parse[Parse Input<br/>Text or Speech-to-Text]
+            Validate[Input Validation]
+        end
+
+        subgraph "2. Safety Layer (Shared)"
+            ContentFilter[Content Filter]
+            JailbreakDetect[Jailbreak Detection]
+            PIIDetect[PII Detection]
+        end
+
+        subgraph "3. Context Building (Shared)"
+            Character[Character Selection<br/>Same Maestro/Coach/Buddy]
+            Knowledge[Embedded Knowledge<br/>Same knowledge base]
+            RAGContext[RAG Retrieval<br/>Same user materials]
+            Memory[Conversation Memory<br/>Same history]
+        end
+
+        subgraph "4. AI Processing"
+            Prompt[System Prompt Assembly]
+            LLM[LLM Completion]
+        end
+
+        subgraph "5. Output Processing (Shared)"
+            OutputFilter[Output Safety Filter]
+            ToolDetect[Tool Call Detection]
+        end
+
+        subgraph "6. Storage (Shared)"
+            SaveMsg[Save Message]
+            UpdateTokens[Update Token Count]
+        end
+    end
+
+    subgraph "Output Channels"
+        ChatOut[Chat Response<br/>SSE Stream]
+        VoiceOut[Voice Response<br/>TTS Audio]
+    end
+
+    Chat --> Parse
+    Voice --> Parse
+
+    Parse --> Validate
+    Validate --> ContentFilter
+    ContentFilter --> JailbreakDetect
+    JailbreakDetect --> PIIDetect
+
+    PIIDetect --> Character
+    Character --> Knowledge
+    Knowledge --> RAGContext
+    RAGContext --> Memory
+
+    Memory --> Prompt
+    Prompt --> LLM
+
+    LLM --> OutputFilter
+    OutputFilter --> ToolDetect
+    ToolDetect --> SaveMsg
+    SaveMsg --> UpdateTokens
+
+    UpdateTokens --> ChatOut
+    UpdateTokens --> VoiceOut
 ```
 
-### 5.1 System Prompt Construction
+### 5.2 What's Shared vs Channel-Specific
+
+```mermaid
+graph LR
+    subgraph "SHARED (Conversation Engine)"
+        S1[Character Personality]
+        S2[Embedded Knowledge]
+        S3[Safety Guardrails]
+        S4[RAG Context]
+        S5[Tool Execution]
+        S6[Conversation Storage]
+        S7[Tier Limits]
+        S8[Gamification]
+    end
+
+    subgraph "CHAT-SPECIFIC"
+        C1[SSE Streaming]
+        C2[Markdown Rendering]
+        C3[Tool Canvas UI]
+    end
+
+    subgraph "VOICE-SPECIFIC"
+        V1[WebRTC/WebSocket]
+        V2[VAD Detection]
+        V3[TTS Output]
+        V4[Audio Waveform UI]
+    end
+```
+
+### 5.3 System Prompt Construction (Used by Both)
 
 ```mermaid
 graph TB
     subgraph "Prompt Layers"
         Base[Base System Prompt]
-        Character[Character Persona]
-        Knowledge[Embedded Knowledge Base]
-        RAG[RAG Context]
-        Safety[Safety Guidelines]
-        Memory[Conversation Memory]
+        Character[Character Persona<br/>Maestro/Coach/Buddy]
+        Knowledge[Embedded Knowledge Base<br/>Verified facts]
+        RAG[RAG Context<br/>User materials]
+        Safety[Safety Guidelines<br/>SAFETY_GUIDELINES constant]
+        Memory[Conversation Memory<br/>Recent messages]
     end
 
     subgraph "Final Prompt"
-        Final[Complete System Prompt]
+        Final[Complete System Prompt<br/>Identical for Chat & Voice]
     end
 
     Base --> Final
@@ -379,17 +497,53 @@ graph TB
 
 ---
 
-## 6. Voice System
+## 6. Channel: Chat (Text)
 
-### 6.1 WebRTC Architecture (ADR 0038)
+The Chat channel uses SSE (Server-Sent Events) for real-time streaming.
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Chat UI
+    participant API as /api/chat
+    participant Engine as Conversation Engine
+    participant AI as Azure OpenAI
+
+    U->>UI: Type message
+    UI->>API: POST message
+
+    API->>Engine: Process via shared pipeline
+    Note over Engine: Safety → RAG → Character → Memory
+
+    Engine->>AI: Stream completion
+
+    loop SSE Stream
+        AI-->>Engine: Token chunk
+        Engine->>Engine: Output filter (shared)
+        Engine-->>API: Sanitized chunk
+        API-->>UI: SSE event
+        UI->>UI: Render token
+    end
+
+    Engine->>Engine: Save to shared storage
+```
+
+---
+
+## 7. Channel: Voice (Audio)
+
+The Voice channel uses WebRTC for low-latency audio streaming.
+**Same Conversation Engine, different transport.**
+
+### 7.1 WebRTC Architecture (ADR 0038)
 
 ```mermaid
 sequenceDiagram
     participant U as User
     participant UI as Voice UI
     participant API as /api/realtime
+    participant Engine as Conversation Engine
     participant Azure as Azure Realtime API
-    participant TTS as TTS Engine
 
     U->>UI: Click voice button
     UI->>API: GET /token
@@ -442,7 +596,7 @@ graph TB
 
 ---
 
-## 7. Character System
+## 8. Character System
 
 ### 7.1 Support Triangle
 
@@ -565,7 +719,7 @@ graph TB
 
 ---
 
-## 8. Tool Execution
+## 9. Tool Execution
 
 ### 8.1 Tool Plugin Architecture (ADR 0037)
 
@@ -649,7 +803,7 @@ sequenceDiagram
 
 ---
 
-## 9. RAG System
+## 10. RAG System
 
 ### 9.1 RAG Architecture (ADR 0033)
 
@@ -702,7 +856,7 @@ erDiagram
 
 ---
 
-## 10. Tier & Subscription
+## 11. Tier & Subscription
 
 ### 10.1 Tier Hierarchy (ADR 0071)
 
@@ -804,7 +958,7 @@ graph LR
 
 ---
 
-## 11. Trial Mode
+## 12. Trial Mode
 
 ### 11.1 Trial Session Flow (ADR 0056)
 
@@ -872,7 +1026,7 @@ graph TB
 
 ---
 
-## 12. Invite System
+## 13. Invite System
 
 ### 12.1 Invite Flow (ADR 0057)
 
@@ -930,7 +1084,7 @@ stateDiagram-v2
 
 ---
 
-## 13. CI/CD Pipeline
+## 14. CI/CD Pipeline
 
 ### 13.1 GitHub Actions Workflow
 
@@ -1027,7 +1181,7 @@ graph LR
 
 ---
 
-## 14. Git Hooks
+## 15. Git Hooks
 
 ### 14.1 Pre-Commit Hook
 
@@ -1110,7 +1264,7 @@ graph TB
 
 ---
 
-## 15. Cron Jobs
+## 16. Cron Jobs
 
 ### 15.1 Scheduled Tasks (vercel.json)
 
@@ -1161,7 +1315,7 @@ sequenceDiagram
 
 ---
 
-## 16. API Routes
+## 17. API Routes
 
 ### 16.1 API Route Organization
 
@@ -1263,7 +1417,7 @@ sequenceDiagram
 
 ---
 
-## 17. Accessibility System
+## 18. Accessibility System
 
 ### 17.1 7 DSA Profiles (ADR 0060)
 
@@ -1332,7 +1486,7 @@ graph LR
 
 ---
 
-## 18. Compliance & Safety
+## 19. Compliance & Safety
 
 ### 18.1 5-Layer Safety Architecture (ADR 0004)
 
@@ -1419,7 +1573,7 @@ graph TB
 
 ---
 
-## 19. Observability
+## 20. Observability
 
 ### 19.1 Monitoring Stack
 
@@ -1500,7 +1654,7 @@ graph LR
 
 ---
 
-## 20. External Integrations
+## 21. External Integrations
 
 ### 20.1 Service Map
 
@@ -1575,7 +1729,7 @@ graph LR
 
 ---
 
-## 21. Component Structure
+## 22. Component Structure
 
 ### 21.1 Component Organization
 
@@ -1621,7 +1775,7 @@ graph TB
 
 ---
 
-## 22. State Management
+## 23. State Management
 
 ### 22.1 Zustand Stores
 
@@ -1684,7 +1838,7 @@ graph LR
 
 ---
 
-## 23. Deployment Flow
+## 24. Deployment Flow
 
 ### 23.1 Vercel Deployment
 
@@ -1751,7 +1905,7 @@ graph TB
 
 ---
 
-## 24. ADR Index
+## 25. ADR Index
 
 ### 24.1 Architecture Decision Records
 
