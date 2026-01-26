@@ -82,11 +82,20 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   });
 
   test("CP-03: API health endpoint responds", async ({ request }) => {
-    const response = await request.get("/api/health");
+    // Health check may return 503 on first request due to database cold start in CI
+    // Retry with backoff to handle this case (ADR 0067: serverless cold starts)
+    let response = await request.get("/api/health");
+    let data = await response.json();
 
+    // If unhealthy on first attempt, retry after a brief delay (cold start recovery)
+    if (response.status() === 503) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      response = await request.get("/api/health");
+      data = await response.json();
+    }
+
+    // After retry, endpoint should be healthy or degraded (not unhealthy)
     expect(response.status()).toBe(200);
-
-    const data = await response.json();
     expect(data).toHaveProperty("status");
     expect(["healthy", "degraded"]).toContain(data.status);
   });
