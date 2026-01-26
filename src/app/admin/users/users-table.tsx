@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -65,6 +66,7 @@ export function UsersTable({
   users: User[];
   availableTiers: Tier[];
 }) {
+  const t = useTranslations("admin.users");
   const [filter, setFilter] = useState<FilterTab>("all");
   const [search, setSearch] = useState("");
   const [isLoading, setIsLoading] = useState<string | null>(null);
@@ -118,7 +120,7 @@ export function UsersTable({
           throw new Error(err.error || "Failed to toggle user");
         }
       } else if (action === "delete") {
-        if (!confirm("Confermi eliminazione?")) return;
+        if (!confirm(t("confirm-delete"))) return;
         await csrfFetch(`/api/admin/users/${userId}`, {
           method: "DELETE",
           body: JSON.stringify({ reason: "admin_delete" }),
@@ -174,40 +176,46 @@ export function UsersTable({
         <TabsList className="mb-4 overflow-x-auto snap-x snap-mandatory md:overflow-visible md:snap-none">
           <TabsTrigger
             value="all"
-            title={`Tutti (${users.length})`}
+            title={`${t("tabs.all")} (${users.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">Tutti ({users.length})</span>
+            <span className="sr-only">
+              {t("tabs.all")} ({users.length})
+            </span>
             <span className="md:hidden">👥</span>
-            <span className="hidden md:inline">Tutti ({users.length})</span>
+            <span className="hidden md:inline">
+              {t("tabs.all")} ({users.length})
+            </span>
           </TabsTrigger>
           <TabsTrigger
             value="active"
-            title="Attivi"
+            title={t("tabs.active")}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">Attivi</span>
+            <span className="sr-only">{t("tabs.active")}</span>
             <span className="md:hidden">✓</span>
-            <span className="hidden md:inline">Attivi</span>
+            <span className="hidden md:inline">{t("tabs.active")}</span>
           </TabsTrigger>
           <TabsTrigger
             value="disabled"
-            title="Disabilitati"
+            title={t("tabs.disabled")}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">Disabilitati</span>
+            <span className="sr-only">{t("tabs.disabled")}</span>
             <span className="md:hidden">🚫</span>
-            <span className="hidden md:inline">Disabilitati</span>
+            <span className="hidden md:inline">{t("tabs.disabled")}</span>
           </TabsTrigger>
           <TabsTrigger
             value="trash"
-            title={`Cestino (${deletedBackups.length})`}
+            title={`${t("tabs.trash")} (${deletedBackups.length})`}
             className="min-h-11 min-w-11 md:min-w-auto"
           >
-            <span className="sr-only">Cestino ({deletedBackups.length})</span>
+            <span className="sr-only">
+              {t("tabs.trash")} ({deletedBackups.length})
+            </span>
             <span className="md:hidden">🗑️</span>
             <span className="hidden md:inline">
-              Cestino ({deletedBackups.length})
+              {t("tabs.trash")} ({deletedBackups.length})
             </span>
           </TabsTrigger>
         </TabsList>
@@ -239,19 +247,19 @@ export function UsersTable({
                     />
                   </TableHead>
                 )}
-                <TableHead>Username</TableHead>
-                <TableHead>Email</TableHead>
+                <TableHead>{t("table.username")}</TableHead>
+                <TableHead>{t("table.email")}</TableHead>
                 {filter !== "trash" && (
                   <>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Tier</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>{t("table.role")}</TableHead>
+                    <TableHead>{t("table.tier")}</TableHead>
+                    <TableHead>{t("table.status")}</TableHead>
                   </>
                 )}
                 <TableHead>
-                  {filter === "trash" ? "Eliminato" : "Creato"}
+                  {filter === "trash" ? t("table.deleted") : t("table.created")}
                 </TableHead>
-                <TableHead>Azioni</TableHead>
+                <TableHead>{t("table.actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -283,10 +291,10 @@ export function UsersTable({
         </ResponsiveTable>
 
         {filter !== "trash" && filteredUsers.length === 0 && (
-          <TableEmpty>Nessun utente trovato</TableEmpty>
+          <TableEmpty>{t("empty-message")}</TableEmpty>
         )}
         {filter === "trash" && deletedBackups.length === 0 && (
-          <TableEmpty>Cestino vuoto</TableEmpty>
+          <TableEmpty>{t("trash-empty")}</TableEmpty>
         )}
 
         <UsersBulkActions

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 interface FeaturesSectionProps {
   formData: {
     features: Record<string, unknown>;
@@ -58,6 +60,8 @@ const FEATURE_DEFINITIONS: FeatureDefinition[] = [
 ];
 
 export function FeaturesSection({ formData, onChange }: FeaturesSectionProps) {
+  const t = useTranslations("admin.tiers.form");
+
   const handleFeatureToggle = (featureKey: string, enabled: boolean) => {
     const updatedFeatures = {
       ...formData.features,
@@ -73,7 +77,7 @@ export function FeaturesSection({ formData, onChange }: FeaturesSectionProps) {
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
       <h2 className="text-lg font-semibold mb-4 text-foreground">
-        Funzionalità
+        {t("features")}
       </h2>
 
       <div className="space-y-3">
@@ -109,9 +113,7 @@ export function FeaturesSection({ formData, onChange }: FeaturesSectionProps) {
 
       <div className="mt-4 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
         <p className="text-xs text-slate-600 dark:text-slate-400">
-          <strong>Nota:</strong> Le funzionalità selezionate saranno disponibili
-          per gli utenti con questo piano. Alcune funzionalità potrebbero
-          richiedere configurazioni aggiuntive.
+          <strong>Note:</strong> {t("featuresNote")}
         </p>
       </div>
     </div>

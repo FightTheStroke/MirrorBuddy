@@ -1680,7 +1680,31 @@
     "favorites": "Favoriten",
     "byType": "Nach Typ",
     "bySubject": "Nach Fach",
-    "byProfessor": "Nach Professor"
+    "byProfessor": "Nach Professor",
+    "search": {
+      "placeholder": "Deine Materialien durchsuchen...",
+      "label": "Materialien durchsuchen",
+      "clear": "Suche löschen"
+    },
+    "results": {
+      "singular": "Ergebnis",
+      "plural": "Ergebnisse"
+    },
+    "filters": {
+      "reset": "Filter zurücksetzen"
+    },
+    "sort": {
+      "label": "Sortieren nach",
+      "placeholder": "Sortieren nach"
+    },
+    "view": {
+      "grid": "Rasteransicht",
+      "list": "Listenansicht"
+    },
+    "voiceSearch": {
+      "stop": "Sprachsuche beenden",
+      "start": "Sprachsuche starten"
+    }
   },
   "admin": {
     "invites": {
@@ -1702,7 +1726,14 @@
       "rejectionReason": "Ablehnungsgrund",
       "optional": "Optional",
       "cancel": "Abbrechen",
-      "confirmRejection": "Ablehnung bestätigen"
+      "confirmRejection": "Ablehnung bestätigen",
+      "reject-modal": {
+        "title": "Anfrage ablehnen",
+        "reason-label": "Ablehnungsgrund",
+        "placeholder": "Optional",
+        "cancel-button": "Abbrechen",
+        "confirm-button": "Ablehnung bestätigen"
+      }
     },
     "locales": {
       "search": "Nach Ländercode, Name, Locale oder Maestro suchen...",
@@ -1721,7 +1752,44 @@
     },
     "settings": {
       "title": "Einstellungen",
-      "subtitle": "MirrorBuddy-Systemkonfiguration"
+      "subtitle": "MirrorBuddy-Systemkonfiguration",
+      "system-info": {
+        "title": "System Info",
+        "description": "Systeminformationen",
+        "version": "Version",
+        "environment": "Umgebung",
+        "node-version": "Node :",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Budgetlimit für Testbenutzer",
+        "per-month": "/Monat",
+        "configured-via": "Konfiguriert über Umgebungsvariable",
+        "description-text": "Dieser Betrag definiert das maximale monatliche Budgetlimit für Testbenutzer. Der Wert wird aus der Umgebungsvariable gelesen und kann nicht über diese Schnittstelle geändert werden."
+      }
+    },
+    "users": {
+      "page-title": "Benutzerverwaltung",
+      "confirm-delete": "Löschen bestätigen?",
+      "tabs": {
+        "all": "Alle",
+        "active": "Aktiv",
+        "disabled": "Deaktiviert",
+        "trash": "Papierkorb"
+      },
+      "table": {
+        "username": "Benutzername",
+        "email": "Email",
+        "role": "Rolle",
+        "tier": "Tier",
+        "status": "Status",
+        "created": "Erstellt",
+        "deleted": "Gelöscht",
+        "actions": "Aktionen"
+      },
+      "empty-message": "Keine Benutzer gefunden",
+      "trash-empty": "Papierkorb ist leer"
     },
     "tiers": {
       "page": {
@@ -1730,7 +1798,9 @@
         "newTier": "New Tier",
         "createNew": "Create a new subscription plan",
         "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}"
+        "editMessage": "Edit tier: {name}",
+        "conversionFunnelButton": "Conversion Funnel",
+        "analyticsButton": "Analytics"
       },
       "table": {
         "code": "Code",
@@ -1837,12 +1907,16 @@
         "totalMessagesCol": "Total Messages",
         "averageCol": "Average/User",
         "activityRate": "Activity Rate",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
         "noPlans": "No tiers available",
         "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
       },
       "conversionFunnel": {
         "title": "Tier Conversion Funnel",
         "subtitle": "User progression through tier stages",
+        "backToTiers": "Back to Tiers",
         "period": "{start} to {end}",
         "trialToBase": "Trial → Base",
         "baseToProRate": "Base → Pro",
@@ -1941,11 +2015,88 @@
       "errorMessage": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
       "placeholderMessage": "Beschreiben Sie Ihre Nachricht..."
     },
-    "backButton": "Zurück zur Startseite"
+    "backButton": "Zurück zur Startseite",
+    "layout": {
+      "title": {},
+      "description": {}
+    },
+    "enterprise": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "features": {
+        "customization": "Vollständige Anpassung und Corporate Branding",
+        "analytics": "Erweiterte Analytik und Berichterstellung",
+        "integration": "Integration mit Ihren Systemen"
+      }
+    },
+    "schools": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "description2": {},
+      "support": {}
+    },
+    "schools_form": {
+      "solutions": {},
+      "features": {
+        "curriculum": "Lehrplananpassung",
+        "management": "Klassen- und Schülerverwaltung",
+        "reporting": "Berichte und Analytik für Lehrer",
+        "support": "Dedizierter Support"
+      },
+      "successTitle": {},
+      "successMessage": {},
+      "errorDefault": {},
+      "errorConnection": {},
+      "roleLabel": {},
+      "schoolTypeLabel": {},
+      "schoolNameLabel": {},
+      "studentCountLabel": {},
+      "specificNeedsLabel": {},
+      "messagePlaceholder": {},
+      "submitButtonDefault": {},
+      "submitButtonLoading": {},
+      "options": {
+        "roles": {
+          "dirigente": "Schulleiter",
+          "docente": "Lehrer",
+          "segreteria": "Verwaltung",
+          "altro": "Sonstiges"
+        },
+        "schoolTypes": {
+          "primaria": "Grundschule",
+          "secondariaI": "Hauptschule",
+          "secondariaII": "Gymnasium",
+          "universita": "Universität"
+        },
+        "studentCounts": {
+          "lessThan100": "Weniger als 100",
+          "range100To500": "100-500",
+          "range500To1000": "500-1000",
+          "moreThan1000": "Mehr als 1000"
+        }
+      }
+    }
   },
   "astuccio": {
     "backButton": "Zurück zu Astuccio",
-    "itemCount": "{count} Werkzeuge"
+    "itemCount": "{count} Werkzeuge",
+    "how_it_works": {
+      "title": {},
+      "step1_title": {},
+      "step1_desc": {},
+      "step2_title": {},
+      "step2_desc": {},
+      "step3_title": {},
+      "step3_desc": {}
+    },
+    "study_tip": {
+      "title": {},
+      "description": {}
+    }
   },
   "home": {
     "title": "Die Schule, Die Ich Will",

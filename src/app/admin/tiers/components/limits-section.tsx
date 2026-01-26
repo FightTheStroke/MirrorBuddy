@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 
 interface LimitsSectionProps {
@@ -26,6 +27,7 @@ interface FieldError {
 }
 
 export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
+  const t = useTranslations("admin.tiers.form");
   const [errors, setErrors] = useState<FieldError>({});
 
   const validateField = (
@@ -35,10 +37,10 @@ export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
     const limit = LIMITS[fieldName];
 
     if (value < limit.min) {
-      return `Minimo: ${limit.min}`;
+      return t("minError", { min: limit.min });
     }
     if (value > limit.max) {
-      return `Massimo: ${limit.max}`;
+      return t("maxError", { max: limit.max });
     }
     return null;
   };
@@ -47,7 +49,7 @@ export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
     const numValue = parseInt(value, 10);
 
     if (isNaN(numValue)) {
-      setErrors((prev) => ({ ...prev, [fieldName]: "Inserisci un numero" }));
+      setErrors((prev) => ({ ...prev, [fieldName]: t("invalidNumber") }));
       return;
     }
 
@@ -118,32 +120,26 @@ export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
-      <h2 className="text-lg font-semibold mb-4 text-foreground">Limiti</h2>
+      <h2 className="text-lg font-semibold mb-4 text-foreground">
+        {t("limits")}
+      </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {renderField(
           "chatLimitDaily",
-          "Messaggi Chat Giornalieri",
-          "Numero massimo di messaggi che un utente può inviare al giorno",
+          t("chatMessagesDaily"),
+          t("chatMessagesHelp"),
         )}
 
         {renderField(
           "voiceMinutesDaily",
-          "Minuti Voce Giornalieri",
-          "Minuti di utilizzo voce disponibili al giorno per l'utente",
+          t("voiceMinutesDaily"),
+          t("voiceMinutesHelp"),
         )}
 
-        {renderField(
-          "toolsLimitDaily",
-          "Strumenti Giornalieri",
-          "Numero massimo di strumenti che possono essere utilizzati al giorno",
-        )}
+        {renderField("toolsLimitDaily", t("toolsDaily"), t("toolsHelp"))}
 
-        {renderField(
-          "docsLimitTotal",
-          "Documenti Totali",
-          "Numero massimo di documenti che un utente può caricare in totale",
-        )}
+        {renderField("docsLimitTotal", t("docsTotal"), t("docsHelp"))}
       </div>
     </div>
   );

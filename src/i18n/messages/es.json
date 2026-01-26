@@ -397,7 +397,20 @@
   },
   "astuccio": {
     "backButton": "Volver a Astuccio",
-    "itemCount": "{count} herramientas"
+    "itemCount": "{count} herramientas",
+    "how_it_works": {
+      "title": {},
+      "step1_title": {},
+      "step1_desc": {},
+      "step2_title": {},
+      "step2_desc": {},
+      "step3_title": {},
+      "step3_desc": {}
+    },
+    "study_tip": {
+      "title": {},
+      "description": {}
+    }
   },
   "zaino": {
     "print": {
@@ -1889,7 +1902,31 @@
     "favorites": "Favoritos",
     "byType": "Por Tipo",
     "bySubject": "Por Materia",
-    "byProfessor": "Por Profesor"
+    "byProfessor": "Por Profesor",
+    "search": {
+      "placeholder": "Buscar en tus materiales...",
+      "label": "Buscar materiales",
+      "clear": "Borrar búsqueda"
+    },
+    "results": {
+      "singular": "resultado",
+      "plural": "resultados"
+    },
+    "filters": {
+      "reset": "Restablecer filtros"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "placeholder": "Ordenar por"
+    },
+    "view": {
+      "grid": "Vista de cuadrícula",
+      "list": "Vista de lista"
+    },
+    "voiceSearch": {
+      "stop": "Detener búsqueda por voz",
+      "start": "Iniciar búsqueda por voz"
+    }
   },
   "admin": {
     "invites": {
@@ -1911,7 +1948,14 @@
       "rejectionReason": "Motivo del rechazo",
       "optional": "Opcional",
       "cancel": "Cancelar",
-      "confirmRejection": "Confirmar rechazo"
+      "confirmRejection": "Confirmar rechazo",
+      "reject-modal": {
+        "title": "Rechazar solicitud",
+        "reason-label": "Motivo del rechazo",
+        "placeholder": "Opcional",
+        "cancel-button": "Cancelar",
+        "confirm-button": "Confirmar rechazo"
+      }
     },
     "locales": {
       "search": "Buscar por código de país, nombre, locale o maestro...",
@@ -1930,7 +1974,44 @@
     },
     "settings": {
       "title": "Configuración",
-      "subtitle": "Configuración del sistema MirrorBuddy"
+      "subtitle": "Configuración del sistema MirrorBuddy",
+      "system-info": {
+        "title": "System Info",
+        "description": "Información del sistema",
+        "version": "Versión",
+        "environment": "Entorno",
+        "node-version": "Node :",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Límite de presupuesto para usuarios de prueba",
+        "per-month": "/mes",
+        "configured-via": "Configurado mediante variable env",
+        "description-text": "Esta cantidad define el límite presupuestario mensual máximo para usuarios de prueba. El valor se lee de la variable de entorno y no se puede modificar desde esta interfaz."
+      }
+    },
+    "users": {
+      "page-title": "Gestión de Usuarios",
+      "confirm-delete": "¿Confirmar eliminación?",
+      "tabs": {
+        "all": "Todos",
+        "active": "Activos",
+        "disabled": "Desactivados",
+        "trash": "Papelera"
+      },
+      "table": {
+        "username": "Nombre de usuario",
+        "email": "Email",
+        "role": "Rol",
+        "tier": "Tier",
+        "status": "Estado",
+        "created": "Creado",
+        "deleted": "Eliminado",
+        "actions": "Acciones"
+      },
+      "empty-message": "No se encontraron usuarios",
+      "trash-empty": "Papelera vacía"
     },
     "tiers": {
       "page": {
@@ -1939,7 +2020,9 @@
         "newTier": "New Tier",
         "createNew": "Create a new subscription plan",
         "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}"
+        "editMessage": "Edit tier: {name}",
+        "conversionFunnelButton": "Conversion Funnel",
+        "analyticsButton": "Analytics"
       },
       "table": {
         "code": "Code",
@@ -2046,12 +2129,16 @@
         "totalMessagesCol": "Total Messages",
         "averageCol": "Average/User",
         "activityRate": "Activity Rate",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
         "noPlans": "No tiers available",
         "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
       },
       "conversionFunnel": {
         "title": "Tier Conversion Funnel",
         "subtitle": "User progression through tier stages",
+        "backToTiers": "Back to Tiers",
         "period": "{start} to {end}",
         "trialToBase": "Trial → Base",
         "baseToProRate": "Base → Pro",
@@ -2150,7 +2237,71 @@
       "errorMessage": "Ocurrió un error. Inténtelo más tarde.",
       "placeholderMessage": "Describa su mensaje..."
     },
-    "backButton": "Volver al inicio"
+    "backButton": "Volver al inicio",
+    "layout": {
+      "title": {},
+      "description": {}
+    },
+    "enterprise": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "features": {
+        "customization": "Personalización completa y marca corporativa",
+        "analytics": "Análisis avanzados e informes",
+        "integration": "Integración con tus sistemas"
+      }
+    },
+    "schools": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "description2": {},
+      "support": {}
+    },
+    "schools_form": {
+      "solutions": {},
+      "features": {
+        "curriculum": "Personalización curricular",
+        "management": "Gestión de clases y estudiantes",
+        "reporting": "Informes y análisis para docentes",
+        "support": "Soporte dedicado"
+      },
+      "successTitle": {},
+      "successMessage": {},
+      "errorDefault": {},
+      "errorConnection": {},
+      "roleLabel": {},
+      "schoolTypeLabel": {},
+      "schoolNameLabel": {},
+      "studentCountLabel": {},
+      "specificNeedsLabel": {},
+      "messagePlaceholder": {},
+      "submitButtonDefault": {},
+      "submitButtonLoading": {},
+      "options": {
+        "roles": {
+          "dirigente": "Director",
+          "docente": "Docente",
+          "segreteria": "Administración",
+          "altro": "Otro"
+        },
+        "schoolTypes": {
+          "primaria": "Escuela Primaria",
+          "secondariaI": "Educación Secundaria I",
+          "secondariaII": "Educación Secundaria II",
+          "universita": "Universidad"
+        },
+        "studentCounts": {
+          "lessThan100": "Menos de 100",
+          "range100To500": "100-500",
+          "range500To1000": "500-1000",
+          "moreThan1000": "Más de 1000"
+        }
+      }
+    }
   },
   "ambientAudio": {
     "title": "Audio Ambiental",

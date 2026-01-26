@@ -2,8 +2,10 @@
 
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function AstuccioInfoSection() {
+  const t = useTranslations("astuccio");
   return (
     <>
       <motion.div
@@ -13,7 +15,7 @@ export function AstuccioInfoSection() {
         className="mt-12 bg-white dark:bg-slate-800 rounded-2xl shadow-lg border border-slate-200 dark:border-slate-700 p-8"
       >
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 text-center">
-          Come Funziona?
+          {t("how_it_works.title")}
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
@@ -23,11 +25,10 @@ export function AstuccioInfoSection() {
               </span>
             </div>
             <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-              Scegli lo Strumento
+              {t("how_it_works.step1_title")}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Seleziona lo strumento piu adatto al tuo obiettivo di
-              apprendimento
+              {t("how_it_works.step1_desc")}
             </p>
           </div>
           <div className="text-center">
@@ -37,10 +38,10 @@ export function AstuccioInfoSection() {
               </span>
             </div>
             <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-              Scegli il Maestro
+              {t("how_it_works.step2_title")}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              Ogni maestro ha un approccio unico per aiutarti a imparare
+              {t("how_it_works.step2_desc")}
             </p>
           </div>
           <div className="text-center">
@@ -50,11 +51,10 @@ export function AstuccioInfoSection() {
               </span>
             </div>
             <h3 className="font-semibold text-slate-900 dark:text-white mb-2">
-              Salva nello Zaino
+              {t("how_it_works.step3_title")}
             </h3>
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              I materiali creati vengono salvati nel tuo Zaino per riusarli
-              quando vuoi
+              {t("how_it_works.step3_desc")}
             </p>
           </div>
         </div>
@@ -67,15 +67,12 @@ export function AstuccioInfoSection() {
         className="mt-8 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 rounded-xl p-6 border border-blue-200 dark:border-blue-800"
       >
         <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
-          <Sparkles className="w-5 h-5" /> Consiglio per Studiare
+          <Sparkles className="w-5 h-5" /> {t("study_tip.title")}
         </h3>
-        <p className="text-sm text-blue-700 dark:text-blue-300">
-          Inizia con una <strong>Mappa Mentale</strong> per avere una visione
-          d&apos;insieme, poi crea delle <strong>Flashcard</strong> per
-          memorizzare i concetti chiave, e infine verifica la tua preparazione
-          con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel
-          tuo <strong>Zaino</strong>!
-        </p>
+        <p
+          className="text-sm text-blue-700 dark:text-blue-300"
+          dangerouslySetInnerHTML={{ __html: t("study_tip.description") }}
+        />
       </motion.div>
     </>
   );

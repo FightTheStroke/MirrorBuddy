@@ -5,6 +5,8 @@
 
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -47,6 +49,7 @@ interface ConversionFunnelData {
 }
 
 export default function ConversionFunnelPage() {
+  const t = useTranslations("admin.tiers.conversionFunnel");
   const [data, setData] = useState<ConversionFunnelData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -109,14 +112,12 @@ export default function ConversionFunnelPage() {
         <Link href="/admin/tiers">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Tiers
+            {t("backToTiers")}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold text-foreground">
-          Tier Conversion Funnel
-        </h1>
+        <h1 className="text-3xl font-bold text-foreground">{t("title")}</h1>
         <p className="text-sm text-muted-foreground">
-          {summary.periodStart} to {summary.periodEnd}
+          {t("period", { start: summary.periodStart, end: summary.periodEnd })}
         </p>
       </div>
 
@@ -127,13 +128,13 @@ export default function ConversionFunnelPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Trial → Base
+                  {t("trialToBase")}
                 </p>
                 <p className="text-3xl font-bold mt-2 text-foreground">
                   {summary.trialToBaseRate.toFixed(1)}%
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Conversion rate
+                  {t("conversionRate")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-blue-100 dark:bg-blue-900/30">
@@ -148,13 +149,13 @@ export default function ConversionFunnelPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Base → Pro
+                  {t("baseToProRate")}
                 </p>
                 <p className="text-3xl font-bold mt-2 text-foreground">
                   {summary.baseToProRate.toFixed(1)}%
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Conversion rate
+                  {t("conversionRate")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-purple-100 dark:bg-purple-900/30">
@@ -169,13 +170,13 @@ export default function ConversionFunnelPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Funnel Efficiency
+                  {t("funnelEfficiency")}
                 </p>
                 <p className="text-3xl font-bold mt-2 text-foreground">
                   {summary.funnelEfficiency.toFixed(1)}%
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Base → Pro conversion
+                  {t("baseToProRate")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-green-100 dark:bg-green-900/30">
@@ -190,13 +191,13 @@ export default function ConversionFunnelPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Total Tracked
+                  {t("totalTracked")}
                 </p>
                 <p className="text-3xl font-bold mt-2 text-foreground">
                   {summary.totalUsersTracked}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Trial users
+                  {t("trialUsers")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-amber-100 dark:bg-amber-900/30">
@@ -210,10 +211,8 @@ export default function ConversionFunnelPage() {
       {/* Funnel Visualization */}
       <Card>
         <CardHeader>
-          <CardTitle>Conversion Funnel</CardTitle>
-          <CardDescription>
-            User progression through tier stages
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           {stages.map((stage, index) => (
@@ -224,7 +223,7 @@ export default function ConversionFunnelPage() {
                     {stage.tierName}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {stage.totalUsers} users
+                    {t("users", { count: stage.totalUsers })}
                   </p>
                 </div>
                 {stage.conversionRate !== null && (
@@ -233,7 +232,9 @@ export default function ConversionFunnelPage() {
                       {stage.conversionRate.toFixed(1)}%
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      → {stage.nextStageConversions} conversions
+                      {t("conversions", {
+                        count: stage.nextStageConversions || 0,
+                      })}
                     </p>
                   </div>
                 )}
@@ -285,27 +286,29 @@ export default function ConversionFunnelPage() {
       {/* Additional Metrics */}
       <Card>
         <CardHeader>
-          <CardTitle>Key Metrics</CardTitle>
-          <CardDescription>Detailed conversion analysis</CardDescription>
+          <CardTitle>{t("keyMetrics")}</CardTitle>
+          <CardDescription>{t("detailedAnalysis")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">Trial → Base</p>
+              <p className="text-xs text-muted-foreground">
+                {t("trialToBase")}
+              </p>
               <p className="text-xl font-bold mt-1">
                 {summary.trialToBaseRate.toFixed(1)}%
               </p>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">Base → Pro</p>
+              <p className="text-xs text-muted-foreground">
+                {t("baseToProRate")}
+              </p>
               <p className="text-xl font-bold mt-1">
                 {summary.baseToProRate.toFixed(1)}%
               </p>
             </div>
             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
-              <p className="text-xs text-muted-foreground">
-                Trial → Pro (Direct)
-              </p>
+              <p className="text-xs text-muted-foreground">{t("trialToPro")}</p>
               <p className="text-xl font-bold mt-1">
                 {summary.trialToProRate.toFixed(1)}%
               </p>

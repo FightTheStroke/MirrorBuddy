@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -35,6 +36,7 @@ interface Tier {
 }
 
 export default async function AdminUsersPage() {
+  const t = await getTranslations("admin.users");
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
@@ -88,7 +90,7 @@ export default async function AdminUsersPage() {
       <div className="flex items-center gap-3 mb-6">
         <Users className="w-8 h-8 text-primary" aria-hidden="true" />
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-          Gestione Utenti
+          {t("page-title")}
         </h1>
       </div>
       <UsersTable users={users} availableTiers={tiers} />

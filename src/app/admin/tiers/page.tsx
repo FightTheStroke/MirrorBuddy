@@ -88,13 +88,13 @@ export default async function AdminTiersPage() {
           <Link href="/admin/tiers/conversion-funnel">
             <Button variant="outline">
               <Funnel className="w-4 h-4 mr-2" />
-              Conversion Funnel
+              {t("conversionFunnelButton")}
             </Button>
           </Link>
           <Link href="/admin/tiers/analytics">
             <Button variant="outline">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics
+              {t("analyticsButton")}
             </Button>
           </Link>
           <Link href="/admin/tiers/new">

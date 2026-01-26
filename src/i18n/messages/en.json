@@ -1689,7 +1689,31 @@
     "favorites": "Favorites",
     "byType": "By Type",
     "bySubject": "By Subject",
-    "byProfessor": "By Professor"
+    "byProfessor": "By Professor",
+    "search": {
+      "placeholder": "Search your materials...",
+      "label": "Search materials",
+      "clear": "Clear search"
+    },
+    "results": {
+      "singular": "result",
+      "plural": "results"
+    },
+    "filters": {
+      "reset": "Reset filters"
+    },
+    "sort": {
+      "label": "Sort by",
+      "placeholder": "Sort by"
+    },
+    "view": {
+      "grid": "Grid view",
+      "list": "List view"
+    },
+    "voiceSearch": {
+      "stop": "Stop voice search",
+      "start": "Start voice search"
+    }
   },
   "admin": {
     "invites": {
@@ -1711,7 +1735,14 @@
       "rejectionReason": "Rejection reason",
       "optional": "Optional",
       "cancel": "Cancel",
-      "confirmRejection": "Confirm rejection"
+      "confirmRejection": "Confirm rejection",
+      "reject-modal": {
+        "title": "Reject request",
+        "reason-label": "Rejection reason",
+        "placeholder": "Optional",
+        "cancel-button": "Cancel",
+        "confirm-button": "Confirm rejection"
+      }
     },
     "locales": {
       "search": "Search by country code, name, locale or maestro...",
@@ -1730,7 +1761,44 @@
     },
     "settings": {
       "title": "Settings",
-      "subtitle": "MirrorBuddy system configuration"
+      "subtitle": "MirrorBuddy system configuration",
+      "system-info": {
+        "title": "System Info",
+        "description": "System information",
+        "version": "Version",
+        "environment": "Environment",
+        "node-version": "Node:",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Budget limit for trial users",
+        "per-month": "/month",
+        "configured-via": "Configured via env var",
+        "description-text": "This amount defines the maximum monthly budget limit for trial users. The value is read from the environment variable and cannot be modified from this interface."
+      }
+    },
+    "users": {
+      "page-title": "User Management",
+      "confirm-delete": "Confirm deletion?",
+      "tabs": {
+        "all": "All",
+        "active": "Active",
+        "disabled": "Disabled",
+        "trash": "Trash"
+      },
+      "table": {
+        "username": "Username",
+        "email": "Email",
+        "role": "Role",
+        "tier": "Tier",
+        "status": "Status",
+        "created": "Created",
+        "deleted": "Deleted",
+        "actions": "Actions"
+      },
+      "empty-message": "No users found",
+      "trash-empty": "Trash empty"
     },
     "tiers": {
       "page": {
@@ -1739,7 +1807,9 @@
         "newTier": "New Tier",
         "createNew": "Create a new subscription plan",
         "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}"
+        "editMessage": "Edit tier: {name}",
+        "conversionFunnelButton": "Conversion Funnel",
+        "analyticsButton": "Analytics"
       },
       "table": {
         "code": "Code",
@@ -1846,12 +1916,16 @@
         "totalMessagesCol": "Total Messages",
         "averageCol": "Average/User",
         "activityRate": "Activity Rate",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
         "noPlans": "No tiers available",
         "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
       },
       "conversionFunnel": {
         "title": "Tier Conversion Funnel",
         "subtitle": "User progression through tier stages",
+        "backToTiers": "Back to Tiers",
         "period": "{start} to {end}",
         "trialToBase": "Trial → Base",
         "baseToProRate": "Base → Pro",
@@ -1950,11 +2024,88 @@
       "errorMessage": "An error occurred. Please try again later.",
       "placeholderMessage": "Describe your message..."
     },
-    "backButton": "Back to home"
+    "backButton": "Back to home",
+    "layout": {
+      "title": {},
+      "description": {}
+    },
+    "enterprise": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "features": {
+        "customization": "Complete customization and corporate branding",
+        "analytics": "Advanced analytics and reporting",
+        "integration": "Integration with your systems"
+      }
+    },
+    "schools": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "description2": {},
+      "support": {}
+    },
+    "schools_form": {
+      "solutions": {},
+      "features": {
+        "curriculum": "Curriculum customization",
+        "management": "Class and student management",
+        "reporting": "Reports and analytics for teachers",
+        "support": "Dedicated support"
+      },
+      "successTitle": {},
+      "successMessage": {},
+      "errorDefault": {},
+      "errorConnection": {},
+      "roleLabel": {},
+      "schoolTypeLabel": {},
+      "schoolNameLabel": {},
+      "studentCountLabel": {},
+      "specificNeedsLabel": {},
+      "messagePlaceholder": {},
+      "submitButtonDefault": {},
+      "submitButtonLoading": {},
+      "options": {
+        "roles": {
+          "dirigente": "Principal",
+          "docente": "Teacher",
+          "segreteria": "Administration",
+          "altro": "Other"
+        },
+        "schoolTypes": {
+          "primaria": "Primary School",
+          "secondariaI": "Middle School",
+          "secondariaII": "High School",
+          "universita": "University"
+        },
+        "studentCounts": {
+          "lessThan100": "Less than 100",
+          "range100To500": "100-500",
+          "range500To1000": "500-1000",
+          "moreThan1000": "More than 1000"
+        }
+      }
+    }
   },
   "astuccio": {
     "backButton": "Back to Astuccio",
-    "itemCount": "{count} tools"
+    "itemCount": "{count} tools",
+    "how_it_works": {
+      "title": {},
+      "step1_title": {},
+      "step1_desc": {},
+      "step2_title": {},
+      "step2_desc": {},
+      "step3_title": {},
+      "step3_desc": {}
+    },
+    "study_tip": {
+      "title": {},
+      "description": {}
+    }
   },
   "home": {
     "title": "The School I Want",

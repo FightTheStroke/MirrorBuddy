@@ -1680,7 +1680,31 @@
     "favorites": "Favoris",
     "byType": "Par Type",
     "bySubject": "Par Matière",
-    "byProfessor": "Par Professeur"
+    "byProfessor": "Par Professeur",
+    "search": {
+      "placeholder": "Rechercher vos matériaux...",
+      "label": "Rechercher les matériaux",
+      "clear": "Effacer la recherche"
+    },
+    "results": {
+      "singular": "résultat",
+      "plural": "résultats"
+    },
+    "filters": {
+      "reset": "Réinitialiser les filtres"
+    },
+    "sort": {
+      "label": "Trier par",
+      "placeholder": "Trier par"
+    },
+    "view": {
+      "grid": "Vue grille",
+      "list": "Vue liste"
+    },
+    "voiceSearch": {
+      "stop": "Arrêter la recherche vocale",
+      "start": "Démarrer la recherche vocale"
+    }
   },
   "admin": {
     "invites": {
@@ -1702,7 +1726,14 @@
       "rejectionReason": "Motif du rejet",
       "optional": "Optionnel",
       "cancel": "Annuler",
-      "confirmRejection": "Confirmer le rejet"
+      "confirmRejection": "Confirmer le rejet",
+      "reject-modal": {
+        "title": "Rejeter la demande",
+        "reason-label": "Motif du rejet",
+        "placeholder": "Optionnel",
+        "cancel-button": "Annuler",
+        "confirm-button": "Confirmer le rejet"
+      }
     },
     "locales": {
       "search": "Rechercher par code pays, nom, locale ou maestro...",
@@ -1721,7 +1752,44 @@
     },
     "settings": {
       "title": "Paramètres",
-      "subtitle": "Configuration du système MirrorBuddy"
+      "subtitle": "Configuration du système MirrorBuddy",
+      "system-info": {
+        "title": "System Info",
+        "description": "Informations système",
+        "version": "Version",
+        "environment": "Environnement",
+        "node-version": "Node :",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Limite de budget pour les utilisateurs en essai",
+        "per-month": "/mois",
+        "configured-via": "Configuré via var env",
+        "description-text": "Ce montant définit la limite budgétaire mensuelle maximale pour les utilisateurs en essai. La valeur est lue à partir de la variable d'environnement et ne peut pas être modifiée à partir de cette interface."
+      }
+    },
+    "users": {
+      "page-title": "Gestion des Utilisateurs",
+      "confirm-delete": "Confirmer la suppression ?",
+      "tabs": {
+        "all": "Tous",
+        "active": "Actifs",
+        "disabled": "Désactivés",
+        "trash": "Corbeille"
+      },
+      "table": {
+        "username": "Nom d'utilisateur",
+        "email": "Email",
+        "role": "Rôle",
+        "tier": "Tier",
+        "status": "Statut",
+        "created": "Créé",
+        "deleted": "Supprimé",
+        "actions": "Actions"
+      },
+      "empty-message": "Aucun utilisateur trouvé",
+      "trash-empty": "Corbeille vide"
     },
     "tiers": {
       "page": {
@@ -1730,7 +1798,9 @@
         "newTier": "New Tier",
         "createNew": "Create a new subscription plan",
         "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}"
+        "editMessage": "Edit tier: {name}",
+        "conversionFunnelButton": "Conversion Funnel",
+        "analyticsButton": "Analytics"
       },
       "table": {
         "code": "Code",
@@ -1837,12 +1907,16 @@
         "totalMessagesCol": "Total Messages",
         "averageCol": "Average/User",
         "activityRate": "Activity Rate",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
         "noPlans": "No tiers available",
         "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
       },
       "conversionFunnel": {
         "title": "Tier Conversion Funnel",
         "subtitle": "User progression through tier stages",
+        "backToTiers": "Back to Tiers",
         "period": "{start} to {end}",
         "trialToBase": "Trial → Base",
         "baseToProRate": "Base → Pro",
@@ -1941,11 +2015,88 @@
       "errorMessage": "Une erreur s'est produite. Veuillez réessayer plus tard.",
       "placeholderMessage": "Décrivez votre message..."
     },
-    "backButton": "Retour à l'accueil"
+    "backButton": "Retour à l'accueil",
+    "layout": {
+      "title": {},
+      "description": {}
+    },
+    "enterprise": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "features": {
+        "customization": "Personnalisation complète et image de marque d'entreprise",
+        "analytics": "Analyses avancées et rapports",
+        "integration": "Intégration avec vos systèmes"
+      }
+    },
+    "schools": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "description2": {},
+      "support": {}
+    },
+    "schools_form": {
+      "solutions": {},
+      "features": {
+        "curriculum": "Personnalisation du curriculum",
+        "management": "Gestion des classes et des étudiants",
+        "reporting": "Rapports et analyses pour les enseignants",
+        "support": "Support dédié"
+      },
+      "successTitle": {},
+      "successMessage": {},
+      "errorDefault": {},
+      "errorConnection": {},
+      "roleLabel": {},
+      "schoolTypeLabel": {},
+      "schoolNameLabel": {},
+      "studentCountLabel": {},
+      "specificNeedsLabel": {},
+      "messagePlaceholder": {},
+      "submitButtonDefault": {},
+      "submitButtonLoading": {},
+      "options": {
+        "roles": {
+          "dirigente": "Directeur",
+          "docente": "Enseignant",
+          "segreteria": "Secrétariat",
+          "altro": "Autre"
+        },
+        "schoolTypes": {
+          "primaria": "École Primaire",
+          "secondariaI": "Collège",
+          "secondariaII": "Lycée",
+          "universita": "Université"
+        },
+        "studentCounts": {
+          "lessThan100": "Moins de 100",
+          "range100To500": "100-500",
+          "range500To1000": "500-1000",
+          "moreThan1000": "Plus de 1000"
+        }
+      }
+    }
   },
   "astuccio": {
     "backButton": "Retour à Astuccio",
-    "itemCount": "{count} outils"
+    "itemCount": "{count} outils",
+    "how_it_works": {
+      "title": {},
+      "step1_title": {},
+      "step1_desc": {},
+      "step2_title": {},
+      "step2_desc": {},
+      "step3_title": {},
+      "step3_desc": {}
+    },
+    "study_tip": {
+      "title": {},
+      "description": {}
+    }
   },
   "home": {
     "title": "L'École Que Je Veux",
