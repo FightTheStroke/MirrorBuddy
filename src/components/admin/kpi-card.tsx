@@ -12,11 +12,12 @@ interface KpiCardProps {
   subValue?: string;
   icon: LucideIcon;
   href?: string;
+  external?: boolean;
   trend?: "up" | "down" | "neutral";
   trendValue?: string;
   badge?: number;
   badgeColor?: "amber" | "red" | "green" | "blue";
-  color?: "indigo" | "green" | "amber" | "red" | "blue" | "purple";
+  color?: "indigo" | "green" | "amber" | "red" | "blue" | "purple" | "orange";
 }
 
 const colorClasses = {
@@ -26,6 +27,7 @@ const colorClasses = {
   red: "from-red-500 to-rose-600",
   blue: "from-blue-500 to-cyan-600",
   purple: "from-purple-500 to-pink-600",
+  orange: "from-orange-500 to-red-600",
 };
 
 const badgeColorClasses = {
@@ -41,6 +43,7 @@ export function KpiCard({
   subValue,
   icon: Icon,
   href,
+  external = false,
   trend,
   trendValue,
   badge,
@@ -114,6 +117,13 @@ export function KpiCard({
   );
 
   if (href) {
+    if (external) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer">
+          {content}
+        </a>
+      );
+    }
     return <Link href={href}>{content}</Link>;
   }
 

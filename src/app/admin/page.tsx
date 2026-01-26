@@ -10,6 +10,7 @@ import {
   RefreshCw,
   Loader2,
   ExternalLink,
+  Bug,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { KpiCard } from "@/components/admin/kpi-card";
@@ -176,7 +177,27 @@ function FunnelSection() {
 
 export default function AdminDashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [sentryErrorCount, setSentryErrorCount] = useState(0);
   const { counts, status, error } = useAdminCountsSSE();
+
+  // Fetch Sentry unresolved errors count
+  useEffect(() => {
+    async function fetchSentryCount() {
+      try {
+        const res = await fetch("/api/admin/sentry/issues?limit=25");
+        if (res.ok) {
+          const data = await res.json();
+          setSentryErrorCount(data.issues?.length || 0);
+        }
+      } catch {
+        // Silently fail - Sentry integration is optional
+      }
+    }
+    fetchSentryCount();
+    // Refresh every 60 seconds
+    const interval = setInterval(fetchSentryCount, 60000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Handle manual refresh (re-establish SSE connection)
   const handleManualRefresh = async () => {
@@ -246,7 +267,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <KpiCard
           title="Richieste Beta"
           value={counts.pendingInvites}
@@ -282,6 +303,17 @@ export default function AdminDashboardPage() {
           badgeColor={counts.systemAlerts ? "red" : "green"}
           color={counts.systemAlerts ? "red" : "green"}
         />
+        <KpiCard
+          title="Errori Sentry"
+          value={sentryErrorCount}
+          subValue="Non risolti"
+          icon={Bug}
+          href="https://fightthestroke.sentry.io/issues/?query=is%3Aunresolved"
+          badge={sentryErrorCount}
+          badgeColor={sentryErrorCount > 0 ? "red" : "green"}
+          color={sentryErrorCount > 0 ? "orange" : "green"}
+          external
+        />
       </div>
 
       {/* Collapsible Panels */}
@@ -302,7 +334,7 @@ export default function AdminDashboardPage() {
           <SLOMonitoringPanel />
         </CollapsibleSection>
 
-        <CollapsibleSection title="Sentry Errors" defaultOpen={false}>
+        <CollapsibleSection title="Sentry Errors" defaultOpen={true}>
           <SentryErrorsPanel />
         </CollapsibleSection>
       </div>
