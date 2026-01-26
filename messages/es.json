@@ -1037,5 +1037,52 @@
       "greeting": "Hi, I'm Laura. How are you today? Take the time you need to tell me.",
       "description": "Reflective coach with empathetic approach and respectful timing"
     }
+  },
+  "education": {
+    "knowledge-hub": {
+      "homework": {
+        "default-title": "Tareas",
+        "no-tasks": "Sin tareas"
+      },
+      "timeline": {
+        "default-title": "Línea de tiempo",
+        "no-events": "Sin eventos"
+      },
+      "mindmap": {
+        "default-title": "Mapa mental"
+      },
+      "quiz": {
+        "default-title": "Quiz",
+        "no-questions": "Sin preguntas"
+      },
+      "flashcard": {
+        "default-title": "Tarjeta",
+        "no-cards": "Sin tarjetas"
+      },
+      "summary": {
+        "default-title": "Resumen"
+      },
+      "demo": {
+        "default-title": "Simulación"
+      },
+      "diagram": {
+        "default-title": "Diagrama"
+      },
+      "formula": {
+        "default-title": "Fórmula"
+      },
+      "chart": {
+        "default-title": "Gráfico"
+      },
+      "image": {
+        "default-title": "Imagen"
+      },
+      "pdf": {
+        "default-title": "PDF"
+      },
+      "error-title": "Error de visualización",
+      "error-message-default": "Se ha producido un error al mostrar el contenido.",
+      "retry-button": "Reintentar"
+    }
   }
 }

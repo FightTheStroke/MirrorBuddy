@@ -1037,5 +1037,52 @@
       "greeting": "Salut, je suis Laura. Comment vas-tu aujourd'hui ? Prends le temps qu'il te faut pour me raconter.",
       "description": "Coach réfléchie avec approche empathique et rythme respectueux"
     }
+  },
+  "education": {
+    "knowledge-hub": {
+      "homework": {
+        "default-title": "Devoirs",
+        "no-tasks": "Aucune tâche"
+      },
+      "timeline": {
+        "default-title": "Chronologie",
+        "no-events": "Aucun événement"
+      },
+      "mindmap": {
+        "default-title": "Carte mentale"
+      },
+      "quiz": {
+        "default-title": "Quiz",
+        "no-questions": "Aucune question"
+      },
+      "flashcard": {
+        "default-title": "Carte mémoire",
+        "no-cards": "Aucune carte"
+      },
+      "summary": {
+        "default-title": "Résumé"
+      },
+      "demo": {
+        "default-title": "Simulation"
+      },
+      "diagram": {
+        "default-title": "Diagramme"
+      },
+      "formula": {
+        "default-title": "Formule"
+      },
+      "chart": {
+        "default-title": "Graphique"
+      },
+      "image": {
+        "default-title": "Image"
+      },
+      "pdf": {
+        "default-title": "PDF"
+      },
+      "error-title": "Erreur d'affichage",
+      "error-message-default": "Une erreur s'est produite lors de l'affichage du contenu.",
+      "retry-button": "Réessayer"
+    }
   }
 }

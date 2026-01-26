@@ -1,14 +1,116 @@
 /**
  * Vitest Test Setup
  * Configures global test environment
+ *
+ * ADR 0080 Section 8: Unit tests must use real Italian translations
+ * to maintain backward compatibility with existing test assertions.
  */
 
 import { vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const itMessages = require("../../messages/it.json");
 
 // Mock server-only module - it throws when imported outside of server components
 // This allows testing modules that import server-only code
 vi.mock("server-only", () => ({}));
+
+/**
+ * Converts kebab-case to camelCase.
+ * Example: "tier-comparison" -> "tierComparison"
+ */
+function kebabToCamel(str: string): string {
+  return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
+/**
+ * Tries to find a key in an object, attempting both kebab-case and camelCase.
+ * Returns [value, found] tuple.
+ */
+function findKey(
+  obj: Record<string, unknown>,
+  key: string,
+): [unknown, boolean] {
+  // Try exact key first
+  if (key in obj) return [obj[key], true];
+  // Try camelCase version
+  const camelKey = kebabToCamel(key);
+  if (camelKey in obj) return [obj[camelKey], true];
+  return [undefined, false];
+}
+
+/**
+ * Resolves a nested translation key like "common.save" from messages object.
+ * Handles both kebab-case and camelCase namespace/key variants.
+ * Returns the key itself if not found (fallback for missing translations).
+ */
+function resolveTranslation(
+  messages: Record<string, unknown>,
+  namespace: string,
+  key: string,
+): string {
+  // Navigate to namespace first (e.g., "welcome.tier-comparison" -> messages.welcome.tierComparison)
+  const parts = namespace.split(".");
+  let current: unknown = messages;
+
+  for (const part of parts) {
+    if (current && typeof current === "object") {
+      const [value, found] = findKey(current as Record<string, unknown>, part);
+      if (found) {
+        current = value;
+      } else {
+        return key; // Namespace not found, return key
+      }
+    } else {
+      return key;
+    }
+  }
+
+  // Now resolve the key within the namespace
+  const keyParts = key.split(".");
+  for (const part of keyParts) {
+    if (current && typeof current === "object") {
+      const [value, found] = findKey(current as Record<string, unknown>, part);
+      if (found) {
+        current = value;
+      } else {
+        return key; // Key not found, return key
+      }
+    } else {
+      return key;
+    }
+  }
+
+  return typeof current === "string" ? current : key;
+}
+
+// Mock next-intl for components using useTranslations
+// Uses REAL Italian translations to maintain test compatibility (ADR 0080)
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string = "") => {
+    return (key: string, values?: Record<string, unknown>) => {
+      const translation = resolveTranslation(itMessages, namespace, key);
+      // Handle interpolation if values provided
+      if (values && typeof translation === "string") {
+        return translation.replace(/\{(\w+)\}/g, (_, name) =>
+          values[name] !== undefined ? String(values[name]) : `{${name}}`,
+        );
+      }
+      return translation;
+    };
+  },
+  useLocale: () => "it",
+  useMessages: () => itMessages,
+  useTimeZone: () => "Europe/Rome",
+  useFormatter: () => ({
+    dateTime: (date: Date) => date.toISOString(),
+    number: (n: number) => n.toString(),
+    relativeTime: () => "now",
+  }),
+  useNow: () => new Date(),
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) =>
+    children,
+}));
 
 // Mock console methods for cleaner test output
 global.console = {

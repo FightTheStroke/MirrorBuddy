@@ -170,6 +170,100 @@ These are **UI labels, NOT secrets**. GitGuardian's "Username Password" detector
 5. Fix any remaining `console.error/warn/log` calls
 6. Force push: `git push --force-with-lease --no-verify`
 
+### 8. Unit Test i18n Mock Requirements (CRITICAL)
+
+**Risk**: Unit tests fail with 600+ errors because `useTranslations` requires proper mocking.
+
+**Problem**: Components using `useTranslations` from `next-intl` throw errors in Vitest:
+
+```
+Error: `useTranslations` requires a `NextIntlClientProvider` ancestor
+```
+
+**Solution implemented in `src/test/setup.ts`**:
+
+```typescript
+// Load real Italian translations for test compatibility
+const itMessages = require("../../messages/it.json");
+
+vi.mock("next-intl", () => ({
+  useTranslations: (namespace: string = "") => {
+    return (key: string, values?: Record<string, unknown>) => {
+      const translation = resolveTranslation(itMessages, namespace, key);
+      // Handle interpolation if values provided
+      if (values && typeof translation === "string") {
+        return translation.replace(/\{(\w+)\}/g, (_, name) =>
+          values[name] !== undefined ? String(values[name]) : `{${name}}`,
+        );
+      }
+      return translation;
+    };
+  },
+  useLocale: () => "it",
+  useMessages: () => itMessages,
+  // ... other hooks
+}));
+```
+
+**Why real translations instead of keys**:
+
+- Existing tests use assertions like `screen.getByRole('group', { name: 'Tag' })`
+- Returning keys would require updating 300+ test assertions
+- Real translations maintain backward compatibility
+
+**ESLint protection**: The `no-hardcoded-italian` rule in `eslint.config.mjs` catches
+hardcoded Italian text in JSX, but explicitly ignores test files:
+
+```javascript
+{
+  files: ["src/**/*.tsx"],
+  ignores: ["src/**/*.test.tsx", "src/**/__tests__/**"],
+  rules: { "local-rules/no-hardcoded-italian": "error" },
+}
+```
+
+**Future-proofing**: When adding new test assertions for i18n components:
+
+1. Use actual Italian text that will be resolved from `messages/it.json`
+2. Or use `data-testid` attributes for locale-independent testing
+3. Prefer testing behavior over text content where possible
+
+### 9. Missing Translation Keys (BLOCKING ISSUE)
+
+**Status**: ⚠️ INCOMPLETE - Many translation keys are missing from messages files
+
+**Problem**: Components have been migrated to use `useTranslations` but the corresponding
+translation keys don't exist in `messages/*.json` files.
+
+**Symptoms**:
+
+- ~300+ unit tests fail because expected Italian text is not in messages
+- Tests look for text like "Tag", "Preferiti" but translations are missing
+- Mock returns translation keys instead of translated text
+
+**Namespace mismatches found**:
+
+| Code Namespace            | Messages Key              | Status   |
+| ------------------------- | ------------------------- | -------- |
+| `welcome.tier-comparison` | `welcome.tierComparison`  | ✓ Fixed  |
+| `education.knowledge-hub` | `education.knowledge-hub` | ✓ Added  |
+| `admin.*`                 | (missing)                 | ✗ NEEDED |
+| `conversation.*`          | (missing)                 | ✗ NEEDED |
+| `tools.*` (many)          | Partially present         | ⚠️ Check |
+| `profile.*`               | (missing)                 | ✗ NEEDED |
+
+**Resolution before merge** (REQUIRED):
+
+1. Run: `npm run test:unit 2>&1 | grep "FAIL\|namespace"` to identify missing keys
+2. For each failing test, check what namespace the component uses
+3. Add missing keys to `messages/it.json` (and other language files)
+4. Verify with: `npm run test:unit -- --reporter=dot | tail -5`
+
+**Workaround in mock**: The test setup converts kebab-case to camelCase
+(`tier-comparison` → `tierComparison`) automatically.
+
+**Estimated effort**: ~300 translation keys need to be added across 5 language files
+
 ## Files Changed
 
 | File                                      | Change                                      | Risk Level |
@@ -186,6 +280,7 @@ These are **UI labels, NOT secrets**. GitGuardian's "Username Password" detector
 | `src/app/api/admin/funnel/by-locale/*.ts` | NEW - Analytics by locale                   | LOW        |
 | `src/lib/i18n/language-cookie.ts`         | NEW - Client language cookie                | LOW        |
 | `src/lib/metadata/get-page-metadata.ts`   | NEW - Localized metadata                    | LOW        |
+| `src/test/setup.ts`                       | Added next-intl mock with real translations | MEDIUM     |
 
 ## Verification Checklist
 
@@ -193,6 +288,7 @@ Before deploying after merge:
 
 - [ ] `npm run lint` passes (no-console rule, ADR 0076)
 - [ ] `npm run typecheck` passes
+- [ ] `npm run test:unit` passes (requires next-intl mock, see section 8)
 - [ ] `npm run build` completes without errors
 - [ ] `npx prisma generate` runs successfully
 - [ ] `./scripts/sync-databases.sh` executed for all environments

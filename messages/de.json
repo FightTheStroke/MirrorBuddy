@@ -1036,5 +1036,52 @@
       "greeting": "Hallo, ich bin Laura. Wie geht es dir heute? Nimm dir die Zeit, die du brauchst, um mir davon zu erzählen.",
       "description": "Nachdenklicher Coach mit empathischem Ansatz und respektvollem Tempo"
     }
+  },
+  "education": {
+    "knowledge-hub": {
+      "homework": {
+        "default-title": "Aufgaben",
+        "no-tasks": "Keine Aufgaben"
+      },
+      "timeline": {
+        "default-title": "Zeitstrahl",
+        "no-events": "Keine Ereignisse"
+      },
+      "mindmap": {
+        "default-title": "Mindmap"
+      },
+      "quiz": {
+        "default-title": "Quiz",
+        "no-questions": "Keine Fragen"
+      },
+      "flashcard": {
+        "default-title": "Karteikarte",
+        "no-cards": "Keine Karteikarten"
+      },
+      "summary": {
+        "default-title": "Zusammenfassung"
+      },
+      "demo": {
+        "default-title": "Simulation"
+      },
+      "diagram": {
+        "default-title": "Diagramm"
+      },
+      "formula": {
+        "default-title": "Formel"
+      },
+      "chart": {
+        "default-title": "Diagramm"
+      },
+      "image": {
+        "default-title": "Bild"
+      },
+      "pdf": {
+        "default-title": "PDF"
+      },
+      "error-title": "Anzeigefehler",
+      "error-message-default": "Ein Fehler ist beim Anzeigen aufgetreten.",
+      "retry-button": "Wiederholen"
+    }
   }
 }

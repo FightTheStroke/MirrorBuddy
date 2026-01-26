@@ -1037,5 +1037,52 @@
       "greeting": "Ciao, sono Laura. Come stai oggi? Prenditi il tempo che ti serve per raccontarmi.",
       "description": "Coach riflessiva con approccio empatico e tempi rispettosi"
     }
+  },
+  "education": {
+    "knowledge-hub": {
+      "homework": {
+        "default-title": "Compiti",
+        "no-tasks": "Nessun compito"
+      },
+      "timeline": {
+        "default-title": "Linea del Tempo",
+        "no-events": "Nessun evento"
+      },
+      "mindmap": {
+        "default-title": "Mappa Mentale"
+      },
+      "quiz": {
+        "default-title": "Quiz",
+        "no-questions": "Nessuna domanda"
+      },
+      "flashcard": {
+        "default-title": "Flashcard",
+        "no-cards": "Nessuna flashcard"
+      },
+      "summary": {
+        "default-title": "Riassunto"
+      },
+      "demo": {
+        "default-title": "Simulazione"
+      },
+      "diagram": {
+        "default-title": "Diagramma"
+      },
+      "formula": {
+        "default-title": "Formula"
+      },
+      "chart": {
+        "default-title": "Grafico"
+      },
+      "image": {
+        "default-title": "Immagine"
+      },
+      "pdf": {
+        "default-title": "PDF"
+      },
+      "error-title": "Errore di visualizzazione",
+      "error-message-default": "Si è verificato un errore durante la visualizzazione del contenuto.",
+      "retry-button": "Riprova"
+    }
   }
 }
