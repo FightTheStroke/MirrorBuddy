@@ -3,6 +3,8 @@ import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { tierService } from "@/lib/tier/tier-service";
+import { requireCSRF } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/admin/tiers
@@ -21,7 +23,7 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json({ tiers });
   } catch (error) {
-    console.error("Error fetching tiers:", error);
+    logger.error("Error fetching tiers", {}, error as Error);
     return NextResponse.json(
       { error: "Failed to fetch tiers" },
       { status: 500 },
@@ -33,7 +35,11 @@ export async function GET(_request: NextRequest) {
  * POST /api/admin/tiers
  * Create a new tier
  */
-export async function POST(request: NextRequest /* unused */) {
+export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
@@ -109,7 +115,7 @@ export async function POST(request: NextRequest /* unused */) {
 
     return NextResponse.json({ success: true, tier }, { status: 201 });
   } catch (error) {
-    console.error("Error creating tier:", error);
+    logger.error("Error creating tier", {}, error as Error);
     return NextResponse.json(
       { error: "Failed to create tier" },
       { status: 500 },

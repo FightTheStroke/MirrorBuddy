@@ -1,0 +1,2 @@
+-- Add USER_STATUS_CHANGE to TierAuditAction enum
+ALTER TYPE "TierAuditAction" ADD VALUE 'USER_STATUS_CHANGE';

@@ -109,11 +109,14 @@ export function UsersTable({
     setError(null);
     try {
       if (action === "toggle") {
-        await fetch(`/api/admin/users/${userId}`, {
+        const res = await csrfFetch(`/api/admin/users/${userId}`, {
           method: "PATCH",
-          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ disabled: !currentDisabled }),
         });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.error || "Failed to toggle user");
+        }
       } else if (action === "delete") {
         if (!confirm("Confermi eliminazione?")) return;
         await csrfFetch(`/api/admin/users/${userId}`, {

@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { Save, X } from "lucide-react";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import { BasicInfoSection } from "./basic-info-section";
 import { LimitsSection } from "./limits-section";
 import { FeaturesSection } from "./features-section";
@@ -103,9 +104,8 @@ export function TierForm({ tier }: TierFormProps) {
         : "/api/admin/tiers";
       const method = isEditing ? "PUT" : "POST";
 
-      const response = await fetch(url, {
+      const response = await csrfFetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });
 

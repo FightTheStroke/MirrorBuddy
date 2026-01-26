@@ -8,6 +8,13 @@ import { executeUserDataDeletion } from "@/app/api/privacy/delete-my-data/helper
 
 export const PATCH = withAdmin(
   async (request: NextRequest, { userId: adminId }) => {
+    if (!requireCSRF(request)) {
+      return NextResponse.json(
+        { error: "Invalid CSRF token" },
+        { status: 403 },
+      );
+    }
+
     try {
       const targetId = new URL(request.url).pathname.split("/").pop();
       if (!targetId) {
@@ -34,6 +41,19 @@ export const PATCH = withAdmin(
       const updated = await prisma.user.update({
         where: { id: targetId },
         data: { disabled },
+      });
+
+      // Create audit log for status change
+      await prisma.tierAuditLog.create({
+        data: {
+          userId: targetId,
+          adminId,
+          action: "USER_STATUS_CHANGE",
+          changes: {
+            old: { disabled: user.disabled },
+            new: { disabled },
+          },
+        },
       });
 
       logger.info("User status updated", {

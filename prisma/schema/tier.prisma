@@ -21,6 +21,7 @@ enum TierAuditAction {
   TIER_CHANGE
   USER_FEATURE_CONFIG_SET
   USER_FEATURE_CONFIG_DELETE
+  USER_STATUS_CHANGE
 }
 
 model TierDefinition {

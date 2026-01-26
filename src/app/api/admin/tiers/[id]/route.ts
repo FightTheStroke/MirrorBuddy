@@ -3,6 +3,8 @@ import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { tierService } from "@/lib/tier/tier-service";
+import { requireCSRF } from "@/lib/security/csrf";
+import { logger } from "@/lib/logger";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
@@ -31,7 +33,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json(tier);
   } catch (error) {
-    console.error("Error fetching tier:", error);
+    logger.error("Error fetching tier", {}, error as Error);
     return NextResponse.json(
       { error: "Failed to fetch tier" },
       { status: 500 },
@@ -44,6 +46,10 @@ export async function GET(request: NextRequest, context: RouteContext) {
  * Update a tier
  */
 export async function PUT(request: NextRequest, context: RouteContext) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
@@ -60,6 +66,14 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
     if (!existing) {
       return NextResponse.json({ error: "Tier not found" }, { status: 404 });
+    }
+
+    // Tier code cannot be changed
+    if (body.code && body.code !== existing.code) {
+      return NextResponse.json(
+        { error: "Tier code cannot be changed" },
+        { status: 400 },
+      );
     }
 
     // Store old values for audit
@@ -155,7 +169,7 @@ export async function PUT(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ success: true, tier });
   } catch (error) {
-    console.error("Error updating tier:", error);
+    logger.error("Error updating tier", {}, error as Error);
     return NextResponse.json(
       { error: "Failed to update tier" },
       { status: 500 },
@@ -168,6 +182,10 @@ export async function PUT(request: NextRequest, context: RouteContext) {
  * Delete a tier (optional - only if not used by any subscriptions)
  */
 export async function DELETE(request: NextRequest, context: RouteContext) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
@@ -224,7 +242,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting tier:", error);
+    logger.error("Error deleting tier", {}, error as Error);
     return NextResponse.json(
       { error: "Failed to delete tier" },
       { status: 500 },

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/admin/audit-logs
@@ -20,8 +21,17 @@ export async function GET(request: NextRequest) {
     const adminId = searchParams.get("adminId");
     const startDate = searchParams.get("startDate");
     const endDate = searchParams.get("endDate");
-    const page = parseInt(searchParams.get("page") || "1", 10);
-    const pageSize = parseInt(searchParams.get("pageSize") || "50", 10);
+
+    // Validate pagination parameters
+    const rawPage = parseInt(searchParams.get("page") || "1", 10);
+    const rawPageSize = parseInt(searchParams.get("pageSize") || "50", 10);
+    const page = Number.isNaN(rawPage) || rawPage < 1 ? 1 : rawPage;
+    const pageSize =
+      Number.isNaN(rawPageSize) || rawPageSize < 1
+        ? 50
+        : rawPageSize > 100
+          ? 100
+          : rawPageSize;
 
     // Build filter object
     const where: Record<string, unknown> = {};
@@ -65,10 +75,13 @@ export async function GET(request: NextRequest) {
     // Log detailed error for debugging
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
-    console.error("Error fetching audit logs:", {
-      error: errorMessage,
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    logger.error(
+      "Error fetching audit logs",
+      {
+        error: errorMessage,
+      },
+      error as Error,
+    );
 
     // Check if it's a Prisma error (table doesn't exist, etc.)
     if (
