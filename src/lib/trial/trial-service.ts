@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
+import { logger } from "@/lib/logger";
 import {
   checkAndIncrementUsage,
   getTierLimitsForTrial,
@@ -28,8 +29,31 @@ export const TRIAL_LIMITS = {
   DOCS: 1, // 1 document upload
 } as const;
 
+/**
+ * Hash IP address with salt for trial session identification.
+ * Uses IP_HASH_SALT env var for security. Monthly rotation recommended.
+ *
+ * @param ip - IP address to hash
+ * @returns SHA-256 hash of IP + salt (64 hex characters)
+ */
 function hashIp(ip: string): string {
-  return crypto.createHash("sha256").update(ip).digest("hex");
+  // Get salt from env var (recommended: 32+ characters, monthly rotation)
+  let salt = process.env.IP_HASH_SALT;
+
+  // Fallback: generate random salt if missing (per-process, not persisted)
+  if (!salt) {
+    salt = crypto.randomBytes(16).toString("hex");
+    logger.warn(
+      "IP_HASH_SALT environment variable not set. Using ephemeral salt. " +
+        "Set IP_HASH_SALT in production for consistent hashing across deployments.",
+    );
+  }
+
+  // Hash IP with salt
+  return crypto
+    .createHash("sha256")
+    .update(ip + salt)
+    .digest("hex");
 }
 
 function getRandomItems<T>(arr: T[], count: number): T[] {

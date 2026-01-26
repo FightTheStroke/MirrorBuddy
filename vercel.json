@@ -16,6 +16,10 @@
     {
       "path": "/api/cron/trial-nurturing",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/rotate-ip-salt",
+      "schedule": "0 0 1 * *"
     }
   ]
 }
