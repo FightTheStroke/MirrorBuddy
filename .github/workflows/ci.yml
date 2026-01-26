@@ -268,6 +268,19 @@ jobs:
             exit 1
           fi
 
+      - name: Regression Gate - Skipped test monitoring
+        run: |
+          echo "Monitoring skipped tests to prevent regression debt..."
+          BASELINE=5  # Update when intentionally fixing/adding skips
+
+          # Count skipped tests from coverage output
+          SKIPPED=$(grep -r "skip\|pending" coverage/ 2>/dev/null | wc -l || echo "0")
+
+          if [ "$SKIPPED" -gt "$BASELINE" ]; then
+            echo "::warning::Skipped tests ($SKIPPED) above baseline ($BASELINE)"
+            echo "Consider fixing flaky tests before merging"
+          fi
+
       - name: Upload coverage report
         if: always()
         uses: actions/upload-artifact@v4
@@ -379,16 +392,106 @@ jobs:
             echo "No circular imports detected"
           fi
 
+  # Lane 5b: SMOKE TESTS - Critical Path Validation (BLOCKING)
+  # Runs on EVERY PR - fast, high-value tests that catch regressions
+  # Must pass before any merge to main
+  smoke-tests:
+    name: Smoke Tests (BLOCKING)
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      # Download pre-built .next from build job
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Smoke Tests
+        run: |
+          echo "Running critical path smoke tests..."
+          npx playwright test e2e/smoke/ --reporter=list
+        env:
+          CI: true
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      - name: Upload smoke test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-test-report
+          path: playwright-report/
+          retention-days: 7
+
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
-  # MANDATORY on main branch only (push to main or PR targeting main)
+  # MANDATORY on all PRs to main/development branches (ADR 0064: Mobile UX)
   # NOTE: Runs AFTER e2e-tests to avoid database conflicts (shared test DB)
   mobile-e2e:
     name: Mobile E2E Tests
     runs-on: ubuntu-latest
     needs: [build, e2e-tests]
-    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    if: |
+      github.event_name == 'pull_request' &&
+      (github.base_ref == 'main' || github.base_ref == 'development')
 
     services:
       postgres:
@@ -472,13 +575,36 @@ jobs:
           path: playwright-report/
           retention-days: 30
 
+      - name: Mobile E2E failure check
+        if: failure()
+        run: |
+          echo "::error::Mobile E2E Tests Failed - This is a BLOCKING check"
+          echo ""
+          echo "Mobile responsive design regression detected!"
+          echo ""
+          echo "What to check:"
+          echo "1. Touch targets: All interactive elements must be ≥44×44px (WCAG 2.5.5)"
+          echo "2. Responsive layout: Use mobile-first classes (grid-cols-1 md:grid-cols-2)"
+          echo "3. Horizontal scroll: Ensure no overflow on small screens"
+          echo "4. Text readability: Font sizes appropriate for mobile devices"
+          echo ""
+          echo "Device viewports tested:"
+          echo "- iPhone SE: 375×667px (smallest supported)"
+          echo "- Pixel 7: 412×915px (Android flagship)"
+          echo "- iPad Mini: 768×1024px (tablet portrait)"
+          echo ""
+          echo "See mobile-e2e-report artifact for detailed test results."
+          exit 1
+
   # Lane 6b: E2E Tests - Full end-to-end test suite
-  # MANDATORY on main branch only (push to main or PR targeting main)
+  # MANDATORY on all PRs to main/development branches
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
-    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    if: |
+      github.event_name == 'pull_request' &&
+      (github.base_ref == 'main' || github.base_ref == 'development')
 
     services:
       postgres:
@@ -579,12 +705,14 @@ jobs:
           tags: mirrorbuddy:test
 
   # Lane 8: Performance Budgets
-  # MANDATORY on main branch only (push to main or PR targeting main)
+  # MANDATORY on all PRs to main/development branches
   performance:
     name: Performance Budgets
     runs-on: ubuntu-latest
     needs: [build]
-    if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
+    if: |
+      github.event_name == 'pull_request' &&
+      (github.base_ref == 'main' || github.base_ref == 'development')
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
