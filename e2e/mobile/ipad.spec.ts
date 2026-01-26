@@ -103,7 +103,10 @@ test.describe("iPad Mini Responsive UX", () => {
 
     // Skip test on large viewports where hamburger menu is hidden (lg:hidden)
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(
+        true,
+        "Mobile sidebar overlay hidden on desktop viewports (lg:hidden)",
+      );
       return;
     }
 
@@ -173,7 +176,10 @@ test.describe("iPad Mini Responsive UX", () => {
 
     // Skip test on large viewports where hamburger menu is hidden (lg:hidden)
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(
+        true,
+        "Mobile sidebar overlay hidden on desktop viewports (lg:hidden)",
+      );
       return;
     }
 
@@ -289,7 +295,10 @@ test.describe("iPad Mini Responsive UX", () => {
 
     // Skip test on large viewports where hamburger menu is hidden (lg:hidden)
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(
+        true,
+        "Mobile sidebar overlay hidden on desktop viewports (lg:hidden)",
+      );
       return;
     }
 

@@ -482,9 +482,13 @@ test.describe("Instant Access - Quick Panel", () => {
 });
 
 test.describe("Instant Access - Profile Activation", () => {
-  // Skipped: Font loading is unreliable in CI environment
-  // TODO: Add font preloading or mock to fix this test
-  test.skip("selecting dyslexia profile changes font", async ({ page }) => {
+  test("selecting dyslexia profile changes font", async ({ page }) => {
+    // Font loading is unreliable in CI environment - OpenDyslexic may not be cached
+    test.skip(
+      !!process.env.CI,
+      "Font loading unreliable in CI - needs font preloading",
+    );
+
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 

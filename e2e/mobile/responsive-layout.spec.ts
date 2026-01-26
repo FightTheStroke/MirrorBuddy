@@ -39,7 +39,7 @@ test.describe("Mobile Responsive Layout", () => {
     // Skip on large viewports where hamburger menu is hidden (lg:hidden)
     const viewportWidth = await mobile.getViewportWidth();
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(true, "Hamburger menu hidden on desktop viewports (lg:hidden)");
       return;
     }
 
@@ -69,7 +69,7 @@ test.describe("Mobile Responsive Layout", () => {
     // Skip on large viewports where sidebar is always visible (no mobile overlay)
     const viewportWidth = await mobile.getViewportWidth();
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(true, "Hamburger menu hidden on desktop viewports (lg:hidden)");
       return;
     }
 
@@ -98,7 +98,7 @@ test.describe("Mobile Responsive Layout", () => {
     // Skip on large viewports where sidebar is always visible
     const viewportWidth = await mobile.getViewportWidth();
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(true, "Hamburger menu hidden on desktop viewports (lg:hidden)");
       return;
     }
 
@@ -121,7 +121,7 @@ test.describe("Mobile Responsive Layout", () => {
     // Skip on large viewports where mobile toggle doesn't exist
     const viewportWidth = await mobile.getViewportWidth();
     if (viewportWidth >= 1024) {
-      test.skip();
+      test.skip(true, "Hamburger menu hidden on desktop viewports (lg:hidden)");
       return;
     }
 
