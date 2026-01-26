@@ -177,7 +177,9 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     });
 
     await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    // Use domcontentloaded instead of networkidle to avoid CI timeout issues
+    // networkidle can hang if there are persistent connections (EventSource, etc.)
+    await page.waitForLoadState("domcontentloaded");
 
     // Page should not be stuck on loading due to CSP
     const isLoading = await page
