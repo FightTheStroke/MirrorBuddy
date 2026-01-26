@@ -38,17 +38,26 @@ import {
   getFeatureAIConfig,
   type FeatureModelType,
 } from "./tier-helpers";
+import {
+  getTierMemoryLimits,
+  type TierMemoryLimits,
+} from "@/lib/conversation/tier-memory-config";
+import type { TierName } from "@/types/tier-types";
 
 export class TierService {
   // Cache for tier feature configs (rarely change)
   private featureCache = new Map<string, Record<string, unknown>>();
 
+  // Cache for tier memory configs (rarely change)
+  private memoryConfigCache = new Map<string, TierMemoryLimits>();
+
   /**
-   * Invalidate all cached tier features
+   * Invalidate all cached tier features and memory configs
    * Call this after tier updates in admin panel
    */
   invalidateCache(): void {
     this.featureCache.clear();
+    this.memoryConfigCache.clear();
     logger.info("All tier caches invalidated");
   }
 
@@ -324,6 +333,52 @@ export class TierService {
       const fallbackCode = userId ? TierCode.BASE : TierCode.TRIAL;
       const fallbackTier = await this.getTierByCode(fallbackCode);
       return extractTierLimits(fallbackTier);
+    }
+  }
+
+  /**
+   * Get conversation memory configuration for a user's tier
+   *
+   * Returns memory limits that control:
+   * - How many previous conversations to retain for memory injection
+   * - How long conversation history is kept
+   * - Maximum key facts and topics stored
+   * - Advanced features like semantic search and cross-maestro memory
+   *
+   * Results are cached by tier to avoid repeated lookups.
+   * Each call returns a fresh deep copy to prevent accidental mutations
+   * from affecting other parts of the application.
+   *
+   * @param userId - User ID (null for anonymous users)
+   * @returns TierMemoryLimits with memory configuration for the user's tier (fresh copy)
+   */
+  async getTierMemoryConfig(userId: string | null): Promise<TierMemoryLimits> {
+    try {
+      // Get the user's effective tier
+      const tier = await this.getEffectiveTier(userId);
+
+      // Extract tier name from tier code
+      const tierName = tier.code.toLowerCase() as TierName;
+
+      // Check cache first
+      let cachedConfig = this.memoryConfigCache.get(tierName);
+
+      // If not in cache, get from getTierMemoryLimits and cache it
+      if (!cachedConfig) {
+        cachedConfig = getTierMemoryLimits(tierName);
+        this.memoryConfigCache.set(tierName, cachedConfig);
+      }
+
+      // Always return a fresh deep copy to prevent mutation issues
+      return structuredClone(cachedConfig);
+    } catch (error) {
+      logger.error("Error fetching memory config for user, using fallback", {
+        userId,
+        error: String(error),
+      });
+
+      // Error fallback: return Trial tier memory config (fresh copy)
+      return getTierMemoryLimits("trial");
     }
   }
 
