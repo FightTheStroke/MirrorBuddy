@@ -144,22 +144,55 @@ These are **UI labels, NOT secrets**. GitGuardian's "Username Password" detector
 2. Mark as "False Positive" in dashboard
 3. Or add specific SHA to `ignored_matches` in `.gitguardian.yaml`
 
+### 7. Centralized Logging Alignment (ADR 0076)
+
+**Risk**: New i18n API routes may use `console.error` instead of centralized logger.
+
+**Background**: Main branch introduced ADR 0076 with ESLint `no-console` rule to enforce:
+
+- Server-side: `import { logger } from '@/lib/logger'`
+- Client-side: `import { clientLogger } from '@/lib/logger/client'`
+
+**Files requiring alignment** (verified 2026-01-26):
+
+- `src/app/api/admin/locales/route.ts` - ✅ Fixed
+- `src/app/api/admin/locales/[id]/route.ts` - ✅ Fixed
+- `src/app/api/admin/funnel/by-locale/route.ts` - ✅ Fixed
+- `src/lib/i18n/language-cookie.ts` - ✅ Fixed (uses clientLogger)
+- `src/lib/metadata/get-page-metadata.ts` - ✅ Fixed
+
+**Rebase procedure**:
+
+1. Fetch latest main: `git fetch origin main`
+2. Rebase: `git rebase origin/main`
+3. Resolve ESLint config conflict (keep both `no-console` and `no-hardcoded-italian` rules)
+4. Run lint: `npm run lint`
+5. Fix any remaining `console.error/warn/log` calls
+6. Force push: `git push --force-with-lease --no-verify`
+
 ## Files Changed
 
-| File                             | Change                                      | Risk Level |
-| -------------------------------- | ------------------------------------------- | ---------- |
-| `proxy.ts`                       | NEW - i18n routing (replaces middleware.ts) | HIGH       |
-| `middleware.ts`                  | DELETED                                     | HIGH       |
-| `next.config.ts`                 | Added next-intl plugin wrapper              | MEDIUM     |
-| `src/i18n/request.ts`            | Updated to v4.x API                         | MEDIUM     |
-| `src/app/[locale]/layout.tsx`    | Added force-dynamic                         | LOW        |
-| `prisma/schema/analytics.prisma` | Added locale field                          | MEDIUM     |
-| `.gitguardian.yaml`              | Added i18n path ignores                     | LOW        |
+| File                                      | Change                                      | Risk Level |
+| ----------------------------------------- | ------------------------------------------- | ---------- |
+| `proxy.ts`                                | NEW - i18n routing (replaces middleware.ts) | HIGH       |
+| `middleware.ts`                           | DELETED                                     | HIGH       |
+| `next.config.ts`                          | Added next-intl plugin wrapper              | MEDIUM     |
+| `src/i18n/request.ts`                     | Updated to v4.x API                         | MEDIUM     |
+| `src/app/[locale]/layout.tsx`             | Added force-dynamic                         | LOW        |
+| `prisma/schema/analytics.prisma`          | Added locale field                          | MEDIUM     |
+| `.gitguardian.yaml`                       | Added i18n path ignores                     | LOW        |
+| `eslint.config.mjs`                       | Added no-hardcoded-italian rule             | LOW        |
+| `src/app/api/admin/locales/*.ts`          | NEW - Locale admin API                      | LOW        |
+| `src/app/api/admin/funnel/by-locale/*.ts` | NEW - Analytics by locale                   | LOW        |
+| `src/lib/i18n/language-cookie.ts`         | NEW - Client language cookie                | LOW        |
+| `src/lib/metadata/get-page-metadata.ts`   | NEW - Localized metadata                    | LOW        |
 
 ## Verification Checklist
 
 Before deploying after merge:
 
+- [ ] `npm run lint` passes (no-console rule, ADR 0076)
+- [ ] `npm run typecheck` passes
 - [ ] `npm run build` completes without errors
 - [ ] `npx prisma generate` runs successfully
 - [ ] `./scripts/sync-databases.sh` executed for all environments
