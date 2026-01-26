@@ -143,7 +143,7 @@ const eslintConfig = defineConfig([
   // CSRF Protection: Enforce csrfFetch for client-side POST/PUT/DELETE requests
   // Only applies to client-side code (components, hooks, stores, client utils)
   // Excludes: API routes, AI providers, server utilities, scripts
-  // See ADR 0053 for full documentation
+  // See ADR 0078 for full documentation (formerly ADR 0053)
   {
     files: [
       "src/components/**/*.ts",
@@ -171,15 +171,15 @@ const eslintConfig = defineConfig([
         "error",
         {
           selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='POST'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for POST requests. Plain fetch fails with 403 in production. See ADR 0053.",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for POST requests. Plain fetch fails with 403 in production. See ADR 0078.",
         },
         {
           selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='PUT'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for PUT requests. Plain fetch fails with 403 in production. See ADR 0053.",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for PUT requests. Plain fetch fails with 403 in production. See ADR 0078.",
         },
         {
           selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='DELETE'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for DELETE requests. Plain fetch fails with 403 in production. See ADR 0053.",
+          message: "Use csrfFetch from '@/lib/auth/csrf-client' for DELETE requests. Plain fetch fails with 403 in production. See ADR 0078.",
         },
       ],
     },
@@ -214,6 +214,84 @@ const eslintConfig = defineConfig([
         "error",
         {
           allow: ["info", "debug", "time", "timeEnd", "trace", "assert"],
+        },
+      ],
+    },
+  },
+  // ADR 0015: Block localStorage writes outside authorized files
+  // Only consent, trial visitor tracking, and accessibility settings are allowed
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      // Authorized localStorage uses per ADR 0015
+      "src/lib/consent/**/*.ts", // GDPR consent management
+      "src/lib/storage/**/*.ts", // Legacy cleanup and migrations
+      "src/lib/trial/**/*.ts", // Trial visitor tracking (ADR 0056)
+      "src/lib/accessibility/**/*.ts", // Device-specific a11y settings
+      "src/app/cookies/**/*.tsx", // Cookie documentation page
+      "src/components/pwa/**/*.tsx", // PWA install banner dismissal
+      "src/lib/hooks/use-permissions.ts", // Browser permission caches
+      // Test files
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "CallExpression[callee.object.name='localStorage'][callee.property.name='setItem']",
+          message: "localStorage.setItem is restricted per ADR 0015. Use database API for user data. Allowed: consent, trial tracking, a11y settings only.",
+        },
+      ],
+    },
+  },
+  // ADR 0005, 0034: EventSource must be closed in cleanup
+  // Warns about EventSource usage to remind developers about .close() in useEffect cleanup
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      // SSE server-side implementations
+      "src/app/api/**/*.ts",
+      // Test files
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "NewExpression[callee.name='EventSource']",
+          message: "EventSource instances must call .close() in useEffect cleanup to prevent memory leaks. See ADR 0005, 0034.",
+        },
+      ],
+    },
+  },
+  // ADR 0075: Prefer validateAuth() over direct cookie reads in API routes
+  // Warns about direct cookies().get() calls to encourage using validateAuth/validateAdminAuth
+  {
+    files: ["src/app/api/**/*.ts"],
+    ignores: [
+      // Auth implementation files (they define validateAuth)
+      "src/app/api/auth/**/*.ts",
+      // Health checks don't need auth
+      "src/app/api/health/**/*.ts",
+      "src/app/api/metrics/**/*.ts",
+      // Public endpoints
+      "src/app/api/contact/**/*.ts",
+      "src/app/api/tos/**/*.ts",
+      "src/app/api/invite/request/**/*.ts",
+      // Test files
+      "**/*.test.ts",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "no-restricted-syntax": [
+        "warn",
+        {
+          selector: "CallExpression[callee.object.name='cookieStore'][callee.property.name='get']",
+          message: "Prefer validateAuth() or validateAdminAuth() from '@/lib/auth/session-auth' instead of direct cookie reads. See ADR 0075.",
         },
       ],
     },

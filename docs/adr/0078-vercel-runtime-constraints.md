@@ -1,4 +1,4 @@
-# ADR 0053: Vercel Runtime Constraints
+# ADR 0078: Vercel Runtime Constraints
 
 ## Status
 
@@ -115,7 +115,7 @@ ESLint rule in `eslint.config.mjs` now enforces `csrfFetch` for client-side code
   rules: {
     "no-restricted-syntax": ["error", {
       selector: "CallExpression[callee.name='fetch']:has(...method: 'POST')",
-      message: "Use csrfFetch for POST requests. See ADR 0053."
+      message: "Use csrfFetch for POST requests. See ADR 0078."
     }]
   }
 }

@@ -13,32 +13,35 @@ This document provides a complete inventory of Vercel Plus limits and monitoring
 
 ### Bandwidth
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Bandwidth** | 1 TB/month | Total data transfer (requests + responses) |
-| **Serverless Function Bandwidth** | 100 GB/month | Included in total bandwidth |
-| **Overage** | $0.15/GB | Charged beyond 1 TB limit |
+| Resource                          | Limit        | Notes                                      |
+| --------------------------------- | ------------ | ------------------------------------------ |
+| **Bandwidth**                     | 1 TB/month   | Total data transfer (requests + responses) |
+| **Serverless Function Bandwidth** | 100 GB/month | Included in total bandwidth                |
+| **Overage**                       | $0.15/GB     | Charged beyond 1 TB limit                  |
 
 **Monitoring**:
+
 - Vercel Dashboard → Usage → Bandwidth
 - Check monthly on 1st of each month
 - Alert threshold: 800 GB (80% of limit)
 
 ### Build Execution
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Build Minutes** | 6,000 minutes/month | Shared across all team projects |
-| **Concurrent Builds** | 12 | Maximum simultaneous builds |
-| **Build Timeout** | 45 minutes | Per build maximum duration |
-| **Overage** | $0.005/minute | Charged beyond 6,000 minutes |
+| Resource              | Limit               | Notes                           |
+| --------------------- | ------------------- | ------------------------------- |
+| **Build Minutes**     | 6,000 minutes/month | Shared across all team projects |
+| **Concurrent Builds** | 12                  | Maximum simultaneous builds     |
+| **Build Timeout**     | 45 minutes          | Per build maximum duration      |
+| **Overage**           | $0.005/minute       | Charged beyond 6,000 minutes    |
 
 **Current Usage** (observed):
+
 - Average build duration: ~2 minutes
 - ~20 deployments/day = 40 minutes/day
 - Monthly estimate: ~1,200 minutes (20% of limit)
 
 **Monitoring**:
+
 ```bash
 # Check recent build durations
 vercel ls --prod | head -20
@@ -46,48 +49,52 @@ vercel ls --prod | head -20
 
 ### Serverless Functions
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Function Invocations** | 1,000,000/month | Per team (all projects combined) |
-| **Function Duration** | 300s max (5 minutes) | Per invocation on Plus plan |
-| **Memory Allocation** | 3,008 MB max | Configurable per function |
-| **Payload Size** | 4.5 MB | Request/response body limit |
-| **Overage** | $0.0000002/invocation | ($0.20 per million) |
+| Resource                 | Limit                 | Notes                            |
+| ------------------------ | --------------------- | -------------------------------- |
+| **Function Invocations** | 1,000,000/month       | Per team (all projects combined) |
+| **Function Duration**    | 300s max (5 minutes)  | Per invocation on Plus plan      |
+| **Memory Allocation**    | 3,008 MB max          | Configurable per function        |
+| **Payload Size**         | 4.5 MB                | Request/response body limit      |
+| **Overage**              | $0.0000002/invocation | ($0.20 per million)              |
 
 **Critical Functions** (MirrorBuddy):
+
 - `/api/chat` - Main AI chat endpoint (~50% of invocations)
 - `/api/realtime/ephemeral-token` - Voice session tokens
 - `/api/health` - Health checks (frequent, lightweight)
 - `/api/conversation/*` - CRUD operations
 
 **Monitoring**:
+
 - Vercel Dashboard → Analytics → Functions
 - Track invocations per function
 - Alert threshold: 800,000 invocations/month
 
 ### Edge Functions
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Edge Requests** | Unlimited | Included in Plus plan |
+| Resource          | Limit           | Notes                           |
+| ----------------- | --------------- | ------------------------------- |
+| **Edge Requests** | Unlimited       | Included in Plus plan           |
 | **Edge Duration** | 50ms soft limit | 30s hard limit (rare scenarios) |
-| **Edge Memory** | 128 MB | Fixed allocation |
-| **Edge Payload** | 4 MB | Request body limit |
+| **Edge Memory**   | 128 MB          | Fixed allocation                |
+| **Edge Payload**  | 4 MB            | Request body limit              |
 
 **Current Edge Usage** (MirrorBuddy):
+
 - `src/proxy.ts` - CSP injection, request tracking
 - Runs on every request
 - No edge functions beyond middleware
 
 ### Edge Middleware
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Middleware Requests** | Unlimited | Included in Plus plan |
-| **Middleware Size** | 1 MB | Compressed bundle size |
-| **Middleware Latency** | <50ms typical | Performance budget |
+| Resource                | Limit         | Notes                  |
+| ----------------------- | ------------- | ---------------------- |
+| **Middleware Requests** | Unlimited     | Included in Plus plan  |
+| **Middleware Size**     | 1 MB          | Compressed bundle size |
+| **Middleware Latency**  | <50ms typical | Performance budget     |
 
 **Implementation**: `src/proxy.ts`
+
 - CSRF token validation
 - Content-Security-Policy headers
 - Request ID injection
@@ -95,13 +102,14 @@ vercel ls --prod | head -20
 
 ### Image Optimization
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
+| Resource                | Limit     | Notes                 |
+| ----------------------- | --------- | --------------------- |
 | **Image Optimizations** | Unlimited | Included in Plus plan |
-| **Source Image Limit** | 5 MB | Per image |
-| **Cache Duration** | 31 days | CDN caching |
+| **Source Image Limit**  | 5 MB      | Per image             |
+| **Cache Duration**      | 31 days   | CDN caching           |
 
 **Current Usage** (MirrorBuddy):
+
 - Maestro avatars: `public/maestri/*.png` (22 images)
 - Coach avatars: `public/avatars/*.webp` (6 images)
 - Buddy avatars: `public/avatars/*.webp` (6 images)
@@ -109,36 +117,37 @@ vercel ls --prod | head -20
 
 ### Team and Collaboration
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Team Members** | Unlimited | No per-seat cost |
-| **Projects** | 200 | Per team |
-| **Deployments** | Unlimited | Preview + production |
-| **Deployment Retention** | 90 days | Automatic cleanup after 90 days |
+| Resource                 | Limit     | Notes                           |
+| ------------------------ | --------- | ------------------------------- |
+| **Team Members**         | Unlimited | No per-seat cost                |
+| **Projects**             | 200       | Per team                        |
+| **Deployments**          | Unlimited | Preview + production            |
+| **Deployment Retention** | 90 days   | Automatic cleanup after 90 days |
 
 **Current Team Size**: 1 active member (mirrorbuddy user)
 
 ### Security and DDoS Protection
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| **DDoS Mitigation** | ✅ Included | Automatic protection |
-| **Attack Mode** | ✅ Available | Enable during incidents |
-| **WAF Rules** | ✅ Basic | Vercel-managed rules |
-| **Rate Limiting** | ❌ Not included | Use external (Upstash Redis) |
+| Feature             | Status          | Notes                        |
+| ------------------- | --------------- | ---------------------------- |
+| **DDoS Mitigation** | ✅ Included     | Automatic protection         |
+| **Attack Mode**     | ✅ Available    | Enable during incidents      |
+| **WAF Rules**       | ✅ Basic        | Vercel-managed rules         |
+| **Rate Limiting**   | ❌ Not included | Use external (Upstash Redis) |
 
 **Implementation**: MirrorBuddy uses Upstash Redis for rate limiting (ADR 0052).
 
 ### Build and Deployment
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Root Directory Size** | 100 GB | Total repository size |
-| **Output Size** | 250 MB | Compressed deployment artifact |
-| **Environment Variables** | 4 KB/variable | 100 variables max |
-| **Git Integrations** | Unlimited | GitHub, GitLab, Bitbucket |
+| Resource                  | Limit         | Notes                          |
+| ------------------------- | ------------- | ------------------------------ |
+| **Root Directory Size**   | 100 GB        | Total repository size          |
+| **Output Size**           | 250 MB        | Compressed deployment artifact |
+| **Environment Variables** | 4 KB/variable | 100 variables max              |
+| **Git Integrations**      | Unlimited     | GitHub, GitLab, Bitbucket      |
 
 **Current Deployment Size** (MirrorBuddy):
+
 ```bash
 # Check output size after build
 npm run build && du -sh .next/
@@ -147,37 +156,39 @@ npm run build && du -sh .next/
 
 ### Logging and Observability
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Log Retention** | 1 hour | Real-time logs only |
-| **Log Drains** | ✅ Available | Send to external services |
-| **Analytics** | ✅ Included | Web Analytics + Speed Insights |
+| Resource          | Limit        | Notes                          |
+| ----------------- | ------------ | ------------------------------ |
+| **Log Retention** | 1 hour       | Real-time logs only            |
+| **Log Drains**    | ✅ Available | Send to external services      |
+| **Analytics**     | ✅ Included  | Web Analytics + Speed Insights |
 
 **External Observability** (MirrorBuddy):
+
 - Grafana Cloud for metrics (ADR 0047)
 - Logs exported via log drains
 - Custom `/api/health/detailed` endpoint
 
 ### Domains and SSL
 
-| Resource | Limit | Notes |
-|----------|-------|-------|
-| **Custom Domains** | Unlimited | Per project |
-| **Wildcard Domains** | ✅ Supported | `*.example.com` |
+| Resource             | Limit           | Notes                        |
+| -------------------- | --------------- | ---------------------------- |
+| **Custom Domains**   | Unlimited       | Per project                  |
+| **Wildcard Domains** | ✅ Supported    | `*.example.com`              |
 | **SSL Certificates** | ✅ Auto-renewed | Let's Encrypt + Vercel certs |
-| **DNS Records** | Unlimited | Managed via Vercel DNS |
+| **DNS Records**      | Unlimited       | Managed via Vercel DNS       |
 
 **Current Domains**:
+
 - `mirrorbuddy.vercel.app` (production)
 - Preview URLs: `mirrorbuddy-*.vercel.app` (per deployment)
 
 ### Support and SLA
 
-| Feature | Plus Plan | Notes |
-|---------|-----------|-------|
-| **Support Response** | Standard | Email support (24-48h) |
-| **Uptime SLA** | 99.9% | ~43 minutes downtime/month allowed |
-| **Priority Support** | ❌ Not included | Available on Enterprise |
+| Feature              | Plus Plan       | Notes                              |
+| -------------------- | --------------- | ---------------------------------- |
+| **Support Response** | Standard        | Email support (24-48h)             |
+| **Uptime SLA**       | 99.9%           | ~43 minutes downtime/month allowed |
+| **Priority Support** | ❌ Not included | Available on Enterprise            |
 
 ## Monitoring Procedures
 
@@ -235,12 +246,12 @@ vercel ls --prod --next 0 | grep "$(date -v-1m +%Y-%m)"
 
 ### Alert Thresholds
 
-| Metric | Warning (80%) | Critical (95%) | Action |
-|--------|---------------|----------------|--------|
-| Bandwidth | 800 GB | 950 GB | Optimize assets, enable caching |
-| Build Minutes | 4,800 min | 5,700 min | Reduce build frequency, optimize builds |
-| Function Invocations | 800K | 950K | Implement caching, optimize endpoints |
-| Function Duration | 240s avg | 285s avg | Optimize code, reduce API calls |
+| Metric               | Warning (80%) | Critical (95%) | Action                                  |
+| -------------------- | ------------- | -------------- | --------------------------------------- |
+| Bandwidth            | 800 GB        | 950 GB         | Optimize assets, enable caching         |
+| Build Minutes        | 4,800 min     | 5,700 min      | Reduce build frequency, optimize builds |
+| Function Invocations | 800K          | 950K           | Implement caching, optimize endpoints   |
+| Function Duration    | 240s avg      | 285s avg       | Optimize code, reduce API calls         |
 
 ## Cost Projections
 
@@ -254,12 +265,12 @@ vercel ls --prod --next 0 | grep "$(date -v-1m +%Y-%m)"
 
 Based on current usage patterns:
 
-| Resource | Current Usage | % of Limit | Projected Overage | Cost |
-|----------|---------------|------------|-------------------|------|
-| Bandwidth | ~200 GB/mo | 20% | $0 | $0 |
-| Build Minutes | ~1,200 min/mo | 20% | $0 | $0 |
-| Function Invocations | ~300K/mo | 30% | $0 | $0 |
-| **Total Projected** | - | - | - | **$20/month** |
+| Resource             | Current Usage | % of Limit | Projected Overage | Cost          |
+| -------------------- | ------------- | ---------- | ----------------- | ------------- |
+| Bandwidth            | ~200 GB/mo    | 20%        | $0                | $0            |
+| Build Minutes        | ~1,200 min/mo | 20%        | $0                | $0            |
+| Function Invocations | ~300K/mo      | 30%        | $0                | $0            |
+| **Total Projected**  | -             | -          | -                 | **$20/month** |
 
 **Headroom**: 70-80% capacity remaining on all metrics.
 
@@ -321,7 +332,7 @@ npm run build && du -sh .next/static/chunks/*
 ## Related Documentation
 
 - [ADR 0052: Vercel Deployment Configuration](../adr/0052-vercel-deployment-configuration.md)
-- [ADR 0053: Vercel Runtime Constraints](../adr/0053-vercel-runtime-constraints.md)
+- [ADR 0053: Vercel Runtime Constraints](../adr/0078-vercel-runtime-constraints.md)
 - [ADR 0047: Grafana Cloud Observability](../adr/0047-grafana-cloud-observability.md)
 - [Vercel Troubleshooting Guide](./VERCEL-TROUBLESHOOTING.md)
 - [SLI/SLO Definitions](./SLI-SLO.md)
@@ -335,19 +346,20 @@ npm run build && du -sh .next/static/chunks/*
 
 ## Changelog
 
-| Date | Change | Author |
-|------|--------|--------|
+| Date       | Change                                                | Author              |
+| ---------- | ----------------------------------------------------- | ------------------- |
 | 2026-01-21 | Initial audit via Vercel CLI and public documentation | Claude (Task T1-02) |
 
 ## F-xx Verification Status
 
-| F-xx | Requirement | Status | Evidence |
-|------|-------------|--------|----------|
-| F-03 | Complete inventory of Vercel Plus limits | ✅ PASS | All 12 limit categories documented above |
-| F-12 | MCP/CLI used for audit | ⚠️ PARTIAL | Vercel CLI used (MCP unavailable), manual dashboard checks required |
-| F-19 | Complete documentation of limits | ✅ PASS | Bandwidth, builds, functions, edge, images, team, security, domains, support documented |
+| F-xx | Requirement                              | Status     | Evidence                                                                                |
+| ---- | ---------------------------------------- | ---------- | --------------------------------------------------------------------------------------- |
+| F-03 | Complete inventory of Vercel Plus limits | ✅ PASS    | All 12 limit categories documented above                                                |
+| F-12 | MCP/CLI used for audit                   | ⚠️ PARTIAL | Vercel CLI used (MCP unavailable), manual dashboard checks required                     |
+| F-19 | Complete documentation of limits         | ✅ PASS    | Bandwidth, builds, functions, edge, images, team, security, domains, support documented |
 
 **Notes**:
+
 - F-12: Vercel MCP server not available in npm registry. Used Vercel CLI (`vercel ls`, `vercel project`, `vercel whoami`) as automated alternative.
 - Manual dashboard access required for detailed usage metrics (bandwidth, invocations) - no CLI equivalent available.
 - Documented monitoring procedures for manual verification of limits.

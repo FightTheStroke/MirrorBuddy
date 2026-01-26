@@ -51,7 +51,7 @@ ADMIN_EMAIL=admin@example.com             # Admin access control
 TRIAL_BUDGET_LIMIT_EUR=100                # Monthly trial budget
 PROTECTED_USERS=email1@example.com,...    # Whitelist for test data cleanup (Plan 063)
 RESEND_API_KEY=re_xxx                     # Email notifications
-TOKEN_ENCRYPTION_KEY=xxx                  # 32+ chars for AES-256-GCM (ADR 0060)
+TOKEN_ENCRYPTION_KEY=xxx                  # 32+ chars for AES-256-GCM (ADR 0080)
 SUPABASE_CA_CERT=xxx                      # SSL cert for production (ADR 0063)
 ```
 
@@ -85,7 +85,7 @@ Load with `@docs/claude/<name>.md`:
 **Voice**: voice-api | ambient-audio | onboarding
 **Features**: learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator | gamification
 **Beta**: trial-mode (ADR 0056) | invite-system (ADR 0057) | observability-kpis (ADR 0058)
-**Compliance**: e2e-setup (ADR 0059) | security-hardening (ADR 0060) | instant-a11y (ADR 0060) | admin-redesign (ADR 0061) | ai-compliance (ADR 0062) | supabase-ssl (ADR 0063)
+**Compliance**: e2e-setup (ADR 0059) | security-hardening (ADR 0080) | instant-a11y (ADR 0060) | admin-redesign (ADR 0061) | ai-compliance (ADR 0062) | supabase-ssl (ADR 0063)
 **Characters**: buddies | coaches | adding-maestri
 
 ## Setup Docs (one-time)

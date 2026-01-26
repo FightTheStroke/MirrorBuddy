@@ -38,22 +38,44 @@ export function escapeHtml(text: string): string {
 
 All user input in email templates must pass through `escapeHtml()`.
 
-### 2. CSRF Protection Missing
+### 2. CSRF Protection Clarification
 
-**Issue**: Contact form used plain `fetch()` instead of `csrfFetch()`.
+**Initial Issue**: Contact form used plain `fetch()` instead of `csrfFetch()`.
 
-**Attack Vector**: Cross-site request forgery allowing attackers to submit contact forms on behalf of users.
+**Analysis**: Per [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html), CSRF attacks exploit **authenticated sessions**. The contact form:
 
-**Solution**: Use `csrfFetch()` from `@/lib/auth/csrf-client` for all form submissions:
+- Does NOT require authentication
+- Does NOT create or use session cookies
+- Is a truly public endpoint
+
+**Conclusion**: CSRF token validation is **not required** for public endpoints without sessions. The appropriate protections are:
+
+1. **Rate limiting** (implemented) - Prevents spam/abuse
+2. **Input validation** (implemented) - Prevents injection attacks
+3. **Honeypot fields** (optional) - Bot detection
+
+**Current Implementation**:
 
 ```typescript
+// Client: Uses csrfFetch() for consistency (harmless but not required)
 import { csrfFetch } from "@/lib/auth/csrf-client";
+const response = await csrfFetch("/api/contact", { ... });
 
-const response = await csrfFetch("/api/contact", {
-  method: "POST",
-  body: JSON.stringify(formData),
-});
+// Server: NO requireCSRF() needed - rate limiting is the protection
+export async function POST(request: NextRequest) {
+  const rateLimitResult = await checkRateLimitAsync(`contact:form:${clientId}`, ...);
+  if (!rateLimitResult.success) {
+    return rateLimitResponse(rateLimitResult);
+  }
+  // ... validation and processing
+}
 ```
+
+**When CSRF IS Required**: See ADR 0075 for the complete CSRF policy. In summary:
+
+- Authenticated endpoints (user session) → `requireCSRF()` + `csrfFetch()` required
+- Public endpoints (no session) → Rate limiting, no CSRF needed
+- Cron jobs → `CRON_SECRET` header validation
 
 ### 3. ReDoS Vulnerability in Email Regex
 
@@ -243,17 +265,21 @@ export const metadata: Metadata = {
 
 **Issue**: No rate limiting on contact endpoint.
 
-**Decision**: Lower priority. Contact forms are low-value targets. Can add if abuse detected.
+**Decision**: ✅ **Implemented**. Contact endpoint now has rate limiting (5 requests/hour per client IP).
 
 ## Decision
 
 1. **All user input in HTML must be escaped** - Use `escapeHtml()` for all HTML contexts
-2. **All form submissions must use CSRF protection** - Use `csrfFetch()` for all mutations
+2. **CSRF protection based on endpoint type** (updated per OWASP):
+   - Authenticated endpoints → `requireCSRF()` + `csrfFetch()` required
+   - Public endpoints (no session) → Rate limiting instead, CSRF optional
+   - See ADR 0075 for complete policy
 3. **All regex must be ReDoS-safe** - Use simple patterns, no nested quantifiers
 4. **All API inputs must be validated** - Type, length, and enum validation required
 5. **All text inputs must be trimmed** - Both client and server-side
 6. **All interactive controls must support keyboard navigation** - ARIA patterns required
 7. **All pages must have metadata** - SEO compliance required
+8. **Public endpoints must have rate limiting** - Primary protection against abuse
 
 ## Consequences
 
@@ -271,7 +297,8 @@ export const metadata: Metadata = {
 
 ## Checklist for Future Forms
 
-- [ ] Use `csrfFetch()` for submissions
+### All Forms (Public or Authenticated)
+
 - [ ] Escape all user input in HTML (emails, rendered output)
 - [ ] Validate type/category field against allowed values
 - [ ] Add max length validation for all string fields
@@ -281,6 +308,18 @@ export const metadata: Metadata = {
 - [ ] Add keyboard navigation (Enter, Space, Arrow keys)
 - [ ] Export page metadata for SEO
 - [ ] Standardize API response format (`success`, `message`)
+
+### Authenticated Forms (User Session Required)
+
+- [ ] Use `csrfFetch()` for client submissions
+- [ ] Add `requireCSRF()` check in API route (before `validateAuth()`)
+- [ ] Use `validateAuth()` for user identification
+
+### Public Forms (No Authentication)
+
+- [ ] Add rate limiting (e.g., 5 requests/hour per IP)
+- [ ] Consider honeypot fields for bot detection
+- [ ] `csrfFetch()` optional (harmless but not required)
 
 ### 11. Incomplete URL Sanitization (CodeQL)
 

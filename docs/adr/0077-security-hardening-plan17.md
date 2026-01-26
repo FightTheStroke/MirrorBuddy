@@ -1,4 +1,4 @@
-# ADR-0047: Security Hardening (Plan 17)
+# ADR 0077: Security Hardening (Plan 17)
 
 **Status:** Accepted
 **Date:** 2026-01-17 (Updated: 2026-01-18)
@@ -64,6 +64,7 @@ Implement security hardening across 4 waves:
 ### Wave 5: CSRF Coverage Completion (2026-01-18)
 
 Post-audit review identified 5 endpoints missing CSRF protection:
+
 - `/api/chat` - Main chat endpoint
 - `/api/chat/stream` - Streaming chat endpoint
 - `/api/tts` - Text-to-speech endpoint

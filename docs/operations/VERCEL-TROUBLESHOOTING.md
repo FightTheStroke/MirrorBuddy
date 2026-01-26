@@ -225,5 +225,5 @@ vercel --prod --force
 ## Related Documentation
 
 - [ADR 0052: Vercel Deployment Configuration](../adr/0052-vercel-deployment-configuration.md)
-- [ADR 0053: Vercel Runtime Constraints](../adr/0053-vercel-runtime-constraints.md)
+- [ADR 0053: Vercel Runtime Constraints](../adr/0078-vercel-runtime-constraints.md)
 - [Runbook](./RUNBOOK.md)

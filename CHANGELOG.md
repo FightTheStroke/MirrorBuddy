@@ -98,7 +98,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Inline admin actions: Send invite, Approve, Block
 - **FunnelEvent Model**: New analytics model for tracking user journey
   - Stages: VISITOR → TRIAL_START → TRIAL_ENGAGED → LIMIT_HIT → BETA_REQUEST → APPROVED → FIRST_LOGIN → ACTIVE → CHURNED
-  - Test data isolation via `isTestData` flag (ADR 0065)
+  - Test data isolation via `isTestData` flag (ADR 0081))
 - **Funnel APIs**:
   - `GET /api/admin/funnel/metrics` - Aggregate funnel metrics
   - `GET /api/admin/funnel/users` - Paginated user listing with filters
@@ -155,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-## [0.8.0] - 2026-01-19 - Beta Release with Security Hardening (ADR 0060)
+## [0.8.0] - 2026-01-19 - Beta Release with Security Hardening (ADR 0080)
 
 ### Security
 
@@ -204,7 +204,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/lib/security/encryption.ts` - AES-256-GCM token encryption
 - `src/lib/email/templates/coppa-templates.ts` - Parental consent emails
 - `docs/security/DATA-BREACH-PROTOCOL.md` - GDPR Art. 33/34 runbook
-- `docs/adr/0060-security-audit-hardening.md` - Architecture decision record
+- `docs/adr/0080-security-audit-hardening.md` - Architecture decision record
 
 ### Changed
 

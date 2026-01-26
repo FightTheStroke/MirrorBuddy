@@ -1,4 +1,4 @@
-# ADR 0060: Security Audit Hardening
+# ADR 0080: Security Audit Hardening
 
 ## Status
 

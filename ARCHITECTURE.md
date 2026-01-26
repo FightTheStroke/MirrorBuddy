@@ -254,7 +254,7 @@ flowchart LR
 
 **Session Auth:** `src/lib/auth/session-auth.ts` - Cookie-based sessions with `validateSessionAuth()` and `validateAdminAuth()`.
 
-### Security Hardening (ADR 0060)
+### Security Hardening (ADR 0080)
 
 - **OAuth PKCE**: RFC 7636 code_verifier/code_challenge with SHA-256
 - **Token Encryption**: AES-256-GCM at rest (requires `TOKEN_ENCRYPTION_KEY`)

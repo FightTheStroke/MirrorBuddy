@@ -55,7 +55,7 @@ Instead, please report vulnerabilities through one of these channels:
 - **COPPA Compliance**: Email verification (6-digit codes) for parental consent of children under 13
 - **Data Breach Protocol**: Documented runbook at `docs/security/DATA-BREACH-PROTOCOL.md`
 
-### Authentication & Authorization (ADR 0060)
+### Authentication & Authorization (ADR 0080)
 
 - Secure session management with httpOnly cookies
 - Role-based access control (RBAC)

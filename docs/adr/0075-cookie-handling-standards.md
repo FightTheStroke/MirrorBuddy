@@ -96,32 +96,77 @@ const visitorId = cookie?.value;
 
 ### 4. CSRF Protection Pattern
 
-All mutation endpoints (POST/PUT/PATCH/DELETE) MUST:
+#### When CSRF Protection is Required
+
+Per [OWASP CSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html), CSRF exploits **authenticated sessions**. Protection requirements depend on endpoint type:
+
+| Endpoint Type                              | Server `requireCSRF()` | Client `csrfFetch()` | Rationale                                        |
+| ------------------------------------------ | ---------------------- | -------------------- | ------------------------------------------------ |
+| **Authenticated** (user session)           | ✓ Required             | ✓ Required           | Session cookie can be exploited                  |
+| **Public** (no session, e.g. contact form) | ✗ Not needed           | Optional             | No session to exploit; use rate limiting instead |
+| **Cron jobs**                              | ✗ Not needed           | N/A                  | Use `CRON_SECRET` header validation              |
+| **Login/Logout**                           | ✗ Not needed           | Optional             | Pre-session; use rate limiting                   |
+
+#### Authenticated Endpoints (Session-Based)
 
 ```typescript
 import { requireCSRF } from "@/lib/security/csrf";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 export async function POST(request: NextRequest) {
+  // CSRF check first (before reading body)
   if (!requireCSRF(request)) {
     return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
+
+  // Then auth check
+  const auth = await validateAuth();
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
+
   // ... rest of handler
 }
 ```
 
-Clients MUST use `csrfFetch()` for mutations:
+#### Public Endpoints (No Authentication)
+
+For endpoints like contact forms that don't create or use sessions:
 
 ```typescript
+// Server: NO requireCSRF() needed - no session to protect
+export async function POST(request: NextRequest) {
+  // Rate limiting is the primary protection
+  const rateLimitResult = await checkRateLimitAsync(...);
+  if (!rateLimitResult.success) {
+    return rateLimitResponse(rateLimitResult);
+  }
+
+  // Input validation, enum checks, length limits
+  // ... rest of handler
+}
+```
+
+```typescript
+// Client: csrfFetch() optional but harmless for consistency
 import { csrfFetch } from "@/lib/auth/csrf-client";
 
-// CORRECT
-await csrfFetch("/api/resource", {
+await csrfFetch("/api/contact", {
   method: "POST",
   body: JSON.stringify(data),
 });
+```
 
-// WRONG - Missing CSRF token
-await fetch("/api/resource", { method: "POST", body: JSON.stringify(data) });
+#### Cron Job Endpoints
+
+```typescript
+export async function POST(request: NextRequest) {
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  // ... rest of handler
+}
 ```
 
 ### 5. Cookie Writing Pattern

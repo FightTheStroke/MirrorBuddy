@@ -154,4 +154,4 @@ To verify CSRF protection:
 - [OWASP CSRF Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)
 - [Double-Submit Cookie Pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#double-submit-cookie)
 - [SameSite Cookies Explained](https://web.dev/samesite-cookies-explained/)
-- [ADR-0047](../adr/0047-security-hardening-plan17.md)
+- [ADR 0077](../adr/0077-security-hardening-plan17.md)

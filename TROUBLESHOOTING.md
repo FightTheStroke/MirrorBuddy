@@ -2923,7 +2923,7 @@ Tests use `test.skip(!!process.env.CI, 'reason')` to auto-skip in CI.
 
 ## Security & Encryption Issues
 
-> See [ADR 0060](docs/adr/0060-security-audit-hardening.md) and [ADR 0063](docs/adr/0063-supabase-ssl-certificate-requirements.md).
+> See [ADR 0060](docs/adr/0080-security-audit-hardening.md) and [ADR 0063](docs/adr/0063-supabase-ssl-certificate-requirements.md).
 
 ### Supabase SSL Certificate
 

@@ -410,7 +410,7 @@ VERCEL_GIT_COMMIT_REF="main" && [ "$VERCEL_GIT_COMMIT_REF" != "main" ] && echo "
 
 ## Related
 
-- **ADR 0053**: Vercel Runtime Constraints (CSRF, Voice Transport, Health Checks)
+- \*\*ADR 0078: Vercel Runtime Constraints (CSRF, Voice Transport, Health Checks)
 - ADR 0028: PostgreSQL + pgvector migration
 - ADR 0038: WebRTC migration for voice
 - ADR 0047: Grafana Cloud observability

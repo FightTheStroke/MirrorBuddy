@@ -67,29 +67,44 @@ if (!visitorId) {
 
 ## CSRF Protection (POST/PUT/PATCH/DELETE)
 
-### Server-Side
+Per [OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html), CSRF exploits **authenticated sessions**. Requirements vary by endpoint type:
+
+| Endpoint Type           | Server `requireCSRF()` | Client `csrfFetch()`  |
+| ----------------------- | ---------------------- | --------------------- |
+| Authenticated (session) | ✓ Required             | ✓ Required            |
+| Public (no session)     | ✗ Not needed           | Optional              |
+| Cron jobs               | ✗ Not needed           | N/A (use CRON_SECRET) |
+
+### Authenticated Endpoints
 
 ```typescript
 import { requireCSRF } from "@/lib/security/csrf";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 export async function POST(request: NextRequest) {
   if (!requireCSRF(request)) {
     return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
+  const auth = await validateAuth();
+  if (!auth.authenticated) {
+    return NextResponse.json({ error: auth.error }, { status: 401 });
+  }
   // ... handler
 }
 ```
 
-### Client-Side
+### Public Endpoints (contact forms, etc.)
 
 ```typescript
-import { csrfFetch } from "@/lib/auth/csrf-client";
+// Server: Rate limiting is the primary protection, NO requireCSRF needed
+export async function POST(request: NextRequest) {
+  const rateLimitResult = await checkRateLimitAsync(...);
+  if (!rateLimitResult.success) return rateLimitResponse(rateLimitResult);
+  // ... validation and handler
+}
 
-// All mutations MUST use csrfFetch
-await csrfFetch("/api/resource", {
-  method: "POST",
-  body: JSON.stringify(data),
-});
+// Client: csrfFetch optional but harmless
+await csrfFetch("/api/contact", { method: "POST", body: JSON.stringify(data) });
 ```
 
 ## Cookie Security Matrix
@@ -127,23 +142,27 @@ const visitorId = cookie?.value;
 const visitorId = validateVisitorId(cookie?.value);
 ```
 
-### 3. Missing CSRF on Mutations
+### 3. Missing CSRF on Authenticated Mutations
 
 ```typescript
-// WRONG - No CSRF check
+// WRONG - Authenticated endpoint without CSRF
 export async function POST(request: NextRequest) {
+  const auth = await validateAuth();  // Has session!
+  if (!auth.authenticated) return ...;
   const data = await request.json();
-  // ...
+  // ... CSRF attack possible!
 }
 
-// CORRECT - CSRF check first
+// CORRECT - CSRF check BEFORE auth for authenticated endpoints
 export async function POST(request: NextRequest) {
   if (!requireCSRF(request)) {
     return NextResponse.json({ error: "CSRF" }, { status: 403 });
   }
-  const data = await request.json();
+  const auth = await validateAuth();
   // ...
 }
+
+// NOTE: Public endpoints (no validateAuth) don't need CSRF - use rate limiting
 ```
 
 ## Verification

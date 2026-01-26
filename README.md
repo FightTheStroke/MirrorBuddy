@@ -173,7 +173,7 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 - **Session Throttling**: Gradual escalation from warnings to timeouts
 - **Audit Trail**: Anonymized logging for safety monitoring
 
-### Security Hardening (ADR 0060)
+### Security Hardening (ADR 0080)
 
 - **OAuth PKCE**: RFC 7636 code_verifier/code_challenge with SHA-256
 - **Token Encryption**: AES-256-GCM encryption at rest for OAuth tokens
@@ -184,7 +184,7 @@ MirrorBuddy implements Microsoft's [Ethical Design Hacker](https://www.microsoft
 - **Configuration Versioning**: Rollback safety settings with history
 - **Knowledge Base Auditing**: Content validation before embedding
 
-**→ Technical details: [docs/adr/0004-safety-guardrails.md](docs/adr/0004-safety-guardrails.md) | [docs/adr/0008-parent-dashboard-gdpr.md](docs/adr/0008-parent-dashboard-gdpr.md) | [docs/adr/0060-security-audit-hardening.md](docs/adr/0060-security-audit-hardening.md)**
+**→ Technical details: [docs/adr/0004-safety-guardrails.md](docs/adr/0004-safety-guardrails.md) | [docs/adr/0008-parent-dashboard-gdpr.md](docs/adr/0008-parent-dashboard-gdpr.md) | [docs/adr/0080-security-audit-hardening.md](docs/adr/0080-security-audit-hardening.md)**
 
 ---
 
@@ -367,16 +367,17 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 
 ## Documentation
 
-| Document                                     | Description                          |
-| -------------------------------------------- | ------------------------------------ |
-| [FEATURES.md](FEATURES.md)                   | Comprehensive feature documentation  |
-| [SETUP.md](SETUP.md)                         | Installation and configuration guide |
-| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)   | Production deployment guide          |
-| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)     | Common issues and solutions          |
-| [ARCHITECTURE.md](ARCHITECTURE.md)           | Technical architecture details       |
-| [CONTRIBUTING.md](CONTRIBUTING.md)           | Contribution guidelines              |
-| [CLAUDE.md](CLAUDE.md)                       | Developer quick reference            |
-| [backend/.env.example](backend/.env.example) | Azure Cost API configuration         |
+| Document                                             | Description                               |
+| ---------------------------------------------------- | ----------------------------------------- |
+| [FEATURES.md](FEATURES.md)                           | Comprehensive feature documentation       |
+| [SETUP.md](SETUP.md)                                 | Installation and configuration guide      |
+| [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)           | Production deployment guide               |
+| [TROUBLESHOOTING.md](TROUBLESHOOTING.md)             | Common issues and solutions               |
+| [ARCHITECTURE.md](ARCHITECTURE.md)                   | Technical architecture details            |
+| [ARCHITECTURE-DIAGRAMS.md](ARCHITECTURE-DIAGRAMS.md) | Visual architecture (24 Mermaid diagrams) |
+| [CONTRIBUTING.md](CONTRIBUTING.md)                   | Contribution guidelines                   |
+| [CLAUDE.md](CLAUDE.md)                               | Developer quick reference                 |
+| [backend/.env.example](backend/.env.example)         | Azure Cost API configuration              |
 
 ---
 

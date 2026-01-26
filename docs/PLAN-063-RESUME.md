@@ -72,7 +72,7 @@ sqlite3 ~/.claude/data/dashboard.db "SELECT id, name, status, tasks_done, tasks_
 
 **Deliverables**:
 
-- ✓ ADR 0065: Test Data Isolation Strategy
+- ✓ ADR 0081: Test Data Isolation Strategy
 - ✓ Migration: `20260121030000_add_is_test_data_flag`
 - ✓ Helper: `src/lib/test-isolation/protected-users.ts`
 - ✓ Script: `scripts/cleanup-test-data.ts`
@@ -172,7 +172,7 @@ docs/admin-ui-audit-report.md (700+ lines)
 docs/mobile-ux-audit-report.md (536 lines, 32 issues)
 docs/voice-mobile-investigation-report.md (29KB, 5 root causes)
 docs/voice-iphone-testing-checklist.md (testing guide)
-docs/adr/0065-test-data-isolation-strategy.md (ADR)
+docs/adr/0081-test-data-isolation-strategy.md (ADR)
 ```
 
 ### Task già implementati (non rifare):

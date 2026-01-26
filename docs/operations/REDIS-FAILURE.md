@@ -140,6 +140,6 @@ vercel --prod
 
 ## Related
 
-- [ADR-0047: Security Hardening](../adr/0047-security-hardening-plan17.md)
+- [ADR 0077: Security Hardening](../adr/0077-security-hardening-plan17.md)
 - [SLI/SLO Definitions](./SLI-SLO.md)
 - [Main Runbook](./RUNBOOK.md)

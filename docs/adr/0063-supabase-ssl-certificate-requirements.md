@@ -4,6 +4,8 @@
 
 Accepted (Updated 2026-01-25)
 
+**See also**: ADR 0067 for detailed SSL investigation and database performance optimization.
+
 ## Date
 
 2026-01-20 (Updated 2026-01-25)

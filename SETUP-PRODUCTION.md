@@ -174,7 +174,7 @@ Create accounts and have credentials ready:
    vercel env add TOKEN_ENCRYPTION_KEY production --sensitive <<< "$(openssl rand -hex 32)"
    ```
 
-   > **Breaking Change (v0.8.0)**: `TOKEN_ENCRYPTION_KEY` is required for OAuth token encryption (AES-256-GCM). See [ADR 0060](docs/adr/0060-security-audit-hardening.md).
+   > **Breaking Change (v0.8.0)**: `TOKEN_ENCRYPTION_KEY` is required for OAuth token encryption (AES-256-GCM). See [ADR 0060](docs/adr/0080-security-audit-hardening.md).
 
 3. **Deploy**
    ```bash

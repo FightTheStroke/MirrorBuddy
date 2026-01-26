@@ -95,7 +95,7 @@ Implement a comprehensive conversion funnel system with:
 - ADR 0056: Trial Mode Implementation
 - ADR 0057: Invite System
 - ADR 0058: Observability KPIs
-- ADR 0065: Test Data Isolation Strategy
+- ADR 0081: Test Data Isolation Strategy
 
 ## Files
 
