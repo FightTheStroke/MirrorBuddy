@@ -1929,6 +1929,17 @@
     }
   },
   "admin": {
+    "dashboard": "Panel de administración",
+    "betaRequests": "Solicitudes Beta",
+    "users": "Usuarios",
+    "tiers": "Planes",
+    "terms": "Términos de Servicio",
+    "settings": "Configuración",
+    "pendingBetaRequests": "{count} solicitudes beta pendientes",
+    "systemAlerts": "{count} alertas del sistema",
+    "collapseMenu": "Contraer menú",
+    "expandMenu": "Expandir menú",
+    "returnToApp": "Volver a la aplicación",
     "invites": {
       "unauthorized": "No autorizado. Inicia sesión como administrador.",
       "loadingError": "Error de carga",
@@ -2332,7 +2343,33 @@
     "loadingError": "Error al Cargar Costos",
     "last30Days": "Últimos 30 Días",
     "monthlyForecast": "Previsión Mensual",
-    "topServices": "Servicios Principales"
+    "topServices": "Servicios Principales",
+    "description": "Análisis detallado de tu aprendizaje",
+    "periods": {
+      "today": "Hoy",
+      "week": "Semana",
+      "month": "Mes",
+      "season": "Temporada"
+    },
+    "studyTime": "Tiempo de Estudio",
+    "total": "Total",
+    "sessions": "Sesiones",
+    "maestriUsed": "maestros utilizados",
+    "tokenAI": "Token AI",
+    "calls": "llamadas",
+    "estimatedCost": "Costo Estimado",
+    "notConfigured": "No configurado",
+    "sessionsByMaestro": "Sesiones por Maestro",
+    "noSessions": "Ninguna sesión registrada",
+    "sessionSingular": "sesión",
+    "sessionPlural": "sesiones",
+    "tokenUsageByType": "Uso de Token por Tipo",
+    "noDataAvailable": "Sin datos disponibles",
+    "studyTrend": "Tendencia de Estudio",
+    "dailyCosts": "Costos Diarios",
+    "azureNotConfigured": "Gestión de Costos de Azure no configurada",
+    "configureAzure": "Configura las credenciales de Azure para ver los costos",
+    "noCostData": "Sin datos de costos disponibles"
   },
   "google-drive": {
     "description": "Conecta Google Drive para importar materiales de estudio directamente desde la nube",

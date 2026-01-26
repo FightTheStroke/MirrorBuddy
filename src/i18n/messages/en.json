@@ -690,6 +690,17 @@
       }
     },
     "admin": {
+      "dashboard": "Dashboard",
+      "betaRequests": "Beta Requests",
+      "users": "Users",
+      "tiers": "Tiers",
+      "terms": "Terms of Service",
+      "settings": "Settings",
+      "pendingBetaRequests": "{count} pending beta requests",
+      "systemAlerts": "{count} system alerts",
+      "collapseMenu": "Collapse menu",
+      "expandMenu": "Expand menu",
+      "returnToApp": "Return to app",
       "changeTier": {
         "title": "Change Tier",
         "anonymousUser": "Anonymous User",
@@ -2152,7 +2163,33 @@
     "loadingError": "Error Loading Costs",
     "last30Days": "Last 30 Days",
     "monthlyForecast": "Monthly Forecast",
-    "topServices": "Top Services"
+    "topServices": "Top Services",
+    "description": "Detailed analysis of your learning",
+    "periods": {
+      "today": "Today",
+      "week": "Week",
+      "month": "Month",
+      "season": "Season"
+    },
+    "studyTime": "Study Time",
+    "total": "Total",
+    "sessions": "Sessions",
+    "maestriUsed": "maestri used",
+    "tokenAI": "AI Tokens",
+    "calls": "calls",
+    "estimatedCost": "Estimated Cost",
+    "notConfigured": "Not Configured",
+    "sessionsByMaestro": "Sessions by Maestro",
+    "noSessions": "No sessions recorded",
+    "sessionSingular": "session",
+    "sessionPlural": "sessions",
+    "tokenUsageByType": "Token Usage by Type",
+    "noDataAvailable": "No data available",
+    "studyTrend": "Study Trend",
+    "dailyCosts": "Daily Costs",
+    "azureNotConfigured": "Azure Cost Management not configured",
+    "configureAzure": "Configure Azure credentials to see costs",
+    "noCostData": "No cost data available"
   },
   "google-drive": {
     "description": "Link Google Drive to import study materials directly from the cloud",

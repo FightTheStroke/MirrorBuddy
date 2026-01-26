@@ -681,6 +681,17 @@
       }
     },
     "admin": {
+      "dashboard": "Tableau de bord",
+      "betaRequests": "Demandes bêta",
+      "users": "Utilisateurs",
+      "tiers": "Plans",
+      "terms": "Conditions de service",
+      "settings": "Paramètres",
+      "pendingBetaRequests": "{count} demandes bêta en attente",
+      "systemAlerts": "{count} alertes système",
+      "collapseMenu": "Réduire le menu",
+      "expandMenu": "Développer le menu",
+      "returnToApp": "Retour à l'application",
       "changeTier": {
         "title": "Changer le plan",
         "anonymousUser": "Utilisateur anonyme",
@@ -2143,7 +2154,33 @@
     "loadingError": "Erreur lors du chargement des coûts",
     "last30Days": "Les 30 derniers jours",
     "monthlyForecast": "Prévision Mensuelle",
-    "topServices": "Services Principaux"
+    "topServices": "Services Principaux",
+    "description": "Analyse détaillée de votre apprentissage",
+    "periods": {
+      "today": "Aujourd'hui",
+      "week": "Semaine",
+      "month": "Mois",
+      "season": "Saison"
+    },
+    "studyTime": "Temps d'étude",
+    "total": "Total",
+    "sessions": "Séances",
+    "maestriUsed": "maestri utilisés",
+    "tokenAI": "Jetons IA",
+    "calls": "appels",
+    "estimatedCost": "Coût estimé",
+    "notConfigured": "Non configuré",
+    "sessionsByMaestro": "Séances par Maestro",
+    "noSessions": "Aucune séance enregistrée",
+    "sessionSingular": "séance",
+    "sessionPlural": "séances",
+    "tokenUsageByType": "Utilisation des jetons par type",
+    "noDataAvailable": "Aucune donnée disponible",
+    "studyTrend": "Tendance d'étude",
+    "dailyCosts": "Coûts quotidiens",
+    "azureNotConfigured": "Gestion des coûts Azure non configurée",
+    "configureAzure": "Configurez les identifiants Azure pour voir les coûts",
+    "noCostData": "Aucune donnée de coûts disponible"
   },
   "google-drive": {
     "description": "Connectez Google Drive pour importer du matériel d'étude directement depuis le cloud",

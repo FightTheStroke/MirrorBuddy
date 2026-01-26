@@ -681,6 +681,17 @@
       }
     },
     "admin": {
+      "dashboard": "Dashboard",
+      "betaRequests": "Beta-Anfragen",
+      "users": "Benutzer",
+      "tiers": "Pläne",
+      "terms": "Nutzungsbedingungen",
+      "settings": "Einstellungen",
+      "pendingBetaRequests": "{count} ausstehende Beta-Anfragen",
+      "systemAlerts": "{count} Systemwarnungen",
+      "collapseMenu": "Menü ausblenden",
+      "expandMenu": "Menü erweitern",
+      "returnToApp": "Zurück zur App",
       "changeTier": {
         "title": "Plan ändern",
         "anonymousUser": "Anonymer Benutzer",
@@ -2143,7 +2154,33 @@
     "loadingError": "Fehler beim Laden der Kosten",
     "last30Days": "Letzte 30 Tage",
     "monthlyForecast": "Monatsprognose",
-    "topServices": "Top-Services"
+    "topServices": "Top-Services",
+    "description": "Detaillierte Analyse Ihres Lernens",
+    "periods": {
+      "today": "Heute",
+      "week": "Woche",
+      "month": "Monat",
+      "season": "Saison"
+    },
+    "studyTime": "Lernzeit",
+    "total": "Gesamt",
+    "sessions": "Sitzungen",
+    "maestriUsed": "Maestri verwendet",
+    "tokenAI": "KI-Token",
+    "calls": "Aufrufe",
+    "estimatedCost": "Geschätzte Kosten",
+    "notConfigured": "Nicht konfiguriert",
+    "sessionsByMaestro": "Sitzungen pro Maestro",
+    "noSessions": "Keine Sitzungen aufgezeichnet",
+    "sessionSingular": "Sitzung",
+    "sessionPlural": "Sitzungen",
+    "tokenUsageByType": "Token-Verwendung nach Typ",
+    "noDataAvailable": "Keine Daten verfügbar",
+    "studyTrend": "Lerntrend",
+    "dailyCosts": "Tägliche Kosten",
+    "azureNotConfigured": "Azure-Kostenverwaltung nicht konfiguriert",
+    "configureAzure": "Konfigurieren Sie Azure-Anmeldedaten, um Kosten anzuzeigen",
+    "noCostData": "Keine Kostendaten verfügbar"
   },
   "google-drive": {
     "description": "Verbinden Sie Google Drive, um Studienunterlagen direkt aus der Cloud zu importieren",
