@@ -4,6 +4,7 @@
 // ============================================================================
 
 import { z } from "zod";
+import { logger } from "@/lib/logger";
 
 const isProduction =
   (process.env.NODE_ENV === "production" || process.env.VERCEL === "1") &&
@@ -61,8 +62,9 @@ export function validateEnv(): void {
     const hasOllama = process.env.OLLAMA_URL;
 
     if (!hasAzure && !hasOllama) {
-      console.warn(
-        "[env] Warning: No AI provider configured. Set AZURE_OPENAI_* or OLLAMA_URL.",
+      logger.warn(
+        "No AI provider configured. Set AZURE_OPENAI_* or OLLAMA_URL.",
+        { component: "env" },
       );
     }
   }

@@ -192,6 +192,32 @@ const eslintConfig = defineConfig([
       "@typescript-eslint/no-unsafe-function-type": "off",
     },
   },
+  // ADR 0076: Centralized Logging with Sentry Integration
+  // Ban console.error/warn/log in production code - use logger/clientLogger instead
+  // Server: import { logger } from '@/lib/logger'
+  // Client: import { clientLogger } from '@/lib/logger/client'
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      // Logger implementations (they use console internally)
+      "src/lib/logger/**/*.ts",
+      // Test files and setup
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+      "src/test/**",
+      // E2E test utilities
+      "src/e2e/**",
+    ],
+    rules: {
+      "no-console": [
+        "error",
+        {
+          allow: ["info", "debug", "time", "timeEnd", "trace", "assert"],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;

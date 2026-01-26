@@ -10,6 +10,7 @@ import type {
   TypingLevel,
   TypingStats,
 } from "@/types/tools";
+import { clientLogger } from "@/lib/logger/client";
 
 export interface TypingSessionState {
   currentLesson: TypingLesson | null;
@@ -209,7 +210,11 @@ export const useTypingStore = create<TypingState>()((set, get) => ({
         });
       }
     } catch (error) {
-      console.error("Failed to load typing progress:", error);
+      clientLogger.error(
+        "Failed to load typing progress",
+        { component: "TypingStore", userId },
+        error,
+      );
       set({
         progress: createInitialProgress(userId),
       });
@@ -236,7 +241,11 @@ export const useTypingStore = create<TypingState>()((set, get) => ({
         throw new Error("Failed to save typing progress");
       }
     } catch (error) {
-      console.error("Failed to save typing progress:", error);
+      clientLogger.error(
+        "Failed to save typing progress",
+        { component: "TypingStore" },
+        error,
+      );
     }
   },
 }));

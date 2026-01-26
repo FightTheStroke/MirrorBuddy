@@ -9,6 +9,7 @@ import { type FunnelStage } from "./constants";
 import { getVisitorIdFromClient } from "@/lib/trial/visitor-id";
 import { hasAnalyticsConsent } from "@/lib/consent/consent-storage";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { clientLogger } from "@/lib/logger/client";
 
 export { type FunnelStage };
 
@@ -35,7 +36,9 @@ export async function trackFunnelEvent({
   // Get visitor ID
   const visitorId = getVisitorIdFromClient();
   if (!visitorId) {
-    console.warn("[Funnel] No visitor ID, cannot track event");
+    clientLogger.warn("No visitor ID, cannot track event", {
+      component: "Funnel",
+    });
     return false;
   }
 
@@ -54,7 +57,7 @@ export async function trackFunnelEvent({
 
     return response.ok;
   } catch (error) {
-    console.error("[Funnel] Failed to track event:", error);
+    clientLogger.error("Failed to track event", { component: "Funnel" }, error);
     return false;
   }
 }

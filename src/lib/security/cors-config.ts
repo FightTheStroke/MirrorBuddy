@@ -3,6 +3,8 @@
 // Purpose: Prevent wildcard CORS in production, enforce origin whitelist
 // ============================================================================
 
+import { logger } from "@/lib/logger";
+
 /**
  * Get allowed origins based on environment
  *
@@ -27,10 +29,9 @@ export function getAllowedOrigins(): string[] {
   const allowedOriginsEnv = process.env.ALLOWED_ORIGINS;
   if (!allowedOriginsEnv) {
     // F-04: Warn in production if ALLOWED_ORIGINS is not configured
-    console.warn(
-      "[CORS] WARNING: ALLOWED_ORIGINS not configured in production. " +
-        "All cross-origin requests will be blocked. " +
-        "Set ALLOWED_ORIGINS=https://yourdomain.com in environment variables.",
+    logger.warn(
+      "ALLOWED_ORIGINS not configured in production. All cross-origin requests will be blocked.",
+      { component: "CORS" },
     );
     return [];
   }

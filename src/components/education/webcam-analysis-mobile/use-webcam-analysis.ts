@@ -3,6 +3,7 @@
  */
 
 import { useState, useRef, useCallback, useEffect } from "react";
+import { clientLogger } from "@/lib/logger/client";
 
 export interface CameraDevice {
   deviceId: string;
@@ -39,7 +40,11 @@ export function useWebcamAnalysis() {
       setAvailableCameras(videoDevices);
       return videoDevices;
     } catch (err) {
-      console.error("Error enumerating cameras:", err);
+      clientLogger.error(
+        "Error enumerating cameras",
+        { component: "useWebcamAnalysis" },
+        err,
+      );
       return [];
     }
   }, []);
@@ -70,7 +75,10 @@ export function useWebcamAnalysis() {
           try {
             await videoRef.current.play();
           } catch (playErr) {
-            console.warn("Video autoplay blocked:", playErr);
+            clientLogger.warn("Video autoplay blocked", {
+              component: "useWebcamAnalysis",
+              error: String(playErr),
+            });
           }
 
           const videoTrack = mediaStream.getVideoTracks()[0];
@@ -174,7 +182,10 @@ export function useWebcamAnalysis() {
         setIsFlashEnabled(!isFlashEnabled);
       }
     } catch (err) {
-      console.warn("Flash control not available:", err);
+      clientLogger.warn("Flash control not available", {
+        component: "useWebcamAnalysis",
+        error: String(err),
+      });
     }
   }, [stream, isFlashEnabled]);
 

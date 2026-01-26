@@ -256,9 +256,9 @@ export async function loadUnifiedConsentFromDB(): Promise<UnifiedConsentData | n
     }
 
     return consent;
-  } catch (error) {
-    console.error("Failed to load consent from DB:", error);
-    // Fallback to localStorage
+  } catch (_error) {
+    // Failed to load from DB, fallback to localStorage silently
+    // This is expected for anonymous users or network issues
     return getUnifiedConsent();
   }
 }

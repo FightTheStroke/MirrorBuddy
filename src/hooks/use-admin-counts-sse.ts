@@ -110,7 +110,11 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
           retryCount = 0; // Reset retry counter on successful message
           setError(null);
         } catch (err) {
-          console.error("[useAdminCountsSSE] Failed to parse SSE data:", err);
+          logger.error(
+            "[useAdminCountsSSE] Failed to parse SSE data",
+            { component: "useAdminCountsSSE" },
+            err,
+          );
           // Continue listening - parsing error doesn't close connection
         }
       };
