@@ -3,6 +3,10 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
+**Version**: 0.10.0
+**Last Verified**: 2026-01-26
+**Update Policy**: This file is verified and updated during each release via `/release`
+
 ---
 
 ## Table of Contents
@@ -798,6 +802,84 @@ sequenceDiagram
     S-->>UI: Render tool output
 
     UI->>UI: 80% canvas, 20% PiP
+```
+
+### 9.3 Voice Tool Commands (Unified)
+
+**Tools work identically via Chat and Voice** - the Conversation Engine shares tool execution.
+
+```mermaid
+graph TB
+    subgraph Input_Channels["Input Channels"]
+        Chat["Chat: 'Create a mind map about geography'"]
+        Voice["Voice: 'Fammi una mappa sulla geografia'"]
+    end
+
+    subgraph Voice_Tool_Commands["Voice Tool Commands (src/lib/voice/voice-tool-commands/)"]
+        Instructions["TOOL_USAGE_INSTRUCTIONS (Italian instructions for AI)"]
+        Helpers["helpers.ts (isMindmapModificationCommand, isToolCreationCommand)"]
+        Types["types.ts (VoiceToolDefinition, CreateMindmapArgs, etc.)"]
+    end
+
+    subgraph Shared_Tool_Orchestrator["Shared Tool Orchestrator"]
+        Detect["Tool Call Detection"]
+        Validate["Validate Tool Access (Tier)"]
+        Execute["Execute Plugin"]
+    end
+
+    subgraph Output_Channels["Output Channels"]
+        ChatOutput["Chat: Tool Canvas with Mermaid/React"]
+        VoiceOutput["Voice: Tool Canvas + verbal confirmation"]
+    end
+
+    Chat --> Detect
+    Voice --> Instructions
+    Instructions --> Detect
+    Helpers --> Detect
+    Types --> Detect
+    Detect --> Validate
+    Validate --> Execute
+    Execute --> ChatOutput
+    Execute --> VoiceOutput
+```
+
+### 9.4 Available Voice Tools
+
+| Tool Command           | Trigger Phrases                      | Output                   |
+| ---------------------- | ------------------------------------ | ------------------------ |
+| `create_mindmap`       | "Fammi una mappa", "Crea uno schema" | Mind map in canvas       |
+| `create_quiz`          | "Interrogami", "Fammi delle domande" | Quiz (written or verbal) |
+| `create_flashcards`    | "Fammi delle flashcard"              | Flashcard deck           |
+| `create_summary`       | "Riassumimi", "Fai una sintesi"      | AI-generated summary     |
+| `open_student_summary` | "Devo scrivere un riassunto"         | Empty editor for student |
+| `create_diagram`       | "Fammi un flowchart"                 | Mermaid diagram          |
+| `create_timeline`      | "Fai una linea del tempo"            | Timeline visualization   |
+| `capture_homework`     | "Ti faccio vedere"                   | Webcam capture           |
+| `search_archive`       | "Rivediamo quel quiz"                | Search past materials    |
+
+### 9.5 Voice Mindmap Modification Commands
+
+```mermaid
+graph LR
+    subgraph Voice_Commands["Real-time Voice Commands"]
+        Add["mindmap_add_node: 'Aggiungi [concetto]'"]
+        Connect["mindmap_connect_nodes: 'Collega A con B'"]
+        Expand["mindmap_expand_node: 'Approfondisci [nodo]'"]
+        Delete["mindmap_delete_node: 'Cancella [nodo]'"]
+        Focus["mindmap_focus_node: 'Vai a [nodo]'"]
+        Color["mindmap_set_color: 'Colora [nodo] di rosso'"]
+    end
+
+    subgraph Canvas["Tool Canvas (Live Update)"]
+        Mindmap[Active Mindmap]
+    end
+
+    Add --> Mindmap
+    Connect --> Mindmap
+    Expand --> Mindmap
+    Delete --> Mindmap
+    Focus --> Mindmap
+    Color --> Mindmap
 ```
 
 ---
@@ -1936,6 +2018,9 @@ graph TB
         ADR0060[0060 Security Hardening]
         ADR0072[0072 Secrets Scan]
         ADR0075[0075 Cookie Standards]
+        ADR0077[0077 Security Hardening Plan17]
+        ADR0078[0078 Vercel Runtime Constraints]
+        ADR0080[0080 Security Audit Hardening]
     end
 
     subgraph Business_Logic["Business Logic"]
@@ -1956,6 +2041,8 @@ graph TB
         ADR0008[0008 Parent Dashboard GDPR]
         ADR0059[0059 E2E Test Setup]
         ADR0062[0062 AI Compliance]
+        ADR0079[0079 Web Vitals and Legal Docs]
+        ADR0081[0081 Test Data Isolation]
     end
 ```
 
@@ -1963,22 +2050,26 @@ graph TB
 
 ## Quick Reference
 
-| Category   | Key Files                                         | ADRs             |
-| ---------- | ------------------------------------------------- | ---------------- |
-| Database   | `prisma/schema/*.prisma`                          | 0015, 0028, 0033 |
-| Auth       | `src/lib/auth/`                                   | 0055, 0075       |
-| Chat       | `src/lib/ai/`, `src/app/api/chat/`                | 0034             |
-| Voice      | `src/app/api/realtime/`                           | 0038, 0069       |
-| Professors | `src/data/maestri/`                               | 0031, 0064       |
-| Tools      | `src/lib/tools/`                                  | 0009, 0037       |
-| Tiers      | `src/lib/tier/`                                   | 0071, 0073       |
-| Trial      | `src/lib/trial/`                                  | 0056, 0057       |
-| Safety     | `src/lib/safety/`                                 | 0004, 0062       |
-| A11y       | `src/lib/accessibility/`                          | 0060             |
-| CI/CD      | `.github/workflows/ci.yml`                        | -                |
-| Hooks      | `.husky/pre-commit`, `scripts/pre-push-vercel.sh` | 0072             |
+| Category   | Key Files                                                     | ADRs                   |
+| ---------- | ------------------------------------------------------------- | ---------------------- |
+| Database   | `prisma/schema/*.prisma`                                      | 0015, 0028, 0033       |
+| Auth       | `src/lib/auth/`                                               | 0055, 0075, 0077, 0080 |
+| Chat       | `src/lib/ai/`, `src/app/api/chat/`                            | 0034                   |
+| Voice      | `src/app/api/realtime/`, `src/lib/voice/`                     | 0038, 0069, 0078       |
+| Professors | `src/data/maestri/`                                           | 0031, 0064             |
+| Tools      | `src/lib/tools/`, `src/lib/voice/voice-tool-commands/`        | 0009, 0037             |
+| Tiers      | `src/lib/tier/`                                               | 0071, 0073             |
+| Trial      | `src/lib/trial/`                                              | 0056, 0057             |
+| Safety     | `src/lib/safety/`                                             | 0004, 0062             |
+| A11y       | `src/lib/accessibility/`                                      | 0060                   |
+| CI/CD      | `.github/workflows/ci.yml`                                    | -                      |
+| Hooks      | `.husky/pre-commit`, `scripts/pre-push-vercel.sh`             | 0072                   |
+| Vercel     | `src/lib/ssl-config.ts`, `.claude/rules/vercel-deployment.md` | 0063, 0067, 0078       |
+| Compliance | `docs/compliance/`                                            | 0079, 0081             |
 
 ---
 
-_Last updated: January 2025_
+_Version: 0.10.0_
+_Last updated: 26 January 2026_
 _Generated from codebase analysis and ADR documentation_
+_Updated on each release via `/release` command_

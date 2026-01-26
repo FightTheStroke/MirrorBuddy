@@ -127,11 +127,38 @@ curl -s https://mirrorbuddy.vercel.app/api/health/detailed | jq '.checks.databas
 - ADR 0063 - Supabase SSL Certificate Requirements
 - ADR 0067 - Database Performance Optimization (Sentry warnings fix)
 
+## ARCHITECTURE DIAGRAMS UPDATE (MANDATORY)
+
+Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:
+
+1. **Update version header** to match new version
+2. **Update "Last Verified" date** to release date
+3. **Check for new ADRs** - add any missing to ADR Index section
+4. **Verify accuracy** against implementation (especially new features)
+
+```bash
+# Quick check for new ADRs not in diagrams
+ls -la docs/adr/*.md | tail -10  # Recent ADRs
+grep "ADR0" ARCHITECTURE-DIAGRAMS.md | wc -l  # Count in diagrams
+```
+
+**Key sections to verify**:
+
+- Section 9: Tool Execution (voice tool commands)
+- Section 25: ADR Index (all recent ADRs)
+- Quick Reference table (file paths and ADR refs)
+
 ## VERSION + RELEASE
 
 ```bash
 ./scripts/auto-version.sh           # Analyze commits
 ./scripts/auto-version.sh --apply   # Bump version
+# Update ARCHITECTURE-DIAGRAMS.md version header
+sed -i '' "s/\*\*Version\*\*: .*/\*\*Version\*\*: $(cat VERSION)/" ARCHITECTURE-DIAGRAMS.md
+sed -i '' "s/\*\*Last Verified\*\*: .*/\*\*Last Verified\*\*: $(date +%Y-%m-%d)/" ARCHITECTURE-DIAGRAMS.md
+sed -i '' "s/_Version: .*/_Version: $(cat VERSION)_/" ARCHITECTURE-DIAGRAMS.md
+sed -i '' "s/_Last updated: .*/_Last updated: $(date '+%d %B %Y')_/" ARCHITECTURE-DIAGRAMS.md
+git add ARCHITECTURE-DIAGRAMS.md && git commit --amend --no-edit
 git tag -a vX.Y.Z -m "Release X.Y.Z"
 git push origin main --tags
 gh release create vX.Y.Z --generate-notes
