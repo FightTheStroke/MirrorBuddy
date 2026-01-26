@@ -6,7 +6,7 @@
     "warning": "Warning",
     "info": "Information",
     "confirm": "Confirm",
-    "cancel": "Cancel",
+    "cancel": "Cancelar",
     "save": "Save",
     "delete": "Delete",
     "edit": "Edit",
@@ -46,7 +46,21 @@
     "profile": "Profile",
     "logout": "Logout",
     "login": "Login",
-    "retry": "Reintentar"
+    "retry": "Reintentar",
+    "ambientAudio": {
+      "loading": "Cargando audio..."
+    },
+    "dashboard": {
+      "noMaestroUsage": "Ningún Maestro utilizado"
+    },
+    "models": {
+      "selectModels": "Selecciona modelos de IA para cada característica. ★ = recomendado, ⚠ = no recomendado",
+      "mainFeatures": "Características principales",
+      "notRecommended": "No recomendado para esta característica"
+    },
+    "errorUnexpected": "Ocurrió un error inesperado. Por favor intenta más tarde.",
+    "errorTitle": "Algo salió mal",
+    "wcagCompliance": "Cumplimiento WCAG 2.1 AA"
   },
   "home": {
     "title": "La Escuela Que Quiero",
@@ -519,6 +533,44 @@
       "profileAuditory": "Auditiva",
       "profileCerebral": "Motora+",
       "a11yActivateProfile": "Activar perfil"
+    },
+    "onboarding": {
+      "title": "Tutoriales y reinicio",
+      "reviewTutorial": {
+        "title": "Revisar el tutorial",
+        "description": "Vea de nuevo la presentación de Melissa y los Profesores. Sus datos no serán modificados.",
+        "button": "Revisar Tutorial"
+      },
+      "resetComplete": {
+        "title": "Reinicio completo",
+        "description": "Elimina TODOS tus datos y comienza de nuevo. ¡Esta acción es irreversible!",
+        "button": "Reinicio Completo"
+      },
+      "confirmDialog": {
+        "titles": {
+          "step1": "¿Estás seguro?",
+          "step2": "Confirmar con RESET",
+          "step3": "Confirmación final"
+        },
+        "descriptions": {
+          "step1": "Estás a punto de eliminar TODOS tus datos:",
+          "step1Items": [
+            "Progreso y XP",
+            "Tarjetas de memoria y materiales guardados",
+            "Conversaciones con Profesores",
+            "Configuraciones y preferencias"
+          ],
+          "step2": "Para confirmar, escribe RESET en el campo a continuación.",
+          "step3": "Esta es tu última advertencia. Haz clic en \"Eliminar todo\" para continuar. ¡NO puedes volver atrás!"
+        },
+        "input": "Escribe RESET...",
+        "buttons": {
+          "cancel": "Cancelar",
+          "deleting": "Eliminando...",
+          "deleteAll": "Eliminar todo",
+          "continue": "Continuar"
+        }
+      }
     }
   },
   "astuccio": {
@@ -1026,6 +1078,48 @@
       "flashcardsSuccessDetail": "Creadas {count} tarjetas de estudio de \"{topic}\".",
       "flashcardsError": "Error",
       "flashcardsErrorDetail": "No se pudieron guardar las tarjetas de estudio."
+    },
+    "selectedMaestro": "Selecciona un Maestro",
+    "htmlSnippetsLoading": "Cargando contenido...",
+    "emptyState": "No hay métricas disponibles",
+    "emptyStateDescription": "Las métricas de éxito se calcularán después de algunas sesiones de estudio. Comienza a interactuar con los Profesores para ver tu progreso.",
+    "selectMaestro": "Selecciona un Profesor",
+    "selectSubject": "Selecciona una materia",
+    "materialViewer": {
+      "noContent": "No hay contenido disponible para este material."
+    },
+    "noMaterialAvailable": "Sin material disponible",
+    "htmlSnippetsTitle": "Visualización HTML",
+    "maestroTitle": "Profesor",
+    "parentDashboardTitle": "Panel de Control de Padres",
+    "noDataAvailable": "No hay datos disponibles",
+    "svgDiagram": {
+      "error": "Error:"
+    },
+    "maestroSelectionStep": {
+      "noSpecificProfessor": "Sin profesor específico para esta materia. Elige entre todos los Profesores:"
+    },
+    "htmlSnippetsView": {
+      "loading": "Cargando demo..."
+    },
+    "parentDashboard": {
+      "profileTitle": "Perfil de {studentName}"
+    },
+    "subjectConfirmation": {
+      "maestroPanel": {
+        "description": "con un Profesor? Te guiará paso a paso."
+      },
+      "subjectPanel": {
+        "detected": "Materia detectada:",
+        "confirmOrSelect": "Confirma o selecciona otra materia.",
+        "unrecognized": "No pude reconocer la materia automáticamente.",
+        "selectCorrect": "Selecciona la materia correcta:",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar"
+      }
+    },
+    "emptyMetrics": {
+      "description": "Las métricas de éxito se calcularán después de algunas sesiones de estudio. Comienza a interactuar con los Profesores para ver tu progreso."
     }
   },
   "chat": {
@@ -1780,8 +1874,10 @@
       "you": "Tú:",
       "enableMicrophone": "Activar micrófono",
       "disableMicrophone": "Desactivar micrófono",
-      "endCall": "Terminar llamada"
-    }
+      "endCall": "Terminar llamada",
+      "cancel": "Cancelar"
+    },
+    "connecting": "Conectando..."
   },
   "profile": {
     "genitori": {
@@ -1806,8 +1902,18 @@
       "formalLanguage": "El Profesor utiliza un lenguaje formal",
       "observationsStudySessions": "Las observaciones se basan en sesiones de estudio",
       "cancel": "Cancelar",
-      "understood": "Entendido, continuar"
-    }
+      "understood": "Entendido, continuar",
+      "loadingConversation": "Cargando conversación...",
+      "startConversation": "Iniciar conversación con {maestroName}",
+      "askAbout": "Preguntar sobre el progreso de {studentName}"
+    },
+    "studentLabel": "Estudiante:",
+    "activityOverview": "Descripción general de actividades de estudio",
+    "updateButton": "Actualizar",
+    "deleteButton": "Eliminar",
+    "confidenceNote": "Nota: Confiabilidad {score}%. Más sesiones mejorarán las observaciones.",
+    "settingsNote": "Nota: Estas configuraciones se aplican solo a la vista del Panel de control de padres.",
+    "dataDeletionRequestConfirm": "¿Está seguro de que desea solicitar la eliminación de datos?"
   },
   "maestros": {
     "grid": {
@@ -2027,7 +2133,13 @@
     "voiceSearch": {
       "stop": "Detener búsqueda por voz",
       "start": "Iniciar búsqueda por voz"
-    }
+    },
+    "emptyState": {
+      "backpackEmpty": "Tu Mochila está vacía",
+      "startCreating": "¡Comienza a crear materiales de estudio con los Maestros! Ve al Estuche para elegir una herramienta.",
+      "goToToolcase": "Ir al Estuche"
+    },
+    "loadingMaterials": "Cargando materiales..."
   },
   "admin": {
     "dashboard": "Panel de administración",
@@ -2052,7 +2164,17 @@
         "actions": "Acciones"
       },
       "empty-message": "No se encontraron usuarios",
-      "trash-empty": "Papelera vacía"
+      "trash-empty": "Papelera vacía",
+      "bulkActions": {
+        "selected": "seleccionados",
+        "changeTier": "Cambiar nivel",
+        "enable": "Habilitar",
+        "disable": "Deshabilitar",
+        "delete": "Eliminar",
+        "confirmDisable": "¿Deshabilitar {count} usuarios?",
+        "confirmEnable": "¿Habilitar {count} usuarios?",
+        "confirmDelete": "¿Eliminar permanentemente {count} usuarios?"
+      }
     },
     "tiers": {
       "page": {
@@ -2321,6 +2443,24 @@
         "previewLabel": "Vista previa",
         "resetButton": "Restablecer región"
       }
+    },
+    "analytics": {
+      "resetStats": "Reiniciar estadísticas",
+      "actionIrreversible": "⚠️ ACCIÓN IRREVERSIBLE",
+      "willDeleteAllStats": "Esta acción eliminará TODAS las estadísticas y datos de actividad:",
+      "userAccountsWillRemain": "Las cuentas de usuario y los perfiles PERMANECERÁN intactos.",
+      "typeToConfirm": "Escriba RESET_ALL_STATS para confirmar:",
+      "confirmReset": "Confirmar reinicio",
+      "pageWillReload": "La página se recargará en breve..."
+    },
+    "sentry": {
+      "unresolved": "sin resolver",
+      "notConfigured": "Sentry no configurado. Agregue SENTRY_AUTH_TOKEN a las variables de entorno.",
+      "noUnresolvedErrors": "Sin errores sin resolver"
+    },
+    "protectedUsers": {
+      "title": "Usuarios protegidos",
+      "noUsers": "No hay usuarios protegidos configurados"
     }
   },
   "contact": {
@@ -2352,15 +2492,9 @@
       "description": {}
     },
     "enterprise": {
-      "title": {},
-      "description": {},
-      "heading": {},
-      "subtitle": {},
-      "features": {
-        "customization": "Personalización completa y marca corporativa",
-        "analytics": "Análisis avanzados e informes",
-        "integration": "Integración con tus sistemas"
-      }
+      "successTitle": "¡Solicitud Enviada!",
+      "successDescription": "Nuestro equipo se pondrá en contacto contigo pronto para discutir tus necesidades.",
+      "submitting": "Enviando..."
     },
     "schools": {
       "title": {},
@@ -2410,7 +2544,8 @@
           "moreThan1000": "Más de 1000"
         }
       }
-    }
+    },
+    "error": "Error"
   },
   "ambientAudio": {
     "title": "Audio Ambiental",
@@ -2431,7 +2566,8 @@
     "presets": {
       "creative": "Creatividad",
       "rainyDay": "Día Lluvioso"
-    }
+    },
+    "info": "El audio ambiental puede mejorar la concentración mientras estudias. Los beats binaurales requieren auriculares estéreo para el efecto óptimo."
   },
   "dashboard": {
     "azureCosts": "Costos de Azure",
@@ -2467,7 +2603,11 @@
     "dailyCosts": "Costos Diarios",
     "azureNotConfigured": "Gestión de Costos de Azure no configurada",
     "configureAzure": "Configura las credenciales de Azure para ver los costos",
-    "noCostData": "Sin datos de costos disponibles"
+    "noCostData": "Sin datos de costos disponibles",
+    "maestroUsage": "Uso de Profesores",
+    "maestroUsageChart": {
+      "title": "Profesores Más Utilizados"
+    }
   },
   "google-drive": {
     "description": "Conecta Google Drive para importar materiales de estudio directamente desde la nube",
@@ -2611,6 +2751,73 @@
       "viewLoading": "Página cargando",
       "sessionLoading": "Sesión cargando",
       "sessionLoadingText": "Cargando sesión..."
+    }
+  },
+  "typing": {
+    "oneHandedMode": {
+      "title": "Modo de una mano",
+      "help": "Ayuda",
+      "cursor": "Cursor"
+    },
+    "progressTracker": {
+      "wordsPerMinute": "Palabras por minuto",
+      "noBadges": "Sin insignias aún"
+    },
+    "stickyKeysHelper": {
+      "enable": "Habilitar teclas permanentes",
+      "description": "Las teclas permanecen activas hasta que se presionan de nuevo"
+    },
+    "visualImpairment": {
+      "readingGuide": "Guía de lectura",
+      "wcagLabel": "Cumplimiento WCAG 2.1 AA",
+      "wcagCompliance": "Cumplimiento WCAG 2.1 AA:"
+    },
+    "oneHanded": {
+      "title": "Modo de escritura",
+      "showInfo": "Mostrar información",
+      "hideInfo": "Ocultar información",
+      "modes": {
+        "both": {
+          "label": "Ambas manos",
+          "description": "Escritura estándar con 10 dedos"
+        },
+        "leftOnly": {
+          "label": "Solo izquierda",
+          "description": "Para usuarios con solo la mano izquierda"
+        },
+        "rightOnly": {
+          "label": "Solo derecha",
+          "description": "Para usuarios con solo la mano derecha"
+        }
+      },
+      "info": {
+        "active": "Modo de una sola mano activo:",
+        "description": "El teclado virtual mostrará solo las teclas para la mano seleccionada. Las lecciones se han modificado para una escritura eficiente con una sola mano.",
+        "tips": "Consejos para escribir con una sola mano:",
+        "tipItems": [
+          "Coloca tu mano en el centro del teclado",
+          "Usa Sticky Keys para combinaciones de teclas",
+          "Practica regularmente para mejorar la velocidad"
+        ]
+      }
+    },
+    "stickyKeys": {
+      "openSettings": "Abrir configuración",
+      "tip": "Para una escritura más eficiente, habilita Sticky Keys en la configuración de accesibilidad de tu sistema operativo.",
+      "tipLabel": "Consejo",
+      "activated": "Sticky Keys activadas",
+      "restartRequired": "Los cambios requieren un reinicio del navegador",
+      "enableFailed": "Error al activar Sticky Keys",
+      "enableManually": "Actívalo manualmente en la configuración del sistema",
+      "windowsInfo": "Habilitar Sticky Keys en Windows",
+      "windowsHint": "Presiona Mayús 5 veces para alternar",
+      "linuxSettings": "Configuración de accesibilidad",
+      "linuxInfo": "Abre la configuración de tu sistema Linux",
+      "unsupported": "Sticky Keys no están disponibles en este sistema operativo",
+      "active": "Activo",
+      "title": "Sticky Keys",
+      "description": "Sticky Keys te permite presionar las teclas modificadoras (Mayús, Ctrl, Alt, Cmd) una a la vez en lugar de mantenerlas presionadas.",
+      "enableButton": "Habilitar Sticky Keys"
     }
   }
 }

@@ -9,7 +9,21 @@
     "delete": "Supprimer",
     "edit": "Modifier",
     "close": "Fermer",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "ambientAudio": {
+      "loading": "Chargement audio..."
+    },
+    "dashboard": {
+      "noMaestroUsage": "Aucun Maître utilisé"
+    },
+    "models": {
+      "selectModels": "Sélectionnez les modèles IA pour chaque fonctionnalité. ★ = recommandé, ⚠ = non recommandé",
+      "mainFeatures": "Fonctionnalités principales",
+      "notRecommended": "Non recommandé pour cette fonctionnalité"
+    },
+    "errorUnexpected": "Une erreur inattendue s'est produite. Veuillez réessayer plus tard.",
+    "errorTitle": "Quelque chose s'est mal passé",
+    "wcagCompliance": "Conformité WCAG 2.1 AA"
   },
   "navigation": {
     "home": "Accueil",
@@ -536,6 +550,48 @@
       "flashcardsSuccessDetail": "Créé {count} cartes mémoire à partir de \"{topic}\".",
       "flashcardsError": "Erreur",
       "flashcardsErrorDetail": "Impossible d'enregistrer les cartes mémoire."
+    },
+    "selectedMaestro": "Sélectionner un Maître",
+    "htmlSnippetsLoading": "Chargement du contenu...",
+    "emptyState": "Aucune métrique disponible",
+    "emptyStateDescription": "Les métriques de succès seront calculées après quelques sessions d'étude. Commencez à interagir avec les Professeurs pour voir vos progrès.",
+    "selectMaestro": "Sélectionnez un Professeur",
+    "selectSubject": "Sélectionnez une matière",
+    "materialViewer": {
+      "noContent": "Aucun contenu disponible pour ce matériel."
+    },
+    "noMaterialAvailable": "Aucun matériel disponible",
+    "htmlSnippetsTitle": "Affichage HTML",
+    "maestroTitle": "Professeur",
+    "parentDashboardTitle": "Tableau de bord parental",
+    "noDataAvailable": "Aucune donnée disponible",
+    "svgDiagram": {
+      "error": "Erreur:"
+    },
+    "maestroSelectionStep": {
+      "noSpecificProfessor": "Aucun professeur spécifique pour cette matière. Choisissez parmi tous les Professeurs:"
+    },
+    "htmlSnippetsView": {
+      "loading": "Chargement de la démo..."
+    },
+    "parentDashboard": {
+      "profileTitle": "Profil de {studentName}"
+    },
+    "subjectConfirmation": {
+      "maestroPanel": {
+        "description": "avec un Professeur? Il vous guidera étape par étape."
+      },
+      "subjectPanel": {
+        "detected": "Matière détectée:",
+        "confirmOrSelect": "Confirmez ou sélectionnez une autre matière.",
+        "unrecognized": "Je n'ai pas pu reconnaître la matière automatiquement.",
+        "selectCorrect": "Sélectionnez la matière correcte:",
+        "cancel": "Annuler",
+        "confirm": "Confirmer"
+      }
+    },
+    "emptyMetrics": {
+      "description": "Les métriques de succès seront calculées après quelques sessions d'étude. Commencez à interagir avec les Professeurs pour voir vos progrès."
     }
   },
   "tier": {
@@ -1426,8 +1482,10 @@
       "you": "Toi :",
       "enableMicrophone": "Activer le microphone",
       "disableMicrophone": "Désactiver le microphone",
-      "endCall": "Terminer l'appel"
-    }
+      "endCall": "Terminer l'appel",
+      "cancel": "Annuler"
+    },
+    "connecting": "Connexion en cours..."
   },
   "settings": {
     "notifications": {
@@ -1580,6 +1638,44 @@
       "profileAuditory": "Auditif",
       "profileCerebral": "Moteur+",
       "a11yActivateProfile": "Activer le profil"
+    },
+    "onboarding": {
+      "title": "Tutoriels et réinitialisation",
+      "reviewTutorial": {
+        "title": "Revoir le tutoriel",
+        "description": "Regardez à nouveau la présentation de Melissa et les Professeurs. Vos données ne seront pas modifiées.",
+        "button": "Revoir le tutoriel"
+      },
+      "resetComplete": {
+        "title": "Réinitialisation complète",
+        "description": "Supprimer TOUTES vos données et recommencer à zéro. Cette action est irréversible!",
+        "button": "Réinitialisation complète"
+      },
+      "confirmDialog": {
+        "titles": {
+          "step1": "Êtes-vous sûr?",
+          "step2": "Confirmer avec RESET",
+          "step3": "Confirmation finale"
+        },
+        "descriptions": {
+          "step1": "Vous êtes sur le point de supprimer TOUTES vos données:",
+          "step1Items": [
+            "Progrès et XP",
+            "Flashcards et matériaux sauvegardés",
+            "Conversations avec les Professeurs",
+            "Paramètres et préférences"
+          ],
+          "step2": "Pour confirmer, tapez RESET dans le champ ci-dessous.",
+          "step3": "Ceci est votre dernier avertissement. Cliquez sur \"Supprimer tout\" pour continuer. Vous NE pouvez PAS revenir!"
+        },
+        "input": "Tapez RESET...",
+        "buttons": {
+          "cancel": "Annuler",
+          "deleting": "Suppression en cours...",
+          "deleteAll": "Supprimer tout",
+          "continue": "Continuer"
+        }
+      }
     }
   },
   "profile": {
@@ -1605,8 +1701,18 @@
       "formalLanguage": "Le Professeur utilise un langage formel",
       "observationsStudySessions": "Les observations sont basées sur les séances d'étude",
       "cancel": "Annuler",
-      "understood": "J'ai compris, continuer"
-    }
+      "understood": "J'ai compris, continuer",
+      "loadingConversation": "Chargement de la conversation...",
+      "startConversation": "Commencer la conversation avec {maestroName}",
+      "askAbout": "Demander des informations sur les progrès de {studentName}"
+    },
+    "studentLabel": "Élève :",
+    "activityOverview": "Aperçu des activités d'étude",
+    "updateButton": "Mettre à jour",
+    "deleteButton": "Supprimer",
+    "confidenceNote": "Remarque : Fiabilité {score}%. Plus de sessions amélioreront les observations.",
+    "settingsNote": "Remarque : Ces paramètres s'appliquent uniquement à l'affichage du Tableau de bord des parents.",
+    "dataDeletionRequestConfirm": "Êtes-vous sûr de vouloir demander la suppression des données ?"
   },
   "aiTransparency": {
     "page": {
@@ -1816,7 +1922,13 @@
     "voiceSearch": {
       "stop": "Arrêter la recherche vocale",
       "start": "Démarrer la recherche vocale"
-    }
+    },
+    "emptyState": {
+      "backpackEmpty": "Votre Sac est vide",
+      "startCreating": "Commencez à créer du matériel d'étude avec les Maîtres ! Allez à la Trousse pour choisir un outil.",
+      "goToToolcase": "Aller à la Trousse"
+    },
+    "loadingMaterials": "Chargement du matériel..."
   },
   "admin": {
     "invites": {
@@ -1901,7 +2013,17 @@
         "actions": "Actions"
       },
       "empty-message": "Aucun utilisateur trouvé",
-      "trash-empty": "Corbeille vide"
+      "trash-empty": "Corbeille vide",
+      "bulkActions": {
+        "selected": "sélectionnés",
+        "changeTier": "Changer le niveau",
+        "enable": "Activer",
+        "disable": "Désactiver",
+        "delete": "Supprimer",
+        "confirmDisable": "Désactiver {count} utilisateurs ?",
+        "confirmEnable": "Activer {count} utilisateurs ?",
+        "confirmDelete": "Supprimer définitivement {count} utilisateurs ?"
+      }
     },
     "tiers": {
       "page": {
@@ -2102,6 +2224,24 @@
         "previewLabel": "Aperçu",
         "resetButton": "Réinitialiser la locale"
       }
+    },
+    "analytics": {
+      "resetStats": "Réinitialiser les statistiques",
+      "actionIrreversible": "⚠️ ACTION IRRÉVERSIBLE",
+      "willDeleteAllStats": "Cette action supprimera TOUTES les statistiques et données d'activité :",
+      "userAccountsWillRemain": "Les comptes utilisateurs et les profils RESTERONT intacts.",
+      "typeToConfirm": "Tapez RESET_ALL_STATS pour confirmer :",
+      "confirmReset": "Confirmer la réinitialisation",
+      "pageWillReload": "La page sera rechargée bientôt..."
+    },
+    "sentry": {
+      "unresolved": "non résolu",
+      "notConfigured": "Sentry non configuré. Ajoutez SENTRY_AUTH_TOKEN aux variables d'environnement.",
+      "noUnresolvedErrors": "Aucune erreur non résolue"
+    },
+    "protectedUsers": {
+      "title": "Utilisateurs protégés",
+      "noUsers": "Aucun utilisateur protégé configuré"
     }
   },
   "contact": {
@@ -2133,15 +2273,9 @@
       "description": {}
     },
     "enterprise": {
-      "title": {},
-      "description": {},
-      "heading": {},
-      "subtitle": {},
-      "features": {
-        "customization": "Personnalisation complète et image de marque d'entreprise",
-        "analytics": "Analyses avancées et rapports",
-        "integration": "Intégration avec vos systèmes"
-      }
+      "successTitle": "Demande Envoyée!",
+      "successDescription": "Notre équipe vous contactera bientôt pour discuter de vos besoins.",
+      "submitting": "Envoi en cours..."
     },
     "schools": {
       "title": {},
@@ -2191,7 +2325,8 @@
           "moreThan1000": "Plus de 1000"
         }
       }
-    }
+    },
+    "error": "Erreur"
   },
   "astuccio": {
     "backButton": "Retour à Astuccio",
@@ -2245,7 +2380,8 @@
     "presets": {
       "creative": "Créativité",
       "rainyDay": "Jour Pluvieux"
-    }
+    },
+    "info": "L'audio ambiant peut améliorer la concentration pendant l'étude. Les battements binauraux nécessitent des écouteurs stéréo pour un effet optimal."
   },
   "dashboard": {
     "azureCosts": "Coûts Azure",
@@ -2281,7 +2417,11 @@
     "dailyCosts": "Coûts quotidiens",
     "azureNotConfigured": "Gestion des coûts Azure non configurée",
     "configureAzure": "Configurez les identifiants Azure pour voir les coûts",
-    "noCostData": "Aucune donnée de coûts disponible"
+    "noCostData": "Aucune donnée de coûts disponible",
+    "maestroUsage": "Utilisation des Professeurs",
+    "maestroUsageChart": {
+      "title": "Professeurs Les Plus Utilisés"
+    }
   },
   "google-drive": {
     "description": "Connectez Google Drive pour importer du matériel d'étude directement depuis le cloud",
@@ -2425,6 +2565,73 @@
       "viewLoading": "Chargement de la page en cours",
       "sessionLoading": "Chargement de la session en cours",
       "sessionLoadingText": "Chargement de la session..."
+    }
+  },
+  "typing": {
+    "oneHandedMode": {
+      "title": "Mode une main",
+      "help": "Aide",
+      "cursor": "Curseur"
+    },
+    "progressTracker": {
+      "wordsPerMinute": "Mots par minute",
+      "noBadges": "Pas de badges encore"
+    },
+    "stickyKeysHelper": {
+      "enable": "Activer les touches persistantes",
+      "description": "Les touches restent actives jusqu'à ce qu'elles soient pressées à nouveau"
+    },
+    "visualImpairment": {
+      "readingGuide": "Guide de lecture",
+      "wcagLabel": "Conformité WCAG 2.1 AA",
+      "wcagCompliance": "Conformité WCAG 2.1 AA:"
+    },
+    "oneHanded": {
+      "title": "Mode de dactylographie",
+      "showInfo": "Afficher les infos",
+      "hideInfo": "Masquer les infos",
+      "modes": {
+        "both": {
+          "label": "Les deux mains",
+          "description": "Dactylographie standard avec 10 doigts"
+        },
+        "leftOnly": {
+          "label": "Main gauche uniquement",
+          "description": "Pour les utilisateurs ayant uniquement la main gauche"
+        },
+        "rightOnly": {
+          "label": "Main droite uniquement",
+          "description": "Pour les utilisateurs ayant uniquement la main droite"
+        }
+      },
+      "info": {
+        "active": "Mode une seule main actif:",
+        "description": "Le clavier virtuel n'affichera que les touches pour la main sélectionnée. Les leçons ont été modifiées pour une dactylographie efficace à une seule main.",
+        "tips": "Conseils pour la dactylographie à une seule main:",
+        "tipItems": [
+          "Positionnez votre maint au centre du clavier",
+          "Utilisez les touches Sticky pour les combinaisons",
+          "Pratiquez régulièrement pour améliorer la vitesse"
+        ]
+      }
+    },
+    "stickyKeys": {
+      "openSettings": "Ouvrir les paramètres",
+      "tip": "Pour une dactylographie plus efficace, activez Sticky Keys dans les paramètres d'accessibilité de votre système d'exploitation.",
+      "tipLabel": "Conseil",
+      "activated": "Sticky Keys activées",
+      "restartRequired": "Les modifications nécessitent un redémarrage du navigateur",
+      "enableFailed": "Impossible d'activer Sticky Keys",
+      "enableManually": "Activez manuellement dans les paramètres système",
+      "windowsInfo": "Activer Sticky Keys dans Windows",
+      "windowsHint": "Appuyez sur Maj 5 fois pour basculer",
+      "linuxSettings": "Paramètres d'accessibilité",
+      "linuxInfo": "Ouvrez les paramètres de votre système Linux",
+      "unsupported": "Sticky Keys ne sont pas disponibles sur ce système d'exploitation",
+      "active": "Actif",
+      "title": "Sticky Keys",
+      "description": "Sticky Keys vous permet d'appuyer sur les touches de modification (Maj, Ctrl, Alt, Cmd) une à la fois au lieu de les maintenir enfoncées.",
+      "enableButton": "Activer Sticky Keys"
     }
   }
 }

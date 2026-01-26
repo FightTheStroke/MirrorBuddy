@@ -9,7 +9,21 @@
     "delete": "Delete",
     "edit": "Edit",
     "close": "Close",
-    "retry": "Retry"
+    "retry": "Retry",
+    "ambientAudio": {
+      "loading": "Loading audio..."
+    },
+    "dashboard": {
+      "noMaestroUsage": "No Master used"
+    },
+    "models": {
+      "selectModels": "Select AI models for each feature. ★ = recommended, ⚠ = not recommended",
+      "mainFeatures": "Main Features",
+      "notRecommended": "Not recommended for this feature"
+    },
+    "errorUnexpected": "An unexpected error occurred. Please try again later.",
+    "errorTitle": "Something went wrong",
+    "wcagCompliance": "WCAG 2.1 AA Compliance"
   },
   "navigation": {
     "home": "Home",
@@ -545,6 +559,48 @@
       "flashcardsSuccessDetail": "Created {count} flashcards from \"{topic}\".",
       "flashcardsError": "Error",
       "flashcardsErrorDetail": "Unable to save flashcards."
+    },
+    "selectedMaestro": "Select a Master",
+    "htmlSnippetsLoading": "Loading content...",
+    "emptyState": "No metrics available",
+    "emptyStateDescription": "Success metrics will be calculated after a few study sessions. Start interacting with the Professors to see your progress.",
+    "selectMaestro": "Select a Professor",
+    "selectSubject": "Select a subject",
+    "materialViewer": {
+      "noContent": "No content available for this material."
+    },
+    "noMaterialAvailable": "No material available",
+    "htmlSnippetsTitle": "HTML Display",
+    "maestroTitle": "Professor",
+    "parentDashboardTitle": "Parent Dashboard",
+    "noDataAvailable": "No data available",
+    "svgDiagram": {
+      "error": "Error:"
+    },
+    "maestroSelectionStep": {
+      "noSpecificProfessor": "No specific professor for this subject. Choose from all Professors:"
+    },
+    "htmlSnippetsView": {
+      "loading": "Loading demo..."
+    },
+    "parentDashboard": {
+      "profileTitle": "Profile of {studentName}"
+    },
+    "subjectConfirmation": {
+      "maestroPanel": {
+        "description": "with a Professor? They will guide you step by step."
+      },
+      "subjectPanel": {
+        "detected": "Subject detected:",
+        "confirmOrSelect": "Confirm or select another subject.",
+        "unrecognized": "I couldn't recognize the subject automatically.",
+        "selectCorrect": "Select the correct subject:",
+        "cancel": "Cancel",
+        "confirm": "Confirm"
+      }
+    },
+    "emptyMetrics": {
+      "description": "Success metrics will be calculated after a few study sessions. Start interacting with the Professors to see your progress."
     }
   },
   "tier": {
@@ -1435,8 +1491,10 @@
       "you": "You:",
       "enableMicrophone": "Enable microphone",
       "disableMicrophone": "Disable microphone",
-      "endCall": "End call"
-    }
+      "endCall": "End call",
+      "cancel": "Cancel"
+    },
+    "connecting": "Connecting..."
   },
   "settings": {
     "notifications": {
@@ -1589,6 +1647,44 @@
       "profileAuditory": "Auditory",
       "profileCerebral": "Motor+",
       "a11yActivateProfile": "Activate profile"
+    },
+    "onboarding": {
+      "title": "Tutorials and Reset",
+      "reviewTutorial": {
+        "title": "Review the tutorial",
+        "description": "Watch Melissa's presentation and the Professors again. Your data will not be modified.",
+        "button": "Review Tutorial"
+      },
+      "resetComplete": {
+        "title": "Complete reset",
+        "description": "Delete ALL your data and start over. This action is irreversible!",
+        "button": "Complete Reset"
+      },
+      "confirmDialog": {
+        "titles": {
+          "step1": "Are you sure?",
+          "step2": "Confirm with RESET",
+          "step3": "Final confirmation"
+        },
+        "descriptions": {
+          "step1": "You are about to delete ALL your data:",
+          "step1Items": [
+            "Progress and XP",
+            "Saved flashcards and materials",
+            "Conversations with Professors",
+            "Settings and preferences"
+          ],
+          "step2": "To confirm, type RESET in the field below.",
+          "step3": "This is your final warning. Click \"Delete Everything\" to proceed. You CANNOT go back!"
+        },
+        "input": "Type RESET...",
+        "buttons": {
+          "cancel": "Cancel",
+          "deleting": "Deleting...",
+          "deleteAll": "Delete Everything",
+          "continue": "Continue"
+        }
+      }
     }
   },
   "profile": {
@@ -1614,8 +1710,18 @@
       "formalLanguage": "The Professor uses formal language",
       "observationsStudySessions": "Observations are based on study sessions",
       "cancel": "Cancel",
-      "understood": "I understand, continue"
-    }
+      "understood": "I understand, continue",
+      "loadingConversation": "Loading conversation...",
+      "startConversation": "Start conversation with {maestroName}",
+      "askAbout": "Ask about {studentName}'s progress"
+    },
+    "studentLabel": "Student:",
+    "activityOverview": "Overview of study activities",
+    "updateButton": "Update",
+    "deleteButton": "Delete",
+    "confidenceNote": "Note: Reliability {score}%. More sessions will improve the observations.",
+    "settingsNote": "Note: These settings apply only to the Parent Dashboard view.",
+    "dataDeletionRequestConfirm": "Are you sure you want to request data deletion?"
   },
   "aiTransparency": {
     "page": {
@@ -1825,7 +1931,13 @@
     "voiceSearch": {
       "stop": "Stop voice search",
       "start": "Start voice search"
-    }
+    },
+    "emptyState": {
+      "backpackEmpty": "Your Backpack is empty",
+      "startCreating": "Start creating study materials with the Masters! Go to the Toolcase to choose a tool.",
+      "goToToolcase": "Go to Toolcase"
+    },
+    "loadingMaterials": "Loading materials..."
   },
   "admin": {
     "invites": {
@@ -1910,7 +2022,17 @@
         "actions": "Actions"
       },
       "empty-message": "No users found",
-      "trash-empty": "Trash empty"
+      "trash-empty": "Trash empty",
+      "bulkActions": {
+        "selected": "selected",
+        "changeTier": "Change Tier",
+        "enable": "Enable",
+        "disable": "Disable",
+        "delete": "Delete",
+        "confirmDisable": "Disable {count} users?",
+        "confirmEnable": "Enable {count} users?",
+        "confirmDelete": "Permanently delete {count} users?"
+      }
     },
     "tiers": {
       "page": {
@@ -2111,6 +2233,24 @@
         "previewLabel": "Preview",
         "resetButton": "Reset locale"
       }
+    },
+    "analytics": {
+      "resetStats": "Reset Statistics",
+      "actionIrreversible": "⚠️ IRREVERSIBLE ACTION",
+      "willDeleteAllStats": "This action will delete ALL statistics and activity data:",
+      "userAccountsWillRemain": "User accounts and profiles WILL REMAIN intact.",
+      "typeToConfirm": "Type RESET_ALL_STATS to confirm:",
+      "confirmReset": "Confirm Reset",
+      "pageWillReload": "The page will reload shortly..."
+    },
+    "sentry": {
+      "unresolved": "unresolved",
+      "notConfigured": "Sentry not configured. Add SENTRY_AUTH_TOKEN to environment variables.",
+      "noUnresolvedErrors": "No unresolved errors"
+    },
+    "protectedUsers": {
+      "title": "Protected Users",
+      "noUsers": "No protected users configured"
     }
   },
   "contact": {
@@ -2142,15 +2282,9 @@
       "description": {}
     },
     "enterprise": {
-      "title": {},
-      "description": {},
-      "heading": {},
-      "subtitle": {},
-      "features": {
-        "customization": "Complete customization and corporate branding",
-        "analytics": "Advanced analytics and reporting",
-        "integration": "Integration with your systems"
-      }
+      "successTitle": "Request Sent!",
+      "successDescription": "Our team will contact you soon to discuss your needs.",
+      "submitting": "Submitting..."
     },
     "schools": {
       "title": {},
@@ -2200,7 +2334,8 @@
           "moreThan1000": "More than 1000"
         }
       }
-    }
+    },
+    "error": "Error"
   },
   "astuccio": {
     "backButton": "Back to Astuccio",
@@ -2254,7 +2389,8 @@
     "presets": {
       "creative": "Creativity",
       "rainyDay": "Rainy Day"
-    }
+    },
+    "info": "Ambient audio can improve focus while studying. Binaural beats require stereo headphones for optimal effect."
   },
   "dashboard": {
     "azureCosts": "Azure Costs",
@@ -2290,7 +2426,11 @@
     "dailyCosts": "Daily Costs",
     "azureNotConfigured": "Azure Cost Management not configured",
     "configureAzure": "Configure Azure credentials to see costs",
-    "noCostData": "No cost data available"
+    "noCostData": "No cost data available",
+    "maestroUsage": "Professor Usage",
+    "maestroUsageChart": {
+      "title": "Most Used Professors"
+    }
   },
   "google-drive": {
     "description": "Link Google Drive to import study materials directly from the cloud",
@@ -2434,6 +2574,73 @@
       "viewLoading": "Page loading in progress",
       "sessionLoading": "Session loading in progress",
       "sessionLoadingText": "Loading session..."
+    }
+  },
+  "typing": {
+    "oneHandedMode": {
+      "title": "One-Handed Mode",
+      "help": "Help",
+      "cursor": "Cursor"
+    },
+    "progressTracker": {
+      "wordsPerMinute": "Words Per Minute",
+      "noBadges": "No badges yet"
+    },
+    "stickyKeysHelper": {
+      "enable": "Enable Sticky Keys",
+      "description": "Keys remain active until pressed again"
+    },
+    "visualImpairment": {
+      "readingGuide": "Reading Guide",
+      "wcagLabel": "WCAG 2.1 AA Compliance",
+      "wcagCompliance": "WCAG 2.1 AA Compliance:"
+    },
+    "oneHanded": {
+      "title": "Typing mode",
+      "showInfo": "Show info",
+      "hideInfo": "Hide info",
+      "modes": {
+        "both": {
+          "label": "Both hands",
+          "description": "Standard typing with 10 fingers"
+        },
+        "leftOnly": {
+          "label": "Left only",
+          "description": "For users with only their left hand"
+        },
+        "rightOnly": {
+          "label": "Right only",
+          "description": "For users with only their right hand"
+        }
+      },
+      "info": {
+        "active": "Single-hand mode active:",
+        "description": "The virtual keyboard will show only keys for the selected hand. Lessons have been modified for efficient single-hand typing.",
+        "tips": "Tips for single-hand typing:",
+        "tipItems": [
+          "Position your hand in the center of the keyboard",
+          "Use Sticky Keys for key combinations",
+          "Practice regularly to improve speed"
+        ]
+      }
+    },
+    "stickyKeys": {
+      "openSettings": "Open settings",
+      "tip": "For more efficient typing, enable Sticky Keys in your operating system's accessibility settings.",
+      "tipLabel": "Tip",
+      "activated": "Sticky Keys activated",
+      "restartRequired": "Changes require a browser restart",
+      "enableFailed": "Failed to enable Sticky Keys",
+      "enableManually": "Enable manually in system settings",
+      "windowsInfo": "Enable Sticky Keys in Windows",
+      "windowsHint": "Press Shift 5 times to toggle",
+      "linuxSettings": "Accessibility settings",
+      "linuxInfo": "Open your Linux system settings",
+      "unsupported": "Sticky Keys are not available on this operating system",
+      "active": "Active",
+      "title": "Sticky Keys",
+      "description": "Sticky Keys allows you to press modifier keys (Shift, Ctrl, Alt, Cmd) one at a time instead of holding them down.",
+      "enableButton": "Enable Sticky Keys"
     }
   }
 }

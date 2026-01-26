@@ -2,6 +2,7 @@ import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { TierForm } from "../../components/tier-form";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
@@ -18,6 +19,7 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
     redirect("/login");
   }
 
+  const t = await getTranslations("admin.tiers");
   const { id } = await params;
 
   const tier = await prisma.tierDefinition.findUnique({
@@ -73,14 +75,14 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
         <Link href="/admin/tiers">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Torna ai Piani
+            {t("page.backToTiers")}
           </Button>
         </Link>
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-          Modifica Piano
+          {t("page.editTier")}
         </h1>
         <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-          Modifica il piano: {tier.name}
+          {t("page.editMessage", { name: tier.name })}
         </p>
       </div>
 

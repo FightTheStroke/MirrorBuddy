@@ -1,17 +1,22 @@
-'use client';
+"use client";
 
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Code, Search } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useDemos, type SavedDemo } from '@/lib/hooks/use-saved-materials';
-import { HTMLPreview } from './html-preview';
-import { SnippetCard } from './html-snippets-view/snippet-card';
-import { getMaestroName, handleOpenInNewTab } from './html-snippets-view/snippets-utils';
+import { useState, useMemo, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { Code, Search } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { useDemos, type SavedDemo } from "@/lib/hooks/use-saved-materials";
+import { HTMLPreview } from "./html-preview";
+import { SnippetCard } from "./html-snippets-view/snippet-card";
+import {
+  getMaestroName,
+  handleOpenInNewTab,
+} from "./html-snippets-view/snippets-utils";
 
 export function HTMLSnippetsView() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const t = useTranslations("education.htmlSnippetsView");
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const [previewSnippet, setPreviewSnippet] = useState<SavedDemo | null>(null);
 
@@ -19,19 +24,23 @@ export function HTMLSnippetsView() {
 
   // Get unique subjects from demos
   const subjects = useMemo(() => {
-    const subjectSet = new Set(demos.map(s => s.subject).filter(Boolean));
+    const subjectSet = new Set(demos.map((s) => s.subject).filter(Boolean));
     return Array.from(subjectSet);
   }, [demos]);
 
   // Filter demos
   const filteredDemos = useMemo(() => {
-    return demos.filter(demo => {
-      const matchesSearch = !searchQuery ||
+    return demos.filter((demo) => {
+      const matchesSearch =
+        !searchQuery ||
         demo.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         demo.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        demo.tags.some(t => t.toLowerCase().includes(searchQuery.toLowerCase()));
+        demo.tags.some((t) =>
+          t.toLowerCase().includes(searchQuery.toLowerCase()),
+        );
 
-      const matchesSubject = !selectedSubject || demo.subject === selectedSubject;
+      const matchesSubject =
+        !selectedSubject || demo.subject === selectedSubject;
 
       return matchesSearch && matchesSubject;
     });
@@ -46,12 +55,12 @@ export function HTMLSnippetsView() {
     if (!previewSnippet) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closePreview();
       }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [previewSnippet, closePreview]);
 
   return (
@@ -86,18 +95,22 @@ export function HTMLSnippetsView() {
         {/* Subject filter */}
         <div className="flex gap-2 flex-wrap">
           <Button
-            variant={selectedSubject === null ? 'default' : 'outline'}
+            variant={selectedSubject === null ? "default" : "outline"}
             size="sm"
             onClick={() => setSelectedSubject(null)}
           >
             Tutti
           </Button>
-          {subjects.map(subject => (
+          {subjects.map((subject) => (
             <Button
               key={subject}
-              variant={selectedSubject === subject ? 'default' : 'outline'}
+              variant={selectedSubject === subject ? "default" : "outline"}
               size="sm"
-              onClick={() => setSelectedSubject(subject === selectedSubject ? null : subject ?? null)}
+              onClick={() =>
+                setSelectedSubject(
+                  subject === selectedSubject ? null : (subject ?? null),
+                )
+              }
             >
               {subject}
             </Button>
@@ -111,7 +124,7 @@ export function HTMLSnippetsView() {
           <CardContent className="p-12 text-center">
             <Code className="w-16 h-16 text-slate-300 mx-auto mb-4 animate-pulse" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-              Caricamento demo...
+              {t("loading")}
             </h3>
           </CardContent>
         </Card>
@@ -120,12 +133,12 @@ export function HTMLSnippetsView() {
           <CardContent className="p-12 text-center">
             <Code className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-600 dark:text-slate-400">
-              {demos.length === 0 ? 'Nessuna demo salvata' : 'Nessun risultato'}
+              {demos.length === 0 ? "Nessuna demo salvata" : "Nessun risultato"}
             </h3>
             <p className="text-sm text-slate-500 mt-2">
               {demos.length === 0
-                ? 'Chiedi a un Professore di creare una demo interattiva!'
-                : 'Prova a modificare i filtri di ricerca'}
+                ? "Chiedi a un Professore di creare una demo interattiva!"
+                : "Prova a modificare i filtri di ricerca"}
             </p>
           </CardContent>
         </Card>
@@ -156,7 +169,7 @@ export function HTMLSnippetsView() {
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => setPreviewSnippet(null)}
           >
-            <div onClick={e => e.stopPropagation()}>
+            <div onClick={(e) => e.stopPropagation()}>
               <HTMLPreview
                 code={previewSnippet.code}
                 title={previewSnippet.title}

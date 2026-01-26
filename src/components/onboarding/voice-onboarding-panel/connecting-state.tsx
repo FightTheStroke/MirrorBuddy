@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ConnectingStateProps {
   configError: string | null;
@@ -11,15 +12,20 @@ interface ConnectingStateProps {
   className?: string;
 }
 
-export function ConnectingState({ configError, onCancel, className }: ConnectingStateProps) {
+export function ConnectingState({
+  configError,
+  onCancel,
+  className,
+}: ConnectingStateProps) {
+  const t = useTranslations("onboarding.voicePanel");
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className={cn(
-        'flex flex-col items-center justify-center gap-4 p-8 rounded-2xl',
-        'bg-gradient-to-br from-pink-500 to-pink-600',
-        className
+        "flex flex-col items-center justify-center gap-4 p-8 rounded-2xl",
+        "bg-gradient-to-br from-pink-500 to-pink-600",
+        className,
       )}
     >
       <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30 animate-pulse">
@@ -32,7 +38,7 @@ export function ConnectingState({ configError, onCancel, className }: Connecting
         />
       </div>
       <p className="text-white font-medium">
-        {configError || 'Connessione in corso...'}
+        {configError || "Connessione in corso..."}
       </p>
       {configError && (
         <Button
@@ -41,7 +47,7 @@ export function ConnectingState({ configError, onCancel, className }: Connecting
           onClick={onCancel}
           className="text-white/80 hover:text-white"
         >
-          Annulla
+          {t("cancel")}
         </Button>
       )}
     </motion.div>

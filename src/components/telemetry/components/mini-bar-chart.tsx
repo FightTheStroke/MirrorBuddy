@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import { useTranslations } from 'next-intl';
-import { motion } from 'framer-motion';
-import type { ChartData } from '@/lib/telemetry/types';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import type { ChartData } from "@/lib/telemetry/types";
 
 interface MiniBarChartProps {
   data: ChartData[];
@@ -10,7 +10,7 @@ interface MiniBarChartProps {
 }
 
 export function MiniBarChart({ data, height = 80 }: MiniBarChartProps) {
-  const t = useTranslations('telemetry');
+  const t = useTranslations("telemetry");
 
   if (!data.length || !data[0]?.data.length) {
     return (
@@ -18,16 +18,14 @@ export function MiniBarChart({ data, height = 80 }: MiniBarChartProps) {
         className="flex items-center justify-center text-slate-400 text-sm"
         style={{ height }}
       >
-        {t('noDataAvailable')}
+        {t("noDataAvailable")}
       </div>
     );
   }
 
   const primaryData = data[0].data;
   const maxValue = Math.max(...primaryData.map((d) => d.value), 1);
-  // Days abbreviations - we'll use localization via date formatting instead
-  const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-  const dayFormatter = new Intl.DateTimeFormat('default', { weekday: 'short' });
+  const dayFormatter = new Intl.DateTimeFormat("default", { weekday: "short" });
 
   return (
     <div className="flex items-end justify-between gap-1" style={{ height }}>
@@ -44,7 +42,7 @@ export function MiniBarChart({ data, height = 80 }: MiniBarChartProps) {
               transition={{ duration: 0.5, delay: index * 0.05 }}
               className="w-full rounded-t"
               style={{ backgroundColor: data[0].color }}
-              title={`${point.value} ${t('minutes')}`}
+              title={`${point.value} ${t("minutes")}`}
             />
             <span className="text-xs text-slate-500 mt-1">{dayLabel}</span>
           </div>

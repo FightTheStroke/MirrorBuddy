@@ -3,10 +3,11 @@
  * @brief Empty state tips component
  */
 
-import { motion } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import { Backpack } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { motion } from "framer-motion";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { Backpack } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface EmptyStateTipsProps {
   show: boolean;
@@ -14,6 +15,7 @@ interface EmptyStateTipsProps {
 
 export function EmptyStateTips({ show }: EmptyStateTipsProps) {
   const router = useRouter();
+  const t = useTranslations("supporti");
 
   if (!show) return null;
 
@@ -26,19 +28,17 @@ export function EmptyStateTips({ show }: EmptyStateTipsProps) {
     >
       <h3 className="font-semibold text-emerald-900 dark:text-emerald-100 mb-3 flex items-center gap-2">
         <Backpack className="w-5 h-5" aria-hidden="true" />
-        Il tuo Zaino è vuoto
+        {t("emptyState.backpackEmpty")}
       </h3>
       <p className="text-sm text-emerald-700 dark:text-emerald-300 mb-4">
-        Inizia a creare materiali di studio con i Maestri! Vai nell&apos;Astuccio
-        per scegliere uno strumento.
+        {t("emptyState.startCreating")}
       </p>
       <Button
-        onClick={() => router.push('/astuccio')}
+        onClick={() => router.push("/astuccio")}
         className="bg-emerald-700 hover:bg-emerald-800 text-white"
       >
-        Vai all&apos;Astuccio
+        {t("emptyState.goToToolcase")}
       </Button>
     </motion.div>
   );
 }
-

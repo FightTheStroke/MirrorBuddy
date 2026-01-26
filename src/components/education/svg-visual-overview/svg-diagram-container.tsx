@@ -1,12 +1,13 @@
-'use client';
+"use client";
 
-import { useRef, useEffect } from 'react';
-import { cn } from '@/lib/utils';
+import { useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 interface SVGDiagramContainerProps {
   isLoading: boolean;
   error: string | null;
-  theme: 'light' | 'dark';
+  theme: "light" | "dark";
   useMermaid: boolean;
   onDiagramReady?: (container: HTMLDivElement) => void;
 }
@@ -18,6 +19,7 @@ export function SVGDiagramContainer({
   useMermaid,
   onDiagramReady,
 }: SVGDiagramContainerProps) {
+  const t = useTranslations("education.svgDiagram");
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -31,22 +33,23 @@ export function SVGDiagramContainer({
       {error ? (
         <div
           className={cn(
-            'p-4 rounded-lg text-sm',
-            theme === 'dark'
-              ? 'bg-red-900/20 border border-red-800 text-red-400'
-              : 'bg-red-50 border border-red-200 text-red-600'
+            "p-4 rounded-lg text-sm",
+            theme === "dark"
+              ? "bg-red-900/20 border border-red-800 text-red-400"
+              : "bg-red-50 border border-red-200 text-red-600",
           )}
           role="alert"
         >
-          <strong>Errore:</strong> {error}
+          <strong>{t("error")}</strong> {error}
         </div>
       ) : (
         <div
           ref={containerRef}
           className={cn(
-            'flex justify-center items-center overflow-x-auto min-h-[400px]',
-            isLoading && 'animate-pulse rounded-lg',
-            isLoading && (theme === 'dark' ? 'bg-slate-700/50' : 'bg-slate-200/50')
+            "flex justify-center items-center overflow-x-auto min-h-[400px]",
+            isLoading && "animate-pulse rounded-lg",
+            isLoading &&
+              (theme === "dark" ? "bg-slate-700/50" : "bg-slate-200/50"),
           )}
         />
       )}
@@ -55,10 +58,10 @@ export function SVGDiagramContainer({
       {useMermaid && !error && (
         <div
           className={cn(
-            'px-4 py-2 border-t text-xs',
-            theme === 'dark'
-              ? 'border-slate-700 text-slate-500 bg-slate-900/30'
-              : 'border-slate-200 text-slate-400 bg-slate-50'
+            "px-4 py-2 border-t text-xs",
+            theme === "dark"
+              ? "border-slate-700 text-slate-500 bg-slate-900/30"
+              : "border-slate-200 text-slate-400 bg-slate-50",
           )}
         >
           Visualizzazione semplificata (Mermaid)

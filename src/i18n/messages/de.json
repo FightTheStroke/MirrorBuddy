@@ -9,7 +9,21 @@
     "delete": "Löschen",
     "edit": "Bearbeiten",
     "close": "Schließen",
-    "retry": "Wiederholen"
+    "retry": "Wiederholen",
+    "ambientAudio": {
+      "loading": "Audio wird geladen..."
+    },
+    "dashboard": {
+      "noMaestroUsage": "Kein Meister verwendet"
+    },
+    "models": {
+      "selectModels": "Wählen Sie KI-Modelle für jede Funktion. ★ = empfohlen, ⚠ = nicht empfohlen",
+      "mainFeatures": "Hauptfunktionen",
+      "notRecommended": "Nicht für diese Funktion empfohlen"
+    },
+    "errorUnexpected": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.",
+    "errorTitle": "Etwas ist schief gelaufen",
+    "wcagCompliance": "WCAG 2.1 AA Konformität"
   },
   "navigation": {
     "home": "Startseite",
@@ -536,6 +550,48 @@
       "flashcardsSuccessDetail": "Erstellt {count} Karteikarten aus \"{topic}\".",
       "flashcardsError": "Fehler",
       "flashcardsErrorDetail": "Karteikarten konnten nicht gespeichert werden."
+    },
+    "selectedMaestro": "Wählen Sie einen Meister",
+    "htmlSnippetsLoading": "Inhalte werden geladen...",
+    "emptyState": "Keine Metriken verfügbar",
+    "emptyStateDescription": "Erfolgskennzahlen werden nach wenigen Lernsitzungen berechnet. Beginnen Sie mit der Interaktion mit den Professoren, um Ihren Fortschritt zu sehen.",
+    "selectMaestro": "Wählen Sie einen Professor",
+    "selectSubject": "Wählen Sie ein Fach",
+    "materialViewer": {
+      "noContent": "Kein Inhalt für dieses Material verfügbar."
+    },
+    "noMaterialAvailable": "Kein Material verfügbar",
+    "htmlSnippetsTitle": "HTML-Anzeige",
+    "maestroTitle": "Professor",
+    "parentDashboardTitle": "Eltern-Dashboard",
+    "noDataAvailable": "Keine Daten verfügbar",
+    "svgDiagram": {
+      "error": "Fehler:"
+    },
+    "maestroSelectionStep": {
+      "noSpecificProfessor": "Kein spezifischer Professor für dieses Fach. Wählen Sie aus allen Professoren:"
+    },
+    "htmlSnippetsView": {
+      "loading": "Demo wird geladen..."
+    },
+    "parentDashboard": {
+      "profileTitle": "Profil von {studentName}"
+    },
+    "subjectConfirmation": {
+      "maestroPanel": {
+        "description": "mit einem Professor? Er wird Sie Schritt für Schritt anleiten."
+      },
+      "subjectPanel": {
+        "detected": "Fach erkannt:",
+        "confirmOrSelect": "Bestätigen oder wählen Sie ein anderes Fach.",
+        "unrecognized": "Ich konnte das Fach nicht automatisch erkennen.",
+        "selectCorrect": "Wählen Sie das richtige Fach:",
+        "cancel": "Abbrechen",
+        "confirm": "Bestätigen"
+      }
+    },
+    "emptyMetrics": {
+      "description": "Erfolgskennzahlen werden nach einigen Lernsitzungen berechnet. Beginnen Sie mit der Interaktion mit den Professoren, um Ihren Fortschritt zu sehen."
     }
   },
   "tier": {
@@ -1426,8 +1482,10 @@
       "you": "Sie:",
       "enableMicrophone": "Mikrofon aktivieren",
       "disableMicrophone": "Mikrofon deaktivieren",
-      "endCall": "Anruf beenden"
-    }
+      "endCall": "Anruf beenden",
+      "cancel": "Abbrechen"
+    },
+    "connecting": "Verbindung wird hergestellt..."
   },
   "settings": {
     "notifications": {
@@ -1580,6 +1638,44 @@
       "profileAuditory": "Auditiv",
       "profileCerebral": "Motorisch+",
       "a11yActivateProfile": "Profil aktivieren"
+    },
+    "onboarding": {
+      "title": "Tutorials und Zurücksetzen",
+      "reviewTutorial": {
+        "title": "Anleitung überprüfen",
+        "description": "Schauen Sie sich Melissas Präsentation und die Professoren noch einmal an. Ihre Daten werden nicht verändert.",
+        "button": "Anleitung überprüfen"
+      },
+      "resetComplete": {
+        "title": "Vollständiges Zurücksetzen",
+        "description": "Löschen Sie ALLE Ihre Daten und starten Sie von vorne. Diese Aktion ist nicht umkehrbar!",
+        "button": "Vollständiges Zurücksetzen"
+      },
+      "confirmDialog": {
+        "titles": {
+          "step1": "Sind Sie sicher?",
+          "step2": "Mit RESET bestätigen",
+          "step3": "Letzte Bestätigung"
+        },
+        "descriptions": {
+          "step1": "Sie sind dabei, ALLE Ihre Daten zu löschen:",
+          "step1Items": [
+            "Fortschritt und XP",
+            "Gespeicherte Flashcards und Materialien",
+            "Gespräche mit Professoren",
+            "Einstellungen und Voreinstellungen"
+          ],
+          "step2": "Geben Sie zum Bestätigen RESET in das Feld unten ein.",
+          "step3": "Dies ist Ihre letzte Warnung. Klicken Sie auf \"Alles löschen\", um fortzufahren. Sie können NICHT zurückgehen!"
+        },
+        "input": "RESET eingeben...",
+        "buttons": {
+          "cancel": "Abbrechen",
+          "deleting": "Wird gelöscht...",
+          "deleteAll": "Alles löschen",
+          "continue": "Fortfahren"
+        }
+      }
     }
   },
   "profile": {
@@ -1605,8 +1701,18 @@
       "formalLanguage": "Der Professor verwendet formale Sprache",
       "observationsStudySessions": "Beobachtungen basieren auf Lernsitzungen",
       "cancel": "Abbrechen",
-      "understood": "Ich verstanden, fortfahren"
-    }
+      "understood": "Ich verstanden, fortfahren",
+      "loadingConversation": "Konversation wird geladen...",
+      "startConversation": "Gespräch mit {maestroName} starten",
+      "askAbout": "Nach {studentName}'s Fortschritten fragen"
+    },
+    "studentLabel": "Schüler:",
+    "activityOverview": "Überblick über Lernaktivitäten",
+    "updateButton": "Aktualisieren",
+    "deleteButton": "Löschen",
+    "confidenceNote": "Hinweis: Zuverlässigkeit {score}%. Mehr Sitzungen verbessern die Beobachtungen.",
+    "settingsNote": "Hinweis: Diese Einstellungen gelten nur für die Ansicht des Eltern-Dashboards.",
+    "dataDeletionRequestConfirm": "Sind Sie sicher, dass Sie die Löschung von Daten anfordern möchten?"
   },
   "aiTransparency": {
     "page": {
@@ -1816,7 +1922,13 @@
     "voiceSearch": {
       "stop": "Sprachsuche beenden",
       "start": "Sprachsuche starten"
-    }
+    },
+    "emptyState": {
+      "backpackEmpty": "Ihr Rucksack ist leer",
+      "startCreating": "Beginnen Sie mit der Erstellung von Studienmaterialien mit den Meistern! Gehen Sie zum Etui, um ein Werkzeug auszuwählen.",
+      "goToToolcase": "Zum Etui gehen"
+    },
+    "loadingMaterials": "Materialien werden geladen..."
   },
   "admin": {
     "invites": {
@@ -1901,7 +2013,17 @@
         "actions": "Aktionen"
       },
       "empty-message": "Keine Benutzer gefunden",
-      "trash-empty": "Papierkorb ist leer"
+      "trash-empty": "Papierkorb ist leer",
+      "bulkActions": {
+        "selected": "ausgewählt",
+        "changeTier": "Tier ändern",
+        "enable": "Aktivieren",
+        "disable": "Deaktivieren",
+        "delete": "Löschen",
+        "confirmDisable": "{count} Benutzer deaktivieren?",
+        "confirmEnable": "{count} Benutzer aktivieren?",
+        "confirmDelete": "{count} Benutzer dauerhaft löschen?"
+      }
     },
     "tiers": {
       "page": {
@@ -2102,6 +2224,24 @@
         "previewLabel": "Vorschau",
         "resetButton": "Gebietsschema zurücksetzen"
       }
+    },
+    "analytics": {
+      "resetStats": "Statistiken zurücksetzen",
+      "actionIrreversible": "⚠️ NICHT UMKEHRBARE AKTION",
+      "willDeleteAllStats": "Diese Aktion löscht ALLE Statistiken und Aktivitätsdaten:",
+      "userAccountsWillRemain": "Benutzerkonten und Profile BLEIBEN erhalten.",
+      "typeToConfirm": "Geben Sie RESET_ALL_STATS ein, um zu bestätigen:",
+      "confirmReset": "Zurücksetzen bestätigen",
+      "pageWillReload": "Die Seite wird in Kürze neu geladen..."
+    },
+    "sentry": {
+      "unresolved": "ungelöst",
+      "notConfigured": "Sentry nicht konfiguriert. Fügen Sie SENTRY_AUTH_TOKEN zu den Umgebungsvariablen hinzu.",
+      "noUnresolvedErrors": "Keine ungelösten Fehler"
+    },
+    "protectedUsers": {
+      "title": "Geschützte Benutzer",
+      "noUsers": "Keine geschützten Benutzer konfiguriert"
     }
   },
   "contact": {
@@ -2133,15 +2273,9 @@
       "description": {}
     },
     "enterprise": {
-      "title": {},
-      "description": {},
-      "heading": {},
-      "subtitle": {},
-      "features": {
-        "customization": "Vollständige Anpassung und Corporate Branding",
-        "analytics": "Erweiterte Analytik und Berichterstellung",
-        "integration": "Integration mit Ihren Systemen"
-      }
+      "successTitle": "Anfrage Versendet!",
+      "successDescription": "Unser Team wird sich bald mit Ihnen in Verbindung setzen, um Ihre Anforderungen zu besprechen.",
+      "submitting": "Wird versendet..."
     },
     "schools": {
       "title": {},
@@ -2191,7 +2325,8 @@
           "moreThan1000": "Mehr als 1000"
         }
       }
-    }
+    },
+    "error": "Fehler"
   },
   "astuccio": {
     "backButton": "Zurück zu Astuccio",
@@ -2245,7 +2380,8 @@
     "presets": {
       "creative": "Kreativität",
       "rainyDay": "Regnerischer Tag"
-    }
+    },
+    "info": "Umgebungsaudio kann die Konzentration beim Lernen verbessern. Binaurale Schläge benötigen Stereokopfhörer für optimale Wirkung."
   },
   "dashboard": {
     "azureCosts": "Azure-Kosten",
@@ -2281,7 +2417,11 @@
     "dailyCosts": "Tägliche Kosten",
     "azureNotConfigured": "Azure-Kostenverwaltung nicht konfiguriert",
     "configureAzure": "Konfigurieren Sie Azure-Anmeldedaten, um Kosten anzuzeigen",
-    "noCostData": "Keine Kostendaten verfügbar"
+    "noCostData": "Keine Kostendaten verfügbar",
+    "maestroUsage": "Professorennutzung",
+    "maestroUsageChart": {
+      "title": "Meistgenutzte Professoren"
+    }
   },
   "google-drive": {
     "description": "Verbinden Sie Google Drive, um Studienunterlagen direkt aus der Cloud zu importieren",
@@ -2425,6 +2565,73 @@
       "viewLoading": "Seite wird geladen",
       "sessionLoading": "Sitzung wird geladen",
       "sessionLoadingText": "Sitzung wird geladen..."
+    }
+  },
+  "typing": {
+    "oneHandedMode": {
+      "title": "Einhandmodus",
+      "help": "Hilfe",
+      "cursor": "Cursor"
+    },
+    "progressTracker": {
+      "wordsPerMinute": "Wörter pro Minute",
+      "noBadges": "Noch keine Abzeichen"
+    },
+    "stickyKeysHelper": {
+      "enable": "Sticky Keys aktivieren",
+      "description": "Tasten bleiben aktiv, bis sie erneut gedrückt werden"
+    },
+    "visualImpairment": {
+      "readingGuide": "Leseanleitung",
+      "wcagLabel": "WCAG 2.1 AA Konformität",
+      "wcagCompliance": "WCAG 2.1 AA Konformität:"
+    },
+    "oneHanded": {
+      "title": "Schreibmodus",
+      "showInfo": "Informationen anzeigen",
+      "hideInfo": "Informationen ausblenden",
+      "modes": {
+        "both": {
+          "label": "Beide Hände",
+          "description": "Standardschreiben mit 10 Fingern"
+        },
+        "leftOnly": {
+          "label": "Nur links",
+          "description": "Für Benutzer mit nur der linken Hand"
+        },
+        "rightOnly": {
+          "label": "Nur rechts",
+          "description": "Für Benutzer mit nur der rechten Hand"
+        }
+      },
+      "info": {
+        "active": "Einhandbetrieb aktiv:",
+        "description": "Die virtuelle Tastatur zeigt nur Tasten für die ausgewählte Hand. Die Lektionen wurden für effizientes Schreiben mit einer Hand angepasst.",
+        "tips": "Tipps zum Schreiben mit einer Hand:",
+        "tipItems": [
+          "Positionieren Sie Ihre Hand in der Mitte der Tastatur",
+          "Verwenden Sie Sticky Keys für Tastenkombinationen",
+          "Üben Sie regelmäßig, um die Geschwindigkeit zu verbessern"
+        ]
+      }
+    },
+    "stickyKeys": {
+      "openSettings": "Einstellungen öffnen",
+      "tip": "Für effizienteres Schreiben aktivieren Sie Sticky Keys in den Zugänglichkeitseinstellungen Ihres Betriebssystems.",
+      "tipLabel": "Tipp",
+      "activated": "Sticky Keys aktiviert",
+      "restartRequired": "Änderungen erfordern einen Browser-Neustart",
+      "enableFailed": "Sticky Keys konnte nicht aktiviert werden",
+      "enableManually": "Manuell in den Systemeinstellungen aktivieren",
+      "windowsInfo": "Aktivieren Sie Sticky Keys in Windows",
+      "windowsHint": "Drücken Sie die Umschalttaste 5 Mal",
+      "linuxSettings": "Zugänglichkeitseinstellungen",
+      "linuxInfo": "Öffnen Sie Ihre Linux-Systemeinstellungen",
+      "unsupported": "Sticky Keys sind auf diesem Betriebssystem nicht verfügbar",
+      "active": "Aktiv",
+      "title": "Sticky Keys",
+      "description": "Sticky Keys ermöglicht es Ihnen, Änderungstasten (Umschalt, Strg, Alt, Cmd) einzeln zu drücken, anstatt sie gedrückt zu halten.",
+      "enableButton": "Sticky Keys aktivieren"
     }
   }
 }

@@ -8,6 +8,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
@@ -85,6 +86,7 @@ function formatTimeAgo(dateString: string): string {
 export function SentryErrorsPanel({
   refreshInterval = 60000,
 }: SentryErrorsPanelProps) {
+  const t = useTranslations("admin.sentry");
   const [issues, setIssues] = useState<SentryIssue[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -139,7 +141,7 @@ export function SentryErrorsPanel({
             Sentry Errors
             {issues.length > 0 && (
               <span className="text-xs font-normal text-muted-foreground">
-                ({issues.length} non risolti)
+                ({issues.length} {t("unresolved")})
               </span>
             )}
           </CardTitle>
@@ -166,15 +168,13 @@ export function SentryErrorsPanel({
           {error && !issues.length ? (
             <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                {error === "Sentry not configured"
-                  ? "Sentry non configurato. Aggiungi SENTRY_AUTH_TOKEN nelle variabili d'ambiente."
-                  : error}
+                {error === "Sentry not configured" ? t("notConfigured") : error}
               </p>
             </div>
           ) : issues.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
               <AlertCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
-              <p>Nessun errore non risolto</p>
+              <p>{t("noUnresolvedErrors")}</p>
             </div>
           ) : (
             <div className="space-y-2">

@@ -1,8 +1,10 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useTypingStore } from "@/lib/stores";
 
 export function ProgressTracker() {
+  const t = useTranslations("typing.progressTracker");
   const { progress } = useTypingStore();
 
   if (!progress) return null;
@@ -58,7 +60,7 @@ export function ProgressTracker() {
           ))}
           {stats.badges.length === 0 && (
             <span className="text-sm text-muted-foreground">
-              Nessun badge ancora
+              {t("noBadges")}
             </span>
           )}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "@/components/ui/toast";
 import { clientLogger } from "@/lib/logger/client";
 
@@ -11,6 +12,7 @@ export interface StickyKeysStatus {
 }
 
 export function useStickyKeys() {
+  const t = useTranslations("typing.stickyKeys");
   const [status, setStatus] = useState<StickyKeysStatus>({
     isSupported: false,
     isEnabled: false,
@@ -58,24 +60,15 @@ export function useStickyKeys() {
 
         if (response.ok) {
           setStatus((prev) => ({ ...prev, isEnabled: true }));
-          toast.success(
-            "Sticky Keys attivate",
-            "Le modifiche richiedono un riavvio del browser",
-          );
+          toast.success(t("activated"), t("restartRequired"));
         }
       } catch (_error) {
-        toast.error(
-          "Impossibile attivare Sticky Keys",
-          "Attivale manualmente nelle impostazioni di sistema",
-        );
+        toast.error(t("enableFailed"), t("enableManually"));
       }
     } else if (status.platform === "windows") {
-      toast.info(
-        "Attiva Sticky Keys in Windows",
-        "Premi Shift 5 volte per attivare/disattivare",
-      );
+      toast.info(t("windowsInfo"), t("windowsHint"));
     }
-  }, [status.platform]);
+  }, [status.platform, t]);
 
   useEffect(() => {
     const platform = detectPlatform();
@@ -101,10 +94,7 @@ export function useStickyKeys() {
     } else if (status.platform === "windows") {
       window.open("ms-settings:easeofaccess-stickykeys", "_blank");
     } else if (status.platform === "linux") {
-      toast.info(
-        "Impostazioni di accessibilità",
-        "Apri le impostazioni del tuo sistema Linux",
-      );
+      toast.info(t("linuxSettings"), t("linuxInfo"));
     }
   };
 
@@ -134,16 +124,16 @@ function detectPlatform(): "macos" | "windows" | "linux" | "unknown" {
 }
 
 export function StickyKeysHelper() {
+  const t = useTranslations("typing.stickyKeys");
   const { status, enableStickyKeys, openAccessibilitySettings } =
     useStickyKeys();
 
   if (!status.isSupported) {
     return (
       <div className="p-4 bg-muted/50 border border-border rounded-lg">
-        <h4 className="font-semibold mb-2">Sticky Keys</h4>
+        <h4 className="font-semibold mb-2">{t("title")}</h4>
         <p className="text-sm text-muted-foreground">
-          Sticky Keys non sono disponibili su questo sistema operativo (
-          {status.platform}).
+          {t("unsupported")} ({status.platform}).
         </p>
       </div>
     );
@@ -152,18 +142,15 @@ export function StickyKeysHelper() {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h4 className="font-semibold">Sticky Keys</h4>
+        <h4 className="font-semibold">{t("title")}</h4>
         {status.isEnabled && (
           <span className="text-xs px-2 py-1 bg-green-500/10 text-green-600 dark:text-green-400 rounded-full">
-            Attivo
+            {t("active")}
           </span>
         )}
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Sticky Keys permette di premere i tasti modificatori (Shift, Ctrl, Alt,
-        Cmd) uno alla volta invece di tenerli premuti.
-      </p>
+      <p className="text-sm text-muted-foreground">{t("description")}</p>
 
       <div className="flex gap-2">
         {!status.isEnabled ? (
@@ -171,23 +158,21 @@ export function StickyKeysHelper() {
             onClick={enableStickyKeys}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
           >
-            Attiva Sticky Keys
+            {t("enableButton")}
           </button>
         ) : (
           <button
             onClick={openAccessibilitySettings}
             className="px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
           >
-            Apri impostazioni
+            {t("openSettings")}
           </button>
         )}
       </div>
 
       <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
         <p className="text-xs text-muted-foreground">
-          <strong>Suggerimento:</strong> Per una digitazione più efficiente,
-          abilita Sticky Keys nelle impostazioni di accessibilità del sistema
-          operativo.
+          <strong>{t("tipLabel")}:</strong> {t("tip")}
         </p>
       </div>
     </div>

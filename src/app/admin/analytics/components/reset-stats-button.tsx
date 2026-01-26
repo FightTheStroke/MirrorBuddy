@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, Trash2 } from "lucide-react";
 
 export function ResetStatsButton() {
+  const t = useTranslations("admin.analytics");
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isResetting, setIsResetting] = useState(false);
@@ -67,11 +69,10 @@ export function ResetStatsButton() {
             <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400 flex-shrink-0 mt-1" />
             <div className="space-y-2">
               <h3 className="text-lg font-semibold text-red-900 dark:text-red-100">
-                ⚠️ AZIONE IRREVERSIBILE
+                {t("actionIrreversible")}
               </h3>
               <p className="text-sm text-red-800 dark:text-red-200">
-                Questa azione eliminerà TUTTE le statistiche e i dati di
-                attività:
+                {t("willDeleteAllStats")}
               </p>
               <ul className="text-sm text-red-800 dark:text-red-200 list-disc list-inside space-y-1">
                 <li>Conversazioni</li>
@@ -85,18 +86,14 @@ export function ResetStatsButton() {
                 <li>Notifications</li>
               </ul>
               <p className="text-sm font-medium text-red-900 dark:text-red-100">
-                Gli account utente e i profili RIMARRANNO intatti.
+                {t("userAccountsWillRemain")}
               </p>
             </div>
           </div>
 
           <div className="space-y-2">
             <label className="block text-sm font-medium text-red-900 dark:text-red-100">
-              Digita{" "}
-              <code className="px-1.5 py-0.5 bg-red-200 dark:bg-red-900 rounded font-mono">
-                RESET_ALL_STATS
-              </code>{" "}
-              per confermare:
+              {t("typeToConfirm")}
             </label>
             <input
               type="text"
@@ -114,7 +111,7 @@ export function ResetStatsButton() {
               disabled={confirmText !== "RESET_ALL_STATS" || isResetting}
               className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg font-medium transition-colors"
             >
-              {isResetting ? "Resetting..." : "Conferma Reset"}
+              {isResetting ? "Resetting..." : t("confirmReset")}
             </button>
             <button
               onClick={() => {
@@ -125,7 +122,7 @@ export function ResetStatsButton() {
               disabled={isResetting}
               className="px-4 py-2 bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 rounded-lg font-medium transition-colors"
             >
-              Annulla
+              {t("cancel")}
             </button>
           </div>
         </div>
@@ -141,9 +138,7 @@ export function ResetStatsButton() {
         >
           <p className="font-medium">{result.message}</p>
           {result.success && (
-            <p className="text-sm mt-1">
-              La pagina verrà ricaricata tra poco...
-            </p>
+            <p className="text-sm mt-1">{t("pageWillReload")}</p>
           )}
         </div>
       )}

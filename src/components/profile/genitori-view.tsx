@@ -94,11 +94,6 @@ export function GenitoriView() {
     return () => setContext("student");
   }, [setContext]);
 
-  const getMaestroDisplayName = (maestroId: string | null): string => {
-    if (!maestroId) return tProfile("professorFallback");
-    return MAESTRO_NAMES[maestroId.toLowerCase()] || maestroId;
-  };
-
   const fetchActivity = useCallback(async () => {
     try {
       const response = await fetch("/api/parent-dashboard/activity");
@@ -112,6 +107,11 @@ export function GenitoriView() {
   }, []);
 
   const fetchDiaryEntries = useCallback(async () => {
+    const getMaestroDisplayName = (maestroId: string | null): string => {
+      if (!maestroId) return tProfile("professorFallback");
+      return MAESTRO_NAMES[maestroId.toLowerCase()] || maestroId;
+    };
+
     setIsDiaryLoading(true);
     try {
       const response = await fetch(`/api/learnings?userId=${DEMO_USER_ID}`);
@@ -139,7 +139,7 @@ export function GenitoriView() {
     } finally {
       setIsDiaryLoading(false);
     }
-  }, []);
+  }, [tProfile]);
 
   const handleFetchProfile = useCallback(async () => {
     try {
@@ -226,8 +226,7 @@ export function GenitoriView() {
   };
 
   const handleRequestDeletionClick = async () => {
-    if (!confirm("Sei sicuro di voler richiedere la cancellazione dei dati?"))
-      return;
+    if (!confirm(tProfile("dataDeletionRequestConfirm"))) return;
     try {
       await requestDeletion();
       setPageState("deletion-pending");
@@ -326,7 +325,7 @@ export function GenitoriView() {
                       highContrast ? "text-yellow-400" : "text-foreground",
                     )}
                   >
-                    Studente: {studentName}
+                    {tProfile("studentLabel")} {studentName}
                   </p>
                   <p
                     className={cn(
@@ -336,7 +335,7 @@ export function GenitoriView() {
                         : "text-muted-foreground",
                     )}
                   >
-                    Panoramica delle attività di studio
+                    {tProfile("activityOverview")}
                   </p>
                 </div>
               </div>
@@ -353,7 +352,7 @@ export function GenitoriView() {
                     ) : (
                       <RefreshCw className="h-4 w-4 mr-2" />
                     )}
-                    Aggiorna
+                    {tProfile("updateButton")}
                   </Button>
                   <Button
                     variant="ghost"
@@ -362,7 +361,7 @@ export function GenitoriView() {
                     className="text-destructive hover:text-destructive/80"
                   >
                     <Trash2 className="h-4 w-4 mr-2" />
-                    Cancella
+                    {tProfile("deleteButton")}
                   </Button>
                 </div>
               )}
@@ -393,9 +392,10 @@ export function GenitoriView() {
                       : "text-amber-700 dark:text-amber-300",
                   )}
                 >
-                  <strong>Nota:</strong> Affidabilità{" "}
-                  {Math.round(meta.confidenceScore * 100)}%. Più sessioni
-                  miglioreranno le osservazioni.
+                  <strong>Nota:</strong>{" "}
+                  {tProfile("confidenceNote", {
+                    score: String(Math.round(meta.confidenceScore * 100)),
+                  })}
                 </p>
               </div>
             )}
@@ -480,8 +480,7 @@ export function GenitoriView() {
                             : "text-blue-700 dark:text-blue-300",
                         )}
                       >
-                        <strong>Nota:</strong> Queste impostazioni si applicano
-                        solo alla visualizzazione del Dashboard Genitori.
+                        <strong>Nota:</strong> {tProfile("settingsNote")}
                       </p>
                     </div>
                   </div>

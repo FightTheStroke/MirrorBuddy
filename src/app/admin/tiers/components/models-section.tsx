@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Brain, Zap, GraduationCap, AlertCircle } from "lucide-react";
 
 interface ModelInfo {
@@ -90,6 +91,7 @@ function ScoreIndicator({
 }
 
 export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
+  const t = useTranslations("common.models");
   const [models, setModels] = useState<ModelInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,13 +104,13 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
         const data = await res.json();
         setModels(data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Errore caricamento");
+        setError(err instanceof Error ? err.message : t("error"));
       } finally {
         setLoading(false);
       }
     }
     fetchModels();
-  }, []);
+  }, [t]);
 
   const getModelsForCategory = (category: string) => {
     return models.filter((m) => m.category === category);
@@ -189,7 +191,7 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
         {currentModel && isNotRecommended(currentModel, featureKey) && (
           <div className="flex items-center gap-1 text-xs text-amber-600">
             <AlertCircle className="w-3 h-3" />
-            Non raccomandato per questa feature
+            {t("notRecommended")}
           </div>
         )}
       </div>
@@ -199,10 +201,8 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
   if (loading) {
     return (
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
-        <h2 className="text-lg font-semibold mb-4">Modelli AI</h2>
-        <div className="animate-pulse text-slate-400">
-          Caricamento modelli...
-        </div>
+        <h2 className="text-lg font-semibold mb-4">{t("aiModels")}</h2>
+        <div className="animate-pulse text-slate-400">{t("loading")}</div>
       </div>
     );
   }
@@ -232,16 +232,15 @@ export function ModelsSection({ formData, onChange }: ModelsSectionProps) {
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
-      <h2 className="text-lg font-semibold mb-4 text-foreground">Modelli AI</h2>
-      <p className="text-sm text-slate-500 mb-6">
-        Seleziona i modelli AI per ogni funzionalità. ★ = raccomandato, ⚠ = non
-        raccomandato
-      </p>
+      <h2 className="text-lg font-semibold mb-4 text-foreground">
+        {t("aiModels")}
+      </h2>
+      <p className="text-sm text-slate-500 mb-6">{t("selectModels")}</p>
 
       {/* Main Features */}
       <div className="mb-6">
         <h3 className="text-sm font-medium text-slate-600 dark:text-slate-400 mb-3">
-          Funzionalità Principali
+          {t("mainFeatures")}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {mainFeatures.map((f) => renderFeatureSelect(f))}

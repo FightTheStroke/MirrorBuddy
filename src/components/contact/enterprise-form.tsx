@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Send, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -46,6 +47,7 @@ interface FormErrors {
 }
 
 export function EnterpriseForm() {
+  const t = useTranslations("contact.enterprise");
   const [formState, setFormState] = useState<FormState>("idle");
   const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState({
@@ -123,10 +125,10 @@ export function EnterpriseForm() {
     return (
       <div className="text-center space-y-6">
         <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Richiesta Inviata!
+          {t("successTitle")}
         </h2>
         <p className="text-slate-600 dark:text-slate-300">
-          Il nostro team vi contatterà presto per discutere le vostre esigenze.
+          {t("successDescription")}
         </p>
         <Button onClick={() => (window.location.href = "/")}>
           Torna alla Home
@@ -387,7 +389,7 @@ export function EnterpriseForm() {
         {formState === "submitting" ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            Invio in corso...
+            {t("submitting")}
           </>
         ) : (
           <>

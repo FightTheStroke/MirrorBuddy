@@ -1,8 +1,9 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import type { TypingHandMode } from '@/types/tools';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import type { TypingHandMode } from "@/types/tools";
 
 export interface OneHandedModeProps {
   currentMode: TypingHandMode;
@@ -15,25 +16,39 @@ export function OneHandedMode({
   onModeChange,
   disabled = false,
 }: OneHandedModeProps) {
+  const t = useTranslations("typing.oneHanded");
   const [showInfo, setShowInfo] = useState(false);
 
-  const modes: { value: TypingHandMode; label: string; description: string }[] = [
-    { value: 'both', label: 'Entrambe le mani', description: 'Digitazione standard con 10 dita' },
-    { value: 'left-only', label: 'Solo sinistra', description: 'Per utenti con solo la mano sinistra' },
-    { value: 'right-only', label: 'Solo destra', description: 'Per utenti con solo la mano destra' },
-  ];
+  const modes: { value: TypingHandMode; label: string; description: string }[] =
+    [
+      {
+        value: "both",
+        label: t("modes.both.label"),
+        description: t("modes.both.description"),
+      },
+      {
+        value: "left-only",
+        label: t("modes.leftOnly.label"),
+        description: t("modes.leftOnly.description"),
+      },
+      {
+        value: "right-only",
+        label: t("modes.rightOnly.label"),
+        description: t("modes.rightOnly.description"),
+      },
+    ];
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Modalità di digitazione</h3>
+        <h3 className="text-lg font-semibold">{t("title")}</h3>
         <button
           onClick={() => setShowInfo(!showInfo)}
           className="text-sm text-primary hover:underline"
           aria-expanded={showInfo}
           aria-controls="one-handed-info"
         >
-          {showInfo ? 'Nascondi info' : 'Mostra info'}
+          {showInfo ? t("hideInfo") : t("showInfo")}
         </button>
       </div>
 
@@ -44,46 +59,44 @@ export function OneHandedMode({
             onClick={() => !disabled && onModeChange(mode.value)}
             disabled={disabled}
             className={cn(
-              'p-4 rounded-xl border text-left transition-all duration-200',
-              'focus:outline-none focus:ring-2 focus:ring-primary',
+              "p-4 rounded-xl border text-left transition-all duration-200",
+              "focus:outline-none focus:ring-2 focus:ring-primary",
               currentMode === mode.value
-                ? 'bg-primary text-primary-foreground border-primary shadow-lg'
-                : 'bg-card hover:bg-muted border-border cursor-pointer',
-              disabled && 'opacity-50 cursor-not-allowed'
+                ? "bg-primary text-primary-foreground border-primary shadow-lg"
+                : "bg-card hover:bg-muted border-border cursor-pointer",
+              disabled && "opacity-50 cursor-not-allowed",
             )}
             aria-pressed={currentMode === mode.value}
           >
             <div className="font-semibold mb-1">{mode.label}</div>
-            <div className={cn(
-              'text-xs',
-              currentMode === mode.value
-                ? 'text-primary-foreground/80'
-                : 'text-muted-foreground'
-            )}>
+            <div
+              className={cn(
+                "text-xs",
+                currentMode === mode.value
+                  ? "text-primary-foreground/80"
+                  : "text-muted-foreground",
+              )}
+            >
               {mode.description}
             </div>
           </button>
         ))}
       </div>
 
-      {showInfo && currentMode !== 'both' && (
+      {showInfo && currentMode !== "both" && (
         <div
           id="one-handed-info"
           className="p-4 bg-primary/10 border border-primary/20 rounded-lg"
           role="note"
         >
           <p className="text-sm">
-            <strong>Modalità una sola mano attiva:</strong> La tastiera virtuale mostrerà solo le
-            chiavi per la mano selezionata. Le lezioni sono state modificate per una digitazione
-            efficiente con una sola mano.
+            <strong>{t("info.active")}</strong> {t("info.description")}
           </p>
-          <p className="text-sm mt-2">
-            Suggerimenti per una sola mano:
-          </p>
+          <p className="text-sm mt-2">{t("info.tips")}</p>
           <ul className="list-disc list-inside text-sm mt-1 space-y-1 text-muted-foreground">
-            <li>Posiziona la mano al centro della tastiera</li>
-            <li>Usa i comandi <kbd className="px-1 bg-muted rounded">Sticky Keys</kbd> per combinazioni</li>
-            <li>Pratica regolarmente per migliorare la velocità</li>
+            {t.raw("info.tipItems").map((tip: string, index: number) => (
+              <li key={index}>{tip}</li>
+            ))}
           </ul>
         </div>
       )}

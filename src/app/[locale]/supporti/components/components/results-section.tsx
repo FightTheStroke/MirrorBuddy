@@ -3,18 +3,19 @@
  * @brief Results section component
  */
 
-import { motion } from 'framer-motion';
-import { Loader2 } from 'lucide-react';
-import { GridView, ListView, EmptyState } from '@/components/education/archive';
-import { containerVariants } from '../constants';
-import type { ArchiveItem, FilterType } from '@/components/education/archive';
-import type { ToolType } from '@/types/tools';
-import { TOOL_LABELS } from '@/components/education/archive';
+import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
+import { Loader2 } from "lucide-react";
+import { GridView, ListView, EmptyState } from "@/components/education/archive";
+import { containerVariants } from "../constants";
+import type { ArchiveItem, FilterType } from "@/components/education/archive";
+import type { ToolType } from "@/types/tools";
+import { TOOL_LABELS } from "@/components/education/archive";
 
 interface ResultsSectionProps {
   isLoading: boolean;
   filtered: ArchiveItem[];
-  viewMode: 'grid' | 'list';
+  viewMode: "grid" | "list";
   typeFilter: string;
   debouncedQuery: string;
   onDelete: (toolId: string) => void;
@@ -34,6 +35,7 @@ export function ResultsSection({
   onBookmark,
   onRate,
 }: ResultsSectionProps) {
+  const t = useTranslations("supporti");
   return (
     <>
       <motion.div
@@ -42,13 +44,10 @@ export function ResultsSection({
         transition={{ delay: 0.4 }}
         className="mb-4 text-sm text-slate-600 dark:text-slate-400"
       >
-        {filtered.length} {filtered.length === 1 ? 'materiale' : 'materiali'}
+        {filtered.length} {filtered.length === 1 ? "materiale" : "materiali"}
         {debouncedQuery && ` per "${debouncedQuery}"`}
-        {typeFilter && typeFilter !== 'all' && (
-          <span>
-            {' '}
-            in {TOOL_LABELS[typeFilter as ToolType] || typeFilter}
-          </span>
+        {typeFilter && typeFilter !== "all" && (
+          <span> in {TOOL_LABELS[typeFilter as ToolType] || typeFilter}</span>
         )}
       </motion.div>
 
@@ -56,16 +55,23 @@ export function ResultsSection({
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary" />
           <span className="ml-3 text-slate-600 dark:text-slate-400">
-            Caricamento materiali...
+            {t("loadingMaterials")}
           </span>
         </div>
       ) : filtered.length === 0 ? (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}>
-          <EmptyState filter={(typeFilter || 'all') as FilterType} />
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <EmptyState filter={(typeFilter || "all") as FilterType} />
         </motion.div>
       ) : (
-        <motion.div variants={containerVariants} initial="hidden" animate="visible">
-          {viewMode === 'grid' ? (
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          {viewMode === "grid" ? (
             <GridView
               items={filtered}
               onDelete={onDelete}
@@ -87,4 +93,3 @@ export function ResultsSection({
     </>
   );
 }
-
