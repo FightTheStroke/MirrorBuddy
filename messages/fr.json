@@ -228,8 +228,13 @@
     "saveFailed": "Save failed",
     "deleteFailed": "Delete failed",
     "loadFailed": "Load failed",
-    "tryAgain": "Try again",
-    "contactSupport": "Contact support"
+    "tryAgain": "Réessayer",
+    "contactSupport": "Contacter le support",
+    "notFoundPage": {
+      "title": "Page non trouvée",
+      "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
+      "backHome": "Retour à l'accueil"
+    }
   },
   "accessibility": {
     "skipToContent": "Skip to content",

@@ -1,5 +1,8 @@
 "use client";
 
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import { Check, X, Loader2, RefreshCw, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";

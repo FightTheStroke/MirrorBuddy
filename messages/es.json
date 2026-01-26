@@ -228,8 +228,13 @@
     "saveFailed": "Save failed",
     "deleteFailed": "Delete failed",
     "loadFailed": "Load failed",
-    "tryAgain": "Try again",
-    "contactSupport": "Contact support"
+    "tryAgain": "Intentar de nuevo",
+    "contactSupport": "Contactar soporte",
+    "notFoundPage": {
+      "title": "Página no encontrada",
+      "description": "La página que buscas no existe o ha sido movida.",
+      "backHome": "Volver al inicio"
+    }
   },
   "accessibility": {
     "skipToContent": "Skip to content",

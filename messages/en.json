@@ -229,7 +229,12 @@
     "deleteFailed": "Delete failed",
     "loadFailed": "Load failed",
     "tryAgain": "Try again",
-    "contactSupport": "Contact support"
+    "contactSupport": "Contact support",
+    "notFoundPage": {
+      "title": "Page not found",
+      "description": "The page you are looking for does not exist or has been moved.",
+      "backHome": "Back to Home"
+    }
   },
   "accessibility": {
     "skipToContent": "Skip to content",

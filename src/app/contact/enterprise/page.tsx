@@ -1,3 +1,6 @@
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import type { Metadata } from "next";
 import { Building2 } from "lucide-react";
 import { getTranslations } from "next-intl/server";

@@ -1,3 +1,6 @@
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { SchoolsContactForm } from "./schools-form";

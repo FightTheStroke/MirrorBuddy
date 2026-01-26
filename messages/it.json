@@ -229,7 +229,12 @@
     "deleteFailed": "Eliminazione fallita",
     "loadFailed": "Caricamento fallito",
     "tryAgain": "Riprova",
-    "contactSupport": "Contatta il supporto"
+    "contactSupport": "Contatta il supporto",
+    "notFoundPage": {
+      "title": "Pagina non trovata",
+      "description": "La pagina che stai cercando non esiste o è stata spostata.",
+      "backHome": "Torna alla Home"
+    }
   },
   "accessibility": {
     "skipToContent": "Salta al contenuto",

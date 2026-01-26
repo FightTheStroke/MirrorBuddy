@@ -6,6 +6,9 @@ import { LocalesTable } from "./locales-table";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
+// Mark as dynamic since validateAdminAuth reads cookies
+export const dynamic = "force-dynamic";
+
 export default async function AdminLocalesPage() {
   const auth = await validateAdminAuth();
 

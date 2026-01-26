@@ -1,3 +1,6 @@
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { useTranslations } from "next-intl";
 import { Metadata } from "next";
 import Link from "next/link";

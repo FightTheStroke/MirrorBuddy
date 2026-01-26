@@ -1,5 +1,8 @@
 "use client";
 
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { useTranslations } from "next-intl";
 import { TrialBudgetCard } from "./components/trial-budget-card";
 import { SystemInfoCard } from "./components/system-info-card";

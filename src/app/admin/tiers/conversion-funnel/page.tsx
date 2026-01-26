@@ -1,9 +1,12 @@
+"use client";
+
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 /**
  * Admin Tier Conversion Funnel Dashboard
  * Visualizes Trial → Base → Pro conversion metrics
  */
-
-"use client";
 
 import { useTranslations } from "next-intl";
 

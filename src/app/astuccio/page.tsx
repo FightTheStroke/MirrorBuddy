@@ -1,11 +1,8 @@
-'use client';
+// Force dynamic rendering to avoid i18n static generation issues
+export const dynamic = "force-dynamic";
 
-import { AstuccioView } from '@/app/astuccio/components/astuccio-view';
+import { AstuccioPageClient } from "./astuccio-page-client";
 
 export default function AstuccioPage() {
-  return (
-    <main className="h-full">
-      <AstuccioView />
-    </main>
-  );
+  return <AstuccioPageClient />;
 }

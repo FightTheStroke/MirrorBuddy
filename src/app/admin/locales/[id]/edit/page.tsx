@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { LocaleForm } from "@/components/admin/locale-form";
 
+// Mark as dynamic since validateAdminAuth reads cookies
+export const dynamic = "force-dynamic";
+
 interface EditLocalePageProps {
   params: Promise<{ id: string }>;
 }
