@@ -437,6 +437,7 @@ jobs:
         run: |
           npx prisma generate
           npx prisma migrate deploy
+          npx prisma db seed
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -531,6 +532,7 @@ jobs:
         run: |
           npx prisma generate
           npx prisma migrate deploy
+          npx prisma db seed
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -644,6 +646,7 @@ jobs:
         run: |
           npx prisma generate
           npx prisma migrate deploy
+          npx prisma db seed
         env:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
