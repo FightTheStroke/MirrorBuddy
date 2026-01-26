@@ -36,19 +36,10 @@ Sentry.init({
     }),
   ],
 
-  // Filter out common non-actionable errors
-  ignoreErrors: [
-    // Browser extensions
-    /^chrome-extension:\/\//,
-    /^moz-extension:\/\//,
-    // Network errors that are expected
-    "Network request failed",
-    "Failed to fetch",
-    "Load failed",
-    // User cancelled actions
-    "AbortError",
-    "The operation was aborted",
-  ],
+  // ZERO TOLERANCE: Capture ALL errors, filter nothing
+  // Errors from browser extensions are rare and worth knowing about
+  // User can create Sentry alerts/filters as needed
+  ignoreErrors: [],
 
   // Only send errors in production
   enabled: process.env.NODE_ENV === "production",

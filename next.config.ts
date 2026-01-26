@@ -15,6 +15,10 @@ const nextConfig: NextConfig = {
   env: {
     APP_VERSION: packageJson.version,
   },
+  // Enable source maps in production - serve them publicly
+  // This eliminates 404 errors for .js.map files
+  // Security note: source maps expose code structure but MirrorBuddy is open-source anyway
+  productionBrowserSourceMaps: true,
   // Note: pdf-parse was previously in serverExternalPackages, but this caused
   // runtime failures on Vercel serverless because the package wasn't available.
   // Now bundled with the app for proper Vercel deployment.
@@ -166,8 +170,9 @@ const sentryConfig = {
   // Upload source maps for better error tracking (only if token available)
   widenClientFileUpload: hasSentryToken,
 
-  // Hides source maps from generated client bundles
-  hideSourceMaps: true,
+  // Serve source maps publicly (don't hide them)
+  // Combined with productionBrowserSourceMaps: true, this ensures .map files exist
+  hideSourceMaps: false,
 
   // Route browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers
   tunnelRoute: "/monitoring",

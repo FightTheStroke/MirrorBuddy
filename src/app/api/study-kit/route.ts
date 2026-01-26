@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
@@ -92,6 +93,7 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     logger.error("Failed to list study kits", { error: String(error) });
+    Sentry.captureException(error, { tags: { api: "study-kit-list" } });
     return NextResponse.json(
       { error: "Failed to list study kits" },
       { status: 500 },

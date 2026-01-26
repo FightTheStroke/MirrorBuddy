@@ -7,6 +7,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
@@ -149,6 +150,12 @@ export async function POST(request: NextRequest) {
           studyKitId: studyKit.id,
         });
       } catch (error) {
+        // Capture to Sentry for visibility
+        Sentry.captureException(error, {
+          tags: { api: "study-kit-upload", phase: "processing" },
+          extra: { studyKitId: studyKit.id },
+        });
+
         // Update with error status - guaranteed to run for any error
         await prisma.studyKit.update({
           where: { id: studyKit.id },
@@ -174,6 +181,9 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error("Failed to upload study kit", { error: String(error) });
+    Sentry.captureException(error, {
+      tags: { api: "study-kit-upload", phase: "initial" },
+    });
     return NextResponse.json(
       { error: "Failed to upload study kit", details: String(error) },
       { status: 500 },

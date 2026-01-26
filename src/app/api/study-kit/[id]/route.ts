@@ -6,12 +6,13 @@
  * Wave 2: Study Kit Generator
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { StudyKit } from '@/types/study-kit';
-import { deleteMaterialsFromStudyKit } from '@/lib/study-kit/sync-materials';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import type { StudyKit } from "@/types/study-kit";
+import { deleteMaterialsFromStudyKit } from "@/lib/study-kit/sync-materials";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 /**
  * GET /api/study-kit/[id]
@@ -19,7 +20,7 @@ import { validateAuth } from '@/lib/auth/session-auth';
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Auth check
@@ -38,17 +39,14 @@ export async function GET(
 
     if (!studyKit) {
       return NextResponse.json(
-        { error: 'Study kit not found' },
-        { status: 404 }
+        { error: "Study kit not found" },
+        { status: 404 },
       );
     }
 
     // Verify ownership
     if (studyKit.userId !== userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Parse JSON fields
@@ -61,7 +59,7 @@ export async function GET(
       mindmap: studyKit.mindmap ? JSON.parse(studyKit.mindmap) : undefined,
       demo: studyKit.demo ? JSON.parse(studyKit.demo) : undefined,
       quiz: studyKit.quiz ? JSON.parse(studyKit.quiz) : undefined,
-      status: studyKit.status as 'processing' | 'ready' | 'error',
+      status: studyKit.status as "processing" | "ready" | "error",
       errorMessage: studyKit.errorMessage || undefined,
       subject: studyKit.subject || undefined,
       pageCount: studyKit.pageCount || undefined,
@@ -75,10 +73,11 @@ export async function GET(
       studyKit: response,
     });
   } catch (error) {
-    logger.error('Failed to get study kit', { error: String(error) });
+    logger.error("Failed to get study kit", { error: String(error) });
+    Sentry.captureException(error, { tags: { api: "study-kit-get" } });
     return NextResponse.json(
-      { error: 'Failed to get study kit' },
-      { status: 500 }
+      { error: "Failed to get study kit" },
+      { status: 500 },
     );
   }
 }
@@ -89,7 +88,7 @@ export async function GET(
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     // Auth check
@@ -108,16 +107,13 @@ export async function DELETE(
 
     if (!studyKit) {
       return NextResponse.json(
-        { error: 'Study kit not found' },
-        { status: 404 }
+        { error: "Study kit not found" },
+        { status: 404 },
       );
     }
 
     if (studyKit.userId !== userId) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
     // Delete related materials first (Phase 1 - T-03)
@@ -128,17 +124,18 @@ export async function DELETE(
       where: { id },
     });
 
-    logger.info('Study kit deleted', { studyKitId: id, userId });
+    logger.info("Study kit deleted", { studyKitId: id, userId });
 
     return NextResponse.json({
       success: true,
-      message: 'Study kit deleted',
+      message: "Study kit deleted",
     });
   } catch (error) {
-    logger.error('Failed to delete study kit', { error: String(error) });
+    logger.error("Failed to delete study kit", { error: String(error) });
+    Sentry.captureException(error, { tags: { api: "study-kit-delete" } });
     return NextResponse.json(
-      { error: 'Failed to delete study kit' },
-      { status: 500 }
+      { error: "Failed to delete study kit" },
+      { status: 500 },
     );
   }
 }
