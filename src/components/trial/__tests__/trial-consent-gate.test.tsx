@@ -26,6 +26,9 @@ describe("TrialConsentGate", () => {
     vi.clearAllMocks();
     // Clear localStorage
     localStorage.clear();
+    // Clear trial consent cookie (set by handleAccept)
+    document.cookie =
+      "mirrorbuddy-trial-consent=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
   });
 
   describe("when consent already given", () => {
