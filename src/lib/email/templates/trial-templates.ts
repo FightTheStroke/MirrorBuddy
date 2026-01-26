@@ -16,6 +16,97 @@ export interface TrialUsageNudgeData {
   betaRequestUrl?: string;
 }
 
+export interface TrialEmailVerificationData {
+  email: string;
+  verificationCode: string;
+  verificationUrl: string;
+  expiresAt: Date;
+}
+
+export function getTrialEmailVerificationTemplate(
+  data: TrialEmailVerificationData,
+): {
+  subject: string;
+  html: string;
+  text: string;
+  to: string;
+} {
+  const expiresFormatted = data.expiresAt.toLocaleDateString("it-IT", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return {
+    to: data.email,
+    subject: "MirrorBuddy - Verifica la tua email di prova",
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MirrorBuddy - Verifica Email</title>
+</head>
+<body style="font-family: system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 0; background-color: #f8fafc;">
+  <div style="background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); padding: 32px 24px; text-align: center;">
+    <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 700;">MirrorBuddy</h1>
+    <p style="margin: 8px 0 0; color: #e0e7ff; font-size: 14px;">Verifica email per sbloccare gli strumenti</p>
+  </div>
+
+  <div style="background: #ffffff; padding: 32px 24px; margin: 0;">
+    <h2 style="margin: 0 0 16px 0; color: #1e293b; font-size: 20px; font-weight: 600;">
+      Verifica la tua email
+    </h2>
+    <p style="margin: 0 0 20px 0; color: #475569; font-size: 15px; line-height: 1.6;">
+      Inserisci questo codice per continuare a usare gli strumenti di MirrorBuddy durante la prova.
+    </p>
+
+    <div style="background: #f1f5f9; border-radius: 8px; padding: 24px; text-align: center; margin: 20px 0;">
+      <code style="font-size: 32px; font-weight: bold; letter-spacing: 8px; color: #1e293b;">
+        ${escapeHtml(data.verificationCode)}
+      </code>
+    </div>
+
+    <div style="text-align: center; margin: 24px 0;">
+      <a href="${escapeHtml(data.verificationUrl)}" style="display: inline-block; background: #6366f1; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-size: 15px; font-weight: 600;">
+        Verifica email
+      </a>
+    </div>
+
+    <p style="color: #64748b; font-size: 14px; text-align: center;">
+      Oppure inserisci il codice su: <a href="${escapeHtml(`${APP_URL}/trial/verify`)}" style="color: #6366f1;">${APP_URL}/trial/verify</a>
+    </p>
+
+    <p style="color: #94a3b8; font-size: 12px; margin-top: 24px;">
+      Codice valido fino a: ${expiresFormatted}
+    </p>
+  </div>
+
+  <div style="background: #f1f5f9; padding: 20px; text-align: center; border-top: 1px solid #e2e8f0;">
+    <p style="margin: 0; color: #64748b; font-size: 12px;">
+      © 2026 MirrorBuddy • <a href="${escapeHtml(`${APP_URL}/privacy`)}" style="color: #6366f1; text-decoration: none;">Privacy Policy</a>
+    </p>
+  </div>
+</body>
+</html>
+    `.trim(),
+    text: `
+MirrorBuddy - Verifica email
+
+Il tuo codice di verifica: ${data.verificationCode}
+
+Verifica ora: ${data.verificationUrl}
+
+Oppure inserisci il codice su ${APP_URL}/trial/verify
+
+Codice valido fino a: ${expiresFormatted}
+    `.trim(),
+  };
+}
+
 /**
  * 70% trial usage nudge email
  * Sent when user reaches 70% of their trial quota

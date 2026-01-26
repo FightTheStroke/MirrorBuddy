@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 import crypto from "crypto";
+import { randomBytes, timingSafeEqual } from "crypto";
+import { sendEmail, isEmailConfigured } from "@/lib/email";
+import { getTrialEmailVerificationTemplate } from "@/lib/email/templates/trial-templates";
 import {
   checkAndIncrementUsage,
   getTierLimitsForTrial,
@@ -27,6 +30,9 @@ export const TRIAL_LIMITS = {
   TOOLS: 10, // 10 tool uses (mindmap, summary, etc.)
   DOCS: 1, // 1 document upload
 } as const;
+
+const TRIAL_VERIFICATION_EXPIRY_MS = 24 * 60 * 60 * 1000;
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
 function hashIp(ip: string): string {
   return crypto.createHash("sha256").update(ip).digest("hex");
@@ -201,6 +207,138 @@ export async function updateTrialEmail(sessionId: string, email: string) {
   });
 }
 
+export async function getTrialSessionById(sessionId: string) {
+  return prisma.trialSession.findUnique({
+    where: { id: sessionId },
+  });
+}
+
+function generateVerificationCode(): string {
+  return randomBytes(3).toString("hex").toUpperCase();
+}
+
+function normalizeVerificationCode(code: string): string {
+  return code.replace(/\s+/g, "").toUpperCase();
+}
+
+export function isTrialEmailVerified(session: {
+  emailVerifiedAt: Date | null;
+}): boolean {
+  return Boolean(session.emailVerifiedAt);
+}
+
+export function isTrialVerificationPending(session: {
+  emailVerificationSentAt: Date | null;
+  emailVerificationExpiresAt: Date | null;
+  emailVerifiedAt: Date | null;
+}): boolean {
+  if (session.emailVerifiedAt) return false;
+  if (!session.emailVerificationSentAt || !session.emailVerificationExpiresAt) {
+    return false;
+  }
+  return session.emailVerificationExpiresAt > new Date();
+}
+
+export async function requestTrialEmailVerification(sessionId: string) {
+  const session = await prisma.trialSession.findUnique({
+    where: { id: sessionId },
+  });
+
+  if (!session) {
+    throw new Error("Session not found");
+  }
+
+  if (!session.email) {
+    throw new Error("Email not set");
+  }
+
+  const verificationCode = generateVerificationCode();
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + TRIAL_VERIFICATION_EXPIRY_MS);
+
+  const updatedSession = await prisma.trialSession.update({
+    where: { id: sessionId },
+    data: {
+      emailVerificationCode: verificationCode,
+      emailVerificationSentAt: now,
+      emailVerificationExpiresAt: expiresAt,
+      emailVerifiedAt: null,
+    },
+  });
+
+  let emailSent = false;
+  if (isEmailConfigured()) {
+    const verificationUrl = `${APP_URL}/trial/verify?code=${verificationCode}`;
+    const template = getTrialEmailVerificationTemplate({
+      email: session.email,
+      verificationCode,
+      verificationUrl,
+      expiresAt,
+    });
+
+    const result = await sendEmail({
+      to: template.to,
+      subject: template.subject,
+      html: template.html,
+      text: template.text,
+    });
+
+    emailSent = result.success;
+    if (!result.success) {
+      throw new Error(result.error || "Failed to send verification email");
+    }
+  }
+
+  return {
+    session: updatedSession,
+    emailSent,
+    expiresAt,
+    verificationCode:
+      process.env.NODE_ENV !== "production" ? verificationCode : undefined,
+  };
+}
+
+export async function verifyTrialEmailCode(sessionId: string, code: string) {
+  const session = await prisma.trialSession.findUnique({
+    where: { id: sessionId },
+  });
+
+  if (!session) {
+    throw new Error("Session not found");
+  }
+
+  if (!session.emailVerificationCode) {
+    throw new Error("Verification not requested");
+  }
+
+  if (session.emailVerifiedAt) {
+    return { session, verified: true };
+  }
+
+  const expiresAt = session.emailVerificationExpiresAt;
+  if (expiresAt && expiresAt < new Date()) {
+    throw new Error("Verification code expired");
+  }
+
+  const normalized = normalizeVerificationCode(code);
+  const stored = normalizeVerificationCode(session.emailVerificationCode);
+  const match = timingSafeEqual(Buffer.from(normalized), Buffer.from(stored));
+  if (!match) {
+    throw new Error("Invalid verification code");
+  }
+
+  const updatedSession = await prisma.trialSession.update({
+    where: { id: sessionId },
+    data: {
+      emailVerifiedAt: new Date(),
+      emailVerificationCode: null,
+      emailVerificationExpiresAt: null,
+    },
+  });
+
+  return { session: updatedSession, verified: true };
+}
+
 export async function getTrialStatus(sessionId: string) {
   const session = await prisma.trialSession.findUnique({
     where: { id: sessionId },
@@ -242,5 +380,11 @@ export async function getTrialStatus(sessionId: string) {
 
     // Assigned coach (maestri restrictions removed - users can talk to any maestro)
     assignedCoach: session.assignedCoach,
+
+    // Email verification
+    email: session.email,
+    emailCollectedAt: session.emailCollectedAt,
+    emailVerifiedAt: session.emailVerifiedAt,
+    verificationPending: isTrialVerificationPending(session),
   };
 }

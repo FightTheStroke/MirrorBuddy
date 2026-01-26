@@ -2,27 +2,35 @@
  * Tool-specific renderer component
  */
 
-'use client';
+"use client";
 
-import { Loader2, XCircle, Pause } from 'lucide-react';
-import { MindmapRenderer } from '@/components/tools/markmap';
-import { QuizTool } from '@/components/tools/quiz-tool';
-import { FlashcardTool } from '@/components/tools/flashcard-tool';
-import { DiagramRenderer } from '@/components/tools/diagram-renderer';
-import { SummaryTool } from '@/components/tools/summary-tool';
-import { StudentSummaryEditor } from '@/components/tools/student-summary-editor';
-import type { SummaryData, StudentSummaryData } from '@/types/tools';
-import type { ActiveToolState } from '@/lib/hooks/use-tool-stream';
-import type { MindmapRequest, QuizRequest, FlashcardDeckRequest, DiagramRequest } from '@/types';
+import { Loader2, XCircle, Pause } from "lucide-react";
+import { MindmapRenderer } from "@/components/tools/markmap";
+import { QuizTool } from "@/components/tools/quiz-tool";
+import { FlashcardTool } from "@/components/tools/flashcard-tool";
+import { DiagramRenderer } from "@/components/tools/diagram-renderer";
+import { LiveSummary } from "@/components/tools/live-summary";
+import { StudentSummaryEditor } from "@/components/tools/student-summary-editor";
+import type { SummaryData, StudentSummaryData } from "@/types/tools";
+import type { ActiveToolState } from "@/lib/hooks/use-tool-stream";
+import type {
+  MindmapRequest,
+  QuizRequest,
+  FlashcardDeckRequest,
+  DiagramRequest,
+} from "@/types";
 
 interface ToolRendererProps {
   tool: ActiveToolState;
   onSaveStudentSummary?: (data: StudentSummaryData) => Promise<void>;
 }
 
-export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) {
+export function ToolRenderer({
+  tool,
+  onSaveStudentSummary,
+}: ToolRendererProps) {
   // Handle incomplete content during building
-  if (tool.status === 'building' && !tool.content) {
+  if (tool.status === "building" && !tool.content) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4">
@@ -39,19 +47,21 @@ export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) 
   }
 
   // Error state
-  if (tool.status === 'error') {
+  if (tool.status === "error") {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4 p-8 bg-red-900/20 rounded-xl">
           <XCircle className="w-12 h-12 text-red-400 mx-auto" />
-          <p className="text-red-400">{tool.errorMessage || 'Si è verificato un errore'}</p>
+          <p className="text-red-400">
+            {tool.errorMessage || "Si è verificato un errore"}
+          </p>
         </div>
       </div>
     );
   }
 
   // Cancelled state
-  if (tool.status === 'cancelled') {
+  if (tool.status === "cancelled") {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4 p-8 bg-yellow-900/20 rounded-xl">
@@ -64,7 +74,7 @@ export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) 
 
   // Render based on tool type
   switch (tool.type) {
-    case 'mindmap':
+    case "mindmap":
       return (
         <MindmapRenderer
           title={(tool.content as MindmapRequest)?.title || tool.title}
@@ -72,31 +82,19 @@ export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) 
         />
       );
 
-    case 'quiz':
-      return (
-        <QuizTool
-          request={tool.content as QuizRequest}
-        />
-      );
+    case "quiz":
+      return <QuizTool request={tool.content as QuizRequest} />;
 
-    case 'flashcard':
-      return (
-        <FlashcardTool
-          request={tool.content as FlashcardDeckRequest}
-        />
-      );
+    case "flashcard":
+      return <FlashcardTool request={tool.content as FlashcardDeckRequest} />;
 
-    case 'diagram':
-      return (
-        <DiagramRenderer
-          request={tool.content as DiagramRequest}
-        />
-      );
+    case "diagram":
+      return <DiagramRenderer request={tool.content as DiagramRequest} />;
 
-    case 'summary': {
+    case "summary": {
       const summaryContent = tool.content as Record<string, unknown>;
       // Check if this is a student-written summary (maieutic method)
-      if (summaryContent.type === 'student_summary') {
+      if (summaryContent.type === "student_summary") {
         const studentData = summaryContent as unknown as StudentSummaryData;
         return (
           <StudentSummaryEditor
@@ -109,10 +107,17 @@ export function ToolRenderer({ tool, onSaveStudentSummary }: ToolRendererProps) 
         );
       }
       // AI-generated summary (legacy)
-      return <SummaryTool data={summaryContent as unknown as SummaryData} />;
+      return (
+        <LiveSummary
+          initialData={summaryContent as unknown as SummaryData}
+          sessionId={tool.sessionId ?? null}
+          listenForEvents={Boolean(tool.sessionId)}
+          readOnly={false}
+        />
+      );
     }
 
-    case 'timeline':
+    case "timeline":
     default:
       // Fallback for unsupported types
       return (

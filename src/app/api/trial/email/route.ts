@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateTrialEmail } from "@/lib/trial/trial-service";
+import {
+  requestTrialEmailVerification,
+  updateTrialEmail,
+} from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
+import {
+  checkRateLimitAsync,
+  getClientIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 const log = logger.child({ module: "api/trial/email" });
 
@@ -11,6 +20,16 @@ const log = logger.child({ module: "api/trial/email" });
  * Email capture is optional and can be triggered after X messages or at limit.
  */
 export async function PATCH(request: NextRequest) {
+  const clientId = getClientIdentifier(request);
+  const rateLimitResult = await checkRateLimitAsync(
+    `trial:email:${clientId}`,
+    RATE_LIMITS.CONTACT_FORM,
+  );
+  if (!rateLimitResult.success) {
+    log.warn("Trial email rate limited", { clientId });
+    return rateLimitResponse(rateLimitResult);
+  }
+
   try {
     const body = await request.json();
     const { sessionId, email } = body;
@@ -45,6 +64,9 @@ export async function PATCH(request: NextRequest) {
     // Update session with email
     const updatedSession = await updateTrialEmail(sessionId, email);
 
+    // Request verification email
+    const verificationResult = await requestTrialEmailVerification(sessionId);
+
     log.info("[TrialEmail] Email captured", {
       sessionId,
       hasEmail: !!updatedSession.email,
@@ -54,11 +76,22 @@ export async function PATCH(request: NextRequest) {
       success: true,
       email: updatedSession.email,
       emailCollectedAt: updatedSession.emailCollectedAt,
+      emailVerifiedAt: verificationResult.session.emailVerifiedAt,
+      verificationPending: true,
+      expiresAt: verificationResult.expiresAt.toISOString(),
+      emailSent: verificationResult.emailSent,
+      ...(verificationResult.verificationCode && {
+        verificationCode: verificationResult.verificationCode,
+      }),
     });
   } catch (error) {
     // Handle session not found error
     if (error instanceof Error && error.message.includes("Session not found")) {
       return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
+
+    if (error instanceof Error && error.message.includes("Email not set")) {
+      return NextResponse.json({ error: "Email not set" }, { status: 400 });
     }
 
     log.error("[TrialEmail] Failed to save email", {

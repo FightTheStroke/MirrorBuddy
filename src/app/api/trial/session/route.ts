@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import {
   getOrCreateTrialSession,
+  isTrialVerificationPending,
   TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
@@ -72,6 +73,11 @@ export async function POST(_request: NextRequest) {
       // Assigned characters
       assignedMaestri: JSON.parse(session.assignedMaestri),
       assignedCoach: session.assignedCoach,
+      // Email verification
+      email: session.email,
+      emailCollectedAt: session.emailCollectedAt,
+      emailVerifiedAt: session.emailVerifiedAt,
+      verificationPending: isTrialVerificationPending(session),
     });
 
     if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
@@ -149,6 +155,11 @@ export async function GET() {
       // Assigned characters
       assignedMaestri: JSON.parse(session.assignedMaestri),
       assignedCoach: session.assignedCoach,
+      // Email verification
+      email: session.email,
+      emailCollectedAt: session.emailCollectedAt,
+      emailVerifiedAt: session.emailVerifiedAt,
+      verificationPending: isTrialVerificationPending(session),
     });
   } catch (error) {
     log.error("[TrialSession] Failed to get session", {

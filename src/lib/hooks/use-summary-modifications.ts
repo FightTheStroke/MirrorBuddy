@@ -7,8 +7,8 @@
  * Part of Issue #70: Real-time summary tool
  */
 
-import { useEffect, useCallback, useRef, useState } from 'react';
-import { logger } from '@/lib/logger';
+import { useEffect, useCallback, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
 
 // ============================================================================
 // TYPES
@@ -18,21 +18,21 @@ import { logger } from '@/lib/logger';
  * Summary modification commands
  */
 export type SummaryModifyCommand =
-  | 'summary_set_title'
-  | 'summary_add_section'
-  | 'summary_update_section'
-  | 'summary_delete_section'
-  | 'summary_add_point'
-  | 'summary_delete_point'
-  | 'summary_finalize';
+  | "summary_set_title"
+  | "summary_add_section"
+  | "summary_update_section"
+  | "summary_delete_section"
+  | "summary_add_point"
+  | "summary_delete_point"
+  | "summary_finalize";
 
 /**
  * Modification event from SSE
  */
 export interface SummaryModifyEvent {
   id: string;
-  type: 'summary:modify';
-  toolType: 'summary';
+  type: "summary:modify";
+  toolType: "summary";
   sessionId: string;
   maestroId: string;
   timestamp: number;
@@ -46,21 +46,33 @@ export interface SummaryModifyEvent {
  * Union of all modification argument types
  */
 export type SummaryModifyArgs =
-  | { title: string }                                      // summary_set_title
-  | { title: string; content?: string; keyPoints?: string[] }  // summary_add_section
-  | { sectionIndex: number; title?: string; content?: string; keyPoints?: string[] }  // summary_update_section
-  | { sectionIndex: number }                               // summary_delete_section
-  | { sectionIndex: number; point: string }                // summary_add_point
-  | { sectionIndex: number; pointIndex: number }           // summary_delete_point
-  | Record<string, never>;                                 // summary_finalize
+  | { title: string } // summary_set_title
+  | { title: string; content?: string; keyPoints?: string[] } // summary_add_section
+  | {
+      sectionIndex: number;
+      title?: string;
+      content?: string;
+      keyPoints?: string[];
+    } // summary_update_section
+  | { sectionIndex: number } // summary_delete_section
+  | { sectionIndex: number; point: string } // summary_add_point
+  | { sectionIndex: number; pointIndex: number } // summary_delete_point
+  | Record<string, never>; // summary_finalize
 
 /**
  * Callbacks for each modification type
  */
 export interface SummaryModificationCallbacks {
   onSetTitle?: (title: string) => void;
-  onAddSection?: (title: string, content?: string, keyPoints?: string[]) => void;
-  onUpdateSection?: (sectionIndex: number, updates: { title?: string; content?: string; keyPoints?: string[] }) => void;
+  onAddSection?: (
+    title: string,
+    content?: string,
+    keyPoints?: string[],
+  ) => void;
+  onUpdateSection?: (
+    sectionIndex: number,
+    updates: { title?: string; content?: string; keyPoints?: string[] },
+  ) => void;
   onDeleteSection?: (sectionIndex: number) => void;
   onAddPoint?: (sectionIndex: number, point: string) => void;
   onDeletePoint?: (sectionIndex: number, pointIndex: number) => void;
@@ -115,28 +127,28 @@ export function useSummaryModifications({
   const handleEvent = useCallback((event: MessageEvent) => {
     try {
       // Skip heartbeat events
-      if (event.data.startsWith(':')) return;
+      if (event.data.startsWith(":")) return;
 
       const data = JSON.parse(event.data);
 
       // Only handle summary:modify events
-      if (data.type !== 'summary:modify') return;
+      if (data.type !== "summary:modify") return;
 
       const modifyEvent = data as SummaryModifyEvent;
       setLastEvent(modifyEvent);
 
       const { command, args } = modifyEvent.data;
 
-      logger.info('[SummaryModifications] Received event', { command, args });
+      logger.info("[SummaryModifications] Received event", { command, args });
 
       // Dispatch to appropriate callback
       switch (command) {
-        case 'summary_set_title': {
+        case "summary_set_title": {
           const { title } = args as { title: string };
           callbacksRef.current.onSetTitle?.(title);
           break;
         }
-        case 'summary_add_section': {
+        case "summary_add_section": {
           const { title, content, keyPoints } = args as {
             title: string;
             content?: string;
@@ -145,40 +157,52 @@ export function useSummaryModifications({
           callbacksRef.current.onAddSection?.(title, content, keyPoints);
           break;
         }
-        case 'summary_update_section': {
+        case "summary_update_section": {
           const { sectionIndex, title, content, keyPoints } = args as {
             sectionIndex: number;
             title?: string;
             content?: string;
             keyPoints?: string[];
           };
-          callbacksRef.current.onUpdateSection?.(sectionIndex, { title, content, keyPoints });
+          callbacksRef.current.onUpdateSection?.(sectionIndex, {
+            title,
+            content,
+            keyPoints,
+          });
           break;
         }
-        case 'summary_delete_section': {
+        case "summary_delete_section": {
           const { sectionIndex } = args as { sectionIndex: number };
           callbacksRef.current.onDeleteSection?.(sectionIndex);
           break;
         }
-        case 'summary_add_point': {
-          const { sectionIndex, point } = args as { sectionIndex: number; point: string };
+        case "summary_add_point": {
+          const { sectionIndex, point } = args as {
+            sectionIndex: number;
+            point: string;
+          };
           callbacksRef.current.onAddPoint?.(sectionIndex, point);
           break;
         }
-        case 'summary_delete_point': {
-          const { sectionIndex, pointIndex } = args as { sectionIndex: number; pointIndex: number };
+        case "summary_delete_point": {
+          const { sectionIndex, pointIndex } = args as {
+            sectionIndex: number;
+            pointIndex: number;
+          };
           callbacksRef.current.onDeletePoint?.(sectionIndex, pointIndex);
           break;
         }
-        case 'summary_finalize': {
+        case "summary_finalize": {
           callbacksRef.current.onFinalize?.();
           break;
         }
         default:
-          logger.warn('[SummaryModifications] Unknown command', { command });
+          logger.warn("[SummaryModifications] Unknown command", { command });
       }
     } catch (error) {
-      logger.error('[SummaryModifications] Failed to parse event', { error: String(error) });
+      logger.error("[SummaryModifications] Failed to parse event", {
+        error: String(error),
+      });
     }
   }, []);
 
@@ -191,19 +215,21 @@ export function useSummaryModifications({
       eventSourceRef.current.close();
     }
 
-    const url = `/api/tools/sse?sessionId=${encodeURIComponent(sessionId)}`;
+    const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
-      logger.info('[SummaryModifications] SSE connected', { sessionId });
+      logger.info("[SummaryModifications] SSE connected", { sessionId });
       setIsConnected(true);
     };
 
     eventSource.onmessage = handleEvent;
 
     eventSource.onerror = (error) => {
-      logger.warn('[SummaryModifications] SSE error, reconnecting...', { error });
+      logger.warn("[SummaryModifications] SSE error, reconnecting...", {
+        error,
+      });
       setIsConnected(false);
 
       // Reconnect after 3 seconds

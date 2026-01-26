@@ -10,22 +10,22 @@
  */
 export enum ToolEventType {
   // Tool has been proposed by AI and sent to client
-  TOOL_PROPOSED = 'TOOL_PROPOSED',
+  TOOL_PROPOSED = "TOOL_PROPOSED",
 
   // User has accepted the proposed tool
-  TOOL_ACCEPTED = 'TOOL_ACCEPTED',
+  TOOL_ACCEPTED = "TOOL_ACCEPTED",
 
   // User has rejected the proposed tool
-  TOOL_REJECTED = 'TOOL_REJECTED',
+  TOOL_REJECTED = "TOOL_REJECTED",
 
   // Tool execution has started on client
-  TOOL_EXECUTING = 'TOOL_EXECUTING',
+  TOOL_EXECUTING = "TOOL_EXECUTING",
 
   // Tool execution completed successfully
-  TOOL_COMPLETED = 'TOOL_COMPLETED',
+  TOOL_COMPLETED = "TOOL_COMPLETED",
 
   // Tool execution failed with error
-  TOOL_ERROR = 'TOOL_ERROR',
+  TOOL_ERROR = "TOOL_ERROR",
 }
 
 /**
@@ -38,6 +38,11 @@ export interface ToolDataChannelMessage {
 
   // Unique identifier for the tool
   toolId: string;
+
+  // Optional tool metadata for SSE bridge
+  toolType?: string;
+  sessionId?: string;
+  maestroId?: string;
 
   // Optional payload data (varies by event type)
   payload?: Record<string, unknown> | string | number | boolean;
@@ -58,7 +63,7 @@ export function serializeMessage(msg: ToolDataChannelMessage): string {
   try {
     return JSON.stringify(msg);
   } catch (error) {
-    const err = error instanceof Error ? error.message : 'Unknown error';
+    const err = error instanceof Error ? error.message : "Unknown error";
     throw new Error(`Failed to serialize tool message: ${err}`);
   }
 }
@@ -70,7 +75,9 @@ export function serializeMessage(msg: ToolDataChannelMessage): string {
  * @param data - JSON string to deserialize
  * @returns Parsed message or null if invalid
  */
-export function deserializeMessage(data: string): ToolDataChannelMessage | null {
+export function deserializeMessage(
+  data: string,
+): ToolDataChannelMessage | null {
   try {
     const parsed = JSON.parse(data);
 
@@ -79,7 +86,7 @@ export function deserializeMessage(data: string): ToolDataChannelMessage | null 
       !parsed.type ||
       !Object.values(ToolEventType).includes(parsed.type) ||
       !parsed.toolId ||
-      typeof parsed.timestamp !== 'number'
+      typeof parsed.timestamp !== "number"
     ) {
       return null;
     }
@@ -108,10 +115,18 @@ export function createToolMessage(
   type: ToolEventType,
   toolId: string,
   payload?: Record<string, unknown> | string | number | boolean,
+  meta?: {
+    toolType?: string;
+    sessionId?: string;
+    maestroId?: string;
+  },
 ): ToolDataChannelMessage {
   return {
     type,
     toolId,
+    toolType: meta?.toolType,
+    sessionId: meta?.sessionId,
+    maestroId: meta?.maestroId,
     payload,
     timestamp: Date.now(),
   };

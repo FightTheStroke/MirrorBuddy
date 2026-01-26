@@ -9,6 +9,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Trial Email Verification (Issue #70)
+
+- **Trial verification flow**: Email capture + verification code to unlock trial tools
+- **New endpoints**: `POST /api/trial/verify`, updated `PATCH /api/trial/email`
+- **UI**: `/trial/verify` page for entering verification code
+- **Rate limiting**: COPPA-tier rate limits on verification flow
+- **Prisma**: Trial session fields for verification code, sent/expires timestamps, and verified-at
+
+#### Tool Stream & Security Hardening
+
+- **Tool stream SSE**: Standardized on `/api/tools/stream` for real-time updates
+- **Modify endpoint**: Added summary/student-summary commands with validation
+- **Authorization**: Trial ownership checks + auth gating on tool modifications
+- **Rate limiting**: General limits on tool creation and modifications
+- **Event payloads**: Align SSE payloads with `/api/tools/events` contract
+
 #### Secrets Scan (Pre-commit Security)
 
 - **scripts/secrets-scan.sh**: Detects sensitive data before commit

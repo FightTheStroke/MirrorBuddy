@@ -9,16 +9,6 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { PATCH } from "../route";
 
-// Mock dependencies
-vi.mock("@/lib/db", () => ({
-  prisma: {
-    trialSession: {
-      findUnique: vi.fn(),
-      update: vi.fn(),
-    },
-  },
-}));
-
 vi.mock("@/lib/logger", () => ({
   logger: {
     child: vi.fn(() => ({
@@ -26,6 +16,18 @@ vi.mock("@/lib/logger", () => ({
       error: vi.fn(),
     })),
   },
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true }),
+  getClientIdentifier: vi.fn().mockReturnValue("test-ip"),
+  rateLimitResponse: vi.fn(),
+  RATE_LIMITS: { CONTACT_FORM: { maxRequests: 5, windowMs: 3600000 } },
+}));
+
+vi.mock("@/lib/trial/trial-service", () => ({
+  updateTrialEmail: vi.fn(),
+  requestTrialEmailVerification: vi.fn(),
 }));
 
 vi.mock("next/headers", () => ({
@@ -46,7 +48,10 @@ vi.mock("next/headers", () => ({
   })),
 }));
 
-import { prisma } from "@/lib/db";
+import {
+  requestTrialEmailVerification,
+  updateTrialEmail,
+} from "@/lib/trial/trial-service";
 
 describe("PATCH /api/trial/email", () => {
   beforeEach(() => {
@@ -60,19 +65,18 @@ describe("PATCH /api/trial/email", () => {
       emailCollectedAt: null,
     };
 
-    vi.mocked(prisma.trialSession.findUnique).mockResolvedValue(
-      mockSession as any,
-    );
-
     const updatedSession = {
       ...mockSession,
       email: "user@example.com",
       emailCollectedAt: new Date(),
     };
 
-    vi.mocked(prisma.trialSession.update).mockResolvedValue(
-      updatedSession as any,
-    );
+    vi.mocked(updateTrialEmail).mockResolvedValue(updatedSession as any);
+    vi.mocked(requestTrialEmailVerification).mockResolvedValue({
+      session: updatedSession,
+      emailSent: true,
+      expiresAt: new Date(),
+    } as any);
 
     const request = new NextRequest("http://localhost:3000/api/trial/email", {
       method: "PATCH",
@@ -88,13 +92,11 @@ describe("PATCH /api/trial/email", () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.email).toBe("user@example.com");
-    expect(prisma.trialSession.update).toHaveBeenCalledWith({
-      where: { id: "session-123" },
-      data: {
-        email: "user@example.com",
-        emailCollectedAt: expect.any(Date),
-      },
-    });
+    expect(updateTrialEmail).toHaveBeenCalledWith(
+      "session-123",
+      "user@example.com",
+    );
+    expect(requestTrialEmailVerification).toHaveBeenCalledWith("session-123");
   });
 
   it("validates email format", async () => {
@@ -129,7 +131,9 @@ describe("PATCH /api/trial/email", () => {
   });
 
   it("returns 404 if session not found", async () => {
-    vi.mocked(prisma.trialSession.findUnique).mockResolvedValue(null);
+    vi.mocked(updateTrialEmail).mockRejectedValue(
+      new Error("Session not found"),
+    );
 
     const request = new NextRequest("http://localhost:3000/api/trial/email", {
       method: "PATCH",
@@ -153,19 +157,18 @@ describe("PATCH /api/trial/email", () => {
       emailCollectedAt: new Date("2024-01-01"),
     };
 
-    vi.mocked(prisma.trialSession.findUnique).mockResolvedValue(
-      mockSession as any,
-    );
-
     const updatedSession = {
       ...mockSession,
       email: "new@example.com",
       emailCollectedAt: new Date(),
     };
 
-    vi.mocked(prisma.trialSession.update).mockResolvedValue(
-      updatedSession as any,
-    );
+    vi.mocked(updateTrialEmail).mockResolvedValue(updatedSession as any);
+    vi.mocked(requestTrialEmailVerification).mockResolvedValue({
+      session: updatedSession,
+      emailSent: true,
+      expiresAt: new Date(),
+    } as any);
 
     const request = new NextRequest("http://localhost:3000/api/trial/email", {
       method: "PATCH",
@@ -181,5 +184,10 @@ describe("PATCH /api/trial/email", () => {
     expect(response.status).toBe(200);
     expect(data.success).toBe(true);
     expect(data.email).toBe("new@example.com");
+    expect(updateTrialEmail).toHaveBeenCalledWith(
+      "session-123",
+      "new@example.com",
+    );
+    expect(requestTrialEmailVerification).toHaveBeenCalledWith("session-123");
   });
 });

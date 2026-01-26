@@ -265,6 +265,20 @@ export async function POST(request: NextRequest) {
         if (trialSessionId && !userId) {
           const toolLimitCheck = await checkTrialToolLimit(trialSessionId);
           if (!toolLimitCheck.allowed) {
+            if (toolLimitCheck.reason === "Trial email verification required") {
+              const response = NextResponse.json(
+                {
+                  error: "Email verification required",
+                  code: "TRIAL_EMAIL_VERIFICATION_REQUIRED",
+                  message:
+                    "Verifica la tua email per continuare a usare gli strumenti della prova.",
+                  sessionId: trialSessionId,
+                },
+                { status: 403 },
+              );
+              response.headers.set("X-Request-ID", getRequestId(request));
+              return response;
+            }
             const response = NextResponse.json(
               {
                 error: "Trial tool limit reached",

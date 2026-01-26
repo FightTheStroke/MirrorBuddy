@@ -16,6 +16,10 @@ model TrialSession {
   abuseScore       Int       @default(0)
   email            String? // Optional email for nurturing (F-01)
   emailCollectedAt DateTime? // When email was provided
+  emailVerificationCode String? // One-time verification code
+  emailVerificationSentAt DateTime?
+  emailVerificationExpiresAt DateTime?
+  emailVerifiedAt DateTime? // Email verified timestamp
   createdAt        DateTime  @default(now())
   lastActivityAt   DateTime  @updatedAt
 
@@ -23,4 +27,5 @@ model TrialSession {
   @@index([ipHash])
   @@index([visitorId])
   @@index([email]) // Index for email lookups (F-01)
+  @@index([emailVerificationCode])
 }

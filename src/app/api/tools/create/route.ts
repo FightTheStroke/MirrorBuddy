@@ -19,6 +19,12 @@ import {
 } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
+import {
+  checkRateLimitAsync,
+  getRateLimitIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
 
 // Valid tool types
 const VALID_TOOL_TYPES: ToolType[] = [
@@ -62,6 +68,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const rateLimitIdentifier = getRateLimitIdentifier(request, auth.userId);
+    const rateLimitResult = await checkRateLimitAsync(
+      `tools:create:${rateLimitIdentifier}`,
+      RATE_LIMITS.GENERAL,
+    );
+    if (!rateLimitResult.success) {
+      logger.warn("Tool create rate limited", {
+        identifier: rateLimitIdentifier,
+      });
+      return rateLimitResponse(rateLimitResult);
+    }
+
     // COPPA compliance check - under-13 users require parental consent
     const canAccess = await canAccessFullFeatures(auth.userId);
     if (!canAccess) {
@@ -69,7 +87,8 @@ export async function POST(request: NextRequest) {
         {
           error: "Parental consent required",
           code: "COPPA_CONSENT_REQUIRED",
-          message: "Users under 13 require parental consent to create learning materials.",
+          message:
+            "Users under 13 require parental consent to create learning materials.",
         },
         { status: 403 },
       );

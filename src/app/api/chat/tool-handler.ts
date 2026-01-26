@@ -50,6 +50,7 @@ async function processSingleToolCall(
       maestroId: context.maestroId,
       conversationId: context.conversationId,
       userId: context.userId,
+      sessionId: context.conversationId,
     });
 
     let materialId: string | undefined;
