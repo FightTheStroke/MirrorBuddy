@@ -84,7 +84,7 @@ Retrieval-Augmented Generation using Azure OpenAI embeddings (text-embedding-3-s
 
 ### ADR 0047 - Grafana Cloud Observability
 
-Prometheus push metrics to Grafana Cloud (60s interval). Dashboard at https://mirrorbuddy.grafana.net/d/dashboard/
+Prometheus push metrics to Grafana Cloud (5 min interval). Dashboard at https://mirrorbuddy.grafana.net/d/dashboard/
 
 **Metrics:** Session health, safety incidents, latency P50/P95/P99, business metrics (DAU/WAU/MAU)
 

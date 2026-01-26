@@ -1,6 +1,6 @@
 # ADR-0056: Trial Mode Architecture
 
-**Status**: Accepted
+**Status**: Superseded by Plan 088 implementation
 **Date**: 18 January 2026
 **Author**: ISE Team
 
@@ -76,3 +76,35 @@ We implement trial mode with the following architecture:
 - Allow manual appeal via support (verify email domain)
 - Dashboard shows remaining budget; notify at 70%, 90% thresholds
 - Score transparency enables user understanding of blocks
+
+## Implementation Notes (Plan 088)
+
+This ADR was superseded by Plan 088, which implemented trial mode with the following refinements to the original design:
+
+### Key Implementation Details
+
+**IP Hashing & Session Tracking**:
+
+- IP hashing now uses salted hash with `IP_HASH_SALT` environment variable
+- Visitor session tracking uses httpOnly cookie (not localStorage) for enhanced security
+- Cookie is never transmitted to client-side JavaScript, preventing tampering
+
+**GDPR Compliance Gate**:
+
+- GDPR consent gate is required before trial session creation
+- Ensures compliance with data protection regulations before any trial data is stored
+- Users must explicitly accept terms before accessing trial features
+
+**Anti-Abuse Scoring**:
+
+- Scoring threshold adjusted to 10 points (not 15) for stricter abuse prevention
+- Provides better protection against sophisticated multi-account attacks
+- Transparent scoring maintains user understanding of blocks
+
+**Data Retention & Cleanup**:
+
+- Trial session data retained for 30 days
+- Automated cleanup process removes expired trial data from database
+- Ensures compliance with privacy policy and reduces storage costs
+
+**Historical Note**: Original design stored IP hash + visitor cookie in localStorage. Plan 088 implementation moved to httpOnly cookie storage for better security posture while maintaining all anti-abuse detection capabilities.
