@@ -95,7 +95,7 @@ export function HomeHeader({
               {mbInLevel}/{mbNeeded} MB
             </span>
           </div>
-          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-full xs:w-28 sm:w-36 md:w-40">
+          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-24 sm:w-36 md:w-40">
             <motion.div
               className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
               initial={{ width: 0 }}

@@ -18,3 +18,22 @@ if git diff --cached --name-only | grep -qE "(proxy\.ts|providers\.tsx|csp)" ; t
   fi
   echo "✅ CSP validation passed"
 fi
+
+# Mobile regression pattern check (F-09)
+# Detects w-full sm:w-* patterns without max-w constraint
+if git diff --cached --name-only | grep -qE "\.tsx$" ; then
+  MOBILE_ISSUES=$(git diff --cached --name-only -- "*.tsx" | xargs grep -l "w-full sm:w-\|w-full md:w-\|w-full lg:w-" 2>/dev/null | xargs grep -L "max-w-" 2>/dev/null || true)
+  if [ -n "$MOBILE_ISSUES" ]; then
+    echo "❌ Mobile regression pattern detected!"
+    echo ""
+    echo "Files with 'w-full sm:w-*' without 'max-w-*' constraint:"
+    echo "$MOBILE_ISSUES"
+    echo ""
+    echo "FIX: Use one of these patterns instead:"
+    echo "  • w-28 sm:w-72              (fixed width on mobile)"
+    echo "  • w-full max-w-xs sm:w-72   (constrained full width)"
+    echo "  • w-[min(7rem,85vw)] sm:w-72 (CSS min function)"
+    echo ""
+    exit 1
+  fi
+fi
