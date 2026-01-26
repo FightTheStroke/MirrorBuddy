@@ -47,11 +47,12 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     // - Onboarding completed
     // - Consent accepted
     // The test user is created by global-setup with a valid signed cookie
+    // NOTE: Home page is at "/" (root), not "/home"
 
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
 
-    await page.goto("/home");
+    await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Should not redirect to login (auth from storage state should work)
@@ -134,12 +135,12 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     const response = await page.request.post("/api/auth/logout");
     expect(response.status()).toBe(200);
 
-    // Navigate to protected page after logout
-    await page.goto("/home");
+    // Navigate to protected page after logout (home is at "/")
+    await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Should be redirected away from home (to login or welcome)
-    // OR stay on home but show trial/unauthenticated state
+    // OR stay on "/" but show trial/unauthenticated state
     const currentUrl = page.url();
     const redirectedAway =
       currentUrl.includes("/login") || currentUrl.includes("/welcome");
