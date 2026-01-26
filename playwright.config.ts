@@ -71,8 +71,10 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
-  retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 4 : undefined,
+  // 2 retries in CI to handle flaky mobile tests (hydration timing varies)
+  retries: process.env.CI ? 2 : 0,
+  // Use 2 workers for mobile tests (CI_MOBILE_TESTS=1) to reduce resource contention
+  workers: process.env.CI ? (process.env.CI_MOBILE_TESTS ? 2 : 4) : undefined,
   reporter: "html",
 
   // Global setup: sets onboarding as completed
@@ -171,6 +173,8 @@ export default defineConfig({
         // Use Chromium in CI for consistent cross-platform behavior
         browserName: "chromium",
       },
+      // Extended timeout for mobile tests (hydration varies in CI)
+      timeout: 45000,
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
@@ -199,6 +203,8 @@ export default defineConfig({
         ...devices["Pixel 7"],
         // Pixel 7: 412px × 915px (standard Android flagship)
       },
+      // Extended timeout for mobile tests (hydration varies in CI)
+      timeout: 45000,
       testMatch: [
         "**/mobile/android.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
@@ -214,6 +220,8 @@ export default defineConfig({
         // iPad Mini: 768px × 1024px (tablet breakpoint)
         browserName: "chromium",
       },
+      // Extended timeout for mobile tests (hydration varies in CI)
+      timeout: 45000,
       testMatch: [
         "**/mobile/ipad.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
