@@ -30,7 +30,7 @@ export function QuickStart({
     <motion.section
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
+      transition={{ duration: 0.3 }}
       className="w-full max-w-4xl mx-auto px-4 mt-8"
       aria-labelledby="quickstart-heading"
     >
@@ -66,7 +66,7 @@ export function QuickStart({
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="flex flex-col p-8 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-2xl border-2 border-purple-200 dark:border-purple-800/50 shadow-lg"
           >
             <div className="flex flex-col items-center text-center mb-6">
@@ -128,7 +128,7 @@ export function QuickStart({
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.6 }}
+            transition={{ duration: 0.3 }}
             className="flex flex-col p-8 bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 rounded-2xl border-2 border-pink-200 dark:border-pink-800/50 shadow-lg"
           >
             <div className="flex flex-col items-center text-center mb-6">

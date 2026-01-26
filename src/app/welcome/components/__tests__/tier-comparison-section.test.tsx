@@ -179,7 +179,7 @@ describe("TierComparisonSection", () => {
       });
     });
 
-    it("highlights Enterprise tier", async () => {
+    it("highlights Scuole tier", async () => {
       render(<TierComparisonSection />);
 
       const organizationsTab = screen.getByRole("tab", {
@@ -188,9 +188,8 @@ describe("TierComparisonSection", () => {
       fireEvent.click(organizationsTab);
 
       await waitFor(() => {
-        // Verify Enterprise badge is present (which indicates highlight)
-        const enterpriseElements = screen.getAllByText("Enterprise");
-        expect(enterpriseElements.length).toBe(2); // Badge + Heading
+        // Verify Scuole badge is present (which indicates highlight)
+        expect(screen.getByText("Per le Scuole")).toBeInTheDocument();
       });
     });
   });

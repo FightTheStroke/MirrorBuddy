@@ -8,6 +8,8 @@ export const b2bTierCards: TierCard[] = [
     name: "Scuole",
     tagline: "Per istituti scolastici",
     price: "Personalizzato",
+    badge: "Per le Scuole",
+    highlight: true,
     features: [
       {
         icon: <BookOpen className="w-4 h-4" />,
@@ -35,8 +37,6 @@ export const b2bTierCards: TierCard[] = [
     name: "Enterprise",
     tagline: "Per aziende e organizzazioni",
     price: "Personalizzato",
-    badge: "Enterprise",
-    highlight: true,
     features: [
       {
         icon: <Users className="w-4 h-4" />,

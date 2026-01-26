@@ -54,7 +54,8 @@ export const tierCards: TierCard[] = [
     name: "Base",
     tagline: "Per studenti registrati",
     price: "Gratis",
-    badge: undefined,
+    badge: "Consigliato",
+    highlight: true,
     features: [
       {
         icon: <Users className="w-4 h-4" />,
@@ -83,8 +84,6 @@ export const tierCards: TierCard[] = [
     name: "Pro",
     tagline: "Esperienza completa",
     price: "A richiesta",
-    badge: "Consigliato",
-    highlight: true,
     features: [
       {
         icon: <Users className="w-4 h-4" />,

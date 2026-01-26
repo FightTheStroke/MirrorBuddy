@@ -79,8 +79,12 @@ describe("b2b-tier-data", () => {
       expect(schoolCard.cta.href).toBe("/contact/schools");
     });
 
-    it("does not have highlight flag", () => {
-      expect(schoolCard.highlight).not.toBe(true);
+    it("has highlight flag", () => {
+      expect(schoolCard.highlight).toBe(true);
+    });
+
+    it("has 'Per le Scuole' badge", () => {
+      expect(schoolCard.badge).toBe("Per le Scuole");
     });
   });
 
@@ -107,12 +111,12 @@ describe("b2b-tier-data", () => {
       expect(enterpriseCard.price).toBe("Personalizzato");
     });
 
-    it("has Enterprise badge", () => {
-      expect(enterpriseCard.badge).toBe("Enterprise");
+    it("does not have badge", () => {
+      expect(enterpriseCard.badge).toBeUndefined();
     });
 
-    it("is highlighted", () => {
-      expect(enterpriseCard.highlight).toBe(true);
+    it("is not highlighted", () => {
+      expect(enterpriseCard.highlight).not.toBe(true);
     });
 
     it("has 4 features", () => {
