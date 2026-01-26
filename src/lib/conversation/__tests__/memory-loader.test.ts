@@ -4,7 +4,11 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { loadPreviousContext, formatRelativeDate } from "../memory-loader";
+import {
+  loadPreviousContext,
+  loadEnhancedContext,
+  formatRelativeDate,
+} from "../memory-loader";
 
 // Mock prisma
 vi.mock("@/lib/db", () => ({
@@ -30,8 +34,14 @@ vi.mock("../tier-memory-config", () => ({
   getTierMemoryLimits: vi.fn(),
 }));
 
+// Mock semantic-memory
+vi.mock("../semantic-memory", () => ({
+  searchRelevantSummaries: vi.fn(),
+}));
+
 import { prisma } from "@/lib/db";
 import { getTierMemoryLimits } from "../tier-memory-config";
+import { searchRelevantSummaries } from "../semantic-memory";
 
 // Helper to create mock conversation with all required fields
 function createMockConversation(overrides: {
@@ -326,6 +336,229 @@ describe("memory-loader", () => {
     });
   });
 
+  describe("loadEnhancedContext", () => {
+    beforeEach(() => {
+      // Reset semantic search mock
+      vi.mocked(searchRelevantSummaries).mockResolvedValue([]);
+    });
+
+    it("returns semantic memories for Pro users when query provided", async () => {
+      // Mock Pro tier config
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      // Mock conversation data
+      const mockConversation = createMockConversation({
+        summary: "Discussed fractions",
+        keyFacts: '["prefers visual examples"]',
+        topics: '["mathematics"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      // Mock semantic search results
+      const mockSemanticResults = [
+        {
+          conversationId: "conv-123",
+          content: "Previous discussion about fractions and ratios",
+          relevanceScore: 0.85,
+          date: new Date("2026-01-10"),
+          subject: "Mathematics",
+          tags: ["fractions", "ratios"],
+        },
+        {
+          conversationId: "conv-456",
+          content: "Worked on fraction problems together",
+          relevanceScore: 0.72,
+          date: new Date("2026-01-05"),
+          subject: "Mathematics",
+          tags: ["fractions"],
+        },
+      ];
+      vi.mocked(searchRelevantSummaries).mockResolvedValue(mockSemanticResults);
+
+      const query = "What did we learn about fractions?";
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "pro",
+        query,
+      );
+
+      // Should call semantic search with correct parameters
+      expect(searchRelevantSummaries).toHaveBeenCalledWith(
+        "user-1",
+        query,
+        "pro",
+        10,
+      );
+
+      // Should include semantic memories in result
+      expect(result.semanticMemories).toBeDefined();
+      expect(result.semanticMemories).toHaveLength(2);
+      expect(result.semanticMemories?.[0].conversationId).toBe("conv-123");
+      expect(result.semanticMemories?.[0].relevanceScore).toBe(0.85);
+
+      // Should still include regular memory fields
+      expect(result.recentSummary).toBe("Discussed fractions");
+      expect(result.keyFacts).toContain("prefers visual examples");
+    });
+
+    it("skips semantic search for Base tier users", async () => {
+      // Mock Base tier config (semanticEnabled: false)
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 3,
+        timeWindowDays: 15,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      const mockConversation = createMockConversation({
+        summary: "Regular session",
+        keyFacts: '["fact1"]',
+        topics: '["topic1"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      const query = "What did we discuss?";
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "base",
+        query,
+      );
+
+      // Should NOT call semantic search for base tier
+      expect(searchRelevantSummaries).not.toHaveBeenCalled();
+
+      // Should still return regular memory
+      expect(result.recentSummary).toBe("Regular session");
+      expect(result.keyFacts).toContain("fact1");
+
+      // semanticMemories should be undefined (not included)
+      expect(result.semanticMemories).toBeUndefined();
+    });
+
+    it("skips semantic search for Trial tier users", async () => {
+      // Mock Trial tier config
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 0,
+        timeWindowDays: 0,
+        maxKeyFacts: 0,
+        maxTopics: 0,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      const query = "Some query";
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "trial",
+        query,
+      );
+
+      // Should NOT call semantic search for trial tier
+      expect(searchRelevantSummaries).not.toHaveBeenCalled();
+
+      // Should return empty memory
+      expect(result.recentSummary).toBeNull();
+      expect(result.semanticMemories).toBeUndefined();
+    });
+
+    it("skips semantic search when no query provided", async () => {
+      // Mock Pro tier config
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      const mockConversation = createMockConversation({
+        summary: "Session",
+        keyFacts: "[]",
+        topics: "[]",
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      // Call without query
+      const result = await loadEnhancedContext("user-1", "melissa", "pro");
+
+      // Should NOT call semantic search without query
+      expect(searchRelevantSummaries).not.toHaveBeenCalled();
+
+      // Should still return regular memory
+      expect(result.recentSummary).toBe("Session");
+      expect(result.semanticMemories).toBeUndefined();
+    });
+
+    it("handles empty semantic search results gracefully", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      const mockConversation = createMockConversation({
+        summary: "Session",
+        keyFacts: "[]",
+        topics: "[]",
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      // Mock empty semantic results
+      vi.mocked(searchRelevantSummaries).mockResolvedValue([]);
+
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "pro",
+        "query",
+      );
+
+      // Should include empty array for semantic memories
+      expect(result.semanticMemories).toEqual([]);
+    });
+
+    it("defaults to base tier when tierName not provided", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 3,
+        timeWindowDays: 15,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
+
+      await loadEnhancedContext("user-1", "melissa");
+
+      expect(getTierMemoryLimits).toHaveBeenCalledWith("base");
+    });
+  });
+
   describe("formatRelativeDate", () => {
     it('returns "data sconosciuta" for null date', () => {
       expect(formatRelativeDate(null)).toBe("data sconosciuta");
@@ -370,6 +603,298 @@ describe("memory-loader", () => {
       const threeMonthsAgo = new Date();
       threeMonthsAgo.setDate(threeMonthsAgo.getDate() - 90);
       expect(formatRelativeDate(threeMonthsAgo)).toBe("3 mesi fa");
+    });
+
+    it('returns "la settimana scorsa" for exactly 7 days ago', () => {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      expect(formatRelativeDate(sevenDaysAgo)).toBe("la settimana scorsa");
+    });
+
+    it("returns weeks for exactly 14 days ago", () => {
+      const fourteenDaysAgo = new Date();
+      fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
+      expect(formatRelativeDate(fourteenDaysAgo)).toBe("2 settimane fa");
+    });
+
+    it('returns "il mese scorso" for exactly 30 days ago', () => {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      expect(formatRelativeDate(thirtyDaysAgo)).toBe("il mese scorso");
+    });
+
+    it("returns months for exactly 60 days ago", () => {
+      const sixtyDaysAgo = new Date();
+      sixtyDaysAgo.setDate(sixtyDaysAgo.getDate() - 60);
+      expect(formatRelativeDate(sixtyDaysAgo)).toBe("2 mesi fa");
+    });
+  });
+
+  describe("loadPreviousContext - Error Handling", () => {
+    it("handles database error gracefully and returns empty memory", async () => {
+      vi.mocked(prisma.conversation.findMany).mockRejectedValue(
+        new Error("Database connection failed"),
+      );
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result).toEqual({
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      });
+    });
+
+    it("handles null summary in conversation data", async () => {
+      const conversation = createMockConversation({
+        summary: null,
+        keyFacts: '["fact1", "fact2"]',
+        topics: '["topic1"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([conversation]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.recentSummary).toBeNull();
+      expect(result.keyFacts).toContain("fact1");
+      expect(result.topics).toContain("topic1");
+    });
+
+    it("handles empty string summary (different from null)", async () => {
+      const conversation = createMockConversation({
+        summary: "",
+        keyFacts: '["fact1"]',
+        topics: '["topic1"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([conversation]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.recentSummary).toBe("");
+      expect(result.keyFacts).toContain("fact1");
+    });
+
+    it("handles topic JSON with non-array JSON gracefully", async () => {
+      const conversation = createMockConversation({
+        summary: "Session",
+        keyFacts: "[]",
+        topics: '{"invalid": "object"}', // Not an array
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([conversation]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.topics).toEqual([]); // Should gracefully handle non-array JSON
+    });
+
+    it("handles null keyFacts (different from invalid JSON)", async () => {
+      const conversation = createMockConversation({
+        summary: "Session",
+        keyFacts: null,
+        topics: '["topic1"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([conversation]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.keyFacts).toEqual([]);
+      expect(result.topics).toContain("topic1");
+    });
+
+    it("handles topic JSON parsing with empty strings in array", async () => {
+      const conversation = createMockConversation({
+        summary: "Session",
+        keyFacts: "[]",
+        topics: '["", "  ", "valid_topic", null]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([conversation]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      // Only "valid_topic" should be included (empty strings and null filtered)
+      expect(result.topics).toEqual(["valid_topic"]);
+    });
+
+    it("merges key facts with duplicate detection", async () => {
+      const conversations = [
+        createMockConversation({
+          summary: "Session 1",
+          keyFacts: '["duplicate", "unique1"]',
+          topics: "[]",
+        }),
+        createMockConversation({
+          summary: "Session 2",
+          keyFacts: '["duplicate", "unique2"]',
+          topics: "[]",
+        }),
+      ];
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.keyFacts).toHaveLength(3); // duplicate, unique1, unique2
+      expect(result.keyFacts).toEqual(
+        expect.arrayContaining(["duplicate", "unique1", "unique2"]),
+      );
+    });
+
+    it("merges topics with duplicate detection", async () => {
+      const conversations = [
+        createMockConversation({
+          summary: "Session 1",
+          keyFacts: "[]",
+          topics: '["duplicate", "unique1"]',
+        }),
+        createMockConversation({
+          summary: "Session 2",
+          keyFacts: "[]",
+          topics: '["duplicate", "unique2"]',
+        }),
+      ];
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
+
+      const result = await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(result.topics).toHaveLength(3); // duplicate, unique1, unique2
+      expect(result.topics).toEqual(
+        expect.arrayContaining(["duplicate", "unique1", "unique2"]),
+      );
+    });
+
+    it("respects both recentConversations and timeWindowDays together", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 2,
+        timeWindowDays: 5,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
+
+      await loadPreviousContext("user-1", "melissa", "base");
+
+      const call = vi.mocked(prisma.conversation.findMany).mock.calls[0][0];
+      expect(call?.take).toBe(2);
+      expect((call?.where as Record<string, unknown>)?.updatedAt).toBeDefined();
+    });
+  });
+
+  describe("loadEnhancedContext - Error Handling", () => {
+    it("handles database error and falls back to empty memory", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      vi.mocked(prisma.conversation.findMany).mockRejectedValue(
+        new Error("Database error"),
+      );
+
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "pro",
+        "query",
+      );
+
+      // When database fails, loadPreviousContext handles it gracefully
+      // loadEnhancedContext continues and calls searchRelevantSummaries
+      expect(result).toMatchObject({
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      });
+      // semanticMemories will be present if semantic search was attempted
+      expect(result.semanticMemories).toBeDefined();
+    });
+
+    it("handles semantic search error and returns base memory only", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      const mockConversation = createMockConversation({
+        summary: "Session",
+        keyFacts: '["fact1"]',
+        topics: '["topic1"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      vi.mocked(searchRelevantSummaries).mockRejectedValue(
+        new Error("Semantic search failed"),
+      );
+
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "pro",
+        "query",
+      );
+
+      // Should return base memory without semantic results
+      expect(result.recentSummary).toBe("Session");
+      expect(result.keyFacts).toContain("fact1");
+      expect(result.semanticMemories).toBeUndefined();
+    });
+
+    it("combines base memory structure correctly with semantic results", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      const mockConversation = createMockConversation({
+        summary: "Base session",
+        keyFacts: '["base_fact"]',
+        topics: '["base_topic"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      const semanticResults = [
+        {
+          conversationId: "sem-conv-1",
+          content: "Semantic content",
+          relevanceScore: 0.9,
+          date: new Date(),
+          subject: "math",
+          tags: ["semantic"],
+        },
+      ];
+      vi.mocked(searchRelevantSummaries).mockResolvedValue(semanticResults);
+
+      const result = await loadEnhancedContext(
+        "user-1",
+        "melissa",
+        "pro",
+        "query",
+      );
+
+      // Should have both base memory and semantic results
+      expect(result.recentSummary).toBe("Base session");
+      expect(result.keyFacts).toContain("base_fact");
+      expect(result.topics).toContain("base_topic");
+      expect(result.semanticMemories).toEqual(semanticResults);
     });
   });
 });

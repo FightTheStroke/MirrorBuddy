@@ -13,6 +13,10 @@
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getTierMemoryLimits } from "./tier-memory-config";
+import {
+  searchRelevantSummaries,
+  type RelevantSummary,
+} from "./semantic-memory";
 import type { TierName } from "@/types/tier-types";
 
 export interface ConversationMemory {
@@ -20,6 +24,7 @@ export interface ConversationMemory {
   keyFacts: string[];
   topics: string[];
   lastSessionDate: Date | null;
+  semanticMemories?: RelevantSummary[];
 }
 
 /**
@@ -129,6 +134,71 @@ export async function loadPreviousContext(
       topics: [],
       lastSessionDate: null,
     };
+  }
+}
+
+/**
+ * Load enhanced conversation context with semantic memory for Pro tier users.
+ * Extends loadPreviousContext by adding semantic search results when available.
+ *
+ * @param userId User identifier
+ * @param maestroId Maestro identifier
+ * @param tierName Subscription tier (defaults to 'base')
+ * @param query Optional search query for semantic search (Pro tier only)
+ * @returns Merged conversation memory context with optional semantic memories
+ */
+export async function loadEnhancedContext(
+  userId: string,
+  maestroId: string,
+  tierName: TierName = "base",
+  query?: string,
+): Promise<ConversationMemory> {
+  try {
+    // Load standard conversation memory first
+    const baseMemory = await loadPreviousContext(userId, maestroId, tierName);
+
+    // Check if semantic search should be performed
+    const limits = getTierMemoryLimits(tierName);
+    const shouldSearchSemantic =
+      limits.semanticEnabled && query && query.trim().length > 0;
+
+    if (!shouldSearchSemantic) {
+      return baseMemory;
+    }
+
+    // Perform semantic search for Pro tier users with query
+    logger.debug("Performing semantic search for enhanced context", {
+      userId,
+      maestroId,
+      tierName,
+      queryLength: query.length,
+    });
+
+    const semanticResults = await searchRelevantSummaries(
+      userId,
+      query,
+      tierName,
+      10, // Default limit of 10 results
+    );
+
+    logger.info("Enhanced context loaded with semantic memories", {
+      userId,
+      maestroId,
+      semanticResultCount: semanticResults.length,
+    });
+
+    return {
+      ...baseMemory,
+      semanticMemories: semanticResults,
+    };
+  } catch (error) {
+    logger.error(
+      "Failed to load enhanced context, falling back to base memory",
+      { userId, maestroId, tierName },
+      error,
+    );
+    // Graceful fallback to base memory without semantic results
+    return loadPreviousContext(userId, maestroId, tierName);
   }
 }
 
