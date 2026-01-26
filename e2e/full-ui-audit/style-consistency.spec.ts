@@ -224,8 +224,9 @@ test.describe("Style Consistency - Spacing", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
     // Wait for hydration - either landing page or main app
+    // "Professori" is an h1 heading in the main app, "Prova gratis" is a button on landing page
     await page.waitForSelector(
-      'button:has-text("Professori"), button:has-text("Prova gratis")',
+      'h1:has-text("Professori"), button:has-text("Prova gratis")',
       { timeout: 15000 },
     );
 
@@ -336,8 +337,9 @@ test.describe("Style Consistency - Responsive", () => {
       await page.goto("/");
       await page.waitForLoadState("networkidle");
       // Wait for hydration - either landing page or main app
+      // "Professori" is an h1 heading in the main app, "Prova gratis" is a button on landing page
       await page.waitForSelector(
-        'button:has-text("Professori"), button:has-text("Prova gratis")',
+        'h1:has-text("Professori"), button:has-text("Prova gratis")',
         { timeout: 15000 },
       );
 

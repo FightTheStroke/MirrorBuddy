@@ -157,8 +157,8 @@ test.describe("Smoke Test", () => {
     await page.waitForLoadState("networkidle");
 
     // Wait for hydration to complete - loading screen shows "Caricamento..."
-    // After hydration, navigation buttons appear
-    await page.waitForSelector('button:has-text("Professori")', {
+    // After hydration, the main heading "Professori" appears (it's an h1, not a button)
+    await page.waitForSelector('h1:has-text("Professori"), main h1', {
       timeout: 15000,
     });
 

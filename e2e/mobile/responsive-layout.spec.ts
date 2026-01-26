@@ -12,8 +12,8 @@ test.describe("Mobile Responsive Layout", () => {
     // Navigate and wait for DOM to be ready (networkidle doesn't work with HMR)
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
-    // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
-    await page.waitForSelector('button:has-text("Professori")', {
+    // After hydration, the main heading "Professori" appears (it's an h1, not a button)
+    await page.waitForSelector('h1:has-text("Professori"), main h1', {
       timeout: 20000,
     });
   });
