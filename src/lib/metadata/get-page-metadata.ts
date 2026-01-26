@@ -6,6 +6,7 @@
  */
 
 import type { Locale } from "@/i18n";
+import { logger } from "@/lib/logger";
 
 interface PageMetadata {
   title: string;
@@ -51,9 +52,13 @@ export async function getPageMetadata(
     return pageMetadata;
   } catch (error) {
     // Fallback to default metadata on any error
-    console.warn(
-      `Failed to load metadata for locale ${locale}, page ${pageKey}:`,
-      error,
+    logger.warn(
+      `Failed to load metadata for locale ${locale}, page ${pageKey}`,
+      {
+        locale,
+        pageKey,
+        error: String(error),
+      },
     );
     return getDefaultMetadata(pageKey);
   }

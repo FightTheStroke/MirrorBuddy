@@ -5,6 +5,7 @@
 
 import { defaultLocale, locales } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
+import { clientLogger } from "@/lib/logger/client";
 
 const COOKIE_NAME = "NEXT_LOCALE";
 const COOKIE_MAX_AGE = 365 * 24 * 60 * 60; // 1 year in seconds
@@ -43,7 +44,12 @@ export function setLanguageCookie(locale: Locale): void {
 
   // Validate locale
   if (!locales.includes(locale)) {
-    console.warn(`Invalid locale: ${locale}, using default: ${defaultLocale}`);
+    clientLogger.warn(
+      `Invalid locale: ${locale}, using default: ${defaultLocale}`,
+      {
+        component: "language-cookie",
+      },
+    );
     locale = defaultLocale;
   }
 
