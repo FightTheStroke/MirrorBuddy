@@ -1529,6 +1529,138 @@
     },
     "contact": {
       "text": "Questions about AI in MirrorBuddy? Write to us: compliance@mirrorbuddy.it"
+    },
+    "sections": {
+      "section1": {
+        "title": "What AI Does in MirrorBuddy?",
+        "para1": "MirrorBuddy uses artificial intelligence (AI) to provide a personalized educational experience. The 22 AI Maestri (virtual tutors) are designed to teach, explain difficult concepts, create quizzes, mind maps, and flashcards.",
+        "para2": "Important: AI does NOT decide your grade, does NOT evaluate your disability, and does NOT replace your teachers. Teachers remain always the primary responsible for evaluation and pedagogical decisions."
+      },
+      "section2": {
+        "title": "The AI System",
+        "intro": "MirrorBuddy uses Azure OpenAI (GPT-4), a state-of-the-art language model developed by OpenAI and hosted in Microsoft's European data centers.",
+        "subtitle": "How It Works:",
+        "item1Title": "Text Processing",
+        "item1Desc": "When you write a question, the model analyzes the text and generates a response based on its training",
+        "item2Title": "Verified Knowledge",
+        "item2Desc": "The 22 Maestri have embedded knowledge bases - libraries of knowledge controlled and verified by experts - that limit what they can say",
+        "item3Title": "Human Feedback",
+        "item3Desc": "Each response can be reviewed by teachers and parents through the control dashboard"
+      },
+      "section3": {
+        "title": "The 22 AI Maestri",
+        "intro": "MirrorBuddy has 22 virtual tutors specialized in different subjects. Each Maestro has an authentic personality and verified knowledge in their field.",
+        "subtitle": "Categories of Maestri:",
+        "category1": "Science and Mathematics: Euclide (Geometry), Galileo (Astronomy), Feynman (Physics), Curie (Chemistry), Darwin (Biology)",
+        "category2": "Languages and Humanities: Manzoni (Italian), Shakespeare (English), Alex Pina (Spanish), Omero (Storytelling)",
+        "category3": "Society and Environment: Cicerone (Civic Education), Smith (Economics), Humboldt (Geography), Erodoto (History)",
+        "category4": "Art, Music, and Wellness: Leonardo (Art), Mozart (Music), Ippocrate (Health), Chris (Physical Education), Simone (Sport)",
+        "category5": "Specialist Disciplines: Lovelace (Computer Science), Socrate (Philosophy), Cassese (International Law)",
+        "outro": "Each Maestro has a unique voice (both text and audio), a personalized teaching style, and can access tools like quizzes, flashcards, mind maps, and PDFs to teach effectively.",
+        "category1Label": "Science and Mathematics",
+        "category2Label": "Languages and Humanities",
+        "category3Label": "Society and Environment",
+        "category4Label": "Art, Music, and Wellness",
+        "category5Label": "Specialist Disciplines"
+      },
+      "section4": {
+        "title": "Your Protections",
+        "subtitle": "5-Level Safety System:",
+        "protection1Title": "1. Constant Transparency",
+        "protection1Desc": "You'll always know when you're talking to AI. A banner reminds you in every chat.",
+        "protection2Title": "2. Human Supervision",
+        "protection2Desc": "Teachers and parents see all your chats and can intervene at any time",
+        "protection3Title": "3. Filtered Content",
+        "protection3Desc": "AI will never generate violent, explicit, or age-inappropriate content",
+        "protection4Title": "4. Usage Limits",
+        "protection4Desc": "You have a daily budget of AI interactions to prevent addiction and maintain focus",
+        "protection5Title": "5. Double Consent (for minors)",
+        "protection5Desc": "Both you and your parents must approve AI usage"
+      },
+      "section5": {
+        "title": "Your Rights",
+        "intro": "According to Italian law (Law 132/2025) and GDPR, you have the right to:",
+        "right1Title": "Know you're using AI",
+        "right1Desc": "Be informed whenever an automated system generates responses",
+        "right2Title": "Understand how it works",
+        "right2Desc": "Receive clear explanations on how the AI Maestro chooses to respond",
+        "right3Title": "Refuse AI",
+        "right3Desc": "You can choose to talk only with human teachers, without losing platform access",
+        "right4Title": "Access your data",
+        "right4Desc": "Request a copy of all chats, feedback, and data that AI processed about you",
+        "right5Title": "Correct or delete data",
+        "right5Desc": "If data is inaccurate, you can ask for it to be corrected or deleted",
+        "right6Title": "File complaints",
+        "right6Desc": "If you think AI doesn't respect your rights, you can report the issue"
+      },
+      "section6": {
+        "title": "How Your Data Is Protected",
+        "intro": "All data you share with Maestri is protected as required by GDPR (European privacy law):",
+        "protection1Title": "Encryption",
+        "protection1Desc": "Data is encrypted both in transit and when stored on servers",
+        "protection2Title": "Not Sold",
+        "protection2Desc": "Your data is NEVER sold to third parties or used for advertising",
+        "protection3Title": "Restricted Access",
+        "protection3Desc": "Only MirrorBuddy and Microsoft (which hosts the servers) can access data",
+        "protection4Title": "Limited Retention",
+        "protection4Desc": "Data is kept only as long as necessary for education",
+        "protection5Title": "Right to be Forgotten",
+        "protection5Desc": "You can request that all your data be deleted"
+      },
+      "section7": {
+        "title": "Risks and How We Manage Them",
+        "intro": "Like any AI, there are some risks. Here's how we address them:",
+        "tableHeader1": "Risk",
+        "tableHeader2": "How We Prevent It",
+        "risk1": "Inappropriate Content",
+        "mitigation1": "Automatic filters + human review",
+        "risk2": "Inaccurate Responses",
+        "mitigation2": "Verified knowledge bases, human fallback",
+        "risk3": "Bias or Discrimination",
+        "mitigation3": "Bi-monthly bias tests, diverse datasets",
+        "risk4": "Privacy Breach",
+        "mitigation4": "Encryption, security audits, GDPR compliance",
+        "risk5": "AI Addiction",
+        "mitigation5": "Daily budget, parental controls, opt-out option"
+      },
+      "section8": {
+        "title": "Legal Compliance",
+        "intro": "MirrorBuddy complies with the following European and Italian regulations:",
+        "law1": "AI Act (EU 2024/1689): European regulation on high-risk AI in education and child protection",
+        "law2": "Law 132/2025: Italian implementation of AI Act with user rights and provider responsibilities",
+        "law3": "GDPR (EU 2016/679): Personal data protection and privacy",
+        "law4": "Italian Privacy Code: National implementation of data protection",
+        "classification": "MirrorBuddy is classified as a high-risk AI system because it supports the learning of minors with cognitive difficulties. Consequently, we implement rigorous measures of transparency, supervision, and protection."
+      },
+      "section9": {
+        "title": "Report Issues",
+        "intro": "If you have concerns about how MirrorBuddy uses AI, contact us:",
+        "emailLabel": "Email:",
+        "emailValue": "compliance@mirrorbuddy.it",
+        "formLabel": "Online Form:",
+        "formValue": "Available in account dashboard",
+        "authorityLabel": "Regulatory Authority:",
+        "authorityValue": "You can also contact directly the Privacy Guarantor (www.garanteprivacy.it)",
+        "commitment": "We respond to all complaints within 30 business days."
+      },
+      "section10": {
+        "title": "Frequently Asked Questions",
+        "faq1Title": "Does AI read my chats with my friends?",
+        "faq1Answer": "No. AI only sees chats that happen within MirrorBuddy when you talk with Maestri. Your private conversations outside MirrorBuddy remain private.",
+        "faq2Title": "Can I delete my chats with Maestri?",
+        "faq2Answer": "Yes. You can delete individual chats from your dashboard. If you want to delete everything, you can request the 'right to be forgotten' through the compliance email address.",
+        "faq3Title": "Does AI know my diagnoses (Dyslexia, ADHD, etc.)?",
+        "faq3Answer": "Only if you choose to share them in your profile. MirrorBuddy doesn't automatically collect medical diagnoses, but Maestri can personalize teaching if they know your learning needs.",
+        "faq4Title": "What happens if AI makes a mistake?",
+        "faq4Answer": "Report it to your teacher, who can mark the response as incorrect. This helps improve the Maestro. Additionally, teachers can always correct or supplement the AI's explanation.",
+        "faq5Title": "How can I refuse to use AI?",
+        "faq5Answer": "Go to account settings and disable 'Use AI Maestri'. You'll still have access to all other MirrorBuddy tools (resources, notes, etc.), and you can talk directly with your teachers."
+      },
+      "section11": {
+        "title": "Latest Updates",
+        "intro": "This page is updated with the latest information on AI compliance. Please check periodically for any changes in the systems used or regulations.",
+        "nextReview": "Next review scheduled: January 20, 2027"
+      }
     }
   },
   "compliance": {

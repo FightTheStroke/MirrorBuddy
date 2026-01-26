@@ -1,95 +1,67 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Section } from "../sections";
 
 export function FAQSupportSections() {
+  const t = useTranslations("aiTransparency.sections");
+
   return (
     <>
-      <Section number={9} title="Segnalare Problemi">
-        <p>
-          Se hai preoccupazioni su come MirrorBuddy usa l&apos;IA, contattaci:
-        </p>
+      <Section number={9} title={t("section9.title")}>
+        <p>{t("section9.intro")}</p>
         <ul className="space-y-2">
           <li>
-            <strong>Email</strong>:{" "}
+            <strong>{t("section9.emailLabel")}</strong>{" "}
             <a
               href="mailto:compliance@mirrorbuddy.it"
               className="text-blue-600 dark:text-blue-400 hover:underline"
             >
-              compliance@mirrorbuddy.it
+              {t("section9.emailValue")}
             </a>
           </li>
           <li>
-            <strong>Modulo Online</strong>: Disponibile nel dashboard account
+            <strong>{t("section9.formLabel")}</strong> {t("section9.formValue")}
           </li>
           <li>
-            <strong>Autorità di Vigilanza</strong>: Puoi anche contattare
-            direttamente il Garante della Privacy (www.garanteprivacy.it)
+            <strong>{t("section9.authorityLabel")}</strong>{" "}
+            {t("section9.authorityValue")}
           </li>
         </ul>
-        <p className="mt-4">
-          Rispondiamo a tutti i reclami entro 30 giorni lavorativi.
-        </p>
+        <p className="mt-4">{t("section9.commitment")}</p>
       </Section>
 
-      <Section number={10} title="Domande Frequenti">
+      <Section number={10} title={t("section10.title")}>
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          L&apos;IA legge le mie chat con i miei amici?
+          {t("section10.faq1Title")}
         </h3>
-        <p>
-          No. L&apos;IA vede solo le chat che avvengono all&apos;interno di
-          MirrorBuddy quando parli con i Maestri. Le tue conversazioni private
-          fuori da MirrorBuddy rimangono private.
-        </p>
+        <p>{t("section10.faq1Answer")}</p>
 
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Posso cancellare le mie chat con i Maestri?
+          {t("section10.faq2Title")}
         </h3>
-        <p>
-          Sì. Puoi cancellare singole chat dal tuo dashboard. Se vuoi cancellare
-          tutto, puoi richiedere il &quot;diritto all&apos;oblio&quot; tramite
-          l&apos;indirizzo email di compliance.
-        </p>
+        <p>{t("section10.faq2Answer")}</p>
 
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          L&apos;IA conosce le mie diagnosi (DSA, ADHD, ecc.)?
+          {t("section10.faq3Title")}
         </h3>
-        <p>
-          Solo se li hai scelto di condividere nel profilo. MirrorBuddy non
-          raccoglie diagnosi mediche automaticamente, ma i Maestri possono
-          personalizzare l&apos;insegnamento se sai i tuoi bisogni di
-          apprendimento.
-        </p>
+        <p>{t("section10.faq3Answer")}</p>
 
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Cosa succede se l&apos;IA fa un errore?
+          {t("section10.faq4Title")}
         </h3>
-        <p>
-          Segnalalo al tuo insegnante, che può marcare la risposta come
-          inesatta. Questo aiuta a migliorare il Maestro. Inoltre, gli
-          insegnanti possono sempre correggere o integrare la spiegazione
-          dell&apos;IA.
-        </p>
+        <p>{t("section10.faq4Answer")}</p>
 
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Come posso rifiutare di usare l&apos;IA?
+          {t("section10.faq5Title")}
         </h3>
-        <p>
-          Vai nelle impostazioni account e disattiva &quot;Usa i Maestri
-          IA&quot;. Avrai comunque accesso a tutti gli altri strumenti di
-          MirrorBuddy (risorse, appunti, ecc.), e potrai parlare direttamente
-          con i tuoi insegnanti.
-        </p>
+        <p>{t("section10.faq5Answer")}</p>
       </Section>
 
-      <Section title="Ultimi Aggiornamenti">
-        <p>
-          Questa pagina è aggiornata con le ultime informazioni sulla conformità
-          IA. Controlli periodicamente per eventuali cambiamenti nei sistemi
-          utilizzati o nella normativa.
-        </p>
+      <Section title={t("section11.title")}>
+        <p>{t("section11.intro")}</p>
         <p className="mt-4 text-sm text-slate-600 dark:text-gray-400">
-          <strong>Prossima revisione prevista:</strong> 20 Gennaio 2027
+          <strong>{t("section11.nextReview")}</strong>
         </p>
       </Section>
     </>

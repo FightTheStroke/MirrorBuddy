@@ -1729,6 +1729,138 @@
     },
     "contact": {
       "text": "¿Preguntas sobre la IA en MirrorBuddy? Escribanos: compliance@mirrorbuddy.it"
+    },
+    "sections": {
+      "section1": {
+        "title": "¿Qué hace la IA en MirrorBuddy?",
+        "para1": "MirrorBuddy utiliza inteligencia artificial (IA) para proporcionar una experiencia educativa personalizada. Los 22 Maestros de IA (tutores virtuales) están diseñados para enseñar, explicar conceptos difíciles, crear cuestionarios, mapas mentales y tarjetas de memoria.",
+        "para2": "Importante: La IA NO decide tu calificación, NO evalúa tu discapacidad, y NO reemplaza a tus maestros. Los maestros siguen siendo siempre los principales responsables de la evaluación y las decisiones pedagógicas."
+      },
+      "section2": {
+        "title": "El Sistema de IA",
+        "intro": "MirrorBuddy utiliza Azure OpenAI (GPT-4), un modelo de lenguaje de última generación desarrollado por OpenAI y alojado en los centros de datos europeos de Microsoft.",
+        "subtitle": "Cómo funciona:",
+        "item1Title": "Procesamiento de Texto",
+        "item1Desc": "Cuando haces una pregunta, el modelo analiza el texto y genera una respuesta basada en su entrenamiento",
+        "item2Title": "Conocimiento Verificado",
+        "item2Desc": "Los 22 Maestros tienen bases de conocimiento integradas - bibliotecas de conocimiento controladas y verificadas por expertos - que limitan lo que pueden decir",
+        "item3Title": "Retroalimentación Humana",
+        "item3Desc": "Cada respuesta puede ser revisada por maestros y padres a través del panel de control"
+      },
+      "section3": {
+        "title": "Los 22 Maestros de IA",
+        "intro": "MirrorBuddy tiene 22 tutores virtuales especializados en diferentes materias. Cada Maestro tiene una personalidad auténtica y conocimiento verificado en su campo.",
+        "subtitle": "Categorías de Maestros:",
+        "category1": "Ciencias y Matemáticas: Euclide (Geometría), Galileo (Astronomía), Feynman (Física), Curie (Química), Darwin (Biología)",
+        "category2": "Lenguas y Humanidades: Manzoni (Italiano), Shakespeare (Inglés), Alex Pina (Español), Omero (Narración)",
+        "category3": "Sociedad y Ambiente: Cicerone (Educación Cívica), Smith (Economía), Humboldt (Geografía), Erodoto (Historia)",
+        "category4": "Arte, Música y Bienestar: Leonardo (Arte), Mozart (Música), Ippocrate (Salud), Chris (Educación Física), Simone (Deporte)",
+        "category5": "Disciplinas Especializadas: Lovelace (Informática), Socrate (Filosofía), Cassese (Derecho Internacional)",
+        "outro": "Cada Maestro tiene una voz única (texto y audio), un estilo de enseñanza personalizado, y puede acceder a herramientas como cuestionarios, tarjetas de memoria, mapas mentales y PDFs para enseñar efectivamente.",
+        "category1Label": "Ciencias y Matemáticas",
+        "category2Label": "Lenguas y Humanidades",
+        "category3Label": "Sociedad y Ambiente",
+        "category4Label": "Arte, Música y Bienestar",
+        "category5Label": "Disciplinas Especializadas"
+      },
+      "section4": {
+        "title": "Tus Protecciones",
+        "subtitle": "Sistema de Seguridad de 5 Niveles:",
+        "protection1Title": "1. Transparencia Constante",
+        "protection1Desc": "Siempre sabrás cuándo estás hablando con IA. Un banner te lo recuerda en cada chat.",
+        "protection2Title": "2. Supervisión Humana",
+        "protection2Desc": "Los maestros y padres ven todos tus chats y pueden intervenir en cualquier momento",
+        "protection3Title": "3. Contenido Filtrado",
+        "protection3Desc": "La IA nunca generará contenido violento, explícito o inapropiado para tu edad",
+        "protection4Title": "4. Límites de Uso",
+        "protection4Desc": "Tienes un presupuesto diario de interacciones con IA para prevenir la adicción y mantener la concentración",
+        "protection5Title": "5. Consentimiento Doble (para menores)",
+        "protection5Desc": "Tanto tú como tus padres deben aprobar el uso de IA"
+      },
+      "section5": {
+        "title": "Tus Derechos",
+        "intro": "Según la ley italiana (Ley 132/2025) y el RGPD, tienes derecho a:",
+        "right1Title": "Saber que estás usando IA",
+        "right1Desc": "Ser informado siempre que un sistema automatizado genera respuestas",
+        "right2Title": "Entender cómo funciona",
+        "right2Desc": "Recibir explicaciones claras sobre cómo el Maestro de IA elige responder",
+        "right3Title": "Rechazar la IA",
+        "right3Desc": "Puedes elegir hablar solo con maestros humanos, sin perder acceso a la plataforma",
+        "right4Title": "Acceder a tus datos",
+        "right4Desc": "Solicitar copia de todos los chats, comentarios y datos que la IA procesó sobre ti",
+        "right5Title": "Corregir o eliminar datos",
+        "right5Desc": "Si los datos son inexactos, puedes solicitar que se corrijan o eliminen",
+        "right6Title": "Presentar reclamaciones",
+        "right6Desc": "Si crees que la IA no respeta tus derechos, puedes reportar el problema"
+      },
+      "section6": {
+        "title": "Cómo Se Protegen Tus Datos",
+        "intro": "Todos los datos que compartes con los Maestros están protegidos según lo requerido por el RGPD (ley de privacidad europea):",
+        "protection1Title": "Cifrado",
+        "protection1Desc": "Los datos se cifran tanto en tránsito como cuando se almacenan en servidores",
+        "protection2Title": "No Se Venden",
+        "protection2Desc": "Tus datos NUNCA se venden a terceros ni se utilizan para publicidad",
+        "protection3Title": "Acceso Restringido",
+        "protection3Desc": "Solo MirrorBuddy y Microsoft (que aloja los servidores) pueden acceder a los datos",
+        "protection4Title": "Retención Limitada",
+        "protection4Desc": "Los datos se mantienen solo mientras sea necesario para la educación",
+        "protection5Title": "Derecho al Olvido",
+        "protection5Desc": "Puedes solicitar que todos tus datos sean eliminados"
+      },
+      "section7": {
+        "title": "Riesgos y Cómo Los Gestionamos",
+        "intro": "Como con cualquier IA, hay riesgos. Así es como los abordamos:",
+        "tableHeader1": "Riesgo",
+        "tableHeader2": "Cómo Lo Prevenimos",
+        "risk1": "Contenido Inapropiado",
+        "mitigation1": "Filtros automáticos + revisión humana",
+        "risk2": "Respuestas Inexactas",
+        "mitigation2": "Bases de conocimiento verificadas, respaldo humano",
+        "risk3": "Sesgo o Discriminación",
+        "mitigation3": "Pruebas de sesgo bimensuales, conjuntos de datos diversos",
+        "risk4": "Violación de Privacidad",
+        "mitigation4": "Cifrado, auditorías de seguridad, cumplimiento del RGPD",
+        "risk5": "Adicción a la IA",
+        "mitigation5": "Presupuesto diario, controles parentales, opción de exclusión"
+      },
+      "section8": {
+        "title": "Conformidad Legal",
+        "intro": "MirrorBuddy cumple con las siguientes normas europeas e italianas:",
+        "law1": "AI Act (UE 2024/1689): Regulación europea sobre IA de alto riesgo en educación y protección infantil",
+        "law2": "Ley 132/2025: Implementación italiana del AI Act con derechos de usuarios y responsabilidades de proveedores",
+        "law3": "RGPD (UE 2016/679): Protección de datos personales y privacidad",
+        "law4": "Código de Privacidad Italiano: Implementación nacional de la protección de datos",
+        "classification": "MirrorBuddy se clasifica como un sistema de IA de alto riesgo porque apoya el aprendizaje de menores con dificultades cognitivas. En consecuencia, implementamos medidas rigurosas de transparencia, supervisión y protección."
+      },
+      "section9": {
+        "title": "Reportar Problemas",
+        "intro": "Si tienes preocupaciones sobre cómo MirrorBuddy usa la IA, contactanos:",
+        "emailLabel": "Correo Electrónico:",
+        "emailValue": "compliance@mirrorbuddy.it",
+        "formLabel": "Formulario en Línea:",
+        "formValue": "Disponible en el panel de control de la cuenta",
+        "authorityLabel": "Autoridad Reguladora:",
+        "authorityValue": "También puedes contactar directamente al Garante de la Privacidad (www.garanteprivacy.it)",
+        "commitment": "Respondemos a todos los reclamos dentro de 30 días hábiles."
+      },
+      "section10": {
+        "title": "Preguntas Frecuentes",
+        "faq1Title": "¿La IA lee mis chats con mis amigos?",
+        "faq1Answer": "No. La IA solo ve los chats que ocurren dentro de MirrorBuddy cuando hablas con los Maestros. Tus conversaciones privadas fuera de MirrorBuddy permanecen privadas.",
+        "faq2Title": "¿Puedo eliminar mis chats con los Maestros?",
+        "faq2Answer": "Sí. Puedes eliminar chats individuales de tu panel de control. Si deseas eliminar todo, puedes solicitar el 'derecho al olvido' a través de la dirección de correo de cumplimiento.",
+        "faq3Title": "¿La IA conoce mis diagnósticos (Dislexia, TDAH, etc.)?",
+        "faq3Answer": "Solo si eliges compartirlos en tu perfil. MirrorBuddy no recopila automáticamente diagnósticos médicos, pero los Maestros pueden personalizar la enseñanza si conocen tus necesidades de aprendizaje.",
+        "faq4Title": "¿Qué sucede si la IA comete un error?",
+        "faq4Answer": "Repórtalo a tu maestro, quien puede marcar la respuesta como incorrecta. Esto ayuda a mejorar el Maestro. Además, los maestros siempre pueden corregir o complementar la explicación de la IA.",
+        "faq5Title": "¿Cómo puedo rechazar el uso de IA?",
+        "faq5Answer": "Ve a la configuración de la cuenta y desactiva 'Usar Maestros de IA'. Aún tendrás acceso a todas las demás herramientas de MirrorBuddy (recursos, notas, etc.), y podrás hablar directamente con tus maestros."
+      },
+      "section11": {
+        "title": "Últimas Actualizaciones",
+        "intro": "Esta página se actualiza con la información más reciente sobre cumplimiento de IA. Por favor, verifica periódicamente para cualquier cambio en los sistemas utilizados o en la normativa.",
+        "nextReview": "Próxima revisión programada: 20 de enero de 2027"
+      }
     }
   },
   "compliance": {

@@ -1,127 +1,122 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Section } from "../sections";
 
 export function RightsComplianceSections() {
+  const t = useTranslations("aiTransparency.sections");
+
   return (
     <>
-      <Section number={5} title="I Tuoi Diritti">
-        <p>
-          Secondo la legge italiana (Legge 132/2025) e il GDPR, hai diritto a:
-        </p>
+      <Section number={5} title={t("section5.title")}>
+        <p>{t("section5.intro")}</p>
         <ul className="space-y-2">
           <li>
-            <strong>Sapere che stai usando l&apos;IA</strong>: Essere informato
-            sempre quando un sistema automatico genera risposte
+            <strong>{t("section5.right1Title")}</strong>:{" "}
+            {t("section5.right1Desc")}
           </li>
           <li>
-            <strong>Capire come funziona</strong>: Ricevere spiegazioni chiare
-            su come il Maestro IA sceglie di rispondere
+            <strong>{t("section5.right2Title")}</strong>:{" "}
+            {t("section5.right2Desc")}
           </li>
           <li>
-            <strong>Rifiutare l&apos;IA</strong>: Puoi scegliere di parlare solo
-            con insegnanti umani, senza perdere accesso alla piattaforma
+            <strong>{t("section5.right3Title")}</strong>:{" "}
+            {t("section5.right3Desc")}
           </li>
           <li>
-            <strong>Accedere ai tuoi dati</strong>: Richiedere copia di tutte le
-            chat, i feedback e i dati che l&apos;IA ha processato su di te
+            <strong>{t("section5.right4Title")}</strong>:{" "}
+            {t("section5.right4Desc")}
           </li>
           <li>
-            <strong>Correggere o cancellare i dati</strong>: Se un dato è
-            inesatto, puoi chiedere che sia corretto o eliminato
+            <strong>{t("section5.right5Title")}</strong>:{" "}
+            {t("section5.right5Desc")}
           </li>
           <li>
-            <strong>Presentare reclami</strong>: Se pensi che l&apos;IA non
-            rispetti i tuoi diritti, puoi segnalare il problema
+            <strong>{t("section5.right6Title")}</strong>:{" "}
+            {t("section5.right6Desc")}
           </li>
         </ul>
       </Section>
 
-      <Section number={6} title="Come Proteggono i Tuoi Dati">
-        <p>
-          Tutti i dati che condividi con i Maestri sono protetti come previsto
-          dal GDPR (legge europea sulla privacy):
-        </p>
+      <Section number={6} title={t("section6.title")}>
+        <p>{t("section6.intro")}</p>
         <ul className="space-y-2">
           <li>
-            <strong>Crittografia</strong>: I dati sono criptati sia quando
-            viggiano (in transito) che quando stoccati nei server
+            <strong>{t("section6.protection1Title")}</strong>:{" "}
+            {t("section6.protection1Desc")}
           </li>
           <li>
-            <strong>Non venduti</strong>: I tuoi dati NON sono mai venduti a
-            terzi o usati per pubblicità
+            <strong>{t("section6.protection2Title")}</strong>:{" "}
+            {t("section6.protection2Desc")}
           </li>
           <li>
-            <strong>Accesso Ristretto</strong>: Solo MirrorBuddy e Microsoft
-            (che ospita i server) possono accedere ai dati
+            <strong>{t("section6.protection3Title")}</strong>:{" "}
+            {t("section6.protection3Desc")}
           </li>
           <li>
-            <strong>Conservazione Limitata</strong>: I dati sono mantenuti solo
-            finché necessario per l&apos;educazione
+            <strong>{t("section6.protection4Title")}</strong>:{" "}
+            {t("section6.protection4Desc")}
           </li>
           <li>
-            <strong>Diritto all&apos;Oblio</strong>: Puoi chiedere che tutti i
-            tuoi dati siano cancellati
+            <strong>{t("section6.protection5Title")}</strong>:{" "}
+            {t("section6.protection5Desc")}
           </li>
         </ul>
       </Section>
 
-      <Section number={7} title="Rischi e Come Li Gestiamo">
-        <p>
-          Come con qualsiasi IA, ci sono alcuni rischi. Ecco come li
-          affrontiamo:
-        </p>
+      <Section number={7} title={t("section7.title")}>
+        <p>{t("section7.intro")}</p>
         <div className="overflow-x-auto mt-4">
           <table className="w-full text-sm border-collapse">
             <thead>
               <tr className="bg-slate-100 dark:bg-slate-700">
                 <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">
-                  Rischio
+                  {t("section7.tableHeader1")}
                 </th>
                 <th className="border border-slate-300 dark:border-slate-600 p-3 text-left font-semibold">
-                  Come lo preveniamo
+                  {t("section7.tableHeader2")}
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Contenuti inappropriati
+                  {t("section7.risk1")}
                 </td>
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Filtri automatici + revisione umana
-                </td>
-              </tr>
-              <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Risposte inaccurate
-                </td>
-                <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Knowledge bases verificate, fallback umano
+                  {t("section7.mitigation1")}
                 </td>
               </tr>
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Bias o discriminazione
+                  {t("section7.risk2")}
                 </td>
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Test bimestrale sui bias, dataset diversi
-                </td>
-              </tr>
-              <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Privacy breach
-                </td>
-                <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Encryption, audit di sicurezza, GDPR compliance
+                  {t("section7.mitigation2")}
                 </td>
               </tr>
               <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Dipendenza dall&apos;IA
+                  {t("section7.risk3")}
                 </td>
                 <td className="border border-slate-300 dark:border-slate-600 p-3">
-                  Budget giornaliero, controlli genitoriali, opzione opt-out
+                  {t("section7.mitigation3")}
+                </td>
+              </tr>
+              <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                <td className="border border-slate-300 dark:border-slate-600 p-3">
+                  {t("section7.risk4")}
+                </td>
+                <td className="border border-slate-300 dark:border-slate-600 p-3">
+                  {t("section7.mitigation4")}
+                </td>
+              </tr>
+              <tr className="hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                <td className="border border-slate-300 dark:border-slate-600 p-3">
+                  {t("section7.risk5")}
+                </td>
+                <td className="border border-slate-300 dark:border-slate-600 p-3">
+                  {t("section7.mitigation5")}
                 </td>
               </tr>
             </tbody>
@@ -129,35 +124,23 @@ export function RightsComplianceSections() {
         </div>
       </Section>
 
-      <Section number={8} title="Conformità Legale">
-        <p>
-          MirrorBuddy è conforme alle seguenti normative europee e italiane:
-        </p>
+      <Section number={8} title={t("section8.title")}>
+        <p>{t("section8.intro")}</p>
         <ul className="space-y-2">
           <li>
-            <strong>AI Act (UE 2024/1689)</strong>: Regolamento europeo sulla IA
-            ad alto rischio in ambito educativo e protezione dei minori
+            <strong>{t("section8.law1")}</strong>
           </li>
           <li>
-            <strong>Legge 132/2025</strong>: Attuazione italiana dell&apos;AI
-            Act con diritti degli utenti e responsabilità dei fornitori
+            <strong>{t("section8.law2")}</strong>
           </li>
           <li>
-            <strong>GDPR (UE 2016/679)</strong>: Protezione dei dati personali e
-            privacy
+            <strong>{t("section8.law3")}</strong>
           </li>
           <li>
-            <strong>Codice della Privacy italiano</strong>: Implementazione
-            nazionale della protezione dati
+            <strong>{t("section8.law4")}</strong>
           </li>
         </ul>
-        <p className="mt-4">
-          MirrorBuddy è classificato come{" "}
-          <strong>sistema IA ad alto rischio</strong> perché supporta
-          l&apos;apprendimento di minori con difficoltà cognitive. Di
-          conseguenza, implementiamo misure rigorose di trasparenza,
-          supervisione e protezione.
-        </p>
+        <p className="mt-4">{t("section8.classification")}</p>
       </Section>
     </>
   );

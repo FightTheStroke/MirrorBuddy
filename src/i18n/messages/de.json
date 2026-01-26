@@ -1520,6 +1520,138 @@
     },
     "contact": {
       "text": "Fragen zu KI in MirrorBuddy? Schreiben Sie uns: compliance@mirrorbuddy.it"
+    },
+    "sections": {
+      "section1": {
+        "title": "Was macht KI in MirrorBuddy?",
+        "para1": "MirrorBuddy nutzt künstliche Intelligenz (KI), um ein personalisiertes Lernentlebnis zu bieten. Die 22 KI-Maestri (virtuelle Tutoren) sind dafür konzipiert, zu unterrichten, schwierige Konzepte zu erklären, Quiz, Mindmaps und Karteikarten zu erstellen.",
+        "para2": "Wichtig: KI entscheidet NICHT über deine Note, bewertet NICHT deine Behinderung und ersetzt NICHT deine Lehrer. Lehrer bleiben immer die Hauptverantwortlichen für die Bewertung und pädagogischen Entscheidungen."
+      },
+      "section2": {
+        "title": "Das KI-System",
+        "intro": "MirrorBuddy nutzt Azure OpenAI (GPT-4), ein hochmodernes Sprachmodell von OpenAI, das in Microsofts europäischen Rechenzentren gehostet wird.",
+        "subtitle": "Wie es funktioniert:",
+        "item1Title": "Textverarbeitung",
+        "item1Desc": "Wenn du eine Frage stellst, analysiert das Modell den Text und generiert eine Antwort basierend auf seinem Training",
+        "item2Title": "Verifiziertes Wissen",
+        "item2Desc": "Die 22 Maestri haben eingebettete Wissensdatenbanken - von Experten kontrollierte und verifizierte Wissensbibliotheken - die begrenzen, was sie sagen können",
+        "item3Title": "Menschliches Feedback",
+        "item3Desc": "Jede Antwort kann von Lehrern und Eltern über das Kontroll-Dashboard überprüft werden"
+      },
+      "section3": {
+        "title": "Die 22 KI-Maestri",
+        "intro": "MirrorBuddy hat 22 virtuelle Tutoren, die auf verschiedene Fächer spezialisiert sind. Jeder Maestro hat eine authentische Persönlichkeit und verifiziertes Wissen in seinem Bereich.",
+        "subtitle": "Kategorien von Maestri:",
+        "category1": "Naturwissenschaften und Mathematik: Euclide (Geometrie), Galileo (Astronomie), Feynman (Physik), Curie (Chemie), Darwin (Biologie)",
+        "category2": "Sprachen und Geisteswissenschaften: Manzoni (Italienisch), Shakespeare (Englisch), Alex Pina (Spanisch), Omero (Geschichtenerzählen)",
+        "category3": "Gesellschaft und Umwelt: Cicerone (Bürgerkunde), Smith (Wirtschaft), Humboldt (Geographie), Erodoto (Geschichte)",
+        "category4": "Kunst, Musik und Wohlbefinden: Leonardo (Kunst), Mozart (Musik), Ippocrate (Gesundheit), Chris (Sportunterricht), Simone (Sport)",
+        "category5": "Spezialdisziplinen: Lovelace (Informatik), Socrate (Philosophie), Cassese (Internationales Recht)",
+        "outro": "Jeder Maestro hat eine einzigartige Stimme (Text und Audio), einen personalisierten Unterrichtsstil und kann auf Tools wie Quiz, Karteikarten, Mindmaps und PDFs zugreifen, um effektiv zu unterrichten.",
+        "category1Label": "Naturwissenschaften und Mathematik",
+        "category2Label": "Sprachen und Geisteswissenschaften",
+        "category3Label": "Gesellschaft und Umwelt",
+        "category4Label": "Kunst, Musik und Wohlbefinden",
+        "category5Label": "Spezialdisziplinen"
+      },
+      "section4": {
+        "title": "Deine Schutzmaßnahmen",
+        "subtitle": "5-Ebenen-Sicherheitssystem:",
+        "protection1Title": "1. Ständige Transparenz",
+        "protection1Desc": "Du wirst immer wissen, wenn du mit KI sprichst. Ein Banner erinnert dich in jedem Chat daran.",
+        "protection2Title": "2. Menschliche Überwachung",
+        "protection2Desc": "Lehrer und Eltern sehen all deine Chats und können jederzeit eingreifen",
+        "protection3Title": "3. Gefilterte Inhalte",
+        "protection3Desc": "Die KI wird niemals Gewalt-, explizite oder altersungeeignete Inhalte generieren",
+        "protection4Title": "4. Nutzungsbeschränkungen",
+        "protection4Desc": "Du hast ein tägliches Budget für KI-Interaktionen, um Sucht zu verhindern und die Konzentration zu bewahren",
+        "protection5Title": "5. Doppelte Zustimmung (für Minderjährige)",
+        "protection5Desc": "Du und deine Eltern müssen der KI-Nutzung zustimmen"
+      },
+      "section5": {
+        "title": "Deine Rechte",
+        "intro": "Nach italienischem Recht (Gesetz 132/2025) und der DSGVO hast du das Recht auf:",
+        "right1Title": "Wissen, dass du KI nutzt",
+        "right1Desc": "Benachrichtigung, wann ein automatisiertes System Antworten generiert",
+        "right2Title": "Verständnis, wie es funktioniert",
+        "right2Desc": "Klare Erklärungen darüber, wie der KI-Maestro antwortet",
+        "right3Title": "Ablehnung von KI",
+        "right3Desc": "Du kannst nur mit menschlichen Lehrern sprechen, ohne Plattformzugriff zu verlieren",
+        "right4Title": "Zugriff auf deine Daten",
+        "right4Desc": "Kopie aller Chats, Rückmeldungen und Daten anfordern, die KI über dich verarbeitet hat",
+        "right5Title": "Daten korrigieren oder löschen",
+        "right5Desc": "Wenn Daten ungenau sind, kannst du ihre Korrektur oder Löschung anfordern",
+        "right6Title": "Beschwerden einreichen",
+        "right6Desc": "Wenn du glaubst, dass KI deine Rechte nicht respektiert, kannst du das Problem melden"
+      },
+      "section6": {
+        "title": "Wie Deine Daten Geschützt Werden",
+        "intro": "Alle Daten, die du mit Maestri teilst, sind nach der DSGVO (europäisches Datenschutzgesetz) geschützt:",
+        "protection1Title": "Verschlüsselung",
+        "protection1Desc": "Daten sind sowohl während der Übertragung als auch bei der Speicherung auf Servern verschlüsselt",
+        "protection2Title": "Nicht Verkauft",
+        "protection2Desc": "Deine Daten werden NIEMALS an Dritte verkauft oder für Werbung verwendet",
+        "protection3Title": "Eingeschränkter Zugriff",
+        "protection3Desc": "Nur MirrorBuddy und Microsoft (das die Server hostet) können auf Daten zugreifen",
+        "protection4Title": "Begrenzte Aufbewahrung",
+        "protection4Desc": "Daten werden nur so lange aufbewahrt, wie für die Bildung notwendig ist",
+        "protection5Title": "Recht auf Vergessenwerden",
+        "protection5Desc": "Du kannst anfordern, dass alle deine Daten gelöscht werden"
+      },
+      "section7": {
+        "title": "Risiken und Wie Wir Sie Managen",
+        "intro": "Wie bei jeder KI gibt es Risiken. So gehen wir damit um:",
+        "tableHeader1": "Risiko",
+        "tableHeader2": "Wie Wir Es Verhindern",
+        "risk1": "Unangemessene Inhalte",
+        "mitigation1": "Automatische Filter + menschliche Überprüfung",
+        "risk2": "Ungenaue Antworten",
+        "mitigation2": "Verifizierte Wissensdatenbanken, menschliche Unterstützung",
+        "risk3": "Vorurteile oder Diskriminierung",
+        "mitigation3": "Monatliche Bias-Tests, vielfältige Datensätze",
+        "risk4": "Datenschutzverletzung",
+        "mitigation4": "Verschlüsselung, Sicherheitsaudits, DSGVO-Konformität",
+        "risk5": "KI-Sucht",
+        "mitigation5": "Tägliches Budget, elterliche Kontrollen, Opt-out-Option"
+      },
+      "section8": {
+        "title": "Rechtliche Konformität",
+        "intro": "MirrorBuddy erfüllt die folgenden europäischen und italienischen Vorschriften:",
+        "law1": "AI Act (EU 2024/1689): Europäische Verordnung für hochriskante KI in Bildung und Kinderschutz",
+        "law2": "Gesetz 132/2025: Italienische Umsetzung des AI Act mit Nutzerrechten und Anbieterverantwortung",
+        "law3": "DSGVO (EU 2016/679): Schutz personenbezogener Daten und Datenschutz",
+        "law4": "Italienischer Datenschutzcode: Nationale Umsetzung des Datenschutzes",
+        "classification": "MirrorBuddy wird als hochriskantes KI-System klassifiziert, da es das Lernen von Minderjährigen mit kognitiven Schwierigkeiten unterstützt. Folglich setzen wir strenge Maßnahmen für Transparenz, Überwachung und Schutz um."
+      },
+      "section9": {
+        "title": "Probleme Melden",
+        "intro": "Falls du Bedenken bezüglich der KI-Nutzung in MirrorBuddy hast, kontaktiere uns:",
+        "emailLabel": "E-Mail:",
+        "emailValue": "compliance@mirrorbuddy.it",
+        "formLabel": "Online-Formular:",
+        "formValue": "Verfügbar im Account-Dashboard",
+        "authorityLabel": "Aufsichtsbehörde:",
+        "authorityValue": "Du kannst auch direkt den Datenschutzbeauftragten kontaktieren (www.garanteprivacy.it)",
+        "commitment": "Wir beantworten alle Beschwerden innerhalb von 30 Werktagen."
+      },
+      "section10": {
+        "title": "Häufig Gestellte Fragen",
+        "faq1Title": "Liest die KI meine Chats mit meinen Freunden?",
+        "faq1Answer": "Nein. Die KI sieht nur Chats innerhalb von MirrorBuddy, wenn du mit Maestri sprichst. Deine privaten Unterhaltungen außerhalb von MirrorBuddy bleiben privat.",
+        "faq2Title": "Kann ich meine Chats mit den Maestri löschen?",
+        "faq2Answer": "Ja. Du kannst individuelle Chats von deinem Dashboard löschen. Wenn du alles löschen möchtest, kannst du das 'Recht auf Vergessenwerden' über die Compliance-E-Mail-Adresse anfordern.",
+        "faq3Title": "Kennt die KI meine Diagnosen (Dyslexie, ADHS, usw.)?",
+        "faq3Answer": "Nur wenn du sie in deinem Profil freigeben möchtest. MirrorBuddy sammelt nicht automatisch medizinische Diagnosen, aber Maestri können den Unterricht personalisieren, wenn sie deine Lernbedürfnisse kennen.",
+        "faq4Title": "Was passiert, wenn die KI einen Fehler macht?",
+        "faq4Answer": "Melde es deinem Lehrer, der die Antwort als falsch markieren kann. Das hilft, den Maestro zu verbessern. Darüber hinaus können Lehrer die Erklärung der KI immer korrigieren oder ergänzen.",
+        "faq5Title": "Wie kann ich die KI-Nutzung ablehnen?",
+        "faq5Answer": "Gehe zu Kontoeinstellungen und deaktiviere 'KI-Maestri verwenden'. Du hast weiterhin Zugriff auf alle anderen MirrorBuddy-Tools (Ressourcen, Notizen usw.) und kannst direkt mit deinen Lehrern sprechen."
+      },
+      "section11": {
+        "title": "Neueste Aktualisierungen",
+        "intro": "Diese Seite wird mit den neuesten Informationen zur KI-Konformität aktualisiert. Bitte überprüfe regelmäßig auf Änderungen der verwendeten Systeme oder Vorschriften.",
+        "nextReview": "Nächste Überprüfung geplant: 20. Januar 2027"
+      }
     }
   },
   "compliance": {
