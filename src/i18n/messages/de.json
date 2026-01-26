@@ -556,6 +556,66 @@
       "easyQuestion": "Wie einfach war es zu erinnern?",
       "navigationHint": "Leertaste drücken oder klicken, um die Antwort anzuzeigen"
     },
+    "quiz-header": {
+      "question-counter": "Frage {current} von {total}",
+      "correct-count": "{count} richtig"
+    },
+    "quiz-completion": {
+      "excellent": "Ausgezeichnete Arbeit!",
+      "keep-practicing": "Machen Sie weiter!",
+      "correct-answers": "Sie haben {correct} von {total} Fragen korrekt beantwortet",
+      "retry-button": "Nochmal versuchen",
+      "continue-button": "Weiter"
+    },
+    "topic-card": {
+      "continue-button": "Fortfahren",
+      "start-button": "Starten",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Grundstufe",
+        "intermediate": "Mittelstufe",
+        "advanced": "Fortgeschritten"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Überblicksinhalt nicht verfügbar",
+      "mindmap-description": "Sehen Sie sich die Gedankenkarte für dieses Thema an",
+      "open-mindmap-button": "Karte öffnen",
+      "flashcard-description": "Lernen Sie mit Lernkarten, um Konzepte zu merken",
+      "start-flashcard-button": "Lernkarten starten",
+      "quiz-description": "Testen Sie Ihr Verständnis mit einem Quiz",
+      "start-quiz-button": "Quiz starten",
+      "content-unavailable": "Inhalt nicht verfügbar"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Vorheriger Monat",
+      "aria-label-next-month": "Nächster Monat",
+      "today-button": "Heute",
+      "more-events": "+{count} weitere",
+      "day-names": {
+        "monday": "Mo",
+        "tuesday": "Di",
+        "wednesday": "Mi",
+        "thursday": "Do",
+        "friday": "Fr",
+        "saturday": "Sa",
+        "sunday": "So"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Fotovorschau",
+      "homework-alt": "Hausaufgabenvorschau",
+      "homework-label": "Hausaufgaben",
+      "questions-label": "Fragen",
+      "flashcard-label": "Lernkarten",
+      "demo-label": "Interaktive Demo"
+    },
+    "knowledge-hub": {
+      "error-title": "Anzeigefehl",
+      "error-message-with-type": "Material vom Typ \"{type}\" kann nicht angezeigt werden.",
+      "error-message-default": "Dieses Material kann nicht angezeigt werden.",
+      "retry-button": "Nochmal versuchen"
+    },
     "mindmaps": {
       "title": "Mindmaps",
       "subtitle": "Zeige und drucke deine während des Unterrichts erstellten Mindmaps",

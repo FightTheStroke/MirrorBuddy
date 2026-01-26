@@ -556,6 +556,66 @@
       "easyQuestion": "Était-ce facile à retenir?",
       "navigationHint": "Appuyez sur l'espace ou cliquez pour afficher la réponse"
     },
+    "quiz-header": {
+      "question-counter": "Question {current} sur {total}",
+      "correct-count": "{count} correctes"
+    },
+    "quiz-completion": {
+      "excellent": "Excellent travail!",
+      "keep-practicing": "Continue à t'exercer!",
+      "correct-answers": "Vous avez répondu correctement à {correct} questions sur {total}",
+      "retry-button": "Réessayer",
+      "continue-button": "Continuer"
+    },
+    "topic-card": {
+      "continue-button": "Continuer",
+      "start-button": "Commencer",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Base",
+        "intermediate": "Intermédiaire",
+        "advanced": "Avancé"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Contenu d'aperçu non disponible",
+      "mindmap-description": "Afficher la carte mentale pour ce sujet",
+      "open-mindmap-button": "Ouvrir la Carte",
+      "flashcard-description": "Étudiez avec des flashcards pour mémoriser les concepts",
+      "start-flashcard-button": "Commencer les Flashcards",
+      "quiz-description": "Testez votre compréhension avec un quiz",
+      "start-quiz-button": "Commencer le Quiz",
+      "content-unavailable": "Contenu non disponible"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Mois précédent",
+      "aria-label-next-month": "Mois suivant",
+      "today-button": "Aujourd'hui",
+      "more-events": "+{count} autres",
+      "day-names": {
+        "monday": "Lun",
+        "tuesday": "Mar",
+        "wednesday": "Mer",
+        "thursday": "Jeu",
+        "friday": "Ven",
+        "saturday": "Sam",
+        "sunday": "Dim"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Aperçu de la photo",
+      "homework-alt": "Aperçu des devoirs",
+      "homework-label": "Devoirs",
+      "questions-label": "questions",
+      "flashcard-label": "flashcards",
+      "demo-label": "Démo Interactive"
+    },
+    "knowledge-hub": {
+      "error-title": "Erreur d'affichage",
+      "error-message-with-type": "Impossible d'afficher le matériel de type \"{type}\".",
+      "error-message-default": "Impossible d'afficher ce matériel.",
+      "retry-button": "Réessayer"
+    },
     "mindmaps": {
       "title": "Cartes mentales",
       "subtitle": "Affichez et imprimez vos cartes mentales créées pendant les cours",

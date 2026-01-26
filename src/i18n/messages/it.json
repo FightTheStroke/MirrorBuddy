@@ -782,6 +782,66 @@
       "easyQuestion": "Quanto è stato facile ricordare?",
       "navigationHint": "Premi spazio o clicca per mostrare la risposta"
     },
+    "quiz-header": {
+      "question-counter": "Domanda {current} di {total}",
+      "correct-count": "{count} corrette"
+    },
+    "quiz-completion": {
+      "excellent": "Ottimo lavoro!",
+      "keep-practicing": "Continua a esercitarti!",
+      "correct-answers": "Hai risposto correttamente a {correct} domande su {total}",
+      "retry-button": "Riprova",
+      "continue-button": "Continua"
+    },
+    "topic-card": {
+      "continue-button": "Continua",
+      "start-button": "Inizia",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Base",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzato"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Contenuto panoramica non disponibile",
+      "mindmap-description": "Visualizza la mappa mentale per questo argomento",
+      "open-mindmap-button": "Apri Mappa",
+      "flashcard-description": "Studia con le flashcard per memorizzare i concetti",
+      "start-flashcard-button": "Inizia Flashcard",
+      "quiz-description": "Verifica la tua comprensione con un quiz",
+      "start-quiz-button": "Inizia Quiz",
+      "content-unavailable": "Contenuto non disponibile"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Mese precedente",
+      "aria-label-next-month": "Mese successivo",
+      "today-button": "Oggi",
+      "more-events": "+{count} altri",
+      "day-names": {
+        "monday": "Lun",
+        "tuesday": "Mar",
+        "wednesday": "Mer",
+        "thursday": "Gio",
+        "friday": "Ven",
+        "saturday": "Sab",
+        "sunday": "Dom"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Anteprima foto",
+      "homework-alt": "Anteprima compito",
+      "homework-label": "Compito",
+      "questions-label": "domande",
+      "flashcard-label": "flashcard",
+      "demo-label": "Demo Interattiva"
+    },
+    "knowledge-hub": {
+      "error-title": "Errore di visualizzazione",
+      "error-message-with-type": "Impossibile visualizzare il materiale di tipo \"{type}\".",
+      "error-message-default": "Impossibile visualizzare questo materiale.",
+      "retry-button": "Riprova"
+    },
     "mindmap": {
       "saved": "Mappa mentale salvata!",
       "saveFailed": "Impossibile salvare la mappa mentale."

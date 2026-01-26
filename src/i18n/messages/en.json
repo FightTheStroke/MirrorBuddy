@@ -565,6 +565,66 @@
       "easyQuestion": "How easy was it to recall?",
       "navigationHint": "Press space or click to show the answer"
     },
+    "quiz-header": {
+      "question-counter": "Question {current} of {total}",
+      "correct-count": "{count} correct"
+    },
+    "quiz-completion": {
+      "excellent": "Excellent work!",
+      "keep-practicing": "Keep practicing!",
+      "correct-answers": "You answered {correct} questions correctly out of {total}",
+      "retry-button": "Retry",
+      "continue-button": "Continue"
+    },
+    "topic-card": {
+      "continue-button": "Continue",
+      "start-button": "Start",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Basic",
+        "intermediate": "Intermediate",
+        "advanced": "Advanced"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Overview content not available",
+      "mindmap-description": "View the mind map for this topic",
+      "open-mindmap-button": "Open Map",
+      "flashcard-description": "Study with flashcards to memorize concepts",
+      "start-flashcard-button": "Start Flashcards",
+      "quiz-description": "Test your understanding with a quiz",
+      "start-quiz-button": "Start Quiz",
+      "content-unavailable": "Content not available"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Previous month",
+      "aria-label-next-month": "Next month",
+      "today-button": "Today",
+      "more-events": "+{count} more",
+      "day-names": {
+        "monday": "Mon",
+        "tuesday": "Tue",
+        "wednesday": "Wed",
+        "thursday": "Thu",
+        "friday": "Fri",
+        "saturday": "Sat",
+        "sunday": "Sun"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Photo preview",
+      "homework-alt": "Homework preview",
+      "homework-label": "Homework",
+      "questions-label": "questions",
+      "flashcard-label": "flashcards",
+      "demo-label": "Interactive Demo"
+    },
+    "knowledge-hub": {
+      "error-title": "Viewing error",
+      "error-message-with-type": "Unable to display material of type \"{type}\".",
+      "error-message-default": "Unable to display this material.",
+      "retry-button": "Retry"
+    },
     "mindmaps": {
       "title": "Mind Maps",
       "subtitle": "View and print your mind maps created during lessons",

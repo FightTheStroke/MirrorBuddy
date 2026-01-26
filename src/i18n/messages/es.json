@@ -920,6 +920,66 @@
       "easyQuestion": "¿Qué tan fácil fue recordar?",
       "navigationHint": "Presiona espacio o haz clic para mostrar la respuesta"
     },
+    "quiz-header": {
+      "question-counter": "Pregunta {current} de {total}",
+      "correct-count": "{count} correctas"
+    },
+    "quiz-completion": {
+      "excellent": "¡Excelente trabajo!",
+      "keep-practicing": "¡Sigue practicando!",
+      "correct-answers": "Respondiste correctamente {correct} preguntas de {total}",
+      "retry-button": "Reintentar",
+      "continue-button": "Continuar"
+    },
+    "topic-card": {
+      "continue-button": "Continuar",
+      "start-button": "Comenzar",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Básico",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Contenido de descripción general no disponible",
+      "mindmap-description": "Ver el mapa mental para este tema",
+      "open-mindmap-button": "Abrir Mapa",
+      "flashcard-description": "Estudia con fichas para memorizar conceptos",
+      "start-flashcard-button": "Comenzar Fichas",
+      "quiz-description": "Prueba tu comprensión con un quiz",
+      "start-quiz-button": "Comenzar Quiz",
+      "content-unavailable": "Contenido no disponible"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Mes anterior",
+      "aria-label-next-month": "Próximo mes",
+      "today-button": "Hoy",
+      "more-events": "+{count} más",
+      "day-names": {
+        "monday": "Lun",
+        "tuesday": "Mar",
+        "wednesday": "Mié",
+        "thursday": "Jue",
+        "friday": "Vie",
+        "saturday": "Sáb",
+        "sunday": "Dom"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Vista previa de foto",
+      "homework-alt": "Vista previa de tarea",
+      "homework-label": "Tarea",
+      "questions-label": "preguntas",
+      "flashcard-label": "fichas",
+      "demo-label": "Demo Interactiva"
+    },
+    "knowledge-hub": {
+      "error-title": "Error de visualización",
+      "error-message-with-type": "No se puede mostrar el material de tipo \"{type}\".",
+      "error-message-default": "No se puede mostrar este material.",
+      "retry-button": "Reintentar"
+    },
     "mindmaps": {
       "title": "Mapas mentales",
       "subtitle": "Ve e imprime tus mapas mentales creados durante las lecciones",

@@ -67,17 +67,15 @@ class RendererErrorBoundaryCore extends Component<
   render(): ReactNode {
     if (this.state.hasError) {
       const { materialType, className, t } = this.props;
-      const errorTitle = t
-        ? t("renderers.error-title")
-        : "Errore di visualizzazione";
+      const errorTitle = t ? t("error-title") : "Errore di visualizzazione";
       const errorMessage = materialType
         ? t
-          ? t("renderers.error-message-with-type", { type: materialType })
+          ? t("error-message-with-type", { type: materialType })
           : `Impossibile visualizzare il materiale di tipo "${materialType}".`
         : t
-          ? t("renderers.error-message-default")
+          ? t("error-message-default")
           : "Impossibile visualizzare questo materiale.";
-      const retryLabel = t ? t("renderers.retry-button") : "Riprova";
+      const retryLabel = t ? t("retry-button") : "Riprova";
 
       return (
         <div

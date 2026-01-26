@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { Progress } from '@/components/ui/progress';
+import { useTranslations } from "next-intl";
+import { Progress } from "@/components/ui/progress";
 
 export interface QuizHeaderProps {
   currentIndex: number;
@@ -15,14 +16,19 @@ export function QuizHeader({
   correctCount,
   progress,
 }: QuizHeaderProps) {
+  const t = useTranslations("education.quiz-header");
+
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm text-slate-500">
-          Domanda {currentIndex + 1} di {totalQuestions}
+          {t("question-counter", {
+            current: currentIndex + 1,
+            total: totalQuestions,
+          })}
         </span>
         <span className="text-sm font-medium text-blue-600">
-          {correctCount} corrette
+          {t("correct-count", { count: correctCount })}
         </span>
       </div>
       <Progress value={progress} className="h-2" />
