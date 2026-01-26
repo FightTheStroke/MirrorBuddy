@@ -27,13 +27,17 @@ These tests require external services not available in CI. **Acceptable.**
 
 ## Category 2: Conditional Skips (Valid)
 
-These skip based on runtime conditions (user not seeded, etc.). **Acceptable.**
+These skip based on runtime conditions (user not seeded, viewport size, etc.). **Acceptable.**
 
-| File               | Test                   | Condition              | Status |
-| ------------------ | ---------------------- | ---------------------- | ------ |
-| `auth.spec.ts:77`  | Login with credentials | Test user not seeded   | Valid  |
-| `auth.spec.ts:121` | Logout from settings   | User not authenticated | Valid  |
-| `auth.spec.ts:167` | Logout from sidebar    | Button not visible     | Valid  |
+| File                               | Test                      | Condition                        | Status |
+| ---------------------------------- | ------------------------- | -------------------------------- | ------ |
+| `auth.spec.ts:77`                  | Login with credentials    | Test user not seeded             | Valid  |
+| `auth.spec.ts:121`                 | Logout from settings      | User not authenticated           | Valid  |
+| `auth.spec.ts:167`                 | Logout from sidebar       | Button not visible               | Valid  |
+| `accessibility.spec.ts:487`        | Dyslexia font change      | CI env (font loading unreliable) | Valid  |
+| `visual-regression.spec.ts:32`     | Visual diff               | VISUAL_REGRESSION env not set    | Valid  |
+| `mobile/responsive-layout.spec.ts` | Touch target tests (4)    | viewport >= 1024px (lg:hidden)   | Valid  |
+| `mobile/ipad.spec.ts`              | Sidebar overlay tests (3) | viewport >= 1024px (lg:hidden)   | Valid  |
 
 ---
 
@@ -41,12 +45,9 @@ These skip based on runtime conditions (user not seeded, etc.). **Acceptable.**
 
 These have unconditional skips that need investigation.
 
-| File                               | Line          | Test                 | Action Required         | Deadline   |
-| ---------------------------------- | ------------- | -------------------- | ----------------------- | ---------- |
-| `accessibility.spec.ts`            | 487           | Dyslexia font change | Investigate why skipped | 2026-02-15 |
-| `visual-regression.spec.ts`        | 32            | Visual diff          | Needs baseline images   | 2026-02-15 |
-| `mobile/responsive-layout.spec.ts` | 42,72,101,124 | Layout tests         | Missing test data       | 2026-02-15 |
-| `mobile/ipad.spec.ts`              | 106,176,292   | iPad tests           | Missing test data       | 2026-02-15 |
+| File | Line | Test | Action Required | Deadline |
+| ---- | ---- | ---- | --------------- | -------- |
+| -    | -    | -    | None pending    | -        |
 
 ---
 
