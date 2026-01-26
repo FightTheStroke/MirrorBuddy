@@ -14,8 +14,23 @@ import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
 import { logger } from "@/lib/logger";
 
-const redis = Redis.fromEnv();
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Lazy initialization to avoid build-time errors
+let redis: ReturnType<typeof Redis.fromEnv> | null = null;
+let resend: Resend | null = null;
+
+function getRedis() {
+  if (!redis) {
+    redis = Redis.fromEnv();
+  }
+  return redis;
+}
+
+function getResend() {
+  if (!resend && process.env.RESEND_API_KEY) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resend;
+}
 
 export async function POST(request: NextRequest) {
   // Validate cron secret header
@@ -30,7 +45,7 @@ export async function POST(request: NextRequest) {
     const rotationDate = new Date().toISOString();
 
     // Store in Redis as pending (admin must apply to env var)
-    await redis.set("mirrorbuddy:ip-salt:pending", {
+    await getRedis().set("mirrorbuddy:ip-salt:pending", {
       salt: newSalt,
       generatedAt: rotationDate,
       appliedToEnv: false,
@@ -38,8 +53,9 @@ export async function POST(request: NextRequest) {
 
     // Send admin notification email
     const adminEmail = process.env.ADMIN_EMAIL;
-    if (adminEmail && process.env.RESEND_API_KEY) {
-      await resend.emails.send({
+    const resendClient = getResend();
+    if (adminEmail && resendClient) {
+      await resendClient.emails.send({
         from: "MirrorBuddy <noreply@mirrorbuddy.it>",
         to: adminEmail,
         subject: "[Action Required] Monthly IP Salt Rotation",
