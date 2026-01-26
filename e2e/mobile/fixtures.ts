@@ -137,6 +137,41 @@ export const test = base.extend<{ mobile: MobileTestHelpers }>({
       });
     });
 
+    // Mock /api/user/settings to prevent 401 errors
+    // Settings are loaded on mount and missing data causes hydration issues
+    await page.route("**/api/user/settings", async (route) => {
+      if (route.request().method() === "GET") {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            studentProfile: {
+              preferredCoach: "melissa",
+              preferredBuddy: "mario",
+            },
+          }),
+        });
+      } else {
+        await route.fulfill({ status: 200, body: "{}" });
+      }
+    });
+
+    // Mock /api/progress to prevent gamification errors
+    await page.route("**/api/progress", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          xp: 100,
+          level: 1,
+          streak: 1,
+          totalStudyMinutes: 30,
+          sessionsThisWeek: 1,
+          questionsAsked: 5,
+        }),
+      });
+    });
+
     const helpers: MobileTestHelpers = {
       verifyTouchTarget: async (locator: Locator) => {
         const box = await locator.boundingBox();

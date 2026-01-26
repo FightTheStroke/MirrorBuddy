@@ -12,8 +12,9 @@ test.describe("iPad Mini Responsive UX", () => {
     await page.goto("/");
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
+    // Use longer timeout for CI where hydration is slower
     await page.waitForSelector('button:has-text("Professori")', {
-      timeout: 15000,
+      timeout: 30000,
     });
   });
 

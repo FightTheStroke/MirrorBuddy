@@ -379,16 +379,15 @@ jobs:
             echo "No circular imports detected"
           fi
 
-  # Lane 6a: Mobile E2E Tests - Responsive design validation
+  # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
-  # NON-BLOCKING: Mobile tests are flaky in CI due to hydration timing
-  # Tests still run and report status, but failures don't block the pipeline
+  # Ensures mobile-first design is not broken by new features
+  # MANDATORY on main branch only (push to main or PR targeting main)
   mobile-e2e:
     name: Mobile E2E Tests
     runs-on: ubuntu-latest
     needs: [build]
     if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
-    continue-on-error: true  # Non-blocking - mobile tests are flaky in CI
 
     services:
       postgres:

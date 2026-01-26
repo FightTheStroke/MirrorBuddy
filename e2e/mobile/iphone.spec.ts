@@ -12,8 +12,9 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     await page.goto("/");
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
+    // Use longer timeout for CI where hydration is slower
     await page.waitForSelector('button:has-text("Professori")', {
-      timeout: 15000,
+      timeout: 30000,
     });
   });
 
@@ -104,8 +105,7 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     expect(typeof isLvVisible).toBe("boolean"); // Just verify the check completes
   });
 
-  // Skip: Flaky in CI - sidebar overlay timing issues with openMobileSidebar()
-  test.skip("all touch targets should meet WCAG 2.5.5 minimum", async ({
+  test("all touch targets should meet WCAG 2.5.5 minimum", async ({
     page,
     mobile,
   }) => {
@@ -151,8 +151,7 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     }
   });
 
-  // Skip: Flaky in CI - sidebar overlay timing issues with openMobileSidebar()
-  test.skip("landscape orientation should maintain functionality", async ({
+  test("landscape orientation should maintain functionality", async ({
     page,
     mobile,
   }) => {
