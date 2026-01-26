@@ -32,6 +32,15 @@ START_TIME=$(date +%s)
 # =============================================================================
 echo -e "${BLUE}[PHASE 1] Instant checks...${NC}"
 
+# Redirect metadata lint (a11y guard)
+if [ -f "./scripts/lint-redirect-metadata.tsx" ]; then
+    if ! npx tsx ./scripts/lint-redirect-metadata.tsx; then
+        echo -e "${RED}✗ Redirect metadata lint failed${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Redirect metadata lint passed${NC}"
+fi
+
 # Documentation check (instant)
 MISSING_DOCS=""
 for doc in "README.md" "CHANGELOG.md" "CONTRIBUTING.md" "CLAUDE.md"; do

@@ -17,7 +17,7 @@ test.describe("CSRF Protection", () => {
     // explicitly omit the CSRF header to test protection
     const response = await request.post("/api/tools/events", {
       data: {
-        sessionId: "test-session",
+        sessionId: "voice-test-session",
         maestroId: "archimede",
         type: "tool:created",
         toolType: "mindmap",
@@ -45,7 +45,7 @@ test.describe("CSRF Protection", () => {
     // Note: request.post() automatically includes cookies from previous responses
     const response = await request.post("/api/tools/events", {
       data: {
-        sessionId: `test-session-${Date.now()}`,
+        sessionId: `voice-test-session-${Date.now()}`,
         maestroId: "archimede",
         type: "tool:created",
         toolType: "mindmap",
@@ -107,7 +107,7 @@ test.describe("CSRF with Tools Integration", () => {
     const { csrfToken } = await sessionResponse.json();
     expect(csrfToken).toBeDefined();
 
-    const sessionId = `csrf-flow-${Date.now()}`;
+    const sessionId = `voice-csrf-flow-${Date.now()}`;
 
     // Step 1: Create tool event (simulates voice command)
     const createResponse = await request.post("/api/tools/events", {

@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Benvenuto | MirrorBuddy",
+};
 
 /**
  * /landing route - redirects to /welcome

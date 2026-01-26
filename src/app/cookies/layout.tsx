@@ -1,8 +1,8 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: 'Cookie Policy - MirrorBuddy',
-  description: 'Informativa sui Cookie di MirrorBuddy',
+  title: "Cookie Policy | MirrorBuddy",
+  description: "Informativa sui cookie di MirrorBuddy",
 };
 
 export default function CookiesLayout({

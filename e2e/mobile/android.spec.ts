@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from "./fixtures";
+import { waitForHomeReady } from "./helpers/wait-for-home";
 
 test.describe("Android Pixel 7 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
@@ -13,9 +14,7 @@ test.describe("Android Pixel 7 Mobile UX", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, the main heading "Professori" appears (it's an h1, not a button)
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
-      timeout: 20000,
-    });
+    await waitForHomeReady(page);
   });
 
   test("voice panel should be less than 30% of viewport width", async ({
@@ -31,7 +30,9 @@ test.describe("Android Pixel 7 Mobile UX", () => {
     if (await firstMaestro.isVisible()) {
       await firstMaestro.click();
 
-      await page.waitForTimeout(500);
+      await page.locator("[class*='voice-panel']").first().waitFor({
+        state: "visible",
+      });
 
       const voicePanel = page.locator("[class*='voice-panel']").first();
       if (await voicePanel.isVisible()) {
@@ -119,7 +120,7 @@ test.describe("Android Pixel 7 Mobile UX", () => {
     await page.keyboard.press("Escape");
 
     // Wait for animation
-    await page.waitForTimeout(400);
+    await mobile.waitForSidebarAnimation();
 
     // Check if close button is present, meaning sidebar may still be open but closeable
     // The app may not respond to Escape key - this is acceptable behavior
@@ -166,7 +167,12 @@ test.describe("Android Pixel 7 Mobile UX", () => {
       await firstMaestro.click();
 
       // Wait for chat interface
-      await page.waitForTimeout(500);
+      await page
+        .getByPlaceholder(/scrivi/i)
+        .first()
+        .waitFor({
+          state: "visible",
+        });
 
       const chatInput = page.locator(
         'textarea[placeholder*="scrivi"], textarea[placeholder*="Scrivi"]',
@@ -187,14 +193,14 @@ test.describe("Android Pixel 7 Mobile UX", () => {
   test("pull-to-refresh should not interfere with scroll", async ({ page }) => {
     // Scroll down page
     await page.evaluate(() => window.scrollTo(0, 100));
-    await page.waitForTimeout(100);
+    await page.waitForFunction(() => window.scrollY > 0);
 
     const scrollY = await page.evaluate(() => window.scrollY);
     expect(scrollY).toBeGreaterThan(0);
 
     // Scroll up should work normally (no pull-to-refresh blocking)
     await page.evaluate(() => window.scrollTo(0, 0));
-    await page.waitForTimeout(100);
+    await page.waitForFunction(() => window.scrollY === 0);
 
     const scrollYAfter = await page.evaluate(() => window.scrollY);
     expect(scrollYAfter).toBe(0);

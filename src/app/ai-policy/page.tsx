@@ -1,4 +1,9 @@
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = {
+  title: "Politica AI | MirrorBuddy",
+};
 
 /**
  * /ai-policy route - redirects to /ai-transparency

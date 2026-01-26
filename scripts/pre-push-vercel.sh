@@ -63,6 +63,16 @@ echo -e "${GREEN}✓ Prisma generated fresh${NC}"
 # =============================================================================
 echo -e "${BLUE}[2/5] Parallel checks (lint, typecheck, audit)...${NC}"
 
+# Redirect metadata lint (a11y guard)
+if [ -f "./scripts/lint-redirect-metadata.tsx" ]; then
+    if ! npx tsx ./scripts/lint-redirect-metadata.tsx > "$TEMP_DIR/redirect-metadata.log" 2>&1; then
+        echo -e "${RED}✗ Redirect metadata lint failed${NC}"
+        cat "$TEMP_DIR/redirect-metadata.log"
+        exit 1
+    fi
+    echo -e "${GREEN}✓ Redirect metadata lint passed${NC}"
+fi
+
 (
     npm run lint > "$TEMP_DIR/lint.log" 2>&1
     echo $? > "$TEMP_DIR/lint.exit"

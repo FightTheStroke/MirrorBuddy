@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from "./fixtures";
+import { waitForHomeReady } from "./helpers/wait-for-home";
 
 test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
@@ -13,9 +14,7 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, the main heading "Professori" appears (it's an h1, not a button)
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
-      timeout: 20000,
-    });
+    await waitForHomeReady(page);
   });
 
   test("voice panel should be less than 30% of viewport width", async ({
@@ -33,7 +32,9 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
       await firstMaestro.click();
 
       // Wait for voice panel to appear
-      await page.waitForTimeout(500);
+      await page.locator("[class*='voice-panel']").first().waitFor({
+        state: "visible",
+      });
 
       // Check if voice panel exists
       const voicePanel = page.locator("[class*='voice-panel']").first();
@@ -164,7 +165,12 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
       });
 
       // Wait for layout recalculation
-      await page.waitForTimeout(500);
+      await page
+        .getByPlaceholder(/scrivi/i)
+        .first()
+        .waitFor({
+          state: "visible",
+        });
 
       // Header should still be visible
       await expect(page.locator("header").first()).toBeVisible();
@@ -196,7 +202,7 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
     const menuButton = page.locator('button[aria-label="Apri menu"]').first();
     if (await menuButton.isVisible()) {
       await menuButton.click();
-      await page.waitForTimeout(100); // Minimal wait
+      await page.locator("aside").first().waitFor({ state: "visible" });
 
       const sidebar = page.locator("aside").first();
       await expect(sidebar).toBeVisible();

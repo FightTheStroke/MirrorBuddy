@@ -118,10 +118,6 @@ const eslintConfig = defineConfig([
           message: "Use AUTH_COOKIE_CLIENT from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
         },
         {
-          selector: "Literal[value='mirrorbuddy-visitor-id']",
-          message: "Use VISITOR_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
           selector: "Literal[value='mirrorbuddy-admin']",
           message: "Use ADMIN_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
         },
@@ -136,6 +132,10 @@ const eslintConfig = defineConfig([
         {
           selector: "Literal[value='convergio-user-id']",
           message: "Use LEGACY_AUTH_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
+        },
+        {
+          selector: "Literal[value='mirrorbuddy-visitor-id']",
+          message: "Use VISITOR_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
         },
       ],
     },
