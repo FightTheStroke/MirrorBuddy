@@ -25,7 +25,13 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+// Mock tier-memory-config
+vi.mock("../tier-memory-config", () => ({
+  getTierMemoryLimits: vi.fn(),
+}));
+
 import { prisma } from "@/lib/db";
+import { getTierMemoryLimits } from "../tier-memory-config";
 
 // Helper to create mock conversation with all required fields
 function createMockConversation(overrides: {
@@ -58,13 +64,22 @@ function createMockConversation(overrides: {
 describe("memory-loader", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Default mock to base tier limits
+    vi.mocked(getTierMemoryLimits).mockReturnValue({
+      recentConversations: 3,
+      timeWindowDays: 15,
+      maxKeyFacts: 10,
+      maxTopics: 15,
+      semanticEnabled: false,
+      crossMaestroEnabled: false,
+    });
   });
 
   describe("loadPreviousContext", () => {
     it("returns empty memory for user with no previous conversations", async () => {
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result).toEqual({
         recentSummary: null,
@@ -72,6 +87,14 @@ describe("memory-loader", () => {
         topics: [],
         lastSessionDate: null,
       });
+    });
+
+    it("defaults to base tier when tierName not provided", async () => {
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
+
+      await loadPreviousContext("user-1", "melissa");
+
+      expect(getTierMemoryLimits).toHaveBeenCalledWith("base");
     });
 
     it("loads summary from most recent closed conversation", async () => {
@@ -85,7 +108,7 @@ describe("memory-loader", () => {
         mockConversation,
       ]);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result.recentSummary).toBe("Lo studente ha imparato le frazioni");
       expect(result.keyFacts).toContain("preferisce esempi visivi");
@@ -110,7 +133,7 @@ describe("memory-loader", () => {
       ];
       vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result.keyFacts).toHaveLength(3);
       expect(result.keyFacts).toContain("fact1");
@@ -118,7 +141,15 @@ describe("memory-loader", () => {
       expect(result.keyFacts).toContain("fact3");
     });
 
-    it("limits key facts to 5", async () => {
+    it("limits key facts to tier-specific max", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 1,
+        timeWindowDays: 30,
+        maxKeyFacts: 5,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
       const conversations = [
         createMockConversation({
           summary: "Session",
@@ -128,12 +159,20 @@ describe("memory-loader", () => {
       ];
       vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result.keyFacts.length).toBeLessThanOrEqual(5);
     });
 
-    it("limits topics to 10", async () => {
+    it("limits topics to tier-specific max", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 1,
+        timeWindowDays: 30,
+        maxKeyFacts: 10,
+        maxTopics: 10,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
       const manyTopics = Array.from({ length: 15 }, (_, i) => `topic${i}`);
       const conversations = [
         createMockConversation({
@@ -144,7 +183,7 @@ describe("memory-loader", () => {
       ];
       vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result.topics.length).toBeLessThanOrEqual(10);
     });
@@ -159,14 +198,91 @@ describe("memory-loader", () => {
       ];
       vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
 
-      const result = await loadPreviousContext("user-1", "melissa");
+      const result = await loadPreviousContext("user-1", "melissa", "base");
 
       expect(result.keyFacts).toEqual([]);
       expect(result.topics).toContain("valid");
     });
 
+    it("trial tier returns empty memory", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 0,
+        timeWindowDays: 0,
+        maxKeyFacts: 0,
+        maxTopics: 0,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+      const mockConversation = createMockConversation({
+        summary: "Should be ignored",
+        keyFacts: '["should", "be", "ignored"]',
+        topics: '["ignored"]',
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([
+        mockConversation,
+      ]);
+
+      const result = await loadPreviousContext("user-1", "melissa", "trial");
+
+      expect(result).toEqual({
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      });
+    });
+
+    it("pro tier uses higher limits", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+      const conversations = Array.from({ length: 5 }, (_, i) =>
+        createMockConversation({
+          summary: `Session ${i}`,
+          keyFacts: JSON.stringify([`fact${i}`]),
+          topics: JSON.stringify([`topic${i}`]),
+          updatedAt: new Date(Date.now() - i * 24 * 60 * 60 * 1000),
+        }),
+      );
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue(conversations);
+
+      await loadPreviousContext("user-1", "melissa", "pro");
+
+      expect(prisma.conversation.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 5,
+        }),
+      );
+    });
+
+    it("respects timeWindowDays filter", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 5,
+        timeWindowDays: 7,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
+
+      await loadPreviousContext("user-1", "melissa", "base");
+
+      const call = vi.mocked(prisma.conversation.findMany).mock.calls[0][0];
+      const whereClause = call?.where as Record<string, unknown>;
+      expect(
+        (whereClause?.updatedAt as Record<string, unknown>)?.gte,
+      ).toBeDefined();
+    });
+
     it("excludes active conversations", async () => {
-      await loadPreviousContext("user-1", "melissa");
+      await loadPreviousContext("user-1", "melissa", "base");
 
       expect(prisma.conversation.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -178,13 +294,33 @@ describe("memory-loader", () => {
     });
 
     it("excludes parent mode conversations", async () => {
-      await loadPreviousContext("user-1", "melissa");
+      await loadPreviousContext("user-1", "melissa", "base");
 
       expect(prisma.conversation.findMany).toHaveBeenCalledWith(
         expect.objectContaining({
           where: expect.objectContaining({
             isParentMode: false,
           }),
+        }),
+      );
+    });
+
+    it("passes correct recentConversations limit to query", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 3,
+        timeWindowDays: 15,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+      vi.mocked(prisma.conversation.findMany).mockResolvedValue([]);
+
+      await loadPreviousContext("user-1", "melissa", "base");
+
+      expect(prisma.conversation.findMany).toHaveBeenCalledWith(
+        expect.objectContaining({
+          take: 3,
         }),
       );
     });
