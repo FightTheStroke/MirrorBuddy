@@ -16,6 +16,9 @@ vi.mock("@/lib/db", () => ({
     conversation: {
       findMany: vi.fn(),
     },
+    hierarchicalSummary: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
@@ -895,6 +898,141 @@ describe("memory-loader", () => {
       expect(result.keyFacts).toContain("base_fact");
       expect(result.topics).toContain("base_topic");
       expect(result.semanticMemories).toEqual(semanticResults);
+    });
+  });
+
+  describe("loadHierarchicalContext", () => {
+    beforeEach(() => {
+      vi.mocked(prisma.hierarchicalSummary.findMany).mockResolvedValue([]);
+    });
+
+    it("returns empty hierarchical context for trial tier", async () => {
+      vi.mocked(getTierMemoryLimits).mockReturnValue({
+        recentConversations: 0,
+        timeWindowDays: 0,
+        maxKeyFacts: 0,
+        maxTopics: 0,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      const { loadHierarchicalContext } = await import("../memory-loader");
+      const result = await loadHierarchicalContext("user-1", {
+        recentConversations: 0,
+        timeWindowDays: 0,
+        maxKeyFacts: 0,
+        maxTopics: 0,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      expect(result).toEqual({
+        weeklySummary: undefined,
+        monthlySummary: undefined,
+      });
+    });
+
+    it("returns empty hierarchical context for base tier without semanticEnabled", async () => {
+      const { loadHierarchicalContext } = await import("../memory-loader");
+      const result = await loadHierarchicalContext("user-1", {
+        recentConversations: 3,
+        timeWindowDays: 15,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      });
+
+      expect(result).toEqual({
+        weeklySummary: undefined,
+        monthlySummary: undefined,
+      });
+    });
+
+    it("loads weekly and monthly summaries for Pro tier", async () => {
+      const mockWeeklySummary = {
+        id: "summary-1",
+        userId: "user-1",
+        type: "weekly",
+        startDate: new Date("2026-01-20"),
+        endDate: new Date("2026-01-26"),
+        keyThemes: ["fractions", "geometry"],
+        consolidatedLearnings: ["understands basic fractions"],
+        frequentTopics: [{ topic: "math", count: 5 }],
+        sourceConversationIds: ["conv-1", "conv-2"],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      const mockMonthlySummary = {
+        id: "summary-2",
+        userId: "user-1",
+        type: "monthly",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-01-31"),
+        keyThemes: ["math", "science"],
+        consolidatedLearnings: ["completed unit 1", "started unit 2"],
+        frequentTopics: [
+          { topic: "math", count: 15 },
+          { topic: "science", count: 8 },
+        ],
+        sourceConversationIds: ["conv-1", "conv-2", "conv-3"],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(prisma.hierarchicalSummary.findMany).mockResolvedValue([
+        mockWeeklySummary,
+        mockMonthlySummary,
+      ]);
+
+      const { loadHierarchicalContext } = await import("../memory-loader");
+      const result = await loadHierarchicalContext("user-1", {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      expect(result.weeklySummary).toBeDefined();
+      expect(result.monthlySummary).toBeDefined();
+      expect(typeof result.weeklySummary).toBe("string");
+      expect(typeof result.monthlySummary).toBe("string");
+    });
+
+    it("handles missing weekly summary gracefully", async () => {
+      const mockMonthlySummary = {
+        id: "summary-2",
+        userId: "user-1",
+        type: "monthly",
+        startDate: new Date("2026-01-01"),
+        endDate: new Date("2026-01-31"),
+        keyThemes: ["math"],
+        consolidatedLearnings: ["completed unit 1"],
+        frequentTopics: [{ topic: "math", count: 15 }],
+        sourceConversationIds: ["conv-1"],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+
+      vi.mocked(prisma.hierarchicalSummary.findMany).mockResolvedValue([
+        mockMonthlySummary,
+      ]);
+
+      const { loadHierarchicalContext } = await import("../memory-loader");
+      const result = await loadHierarchicalContext("user-1", {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      });
+
+      expect(result.monthlySummary).toBeDefined();
+      expect(result.weeklySummary).toBeUndefined();
     });
   });
 });

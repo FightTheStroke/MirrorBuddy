@@ -25,6 +25,10 @@ export interface ConversationMemory {
   topics: string[];
   lastSessionDate: Date | null;
   semanticMemories?: RelevantSummary[];
+  hierarchicalContext?: {
+    weeklySummary?: string;
+    monthlySummary?: string;
+  };
 }
 
 /**
@@ -162,35 +166,51 @@ export async function loadEnhancedContext(
     const shouldSearchSemantic =
       limits.semanticEnabled && query && query.trim().length > 0;
 
-    if (!shouldSearchSemantic) {
-      return baseMemory;
-    }
+    let semanticResults: RelevantSummary[] = [];
+    let hierarchicalContext:
+      | { weeklySummary?: string; monthlySummary?: string }
+      | undefined = undefined;
 
     // Perform semantic search for Pro tier users with query
-    logger.debug("Performing semantic search for enhanced context", {
-      userId,
-      maestroId,
-      tierName,
-      queryLength: query.length,
-    });
+    if (shouldSearchSemantic) {
+      logger.debug("Performing semantic search for enhanced context", {
+        userId,
+        maestroId,
+        tierName,
+        queryLength: query.length,
+      });
 
-    const semanticResults = await searchRelevantSummaries(
-      userId,
-      query,
-      tierName,
-      10, // Default limit of 10 results
-    );
+      semanticResults = await searchRelevantSummaries(
+        userId,
+        query,
+        tierName,
+        10, // Default limit of 10 results
+      );
+    }
 
-    logger.info("Enhanced context loaded with semantic memories", {
+    // Load hierarchical summaries for Pro tier users
+    if (limits.semanticEnabled) {
+      hierarchicalContext = await loadHierarchicalContext(userId, limits);
+    }
+
+    logger.info("Enhanced context loaded", {
       userId,
       maestroId,
       semanticResultCount: semanticResults.length,
+      hasHierarchicalContext: !!hierarchicalContext,
     });
 
-    return {
+    const result: ConversationMemory = {
       ...baseMemory,
-      semanticMemories: semanticResults,
+      hierarchicalContext,
     };
+
+    // Include semanticMemories only if semantic search was performed
+    if (shouldSearchSemantic) {
+      result.semanticMemories = semanticResults;
+    }
+
+    return result;
   } catch (error) {
     logger.error(
       "Failed to load enhanced context, falling back to base memory",
@@ -271,6 +291,52 @@ function mergeTopics(
 
   // Return topics limited to tier-specific max
   return Array.from(allTopics).slice(0, maxTopics);
+}
+
+/**
+ * Load hierarchical summaries (weekly/monthly) for Pro tier users.
+ */
+export async function loadHierarchicalContext(
+  userId: string,
+  tierLimits: import("./tier-memory-config").TierMemoryLimits,
+): Promise<{ weeklySummary?: string; monthlySummary?: string }> {
+  if (!tierLimits.semanticEnabled) {
+    return {};
+  }
+  try {
+    const summaries = await prisma.hierarchicalSummary.findMany({
+      where: { userId, type: { in: ["weekly", "monthly"] } },
+      orderBy: { endDate: "desc" },
+      take: 2,
+    });
+    const result: Record<string, string | undefined> = {};
+    for (const s of summaries) {
+      const key = s.type === "weekly" ? "weeklySummary" : "monthlySummary";
+      if (!result[key]) {
+        const themes = Array.isArray(s.keyThemes) ? s.keyThemes : [];
+        const learnings = Array.isArray(s.consolidatedLearnings)
+          ? s.consolidatedLearnings
+          : [];
+        const topicNames = Array.isArray(s.frequentTopics)
+          ? (s.frequentTopics as Array<{ topic?: string; count?: number }>)
+              .filter((t) => t?.topic)
+              .map((t) => t.topic)
+              .join(", ")
+          : "";
+        const parts = [];
+        if (themes.length) parts.push(`Temi: ${themes.join(", ")}`);
+        if (learnings.length)
+          parts.push(`Apprendimenti: ${learnings.join(", ")}`);
+        if (topicNames) parts.push(`Argomenti: ${topicNames}`);
+        result[key] = parts.join(" | ");
+      }
+    }
+    logger.info("Loaded hierarchical context", { userId });
+    return result as { weeklySummary?: string; monthlySummary?: string };
+  } catch (error) {
+    logger.error("Failed to load hierarchical context", { userId }, error);
+    return {};
+  }
 }
 
 /**
