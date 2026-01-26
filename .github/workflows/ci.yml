@@ -473,9 +473,8 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          # Use repo secret if configured, otherwise use a static test-only secret
-          # Safe for CI: ephemeral test DB, no real user data
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'ci-test-session-secret-for-smoke-tests-not-for-production-0123456789abcdef' }}
+          # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
 
       - name: Upload smoke test report
         if: failure()
@@ -572,7 +571,8 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'ci-test-session-secret-for-smoke-tests-not-for-production-0123456789abcdef' }}
+          # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
 
       - name: Upload Playwright report
         if: always()
@@ -684,7 +684,8 @@ jobs:
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
-          SESSION_SECRET: ${{ secrets.SESSION_SECRET || 'ci-test-session-secret-for-smoke-tests-not-for-production-0123456789abcdef' }}
+          # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
 
       - name: Upload Playwright report
         if: always()
