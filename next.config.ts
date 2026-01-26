@@ -31,6 +31,10 @@ const nextConfig: NextConfig = {
   // Bundle optimization: Tree-shake large packages
   // Reduces bundle size by only importing used components
   experimental: {
+    // Increase body size limit for file uploads (study kit PDFs up to 20MB)
+    serverActions: {
+      bodySizeLimit: "20mb",
+    },
     optimizePackageImports: [
       "@radix-ui/react-accordion",
       "@radix-ui/react-alert-dialog",
