@@ -1,14 +1,18 @@
-import { AnimatePresence } from 'framer-motion';
-import { ToolMaestroSelectionDialog } from '../tool-maestro-selection-dialog';
-import { ConversationHeader, HandoffBanner } from './index';
-import { ConversationInput } from './conversation-input';
-import { ToolLayout } from './tool-layout';
-import { ChatLayout } from './chat-layout';
-import { VoiceCallPanel } from './voice-call-panel';
-import { useTTS } from '@/components/accessibility';
-import { cn } from '@/lib/utils';
-import type { ToolType, ToolState } from '@/types/tools';
-import type { ActiveCharacter, FlowMessage, HandoffSuggestion } from '@/lib/stores/conversation-flow-store';
+import { AnimatePresence } from "framer-motion";
+import { ToolMaestroSelectionDialog } from "../tool-maestro-selection-dialog";
+import { ConversationHeader, HandoffBanner } from "./index";
+import { ConversationInput } from "./conversation-input";
+import { ToolLayout } from "./tool-layout";
+import { ChatLayout } from "./chat-layout";
+import { VoiceCallPanel } from "./voice-call-panel";
+import { useTTS } from "@/components/accessibility";
+import { cn } from "@/lib/utils";
+import type { ToolType, ToolState } from "@/types/tools";
+import type {
+  ActiveCharacter,
+  FlowMessage,
+  HandoffSuggestion,
+} from "@/lib/stores/conversation-flow-store";
 
 interface ConversationContentProps {
   activeCharacter: ActiveCharacter;
@@ -21,7 +25,7 @@ interface ConversationContentProps {
   isToolMinimized: boolean;
   voiceSessionId: string | null;
   inputValue: string;
-  mode: 'text' | 'voice';
+  mode: "text" | "voice";
   isMuted: boolean;
   inputRef: React.RefObject<HTMLInputElement>;
   messagesEndRef: React.RefObject<HTMLDivElement>;
@@ -81,19 +85,23 @@ export function ConversationContent({
   onToggleMinimize,
   onSetVoiceSessionId,
 }: ConversationContentProps) {
-  const hasActiveTool = activeTool && activeTool.status !== 'error';
+  const hasActiveTool = activeTool && activeTool.status !== "error";
   const { stop: stopTTS, enabled: ttsEnabled } = useTTS();
 
   return (
-    <div className={cn(
-      "flex flex-col lg:flex-row gap-4",
-      isVoiceActive ? "flex-1 min-w-0" : "w-full h-full"
-    )}>
+    <div
+      className={cn(
+        "flex flex-col lg:flex-row gap-4 flex-1 min-w-0",
+        !isVoiceActive && "h-full",
+      )}
+    >
       {/* Main content area */}
-      <div className={cn(
-        "flex flex-col min-w-0",
-        isVoiceActive ? "flex-1" : "w-full h-full"
-      )}>
+      <div
+        className={cn(
+          "flex flex-col min-w-0 flex-1",
+          !isVoiceActive && "h-full",
+        )}
+      >
         {/* Header - hidden when voice is active (all controls in panel) */}
         {!isVoiceActive && (
           <ConversationHeader
@@ -167,7 +175,7 @@ export function ConversationContent({
 
       <ToolMaestroSelectionDialog
         isOpen={showMaestroDialog}
-        toolType={pendingToolType || 'mindmap'}
+        toolType={pendingToolType || "mindmap"}
         onSelect={(maestro) => {
           if (pendingToolType) {
             onMaestroSelected(maestro, pendingToolType);
