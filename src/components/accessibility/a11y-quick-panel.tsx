@@ -12,7 +12,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
-import { A11yProfileButton, PROFILE_CONFIGS } from "./a11y-profile-button";
+import { A11yProfileButton, getProfileConfigs } from "./a11y-profile-button";
 
 interface A11yQuickPanelProps {
   isOpen: boolean;
@@ -26,6 +26,9 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
   const settings = useAccessibilityStore((state) => state.settings);
   const updateSettings = useAccessibilityStore((state) => state.updateSettings);
   const resetSettings = useAccessibilityStore((state) => state.resetSettings);
+
+  // Get translated profile configs
+  const PROFILE_CONFIGS = getProfileConfigs(t);
 
   // Profile apply functions
   const applyDyslexia = useAccessibilityStore((s) => s.applyDyslexiaProfile);

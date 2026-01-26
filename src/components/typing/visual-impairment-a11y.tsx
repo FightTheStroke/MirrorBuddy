@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 export interface VisualImpairmentSettings {
@@ -19,6 +20,7 @@ export function VisualImpairmentA11y({
   settings: VisualImpairmentSettings;
   onSettingsChange: (settings: VisualImpairmentSettings) => void;
 }) {
+  const t = useTranslations('settings.accessibility');
   const [showTTSSettings, setShowTTSSettings] = useState(false);
 
   const updateSetting = <K extends keyof VisualImpairmentSettings>(
@@ -34,16 +36,16 @@ export function VisualImpairmentA11y({
       settings.highContrast && 'contrast-100'
     )}>
       <div>
-        <h3 className="text-lg font-semibold mb-4">Accessibilità Visiva</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('visualTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni per utenti con problemi alla vista.
+          {t('visualDesc')}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Alto contrasto"
-          description="Aumenta il contrasto dei colori per migliore leggibilità"
+          title={t('visualHighContrast')}
+          description={t('visualHighContrastDesc')}
           enabled={settings.highContrast}
           onToggle={() => updateSetting('highContrast', !settings.highContrast)}
         />
@@ -53,7 +55,7 @@ export function VisualImpairmentA11y({
           settings.highContrast ? 'bg-background border-primary/50' : 'bg-muted/30 border-border'
         )}>
           <label className="font-semibold mb-2 block">
-            Dimensione testo ({settings.textSize}%)
+            {t('visualTextSizeLabel')} ({settings.textSize}%)
           </label>
           <input
             type="range"
@@ -68,13 +70,13 @@ export function VisualImpairmentA11y({
             aria-valuemax={200}
           />
           <p className="text-xs text-muted-foreground mt-2">
-            100% (normale) - 200% (massimo)
+            {t('visualTextSizeRange')}
           </p>
         </div>
 
         <SettingCard
-          title="Sintesi vocale (TTS)"
-          description="Legge ad alta voce le istruzioni e il feedback"
+          title={t('visualTTS')}
+          description={t('visualTTSDesc')}
           enabled={settings.ttsEnabled}
           onToggle={() => updateSetting('ttsEnabled', !settings.ttsEnabled)}
         >
@@ -84,14 +86,14 @@ export function VisualImpairmentA11y({
                 onClick={() => setShowTTSSettings(!showTTSSettings)}
                 className="text-sm text-primary hover:underline"
               >
-                {showTTSSettings ? 'Nascondi impostazioni TTS' : 'Mostra impostazioni TTS'}
+                {showTTSSettings ? t('visualHideTTSSettings') : t('visualShowTTSSettings')}
               </button>
 
               {showTTSSettings && (
                 <div className="space-y-4">
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Velocità ({settings.speechRate}x)
+                      {t('visualSpeechRateLabel')} ({settings.speechRate}x)
                     </label>
                     <input
                       type="range"
@@ -106,7 +108,7 @@ export function VisualImpairmentA11y({
 
                   <div>
                     <label className="text-sm font-medium mb-2 block">
-                      Volume ({Math.round(settings.speechVolume * 100)}%)
+                      {t('visualSpeechVolumeLabel')} ({Math.round(settings.speechVolume * 100)}%)
                     </label>
                     <input
                       type="range"
@@ -125,8 +127,8 @@ export function VisualImpairmentA11y({
         </SettingCard>
 
         <SettingCard
-          title="Indicatori di focus"
-          description="Mostra evidenziazione chiara dell'elemento attivo"
+          title={t('visualFocusIndicators')}
+          description={t('visualFocusIndicatorsDesc')}
           enabled={settings.focusIndicators}
           onToggle={() => updateSetting('focusIndicators', !settings.focusIndicators)}
         />
@@ -134,8 +136,7 @@ export function VisualImpairmentA11y({
 
       <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
         <p className="text-sm">
-          <strong>Conformità WCAG 2.1 AA:</strong> Tutte le impostazioni rispettano
-          i requisiti di accessibilità per utenti con disabilità visive.
+          <strong>Conformità WCAG 2.1 AA:</strong> {t('visualWCAGCompliance')}
         </p>
       </div>
     </div>

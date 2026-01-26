@@ -315,127 +315,10 @@
       "close": "Schließen"
     },
     "knowledge-hub": {
-      "header": {
-        "search": {
-          "placeholder": "Materialien durchsuchen...",
-          "aria-label": "Materialien durchsuchen",
-          "clear-aria-label": "Suche löschen",
-          "announcement": "Suchergebnisse für: {value}"
-        },
-        "filter": {
-          "aria-label": "Filter",
-          "listbox-aria-label": "Nach Materialtyp filtern"
-        }
-      },
-      "views": {
-        "explorer": {
-          "label": "Erkunden",
-          "description": "Ordneransicht mit Baumnavigation"
-        },
-        "gallery": {
-          "label": "Galerie",
-          "description": "Rasteransicht mit großer Vorschau"
-        },
-        "timeline": {
-          "label": "Zeitstrahl",
-          "description": "Chronologische Ansicht sortiert nach Datum"
-        },
-        "calendar": {
-          "label": "Kalender",
-          "description": "Kalenderansicht von Ereignissen"
-        }
-      },
-      "types": {
-        "all": "Alle",
-        "mindmap": "Gedankenkarte",
-        "quiz": "Quiz",
-        "flashcard": "Lernkarte",
-        "summary": "Zusammenfassung",
-        "demo": "Demo",
-        "diagram": "Diagramm",
-        "timeline": "Zeitstrahl",
-        "formula": "Formel",
-        "calculator": "Rechner",
-        "chart": "Diagramm",
-        "pdf": "PDF",
-        "webcam": "Foto",
-        "homework": "Hausaufgaben",
-        "search": "Suche",
-        "typing": "Tippen",
-        "study-kit": "Lernset"
-      },
-      "material-menu": {
-        "open": "Öffnen",
-        "duplicate": "Duplizieren",
-        "move": "Verschieben",
-        "add-tags": "Tags hinzufügen",
-        "find-similar": "Ähnliche Materialien finden",
-        "archive": "Archivieren",
-        "delete": "Löschen",
-        "aria-label": "Materialaktionen"
-      },
-      "sidebar": {
-        "navigation-aria-label": "Materialnavigation",
-        "quick-filters-title": "Schnellfilter",
-        "quick-filters-aria-label": "Filter",
-        "recent": "Zuletzt verwendet",
-        "favorites": "Favoriten",
-        "archived": "Archiviert",
-        "collections-title": "Ordner",
-        "create-collection-aria-label": "Neuen Ordner erstellen",
-        "no-collections": "Keine Ordner",
-        "collections-aria-label": "Ordner",
-        "tags-title": "Tags",
-        "create-tag-aria-label": "Neues Tag erstellen",
-        "no-tags": "Keine Tags",
-        "tags-aria-label": "Tags"
-      },
-      "status-bar": {
-        "selected-count": "Materialien ausgewählt",
-        "deselect-button": "Abwählen",
-        "delete-button": "Löschen"
-      },
-      "similar-materials": {
-        "title": "Ähnliche Materialien",
-        "aria-label": "Ähnliche Materialien",
-        "close-aria-label": "Schließen",
-        "loading": "Wird durchsucht...",
-        "error-loading": "Fehler bei der Suche",
-        "no-results": "Keine ähnlichen Materialien gefunden.",
-        "similarity": "Ähnlichkeit"
-      },
-      "renderers": {
-        "error-title": "Anzeigefehler",
-        "error-message-default": "Dieses Material kann nicht angezeigt werden.",
-        "error-message-with-type": "Materialien vom Typ \"{type}\" können nicht angezeigt werden.",
-        "retry-button": "Erneut versuchen"
-      },
-      "homework": {
-        "default-title": "Hausaufgaben",
-        "due-date-label": "Abgabedatum:",
-        "no-tasks": "Keine Aufgaben"
-      },
-      "timeline": {
-        "default-title": "Zeitstrahl",
-        "no-events": "Keine Ereignisse verfügbar"
-      },
-      "explorer-view": {
-        "all-materials": "Alle Materialien",
-        "all-materials-aria-label": "Alle Materialien",
-        "folder-aria-label": "Ordner {name}",
-        "no-materials": "Keine Materialien in diesem Ordner"
-      },
-      "gallery-view": {
-        "no-materials": "Keine Materialien gefunden"
-      },
-      "timeline-view": {
-        "today": "Heute",
-        "yesterday": "Gestern",
-        "weeks-ago": "vor {count} Wochen",
-        "no-materials": "Keine Materialien gefunden",
-        "material-singular": "Material",
-        "material-plural": "Materialien"
-      }
+      "error-title": "Anzeigefehl",
+      "error-message-with-type": "Material vom Typ \"{type}\" kann nicht angezeigt werden.",
+      "error-message-default": "Dieses Material kann nicht angezeigt werden.",
+      "retry-button": "Nochmal versuchen"
     },
     "learning-path": {
       "loading-path": "Lernpfad wird geladen...",
@@ -609,12 +492,6 @@
       "questions-label": "Fragen",
       "flashcard-label": "Lernkarten",
       "demo-label": "Interaktive Demo"
-    },
-    "knowledge-hub": {
-      "error-title": "Anzeigefehl",
-      "error-message-with-type": "Material vom Typ \"{type}\" kann nicht angezeigt werden.",
-      "error-message-default": "Dieses Material kann nicht angezeigt werden.",
-      "retry-button": "Nochmal versuchen"
     },
     "mindmaps": {
       "title": "Mindmaps",
@@ -1538,7 +1415,19 @@
       "differencesLabel": "Schwierigkeiten",
       "differencesCount": "{count} angegeben"
     },
-    "ageYears": "Jahre"
+    "ageYears": "Jahre",
+    "voicePanel": {
+      "speaking": "Sie spricht...",
+      "microphoneMuted": "Mikrofon ausgeschaltet",
+      "listening": "Hört zu...",
+      "connected": "Verbunden",
+      "speakWithMelissa": "Sprich mit Melissa...",
+      "melissa": "Melissa:",
+      "you": "Sie:",
+      "enableMicrophone": "Mikrofon aktivieren",
+      "disableMicrophone": "Mikrofon deaktivieren",
+      "endCall": "Anruf beenden"
+    }
   },
   "settings": {
     "notifications": {
@@ -1565,6 +1454,158 @@
       "breaksDesc": "Pausenvorschläge (ADHS-Modus)",
       "sessionEnd": "Sitzungsende",
       "sessionEndDesc": "Zusammenfassung am Ende der Lernsitzung"
+    },
+    "tabs": {
+      "profile": "Profil",
+      "characters": "Charaktere",
+      "accessibility": "Barrierefreiheit",
+      "appearance": "Erscheinungsbild",
+      "aiProvider": "KI-Anbieter",
+      "audio": "Audio/Video",
+      "ambientAudio": "Umgebungsaudio",
+      "integrations": "Integrationen",
+      "notifications": "Benachrichtigungen",
+      "statistics": "Statistiken",
+      "privacy": "Datenschutz",
+      "parents": "Eltern",
+      "diagnostics": "Diagnose"
+    },
+    "view": {
+      "title": "Einstellungen",
+      "undoTitle": "Änderungen rückgängig machen",
+      "undoButton": "Rückgängig",
+      "savingButton": "Speichern...",
+      "saveChangesButton": "Änderungen speichern",
+      "saveButton": "Speichern",
+      "parentAreaTitle": "Elternbereich",
+      "parentAreaDescription": "Greifen Sie auf das Eltern-Dashboard zu, um die Fortschritte und Aktivitäten Ihres Kindes sicher und unter Wahrung der Datenschutz (DSGVO) zu überwachen.",
+      "consentRequiredTitle": "Zustimmung erforderlich:",
+      "consentRequiredText": "Das Eltern-Dashboard erfordert die Zustimmung von Eltern und Schüler, um DSGVO-Vorschriften zum Schutz von Kinderdaten einzuhalten.",
+      "openParentDashboard": "Eltern-Dashboard öffnen"
+    },
+    "diagnostics": {
+      "title": "Systemdiagnose",
+      "description": "Stellen Sie sicher, dass alle Komponenten ordnungsgemäß funktionieren: Konfiguration, Chat-API (mit KI-Antwort), Sprachnachricht (mit Audiowiedergabe), Mikrofon und Lautsprecher.",
+      "runAllTests": "Alle Tests ausführen",
+      "connecting": "Verbindung wird hergestellt...",
+      "config": "Konfiguration",
+      "chatApi": "Chat-API",
+      "voiceTest": "Sprachnachricht (vollständiger Test)",
+      "microphone": "Mikrofon",
+      "speaker": "Lautsprecher / Audio"
+    },
+    "accessibility": {
+      "panelTitle": "Barrierefreiheit",
+      "closePanel": "Panel schließen",
+      "quickProfiles": "Schnellprofile",
+      "quickSettings": "Schnelleinstellungen",
+      "largeText": "Großer Text",
+      "highContrast": "Hoher Kontrast",
+      "reduceAnimations": "Animationen reduzieren",
+      "dyslexiaFont": "Legasthenie-Schrift",
+      "resetSettings": "Einstellungen zurücksetzen",
+      "allSettings": "Alle Einstellungen",
+      "auditoryTitle": "Auditive Barrierefreiheit",
+      "auditoryDesc": "Einstellungen für gehörlose oder schwerhörige Benutzer.",
+      "auditoryVisualCues": "Visuelle Hinweise für Audio",
+      "auditoryVisualCuesDesc": "Zeigt visuelle Indikatoren für alle Audiosignale",
+      "auditoryCaptions": "Untertitel aktiviert",
+      "auditoryCaptionsDesc": "Zeigt Untertitel für Audioanweisungen",
+      "auditoryNoAudioOnly": "Kein reines Audioinhalte",
+      "auditoryNoAudioOnlyDesc": "Stellt sicher, dass alle Informationen visuell verfügbar sind",
+      "autismTitle": "Autismus-Barrierefreiheit",
+      "autismDesc": "Einstellungen für Benutzer im Autismus-Spektrum.",
+      "autismReducedMotion": "Reduzierte Bewegung",
+      "autismReducedMotionDesc": "Deaktiviert unnötige Animationen",
+      "autismPredictableLayouts": "Vorhersehbare Layouts",
+      "autismPredictableLayoutsDesc": "Behält eine konsistente und vorhersehbare Struktur bei",
+      "autismMinimalUI": "Minimalistische Benutzeroberfläche",
+      "autismMinimalUIDesc": "Entfernt dekorative Elemente und Ablenkungen",
+      "cerebralTitle": "Zerebralparese-Barrierefreiheit",
+      "cerebralDesc": "Kombinierte motorische und kognitive Anpassungen.",
+      "cerebralAdaptiveDifficulty": "Adaptive Schwierigkeit",
+      "cerebralAdaptiveDifficultyDesc": "Passt den Schwierigkeitsgrad automatisch an die Leistung an",
+      "cerebralSimplifiedUI": "Vereinfachte Benutzeroberfläche",
+      "cerebralSimplifiedUIDesc": "Reduziert visuelle Elemente zur Minimierung kognitiver Überlastung",
+      "cerebralCustomShortcuts": "Anpassbare Verknüpfungen",
+      "cerebralCustomShortcutsDesc": "Ermöglicht das Konfigurieren von Tastaturkürzeln",
+      "cerebralTimeoutExtended": "Verlängerte Timeouts",
+      "cerebralTimeoutExtendedDesc": "Verlängert oder deaktiviert Inaktivitäts-Timeouts",
+      "motorTitle": "Motorische Barrierefreiheit",
+      "motorDesc": "Einstellungen für Benutzer mit motorischen Schwierigkeiten oder eingeschränkter Kontrolle.",
+      "motorLargeClickTargets": "Große Klickziele",
+      "motorLargeClickTargetsDesc": "Erhöht die Größe virtueller Schaltflächen auf mindestens 44x44px",
+      "motorKeyboardNav": "Tastaturnavigation",
+      "motorKeyboardNavDesc": "Aktiviert vollständige Navigation mit Tabulatur, Eingabetaste, Escape",
+      "motorAdjustableTimeout": "Verstellbares Timeout",
+      "motorAdjustableTimeoutDesc": "Ermöglicht das Anpassen oder Deaktivieren von Inaktivitäts-Timeouts",
+      "motorTimeoutLabel": "Timeout (Sekunden)",
+      "motorTimeoutDisableHint": "Auf 0 setzen um Timeout zu deaktivieren",
+      "motorKeyboardShortcuts": "Tastaturverknüpfungen",
+      "motorKeyboardShortcutsDesc": "Aktiviert Verknüpfungen für häufige Aktionen",
+      "motorShowShortcuts": "Verknüpfungen anzeigen",
+      "motorHideShortcuts": "Verknüpfungen ausblenden",
+      "motorShortcutPause": "Pausieren/Fortsetzen",
+      "motorShortcutExit": "Lektion beenden",
+      "motorShortcutTab": "Fokus verschieben",
+      "motorShortcutEnter": "Auswählen/Bestätigen",
+      "motorShortcutHint": "Hinweis anzeigen",
+      "motorShortcutMute": "Stummschalten/Audio aktivieren",
+      "motorPauseResume": "Sofortige Pause/Fortsetzen",
+      "motorPauseResumeDesc": "Ermöglicht das Pausieren der Lektion jederzeit",
+      "motorRecommendations": "Empfehlungen: Kombinieren Sie diese Einstellungen für das beste Erlebnis mit dem Einhand-Modus und Sticky Keys.",
+      "visualTitle": "Visuelle Barrierefreiheit",
+      "visualDesc": "Einstellungen für Benutzer mit Sehproblemen.",
+      "visualHighContrast": "Hoher Kontrast",
+      "visualHighContrastDesc": "Erhöht den Farbkontrast für bessere Lesbarkeit",
+      "visualTextSizeLabel": "Textgröße",
+      "visualTextSizeRange": "100% (normal) - 200% (maximal)",
+      "visualTTS": "Text-zu-Sprache (TTS)",
+      "visualTTSDesc": "Liest Anweisungen und Feedback vor",
+      "visualShowTTSSettings": "TTS-Einstellungen anzeigen",
+      "visualHideTTSSettings": "TTS-Einstellungen ausblenden",
+      "visualSpeechRateLabel": "Geschwindigkeit",
+      "visualSpeechVolumeLabel": "Volumen",
+      "visualFocusIndicators": "Fokus-Indikatoren",
+      "visualFocusIndicatorsDesc": "Zeigt klare Hervorhebung des aktiven Elements",
+      "visualWCAGCompliance": "WCAG 2.1 AA Konformität: Alle Einstellungen erfüllen die Barrierefreiheitsanforderungen für sehbehinderte Benutzer.",
+      "dyslexiaLineHeightText": "Text mit erhöhter Zeilenhöhe für bessere Lesbarkeit. Jede Zeile hat mehr vertikalen Abstand zwischen ihnen.",
+      "a11yOpenSettings": "Barrierefreiheitseinstellungen öffnen",
+      "a11yActiveProfile": "Aktives Profil",
+      "profileDyslexia": "Legasthenie",
+      "profileADHD": "ADHS",
+      "profileVisual": "Visuell",
+      "profileMotor": "Motorisch",
+      "profileAutism": "Autismus",
+      "profileAuditory": "Auditiv",
+      "profileCerebral": "Motorisch+",
+      "a11yActivateProfile": "Profil aktivieren"
+    }
+  },
+  "profile": {
+    "genitori": {
+      "loadingProfile": "Profil wird geladen...",
+      "error": "Fehler",
+      "retry": "Erneut versuchen",
+      "welcomeTitle": "Willkommen im Elternbereich",
+      "welcomeDescription": "Dieses Dashboard wird sich automatisch füllen, wenn der Schüler mit den Maestri zu lernen beginnt. Hier ist eine Vorschau, wie es aussehen wird!",
+      "consentTitle": "Zustimmung für das Eltern-Dashboard",
+      "consentDescription": "Um die Beobachtungen der Professoren zu sehen, benötigen wir Ihre Zustimmung.",
+      "consentButton": "Ich stimme der Ansicht zu",
+      "deletionTitle": "Löschung angefordert",
+      "deletionDescription": "Daten werden gemäß DSGVO innerhalb von 30 Tagen gelöscht."
+    },
+    "parentChat": {
+      "title": "Gespräch mit {name}",
+      "description": "Sie sind dabei, ein Gespräch mit Professor {maestro} über den Lernweg von {student} zu beginnen.",
+      "disclaimerTitle": "Wichtiger Haftungsausschluss",
+      "disclaimerText": "Professoren sind KI-Assistenten, die pädagogische Beobachtungen bereitstellen. Ihre Bewertungen ersetzen keine ärztlichen, psychologischen Meinungen oder professionellen Diagnosen. Wenden Sie sich für klinische Fragen an qualifizierte Fachleute.",
+      "conversationTitle": "In diesem Gespräch:",
+      "messagesSaved": "Nachrichten werden sicher gespeichert",
+      "formalLanguage": "Der Professor verwendet formale Sprache",
+      "observationsStudySessions": "Beobachtungen basieren auf Lernsitzungen",
+      "cancel": "Abbrechen",
+      "understood": "Ich verstanden, fortfahren"
     }
   },
   "aiTransparency": {

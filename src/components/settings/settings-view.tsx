@@ -13,8 +13,9 @@ import { TelemetryDashboard } from '@/components/telemetry';
 import { OnboardingSettings } from '@/components/settings/onboarding-settings';
 import { cn } from '@/lib/utils';
 import { logger } from '@/lib/logger';
+import { useTranslations } from 'next-intl';
 import { PageHeader } from '@/components/ui/page-header';
-import { SETTINGS_TABS, type SettingsTab } from './settings-tabs';
+import { getSettingsTabs, type SettingsTab } from './settings-tabs';
 
 // Import section components
 import {
@@ -33,6 +34,9 @@ import { GoogleAccountCard } from '@/components/google-drive';
 import { getUserId } from '@/lib/hooks/use-saved-materials/utils/user-id';
 
 export function SettingsView() {
+  const t = useTranslations('settings.view');
+  const SETTINGS_TABS = getSettingsTabs();
+
   const [activeTab, setActiveTab] = useState<SettingsTab>('profile');
   const [showAccessibilityModal, setShowAccessibilityModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -109,17 +113,17 @@ export function SettingsView() {
     <div className="container mx-auto px-4 max-w-7xl space-y-6">
       <PageHeader
         icon={Settings}
-        title="Impostazioni"
+        title={t('title')}
         rightContent={
           <>
             <Button
               onClick={handleUndo}
               variant="outline"
               disabled={!hasChanges || isSaving}
-              title="Annulla modifiche"
+              title={t('undoTitle')}
             >
               <Undo2 className="w-4 h-4 mr-2" />
-              Annulla
+              {t('undoButton')}
             </Button>
             <Button
               onClick={handleSave}
@@ -129,7 +133,7 @@ export function SettingsView() {
               )}
             >
               <Save className="w-4 h-4 mr-2" />
-              {isSaving ? 'Salvando...' : hasChanges ? 'Salva Modifiche' : 'Salva'}
+              {isSaving ? t('savingButton') : hasChanges ? t('saveChangesButton') : t('saveButton')}
             </Button>
           </>
         }
@@ -216,25 +220,22 @@ export function SettingsView() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserCircle className="w-5 h-5" />
-                Area Genitori
+                {t('parentAreaTitle')}
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
-                Accedi alla dashboard dedicata ai genitori per monitorare i progressi
-                e le attivita del tuo bambino in modo sicuro e rispettoso della privacy (GDPR).
+                {t('parentAreaDescription')}
               </p>
               <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
                 <p className="text-sm text-amber-800 dark:text-amber-200">
-                  <strong>Consenso richiesto:</strong> La dashboard genitori richiede il consenso
-                  sia del genitore che dello studente per rispettare la normativa GDPR sulla
-                  protezione dei dati dei minori.
+                  <strong>{t('consentRequiredTitle')}</strong> {t('consentRequiredText')}
                 </p>
               </div>
               <Link href="/parent-dashboard">
                 <Button className="w-full mt-4" size="lg">
                   <UserCircle className="w-5 h-5 mr-2" />
-                  Apri Dashboard Genitori
+                  {t('openParentDashboard')}
                 </Button>
               </Link>
             </CardContent>

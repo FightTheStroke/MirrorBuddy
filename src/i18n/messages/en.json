@@ -411,127 +411,10 @@
       }
     },
     "knowledge-hub": {
-      "header": {
-        "search": {
-          "placeholder": "Search materials...",
-          "aria-label": "Search materials",
-          "clear-aria-label": "Clear search",
-          "announcement": "Search results for: {value}"
-        },
-        "filter": {
-          "aria-label": "Filters",
-          "listbox-aria-label": "Filter by material type"
-        }
-      },
-      "views": {
-        "explorer": {
-          "label": "Explorer",
-          "description": "Folder view with tree navigation"
-        },
-        "gallery": {
-          "label": "Gallery",
-          "description": "Grid view with large preview"
-        },
-        "timeline": {
-          "label": "Timeline",
-          "description": "Chronological view sorted by date"
-        },
-        "calendar": {
-          "label": "Calendar",
-          "description": "Calendar view of events"
-        }
-      },
-      "types": {
-        "all": "All",
-        "mindmap": "Mind Map",
-        "quiz": "Quiz",
-        "flashcard": "Flashcard",
-        "summary": "Summary",
-        "demo": "Demo",
-        "diagram": "Diagram",
-        "timeline": "Timeline",
-        "formula": "Formula",
-        "calculator": "Calculator",
-        "chart": "Chart",
-        "pdf": "PDF",
-        "webcam": "Photo",
-        "homework": "Homework",
-        "search": "Search",
-        "typing": "Typing",
-        "study-kit": "Study Kit"
-      },
-      "material-menu": {
-        "open": "Open",
-        "duplicate": "Duplicate",
-        "move": "Move",
-        "add-tags": "Add tags",
-        "find-similar": "Find similar",
-        "archive": "Archive",
-        "delete": "Delete",
-        "aria-label": "Material actions"
-      },
-      "sidebar": {
-        "navigation-aria-label": "Material navigation",
-        "quick-filters-title": "Quick Filters",
-        "quick-filters-aria-label": "Filters",
-        "recent": "Recent",
-        "favorites": "Favorites",
-        "archived": "Archived",
-        "collections-title": "Folders",
-        "create-collection-aria-label": "Create new folder",
-        "no-collections": "No folders",
-        "collections-aria-label": "Folders",
-        "tags-title": "Tags",
-        "create-tag-aria-label": "Create new tag",
-        "no-tags": "No tags",
-        "tags-aria-label": "Tags"
-      },
-      "status-bar": {
-        "selected-count": "materials selected",
-        "deselect-button": "Deselect",
-        "delete-button": "Delete"
-      },
-      "similar-materials": {
-        "title": "Similar Materials",
-        "aria-label": "Similar materials",
-        "close-aria-label": "Close",
-        "loading": "Searching...",
-        "error-loading": "Error searching materials",
-        "no-results": "No similar materials found.",
-        "similarity": "Similarity"
-      },
-      "renderers": {
-        "error-title": "Display Error",
-        "error-message-default": "Unable to display this material.",
-        "error-message-with-type": "Unable to display material of type \"{type}\".",
-        "retry-button": "Retry"
-      },
-      "homework": {
-        "default-title": "Homework",
-        "due-date-label": "Due date:",
-        "no-tasks": "No tasks"
-      },
-      "timeline": {
-        "default-title": "Timeline",
-        "no-events": "No events available"
-      },
-      "explorer-view": {
-        "all-materials": "All Materials",
-        "all-materials-aria-label": "All materials",
-        "folder-aria-label": "Folder {name}",
-        "no-materials": "No materials in this folder"
-      },
-      "gallery-view": {
-        "no-materials": "No materials found"
-      },
-      "timeline-view": {
-        "today": "Today",
-        "yesterday": "Yesterday",
-        "weeks-ago": "{count} weeks ago",
-        "no-materials": "No materials found",
-        "material-singular": "material",
-        "material-plural": "materials"
-      }
+      "error-title": "Viewing error",
+      "error-message-with-type": "Unable to display material of type \"{type}\".",
+      "error-message-default": "Unable to display this material.",
+      "retry-button": "Retry"
     },
     "archive": {
       "title": "Backpack",
@@ -618,12 +501,6 @@
       "questions-label": "questions",
       "flashcard-label": "flashcards",
       "demo-label": "Interactive Demo"
-    },
-    "knowledge-hub": {
-      "error-title": "Viewing error",
-      "error-message-with-type": "Unable to display material of type \"{type}\".",
-      "error-message-default": "Unable to display this material.",
-      "retry-button": "Retry"
     },
     "mindmaps": {
       "title": "Mind Maps",
@@ -1547,7 +1424,19 @@
       "differencesLabel": "Difficulties",
       "differencesCount": "{count} indicated"
     },
-    "ageYears": "years"
+    "ageYears": "years",
+    "voicePanel": {
+      "speaking": "Speaking...",
+      "microphoneMuted": "Microphone muted",
+      "listening": "Listening...",
+      "connected": "Connected",
+      "speakWithMelissa": "Speak with Melissa...",
+      "melissa": "Melissa:",
+      "you": "You:",
+      "enableMicrophone": "Enable microphone",
+      "disableMicrophone": "Disable microphone",
+      "endCall": "End call"
+    }
   },
   "settings": {
     "notifications": {
@@ -1574,6 +1463,158 @@
       "breaksDesc": "Suggestions for breaks (ADHD mode)",
       "sessionEnd": "Session end",
       "sessionEndDesc": "Summary at the end of study session"
+    },
+    "tabs": {
+      "profile": "Profile",
+      "characters": "Characters",
+      "accessibility": "Accessibility",
+      "appearance": "Appearance",
+      "aiProvider": "AI Provider",
+      "audio": "Audio/Video",
+      "ambientAudio": "Ambient Audio",
+      "integrations": "Integrations",
+      "notifications": "Notifications",
+      "statistics": "Statistics",
+      "privacy": "Privacy",
+      "parents": "Parents",
+      "diagnostics": "Diagnostics"
+    },
+    "view": {
+      "title": "Settings",
+      "undoTitle": "Undo changes",
+      "undoButton": "Undo",
+      "savingButton": "Saving...",
+      "saveChangesButton": "Save Changes",
+      "saveButton": "Save",
+      "parentAreaTitle": "Parent Area",
+      "parentAreaDescription": "Access the parent dashboard to monitor your child's progress and activities safely and with respect for privacy (GDPR).",
+      "consentRequiredTitle": "Consent required:",
+      "consentRequiredText": "The parent dashboard requires consent from both parent and student to comply with GDPR regulations on protecting children's data.",
+      "openParentDashboard": "Open Parent Dashboard"
+    },
+    "diagnostics": {
+      "title": "System Diagnostics",
+      "description": "Verify that all components are working correctly: configuration, chat API (with AI response), voice (with audio playback), microphone and speaker.",
+      "runAllTests": "Run All Tests",
+      "connecting": "Connecting...",
+      "config": "Configuration",
+      "chatApi": "Chat API",
+      "voiceTest": "Voice (Full Test)",
+      "microphone": "Microphone",
+      "speaker": "Speaker / Audio"
+    },
+    "accessibility": {
+      "panelTitle": "Accessibility",
+      "closePanel": "Close panel",
+      "quickProfiles": "Quick Profiles",
+      "quickSettings": "Quick Settings",
+      "largeText": "Large Text",
+      "highContrast": "High Contrast",
+      "reduceAnimations": "Reduce Animations",
+      "dyslexiaFont": "Dyslexia Font",
+      "resetSettings": "Reset Settings",
+      "allSettings": "All Settings",
+      "auditoryTitle": "Auditory Accessibility",
+      "auditoryDesc": "Settings for deaf or hard of hearing users.",
+      "auditoryVisualCues": "Visual cues for audio",
+      "auditoryVisualCuesDesc": "Shows visual indicators for all audio events",
+      "auditoryCaptions": "Captions enabled",
+      "auditoryCaptionsDesc": "Shows captions for audio instructions",
+      "auditoryNoAudioOnly": "No audio-only content",
+      "auditoryNoAudioOnlyDesc": "Ensures all information is visually available",
+      "autismTitle": "Autism Accessibility",
+      "autismDesc": "Settings for users on the autism spectrum.",
+      "autismReducedMotion": "Reduced motion",
+      "autismReducedMotionDesc": "Disables unnecessary animations",
+      "autismPredictableLayouts": "Predictable layouts",
+      "autismPredictableLayoutsDesc": "Maintains consistent and predictable structure",
+      "autismMinimalUI": "Minimalist UI",
+      "autismMinimalUIDesc": "Removes decorative elements and distractions",
+      "cerebralTitle": "Cerebral Palsy Accessibility",
+      "cerebralDesc": "Combined motor + cognitive adaptations.",
+      "cerebralAdaptiveDifficulty": "Adaptive difficulty",
+      "cerebralAdaptiveDifficultyDesc": "Automatically adjusts difficulty based on performance",
+      "cerebralSimplifiedUI": "Simplified UI",
+      "cerebralSimplifiedUIDesc": "Reduces visual elements to minimize cognitive overload",
+      "cerebralCustomShortcuts": "Customizable shortcuts",
+      "cerebralCustomShortcutsDesc": "Allows configuring keyboard shortcuts",
+      "cerebralTimeoutExtended": "Extended timeouts",
+      "cerebralTimeoutExtendedDesc": "Extends or disables inactivity timeouts",
+      "motorTitle": "Motor Impairment Accessibility",
+      "motorDesc": "Settings for users with motor difficulties or limited control.",
+      "motorLargeClickTargets": "Large click targets",
+      "motorLargeClickTargetsDesc": "Increases virtual button sizes to minimum 44x44px",
+      "motorKeyboardNav": "Keyboard navigation",
+      "motorKeyboardNavDesc": "Enables full navigation with Tab, Enter, Escape",
+      "motorAdjustableTimeout": "Adjustable timeout",
+      "motorAdjustableTimeoutDesc": "Allows adjusting or disabling inactivity timeouts",
+      "motorTimeoutLabel": "Timeout (seconds)",
+      "motorTimeoutDisableHint": "Set to 0 to disable timeout",
+      "motorKeyboardShortcuts": "Keyboard shortcuts",
+      "motorKeyboardShortcutsDesc": "Enables shortcuts for common actions",
+      "motorShowShortcuts": "Show shortcuts",
+      "motorHideShortcuts": "Hide shortcuts",
+      "motorShortcutPause": "Pause/Resume",
+      "motorShortcutExit": "Exit lesson",
+      "motorShortcutTab": "Move focus",
+      "motorShortcutEnter": "Select/Confirm",
+      "motorShortcutHint": "Show hint",
+      "motorShortcutMute": "Mute/Unmute audio",
+      "motorPauseResume": "Instant pause/resume",
+      "motorPauseResumeDesc": "Allows pausing the lesson at any time",
+      "motorRecommendations": "Recommendations: For best experience, combine these settings with one-handed mode and Sticky Keys.",
+      "visualTitle": "Visual Accessibility",
+      "visualDesc": "Settings for users with vision problems.",
+      "visualHighContrast": "High contrast",
+      "visualHighContrastDesc": "Increases color contrast for better readability",
+      "visualTextSizeLabel": "Text size",
+      "visualTextSizeRange": "100% (normal) - 200% (maximum)",
+      "visualTTS": "Text-to-Speech (TTS)",
+      "visualTTSDesc": "Reads aloud instructions and feedback",
+      "visualShowTTSSettings": "Show TTS settings",
+      "visualHideTTSSettings": "Hide TTS settings",
+      "visualSpeechRateLabel": "Speed",
+      "visualSpeechVolumeLabel": "Volume",
+      "visualFocusIndicators": "Focus indicators",
+      "visualFocusIndicatorsDesc": "Shows clear highlighting of active element",
+      "visualWCAGCompliance": "WCAG 2.1 AA Compliance: All settings respect accessibility requirements for visually impaired users.",
+      "dyslexiaLineHeightText": "Text with increased line height to improve readability. Each line has more vertical space between them.",
+      "a11yOpenSettings": "Open accessibility settings",
+      "a11yActiveProfile": "Active profile",
+      "profileDyslexia": "Dyslexia",
+      "profileADHD": "ADHD",
+      "profileVisual": "Visual",
+      "profileMotor": "Motor",
+      "profileAutism": "Autism",
+      "profileAuditory": "Auditory",
+      "profileCerebral": "Motor+",
+      "a11yActivateProfile": "Activate profile"
+    }
+  },
+  "profile": {
+    "genitori": {
+      "loadingProfile": "Loading profile...",
+      "error": "Error",
+      "retry": "Retry",
+      "welcomeTitle": "Welcome to Parent Area",
+      "welcomeDescription": "This dashboard will populate automatically when the student starts studying with the Maestri. In the meantime, here's how it will look!",
+      "consentTitle": "Consent for Parent Dashboard",
+      "consentDescription": "To view the Professors' observations, we need your consent.",
+      "consentButton": "I Consent to Viewing",
+      "deletionTitle": "Deletion Requested",
+      "deletionDescription": "Data will be deleted within 30 days, as required by GDPR."
+    },
+    "parentChat": {
+      "title": "Conversation with {name}",
+      "description": "You are about to start a conversation with Professor {maestro} regarding {student}'s learning path.",
+      "disclaimerTitle": "Important disclaimer",
+      "disclaimerText": "Professors are AI assistants that provide pedagogical observations. Their evaluations do not replace medical, psychological opinions or professional diagnoses. For clinical matters, consult qualified specialists.",
+      "conversationTitle": "In this conversation:",
+      "messagesSaved": "Messages are saved securely",
+      "formalLanguage": "The Professor uses formal language",
+      "observationsStudySessions": "Observations are based on study sessions",
+      "cancel": "Cancel",
+      "understood": "I understand, continue"
     }
   },
   "aiTransparency": {

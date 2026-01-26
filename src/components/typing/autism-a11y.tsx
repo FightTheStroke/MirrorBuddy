@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface AutismSettings {
@@ -15,21 +16,23 @@ export function AutismA11y({
   settings: AutismSettings;
   onSettingsChange: (settings: AutismSettings) => void;
 }) {
+  const t = useTranslations('settings.accessibility');
+
   return (
     <div
       className={cn("space-y-6", settings.reducedMotion && "reduced-motion")}
     >
       <div>
-        <h3 className="text-lg font-semibold mb-4">Accessibilità Autismo</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('autismTitle')}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni per utenti nello spettro autistico.
+          {t('autismDesc')}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Motion ridotto"
-          description="Disabilita le animazioni non necessarie"
+          title={t('autismReducedMotion')}
+          description={t('autismReducedMotionDesc')}
           enabled={settings.reducedMotion}
           onToggle={() =>
             onSettingsChange({
@@ -40,8 +43,8 @@ export function AutismA11y({
         />
 
         <SettingCard
-          title="Layout prevedibili"
-          description="Mantiene una struttura consistente e prevedibile"
+          title={t('autismPredictableLayouts')}
+          description={t('autismPredictableLayoutsDesc')}
           enabled={settings.predictableLayouts}
           onToggle={() =>
             onSettingsChange({
@@ -52,8 +55,8 @@ export function AutismA11y({
         />
 
         <SettingCard
-          title="UI minimalista"
-          description="Rimuove elementi decorativi e distrazioni"
+          title={t('autismMinimalUI')}
+          description={t('autismMinimalUIDesc')}
           enabled={settings.minimalUI}
           onToggle={() =>
             onSettingsChange({ ...settings, minimalUI: !settings.minimalUI })

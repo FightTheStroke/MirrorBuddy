@@ -74,7 +74,7 @@ export function DyslexiaA11y({
           {settings.increasedLineHeight && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm" style={{ lineHeight: "1.8" }}>
-                Testo con altezza riga aumentata per migliorare la leggibilità. Ogni riga ha più spazio verticale tra di essa.
+                {t('dyslexiaLineHeightText')}
               </p>
             </div>
           )}

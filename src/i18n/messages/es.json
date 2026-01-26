@@ -374,25 +374,151 @@
       "enable": "Habilitar notificaciones",
       "description": "Activar o desactivar todas las notificaciones",
       "push": "Notificaciones push",
-      "pushGranted": "Recibe notificaciones incluso cuando la app está cerrada",
-      "pushDenied": "Permiso denegado - verifica la configuración de tu navegador",
-      "pushDefault": "Habilita las notificaciones push del navegador",
+      "pushGranted": "Reciba notificaciones incluso cuando la aplicación esté cerrada",
+      "pushDenied": "Permiso denegado - verifique la configuración de su navegador",
+      "pushDefault": "Habilitar notificaciones push del navegador",
       "pushButton": "Habilitar",
       "sound": "Sonidos",
-      "soundDescription": "Reproducir sonidos para las notificaciones",
+      "soundDescription": "Reproducir sonidos para notificaciones",
       "typeTitle": "Tipos de notificaciones",
       "reminders": "Recordatorios de estudio",
-      "remindersDesc": "Recibe un recordatorio para estudiar",
+      "remindersDesc": "Reciba un recordatorio para estudiar",
       "streaks": "Alertas de racha",
-      "streaksDesc": "Notificación cuando riesgos perder tu racha",
+      "streaksDesc": "Notificación cuando corre riesgo de perder su racha",
       "achievements": "Logros",
-      "achievementsDesc": "Notificación cuando desbloqueas un logro",
+      "achievementsDesc": "Notificación cuando desbloquea un logro",
       "levelUp": "Niveles",
       "levelUpDesc": "Notificación cuando subes de nivel",
       "breaks": "Descansos",
-      "breaksDesc": "Sugerencias para descansos (modo TDAH)",
+      "breaksDesc": "Sugerencias para hacer descansos (modo ADHD)",
       "sessionEnd": "Fin de sesión",
       "sessionEndDesc": "Resumen al final de la sesión de estudio"
+    },
+    "tabs": {
+      "profile": "Perfil",
+      "characters": "Personajes",
+      "accessibility": "Accesibilidad",
+      "appearance": "Apariencia",
+      "aiProvider": "Proveedor de IA",
+      "audio": "Audio/Vídeo",
+      "ambientAudio": "Audio ambiental",
+      "integrations": "Integraciones",
+      "notifications": "Notificaciones",
+      "statistics": "Estadísticas",
+      "privacy": "Privacidad",
+      "parents": "Padres",
+      "diagnostics": "Diagnósticos"
+    },
+    "view": {
+      "title": "Configuración",
+      "undoTitle": "Deshacer cambios",
+      "undoButton": "Deshacer",
+      "savingButton": "Guardando...",
+      "saveChangesButton": "Guardar cambios",
+      "saveButton": "Guardar",
+      "parentAreaTitle": "Área de padres",
+      "parentAreaDescription": "Accede al panel de padres dedicado para monitorear el progreso y las actividades de tu hijo de forma segura y respetando la privacidad (GDPR).",
+      "consentRequiredTitle": "Consentimiento requerido:",
+      "consentRequiredText": "El panel de padres requiere el consentimiento tanto del padre como del estudiante para cumplir con las regulaciones del GDPR sobre la protección de datos de menores.",
+      "openParentDashboard": "Abrir panel de padres"
+    },
+    "diagnostics": {
+      "title": "Diagnóstico del sistema",
+      "description": "Verifica que todos los componentes funcionen correctamente: configuración, API de chat (con respuesta de IA), voz (con reproducción de audio), micrófono y altavoz.",
+      "runAllTests": "Ejecutar todas las pruebas",
+      "connecting": "Conectando...",
+      "config": "Configuración",
+      "chatApi": "API de Chat",
+      "voiceTest": "Voz (prueba completa)",
+      "microphone": "Micrófono",
+      "speaker": "Altavoz / Audio"
+    },
+    "accessibility": {
+      "panelTitle": "Accesibilidad",
+      "closePanel": "Cerrar panel",
+      "quickProfiles": "Perfiles Rápidos",
+      "quickSettings": "Configuración Rápida",
+      "largeText": "Texto Grande",
+      "highContrast": "Alto Contraste",
+      "reduceAnimations": "Reducir Animaciones",
+      "dyslexiaFont": "Fuente Dislexia",
+      "resetSettings": "Restablecer Configuración",
+      "allSettings": "Todas las Configuraciones",
+      "auditoryTitle": "Accesibilidad Auditiva",
+      "auditoryDesc": "Configuración para usuarios sordos o con pérdida auditiva.",
+      "auditoryVisualCues": "Indicadores visuales para audio",
+      "auditoryVisualCuesDesc": "Muestra indicadores visuales para todos los eventos de audio",
+      "auditoryCaptions": "Subtítulos activados",
+      "auditoryCaptionsDesc": "Muestra subtítulos para instrucciones de audio",
+      "auditoryNoAudioOnly": "Sin contenido solo de audio",
+      "auditoryNoAudioOnlyDesc": "Garantiza que toda la información esté visualmente disponible",
+      "autismTitle": "Accesibilidad del Autismo",
+      "autismDesc": "Configuración para usuarios del espectro autista.",
+      "autismReducedMotion": "Movimiento reducido",
+      "autismReducedMotionDesc": "Desactiva animaciones innecesarias",
+      "autismPredictableLayouts": "Diseños predecibles",
+      "autismPredictableLayoutsDesc": "Mantiene una estructura consistente y predecible",
+      "autismMinimalUI": "Interfaz Minimalista",
+      "autismMinimalUIDesc": "Elimina elementos decorativos y distracciones",
+      "cerebralTitle": "Accesibilidad de Parálisis Cerebral",
+      "cerebralDesc": "Adaptaciones motoras y cognitivas combinadas.",
+      "cerebralAdaptiveDifficulty": "Dificultad adaptativa",
+      "cerebralAdaptiveDifficultyDesc": "Ajusta automáticamente la dificultad según el desempeño",
+      "cerebralSimplifiedUI": "Interfaz Simplificada",
+      "cerebralSimplifiedUIDesc": "Reduce elementos visuales para minimizar la sobrecarga cognitiva",
+      "cerebralCustomShortcuts": "Atajos personalizables",
+      "cerebralCustomShortcutsDesc": "Permite configurar atajos de teclado",
+      "cerebralTimeoutExtended": "Tiempos de espera extendidos",
+      "cerebralTimeoutExtendedDesc": "Extiende o desactiva los tiempos de espera de inactividad",
+      "motorTitle": "Accesibilidad Motora",
+      "motorDesc": "Configuración para usuarios con dificultades motrices o control limitado.",
+      "motorLargeClickTargets": "Objetivos de clic grandes",
+      "motorLargeClickTargetsDesc": "Aumenta el tamaño de los botones virtuales a mínimo 44x44px",
+      "motorKeyboardNav": "Navegación por teclado",
+      "motorKeyboardNavDesc": "Habilita navegación completa con Tabulación, Intro, Escape",
+      "motorAdjustableTimeout": "Tiempo de espera ajustable",
+      "motorAdjustableTimeoutDesc": "Permite ajustar o desactivar los tiempos de espera de inactividad",
+      "motorTimeoutLabel": "Tiempo de espera (segundos)",
+      "motorTimeoutDisableHint": "Establece en 0 para desactivar el tiempo de espera",
+      "motorKeyboardShortcuts": "Atajos de teclado",
+      "motorKeyboardShortcutsDesc": "Habilita atajos para acciones comunes",
+      "motorShowShortcuts": "Mostrar atajos",
+      "motorHideShortcuts": "Ocultar atajos",
+      "motorShortcutPause": "Pausar/Reanudar",
+      "motorShortcutExit": "Salir de la lección",
+      "motorShortcutTab": "Mover foco",
+      "motorShortcutEnter": "Seleccionar/Confirmar",
+      "motorShortcutHint": "Mostrar pista",
+      "motorShortcutMute": "Silenciar/Activar audio",
+      "motorPauseResume": "Pausa/Reanudación instantánea",
+      "motorPauseResumeDesc": "Permite pausar la lección en cualquier momento",
+      "motorRecommendations": "Recomendaciones: Para mejor experiencia, combina estos ajustes con modo de una mano y teclas persistentes.",
+      "visualTitle": "Accesibilidad Visual",
+      "visualDesc": "Configuración para usuarios con problemas de visión.",
+      "visualHighContrast": "Alto contraste",
+      "visualHighContrastDesc": "Aumenta el contraste de colores para mejor legibilidad",
+      "visualTextSizeLabel": "Tamaño de texto",
+      "visualTextSizeRange": "100% (normal) - 200% (máximo)",
+      "visualTTS": "Texto a Voz (TTS)",
+      "visualTTSDesc": "Lee en voz alta las instrucciones y retroalimentación",
+      "visualShowTTSSettings": "Mostrar configuración de TTS",
+      "visualHideTTSSettings": "Ocultar configuración de TTS",
+      "visualSpeechRateLabel": "Velocidad",
+      "visualSpeechVolumeLabel": "Volumen",
+      "visualFocusIndicators": "Indicadores de foco",
+      "visualFocusIndicatorsDesc": "Muestra resaltado claro del elemento activo",
+      "visualWCAGCompliance": "Cumplimiento de WCAG 2.1 AA: Todos los ajustes respetan los requisitos de accesibilidad para usuarios con discapacidad visual.",
+      "dyslexiaLineHeightText": "Texto con altura de línea aumentada para mejorar la legibilidad. Cada línea tiene más espacio vertical entre ellas.",
+      "a11yOpenSettings": "Abrir configuración de accesibilidad",
+      "a11yActiveProfile": "Perfil activo",
+      "profileDyslexia": "Dislexia",
+      "profileADHD": "TDAH",
+      "profileVisual": "Visual",
+      "profileMotor": "Motora",
+      "profileAutism": "Autismo",
+      "profileAuditory": "Auditiva",
+      "profileCerebral": "Motora+",
+      "a11yActivateProfile": "Activar perfil"
     }
   },
   "astuccio": {
@@ -766,127 +892,10 @@
       }
     },
     "knowledge-hub": {
-      "header": {
-        "search": {
-          "placeholder": "Buscar materiales...",
-          "aria-label": "Buscar materiales",
-          "clear-aria-label": "Limpiar búsqueda",
-          "announcement": "Resultados de búsqueda para: {value}"
-        },
-        "filter": {
-          "aria-label": "Filtros",
-          "listbox-aria-label": "Filtrar por tipo de material"
-        }
-      },
-      "views": {
-        "explorer": {
-          "label": "Explorador",
-          "description": "Vista de carpetas con navegación de árbol"
-        },
-        "gallery": {
-          "label": "Galería",
-          "description": "Vista de cuadrícula con vista previa grande"
-        },
-        "timeline": {
-          "label": "Línea de tiempo",
-          "description": "Vista cronológica ordenada por fecha"
-        },
-        "calendar": {
-          "label": "Calendario",
-          "description": "Vista de calendario de eventos"
-        }
-      },
-      "types": {
-        "all": "Todos",
-        "mindmap": "Mapa Mental",
-        "quiz": "Cuestionario",
-        "flashcard": "Tarjeta",
-        "summary": "Resumen",
-        "demo": "Demo",
-        "diagram": "Diagrama",
-        "timeline": "Línea de tiempo",
-        "formula": "Fórmula",
-        "calculator": "Calculadora",
-        "chart": "Gráfico",
-        "pdf": "PDF",
-        "webcam": "Foto",
-        "homework": "Tareas",
-        "search": "Búsqueda",
-        "typing": "Escritura",
-        "study-kit": "Kit de Estudio"
-      },
-      "material-menu": {
-        "open": "Abrir",
-        "duplicate": "Duplicar",
-        "move": "Mover",
-        "add-tags": "Agregar etiquetas",
-        "find-similar": "Encontrar similares",
-        "archive": "Archivar",
-        "delete": "Eliminar",
-        "aria-label": "Acciones del material"
-      },
-      "sidebar": {
-        "navigation-aria-label": "Navegación de materiales",
-        "quick-filters-title": "Filtros Rápidos",
-        "quick-filters-aria-label": "Filtros",
-        "recent": "Reciente",
-        "favorites": "Favoritos",
-        "archived": "Archivado",
-        "collections-title": "Carpetas",
-        "create-collection-aria-label": "Crear nueva carpeta",
-        "no-collections": "Sin carpetas",
-        "collections-aria-label": "Carpetas",
-        "tags-title": "Etiquetas",
-        "create-tag-aria-label": "Crear nueva etiqueta",
-        "no-tags": "Sin etiquetas",
-        "tags-aria-label": "Etiquetas"
-      },
-      "status-bar": {
-        "selected-count": "materiales seleccionados",
-        "deselect-button": "Deseleccionar",
-        "delete-button": "Eliminar"
-      },
-      "similar-materials": {
-        "title": "Materiales Similares",
-        "aria-label": "Materiales similares",
-        "close-aria-label": "Cerrar",
-        "loading": "Buscando...",
-        "error-loading": "Error al buscar materiales",
-        "no-results": "No se encontraron materiales similares.",
-        "similarity": "Similitud"
-      },
-      "renderers": {
-        "error-title": "Error de visualización",
-        "error-message-default": "No se puede mostrar este material.",
-        "error-message-with-type": "No se puede mostrar material de tipo \"{type}\".",
-        "retry-button": "Reintentar"
-      },
-      "homework": {
-        "default-title": "Tareas",
-        "due-date-label": "Fecha de vencimiento:",
-        "no-tasks": "Sin tareas"
-      },
-      "timeline": {
-        "default-title": "Línea de tiempo",
-        "no-events": "Sin eventos disponibles"
-      },
-      "explorer-view": {
-        "all-materials": "Todos los Materiales",
-        "all-materials-aria-label": "Todos los materiales",
-        "folder-aria-label": "Carpeta {name}",
-        "no-materials": "Sin materiales en esta carpeta"
-      },
-      "gallery-view": {
-        "no-materials": "No se encontraron materiales"
-      },
-      "timeline-view": {
-        "today": "Hoy",
-        "yesterday": "Ayer",
-        "weeks-ago": "hace {count} semanas",
-        "no-materials": "No se encontraron materiales",
-        "material-singular": "material",
-        "material-plural": "materiales"
-      }
+      "error-title": "Error de visualización",
+      "error-message-with-type": "No se puede mostrar el material de tipo \"{type}\".",
+      "error-message-default": "No se puede mostrar este material.",
+      "retry-button": "Reintentar"
     },
     "archive": {
       "title": "Mochila",
@@ -973,12 +982,6 @@
       "questions-label": "preguntas",
       "flashcard-label": "fichas",
       "demo-label": "Demo Interactiva"
-    },
-    "knowledge-hub": {
-      "error-title": "Error de visualización",
-      "error-message-with-type": "No se puede mostrar el material de tipo \"{type}\".",
-      "error-message-default": "No se puede mostrar este material.",
-      "retry-button": "Reintentar"
     },
     "mindmaps": {
       "title": "Mapas mentales",
@@ -1766,7 +1769,45 @@
       "differencesLabel": "Dificultades",
       "differencesCount": "{count} indicadas"
     },
-    "ageYears": "años"
+    "ageYears": "años",
+    "voicePanel": {
+      "speaking": "Está hablando...",
+      "microphoneMuted": "Micrófono apagado",
+      "listening": "Escuchando...",
+      "connected": "Conectada",
+      "speakWithMelissa": "Habla con Melissa...",
+      "melissa": "Melissa:",
+      "you": "Tú:",
+      "enableMicrophone": "Activar micrófono",
+      "disableMicrophone": "Desactivar micrófono",
+      "endCall": "Terminar llamada"
+    }
+  },
+  "profile": {
+    "genitori": {
+      "loadingProfile": "Cargando perfil...",
+      "error": "Error",
+      "retry": "Reintentar",
+      "welcomeTitle": "Bienvenido al Área de Padres",
+      "welcomeDescription": "Este panel se llenará automáticamente cuando el estudiante comience a estudiar con los Maestri. Mientras tanto, así es como se verá!",
+      "consentTitle": "Consentimiento para el Panel de Padres",
+      "consentDescription": "Para ver las observaciones de los Profesores, necesitamos su consentimiento.",
+      "consentButton": "Doy mi consentimiento a la visualización",
+      "deletionTitle": "Eliminación solicitada",
+      "deletionDescription": "Los datos serán eliminados dentro de 30 días, como lo requiere el GDPR."
+    },
+    "parentChat": {
+      "title": "Conversación con {name}",
+      "description": "Está a punto de comenzar una conversación con el Profesor {maestro} respecto al camino de aprendizaje de {student}.",
+      "disclaimerTitle": "Aviso importante",
+      "disclaimerText": "Los Profesores son asistentes de IA que proporcionan observaciones pedagógicas. Sus evaluaciones no reemplazan opiniones médicas, psicológicas o diagnósticos profesionales. Para cuestiones clínicas, consulte a especialistas calificados.",
+      "conversationTitle": "En esta conversación:",
+      "messagesSaved": "Los mensajes se guardan de forma segura",
+      "formalLanguage": "El Profesor utiliza un lenguaje formal",
+      "observationsStudySessions": "Las observaciones se basan en sesiones de estudio",
+      "cancel": "Cancelar",
+      "understood": "Entendido, continuar"
+    }
   },
   "maestros": {
     "grid": {
@@ -1991,77 +2032,6 @@
   "admin": {
     "dashboard": "Panel de administración",
     "betaRequests": "Solicitudes Beta",
-    "users": "Usuarios",
-    "tiers": "Planes",
-    "terms": "Términos de Servicio",
-    "settings": "Configuración",
-    "pendingBetaRequests": "{count} solicitudes beta pendientes",
-    "systemAlerts": "{count} alertas del sistema",
-    "collapseMenu": "Contraer menú",
-    "expandMenu": "Expandir menú",
-    "returnToApp": "Volver a la aplicación",
-    "invites": {
-      "unauthorized": "No autorizado. Inicia sesión como administrador.",
-      "loadingError": "Error de carga",
-      "approvalError": "Error durante la aprobación",
-      "rejectionError": "Error durante el rechazo",
-      "error": "Error",
-      "pending": "Pendiente",
-      "approved": "Aprobadas",
-      "rejected": "Rechazadas",
-      "direct": "Directas (mías)",
-      "all": "Todas",
-      "directInvite": "Invitar directamente",
-      "refresh": "Actualizar",
-      "approve": "Aprobar",
-      "reject": "Rechazar",
-      "rejectRequest": "Rechazar solicitud",
-      "rejectionReason": "Motivo del rechazo",
-      "optional": "Opcional",
-      "cancel": "Cancelar",
-      "confirmRejection": "Confirmar rechazo",
-      "reject-modal": {
-        "title": "Rechazar solicitud",
-        "reason-label": "Motivo del rechazo",
-        "placeholder": "Opcional",
-        "cancel-button": "Cancelar",
-        "confirm-button": "Confirmar rechazo"
-      }
-    },
-    "locales": {
-      "search": "Buscar por código de país, nombre, locale o maestro...",
-      "countryCode": "Código de País",
-      "countryName": "Nombre del País",
-      "primaryLocale": "Locale Primaria",
-      "languageMaestro": "Maestro de Idioma",
-      "secondaryLocales": "Locales Secundarias",
-      "status": "Estado",
-      "actions": "Acciones",
-      "active": "Activo",
-      "inactive": "Inactivo",
-      "edit": "Editar",
-      "notFound": "No se encontró configuración de locale",
-      "summary": "{count} de {total} configuraciones"
-    },
-    "settings": {
-      "title": "Configuración",
-      "subtitle": "Configuración del sistema MirrorBuddy",
-      "system-info": {
-        "title": "System Info",
-        "description": "Información del sistema",
-        "version": "Versión",
-        "environment": "Entorno",
-        "node-version": "Node :",
-        "build-date": "Build"
-      },
-      "trial-budget": {
-        "title": "Trial Budget",
-        "description": "Límite de presupuesto para usuarios de prueba",
-        "per-month": "/mes",
-        "configured-via": "Configurado mediante variable env",
-        "description-text": "Esta cantidad define el límite presupuestario mensual máximo para usuarios de prueba. El valor se lee de la variable de entorno y no se puede modificar desde esta interfaz."
-      }
-    },
     "users": {
       "page-title": "Gestión de Usuarios",
       "confirm-delete": "¿Confirmar eliminación?",
@@ -2231,6 +2201,74 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
+    },
+    "terms": "Términos de Servicio",
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Configuración del sistema MirrorBuddy",
+      "system-info": {
+        "title": "System Info",
+        "description": "Información del sistema",
+        "version": "Versión",
+        "environment": "Entorno",
+        "node-version": "Node :",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Límite de presupuesto para usuarios de prueba",
+        "per-month": "/mes",
+        "configured-via": "Configurado mediante variable env",
+        "description-text": "Esta cantidad define el límite presupuestario mensual máximo para usuarios de prueba. El valor se lee de la variable de entorno y no se puede modificar desde esta interfaz."
+      }
+    },
+    "pendingBetaRequests": "{count} solicitudes beta pendientes",
+    "systemAlerts": "{count} alertas del sistema",
+    "collapseMenu": "Contraer menú",
+    "expandMenu": "Expandir menú",
+    "returnToApp": "Volver a la aplicación",
+    "invites": {
+      "unauthorized": "No autorizado. Inicia sesión como administrador.",
+      "loadingError": "Error de carga",
+      "approvalError": "Error durante la aprobación",
+      "rejectionError": "Error durante el rechazo",
+      "error": "Error",
+      "pending": "Pendiente",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "direct": "Directas (mías)",
+      "all": "Todas",
+      "directInvite": "Invitar directamente",
+      "refresh": "Actualizar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "rejectRequest": "Rechazar solicitud",
+      "rejectionReason": "Motivo del rechazo",
+      "optional": "Opcional",
+      "cancel": "Cancelar",
+      "confirmRejection": "Confirmar rechazo",
+      "reject-modal": {
+        "title": "Rechazar solicitud",
+        "reason-label": "Motivo del rechazo",
+        "placeholder": "Opcional",
+        "cancel-button": "Cancelar",
+        "confirm-button": "Confirmar rechazo"
+      }
+    },
+    "locales": {
+      "search": "Buscar por código de país, nombre, locale o maestro...",
+      "countryCode": "Código de País",
+      "countryName": "Nombre del País",
+      "primaryLocale": "Locale Primaria",
+      "languageMaestro": "Maestro de Idioma",
+      "secondaryLocales": "Locales Secundarias",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "edit": "Editar",
+      "notFound": "No se encontró configuración de locale",
+      "summary": "{count} de {total} configuraciones"
     },
     "components": {
       "bulkActionBar": {
