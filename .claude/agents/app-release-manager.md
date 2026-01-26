@@ -21,16 +21,17 @@ ZERO TOLERANCE. Script does work, agent interprets.
 
 ## CHECK CATEGORIES
 
-| Phase      | Checks                                    | Blocking |
-| ---------- | ----------------------------------------- | -------- |
-| Instant    | docs, hygiene, ts-ignore, any-type        | Yes      |
-| Static     | lint, typecheck, audit                    | Yes      |
-| Build      | build                                     | Yes      |
-| Tests      | unit, e2e                                 | Yes      |
-| Perf       | perf, filesize                            | Yes      |
-| Security   | csp, csrf, no-debug, rate-limit           | Yes      |
-| Compliance | dpia, ai-policy, privacy-page, terms-page | Yes      |
-| Plans      | plans (no `[ ]` in done/)                 | Yes      |
+| Phase      | Checks                                      | Blocking |
+| ---------- | ------------------------------------------- | -------- |
+| Instant    | docs, hygiene, ts-ignore, any-type          | Yes      |
+| Static     | lint, typecheck, audit                      | Yes      |
+| Build      | build                                       | Yes      |
+| Tests      | unit, e2e                                   | Yes      |
+| Perf       | perf, filesize                              | Yes      |
+| Security   | csp, csrf, no-debug, rate-limit             | Yes      |
+| Compliance | dpia, ai-policy, privacy-page, terms-page   | Yes      |
+| Arch Diags | arch-diagrams (25 sections + 21 compliance) | Yes      |
+| Plans      | plans (no `[ ]` in done/)                   | Yes      |
 
 ## ON FAILURE
 
@@ -127,26 +128,35 @@ curl -s https://mirrorbuddy.vercel.app/api/health/detailed | jq '.checks.databas
 - ADR 0063 - Supabase SSL Certificate Requirements
 - ADR 0067 - Database Performance Optimization (Sentry warnings fix)
 
-## ARCHITECTURE DIAGRAMS UPDATE (MANDATORY)
+## ARCHITECTURE DIAGRAMS VALIDATION (MANDATORY)
+
+The `arch-diagrams` check in release-brutal.sh validates:
+
+| Validation          | Count | Blocking |
+| ------------------- | ----- | -------- |
+| Main sections       | 25    | Yes      |
+| Compliance sections | 21    | Yes      |
+| Mermaid diagrams    | ≥40   | Yes      |
+| Required ADRs       | 14    | Yes      |
+| Unreferenced ADRs   | \*    | Warning  |
+
+```bash
+# Run comprehensive check
+./scripts/check-architecture-diagrams.sh
+
+# If warnings about unreferenced ADRs, add them to Section 25 (ADR Index)
+```
 
 Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:
 
 1. **Update version header** to match new version
 2. **Update "Last Verified" date** to release date
-3. **Check for new ADRs** - add any missing to ADR Index section
-4. **Verify accuracy** against implementation (especially new features)
+3. **Add any new sections** if architecture expanded
+4. **Add missing ADRs** shown as warnings in check script
 
-```bash
-# Quick check for new ADRs not in diagrams
-ls -la docs/adr/*.md | tail -10  # Recent ADRs
-grep "ADR0" ARCHITECTURE-DIAGRAMS.md | wc -l  # Count in diagrams
-```
+**If adding new main section** (beyond 25): Update `EXPECTED_SECTIONS` in `scripts/check-architecture-diagrams.sh`
 
-**Key sections to verify**:
-
-- Section 9: Tool Execution (voice tool commands)
-- Section 25: ADR Index (all recent ADRs)
-- Quick Reference table (file paths and ADR refs)
+**If adding new compliance section** (beyond 19.21): Update `COMPLIANCE_EXPECTED` in same script
 
 ## VERSION + RELEASE
 
