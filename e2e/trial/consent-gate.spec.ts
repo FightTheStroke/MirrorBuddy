@@ -25,9 +25,11 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Clear any existing consent
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
-      localStorage.removeItem("mirrorbuddy-consent");
-      localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      // Clear ALL consent-related localStorage keys
+      localStorage.removeItem("mirrorbuddy-consent"); // Old cookie consent
+      localStorage.removeItem("mirrorbuddy-unified-consent"); // New unified consent
+      localStorage.removeItem("trialConsent"); // Trial-specific consent
+      localStorage.removeItem("mirrorbuddy-onboarding"); // Prevent redirect
     });
 
     // Navigate to welcome page
@@ -56,9 +58,11 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Clear consent
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
+      // Clear ALL consent-related localStorage keys
       localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem("mirrorbuddy-unified-consent");
       localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
@@ -89,9 +93,11 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Clear consent
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
+      // Clear ALL consent-related localStorage keys
       localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem("mirrorbuddy-unified-consent");
       localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
@@ -164,46 +170,61 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     expect(body.sessionId).toBeTruthy();
   });
 
-  test("consent persists across page reloads", async ({ trialPage }) => {
-    // Clear initial state
-    await trialPage.context().clearCookies();
-    await trialPage.addInitScript(() => {
+  test("consent persists across page reloads", async ({ page }) => {
+    // Use fresh page without fixture's addInitScript to test persistence properly
+    // Clear cookies first
+    await page.context().clearCookies();
+
+    // Navigate to welcome page to establish origin for localStorage
+    await page.goto("/welcome", { waitUntil: "domcontentloaded" });
+
+    // Clear localStorage on localhost origin
+    await page.evaluate(() => {
       localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem("mirrorbuddy-unified-consent");
       localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
-    // Navigate to welcome
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    // Reload to see consent gate
+    await page.reload();
+    await page.waitForLoadState("domcontentloaded");
+
+    // Wait for consent gate to appear
+    await expect(page.getByText(/Modalità Prova Gratuita/i)).toBeVisible({
+      timeout: 10000,
+    });
 
     // Accept consent
-    const checkbox = trialPage.getByRole("checkbox");
+    const checkbox = page.getByRole("checkbox");
     await checkbox.check();
 
-    const acceptButton = trialPage.getByRole("button", {
+    const acceptButton = page.getByRole("button", {
       name: /Inizia la prova/i,
     });
     await acceptButton.click();
 
-    // Wait for consent to be saved
-    await trialPage.waitForTimeout(500);
+    // Wait for consent to be saved (cookie is set)
+    await page.waitForTimeout(500);
 
-    // Reload the page
-    await trialPage.reload();
-    await trialPage.waitForLoadState("networkidle");
+    // Reload the page - consent should persist via cookie
+    await page.reload();
+    await page.waitForLoadState("domcontentloaded");
 
-    // Consent gate should not appear on reload
-    const consentGate = trialPage.getByText(/Modalità Prova Gratuita/i);
-    await expect(consentGate).not.toBeVisible();
+    // Consent gate should not appear on reload (consent persisted via cookie)
+    const consentGate = page.getByText(/Modalità Prova Gratuita/i);
+    await expect(consentGate).not.toBeVisible({ timeout: 5000 });
   });
 
   test("privacy link opens external page", async ({ trialPage }) => {
     // Clear consent
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
+      // Clear ALL consent-related localStorage keys
       localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem("mirrorbuddy-unified-consent");
       localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
@@ -222,9 +243,11 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Clear consent
     await trialPage.context().clearCookies();
     await trialPage.addInitScript(() => {
+      // Clear ALL consent-related localStorage keys
       localStorage.removeItem("mirrorbuddy-consent");
+      localStorage.removeItem("mirrorbuddy-unified-consent");
       localStorage.removeItem("trialConsent");
-      localStorage.removeItem("mirrorbuddy-trial-consent");
+      localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
