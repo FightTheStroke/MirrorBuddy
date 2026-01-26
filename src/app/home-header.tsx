@@ -202,8 +202,9 @@ export function HomeHeader({
       </div>
 
       {/* Right section: tier badge + calculator + ambient audio + pomodoro + notifications + version */}
+      {/* Note: TierBadge hidden when trial dropdown is shown to avoid redundancy */}
       <div className="hidden lg:flex items-center gap-3">
-        {userTier && (
+        {userTier && !trialStatus?.isTrialMode && (
           <div className="flex items-center gap-1">
             <TierBadge tier={userTier} showIcon={userTier === "pro"} />
             {isSimulatedTier && (

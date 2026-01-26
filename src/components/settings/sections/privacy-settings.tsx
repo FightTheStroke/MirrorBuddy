@@ -23,6 +23,7 @@ import {
   type UnifiedConsentData,
 } from "@/lib/consent/unified-consent-storage";
 import { updateConsentSnapshot } from "@/lib/consent/consent-store";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 
 // Privacy Settings
 export function PrivacySettings() {
@@ -72,6 +73,8 @@ export function PrivacySettings() {
         }
       }
       keysToRemove.forEach((key) => localStorage.removeItem(key));
+      // Reset onboarding store to prevent auto-redirect to home
+      useOnboardingStore.getState().resetOnboarding();
       router.push("/welcome");
     } catch {
       setIsLoggingOut(false);
