@@ -178,6 +178,7 @@ export default defineConfig({
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
+        "**/mobile/regression-guard.spec.ts",
       ],
       // ENABLED in CI when CI_MOBILE_TESTS=1, otherwise skip
       ...(process.env.CI &&
@@ -193,6 +194,7 @@ export default defineConfig({
       testMatch: [
         "**/mobile/iphone.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
+        "**/mobile/regression-guard.spec.ts",
       ],
       // Skip in CI - covered by iphone-se (similar viewport)
       ...(process.env.CI && { testIgnore: "**/*" }),
@@ -208,6 +210,7 @@ export default defineConfig({
       testMatch: [
         "**/mobile/android.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
+        "**/mobile/regression-guard.spec.ts",
       ],
       // ENABLED in CI when CI_MOBILE_TESTS=1
       ...(process.env.CI &&
@@ -225,6 +228,7 @@ export default defineConfig({
       testMatch: [
         "**/mobile/ipad.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
+        "**/mobile/regression-guard.spec.ts",
       ],
       // ENABLED in CI when CI_MOBILE_TESTS=1
       ...(process.env.CI &&
@@ -240,6 +244,7 @@ export default defineConfig({
       testMatch: [
         "**/mobile/ipad.spec.ts",
         "**/mobile/responsive-layout.spec.ts",
+        "**/mobile/regression-guard.spec.ts",
       ],
       // Skip in CI - tablet portrait (ipad-mini) is sufficient
       ...(process.env.CI && { testIgnore: "**/*" }),
