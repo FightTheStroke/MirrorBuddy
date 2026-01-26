@@ -26,6 +26,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 interface ModifyRequest {
   sessionId: string;
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       const cookieStore = await cookies();
-      const visitorId = cookieStore.get("mirrorbuddy-visitor-id")?.value;
+      const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
       if (!visitorId) {
         return NextResponse.json({ error: "Invalid session" }, { status: 401 });
       }

@@ -118,7 +118,8 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
     toolId: string;
     data: Record<string, unknown>;
   } | null {
-    if (!event.sessionId || !event.maestroId || !event.toolType) {
+    const sessionId = event.sessionId ?? this.sessionId;
+    if (!sessionId || !event.maestroId || !event.toolType) {
       return null;
     }
 
@@ -135,7 +136,7 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
           : { value: event.payload };
 
     return {
-      sessionId: event.sessionId,
+      sessionId,
       maestroId: event.maestroId,
       type,
       toolType: event.toolType as RealtimeToolType,

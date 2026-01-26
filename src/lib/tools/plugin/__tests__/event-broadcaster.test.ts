@@ -44,6 +44,9 @@ describe("ToolEventBroadcaster", () => {
     mockEvent = {
       type: ToolEventType.TOOL_EXECUTING,
       toolId: "test-tool-123",
+      toolType: "mindmap",
+      maestroId: "test-maestro",
+      sessionId: "session-123",
       timestamp: Date.now(),
       payload: { progress: 50 },
     };
@@ -158,7 +161,11 @@ describe("ToolEventBroadcaster", () => {
     it("should set session ID for SSE fallback", async () => {
       const broadcaster = new ToolEventBroadcaster();
       broadcaster.setSessionId("new-session-456");
-      broadcaster.sendEvent(mockEvent);
+      const eventWithSession = {
+        ...mockEvent,
+        sessionId: undefined,
+      };
+      broadcaster.sendEvent(eventWithSession);
 
       await vi.waitFor(() => {
         expect(mockCsrfFetch).toHaveBeenCalledWith(
