@@ -143,6 +143,9 @@ pass "rate-limit"
 # Architecture diagrams check (25 sections + 21 compliance subsections)
 ./scripts/check-architecture-diagrams.sh > /tmp/release-arch-diagrams.log 2>&1 && pass "arch-diagrams" || fail "arch-diagrams" "\`\`\`\n$(/usr/bin/grep -E '✗|FAIL|MISSING' /tmp/release-arch-diagrams.log | head -10)\n\`\`\`"
 
+# Documentation/Code audit (trial limits, health status, voice model, metrics cadence)
+./scripts/doc-code-audit.sh > /tmp/release-doc-code-audit.log 2>&1 && pass "doc-code-audit" || fail "doc-code-audit" "\`\`\`\n$(/usr/bin/grep -E '✗ FAIL' /tmp/release-doc-code-audit.log | head -10)\n\`\`\`"
+
 # =============================================================================
 # PHASE 8: PLAN SANITY
 # =============================================================================
