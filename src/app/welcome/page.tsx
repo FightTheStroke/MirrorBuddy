@@ -75,9 +75,19 @@ function WelcomeContent() {
     }
   }, [skipOnboarding, router]);
 
+  // F-02: Only redirect if user has given GDPR consent
+  // Without consent, the TrialConsentGate will block content
   useEffect(() => {
     if (hasCompletedOnboarding && !isReplay && !isReplayMode) {
-      router.push("/");
+      // Check for trial consent cookie before redirecting
+      const cookies = document.cookie.split("; ");
+      const hasConsentCookie = cookies.some((c) =>
+        c.startsWith("mirrorbuddy-trial-consent="),
+      );
+      if (hasConsentCookie) {
+        router.push("/");
+      }
+      // If no consent cookie, stay on page - consent gate will handle the flow
     }
   }, [hasCompletedOnboarding, isReplay, isReplayMode, router]);
 
