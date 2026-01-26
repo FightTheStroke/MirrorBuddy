@@ -17,20 +17,6 @@
  */
 
 import { test, expect } from "@playwright/test";
-import { createHmac } from "crypto";
-
-// Must match playwright.config.ts and global-setup.ts
-const E2E_SESSION_SECRET = "e2e-test-session-secret-32-characters-min";
-
-/**
- * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
- */
-function signCookieValue(value: string): string {
-  const hmac = createHmac("sha256", E2E_SESSION_SECRET);
-  hmac.update(value);
-  const signature = hmac.digest("hex");
-  return `${value}.${signature}`;
-}
 
 test.describe("SMOKE: Critical Paths @smoke", () => {
   test.describe.configure({ mode: "serial" });
@@ -56,30 +42,11 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   });
 
   test("CP-02: Home page loads for authenticated users", async ({ page }) => {
-    // Set up properly signed auth cookies (must match E2E_SESSION_SECRET)
-    const testUserId = "smoke-test-user";
-    const signedCookie = signCookieValue(testUserId);
-
-    await page.context().addCookies([
-      {
-        name: "mirrorbuddy-user-id",
-        value: signedCookie,
-        domain: "localhost",
-        path: "/",
-      },
-      {
-        name: "mirrorbuddy-user-id-client",
-        value: testUserId,
-        domain: "localhost",
-        path: "/",
-      },
-      {
-        name: "mirrorbuddy-consent",
-        value: JSON.stringify({ essential: true, analytics: false }),
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
+    // This test uses the storage state from global-setup.ts which already has:
+    // - Properly signed auth cookies
+    // - Onboarding completed
+    // - Consent accepted
+    // The test user is created by global-setup with a valid signed cookie
 
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
@@ -87,8 +54,7 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     await page.goto("/home");
     await page.waitForLoadState("domcontentloaded");
 
-    // Should not redirect to login (auth should work)
-    // Allow /home or / as valid destinations
+    // Should not redirect to login (auth from storage state should work)
     const currentUrl = page.url();
     expect(currentUrl).not.toContain("/login");
 
@@ -156,24 +122,13 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   });
 
   test("CP-06: Logout clears session and redirects", async ({ page }) => {
-    // Set up properly signed auth cookies
-    const logoutTestUserId = "logout-test-user";
-    const signedLogoutCookie = signCookieValue(logoutTestUserId);
-
-    await page.context().addCookies([
-      {
-        name: "mirrorbuddy-user-id",
-        value: signedLogoutCookie,
-        domain: "localhost",
-        path: "/",
-      },
-      {
-        name: "mirrorbuddy-user-id-client",
-        value: logoutTestUserId,
-        domain: "localhost",
-        path: "/",
-      },
-    ]);
+    // This test uses the storage state from global-setup.ts which has valid auth
+    // First verify we're authenticated (has auth cookie from storage state)
+    const cookiesBefore = await page.context().cookies();
+    const hasAuthCookie = cookiesBefore.some(
+      (c) => c.name === "mirrorbuddy-user-id",
+    );
+    expect(hasAuthCookie).toBe(true);
 
     // Call logout API directly (more reliable than UI click)
     const response = await page.request.post("/api/auth/logout");
@@ -188,9 +143,9 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     const currentUrl = page.url();
     const redirectedAway =
       currentUrl.includes("/login") || currentUrl.includes("/welcome");
-    const authCookieCleared = !(await page.context().cookies()).some(
-      (c) =>
-        c.name === "mirrorbuddy-user-id" && c.value.includes("logout-test"),
+    const cookiesAfter = await page.context().cookies();
+    const authCookieCleared = !cookiesAfter.some(
+      (c) => c.name === "mirrorbuddy-user-id",
     );
 
     expect(redirectedAway || authCookieCleared).toBe(true);
