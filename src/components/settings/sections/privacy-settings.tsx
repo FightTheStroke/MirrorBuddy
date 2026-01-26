@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import {
   Shield,
   BarChart3,
@@ -23,11 +22,9 @@ import {
   type UnifiedConsentData,
 } from "@/lib/consent/unified-consent-storage";
 import { updateConsentSnapshot } from "@/lib/consent/consent-store";
-import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 
 // Privacy Settings
 export function PrivacySettings() {
-  const router = useRouter();
   const [version, setVersion] = useState<{
     version: string;
     buildTime: string;
@@ -73,9 +70,9 @@ export function PrivacySettings() {
         }
       }
       keysToRemove.forEach((key) => localStorage.removeItem(key));
-      // Reset onboarding store to prevent auto-redirect to home
-      useOnboardingStore.getState().resetOnboarding();
-      router.push("/welcome");
+      // Force full page reload to /welcome to reset all state
+      // This ensures Zustand stores are cleared and hydration happens fresh
+      window.location.href = "/welcome";
     } catch {
       setIsLoggingOut(false);
     }
