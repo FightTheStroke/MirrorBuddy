@@ -457,6 +457,9 @@
       "reduceAnimations": "Reducir Animaciones",
       "dyslexiaFont": "Fuente Dislexia",
       "resetSettings": "Restablecer Configuración",
+      "resetDefaults": "Restablecer configuración predeterminada",
+      "mobileSubtitle": "Personaliza la experiencia según tus necesidades",
+      "sectionTitle": "Configuraciones",
       "allSettings": "Todas las Configuraciones",
       "auditoryTitle": "Accesibilidad Auditiva",
       "auditoryDesc": "Configuración para usuarios sordos o con pérdida auditiva.",
@@ -911,7 +914,8 @@
       "cardBackPlaceholder": "Respuesta (reverso)",
       "addCardButton": "Agregar tarjeta",
       "cancelButton": "Cancelar",
-      "saveButton": "Guardar"
+      "saveButton": "Guardar",
+      "ratingQuestion": "¿Qué tan fácil fue recordar?"
     },
     "calendar": {
       "title": "Calendario",

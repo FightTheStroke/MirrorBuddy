@@ -389,7 +389,8 @@
       "cardBackPlaceholder": "Réponse (verso)",
       "addCardButton": "Ajouter une carte",
       "cancelButton": "Annuler",
-      "saveButton": "Enregistrer"
+      "saveButton": "Enregistrer",
+      "ratingQuestion": "Quelle a été la facilité à se souvenir ?"
     },
     "calendar": {
       "title": "Calendrier",
@@ -1562,6 +1563,9 @@
       "reduceAnimations": "Réduire les Animations",
       "dyslexiaFont": "Police Dyslexie",
       "resetSettings": "Réinitialiser les Paramètres",
+      "resetDefaults": "Réinitialiser les paramètres par défaut",
+      "mobileSubtitle": "Personnalisez l'expérience selon vos besoins",
+      "sectionTitle": "Paramètres",
       "allSettings": "Tous les Paramètres",
       "auditoryTitle": "Accessibilité Auditive",
       "auditoryDesc": "Paramètres pour les utilisateurs sourds ou malentendants.",

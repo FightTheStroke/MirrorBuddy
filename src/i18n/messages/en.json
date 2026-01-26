@@ -381,7 +381,8 @@
       "cardBackPlaceholder": "Answer (back)",
       "addCardButton": "Add Card",
       "cancelButton": "Cancel",
-      "saveButton": "Save"
+      "saveButton": "Save",
+      "ratingQuestion": "How easy was it to remember?"
     },
     "learning-path": {
       "loading-topic": "Loading topic...",
@@ -1571,6 +1572,9 @@
       "reduceAnimations": "Reduce Animations",
       "dyslexiaFont": "Dyslexia Font",
       "resetSettings": "Reset Settings",
+      "resetDefaults": "Reset to default settings",
+      "mobileSubtitle": "Customize the experience according to your needs",
+      "sectionTitle": "Settings",
       "allSettings": "All Settings",
       "auditoryTitle": "Auditory Accessibility",
       "auditoryDesc": "Settings for deaf or hard of hearing users.",

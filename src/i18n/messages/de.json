@@ -389,7 +389,8 @@
       "cardBackPlaceholder": "Antwort (Rückseite)",
       "addCardButton": "Karte hinzufügen",
       "cancelButton": "Abbrechen",
-      "saveButton": "Speichern"
+      "saveButton": "Speichern",
+      "ratingQuestion": "Wie leicht war es, sich zu erinnern?"
     },
     "calendar": {
       "title": "Kalender",
@@ -1562,6 +1563,9 @@
       "reduceAnimations": "Animationen reduzieren",
       "dyslexiaFont": "Legasthenie-Schrift",
       "resetSettings": "Einstellungen zurücksetzen",
+      "resetDefaults": "Auf Standardeinstellungen zurücksetzen",
+      "mobileSubtitle": "Passen Sie das Erlebnis nach Ihren Bedürfnissen an",
+      "sectionTitle": "Einstellungen",
       "allSettings": "Alle Einstellungen",
       "auditoryTitle": "Auditive Barrierefreiheit",
       "auditoryDesc": "Einstellungen für gehörlose oder schwerhörige Benutzer.",

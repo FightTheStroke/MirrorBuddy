@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 import { ProfileCardsSection } from "./accessibility-panel-mobile/profile-cards-section";
@@ -20,6 +21,7 @@ import { ResetButton } from "./accessibility-panel-mobile/reset-button";
  * - Uses xs: breakpoint for mobile optimization
  */
 export function AccessibilityPanelMobile() {
+  const t = useTranslations("settings.accessibility");
   const { settings, getFontSizeMultiplier } = useAccessibilityStore();
 
   const fontSizeMultiplier = getFontSizeMultiplier();
@@ -47,7 +49,7 @@ export function AccessibilityPanelMobile() {
             fontSize: `${18 * fontSizeMultiplier}px`,
           }}
         >
-          Accessibilità
+          {t("panelTitle")}
         </h2>
         <p
           className={cn(
@@ -61,7 +63,7 @@ export function AccessibilityPanelMobile() {
             fontSize: `${14 * fontSizeMultiplier}px`,
           }}
         >
-          Personalizza l&apos;esperienza secondo le tue necessità
+          {t("mobileSubtitle")}
         </p>
       </div>
 

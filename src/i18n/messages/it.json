@@ -444,7 +444,8 @@
       "cardBackPlaceholder": "Risposta (retro)",
       "addCardButton": "Aggiungi Carta",
       "cancelButton": "Annulla",
-      "saveButton": "Salva"
+      "saveButton": "Salva",
+      "ratingQuestion": "Quanto è stato facile ricordare?"
     },
     "calendar": {
       "title": "Calendario",
@@ -2067,6 +2068,9 @@
       "reduceAnimations": "Riduci Animazioni",
       "dyslexiaFont": "Font Dislessia",
       "resetSettings": "Ripristina Impostazioni",
+      "resetDefaults": "Ripristina impostazioni predefinite",
+      "mobileSubtitle": "Personalizza l'esperienza secondo le tue necessità",
+      "sectionTitle": "Impostazioni",
       "allSettings": "Tutte le Impostazioni",
       "auditoryTitle": "Accessibilità Uditiva",
       "auditoryDesc": "Impostazioni per utenti non udenti o ipoudenti.",

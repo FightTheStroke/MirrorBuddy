@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { RotateCcw } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
@@ -9,6 +10,7 @@ interface ResetButtonProps {
 }
 
 export function ResetButton({ fontSizeMultiplier }: ResetButtonProps) {
+  const t = useTranslations("settings.accessibility");
   const { settings, resetSettings } = useAccessibilityStore();
 
   return (
@@ -26,7 +28,7 @@ export function ResetButton({ fontSizeMultiplier }: ResetButtonProps) {
       }}
     >
       <RotateCcw className="w-5 h-5" />
-      <span>Ripristina impostazioni predefinite</span>
+      <span>{t("resetDefaults")}</span>
     </button>
   );
 }
