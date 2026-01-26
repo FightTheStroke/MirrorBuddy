@@ -14,6 +14,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 interface LocaleFunnelMetrics {
   locale: string;
@@ -107,8 +108,7 @@ export async function GET(request: NextRequest) {
       // Stage breakdown
       const stageBreakdown: { [stage: string]: number } = {};
       events.forEach((event) => {
-        stageBreakdown[event.stage] =
-          (stageBreakdown[event.stage] || 0) + 1;
+        stageBreakdown[event.stage] = (stageBreakdown[event.stage] || 0) + 1;
       });
 
       // Unique visitors and users
@@ -162,13 +162,20 @@ export async function GET(request: NextRequest) {
         locale,
         stageBreakdown,
         conversionRates: {
-          visitorToTrialStart: Math.round(conversionRates.visitorToTrialStart * 100) / 100,
-          trialStartToEngaged: Math.round(conversionRates.trialStartToEngaged * 100) / 100,
-          engagedToLimitHit: Math.round(conversionRates.engagedToLimitHit * 100) / 100,
-          limitHitToBetaRequest: Math.round(conversionRates.limitHitToBetaRequest * 100) / 100,
-          betaRequestToApproved: Math.round(conversionRates.betaRequestToApproved * 100) / 100,
-          approvedToFirstLogin: Math.round(conversionRates.approvedToFirstLogin * 100) / 100,
-          firstLoginToActive: Math.round(conversionRates.firstLoginToActive * 100) / 100,
+          visitorToTrialStart:
+            Math.round(conversionRates.visitorToTrialStart * 100) / 100,
+          trialStartToEngaged:
+            Math.round(conversionRates.trialStartToEngaged * 100) / 100,
+          engagedToLimitHit:
+            Math.round(conversionRates.engagedToLimitHit * 100) / 100,
+          limitHitToBetaRequest:
+            Math.round(conversionRates.limitHitToBetaRequest * 100) / 100,
+          betaRequestToApproved:
+            Math.round(conversionRates.betaRequestToApproved * 100) / 100,
+          approvedToFirstLogin:
+            Math.round(conversionRates.approvedToFirstLogin * 100) / 100,
+          firstLoginToActive:
+            Math.round(conversionRates.firstLoginToActive * 100) / 100,
         },
         totalEvents: events.length,
         uniqueVisitors,
@@ -180,13 +187,11 @@ export async function GET(request: NextRequest) {
     byLocale.sort((a, b) => b.totalEvents - a.totalEvents);
 
     // Top locales summary
-    const topLocales = byLocale
-      .slice(0, 10)
-      .map((locale) => ({
-        locale: locale.locale,
-        events: locale.totalEvents,
-        conversionToTrialStart: locale.conversionRates.visitorToTrialStart,
-      }));
+    const topLocales = byLocale.slice(0, 10).map((locale) => ({
+      locale: locale.locale,
+      events: locale.totalEvents,
+      conversionToTrialStart: locale.conversionRates.visitorToTrialStart,
+    }));
 
     const response: LocaleFunnelResponse = {
       summary: {
@@ -201,7 +206,9 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error fetching locale-segmented funnel metrics:", error);
+    logger.error("Error fetching locale-segmented funnel metrics", {
+      error: String(error),
+    });
     return NextResponse.json(
       { error: "Failed to fetch locale funnel metrics" },
       { status: 500 },

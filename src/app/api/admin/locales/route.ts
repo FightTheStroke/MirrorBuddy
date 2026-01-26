@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import { logLocaleCreate } from "@/lib/locale/locale-audit-service";
 import { localeConfigService } from "@/lib/locale/locale-config-service";
 
@@ -21,7 +22,7 @@ export async function GET(_request: NextRequest) {
 
     return NextResponse.json({ locales });
   } catch (error) {
-    console.error("Error fetching locales:", error);
+    logger.error("Error fetching locales", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to fetch locales" },
       { status: 500 },
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, locale }, { status: 201 });
   } catch (error) {
-    console.error("Error creating locale:", error);
+    logger.error("Error creating locale", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to create locale configuration" },
       { status: 500 },

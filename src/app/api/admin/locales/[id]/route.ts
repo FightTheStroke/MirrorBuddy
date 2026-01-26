@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   logLocaleUpdate,
   logLocaleDelete,
@@ -36,7 +37,7 @@ export async function GET(
 
     return NextResponse.json({ locale });
   } catch (error) {
-    console.error("Error fetching locale:", error);
+    logger.error("Error fetching locale", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to fetch locale configuration" },
       { status: 500 },
@@ -152,7 +153,7 @@ export async function PUT(
 
     return NextResponse.json({ success: true, locale });
   } catch (error) {
-    console.error("Error updating locale:", error);
+    logger.error("Error updating locale", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to update locale configuration" },
       { status: 500 },
@@ -216,7 +217,7 @@ export async function DELETE(
       { status: 200 },
     );
   } catch (error) {
-    console.error("Error deleting locale:", error);
+    logger.error("Error deleting locale", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to delete locale configuration" },
       { status: 500 },
