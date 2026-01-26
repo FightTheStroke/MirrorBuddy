@@ -9,13 +9,12 @@ import { test, expect } from "./fixtures";
 test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
   test.beforeEach(async ({ page, mobile: _mobile }) => {
-    await page.goto("/");
-    // Wait for network to settle before checking for hydrated content
-    await page.waitForLoadState("networkidle");
+    // Navigate and wait for DOM to be ready (networkidle doesn't work with HMR)
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
     await page.waitForSelector('button:has-text("Professori")', {
-      timeout: 15000,
+      timeout: 20000,
     });
   });
 
