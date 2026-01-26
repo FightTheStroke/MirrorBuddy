@@ -114,12 +114,15 @@ function WelcomeContent() {
     return <LoadingState />;
   }
 
+  // F-02: GDPR consent gate must block ALL trial content (landing + onboarding)
   if (showLandingPage) {
     return (
-      <LandingPage
-        existingUserData={existingUserData}
-        onStartOnboarding={handleStartOnboarding}
-      />
+      <TrialConsentGate>
+        <LandingPage
+          existingUserData={existingUserData}
+          onStartOnboarding={handleStartOnboarding}
+        />
+      </TrialConsentGate>
     );
   }
 
