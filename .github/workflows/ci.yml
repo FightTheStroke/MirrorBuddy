@@ -383,10 +383,11 @@ jobs:
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
   # MANDATORY on main branch only (push to main or PR targeting main)
+  # NOTE: Runs AFTER e2e-tests to avoid database conflicts (shared test DB)
   mobile-e2e:
     name: Mobile E2E Tests
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [build, e2e-tests]
     if: github.ref == 'refs/heads/main' || github.base_ref == 'main'
 
     services:

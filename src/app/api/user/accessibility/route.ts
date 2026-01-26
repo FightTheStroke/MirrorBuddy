@@ -40,10 +40,11 @@ export async function GET(request: NextRequest) {
           });
           return a11ySettings;
         } catch (error) {
-          // If unique constraint violation, fetch the existing record
+          // If unique constraint violation (Prisma or PostgreSQL error), fetch existing
           if (
             error instanceof Error &&
-            error.message.includes("Unique constraint")
+            (error.message.includes("Unique constraint") ||
+              error.message.includes("duplicate key"))
           ) {
             const existing = await prisma.accessibilitySettings.findUnique({
               where: { userId },
