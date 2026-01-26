@@ -1,20 +1,29 @@
-'use client';
+"use client";
 
 /**
  * @file character-voice-panel.tsx
  * @brief Unified voice panel component for all character types
  */
 
-import { useEffect } from 'react';
-import Image from 'next/image';
-import { X, Phone, PhoneOff, Volume2, VolumeX, RotateCcw, Mic, MicOff } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { UnifiedCharacter, VoiceState, HeaderActions } from '../types';
-import { createVerticalGradientStyle } from '../utils/gradient-utils';
-import { AuraRings } from './aura-rings';
+import { useEffect } from "react";
+import Image from "next/image";
+import {
+  X,
+  Phone,
+  PhoneOff,
+  Volume2,
+  VolumeX,
+  RotateCcw,
+  Mic,
+  MicOff,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import type { UnifiedCharacter, VoiceState, HeaderActions } from "../types";
+import { createVerticalGradientStyle } from "../utils/gradient-utils";
+import { AuraRings } from "./aura-rings";
 
 interface CharacterVoicePanelProps {
   character: UnifiedCharacter;
@@ -46,23 +55,23 @@ export function CharacterVoicePanel({
 
   const statusText = configError
     ? configError
-    : connectionState === 'connecting'
-      ? 'Connessione...'
+    : connectionState === "connecting"
+      ? "Connessione..."
       : isConnected && isSpeaking
         ? `${character.name} sta parlando...`
         : isConnected && isListening
-          ? 'In ascolto...'
+          ? "In ascolto..."
           : isConnected
-            ? 'Connesso'
-            : 'Avvio chiamata...';
+            ? "Connesso"
+            : "Avvio chiamata...";
 
   // Escape key handler
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') actions.onClose();
+      if (e.key === "Escape") actions.onClose();
     };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
   }, [actions]);
 
   const handleTTSToggle = () => {
@@ -70,22 +79,22 @@ export function CharacterVoicePanel({
     else updateSettings({ ttsEnabled: true });
   };
 
-  const buttonBg = 'bg-white/30 hover:bg-white/40';
-  const buttonBgMuted = 'bg-red-500/60 hover:bg-red-500/70';
-  const iconColor = 'text-white';
+  const buttonBg = "bg-white/30 hover:bg-white/40";
+  const buttonBgMuted = "bg-red-500/60 hover:bg-red-500/70";
+  const iconColor = "text-white";
 
-    return (
-      <div
-        className="relative w-full sm:w-72 lg:w-64 flex flex-col p-4 sm:p-5 rounded-2xl h-full min-h-[120px] text-white"
-        style={gradientStyle}
-      >
+  return (
+    <div
+      className="relative w-28 sm:w-72 lg:w-64 flex flex-col p-4 sm:p-5 rounded-2xl h-full min-h-[120px] text-white"
+      style={gradientStyle}
+    >
       {/* Top bar: Always render both buttons */}
       <div className="flex items-center justify-between mb-4">
         <Button
           variant="ghost"
           size="icon"
           onClick={actions.onClearChat}
-          className={cn('rounded-full h-8 w-8', buttonBg, iconColor)}
+          className={cn("rounded-full h-8 w-8", buttonBg, iconColor)}
           aria-label="Nuova conversazione"
         >
           <RotateCcw className="w-4 h-4" />
@@ -95,7 +104,7 @@ export function CharacterVoicePanel({
           variant="ghost"
           size="icon"
           onClick={actions.onClose}
-          className={cn('rounded-full h-8 w-8', buttonBg, iconColor)}
+          className={cn("rounded-full h-8 w-8", buttonBg, iconColor)}
           aria-label="Chiudi (Esc)"
         >
           <X className="w-4 h-4" />
@@ -104,11 +113,13 @@ export function CharacterVoicePanel({
 
       {/* Center: Name and status */}
       <div className="flex flex-col items-center gap-1.5 mb-4">
-        <h2 className="text-lg sm:text-xl font-bold text-center">{character.name}</h2>
+        <h2 className="text-lg sm:text-xl font-bold text-center">
+          {character.name}
+        </h2>
         <p
           className={cn(
-            'text-xs sm:text-sm text-center',
-            configError ? 'text-red-200' : 'text-white/90'
+            "text-xs sm:text-sm text-center",
+            configError ? "text-red-200" : "text-white/90",
           )}
         >
           {statusText}
@@ -133,8 +144,8 @@ export function CharacterVoicePanel({
               width={80}
               height={80}
               className={cn(
-                'w-20 h-20 rounded-full border-4 object-cover',
-                isConnected ? 'border-white shadow-2xl' : 'border-white/50'
+                "w-20 h-20 rounded-full border-4 object-cover",
+                isConnected ? "border-white shadow-2xl" : "border-white/50",
               )}
             />
             {isConnected && (
@@ -155,45 +166,66 @@ export function CharacterVoicePanel({
             onClick={actions.onToggleMute}
             disabled={!isActive || !isConnected}
             className={cn(
-              'rounded-full h-10 w-10',
-              !isActive && 'opacity-40',
+              "rounded-full h-10 w-10",
+              !isActive && "opacity-40",
               isMuted ? buttonBgMuted : buttonBg,
-              iconColor
+              iconColor,
             )}
-            aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+            aria-label={isMuted ? "Attiva microfono" : "Disattiva microfono"}
           >
-            {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+            {isMuted ? (
+              <MicOff className="w-5 h-5" />
+            ) : (
+              <Mic className="w-5 h-5" />
+            )}
           </Button>
 
           <Button
             variant="ghost"
             size="icon"
             onClick={handleTTSToggle}
-            className={cn('rounded-full h-10 w-10', !ttsEnabled && 'opacity-60', buttonBg, iconColor)}
-            aria-label={ttsEnabled ? 'Ferma lettura vocale' : 'Attiva lettura vocale'}
+            className={cn(
+              "rounded-full h-10 w-10",
+              !ttsEnabled && "opacity-60",
+              buttonBg,
+              iconColor,
+            )}
+            aria-label={
+              ttsEnabled ? "Ferma lettura vocale" : "Attiva lettura vocale"
+            }
           >
-            {ttsEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+            {ttsEnabled ? (
+              <Volume2 className="w-5 h-5" />
+            ) : (
+              <VolumeX className="w-5 h-5" />
+            )}
           </Button>
         </div>
 
         <Button
-          variant={isActive ? 'destructive' : 'default'}
+          variant={isActive ? "destructive" : "default"}
           size="icon"
           onClick={actions.onVoiceCall}
           disabled={!!configError && !isActive}
           className={cn(
-            'rounded-full h-14 w-14',
-            isActive ? 'bg-red-500 hover:bg-red-600 animate-pulse' : 'bg-green-500 hover:bg-green-600',
-            configError && !isActive && 'opacity-40'
+            "rounded-full h-14 w-14",
+            isActive
+              ? "bg-red-500 hover:bg-red-600 animate-pulse"
+              : "bg-green-500 hover:bg-green-600",
+            configError && !isActive && "opacity-40",
           )}
-          aria-label={isActive ? 'Termina chiamata' : 'Avvia chiamata'}
+          aria-label={isActive ? "Termina chiamata" : "Avvia chiamata"}
         >
-          {isActive ? <PhoneOff className="w-7 h-7" /> : <Phone className="w-7 h-7" />}
+          {isActive ? (
+            <PhoneOff className="w-7 h-7" />
+          ) : (
+            <Phone className="w-7 h-7" />
+          )}
         </Button>
 
         {isConnected && (
           <p className="text-xs text-white/80 text-center mt-2">
-            {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+            {isMuted ? "Microfono disattivato" : "Parla ora..."}
           </p>
         )}
       </div>
