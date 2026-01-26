@@ -10,11 +10,12 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
   test.beforeEach(async ({ page, mobile: _mobile }) => {
     await page.goto("/");
+    // Wait for network to settle before checking for hydrated content
+    await page.waitForLoadState("networkidle");
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, navigation buttons appear (Professori, Astuccio, etc.)
-    // Use longer timeout for CI where hydration is slower
     await page.waitForSelector('button:has-text("Professori")', {
-      timeout: 30000,
+      timeout: 15000,
     });
   });
 
