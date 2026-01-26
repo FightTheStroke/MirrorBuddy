@@ -7,12 +7,14 @@
  * - Context enrichment (request ID, user ID, etc.)
  * - OpenTelemetry trace ID correlation
  * - Safe serialization (no PII in production)
+ * - **Automatic Sentry integration for errors**
  *
  * ISE Engineering Fundamentals: Observability
  * https://microsoft.github.io/code-with-engineering-playbook/observability/
  */
 
 import { trace, context } from "@opentelemetry/api";
+import * as Sentry from "@sentry/nextjs";
 
 export type LogLevel = "error" | "warn" | "info" | "debug";
 
@@ -166,6 +168,53 @@ function output(entry: LogEntry): void {
   }
 }
 
+/**
+ * Send error to Sentry with context
+ * Only runs in production to avoid noise during development
+ */
+function captureErrorToSentry(
+  message: string,
+  context?: LogContext,
+  error?: unknown,
+): void {
+  // Only capture in production
+  if (process.env.NODE_ENV !== "production") return;
+
+  const errorToCapture = error instanceof Error ? error : new Error(message);
+
+  Sentry.captureException(errorToCapture, {
+    tags: {
+      component: context?.component || "unknown",
+      ...(context?.requestId && { requestId: context.requestId }),
+    },
+    extra: {
+      message,
+      ...context,
+      originalError: error ? String(error) : undefined,
+    },
+  });
+}
+
+/**
+ * Send warning to Sentry as message (not exception)
+ * Enabled for zero-tolerance monitoring
+ */
+function captureWarningToSentry(message: string, context?: LogContext): void {
+  // Only capture in production
+  if (process.env.NODE_ENV !== "production") return;
+
+  Sentry.captureMessage(message, {
+    level: "warning",
+    tags: {
+      component: context?.component || "unknown",
+      ...(context?.requestId && { requestId: context.requestId }),
+    },
+    extra: {
+      ...context,
+    },
+  });
+}
+
 function log(
   level: LogLevel,
   message: string,
@@ -174,6 +223,13 @@ function log(
 ): void {
   if (!shouldLog(level)) return;
   output(createEntry(level, message, context, error));
+
+  // Automatically send to Sentry (zero tolerance monitoring)
+  if (level === "error") {
+    captureErrorToSentry(message, context, error);
+  } else if (level === "warn") {
+    captureWarningToSentry(message, context);
+  }
 }
 
 export const logger = {

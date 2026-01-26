@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/admin/subscriptions
@@ -34,7 +35,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(subscriptions);
   } catch (error) {
-    console.error("Error listing subscriptions:", error);
+    logger.error(
+      "Error listing subscriptions",
+      { component: "admin-subscriptions" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to list subscriptions" },
       { status: 500 },

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { Save, X } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { clientLogger } from "@/lib/logger/client";
 import { BasicInfoSection } from "./basic-info-section";
 import { LimitsSection } from "./limits-section";
 import { FeaturesSection } from "./features-section";
@@ -124,7 +125,7 @@ export function TierForm({ tier }: TierFormProps) {
       router.push("/admin/tiers");
       router.refresh();
     } catch (error) {
-      console.error("Error saving tier:", error);
+      clientLogger.error("Error saving tier", { component: "TierForm" }, error);
       toast.error(
         "Errore",
         error instanceof Error

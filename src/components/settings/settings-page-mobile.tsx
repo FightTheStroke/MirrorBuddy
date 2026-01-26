@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/lib/stores";
+import { clientLogger } from "@/lib/logger/client";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 import {
   SettingsSectionsMobile,
@@ -59,7 +60,11 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
       await syncToServer();
       setHasChanges(false);
     } catch (error) {
-      console.error("Failed to save settings", error);
+      clientLogger.error(
+        "Failed to save settings",
+        { component: "SettingsPageMobile" },
+        error,
+      );
     } finally {
       setIsSaving(false);
     }

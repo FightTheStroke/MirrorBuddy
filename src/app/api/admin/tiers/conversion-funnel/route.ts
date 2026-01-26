@@ -11,6 +11,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 interface FunnelStage {
   tierCode: string;
@@ -238,7 +239,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("Error fetching conversion funnel:", error);
+    logger.error(
+      "Error fetching conversion funnel",
+      { component: "admin-conversion-funnel" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to fetch conversion funnel metrics" },
       { status: 500 },

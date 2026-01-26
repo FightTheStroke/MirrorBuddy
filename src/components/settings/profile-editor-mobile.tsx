@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import { Camera, Save, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { clientLogger } from "@/lib/logger/client";
 
 interface ProfileEditorMobileProps {
   profile: {
@@ -70,7 +71,11 @@ export function ProfileEditorMobile({
         setIsCameraActive(true);
       }
     } catch (error) {
-      console.error("Camera access denied:", error);
+      clientLogger.error(
+        "Camera access denied",
+        { component: "ProfileEditorMobile" },
+        error,
+      );
       setErrors((prev) => ({
         ...prev,
         camera: "Camera access denied. Please enable camera permissions.",

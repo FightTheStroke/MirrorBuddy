@@ -27,12 +27,16 @@ Sentry.init({
   replaysOnErrorSampleRate: 1.0,
   replaysSessionSampleRate: 0,
 
-  // You can remove this option if you're not planning to use the Sentry Session Replay feature:
+  // Integrations for comprehensive error capture
   integrations: [
     Sentry.replayIntegration({
       // Additional Replay configuration goes in here
       maskAllText: true,
       blockAllMedia: true,
+    }),
+    // Capture console.error and console.warn
+    Sentry.captureConsoleIntegration({
+      levels: ["error", "warn"],
     }),
   ],
 
@@ -43,4 +47,15 @@ Sentry.init({
 
   // Only send errors in production
   enabled: process.env.NODE_ENV === "production",
+
+  // Also capture fetch errors and XHR failures
+  beforeSend(event, _hint) {
+    // Always send - zero tolerance
+    return event;
+  },
+
+  // Capture all breadcrumbs for better debugging context
+  beforeBreadcrumb(breadcrumb) {
+    return breadcrumb;
+  },
 });

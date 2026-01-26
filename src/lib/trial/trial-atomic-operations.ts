@@ -6,6 +6,7 @@
  */
 
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 /**
  * Internal cache for tier limits to avoid repeated DB calls
@@ -47,7 +48,11 @@ export async function getTierLimitsForTrial(): Promise<{
     return cachedLimits;
   } catch (error) {
     // Fallback to hardcoded limits if TierService fails
-    console.error("Failed to fetch trial limits from TierService:", error);
+    logger.error(
+      "Failed to fetch trial limits from TierService",
+      { component: "trial-atomic" },
+      error,
+    );
     const { TRIAL_LIMITS } = await import("./trial-service");
     return {
       chat: TRIAL_LIMITS.CHAT,
@@ -146,7 +151,11 @@ export async function checkAndIncrementUsage(
     return result;
   } catch (error) {
     // Transaction failed (e.g., serialization error, limit exceeded)
-    console.error("checkAndIncrementUsage error:", error);
+    logger.error(
+      "checkAndIncrementUsage error",
+      { component: "trial-atomic", sessionId },
+      error,
+    );
     return {
       allowed: false,
       remaining: 0,

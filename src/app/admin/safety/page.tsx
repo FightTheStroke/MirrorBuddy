@@ -9,6 +9,7 @@ import {
   Shield,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { clientLogger } from "@/lib/logger/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { SafetyOverviewCards } from "./components/safety-overview-cards";
@@ -69,7 +70,11 @@ export default function AdminSafetyPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Failed to export audit log", err);
+      clientLogger.error(
+        "Failed to export audit log",
+        { component: "AdminSafetyPage" },
+        err,
+      );
     }
   };
 

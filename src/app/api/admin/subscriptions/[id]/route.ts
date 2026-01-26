@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { subscriptionTelemetry } from "@/lib/analytics/subscription-telemetry";
+import { logger } from "@/lib/logger";
 
 /**
  * GET /api/admin/subscriptions/[id]
@@ -35,7 +36,11 @@ export async function GET(
 
     return NextResponse.json(subscription);
   } catch (error) {
-    console.error("Error retrieving subscription:", error);
+    logger.error(
+      "Error retrieving subscription",
+      { component: "admin-subscriptions" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to retrieve subscription" },
       { status: 500 },
@@ -160,7 +165,11 @@ export async function PUT(
 
     return NextResponse.json(updatedSubscription);
   } catch (error) {
-    console.error("Error updating subscription:", error);
+    logger.error(
+      "Error updating subscription",
+      { component: "admin-subscriptions" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to update subscription" },
       { status: 500 },
@@ -231,7 +240,11 @@ export async function DELETE(
 
     return NextResponse.json({ success: true, id: subscriptionId });
   } catch (error) {
-    console.error("Error deleting subscription:", error);
+    logger.error(
+      "Error deleting subscription",
+      { component: "admin-subscriptions" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to delete subscription" },
       { status: 500 },

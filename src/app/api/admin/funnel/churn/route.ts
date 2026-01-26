@@ -7,6 +7,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -190,7 +191,11 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("[funnel/churn] Error:", error);
+    logger.error(
+      "Failed to fetch churn metrics",
+      { component: "funnel-churn" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to fetch churn metrics" },
       { status: 500 },

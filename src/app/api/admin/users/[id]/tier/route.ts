@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 /**
  * POST /api/admin/users/[id]/tier
@@ -98,7 +99,11 @@ export async function POST(
       auditLogId: auditLog.id,
     });
   } catch (error) {
-    console.error("Error changing user tier:", error);
+    logger.error(
+      "Error changing user tier",
+      { component: "admin-user-tier" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to change tier" },
       { status: 500 },

@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -174,7 +175,11 @@ export async function GET(
 
     return NextResponse.json(response);
   } catch (error) {
-    console.error("[funnel/user] Error:", error);
+    logger.error(
+      "Failed to fetch user funnel data",
+      { component: "funnel-user-detail" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to fetch user data" },
       { status: 500 },

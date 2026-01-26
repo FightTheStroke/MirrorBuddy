@@ -4,6 +4,7 @@ import { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
 import { Cookie, Shield, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { clientLogger } from "@/lib/logger/client";
 import {
   saveUnifiedConsent,
   syncUnifiedConsentToServer,
@@ -68,7 +69,11 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           setIsLoading(false);
         }
       } catch (error) {
-        console.error("Failed to initialize consent:", error);
+        clientLogger.error(
+          "Failed to initialize consent",
+          { component: "UnifiedConsentWall" },
+          error,
+        );
         if (mounted) {
           setIsLoading(false);
         }
@@ -99,7 +104,11 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
       // Update external store and notify subscribers
       updateConsentSnapshot(true);
     } catch (error) {
-      console.error("Failed to save consent:", error);
+      clientLogger.error(
+        "Failed to save consent",
+        { component: "UnifiedConsentWall" },
+        error,
+      );
       // Still proceed - localStorage is primary
       updateConsentSnapshot(true);
     } finally {

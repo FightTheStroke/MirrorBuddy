@@ -18,6 +18,7 @@ import { CostPanel } from "@/components/admin/CostPanel";
 import { FeatureFlagsPanel } from "@/components/admin/FeatureFlagsPanel";
 import { SLOMonitoringPanel } from "@/components/admin/SLOMonitoringPanel";
 import { SentryErrorsPanel } from "@/components/admin/SentryErrorsPanel";
+import { SentryQuotaCard } from "@/components/admin/SentryQuotaCard";
 import { FunnelChart } from "@/components/admin/funnel-chart";
 import { FunnelUsersTable } from "@/components/admin/funnel-users-table";
 import { UserDrilldownModal } from "@/components/admin/user-drill-down-modal";
@@ -335,6 +336,9 @@ export default function AdminDashboardPage() {
         </CollapsibleSection>
 
         <CollapsibleSection title="Sentry Errors" defaultOpen={true}>
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-4">
+            <SentryQuotaCard />
+          </div>
           <SentryErrorsPanel />
         </CollapsibleSection>
       </div>

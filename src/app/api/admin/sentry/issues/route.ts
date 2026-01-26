@@ -9,6 +9,7 @@
 
 import { NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { logger } from "@/lib/logger";
 
 const SENTRY_API_BASE = "https://sentry.io/api/0";
 
@@ -79,7 +80,11 @@ export async function GET(request: Request) {
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("[Sentry API Error]", response.status, errorText);
+      logger.error("Sentry API error response", {
+        component: "sentry-issues",
+        status: response.status,
+        errorText,
+      });
       return NextResponse.json(
         { error: "Failed to fetch Sentry issues", issues: [], total: 0 },
         { status: 200 },
@@ -112,7 +117,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("[Sentry API Error]", error);
+    logger.error(
+      "Sentry API request failed",
+      { component: "sentry-issues" },
+      error,
+    );
     return NextResponse.json(
       { error: "Sentry API request failed", issues: [], total: 0 },
       { status: 200 },

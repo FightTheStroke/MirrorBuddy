@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "@/components/ui/toast";
+import { clientLogger } from "@/lib/logger/client";
 
 export interface StickyKeysStatus {
   isSupported: boolean;
@@ -28,8 +29,12 @@ export function useStickyKeys() {
             const data = await response.json();
             enabled = data.enabled || false;
           }
-        } catch (_error) {
-          console.error("Failed to check Sticky Keys status");
+        } catch (error) {
+          clientLogger.error(
+            "Failed to check Sticky Keys status",
+            { component: "StickyKeysHelper" },
+            error,
+          );
         }
       }
 

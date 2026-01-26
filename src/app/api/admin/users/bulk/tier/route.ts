@@ -155,7 +155,11 @@ export async function POST(request: NextRequest) {
       results,
     });
   } catch (error) {
-    console.error("Error in bulk tier change:", error);
+    logger.error(
+      "Error in bulk tier change",
+      { component: "admin-bulk-tier" },
+      error,
+    );
     return NextResponse.json(
       { error: "Failed to process bulk tier change" },
       { status: 500 },
