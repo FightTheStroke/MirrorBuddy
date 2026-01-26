@@ -35,8 +35,10 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Navigate to welcome page
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
 
-    // Should see consent gate, not welcome content
-    await expect(trialPage.getByText(/Modalità Prova Gratuita/i)).toBeVisible({
+    // Should see consent gate, not welcome content (use heading to be specific)
+    await expect(
+      trialPage.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
+    ).toBeVisible({
       timeout: 10000,
     });
 
@@ -111,9 +113,9 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     });
     await acceptButton.click();
 
-    // Consent gate should disappear
+    // Consent gate should disappear (use heading to be specific)
     await expect(
-      trialPage.getByText(/Modalità Prova Gratuita/i),
+      trialPage.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
     ).not.toBeVisible();
 
     // Welcome content should be visible (landing page or onboarding)
@@ -190,8 +192,10 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     await page.reload();
     await page.waitForLoadState("domcontentloaded");
 
-    // Wait for consent gate to appear
-    await expect(page.getByText(/Modalità Prova Gratuita/i)).toBeVisible({
+    // Wait for consent gate to appear (use heading to be specific)
+    await expect(
+      page.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
+    ).toBeVisible({
       timeout: 10000,
     });
 
@@ -212,7 +216,9 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     await page.waitForLoadState("domcontentloaded");
 
     // Consent gate should not appear on reload (consent persisted via cookie)
-    const consentGate = page.getByText(/Modalità Prova Gratuita/i);
+    const consentGate = page.getByRole("heading", {
+      name: /Modalità Prova Gratuita/i,
+    });
     await expect(consentGate).not.toBeVisible({ timeout: 5000 });
   });
 
