@@ -13,6 +13,7 @@ import { formatRelativeDate } from "./memory-loader";
 import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
 import type { SafetyInjectionOptions } from "@/lib/safety/safety-prompts";
 import type { TierMemoryLimits } from "./tier-memory-config";
+import type { CrossMaestroLearning } from "./cross-maestro-memory";
 
 export interface PromptEnhancementOptions {
   /** Base system prompt from the Maestro configuration */
@@ -23,6 +24,8 @@ export interface PromptEnhancementOptions {
   safetyOptions: SafetyInjectionOptions;
   /** Tier-specific memory limits (optional, defaults to including all memory) */
   tierLimits?: TierMemoryLimits;
+  /** Cross-maestro learnings (Pro tier only) */
+  crossMaestroLearnings?: CrossMaestroLearning[];
 }
 
 /**
@@ -36,7 +39,13 @@ export interface PromptEnhancementOptions {
  * - No tierLimits provided: All memory is included (backward compatible)
  */
 export function enhanceSystemPrompt(options: PromptEnhancementOptions): string {
-  const { basePrompt, memory, safetyOptions, tierLimits } = options;
+  const {
+    basePrompt,
+    memory,
+    safetyOptions,
+    tierLimits,
+    crossMaestroLearnings,
+  } = options;
 
   // First, apply safety guardrails to the base prompt
   const safePrompt = injectSafetyGuardrails(basePrompt, safetyOptions);
@@ -46,22 +55,37 @@ export function enhanceSystemPrompt(options: PromptEnhancementOptions): string {
     return safePrompt;
   }
 
-  // If no memory at all, return the safe prompt as-is
-  if (
-    !memory.recentSummary &&
-    memory.keyFacts.length === 0 &&
-    memory.topics.length === 0
-  ) {
+  // Check if we have any content to inject
+  const hasMemory =
+    memory.recentSummary ||
+    memory.keyFacts.length > 0 ||
+    memory.topics.length > 0;
+  const hasCrossMaestro =
+    tierLimits?.crossMaestroEnabled &&
+    crossMaestroLearnings &&
+    crossMaestroLearnings.length > 0;
+
+  // If no memory or cross-maestro content, return the safe prompt as-is
+  if (!hasMemory && !hasCrossMaestro) {
     return safePrompt;
   }
 
-  // Build memory section with tier limits applied
-  const memorySection = buildMemorySection(memory, tierLimits);
+  const sections: string[] = [];
 
-  // Inject memory section before the end of the prompt
+  // Build memory section with tier limits applied
+  if (hasMemory) {
+    sections.push(buildMemorySection(memory, tierLimits));
+  }
+
+  // Build cross-maestro section for Pro tier
+  if (hasCrossMaestro) {
+    sections.push(buildCrossMaestroSection(crossMaestroLearnings!));
+  }
+
+  // Inject sections before the end of the prompt
   return `${safePrompt}
 
-${memorySection}`;
+${sections.join("\n\n")}`;
 }
 
 /**
@@ -142,4 +166,35 @@ export function extractBasePrompt(enhancedPrompt: string): string {
     return enhancedPrompt;
   }
   return enhancedPrompt.slice(0, memoryIndex).trim();
+}
+
+/**
+ * Build the cross-maestro knowledge section in Italian.
+ * Shows what the student has learned from other maestri (professors).
+ *
+ * @param learnings Array of cross-maestro learnings
+ * @returns Formatted section text
+ */
+function buildCrossMaestroSection(learnings: CrossMaestroLearning[]): string {
+  const sections: string[] = [];
+
+  sections.push("## Conoscenze Interdisciplinari");
+  sections.push("");
+  sections.push(
+    "ISTRUZIONI INTERDISCIPLINARI: Lo studente ha appreso questi concetti da altri professori.",
+  );
+  sections.push(
+    "Puoi fare riferimento a queste conoscenze per creare collegamenti interdisciplinari.",
+  );
+  sections.push("");
+
+  for (const learning of learnings) {
+    sections.push(`### Da ${learning.maestroName} (${learning.subject})`);
+    for (const item of learning.learnings) {
+      sections.push(`- ${item}`);
+    }
+    sections.push("");
+  }
+
+  return sections.join("\n");
 }

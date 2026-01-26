@@ -11,6 +11,7 @@ import {
 } from "../prompt-enhancer";
 import type { ConversationMemory } from "../memory-loader";
 import type { TierMemoryLimits } from "../tier-memory-config";
+// CrossMaestroLearning type used internally by promptCrossMaestroSection
 
 // Mock the safety guardrails
 vi.mock("@/lib/safety/safety-prompts", () => ({
@@ -183,6 +184,194 @@ describe("prompt-enhancer", () => {
       const prompt =
         "Base prompt   \n\n## Memoria delle Sessioni Precedenti\n...";
       expect(extractBasePrompt(prompt)).toBe("Base prompt");
+    });
+  });
+
+  describe("cross-maestro context injection", () => {
+    it("injects cross-maestro learnings for Pro tier", () => {
+      const proLimits: TierMemoryLimits = {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      };
+
+      const memory: ConversationMemory = {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+
+      const crossMaestroLearnings = [
+        {
+          maestroId: "galileo-fisica",
+          maestroName: "Galileo",
+          subject: "physics",
+          learnings: ["gravitazione", "leggi del moto"],
+          date: new Date("2026-01-20"),
+        },
+        {
+          maestroId: "curie-chimica",
+          maestroName: "Marie Curie",
+          subject: "chemistry",
+          learnings: ["radioattività"],
+          date: new Date("2026-01-15"),
+        },
+      ];
+
+      const result = enhanceSystemPrompt({
+        basePrompt,
+        memory,
+        safetyOptions,
+        tierLimits: proLimits,
+        crossMaestroLearnings,
+      });
+
+      expect(result).toContain("## Conoscenze Interdisciplinari");
+      expect(result).toContain("Galileo (physics)");
+      expect(result).toContain("gravitazione");
+      expect(result).toContain("leggi del moto");
+      expect(result).toContain("Marie Curie (chemistry)");
+      expect(result).toContain("radioattività");
+    });
+
+    it("skips cross-maestro section for non-Pro tiers", () => {
+      const baseLimits: TierMemoryLimits = {
+        recentConversations: 3,
+        timeWindowDays: 15,
+        maxKeyFacts: 10,
+        maxTopics: 15,
+        semanticEnabled: false,
+        crossMaestroEnabled: false,
+      };
+
+      const memory: ConversationMemory = {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+
+      const crossMaestroLearnings = [
+        {
+          maestroId: "galileo-fisica",
+          maestroName: "Galileo",
+          subject: "physics",
+          learnings: ["gravitazione"],
+          date: new Date(),
+        },
+      ];
+
+      const result = enhanceSystemPrompt({
+        basePrompt,
+        memory,
+        safetyOptions,
+        tierLimits: baseLimits,
+        crossMaestroLearnings,
+      });
+
+      expect(result).not.toContain("## Conoscenze Interdisciplinari");
+      expect(result).not.toContain("Galileo");
+      expect(result).not.toContain("gravitazione");
+    });
+
+    it("skips cross-maestro section when no learnings provided", () => {
+      const proLimits: TierMemoryLimits = {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      };
+
+      const memory: ConversationMemory = {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+
+      const result = enhanceSystemPrompt({
+        basePrompt,
+        memory,
+        safetyOptions,
+        tierLimits: proLimits,
+        crossMaestroLearnings: undefined,
+      });
+
+      expect(result).not.toContain("## Conoscenze Interdisciplinari");
+    });
+
+    it("skips cross-maestro section when empty array provided", () => {
+      const proLimits: TierMemoryLimits = {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      };
+
+      const memory: ConversationMemory = {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+
+      const result = enhanceSystemPrompt({
+        basePrompt,
+        memory,
+        safetyOptions,
+        tierLimits: proLimits,
+        crossMaestroLearnings: [],
+      });
+
+      expect(result).not.toContain("## Conoscenze Interdisciplinari");
+    });
+
+    it("formats multiple learnings per maestro correctly", () => {
+      const proLimits: TierMemoryLimits = {
+        recentConversations: 5,
+        timeWindowDays: null,
+        maxKeyFacts: 50,
+        maxTopics: 30,
+        semanticEnabled: true,
+        crossMaestroEnabled: true,
+      };
+
+      const memory: ConversationMemory = {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+
+      const crossMaestroLearnings = [
+        {
+          maestroId: "euclide-matematica",
+          maestroName: "Euclide",
+          subject: "mathematics",
+          learnings: ["teorema di Pitagora", "geometria euclidea", "assiomi"],
+          date: new Date(),
+        },
+      ];
+
+      const result = enhanceSystemPrompt({
+        basePrompt,
+        memory,
+        safetyOptions,
+        tierLimits: proLimits,
+        crossMaestroLearnings,
+      });
+
+      expect(result).toContain("teorema di Pitagora");
+      expect(result).toContain("geometria euclidea");
+      expect(result).toContain("assiomi");
     });
   });
 
