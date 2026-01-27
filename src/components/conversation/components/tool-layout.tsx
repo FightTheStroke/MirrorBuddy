@@ -40,7 +40,7 @@ export function ToolLayout({
                   displayName: activeCharacter.name,
                   avatar:
                     CHARACTER_AVATARS[activeCharacter.id] ||
-                    "/avatars/default.jpg",
+                    "/avatars/default.webp",
                   color: activeCharacter.color,
                 }
               : null

@@ -37,7 +37,7 @@ function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
     teachingStyle: character.type === "coach" ? "scaffolding" : "peer-support",
     avatar:
       (character as unknown as { avatar?: string }).avatar ||
-      "/avatars/default.jpg",
+      "/avatars/default.webp",
     color: character.color,
     systemPrompt: character.systemPrompt,
     greeting: character.greeting,
@@ -56,7 +56,7 @@ function activeCharacterToUnified(
     greeting: character.greeting,
     avatar:
       (character as unknown as { avatar?: string }).avatar ||
-      "/avatars/default.jpg",
+      "/avatars/default.webp",
     color: character.color,
     badge: character.type === "coach" ? "Coach" : "Amico",
   };

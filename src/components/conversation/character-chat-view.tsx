@@ -174,7 +174,7 @@ export function CharacterChatView({
             tool={activeTool}
             maestro={{
               displayName: character.name,
-              avatar: character.avatar || "/avatars/default.jpg",
+              avatar: character.avatar || "/avatars/default.webp",
               color: character.themeColor,
             }}
             onClose={() => setActiveTool(null)}

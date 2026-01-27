@@ -20,7 +20,7 @@ export function activeCharacterToMaestro(character: ActiveCharacter): Maestro {
     voice: (character.voice || "alloy") as MaestroVoice,
     voiceInstructions: character.voiceInstructions || "",
     teachingStyle: character.type === "coach" ? "scaffolding" : "peer-support",
-    avatar: CHARACTER_AVATARS[character.id] || "/avatars/default.jpg",
+    avatar: CHARACTER_AVATARS[character.id] || "/avatars/default.webp",
     color: character.color,
     systemPrompt: character.systemPrompt,
     greeting: character.greeting,
