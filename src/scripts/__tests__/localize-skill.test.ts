@@ -16,8 +16,7 @@ import path from "path";
 import { execSync } from "child_process";
 
 describe("Localize Skill", () => {
-  const projectRoot =
-    process.cwd?.() || "/Users/roberdan/GitHub/MirrorBuddy-i18n-multi-language";
+  const projectRoot = process.cwd();
   const messagesDir = path.join(projectRoot, "messages");
   const skillPath = path.join(
     projectRoot,
