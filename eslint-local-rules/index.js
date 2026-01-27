@@ -256,10 +256,15 @@ const noHardcodedItalian = {
   },
 };
 
+// Plan 091 - Tech Debt Prevention
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- CommonJS for ESLint rules
+const noTodoWithoutIssue = require("./no-todo-without-issue");
+
 module.exports = {
   rules: {
     "no-hardcoded-italian": noHardcodedItalian,
     "no-i18n-in-providers": noI18nInProviders,
     "prefer-validate-auth": preferValidateAuth,
+    "no-todo-without-issue": noTodoWithoutIssue,
   },
 };
