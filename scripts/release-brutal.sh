@@ -53,6 +53,19 @@ else
 fi
 
 # =============================================================================
+# PHASE 0.5: VERCEL/SENTRY CONFIGURATION CHECK
+# =============================================================================
+# Verify Vercel environment variables (if Vercel CLI available)
+if command -v vercel &> /dev/null; then
+  ./scripts/verify-vercel-env.sh > /tmp/release-vercel-env.log 2>&1 && pass "vercel-env" || fail "vercel-env" "\`\`\`\n$(tail -20 /tmp/release-vercel-env.log)\n\`\`\`"
+else
+  pass "vercel-env"  # Skip if Vercel CLI not available (local dev)
+fi
+
+# Verify Sentry configuration (critical for production error tracking)
+./scripts/verify-sentry-config.sh > /tmp/release-sentry-config.log 2>&1 && pass "sentry-config" || fail "sentry-config" "\`\`\`\n$(tail -20 /tmp/release-sentry-config.log)\n\`\`\`"
+
+# =============================================================================
 # PHASE 1: INSTANT CHECKS
 # =============================================================================
 [ -f README.md ] && [ -f CHANGELOG.md ] && [ -f CLAUDE.md ] && pass "docs" || fail "docs" "Missing: README.md, CHANGELOG.md, or CLAUDE.md"

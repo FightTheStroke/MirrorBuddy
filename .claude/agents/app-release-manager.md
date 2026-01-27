@@ -23,6 +23,8 @@ ZERO TOLERANCE. Script does work, agent interprets.
 
 | Phase      | Checks                                      | Blocking |
 | ---------- | ------------------------------------------- | -------- |
+| Env        | env-vars-db, env-vars-node, env-vars-ssl    | Yes      |
+| Vercel     | vercel-env, sentry-config                   | Yes      |
 | Instant    | docs, hygiene, ts-ignore, any-type          | Yes      |
 | Static     | lint, typecheck, audit                      | Yes      |
 | Build      | build                                       | Yes      |
@@ -62,6 +64,24 @@ VISUAL_REGRESSION=1 npx playwright test visual-regression.spec.ts
 
 **Before release**, validate production Vercel deployment is configured correctly (ADR 0063, 0067):
 
+### Automatic Checks (via release-brutal.sh)
+
+The release script automatically runs:
+
+1. **Vercel Environment Variables**: `./scripts/verify-vercel-env.sh`
+   - Validates required env vars (DATABASE_URL, NODE_ENV, SUPABASE_CA_CERT)
+   - Checks Vercel CLI availability
+   - Verifies SSL certificate configuration
+
+2. **Sentry Configuration**: `./scripts/verify-sentry-config.sh`
+   - Validates NEXT_PUBLIC_SENTRY_DSN format and presence
+   - Checks SENTRY_AUTH_TOKEN, SENTRY_ORG, SENTRY_PROJECT
+   - Verifies configuration files use VERCEL_ENV check
+   - Ensures tunnel route `/monitoring` is configured
+   - Validates CSP includes Sentry domains
+
+**Both checks are blocking** - release fails if either check fails.
+
 ### Required Environment Variables
 
 | Variable               | Purpose                                      |
@@ -100,11 +120,16 @@ Our code uses per-connection `ssl: { rejectUnauthorized: false }` which:
 - [ ] All env vars set in Vercel dashboard (Settings → Environment Variables)
 - [ ] SSL certificate `SUPABASE_CA_CERT` is pipe-separated (NOT base64)
 - [ ] No `NODE_TLS_REJECT_UNAUTHORIZED` in any env
-- [ ] `release-brutal.sh` passed (compliance, security, tests)
+- [ ] `release-brutal.sh` passed (includes automatic Vercel/Sentry checks)
 - [ ] Build has ZERO warnings (Sentry `silent: true` in next.config.ts)
 - [ ] Health check returns "healthy": `curl https://mirrorbuddy.vercel.app/api/health`
+- [ ] Sentry configuration verified (automatic via `verify-sentry-config.sh`)
 
-**Release BLOCKED if** any env var missing or health check fails.
+**Release BLOCKED if**:
+
+- Any env var missing
+- Sentry configuration invalid (DSN missing, wrong format, or config files incorrect)
+- Health check fails
 
 ### Post-Deployment Verification
 
