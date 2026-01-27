@@ -1,15 +1,15 @@
 // Character info for sidebar display
 export const COACH_INFO = {
-  melissa: { name: "Melissa", avatar: "/avatars/melissa.jpg" },
+  melissa: { name: "Melissa", avatar: "/avatars/melissa.webp" },
   roberto: { name: "Roberto", avatar: "/avatars/roberto.webp" },
   chiara: { name: "Chiara", avatar: "/avatars/chiara.webp" },
   andrea: { name: "Andrea", avatar: "/avatars/andrea.webp" },
-  favij: { name: "Favij", avatar: "/avatars/favij.jpg" },
+  favij: { name: "Favij", avatar: "/avatars/favij.webp" },
   laura: { name: "Laura", avatar: "/avatars/laura.webp" },
 } as const;
 
 export const BUDDY_INFO = {
-  mario: { name: "Mario", avatar: "/avatars/mario.jpg" },
+  mario: { name: "Mario", avatar: "/avatars/mario.webp" },
   noemi: { name: "Noemi", avatar: "/avatars/noemi.webp" },
   enea: { name: "Enea", avatar: "/avatars/enea.webp" },
   bruno: { name: "Bruno", avatar: "/avatars/bruno.webp" },

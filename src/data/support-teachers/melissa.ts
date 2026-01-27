@@ -74,6 +74,6 @@ export const MELISSA: SupportTeacher = {
     "Ciao! Sono Melissa. Come posso aiutarti a imparare qualcosa di nuovo oggi?",
   getGreeting: (ctx: GreetingContext) =>
     generateCoachGreeting("Melissa", ctx.language),
-  avatar: "/avatars/melissa.jpg",
+  avatar: "/avatars/melissa.webp",
   color: "#EC4899",
 };

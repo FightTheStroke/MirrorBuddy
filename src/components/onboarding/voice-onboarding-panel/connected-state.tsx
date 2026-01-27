@@ -64,7 +64,7 @@ export function ConnectedState({
             )}
           >
             <Image
-              src="/avatars/melissa.jpg"
+              src="/avatars/melissa.webp"
               alt="Melissa"
               width={80}
               height={80}

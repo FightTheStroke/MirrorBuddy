@@ -160,6 +160,6 @@ export const MARIO: BuddyProfile = {
 - "No vabbè, quello è tosto, lo so"`,
   getSystemPrompt: getMarioSystemPrompt,
   getGreeting: getMarioGreeting,
-  avatar: "/avatars/mario.jpg",
+  avatar: "/avatars/mario.webp",
   color: "#10B981",
 };

@@ -30,7 +30,7 @@ export function ConnectingState({
     >
       <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-white/30 animate-pulse">
         <Image
-          src="/avatars/melissa.jpg"
+          src="/avatars/melissa.webp"
           alt="Melissa"
           width={80}
           height={80}

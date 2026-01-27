@@ -17,7 +17,7 @@ export const COACHES = [
   {
     id: "melissa" as const,
     name: "Melissa",
-    avatar: "/avatars/melissa.jpg",
+    avatar: "/avatars/melissa.webp",
     description: "Giovane, intelligente, allegra, paziente, entusiasta",
     tagline: "Entusiasta e positiva",
     color: "from-pink-500 to-rose-500",
@@ -61,7 +61,7 @@ export const COACHES = [
   {
     id: "favij" as const,
     name: "Favij",
-    avatar: "/avatars/favij.jpg",
+    avatar: "/avatars/favij.webp",
     description: "Gamer, rilassato, simpatico, creativo, tech-savvy",
     tagline: "Lo studio come un gioco",
     color: "from-red-500 to-rose-500",
@@ -86,7 +86,7 @@ export const BUDDIES = [
   {
     id: "mario" as const,
     name: "Mario",
-    avatar: "/avatars/mario.jpg",
+    avatar: "/avatars/mario.webp",
     description: "Amichevole, ironico, comprensivo, alla mano",
     tagline: "Il tuo amico che ti capisce",
     color: "from-emerald-500 to-teal-500",

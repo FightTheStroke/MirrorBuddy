@@ -15,17 +15,17 @@ import type {
 import type { GreetingContext } from "@/types/greeting";
 
 const CHARACTER_AVATARS: Record<string, string> = {
-  mario: "/avatars/mario.jpg",
+  mario: "/avatars/mario.webp",
   noemi: "/avatars/noemi.webp",
   enea: "/avatars/enea.webp",
   bruno: "/avatars/bruno.webp",
   sofia: "/avatars/sofia.webp",
   marta: "/avatars/marta.webp",
-  melissa: "/avatars/melissa.jpg",
+  melissa: "/avatars/melissa.webp",
   roberto: "/avatars/roberto.webp",
   chiara: "/avatars/chiara.webp",
   andrea: "/avatars/andrea.webp",
-  favij: "/avatars/favij.jpg",
+  favij: "/avatars/favij.webp",
   laura: "/avatars/laura.webp",
 };
 

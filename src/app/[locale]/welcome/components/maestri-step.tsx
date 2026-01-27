@@ -120,7 +120,7 @@ export function MaestriStep(_props: MaestriStepProps) {
         <div className="flex items-center gap-4">
           <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-pink-200 shadow">
             <Image
-              src="/avatars/melissa.jpg"
+              src="/avatars/melissa.webp"
               alt="Melissa"
               width={56}
               height={56}

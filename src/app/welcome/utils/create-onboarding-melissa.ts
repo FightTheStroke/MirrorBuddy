@@ -23,7 +23,7 @@ export function createOnboardingMelissa(
     voice: "shimmer" as MaestroVoice,
     voiceInstructions: MELISSA_ONBOARDING_VOICE_INSTRUCTIONS,
     teachingStyle: "scaffolding",
-    avatar: "/avatars/melissa.jpg",
+    avatar: "/avatars/melissa.webp",
     color: "#EC4899",
     systemPrompt: generateMelissaOnboardingPrompt(existingUserData),
     greeting: isReturningUser

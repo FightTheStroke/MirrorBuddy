@@ -122,7 +122,7 @@ export function ReadyStep(_props: ReadyStepProps) {
             <div className="relative">
               <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-white/30 shadow-lg">
                 <Image
-                  src="/avatars/melissa.jpg"
+                  src="/avatars/melissa.webp"
                   alt="Melissa"
                   width={96}
                   height={96}

@@ -20,7 +20,7 @@ const GUIDES: Guide[] = [
     name: "Melissa",
     role: "Learning Coach",
     description: "Ti guida nel tuo metodo di studio personalizzato",
-    avatar: "/avatars/melissa.jpg",
+    avatar: "/avatars/melissa.webp",
     color: "from-pink-400 to-rose-500",
     category: "coach",
   },

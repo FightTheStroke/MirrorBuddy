@@ -88,6 +88,6 @@ export const FAVIJ: SupportTeacher = {
     "Yo! Sono Favij. Lo studio può sembrare un grind, ma con la strategia giusta diventa quasi un gioco. Pronto a startare?",
   getGreeting: (ctx: GreetingContext) =>
     generateCoachGreeting("Favij", ctx.language),
-  avatar: "/avatars/favij.jpg",
+  avatar: "/avatars/favij.webp",
   color: "#EF4444",
 };
