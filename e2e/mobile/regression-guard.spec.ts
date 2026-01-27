@@ -162,33 +162,30 @@ test.describe("Mobile Regression Guard (375px Viewport)", () => {
     }
   });
 
-  test("F-05: sidebar dimensions consistent across pages", async ({
+  test("F-05: sidebar dimensions consistent on homepage", async ({
     page,
     mobile,
   }) => {
-    // Test sidebar sizing on multiple pages
-    const pages = ["/", "/astuccio"];
+    // Test sidebar sizing on homepage (only page with sidebar hamburger menu)
+    // Note: /astuccio and other pages don't have the same header/sidebar structure
+    await page.goto("/", { waitUntil: "domcontentloaded" });
+    await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
-    for (const route of pages) {
-      await page.goto(route, { waitUntil: "domcontentloaded" });
-      await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
+    // Open sidebar
+    await mobile.openMobileSidebar();
 
-      // Open sidebar
-      await mobile.openMobileSidebar();
+    const sidebar = page.locator("aside").first();
+    await expect(sidebar).toBeVisible();
 
-      const sidebar = page.locator("aside").first();
-      await expect(sidebar).toBeVisible();
+    const box = await sidebar.boundingBox();
+    const viewportWidth = await mobile.getViewportWidth();
+    const maxWidth = viewportWidth * 0.85;
 
-      const box = await sidebar.boundingBox();
-      const viewportWidth = await mobile.getViewportWidth();
-      const maxWidth = viewportWidth * 0.85;
+    expect(box!.width).toBeLessThanOrEqual(maxWidth + 1);
+    expect(box!.width).toBeLessThanOrEqual(viewportWidth);
 
-      expect(box!.width).toBeLessThanOrEqual(maxWidth + 1);
-      expect(box!.width).toBeLessThanOrEqual(viewportWidth);
-
-      // Close sidebar before next iteration
-      await mobile.closeMobileSidebar();
-    }
+    // Close sidebar
+    await mobile.closeMobileSidebar();
   });
 
   test("F-06: no overflow on content areas at 375px", async ({
