@@ -2,7 +2,10 @@
  * ESLint Local Rules Plugin
  *
  * Exports custom ESLint rules for MirrorBuddy project.
+ * All rules are ESM exports for compatibility with eslint.config.mjs.
  */
+
+import { noTodoWithoutIssue } from "./no-todo-without-issue.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -59,7 +62,7 @@ const containsItalian = (text) => {
     // eslint-disable-next-line security/detect-non-literal-regexp
     const wordPattern = new RegExp(
       `(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`,
-      "i"
+      "i",
     );
     if (wordPattern.test(lowercased)) {
       return true;
@@ -256,11 +259,8 @@ const noHardcodedItalian = {
   },
 };
 
-// Plan 091 - Tech Debt Prevention
-// eslint-disable-next-line @typescript-eslint/no-require-imports -- CommonJS for ESLint rules
-const noTodoWithoutIssue = require("./no-todo-without-issue");
-
-module.exports = {
+// ESM export - no CommonJS
+const localRules = {
   rules: {
     "no-hardcoded-italian": noHardcodedItalian,
     "no-i18n-in-providers": noI18nInProviders,
@@ -268,3 +268,5 @@ module.exports = {
     "no-todo-without-issue": noTodoWithoutIssue,
   },
 };
+
+export default localRules;
