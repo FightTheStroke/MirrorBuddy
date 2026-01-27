@@ -13,6 +13,11 @@ export default defineConfig({
     // JSON reporter for flaky test tracking
     reporters: process.env.CI ? ["default", "json"] : ["default"],
     outputFile: process.env.CI ? "./coverage/test-results.json" : undefined,
+    // Tests that modify i18n files should run with proper isolation
+    // Using hooks: "list" ensures beforeAll/afterAll run in correct order
+    sequence: {
+      hooks: "list",
+    },
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

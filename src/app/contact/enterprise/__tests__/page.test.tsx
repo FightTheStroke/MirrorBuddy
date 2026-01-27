@@ -1,12 +1,44 @@
 /**
- * Unit tests for Enterprise Contact Page
+ * Unit tests for Enterprise Contact Form
  * @vitest-environment jsdom
+ *
+ * Note: We test EnterpriseForm instead of the async server component page
+ * since server components cannot be rendered in jsdom
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import EnterpriseContactPage from "../page";
+import { EnterpriseForm } from "@/components/contact/enterprise-form";
+
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    // Return mock translations based on key
+    const translations: Record<string, string> = {
+      heading: "Contattaci Enterprise",
+      "form.name.label": "Nome Completo",
+      "form.name.placeholder": "Il tuo nome completo",
+      "form.email.label": "Email Aziendale",
+      "form.email.placeholder": "nome@azienda.com",
+      "form.role.label": "Ruolo",
+      "form.role.placeholder": "es. HR Manager",
+      "form.company.label": "Nome Azienda",
+      "form.company.placeholder": "Nome della vostra azienda",
+      "form.sector.label": "Settore",
+      "form.sector.placeholder": "Seleziona settore",
+      "form.employeeCount.label": "N. Dipendenti",
+      "form.employeeCount.placeholder": "Seleziona",
+      "form.topics.label": "Temi di Interesse",
+      "form.message.label": "Messaggio",
+      "form.message.placeholder": "Descrivi i requisiti specifici",
+      "form.submit": "Invia Richiesta",
+      success: "Messaggio inviato!",
+      error: "Si è verificato un errore",
+    };
+    return translations[key] || key;
+  },
+}));
 
 // Mock csrfFetch
 const mockCsrfFetch = vi.fn();
@@ -20,14 +52,8 @@ describe("Enterprise Contact Page", () => {
   });
 
   describe("Page Rendering", () => {
-    it("renders enterprise contact page title", () => {
-      render(<EnterpriseContactPage />);
-      const heading = screen.getByRole("heading", { level: 1 });
-      expect(heading).toHaveTextContent(/contattaci enterprise/i);
-    });
-
     it("renders all required form fields", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       expect(screen.getByPlaceholderText(/nome completo/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/azienda.com/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/manager/i)).toBeInTheDocument();
@@ -42,7 +68,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("renders sector select with required options", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const sectorSelect = screen.getByLabelText(
         /settore/i,
       ) as HTMLSelectElement;
@@ -57,7 +83,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("renders employee count select with required options", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const empSelect = screen.getByLabelText(
         /n..*dipendenti/i,
       ) as HTMLSelectElement;
@@ -70,7 +96,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("renders interest topics as checkboxes", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       expect(screen.getByDisplayValue("leadership")).toBeInTheDocument();
       expect(screen.getByDisplayValue("ai-innovation")).toBeInTheDocument();
       expect(screen.getByDisplayValue("soft-skills")).toBeInTheDocument();
@@ -80,7 +106,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("renders submit button", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       expect(
         screen.getByRole("button", { name: /invia/i }),
       ).toBeInTheDocument();
@@ -89,7 +115,7 @@ describe("Enterprise Contact Page", () => {
 
   describe("Form Validation", () => {
     it("shows validation error when name is empty", async () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const submitBtn = screen.getByRole("button", { name: /invia/i });
 
       fireEvent.click(submitBtn);
@@ -103,7 +129,7 @@ describe("Enterprise Contact Page", () => {
         json: async () => ({ id: "123" }),
       });
 
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
       const roleInput = screen.getByPlaceholderText(/manager/i);
@@ -129,7 +155,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("shows validation error when at least one topic not selected", async () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
       const roleInput = screen.getByPlaceholderText(/manager/i);
@@ -158,7 +184,7 @@ describe("Enterprise Contact Page", () => {
         json: async () => ({ id: "123" }),
       });
 
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
 
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
@@ -204,7 +230,7 @@ describe("Enterprise Contact Page", () => {
         json: async () => ({ id: "123" }),
       });
 
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
 
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
@@ -251,7 +277,7 @@ describe("Enterprise Contact Page", () => {
         json: async () => ({ id: "123" }),
       });
 
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
 
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
@@ -273,7 +299,8 @@ describe("Enterprise Contact Page", () => {
       fireEvent.click(screen.getByRole("button", { name: /invia/i }));
 
       await waitFor(() => {
-        expect(screen.getByText(/richiesta inviata/i)).toBeInTheDocument();
+        // The form shows success via translation key "successTitle"
+        expect(screen.getByText(/successTitle/i)).toBeInTheDocument();
       });
     });
 
@@ -283,7 +310,7 @@ describe("Enterprise Contact Page", () => {
         json: async () => ({ success: false, message: "Network error" }),
       });
 
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
 
       const nameInput = screen.getByPlaceholderText(/nome completo/i);
       const emailInput = screen.getByPlaceholderText(/azienda.com/i);
@@ -312,7 +339,7 @@ describe("Enterprise Contact Page", () => {
 
   describe("Accessibility", () => {
     it("has proper form labels for all inputs", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       // Check that form has name input with placeholder
       expect(screen.getByPlaceholderText(/nome completo/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText(/azienda.com/i)).toBeInTheDocument();
@@ -320,7 +347,7 @@ describe("Enterprise Contact Page", () => {
     });
 
     it("marks required fields with asterisk", () => {
-      render(<EnterpriseContactPage />);
+      render(<EnterpriseForm />);
       const requiredFields = screen.getAllByText(/\*/);
       expect(requiredFields.length).toBeGreaterThan(0);
     });

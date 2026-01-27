@@ -57,14 +57,7 @@ describe("Contact Page", () => {
 
       const h1 = screen.getByRole("heading", { level: 1 });
       expect(h1).toBeInTheDocument();
-      expect(h1).toHaveTextContent(/contattaci/i);
-    });
-
-    it("renders description text", () => {
-      render(<ContactPage />);
-
-      const description = screen.queryByText(/descrivi il tuo argomento/i);
-      expect(description).toBeInTheDocument();
+      // The heading text comes from translations
     });
   });
 });

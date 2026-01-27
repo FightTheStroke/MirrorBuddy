@@ -69,10 +69,10 @@ describe("Trial Service - IP Hashing", () => {
       const { getOrCreateTrialSession } = await import("../trial-service");
       const { prisma } = await import("@/lib/db");
 
-      // Calculate expected hash
+      // Calculate expected hash (format: salt:ip)
       const expectedHash = crypto
         .createHash("sha256")
-        .update(TEST_IP + testSalt)
+        .update(`${testSalt}:${TEST_IP}`)
         .digest("hex");
 
       // Mock prisma to capture the hash

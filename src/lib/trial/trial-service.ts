@@ -7,12 +7,16 @@ import {
   checkAndIncrementUsage,
   getTierLimitsForTrial,
 } from "./trial-atomic-operations";
+import { logger } from "@/lib/logger";
 
 // Re-export atomic operations for backward compatibility
 export { checkAndIncrementUsage, getTierLimitsForTrial };
 
 // Available coaches from src/data/coaches/
 const COACHES = ["melissa", "laura"];
+
+// Fallback salt for IP hashing (used only when IP_HASH_SALT is not set)
+const FALLBACK_SALT = "mirrorbuddy-fallback-salt-32-chars";
 
 /**
  * Trial limits (DEPRECATED - for backward compatibility only)
@@ -34,8 +38,19 @@ export const TRIAL_LIMITS = {
 const TRIAL_VERIFICATION_EXPIRY_MS = 24 * 60 * 60 * 1000;
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.app";
 
+/**
+ * Hash an IP address with a salt for privacy-preserving identification.
+ * Uses IP_HASH_SALT from environment, falls back to a default with a warning.
+ */
 function hashIp(ip: string): string {
-  return crypto.createHash("sha256").update(ip).digest("hex");
+  let salt = process.env.IP_HASH_SALT;
+  if (!salt) {
+    logger.warn(
+      "IP_HASH_SALT environment variable is not set, using fallback salt",
+    );
+    salt = FALLBACK_SALT;
+  }
+  return crypto.createHash("sha256").update(`${salt}:${ip}`).digest("hex");
 }
 
 function getRandomItems<T>(arr: T[], count: number): T[] {
