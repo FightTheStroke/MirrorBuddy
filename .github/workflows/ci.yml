@@ -101,6 +101,24 @@ jobs:
           head: ${{ github.event.after }}
           extra_args: --only-verified
 
+  # Lane 2a-bis: Technical Debt Check
+  debt-check:
+    name: Technical Debt Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run debt check
+        run: npm run debt:check
+
   # Lane 2b: Security Audit + SBOM (runs after secret scanning)
   security:
     name: Security & SBOM

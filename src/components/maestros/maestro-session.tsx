@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * MaestroSession - Unified conversation layout matching Coach/Buddy pattern
@@ -12,34 +12,40 @@
  * - Evaluation inline in chat when session ends
  */
 
-import { useRef, useEffect, useState } from 'react';
-import { AnimatePresence } from 'framer-motion';
-import { useTTS } from '@/components/accessibility';
-import { ToolResultDisplay } from '@/components/tools';
-import { useUIStore } from '@/lib/stores';
-import type { Maestro, ToolType } from '@/types';
-import { useMaestroSessionLogic } from './use-maestro-session-logic';
-import { MaestroSessionMessages } from './maestro-session-messages';
-import { MaestroSessionInput } from './maestro-session-input';
-import { MaestroSessionWebcam } from './maestro-session-webcam';
-import { cn } from '@/lib/utils';
+import { useRef, useEffect, useState } from "react";
+import { AnimatePresence } from "framer-motion";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { useTTS } from "@/components/accessibility";
+import { ToolResultDisplay } from "@/components/tools";
+import { useUIStore } from "@/lib/stores";
+import type { Maestro, ToolType } from "@/types";
+import { useMaestroSessionLogic } from "./use-maestro-session-logic";
+import { MaestroSessionMessages } from "./maestro-session-messages";
+import { MaestroSessionInput } from "./maestro-session-input";
+import { MaestroSessionWebcam } from "./maestro-session-webcam";
+import { cn } from "@/lib/utils";
 import {
   CharacterHeader,
   CharacterVoicePanel,
   maestroToUnified,
   type VoiceState,
   type HeaderActions,
-} from '@/components/character';
-import { ConversationSidebar } from '@/components/conversation/conversation-drawer';
+} from "@/components/character";
+import { ConversationSidebar } from "@/components/conversation/conversation-drawer";
 
 interface MaestroSessionProps {
   maestro: Maestro;
   onClose: () => void;
-  initialMode?: 'voice' | 'chat';
+  initialMode?: "voice" | "chat";
   requestedToolType?: ToolType;
 }
 
-export function MaestroSession({ maestro, onClose, initialMode = 'voice', requestedToolType }: MaestroSessionProps) {
+export function MaestroSession({
+  maestro,
+  onClose,
+  initialMode = "voice",
+  requestedToolType,
+}: MaestroSessionProps) {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const [fullscreenToolId, setFullscreenToolId] = useState<string | null>(null);
@@ -118,7 +124,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
   useEffect(() => {
     const currentCount = messages.length + toolCalls.length;
     if (currentCount > previousMessageCountRef.current) {
-      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
     }
     previousMessageCountRef.current = currentCount;
   }, [messages.length, toolCalls.length, previousMessageCountRef]);
@@ -129,7 +135,7 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
   }, [isVoiceActive]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit();
     }
@@ -137,11 +143,12 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
 
   const handleToggleToolFullscreen = (toolId: string) => {
     const newFullscreenId = fullscreenToolId === toolId ? null : toolId;
-    
+
     if (newFullscreenId !== null) {
       // Entering fullscreen: save current sidebar state and compress it
       if (sidebarStateBeforeFullscreen.current === null) {
-        sidebarStateBeforeFullscreen.current = useUIStore.getState().sidebarOpen;
+        sidebarStateBeforeFullscreen.current =
+          useUIStore.getState().sidebarOpen;
       }
       setSidebarOpen(false);
     } else {
@@ -151,32 +158,36 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
         sidebarStateBeforeFullscreen.current = null;
       }
     }
-    
+
     setFullscreenToolId(newFullscreenId);
   };
 
   const isToolFullscreen = fullscreenToolId !== null;
-  const fullscreenTool = toolCalls.find(t => t.id === fullscreenToolId);
+  const fullscreenTool = toolCalls.find((t) => t.id === fullscreenToolId);
 
   return (
-    <>
+    <ErrorBoundary>
       {/* Fullscreen tool overlay */}
       {isToolFullscreen && fullscreenTool && (
         <div className="fixed inset-0 z-[100] bg-white dark:bg-slate-950">
-          <ToolResultDisplay 
-            toolCall={fullscreenTool} 
+          <ToolResultDisplay
+            toolCall={fullscreenTool}
             sessionId={voiceSessionId}
             isFullscreen={true}
-            onToggleFullscreen={() => handleToggleToolFullscreen(fullscreenTool.id)}
+            onToggleFullscreen={() =>
+              handleToggleToolFullscreen(fullscreenTool.id)
+            }
           />
         </div>
       )}
 
       {/* Normal chat view */}
-      <div className={cn(
-        'flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]',
-        isToolFullscreen && 'opacity-0 pointer-events-none'
-      )}>
+      <div
+        className={cn(
+          "flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]",
+          isToolFullscreen && "opacity-0 pointer-events-none",
+        )}
+      >
         {/* Main Chat Area */}
         <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
           {/* Header always visible */}
@@ -255,6 +266,6 @@ export function MaestroSession({ maestro, onClose, initialMode = 'voice', reques
           ) : null}
         </AnimatePresence>
       </div>
-    </>
+    </ErrorBoundary>
   );
 }

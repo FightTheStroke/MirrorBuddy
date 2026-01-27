@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { Card } from "@/components/ui/card";
 import { WebcamCapture } from "@/components/tools/webcam-capture";
 import { SessionGradeDisplay } from "./session-grade";
@@ -189,78 +190,80 @@ export function VoiceSession({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
-        className="w-full max-w-2xl mx-4"
-      >
-        <Card className="bg-gradient-to-b from-slate-900 to-slate-950 border-slate-700 text-white overflow-hidden">
-          <SessionHeader
-            maestro={maestro}
-            isConnected={isConnected}
-            elapsedSeconds={elapsedSeconds}
-            level={level}
-            xp={xp}
-            xpProgress={xpProgress}
-            onClose={handleClose}
-          />
+    <ErrorBoundary>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95 }}
+          className="w-full max-w-2xl mx-4"
+        >
+          <Card className="bg-gradient-to-b from-slate-900 to-slate-950 border-slate-700 text-white overflow-hidden">
+            <SessionHeader
+              maestro={maestro}
+              isConnected={isConnected}
+              elapsedSeconds={elapsedSeconds}
+              level={level}
+              xp={xp}
+              xpProgress={xpProgress}
+              onClose={handleClose}
+            />
 
-          <SessionVisualization
-            maestro={maestro}
-            isListening={isListening}
-            isSpeaking={isSpeaking}
-            inputLevel={inputLevel}
-            outputLevel={outputLevel}
-            inputAnalyser={inputAnalyser}
-            stateText={stateText}
-            connectionState={connectionState}
-          />
+            <SessionVisualization
+              maestro={maestro}
+              isListening={isListening}
+              isSpeaking={isSpeaking}
+              inputLevel={inputLevel}
+              outputLevel={outputLevel}
+              inputAnalyser={inputAnalyser}
+              stateText={stateText}
+              connectionState={connectionState}
+            />
 
-          <SessionTranscript maestro={maestro} transcript={transcript} />
+            <SessionTranscript maestro={maestro} transcript={transcript} />
 
-          <SessionTools
-            toolCalls={toolCalls}
-            sessionId={voiceSessionId}
-            onClearToolCalls={clearToolCalls}
-            onTriggerTool={handleTriggerTool}
-          />
+            <SessionTools
+              toolCalls={toolCalls}
+              sessionId={voiceSessionId}
+              onClearToolCalls={clearToolCalls}
+              onTriggerTool={handleTriggerTool}
+            />
 
-          <SessionControls
-            isMuted={isMuted}
-            isSpeaking={isSpeaking}
-            onToggleMute={toggleMute}
-            onCancelResponse={cancelResponse}
-            onSendText={sendText}
-            onSwitchToChat={handleSwitchToChat}
-            onClose={handleClose}
-          />
-        </Card>
-      </motion.div>
+            <SessionControls
+              isMuted={isMuted}
+              isSpeaking={isSpeaking}
+              onToggleMute={toggleMute}
+              onCancelResponse={cancelResponse}
+              onSendText={sendText}
+              onSwitchToChat={handleSwitchToChat}
+              onClose={handleClose}
+            />
+          </Card>
+        </motion.div>
 
-      <AnimatePresence>
-        {showWebcam && webcamRequest && (
-          <WebcamCapture
-            purpose={webcamRequest.purpose}
-            instructions={webcamRequest.instructions}
-            onCapture={(data) => handleWebcamCapture(webcamRequest, data)}
-            onClose={() => handleWebcamClose(webcamRequest)}
-          />
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showWebcam && webcamRequest && (
+            <WebcamCapture
+              purpose={webcamRequest.purpose}
+              instructions={webcamRequest.instructions}
+              onCapture={(data) => handleWebcamCapture(webcamRequest, data)}
+              onClose={() => handleWebcamClose(webcamRequest)}
+            />
+          )}
+        </AnimatePresence>
 
-      <AnimatePresence>
-        {showGrade && (
-          <SessionGradeDisplay
-            maestro={maestro}
-            sessionDuration={finalSessionDuration}
-            questionsAsked={finalQuestionCount}
-            xpEarned={xpEarned}
-            onClose={handleGradeClose}
-          />
-        )}
-      </AnimatePresence>
-    </div>
+        <AnimatePresence>
+          {showGrade && (
+            <SessionGradeDisplay
+              maestro={maestro}
+              sessionDuration={finalSessionDuration}
+              questionsAsked={finalQuestionCount}
+              xpEarned={xpEarned}
+              onClose={handleGradeClose}
+            />
+          )}
+        </AnimatePresence>
+      </div>
+    </ErrorBoundary>
   );
 }

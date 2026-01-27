@@ -45,6 +45,7 @@
     "build:analyze": "ANALYZE=true npm run build",
     "check:bundle": "tsx scripts/check-bundle-size.ts",
     "i18n:check": "npx tsx scripts/i18n-check.ts",
+    "debt:check": "npx tsx scripts/debt-check.ts",
     "version:patch": "npm version patch && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "version:minor": "npm version minor && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
     "version:major": "npm version major && cat package.json | grep version | head -1 | sed 's/.*: \"\\(.*\\)\".*/\\1/' > VERSION",
