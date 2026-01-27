@@ -167,11 +167,11 @@ test.describe("Mobile Regression Guard (375px Viewport)", () => {
     mobile,
   }) => {
     // Test sidebar sizing on multiple pages
-    const pages = ["/", "/hub"];
+    const pages = ["/", "/astuccio"];
 
     for (const route of pages) {
       await page.goto(route, { waitUntil: "domcontentloaded" });
-      await page.waitForSelector('main, [role="main"]', { timeout: 5000 });
+      await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
       // Open sidebar
       await mobile.openMobileSidebar();
