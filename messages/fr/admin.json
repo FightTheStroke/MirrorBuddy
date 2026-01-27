@@ -10,34 +10,19 @@
       "subtitle": "Sottotitolo",
       "title": "Titolo",
       "systemInfo": {
-        "buildDate": "Build date",
-        "description": "Descrizione",
-        "environment": "Environment",
-        "nodeVersion": "Node version",
-        "title": "Titolo",
-        "version": "Version"
-      },
-      "trialBudget": {
-        "configuredVia": "Configured via",
-        "description": "Descrizione",
-        "descriptionText": "Description text",
-        "perMonth": "Per month",
-        "title": "Titolo"
-      },
-      "system-info": {
         "title": "System Info",
         "description": "Informations système",
         "version": "Version",
         "environment": "Environment",
-        "node-version": "Node:",
-        "build-date": "Build"
+        "nodeVersion": "Node:",
+        "buildDate": "Build"
       },
-      "trial-budget": {
+      "trialBudget": {
         "title": "Trial Budget",
         "description": "Budget mensuel pour les utilisateurs d'essai",
-        "per-month": "par mois",
-        "configured-via": "Configuré via env var",
-        "description-text": "Budget mensuel maximum pour les utilisateurs d'essai"
+        "perMonth": "par mois",
+        "configuredVia": "Configuré via env var",
+        "descriptionText": "Budget mensuel maximum pour les utilisateurs d'essai"
       }
     },
     "systemAlerts": "System Alerts",

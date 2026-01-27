@@ -35,7 +35,7 @@ export function VisualOverview({
   className,
   compact = false,
 }: VisualOverviewProps) {
-  const t = useTranslations("education.learning-path");
+  const t = useTranslations("education.learningPath");
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
@@ -131,10 +131,10 @@ export function VisualOverview({
       <div className="px-4 py-3 border-b border-slate-700 bg-slate-800/50 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-medium text-slate-200">
-            {title || t("visual-title")}
+            {title || t("visualTitle")}
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            {completedCount}/{topics.length} {t("topics-completed-count")}
+            {completedCount}/{topics.length} {t("topicsCompletedCount")}
           </p>
         </div>
         {/* Progress indicator */}
@@ -192,14 +192,14 @@ export function VisualOverview({
                 className="w-3 h-3 rounded"
                 style={{ backgroundColor: STATUS_COLORS.in_progress.bg }}
               />
-              <span>{t("in-progress-legend")}</span>
+              <span>{t("inProgressLegend")}</span>
             </div>
             <div className="flex items-center gap-1">
               <span
                 className="w-3 h-3 rounded"
                 style={{ backgroundColor: STATUS_COLORS.completed.bg }}
               />
-              <span>{t("completed-legend")}</span>
+              <span>{t("completedLegend")}</span>
             </div>
           </div>
         </div>

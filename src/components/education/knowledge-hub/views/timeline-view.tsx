@@ -55,7 +55,7 @@ export function TimelineView({
   onToggleMaterialSelection,
   className,
 }: TimelineViewProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
 
   const formatDateLabel = useCallback(
     (date: Date): string => {
@@ -69,10 +69,10 @@ export function TimelineView({
       );
 
       if (materialDate.getTime() === today.getTime()) {
-        return t("timeline-view.today");
+        return t("timelineView.today");
       }
       if (materialDate.getTime() === yesterday.getTime()) {
-        return t("timeline-view.yesterday");
+        return t("timelineView.yesterday");
       }
 
       const diffDays = Math.floor(
@@ -83,7 +83,7 @@ export function TimelineView({
       }
       if (diffDays < 30) {
         const weeks = Math.floor(diffDays / 7);
-        return t("timeline-view.weeks-ago", { count: weeks });
+        return t("timelineView.weeksAgo", { count: weeks });
       }
 
       return date.toLocaleDateString("it-IT", {
@@ -130,7 +130,7 @@ export function TimelineView({
             animate={{ opacity: 1 }}
             className="flex items-center justify-center h-64 text-slate-400"
           >
-            {t("timeline-view.no-materials")}
+            {t("timelineView.noMaterials")}
           </motion.div>
         ) : (
           <div className="relative">
@@ -158,8 +158,8 @@ export function TimelineView({
                       <p className="text-sm text-slate-500">
                         {group.materials.length}{" "}
                         {group.materials.length !== 1
-                          ? t("timeline-view.material-plural")
-                          : t("timeline-view.material-singular")}
+                          ? t("timelineView.materialPlural")
+                          : t("timelineView.materialSingular")}
                       </p>
                     </div>
                   </div>

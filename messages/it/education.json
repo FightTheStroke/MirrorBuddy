@@ -38,264 +38,6 @@
     }
   },
   "education": {
-    "knowledge-hub": {
-      "homework": {
-        "default-title": "Compiti",
-        "no-tasks": "Nessun compito"
-      },
-      "timeline": {
-        "default-title": "Linea del Tempo",
-        "no-events": "Nessun evento disponibile"
-      },
-      "mindmap": {
-        "default-title": "Mappa Mentale"
-      },
-      "quiz": {
-        "default-title": "Quiz",
-        "no-questions": "Nessuna domanda"
-      },
-      "flashcard": {
-        "default-title": "Flashcard",
-        "no-cards": "Nessuna flashcard"
-      },
-      "summary": {
-        "default-title": "Riassunto"
-      },
-      "demo": {
-        "default-title": "Simulazione"
-      },
-      "diagram": {
-        "default-title": "Diagramma"
-      },
-      "formula": {
-        "default-title": "Formula"
-      },
-      "chart": {
-        "default-title": "Grafico"
-      },
-      "image": {
-        "default-title": "Immagine"
-      },
-      "pdf": {
-        "default-title": "PDF"
-      },
-      "error-title": "Errore di visualizzazione",
-      "error-message-default": "Impossibile visualizzare questo materiale.",
-      "error-message-with-type": "Impossibile visualizzare il materiale di tipo \"{type}\".",
-      "retry-button": "Riprova",
-      "sidebar": {
-        "navigation-aria-label": "Navigazione materiali",
-        "quick-filters-title": "Filtri rapidi",
-        "quick-filters-aria-label": "Filtri rapidi",
-        "recent": "Recenti",
-        "favorites": "Preferiti",
-        "archived": "Archiviati",
-        "collections-title": "Cartelle",
-        "collections-aria-label": "Cartelle",
-        "create-collection-aria-label": "Crea nuova cartella",
-        "no-collections": "Nessuna cartella",
-        "tags-title": "Tag",
-        "tags-aria-label": "Tag",
-        "create-tag-aria-label": "Crea nuovo tag",
-        "no-tags": "Nessun tag"
-      },
-      "renderers": {
-        "noEvents": "Nessun evento disponibile",
-        "noData": "Nessun dato disponibile",
-        "noItems": "Nessun elemento disponibile"
-      },
-      "header": {
-        "search": {
-          "placeholder": "Cerca nei materiali...",
-          "aria-label": "Cerca materiali",
-          "clear-aria-label": "Cancella ricerca",
-          "announcement": "Ricerca: {value}"
-        },
-        "filter": {
-          "aria-label": "Filtra per tipo",
-          "listbox-aria-label": "Seleziona tipo materiale"
-        }
-      },
-      "types": {
-        "all": "Tutti",
-        "mindmap": "Mappe mentali",
-        "quiz": "Quiz",
-        "flashcard": "Flashcard",
-        "summary": "Riassunto",
-        "demo": "Demo",
-        "diagram": "Diagramma",
-        "timeline": "Linea temporale",
-        "formula": "Formula",
-        "calculator": "Calcolatrice",
-        "chart": "Grafico",
-        "pdf": "PDF",
-        "webcam": "Webcam",
-        "homework": "Compiti",
-        "search": "Ricerca",
-        "typing": "Digitazione",
-        "study-kit": "Kit di studio"
-      },
-      "material-menu": {
-        "aria-label": "Azioni materiale",
-        "open": "Apri",
-        "duplicate": "Duplica",
-        "move": "Sposta",
-        "add-tags": "Aggiungi tag",
-        "find-similar": "Trova simili",
-        "archive": "Archivia",
-        "delete": "Elimina"
-      }
-    },
-    "quiz": {
-      "comingSoon": "Coming Soon",
-      "comingSoonMessage": "Coming Soon Message",
-      "completed": "Completed",
-      "completedBadge": "Completed badge",
-      "createWithProfessor": "Create With Professor",
-      "created": "Created",
-      "deleteButton": "Delete button",
-      "deleteConfirm": "Delete confirm",
-      "loading": "Caricamento...",
-      "questionsCount": "Questions count",
-      "sampleQuizzes": "Sample Quizzes",
-      "startButton": "Start button",
-      "subtitle": "Sottotitolo",
-      "title": "Titolo",
-      "yourQuizzes": "Your Quizzes"
-    },
-    "quizReview": {
-      "failedSuggestions": "Failed Suggestions",
-      "highPriority": "High Priority",
-      "loadingSuggestions": "Loading Suggestions",
-      "needsReview": "Needs Review",
-      "reviewText": "Review Text",
-      "suggestedMaterials": "Suggested Materials",
-      "suggestionsText": "Suggestions Text",
-      "suggestionsTitle": "Suggestions Title"
-    },
-    "toolSelection": {
-      "back": "Indietro",
-      "chooseProfessor": "Scegli Maestro per {tool}",
-      "chooseSubject": "Scegli Materia per {tool}",
-      "close": "Chiudi"
-    },
-    "tools": {
-      "mindmap": "Mappa Mentale",
-      "quiz": "Quiz",
-      "flashcard": "Flashcard",
-      "summary": "Riassunto",
-      "demo": "Simulazione",
-      "diagram": "Diagramma",
-      "timeline": "Linea Temporale",
-      "formula": "Formula",
-      "calculator": "Calcolatrice",
-      "chart": "Grafico",
-      "pdf": "PDF",
-      "webcam": "Webcam",
-      "homework": "Compiti",
-      "search": "Ricerca",
-      "typing": "Digitazione",
-      "study-kit": "Kit di Studio"
-    },
-    "archive": {
-      "emptyDescription": "Empty Description",
-      "emptyMaterials": "Empty Materials",
-      "emptyPreferred": "Empty Preferred",
-      "gridView": "Grid View",
-      "listView": "List View",
-      "searchPlaceholder": "Search Placeholder",
-      "sortLabel": "Sort Label",
-      "startConversation": "Start Conversation",
-      "subtitle": "Sottotitolo",
-      "title": "Titolo"
-    },
-    "calendar": {
-      "addButton": "Add Button",
-      "cancelButton": "Cancel Button",
-      "dateLabel": "Date Label",
-      "daysUntil": "Days Until",
-      "editEvent": "Edit Event",
-      "emptyState": "Empty State",
-      "emptyStateSubtitle": "Empty State Subtitle",
-      "newEvent": "New Event",
-      "notesLabel": "Notes Label",
-      "notesPlaceholder": "Notes Placeholder",
-      "priorityHigh": "Priority High",
-      "priorityLabel": "Priority Label",
-      "priorityLow": "Priority Low",
-      "priorityMedium": "Priority Medium",
-      "saveButton": "Save Button",
-      "subjectLabel": "Subject Label",
-      "title": "Titolo",
-      "titleLabel": "Title Label",
-      "titlePlaceholder": "Title Placeholder",
-      "today": "Oggi",
-      "tomorrow": "Tomorrow",
-      "typeLabel": "Type Label",
-      "upcomingEvents": "Upcoming Events"
-    },
-    "calendarGrid": {
-      "ariaLabelNextMonth": "Aria label next month",
-      "ariaLabelPreviousMonth": "Aria label previous month",
-      "dayNames": {
-        "friday": "Friday",
-        "monday": "Monday",
-        "saturday": "Saturday",
-        "sunday": "Sunday",
-        "thursday": "Thursday",
-        "tuesday": "Tuesday",
-        "wednesday": "Wednesday"
-      },
-      "moreEvents": "More events",
-      "todayButton": "Today button"
-    },
-    "characterSwitcher": {
-      "noCharactersFound": "No Characters Found",
-      "recent": "Recent"
-    },
-    "emptyMetrics": {
-      "description": "Descrizione"
-    },
-    "flashcard": {
-      "again": "Again",
-      "answer": "Answer",
-      "cardCounter": "Card Counter",
-      "cardsReviewed": "Cards Reviewed",
-      "completed": "Completed",
-      "completedMessage": "Completed Message",
-      "continueButton": "Continue Button",
-      "easy": "Easy",
-      "easyQuestion": "Easy Question",
-      "good": "Good",
-      "hard": "Hard",
-      "navigationHint": "Navigation Hint",
-      "question": "Question",
-      "tapToFlip": "Tap To Flip"
-    },
-    "flashcards": {
-      "addCardButton": "Add Card Button",
-      "cancelButton": "Cancel Button",
-      "cardBackPlaceholder": "Card Back Placeholder",
-      "cardFrontPlaceholder": "Card Front Placeholder",
-      "cardsLabel": "Cards Label",
-      "createDeckButton": "Create Deck Button",
-      "createWithProfessor": "Create With Professor",
-      "deckNameLabel": "Deck Name Label",
-      "deckNamePlaceholder": "Deck Name Placeholder",
-      "editDeckTitle": "Edit Deck Title",
-      "emptyState": "Empty State",
-      "emptyStateDescription": "Empty State Description",
-      "fsrsDescription": "Fsrs Description",
-      "loading": "Caricamento...",
-      "manualMode": "Manual Mode",
-      "newDeckTitle": "New Deck Title",
-      "saveButton": "Save Button",
-      "subjectLabel": "Subject Label",
-      "title": "Titolo"
-    },
-    "htmlSnippetsView": {
-      "loading": "Caricamento..."
-    },
     "knowledgeHub": {
       "errorMessageDefault": "Error message default",
       "errorMessageWithType": "Error message with type",
@@ -397,6 +139,156 @@
         "typing": "Typing",
         "webcam": "Webcam"
       }
+    },
+    "quiz": {
+      "comingSoon": "Coming Soon",
+      "comingSoonMessage": "Coming Soon Message",
+      "completed": "Completed",
+      "completedBadge": "Completed badge",
+      "createWithProfessor": "Create With Professor",
+      "created": "Created",
+      "deleteButton": "Delete button",
+      "deleteConfirm": "Delete confirm",
+      "loading": "Caricamento...",
+      "questionsCount": "Questions count",
+      "sampleQuizzes": "Sample Quizzes",
+      "startButton": "Start button",
+      "subtitle": "Sottotitolo",
+      "title": "Titolo",
+      "yourQuizzes": "Your Quizzes"
+    },
+    "quizReview": {
+      "failedSuggestions": "Failed Suggestions",
+      "highPriority": "High Priority",
+      "loadingSuggestions": "Loading Suggestions",
+      "needsReview": "Needs Review",
+      "reviewText": "Review Text",
+      "suggestedMaterials": "Suggested Materials",
+      "suggestionsText": "Suggestions Text",
+      "suggestionsTitle": "Suggestions Title"
+    },
+    "toolSelection": {
+      "back": "Indietro",
+      "chooseProfessor": "Scegli Maestro per {tool}",
+      "chooseSubject": "Scegli Materia per {tool}",
+      "close": "Chiudi"
+    },
+    "tools": {
+      "mindmap": "Mappa Mentale",
+      "quiz": "Quiz",
+      "flashcard": "Flashcard",
+      "summary": "Riassunto",
+      "demo": "Simulazione",
+      "diagram": "Diagramma",
+      "timeline": "Linea Temporale",
+      "formula": "Formula",
+      "calculator": "Calcolatrice",
+      "chart": "Grafico",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Compiti",
+      "search": "Ricerca",
+      "typing": "Digitazione",
+      "studyKit": "Kit di Studio"
+    },
+    "archive": {
+      "emptyDescription": "Empty Description",
+      "emptyMaterials": "Empty Materials",
+      "emptyPreferred": "Empty Preferred",
+      "gridView": "Grid View",
+      "listView": "List View",
+      "searchPlaceholder": "Search Placeholder",
+      "sortLabel": "Sort Label",
+      "startConversation": "Start Conversation",
+      "subtitle": "Sottotitolo",
+      "title": "Titolo"
+    },
+    "calendar": {
+      "addButton": "Add Button",
+      "cancelButton": "Cancel Button",
+      "dateLabel": "Date Label",
+      "daysUntil": "Days Until",
+      "editEvent": "Edit Event",
+      "emptyState": "Empty State",
+      "emptyStateSubtitle": "Empty State Subtitle",
+      "newEvent": "New Event",
+      "notesLabel": "Notes Label",
+      "notesPlaceholder": "Notes Placeholder",
+      "priorityHigh": "Priority High",
+      "priorityLabel": "Priority Label",
+      "priorityLow": "Priority Low",
+      "priorityMedium": "Priority Medium",
+      "saveButton": "Save Button",
+      "subjectLabel": "Subject Label",
+      "title": "Titolo",
+      "titleLabel": "Title Label",
+      "titlePlaceholder": "Title Placeholder",
+      "today": "Oggi",
+      "tomorrow": "Tomorrow",
+      "typeLabel": "Type Label",
+      "upcomingEvents": "Upcoming Events"
+    },
+    "calendarGrid": {
+      "ariaLabelNextMonth": "Aria label next month",
+      "ariaLabelPreviousMonth": "Aria label previous month",
+      "dayNames": {
+        "friday": "Friday",
+        "monday": "Monday",
+        "saturday": "Saturday",
+        "sunday": "Sunday",
+        "thursday": "Thursday",
+        "tuesday": "Tuesday",
+        "wednesday": "Wednesday"
+      },
+      "moreEvents": "More events",
+      "todayButton": "Today button"
+    },
+    "characterSwitcher": {
+      "noCharactersFound": "No Characters Found",
+      "recent": "Recent"
+    },
+    "emptyMetrics": {
+      "description": "Descrizione"
+    },
+    "flashcard": {
+      "again": "Again",
+      "answer": "Answer",
+      "cardCounter": "Card Counter",
+      "cardsReviewed": "Cards Reviewed",
+      "completed": "Completed",
+      "completedMessage": "Completed Message",
+      "continueButton": "Continue Button",
+      "easy": "Easy",
+      "easyQuestion": "Easy Question",
+      "good": "Good",
+      "hard": "Hard",
+      "navigationHint": "Navigation Hint",
+      "question": "Question",
+      "tapToFlip": "Tap To Flip"
+    },
+    "flashcards": {
+      "addCardButton": "Add Card Button",
+      "cancelButton": "Cancel Button",
+      "cardBackPlaceholder": "Card Back Placeholder",
+      "cardFrontPlaceholder": "Card Front Placeholder",
+      "cardsLabel": "Cards Label",
+      "createDeckButton": "Create Deck Button",
+      "createWithProfessor": "Create With Professor",
+      "deckNameLabel": "Deck Name Label",
+      "deckNamePlaceholder": "Deck Name Placeholder",
+      "editDeckTitle": "Edit Deck Title",
+      "emptyState": "Empty State",
+      "emptyStateDescription": "Empty State Description",
+      "fsrsDescription": "Fsrs Description",
+      "loading": "Caricamento...",
+      "manualMode": "Manual Mode",
+      "newDeckTitle": "New Deck Title",
+      "saveButton": "Save Button",
+      "subjectLabel": "Subject Label",
+      "title": "Titolo"
+    },
+    "htmlSnippetsView": {
+      "loading": "Caricamento..."
     },
     "learningPath": {
       "back": "Indietro",
@@ -646,11 +538,11 @@
   },
   "maestros": {
     "grid": {
-      "all-button": "Tutti",
-      "empty-description": "Nessun professore trovato",
-      "empty-title": "Nessun risultato",
-      "search-aria-label": "Cerca professore o materia",
-      "search-placeholder": "Cerca professore o materia...",
+      "allButton": "Tutti",
+      "emptyDescription": "Nessun professore trovato",
+      "emptyTitle": "Nessun risultato",
+      "searchAriaLabel": "Cerca professore o materia",
+      "searchPlaceholder": "Cerca professore o materia...",
       "title": "Professori"
     }
   },

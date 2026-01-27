@@ -260,7 +260,7 @@ export function MaestriStep(_props: MaestriStepProps) {
           className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50"
         >
           <p className="text-gray-700 dark:text-gray-300 text-sm">
-            <strong>{t("how-it-works")}</strong> {t("how-it-works-desc")}
+            <strong>{t("howItWorks")}</strong> {t("howItWorksDesc")}
           </p>
         </motion.div>
 

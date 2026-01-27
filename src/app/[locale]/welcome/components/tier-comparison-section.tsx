@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 import { tierCards } from "./tier-data";
 
 export function TierComparisonSection() {
-  const t = useTranslations("welcome.tier-comparison");
+  const t = useTranslations("welcome.tierComparison");
 
   return (
     <motion.section
@@ -26,7 +26,7 @@ export function TierComparisonSection() {
           {t("heading")}
         </h2>
         <p className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-          {t("subheading")}
+          {t("subtitle")}
         </p>
       </div>
 
@@ -124,7 +124,7 @@ export function TierComparisonSection() {
       </div>
 
       <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-        <p>{t("footer-note")}</p>
+        <p>{t("footerNote")}</p>
       </div>
     </motion.section>
   );

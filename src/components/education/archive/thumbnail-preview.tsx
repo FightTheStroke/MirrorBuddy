@@ -15,7 +15,7 @@ interface ThumbnailPreviewProps {
 }
 
 export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
-  const t = useTranslations("education.thumbnail-preview");
+  const t = useTranslations("education.thumbnailPreview");
   const Icon = TOOL_ICONS[item.toolType];
   const content = item.content;
 
@@ -30,7 +30,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
         {/* eslint-disable-next-line @next/next/no-img-element -- User-captured data URL */}
         <img
           src={(content as { imageData: string }).imageData}
-          alt={t("webcam-alt")}
+          alt={t("webcamAlt")}
           className="w-full h-full object-cover"
         />
       </div>
@@ -55,13 +55,13 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
         {/* eslint-disable-next-line @next/next/no-img-element -- User-uploaded base64 */}
         <img
           src={homeworkContent.photoUrl}
-          alt={t("homework-alt")}
+          alt={t("homeworkAlt")}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="absolute bottom-1 left-2 right-2 flex items-center justify-between">
           <span className="text-[10px] text-white font-medium">
-            {t("homework-label")}
+            {t("homeworkLabel")}
           </span>
           {totalSteps > 0 && (
             <span className="text-[10px] text-white/80">
@@ -111,7 +111,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
             {questions.length}
           </div>
           <div className="text-xs text-green-600/70 dark:text-green-400/70">
-            {t("questions-label")}
+            {t("questionsLabel")}
           </div>
         </div>
       </div>
@@ -132,7 +132,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
             {cards.length}
           </div>
           <div className="text-xs text-purple-600/70 dark:text-purple-400/70">
-            {t("flashcard-label")}
+            {t("flashcardLabel")}
           </div>
         </div>
       </div>
@@ -146,7 +146,7 @@ export function ThumbnailPreview({ item }: ThumbnailPreviewProps) {
         <div className="text-center">
           <Play className="w-8 h-8 text-orange-500 mx-auto mb-1" />
           <div className="text-xs text-orange-600/70 dark:text-orange-400/70">
-            {t("demo-label")}
+            {t("demoLabel")}
           </div>
         </div>
       </div>

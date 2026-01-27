@@ -42,7 +42,7 @@ export function PDFPreviewHeader({
               {totalPages} {totalPages === 1 ? t("page") : t("pages")}
               {truncated && (
                 <span className="text-amber-400 ml-2">
-                  ({t("truncated-info")} {MAX_PDF_PAGES})
+                  ({t("truncatedInfo")} {MAX_PDF_PAGES})
                 </span>
               )}
             </p>

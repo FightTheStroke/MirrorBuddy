@@ -31,46 +31,46 @@ export function FeatureGuideCards({
   highContrast = false,
   className,
 }: FeatureGuideCardsProps) {
-  const t = useTranslations("education.parent-dashboard.features");
+  const t = useTranslations("education.parentDashboard.features");
 
   const FEATURES: FeatureCardData[] = [
     {
       icon: <GraduationCap className="w-5 h-5" />,
-      title: t("maestri-title"),
-      description: t("maestri-desc"),
+      title: t("maestriTitle"),
+      description: t("maestriDesc"),
       color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
     },
     {
       icon: <Brain className="w-5 h-5" />,
-      title: t("flashcards-title"),
-      description: t("flashcards-desc"),
+      title: t("flashcardsTitle"),
+      description: t("flashcardsDesc"),
       color:
         "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
     },
     {
       icon: <Sparkles className="w-5 h-5" />,
-      title: t("quiz-title"),
-      description: t("quiz-desc"),
+      title: t("quizTitle"),
+      description: t("quizDesc"),
       color:
         "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
     },
     {
       icon: <Accessibility className="w-5 h-5" />,
-      title: t("accessibility-title"),
-      description: t("accessibility-desc"),
+      title: t("accessibilityTitle"),
+      description: t("accessibilityDesc"),
       color:
         "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
     },
     {
       icon: <MessageSquare className="w-5 h-5" />,
-      title: t("voice-title"),
-      description: t("voice-desc"),
+      title: t("voiceTitle"),
+      description: t("voiceDesc"),
       color: "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
     },
     {
       icon: <FileText className="w-5 h-5" />,
-      title: t("mindmap-title"),
-      description: t("mindmap-desc"),
+      title: t("mindmapTitle"),
+      description: t("mindmapDesc"),
       color: "bg-cyan-100 text-cyan-600 dark:bg-cyan-900/30 dark:text-cyan-400",
     },
   ];
@@ -81,7 +81,7 @@ export function FeatureGuideCards({
         className,
       )}
       role="list"
-      aria-label={t("aria-label")}
+      aria-label={t("ariaLabel")}
     >
       {FEATURES.map((feature) => (
         <article

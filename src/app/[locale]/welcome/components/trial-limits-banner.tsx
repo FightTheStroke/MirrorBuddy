@@ -40,7 +40,7 @@ const TRIAL_LIMITS: TrialLimit[] = [
  * Includes CTA to request full beta access.
  */
 export function TrialLimitsBanner() {
-  const t = useTranslations("welcome.trial-limits");
+  const t = useTranslations("welcome.trialLimits");
 
   return (
     <motion.section
@@ -92,13 +92,13 @@ export function TrialLimitsBanner() {
         {/* CTA */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-amber-200/50 dark:border-amber-700/50">
           <p className="text-sm text-amber-800 dark:text-amber-200">
-            {t("cta-question")}
+            {t("ctaQuestion")}
           </p>
           <Link
             href="/invite/request"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg transition-colors"
           >
-            {t("cta-button")}
+            {t("ctaButton")}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

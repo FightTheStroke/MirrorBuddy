@@ -32,7 +32,7 @@ export function SuccessMetricsDashboard({
   data,
   className,
 }: SuccessMetricsDashboardProps) {
-  const t = useTranslations("education.success-metrics");
+  const t = useTranslations("education.successMetrics");
   const { settings } = useAccessibilityStore();
   const methodProgress = useMethodProgressStore();
 

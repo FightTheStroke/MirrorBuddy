@@ -55,7 +55,7 @@ export function InfoStepForm({
   onSkip,
   onContinue,
 }: InfoStepFormProps) {
-  const t = useTranslations("welcome.welcome-form");
+  const t = useTranslations("welcome.welcomeForm");
 
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl">
@@ -73,10 +73,10 @@ export function InfoStepForm({
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              {t("tell-me-about-you", { name: userName })}
+              {t("tellMeAboutYou", { name: userName })}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {t("help-personalize")}
+              {t("helpPersonalize")}
             </p>
           </div>
           {/* Voice toggle (Web Speech) */}
@@ -170,10 +170,10 @@ export function InfoStepForm({
         >
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
             <Heart className="w-4 h-4" />
-            {t("learning-differences-label")}
+            {t("learningDifferencesLabel")}
           </label>
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            {t("learning-differences-hint")}
+            {t("learningDifferencesHint")}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {LEARNING_DIFFERENCES.map((diff) => (
@@ -233,7 +233,7 @@ export function InfoStepForm({
 
         {isReplayMode && (
           <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-            {t("replay-mode-message")}
+            {t("replayModeMessage")}
           </p>
         )}
       </CardContent>

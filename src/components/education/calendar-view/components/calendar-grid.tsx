@@ -26,20 +26,20 @@ export function CalendarGrid({
   onMonthChange,
   onEventClick,
 }: CalendarGridProps) {
-  const t = useTranslations("education.calendar-grid");
+  const t = useTranslations("education.calendarGrid");
   const getEventTypeConfig = (type: EventType) => {
     return EVENT_TYPES.find((t) => t.id === type) || EVENT_TYPES[0];
   };
 
   // Get day names for current locale
   const dayNames = [
-    t("day-names.monday"),
-    t("day-names.tuesday"),
-    t("day-names.wednesday"),
-    t("day-names.thursday"),
-    t("day-names.friday"),
-    t("day-names.saturday"),
-    t("day-names.sunday"),
+    t("dayNames.monday"),
+    t("dayNames.tuesday"),
+    t("dayNames.wednesday"),
+    t("dayNames.thursday"),
+    t("dayNames.friday"),
+    t("dayNames.saturday"),
+    t("dayNames.sunday"),
   ];
 
   return (
@@ -64,7 +64,7 @@ export function CalendarGrid({
                   ),
                 )
               }
-              aria-label={t("aria-label-previous-month")}
+              aria-label={t("ariaLabelPreviousMonth")}
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -73,7 +73,7 @@ export function CalendarGrid({
               size="sm"
               onClick={() => onMonthChange(new Date())}
             >
-              {t("today-button")}
+              {t("todayButton")}
             </Button>
             <Button
               variant="ghost"
@@ -86,7 +86,7 @@ export function CalendarGrid({
                   ),
                 )
               }
-              aria-label={t("aria-label-next-month")}
+              aria-label={t("ariaLabelNextMonth")}
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -152,7 +152,7 @@ export function CalendarGrid({
                   })}
                   {day.events.length > 2 && (
                     <div className="text-[10px] text-slate-500">
-                      {t("more-events", { count: day.events.length - 2 })}
+                      {t("moreEvents", { count: day.events.length - 2 })}
                     </div>
                   )}
                 </div>

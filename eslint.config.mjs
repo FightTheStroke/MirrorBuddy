@@ -321,6 +321,19 @@ const eslintConfig = defineConfig([
       "local-rules/no-i18n-in-providers": "error",
     },
   },
+  // ADR 0091: Enforce camelCase for translation keys (no kebab-case)
+  // Prevents mismatch between t("kebab-case") calls and camelCase JSON keys
+  {
+    files: ["src/**/*.tsx", "src/**/*.ts"],
+    ignores: [
+      "src/**/*.test.tsx",
+      "src/**/*.test.ts",
+      "src/**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-kebab-case-i18n-keys": "error",
+    },
+  },
 ]);
 
 export default eslintConfig;

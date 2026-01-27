@@ -34,7 +34,7 @@ export function SimilarMaterialsPanel({
   onSelect,
   className,
 }: SimilarMaterialsPanelProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<SimilarMaterial[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -62,7 +62,7 @@ export function SimilarMaterialsPanel({
           setError(
             fetchError instanceof Error
               ? fetchError.message
-              : t("similar-materials.error-loading"),
+              : t("similarMaterials.errorLoading"),
           );
         }
       } finally {
@@ -88,21 +88,21 @@ export function SimilarMaterialsPanel({
         className,
       )}
       role="dialog"
-      aria-label={t("similar-materials.aria-label")}
+      aria-label={t("similarMaterials.ariaLabel")}
     >
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-indigo-500" />
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              {t("similar-materials.title")}
+              {t("similarMaterials.title")}
             </h2>
           </div>
           <Button
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label={t("similar-materials.close-aria-label")}
+            aria-label={t("similarMaterials.closeAriaLabel")}
           >
             <X className="w-5 h-5" />
           </Button>
@@ -111,7 +111,7 @@ export function SimilarMaterialsPanel({
         <div className="p-4 space-y-3">
           {loading && (
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              {t("similar-materials.loading")}
+              {t("similarMaterials.loading")}
             </div>
           )}
           {error && (
@@ -121,7 +121,7 @@ export function SimilarMaterialsPanel({
           )}
           {!loading && !error && items.length === 0 && (
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              {t("similar-materials.no-results")}
+              {t("similarMaterials.noResults")}
             </div>
           )}
 
@@ -137,7 +137,7 @@ export function SimilarMaterialsPanel({
                     {item.title}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {item.toolType} • {t("similar-materials.similarity")}{" "}
+                    {item.toolType} • {t("similarMaterials.similarity")}{" "}
                     {item.similarity}
                   </div>
                 </div>

@@ -21,7 +21,7 @@ export function RejectModal({
   onConfirm,
   onCancel,
 }: RejectModalProps) {
-  const t = useTranslations("admin.invites.reject-modal");
+  const t = useTranslations("admin.invites.rejectModal");
 
   if (!isOpen) return null;
 
@@ -35,7 +35,7 @@ export function RejectModal({
           htmlFor="reject-reason"
           className="block text-sm font-medium text-foreground mb-2"
         >
-          {t("reason-label")}
+          {t("reasonLabel")}
         </label>
         <textarea
           id="reject-reason"
@@ -51,7 +51,7 @@ export function RejectModal({
             variant="outline"
             className="flex-1 min-h-11 min-w-11"
           >
-            {t("cancel-button")}
+            {t("cancelButton")}
           </Button>
           <Button
             onClick={onConfirm}
@@ -61,7 +61,7 @@ export function RejectModal({
             {isProcessing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
             ) : (
-              t("confirm-button")
+              t("confirmButton")
             )}
           </Button>
         </div>

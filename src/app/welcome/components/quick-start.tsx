@@ -27,7 +27,7 @@ export function QuickStart({
   onSkip,
   onUpdateProfile,
 }: QuickStartProps) {
-  const t = useTranslations("welcome.quick-start");
+  const t = useTranslations("welcome.quickStart");
 
   return (
     <motion.section
@@ -59,7 +59,7 @@ export function QuickStart({
               className="w-full sm:w-auto px-8 py-6 text-lg rounded-xl border-2"
             >
               <Settings className="w-5 h-5 mr-2" aria-hidden="true" />
-              {t("update-profile")}
+              {t("updateProfile")}
             </Button>
           )}
         </div>

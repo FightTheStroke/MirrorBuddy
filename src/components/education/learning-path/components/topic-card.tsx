@@ -22,7 +22,7 @@ interface TopicCardProps {
 }
 
 export function TopicCard({ topic, index, onClick, onStart }: TopicCardProps) {
-  const t = useTranslations("education.topic-card");
+  const t = useTranslations("education.topicCard");
   const isLocked = topic.status === "locked";
   const isCompleted = topic.status === "completed";
   const isActive =
@@ -104,8 +104,8 @@ export function TopicCard({ topic, index, onClick, onStart }: TopicCardProps) {
                 className="flex-shrink-0"
               >
                 {topic.status === "in_progress"
-                  ? t("continue-button")
-                  : t("start-button")}
+                  ? t("continueButton")
+                  : t("startButton")}
                 <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
             )}
@@ -115,7 +115,7 @@ export function TopicCard({ topic, index, onClick, onStart }: TopicCardProps) {
                 <div className="text-lg font-bold text-green-600">
                   {topic.quizScore}%
                 </div>
-                <div className="text-xs text-slate-500">{t("quiz-label")}</div>
+                <div className="text-xs text-slate-500">{t("quizLabel")}</div>
               </div>
             )}
           </div>

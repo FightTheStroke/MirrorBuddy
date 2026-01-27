@@ -78,7 +78,7 @@ export function ExplorerView({
   onToggleMaterialSelection,
   className,
 }: ExplorerViewProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
 
   // Filter materials by selected collection
   const filteredMaterials = useMemo(() => {
@@ -107,7 +107,7 @@ export function ExplorerView({
             isSelected && "bg-primary/10 text-primary font-medium",
           )}
           style={{ paddingLeft: `${depth * 16 + 8}px` }}
-          aria-label={t("explorer-view.folder-aria-label", { name: node.name })}
+          aria-label={t("explorerView.folderAriaLabel", { name: node.name })}
         >
           {hasChildren ? (
             isExpanded ? (
@@ -160,11 +160,11 @@ export function ExplorerView({
               selectedCollectionId === null &&
                 "bg-primary/10 text-primary font-medium",
             )}
-            aria-label={t("explorer-view.all-materials-aria-label")}
+            aria-label={t("explorerView.allMaterialsAriaLabel")}
           >
             <span className="w-4" />
             <Folder className="w-4 h-4 text-slate-500" />
-            <span>{t("explorer-view.all-materials")}</span>
+            <span>{t("explorerView.allMaterials")}</span>
             <span className="ml-auto text-xs text-slate-400">
               {materials.length}
             </span>
@@ -184,7 +184,7 @@ export function ExplorerView({
               animate={{ opacity: 1 }}
               className="flex items-center justify-center h-full text-slate-400"
             >
-              {t("explorer-view.no-materials")}
+              {t("explorerView.noMaterials")}
             </motion.div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

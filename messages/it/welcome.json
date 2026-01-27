@@ -40,14 +40,14 @@
       "adminDashboardAria": "Dashboard amministratore",
       "parentArea": "Area Genitori"
     },
-    "adminDashboard": "Admin Dashboard",
-    "closeMenu": "Close Menu",
-    "logout": "Logout",
-    "openMenu": "Open Menu",
-    "parentArea": "Parent Area",
-    "returnHome": "Return Home",
+    "adminDashboard": "Dashboard Admin",
+    "closeMenu": "Chiudi menu",
+    "logout": "Esci",
+    "openMenu": "Apri menu",
+    "parentArea": "Area Genitori",
+    "returnHome": "Torna alla home",
     "season": {
-      "autumn": "Autumn"
+      "autumn": "Autunno"
     },
     "title": "Titolo",
     "hero": {
@@ -79,18 +79,14 @@
         "textToSpeech": "Sintesi vocale",
         "adaptiveQuizzes": "Quiz adattivi"
       },
-      "adaptiveQuizzes": "Adaptive quizzes",
-      "anyAbility": "Any ability",
-      "learn": "Learn",
-      "mindMaps": "Mind maps",
-      "readableFonts": "Readable fonts",
-      "textToSpeech": "Text to speech",
-      "welcome": "Welcome",
-      "withTeachers": "With teachers",
-      "title": "Impara meglio con MirrorBuddy",
-      "subtitle": "Il tuo compagno di studio basato su intelligenza artificiale",
-      "cta": "Inizia ora",
-      "secondaryCta": "Scopri di più"
+      "adaptiveQuizzes": "Quiz adattivi",
+      "anyAbility": "Qualunque abilità",
+      "learn": "Impara",
+      "mindMaps": "Mappe mentali",
+      "readableFonts": "Font leggibili",
+      "textToSpeech": "Sintesi vocale",
+      "welcome": "Benvenuto",
+      "withTeachers": "Con i professori"
     },
     "quickStart": {
       "heading": "Inizia",
@@ -114,8 +110,8 @@
         "feature3": "Nessuna registrazione",
         "cta": "Prova gratis"
       },
-      "login": "Login",
-      "updateProfile": "Update profile"
+      "login": "Accedi",
+      "updateProfile": "Aggiorna profilo"
     },
     "tierComparison": {
       "heading": "Scegli il piano perfetto per te",
@@ -160,8 +156,8 @@
           "cta": "Passa a Pro"
         }
       },
-      "footerNote": "Footer note",
-      "subheading": "Subheading"
+      "footerNote": "Nota a piè di pagina",
+      "subheading": "Sottotitolo"
     },
     "maestri": {
       "heading": "I tuoi",
@@ -286,59 +282,59 @@
       "copyright": "© {year} MirrorBuddy. Progetto open source su GitHub."
     },
     "principles": {
-      "howItWorks": "How it works",
-      "howItWorksDesc": "How it works desc",
-      "welcomeToSchool": "Welcome to school",
-      "whatMakesUsSpecial": "What makes us special"
+      "howItWorks": "Come funziona",
+      "howItWorksDesc": "Descrizione di come funziona",
+      "welcomeToSchool": "Benvenuto a scuola",
+      "whatMakesUsSpecial": "Cosa ci rende speciali"
     },
     "ready": {
-      "chooseProfessor": "Choose professor",
-      "chooseProfessorDesc": "Choose professor desc"
+      "chooseProfessor": "Scegli un professore",
+      "chooseProfessorDesc": "Descrizione scelta del professore"
     },
     "trialLimits": {
       "base": "Base",
-      "ctaButton": "Cta button",
-      "ctaQuestion": "Cta question",
-      "exploreNoRegistration": "Explore no registration",
-      "freeTrialMode": "Free trial mode",
+      "ctaButton": "Pulsante CTA",
+      "ctaQuestion": "Domanda CTA",
+      "exploreNoRegistration": "Esplora senza registrazione",
+      "freeTrialMode": "Modalità prova gratuita",
       "maestri": "Maestri",
-      "messages": "Messages",
-      "requestBeta": "Request beta",
+      "messages": "Messaggi",
+      "requestBeta": "Richiedi accesso beta",
       "subtitle": "Sottotitolo",
-      "tenPerSession": "Ten per session",
-      "threeAvailable": "Three available",
+      "tenPerSession": "Dieci per sessione",
+      "threeAvailable": "Tre disponibili",
       "title": "Titolo",
-      "tools": "Tools",
-      "wantFullAccess": "Want full access"
+      "tools": "Strumenti",
+      "wantFullAccess": "Vuoi accesso completo"
     },
     "voiceFallback": {
-      "message": "Message",
+      "message": "Messaggio",
       "title": "Titolo"
     },
     "welcomeForm": {
-      "age": "Age",
-      "collectedData": "Collected data",
-      "disableVoice": "Disable voice",
-      "dontWorry": "Dont worry",
-      "enableVoice": "Enable voice",
-      "enterYourNamePlaceholder": "Enter your name placeholder",
-      "helloMelissa": "Hello melissa",
-      "helpPersonalize": "Help personalize",
-      "learningDifferences": "Learning differences",
-      "learningDifferencesHint": "Learning differences hint",
-      "learningDifferencesLabel": "Learning differences label",
-      "niceToMeetYou": "Nice to meet you",
+      "age": "Età",
+      "collectedData": "Dati raccolti",
+      "disableVoice": "Disattiva voce",
+      "dontWorry": "Non preoccuparti",
+      "enableVoice": "Abilita voce",
+      "enterYourNamePlaceholder": "Inserisci il tuo nome",
+      "helloMelissa": "Ciao Melissa",
+      "helpPersonalize": "Aiutaci a personalizzare",
+      "learningDifferences": "Difficoltà di apprendimento",
+      "learningDifferencesHint": "Suggerimento difficoltà di apprendimento",
+      "learningDifferencesLabel": "Etichetta difficoltà di apprendimento",
+      "niceToMeetYou": "Piacere di conoscerti",
       "optional": "Opzionale",
-      "replayModeMessage": "Replay mode message",
-      "school": "School",
-      "schoolElementary": "School elementary",
-      "schoolHigh": "School high",
-      "schoolMiddle": "School middle",
-      "tellMeAboutYou": "Tell me about you",
-      "welcomeIntro": "Welcome intro",
-      "whatIsYourName": "What is your name",
-      "years": "Years",
-      "yourSupportTeacher": "Your support teacher"
+      "replayModeMessage": "Messaggio modalità riproduzione",
+      "school": "Scuola",
+      "schoolElementary": "Scuola elementare",
+      "schoolHigh": "Scuola superiore",
+      "schoolMiddle": "Scuola media",
+      "tellMeAboutYou": "Parlami di te",
+      "welcomeIntro": "Introduzione di benvenuto",
+      "whatIsYourName": "Qual è il tuo nome",
+      "years": "Anni",
+      "yourSupportTeacher": "Il tuo insegnante di supporto"
     }
   },
   "onboarding": {

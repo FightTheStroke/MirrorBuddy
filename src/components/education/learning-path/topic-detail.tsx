@@ -32,7 +32,7 @@ export function TopicDetail({
   onComplete,
   className,
 }: TopicDetailProps) {
-  const t = useTranslations("education.learning-path");
+  const t = useTranslations("education.learningPath");
   const [topic, setTopic] = useState<LearningPathTopic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -133,7 +133,7 @@ export function TopicDetail({
       <div className={cn("flex items-center justify-center py-12", className)}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
         <span className="ml-3 text-slate-600 dark:text-slate-400">
-          {t("loading-topic")}
+          {t("loadingTopic")}
         </span>
       </div>
     );
@@ -143,7 +143,7 @@ export function TopicDetail({
     return (
       <div className={cn("text-center py-12", className)}>
         <p className="text-red-600 dark:text-red-400">
-          {error || t("topic-not-found")}
+          {error || t("topicNotFound")}
         </p>
         {onBack && (
           <Button variant="outline" onClick={onBack} className="mt-4">
@@ -182,7 +182,7 @@ export function TopicDetail({
               {topic.estimatedMinutes} min
             </span>
             <span>
-              {completedSteps}/{topic.steps.length} {t("steps-completed")}
+              {completedSteps}/{topic.steps.length} {t("stepsCompleted")}
             </span>
           </div>
         </div>
@@ -210,7 +210,7 @@ export function TopicDetail({
         return concepts.length > 0 ? (
           <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
             <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              {t("key-concepts")}
+              {t("keyConcepts")}
             </h3>
             <div className="flex flex-wrap gap-2">
               {concepts.map((concept, i) => (
@@ -234,7 +234,7 @@ export function TopicDetail({
 
         {topic.steps.length === 0 ? (
           <p className="text-slate-500 text-center py-8">
-            {t("no-steps-available")}
+            {t("noStepsAvailable")}
           </p>
         ) : (
           topic.steps

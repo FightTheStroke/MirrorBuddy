@@ -40,10 +40,10 @@ interface HomeworkData {
  * Render a homework assignment for Knowledge Hub.
  */
 export function HomeworkRenderer({ data, className }: BaseRendererProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const homeworkData = data as unknown as HomeworkData;
 
-  const title = homeworkData.title || t("homework.default-title");
+  const title = homeworkData.title || t("homework.defaultTitle");
   const tasks = homeworkData.tasks || [];
   const completedCount = tasks.filter((t) => t.completed).length;
 
@@ -102,7 +102,7 @@ export function HomeworkRenderer({ data, className }: BaseRendererProps) {
       {/* Tasks */}
       <div className="p-4 space-y-2">
         {tasks.length === 0 ? (
-          <p className="text-center text-slate-500">{t("homework.no-tasks")}</p>
+          <p className="text-center text-slate-500">{t("homework.noTasks")}</p>
         ) : (
           tasks.map((task) => (
             <div

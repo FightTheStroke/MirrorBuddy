@@ -27,7 +27,7 @@ export function KnowledgeHubHeader({
   onSearchChange,
   onClearSearch,
 }: HeaderProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const viewOptions = getViewOptions(t);
 
   return (
@@ -77,13 +77,13 @@ export function KnowledgeHubHeader({
             "placeholder:text-slate-400",
             "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
           )}
-          aria-label={t("header.search.aria-label")}
+          aria-label={t("header.search.ariaLabel")}
         />
         {searchQuery && (
           <button
             onClick={onClearSearch}
             className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded hover:bg-slate-100 dark:hover:bg-slate-600"
-            aria-label={t("header.search.clear-aria-label")}
+            aria-label={t("header.search.clearAriaLabel")}
           >
             <X className="w-4 h-4 text-slate-400" />
           </button>

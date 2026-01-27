@@ -185,12 +185,12 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (confirm(t("quiz.delete-confirm"))) {
+                            if (confirm(t("quiz.deleteConfirm"))) {
                               deleteQuiz(quiz.id);
                             }
                           }}
                           className="absolute top-2 right-2 p-1.5 rounded-full bg-red-100 dark:bg-red-900/30 text-red-600 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-200"
-                          title={t("quiz.delete-button")}
+                          title={t("quiz.deleteButton")}
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -206,7 +206,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                               <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
                                 <Trophy className="h-3 w-3 text-green-600" />
                                 <span className="text-xs font-medium text-green-700 dark:text-green-300">
-                                  {t("quiz.completed-badge")}
+                                  {t("quiz.completedBadge")}
                                 </span>
                               </div>
                             )}
@@ -231,7 +231,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                             <div className="flex items-center gap-1">
                               <Target className="h-4 w-4" />
                               <span>
-                                {t("quiz.questions-count", {
+                                {t("quiz.questionsCount", {
                                   count: quiz.questions.length,
                                 })}
                               </span>
@@ -250,12 +250,12 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                             {isCompleted ? (
                               <>
                                 <Trophy className="h-4 w-4 mr-2" />
-                                {t("quiz.completed-badge")}
+                                {t("quiz.completedBadge")}
                               </>
                             ) : (
                               <>
                                 <Play className="h-4 w-4 mr-2" />
-                                {t("quiz.start-button")}
+                                {t("quiz.startButton")}
                               </>
                             )}
                           </Button>
@@ -309,7 +309,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                           <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900/30 rounded-full">
                             <Trophy className="h-3 w-3 text-green-600" />
                             <span className="text-xs font-medium text-green-700 dark:text-green-300">
-                              {t("quiz.completed-badge")}
+                              {t("quiz.completedBadge")}
                             </span>
                           </div>
                         )}
@@ -329,7 +329,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                         <div className="flex items-center gap-1">
                           <Target className="h-4 w-4" />
                           <span>
-                            {t("quiz.questions-count", {
+                            {t("quiz.questionsCount", {
                               count: quiz.questions.length,
                             })}
                           </span>
@@ -348,12 +348,12 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                         {isCompleted ? (
                           <>
                             <Trophy className="h-4 w-4 mr-2" />
-                            {t("quiz.completed-badge")}
+                            {t("quiz.completedBadge")}
                           </>
                         ) : (
                           <>
                             <Play className="h-4 w-4 mr-2" />
-                            {t("quiz.start-button")}
+                            {t("quiz.startButton")}
                           </>
                         )}
                       </Button>

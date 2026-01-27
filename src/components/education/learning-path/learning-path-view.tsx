@@ -42,7 +42,7 @@ export function LearningPathView({
   onTopicSelect,
   className,
 }: LearningPathViewProps) {
-  const t = useTranslations("education.learning-path");
+  const t = useTranslations("education.learningPath");
   const [path, setPath] = useState<LearningPath | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -98,7 +98,7 @@ export function LearningPathView({
       <div className={cn("flex items-center justify-center py-12", className)}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
         <span className="ml-3 text-slate-600 dark:text-slate-400">
-          {t("loading-path")}
+          {t("loadingPath")}
         </span>
       </div>
     );
@@ -108,7 +108,7 @@ export function LearningPathView({
     return (
       <div className={cn("text-center py-12", className)}>
         <p className="text-red-600 dark:text-red-400">
-          {error || t("path-not-found")}
+          {error || t("pathNotFound")}
         </p>
         {onBack && (
           <Button variant="outline" onClick={onBack} className="mt-4">
@@ -167,7 +167,7 @@ export function LearningPathView({
             {path.progressPercent}%
           </div>
           <p className="text-xs text-slate-500 mt-1">
-            {path.completedTopics}/{path.totalTopics} {t("completed-topics")}
+            {path.completedTopics}/{path.totalTopics} {t("completedTopics")}
           </p>
         </div>
       </div>
@@ -196,8 +196,8 @@ export function LearningPathView({
             <div>
               <p className="text-sm font-medium text-primary">
                 {currentTopic.status === "in_progress"
-                  ? t("continue-with")
-                  : t("next-topic")}
+                  ? t("continueWith")
+                  : t("nextTopic")}
               </p>
               <p className="text-lg font-semibold text-slate-900 dark:text-white mt-1">
                 {currentTopic.title}
@@ -219,7 +219,7 @@ export function LearningPathView({
       {/* Topics list */}
       <div className="space-y-3">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          {t("topics-header")}
+          {t("topicsHeader")}
         </h2>
 
         {path.topics

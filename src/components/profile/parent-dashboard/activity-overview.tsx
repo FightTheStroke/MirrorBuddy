@@ -98,7 +98,7 @@ export function ActivityOverview({
   highContrast = false,
   className,
 }: ActivityOverviewProps) {
-  const t = useTranslations("education.parent-dashboard.activity");
+  const t = useTranslations("education.parentDashboard.activity");
   const formatMinutes = (mins: number): string => {
     if (mins >= 60) {
       const hours = Math.floor(mins / 60);
@@ -111,7 +111,7 @@ export function ActivityOverview({
   const cards = [
     {
       icon: <Clock className="w-5 h-5" />,
-      label: t("study-time"),
+      label: t("studyTime"),
       value: formatMinutes(stats.totalMinutes),
       subtext: stats.totalMinutes < 60 ? "min" : "",
       color: "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400",
@@ -120,20 +120,20 @@ export function ActivityOverview({
       icon: <BookOpen className="w-5 h-5" />,
       label: t("sessions"),
       value: stats.sessionsCount,
-      subtext: t("this-week"),
+      subtext: t("thisWeek"),
       color:
         "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400",
     },
     {
       icon: <Star className="w-5 h-5" />,
-      label: t("xp-earned"),
+      label: t("xpEarned"),
       value: stats.xpEarned.toLocaleString("it-IT"),
       color:
         "bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400",
     },
     {
       icon: <Coins className="w-5 h-5" />,
-      label: t("mirror-bucks"),
+      label: t("mirrorBucks"),
       value: stats.mirrorBucksEarned.toLocaleString("it-IT"),
       color:
         "bg-purple-100 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400",
@@ -141,10 +141,7 @@ export function ActivityOverview({
   ];
 
   return (
-    <section
-      className={cn("space-y-3", className)}
-      aria-label={t("aria-label")}
-    >
+    <section className={cn("space-y-3", className)} aria-label={t("ariaLabel")}>
       <h2
         className={cn(
           "text-lg font-semibold",

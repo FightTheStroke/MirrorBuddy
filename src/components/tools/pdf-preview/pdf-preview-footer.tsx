@@ -22,10 +22,8 @@ export function PDFPreviewFooter({
   return (
     <div className="p-4 border-t border-slate-700 flex items-center justify-between">
       <div className="text-sm text-slate-400">
-        {t("selected-count", { count: selectedCount })}
-        {allowMultiSelect && (
-          <span className="ml-2">{t("click-to-select")}</span>
-        )}
+        {t("selectedCount", { count: selectedCount })}
+        {allowMultiSelect && <span className="ml-2">{t("clickToSelect")}</span>}
       </div>
 
       <div className="flex gap-2">
@@ -42,7 +40,7 @@ export function PDFPreviewFooter({
           disabled={selectedCount === 0}
         >
           <Check className="w-4 h-4 mr-2" />
-          {t("analyze")} {t("analyze-pages", { count: selectedCount })}
+          {t("analyze")} {t("analyzePages", { count: selectedCount })}
         </Button>
       </div>
     </div>

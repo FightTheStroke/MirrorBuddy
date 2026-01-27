@@ -43,7 +43,7 @@ export function DashboardTabs({
   children,
   className,
 }: DashboardTabsProps) {
-  const t = useTranslations("education.parent-dashboard.tabs");
+  const t = useTranslations("education.parentDashboard.tabs");
 
   const TAB_CONFIG = [
     {

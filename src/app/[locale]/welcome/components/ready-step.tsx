@@ -206,8 +206,8 @@ export function ReadyStep(_props: ReadyStepProps) {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30">
                 <span className="text-2xl">📚</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>{t("choose-professor")}</strong> -{" "}
-                  {t("choose-professor-desc")}
+                  <strong>{t("chooseProfessor")}</strong> -{" "}
+                  {t("chooseProfessorDesc")}
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">

@@ -61,7 +61,7 @@ export function InfoStepVoice({
   onContinue,
   onSkip,
 }: InfoStepVoiceProps) {
-  const t = useTranslations("welcome.welcome-form");
+  const t = useTranslations("welcome.welcomeForm");
 
   // Check if we have enough data to show continue button
   const hasData =
@@ -73,10 +73,10 @@ export function InfoStepVoice({
   const getSchoolLevelLabel = (level?: string) => {
     if (!level) return "...";
     return level === "elementare"
-      ? t("school-elementary")
+      ? t("schoolElementary")
       : level === "media"
-        ? t("school-middle")
-        : t("school-high");
+        ? t("schoolMiddle")
+        : t("schoolHigh");
   };
 
   return (
@@ -108,7 +108,7 @@ export function InfoStepVoice({
             className="mt-4 p-4 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-lg space-y-3"
           >
             <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-              {t("collected-data")}
+              {t("collectedData")}
             </h3>
 
             <div className="space-y-2">
@@ -163,7 +163,7 @@ export function InfoStepVoice({
                       : "text-gray-400"
                   }
                 >
-                  {t("learning-differences")}:{" "}
+                  {t("learningDifferences")}:{" "}
                   {data.learningDifferences?.length
                     ? data.learningDifferences
                         .map(
@@ -210,7 +210,7 @@ export function InfoStepVoice({
 
       {isReplayMode && (
         <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-          {t("replay-mode-message")}
+          {t("replayModeMessage")}
         </p>
       )}
     </motion.div>

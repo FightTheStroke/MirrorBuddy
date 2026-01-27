@@ -1,57 +1,57 @@
 {
   "metadata": {
     "home": {
-      "title": "Home | MirrorBuddy",
-      "description": "Scopri l'apprendimento basato su AI per studenti con difficoltà di apprendimento. Tutoraggio personalizzato con 22 maestri, voce e apprendimento adattivo.",
+      "title": "Inicio | MirrorBuddy",
+      "description": "Descubre el aprendizaje basado en IA para estudiantes con dificultades de aprendizaje. Tutoría personalizada con 22 profesores, voz y aprendizaje adaptativo.",
       "keywords": [
-        "educazione",
-        "AI",
-        "tutoraggio",
-        "apprendimento",
-        "voce",
-        "maestri"
+        "educación",
+        "IA",
+        "tutoría",
+        "aprendizaje",
+        "voz",
+        "profesores"
       ]
     },
     "settings": {
-      "title": "Impostazioni | MirrorBuddy",
-      "description": "Personalizza la tua esperienza con profili di accessibilità, preferenze di caratteri, controlli privacy e impostazioni dell'account adatte alle tue esigenze.",
+      "title": "Configuración | MirrorBuddy",
+      "description": "Personaliza tu experiencia con perfiles de accesibilidad, preferencias de fuentes, controles de privacidad y configuración de cuenta adaptada a tus necesidades.",
       "keywords": [
-        "impostazioni",
-        "preferenze",
-        "accessibilità",
-        "personalizzazione",
-        "privacy"
+        "configuración",
+        "preferencias",
+        "accesibilidad",
+        "personalización",
+        "privacidad"
       ]
     },
     "aiTransparency": {
-      "title": "Trasparenza AI | MirrorBuddy",
-      "description": "Scopri come MirrorBuddy utilizza l'AI responsabilmente, impegni di trasparenza e come garantiamo AI sicura per educazione con forti misure di protezione.",
+      "title": "Transparencia IA | MirrorBuddy",
+      "description": "Descubre cómo MirrorBuddy utiliza la IA de manera responsable, compromisos de transparencia y cómo garantizamos IA segura para educación con fuertes medidas de protección.",
       "keywords": [
-        "AI",
-        "trasparenza",
-        "sicurezza",
-        "conformità",
-        "AI responsabile"
+        "IA",
+        "transparencia",
+        "seguridad",
+        "cumplimiento",
+        "IA responsable"
       ]
     },
     "privacy": {
-      "title": "Politica sulla Privacy | MirrorBuddy",
-      "description": "Comprendi come MirrorBuddy protegge i dati, rispetta GDPR, gestisce informazioni in modo sicuro e garantisce privacy con comunicazioni crittografate qui.",
+      "title": "Política de Privacidad | MirrorBuddy",
+      "description": "Comprende cómo MirrorBuddy protege los datos, respeta GDPR, gestiona información de manera segura y garantiza privacidad con comunicaciones cifradas aquí.",
       "keywords": [
-        "privacy",
+        "privacidad",
         "GDPR",
-        "protezione dei dati",
-        "sicurezza",
-        "conformità"
+        "protección de datos",
+        "seguridad",
+        "cumplimiento"
       ]
     },
     "terms": {
-      "title": "Condizioni di Servizio | MirrorBuddy",
-      "description": "Leggi i nostri termini di servizio, accordi utente, politiche di uso accettabile e informazioni legali per l'utilizzo della piattaforma educativa MirrorBuddy.",
-      "keywords": ["condizioni", "servizio", "legale", "accordo", "politiche"]
+      "title": "Términos de Servicio | MirrorBuddy",
+      "description": "Lee nuestros términos de servicio, acuerdos de usuario, políticas de uso aceptable e información legal para el uso de la plataforma educativa MirrorBuddy.",
+      "keywords": ["términos", "servicio", "legal", "acuerdo", "políticas"]
     },
-    "title": "MirrorBuddy - Il tuo compagno di studio",
-    "description": "Piattaforma educativa basata su AI per studenti con bisogni speciali",
-    "keywords": "educazione, AI, apprendimento, tutor, studenti, DSA"
+    "title": "MirrorBuddy - Tu compañero de estudio",
+    "description": "Plataforma educativa basada en IA para estudiantes con necesidades especiales",
+    "keywords": "educación, IA, aprendizaje, tutor, estudiantes, DEA"
   }
 }

@@ -110,11 +110,11 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="search"
-            placeholder={t("search-placeholder")}
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-8 pr-10 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
-            aria-label={t("search-aria-label")}
+            aria-label={t("searchAriaLabel")}
           />
           {searchQuery && (
             <button
@@ -148,7 +148,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700",
           )}
         >
-          {t("all-button")}
+          {t("allButton")}
         </button>
         {subjects.map((subject) => {
           const isSelected = selectedSubject === subject;
@@ -194,10 +194,10 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
         <div className="text-center py-12">
           <Filter className="h-12 w-12 mx-auto text-slate-400 mb-4" />
           <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
-            {t("empty-title")}
+            {t("emptyTitle")}
           </h3>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            {t("empty-description")}
+            {t("emptyDescription")}
           </p>
         </div>
       )}

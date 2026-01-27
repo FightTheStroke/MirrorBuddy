@@ -79,7 +79,7 @@ export function SidebarNavigation({
   onToggleArchived,
   className,
 }: SidebarNavigationProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
   const toggleExpanded = useCallback((id: string) => {
@@ -131,14 +131,14 @@ export function SidebarNavigation({
   return (
     <nav
       className={cn("flex flex-col gap-4 p-4", className)}
-      aria-label={t("sidebar.navigation-aria-label")}
+      aria-label={t("sidebar.navigationAriaLabel")}
     >
       {/* Quick filters */}
       <section>
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2 px-3">
-          {t("sidebar.quick-filters-title")}
+          {t("sidebar.quickFiltersTitle")}
         </h2>
-        <div role="tree" aria-label={t("sidebar.quick-filters-aria-label")}>
+        <div role="tree" aria-label={t("sidebar.quickFiltersAriaLabel")}>
           <NavItem
             icon={<Clock className="w-4 h-4" />}
             label={t("sidebar.recent")}
@@ -168,7 +168,7 @@ export function SidebarNavigation({
       <section>
         <div className="flex items-center justify-between mb-2 px-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {t("sidebar.collections-title")}
+            {t("sidebar.collectionsTitle")}
           </h2>
           {onCreateCollection && (
             <button
@@ -178,16 +178,16 @@ export function SidebarNavigation({
                 "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300",
                 "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               )}
-              aria-label={t("sidebar.create-collection-aria-label")}
+              aria-label={t("sidebar.createCollectionAriaLabel")}
             >
               <Plus className="w-4 h-4" />
             </button>
           )}
         </div>
-        <div role="tree" aria-label={t("sidebar.collections-aria-label")}>
+        <div role="tree" aria-label={t("sidebar.collectionsAriaLabel")}>
           {collections.length === 0 ? (
             <p className="px-3 py-2 text-sm text-slate-500">
-              {t("sidebar.no-collections")}
+              {t("sidebar.noCollections")}
             </p>
           ) : (
             collections.map((c) => renderCollection(c))
@@ -199,7 +199,7 @@ export function SidebarNavigation({
       <section>
         <div className="flex items-center justify-between mb-2 px-3">
           <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-            {t("sidebar.tags-title")}
+            {t("sidebar.tagsTitle")}
           </h2>
           {onCreateTag && (
             <button
@@ -209,7 +209,7 @@ export function SidebarNavigation({
                 "text-slate-400 hover:text-slate-600 dark:hover:text-slate-300",
                 "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               )}
-              aria-label={t("sidebar.create-tag-aria-label")}
+              aria-label={t("sidebar.createTagAriaLabel")}
             >
               <Plus className="w-4 h-4" />
             </button>
@@ -218,10 +218,10 @@ export function SidebarNavigation({
         <div
           className="flex flex-wrap gap-2 px-3"
           role="group"
-          aria-label={t("sidebar.tags-aria-label")}
+          aria-label={t("sidebar.tagsAriaLabel")}
         >
           {tags.length === 0 ? (
-            <p className="text-sm text-slate-500">{t("sidebar.no-tags")}</p>
+            <p className="text-sm text-slate-500">{t("sidebar.noTags")}</p>
           ) : (
             tags.map((tag) => (
               <button

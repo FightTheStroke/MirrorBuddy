@@ -23,15 +23,17 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
         animate={{ scale: 1, rotate: -12 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
         className="absolute -top-4 -right-4 md:-right-12 z-10"
-        aria-label="Beta Privata - Accesso su invito"
+        aria-label={`${t("betaBadge")} - ${t("betaSubtitle")}`}
       >
         <div className="relative">
           <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900 transform rotate-[-12deg] hover:rotate-[-8deg] transition-transform duration-300">
             <div className="flex flex-col items-center gap-1">
               <span className="text-xs font-bold tracking-wider uppercase">
-                Beta Privata
+                {t("betaBadge")}
               </span>
-              <span className="text-[10px] opacity-90">Accesso su invito</span>
+              <span className="text-[10px] opacity-90">
+                {t("betaSubtitle")}
+              </span>
             </div>
           </div>
           <div className="absolute inset-0 bg-purple-600/20 blur-xl -z-10 rounded-2xl" />
@@ -65,7 +67,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.1 }}
               className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
             >
-              Bentornato,{" "}
+              {t("welcomeBack")}{" "}
               <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
                 {userName}!
               </span>
@@ -76,7 +78,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               transition={{ delay: 0.2 }}
               className="text-2xl text-gray-700 dark:text-gray-200 mb-4 font-semibold"
             >
-              Pronto per la tua prossima avventura di apprendimento?
+              {t("welcomeBackSubtitle")}
             </motion.p>
           </>
         ) : (
@@ -100,11 +102,11 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             >
               {t("learn")}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                {t("with-teachers")}
+                {t("withTeachers")}
               </span>
               ,{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                {t("any-ability")}
+                {t("anyAbility")}
               </span>
             </motion.p>
             <motion.p
@@ -112,21 +114,8 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6"
-            >
-              Studia matematica{" "}
-              <strong className="text-blue-600 dark:text-blue-400">
-                con Euclide
-              </strong>
-              , fisica{" "}
-              <strong className="text-purple-600 dark:text-purple-400">
-                con Feynman
-              </strong>
-              , chimica{" "}
-              <strong className="text-pink-600 dark:text-pink-400">
-                con Marie Curie
-              </strong>
-              . 22 Professori storici ti accompagnano personalmente.
-            </motion.p>
+              dangerouslySetInnerHTML={{ __html: t("description") }}
+            />
             <AccessibilityFeatures t={t} />
           </>
         )}
@@ -142,10 +131,10 @@ interface AccessibilityFeaturesProps {
 function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
   // Accessibility features - 4 key capabilities in grid
   const ACCESSIBILITY_FEATURES = [
-    { icon: "📖", label: t("readable-fonts") },
-    { icon: "🗺️", label: t("mind-maps") },
-    { icon: "🔊", label: t("text-to-speech") },
-    { icon: "🎯", label: t("adaptive-quizzes") },
+    { icon: "📖", label: t("readableFonts") },
+    { icon: "🗺️", label: t("mindMaps") },
+    { icon: "🔊", label: t("textToSpeech") },
+    { icon: "🎯", label: t("adaptiveQuizzes") },
   ];
 
   return (
@@ -161,7 +150,7 @@ function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
         <div className="relative z-10">
           <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
             <span aria-hidden="true">♿</span>
-            Progettato per tutti gli stili di apprendimento
+            {t("accessibility.title")}
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {ACCESSIBILITY_FEATURES.map((feature, idx) => (
