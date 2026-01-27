@@ -86,11 +86,7 @@
       "readableFonts": "Readable fonts",
       "textToSpeech": "Text to speech",
       "welcome": "Welcome",
-      "withTeachers": "With teachers",
-      "title": "Benvenuto in MirrorBuddy",
-      "subtitle": "Il tuo compagno di studio intelligente",
-      "cta": "Inizia ora",
-      "secondaryCta": "Scopri di più"
+      "withTeachers": "With teachers"
     },
     "quickStart": {
       "heading": "Get Started",

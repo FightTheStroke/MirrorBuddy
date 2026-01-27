@@ -18,13 +18,10 @@ export function FeatureGuide({
   highContrast = false,
   className,
 }: FeatureGuideProps) {
-  const t = useTranslations("education.parent-dashboard.guide");
+  const t = useTranslations("education.parentDashboard.guide");
 
   return (
-    <section
-      className={cn("space-y-4", className)}
-      aria-label={t("aria-label")}
-    >
+    <section className={cn("space-y-4", className)} aria-label={t("ariaLabel")}>
       <div className="flex items-center gap-2">
         <HelpCircle
           className={cn(

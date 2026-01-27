@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
 export function EmptyInsightsState() {
-  const t = useTranslations("education.parent-dashboard.empty");
+  const t = useTranslations("education.parentDashboard.empty");
   const { settings } = useAccessibilityStore();
 
   return (

@@ -107,10 +107,10 @@ export function PrinciplesStep(_props: PrinciplesStepProps) {
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              {t("welcome-to-school", { name: data.name })}
+              {t("welcomeToSchool", { name: data.name })}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {t("what-makes-us-special")}
+              {t("whatMakesUsSpecial")}
             </p>
           </div>
           {/* Voice toggle */}

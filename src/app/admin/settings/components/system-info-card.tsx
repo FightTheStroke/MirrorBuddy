@@ -17,7 +17,7 @@ import {
  * - Build date (hardcoded to current date)
  */
 export function SystemInfoCard() {
-  const t = useTranslations("admin.settings.system-info");
+  const t = useTranslations("admin.settings.systemInfo");
 
   // Get version from package.json
   const version = "0.10.0";
@@ -67,7 +67,7 @@ export function SystemInfoCard() {
           {/* Node Version */}
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">
-              {t("node-version")}
+              {t("nodeVersion")}
             </p>
             <p className="text-lg font-semibold text-foreground">
               {nodeVersion}
@@ -77,7 +77,7 @@ export function SystemInfoCard() {
           {/* Build Date */}
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">
-              {t("build-date")}
+              {t("buildDate")}
             </p>
             <p className="text-lg font-semibold text-foreground">{buildDate}</p>
           </div>

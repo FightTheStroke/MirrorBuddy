@@ -33,7 +33,7 @@ interface GoogleAccountCardProps {
 }
 
 export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
-  const t = useTranslations("google-drive");
+  const t = useTranslations("googleDrive");
   const tCommon = useTranslations("common");
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);

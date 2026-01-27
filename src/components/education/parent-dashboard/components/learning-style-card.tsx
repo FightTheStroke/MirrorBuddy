@@ -21,7 +21,7 @@ interface LearningStyleCardProps {
 }
 
 export function LearningStyleCard({ style }: LearningStyleCardProps) {
-  const t = useTranslations("education.parent-dashboard.learning-style");
+  const t = useTranslations("education.parentDashboard.learningStyle");
   const { settings } = useAccessibilityStore();
 
   const channelIcons = {
@@ -72,7 +72,7 @@ export function LearningStyleCard({ style }: LearningStyleCardProps) {
           )}
         />
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {t("preferred-channel")}
+          {t("preferredChannel")}
         </p>
         <p
           className={cn(
@@ -103,7 +103,7 @@ export function LearningStyleCard({ style }: LearningStyleCardProps) {
           )}
         />
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {t("optimal-session")}
+          {t("optimalSession")}
         </p>
         <p
           className={cn(
@@ -134,7 +134,7 @@ export function LearningStyleCard({ style }: LearningStyleCardProps) {
           )}
         />
         <p className="text-xs text-slate-500 dark:text-slate-400">
-          {t("best-time")}
+          {t("bestTime")}
         </p>
         <p
           className={cn(

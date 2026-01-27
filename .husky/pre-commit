@@ -35,12 +35,13 @@ fi
 
 # Check for mobile regression patterns (F-09)
 # Pattern: w-full followed by sm:w-*, md:w-*, or lg:w-* WITHOUT max-w-* constraint
-# This catches patterns like "w-full sm:w-72" which break mobile layouts
+# EXCLUDES: w-auto patterns (valid for buttons) and w-64/similar (valid for sidebars)
+# Only checks ADDED/MODIFIED lines, not pre-existing code
 echo "📱 Checking for mobile regression patterns..."
-MOBILE_ISSUES=$(git diff --cached --name-only | xargs grep -n "w-full sm:w-\|w-full md:w-\|w-full lg:w-" --include="*.tsx" --include="*.ts" 2>/dev/null | grep -v "max-w-" | grep -v "node_modules" || true)
+MOBILE_ISSUES=$(git diff --cached -U0 -- "*.tsx" "*.ts" 2>/dev/null | grep "^+" | grep -v "^+++" | grep "w-full sm:w-\|w-full md:w-\|w-full lg:w-" | grep -v "max-w-" | grep -v "w-auto" || true)
 
 if [ -n "$MOBILE_ISSUES" ]; then
-  echo "❌ Mobile regression pattern detected!"
+  echo "❌ Mobile regression pattern detected in NEW code!"
   echo ""
   echo "Found 'w-full sm:w-*' or similar without 'max-w-*' constraint:"
   echo "$MOBILE_ISSUES"
@@ -51,6 +52,7 @@ if [ -n "$MOBILE_ISSUES" ]; then
   echo "  • w-28 sm:w-72                    (fixed width on mobile)"
   echo "  • w-full max-w-xs sm:w-72        (constrained full width)"
   echo "  • w-[min(7rem,85vw)] sm:w-72     (CSS min function)"
+  echo "  • w-full sm:w-auto               (valid for buttons)"
   echo ""
   exit 1
 fi

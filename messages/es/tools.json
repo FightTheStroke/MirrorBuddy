@@ -1,103 +1,103 @@
 {
   "astuccio": {
-    "title": "Astuccio",
-    "backToAstuccio": "← Torna all'Astuccio",
-    "toolsCount": "{count} strumenti",
+    "title": "Estuche de herramientas",
+    "backToAstuccio": "← Volver al estuche",
+    "toolsCount": "{count} herramientas",
     "categories": {
       "upload": {
-        "title": "Carica",
-        "subtitle": "Importa i tuoi materiali per generare supporti di studio"
+        "title": "Cargar",
+        "subtitle": "Importa tus materiales para generar apoyos de estudio"
       },
       "create": {
-        "title": "Crea",
-        "subtitle": "Genera materiali di studio con l'aiuto dei Maestri"
+        "title": "Crear",
+        "subtitle": "Genera materiales de estudio con la ayuda de los profesores"
       },
       "search": {
-        "title": "Cerca",
-        "subtitle": "Trova risorse e approfondimenti sul web"
+        "title": "Buscar",
+        "subtitle": "Encuentra recursos y conocimientos en la web"
       }
     },
     "info": {
-      "howItWorks": "Come Funziona?",
+      "howItWorks": "¿Cómo funciona?",
       "step1": {
-        "title": "Scegli lo Strumento",
-        "description": "Seleziona lo strumento più adatto al tuo obiettivo di apprendimento"
+        "title": "Elige la herramienta",
+        "description": "Selecciona la herramienta más adecuada para tu objetivo de aprendizaje"
       },
       "step2": {
-        "title": "Scegli il Maestro",
-        "description": "Ogni maestro ha un approccio unico per aiutarti a imparare"
+        "title": "Elige el profesor",
+        "description": "Cada profesor tiene un enfoque único para ayudarte a aprender"
       },
       "step3": {
-        "title": "Salva nello Zaino",
-        "description": "I materiali creati vengono salvati nel tuo Zaino per riusarli quando vuoi"
+        "title": "Guarda en la mochila",
+        "description": "Los materiales creados se guardan en tu mochila para reutilizarlos cuando quieras"
       },
       "studyTip": {
-        "title": "Consiglio per Studiare",
-        "description": "Inizia con una <strong>Mappa Mentale</strong> per avere una visione d'insieme, poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave, e infine verifica la tua preparazione con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!"
+        "title": "Consejo de estudio",
+        "description": "Comienza con un <strong>Mapa mental</strong> para tener una visión general, luego crea <strong>Tarjetas</strong> para memorizar los conceptos clave, y finalmente verifica tu preparación con un <strong>Quiz</strong>. ¡Todos los materiales se guardarán en tu <strong>mochila</strong>!"
       }
     },
-    "backButton": "Back Button",
+    "backButton": "Botón atrás",
     "how_it_works": {
-      "step1_desc": "Step1 desc",
-      "step1_title": "Step1 title",
-      "step2_desc": "Step2 desc",
-      "step2_title": "Step2 title",
-      "step3_desc": "Step3 desc",
-      "step3_title": "Step3 title",
-      "title": "Titolo"
+      "step1_desc": "Elige una herramienta",
+      "step1_title": "Paso 1: Selecciona una herramienta",
+      "step2_desc": "Elige un profesor",
+      "step2_title": "Paso 2: Selecciona un profesor",
+      "step3_desc": "Guarda en tu mochila",
+      "step3_title": "Paso 3: Guarda en la mochila",
+      "title": "Cómo funciona"
     },
-    "itemCount": "Item Count",
+    "itemCount": "Cantidad de elementos",
     "study_tip": {
-      "description": "Descrizione",
-      "title": "Titolo"
+      "description": "Consejos de estudio personalizados",
+      "title": "Consejo de estudio"
     }
   },
   "zaino": {
     "print": {
-      "success": "Stampa avviata",
-      "successDescription": "Il documento si aprirà nella finestra di stampa.",
-      "error": "Errore di stampa",
-      "errorDescription": "Impossibile aprire la finestra di stampa. Controlla le impostazioni popup.",
-      "downloadSuccess": "File scaricato",
-      "downloadSuccessDescription": "Il file HTML è stato scaricato.",
-      "downloadError": "Errore",
-      "downloadErrorDescription": "Impossibile scaricare il file.",
-      "ariaLabel": "Stampa {title}",
-      "button": "Stampa",
-      "optionsAriaLabel": "Opzioni stampa per {title}",
-      "printPdf": "Stampa PDF",
-      "downloadHtml": "Scarica HTML"
+      "success": "Impresión iniciada",
+      "successDescription": "El documento se abrirá en la ventana de impresión.",
+      "error": "Error de impresión",
+      "errorDescription": "No se puede abrir la ventana de impresión. Verifica la configuración de ventanas emergentes.",
+      "downloadSuccess": "Archivo descargado",
+      "downloadSuccessDescription": "El archivo HTML ha sido descargado.",
+      "downloadError": "Error de descarga",
+      "downloadErrorDescription": "No se puede descargar el archivo.",
+      "ariaLabel": "Imprimir {title}",
+      "button": "Imprimir",
+      "optionsAriaLabel": "Opciones de impresión para {title}",
+      "printPdf": "Imprimir PDF",
+      "downloadHtml": "Descargar HTML"
     }
   },
   "tools": {
     "pdf": {
       "label": "PDF",
-      "description": "Genera documenti PDF dei contenuti",
+      "description": "Genera documentos PDF del contenido",
       "preview": {
-        "analyze": "Analyze",
-        "analyzePages": "Analyze pages",
-        "cancel": "Annulla",
-        "clickToSelect": "Click to select",
-        "close": "Chiudi",
-        "page": "Page",
-        "pages": "Pages",
-        "processing": "Elaborazione...",
-        "selectedCount": "Selected count",
-        "truncatedInfo": "Truncated info"
+        "analyze": "Analizar",
+        "analyzePages": "Analizar páginas",
+        "cancel": "Cancelar",
+        "clickToSelect": "Haz clic para seleccionar",
+        "close": "Cerrar",
+        "page": "Página",
+        "pages": "Páginas",
+        "processing": "Procesando...",
+        "selectedCount": "Cantidad seleccionada",
+        "truncatedInfo": "Información truncada"
       }
     },
     "webcam": {
-      "label": "Webcam",
-      "description": "Usa la webcam per interazioni visive",
-      "cancel": "Annulla",
-      "confirm": "Conferma",
-      "inProgress": "In Progress",
-      "positionContent": "Position Content",
-      "retake": "Retake",
-      "startingCamera": "Starting Camera",
-      "switchCamera": "Switch Camera",
-      "switchingCamera": "Switching Camera",
-      "takePhoto": "Take Photo"
+      "label": "Cámara web",
+      "description": "Usa la cámara web para interacciones visuales",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
+      "inProgress": "En progreso",
+      "positionContent": "Posicionar contenido",
+      "retake": "Repetir",
+      "startingCamera": "Iniciando cámara",
+      "switchCamera": "Cambiar cámara",
+      "switchingCamera": "Cambiando cámara",
+      "takePhoto": "Tomar foto"
     },
     "homework": {
       "label": "Compiti",
@@ -124,29 +124,29 @@
       "description": "Esplora concetti STEM con simulazioni interattive"
     },
     "summary": {
-      "label": "Riassunto",
-      "description": "Genera riassunti automatici dei contenuti",
-      "cancel": "Annulla",
-      "convertToMindmap": "Convert To Mindmap",
-      "edit": "Modifica",
-      "exportPdf": "Export Pdf",
-      "generateFlashcards": "Generate Flashcards",
-      "hide": "Hide",
+      "label": "Resumen",
+      "description": "Genera resúmenes automáticos del contenido",
+      "cancel": "Cancelar",
+      "convertToMindmap": "Convertir a mapa mental",
+      "edit": "Editar",
+      "exportPdf": "Exportar PDF",
+      "generateFlashcards": "Generar tarjetas",
+      "hide": "Ocultar",
       "motivational": {
-        "excellent": "Excellent",
-        "good": "Good",
-        "start": "Start"
+        "excellent": "Excelente",
+        "good": "Bueno",
+        "start": "Comenzar"
       },
-      "noContentYet": "No Content Yet",
-      "preview": "Preview",
-      "save": "Salva",
-      "saved": "Saved",
-      "show": "Show",
-      "structure": "Structure",
-      "titlePlaceholder": "Title Placeholder",
-      "unsaved": "Unsaved",
-      "word": "Word",
-      "words": "Words"
+      "noContentYet": "Sin contenido aún",
+      "preview": "Vista previa",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "show": "Mostrar",
+      "structure": "Estructura",
+      "titlePlaceholder": "Título del resumen",
+      "unsaved": "No guardado",
+      "word": "Palabra",
+      "words": "Palabras"
     },
     "diagram": {
       "label": "Diagramma",
@@ -165,129 +165,129 @@
       "description": "Crea grafici e visualizzazioni dati"
     },
     "typing": {
-      "label": "Impara a Digitare",
-      "description": "Impara a digitare con lezioni progressive e accessibilità DSA",
-      "developmentMessage": "Development Message",
+      "label": "Aprender a escribir",
+      "description": "Aprende a escribir con lecciones progresivas y accesibilidad DUA",
+      "developmentMessage": "Función en desarrollo",
       "featureList": {
-        "accessibility": "Accessibility",
-        "ai": "Ai",
-        "games": "Giochi",
-        "multilingual": "Multilingual",
-        "progressive": "Progressive",
-        "singleHand": "Single Hand",
-        "tracking": "Tracking"
+        "accessibility": "Accesibilidad",
+        "ai": "IA",
+        "games": "Juegos",
+        "multilingual": "Multilingüe",
+        "progressive": "Progresivo",
+        "singleHand": "Una sola mano",
+        "tracking": "Seguimiento"
       },
-      "features": "Funzionalità",
-      "level": "Livello",
-      "none": "Nessuno",
-      "recommendedLesson": "Recommended Lesson",
-      "title": "Titolo"
+      "features": "Características",
+      "level": "Nivel",
+      "none": "Ninguno",
+      "recommendedLesson": "Lección recomendada",
+      "title": "Aprende a escribir"
     },
     "search": {
-      "label": "Ricerca Web",
-      "description": "Cerca informazioni, video e risorse educative sul web",
-      "noResults": "No Results",
-      "resultCount": "Result Count",
-      "wikipediaOnly": "Wikipedia Only"
+      "label": "Búsqueda web",
+      "description": "Busca información, videos y recursos educativos en la web",
+      "noResults": "Sin resultados",
+      "resultCount": "Cantidad de resultados",
+      "wikipediaOnly": "Solo Wikipedia"
     },
-    "backToAstuccio": "Back To Astuccio",
-    "title": "Titolo",
-    "toolsCount": "Tools Count",
+    "backToAstuccio": "Volver al estuche",
+    "title": "Herramientas",
+    "toolsCount": "Cantidad de herramientas",
     "connection": {
-      "connected": "Connesso",
-      "connecting": "Connessione...",
-      "disconnected": "Disconnesso",
-      "error": "Errore",
-      "reconnecting": "Riconnessione..."
+      "connected": "Conectado",
+      "connecting": "Conectando...",
+      "disconnected": "Desconectado",
+      "error": "Error",
+      "reconnecting": "Reconectando..."
     },
     "flashcards": {
-      "ratingQuestion": "Rating Question",
-      "label": "Flashcard",
-      "description": "Studia con flashcard per memorizzare meglio"
+      "ratingQuestion": "Pregunta de calificación",
+      "label": "Tarjeta",
+      "description": "Estudia con tarjetas para memorizar mejor"
     },
     "loading": {
-      "cancelled": "Cancelled",
-      "chunksReceived": "Chunks Received",
-      "error": "Errore",
-      "loadingData": "Loading Data",
-      "loadingMaterial": "Loading Material",
-      "noData": "No Data",
-      "preparing": "Preparazione..."
+      "cancelled": "Cancelado",
+      "chunksReceived": "Fragmentos recibidos",
+      "error": "Error",
+      "loadingData": "Cargando datos",
+      "loadingMaterial": "Cargando material",
+      "noData": "Sin datos",
+      "preparing": "Preparando..."
     },
     "markmap": {
       "accessibility": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Accesibilidad del mapa mental",
+        "title": "Accesibilidad"
       },
       "download": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Descargar mapa mental",
+        "title": "Descargar"
       },
-      "error": "Errore",
+      "error": "Error",
       "fullscreen": {
-        "ariaLabelEnter": "Aria Label Enter",
-        "ariaLabelExit": "Aria Label Exit",
-        "enter": "Enter",
-        "exit": "Exit"
+        "ariaLabelEnter": "Pantalla completa",
+        "ariaLabelExit": "Salir de pantalla completa",
+        "enter": "Pantalla completa",
+        "exit": "Salir"
       },
-      "instructions": "Instructions",
-      "interactiveMindmapDescription": "Interactive Mindmap Description",
-      "interactiveRenderMessage": "Interactive Render Message",
-      "mindmapDescription": "Mindmap Description",
+      "instructions": "Instrucciones",
+      "interactiveMindmapDescription": "Mapa mental interactivo con navegación y zoom",
+      "interactiveRenderMessage": "Renderizando mapa mental interactivo...",
+      "mindmapDescription": "Mapa mental",
       "print": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Imprimir mapa mental",
+        "title": "Imprimir"
       },
       "resetView": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Restablecer vista",
+        "title": "Restablecer"
       },
-      "successMessage": "Success Message",
+      "successMessage": "Mapa mental cargado exitosamente",
       "zoomIn": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Acercar",
+        "title": "Acercar"
       },
       "zoomOut": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Alejar",
+        "title": "Alejar"
       }
     },
     "print": {
-      "ariaOptions": "Aria Options",
-      "ariaPrint": "Aria Print",
-      "buttonLabel": "Button Label",
-      "downloadSuccessMessage": "Download Success Message",
-      "downloadSuccessTitle": "Download Success Title",
-      "errorGenericMessage": "Error Generic Message",
-      "errorMessage": "Error Message",
-      "errorTitle": "Error Title",
-      "htmlOption": "Html Option",
-      "pdfOption": "Pdf Option",
-      "successMessage": "Success Message",
-      "successTitle": "Success Title"
+      "ariaOptions": "Opciones de impresión",
+      "ariaPrint": "Imprimir",
+      "buttonLabel": "Etiqueta del botón",
+      "downloadSuccessMessage": "Mensaje de descarga exitosa",
+      "downloadSuccessTitle": "Descarga exitosa",
+      "errorGenericMessage": "Mensaje de error genérico",
+      "errorMessage": "Mensaje de error",
+      "errorTitle": "Título del error",
+      "htmlOption": "Opción HTML",
+      "pdfOption": "Opción PDF",
+      "successMessage": "Mensaje de éxito",
+      "successTitle": "Título de éxito"
     },
     "toolPanel": {
-      "building": "Building",
-      "close": "Chiudi",
-      "error": "Errore",
-      "expand": "Espandi",
+      "building": "Generando",
+      "close": "Cerrar",
+      "error": "Error",
+      "expand": "Expandir",
       "labels": {
-        "chart": "Chart",
+        "chart": "Gráfico",
         "demo": "Demo",
-        "diagram": "Diagram",
-        "flashcard": "Flashcard",
-        "formula": "Formula",
-        "mindmap": "Mindmap",
-        "pdf": "Pdf",
+        "diagram": "Diagrama",
+        "flashcard": "Tarjeta",
+        "formula": "Fórmula",
+        "mindmap": "Mapa mental",
+        "pdf": "PDF",
         "quiz": "Quiz",
-        "search": "Cerca",
-        "summary": "Summary",
-        "timeline": "Timeline",
-        "webcam": "Webcam"
+        "search": "Buscar",
+        "summary": "Resumen",
+        "timeline": "Línea temporal",
+        "webcam": "Cámara web"
       },
-      "minimize": "Riduci a icona",
-      "progress": "Progresso",
-      "unsupportedToolType": "Unsupported Tool Type"
+      "minimize": "Minimizar",
+      "progress": "Progreso",
+      "unsupportedToolType": "Tipo de herramienta no compatible"
     },
     "voice": {
       "label": "Voce",
@@ -296,82 +296,82 @@
   },
   "studyKit": {
     "exportModal": {
-      "cancel": "Annulla",
-      "closeLabel": "Close Label",
-      "description": "Descrizione",
-      "error": "Errore",
-      "export": "Export",
-      "formatLabel": "Format Label",
-      "generating": "Generazione...",
-      "profileLabel": "Profile Label",
+      "cancel": "Cancelar",
+      "closeLabel": "Cerrar",
+      "description": "Descripción",
+      "error": "Error",
+      "export": "Exportar",
+      "formatLabel": "Formato",
+      "generating": "Generando...",
+      "profileLabel": "Perfil",
       "success": {
-        "default": "Default",
-        "withZaino": "With Zaino"
+        "default": "Predeterminado",
+        "withZaino": "Con mochila"
       },
-      "title": "Titolo"
+      "title": "Exportar"
     },
     "list": {
-      "cancel": "Annulla",
-      "delete": "Elimina",
-      "deleteConfirm": "Delete Confirm",
-      "deleteError": "Delete Error",
+      "cancel": "Cancelar",
+      "delete": "Eliminar",
+      "deleteConfirm": "Confirmar eliminación",
+      "deleteError": "Error de eliminación",
       "empty": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "No hay kits de estudio",
+        "title": "Sin kits"
       },
       "error": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Error al cargar los kits",
+        "title": "Error"
       },
       "filters": {
-        "all": "Tutti",
-        "error": "Errore",
-        "processing": "Elaborazione...",
-        "ready": "Ready"
+        "all": "Todos",
+        "error": "Error",
+        "processing": "Procesando...",
+        "ready": "Listo"
       },
-      "open": "Apri",
+      "open": "Abrir",
       "processing": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Procesando kit...",
+        "title": "Procesando"
       },
-      "status": "Stato"
+      "status": "Estado"
     },
     "uploadProgress": {
-      "loadAnother": "Load Another",
-      "processingNote": "Processing Note",
+      "loadAnother": "Cargar otro",
+      "processingNote": "Se está procesando tu PDF. Esto puede tardar unos minutos.",
       "status": {
-        "error": "Errore",
-        "processing": "Elaborazione...",
-        "success": "Completato",
-        "uploading": "Uploading"
+        "error": "Error",
+        "processing": "Procesando...",
+        "success": "Completado",
+        "uploading": "Cargando"
       }
     },
     "view": {
-      "back": "Indietro",
-      "backToList": "Back To List",
+      "back": "Atrás",
+      "backToList": "Volver a la lista",
       "features": {
         "demo": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Simulación interactiva",
+          "title": "Demo"
         },
         "mindmap": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Mapa mental visual",
+          "title": "Mapa mental"
         },
         "quiz": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Preguntas de práctica",
+          "title": "Quiz"
         },
         "summary": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Resumen del contenido",
+          "title": "Resumen"
         }
       },
-      "header": "Header",
-      "myKits": "My Kits",
-      "newKit": "New Kit",
-      "subtitle": "Sottotitolo",
-      "uploadTitle": "Upload Title"
+      "header": "Encabezado",
+      "myKits": "Mis kits",
+      "newKit": "Nuevo kit",
+      "subtitle": "Subtítulo",
+      "uploadTitle": "Cargar PDF"
     }
   }
 }

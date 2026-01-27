@@ -36,20 +36,20 @@
         "description": "Beginnen Sie mit einer <strong>Mind Map</strong> für einen Überblick, erstellen Sie dann <strong>Flashcards</strong>, um Schlüsselkonzepte zu merken, und testen Sie schließlich Ihre Vorbereitung mit einem <strong>Quiz</strong>. Alle Materialien werden in Ihrem <strong>Rucksack</strong> gespeichert!"
       }
     },
-    "backButton": "Back Button",
+    "backButton": "Zurück",
     "how_it_works": {
-      "step1_desc": "Step1 desc",
-      "step1_title": "Step1 title",
-      "step2_desc": "Step2 desc",
-      "step2_title": "Step2 title",
-      "step3_desc": "Step3 desc",
-      "step3_title": "Step3 title",
-      "title": "Titolo"
+      "step1_desc": "Beschreibung Schritt 1",
+      "step1_title": "Schritt 1",
+      "step2_desc": "Beschreibung Schritt 2",
+      "step2_title": "Schritt 2",
+      "step3_desc": "Beschreibung Schritt 3",
+      "step3_title": "Schritt 3",
+      "title": "Wie es funktioniert"
     },
-    "itemCount": "Item Count",
+    "itemCount": "Anzahl Elemente",
     "study_tip": {
-      "description": "Descrizione",
-      "title": "Titolo"
+      "description": "Beginnen Sie mit einer Mind Map für einen Überblick, erstellen Sie dann Flashcards, um Schlüsselkonzepte zu merken",
+      "title": "Lerntipp"
     }
   },
   "zaino": {
@@ -74,16 +74,16 @@
       "label": "PDF hochladen",
       "description": "Laden Sie ein PDF-Dokument hoch und generieren Sie automatisch Lernmaterialien",
       "preview": {
-        "analyze": "Analyze",
-        "analyzePages": "Analyze pages",
+        "analyze": "Analysieren",
+        "analyzePages": "Seiten analysieren",
         "cancel": "Abbrechen",
-        "clickToSelect": "Click to select",
+        "clickToSelect": "Klicken zum Auswählen",
         "close": "Schließen",
-        "page": "Page",
-        "pages": "Pages",
-        "processing": "Elaborazione...",
-        "selectedCount": "Selected count",
-        "truncatedInfo": "Truncated info"
+        "page": "Seite",
+        "pages": "Seiten",
+        "processing": "Verarbeitung...",
+        "selectedCount": "Anzahl ausgewählt",
+        "truncatedInfo": "Gekürzte Info"
       }
     },
     "webcam": {
@@ -91,13 +91,13 @@
       "description": "Fotografieren Sie die Tafel oder Ihre Notizen, um Materialien zu generieren",
       "cancel": "Abbrechen",
       "confirm": "Bestätigen",
-      "inProgress": "In Progress",
-      "positionContent": "Position Content",
-      "retake": "Retake",
-      "startingCamera": "Starting Camera",
-      "switchCamera": "Switch Camera",
-      "switchingCamera": "Switching Camera",
-      "takePhoto": "Take Photo"
+      "inProgress": "In Bearbeitung",
+      "positionContent": "Inhalt positionieren",
+      "retake": "Erneut aufnehmen",
+      "startingCamera": "Kamera wird gestartet",
+      "switchCamera": "Kamera wechseln",
+      "switchingCamera": "Kamera wird gewechselt",
+      "takePhoto": "Foto aufnehmen"
     },
     "homework": {
       "label": "Hausaufgabenhilfe",
@@ -127,26 +127,26 @@
       "label": "Zusammenfassung",
       "description": "Generieren Sie klare und strukturierte Synthesen von Schlüsselkonzepten",
       "cancel": "Abbrechen",
-      "convertToMindmap": "Convert To Mindmap",
+      "convertToMindmap": "In Mind-Map konvertieren",
       "edit": "Bearbeiten",
-      "exportPdf": "Export Pdf",
-      "generateFlashcards": "Generate Flashcards",
-      "hide": "Hide",
+      "exportPdf": "Als PDF exportieren",
+      "generateFlashcards": "Lernkarten generieren",
+      "hide": "Verbergen",
       "motivational": {
-        "excellent": "Excellent",
-        "good": "Good",
-        "start": "Start"
+        "excellent": "Ausgezeichnet",
+        "good": "Gut",
+        "start": "Starten"
       },
-      "noContentYet": "No Content Yet",
-      "preview": "Preview",
+      "noContentYet": "Noch kein Inhalt",
+      "preview": "Vorschau",
       "save": "Speichern",
-      "saved": "Saved",
-      "show": "Show",
-      "structure": "Structure",
-      "titlePlaceholder": "Title Placeholder",
-      "unsaved": "Unsaved",
-      "word": "Word",
-      "words": "Words"
+      "saved": "Gespeichert",
+      "show": "Anzeigen",
+      "structure": "Struktur",
+      "titlePlaceholder": "Titel eingeben",
+      "unsaved": "Nicht gespeichert",
+      "word": "Wort",
+      "words": "Wörter"
     },
     "diagram": {
       "label": "Diagramm",
@@ -167,211 +167,211 @@
     "typing": {
       "label": "Tippen lernen",
       "description": "Lernen Sie mit progressiven Lektionen und DSA-Zugänglichkeit zu tippen",
-      "developmentMessage": "Development Message",
+      "developmentMessage": "Entwicklungsnachricht",
       "featureList": {
-        "accessibility": "Accessibility",
-        "ai": "Ai",
-        "games": "Giochi",
-        "multilingual": "Multilingual",
-        "progressive": "Progressive",
-        "singleHand": "Single Hand",
-        "tracking": "Tracking"
+        "accessibility": "Barrierefreiheit",
+        "ai": "KI",
+        "games": "Spiele",
+        "multilingual": "Mehrsprachig",
+        "progressive": "Progressiv",
+        "singleHand": "Einhändig",
+        "tracking": "Fortschrittsverfolgung"
       },
-      "features": "Funzionalità",
-      "level": "Livello",
-      "none": "Nessuno",
-      "recommendedLesson": "Recommended Lesson",
-      "title": "Titolo"
+      "features": "Funktionen",
+      "level": "Stufe",
+      "none": "Keine",
+      "recommendedLesson": "Empfohlene Lektion",
+      "title": "Titel"
     },
     "search": {
       "label": "Websuche",
       "description": "Suchen Sie nach Informationen, Videos und Bildungsressourcen im Web",
-      "noResults": "No Results",
-      "resultCount": "Result Count",
-      "wikipediaOnly": "Wikipedia Only"
+      "noResults": "Keine Ergebnisse",
+      "resultCount": "Anzahl Ergebnisse",
+      "wikipediaOnly": "Nur Wikipedia"
     },
-    "backToAstuccio": "Back To Astuccio",
-    "title": "Titolo",
-    "toolsCount": "Tools Count",
+    "backToAstuccio": "Zurück zum Federmäppchen",
+    "title": "Titel",
+    "toolsCount": "Anzahl Werkzeuge",
     "connection": {
-      "connected": "Connesso",
-      "connecting": "Connessione...",
-      "disconnected": "Disconnesso",
+      "connected": "Verbunden",
+      "connecting": "Verbindung wird hergestellt...",
+      "disconnected": "Getrennt",
       "error": "Fehler",
-      "reconnecting": "Riconnessione..."
+      "reconnecting": "Verbindung wird wiederhergestellt..."
     },
     "flashcards": {
-      "ratingQuestion": "Rating Question",
-      "label": "Flashcard",
-      "description": "Crea flashcard per lo studio"
+      "ratingQuestion": "Bewertungsfrage",
+      "label": "Lernkarte",
+      "description": "Lernkarten für das Studium erstellen"
     },
     "loading": {
-      "cancelled": "Cancelled",
-      "chunksReceived": "Chunks Received",
+      "cancelled": "Abgebrochen",
+      "chunksReceived": "Chunks empfangen",
       "error": "Fehler",
-      "loadingData": "Loading Data",
-      "loadingMaterial": "Loading Material",
-      "noData": "No Data",
-      "preparing": "Preparazione..."
+      "loadingData": "Daten werden geladen",
+      "loadingMaterial": "Material wird geladen",
+      "noData": "Keine Daten",
+      "preparing": "Vorbereitung..."
     },
     "markmap": {
       "accessibility": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Barrierefreie Mind-Map",
+        "title": "Barrierefreiheit"
       },
       "download": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Mind-Map herunterladen",
+        "title": "Herunterladen"
       },
       "error": "Fehler",
       "fullscreen": {
-        "ariaLabelEnter": "Aria Label Enter",
-        "ariaLabelExit": "Aria Label Exit",
-        "enter": "Enter",
-        "exit": "Exit"
+        "ariaLabelEnter": "Vollbildmodus aktivieren",
+        "ariaLabelExit": "Vollbildmodus verlassen",
+        "enter": "Vollbild",
+        "exit": "Verlassen"
       },
-      "instructions": "Instructions",
-      "interactiveMindmapDescription": "Interactive Mindmap Description",
-      "interactiveRenderMessage": "Interactive Render Message",
-      "mindmapDescription": "Mindmap Description",
+      "instructions": "Anweisungen",
+      "interactiveMindmapDescription": "Interaktive Mind-Map-Beschreibung",
+      "interactiveRenderMessage": "Interaktive Render-Nachricht",
+      "mindmapDescription": "Mind-Map-Beschreibung",
       "print": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Mind-Map drucken",
+        "title": "Drucken"
       },
       "resetView": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Ansicht zurücksetzen",
+        "title": "Zurücksetzen"
       },
-      "successMessage": "Success Message",
+      "successMessage": "Erfolgsnachricht",
       "zoomIn": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Vergrößern",
+        "title": "Vergrößern"
       },
       "zoomOut": {
-        "ariaLabel": "Aria Label",
-        "title": "Titolo"
+        "ariaLabel": "Verkleinern",
+        "title": "Verkleinern"
       }
     },
     "print": {
-      "ariaOptions": "Aria Options",
-      "ariaPrint": "Aria Print",
-      "buttonLabel": "Button Label",
-      "downloadSuccessMessage": "Download Success Message",
-      "downloadSuccessTitle": "Download Success Title",
-      "errorGenericMessage": "Error Generic Message",
-      "errorMessage": "Error Message",
-      "errorTitle": "Error Title",
-      "htmlOption": "Html Option",
-      "pdfOption": "Pdf Option",
-      "successMessage": "Success Message",
-      "successTitle": "Success Title"
+      "ariaOptions": "Druckoptionen",
+      "ariaPrint": "Drucken",
+      "buttonLabel": "Schaltflächenbeschriftung",
+      "downloadSuccessMessage": "Download erfolgreich abgeschlossen",
+      "downloadSuccessTitle": "Download erfolgreich",
+      "errorGenericMessage": "Allgemeine Fehlermeldung",
+      "errorMessage": "Fehlermeldung",
+      "errorTitle": "Fehler",
+      "htmlOption": "HTML-Option",
+      "pdfOption": "PDF-Option",
+      "successMessage": "Erfolgsnachricht",
+      "successTitle": "Erfolg"
     },
     "toolPanel": {
-      "building": "Building",
+      "building": "Wird erstellt",
       "close": "Schließen",
       "error": "Fehler",
-      "expand": "Espandi",
+      "expand": "Erweitern",
       "labels": {
-        "chart": "Chart",
+        "chart": "Diagramm",
         "demo": "Demo",
-        "diagram": "Diagram",
-        "flashcard": "Flashcard",
-        "formula": "Formula",
-        "mindmap": "Mindmap",
-        "pdf": "Pdf",
+        "diagram": "Diagramm",
+        "flashcard": "Lernkarte",
+        "formula": "Formel",
+        "mindmap": "Mind-Map",
+        "pdf": "PDF",
         "quiz": "Quiz",
         "search": "Suchen",
-        "summary": "Summary",
-        "timeline": "Timeline",
+        "summary": "Zusammenfassung",
+        "timeline": "Zeitleiste",
         "webcam": "Webcam"
       },
-      "minimize": "Riduci a icona",
-      "progress": "Progresso",
-      "unsupportedToolType": "Unsupported Tool Type"
+      "minimize": "Minimieren",
+      "progress": "Fortschritt",
+      "unsupportedToolType": "Nicht unterstützter Werkzeugtyp"
     },
     "voice": {
-      "label": "Voce",
-      "description": "Attiva la conversazione vocale"
+      "label": "Sprache",
+      "description": "Sprachkonversation aktivieren"
     }
   },
   "studyKit": {
     "exportModal": {
       "cancel": "Abbrechen",
-      "closeLabel": "Close Label",
-      "description": "Descrizione",
+      "closeLabel": "Schließen",
+      "description": "Beschreibung",
       "error": "Fehler",
-      "export": "Export",
-      "formatLabel": "Format Label",
-      "generating": "Generazione...",
-      "profileLabel": "Profile Label",
+      "export": "Exportieren",
+      "formatLabel": "Format",
+      "generating": "Generierung...",
+      "profileLabel": "Profil",
       "success": {
-        "default": "Default",
-        "withZaino": "With Zaino"
+        "default": "Standard",
+        "withZaino": "Mit Rucksack"
       },
-      "title": "Titolo"
+      "title": "Titel"
     },
     "list": {
       "cancel": "Abbrechen",
       "delete": "Löschen",
-      "deleteConfirm": "Delete Confirm",
-      "deleteError": "Delete Error",
+      "deleteConfirm": "Löschen bestätigen",
+      "deleteError": "Löschfehler",
       "empty": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Keine Lernkits verfügbar",
+        "title": "Keine Kits"
       },
       "error": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Fehler beim Laden",
+        "title": "Fehler"
       },
       "filters": {
-        "all": "Tutti",
+        "all": "Alle",
         "error": "Fehler",
-        "processing": "Elaborazione...",
-        "ready": "Ready"
+        "processing": "Verarbeitung...",
+        "ready": "Bereit"
       },
-      "open": "Apri",
+      "open": "Öffnen",
       "processing": {
-        "description": "Descrizione",
-        "title": "Titolo"
+        "description": "Wird verarbeitet",
+        "title": "Verarbeitung"
       },
-      "status": "Stato"
+      "status": "Status"
     },
     "uploadProgress": {
-      "loadAnother": "Load Another",
-      "processingNote": "Processing Note",
+      "loadAnother": "Weiteres laden",
+      "processingNote": "Verarbeitungshinweis",
       "status": {
         "error": "Fehler",
-        "processing": "Elaborazione...",
-        "success": "Completato",
-        "uploading": "Uploading"
+        "processing": "Verarbeitung...",
+        "success": "Abgeschlossen",
+        "uploading": "Hochladen"
       }
     },
     "view": {
       "back": "Zurück",
-      "backToList": "Back To List",
+      "backToList": "Zurück zur Liste",
       "features": {
         "demo": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Interaktive Demonstration",
+          "title": "Demo"
         },
         "mindmap": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Visuelle Mind-Map",
+          "title": "Mind-Map"
         },
         "quiz": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Interaktives Quiz",
+          "title": "Quiz"
         },
         "summary": {
-          "description": "Descrizione",
-          "title": "Titolo"
+          "description": "Strukturierte Zusammenfassung",
+          "title": "Zusammenfassung"
         }
       },
-      "header": "Header",
-      "myKits": "My Kits",
-      "newKit": "New Kit",
-      "subtitle": "Sottotitolo",
-      "uploadTitle": "Upload Title"
+      "header": "Kopfzeile",
+      "myKits": "Meine Kits",
+      "newKit": "Neues Kit",
+      "subtitle": "Untertitel",
+      "uploadTitle": "Upload-Titel"
     }
   }
 }

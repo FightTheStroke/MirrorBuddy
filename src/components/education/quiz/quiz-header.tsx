@@ -16,19 +16,19 @@ export function QuizHeader({
   correctCount,
   progress,
 }: QuizHeaderProps) {
-  const t = useTranslations("education.quiz-header");
+  const t = useTranslations("education.quizHeader");
 
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-0">
       <div className="flex items-center justify-between mb-4">
         <span className="text-sm text-slate-500">
-          {t("question-counter", {
+          {t("questionCounter", {
             current: currentIndex + 1,
             total: totalQuestions,
           })}
         </span>
         <span className="text-sm font-medium text-blue-600">
-          {t("correct-count", { count: correctCount })}
+          {t("correctCount", { count: correctCount })}
         </span>
       </div>
       <Progress value={progress} className="h-2" />

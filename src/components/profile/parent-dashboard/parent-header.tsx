@@ -19,7 +19,7 @@ export function ParentHeader({
   highContrast = false,
   className,
 }: ParentHeaderProps) {
-  const t = useTranslations("education.parent-dashboard.header");
+  const t = useTranslations("education.parentDashboard.header");
 
   return (
     <header

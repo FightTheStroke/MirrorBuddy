@@ -1,344 +1,340 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - The School I Want",
-    "loading": "Loading...",
-    "seasonDefault": "Autumn",
+    "appTitle": "MirrorBuddy - Die Schule, die ich will",
+    "loading": "Laden...",
+    "seasonDefault": "Herbst",
     "mirrorBucksShort": "MB",
     "navigation": {
-      "professors": "Professors",
-      "astuccio": "Pencil Case",
-      "zaino": "Backpack",
-      "calendar": "Calendar",
-      "progress": "Progress",
-      "settings": "Settings",
-      "features": "Funzionalità",
-      "pricing": "Prezzi",
-      "about": "Chi siamo",
-      "contact": "Contatti",
-      "login": "Accedi",
-      "signup": "Registrati",
+      "professors": "Professoren",
+      "astuccio": "Federmäppchen",
+      "zaino": "Rucksack",
+      "calendar": "Kalender",
+      "progress": "Fortschritt",
+      "settings": "Einstellungen",
+      "features": "Funktionen",
+      "pricing": "Preise",
+      "about": "Über uns",
+      "contact": "Kontakt",
+      "login": "Anmelden",
+      "signup": "Registrieren",
       "dashboard": "Dashboard",
-      "logout": "Esci"
+      "logout": "Abmelden"
     },
     "header": {
-      "openMenu": "Open menu",
-      "streak": "Streak",
-      "sessionsThisWeek": "Sessions this week",
-      "studyTime": "Study time",
-      "questionsAsked": "Questions asked",
-      "trial": "Trial",
-      "trialClickToRequest": "Click to request full access"
+      "openMenu": "Menü öffnen",
+      "streak": "Serie",
+      "sessionsThisWeek": "Sitzungen diese Woche",
+      "studyTime": "Lernzeit",
+      "questionsAsked": "Gestellte Fragen",
+      "trial": "Testversion",
+      "trialClickToRequest": "Klicken Sie, um vollen Zugriff anzufordern"
     },
     "sidebar": {
-      "backToHome": "Back to home",
+      "backToHome": "Zurück zur Startseite",
       "appName": "MirrorBuddy",
-      "closeMenu": "Close menu",
-      "trialMode": "Trial Mode",
-      "login": "Login",
-      "requestAccess": "Request Access",
-      "adminDashboard": "Admin Dashboard",
-      "adminDashboardAria": "Administrator dashboard",
-      "parentArea": "Parent Area"
+      "closeMenu": "Menü schließen",
+      "trialMode": "Testmodus",
+      "login": "Anmelden",
+      "requestAccess": "Zugriff anfordern",
+      "adminDashboard": "Admin-Dashboard",
+      "adminDashboardAria": "Administrator-Dashboard",
+      "parentArea": "Elternbereich"
     },
-    "adminDashboard": "Admin Dashboard",
-    "closeMenu": "Close Menu",
-    "logout": "Logout",
-    "openMenu": "Open Menu",
-    "parentArea": "Parent Area",
-    "returnHome": "Return Home",
+    "adminDashboard": "Admin-Dashboard",
+    "closeMenu": "Menü schließen",
+    "logout": "Abmelden",
+    "openMenu": "Menü öffnen",
+    "parentArea": "Elternbereich",
+    "returnHome": "Zurück zur Startseite",
     "season": {
-      "autumn": "Autumn"
+      "autumn": "Herbst"
     },
-    "title": "Titolo",
+    "title": "Titel",
     "hero": {
-      "title": "Impara meglio con MirrorBuddy",
-      "subtitle": "Il tuo compagno di studio basato su intelligenza artificiale",
-      "cta": "Inizia ora",
-      "secondaryCta": "Scopri di più"
+      "title": "Besser lernen mit MirrorBuddy",
+      "subtitle": "Ihr KI-gestützter Lernbegleiter",
+      "cta": "Jetzt starten",
+      "secondaryCta": "Mehr erfahren"
     }
   },
   "welcome": {
     "page": {
-      "loading": "Loading...",
-      "resetConfirm": "Do you want to start over? All entered data will be deleted."
+      "loading": "Laden...",
+      "resetConfirm": "Möchten Sie von vorne beginnen? Alle eingegebenen Daten werden gelöscht."
     },
     "hero": {
       "betaBadge": "Private Beta",
-      "betaSubtitle": "Invitation only",
-      "welcomeBack": "Welcome back,",
-      "welcomeBackSubtitle": "Ready for your next learning adventure?",
-      "welcomeNew": "Welcome to",
-      "tagline": "Learn",
-      "taglineWith": "WITH the Great Professors",
-      "taglineAbilities": "whatever your abilities",
-      "description": "Study mathematics <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historical professors accompany you personally.",
+      "betaSubtitle": "Nur auf Einladung",
+      "welcomeBack": "Willkommen zurück,",
+      "welcomeBackSubtitle": "Bereit für Ihr nächstes Lernabenteuer?",
+      "welcomeNew": "Willkommen bei",
+      "tagline": "Lernen",
+      "taglineWith": "MIT den großen Meistern",
+      "taglineAbilities": "unabhängig von Ihren Fähigkeiten",
+      "description": "Studieren Sie Mathematik <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 22 historische Professoren begleiten Sie persönlich.",
       "accessibility": {
-        "title": "Designed for all learning styles",
-        "readableFonts": "Readable fonts",
-        "mindMaps": "Mind maps",
-        "textToSpeech": "Text to speech",
-        "adaptiveQuizzes": "Adaptive quizzes"
+        "title": "Für alle Lernstile entwickelt",
+        "readableFonts": "Lesbare Schriftarten",
+        "mindMaps": "Mind-Maps",
+        "textToSpeech": "Text-zu-Sprache",
+        "adaptiveQuizzes": "Adaptive Tests"
       },
-      "adaptiveQuizzes": "Adaptive quizzes",
-      "anyAbility": "Any ability",
-      "learn": "Learn",
-      "mindMaps": "Mind maps",
-      "readableFonts": "Readable fonts",
-      "textToSpeech": "Text to speech",
-      "welcome": "Welcome",
-      "withTeachers": "With teachers",
-      "title": "Benvenuto in MirrorBuddy",
-      "subtitle": "Il tuo compagno di studio intelligente",
-      "cta": "Inizia ora",
-      "secondaryCta": "Scopri di più"
+      "adaptiveQuizzes": "Adaptive Tests",
+      "anyAbility": "Jede Fähigkeit",
+      "learn": "Lernen",
+      "mindMaps": "Mind-Maps",
+      "readableFonts": "Lesbare Schriftarten",
+      "textToSpeech": "Text-zu-Sprache",
+      "welcome": "Willkommen",
+      "withTeachers": "Mit Lehrern"
     },
     "quickStart": {
-      "heading": "Get Started",
+      "heading": "Los geht's",
       "returningUser": {
-        "goToApp": "Go to app",
-        "updateProfile": "Update profile"
+        "goToApp": "Zur App",
+        "updateProfile": "Profil aktualisieren"
       },
       "betaAccess": {
-        "badge": "FULL ACCESS",
-        "title": "Have an account?",
-        "feature1": "22 AI Professors",
-        "feature2": "All tools",
-        "feature3": "Saved progress",
-        "cta": "Sign In"
+        "badge": "VOLLZUGRIFF",
+        "title": "Haben Sie ein Konto?",
+        "feature1": "22 KI-Professoren",
+        "feature2": "Alle Tools",
+        "feature3": "Gespeicherter Fortschritt",
+        "cta": "Anmelden"
       },
       "trial": {
-        "badge": "FREE TRIAL",
-        "title": "Explore now",
-        "feature1": "3 Professors",
-        "feature2": "10 messages",
-        "feature3": "No registration",
-        "cta": "Try for free"
+        "badge": "KOSTENLOSE TESTVERSION",
+        "title": "Jetzt erkunden",
+        "feature1": "3 Professoren",
+        "feature2": "10 Nachrichten",
+        "feature3": "Keine Registrierung",
+        "cta": "Kostenlos testen"
       },
-      "login": "Login",
-      "updateProfile": "Update profile"
+      "login": "Anmelden",
+      "updateProfile": "Profil aktualisieren"
     },
     "tierComparison": {
-      "heading": "Choose the perfect plan for you",
-      "subtitle": "Start with a free trial or register to unlock more features",
-      "footer": "All plans include access to 22 AI Professors and personalized learning tools",
+      "heading": "Wählen Sie den perfekten Plan für Sie",
+      "subtitle": "Beginnen Sie mit einer kostenlosen Testversion oder registrieren Sie sich, um mehr Funktionen freizuschalten",
+      "footer": "Alle Pläne beinhalten Zugang zu 22 KI-Professoren und personalisierten Lerntools",
       "tiers": {
         "trial": {
-          "name": "Trial",
-          "tagline": "Explore without commitment",
-          "price": "Free",
+          "name": "Testversion",
+          "tagline": "Erkunden ohne Verpflichtung",
+          "price": "Kostenlos",
           "features": {
-            "maestri": "3 Professors",
-            "messages": "10 messages/day",
-            "voice": "5 minutes voice/day",
-            "noRegistration": "No registration"
+            "maestri": "3 Professoren",
+            "messages": "10 Nachrichten/Tag",
+            "voice": "5 Minuten Sprache/Tag",
+            "noRegistration": "Keine Registrierung"
           },
-          "cta": "Try for free"
+          "cta": "Kostenlos testen"
         },
         "base": {
-          "name": "Base",
-          "tagline": "For registered students",
-          "price": "Free",
+          "name": "Basis",
+          "tagline": "Für registrierte Studenten",
+          "price": "Kostenlos",
           "features": {
-            "maestri": "10 Professors",
-            "messages": "30 messages/day",
-            "voice": "15 minutes voice/day",
-            "savedProgress": "Saved progress"
+            "maestri": "10 Professoren",
+            "messages": "30 Nachrichten/Tag",
+            "voice": "15 Minuten Sprache/Tag",
+            "savedProgress": "Gespeicherter Fortschritt"
           },
-          "cta": "Register"
+          "cta": "Registrieren"
         },
         "pro": {
           "name": "Pro",
-          "tagline": "Complete experience",
-          "price": "On request",
-          "badge": "Recommended",
+          "tagline": "Vollständiges Erlebnis",
+          "price": "Auf Anfrage",
+          "badge": "Empfohlen",
           "features": {
-            "maestri": "22 Professors",
-            "messagesUnlimited": "Unlimited messages",
-            "voiceUnlimited": "Unlimited voice",
-            "allTools": "All tools"
+            "maestri": "22 Professoren",
+            "messagesUnlimited": "Unbegrenzte Nachrichten",
+            "voiceUnlimited": "Unbegrenzte Sprache",
+            "allTools": "Alle Tools"
           },
-          "cta": "Upgrade to Pro"
+          "cta": "Auf Pro upgraden"
         }
       },
-      "footerNote": "Footer note",
-      "subheading": "Subheading"
+      "footerNote": "Fußnote",
+      "subheading": "Unterüberschrift"
     },
     "maestri": {
-      "heading": "Your",
-      "headingHighlight": "Professors",
-      "subtitle": "{count} extraordinary minds from history become your personal professors.",
-      "scrollLeft": "Scroll left",
-      "scrollRight": "Scroll right",
-      "carouselLabel": "Professors carousel - use arrows to navigate",
-      "scrollHint": "← Scroll to see professors →",
-      "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
-      "disclaimerLink": "Learn more"
+      "heading": "Ihre",
+      "headingHighlight": "Professoren",
+      "subtitle": "{count} außergewöhnliche Köpfe aus der Geschichte werden zu Ihren persönlichen Professoren.",
+      "scrollLeft": "Nach links scrollen",
+      "scrollRight": "Nach rechts scrollen",
+      "carouselLabel": "Professoren-Karussell - verwenden Sie die Pfeile zur Navigation",
+      "scrollHint": "← Scrollen Sie, um Professoren zu sehen →",
+      "disclaimer": "KI-Professoren werden zu pädagogischen und demonstrativen Zwecken erstellt. In Zukunft wird jeder Student in der Lage sein, seine eigenen personalisierten Professoren zu erstellen.",
+      "disclaimerLink": "Mehr erfahren"
     },
     "support": {
-      "heading": "Always by your",
-      "headingHighlight": "side",
-      "subtitle": "Coaches for study methods and Buddies for emotional support",
-      "carouselLabel": "Coaches and buddies carousel - use arrows to navigate",
-      "scrollHint": "← Scroll to see all →",
+      "heading": "Immer an Ihrer",
+      "headingHighlight": "Seite",
+      "subtitle": "Coaches für Lernmethoden und Buddies für emotionale Unterstützung",
+      "carouselLabel": "Coaches- und Buddies-Karussell - verwenden Sie die Pfeile zur Navigation",
+      "scrollHint": "← Scrollen Sie, um alle zu sehen →",
       "coach": "Coach",
-      "buddy": "Buddy"
+      "buddy": "Freund"
     },
     "features": {
-      "heading": "Tools for every learning style",
-      "subtitle": "A complete, accessible platform designed for you",
+      "heading": "Tools für jeden Lernstil",
+      "subtitle": "Eine vollständige, zugängliche Plattform, die für Sie entwickelt wurde",
       "voiceConversation": {
-        "label": "Voice Conversation",
-        "description": "Talk with your Professors in real time"
+        "label": "Sprachkonversation",
+        "description": "Sprechen Sie in Echtzeit mit Ihren Professoren"
       },
       "mindMaps": {
-        "label": "Mind Maps",
-        "description": "Visualize and organize concepts"
+        "label": "Mind-Maps",
+        "description": "Konzepte visualisieren und organisieren"
       },
       "flashcards": {
-        "label": "FSRS Flashcards",
-        "description": "Memorize with spaced repetition"
+        "label": "FSRS-Lernkarten",
+        "description": "Mit verteilter Wiederholung lernen"
       },
       "interactiveQuizzes": {
-        "label": "Interactive Quizzes",
-        "description": "Test your knowledge"
+        "label": "Interaktive Tests",
+        "description": "Testen Sie Ihr Wissen"
       },
       "gamification": {
         "label": "Gamification",
-        "description": "Earn XP and unlock achievements"
+        "description": "Verdienen Sie XP und schalten Sie Erfolge frei"
       },
       "adaptiveLearning": {
-        "label": "Adaptive Learning",
-        "description": "Adapts to your style and pace"
+        "label": "Adaptives Lernen",
+        "description": "Passt sich Ihrem Stil und Tempo an"
       },
       "totalAccessibility": {
-        "label": "Total Accessibility",
-        "description": "Designed for dyslexia, ADHD and everyone"
+        "label": "Vollständige Barrierefreiheit",
+        "description": "Entwickelt für Dyslexie, ADHS und jeden"
       },
       "integratedPlatform": {
-        "label": "Integrated Platform",
-        "description": "Everything in one place"
+        "label": "Integrierte Plattform",
+        "description": "Alles an einem Ort"
       }
     },
     "compliance": {
-      "heading": "Compliance and",
-      "headingHighlight": "Transparency",
-      "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
+      "heading": "Compliance und",
+      "headingHighlight": "Transparenz",
+      "subtitle": "Sicherheit, Datenschutz und Transparenz stehen im Mittelpunkt von MirrorBuddy",
       "items": {
         "gdpr": {
-          "label": "GDPR",
-          "description": "EU data protection and privacy"
+          "label": "DSGVO",
+          "description": "EU-Datenschutz und Privatsphäre"
         },
         "aiAct": {
-          "label": "EU AI Act",
-          "description": "AI regulation compliance"
+          "label": "EU-KI-Verordnung",
+          "description": "Einhaltung der KI-Regulierung"
         },
         "coppa": {
           "label": "COPPA",
-          "description": "Online child protection"
+          "description": "Online-Kinderschutz"
         },
         "aiTransparency": {
-          "label": "AI Transparency",
-          "description": "AI transparency policy"
+          "label": "KI-Transparenz",
+          "description": "KI-Transparenzrichtlinie"
         },
         "openSource": {
           "label": "Open Source",
-          "description": "Open code on GitHub"
+          "description": "Offener Code auf GitHub"
         },
         "apache": {
           "label": "Apache 2.0",
-          "description": "Open source license"
+          "description": "Open-Source-Lizenz"
         }
       },
-      "footer": "MirrorBuddy is developed by <link>Fightthestroke Foundation</link>, a non-profit organization for children and families affected by cerebral palsy and pediatric stroke."
+      "footer": "MirrorBuddy wird von der <link>FightTheStroke Foundation</link> entwickelt, einer gemeinnützigen Organisation für Kinder und Familien, die von Zerebralparese und pädiatrischem Schlaganfall betroffen sind."
     },
     "footer": {
-      "aiDisclaimer": "Created with AI - responses may contain errors",
+      "aiDisclaimer": "Mit KI erstellt - Antworten können Fehler enthalten",
       "compliance": {
         "gdpr": {
-          "label": "GDPR",
-          "description": "European regulation compliant"
+          "label": "DSGVO",
+          "description": "EU-Verordnung konform"
         },
         "aiAct": {
-          "label": "AI Act",
+          "label": "KI-Verordnung",
           "description": "EU 2024/1689"
         },
         "coppa": {
           "label": "COPPA",
-          "description": "Child protection"
+          "description": "Kinderschutz"
         },
         "italianLaw": {
           "label": "L.132/2025",
-          "description": "Italian AI law"
+          "description": "Italienisches KI-Gesetz"
         }
       },
       "legal": {
-        "privacy": "Privacy Policy",
-        "terms": "Terms of Service",
-        "cookies": "Cookie Policy",
-        "aiTransparency": "AI Transparency",
-        "aiPolicy": "AI Policy",
+        "privacy": "Datenschutzerklärung",
+        "terms": "Nutzungsbedingungen",
+        "cookies": "Cookie-Richtlinie",
+        "aiTransparency": "KI-Transparenz",
+        "aiPolicy": "KI-Richtlinie",
         "compliance": "Compliance"
       },
       "openSource": {
         "label": "Open Source",
-        "ariaLabel": "View source code on GitHub"
+        "ariaLabel": "Quellcode auf GitHub ansehen"
       },
-      "copyright": "© {year} MirrorBuddy. Open source project on GitHub."
+      "copyright": "© {year} MirrorBuddy. Open-Source-Projekt auf GitHub."
     },
     "principles": {
-      "howItWorks": "How it works",
-      "howItWorksDesc": "How it works desc",
-      "welcomeToSchool": "Welcome to school",
-      "whatMakesUsSpecial": "What makes us special"
+      "howItWorks": "Wie es funktioniert",
+      "howItWorksDesc": "Beschreibung der Funktionsweise",
+      "welcomeToSchool": "Willkommen in der Schule",
+      "whatMakesUsSpecial": "Was uns besonders macht"
     },
     "ready": {
-      "chooseProfessor": "Choose professor",
-      "chooseProfessorDesc": "Choose professor desc"
+      "chooseProfessor": "Professor wählen",
+      "chooseProfessorDesc": "Beschreibung der Professorenwahl"
     },
     "trialLimits": {
-      "base": "Base",
-      "ctaButton": "Cta button",
-      "ctaQuestion": "Cta question",
-      "exploreNoRegistration": "Explore no registration",
-      "freeTrialMode": "Free trial mode",
-      "maestri": "Maestri",
-      "messages": "Messages",
-      "requestBeta": "Request beta",
-      "subtitle": "Sottotitolo",
-      "tenPerSession": "Ten per session",
-      "threeAvailable": "Three available",
-      "title": "Titolo",
+      "base": "Basis",
+      "ctaButton": "Aktionsschaltfläche",
+      "ctaQuestion": "Aktionsfrage",
+      "exploreNoRegistration": "Erkunden ohne Registrierung",
+      "freeTrialMode": "Kostenloser Testmodus",
+      "maestri": "Professoren",
+      "messages": "Nachrichten",
+      "requestBeta": "Beta anfordern",
+      "subtitle": "Untertitel",
+      "tenPerSession": "Zehn pro Sitzung",
+      "threeAvailable": "Drei verfügbar",
+      "title": "Titel",
       "tools": "Tools",
-      "wantFullAccess": "Want full access"
+      "wantFullAccess": "Vollzugriff gewünscht"
     },
     "voiceFallback": {
-      "message": "Message",
-      "title": "Titolo"
+      "message": "Nachricht",
+      "title": "Titel"
     },
     "welcomeForm": {
-      "age": "Age",
-      "collectedData": "Collected data",
-      "disableVoice": "Disable voice",
-      "dontWorry": "Dont worry",
-      "enableVoice": "Enable voice",
-      "enterYourNamePlaceholder": "Enter your name placeholder",
-      "helloMelissa": "Hello melissa",
-      "helpPersonalize": "Help personalize",
-      "learningDifferences": "Learning differences",
-      "learningDifferencesHint": "Learning differences hint",
-      "learningDifferencesLabel": "Learning differences label",
-      "niceToMeetYou": "Nice to meet you",
-      "optional": "Opzionale",
-      "replayModeMessage": "Replay mode message",
-      "school": "School",
-      "schoolElementary": "School elementary",
-      "schoolHigh": "School high",
-      "schoolMiddle": "School middle",
-      "tellMeAboutYou": "Tell me about you",
-      "welcomeIntro": "Welcome intro",
-      "whatIsYourName": "What is your name",
-      "years": "Years",
-      "yourSupportTeacher": "Your support teacher"
+      "age": "Alter",
+      "collectedData": "Gesammelte Daten",
+      "disableVoice": "Sprache deaktivieren",
+      "dontWorry": "Keine Sorge",
+      "enableVoice": "Sprache aktivieren",
+      "enterYourNamePlaceholder": "Geben Sie Ihren Namen ein",
+      "helloMelissa": "Hallo Melissa",
+      "helpPersonalize": "Hilfe bei der Personalisierung",
+      "learningDifferences": "Lernschwierigkeiten",
+      "learningDifferencesHint": "Hinweis zu Lernschwierigkeiten",
+      "learningDifferencesLabel": "Beschriftung für Lernschwierigkeiten",
+      "niceToMeetYou": "Schön, Sie kennenzulernen",
+      "optional": "Optional",
+      "replayModeMessage": "Wiedergabemodus-Nachricht",
+      "school": "Schule",
+      "schoolElementary": "Grundschule",
+      "schoolHigh": "Gymnasium",
+      "schoolMiddle": "Mittelschule",
+      "tellMeAboutYou": "Erzählen Sie mir von sich",
+      "welcomeIntro": "Willkommenseinführung",
+      "whatIsYourName": "Wie ist Ihr Name",
+      "years": "Jahre",
+      "yourSupportTeacher": "Ihr Betreuungslehrer"
     }
   },
   "onboarding": {
@@ -375,24 +371,24 @@
     }
   },
   "trialConsent": {
-    "title": "Free Trial Mode",
-    "subtitle": "Privacy and GDPR consent",
-    "description": "To use the free trial mode, you must accept our privacy policy and essential cookies.",
-    "processingIntro": "During the free trial, we will process the data necessary to provide you with the educational service:",
-    "dataConversations": "Your conversations with the AI Maestros",
-    "dataProgress": "Your learning progress and preferences",
-    "dataCookies": "Essential cookies for session security",
-    "privacyLink": "Read the full privacy policy",
-    "checkboxLabel": "I have read and accept the privacy policy for the free trial",
-    "startButton": "Start trial",
-    "gdprNote": "GDPR Compliance: You can revoke consent at any time from settings. Your data will be deleted according to data protection regulations."
+    "title": "Kostenloser Testmodus",
+    "subtitle": "Datenschutz und DSGVO-Einwilligung",
+    "description": "Um den kostenlosen Testmodus zu nutzen, müssen Sie unsere Datenschutzerklärung und erforderliche Cookies akzeptieren.",
+    "processingIntro": "Während der kostenlosen Testphase verarbeiten wir die Daten, die notwendig sind, um Ihnen den Bildungsdienst bereitzustellen:",
+    "dataConversations": "Ihre Gespräche mit den KI-Professoren",
+    "dataProgress": "Ihr Lernfortschritt und Ihre Präferenzen",
+    "dataCookies": "Erforderliche Cookies für die Sitzungssicherheit",
+    "privacyLink": "Vollständige Datenschutzerklärung lesen",
+    "checkboxLabel": "Ich habe die Datenschutzerklärung für die kostenlose Testversion gelesen und akzeptiert",
+    "startButton": "Testversion starten",
+    "gdprNote": "DSGVO-Konformität: Sie können die Einwilligung jederzeit in den Einstellungen widerrufen. Ihre Daten werden gemäß den Datenschutzbestimmungen gelöscht."
   },
   "trialLimits": {
-    "title": "Free trial limits",
-    "messagesDay": "Messages/day",
-    "voiceMinutes": "Voice minutes",
-    "toolsDay": "Tools/day",
-    "maestriAvailable": "Maestri available",
-    "trialDescription": "You are using the free trial version. Request beta access for unlimited limits and advanced features."
+    "title": "Grenzen der kostenlosen Testversion",
+    "messagesDay": "Nachrichten/Tag",
+    "voiceMinutes": "Sprachminuten",
+    "toolsDay": "Tools/Tag",
+    "maestriAvailable": "Verfügbare Professoren",
+    "trialDescription": "Sie nutzen die kostenlose Testversion. Fordern Sie Beta-Zugang für unbegrenzte Limits und erweiterte Funktionen an."
   }
 }

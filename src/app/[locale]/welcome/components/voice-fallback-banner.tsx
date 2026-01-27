@@ -3,7 +3,7 @@ import { WifiOff } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function VoiceFallbackBanner() {
-  const t = useTranslations("welcome.voice-fallback");
+  const t = useTranslations("welcome.voiceFallback");
 
   return (
     <motion.div

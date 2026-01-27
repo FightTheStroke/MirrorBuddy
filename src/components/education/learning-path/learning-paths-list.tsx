@@ -31,7 +31,7 @@ export function LearningPathsList({
   onSelect,
   className,
 }: LearningPathsListProps) {
-  const t = useTranslations("education.learning-path");
+  const t = useTranslations("education.learningPath");
   const [paths, setPaths] = useState<LearningPath[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +61,7 @@ export function LearningPathsList({
       <div className={cn("flex items-center justify-center py-12", className)}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
         <span className="ml-3 text-slate-600 dark:text-slate-400">
-          {t("loading-paths")}
+          {t("loadingPaths")}
         </span>
       </div>
     );
@@ -80,17 +80,17 @@ export function LearningPathsList({
       <div className={cn("text-center py-16", className)}>
         <Route className="w-16 h-16 mx-auto text-slate-300 dark:text-slate-600 mb-4" />
         <h3 className="text-xl font-semibold text-slate-700 dark:text-slate-300 mb-2">
-          {t("no-paths-created")}
+          {t("noPathsCreated")}
         </h3>
         <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md mx-auto">
-          {t("no-paths-description")}
+          {t("noPathsDescription")}
         </p>
         <Button
           onClick={() => (window.location.href = "/study-kit")}
           className="gap-2"
         >
           <BookOpen className="w-4 h-4" />
-          {t("go-to-study-kit")}
+          {t("goToStudyKit")}
         </Button>
       </div>
     );
@@ -100,8 +100,8 @@ export function LearningPathsList({
     <div className={cn("space-y-4", className)}>
       <div className="text-sm text-slate-600 dark:text-slate-400 mb-4">
         {paths.length}{" "}
-        {paths.length === 1 ? t("path-singular") : t("path-plural")}{" "}
-        {t("learning-paths")}
+        {paths.length === 1 ? t("pathSingular") : t("pathPlural")}{" "}
+        {t("learningPaths")}
       </div>
 
       {paths.map((path, index) => (
@@ -123,7 +123,7 @@ interface PathCardProps {
 }
 
 function PathCard({ path, onClick }: PathCardProps) {
-  const t = useTranslations("education.learning-path");
+  const t = useTranslations("education.learningPath");
   const isCompleted = path.status === "completed";
   const isInProgress = path.status === "in_progress";
 
@@ -184,8 +184,7 @@ function PathCard({ path, onClick }: PathCardProps) {
           <div className="mt-4 space-y-2">
             <div className="flex items-center justify-between text-sm">
               <span className="text-slate-600 dark:text-slate-400">
-                {path.completedTopics}/{path.totalTopics}{" "}
-                {t("completed-topics")}
+                {path.completedTopics}/{path.totalTopics} {t("completedTopics")}
               </span>
               <span className="font-medium text-primary">
                 {path.progressPercent}%
@@ -212,10 +211,10 @@ function PathCard({ path, onClick }: PathCardProps) {
               )}
             >
               {isCompleted
-                ? t("status-completed")
+                ? t("statusCompleted")
                 : isInProgress
-                  ? t("status-in-progress")
-                  : t("status-not-started")}
+                  ? t("statusInProgress")
+                  : t("statusNotStarted")}
             </span>
           </div>
         </div>

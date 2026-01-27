@@ -17,7 +17,7 @@ export function StatsOverview({
   sessions,
   maestri,
 }: StatsOverviewProps) {
-  const t = useTranslations("education.parent-dashboard.stats");
+  const t = useTranslations("education.parentDashboard.stats");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -44,7 +44,7 @@ export function StatsOverview({
           >
             {hours}h
           </p>
-          <p className="text-sm text-slate-500">{t("total-time")}</p>
+          <p className="text-sm text-slate-500">{t("totalTime")}</p>
         </CardContent>
       </Card>
 

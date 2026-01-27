@@ -24,7 +24,7 @@ export function QuizCompletion({
   onRetry,
   onClose,
 }: QuizCompletionProps) {
-  const t = useTranslations("education.quiz-completion");
+  const t = useTranslations("education.quizCompletion");
   const passed = score >= masteryThreshold;
 
   return (
@@ -48,10 +48,10 @@ export function QuizCompletion({
         </motion.div>
 
         <h2 className="text-2xl font-bold mb-2">
-          {passed ? t("excellent") : t("keep-practicing")}
+          {passed ? t("excellent") : t("keepPracticing")}
         </h2>
         <p className="text-slate-600 dark:text-slate-400 mb-6">
-          {t("correct-answers", {
+          {t("correctAnswers", {
             correct: correctCount,
             total: totalQuestions,
           })}
@@ -67,9 +67,9 @@ export function QuizCompletion({
         <div className="flex justify-center gap-4">
           <Button variant="outline" onClick={onRetry}>
             <RotateCcw className="w-4 h-4 mr-2" />
-            {t("retry-button")}
+            {t("retryButton")}
           </Button>
-          <Button onClick={onClose}>{t("continue-button")}</Button>
+          <Button onClick={onClose}>{t("continueButton")}</Button>
         </div>
       </CardContent>
     </Card>

@@ -10,7 +10,7 @@ interface StepContentProps {
 }
 
 export function StepContent({ step }: StepContentProps) {
-  const t = useTranslations("education.step-content");
+  const t = useTranslations("education.stepContent");
   const content = step.content;
 
   switch (step.type) {
@@ -20,7 +20,7 @@ export function StepContent({ step }: StepContentProps) {
           {"text" in content ? (
             <p>{content.text}</p>
           ) : (
-            <p className="text-slate-500">{t("overview-unavailable")}</p>
+            <p className="text-slate-500">{t("overviewUnavailable")}</p>
           )}
         </div>
       );
@@ -29,9 +29,9 @@ export function StepContent({ step }: StepContentProps) {
       return (
         <div className="text-center py-4">
           <MapIcon className="w-12 h-12 mx-auto text-purple-400 mb-2" />
-          <p className="text-sm text-slate-500">{t("mindmap-description")}</p>
+          <p className="text-sm text-slate-500">{t("mindmapDescription")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            {t("open-mindmap-button")}
+            {t("openMindmapButton")}
           </Button>
         </div>
       );
@@ -40,9 +40,9 @@ export function StepContent({ step }: StepContentProps) {
       return (
         <div className="text-center py-4">
           <Layers className="w-12 h-12 mx-auto text-amber-400 mb-2" />
-          <p className="text-sm text-slate-500">{t("flashcard-description")}</p>
+          <p className="text-sm text-slate-500">{t("flashcardDescription")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            {t("start-flashcard-button")}
+            {t("startFlashcardButton")}
           </Button>
         </div>
       );
@@ -51,9 +51,9 @@ export function StepContent({ step }: StepContentProps) {
       return (
         <div className="text-center py-4">
           <ClipboardCheck className="w-12 h-12 mx-auto text-green-400 mb-2" />
-          <p className="text-sm text-slate-500">{t("quiz-description")}</p>
+          <p className="text-sm text-slate-500">{t("quizDescription")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            {t("start-quiz-button")}
+            {t("startQuizButton")}
           </Button>
         </div>
       );
@@ -62,7 +62,7 @@ export function StepContent({ step }: StepContentProps) {
       return (
         <div className="text-center py-4 text-slate-500">
           <Circle className="w-8 h-8 mx-auto mb-2" />
-          <p>{t("content-unavailable")}</p>
+          <p>{t("contentUnavailable")}</p>
         </div>
       );
   }

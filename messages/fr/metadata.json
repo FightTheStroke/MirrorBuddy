@@ -2,7 +2,7 @@
   "metadata": {
     "home": {
       "title": "Accueil | MirrorBuddy",
-      "description": "Scopri l'apprendimento basato su AI per studenti con difficoltà di apprendimento. Tutoraggio personalizzato con 22 maestri, voce adattivo.                 ",
+      "description": "Découvrez l'apprentissage basé sur l'IA pour les élèves en difficulté d'apprentissage. Tutorat personnalisé avec 22 maîtres, voix et apprentissage adaptatif.",
       "keywords": [
         "éducation",
         "IA",
@@ -25,7 +25,7 @@
     },
     "aiTransparency": {
       "title": "Transparence IA | MirrorBuddy",
-      "description": "Scopri come MirrorBuddy utilizza l'AI in modo responsabile, impegni di trasparenza e come garantiamo AI sicura per educazione con forti misure protezione.",
+      "description": "Découvrez comment MirrorBuddy utilise l'IA de manière responsable pour l'éducation: transparence totale, sécurité des données et protection des élèves.",
       "keywords": [
         "IA",
         "transparence",
@@ -50,8 +50,8 @@
       "description": "Lisez nos conditions d'utilisation, accords utilisateur, politiques acceptables et informations légales pour l'utilisation de la plateforme MirrorBuddy.",
       "keywords": ["conditions", "service", "juridique", "accord", "politiques"]
     },
-    "title": "MirrorBuddy - Il tuo compagno di studio",
-    "description": "Piattaforma educativa con AI per studenti con bisogni speciali",
-    "keywords": "educazione, AI, apprendimento, tutor, studenti, DSA"
+    "title": "MirrorBuddy - Votre compagnon d'étude",
+    "description": "Plateforme éducative basée sur l'IA pour les élèves ayant des besoins spéciaux",
+    "keywords": "éducation, IA, apprentissage, tuteur, élèves, troubles apprentissage"
   }
 }

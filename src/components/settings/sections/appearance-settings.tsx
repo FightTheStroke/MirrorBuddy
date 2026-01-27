@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { Sun, Moon, Laptop, Globe, Check } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { useLocaleContext } from "@/i18n/locale-provider";
 
 // Static arrays moved outside component to prevent recreation
 const THEMES: Array<{
@@ -50,6 +51,7 @@ export function AppearanceSettings({
 }: AppearanceSettingsProps) {
   const t = useTranslations("settings.appearance");
   const { theme: currentTheme, setTheme, resolvedTheme } = useTheme();
+  const { switchLocale } = useLocaleContext();
   const [mounted, setMounted] = useState(false);
 
   // Avoid hydration mismatch - standard Next.js pattern for client-only rendering
@@ -64,6 +66,14 @@ export function AppearanceSettings({
       onUpdate({ theme: newTheme });
     },
     [setTheme, onUpdate],
+  );
+
+  const handleLanguageChange = useCallback(
+    (newLanguage: "it" | "en" | "es" | "fr" | "de") => {
+      // Use hard navigation (window.location) to properly reload messages
+      switchLocale(newLanguage);
+    },
+    [switchLocale],
   );
 
   // Show loading state during hydration
@@ -168,7 +178,7 @@ export function AppearanceSettings({
               return (
                 <button
                   key={lang.value}
-                  onClick={() => onUpdate({ language: lang.value })}
+                  onClick={() => handleLanguageChange(lang.value)}
                   className={cn(
                     "flex items-center gap-2 p-3 rounded-xl border-2 transition-all font-medium",
                     "focus:outline-none focus:ring-2 focus:ring-offset-2 dark:focus:ring-offset-slate-900",

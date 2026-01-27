@@ -91,7 +91,7 @@
     "warning": "Attenzione",
     "yes": "Sì"
   },
-  "not-found": {
+  "notFound": {
     "title": "Pagina non trovata",
     "description": "La pagina che stai cercando non esiste o è stata spostata.",
     "backHome": "Torna alla home",

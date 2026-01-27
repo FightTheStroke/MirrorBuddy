@@ -12,7 +12,7 @@ interface StrategyCardProps {
 }
 
 export function StrategyCard({ strategy }: StrategyCardProps) {
-  const t = useTranslations("education.parent-dashboard.strategy");
+  const t = useTranslations("education.parentDashboard.strategy");
   const { settings } = useAccessibilityStore();
 
   const priorityColors = {
@@ -91,7 +91,7 @@ export function StrategyCard({ strategy }: StrategyCardProps) {
             {strategy.description}
           </p>
           <p className="text-xs text-slate-500 mt-2">
-            {t("suggested-by")} {strategy.suggestedBy.join(", ")}
+            {t("suggestedBy")} {strategy.suggestedBy.join(", ")}
           </p>
         </div>
       </div>

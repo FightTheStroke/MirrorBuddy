@@ -14,7 +14,7 @@ import {
  * The budget is controlled via TRIAL_BUDGET_LIMIT_EUR environment variable.
  */
 export function TrialBudgetCard() {
-  const t = useTranslations("admin.settings.trial-budget");
+  const t = useTranslations("admin.settings.trialBudget");
   const budgetLimit = process.env.TRIAL_BUDGET_LIMIT_EUR || "100";
 
   return (
@@ -34,15 +34,13 @@ export function TrialBudgetCard() {
           <span className="text-4xl font-bold text-foreground">
             €{budgetLimit}
           </span>
-          <span className="text-lg text-muted-foreground">
-            {t("per-month")}
-          </span>
+          <span className="text-lg text-muted-foreground">{t("perMonth")}</span>
         </div>
 
         {/* Configuration Info */}
         <div className="bg-muted rounded-lg p-3 space-y-2">
           <p className="text-sm font-medium text-foreground">
-            {t("configured-via")}
+            {t("configuredVia")}
           </p>
           <code className="block text-xs bg-background rounded px-2 py-1 text-muted-foreground font-mono">
             TRIAL_BUDGET_LIMIT_EUR={budgetLimit}
@@ -50,7 +48,7 @@ export function TrialBudgetCard() {
         </div>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground">{t("description-text")}</p>
+        <p className="text-sm text-muted-foreground">{t("descriptionText")}</p>
       </CardContent>
     </Card>
   );

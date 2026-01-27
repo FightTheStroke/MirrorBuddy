@@ -43,7 +43,7 @@ export function MaterialMenu({
   materialId,
   menuRef,
 }: MaterialMenuProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
 
   const menuAction = (action: ((id: string) => void) | undefined) => {
     return (e: React.MouseEvent) => {
@@ -74,7 +74,7 @@ export function MaterialMenu({
           "border border-slate-200 dark:border-slate-700",
         )}
         role="menu"
-        aria-label={t("material-menu.aria-label")}
+        aria-label={t("materialMenu.ariaLabel")}
       >
         {onOpen && (
           <button
@@ -83,7 +83,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <ExternalLink className="w-4 h-4" />
-            {t("material-menu.open")}
+            {t("materialMenu.open")}
           </button>
         )}
         {onDuplicate && (
@@ -93,7 +93,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Copy className="w-4 h-4" />
-            {t("material-menu.duplicate")}
+            {t("materialMenu.duplicate")}
           </button>
         )}
         {onMove && (
@@ -103,7 +103,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <FolderInput className="w-4 h-4" />
-            {t("material-menu.move")}
+            {t("materialMenu.move")}
           </button>
         )}
         {onAddTags && (
@@ -113,7 +113,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Tag className="w-4 h-4" />
-            {t("material-menu.add-tags")}
+            {t("materialMenu.addTags")}
           </button>
         )}
         {onFindSimilar && (
@@ -123,7 +123,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Sparkles className="w-4 h-4" />
-            {t("material-menu.find-similar")}
+            {t("materialMenu.findSimilar")}
           </button>
         )}
         {onArchive && (
@@ -133,7 +133,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Archive className="w-4 h-4" />
-            {t("material-menu.archive")}
+            {t("materialMenu.archive")}
           </button>
         )}
         {onDelete && (
@@ -145,7 +145,7 @@ export function MaterialMenu({
               role="menuitem"
             >
               <Trash2 className="w-4 h-4" />
-              {t("material-menu.delete")}
+              {t("materialMenu.delete")}
             </button>
           </>
         )}

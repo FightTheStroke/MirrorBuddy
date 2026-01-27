@@ -10,34 +10,19 @@
       "subtitle": "Sottotitolo",
       "title": "Titolo",
       "systemInfo": {
-        "buildDate": "Build",
-        "description": "Informazioni sul sistema e versioni",
-        "environment": "Ambiente",
-        "nodeVersion": "Node:",
-        "title": "Informazioni Sistema",
-        "version": "Versione"
-      },
-      "trialBudget": {
-        "configuredVia": "Configurato via env var",
-        "description": "Budget mensile per utenti trial",
-        "descriptionText": "Testo descrizione",
-        "perMonth": "al mese",
-        "title": "Budget Trial"
-      },
-      "system-info": {
         "title": "System Info",
         "description": "Informazioni sul sistema",
         "version": "Version",
         "environment": "Environment",
-        "node-version": "Node:",
-        "build-date": "Build"
+        "nodeVersion": "Node:",
+        "buildDate": "Build"
       },
-      "trial-budget": {
+      "trialBudget": {
         "title": "Trial Budget",
         "description": "Budget mensile per utenti trial",
-        "per-month": "al mese",
-        "configured-via": "Configurato via env var",
-        "description-text": "Il budget massimo mensile per gli utenti in prova"
+        "perMonth": "al mese",
+        "configuredVia": "Configurato via env var",
+        "descriptionText": "Il budget massimo mensile per gli utenti in prova"
       }
     },
     "systemAlerts": "System Alerts",
@@ -63,16 +48,14 @@
       "form": {
         "basicInfo": "Basic Info",
         "cancel": "Annulla",
-        "chatMessagesDaily": "Chat Messages Daily",
-        "chatMessagesHelp": "Chat Messages Help",
+        "chatMessagesDaily": "Messaggi Chat Giornalieri",
+        "chatMessagesHelp": "Numero massimo di messaggi chat al giorno",
         "code": "Code",
         "codePlaceholder": "Code Placeholder",
         "codeReadOnly": "Code Read Only",
         "create": "Crea",
         "description": "Descrizione",
         "descriptionPlaceholder": "Description Placeholder",
-        "chatMessagesDaily": "Messaggi Chat Giornalieri",
-        "chatMessagesHelp": "Numero massimo di messaggi chat al giorno",
         "docsHelp": "Numero massimo di documenti caricabili",
         "docsTotal": "Documenti Totali",
         "error": "Errore",

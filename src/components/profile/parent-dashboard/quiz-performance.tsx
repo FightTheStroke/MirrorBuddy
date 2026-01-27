@@ -34,7 +34,7 @@ export function QuizPerformance({
   highContrast = false,
   className,
 }: QuizPerformanceProps) {
-  const t = useTranslations("education.parent-dashboard.quiz");
+  const t = useTranslations("education.parentDashboard.quiz");
 
   if (stats.totalAttempts === 0) {
     return (
@@ -69,7 +69,7 @@ export function QuizPerformance({
               : "text-slate-500 dark:text-slate-400",
           )}
         >
-          {t("no-quizzes")}
+          {t("noQuizzes")}
         </p>
       </section>
     );

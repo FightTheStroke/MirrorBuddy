@@ -35,16 +35,16 @@ interface TimelineData {
  * Render a timeline for Knowledge Hub.
  */
 export function TimelineRenderer({ data, className }: BaseRendererProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const timelineData = data as unknown as TimelineData;
 
-  const title = timelineData.title || t("timeline.default-title");
+  const title = timelineData.title || t("timeline.defaultTitle");
   const events = timelineData.events || [];
 
   if (events.length === 0) {
     return (
       <div className={cn("p-4 text-center text-slate-500", className)}>
-        {t("timeline.no-events")}
+        {t("timeline.noEvents")}
       </div>
     );
   }

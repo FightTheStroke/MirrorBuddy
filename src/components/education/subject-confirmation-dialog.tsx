@@ -28,7 +28,7 @@ export function SubjectConfirmationDialog({
   onConfirm,
   onClose,
 }: SubjectConfirmationDialogProps) {
-  const t = useTranslations("education.subject-confirmation");
+  const t = useTranslations("education.subjectConfirmation");
   const initialSubject = isValidSubject(detectedSubject)
     ? detectedSubject
     : "mathematics";

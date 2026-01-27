@@ -93,7 +93,7 @@ export default async function AdminUsersPage() {
       <div className="flex items-center gap-3 mb-6">
         <Users className="w-8 h-8 text-primary" aria-hidden="true" />
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-          {t("page-title")}
+          {t("pageTitle")}
         </h1>
       </div>
       <UsersTable users={users} availableTiers={tiers} />

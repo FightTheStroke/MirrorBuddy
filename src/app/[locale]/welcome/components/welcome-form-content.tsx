@@ -31,7 +31,7 @@ export function WelcomeFormContent({
   onContinue,
   onToggleMute,
 }: WelcomeFormContentProps) {
-  const t = useTranslations("welcome.welcome-form");
+  const t = useTranslations("welcome.welcomeForm");
   const { isPlaying } = useOnboardingTTS({
     autoSpeak: !isVoiceMuted,
     text: ONBOARDING_SCRIPTS.welcome,
@@ -71,10 +71,8 @@ export function WelcomeFormContent({
             </div>
 
             <div className="flex-1">
-              <h1 className="text-2xl font-bold mb-1">{t("hello-melissa")}</h1>
-              <p className="text-pink-100 text-sm">
-                {t("your-support-teacher")}
-              </p>
+              <h1 className="text-2xl font-bold mb-1">{t("helloMelissa")}</h1>
+              <p className="text-pink-100 text-sm">{t("yourSupportTeacher")}</p>
             </div>
 
             {/* Voice toggle button (Web Speech) */}
@@ -84,8 +82,8 @@ export function WelcomeFormContent({
               transition={{ delay: 0.5 }}
               onClick={onToggleMute}
               className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
-              aria-label={isVoiceMuted ? t("enable-voice") : t("disable-voice")}
-              title={isVoiceMuted ? t("enable-voice") : t("disable-voice")}
+              aria-label={isVoiceMuted ? t("enableVoice") : t("disableVoice")}
+              title={isVoiceMuted ? t("enableVoice") : t("disableVoice")}
             >
               {isVoiceMuted ? (
                 <VolumeX className="w-5 h-5 text-white" />
@@ -107,11 +105,9 @@ export function WelcomeFormContent({
             className="space-y-4"
           >
             <p className="text-lg text-gray-700 dark:text-gray-300 leading-relaxed">
-              {t("welcome-intro")}
+              {t("welcomeIntro")}
             </p>
-            <p className="text-gray-600 dark:text-gray-400">
-              {t("dont-worry")}
-            </p>
+            <p className="text-gray-600 dark:text-gray-400">{t("dontWorry")}</p>
           </motion.div>
 
           {/* Manual input */}
@@ -125,7 +121,7 @@ export function WelcomeFormContent({
               htmlFor="student-name"
               className="block text-lg font-medium text-gray-800 dark:text-gray-200"
             >
-              {t("what-is-your-name")}
+              {t("whatIsYourName")}
             </label>
             <Input
               id="student-name"
@@ -134,7 +130,7 @@ export function WelcomeFormContent({
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 onNameChange(e.target.value);
               }}
-              placeholder={t("enter-your-name-placeholder")}
+              placeholder={t("enterYourNamePlaceholder")}
               className="text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500"
               aria-describedby={error ? "name-error" : undefined}
               autoFocus
@@ -157,14 +153,14 @@ export function WelcomeFormContent({
               size="lg"
               className="w-full bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white py-6 text-lg font-semibold shadow-lg"
             >
-              {t("nice-to-meet-you")}
+              {t("niceToMeetYou")}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </motion.div>
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              {t("replay-mode-message")}
+              {t("replayModeMessage")}
             </p>
           )}
         </div>

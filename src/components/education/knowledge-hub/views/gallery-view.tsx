@@ -65,7 +65,7 @@ export function GalleryView({
   cardSize = "medium",
   className,
 }: GalleryViewProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
 
   // Group materials by type for visual variety
   const sortedMaterials = useMemo(() => {
@@ -84,7 +84,7 @@ export function GalleryView({
             animate={{ opacity: 1 }}
             className="flex items-center justify-center h-64 text-slate-400"
           >
-            {t("gallery-view.no-materials")}
+            {t("galleryView.noMaterials")}
           </motion.div>
         ) : (
           <div className={cn("grid gap-4", GRID_CLASSES[cardSize])}>

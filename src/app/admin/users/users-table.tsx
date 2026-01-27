@@ -120,7 +120,7 @@ export function UsersTable({
           throw new Error(err.error || "Failed to toggle user");
         }
       } else if (action === "delete") {
-        if (!confirm(t("confirm-delete"))) return;
+        if (!confirm(t("confirmDelete"))) return;
         await csrfFetch(`/api/admin/users/${userId}`, {
           method: "DELETE",
           body: JSON.stringify({ reason: "admin_delete" }),
@@ -291,10 +291,10 @@ export function UsersTable({
         </ResponsiveTable>
 
         {filter !== "trash" && filteredUsers.length === 0 && (
-          <TableEmpty>{t("empty-message")}</TableEmpty>
+          <TableEmpty>{t("emptyMessage")}</TableEmpty>
         )}
         {filter === "trash" && deletedBackups.length === 0 && (
-          <TableEmpty>{t("trash-empty")}</TableEmpty>
+          <TableEmpty>{t("trashEmpty")}</TableEmpty>
         )}
 
         <UsersBulkActions

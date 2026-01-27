@@ -18,7 +18,7 @@ export function ObservationCard({
   observation,
   isStrength,
 }: ObservationCardProps) {
-  const t = useTranslations("education.parent-dashboard.observation");
+  const t = useTranslations("education.parentDashboard.observation");
   const { settings } = useAccessibilityStore();
   const [isExpanded, setIsExpanded] = useState(false);
 

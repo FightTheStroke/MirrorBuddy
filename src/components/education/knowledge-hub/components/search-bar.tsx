@@ -56,7 +56,7 @@ function getTypeLabels(
     homework: t("types.homework"),
     search: t("types.search"),
     typing: t("types.typing"),
-    "study-kit": t("types.study-kit"),
+    "study-kit": t("types.studyKit"),
   };
 }
 
@@ -75,7 +75,7 @@ export function SearchBar({
   debounceMs = 300,
   autoFocus = false,
 }: SearchBarProps) {
-  const t = useTranslations("education.knowledge-hub");
+  const t = useTranslations("education.knowledgeHub");
   const typeLabels = useMemo(() => getTypeLabels(t), [t]);
   const defaultPlaceholder = useMemo(
     () => placeholder || t("header.search.placeholder"),
@@ -205,7 +205,7 @@ export function SearchBar({
             "text-slate-900 dark:text-slate-100",
             "placeholder:text-slate-400",
           )}
-          aria-label={t("header.search.aria-label")}
+          aria-label={t("header.search.ariaLabel")}
           role="searchbox"
           autoComplete="off"
           spellCheck={false}
@@ -221,7 +221,7 @@ export function SearchBar({
               "focus:outline-none focus:ring-2 focus:ring-accent-themed",
               "transition-colors",
             )}
-            aria-label={t("header.search.clear-aria-label")}
+            aria-label={t("header.search.clearAriaLabel")}
           >
             <X className="w-4 h-4" />
           </button>
@@ -241,7 +241,7 @@ export function SearchBar({
                 typeFilter !== "all" &&
                   "bg-accent-themed/10 text-accent-themed",
               )}
-              aria-label={t("header.filter.aria-label")}
+              aria-label={t("header.filter.ariaLabel")}
               aria-expanded={isFilterOpen}
               aria-haspopup="listbox"
             >
@@ -265,7 +265,7 @@ export function SearchBar({
                   "py-1",
                 )}
                 role="listbox"
-                aria-label={t("header.filter.listbox-aria-label")}
+                aria-label={t("header.filter.listboxAriaLabel")}
               >
                 {types.map((type) => (
                   <button
