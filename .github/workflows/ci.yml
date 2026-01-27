@@ -505,17 +505,13 @@ jobs:
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
-  # MANDATORY on all PRs and pushes to main/development branches (ADR 0064: Mobile UX)
+  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents broken releases)
   # NOTE: Runs AFTER e2e-tests to avoid database conflicts (shared test DB)
   mobile-e2e:
-    name: Mobile E2E Tests
+    name: Mobile E2E Tests (BLOCKING)
     runs-on: ubuntu-latest
     needs: [build, e2e-tests]
-    if: |
-      (github.event_name == 'pull_request' &&
-       (github.base_ref == 'main' || github.base_ref == 'development')) ||
-      (github.event_name == 'push' &&
-       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development'))
+    # NO CONDITION - Always runs to prevent broken mobile releases
 
     services:
       postgres:
@@ -624,16 +620,12 @@ jobs:
           exit 1
 
   # Lane 6b: E2E Tests - Full end-to-end test suite
-  # MANDATORY on all PRs and pushes to main/development branches
+  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents broken releases)
   e2e-tests:
-    name: E2E Tests
+    name: E2E Tests (BLOCKING)
     runs-on: ubuntu-latest
     needs: [build]
-    if: |
-      (github.event_name == 'pull_request' &&
-       (github.base_ref == 'main' || github.base_ref == 'development')) ||
-      (github.event_name == 'push' &&
-       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development'))
+    # NO CONDITION - Always runs to prevent broken releases
 
     services:
       postgres:
@@ -737,16 +729,12 @@ jobs:
           tags: mirrorbuddy:test
 
   # Lane 8: Performance Budgets
-  # MANDATORY on all PRs and pushes to main/development branches
+  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents performance regressions)
   performance:
-    name: Performance Budgets
+    name: Performance Budgets (BLOCKING)
     runs-on: ubuntu-latest
     needs: [build]
-    if: |
-      (github.event_name == 'pull_request' &&
-       (github.base_ref == 'main' || github.base_ref == 'development')) ||
-      (github.event_name == 'push' &&
-       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/development'))
+    # NO CONDITION - Always runs to catch performance regressions
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -834,3 +822,99 @@ jobs:
           name: lighthouse-report
           path: .lighthouseci/
           retention-days: 30
+
+  # ==========================================================================
+  # DEPLOYMENT GATE - Single status check for Vercel
+  # This job MUST pass before Vercel deploys to production
+  # Configure in Vercel: Settings → Git → "Wait for Deployment Checks"
+  # ==========================================================================
+  deployment-gate:
+    name: "✅ Deployment Gate"
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - secret-scanning
+      - debt-check
+      - security
+      - llm-safety-tests
+      - unit-tests
+      - docs
+      - migrations
+      - quality
+      - smoke-tests
+      - e2e-tests
+      - mobile-e2e
+      - docker
+      - performance
+    if: always()
+    steps:
+      - name: Check all jobs passed
+        if: |
+          needs.build.result != 'success' ||
+          needs.secret-scanning.result != 'success' ||
+          needs.debt-check.result != 'success' ||
+          needs.security.result != 'success' ||
+          needs.llm-safety-tests.result != 'success' ||
+          needs.unit-tests.result != 'success' ||
+          needs.docs.result != 'success' ||
+          needs.migrations.result != 'success' ||
+          needs.quality.result != 'success' ||
+          needs.smoke-tests.result != 'success' ||
+          needs.e2e-tests.result != 'success' ||
+          needs.mobile-e2e.result != 'success' ||
+          needs.docker.result != 'success' ||
+          needs.performance.result != 'success'
+        run: |
+          echo "::error::DEPLOYMENT BLOCKED - One or more checks failed"
+          echo ""
+          echo "Job results:"
+          echo "  build: ${{ needs.build.result }}"
+          echo "  secret-scanning: ${{ needs.secret-scanning.result }}"
+          echo "  debt-check: ${{ needs.debt-check.result }}"
+          echo "  security: ${{ needs.security.result }}"
+          echo "  llm-safety-tests: ${{ needs.llm-safety-tests.result }}"
+          echo "  unit-tests: ${{ needs.unit-tests.result }}"
+          echo "  docs: ${{ needs.docs.result }}"
+          echo "  migrations: ${{ needs.migrations.result }}"
+          echo "  quality: ${{ needs.quality.result }}"
+          echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
+          echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
+          echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
+          echo "  docker: ${{ needs.docker.result }}"
+          echo "  performance: ${{ needs.performance.result }}"
+          exit 1
+
+      - name: Deployment approved
+        if: |
+          needs.build.result == 'success' &&
+          needs.secret-scanning.result == 'success' &&
+          needs.debt-check.result == 'success' &&
+          needs.security.result == 'success' &&
+          needs.llm-safety-tests.result == 'success' &&
+          needs.unit-tests.result == 'success' &&
+          needs.docs.result == 'success' &&
+          needs.migrations.result == 'success' &&
+          needs.quality.result == 'success' &&
+          needs.smoke-tests.result == 'success' &&
+          needs.e2e-tests.result == 'success' &&
+          needs.mobile-e2e.result == 'success' &&
+          needs.docker.result == 'success' &&
+          needs.performance.result == 'success'
+        run: |
+          echo "✅ All 14 checks passed - Safe to deploy to production"
+          echo ""
+          echo "Verified jobs:"
+          echo "  ✓ build"
+          echo "  ✓ secret-scanning"
+          echo "  ✓ debt-check"
+          echo "  ✓ security"
+          echo "  ✓ llm-safety-tests"
+          echo "  ✓ unit-tests"
+          echo "  ✓ docs"
+          echo "  ✓ migrations"
+          echo "  ✓ quality"
+          echo "  ✓ smoke-tests"
+          echo "  ✓ e2e-tests"
+          echo "  ✓ mobile-e2e"
+          echo "  ✓ docker"
+          echo "  ✓ performance"

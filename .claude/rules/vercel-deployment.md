@@ -1,5 +1,62 @@
 # Vercel Deployment Rules - MirrorBuddy
 
+## Deployment Gate (CRITICAL - Configure in Vercel)
+
+**Vercel MUST wait for CI before deploying.** Without this, broken code deploys immediately.
+
+### Vercel Dashboard Configuration
+
+1. Go to: **Project → Settings → Git → Deployment Protection**
+2. Enable: **"Vercel Deployment Protection"**
+3. Under "Required Status Checks", add: `✅ Deployment Gate`
+
+**Alternative** (if above unavailable):
+
+1. Go to: **Project → Settings → Git**
+2. Find: **"Ignored Build Step"** section
+3. Set command: `[[ $(gh run view --json conclusion -q .conclusion) == "success" ]] || exit 0`
+
+### Why This Matters
+
+The proxy.ts disaster (2026-01-27) happened because:
+
+- Push to main → Vercel deployed IMMEDIATELY
+- CI was still running E2E tests
+- Tests would have caught the bug, but deployment was already live
+- Result: ALL images broken, ALL API routes returning 404
+
+### CI Deployment Gate Job
+
+The `deployment-gate` job in `.github/workflows/ci.yml` aggregates ALL 14 checks:
+
+| Category    | Checks                                         |
+| ----------- | ---------------------------------------------- |
+| Build       | build                                          |
+| Security    | secret-scanning, security, llm-safety-tests    |
+| Quality     | debt-check, quality, docs, migrations          |
+| Tests       | unit-tests, smoke-tests, e2e-tests, mobile-e2e |
+| Performance | docker, performance                            |
+
+**Deployment blocked if ANY check fails.**
+
+### GitHub Branch Protection (Recommended)
+
+For maximum safety, also configure GitHub branch protection on `main`:
+
+1. Go to: **Repository → Settings → Branches → Add rule**
+2. Branch name pattern: `main`
+3. Enable:
+   - ✅ Require a pull request before merging
+   - ✅ Require status checks to pass before merging
+   - ✅ Require branches to be up to date before merging
+4. Add required status checks:
+   - `✅ Deployment Gate`
+   - `Build & Lint`
+   - `E2E Tests (BLOCKING)`
+   - `Mobile E2E Tests (BLOCKING)`
+
+**Result**: No direct pushes to main. All changes go through PRs with CI validation.
+
 ## Pre-Deployment Checklist (MANDATORY)
 
 Before ANY push to main or release:
