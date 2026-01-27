@@ -1,19 +1,21 @@
 # Vercel Deployment Rules - MirrorBuddy
 
-## Deployment Architecture (Deploy Hook)
+## Deployment Architecture (Deployment Checks)
 
-**Vercel deploys ONLY when CI triggers the deploy hook.** Auto-deploy is DISABLED.
+**Vercel waits for GitHub CI checks before promoting to production.**
 
 ### How It Works
 
 ```
-Push to main → CI runs 14 checks → deployment-gate → deploy-to-vercel → Vercel builds
+Push to main → Vercel builds (preview) → CI runs 14 checks → deployment-gate passes → Vercel promotes to production
 ```
 
-1. **CI runs ALL checks** (build, tests, security, quality)
-2. **deployment-gate** aggregates results - blocks if ANY fails
-3. **deploy-to-vercel** calls Vercel Deploy Hook ONLY if gate passes
-4. **Vercel builds** triggered by webhook, not by git push
+1. **Push triggers** both Vercel build AND GitHub CI in parallel
+2. **Vercel builds** but holds deployment in preview state
+3. **CI runs ALL checks** (build, tests, security, quality)
+4. **deployment-gate** aggregates results
+5. **Vercel Deployment Checks** waits for `deployment-gate` to pass
+6. **Only then** Vercel promotes to production
 
 ### Why This Architecture (The proxy.ts Disaster)
 
@@ -24,27 +26,16 @@ On 2026-01-27:
 - Tests would have caught the bug, but deployment was already live
 - Result: ALL images broken, ALL API routes returning 404
 
-**Solution**: Disable auto-deploy, use Deploy Hook triggered by CI.
+**Solution**: Vercel Deployment Checks integration waits for CI.
 
-## Setup Instructions
+## Setup Instructions (Vercel Pro Required)
 
-### Step 1: Disable Auto-Deploy on Vercel
+### Configure Deployment Checks
 
-1. Go to: **Project → Settings → Git**
-2. Find: **"Automatic Deployments"** section
-3. Set to: **"Only deploy when instructed"** or disable for `main` branch
-
-### Step 2: Create Deploy Hook
-
-1. Go to: **Project → Settings → Git → Deploy Hooks**
-2. Create hook with name: `CI-Deployment` and branch: `main`
-3. Copy the URL (format: `https://api.vercel.com/v1/integrations/deploy/prj_xxx/xxx`)
-
-### Step 3: Add GitHub Secret
-
-```bash
-gh secret set VERCEL_DEPLOY_HOOK --body "https://api.vercel.com/v1/integrations/deploy/prj_xxx/xxx"
-```
+1. Go to: **Project → Settings → Deployment Protection**
+2. Find: **"Deployment Checks"** section
+3. Click: **"+ Add"** → Select **"GitHub"**
+4. Import check: `✅ Deployment Gate`
 
 ### CI Jobs
 
@@ -58,14 +49,7 @@ The `deployment-gate` job aggregates ALL 14 checks:
 | Tests       | unit-tests, smoke-tests, e2e-tests, mobile-e2e |
 | Performance | docker, performance                            |
 
-**Deployment blocked if ANY check fails.**
-
-The `deploy-to-vercel` job:
-
-- Depends on `deployment-gate`
-- Only runs on push to main (not PRs)
-- Calls the Vercel Deploy Hook URL
-- Fails if hook returns error
+**Production deployment blocked if ANY check fails.**
 
 ### GitHub Branch Protection (Configured)
 
