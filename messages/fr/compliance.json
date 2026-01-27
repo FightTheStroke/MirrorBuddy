@@ -298,16 +298,131 @@
       "publicDocs": "Public Docs",
       "technicalDocs": "Technical Docs"
     },
-    "privacy": "Privacy Policy",
-    "terms": "Termini di Servizio",
-    "cookies": "Cookie Policy",
-    "accessibility": "Dichiarazione di accessibilità",
-    "aiTransparency": "Trasparenza AI",
-    "privacyTitle": "Informativa sulla Privacy",
-    "termsTitle": "Termini e Condizioni",
-    "cookiesTitle": "Informativa sui Cookie",
-    "accessibilityTitle": "Dichiarazione di Accessibilità",
-    "aiTransparencyTitle": "Trasparenza sull'Intelligenza Artificiale"
+    "privacy": "Politique de Confidentialité",
+    "terms": "Conditions de Service",
+    "cookies": "Politique en Matière de Cookies",
+    "accessibility": "Déclaration d'Accessibilité",
+    "aiTransparency": "Transparence de l'IA",
+    "privacyTitle": "Politique de Confidentialité",
+    "termsTitle": "Conditions de Service",
+    "cookiesTitle": "Politique en Matière de Cookies",
+    "accessibilityTitle": "Déclaration d'Accessibilité",
+    "aiTransparencyTitle": "Transparence de l'IA",
+    "dataSubjectRights": "Droits des Personnes Concernées"
+  },
+  "dataSubjectRights": {
+    "page": {
+      "title": "Droits des Personnes Concernées en Vertu du RGPD",
+      "subtitle": "Comprenez vos droits à la vie privée et comment les exercer",
+      "description": "MirrorBuddy respecte pleinement vos droits en tant que personne concernée en vertu du Règlement Général sur la Protection des Données (RGPD). Cette page explique chaque droit et comment vous pouvez le demander.",
+      "lastUpdated": "Dernière mise à jour",
+      "version": "Version",
+      "backButton": "Retour"
+    },
+    "introduction": {
+      "title": "Vos Droits à la Vie Privée",
+      "content": "En tant que personne concernée, vous disposez de droits importants concernant vos données personnelles. Le RGPD vous assure le contrôle total de vos données et le droit de savoir comment elles sont utilisées.",
+      "contactText": "Des questions sur vos droits ? Contactez-nous :"
+    },
+    "rights": {
+      "access": {
+        "title": "Droit d'Accès (Art. 15 RGPD)",
+        "description": "Vous avez le droit d'accéder à vos données personnelles à tout moment.",
+        "details": "Vous pouvez demander une copie de toutes les données personnelles que nous détenons vous concernant dans un format lisible. Nous vous fournirons des informations sur la façon dont vos données sont utilisées, avec qui elles sont partagées et combien de temps nous les conservons.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Pour exercer ce droit, contactez notre équipe d'assistance avec une demande écrite d'accès aux données."
+      },
+      "rectification": {
+        "title": "Droit de Rectification (Art. 16 RGPD)",
+        "description": "Vous avez le droit de corriger vos données si elles sont inexactes ou incomplètes.",
+        "details": "Si vous découvrez que vos données personnelles sont inexactes, incomplètes ou obsolètes, vous pouvez demander une correction immédiate. Cela inclut la mise à jour de vos informations de profil, préférences éducatives ou détails de contact.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Connectez-vous à votre compte et modifiez vos données directement, ou contactez-nous pour de l'aide."
+      },
+      "erasure": {
+        "title": "Droit à l'Oubli - Suppression (Art. 17 RGPD)",
+        "description": "Vous avez le droit d'obtenir la suppression de vos données personnelles.",
+        "details": "Dans certaines circonstances, vous pouvez demander la suppression complète de vos données personnelles de nos systèmes. Cela inclut votre compte, l'historique de chat, les données d'apprentissage et toutes les informations associées.",
+        "limitations": "Limitations : Certaines données doivent être conservées à des fins légales ou contractuelles (par exemple, facturation). Lorsque vous supprimez votre compte, vos données sont supprimées dans les 30 jours, sauf obligation légale.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Contactez notre équipe d'assistance à la confidentialité avec une demande écrite de suppression."
+      },
+      "portability": {
+        "title": "Droit à la Portabilité des Données (Art. 20 RGPD)",
+        "description": "Vous avez le droit de recevoir vos données dans un format structuré et de les transférer à d'autres services.",
+        "details": "Vous pouvez demander une copie de vos données personnelles dans un format lisible par machine (tel que JSON ou CSV), vous permettant de les transférer à un autre service sans perte d'informations. Cela inclut votre profil, historique d'apprentissage, progression et préférences.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Contactez notre équipe avec une demande de portabilité des données."
+      },
+      "object": {
+        "title": "Droit d'Opposition (Art. 21 RGPD)",
+        "description": "Vous avez le droit de vous opposer au traitement de vos données.",
+        "details": "Vous pouvez vous opposer au traitement de vos données à des fins de marketing, profilage ou autres. Si vous exercez ce droit, nous cesserons de traiter vos données pour la finalité spécifiée, sauf si nous avons des raisons légitimes de continuer.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Contactez notre équipe d'assistance pour spécifier à quels usages vous souhaitez vous opposer."
+      },
+      "restriction": {
+        "title": "Droit à la Limitation du Traitement (Art. 18 RGPD)",
+        "description": "Vous avez le droit de demander la limitation du traitement de vos données.",
+        "details": "Dans certaines circonstances, vous pouvez demander que vos données soient 'gelées' et utilisées uniquement de manière limitée. C'est utile si vous contestez l'exactitude de vos données ou si vous êtes en désaccord avec leur traitement.",
+        "responseTime": "Délai de réponse : 30 jours (France)",
+        "howToRequest": "Contactez notre équipe de confidentialité pour demander la limitation du traitement."
+      }
+    },
+    "countriesInfo": {
+      "france": {
+        "name": "France",
+        "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+        "email": "cnil@cnil.fr",
+        "website": "www.cnil.fr",
+        "responseTime": "30 jours",
+        "escalationTime": "Vous pouvez déposer une plainte auprès de la CNIL si vous estimez que vos droits ne sont pas respectés."
+      },
+      "italy": {
+        "name": "Italie",
+        "authority": "Garante per la Protezione dei Dati Personali",
+        "email": "garante@gpdp.it",
+        "website": "www.garanteprivacy.it",
+        "responseTime": "30 jours",
+        "escalationTime": "Vous pouvez déposer une plainte auprès de l'autorité de contrôle dans les 12 mois."
+      },
+      "germany": {
+        "name": "Allemagne",
+        "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+        "email": "kontakt@bfdi.bund.de",
+        "website": "www.bfdi.bund.de",
+        "responseTime": "30 jours",
+        "escalationTime": "Vous pouvez déposer une plainte auprès du BfDI si vous avez des préoccupations en matière de protection des données."
+      },
+      "spain": {
+        "name": "Espagne",
+        "authority": "AEPD (Agencia Española de Protección de Datos)",
+        "email": "consultas@aepd.es",
+        "website": "www.aepd.es",
+        "responseTime": "30 jours",
+        "escalationTime": "Vous pouvez déposer une plainte auprès de l'AEPD pour des questions de protection des données."
+      }
+    },
+    "howToExercise": {
+      "title": "Comment Exercer Vos Droits",
+      "steps": {
+        "step1": "Envoyez une demande écrite à privacy@mirrorbuddy.com en spécifiant quel droit vous souhaitez exercer.",
+        "step2": "Fournissez autant de détails que possible sur les données ou aspects que vous souhaitez aborder.",
+        "step3": "Nous vérifions votre identité pour protéger vos données.",
+        "step4": "Nous traitons votre demande dans les 30 jours et vous contactons avec une réponse."
+      },
+      "contactInfo": "Si vous avez des questions pendant le processus, notre équipe est disponible pour vous assister."
+    },
+    "faq": {
+      "q1": "Combien de temps faut-il pour répondre ?",
+      "a1": "Nous sommes tenus de répondre dans les 30 jours suivant la réception de votre demande. Si votre demande est complexe, nous pouvons prolonger cela de 60 jours supplémentaires.",
+      "q2": "Dois-je payer pour exercer mes droits ?",
+      "a2": "Non, vous ne devez pas payer. Cependant, si nous estimons que votre demande est clairement infondée ou abusive, nous pouvons facturer des frais raisonnables.",
+      "q3": "Que se passe-t-il si vous refusez ma demande ?",
+      "a3": "Si nous refusons votre demande, nous expliquons pourquoi et vous fournirons des informations sur comment contester la décision.",
+      "q4": "Puis-je déposer plainte après avoir reçu une réponse ?",
+      "a4": "Oui, si vous n'êtes pas satisfait de notre réponse, vous pouvez déposer une plainte auprès de l'autorité de protection des données de votre pays."
+    }
   },
   "contact": {
     "backButton": "Back Button",
@@ -531,23 +646,130 @@
     },
     "privacy": {
       "page": {
-        "backToHome": "Back To Home",
-        "lastUpdated": "Last Updated",
-        "pageNavigation": "Page Navigation",
-        "questionAriaLabel": "Question Aria Label",
-        "questionText": "Question Text",
-        "title": "Titolo",
-        "tldrHeading": "Tldr Heading",
+        "backToHome": "Retour à l'accueil",
+        "lastUpdated": "Dernière mise à jour",
+        "pageNavigation": "Navigation de la page",
+        "questionAriaLabel": "Questions sur la confidentialité",
+        "questionText": "Des questions sur notre politique de confidentialité?",
+        "title": "Politique de Confidentialité",
+        "tldrHeading": "Résumé Rapide",
         "version": "Version",
         "tldrItems": {
-          "backToHome": "Back To Home",
-          "lastUpdated": "Last Updated",
-          "pageNavigation": "Page Navigation",
-          "questionAriaLabel": "Question Aria Label",
-          "questionText": "Question Text",
-          "title": "Titolo",
-          "tldrHeading": "Tldr Heading",
-          "version": "Version"
+          "dataCollection": "Nous ne collectons que les données nécessaires pour t'aider à apprendre et améliorer MirrorBuddy",
+          "noDataSale": "Nous ne vendons jamais tes données à des tiers",
+          "deleteAnytime": "Tu peux supprimer ton compte et tes données à tout moment",
+          "europeanData": "Tes données sont protégées par la loi française et européenne sur la protection des données",
+          "optionalAnalytics": "Les analyses optionnelles nous aident à comprendre comment tu utilises l'app, mais tu peux les refuser"
+        }
+      },
+      "section1": {
+        "title": "Qui nous sommes et comment fonctionne cette politique",
+        "content": "MirrorBuddy est une application éducative pour les étudiants présentant des difficultés d'apprentissage, développée par une équipe internationale avec une présence en France. Cette politique de confidentialité explique comment nous collectons, utilisons et protégeons tes données personnelles. En tant que responsable du traitement des données, nous sommes responsables de la protection de tes informations personnelles conformément au Règlement Général sur la Protection des Données (RGPD) UE 2016/679 et à la Loi Informatique et Libertés française (CNIL)."
+      },
+      "section2": {
+        "title": "Quelles données nous collectons",
+        "intro": "Pour te fournir notre service, nous collectons ces données personnelles:",
+        "itemLabels": {
+          "email": "Adresse Email",
+          "name": "Nom",
+          "conversations": "Conversations",
+          "flashcards": "Cartes Mnémotechniques",
+          "progress": "Progression d'Apprentissage",
+          "settings": "Préférences Utilisateur"
+        },
+        "items": {
+          "email": "Utilisée pour la connexion et les notifications",
+          "name": "Utilisée pour personnaliser ton expérience",
+          "conversations": "Sauvegardées pour continuer à apprendre où tu t'es arrêté",
+          "flashcards": "Utilisées pour suivre ta progression via l'algorithme FSRS",
+          "progress": "Enregistré pour te donner des retours personnalisés",
+          "settings": "Sauvegardées pour mémoriser tes choix d'accessibilité et de langue"
+        }
+      },
+      "section3": {
+        "title": "Données sensibles que nous NE collectons JAMAIS",
+        "intro": "Pour protéger ta confidentialité, nous ne collectons jamais de données sensibles telles que:",
+        "items": {
+          "health": "Informations de santé (sauf si tu les partages volontairement dans une conversation)",
+          "payments": "Détails de paiement directs (nous utilisons des tiers certifiés)",
+          "media": "Photos ou vidéos personnelles",
+          "gps": "Ta localisation géographique"
+        }
+      },
+      "section4": {
+        "title": "Comment nous utilisons tes données",
+        "intro": "Nous utilisons tes données uniquement pour ces objectifs légitimes:",
+        "items": {
+          "appFunctionality": "Charger tes conversations, cartes mnémotechniques et progression",
+          "personalization": "Adapter les maestri à tes intérêts et ton niveau d'apprentissage",
+          "improvement": "Comprendre comment tu utilises MirrorBuddy pour ajouter de nouvelles fonctionnalités (avec analyses optionnelles)",
+          "support": "T'aider si tu rencontres des problèmes techniques ou pédagogiques"
+        },
+        "disclaimer": "Nous n'utilisons pas tes données pour le profilage automatisé, la publicité ciblée ou des décisions te concernant sans intervention humaine."
+      },
+      "section5": {
+        "title": "Analyses Optionnelles et Suivi",
+        "intro": "En tant qu'utilisateur, tu peux choisir de participer à nos analyses pour nous aider à améliorer l'application.",
+        "labels": {
+          "collect": "Ce que nous collectons",
+          "why": "Pourquoi",
+          "retention": "Combien de temps",
+          "optOut": "Comment refuser"
+        },
+        "weCollect": "Pages visitées, temps passé, fonctionnalités utilisées, erreurs rencontrées. Aucune donnée personnelle n'est stockée dans les journaux.",
+        "why": "Pour comprendre quelles fonctionnalités sont utiles, où les étudiants rencontrent des difficultés, et comment améliorer MirrorBuddy pour tous.",
+        "retention": "Les données d'analyse sont conservées pendant 12 mois, puis agrégées et supprimées.",
+        "optOut": "Tu peux désactiver les analyses dans les paramètres de confidentialité sans perdre de fonctionnalités."
+      },
+      "section6": {
+        "title": "Qui peut accéder à tes données",
+        "intro": "Tes données personnelles sont accessibles à:",
+        "items": {
+          "you": "Tu as toujours le contrôle total de tes données et peux les télécharger, les modifier ou les supprimer",
+          "parents": "Tes parents peuvent suivre ta progression via le Tableau de Bord Parents (si tu es mineur)",
+          "team": "L'équipe MirrorBuddy accède aux données pour le support technique, uniquement si nécessaire"
+        },
+        "thirdPartyHeading": "Partenaires de Confiance",
+        "thirdPartyIntro": "Nous utilisons ces services certifiés pour faire fonctionner MirrorBuddy de manière sécurisée:",
+        "vendors": {
+          "vercel": "Vercel (hébergement de serveur, conforme au RGPD, siège dans l'UE)",
+          "supabase": "Supabase (base de données PostgreSQL, chiffrée, conforme au RGPD)",
+          "azure": "Azure OpenAI (traitement des données conversationnelles, conforme au RGPD)",
+          "resend": "Resend (envoi d'e-mails transactionnels, conforme au RGPD)",
+          "upstash": "Upstash (cache Redis, conforme au RGPD)",
+          "brave": "Brave (recherche optionnelle respectueuse de la confidentialité, ne collecte pas l'IP)",
+          "google": "Google Drive (facultatif pour l'envoi de documents, uniquement si tu choisis de te connecter)",
+          "grafana": "Grafana (métriques système uniquement, aucune donnée personnelle)",
+          "ollama": "Ollama (modèles d'IA locaux optionnels, tout sur l'appareil)"
+        },
+        "noOtherAccess": "Aucun autre service n'a accès à tes données. Nous ne vendons pas de données à des tiers.",
+        "extraEUNote": "Remarque: Azure OpenAI traite certaines données conversationnelles aux États-Unis avec des Clauses Contractuelles Types (CCT) selon le RGPD Art. 46."
+      },
+      "section7": {
+        "title": "Bases Légales du Traitement",
+        "primary": "Nous traitons tes données personnelles sur ces bases légales selon le RGPD: (1) Nécessité contractuelle (Art. 6.1.b) - pour fournir le service; (2) Consentement explicite (Art. 6.1.a) - pour les analyses et communications optionnelles; (3) Intérêt légitime (Art. 6.1.f) - pour la sécurité, la prévention de la fraude, l'amélioration du service.",
+        "transfers": "Les transferts de données vers des pays en dehors de l'UE (comme les États-Unis) ne se font que pour des services avec des Clauses Contractuelles Types (CCT) approuvées ou des décisions d'adéquation de l'UE.",
+        "legalBasis": "Ta base légale pour le traitement des données est le consentement au service (contrat) et, le cas échéant, le consentement explicite que tu as donné dans les paramètres."
+      },
+      "section8": {
+        "title": "Responsable du Traitement et Sous-traitants",
+        "intro": "MirrorBuddy est le responsable du traitement. Cependant, certains services sont traités par des sous-traitants qui traitent les données en notre nom selon des contrats de traitement des données (DPA) conformes au RGPD Art. 28.",
+        "subprocessorsHeading": "Nos sous-traitants certifiés:",
+        "subprocessors": {
+          "vercel": "Hébergement et CDN global - siège dans l'UE, certifié SOC 2 Type II",
+          "supabase": "Base de données PostgreSQL gérée - siège dans l'UE, certifié ISO 27001",
+          "resend": "Service d'e-mail transactionnel - siège dans l'UE, avec DPA conforme au RGPD",
+          "azure": "Traitement de l'IA conversationnelle - siège aux États-Unis mais avec CCT et OneTrust conformes"
+        },
+        "gdprObligations": "Tous les sous-traitants ont signé des contrats DPA conformes au RGPD Art. 28 et 32. Tu peux demander une copie de nos DPA en écrivant à info@fightthestroke.org."
+      },
+      "section9": {
+        "title": "Combien de temps nous conservons tes données",
+        "items": {
+          "activeAccount": "Pendant que ton compte est actif, nous conservons toutes tes données (e-mail, conversations, cartes mnémotechniques, progression) pour fournir le service",
+          "conversations": "Les conversations avec les maestri sont conservées pendant 90 jours d'inactivité, puis archivées pendant 1 an, puis supprimées",
+          "webVitals": "Les données techniques (Web Vitals, erreurs) sont conservées pendant 12 mois pour amélioration, puis agrégées et supprimées",
+          "deletedAccount": "Lorsque tu supprimes ton compte, toutes les données sont supprimées dans les 30 jours (sauvegarde: 90 jours par la loi). Les données agrégées de recherche restent pseudonymisées"
         }
       }
     },

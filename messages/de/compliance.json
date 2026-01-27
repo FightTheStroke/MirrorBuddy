@@ -298,16 +298,131 @@
       "publicDocs": "Public Docs",
       "technicalDocs": "Technical Docs"
     },
-    "privacy": "Privacy Policy",
-    "terms": "Termini di Servizio",
-    "cookies": "Cookie Policy",
-    "accessibility": "Dichiarazione di accessibilità",
-    "aiTransparency": "Trasparenza AI",
-    "privacyTitle": "Informativa sulla Privacy",
-    "termsTitle": "Termini e Condizioni",
-    "cookiesTitle": "Informativa sui Cookie",
-    "accessibilityTitle": "Dichiarazione di Accessibilità",
-    "aiTransparencyTitle": "Trasparenza sull'Intelligenza Artificiale"
+    "privacy": "Datenschutzerklärung",
+    "terms": "Nutzungsbedingungen",
+    "cookies": "Cookie-Richtlinie",
+    "accessibility": "Erklärung zur Barrierefreiheit",
+    "aiTransparency": "KI-Transparenz",
+    "privacyTitle": "Datenschutzerklärung",
+    "termsTitle": "Nutzungsbedingungen",
+    "cookiesTitle": "Cookie-Richtlinie",
+    "accessibilityTitle": "Erklärung zur Barrierefreiheit",
+    "aiTransparencyTitle": "KI-Transparenz",
+    "dataSubjectRights": "Rechte der betroffenen Personen"
+  },
+  "dataSubjectRights": {
+    "page": {
+      "title": "Rechte der betroffenen Personen gemäß DSGVO",
+      "subtitle": "Verstehen Sie Ihre Datenschutzrechte und wie Sie diese wahrnehmen",
+      "description": "MirrorBuddy respektiert vollständig Ihre Rechte als betroffene Person gemäß der Datenschutz-Grundverordnung (DSGVO). Diese Seite erklärt jedes Recht und wie Sie es beantragen können.",
+      "lastUpdated": "Zuletzt aktualisiert",
+      "version": "Version",
+      "backButton": "Zurück"
+    },
+    "introduction": {
+      "title": "Ihre Datenschutzrechte",
+      "content": "Als betroffene Person haben Sie wichtige Rechte bezüglich Ihrer personenbezogenen Daten. Die DSGVO gewährleistet, dass Sie vollständige Kontrolle über Ihre Daten haben und das Recht kennen, wie sie verwendet werden.",
+      "contactText": "Fragen zu Ihren Rechten? Kontaktieren Sie uns unter:"
+    },
+    "rights": {
+      "access": {
+        "title": "Auskunftsrecht (Art. 15 DSGVO)",
+        "description": "Sie haben das Recht, jederzeit auf Ihre personenbezogenen Daten zuzugreifen.",
+        "details": "Sie können eine Kopie aller personenbezogenen Daten anfordern, die wir über Sie speichern, in einem lesbaren Format. Wir werden Ihnen Informationen darüber zur Verfügung stellen, wie Ihre Daten verwendet werden, mit wem sie geteilt werden und wie lange wir sie speichern.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Um dieses Recht auszuüben, wenden Sie sich schriftlich an unser Support-Team mit einer Datenzugangsanfrage."
+      },
+      "rectification": {
+        "title": "Recht auf Berichtigung (Art. 16 DSGVO)",
+        "description": "Sie haben das Recht, Ihre Daten zu korrigieren, wenn sie ungenau oder unvollständig sind.",
+        "details": "Wenn Sie feststellen, dass Ihre personenbezogenen Daten ungenau, unvollständig oder veraltet sind, können Sie sofortige Berichtigung anfordern. Dies umfasst die Aktualisierung Ihrer Profilinformationen, Lernvorlieben oder Kontaktdaten.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Melden Sie sich bei Ihrem Konto an und ändern Sie Ihre Daten direkt, oder wenden Sie sich für Hilfe an uns."
+      },
+      "erasure": {
+        "title": "Recht auf Löschung - \"Recht auf Vergessenwerden\" (Art. 17 DSGVO)",
+        "description": "Sie haben das Recht, die Löschung Ihrer personenbezogenen Daten zu verlangen.",
+        "details": "Unter bestimmten Umständen können Sie die vollständige Entfernung Ihrer personenbezogenen Daten aus unseren Systemen anfordern. Dies umfasst Ihr Konto, den Chat-Verlauf, die Lernendaten und alle zugehörigen Informationen.",
+        "limitations": "Einschränkungen: Einige Daten müssen für rechtliche oder vertragliche Zwecke aufbewahrt werden (z. B. Abrechnungsdaten). Wenn Sie Ihr Konto löschen, werden Ihre Daten innerhalb von 30 Tagen entfernt, sofern nicht gesetzlich vorgeschrieben.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Wenden Sie sich schriftlich an unser Datenschutz-Support-Team mit einer Löschanfrage."
+      },
+      "portability": {
+        "title": "Recht auf Datenportabilität (Art. 20 DSGVO)",
+        "description": "Sie haben das Recht, Ihre Daten in einem strukturierten Format zu erhalten und auf andere Dienste zu übertragen.",
+        "details": "Sie können eine Kopie Ihrer personenbezogenen Daten in einem maschinenlesbaren Format (wie JSON oder CSV) anfordern, um sie problemlos auf einen anderen Dienst zu übertragen. Dies umfasst Ihr Profil, Lernverlauf, Fortschritt und Voreinstellungen.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Wenden Sie sich an unser Team mit einer Datenportabilitätsanfrage."
+      },
+      "object": {
+        "title": "Widerspruchsrecht (Art. 21 DSGVO)",
+        "description": "Sie haben das Recht, sich der Verarbeitung Ihrer Daten zu widersprechen.",
+        "details": "Sie können sich der Verarbeitung Ihrer Daten zu Marketing-, Profiling- oder anderen Zwecken widersetzen. Wenn Sie dieses Recht ausüben, werden wir die Verarbeitung Ihrer Daten für den angegebenen Zweck einstellen, es sei denn, wir haben legitime Gründe zu fortfahren.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Wenden Sie sich an unser Support-Team, um anzugeben, welchen Nutzungen Sie widersprechen möchten."
+      },
+      "restriction": {
+        "title": "Recht auf Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+        "description": "Sie haben das Recht, die Verarbeitung Ihrer Daten einzuschränken.",
+        "details": "Unter bestimmten Umständen können Sie verlangen, dass Ihre Daten 'eingefroren' und nur begrenzt verwendet werden. Dies ist nützlich, wenn Sie die Richtigkeit Ihrer Daten bestreiten oder mit ihrer Verarbeitung nicht einverstanden sind.",
+        "responseTime": "Antwortfrist: 30 Tage (Deutschland)",
+        "howToRequest": "Wenden Sie sich an unser Datenschutz-Team, um die Einschränkung der Verarbeitung anzufordern."
+      }
+    },
+    "countriesInfo": {
+      "germany": {
+        "name": "Deutschland",
+        "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+        "email": "kontakt@bfdi.bund.de",
+        "website": "www.bfdi.bund.de",
+        "responseTime": "30 Tage",
+        "escalationTime": "Sie können bei der BfDI Beschwerde einreichen, wenn Sie Datenschutzbedenken haben."
+      },
+      "italy": {
+        "name": "Italien",
+        "authority": "Garante per la Protezione dei Dati Personali",
+        "email": "garante@gpdp.it",
+        "website": "www.garanteprivacy.it",
+        "responseTime": "30 Tage",
+        "escalationTime": "Sie können bei der Aufsichtsbehörde Beschwerde einreichen."
+      },
+      "france": {
+        "name": "Frankreich",
+        "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+        "email": "cnil@cnil.fr",
+        "website": "www.cnil.fr",
+        "responseTime": "30 Tage",
+        "escalationTime": "Sie können bei der CNIL Beschwerde einreichen, wenn Sie der Meinung sind, dass Ihre Rechte nicht respektiert werden."
+      },
+      "spain": {
+        "name": "Spanien",
+        "authority": "AEPD (Agencia Española de Protección de Datos)",
+        "email": "consultas@aepd.es",
+        "website": "www.aepd.es",
+        "responseTime": "30 Tage",
+        "escalationTime": "Sie können bei der AEPD Beschwerde für Datenschutzfragen einreichen."
+      }
+    },
+    "howToExercise": {
+      "title": "Wie Sie Ihre Rechte ausüben",
+      "steps": {
+        "step1": "Senden Sie schriftliche Anfrage an privacy@mirrorbuddy.com und geben Sie an, welches Recht Sie ausüben möchten.",
+        "step2": "Geben Sie so viele Details wie möglich darüber an, welche Daten oder Aspekte Sie ansprechen möchten.",
+        "step3": "Wir überprüfen Ihre Identität, um Ihre Daten zu schützen.",
+        "step4": "Wir bearbeiten Ihre Anfrage innerhalb von 30 Tagen und kontaktieren Sie mit einer Antwort."
+      },
+      "contactInfo": "Wenn Sie während des Prozesses Fragen haben, kann unser Team Sie unterstützen."
+    },
+    "faq": {
+      "q1": "Wie lange dauert die Antwort?",
+      "a1": "Wir sind verpflichtet, innerhalb von 30 Tagen nach Eingang Ihrer Anfrage zu antworten. Wenn Ihre Anfrage komplex ist, können wir dies um weitere 60 Tage verlängern.",
+      "q2": "Muss ich bezahlen, um meine Rechte auszuüben?",
+      "a2": "Nein, Sie müssen nicht bezahlen. Wenn wir jedoch feststellen, dass Ihre Anfrage offensichtlich unbegründet oder übermäßig ist, können wir eine angemessene Gebühr erheben.",
+      "q3": "Was passiert, wenn Sie meine Anfrage ablehnen?",
+      "a3": "Wenn wir Ihre Anfrage ablehnen, werden wir Ihnen mitteilen, warum, und Ihnen Informationen geben, wie Sie die Entscheidung anfechten können.",
+      "q4": "Kann ich mich nach Erhalt einer Antwort beschweren?",
+      "a4": "Ja, wenn Sie mit unserer Antwort nicht zufrieden sind, können Sie bei Ihrer Datenschutzbehörde Beschwerde einreichen."
+    }
   },
   "contact": {
     "backButton": "Back Button",
@@ -531,23 +646,130 @@
     },
     "privacy": {
       "page": {
-        "backToHome": "Back To Home",
-        "lastUpdated": "Last Updated",
-        "pageNavigation": "Page Navigation",
-        "questionAriaLabel": "Question Aria Label",
-        "questionText": "Question Text",
-        "title": "Titolo",
-        "tldrHeading": "Tldr Heading",
+        "backToHome": "Zurück zur Startseite",
+        "lastUpdated": "Zuletzt aktualisiert",
+        "pageNavigation": "Seitennavigation",
+        "questionAriaLabel": "Datenschutzfragen",
+        "questionText": "Fragen zu unserer Datenschutzerklärung?",
+        "title": "Datenschutzerklärung",
+        "tldrHeading": "Zusammenfassung",
         "version": "Version",
         "tldrItems": {
-          "backToHome": "Back To Home",
-          "lastUpdated": "Last Updated",
-          "pageNavigation": "Page Navigation",
-          "questionAriaLabel": "Question Aria Label",
-          "questionText": "Question Text",
-          "title": "Titolo",
-          "tldrHeading": "Tldr Heading",
-          "version": "Version"
+          "dataCollection": "Wir erfassen nur die notwendigen Daten, um dir beim Lernen zu helfen und MirrorBuddy zu verbessern",
+          "noDataSale": "Wir verkaufen deine Daten niemals an Dritte",
+          "deleteAnytime": "Du kannst dein Konto und deine Daten jederzeit löschen",
+          "europeanData": "Deine Daten werden durch deutsches und europäisches Datenschutzrecht geschützt",
+          "optionalAnalytics": "Optionale Analysen helfen uns zu verstehen, wie du die App nutzt, aber du kannst ablehnen"
+        }
+      },
+      "section1": {
+        "title": "Wer wir sind und wie diese Richtlinie funktioniert",
+        "content": "MirrorBuddy ist eine Lern-App für Schüler mit Lernbehinderungen, entwickelt von einem internationalen Team mit Sitz in der EU. Diese Datenschutzerklärung erläutert, wie wir deine personenbezogenen Daten erfassen, nutzen und schützen. Als Verantwortlicher für die Datenverarbeitung sind wir verantwortlich für den Schutz deiner persönlichen Informationen gemäß der Datenschutz-Grundverordnung (DSGVO) und des Bundesdatenschutzgesetzes (BDSG)."
+      },
+      "section2": {
+        "title": "Welche Daten wir erfassen",
+        "intro": "Um dir unseren Service zu bieten, erfassen wir diese personenbezogenen Daten:",
+        "itemLabels": {
+          "email": "E-Mail",
+          "name": "Name",
+          "conversations": "Unterhaltungen",
+          "flashcards": "Lernkarten",
+          "progress": "Lernfortschritt",
+          "settings": "Benutzereinstellungen"
+        },
+        "items": {
+          "email": "Wird für die Anmeldung und Benachrichtigungen verwendet",
+          "name": "Wird verwendet, um dein Erlebnis zu personalisieren",
+          "conversations": "Werden gespeichert, um das Lernen fortzusetzen, wo du aufgehört hast",
+          "flashcards": "Werden verwendet, um deinen Fortschritt mittels FSRS-Algorithmus zu verfolgen",
+          "progress": "Wird erfasst, um dir personalisierten Feedback zu geben",
+          "settings": "Werden gespeichert, um deine Barrierefreiheits- und Spracheinstellungen zu merken"
+        }
+      },
+      "section3": {
+        "title": "Empfindliche Daten, die wir niemals erfassen",
+        "intro": "Um deine Privatsphäre zu schützen, erfassen wir niemals empfindliche Daten wie:",
+        "items": {
+          "health": "Gesundheitsinformationen (es sei denn, du teilst sie freiwillig in einer Unterhaltung)",
+          "payments": "Direkte Zahlungsdetails (wir nutzen zertifizierte Dritte)",
+          "media": "Persönliche Fotos oder Videos",
+          "gps": "Deinen geografischen Standort"
+        }
+      },
+      "section4": {
+        "title": "Wie wir deine Daten nutzen",
+        "intro": "Wir nutzen deine Daten nur für diese legitimen Zwecke:",
+        "items": {
+          "appFunctionality": "Laden deine Unterhaltungen, Lernkarten und Fortschritt",
+          "personalization": "Passe die Maestri an deine Interessen und Lernstände an",
+          "improvement": "Verstehe, wie du MirrorBuddy nutzt, um neue Funktionen hinzuzufügen (mit optionalen Analysen)",
+          "support": "Helfe dir bei technischen oder pädagogischen Problemen"
+        },
+        "disclaimer": "Wir verwenden deine Daten nicht für automatische Profilierung, gezielte Werbung oder Entscheidungen über dich ohne menschliche Beteiligung."
+      },
+      "section5": {
+        "title": "Optionale Analysen und Tracking",
+        "intro": "Als Nutzer kannst du wählen, an unseren Analysen teilzunehmen, um uns zu helfen, die App zu verbessern.",
+        "labels": {
+          "collect": "Was wir erfassen",
+          "why": "Warum",
+          "retention": "Wie lange",
+          "optOut": "Wie man ablehnt"
+        },
+        "weCollect": "Besuchte Seiten, verbrachte Zeit, genutzte Funktionen, aufgetretene Fehler. Keine persönlichen Daten werden in Logs gespeichert.",
+        "why": "Um zu verstehen, welche Funktionen hilfreich sind, wo Schüler Schwierigkeiten haben, und wie MirrorBuddy für alle verbessert werden kann.",
+        "retention": "Analysedaten werden 12 Monate beibehalten, dann aggregiert und entfernt.",
+        "optOut": "Du kannst Analysen in den Datenschutzeinstellungen deaktivieren, ohne Funktionen zu verlieren."
+      },
+      "section6": {
+        "title": "Wer kann auf deine Daten zugreifen",
+        "intro": "Deine persönlichen Daten sind zugänglich für:",
+        "items": {
+          "you": "Du hast immer die vollständige Kontrolle über deine Daten und kannst sie herunterladen, ändern oder löschen",
+          "parents": "Deine Eltern können deinen Fortschritt über das Eltern-Dashboard überwachen (wenn du Minderjährig bist)",
+          "team": "Das MirrorBuddy-Team greift auf Daten zu, um technische Unterstützung zu bieten, nur wenn nötig"
+        },
+        "thirdPartyHeading": "Vertrauenswürdige Partner",
+        "thirdPartyIntro": "Wir verwenden diese zertifizierten Dienste, um MirrorBuddy sicher zu betreiben:",
+        "vendors": {
+          "vercel": "Vercel (Server-Hosting, DSGVO-konform, EU-Sitz)",
+          "supabase": "Supabase (PostgreSQL-Datenbank, verschlüsselt, DSGVO-konform)",
+          "azure": "Azure OpenAI (Verarbeitung von Gesprächsdaten, DSGVO-konform)",
+          "resend": "Resend (Versand von Transaktions-E-Mails, DSGVO-konform)",
+          "upstash": "Upstash (Redis-Cache, DSGVO-konform)",
+          "brave": "Brave (optionale datenschutzfreundliche Suche, erfasst keine IP)",
+          "google": "Google Drive (optional zum Hochladen von Dokumenten, nur wenn du dich verbindest)",
+          "grafana": "Grafana (nur Systemmetriken, keine persönlichen Daten)",
+          "ollama": "Ollama (optionale lokale KI-Modelle, alles auf dem Gerät)"
+        },
+        "noOtherAccess": "Kein anderer Dienst hat Zugriff auf deine Daten. Wir verkaufen Daten nicht an Dritte.",
+        "extraEUNote": "Hinweis: Azure OpenAI verarbeitet einige Gesprächsdaten in den USA mit Standard Contractual Clauses (SCC) gemäß DSGVO Art. 46."
+      },
+      "section7": {
+        "title": "Rechtsgrundlagen für die Verarbeitung",
+        "primary": "Wir verarbeiten deine Daten auf diesen Rechtsgrundlagen gemäß DSGVO: (1) Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b) - um den Service bereitzustellen; (2) Explizite Zustimmung (Art. 6 Abs. 1 lit. a) - für optionale Analysen und Kommunikation; (3) Berechtigtes Interesse (Art. 6 Abs. 1 lit. f) - für Sicherheit, Betrugsprävention, Service-Verbesserung.",
+        "transfers": "Datenübertragungen in Länder außerhalb der EU erfolgen nur für Dienste mit genehmigten Standard Contractual Clauses (SCC) oder EU-Angemessenheitsbeschlüssen.",
+        "legalBasis": "Deine Rechtsgrundlage für die Datenverarbeitung ist deine Zustimmung zum Service (Vertrag) und, sofern zutreffend, deine explizite Zustimmung in den Einstellungen."
+      },
+      "section8": {
+        "title": "Verantwortlicher und Auftragsverarbeiter",
+        "intro": "MirrorBuddy ist der Verantwortliche. Einige Dienste werden von Auftragsverarbeitern verarbeitet, die Daten in unserem Auftrag gemäß Datenverarbeitungsverträgen (DPA) verarbeiten, die DSGVO Art. 28 entsprechen.",
+        "subprocessorsHeading": "Unsere zertifizierten Auftragsverarbeiter:",
+        "subprocessors": {
+          "vercel": "Hosting und globales CDN - EU-Sitz, SOC 2 Type II zertifiziert",
+          "supabase": "Verwaltete PostgreSQL-Datenbank - EU-Sitz, ISO 27001 zertifiziert",
+          "resend": "Transaktions-E-Mail-Service - EU-Sitz, mit DSGVO-konformem DPA",
+          "azure": "Verarbeitung von Gesprächs-KI - USA-Sitz aber mit SCC und OneTrust konform"
+        },
+        "gdprObligations": "Alle Auftragsverarbeiter haben Datenverarbeitungsverträge gemäß DSGVO Art. 28 und 32 unterzeichnet. Du kannst eine Kopie unserer DPA anfordern, indem du info@fightthestroke.org kontaktierst."
+      },
+      "section9": {
+        "title": "Wie lange wir deine Daten behalten",
+        "items": {
+          "activeAccount": "Während dein Konto aktiv ist, speichern wir alle deine Daten (E-Mail, Unterhaltungen, Lernkarten, Fortschritt), um den Service bereitzustellen",
+          "conversations": "Unterhaltungen mit Maestri werden 90 Tage Inaktivität beibehalten, dann 1 Jahr archiviert, dann gelöscht",
+          "webVitals": "Technische Daten (Web Vitals, Fehler) werden 12 Monate zur Verbesserung beibehalten, dann aggregiert und gelöscht",
+          "deletedAccount": "Wenn du dein Konto löschst, werden alle Daten innerhalb von 30 Tagen gelöscht (Sicherung: 90 Tage nach Gesetz). Aggregierte Forschungsdaten bleiben pseudonymisiert"
         }
       }
     },

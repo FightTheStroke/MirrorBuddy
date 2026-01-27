@@ -301,13 +301,136 @@
     "privacy": "Privacy Policy",
     "terms": "Termini di Servizio",
     "cookies": "Cookie Policy",
-    "accessibility": "Dichiarazione di accessibilità",
-    "aiTransparency": "Trasparenza AI",
-    "privacyTitle": "Informativa sulla Privacy",
-    "termsTitle": "Termini e Condizioni",
-    "cookiesTitle": "Informativa sui Cookie",
-    "accessibilityTitle": "Dichiarazione di Accessibilità",
-    "aiTransparencyTitle": "Trasparenza sull'Intelligenza Artificiale"
+    "accessibility": "Accessibility Statement",
+    "aiTransparency": "AI Transparency",
+    "privacyTitle": "Privacy Policy",
+    "termsTitle": "Terms of Service",
+    "cookiesTitle": "Cookie Policy",
+    "accessibilityTitle": "Accessibility Statement",
+    "aiTransparencyTitle": "AI Transparency",
+    "dataSubjectRights": "Data Subject Rights"
+  },
+  "dataSubjectRights": {
+    "page": {
+      "title": "Data Subject Rights Under GDPR",
+      "subtitle": "Understand your privacy rights and how to exercise them",
+      "description": "MirrorBuddy fully respects your rights as a data subject under the General Data Protection Regulation (GDPR). This page explains each right and how you can request it.",
+      "lastUpdated": "Last Updated",
+      "version": "Version",
+      "backButton": "Back"
+    },
+    "introduction": {
+      "title": "Your Privacy Rights",
+      "content": "As a data subject, you have important rights regarding your personal data. GDPR ensures you have full control over your data and the right to know how it's used.",
+      "contactText": "Questions about your rights? Contact us at:"
+    },
+    "rights": {
+      "access": {
+        "title": "Right of Access (Art. 15 GDPR)",
+        "description": "You have the right to access your personal data at any time.",
+        "details": "You can request a copy of all personal data we hold about you in a readable format. We will provide information about how your data is used, with whom it is shared, and how long we retain it.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "To exercise this right, contact our support team with a written data access request."
+      },
+      "rectification": {
+        "title": "Right of Rectification (Art. 16 GDPR)",
+        "description": "You have the right to correct your data if it's inaccurate or incomplete.",
+        "details": "If you discover that your personal data is inaccurate, incomplete, or outdated, you can request immediate correction. This includes updating your profile information, educational preferences, or contact details.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "Log into your account and modify your data directly, or contact us for assistance."
+      },
+      "erasure": {
+        "title": "Right to be Forgotten - Erasure (Art. 17 GDPR)",
+        "description": "You have the right to obtain deletion of your personal data.",
+        "details": "Under certain circumstances, you can request complete removal of your personal data from our systems. This includes your account, chat history, learning data, and all associated information.",
+        "limitations": "Limitations: Some data must be retained for legal or contractual purposes (e.g., billing). When you delete your account, your data is removed within 30 days unless required by law.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "Contact our privacy support team with a written deletion request."
+      },
+      "portability": {
+        "title": "Right to Data Portability (Art. 20 GDPR)",
+        "description": "You have the right to receive your data in a structured format and transfer it to other services.",
+        "details": "You can request a copy of your personal data in a machine-readable format (such as JSON or CSV), allowing you to transfer it to another service without information loss. This includes your profile, learning history, progress, and preferences.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "Contact our team with a data portability request."
+      },
+      "object": {
+        "title": "Right to Object (Art. 21 GDPR)",
+        "description": "You have the right to object to the processing of your data.",
+        "details": "You can object to your data being processed for marketing, profiling, or other purposes. If you exercise this right, we will stop processing your data for the specified purpose, except where we have legitimate reasons to continue.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "Contact our support team to specify which uses you wish to object to."
+      },
+      "restriction": {
+        "title": "Right to Restrict Processing (Art. 18 GDPR)",
+        "description": "You have the right to restrict processing of your data.",
+        "details": "In some circumstances, you can request that your data be 'frozen' and used only in a limited way. This is useful if you dispute the accuracy of your data or disagree with its processing.",
+        "responseTime": "Response time: 30 days (UK: 30 days)",
+        "howToRequest": "Contact our privacy team to request processing restriction."
+      }
+    },
+    "countriesInfo": {
+      "italy": {
+        "name": "Italy",
+        "authority": "Garante per la Protezione dei Dati Personali (Data Protection Authority)",
+        "email": "garante@gpdp.it",
+        "website": "www.garanteprivacy.it",
+        "responseTime": "30 days",
+        "escalationTime": "If unsatisfied with our response, you can file a complaint with the supervisory authority within 12 months."
+      },
+      "france": {
+        "name": "France",
+        "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+        "email": "cnil@cnil.fr",
+        "website": "www.cnil.fr",
+        "responseTime": "30 days",
+        "escalationTime": "You can file a complaint with CNIL if you believe your rights are not respected."
+      },
+      "germany": {
+        "name": "Germany",
+        "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+        "email": "kontakt@bfdi.bund.de",
+        "website": "www.bfdi.bund.de",
+        "responseTime": "30 days",
+        "escalationTime": "You can file a complaint with BfDI if you have data protection concerns."
+      },
+      "spain": {
+        "name": "Spain",
+        "authority": "AEPD (Agencia Española de Protección de Datos)",
+        "email": "consultas@aepd.es",
+        "website": "www.aepd.es",
+        "responseTime": "30 days",
+        "escalationTime": "You can file a complaint with AEPD for data protection issues."
+      },
+      "uk": {
+        "name": "United Kingdom",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 days",
+        "escalationTime": "You can file a complaint with the ICO if your UK data protection rights are violated."
+      }
+    },
+    "howToExercise": {
+      "title": "How to Exercise Your Rights",
+      "steps": {
+        "step1": "Send a written request to privacy@mirrorbuddy.com specifying which right you wish to exercise.",
+        "step2": "Provide as much detail as possible about which data or aspects you want to address.",
+        "step3": "We verify your identity to protect your data.",
+        "step4": "We process your request within 30 days and contact you with a response."
+      },
+      "contactInfo": "If you have questions during the process, our team is available to assist you."
+    },
+    "faq": {
+      "q1": "How long does it take to respond?",
+      "a1": "We are required to respond within 30 days of receiving your request. If your request is complex, we may extend this by an additional 60 days.",
+      "q2": "Do I have to pay to exercise my rights?",
+      "a2": "No, you don't have to pay. However, if we believe your request is manifestly unfounded or excessive, we may charge a reasonable fee.",
+      "q3": "What if you don't grant my request?",
+      "a3": "If we refuse your request, we will explain why and provide information on how to contest the decision.",
+      "q4": "Can I complain after receiving a response?",
+      "a4": "Yes, if you're unsatisfied with our response, you can file a complaint with your country's data protection authority."
+    }
   },
   "contact": {
     "backButton": "Back Button",
@@ -531,23 +654,130 @@
     },
     "privacy": {
       "page": {
-        "backToHome": "Back To Home",
+        "backToHome": "Back to Home",
         "lastUpdated": "Last Updated",
         "pageNavigation": "Page Navigation",
-        "questionAriaLabel": "Question Aria Label",
-        "questionText": "Question Text",
-        "title": "Titolo",
-        "tldrHeading": "Tldr Heading",
+        "questionAriaLabel": "Privacy Questions",
+        "questionText": "Questions about our privacy policy?",
+        "title": "Privacy Policy",
+        "tldrHeading": "Quick Summary",
         "version": "Version",
         "tldrItems": {
-          "backToHome": "Back To Home",
-          "lastUpdated": "Last Updated",
-          "pageNavigation": "Page Navigation",
-          "questionAriaLabel": "Question Aria Label",
-          "questionText": "Question Text",
-          "title": "Titolo",
-          "tldrHeading": "Tldr Heading",
-          "version": "Version"
+          "dataCollection": "We collect only the data necessary to help you learn and improve MirrorBuddy",
+          "noDataSale": "We never sell your data to third parties",
+          "deleteAnytime": "You can delete your account and data anytime",
+          "europeanData": "Your data is protected by UK GDPR and UK data protection law",
+          "optionalAnalytics": "Optional analytics help us understand how you use the app, but you can refuse"
+        }
+      },
+      "section1": {
+        "title": "Who We Are and How This Policy Works",
+        "content": "MirrorBuddy is an educational app for students with learning differences, developed by an international team with UK representation. This privacy policy explains how we collect, use, and protect your personal data. As your data controller, we are responsible for protecting your personal information in compliance with the UK General Data Protection Regulation (GDPR) and the Data Protection Act 2018."
+      },
+      "section2": {
+        "title": "What Data We Collect",
+        "intro": "To provide our service, we collect these personal data:",
+        "itemLabels": {
+          "email": "Email",
+          "name": "Name",
+          "conversations": "Conversations",
+          "flashcards": "Flashcards",
+          "progress": "Learning Progress",
+          "settings": "User Preferences"
+        },
+        "items": {
+          "email": "Used for login and notifications",
+          "name": "Used to personalise your experience",
+          "conversations": "Saved to continue learning from where you left off",
+          "flashcards": "Used to track your learning via FSRS algorithm",
+          "progress": "Recorded to give you personalised feedback",
+          "settings": "Saved to remember your accessibility and language choices"
+        }
+      },
+      "section3": {
+        "title": "Sensitive Data We Never Collect",
+        "intro": "To protect your privacy, we never collect sensitive data such as:",
+        "items": {
+          "health": "Health information (unless you voluntarily share it in a conversation)",
+          "payments": "Direct payment details (we use certified third parties)",
+          "media": "Personal photos or videos",
+          "gps": "Your geographical location"
+        }
+      },
+      "section4": {
+        "title": "How We Use Your Data",
+        "intro": "We use your data only for these legitimate purposes:",
+        "items": {
+          "appFunctionality": "Load your conversations, flashcards and progress",
+          "personalization": "Adapt the maestri to your interests and learning level",
+          "improvement": "Understand how you use MirrorBuddy to add new features (with optional analytics)",
+          "support": "Help you if you experience technical or pedagogical issues"
+        },
+        "disclaimer": "We do not use your data for automated profiling, targeted advertising, or decisions about you without human involvement."
+      },
+      "section5": {
+        "title": "Optional Analytics and Tracking",
+        "intro": "As a user, you can choose to participate in our analytics to help us improve the app.",
+        "labels": {
+          "collect": "What We Collect",
+          "why": "Why",
+          "retention": "How Long",
+          "optOut": "How to Refuse"
+        },
+        "weCollect": "Pages visited, time spent, features used, errors encountered. No personal data is stored in logs.",
+        "why": "To understand which features are helpful, where students struggle, and how to make MirrorBuddy better for everyone.",
+        "retention": "Analytics data is retained for 12 months, then aggregated and removed.",
+        "optOut": "You can disable analytics in privacy settings without losing any functionality."
+      },
+      "section6": {
+        "title": "Who Can Access Your Data",
+        "intro": "Your personal data is accessible to:",
+        "items": {
+          "you": "You have complete control of your data and can download, modify or delete it",
+          "parents": "Your parents can monitor your progress via the Parent Dashboard (if you are a minor)",
+          "team": "The MirrorBuddy team accesses data for technical support, only when necessary"
+        },
+        "thirdPartyHeading": "Trusted Partners",
+        "thirdPartyIntro": "We use these certified services to run MirrorBuddy safely:",
+        "vendors": {
+          "vercel": "Vercel (server hosting, GDPR compliant, EU-based)",
+          "supabase": "Supabase (PostgreSQL database, encrypted, GDPR compliant)",
+          "azure": "Azure OpenAI (conversational data processing, GDPR compliant)",
+          "resend": "Resend (transactional email sending, GDPR compliant)",
+          "upstash": "Upstash (Redis cache, GDPR compliant)",
+          "brave": "Brave (optional privacy-first search, doesn't collect IP)",
+          "google": "Google Drive (optional for document uploads, only when you choose to connect)",
+          "grafana": "Grafana (system metrics only, no personal data)",
+          "ollama": "Ollama (optional local AI models, all on-device)"
+        },
+        "noOtherAccess": "No other service has access to your data. We do not sell data to third parties.",
+        "extraEUNote": "Note: Azure OpenAI processes some conversational data in the USA with Standard Contractual Clauses (SCC) as per UK GDPR Art. 46."
+      },
+      "section7": {
+        "title": "Legal Basis for Processing",
+        "primary": "We process your personal data on these legal bases under UK GDPR: (1) Contractual necessity (Art. 6.1.b) - to provide the service; (2) Explicit consent (Art. 6.1.a) - for optional analytics and communications; (3) Legitimate interest (Art. 6.1.f) - for security, fraud prevention, service improvement.",
+        "transfers": "Data transfers to non-UK countries (such as the USA) only occur for services with approved Standard Contractual Clauses (SCC) or UK adequacy decisions.",
+        "legalBasis": "Your legal basis for data processing is consent to the service (contract) and, where applicable, explicit consent you have given in settings."
+      },
+      "section8": {
+        "title": "Data Controller and Processors",
+        "intro": "MirrorBuddy is the data controller. However, some services are processed by data processors who process data on our behalf under DPA (Data Processing Agreements) compliant with UK GDPR Art. 28.",
+        "subprocessorsHeading": "Our certified data processors:",
+        "subprocessors": {
+          "vercel": "Hosting and global CDN - EU-based, SOC 2 Type II certified",
+          "supabase": "Managed PostgreSQL database - EU-based, ISO 27001 certified",
+          "resend": "Transactional email service - EU-based, with UK GDPR compliant DPA",
+          "azure": "Conversational AI processing - USA-based but with SCC and OneTrust compliant"
+        },
+        "gdprObligations": "All data processors have signed DPA contracts compliant with UK GDPR Art. 28 and 32. You can request a copy of our DPAs by writing to info@fightthestroke.org."
+      },
+      "section9": {
+        "title": "How Long We Keep Your Data",
+        "items": {
+          "activeAccount": "While your account is active, we retain all your data (email, conversations, flashcards, progress) to provide the service",
+          "conversations": "Conversations with maestri are retained for 90 days of inactivity, then archived for 1 year, then deleted",
+          "webVitals": "Technical data (Web Vitals, errors) is retained for 12 months for improvement, then aggregated and deleted",
+          "deletedAccount": "When you delete your account, all data is deleted within 30 days (backup: 90 days by law). Aggregated research data remains pseudonymised"
         }
       }
     },
