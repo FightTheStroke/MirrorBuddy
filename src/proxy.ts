@@ -1,9 +1,10 @@
 // ============================================================================
-// PROXY: Route Protection + Provider Check + CSP Nonce + Observability
+// PROXY: Route Protection + Provider Check + CSP Nonce + Observability + i18n
 // 1. Protects MirrorBuddy from unauthorized access (ADR 0055, 0056)
 // 2. Redirects to /landing if no AI provider is configured
 // 3. Injects nonce-based CSP headers for XSS protection (F-03)
 // 4. Tracks latency and errors for API routes (F-02, F-03)
+// 5. Handles i18n locale detection and routing (ADR 0066)
 //
 // Next.js 16: middleware.ts renamed to proxy.ts (December 2025)
 // - "Proxy" clarifies network boundary role (vs Express "middleware" confusion)
@@ -13,15 +14,42 @@
 
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import createIntlMiddleware from "next-intl/middleware";
 import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
 import { metricsStore } from "@/lib/observability/metrics-store";
 import {
   AUTH_COOKIE_NAME,
   VISITOR_COOKIE_NAME,
 } from "@/lib/auth/cookie-constants";
+import { routing } from "@/i18n/routing";
 
 const REQUEST_ID_HEADER = "x-request-id";
 const RESPONSE_TIME_HEADER = "x-response-time";
+
+// ==========================================================================
+// i18n MIDDLEWARE (next-intl)
+// Handles locale detection and routing for localized pages
+// CRITICAL: Only applies to pages inside [locale], NOT to /api or static files
+// ==========================================================================
+const intlMiddleware = createIntlMiddleware(routing);
+
+// Paths that should NEVER be handled by i18n middleware
+// These will bypass locale routing entirely
+const I18N_EXCLUDE_PATHS = [
+  "/api",
+  "/admin",
+  "/_next",
+  "/monitoring",
+  "/favicon",
+  "/icon",
+  "/apple-icon",
+  "/manifest",
+  "/robots",
+  "/sitemap",
+  "/maestri", // Static avatar images
+  "/avatars", // Static avatar images
+  "/logo", // Logo images
+];
 
 // Public routes that don't require authentication (ADR 0055, 0056)
 const AUTH_PUBLIC_ROUTES = [
@@ -195,6 +223,22 @@ export function buildCSPHeader(nonce: string): string {
   ].join("; ");
 }
 
+/**
+ * Check if path should skip i18n middleware entirely
+ * These paths are not localized and should not be redirected
+ */
+function shouldSkipI18n(pathname: string): boolean {
+  // Skip paths that start with excluded prefixes
+  if (I18N_EXCLUDE_PATHS.some((prefix) => pathname.startsWith(prefix))) {
+    return true;
+  }
+  // Skip static files (images, fonts, etc.)
+  if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
+    return true;
+  }
+  return false;
+}
+
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const startTime = Date.now();
@@ -214,13 +258,33 @@ export function proxy(request: NextRequest) {
   const nonce = generateNonce();
   requestHeaders.set(CSP_NONCE_HEADER, nonce);
 
-  // Skip static files - no CSP needed, but add request ID
+  // ==========================================================================
+  // STATIC FILES - Skip all processing, just add request ID
+  // ==========================================================================
   if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
     const response = NextResponse.next({
       request: { headers: requestHeaders },
     });
     response.headers.set(REQUEST_ID_HEADER, requestId);
     return response;
+  }
+
+  // ==========================================================================
+  // i18n ROUTING - Handle locale detection for localized pages ONLY
+  // CRITICAL: Skip for /api, /admin, static files to prevent 307 redirects
+  // ==========================================================================
+  if (!shouldSkipI18n(pathname)) {
+    // Check if pathname already has a locale prefix
+    const locales = ["it", "en", "fr", "de", "es"];
+    const hasLocalePrefix = locales.some(
+      (locale) =>
+        pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+    );
+
+    // Only apply i18n middleware if no locale prefix (needs redirect)
+    if (!hasLocalePrefix) {
+      return intlMiddleware(request);
+    }
   }
 
   // Helper to finalize response with metrics
