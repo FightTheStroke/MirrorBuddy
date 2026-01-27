@@ -133,6 +133,11 @@ export function WelcomeFooter() {
         <p className="text-center text-xs text-gray-500 dark:text-gray-500">
           © {currentYear} MirrorBuddy. Progetto open source su GitHub.
         </p>
+
+        {/* Made in Europe - intentionally not localized */}
+        <p className="text-center text-xs text-gray-400 dark:text-gray-600 mt-2">
+          Made with <span className="text-red-500">♥</span> in Europe
+        </p>
       </div>
     </motion.footer>
   );
