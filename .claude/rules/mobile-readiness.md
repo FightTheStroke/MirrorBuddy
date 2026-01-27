@@ -185,6 +185,116 @@ Before merging any PR that touches UI:
 <div className="order-last md:order-first">Important info</div>
 ```
 
+## Anti-Patterns to Avoid (Regression Prevention)
+
+### The `w-full sm:w-*` Trap
+
+**ANTI-PATTERN** - Causes 100% width on mobile:
+
+```tsx
+// DON'T DO THIS - takes 100% viewport on mobile
+className = "w-full sm:w-72 lg:w-64";
+```
+
+On mobile (0-639px), this renders at 100% of the viewport. Combined with fixed horizontal elements, this creates horizontal scrolling - a mobile UX disaster.
+
+**GOOD - Fixed width on mobile**:
+
+```tsx
+// Fixed width that works on all screens
+className = "w-28 sm:w-72 lg:w-64";
+```
+
+**GOOD - Constrained full width**:
+
+```tsx
+// Full width but with max constraint
+className = "w-full max-w-xs sm:w-72";
+```
+
+**GOOD - CSS min() function**:
+
+```tsx
+// Responsive with CSS calculation (browser handles sizing)
+className = "w-[min(7rem,85vw)] sm:w-72";
+```
+
+### Why This Matters
+
+The pattern `w-full sm:w-*` means:
+
+- Mobile (0-639px): **100% viewport width** ← Problem!
+- sm+ (640px+): Fixed or percentage width
+
+For sidebars, panels, modals, and drawers, 100% mobile width breaks layouts:
+
+| Component      | Issue                              | Fix                                                |
+| -------------- | ---------------------------------- | -------------------------------------------------- |
+| Sidebar drawer | Overlaps content, no tap targets   | Use fixed width or `w-[min(80vw,calc(100%-2rem))]` |
+| Panel          | Pushes sibling elements off-screen | Add `max-w-*` constraint                           |
+| Modal          | No padding from edges              | Use `w-[min(90vw,28rem)]` pattern                  |
+
+### Pre-commit Hook Protection
+
+A pre-commit hook **automatically blocks** the anti-pattern:
+
+```bash
+# Detects: w-full sm:w-* without max-w-*
+# Blocks commit with suggestion:
+✘ Mobile anti-pattern detected: w-full sm:w-*
+  File: src/components/sidebar.tsx:42
+  Suggestion: Add max-w-xs or use w-[min(7rem,85vw)]
+```
+
+**Cannot be bypassed** without explicit flag (security via automation).
+
+### CI Mobile Regression Tests
+
+Mobile E2E tests run automatically on every PR:
+
+```bash
+# iPhone SE (375px) - catches horizontal scroll
+✓ No horizontal scrollbar
+✓ All panels fit within viewport
+✓ Touch targets not clipped
+
+# Pixel 7 (412px) - validates Android
+✓ Sidebar respects safe area
+✓ < 30% viewport overflow
+
+# Tests fail if:
+✗ Horizontal scroll detected
+✗ Sidebar/panel > 85% viewport
+✗ Touch target extends beyond screen edge
+```
+
+**Cannot merge** to main until mobile tests pass.
+
+### When Regression Occurs
+
+**Symptom**: "Horizontal scrollbar on mobile after PR X"
+
+**Root cause**: Someone used `w-full sm:w-*` pattern
+
+**Detection time**: 3-5 minutes (CI catches it)
+
+**Prevention**:
+
+1. Pre-commit hook blocks commit
+2. CI mobile tests fail on PR
+3. Code review catches pattern
+4. Issue cannot merge to main
+
+**Rare workaround** (only for complex responsive cases):
+
+```tsx
+// Document explicitly why w-full is needed
+className =
+  "w-full sm:w-72"; /* REGRESSION: required for drawer overlay - verified no scroll at 375px */
+```
+
+Then verify with: `npx playwright test --project=iphone-se e2e/mobile/responsive-layout.spec.ts`
+
 ## File Locations
 
 | File                                   | Purpose                         |

@@ -28,7 +28,12 @@ export interface HybridSearchOptions {
   query: string;
   limit?: number;
   minScore?: number;
-  sourceType?: "material" | "flashcard" | "studykit" | "message";
+  sourceType?:
+    | "material"
+    | "flashcard"
+    | "studykit"
+    | "message"
+    | "conversation_summary";
   subject?: string;
   semanticWeight?: number;
   excludeSourceIds?: string[];
