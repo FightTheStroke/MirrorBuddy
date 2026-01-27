@@ -5,9 +5,9 @@
     },
     "page": {
       "backButton": "Back Button",
-      "lastUpdated": "Última actualización: {date}",
+      "lastUpdated": "Last Updated",
       "title": "Titolo",
-      "version": "Versión {version}"
+      "version": "Version"
     },
     "relatedDocs": {
       "heading": "Heading",
@@ -309,20 +309,20 @@
     "accessibilityTitle": "Declaración de Accesibilidad",
     "aiTransparencyTitle": "Transparencia de IA",
     "dataSubjectRights": "Derechos de los Interesados",
-    "aiRegulatoryContacts": "Contactos Regulatorios de IA"
+    "aiRegulatoryContacts": "Contactos de Autoridades Regulatorias de IA"
   },
   "aiRegulatoryContacts": {
     "page": {
       "title": "Contactos Regulatorios de IA por País",
-      "subtitle": "Autoridades reguladoras de IA para cada nación",
-      "description": "Información de contacto oficial para las autoridades responsables del cumplimiento normativo de IA",
-      "lastUpdated": "Última actualización",
+      "subtitle": "Autoridades regulatorias de IA para cada nación",
+      "description": "Información de contacto oficial de las autoridades regulatorias responsables de la conformidad normativa de IA",
+      "lastUpdated": "Última Actualización",
       "version": "Versión",
-      "backButton": "Volver"
+      "backButton": "Atrás"
     },
     "introduction": {
-      "title": "Autoridades Reguladoras de IA",
-      "content": "MirrorBuddy opera en cumplimiento con las regulaciones de IA en varios países. Si tiene preguntas sobre nuestro cumplimiento normativo o desea informar un problema, puede contactar directamente a las autoridades competentes en su país."
+      "title": "Autoridades Regulatorias de IA",
+      "content": "MirrorBuddy opera en cumplimiento con las regulaciones de IA en múltiples países. Si tiene preguntas sobre nuestro cumplimiento normativo o desea reportar un problema, puede contactar directamente con las autoridades competentes en su país."
     },
     "countries": {
       "italy": {
@@ -330,7 +330,7 @@
         "authorities": [
           {
             "name": "AgID (Agenzia per l'Italia Digitale)",
-            "role": "Autoridad Principal de Cumplimiento de IA",
+            "role": "Autoridad Principal de Conformidad con IA",
             "website": "https://www.agid.gov.it",
             "email": "ai.policy@agid.gov.it",
             "phone": "+39 06 8526 1",
@@ -350,7 +350,7 @@
         "name": "Reino Unido",
         "authorities": [
           {
-            "name": "AISI UK (AI Safety Institute)",
+            "name": "AISI UK (Instituto de Seguridad de IA)",
             "role": "Autoridad Principal de Seguridad de IA",
             "website": "https://www.aisi.gov.uk",
             "email": "hello@aisi.gov.uk",
@@ -396,8 +396,8 @@
             "role": "Autoridad Principal de Supervisión de IA",
             "website": "https://www.aesia.es",
             "email": "info@aesia.es",
-            "phone": "[REQUIERE VERIFICACIÓN]",
-            "address": "Madrid, España [REQUIERE VERIFICACIÓN]"
+            "phone": "[REQUIRES VERIFICATION]",
+            "address": "Madrid, España [REQUIRES VERIFICATION]"
           },
           {
             "name": "AEPD (Agencia Española de Protección de Datos)",
@@ -409,7 +409,7 @@
           },
           {
             "name": "Defensoría del Pueblo",
-            "role": "Oficina del Defensor del Pueblo",
+            "role": "Oficina del Defensor de los Derechos",
             "website": "https://www.defensordelpueblo.es",
             "email": "defensor@defensordelpueblo.es",
             "phone": "+34 91 432 01 00",
@@ -422,7 +422,7 @@
         "authorities": [
           {
             "name": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-            "role": "Autoridad Principal de Cumplimiento de IA y Protección de Datos",
+            "role": "Autoridad Principal de Conformidad de IA y Protección de Datos",
             "website": "https://www.cnil.fr",
             "email": "contact@cnil.fr",
             "phone": "+33 1 53 73 22 22",
@@ -440,8 +440,8 @@
       }
     },
     "reportingProcess": {
-      "title": "Informar Problemas",
-      "content": "Si encuentra un problema de cumplimiento de IA, puede informarlo a una de las autoridades reguladoras de su país. Las autoridades investigarán su queja y tomarán las medidas apropiadas."
+      "title": "Reporte de Problemas",
+      "content": "Si encuentra un problema de cumplimiento con las regulaciones de IA, puede reportarlo a una de las autoridades regulatorias en su país. Las autoridades investigarán su denuncia y tomarán las medidas apropiadas."
     }
   },
   "dataSubjectRights": {
@@ -535,14 +535,6 @@
         "website": "www.bfdi.bund.de",
         "responseTime": "30 días",
         "escalationTime": "Puede presentar una reclamación ante la BfDI si tiene preocupaciones sobre la protección de datos."
-      },
-      "uk": {
-        "name": "Reino Unido",
-        "authority": "ICO (Information Commissioner's Office)",
-        "email": "mail@ico.org.uk",
-        "website": "www.ico.org.uk",
-        "responseTime": "30 días",
-        "escalationTime": "Puede presentar una reclamación ante la ICO si se violan sus derechos de protección de datos en el Reino Unido."
       }
     },
     "howToExercise": {
@@ -1422,6 +1414,74 @@
         "Retroalimentación de al menos 50 usuarios sobre precisión o sesgo"
       ],
       "contact": "Para preguntas sobre esta tarjeta de modelo, contactar: compliance@mirrorbuddy.com"
+    }
+  },
+  "accessibility": {
+    "page": {
+      "title": "[TRANSLATE] Dichiarazione di Accessibilità",
+      "version": "[TRANSLATE] Versione {version}",
+      "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
+      "backHome": "[TRANSLATE] Torna alla home",
+      "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+    },
+    "compliance": {
+      "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
+      "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
+      "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
+      "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
+      "screenReader": "[TRANSLATE] Supporto per screen reader",
+      "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+    },
+    "features": {
+      "heading": "[TRANSLATE] Funzionalità di Accessibilità",
+      "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
+      "dyslexia": "[TRANSLATE] Dislessia",
+      "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
+      "adhd": "[TRANSLATE] ADHD",
+      "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
+      "visual": "[TRANSLATE] Deficit visivo",
+      "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
+      "motor": "[TRANSLATE] Difficoltà motorie",
+      "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
+      "autism": "[TRANSLATE] Autismo",
+      "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
+      "dyscalculia": "[TRANSLATE] Discalculia",
+      "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
+      "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
+      "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+    },
+    "keyboard": {
+      "heading": "[TRANSLATE] Navigazione da Tastiera",
+      "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
+      "tab": "[TRANSLATE] per navigare tra gli elementi",
+      "enter": "[TRANSLATE] per attivare pulsanti e link",
+      "escape": "[TRANSLATE] per chiudere modali e menu",
+      "space": "[TRANSLATE] per selezionare checkbox e toggle"
+    },
+    "screenReader": {
+      "heading": "[TRANSLATE] Supporto Screen Reader",
+      "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
+      "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
+      "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
+      "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
+      "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+    },
+    "limitations": {
+      "heading": "[TRANSLATE] Limitazioni Conosciute",
+      "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+    },
+    "regulatory": {
+      "heading": "[TRANSLATE] Conformità Normativa",
+      "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
+      "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+    },
+    "feedback": {
+      "heading": "[TRANSLATE] Feedback e Segnalazioni",
+      "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
+      "emailLabel": "[TRANSLATE] Email",
+      "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
+      "responseTime": "[TRANSLATE] Tempo di risposta",
+      "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
     }
   }
 }
