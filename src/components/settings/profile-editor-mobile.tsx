@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { Camera, Save, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ export function ProfileEditorMobile({
   profile,
   onSave,
 }: ProfileEditorMobileProps) {
+  const t = useTranslations("common");
   const [formData, setFormData] = useState(profile);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
@@ -146,7 +148,7 @@ export function ProfileEditorMobile({
           {/* Header */}
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              Profilo
+              {t("profile")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
               Update your profile information

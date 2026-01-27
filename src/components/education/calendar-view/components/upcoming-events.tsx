@@ -3,12 +3,13 @@
  * @brief Upcoming events sidebar component
  */
 
-import { motion } from 'framer-motion';
-import { Calendar, CheckCircle2, Edit2, Trash2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { EVENT_TYPES, PRIORITY_COLORS, type EventType } from '../constants';
-import type { SchoolEvent } from '@/lib/stores';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { Calendar, CheckCircle2, Edit2, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { EVENT_TYPES, PRIORITY_COLORS, type EventType } from "../constants";
+import type { SchoolEvent } from "@/lib/stores";
 
 interface UpcomingEventsProps {
   events: SchoolEvent[];
@@ -23,22 +24,21 @@ export function UpcomingEvents({
   onEdit,
   onDelete,
 }: UpcomingEventsProps) {
+  const t = useTranslations("education.calendar");
+
   const getEventTypeConfig = (type: EventType) => {
     return EVENT_TYPES.find((t) => t.id === type) || EVENT_TYPES[0];
   };
 
   const upcomingEvents = events
     .filter((e) => !e.completed && new Date(e.date) >= new Date())
-    .sort(
-      (a, b) =>
-        new Date(a.date).getTime() - new Date(b.date).getTime()
-    )
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     .slice(0, 5);
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Prossimi Eventi</CardTitle>
+        <CardTitle className="text-lg">{t("upcomingEvents")}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
         {upcomingEvents.map((event) => {
@@ -46,7 +46,7 @@ export function UpcomingEvents({
           const Icon = typeConfig.icon;
           const daysUntil = Math.ceil(
             (new Date(event.date).getTime() - new Date().getTime()) /
-              (24 * 60 * 60 * 1000)
+              (24 * 60 * 60 * 1000),
           );
 
           return (
@@ -55,13 +55,13 @@ export function UpcomingEvents({
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className={cn(
-                'p-3 rounded-lg border-l-4 bg-slate-50 dark:bg-slate-800/50',
-                PRIORITY_COLORS[event.priority]
+                "p-3 rounded-lg border-l-4 bg-slate-50 dark:bg-slate-800/50",
+                PRIORITY_COLORS[event.priority],
               )}
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-2">
-                  <div className={cn('p-1.5 rounded', typeConfig.color)}>
+                  <div className={cn("p-1.5 rounded", typeConfig.color)}>
                     <Icon className="w-3 h-3" />
                   </div>
                   <div>
@@ -69,12 +69,12 @@ export function UpcomingEvents({
                       {event.title}
                     </p>
                     <p className="text-xs text-slate-500">
-                      {event.subject} •{' '}
+                      {event.subject} •{" "}
                       {daysUntil === 0
-                        ? 'Oggi'
+                        ? t("today")
                         : daysUntil === 1
-                          ? 'Domani'
-                          : `${daysUntil} giorni`}
+                          ? t("tomorrow")
+                          : t("daysUntil", { daysUntil })}
                     </p>
                   </div>
                 </div>
@@ -106,12 +106,11 @@ export function UpcomingEvents({
         {upcomingEvents.length === 0 && (
           <div className="text-center py-8 text-slate-500">
             <Calendar className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p className="text-sm">Nessun evento in programma</p>
-            <p className="text-xs mt-1">Aggiungi verifiche e compiti!</p>
+            <p className="text-sm">{t("emptyState")}</p>
+            <p className="text-xs mt-1">{t("emptyStateSubtitle")}</p>
           </div>
         )}
       </CardContent>
     </Card>
   );
 }
-

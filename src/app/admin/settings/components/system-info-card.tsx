@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Info } from "lucide-react";
 import {
   Card,
@@ -16,6 +17,8 @@ import {
  * - Build date (hardcoded to current date)
  */
 export function SystemInfoCard() {
+  const t = useTranslations("admin.settings.system-info");
+
   // Get version from package.json
   const version = "0.10.0";
 
@@ -35,24 +38,26 @@ export function SystemInfoCard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Info className="h-5 w-5 text-blue-600" />
-            <CardTitle>System Info</CardTitle>
+            <CardTitle>{t("title")}</CardTitle>
           </div>
         </div>
-        <CardDescription>Informazioni sul sistema</CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {/* Info Grid */}
         <div className="grid grid-cols-2 gap-4">
           {/* Version */}
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">Version</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("version")}
+            </p>
             <p className="text-lg font-semibold text-foreground">{version}</p>
           </div>
 
           {/* Environment */}
           <div className="space-y-1">
             <p className="text-sm font-medium text-muted-foreground">
-              Environment
+              {t("environment")}
             </p>
             <p className="text-lg font-semibold text-foreground capitalize">
               {nodeEnv}
@@ -61,7 +66,9 @@ export function SystemInfoCard() {
 
           {/* Node Version */}
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">Node :</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("node-version")}
+            </p>
             <p className="text-lg font-semibold text-foreground">
               {nodeVersion}
             </p>
@@ -69,7 +76,9 @@ export function SystemInfoCard() {
 
           {/* Build Date */}
           <div className="space-y-1">
-            <p className="text-sm font-medium text-muted-foreground">Build</p>
+            <p className="text-sm font-medium text-muted-foreground">
+              {t("build-date")}
+            </p>
             <p className="text-lg font-semibold text-foreground">{buildDate}</p>
           </div>
         </div>

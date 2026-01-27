@@ -3,13 +3,14 @@
  * @brief Event form modal component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { EVENT_TYPES, SUBJECTS, type Priority } from '../constants';
-import type { NewEventForm } from '../hooks/use-calendar-view';
-import type { SchoolEvent } from '@/lib/stores';
-import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { EVENT_TYPES, SUBJECTS, type Priority } from "../constants";
+import type { NewEventForm } from "../hooks/use-calendar-view";
+import type { SchoolEvent } from "@/lib/stores";
+import { cn } from "@/lib/utils";
 
 interface EventFormModalProps {
   show: boolean;
@@ -28,6 +29,8 @@ export function EventFormModal({
   onSave,
   onCancel,
 }: EventFormModalProps) {
+  const t = useTranslations("education.calendar");
+
   if (!show) return null;
 
   return (
@@ -48,7 +51,7 @@ export function EventFormModal({
         >
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-              {editingEvent ? 'Modifica Evento' : 'Nuovo Evento'}
+              {editingEvent ? t("editEvent") : t("newEvent")}
             </h3>
             <button
               onClick={onCancel}
@@ -61,7 +64,7 @@ export function EventFormModal({
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Titolo
+                {t("titleLabel")}
               </label>
               <input
                 type="text"
@@ -69,14 +72,14 @@ export function EventFormModal({
                 onChange={(e) =>
                   onFormChange({ ...form, title: e.target.value })
                 }
-                placeholder="Es: Verifica di matematica"
+                placeholder={t("titlePlaceholder")}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Materia
+                {t("subjectLabel")}
               </label>
               <select
                 value={form.subject}
@@ -95,7 +98,7 @@ export function EventFormModal({
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Tipo
+                {t("typeLabel")}
               </label>
               <div className="flex flex-wrap gap-2">
                 {EVENT_TYPES.map((type) => (
@@ -103,10 +106,10 @@ export function EventFormModal({
                     key={type.id}
                     onClick={() => onFormChange({ ...form, type: type.id })}
                     className={cn(
-                      'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                      "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
                       form.type === type.id
                         ? type.color
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400",
                     )}
                   >
                     {type.label}
@@ -117,37 +120,43 @@ export function EventFormModal({
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Data
+                {t("dateLabel")}
               </label>
               <input
                 type="date"
                 value={form.date}
-                onChange={(e) => onFormChange({ ...form, date: e.target.value })}
+                onChange={(e) =>
+                  onFormChange({ ...form, date: e.target.value })
+                }
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Priorità
+                {t("priorityLabel")}
               </label>
               <div className="flex gap-2">
-                {(['low', 'medium', 'high'] as Priority[]).map((p) => (
+                {(["low", "medium", "high"] as Priority[]).map((p) => (
                   <button
                     key={p}
                     onClick={() => onFormChange({ ...form, priority: p })}
                     className={cn(
-                      'flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border-2',
+                      "flex-1 px-3 py-1.5 rounded-lg text-sm font-medium transition-all border-2",
                       form.priority === p
-                        ? p === 'high'
-                          ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600'
-                          : p === 'medium'
-                            ? 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-amber-600'
-                            : 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-600'
-                        : 'border-transparent bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400'
+                        ? p === "high"
+                          ? "border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600"
+                          : p === "medium"
+                            ? "border-amber-500 bg-amber-50 dark:bg-amber-900/20 text-amber-600"
+                            : "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-600"
+                        : "border-transparent bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400",
                     )}
                   >
-                    {p === 'low' ? 'Bassa' : p === 'medium' ? 'Media' : 'Alta'}
+                    {p === "low"
+                      ? t("priorityLow")
+                      : p === "medium"
+                        ? t("priorityMedium")
+                        : t("priorityHigh")}
                   </button>
                 ))}
               </div>
@@ -155,14 +164,14 @@ export function EventFormModal({
 
             <div>
               <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-                Note (opzionale)
+                {t("notesLabel")}
               </label>
               <textarea
                 value={form.description}
                 onChange={(e) =>
                   onFormChange({ ...form, description: e.target.value })
                 }
-                placeholder="Dettagli aggiuntivi..."
+                placeholder={t("notesPlaceholder")}
                 rows={2}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
               />
@@ -170,14 +179,14 @@ export function EventFormModal({
 
             <div className="flex gap-3 pt-2">
               <Button variant="outline" className="flex-1" onClick={onCancel}>
-                Annulla
+                {t("cancelButton")}
               </Button>
               <Button
                 className="flex-1"
                 onClick={onSave}
                 disabled={!form.title.trim()}
               >
-                {editingEvent ? 'Salva' : 'Aggiungi'}
+                {editingEvent ? t("saveButton") : t("addButton")}
               </Button>
             </div>
           </div>
@@ -186,4 +195,3 @@ export function EventFormModal({
     </AnimatePresence>
   );
 }
-

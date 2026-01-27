@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Contattaci | MirrorBuddy",
-  description:
-    "Contatta MirrorBuddy per qualsiasi domanda o richiesta di supporto. Siamo qui per aiutarti.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("contact.layout");
+  return {
+    title: t("title"),
+    description: t("description"),
+  };
+}
 
 export default function ContactLayout({
   children,

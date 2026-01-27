@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Wrench, Server, MessageSquare, Radio, Mic, Volume2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -14,6 +15,7 @@ import { WebcamPreview } from './webcam-preview';
 import { DiagnosticCard, PlatformHelpCard, TroubleshootingCard } from './diagnostic-cards';
 
 export function DiagnosticsTab() {
+  const t = useTranslations('settings.diagnostics');
   const [configCheck, setConfigCheck] = useState<DiagnosticResult>({ status: 'idle' });
   const [chatTest, setChatTest] = useState<DiagnosticResult>({ status: 'idle' });
   const [voiceTest, setVoiceTest] = useState<DiagnosticResult>({ status: 'idle' });
@@ -44,7 +46,7 @@ export function DiagnosticsTab() {
   };
 
   const handleVoiceTest = async () => {
-    setVoiceTest({ status: 'running', message: 'Connessione in corso...' });
+    setVoiceTest({ status: 'running', message: t('connecting') });
     const result = await runVoiceTest();
     setVoiceTest(result);
   };
@@ -75,52 +77,52 @@ export function DiagnosticsTab() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench className="w-5 h-5 text-orange-500" />
-            Diagnostica Sistema
+            {t('title')}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-slate-600 dark:text-slate-400">
-            Verifica che tutti i componenti funzionino correttamente: configurazione, chat API (con AI response), voice (con audio playback), microfono e speaker.
+            {t('description')}
           </p>
 
           <Button onClick={runAllTests} className="w-full" size="lg">
             <Wrench className="w-4 h-4 mr-2" />
-            Esegui Tutti i Test
+            {t('runAllTests')}
           </Button>
         </CardContent>
       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <DiagnosticCard
-          title="Configurazione"
+          title={t('config')}
           icon={<Server className="w-5 h-5 text-blue-500" />}
           result={configCheck}
           onRun={handleConfigCheck}
         />
 
         <DiagnosticCard
-          title="Chat API"
+          title={t('chatApi')}
           icon={<MessageSquare className="w-5 h-5 text-green-500" />}
           result={chatTest}
           onRun={handleChatTest}
         />
 
         <DiagnosticCard
-          title="Voice (Test Completo)"
+          title={t('voiceTest')}
           icon={<Radio className="w-5 h-5 text-purple-500" />}
           result={voiceTest}
           onRun={handleVoiceTest}
         />
 
         <DiagnosticCard
-          title="Microfono"
+          title={t('microphone')}
           icon={<Mic className="w-5 h-5 text-red-500" />}
           result={micTest}
           onRun={handleMicTest}
         />
 
         <DiagnosticCard
-          title="Speaker / Audio"
+          title={t('speaker')}
           icon={<Volume2 className="w-5 h-5 text-amber-500" />}
           result={speakerTest}
           onRun={handleSpeakerTest}

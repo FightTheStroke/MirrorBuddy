@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface CerebralPalsySettings {
@@ -16,21 +17,23 @@ export function CerebralPalsyA11y({
   settings: CerebralPalsySettings;
   onSettingsChange: (settings: CerebralPalsySettings) => void;
 }) {
+  const t = useTranslations('settings.accessibility');
+
   return (
     <div className="space-y-6">
       <div>
         <h3 className="text-lg font-semibold mb-4">
-          Accessibilità Paralisi Cerebrale
+          {t('cerebralTitle')}
         </h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Adattamenti combinati motori + cognitivi.
+          {t('cerebralDesc')}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Difficoltà adattiva"
-          description="Regola automaticamente la difficoltà in base alle performance"
+          title={t('cerebralAdaptiveDifficulty')}
+          description={t('cerebralAdaptiveDifficultyDesc')}
           enabled={settings.adaptiveDifficulty}
           onToggle={() =>
             onSettingsChange({
@@ -41,8 +44,8 @@ export function CerebralPalsyA11y({
         />
 
         <SettingCard
-          title="UI semplificata"
-          description="Riduce elementi visuali per minimizzare sovraccarico cognitivo"
+          title={t('cerebralSimplifiedUI')}
+          description={t('cerebralSimplifiedUIDesc')}
           enabled={settings.simplifiedUI}
           onToggle={() =>
             onSettingsChange({
@@ -53,8 +56,8 @@ export function CerebralPalsyA11y({
         />
 
         <SettingCard
-          title="Scorciatoie personalizzabili"
-          description="Permette di configurare scorciatoie da tastiera"
+          title={t('cerebralCustomShortcuts')}
+          description={t('cerebralCustomShortcutsDesc')}
           enabled={settings.customShortcuts}
           onToggle={() =>
             onSettingsChange({
@@ -65,8 +68,8 @@ export function CerebralPalsyA11y({
         />
 
         <SettingCard
-          title="Timeout estesi"
-          description="Estende i timeout di inattività o li disabilita"
+          title={t('cerebralTimeoutExtended')}
+          description={t('cerebralTimeoutExtendedDesc')}
           enabled={settings.timeoutExtended}
           onToggle={() =>
             onSettingsChange({

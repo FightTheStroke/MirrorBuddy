@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   LayoutDashboard,
   UserPlus,
@@ -37,75 +38,76 @@ interface AdminSidebarProps {
   systemAlerts?: number;
 }
 
-const NAV_ITEMS: NavItem[] = [
-  {
-    id: "dashboard",
-    label: "Dashboard",
-    href: "/admin",
-    icon: LayoutDashboard,
-  },
-  {
-    id: "invites",
-    label: "Richieste Beta",
-    href: "/admin/invites",
-    icon: UserPlus,
-  },
-  {
-    id: "users",
-    label: "Utenti",
-    href: "/admin/users",
-    icon: Users,
-  },
-  {
-    id: "tiers",
-    label: "Piani",
-    href: "/admin/tiers",
-    icon: Layers,
-  },
-  {
-    id: "audit-log",
-    label: "Audit Log",
-    href: "/admin/tiers/audit-log",
-    icon: ScrollText,
-  },
-  {
-    id: "analytics",
-    label: "Analytics",
-    href: "/admin/analytics",
-    icon: BarChart3,
-  },
-  {
-    id: "service-limits",
-    label: "Service Limits",
-    href: "/admin/service-limits",
-    icon: Activity,
-  },
-  {
-    id: "tos",
-    label: "Termini Servizio",
-    href: "/admin/tos",
-    icon: FileText,
-  },
-  {
-    id: "settings",
-    label: "Impostazioni",
-    href: "/admin/settings",
-    icon: Settings,
-  },
-];
-
 export function AdminSidebar({
   open,
   onToggle,
   pendingInvites = 0,
   systemAlerts = 0,
 }: AdminSidebarProps) {
+  const t = useTranslations("admin");
   const pathname = usePathname();
   const handleItemClick = () => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       onToggle();
     }
   };
+
+  const NAV_ITEMS: NavItem[] = [
+    {
+      id: "dashboard",
+      label: t("dashboard"),
+      href: "/admin",
+      icon: LayoutDashboard,
+    },
+    {
+      id: "invites",
+      label: t("betaRequests"),
+      href: "/admin/invites",
+      icon: UserPlus,
+    },
+    {
+      id: "users",
+      label: t("users"),
+      href: "/admin/users",
+      icon: Users,
+    },
+    {
+      id: "tiers",
+      label: t("tiers"),
+      href: "/admin/tiers",
+      icon: Layers,
+    },
+    {
+      id: "audit-log",
+      label: "Audit Log",
+      href: "/admin/tiers/audit-log",
+      icon: ScrollText,
+    },
+    {
+      id: "analytics",
+      label: "Analytics",
+      href: "/admin/analytics",
+      icon: BarChart3,
+    },
+    {
+      id: "service-limits",
+      label: "Service Limits",
+      href: "/admin/service-limits",
+      icon: Activity,
+    },
+    {
+      id: "tos",
+      label: t("terms"),
+      href: "/admin/tos",
+      icon: FileText,
+    },
+    {
+      id: "settings",
+      label: t("settings"),
+      href: "/admin/settings",
+      icon: Settings,
+    },
+  ];
 
   const getNavItems = (): NavItem[] => {
     return NAV_ITEMS.map((item) => {
@@ -163,7 +165,7 @@ export function AdminSidebar({
           size="icon-sm"
           onClick={onToggle}
           className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-          aria-label={open ? "Comprimi menu" : "Espandi menu"}
+          aria-label={open ? t("collapseMenu") : t("expandMenu")}
         >
           {open ? (
             <PanelLeftClose className="h-5 w-5" />
@@ -226,11 +228,11 @@ export function AdminSidebar({
               "text-sm font-medium transition-all duration-200",
               "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
             )}
-            aria-label="Torna all'app"
+            aria-label={t("returnToApp")}
             onClick={handleItemClick}
           >
             <Home className="w-4 h-4" />
-            {open && <span>Torna all&apos;app</span>}
+            {open && <span>{t("returnToApp")}</span>}
           </button>
         </Link>
       </div>

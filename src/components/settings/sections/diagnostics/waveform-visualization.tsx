@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Mic, XCircle, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
+import { useState, useRef } from "react";
+import { useTranslations } from "next-intl";
+import { Mic, XCircle, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 
 interface WaveformVisualizationProps {
   availableMics: MediaDeviceInfo[];
@@ -19,6 +20,7 @@ export function WaveformVisualization({
   onMicChange,
   onRefresh,
 }: WaveformVisualizationProps) {
+  const t = useTranslations("settings.diagnostics");
   const [waveformActive, setWaveformActive] = useState(false);
   const [audioLevel, setAudioLevel] = useState(0);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -32,10 +34,15 @@ export function WaveformVisualization({
       const audioConstraints: boolean | MediaTrackConstraints = selectedMicId
         ? { deviceId: { ideal: selectedMicId } }
         : true;
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: audioConstraints });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: audioConstraints,
+      });
       waveformStreamRef.current = stream;
 
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext })
+          .webkitAudioContext;
       const audioContext = new AudioCtx();
       waveformContextRef.current = audioContext;
 
@@ -51,7 +58,7 @@ export function WaveformVisualization({
       const canvas = canvasRef.current;
       if (!canvas) return;
 
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (!ctx) return;
 
       const timeDataArray = new Uint8Array(analyser.fftSize);
@@ -75,11 +82,11 @@ export function WaveformVisualization({
         const width = canvas.width;
         const height = canvas.height;
 
-        ctx.fillStyle = 'rgb(15, 23, 42)';
+        ctx.fillStyle = "rgb(15, 23, 42)";
         ctx.fillRect(0, 0, width, height);
 
         ctx.lineWidth = 2;
-        ctx.strokeStyle = level > 5 ? 'rgb(34, 197, 94)' : 'rgb(100, 116, 139)';
+        ctx.strokeStyle = level > 5 ? "rgb(34, 197, 94)" : "rgb(100, 116, 139)";
         ctx.beginPath();
 
         const sliceWidth = width / timeDataArray.length;
@@ -101,13 +108,13 @@ export function WaveformVisualization({
         ctx.lineTo(width, height / 2);
         ctx.stroke();
 
-        ctx.fillStyle = 'rgb(34, 197, 94)';
+        ctx.fillStyle = "rgb(34, 197, 94)";
         ctx.fillRect(0, height - 8, (width * level) / 100, 8);
       };
 
       draw();
     } catch (error) {
-      logger.error('Waveform error', undefined, error);
+      logger.error("Waveform error", undefined, error);
       setWaveformActive(false);
     }
   };
@@ -118,7 +125,7 @@ export function WaveformVisualization({
       waveformAnimationRef.current = null;
     }
     if (waveformStreamRef.current) {
-      waveformStreamRef.current.getTracks().forEach(t => t.stop());
+      waveformStreamRef.current.getTracks().forEach((t) => t.stop());
       waveformStreamRef.current = null;
     }
     if (waveformContextRef.current) {
@@ -131,9 +138,9 @@ export function WaveformVisualization({
 
     const canvas = canvasRef.current;
     if (canvas) {
-      const ctx = canvas.getContext('2d');
+      const ctx = canvas.getContext("2d");
       if (ctx) {
-        ctx.fillStyle = 'rgb(15, 23, 42)';
+        ctx.fillStyle = "rgb(15, 23, 42)";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
     }
@@ -149,7 +156,8 @@ export function WaveformVisualization({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-slate-600 dark:text-slate-400">
-          Avvia il test per vedere la waveform del microfono in tempo reale. Parla per vedere la forma d&apos;onda.
+          Avvia il test per vedere la waveform del microfono in tempo reale.
+          Parla per vedere la forma d&apos;onda.
         </p>
 
         <div className="flex items-center gap-3">
@@ -163,7 +171,7 @@ export function WaveformVisualization({
             className="flex-1 px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {availableMics.length === 0 ? (
-              <option value="">Nessun microfono trovato</option>
+              <option value="">{t("noMicrophoneFound")}</option>
             ) : (
               availableMics.map((mic) => (
                 <option key={mic.deviceId} value={mic.deviceId}>
@@ -217,12 +225,20 @@ export function WaveformVisualization({
 
         <div className="flex gap-3">
           {!waveformActive ? (
-            <Button onClick={startWaveform} className="flex-1" variant="default">
+            <Button
+              onClick={startWaveform}
+              className="flex-1"
+              variant="default"
+            >
               <Mic className="w-4 h-4 mr-2" />
               Avvia Waveform
             </Button>
           ) : (
-            <Button onClick={stopWaveform} className="flex-1" variant="destructive">
+            <Button
+              onClick={stopWaveform}
+              className="flex-1"
+              variant="destructive"
+            >
               <XCircle className="w-4 h-4 mr-2" />
               Stop Waveform
             </Button>

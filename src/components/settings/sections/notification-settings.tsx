@@ -1,15 +1,26 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Bell, Loader2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { useNotificationStore, requestPushPermission, isPushSupported } from '@/lib/stores/notification-store';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Bell, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  useNotificationStore,
+  requestPushPermission,
+  isPushSupported,
+} from "@/lib/stores/notification-store";
+import { cn } from "@/lib/utils";
 
 // Notification Settings - Uses global notification store
 export function NotificationSettings() {
-  const { preferences, pushPermission, updatePreferences, setPushPermission: _setPushPermission } = useNotificationStore();
+  const t = useTranslations("settings");
+  const {
+    preferences,
+    pushPermission,
+    updatePreferences,
+    setPushPermission: _setPushPermission,
+  } = useNotificationStore();
   const [isRequestingPush, setIsRequestingPush] = useState(false);
 
   const handleRequestPush = async () => {
@@ -35,31 +46,33 @@ export function NotificationSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-amber-500" />
-            Notifiche
+            {t("notifications.title")}
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Master enable toggle */}
-          <label
-            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
-          >
+          <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
             <div>
               <span className="font-medium text-slate-900 dark:text-white block">
-                Abilita notifiche
+                {t("notifications.enable")}
               </span>
-              <span className="text-sm text-slate-500">Attiva o disattiva tutte le notifiche</span>
+              <span className="text-sm text-slate-500">
+                {t("notifications.description")}
+              </span>
             </div>
             <div
               className={cn(
-                'relative w-12 h-7 rounded-full transition-colors',
-                preferences.enabled ? 'bg-accent-themed' : 'bg-slate-300 dark:bg-slate-600'
+                "relative w-12 h-7 rounded-full transition-colors",
+                preferences.enabled
+                  ? "bg-accent-themed"
+                  : "bg-slate-300 dark:bg-slate-600",
               )}
-              onClick={() => togglePreference('enabled')}
+              onClick={() => togglePreference("enabled")}
             >
               <span
                 className={cn(
-                  'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                  preferences.enabled ? 'translate-x-5' : 'translate-x-0'
+                  "absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform",
+                  preferences.enabled ? "translate-x-5" : "translate-x-0",
                 )}
               />
             </div>
@@ -67,45 +80,45 @@ export function NotificationSettings() {
 
           {/* Push notifications */}
           {isPushSupported() && (
-            <label
-              className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
-            >
+            <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
               <div>
                 <span className="font-medium text-slate-900 dark:text-white block">
-                  Notifiche push
+                  {t("notifications.push")}
                 </span>
                 <span className="text-sm text-slate-500">
-                  {pushPermission === 'granted'
-                    ? 'Ricevi notifiche anche quando l\'app è chiusa'
-                    : pushPermission === 'denied'
-                    ? 'Permesso negato - controlla le impostazioni del browser'
-                    : 'Abilita le notifiche push del browser'}
+                  {pushPermission === "granted"
+                    ? t("notifications.pushGranted")
+                    : pushPermission === "denied"
+                      ? t("notifications.pushDenied")
+                      : t("notifications.pushDefault")}
                 </span>
               </div>
-              {pushPermission !== 'granted' ? (
+              {pushPermission !== "granted" ? (
                 <Button
                   size="sm"
                   onClick={handleRequestPush}
-                  disabled={isRequestingPush || pushPermission === 'denied'}
+                  disabled={isRequestingPush || pushPermission === "denied"}
                 >
                   {isRequestingPush ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
                   ) : (
-                    'Abilita'
+                    t("notifications.pushButton")
                   )}
                 </Button>
               ) : (
                 <div
                   className={cn(
-                    'relative w-12 h-7 rounded-full transition-colors',
-                    preferences.push ? 'bg-accent-themed' : 'bg-slate-300 dark:bg-slate-600'
+                    "relative w-12 h-7 rounded-full transition-colors",
+                    preferences.push
+                      ? "bg-accent-themed"
+                      : "bg-slate-300 dark:bg-slate-600",
                   )}
-                  onClick={() => togglePreference('push')}
+                  onClick={() => togglePreference("push")}
                 >
                   <span
                     className={cn(
-                      'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                      preferences.push ? 'translate-x-5' : 'translate-x-0'
+                      "absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform",
+                      preferences.push ? "translate-x-5" : "translate-x-0",
                     )}
                   />
                 </div>
@@ -114,26 +127,28 @@ export function NotificationSettings() {
           )}
 
           {/* Sound */}
-          <label
-            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
-          >
+          <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
             <div>
               <span className="font-medium text-slate-900 dark:text-white block">
-                Suoni
+                {t("notifications.sound")}
               </span>
-              <span className="text-sm text-slate-500">Riproduci suoni per le notifiche</span>
+              <span className="text-sm text-slate-500">
+                {t("notifications.soundDescription")}
+              </span>
             </div>
             <div
               className={cn(
-                'relative w-12 h-7 rounded-full transition-colors',
-                preferences.sound ? 'bg-accent-themed' : 'bg-slate-300 dark:bg-slate-600'
+                "relative w-12 h-7 rounded-full transition-colors",
+                preferences.sound
+                  ? "bg-accent-themed"
+                  : "bg-slate-300 dark:bg-slate-600",
               )}
-              onClick={() => togglePreference('sound')}
+              onClick={() => togglePreference("sound")}
             >
               <span
                 className={cn(
-                  'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                  preferences.sound ? 'translate-x-5' : 'translate-x-0'
+                  "absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform",
+                  preferences.sound ? "translate-x-5" : "translate-x-0",
                 )}
               />
             </div>
@@ -144,24 +159,50 @@ export function NotificationSettings() {
       {/* Notification types */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Tipi di notifiche</CardTitle>
+          <CardTitle className="text-base">
+            {t("notifications.typeTitle")}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           {[
-            { key: 'reminders' as const, label: 'Promemoria studio', desc: 'Ricevi un promemoria per studiare' },
-            { key: 'streaks' as const, label: 'Avvisi streak', desc: 'Notifica quando rischi di perdere la serie' },
-            { key: 'achievements' as const, label: 'Traguardi', desc: 'Notifica quando sblocchi un achievement' },
-            { key: 'levelUp' as const, label: 'Livelli', desc: 'Notifica quando sali di livello' },
-            { key: 'breaks' as const, label: 'Pause', desc: 'Suggerimenti per fare pause (ADHD mode)' },
-            { key: 'sessionEnd' as const, label: 'Fine sessione', desc: 'Riepilogo a fine sessione di studio' },
-          ].map(item => (
+            {
+              key: "reminders" as const,
+              label: t("notifications.reminders"),
+              desc: t("notifications.remindersDesc"),
+            },
+            {
+              key: "streaks" as const,
+              label: t("notifications.streaks"),
+              desc: t("notifications.streaksDesc"),
+            },
+            {
+              key: "achievements" as const,
+              label: t("notifications.achievements"),
+              desc: t("notifications.achievementsDesc"),
+            },
+            {
+              key: "levelUp" as const,
+              label: t("notifications.levelUp"),
+              desc: t("notifications.levelUpDesc"),
+            },
+            {
+              key: "breaks" as const,
+              label: t("notifications.breaks"),
+              desc: t("notifications.breaksDesc"),
+            },
+            {
+              key: "sessionEnd" as const,
+              label: t("notifications.sessionEnd"),
+              desc: t("notifications.sessionEndDesc"),
+            },
+          ].map((item) => (
             <label
               key={item.key}
               className={cn(
-                'flex items-center justify-between p-4 rounded-lg cursor-pointer transition-opacity',
+                "flex items-center justify-between p-4 rounded-lg cursor-pointer transition-opacity",
                 preferences.enabled
-                  ? 'bg-slate-50 dark:bg-slate-800/50'
-                  : 'bg-slate-50/50 dark:bg-slate-800/25 opacity-50'
+                  ? "bg-slate-50 dark:bg-slate-800/50"
+                  : "bg-slate-50/50 dark:bg-slate-800/25 opacity-50",
               )}
             >
               <div>
@@ -172,15 +213,19 @@ export function NotificationSettings() {
               </div>
               <div
                 className={cn(
-                  'relative w-12 h-7 rounded-full transition-colors',
-                  preferences[item.key] && preferences.enabled ? 'bg-accent-themed' : 'bg-slate-300 dark:bg-slate-600'
+                  "relative w-12 h-7 rounded-full transition-colors",
+                  preferences[item.key] && preferences.enabled
+                    ? "bg-accent-themed"
+                    : "bg-slate-300 dark:bg-slate-600",
                 )}
-                onClick={() => preferences.enabled && togglePreference(item.key)}
+                onClick={() =>
+                  preferences.enabled && togglePreference(item.key)
+                }
               >
                 <span
                   className={cn(
-                    'absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform',
-                    preferences[item.key] ? 'translate-x-5' : 'translate-x-0'
+                    "absolute top-1 left-1 w-5 h-5 rounded-full bg-white transition-transform",
+                    preferences[item.key] ? "translate-x-5" : "translate-x-0",
                   )}
                 />
               </div>

@@ -3,14 +3,15 @@
  * @brief Calendar grid component
  */
 
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { isSameDay } from '../utils/calendar-utils';
-import { EVENT_TYPES, type EventType } from '../constants';
-import type { CalendarDay } from '../utils/calendar-utils';
-import type { SchoolEvent } from '@/lib/stores';
+import { useTranslations } from "next-intl";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { isSameDay } from "../utils/calendar-utils";
+import { EVENT_TYPES, type EventType } from "../constants";
+import type { CalendarDay } from "../utils/calendar-utils";
+import type { SchoolEvent } from "@/lib/stores";
 
 interface CalendarGridProps {
   currentMonth: Date;
@@ -25,18 +26,30 @@ export function CalendarGrid({
   onMonthChange,
   onEventClick,
 }: CalendarGridProps) {
+  const t = useTranslations("education.calendar-grid");
   const getEventTypeConfig = (type: EventType) => {
     return EVENT_TYPES.find((t) => t.id === type) || EVENT_TYPES[0];
   };
+
+  // Get day names for current locale
+  const dayNames = [
+    t("day-names.monday"),
+    t("day-names.tuesday"),
+    t("day-names.wednesday"),
+    t("day-names.thursday"),
+    t("day-names.friday"),
+    t("day-names.saturday"),
+    t("day-names.sunday"),
+  ];
 
   return (
     <Card className="lg:col-span-2">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <CardTitle className="capitalize">
-            {currentMonth.toLocaleDateString('it-IT', {
-              month: 'long',
-              year: 'numeric',
+            {currentMonth.toLocaleDateString(undefined, {
+              month: "long",
+              year: "numeric",
             })}
           </CardTitle>
           <div className="flex gap-1">
@@ -47,11 +60,11 @@ export function CalendarGrid({
                 onMonthChange(
                   new Date(
                     currentMonth.getFullYear(),
-                    currentMonth.getMonth() - 1
-                  )
+                    currentMonth.getMonth() - 1,
+                  ),
                 )
               }
-              aria-label="Mese precedente"
+              aria-label={t("aria-label-previous-month")}
             >
               <ChevronLeft className="w-4 h-4" />
             </Button>
@@ -60,7 +73,7 @@ export function CalendarGrid({
               size="sm"
               onClick={() => onMonthChange(new Date())}
             >
-              Oggi
+              {t("today-button")}
             </Button>
             <Button
               variant="ghost"
@@ -69,11 +82,11 @@ export function CalendarGrid({
                 onMonthChange(
                   new Date(
                     currentMonth.getFullYear(),
-                    currentMonth.getMonth() + 1
-                  )
+                    currentMonth.getMonth() + 1,
+                  ),
                 )
               }
-              aria-label="Mese successivo"
+              aria-label={t("aria-label-next-month")}
             >
               <ChevronRight className="w-4 h-4" />
             </Button>
@@ -82,7 +95,7 @@ export function CalendarGrid({
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-7 gap-1 mb-2">
-          {['Lun', 'Mar', 'Mer', 'Gio', 'Ven', 'Sab', 'Dom'].map((day) => (
+          {dayNames.map((day) => (
             <div
               key={day}
               className="text-center text-xs font-medium text-slate-500 py-2"
@@ -100,21 +113,21 @@ export function CalendarGrid({
               <div
                 key={i}
                 className={cn(
-                  'min-h-[80px] p-1 rounded-lg border transition-colors',
+                  "min-h-[80px] p-1 rounded-lg border transition-colors",
                   day.isCurrentMonth
-                    ? 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-                    : 'bg-slate-50 dark:bg-slate-900/50 border-transparent',
-                  isToday && 'ring-2 ring-primary'
+                    ? "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                    : "bg-slate-50 dark:bg-slate-900/50 border-transparent",
+                  isToday && "ring-2 ring-primary",
                 )}
               >
                 <div
                   className={cn(
-                    'text-xs font-medium mb-1',
+                    "text-xs font-medium mb-1",
                     isToday
-                      ? 'text-primary'
+                      ? "text-primary"
                       : day.isCurrentMonth
-                        ? 'text-slate-700 dark:text-slate-300'
-                        : 'text-slate-400'
+                        ? "text-slate-700 dark:text-slate-300"
+                        : "text-slate-400",
                   )}
                 >
                   {day.date.getDate()}
@@ -127,9 +140,9 @@ export function CalendarGrid({
                         key={event.id}
                         onClick={() => onEventClick(event)}
                         className={cn(
-                          'text-[10px] px-1 py-0.5 rounded truncate cursor-pointer transition-opacity',
+                          "text-[10px] px-1 py-0.5 rounded truncate cursor-pointer transition-opacity",
                           typeConfig.color,
-                          event.completed && 'opacity-50 line-through'
+                          event.completed && "opacity-50 line-through",
                         )}
                         title={event.title}
                       >
@@ -139,7 +152,7 @@ export function CalendarGrid({
                   })}
                   {day.events.length > 2 && (
                     <div className="text-[10px] text-slate-500">
-                      +{day.events.length - 2} altri
+                      {t("more-events", { count: day.events.length - 2 })}
                     </div>
                   )}
                 </div>
@@ -151,4 +164,3 @@ export function CalendarGrid({
     </Card>
   );
 }
-

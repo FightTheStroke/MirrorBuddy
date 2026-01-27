@@ -1,6 +1,7 @@
 "use client";
 
 import { HelpCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { FeatureGuideCards } from "./feature-guide-cards";
 
@@ -17,10 +18,12 @@ export function FeatureGuide({
   highContrast = false,
   className,
 }: FeatureGuideProps) {
+  const t = useTranslations("education.parent-dashboard.guide");
+
   return (
     <section
       className={cn("space-y-4", className)}
-      aria-label="Guida alle funzionalità"
+      aria-label={t("aria-label")}
     >
       <div className="flex items-center gap-2">
         <HelpCircle
@@ -36,7 +39,7 @@ export function FeatureGuide({
             highContrast ? "text-yellow-400" : "text-slate-900 dark:text-white",
           )}
         >
-          Come funziona MirrorBuddy
+          {t("title")}
         </h2>
       </div>
 
@@ -48,9 +51,7 @@ export function FeatureGuide({
             : "text-slate-600 dark:text-slate-400",
         )}
       >
-        MirrorBuddy è una piattaforma educativa basata su AI progettata per
-        studenti con difficoltà di apprendimento. Ecco le principali
-        funzionalità:
+        {t("intro")}
       </p>
 
       <FeatureGuideCards highContrast={highContrast} />

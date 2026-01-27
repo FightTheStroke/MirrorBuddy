@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { createWPMCalculator } from "@/lib/typing/wpm-calculator";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +30,7 @@ interface SpeedGameProps {
 }
 
 export function SpeedGame({ onGameEnd }: SpeedGameProps) {
+  const t = useTranslations("typing.speedGame");
   const [words] = useState<string[]>(() =>
     shuffle([...GAME_WORDS]).slice(0, 10),
   );
@@ -91,26 +93,28 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
         <div className="text-2xl font-bold text-primary">{timeLeft}s</div>
       </div>
 
-      <p className="text-sm text-muted-foreground">
-        Digita le parole il più velocemente possibile. Hai 60 secondi!
-      </p>
+      <p className="text-sm text-muted-foreground">{t("instructions")}</p>
 
       {!isPlaying ? (
         <button
           onClick={startGame}
           className="w-full py-4 bg-primary text-primary-foreground rounded-lg text-lg font-semibold hover:bg-primary/90"
         >
-          Inizia Gioco
+          {t("startButton")}
         </button>
       ) : (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-              <div className="text-sm text-muted-foreground">Punti</div>
+              <div className="text-sm text-muted-foreground">
+                {t("scoreLabel")}
+              </div>
               <div className="text-2xl font-bold">{score}</div>
             </div>
             <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg">
-              <div className="text-sm text-muted-foreground">Parole</div>
+              <div className="text-sm text-muted-foreground">
+                {t("wordsLabel")}
+              </div>
               <div className="text-2xl font-bold">
                 {currentIndex}/{words.length}
               </div>

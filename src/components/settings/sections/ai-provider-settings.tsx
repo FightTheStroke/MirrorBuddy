@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Search } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useProviderSettings } from "./ai-provider-settings/hooks/use-provider-settings";
@@ -11,6 +12,7 @@ import { CostConfigForm } from "./ai-provider-settings/components/cost-config-fo
 import { CostsSection } from "./ai-provider-settings/components/costs-section";
 
 export function AIProviderSettings() {
+  const t = useTranslations("settings.aiProvider");
   const {
     providerStatus,
     costs,
@@ -43,11 +45,10 @@ export function AIProviderSettings() {
             {!providerStatus.activeProvider && (
               <div className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800">
                 <h4 className="font-medium text-amber-700 dark:text-amber-300">
-                  Nessun provider configurato
+                  {t("noProviderConfigured")}
                 </h4>
                 <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
-                  Configura Azure OpenAI nel file .env oppure avvia Ollama
-                  localmente.
+                  {t("configureAzureOpenAI")}
                 </p>
               </div>
             )}
@@ -74,7 +75,7 @@ export function AIProviderSettings() {
       {showCostConfig && (
         <Card>
           <CardHeader>
-            <CardTitle>Configurazione Costi Azure</CardTitle>
+            <CardTitle>{t("costConfigurationTitle")}</CardTitle>
           </CardHeader>
           <CardContent>
             <CostConfigForm onSave={saveCostConfig} />
@@ -84,7 +85,7 @@ export function AIProviderSettings() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Funzionalita Voce</CardTitle>
+          <CardTitle>{t("voiceFunctionalityTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           {providerStatus?.azure.realtimeConfigured ? (
@@ -92,7 +93,7 @@ export function AIProviderSettings() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 rounded-full bg-green-500" />
                 <span className="font-medium text-green-700 dark:text-green-300">
-                  Voce disponibile
+                  {t("voiceAvailable")}
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
@@ -104,11 +105,11 @@ export function AIProviderSettings() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 rounded-full bg-amber-500" />
                 <span className="font-medium text-amber-700 dark:text-amber-300">
-                  Voce non disponibile
+                  {t("voiceNotAvailable")}
                 </span>
               </div>
               <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
-                Le conversazioni vocali richiedono Azure OpenAI Realtime.
+                {t("realtimeRequirement")}
               </p>
               <p className="text-xs text-slate-500">
                 Configura: AZURE_OPENAI_REALTIME_ENDPOINT,
@@ -123,7 +124,7 @@ export function AIProviderSettings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Search className="w-5 h-5 text-blue-500" />
-            Ricerca Web
+            {t("webSearchTitle")}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -132,7 +133,7 @@ export function AIProviderSettings() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 rounded-full bg-green-500" />
                 <span className="font-medium text-green-700 dark:text-green-300">
-                  Ricerca Web attiva
+                  {t("webSearchActive")}
                 </span>
               </div>
               <p className="text-sm text-green-600 dark:text-green-400">
@@ -145,12 +146,11 @@ export function AIProviderSettings() {
               <div className="flex items-center gap-2 mb-2">
                 <span className="w-3 h-3 rounded-full bg-amber-500" />
                 <span className="font-medium text-amber-700 dark:text-amber-300">
-                  Ricerca Web limitata
+                  {t("webSearchLimited")}
                 </span>
               </div>
               <p className="text-sm text-amber-600 dark:text-amber-400 mb-2">
-                I maestri usano Wikipedia come fonte. Per notizie e informazioni
-                aggiornate, configura Brave Search.
+                {t("wikipediaSource")}
               </p>
               <p className="text-xs text-slate-500">
                 Ottieni una API key gratuita su{" "}

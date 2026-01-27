@@ -33,6 +33,7 @@ const EXPECTED_SCHEMA_FILES = [
   "invite.prisma", // InviteRequest (beta invite system)
   "tier.prisma", // TierDefinition (subscription tiers)
   "b2b.prisma", // ContactRequest (B2B contact form submissions)
+  "locale.prisma", // LocaleConfig (i18n locale configuration)
 ];
 
 // Expected models that should be present across all schema files
@@ -108,6 +109,9 @@ const EXPECTED_MODELS = [
   "TierAuditLog",
   // b2b.prisma
   "ContactRequest",
+  // locale.prisma
+  "LocaleConfig",
+  "LocaleAuditLog",
 ];
 
 describe("Prisma Schema Split", () => {

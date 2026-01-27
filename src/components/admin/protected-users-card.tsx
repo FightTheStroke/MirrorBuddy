@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Shield } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -11,6 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
  * @component
  */
 export function ProtectedUsersCard() {
+  const t = useTranslations("admin.protectedUsers");
   // Parse PROTECTED_USERS from environment variable
   const protectedUsersEnv = process.env.PROTECTED_USERS || "";
   const protectedUsers = protectedUsersEnv
@@ -27,7 +29,7 @@ export function ProtectedUsersCard() {
           <div>
             <CardTitle className="flex items-center gap-2">
               <Shield className="h-5 w-5" />
-              Protected Users
+              {t("title")}
             </CardTitle>
             <p className="text-sm text-muted-foreground mt-2">
               Utenti esclusi da cleanup test
@@ -49,9 +51,7 @@ export function ProtectedUsersCard() {
             ))}
           </ul>
         ) : (
-          <p className="text-sm text-muted-foreground italic">
-            Nessun utente protetto configurato
-          </p>
+          <p className="text-sm text-muted-foreground italic">{t("noUsers")}</p>
         )}
       </CardContent>
     </Card>

@@ -5,6 +5,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { motion, AnimatePresence } from "framer-motion";
@@ -19,14 +20,6 @@ import type {
 } from "./types";
 
 type DateGroup = "oggi" | "ieri" | "settimana" | "mese" | "vecchie";
-
-const groupLabels: Record<DateGroup, string> = {
-  oggi: "Oggi",
-  ieri: "Ieri",
-  settimana: "Questa settimana",
-  mese: "Questo mese",
-  vecchie: "Più vecchie",
-};
 
 function createGradientStyle(color: string) {
   const hex = color.startsWith("#") ? color : "#6366F1";
@@ -59,6 +52,7 @@ export function ConversationSidebar({
   onSelectConversation,
   onNewConversation,
 }: ConversationDrawerProps) {
+  const t = useTranslations("conversation.sidebar");
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -66,6 +60,15 @@ export function ConversationSidebar({
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+  // Create groupLabels object dynamically with translations
+  const groupLabels: Record<DateGroup, string> = {
+    oggi: "Oggi",
+    ieri: "Ieri",
+    settimana: "Questa settimana",
+    mese: "Questo mese",
+    vecchie: "Più vecchie",
+  };
 
   const gradientStyle = createGradientStyle(characterColor);
   const buttonBg = "bg-white/20 hover:bg-white/30";
@@ -196,8 +199,10 @@ export function ConversationSidebar({
               <div className="absolute inset-0 bg-black/50 z-10 flex items-center justify-center p-4 rounded-2xl">
                 <div className="bg-slate-800 rounded-xl p-4 max-w-[240px] text-center">
                   <p className="text-sm mb-3">
-                    Eliminare {selectedIds.size} conversazion
-                    {selectedIds.size === 1 ? "e" : "i"}?
+                    {t("deleteConfirm.title", {
+                      count: selectedIds.size,
+                      plural: selectedIds.size === 1 ? "e" : "i",
+                    })}
                   </p>
                   <div className="flex gap-2 justify-center">
                     <Button
@@ -206,7 +211,7 @@ export function ConversationSidebar({
                       onClick={() => setShowDeleteConfirm(false)}
                       disabled={isDeleting}
                     >
-                      Annulla
+                      {t("deleteConfirm.cancel")}
                     </Button>
                     <Button
                       size="sm"
@@ -214,7 +219,9 @@ export function ConversationSidebar({
                       onClick={handleDeleteConfirm}
                       disabled={isDeleting}
                     >
-                      {isDeleting ? "Elimino..." : "Elimina"}
+                      {isDeleting
+                        ? t("deleteConfirm.deleting")
+                        : t("deleteConfirm.delete")}
                     </Button>
                   </div>
                 </div>
@@ -223,7 +230,7 @@ export function ConversationSidebar({
 
             {/* Header */}
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold">Storico</h3>
+              <h3 className="text-sm font-semibold">{t("title")}</h3>
               <div className="flex items-center gap-1">
                 {selectedIds.size > 0 && (
                   <Button
@@ -261,7 +268,7 @@ export function ConversationSidebar({
             <div className="relative mb-3">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-white/60" />
               <Input
-                placeholder="Cerca..."
+                placeholder={t("search.placeholder")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 h-8 text-xs bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/20"
@@ -282,12 +289,12 @@ export function ConversationSidebar({
                   )}
                 >
                   {f === "all"
-                    ? "Tutte"
+                    ? t("filters.all")
                     : f === "today"
-                      ? "Oggi"
+                      ? t("filters.today")
                       : f === "week"
-                        ? "7gg"
-                        : "30gg"}
+                        ? t("filters.week")
+                        : t("filters.month")}
                 </button>
               ))}
             </div>
@@ -301,7 +308,7 @@ export function ConversationSidebar({
               ) : conversations.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-8 text-white/60">
                   <MessageSquare className="w-8 h-8 mb-2" />
-                  <p className="text-xs">Nessuna conversazione</p>
+                  <p className="text-xs">{t("empty")}</p>
                 </div>
               ) : (
                 <div className="space-y-3">

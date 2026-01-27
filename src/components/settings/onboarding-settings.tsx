@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { BookOpen, Trash2, AlertTriangle, RotateCcw } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { useRouter } from "next/navigation";
+import { BookOpen, Trash2, AlertTriangle, RotateCcw } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -13,8 +14,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+} from "@/components/ui/dialog";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 
 /**
  * Onboarding Settings Component
@@ -24,24 +25,25 @@ import { useOnboardingStore } from '@/lib/stores/onboarding-store';
  * - "Reset completo" destructive action with multiple confirmations
  */
 export function OnboardingSettings() {
+  const t = useTranslations("settings.onboarding");
   const router = useRouter();
   const { startReplay, resetAllData } = useOnboardingStore();
 
   const [showResetDialog, setShowResetDialog] = useState(false);
   const [resetConfirmStep, setResetConfirmStep] = useState<1 | 2 | 3>(1);
-  const [resetInput, setResetInput] = useState('');
+  const [resetInput, setResetInput] = useState("");
   const [isResetting, setIsResetting] = useState(false);
 
   const handleReplayTutorial = () => {
     startReplay();
-    router.push('/welcome?replay=true');
+    router.push("/welcome?replay=true");
   };
 
   const handleResetConfirm = async () => {
     if (resetConfirmStep === 1) {
       setResetConfirmStep(2);
     } else if (resetConfirmStep === 2) {
-      if (resetInput.toUpperCase() === 'RESET') {
+      if (resetInput.toUpperCase() === "RESET") {
         setResetConfirmStep(3);
       }
     } else if (resetConfirmStep === 3) {
@@ -54,7 +56,7 @@ export function OnboardingSettings() {
   const handleResetCancel = () => {
     setShowResetDialog(false);
     setResetConfirmStep(1);
-    setResetInput('');
+    setResetInput("");
   };
 
   return (
@@ -62,7 +64,7 @@ export function OnboardingSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <RotateCcw className="w-5 h-5 text-blue-500" />
-          Tutorial e Reset
+          {t("title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -72,11 +74,10 @@ export function OnboardingSettings() {
             <BookOpen className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-medium text-blue-700 dark:text-blue-300">
-                Rivedi il tutorial
+                {t("reviewTutorial.title")}
               </h4>
               <p className="text-sm text-blue-600 dark:text-blue-400">
-                Guarda di nuovo la presentazione di Melissa e i Professori.
-                I tuoi dati non verranno modificati.
+                {t("reviewTutorial.description")}
               </p>
             </div>
           </div>
@@ -86,7 +87,7 @@ export function OnboardingSettings() {
             onClick={handleReplayTutorial}
           >
             <BookOpen className="w-4 h-4 mr-2" />
-            Rivedi Tutorial
+            {t("reviewTutorial.button")}
           </Button>
         </div>
 
@@ -96,11 +97,10 @@ export function OnboardingSettings() {
             <AlertTriangle className="w-5 h-5 text-red-500 mt-0.5 flex-shrink-0" />
             <div>
               <h4 className="font-medium text-red-700 dark:text-red-300">
-                Reset completo
+                {t("resetComplete.title")}
               </h4>
               <p className="text-sm text-red-600 dark:text-red-400">
-                Elimina TUTTI i tuoi dati e ricomincia da zero.
-                Questa azione e irreversibile!
+                {t("resetComplete.description")}
               </p>
             </div>
           </div>
@@ -110,7 +110,7 @@ export function OnboardingSettings() {
             onClick={() => setShowResetDialog(true)}
           >
             <Trash2 className="w-4 h-4 mr-2" />
-            Reset Completo
+            {t("resetComplete.button")}
           </Button>
         </div>
 
@@ -120,31 +120,29 @@ export function OnboardingSettings() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2 text-red-600">
                 <AlertTriangle className="w-5 h-5" />
-                {resetConfirmStep === 1 && 'Sei sicuro?'}
-                {resetConfirmStep === 2 && 'Conferma con RESET'}
-                {resetConfirmStep === 3 && 'Ultima conferma'}
+                {resetConfirmStep === 1 && t("confirmDialog.titles.step1")}
+                {resetConfirmStep === 2 && t("confirmDialog.titles.step2")}
+                {resetConfirmStep === 3 && t("confirmDialog.titles.step3")}
               </DialogTitle>
               <DialogDescription>
                 {resetConfirmStep === 1 && (
                   <span className="text-red-600">
-                    Stai per eliminare TUTTI i tuoi dati:
+                    {t("confirmDialog.descriptions.step1")}
                     <ul className="list-disc list-inside mt-2 space-y-1">
-                      <li>Progressi e XP</li>
-                      <li>Flashcard e materiali salvati</li>
-                      <li>Conversazioni con i Professori</li>
-                      <li>Impostazioni e preferenze</li>
+                      {t
+                        .raw("confirmDialog.descriptions.step1Items")
+                        .map((item: string, index: number) => (
+                          <li key={index}>{item}</li>
+                        ))}
                     </ul>
                   </span>
                 )}
                 {resetConfirmStep === 2 && (
-                  <span>
-                    Per confermare, scrivi <strong>RESET</strong> nel campo qui sotto.
-                  </span>
+                  <span>{t("confirmDialog.descriptions.step2")}</span>
                 )}
                 {resetConfirmStep === 3 && (
                   <span className="text-red-600 font-medium">
-                    Questo è l&apos;ultimo avviso. Clicca &ldquo;Elimina tutto&rdquo; per procedere.
-                    NON potrai tornare indietro!
+                    {t("confirmDialog.descriptions.step3")}
                   </span>
                 )}
               </DialogDescription>
@@ -154,8 +152,10 @@ export function OnboardingSettings() {
               <div className="py-4">
                 <Input
                   value={resetInput}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setResetInput(e.target.value)}
-                  placeholder="Scrivi RESET..."
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    setResetInput(e.target.value)
+                  }
+                  placeholder={t("confirmDialog.input")}
                   className="text-center uppercase"
                   autoFocus
                 />
@@ -164,23 +164,22 @@ export function OnboardingSettings() {
 
             <DialogFooter className="gap-2 sm:gap-0">
               <Button variant="outline" onClick={handleResetCancel}>
-                Annulla
+                {t("confirmDialog.buttons.cancel")}
               </Button>
               <Button
                 variant="destructive"
                 onClick={handleResetConfirm}
                 disabled={
-                  (resetConfirmStep === 2 && resetInput.toUpperCase() !== 'RESET') ||
+                  (resetConfirmStep === 2 &&
+                    resetInput.toUpperCase() !== "RESET") ||
                   isResetting
                 }
               >
-                {isResetting ? (
-                  'Eliminazione in corso...'
-                ) : resetConfirmStep === 3 ? (
-                  'Elimina tutto'
-                ) : (
-                  'Continua'
-                )}
+                {isResetting
+                  ? t("confirmDialog.buttons.deleting")
+                  : resetConfirmStep === 3
+                    ? t("confirmDialog.buttons.deleteAll")
+                    : t("confirmDialog.buttons.continue")}
               </Button>
             </DialogFooter>
           </DialogContent>

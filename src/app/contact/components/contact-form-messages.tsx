@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
 interface ContactFormMessagesProps {
@@ -9,6 +10,8 @@ interface ContactFormMessagesProps {
 export function ContactFormMessages({
   submitStatus,
 }: ContactFormMessagesProps) {
+  const t = useTranslations("contact.form");
+
   if (submitStatus === "success") {
     return (
       <div
@@ -17,10 +20,8 @@ export function ContactFormMessages({
       >
         <CheckCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium">Messaggio inviato con successo!</p>
-          <p className="text-sm mt-1">
-            Grazie per averci contattato. Ti risponderemo presto.
-          </p>
+          <p className="font-medium">{t("successTitle")}</p>
+          <p className="text-sm mt-1">{t("successMessage")}</p>
         </div>
       </div>
     );
@@ -34,10 +35,8 @@ export function ContactFormMessages({
       >
         <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
         <div>
-          <p className="font-medium">Errore nell&apos;invio del messaggio</p>
-          <p className="text-sm mt-1">
-            Si è verificato un errore. Riprova più tardi.
-          </p>
+          <p className="font-medium">{t("errorTitle")}</p>
+          <p className="text-sm mt-1">{t("errorMessage")}</p>
         </div>
       </div>
     );

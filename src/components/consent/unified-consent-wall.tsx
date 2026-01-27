@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useSyncExternalStore, useCallback } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Cookie, Shield, FileText, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clientLogger } from "@/lib/logger/client";
@@ -40,6 +41,8 @@ interface UnifiedConsentWallProps {
  * GDPR/COPPA compliant.
  */
 export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
+  const t = useTranslations("consent.unified");
+
   // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(
     subscribeToConsent,
@@ -133,7 +136,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
         <div className="text-center space-y-4">
           <div className="w-12 h-12 mx-auto border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
           <p className="text-sm text-slate-600 dark:text-slate-400">
-            Caricamento...
+            {t("loading")}
           </p>
         </div>
       </div>
@@ -163,12 +166,10 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-              {isReconsent ? "Termini Aggiornati" : "Benvenuto in MirrorBuddy!"}
+              {isReconsent ? t("titleUpdated") : t("titleWelcome")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {isReconsent
-                ? "I nostri termini sono stati aggiornati"
-                : "Privacy, cookie e termini di servizio"}
+              {isReconsent ? t("subtitleUpdated") : t("subtitleWelcome")}
             </p>
           </div>
         </div>
@@ -177,13 +178,11 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
         {isReconsent && existingConsent && (
           <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
             <p className="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Ultima accettazione:</strong>{" "}
-              {new Date(existingConsent.tos.acceptedAt).toLocaleDateString(
-                "it-IT",
-              )}
+              <strong>{t("reconsentNotice.lastAccepted")}</strong>{" "}
+              {new Date(existingConsent.tos.acceptedAt).toLocaleDateString()}
               <br />
-              <strong>Cosa è cambiato:</strong> Abbiamo aggiornato i Termini di
-              Servizio. Per continuare, leggi e accetta i nuovi termini.
+              <strong>{t("reconsentNotice.changed")}</strong>{" "}
+              {t("reconsentNotice.details")}
             </p>
           </div>
         )}
@@ -191,17 +190,17 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
         {/* Summary */}
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-50">
-            In breve:
+            {t("summaryTitle")}
           </h2>
           <div className="grid gap-3">
             <div className="flex items-start gap-3 p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
               <Shield className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-white">
-                  Privacy e sicurezza
+                  {t("privacy.title")}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-300">
-                  I tuoi dati sono protetti secondo GDPR e COPPA
+                  {t("privacy.description")}
                 </p>
               </div>
             </div>
@@ -209,10 +208,10 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
               <Cookie className="w-5 h-5 text-amber-500 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-white">
-                  Cookie essenziali
+                  {t("cookies.title")}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-300">
-                  Necessari per il funzionamento (sessione, preferenze)
+                  {t("cookies.description")}
                 </p>
               </div>
             </div>
@@ -220,11 +219,10 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
               <FileText className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
               <div>
                 <p className="text-sm font-medium text-slate-900 dark:text-white">
-                  Termini di servizio
+                  {t("tos.title")}
                 </p>
                 <p className="text-xs text-slate-600 dark:text-slate-300">
-                  MirrorBuddy è gratuito, l&apos;AI può sbagliare, usa con un
-                  adulto se hai meno di 14 anni
+                  {t("tos.description")}
                 </p>
               </div>
             </div>
@@ -239,7 +237,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
             rel="noopener"
             className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Termini completi
+            {t("links.full")}
             <ExternalLink className="w-3 h-3" />
           </Link>
           <span className="text-slate-300 dark:text-slate-600">•</span>
@@ -249,7 +247,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
             rel="noopener"
             className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Privacy Policy
+            {t("links.privacy")}
             <ExternalLink className="w-3 h-3" />
           </Link>
           <span className="text-slate-300 dark:text-slate-600">•</span>
@@ -259,7 +257,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
             rel="noopener"
             className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Cookie Policy
+            {t("links.cookies")}
             <ExternalLink className="w-3 h-3" />
           </Link>
         </div>
@@ -285,8 +283,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
               id="tos-checkbox-label"
               className="text-sm text-slate-700 dark:text-slate-300 select-none"
             >
-              <strong>Ho letto e accetto</strong> i Termini di Servizio e
-              l&apos;uso di cookie essenziali (obbligatorio)
+              <strong>{t("tosCheckbox.label")}</strong> {t("tosCheckbox.text")}
             </span>
           </label>
 
@@ -294,17 +291,17 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
             <div>
               <p className="font-medium text-slate-900 dark:text-white text-sm">
-                Cookie analitici (opzionale)
+                {t("analytics.label")}
               </p>
               <p className="text-xs text-slate-500 dark:text-slate-400">
-                Ci aiutano a migliorare MirrorBuddy
+                {t("analytics.description")}
               </p>
             </div>
             <button
               type="button"
               role="switch"
               aria-checked={analyticsEnabled}
-              aria-label="Abilita cookie analitici"
+              aria-label={t("analytics.label")}
               onClick={() => setAnalyticsEnabled(!analyticsEnabled)}
               disabled={isSubmitting}
               className={`relative w-11 h-6 rounded-full transition-colors ${
@@ -329,18 +326,15 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           className="w-full"
           size="lg"
           aria-label={
-            !tosAccepted
-              ? "Accetta (prima spunta la casella dei termini)"
-              : "Accetta e continua"
+            !tosAccepted ? t("buttons.disabled") : t("buttons.accept")
           }
         >
-          {isSubmitting ? "Salvataggio..." : "Accetta e continua"}
+          {isSubmitting ? t("buttons.submitting") : t("buttons.accept")}
         </Button>
 
         {/* COPPA note */}
         <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-          MirrorBuddy è conforme alle normative GDPR e COPPA per la protezione
-          dei minori.
+          {t("coppa")}
         </p>
 
         {/* Screen reader announcement */}
@@ -350,9 +344,8 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
           aria-atomic="true"
           className="sr-only"
         >
-          {!tosAccepted &&
-            "Per continuare, è necessario accettare i Termini di Servizio"}
-          {isSubmitting && "Salvataggio in corso..."}
+          {!tosAccepted && t("screenReader.required")}
+          {isSubmitting && t("screenReader.submitting")}
         </div>
       </div>
     </div>

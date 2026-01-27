@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Summary Tool Component
@@ -9,19 +9,14 @@
  * Part of Issue #70: Real-time summary tool
  */
 
-import { useState, useCallback } from 'react';
-import {
-  Download,
-  Brain,
-  Layers,
-  Edit2,
-  Save,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { SummaryRenderer } from './summary-renderer';
-import { SummaryEditor } from './summary-editor';
-import { cn } from '@/lib/utils';
-import type { SummaryData, SummarySection } from '@/types/tools';
+import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
+import { Download, Brain, Layers, Edit2, Save } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { SummaryRenderer } from "./summary-renderer";
+import { SummaryEditor } from "./summary-editor";
+import { cn } from "@/lib/utils";
+import type { SummaryData, SummarySection } from "@/types/tools";
 
 // ============================================================================
 // TYPES
@@ -60,6 +55,7 @@ export function SummaryTool({
   allowEdit = true,
   className,
 }: SummaryToolProps) {
+  const t = useTranslations("tools.summary");
   const [isEditing, setIsEditing] = useState(false);
   const [editedData, setEditedData] = useState<SummaryData>(data);
 
@@ -102,7 +98,7 @@ export function SummaryTool({
   }, [isEditing, editedData, data, onGenerateFlashcards]);
 
   return (
-    <div className={cn('flex flex-col h-full', className)}>
+    <div className={cn("flex flex-col h-full", className)}>
       {/* Content */}
       <div className="flex-1 overflow-auto">
         {isEditing ? (
@@ -137,14 +133,10 @@ export function SummaryTool({
                   className="gap-2"
                 >
                   <Save className="w-4 h-4" />
-                  Salva
+                  {t("save")}
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleCancel}
-                >
-                  Annulla
+                <Button variant="outline" size="sm" onClick={handleCancel}>
+                  {t("cancel")}
                 </Button>
               </>
             ) : (
@@ -156,7 +148,7 @@ export function SummaryTool({
                   className="gap-2"
                 >
                   <Edit2 className="w-4 h-4" />
-                  Modifica
+                  {t("edit")}
                 </Button>
               )
             )}
@@ -170,7 +162,7 @@ export function SummaryTool({
                 size="sm"
                 onClick={handleExportPdf}
                 className="gap-2"
-                title="Esporta come PDF"
+                title={t("exportPdf")}
               >
                 <Download className="w-4 h-4" />
                 <span className="hidden sm:inline">PDF</span>
@@ -183,7 +175,7 @@ export function SummaryTool({
                 size="sm"
                 onClick={handleConvertToMindmap}
                 className="gap-2"
-                title="Converti in mappa mentale"
+                title={t("convertToMindmap")}
               >
                 <Brain className="w-4 h-4" />
                 <span className="hidden sm:inline">Mappa</span>
@@ -196,7 +188,7 @@ export function SummaryTool({
                 size="sm"
                 onClick={handleGenerateFlashcards}
                 className="gap-2"
-                title="Genera flashcard dai punti chiave"
+                title={t("generateFlashcards")}
               >
                 <Layers className="w-4 h-4" />
                 <span className="hidden sm:inline">Flashcard</span>

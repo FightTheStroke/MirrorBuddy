@@ -11,6 +11,7 @@ import {
   GENERIC_GREETINGS,
   FORMAL_GREETINGS,
   COACH_GREETINGS,
+  BUDDY_GREETINGS,
   BILINGUAL_GREETINGS,
   MASCETTI_GREETINGS,
   applyGreetingTemplate,
@@ -93,6 +94,22 @@ export function generateCoachGreeting(
 }
 
 /**
+ * Generate a greeting for a buddy character
+ */
+export function generateBuddyGreeting(
+  displayName: string,
+  studentAge: number,
+  language: SupportedLanguage,
+): string {
+  const buddyAge = studentAge + 1; // Buddies are always 1 year older
+  const template = BUDDY_GREETINGS[language] || BUDDY_GREETINGS.it;
+  return applyGreetingTemplate(template, {
+    name: displayName,
+    age: String(buddyAge),
+  });
+}
+
+/**
  * Generate a greeting using the full context
  * This is the main entry point for dynamic greetings
  */
@@ -116,10 +133,8 @@ export function generateGreeting(
     case "coach":
       return generateCoachGreeting(displayName, language);
     case "buddy":
-      // Buddies already have getGreeting with student context
-      // This fallback uses language-aware generic greeting
-      const template = GENERIC_GREETINGS[language] || GENERIC_GREETINGS.it;
-      return applyGreetingTemplate(template, { name: displayName });
+      // Buddies use age-aware greetings
+      return generateBuddyGreeting(displayName, context.student.age, language);
     default:
       return (
         fallbackGreeting ||

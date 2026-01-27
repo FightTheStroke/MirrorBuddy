@@ -1,7 +1,11 @@
 "use client";
 
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { useState, useEffect, useCallback } from "react";
 import { Check, X, Loader2, RefreshCw, UserPlus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import {
@@ -15,6 +19,7 @@ import { cn } from "@/lib/utils";
 type TabStatus = "PENDING" | "APPROVED" | "REJECTED" | "ALL" | "DIRECT";
 
 export default function AdminInvitesPage() {
+  const t = useTranslations("admin.invites");
   const [invites, setInvites] = useState<InviteRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -44,7 +49,7 @@ export default function AdminInvitesPage() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          setError("Non autorizzato. Effettua il login come admin.");
+          setError(t("unauthorized"));
           return;
         }
         throw new Error("Failed to fetch invites");
@@ -55,11 +60,11 @@ export default function AdminInvitesPage() {
       // Clear selection when data changes
       setSelectedIds(new Set());
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore di caricamento");
+      setError(err instanceof Error ? err.message : t("loadingError"));
     } finally {
       setLoading(false);
     }
-  }, [activeTab]);
+  }, [activeTab, t]);
 
   useEffect(() => {
     fetchInvites();
@@ -75,12 +80,12 @@ export default function AdminInvitesPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Errore durante l'approvazione");
+        throw new Error(data.error || t("approvalError"));
       }
 
       await fetchInvites();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Errore");
+      alert(err instanceof Error ? err.message : t("error"));
     } finally {
       setProcessingId(null);
     }
@@ -99,14 +104,14 @@ export default function AdminInvitesPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Errore durante il rifiuto");
+        throw new Error(data.error || t("rejectionError"));
       }
 
       setShowRejectModal(null);
       setRejectReason("");
       await fetchInvites();
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Errore");
+      alert(err instanceof Error ? err.message : t("error"));
     } finally {
       setProcessingId(null);
     }
@@ -115,13 +120,13 @@ export default function AdminInvitesPage() {
   const tabs: { status: TabStatus; label: string; count?: number }[] = [
     {
       status: "PENDING",
-      label: "In attesa",
+      label: t("pending"),
       count: invites.filter((i) => i.status === "PENDING").length,
     },
-    { status: "APPROVED", label: "Approvate" },
-    { status: "REJECTED", label: "Rifiutate" },
-    { status: "DIRECT", label: "Diretti (miei)" },
-    { status: "ALL", label: "Tutte" },
+    { status: "APPROVED", label: t("approved") },
+    { status: "REJECTED", label: t("rejected") },
+    { status: "DIRECT", label: t("direct") },
+    { status: "ALL", label: t("all") },
   ];
 
   // Show checkboxes only on PENDING or ALL tab
@@ -140,7 +145,7 @@ export default function AdminInvitesPage() {
           className="gap-2"
         >
           <UserPlus className="w-4 h-4" />
-          Invita direttamente
+          {t("directInvite")}
         </Button>
 
         <Button
@@ -151,7 +156,7 @@ export default function AdminInvitesPage() {
           disabled={loading}
         >
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          Aggiorna
+          {t("refresh")}
         </Button>
       </div>
 
@@ -232,7 +237,7 @@ export default function AdminInvitesPage() {
                   ) : (
                     <Check className="w-4 h-4" />
                   )}
-                  Approva
+                  {t("approve")}
                 </Button>
                 <Button
                   onClick={() => setShowRejectModal(invite.id)}
@@ -242,7 +247,7 @@ export default function AdminInvitesPage() {
                   className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
                 >
                   <X className="w-4 h-4" />
-                  Rifiuta
+                  {t("reject")}
                 </Button>
               </div>
             </div>
@@ -270,19 +275,19 @@ export default function AdminInvitesPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
           <div className="bg-card rounded-xl p-6 max-w-md w-full">
             <h3 className="text-lg font-semibold text-foreground mb-4">
-              Rifiuta richiesta
+              {t("rejectRequest")}
             </h3>
             <label
               htmlFor="reject-reason"
               className="block text-sm font-medium text-foreground mb-2"
             >
-              Motivo del rifiuto
+              {t("rejectionReason")}
             </label>
             <textarea
               id="reject-reason"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
-              placeholder="Opzionale"
+              placeholder={t("optional")}
               className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
               rows={3}
             />
@@ -295,7 +300,7 @@ export default function AdminInvitesPage() {
                 variant="outline"
                 className="flex-1 min-w-20"
               >
-                Annulla
+                {t("cancel")}
               </Button>
               <Button
                 onClick={() => handleReject(showRejectModal)}
@@ -305,7 +310,7 @@ export default function AdminInvitesPage() {
                 {processingId === showRejectModal ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  "Conferma rifiuto"
+                  t("confirmRejection")
                 )}
               </Button>
             </div>

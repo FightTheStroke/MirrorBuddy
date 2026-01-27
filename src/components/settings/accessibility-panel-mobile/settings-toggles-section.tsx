@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
@@ -10,6 +11,7 @@ interface SettingsTogglesSectionProps {
 export function SettingsTogglesSection({
   fontSizeMultiplier,
 }: SettingsTogglesSectionProps) {
+  const t = useTranslations("settings.accessibility");
   const { settings, updateSettings } = useAccessibilityStore();
 
   return (
@@ -26,7 +28,7 @@ export function SettingsTogglesSection({
           fontSize: `${16 * fontSizeMultiplier}px`,
         }}
       >
-        Impostazioni
+        {t("sectionTitle")}
       </h3>
 
       {/* Large Text Toggle */}

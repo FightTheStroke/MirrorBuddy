@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Download, Trash2, Loader2, CheckCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -25,6 +26,7 @@ export function MigrationChoice({
   userId,
   onComplete,
 }: MigrationChoiceProps) {
+  const t = useTranslations("invite.migration");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);
@@ -41,13 +43,13 @@ export function MigrationChoice({
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || "Errore durante la migrazione");
+        throw new Error(data.error || t("errors.migrationError"));
       }
 
       setCompleted(true);
       setTimeout(onComplete, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Errore");
+      setError(err instanceof Error ? err.message : t("errors.migrationError"));
     } finally {
       setLoading(false);
     }
@@ -64,10 +66,10 @@ export function MigrationChoice({
           <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
         </div>
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-          Dati migrati!
+          {t("successTitle")}
         </h3>
         <p className="text-slate-600 dark:text-slate-400">
-          La tua esperienza di prova e stata trasferita al tuo account.
+          {t("successMessage")}
         </p>
       </div>
     );
@@ -77,13 +79,13 @@ export function MigrationChoice({
     return (
       <div className="text-center space-y-4 py-8">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-          Benvenuto in MirrorBuddy!
+          {t("welcomeTitle")}
         </h3>
         <p className="text-slate-600 dark:text-slate-400">
-          Il tuo account e pronto. Inizia la tua avventura di apprendimento!
+          {t("welcomeMessage")}
         </p>
         <Button onClick={onComplete} className="mt-4">
-          Inizia
+          {t("startButton")}
         </Button>
       </div>
     );
@@ -93,30 +95,35 @@ export function MigrationChoice({
     <div className="space-y-6 max-w-md mx-auto">
       <div className="text-center">
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-          Abbiamo trovato la tua prova!
+          {t("trialFound")}
         </h3>
         <p className="text-slate-600 dark:text-slate-400 mt-2">
-          Vuoi trasferire i dati della tua prova nel nuovo account?
+          {t("migrateQuestion")}
         </p>
       </div>
 
       {/* Trial summary */}
       <div className="bg-slate-100 dark:bg-slate-800 rounded-xl p-4 space-y-2">
         <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-          La tua prova include:
+          {t("summary")}
         </p>
         <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-1">
-          <li>- {trialSummary.chatsUsed} messaggi con i Maestri</li>
+          <li>- {t("chatsWithMaestri", { count: trialSummary.chatsUsed })}</li>
           {trialSummary.docsUsed > 0 && (
-            <li>- {trialSummary.docsUsed} documenti analizzati</li>
+            <li>
+              - {t("documentsAnalyzed", { count: trialSummary.docsUsed })}
+            </li>
           )}
           {trialSummary.assignedMaestri.length > 0 && (
             <li>
-              - Maestri preferiti: {trialSummary.assignedMaestri.join(", ")}
+              -{" "}
+              {t("favoriteMaestri", {
+                maestri: trialSummary.assignedMaestri.join(", "),
+              })}
             </li>
           )}
           {trialSummary.assignedCoach && (
-            <li>- Coach: {trialSummary.assignedCoach}</li>
+            <li>- {t("coach", { name: trialSummary.assignedCoach })}</li>
           )}
         </ul>
       </div>
@@ -138,7 +145,7 @@ export function MigrationChoice({
           ) : (
             <Download className="w-4 h-4" />
           )}
-          Trasferisci dati
+          {t("migrateButton")}
         </Button>
         <Button
           onClick={handleSkip}
@@ -147,13 +154,12 @@ export function MigrationChoice({
           className="flex-1 gap-2"
         >
           <Trash2 className="w-4 h-4" />
-          Inizia da zero
+          {t("startFresh")}
         </Button>
       </div>
 
       <p className="text-xs text-slate-500 dark:text-slate-400 text-center">
-        I dati della prova non includono le conversazioni complete, solo le
-        preferenze e i progressi.
+        {t("dataNote")}
       </p>
     </div>
   );

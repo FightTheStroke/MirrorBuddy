@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import Image from 'next/image';
-import { ExternalLink, Youtube, Globe, Info } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useTranslations } from "next-intl";
+import Image from "next/image";
+import { ExternalLink, Youtube, Globe, Info } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface SearchResult {
-  type: 'web' | 'youtube';
+  type: "web" | "youtube";
   title: string;
   url: string;
   description?: string;
@@ -17,17 +18,18 @@ interface SearchResultsProps {
   data: {
     query: string;
     results: SearchResult[];
-    searchSource?: 'brave' | 'wikipedia';
+    searchSource?: "brave" | "wikipedia";
   };
 }
 
 export function SearchResults({ data }: SearchResultsProps) {
+  const t = useTranslations("tools.search");
   const { query, results, searchSource } = data;
 
   if (!results || results.length === 0) {
     return (
       <div className="text-center py-8 text-slate-500 dark:text-slate-400">
-        Nessun risultato trovato per &quot;{query}&quot;
+        {t("noResults", { query })}
       </div>
     );
   }
@@ -36,12 +38,12 @@ export function SearchResults({ data }: SearchResultsProps) {
     <div className="space-y-4 p-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          {results.length} risultati per &quot;{query}&quot;
+          {t("resultCount", { count: results.length, query })}
         </p>
-        {searchSource === 'wikipedia' && (
+        {searchSource === "wikipedia" && (
           <div className="flex items-center gap-1.5 text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-full">
             <Info className="w-3 h-3" />
-            <span>Solo Wikipedia</span>
+            <span>{t("wikipediaOnly")}</span>
           </div>
         )}
       </div>
@@ -65,7 +67,7 @@ export function SearchResults({ data }: SearchResultsProps) {
                       unoptimized
                       className="object-cover"
                     />
-                    {result.type === 'youtube' && result.duration && (
+                    {result.type === "youtube" && result.duration && (
                       <span className="absolute bottom-1 right-1 bg-black/80 text-white text-xs px-1 rounded">
                         {result.duration}
                       </span>
@@ -74,7 +76,7 @@ export function SearchResults({ data }: SearchResultsProps) {
                 )}
 
                 <div className="flex items-start gap-2">
-                  {result.type === 'youtube' ? (
+                  {result.type === "youtube" ? (
                     <Youtube className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
                   ) : (
                     <Globe className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />

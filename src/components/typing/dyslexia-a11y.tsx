@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface DyslexiaSettings {
@@ -18,6 +19,7 @@ export function DyslexiaA11y({
   settings: DyslexiaSettings;
   onSettingsChange: (settings: DyslexiaSettings) => void;
 }) {
+  const t = useTranslations('settings.accessibility');
   const [showInfo, setShowInfo] = useState(false);
 
   const toggleSetting = <K extends keyof DyslexiaSettings>(key: K) => {
@@ -33,64 +35,61 @@ export function DyslexiaA11y({
     >
       <div>
         <h3 className="text-lg font-semibold mb-4">
-          Accessibilità per Dislessia
+          {t('dyslexiaTitle')}
         </h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni ottimizzate per utenti con dislessia o difficoltà di
-          lettura.
+          {t('dyslexiaDesc')}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Font OpenDyslexic"
-          description="Font specializzato per facilitare la lettura"
+          title={t('fontOpenDyslexic')}
+          description={t('fontOpenDyslexicDesc')}
           enabled={settings.openDyslexicFont}
           onToggle={() => toggleSetting("openDyslexicFont")}
         />
 
         <SettingCard
-          title="Spacing extra tra lettere"
-          description="Aumenta lo spazio tra le lettere per migliore leggibilità"
+          title={t('spacingExtra')}
+          description={t('spacingExtraDesc')}
           enabled={settings.extraLetterSpacing}
           onToggle={() => toggleSetting("extraLetterSpacing")}
         >
           {settings.extraLetterSpacing && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm" style={{ letterSpacing: "0.15em" }}>
-                Testo con spacing extra tra le lettere
+                {t('spacingExtraText')}
               </p>
             </div>
           )}
         </SettingCard>
 
         <SettingCard
-          title="Altezza riga aumentata"
-          description="Aumenta l'interlinea per ridurre la fatica visiva"
+          title={t('lineHeight')}
+          description={t('lineHeightDesc')}
           enabled={settings.increasedLineHeight}
           onToggle={() => toggleSetting("increasedLineHeight")}
         >
           {settings.increasedLineHeight && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm" style={{ lineHeight: "1.8" }}>
-                Testo con altezza riga aumentata per migliorare la
-                leggibilit&agrave;. Ogni riga ha pi&ugrave; spazio verticale tra
-                di essa.
+                {t('dyslexiaLineHeightText')}
               </p>
             </div>
           )}
         </SettingCard>
 
         <SettingCard
-          title="Testi brevi (chunks)"
-          description="Divide il testo in sezioni più corte per facilitare la comprensione"
+          title={t('shortTextChunks')}
+          description={t('shortTextChunksDesc')}
           enabled={settings.shortTextChunks}
           onToggle={() => toggleSetting("shortTextChunks")}
         />
 
         <SettingCard
-          title="Feedback audio"
-          description="Legge ad alta voce ogni tasto premuto"
+          title={t('audioFeedback')}
+          description={t('audioFeedbackDesc')}
           enabled={settings.audioFeedback}
           onToggle={() => toggleSetting("audioFeedback")}
         />
@@ -101,14 +100,12 @@ export function DyslexiaA11y({
           onClick={() => setShowInfo(!showInfo)}
           className="text-sm text-primary hover:underline"
         >
-          {showInfo ? "Nascondi info dislessia" : "Mostra info dislessia"}
+          {showInfo ? t('hideInfo') : t('showInfo')}
         </button>
 
         {showInfo && (
           <p className="text-sm mt-2 text-muted-foreground">
-            Queste impostazioni sono basate sulle raccomandazioni della British
-            Dyslexia Association e dell&apos;International Dyslexia Association
-            per migliorare l&apos;accessibilit&agrave; per utenti con dislessia.
+            {t('dyslexiaInfo')}
           </p>
         )}
       </div>

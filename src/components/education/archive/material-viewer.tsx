@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Material Viewer Modal
@@ -8,22 +8,23 @@
  * instead of showing raw JSON for structured content types.
  */
 
-import { useEffect, Suspense, lazy, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { X, FileText, ExternalLink, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { PrintButton } from '@/components/zaino/print-button';
-import { TOOL_ICONS, TOOL_LABELS } from './constants';
-import { formatDate } from './utils';
-import type { ArchiveItem } from './types';
-import type { PrintableContentType } from '@/lib/tools/accessible-print';
-import { RelatedMaterials } from '@/components/education/knowledge-hub/components/related-materials';
+import { useEffect, Suspense, lazy, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { X, FileText, ExternalLink, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { PrintButton } from "@/components/zaino/print-button";
+import { TOOL_ICONS, TOOL_LABELS } from "./constants";
+import { formatDate } from "./utils";
+import type { ArchiveItem } from "./types";
+import type { PrintableContentType } from "@/lib/tools/accessible-print";
+import { RelatedMaterials } from "@/components/education/knowledge-hub/components/related-materials";
 import {
   getRendererImport,
   hasRenderer,
   FallbackRenderer,
   type BaseRendererProps,
-} from '@/components/education/knowledge-hub/renderers';
+} from "@/components/education/knowledge-hub/renderers";
 
 interface MaterialViewerProps {
   item: ArchiveItem;
@@ -31,17 +32,22 @@ interface MaterialViewerProps {
   onNavigate?: (toolId: string) => void;
 }
 
-export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProps) {
+export function MaterialViewer({
+  item,
+  onClose,
+  onNavigate,
+}: MaterialViewerProps) {
+  const t = useTranslations("education.materialViewer");
   const Icon = TOOL_ICONS[item.toolType];
   const label = TOOL_LABELS[item.toolType];
 
   // Handle escape key to close
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.key === "Escape") onClose();
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [onClose]);
 
   // Create lazy component for the renderer if available
@@ -66,19 +72,23 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
     if (!content) {
       return (
         <div className="text-center text-slate-500 dark:text-slate-400 py-8">
-          Nessun contenuto disponibile per questo materiale.
+          {t("noContent")}
         </div>
       );
     }
 
     // Image content (webcam captures) - handle specially for base64 data
-    if (item.toolType === 'webcam' && typeof content === 'object' && 'imageData' in content) {
+    if (
+      item.toolType === "webcam" &&
+      typeof content === "object" &&
+      "imageData" in content
+    ) {
       return (
         <div className="flex justify-center">
           {/* eslint-disable-next-line @next/next/no-img-element -- User-captured data URL */}
           <img
             src={(content as { imageData: string }).imageData}
-            alt={item.title || 'Foto catturata'}
+            alt={item.title || "Foto catturata"}
             className="max-w-full max-h-[60vh] rounded-lg shadow-lg"
           />
         </div>
@@ -86,15 +96,21 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
     }
 
     // PDF content - handle specially for external URL
-    if (item.toolType === 'pdf' && typeof content === 'object' && 'url' in content) {
+    if (
+      item.toolType === "pdf" &&
+      typeof content === "object" &&
+      "url" in content
+    ) {
       return (
         <div className="flex flex-col items-center gap-4">
           <FileText className="w-16 h-16 text-slate-400" />
           <p className="text-slate-600 dark:text-slate-300">
-            {(content as { filename?: string }).filename || 'Documento PDF'}
+            {(content as { filename?: string }).filename || "Documento PDF"}
           </p>
           <Button
-            onClick={() => window.open((content as { url: string }).url, '_blank')}
+            onClick={() =>
+              window.open((content as { url: string }).url, "_blank")
+            }
             className="gap-2"
           >
             <ExternalLink className="w-4 h-4" />
@@ -105,11 +121,11 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
     }
 
     // Use Knowledge Hub renderer if available for structured content
-    if (typeof content === 'object' && LazyRenderer) {
+    if (typeof content === "object" && LazyRenderer) {
       const rendererProps: BaseRendererProps = {
         data: content as Record<string, unknown>,
         readOnly: true,
-        className: 'max-h-[60vh] overflow-auto',
+        className: "max-h-[60vh] overflow-auto",
       };
 
       return (
@@ -120,7 +136,7 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
     }
 
     // Fallback for object content without a specific renderer
-    if (typeof content === 'object') {
+    if (typeof content === "object") {
       return (
         <FallbackRenderer
           data={content as Record<string, unknown>}
@@ -169,9 +185,11 @@ export function MaterialViewer({ item, onClose, onNavigate }: MaterialViewerProp
           </div>
           <div className="flex items-center gap-2">
             {/* Print button - only show for printable content types */}
-            {item.content && !['webcam', 'pdf'].includes(item.toolType) && (
+            {item.content && !["webcam", "pdf"].includes(item.toolType) && (
               <PrintButton
-                title={item.title || `${label} del ${formatDate(item.createdAt)}`}
+                title={
+                  item.title || `${label} del ${formatDate(item.createdAt)}`
+                }
                 contentType={item.toolType as PrintableContentType}
                 content={item.content}
                 variant="outline"

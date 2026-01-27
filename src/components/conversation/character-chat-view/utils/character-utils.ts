@@ -96,10 +96,13 @@ export function getCharacterInfo(
     const buddy = getBuddyById(
       characterId as "mario" | "noemi" | "enea" | "bruno" | "sofia" | "marta",
     );
-    // Buddies use ExtendedStudentProfile directly (already language-aware via their getGreeting)
+    // Build greeting context for dynamic language-aware greeting
+    const greetingCtx: GreetingContext = {
+      student: DEFAULT_STUDENT_PROFILE,
+      language,
+    };
     const greeting =
-      buddy?.getGreeting?.(DEFAULT_STUDENT_PROFILE) ||
-      `Ehi! Piacere di conoscerti!`;
+      buddy?.getGreeting?.(greetingCtx) || `Ehi! Piacere di conoscerti!`;
     const systemPrompt =
       buddy?.getSystemPrompt?.(DEFAULT_STUDENT_PROFILE) || "";
     return {

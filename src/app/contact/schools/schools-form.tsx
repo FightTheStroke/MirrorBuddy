@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   CheckCircle,
@@ -22,6 +23,7 @@ import {
 type FormState = "idle" | "submitting" | "success" | "error";
 
 export function SchoolsContactForm() {
+  const t = useTranslations("contact.schools_form");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",
@@ -85,18 +87,14 @@ export function SchoolsContactForm() {
 
       if (!response.ok) {
         setFormState("error");
-        setErrorMessage(
-          data.message || "Errore durante l'invio. Riprova più tardi.",
-        );
+        setErrorMessage(data.message || t("errorDefault"));
         return;
       }
 
       setFormState("success");
     } catch {
       setFormState("error");
-      setErrorMessage(
-        "Errore di connessione. Verifica la tua connessione e riprova.",
-      );
+      setErrorMessage(t("errorConnection"));
     }
   };
 
@@ -108,11 +106,10 @@ export function SchoolsContactForm() {
         </div>
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            Grazie per averci contattato!
+            {t("successTitle")}
           </h2>
           <p className="text-slate-600 dark:text-slate-300">
-            Il tuo messaggio è stato ricevuto. Ti contatteremo entro 24 ore per
-            discutere le soluzioni personalizzate per la tua scuola.
+            {t("successMessage")}
           </p>
         </div>
       </div>
@@ -123,24 +120,24 @@ export function SchoolsContactForm() {
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-6 space-y-4">
         <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-          Soluzioni per la tua scuola
+          {t("solutions")}
         </h2>
         <div className="grid md:grid-cols-2 gap-3 text-sm text-slate-700 dark:text-slate-300">
           <div className="flex items-start gap-2">
             <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <span>Personalizzazione curricolare</span>
+            <span>{t("features.curriculum")}</span>
           </div>
           <div className="flex items-start gap-2">
             <Users className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <span>Gestione classi e studenti</span>
+            <span>{t("features.management")}</span>
           </div>
           <div className="flex items-start gap-2">
             <BarChart3 className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <span>Report e analytics per docenti</span>
+            <span>{t("features.reporting")}</span>
           </div>
           <div className="flex items-start gap-2">
             <Headphones className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0 mt-0.5" />
-            <span>Supporto dedicato</span>
+            <span>{t("features.support")}</span>
           </div>
         </div>
       </div>
@@ -185,14 +182,24 @@ export function SchoolsContactForm() {
             value={formData.role}
             onChange={handleInputChange}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Ruolo"
+            aria-label={t("roleLabel")}
           >
-            <option value="">Ruolo *</option>
-            {ROLES.map((role) => (
-              <option key={role.value} value={role.value}>
-                {role.label}
-              </option>
-            ))}
+            <option value="">{t("roleLabel")}</option>
+            {ROLES.map((role) => {
+              const label = role.label.includes("contact.schools_form")
+                ? t(
+                    role.label.replace(
+                      "contact.schools_form.options.",
+                      "options.",
+                    ),
+                  )
+                : role.label;
+              return (
+                <option key={role.value} value={role.value}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
           <select
             id="schoolType"
@@ -200,14 +207,24 @@ export function SchoolsContactForm() {
             value={formData.schoolType}
             onChange={handleInputChange}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Tipo Scuola"
+            aria-label={t("schoolTypeLabel")}
           >
-            <option value="">Tipo Scuola *</option>
-            {SCHOOL_TYPES.map((type) => (
-              <option key={type.value} value={type.value}>
-                {type.label}
-              </option>
-            ))}
+            <option value="">{t("schoolTypeLabel")}</option>
+            {SCHOOL_TYPES.map((type) => {
+              const label = type.label.includes("contact.schools_form")
+                ? t(
+                    type.label.replace(
+                      "contact.schools_form.options.",
+                      "options.",
+                    ),
+                  )
+                : type.label;
+              return (
+                <option key={type.value} value={type.value}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -218,9 +235,9 @@ export function SchoolsContactForm() {
             name="schoolName"
             value={formData.schoolName}
             onChange={handleInputChange}
-            placeholder="Nome Scuola *"
+            placeholder={t("schoolNameLabel")}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Nome Scuola"
+            aria-label={t("schoolNameLabel")}
           />
           <select
             id="studentCount"
@@ -228,14 +245,24 @@ export function SchoolsContactForm() {
             value={formData.studentCount}
             onChange={handleInputChange}
             className="px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            aria-label="Numero Studenti"
+            aria-label={t("studentCountLabel")}
           >
-            <option value="">Numero Studenti *</option>
-            {STUDENT_COUNTS.map((count) => (
-              <option key={count.value} value={count.value}>
-                {count.label}
-              </option>
-            ))}
+            <option value="">{t("studentCountLabel")}</option>
+            {STUDENT_COUNTS.map((count) => {
+              const label = count.label.includes("contact.schools_form")
+                ? t(
+                    count.label.replace(
+                      "contact.schools_form.options.",
+                      "options.",
+                    ),
+                  )
+                : count.label;
+              return (
+                <option key={count.value} value={count.value}>
+                  {label}
+                </option>
+              );
+            })}
           </select>
         </div>
 
@@ -244,10 +271,10 @@ export function SchoolsContactForm() {
           name="specificNeeds"
           value={formData.specificNeeds}
           onChange={handleInputChange}
-          placeholder="Esigenze Specifiche (opzionale)"
+          placeholder={t("specificNeedsLabel")}
           rows={3}
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          aria-label="Esigenze Specifiche"
+          aria-label={t("specificNeedsLabel")}
         />
 
         <textarea
@@ -255,10 +282,10 @@ export function SchoolsContactForm() {
           name="message"
           value={formData.message}
           onChange={handleInputChange}
-          placeholder="Messaggio (opzionale)"
+          placeholder={t("messagePlaceholder")}
           rows={4}
           className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-          aria-label="Messaggio"
+          aria-label={t("messagePlaceholder")}
         />
       </div>
 
@@ -268,7 +295,9 @@ export function SchoolsContactForm() {
         className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold py-2 px-8 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         <Send className="w-4 h-4" />
-        {formState === "submitting" ? "Invio in corso..." : "Invia Richiesta"}
+        {formState === "submitting"
+          ? t("submitButtonLoading")
+          : t("submitButtonDefault")}
       </Button>
     </form>
   );

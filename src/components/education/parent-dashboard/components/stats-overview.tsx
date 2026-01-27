@@ -1,4 +1,7 @@
+"use client";
+
 import { Clock, TrendingUp, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
@@ -14,6 +17,7 @@ export function StatsOverview({
   sessions,
   maestri,
 }: StatsOverviewProps) {
+  const t = useTranslations("education.parent-dashboard.stats");
   const { settings } = useAccessibilityStore();
 
   return (
@@ -40,7 +44,7 @@ export function StatsOverview({
           >
             {hours}h
           </p>
-          <p className="text-sm text-slate-500">Tempo totale</p>
+          <p className="text-sm text-slate-500">{t("total-time")}</p>
         </CardContent>
       </Card>
 
@@ -66,7 +70,7 @@ export function StatsOverview({
           >
             {sessions}
           </p>
-          <p className="text-sm text-slate-500">Sessioni</p>
+          <p className="text-sm text-slate-500">{t("sessions")}</p>
         </CardContent>
       </Card>
 
@@ -92,7 +96,7 @@ export function StatsOverview({
           >
             {maestri}
           </p>
-          <p className="text-sm text-slate-500">Maestri</p>
+          <p className="text-sm text-slate-500">{t("maestri")}</p>
         </CardContent>
       </Card>
     </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
+import { useTranslations } from "next-intl";
 import { Cookie, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,8 @@ interface CookieConsentWallProps {
  * Required for GDPR/COPPA compliance.
  */
 export function CookieConsentWall({ children }: CookieConsentWallProps) {
+  const t = useTranslations("consent.cookie");
+
   // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(
     subscribeToConsent,
@@ -56,32 +59,29 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-              Privacy e Cookie
+              {t("title")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              MirrorBuddy rispetta la tua privacy
+              {t("subtitle")}
             </p>
           </div>
         </div>
 
         {/* Explanation */}
         <div className="space-y-4 text-sm text-slate-600 dark:text-slate-300">
-          <p>
-            Per utilizzare MirrorBuddy, devi accettare i cookie essenziali che
-            ci permettono di:
-          </p>
+          <p>{t("explanation")}</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>Mantenere la tua sessione sicura</span>
+              <span>{t("list.session")}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>Salvare le tue preferenze</span>
+              <span>{t("list.preferences")}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>Proteggere i tuoi dati</span>
+              <span>{t("list.protect")}</span>
             </li>
           </ul>
         </div>
@@ -90,17 +90,17 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
         <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-700/50 rounded-xl">
           <div>
             <p className="font-medium text-slate-900 dark:text-white text-sm">
-              Cookie analitici (opzionale)
+              {t("analytics.label")}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-              Ci aiutano a migliorare MirrorBuddy
+              {t("analytics.description")}
             </p>
           </div>
           <button
             type="button"
             role="switch"
             aria-checked={analyticsEnabled}
-            aria-label="Abilita cookie analitici"
+            aria-label={t("analytics.aria")}
             onClick={() => setAnalyticsEnabled(!analyticsEnabled)}
             className={`relative w-11 h-6 rounded-full transition-colors ${
               analyticsEnabled
@@ -118,7 +118,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
 
         {/* Accept button */}
         <Button onClick={handleAccept} className="w-full" size="lg">
-          Accetta e continua
+          {t("button")}
         </Button>
 
         {/* Links */}
@@ -146,8 +146,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
 
         {/* COPPA note */}
         <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-          MirrorBuddy e conforme alle normative GDPR e COPPA per la protezione
-          dei minori. I tuoi dati sono al sicuro con noi.
+          {t("coppa")}
         </p>
       </div>
     </div>

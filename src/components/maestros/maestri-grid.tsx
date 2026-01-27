@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import {
   Search,
   Filter,
@@ -63,6 +64,7 @@ interface MaestriGridProps {
 }
 
 export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
+  const t = useTranslations("maestros.grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">(
     "all",
@@ -100,7 +102,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
 
   return (
     <div className="space-y-4">
-      <PageHeader icon={GraduationCap} title="Professori" />
+      <PageHeader icon={GraduationCap} title={t("title")} />
 
       {/* Search + Filters */}
       <div className="flex flex-wrap items-center gap-2">
@@ -108,11 +110,11 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
           <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input
             type="search"
-            placeholder="Cerca..."
+            placeholder={t("search-placeholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-8 pr-10 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
-            aria-label="Cerca professore o materia"
+            aria-label={t("search-aria-label")}
           />
           {searchQuery && (
             <button
@@ -146,7 +148,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
               : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700",
           )}
         >
-          Tutti
+          {t("all-button")}
         </button>
         {subjects.map((subject) => {
           const isSelected = selectedSubject === subject;
@@ -192,10 +194,10 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
         <div className="text-center py-12">
           <Filter className="h-12 w-12 mx-auto text-slate-400 mb-4" />
           <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300">
-            Nessun professore trovato
+            {t("empty-title")}
           </h3>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Prova a modificare i filtri di ricerca
+            {t("empty-description")}
           </p>
         </div>
       )}

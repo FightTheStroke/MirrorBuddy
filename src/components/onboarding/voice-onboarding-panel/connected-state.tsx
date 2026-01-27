@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { PhoneOff, Mic, MicOff, Check, Circle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -35,6 +36,8 @@ export function ConnectedState({
   onHangup,
   className,
 }: ConnectedStateProps) {
+  const t = useTranslations('onboarding.voicePanel');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -70,7 +73,7 @@ export function ConnectedState({
         <div className="flex-1">
           <h3 className="text-xl font-bold text-white">Melissa</h3>
           <p className="text-sm text-pink-100">
-            {isSpeaking ? 'Sta parlando...' : isMuted ? 'Microfono spento' : isListening ? 'In ascolto...' : 'Connessa'}
+            {isSpeaking ? t('speaking') : isMuted ? t('microphoneMuted') : isListening ? t('listening') : t('connected')}
           </p>
         </div>
 
@@ -105,7 +108,7 @@ export function ConnectedState({
               animate={{ opacity: 1 }}
               className="text-pink-100 text-sm italic text-center py-4"
             >
-              Parla con Melissa...
+              {t('speakWithMelissa')}
             </motion.p>
           ) : (
             recentTranscript.map((entry) => (
@@ -122,7 +125,7 @@ export function ConnectedState({
                 )}
               >
                 <span className="font-medium">
-                  {entry.role === 'assistant' ? 'Melissa: ' : 'Tu: '}
+                  {entry.role === 'assistant' ? t('melissa') : t('you')}
                 </span>
                 {entry.text}
               </motion.div>
@@ -162,7 +165,7 @@ export function ConnectedState({
           variant="ghost"
           size="icon"
           onClick={onMute}
-          aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+          aria-label={isMuted ? t('enableMicrophone') : t('disableMicrophone')}
           className={cn(
             'rounded-full w-14 h-14 transition-colors',
             isMuted
@@ -178,7 +181,7 @@ export function ConnectedState({
           size="icon"
           onClick={onHangup}
           className="rounded-full w-14 h-14 bg-red-500 text-white hover:bg-red-600"
-          aria-label="Termina chiamata"
+          aria-label={t('endCall')}
         >
           <PhoneOff className="w-6 h-6" />
         </Button>

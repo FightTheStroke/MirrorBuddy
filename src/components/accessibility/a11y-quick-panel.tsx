@@ -9,9 +9,10 @@ import { useRef, useEffect } from "react";
 import { X, RotateCcw, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
-import { A11yProfileButton, PROFILE_CONFIGS } from "./a11y-profile-button";
+import { A11yProfileButton, getProfileConfigs } from "./a11y-profile-button";
 
 interface A11yQuickPanelProps {
   isOpen: boolean;
@@ -19,11 +20,15 @@ interface A11yQuickPanelProps {
 }
 
 export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
+  const t = useTranslations("settings.accessibility");
   const panelRef = useRef<HTMLDivElement>(null);
   const activeProfile = useAccessibilityStore((state) => state.activeProfile);
   const settings = useAccessibilityStore((state) => state.settings);
   const updateSettings = useAccessibilityStore((state) => state.updateSettings);
   const resetSettings = useAccessibilityStore((state) => state.resetSettings);
+
+  // Get translated profile configs
+  const PROFILE_CONFIGS = getProfileConfigs(t);
 
   // Profile apply functions
   const applyDyslexia = useAccessibilityStore((s) => s.applyDyslexiaProfile);
@@ -132,12 +137,12 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                 id="a11y-panel-title"
                 className="text-lg font-semibold text-gray-900 dark:text-white"
               >
-                Accessibilità
+                {t("panelTitle")}
               </h2>
               <button
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
-                aria-label="Chiudi pannello"
+                aria-label={t("closePanel")}
               >
                 <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
@@ -151,7 +156,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   id="profiles-heading"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
                 >
-                  Profili rapidi
+                  {t("quickProfiles")}
                 </h3>
                 <div className="grid grid-cols-3 gap-2">
                   {PROFILE_CONFIGS.map((profile) => (
@@ -171,26 +176,26 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   id="toggles-heading"
                   className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3"
                 >
-                  Impostazioni rapide
+                  {t("quickSettings")}
                 </h3>
                 <div className="space-y-3">
                   <QuickToggle
-                    label="Testo grande"
+                    label={t("largeText")}
                     checked={settings.largeText}
                     onChange={(v) => updateSettings({ largeText: v })}
                   />
                   <QuickToggle
-                    label="Alto contrasto"
+                    label={t("highContrast")}
                     checked={settings.highContrast}
                     onChange={(v) => updateSettings({ highContrast: v })}
                   />
                   <QuickToggle
-                    label="Riduci animazioni"
+                    label={t("reduceAnimations")}
                     checked={settings.reducedMotion}
                     onChange={(v) => updateSettings({ reducedMotion: v })}
                   />
                   <QuickToggle
-                    label="Font dislessia"
+                    label={t("dyslexiaFont")}
                     checked={settings.dyslexiaFont}
                     onChange={(v) => updateSettings({ dyslexiaFont: v })}
                   />
@@ -204,7 +209,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  Ripristina impostazioni
+                  {t("resetSettings")}
                 </button>
                 <Link
                   href="/settings?section=accessibility"
@@ -212,7 +217,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg bg-violet-600 text-white hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 >
                   <Settings className="w-4 h-4" />
-                  Tutte le impostazioni
+                  {t("allSettings")}
                 </Link>
               </div>
             </div>

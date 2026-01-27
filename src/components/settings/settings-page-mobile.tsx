@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, Save } from "lucide-react";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,7 @@ interface SettingsPageMobileProps {
 }
 
 export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
+  const t = useTranslations("common");
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -209,7 +211,7 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
         </Button>
 
         <h1 className="text-lg font-semibold text-center flex-1">
-          Impostazioni
+          {t("settings")}
         </h1>
 
         <Button

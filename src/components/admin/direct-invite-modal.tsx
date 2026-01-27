@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { X, Mail, User, Loader2, CheckCircle, Copy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -22,6 +23,7 @@ export function DirectInviteModal({
   onClose,
   onSuccess,
 }: DirectInviteModalProps) {
+  const t = useTranslations("admin.components.directInviteModal");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
@@ -131,7 +133,7 @@ export function DirectInviteModal({
             id="direct-invite-title"
             className="text-lg font-semibold text-slate-900 dark:text-white"
           >
-            {result ? "Utente creato" : "Invito diretto"}
+            {result ? t("titleSuccess") : t("titleCreate")}
           </h2>
           <button
             onClick={handleClose}
@@ -148,13 +150,12 @@ export function DirectInviteModal({
               <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
             </div>
             <p className="text-slate-600 dark:text-slate-300 mb-4">
-              L&apos;utente è stato creato e riceverà un&apos;email con le
-              credenziali di accesso.
+              {t("successMessage")}
             </p>
 
             <div className="bg-slate-50 dark:bg-slate-700/50 rounded-lg p-4 mb-6">
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">
-                Username generato
+                {t("generatedUsername")}
               </p>
               <div className="flex items-center justify-center gap-2">
                 <code className="text-lg font-mono text-slate-900 dark:text-white">
@@ -163,7 +164,7 @@ export function DirectInviteModal({
                 <button
                   onClick={handleCopyUsername}
                   className="p-1.5 rounded hover:bg-slate-200 dark:hover:bg-slate-600"
-                  title="Copia username"
+                  title={t("copyUsername")}
                 >
                   {copied ? (
                     <CheckCircle className="w-4 h-4 text-green-600" />
@@ -182,7 +183,7 @@ export function DirectInviteModal({
               onClick={handleClose}
               className="w-full"
             >
-              Chiudi
+              {t("close")}
             </Button>
           </div>
         ) : (
@@ -213,7 +214,7 @@ export function DirectInviteModal({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    placeholder="utente@esempio.com"
+                    placeholder={t("emailPlaceholder")}
                     className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                   />
                 </div>
@@ -224,7 +225,7 @@ export function DirectInviteModal({
                   htmlFor="direct-name"
                   className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
                 >
-                  Nome (opzionale)
+                  {t("nameLabel")}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -233,7 +234,7 @@ export function DirectInviteModal({
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Mario Rossi"
+                    placeholder={t("namePlaceholder")}
                     className="w-full pl-10 pr-4 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white placeholder:text-slate-400 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                   />
                 </div>
@@ -241,8 +242,7 @@ export function DirectInviteModal({
             </div>
 
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-4 mb-6">
-              L&apos;utente riceverà un&apos;email con username e password
-              temporanea per accedere.
+              {t("emailHelpText")}
             </p>
 
             <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row">
@@ -253,7 +253,7 @@ export function DirectInviteModal({
                 className="flex-1 min-h-11 min-w-11"
                 disabled={loading}
               >
-                Annulla
+                {t("cancel")}
               </Button>
               <Button
                 type="submit"
@@ -263,10 +263,10 @@ export function DirectInviteModal({
                 {loading ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Creazione...
+                    {t("creating")}
                   </>
                 ) : (
-                  "Crea utente"
+                  t("createUser")
                 )}
               </Button>
             </div>

@@ -118,6 +118,58 @@ sequenceDiagram
 3. Review detection patterns
 4. If bypass detected → full incident review
 
+### INC-005: Missing Translations or Translation Loading Failures
+
+**Symptoms**: Users see untranslated keys (e.g., `i18n.key_name`), 404 errors loading language packs
+
+**Diagnostic Tree**:
+
+1. Locale detected correctly? → Check browser/profile settings
+2. Translation file exists? → Verify `public/locales/{lang}/translation.json`
+3. Bundle includes locale? → Check build output for language pack
+4. Cache stale? → Check CDN/browser cache headers
+
+**Root Causes**:
+
+- Missing translation file for new language
+- Translation key not in bundle (missing in source JSON)
+- Locale code mismatch (e.g., `en-US` vs `en`)
+- Language pack failed to download (network/CDN issue)
+
+**Resolution**:
+
+1. Add missing translation: `public/locales/{lang}/translation.json`
+2. Run `npm run build` to include in bundle
+3. Clear CDN cache: Contact DevOps team with language code
+4. Fallback to English if issue persists
+5. Log incident in Grafana
+
+### INC-006: Locale Detection Failures
+
+**Symptoms**: User's language preference not respected, wrong language displayed
+
+**Diagnostic Tree**:
+
+1. Browser locale detected? → Check `navigator.language` in console
+2. User profile has language setting? → Query database for `userLanguage`
+3. Cookie/localStorage preserved? → Check `mirrorbuddy-locale` cookie
+4. Fallback language working? → Default to English fallback
+
+**Root Causes**:
+
+- Browser language not in supported locales list
+- User profile not synced with auth provider
+- Cookie/session cleared unexpectedly
+- Invalid locale code stored
+
+**Resolution**:
+
+1. Verify supported locales: `src/lib/i18n/config.ts`
+2. Add unsupported locale to mapping if valid
+3. Force language refresh: Clear `mirrorbuddy-locale` cookie
+4. Check auth provider profile sync
+5. Monitor detection via Grafana i18n dashboard
+
 ## Communication Template
 
 ```markdown
@@ -206,6 +258,24 @@ sequenceDiagram
 | `mirrorbuddy_session_stuck_loop_rate`        | ≤5%          | >15%            |
 | `mirrorbuddy_refusal_precision`              | ≥95%         | <80%            |
 | `mirrorbuddy_incidents_total{severity="S3"}` | 0            | ≥1 (STOP)       |
+| `mirrorbuddy_i18n_missing_translations`      | 0            | >5 (alert)      |
+| `mirrorbuddy_i18n_locale_detection_failures` | <1%          | >5% (alert)     |
+
+### i18n Monitoring
+
+**Dashboard Panel**: Grafana → `mirrorbuddy` folder → `dashboard` → i18n Metrics section
+
+**Key Indicators**:
+
+- Translation load errors (by language)
+- Locale detection success rate
+- Missing translation key requests
+- Language pack CDN latency
+
+**Alert escalation** (i18n incidents):
+
+- **INC-005** (Missing Translations): SEV3, L1 on-call, involves frontend + i18n team
+- **INC-006** (Locale Detection): SEV3, L1 on-call, may require config changes
 
 ### S3 Incident Response
 
@@ -499,10 +569,11 @@ connect-src: 'self' ... https://*.ingest.us.sentry.io https://*.ingest.de.sentry
 - [RUNBOOK-PROCEDURES.md](./RUNBOOK-PROCEDURES.md) - Maintenance & recovery
 - [SLI-SLO.md](./SLI-SLO.md) - Service level definitions
 - [ALERT-TESTING-GUIDE.md](./ALERT-TESTING-GUIDE.md) - Testing service limit alerts
+- [I18N-RUNBOOK.md](./I18N-RUNBOOK.md) - i18n-specific incidents & troubleshooting
 - [ADR 0037](../adr/0037-deferred-production-items.md) - Known limitations
 - [ADR 0047](../adr/0047-grafana-cloud-observability.md) - Grafana Cloud architecture
 - [ADR 0070](../adr/0070-sentry-error-tracking.md) - Sentry integration
 
 ---
 
-_Version 2.3 | January 2026 | Added Sentry Error Tracking section_
+_Version 2.4 | January 2026 | Added i18n Incidents (INC-005, INC-006), Grafana i18n monitoring, and escalation paths_

@@ -1,4 +1,8 @@
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { getTranslations } from "next-intl/server";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import {
@@ -39,6 +43,7 @@ interface TierAnalytics {
 }
 
 export default async function TierAnalyticsPage() {
+  const t = await getTranslations("admin.tiers.analytics");
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
@@ -144,18 +149,16 @@ export default async function TierAnalyticsPage() {
         <Link href="/admin/tiers">
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Torna ai Piani
+            {t("backToTiers")}
           </Button>
         </Link>
         <div className="flex items-center gap-3">
           <BarChart3 className="w-8 h-8 text-primary" aria-hidden="true" />
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-            Analytics per Piano
+            {t("title")}
           </h1>
         </div>
-        <p className="text-sm text-muted-foreground mt-2">
-          Statistiche di utilizzo aggregate per ciascun piano tariffario
-        </p>
+        <p className="text-sm text-muted-foreground mt-2">{t("subtitle")}</p>
       </div>
 
       {/* Summary Cards */}
@@ -165,13 +168,13 @@ export default async function TierAnalyticsPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Utenti Totali
+                  {t("totalUsers")}
                 </p>
                 <p className="text-2xl font-bold mt-1 text-foreground">
                   {totals.totalUsers}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Tutti i piani
+                  {t("allPlans")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg">
@@ -186,13 +189,13 @@ export default async function TierAnalyticsPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Utenti Attivi
+                  {t("activeUsers")}
                 </p>
                 <p className="text-2xl font-bold mt-1 text-foreground">
                   {totals.activeUsers}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Ultimi 7 giorni
+                  {t("lastDays")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 shadow-lg">
@@ -207,13 +210,13 @@ export default async function TierAnalyticsPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Messaggi Totali
+                  {t("totalMessages")}
                 </p>
                 <p className="text-2xl font-bold mt-1 text-foreground">
                   {totals.totalMessages.toLocaleString()}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Tutte le conversazioni
+                  {t("allConversations")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-600 shadow-lg">
@@ -228,13 +231,13 @@ export default async function TierAnalyticsPage() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <p className="text-sm font-medium text-muted-foreground">
-                  Media per Utente
+                  {t("averagePerUser")}
                 </p>
                 <p className="text-2xl font-bold mt-1 text-foreground">
                   {avgMessagesOverall}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Messaggi/utente
+                  {t("messagesPerUser")}
                 </p>
               </div>
               <div className="p-3 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-lg">
@@ -248,26 +251,32 @@ export default async function TierAnalyticsPage() {
       {/* Detailed Table */}
       <Card>
         <CardHeader>
-          <CardTitle>Dettaglio per Piano</CardTitle>
-          <CardDescription>
-            Statistiche di utilizzo aggregate per ciascun piano tariffario
-          </CardDescription>
+          <CardTitle>{t("details")}</CardTitle>
+          <CardDescription>{t("subtitle")}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Piano</TableHead>
-                  <TableHead>Codice</TableHead>
-                  <TableHead className="text-right">Utenti Totali</TableHead>
+                  <TableHead>{t("plan")}</TableHead>
+                  <TableHead>{t("code")}</TableHead>
                   <TableHead className="text-right">
-                    Utenti Attivi (7gg)
+                    {t("totalUsersCol")}
                   </TableHead>
-                  <TableHead className="text-right">Messaggi Totali</TableHead>
-                  <TableHead className="text-right">Media/Utente</TableHead>
-                  <TableHead className="text-right">Tasso Attività</TableHead>
-                  <TableHead>Stato</TableHead>
+                  <TableHead className="text-right">
+                    {t("activeUsersCol")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("totalMessagesCol")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("averageCol")}
+                  </TableHead>
+                  <TableHead className="text-right">
+                    {t("activityRate")}
+                  </TableHead>
+                  <TableHead>{t("status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -318,7 +327,7 @@ export default async function TierAnalyticsPage() {
                               : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300"
                           }`}
                         >
-                          {tier.isActive ? "Attivo" : "Inattivo"}
+                          {tier.isActive ? t("active") : t("inactive")}
                         </span>
                       </TableCell>
                     </TableRow>
@@ -330,7 +339,7 @@ export default async function TierAnalyticsPage() {
 
           {analytics.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
-              Nessun piano disponibile
+              {t("noPlans")}
             </div>
           )}
         </CardContent>
@@ -339,10 +348,7 @@ export default async function TierAnalyticsPage() {
       {/* Footer Note */}
       <div className="mt-6 p-4 bg-muted/50 rounded-lg">
         <p className="text-sm text-muted-foreground">
-          <strong>Note:</strong> Gli &quot;Utenti Attivi&quot; sono calcolati in
-          base all&apos;attività degli ultimi 7 giorni. Il &quot;Tasso di
-          Attività&quot; indica la percentuale di utenti del piano che sono
-          stati attivi recentemente.
+          <strong>Note:</strong> {t("note")}
         </p>
       </div>
     </div>

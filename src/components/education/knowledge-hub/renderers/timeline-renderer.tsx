@@ -13,6 +13,7 @@
  */
 
 import { motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Clock, Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { BaseRendererProps } from "./types";
@@ -34,15 +35,16 @@ interface TimelineData {
  * Render a timeline for Knowledge Hub.
  */
 export function TimelineRenderer({ data, className }: BaseRendererProps) {
+  const t = useTranslations("education.knowledge-hub");
   const timelineData = data as unknown as TimelineData;
 
-  const title = timelineData.title || "Linea del Tempo";
+  const title = timelineData.title || t("timeline.default-title");
   const events = timelineData.events || [];
 
   if (events.length === 0) {
     return (
       <div className={cn("p-4 text-center text-slate-500", className)}>
-        Nessun evento disponibile
+        {t("timeline.no-events")}
       </div>
     );
   }

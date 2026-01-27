@@ -8,6 +8,7 @@
  */
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Cloud, LogOut, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,6 +27,8 @@ interface GoogleAccountCardProps {
 }
 
 export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
+  const t = useTranslations('google-drive');
+  const tCommon = useTranslations('common');
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
@@ -52,14 +55,14 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
           Google Drive
         </CardTitle>
         <CardDescription>
-          Collega Google Drive per importare materiali di studio direttamente dal cloud
+          {t('description')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         {isLoading ? (
           <div className="flex items-center gap-2 text-muted-foreground">
             <Loader2 className="w-4 h-4 animate-spin" />
-            <span>Verifica connessione...</span>
+            <span>{t('loadingCheck')}</span>
           </div>
         ) : isConnected ? (
           <div className="space-y-4">
@@ -93,7 +96,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
             <div className="text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-4 h-4 text-green-500" />
-                Accesso in sola lettura ai file di Google Drive
+                {t('readOnlyAccess')}
               </div>
             </div>
 
@@ -109,17 +112,16 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
               ) : (
                 <LogOut className="w-4 h-4 mr-2" />
               )}
-              Disconnetti Google Drive
+              {t('disconnectButton')}
             </Button>
 
             {/* Confirm dialog */}
             <Dialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Disconnetti Google Drive?</DialogTitle>
+                  <DialogTitle>{t('disconnectTitle')}</DialogTitle>
                   <DialogDescription>
-                    Non potrai più importare file da Google Drive.
-                    Potrai ricollegare l&apos;account in qualsiasi momento.
+                    {t('disconnectWarning')}
                   </DialogDescription>
                 </DialogHeader>
                 <DialogFooter>
@@ -127,7 +129,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
                     variant="outline"
                     onClick={() => setShowConfirmDialog(false)}
                   >
-                    Annulla
+                    {tCommon('cancel')}
                   </Button>
                   <Button
                     variant="destructive"
@@ -137,7 +139,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
                     {isDisconnecting && (
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                     )}
-                    Disconnetti
+                    {t('disconnectConfirm')}
                   </Button>
                 </DialogFooter>
               </DialogContent>
@@ -151,27 +153,26 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
                 <AlertCircle className="w-5 h-5 text-muted-foreground" />
               </div>
               <div>
-                <div className="font-medium">Non connesso</div>
+                <div className="font-medium">{t('notConnected')}</div>
                 <div className="text-sm text-muted-foreground">
-                  Collega il tuo account Google per importare file
+                  {t('connectPrompt')}
                 </div>
               </div>
             </div>
 
             {/* What you can do */}
             <div className="text-sm text-muted-foreground space-y-1">
-              <p>Con Google Drive puoi:</p>
+              <p>{t('capabilities')}</p>
               <ul className="list-disc list-inside space-y-1 ml-2">
-                <li>Importare PDF per lo Study Kit</li>
-                <li>Caricare foto dei compiti da Google Drive</li>
-                <li>Accedere ai tuoi documenti scolastici</li>
+                <li>{t('capabilityPdf')}</li>
+                <li>{t('capabilityHomework')}</li>
+                <li>{t('capabilityDocuments')}</li>
               </ul>
             </div>
 
             {/* Privacy notice */}
             <div className="text-xs text-muted-foreground bg-amber-50 dark:bg-amber-950/30 p-3 rounded-lg">
-              <strong>Privacy:</strong> MirrorBuddy richiede solo l&apos;accesso in
-              lettura ai tuoi file. Non modifichiamo né eliminiamo nulla.
+              <strong>Privacy:</strong> {t('privacyNotice')}
             </div>
 
             {/* Connect button */}
@@ -182,7 +183,7 @@ export function GoogleAccountCard({ userId }: GoogleAccountCardProps) {
                 <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
                 <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
-              Connetti Google Drive
+              {t('connectButton')}
             </Button>
           </div>
         )}

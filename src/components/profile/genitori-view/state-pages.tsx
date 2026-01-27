@@ -2,6 +2,7 @@
  * State page components for GenitoriView
  */
 
+import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -15,10 +16,11 @@ import {
 import { cn } from "@/lib/utils";
 
 export function LoadingState() {
+  const t = useTranslations('profile.genitori');
   return (
     <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      <p className="text-muted-foreground">Caricamento profilo...</p>
+      <p className="text-muted-foreground">{t('loadingProfile')}</p>
     </div>
   );
 }
@@ -29,18 +31,19 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ error, onRetry }: ErrorStateProps) {
+  const t = useTranslations('profile.genitori');
   return (
     <div className="flex flex-col items-center gap-4 text-center py-8">
       <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
         <AlertCircle className="h-7 w-7 text-destructive" />
       </div>
       <div>
-        <h3 className="font-semibold text-lg text-foreground">Errore</h3>
+        <h3 className="font-semibold text-lg text-foreground">{t('error')}</h3>
         <p className="text-muted-foreground mt-1">{error}</p>
       </div>
       <Button onClick={onRetry}>
         <RefreshCw className="h-4 w-4 mr-2" />
-        Riprova
+        {t('retry')}
       </Button>
     </div>
   );
@@ -55,6 +58,7 @@ interface WelcomeBannerProps {
  * Displays above the empty dashboard to explain the current state.
  */
 export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
+  const t = useTranslations('profile.genitori');
   return (
     <div
       className={cn(
@@ -85,7 +89,7 @@ export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
               highContrast ? "text-yellow-400" : "text-foreground",
             )}
           >
-            Benvenuto nell&apos;Area Genitori
+            {t('welcomeTitle')}
           </h2>
           <p
             className={cn(
@@ -93,8 +97,7 @@ export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
               highContrast ? "text-yellow-200" : "text-muted-foreground",
             )}
           >
-            Questa dashboard si popolerà automaticamente quando lo studente
-            inizierà a studiare con i Maestri. Intanto, ecco come apparirà!
+            {t('welcomeDescription')}
           </p>
         </div>
       </div>
@@ -107,6 +110,7 @@ interface NeedsConsentStateProps {
 }
 
 export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
+  const t = useTranslations('profile.genitori');
   return (
     <Card className="border-border">
       <CardHeader className="text-center pb-2">
@@ -114,17 +118,16 @@ export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
           <Shield className="h-7 w-7 text-primary" />
         </div>
         <CardTitle className="text-foreground">
-          Consenso per il Dashboard Genitori
+          {t('consentTitle')}
         </CardTitle>
         <p className="text-sm text-muted-foreground mt-2">
-          Per visualizzare le osservazioni dei Professori, abbiamo bisogno del
-          tuo consenso.
+          {t('consentDescription')}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button onClick={onConsent} className="w-full">
           <Shield className="h-4 w-4 mr-2" />
-          Acconsento alla Visualizzazione
+          {t('consentButton')}
         </Button>
       </CardContent>
     </Card>

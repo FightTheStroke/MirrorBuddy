@@ -50,6 +50,7 @@ export function quickRoute(message: string): RoutingResult {
 export function getCharacterGreeting(
   result: RoutingResult,
   studentProfile: ExtendedStudentProfile,
+  language: "it" | "en" | "es" | "fr" | "de" = "it",
 ): string {
   const { character, characterType } = result;
 
@@ -59,7 +60,10 @@ export function getCharacterGreeting(
     case "coach":
       return (character as SupportTeacher).greeting;
     case "buddy":
-      return (character as BuddyProfile).getGreeting(studentProfile);
+      return (character as BuddyProfile).getGreeting({
+        student: studentProfile,
+        language,
+      });
     default:
       return "Ciao! Come posso aiutarti?";
   }

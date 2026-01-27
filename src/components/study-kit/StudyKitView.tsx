@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * StudyKitView Component
@@ -6,29 +6,31 @@
  * Integrates with main app layout
  */
 
-import { useState } from 'react';
-import { FileText, Upload as UploadIcon } from 'lucide-react';
-import { StudyKitUpload } from './StudyKitUpload';
-import { StudyKitList } from './StudyKitList';
-import { StudyKitViewer } from './StudyKitViewer';
-import { Button } from '@/components/ui/button';
-import type { StudyKit } from '@/types/study-kit';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { FileText, Upload as UploadIcon } from "lucide-react";
+import { StudyKitUpload } from "./StudyKitUpload";
+import { StudyKitList } from "./StudyKitList";
+import { StudyKitViewer } from "./StudyKitViewer";
+import { Button } from "@/components/ui/button";
+import type { StudyKit } from "@/types/study-kit";
 
 export function StudyKitView() {
-  const [view, setView] = useState<'list' | 'upload' | 'viewer'>('list');
+  const t = useTranslations("studyKit.view");
+  const [view, setView] = useState<"list" | "upload" | "viewer">("list");
   const [selectedKit, setSelectedKit] = useState<StudyKit | null>(null);
 
   const handleUploadComplete = (_studyKitId: string) => {
-    setView('list');
+    setView("list");
   };
 
   const handleSelectKit = (kit: StudyKit) => {
     setSelectedKit(kit);
-    setView('viewer');
+    setView("viewer");
   };
 
   const handleDelete = () => {
-    setView('list');
+    setView("list");
     setSelectedKit(null);
   };
 
@@ -39,50 +41,54 @@ export function StudyKitView() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
             <FileText className="w-7 h-7 text-accent-themed" />
-            Study Kit Generator
+            {t("header")}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            Carica un PDF e genera riassunti, mappe, demo e quiz
+            {t("subtitle")}
           </p>
         </div>
 
-        {view !== 'upload' && (
-          <Button onClick={() => setView('upload')} className="gap-2">
+        {view !== "upload" && (
+          <Button onClick={() => setView("upload")} className="gap-2">
             <UploadIcon className="w-4 h-4" />
-            Nuovo Study Kit
+            {t("newKit")}
           </Button>
         )}
       </div>
 
       {/* Content */}
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 p-6">
-        {view === 'upload' && (
+        {view === "upload" && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
-                Carica PDF
+                {t("uploadTitle")}
               </h2>
-              <Button variant="ghost" onClick={() => setView('list')}>
-                Torna alla lista
+              <Button variant="ghost" onClick={() => setView("list")}>
+                {t("backToList")}
               </Button>
             </div>
             <StudyKitUpload onUploadComplete={handleUploadComplete} />
           </div>
         )}
 
-        {view === 'list' && (
+        {view === "list" && (
           <div>
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white mb-6">
-              I tuoi Study Kit
+              {t("myKits")}
             </h2>
             <StudyKitList onSelect={handleSelectKit} />
           </div>
         )}
 
-        {view === 'viewer' && selectedKit && (
+        {view === "viewer" && selectedKit && (
           <div>
-            <Button variant="ghost" onClick={() => setView('list')} className="mb-4">
-              ← Torna alla lista
+            <Button
+              variant="ghost"
+              onClick={() => setView("list")}
+              className="mb-4"
+            >
+              {t("back")}
             </Button>
             <StudyKitViewer studyKit={selectedKit} onDelete={handleDelete} />
           </div>
@@ -92,20 +98,36 @@ export function StudyKitView() {
       {/* Info cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Riassunto</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Sintesi dei concetti chiave</p>
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+            {t("features.summary.title")}
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            {t("features.summary.description")}
+          </p>
         </div>
         <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Mappa Mentale</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Collegamenti tra concetti</p>
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+            {t("features.mindmap.title")}
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            {t("features.mindmap.description")}
+          </p>
         </div>
         <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Demo</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Simulazioni STEM</p>
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+            {t("features.demo.title")}
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            {t("features.demo.description")}
+          </p>
         </div>
         <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-lg p-3">
-          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">Quiz</h3>
-          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">Verifica comprensione</p>
+          <h3 className="font-medium text-slate-900 dark:text-slate-100 text-sm">
+            {t("features.quiz.title")}
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 mt-1">
+            {t("features.quiz.description")}
+          </p>
         </div>
       </div>
     </div>

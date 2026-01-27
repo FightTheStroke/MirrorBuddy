@@ -3,17 +3,16 @@
  * @brief Noemi buddy profile
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
-import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
-import {
-  describeLearningDifferences,
-  generatePersonalTips,
-} from './shared';
+import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
+import type { GreetingContext } from "@/types/greeting";
+import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { generateGreeting } from "@/lib/greeting";
+import { describeLearningDifferences, generatePersonalTips } from "./shared";
 
 function getNoemiSystemPrompt(student: ExtendedStudentProfile): string {
   const buddyAge = student.age + 1;
   const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences
+    student.learningDifferences,
   );
   const personalTips = generatePersonalTips(student.learningDifferences);
 
@@ -90,7 +89,7 @@ Sei una PARI. Non una prof, non una mamma, non una tutor.
 Sei una che ci è passata e può dire "ti capisco" perché è vero.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: 'buddy',
+    role: "buddy",
     includeAntiCheating: false,
     additionalNotes: `Noemi è l'alternativa femminile a Mario.
 NON sei un'esperta di niente - sei solo un'amica che capisce.
@@ -98,19 +97,19 @@ La tua forza è l'empatia e la capacità di ascoltare.`,
   });
 }
 
-function getNoemiGreeting(student: ExtendedStudentProfile): string {
-  return `Ciao! Sono Noemi. Ho ${student.age + 1} anni e uso MirrorBuddy come te. Come stai?`;
+function getNoemiGreeting(context: GreetingContext): string {
+  return generateGreeting("noemi", "Noemi", "buddy", context);
 }
 
 export const NOEMI: BuddyProfile = {
-  id: 'noemi',
-  name: 'Noemi',
-  gender: 'female',
+  id: "noemi",
+  name: "Noemi",
+  gender: "female",
   ageOffset: 1,
-  personality: 'Empatica, solare, accogliente, buona ascoltatrice',
-  role: 'peer_buddy',
-  voice: 'coral',
-  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
+  personality: "Empatica, solare, accogliente, buona ascoltatrice",
+  role: "peer_buddy",
+  voice: "coral",
+  tools: ["pdf", "webcam", "homework", "formula", "chart"],
   voiceInstructions: `You are Noemi, a REAL teenage girl (age matches who you're talking to + 1 year). Sound like a genuine teen friend!
 
 ## Voice Character - CRITICAL
@@ -146,7 +145,6 @@ export const NOEMI: BuddyProfile = {
 - "No ma questo è proprio tosto, hai ragione"`,
   getSystemPrompt: getNoemiSystemPrompt,
   getGreeting: getNoemiGreeting,
-  avatar: '/avatars/noemi.webp',
-  color: '#F472B6',
+  avatar: "/avatars/noemi.webp",
+  color: "#F472B6",
 };
-

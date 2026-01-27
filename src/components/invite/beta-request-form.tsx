@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,6 +28,7 @@ export function BetaRequestForm({
   trialSessionId,
   onSuccess,
 }: BetaRequestFormProps) {
+  const t = useTranslations("invite.form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [motivation, setMotivation] = useState("");
@@ -37,21 +39,21 @@ export function BetaRequestForm({
     const newErrors: FormErrors = {};
 
     if (!name.trim()) {
-      newErrors.name = "Il nome e obbligatorio";
+      newErrors.name = t("nameRequired");
     } else if (name.trim().length < 2) {
-      newErrors.name = "Il nome deve avere almeno 2 caratteri";
+      newErrors.name = t("nameMinLength");
     }
 
     if (!email.trim()) {
-      newErrors.email = "L'email e obbligatoria";
+      newErrors.email = t("emailRequired");
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      newErrors.email = "Inserisci un'email valida";
+      newErrors.email = t("emailInvalid");
     }
 
     if (!motivation.trim()) {
-      newErrors.motivation = "Raccontaci perche vuoi usare MirrorBuddy";
+      newErrors.motivation = t("motivationRequired");
     } else if (motivation.trim().length < 20) {
-      newErrors.motivation = "Scrivi almeno 20 caratteri";
+      newErrors.motivation = t("motivationMinLength");
     }
 
     setErrors(newErrors);
@@ -81,11 +83,11 @@ export function BetaRequestForm({
       if (!response.ok) {
         const data = await response.json();
         if (response.status === 409) {
-          setErrors({ email: "Questa email ha gia una richiesta in corso" });
+          setErrors({ email: t("errors.emailDuplicate") });
           setState("idle");
           return;
         }
-        throw new Error(data.error || "Errore durante l'invio");
+        throw new Error(data.error || t("errors.sendError"));
       }
 
       setState("success");
@@ -94,10 +96,10 @@ export function BetaRequestForm({
       logger.error("Invite request failed", { error: String(error) });
       const message =
         error instanceof Error && /csrf/i.test(error.message)
-          ? "Sessione scaduta. Ricarica la pagina e riprova."
+          ? t("errors.sessionExpired")
           : error instanceof Error
             ? error.message
-            : "Errore durante l'invio";
+            : t("errors.sendError");
       setErrors({
         general: message,
       });
@@ -112,11 +114,10 @@ export function BetaRequestForm({
           <CheckCircle className="w-8 h-8 text-green-600 dark:text-green-400" />
         </div>
         <h3 className="text-xl font-semibold text-slate-900 dark:text-white">
-          Richiesta inviata!
+          {t("successTitle")}
         </h3>
         <p className="text-slate-600 dark:text-slate-400 max-w-sm mx-auto">
-          Ti contatteremo presto via email per confermare il tuo accesso alla
-          beta di MirrorBuddy.
+          {t("successMessage")}
         </p>
       </div>
     );
@@ -138,12 +139,12 @@ export function BetaRequestForm({
           htmlFor="name"
           className="text-sm font-medium text-slate-700 dark:text-slate-300"
         >
-          Nome
+          {t("nameLabel")}
         </label>
         <Input
           id="name"
           type="text"
-          placeholder="Il tuo nome"
+          placeholder={t("namePlaceholder")}
           value={name}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setName(e.target.value)
@@ -163,12 +164,12 @@ export function BetaRequestForm({
           htmlFor="email"
           className="text-sm font-medium text-slate-700 dark:text-slate-300"
         >
-          Email
+          {t("emailLabel")}
         </label>
         <Input
           id="email"
           type="email"
-          placeholder="la-tua-email@esempio.com"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setEmail(e.target.value)
@@ -188,11 +189,11 @@ export function BetaRequestForm({
           htmlFor="motivation"
           className="text-sm font-medium text-slate-700 dark:text-slate-300"
         >
-          Perche vuoi usare MirrorBuddy?
+          {t("motivationLabel")}
         </label>
         <textarea
           id="motivation"
-          placeholder="Raccontaci come pensi di usare MirrorBuddy per studiare..."
+          placeholder={t("motivationPlaceholder")}
           value={motivation}
           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
             setMotivation(e.target.value)
@@ -220,12 +221,12 @@ export function BetaRequestForm({
         {state === "submitting" ? (
           <>
             <Loader2 className="w-4 h-4 animate-spin" />
-            Invio in corso...
+            {t("submitting")}
           </>
         ) : (
           <>
             <Send className="w-4 h-4" />
-            Richiedi accesso Beta
+            {t("submitButton")}
           </>
         )}
       </Button>

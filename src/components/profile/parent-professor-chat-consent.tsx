@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import {
   Dialog,
   DialogContent,
@@ -30,18 +31,18 @@ export function ConsentModal({
   onConsent,
   onCancel,
 }: ConsentModalProps) {
+  const t = useTranslations('profile.parentChat');
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Shield className="h-5 w-5 text-indigo-500" />
-            Conversazione con {maestroName}
+            {t('title', { maestroName })}
           </DialogTitle>
           <DialogDescription className="text-left space-y-3 pt-4">
             <p>
-              Sta per iniziare una conversazione con il Professore {maestroName}
-              riguardo al percorso di apprendimento di {studentName}.
+              {t('description', { maestroName, studentName })}
             </p>
 
             <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
@@ -49,31 +50,29 @@ export function ConsentModal({
                 <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="text-sm">
                   <p className="font-medium text-amber-800 dark:text-amber-200">
-                    Disclaimer importante
+                    {t('disclaimerTitle')}
                   </p>
                   <p className="text-amber-700 dark:text-amber-300 mt-1">
-                    I Professori sono assistenti AI che forniscono osservazioni pedagogiche.
-                    Le loro valutazioni non sostituiscono pareri medici, psicologici o
-                    diagnosi professionali. Per questioni cliniche, consultare specialisti qualificati.
+                    {t('disclaimerText')}
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-2 text-sm">
-              <p className="font-medium">In questa conversazione:</p>
+              <p className="font-medium">{t('conversationTitle')}</p>
               <ul className="space-y-1.5">
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
-                  I messaggi vengono salvati in modo sicuro
+                  {t('messagesSaved')}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
-                  Il Professore utilizza un linguaggio formale
+                  {t('formalLanguage')}
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle className="h-4 w-4 text-green-500" />
-                  Le osservazioni si basano sulle sessioni di studio
+                  {t('observationsStudySessions')}
                 </li>
               </ul>
             </div>
@@ -81,10 +80,10 @@ export function ConsentModal({
         </DialogHeader>
         <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button variant="outline" onClick={onCancel}>
-            Annulla
+            {t('cancel')}
           </Button>
           <Button onClick={onConsent} className="bg-indigo-600 hover:bg-indigo-700">
-            Ho capito, continua
+            {t('understood')}
           </Button>
         </DialogFooter>
       </DialogContent>

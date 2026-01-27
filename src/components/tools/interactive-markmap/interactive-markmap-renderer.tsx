@@ -10,6 +10,7 @@
  */
 
 import { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import type { Markmap } from "markmap-view";
 import { cn } from "@/lib/utils";
@@ -38,6 +39,7 @@ export const InteractiveMarkMapRenderer = forwardRef<
   const markmapRef = useRef<Markmap | null>(null);
 
   const [accessibilityMode, setAccessibilityMode] = useState(false);
+  const t = useTranslations("tools.markmap");
 
   const { settings } = useAccessibilityStore();
 
@@ -136,7 +138,7 @@ export const InteractiveMarkMapRenderer = forwardRef<
         className,
       )}
       role="region"
-      aria-label={`Mappa mentale interattiva: ${title}`}
+      aria-label={t("interactiveMindmapDescription", { title })}
     >
       {/* Toolbar */}
       <Toolbar
@@ -177,7 +179,7 @@ export const InteractiveMarkMapRenderer = forwardRef<
             )}
             role="alert"
           >
-            <strong>Errore:</strong> {error}
+            <strong>{t("error")}</strong> {error}
           </div>
         ) : (
           <>
@@ -201,8 +203,7 @@ export const InteractiveMarkMapRenderer = forwardRef<
             />
             {rendered && (
               <div className="absolute bottom-2 left-2 text-xs text-slate-400 dark:text-slate-500 pointer-events-none select-none">
-                Trascina per spostare • Scroll/pinch per zoom • Click sui nodi
-                per espandere/comprimere
+                {t("instructions")}
               </div>
             )}
           </>
@@ -212,7 +213,7 @@ export const InteractiveMarkMapRenderer = forwardRef<
       {/* Screen reader description */}
       <div className="sr-only" aria-live="polite">
         {rendered &&
-          `Mappa mentale "${title}" renderizzata con ${nodes.length} nodi.`}
+          t("interactiveRenderMessage", { title, count: nodes.length })}
       </div>
     </motion.div>
   );

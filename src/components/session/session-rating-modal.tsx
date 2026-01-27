@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================================
 // SESSION RATING MODAL
@@ -6,8 +6,9 @@
 // Part of Session Summary & Unified Archive feature
 // ============================================================================
 
-import React, { useState, useEffect } from 'react';
-import { Star, X, Send, Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Star, X, Send, Loader2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SessionRatingModalProps {
   isOpen: boolean;
@@ -26,9 +27,10 @@ export function SessionRatingModal({
   onSubmit,
   sessionInfo,
 }: SessionRatingModalProps) {
+  const t = useTranslations("session");
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
-  const [feedback, setFeedback] = useState<string>('');
+  const [feedback, setFeedback] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -36,19 +38,19 @@ export function SessionRatingModal({
   useEffect(() => {
     if (!isOpen) return;
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         onClose();
       }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
   const handleSubmit = async () => {
     if (rating === 0) {
-      setError('Per favore seleziona un voto');
+      setError(t("rating.selectError"));
       return;
     }
 
@@ -59,7 +61,7 @@ export function SessionRatingModal({
       await onSubmit(rating, feedback.trim() || undefined);
       onClose();
     } catch (_err) {
-      setError('Errore nel salvare la valutazione. Riprova.');
+      setError(t("rating.savingError"));
     } finally {
       setIsSubmitting(false);
     }
@@ -70,12 +72,12 @@ export function SessionRatingModal({
   };
 
   const ratingLabels = [
-    '',
-    'Per niente soddisfatto',
-    'Poco soddisfatto',
-    'Così così',
-    'Soddisfatto',
-    'Molto soddisfatto!',
+    "",
+    t("rating.labels.1"),
+    t("rating.labels.2"),
+    t("rating.labels.3"),
+    t("rating.labels.4"),
+    t("rating.labels.5"),
   ];
 
   return (
@@ -84,12 +86,12 @@ export function SessionRatingModal({
         {/* Header */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-xl font-bold text-gray-900 dark:text-white">
-            Come è andata?
+            {t("rating.title")}
           </h2>
           <button
             onClick={handleSkip}
             className="inline-flex h-11 w-11 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-700"
-            aria-label="Chiudi"
+            aria-label={t("rating.close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -99,14 +101,18 @@ export function SessionRatingModal({
         {sessionInfo && (
           <div className="mb-6 rounded-lg bg-gray-50 p-3 dark:bg-gray-700/50">
             <p className="text-sm text-gray-600 dark:text-gray-300">
-              Sessione con <span className="font-medium">{sessionInfo.maestroName}</span>
+              {t("rating.sessionWith")}{" "}
+              <span className="font-medium">{sessionInfo.maestroName}</span>
               {sessionInfo.duration > 0 && (
-                <> • {sessionInfo.duration} minuti</>
+                <>
+                  {" "}
+                  • {sessionInfo.duration} {t("rating.minutes")}
+                </>
               )}
             </p>
             {sessionInfo.topics.length > 0 && (
               <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                Argomenti: {sessionInfo.topics.slice(0, 3).join(', ')}
+                {t("rating.topics")} {sessionInfo.topics.slice(0, 3).join(", ")}
               </p>
             )}
           </div>
@@ -122,20 +128,21 @@ export function SessionRatingModal({
                 onMouseEnter={() => setHoveredRating(star)}
                 onMouseLeave={() => setHoveredRating(0)}
                 className="transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-full"
-                aria-label={`${star} stelle`}
+                aria-label={t("rating.stars", { count: star })}
               >
                 <Star
                   className={`h-10 w-10 transition-colors ${
                     star <= (hoveredRating || rating)
-                      ? 'fill-yellow-400 text-yellow-400'
-                      : 'text-gray-300 dark:text-gray-600'
+                      ? "fill-yellow-400 text-yellow-400"
+                      : "text-gray-300 dark:text-gray-600"
                   }`}
                 />
               </button>
             ))}
           </div>
           <p className="mt-2 h-6 text-sm text-gray-600 dark:text-gray-400">
-            {ratingLabels[hoveredRating || rating] || 'Seleziona un voto'}
+            {ratingLabels[hoveredRating || rating] ||
+              t("rating.selectPlaceholder")}
           </p>
         </div>
 
@@ -145,13 +152,13 @@ export function SessionRatingModal({
             htmlFor="feedback"
             className="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
           >
-            Vuoi aggiungere un commento? (opzionale)
+            {t("rating.feedbackLabel")}
           </label>
           <textarea
             id="feedback"
             value={feedback}
             onChange={(e) => setFeedback(e.target.value)}
-            placeholder="Cosa ti è piaciuto? Cosa potrebbe migliorare?"
+            placeholder={t("rating.feedbackPlaceholder")}
             className="w-full rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             rows={3}
             maxLength={500}
@@ -169,7 +176,7 @@ export function SessionRatingModal({
             onClick={handleSkip}
             className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
           >
-            Salta
+            {t("rating.skip")}
           </button>
           <button
             onClick={handleSubmit}
@@ -179,12 +186,12 @@ export function SessionRatingModal({
             {isSubmitting ? (
               <>
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Invio...
+                {t("rating.submitting")}
               </>
             ) : (
               <>
                 <Send className="h-4 w-4" />
-                Invia
+                {t("rating.submit")}
               </>
             )}
           </button>

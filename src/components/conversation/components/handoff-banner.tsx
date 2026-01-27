@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
-import { CharacterAvatar } from './character-avatar';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
+import { CharacterAvatar } from "./character-avatar";
 
 interface HandoffBannerProps {
   suggestion: {
@@ -23,6 +24,8 @@ export function HandoffBanner({
   onAccept,
   onDismiss,
 }: HandoffBannerProps) {
+  const t = useTranslations("conversation.handoff");
+
   return (
     <motion.div
       initial={{ opacity: 0, y: -20 }}
@@ -37,20 +40,20 @@ export function HandoffBanner({
             {suggestion.reason}
           </p>
           <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">
-            Vuoi parlare con {suggestion.toCharacter.name}?
+            {t("question", { name: suggestion.toCharacter.name })}
           </p>
         </div>
       </div>
       <div className="flex gap-2 mt-3 justify-end">
         <Button variant="ghost" size="sm" onClick={onDismiss}>
-          No grazie
+          {t("decline")}
         </Button>
         <Button
           size="sm"
           onClick={onAccept}
           style={{ backgroundColor: suggestion.toCharacter.color }}
         >
-          Parla con {suggestion.toCharacter.name}
+          {t("accept", { name: suggestion.toCharacter.name })}
         </Button>
       </div>
     </motion.div>

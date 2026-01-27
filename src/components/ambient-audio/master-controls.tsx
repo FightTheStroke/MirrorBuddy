@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { Volume2, VolumeX, Play, Pause, Square } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Slider } from '@/components/ui/slider';
-import { Music } from 'lucide-react';
+import { useTranslations } from "next-intl";
+import { Volume2, VolumeX, Play, Pause, Square } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Slider } from "@/components/ui/slider";
+import { Music } from "lucide-react";
 
 interface MasterControlsProps {
   isPlaying: boolean;
@@ -25,12 +26,14 @@ export function MasterControls({
   onStop,
   onVolumeChange,
 }: MasterControlsProps) {
+  const t = useTranslations("ambientAudio");
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Music className="w-5 h-5 text-purple-500" />
-          Audio Ambientale
+          {t("title")}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -43,8 +46,12 @@ export function MasterControls({
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <label className="flex items-center gap-2 text-sm font-medium">
-              {masterVolume === 0 ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-              Volume Principale
+              {masterVolume === 0 ? (
+                <VolumeX className="w-4 h-4" />
+              ) : (
+                <Volume2 className="w-4 h-4" />
+              )}
+              {t("mainVolume")}
             </label>
             <span className="text-sm text-slate-600 dark:text-slate-400">
               {Math.round(masterVolume * 100)}%
@@ -62,13 +69,13 @@ export function MasterControls({
         <div className="flex items-center gap-2">
           <Button
             onClick={onPlayPause}
-            variant={isPlaying ? 'default' : 'outline'}
+            variant={isPlaying ? "default" : "outline"}
             className="flex-1"
           >
             {isPlaying ? (
               <>
                 <Pause className="w-4 h-4 mr-2" />
-                Pausa
+                {t("pause")}
               </>
             ) : (
               <>
@@ -80,7 +87,7 @@ export function MasterControls({
           <Button
             onClick={onStop}
             variant="outline"
-            disabled={playbackState === 'idle'}
+            disabled={playbackState === "idle"}
           >
             <Square className="w-4 h-4" />
           </Button>

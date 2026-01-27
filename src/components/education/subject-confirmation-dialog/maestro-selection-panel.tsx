@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ export function MaestroSelectionPanel({
   onSelectMaestro,
   onBack,
 }: MaestroSelectionPanelProps) {
+  const t = useTranslations("education.subjectConfirmation.maestroPanel");
   const availableMaestri = getMaestriBySubject(selectedSubject);
 
   return (
@@ -27,7 +29,7 @@ export function MaestroSelectionPanel({
         <span className="font-semibold text-blue-600">
           {getSubjectLabel(selectedSubject)}
         </span>{" "}
-        con un Professore? Ti guiderà passo dopo passo.
+        {t("description")}
       </p>
 
       <div className="space-y-2 mb-6">

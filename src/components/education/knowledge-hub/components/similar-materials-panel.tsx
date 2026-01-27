@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
 /**
  * Similar Materials Panel
  * Wave 4: UI for similarity search results
  */
 
-import { useEffect, useState } from 'react';
-import { Sparkles, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Sparkles, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface SimilarMaterial {
   id: string;
@@ -33,6 +34,7 @@ export function SimilarMaterialsPanel({
   onSelect,
   className,
 }: SimilarMaterialsPanelProps) {
+  const t = useTranslations("education.knowledge-hub");
   const [loading, setLoading] = useState(false);
   const [items, setItems] = useState<SimilarMaterial[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -45,9 +47,11 @@ export function SimilarMaterialsPanel({
       try {
         setLoading(true);
         setError(null);
-        const response = await fetch(`/api/materials/similar?toolId=${toolId}&limit=6`);
+        const response = await fetch(
+          `/api/materials/similar?toolId=${toolId}&limit=6`,
+        );
         if (!response.ok) {
-          throw new Error('Failed to fetch similar materials');
+          throw new Error("Failed to fetch similar materials");
         }
         const data = await response.json();
         if (!cancelled) {
@@ -55,7 +59,11 @@ export function SimilarMaterialsPanel({
         }
       } catch (fetchError) {
         if (!cancelled) {
-          setError(fetchError instanceof Error ? fetchError.message : 'Errore durante la ricerca');
+          setError(
+            fetchError instanceof Error
+              ? fetchError.message
+              : t("similar-materials.error-loading"),
+          );
         }
       } finally {
         if (!cancelled) {
@@ -69,28 +77,33 @@ export function SimilarMaterialsPanel({
     return () => {
       cancelled = true;
     };
-  }, [open, toolId]);
+  }, [open, toolId, t]);
 
   if (!open) return null;
 
   return (
     <div
       className={cn(
-        'fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4',
-        className
+        "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4",
+        className,
       )}
       role="dialog"
-      aria-label="Materiali simili"
+      aria-label={t("similar-materials.aria-label")}
     >
       <div className="bg-white dark:bg-slate-900 rounded-xl shadow-xl w-full max-w-xl overflow-hidden">
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-200 dark:border-slate-700">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-indigo-500" />
             <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-              Materiali simili
+              {t("similar-materials.title")}
             </h2>
           </div>
-          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Chiudi">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            aria-label={t("similar-materials.close-aria-label")}
+          >
             <X className="w-5 h-5" />
           </Button>
         </div>
@@ -98,7 +111,7 @@ export function SimilarMaterialsPanel({
         <div className="p-4 space-y-3">
           {loading && (
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              Ricerca in corso...
+              {t("similar-materials.loading")}
             </div>
           )}
           {error && (
@@ -108,7 +121,7 @@ export function SimilarMaterialsPanel({
           )}
           {!loading && !error && items.length === 0 && (
             <div className="text-sm text-slate-500 dark:text-slate-400">
-              Nessun materiale simile trovato.
+              {t("similar-materials.no-results")}
             </div>
           )}
 
@@ -124,7 +137,8 @@ export function SimilarMaterialsPanel({
                     {item.title}
                   </div>
                   <div className="text-xs text-slate-500">
-                    {item.toolType} • Similarita {item.similarity}
+                    {item.toolType} • {t("similar-materials.similarity")}{" "}
+                    {item.similarity}
                   </div>
                 </div>
                 <Sparkles className="w-4 h-4 text-indigo-400" />

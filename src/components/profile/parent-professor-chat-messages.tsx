@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
-import { Loader2, MessageCircle } from 'lucide-react';
-import { CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import type { MaestroFull } from '@/data/maestri/types';
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import { Loader2, MessageCircle } from "lucide-react";
+import { CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import type { MaestroFull } from "@/data/maestri/types";
 
 interface Message {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   createdAt: Date;
 }
@@ -41,22 +42,22 @@ export function ChatMessages({
   studentName,
   messagesEndRef,
 }: ChatMessagesProps) {
+  const t = useTranslations("profile.parentChat");
+
   return (
     <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">
       {isLoadingHistory && (
         <div className="text-center py-8 text-slate-500">
           <Loader2 className="h-8 w-8 mx-auto mb-3 animate-spin" />
-          <p>Caricamento conversazione...</p>
+          <p>{t("loadingConversation")}</p>
         </div>
       )}
 
       {!isLoadingHistory && messages.length === 0 && (
         <div className="text-center py-8 text-slate-500">
           <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-          <p>Inizia la conversazione con {maestroName}</p>
-          <p className="text-sm mt-1">
-            Chieda informazioni sui progressi di {studentName}
-          </p>
+          <p>{t("startConversation", { maestroName })}</p>
+          <p className="text-sm mt-1">{t("askAbout", { studentName })}</p>
         </div>
       )}
 
@@ -67,11 +68,11 @@ export function ChatMessages({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             className={cn(
-              'flex gap-3',
-              message.role === 'user' ? 'justify-end' : 'justify-start'
+              "flex gap-3",
+              message.role === "user" ? "justify-end" : "justify-start",
             )}
           >
-            {message.role === 'assistant' && (
+            {message.role === "assistant" && (
               <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                 <Image
                   src={maestro?.avatar || `/maestri/${maestroId}.webp`}
@@ -84,24 +85,24 @@ export function ChatMessages({
             )}
             <div
               className={cn(
-                'max-w-[80%] rounded-2xl px-4 py-2',
-                message.role === 'user'
-                  ? 'bg-indigo-600 text-white'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white'
+                "max-w-[80%] rounded-2xl px-4 py-2",
+                message.role === "user"
+                  ? "bg-indigo-600 text-white"
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white",
               )}
             >
               <p className="whitespace-pre-wrap">{message.content}</p>
               <p
                 className={cn(
-                  'text-xs mt-1',
-                  message.role === 'user'
-                    ? 'text-indigo-200'
-                    : 'text-slate-500'
+                  "text-xs mt-1",
+                  message.role === "user"
+                    ? "text-indigo-200"
+                    : "text-slate-500",
                 )}
               >
-                {message.createdAt.toLocaleTimeString('it-IT', {
-                  hour: '2-digit',
-                  minute: '2-digit',
+                {message.createdAt.toLocaleTimeString("it-IT", {
+                  hour: "2-digit",
+                  minute: "2-digit",
                 })}
               </p>
             </div>

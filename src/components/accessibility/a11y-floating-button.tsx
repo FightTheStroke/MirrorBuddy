@@ -7,6 +7,7 @@
  */
 
 import { Accessibility } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
@@ -21,6 +22,7 @@ export function A11yFloatingButton({
   isExpanded,
   className,
 }: A11yFloatingButtonProps) {
+  const t = useTranslations('settings.accessibility');
   const activeProfile = useAccessibilityStore((state) => state.activeProfile);
 
   // Visual indicator when a profile is active
@@ -43,7 +45,7 @@ export function A11yFloatingButton({
         hasActiveProfile && "ring-2 ring-offset-2 ring-green-400",
         className,
       )}
-      aria-label="Apri impostazioni accessibilità"
+      aria-label={t('a11yOpenSettings')}
       aria-expanded={isExpanded}
       aria-controls="a11y-quick-panel"
       aria-haspopup="dialog"
@@ -52,7 +54,7 @@ export function A11yFloatingButton({
       {hasActiveProfile && (
         <span
           className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white dark:border-gray-900"
-          aria-label="Profilo attivo"
+          aria-label={t('a11yActiveProfile')}
         />
       )}
     </button>

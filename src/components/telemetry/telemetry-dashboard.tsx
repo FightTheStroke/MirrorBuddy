@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion } from 'framer-motion';
 import {
   BarChart3,
@@ -27,6 +28,7 @@ interface TelemetryDashboardProps {
 }
 
 export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
+  const t = useTranslations('telemetry');
   const { localStats, usageStats, lastFetchedAt, fetchUsageStats, config, updateConfig } = useTelemetryStore();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,10 +59,10 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
         <div>
           <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
             <BarChart3 className="w-6 h-6 text-blue-500" />
-            Statistiche di Utilizzo
+            {t('statsTitle')}
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Analisi dell&apos;attività e progressi sulla piattaforma
+            {t('statsDesc')}
           </p>
         </div>
         <Button
@@ -70,31 +72,31 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
           disabled={isLoading}
         >
           <RefreshCw className={cn('w-4 h-4 mr-2', isLoading && 'animate-spin')} />
-          Aggiorna
+          {t('refresh')}
         </Button>
       </div>
 
       {/* Today's Stats */}
       <div>
-        <h3 className="text-sm font-medium text-slate-500 mb-3">Oggi</h3>
+        <h3 className="text-sm font-medium text-slate-500 mb-3">{t('today')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
-            title="Sessioni"
+            title={t('sessions')}
             value={usageStats?.todaySessions ?? localStats.todaySessions}
             icon={<Users className="w-5 h-5 text-blue-500" />}
           />
           <StatCard
-            title="Tempo di studio"
+            title={t('studyTime')}
             value={formatMinutes(usageStats?.todayStudyMinutes ?? localStats.todayStudyMinutes)}
             icon={<Clock className="w-5 h-5 text-emerald-500" />}
           />
           <StatCard
-            title="Domande"
+            title={t('questions')}
             value={usageStats?.todayQuestions ?? localStats.todayQuestions}
             icon={<MessageCircle className="w-5 h-5 text-purple-500" />}
           />
           <StatCard
-            title="Pagine viste"
+            title={t('pageViews')}
             value={localStats.todayPageViews}
             icon={<BookOpen className="w-5 h-5 text-orange-500" />}
           />
@@ -105,7 +107,7 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center justify-between">
-            <span>Attività Settimanale</span>
+            <span>{t('weeklyActivity')}</span>
             {usageStats?.studyTimeTrend && (
               <span
                 className={cn(
@@ -118,14 +120,14 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
                 {usageStats.studyTimeTrend === 'increasing' && <TrendingUp className="w-4 h-4" />}
                 {usageStats.studyTimeTrend === 'decreasing' && <TrendingDown className="w-4 h-4" />}
                 {usageStats.studyTimeTrend === 'stable' && <Minus className="w-4 h-4" />}
-                {usageStats.studyTimeTrend === 'increasing' && 'In crescita'}
-                {usageStats.studyTimeTrend === 'decreasing' && 'In calo'}
-                {usageStats.studyTimeTrend === 'stable' && 'Stabile'}
+                {usageStats.studyTimeTrend === 'increasing' && t('trend.increasing')}
+                {usageStats.studyTimeTrend === 'decreasing' && t('trend.decreasing')}
+                {usageStats.studyTimeTrend === 'stable' && t('trend.stable')}
               </span>
             )}
           </CardTitle>
           <CardDescription>
-            Minuti di studio per giorno (ultimi 7 giorni)
+            {t('weeklyStats')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -136,19 +138,19 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
               <div className="text-2xl font-bold text-blue-600">
                 {usageStats?.weeklySessionsCount ?? 0}
               </div>
-              <div className="text-xs text-slate-500">Sessioni</div>
+              <div className="text-xs text-slate-500">{t('sessions')}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-emerald-600">
                 {formatMinutes(usageStats?.weeklyActiveMinutes ?? 0)}
               </div>
-              <div className="text-xs text-slate-500">Tempo totale</div>
+              <div className="text-xs text-slate-500">{t('totalTime')}</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-purple-600">
                 {usageStats?.weeklyMaestrosUsed?.length ?? 0}
               </div>
-              <div className="text-xs text-slate-500">Maestri usati</div>
+              <div className="text-xs text-slate-500">{t('maestriUsed')}</div>
             </div>
           </div>
         </CardContent>
@@ -159,9 +161,9 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
         {/* Feature Usage */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Utilizzo Funzionalità</CardTitle>
+            <CardTitle className="text-lg">{t('featureUsage')}</CardTitle>
             <CardDescription>
-              Come usi la piattaforma questa settimana
+              {t('featureUsageDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -172,9 +174,9 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
         {/* Engagement Score */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Punteggio Coinvolgimento</CardTitle>
+            <CardTitle className="text-lg">{t('engagementScore')}</CardTitle>
             <CardDescription>
-              Basato su frequenza, durata e varietà
+              {t('engagementDesc')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -221,10 +223,10 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
             </div>
             <p className="text-center text-sm text-slate-500 mt-2">
               {(usageStats?.engagementScore ?? 0) >= 70
-                ? 'Ottimo! Continua così!'
+                ? t('engagementHigh')
                 : (usageStats?.engagementScore ?? 0) >= 40
-                  ? 'Buon inizio, puoi migliorare!'
-                  : 'Studia di più per aumentare il punteggio'}
+                  ? t('engagementMedium')
+                  : t('engagementLow')}
             </p>
           </CardContent>
         </Card>
@@ -235,18 +237,18 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Activity className="w-5 h-5 text-blue-500" />
-            Impostazioni Telemetria
+            {t('telemetrySettings')}
           </CardTitle>
           <CardDescription>
-            Controlla la raccolta dati per le statistiche
+            {t('telemetryDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <div className="font-medium">Raccolta dati attiva</div>
+              <div className="font-medium">{t('dataCollection')}</div>
               <div className="text-sm text-slate-500">
-                I dati sono usati solo per mostrarti le tue statistiche
+                {t('dataCollectionDesc')}
               </div>
             </div>
             <Button
@@ -254,14 +256,14 @@ export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
               size="sm"
               onClick={() => updateConfig({ enabled: !config.enabled })}
             >
-              {config.enabled ? 'Attivo' : 'Disattivo'}
+              {config.enabled ? t('active') : t('inactive')}
             </Button>
           </div>
 
           {/* Last updated */}
           {lastFetchedAt && (
             <div className="text-xs text-slate-400 mt-4 text-right">
-              Ultimo aggiornamento: {new Date(lastFetchedAt).toLocaleTimeString('it-IT')}
+              {t('lastUpdated')} {new Date(lastFetchedAt).toLocaleTimeString('it-IT')}
             </div>
           )}
         </CardContent>

@@ -6,6 +6,7 @@
  */
 
 import { type ChangeEvent } from "react";
+import { useTranslations } from "next-intl";
 import { Grid, List, Search, ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -28,14 +29,16 @@ export function ArchiveHeader({
   viewMode,
   onViewModeChange,
 }: ArchiveHeaderProps) {
+  const t = useTranslations("education.archive");
+
   return (
     <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
       <div>
         <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-          Zaino
+          {t("title")}
         </h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Tutti i tuoi materiali di studio salvati
+          {t("subtitle")}
         </p>
       </div>
 
@@ -45,11 +48,11 @@ export function ArchiveHeader({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
           <input
             type="text"
-            placeholder="Cerca materiali..."
+            placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={onSearchChange}
             className="pl-9 w-full sm:w-48 h-10 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            aria-label="Cerca materiali"
+            aria-label={t("searchPlaceholder")}
           />
         </div>
 
@@ -59,7 +62,7 @@ export function ArchiveHeader({
             value={sortBy}
             onChange={(e) => onSortChange(e.target.value as SortBy)}
             className="appearance-none pl-8 pr-8 h-9 rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-sm focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-            aria-label="Ordina per"
+            aria-label={t("sortLabel")}
           >
             {SORT_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -80,7 +83,7 @@ export function ArchiveHeader({
               viewMode === "grid" && "bg-slate-100 dark:bg-slate-800",
             )}
             onClick={() => onViewModeChange("grid")}
-            aria-label="Vista griglia"
+            aria-label={t("gridView")}
             aria-pressed={viewMode === "grid"}
           >
             <Grid className="w-4 h-4" />
@@ -93,7 +96,7 @@ export function ArchiveHeader({
               viewMode === "list" && "bg-slate-100 dark:bg-slate-800",
             )}
             onClick={() => onViewModeChange("list")}
-            aria-label="Vista lista"
+            aria-label={t("listView")}
             aria-pressed={viewMode === "list"}
           >
             <List className="w-4 h-4" />
