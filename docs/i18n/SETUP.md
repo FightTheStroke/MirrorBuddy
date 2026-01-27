@@ -107,15 +107,16 @@ All message files are JSON with nested namespaces:
 
 ### Namespace Conventions
 
-| Namespace | Purpose | Example Keys |
-|-----------|---------|--------------|
-| `common` | Universal UI actions | save, cancel, loading, error |
-| `navigation` | Links, menus, breadcrumbs | home, chat, dashboard |
-| `auth` | Login, signup, validation | login, emailRequired, signup |
-| `errors` | Error messages | notFound, unauthorized |
-| `{feature}` | Feature-specific | myFeature.title, myFeature.description |
+| Namespace    | Purpose                   | Example Keys                           |
+| ------------ | ------------------------- | -------------------------------------- |
+| `common`     | Universal UI actions      | save, cancel, loading, error           |
+| `navigation` | Links, menus, breadcrumbs | home, chat, dashboard                  |
+| `auth`       | Login, signup, validation | login, emailRequired, signup           |
+| `errors`     | Error messages            | notFound, unauthorized                 |
+| `{feature}`  | Feature-specific          | myFeature.title, myFeature.description |
 
 **Rules:**
+
 - Keep `common` minimal (only truly global strings)
 - Create feature namespaces for complex domains
 - Use nested objects for related strings
@@ -160,19 +161,20 @@ npm run build        # Build with new language
 
 ## Key Files Reference
 
-| File | Responsibility |
-|------|-----------------|
-| `src/i18n/config.ts` | Locale constants, names, flags |
-| `src/i18n/request.ts` | Server message loading |
-| `src/i18n/routing.ts` | Route generation |
-| `src/i18n/types.ts` | TypeScript types for messages |
-| `src/i18n/index.ts` | Public API exports |
-| `src/i18n/locale-provider.tsx` | Client context provider |
-| `messages/{locale}.json` | Translations for each language |
+| File                           | Responsibility                 |
+| ------------------------------ | ------------------------------ |
+| `src/i18n/config.ts`           | Locale constants, names, flags |
+| `src/i18n/request.ts`          | Server message loading         |
+| `src/i18n/routing.ts`          | Route generation               |
+| `src/i18n/types.ts`            | TypeScript types for messages  |
+| `src/i18n/index.ts`            | Public API exports             |
+| `src/i18n/locale-provider.tsx` | Client context provider        |
+| `messages/{locale}.json`       | Translations for each language |
 
 ## Type Safety
 
 With proper TypeScript configuration, you get:
+
 - Autocomplete for namespace names
 - Autocomplete for keys within namespaces
 - Type checking for interpolation variables

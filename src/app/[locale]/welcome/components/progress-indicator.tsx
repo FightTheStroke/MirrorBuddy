@@ -1,10 +1,14 @@
-import { RotateCcw, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useOnboardingStore, getStepIndex, getTotalSteps } from '@/lib/stores/onboarding-store';
-import { useRouter } from 'next/navigation';
-import type { VoiceConnectionInfo } from '../types';
-import { VoiceModeIndicator, useVoiceModeInfo } from './voice-mode-indicator';
+import { RotateCcw, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import {
+  useOnboardingStore,
+  getStepIndex,
+  getTotalSteps,
+} from "@/lib/stores/onboarding-store";
+import { useRouter } from "next/navigation";
+import type { VoiceConnectionInfo } from "../types";
+import { VoiceModeIndicator, useVoiceModeInfo } from "./voice-mode-indicator";
 
 interface ProgressIndicatorProps {
   existingUserName?: string;
@@ -25,7 +29,11 @@ export function ProgressIndicator({
   const { currentStep } = useOnboardingStore();
   const stepIndex = getStepIndex(currentStep);
   const totalSteps = getTotalSteps();
-  const voiceMode = useVoiceModeInfo(hasCheckedAzure, useWebSpeechFallback, connectionInfo);
+  const voiceMode = useVoiceModeInfo(
+    hasCheckedAzure,
+    useWebSpeechFallback,
+    connectionInfo,
+  );
 
   return (
     <div className="fixed top-0 left-0 right-0 z-50 px-4 py-3 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800">
@@ -34,7 +42,7 @@ export function ProgressIndicator({
           <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
             {existingUserName
               ? `Aggiornamento profilo di ${existingUserName}`
-              : 'Benvenuto in MirrorBuddy'}
+              : "Benvenuto in MirrorBuddy"}
           </span>
 
           <div className="flex items-center gap-3">
@@ -47,7 +55,7 @@ export function ProgressIndicator({
               size="sm"
               onClick={() => {
                 useOnboardingStore.getState().completeOnboarding();
-                router.push('/');
+                router.push("/");
               }}
               className="h-7 px-3 text-pink-600 hover:text-pink-700 hover:bg-pink-50"
             >
@@ -71,12 +79,12 @@ export function ProgressIndicator({
             <div
               key={i}
               className={cn(
-                'h-1.5 flex-1 rounded-full transition-all duration-300',
+                "h-1.5 flex-1 rounded-full transition-all duration-300",
                 i < stepIndex
-                  ? 'bg-pink-500'
+                  ? "bg-pink-500"
                   : i === stepIndex
-                    ? 'bg-pink-400'
-                    : 'bg-gray-200 dark:bg-gray-700'
+                    ? "bg-pink-400"
+                    : "bg-gray-200 dark:bg-gray-700",
               )}
             />
           ))}
@@ -85,4 +93,3 @@ export function ProgressIndicator({
     </div>
   );
 }
-

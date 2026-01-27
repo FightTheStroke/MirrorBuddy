@@ -1,6 +1,7 @@
 "use client";
 
 import { MessageCircle, Mic, Wrench, Users } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 interface TrialLimitsBannerProps {
@@ -24,6 +25,7 @@ export function TrialLimitsBanner({
   className,
   variant = "full",
 }: TrialLimitsBannerProps) {
+  const t = useTranslations("trialLimits");
   // Trial tier limits (from TierService tier-fallbacks.ts)
   const limits = {
     dailyChats: 10,
@@ -74,7 +76,7 @@ export function TrialLimitsBanner({
       )}
     >
       <h3 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-3">
-        Limiti della prova gratuita
+        {t("title")}
       </h3>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -86,7 +88,7 @@ export function TrialLimitsBanner({
               {limits.dailyChats}
             </div>
             <div className="text-xs text-purple-700 dark:text-purple-300">
-              Messaggi/giorno
+              {t("messagesDay")}
             </div>
           </div>
         </div>
@@ -99,7 +101,7 @@ export function TrialLimitsBanner({
               {limits.dailyVoiceMinutes}
             </div>
             <div className="text-xs text-purple-700 dark:text-purple-300">
-              Minuti vocali
+              {t("voiceMinutes")}
             </div>
           </div>
         </div>
@@ -112,7 +114,7 @@ export function TrialLimitsBanner({
               {limits.dailyTools}
             </div>
             <div className="text-xs text-purple-700 dark:text-purple-300">
-              Strumenti/giorno
+              {t("toolsDay")}
             </div>
           </div>
         </div>
@@ -125,15 +127,14 @@ export function TrialLimitsBanner({
               {limits.maestriCount}
             </div>
             <div className="text-xs text-purple-700 dark:text-purple-300">
-              Maestri disponibili
+              {t("maestriAvailable")}
             </div>
           </div>
         </div>
       </div>
 
       <p className="mt-4 text-xs text-purple-700 dark:text-purple-300 leading-relaxed">
-        Stai usando la versione di prova gratuita. Richiedi accesso alla beta
-        per limiti illimitati e funzionalità avanzate.
+        {t("trialDescription")}
       </p>
     </div>
   );

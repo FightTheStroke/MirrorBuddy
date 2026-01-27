@@ -39,9 +39,7 @@ export function useAdminLocalePreview(): Locale {
 
   useEffect(() => {
     // Listen for preview locale changes
-    const handlePreviewChange = (
-      event: CustomEvent<{ locale: Locale }>,
-    ) => {
+    const handlePreviewChange = (event: CustomEvent<{ locale: Locale }>) => {
       setPreviewLocale(event.detail.locale);
     };
 

@@ -20,9 +20,9 @@
  * F-07: Maestri Localized Greetings Tests
  */
 
-import { test, expect, testAllLocales } from './fixtures';
-import { buildLocalizedPath } from './fixtures';
-import type { Locale } from '@/i18n/config';
+import { test, expect, testAllLocales } from "./fixtures";
+import { buildLocalizedPath } from "./fixtures";
+import type { Locale } from "@/i18n/config";
 
 /**
  * Maestri test data including formal/informal information
@@ -34,29 +34,29 @@ import type { Locale } from '@/i18n/config';
  * INFORMAL_PROFESSORS (modern): feynman, chris, simone, alex-pina
  */
 const FORMAL_MAESTRI = [
-  { id: 'manzoni', displayName: 'Alessandro Manzoni', subject: 'Italian' },
-  { id: 'shakespeare', displayName: 'Shakespeare', subject: 'English' },
-  { id: 'erodoto', displayName: 'Erodoto', subject: 'History' },
-  { id: 'cicerone', displayName: 'Cicerone', subject: 'Civic Education' },
-  { id: 'socrate', displayName: 'Socrate', subject: 'Philosophy' },
-  { id: 'mozart', displayName: 'Mozart', subject: 'Music' },
-  { id: 'galileo', displayName: 'Galileo', subject: 'Physics' },
-  { id: 'darwin', displayName: 'Darwin', subject: 'Biology' },
-  { id: 'curie', displayName: 'Curie', subject: 'Chemistry' },
-  { id: 'leonardo', displayName: 'Leonardo', subject: 'Art' },
-  { id: 'euclide', displayName: 'Euclide', subject: 'Mathematics' },
+  { id: "manzoni", displayName: "Alessandro Manzoni", subject: "Italian" },
+  { id: "shakespeare", displayName: "Shakespeare", subject: "English" },
+  { id: "erodoto", displayName: "Erodoto", subject: "History" },
+  { id: "cicerone", displayName: "Cicerone", subject: "Civic Education" },
+  { id: "socrate", displayName: "Socrate", subject: "Philosophy" },
+  { id: "mozart", displayName: "Mozart", subject: "Music" },
+  { id: "galileo", displayName: "Galileo", subject: "Physics" },
+  { id: "darwin", displayName: "Darwin", subject: "Biology" },
+  { id: "curie", displayName: "Curie", subject: "Chemistry" },
+  { id: "leonardo", displayName: "Leonardo", subject: "Art" },
+  { id: "euclide", displayName: "Euclide", subject: "Mathematics" },
 ];
 
 const INFORMAL_MAESTRI = [
-  { id: 'feynman', displayName: 'Feynman', subject: 'Physics' },
-  { id: 'chris', displayName: 'Chris', subject: 'Physical Education' },
-  { id: 'simone', displayName: 'Simone', subject: 'Sport' },
-  { id: 'alex-pina', displayName: 'Álex Pina', subject: 'Spanish' },
+  { id: "feynman", displayName: "Feynman", subject: "Physics" },
+  { id: "chris", displayName: "Chris", subject: "Physical Education" },
+  { id: "simone", displayName: "Simone", subject: "Sport" },
+  { id: "alex-pina", displayName: "Álex Pina", subject: "Spanish" },
 ];
 
 const LANGUAGE_TEACHERS = [
-  { id: 'shakespeare', displayName: 'Shakespeare' },
-  { id: 'alex-pina', displayName: 'Álex Pina' },
+  { id: "shakespeare", displayName: "Shakespeare" },
+  { id: "alex-pina", displayName: "Álex Pina" },
 ];
 
 /**
@@ -64,11 +64,11 @@ const LANGUAGE_TEACHERS = [
  * These patterns indicate formal address (Lei, Vous, Usted, Sie)
  */
 const FORMAL_PATTERNS: Record<Locale, string[]> = {
-  it: ['esserLe', 'Le'], // Italian formal "Lei"
-  en: ['may I assist', 'How may I'], // English formal
-  es: ['servirle', 'puedo servirle'], // Spanish formal "usted"
-  fr: ['vous aider', 'vous '], // French formal "vous"
-  de: ['Ihnen', 'helfen'], // German formal "Sie"
+  it: ["esserLe", "Le"], // Italian formal "Lei"
+  en: ["may I assist", "How may I"], // English formal
+  es: ["servirle", "puedo servirle"], // Spanish formal "usted"
+  fr: ["vous aider", "vous "], // French formal "vous"
+  de: ["Ihnen", "helfen"], // German formal "Sie"
 };
 
 /**
@@ -76,25 +76,25 @@ const FORMAL_PATTERNS: Record<Locale, string[]> = {
  * These patterns indicate informal address (tu, tu, tú, du)
  */
 const INFORMAL_PATTERNS: Record<Locale, string[]> = {
-  it: ['aiutarti', 'posso aiutarti'], // Italian informal "tu"
-  en: ["I'm", 'help you'], // English informal
-  es: ['ayudarte', 'puedo ayudarte'], // Spanish informal "tú"
-  fr: ['t\'aider', "t'aider"], // French informal "tu"
-  de: ['dir helfen', 'Wie kann ich dir'], // German informal "du"
+  it: ["aiutarti", "posso aiutarti"], // Italian informal "tu"
+  en: ["I'm", "help you"], // English informal
+  es: ["ayudarte", "puedo ayudarte"], // Spanish informal "tú"
+  fr: ["t'aider", "t'aider"], // French informal "tu"
+  de: ["dir helfen", "Wie kann ich dir"], // German informal "du"
 };
 
-test.describe('Maestri Localized Greetings (i18n)', () => {
+test.describe("Maestri Localized Greetings (i18n)", () => {
   /**
    * Test 1: Maestri greetings load in all locales via API
    * Verifies the /api/maestri endpoint returns locale-aware greetings
    */
   testAllLocales(
-    'should load maestri greetings in locale',
+    "should load maestri greetings in locale",
     async ({ localePage }) => {
       const locale = localePage.locale;
 
       // Make API call with locale in URL
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await localePage.page.request.get(url);
 
       expect(response.ok()).toBeTruthy();
@@ -108,7 +108,7 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
         expect(maestro.id).toBeTruthy();
         expect(maestro.displayName).toBeTruthy();
         expect(maestro.greeting).toBeTruthy();
-        expect(typeof maestro.greeting).toBe('string');
+        expect(typeof maestro.greeting).toBe("string");
       }
     },
   );
@@ -117,11 +117,11 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 2: Formal maestri use formal address in Italian
    * Verifies that historical professors (Manzoni, Socrate, etc.) use "Lei"
    */
-  test('formal maestri should use formal address in Italian locale', async ({
+  test("formal maestri should use formal address in Italian locale", async ({
     page,
   }) => {
-    const locale: Locale = 'it';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+    const locale: Locale = "it";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -148,11 +148,11 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 3: Formal maestri use formal address in French
    * Verifies formal professors use "Vous" in French
    */
-  test('formal maestri should use formal address in French locale', async ({
+  test("formal maestri should use formal address in French locale", async ({
     page,
   }) => {
-    const locale: Locale = 'fr';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+    const locale: Locale = "fr";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -180,11 +180,11 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 4: Informal maestri use informal address in Italian
    * Verifies that modern professors (Feynman, Chris, etc.) use "tu"
    */
-  test('informal maestri should use informal address in Italian locale', async ({
+  test("informal maestri should use informal address in Italian locale", async ({
     page,
   }) => {
-    const locale: Locale = 'it';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+    const locale: Locale = "it";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -211,29 +211,28 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 5: Maestri greetings differ by locale
    * Verifies same maestro has different greetings in different locales
    */
-  test('same maestro should have different greetings in different locales', async ({
+  test("same maestro should have different greetings in different locales", async ({
     page,
   }) => {
-    const maestroId = 'galileo';
-    const locales: Locale[] = ['it', 'en', 'es', 'fr'];
+    const maestroId = "galileo";
+    const locales: Locale[] = ["it", "en", "es", "fr"];
     const greetings: Record<Locale, string> = {
-      it: '',
-      en: '',
-      es: '',
-      fr: '',
-      de: '',
+      it: "",
+      en: "",
+      es: "",
+      fr: "",
+      de: "",
     };
 
     // Fetch greeting for each locale
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
 
       const maestro = maestri.find(
         (m: { id: string }) =>
-          m.id.toLowerCase().includes(maestroId) ||
-          m.id === maestroId,
+          m.id.toLowerCase().includes(maestroId) || m.id === maestroId,
       );
 
       expect(maestro).toBeTruthy();
@@ -254,17 +253,16 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 6: Language teachers show bilingual content
    * Verifies Shakespeare and Alex Pina include bilingual elements
    */
-  test('language teachers should show bilingual content', async ({ page }) => {
-    const locale: Locale = 'it';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+  test("language teachers should show bilingual content", async ({ page }) => {
+    const locale: Locale = "it";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
     for (const teacher of LANGUAGE_TEACHERS) {
       const maestro = maestri.find(
         (m: { id: string }) =>
-          m.id.toLowerCase().includes(teacher.id) ||
-          m.id === teacher.id,
+          m.id.toLowerCase().includes(teacher.id) || m.id === teacher.id,
       );
 
       expect(maestro).toBeTruthy();
@@ -280,9 +278,9 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 7: English locale shows English greetings
    * Verifies that English greetings don't contain Italian-specific patterns
    */
-  test('English locale should show English greetings', async ({ page }) => {
-    const locale: Locale = 'en';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+  test("English locale should show English greetings", async ({ page }) => {
+    const locale: Locale = "en";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -305,9 +303,9 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 8: Spanish locale shows Spanish greetings
    * Verifies Spanish locale produces Spanish content
    */
-  test('Spanish locale should show Spanish greetings', async ({ page }) => {
-    const locale: Locale = 'es';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+  test("Spanish locale should show Spanish greetings", async ({ page }) => {
+    const locale: Locale = "es";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -333,9 +331,9 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 9: German locale available and returns content
    * Verifies German locale support is working
    */
-  test('German locale should return German greetings', async ({ page }) => {
-    const locale: Locale = 'de';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+  test("German locale should return German greetings", async ({ page }) => {
+    const locale: Locale = "de";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -345,7 +343,7 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
     const sampleMaestri = maestri.slice(0, 3);
     for (const maestro of sampleMaestri) {
       expect(maestro.greeting).toBeTruthy();
-      expect(typeof maestro.greeting).toBe('string');
+      expect(typeof maestro.greeting).toBe("string");
       // German greetings often contain Guten, Ich, Wie, Können etc
       expect(maestro.greeting.length).toBeGreaterThan(15);
     }
@@ -355,19 +353,19 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 10: Greeting templates are consistent in structure
    * Verifies all greetings follow expected patterns regardless of locale
    */
-  test('greeting templates should be consistent in structure', async ({
+  test("greeting templates should be consistent in structure", async ({
     page,
   }) => {
-    const locales: Locale[] = ['it', 'en', 'es', 'fr', 'de'];
+    const locales: Locale[] = ["it", "en", "es", "fr", "de"];
 
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
 
       for (const maestro of maestri) {
         // Each greeting should be a non-empty string
-        expect(typeof maestro.greeting).toBe('string');
+        expect(typeof maestro.greeting).toBe("string");
         expect(maestro.greeting.length).toBeGreaterThan(5);
 
         // Greetings should not contain template placeholders
@@ -383,15 +381,15 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 11: Formal maestri stay formal across all formal languages
    * Verifies formal/informal consistency for specific maestri
    */
-  test('Manzoni should use formal address in Italian and French', async ({
+  test("Manzoni should use formal address in Italian and French", async ({
     page,
   }) => {
-    const maestroId = 'manzoni';
+    const maestroId = "manzoni";
 
     // Italian test
     {
-      const locale: Locale = 'it';
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const locale: Locale = "it";
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -404,8 +402,8 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
 
     // French test
     {
-      const locale: Locale = 'fr';
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const locale: Locale = "fr";
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -424,12 +422,12 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
   test("Feynman should use informal address in Italian and French", async ({
     page,
   }) => {
-    const maestroId = 'feynman';
+    const maestroId = "feynman";
 
     // Italian test
     {
-      const locale: Locale = 'it';
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const locale: Locale = "it";
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -443,8 +441,8 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
 
     // French test
     {
-      const locale: Locale = 'fr';
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const locale: Locale = "fr";
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -462,10 +460,10 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Verifies no missing translations
    */
   testAllLocales(
-    'all maestri should have greetings in locale',
+    "all maestri should have greetings in locale",
     async ({ localePage }) => {
       const locale = localePage.locale;
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await localePage.page.request.get(url);
       const maestri = await response.json();
 
@@ -485,10 +483,10 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
    * Test 14: API supports locale query parameter
    * Verifies /api/maestri?locale=XX works correctly
    */
-  test('maestri API should support locale query parameter', async ({
+  test("maestri API should support locale query parameter", async ({
     page,
   }) => {
-    const locales: Locale[] = ['it', 'en', 'es', 'fr', 'de'];
+    const locales: Locale[] = ["it", "en", "es", "fr", "de"];
     const greetingsByLocale: Record<Locale, string[]> = {
       it: [],
       en: [],
@@ -498,9 +496,7 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
     };
 
     for (const locale of locales) {
-      const response = await page.request.get(
-        `/api/maestri?locale=${locale}`,
-      );
+      const response = await page.request.get(`/api/maestri?locale=${locale}`);
       expect(response.ok()).toBeTruthy();
 
       const maestri = await response.json();
@@ -509,23 +505,21 @@ test.describe('Maestri Localized Greetings (i18n)', () => {
     }
 
     // Verify we got different content for different locales
-    const italianGreetings = greetingsByLocale.it.join(' ');
-    const englishGreetings = greetingsByLocale.en.join(' ');
+    const italianGreetings = greetingsByLocale.it.join(" ");
+    const englishGreetings = greetingsByLocale.en.join(" ");
 
     expect(italianGreetings).not.toBe(englishGreetings);
   });
 });
 
-test.describe('Maestri Greetings - Edge Cases', () => {
+test.describe("Maestri Greetings - Edge Cases", () => {
   /**
    * Test 15: Fallback greeting when personalized not available
    * Some maestri may not have personalized greetings
    */
-  test('should provide fallback greeting for all maestri', async ({
-    page,
-  }) => {
-    const locale: Locale = 'it';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+  test("should provide fallback greeting for all maestri", async ({ page }) => {
+    const locale: Locale = "it";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -533,7 +527,7 @@ test.describe('Maestri Greetings - Edge Cases', () => {
     for (const maestro of maestri) {
       expect(maestro.greeting).toBeTruthy();
       expect(maestro.greeting.length).toBeGreaterThan(5);
-      expect(typeof maestro.greeting).toBe('string');
+      expect(typeof maestro.greeting).toBe("string");
     }
   });
 
@@ -541,18 +535,18 @@ test.describe('Maestri Greetings - Edge Cases', () => {
    * Test 16: Maestri IDs are normalized in greeting generation
    * Verifies IDs like "euclide-matematica" work correctly
    */
-  test('maestro IDs should be normalized for greeting lookup', async ({
+  test("maestro IDs should be normalized for greeting lookup", async ({
     page,
   }) => {
-    const locale: Locale = 'it';
-    const url = buildLocalizedPath(locale, '/api/maestri');
+    const locale: Locale = "it";
+    const url = buildLocalizedPath(locale, "/api/maestri");
     const response = await page.request.get(url);
     const maestri = await response.json();
 
     // IDs may contain subject (e.g., "euclide-matematica")
     // But greetings should still work correctly
     const euclide = maestri.find((m: { id: string }) =>
-      m.id.toLowerCase().includes('euclide'),
+      m.id.toLowerCase().includes("euclide"),
     );
 
     expect(euclide).toBeTruthy();
@@ -564,13 +558,13 @@ test.describe('Maestri Greetings - Edge Cases', () => {
    * Test 17: No hardcoded placeholders in greetings
    * Verifies template variables are resolved
    */
-  test('greetings should not contain template placeholders', async ({
+  test("greetings should not contain template placeholders", async ({
     page,
   }) => {
-    const locales: Locale[] = ['it', 'en', 'es', 'fr', 'de'];
+    const locales: Locale[] = ["it", "en", "es", "fr", "de"];
 
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, '/api/maestri');
+      const url = buildLocalizedPath(locale, "/api/maestri");
       const response = await page.request.get(url);
       const maestri = await response.json();
 

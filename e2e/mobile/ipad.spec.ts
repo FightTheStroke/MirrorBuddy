@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from "./fixtures";
+import { waitForHomeReady } from "./helpers/wait-for-home";
 
 test.describe("iPad Mini Responsive UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
@@ -13,9 +14,7 @@ test.describe("iPad Mini Responsive UX", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, the main heading "Professori" appears (it's an h1, not a button)
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
-      timeout: 20000,
-    });
+    await waitForHomeReady(page);
   });
 
   test("sidebar should be persistent on tablet viewport", async ({
@@ -61,10 +60,12 @@ test.describe("iPad Mini Responsive UX", () => {
       const viewportWidth = await mobile.getViewportWidth();
       // Just use viewportWidth to satisfy linter
       if (viewportWidth > 0) {
-        await page.waitForTimeout(100);
+        await page.locator("main").first().waitFor({ state: "visible" });
       }
 
-      await page.waitForTimeout(500);
+      await page.locator("[class*='voice-panel']").first().waitFor({
+        state: "visible",
+      });
 
       const voicePanel = page.locator("[class*='voice-panel']").first();
       if (await voicePanel.isVisible()) {
@@ -145,7 +146,7 @@ test.describe("iPad Mini Responsive UX", () => {
     // Start in portrait (768px × 1024px)
     const portraitSize = { width: 768, height: 1024 };
     await page.setViewportSize(portraitSize);
-    await page.waitForTimeout(300);
+    await page.locator("header").first().waitFor({ state: "visible" });
 
     // Verify portrait layout (use first() for nested main elements)
     await expect(page.locator("header").first()).toBeVisible();
@@ -154,7 +155,7 @@ test.describe("iPad Mini Responsive UX", () => {
     // Rotate to landscape (1024px × 768px)
     const landscapeSize = { width: 1024, height: 768 };
     await page.setViewportSize(landscapeSize);
-    await page.waitForTimeout(300);
+    await page.locator("header").first().waitFor({ state: "visible" });
 
     // Verify landscape layout still works (use first() for nested main elements)
     await expect(page.locator("header").first()).toBeVisible();
@@ -193,7 +194,9 @@ test.describe("iPad Mini Responsive UX", () => {
 
     // Hover should work (button has hover:opacity-80)
     await logoButton.hover();
-    await page.waitForTimeout(100);
+    await page.locator('button[aria-label="Torna alla home"]').first().waitFor({
+      state: "visible",
+    });
 
     // Button should still be visible and functional
     await expect(logoButton).toBeVisible();
@@ -209,7 +212,7 @@ test.describe("iPad Mini Responsive UX", () => {
     // Simulate iPad split view (1/3 width = ~341px)
     const splitViewSize = { width: 341, height: 1024 };
     await page.setViewportSize(splitViewSize);
-    await page.waitForTimeout(300);
+    await page.locator("header").first().waitFor({ state: "visible" });
 
     // Should still render correctly at narrow width (use first() for nested main)
     await expect(page.locator("header").first()).toBeVisible();
@@ -249,7 +252,7 @@ test.describe("iPad Mini Responsive UX", () => {
       document.body.style.zoom = "1.2";
     });
 
-    await page.waitForTimeout(200);
+    await page.locator("header").first().waitFor({ state: "visible" });
 
     // Layout should still be functional (use first() for nested main)
     await expect(page.locator("header").first()).toBeVisible();
@@ -279,7 +282,7 @@ test.describe("iPad Mini Responsive UX", () => {
 
     // Escape should close modals/panels
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(100);
+    await page.locator("body").waitFor({ state: "visible" });
 
     // No modal overlays should be visible
     const overlay = page.locator(".fixed.inset-0.bg-black\\/40");

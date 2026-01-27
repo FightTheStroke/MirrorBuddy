@@ -9,12 +9,14 @@ The system has two components:
 ### 1. Database-Backed Feature Flags (feature-flags-service.ts)
 
 For features that need:
+
 - Per-feature kill-switch capability
 - Percentage-based rollout
 - Admin UI management
 - Persistent state across restarts
 
 **Built-in Flags**:
+
 - `voice_realtime` - Real-time voice API
 - `rag_enabled` - RAG retrieval
 - `flashcards` - FSRS flashcards
@@ -27,8 +29,12 @@ For features that need:
 - `ambient_audio` - Background audio
 
 **Usage**:
+
 ```typescript
-import { isFeatureEnabled, updateFlag } from "@/lib/feature-flags/feature-flags-service";
+import {
+  isFeatureEnabled,
+  updateFlag,
+} from "@/lib/feature-flags/feature-flags-service";
 
 // Check if feature is enabled
 const result = isFeatureEnabled("voice_realtime", userId);
@@ -49,15 +55,18 @@ await activateKillSwitch("voice_realtime", "API quota exceeded");
 ### 2. Environment-Based Flags (i18n-flags.ts)
 
 For features that need:
+
 - Simple enable/disable per environment
 - No admin UI management
 - Environment-specific control (dev/staging/prod)
 - Gradual rollout without database
 
 **Available Flags**:
+
 - `FEATURE_I18N_ENABLED` - Internationalization (multi-language support)
 
 **Usage**:
+
 ```typescript
 import { isI18nEnabled, getI18nStatus } from "@/lib/feature-flags/i18n-flags";
 
@@ -118,16 +127,19 @@ production:  false → true (enable after validation)
 ### Configuration Examples
 
 #### Development (Always Enabled)
+
 ```env
 FEATURE_I18N_ENABLED=true
 ```
 
 #### Staging (Test i18n)
+
 ```env
 FEATURE_I18N_ENABLED=true
 ```
 
 #### Production (Staged Rollout)
+
 ```env
 # Phase 1: Disable i18n, use default language
 FEATURE_I18N_ENABLED=false
@@ -145,6 +157,7 @@ npm run test:unit -- src/lib/feature-flags/__tests__/i18n-flags.test.ts
 ```
 
 Tests verify:
+
 - Default behavior (true when not set)
 - Case-insensitive parsing
 - All truthy/falsy values
@@ -177,6 +190,7 @@ console.log(`i18n status: ${getI18nStatus()}`);
 ### Metrics
 
 Track in observability system:
+
 - i18n enabled/disabled in each environment
 - Number of users experiencing each state
 - Locale distribution before/after rollout

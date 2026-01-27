@@ -8,10 +8,12 @@ import { logger } from "@/lib/logger";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import {
   getOrCreateTrialSession,
+  getTrialSessionById,
   checkTrialLimits,
   incrementUsage,
   checkAndIncrementUsage,
   getTierLimitsForTrial,
+  isTrialEmailVerified,
 } from "@/lib/trial/trial-service";
 
 const log = logger.child({ module: "api/chat/trial-handler" });
@@ -122,6 +124,16 @@ export async function checkTrialForAnonymous(
 export async function checkTrialToolLimit(
   sessionId: string,
 ): Promise<{ allowed: boolean; reason?: string }> {
+  const session = await getTrialSessionById(sessionId);
+  if (!session) {
+    return { allowed: false, reason: "Session not found" };
+  }
+  if (!isTrialEmailVerified(session)) {
+    return {
+      allowed: false,
+      reason: "Trial email verification required",
+    };
+  }
   return checkTrialLimits(sessionId, "tool");
 }
 

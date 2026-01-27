@@ -48,7 +48,10 @@ test.describe("Locale Patterns", () => {
 // ==================================================
 
 test.describe("Real World Locale Scenarios", () => {
-  test("user visits from Italy (Accept-Language: it)", async ({ page, context }) => {
+  test("user visits from Italy (Accept-Language: it)", async ({
+    page,
+    context,
+  }) => {
     // Simulate Italian browser
     await context.setExtraHTTPHeaders({
       "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
@@ -63,7 +66,10 @@ test.describe("Real World Locale Scenarios", () => {
     expect(verification.isValid).toBe(true);
   });
 
-  test("user visits from UK (Accept-Language: en)", async ({ page, context }) => {
+  test("user visits from UK (Accept-Language: en)", async ({
+    page,
+    context,
+  }) => {
     // Simulate UK browser
     await context.setExtraHTTPHeaders({
       "Accept-Language": "en-GB,en;q=0.9",
@@ -95,7 +101,10 @@ test.describe("Real World Locale Scenarios", () => {
     expect(await verifyPageLocale(page, "fr")).toMatchObject({ isValid: true });
   });
 
-  test("user preference cookie overrides Accept-Language", async ({ page, context }) => {
+  test("user preference cookie overrides Accept-Language", async ({
+    page,
+    context,
+  }) => {
     // Browser sends Italian Accept-Language
     await context.setExtraHTTPHeaders({
       "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
@@ -151,7 +160,10 @@ test.describe("Real World Locale Scenarios", () => {
     }
   });
 
-  test("Accept-Language fallback when no cookie set", async ({ page, context }) => {
+  test("Accept-Language fallback when no cookie set", async ({
+    page,
+    context,
+  }) => {
     // User has Spanish browser
     await context.setExtraHTTPHeaders({
       "Accept-Language": "es-ES,es;q=0.9,en;q=0.8",

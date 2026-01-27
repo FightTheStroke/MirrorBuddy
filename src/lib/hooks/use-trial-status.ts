@@ -20,6 +20,10 @@ interface TrialStatus {
   maxTools: number;
   // Session info
   visitorId?: string;
+  email?: string | null;
+  emailCollectedAt?: string | null;
+  emailVerifiedAt?: string | null;
+  verificationPending?: boolean;
 }
 
 /**
@@ -111,6 +115,10 @@ export function useTrialStatus(): TrialStatus {
             maxTools: data.maxTools ?? 10,
             // Session
             visitorId,
+            email: data.email ?? null,
+            emailCollectedAt: data.emailCollectedAt ?? null,
+            emailVerifiedAt: data.emailVerifiedAt ?? null,
+            verificationPending: Boolean(data.verificationPending),
           });
         } else if (isMounted) {
           // API error - assume trial with defaults
@@ -126,6 +134,10 @@ export function useTrialStatus(): TrialStatus {
             toolsUsed: 0,
             toolsRemaining: 10,
             maxTools: 10,
+            email: null,
+            emailCollectedAt: null,
+            emailVerifiedAt: null,
+            verificationPending: false,
           });
         }
       } catch {
@@ -143,6 +155,10 @@ export function useTrialStatus(): TrialStatus {
             toolsUsed: 0,
             toolsRemaining: 10,
             maxTools: 10,
+            email: null,
+            emailCollectedAt: null,
+            emailVerifiedAt: null,
+            verificationPending: false,
           });
         }
       }

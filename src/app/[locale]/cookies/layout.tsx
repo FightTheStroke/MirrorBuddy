@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { generateCanonicalUrl } from '@/lib/canonical-urls';
-import type { Locale } from '@/i18n/config';
+import type { Metadata } from "next";
+import { generateCanonicalUrl } from "@/lib/canonical-urls";
+import type { Locale } from "@/i18n/config";
 
 /**
  * Generate metadata for cookie policy page
@@ -14,10 +14,10 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: 'Cookie Policy - MirrorBuddy',
-    description: 'Informativa sui Cookie di MirrorBuddy',
+    title: "Cookie Policy - MirrorBuddy",
+    description: "Informativa sui Cookie di MirrorBuddy",
     alternates: {
-      canonical: generateCanonicalUrl(locale as Locale, '/cookies'),
+      canonical: generateCanonicalUrl(locale as Locale, "/cookies"),
     },
   };
 }

@@ -117,6 +117,17 @@ async function globalSetup() {
         sameSite: "Lax",
       },
       {
+        // Visitor cookie for trial session flows
+        name: "mirrorbuddy-visitor-id",
+        value: `e2e-test-visitor-${randomSuffix}`,
+        domain: "localhost",
+        path: "/",
+        expires: -1,
+        httpOnly: false,
+        secure: false,
+        sameSite: "Lax",
+      },
+      {
         // Accessibility settings bypass (ADR 0060)
         name: "mirrorbuddy-a11y",
         value: encodeURIComponent(

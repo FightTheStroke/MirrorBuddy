@@ -1,8 +1,17 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { GraduationCap, Map, BookOpen, Gamepad2, Mic, Sparkles, Brain, Target } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { motion } from "framer-motion";
+import {
+  GraduationCap,
+  Map,
+  BookOpen,
+  Gamepad2,
+  Mic,
+  Sparkles,
+  Brain,
+  Target,
+} from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 interface Feature {
   icon: LucideIcon;
@@ -13,43 +22,43 @@ interface Feature {
 const FEATURES: Feature[] = [
   {
     icon: Mic,
-    label: 'Conversazione Vocale',
-    description: 'Parla con i tuoi Maestri in tempo reale',
+    label: "Conversazione Vocale",
+    description: "Parla con i tuoi Maestri in tempo reale",
   },
   {
     icon: Map,
-    label: 'Mappe Mentali',
-    description: 'Visualizza e organizza i concetti',
+    label: "Mappe Mentali",
+    description: "Visualizza e organizza i concetti",
   },
   {
     icon: BookOpen,
-    label: 'Flashcard FSRS',
-    description: 'Memorizza con la ripetizione spaziata',
+    label: "Flashcard FSRS",
+    description: "Memorizza con la ripetizione spaziata",
   },
   {
     icon: Sparkles,
-    label: 'Quiz Interattivi',
-    description: 'Metti alla prova le tue conoscenze',
+    label: "Quiz Interattivi",
+    description: "Metti alla prova le tue conoscenze",
   },
   {
     icon: Gamepad2,
-    label: 'Gamification',
-    description: 'Guadagna XP e sblocca traguardi',
+    label: "Gamification",
+    description: "Guadagna XP e sblocca traguardi",
   },
   {
     icon: Brain,
-    label: 'Apprendimento Adattivo',
-    description: 'Si adatta al tuo stile e ritmo',
+    label: "Apprendimento Adattivo",
+    description: "Si adatta al tuo stile e ritmo",
   },
   {
     icon: Target,
-    label: 'Accessibilità Totale',
-    description: 'Progettato per DSA, ADHD e tutti',
+    label: "Accessibilità Totale",
+    description: "Progettato per DSA, ADHD e tutti",
   },
   {
     icon: GraduationCap,
-    label: 'Piattaforma Integrata',
-    description: 'Tutto in un unico posto',
+    label: "Piattaforma Integrata",
+    description: "Tutto in un unico posto",
   },
 ];
 
@@ -76,7 +85,10 @@ export function FeaturesSection() {
         transition={{ delay: 1.1 }}
         className="text-center mb-8"
       >
-        <h2 id="features-heading" className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
+        <h2
+          id="features-heading"
+          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
+        >
           Strumenti per ogni stile di apprendimento
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400">
@@ -96,7 +108,10 @@ export function FeaturesSection() {
               className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <Icon className="w-5 h-5 text-pink-600 dark:text-pink-400" aria-hidden="true" />
+                <Icon
+                  className="w-5 h-5 text-pink-600 dark:text-pink-400"
+                  aria-hidden="true"
+                />
               </div>
               <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
                 {feature.label}

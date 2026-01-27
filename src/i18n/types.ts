@@ -27,28 +27,51 @@ export type MessageNamespace =
 export type MessageKey<T extends MessageNamespace> = T extends "navigation"
   ? "breadcrumbs.home" | "breadcrumbs.separator" | keyof Messages["navigation"]
   : T extends "validation"
-  ? "password.minLength" | "password.requireUppercase" | "password.requireLowercase" |
-    "password.requireNumber" | "password.requireSpecial" | "password.mismatch" |
-    keyof Messages["validation"]
-  : T extends "tools"
-  ? "categories.upload" | "categories.create" | "categories.search" |
-    "pdf.label" | "pdf.description" |
-    "webcam.label" | "webcam.description" |
-    "homework.label" | "homework.description" |
-    "studyKit.label" | "studyKit.description" |
-    "mindmap.label" | "mindmap.description" |
-    "quiz.label" | "quiz.description" |
-    "flashcard.label" | "flashcard.description" |
-    "demo.label" | "demo.description" |
-    "summary.label" | "summary.description" |
-    "diagram.label" | "diagram.description" |
-    "timeline.label" | "timeline.description" |
-    "formula.label" | "formula.description" |
-    "chart.label" | "chart.description" |
-    "typing.label" | "typing.description" |
-    "search.label" | "search.description" |
-    keyof Messages["tools"]
-  : keyof Messages[T];
+    ?
+        | "password.minLength"
+        | "password.requireUppercase"
+        | "password.requireLowercase"
+        | "password.requireNumber"
+        | "password.requireSpecial"
+        | "password.mismatch"
+        | keyof Messages["validation"]
+    : T extends "tools"
+      ?
+          | "categories.upload"
+          | "categories.create"
+          | "categories.search"
+          | "pdf.label"
+          | "pdf.description"
+          | "webcam.label"
+          | "webcam.description"
+          | "homework.label"
+          | "homework.description"
+          | "studyKit.label"
+          | "studyKit.description"
+          | "mindmap.label"
+          | "mindmap.description"
+          | "quiz.label"
+          | "quiz.description"
+          | "flashcard.label"
+          | "flashcard.description"
+          | "demo.label"
+          | "demo.description"
+          | "summary.label"
+          | "summary.description"
+          | "diagram.label"
+          | "diagram.description"
+          | "timeline.label"
+          | "timeline.description"
+          | "formula.label"
+          | "formula.description"
+          | "chart.label"
+          | "chart.description"
+          | "typing.label"
+          | "typing.description"
+          | "search.label"
+          | "search.description"
+          | keyof Messages["tools"]
+      : keyof Messages[T];
 
 /**
  * Full message structure matching messages/en.json

@@ -49,7 +49,12 @@ describe("i18n-templates", () => {
 
   describe("getMaestroGreetingTemplate", () => {
     it("should return generic greeting by default (usePersonalized=false)", () => {
-      const greeting = getMaestroGreetingTemplate("euclide", "it", false, false);
+      const greeting = getMaestroGreetingTemplate(
+        "euclide",
+        "it",
+        false,
+        false,
+      );
       expect(greeting).toContain("Ciao");
       expect(greeting).toContain("{name}");
       expect(greeting).not.toContain("matematica"); // Not personalized
@@ -62,13 +67,23 @@ describe("i18n-templates", () => {
     });
 
     it("should return personalized greeting for Shakespeare when enabled", () => {
-      const greeting = getMaestroGreetingTemplate("shakespeare", "it", false, true);
+      const greeting = getMaestroGreetingTemplate(
+        "shakespeare",
+        "it",
+        false,
+        true,
+      );
       expect(greeting).toContain("Shakespeare");
       expect(greeting).toContain("inglese");
     });
 
     it("should return personalized greeting for Mascetti when enabled", () => {
-      const greeting = getMaestroGreetingTemplate("mascetti", "it", false, true);
+      const greeting = getMaestroGreetingTemplate(
+        "mascetti",
+        "it",
+        false,
+        true,
+      );
       expect(greeting).toContain("Mascetti");
       expect(greeting).toContain("antani");
     });
@@ -80,7 +95,12 @@ describe("i18n-templates", () => {
     });
 
     it("should return generic greeting when isFormal=false and maestro unknown", () => {
-      const greeting = getMaestroGreetingTemplate("unknown", "it", false, false);
+      const greeting = getMaestroGreetingTemplate(
+        "unknown",
+        "it",
+        false,
+        false,
+      );
       expect(greeting).toContain("Ciao");
       expect(greeting).toContain("{name}");
     });
@@ -88,7 +108,12 @@ describe("i18n-templates", () => {
     it("should work for all supported languages (generic mode)", () => {
       const languages = ["it", "en", "es", "fr", "de"] as const;
       languages.forEach((lang) => {
-        const greeting = getMaestroGreetingTemplate("euclide", lang, false, false);
+        const greeting = getMaestroGreetingTemplate(
+          "euclide",
+          lang,
+          false,
+          false,
+        );
         expect(greeting).toBeTruthy();
         expect(greeting.length).toBeGreaterThan(0);
         expect(greeting).toContain("{name}"); // Generic template
@@ -98,7 +123,12 @@ describe("i18n-templates", () => {
     it("should work for all supported languages (personalized mode)", () => {
       const languages = ["it", "en", "es", "fr", "de"] as const;
       languages.forEach((lang) => {
-        const greeting = getMaestroGreetingTemplate("euclide", lang, false, true);
+        const greeting = getMaestroGreetingTemplate(
+          "euclide",
+          lang,
+          false,
+          true,
+        );
         expect(greeting).toBeTruthy();
         expect(greeting.length).toBeGreaterThan(0);
       });

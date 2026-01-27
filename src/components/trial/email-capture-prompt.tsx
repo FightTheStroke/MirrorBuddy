@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -34,7 +35,8 @@ export function EmailCapturePrompt({
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
+  const [success, _setSuccess] = useState(false);
+  const [verificationSent, setVerificationSent] = useState(false);
   const [isDismissed, setIsDismissed] = useState(false);
 
   // Check localStorage for dismissal
@@ -49,7 +51,10 @@ export function EmailCapturePrompt({
 
   // Determine if prompt should show
   const shouldShow =
-    !isDismissed && !success && (messageCount >= threshold || showOnLimit);
+    !isDismissed &&
+    !success &&
+    !verificationSent &&
+    (messageCount >= threshold || showOnLimit);
 
   const handleDismiss = () => {
     localStorage.setItem("mirrorbuddy-email-prompt-dismissed", "true");
@@ -82,7 +87,8 @@ export function EmailCapturePrompt({
         throw new Error(data.error || "Failed to save email");
       }
 
-      setSuccess(true);
+      localStorage.setItem("mirrorbuddy-trial-session-id", sessionId);
+      setVerificationSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save email");
     } finally {
@@ -100,6 +106,21 @@ export function EmailCapturePrompt({
         <Mail className="h-4 w-4 text-green-600 dark:text-green-400" />
         <p className="text-sm text-green-800 dark:text-green-200">
           Thanks! We will notify you when full features are available.
+        </p>
+      </div>
+    );
+  }
+
+  if (verificationSent) {
+    return (
+      <div className="flex items-start gap-2 p-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 rounded-lg">
+        <Mail className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mt-0.5" />
+        <p className="text-sm text-indigo-800 dark:text-indigo-200">
+          Abbiamo inviato un codice di verifica. Inseriscilo su{" "}
+          <Link href="/trial/verify" className="underline">
+            /trial/verify
+          </Link>{" "}
+          per sbloccare gli strumenti della prova.
         </p>
       </div>
     );

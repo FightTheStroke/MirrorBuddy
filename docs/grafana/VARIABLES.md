@@ -18,28 +18,28 @@ The locale variable is a **Custom type** variable that allows users to select fr
 4. Click **Create variable**
 5. Fill in the following:
 
-| Field | Value |
-|-------|-------|
-| **Name** | `locale` |
-| **Type** | Custom |
-| **Custom options** | `it,en,fr,de,es,All` |
-| **Default value** | `All` |
-| **Multi-value** | Off |
-| **Include All option** | On |
+| Field                  | Value                |
+| ---------------------- | -------------------- |
+| **Name**               | `locale`             |
+| **Type**               | Custom               |
+| **Custom options**     | `it,en,fr,de,es,All` |
+| **Default value**      | `All`                |
+| **Multi-value**        | Off                  |
+| **Include All option** | On                   |
 
 6. Click **Create**
 7. **Save** the dashboard (Ctrl+S or Cmd+S)
 
 ### Locale Values
 
-| Locale | Description |
-|--------|-------------|
-| `it` | Italian |
-| `en` | English |
-| `fr` | French |
-| `de` | German |
-| `es` | Spanish |
-| `All` | All locales combined |
+| Locale | Description          |
+| ------ | -------------------- |
+| `it`   | Italian              |
+| `en`   | English              |
+| `fr`   | French               |
+| `de`   | German               |
+| `es`   | Spanish              |
+| `All`  | All locales combined |
 
 ### Using the Variable in Queries
 
@@ -112,13 +112,13 @@ For the locale variable to work effectively, your metrics must include a `locale
 ```typescript
 // Example: Prometheus metric with locale label
 const localeHistogram = new Histogram({
-  name: 'mirrorbuddy_api_requests_total',
-  help: 'Total API requests by locale',
-  labelNames: ['locale', 'endpoint', 'method', 'status'],
+  name: "mirrorbuddy_api_requests_total",
+  help: "Total API requests by locale",
+  labelNames: ["locale", "endpoint", "method", "status"],
 });
 
 // Record metric with locale
-localeHistogram.labels(userLocale, '/api/chat', 'POST', '200').inc();
+localeHistogram.labels(userLocale, "/api/chat", "POST", "200").inc();
 ```
 
 ### Dashboard Refresh Behavior

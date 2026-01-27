@@ -1,17 +1,20 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
-import { WelcomeFormContent } from './welcome-form-content';
-import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
-import type { Maestro, VoiceSessionHandle } from '@/types';
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ArrowRight, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import { VoiceOnboardingPanel } from "@/components/onboarding/voice-onboarding-panel";
+import { WelcomeFormContent } from "./welcome-form-content";
+import {
+  useOnboardingTTS,
+  ONBOARDING_SCRIPTS,
+} from "@/lib/hooks/use-onboarding-tts";
+import type { Maestro, VoiceSessionHandle } from "@/types";
 
 interface VoiceConnectionInfo {
-  provider: 'azure';
+  provider: "azure";
   proxyPort: number;
   configured: boolean;
 }
@@ -19,7 +22,7 @@ interface VoiceConnectionInfo {
 interface ExistingUserData {
   name: string;
   age?: number;
-  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  schoolLevel?: "elementare" | "media" | "superiore";
   learningDifferences?: string[];
 }
 
@@ -63,8 +66,8 @@ export function WelcomeStep({
     setVoiceMuted,
   } = useOnboardingStore();
 
-  const [name, setName] = useState(data.name || '');
-  const [error, setError] = useState('');
+  const [name, setName] = useState(data.name || "");
+  const [error, setError] = useState("");
 
   // Track previous store value to detect voice-captured changes
   const prevNameRef = useRef(data.name);
@@ -96,18 +99,17 @@ export function WelcomeStep({
   const handleContinue = () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError('Per favore, dimmi come ti chiami!');
+      setError("Per favore, dimmi come ti chiami!");
       return;
     }
     if (trimmedName.length < 2) {
-      setError('Il nome deve avere almeno 2 caratteri');
+      setError("Il nome deve avere almeno 2 caratteri");
       return;
     }
     stop();
     updateData({ name: trimmedName });
     nextStep();
   };
-
 
   // ========== VOICE MODE: Melissa auto-starts (default when Azure available) ==========
   if (!useWebSpeechFallback) {
@@ -144,8 +146,12 @@ export function WelcomeStep({
                   <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Nome catturato</p>
-                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">{data.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Nome catturato
+                  </p>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    {data.name}
+                  </p>
                 </div>
               </div>
 
@@ -162,7 +168,8 @@ export function WelcomeStep({
 
         {isReplayMode && (
           <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-            Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.
+            Stai rivedendo il tutorial. I tuoi dati esistenti non verranno
+            modificati.
           </p>
         )}
       </motion.div>
@@ -178,7 +185,7 @@ export function WelcomeStep({
       isReplayMode={isReplayMode}
       onNameChange={(value) => {
         setName(value);
-        setError('');
+        setError("");
       }}
       onContinue={handleContinue}
       onToggleMute={toggleMute}

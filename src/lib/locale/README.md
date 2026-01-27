@@ -6,13 +6,13 @@ This module provides utilities for managing locale configurations with language 
 
 MirrorBuddy supports 6 language maestri across 5 languages:
 
-| Language | Maestro(s) | ID(s) |
-|----------|-----------|-------|
-| Italian | Alessandro Manzoni | `manzoni-italiano` |
-| English | William Shakespeare | `shakespeare-inglese` |
-| French | Molière | `moliere-french` |
-| German | Goethe | `goethe-german` |
-| Spanish | Cervantes, Álex Pina | `cervantes-spanish`, `alex-pina-spagnolo` |
+| Language | Maestro(s)           | ID(s)                                     |
+| -------- | -------------------- | ----------------------------------------- |
+| Italian  | Alessandro Manzoni   | `manzoni-italiano`                        |
+| English  | William Shakespeare  | `shakespeare-inglese`                     |
+| French   | Molière              | `moliere-french`                          |
+| German   | Goethe               | `goethe-german`                           |
+| Spanish  | Cervantes, Álex Pina | `cervantes-spanish`, `alex-pina-spagnolo` |
 
 ## Usage
 
@@ -101,6 +101,7 @@ const stats = localeConfigService.getCacheStats();
 ```
 
 **Performance Features:**
+
 - In-memory caching with 5-minute TTL
 - Automatic cache refresh on stale data
 - Singleton pattern for consistent state
@@ -113,6 +114,7 @@ const stats = localeConfigService.getCacheStats();
 Navigate to `/admin/locales` and click "Nuova Configurazione".
 
 **Form Fields:**
+
 - **Country Code** (required): 2-letter ISO 3166-1 alpha-2 code (e.g., IT, FR, DE)
 - **Country Name** (required): Display name (e.g., Italia, France, Germany)
 - **Primary Locale** (required): ISO 639-1 language code (e.g., it, en, fr)
@@ -129,26 +131,31 @@ From the locales table, click "Modifica" on any configuration to edit.
 ## API Routes
 
 ### Create Locale
+
 ```
 POST /api/admin/locales
 ```
 
 ### Get All Locales
+
 ```
 GET /api/admin/locales
 ```
 
 ### Get Single Locale
+
 ```
 GET /api/admin/locales/[id]
 ```
 
 ### Update Locale
+
 ```
 PUT /api/admin/locales/[id]
 ```
 
 ### Delete Locale
+
 ```
 DELETE /api/admin/locales/[id]
 ```
@@ -172,6 +179,7 @@ model LocaleConfig {
 ## Tests
 
 Run unit tests:
+
 ```bash
 # Test maestri helpers
 npm run test:unit -- maestri-helpers.test.ts
@@ -181,12 +189,14 @@ npm run test:unit -- locale-config-service.test.ts
 ```
 
 **maestri-helpers.test.ts** coverage:
+
 - Language maestri filtering
 - Maestro options generation
 - Validation of maestro IDs
 - Subject label translation
 
 **locale-config-service.test.ts** coverage:
+
 - Get enabled locales with caching
 - Resolve country to locale configuration
 - Get maestro for country

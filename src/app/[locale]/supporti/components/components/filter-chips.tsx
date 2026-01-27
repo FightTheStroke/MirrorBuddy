@@ -3,13 +3,13 @@
  * @brief Filter component with toggle switches for multi-select
  */
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, ChevronUp, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { TYPE_FILTERS, CHIP_COLORS, DATE_FILTERS } from '../constants';
-import { SUBJECT_LABELS } from '@/components/education/archive';
-import { useFilterDropdown } from './use-filter-dropdown';
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronDown, ChevronUp, Check } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { TYPE_FILTERS, CHIP_COLORS, DATE_FILTERS } from "../constants";
+import { SUBJECT_LABELS } from "@/components/education/archive";
+import { useFilterDropdown } from "./use-filter-dropdown";
 
 interface FilterChipsProps {
   typeFilter: string;
@@ -37,12 +37,15 @@ export function FilterChips({
   getDateFilterCount,
 }: FilterChipsProps) {
   const [showSubjects, setShowSubjects] = useState(true);
-  const { showMoreTypes, setShowMoreTypes, dropdownPosition, moreTypesRef } = useFilterDropdown();
+  const { showMoreTypes, setShowMoreTypes, dropdownPosition, moreTypesRef } =
+    useFilterDropdown();
 
-  const visibleTypes = TYPE_FILTERS.slice(0, 5).filter(f => getTypeFilterCount(f.id) > 0);
+  const visibleTypes = TYPE_FILTERS.slice(0, 5).filter(
+    (f) => getTypeFilterCount(f.id) > 0,
+  );
   const moreTypes = TYPE_FILTERS.slice(5)
-    .filter(f => getTypeFilterCount(f.id) > 0)
-    .map(f => ({ ...f, count: getTypeFilterCount(f.id) }));
+    .filter((f) => getTypeFilterCount(f.id) > 0)
+    .map((f) => ({ ...f, count: getTypeFilterCount(f.id) }));
 
   return (
     <div className="space-y-6">
@@ -53,7 +56,9 @@ export function FilterChips({
         <div className="flex flex-wrap gap-2">
           {visibleTypes.map((filter) => {
             const count = getTypeFilterCount(filter.id);
-            const isActive = typeFilter === filter.id || (filter.id === 'all' && typeFilter === 'all');
+            const isActive =
+              typeFilter === filter.id ||
+              (filter.id === "all" && typeFilter === "all");
             const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
             const Icon = filter.icon;
 
@@ -62,15 +67,20 @@ export function FilterChips({
                 key={filter.id}
                 onClick={() => onTypeFilterChange(filter.id)}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
+                  "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                   isActive
                     ? colors.activeBg
-                    : cn(colors.bg, colors.text, colors.border)
+                    : cn(colors.bg, colors.text, colors.border),
                 )}
               >
                 <Icon className="w-4 h-4" />
                 <span>{filter.label}</span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600')}>
+                <span
+                  className={cn(
+                    "text-xs px-1.5 py-0.5 rounded",
+                    isActive ? "bg-white/20" : "bg-slate-200 dark:bg-slate-600",
+                  )}
+                >
                   {count}
                 </span>
               </button>
@@ -82,13 +92,17 @@ export function FilterChips({
               <button
                 onClick={() => setShowMoreTypes(!showMoreTypes)}
                 className={cn(
-                  'flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-all',
-                  'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700',
-                  showMoreTypes && 'ring-2 ring-primary'
+                  "flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-all",
+                  "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700",
+                  showMoreTypes && "ring-2 ring-primary",
                 )}
               >
                 Altro
-                {showMoreTypes ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {showMoreTypes ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -106,7 +120,8 @@ export function FilterChips({
                   >
                     {moreTypes.map((filter) => {
                       const isActive = typeFilter === filter.id;
-                      const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
+                      const colors =
+                        CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
                       const Icon = filter.icon;
 
                       return (
@@ -117,16 +132,20 @@ export function FilterChips({
                             setShowMoreTypes(false);
                           }}
                           className={cn(
-                            'w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors',
+                            "w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors",
                             isActive
                               ? colors.activeBg
-                              : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+                              : "hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200",
                           )}
                         >
                           <Icon className="w-4 h-4 flex-shrink-0" />
-                          <span className="flex-1 text-left">{filter.label}</span>
+                          <span className="flex-1 text-left">
+                            {filter.label}
+                          </span>
                           {isActive && <Check className="w-4 h-4" />}
-                          <span className="text-xs text-muted-foreground ml-2">{filter.count}</span>
+                          <span className="text-xs text-muted-foreground ml-2">
+                            {filter.count}
+                          </span>
                         </button>
                       );
                     })}
@@ -145,7 +164,9 @@ export function FilterChips({
         <div className="flex flex-wrap gap-2">
           {DATE_FILTERS.map((filter) => {
             const count = getDateFilterCount(filter.id);
-            const isActive = dateFilter === filter.id || (filter.id === 'all' && dateFilter === 'all');
+            const isActive =
+              dateFilter === filter.id ||
+              (filter.id === "all" && dateFilter === "all");
             const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
 
             return (
@@ -153,14 +174,19 @@ export function FilterChips({
                 key={filter.id}
                 onClick={() => onDateFilterChange(filter.id)}
                 className={cn(
-                  'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
+                  "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                   isActive
                     ? colors.activeBg
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                    : "bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700",
                 )}
               >
                 <span>{filter.label}</span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600')}>
+                <span
+                  className={cn(
+                    "text-xs px-1.5 py-0.5 rounded",
+                    isActive ? "bg-white/20" : "bg-slate-200 dark:bg-slate-600",
+                  )}
+                >
                   {count}
                 </span>
               </button>
@@ -176,14 +202,18 @@ export function FilterChips({
             className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
             Materia
-            {showSubjects ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+            {showSubjects ? (
+              <ChevronUp className="w-4 h-4" />
+            ) : (
+              <ChevronDown className="w-4 h-4" />
+            )}
           </button>
 
           <AnimatePresence>
             {showSubjects && (
               <motion.div
                 initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: 'auto' }}
+                animate={{ opacity: 1, height: "auto" }}
                 exit={{ opacity: 0, height: 0 }}
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
@@ -192,10 +222,10 @@ export function FilterChips({
                   <button
                     onClick={() => onSubjectFilterChange(null)}
                     className={cn(
-                      'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
+                      "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                       !subjectFilter
-                        ? 'bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400'
-                        : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700'
+                        ? "bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400"
+                        : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700",
                     )}
                   >
                     <span>Tutte</span>
@@ -209,17 +239,24 @@ export function FilterChips({
                         key={subject}
                         onClick={() => onSubjectFilterChange(subject)}
                         className={cn(
-                          'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
+                          "flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all",
                           isActive
-                            ? 'bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400'
-                            : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700'
+                            ? "bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400"
+                            : "bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700",
                         )}
                       >
                         <span className="w-5 h-5 rounded-full bg-emerald-200 dark:bg-emerald-600 flex items-center justify-center text-xs font-bold">
                           {subject.charAt(0).toUpperCase()}
                         </span>
                         <span>{SUBJECT_LABELS[subject] || subject}</span>
-                        <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-emerald-200 dark:bg-emerald-600')}>
+                        <span
+                          className={cn(
+                            "text-xs px-1.5 py-0.5 rounded",
+                            isActive
+                              ? "bg-white/20"
+                              : "bg-emerald-200 dark:bg-emerald-600",
+                          )}
+                        >
                           {count}
                         </span>
                       </button>

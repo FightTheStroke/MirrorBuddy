@@ -29,7 +29,7 @@
     "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "tsx scripts/lint-redirect-metadata.tsx && eslint",
     "typecheck": "tsc --noEmit",
     "test": "E2E_TESTS=1 playwright test",
     "test:unit": "vitest run",

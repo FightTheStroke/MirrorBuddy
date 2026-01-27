@@ -49,7 +49,8 @@ Use the `useLocale` hook to access locale information:
 import { useLocale } from "@/hooks/use-locale";
 
 function LanguageSwitcher() {
-  const { locale, locales, localeNames, localeFlags, switchLocale } = useLocale();
+  const { locale, locales, localeNames, localeFlags, switchLocale } =
+    useLocale();
 
   return (
     <select
@@ -123,13 +124,23 @@ export function CurrentLocaleDisplay() {
 
 ```tsx
 import { useLocale } from "@/hooks/use-locale";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export function LanguageDropdown() {
-  const { locale, locales, localeNames, localeFlags, switchLocale } = useLocale();
+  const { locale, locales, localeNames, localeFlags, switchLocale } =
+    useLocale();
 
   return (
-    <Select value={locale} onValueChange={(value) => switchLocale(value as Locale)}>
+    <Select
+      value={locale}
+      onValueChange={(value) => switchLocale(value as Locale)}
+    >
       <SelectTrigger className="w-[180px]">
         <SelectValue>
           {localeFlags[locale]} {localeNames[locale]}

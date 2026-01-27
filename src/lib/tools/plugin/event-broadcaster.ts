@@ -6,8 +6,13 @@
 
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import type {
+  ToolEventType as RealtimeToolEventTypeAlias,
+  ToolType as RealtimeToolType,
+} from "@/lib/realtime/tool-events";
 import type { ToolDataChannelMessage } from "./data-channel-protocol";
 import { ToolDataChannelSender } from "./data-channel-sender";
+import { ToolEventType } from "./data-channel-protocol";
 import type { EventBroadcaster as EventBroadcasterInterface } from "./orchestrator";
 
 /**
@@ -62,11 +67,24 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
     event: ToolDataChannelMessage,
   ): Promise<boolean> {
     try {
+      const payload = this.mapToSsePayload(event);
+      if (!payload) {
+        logger.warn("[ToolEventBroadcaster] SSE payload missing metadata", {
+          toolId: event.toolId,
+          eventType: event.type,
+        });
+        return false;
+      }
+
       const response = await csrfFetch("/api/tools/events", {
         method: "POST",
         body: JSON.stringify({
-          event,
-          sessionId: this.sessionId,
+          sessionId: payload.sessionId,
+          maestroId: payload.maestroId,
+          type: payload.type,
+          toolType: payload.toolType,
+          toolId: payload.toolId,
+          data: payload.data,
         }),
       });
 
@@ -89,6 +107,60 @@ export class ToolEventBroadcaster implements EventBroadcasterInterface {
         error: error instanceof Error ? error.message : "Unknown error",
       });
       return false;
+    }
+  }
+
+  private mapToSsePayload(event: ToolDataChannelMessage): {
+    sessionId: string;
+    maestroId: string;
+    type: RealtimeToolEventTypeAlias;
+    toolType: RealtimeToolType;
+    toolId: string;
+    data: Record<string, unknown>;
+  } | null {
+    const sessionId = event.sessionId ?? this.sessionId;
+    if (!sessionId || !event.maestroId || !event.toolType) {
+      return null;
+    }
+
+    const type = this.mapDataChannelType(event.type);
+    if (!type) {
+      return null;
+    }
+
+    const data =
+      event.payload && typeof event.payload === "object"
+        ? (event.payload as Record<string, unknown>)
+        : event.payload === undefined
+          ? {}
+          : { value: event.payload };
+
+    return {
+      sessionId,
+      maestroId: event.maestroId,
+      type,
+      toolType: event.toolType as RealtimeToolType,
+      toolId: event.toolId,
+      data,
+    };
+  }
+
+  private mapDataChannelType(
+    type: ToolEventType,
+  ): RealtimeToolEventTypeAlias | null {
+    switch (type) {
+      case ToolEventType.TOOL_PROPOSED:
+      case ToolEventType.TOOL_ACCEPTED:
+      case ToolEventType.TOOL_EXECUTING:
+        return "tool:update";
+      case ToolEventType.TOOL_COMPLETED:
+        return "tool:complete";
+      case ToolEventType.TOOL_ERROR:
+        return "tool:error";
+      case ToolEventType.TOOL_REJECTED:
+        return "tool:cancelled";
+      default:
+        return null;
     }
   }
 

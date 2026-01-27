@@ -12,7 +12,7 @@ import { QuizTool } from "./quiz-tool";
 import { FlashcardTool } from "./flashcard-tool";
 import { DemoSandbox } from "./demo-sandbox";
 import { SearchResults } from "./search-results";
-import { SummaryTool } from "./summary-tool";
+import { LiveSummary } from "./live-summary";
 import { StudentSummaryEditor } from "./student-summary-editor";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
@@ -159,7 +159,14 @@ export function ToolPanel({
           );
         }
         // AI-generated summary (legacy)
-        return <SummaryTool data={summaryContent as unknown as SummaryData} />;
+        return (
+          <LiveSummary
+            initialData={summaryContent as unknown as SummaryData}
+            sessionId={sessionId}
+            listenForEvents={Boolean(sessionId)}
+            readOnly={false}
+          />
+        );
       }
       default:
         return (

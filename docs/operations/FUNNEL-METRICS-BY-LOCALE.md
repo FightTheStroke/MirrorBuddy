@@ -59,6 +59,7 @@ Locale is automatically captured from the client-side environment:
 **Endpoint**: `POST /api/funnel/track`
 
 **Request body**:
+
 ```json
 {
   "stage": "TRIAL_START",
@@ -72,6 +73,7 @@ Locale is automatically captured from the client-side environment:
 ```
 
 **Response**:
+
 ```json
 {
   "success": true,
@@ -85,10 +87,12 @@ Locale is automatically captured from the client-side environment:
 **Endpoint**: `GET /api/admin/funnel/by-locale`
 
 **Query Parameters**:
+
 - `startDate` (YYYY-MM-DD): Start of analysis period (default: 30 days ago)
 - `endDate` (YYYY-MM-DD): End of analysis period (default: today)
 
 **Response example**:
+
 ```json
 {
   "summary": {
@@ -111,7 +115,7 @@ Locale is automatically captured from the client-side environment:
         "ACTIVE": 8
       },
       "conversionRates": {
-        "visitorToTrialStart": 40.00,
+        "visitorToTrialStart": 40.0,
         "trialStartToEngaged": 52.78,
         "engagedToLimitHit": 44.21,
         "limitHitToBetaRequest": 66.67,
@@ -131,7 +135,7 @@ Locale is automatically captured from the client-side environment:
         "TRIAL_ENGAGED": 67
       },
       "conversionRates": {
-        "visitorToTrialStart": 40.00,
+        "visitorToTrialStart": 40.0,
         "trialStartToEngaged": 59.82
       },
       "totalEvents": 459,
@@ -143,12 +147,12 @@ Locale is automatically captured from the client-side environment:
     {
       "locale": "it",
       "events": 833,
-      "conversionToTrialStart": 40.00
+      "conversionToTrialStart": 40.0
     },
     {
       "locale": "en",
       "events": 459,
-      "conversionToTrialStart": 40.00
+      "conversionToTrialStart": 40.0
     }
   ]
 }
@@ -165,14 +169,14 @@ import { trackFunnelEvent } from "@/lib/funnel/client";
 trackFunnelEvent({
   stage: "TRIAL_START",
   fromStage: "VISITOR",
-  metadata: { page: "welcome" }
+  metadata: { page: "welcome" },
 });
 
 // Explicit locale
 trackFunnelEvent({
   stage: "TRIAL_START",
   locale: "en",
-  metadata: { page: "welcome" }
+  metadata: { page: "welcome" },
 });
 ```
 
@@ -186,7 +190,7 @@ await recordFunnelEvent({
   userId: "user-123",
   stage: "FIRST_LOGIN",
   locale: "it",
-  metadata: { source: "email" }
+  metadata: { source: "email" },
 });
 
 // Record transition with automatic fromStage
@@ -194,13 +198,14 @@ await recordStageTransition(
   { userId: "user-123" },
   "ACTIVE",
   { reason: "completed_onboarding" },
-  "it" // locale parameter
+  "it", // locale parameter
 );
 ```
 
 ## Metrics Dashboard
 
 Access locale-segmented funnel metrics at:
+
 - **Admin path**: `/admin/funnel` (main dashboard)
 - **Analytics endpoint**: `GET /api/admin/funnel/by-locale`
 
@@ -230,6 +235,7 @@ For each locale, the system tracks:
 ## Supported Locales
 
 Currently tracked locales (ISO 639-1):
+
 - **it** - Italian (default)
 - **en** - English
 - **fr** - French

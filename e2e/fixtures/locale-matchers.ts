@@ -4,7 +4,11 @@
  * Custom Playwright expect matchers for locale testing.
  */
 
-import { expect as baseExpect, type Page, type Locator } from "@playwright/test";
+import {
+  expect as baseExpect,
+  type Page,
+  type Locator,
+} from "@playwright/test";
 import type { Locale } from "@/i18n/config";
 
 /**

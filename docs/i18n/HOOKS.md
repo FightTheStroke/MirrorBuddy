@@ -2,12 +2,12 @@
 
 ## Quick Hook Guide
 
-| Hook | Type | Purpose | Use When |
-|------|------|---------|----------|
-| `useTranslations()` | Client | Get translations with namespace | In client components |
-| `getTranslations()` | Server | Get translations in server components | In server components (async) |
-| `useLocale()` | Client | Get current locale string | Need locale for conditionals |
-| `useLocaleContext()` | Client | Get locale + switching | Need to switch languages |
+| Hook                 | Type   | Purpose                               | Use When                     |
+| -------------------- | ------ | ------------------------------------- | ---------------------------- |
+| `useTranslations()`  | Client | Get translations with namespace       | In client components         |
+| `getTranslations()`  | Server | Get translations in server components | In server components (async) |
+| `useLocale()`        | Client | Get current locale string             | Need locale for conditionals |
+| `useLocaleContext()` | Client | Get locale + switching                | Need to switch languages     |
 
 ## useTranslations() - Basic Hook
 
@@ -35,7 +35,7 @@ t("passwordMinLength", { min: 8 });
 
 ```tsx
 const t = useTranslations("navigation");
-t("breadcrumbs.home");  // Access nested objects
+t("breadcrumbs.home"); // Access nested objects
 ```
 
 ## useTranslationsGlobal() - Multi-Namespace
@@ -94,26 +94,19 @@ Format messages in utilities, API calls, or server code.
 ```typescript
 import { formatMessage } from "@/hooks/useTranslations";
 
-const message = formatMessage(
-  "Password must be at least {min} characters",
-  { min: 8 }
-);
+const message = formatMessage("Password must be at least {min} characters", {
+  min: 8,
+});
 ```
 
 ### Use Cases
 
 ```typescript
 // Error messages
-const validationError = formatMessage(
-  "Invalid {field}",
-  { field: "email" }
-);
+const validationError = formatMessage("Invalid {field}", { field: "email" });
 
 // API responses
-const errorMsg = formatMessage(
-  "User {userId} not found",
-  { userId: 123 }
-);
+const errorMsg = formatMessage("User {userId} not found", { userId: 123 });
 ```
 
 ## Rich Text with Components
@@ -165,7 +158,9 @@ export function LocaleSwitcher() {
       onChange={(e) => switchLocale(e.target.value as Locale)}
     >
       {locales.map((loc) => (
-        <option key={loc} value={loc}>{localeNames[loc]}</option>
+        <option key={loc} value={loc}>
+          {localeNames[loc]}
+        </option>
       ))}
     </select>
   );
@@ -177,15 +172,17 @@ export function LocaleSwitcher() {
 ```tsx
 const { locale, locales, localeFlags, switchLocale } = useLocaleContext();
 
-{locales.map((loc) => (
-  <button
-    key={loc}
-    onClick={() => switchLocale(loc)}
-    className={locale === loc ? "active" : ""}
-  >
-    {localeFlags[loc]}
-  </button>
-))}
+{
+  locales.map((loc) => (
+    <button
+      key={loc}
+      onClick={() => switchLocale(loc)}
+      className={locale === loc ? "active" : ""}
+    >
+      {localeFlags[loc]}
+    </button>
+  ));
+}
 ```
 
 ## Server Components
@@ -222,9 +219,9 @@ TypeScript provides autocomplete and type checking:
 
 ```tsx
 const t = useTranslations("auth");
-t("login");           // ✓ Valid
-t("unknownKey");      // ✗ Type error - key not found
-t("common.save");     // ✗ Type error - wrong namespace
+t("login"); // ✓ Valid
+t("unknownKey"); // ✗ Type error - key not found
+t("common.save"); // ✗ Type error - wrong namespace
 ```
 
 Type definitions come from `src/i18n/types.ts` generated from your message files.

@@ -3,14 +3,18 @@
  * @brief Custom hook for zaino view logic with local state filtering
  */
 
-import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import Fuse from 'fuse.js';
-import { logger } from '@/lib/logger';
-import { getActiveMaterials } from '@/lib/storage/materials-db-utils';
-import { deleteMaterial } from '@/lib/storage/materials-db-crud';
-import { updateMaterialInteraction } from '@/components/education/archive';
-import type { SortBy, ViewMode, ArchiveItem } from '@/components/education/archive';
-import { DATE_FILTERS, DATE_FILTER_IDS } from '../constants';
+import { useState, useEffect, useMemo, useCallback, useRef } from "react";
+import Fuse from "fuse.js";
+import { logger } from "@/lib/logger";
+import { getActiveMaterials } from "@/lib/storage/materials-db-utils";
+import { deleteMaterial } from "@/lib/storage/materials-db-crud";
+import { updateMaterialInteraction } from "@/components/education/archive";
+import type {
+  SortBy,
+  ViewMode,
+  ArchiveItem,
+} from "@/components/education/archive";
+import { DATE_FILTERS, DATE_FILTER_IDS } from "../constants";
 
 interface UseZainoViewProps {
   initialType?: string;
@@ -21,29 +25,34 @@ export function useZainoView({
   initialType,
   initialSubject,
 }: UseZainoViewProps) {
-  const [sortBy, setSortBy] = useState<SortBy>('date');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [viewMode, setViewMode] = useState<ViewMode>('grid');
+  const [sortBy, setSortBy] = useState<SortBy>("date");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [viewMode, setViewMode] = useState<ViewMode>("grid");
   const [materials, setMaterials] = useState<ArchiveItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedItem, setSelectedItem] = useState<ArchiveItem | null>(null);
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [typeFilter, setTypeFilter] = useState(initialType || 'all');
-  const [dateFilter, setDateFilter] = useState('all');
-  const [subjectFilter, setSubjectFilter] = useState<string | null>(initialSubject || null);
+  const [typeFilter, setTypeFilter] = useState(initialType || "all");
+  const [dateFilter, setDateFilter] = useState("all");
+  const [subjectFilter, setSubjectFilter] = useState<string | null>(
+    initialSubject || null,
+  );
 
   const [selectedPathId, setSelectedPathId] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
 
-  const isBookmarked = typeFilter === 'bookmarked';
-  const isPercorsi = typeFilter === 'percorsi';
+  const isBookmarked = typeFilter === "bookmarked";
+  const isPercorsi = typeFilter === "percorsi";
 
   useEffect(() => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
-    searchTimerRef.current = setTimeout(() => setDebouncedQuery(searchQuery), 200);
+    searchTimerRef.current = setTimeout(
+      () => setDebouncedQuery(searchQuery),
+      200,
+    );
     return () => {
       if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     };
@@ -57,8 +66,8 @@ export function useZainoView({
         const records = await getActiveMaterials();
         setMaterials(records as ArchiveItem[]);
       } catch (err) {
-        logger.error('Failed to load materials', undefined, err);
-        setError('Impossibile caricare i materiali. Riprova più tardi.');
+        logger.error("Failed to load materials", undefined, err);
+        setError("Impossibile caricare i materiali. Riprova più tardi.");
       } finally {
         setIsLoading(false);
       }
@@ -74,7 +83,7 @@ export function useZainoView({
       bySubject: {} as Record<string, number>,
       byDate: {} as Record<string, number>,
     };
-    
+
     for (const item of materials) {
       if (item.isBookmarked) result.bookmarked++;
       result.byType[item.toolType] = (result.byType[item.toolType] || 0) + 1;
@@ -82,7 +91,7 @@ export function useZainoView({
         result.bySubject[item.subject] =
           (result.bySubject[item.subject] || 0) + 1;
     }
-    
+
     for (const id of DATE_FILTER_IDS) {
       const filter = DATE_FILTERS.find((f) => f.id === id);
       if (filter) {
@@ -98,16 +107,16 @@ export function useZainoView({
         result.byDate[id] = count;
       }
     }
-    
+
     return result;
   }, [materials]);
 
   const subjects = useMemo(
     () =>
       Array.from(
-        new Set(materials.map((m) => m.subject).filter(Boolean) as string[])
+        new Set(materials.map((m) => m.subject).filter(Boolean) as string[]),
       ).sort(),
-    [materials]
+    [materials],
   );
 
   const filtered = useMemo(() => {
@@ -122,7 +131,7 @@ export function useZainoView({
         // Percorsi is handled separately in UI via LearningPathsView
         // Don't filter materials here - return empty to show only paths view
         return [];
-      } else if (typeFilter && typeFilter !== 'all') {
+      } else if (typeFilter && typeFilter !== "all") {
         result = result.filter((item) => item.toolType === typeFilter);
       }
 
@@ -130,7 +139,7 @@ export function useZainoView({
         result = result.filter((item) => item.subject === subjectFilter);
       }
 
-      if (dateFilter && dateFilter !== 'all') {
+      if (dateFilter && dateFilter !== "all") {
         const filter = DATE_FILTERS.find((f) => f.id === dateFilter);
         if (filter) {
           const { start, end } = filter.getRange();
@@ -148,8 +157,8 @@ export function useZainoView({
       if (debouncedQuery.trim()) {
         const fuse = new Fuse(result, {
           keys: [
-            { name: 'title', weight: 2 },
-            { name: 'subject', weight: 1 },
+            { name: "title", weight: 2 },
+            { name: "subject", weight: 1 },
           ],
           threshold: 0.3,
           ignoreLocation: true,
@@ -160,20 +169,22 @@ export function useZainoView({
 
       result.sort((a, b) => {
         switch (sortBy) {
-          case 'date':
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-          case 'type':
+          case "date":
+            return (
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+            );
+          case "type":
             return a.toolType.localeCompare(b.toolType);
-          case 'rating':
+          case "rating":
             return (b.userRating || 0) - (a.userRating || 0);
-          case 'views':
+          case "views":
             return (b.viewCount || 0) - (a.viewCount || 0);
           default:
             return 0;
         }
       });
     } catch (err) {
-      logger.error('Filter error', undefined, err);
+      logger.error("Filter error", undefined, err);
     }
 
     return result;
@@ -203,35 +214,48 @@ export function useZainoView({
   }, []);
 
   const clearAllFilters = useCallback(() => {
-    setTypeFilter('all');
-    setDateFilter('all');
+    setTypeFilter("all");
+    setDateFilter("all");
     setSubjectFilter(null);
-    setSearchQuery('');
+    setSearchQuery("");
   }, []);
 
-  const getFilterCount = useCallback((id: string): number => {
-    if (id === 'all') return counts.total;
-    if (id === 'bookmarked') return counts.bookmarked;
-    return counts.byType[id] || 0;
-  }, [counts]);
+  const getFilterCount = useCallback(
+    (id: string): number => {
+      if (id === "all") return counts.total;
+      if (id === "bookmarked") return counts.bookmarked;
+      return counts.byType[id] || 0;
+    },
+    [counts],
+  );
 
-  const getDateFilterCount = useCallback((id: string): number => {
-    return counts.byDate[id] || 0;
-  }, [counts]);
+  const getDateFilterCount = useCallback(
+    (id: string): number => {
+      return counts.byDate[id] || 0;
+    },
+    [counts],
+  );
 
-  const getSubjectFilterCount = useCallback((id: string): number => {
-    return counts.bySubject[id] || 0;
-  }, [counts]);
+  const getSubjectFilterCount = useCallback(
+    (id: string): number => {
+      return counts.bySubject[id] || 0;
+    },
+    [counts],
+  );
 
-  const hasActiveFilters = typeFilter !== 'all' || dateFilter !== 'all' || subjectFilter !== null || searchQuery.trim() !== '';
+  const hasActiveFilters =
+    typeFilter !== "all" ||
+    dateFilter !== "all" ||
+    subjectFilter !== null ||
+    searchQuery.trim() !== "";
 
   const handleDelete = useCallback(async (toolId: string) => {
-    if (!confirm('Sei sicuro di voler eliminare questo materiale?')) return;
+    if (!confirm("Sei sicuro di voler eliminare questo materiale?")) return;
     try {
       await deleteMaterial(toolId);
       setMaterials((prev) => prev.filter((m) => m.toolId !== toolId));
     } catch (err) {
-      logger.error('Failed to delete', undefined, err);
+      logger.error("Failed to delete", undefined, err);
     }
   }, []);
 
@@ -243,31 +267,34 @@ export function useZainoView({
     setSelectedItem(null);
   }, []);
 
-  const handleBookmark = useCallback(async (toolId: string, isBookmarked: boolean) => {
-    try {
-      const success = await updateMaterialInteraction(toolId, { isBookmarked });
-      if (success) {
-        setMaterials((prev) =>
-          prev.map((m) =>
-            m.toolId === toolId ? { ...m, isBookmarked } : m
-          )
-        );
+  const handleBookmark = useCallback(
+    async (toolId: string, isBookmarked: boolean) => {
+      try {
+        const success = await updateMaterialInteraction(toolId, {
+          isBookmarked,
+        });
+        if (success) {
+          setMaterials((prev) =>
+            prev.map((m) => (m.toolId === toolId ? { ...m, isBookmarked } : m)),
+          );
+        }
+      } catch (err) {
+        logger.error("Failed to update bookmark", undefined, err);
       }
-    } catch (err) {
-      logger.error('Failed to update bookmark', undefined, err);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const handleRate = useCallback(async (toolId: string, userRating: number) => {
     try {
       const success = await updateMaterialInteraction(toolId, { userRating });
       if (success) {
         setMaterials((prev) =>
-          prev.map((m) => (m.toolId === toolId ? { ...m, userRating } : m))
+          prev.map((m) => (m.toolId === toolId ? { ...m, userRating } : m)),
         );
       }
     } catch (err) {
-      logger.error('Failed to update rating', undefined, err);
+      logger.error("Failed to update rating", undefined, err);
     }
   }, []);
 

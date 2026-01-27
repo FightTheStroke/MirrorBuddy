@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback } from "react";
 
 export interface DropdownPosition {
   top: number;
@@ -10,7 +10,10 @@ export interface DropdownPosition {
  */
 export function useFilterDropdown() {
   const [showMoreTypes, setShowMoreTypes] = useState(false);
-  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({ top: 0, left: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState<DropdownPosition>({
+    top: 0,
+    left: 0,
+  });
   const moreTypesRef = useRef<HTMLDivElement>(null);
 
   const updateDropdownPosition = useCallback(() => {
@@ -23,26 +26,29 @@ export function useFilterDropdown() {
   useEffect(() => {
     if (showMoreTypes) {
       updateDropdownPosition();
-      window.addEventListener('resize', updateDropdownPosition);
-      window.addEventListener('scroll', updateDropdownPosition, true);
+      window.addEventListener("resize", updateDropdownPosition);
+      window.addEventListener("scroll", updateDropdownPosition, true);
     }
     return () => {
-      window.removeEventListener('resize', updateDropdownPosition);
-      window.removeEventListener('scroll', updateDropdownPosition, true);
+      window.removeEventListener("resize", updateDropdownPosition);
+      window.removeEventListener("scroll", updateDropdownPosition, true);
     };
   }, [showMoreTypes, updateDropdownPosition]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (moreTypesRef.current && !moreTypesRef.current.contains(event.target as Node)) {
+      if (
+        moreTypesRef.current &&
+        !moreTypesRef.current.contains(event.target as Node)
+      ) {
         setShowMoreTypes(false);
       }
     }
 
     if (showMoreTypes) {
-      document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener("mousedown", handleClickOutside);
     }
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showMoreTypes]);
 
   return {

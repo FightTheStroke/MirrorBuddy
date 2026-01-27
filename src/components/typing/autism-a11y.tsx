@@ -16,23 +16,21 @@ export function AutismA11y({
   settings: AutismSettings;
   onSettingsChange: (settings: AutismSettings) => void;
 }) {
-  const t = useTranslations('settings.accessibility');
+  const t = useTranslations("settings.accessibility");
 
   return (
     <div
       className={cn("space-y-6", settings.reducedMotion && "reduced-motion")}
     >
       <div>
-        <h3 className="text-lg font-semibold mb-4">{t('autismTitle')}</h3>
-        <p className="text-sm text-muted-foreground mb-4">
-          {t('autismDesc')}
-        </p>
+        <h3 className="text-lg font-semibold mb-4">{t("autismTitle")}</h3>
+        <p className="text-sm text-muted-foreground mb-4">{t("autismDesc")}</p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title={t('autismReducedMotion')}
-          description={t('autismReducedMotionDesc')}
+          title={t("autismReducedMotion")}
+          description={t("autismReducedMotionDesc")}
           enabled={settings.reducedMotion}
           onToggle={() =>
             onSettingsChange({
@@ -43,8 +41,8 @@ export function AutismA11y({
         />
 
         <SettingCard
-          title={t('autismPredictableLayouts')}
-          description={t('autismPredictableLayoutsDesc')}
+          title={t("autismPredictableLayouts")}
+          description={t("autismPredictableLayoutsDesc")}
           enabled={settings.predictableLayouts}
           onToggle={() =>
             onSettingsChange({
@@ -55,8 +53,8 @@ export function AutismA11y({
         />
 
         <SettingCard
-          title={t('autismMinimalUI')}
-          description={t('autismMinimalUIDesc')}
+          title={t("autismMinimalUI")}
+          description={t("autismMinimalUIDesc")}
           enabled={settings.minimalUI}
           onToggle={() =>
             onSettingsChange({ ...settings, minimalUI: !settings.minimalUI })

@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Voice Search Component
@@ -7,11 +7,11 @@
  * Updates filters automatically based on voice input
  */
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { Mic, MicOff, Loader2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Mic, MicOff, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
 
 interface VoiceSearchProps {
   onSearchUpdate: (query: string) => void;
@@ -22,79 +22,106 @@ interface VoiceSearchProps {
   }) => void;
 }
 
-export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps) {
+export function VoiceSearch({
+  onSearchUpdate,
+  onFilterUpdate,
+}: VoiceSearchProps) {
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<SpeechRecognition | null>(null);
 
-  const handleVoiceCommand = useCallback(async (command: string) => {
-    setIsProcessing(true);
-    const lowerCommand = command.toLowerCase();
+  const handleVoiceCommand = useCallback(
+    async (command: string) => {
+      setIsProcessing(true);
+      const lowerCommand = command.toLowerCase();
 
-    try {
-      // Parse command for filters
-      const filters: { type?: string; subject?: string; maestro?: string } = {};
+      try {
+        // Parse command for filters
+        const filters: { type?: string; subject?: string; maestro?: string } =
+          {};
 
-      // Detect tool types
-      if (lowerCommand.includes('mappa') || lowerCommand.includes('mappe')) {
-        filters.type = 'mindmap';
-      } else if (lowerCommand.includes('quiz')) {
-        filters.type = 'quiz';
-      } else if (lowerCommand.includes('flashcard')) {
-        filters.type = 'flashcard';
-      } else if (lowerCommand.includes('demo') || lowerCommand.includes('dimostrazione')) {
-        filters.type = 'demo';
-      } else if (lowerCommand.includes('riassunto') || lowerCommand.includes('riassunti')) {
-        filters.type = 'summary';
+        // Detect tool types
+        if (lowerCommand.includes("mappa") || lowerCommand.includes("mappe")) {
+          filters.type = "mindmap";
+        } else if (lowerCommand.includes("quiz")) {
+          filters.type = "quiz";
+        } else if (lowerCommand.includes("flashcard")) {
+          filters.type = "flashcard";
+        } else if (
+          lowerCommand.includes("demo") ||
+          lowerCommand.includes("dimostrazione")
+        ) {
+          filters.type = "demo";
+        } else if (
+          lowerCommand.includes("riassunto") ||
+          lowerCommand.includes("riassunti")
+        ) {
+          filters.type = "summary";
+        }
+
+        // Detect subjects
+        if (lowerCommand.includes("matematica")) {
+          filters.subject = "mathematics";
+        } else if (lowerCommand.includes("fisica")) {
+          filters.subject = "physics";
+        } else if (lowerCommand.includes("chimica")) {
+          filters.subject = "chemistry";
+        } else if (lowerCommand.includes("biologia")) {
+          filters.subject = "biology";
+        } else if (lowerCommand.includes("storia")) {
+          filters.subject = "history";
+        } else if (lowerCommand.includes("geografia")) {
+          filters.subject = "geography";
+        } else if (lowerCommand.includes("italiano")) {
+          filters.subject = "italian";
+        } else if (lowerCommand.includes("inglese")) {
+          filters.subject = "english";
+        }
+
+        // If filters were detected, apply them
+        if (Object.keys(filters).length > 0) {
+          onFilterUpdate(filters);
+        } else {
+          // Otherwise, use as search query
+          onSearchUpdate(command);
+        }
+
+        logger.info("Voice command processed", { command, filters });
+      } catch (error) {
+        logger.error("Failed to process voice command", { command }, error);
+      } finally {
+        setIsProcessing(false);
       }
-
-      // Detect subjects
-      if (lowerCommand.includes('matematica')) {
-        filters.subject = 'mathematics';
-      } else if (lowerCommand.includes('fisica')) {
-        filters.subject = 'physics';
-      } else if (lowerCommand.includes('chimica')) {
-        filters.subject = 'chemistry';
-      } else if (lowerCommand.includes('biologia')) {
-        filters.subject = 'biology';
-      } else if (lowerCommand.includes('storia')) {
-        filters.subject = 'history';
-      } else if (lowerCommand.includes('geografia')) {
-        filters.subject = 'geography';
-      } else if (lowerCommand.includes('italiano')) {
-        filters.subject = 'italian';
-      } else if (lowerCommand.includes('inglese')) {
-        filters.subject = 'english';
-      }
-
-      // If filters were detected, apply them
-      if (Object.keys(filters).length > 0) {
-        onFilterUpdate(filters);
-      } else {
-        // Otherwise, use as search query
-        onSearchUpdate(command);
-      }
-
-      logger.info('Voice command processed', { command, filters });
-    } catch (error) {
-      logger.error('Failed to process voice command', { command }, error);
-    } finally {
-      setIsProcessing(false);
-    }
-  }, [onFilterUpdate, onSearchUpdate]);
+    },
+    [onFilterUpdate, onSearchUpdate],
+  );
 
   useEffect(() => {
     // Initialize Speech Recognition if available
-    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
-      const SpeechRecognitionClass = (window as typeof window & { SpeechRecognition?: new () => SpeechRecognition; webkitSpeechRecognition?: new () => SpeechRecognition }).SpeechRecognition || (window as typeof window & { webkitSpeechRecognition?: new () => SpeechRecognition }).webkitSpeechRecognition;
+    if (
+      typeof window !== "undefined" &&
+      ("SpeechRecognition" in window || "webkitSpeechRecognition" in window)
+    ) {
+      const SpeechRecognitionClass =
+        (
+          window as typeof window & {
+            SpeechRecognition?: new () => SpeechRecognition;
+            webkitSpeechRecognition?: new () => SpeechRecognition;
+          }
+        ).SpeechRecognition ||
+        (
+          window as typeof window & {
+            webkitSpeechRecognition?: new () => SpeechRecognition;
+          }
+        ).webkitSpeechRecognition;
 
       if (SpeechRecognitionClass) {
         const recognition = new SpeechRecognitionClass();
         recognitionRef.current = recognition;
         recognition.continuous = false;
         recognition.interimResults = false;
-        recognition.lang = 'it-IT';
+        recognition.lang = "it-IT";
 
         recognition.onresult = (event) => {
           const result = event.results[0][0].transcript;
@@ -103,7 +130,7 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
         };
 
         recognition.onerror = (event) => {
-          logger.error('Speech recognition error', { errorCode: event.error });
+          logger.error("Speech recognition error", { errorCode: event.error });
           setIsListening(false);
           setIsProcessing(false);
         };
@@ -123,7 +150,7 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
 
   const toggleListening = () => {
     if (!recognitionRef.current) {
-      logger.warn('Speech recognition not available');
+      logger.warn("Speech recognition not available");
       return;
     }
 
@@ -131,14 +158,16 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
       recognitionRef.current.stop();
       setIsListening(false);
     } else {
-      setTranscript('');
+      setTranscript("");
       recognitionRef.current.start();
       setIsListening(true);
     }
   };
 
   // Check if speech recognition is available
-  const isAvailable = typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window);
+  const isAvailable =
+    typeof window !== "undefined" &&
+    ("SpeechRecognition" in window || "webkitSpeechRecognition" in window);
 
   if (!isAvailable) {
     return null; // Don't render if not available
@@ -147,15 +176,17 @@ export function VoiceSearch({ onSearchUpdate, onFilterUpdate }: VoiceSearchProps
   return (
     <div className="relative">
       <Button
-        variant={isListening ? 'default' : 'outline'}
+        variant={isListening ? "default" : "outline"}
         size="icon"
         onClick={toggleListening}
         disabled={isProcessing}
         className={cn(
-          'relative',
-          isListening && 'bg-red-500 hover:bg-red-600 animate-pulse'
+          "relative",
+          isListening && "bg-red-500 hover:bg-red-600 animate-pulse",
         )}
-        aria-label={isListening ? 'Interrompi ricerca vocale' : 'Avvia ricerca vocale'}
+        aria-label={
+          isListening ? "Interrompi ricerca vocale" : "Avvia ricerca vocale"
+        }
         aria-pressed={isListening}
       >
         {isProcessing ? (

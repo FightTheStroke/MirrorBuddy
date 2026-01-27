@@ -7,11 +7,13 @@
 **Step 1: Update all message files**
 
 messages/it.json:
+
 ```json
 { "common": { "share": "Condividi" } }
 ```
 
 messages/en.json:
+
 ```json
 { "common": { "share": "Share" } }
 ```
@@ -151,6 +153,7 @@ export function LocaleSpecificContent() {
 **Diagnosis:** Key exists in one language but not others
 
 **Solution:**
+
 1. Check all message files have the key: `grep -r "share" messages/*.json`
 2. Validate JSON syntax: `node -e "require('messages/en.json')"`
 3. Run typecheck: `npm run typecheck`
@@ -160,6 +163,7 @@ export function LocaleSpecificContent() {
 **Diagnosis:** Typo in component or key doesn't exist
 
 **Solution:**
+
 ```tsx
 // ✗ Check if message file has this key
 const t = useTranslations("common");
@@ -174,6 +178,7 @@ npm run typecheck
 **Diagnosis:** Variable name mismatch or not passed
 
 **Solution:**
+
 ```json
 {
   "auth": {
@@ -195,6 +200,7 @@ t("minLength", { min: 8 });
 **Diagnosis:** Provider missing or switching function not called
 
 **Solution:**
+
 ```tsx
 "use client";
 import { useLocaleContext } from "@/i18n/locale-provider";
@@ -208,7 +214,9 @@ export function LanguageSwitcher() {
       onChange={(e) => switchLocale(e.target.value as Locale)}
     >
       {locales.map((loc) => (
-        <option key={loc} value={loc}>{loc}</option>
+        <option key={loc} value={loc}>
+          {loc}
+        </option>
       ))}
     </select>
   );
@@ -234,6 +242,7 @@ Test each locale URL in E2E: `/it`, `/en`, `/fr`, `/de`, `/es`
 ## Common Patterns
 
 **Plural handling:** Use conditional based on count:
+
 ```tsx
 const message = count === 1 ? t("singular") : t("plural", { count });
 ```

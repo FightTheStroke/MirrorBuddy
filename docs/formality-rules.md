@@ -7,19 +7,20 @@ Comprehensive formality system for all 5 languages in MirrorBuddy.
 ## Overview
 
 MirrorBuddy uses appropriate formal or informal address based on:
+
 - **Character type** (maestro/coach/buddy)
 - **Historical era** (pre-1900 = formal, modern = informal)
 - **Language** (each language has specific formal/informal pronouns)
 
 ## Language-Specific Formality
 
-| Language | Formal Pronoun | Informal Pronoun | Notes |
-|----------|---------------|------------------|-------|
-| Italian (it) | Lei | tu | Classic Italian formal address |
-| French (fr) | Vous | tu | French vouvoiement/tutoiement |
-| German (de) | Sie | du | German Sie/du distinction |
-| Spanish (es) | Usted | tú | Spanish formal/informal |
-| English (en) | Formal tone | Casual tone | Tone-based (no pronoun change) |
+| Language     | Formal Pronoun | Informal Pronoun | Notes                          |
+| ------------ | -------------- | ---------------- | ------------------------------ |
+| Italian (it) | Lei            | tu               | Classic Italian formal address |
+| French (fr)  | Vous           | tu               | French vouvoiement/tutoiement  |
+| German (de)  | Sie            | du               | German Sie/du distinction      |
+| Spanish (es) | Usted          | tú               | Spanish formal/informal        |
+| English (en) | Formal tone    | Casual tone      | Tone-based (no pronoun change) |
 
 ## Character Formality Classification
 
@@ -57,11 +58,13 @@ These characters use informal address (tu/du/tu/tú) across ALL languages:
 ### Coaches (ALWAYS INFORMAL)
 
 All coaches use informal address regardless of their persona:
+
 - melissa, roberto, chiara, andrea, favij, laura
 
 ### Buddies (ALWAYS INFORMAL)
 
 All buddies use informal address:
+
 - mario, noemi, enea, bruno, sofia, marta
 
 ## Usage
@@ -89,29 +92,28 @@ import { getFormalitySection } from "@/lib/i18n/formality-rules";
 
 // Get appropriate formality section for system prompt
 const section = getFormalitySection(
-  "galileo",    // characterId
-  "maestro",    // characterType
-  "it"          // language
+  "galileo", // characterId
+  "maestro", // characterType
+  "it", // language
 );
 // Returns FORMAL_ADDRESS_SECTIONS.it with Lei instructions
 
-const informalSection = getFormalitySection(
-  "feynman",
-  "maestro",
-  "fr"
-);
+const informalSection = getFormalitySection("feynman", "maestro", "fr");
 // Returns INFORMAL_ADDRESS_SECTIONS.fr with tu instructions
 ```
 
 ### Get Language-Specific Terms
 
 ```typescript
-import { getFormalityTerms, getExamplePhrases } from "@/lib/i18n/formality-rules";
+import {
+  getFormalityTerms,
+  getExamplePhrases,
+} from "@/lib/i18n/formality-rules";
 
 // Get formality terms for a language
 const italianTerms = getFormalityTerms("it");
-console.log(italianTerms.formal.pronoun);    // "Lei"
-console.log(italianTerms.informal.pronoun);  // "tu"
+console.log(italianTerms.formal.pronoun); // "Lei"
+console.log(italianTerms.informal.pronoun); // "tu"
 
 // Get example phrases
 const formalExamples = getExamplePhrases("it", true);
@@ -186,12 +188,14 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 ### Italian (it)
 
 **Formal (Lei)**:
+
 - "Come posso esserLe utile?"
 - "Lei cosa ne pensa?"
 - "Mi permetta di spiegarLe..."
 - "Lei ha ragione a porsi questa domanda."
 
 **Informal (tu)**:
+
 - "Come ti posso aiutare?"
 - "Tu cosa ne pensi?"
 - "Dimmi di più..."
@@ -200,12 +204,14 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 ### French (fr)
 
 **Formal (Vous)**:
+
 - "Comment puis-je vous aider?"
 - "Que pensez-vous?"
 - "Permettez-moi de vous expliquer..."
 - "Vous avez raison de poser cette question."
 
 **Informal (tu)**:
+
 - "Comment puis-je t'aider?"
 - "Qu'en penses-tu?"
 - "Dis-moi plus..."
@@ -214,12 +220,14 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 ### German (de)
 
 **Formal (Sie)**:
+
 - "Wie kann ich Ihnen helfen?"
 - "Was denken Sie?"
 - "Erlauben Sie mir zu erklären..."
 - "Sie haben recht, diese Frage zu stellen."
 
 **Informal (du)**:
+
 - "Wie kann ich dir helfen?"
 - "Was denkst du?"
 - "Sag mir mehr..."
@@ -228,12 +236,14 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 ### Spanish (es)
 
 **Formal (Usted)**:
+
 - "¿Cómo puedo servirle?"
 - "¿Qué piensa usted?"
 - "Permítame explicarle..."
 - "Usted tiene razón al hacer esta pregunta."
 
 **Informal (tú)**:
+
 - "¿Cómo te puedo ayudar?"
 - "¿Qué piensas?"
 - "Dime más..."
@@ -242,12 +252,14 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 ### English (en)
 
 **Formal tone**:
+
 - "How may I assist you?"
 - "What are your thoughts?"
 - "Allow me to explain..."
 - "You are quite right to ask this question."
 
 **Casual tone**:
+
 - "How can I help you?"
 - "What do you think?"
 - "Tell me more..."
@@ -255,12 +267,12 @@ Sei un personaggio moderno e accessibile. Usi il "tu" con lo studente.
 
 ## Implementation Files
 
-| File | Purpose |
-|------|---------|
-| `src/lib/i18n/formality-rules.ts` | Main module with all formality logic |
-| `src/lib/i18n/__tests__/formality-rules.test.ts` | Comprehensive tests (35 tests) |
-| `src/lib/greeting/templates/index.ts` | Greeting templates using formality |
-| `src/lib/safety/formality-templates.ts` | Legacy Italian-only (deprecated) |
+| File                                             | Purpose                              |
+| ------------------------------------------------ | ------------------------------------ |
+| `src/lib/i18n/formality-rules.ts`                | Main module with all formality logic |
+| `src/lib/i18n/__tests__/formality-rules.test.ts` | Comprehensive tests (35 tests)       |
+| `src/lib/greeting/templates/index.ts`            | Greeting templates using formality   |
+| `src/lib/safety/formality-templates.ts`          | Legacy Italian-only (deprecated)     |
 
 ## Adding New Languages
 
@@ -305,6 +317,7 @@ npm run test:unit -- formality-rules
 ```
 
 Test coverage includes:
+
 - Character classification (formal/informal)
 - All 5 languages (it/fr/de/es/en)
 - System prompt sections

@@ -7,7 +7,12 @@
  * - Custom matchers
  */
 
-import { test, expect, testAllLocales, testLocale } from "./fixtures/locale-fixtures";
+import {
+  test,
+  expect,
+  testAllLocales,
+  testLocale,
+} from "./fixtures/locale-fixtures";
 import {
   verifyPageLocale,
   waitForLocale,
@@ -25,12 +30,17 @@ import {
 
 test.describe("Locale Fixtures - Basic", () => {
   test.describe("LocalePage Navigation", () => {
-    test("should navigate to Italian page by default", async ({ localePage }) => {
+    test("should navigate to Italian page by default", async ({
+      localePage,
+    }) => {
       await localePage.goto("/home");
       await expect(localePage.page).toHaveLocale("it");
     });
 
-    test("should navigate to English page when configured", async ({ page, context }) => {
+    test("should navigate to English page when configured", async ({
+      page,
+      context,
+    }) => {
       // Set Accept-Language header for English
       await context.setExtraHTTPHeaders({
         "Accept-Language": "en-US,en;q=0.9",
@@ -60,7 +70,10 @@ test.describe("Locale Fixtures - Basic", () => {
   });
 
   test.describe("Accept-Language Header", () => {
-    test("should detect Italian from Accept-Language", async ({ page, context }) => {
+    test("should detect Italian from Accept-Language", async ({
+      page,
+      context,
+    }) => {
       await context.setExtraHTTPHeaders({
         "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
       });
@@ -70,7 +83,10 @@ test.describe("Locale Fixtures - Basic", () => {
       expect(verification.isValid).toBe(true);
     });
 
-    test("should detect English from Accept-Language", async ({ page, context }) => {
+    test("should detect English from Accept-Language", async ({
+      page,
+      context,
+    }) => {
       await context.setExtraHTTPHeaders({
         "Accept-Language": "en-US,en;q=0.9",
       });
@@ -80,7 +96,10 @@ test.describe("Locale Fixtures - Basic", () => {
       expect(verification.isValid).toBe(true);
     });
 
-    test("should detect French from Accept-Language", async ({ page, context }) => {
+    test("should detect French from Accept-Language", async ({
+      page,
+      context,
+    }) => {
       await context.setExtraHTTPHeaders({
         "Accept-Language": "fr-FR,fr;q=0.9,en;q=0.8",
       });
@@ -118,17 +137,23 @@ test.describe("Locale Fixtures - Basic", () => {
   });
 
   test.describe("Custom Matchers", () => {
-    test("toHaveLocale matcher should verify Italian page", async ({ page }) => {
+    test("toHaveLocale matcher should verify Italian page", async ({
+      page,
+    }) => {
       await page.goto("/it/home");
       await expect(page).toHaveLocale("it");
     });
 
-    test("toHaveLocale matcher should verify English page", async ({ page }) => {
+    test("toHaveLocale matcher should verify English page", async ({
+      page,
+    }) => {
       await page.goto("/en/home");
       await expect(page).toHaveLocale("en");
     });
 
-    test("toHaveLocale matcher should fail for wrong locale", async ({ page }) => {
+    test("toHaveLocale matcher should fail for wrong locale", async ({
+      page,
+    }) => {
       await page.goto("/it/home");
 
       // This should fail - page is in Italian, not English
@@ -137,7 +162,8 @@ test.describe("Locale Fixtures - Basic", () => {
         throw new Error("Expected matcher to fail but it passed");
       } catch (error) {
         // Expected to fail
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         expect(errorMessage).toContain("Expected page to be in locale");
       }
     });
@@ -176,7 +202,9 @@ test.describe("Locale Helpers", () => {
   });
 
   test.describe("Verification Helpers", () => {
-    test("verifyPageLocale should return detailed verification", async ({ page }) => {
+    test("verifyPageLocale should return detailed verification", async ({
+      page,
+    }) => {
       await page.goto("/it/home");
       await waitForLocale(page, "it");
 
@@ -217,15 +245,21 @@ test.describe("Locale Testing Patterns", () => {
   });
 
   // Test all locales with testAllLocales helper
-  testAllLocales("should load home page in all locales", async ({ localePage }) => {
-    await localePage.goto("/home");
-    await localePage.waitForLocaleLoad();
-    await expect(localePage.page).toHaveLocale(localePage.locale);
-  });
+  testAllLocales(
+    "should load home page in all locales",
+    async ({ localePage }) => {
+      await localePage.goto("/home");
+      await localePage.waitForLocaleLoad();
+      await expect(localePage.page).toHaveLocale(localePage.locale);
+    },
+  );
 
-  testAllLocales("should have correct HTML lang attribute", async ({ localePage }) => {
-    await localePage.goto("/home");
-    const currentLocale = await localePage.getCurrentLocale();
-    expect(currentLocale).toBe(localePage.locale);
-  });
+  testAllLocales(
+    "should have correct HTML lang attribute",
+    async ({ localePage }) => {
+      await localePage.goto("/home");
+      const currentLocale = await localePage.getCurrentLocale();
+      expect(currentLocale).toBe(localePage.locale);
+    },
+  );
 });

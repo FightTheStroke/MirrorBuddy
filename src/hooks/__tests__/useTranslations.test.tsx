@@ -21,10 +21,13 @@ describe("useTranslations hook utilities", () => {
     });
 
     it("should replace multiple variables", () => {
-      const result = formatMessage("Must be at least {min} and at most {max} characters", {
-        min: 8,
-        max: 100,
-      });
+      const result = formatMessage(
+        "Must be at least {min} and at most {max} characters",
+        {
+          min: 8,
+          max: 100,
+        },
+      );
       expect(result).toBe("Must be at least 8 and at most 100 characters");
     });
 
@@ -34,7 +37,9 @@ describe("useTranslations hook utilities", () => {
     });
 
     it("should handle multiple occurrences of the same variable", () => {
-      const result = formatMessage("{name} said hello to {name}", { name: "Alice" });
+      const result = formatMessage("{name} said hello to {name}", {
+        name: "Alice",
+      });
       expect(result).toBe("Alice said hello to Alice");
     });
 

@@ -2,11 +2,11 @@
 
 ## Quick Reference
 
-| Pattern | Type | When | Code |
-|---------|------|------|------|
-| `useTranslations()` | Client | Interactive components | `const t = useTranslations("ns")` |
-| `getTranslations()` | Server | Static content, metadata | `const t = await getTranslations("ns")` |
-| `useLocaleContext()` | Client | Language switching | `const { switchLocale } = useLocaleContext()` |
+| Pattern              | Type   | When                     | Code                                          |
+| -------------------- | ------ | ------------------------ | --------------------------------------------- |
+| `useTranslations()`  | Client | Interactive components   | `const t = useTranslations("ns")`             |
+| `getTranslations()`  | Server | Static content, metadata | `const t = await getTranslations("ns")`       |
+| `useLocaleContext()` | Client | Language switching       | `const { switchLocale } = useLocaleContext()` |
 
 ## Server Components (Recommended for Content)
 
@@ -74,11 +74,7 @@ import { useTranslations } from "next-intl";
 export function SaveButton() {
   const t = useTranslations("common");
 
-  return (
-    <button onClick={handleSave}>
-      {t("save")}
-    </button>
-  );
+  return <button onClick={handleSave}>{t("save")}</button>;
 }
 ```
 
@@ -139,7 +135,7 @@ export default async function Page() {
 }
 
 // ✓ Client Component
-"use client";
+("use client");
 import { useTranslations } from "next-intl";
 
 export function InteractiveForm() {
@@ -171,7 +167,9 @@ export function LocaleSwitcher() {
       onChange={(e) => switchLocale(e.target.value as Locale)}
     >
       {locales.map((loc) => (
-        <option key={loc} value={loc}>{localeNames[loc]}</option>
+        <option key={loc} value={loc}>
+          {localeNames[loc]}
+        </option>
       ))}
     </select>
   );

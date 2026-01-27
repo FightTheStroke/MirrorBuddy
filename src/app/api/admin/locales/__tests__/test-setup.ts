@@ -5,11 +5,16 @@
 import { vi, type Mock } from "vitest";
 import { prisma } from "@/lib/db";
 
-export const mockLocaleConfigFindMany = prisma.localeConfig.findMany as unknown as Mock;
-export const mockLocaleConfigFindUnique = prisma.localeConfig.findUnique as unknown as Mock;
-export const mockLocaleConfigCreate = prisma.localeConfig.create as unknown as Mock;
-export const mockLocaleConfigUpdate = prisma.localeConfig.update as unknown as Mock;
-export const mockLocaleConfigDelete = prisma.localeConfig.delete as unknown as Mock;
+export const mockLocaleConfigFindMany = prisma.localeConfig
+  .findMany as unknown as Mock;
+export const mockLocaleConfigFindUnique = prisma.localeConfig
+  .findUnique as unknown as Mock;
+export const mockLocaleConfigCreate = prisma.localeConfig
+  .create as unknown as Mock;
+export const mockLocaleConfigUpdate = prisma.localeConfig
+  .update as unknown as Mock;
+export const mockLocaleConfigDelete = prisma.localeConfig
+  .delete as unknown as Mock;
 
 export const mockValidateAdminAuth = vi.fn();
 

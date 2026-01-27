@@ -373,5 +373,26 @@
       "speaking": "Speaking",
       "you": "You"
     }
+  },
+  "trialConsent": {
+    "title": "Free Trial Mode",
+    "subtitle": "Privacy and GDPR consent",
+    "description": "To use the free trial mode, you must accept our privacy policy and essential cookies.",
+    "processingIntro": "During the free trial, we will process the data necessary to provide you with the educational service:",
+    "dataConversations": "Your conversations with the AI Maestros",
+    "dataProgress": "Your learning progress and preferences",
+    "dataCookies": "Essential cookies for session security",
+    "privacyLink": "Read the full privacy policy",
+    "checkboxLabel": "I have read and accept the privacy policy for the free trial",
+    "startButton": "Start trial",
+    "gdprNote": "GDPR Compliance: You can revoke consent at any time from settings. Your data will be deleted according to data protection regulations."
+  },
+  "trialLimits": {
+    "title": "Free trial limits",
+    "messagesDay": "Messages/day",
+    "voiceMinutes": "Voice minutes",
+    "toolsDay": "Tools/day",
+    "maestriAvailable": "Maestri available",
+    "trialDescription": "You are using the free trial version. Request beta access for unlimited limits and advanced features."
   }
 }

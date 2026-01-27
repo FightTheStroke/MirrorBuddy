@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
-import { logger } from '@/lib/logger';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import type { ExistingUserData } from '../types';
+import { useState, useEffect } from "react";
+import { logger } from "@/lib/logger";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import type { ExistingUserData } from "../types";
 
 export function useExistingUserData() {
-  const [existingUserData, setExistingUserData] = useState<ExistingUserData | null>(null);
+  const [existingUserData, setExistingUserData] =
+    useState<ExistingUserData | null>(null);
   const [hasCheckedExistingData, setHasCheckedExistingData] = useState(false);
   const { updateData } = useOnboardingStore();
 
   useEffect(() => {
     async function fetchExistingData() {
       try {
-        const response = await fetch('/api/onboarding');
+        const response = await fetch("/api/onboarding");
         const data = await response.json();
 
         if (data.hasExistingData && data.data) {
@@ -23,7 +24,9 @@ export function useExistingUserData() {
 
         setHasCheckedExistingData(true);
       } catch (error) {
-        logger.error('[WelcomePage] Failed to fetch existing data', { error: String(error) });
+        logger.error("[WelcomePage] Failed to fetch existing data", {
+          error: String(error),
+        });
         setHasCheckedExistingData(true);
       }
     }
@@ -35,4 +38,3 @@ export function useExistingUserData() {
     hasCheckedExistingData,
   };
 }
-

@@ -16,21 +16,21 @@ export function AuditoryA11y({
   settings: AuditorySettings;
   onSettingsChange: (settings: AuditorySettings) => void;
 }) {
-  const t = useTranslations('settings.accessibility');
+  const t = useTranslations("settings.accessibility");
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4">{t('auditoryTitle')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("auditoryTitle")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          {t('auditoryDesc')}
+          {t("auditoryDesc")}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title={t('auditoryVisualCues')}
-          description={t('auditoryVisualCuesDesc')}
+          title={t("auditoryVisualCues")}
+          description={t("auditoryVisualCuesDesc")}
           enabled={settings.visualCues}
           onToggle={() =>
             onSettingsChange({ ...settings, visualCues: !settings.visualCues })
@@ -38,8 +38,8 @@ export function AuditoryA11y({
         />
 
         <SettingCard
-          title={t('auditoryCaptions')}
-          description={t('auditoryCaptionsDesc')}
+          title={t("auditoryCaptions")}
+          description={t("auditoryCaptionsDesc")}
           enabled={settings.captionsEnabled}
           onToggle={() =>
             onSettingsChange({
@@ -50,8 +50,8 @@ export function AuditoryA11y({
         />
 
         <SettingCard
-          title={t('auditoryNoAudioOnly')}
-          description={t('auditoryNoAudioOnlyDesc')}
+          title={t("auditoryNoAudioOnly")}
+          description={t("auditoryNoAudioOnlyDesc")}
           enabled={settings.noAudioOnlyContent}
           onToggle={() =>
             onSettingsChange({

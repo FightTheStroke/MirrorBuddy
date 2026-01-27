@@ -31,6 +31,7 @@ const mockStudent: ExtendedStudentProfile = {
   simplifiedLanguage: false,
   adhdMode: false,
   learningDifferences: [],
+  crossMaestroEnabled: false,
 };
 
 describe("Locale-aware greeting generation", () => {

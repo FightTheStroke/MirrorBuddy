@@ -36,13 +36,8 @@ export function useLocale() {
   const currentLocale = useNextIntlLocale();
 
   // Get locale context (metadata and switching)
-  const {
-    locales,
-    defaultLocale,
-    localeNames,
-    localeFlags,
-    switchLocale,
-  } = useLocaleContext();
+  const { locales, defaultLocale, localeNames, localeFlags, switchLocale } =
+    useLocaleContext();
 
   return {
     locale: currentLocale,

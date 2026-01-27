@@ -3,11 +3,11 @@
 // Orchestrator-based execution path for tools
 // ============================================================================
 
-import { logger } from '@/lib/logger';
-import type { ToolExecutionResult, ToolContext } from '@/types/tools';
-import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
-import { getToolTypeFromFunctionName } from './tool-executor-mapping';
-import { saveToolOutput } from '@/lib/tools/tool-output-storage';
+import { logger } from "@/lib/logger";
+import type { ToolExecutionResult, ToolContext } from "@/types/tools";
+import { ToolOrchestrator } from "@/lib/tools/plugin/orchestrator";
+import { getToolTypeFromFunctionName } from "./tool-executor-mapping";
+import { saveToolOutput } from "@/lib/tools/tool-output-storage";
 
 /**
  * Execute a tool via the orchestrator path
@@ -19,7 +19,7 @@ export async function executeViaOrchestrator(
   context: ToolContext,
   orchestrator: ToolOrchestrator | null,
   toolId: string,
-  hasToolInRegistry: boolean
+  hasToolInRegistry: boolean,
 ): Promise<ToolExecutionResult | null> {
   if (!orchestrator || !hasToolInRegistry) {
     return null;
@@ -29,9 +29,18 @@ export async function executeViaOrchestrator(
 
   try {
     // Build orchestrator context
+    if (!context.userId || !context.sessionId) {
+      logger.warn("Tool orchestrator missing session context", {
+        functionName,
+        hasUserId: Boolean(context.userId),
+        hasSessionId: Boolean(context.sessionId),
+      });
+      return null;
+    }
+
     const orchestratorContext = {
-      userId: context.userId || 'unknown',
-      sessionId: context.sessionId || 'unknown',
+      userId: context.userId,
+      sessionId: context.sessionId,
       maestroId: context.maestroId,
       conversationId: context.conversationId,
       conversationHistory: [],
@@ -40,7 +49,11 @@ export async function executeViaOrchestrator(
     };
 
     // Execute through orchestrator
-    const result = await orchestrator.execute(functionName, args, orchestratorContext);
+    const result = await orchestrator.execute(
+      functionName,
+      args,
+      orchestratorContext,
+    );
 
     // Convert orchestrator result to ToolExecutionResult
     if (result.success) {
@@ -58,10 +71,12 @@ export async function executeViaOrchestrator(
             toolType,
             outputData as Record<string, unknown>,
             finalToolId,
-            { userId: context.userId, enableRAG: true }
+            { userId: context.userId, enableRAG: true },
           );
         } catch (error) {
-          logger.warn('Failed to save tool output to database:', { error: String(error) });
+          logger.warn("Failed to save tool output to database:", {
+            error: String(error),
+          });
         }
       }
 
@@ -76,7 +91,7 @@ export async function executeViaOrchestrator(
         success: false,
         toolId,
         toolType,
-        error: result.error || 'Unknown error',
+        error: result.error || "Unknown error",
       };
     }
   } catch (error) {

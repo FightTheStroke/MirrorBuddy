@@ -3,9 +3,9 @@
  * Provides utility functions to generate Next.js metadata with canonical URLs
  */
 
-import type { Metadata } from 'next';
-import type { Locale } from '@/i18n/config';
-import { generateCanonicalUrl } from './canonical-urls';
+import type { Metadata } from "next";
+import type { Locale } from "@/i18n/config";
+import { generateCanonicalUrl } from "./canonical-urls";
 
 /**
  * Merge canonical URL into existing metadata

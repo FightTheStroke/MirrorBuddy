@@ -6,18 +6,19 @@
 
 #### Acceptance Criteria Status
 
-| # | Criterion | Status | Evidence |
-|---|-----------|--------|----------|
-| 1 | Create custom ESLint rule | ✅ PASS | `/eslint-local-rules/index.js` - 95 line custom rule implementation |
-| 2 | Warn on Italian text in JSX (not comments/code) | ✅ PASS | Rule uses `JSXText` visitor node, detects Italian words + accented chars |
-| 3 | Allow exceptions via eslint-disable | ✅ PASS | `eslint-disable-next-line local-rules/no-hardcoded-italian` works |
-| 4 | Add rule to eslint.config.js | ✅ PASS | Line 42: `"local-rules/no-hardcoded-italian": "warn"` |
-| 5 | Rule severity: "warn" | ✅ PASS | Configured as "warn" for gradual adoption |
-| 6 | Document the rule | ✅ PASS | `/eslint-local-rules/README.md` with examples and usage |
+| #   | Criterion                                       | Status  | Evidence                                                                 |
+| --- | ----------------------------------------------- | ------- | ------------------------------------------------------------------------ |
+| 1   | Create custom ESLint rule                       | ✅ PASS | `/eslint-local-rules/index.js` - 95 line custom rule implementation      |
+| 2   | Warn on Italian text in JSX (not comments/code) | ✅ PASS | Rule uses `JSXText` visitor node, detects Italian words + accented chars |
+| 3   | Allow exceptions via eslint-disable             | ✅ PASS | `eslint-disable-next-line local-rules/no-hardcoded-italian` works        |
+| 4   | Add rule to eslint.config.js                    | ✅ PASS | Line 42: `"local-rules/no-hardcoded-italian": "warn"`                    |
+| 5   | Rule severity: "warn"                           | ✅ PASS | Configured as "warn" for gradual adoption                                |
+| 6   | Document the rule                               | ✅ PASS | `/eslint-local-rules/README.md` with examples and usage                  |
 
 ### Implementation Summary
 
 **Files Created:**
+
 1. `eslint-local-rules/index.js` - Custom ESLint rule plugin (95 lines)
 2. `eslint-local-rules/README.md` - Rule documentation with examples
 3. `eslint.config.js` - ESLint 9 configuration with custom rule enabled
@@ -26,6 +27,7 @@
 **How It Works:**
 
 The rule detects hardcoded Italian strings by:
+
 1. Listening for `JSXText` nodes (text inside JSX elements)
 2. Checking for Italian patterns:
    - Common Italian words (ciao, salva, benvenuto, etc.)
@@ -36,15 +38,17 @@ The rule detects hardcoded Italian strings by:
 
 ```jsx
 // ❌ Triggers warning
-<p>Ciao mondo</p>
+<p>Ciao mondo</p>;
 
 // ✅ No warning
 const t = useTranslations();
-<p>{t('greeting')}</p>
+<p>{t("greeting")}</p>;
 
 // ✅ No warning (disabled)
-{/* eslint-disable-next-line local-rules/no-hardcoded-italian */}
-<p>Giuseppe Garibaldi</p>
+{
+  /* eslint-disable-next-line local-rules/no-hardcoded-italian */
+}
+<p>Giuseppe Garibaldi</p>;
 ```
 
 ### Test Coverage
@@ -67,23 +71,29 @@ const t = useTranslations();
 ### How to Use
 
 **Run ESLint:**
+
 ```bash
 npm run lint src/
 ```
 
 **Expected output for hardcoded Italian:**
+
 ```
 /path/to/file.tsx
   15:11  warning  Hardcoded Italian text detected in JSX. Use useTranslations() hook instead for i18n support  local-rules/no-hardcoded-italian
 ```
 
 **Disable the rule for a line:**
+
 ```jsx
-{/* eslint-disable-next-line local-rules/no-hardcoded-italian */}
-<p>Exception text</p>
+{
+  /* eslint-disable-next-line local-rules/no-hardcoded-italian */
+}
+<p>Exception text</p>;
 ```
 
 **Disable for entire component:**
+
 ```jsx
 // eslint-disable local-rules/no-hardcoded-italian
 const NoTranslateComponent = () => {

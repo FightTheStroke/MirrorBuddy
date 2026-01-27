@@ -85,11 +85,11 @@ Our middleware and layout configuration ensure this happens automatically.
 
 ## CSP Policy
 
-Current policy (from `src/middleware.ts`):
+Current policy (from `src/proxy.ts`):
 
-- `script-src 'self' 'nonce-{random}' 'strict-dynamic'` - Only allow scripts with nonce or loaded by nonce-approved scripts
+- `script-src 'self' 'nonce-{random}' 'strict-dynamic' 'unsafe-inline'` - Nonce-gated scripts + legacy fallback
 - `'strict-dynamic'` - Scripts loaded by approved scripts are automatically trusted
-- No `'unsafe-inline'` - Blocks all inline scripts without nonce
+- `'unsafe-inline'` is ignored by modern browsers when a nonce is present
 
 ## Security Notes
 

@@ -11,11 +11,13 @@ Detects hardcoded Italian strings in JSX content and warns developers to use the
 This rule checks for Italian text (via common words and accented characters) that appears directly in JSX content and suggests using the i18n system instead.
 
 **What it detects:**
+
 - Italian text in JSX elements: `<p>Ciao mondo</p>`
 - Common Italian words (benvenuto, salva, etc.)
 - Italian accented characters (à, è, é, ì, ò, ù)
 
 **What it ignores:**
+
 - Comments (even with Italian text)
 - Variable names and identifiers
 - Import statements
@@ -47,15 +49,15 @@ This rule checks for Italian text (via common words and accented characters) tha
 // ✅ Using useTranslations hook
 const MyComponent = () => {
   const t = useTranslations();
-  return <p>{t('greeting')}</p>;
+  return <p>{t("greeting")}</p>;
 };
 
 // ✅ Using imported translations object
-<p>{translations.welcome}</p>
+<p>{translations.welcome}</p>;
 
 // ✅ Using variable (not evaluated as hardcoded)
-const message = 'Ciao';
-<p>{message}</p>
+const message = "Ciao";
+<p>{message}</p>;
 ```
 
 ### Severity

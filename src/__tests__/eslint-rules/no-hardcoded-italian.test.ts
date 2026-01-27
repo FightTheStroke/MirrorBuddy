@@ -31,7 +31,10 @@ describe("no-hardcoded-italian rule - Detection Logic", () => {
     // Check for common Italian words
     for (const word of ITALIAN_COMMON_WORDS) {
       // Use word boundary that includes punctuation and end of string
-      const wordPattern = new RegExp(`(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`, "i");
+      const wordPattern = new RegExp(
+        `(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`,
+        "i",
+      );
       if (wordPattern.test(lowercased)) {
         return true;
       }

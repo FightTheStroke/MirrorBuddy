@@ -822,5 +822,12 @@
     },
     "weeklyActivity": "Weekly Activity",
     "weeklyStats": "Weekly Stats"
+  },
+  "crossMaestroMemory": {
+    "title": "Cross-Disciplinary Memory",
+    "badge": "Pro",
+    "description": "Allow your teachers to access what you have learned from other maestros. This improves the quality of personalized teaching.",
+    "enableLabel": "Enable cross-disciplinary memory",
+    "enableDescription": "Your teachers will be able to see your learning path"
   }
 }

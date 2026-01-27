@@ -46,8 +46,13 @@ export function TranslationExampleWithVariables() {
 
 export function TranslationExampleCommon() {
   // Using the common translations helper
-  const { save, cancel, loading, edit, delete: deleteText } =
-    useCommonTranslations();
+  const {
+    save,
+    cancel,
+    loading,
+    edit,
+    delete: deleteText,
+  } = useCommonTranslations();
 
   return (
     <div>

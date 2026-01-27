@@ -10,14 +10,15 @@
 
 ## Step 1: Choose a Namespace
 
-| Namespace | Use For | Examples |
-|-----------|---------|----------|
-| `common` | Universal UI | save, delete, loading, error |
-| `navigation` | Menu & links | home, chat, dashboard |
-| `auth` | Login & validation | login, emailRequired |
-| `{feature}` | Feature-specific | tools, flashcards, mindmap |
+| Namespace    | Use For            | Examples                     |
+| ------------ | ------------------ | ---------------------------- |
+| `common`     | Universal UI       | save, delete, loading, error |
+| `navigation` | Menu & links       | home, chat, dashboard        |
+| `auth`       | Login & validation | login, emailRequired         |
+| `{feature}`  | Feature-specific   | tools, flashcards, mindmap   |
 
 **Rules:**
+
 - Keep `common` minimal
 - Create feature namespaces for complex domains
 - Max nesting: 3 levels (`namespace.group.key`)
@@ -102,6 +103,7 @@ npm run typecheck
 ```
 
 Verifies:
+
 - All keys exist in all languages
 - Variable names match templates
 - No typos in namespace or key names
@@ -113,6 +115,7 @@ npm run dev
 ```
 
 Visit each locale URL and verify translations:
+
 - http://localhost:3000/it
 - http://localhost:3000/en
 - http://localhost:3000/fr
@@ -197,6 +200,7 @@ git commit -m "feat: add share button translations"
 **Problem:** Key missing in message file
 
 **Solution:**
+
 1. Add key to ALL language files
 2. Check spelling (case-sensitive)
 3. Run `npm run typecheck`
@@ -206,6 +210,7 @@ git commit -m "feat: add share button translations"
 **Problem:** Key not found in namespace
 
 **Solution:**
+
 1. Verify namespace name: `useTranslations("common")`
 2. Check key exists in message file
 3. Validate JSON syntax
@@ -215,6 +220,7 @@ git commit -m "feat: add share button translations"
 **Problem:** `{min}` appears instead of value
 
 **Solution:**
+
 1. Check variable name in message: `{min}` not `{minimum}`
 2. Pass variable in call: `t("key", { min: 8 })`
 3. Verify spelling matches exactly

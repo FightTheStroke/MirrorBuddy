@@ -33,8 +33,10 @@ vi.mock("@/lib/locale/locale-audit-service", () => ({
 
 import { GET as GET_LIST, POST } from "../route";
 
-const mockLocaleConfigFindMany = prisma.localeConfig.findMany as unknown as Mock;
-const mockLocaleConfigFindUnique = prisma.localeConfig.findUnique as unknown as Mock;
+const mockLocaleConfigFindMany = prisma.localeConfig
+  .findMany as unknown as Mock;
+const mockLocaleConfigFindUnique = prisma.localeConfig
+  .findUnique as unknown as Mock;
 const mockLocaleConfigCreate = prisma.localeConfig.create as unknown as Mock;
 
 function createMockLocale(overrides = {}) {
@@ -58,21 +60,30 @@ describe("GET /api/admin/locales", () => {
   });
 
   it("returns 401 without admin auth", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: false, isAdmin: false });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: false,
+      isAdmin: false,
+    });
     const request = new NextRequest("http://localhost:3000/api/admin/locales");
     const response = await GET_LIST(request);
     expect(response.status).toBe(401);
   });
 
   it("returns 401 if not admin", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: false });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: false,
+    });
     const request = new NextRequest("http://localhost:3000/api/admin/locales");
     const response = await GET_LIST(request);
     expect(response.status).toBe(401);
   });
 
   it("returns all locales ordered by countryName", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindMany.mockResolvedValueOnce([
       createMockLocale({ id: "IT", countryName: "Italia" }),
       createMockLocale({ id: "FR", countryName: "France" }),
@@ -90,7 +101,10 @@ describe("GET /api/admin/locales", () => {
   });
 
   it("handles database errors", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindMany.mockRejectedValueOnce(new Error("DB error"));
     const request = new NextRequest("http://localhost:3000/api/admin/locales");
     const response = await GET_LIST(request);
@@ -106,17 +120,28 @@ describe("POST /api/admin/locales", () => {
   });
 
   it("returns 401 without admin auth", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: false, isAdmin: false });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: false,
+      isAdmin: false,
+    });
     const request = new NextRequest("http://localhost:3000/api/admin/locales", {
       method: "POST",
-      body: JSON.stringify({ id: "IT", countryName: "Italia", primaryLocale: "it", primaryLanguageMaestroId: "m1" }),
+      body: JSON.stringify({
+        id: "IT",
+        countryName: "Italia",
+        primaryLocale: "it",
+        primaryLanguageMaestroId: "m1",
+      }),
     });
     const response = await POST(request);
     expect(response.status).toBe(401);
   });
 
   it("validates required fields", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     const request = new NextRequest("http://localhost:3000/api/admin/locales", {
       method: "POST",
       body: JSON.stringify({ id: "IT" }),
@@ -126,7 +151,10 @@ describe("POST /api/admin/locales", () => {
   });
 
   it("rejects duplicate locale ID with 409", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     const request = new NextRequest("http://localhost:3000/api/admin/locales", {
       method: "POST",
@@ -142,7 +170,11 @@ describe("POST /api/admin/locales", () => {
   });
 
   it("creates new locale with status 201", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true, userId: "admin-1" });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     const mockLocale = createMockLocale();
     mockLocaleConfigCreate.mockResolvedValueOnce(mockLocale);
@@ -165,7 +197,11 @@ describe("POST /api/admin/locales", () => {
   });
 
   it("sets enabled=true by default", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true, userId: "admin-1" });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     mockLocaleConfigCreate.mockResolvedValueOnce(createMockLocale());
 
@@ -181,12 +217,17 @@ describe("POST /api/admin/locales", () => {
 
     await POST(request);
     expect(mockLocaleConfigCreate).toHaveBeenCalledWith(
-      expect.objectContaining({ data: expect.objectContaining({ enabled: true }) })
+      expect.objectContaining({
+        data: expect.objectContaining({ enabled: true }),
+      }),
     );
   });
 
   it("handles database errors on create", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     mockLocaleConfigCreate.mockRejectedValueOnce(new Error("DB error"));
 

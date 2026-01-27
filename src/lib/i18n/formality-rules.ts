@@ -446,9 +446,7 @@ export function getFormalitySection(
 /**
  * Get formality terminology for a language
  */
-export function getFormalityTerms(
-  language: SupportedLanguage,
-): FormalityTerms {
+export function getFormalityTerms(language: SupportedLanguage): FormalityTerms {
   return FORMALITY_TERMS[language];
 }
 

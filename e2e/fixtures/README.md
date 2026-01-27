@@ -17,21 +17,21 @@ These fixtures provide:
 ### Basic Usage
 
 ```typescript
-import { test, expect } from './fixtures';
+import { test, expect } from "./fixtures";
 
-test('should display Italian home page', async ({ localePage }) => {
-  await localePage.goto('/home');
-  await expect(localePage.page).toHaveLocale('it');
+test("should display Italian home page", async ({ localePage }) => {
+  await localePage.goto("/home");
+  await expect(localePage.page).toHaveLocale("it");
 });
 ```
 
 ### Test All Locales
 
 ```typescript
-import { testAllLocales } from './fixtures';
+import { testAllLocales } from "./fixtures";
 
-testAllLocales('should load home page', async ({ localePage }) => {
-  await localePage.goto('/home');
+testAllLocales("should load home page", async ({ localePage }) => {
+  await localePage.goto("/home");
   await expect(localePage.page).toHaveLocale(localePage.locale);
 });
 ```
@@ -39,11 +39,11 @@ testAllLocales('should load home page', async ({ localePage }) => {
 ### Test Specific Locale
 
 ```typescript
-import { testLocale } from './fixtures';
+import { testLocale } from "./fixtures";
 
-testLocale('en', 'should display English content', async ({ localePage }) => {
-  await localePage.goto('/chat');
-  await expect(localePage.page).toHaveLocale('en');
+testLocale("en", "should display English content", async ({ localePage }) => {
+  await localePage.goto("/chat");
+  await expect(localePage.page).toHaveLocale("en");
 });
 ```
 
@@ -54,9 +54,9 @@ testLocale('en', 'should display English content', async ({ localePage }) => {
 Locale-aware page wrapper that provides navigation with automatic locale prefixing.
 
 ```typescript
-test('navigate with locale', async ({ localePage }) => {
+test("navigate with locale", async ({ localePage }) => {
   // Automatically navigates to /it/home
-  await localePage.goto('/home');
+  await localePage.goto("/home");
 
   // Get current locale
   const locale = await localePage.getCurrentLocale();
@@ -74,14 +74,14 @@ Configure locale behavior for your test.
 ```typescript
 test.use({
   localeOptions: {
-    locale: 'en',
-    acceptLanguage: 'en-US,en;q=0.9',
+    locale: "en",
+    acceptLanguage: "en-US,en;q=0.9",
     setLocaleCookie: true,
   },
 });
 
-test('test with English locale', async ({ localePage }) => {
-  await localePage.goto('/home');
+test("test with English locale", async ({ localePage }) => {
+  await localePage.goto("/home");
   // Page will be in English
 });
 ```
@@ -93,13 +93,14 @@ test('test with English locale', async ({ localePage }) => {
 Assert that a page is in the expected locale.
 
 ```typescript
-test('verify page locale', async ({ page }) => {
-  await page.goto('/it/home');
-  await expect(page).toHaveLocale('it');
+test("verify page locale", async ({ page }) => {
+  await page.goto("/it/home");
+  await expect(page).toHaveLocale("it");
 });
 ```
 
 Checks:
+
 - HTML `lang` attribute
 - URL locale prefix
 - NEXT_LOCALE cookie (if set)
@@ -109,10 +110,10 @@ Checks:
 Assert that an element contains locale-specific text.
 
 ```typescript
-test('verify translated content', async ({ page }) => {
-  await page.goto('/it/home');
-  const heading = page.locator('h1');
-  await expect(heading).toHaveLocaleText('Benvenuto');
+test("verify translated content", async ({ page }) => {
+  await page.goto("/it/home");
+  const heading = page.locator("h1");
+  await expect(heading).toHaveLocaleText("Benvenuto");
 });
 ```
 
@@ -121,22 +122,22 @@ test('verify translated content', async ({ page }) => {
 ### Navigation Helpers
 
 ```typescript
-import { buildLocalizedPath, extractLocaleFromUrl } from './fixtures';
+import { buildLocalizedPath, extractLocaleFromUrl } from "./fixtures";
 
 // Build localized URL
-const path = buildLocalizedPath('it', '/home'); // '/it/home'
+const path = buildLocalizedPath("it", "/home"); // '/it/home'
 
 // Extract locale from URL
-const locale = extractLocaleFromUrl('/en/chat'); // 'en'
+const locale = extractLocaleFromUrl("/en/chat"); // 'en'
 ```
 
 ### Verification Helpers
 
 ```typescript
-import { verifyPageLocale, waitForLocale } from './fixtures';
+import { verifyPageLocale, waitForLocale } from "./fixtures";
 
 // Detailed verification
-const verification = await verifyPageLocale(page, 'it');
+const verification = await verifyPageLocale(page, "it");
 console.log(verification);
 // {
 //   locale: 'it',
@@ -148,16 +149,20 @@ console.log(verification);
 // }
 
 // Wait for locale to be applied
-await waitForLocale(page, 'en', 5000);
+await waitForLocale(page, "en", 5000);
 ```
 
 ### Cookie Helpers
 
 ```typescript
-import { setLocaleCookie, getLocaleCookie, clearLocaleCookie } from './fixtures';
+import {
+  setLocaleCookie,
+  getLocaleCookie,
+  clearLocaleCookie,
+} from "./fixtures";
 
 // Set user preference
-await setLocaleCookie(page, 'en');
+await setLocaleCookie(page, "en");
 
 // Get current preference
 const locale = await getLocaleCookie(page); // 'en'
@@ -169,9 +174,9 @@ await clearLocaleCookie(page);
 ### Content Matchers
 
 ```typescript
-import { contentMatchers } from './fixtures';
+import { contentMatchers } from "./fixtures";
 
-const heading = page.locator('h1');
+const heading = page.locator("h1");
 
 // Check for Italian content
 const isItalian = await contentMatchers.hasItalianText(heading);
@@ -185,29 +190,25 @@ const isEnglish = await contentMatchers.hasEnglishText(heading);
 ### Pattern 1: Test Page in All Locales
 
 ```typescript
-import { localePatterns } from './fixtures';
+import { localePatterns } from "./fixtures";
 
-test('all locales work', async ({ page }) => {
-  await localePatterns.testPageInAllLocales(
-    page,
-    '/home',
-    async (locale) => {
-      // Custom verification for each locale
-      const title = await page.title();
-      expect(title).toBeTruthy();
-    }
-  );
+test("all locales work", async ({ page }) => {
+  await localePatterns.testPageInAllLocales(page, "/home", async (locale) => {
+    // Custom verification for each locale
+    const title = await page.title();
+    expect(title).toBeTruthy();
+  });
 });
 ```
 
 ### Pattern 2: Test Locale Persistence
 
 ```typescript
-test('locale persists across navigation', async ({ page }) => {
-  await localePatterns.testLocalePersistence(page, 'it', [
-    '/home',
-    '/chat',
-    '/settings',
+test("locale persists across navigation", async ({ page }) => {
+  await localePatterns.testLocalePersistence(page, "it", [
+    "/home",
+    "/chat",
+    "/settings",
   ]);
 });
 ```
@@ -215,12 +216,12 @@ test('locale persists across navigation', async ({ page }) => {
 ### Pattern 3: Test Locale Switching
 
 ```typescript
-test('user can switch locales', async ({ page }) => {
+test("user can switch locales", async ({ page }) => {
   await localePatterns.testLocaleSwitching(
     page,
-    'it',  // from
-    'en',  // to
-    '/home'
+    "it", // from
+    "en", // to
+    "/home",
   );
 });
 ```
@@ -230,61 +231,64 @@ test('user can switch locales', async ({ page }) => {
 ### Example 1: User from Italy
 
 ```typescript
-test('Italian user visits site', async ({ page, context }) => {
+test("Italian user visits site", async ({ page, context }) => {
   // Simulate Italian browser
   await context.setExtraHTTPHeaders({
-    'Accept-Language': 'it-IT,it;q=0.9,en;q=0.8',
+    "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
   });
 
-  await page.goto('/it/home');
-  await expect(page).toHaveLocale('it');
+  await page.goto("/it/home");
+  await expect(page).toHaveLocale("it");
 });
 ```
 
 ### Example 2: User Preference Override
 
 ```typescript
-test('user preference overrides browser language', async ({ page, context }) => {
+test("user preference overrides browser language", async ({
+  page,
+  context,
+}) => {
   // Browser sends Italian
   await context.setExtraHTTPHeaders({
-    'Accept-Language': 'it-IT,it;q=0.9',
+    "Accept-Language": "it-IT,it;q=0.9",
   });
 
   // But user prefers English
-  await setLocaleCookie(page, 'en');
+  await setLocaleCookie(page, "en");
 
-  await page.goto('/en/home');
-  await expect(page).toHaveLocale('en');
+  await page.goto("/en/home");
+  await expect(page).toHaveLocale("en");
 });
 ```
 
 ### Example 3: Navigate Between Locales
 
 ```typescript
-test('navigate between locale versions', async ({ page }) => {
+test("navigate between locale versions", async ({ page }) => {
   // Start in Italian
-  await page.goto('/it/chat');
-  await expect(page).toHaveLocale('it');
+  await page.goto("/it/chat");
+  await expect(page).toHaveLocale("it");
 
   // Switch to English
-  await page.goto('/en/chat');
-  await expect(page).toHaveLocale('en');
+  await page.goto("/en/chat");
+  await expect(page).toHaveLocale("en");
 
   // Switch to French
-  await page.goto('/fr/chat');
-  await expect(page).toHaveLocale('fr');
+  await page.goto("/fr/chat");
+  await expect(page).toHaveLocale("fr");
 });
 ```
 
 ## Supported Locales
 
-| Code | Language | Accept-Language Header |
-|------|----------|------------------------|
+| Code | Language | Accept-Language Header    |
+| ---- | -------- | ------------------------- |
 | `it` | Italiano | `it-IT,it;q=0.9,en;q=0.8` |
-| `en` | English | `en-US,en;q=0.9` |
+| `en` | English  | `en-US,en;q=0.9`          |
 | `fr` | Français | `fr-FR,fr;q=0.9,en;q=0.8` |
-| `de` | Deutsch | `de-DE,de;q=0.9,en;q=0.8` |
-| `es` | Español | `es-ES,es;q=0.9,en;q=0.8` |
+| `de` | Deutsch  | `de-DE,de;q=0.9,en;q=0.8` |
+| `es` | Español  | `es-ES,es;q=0.9,en;q=0.8` |
 
 ## API Reference
 
@@ -349,7 +353,7 @@ test('navigate between locale versions', async ({ page }) => {
 
 ```typescript
 // Check detailed verification
-const verification = await verifyPageLocale(page, 'it');
+const verification = await verifyPageLocale(page, "it");
 console.log(verification.errors);
 ```
 
@@ -358,14 +362,14 @@ console.log(verification.errors);
 ```typescript
 // Verify cookie was set
 const cookie = await getLocaleCookie(page);
-console.log('Cookie value:', cookie);
+console.log("Cookie value:", cookie);
 ```
 
 ### Wrong locale after navigation
 
 ```typescript
 // Wait for locale to be applied
-await waitForLocale(page, 'en', 10000);
+await waitForLocale(page, "en", 10000);
 ```
 
 ## See Also

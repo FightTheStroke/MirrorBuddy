@@ -690,6 +690,13 @@
       }
     }
   },
+  "crossMaestroMemory": {
+    "title": "Memoria Interdisciplinare",
+    "badge": "Pro",
+    "description": "Consenti ai tuoi professori di accedere a ciò che hai imparato da altri maestri. Questo migliora la qualità dell'insegnamento personalizzato.",
+    "enableLabel": "Abilita memoria cross-disciplinare",
+    "enableDescription": "I tuoi insegnanti potranno conoscere il tuo percorso di apprendimento"
+  },
   "ambientAudio": {
     "activeLayers": "Livelli Attivi",
     "addLayer": "Aggiungi Layer",

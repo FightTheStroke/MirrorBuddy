@@ -31,6 +31,7 @@ Add strings to `src/i18n/messages/it.json`:
 ### 3. Update Components to Use i18n
 
 **Before:**
+
 ```tsx
 function SaveButton() {
   return <button>Salva</button>;
@@ -38,12 +39,13 @@ function SaveButton() {
 ```
 
 **After:**
+
 ```tsx
-import { useTranslations } from '@/hooks/useTranslations';
+import { useTranslations } from "@/hooks/useTranslations";
 
 function SaveButton() {
-  const t = useTranslations('common');
-  return <button>{t('save')}</button>;
+  const t = useTranslations("common");
+  return <button>{t("save")}</button>;
 }
 ```
 
@@ -52,8 +54,8 @@ function SaveButton() {
 Use variable interpolation for dynamic values:
 
 ```tsx
-const t = useTranslations('common');
-<p>{t('itemsFound', { count: itemCount })}</p>
+const t = useTranslations("common");
+<p>{t("itemsFound", { count: itemCount })}</p>;
 ```
 
 Message file: `"{count} elementi trovati"`
@@ -63,14 +65,14 @@ Message file: `"{count} elementi trovati"`
 For components accessing multiple namespaces:
 
 ```tsx
-import { useTranslationsGlobal } from '@/hooks/useTranslations';
+import { useTranslationsGlobal } from "@/hooks/useTranslations";
 
 function ComplexComponent() {
   const t = useTranslationsGlobal();
   return (
     <div>
-      <h1>{t('common.title')}</h1>
-      <span>{t('errors.notFound')}</span>
+      <h1>{t("common.title")}</h1>
+      <span>{t("errors.notFound")}</span>
     </div>
   );
 }
@@ -81,11 +83,13 @@ function ComplexComponent() {
 **Rule:** `local-rules/no-hardcoded-italian`
 
 **Detects:**
+
 - JSX text nodes with Italian content
 - Common Italian vocabulary (ciao, benvenuto, accedi, salva, etc.)
 - Italian accented characters
 
 **Ignores:**
+
 - Comments, variable names, imports, expressions `{variable}`, eslint-disable lines
 
 **Disable for legitimate cases:**
@@ -109,11 +113,13 @@ npm run i18n:check
 ```
 
 **What it does:**
+
 1. Loads all locale files (it, en, fr, de, es)
 2. Compares keys across locales
 3. Reports missing/extra keys
 
 **Sample output:**
+
 ```
 ✓ it.json: 35/35 keys
 ✓ en.json: 35/35 keys
@@ -139,30 +145,33 @@ Result: FAIL (5 missing keys)
 
 ## Namespace Organization
 
-| Namespace       | Purpose                  | Examples           |
-|-----------------|--------------------------|-------------------|
-| `common`        | UI labels, actions       | save, cancel, loading |
-| `navigation`    | Routes, menus            | home, settings    |
-| `auth`          | Login, registration      | login, register   |
-| `errors`        | Error messages           | notFound, serverError |
-| `validation`    | Form validation          | required, email   |
-| `status`        | Status indicators        | active, pending   |
-| `accessibility` | ARIA labels              | skipToContent     |
+| Namespace       | Purpose             | Examples              |
+| --------------- | ------------------- | --------------------- |
+| `common`        | UI labels, actions  | save, cancel, loading |
+| `navigation`    | Routes, menus       | home, settings        |
+| `auth`          | Login, registration | login, register       |
+| `errors`        | Error messages      | notFound, serverError |
+| `validation`    | Form validation     | required, email       |
+| `status`        | Status indicators   | active, pending       |
+| `accessibility` | ARIA labels         | skipToContent         |
 
 ## Best Practices
 
 1. **Use specific namespaces** (not global)
+
    ```tsx
    ✅ const t = useTranslations('auth');
    ❌ const t = useTranslationsGlobal();
    ```
 
 2. **Use common translations hook** for frequent strings
+
    ```tsx
    ✅ const { save, cancel } = useCommonTranslations();
    ```
 
 3. **Keep keys hierarchical** for related strings
+
    ```json
    ✅ "form.labels.firstName": "Nome"
    ```
@@ -174,9 +183,9 @@ Result: FAIL (5 missing keys)
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| ESLint warns but text needed in Italian | Use `eslint-disable-next-line no-hardcoded-italian` |
-| i18n-check fails with missing keys | Add keys to all locale files (it, en, fr, de, es) |
-| Variable interpolation not working | Check format: `"{variable}"` and pass: `t('key', { variable: value })` |
-| Component still not translating | Use `useTranslations` hook, verify namespace matches message file |
+| Issue                                   | Solution                                                               |
+| --------------------------------------- | ---------------------------------------------------------------------- |
+| ESLint warns but text needed in Italian | Use `eslint-disable-next-line no-hardcoded-italian`                    |
+| i18n-check fails with missing keys      | Add keys to all locale files (it, en, fr, de, es)                      |
+| Variable interpolation not working      | Check format: `"{variable}"` and pass: `t('key', { variable: value })` |
+| Component still not translating         | Use `useTranslations` hook, verify namespace matches message file      |

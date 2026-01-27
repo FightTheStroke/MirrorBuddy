@@ -5,6 +5,7 @@
  */
 
 import { test, expect } from "./fixtures";
+import { waitForHomeReady } from "./helpers/wait-for-home";
 
 test.describe("Mobile Responsive Layout", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
@@ -13,9 +14,7 @@ test.describe("Mobile Responsive Layout", () => {
     await page.goto("/", { waitUntil: "domcontentloaded" });
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, the main heading "Professori" appears (it's an h1, not a button)
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
-      timeout: 20000,
-    });
+    await waitForHomeReady(page);
   });
 
   test("header should be visible and properly sized", async ({

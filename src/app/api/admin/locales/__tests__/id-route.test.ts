@@ -33,7 +33,8 @@ vi.mock("@/lib/locale/locale-audit-service", () => ({
 
 import { GET, PUT, DELETE } from "../[id]/route";
 
-const mockLocaleConfigFindUnique = prisma.localeConfig.findUnique as unknown as Mock;
+const mockLocaleConfigFindUnique = prisma.localeConfig
+  .findUnique as unknown as Mock;
 const mockLocaleConfigUpdate = prisma.localeConfig.update as unknown as Mock;
 const mockLocaleConfigDelete = prisma.localeConfig.delete as unknown as Mock;
 
@@ -58,25 +59,46 @@ describe("GET /api/admin/locales/[id]", () => {
   });
 
   it("returns 401 without admin auth", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: false, isAdmin: false });
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT");
-    const response = await GET(request, { params: Promise.resolve({ id: "IT" }) });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: false,
+      isAdmin: false,
+    });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(401);
   });
 
   it("returns 404 when locale not found", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT");
-    const response = await GET(request, { params: Promise.resolve({ id: "IT" }) });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(404);
   });
 
   it("returns single locale by ID", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT");
-    const response = await GET(request, { params: Promise.resolve({ id: "IT" }) });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -84,10 +106,17 @@ describe("GET /api/admin/locales/[id]", () => {
   });
 
   it("handles database errors", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockRejectedValueOnce(new Error("DB error"));
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT");
-    const response = await GET(request, { params: Promise.resolve({ id: "IT" }) });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+    );
+    const response = await GET(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(500);
   });
 });
@@ -100,38 +129,63 @@ describe("PUT /api/admin/locales/[id]", () => {
   });
 
   it("returns 401 without admin auth", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: false, isAdmin: false });
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "PUT",
-      body: JSON.stringify({ countryName: "Updated" }),
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: false,
+      isAdmin: false,
     });
-    const response = await PUT(request, { params: Promise.resolve({ id: "IT" }) });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "PUT",
+        body: JSON.stringify({ countryName: "Updated" }),
+      },
+    );
+    const response = await PUT(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(401);
   });
 
   it("returns 404 when locale not found", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
-    mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "PUT",
-      body: JSON.stringify({ countryName: "Updated" }),
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
     });
-    const response = await PUT(request, { params: Promise.resolve({ id: "IT" }) });
+    mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "PUT",
+        body: JSON.stringify({ countryName: "Updated" }),
+      },
+    );
+    const response = await PUT(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(404);
   });
 
   it("updates locale with partial data", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true, userId: "admin-1" });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    });
     const existing = createMockLocale();
     mockLocaleConfigFindUnique.mockResolvedValueOnce(existing);
     const updated = { ...existing, countryName: "Updated Country" };
     mockLocaleConfigUpdate.mockResolvedValueOnce(updated);
 
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "PUT",
-      body: JSON.stringify({ countryName: "Updated Country" }),
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "PUT",
+        body: JSON.stringify({ countryName: "Updated Country" }),
+      },
+    );
+    const response = await PUT(request, {
+      params: Promise.resolve({ id: "IT" }),
     });
-    const response = await PUT(request, { params: Promise.resolve({ id: "IT" }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -140,17 +194,33 @@ describe("PUT /api/admin/locales/[id]", () => {
   });
 
   it("updates multiple fields", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true, userId: "admin-1" });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    });
     const existing = createMockLocale();
     mockLocaleConfigFindUnique.mockResolvedValueOnce(existing);
-    const updated = { ...existing, enabled: false, secondaryLocales: ["en", "fr"] };
+    const updated = {
+      ...existing,
+      enabled: false,
+      secondaryLocales: ["en", "fr"],
+    };
     mockLocaleConfigUpdate.mockResolvedValueOnce(updated);
 
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "PUT",
-      body: JSON.stringify({ enabled: false, secondaryLocales: ["en", "fr"] }),
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "PUT",
+        body: JSON.stringify({
+          enabled: false,
+          secondaryLocales: ["en", "fr"],
+        }),
+      },
+    );
+    const response = await PUT(request, {
+      params: Promise.resolve({ id: "IT" }),
     });
-    const response = await PUT(request, { params: Promise.resolve({ id: "IT" }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -158,15 +228,23 @@ describe("PUT /api/admin/locales/[id]", () => {
   });
 
   it("handles database errors on update", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     mockLocaleConfigUpdate.mockRejectedValueOnce(new Error("DB error"));
 
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "PUT",
-      body: JSON.stringify({ countryName: "Updated" }),
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "PUT",
+        body: JSON.stringify({ countryName: "Updated" }),
+      },
+    );
+    const response = await PUT(request, {
+      params: Promise.resolve({ id: "IT" }),
     });
-    const response = await PUT(request, { params: Promise.resolve({ id: "IT" }) });
     expect(response.status).toBe(500);
   });
 });
@@ -179,33 +257,58 @@ describe("DELETE /api/admin/locales/[id]", () => {
   });
 
   it("returns 401 without admin auth", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: false, isAdmin: false });
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "DELETE",
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: false,
+      isAdmin: false,
     });
-    const response = await DELETE(request, { params: Promise.resolve({ id: "IT" }) });
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "DELETE",
+      },
+    );
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(401);
   });
 
   it("returns 404 when locale not found", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
-    mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "DELETE",
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
     });
-    const response = await DELETE(request, { params: Promise.resolve({ id: "IT" }) });
+    mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "DELETE",
+      },
+    );
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: "IT" }),
+    });
     expect(response.status).toBe(404);
   });
 
   it("deletes existing locale", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true, userId: "admin-1" });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     mockLocaleConfigDelete.mockResolvedValueOnce(createMockLocale());
 
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "DELETE",
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "DELETE",
+      },
+    );
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: "IT" }),
     });
-    const response = await DELETE(request, { params: Promise.resolve({ id: "IT" }) });
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -214,14 +317,22 @@ describe("DELETE /api/admin/locales/[id]", () => {
   });
 
   it("handles database errors on delete", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({ authenticated: true, isAdmin: true });
+    mockValidateAdminAuth.mockResolvedValueOnce({
+      authenticated: true,
+      isAdmin: true,
+    });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     mockLocaleConfigDelete.mockRejectedValueOnce(new Error("DB error"));
 
-    const request = new NextRequest("http://localhost:3000/api/admin/locales/IT", {
-      method: "DELETE",
+    const request = new NextRequest(
+      "http://localhost:3000/api/admin/locales/IT",
+      {
+        method: "DELETE",
+      },
+    );
+    const response = await DELETE(request, {
+      params: Promise.resolve({ id: "IT" }),
     });
-    const response = await DELETE(request, { params: Promise.resolve({ id: "IT" }) });
     expect(response.status).toBe(500);
   });
 });

@@ -19,7 +19,7 @@ export function DyslexiaA11y({
   settings: DyslexiaSettings;
   onSettingsChange: (settings: DyslexiaSettings) => void;
 }) {
-  const t = useTranslations('settings.accessibility');
+  const t = useTranslations("settings.accessibility");
   const [showInfo, setShowInfo] = useState(false);
 
   const toggleSetting = <K extends keyof DyslexiaSettings>(key: K) => {
@@ -34,62 +34,60 @@ export function DyslexiaA11y({
       )}
     >
       <div>
-        <h3 className="text-lg font-semibold mb-4">
-          {t('dyslexiaTitle')}
-        </h3>
+        <h3 className="text-lg font-semibold mb-4">{t("dyslexiaTitle")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          {t('dyslexiaDesc')}
+          {t("dyslexiaDesc")}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title={t('fontOpenDyslexic')}
-          description={t('fontOpenDyslexicDesc')}
+          title={t("fontOpenDyslexic")}
+          description={t("fontOpenDyslexicDesc")}
           enabled={settings.openDyslexicFont}
           onToggle={() => toggleSetting("openDyslexicFont")}
         />
 
         <SettingCard
-          title={t('spacingExtra')}
-          description={t('spacingExtraDesc')}
+          title={t("spacingExtra")}
+          description={t("spacingExtraDesc")}
           enabled={settings.extraLetterSpacing}
           onToggle={() => toggleSetting("extraLetterSpacing")}
         >
           {settings.extraLetterSpacing && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm" style={{ letterSpacing: "0.15em" }}>
-                {t('spacingExtraText')}
+                {t("spacingExtraText")}
               </p>
             </div>
           )}
         </SettingCard>
 
         <SettingCard
-          title={t('lineHeight')}
-          description={t('lineHeightDesc')}
+          title={t("lineHeight")}
+          description={t("lineHeightDesc")}
           enabled={settings.increasedLineHeight}
           onToggle={() => toggleSetting("increasedLineHeight")}
         >
           {settings.increasedLineHeight && (
             <div className="mt-4 p-3 bg-muted/50 rounded-lg">
               <p className="text-sm" style={{ lineHeight: "1.8" }}>
-                {t('dyslexiaLineHeightText')}
+                {t("dyslexiaLineHeightText")}
               </p>
             </div>
           )}
         </SettingCard>
 
         <SettingCard
-          title={t('shortTextChunks')}
-          description={t('shortTextChunksDesc')}
+          title={t("shortTextChunks")}
+          description={t("shortTextChunksDesc")}
           enabled={settings.shortTextChunks}
           onToggle={() => toggleSetting("shortTextChunks")}
         />
 
         <SettingCard
-          title={t('audioFeedback')}
-          description={t('audioFeedbackDesc')}
+          title={t("audioFeedback")}
+          description={t("audioFeedbackDesc")}
           enabled={settings.audioFeedback}
           onToggle={() => toggleSetting("audioFeedback")}
         />
@@ -100,12 +98,12 @@ export function DyslexiaA11y({
           onClick={() => setShowInfo(!showInfo)}
           className="text-sm text-primary hover:underline"
         >
-          {showInfo ? t('hideInfo') : t('showInfo')}
+          {showInfo ? t("hideInfo") : t("showInfo")}
         </button>
 
         {showInfo && (
           <p className="text-sm mt-2 text-muted-foreground">
-            {t('dyslexiaInfo')}
+            {t("dyslexiaInfo")}
           </p>
         )}
       </div>

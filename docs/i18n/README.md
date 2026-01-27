@@ -27,6 +27,7 @@ export async function MyServerComponent() {
 ## Documentation Sections
 
 ### [SETUP.md](./SETUP.md)
+
 Configure locales, understand folder structure, and set up the i18n system.
 
 - Folder structure and conventions
@@ -35,6 +36,7 @@ Configure locales, understand folder structure, and set up the i18n system.
 - Adding new languages
 
 ### [GUIDE.md](./GUIDE.md)
+
 Step-by-step guide to adding new translation keys and managing translations.
 
 - Namespace conventions
@@ -43,6 +45,7 @@ Step-by-step guide to adding new translation keys and managing translations.
 - Quality validation
 
 ### [HOOKS.md](./HOOKS.md)
+
 Comprehensive reference for translation hooks and functions.
 
 - `useTranslations()` hook
@@ -52,6 +55,7 @@ Comprehensive reference for translation hooks and functions.
 - Variables and rich text formatting
 
 ### [COMPONENTS.md](./COMPONENTS.md)
+
 Server vs client component translation patterns and best practices.
 
 - Server components with `getTranslations()`
@@ -60,6 +64,7 @@ Server vs client component translation patterns and best practices.
 - Locale context and switching
 
 ### [EXAMPLES.md](./EXAMPLES.md)
+
 Real-world code examples and troubleshooting guide.
 
 - Common scenarios
@@ -76,6 +81,7 @@ Supported languages: **Italian** (it), **English** (en), **French** (fr), **Germ
 ### Namespaces
 
 Translations are organized by namespace:
+
 - `common` - Universal UI strings (save, cancel, loading)
 - `navigation` - Menu items, links, breadcrumbs
 - `auth` - Login, signup, validation
@@ -103,13 +109,13 @@ messages/
 
 ## Configuration Files
 
-| File | Purpose |
-|------|---------|
-| `src/i18n/config.ts` | Locale list, names, flags |
-| `src/i18n/request.ts` | Server-side message loading |
-| `src/i18n/routing.ts` | Route configuration |
-| `src/i18n/types.ts` | TypeScript types |
-| `src/i18n/locale-provider.tsx` | Client provider |
+| File                           | Purpose                     |
+| ------------------------------ | --------------------------- |
+| `src/i18n/config.ts`           | Locale list, names, flags   |
+| `src/i18n/request.ts`          | Server-side message loading |
+| `src/i18n/routing.ts`          | Route configuration         |
+| `src/i18n/types.ts`            | TypeScript types            |
+| `src/i18n/locale-provider.tsx` | Client provider             |
 
 ## Common Commands
 

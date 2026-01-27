@@ -1,19 +1,19 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import fs from 'fs';
-import path from 'path';
-import { execSync } from 'child_process';
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import fs from "fs";
+import path from "path";
+import { execSync } from "child_process";
 
-const MESSAGES_DIR = path.join(process.cwd(), 'messages');
-const TEST_BACKUP_DIR = path.join(process.cwd(), '.test-i18n-backup');
+const MESSAGES_DIR = path.join(process.cwd(), "messages");
+const TEST_BACKUP_DIR = path.join(process.cwd(), ".test-i18n-backup");
 
-describe('i18n-check script', () => {
+describe("i18n-check script", () => {
   beforeAll(() => {
     // Backup original message files
     if (!fs.existsSync(TEST_BACKUP_DIR)) {
       fs.mkdirSync(TEST_BACKUP_DIR);
     }
 
-    ['en', 'it', 'de', 'es', 'fr'].forEach(lang => {
+    ["en", "it", "de", "es", "fr"].forEach((lang) => {
       const src = path.join(MESSAGES_DIR, `${lang}.json`);
       const dst = path.join(TEST_BACKUP_DIR, `${lang}.json`);
       if (fs.existsSync(src)) {
@@ -24,7 +24,7 @@ describe('i18n-check script', () => {
 
   afterAll(() => {
     // Restore original message files
-    ['en', 'it', 'de', 'es', 'fr'].forEach(lang => {
+    ["en", "it", "de", "es", "fr"].forEach((lang) => {
       const src = path.join(TEST_BACKUP_DIR, `${lang}.json`);
       const dst = path.join(MESSAGES_DIR, `${lang}.json`);
       if (fs.existsSync(src)) {
@@ -39,19 +39,19 @@ describe('i18n-check script', () => {
     }
   });
 
-  it('should pass when all language files have consistent keys', () => {
-    const result = execSync('npm run i18n:check', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'] as const,
+  it("should pass when all language files have consistent keys", () => {
+    const result = execSync("npm run i18n:check", {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"] as const,
     });
 
-    expect(result).toContain('Result: PASS');
+    expect(result).toContain("Result: PASS");
   });
 
-  it('should detect missing keys in a language file', () => {
+  it("should detect missing keys in a language file", () => {
     // Remove a key from German (reference is Italian, so test against it)
-    const dePath = path.join(MESSAGES_DIR, 'de.json');
-    const deContent = JSON.parse(fs.readFileSync(dePath, 'utf-8'));
+    const dePath = path.join(MESSAGES_DIR, "de.json");
+    const deContent = JSON.parse(fs.readFileSync(dePath, "utf-8"));
 
     // Remove a common key
     if (deContent.common && deContent.common.loading) {
@@ -62,8 +62,8 @@ describe('i18n-check script', () => {
 
     let errorThrown = false;
     try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'] as const,
+      execSync("npm run i18n:check", {
+        stdio: ["pipe", "pipe", "pipe"] as const,
       });
     } catch {
       errorThrown = true;
@@ -72,40 +72,40 @@ describe('i18n-check script', () => {
     expect(errorThrown).toBe(true);
 
     // Restore from backup
-    fs.copyFileSync(path.join(TEST_BACKUP_DIR, 'de.json'), dePath);
+    fs.copyFileSync(path.join(TEST_BACKUP_DIR, "de.json"), dePath);
   });
 
-  it('should detect extra keys in a language file (and report but not fail)', () => {
+  it("should detect extra keys in a language file (and report but not fail)", () => {
     // Add an extra key to English (comparing against Italian reference)
-    const enPath = path.join(MESSAGES_DIR, 'en.json');
-    const enContent = JSON.parse(fs.readFileSync(enPath, 'utf-8'));
+    const enPath = path.join(MESSAGES_DIR, "en.json");
+    const enContent = JSON.parse(fs.readFileSync(enPath, "utf-8"));
 
     // Add an extra top-level key
-    enContent.extraTestKey = 'should not exist';
+    enContent.extraTestKey = "should not exist";
 
     fs.writeFileSync(enPath, JSON.stringify(enContent, null, 2));
 
-    const result = execSync('npm run i18n:check', {
-      encoding: 'utf-8',
-      stdio: ['pipe', 'pipe', 'pipe'] as const,
+    const result = execSync("npm run i18n:check", {
+      encoding: "utf-8",
+      stdio: ["pipe", "pipe", "pipe"] as const,
     });
 
     // The script reports extra keys but doesn't fail on them
-    expect(result).toContain('Extra: extraTestKey');
+    expect(result).toContain("Extra: extraTestKey");
 
     // Restore from backup
-    fs.copyFileSync(path.join(TEST_BACKUP_DIR, 'en.json'), enPath);
+    fs.copyFileSync(path.join(TEST_BACKUP_DIR, "en.json"), enPath);
   });
 
-  it('should detect invalid JSON syntax', () => {
+  it("should detect invalid JSON syntax", () => {
     // Create invalid JSON in Spanish
-    const esPath = path.join(MESSAGES_DIR, 'es.json');
-    fs.writeFileSync(esPath, '{ invalid json }');
+    const esPath = path.join(MESSAGES_DIR, "es.json");
+    fs.writeFileSync(esPath, "{ invalid json }");
 
     let errorThrown = false;
     try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'] as const,
+      execSync("npm run i18n:check", {
+        stdio: ["pipe", "pipe", "pipe"] as const,
       });
     } catch {
       errorThrown = true;
@@ -114,15 +114,15 @@ describe('i18n-check script', () => {
     expect(errorThrown).toBe(true);
 
     // Restore from backup
-    fs.copyFileSync(path.join(TEST_BACKUP_DIR, 'es.json'), esPath);
+    fs.copyFileSync(path.join(TEST_BACKUP_DIR, "es.json"), esPath);
   });
 
-  it('should execute quickly (< 2 seconds)', () => {
+  it("should execute quickly (< 2 seconds)", () => {
     const start = Date.now();
 
     try {
-      execSync('npm run i18n:check', {
-        stdio: ['pipe', 'pipe', 'pipe'] as const,
+      execSync("npm run i18n:check", {
+        stdio: ["pipe", "pipe", "pipe"] as const,
       });
     } catch {
       // Ignore errors for timing test

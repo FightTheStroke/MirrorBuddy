@@ -10,7 +10,7 @@ import { MindmapRenderer } from "@/components/tools/markmap";
 import { QuizTool } from "@/components/tools/quiz-tool";
 import { FlashcardTool } from "@/components/tools/flashcard-tool";
 import { DiagramRenderer } from "@/components/tools/diagram-renderer";
-import { SummaryTool } from "@/components/tools/summary-tool";
+import { LiveSummary } from "@/components/tools/live-summary";
 import { StudentSummaryEditor } from "@/components/tools/student-summary-editor";
 import type { SummaryData, StudentSummaryData } from "@/types/tools";
 import type { ActiveToolState } from "@/lib/hooks/use-tool-stream";
@@ -108,7 +108,14 @@ export function ToolRenderer({
         );
       }
       // AI-generated summary (legacy)
-      return <SummaryTool data={summaryContent as unknown as SummaryData} />;
+      return (
+        <LiveSummary
+          initialData={summaryContent as unknown as SummaryData}
+          sessionId={tool.sessionId ?? null}
+          listenForEvents={Boolean(tool.sessionId)}
+          readOnly={false}
+        />
+      );
     }
 
     case "timeline":

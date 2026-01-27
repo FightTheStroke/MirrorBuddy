@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { generateCanonicalUrl } from '@/lib/canonical-urls';
-import type { Locale } from '@/i18n/config';
+import type { Metadata } from "next";
+import { generateCanonicalUrl } from "@/lib/canonical-urls";
+import type { Locale } from "@/i18n/config";
 
 /**
  * Generate metadata for privacy policy page
@@ -14,10 +14,10 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: 'Privacy Policy - MirrorBuddy',
-    description: 'Informativa sulla Privacy di MirrorBuddy',
+    title: "Privacy Policy - MirrorBuddy",
+    description: "Informativa sulla Privacy di MirrorBuddy",
     alternates: {
-      canonical: generateCanonicalUrl(locale as Locale, '/privacy'),
+      canonical: generateCanonicalUrl(locale as Locale, "/privacy"),
     },
   };
 }

@@ -7,15 +7,15 @@
  * Part of Phase 7: Voice Commands for Mindmaps
  */
 
-import { useEffect, useCallback, useRef, useState } from 'react';
-import { logger } from '@/lib/logger';
-import type { MindmapModifyCommand } from '@/lib/realtime/tool-events';
+import { useEffect, useCallback, useRef, useState } from "react";
+import { logger } from "@/lib/logger";
+import type { MindmapModifyCommand } from "@/lib/realtime/tool-events";
 
 // Modification event from SSE
 export interface MindmapModifyEvent {
   id: string;
-  type: 'mindmap:modify';
-  toolType: 'mindmap';
+  type: "mindmap:modify";
+  toolType: "mindmap";
   sessionId: string;
   maestroId: string;
   timestamp: number;
@@ -27,11 +27,11 @@ export interface MindmapModifyEvent {
 
 // Union of all modification argument types
 export type MindmapModifyArgs =
-  | { concept: string; parentNode?: string }  // mindmap_add_node
-  | { nodeA: string; nodeB: string }          // mindmap_connect_nodes
-  | { node: string; suggestions?: string[] }  // mindmap_expand_node
-  | { node: string }                          // mindmap_delete_node, mindmap_focus_node
-  | { node: string; color: string };          // mindmap_set_color
+  | { concept: string; parentNode?: string } // mindmap_add_node
+  | { nodeA: string; nodeB: string } // mindmap_connect_nodes
+  | { node: string; suggestions?: string[] } // mindmap_expand_node
+  | { node: string } // mindmap_delete_node, mindmap_focus_node
+  | { node: string; color: string }; // mindmap_set_color
 
 // Callbacks for each modification type
 export interface MindmapModificationCallbacks {
@@ -86,57 +86,65 @@ export function useMindmapModifications({
   const handleEvent = useCallback((event: MessageEvent) => {
     try {
       // Skip heartbeat events
-      if (event.data.startsWith(':')) return;
+      if (event.data.startsWith(":")) return;
 
       const data = JSON.parse(event.data);
 
       // Only handle mindmap:modify events
-      if (data.type !== 'mindmap:modify') return;
+      if (data.type !== "mindmap:modify") return;
 
       const modifyEvent = data as MindmapModifyEvent;
       setLastEvent(modifyEvent);
 
       const { command, args } = modifyEvent.data;
 
-      logger.info('[MindmapModifications] Received event', { command, args });
+      logger.info("[MindmapModifications] Received event", { command, args });
 
       // Dispatch to appropriate callback
       switch (command) {
-        case 'mindmap_add_node': {
-          const { concept, parentNode } = args as { concept: string; parentNode?: string };
+        case "mindmap_add_node": {
+          const { concept, parentNode } = args as {
+            concept: string;
+            parentNode?: string;
+          };
           callbacksRef.current.onAddNode?.(concept, parentNode);
           break;
         }
-        case 'mindmap_connect_nodes': {
+        case "mindmap_connect_nodes": {
           const { nodeA, nodeB } = args as { nodeA: string; nodeB: string };
           callbacksRef.current.onConnectNodes?.(nodeA, nodeB);
           break;
         }
-        case 'mindmap_expand_node': {
-          const { node, suggestions } = args as { node: string; suggestions?: string[] };
+        case "mindmap_expand_node": {
+          const { node, suggestions } = args as {
+            node: string;
+            suggestions?: string[];
+          };
           callbacksRef.current.onExpandNode?.(node, suggestions);
           break;
         }
-        case 'mindmap_delete_node': {
+        case "mindmap_delete_node": {
           const { node } = args as { node: string };
           callbacksRef.current.onDeleteNode?.(node);
           break;
         }
-        case 'mindmap_focus_node': {
+        case "mindmap_focus_node": {
           const { node } = args as { node: string };
           callbacksRef.current.onFocusNode?.(node);
           break;
         }
-        case 'mindmap_set_color': {
+        case "mindmap_set_color": {
           const { node, color } = args as { node: string; color: string };
           callbacksRef.current.onSetColor?.(node, color);
           break;
         }
         default:
-          logger.warn('[MindmapModifications] Unknown command', { command });
+          logger.warn("[MindmapModifications] Unknown command", { command });
       }
     } catch (error) {
-      logger.error('[MindmapModifications] Failed to parse event', { error: String(error) });
+      logger.error("[MindmapModifications] Failed to parse event", {
+        error: String(error),
+      });
     }
   }, []);
 
@@ -149,19 +157,21 @@ export function useMindmapModifications({
       eventSourceRef.current.close();
     }
 
-    const url = `/api/tools/sse?sessionId=${encodeURIComponent(sessionId)}`;
+    const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
-      logger.info('[MindmapModifications] SSE connected', { sessionId });
+      logger.info("[MindmapModifications] SSE connected", { sessionId });
       setIsConnected(true);
     };
 
     eventSource.onmessage = handleEvent;
 
     eventSource.onerror = (error) => {
-      logger.warn('[MindmapModifications] SSE error, reconnecting...', { error });
+      logger.warn("[MindmapModifications] SSE error, reconnecting...", {
+        error,
+      });
       setIsConnected(false);
 
       // Reconnect after 3 seconds using ref to avoid lexical access issue

@@ -34,7 +34,7 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 const greeting = generateMaestroGreeting(
   "euclide-matematica",
   "Euclide",
-  "it" // language
+  "it", // language
 );
 // Output: "Ciao! Sono Euclide. Come posso aiutarti oggi?"
 
@@ -42,7 +42,7 @@ const greeting = generateMaestroGreeting(
 const formalGreeting = generateMaestroGreeting(
   "manzoni-italiano",
   "Alessandro Manzoni",
-  "it"
+  "it",
 );
 // Output: "Buongiorno! Sono Alessandro Manzoni. Come posso esserLe utile oggi?"
 ```
@@ -58,7 +58,7 @@ const greeting = generateMaestroGreeting(
   "Euclide",
   "it",
   undefined, // fallback
-  true // usePersonalized
+  true, // usePersonalized
 );
 // Output: "Χαῖρε! Sono Euclide. Costruiamo insieme le basi della matematica?"
 ```
@@ -123,11 +123,12 @@ function generateMaestroGreeting(
   displayName: string,
   language: SupportedLanguage,
   fallbackGreeting?: string,
-  usePersonalized?: boolean
-): string
+  usePersonalized?: boolean,
+): string;
 ```
 
 **Parameters:**
+
 - `characterId` - Maestro ID (e.g., "euclide-matematica")
 - `displayName` - Human-readable name (e.g., "Euclide")
 - `language` - User's preferred language
@@ -141,11 +142,12 @@ function getMaestroGreetingTemplate(
   maestroKey: string,
   language: SupportedLanguage,
   isFormal?: boolean,
-  usePersonalized?: boolean
-): string
+  usePersonalized?: boolean,
+): string;
 ```
 
 **Parameters:**
+
 - `maestroKey` - Normalized key (e.g., "euclide")
 - `language` - User's preferred language
 - `isFormal` - Use formal address (default: false)
@@ -154,10 +156,11 @@ function getMaestroGreetingTemplate(
 ### `normalizeMaestroKey()`
 
 ```typescript
-function normalizeMaestroKey(maestroId: string): string
+function normalizeMaestroKey(maestroId: string): string;
 ```
 
 Extracts the maestro key from a full ID:
+
 - `"euclide-matematica"` → `"euclide"`
 - `"shakespeare-inglese"` → `"shakespeare"`
 

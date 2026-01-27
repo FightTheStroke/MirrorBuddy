@@ -32,6 +32,7 @@ const mockStudent: ExtendedStudentProfile = {
   simplifiedLanguage: false,
   adhdMode: false,
   learningDifferences: [],
+  crossMaestroEnabled: false,
 };
 
 describe("New Language Maestri Configuration", () => {

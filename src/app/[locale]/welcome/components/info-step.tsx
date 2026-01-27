@@ -1,14 +1,17 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useRef } from 'react';
-import { useOnboardingStore } from '@/lib/stores/onboarding-store';
-import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
-import { InfoStepVoice } from './info-step-voice';
-import { InfoStepForm } from './info-step-form';
-import type { Maestro, VoiceSessionHandle } from '@/types';
+import { useState, useEffect, useRef } from "react";
+import { useOnboardingStore } from "@/lib/stores/onboarding-store";
+import {
+  useOnboardingTTS,
+  ONBOARDING_SCRIPTS,
+} from "@/lib/hooks/use-onboarding-tts";
+import { InfoStepVoice } from "./info-step-voice";
+import { InfoStepForm } from "./info-step-form";
+import type { Maestro, VoiceSessionHandle } from "@/types";
 
 interface VoiceConnectionInfo {
-  provider: 'azure';
+  provider: "azure";
   proxyPort: number;
   configured: boolean;
 }
@@ -16,7 +19,7 @@ interface VoiceConnectionInfo {
 interface ExistingUserData {
   name: string;
   age?: number;
-  schoolLevel?: 'elementare' | 'media' | 'superiore';
+  schoolLevel?: "elementare" | "media" | "superiore";
   learningDifferences?: string[];
 }
 
@@ -63,11 +66,11 @@ export function InfoStep({
   } = useOnboardingStore();
 
   const [age, setAge] = useState<number | undefined>(data.age);
-  const [schoolLevel, setSchoolLevel] = useState<'elementare' | 'media' | 'superiore' | undefined>(
-    data.schoolLevel
-  );
+  const [schoolLevel, setSchoolLevel] = useState<
+    "elementare" | "media" | "superiore" | undefined
+  >(data.schoolLevel);
   const [selectedDifferences, setSelectedDifferences] = useState<string[]>(
-    data.learningDifferences || []
+    data.learningDifferences || [],
   );
 
   // Sync local state with store (when voice captures data)
@@ -93,10 +96,14 @@ export function InfoStep({
     if (data.learningDifferences && data.learningDifferences.length > 0) {
       const prevSet = new Set(prevDiffsRef.current || []);
       const newSet = new Set(data.learningDifferences);
-      const hasChanged = ![...prevSet].every(d => newSet.has(d)) || ![...newSet].every(d => prevSet.has(d));
+      const hasChanged =
+        ![...prevSet].every((d) => newSet.has(d)) ||
+        ![...newSet].every((d) => prevSet.has(d));
       if (hasChanged) {
         prevDiffsRef.current = data.learningDifferences;
-        queueMicrotask(() => setSelectedDifferences(data.learningDifferences || []));
+        queueMicrotask(() =>
+          setSelectedDifferences(data.learningDifferences || []),
+        );
       }
     }
   }, [data.learningDifferences]);
@@ -135,7 +142,7 @@ export function InfoStep({
 
   const toggleDifference = (id: string) => {
     setSelectedDifferences((prev) =>
-      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id]
+      prev.includes(id) ? prev.filter((d) => d !== id) : [...prev, id],
     );
   };
 

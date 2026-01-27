@@ -25,9 +25,7 @@ export const contentMatchers = {
       "profilo",
       "esci",
     ];
-    return italianIndicators.some((word) =>
-      text?.toLowerCase().includes(word),
-    );
+    return italianIndicators.some((word) => text?.toLowerCase().includes(word));
   },
 
   /**
@@ -43,9 +41,7 @@ export const contentMatchers = {
       "profile",
       "logout",
     ];
-    return englishIndicators.some((word) =>
-      text?.toLowerCase().includes(word),
-    );
+    return englishIndicators.some((word) => text?.toLowerCase().includes(word));
   },
 
   /**
@@ -61,9 +57,7 @@ export const contentMatchers = {
       "profil",
       "déconnexion",
     ];
-    return frenchIndicators.some((word) =>
-      text?.toLowerCase().includes(word),
-    );
+    return frenchIndicators.some((word) => text?.toLowerCase().includes(word));
   },
 
   /**
@@ -79,9 +73,7 @@ export const contentMatchers = {
       "profil",
       "abmelden",
     ];
-    return germanIndicators.some((word) =>
-      text?.toLowerCase().includes(word),
-    );
+    return germanIndicators.some((word) => text?.toLowerCase().includes(word));
   },
 
   /**
@@ -97,8 +89,6 @@ export const contentMatchers = {
       "perfil",
       "cerrar sesión",
     ];
-    return spanishIndicators.some((word) =>
-      text?.toLowerCase().includes(word),
-    );
+    return spanishIndicators.some((word) => text?.toLowerCase().includes(word));
   },
 };

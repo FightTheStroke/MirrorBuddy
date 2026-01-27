@@ -20,6 +20,7 @@ When you commit changes to any message files (in the `messages/` directory), the
 ## Message File Structure
 
 Supported language files in `messages/`:
+
 - `en.json` - English
 - `it.json` - Italian (reference locale)
 - `de.json` - German
@@ -36,11 +37,13 @@ Supported language files in `messages/`:
 ## Pre-Commit Hook Output
 
 ### Success Example
+
 ```
 ✓ i18n validation passed
 ```
 
 ### Failure Example
+
 ```
 ❌ i18n validation failed:
 
@@ -92,6 +95,7 @@ npm run i18n:check
 ```
 
 Output format:
+
 ```
 Checking i18n completeness...
 
@@ -113,11 +117,13 @@ Result: PASS
 **Cause**: A translation file is missing keys from the reference language
 
 **Solution**:
+
 1. Run `npm run i18n:check` to see which keys are missing
 2. Add the missing keys to your language file
 3. Commit again
 
 Example:
+
 ```bash
 npm run i18n:check
 # Output shows: de.json is missing keys from it.json: common.loading, common.error
@@ -138,6 +144,7 @@ git commit -m "fix(i18n): add missing German translations"
 **Cause**: A message file has JSON syntax errors
 
 **Solution**:
+
 1. Validate JSON syntax using a JSON linter
 2. Fix syntax errors in the file
 3. Commit again
@@ -154,6 +161,7 @@ node -e "console.log(JSON.parse(require('fs').readFileSync('messages/de.json')))
 **Cause**: The hook is taking longer than expected to run
 
 **Solution**: The hook is designed to execute in < 2 seconds. If it's timing out:
+
 1. Check if message files are very large (>1MB)
 2. Verify disk I/O performance
 3. Run `npm run i18n:check` manually to confirm it completes quickly
@@ -169,6 +177,7 @@ The pre-commit hook is tested in `src/__tests__/scripts/i18n-check.test.ts`:
 - ✓ Executes quickly (< 2 seconds)
 
 Run tests:
+
 ```bash
 npm run test:unit -- src/__tests__/scripts/i18n-check.test.ts
 ```
@@ -176,6 +185,7 @@ npm run test:unit -- src/__tests__/scripts/i18n-check.test.ts
 ## CI/CD Integration
 
 The i18n check also runs in CI/CD pipelines:
+
 - Blocks deployment if validation fails
 - Part of pre-push checks
 - Integrated with release gates

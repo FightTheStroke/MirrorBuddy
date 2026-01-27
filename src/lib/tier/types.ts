@@ -214,7 +214,8 @@ export type TierAuditAction =
   | "TIER_CHANGE"
   | "USER_STATUS_CHANGE"
   | "USER_FEATURE_CONFIG_SET"
-  | "USER_FEATURE_CONFIG_DELETE";
+  | "USER_FEATURE_CONFIG_DELETE"
+  | "USER_STATUS_CHANGE";
 
 /**
  * Tier audit log entry

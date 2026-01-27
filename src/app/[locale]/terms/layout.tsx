@@ -1,6 +1,6 @@
-import type { Metadata } from 'next';
-import { generateCanonicalUrl } from '@/lib/canonical-urls';
-import type { Locale } from '@/i18n/config';
+import type { Metadata } from "next";
+import { generateCanonicalUrl } from "@/lib/canonical-urls";
+import type { Locale } from "@/i18n/config";
 
 /**
  * Generate metadata for terms of service page
@@ -14,12 +14,12 @@ export async function generateMetadata({
   const { locale } = await params;
 
   return {
-    title: 'Termini di Servizio | MirrorBuddy',
+    title: "Termini di Servizio | MirrorBuddy",
     description:
-      'Termini di Servizio di MirrorBuddy in linguaggio semplice e comprensibile. Scopri cosa promettiamo e cosa ti chiediamo.',
-    robots: 'index, follow',
+      "Termini di Servizio di MirrorBuddy in linguaggio semplice e comprensibile. Scopri cosa promettiamo e cosa ti chiediamo.",
+    robots: "index, follow",
     alternates: {
-      canonical: generateCanonicalUrl(locale as Locale, '/terms'),
+      canonical: generateCanonicalUrl(locale as Locale, "/terms"),
     },
   };
 }

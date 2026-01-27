@@ -284,9 +284,7 @@ export function TypingView() {
             <Keyboard className="w-7 h-7 text-primary" />
             {t("title")}
           </h1>
-          <p className="text-muted-foreground mt-1">
-            {t("subtitle")}
-          </p>
+          <p className="text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -328,10 +326,16 @@ export function TypingView() {
 
       {/* Info cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <InfoCard title={t("infoMultiLanguage")} desc={t("infoMultiLanguageDesc")} />
+        <InfoCard
+          title={t("infoMultiLanguage")}
+          desc={t("infoMultiLanguageDesc")}
+        />
         <InfoCard title={t("infoOneHanded")} desc={t("infoOneHandedDesc")} />
         <InfoCard title={t("infoDSA")} desc={t("infoDSADesc")} />
-        <InfoCard title={t("infoGamification")} desc={t("infoGamificationDesc")} />
+        <InfoCard
+          title={t("infoGamification")}
+          desc={t("infoGamificationDesc")}
+        />
       </div>
     </div>
   );

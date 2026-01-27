@@ -5,7 +5,9 @@
 // ============================================================================
 
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
+import { prisma } from "@/lib/db";
 import {
   broadcastToolEvent,
   getSessionClientCount,
@@ -13,7 +15,18 @@ import {
   type ToolEventType,
   type ToolType,
 } from "@/lib/realtime/tool-events";
+import {
+  validateAuth,
+  validateSessionOwnership,
+} from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
+import {
+  checkRateLimitAsync,
+  getRateLimitIdentifier,
+  rateLimitResponse,
+  RATE_LIMITS,
+} from "@/lib/rate-limit";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 
 // Validate tool event type
 const VALID_EVENT_TYPES: ToolEventType[] = [
@@ -32,6 +45,7 @@ const VALID_TOOL_TYPES: ToolType[] = [
   "summary",
   "timeline",
   "diagram",
+  "demo",
 ];
 
 interface PublishEventRequest {
@@ -113,6 +127,58 @@ export async function POST(request: NextRequest) {
         { error: "Invalid sessionId format" },
         { status: 400 },
       );
+    }
+
+    // Verify session ownership (authenticated or trial)
+    const auth = await validateAuth();
+    let userId: string | null = null;
+
+    if (auth.authenticated && auth.userId) {
+      userId = auth.userId;
+      const ownsSession = await validateSessionOwnership(
+        sessionId,
+        auth.userId,
+      );
+      if (!ownsSession) {
+        return NextResponse.json(
+          { error: "Session access denied" },
+          { status: 403 },
+        );
+      }
+    } else {
+      const cookieStore = await cookies();
+      const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
+
+      if (!visitorId) {
+        return NextResponse.json({ error: "Invalid session" }, { status: 401 });
+      }
+
+      const trialSession = await prisma.trialSession.findFirst({
+        where: {
+          id: sessionId,
+          visitorId: visitorId,
+        },
+        select: { id: true },
+      });
+
+      if (!trialSession) {
+        return NextResponse.json(
+          { error: "Session access denied" },
+          { status: 403 },
+        );
+      }
+    }
+
+    const rateLimitIdentifier = getRateLimitIdentifier(request, userId);
+    const rateLimitResult = await checkRateLimitAsync(
+      `tools:events:${rateLimitIdentifier}`,
+      RATE_LIMITS.GENERAL,
+    );
+    if (!rateLimitResult.success) {
+      logger.warn("Tool events rate limited", {
+        identifier: rateLimitIdentifier,
+      });
+      return rateLimitResponse(rateLimitResult);
     }
 
     // Validate maestro ID format

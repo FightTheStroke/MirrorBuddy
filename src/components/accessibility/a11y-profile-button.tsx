@@ -28,7 +28,9 @@ export interface ProfileConfig {
   borderColor: string;
 }
 
-export const getProfileConfigs = (t: ReturnType<typeof useTranslations>): ProfileConfig[] => [
+export const getProfileConfigs = (
+  t: ReturnType<typeof useTranslations>,
+): ProfileConfig[] => [
   {
     id: "dyslexia",
     label: t("profileDyslexia"),
@@ -151,7 +153,7 @@ export function A11yProfileButton({
   isActive,
   onClick,
 }: A11yProfileButtonProps) {
-  const t = useTranslations('settings.accessibility');
+  const t = useTranslations("settings.accessibility");
   const Icon = profile.icon;
 
   return (
@@ -168,7 +170,7 @@ export function A11yProfileButton({
         "focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2",
       )}
       aria-pressed={isActive}
-      aria-label={`${t('a11yActivateProfile')} ${profile.label}`}
+      aria-label={`${t("a11yActivateProfile")} ${profile.label}`}
     >
       <Icon className={cn("w-5 h-5", profile.color)} aria-hidden="true" />
       <span className={cn("text-xs font-medium", profile.color)}>

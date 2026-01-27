@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Shield, ExternalLink } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { hasTrialConsent, setTrialConsent } from "@/lib/consent/trial-consent";
@@ -23,6 +24,7 @@ interface TrialConsentGateProps {
  * - WCAG 2.1 AA accessible
  */
 export function TrialConsentGate({ children }: TrialConsentGateProps) {
+  const t = useTranslations("trialConsent");
   const [consented, setConsented] = useState<boolean>(false);
   const [checkboxChecked, setCheckboxChecked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -94,10 +96,10 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
               id="trial-consent-title"
               className="text-xl font-bold text-slate-900 dark:text-white"
             >
-              Modalità Prova Gratuita
+              {t("title")}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              Privacy e consenso GDPR
+              {t("subtitle")}
             </p>
           </div>
         </div>
@@ -107,26 +109,20 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
           id="trial-consent-description"
           className="space-y-4 text-sm text-slate-600 dark:text-slate-300"
         >
-          <p>
-            Per usare la modalità prova gratuita, devi accettare la nostra
-            informativa privacy e i cookie essenziali.
-          </p>
-          <p>
-            Durante la prova gratuita, elaboreremo i dati necessari per fornirti
-            il servizio educativo:
-          </p>
+          <p>{t("description")}</p>
+          <p>{t("processingIntro")}</p>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>Le tue conversazioni con i Maestri AI</span>
+              <span>{t("dataConversations")}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>I tuoi progressi e preferenze di apprendimento</span>
+              <span>{t("dataProgress")}</span>
             </li>
             <li className="flex items-start gap-2">
               <Shield className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-              <span>Cookie essenziali per la sicurezza della sessione</span>
+              <span>{t("dataCookies")}</span>
             </li>
           </ul>
         </div>
@@ -139,7 +135,7 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline font-medium"
           >
-            Leggi l&apos;informativa privacy completa
+            {t("privacyLink")}
             <ExternalLink className="w-4 h-4" />
           </a>
         </div>
@@ -150,13 +146,13 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
             id="trial-consent-checkbox"
             checked={checkboxChecked}
             onCheckedChange={(checked) => setCheckboxChecked(checked === true)}
-            aria-label="Ho letto e accetto l'informativa privacy per la prova gratuita"
+            aria-label={t("checkboxLabel")}
           />
           <label
             htmlFor="trial-consent-checkbox"
             className="text-sm text-slate-700 dark:text-slate-300 cursor-pointer select-none"
           >
-            Ho letto e accetto l&apos;informativa privacy per la prova gratuita
+            {t("checkboxLabel")}
           </label>
         </div>
 
@@ -166,16 +162,14 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
           disabled={!checkboxChecked}
           className="w-full"
           size="lg"
-          aria-label="Inizia la prova gratuita"
+          aria-label={t("startButton")}
         >
-          Inizia la prova
+          {t("startButton")}
         </Button>
 
         {/* GDPR compliance note */}
         <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-          Conformità GDPR: Puoi revocare il consenso in qualsiasi momento dalle
-          impostazioni. I tuoi dati saranno cancellati secondo la normativa
-          sulla protezione dei dati.
+          {t("gdprNote")}
         </p>
       </div>
     </div>

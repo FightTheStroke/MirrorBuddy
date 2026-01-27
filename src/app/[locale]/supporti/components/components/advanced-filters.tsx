@@ -3,11 +3,17 @@
  * @brief Advanced filters panel component
  */
 
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SUBJECT_LABELS } from '@/components/education/archive';
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SUBJECT_LABELS } from "@/components/education/archive";
 
 interface AdvancedFiltersProps {
   subjectFilter: string | null;
@@ -34,7 +40,7 @@ export function AdvancedFilters({
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
+      animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="overflow-hidden"
@@ -46,8 +52,10 @@ export function AdvancedFilters({
               Materia
             </label>
             <Select
-              value={subjectFilter || 'all'}
-              onValueChange={(v) => onNavigate({ subject: v === 'all' ? null : v })}
+              value={subjectFilter || "all"}
+              onValueChange={(v) =>
+                onNavigate({ subject: v === "all" ? null : v })
+              }
             >
               <SelectTrigger className="h-11" aria-label="Filtra per materia">
                 <SelectValue placeholder="Tutte le materie" />
@@ -71,8 +79,10 @@ export function AdvancedFilters({
               Maestro
             </label>
             <Select
-              value={maestroFilter || 'all'}
-              onValueChange={(v) => onNavigate({ maestro: v === 'all' ? null : v })}
+              value={maestroFilter || "all"}
+              onValueChange={(v) =>
+                onNavigate({ maestro: v === "all" ? null : v })
+              }
             >
               <SelectTrigger className="h-11" aria-label="Filtra per maestro">
                 <SelectValue placeholder="Tutti i maestri" />
@@ -109,4 +119,3 @@ export function AdvancedFilters({
     </motion.div>
   );
 }
-

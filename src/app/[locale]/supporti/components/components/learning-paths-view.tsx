@@ -3,12 +3,12 @@
  * @brief Learning paths view component
  */
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 import {
   LearningPathsList,
   LearningPathView,
   TopicDetail,
-} from '@/components/education/learning-path';
+} from "@/components/education/learning-path";
 
 interface LearningPathsViewProps {
   selectedPathId: string | null;
@@ -48,4 +48,3 @@ export function LearningPathsView({
     </motion.div>
   );
 }
-

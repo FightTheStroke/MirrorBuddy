@@ -3,14 +3,20 @@
  * @brief Search and controls bar component
  */
 
-import { motion } from 'framer-motion';
-import { Search, X, Grid, List } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { cn } from '@/lib/utils';
-import { SORT_OPTIONS } from '@/components/education/archive';
-import type { SortBy, ViewMode } from '@/components/education/archive';
+import { motion } from "framer-motion";
+import { Search, X, Grid, List } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { cn } from "@/lib/utils";
+import { SORT_OPTIONS } from "@/components/education/archive";
+import type { SortBy, ViewMode } from "@/components/education/archive";
 
 interface SearchControlsProps {
   searchQuery: string;
@@ -55,7 +61,7 @@ export function SearchControls({
           />
           {searchQuery && (
             <button
-              onClick={() => onSearchChange('')}
+              onClick={() => onSearchChange("")}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
               aria-label="Cancella ricerca"
             >
@@ -66,7 +72,7 @@ export function SearchControls({
 
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            {filteredCount} {filteredCount === 1 ? 'risultato' : 'risultati'}
+            {filteredCount} {filteredCount === 1 ? "risultato" : "risultati"}
           </span>
           {hasActiveFilters && (
             <Button
@@ -81,7 +87,10 @@ export function SearchControls({
         </div>
 
         <Select value={sortBy} onValueChange={(v) => onSortChange(v as SortBy)}>
-          <SelectTrigger className="w-full sm:w-[160px] h-11" aria-label="Ordina per">
+          <SelectTrigger
+            className="w-full sm:w-[160px] h-11"
+            aria-label="Ordina per"
+          >
             <SelectValue placeholder="Ordina per" />
           </SelectTrigger>
           <SelectContent>
@@ -98,12 +107,12 @@ export function SearchControls({
             variant="ghost"
             size="icon"
             className={cn(
-              'rounded-r-none h-11 w-11',
-              viewMode === 'grid' && 'bg-slate-100 dark:bg-slate-700'
+              "rounded-r-none h-11 w-11",
+              viewMode === "grid" && "bg-slate-100 dark:bg-slate-700",
             )}
-            onClick={() => onViewModeChange('grid')}
+            onClick={() => onViewModeChange("grid")}
             aria-label="Vista griglia"
-            aria-pressed={viewMode === 'grid'}
+            aria-pressed={viewMode === "grid"}
           >
             <Grid className="w-5 h-5" />
           </Button>
@@ -111,12 +120,12 @@ export function SearchControls({
             variant="ghost"
             size="icon"
             className={cn(
-              'rounded-l-none h-11 w-11',
-              viewMode === 'list' && 'bg-slate-100 dark:bg-slate-700'
+              "rounded-l-none h-11 w-11",
+              viewMode === "list" && "bg-slate-100 dark:bg-slate-700",
             )}
-            onClick={() => onViewModeChange('list')}
+            onClick={() => onViewModeChange("list")}
             aria-label="Vista lista"
-            aria-pressed={viewMode === 'list'}
+            aria-pressed={viewMode === "list"}
           >
             <List className="w-5 h-5" />
           </Button>

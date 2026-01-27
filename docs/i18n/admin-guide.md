@@ -5,6 +5,7 @@ Manage country-to-locale mappings and assign language maestri teachers per count
 ## Overview
 
 The Locale Configuration system (`/admin/locales`) enables admins to:
+
 - Define which countries can access which languages
 - Assign primary and secondary language teachers (maestri)
 - Enable/disable locales by country
@@ -15,6 +16,7 @@ The Locale Configuration system (`/admin/locales`) enables admins to:
 **URL**: `https://app.mirrorbuddy.com/admin/locales`
 
 **Prerequisites**:
+
 - Admin account (set via `ADMIN_EMAIL` env var)
 - Valid session authentication
 
@@ -37,20 +39,21 @@ The `LocaleConfig` model defines the structure:
 
 ### Field Descriptions
 
-| Field | Type | Description | Example |
-|-------|------|-------------|---------|
-| **id** | String | ISO 3166-1 alpha-2 country code | "IT", "FR" |
-| **countryName** | String | Human-readable country name | "Italia", "France" |
-| **primaryLocale** | String | Main BCP 47 language tag | "it-IT", "fr-FR" |
-| **primaryLanguageMaestroId** | String | ID of primary language maestro | "manzoni-italian" |
-| **secondaryLocales** | String[] | Alternative language options | ["en-US", "it-CH"] |
-| **enabled** | Boolean | Whether locale is active | true/false |
+| Field                        | Type     | Description                     | Example            |
+| ---------------------------- | -------- | ------------------------------- | ------------------ |
+| **id**                       | String   | ISO 3166-1 alpha-2 country code | "IT", "FR"         |
+| **countryName**              | String   | Human-readable country name     | "Italia", "France" |
+| **primaryLocale**            | String   | Main BCP 47 language tag        | "it-IT", "fr-FR"   |
+| **primaryLanguageMaestroId** | String   | ID of primary language maestro  | "manzoni-italian"  |
+| **secondaryLocales**         | String[] | Alternative language options    | ["en-US", "it-CH"] |
+| **enabled**                  | Boolean  | Whether locale is active        | true/false         |
 
 ## UI Operations
 
 ### List View (`/admin/locales`)
 
 **Features**:
+
 - Table of all configured locales
 - Search across: country code, name, locale, maestro ID
 - Sort by country name (ascending)
@@ -58,6 +61,7 @@ The `LocaleConfig` model defines the structure:
 - Status indicator: green (Attivo) / gray (Inattivo)
 
 **Columns**:
+
 - Codice Paese (Country Code)
 - Nome Paese (Country Name)
 - Locale Primario (Primary Locale)
@@ -69,16 +73,18 @@ The `LocaleConfig` model defines the structure:
 ### Create New Locale (`/admin/locales/new`)
 
 **Form Fields**:
-1. **Codice Paese*** (Country Code) - 2-letter ISO code
+
+1. **Codice Paese\*** (Country Code) - 2-letter ISO code
    - Auto-validated against existing codes
    - Immutable after creation
-2. **Nome Paese*** (Country Name) - Display name
-3. **Locale Primario*** (Primary Locale) - BCP 47 format
-4. **Maestro Lingua*** (Language Maestro) - Dropdown of available maestri
+2. **Nome Paese\*** (Country Name) - Display name
+3. **Locale Primario\*** (Primary Locale) - BCP 47 format
+4. **Maestro Lingua\*** (Language Maestro) - Dropdown of available maestri
 5. **Locali Secondari** (Secondary Locales) - Multi-select or comma-separated
 6. **Stato** (Status) - Checkbox (enabled by default)
 
 **Validation**:
+
 - Country code must not already exist (409 Conflict)
 - All required fields must be populated
 - Locale codes must match BCP 47 format
@@ -86,6 +92,7 @@ The `LocaleConfig` model defines the structure:
 ### Edit Locale (`/admin/locales/[id]/edit`)
 
 **Editable Fields**:
+
 - Country name
 - Primary locale
 - Language maestro
@@ -93,9 +100,11 @@ The `LocaleConfig` model defines the structure:
 - Enabled status
 
 **Immutable Field**:
+
 - Country code (id) - cannot be changed after creation
 
 **Changes Tracking**:
+
 - Only modified fields logged to audit trail
 - Timestamp updated on save
 
@@ -106,15 +115,18 @@ The `LocaleConfig` model defines the structure:
 **Method 2**: Via API - `DELETE /api/admin/locales/[id]`
 
 **Restrictions**:
+
 - No cascading delete protection in v1
 - Admin must verify no active users in region before deletion
 
 **Audit Logging**:
+
 - Full deletion logged with admin ID and timestamp
 
 ## API Endpoints
 
 ### GET /api/admin/locales
+
 Fetch all locale configurations (sorted by country name)
 
 ```bash
@@ -123,6 +135,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```
 
 **Response**:
+
 ```json
 {
   "locales": [
@@ -133,6 +146,7 @@ curl -H "Authorization: Bearer $TOKEN" \
 ```
 
 ### POST /api/admin/locales
+
 Create new locale configuration
 
 ```json
@@ -147,6 +161,7 @@ Create new locale configuration
 ```
 
 ### PUT /api/admin/locales/[id]
+
 Update existing locale (partial updates supported)
 
 ```json
@@ -157,6 +172,7 @@ Update existing locale (partial updates supported)
 ```
 
 ### DELETE /api/admin/locales/[id]
+
 Delete locale configuration
 
 ## Maestro Assignment
@@ -164,6 +180,7 @@ Delete locale configuration
 ### Primary Maestro Selection
 
 Choose a maestro that matches the primary language:
+
 - Assign **one** maestro per country's primary language
 - Maestro must exist in `src/data/maestri/`
 - Common examples:
@@ -195,11 +212,11 @@ Tracks all administrative changes:
 
 ### Audit Events
 
-| Action | Trigger | Logged Data |
-|--------|---------|------------|
-| LOCALE_CREATE | POST /api/admin/locales | All initial fields |
-| LOCALE_UPDATE | PUT /api/admin/locales/[id] | Only changed fields + unchanged context |
-| LOCALE_DELETE | DELETE /api/admin/locales/[id] | Full deleted configuration |
+| Action        | Trigger                        | Logged Data                             |
+| ------------- | ------------------------------ | --------------------------------------- |
+| LOCALE_CREATE | POST /api/admin/locales        | All initial fields                      |
+| LOCALE_UPDATE | PUT /api/admin/locales/[id]    | Only changed fields + unchanged context |
+| LOCALE_DELETE | DELETE /api/admin/locales/[id] | Full deleted configuration              |
 
 ### Compliance Notes
 
@@ -210,11 +227,11 @@ Tracks all administrative changes:
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|----------|
-| Country code exists | Edit existing locale or use unique code |
-| Maestro not found | Verify maestro ID in `src/data/maestri/index.ts` |
-| Audit log gaps | Check application logs; email admin support |
+| Issue                          | Solution                                            |
+| ------------------------------ | --------------------------------------------------- |
+| Country code exists            | Edit existing locale or use unique code             |
+| Maestro not found              | Verify maestro ID in `src/data/maestri/index.ts`    |
+| Audit log gaps                 | Check application logs; email admin support         |
 | Locale not appearing for users | Verify `enabled: true` and primary maestro validity |
 
 ## Related Documentation

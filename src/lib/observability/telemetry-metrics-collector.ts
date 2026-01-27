@@ -100,7 +100,8 @@ export async function collectTelemetryMetrics(
       // Count feature usage
       if (event.category === "education" || event.category === "tools") {
         const feature = event.label || event.action;
-        metrics.featureUsage[feature] = (metrics.featureUsage[feature] || 0) + 1;
+        metrics.featureUsage[feature] =
+          (metrics.featureUsage[feature] || 0) + 1;
       }
     }
 

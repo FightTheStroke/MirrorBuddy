@@ -1,4 +1,4 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from "next";
 
 /**
  * Robots.txt configuration for multilingual SEO
@@ -13,56 +13,56 @@ import type { MetadataRoute } from 'next';
  */
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://mirrorbuddy.app';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://mirrorbuddy.app";
 
   return {
     rules: [
       {
-        userAgent: '*',
+        userAgent: "*",
         allow: [
-          '/',
-          '/it/',
-          '/en/',
-          '/es/',
-          '/fr/',
-          '/de/',
-          '/home',
-          '/privacy',
-          '/terms',
-          '/ai-transparency',
-          '/ai-policy',
+          "/",
+          "/it/",
+          "/en/",
+          "/es/",
+          "/fr/",
+          "/de/",
+          "/home",
+          "/privacy",
+          "/terms",
+          "/ai-transparency",
+          "/ai-policy",
         ],
         disallow: [
-          '/api/',
-          '/admin/',
-          '/login',
-          '/change-password',
-          '/astuccio/',
-          '/archivio/',
-          '/search',
-          '/_next',
+          "/api/",
+          "/admin/",
+          "/login",
+          "/change-password",
+          "/astuccio/",
+          "/archivio/",
+          "/search",
+          "/_next",
         ],
         crawlDelay: 1,
       },
       {
-        userAgent: 'GPTBot',
-        disallow: '/',
+        userAgent: "GPTBot",
+        disallow: "/",
       },
       {
-        userAgent: 'ChatGPT-User',
-        disallow: '/',
+        userAgent: "ChatGPT-User",
+        disallow: "/",
       },
       {
-        userAgent: 'CCBot',
-        disallow: '/',
+        userAgent: "CCBot",
+        disallow: "/",
       },
       {
-        userAgent: 'anthropic-ai',
-        disallow: '/',
+        userAgent: "anthropic-ai",
+        disallow: "/",
       },
       {
-        userAgent: 'Claude-Web',
-        disallow: '/',
+        userAgent: "Claude-Web",
+        disallow: "/",
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,

@@ -131,14 +131,20 @@ export function HomeHeader({
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5" title={t("header.studyTime")}>
+        <div
+          className="flex items-center gap-1.5"
+          title={t("header.studyTime")}
+        >
           <Clock className="w-4 h-4 text-green-500" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
             {studyTimeStr}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5" title={t("header.questionsAsked")}>
+        <div
+          className="flex items-center gap-1.5"
+          title={t("header.questionsAsked")}
+        >
           <Star className="w-4 h-4 text-purple-500" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
             {questionsAsked}

@@ -105,8 +105,13 @@ Quick access to frequently used common translations:
 import { useCommonTranslations } from "@/i18n";
 
 function QuickActions() {
-  const { save, cancel, loading, edit, delete: deleteText } =
-    useCommonTranslations();
+  const {
+    save,
+    cancel,
+    loading,
+    edit,
+    delete: deleteText,
+  } = useCommonTranslations();
 
   return (
     <div>
@@ -143,15 +148,15 @@ export async function validateInput(input: string) {
 
 ## Available Namespaces
 
-| Namespace       | Purpose                              | Example Keys                      |
-| --------------- | ------------------------------------ | --------------------------------- |
-| `common`        | Common UI elements                   | save, cancel, loading, edit       |
-| `navigation`    | Navigation and menu items            | home, dashboard, settings         |
-| `auth`          | Authentication and user management   | login, logout, register           |
-| `errors`        | Error messages                       | notFound, serverError, validation |
-| `accessibility` | Accessibility labels and ARIA        | skipToContent, loading, selected  |
-| `validation`    | Form validation messages             | required, email, minLength        |
-| `status`        | Status indicators                    | active, pending, completed        |
+| Namespace       | Purpose                            | Example Keys                      |
+| --------------- | ---------------------------------- | --------------------------------- |
+| `common`        | Common UI elements                 | save, cancel, loading, edit       |
+| `navigation`    | Navigation and menu items          | home, dashboard, settings         |
+| `auth`          | Authentication and user management | login, logout, register           |
+| `errors`        | Error messages                     | notFound, serverError, validation |
+| `accessibility` | Accessibility labels and ARIA      | skipToContent, loading, selected  |
+| `validation`    | Form validation messages           | required, email, minLength        |
+| `status`        | Status indicators                  | active, pending, completed        |
 
 ## Type Safety
 

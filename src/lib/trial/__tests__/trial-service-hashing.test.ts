@@ -12,11 +12,21 @@ import crypto from "crypto";
 
 // Mock logger to verify warning is logged
 const mockWarn = vi.fn();
+const mockInfo = vi.fn();
+const mockError = vi.fn();
+const mockDebug = vi.fn();
 vi.mock("@/lib/logger", () => ({
   logger: {
     warn: mockWarn,
-    info: vi.fn(),
-    error: vi.fn(),
+    info: mockInfo,
+    error: mockError,
+    debug: mockDebug,
+    child: () => ({
+      warn: mockWarn,
+      info: mockInfo,
+      error: mockError,
+      debug: mockDebug,
+    }),
   },
 }));
 
