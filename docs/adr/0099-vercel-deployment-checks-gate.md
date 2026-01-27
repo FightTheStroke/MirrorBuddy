@@ -28,13 +28,13 @@ The root cause was that Vercel's auto-deploy and GitHub CI run in parallel, with
 
 ## Decision
 
-Use **Vercel Deployment Checks** with GitHub integration to gate production deployments.
+Use **Vercel CLI from GitHub CI** to deploy only after all checks pass. This saves Vercel build minutes by not building broken code.
 
 ### Architecture
 
 ```
 Push to main
-    ├── Vercel: builds (preview state)
+    ├── Vercel: ignoreCommand exits 0 → NO BUILD (saves minutes)
     └── GitHub CI: runs 14 checks
                       │
                       ▼
@@ -42,18 +42,22 @@ Push to main
               (aggregates all checks)
                       │
                       ▼
-         Vercel Deployment Checks
-         (waits for deployment-gate)
+              deploy-to-vercel job
+              (uses Vercel CLI)
                       │
                       ▼
-         Promote to production (only if passed)
+              Production deployment
 ```
 
 ### Configuration
 
-**Vercel Dashboard** (Project → Settings → Deployment Protection):
+**vercel.json** (skips ALL auto-builds):
 
-- Deployment Checks: `✅ Deployment Gate` (GitHub) → Production → Blocking
+```json
+{
+  "ignoreCommand": "echo 'Build skipped - CI will deploy after checks pass' && exit 0"
+}
+```
 
 **GitHub CI** (`.github/workflows/ci.yml`):
 
@@ -61,41 +65,38 @@ Push to main
   - build, secret-scanning, debt-check, security, llm-safety-tests
   - unit-tests, docs, migrations, quality, smoke-tests
   - e2e-tests, mobile-e2e, docker, performance
+- `deploy-to-vercel` job (runs after deployment-gate passes):
+  - Uses Vercel CLI to pull, build, and deploy
+  - Requires `VERCEL_TOKEN` secret
+
+**GitHub Secrets Required**:
+
+- `VERCEL_TOKEN` - API token from https://vercel.com/account/tokens
 
 **GitHub Branch Protection** (`main`):
 
 - Required checks: `✅ Deployment Gate`, `Build & Lint`, `E2E Tests (BLOCKING)`, `Mobile E2E Tests (BLOCKING)`
 
-**vercel.json**:
-
-```json
-{
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]"
-}
-```
-
-This skips builds for non-main branches (preview deployments for PRs still work).
-
 ## Consequences
 
 ### Positive
 
-- **No more broken production deploys** - CI must pass before promotion
-- **Native integration** - No custom webhooks or CLI tooling needed
-- **Parallel execution** - Vercel builds while CI runs, no sequential delay
-- **Clear visibility** - Vercel dashboard shows check status
-- **No additional cost** - Included in Vercel Pro plan
+- **No more broken production deploys** - CI must pass before any build
+- **Saves Vercel build minutes** - No build until CI passes
+- **Clear visibility** - GitHub Actions shows full deployment log
+- **Health check verification** - Deployment verified after going live
+- **Works on any Vercel plan** - No Pro features required
 
 ### Negative
 
-- **Requires Vercel Pro** - Not available on Hobby plan
-- **Preview builds still happen** - Vercel builds on every push (uses build minutes)
+- **Sequential execution** - Build happens after CI, not in parallel (adds ~2-3 min)
+- **Requires VERCEL_TOKEN** - Must manage API token as GitHub secret
 - **Single point of failure** - If `deployment-gate` job has issues, all deploys blocked
 
 ### Neutral
 
-- Build minutes usage unchanged (Vercel still builds, just doesn't promote)
 - CI pipeline unchanged (same 14 checks)
+- Vercel dashboard still shows deployments (triggered by CLI)
 
 ## References
 
