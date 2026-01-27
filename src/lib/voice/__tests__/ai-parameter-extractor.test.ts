@@ -190,7 +190,7 @@ describe("ai-parameter-extractor", () => {
       expect(result.confidence).toBeGreaterThanOrEqual(0.8);
     });
 
-    it("returns medium confidence (0.6) when AI extracts only required parameters", async () => {
+    it("returns good confidence when AI extracts all required parameters", async () => {
       vi.mocked(aiProviders.chatCompletion).mockResolvedValueOnce({
         content: JSON.stringify({
           topic: "matematica",
@@ -208,8 +208,9 @@ describe("ai-parameter-extractor", () => {
       );
 
       // 2/3 parameters (missing optional difficulty)
-      expect(result.confidence).toBeGreaterThanOrEqual(0.6);
-      expect(result.confidence).toBeLessThan(0.8);
+      // Formula: 0.7 base + (2/3 * 0.2) = 0.833
+      expect(result.confidence).toBeGreaterThanOrEqual(0.8);
+      expect(result.confidence).toBeLessThan(0.9);
     });
   });
 });

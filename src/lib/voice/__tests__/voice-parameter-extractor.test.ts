@@ -327,14 +327,23 @@ describe("voice-parameter-extractor", () => {
 
   describe("edge cases", () => {
     it("handles empty transcript gracefully", async () => {
-      const result = await extractToolParameters("quiz", "");
+      const result = await extractToolParameters("quiz", "", undefined, {
+        enableAIFallback: false,
+      });
 
       expect(result.toolName).toBe("quiz");
       expect(result.confidence).toBeLessThan(0.5);
     });
 
     it("handles unknown tool type", async () => {
-      const result = await extractToolParameters("unknown-tool", "test");
+      const result = await extractToolParameters(
+        "unknown-tool",
+        "test",
+        undefined,
+        {
+          enableAIFallback: false,
+        },
+      );
 
       expect(result.toolName).toBe("unknown-tool");
       expect(result.parameters).toEqual({});
