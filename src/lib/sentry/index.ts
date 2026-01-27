@@ -251,3 +251,119 @@ export function logInfo(
 ): void {
   captureMessage(message, "info", context);
 }
+
+/**
+ * Critical asset paths that MUST load successfully
+ * Add any asset that, if missing, breaks user experience
+ */
+export const CRITICAL_ASSETS = [
+  "/logo-brain.png",
+  "/maestri/euclide.webp",
+  "/maestri/galileo.webp",
+  "/maestri/darwin.webp",
+  "/avatars/melissa.webp",
+] as const;
+
+/**
+ * Capture a resource loading failure to Sentry
+ *
+ * Use this when images, fonts, or other critical resources fail to load.
+ * This captures 404s, network errors, and CORS issues that browsers
+ * normally don't report as JavaScript errors.
+ *
+ * @example
+ * ```tsx
+ * <img
+ *   src="/logo.png"
+ *   onError={(e) => captureResourceError(e.currentTarget.src, 'image')}
+ * />
+ * ```
+ */
+export function captureResourceError(
+  resourceUrl: string,
+  resourceType: "image" | "font" | "script" | "stylesheet" | "other",
+  additionalContext?: Record<string, unknown>,
+): string {
+  const isCritical = CRITICAL_ASSETS.some((asset) =>
+    resourceUrl.includes(asset),
+  );
+
+  return captureMessage(
+    `Resource failed to load: ${resourceUrl}`,
+    isCritical ? "error" : "warning",
+    {
+      errorType: "resource-load-failure",
+      tags: {
+        resourceType,
+        isCritical: String(isCritical),
+        resourcePath: new URL(resourceUrl, "http://localhost").pathname,
+      },
+      extra: {
+        fullUrl: resourceUrl,
+        userAgent:
+          typeof navigator !== "undefined" ? navigator.userAgent : "server",
+        ...additionalContext,
+      },
+    },
+  );
+}
+
+/**
+ * Check if a resource URL is accessible (returns 200)
+ *
+ * Use in health checks or synthetic monitoring to verify
+ * critical assets are available before users hit them.
+ *
+ * @example
+ * ```ts
+ * const results = await checkCriticalAssets();
+ * const failures = results.filter(r => !r.ok);
+ * if (failures.length > 0) {
+ *   // Alert or log
+ * }
+ * ```
+ */
+export async function checkCriticalAssets(
+  baseUrl?: string,
+): Promise<Array<{ asset: string; ok: boolean; status?: number }>> {
+  const base = baseUrl || (typeof window !== "undefined" ? "" : "");
+
+  const results = await Promise.all(
+    CRITICAL_ASSETS.map(async (asset) => {
+      try {
+        const response = await fetch(`${base}${asset}`, {
+          method: "HEAD",
+          cache: "no-cache",
+        });
+        return {
+          asset,
+          ok: response.ok,
+          status: response.status,
+        };
+      } catch {
+        return {
+          asset,
+          ok: false,
+          status: undefined,
+        };
+      }
+    }),
+  );
+
+  // Report failures to Sentry
+  const failures = results.filter((r) => !r.ok);
+  if (failures.length > 0) {
+    captureMessage(`Critical assets unavailable: ${failures.length} failures`, "error", {
+      errorType: "critical-assets-check",
+      tags: {
+        failureCount: String(failures.length),
+      },
+      extra: {
+        failures: failures.map((f) => ({ asset: f.asset, status: f.status })),
+        checkedAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  return results;
+}
