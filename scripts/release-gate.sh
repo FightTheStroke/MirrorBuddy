@@ -52,6 +52,18 @@ echo "$i18n_output" | tail -10
 echo -e "${GREEN}✓ i18n verification passed${NC}"
 
 echo ""
+echo -e "${BLUE}[PHASE 0.8] Technical debt check...${NC}"
+debt_output=$(npx tsx scripts/debt-check.ts 2>&1)
+debt_exit=$?
+if [ $debt_exit -ne 0 ]; then
+  echo -e "${RED}✗ BLOCKED: Technical debt thresholds exceeded${NC}"
+  echo "$debt_output"
+  exit 1
+fi
+echo "$debt_output" | tail -10
+echo -e "${GREEN}✓ Technical debt check passed${NC}"
+
+echo ""
 echo -e "${BLUE}[PHASE 1] TypeScript rigor...${NC}"
 ts_ignore=$(rg -n "@ts-ignore|@ts-nocheck" src -g "*.ts" -g "*.tsx" 2>/dev/null || true)
 if [ -n "$ts_ignore" ]; then
