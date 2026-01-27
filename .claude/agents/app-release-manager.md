@@ -21,16 +21,17 @@ ZERO TOLERANCE. Script does work, agent interprets.
 
 ## CHECK CATEGORIES
 
-| Phase      | Checks                                    | Blocking |
-| ---------- | ----------------------------------------- | -------- |
-| Instant    | docs, hygiene, ts-ignore, any-type        | Yes      |
-| Static     | lint, typecheck, audit                    | Yes      |
-| Build      | build                                     | Yes      |
-| Tests      | unit, e2e                                 | Yes      |
-| Perf       | perf, filesize                            | Yes      |
-| Security   | csp, csrf, no-debug, rate-limit           | Yes      |
-| Compliance | dpia, ai-policy, privacy-page, terms-page | Yes      |
-| Plans      | plans (no `[ ]` in done/)                 | Yes      |
+| Phase      | Checks                                      | Blocking |
+| ---------- | ------------------------------------------- | -------- |
+| Instant    | docs, hygiene, ts-ignore, any-type          | Yes      |
+| Static     | lint, typecheck, audit                      | Yes      |
+| Build      | build                                       | Yes      |
+| Tests      | unit, e2e                                   | Yes      |
+| Perf       | perf, filesize                              | Yes      |
+| Security   | csp, csrf, no-debug, rate-limit             | Yes      |
+| Compliance | dpia, ai-policy, privacy-page, terms-page   | Yes      |
+| Arch Diags | arch-diagrams (25 sections + 21 compliance) | Yes      |
+| Plans      | plans (no `[ ]` in done/)                   | Yes      |
 
 ## ON FAILURE
 
@@ -127,26 +128,131 @@ curl -s https://mirrorbuddy.vercel.app/api/health/detailed | jq '.checks.databas
 - ADR 0063 - Supabase SSL Certificate Requirements
 - ADR 0067 - Database Performance Optimization (Sentry warnings fix)
 
-## ARCHITECTURE DIAGRAMS UPDATE (MANDATORY)
+## ARCHITECTURE DIAGRAMS VALIDATION (MANDATORY)
+
+The `arch-diagrams` check in release-brutal.sh validates:
+
+| Validation          | Count | Blocking |
+| ------------------- | ----- | -------- |
+| Main sections       | 25    | Yes      |
+| Compliance sections | 21    | Yes      |
+| Mermaid diagrams    | ≥40   | Yes      |
+| Required ADRs       | 14    | Yes      |
+| Unreferenced ADRs   | \*    | Warning  |
+
+```bash
+# Run comprehensive check
+./scripts/check-architecture-diagrams.sh
+
+# If warnings about unreferenced ADRs, add them to Section 25 (ADR Index)
+```
 
 Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:
 
 1. **Update version header** to match new version
 2. **Update "Last Verified" date** to release date
-3. **Check for new ADRs** - add any missing to ADR Index section
-4. **Verify accuracy** against implementation (especially new features)
+3. **Add any new sections** if architecture expanded
+4. **Add missing ADRs** shown as warnings in check script
+
+**If adding new main section** (beyond 25): Update `EXPECTED_SECTIONS` in `scripts/check-architecture-diagrams.sh`
+
+**If adding new compliance section** (beyond 19.21): Update `COMPLIANCE_EXPECTED` in same script
+
+## DOCUMENTATION/CODE AUDIT VALIDATION
+
+The `doc-code-audit` check in release-brutal.sh detects documentation/code mismatches before release, ensuring README and docs accurately reflect current codebase values.
+
+### Purpose
+
+Prevents release of stale documentation that could confuse users, mislead customers, or violate compliance claims. Each check compares code-of-truth against public documentation.
+
+### Location
 
 ```bash
-# Quick check for new ADRs not in diagrams
-ls -la docs/adr/*.md | tail -10  # Recent ADRs
-grep "ADR0" ARCHITECTURE-DIAGRAMS.md | wc -l  # Count in diagrams
+./scripts/doc-code-audit.sh
 ```
 
-**Key sections to verify**:
+### Checks Performed
 
-- Section 9: Tool Execution (voice tool commands)
-- Section 25: ADR Index (all recent ADRs)
-- Quick Reference table (file paths and ADR refs)
+| Check                | Code Source                      | Doc Source | Purpose                                   |
+| -------------------- | -------------------------------- | ---------- | ----------------------------------------- |
+| Trial chat limit     | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 daily chats documented          |
+| Trial voice limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 5 minutes documented               |
+| Trial tools limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 tool uses documented            |
+| Trial maestri limit  | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 3 maestri documented               |
+| Health status values | `src/app/api/health/route.ts`    | README.md  | Verify healthy/degraded/unhealthy exist   |
+| Voice model name     | `src/lib/tier/tier-fallbacks.ts` | Code only  | Detect deprecated gpt-4o-realtime-preview |
+| Metrics push cadence | `vercel.json` + code             | Docs/Ops   | Verify 5-minute push schedule documented  |
+
+### Exit Codes
+
+| Code | Meaning                                |
+| ---- | -------------------------------------- |
+| 0    | All checks PASSED - safe to release    |
+| 1    | One or more mismatches FOUND - BLOCKED |
+
+### Usage
+
+```bash
+# Run manually to debug mismatches
+./scripts/doc-code-audit.sh
+
+# Expected output on success
+✓ Trial chat limit: 10 (README ✓, code ✓)
+✓ Trial voice limit: 5 minutes (README ✓, code ✓)
+✓ Trial tools limit: 10 (README ✓, code ✓)
+✓ Trial maestri limit: 3 (README ✓, code ✓)
+✓ Health status 'healthy' found in code and README
+✓ Health status 'degraded' found in code and README
+✓ Health status 'unhealthy' found in code and README
+✓ No deprecated voice model names found
+✓ Found correct voice model name 'gpt-realtime'
+✓ Metrics push cadence: every 5 minutes (vercel.json ✓)
+✓ Operations docs mention 5 minute cadence
+
+✓ All documentation matches code!
+```
+
+### Blocking Behavior
+
+**Release BLOCKED if** `doc-code-audit` returns exit code 1.
+
+When a mismatch is detected:
+
+1. **README mismatch**: Update README.md trial limits table to match code values
+2. **Health status mismatch**: Add missing status values to README or code
+3. **Voice model mismatch**: Fix deprecated model name in tier-fallbacks.ts
+4. **Metrics cadence mismatch**: Update vercel.json schedule or operations docs
+5. Re-run script until all checks PASS
+6. Commit fixes: `git add README.md docs/ && git commit -m "docs: fix doc-code mismatches"`
+7. Proceed with release
+
+### Integration with release-brutal.sh
+
+This check is automatically included in the release flow:
+
+```bash
+./scripts/release-brutal.sh --json
+# Includes doc-code-audit as part of compliance/documentation checks
+```
+
+### Common Fixes
+
+| Mismatch                        | Fix                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| Trial chat 10 → 15 in README    | Update README table: `\| Chat messages \| 10 /month \|`                    |
+| Trial voice 5 → 3 in README     | Update README table: `\| Voice time \| 5 min /month \|`                    |
+| Missing health status in README | Add "healthy, degraded, unhealthy" to health endpoint docs                 |
+| Deprecated model name found     | Replace `gpt-4o-realtime-preview` with `gpt-realtime` in tier-fallbacks.ts |
+| Metrics cadence wrong schedule  | Update vercel.json cron: `"schedule": "*/5 * * * *"`                       |
+
+### References
+
+- Script: `scripts/doc-code-audit.sh`
+- Tier fallbacks: `src/lib/tier/tier-fallbacks.ts`
+- Health endpoint: `src/app/api/health/route.ts`
+- README trial mode section: `README.md` (Trial Mode table)
+- Cron jobs: `vercel.json` + `docs/operations/CRON-JOBS.md`
 
 ## VERSION + RELEASE
 

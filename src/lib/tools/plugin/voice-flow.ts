@@ -4,13 +4,18 @@
  * Enables students to request tools vocally (F-04)
  */
 
-import { logger } from '@/lib/logger';
-import { ToolOrchestrator, ToolExecutionContext } from './orchestrator';
-import { TriggerDetector } from './trigger-detector';
-import { VoiceFeedbackInjector } from './voice-feedback';
-import { ToolRegistry } from './registry';
-import type { ToolResult } from '@/types/tools';
-import { VOICE_FLOW_MESSAGES_IT } from './constants';
+import { logger } from "@/lib/logger";
+import { ToolOrchestrator, ToolExecutionContext } from "./orchestrator";
+import { TriggerDetector } from "./trigger-detector";
+import { VoiceFeedbackInjector } from "./voice-feedback";
+import { ToolRegistry } from "./registry";
+import type { ToolResult } from "@/types/tools";
+import { VOICE_FLOW_MESSAGES_IT } from "./constants";
+import {
+  extractToolParameters,
+  type ExtractionContext,
+} from "@/lib/voice/voice-parameter-extractor";
+import { getMaestroById } from "@/data/maestri";
 
 /**
  * VoiceToolResult - Result of voice-triggered tool execution
@@ -59,7 +64,7 @@ export class VoiceToolFlow {
 
   /**
    * Process voice transcript and execute matched tool
-   * Flow: Detect triggers → Execute tool → Generate voice feedback
+   * Flow: Detect triggers → Extract parameters → Execute tool → Generate voice feedback
    *
    * @param transcript - Voice-to-text transcript from student
    * @param context - Tool execution context with user/session info
@@ -90,15 +95,69 @@ export class VoiceToolFlow {
         };
       }
 
-      // Step 3: Execute tool via orchestrator
       const toolId = bestMatch.toolId;
+
+      // Step 3: Build extraction context
+      const extractionContext: ExtractionContext = {};
+
+      // Add maestro subject if available
+      if (context.maestroId) {
+        try {
+          const maestro = getMaestroById(context.maestroId);
+          if (maestro) {
+            extractionContext.maestroSubject = maestro.subject;
+          }
+        } catch (_error) {
+          // Maestro not found, continue without subject
+          logger.warn("Failed to get maestro info for parameter extraction", {
+            maestroId: context.maestroId,
+          });
+        }
+      }
+
+      // Add conversation topics from recent history
+      if (
+        context.conversationHistory &&
+        context.conversationHistory.length > 0
+      ) {
+        // Extract topics from last 3 user messages
+        const recentUserMessages = context.conversationHistory
+          .filter((msg) => msg.role === "user")
+          .slice(-3)
+          .map((msg) => msg.content)
+          .filter(Boolean);
+
+        if (recentUserMessages.length > 0) {
+          extractionContext.conversationTopics = recentUserMessages;
+        }
+      }
+
+      // Step 4: Extract parameters from transcript (async for AI fallback)
+      const extraction = await extractToolParameters(
+        toolId,
+        transcript,
+        extractionContext,
+      );
+
+      // Log extraction results for monitoring
+      logger.info("Voice parameter extraction", {
+        toolId,
+        confidence: extraction.confidence,
+        paramCount: Object.keys(extraction.parameters).length,
+        hasContext: !!(
+          extractionContext.maestroSubject ||
+          extractionContext.conversationTopics?.length
+        ),
+      });
+
+      // Step 5: Execute tool with extracted parameters
       const result = await this.orchestrator.execute(
         toolId,
-        {}, // Empty args; can be extended for tools requiring parameters
+        extraction.parameters,
         context,
       );
 
-      // Step 4: Generate voice feedback
+      // Step 6: Generate voice feedback
       const voiceFeedback = this.feedbackInjector.injectConfirmation(
         toolId,
         result as ToolResult & { itemCount?: number; title?: string },
@@ -112,8 +171,8 @@ export class VoiceToolFlow {
       };
     } catch (error) {
       const errorMessage =
-        error instanceof Error ? error.message : 'Unknown error';
-      logger.error('VoiceToolFlow error:', { errorDetails: errorMessage });
+        error instanceof Error ? error.message : "Unknown error";
+      logger.error("VoiceToolFlow error:", { errorDetails: errorMessage });
 
       return {
         triggered: false,

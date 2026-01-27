@@ -47,11 +47,12 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     // - Onboarding completed
     // - Consent accepted
     // The test user is created by global-setup with a valid signed cookie
+    // NOTE: Home page is at "/" (root), not "/home"
 
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
 
-    await page.goto("/home");
+    await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Should not redirect to login (auth from storage state should work)
@@ -81,11 +82,20 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   });
 
   test("CP-03: API health endpoint responds", async ({ request }) => {
-    const response = await request.get("/api/health");
+    // Health check may return 503 on first request due to database cold start in CI
+    // Retry with backoff to handle this case (ADR 0067: serverless cold starts)
+    let response = await request.get("/api/health");
+    let data = await response.json();
 
+    // If unhealthy on first attempt, retry after a brief delay (cold start recovery)
+    if (response.status() === 503) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      response = await request.get("/api/health");
+      data = await response.json();
+    }
+
+    // After retry, endpoint should be healthy or degraded (not unhealthy)
     expect(response.status()).toBe(200);
-
-    const data = await response.json();
     expect(data).toHaveProperty("status");
     expect(["healthy", "degraded"]).toContain(data.status);
   });
@@ -134,12 +144,12 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     const response = await page.request.post("/api/auth/logout");
     expect(response.status()).toBe(200);
 
-    // Navigate to protected page after logout
-    await page.goto("/home");
+    // Navigate to protected page after logout (home is at "/")
+    await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
     // Should be redirected away from home (to login or welcome)
-    // OR stay on home but show trial/unauthenticated state
+    // OR stay on "/" but show trial/unauthenticated state
     const currentUrl = page.url();
     const redirectedAway =
       currentUrl.includes("/login") || currentUrl.includes("/welcome");
@@ -176,7 +186,9 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     });
 
     await page.goto("/welcome");
-    await page.waitForLoadState("networkidle");
+    // Use domcontentloaded instead of networkidle to avoid CI timeout issues
+    // networkidle can hang if there are persistent connections (EventSource, etc.)
+    await page.waitForLoadState("domcontentloaded");
 
     // Page should not be stuck on loading due to CSP
     const isLoading = await page

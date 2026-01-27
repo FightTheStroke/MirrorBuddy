@@ -285,6 +285,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Total Memory System (Plan 086)
+
+- **Tier-based memory configuration**: Different memory capabilities per subscription tier
+  - Trial: No memory (fresh start each session)
+  - Base: 3 recent conversations, 15-day retention, 10 key facts
+  - Pro: 5 conversations, unlimited retention, 50 key facts + advanced features
+- **Semantic memory retrieval** (Pro): RAG-based vector search for relevant past learnings
+- **Cross-maestro memory sharing** (Pro): Learnings from one maestro benefit sessions with others
+  - New settings toggle: "Memoria Interdisciplinare" in privacy settings
+- **Hierarchical summarization** (Pro): Weekly/monthly aggregations of learning progress
+  - Automated cron job runs Sunday 3 AM UTC
+- **Exponential decay mechanism**: Recent learnings prioritized (30-day half-life)
+- **Context builder**: Unified orchestration of all memory sources with token budgets
+- **Documentation**: ADR-0090 Total Memory System architecture
+
 #### Secrets Scan (Pre-commit Security)
 
 - **scripts/secrets-scan.sh**: Detects sensitive data before commit

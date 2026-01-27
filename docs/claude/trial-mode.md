@@ -217,6 +217,118 @@ Panels include:
 - Resource usage over time
 - Average usage per trial
 
+## Security Features (Plan 088)
+
+Plan 088 introduces critical security hardening for trial sessions to prevent abuse and protect user privacy:
+
+### Salted IP Hashing
+
+- IP addresses are hashed using SHA256 with a configurable salt (`IP_HASH_SALT` environment variable)
+- Prevents direct IP exposure in database logs and backups
+- Allows session recovery without storing raw IPs
+- Hash includes timestamp bucketing to prevent timing attacks
+
+```typescript
+// Usage in trial-service.ts
+const ipHash = await hashIpWithSalt(clientIp, ipHashSalt);
+```
+
+### GDPR Consent Gate
+
+- Users must explicitly accept the privacy policy before trial session starts
+- Implemented via `TosGateProvider` component that blocks UI until consent
+- Consent status tracked in HTTP-only cookie (`mirrorbuddy-consent`)
+- Fulfills GDPR Article 7 (clear affirmative action) and Italian law compliance
+
+**Enforcement points**:
+
+- Home page: Blocks access until consent accepted
+- API endpoints: Trial endpoints reject requests without consent cookie
+- Analytics: No events tracked before consent
+
+### Anti-Abuse Scoring
+
+- Suspicious patterns trigger an abuse score that accumulates per trial session
+- **Abuse threshold: 10** - sessions reaching this score are blocked/rate-limited
+- Patterns monitored:
+  - Rapid-fire requests (>5 messages/minute)
+  - Multiple session creation attempts (>3 per hour)
+  - Unusual geographic location changes
+  - High tool-to-chat ratio (>50% tools per session)
+
+**Implementation**: `src/lib/safety/abuse-detector.ts`
+
+- Scores tracked in `TrialSession.abuseScore` field
+- Score increments on suspicious behavior
+- Rate limiting applies when score ≥ 10
+
+```typescript
+const detector = new AbuseDetector();
+const score = await detector.evaluateSession(sessionId);
+if (score >= ABUSE_THRESHOLD) {
+  // Apply rate limiting or block session
+}
+```
+
+### 30-Day Data Retention
+
+- Trial session data automatically deleted 30 days after creation
+- Configured via cron job: `data-retention` (runs daily at 03:00 UTC)
+- Deletes: trial sessions, analytics events, temporary files
+- **GDPR compliance**: Implements data minimization principle (Article 5(1)(e))
+- Backup data purged separately to ensure complete removal
+
+**Retention schedule**:
+
+- Days 0-29: Data retained for session and analytics
+- Day 30: Automatic deletion via cron
+- No manual intervention required
+
+```bash
+# Cron job configured in vercel.json
+# DELETE FROM trial_sessions WHERE created_at < NOW() - INTERVAL 30 days
+```
+
+### Monthly Salt Rotation
+
+- IP hash salt rotated monthly via automated cron job: `rotate-ip-salt`
+- Old salt retained for 7 days to allow session lookup continuity
+- New salt applied to all new sessions immediately after rotation
+- Prevents rainbow table attacks and limits exposure window
+
+**Rotation process**:
+
+1. Generate new 32-byte cryptographically random salt
+2. Store as `IP_HASH_SALT_v2` (alongside current `IP_HASH_SALT`)
+3. Update environment variable via Vercel API
+4. New sessions hash with v2 salt immediately
+5. Purge old salt after 7 days
+
+**Implementation**: Cron job in `src/app/api/cron/rotate-ip-salt/route.ts`
+
+**Verification**:
+
+```bash
+# Check salt rotation history (admin only)
+GET /api/admin/security/salt-rotation-log
+
+# Manual test
+curl -X POST http://localhost:3000/api/cron/rotate-ip-salt \
+  -H "Authorization: Bearer $CRON_SECRET"
+```
+
+### Configuration
+
+All security features configured via environment variables:
+
+```bash
+# Required for Plan 088
+IP_HASH_SALT=<32-byte-hex>              # Initial IP hash salt
+ABUSE_THRESHOLD=10                       # Anti-abuse score threshold (default: 10)
+GDPR_ENFORCEMENT=true                    # Enforce consent gate (default: true)
+TRIAL_DATA_RETENTION_DAYS=30             # Data retention window (default: 30)
+```
+
 ## ADR References
 
 ### Primary

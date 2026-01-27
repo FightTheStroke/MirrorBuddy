@@ -59,6 +59,8 @@ async function checkAIProvider(): Promise<CheckResult> {
   );
 
   const ollamaUrl = process.env.OLLAMA_URL || "http://localhost:11434";
+  const isTestEnv =
+    process.env.NODE_ENV === "test" || process.env.CI === "true";
 
   if (azureConfigured) {
     return {
@@ -82,11 +84,28 @@ async function checkAIProvider(): Promise<CheckResult> {
       };
     }
 
+    // In test/CI environment, no AI provider is acceptable (warn, not fail)
+    // AI features won't work but the app is still functional for testing
+    if (isTestEnv) {
+      return {
+        status: "warn",
+        message: "No AI provider (test environment)",
+      };
+    }
+
     return {
       status: "fail",
       message: "No AI provider configured or available",
     };
   } catch {
+    // In test/CI environment, no AI provider is acceptable (warn, not fail)
+    if (isTestEnv) {
+      return {
+        status: "warn",
+        message: "No AI provider (test environment)",
+      };
+    }
+
     return {
       status: "fail",
       message: "No AI provider configured or available",

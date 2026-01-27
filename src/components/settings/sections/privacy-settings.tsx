@@ -23,6 +23,7 @@ import {
   type UnifiedConsentData,
 } from "@/lib/consent/unified-consent-storage";
 import { updateConsentSnapshot } from "@/lib/consent/consent-store";
+import { CrossMaestroMemorySettings } from "./cross-maestro-memory-settings";
 
 // Privacy Settings
 export function PrivacySettings() {
@@ -311,6 +312,9 @@ export function PrivacySettings() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Cross-Maestro Memory Settings */}
+      <CrossMaestroMemorySettings />
 
       {/* Version Info */}
       <Card>

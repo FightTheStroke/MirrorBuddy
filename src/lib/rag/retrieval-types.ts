@@ -49,7 +49,12 @@ export interface FindRelatedOptions {
  */
 export interface IndexMaterialInput {
   userId: string;
-  sourceType: 'material' | 'flashcard' | 'studykit' | 'message';
+  sourceType:
+    | "material"
+    | "flashcard"
+    | "studykit"
+    | "message"
+    | "conversation_summary";
   sourceId: string;
   content: string;
   subject?: string;

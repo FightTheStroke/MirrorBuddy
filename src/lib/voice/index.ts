@@ -31,4 +31,21 @@ export {
   generateToolId,
   // Prompts
   TOOL_USAGE_INSTRUCTIONS,
-} from './voice-tool-commands';
+} from "./voice-tool-commands";
+
+export {
+  // Types
+  type ParameterDefinition,
+  type ToolParameterSchema,
+  type ValidationResult,
+  // Schema registry
+  TOOL_SCHEMAS,
+} from "./tool-parameter-schemas";
+
+export {
+  validateParameters,
+  getToolSchema,
+  getToolParameterNames,
+  getRequiredParameters,
+  getAllTools,
+} from "./tool-parameter-validators";

@@ -107,3 +107,20 @@ model HomeworkSession {
   @@index([userId])
   @@index([status])
 }
+
+model HierarchicalSummary {
+  id                    String   @id @default(cuid())
+  userId                String
+  type                  String   // 'weekly' or 'monthly'
+  startDate             DateTime
+  endDate               DateTime
+  keyThemes             Json     // string[]
+  consolidatedLearnings Json     // string[]
+  frequentTopics        Json     // { topic: string; count: number }[]
+  sourceConversationIds Json     // string[]
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  @@index([userId, type])
+  @@index([userId, startDate, endDate])
+}
