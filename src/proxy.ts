@@ -52,16 +52,26 @@ const I18N_EXCLUDE_PATHS = [
 ];
 
 // Public routes that don't require authentication (ADR 0055, 0056)
+// CRITICAL: pathWithoutLocale strips /it, /en, etc. so /it becomes /
 const AUTH_PUBLIC_ROUTES = [
+  "/",
+  "/home",
   "/welcome",
   "/login",
+  "/landing",
   "/privacy",
   "/terms",
   "/cookies",
-  "/landing",
+  "/ai-transparency",
+  "/ai-policy",
+  "/compliance",
+  "/contact",
   "/showcase",
+  "/demo",
   "/invite",
-  "/maestri", // Avatar images
+  "/trial",
+  "/maestri",
+  "/avatars",
 ];
 
 // Admin routes require authenticated user (ADR 0055)
