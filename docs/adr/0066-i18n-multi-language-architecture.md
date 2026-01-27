@@ -295,6 +295,54 @@ The bug is in the package source: `react: void 0;` instead of a proper type defi
 
 **Never use `ignoreBuildErrors: true`** - it hides legitimate type errors in YOUR code.
 
+### 9. Single Proxy File Location (CRITICAL - Next.js 16)
+
+**Problem discovered 2026-01-27**: Having TWO proxy.ts files caused Next.js to use the wrong one:
+
+```
+/proxy.ts           ← Next.js was using THIS (simple, no path exclusions)
+/src/proxy.ts       ← We thought Next.js was using THIS (comprehensive)
+```
+
+Result: All API routes and images got 307 redirected to `/it/api/*` and `/it/*.png` → 404.
+
+**Next.js 16 Rule**: Only ONE `proxy.ts` file is supported per project.
+
+From [Next.js documentation](https://nextjs.org/docs/app/api-reference/file-conventions/proxy):
+
+> "Create a proxy.ts file in the project root, or inside src if applicable,
+> so that it is located at the same level as pages or app."
+
+**Correct configuration for MirrorBuddy**:
+
+- App directory: `/src/app/`
+- Proxy file: `/src/proxy.ts` (same level as app)
+- Root proxy.ts: **DELETED** (must not exist)
+
+**Export requirement**: Must be `export default function proxy()`:
+
+```typescript
+// CORRECT - Next.js 16 requires default export
+export default function proxy(request: NextRequest) {
+  // ...
+}
+
+// WRONG - Named export won't work
+export function proxy(request: NextRequest) {
+  // ...
+}
+```
+
+**Never create a root `/proxy.ts`** when your app is in `/src/`. Next.js will use the root one and ignore your src version.
+
+**Verification**:
+
+```bash
+# Must show ONLY ONE proxy.ts
+find . -name "proxy.ts" -not -path "./node_modules/*"
+# Expected: ./src/proxy.ts
+```
+
 ## Consequences
 
 ### Positive
@@ -315,18 +363,20 @@ The bug is in the package source: `react: void 0;` instead of a proper type defi
 
 ## Implementation Files
 
-| File                                      | Purpose                                 |
-| ----------------------------------------- | --------------------------------------- |
-| `src/i18n/routing.ts`                     | next-intl routing configuration         |
-| `src/i18n/config.ts`                      | Locale list and defaults                |
-| `middleware.ts`                           | Locale detection and routing middleware |
-| `messages/{locale}.json`                  | Translation strings (5 files)           |
-| `src/i18n/types.ts`                       | Type-safe translation types             |
-| `src/lib/i18n/formality-rules.ts`         | Formal/informal address logic           |
-| `src/lib/locale/locale-config-service.ts` | Locale configuration singleton          |
-| `prisma/schema/locale.prisma`             | LocaleConfig database schema            |
-| `eslint-local-rules/index.js`             | Custom ESLint rule                      |
-| `src/app/api/admin/locales/`              | Admin API routes                        |
+| File                                      | Purpose                                      |
+| ----------------------------------------- | -------------------------------------------- |
+| `src/proxy.ts`                            | **ONLY** proxy file (Next.js 16 requirement) |
+| `src/i18n/routing.ts`                     | next-intl routing configuration              |
+| `src/i18n/config.ts`                      | Locale list and defaults                     |
+| `messages/{locale}.json`                  | Translation strings (5 files)                |
+| `src/i18n/types.ts`                       | Type-safe translation types                  |
+| `src/lib/i18n/formality-rules.ts`         | Formal/informal address logic                |
+| `src/lib/locale/locale-config-service.ts` | Locale configuration singleton               |
+| `prisma/schema/locale.prisma`             | LocaleConfig database schema                 |
+| `eslint-local-rules/index.js`             | Custom ESLint rule                           |
+| `src/app/api/admin/locales/`              | Admin API routes                             |
+
+**CRITICAL**: Never create `/proxy.ts` at root - only `/src/proxy.ts` exists.
 
 ## References
 

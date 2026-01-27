@@ -42,6 +42,14 @@ if [ -n "$INVALID_MIGRATIONS" ]; then
 fi
 echo -e "${GREEN}✓ Migration naming OK${NC}"
 
+# Check for duplicate proxy.ts files (Next.js 16 requirement - ADR 0066)
+if [ -f "./proxy.ts" ]; then
+    echo -e "${RED}✗ Root /proxy.ts found - FORBIDDEN when app is in /src/${NC}"
+    echo -e "${YELLOW}Fix: Delete /proxy.ts - only /src/proxy.ts should exist${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ Proxy architecture OK${NC}"
+
 # =============================================================================
 # PHASE 1: SIMULATE FRESH PRISMA (like Vercel)
 # =============================================================================
