@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo } from "react";
+import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -14,23 +14,49 @@ import { maestri, SUBJECT_NAMES } from "@/data/maestri";
  * Learn WITH the greatest minds in history, not just ABOUT them.
  *
  * Shows ALL professors in a scrollable horizontal carousel (5 visible at a time).
+ * Auto-scrolls to show all professors.
  */
 export function MaestriShowcaseSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
 
   // Show all professors - carousel allows scrolling to see them all
   const displayedMaestri = useMemo(() => maestri, []);
 
-  const scroll = (direction: "left" | "right") => {
+  // Card width (w-44 = 176px) + gap (16px) = 192px per card
+  const CARD_WIDTH = 192;
+  const SCROLL_INTERVAL = 3000; // 3 seconds
+
+  const scroll = useCallback((direction: "left" | "right") => {
     if (scrollRef.current) {
-      // Card width (w-44 = 176px) + gap (16px) = 192px per card, scroll 2 cards
-      const scrollAmount = 384;
+      const scrollAmount = CARD_WIDTH;
       scrollRef.current.scrollBy({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
     }
-  };
+  }, []);
+
+  // Auto-scroll functionality
+  useEffect(() => {
+    if (isPaused || !scrollRef.current) return;
+
+    const interval = setInterval(() => {
+      if (!scrollRef.current) return;
+
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      const maxScroll = scrollWidth - clientWidth;
+
+      // If at the end, reset to start
+      if (scrollLeft >= maxScroll - 10) {
+        scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
+      } else {
+        scroll("right");
+      }
+    }, SCROLL_INTERVAL);
+
+    return () => clearInterval(interval);
+  }, [isPaused, scroll]);
 
   return (
     <motion.section
@@ -64,7 +90,11 @@ export function MaestriShowcaseSection() {
       </motion.div>
 
       {/* Carousel Container */}
-      <div className="relative">
+      <div
+        className="relative"
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+      >
         {/* Left Arrow */}
         <button
           onClick={() => scroll("left")}
@@ -74,55 +104,60 @@ export function MaestriShowcaseSection() {
           <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
-        {/* Scrollable Container */}
+        {/* Scrollable Container - Fixed width to show exactly 5 cards */}
         <div
-          ref={scrollRef}
-          className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
-          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-          tabIndex={0}
-          role="region"
-          aria-label="Carosello professori - usa le frecce per navigare"
+          className="overflow-hidden mx-auto"
+          style={{ width: "min(100%, 960px)" }}
         >
-          {displayedMaestri.map((maestro, i) => (
-            <motion.div
-              key={maestro.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{
-                delay: 0.6 + i * 0.03,
-                type: "spring",
-                stiffness: 150,
-                damping: 15,
-              }}
-              className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all"
-            >
-              {/* Avatar */}
-              <div
-                className="w-16 h-16 mx-auto mb-3 rounded-full p-0.5"
-                style={{
-                  background: `linear-gradient(135deg, ${maestro.color}, ${maestro.color}80)`,
+          <div
+            ref={scrollRef}
+            className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            tabIndex={0}
+            role="region"
+            aria-label="Carosello professori - usa le frecce per navigare"
+          >
+            {displayedMaestri.map((maestro, i) => (
+              <motion.div
+                key={maestro.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{
+                  delay: 0.6 + i * 0.03,
+                  type: "spring",
+                  stiffness: 150,
+                  damping: 15,
                 }}
+                className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all"
               >
-                <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
-                  <Image
-                    src={maestro.avatar}
-                    alt={`${maestro.displayName} - Professore di ${SUBJECT_NAMES[maestro.subject] || maestro.subject}`}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover"
-                  />
+                {/* Avatar */}
+                <div
+                  className="w-16 h-16 mx-auto mb-3 rounded-full p-0.5"
+                  style={{
+                    background: `linear-gradient(135deg, ${maestro.color}, ${maestro.color}80)`,
+                  }}
+                >
+                  <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
+                    <Image
+                      src={maestro.avatar}
+                      alt={`${maestro.displayName} - Professore di ${SUBJECT_NAMES[maestro.subject] || maestro.subject}`}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Info */}
-              <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 leading-tight">
-                {maestro.displayName}
-              </h3>
-              <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                {SUBJECT_NAMES[maestro.subject] || maestro.subject}
-              </p>
-            </motion.div>
-          ))}
+                {/* Info */}
+                <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 leading-tight">
+                  {maestro.displayName}
+                </h3>
+                <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
+                  {SUBJECT_NAMES[maestro.subject] || maestro.subject}
+                </p>
+              </motion.div>
+            ))}
+          </div>
         </div>
 
         {/* Right Arrow */}
