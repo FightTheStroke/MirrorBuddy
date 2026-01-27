@@ -7,10 +7,32 @@ export interface MonthlyBudgetData {
   currency: "EUR";
 }
 
-const redis = new Redis({
-  url: (process.env.UPSTASH_REDIS_REST_URL || "").trim(),
-  token: (process.env.UPSTASH_REDIS_REST_TOKEN || "").trim(),
-});
+// ============================================================================
+// REDIS INITIALIZATION - Lazy init to prevent module-load crashes
+// ============================================================================
+
+let redisInstance: Redis | null = null;
+
+function isRedisConfigured(): boolean {
+  return !!(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
+
+function getRedis(): Redis | null {
+  if (!isRedisConfigured()) {
+    return null;
+  }
+
+  if (!redisInstance) {
+    redisInstance = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!.trim(),
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!.trim(),
+    });
+  }
+
+  return redisInstance;
+}
 
 const TRIAL_BUDGET_LIMIT_EUR = Number(
   process.env.TRIAL_BUDGET_LIMIT_EUR || 100,
@@ -24,6 +46,18 @@ function getMonthlyKey(): string {
 }
 
 async function getMonthlyBudget(): Promise<MonthlyBudgetData> {
+  const redis = getRedis();
+
+  // Fallback when Redis not configured (development, CI)
+  if (!redis) {
+    logger.warn("Redis not configured, using unlimited budget fallback");
+    return {
+      used: 0,
+      limit: TRIAL_BUDGET_LIMIT_EUR,
+      currency: "EUR",
+    };
+  }
+
   try {
     const key = getMonthlyKey();
     const data = await redis.get(key);
@@ -51,6 +85,14 @@ async function getMonthlyBudget(): Promise<MonthlyBudgetData> {
 }
 
 async function incrementBudget(amount: number): Promise<MonthlyBudgetData> {
+  const redis = getRedis();
+
+  // Fallback when Redis not configured
+  if (!redis) {
+    logger.warn("Redis not configured, budget increment skipped");
+    return await getMonthlyBudget();
+  }
+
   try {
     const key = getMonthlyKey();
     const current = await getMonthlyBudget();
