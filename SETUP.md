@@ -23,11 +23,11 @@ Open http://localhost:3000
 
 ## AI Provider Options
 
-| Provider | Voice | Best For | Cost |
-|----------|-------|----------|------|
-| **Azure OpenAI** | ✅ Full | Production, schools | Pay-per-use |
-| **Ollama** | ❌ Text only | Local dev, privacy | Free |
-| **Showcase Mode** | ✅ Simulated | Demo, no API | Free |
+| Provider          | Voice        | Best For            | Cost        |
+| ----------------- | ------------ | ------------------- | ----------- |
+| **Azure OpenAI**  | ✅ Full      | Production, schools | Pay-per-use |
+| **Ollama**        | ❌ Text only | Local dev, privacy  | Free        |
+| **Showcase Mode** | ✅ Simulated | Demo, no API        | Free        |
 
 ---
 
@@ -36,7 +36,7 @@ Open http://localhost:3000
 1. [Azure Portal](https://portal.azure.com) → Create Azure OpenAI resource
 2. Deploy models:
    - `gpt-4o` (chat)
-   - `gpt-4o-realtime-preview` (voice)
+   - `gpt-realtime` (voice)
    - `text-embedding-ada-002` (RAG semantic search, optional)
 3. Configure `.env.local`:
 
@@ -50,7 +50,7 @@ AZURE_OPENAI_API_VERSION=2024-08-01-preview
 # Voice
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview
 
 # RAG Embeddings (optional - enables semantic search)
@@ -60,6 +60,7 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 4. Verify: Settings → AI Provider → Diagnostics → Test Connection
 
 **RAG Setup (optional):**
+
 ```bash
 az cognitiveservices account deployment create \
   --name your-resource --resource-group your-rg \
@@ -118,6 +119,7 @@ AZURE_SUBSCRIPTION_ID=your-subscription-id
 ## Database Configuration
 
 **PostgreSQL with pgvector (required for RAG):**
+
 ```bash
 # macOS
 brew install postgresql@17
@@ -143,7 +145,7 @@ See `.env.example` for all options. Key variables:
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
 AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
-AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
 
 # RAG Embeddings (optional)
 AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
@@ -178,7 +180,7 @@ npm run test         # Run Playwright E2E tests
 
 **Quick Fixes:**
 
-**Voice Not Working:** Verify Azure Realtime credentials, check deployment name, ensure `gpt-4o-realtime-preview` in region, check mic permissions, Settings → Diagnostics.
+**Voice Not Working:** Verify Azure Realtime credentials, check deployment name, ensure `gpt-realtime` in region, check mic permissions, Settings → Diagnostics.
 
 **Build Errors:** `rm -rf .next node_modules package-lock.json && npm install && npx prisma generate && npm run build`
 
@@ -195,6 +197,7 @@ npm run test         # Run Playwright E2E tests
 **Vercel:** `npm i -g vercel && vercel && vercel env add ... && vercel --prod`
 
 **Docker:**
+
 ```dockerfile
 FROM node:18-alpine
 WORKDIR /app
@@ -204,6 +207,7 @@ COPY . .
 RUN npx prisma generate && npm run build
 CMD ["npm", "start"]
 ```
+
 `docker build -t mirrorbuddy . && docker run -p 3000:3000 --env-file .env.local mirrorbuddy`
 
 ---

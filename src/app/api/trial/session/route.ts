@@ -7,6 +7,8 @@ import {
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { checkAbuse, incrementAbuseScore } from "@/lib/trial/anti-abuse";
+import { prisma } from "@/lib/db";
 
 const log = logger.child({ module: "api/trial/session" });
 
@@ -15,9 +17,51 @@ const log = logger.child({ module: "api/trial/session" });
  *
  * Creates or retrieves a trial session for the current visitor.
  * Uses IP hash + visitor cookie for session tracking (ADR 0056).
+ * Requires explicit consent to privacy policy (F-02: GDPR compliance).
  */
-export async function POST(_request: NextRequest) {
+export async function POST(request: NextRequest) {
   try {
+    // F-02: Check GDPR consent before creating trial session
+    const cookieStore = await cookies();
+    // eslint-disable-next-line no-restricted-syntax -- consent cookie, not auth
+    const trialConsentCookie = cookieStore.get("mirrorbuddy-trial-consent");
+
+    // Validate that consent was explicitly given
+    if (!trialConsentCookie?.value) {
+      log.warn("[TrialSession] Consent check failed - no consent cookie", {
+        path: request.nextUrl.pathname,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "Consenso privacy richiesto prima di iniziare la prova. Accetta l'informativa privacy sulla pagina di benvenuto.",
+        },
+        { status: 403 },
+      );
+    }
+
+    // Validate consent data format
+    try {
+      const consentData = JSON.parse(
+        decodeURIComponent(trialConsentCookie.value),
+      );
+      if (!consentData.accepted) {
+        return NextResponse.json(
+          {
+            error: "Consenso privacy non valido",
+          },
+          { status: 403 },
+        );
+      }
+    } catch {
+      return NextResponse.json(
+        {
+          error: "Consenso privacy non valido",
+        },
+        { status: 403 },
+      );
+    }
+
     // Check if user is authenticated
     const auth = await validateAuth();
 
@@ -28,7 +72,7 @@ export async function POST(_request: NextRequest) {
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     // Get or create visitor ID from cookie
-    const cookieStore = await cookies();
+    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
@@ -42,9 +86,30 @@ export async function POST(_request: NextRequest) {
       auth.userId || undefined,
     );
 
+    // F-03: Anti-abuse detection on session creation
+    const abuseCheck = checkAbuse(ip, visitorId);
+    if (abuseCheck.isAbuse) {
+      // Adapter for anti-abuse db interface
+      const dbAdapter = {
+        session: {
+          update: (args: unknown) =>
+            prisma.trialSession.update(
+              args as Parameters<typeof prisma.trialSession.update>[0],
+            ),
+        },
+      };
+      await incrementAbuseScore(session.id, abuseCheck.score, dbAdapter);
+      log.warn("[TrialSession] Abuse detected", {
+        sessionId: session.id.slice(0, 8),
+        score: abuseCheck.score,
+        reason: abuseCheck.reason,
+      });
+    }
+
     log.info("[TrialSession] Session created/retrieved", {
       sessionId: session.id,
       isNew: session.chatsUsed === 0,
+      abuseScore: abuseCheck.score,
     });
 
     // Set visitor cookie if not present
@@ -74,6 +139,7 @@ export async function POST(_request: NextRequest) {
       assignedCoach: session.assignedCoach,
     });
 
+    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
       response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
         httpOnly: true,
@@ -112,6 +178,7 @@ export async function GET() {
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     const cookieStore = await cookies();
+    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {

@@ -30,6 +30,19 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
   // Check consent on mount
   useEffect(() => {
     const checkConsent = () => {
+      // Check if trial consent cookie exists
+      const cookies = document.cookie.split("; ");
+      const trialConsentCookie = cookies.find((c) =>
+        c.startsWith("mirrorbuddy-trial-consent="),
+      );
+
+      if (trialConsentCookie) {
+        setConsented(true);
+        setIsLoading(false);
+        return;
+      }
+
+      // Fallback to unified consent system
       const hasConsent = hasTrialConsent();
       setConsented(hasConsent);
       setIsLoading(false);
@@ -40,6 +53,15 @@ export function TrialConsentGate({ children }: TrialConsentGateProps) {
 
   const handleAccept = () => {
     setTrialConsent();
+    // Also set a cookie that the server can read for API validation
+    const consentData = {
+      accepted: true,
+      version: "1.0",
+      acceptedAt: new Date().toISOString(),
+    };
+    document.cookie = `mirrorbuddy-trial-consent=${encodeURIComponent(
+      JSON.stringify(consentData),
+    )}; path=/; max-age=${60 * 60 * 24 * 365}; SameSite=Lax`;
     setConsented(true);
   };
 
