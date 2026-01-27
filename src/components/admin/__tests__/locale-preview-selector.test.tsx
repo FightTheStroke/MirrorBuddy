@@ -21,6 +21,17 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      previewLabel: "Preview Mode",
+      resetButton: "Reset",
+    };
+    return translations[key] || key;
+  },
+}));
+
 // Mock useLocale hook
 vi.mock("@/hooks/use-locale", () => ({
   useLocale: () => ({
@@ -156,7 +167,7 @@ describe("LocalePreviewSelector", () => {
     render(<LocalePreviewSelector />);
 
     // Should show some indicator that we're in preview mode
-    const indicator = screen.queryByText(/anteprima/i);
+    const indicator = screen.queryByText(/preview mode/i);
     expect(indicator).toBeInTheDocument();
   });
 

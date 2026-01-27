@@ -22,6 +22,32 @@ vi.mock("framer-motion", () => ({
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,
 }));
 
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string, params?: { tool?: string }) => {
+    const translations: Record<string, string> = {
+      "toolSelection.title": "Seleziona Argomento e Maestro",
+      "toolSelection.chooseSubject": params?.tool
+        ? `Scegli Materia per ${params.tool}`
+        : "Scegli Materia",
+      "toolSelection.chooseMaestro": "Scegli Maestro",
+      "toolSelection.chooseProfessor": params?.tool
+        ? `Scegli Professore per ${params.tool}`
+        : "Scegli Professore",
+      "toolSelection.back": "Indietro",
+      "toolSelection.confirm": "Conferma",
+      "toolSelection.close": "Chiudi",
+      "subjects.mathematics": "Matematica",
+      "subjects.physics": "Fisica",
+      "subjects.history": "Storia",
+      "tools.mindmap": "Mappa Mentale",
+      "tools.flashcard": "Flashcard",
+      "tools.quiz": "Quiz",
+    };
+    return translations[key] || key;
+  },
+}));
+
 // Mock Next.js Image
 vi.mock("next/image", () => ({
   default: ({ src, alt, ...props }: { src: string; alt: string }) => (

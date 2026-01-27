@@ -6,10 +6,25 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
 import { QuizPerformance } from "../quiz-performance";
 import type { QuizStats } from "@/types";
+
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      "no-quizzes": "Nessun quiz completato ancora",
+      "total-attempts": "Quiz totali",
+      "average-score": "Punteggio medio",
+      "best-score": "Miglior punteggio",
+      "by-subject": "Per materia",
+      attempts: "tentativi",
+    };
+    return translations[key] || key;
+  },
+}));
 
 describe("QuizPerformance - Mobile Responsive (F-49)", () => {
   const mockQuizStats: QuizStats = {
