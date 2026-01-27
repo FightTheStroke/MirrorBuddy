@@ -918,3 +918,43 @@ jobs:
           echo "  ✓ mobile-e2e"
           echo "  ✓ docker"
           echo "  ✓ performance"
+
+  # ============================================================================
+  # DEPLOY TO VERCEL
+  # ============================================================================
+  # Triggers Vercel deployment ONLY after ALL checks pass.
+  # This replaces Vercel's auto-deploy to ensure broken code never deploys.
+  # Requires: VERCEL_DEPLOY_HOOK secret (Deploy Hook URL from Vercel dashboard)
+  # ============================================================================
+  deploy-to-vercel:
+    name: "🚀 Deploy to Vercel"
+    runs-on: ubuntu-latest
+    needs: [deployment-gate]
+    # Only deploy on push to main (not PRs) and only if gate passed
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.deployment-gate.result == 'success'
+    steps:
+      - name: Trigger Vercel deployment
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$VERCEL_DEPLOY_HOOK" ]; then
+            echo "::error::VERCEL_DEPLOY_HOOK secret not configured"
+            exit 1
+          fi
+
+          echo "🚀 Triggering Vercel deployment..."
+          response=$(curl -s -w "\n%{http_code}" -X POST "$VERCEL_DEPLOY_HOOK")
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | sed '$d')
+
+          if [ "$http_code" -ge 200 ] && [ "$http_code" -lt 300 ]; then
+            echo "✅ Vercel deployment triggered successfully"
+            echo "Response: $body"
+          else
+            echo "::error::Vercel deployment trigger failed with HTTP $http_code"
+            echo "Response: $body"
+            exit 1
+          fi

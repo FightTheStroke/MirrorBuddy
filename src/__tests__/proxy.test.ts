@@ -7,6 +7,42 @@
 
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 
+// Mock Next.js server modules before importing proxy
+vi.mock("next/server", () => ({
+  NextResponse: {
+    next: vi.fn(() => ({ headers: new Map() })),
+    redirect: vi.fn(() => ({ headers: new Map() })),
+  },
+}));
+
+vi.mock("next-intl/middleware", () => ({
+  default: vi.fn(() => vi.fn()),
+}));
+
+vi.mock("@/i18n/routing", () => ({
+  routing: {
+    locales: ["it", "en", "fr", "de", "es"],
+    defaultLocale: "it",
+  },
+}));
+
+vi.mock("@/lib/security/csp-nonce", () => ({
+  generateNonce: vi.fn(() => "test-nonce"),
+  CSP_NONCE_HEADER: "x-csp-nonce",
+}));
+
+vi.mock("@/lib/observability/metrics-store", () => ({
+  metricsStore: {
+    recordLatency: vi.fn(),
+    recordError: vi.fn(),
+  },
+}));
+
+vi.mock("@/lib/auth/cookie-constants", () => ({
+  AUTH_COOKIE_NAME: "mirrorbuddy-user-id",
+  VISITOR_COOKIE_NAME: "mirrorbuddy-visitor-id",
+}));
+
 // We'll need to export buildCSPHeader from proxy.ts for testing
 import { buildCSPHeader } from "../proxy";
 

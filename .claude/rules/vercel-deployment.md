@@ -1,33 +1,54 @@
 # Vercel Deployment Rules - MirrorBuddy
 
-## Deployment Gate (CRITICAL - Configure in Vercel)
+## Deployment Architecture (Deploy Hook)
 
-**Vercel MUST wait for CI before deploying.** Without this, broken code deploys immediately.
+**Vercel deploys ONLY when CI triggers the deploy hook.** Auto-deploy is DISABLED.
 
-### Vercel Dashboard Configuration
+### How It Works
 
-1. Go to: **Project → Settings → Git → Deployment Protection**
-2. Enable: **"Vercel Deployment Protection"**
-3. Under "Required Status Checks", add: `✅ Deployment Gate`
+```
+Push to main → CI runs 14 checks → deployment-gate → deploy-to-vercel → Vercel builds
+```
 
-**Alternative** (if above unavailable):
+1. **CI runs ALL checks** (build, tests, security, quality)
+2. **deployment-gate** aggregates results - blocks if ANY fails
+3. **deploy-to-vercel** calls Vercel Deploy Hook ONLY if gate passes
+4. **Vercel builds** triggered by webhook, not by git push
 
-1. Go to: **Project → Settings → Git**
-2. Find: **"Ignored Build Step"** section
-3. Set command: `[[ $(gh run view --json conclusion -q .conclusion) == "success" ]] || exit 0`
+### Why This Architecture (The proxy.ts Disaster)
 
-### Why This Matters
+On 2026-01-27:
 
-The proxy.ts disaster (2026-01-27) happened because:
-
-- Push to main → Vercel deployed IMMEDIATELY
+- Push to main → Vercel deployed IMMEDIATELY (before CI finished)
 - CI was still running E2E tests
 - Tests would have caught the bug, but deployment was already live
 - Result: ALL images broken, ALL API routes returning 404
 
-### CI Deployment Gate Job
+**Solution**: Disable auto-deploy, use Deploy Hook triggered by CI.
 
-The `deployment-gate` job in `.github/workflows/ci.yml` aggregates ALL 14 checks:
+## Setup Instructions
+
+### Step 1: Disable Auto-Deploy on Vercel
+
+1. Go to: **Project → Settings → Git**
+2. Find: **"Automatic Deployments"** section
+3. Set to: **"Only deploy when instructed"** or disable for `main` branch
+
+### Step 2: Create Deploy Hook
+
+1. Go to: **Project → Settings → Git → Deploy Hooks**
+2. Create hook with name: `CI-Deployment` and branch: `main`
+3. Copy the URL (format: `https://api.vercel.com/v1/integrations/deploy/prj_xxx/xxx`)
+
+### Step 3: Add GitHub Secret
+
+```bash
+gh secret set VERCEL_DEPLOY_HOOK --body "https://api.vercel.com/v1/integrations/deploy/prj_xxx/xxx"
+```
+
+### CI Jobs
+
+The `deployment-gate` job aggregates ALL 14 checks:
 
 | Category    | Checks                                         |
 | ----------- | ---------------------------------------------- |
@@ -39,23 +60,23 @@ The `deployment-gate` job in `.github/workflows/ci.yml` aggregates ALL 14 checks
 
 **Deployment blocked if ANY check fails.**
 
-### GitHub Branch Protection (Recommended)
+The `deploy-to-vercel` job:
 
-For maximum safety, also configure GitHub branch protection on `main`:
+- Depends on `deployment-gate`
+- Only runs on push to main (not PRs)
+- Calls the Vercel Deploy Hook URL
+- Fails if hook returns error
 
-1. Go to: **Repository → Settings → Branches → Add rule**
-2. Branch name pattern: `main`
-3. Enable:
-   - ✅ Require a pull request before merging
-   - ✅ Require status checks to pass before merging
-   - ✅ Require branches to be up to date before merging
-4. Add required status checks:
-   - `✅ Deployment Gate`
-   - `Build & Lint`
-   - `E2E Tests (BLOCKING)`
-   - `Mobile E2E Tests (BLOCKING)`
+### GitHub Branch Protection (Configured)
 
-**Result**: No direct pushes to main. All changes go through PRs with CI validation.
+Branch protection on `main` requires:
+
+- `✅ Deployment Gate`
+- `Build & Lint`
+- `E2E Tests (BLOCKING)`
+- `Mobile E2E Tests (BLOCKING)`
+
+Admins can bypass for emergencies (logged).
 
 ## Pre-Deployment Checklist (MANDATORY)
 
