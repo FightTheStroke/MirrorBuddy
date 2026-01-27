@@ -7,24 +7,24 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import { SidebarNavigation, Collection, TagItem } from "../sidebar-navigation";
 
 // Mock next-intl to return Italian translations
-// Note: sidebar-navigation uses kebab-case keys (legacy, not yet migrated to camelCase per ADR 0091)
+// Note: sidebar-navigation uses camelCase keys per ADR 0091
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
-      "sidebar.navigation-aria-label": "Navigazione materiali",
-      "sidebar.quick-filters-title": "Filtri rapidi",
-      "sidebar.quick-filters-aria-label": "Filtri rapidi",
+      "sidebar.navigationAriaLabel": "Navigazione materiali",
+      "sidebar.quickFiltersTitle": "Filtri rapidi",
+      "sidebar.quickFiltersAriaLabel": "Filtri rapidi",
       "sidebar.recent": "Recenti",
       "sidebar.favorites": "Preferiti",
       "sidebar.archived": "Archiviati",
-      "sidebar.collections-title": "Cartelle",
-      "sidebar.collections-aria-label": "Cartelle",
-      "sidebar.no-collections": "Nessuna cartella",
-      "sidebar.tags-title": "Tag",
-      "sidebar.tags-aria-label": "Tag",
-      "sidebar.no-tags": "Nessun tag",
-      "sidebar.create-collection-aria-label": "Crea nuova cartella",
-      "sidebar.create-tag-aria-label": "Crea nuovo tag",
+      "sidebar.collectionsTitle": "Cartelle",
+      "sidebar.collectionsAriaLabel": "Cartelle",
+      "sidebar.noCollections": "Nessuna cartella",
+      "sidebar.tagsTitle": "Tag",
+      "sidebar.tagsAriaLabel": "Tag",
+      "sidebar.noTags": "Nessun tag",
+      "sidebar.createCollectionAriaLabel": "Crea nuova cartella",
+      "sidebar.createTagAriaLabel": "Crea nuovo tag",
     };
     return translations[key] || key;
   },

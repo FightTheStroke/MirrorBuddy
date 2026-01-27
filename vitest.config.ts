@@ -15,9 +15,11 @@ export default defineConfig({
     outputFile: process.env.CI ? "./coverage/test-results.json" : undefined,
     // Tests that modify i18n files should run with proper isolation
     // Using hooks: "list" ensures beforeAll/afterAll run in correct order
+    // fileParallelism: false prevents cross-file race conditions with i18n files
     sequence: {
       hooks: "list",
     },
+    fileParallelism: false,
     coverage: {
       provider: "v8",
       reporter: ["text", "json", "html"],

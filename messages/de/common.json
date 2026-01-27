@@ -1,6 +1,5 @@
 {
   "common": {
-    "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolgreich",
     "warning": "Warnung",
@@ -100,7 +99,8 @@
       "selectModels": "Modelle auswählen"
     },
     "create": "Erstellen",
-    "update": "Aktualisieren"
+    "update": "Aktualisieren",
+    "loading": "Laden..."
   },
   "status": {
     "active": "Aktiv",

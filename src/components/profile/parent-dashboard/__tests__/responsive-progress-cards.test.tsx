@@ -11,15 +11,15 @@ import { render } from "@testing-library/react";
 import { QuizPerformance } from "../quiz-performance";
 import type { QuizStats } from "@/types";
 
-// Mock next-intl
+// Mock next-intl with camelCase keys per ADR 0091
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
-      "no-quizzes": "Nessun quiz completato ancora",
-      "total-attempts": "Quiz totali",
-      "average-score": "Punteggio medio",
-      "best-score": "Miglior punteggio",
-      "by-subject": "Per materia",
+      noQuizzes: "Nessun quiz completato ancora",
+      totalAttempts: "Quiz totali",
+      averageScore: "Punteggio medio",
+      bestScore: "Miglior punteggio",
+      bySubject: "Per materia",
       attempts: "tentativi",
     };
     return translations[key] || key;
