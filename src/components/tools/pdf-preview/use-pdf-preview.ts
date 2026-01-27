@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 import {
   processPDF,
   PDFProcessingError,
   type ProcessedPDF,
   type ProcessedPage,
-} from '@/lib/pdf';
+} from "@/lib/pdf";
 
-export type ViewMode = 'loading' | 'preview' | 'error';
+export type ViewMode = "loading" | "preview" | "error";
 
 export interface UsePDFPreviewOptions {
   file: File;
@@ -40,7 +40,7 @@ export function usePDFPreview({
   onPagesSelected,
   onClose,
 }: UsePDFPreviewOptions): UsePDFPreviewReturn {
-  const [viewMode, setViewMode] = useState<ViewMode>('loading');
+  const [viewMode, setViewMode] = useState<ViewMode>("loading");
   const [error, setError] = useState<string | null>(null);
   const [pdfData, setPdfData] = useState<ProcessedPDF | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
@@ -58,7 +58,7 @@ export function usePDFPreview({
 
         if (!cancelled) {
           setPdfData(result);
-          setViewMode('preview');
+          setViewMode("preview");
 
           // Auto-select first page
           if (result.pages.length > 0) {
@@ -70,9 +70,9 @@ export function usePDFPreview({
           if (err instanceof PDFProcessingError) {
             setError(err.message);
           } else {
-            setError('Errore durante l\'elaborazione del PDF.');
+            setError("processing-error");
           }
-          setViewMode('error');
+          setViewMode("error");
         }
       }
     }
@@ -115,7 +115,7 @@ export function usePDFPreview({
         return next;
       });
     },
-    [allowMultiSelect]
+    [allowMultiSelect],
   );
 
   // Confirm selection
@@ -140,31 +140,39 @@ export function usePDFPreview({
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (viewMode !== 'preview') return;
+      if (viewMode !== "preview") return;
 
       switch (e.key) {
-        case 'ArrowLeft':
+        case "ArrowLeft":
           goToPrevPage();
           break;
-        case 'ArrowRight':
+        case "ArrowRight":
           goToNextPage();
           break;
-        case 'Escape':
+        case "Escape":
           onClose();
           break;
-        case 'Enter':
+        case "Enter":
           handleConfirm();
           break;
-        case ' ':
+        case " ":
           e.preventDefault();
           togglePageSelection(currentPage);
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [viewMode, currentPage, goToPrevPage, goToNextPage, onClose, handleConfirm, togglePageSelection]);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    viewMode,
+    currentPage,
+    goToPrevPage,
+    goToNextPage,
+    onClose,
+    handleConfirm,
+    togglePageSelection,
+  ]);
 
   const currentPageData = pdfData?.pages[currentPage];
 

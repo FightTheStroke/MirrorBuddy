@@ -1,0 +1,377 @@
+{
+  "astuccio": {
+    "title": "Astuccio",
+    "backToAstuccio": "← Torna all'Astuccio",
+    "toolsCount": "{count} strumenti",
+    "categories": {
+      "upload": {
+        "title": "Carica",
+        "subtitle": "Importa i tuoi materiali per generare supporti di studio"
+      },
+      "create": {
+        "title": "Crea",
+        "subtitle": "Genera materiali di studio con l'aiuto dei Maestri"
+      },
+      "search": {
+        "title": "Cerca",
+        "subtitle": "Trova risorse e approfondimenti sul web"
+      }
+    },
+    "info": {
+      "howItWorks": "Come Funziona?",
+      "step1": {
+        "title": "Scegli lo Strumento",
+        "description": "Seleziona lo strumento più adatto al tuo obiettivo di apprendimento"
+      },
+      "step2": {
+        "title": "Scegli il Maestro",
+        "description": "Ogni maestro ha un approccio unico per aiutarti a imparare"
+      },
+      "step3": {
+        "title": "Salva nello Zaino",
+        "description": "I materiali creati vengono salvati nel tuo Zaino per riusarli quando vuoi"
+      },
+      "studyTip": {
+        "title": "Consiglio per Studiare",
+        "description": "Inizia con una <strong>Mappa Mentale</strong> per avere una visione d'insieme, poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave, e infine verifica la tua preparazione con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!"
+      }
+    },
+    "backButton": "Back Button",
+    "how_it_works": {
+      "step1_desc": "Step1 desc",
+      "step1_title": "Step1 title",
+      "step2_desc": "Step2 desc",
+      "step2_title": "Step2 title",
+      "step3_desc": "Step3 desc",
+      "step3_title": "Step3 title",
+      "title": "Titolo"
+    },
+    "itemCount": "Item Count",
+    "study_tip": {
+      "description": "Descrizione",
+      "title": "Titolo"
+    }
+  },
+  "zaino": {
+    "print": {
+      "success": "Stampa avviata",
+      "successDescription": "Il documento si aprirà nella finestra di stampa.",
+      "error": "Errore di stampa",
+      "errorDescription": "Impossibile aprire la finestra di stampa. Controlla le impostazioni popup.",
+      "downloadSuccess": "File scaricato",
+      "downloadSuccessDescription": "Il file HTML è stato scaricato.",
+      "downloadError": "Errore",
+      "downloadErrorDescription": "Impossibile scaricare il file.",
+      "ariaLabel": "Stampa {title}",
+      "button": "Stampa",
+      "optionsAriaLabel": "Opzioni stampa per {title}",
+      "printPdf": "Stampa PDF",
+      "downloadHtml": "Scarica HTML"
+    }
+  },
+  "tools": {
+    "pdf": {
+      "label": "PDF",
+      "description": "Genera documenti PDF dei contenuti",
+      "preview": {
+        "analyze": "Analyze",
+        "analyzePages": "Analyze pages",
+        "cancel": "Annulla",
+        "clickToSelect": "Click to select",
+        "close": "Chiudi",
+        "page": "Page",
+        "pages": "Pages",
+        "processing": "Elaborazione...",
+        "selectedCount": "Selected count",
+        "truncatedInfo": "Truncated info"
+      }
+    },
+    "webcam": {
+      "label": "Webcam",
+      "description": "Usa la webcam per interazioni visive",
+      "cancel": "Annulla",
+      "confirm": "Conferma",
+      "inProgress": "In Progress",
+      "positionContent": "Position Content",
+      "retake": "Retake",
+      "startingCamera": "Starting Camera",
+      "switchCamera": "Switch Camera",
+      "switchingCamera": "Switching Camera",
+      "takePhoto": "Take Photo"
+    },
+    "homework": {
+      "label": "Compiti",
+      "description": "Assistente per i compiti a casa"
+    },
+    "studyKit": {
+      "label": "Study Kit",
+      "description": "Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz"
+    },
+    "mindmap": {
+      "label": "Mappa Mentale",
+      "description": "Crea mappe mentali visive per organizzare le idee"
+    },
+    "quiz": {
+      "label": "Quiz",
+      "description": "Crea quiz interattivi per verificare le conoscenze"
+    },
+    "flashcard": {
+      "label": "Flashcard",
+      "description": "Memorizza con flashcard intelligenti e ripetizione spaziata"
+    },
+    "demo": {
+      "label": "Demo Interattiva",
+      "description": "Esplora concetti STEM con simulazioni interattive"
+    },
+    "summary": {
+      "label": "Riassunto",
+      "description": "Genera riassunti automatici dei contenuti",
+      "cancel": "Annulla",
+      "convertToMindmap": "Convert To Mindmap",
+      "edit": "Modifica",
+      "exportPdf": "Export Pdf",
+      "generateFlashcards": "Generate Flashcards",
+      "hide": "Hide",
+      "motivational": {
+        "excellent": "Excellent",
+        "good": "Good",
+        "start": "Start"
+      },
+      "noContentYet": "No Content Yet",
+      "preview": "Preview",
+      "save": "Salva",
+      "saved": "Saved",
+      "show": "Show",
+      "structure": "Structure",
+      "titlePlaceholder": "Title Placeholder",
+      "unsaved": "Unsaved",
+      "word": "Word",
+      "words": "Words"
+    },
+    "diagram": {
+      "label": "Diagramma",
+      "description": "Crea diagrammi di flusso e schemi visivi"
+    },
+    "timeline": {
+      "label": "Linea Temporale",
+      "description": "Organizza eventi storici o sequenze in modo visivo"
+    },
+    "formula": {
+      "label": "Formula",
+      "description": "Visualizza e spiega formule matematiche"
+    },
+    "chart": {
+      "label": "Grafico",
+      "description": "Crea grafici e visualizzazioni dati"
+    },
+    "typing": {
+      "label": "Impara a Digitare",
+      "description": "Impara a digitare con lezioni progressive e accessibilità DSA",
+      "developmentMessage": "Development Message",
+      "featureList": {
+        "accessibility": "Accessibility",
+        "ai": "Ai",
+        "games": "Giochi",
+        "multilingual": "Multilingual",
+        "progressive": "Progressive",
+        "singleHand": "Single Hand",
+        "tracking": "Tracking"
+      },
+      "features": "Funzionalità",
+      "level": "Livello",
+      "none": "Nessuno",
+      "recommendedLesson": "Recommended Lesson",
+      "title": "Titolo"
+    },
+    "search": {
+      "label": "Ricerca Web",
+      "description": "Cerca informazioni, video e risorse educative sul web",
+      "noResults": "No Results",
+      "resultCount": "Result Count",
+      "wikipediaOnly": "Wikipedia Only"
+    },
+    "backToAstuccio": "Back To Astuccio",
+    "title": "Titolo",
+    "toolsCount": "Tools Count",
+    "connection": {
+      "connected": "Connesso",
+      "connecting": "Connessione...",
+      "disconnected": "Disconnesso",
+      "error": "Errore",
+      "reconnecting": "Riconnessione..."
+    },
+    "flashcards": {
+      "ratingQuestion": "Rating Question",
+      "label": "Flashcard",
+      "description": "Studia con flashcard per memorizzare meglio"
+    },
+    "loading": {
+      "cancelled": "Cancelled",
+      "chunksReceived": "Chunks Received",
+      "error": "Errore",
+      "loadingData": "Loading Data",
+      "loadingMaterial": "Loading Material",
+      "noData": "No Data",
+      "preparing": "Preparazione..."
+    },
+    "markmap": {
+      "accessibility": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      },
+      "download": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      },
+      "error": "Errore",
+      "fullscreen": {
+        "ariaLabelEnter": "Aria Label Enter",
+        "ariaLabelExit": "Aria Label Exit",
+        "enter": "Enter",
+        "exit": "Exit"
+      },
+      "instructions": "Instructions",
+      "interactiveMindmapDescription": "Interactive Mindmap Description",
+      "interactiveRenderMessage": "Interactive Render Message",
+      "mindmapDescription": "Mindmap Description",
+      "print": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      },
+      "resetView": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      },
+      "successMessage": "Success Message",
+      "zoomIn": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      },
+      "zoomOut": {
+        "ariaLabel": "Aria Label",
+        "title": "Titolo"
+      }
+    },
+    "print": {
+      "ariaOptions": "Aria Options",
+      "ariaPrint": "Aria Print",
+      "buttonLabel": "Button Label",
+      "downloadSuccessMessage": "Download Success Message",
+      "downloadSuccessTitle": "Download Success Title",
+      "errorGenericMessage": "Error Generic Message",
+      "errorMessage": "Error Message",
+      "errorTitle": "Error Title",
+      "htmlOption": "Html Option",
+      "pdfOption": "Pdf Option",
+      "successMessage": "Success Message",
+      "successTitle": "Success Title"
+    },
+    "toolPanel": {
+      "building": "Building",
+      "close": "Chiudi",
+      "error": "Errore",
+      "expand": "Espandi",
+      "labels": {
+        "chart": "Chart",
+        "demo": "Demo",
+        "diagram": "Diagram",
+        "flashcard": "Flashcard",
+        "formula": "Formula",
+        "mindmap": "Mindmap",
+        "pdf": "Pdf",
+        "quiz": "Quiz",
+        "search": "Cerca",
+        "summary": "Summary",
+        "timeline": "Timeline",
+        "webcam": "Webcam"
+      },
+      "minimize": "Riduci a icona",
+      "progress": "Progresso",
+      "unsupportedToolType": "Unsupported Tool Type"
+    },
+    "voice": {
+      "label": "Voce",
+      "description": "Attiva la conversazione vocale"
+    }
+  },
+  "studyKit": {
+    "exportModal": {
+      "cancel": "Annulla",
+      "closeLabel": "Close Label",
+      "description": "Descrizione",
+      "error": "Errore",
+      "export": "Export",
+      "formatLabel": "Format Label",
+      "generating": "Generazione...",
+      "profileLabel": "Profile Label",
+      "success": {
+        "default": "Default",
+        "withZaino": "With Zaino"
+      },
+      "title": "Titolo"
+    },
+    "list": {
+      "cancel": "Annulla",
+      "delete": "Elimina",
+      "deleteConfirm": "Delete Confirm",
+      "deleteError": "Delete Error",
+      "empty": {
+        "description": "Descrizione",
+        "title": "Titolo"
+      },
+      "error": {
+        "description": "Descrizione",
+        "title": "Titolo"
+      },
+      "filters": {
+        "all": "Tutti",
+        "error": "Errore",
+        "processing": "Elaborazione...",
+        "ready": "Ready"
+      },
+      "open": "Apri",
+      "processing": {
+        "description": "Descrizione",
+        "title": "Titolo"
+      },
+      "status": "Stato"
+    },
+    "uploadProgress": {
+      "loadAnother": "Load Another",
+      "processingNote": "Processing Note",
+      "status": {
+        "error": "Errore",
+        "processing": "Elaborazione...",
+        "success": "Completato",
+        "uploading": "Uploading"
+      }
+    },
+    "view": {
+      "back": "Indietro",
+      "backToList": "Back To List",
+      "features": {
+        "demo": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "mindmap": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "quiz": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "summary": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        }
+      },
+      "header": "Header",
+      "myKits": "My Kits",
+      "newKit": "New Kit",
+      "subtitle": "Sottotitolo",
+      "uploadTitle": "Upload Title"
+    }
+  }
+}

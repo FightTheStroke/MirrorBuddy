@@ -1,12 +1,18 @@
-import type { Metadata } from 'next';
+import type { Metadata } from "next";
 
+/**
+ * Terms of Service layout metadata
+ * Used by all locale-specific terms pages
+ * F-75: Localized metadata for search engines
+ * F-81: SEO optimization with proper robots and canonical tags
+ */
 export const metadata: Metadata = {
-  title: 'Termini di Servizio | MirrorBuddy',
+  title: "Terms of Service - MirrorBuddy",
   description:
-    'Termini di Servizio di MirrorBuddy in linguaggio semplice e comprensibile. Scopri cosa promettiamo e cosa ti chiediamo.',
-  robots: 'index, follow',
+    "Terms of Service for MirrorBuddy. Understand our service terms, user rights, and responsibilities.",
+  robots: "index, follow",
   alternates: {
-    canonical: '/terms',
+    canonical: "/terms",
   },
 };
 

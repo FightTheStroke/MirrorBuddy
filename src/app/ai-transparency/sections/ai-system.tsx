@@ -1,118 +1,85 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Section } from "../sections";
 
 export function AISystemSections() {
+  const t = useTranslations("aiTransparency.aiSystem");
+
   return (
     <>
-      <Section number={1} title="Cosa fa l'IA in MirrorBuddy?">
+      <Section number={1} title={t("section1Title")}>
+        <p>{t("section1Para1")}</p>
         <p>
-          MirrorBuddy utilizza l&apos;intelligenza artificiale (IA) per offrire
-          un&apos;esperienza educativa personalizzata. I 22{" "}
-          <strong>Maestri IA</strong> (tutori virtuali) sono progettati per
-          insegnare, spiegare concetti difficili, creare quiz, mappe mentali e
-          flashcard.
-        </p>
-        <p>
-          Importante: <strong>L&apos;IA NON decide il tuo voto</strong>,{" "}
-          <strong>NON valuta la tua disabilità</strong>, e{" "}
-          <strong>NON sostituisce i tuoi insegnanti</strong>. Gli insegnanti
-          rimangono sempre i responsabili principali della valutazione e delle
-          decisioni pedagogiche.
+          {t("section1Para2Intro")} <strong>{t("section1Para2Item1")}</strong>,{" "}
+          <strong>{t("section1Para2Item2")}</strong>, {t("section1Para2Item3")}.{" "}
+          {t("section1Para2Conclusion")}
         </p>
       </Section>
 
-      <Section number={2} title="Il Sistema IA">
-        <p>
-          MirrorBuddy utilizza <strong>Azure OpenAI (GPT-4)</strong>, un modello
-          di linguaggio di ultima generazione sviluppato da OpenAI e ospitato
-          nei data center europei di Microsoft.
-        </p>
+      <Section number={2} title={t("section2Title")}>
+        <p>{t("section2Para1")}</p>
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Come Funziona:
+          {t("section2Heading")}
         </h3>
         <ul className="space-y-2">
           <li>
-            <strong>Elaborazione del Testo</strong>: Quando scrivi una domanda,
-            il modello analizza il testo e genera una risposta basata sul suo
-            addestramento
+            <strong>{t("section2List1Title")}</strong>: {t("section2List1Text")}
           </li>
           <li>
-            <strong>Conoscenza Verificata</strong>: I 22 Maestri hanno{" "}
-            <strong>embedded knowledge bases</strong> - librerie di conoscenza
-            controllate e verificate da esperti - che limitano cosa possono dire
+            <strong>{t("section2List2Title")}</strong>: {t("section2List2Text")}
           </li>
           <li>
-            <strong>Feedback Umano</strong>: Ogni risposta è revisionabile da
-            insegnanti e genitori tramite il dashboard di controllo
+            <strong>{t("section2List3Title")}</strong>: {t("section2List3Text")}
           </li>
         </ul>
       </Section>
 
-      <Section number={3} title="I 22 Maestri IA">
-        <p>
-          MirrorBuddy ha 22 tutori virtuali specializzati in diverse materie.
-          Ogni Maestro ha una personalità autentica e una conoscenza verificata
-          nel suo ambito.
-        </p>
+      <Section number={3} title={t("section3Title")}>
+        <p>{t("section3Para1")}</p>
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Categorie di Maestri:
+          {t("section3Heading")}
         </h3>
         <ul className="space-y-2">
           <li>
-            <strong>Scienze e Matematica</strong>: Euclide (Geometria), Galileo
-            (Astronomia), Feynman (Fisica), Curie (Chimica), Darwin (Biologia)
+            <strong>{t("section3Cat1Title")}</strong>: {t("section3Cat1Items")}
           </li>
           <li>
-            <strong>Lingue e Umanistica</strong>: Manzoni (Italiano),
-            Shakespeare (Inglese), Alex Pina (Spagnolo), Omero (Storytelling)
+            <strong>{t("section3Cat2Title")}</strong>: {t("section3Cat2Items")}
           </li>
           <li>
-            <strong>Società e Ambiente</strong>: Cicerone (Educazione Civica),
-            Smith (Economia), Humboldt (Geografia), Erodoto (Storia)
+            <strong>{t("section3Cat3Title")}</strong>: {t("section3Cat3Items")}
           </li>
           <li>
-            <strong>Arte, Musica e Benessere</strong>: Leonardo (Arte), Mozart
-            (Musica), Ippocrate (Salute), Chris (Educazione Fisica), Simone
-            (Sport)
+            <strong>{t("section3Cat4Title")}</strong>: {t("section3Cat4Items")}
           </li>
           <li>
-            <strong>Discipline Specialistiche</strong>: Lovelace (Informatica),
-            Socrate (Filosofia), Cassese (Diritto Internazionale)
+            <strong>{t("section3Cat5Title")}</strong>: {t("section3Cat5Items")}
           </li>
         </ul>
-        <p className="mt-4">
-          Ogni Maestro ha una voce unica (sia testuale che audio), uno stile
-          didattico personalizzato, e può accedere a strumenti come quiz,
-          flashcard, mappe mentali e PDF per insegnare efficacemente.
-        </p>
+        <p className="mt-4">{t("section3Para2")}</p>
       </Section>
 
-      <Section number={4} title="Le Tue Protezioni">
+      <Section number={4} title={t("section4Title")}>
         <h3 className="text-lg font-semibold text-slate-900 dark:text-white mt-4 mb-2">
-          Sistema di Sicurezza a 5 Livelli:
+          {t("section4Heading")}
         </h3>
         <ul className="space-y-3">
           <li>
-            <strong>1. Trasparenza Costante</strong>: Saprai sempre quando stai
-            parlando con un&apos;IA. Un banner ti lo ricorda in ogni chat.
+            <strong>{t("section4Item1Title")}</strong>: {t("section4Item1Text")}
           </li>
           <li>
-            <strong>2. Supervisione Umana</strong>: Insegnanti e genitori vedono
-            tutte le tue chat e possono intervenire in qualsiasi momento
+            <strong>{t("section4Item2Title")}</strong>: {t("section4Item2Text")}
           </li>
           <li>
-            <strong>3. Contenuto Filtrato</strong>: L&apos;IA non genererà mai
-            contenuti violenti, espliciti o inappropriati per la tua età
+            <strong>{t("section4Item3Title")}</strong>: {t("section4Item3Text")}
           </li>
           <li>
-            <strong>4. Limiti di Utilizzo</strong>: Hai budget giornaliero di
-            interazioni con l&apos;IA per evitare dipendenza e mantenere la
-            concentrazione
+            <strong>{t("section4Item4Title")}</strong>: {t("section4Item4Text")}
           </li>
           <li>
-            <strong>5. Doppio Consenso</strong> (per minori): Sia tu che i tuoi
-            genitori dovete approvare l&apos;uso dell&apos;IA
+            <strong>{t("section4Item5Title")}</strong>{" "}
+            {t("section4Item5Subtitle")}: {t("section4Item5Text")}
           </li>
         </ul>
       </Section>

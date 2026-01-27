@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Topic Detail View
@@ -6,19 +6,16 @@
  * Plan 8 MVP - Wave 4: UI Integration [F-23]
  */
 
-import { useState, useEffect } from 'react';
-import {
-  ArrowLeft,
-  Clock,
-  Loader2,
-} from 'lucide-react';
-import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
-import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { cn } from '@/lib/utils';
-import type { LearningPathTopic, TopicStep } from '@/types';
-import { StepCard } from './topic-detail/step-card';
+import { useState, useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { ArrowLeft, Clock, Loader2 } from "lucide-react";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
+import type { LearningPathTopic, TopicStep } from "@/types";
+import { StepCard } from "./topic-detail/step-card";
 
 interface TopicDetailProps {
   pathId: string;
@@ -35,6 +32,7 @@ export function TopicDetail({
   onComplete,
   className,
 }: TopicDetailProps) {
+  const t = useTranslations("education.learning-path");
   const [topic, setTopic] = useState<LearningPathTopic | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -45,18 +43,21 @@ export function TopicDetail({
     const fetchTopic = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/learning-path/${pathId}/topics/${topicId}`);
+        const response = await fetch(
+          `/api/learning-path/${pathId}/topics/${topicId}`,
+        );
         if (!response.ok) {
-          throw new Error('Failed to load topic');
+          throw new Error("Failed to load topic");
         }
         const data = await response.json();
         setTopic(data.topic);
 
         // Find first incomplete step
-        const firstIncomplete = data.topic.steps?.findIndex((s: TopicStep) => !s.isCompleted) ?? 0;
+        const firstIncomplete =
+          data.topic.steps?.findIndex((s: TopicStep) => !s.isCompleted) ?? 0;
         setActiveStepIndex(Math.max(0, firstIncomplete));
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load');
+        setError(err instanceof Error ? err.message : "Failed to load");
       } finally {
         setLoading(false);
       }
@@ -78,7 +79,9 @@ export function TopicDetail({
       return {
         ...prev,
         steps: prev.steps.map((s) =>
-          s.id === stepId ? { ...s, isCompleted: true, completedAt: new Date() } : s
+          s.id === stepId
+            ? { ...s, isCompleted: true, completedAt: new Date() }
+            : s,
         ),
       };
     });
@@ -90,16 +93,18 @@ export function TopicDetail({
     }
 
     // Check if all steps complete
-    const allComplete = topic.steps.every((s) => s.id === stepId || s.isCompleted);
+    const allComplete = topic.steps.every(
+      (s) => s.id === stepId || s.isCompleted,
+    );
     if (allComplete) {
       try {
         await csrfFetch(`/api/learning-path/${pathId}/topics/${topicId}`, {
-          method: 'PATCH',
-          body: JSON.stringify({ status: 'completed' }),
+          method: "PATCH",
+          body: JSON.stringify({ status: "completed" }),
         });
         onComplete?.();
       } catch (err) {
-        logger.error('Failed to complete topic', {
+        logger.error("Failed to complete topic", {
           topicId,
           pathId,
           error: err instanceof Error ? err.message : String(err),
@@ -125,20 +130,24 @@ export function TopicDetail({
 
   if (loading) {
     return (
-      <div className={cn('flex items-center justify-center py-12', className)}>
+      <div className={cn("flex items-center justify-center py-12", className)}>
         <Loader2 className="w-8 h-8 animate-spin text-primary" />
-        <span className="ml-3 text-slate-600 dark:text-slate-400">Caricamento argomento...</span>
+        <span className="ml-3 text-slate-600 dark:text-slate-400">
+          {t("loading-topic")}
+        </span>
       </div>
     );
   }
 
   if (error || !topic) {
     return (
-      <div className={cn('text-center py-12', className)}>
-        <p className="text-red-600 dark:text-red-400">{error || 'Argomento non trovato'}</p>
+      <div className={cn("text-center py-12", className)}>
+        <p className="text-red-600 dark:text-red-400">
+          {error || t("topic-not-found")}
+        </p>
         {onBack && (
           <Button variant="outline" onClick={onBack} className="mt-4">
-            Torna indietro
+            {t("back")}
           </Button>
         )}
       </div>
@@ -146,12 +155,13 @@ export function TopicDetail({
   }
 
   const completedSteps = topic.steps.filter((s) => s.isCompleted).length;
-  const progressPercent = topic.steps.length > 0
-    ? Math.round((completedSteps / topic.steps.length) * 100)
-    : 0;
+  const progressPercent =
+    topic.steps.length > 0
+      ? Math.round((completedSteps / topic.steps.length) * 100)
+      : 0;
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       {/* Header */}
       <div className="flex items-start gap-4">
         {onBack && (
@@ -160,15 +170,19 @@ export function TopicDetail({
           </Button>
         )}
         <div className="flex-1">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{topic.title}</h1>
-          <p className="text-slate-600 dark:text-slate-400 mt-1">{topic.description}</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+            {topic.title}
+          </h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
+            {topic.description}
+          </p>
           <div className="flex items-center gap-4 mt-3 text-sm text-slate-500">
             <span className="flex items-center gap-1">
               <Clock className="w-4 h-4" />
               {topic.estimatedMinutes} min
             </span>
             <span>
-              {completedSteps}/{topic.steps.length} passaggi completati
+              {completedSteps}/{topic.steps.length} {t("steps-completed")}
             </span>
           </div>
         </div>
@@ -177,21 +191,26 @@ export function TopicDetail({
       {/* Progress */}
       <div className="space-y-2">
         <div className="flex justify-between text-sm">
-          <span className="text-slate-600 dark:text-slate-400">Progresso</span>
-          <span className="font-medium text-slate-900 dark:text-white">{progressPercent}%</span>
+          <span className="text-slate-600 dark:text-slate-400">
+            {t("progress")}
+          </span>
+          <span className="font-medium text-slate-900 dark:text-white">
+            {progressPercent}%
+          </span>
         </div>
         <Progress value={progressPercent} className="h-2" />
       </div>
 
       {/* Key concepts */}
       {(() => {
-        const concepts: string[] = typeof topic.keyConcepts === 'string'
-          ? JSON.parse(topic.keyConcepts || '[]')
-          : (topic.keyConcepts ?? []);
+        const concepts: string[] =
+          typeof topic.keyConcepts === "string"
+            ? JSON.parse(topic.keyConcepts || "[]")
+            : (topic.keyConcepts ?? []);
         return concepts.length > 0 ? (
           <div className="bg-slate-50 dark:bg-slate-800/50 rounded-lg p-4">
             <h3 className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-              Concetti chiave
+              {t("key-concepts")}
             </h3>
             <div className="flex flex-wrap gap-2">
               {concepts.map((concept, i) => (
@@ -209,11 +228,13 @@ export function TopicDetail({
 
       {/* Steps */}
       <div className="space-y-3">
-        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Passaggi</h2>
+        <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+          {t("steps")}
+        </h2>
 
         {topic.steps.length === 0 ? (
           <p className="text-slate-500 text-center py-8">
-            Nessun passaggio disponibile per questo argomento
+            {t("no-steps-available")}
           </p>
         ) : (
           topic.steps
@@ -237,4 +258,4 @@ export function TopicDetail({
 }
 
 export { StepCard };
-export { StepContent } from './topic-detail/step-content';
+export { StepContent } from "./topic-detail/step-content";

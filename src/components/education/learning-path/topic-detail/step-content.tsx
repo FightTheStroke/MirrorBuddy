@@ -1,63 +1,59 @@
-'use client';
+"use client";
 
-import { MapIcon, Layers, ClipboardCheck, Circle } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import type { TopicStep } from '@/types';
+import { useTranslations } from "next-intl";
+import { MapIcon, Layers, ClipboardCheck, Circle } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import type { TopicStep } from "@/types";
 
 interface StepContentProps {
   step: TopicStep;
 }
 
 export function StepContent({ step }: StepContentProps) {
+  const t = useTranslations("education.step-content");
   const content = step.content;
 
   switch (step.type) {
-    case 'overview':
+    case "overview":
       return (
         <div className="prose prose-sm dark:prose-invert max-w-none">
-          {'text' in content ? (
+          {"text" in content ? (
             <p>{content.text}</p>
           ) : (
-            <p className="text-slate-500">Contenuto panoramica non disponibile</p>
+            <p className="text-slate-500">{t("overview-unavailable")}</p>
           )}
         </div>
       );
 
-    case 'mindmap':
+    case "mindmap":
       return (
         <div className="text-center py-4">
           <MapIcon className="w-12 h-12 mx-auto text-purple-400 mb-2" />
-          <p className="text-sm text-slate-500">
-            Visualizza la mappa mentale per questo argomento
-          </p>
+          <p className="text-sm text-slate-500">{t("mindmap-description")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            Apri Mappa
+            {t("open-mindmap-button")}
           </Button>
         </div>
       );
 
-    case 'flashcard':
+    case "flashcard":
       return (
         <div className="text-center py-4">
           <Layers className="w-12 h-12 mx-auto text-amber-400 mb-2" />
-          <p className="text-sm text-slate-500">
-            Studia con le flashcard per memorizzare i concetti
-          </p>
+          <p className="text-sm text-slate-500">{t("flashcard-description")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            Inizia Flashcard
+            {t("start-flashcard-button")}
           </Button>
         </div>
       );
 
-    case 'quiz':
+    case "quiz":
       return (
         <div className="text-center py-4">
           <ClipboardCheck className="w-12 h-12 mx-auto text-green-400 mb-2" />
-          <p className="text-sm text-slate-500">
-            Verifica la tua comprensione con un quiz
-          </p>
+          <p className="text-sm text-slate-500">{t("quiz-description")}</p>
           <Button variant="outline" size="sm" className="mt-2">
-            Inizia Quiz
+            {t("start-quiz-button")}
           </Button>
         </div>
       );
@@ -66,7 +62,7 @@ export function StepContent({ step }: StepContentProps) {
       return (
         <div className="text-center py-4 text-slate-500">
           <Circle className="w-8 h-8 mx-auto mb-2" />
-          <p>Contenuto non disponibile</p>
+          <p>{t("content-unavailable")}</p>
         </div>
       );
   }

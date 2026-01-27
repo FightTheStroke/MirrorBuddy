@@ -3,13 +3,14 @@
  * @brief Mindmaps grid component
  */
 
-import { Loader2, Network, Sparkles } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { subjectNames, subjectIcons } from '@/data';
-import type { Subject } from '@/types';
-import type { SavedMindmap } from '@/lib/hooks/use-saved-materials';
-import { MindmapCard } from './mindmap-card';
+import { Loader2, Network, Sparkles } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { subjectNames, subjectIcons } from "@/data";
+import type { Subject } from "@/types";
+import type { SavedMindmap } from "@/lib/hooks/use-saved-materials";
+import { MindmapCard } from "./mindmap-card";
 
 interface MindmapsGridProps {
   mindmaps: SavedMindmap[];
@@ -26,6 +27,8 @@ export function MindmapsGrid({
   onDeleteMindmap,
   onShowExamples,
 }: MindmapsGridProps) {
+  const t = useTranslations("education.mindmaps");
+  const tCommon = useTranslations("common");
   const mindmapsBySubject: Record<string, SavedMindmap[]> = {};
   mindmaps.forEach((m) => {
     if (!mindmapsBySubject[m.subject]) {
@@ -40,7 +43,7 @@ export function MindmapsGrid({
         <div className="text-center">
           <Loader2 className="w-16 h-16 mx-auto text-slate-400 mb-4 animate-spin" />
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            Caricamento...
+            {tCommon("loading")}
           </h3>
         </div>
       </Card>
@@ -53,16 +56,14 @@ export function MindmapsGrid({
         <div className="text-center">
           <Network className="w-16 h-16 mx-auto text-slate-400 mb-4" />
           <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            Nessuna mappa salvata
+            {t("emptyTitle")}
           </h3>
           <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
-            Le mappe mentali create durante le sessioni vocali con i professori
-            appariranno qui. Prova a chiedere a un professore di creare una mappa
-            su un argomento!
+            {t("emptyDescription")}
           </p>
           <Button variant="outline" onClick={onShowExamples}>
             <Sparkles className="w-4 h-4 mr-2" />
-            Esplora Esempi
+            {t("exploreExamples")}
           </Button>
         </div>
       </Card>
@@ -95,4 +96,3 @@ export function MindmapsGrid({
     </div>
   );
 }
-

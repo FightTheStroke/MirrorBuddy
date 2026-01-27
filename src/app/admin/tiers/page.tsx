@@ -1,3 +1,7 @@
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
+import { getTranslations } from "next-intl/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -31,6 +35,7 @@ interface Tier {
 }
 
 export default async function AdminTiersPage() {
+  const t = await getTranslations("admin.tiers.page");
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {
@@ -79,24 +84,24 @@ export default async function AdminTiersPage() {
         <div className="flex items-center gap-3">
           <Layers className="w-8 h-8 text-primary" aria-hidden="true" />
           <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground">
-            Gestione Piani
+            {t("title")}
           </h1>
         </div>
         <div className="flex items-center gap-3">
           <Link href="/admin/tiers/conversion-funnel">
             <Button variant="outline">
               <Funnel className="w-4 h-4 mr-2" />
-              Conversion Funnel
+              {t("conversionFunnelButton")}
             </Button>
           </Link>
           <Link href="/admin/tiers/analytics">
             <Button variant="outline">
               <BarChart3 className="w-4 h-4 mr-2" />
-              Analytics
+              {t("analyticsButton")}
             </Button>
           </Link>
           <Link href="/admin/tiers/new">
-            <Button>Nuovo Piano</Button>
+            <Button>{t("newTier")}</Button>
           </Link>
         </div>
       </div>

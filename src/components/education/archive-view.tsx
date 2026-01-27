@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 // ============================================================================
 // ARCHIVE VIEW
@@ -6,7 +6,8 @@
 // Issue #37: Unified Archive page with bookmark, rating, filters
 // ============================================================================
 
-import { AnimatePresence } from 'framer-motion';
+import { AnimatePresence } from "framer-motion";
+import { useTranslations } from "next-intl";
 import {
   TOOL_LABELS,
   EmptyState,
@@ -16,9 +17,10 @@ import {
   ArchiveHeader,
   ArchiveFilters,
   useArchiveView,
-} from './archive';
+} from "./archive";
 
 export function ArchiveView() {
+  const tArchive = useTranslations("education.archive");
   const {
     filter,
     setFilter,
@@ -78,14 +80,17 @@ export function ArchiveView() {
       />
 
       {/* Content */}
-      <div role="tabpanel" aria-label={`Materiali ${filter === 'all' ? 'tutti' : filter === 'bookmarked' ? 'preferiti' : TOOL_LABELS[filter]}`}>
+      <div
+        role="tabpanel"
+        aria-label={`Materiali ${filter === "all" ? "tutti" : filter === "bookmarked" ? tArchive("emptyPreferred").toLowerCase() : TOOL_LABELS[filter]}`}
+      >
         {isLoading ? (
           <div className="flex items-center justify-center py-16">
             <div className="animate-spin w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
           </div>
         ) : filtered.length === 0 ? (
           <EmptyState filter={filter} />
-        ) : viewMode === 'grid' ? (
+        ) : viewMode === "grid" ? (
           <GridView
             items={filtered}
             onDelete={handleDelete}

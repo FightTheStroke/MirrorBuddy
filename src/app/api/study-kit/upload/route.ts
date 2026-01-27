@@ -180,12 +180,22 @@ export async function POST(request: NextRequest) {
       message: "Study kit is being processed. This may take a few minutes.",
     });
   } catch (error) {
-    logger.error("Failed to upload study kit", { error: String(error) });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    logger.error("Failed to upload study kit", {
+      error: errorMessage,
+      stack: errorStack,
+      errorType: error?.constructor?.name,
+    });
     Sentry.captureException(error, {
       tags: { api: "study-kit-upload", phase: "initial" },
     });
     return NextResponse.json(
-      { error: "Failed to upload study kit", details: String(error) },
+      {
+        error: "Failed to upload study kit",
+        details: errorMessage,
+        type: error?.constructor?.name,
+      },
       { status: 500 },
     );
   }

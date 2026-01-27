@@ -25,6 +25,9 @@ import { alexPina } from "./alex-pina";
 import { mascetti } from "./mascetti";
 import { simone } from "./simone";
 import { cassese } from "./cassese";
+import { moliere } from "./moliere";
+import { goethe } from "./goethe";
+import { cervantes } from "./cervantes";
 
 export type { MaestroFull } from "./types";
 export { SAFETY_GUIDELINES } from "./types";
@@ -52,6 +55,9 @@ export const maestri: MaestroFull[] = [
   mascetti,
   simone,
   cassese,
+  moliere,
+  goethe,
+  cervantes,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
@@ -83,6 +89,8 @@ export const SUBJECT_NAMES: Record<string, string> = {
   music: "Musica",
   english: "Inglese",
   spanish: "Spagnolo",
+  french: "Francese",
+  german: "Tedesco",
   economics: "Economia",
   philosophy: "Filosofia",
   "civic-education": "Educazione Civica",

@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
+// Mark as dynamic to avoid static generation issues with i18n
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "PDF | MirrorBuddy",
 };
 
-export default function PdfPage() {
-  redirect("/?view=astuccio");
+export default function PDFPage() {
+  redirect("/astuccio");
 }

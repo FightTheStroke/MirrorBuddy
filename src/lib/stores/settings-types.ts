@@ -63,6 +63,8 @@ export interface ExtendedStudentProfile {
   // Custom border colors for coach and buddy avatars
   coachBorderColor?: string;
   buddyBorderColor?: string;
+  // Cross-maestro memory setting - allows users to opt-in/out of shared memory
+  crossMaestroEnabled: boolean;
 }
 
 // Provider preference for manual selection

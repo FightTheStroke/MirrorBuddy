@@ -1,33 +1,38 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 interface SkeletonProps {
   className?: string;
-  'aria-label'?: string;
+  "aria-label"?: string;
 }
 
-export function Skeleton({ className, 'aria-label': _ariaLabel }: SkeletonProps) {
+export function Skeleton({
+  className,
+  "aria-label": _ariaLabel,
+}: SkeletonProps) {
   // Base skeleton is presentational only - ARIA attributes should be on containers
   // to avoid redundant announcements when nested
   return (
     <div
       aria-hidden="true"
       className={cn(
-        'animate-pulse rounded-md bg-slate-200 dark:bg-slate-700',
-        className
+        "animate-pulse rounded-md bg-slate-200 dark:bg-slate-700",
+        className,
       )}
     />
   );
 }
 
 export function ViewSkeleton() {
+  const t = useTranslations("ui.skeleton");
   // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div
       className="space-y-6 animate-in fade-in duration-300"
       role="status"
-      aria-label="Caricamento pagina in corso"
+      aria-label={t("viewLoading")}
     >
       <div className="flex items-center justify-between">
         <div className="space-y-2">
@@ -46,12 +51,13 @@ export function ViewSkeleton() {
 }
 
 export function SessionSkeleton() {
+  const t = useTranslations("ui.skeleton");
   // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
       role="status"
-      aria-label="Caricamento sessione in corso"
+      aria-label={t("sessionLoading")}
     >
       <div className="bg-white dark:bg-slate-900 rounded-2xl p-8 w-full max-w-2xl mx-4 shadow-2xl">
         <div className="flex items-center justify-center gap-4 mb-6">
@@ -63,10 +69,19 @@ export function SessionSkeleton() {
         </div>
         <div className="flex justify-center">
           <div className="flex items-center gap-2 text-slate-500">
-            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '0ms' }} />
-            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '150ms' }} />
-            <div className="h-2 w-2 rounded-full bg-accent-themed animate-bounce" style={{ animationDelay: '300ms' }} />
-            <span className="ml-2 text-sm">Caricamento sessione...</span>
+            <div
+              className="h-2 w-2 rounded-full bg-accent-themed animate-bounce"
+              style={{ animationDelay: "0ms" }}
+            />
+            <div
+              className="h-2 w-2 rounded-full bg-accent-themed animate-bounce"
+              style={{ animationDelay: "150ms" }}
+            />
+            <div
+              className="h-2 w-2 rounded-full bg-accent-themed animate-bounce"
+              style={{ animationDelay: "300ms" }}
+            />
+            <span className="ml-2 text-sm">{t("sessionLoadingText")}</span>
           </div>
         </div>
       </div>

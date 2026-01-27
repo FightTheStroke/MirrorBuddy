@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
 /**
  * Supporti Sidebar (Wave 4)
  * Navigation for filtering materials by type, subject, maestro
  */
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import {
   Brain,
   HelpCircle,
@@ -18,11 +19,11 @@ import {
   Users,
   ChevronDown,
   ChevronRight,
-} from 'lucide-react';
-import { useState } from 'react';
-import { cn } from '@/lib/utils';
-import { TOOL_LABELS, SUBJECT_LABELS } from '@/components/education/archive';
-import type { ToolType } from '@/types/tools';
+} from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import { TOOL_LABELS, SUBJECT_LABELS } from "@/components/education/archive";
+import type { ToolType } from "@/types/tools";
 
 interface SidebarProps {
   counts: {
@@ -48,6 +49,7 @@ const TOOL_ICON_MAP: Partial<Record<ToolType, typeof Brain>> = {
 };
 
 export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
+  const t = useTranslations("supporti");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [expandedSections, setExpandedSections] = useState({
@@ -56,10 +58,10 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
     maestro: false,
   });
 
-  const currentType = searchParams.get('type');
-  const currentSubject = searchParams.get('subject');
-  const currentMaestro = searchParams.get('maestro');
-  const isBookmarked = searchParams.get('bookmarked') === 'true';
+  const currentType = searchParams.get("type");
+  const currentSubject = searchParams.get("subject");
+  const currentMaestro = searchParams.get("maestro");
+  const isBookmarked = searchParams.get("bookmarked") === "true";
 
   const navigate = (params: Record<string, string | null>) => {
     const current = new URLSearchParams(searchParams.toString());
@@ -74,7 +76,7 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
   };
 
   const toggleSection = (section: keyof typeof expandedSections) => {
-    setExpandedSections(prev => ({ ...prev, [section]: !prev[section] }));
+    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
   return (
@@ -82,42 +84,64 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
       <nav aria-label="Filtri materiali">
         {/* All Materials */}
         <button
-          onClick={() => navigate({ type: null, subject: null, maestro: null, bookmarked: null })}
+          onClick={() =>
+            navigate({
+              type: null,
+              subject: null,
+              maestro: null,
+              bookmarked: null,
+            })
+          }
           className={cn(
-            'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium transition-colors',
+            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm font-medium transition-colors",
             !currentType && !currentSubject && !currentMaestro && !isBookmarked
-              ? 'bg-primary text-white'
-              : 'hover:bg-slate-200 dark:hover:bg-slate-800'
+              ? "bg-primary text-white"
+              : "hover:bg-slate-200 dark:hover:bg-slate-800",
           )}
         >
           <BookOpen className="w-4 h-4" />
-          Tutti i Supporti
-          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{counts.total}</span>
+          {t("allSupports")}
+          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
+            {counts.total}
+          </span>
         </button>
 
         {/* Bookmarked */}
         <button
-          onClick={() => navigate({ bookmarked: 'true', type: null, subject: null, maestro: null })}
+          onClick={() =>
+            navigate({
+              bookmarked: "true",
+              type: null,
+              subject: null,
+              maestro: null,
+            })
+          }
           className={cn(
-            'w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm transition-colors mt-1',
+            "w-full flex items-center gap-2 px-3 py-2 rounded-lg text-left text-sm transition-colors mt-1",
             isBookmarked
-              ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
-              : 'hover:bg-slate-200 dark:hover:bg-slate-800'
+              ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+              : "hover:bg-slate-200 dark:hover:bg-slate-800",
           )}
         >
           <Bookmark className="w-4 h-4" />
-          Preferiti
-          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{counts.bookmarked}</span>
+          {t("favorites")}
+          <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
+            {counts.bookmarked}
+          </span>
         </button>
 
         {/* By Type */}
         <div className="mt-4">
           <button
-            onClick={() => toggleSection('type')}
+            onClick={() => toggleSection("type")}
             className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
           >
-            {expandedSections.type ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-            Per Tipo
+            {expandedSections.type ? (
+              <ChevronDown className="w-3 h-3" />
+            ) : (
+              <ChevronRight className="w-3 h-3" />
+            )}
+            {t("byType")}
           </button>
           {expandedSections.type && (
             <div className="mt-1 space-y-0.5">
@@ -128,17 +152,26 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
                 return (
                   <button
                     key={type}
-                    onClick={() => navigate({ type, subject: null, maestro: null, bookmarked: null })}
+                    onClick={() =>
+                      navigate({
+                        type,
+                        subject: null,
+                        maestro: null,
+                        bookmarked: null,
+                      })
+                    }
                     className={cn(
-                      'w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors',
+                      "w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors",
                       currentType === type
-                        ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
-                        : 'hover:bg-slate-200 dark:hover:bg-slate-800'
+                        ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300"
+                        : "hover:bg-slate-200 dark:hover:bg-slate-800",
                     )}
                   >
                     <Icon className="w-4 h-4" />
                     {label}
-                    <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
+                    <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
+                      {count}
+                    </span>
                   </button>
                 );
               })}
@@ -150,29 +183,42 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
         {subjects.length > 0 && (
           <div className="mt-4">
             <button
-              onClick={() => toggleSection('subject')}
+              onClick={() => toggleSection("subject")}
               className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
             >
-              {expandedSections.subject ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-              Per Materia
+              {expandedSections.subject ? (
+                <ChevronDown className="w-3 h-3" />
+              ) : (
+                <ChevronRight className="w-3 h-3" />
+              )}
+              {t("bySubject")}
             </button>
             {expandedSections.subject && (
               <div className="mt-1 space-y-0.5 max-h-48 overflow-y-auto">
-                {subjects.map(subject => {
+                {subjects.map((subject) => {
                   const count = counts.bySubject[subject] || 0;
                   return (
                     <button
                       key={subject}
-                      onClick={() => navigate({ subject, type: null, maestro: null, bookmarked: null })}
+                      onClick={() =>
+                        navigate({
+                          subject,
+                          type: null,
+                          maestro: null,
+                          bookmarked: null,
+                        })
+                      }
                       className={cn(
-                        'w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors',
+                        "w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors",
                         currentSubject === subject
-                          ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
-                          : 'hover:bg-slate-200 dark:hover:bg-slate-800'
+                          ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300"
+                          : "hover:bg-slate-200 dark:hover:bg-slate-800",
                       )}
                     >
                       {SUBJECT_LABELS[subject] || subject}
-                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
+                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
+                        {count}
+                      </span>
                     </button>
                   );
                 })}
@@ -185,31 +231,44 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
         {maestros.length > 0 && (
           <div className="mt-4">
             <button
-              onClick={() => toggleSection('maestro')}
+              onClick={() => toggleSection("maestro")}
               className="w-full flex items-center gap-2 px-3 py-1.5 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide"
             >
-              {expandedSections.maestro ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
-              Per Maestro
+              {expandedSections.maestro ? (
+                <ChevronDown className="w-3 h-3" />
+              ) : (
+                <ChevronRight className="w-3 h-3" />
+              )}
+              {t("byProfessor")}
             </button>
             {expandedSections.maestro && (
               <div className="mt-1 space-y-0.5 max-h-48 overflow-y-auto">
-                {maestros.map(maestro => {
+                {maestros.map((maestro) => {
                   const count = counts.byMaestro[maestro.id] || 0;
                   if (count === 0) return null;
                   return (
                     <button
                       key={maestro.id}
-                      onClick={() => navigate({ maestro: maestro.id, type: null, subject: null, bookmarked: null })}
+                      onClick={() =>
+                        navigate({
+                          maestro: maestro.id,
+                          type: null,
+                          subject: null,
+                          bookmarked: null,
+                        })
+                      }
                       className={cn(
-                        'w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors',
+                        "w-full flex items-center gap-2 px-3 py-1.5 rounded-lg text-left text-sm transition-colors",
                         currentMaestro === maestro.id
-                          ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300'
-                          : 'hover:bg-slate-200 dark:hover:bg-slate-800'
+                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                          : "hover:bg-slate-200 dark:hover:bg-slate-800",
                       )}
                     >
                       <Users className="w-4 h-4" />
                       {maestro.name}
-                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">{count}</span>
+                      <span className="ml-auto text-xs text-slate-600 dark:text-slate-400">
+                        {count}
+                      </span>
                     </button>
                   );
                 })}

@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { ChevronRight, Menu, Bell, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,22 +15,23 @@ interface AdminHeaderProps {
   systemAlerts?: number;
 }
 
-const SECTION_TITLES: Record<string, string> = {
-  "/admin": "Dashboard",
-  "/admin/invites": "Richieste Beta",
-  "/admin/users": "Utenti",
-  "/admin/analytics": "Analytics",
-  "/admin/tos": "Termini di Servizio",
-  "/admin/settings": "Impostazioni",
-};
-
 export function AdminHeader({
   onMenuClick,
   sidebarOpen: _sidebarOpen,
   pendingInvites = 0,
   systemAlerts = 0,
 }: AdminHeaderProps) {
+  const t = useTranslations("admin");
   const pathname = usePathname();
+
+  const SECTION_TITLES: Record<string, string> = {
+    "/admin": t("dashboard"),
+    "/admin/invites": t("betaRequests"),
+    "/admin/users": t("users"),
+    "/admin/analytics": "Analytics",
+    "/admin/tos": t("terms"),
+    "/admin/settings": t("settings"),
+  };
 
   const getBreadcrumbs = () => {
     const parts = pathname.split("/").filter(Boolean);
@@ -108,7 +110,7 @@ export function AdminHeader({
           <Link
             href="/admin/invites"
             className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors"
-            aria-label={`${pendingInvites} richieste beta in attesa`}
+            aria-label={t("pendingBetaRequests", { count: pendingInvites })}
           >
             <UserPlus className="h-4 w-4 text-amber-600 dark:text-amber-400" />
             <span className="text-xs font-bold text-amber-700 dark:text-amber-300">
@@ -122,7 +124,7 @@ export function AdminHeader({
           <Link
             href="/admin"
             className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 hover:bg-red-100 dark:hover:bg-red-900/30 transition-colors"
-            aria-label={`${systemAlerts} alert di sistema`}
+            aria-label={t("systemAlerts", { count: systemAlerts })}
           >
             <Bell className="h-4 w-4 text-red-600 dark:text-red-400" />
             <span className="text-xs font-bold text-red-700 dark:text-red-300">

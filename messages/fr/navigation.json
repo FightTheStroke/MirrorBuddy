@@ -1,0 +1,75 @@
+{
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "chat": "Chat",
+    "maestri": "Teachers",
+    "coaches": "Coaches",
+    "buddies": "Buddies",
+    "tools": "Tools",
+    "flashcards": "Flashcards",
+    "mindmap": "Mind Map",
+    "quiz": "Quiz",
+    "homework": "Homework",
+    "documents": "Documents",
+    "learningPath": "Learning Path",
+    "progress": "Progress",
+    "achievements": "Achievements",
+    "settings": "Settings",
+    "profile": "Profile",
+    "admin": "Administration",
+    "help": "Help",
+    "support": "Support",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms of Service",
+    "calendar": "Calendar",
+    "parentArea": "Parent Area",
+    "adminDashboard": "Admin Dashboard",
+    "breadcrumbs": {
+      "home": "Home",
+      "separator": "/"
+    },
+    "add": "Ajouter",
+    "auth": {
+      "login": "Login"
+    },
+    "back": "Retour",
+    "cancel": "Annuler",
+    "clear": "Cancella",
+    "close": "Fermer",
+    "common": {
+      "save": "Sauvegarder"
+    },
+    "confirm": "Confirmer",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "error": "Erreur",
+    "errors": {
+      "notFound": "Not Found"
+    },
+    "filter": "Filtrer",
+    "info": "Informazione",
+    "loading": "Chargement...",
+    "minLength": "Min Length",
+    "next": "Suivant",
+    "no": "Non",
+    "ok": "OK",
+    "previous": "Precedente",
+    "refresh": "Aggiorna",
+    "remove": "Retirer",
+    "reset": "Reimposta",
+    "save": "Sauvegarder",
+    "search": "Rechercher",
+    "season": {
+      "autumn": "Autumn"
+    },
+    "select": "Seleziona",
+    "sort": "Ordina",
+    "submit": "Envoyer",
+    "success": "Completato",
+    "title": "Titolo",
+    "warning": "Attenzione",
+    "yes": "Oui"
+  }
+}

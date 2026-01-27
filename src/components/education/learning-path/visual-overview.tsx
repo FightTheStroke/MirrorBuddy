@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Learning Path Visual Overview
@@ -6,15 +6,16 @@
  * Plan 8 MVP - Wave 2 [F-11]
  */
 
-import { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import mermaid from 'mermaid';
-import DOMPurify from 'dompurify';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-import type { LearningPathTopic } from '@/types';
-import { generateMermaidCode, STATUS_COLORS } from './visual-overview-utils';
-import { initializeMermaidConfig } from './mermaid-config';
+import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import mermaid from "mermaid";
+import DOMPurify from "dompurify";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import type { LearningPathTopic } from "@/types";
+import { generateMermaidCode, STATUS_COLORS } from "./visual-overview-utils";
+import { initializeMermaidConfig } from "./mermaid-config";
 
 interface VisualOverviewProps {
   topics: LearningPathTopic[];
@@ -34,6 +35,7 @@ export function VisualOverview({
   className,
   compact = false,
 }: VisualOverviewProps) {
+  const t = useTranslations("education.learning-path");
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
   const [rendered, setRendered] = useState(false);
@@ -53,7 +55,7 @@ export function VisualOverview({
         }
 
         // Clear previous content
-        containerRef.current.innerHTML = '';
+        containerRef.current.innerHTML = "";
 
         // Generate unique ID
         const id = `lp-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
@@ -66,22 +68,22 @@ export function VisualOverview({
           // Sanitize SVG to prevent XSS attacks
           const sanitizedSvg = DOMPurify.sanitize(svg, {
             USE_PROFILES: { svg: true, svgFilters: true },
-            ADD_TAGS: ['use'],
+            ADD_TAGS: ["use"],
           });
           containerRef.current.innerHTML = sanitizedSvg;
           setRendered(true);
 
           // Add click handlers to nodes if callback provided
           if (onTopicClick) {
-            const svgElement = containerRef.current.querySelector('svg');
+            const svgElement = containerRef.current.querySelector("svg");
             if (svgElement) {
-              const nodes = svgElement.querySelectorAll('.node');
+              const nodes = svgElement.querySelectorAll(".node");
               nodes.forEach((node, index) => {
                 const topic = topics[index];
-                if (topic && topic.status !== 'locked') {
-                  node.classList.add('cursor-pointer', 'hover:opacity-80');
+                if (topic && topic.status !== "locked") {
+                  node.classList.add("cursor-pointer", "hover:opacity-80");
                   const handler = () => onTopicClick(topic.id);
-                  node.addEventListener('click', handler);
+                  node.addEventListener("click", handler);
                   // Store reference for cleanup
                   clickHandlers.push({ node, handler });
                 }
@@ -93,7 +95,9 @@ export function VisualOverview({
         if (!cancelled) {
           const errorMsg = err instanceof Error ? err.message : String(err);
           setError(errorMsg);
-          logger.error('Learning path diagram render error', { error: String(err) });
+          logger.error("Learning path diagram render error", {
+            error: String(err),
+          });
         }
       }
     };
@@ -104,32 +108,33 @@ export function VisualOverview({
       cancelled = true;
       // Clean up click handlers to prevent memory leak
       for (const { node, handler } of clickHandlers) {
-        node.removeEventListener('click', handler);
+        node.removeEventListener("click", handler);
       }
     };
   }, [topics, compact, onTopicClick]);
 
   // Calculate progress
-  const completedCount = topics.filter((t) => t.status === 'completed').length;
-  const progressPercent = topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
+  const completedCount = topics.filter((t) => t.status === "completed").length;
+  const progressPercent =
+    topics.length > 0 ? Math.round((completedCount / topics.length) * 100) : 0;
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800',
-        className
+        "rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-slate-800",
+        className,
       )}
     >
       {/* Header */}
       <div className="px-4 py-3 border-b border-slate-700 bg-slate-800/50 flex items-center justify-between">
         <div>
           <h3 className="text-sm font-medium text-slate-200">
-            {title || 'Percorso di Apprendimento'}
+            {title || t("visual-title")}
           </h3>
           <p className="text-xs text-slate-400 mt-0.5">
-            {completedCount}/{topics.length} argomenti completati
+            {completedCount}/{topics.length} {t("topics-completed-count")}
           </p>
         </div>
         {/* Progress indicator */}
@@ -140,7 +145,9 @@ export function VisualOverview({
               style={{ width: `${progressPercent}%` }}
             />
           </div>
-          <span className="text-xs font-medium text-slate-300">{progressPercent}%</span>
+          <span className="text-xs font-medium text-slate-300">
+            {progressPercent}%
+          </span>
         </div>
       </div>
 
@@ -148,15 +155,15 @@ export function VisualOverview({
       <div className="p-4">
         {error ? (
           <div className="p-4 rounded-lg bg-red-900/20 border border-red-800 text-red-400 text-sm">
-            <strong>Errore:</strong> {error}
+            <strong>{t("error")}</strong> {error}
           </div>
         ) : (
           <div
             ref={containerRef}
             className={cn(
-              'flex justify-center items-center overflow-x-auto',
-              compact ? 'min-h-[150px]' : 'min-h-[250px]',
-              !rendered && 'animate-pulse bg-slate-700/50 rounded-lg'
+              "flex justify-center items-center overflow-x-auto",
+              compact ? "min-h-[150px]" : "min-h-[250px]",
+              !rendered && "animate-pulse bg-slate-700/50 rounded-lg",
             )}
           />
         )}
@@ -167,20 +174,32 @@ export function VisualOverview({
         <div className="px-4 py-2 border-t border-slate-700 bg-slate-900/30">
           <div className="flex flex-wrap gap-4 text-xs text-slate-400">
             <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded" style={{ backgroundColor: STATUS_COLORS.locked.bg }} />
-              <span>Bloccato</span>
+              <span
+                className="w-3 h-3 rounded"
+                style={{ backgroundColor: STATUS_COLORS.locked.bg }}
+              />
+              <span>{t("locked")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded" style={{ backgroundColor: STATUS_COLORS.unlocked.bg }} />
-              <span>Sbloccato</span>
+              <span
+                className="w-3 h-3 rounded"
+                style={{ backgroundColor: STATUS_COLORS.unlocked.bg }}
+              />
+              <span>{t("unlocked")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded" style={{ backgroundColor: STATUS_COLORS.in_progress.bg }} />
-              <span>In corso</span>
+              <span
+                className="w-3 h-3 rounded"
+                style={{ backgroundColor: STATUS_COLORS.in_progress.bg }}
+              />
+              <span>{t("in-progress-legend")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded" style={{ backgroundColor: STATUS_COLORS.completed.bg }} />
-              <span>Completato</span>
+              <span
+                className="w-3 h-3 rounded"
+                style={{ backgroundColor: STATUS_COLORS.completed.bg }}
+              />
+              <span>{t("completed-legend")}</span>
             </div>
           </div>
         </div>

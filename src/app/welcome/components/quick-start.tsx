@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ArrowRight, Settings, LogIn, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { trackLoginClick } from "@/lib/funnel/client";
@@ -26,6 +27,8 @@ export function QuickStart({
   onSkip,
   onUpdateProfile,
 }: QuickStartProps) {
+  const t = useTranslations("welcome.quick-start");
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -56,7 +59,7 @@ export function QuickStart({
               className="w-full sm:w-auto px-8 py-6 text-lg rounded-xl border-2"
             >
               <Settings className="w-5 h-5 mr-2" aria-hidden="true" />
-              Aggiorna profilo
+              {t("update-profile")}
             </Button>
           )}
         </div>
@@ -119,7 +122,7 @@ export function QuickStart({
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-md py-6 text-lg"
               >
                 <LogIn className="w-5 h-5 mr-2" aria-hidden="true" />
-                Accedi
+                {t("login")}
               </Button>
             </Link>
           </motion.div>

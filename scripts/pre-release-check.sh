@@ -79,6 +79,23 @@ echo -e "${BLUE}   Phase 1: $((PHASE1_TIME - START_TIME))s${NC}"
 echo ""
 
 # =============================================================================
+# PHASE 1.5: i18n VALIDATION
+# =============================================================================
+echo -e "${BLUE}[PHASE 1.5] i18n completeness check...${NC}"
+
+if ! npx tsx scripts/i18n-check.ts > "$TEMP_DIR/i18n.log" 2>&1; then
+    echo -e "${RED}✗ i18n check failed${NC}"
+    cat "$TEMP_DIR/i18n.log"
+    exit 1
+fi
+cat "$TEMP_DIR/i18n.log"
+echo -e "${GREEN}✓ i18n completeness passed${NC}"
+
+PHASE1_5_TIME=$(date +%s)
+echo -e "${BLUE}   Phase 1.5: $((PHASE1_5_TIME - PHASE1_TIME))s${NC}"
+echo ""
+
+# =============================================================================
 # PHASE 2: PARALLEL STATIC ANALYSIS
 # =============================================================================
 echo -e "${BLUE}[PHASE 2] Parallel static analysis (lint + typecheck + audit)...${NC}"
@@ -206,16 +223,18 @@ TOTAL=$((END_TIME - START_TIME))
 echo "=========================================="
 echo -e "${GREEN} ✓ ALL PRE-RELEASE CHECKS PASSED${NC}"
 echo ""
-echo " Phase 1 (instant):   $((PHASE1_TIME - START_TIME))s"
-echo " Phase 2 (parallel):  $((PHASE2_TIME - PHASE1_TIME))s"
-echo " Phase 3 (build):     $((PHASE3_TIME - PHASE2_TIME))s"
-echo " Phase 4 (perf):      $((PHASE4_TIME - PHASE3_TIME))s"
-echo " Phase 5 (size):      $((PHASE5_TIME - PHASE4_TIME))s"
+echo " Phase 1 (instant):     $((PHASE1_TIME - START_TIME))s"
+echo " Phase 1.5 (i18n):      $((PHASE1_5_TIME - PHASE1_TIME))s"
+echo " Phase 2 (parallel):    $((PHASE2_TIME - PHASE1_5_TIME))s"
+echo " Phase 3 (build):       $((PHASE3_TIME - PHASE2_TIME))s"
+echo " Phase 4 (perf):        $((PHASE4_TIME - PHASE3_TIME))s"
+echo " Phase 5 (size):        $((PHASE5_TIME - PHASE4_TIME))s"
 echo " ─────────────────────────"
-echo " Total:               ${TOTAL}s"
+echo " Total:                 ${TOTAL}s"
 echo "=========================================="
 echo ""
 echo "Next steps:"
 echo "  1. Run E2E tests: npm run test"
-echo "  2. Create release: npm run version:patch"
+echo "  2. Run release gate: npm run release:gate"
+echo "  3. Create release: npm run version:patch"
 echo ""

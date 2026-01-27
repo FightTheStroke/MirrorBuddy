@@ -8,6 +8,144 @@
 | Base  | Registered (free) | Unlimited  | Unlimited | 20      | Unl.  | Free     |
 | Pro   | Subscribers       | Unlimited  | Unlimited | 20      | Unl.  | €9.99/mo |
 
+## Memory Features by Tier
+
+Each tier supports different levels of conversation memory and learning capabilities:
+
+| Feature                    | Trial  | Base    | Pro     |
+| -------------------------- | ------ | ------- | ------- |
+| **Basic Memory**           | ✓      | ✓       | ✓       |
+| **Conversation History**   | 5 msgs | 20 msgs | 50 msgs |
+| **Semantic Memory**        | ✗      | ✗       | ✓       |
+| **Cross-Maestro Learning** | ✗      | ✗       | ✓       |
+| **Hierarchical Summaries** | ✗      | ✗       | ✓       |
+
+### Memory Feature Definitions
+
+- **Basic Memory**: Current conversation context maintained within a single chat session
+- **Conversation History**: Previous messages retained and accessible in future sessions (message limits apply)
+- **Semantic Memory** (Pro): Vector embeddings of conversation context for advanced relevance matching
+- **Cross-Maestro Learning** (Pro): Memory shared across multiple maestri to create cohesive learning paths
+- **Hierarchical Summaries** (Pro): Multi-level conversation summaries for long-term retention and recall
+
+### Memory Service Usage
+
+```typescript
+import { memoryService } from "@/lib/memory/memory-service";
+
+// Get memory limits for user's tier
+const limits = await memoryService.getTierMemoryLimits(userId);
+console.log(limits);
+// Output:
+// {
+//   maxConversationHistory: 50,        // Pro: 50 msgs, Base: 20, Trial: 5
+//   semanticMemoryEnabled: true,       // Pro only
+//   crossMaestroEnabled: true,         // Pro only
+//   hierarchicalSummariesEnabled: true // Pro only
+// }
+
+// Check if user has semantic memory access
+const hasSemanticMemory = await memoryService.checkMemoryFeature(
+  userId,
+  "semantic",
+);
+
+// Get conversation history with pagination
+const history = await memoryService.getConversationHistory(userId, maestroId, {
+  limit: 20,
+  offset: 0,
+});
+
+// Store conversation with automatic decay
+await memoryService.storeConversation(userId, maestroId, {
+  message: userMessage,
+  response: assistantResponse,
+  timestamp: Date.now(),
+});
+
+// Get hierarchical summary (Pro only)
+const summary = await memoryService.getHierarchicalSummary(userId, maestroId);
+
+// Get cross-maestro learning context (Pro only)
+const crossContext = await memoryService.getCrossMaestroContext(
+  userId,
+  currentMaestroId,
+);
+```
+
+### getTierMemoryLimits() Function
+
+```typescript
+interface TierMemoryLimits {
+  maxConversationHistory: number; // Max messages retained
+  semanticMemoryEnabled: boolean;
+  crossMaestroEnabled: boolean;
+  hierarchicalSummariesEnabled: boolean;
+  memoryDecayDays: number; // Days before low-priority memories fade
+  priorityMemoryRetentionDays: number; // Always-retain threshold
+}
+
+async function getTierMemoryLimits(
+  userId: string | null,
+): Promise<TierMemoryLimits> {
+  const tier = await tierService.getEffectiveTier(userId);
+
+  const limits: Record<TierName, TierMemoryLimits> = {
+    trial: {
+      maxConversationHistory: 5,
+      semanticMemoryEnabled: false,
+      crossMaestroEnabled: false,
+      hierarchicalSummariesEnabled: false,
+      memoryDecayDays: 7,
+      priorityMemoryRetentionDays: 30,
+    },
+    base: {
+      maxConversationHistory: 20,
+      semanticMemoryEnabled: false,
+      crossMaestroEnabled: false,
+      hierarchicalSummariesEnabled: false,
+      memoryDecayDays: 30,
+      priorityMemoryRetentionDays: 90,
+    },
+    pro: {
+      maxConversationHistory: 50,
+      semanticMemoryEnabled: true,
+      crossMaestroEnabled: true,
+      hierarchicalSummariesEnabled: true,
+      memoryDecayDays: 90,
+      priorityMemoryRetentionDays: 365,
+    },
+  };
+
+  return limits[tier.name];
+}
+```
+
+### Admin Settings for Cross-Maestro Learning
+
+The `crossMaestroEnabled` setting can be configured per-tier in the admin dashboard:
+
+- **Trial**: Always disabled (users limited to 3 maestri anyway)
+- **Base**: Can be enabled by admin for testing, disabled by default
+- **Pro**: Always enabled as part of premium learning experience
+
+Update via admin API:
+
+```typescript
+// Enable cross-maestro learning for Base tier (testing)
+await csrfFetch("/api/admin/tiers/base", {
+  method: "PUT",
+  body: JSON.stringify({
+    memorySettings: {
+      crossMaestroEnabled: true,
+    },
+  }),
+});
+
+// Invalidate tier cache after changes
+await tierService.invalidateTierCache("tier-base");
+```
+
 ## TierService Usage Patterns
 
 ```typescript
@@ -104,6 +242,23 @@ const { isSimulating, simulatedTier } = await res.json();
 - Header shows "(SIM)" badge when simulating
 
 **UI Location:** Admin header → Flask icon dropdown (`TierSimulator` component)
+
+## Tier Flexibility
+
+**All tier limits are stored in the database via TierService, not hardcoded.**
+
+Admins can modify any tier limit at any time through:
+
+- Admin panel: `/admin/tiers`
+- Direct database: `TierDefinition` table
+
+Changes take effect immediately after cache invalidation:
+
+```typescript
+tierService.invalidateCache();
+```
+
+No code deployment required to adjust limits.
 
 ## Header Tier Badge
 

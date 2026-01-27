@@ -14,6 +14,7 @@
 "use client";
 
 import { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import { RotateCcw, ThumbsDown, ThumbsUp, Zap, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,7 @@ export function FlashcardReviewMobile({
   onRating,
   onComplete,
 }: FlashcardReviewMobileProps) {
+  const t = useTranslations("tools.flashcards");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardsReviewed, setCardsReviewed] = useState(0);
@@ -292,7 +294,7 @@ export function FlashcardReviewMobile({
             className="w-4/5 max-w-2xl mt-8 space-y-3"
           >
             <p className="text-center text-sm text-slate-500 mb-4">
-              Quanto è stato facile ricordare?
+              {t("ratingQuestion")}
             </p>
             <div className="grid grid-cols-2 gap-2 xs:grid-cols-2">
               {RATING_CONFIG.map(({ rating, label, color, iconType }) => (

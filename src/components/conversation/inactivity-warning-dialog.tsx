@@ -1,10 +1,11 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useMemo } from 'react';
-import { AlertCircle, Clock, X } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
+import { useState, useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { AlertCircle, Clock, X } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface InactivityWarningDialogProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export function InactivityWarningDialog({
   onClose,
   className,
 }: InactivityWarningDialogProps) {
+  const t = useTranslations("conversation.inactivity");
   const [tick, setTick] = useState(0);
 
   // Calculate countdown based on elapsed time since start
@@ -72,13 +74,13 @@ export function InactivityWarningDialog({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            transition={{ type: "spring", stiffness: 400, damping: 25 }}
             className={cn(
-              'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50',
-              'w-full max-w-md p-6 rounded-2xl',
-              'bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700',
-              'shadow-xl',
-              className
+              "fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50",
+              "w-full max-w-md p-6 rounded-2xl",
+              "bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
+              "shadow-xl",
+              className,
             )}
             role="alertdialog"
             aria-labelledby="inactivity-warning-title"
@@ -95,21 +97,20 @@ export function InactivityWarningDialog({
                   id="inactivity-warning-title"
                   className="text-xl font-bold text-slate-900 dark:text-white mb-1"
                 >
-                  Sei ancora qui?
+                  {t("title")}
                 </h2>
                 <p
                   id="inactivity-warning-description"
                   className="text-sm text-slate-600 dark:text-slate-400"
                 >
-                  Non rileviamo attività da un po&apos;. La conversazione si
-                  chiuderà automaticamente tra:
+                  {t("description")}
                 </p>
               </div>
 
               <button
                 onClick={handleClose}
                 className="flex-shrink-0 inline-flex h-11 w-11 items-center justify-center rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
-                aria-label="Chiudi avviso"
+                aria-label={t("closeAriaLabel")}
               >
                 <X className="w-5 h-5 text-slate-500" />
               </button>
@@ -125,8 +126,7 @@ export function InactivityWarningDialog({
 
             {/* Message */}
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 text-center">
-              Se chiudi la conversazione, genereremo un riassunto automatico
-              della sessione.
+              {t("message")}
             </p>
 
             {/* Actions */}
@@ -136,13 +136,13 @@ export function InactivityWarningDialog({
                 onClick={handleClose}
                 className="flex-1"
               >
-                Chiudi e Riassumi
+                {t("closeButton")}
               </Button>
               <Button
                 onClick={handleContinue}
                 className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >
-                Continua a Studiare
+                {t("continueButton")}
               </Button>
             </div>
           </motion.div>

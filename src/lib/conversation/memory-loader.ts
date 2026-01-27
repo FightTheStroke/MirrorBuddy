@@ -2,43 +2,90 @@
  * Conversation Memory Loader
  *
  * Loads previous conversation context for a user-maestro pair.
- * Used to inject memory into AI system prompts for continuity.
+ * Uses tier-specific limits from TierMemoryConfig to control:
+ * - How many previous conversations are considered
+ * - How far back to look (timeWindowDays)
+ * - Maximum key facts and topics to store
  *
  * ADR: 0021-conversational-memory-injection.md
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { getTierMemoryLimits } from "./tier-memory-config";
+import {
+  searchRelevantSummaries,
+  type RelevantSummary,
+} from "./semantic-memory";
+import type { TierName } from "@/types/tier-types";
 
 export interface ConversationMemory {
   recentSummary: string | null;
   keyFacts: string[];
   topics: string[];
   lastSessionDate: Date | null;
+  semanticMemories?: RelevantSummary[];
+  hierarchicalContext?: {
+    weeklySummary?: string;
+    monthlySummary?: string;
+  };
 }
-
-const MAX_KEY_FACTS = 5;
-const MAX_TOPICS = 10;
-const MAX_CONVERSATIONS = 3;
 
 /**
  * Load previous conversation context for a user-maestro pair.
- * Fetches the last 3 closed conversations and merges their data.
+ * Uses tier-specific memory limits to determine retention window and capacity.
+ *
+ * @param userId User identifier
+ * @param maestroId Maestro identifier
+ * @param tierName Subscription tier (defaults to 'base')
+ * @returns Merged conversation memory context
  */
 export async function loadPreviousContext(
   userId: string,
-  maestroId: string
+  maestroId: string,
+  tierName: TierName = "base",
 ): Promise<ConversationMemory> {
   try {
+    const limits = getTierMemoryLimits(tierName);
+
+    // Trial tier has no memory (recentConversations = 0)
+    if (limits.recentConversations === 0) {
+      logger.debug("Trial tier: skipping memory load", { userId, maestroId });
+      return {
+        recentSummary: null,
+        keyFacts: [],
+        topics: [],
+        lastSessionDate: null,
+      };
+    }
+
+    // Build where clause with time window filter
+    type FindManyWhere = {
+      userId: string;
+      maestroId: string;
+      isActive: boolean;
+      isParentMode: boolean;
+      updatedAt?: { gte: Date };
+    };
+
+    const where: FindManyWhere = {
+      userId,
+      maestroId,
+      isActive: false,
+      isParentMode: false,
+    };
+
+    // Apply timeWindowDays filter if specified
+    if (limits.timeWindowDays !== null && limits.timeWindowDays > 0) {
+      const cutoffDate = new Date();
+      cutoffDate.setDate(cutoffDate.getDate() - limits.timeWindowDays);
+      where.updatedAt = { gte: cutoffDate };
+    }
+
     const conversations = await prisma.conversation.findMany({
-      where: {
-        userId,
-        maestroId,
-        isActive: false,
-        isParentMode: false, // Exclude parent mode conversations
-      },
-      orderBy: { updatedAt: 'desc' },
-      take: MAX_CONVERSATIONS,
+      where,
+      orderBy: { updatedAt: "desc" },
+      take: limits.recentConversations,
       select: {
         summary: true,
         keyFacts: true,
@@ -48,7 +95,11 @@ export async function loadPreviousContext(
     });
 
     if (conversations.length === 0) {
-      logger.debug('No previous conversations found', { userId, maestroId });
+      logger.debug("No previous conversations found", {
+        userId,
+        maestroId,
+        tierName,
+      });
       return {
         recentSummary: null,
         keyFacts: [],
@@ -57,12 +108,13 @@ export async function loadPreviousContext(
       };
     }
 
-    const keyFacts = mergeKeyFacts(conversations);
-    const topics = mergeTopics(conversations);
+    const keyFacts = mergeKeyFacts(conversations, limits.maxKeyFacts);
+    const topics = mergeTopics(conversations, limits.maxTopics);
 
-    logger.info('Loaded conversation memory', {
+    logger.info("Loaded conversation memory", {
       userId,
       maestroId,
+      tierName,
       conversationCount: conversations.length,
       keyFactCount: keyFacts.length,
       topicCount: topics.length,
@@ -75,7 +127,11 @@ export async function loadPreviousContext(
       lastSessionDate: conversations[0].updatedAt,
     };
   } catch (error) {
-    logger.error('Failed to load conversation memory', { userId, maestroId }, error);
+    logger.error(
+      "Failed to load conversation memory",
+      { userId, maestroId },
+      error,
+    );
     return {
       recentSummary: null,
       keyFacts: [],
@@ -86,10 +142,96 @@ export async function loadPreviousContext(
 }
 
 /**
+ * Load enhanced conversation context with semantic memory for Pro tier users.
+ * Extends loadPreviousContext by adding semantic search results when available.
+ *
+ * @param userId User identifier
+ * @param maestroId Maestro identifier
+ * @param tierName Subscription tier (defaults to 'base')
+ * @param query Optional search query for semantic search (Pro tier only)
+ * @returns Merged conversation memory context with optional semantic memories
+ */
+export async function loadEnhancedContext(
+  userId: string,
+  maestroId: string,
+  tierName: TierName = "base",
+  query?: string,
+): Promise<ConversationMemory> {
+  try {
+    // Load standard conversation memory first
+    const baseMemory = await loadPreviousContext(userId, maestroId, tierName);
+
+    // Check if semantic search should be performed
+    const limits = getTierMemoryLimits(tierName);
+    const shouldSearchSemantic =
+      limits.semanticEnabled && query && query.trim().length > 0;
+
+    let semanticResults: RelevantSummary[] = [];
+    let hierarchicalContext:
+      | { weeklySummary?: string; monthlySummary?: string }
+      | undefined = undefined;
+
+    // Perform semantic search for Pro tier users with query
+    if (shouldSearchSemantic) {
+      logger.debug("Performing semantic search for enhanced context", {
+        userId,
+        maestroId,
+        tierName,
+        queryLength: query.length,
+      });
+
+      semanticResults = await searchRelevantSummaries(
+        userId,
+        query,
+        tierName,
+        10, // Default limit of 10 results
+      );
+    }
+
+    // Load hierarchical summaries for Pro tier users
+    if (limits.semanticEnabled) {
+      hierarchicalContext = await loadHierarchicalContext(userId, limits);
+    }
+
+    logger.info("Enhanced context loaded", {
+      userId,
+      maestroId,
+      semanticResultCount: semanticResults.length,
+      hasHierarchicalContext: !!hierarchicalContext,
+    });
+
+    const result: ConversationMemory = {
+      ...baseMemory,
+      hierarchicalContext,
+    };
+
+    // Include semanticMemories only if semantic search was performed
+    if (shouldSearchSemantic) {
+      result.semanticMemories = semanticResults;
+    }
+
+    return result;
+  } catch (error) {
+    logger.error(
+      "Failed to load enhanced context, falling back to base memory",
+      { userId, maestroId, tierName },
+      error,
+    );
+    // Graceful fallback to base memory without semantic results
+    return loadPreviousContext(userId, maestroId, tierName);
+  }
+}
+
+/**
  * Merge key facts from multiple conversations, deduplicating and limiting.
+ *
+ * @param conversations Array of conversation objects with keyFacts
+ * @param maxFacts Maximum number of facts to return (tier-specific)
+ * @returns Deduplicated and limited array of key facts
  */
 function mergeKeyFacts(
-  conversations: Array<{ keyFacts: string | null }>
+  conversations: Array<{ keyFacts: string | null }>,
+  maxFacts: number,
 ): string[] {
   const allFacts = new Set<string>();
 
@@ -99,28 +241,33 @@ function mergeKeyFacts(
       const facts = JSON.parse(conv.keyFacts);
       if (Array.isArray(facts)) {
         for (const fact of facts) {
-          if (typeof fact === 'string' && fact.trim()) {
+          if (typeof fact === "string" && fact.trim()) {
             allFacts.add(fact.trim());
           }
         }
       }
     } catch {
       // Invalid JSON in keyFacts, log warning and skip
-      logger.warn('Invalid JSON in keyFacts, skipping', {
+      logger.warn("Invalid JSON in keyFacts, skipping", {
         keyFacts: conv.keyFacts?.substring(0, 100),
       });
     }
   }
 
-  // Return most recent facts first (limited)
-  return Array.from(allFacts).slice(0, MAX_KEY_FACTS);
+  // Return facts limited to tier-specific max
+  return Array.from(allFacts).slice(0, maxFacts);
 }
 
 /**
  * Merge topics from multiple conversations, deduplicating and limiting.
+ *
+ * @param conversations Array of conversation objects with topics
+ * @param maxTopics Maximum number of topics to return (tier-specific)
+ * @returns Deduplicated and limited array of topics
  */
 function mergeTopics(
-  conversations: Array<{ topics: string }>
+  conversations: Array<{ topics: string }>,
+  maxTopics: number,
 ): string[] {
   const allTopics = new Set<string>();
 
@@ -129,38 +276,84 @@ function mergeTopics(
       const topics = JSON.parse(conv.topics);
       if (Array.isArray(topics)) {
         for (const topic of topics) {
-          if (typeof topic === 'string' && topic.trim()) {
+          if (typeof topic === "string" && topic.trim()) {
             allTopics.add(topic.trim());
           }
         }
       }
     } catch {
       // Invalid JSON in topics, log warning and skip
-      logger.warn('Invalid JSON in topics, skipping', {
+      logger.warn("Invalid JSON in topics, skipping", {
         topics: conv.topics?.substring(0, 100),
       });
     }
   }
 
-  // Return unique topics (limited)
-  return Array.from(allTopics).slice(0, MAX_TOPICS);
+  // Return topics limited to tier-specific max
+  return Array.from(allTopics).slice(0, maxTopics);
+}
+
+/**
+ * Load hierarchical summaries (weekly/monthly) for Pro tier users.
+ */
+export async function loadHierarchicalContext(
+  userId: string,
+  tierLimits: import("./tier-memory-config").TierMemoryLimits,
+): Promise<{ weeklySummary?: string; monthlySummary?: string }> {
+  if (!tierLimits.semanticEnabled) {
+    return {};
+  }
+  try {
+    const summaries = await prisma.hierarchicalSummary.findMany({
+      where: { userId, type: { in: ["weekly", "monthly"] } },
+      orderBy: { endDate: "desc" },
+      take: 2,
+    });
+    const result: Record<string, string | undefined> = {};
+    for (const s of summaries) {
+      const key = s.type === "weekly" ? "weeklySummary" : "monthlySummary";
+      if (!result[key]) {
+        const themes = Array.isArray(s.keyThemes) ? s.keyThemes : [];
+        const learnings = Array.isArray(s.consolidatedLearnings)
+          ? s.consolidatedLearnings
+          : [];
+        const topicNames = Array.isArray(s.frequentTopics)
+          ? (s.frequentTopics as Array<{ topic?: string; count?: number }>)
+              .filter((t) => t?.topic)
+              .map((t) => t.topic)
+              .join(", ")
+          : "";
+        const parts = [];
+        if (themes.length) parts.push(`Temi: ${themes.join(", ")}`);
+        if (learnings.length)
+          parts.push(`Apprendimenti: ${learnings.join(", ")}`);
+        if (topicNames) parts.push(`Argomenti: ${topicNames}`);
+        result[key] = parts.join(" | ");
+      }
+    }
+    logger.info("Loaded hierarchical context", { userId });
+    return result as { weeklySummary?: string; monthlySummary?: string };
+  } catch (error) {
+    logger.error("Failed to load hierarchical context", { userId }, error);
+    return {};
+  }
 }
 
 /**
  * Format a date as relative time in Italian.
  */
 export function formatRelativeDate(date: Date | null): string {
-  if (!date) return 'data sconosciuta';
+  if (!date) return "data sconosciuta";
 
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) return 'oggi';
-  if (diffDays === 1) return 'ieri';
+  if (diffDays === 0) return "oggi";
+  if (diffDays === 1) return "ieri";
   if (diffDays < 7) return `${diffDays} giorni fa`;
-  if (diffDays < 14) return 'la settimana scorsa';
+  if (diffDays < 14) return "la settimana scorsa";
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} settimane fa`;
-  if (diffDays < 60) return 'il mese scorso';
+  if (diffDays < 60) return "il mese scorso";
   return `${Math.floor(diffDays / 30)} mesi fa`;
 }

@@ -126,6 +126,7 @@ model FunnelEvent {
   // Funnel data
   stage     String // VISITOR | TRIAL_START | TRIAL_ENGAGED | LIMIT_HIT | BETA_REQUEST | APPROVED | FIRST_LOGIN | ACTIVE | CHURNED
   fromStage String? // Previous stage (null for first event)
+  locale    String? // ISO 639-1 locale code (e.g., "it", "en", "fr", "de", "es")
 
   // Context
   metadata Json? // Extra data (e.g., maestro used, feature triggered)
@@ -139,5 +140,6 @@ model FunnelEvent {
   @@index([visitorId, createdAt])
   @@index([userId, createdAt])
   @@index([stage, createdAt])
+  @@index([locale, createdAt])
   @@index([isTestData, createdAt])
 }

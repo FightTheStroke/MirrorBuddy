@@ -7,6 +7,7 @@ import {
   HelpCircle,
   Accessibility,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
@@ -31,22 +32,6 @@ interface DashboardTabsProps {
   className?: string;
 }
 
-const TAB_CONFIG = [
-  { value: "panoramica" as const, label: "Panoramica", icon: LayoutDashboard },
-  { value: "progressi" as const, label: "Progressi", icon: TrendingUp },
-  {
-    value: "osservazioni" as const,
-    label: "Osservazioni",
-    icon: MessageSquareText,
-  },
-  { value: "guida" as const, label: "Guida", icon: HelpCircle },
-  {
-    value: "accessibilita" as const,
-    label: "Accessibilità",
-    icon: Accessibility,
-  },
-];
-
 /**
  * Dashboard tabs navigation component.
  * WCAG 2.1 AA compliant with high contrast support.
@@ -58,6 +43,27 @@ export function DashboardTabs({
   children,
   className,
 }: DashboardTabsProps) {
+  const t = useTranslations("education.parent-dashboard.tabs");
+
+  const TAB_CONFIG = [
+    {
+      value: "panoramica" as const,
+      label: t("overview"),
+      icon: LayoutDashboard,
+    },
+    { value: "progressi" as const, label: t("progress"), icon: TrendingUp },
+    {
+      value: "osservazioni" as const,
+      label: t("observations"),
+      icon: MessageSquareText,
+    },
+    { value: "guida" as const, label: t("guide"), icon: HelpCircle },
+    {
+      value: "accessibilita" as const,
+      label: t("accessibility"),
+      icon: Accessibility,
+    },
+  ];
   return (
     <Tabs
       value={activeTab}

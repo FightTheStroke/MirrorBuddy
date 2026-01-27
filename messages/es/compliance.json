@@ -1,0 +1,698 @@
+{
+  "aiTransparency": {
+    "contact": {
+      "text": "Text"
+    },
+    "page": {
+      "backButton": "Back Button",
+      "lastUpdated": "Last Updated",
+      "title": "Titolo",
+      "version": "Version"
+    },
+    "relatedDocs": {
+      "heading": "Heading",
+      "privacy": "Privacy",
+      "privacyDescription": "Privacy Description",
+      "terms": "Termini",
+      "termsDescription": "Terms Description"
+    },
+    "tldr": {
+      "heading": "Heading",
+      "point1": "Point1",
+      "point2": "Point2",
+      "point3": "Point3",
+      "point4": "Point4",
+      "point5": "Point5"
+    },
+    "aiSystem": {
+      "section1Para1": "Section1 Para1",
+      "section1Para2Conclusion": "Section1 Para2 Conclusion",
+      "section1Para2Intro": "Section1 Para2 Intro",
+      "section1Para2Item1": "Section1 Para2 Item1",
+      "section1Para2Item2": "Section1 Para2 Item2",
+      "section1Para2Item3": "Section1 Para2 Item3",
+      "section1Title": "Section1 Title",
+      "section2Heading": "Section2 Heading",
+      "section2List1Text": "Section2 List1 Text",
+      "section2List1Title": "Section2 List1 Title",
+      "section2List2Text": "Section2 List2 Text",
+      "section2List2Title": "Section2 List2 Title",
+      "section2List3Text": "Section2 List3 Text",
+      "section2List3Title": "Section2 List3 Title",
+      "section2Para1": "Section2 Para1",
+      "section2Title": "Section2 Title",
+      "section3Cat1Items": "Section3 Cat1 Items",
+      "section3Cat1Title": "Section3 Cat1 Title",
+      "section3Cat2Items": "Section3 Cat2 Items",
+      "section3Cat2Title": "Section3 Cat2 Title",
+      "section3Cat3Items": "Section3 Cat3 Items",
+      "section3Cat3Title": "Section3 Cat3 Title",
+      "section3Cat4Items": "Section3 Cat4 Items",
+      "section3Cat4Title": "Section3 Cat4 Title",
+      "section3Cat5Items": "Section3 Cat5 Items",
+      "section3Cat5Title": "Section3 Cat5 Title",
+      "section3Heading": "Section3 Heading",
+      "section3Para1": "Section3 Para1",
+      "section3Para2": "Section3 Para2",
+      "section3Title": "Section3 Title",
+      "section4Heading": "Section4 Heading",
+      "section4Item1Text": "Section4 Item1 Text",
+      "section4Item1Title": "Section4 Item1 Title",
+      "section4Item2Text": "Section4 Item2 Text",
+      "section4Item2Title": "Section4 Item2 Title",
+      "section4Item3Text": "Section4 Item3 Text",
+      "section4Item3Title": "Section4 Item3 Title",
+      "section4Item4Text": "Section4 Item4 Text",
+      "section4Item4Title": "Section4 Item4 Title",
+      "section4Item5Subtitle": "Section4 Item5 Subtitle",
+      "section4Item5Text": "Section4 Item5 Text",
+      "section4Item5Title": "Section4 Item5 Title",
+      "section4Title": "Section4 Title"
+    },
+    "faqSupport": {
+      "faq1Answer": "Faq1 Answer",
+      "faq1Question": "Faq1 Question",
+      "faq2Answer": "Faq2 Answer",
+      "faq2Question": "Faq2 Question",
+      "faq3Answer": "Faq3 Answer",
+      "faq3Question": "Faq3 Question",
+      "faq4Answer": "Faq4 Answer",
+      "faq4Question": "Faq4 Question",
+      "faq5Answer": "Faq5 Answer",
+      "faq5Question": "Faq5 Question",
+      "section10Title": "Section10 Title",
+      "section11NextReview": "Section11 Next Review",
+      "section11Para1": "Section11 Para1",
+      "section11ReviewDate": "Section11 Review Date",
+      "section11Title": "Section11 Title",
+      "section9AuthorityLabel": "Section9 Authority Label",
+      "section9AuthorityText": "Section9 Authority Text",
+      "section9EmailAddress": "Section9 Email Address",
+      "section9EmailLabel": "Section9 Email Label",
+      "section9FormLabel": "Section9 Form Label",
+      "section9FormText": "Section9 Form Text",
+      "section9Para1": "Section9 Para1",
+      "section9Para2": "Section9 Para2",
+      "section9Title": "Section9 Title"
+    },
+    "rightsCompliance": {
+      "section5Item1Text": "Section5 Item1 Text",
+      "section5Item1Title": "Section5 Item1 Title",
+      "section5Item2Text": "Section5 Item2 Text",
+      "section5Item2Title": "Section5 Item2 Title",
+      "section5Item3Text": "Section5 Item3 Text",
+      "section5Item3Title": "Section5 Item3 Title",
+      "section5Item4Text": "Section5 Item4 Text",
+      "section5Item4Title": "Section5 Item4 Title",
+      "section5Item5Text": "Section5 Item5 Text",
+      "section5Item5Title": "Section5 Item5 Title",
+      "section5Item6Text": "Section5 Item6 Text",
+      "section5Item6Title": "Section5 Item6 Title",
+      "section5Para1": "Section5 Para1",
+      "section5Title": "Section5 Title",
+      "section6Item1Text": "Section6 Item1 Text",
+      "section6Item1Title": "Section6 Item1 Title",
+      "section6Item2Text": "Section6 Item2 Text",
+      "section6Item2Title": "Section6 Item2 Title",
+      "section6Item3Text": "Section6 Item3 Text",
+      "section6Item3Title": "Section6 Item3 Title",
+      "section6Item4Text": "Section6 Item4 Text",
+      "section6Item4Title": "Section6 Item4 Title",
+      "section6Item5Text": "Section6 Item5 Text",
+      "section6Item5Title": "Section6 Item5 Title",
+      "section6Para1": "Section6 Para1",
+      "section6Title": "Section6 Title",
+      "section7Para1": "Section7 Para1",
+      "section7Risk1": "Section7 Risk1",
+      "section7Risk1Mitigation": "Section7 Risk1 Mitigation",
+      "section7Risk2": "Section7 Risk2",
+      "section7Risk2Mitigation": "Section7 Risk2 Mitigation",
+      "section7Risk3": "Section7 Risk3",
+      "section7Risk3Mitigation": "Section7 Risk3 Mitigation",
+      "section7Risk4": "Section7 Risk4",
+      "section7Risk4Mitigation": "Section7 Risk4 Mitigation",
+      "section7Risk5": "Section7 Risk5",
+      "section7Risk5Mitigation": "Section7 Risk5 Mitigation",
+      "section7TableHeaderMitigation": "Section7 Table Header Mitigation",
+      "section7TableHeaderRisk": "Section7 Table Header Risk",
+      "section7Title": "Section7 Title",
+      "section8Item1Text": "Section8 Item1 Text",
+      "section8Item1Title": "Section8 Item1 Title",
+      "section8Item2Text": "Section8 Item2 Text",
+      "section8Item2Title": "Section8 Item2 Title",
+      "section8Item3Text": "Section8 Item3 Text",
+      "section8Item3Title": "Section8 Item3 Title",
+      "section8Item4Text": "Section8 Item4 Text",
+      "section8Item4Title": "Section8 Item4 Title",
+      "section8Para1": "Section8 Para1",
+      "section8Para2": "Section8 Para2",
+      "section8Title": "Section8 Title"
+    },
+    "sections": {
+      "section1": {
+        "para1": "Para1",
+        "para2": "Para2",
+        "title": "Titolo"
+      },
+      "section10": {
+        "faq1Answer": "Faq1 Answer",
+        "faq1Title": "Faq1 Title",
+        "faq2Answer": "Faq2 Answer",
+        "faq2Title": "Faq2 Title",
+        "faq3Answer": "Faq3 Answer",
+        "faq3Title": "Faq3 Title",
+        "faq4Answer": "Faq4 Answer",
+        "faq4Title": "Faq4 Title",
+        "faq5Answer": "Faq5 Answer",
+        "faq5Title": "Faq5 Title",
+        "title": "Titolo"
+      },
+      "section11": {
+        "intro": "Intro",
+        "nextReview": "Next Review",
+        "title": "Titolo"
+      },
+      "section2": {
+        "intro": "Intro",
+        "item1Desc": "Item1 Desc",
+        "item1Title": "Item1 Title",
+        "item2Desc": "Item2 Desc",
+        "item2Title": "Item2 Title",
+        "item3Desc": "Item3 Desc",
+        "item3Title": "Item3 Title",
+        "subtitle": "Sottotitolo",
+        "title": "Titolo"
+      },
+      "section3": {
+        "category1": "Category1",
+        "category1Label": "Category1 Label",
+        "category2": "Category2",
+        "category2Label": "Category2 Label",
+        "category3": "Category3",
+        "category3Label": "Category3 Label",
+        "category4": "Category4",
+        "category4Label": "Category4 Label",
+        "category5": "Category5",
+        "category5Label": "Category5 Label",
+        "intro": "Intro",
+        "outro": "Outro",
+        "subtitle": "Sottotitolo",
+        "title": "Titolo"
+      },
+      "section4": {
+        "protection1Desc": "Protection1 Desc",
+        "protection1Title": "Protection1 Title",
+        "protection2Desc": "Protection2 Desc",
+        "protection2Title": "Protection2 Title",
+        "protection3Desc": "Protection3 Desc",
+        "protection3Title": "Protection3 Title",
+        "protection4Desc": "Protection4 Desc",
+        "protection4Title": "Protection4 Title",
+        "protection5Desc": "Protection5 Desc",
+        "protection5Title": "Protection5 Title",
+        "subtitle": "Sottotitolo",
+        "title": "Titolo"
+      },
+      "section5": {
+        "intro": "Intro",
+        "right1Desc": "Right1 Desc",
+        "right1Title": "Right1 Title",
+        "right2Desc": "Right2 Desc",
+        "right2Title": "Right2 Title",
+        "right3Desc": "Right3 Desc",
+        "right3Title": "Right3 Title",
+        "right4Desc": "Right4 Desc",
+        "right4Title": "Right4 Title",
+        "right5Desc": "Right5 Desc",
+        "right5Title": "Right5 Title",
+        "right6Desc": "Right6 Desc",
+        "right6Title": "Right6 Title",
+        "title": "Titolo"
+      },
+      "section6": {
+        "intro": "Intro",
+        "protection1Desc": "Protection1 Desc",
+        "protection1Title": "Protection1 Title",
+        "protection2Desc": "Protection2 Desc",
+        "protection2Title": "Protection2 Title",
+        "protection3Desc": "Protection3 Desc",
+        "protection3Title": "Protection3 Title",
+        "protection4Desc": "Protection4 Desc",
+        "protection4Title": "Protection4 Title",
+        "protection5Desc": "Protection5 Desc",
+        "protection5Title": "Protection5 Title",
+        "title": "Titolo"
+      },
+      "section7": {
+        "intro": "Intro",
+        "mitigation1": "Mitigation1",
+        "mitigation2": "Mitigation2",
+        "mitigation3": "Mitigation3",
+        "mitigation4": "Mitigation4",
+        "mitigation5": "Mitigation5",
+        "risk1": "Risk1",
+        "risk2": "Risk2",
+        "risk3": "Risk3",
+        "risk4": "Risk4",
+        "risk5": "Risk5",
+        "tableHeader1": "Table Header1",
+        "tableHeader2": "Table Header2",
+        "title": "Titolo"
+      },
+      "section8": {
+        "classification": "Classification",
+        "intro": "Intro",
+        "law1": "Law1",
+        "law2": "Law2",
+        "law3": "Law3",
+        "law4": "Law4",
+        "title": "Titolo"
+      },
+      "section9": {
+        "authorityLabel": "Authority Label",
+        "authorityValue": "Authority Value",
+        "commitment": "Commitment",
+        "emailLabel": "Email Label",
+        "emailValue": "Email Value",
+        "formLabel": "Form Label",
+        "formValue": "Form Value",
+        "intro": "Intro",
+        "title": "Titolo"
+      }
+    }
+  },
+  "compliance": {
+    "badges": {
+      "conformity": "Conformity"
+    },
+    "contact": {
+      "text": "Text",
+      "title": "Titolo"
+    },
+    "page": {
+      "subtitle": "Sottotitolo",
+      "title": "Titolo"
+    },
+    "sections": {
+      "documentation": "Documentation",
+      "publicDocs": "Public Docs",
+      "technicalDocs": "Technical Docs"
+    },
+    "privacy": "Privacy Policy",
+    "terms": "Termini di Servizio",
+    "cookies": "Cookie Policy",
+    "accessibility": "Accessibilità",
+    "aiTransparency": "Trasparenza AI",
+    "privacyTitle": "Informativa sulla Privacy",
+    "termsTitle": "Termini e Condizioni",
+    "cookiesTitle": "Informativa sui Cookie",
+    "accessibilityTitle": "Dichiarazione di Accessibilità",
+    "aiTransparencyTitle": "Trasparenza sull'Intelligenza Artificiale"
+  },
+  "contact": {
+    "backButton": "Back Button",
+    "page": {
+      "subtitle": "Siamo qui per aiutarti",
+      "title": "Contattaci",
+      "description": "Hai domande o feedback? Compila il modulo sottostante e ti risponderemo il prima possibile."
+    },
+    "enterprise": {
+      "heading": "Contáctanos Enterprise",
+      "subtitle": "Soluciones personalizadas para la formación empresarial",
+      "title": "Enterprise - Contáctanos",
+      "description": "Descubre nuestras soluciones enterprise para formación empresarial personalizada",
+      "features": {
+        "customization": "Personalización completa de los itinerarios formativos",
+        "analytics": "Dashboard de analytics y reportes avanzados",
+        "integration": "Integración con los sistemas de RRHH de la empresa"
+      },
+      "submitting": "Enviando...",
+      "successDescription": "Nuestro equipo enterprise te contactará en las próximas 24 horas laborables.",
+      "successTitle": "Solicitud enviada"
+    },
+    "form": {
+      "emailInvalid": "L'email non è valida",
+      "emailRequired": "L'email è obbligatoria",
+      "errorMessage": "Si è verificato un errore durante l'invio del messaggio. Riprova più tardi.",
+      "errorTitle": "Errore nell'invio",
+      "messageLabel": "Messaggio",
+      "messageRequired": "Il messaggio è obbligatorio",
+      "nameRequired": "Il nome è obbligatorio",
+      "placeholderMessage": "es. premium",
+      "subjectRequired": "L'oggetto è obbligatorio",
+      "submitButtonDefault": "Invia messaggio",
+      "submitButtonLoading": "Invio in corso...",
+      "successMessage": "Grazie per averci contattato. Ti risponderemo il prima possibile.",
+      "successTitle": "Messaggio inviato!",
+      "nameLabel": "Nome",
+      "emailLabel": "Email",
+      "subjectLabel": "Oggetto"
+    },
+    "schools_form": {
+      "errorConnection": "Error de conexión",
+      "errorDefault": "Error al enviar",
+      "features": {
+        "curriculum": "Personalización curricular",
+        "management": "Gestión de clase",
+        "reporting": "Informes y análisis",
+        "support": "Soporte dedicado"
+      },
+      "intro": "Ofrecemos soluciones personalizadas para la personalización curricular y las necesidades específicas de tu escuela.",
+      "messagePlaceholder": "Describe las necesidades de tu escuela...",
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "roleLabel": "Rol",
+      "roleOptions": {
+        "dirigente": "Director de escuela",
+        "docente": "Docente",
+        "coordinatore": "Coordinador",
+        "altro": "Otro"
+      },
+      "schoolNameLabel": "Nombre de la escuela",
+      "schoolTypeLabel": "Tipo de escuela",
+      "schoolTypeOptions": {
+        "primaria": "Escuela primaria",
+        "secondaria1": "Escuela secundaria básica",
+        "secondaria2": "Escuela secundaria superior",
+        "altro": "Otro"
+      },
+      "solutions": "Soluciones",
+      "specificNeedsLabel": "Necesidades específicas",
+      "studentCountLabel": "Número de estudiantes",
+      "studentCountOptions": {
+        "small": "Menos de 200",
+        "medium": "200-500",
+        "large": "500-1000",
+        "xlarge": "Más de 1000"
+      },
+      "messageLabel": "Mensaje",
+      "submitButtonDefault": "Enviar solicitud",
+      "submitButtonLoading": "Enviando...",
+      "successMessage": "Tu solicitud ha sido enviada con éxito. Te contactaremos pronto.",
+      "successTitle": "Solicitud enviada"
+    }
+  },
+  "legal": {
+    "cookies": {
+      "page": {
+        "backHome": "Back Home",
+        "contactEmail": "Contact Email",
+        "contactQuestion": "Contact Question",
+        "lastUpdated": "Last Updated",
+        "pageNavAriaLabel": "Page Nav Aria Label",
+        "title": "Titolo",
+        "version": "Version"
+      },
+      "sections": {
+        "changes": {
+          "importantChanges": "Important Changes",
+          "intro": "Intro",
+          "title": "Titolo",
+          "updateDate": "Update Date",
+          "updatePage": "Update Page"
+        },
+        "cookieManagement": {
+          "chromeInstructions": "Chrome Instructions",
+          "edgeInstructions": "Edge Instructions",
+          "firefoxInstructions": "Firefox Instructions",
+          "h3Browser": "H3 Browser",
+          "h3InApp": "H3 In App",
+          "pBrowser": "P Browser",
+          "pInApp": "P In App",
+          "safariInstructions": "Safari Instructions",
+          "title": "Titolo",
+          "warningAriaLabel": "Warning Aria Label",
+          "warningText": "Warning Text",
+          "warningTitle": "Warning Title"
+        },
+        "duration": {
+          "clearCookies": "Clear Cookies",
+          "intro": "Intro",
+          "persistentCookies": "Persistent Cookies",
+          "persistentCookiesDesc": "Persistent Cookies Desc",
+          "sessionCookies": "Session Cookies",
+          "sessionCookiesDesc": "Session Cookies Desc",
+          "title": "Titolo"
+        },
+        "essentialCookies": {
+          "intro": "Intro",
+          "note": "Note",
+          "title": "Titolo"
+        },
+        "links": {
+          "intro": "Intro",
+          "privacyPolicyDesc": "Privacy Policy Desc",
+          "privacyPolicyLabel": "Privacy Policy Label",
+          "termsDesc": "Terms Desc",
+          "termsLabel": "Terms Label",
+          "title": "Titolo"
+        },
+        "metricsAnalytics": {
+          "aggregated": "Aggregated",
+          "aggregatedDesc": "Aggregated Desc",
+          "gdprCompliant": "Gdpr Compliant",
+          "gdprCompliantDesc": "Gdpr Compliant Desc",
+          "h3Collection": "H3 Collection",
+          "p1": "P1",
+          "p2": "P2",
+          "readMore": "Read More",
+          "serverSide": "Server Side",
+          "serverSideDesc": "Server Side Desc",
+          "technicalOnly": "Technical Only",
+          "technicalOnlyDesc": "Technical Only Desc",
+          "title": "Titolo"
+        },
+        "thirdParty": {
+          "completeList": "Complete List",
+          "googleDriveLabel": "Google Drive Label",
+          "googleDriveNote": "Google Drive Note",
+          "noThirdParty": "No Third Party",
+          "noThirdPartyReason": "No Third Party Reason",
+          "title": "Titolo",
+          "vendors": {
+            "azureOpenAI": "Azure Open A I",
+            "resend": "Resend",
+            "sentry": "Sentry",
+            "supabase": "Supabase",
+            "upstash": "Upstash",
+            "vercel": "Vercel"
+          },
+          "vendorsIntro": "Vendors Intro",
+          "vendorsNoInstall": "Vendors No Install"
+        },
+        "whatAreCookies": {
+          "p1": "P1",
+          "p2": "P2",
+          "title": "Titolo"
+        },
+        "whichCookies": {
+          "analytics": "Analytics",
+          "analyticsDesc": "Analytics Desc",
+          "disclaimer": "Disclaimer",
+          "essential": "Essential",
+          "essentialDesc": "Essential Desc",
+          "intro": "Intro",
+          "title": "Titolo"
+        }
+      },
+      "table": {
+        "ariaLabel": "Aria Label",
+        "headers": {
+          "duration": "Duration",
+          "name": "Nome",
+          "purpose": "Purpose"
+        },
+        "rows": {
+          "a11y": {
+            "duration": "Duration",
+            "purpose": "Purpose"
+          },
+          "admin": {
+            "duration": "Duration",
+            "purpose": "Purpose"
+          },
+          "userId": {
+            "duration": "Duration",
+            "purpose": "Purpose"
+          },
+          "userIdClient": {
+            "duration": "Duration",
+            "purpose": "Purpose"
+          }
+        }
+      },
+      "tldr": {
+        "heading": "Heading",
+        "point1": "Point1",
+        "point2": "Point2",
+        "point3": "Point3",
+        "point4": "Point4"
+      }
+    },
+    "privacy": {
+      "page": {
+        "backToHome": "Back To Home",
+        "lastUpdated": "Last Updated",
+        "pageNavigation": "Page Navigation",
+        "questionAriaLabel": "Question Aria Label",
+        "questionText": "Question Text",
+        "title": "Titolo",
+        "tldrHeading": "Tldr Heading",
+        "version": "Version",
+        "tldrItems": {
+          "backToHome": "Back To Home",
+          "lastUpdated": "Last Updated",
+          "pageNavigation": "Page Navigation",
+          "questionAriaLabel": "Question Aria Label",
+          "questionText": "Question Text",
+          "title": "Titolo",
+          "tldrHeading": "Tldr Heading",
+          "version": "Version"
+        }
+      }
+    },
+    "terms": {
+      "backToHome": "Back To Home",
+      "backToHomeAriaLabel": "Back To Home Aria Label",
+      "lastUpdated": "Last Updated",
+      "pageNavAriaLabel": "Page Nav Aria Label",
+      "questionsEmail": "Questions Email",
+      "questionsPrefix": "Questions Prefix",
+      "title": "Titolo",
+      "tldrHeading": "Tldr Heading",
+      "tldrItems": {
+        "feedback": "Feedback",
+        "free": "Free",
+        "notSchool": "Not School",
+        "respect": "Respect",
+        "supervised": "Supervised"
+      },
+      "version": "Version",
+      "sections": {
+        "section1": {
+          "content1": "Content1",
+          "content2": "Content2",
+          "title": "Titolo"
+        },
+        "section10": {
+          "intro": "Intro",
+          "item1": "Item1",
+          "item2": "Item2",
+          "item3": "Item3",
+          "title": "Titolo"
+        },
+        "section11": {
+          "line1": "Line1",
+          "line2": "Line2",
+          "title": "Titolo"
+        },
+        "section2": {
+          "item1": "Item1",
+          "item2": "Item2",
+          "item3": "Item3",
+          "item4": "Item4",
+          "title": "Titolo"
+        },
+        "section3": {
+          "ai": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "beta": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "intro": "Intro",
+          "school": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "title": "Titolo"
+        },
+        "section4": {
+          "changeable": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "demo": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "educational": {
+            "content": "Content",
+            "heading": "Heading"
+          },
+          "intro": "Intro",
+          "title": "Titolo"
+        },
+        "section5": {
+          "intro": "Intro",
+          "item1": "Item1",
+          "item2": "Item2",
+          "item3": "Item3",
+          "item4": "Item4",
+          "note": "Note",
+          "title": "Titolo"
+        },
+        "section6": {
+          "intro": "Intro",
+          "noAbuse": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "notShare": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "report": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "respect": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "title": "Titolo"
+        },
+        "section7": {
+          "check": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "contact": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "intro": "Intro",
+          "responsible": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "supervise": {
+            "content": "Content",
+            "label": "Label"
+          },
+          "title": "Titolo"
+        },
+        "section8": {
+          "brief": "Brief",
+          "intro": "Intro",
+          "item1": "Item1",
+          "item2": "Item2",
+          "item3": "Item3",
+          "item4": "Item4",
+          "privacyLink": "Privacy Link",
+          "title": "Titolo"
+        },
+        "section9": {
+          "intro": "Intro",
+          "item1": "Item1",
+          "item2": "Item2",
+          "item3": "Item3",
+          "note": "Note",
+          "title": "Titolo"
+        }
+      }
+    }
+  }
+}

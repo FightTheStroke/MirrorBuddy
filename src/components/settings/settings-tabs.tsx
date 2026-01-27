@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import {
   User,
   Accessibility,
@@ -12,9 +13,22 @@ import {
   Music,
   Wrench,
   Cloud,
-} from 'lucide-react';
+} from "lucide-react";
 
-export type SettingsTab = 'profile' | 'characters' | 'accessibility' | 'appearance' | 'ai' | 'audio' | 'ambient-audio' | 'integrations' | 'notifications' | 'telemetry' | 'privacy' | 'genitori' | 'diagnostics';
+export type SettingsTab =
+  | "profile"
+  | "characters"
+  | "accessibility"
+  | "appearance"
+  | "ai"
+  | "audio"
+  | "ambient-audio"
+  | "integrations"
+  | "notifications"
+  | "telemetry"
+  | "privacy"
+  | "genitori"
+  | "diagnostics";
 
 export interface SettingsTabDef {
   id: SettingsTab;
@@ -22,18 +36,65 @@ export interface SettingsTabDef {
   icon: React.ReactNode;
 }
 
-export const SETTINGS_TABS: SettingsTabDef[] = [
-  { id: 'profile', label: 'Profilo', icon: <User className="w-5 h-5" /> },
-  { id: 'characters', label: 'Personaggi', icon: <Users className="w-5 h-5" /> },
-  { id: 'accessibility', label: 'Accessibilita', icon: <Accessibility className="w-5 h-5" /> },
-  { id: 'appearance', label: 'Aspetto', icon: <Palette className="w-5 h-5" /> },
-  { id: 'ai', label: 'AI Provider', icon: <Bot className="w-5 h-5" /> },
-  { id: 'audio', label: 'Audio/Video', icon: <Volume2 className="w-5 h-5" /> },
-  { id: 'ambient-audio', label: 'Audio Ambientale', icon: <Music className="w-5 h-5" /> },
-  { id: 'integrations', label: 'Integrazioni', icon: <Cloud className="w-5 h-5" /> },
-  { id: 'notifications', label: 'Notifiche', icon: <Bell className="w-5 h-5" /> },
-  { id: 'telemetry', label: 'Statistiche', icon: <BarChart3 className="w-5 h-5" /> },
-  { id: 'privacy', label: 'Privacy', icon: <Shield className="w-5 h-5" /> },
-  { id: 'genitori', label: 'Genitori', icon: <UserCircle className="w-5 h-5" /> },
-  { id: 'diagnostics', label: 'Diagnostica', icon: <Wrench className="w-5 h-5" /> },
-];
+export function useSettingsTabs(): SettingsTabDef[] {
+  const t = useTranslations("settings.tabs");
+
+  return [
+    { id: "profile", label: t("profile"), icon: <User className="w-5 h-5" /> },
+    {
+      id: "characters",
+      label: t("characters"),
+      icon: <Users className="w-5 h-5" />,
+    },
+    {
+      id: "accessibility",
+      label: t("accessibility"),
+      icon: <Accessibility className="w-5 h-5" />,
+    },
+    {
+      id: "appearance",
+      label: t("appearance"),
+      icon: <Palette className="w-5 h-5" />,
+    },
+    { id: "ai", label: t("aiProvider"), icon: <Bot className="w-5 h-5" /> },
+    { id: "audio", label: t("audio"), icon: <Volume2 className="w-5 h-5" /> },
+    {
+      id: "ambient-audio",
+      label: t("ambientAudio"),
+      icon: <Music className="w-5 h-5" />,
+    },
+    {
+      id: "integrations",
+      label: t("integrations"),
+      icon: <Cloud className="w-5 h-5" />,
+    },
+    {
+      id: "notifications",
+      label: t("notifications"),
+      icon: <Bell className="w-5 h-5" />,
+    },
+    {
+      id: "telemetry",
+      label: t("statistics"),
+      icon: <BarChart3 className="w-5 h-5" />,
+    },
+    {
+      id: "privacy",
+      label: t("privacy"),
+      icon: <Shield className="w-5 h-5" />,
+    },
+    {
+      id: "genitori",
+      label: t("parents"),
+      icon: <UserCircle className="w-5 h-5" />,
+    },
+    {
+      id: "diagnostics",
+      label: t("diagnostics"),
+      icon: <Wrench className="w-5 h-5" />,
+    },
+  ];
+}
+
+// Fallback export for static access during component initialization
+export const SETTINGS_TABS: SettingsTabDef[] = [];

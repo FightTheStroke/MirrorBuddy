@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Gift,
@@ -31,6 +32,7 @@ export function TrialHeaderDropdown({
   chatsRemaining,
   maxChats,
 }: TrialHeaderDropdownProps) {
+  const t = useTranslations("common");
   const [isOpen, setIsOpen] = useState(false);
   const [usageData, setUsageData] = useState<TrialUsageData | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -201,7 +203,7 @@ export function TrialHeaderDropdown({
                 onClick={() => setIsOpen(false)}
               >
                 <LogIn className="w-4 h-4" />
-                Accedi
+                {t("login")}
               </Link>
             </div>
           </motion.div>

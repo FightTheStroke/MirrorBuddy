@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { X, Minimize2, Maximize2, Loader2 } from "lucide-react";
@@ -52,6 +53,8 @@ export function ToolPanel({
   embedded = false,
   sessionId = null,
 }: ToolPanelProps) {
+  const t = useTranslations("tools.toolPanel");
+
   // Save student summary to materials archive
   const handleSaveStudentSummary = useCallback(
     async (data: StudentSummaryData) => {
@@ -168,7 +171,7 @@ export function ToolPanel({
       default:
         return (
           <div className="p-4 text-center text-slate-500 dark:text-slate-400">
-            Tipo di tool non supportato: {tool.type}
+            {t("unsupportedToolType", { type: tool.type })}
           </div>
         );
     }
@@ -176,18 +179,18 @@ export function ToolPanel({
 
   const getToolLabel = () => {
     const labels: Record<string, string> = {
-      mindmap: "Mappa Mentale",
-      quiz: "Quiz",
-      flashcard: "Flashcard",
-      demo: "Demo Interattiva",
-      search: "Ricerca",
-      diagram: "Diagramma",
-      timeline: "Linea del Tempo",
-      summary: "Riassunto",
-      formula: "Formula",
-      chart: "Grafico",
-      webcam: "Foto",
-      pdf: "PDF",
+      mindmap: t("labels.mindmap"),
+      quiz: t("labels.quiz"),
+      flashcard: t("labels.flashcard"),
+      demo: t("labels.demo"),
+      search: t("labels.search"),
+      diagram: t("labels.diagram"),
+      timeline: t("labels.timeline"),
+      summary: t("labels.summary"),
+      formula: t("labels.formula"),
+      chart: t("labels.chart"),
+      webcam: t("labels.webcam"),
+      pdf: t("labels.pdf"),
     };
     return labels[tool.type] || tool.type;
   };
@@ -229,9 +232,7 @@ export function ToolPanel({
               {maestro?.displayName || "Tool"}
             </span>
             <span className="text-sm text-slate-500 dark:text-slate-400">
-              {tool.status === "building"
-                ? "Creazione in corso..."
-                : getToolLabel()}
+              {tool.status === "building" ? t("building") : getToolLabel()}
             </span>
           </div>
 
@@ -241,7 +242,7 @@ export function ToolPanel({
                 variant="ghost"
                 size="icon"
                 onClick={onToggleMinimize}
-                aria-label={isMinimized ? "Espandi" : "Minimizza"}
+                aria-label={isMinimized ? t("expand") : t("minimize")}
                 className="h-11 w-11"
               >
                 {isMinimized ? (
@@ -255,7 +256,7 @@ export function ToolPanel({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              aria-label="Chiudi"
+              aria-label={t("close")}
               className="h-11 w-11"
             >
               <X className="w-4 h-4" />
@@ -270,13 +271,13 @@ export function ToolPanel({
               <div className="flex flex-col items-center justify-center h-full gap-4">
                 <Loader2 className="w-12 h-12 text-primary animate-spin" />
                 <p className="text-slate-500 dark:text-slate-400">
-                  {Math.round(tool.progress * 100)}% completato...
+                  {t("progress", { percent: Math.round(tool.progress * 100) })}
                 </p>
               </div>
             ) : tool.status === "error" ? (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-red-500">
                 <X className="w-12 h-12" />
-                <p>Errore nella creazione del tool</p>
+                <p>{t("error")}</p>
                 {tool.error && (
                   <p className="text-sm text-slate-500">{tool.error}</p>
                 )}

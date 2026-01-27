@@ -3,7 +3,7 @@
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
-**Version**: 0.10.0
+**Version**: 0.12.0
 **Last Verified**: 2026-01-26
 **Update Policy**: This file is verified and updated during each release via `/release`
 
@@ -1652,6 +1652,1014 @@ graph TB
     WCAG --> AITransparency
 ```
 
+### 19.3 COPPA Compliance Flow
+
+Children's Online Privacy Protection Act compliance for users under 13.
+
+```mermaid
+stateDiagram-v2
+    [*] --> AgeCheck: User starts registration
+
+    AgeCheck: Age Verification
+    note right of AgeCheck: Birth date input
+
+    AgeCheck --> Adult: Age >= 13
+    AgeCheck --> MinorFlow: Age < 13
+
+    Adult: Standard Registration
+    Adult --> [*]: Complete
+
+    MinorFlow: Minor Flow (COPPA)
+
+    MinorFlow --> ParentEmail: Request parent email
+
+    ParentEmail: Parent Contact
+    note right of ParentEmail: Store only parent email initially
+
+    ParentEmail --> VerificationSent: Send verification email
+
+    VerificationSent: Awaiting Parent Response
+    note right of VerificationSent: 7-day expiry
+
+    VerificationSent --> ParentConsent: Parent clicks link
+    VerificationSent --> Expired: No response 7 days
+
+    Expired: Request Expired
+    Expired --> DataDeleted: Auto-delete child data
+
+    ParentConsent: Parent Consent Form
+    note right of ParentConsent: Explain data collection + rights
+
+    ParentConsent --> Approved: Parent approves
+    ParentConsent --> Denied: Parent denies
+
+    Denied: Consent Denied
+    Denied --> DataDeleted: Delete all child data
+
+    DataDeleted: Data Purged
+    DataDeleted --> [*]
+
+    Approved: Verified Minor Account
+    note right of Approved: Limited data collection + parent dashboard access
+
+    Approved --> [*]
+```
+
+### 19.4 GDPR Data Lifecycle
+
+Complete data flow from collection to deletion per GDPR Articles 5, 6, 17.
+
+```mermaid
+graph TB
+    subgraph Collection["1. Data Collection"]
+        Input["User Input (Chat, Voice, Profile)"]
+        Consent["Consent Capture (Cookie + ToS)"]
+        Legal["Legal Basis: Consent or Contract"]
+    end
+
+    subgraph Processing["2. Data Processing"]
+        Minimize["Data Minimization (Collect only necessary)"]
+        Purpose["Purpose Limitation (Education only)"]
+        Accuracy["Accuracy (User can correct)"]
+    end
+
+    subgraph Storage["3. Data Storage"]
+        Encrypt["Encryption at Rest (AES-256)"]
+        Transit["Encryption in Transit (TLS 1.3)"]
+        Location["EU Data Residency (Supabase EU)"]
+    end
+
+    subgraph Retention["4. Retention Policy"]
+        Active["Active Data (User account exists)"]
+        Inactive["Inactive 365 days: Archive"]
+        Expired["Archived 730 days: Delete"]
+    end
+
+    subgraph Deletion["5. Data Deletion"]
+        UserRequest["User Requests Deletion (Art. 17)"]
+        AutoRetention["Auto Retention Expiry"]
+        AccountClose["Account Closure"]
+
+        SoftDelete["Soft Delete (30-day grace)"]
+        HardDelete["Hard Delete (Irreversible)"]
+        AuditLog["Audit Log (Anonymized record)"]
+    end
+
+    Input --> Consent
+    Consent --> Legal
+    Legal --> Minimize
+    Minimize --> Purpose
+    Purpose --> Accuracy
+
+    Accuracy --> Encrypt
+    Encrypt --> Transit
+    Transit --> Location
+
+    Location --> Active
+    Active --> Inactive
+    Inactive --> Expired
+
+    UserRequest --> SoftDelete
+    AutoRetention --> SoftDelete
+    AccountClose --> SoftDelete
+    Expired --> HardDelete
+
+    SoftDelete --> HardDelete
+    HardDelete --> AuditLog
+```
+
+### 19.5 User Rights (GDPR Articles 15-22)
+
+```mermaid
+graph TB
+    subgraph User_Rights["GDPR User Rights"]
+        Art15["Art. 15: Right of Access"]
+        Art16["Art. 16: Right to Rectification"]
+        Art17["Art. 17: Right to Erasure"]
+        Art18["Art. 18: Right to Restriction"]
+        Art20["Art. 20: Right to Portability"]
+        Art21["Art. 21: Right to Object"]
+        Art22["Art. 22: Automated Decision Rights"]
+    end
+
+    subgraph Implementation["Implementation"]
+        subgraph Access["Access (Art. 15)"]
+            ExportAPI["GET /api/privacy/export-data"]
+            ExportFormat["JSON + PDF export"]
+        end
+
+        subgraph Rectification["Rectification (Art. 16)"]
+            ProfileEdit["PUT /api/user/profile"]
+            SettingsEdit["PUT /api/user/settings"]
+        end
+
+        subgraph Erasure["Erasure (Art. 17)"]
+            DeleteAPI["DELETE /api/user/account"]
+            GracePeriod["30-day grace period"]
+            Confirmation["Email confirmation required"]
+        end
+
+        subgraph Restriction["Restriction (Art. 18)"]
+            PauseAPI["POST /api/user/pause-processing"]
+            DataFreeze["Freeze data, stop AI processing"]
+        end
+
+        subgraph Portability["Portability (Art. 20)"]
+            PortableAPI["GET /api/privacy/portable-export"]
+            MachineFormat["JSON machine-readable"]
+        end
+
+        subgraph Object["Object (Art. 21)"]
+            OptOutAPI["POST /api/user/opt-out"]
+            MarketingStop["Stop marketing emails"]
+            AnalyticsStop["Stop analytics collection"]
+        end
+
+        subgraph Automated["Automated Decisions (Art. 22)"]
+            ExplainAPI["GET /api/ai/explanation"]
+            HumanReview["Request human review"]
+            AITransparency["/ai-transparency page"]
+        end
+    end
+
+    Art15 --> ExportAPI
+    Art16 --> ProfileEdit
+    Art17 --> DeleteAPI
+    Art18 --> PauseAPI
+    Art20 --> PortableAPI
+    Art21 --> OptOutAPI
+    Art22 --> ExplainAPI
+```
+
+### 19.6 Consent Management
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Consent UI
+    participant API as /api/consent
+    participant DB as Database
+    participant Cookie as Cookie Store
+
+    Note over U,Cookie: First Visit
+
+    U->>UI: Visit site
+    UI->>UI: Show Cookie Banner
+    U->>UI: Accept/Customize
+
+    alt Accept All
+        UI->>Cookie: Set mirrorbuddy-consent (all)
+        UI->>API: POST consent (all categories)
+    else Customize
+        UI->>UI: Show preference panel
+        U->>UI: Select categories
+        UI->>Cookie: Set mirrorbuddy-consent (selected)
+        UI->>API: POST consent (selected)
+    else Reject Non-Essential
+        UI->>Cookie: Set mirrorbuddy-consent (essential only)
+        UI->>API: POST consent (essential)
+    end
+
+    API->>DB: Store ConsentRecord
+    Note over DB: userId, categories, timestamp, version
+
+    Note over U,Cookie: Subsequent Visits
+
+    U->>UI: Return visit
+    UI->>Cookie: Check mirrorbuddy-consent
+    Cookie-->>UI: Consent preferences
+    UI->>UI: Apply preferences (no banner)
+
+    Note over U,Cookie: Consent Update
+
+    U->>UI: Open privacy settings
+    UI->>API: GET /api/consent
+    API->>DB: Load ConsentRecord
+    DB-->>API: Current preferences
+    API-->>UI: Show current state
+    U->>UI: Modify preferences
+    UI->>API: PUT /api/consent
+    API->>DB: Update + version bump
+    API->>Cookie: Update cookie
+```
+
+### 19.7 Consent Categories
+
+```mermaid
+graph TB
+    subgraph Essential["Essential (Always On)"]
+        Auth["Authentication cookies"]
+        CSRF["CSRF protection"]
+        Session["Session management"]
+        A11y["Accessibility preferences"]
+    end
+
+    subgraph Functional["Functional (Opt-in)"]
+        Prefs["User preferences sync"]
+        Language["Language settings"]
+        Theme["Theme preferences"]
+    end
+
+    subgraph Analytics["Analytics (Opt-in)"]
+        Usage["Usage analytics"]
+        Performance["Performance metrics"]
+        ErrorTrack["Error tracking (Sentry)"]
+    end
+
+    subgraph Marketing["Marketing (Opt-in)"]
+        Email["Email campaigns"]
+        Nurturing["Trial nurturing"]
+        Updates["Product updates"]
+    end
+
+    subgraph AI_Processing["AI Processing (Opt-in)"]
+        Training["Conversation for AI improvement"]
+        Personalization["Learning personalization"]
+        Recommendations["Content recommendations"]
+    end
+```
+
+### 19.8 Parent Dashboard (ADR 0008)
+
+GDPR-compliant parental oversight for minor users.
+
+```mermaid
+graph TB
+    subgraph Parent_Access["Parent Access"]
+        ParentAuth["Parent Authentication"]
+        LinkedMinors["Linked Minor Accounts"]
+    end
+
+    subgraph Dashboard_Features["Dashboard Features"]
+        subgraph Activity_View["Activity View (Read-Only)"]
+            Sessions["Study Sessions (times, duration)"]
+            Subjects["Subjects studied"]
+            Progress["Learning progress"]
+            TimeSpent["Time spent per day/week"]
+        end
+
+        subgraph Privacy_Controls["Privacy Controls"]
+            DataExport["Export child's data"]
+            DataDelete["Request data deletion"]
+            ConsentManage["Manage consents"]
+            AIOptOut["Opt-out of AI personalization"]
+        end
+
+        subgraph Safety_Features["Safety Features"]
+            TimeLimit["Set daily time limits"]
+            Notifications["Activity notifications"]
+            EmergencyStop["Emergency session stop"]
+        end
+    end
+
+    subgraph NOT_Visible["NOT Visible to Parents"]
+        ChatContent["Chat conversation content"]
+        VoiceTranscripts["Voice transcripts"]
+        PersonalNotes["Personal notes"]
+        EmotionalState["Emotional indicators"]
+    end
+
+    ParentAuth --> LinkedMinors
+    LinkedMinors --> Activity_View
+    LinkedMinors --> Privacy_Controls
+    LinkedMinors --> Safety_Features
+```
+
+### 19.9 Parent-Minor Link Flow
+
+```mermaid
+sequenceDiagram
+    participant P as Parent
+    participant M as Minor
+    participant API as API
+    participant Email as Email Service
+    participant DB as Database
+
+    Note over P,DB: Initial Link (COPPA Flow)
+
+    P->>API: POST /api/parent/verify-consent
+    API->>DB: Create ParentMinorLink (pending)
+    API->>Email: Send verification to parent
+
+    P->>Email: Click verification link
+    Email->>API: GET /api/parent/verify/{token}
+    API->>DB: Activate link
+    API-->>P: Redirect to dashboard
+
+    Note over P,DB: Ongoing Access
+
+    P->>API: GET /api/parent/dashboard
+    API->>API: Validate parent session
+    API->>DB: Load linked minors
+    DB-->>API: Minor activity (filtered)
+    API-->>P: Dashboard data
+
+    Note over P,DB: Revoke Access
+
+    M->>API: POST /api/user/revoke-parent (age >= 13)
+    API->>DB: Deactivate ParentMinorLink
+    API->>Email: Notify parent
+    API-->>M: Confirmation
+```
+
+### 19.10 EU AI Act Compliance
+
+High-risk AI system requirements per EU AI Act 2024/1689.
+
+```mermaid
+graph TB
+    subgraph Risk_Classification["Risk Classification"]
+        HighRisk["High-Risk: Education AI System"]
+        Note1["Art. 6 Annex III: AI in education"]
+    end
+
+    subgraph Required_Documentation["Required Documentation"]
+        TechDoc["Technical Documentation (Art. 11)"]
+        RiskMgmt["Risk Management System (Art. 9)"]
+        DataGov["Data Governance (Art. 10)"]
+        Logging["Automatic Logging (Art. 12)"]
+        Transparency["Transparency (Art. 13)"]
+        HumanOversight["Human Oversight (Art. 14)"]
+        Accuracy["Accuracy and Robustness (Art. 15)"]
+    end
+
+    subgraph Implementation["MirrorBuddy Implementation"]
+        subgraph Tech_Docs["Technical Docs"]
+            ModelCard["MODEL-CARD.md"]
+            DPIA["DPIA.md"]
+            BiasAudit["BIAS-AUDIT-REPORT.md"]
+        end
+
+        subgraph Risk_System["Risk System"]
+            RiskRegister["AI-RISK-MANAGEMENT.md"]
+            SafetyLayers["5-Layer Safety Architecture"]
+            IncidentLog["SafetyEvent logging"]
+        end
+
+        subgraph Data_Gov["Data Governance"]
+            DataPolicy["Privacy Policy"]
+            RetentionPolicy["Retention Cron Job"]
+            MinimizationRules["Data Minimization"]
+        end
+
+        subgraph Logging_System["Logging System"]
+            AuditTrail["AuditEntry table"]
+            ConversationLog["Message storage"]
+            SafetyEvents["SafetyEvent table"]
+        end
+
+        subgraph Transparency_UI["Transparency UI"]
+            AIPage["/ai-transparency page"]
+            Disclosure["AI disclosure in chat"]
+            Explanations["Decision explanations"]
+        end
+
+        subgraph Human_Oversight_System["Human Oversight"]
+            AdminDash["/admin/safety dashboard"]
+            ManualReview["Manual incident review"]
+            KillSwitch["Emergency AI disable"]
+        end
+    end
+
+    HighRisk --> TechDoc
+    HighRisk --> RiskMgmt
+    HighRisk --> DataGov
+    HighRisk --> Logging
+    HighRisk --> Transparency
+    HighRisk --> HumanOversight
+    HighRisk --> Accuracy
+
+    TechDoc --> Tech_Docs
+    RiskMgmt --> Risk_System
+    DataGov --> Data_Gov
+    Logging --> Logging_System
+    Transparency --> Transparency_UI
+    HumanOversight --> Human_Oversight_System
+```
+
+### 19.11 Human Oversight Mechanisms (Art. 14)
+
+```mermaid
+graph TB
+    subgraph Oversight_Levels["Oversight Levels"]
+        L1["Level 1: Automated Monitoring"]
+        L2["Level 2: Alert Review"]
+        L3["Level 3: Manual Intervention"]
+        L4["Level 4: Emergency Stop"]
+    end
+
+    subgraph L1_Automated["Level 1: Automated"]
+        SafetyFilters["5-Layer Safety Filters"]
+        MetricsCollect["Metrics Collection"]
+        AnomalyDetect["Anomaly Detection"]
+    end
+
+    subgraph L2_Alerts["Level 2: Alerts"]
+        SafetyAlerts["Safety Event Alerts"]
+        ThresholdAlerts["Threshold Breaches"]
+        BiasAlerts["Bias Detection Alerts"]
+    end
+
+    subgraph L3_Manual["Level 3: Manual Review"]
+        IncidentReview["Incident Review Queue"]
+        ConversationAudit["Conversation Audit"]
+        DecisionOverride["AI Decision Override"]
+    end
+
+    subgraph L4_Emergency["Level 4: Emergency"]
+        KillSwitch["AI Kill Switch"]
+        FeatureDisable["Feature Disable"]
+        UserBlock["User Session Block"]
+        RollbackDeploy["Rollback Deployment"]
+    end
+
+    subgraph Triggers["Escalation Triggers"]
+        T1["Severity S0: Immediate L4"]
+        T2["Severity S1: L3 + Alert"]
+        T3["Severity S2: L2 Review"]
+        T4["Severity S3: L1 Log"]
+    end
+
+    L1 --> L2
+    L2 --> L3
+    L3 --> L4
+
+    SafetyFilters --> MetricsCollect
+    MetricsCollect --> AnomalyDetect
+    AnomalyDetect --> SafetyAlerts
+
+    T1 --> KillSwitch
+    T2 --> IncidentReview
+    T3 --> SafetyAlerts
+    T4 --> MetricsCollect
+```
+
+### 19.12 AI Explainability
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant UI as Chat UI
+    participant API as /api/ai/explanation
+    participant LLM as AI Model
+    participant DB as AuditEntry
+
+    U->>UI: Click "Why this response?"
+    UI->>API: GET /explanation/{messageId}
+
+    API->>DB: Load message context
+    DB-->>API: Original prompt, safety flags, tool calls
+
+    API->>API: Build explanation context
+
+    API->>LLM: Generate explanation
+    Note over LLM: "Explain why you gave this response"
+
+    LLM-->>API: Explanation text
+
+    API->>DB: Log explanation request (audit)
+
+    API-->>UI: Explanation response
+    UI->>U: Show explanation modal
+
+    Note over UI: Includes: reasoning, sources, limitations
+```
+
+### 19.13 Compliance Audit Trail
+
+```mermaid
+erDiagram
+    AuditEntry {
+        string id PK
+        datetime timestamp
+        string action "consent_given, data_exported, etc."
+        string actorType "user, parent, admin, system"
+        string actorId FK
+        string targetType "user, conversation, etc."
+        string targetId FK
+        json details "action-specific data"
+        string ipHash "anonymized IP"
+        string userAgent
+    }
+
+    ConsentRecord {
+        string id PK
+        string userId FK
+        json categories "essential, functional, analytics, marketing, ai"
+        string version "consent version"
+        datetime givenAt
+        datetime updatedAt
+        string source "banner, settings, registration"
+    }
+
+    DataRequest {
+        string id PK
+        string userId FK
+        string type "export, delete, rectify, restrict"
+        string status "pending, processing, completed, rejected"
+        datetime requestedAt
+        datetime completedAt
+        string completedBy "system or admin ID"
+        json response "export URL or rejection reason"
+    }
+
+    SafetyEvent {
+        string id PK
+        string conversationId FK
+        string userId FK
+        string eventType "content_blocked, jailbreak_detected, pii_detected"
+        string severity "S0, S1, S2, S3"
+        json details "input, output, action taken"
+        datetime timestamp
+        boolean reviewed
+        string reviewedBy FK
+    }
+
+    User ||--o{ AuditEntry : generates
+    User ||--o{ ConsentRecord : has
+    User ||--o{ DataRequest : submits
+    User ||--o{ SafetyEvent : triggers
+```
+
+### 19.14 Data Breach Notification (GDPR Art. 33-34)
+
+72-hour notification requirement to supervisory authority.
+
+```mermaid
+sequenceDiagram
+    participant Detect as Detection System
+    participant CISO as Security Team
+    participant DPO as Data Protection Officer
+    participant DPA as Supervisory Authority
+    participant Users as Affected Users
+    participant Log as Audit Log
+
+    Note over Detect,Log: T+0: Breach Detected
+
+    Detect->>CISO: Security alert triggered
+    CISO->>CISO: Assess breach severity
+    CISO->>Log: Log incident (timestamp T+0)
+
+    alt High Risk Breach
+        CISO->>DPO: Escalate immediately
+        DPO->>DPO: Assess risk to data subjects
+
+        Note over DPO,DPA: T+72h MAX: DPA Notification
+
+        DPO->>DPA: Notify supervisory authority
+        Note over DPA: Include: nature, categories,<br/>approx subjects, consequences,<br/>measures taken
+
+        DPO->>Log: Log DPA notification
+
+        alt High Risk to Individuals
+            Note over DPO,Users: Without undue delay
+
+            DPO->>Users: Notify affected users
+            Note over Users: Clear language: what happened,<br/>likely consequences,<br/>measures to protect themselves
+
+            DPO->>Log: Log user notifications
+        end
+    else Low Risk Breach
+        CISO->>DPO: Document internally
+        DPO->>Log: Log decision not to notify
+        Note over Log: Justification required
+    end
+
+    CISO->>CISO: Implement containment
+    CISO->>CISO: Root cause analysis
+    CISO->>Log: Log remediation actions
+```
+
+### 19.15 Third-Party Data Flow
+
+Data sharing with external processors per GDPR Article 28.
+
+```mermaid
+graph TB
+    subgraph MirrorBuddy["MirrorBuddy (Controller)"]
+        App[Application]
+    end
+
+    subgraph EU_Processors["EU Processors (Adequate)"]
+        subgraph Supabase["Supabase (Germany)"]
+            SB_Data["User profiles, conversations,<br/>learning progress, materials"]
+            SB_Risk["Risk: NEGLIGIBLE"]
+        end
+
+        subgraph Azure["Azure OpenAI (Sweden)"]
+            AZ_Data["Conversation text (sanitized),<br/>NO PII sent"]
+            AZ_Risk["Risk: NEGLIGIBLE"]
+        end
+    end
+
+    subgraph US_Processors["US Processors (SCCs)"]
+        subgraph Vercel["Vercel (US + EU Edge)"]
+            V_Data["Request logs (IP anonymized),<br/>deployment artifacts"]
+            V_Risk["Risk: LOW"]
+        end
+
+        subgraph Resend["Resend (US)"]
+            R_Data["Email addresses only,<br/>transactional emails"]
+            R_Risk["Risk: LOW"]
+        end
+
+        subgraph Upstash["Upstash Redis (US)"]
+            U_Data["Hashed session IDs,<br/>rate limit counters, 1h TTL"]
+            U_Risk["Risk: VERY LOW"]
+        end
+
+        subgraph Sentry["Sentry (US)"]
+            SE_Data["Error traces (PII scrubbed),<br/>performance metrics"]
+            SE_Risk["Risk: LOW"]
+        end
+
+        subgraph Grafana["Grafana Cloud (US)"]
+            G_Data["Aggregated metrics only,<br/>NO user data"]
+            G_Risk["Risk: NEGLIGIBLE"]
+        end
+    end
+
+    App -->|"Profiles, Conversations"| SB_Data
+    App -->|"Chat prompts (sanitized)"| AZ_Data
+    App -->|"HTTP requests"| V_Data
+    App -->|"Notification emails"| R_Data
+    App -->|"Session hashes"| U_Data
+    App -->|"Error reports"| SE_Data
+    App -->|"System metrics"| G_Data
+```
+
+### 19.16 DSAR Response SLA (GDPR Art. 12)
+
+Data Subject Access Request response timeline.
+
+```mermaid
+gantt
+    title DSAR Response Timeline (30 Days Max)
+    dateFormat  YYYY-MM-DD
+    axisFormat %d
+
+    section Receipt
+    Request received           :milestone, m1, 2026-01-01, 0d
+    Acknowledge receipt (24h)  :a1, 2026-01-01, 1d
+
+    section Verification
+    Verify identity            :a2, after a1, 2d
+    Validate request scope     :a3, after a2, 1d
+
+    section Processing
+    Gather data from systems   :a4, after a3, 5d
+    Review for third-party data:a5, after a4, 3d
+    Prepare export package     :a6, after a5, 3d
+
+    section Delivery
+    Quality review             :a7, after a6, 2d
+    Deliver to requester       :a8, after a7, 1d
+    Log completion             :milestone, m2, after a8, 0d
+
+    section Buffer
+    Extension buffer (complex) :crit, a9, after a8, 12d
+```
+
+```mermaid
+stateDiagram-v2
+    [*] --> Received: User submits request
+
+    Received: Request Received
+    note right of Received: Auto-acknowledge within 24h
+
+    Received --> Verifying: Start verification
+
+    Verifying: Identity Verification
+    note right of Verifying: Email confirmation or ID check
+
+    Verifying --> Rejected: Verification failed
+    Verifying --> Processing: Identity confirmed
+
+    Rejected: Request Rejected
+    note right of Rejected: Log rejection reason
+
+    Processing: Data Gathering
+    note right of Processing: Query all systems
+
+    Processing --> Review: Data compiled
+
+    Review: Privacy Review
+    note right of Review: Remove third-party PII
+
+    Review --> Preparing: Review complete
+
+    Preparing: Export Preparation
+    note right of Preparing: JSON + PDF format
+
+    Preparing --> Delivered: Export ready
+
+    Delivered: Request Fulfilled
+    note right of Delivered: Within 30 days
+
+    Delivered --> [*]
+    Rejected --> [*]
+
+    Processing --> Extended: Complex request
+    Extended: Extension (max +60 days)
+    note right of Extended: Notify user of delay
+    Extended --> Review
+```
+
+### 19.17 Age Gating Implementation
+
+Content restriction based on user age (COPPA, Italian L.132/2025).
+
+```mermaid
+graph TB
+    subgraph Age_Verification["Age Verification"]
+        Profile["User Profile (age range)"]
+        Calculate["Calculate age from birth year"]
+    end
+
+    subgraph Age_Brackets["Age Brackets"]
+        Under13["Under 13 (COPPA)"]
+        Age13_15["13-15 (Italian minor)"]
+        Age16_17["16-17 (GDPR minor)"]
+        Adult["18+ (Adult)"]
+    end
+
+    subgraph Content_Restrictions["Content Restrictions"]
+        subgraph Blocked_Under13["Blocked for Under 13"]
+            B1["Explicit historical content"]
+            B2["Medical/health detailed"]
+            B3["Violence in history"]
+            B4["Relationship topics"]
+        end
+
+        subgraph Blocked_Under16["Blocked for Under 16"]
+            B5["Political opinions"]
+            B6["Religious debates"]
+            B7["Controversial ethics"]
+        end
+
+        subgraph Allowed_All["Allowed for All Ages"]
+            A1["Core curriculum"]
+            A2["Age-appropriate examples"]
+            A3["Educational games"]
+            A4["Study tools"]
+        end
+    end
+
+    subgraph Implementation["Implementation"]
+        AgeGate["src/lib/safety/age-gating.ts"]
+        TopicFilter["Topic filter in system prompt"]
+        ResponseCheck["Response age-appropriateness check"]
+    end
+
+    Profile --> Calculate
+    Calculate --> Under13
+    Calculate --> Age13_15
+    Calculate --> Age16_17
+    Calculate --> Adult
+
+    Under13 --> Blocked_Under13
+    Under13 --> Blocked_Under16
+    Age13_15 --> Blocked_Under16
+
+    AgeGate --> TopicFilter
+    TopicFilter --> ResponseCheck
+```
+
+### 19.18 Security Incident Response
+
+Full incident response flow (beyond AI safety events).
+
+```mermaid
+stateDiagram-v2
+    [*] --> Detection: Incident detected
+
+    state Detection {
+        Automated: Automated Detection
+        Manual: Manual Report
+        External: External Report
+    }
+
+    Detection --> Triage: Alert triggered
+
+    Triage: Incident Triage
+    note right of Triage: Classify severity (S0-S3)
+
+    Triage --> S0: Critical
+    Triage --> S1: High
+    Triage --> S2: Medium
+    Triage --> S3: Low
+
+    state S0 {
+        S0_1: Page on-call immediately
+        S0_2: War room activated
+        S0_3: All hands on deck
+    }
+
+    state S1 {
+        S1_1: Alert security team
+        S1_2: Begin investigation
+        S1_3: Prepare containment
+    }
+
+    state S2 {
+        S2_1: Queue for review
+        S2_2: Investigate next business day
+    }
+
+    state S3 {
+        S3_1: Log for tracking
+        S3_2: Batch review weekly
+    }
+
+    S0 --> Containment
+    S1 --> Containment
+    S2 --> Investigation
+    S3 --> Monitoring
+
+    Containment: Containment
+    note right of Containment: Isolate, disable, block
+
+    Containment --> Investigation
+
+    Investigation: Investigation
+    note right of Investigation: Root cause analysis
+
+    Investigation --> Remediation
+
+    Remediation: Remediation
+    note right of Remediation: Fix vulnerability
+
+    Remediation --> Recovery
+
+    Recovery: Recovery
+    note right of Recovery: Restore services
+
+    Recovery --> PostMortem
+
+    PostMortem: Post-Mortem
+    note right of PostMortem: Document lessons learned
+
+    PostMortem --> [*]
+
+    Monitoring: Monitoring
+    Monitoring --> [*]
+```
+
+### 19.19 Incident Severity Matrix
+
+```mermaid
+graph TB
+    subgraph Severity_Levels["Severity Levels"]
+        S0["S0: Critical (Data breach, system down)"]
+        S1["S1: High (Security vulnerability, data exposure risk)"]
+        S2["S2: Medium (Service degradation, minor security issue)"]
+        S3["S3: Low (Cosmetic, non-urgent)"]
+    end
+
+    subgraph Response_Times["Response Times"]
+        R0["S0: 15 min response, 4h resolution target"]
+        R1["S1: 1h response, 24h resolution target"]
+        R2["S2: 4h response, 72h resolution target"]
+        R3["S3: Next business day, 1 week resolution"]
+    end
+
+    subgraph Notification["Notification Required"]
+        N0["S0: CEO, DPO, Legal, All Engineering"]
+        N1["S1: CTO, Security Team, Affected Team"]
+        N2["S2: Team Lead, Security Team"]
+        N3["S3: Ticket in backlog"]
+    end
+
+    S0 --> R0
+    S1 --> R1
+    S2 --> R2
+    S3 --> R3
+
+    S0 --> N0
+    S1 --> N1
+    S2 --> N2
+    S3 --> N3
+```
+
+### 19.20 Annual Compliance Calendar
+
+GDPR Article 35(11) requires regular DPIA review.
+
+```mermaid
+gantt
+    title Annual Compliance Calendar
+    dateFormat  YYYY-MM-DD
+    axisFormat %b
+
+    section Q1: Review
+    DPIA Annual Review          :q1_1, 2026-01-15, 14d
+    AI Risk Assessment Update   :q1_2, 2026-01-20, 10d
+    Bias Audit                  :q1_3, 2026-02-01, 21d
+    Security Penetration Test   :q1_4, 2026-02-15, 14d
+
+    section Q2: Training
+    Staff Privacy Training      :q2_1, 2026-04-01, 7d
+    Incident Response Drill     :q2_2, 2026-04-15, 3d
+    Consent Mechanism Review    :q2_3, 2026-05-01, 14d
+
+    section Q3: Audit
+    Third-Party Processor Audit :q3_1, 2026-07-01, 21d
+    Data Retention Cleanup      :q3_2, 2026-07-15, 7d
+    Access Control Review       :q3_3, 2026-08-01, 14d
+
+    section Q4: Certification
+    WCAG Accessibility Audit    :q4_1, 2026-10-01, 21d
+    EU AI Act Compliance Check  :q4_2, 2026-11-01, 14d
+    Annual Report Preparation   :q4_3, 2026-12-01, 14d
+```
+
+### 19.21 Compliance Checklist Summary
+
+```mermaid
+graph TB
+    subgraph GDPR["GDPR Compliance"]
+        G1["✓ Legal basis documented"]
+        G2["✓ Privacy policy published"]
+        G3["✓ Consent management"]
+        G4["✓ Data subject rights (Art. 15-22)"]
+        G5["✓ DPIA completed"]
+        G6["✓ Breach notification process"]
+        G7["✓ Data retention policy"]
+        G8["✓ Third-party DPAs signed"]
+    end
+
+    subgraph COPPA["COPPA Compliance"]
+        C1["✓ Age verification"]
+        C2["✓ Parental consent flow"]
+        C3["✓ Parent dashboard"]
+        C4["✓ Data minimization for minors"]
+        C5["✓ No behavioral advertising"]
+    end
+
+    subgraph AI_Act["EU AI Act Compliance"]
+        A1["✓ Risk classification (High-risk)"]
+        A2["✓ Technical documentation"]
+        A3["✓ Risk management system"]
+        A4["✓ Data governance"]
+        A5["✓ Transparency obligations"]
+        A6["✓ Human oversight mechanisms"]
+        A7["✓ Accuracy and robustness"]
+    end
+
+    subgraph WCAG["WCAG 2.1 AA"]
+        W1["✓ Perceivable"]
+        W2["✓ Operable"]
+        W3["✓ Understandable"]
+        W4["✓ Robust"]
+    end
+
+    subgraph Italian_Law["Italian L.132/2025"]
+        I1["✓ AI transparency page"]
+        I2["✓ Age-appropriate content"]
+        I3["✓ Educational context compliance"]
+    end
+```
+
 ---
 
 ## 20. Observability
@@ -2069,7 +3077,7 @@ graph TB
 
 ---
 
-_Version: 0.10.0_
+_Version: 0.12.0_
 _Last updated: 26 January 2026_
 _Generated from codebase analysis and ADR documentation_
 _Updated on each release via `/release` command_

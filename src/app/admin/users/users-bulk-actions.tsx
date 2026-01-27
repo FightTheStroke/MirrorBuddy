@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Trash2, Lock, Unlock, X, RefreshCw } from "lucide-react";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -33,6 +34,7 @@ export function UsersBulkActions({
   users = [],
   availableTiers = [],
 }: UsersBulkActionsProps) {
+  const t = useTranslations("admin.users.bulkActions");
   const [isLoading, setIsLoading] = useState(false);
   const [showTierModal, setShowTierModal] = useState(false);
   const count = selectedIds.size;
@@ -43,7 +45,7 @@ export function UsersBulkActions({
   const selectedUsers = users.filter((u) => selectedIds.has(u.id));
 
   const handleBulkDisable = async () => {
-    if (!confirm(`Disabilitare ${count} utenti?`)) return;
+    if (!confirm(t("confirmDisable", { count: String(count) }))) return;
     setIsLoading(true);
     try {
       const ids = Array.from(selectedIds);
@@ -64,7 +66,7 @@ export function UsersBulkActions({
   };
 
   const handleBulkEnable = async () => {
-    if (!confirm(`Abilitare ${count} utenti?`)) return;
+    if (!confirm(t("confirmEnable", { count: String(count) }))) return;
     setIsLoading(true);
     try {
       const ids = Array.from(selectedIds);
@@ -85,7 +87,7 @@ export function UsersBulkActions({
   };
 
   const handleBulkDelete = async () => {
-    if (!confirm(`Eliminare definitivamente ${count} utenti?`)) return;
+    if (!confirm(t("confirmDelete", { count: String(count) }))) return;
     setIsLoading(true);
     try {
       const ids = Array.from(selectedIds);
@@ -108,7 +110,9 @@ export function UsersBulkActions({
     <>
       <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50">
         <div className="flex items-center gap-3 px-4 py-3 bg-popover text-popover-foreground border border-border rounded-xl shadow-xl">
-          <span className="text-sm font-medium">{count} selezionati</span>
+          <span className="text-sm font-medium">
+            {count} {t("selected")}
+          </span>
           <div className="h-4 w-px bg-border" />
           <Button
             size="sm"
@@ -119,7 +123,7 @@ export function UsersBulkActions({
             aria-label="Change tier for selected users"
           >
             <RefreshCw className="w-4 h-4 mr-1" />
-            Cambia Tier
+            {t("changeTier")}
           </Button>
           <Button
             size="sm"
@@ -129,7 +133,7 @@ export function UsersBulkActions({
             className="hover:bg-accent"
           >
             <Unlock className="w-4 h-4 mr-1" />
-            Abilita
+            {t("enable")}
           </Button>
           <Button
             size="sm"
@@ -139,7 +143,7 @@ export function UsersBulkActions({
             className="hover:bg-accent"
           >
             <Lock className="w-4 h-4 mr-1" />
-            Disabilita
+            {t("disable")}
           </Button>
           <Button
             size="sm"
@@ -149,7 +153,7 @@ export function UsersBulkActions({
             className="text-destructive hover:bg-destructive/10"
           >
             <Trash2 className="w-4 h-4 mr-1" />
-            Elimina
+            {t("delete")}
           </Button>
           <div className="h-4 w-px bg-border" />
           <Button

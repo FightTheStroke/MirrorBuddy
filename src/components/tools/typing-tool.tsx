@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { useTypingStore } from "@/lib/stores";
 
 export interface TypingRequest {
@@ -25,6 +26,7 @@ export function TypingTool({
   request,
   onComplete: _onComplete,
 }: TypingToolProps) {
+  const t = useTranslations("tools.typing");
   const { progress, loadProgress } = useTypingStore();
 
   useEffect(() => {
@@ -36,10 +38,8 @@ export function TypingTool({
   return (
     <div className="p-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-4">Impara a Digitare</h1>
-        <p className="text-muted-foreground mb-6">
-          Il tool &quot;Impara a Digitare&quot; è in fase di sviluppo.
-        </p>
+        <h1 className="text-3xl font-bold mb-4">{t("title")}</h1>
+        <p className="text-muted-foreground mb-6">{t("developmentMessage")}</p>
 
         {request.message && (
           <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg mb-6">
@@ -49,27 +49,25 @@ export function TypingTool({
 
         <div className="grid gap-4">
           <div className="p-6 border rounded-lg">
-            <h2 className="text-xl font-semibold mb-2">Caratteristiche</h2>
+            <h2 className="text-xl font-semibold mb-2">{t("features")}</h2>
             <ul className="list-disc list-inside space-y-2 text-sm">
-              <li>Lezioni progressive (beginner, intermediate, advanced)</li>
-              <li>
-                Tastiera virtuale multi-lingua (QWERTY, AZERTY, QWERTZ, Dvorak)
-              </li>
-              <li>Modalità una sola mano (destra/sinistra)</li>
-              <li>Accessibilità completa per 7 profili DSA</li>
-              <li>Giochi divertenti per practice</li>
-              <li>Tracking WPM e accuracy</li>
-              <li>Integrazione con Maestri AI</li>
+              <li>{t("featureList.progressive")}</li>
+              <li>{t("featureList.multilingual")}</li>
+              <li>{t("featureList.singleHand")}</li>
+              <li>{t("featureList.accessibility")}</li>
+              <li>{t("featureList.games")}</li>
+              <li>{t("featureList.tracking")}</li>
+              <li>{t("featureList.ai")}</li>
             </ul>
           </div>
 
           <div className="p-6 border rounded-lg bg-muted/50">
             <p className="text-sm">
-              <strong>Lezione consigliata:</strong>{" "}
-              {request.lessonId || "Nessuna"}
+              <strong>{t("recommendedLesson")}:</strong>{" "}
+              {request.lessonId || t("none")}
             </p>
             <p className="text-sm">
-              <strong>Livello:</strong> {request.level || "beginner"}
+              <strong>{t("level")}:</strong> {request.level || "beginner"}
             </p>
           </div>
         </div>

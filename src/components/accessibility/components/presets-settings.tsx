@@ -13,9 +13,10 @@ import {
   Accessibility,
   ChevronRight,
   RotateCcw,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
 interface PresetsSettingsProps {
   onApplyDyslexia: () => void;
@@ -38,56 +39,57 @@ export function PresetsSettings({
   onApplyCerebralPalsy,
   onReset,
 }: PresetsSettingsProps) {
+  const t = useTranslations("settings.accessibility");
   const { settings } = useAccessibilityStore();
 
   const presets = [
     {
-      title: 'Profilo Dislessia',
-      description: 'Font ottimizzato, spaziatura e TTS',
+      title: t("presetDyslexia"),
+      description: t("presetDyslexiaDesc"),
       icon: <TextIcon className="w-6 h-6" />,
-      color: 'blue',
+      color: "blue",
       onClick: onApplyDyslexia,
     },
     {
-      title: 'Profilo ADHD',
-      description: 'Focus mode, timer e pause',
+      title: t("presetADHD"),
+      description: t("presetADHDDesc"),
       icon: <Brain className="w-6 h-6" />,
-      color: 'purple',
+      color: "purple",
       onClick: onApplyADHD,
     },
     {
-      title: 'Profilo Autismo',
-      description: 'Ambiente calmo, no distrazioni',
+      title: t("presetAutism"),
+      description: t("presetAutismDesc"),
       icon: <Puzzle className="w-6 h-6" />,
-      color: 'teal',
+      color: "teal",
       onClick: onApplyAutism,
     },
     {
-      title: 'Profilo Visivo',
-      description: 'Alto contrasto, testo grande, TTS',
+      title: t("presetVisual"),
+      description: t("presetVisualDesc"),
       icon: <Eye className="w-6 h-6" />,
-      color: 'orange',
+      color: "orange",
       onClick: onApplyVisual,
     },
     {
-      title: 'Profilo Uditivo',
-      description: 'Focus su comunicazione visiva',
+      title: t("presetAuditory"),
+      description: t("presetAuditoryDesc"),
       icon: <EarOff className="w-6 h-6" />,
-      color: 'pink',
+      color: "pink",
       onClick: onApplyAuditory,
     },
     {
-      title: 'Profilo Motorio',
-      description: 'Navigazione tastiera, no animazioni',
+      title: t("presetMotor"),
+      description: t("presetMotorDesc"),
       icon: <Hand className="w-6 h-6" />,
-      color: 'green',
+      color: "green",
       onClick: onApplyMotor,
     },
     {
-      title: 'Paralisi Cerebrale',
-      description: 'TTS, testo grande, navigazione facilitata',
+      title: t("presetCerebral"),
+      description: t("presetCerebralDesc"),
       icon: <Accessibility className="w-6 h-6" />,
-      color: 'cyan',
+      color: "cyan",
       onClick: onApplyCerebralPalsy,
     },
   ];
@@ -99,18 +101,18 @@ export function PresetsSettings({
           key={preset.title}
           onClick={preset.onClick}
           className={cn(
-            'w-full flex items-center gap-4 p-4 rounded-lg text-left transition-colors',
+            "w-full flex items-center gap-4 p-4 rounded-lg text-left transition-colors",
             settings.highContrast
-              ? 'bg-gray-900 border border-gray-700 hover:border-yellow-400'
-              : 'bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800'
+              ? "bg-gray-900 border border-gray-700 hover:border-yellow-400"
+              : "bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800",
           )}
         >
           <span
             className={cn(
-              'p-3 rounded-lg',
+              "p-3 rounded-lg",
               settings.highContrast
-                ? 'bg-yellow-400/20 text-yellow-400'
-                : `bg-${preset.color}-100 dark:bg-${preset.color}-900/30 text-${preset.color}-600 dark:text-${preset.color}-400`
+                ? "bg-yellow-400/20 text-yellow-400"
+                : `bg-${preset.color}-100 dark:bg-${preset.color}-900/30 text-${preset.color}-600 dark:text-${preset.color}-400`,
             )}
           >
             {preset.icon}
@@ -119,20 +121,20 @@ export function PresetsSettings({
           <div className="flex-1">
             <span
               className={cn(
-                'block font-medium',
+                "block font-medium",
                 settings.highContrast
-                  ? 'text-white'
-                  : 'text-slate-900 dark:text-white'
+                  ? "text-white"
+                  : "text-slate-900 dark:text-white",
               )}
             >
               {preset.title}
             </span>
             <span
               className={cn(
-                'block text-sm',
+                "block text-sm",
                 settings.highContrast
-                  ? 'text-gray-400'
-                  : 'text-slate-500 dark:text-slate-400'
+                  ? "text-gray-400"
+                  : "text-slate-500 dark:text-slate-400",
               )}
             >
               {preset.description}
@@ -141,8 +143,8 @@ export function PresetsSettings({
 
           <ChevronRight
             className={cn(
-              'w-5 h-5',
-              settings.highContrast ? 'text-yellow-400' : 'text-slate-400'
+              "w-5 h-5",
+              settings.highContrast ? "text-yellow-400" : "text-slate-400",
             )}
           />
         </button>
@@ -151,16 +153,15 @@ export function PresetsSettings({
       <button
         onClick={onReset}
         className={cn(
-          'w-full flex items-center justify-center gap-2 p-4 rounded-lg transition-colors',
+          "w-full flex items-center justify-center gap-2 p-4 rounded-lg transition-colors",
           settings.highContrast
-            ? 'bg-red-900 text-white hover:bg-red-800'
-            : 'bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30'
+            ? "bg-red-900 text-white hover:bg-red-800"
+            : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30",
         )}
       >
         <RotateCcw className="w-5 h-5" />
-        <span>Ripristina impostazioni predefinite</span>
+        <span>{t("resetDefaults")}</span>
       </button>
     </div>
   );
 }
-

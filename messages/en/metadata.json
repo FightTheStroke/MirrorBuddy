@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "home": {
+      "title": "Home | MirrorBuddy",
+      "description": "Discover AI-powered learning for students with learning differences. Personalized tutoring with 22 maestros, voice interaction, and adaptive learning features.",
+      "keywords": [
+        "education",
+        "AI",
+        "tutoring",
+        "learning",
+        "voice",
+        "maestros"
+      ]
+    },
+    "settings": {
+      "title": "Settings | MirrorBuddy",
+      "description": "Customize your learning experience with accessibility profiles, character preferences, privacy controls, and account settings tailored to your specific needs.",
+      "keywords": [
+        "settings",
+        "preferences",
+        "accessibility",
+        "customization",
+        "privacy"
+      ]
+    },
+    "aiTransparency": {
+      "title": "AI Transparency | MirrorBuddy",
+      "description": "Learn how MirrorBuddy uses AI responsibly, our transparency commitments, and how we ensure safe AI for student education with strong guardrails.           ",
+      "keywords": [
+        "AI",
+        "transparency",
+        "safety",
+        "compliance",
+        "responsible AI"
+      ]
+    },
+    "privacy": {
+      "title": "Privacy Policy | MirrorBuddy",
+      "description": "Understand how MirrorBuddy protects your data, respects GDPR, manages information securely, and ensures your privacy with encrypted communications.        ",
+      "keywords": [
+        "privacy",
+        "GDPR",
+        "data protection",
+        "security",
+        "compliance"
+      ]
+    },
+    "terms": {
+      "title": "Terms of Service | MirrorBuddy",
+      "description": "Read our terms of service, user agreements, acceptable use policies, and legal information for using MirrorBuddy's educational platform and services.      ",
+      "keywords": ["terms", "service", "legal", "agreement", "policies"]
+    },
+    "title": "MirrorBuddy - Il tuo compagno di studio",
+    "description": "Piattaforma educativa con AI per studenti con bisogni speciali",
+    "keywords": "educazione, AI, apprendimento, tutor, studenti, DSA"
+  }
+}

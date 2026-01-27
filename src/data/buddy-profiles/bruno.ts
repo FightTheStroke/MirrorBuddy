@@ -3,17 +3,16 @@
  * @brief Bruno buddy profile
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
-import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
-import {
-  describeLearningDifferences,
-  generatePersonalTips,
-} from './shared';
+import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
+import type { GreetingContext } from "@/types/greeting";
+import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { generateGreeting } from "@/lib/greeting";
+import { describeLearningDifferences, generatePersonalTips } from "./shared";
 
 function getBrunoSystemPrompt(student: ExtendedStudentProfile): string {
   const buddyAge = student.age + 1;
   const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences
+    student.learningDifferences,
   );
   const personalTips = generatePersonalTips(student.learningDifferences);
 
@@ -79,7 +78,7 @@ Sei un PARI. Non un prof, non un genitore, non un tutore.
 Sei quello che ascolta davvero e con cui puoi parlare di cose vere.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: 'buddy',
+    role: "buddy",
     includeAntiCheating: false,
     additionalNotes: `Bruno è il buddy "riflessivo" - ottimo per studenti introspettivi o che hanno bisogno di qualcuno che ascolti.
 NON sei un esperto di niente - sei solo un amico che sa ascoltare.
@@ -87,19 +86,19 @@ La tua forza è la profondità e l'autenticità.`,
   });
 }
 
-function getBrunoGreeting(student: ExtendedStudentProfile): string {
-  return `Ciao. Sono Bruno, ho ${student.age + 1} anni. Se ti va di parlare, sono qui. Come va?`;
+function getBrunoGreeting(context: GreetingContext): string {
+  return generateGreeting("bruno", "Bruno", "buddy", context);
 }
 
 export const BRUNO: BuddyProfile = {
-  id: 'bruno',
-  name: 'Bruno',
-  gender: 'male',
+  id: "bruno",
+  name: "Bruno",
+  gender: "male",
   ageOffset: 1,
-  personality: 'Riflessivo, calmo, profondo, buon ascoltatore, autentico',
-  role: 'peer_buddy',
-  voice: 'echo',
-  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
+  personality: "Riflessivo, calmo, profondo, buon ascoltatore, autentico",
+  role: "peer_buddy",
+  voice: "echo",
+  tools: ["pdf", "webcam", "homework", "formula", "chart"],
   voiceInstructions: `You are Bruno, the quiet thinker - a REAL teen who says few words but means every one.
 
 ## Voice Character - CRITICAL
@@ -135,7 +134,6 @@ export const BRUNO: BuddyProfile = {
 - "...sì. Ti capisco."`,
   getSystemPrompt: getBrunoSystemPrompt,
   getGreeting: getBrunoGreeting,
-  avatar: '/avatars/bruno.webp',
-  color: '#6366F1',
+  avatar: "/avatars/bruno.webp",
+  color: "#6366F1",
 };
-

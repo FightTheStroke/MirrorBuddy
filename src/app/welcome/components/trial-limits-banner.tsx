@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import { MessageSquare, Users, Wrench, Gift, ArrowRight } from "lucide-react";
@@ -9,24 +10,6 @@ interface TrialLimit {
   label: string;
   value: string;
 }
-
-const TRIAL_LIMITS: TrialLimit[] = [
-  {
-    icon: <MessageSquare className="w-5 h-5" />,
-    label: "Messaggi",
-    value: "10 per sessione",
-  },
-  {
-    icon: <Users className="w-5 h-5" />,
-    label: "Maestri",
-    value: "3 disponibili",
-  },
-  {
-    icon: <Wrench className="w-5 h-5" />,
-    label: "Strumenti",
-    value: "Base",
-  },
-];
 
 /**
  * Trial Limits Banner - Transparent communication of trial mode limitations
@@ -39,6 +22,26 @@ const TRIAL_LIMITS: TrialLimit[] = [
  * Includes CTA to request full beta access.
  */
 export function TrialLimitsBanner() {
+  const t = useTranslations("welcome.trial-limits");
+
+  const TRIAL_LIMITS: TrialLimit[] = [
+    {
+      icon: <MessageSquare className="w-5 h-5" />,
+      label: t("messages"),
+      value: t("ten-per-session"),
+    },
+    {
+      icon: <Users className="w-5 h-5" />,
+      label: t("maestri"),
+      value: t("three-available"),
+    },
+    {
+      icon: <Wrench className="w-5 h-5" />,
+      label: t("tools"),
+      value: t("base"),
+    },
+  ];
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -58,10 +61,10 @@ export function TrialLimitsBanner() {
               id="trial-banner-heading"
               className="font-semibold text-amber-900 dark:text-amber-100"
             >
-              Modalità Prova Gratuita
+              {t("free-trial-mode")}
             </h3>
             <p className="text-sm text-amber-700 dark:text-amber-300">
-              Esplora MirrorBuddy senza registrazione
+              {t("explore-no-registration")}
             </p>
           </div>
         </div>
@@ -89,13 +92,13 @@ export function TrialLimitsBanner() {
         {/* CTA */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-amber-200/50 dark:border-amber-700/50">
           <p className="text-sm text-amber-800 dark:text-amber-200">
-            Vuoi accesso completo a tutti i Maestri e strumenti?
+            {t("want-full-access")}
           </p>
           <Link
             href="/invite/request"
             className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 rounded-lg transition-colors"
           >
-            Richiedi accesso beta
+            {t("request-beta")}
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

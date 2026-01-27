@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export interface AuditorySettings {
@@ -15,19 +16,21 @@ export function AuditoryA11y({
   settings: AuditorySettings;
   onSettingsChange: (settings: AuditorySettings) => void;
 }) {
+  const t = useTranslations("settings.accessibility");
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-4">Accessibilità Uditiva</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("auditoryTitle")}</h3>
         <p className="text-sm text-muted-foreground mb-4">
-          Impostazioni per utenti non udenti o ipoudenti.
+          {t("auditoryDesc")}
         </p>
       </div>
 
       <div className="space-y-4">
         <SettingCard
-          title="Cue visive per audio"
-          description="Mostra indicazioni visive per tutti gli eventi audio"
+          title={t("auditoryVisualCues")}
+          description={t("auditoryVisualCuesDesc")}
           enabled={settings.visualCues}
           onToggle={() =>
             onSettingsChange({ ...settings, visualCues: !settings.visualCues })
@@ -35,8 +38,8 @@ export function AuditoryA11y({
         />
 
         <SettingCard
-          title="Sottotitoli attivati"
-          description="Mostra sottotitoli per eventuali istruzioni audio"
+          title={t("auditoryCaptions")}
+          description={t("auditoryCaptionsDesc")}
           enabled={settings.captionsEnabled}
           onToggle={() =>
             onSettingsChange({
@@ -47,8 +50,8 @@ export function AuditoryA11y({
         />
 
         <SettingCard
-          title="Niente contenuti solo audio"
-          description="Garantisce che tutte le informazioni siano visibili"
+          title={t("auditoryNoAudioOnly")}
+          description={t("auditoryNoAudioOnlyDesc")}
           enabled={settings.noAudioOnlyContent}
           onToggle={() =>
             onSettingsChange({

@@ -1,31 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef } from "react";
 import {
   MessageSquare,
   PlusCircle,
   Sparkles,
   Upload,
   Network,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { ToolMaestroSelectionDialog } from './tool-maestro-selection-dialog';
-import type { Maestro } from '@/types';
-import { useMindmapsView } from './mindmaps-view/hooks/use-mindmaps-view';
-import { MindmapsGrid } from './mindmaps-view/components/mindmaps-grid';
-import { ViewMindmapModal } from './mindmaps-view/components/view-mindmap-modal';
-import { ExamplesModal } from './mindmaps-view/components/examples-modal';
-import { CreateMindmapModal } from './mindmaps-view/components/create-mindmap-modal';
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { ToolMaestroSelectionDialog } from "./tool-maestro-selection-dialog";
+import type { Maestro } from "@/types";
+import { useMindmapsView } from "./mindmaps-view/hooks/use-mindmaps-view";
+import { MindmapsGrid } from "./mindmaps-view/components/mindmaps-grid";
+import { ViewMindmapModal } from "./mindmaps-view/components/view-mindmap-modal";
+import { ExamplesModal } from "./mindmaps-view/components/examples-modal";
+import { CreateMindmapModal } from "./mindmaps-view/components/create-mindmap-modal";
 
 interface MindmapsViewProps {
   className?: string;
   initialMaestroId?: string | null;
-  initialMode?: 'voice' | 'chat' | null;
+  initialMode?: "voice" | "chat" | null;
 }
 
-export function MindmapsView({ className, initialMaestroId, initialMode }: MindmapsViewProps) {
+export function MindmapsView({
+  className,
+  initialMaestroId,
+  initialMode,
+}: MindmapsViewProps) {
+  const t = useTranslations("education.mindmaps");
   const [showMaestroDialog, setShowMaestroDialog] = useState(false);
   const initialProcessed = useRef(false);
 
@@ -64,11 +70,11 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
   } = useMindmapsView();
 
   const handleMaestroConfirm = useCallback(
-    (_maestro: Maestro, _mode: 'voice' | 'chat') => {
+    (_maestro: Maestro, _mode: "voice" | "chat") => {
       setShowMaestroDialog(false);
       // Focus mode has been removed, close dialog only
     },
-    []
+    [],
   );
 
   const handleInitialMaestroConfirm = useCallback(() => {
@@ -77,7 +83,7 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
   }, []);
 
   const addTopic = () => {
-    setNewMapTopics([...newMapTopics, { name: '', subtopics: [''] }]);
+    setNewMapTopics([...newMapTopics, { name: "", subtopics: [""] }]);
   };
 
   const updateTopicName = (index: number, name: string) => {
@@ -88,14 +94,14 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
 
   const addSubtopic = (topicIndex: number) => {
     const updated = [...newMapTopics];
-    updated[topicIndex].subtopics.push('');
+    updated[topicIndex].subtopics.push("");
     setNewMapTopics(updated);
   };
 
   const updateSubtopic = (
     topicIndex: number,
     subtopicIndex: number,
-    value: string
+    value: string,
   ) => {
     const updated = [...newMapTopics];
     updated[topicIndex].subtopics[subtopicIndex] = value;
@@ -112,40 +118,38 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
     const updated = [...newMapTopics];
     if (updated[topicIndex].subtopics.length > 1) {
       updated[topicIndex].subtopics = updated[topicIndex].subtopics.filter(
-        (_, i) => i !== subtopicIndex
+        (_, i) => i !== subtopicIndex,
       );
       setNewMapTopics(updated);
     }
   };
 
   return (
-    <div className={cn('space-y-6', className)}>
+    <div className={cn("space-y-6", className)}>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-            Mappe Mentali
+            {t("title")}
           </h2>
-          <p className="text-slate-600 dark:text-slate-400">
-            Visualizza e stampa le tue mappe create durante le lezioni
-          </p>
+          <p className="text-slate-600 dark:text-slate-400">{t("subtitle")}</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setShowMaestroDialog(true)}>
             <MessageSquare className="w-4 h-4 mr-2" />
-            Crea con un Professore
+            {t("createWithProfessor")}
           </Button>
           <Button variant="outline" onClick={() => setShowCreateModal(true)}>
             <PlusCircle className="w-4 h-4 mr-2" />
-            Modalità Manuale
+            {t("manualMode")}
           </Button>
           <Button variant="outline" onClick={() => setShowExamples(true)}>
             <Sparkles className="w-4 h-4 mr-2" />
-            Esempi
+            {t("examples")}
           </Button>
           <Button variant="outline" asChild>
             <label className="cursor-pointer">
               <Upload className="w-4 h-4 mr-2" />
-              Importa
+              {t("import")}
               <input
                 type="file"
                 accept=".json,.md,.markdown,.mm,.xmind,.txt"
@@ -165,13 +169,10 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
             </div>
             <div>
               <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-1">
-                Come funzionano le Mappe Mentali?
+                {t("how")}
               </h3>
               <p className="text-sm text-blue-800 dark:text-blue-200">
-                Durante le lezioni con i professori, chiedi di creare una mappa
-                mentale su qualsiasi argomento. Le mappe appariranno qui
-                automaticamente e potrai stamparle o scaricarle per studiare
-                offline.
+                {t("description")}
               </p>
             </div>
           </div>
@@ -221,7 +222,11 @@ export function MindmapsView({ className, initialMaestroId, initialMode }: Mindm
       <ToolMaestroSelectionDialog
         isOpen={showMaestroDialog}
         toolType="mindmap"
-        onConfirm={initialMaestroId && initialMode ? handleInitialMaestroConfirm : handleMaestroConfirm}
+        onConfirm={
+          initialMaestroId && initialMode
+            ? handleInitialMaestroConfirm
+            : handleMaestroConfirm
+        }
         onClose={() => setShowMaestroDialog(false)}
       />
     </div>

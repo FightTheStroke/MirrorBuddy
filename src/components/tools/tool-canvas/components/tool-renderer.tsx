@@ -4,6 +4,7 @@
 
 "use client";
 
+import { useTranslations } from "next-intl";
 import { Loader2, XCircle, Pause } from "lucide-react";
 import { MindmapRenderer } from "@/components/tools/markmap";
 import { QuizTool } from "@/components/tools/quiz-tool";
@@ -29,16 +30,18 @@ export function ToolRenderer({
   tool,
   onSaveStudentSummary,
 }: ToolRendererProps) {
+  const t = useTranslations("tools.loading");
+
   // Handle incomplete content during building
   if (tool.status === "building" && !tool.content) {
     return (
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="w-8 h-8 animate-spin text-blue-500 mx-auto" />
-          <p className="text-slate-400">Preparazione in corso...</p>
+          <p className="text-slate-400">{t("preparing")}</p>
           {tool.chunks.length > 0 && (
             <p className="text-xs text-slate-500">
-              Ricevuti {tool.chunks.length} frammenti
+              {t("chunksReceived", { count: tool.chunks.length })}
             </p>
           )}
         </div>
@@ -52,9 +55,7 @@ export function ToolRenderer({
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4 p-8 bg-red-900/20 rounded-xl">
           <XCircle className="w-12 h-12 text-red-400 mx-auto" />
-          <p className="text-red-400">
-            {tool.errorMessage || "Si è verificato un errore"}
-          </p>
+          <p className="text-red-400">{tool.errorMessage || t("error")}</p>
         </div>
       </div>
     );
@@ -66,7 +67,7 @@ export function ToolRenderer({
       <div className="h-full flex items-center justify-center">
         <div className="text-center space-y-4 p-8 bg-yellow-900/20 rounded-xl">
           <Pause className="w-12 h-12 text-yellow-400 mx-auto" />
-          <p className="text-yellow-400">Costruzione annullata</p>
+          <p className="text-yellow-400">{t("cancelled")}</p>
         </div>
       </div>
     );

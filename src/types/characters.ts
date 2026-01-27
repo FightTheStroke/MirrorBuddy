@@ -94,9 +94,10 @@ export interface BuddyProfile {
    */
   getSystemPrompt: (student: ExtendedStudentProfile) => string;
   /**
-   * Dynamic greeting generator.
+   * Dynamic greeting generator (language-aware).
+   * Uses GreetingContext to support multi-language greetings.
    */
-  getGreeting: (student: ExtendedStudentProfile) => string;
+  getGreeting: (context: GreetingContext) => string;
   avatar: string;
   color: string;
   tools: string[];

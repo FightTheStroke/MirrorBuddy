@@ -1,0 +1,57 @@
+{
+  "metadata": {
+    "home": {
+      "title": "Accueil | MirrorBuddy",
+      "description": "Scopri l'apprendimento basato su AI per studenti con difficoltà di apprendimento. Tutoraggio personalizzato con 22 maestri, voce adattivo.                 ",
+      "keywords": [
+        "éducation",
+        "IA",
+        "tutoriel",
+        "apprentissage",
+        "voix",
+        "maîtres"
+      ]
+    },
+    "settings": {
+      "title": "Paramètres | MirrorBuddy",
+      "description": "Personnalisez votre expérience avec profils d'accessibilité, préférences de caractères, contrôles confidentialité et paramètres de compte adaptés à vos besoins.",
+      "keywords": [
+        "paramètres",
+        "préférences",
+        "accessibilité",
+        "personnalisation",
+        "confidentialité"
+      ]
+    },
+    "aiTransparency": {
+      "title": "Transparence IA | MirrorBuddy",
+      "description": "Scopri come MirrorBuddy utilizza l'AI in modo responsabile, impegni di trasparenza e come garantiamo AI sicura per educazione con forti misure protezione.",
+      "keywords": [
+        "IA",
+        "transparence",
+        "sécurité",
+        "conformité",
+        "IA responsable"
+      ]
+    },
+    "privacy": {
+      "title": "Politique de Confidentialité | MirrorBuddy",
+      "description": "Comprenez comment MirrorBuddy protège vos données, respecte RGPD, gère infos de manière sécurisée et garantit confidentialité avec communications chiffrées.",
+      "keywords": [
+        "confidentialité",
+        "RGPD",
+        "protection données",
+        "sécurité",
+        "conformité"
+      ]
+    },
+    "terms": {
+      "title": "Conditions d'Utilisation | MirrorBuddy",
+      "description": "Lisez nos conditions d'utilisation, accords utilisateur, politiques acceptables et informations légales pour l'utilisation de la plateforme MirrorBuddy.",
+      "keywords": ["conditions", "service", "juridique", "accord", "politiques"]
+    },
+    "title": "MirrorBuddy - Il tuo compagno di studio",
+    "description": "Piattaforma educativa con AI per studenti con bisogni speciali",
+    "keywords": "educazione, AI, apprendimento, tutor, studenti, DSA"
+  }
+}

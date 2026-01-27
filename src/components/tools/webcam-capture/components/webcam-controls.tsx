@@ -3,6 +3,7 @@
  * @brief Webcam controls component
  */
 
+import { useTranslations } from "next-intl";
 import { Camera, Check, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { TIMER_OPTIONS, type TimerOption } from "../constants";
@@ -32,6 +33,8 @@ export function WebcamControls({
   onRetake,
   onConfirm,
 }: WebcamControlsProps) {
+  const t = useTranslations("tools.webcam");
+
   return (
     <div className="p-4 flex flex-col gap-4">
       {!capturedImage ? (
@@ -69,7 +72,7 @@ export function WebcamControls({
               className="bg-blue-600 hover:bg-blue-700 px-8 h-14 text-lg"
             >
               <Camera className="w-6 h-6 mr-2" />
-              {countdown !== null ? "In corso..." : "Scatta foto"}
+              {countdown !== null ? t("inProgress") : t("takePhoto")}
             </Button>
           </div>
         </>
@@ -82,7 +85,7 @@ export function WebcamControls({
             className="border-slate-300 dark:border-slate-600 h-14 px-6"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
-            Riprova
+            {t("retake")}
           </Button>
           <Button
             onClick={onConfirm}
@@ -90,7 +93,7 @@ export function WebcamControls({
             className="bg-green-600 hover:bg-green-700 px-8 h-14"
           >
             <Check className="w-5 h-5 mr-2" />
-            Conferma
+            {t("confirm")}
           </Button>
         </div>
       )}

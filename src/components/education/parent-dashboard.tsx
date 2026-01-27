@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { Star, Sprout, Lightbulb, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
@@ -18,6 +19,7 @@ interface ParentDashboardProps {
 }
 
 export function ParentDashboard({ insights, className }: ParentDashboardProps) {
+  const t = useTranslations("education.parentDashboard");
   const { settings } = useAccessibilityStore();
 
   const stats = useMemo(
@@ -64,7 +66,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                 : "text-slate-900 dark:text-white",
             )}
           >
-            Profilo di {insights.studentName}
+            {t("profileTitle", { studentName: insights.studentName })}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
             Ultimo aggiornamento:{" "}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ChevronUp, ChevronDown, LogOut, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
@@ -42,6 +43,7 @@ export function HomeSidebar({
 }: HomeSidebarProps) {
   const router = useRouter();
   const { isAdmin } = useAdminStatus();
+  const t = useTranslations("home");
 
   const handleViewChange = async (view: View) => {
     await onViewChange(view);
@@ -83,7 +85,7 @@ export function HomeSidebar({
           <button
             onClick={() => handleViewChange("maestri")}
             className="flex items-center gap-3 h-11 min-w-11 hover:opacity-80 transition-opacity"
-            aria-label="Torna alla home"
+            aria-label={t("returnHome")}
           >
             <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
               <Image
@@ -106,7 +108,7 @@ export function HomeSidebar({
             size="icon"
             onClick={onToggle}
             className="text-slate-500"
-            aria-label={open ? "Chiudi menu" : "Apri menu"}
+            aria-label={open ? t("closeMenu") : t("openMenu")}
           >
             {open ? (
               <ChevronUp className="h-4 w-4" />
@@ -214,10 +216,10 @@ export function HomeSidebar({
                   "text-sm font-medium transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2",
                 )}
-                aria-label="Dashboard amministratore"
+                aria-label={t("adminDashboard")}
               >
                 <Shield className="w-4 h-4" />
-                {open && <span>Admin Dashboard</span>}
+                {open && <span>{t("adminDashboard")}</span>}
               </button>
             </Link>
           )}
@@ -240,7 +242,7 @@ export function HomeSidebar({
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
             </span>
-            {open && <span>Area Genitori</span>}
+            {open && <span>{t("parentArea")}</span>}
           </button>
 
           {/* Logout Button - only show for authenticated users (not trial) */}
@@ -255,10 +257,10 @@ export function HomeSidebar({
                 "text-sm font-medium transition-all duration-200",
                 "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
               )}
-              aria-label="Esci"
+              aria-label={t("logout")}
             >
               <LogOut className="w-4 h-4" />
-              {open && <span>Esci</span>}
+              {open && <span>{t("logout")}</span>}
             </button>
           )}
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -50,6 +51,7 @@ export function MaestroSelectionStep({
   allMaestri,
   onMaestroSelect,
 }: MaestroSelectionStepProps) {
+  const t = useTranslations("education.maestroSelectionStep");
   return (
     <motion.div
       key="maestro"
@@ -67,10 +69,7 @@ export function MaestroSelectionStep({
             :
           </>
         ) : (
-          <>
-            Nessun professore specifico per questa materia. Scegli tra tutti i
-            Professori:
-          </>
+          <>{t("noSpecificProfessor")}</>
         )}
       </p>
       <div className="space-y-2">

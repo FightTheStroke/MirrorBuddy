@@ -5,15 +5,18 @@ version: 2
 
 # Paths to ignore (test files, CI configs with test credentials)
 secret:
-  ignored-paths:
+  ignored_paths:
     # E2E test configuration files with test-only secrets
     - "e2e/**"
     - "playwright.config.ts"
     # CI workflow uses ephemeral test database credentials
     - ".github/workflows/ci.yml"
+    # i18n translation files contain UI labels (username, password) not secrets
+    - "messages/*.json"
+    - "messages/**/*.json"
 
   # Ignore specific patterns that are test values, not real secrets
-  ignored-matches:
+  ignored_matches:
     # Test session secret (not production)
     - name: "E2E test session secret"
       match: "e2e-test-session-secret-32-characters-min"
@@ -23,3 +26,8 @@ secret:
     # CI PostgreSQL test database (ephemeral, no real data)
     - name: "CI test database password"
       match: "POSTGRES_PASSWORD: postgres"
+    # i18n UI form labels - NOT secrets
+    - name: "i18n username label"
+      match: '"username": "'
+    - name: "i18n password label"
+      match: '"password": "'

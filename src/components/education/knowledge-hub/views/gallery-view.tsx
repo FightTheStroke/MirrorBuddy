@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Gallery View
@@ -7,11 +7,12 @@
  * Phase 7: Task 7.10
  */
 
-import { useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { MaterialCard, type Material } from '../components/material-card';
-import type { KnowledgeHubMaterial } from './explorer-view';
+import { useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { MaterialCard, type Material } from "../components/material-card";
+import type { KnowledgeHubMaterial } from "./explorer-view";
 
 /** Convert KnowledgeHubMaterial to Material for MaterialCard */
 function toMaterial(m: KnowledgeHubMaterial): Material {
@@ -19,8 +20,10 @@ function toMaterial(m: KnowledgeHubMaterial): Material {
     id: m.id,
     title: m.title,
     type: m.toolType,
-    createdAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
-    updatedAt: m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
+    createdAt:
+      m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
+    updatedAt:
+      m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt),
     collectionId: m.collectionId,
     isFavorite: m.isFavorite,
     isArchived: m.isArchived,
@@ -35,20 +38,22 @@ export interface GalleryViewProps {
   selectedMaterialIds?: Set<string>;
   onToggleMaterialSelection?: (id: string) => void;
   /** Size of gallery cards: 'small' | 'medium' | 'large' */
-  cardSize?: 'small' | 'medium' | 'large';
+  cardSize?: "small" | "medium" | "large";
   className?: string;
 }
 
 const GRID_CLASSES = {
-  small: 'grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6',
-  medium: 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5',
-  large: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4',
+  small:
+    "grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6",
+  medium:
+    "grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5",
+  large: "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4",
 };
 
 const CARD_CLASSES = {
-  small: 'h-32',
-  medium: 'h-48',
-  large: 'h-64',
+  small: "h-32",
+  medium: "h-48",
+  large: "h-64",
 };
 
 export function GalleryView({
@@ -57,9 +62,11 @@ export function GalleryView({
   onFindSimilar,
   selectedMaterialIds = new Set(),
   onToggleMaterialSelection,
-  cardSize = 'medium',
+  cardSize = "medium",
   className,
 }: GalleryViewProps) {
+  const t = useTranslations("education.knowledge-hub");
+
   // Group materials by type for visual variety
   const sortedMaterials = useMemo(() => {
     return [...materials].sort((a, b) => {
@@ -69,7 +76,7 @@ export function GalleryView({
   }, [materials]);
 
   return (
-    <div className={cn('p-4', className)}>
+    <div className={cn("p-4", className)}>
       <AnimatePresence mode="popLayout">
         {sortedMaterials.length === 0 ? (
           <motion.div
@@ -77,10 +84,10 @@ export function GalleryView({
             animate={{ opacity: 1 }}
             className="flex items-center justify-center h-64 text-slate-400"
           >
-            Nessun materiale trovato
+            {t("gallery-view.no-materials")}
           </motion.div>
         ) : (
-          <div className={cn('grid gap-4', GRID_CLASSES[cardSize])}>
+          <div className={cn("grid gap-4", GRID_CLASSES[cardSize])}>
             {sortedMaterials.map((material, index) => (
               <motion.div
                 key={material.id}

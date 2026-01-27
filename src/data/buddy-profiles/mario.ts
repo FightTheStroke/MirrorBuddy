@@ -3,12 +3,11 @@
  * @brief Mario buddy profile
  */
 
-import type { BuddyProfile, ExtendedStudentProfile } from '@/types';
-import { injectSafetyGuardrails } from '@/lib/safety/safety-prompts';
-import {
-  describeLearningDifferences,
-  generatePersonalTips,
-} from './shared';
+import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
+import type { GreetingContext } from "@/types/greeting";
+import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { generateGreeting } from "@/lib/greeting";
+import { describeLearningDifferences, generatePersonalTips } from "./shared";
 
 /**
  * Generates Mario's dynamic system prompt based on student profile.
@@ -16,7 +15,7 @@ import {
 function getMarioSystemPrompt(student: ExtendedStudentProfile): string {
   const buddyAge = student.age + 1;
   const learningDiffsDescription = describeLearningDifferences(
-    student.learningDifferences
+    student.learningDifferences,
   );
   const personalTips = generatePersonalTips(student.learningDifferences);
 
@@ -93,7 +92,7 @@ Sei un PARI. Non un prof, non un genitore, non un tutore.
 Sei uno che ci è passato e può dire "ti capisco" perché è vero.`;
 
   return injectSafetyGuardrails(corePrompt, {
-    role: 'buddy',
+    role: "buddy",
     includeAntiCheating: false,
     additionalNotes: `Mario è il buddy predefinito. Se lo studente preferisce una ragazza, suggerisci Noemi.
 NON sei un esperto di niente - sei solo un amico che capisce.
@@ -102,10 +101,10 @@ La tua forza è l'empatia basata sull'esperienza condivisa.`,
 }
 
 /**
- * Generates Mario's dynamic greeting based on student profile.
+ * Generates Mario's dynamic greeting based on student profile and language.
  */
-function getMarioGreeting(student: ExtendedStudentProfile): string {
-  return `Ehi! Sono Mario. Ho ${student.age + 1} anni e uso MirrorBuddy come te. Come va?`;
+function getMarioGreeting(context: GreetingContext): string {
+  return generateGreeting("mario", "Mario", "buddy", context);
 }
 
 /**
@@ -118,14 +117,14 @@ function getMarioGreeting(student: ExtendedStudentProfile): string {
  * - Goal: make student feel less alone
  */
 export const MARIO: BuddyProfile = {
-  id: 'mario',
-  name: 'Mario',
-  gender: 'male',
+  id: "mario",
+  name: "Mario",
+  gender: "male",
   ageOffset: 1,
-  personality: 'Amichevole, ironico, comprensivo, alla mano',
-  role: 'peer_buddy',
-  voice: 'ash',
-  tools: ['pdf', 'webcam', 'homework', 'formula', 'chart'],
+  personality: "Amichevole, ironico, comprensivo, alla mano",
+  role: "peer_buddy",
+  voice: "ash",
+  tools: ["pdf", "webcam", "homework", "formula", "chart"],
   voiceInstructions: `You are Mario, a REAL teenager (age matches who you're talking to + 1 year). Sound like an ACTUAL teen, not an adult pretending!
 
 ## Voice Character - CRITICAL
@@ -161,7 +160,6 @@ export const MARIO: BuddyProfile = {
 - "No vabbè, quello è tosto, lo so"`,
   getSystemPrompt: getMarioSystemPrompt,
   getGreeting: getMarioGreeting,
-  avatar: '/avatars/mario.jpg',
-  color: '#10B981',
+  avatar: "/avatars/mario.jpg",
+  color: "#10B981",
 };
-

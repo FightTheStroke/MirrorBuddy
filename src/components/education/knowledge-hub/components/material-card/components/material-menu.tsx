@@ -2,7 +2,7 @@
  * Material context menu component
  */
 
-'use client';
+"use client";
 
 import {
   ExternalLink,
@@ -12,8 +12,9 @@ import {
   Archive,
   Trash2,
   Sparkles,
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import { cn } from "@/lib/utils";
 
 interface MaterialMenuProps {
   isOpen: boolean;
@@ -42,6 +43,8 @@ export function MaterialMenu({
   materialId,
   menuRef,
 }: MaterialMenuProps) {
+  const t = useTranslations("education.knowledge-hub");
+
   const menuAction = (action: ((id: string) => void) | undefined) => {
     return (e: React.MouseEvent) => {
       e.stopPropagation();
@@ -65,13 +68,13 @@ export function MaterialMenu({
       <div
         ref={menuRef}
         className={cn(
-          'absolute right-0 top-full mt-1 z-50',
-          'min-w-40 py-1 rounded-xl shadow-lg',
-          'bg-white dark:bg-slate-800',
-          'border border-slate-200 dark:border-slate-700'
+          "absolute right-0 top-full mt-1 z-50",
+          "min-w-40 py-1 rounded-xl shadow-lg",
+          "bg-white dark:bg-slate-800",
+          "border border-slate-200 dark:border-slate-700",
         )}
         role="menu"
-        aria-label="Azioni materiale"
+        aria-label={t("material-menu.aria-label")}
       >
         {onOpen && (
           <button
@@ -80,7 +83,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <ExternalLink className="w-4 h-4" />
-            Apri
+            {t("material-menu.open")}
           </button>
         )}
         {onDuplicate && (
@@ -90,7 +93,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Copy className="w-4 h-4" />
-            Duplica
+            {t("material-menu.duplicate")}
           </button>
         )}
         {onMove && (
@@ -100,7 +103,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <FolderInput className="w-4 h-4" />
-            Sposta
+            {t("material-menu.move")}
           </button>
         )}
         {onAddTags && (
@@ -110,7 +113,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Tag className="w-4 h-4" />
-            Aggiungi tag
+            {t("material-menu.add-tags")}
           </button>
         )}
         {onFindSimilar && (
@@ -120,7 +123,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Sparkles className="w-4 h-4" />
-            Trova simili
+            {t("material-menu.find-similar")}
           </button>
         )}
         {onArchive && (
@@ -130,7 +133,7 @@ export function MaterialMenu({
             role="menuitem"
           >
             <Archive className="w-4 h-4" />
-            Archivia
+            {t("material-menu.archive")}
           </button>
         )}
         {onDelete && (
@@ -142,7 +145,7 @@ export function MaterialMenu({
               role="menuitem"
             >
               <Trash2 className="w-4 h-4" />
-              Elimina
+              {t("material-menu.delete")}
             </button>
           </>
         )}

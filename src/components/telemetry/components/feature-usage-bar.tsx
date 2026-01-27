@@ -1,20 +1,23 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import type { ChartData } from '@/lib/telemetry/types';
+import { useTranslations } from "next-intl";
+import { motion } from "framer-motion";
+import type { ChartData } from "@/lib/telemetry/types";
 
 interface FeatureUsageBarProps {
   data: ChartData[];
 }
 
 export function FeatureUsageBar({ data }: FeatureUsageBarProps) {
+  const t = useTranslations("telemetry");
+
   if (!data.length) {
-    return <div className="text-sm text-slate-400">Nessun dato</div>;
+    return <div className="text-sm text-slate-400">{t("noData")}</div>;
   }
 
   const total = data.reduce((sum, d) => sum + (d.data[0]?.value || 0), 0);
   if (total === 0) {
-    return <div className="text-sm text-slate-400">Nessun utilizzo questa settimana</div>;
+    return <div className="text-sm text-slate-400">{t("noUsage")}</div>;
   }
 
   return (
@@ -37,9 +40,7 @@ export function FeatureUsageBar({ data }: FeatureUsageBarProps) {
                 style={{ backgroundColor: feature.color }}
               />
             </div>
-            <div className="w-12 text-right text-sm font-medium">
-              {value}
-            </div>
+            <div className="w-12 text-right text-sm font-medium">{value}</div>
           </div>
         );
       })}

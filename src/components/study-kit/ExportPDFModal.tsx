@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * ExportPDFModal Component
@@ -6,15 +6,16 @@
  * Wave 3: PDF-Accessibile-DSA UI Integration
  */
 
-import { useState } from 'react';
-import { X, Download, Loader2, FileText, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
-import toast from '@/components/ui/toast';
-import { DSA_PROFILES, type DSAProfile } from './dsa-profiles';
-import type { StudyKit } from '@/types/study-kit';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { X, Download, Loader2, FileText, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
+import toast from "@/components/ui/toast";
+import { DSA_PROFILES, type DSAProfile } from "./dsa-profiles";
+import type { StudyKit } from "@/types/study-kit";
 
 interface ExportPDFModalProps {
   studyKit: StudyKit;
@@ -22,16 +23,22 @@ interface ExportPDFModalProps {
   onClose: () => void;
 }
 
-export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProps) {
-  const [selectedProfile, setSelectedProfile] = useState<DSAProfile>('dyslexia');
+export function ExportPDFModal({
+  studyKit,
+  isOpen,
+  onClose,
+}: ExportPDFModalProps) {
+  const t = useTranslations("studyKit.exportModal");
+  const [selectedProfile, setSelectedProfile] =
+    useState<DSAProfile>("dyslexia");
   const [isExporting, setIsExporting] = useState(false);
-  const [format, setFormat] = useState<'A4' | 'Letter'>('A4');
+  const [format, setFormat] = useState<"A4" | "Letter">("A4");
 
   const handleExport = async () => {
     setIsExporting(true);
     try {
-      const response = await csrfFetch('/api/pdf-generator', {
-        method: 'POST',
+      const response = await csrfFetch("/api/pdf-generator", {
+        method: "POST",
         body: JSON.stringify({
           kitId: studyKit.id,
           profile: selectedProfile,
@@ -40,12 +47,14 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
       });
 
       if (!response.ok) {
-        const error = await response.json().catch(() => ({ error: 'Export failed' }));
-        throw new Error(error.error || 'Export failed');
+        const error = await response
+          .json()
+          .catch(() => ({ error: "Export failed" }));
+        throw new Error(error.error || "Export failed");
       }
 
       // Get filename from header or generate one
-      const contentDisposition = response.headers.get('Content-Disposition');
+      const contentDisposition = response.headers.get("Content-Disposition");
       let filename = `${studyKit.title}_DSA.pdf`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename="(.+?)"/);
@@ -53,12 +62,12 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
       }
 
       // Check if saved to Zaino
-      const savedToZaino = response.headers.get('X-Saved-To-Zaino') === 'true';
+      const savedToZaino = response.headers.get("X-Saved-To-Zaino") === "true";
 
       // Download the PDF
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -68,15 +77,15 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
 
       // Show success message
       if (savedToZaino) {
-        toast.success('PDF scaricato e salvato nello Zaino');
+        toast.success(t("success.withZaino"));
       } else {
-        toast.success('PDF scaricato con successo');
+        toast.success(t("success.default"));
       }
 
       onClose();
     } catch (error) {
-      logger.error('PDF export failed', { error: String(error) });
-      toast.error(error instanceof Error ? error.message : 'Errore durante l\'esportazione');
+      logger.error("PDF export failed", { error: String(error) });
+      toast.error(error instanceof Error ? error.message : t("error"));
     } finally {
       setIsExporting(false);
     }
@@ -101,17 +110,15 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
             </div>
             <div>
               <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                Esporta PDF Accessibile
+                {t("title")}
               </h2>
-              <p className="text-sm text-slate-500">
-                Seleziona il profilo DSA per ottimizzare il PDF
-              </p>
+              <p className="text-sm text-slate-500">{t("description")}</p>
             </div>
           </div>
           <button
             onClick={onClose}
             className="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            aria-label="Chiudi"
+            aria-label={t("closeLabel")}
           >
             <X className="w-5 h-5" />
           </button>
@@ -121,7 +128,9 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
         <div className="p-6 space-y-6">
           {/* Study Kit info */}
           <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
-            <p className="font-medium text-slate-900 dark:text-white">{studyKit.title}</p>
+            <p className="font-medium text-slate-900 dark:text-white">
+              {studyKit.title}
+            </p>
             {studyKit.subject && (
               <p className="text-sm text-slate-500">{studyKit.subject}</p>
             )}
@@ -130,7 +139,7 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
           {/* DSA Profile Selection */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-              Profilo DSA
+              {t("profileLabel")}
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {DSA_PROFILES.map((profile) => (
@@ -139,18 +148,18 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
                   type="button"
                   onClick={() => setSelectedProfile(profile.value)}
                   className={cn(
-                    'flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all',
+                    "flex items-start gap-3 p-4 rounded-lg border-2 text-left transition-all",
                     selectedProfile === profile.value
-                      ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                      ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                      : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
                   )}
                 >
                   <div
                     className={cn(
-                      'w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm',
+                      "w-10 h-10 rounded-lg flex items-center justify-center font-bold text-sm",
                       selectedProfile === profile.value
-                        ? 'bg-green-500 text-white'
-                        : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300'
+                        ? "bg-green-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300",
                     )}
                   >
                     {profile.icon}
@@ -176,29 +185,29 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
           {/* Format Selection */}
           <div>
             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
-              Formato pagina
+              {t("formatLabel")}
             </label>
             <div className="flex gap-3">
               <button
                 type="button"
-                onClick={() => setFormat('A4')}
+                onClick={() => setFormat("A4")}
                 className={cn(
-                  'flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all',
-                  format === 'A4'
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                  "flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all",
+                  format === "A4"
+                    ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300",
                 )}
               >
                 A4
               </button>
               <button
                 type="button"
-                onClick={() => setFormat('Letter')}
+                onClick={() => setFormat("Letter")}
                 className={cn(
-                  'flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all',
-                  format === 'Letter'
-                    ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400'
-                    : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300'
+                  "flex-1 py-3 px-4 rounded-lg border-2 font-medium transition-all",
+                  format === "Letter"
+                    ? "border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-400"
+                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300",
                 )}
               >
                 Letter (US)
@@ -210,7 +219,7 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
         {/* Footer */}
         <div className="flex items-center justify-end gap-3 p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50">
           <Button variant="outline" onClick={onClose} disabled={isExporting}>
-            Annulla
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleExport}
@@ -220,12 +229,12 @@ export function ExportPDFModal({ studyKit, isOpen, onClose }: ExportPDFModalProp
             {isExporting ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Generando...
+                {t("generating")}
               </>
             ) : (
               <>
                 <Download className="w-4 h-4" />
-                Esporta PDF
+                {t("export")}
               </>
             )}
           </Button>

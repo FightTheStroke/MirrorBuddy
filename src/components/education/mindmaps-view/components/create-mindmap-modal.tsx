@@ -3,11 +3,12 @@
  * @brief Create mindmap modal component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Save, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { subjectNames, subjectIcons } from '@/data';
-import type { Subject } from '@/types';
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Plus, Save, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { subjectNames, subjectIcons } from "@/data";
+import type { Subject } from "@/types";
 
 interface Topic {
   name: string;
@@ -26,7 +27,11 @@ interface CreateMindmapModalProps {
   onUpdateTopicName: (index: number, name: string) => void;
   onRemoveTopic: (index: number) => void;
   onAddSubtopic: (topicIndex: number) => void;
-  onUpdateSubtopic: (topicIndex: number, subtopicIndex: number, value: string) => void;
+  onUpdateSubtopic: (
+    topicIndex: number,
+    subtopicIndex: number,
+    value: string,
+  ) => void;
   onRemoveSubtopic: (topicIndex: number, subtopicIndex: number) => void;
   onCreate: () => void;
 }
@@ -47,6 +52,7 @@ export function CreateMindmapModal({
   onRemoveSubtopic,
   onCreate,
 }: CreateMindmapModalProps) {
+  const t = useTranslations("education.mindmaps");
   if (!isOpen) return null;
 
   return (
@@ -67,7 +73,7 @@ export function CreateMindmapModal({
             className="bg-white dark:bg-slate-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-              <h3 className="text-xl font-bold">Crea Nuova Mappa Mentale</h3>
+              <h3 className="text-xl font-bold">{t("createTitle")}</h3>
               <button
                 onClick={onClose}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -78,19 +84,21 @@ export function CreateMindmapModal({
             <div className="flex-1 overflow-auto p-4 space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Titolo della mappa
+                  {t("titleLabel")}
                 </label>
                 <input
                   type="text"
                   value={title}
                   onChange={(e) => onTitleChange(e.target.value)}
-                  placeholder="Es: Rivoluzione Francese, Teorema di Pitagora..."
+                  placeholder={t("titlePlaceholder")}
                   className="w-full px-3 py-2 border rounded-lg dark:bg-slate-800 dark:border-slate-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Materia</label>
+                <label className="block text-sm font-medium mb-1">
+                  {t("subjectLabel")}
+                </label>
                 <select
                   value={subject}
                   onChange={(e) => onSubjectChange(e.target.value as Subject)}
@@ -106,7 +114,7 @@ export function CreateMindmapModal({
 
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Argomenti principali
+                  {t("topicsLabel")}
                 </label>
                 <div className="space-y-4">
                   {topics.map((topic, topicIndex) => (
@@ -121,7 +129,9 @@ export function CreateMindmapModal({
                           onChange={(e) =>
                             onUpdateTopicName(topicIndex, e.target.value)
                           }
-                          placeholder={`Argomento ${topicIndex + 1}`}
+                          placeholder={t("topicPlaceholder", {
+                            index: topicIndex + 1,
+                          })}
                           className="flex-1 px-3 py-2 border rounded-lg dark:bg-slate-700 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         {topics.length > 1 && (
@@ -145,10 +155,12 @@ export function CreateMindmapModal({
                                 onUpdateSubtopic(
                                   topicIndex,
                                   subtopicIndex,
-                                  e.target.value
+                                  e.target.value,
                                 )
                               }
-                              placeholder={`Sotto-argomento ${subtopicIndex + 1}`}
+                              placeholder={t("subtopicPlaceholder", {
+                                index: subtopicIndex + 1,
+                              })}
                               className="flex-1 px-3 py-1.5 text-sm border rounded-lg dark:bg-slate-700 dark:border-slate-600 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             />
                             {topic.subtopics.length > 1 && (
@@ -172,7 +184,7 @@ export function CreateMindmapModal({
                           className="text-slate-600 dark:text-slate-400"
                         >
                           <Plus className="w-3 h-3 mr-1" />
-                          Aggiungi sotto-argomento
+                          {t("addSubtopic")}
                         </Button>
                       </div>
                     </div>
@@ -185,20 +197,20 @@ export function CreateMindmapModal({
                   className="mt-2"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Aggiungi argomento
+                  {t("addTopic")}
                 </Button>
               </div>
             </div>
             <div className="p-4 border-t border-slate-200 dark:border-slate-700 flex justify-end gap-2">
               <Button variant="outline" onClick={onClose}>
-                Annulla
+                {t("cancel")}
               </Button>
               <Button
                 onClick={onCreate}
                 disabled={!title.trim() || !topics.some((t) => t.name.trim())}
               >
                 <Save className="w-4 h-4 mr-2" />
-                Crea Mappa
+                {t("create")}
               </Button>
             </div>
           </motion.div>
@@ -207,4 +219,3 @@ export function CreateMindmapModal({
     </AnimatePresence>
   );
 }
-

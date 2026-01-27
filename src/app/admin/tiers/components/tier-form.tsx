@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { Save, X } from "lucide-react";
@@ -54,6 +55,7 @@ interface TierFormProps {
 
 export function TierForm({ tier }: TierFormProps) {
   const router = useRouter();
+  const t = useTranslations("admin.tiers.form");
   const isEditing = !!tier?.id;
 
   const [formData, setFormData] = useState<TierFormData>({
@@ -93,7 +95,7 @@ export function TierForm({ tier }: TierFormProps) {
     e.preventDefault();
 
     if (!formData.code || !formData.name) {
-      toast.error("Errore", "Codice e nome sono obbligatori");
+      toast.error(t("error"), t("requiredFields"));
       return;
     }
 
@@ -112,14 +114,12 @@ export function TierForm({ tier }: TierFormProps) {
 
       if (!response.ok) {
         const error = await response.json().catch(() => ({}));
-        throw new Error(error.error || "Errore durante il salvataggio");
+        throw new Error(error.error || t("saveFailed"));
       }
 
       toast.success(
-        "Successo",
-        isEditing
-          ? "Piano aggiornato con successo"
-          : "Piano creato con successo",
+        t("success"),
+        isEditing ? t("successUpdate") : t("successCreate"),
       );
 
       router.push("/admin/tiers");
@@ -127,10 +127,8 @@ export function TierForm({ tier }: TierFormProps) {
     } catch (error) {
       clientLogger.error("Error saving tier", { component: "TierForm" }, error);
       toast.error(
-        "Errore",
-        error instanceof Error
-          ? error.message
-          : "Errore durante il salvataggio",
+        t("error"),
+        error instanceof Error ? error.message : t("saveFailed"),
       );
     } finally {
       setIsSaving(false);
@@ -232,15 +230,11 @@ export function TierForm({ tier }: TierFormProps) {
           disabled={isSaving}
         >
           <X className="w-4 h-4 mr-2" />
-          Annulla
+          {t("cancel")}
         </Button>
         <Button type="submit" disabled={isSaving}>
           <Save className="w-4 h-4 mr-2" />
-          {isSaving
-            ? "Salvataggio..."
-            : isEditing
-              ? "Salva Modifiche"
-              : "Crea Piano"}
+          {isSaving ? t("saving") : isEditing ? t("update") : t("create")}
         </Button>
       </div>
     </form>

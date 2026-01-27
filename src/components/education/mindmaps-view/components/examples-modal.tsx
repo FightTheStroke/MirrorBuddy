@@ -3,23 +3,35 @@
  * @brief Examples modal component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { MindmapRenderer } from '@/components/tools/markmap';
-import { subjectNames, subjectIcons, subjectColors } from '@/data';
-import type { Subject } from '@/types';
-import { exampleMindmapsBySubject } from '../constants/example-mindmaps';
-import type { MindmapNode } from '../types';
+import { motion, AnimatePresence } from "framer-motion";
+import { X, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { MindmapRenderer } from "@/components/tools/markmap";
+import { subjectNames, subjectIcons, subjectColors } from "@/data";
+import type { Subject } from "@/types";
+import { exampleMindmapsBySubject } from "../constants/example-mindmaps";
+import type { MindmapNode } from "../types";
 
 interface ExamplesModalProps {
   isOpen: boolean;
-  selectedExample: { title: string; nodes: MindmapNode[]; subject: string } | null;
+  selectedExample: {
+    title: string;
+    nodes: MindmapNode[];
+    subject: string;
+  } | null;
   onClose: () => void;
-  onSelectExample: (example: { title: string; nodes: MindmapNode[]; subject: string }) => void;
+  onSelectExample: (example: {
+    title: string;
+    nodes: MindmapNode[];
+    subject: string;
+  }) => void;
   onBackToExamples: () => void;
-  onSaveExample: (example: { title: string; nodes: MindmapNode[] }, subject: string) => void;
+  onSaveExample: (
+    example: { title: string; nodes: MindmapNode[] },
+    subject: string,
+  ) => void;
 }
 
 export function ExamplesModal({
@@ -30,6 +42,7 @@ export function ExamplesModal({
   onBackToExamples,
   onSaveExample,
 }: ExamplesModalProps) {
+  const t = useTranslations("education.mindmaps");
   if (!isOpen) return null;
 
   return (
@@ -50,7 +63,7 @@ export function ExamplesModal({
             className="bg-white dark:bg-slate-900 rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col"
           >
             <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700">
-              <h3 className="text-xl font-bold">Mappe Mentali di Esempio</h3>
+              <h3 className="text-xl font-bold">{t("examplesTitle")}</h3>
               <button
                 onClick={onClose}
                 className="inline-flex h-11 w-11 items-center justify-center rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
@@ -62,7 +75,7 @@ export function ExamplesModal({
               {selectedExample ? (
                 <div className="space-y-4">
                   <Button variant="outline" onClick={onBackToExamples}>
-                    Torna agli esempi
+                    {t("backToExamples")}
                   </Button>
                   <MindmapRenderer
                     title={selectedExample.title}
@@ -76,12 +89,12 @@ export function ExamplesModal({
                             title: selectedExample.title,
                             nodes: selectedExample.nodes,
                           },
-                          selectedExample.subject
+                          selectedExample.subject,
                         )
                       }
                     >
                       <Plus className="w-4 h-4 mr-2" />
-                      Salva nella mia raccolta
+                      {t("saveToCollection")}
                     </Button>
                   </div>
                 </div>
@@ -92,9 +105,7 @@ export function ExamplesModal({
                       <Card
                         key={subject}
                         className="cursor-pointer hover:shadow-lg transition-shadow"
-                        onClick={() =>
-                          onSelectExample({ ...example, subject })
-                        }
+                        onClick={() => onSelectExample({ ...example, subject })}
                       >
                         <CardHeader className="pb-3">
                           <div className="flex items-center gap-3">
@@ -129,7 +140,7 @@ export function ExamplesModal({
                           </div>
                         </CardContent>
                       </Card>
-                    )
+                    ),
                   )}
                 </div>
               )}
@@ -140,4 +151,3 @@ export function ExamplesModal({
     </AnimatePresence>
   );
 }
-

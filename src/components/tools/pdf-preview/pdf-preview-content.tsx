@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import {
   ChevronLeft,
@@ -45,12 +46,14 @@ export function PDFPreviewContent({
   onSetCurrentPage,
   onTogglePageSelection,
 }: PDFPreviewContentProps) {
+  const t = useTranslations("tools.pdf.preview");
+
   return (
     <div className="flex-1 overflow-hidden flex flex-col">
       {viewMode === "loading" && (
         <div className="flex-1 flex items-center justify-center flex-col gap-4">
           <Loader2 className="w-12 h-12 animate-spin text-blue-500" />
-          <p className="text-slate-400">Elaborazione PDF in corso...</p>
+          <p className="text-slate-400">{t("processing")}</p>
         </div>
       )}
 
@@ -59,13 +62,15 @@ export function PDFPreviewContent({
           <div className="w-16 h-16 rounded-full bg-red-500/20 flex items-center justify-center">
             <AlertCircle className="w-8 h-8 text-red-400" />
           </div>
-          <p className="text-slate-300 text-center max-w-md">{error}</p>
+          <p className="text-slate-300 text-center max-w-md">
+            {error === "processing-error" ? t(error) : error}
+          </p>
           <Button
             variant="outline"
             onClick={onClose}
             className="border-slate-600"
           >
-            Chiudi
+            {t("close")}
           </Button>
         </div>
       )}
@@ -88,7 +93,7 @@ export function PDFPreviewContent({
                 {/* eslint-disable-next-line @next/next/no-img-element -- Data URL from PDF rendering */}
                 <img
                   src={currentPageData.imageData}
-                  alt={`Pagina ${currentPageData.pageNumber}`}
+                  alt={`${t("page")} ${currentPageData.pageNumber}`}
                   className="max-w-full max-h-full shadow-2xl rounded"
                 />
 
@@ -140,7 +145,7 @@ export function PDFPreviewContent({
                     {/* eslint-disable-next-line @next/next/no-img-element -- Data URL from PDF rendering */}
                     <img
                       src={page.imageData}
-                      alt={`Pagina ${page.pageNumber}`}
+                      alt={`${t("page")} ${page.pageNumber}`}
                       className="w-full h-full object-cover"
                     />
                     <span className="absolute bottom-0 left-0 right-0 bg-black/70 text-[10px] text-center py-0.5">

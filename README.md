@@ -227,6 +227,8 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 | Documents     | 1         | PDF/image upload for homework help        |
 | Maestri       | 3         | Randomly assigned AI tutors               |
 
+**Trial limits are configurable via TierService in the database.** Admins can adjust trial tier limits in the admin panel without code changes.
+
 **Anti-abuse protection:** Trial sessions are tracked by IP hash + cookie to prevent repeated trials via incognito browsing.
 
 **Admin Features (ADR 0061):** Collapsible sidebar, bulk invite actions, direct invite creation, real-time KPI dashboard.
@@ -257,6 +259,87 @@ MirrorBuddy offers three tiers to meet different needs:
 
 ---
 
+## Internationalization (i18n)
+
+MirrorBuddy is a **fully multilingual platform** supporting 5 languages with dynamic locale detection, language-specific maestri, and localized content delivery.
+
+### Supported Languages
+
+| Language | Code | Primary Region      | Status    |
+| -------- | ---- | ------------------- | --------- |
+| Italian  | it   | Italy               | Primary   |
+| English  | en   | Global              | Supported |
+| French   | fr   | France/Belgium      | Supported |
+| German   | de   | Germany/Austria     | Supported |
+| Spanish  | es   | Spain/Latin America | Supported |
+
+### Multilingual Features
+
+- **Dynamic Locale Detection**: Browser language → user profile → IP geolocation → Italian fallback
+- **Language-Specific Maestri**: Molière (French), Goethe (German), Cervantes (Spanish) teach their own language
+- **Bilingual Learning**: Grammar lessons grounded in authentic literature and cultural context
+- **Real-Time Translation**: All UI text, tool responses, and educational content translated
+- **Voice Localization**: Azure OpenAI voices support all 5 languages
+- **FSRS Flashcards**: Spaced repetition works across all languages
+- **Accessibility**: All 7 DSA profiles work in every supported language
+
+### Locale Detection Flow
+
+1. **User Selection**: Explicit language choice (stored in `mirrorbuddy-locale` cookie)
+2. **Profile Setting**: User's preferred language from database
+3. **Browser Locale**: `navigator.language` (Italian/English/French/German/Spanish)
+4. **IP Geolocation**: Inferred from Vercel Analytics geo data
+5. **Fallback**: Italian if unsupported locale
+
+### Adding New Languages
+
+To add a new language (e.g., Portuguese):
+
+```bash
+# 1. Create translation file
+cp public/locales/it/translation.json public/locales/pt/translation.json
+
+# 2. Update config
+# Edit src/lib/i18n/config.ts
+export const SUPPORTED_LOCALES = ['it', 'en', 'fr', 'de', 'es', 'pt'];
+
+# 3. Validate translations
+npm run i18n:validate
+
+# 4. Deploy
+git add public/locales/pt/ src/lib/i18n/config.ts
+git commit -m "i18n: add Portuguese language support"
+git push
+```
+
+### i18n Monitoring
+
+**Dashboard**: https://mirrorbuddy.grafana.net/d/dashboard/ → i18n Metrics
+
+**Key Metrics**:
+
+- Missing translations (count)
+- Locale detection success rate (%)
+- Translation load time (ms, P95)
+- Language pack CDN hit ratio (%)
+- Fallback language usage (%)
+
+**Alerts**:
+
+- Missing translations > 5 → SEV3 incident
+- Locale detection < 95% → SEV3 incident
+- Translation load time > 500ms → SEV3 incident
+
+### Incident Response
+
+For i18n-specific incidents, see [I18N-RUNBOOK.md](docs/operations/I18N-RUNBOOK.md):
+
+- **INC-005**: Missing translations or broken language packs
+- **INC-006**: Locale detection failures, wrong language displayed
+- Troubleshooting locale mapping, cache clearing, deployment verification
+
+---
+
 ## Architecture
 
 **Stack:** Next.js 16 App Router → Zustand State → API Routes → Azure OpenAI (chat+voice+embeddings) / Ollama (fallback, text) → Prisma ORM → PostgreSQL + pgvector
@@ -265,6 +348,8 @@ MirrorBuddy offers three tiers to meet different needs:
 
 - **ADR 0015:** Zustand syncs with backend via REST APIs. User data NEVER in localStorage—only database.
 - **ADR 0033:** RAG (Retrieval-Augmented Generation) using Azure OpenAI embeddings + pgvector for semantic search of user materials.
+- **ADR 0064:** Language-specific maestri with bilingual teaching patterns for foreign language learning
+- **ADR 0068:** Multilingual platform architecture with dynamic locale detection and real-time translation
 
 **→ Full architecture & diagram: [ARCHITECTURE.md](ARCHITECTURE.md)**
 
@@ -315,6 +400,40 @@ npx tsx scripts/test-grafana-push.ts
 - `GET /api/health` — Load balancer health check
 - `GET /api/health/detailed` — Full system metrics
 - `GET /api/metrics` — Prometheus format (Grafana scrape)
+
+**Health Status Values:**
+
+| Status      | Meaning                                                   | HTTP Status |
+| ----------- | --------------------------------------------------------- | ----------- |
+| `healthy`   | All checks passed                                         | 200         |
+| `degraded`  | One or more checks warning (high latency, etc.)           | 200         |
+| `unhealthy` | One or more checks failed (database down, AI unavailable) | 503         |
+
+**Example Response:**
+
+```json
+{
+  "status": "healthy",
+  "version": "0.10.0",
+  "timestamp": "2025-01-26T21:50:00.000Z",
+  "uptime": 3600,
+  "checks": {
+    "database": {
+      "status": "pass",
+      "message": "Connected",
+      "latency_ms": 45
+    },
+    "ai_provider": {
+      "status": "pass",
+      "message": "Azure OpenAI configured"
+    },
+    "memory": {
+      "status": "pass",
+      "message": "128MB / 512MB (25%)"
+    }
+  }
+}
+```
 
 ---
 

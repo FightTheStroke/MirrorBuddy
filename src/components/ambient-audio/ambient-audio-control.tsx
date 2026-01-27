@@ -1,15 +1,17 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Wind } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { useAmbientAudio } from '@/lib/hooks/use-ambient-audio';
-import { MasterControls } from './master-controls';
-import { PresetsSection } from './presets-section';
-import { AdvancedMixer } from './advanced-mixer';
-import type { AudioMode, AudioPreset } from '@/types';
+import { useState } from "react";
+import { useTranslations } from "next-intl";
+import { Wind } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAmbientAudio } from "@/lib/hooks/use-ambient-audio";
+import { MasterControls } from "./master-controls";
+import { PresetsSection } from "./presets-section";
+import { AdvancedMixer } from "./advanced-mixer";
+import type { AudioMode, AudioPreset } from "@/types";
 
 export function AmbientAudioControl() {
+  const t = useTranslations("ambientAudio");
   const {
     playbackState,
     masterVolume,
@@ -28,9 +30,9 @@ export function AmbientAudioControl() {
     clearLayers,
   } = useAmbientAudio();
 
-  const [selectedMode, setSelectedMode] = useState<AudioMode>('white_noise');
+  const [selectedMode, setSelectedMode] = useState<AudioMode>("white_noise");
 
-  const isPlaying = playbackState === 'playing';
+  const isPlaying = playbackState === "playing";
 
   const handlePlayPause = () => {
     if (isPlaying) {
@@ -51,7 +53,7 @@ export function AmbientAudioControl() {
 
   const handlePresetClick = (preset: AudioPreset) => {
     applyPreset(preset);
-    if (playbackState === 'idle') {
+    if (playbackState === "idle") {
       play();
     }
   };
@@ -68,7 +70,10 @@ export function AmbientAudioControl() {
         onVolumeChange={setMasterVolume}
       />
 
-      <PresetsSection currentPreset={currentPreset} onSelect={handlePresetClick} />
+      <PresetsSection
+        currentPreset={currentPreset}
+        onSelect={handlePresetClick}
+      />
 
       <AdvancedMixer
         layers={layers}
@@ -85,8 +90,7 @@ export function AmbientAudioControl() {
         <CardContent className="pt-6">
           <p className="text-xs text-slate-600 dark:text-slate-400">
             <Wind className="w-3 h-3 inline mr-1" />
-            L&apos;audio ambientale può migliorare la concentrazione durante lo studio.
-            I binaural beats richiedono cuffie stereo per un effetto ottimale.
+            {t("info")}
           </p>
         </CardContent>
       </Card>

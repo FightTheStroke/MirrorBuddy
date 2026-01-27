@@ -7,6 +7,7 @@
  */
 
 import { useState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Keyboard, Trophy, Gamepad2, BookOpen } from "lucide-react";
 import { useTypingStore } from "@/lib/stores";
 import { LessonSelector } from "./lesson-selector";
@@ -26,20 +27,22 @@ import type { KeyMappingResult } from "@/lib/typing/key-mapping-engine";
 type ViewMode = "lessons" | "practice" | "games" | "progress";
 type GameType = "speed" | "accuracy" | "exploration" | null;
 
-const LEVEL_OPTIONS: { value: TypingLevel; label: string }[] = [
-  { value: "beginner", label: "Principiante" },
-  { value: "intermediate", label: "Intermedio" },
-  { value: "advanced", label: "Avanzato" },
-];
-
-const LAYOUT_OPTIONS: { value: KeyboardLayout; label: string }[] = [
-  { value: "qwertz", label: "QWERTZ (Italiano)" },
-  { value: "qwerty", label: "QWERTY (US)" },
-  { value: "azerty", label: "AZERTY (Francese)" },
-  { value: "dvorak", label: "Dvorak" },
-];
-
 export function TypingView() {
+  const t = useTranslations("typing");
+
+  const LEVEL_OPTIONS: { value: TypingLevel; label: string }[] = [
+    { value: "beginner", label: t("beginner") },
+    { value: "intermediate", label: t("intermediate") },
+    { value: "advanced", label: t("advanced") },
+  ];
+
+  const LAYOUT_OPTIONS: { value: KeyboardLayout; label: string }[] = [
+    { value: "qwertz", label: t("qwertz") },
+    { value: "qwerty", label: t("qwerty") },
+    { value: "azerty", label: t("azerty") },
+    { value: "dvorak", label: t("dvorak") },
+  ];
+
   const [viewMode, setViewMode] = useState<ViewMode>("lessons");
   const [activeGame, setActiveGame] = useState<GameType>(null);
   const [currentLesson, setCurrentLesson] = useState<TypingLesson | null>(null);
@@ -123,7 +126,7 @@ export function TypingView() {
             onClick={() => setActiveGame(null)}
             className="mb-2"
           >
-            ← Torna ai giochi
+            ← {t("backToGames")}
           </Button>
           <SpeedGame onGameEnd={handleSpeedGameEnd} />
         </div>
@@ -137,7 +140,7 @@ export function TypingView() {
             onClick={() => setActiveGame(null)}
             className="mb-2"
           >
-            ← Torna ai giochi
+            ← {t("backToGames")}
           </Button>
           <AccuracyGame onGameEnd={handleAccuracyGameEnd} />
         </div>
@@ -151,7 +154,7 @@ export function TypingView() {
             onClick={() => setActiveGame(null)}
             className="mb-2"
           >
-            ← Torna ai giochi
+            ← {t("backToGames")}
           </Button>
           <KeyboardExplorationGame
             layout={currentLayout}
@@ -171,7 +174,7 @@ export function TypingView() {
               onClick={handleBackToLessons}
               className="mb-2"
             >
-              ← Torna alle lezioni
+              ← {t("backToLessons")}
             </Button>
 
             <div className="p-6 bg-muted/30 rounded-xl">
@@ -226,7 +229,7 @@ export function TypingView() {
             <div className="flex flex-wrap gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Livello
+                  {t("level")}
                 </label>
                 <select
                   value={currentLevel}
@@ -244,7 +247,7 @@ export function TypingView() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Layout Tastiera
+                  {t("keyboardLayout")}
                 </label>
                 <select
                   value={currentLayout}
@@ -279,11 +282,9 @@ export function TypingView() {
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-3">
             <Keyboard className="w-7 h-7 text-primary" />
-            Impara a Digitare
+            {t("title")}
           </h1>
-          <p className="text-muted-foreground mt-1">
-            Lezioni progressive e accessibilità DSA
-          </p>
+          <p className="text-muted-foreground mt-1">{t("subtitle")}</p>
         </div>
       </div>
 
@@ -296,7 +297,7 @@ export function TypingView() {
             setActiveGame(null);
           }}
           icon={BookOpen}
-          label="Lezioni"
+          label={t("lessons")}
         />
         <NavTab
           active={viewMode === "games"}
@@ -305,7 +306,7 @@ export function TypingView() {
             setActiveGame(null);
           }}
           icon={Gamepad2}
-          label="Giochi"
+          label={t("games")}
         />
         <NavTab
           active={viewMode === "progress"}
@@ -314,7 +315,7 @@ export function TypingView() {
             setActiveGame(null);
           }}
           icon={Trophy}
-          label="Progresso"
+          label={t("progress")}
         />
       </div>
 
@@ -325,10 +326,16 @@ export function TypingView() {
 
       {/* Info cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <InfoCard title="Multi-lingua" desc="QWERTY, AZERTY, QWERTZ, Dvorak" />
-        <InfoCard title="Una mano" desc="Modalità sinistra o destra" />
-        <InfoCard title="DSA Friendly" desc="7 profili accessibilità" />
-        <InfoCard title="Gamification" desc="Punti, badge e streak" />
+        <InfoCard
+          title={t("infoMultiLanguage")}
+          desc={t("infoMultiLanguageDesc")}
+        />
+        <InfoCard title={t("infoOneHanded")} desc={t("infoOneHandedDesc")} />
+        <InfoCard title={t("infoDSA")} desc={t("infoDSADesc")} />
+        <InfoCard
+          title={t("infoGamification")}
+          desc={t("infoGamificationDesc")}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
-'use client';
+"use client";
 
-import { Wifi, WifiOff } from 'lucide-react';
+import { useTranslations } from "next-intl";
+import { Wifi, WifiOff } from "lucide-react";
 
 interface SummaryConnectionStatusProps {
   sessionId: string | null;
@@ -13,6 +14,8 @@ export function SummaryConnectionStatus({
   listenForEvents,
   isConnected,
 }: SummaryConnectionStatusProps) {
+  const t = useTranslations("tools.connection");
+
   if (!sessionId || !listenForEvents) return null;
 
   return (
@@ -21,14 +24,14 @@ export function SummaryConnectionStatus({
         <>
           <Wifi className="w-4 h-4 text-green-500" />
           <span className="text-xs text-green-600 dark:text-green-400">
-            Connesso - modifica vocale attiva
+            {t("connected")}
           </span>
         </>
       ) : (
         <>
           <WifiOff className="w-4 h-4 text-amber-500" />
           <span className="text-xs text-amber-600 dark:text-amber-400">
-            Connessione in corso...
+            {t("connecting")}
           </span>
         </>
       )}

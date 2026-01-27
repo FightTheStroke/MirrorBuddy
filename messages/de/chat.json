@@ -1,0 +1,329 @@
+{
+  "chat": {
+    "input": {
+      "placeholder": "Schreibe an {name}...",
+      "ariaLabel": "Schreibe eine Nachricht an {name}",
+      "sendMessage": "Nachricht senden",
+      "enableAudio": "Audio aktivieren",
+      "disableAudio": "Audio deaktivieren",
+      "switchToText": "Zu Text wechseln",
+      "switchToVoice": "Zu Sprache wechseln",
+      "send": "Absenden",
+      "voiceStart": "Inizia registrazione vocale",
+      "voiceStop": "Ferma registrazione"
+    },
+    "header": {
+      "backButton": "Zurück",
+      "defaultDescription": "Ich bin hier, um dir zu helfen",
+      "endCall": "Anruf beenden",
+      "startVoiceCall": "Sprachanruf starten",
+      "talkToCoach": "Mit Coach sprechen",
+      "talkToBuddy": "Mit einem Freund sprechen"
+    },
+    "message": {
+      "thinking": "{name} denkt nach..."
+    },
+    "tools": {
+      "mindmap": {
+        "label": "Karte",
+        "tooltip": "Mindmap erstellen"
+      },
+      "quiz": {
+        "label": "Quiz",
+        "tooltip": "Quiz erstellen"
+      },
+      "demo": {
+        "label": "Demo",
+        "tooltip": "Interaktive Simulation erstellen"
+      },
+      "flashcard": {
+        "label": "Karteikarte",
+        "tooltip": "Karteikarten erstellen"
+      },
+      "summary": {
+        "label": "Zusammenfassung",
+        "tooltip": "Geführte Zusammenfassung schreiben"
+      },
+      "search": {
+        "label": "Suchen",
+        "tooltip": "Web/YouTube durchsuchen"
+      },
+      "webcam": {
+        "label": "Foto",
+        "tooltip": "Foto aufnehmen"
+      }
+    },
+    "history": {
+      "untitled": "Ohne Titel",
+      "active": "Aktiv",
+      "messageSingular": "Nachricht",
+      "messagePlural": "Nachrichten"
+    },
+    "inactivity": {
+      "title": "Bist du noch da?",
+      "description": "Wir haben seit einiger Zeit keine Aktivität festgestellt. Das Gespräch wird automatisch geschlossen in:",
+      "closeWarning": "Warnung schließen",
+      "summaryMessage": "Wenn Sie das Gespräch schließen, erstellen wir automatisch eine Sitzungszusammenfassung.",
+      "closeAndSummarize": "Schließen und Zusammenfassen",
+      "continueStudying": "Weiter Lernen"
+    },
+    "voice": {
+      "connectionError": "Sprachverbindungsfehler",
+      "serviceUnavailable": "Verbindung zum Sprachdienst nicht möglich",
+      "microphonePermission": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in Ihren Browsereinstellungen.",
+      "sessionTitle": "Sprachsitzung mit {name}",
+      "studyMethod": "Lernmethode",
+      "emotionalSupport": "Emotionale Unterstützung"
+    },
+    "handoff": {
+      "askToSwitch": "Möchtest du mit {name} sprechen?",
+      "decline": "Nein danke",
+      "accept": "Mit {name} sprechen"
+    },
+    "loading": "Laden...",
+    "error": "Errore nel caricamento della chat",
+    "newChat": "Nuova chat",
+    "clearChat": "Cancella chat"
+  },
+  "conversation": {
+    "detail": {
+      "back": "Zurück",
+      "backAriaLabel": "Back Aria Label",
+      "defaultTitle": "Default Title",
+      "emptyMessages": "Empty Messages",
+      "error": {
+        "loadingFailed": "Loading Failed",
+        "notFound": "Not Found",
+        "unknown": "Unknown"
+      },
+      "loading": "Laden...",
+      "summaryLabel": "Summary Label",
+      "timeAt": "Time At"
+    },
+    "handoff": {
+      "accept": "Accept",
+      "decline": "Decline",
+      "question": "Question"
+    },
+    "history": {
+      "dateFormat": {
+        "daysAgo": "Days Ago",
+        "today": "Oggi",
+        "yesterday": "Yesterday"
+      },
+      "empty": {
+        "all": "Tutti",
+        "filtered": "Filtered"
+      },
+      "loading": "Laden...",
+      "title": "Titolo"
+    },
+    "inactivity": {
+      "closeAriaLabel": "Close Aria Label",
+      "closeButton": "Close Button",
+      "continueButton": "Continue Button",
+      "description": "Descrizione",
+      "message": "Message",
+      "title": "Titolo"
+    },
+    "sidebar": {
+      "deleteConfirm": {
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "deleting": "Deleting",
+        "title": "Titolo"
+      },
+      "empty": "Empty",
+      "filters": {
+        "all": "Tutti",
+        "month": "Month",
+        "today": "Oggi",
+        "week": "Week"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Titolo"
+    },
+    "toolSelection": {
+      "closeAriaLabel": "Close Aria Label",
+      "empty": "Empty",
+      "question": "Question",
+      "search": "Suchen",
+      "title": "Titolo"
+    }
+  },
+  "session": {
+    "rating": {
+      "close": "Schließen",
+      "feedbackLabel": "Ihr Feedback",
+      "feedbackPlaceholder": "Teilen Sie Ihre Meinung...",
+      "labels": {
+        "1": "Sehr schlecht",
+        "2": "Schlecht",
+        "3": "Okay",
+        "4": "Gut",
+        "5": "Ausgezeichnet"
+      },
+      "minutes": "Minuten",
+      "savingError": "Fehler beim Speichern",
+      "selectError": "Bitte wählen Sie eine Bewertung",
+      "selectPlaceholder": "Thema auswählen",
+      "sessionWith": "Sitzung mit",
+      "skip": "Überspringen",
+      "stars": "Sterne",
+      "submit": "Absenden",
+      "submitting": "Wird gesendet",
+      "title": "Bewerten Sie Ihre Sitzung",
+      "topics": "Besprochene Themen"
+    },
+    "controls": {
+      "cancelResponseAriaLabel": "Antwort abbrechen",
+      "cancelResponseTooltip": "Aktuelle Antwort abbrechen",
+      "endSessionAriaLabel": "Sitzung beenden",
+      "endSessionTooltip": "Sprachsitzung beenden",
+      "inputPlaceholder": "Nachricht eingeben...",
+      "muteAriaLabel": {
+        "muted": "Stummgeschaltet",
+        "unmuted": "Ton aktiviert"
+      },
+      "muteTooltip": {
+        "muted": "Stummschaltung aufheben",
+        "unmuted": "Stummschalten"
+      },
+      "sendButton": "Senden",
+      "sendMessageAriaLabel": "Nachricht senden",
+      "sendMessageTooltip": "Nachricht senden",
+      "switchToChatAriaLabel": "Zum Chat wechseln",
+      "switchToChatTooltip": "Zurück zum Textchat"
+    }
+  },
+  "typing": {
+    "advanced": "Advanced",
+    "azerty": "Azerty",
+    "backToGames": "Back To Games",
+    "backToLessons": "Back To Lessons",
+    "beginner": "Beginner",
+    "dvorak": "Dvorak",
+    "games": "Giochi",
+    "infoDSA": "Info D S A",
+    "infoDSADesc": "Info D S A Desc",
+    "infoGamification": "Info Gamification",
+    "infoGamificationDesc": "Info Gamification Desc",
+    "infoMultiLanguage": "Info Multi Language",
+    "infoMultiLanguageDesc": "Info Multi Language Desc",
+    "infoOneHanded": "Info One Handed",
+    "infoOneHandedDesc": "Info One Handed Desc",
+    "intermediate": "Intermediate",
+    "keyboardLayout": "Keyboard Layout",
+    "lessons": "Lezioni",
+    "level": "Livello",
+    "progress": "Progresso",
+    "qwerty": "Qwerty",
+    "qwertz": "Qwertz",
+    "subtitle": "Sottotitolo",
+    "title": "Titolo",
+    "lessonSelector": {
+      "completed": "Completed",
+      "completedBadge": "Completed Badge",
+      "inProgress": "In Progress",
+      "title": "Titolo"
+    },
+    "oneHanded": {
+      "hideInfo": "Hide Info",
+      "info": {
+        "active": "Attivo",
+        "description": "Descrizione",
+        "tips": "Tips"
+      },
+      "modes": {
+        "both": {
+          "description": "Descrizione",
+          "label": "Label"
+        },
+        "leftOnly": {
+          "description": "Descrizione",
+          "label": "Label"
+        },
+        "rightOnly": {
+          "description": "Descrizione",
+          "label": "Label"
+        }
+      },
+      "showInfo": "Show Info",
+      "title": "Titolo"
+    },
+    "progressTracker": {
+      "noBadges": "No Badges"
+    },
+    "speedGame": {
+      "instructions": "Instructions",
+      "scoreLabel": "Score Label",
+      "startButton": "Start Button",
+      "wordsLabel": "Words Label"
+    },
+    "stickyKeys": {
+      "activated": "Activated",
+      "active": "Attivo",
+      "description": "Descrizione",
+      "enableButton": "Enable Button",
+      "enableFailed": "Enable Failed",
+      "enableManually": "Enable Manually",
+      "linuxInfo": "Linux Info",
+      "linuxSettings": "Linux Settings",
+      "openSettings": "Open Settings",
+      "restartRequired": "Restart Required",
+      "tip": "Tip",
+      "tipLabel": "Tip Label",
+      "title": "Titolo",
+      "unsupported": "Unsupported",
+      "windowsHint": "Windows Hint",
+      "windowsInfo": "Windows Info"
+    },
+    "visualImpairment": {
+      "visualDesc": "Visual Desc",
+      "visualFocusIndicators": "Visual Focus Indicators",
+      "visualFocusIndicatorsDesc": "Visual Focus Indicators Desc",
+      "visualHideTTSSettings": "Visual Hide T T S Settings",
+      "visualHighContrast": "Visual High Contrast",
+      "visualHighContrastDesc": "Visual High Contrast Desc",
+      "visualShowTTSSettings": "Visual Show T T S Settings",
+      "visualSpeechRateLabel": "Visual Speech Rate Label",
+      "visualSpeechVolumeLabel": "Visual Speech Volume Label",
+      "visualTTS": "Visual T T S",
+      "visualTTSDesc": "Visual T T S Desc",
+      "visualTextSizeLabel": "Visual Text Size Label",
+      "visualTextSizeRange": "Visual Text Size Range",
+      "visualTitle": "Visual Title",
+      "visualWCAGCompliance": "Visual W C A G Compliance"
+    }
+  },
+  "voice": {
+    "panel": {
+      "connected": "Verbunden",
+      "connecting": "Verbindung wird hergestellt...",
+      "listening": "Hört zu",
+      "microphoneDisabled": "Mikrofon deaktiviert",
+      "mutedLabel": "Stummgeschaltet",
+      "muteLabel": "Stummschalten",
+      "speakNow": "Jetzt sprechen",
+      "speaking": "Spricht",
+      "startingCall": "Anruf wird gestartet...",
+      "unmuteLabel": "Stummschaltung aufheben"
+    },
+    "connectionError": "Sprachverbindungsfehler",
+    "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in den Browsereinstellungen.",
+    "permission": {
+      "enableLabel": "Enable Label",
+      "steps": {
+        "findMicrophone": "Find Microphone",
+        "lockIcon": "Lock Icon",
+        "reload": "Reload",
+        "selectAllow": "Select Allow"
+      },
+      "subtitle": "Sottotitolo",
+      "switchToChat": "Switch To Chat",
+      "title": "Titolo"
+    }
+  }
+}

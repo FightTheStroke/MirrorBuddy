@@ -2,6 +2,7 @@ import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
 import security from "eslint-plugin-security";
+import localRules from "./eslint-local-rules/index.js";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -294,6 +295,21 @@ const eslintConfig = defineConfig([
           message: "Prefer validateAuth() or validateAdminAuth() from '@/lib/auth/session-auth' instead of direct cookie reads. See ADR 0075.",
         },
       ],
+    },
+  },
+  // i18n: Detect hardcoded Italian text in JSX - enforce translation usage
+  // See ADR 0079 for i18n multi-language implementation
+  {
+    files: ["src/**/*.tsx"],
+    ignores: [
+      "src/**/*.test.tsx",
+      "src/**/__tests__/**",
+    ],
+    plugins: {
+      "local-rules": { rules: localRules.rules },
+    },
+    rules: {
+      "local-rules/no-hardcoded-italian": "error",
     },
   },
 ]);

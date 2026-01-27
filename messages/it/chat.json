@@ -1,0 +1,329 @@
+{
+  "chat": {
+    "input": {
+      "placeholder": "Scrivi un messaggio...",
+      "ariaLabel": "Scrivi un messaggio a {name}",
+      "sendMessage": "Invia messaggio",
+      "enableAudio": "Attiva audio",
+      "disableAudio": "Disattiva audio",
+      "switchToText": "Passa al testo",
+      "switchToVoice": "Passa alla voce",
+      "send": "Invia",
+      "voiceStart": "Inizia registrazione vocale",
+      "voiceStop": "Ferma registrazione"
+    },
+    "header": {
+      "backButton": "Torna indietro",
+      "defaultDescription": "Sono qui per aiutarti",
+      "endCall": "Termina chiamata",
+      "startVoiceCall": "Chiama a voce",
+      "talkToCoach": "Parla con il Coach",
+      "talkToBuddy": "Parla con un amico"
+    },
+    "message": {
+      "thinking": "{name} sta pensando..."
+    },
+    "tools": {
+      "mindmap": {
+        "label": "Mappa",
+        "tooltip": "Crea mappa mentale"
+      },
+      "quiz": {
+        "label": "Quiz",
+        "tooltip": "Crea quiz"
+      },
+      "demo": {
+        "label": "Demo",
+        "tooltip": "Crea simulazione interattiva"
+      },
+      "flashcard": {
+        "label": "Flashcard",
+        "tooltip": "Crea flashcard"
+      },
+      "summary": {
+        "label": "Riassunto",
+        "tooltip": "Scrivi un riassunto guidato"
+      },
+      "search": {
+        "label": "Cerca",
+        "tooltip": "Cerca su web/YouTube"
+      },
+      "webcam": {
+        "label": "Foto",
+        "tooltip": "Scatta foto"
+      }
+    },
+    "history": {
+      "untitled": "Senza titolo",
+      "active": "Attiva",
+      "messageSingular": "messaggio",
+      "messagePlural": "messaggi"
+    },
+    "inactivity": {
+      "title": "Sei ancora qui?",
+      "description": "Non rileviamo attività da un po'. La conversazione si chiuderà automaticamente tra:",
+      "closeWarning": "Chiudi avviso",
+      "summaryMessage": "Se chiudi la conversazione, genereremo un riassunto automatico della sessione.",
+      "closeAndSummarize": "Chiudi e Riassumi",
+      "continueStudying": "Continua a Studiare"
+    },
+    "voice": {
+      "connectionError": "Errore di connessione vocale",
+      "serviceUnavailable": "Impossibile connettersi al servizio vocale",
+      "microphonePermission": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
+      "sessionTitle": "Sessione vocale con {name}",
+      "studyMethod": "Metodo di studio",
+      "emotionalSupport": "Supporto emotivo"
+    },
+    "handoff": {
+      "askToSwitch": "Vuoi parlare con {name}?",
+      "decline": "No grazie",
+      "accept": "Parla con {name}"
+    },
+    "loading": "Caricamento...",
+    "error": "Errore nel caricamento della chat",
+    "newChat": "Nuova chat",
+    "clearChat": "Cancella chat"
+  },
+  "conversation": {
+    "detail": {
+      "back": "Indietro",
+      "backAriaLabel": "Back Aria Label",
+      "defaultTitle": "Default Title",
+      "emptyMessages": "Empty Messages",
+      "error": {
+        "loadingFailed": "Loading Failed",
+        "notFound": "Not Found",
+        "unknown": "Unknown"
+      },
+      "loading": "Caricamento...",
+      "summaryLabel": "Summary Label",
+      "timeAt": "Time At"
+    },
+    "handoff": {
+      "accept": "Accept",
+      "decline": "Decline",
+      "question": "Question"
+    },
+    "history": {
+      "dateFormat": {
+        "daysAgo": "Days Ago",
+        "today": "Oggi",
+        "yesterday": "Yesterday"
+      },
+      "empty": {
+        "all": "Tutti",
+        "filtered": "Filtered"
+      },
+      "loading": "Caricamento...",
+      "title": "Titolo"
+    },
+    "inactivity": {
+      "closeAriaLabel": "Close Aria Label",
+      "closeButton": "Close Button",
+      "continueButton": "Continue Button",
+      "description": "Descrizione",
+      "message": "Message",
+      "title": "Titolo"
+    },
+    "sidebar": {
+      "deleteConfirm": {
+        "cancel": "Annulla",
+        "delete": "Elimina",
+        "deleting": "Deleting",
+        "title": "Titolo"
+      },
+      "empty": "Empty",
+      "filters": {
+        "all": "Tutti",
+        "month": "Month",
+        "today": "Oggi",
+        "week": "Week"
+      },
+      "search": {
+        "placeholder": "Placeholder"
+      },
+      "title": "Titolo"
+    },
+    "toolSelection": {
+      "closeAriaLabel": "Close Aria Label",
+      "empty": "Empty",
+      "question": "Question",
+      "search": "Cerca",
+      "title": "Titolo"
+    }
+  },
+  "session": {
+    "rating": {
+      "close": "Chiudi",
+      "feedbackLabel": "Feedback Label",
+      "feedbackPlaceholder": "Feedback Placeholder",
+      "labels": {
+        "1": "1",
+        "2": "2",
+        "3": "3",
+        "4": "4",
+        "5": "5"
+      },
+      "minutes": "Minutes",
+      "savingError": "Saving Error",
+      "selectError": "Select Error",
+      "selectPlaceholder": "Select Placeholder",
+      "sessionWith": "Session With",
+      "skip": "Skip",
+      "stars": "Stars",
+      "submit": "Invia",
+      "submitting": "Submitting",
+      "title": "Titolo",
+      "topics": "Topics"
+    },
+    "controls": {
+      "cancelResponseAriaLabel": "Annulla risposta",
+      "cancelResponseTooltip": "Annulla risposta in corso",
+      "endSessionAriaLabel": "Termina sessione",
+      "endSessionTooltip": "Termina la sessione vocale",
+      "inputPlaceholder": "Scrivi un messaggio...",
+      "muteAriaLabel": {
+        "muted": "Audio disattivato",
+        "unmuted": "Audio attivo"
+      },
+      "muteTooltip": {
+        "muted": "Attiva audio",
+        "unmuted": "Disattiva audio"
+      },
+      "sendButton": "Invia",
+      "sendMessageAriaLabel": "Invia messaggio",
+      "sendMessageTooltip": "Invia il messaggio",
+      "switchToChatAriaLabel": "Passa alla chat",
+      "switchToChatTooltip": "Torna alla chat testuale"
+    }
+  },
+  "typing": {
+    "advanced": "Advanced",
+    "azerty": "Azerty",
+    "backToGames": "Back To Games",
+    "backToLessons": "Back To Lessons",
+    "beginner": "Beginner",
+    "dvorak": "Dvorak",
+    "games": "Giochi",
+    "infoDSA": "Info D S A",
+    "infoDSADesc": "Info D S A Desc",
+    "infoGamification": "Info Gamification",
+    "infoGamificationDesc": "Info Gamification Desc",
+    "infoMultiLanguage": "Info Multi Language",
+    "infoMultiLanguageDesc": "Info Multi Language Desc",
+    "infoOneHanded": "Info One Handed",
+    "infoOneHandedDesc": "Info One Handed Desc",
+    "intermediate": "Intermediate",
+    "keyboardLayout": "Keyboard Layout",
+    "lessons": "Lezioni",
+    "level": "Livello",
+    "progress": "Progresso",
+    "qwerty": "Qwerty",
+    "qwertz": "Qwertz",
+    "subtitle": "Sottotitolo",
+    "title": "Titolo",
+    "lessonSelector": {
+      "completed": "Completed",
+      "completedBadge": "Completed Badge",
+      "inProgress": "In Progress",
+      "title": "Titolo"
+    },
+    "oneHanded": {
+      "hideInfo": "Hide Info",
+      "info": {
+        "active": "Attivo",
+        "description": "Descrizione",
+        "tips": "Tips"
+      },
+      "modes": {
+        "both": {
+          "description": "Descrizione",
+          "label": "Label"
+        },
+        "leftOnly": {
+          "description": "Descrizione",
+          "label": "Label"
+        },
+        "rightOnly": {
+          "description": "Descrizione",
+          "label": "Label"
+        }
+      },
+      "showInfo": "Show Info",
+      "title": "Titolo"
+    },
+    "progressTracker": {
+      "noBadges": "No Badges"
+    },
+    "speedGame": {
+      "instructions": "Instructions",
+      "scoreLabel": "Score Label",
+      "startButton": "Start Button",
+      "wordsLabel": "Words Label"
+    },
+    "stickyKeys": {
+      "activated": "Activated",
+      "active": "Attivo",
+      "description": "Descrizione",
+      "enableButton": "Enable Button",
+      "enableFailed": "Enable Failed",
+      "enableManually": "Enable Manually",
+      "linuxInfo": "Linux Info",
+      "linuxSettings": "Linux Settings",
+      "openSettings": "Open Settings",
+      "restartRequired": "Restart Required",
+      "tip": "Tip",
+      "tipLabel": "Tip Label",
+      "title": "Titolo",
+      "unsupported": "Unsupported",
+      "windowsHint": "Windows Hint",
+      "windowsInfo": "Windows Info"
+    },
+    "visualImpairment": {
+      "visualDesc": "Visual Desc",
+      "visualFocusIndicators": "Visual Focus Indicators",
+      "visualFocusIndicatorsDesc": "Visual Focus Indicators Desc",
+      "visualHideTTSSettings": "Visual Hide T T S Settings",
+      "visualHighContrast": "Visual High Contrast",
+      "visualHighContrastDesc": "Visual High Contrast Desc",
+      "visualShowTTSSettings": "Visual Show T T S Settings",
+      "visualSpeechRateLabel": "Visual Speech Rate Label",
+      "visualSpeechVolumeLabel": "Visual Speech Volume Label",
+      "visualTTS": "Visual T T S",
+      "visualTTSDesc": "Visual T T S Desc",
+      "visualTextSizeLabel": "Visual Text Size Label",
+      "visualTextSizeRange": "Visual Text Size Range",
+      "visualTitle": "Visual Title",
+      "visualWCAGCompliance": "Visual W C A G Compliance"
+    }
+  },
+  "voice": {
+    "panel": {
+      "connected": "Connesso",
+      "connecting": "Connessione...",
+      "listening": "In ascolto",
+      "microphoneDisabled": "Microfono disabilitato",
+      "mutedLabel": "Audio disattivato",
+      "muteLabel": "Disattiva audio",
+      "speakNow": "Parla ora",
+      "speaking": "Sta parlando",
+      "startingCall": "Avvio chiamata...",
+      "unmuteLabel": "Attiva audio"
+    },
+    "connectionError": "Errore di connessione vocale",
+    "microphoneUnauthorized": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
+    "permission": {
+      "enableLabel": "Enable Label",
+      "steps": {
+        "findMicrophone": "Find Microphone",
+        "lockIcon": "Lock Icon",
+        "reload": "Reload",
+        "selectAllow": "Select Allow"
+      },
+      "subtitle": "Sottotitolo",
+      "switchToChat": "Switch To Chat",
+      "title": "Titolo"
+    }
+  }
+}

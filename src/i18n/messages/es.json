@@ -1,0 +1,3046 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "warning": "Warning",
+    "info": "Information",
+    "confirm": "Confirm",
+    "cancel": "Cancelar",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "remove": "Remove",
+    "search": "Search",
+    "filter": "Filter",
+    "sort": "Sort",
+    "refresh": "Refresh",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset",
+    "clear": "Clear",
+    "select": "Select",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK",
+    "apply": "Apply",
+    "view": "View",
+    "download": "Download",
+    "upload": "Upload",
+    "print": "Print",
+    "export": "Export",
+    "import": "Import",
+    "copy": "Copy",
+    "paste": "Paste",
+    "cut": "Cut",
+    "undo": "Undo",
+    "redo": "Redo",
+    "help": "Help",
+    "settings": "Settings",
+    "profile": "Profile",
+    "logout": "Logout",
+    "login": "Login",
+    "retry": "Reintentar",
+    "ambientAudio": {
+      "loading": "Cargando audio..."
+    },
+    "dashboard": {
+      "noMaestroUsage": "Ningún Maestro utilizado"
+    },
+    "models": {
+      "selectModels": "Selecciona modelos de IA para cada característica. ★ = recomendado, ⚠ = no recomendado",
+      "mainFeatures": "Características principales",
+      "notRecommended": "No recomendado para esta característica"
+    },
+    "errorUnexpected": "Ocurrió un error inesperado. Por favor intenta más tarde.",
+    "errorTitle": "Algo salió mal",
+    "wcagCompliance": "Cumplimiento WCAG 2.1 AA"
+  },
+  "home": {
+    "title": "La Escuela Que Quiero",
+    "loading": "Cargando...",
+    "returnHome": "Volver al inicio",
+    "openMenu": "Abrir menú",
+    "closeMenu": "Cerrar menú",
+    "trialMode": "Modo Prueba",
+    "login": "Iniciar Sesión",
+    "requestAccess": "Solicitar Acceso",
+    "parentArea": "Área de Padres",
+    "adminDashboard": "Panel de Administración",
+    "logout": "Cerrar Sesión",
+    "season": {
+      "autumn": "Otoño"
+    }
+  },
+  "navigation": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "chat": "Chat",
+    "maestri": "Teachers",
+    "coaches": "Coaches",
+    "buddies": "Buddies",
+    "tools": "Tools",
+    "flashcards": "Flashcards",
+    "mindmap": "Mind Map",
+    "quiz": "Quiz",
+    "homework": "Homework",
+    "documents": "Documents",
+    "learningPath": "Learning Path",
+    "progress": "Progreso",
+    "achievements": "Achievements",
+    "settings": "Configuración",
+    "profile": "Profile",
+    "admin": "Administration",
+    "help": "Help",
+    "support": "Support",
+    "about": "About",
+    "privacy": "Privacy",
+    "terms": "Terms of Service",
+    "calendar": "Calendario",
+    "parentArea": "Parent Area",
+    "adminDashboard": "Admin Dashboard",
+    "breadcrumbs": {
+      "home": "Home",
+      "separator": "/"
+    },
+    "professors": "Profesores",
+    "backpack": "Mochila",
+    "toolcase": "Estuche"
+  },
+  "auth": {
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión",
+    "register": "Registrarse",
+    "signIn": "Iniciar sesión",
+    "signUp": "Registrarse",
+    "signOut": "Cerrar sesión",
+    "email": "Email",
+    "password": {
+      "minLength": "Mínimo 8 caracteres",
+      "requiresUppercase": "Al menos una letra mayúscula",
+      "requiresLowercase": "Al menos una letra minúscula",
+      "requiresNumber": "Al menos un número",
+      "changeErrorDefault": "Error al cambiar la contraseña",
+      "connectionError": "Error de conexión. Por favor, inténtelo de nuevo.",
+      "successTitle": "¡Contraseña cambiada!",
+      "successMessage": "Tu contraseña ha sido actualizada correctamente. Serás redirigido...",
+      "pageTitle": "Cambiar contraseña",
+      "pageSubtitle": "Por tu seguridad, debes cambiar tu contraseña temporal.",
+      "currentPasswordLabel": "Contraseña actual *",
+      "currentPasswordPlaceholder": "Contraseña temporal recibida por correo",
+      "newPasswordLabel": "Nueva contraseña *",
+      "newPasswordPlaceholder": "Elige una contraseña segura",
+      "confirmPasswordLabel": "Confirmar contraseña *",
+      "confirmPasswordPlaceholder": "Repite tu nueva contraseña",
+      "passwordMismatch": "Las contraseñas no coinciden",
+      "submitButtonLoading": "Cambiando contraseña...",
+      "submitButtonText": "Cambiar contraseña"
+    },
+    "confirmPassword": "Confirmar contraseña",
+    "username": "Nombre de usuario",
+    "rememberMe": "Recuérdame",
+    "forgotPassword": "¿Olvidó su contraseña?",
+    "resetPassword": "Restablecer contraseña",
+    "changePassword": "Cambiar contraseña",
+    "newPassword": "Nueva contraseña",
+    "currentPassword": "Contraseña actual",
+    "createAccount": "Crear cuenta",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta?",
+    "dontHaveAccount": "¿No tienes una cuenta?",
+    "backToLogin": "Volver a iniciar sesión",
+    "welcomeBack": "¡Bienvenido de vuelta!",
+    "welcome": "¡Bienvenido!",
+    "loginSuccess": "Inicio de sesión exitoso",
+    "logoutSuccess": "Cierre de sesión exitoso",
+    "registrationSuccess": "Registro exitoso",
+    "signInToAccount": "Inicia sesión en tu cuenta",
+    "yourEmail": "Tu correo electrónico",
+    "yourPassword": "Tu contraseña",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
+    "signingIn": "Iniciando sesión...",
+    "invalidCredentials": "Credenciales inválidas",
+    "connectionError": "Error de conexión",
+    "noAccount": "¿Aún no tienes una cuenta?",
+    "requestBetaAccess": "Solicitar acceso Beta",
+    "emailRequired": "El correo electrónico es obligatorio",
+    "passwordRequired": "La contraseña es obligatoria",
+    "passwordMismatch": "Las contraseñas no coinciden",
+    "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+    "emailInvalid": "Email inválido",
+    "userExists": "El usuario ya existe",
+    "userNotFound": "Usuario no encontrado",
+    "sessionExpired": "La sesión ha expirado, por favor inicie sesión nuevamente",
+    "unauthorized": "No autorizado"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "unknown": "Unknown error",
+    "network": "Network error",
+    "timeout": "Request timeout",
+    "notFound": "Not found",
+    "forbidden": "Access denied",
+    "unauthorized": "Unauthorized",
+    "serverError": "Server error",
+    "badRequest": "Bad request",
+    "validation": "Validation error",
+    "required": "This field is required",
+    "invalidFormat": "Invalid format",
+    "tooShort": "Too short",
+    "tooLong": "Too long",
+    "invalidEmail": "Invalid email",
+    "invalidUrl": "Invalid URL",
+    "invalidPhone": "Invalid phone number",
+    "invalidDate": "Invalid date",
+    "fileTooBig": "File too large",
+    "fileTypeNotAllowed": "File type not allowed",
+    "uploadFailed": "Upload failed",
+    "downloadFailed": "Download failed",
+    "saveFailed": "Save failed",
+    "deleteFailed": "Delete failed",
+    "loadFailed": "Load failed",
+    "tryAgain": "Try again",
+    "contactSupport": "Contact support"
+  },
+  "accessibility": {
+    "skipToContent": "Skip to content",
+    "skipToNavigation": "Skip to navigation",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "toggleMenu": "Toggle menu",
+    "openDialog": "Open dialog",
+    "closeDialog": "Close dialog",
+    "loading": "Loading",
+    "loadingComplete": "Loading complete",
+    "searchResults": "Search results",
+    "noResults": "No results",
+    "currentPage": "Current page",
+    "page": "Page",
+    "of": "of",
+    "selected": "selected",
+    "sortAscending": "Sort ascending",
+    "sortDescending": "Sort descending",
+    "expandSection": "Expand section",
+    "collapseSection": "Collapse section",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "required": "required",
+    "optional": "optional",
+    "errorMessage": "Error message",
+    "warningMessage": "Warning message",
+    "successMessage": "Success message",
+    "infoMessage": "Info message",
+    "screenReaderOnly": "Screen reader only",
+    "newWindow": "opens in new window",
+    "externalLink": "external link"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Must be at least {min} characters",
+    "maxLength": "Cannot exceed {max} characters",
+    "pattern": "Invalid format",
+    "numeric": "Must be a number",
+    "url": "Please enter a valid URL",
+    "date": "Please enter a valid date",
+    "phone": "Please enter a valid phone number",
+    "password": {
+      "minLength": "Password must be at least 8 characters",
+      "requireUppercase": "Password must contain at least one uppercase letter",
+      "requireLowercase": "Password must contain at least one lowercase letter",
+      "requireNumber": "Password must contain at least one number",
+      "requireSpecial": "Password must contain at least one special character",
+      "mismatch": "Passwords do not match"
+    }
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "pending": "Pending",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "draft": "Draft",
+    "published": "Published",
+    "archived": "Archived",
+    "deleted": "Deleted",
+    "enabled": "Enabled",
+    "disabled": "Disabled",
+    "online": "Online",
+    "offline": "Offline",
+    "available": "Available",
+    "unavailable": "Unavailable",
+    "processing": "Processing",
+    "success": "Success",
+    "failed": "Failed",
+    "error": "Error"
+  },
+  "welcome": {
+    "welcome-form": {
+      "hello-melissa": "¡Hola! Soy Melissa",
+      "your-support-teacher": "Tu maestra de apoyo",
+      "welcome-intro": "¡Bienvenido a la Escuela que Desearía! Estoy aquí para ayudarte a estudiar de la manera que mejor funciona para ti.",
+      "dont-worry": "No te preocupes si algo te parece difícil - ¡juntos siempre encontraremos una manera de entenderlo!",
+      "what-is-your-name": "¿Cuál es tu nombre?",
+      "enter-your-name-placeholder": "Escribe tu nombre...",
+      "nice-to-meet-you": "¡Mucho gusto!",
+      "replay-mode-message": "Estás revisando el tutorial. Tus datos existentes no serán modificados.",
+      "enable-voice": "Activar voz",
+      "disable-voice": "Desactivar voz",
+      "tell-me-about-you": "¡Cuéntame un poco sobre ti, {name}!",
+      "help-personalize": "Esto me ayudará a personalizar tu experiencia",
+      "learning-differences-label": "¿Tienes alguna dificultad de aprendizaje particular? (opcional)",
+      "learning-differences-hint": "Esto nos ayuda a hacer la app más accesible para ti",
+      "school-elementary": "Primaria",
+      "school-middle": "Secundaria",
+      "school-high": "Preparatoria",
+      "collected-data": "Datos recopilados",
+      "age": "Edad",
+      "years": "años",
+      "school": "Escuela",
+      "learning-differences": "Dificultades de aprendizaje",
+      "optional": "(opcional)"
+    },
+    "trial-limits": {
+      "title": "Modo de Prueba Gratuita",
+      "subtitle": "Explora MirrorBuddy sin registro",
+      "messages": "Mensajes",
+      "messages-value": "10 por sesión",
+      "maestri": "Maestri",
+      "maestri-value": "3 disponibles",
+      "tools": "Herramientas",
+      "tools-value": "Básico",
+      "cta-question": "¿Quieres acceso completo a todos los Maestri y herramientas?",
+      "cta-button": "Solicitar acceso beta"
+    },
+    "tier-comparison": {
+      "heading": "Elige el plan perfecto para ti",
+      "subheading": "Comienza con una prueba gratuita o regístrate para desbloquear más funciones",
+      "footer-note": "Todos los planes incluyen acceso a 22 Maestri IA y herramientas de aprendizaje personalizadas"
+    },
+    "principles": {
+      "welcome-to-school": "¡Bienvenido a la Escuela que Desearía, {name}!",
+      "what-makes-us-special": "Esto es lo que nos hace especiales",
+      "accessible-learning": "Aprendizaje Accesible",
+      "accessible-learning-desc": "Caminos de aprendizaje personalizados para tus necesidades",
+      "ai-teachers": "22 Maestros IA",
+      "ai-teachers-desc": "Expertos en cada materia, siempre disponibles",
+      "your-pace": "A Tu Ritmo",
+      "your-pace-desc": "Aprende cuando quieras, durante el tiempo que quieras",
+      "no-judgment": "Sin Juzgar",
+      "no-judgment-desc": "Un espacio seguro para aprender y cometer errores",
+      "melissa-quote": "¡Recuerda: no hay preguntas estúpidas, solo mentes curiosas!",
+      "ready-to-start": "¿Listo para empezar?",
+      "how-it-works": "¿Cómo funciona?",
+      "how-it-works-desc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pídele a Euclides. ¡Para inglés, está Shakespeare! Te ayudaré a elegir al Profesor correcto para cada situación."
+    },
+    "ready": {
+      "perfect": "¡Perfecto, {name}!",
+      "ready-to-start": "¡Estás listo para comenzar tu aventura!",
+      "prepared-for-you": "¡He preparado todo para ti! Recuerda:",
+      "always-talk": "Siempre puedes hablarme - estoy aquí para ayudarte con tu método de estudio",
+      "choose-professor": "Elige un Profesor",
+      "choose-professor-desc": "para cada materia hay el experto correcto",
+      "earn-xp": "Gana XP - ¡cada lección te ayuda a subir de nivel!",
+      "back": "Atrás",
+      "lets-start": "¡Comencemos!",
+      "tutorial-end": "Fin del tutorial. ¡Haz clic en \"¡Comencemos!\" para volver a la app."
+    },
+    "quick-start": {
+      "go-to-app": "Ir a la app",
+      "update-profile": "Actualizar perfil",
+      "full-access": "ACCESO COMPLETO",
+      "free-trial": "PRUEBA GRATUITA",
+      "have-account": "¿Tienes una cuenta?",
+      "try-now": "Explora ahora",
+      "22-maestri": "22 Maestri IA",
+      "all-tools": "Todas las herramientas",
+      "unlimited-chats": "Chats ilimitados",
+      "login": "Iniciar sesión",
+      "try-free": "Prueba gratis"
+    },
+    "hero": {
+      "title": "La Escuela que Desearía",
+      "subtitle": "Maestros IA personalizados para tus necesidades",
+      "cta": "Comienza Ahora",
+      "welcome": "Bienvenido a",
+      "learn": "Aprende",
+      "with-teachers": "CON los Grandes Profesores",
+      "any-ability": "cualquiera que sean tus habilidades",
+      "readable-fonts": "Fuentes legibles",
+      "mind-maps": "Mapas mentales",
+      "text-to-speech": "Conversión de texto a voz",
+      "adaptive-quizzes": "Cuestionarios adaptativos"
+    },
+    "voice-fallback": {
+      "title": "Modo Alternativo:",
+      "message": "API Realtime de Azure no disponible. Melissa usa la API Web Speech del navegador (voz sintética, sin conversación)."
+    }
+  },
+  "settings": {
+    "notifications": {
+      "title": "Notificaciones",
+      "enable": "Habilitar notificaciones",
+      "description": "Activar o desactivar todas las notificaciones",
+      "push": "Notificaciones push",
+      "pushGranted": "Reciba notificaciones incluso cuando la aplicación esté cerrada",
+      "pushDenied": "Permiso denegado - verifique la configuración de su navegador",
+      "pushDefault": "Habilitar notificaciones push del navegador",
+      "pushButton": "Habilitar",
+      "sound": "Sonidos",
+      "soundDescription": "Reproducir sonidos para notificaciones",
+      "typeTitle": "Tipos de notificaciones",
+      "reminders": "Recordatorios de estudio",
+      "remindersDesc": "Reciba un recordatorio para estudiar",
+      "streaks": "Alertas de racha",
+      "streaksDesc": "Notificación cuando corre riesgo de perder su racha",
+      "achievements": "Logros",
+      "achievementsDesc": "Notificación cuando desbloquea un logro",
+      "levelUp": "Niveles",
+      "levelUpDesc": "Notificación cuando subes de nivel",
+      "breaks": "Descansos",
+      "breaksDesc": "Sugerencias para hacer descansos (modo ADHD)",
+      "sessionEnd": "Fin de sesión",
+      "sessionEndDesc": "Resumen al final de la sesión de estudio"
+    },
+    "tabs": {
+      "profile": "Perfil",
+      "characters": "Personajes",
+      "accessibility": "Accesibilidad",
+      "appearance": "Apariencia",
+      "aiProvider": "Proveedor de IA",
+      "audio": "Audio/Vídeo",
+      "ambientAudio": "Audio ambiental",
+      "integrations": "Integraciones",
+      "notifications": "Notificaciones",
+      "statistics": "Estadísticas",
+      "privacy": "Privacidad",
+      "parents": "Padres",
+      "diagnostics": "Diagnósticos"
+    },
+    "view": {
+      "title": "Configuración",
+      "undoTitle": "Deshacer cambios",
+      "undoButton": "Deshacer",
+      "savingButton": "Guardando...",
+      "saveChangesButton": "Guardar cambios",
+      "saveButton": "Guardar",
+      "parentAreaTitle": "Área de padres",
+      "parentAreaDescription": "Accede al panel de padres dedicado para monitorear el progreso y las actividades de tu hijo de forma segura y respetando la privacidad (GDPR).",
+      "consentRequiredTitle": "Consentimiento requerido:",
+      "consentRequiredText": "El panel de padres requiere el consentimiento tanto del padre como del estudiante para cumplir con las regulaciones del GDPR sobre la protección de datos de menores.",
+      "openParentDashboard": "Abrir panel de padres"
+    },
+    "diagnostics": {
+      "title": "Diagnóstico del sistema",
+      "description": "Verifica que todos los componentes funcionen correctamente: configuración, API de chat (con respuesta de IA), voz (con reproducción de audio), micrófono y altavoz.",
+      "runAllTests": "Ejecutar todas las pruebas",
+      "connecting": "Conectando...",
+      "config": "Configuración",
+      "chatApi": "API de Chat",
+      "voiceTest": "Voz (prueba completa)",
+      "microphone": "Micrófono",
+      "speaker": "Altavoz / Audio"
+    },
+    "accessibility": {
+      "panelTitle": "Accesibilidad",
+      "closePanel": "Cerrar panel",
+      "quickProfiles": "Perfiles Rápidos",
+      "quickSettings": "Configuración Rápida",
+      "largeText": "Texto Grande",
+      "highContrast": "Alto Contraste",
+      "reduceAnimations": "Reducir Animaciones",
+      "dyslexiaFont": "Fuente Dislexia",
+      "resetSettings": "Restablecer Configuración",
+      "resetDefaults": "Restablecer configuración predeterminada",
+      "mobileSubtitle": "Personaliza la experiencia según tus necesidades",
+      "sectionTitle": "Configuraciones",
+      "allSettings": "Todas las Configuraciones",
+      "auditoryTitle": "Accesibilidad Auditiva",
+      "auditoryDesc": "Configuración para usuarios sordos o con pérdida auditiva.",
+      "auditoryVisualCues": "Indicadores visuales para audio",
+      "auditoryVisualCuesDesc": "Muestra indicadores visuales para todos los eventos de audio",
+      "auditoryCaptions": "Subtítulos activados",
+      "auditoryCaptionsDesc": "Muestra subtítulos para instrucciones de audio",
+      "auditoryNoAudioOnly": "Sin contenido solo de audio",
+      "auditoryNoAudioOnlyDesc": "Garantiza que toda la información esté visualmente disponible",
+      "autismTitle": "Accesibilidad del Autismo",
+      "autismDesc": "Configuración para usuarios del espectro autista.",
+      "autismReducedMotion": "Movimiento reducido",
+      "autismReducedMotionDesc": "Desactiva animaciones innecesarias",
+      "autismPredictableLayouts": "Diseños predecibles",
+      "autismPredictableLayoutsDesc": "Mantiene una estructura consistente y predecible",
+      "autismMinimalUI": "Interfaz Minimalista",
+      "autismMinimalUIDesc": "Elimina elementos decorativos y distracciones",
+      "cerebralTitle": "Accesibilidad de Parálisis Cerebral",
+      "cerebralDesc": "Adaptaciones motoras y cognitivas combinadas.",
+      "cerebralAdaptiveDifficulty": "Dificultad adaptativa",
+      "cerebralAdaptiveDifficultyDesc": "Ajusta automáticamente la dificultad según el desempeño",
+      "cerebralSimplifiedUI": "Interfaz Simplificada",
+      "cerebralSimplifiedUIDesc": "Reduce elementos visuales para minimizar la sobrecarga cognitiva",
+      "cerebralCustomShortcuts": "Atajos personalizables",
+      "cerebralCustomShortcutsDesc": "Permite configurar atajos de teclado",
+      "cerebralTimeoutExtended": "Tiempos de espera extendidos",
+      "cerebralTimeoutExtendedDesc": "Extiende o desactiva los tiempos de espera de inactividad",
+      "motorTitle": "Accesibilidad Motora",
+      "motorDesc": "Configuración para usuarios con dificultades motrices o control limitado.",
+      "motorLargeClickTargets": "Objetivos de clic grandes",
+      "motorLargeClickTargetsDesc": "Aumenta el tamaño de los botones virtuales a mínimo 44x44px",
+      "motorKeyboardNav": "Navegación por teclado",
+      "motorKeyboardNavDesc": "Habilita navegación completa con Tabulación, Intro, Escape",
+      "motorAdjustableTimeout": "Tiempo de espera ajustable",
+      "motorAdjustableTimeoutDesc": "Permite ajustar o desactivar los tiempos de espera de inactividad",
+      "motorTimeoutLabel": "Tiempo de espera (segundos)",
+      "motorTimeoutDisableHint": "Establece en 0 para desactivar el tiempo de espera",
+      "motorKeyboardShortcuts": "Atajos de teclado",
+      "motorKeyboardShortcutsDesc": "Habilita atajos para acciones comunes",
+      "motorShowShortcuts": "Mostrar atajos",
+      "motorHideShortcuts": "Ocultar atajos",
+      "motorShortcutPause": "Pausar/Reanudar",
+      "motorShortcutExit": "Salir de la lección",
+      "motorShortcutTab": "Mover foco",
+      "motorShortcutEnter": "Seleccionar/Confirmar",
+      "motorShortcutHint": "Mostrar pista",
+      "motorShortcutMute": "Silenciar/Activar audio",
+      "motorPauseResume": "Pausa/Reanudación instantánea",
+      "motorPauseResumeDesc": "Permite pausar la lección en cualquier momento",
+      "motorRecommendations": "Recomendaciones: Para mejor experiencia, combina estos ajustes con modo de una mano y teclas persistentes.",
+      "visualTitle": "Accesibilidad Visual",
+      "visualDesc": "Configuración para usuarios con problemas de visión.",
+      "visualHighContrast": "Alto contraste",
+      "visualHighContrastDesc": "Aumenta el contraste de colores para mejor legibilidad",
+      "visualTextSizeLabel": "Tamaño de texto",
+      "visualTextSizeRange": "100% (normal) - 200% (máximo)",
+      "visualTTS": "Texto a Voz (TTS)",
+      "visualTTSDesc": "Lee en voz alta las instrucciones y retroalimentación",
+      "visualShowTTSSettings": "Mostrar configuración de TTS",
+      "visualHideTTSSettings": "Ocultar configuración de TTS",
+      "visualSpeechRateLabel": "Velocidad",
+      "visualSpeechVolumeLabel": "Volumen",
+      "visualFocusIndicators": "Indicadores de foco",
+      "visualFocusIndicatorsDesc": "Muestra resaltado claro del elemento activo",
+      "visualWCAGCompliance": "Cumplimiento de WCAG 2.1 AA: Todos los ajustes respetan los requisitos de accesibilidad para usuarios con discapacidad visual.",
+      "dyslexiaLineHeightText": "Texto con altura de línea aumentada para mejorar la legibilidad. Cada línea tiene más espacio vertical entre ellas.",
+      "a11yOpenSettings": "Abrir configuración de accesibilidad",
+      "a11yActiveProfile": "Perfil activo",
+      "profileDyslexia": "Dislexia",
+      "profileADHD": "TDAH",
+      "profileVisual": "Visual",
+      "profileMotor": "Motora",
+      "profileAutism": "Autismo",
+      "profileAuditory": "Auditiva",
+      "profileCerebral": "Motora+",
+      "a11yActivateProfile": "Activar perfil"
+    },
+    "onboarding": {
+      "title": "Tutoriales y reinicio",
+      "reviewTutorial": {
+        "title": "Revisar el tutorial",
+        "description": "Vea de nuevo la presentación de Melissa y los Profesores. Sus datos no serán modificados.",
+        "button": "Revisar Tutorial"
+      },
+      "resetComplete": {
+        "title": "Reinicio completo",
+        "description": "Elimina TODOS tus datos y comienza de nuevo. ¡Esta acción es irreversible!",
+        "button": "Reinicio Completo"
+      },
+      "confirmDialog": {
+        "titles": {
+          "step1": "¿Estás seguro?",
+          "step2": "Confirmar con RESET",
+          "step3": "Confirmación final"
+        },
+        "descriptions": {
+          "step1": "Estás a punto de eliminar TODOS tus datos:",
+          "step1Items": [
+            "Progreso y XP",
+            "Tarjetas de memoria y materiales guardados",
+            "Conversaciones con Profesores",
+            "Configuraciones y preferencias"
+          ],
+          "step2": "Para confirmar, escribe RESET en el campo a continuación.",
+          "step3": "Esta es tu última advertencia. Haz clic en \"Eliminar todo\" para continuar. ¡NO puedes volver atrás!"
+        },
+        "input": "Escribe RESET...",
+        "buttons": {
+          "cancel": "Cancelar",
+          "deleting": "Eliminando...",
+          "deleteAll": "Eliminar todo",
+          "continue": "Continuar"
+        }
+      }
+    }
+  },
+  "astuccio": {
+    "backButton": "Volver a Astuccio",
+    "itemCount": "{count} herramientas",
+    "how_it_works": {
+      "title": {},
+      "step1_title": {},
+      "step1_desc": {},
+      "step2_title": {},
+      "step2_desc": {},
+      "step3_title": {},
+      "step3_desc": {}
+    },
+    "study_tip": {
+      "title": {},
+      "description": {}
+    }
+  },
+  "zaino": {
+    "print": {
+      "success": "Impresión iniciada",
+      "successDescription": "El documento se abrirá en la ventana de impresión.",
+      "error": "Error de impresión",
+      "errorDescription": "No se puede abrir la ventana de impresión. Comprueba la configuración de ventanas emergentes.",
+      "downloadSuccess": "Archivo descargado",
+      "downloadSuccessDescription": "El archivo HTML se ha descargado.",
+      "downloadError": "Error",
+      "downloadErrorDescription": "No se puede descargar el archivo.",
+      "ariaLabel": "Imprimir {title}",
+      "button": "Imprimir",
+      "optionsAriaLabel": "Opciones de impresión para {title}",
+      "printPdf": "Imprimir PDF",
+      "downloadHtml": "Descargar HTML"
+    }
+  },
+  "tools": {
+    "pdf": {
+      "label": "Cargar PDF",
+      "description": "Carga un documento PDF y genera automáticamente materiales de estudio",
+      "preview": {
+        "processing": "Procesando PDF...",
+        "close": "Cerrar",
+        "page": "Página",
+        "pages": "Páginas",
+        "selected-count": "{count, plural, one {1 página} other {{count} páginas}} seleccionada(s)",
+        "click-to-select": "(haz clic para seleccionar/deseleccionar)",
+        "cancel": "Cancelar",
+        "analyze": "Analizar",
+        "analyze-pages": "{count, plural, one {página} other {{count} páginas}}",
+        "truncated-info": "primeras mostradas",
+        "processing-error": "Error al procesar PDF."
+      }
+    },
+    "webcam": {
+      "inProgress": "En Progreso...",
+      "takePhoto": "Tomar Foto",
+      "retake": "Repetir",
+      "confirm": "Confirmar",
+      "loading": "Iniciando cámara...",
+      "capturedPhoto": "Foto Capturada",
+      "switching": "Cambiando cámara...",
+      "cancel": "Cancelar",
+      "changCamera": "Cambiar Cámara",
+      "positioning": "Posiciona el contenido en el marco"
+    },
+    "homework": {
+      "label": "Ayuda con Tareas",
+      "description": "Carga un ejercicio y recibe asistencia guiada paso a paso"
+    },
+    "studyKit": {
+      "label": "Kit de Estudio",
+      "description": "Carga un PDF y genera automáticamente resúmenes, mapas, demos y cuestionarios"
+    },
+    "mindmap": {
+      "label": "Mapa Mental",
+      "description": "Visualiza las conexiones entre conceptos con mapas interactivos"
+    },
+    "quiz": {
+      "label": "Quiz",
+      "description": "Prueba tu comprensión con cuestionarios personalizados"
+    },
+    "flashcard": {
+      "label": "Flashcard",
+      "description": "Memoriza con flashcards inteligentes y repetición espaciada"
+    },
+    "demo": {
+      "label": "Demo Interactiva",
+      "description": "Explora conceptos STEM con simulaciones interactivas"
+    },
+    "summary": {
+      "save": "Guardar",
+      "saved": "Guardado",
+      "exportPdf": "Exportar como PDF",
+      "convertToMindmap": "Convertir a Mapa Mental",
+      "generateFlashcards": "Generar Tarjetas de Puntos Clave",
+      "titlePlaceholder": "Título del Resumen...",
+      "wordCount": "{count} {count, plural, one {palabra} other {palabras}}",
+      "unsaved": "No Guardado",
+      "structure": "Estructura",
+      "edit": "Escribir",
+      "preview": "Vista Previa",
+      "writeHere": "Empieza a escribir aquí...",
+      "emptyContent": "Sin contenido aún. ¡Empieza a escribir!",
+      "toggleSidebar": "Ocultar",
+      "showSidebar": "Mostrar",
+      "commentsUnresolved": "{count} comentarios para leer (ver vista previa)",
+      "commentsResolved": "Todos los comentarios resueltos",
+      "incomplete": "Para completar",
+      "goodStart": "¡Buen comienzo! Continúa...",
+      "doingWell": "¡Te está yendo bien!",
+      "congratulations": "¡Felicidades!",
+      "word": "palabra",
+      "words": "palabras"
+    },
+    "diagram": {
+      "label": "Diagrama",
+      "description": "Crea diagramas de flujo y esquemas visuales"
+    },
+    "timeline": {
+      "label": "Línea de Tiempo",
+      "description": "Organiza eventos históricos o secuencias visualmente"
+    },
+    "formula": {
+      "label": "Fórmula",
+      "description": "Visualiza y comprende fórmulas matemáticas y científicas"
+    },
+    "chart": {
+      "label": "Gráfico",
+      "description": "Crea gráficos y visualizaciones para datos y estadísticas"
+    },
+    "typing": {
+      "title": "Aprende a Escribir",
+      "description": "La herramienta \"Aprende a Escribir\" está en desarrollo.",
+      "features": "Características",
+      "recommendedLesson": "Lección recomendada:",
+      "noLesson": "Ninguna",
+      "level": "Nivel:",
+      "speedGame": {
+        "instructions": "Escribe palabras lo más rápido posible. ¡Tienes 60 segundos!",
+        "startButton": "Iniciar Juego",
+        "scoreLabel": "Puntos",
+        "wordsLabel": "Palabras"
+      },
+      "lessonSelector": {
+        "title": "Lecciones {level}",
+        "completed": "completadas",
+        "completedBadge": "Completada",
+        "inProgress": "En curso"
+      }
+    },
+    "search": {
+      "noResults": "No se encontraron resultados para \"{query}\"",
+      "resultCount": "{count} resultados para \"{query}\"",
+      "wikiOnly": "Solo Wikipedia"
+    },
+    "markmap": {
+      "error": "Error:",
+      "accessibility": {
+        "title": "Modo de accesibilidad",
+        "ariaLabel": "Activar/desactivar modo de accesibilidad"
+      },
+      "resetView": {
+        "title": "Reiniciar vista",
+        "ariaLabel": "Reiniciar vista"
+      },
+      "zoomOut": {
+        "title": "Alejar",
+        "ariaLabel": "Alejar"
+      },
+      "zoomIn": {
+        "title": "Acercar",
+        "ariaLabel": "Acercar"
+      },
+      "fullscreen": {
+        "enter": "Pantalla completa",
+        "exit": "Salir de pantalla completa",
+        "ariaLabelEnter": "Pantalla completa",
+        "ariaLabelExit": "Salir de pantalla completa"
+      },
+      "download": {
+        "title": "Descargar PNG",
+        "ariaLabel": "Descargar mapa mental como PNG"
+      },
+      "print": {
+        "title": "Imprimir",
+        "ariaLabel": "Imprimir mapa mental"
+      },
+      "mindmapDescription": "Mapa mental: {title}",
+      "interactiveMindmapDescription": "Mapa mental interactivo: {title}",
+      "instructions": "Arrastra para mover • Desplazamiento/pellizco para ampliar • Haz clic en los nodos para expandir/contraer",
+      "successMessage": "Mapa mental \"{title}\" renderizado correctamente.",
+      "interactiveRenderMessage": "Mapa mental \"{title}\" renderizado con {count} nodos."
+    },
+    "connection": {
+      "connected": "Conectado - edición por voz activa",
+      "connecting": "Conectando...",
+      "reconnecting": "Reconectando...",
+      "error": "Conexión fallida",
+      "disconnected": "Desconectado"
+    },
+    "toolPanel": {
+      "buildingTool": "Construyendo...",
+      "expand": "Expandir",
+      "minimize": "Minimizar",
+      "close": "Cerrar",
+      "errorCreating": "Error al crear la herramienta",
+      "unsupportedTool": "Tipo de herramienta no soportado: {type}",
+      "percentComplete": "{percent}% Completado..."
+    },
+    "loading": {
+      "preparing": "Preparando...",
+      "receivedChunks": "Recibidos {count} fragmentos",
+      "loadingData": "Cargando datos...",
+      "loadingMaterial": "Cargando material...",
+      "buildCancelled": "Construcción cancelada",
+      "errorOccurred": "Ocurrió un error"
+    },
+    "print": {
+      "successTitle": "Impresión iniciada",
+      "successMessage": "El documento se abrirá en la ventana de impresión.",
+      "downloadSuccessTitle": "Archivo descargado",
+      "downloadSuccessMessage": "El archivo HTML ha sido descargado.",
+      "errorTitle": "Error de impresión",
+      "errorMessage": "No se puede abrir la ventana de impresión. Verifica la configuración de ventanas emergentes.",
+      "errorGenericMessage": "No se puede descargar el archivo.",
+      "ariaPrint": "Imprimir {title}",
+      "ariaOptions": "Opciones de impresión para {title}",
+      "buttonLabel": "Imprimir",
+      "pdfOption": "Imprimir PDF",
+      "htmlOption": "Descargar HTML"
+    }
+  },
+  "education": {
+    "tools": {
+      "mindmap": "Mapa Mental",
+      "quiz": "Quiz",
+      "flashcard": "Tarjetas",
+      "summary": "Resumen",
+      "demo": "Demo Interactiva",
+      "diagram": "Diagrama",
+      "timeline": "Cronología",
+      "formula": "Fórmula",
+      "calculator": "Calculadora",
+      "chart": "Gráfico",
+      "search": "Búsqueda",
+      "webcam": "Foto",
+      "pdf": "PDF",
+      "homework": "Deberes",
+      "typing": "Aprender a Escribir",
+      "study-kit": "Kit de Estudio"
+    },
+    "quiz": {
+      "title": "Quiz",
+      "subtitle": "Prueba tu conocimiento y gana XP",
+      "createWithProfessor": "Crear Quiz con un Profesor",
+      "completed": "{count} completados",
+      "loading": "Cargando quiz guardados...",
+      "yourQuizzes": "Tus Quiz",
+      "sampleQuizzes": "Quiz de Ejemplo",
+      "completed-badge": "Completado",
+      "start-button": "Iniciar Quiz",
+      "delete-confirm": "¿Estás seguro de que quieres eliminar este quiz?",
+      "delete-button": "Eliminar quiz",
+      "questions-count": "{count} preguntas",
+      "created": "Creado el {date}",
+      "comingSoon": "¡Más quiz próximamente!",
+      "comingSoonMessage": "Tus Profesores están preparando nuevos quiz para cada materia. ¡Estudia con ellos y los quiz se adaptarán a tu progreso!"
+    },
+    "quizReview": {
+      "loadingSuggestions": "Cargando sugerencias...",
+      "failedSuggestions": "No se pudieron cargar las sugerencias de repaso",
+      "suggestionsTitle": "Sugerencias de Repaso",
+      "suggestionsText": "Tu puntuación está por debajo del 60%. Te recomendamos repasar estos temas:",
+      "highPriority": "Prioridad Alta",
+      "suggestedMaterials": "Materiales Sugeridos:",
+      "needsReview": "Necesitas repasar {topic}",
+      "reviewText": "¡Repasa estos temas e intenta el quiz de nuevo para mejorar tu puntuación!"
+    },
+    "toolSelection": {
+      "chooseSubject": "Crear {tool} - Elegir Materia",
+      "chooseProfessor": "Crear {tool} - Elegir Profesor",
+      "back": "Atrás",
+      "close": "Cerrar"
+    },
+    "learning-path": {
+      "loading-path": "Cargando ruta de aprendizaje...",
+      "path-not-found": "Ruta de aprendizaje no encontrada",
+      "back": "Atrás",
+      "topics": "temas",
+      "continue-with": "Continuar con",
+      "next-topic": "Siguiente tema",
+      "continue": "Continuar",
+      "start": "Comenzar",
+      "topics-header": "Temas",
+      "loading-paths": "Cargando rutas de aprendizaje...",
+      "no-paths-created": "No hay rutas de aprendizaje creadas",
+      "no-paths-description": "¡Carga un PDF en Study Kit y genera tu primera ruta de aprendizaje progresivo!",
+      "go-to-study-kit": "Ir a Study Kit",
+      "path-singular": "ruta",
+      "path-plural": "rutas",
+      "learning-paths": "aprendizaje",
+      "completed-topics": "temas",
+      "status-completed": "Completado",
+      "status-in-progress": "En progreso",
+      "status-not-started": "No comenzado",
+      "loading-topic": "Cargando tema...",
+      "topic-not-found": "Tema no encontrado",
+      "steps-completed": "pasos completados",
+      "progress": "Progreso",
+      "key-concepts": "Conceptos clave",
+      "steps": "Pasos",
+      "no-steps-available": "No hay pasos disponibles para este tema",
+      "error": "Error:",
+      "locked": "Bloqueado",
+      "unlocked": "Desbloqueado",
+      "in-progress-legend": "En progreso",
+      "completed-legend": "Completado",
+      "visual-title": "Ruta de aprendizaje",
+      "topics-completed-count": "temas completados"
+    },
+    "flashcards": {
+      "title": "Tarjetas de aprendizaje",
+      "fsrsDescription": "Sistema de repetición espaciada FSRS-5",
+      "createWithProfessor": "Crear con un Profesor",
+      "manualMode": "Modo manual",
+      "loading": "Cargando...",
+      "emptyState": "Ningún mazo creado",
+      "emptyStateDescription": "Crea tu primer mazo de tarjetas de aprendizaje para comenzar a estudiar",
+      "createDeckButton": "Crear mazo",
+      "editDeckTitle": "Editar mazo",
+      "newDeckTitle": "Nuevo mazo",
+      "deckNameLabel": "Nombre del mazo",
+      "deckNamePlaceholder": "Ej: Verbos irregulares en inglés",
+      "subjectLabel": "Asignatura",
+      "cardsLabel": "Tarjetas ({count})",
+      "cardFrontPlaceholder": "Pregunta (frente)",
+      "cardBackPlaceholder": "Respuesta (reverso)",
+      "addCardButton": "Agregar tarjeta",
+      "cancelButton": "Cancelar",
+      "saveButton": "Guardar",
+      "ratingQuestion": "¿Qué tan fácil fue recordar?"
+    },
+    "calendar": {
+      "title": "Calendario",
+      "newEvent": "Nuevo evento",
+      "editEvent": "Editar evento",
+      "titleLabel": "Título",
+      "titlePlaceholder": "Ej: Examen de matemáticas",
+      "subjectLabel": "Asignatura",
+      "typeLabel": "Tipo",
+      "dateLabel": "Fecha",
+      "priorityLabel": "Prioridad",
+      "priorityLow": "Baja",
+      "priorityMedium": "Media",
+      "priorityHigh": "Alta",
+      "notesLabel": "Notas (opcional)",
+      "notesPlaceholder": "Detalles adicionales...",
+      "cancelButton": "Cancelar",
+      "addButton": "Añadir",
+      "saveButton": "Guardar",
+      "upcomingEvents": "Eventos próximos",
+      "today": "Hoy",
+      "tomorrow": "Mañana",
+      "daysUntil": "{daysUntil} días",
+      "emptyState": "Sin eventos programados",
+      "emptyStateSubtitle": "¡Añade exámenes y tareas!"
+    },
+    "parent-dashboard": {
+      "quiz": {
+        "no-quizzes": "Ningún cuestionario completado aún"
+      }
+    },
+    "knowledge-hub": {
+      "error-title": "Error de visualización",
+      "error-message-with-type": "No se puede mostrar el material de tipo \"{type}\".",
+      "error-message-default": "No se puede mostrar este material.",
+      "retry-button": "Reintentar"
+    },
+    "archive": {
+      "title": "Mochila",
+      "subtitle": "Todos tus materiales de estudio guardados",
+      "searchPlaceholder": "Buscar materiales...",
+      "sortLabel": "Ordenar por",
+      "gridView": "Vista de cuadrícula",
+      "listView": "Vista de lista",
+      "emptyMaterials": "Sin materiales guardados",
+      "emptyPreferred": "Sin favoritos guardados",
+      "emptyDescription": "Los materiales creados durante tus sesiones de estudio aparecerán aquí. ¡Comienza una conversación con un Profesor para crear contenido nuevo!",
+      "startConversation": "Comenzar una conversación"
+    },
+    "characterSwitcher": {
+      "recent": "Reciente",
+      "noCharactersFound": "No se encontraron personajes"
+    },
+    "flashcard": {
+      "again": "De nuevo",
+      "hard": "Difícil",
+      "good": "Bien",
+      "easy": "Fácil",
+      "completed": "¡Completado!",
+      "completedMessage": "Has revisado todas las tarjetas de hoy.",
+      "continueButton": "Continuar",
+      "cardCounter": "Tarjeta {current} de {total}",
+      "cardsReviewed": "{count} revisadas",
+      "question": "Pregunta",
+      "tapToFlip": "Toca para girar",
+      "answer": "Respuesta",
+      "easyQuestion": "¿Qué tan fácil fue recordar?",
+      "navigationHint": "Presiona espacio o haz clic para mostrar la respuesta"
+    },
+    "quiz-header": {
+      "question-counter": "Pregunta {current} de {total}",
+      "correct-count": "{count} correctas"
+    },
+    "quiz-completion": {
+      "excellent": "¡Excelente trabajo!",
+      "keep-practicing": "¡Sigue practicando!",
+      "correct-answers": "Respondiste correctamente {correct} preguntas de {total}",
+      "retry-button": "Reintentar",
+      "continue-button": "Continuar"
+    },
+    "topic-card": {
+      "continue-button": "Continuar",
+      "start-button": "Comenzar",
+      "quiz-label": "Quiz",
+      "difficulty": {
+        "basic": "Básico",
+        "intermediate": "Intermedio",
+        "advanced": "Avanzado"
+      }
+    },
+    "step-content": {
+      "overview-unavailable": "Contenido de descripción general no disponible",
+      "mindmap-description": "Ver el mapa mental para este tema",
+      "open-mindmap-button": "Abrir Mapa",
+      "flashcard-description": "Estudia con fichas para memorizar conceptos",
+      "start-flashcard-button": "Comenzar Fichas",
+      "quiz-description": "Prueba tu comprensión con un quiz",
+      "start-quiz-button": "Comenzar Quiz",
+      "content-unavailable": "Contenido no disponible"
+    },
+    "calendar-grid": {
+      "aria-label-previous-month": "Mes anterior",
+      "aria-label-next-month": "Próximo mes",
+      "today-button": "Hoy",
+      "more-events": "+{count} más",
+      "day-names": {
+        "monday": "Lun",
+        "tuesday": "Mar",
+        "wednesday": "Mié",
+        "thursday": "Jue",
+        "friday": "Vie",
+        "saturday": "Sáb",
+        "sunday": "Dom"
+      }
+    },
+    "thumbnail-preview": {
+      "webcam-alt": "Vista previa de foto",
+      "homework-alt": "Vista previa de tarea",
+      "homework-label": "Tarea",
+      "questions-label": "preguntas",
+      "flashcard-label": "fichas",
+      "demo-label": "Demo Interactiva"
+    },
+    "mindmaps": {
+      "title": "Mapas mentales",
+      "subtitle": "Ve e imprime tus mapas mentales creados durante las lecciones",
+      "createWithProfessor": "Crear con un Profesor",
+      "manualMode": "Modo manual",
+      "examples": "Ejemplos",
+      "import": "Importar",
+      "how": "¿Cómo funcionan los mapas mentales?",
+      "description": "Durante las lecciones con profesores, pídeles que creen un mapa mental sobre cualquier tema. Los mapas mentales aparecerán aquí automáticamente y podrás imprimirlos o descargarlos para estudiar sin conexión."
+    },
+    "subject-confirmation": {
+      "photoAlt": "Foto de la tarea",
+      "chooseProfessor": "Elige un Profesor",
+      "selectSubject": "Selecciona la Asignatura"
+    },
+    "success-metrics": {
+      "title": "Métricas de éxito",
+      "progressDescription": "Progreso de {studentName} hacia la autonomía",
+      "overallScore": "Puntuación general",
+      "quote": "Nuestro éxito se mide cuando el estudiante ya no nos necesita.",
+      "quoteAuthor": "— ManifestoEdu",
+      "milestones": "Hitos",
+      "milestonesDescription": "{achieved} logrados, {pending} por desbloquear",
+      "upcomingMilestones": "Próximos hitos:"
+    },
+    "summaries": {
+      "title": "Resúmenes",
+      "subtitle": "Tus resúmenes creados durante las sesiones con Entrenadores y Profesores",
+      "createButton": "Crear con un Profesor",
+      "infoTitle": "¿Cómo crear un resumen?",
+      "infoDescription": "Habla con un Entrenador o Profesor y pregunta: \"Necesito crear un resumen sobre...\" Te guiarán paso a paso en la creación de un resumen estructurado.",
+      "loading": "Cargando...",
+      "emptySummaries": "No hay resúmenes guardados",
+      "emptyDescription": "Los resúmenes creados durante las sesiones con Entrenadores y Profesores aparecerán aquí. Intenta preguntar: \"Necesito crear un resumen sobre la fotosíntesis\"",
+      "defaultTitle": "Resumen",
+      "mindmapSuccess": "¡Mapa mental guardado!",
+      "mindmapSuccessDetail": "Creados {count} nodos de \"{topic}\".",
+      "mindmapError": "Error",
+      "mindmapErrorDetail": "No se pudo guardar el mapa mental.",
+      "flashcardsSuccess": "¡Tarjetas de estudio guardadas!",
+      "flashcardsSuccessDetail": "Creadas {count} tarjetas de estudio de \"{topic}\".",
+      "flashcardsError": "Error",
+      "flashcardsErrorDetail": "No se pudieron guardar las tarjetas de estudio."
+    },
+    "selectedMaestro": "Selecciona un Maestro",
+    "htmlSnippetsLoading": "Cargando contenido...",
+    "emptyState": "No hay métricas disponibles",
+    "emptyStateDescription": "Las métricas de éxito se calcularán después de algunas sesiones de estudio. Comienza a interactuar con los Profesores para ver tu progreso.",
+    "selectMaestro": "Selecciona un Profesor",
+    "selectSubject": "Selecciona una materia",
+    "materialViewer": {
+      "noContent": "No hay contenido disponible para este material."
+    },
+    "noMaterialAvailable": "Sin material disponible",
+    "htmlSnippetsTitle": "Visualización HTML",
+    "maestroTitle": "Profesor",
+    "parentDashboardTitle": "Panel de Control de Padres",
+    "noDataAvailable": "No hay datos disponibles",
+    "svgDiagram": {
+      "error": "Error:"
+    },
+    "maestroSelectionStep": {
+      "noSpecificProfessor": "Sin profesor específico para esta materia. Elige entre todos los Profesores:"
+    },
+    "htmlSnippetsView": {
+      "loading": "Cargando demo..."
+    },
+    "parentDashboard": {
+      "profileTitle": "Perfil de {studentName}"
+    },
+    "subjectConfirmation": {
+      "maestroPanel": {
+        "description": "con un Profesor? Te guiará paso a paso."
+      },
+      "subjectPanel": {
+        "detected": "Materia detectada:",
+        "confirmOrSelect": "Confirma o selecciona otra materia.",
+        "unrecognized": "No pude reconocer la materia automáticamente.",
+        "selectCorrect": "Selecciona la materia correcta:",
+        "cancel": "Cancelar",
+        "confirm": "Confirmar"
+      }
+    },
+    "emptyMetrics": {
+      "description": "Las métricas de éxito se calcularán después de algunas sesiones de estudio. Comienza a interactuar con los Profesores para ver tu progreso."
+    }
+  },
+  "chat": {
+    "input": {
+      "placeholder": "Escribe a {name}...",
+      "ariaLabel": "Escribe un mensaje a {name}",
+      "sendMessage": "Enviar mensaje",
+      "enableAudio": "Activar audio",
+      "disableAudio": "Desactivar audio",
+      "switchToText": "Cambiar a texto",
+      "switchToVoice": "Cambiar a voz"
+    },
+    "header": {
+      "backButton": "Volver",
+      "defaultDescription": "Estoy aquí para ayudarte",
+      "endCall": "Finalizar llamada",
+      "startVoiceCall": "Iniciar llamada de voz",
+      "talkToCoach": "Hablar con el Coach",
+      "talkToBuddy": "Hablar con un amigo"
+    },
+    "message": {
+      "thinking": "{name} está pensando..."
+    },
+    "tools": {
+      "mindmap": {
+        "label": "Mapa",
+        "tooltip": "Crear mapa mental"
+      },
+      "quiz": {
+        "label": "Quiz",
+        "tooltip": "Crear quiz"
+      },
+      "demo": {
+        "label": "Demo",
+        "tooltip": "Crear simulación interactiva"
+      },
+      "flashcard": {
+        "label": "Flashcard",
+        "tooltip": "Crear flashcards"
+      },
+      "summary": {
+        "label": "Resumen",
+        "tooltip": "Escribir un resumen guiado"
+      },
+      "search": {
+        "label": "Buscar",
+        "tooltip": "Buscar en web/YouTube"
+      },
+      "webcam": {
+        "label": "Foto",
+        "tooltip": "Tomar foto"
+      }
+    },
+    "history": {
+      "untitled": "Sin título",
+      "active": "Activa",
+      "messageSingular": "mensaje",
+      "messagePlural": "mensajes"
+    },
+    "inactivity": {
+      "title": "¿Sigues ahí?",
+      "description": "No hemos detectado actividad desde hace un rato. La conversación se cerrará automáticamente en:",
+      "closeWarning": "Cerrar aviso",
+      "summaryMessage": "Si cierras la conversación, generaremos un resumen automático de la sesión.",
+      "closeAndSummarize": "Cerrar y Resumir",
+      "continueStudying": "Continuar Estudiando"
+    },
+    "voice": {
+      "connectionError": "Error de conexión de voz",
+      "serviceUnavailable": "No se puede conectar al servicio de voz",
+      "microphonePermission": "Micrófono no autorizado. Habilita el micrófono en la configuración de tu navegador.",
+      "sessionTitle": "Sesión de voz con {name}",
+      "studyMethod": "Método de estudio",
+      "emotionalSupport": "Apoyo emocional"
+    },
+    "handoff": {
+      "askToSwitch": "¿Quieres hablar con {name}?",
+      "decline": "No gracias",
+      "accept": "Hablar con {name}"
+    }
+  },
+  "toasts": {
+    "trial": {
+      "welcome": {
+        "title": "¡Bienvenido a MirrorBuddy!",
+        "message": "Tienes {maxChats} mensajes gratuitos. Solicita acceso beta para desbloquear todo.",
+        "action": "Solicitar Acceso"
+      },
+      "warning3Left": {
+        "title": "Solo 3 mensajes restantes",
+        "message": "Solicita acceso beta para continuar sin límites.",
+        "action": "Solicitar Acceso"
+      },
+      "lastMessage": {
+        "title": "¡Último mensaje!",
+        "message": "Este es tu último mensaje de prueba.",
+        "action": "Solicitar Acceso"
+      },
+      "exhausted": {
+        "title": "Mensajes agotados",
+        "message": "Solicita acceso beta para continuar usando MirrorBuddy.",
+        "action": "Solicitar Acceso"
+      }
+    },
+    "admin": {
+      "tierChanged": "Plan cambiado con éxito",
+      "tierChangeFailed": "Error al cambiar el plan",
+      "limitOverrideSuccess": "Límites actualizados con éxito",
+      "limitOverrideFailed": "Error al actualizar los límites",
+      "noSubscription": "El usuario no tiene suscripción",
+      "bulkTierSuccess": "Planes actualizados con éxito para {count} usuarios",
+      "bulkTierFailed": "Error al cambiar los planes",
+      "tierSaved": "Plan guardado con éxito",
+      "tierSaveFailed": "Error al guardar el plan",
+      "requiredFields": "Código y nombre son obligatorios"
+    },
+    "pdf": {
+      "downloaded": "PDF descargado",
+      "downloadedAndSaved": "PDF descargado y guardado en Zaino",
+      "exportFailed": "Error durante la exportación",
+      "generationFailed": "Error al generar la ruta"
+    },
+    "quiz": {
+      "completed": "¡Quiz completado! +{xp} XP",
+      "masteryAchieved": "¡Maestría alcanzada!",
+      "keepGoing": "¡Sigue así!"
+    },
+    "flashcard": {
+      "completed": "¡Sesión completada! +{xp} XP",
+      "masteryAchieved": "¡Maestría alcanzada!",
+      "keepGoing": "¡Sigue así!"
+    },
+    "mindmap": {
+      "saved": "¡Mapa mental guardado!",
+      "saveFailed": "No se pudo guardar el mapa mental."
+    },
+    "pomodoro": {
+      "sessionComplete": "¡Pomodoro completado! +{xp} XP",
+      "focusTime": "Tiempo de concentración: {minutes} minutos"
+    },
+    "typing": {
+      "stickyKeysEnabled": "Teclas persistentes activadas",
+      "stickyKeysDisabled": "Teclas persistentes desactivadas",
+      "stickyKeysFailed": "Error al actualizar las teclas persistentes",
+      "stickyKeysInfo": "Presiona una tecla a la vez para Shift, Ctrl, Alt, Command",
+      "stickyKeysActive": "Teclas persistentes activas: {key}"
+    },
+    "googleDrive": {
+      "notReady": "Google Picker no está listo. Inténtalo de nuevo en unos segundos.",
+      "notConnected": "Primero debes conectar Google Drive en Configuración.",
+      "configMissing": "Configuración de Google faltante"
+    },
+    "storage": {
+      "storageAdded": "Se agregaron {amount} MB a tu espacio"
+    },
+    "maestro": {
+      "sessionSaved": "¡Conversación guardada en Zaino!"
+    },
+    "tos": {
+      "mustAccept": "Debes aceptar los Términos de Servicio para continuar"
+    },
+    "studyKit": {
+      "printFailed": "No se pudo abrir la ventana de impresión",
+      "mindmapSaved": "¡Mapa mental guardado en zaino!",
+      "flashcardsSaved": "¡Flashcards guardadas en zaino!"
+    }
+  },
+  "buddies": {
+    "mario": {
+      "personality": "Amigable, irónico, comprensivo, cercano",
+      "greeting": "¡Eh! Soy Mario. Tengo {age} años y uso MirrorBuddy como tú. ¿Cómo va?"
+    },
+    "noemi": {
+      "personality": "Empática, alegre, acogedora, buena oyente",
+      "greeting": "¡Hola! Soy Noemi. Tengo {age} años y uso MirrorBuddy como tú. ¿Cómo estás?"
+    },
+    "enea": {
+      "personality": "Alegre, positivo, ingenioso, enérgico, empático",
+      "greeting": "¡Eh! Soy Enea, tengo {age} años. También uso MirrorBuddy para estudiar... bueno, entre pausas 😄 ¿Cómo te va?"
+    },
+    "bruno": {
+      "personality": "Reflexivo, tranquilo, profundo, buen oyente, auténtico",
+      "greeting": "Hola. Soy Bruno, tengo {age} años. Si quieres hablar, estoy aquí. ¿Cómo estás?"
+    },
+    "sofia": {
+      "personality": "Creativa, soñadora, profunda, artística, empática",
+      "greeting": "¡Hola! Soy Sofia, tengo {age} años. Me gusta leer, dibujar... y sí, también estudiar a mi manera 📚 ¿Cómo estás?"
+    },
+    "marta": {
+      "personality": "Deportista, decidida, práctica, directa pero amable",
+      "greeting": "¡Hola! Soy Marta, tengo {age} años. Me encantan las montañas y el deporte. ¿Y tú?"
+    }
+  },
+  "invite": {
+    "backButton": "Atrás",
+    "pageTitle": "Solicitar Acceso a Beta",
+    "pageDescription": "MirrorBuddy está en beta privada. Complete el formulario para solicitar acceso.",
+    "successTitle": "¡Solicitud Enviada!",
+    "successMessage": "¡Gracias por tu interés en MirrorBuddy! Te contactaremos pronto por correo electrónico con tus credenciales de acceso.",
+    "backToHome": "Volver al Inicio",
+    "nameLabel": "Nombre *",
+    "namePlaceholder": "Tu nombre",
+    "emailLabel": "Email *",
+    "emailPlaceholder": "tu-email@ejemplo.com",
+    "motivationLabel": "¿Por qué deseas usar MirrorBuddy? *",
+    "motivationPlaceholder": "Cuéntanos un poco sobre ti y por qué estás interesado...",
+    "minimumCharacters": "Mínimo 20 caracteres",
+    "submitButtonSubmitting": "Enviando...",
+    "submitButtonText": "Enviar Solicitud",
+    "confirmationText": "Recibirás un correo de confirmación y, si se aprueba, tus credenciales de acceso.",
+    "haveAccount": "¿Ya tienes una cuenta?",
+    "loginButton": "Inicia Sesión",
+    "errorDefault": "Error al enviar la solicitud",
+    "errorSession": "Sesión caducada. Recarga la página e intenta de nuevo.",
+    "errorConnection": "Error de conexión. Por favor, intenta de nuevo."
+  },
+  "legal": {
+    "terms": {
+      "backToHome": "Volver al inicio",
+      "backToHomeAriaLabel": "Volver a la página de inicio de MirrorBuddy",
+      "pageNavAriaLabel": "Navegación de la página",
+      "title": "Términos de Servicio de MirrorBuddy",
+      "version": "Versión {version}",
+      "lastUpdated": "Última actualización: {lastUpdated}",
+      "tldrHeading": "En resumen (TL;DR)",
+      "tldrItems": {
+        "free": "MirrorBuddy es gratis, hecho para ayudar",
+        "notSchool": "No somos una escuela, la IA puede cometer errores",
+        "supervised": "Úsalo con un adulto cerca si tienes menos de 18 años",
+        "respect": "Respeta a los demás, nosotros te respetamos",
+        "feedback": "¿Problemas? Escríbenos, estamos aquí para ayudar"
+      },
+      "questionsPrefix": "¿Preguntas? Escríbenos:",
+      "questionsEmail": "info@fightthestroke.org",
+      "sections": {
+        "section1": {
+          "title": "Qué es MirrorBuddy",
+          "content1": "MirrorBuddy es una aplicación gratuita que utiliza inteligencia artificial para ayudar a niños y adolescentes a estudiar.",
+          "content2": "Es un proyecto de la Fundación FightTheStroke, creado por personas que quieren hacer el aprendizaje más accesible para todos."
+        },
+        "section2": {
+          "title": "Lo que prometemos",
+          "item1": "Hacer nuestro mejor esfuerzo para crear una herramienta útil",
+          "item2": "Proteger sus datos (ver Política de privacidad)",
+          "item3": "Escuchar sus comentarios y mejorar",
+          "item4": "Ser transparente sobre cómo funciona"
+        },
+        "section3": {
+          "title": "Lo que NO podemos prometer",
+          "intro": "Seamos honestos: MirrorBuddy tiene limitaciones.",
+          "school": {
+            "heading": "No somos una escuela",
+            "content": "MirrorBuddy ayuda a estudiar, pero no reemplaza a maestros y escuelas."
+          },
+          "ai": {
+            "heading": "La IA puede cometer errores",
+            "content": "La inteligencia artificial es buena pero no perfecta. Siempre verifica respuestas importantes con un adulto o un libro."
+          },
+          "beta": {
+            "heading": "Es un servicio gratuito en versión beta",
+            "content": "Hacemos nuestro mejor esfuerzo, pero el servicio podría no funcionar siempre o podría cambiar."
+          }
+        },
+        "section4": {
+          "title": "Profesores de IA",
+          "intro": "MirrorBuddy incluye profesores virtuales inspirados en figuras históricas y contemporáneas. Esto es lo que debes saber:",
+          "educational": {
+            "heading": "Propósito puramente educativo",
+            "content": "Los profesores de IA se crean exclusivamente con fines educativos y de demostración. No representan personas reales y no están afiliados ni aprobados por ellas."
+          },
+          "changeable": {
+            "heading": "Los profesores pueden cambiar",
+            "content": "La lista de profesores disponibles puede variar con el tiempo. Algunos podrían ser reemplazados o eliminados."
+          },
+          "demo": {
+            "heading": "Versión de demostración",
+            "content": "Esta versión sirve para demostrar las capacidades de la plataforma. En el futuro, cada estudiante podrá crear sus propios profesores personalizados, eligiendo libremente nombres y avatares."
+          }
+        },
+        "section5": {
+          "title": "Si algo sale mal",
+          "intro": "MirrorBuddy es gratuito y hecho con amor. No podemos ser responsables si:",
+          "item1": "La IA da una respuesta incorrecta",
+          "item2": "El servicio no funciona por un tiempo",
+          "item3": "No pasas un examen (¡estudiar sigue siendo fundamental!)",
+          "item4": "Algo sucede mientras usas la app",
+          "note": "Esto no significa que no nos importa - ¡nos importa mucho! Pero legalmente necesitamos protegernos para continuar ayudando."
+        },
+        "section6": {
+          "title": "Te pedimos que...",
+          "intro": "Para que todo funcione bien, te pedimos que:",
+          "respect": {
+            "label": "Usa MirrorBuddy con respeto",
+            "content": "hacia la app y hacia otros"
+          },
+          "noAbuse": {
+            "label": "No intentes \"engañar\" a la IA",
+            "content": "no le hagas decir cosas malas o peligrosas"
+          },
+          "report": {
+            "label": "Repórtanos los problemas",
+            "content": "si algo anda mal, cuéntanos: info@fightthestroke.org"
+          },
+          "notShare": {
+            "label": "No compartas tu cuenta",
+            "content": "es personal"
+          }
+        },
+        "section7": {
+          "title": "Para padres y tutores",
+          "intro": "Si tu hijo tiene menos de 14 años:",
+          "responsible": {
+            "label": "Eres responsable",
+            "content": "de su uso de MirrorBuddy"
+          },
+          "supervise": {
+            "label": "Te pedimos que supervises",
+            "content": "mantente cerca mientras usa la app"
+          },
+          "check": {
+            "label": "Verifica las conversaciones",
+            "content": "puedes hacerlo en cualquier momento"
+          },
+          "contact": {
+            "label": "Habla con nosotros si tienes dudas",
+            "content": "también somos padres, entendemos"
+          }
+        },
+        "section8": {
+          "title": "Tus datos",
+          "intro": "Tratamos tus datos con respeto. Para todos los detalles, lee la",
+          "privacyLink": "Política de privacidad completa",
+          "brief": "En resumen:",
+          "item1": "Recopilamos solo lo que necesitamos",
+          "item2": "No vendemos tus datos a nadie",
+          "item3": "Puedes borrar todo cuando quieras",
+          "item4": "Los datos permanecen en Europa"
+        },
+        "section9": {
+          "title": "¿Podemos bloquearte?",
+          "intro": "Sí, pero solo si:",
+          "item1": "Abusas del servicio",
+          "item2": "Intentas dañar a otros usuarios",
+          "item3": "Violas estos términos gravemente",
+          "note": "Antes de bloquearte, intentaremos hablar contigo. No estamos aquí para castigar, estamos aquí para ayudar."
+        },
+        "section10": {
+          "title": "Cambios en estos términos",
+          "intro": "Si cambiamos estos términos:",
+          "item1": "Te notificaremos",
+          "item2": "Te pediremos que aceptes de nuevo",
+          "item3": "No cambiaremos las reglas \"en secreto\""
+        },
+        "section11": {
+          "title": "Ley y tribunal",
+          "line1": "Estos términos se rigen por la ley italiana.",
+          "line2": "Si realmente no podemos resolver un problema hablando, el tribunal competente es el de Milán."
+        }
+      }
+    },
+    "cookies": {
+      "page": {
+        "title": "Política de Cookies de MirrorBuddy",
+        "version": "1.1",
+        "lastUpdated": "21 de enero de 2025",
+        "backHome": "Volver al inicio",
+        "contactQuestion": "¿Preguntas sobre cookies? Escríbenos",
+        "contactEmail": "info@fightthestroke.org"
+      },
+      "tldr": {
+        "heading": "En breve (TL;DR)",
+        "point1": "Solo 4 cookies esenciales (autenticación y accesibilidad)",
+        "point2": "Sin cookies de publicidad o rastreo",
+        "point3": "Sin cookies de análisis instaladas (métricas del lado del servidor)",
+        "point4": "Los subprocesadores (Vercel, Azure, Supabase) no utilizan cookies"
+      },
+      "sections": {
+        "whatAreCookies": {
+          "title": "Qué son las cookies",
+          "p1": "Las cookies son pequeños archivos de texto que los sitios web guardan en su dispositivo (computadora, teléfono, tableta). Ayudan a recordar información útil, como si ya ha iniciado sesión.",
+          "p2": "Piense en las cookies como notas adhesivas que el sitio web deja en su navegador para recordarle."
+        },
+        "whichCookies": {
+          "title": "Qué cookies utilizamos",
+          "intro": "MirrorBuddy utiliza solo dos tipos de cookies",
+          "essential": "Cookies esenciales",
+          "essentialDesc": "necesarias para que funcione la aplicación",
+          "analytics": "Cookies de análisis",
+          "analyticsDesc": "nos ayudan a entender si la aplicación funciona bien",
+          "disclaimer": "NUNCA utilizamos cookies publicitarias. Nunca. No tenemos publicidad."
+        },
+        "essentialCookies": {
+          "title": "Cookies esenciales",
+          "intro": "Estas cookies son necesarias para usar MirrorBuddy. No puede desactivarlas porque sin ellas la aplicación no funcionaría.",
+          "note": "La cookie de autenticación utiliza la firma HMAC-SHA256 para prevenir la manipulación. La bandera httpOnly protege contra el acceso no autorizado de JavaScript."
+        },
+        "metricsAnalytics": {
+          "title": "Métricas y análisis",
+          "p1": "MirrorBuddy no utiliza cookies de análisis de terceros. Sus preferencias de cookies se guardan en el navegador (localStorage), no en una cookie.",
+          "h3Collection": "Cómo recopilamos métricas",
+          "p2": "Recopilamos métricas técnicas (Web Vitals) para entender si la aplicación funciona bien. Estas métricas son",
+          "serverSide": "Recopiladas del lado del servidor",
+          "serverSideDesc": "ninguna cookie de análisis instalada en su navegador",
+          "aggregated": "Agregadas y anónimas",
+          "aggregatedDesc": "no le identificamos personalmente",
+          "technicalOnly": "Solo técnicas",
+          "technicalOnlyDesc": "velocidad de carga, tipo de dispositivo, errores",
+          "gdprCompliant": "Conforme al RGPD",
+          "gdprCompliantDesc": "datos procesados según la Política de Privacidad",
+          "readMore": "Para más detalles, lea la sección \"Métricas de Rendimiento\" en la"
+        },
+        "cookieManagement": {
+          "title": "Cómo administrar cookies",
+          "inSettings": "En la configuración de MirrorBuddy",
+          "settingsDesc": "Puede administrar cookies de análisis directamente desde la aplicación. Vaya a configuración y busque la sección \"Privacidad y Cookies\".",
+          "inBrowser": "Desde su navegador",
+          "browserDesc": "También puede administrar cookies en la configuración de su navegador. Así es como en los navegadores más comunes",
+          "chromeLabel": "Chrome",
+          "chromeDesc": "Configuración → Privacidad y seguridad → Cookies",
+          "firefoxLabel": "Firefox",
+          "firefoxDesc": "Configuración → Privacidad → Cookies",
+          "safariLabel": "Safari",
+          "safariDesc": "Preferencias → Privacidad → Administrar datos del sitio web",
+          "edgeLabel": "Edge",
+          "edgeDesc": "Configuración → Cookies y permisos del sitio",
+          "warningTitle": "Advertencia",
+          "warningText": "Si bloquea todas las cookies, MirrorBuddy puede no funcionar correctamente. Recomendamos permitir al menos cookies esenciales."
+        },
+        "thirdParty": {
+          "title": "Cookies de terceros y subprocesadores",
+          "p1": "MirrorBuddy no utiliza cookies de terceros para publicidad o rastreo.",
+          "p2": "Nuestros proveedores de servicios técnicos (subprocesadores) no instalan cookies en su dispositivo",
+          "vercelLabel": "Vercel",
+          "vercelDesc": "alojamiento de aplicación (sin cookies, sin análisis instalado)",
+          "supabaseLabel": "Supabase",
+          "supabaseDesc": "base de datos PostgreSQL (comunicación del lado del servidor, sin cookies)",
+          "azureLabel": "Azure OpenAI",
+          "azureDesc": "inteligencia artificial (API backend, sin cookies)",
+          "resendLabel": "Resend",
+          "resendDesc": "envío de correo electrónico (servicio backend, sin cookies)",
+          "upstashLabel": "Upstash",
+          "upstashDesc": "caché Redis (servicio backend, sin cookies)",
+          "sentryLabel": "Sentry",
+          "sentryDesc": "monitoreo de errores y rendimiento (utiliza localStorage para Session Replay en errores, sin cookies)",
+          "googleDriveLabel": "Google Drive (opcional)",
+          "googleDriveDesc": "Si conecta su cuenta de Google para guardar documentos, Google puede establecer sus propias cookies durante la autenticación OAuth. Los tokens de acceso se cifran y se guardan en nuestra base de datos, no en cookies del navegador.",
+          "seeMore": "Para la lista completa de subprocesadores, consulte la"
+        },
+        "duration": {
+          "title": "Cuánto tiempo permanecen",
+          "intro": "Las cookies tienen duraciones diferentes",
+          "session": "Cookies de sesión",
+          "sessionDesc": "desaparecen cuando cierra el navegador",
+          "persistent": "Cookies persistentes",
+          "persistentDesc": "permanecen hasta el vencimiento (máx. 1 año)",
+          "delete": "Puede eliminar todas las cookies en cualquier momento desde la configuración de su navegador."
+        },
+        "changes": {
+          "title": "Cambios en esta política",
+          "intro": "Si cambiamos esta Política de Cookies",
+          "point1": "Actualizaremos esta página",
+          "point2": "Cambiaremos la fecha \"Última actualización\"",
+          "point3": "Si los cambios son importantes, le pediremos que acepte de nuevo"
+        },
+        "links": {
+          "title": "Enlaces útiles",
+          "intro": "Para obtener más información",
+          "privacyLabel": "Política de Privacidad",
+          "privacyDesc": "cómo manejamos sus datos",
+          "tosLabel": "Términos de Servicio",
+          "tosDesc": "las reglas de MirrorBuddy"
+        }
+      },
+      "table": {
+        "ariaLabel": "Lista de cookies",
+        "headers": {
+          "name": "Nombre",
+          "purpose": "Para qué sirve",
+          "duration": "Duración"
+        },
+        "rows": {
+          "userId": {
+            "purpose": "Autenticación: recuerda quién eres (firmado criptográficamente, httpOnly)",
+            "duration": "1 año"
+          },
+          "userIdClient": {
+            "purpose": "Copia legible de su ID para funciones del lado del cliente (sin datos sensibles)",
+            "duration": "1 año"
+          },
+          "a11y": {
+            "purpose": "Preferencias de accesibilidad (fuente, contraste, movimiento)",
+            "duration": "90 días"
+          },
+          "admin": {
+            "purpose": "Indica sesión de administrador (solo personal)",
+            "duration": "Hasta cerrar sesión"
+          }
+        }
+      }
+    }
+  },
+  "consent": {
+    "inline": {
+      "acceptedText": "Cookies aceptadas",
+      "manage": "Gestionar",
+      "acceptButton": "Aceptar cookies",
+      "info": "Información",
+      "title": "Cookies y Privacidad",
+      "description": "Utilizamos cookies esenciales para que todo funcione.",
+      "learnMore": "Saber más",
+      "analyticsLabel": "Incluir análisis",
+      "submitButton": "Aceptar"
+    },
+    "unified": {
+      "loading": "Cargando...",
+      "titleUpdated": "Términos Actualizados",
+      "titleWelcome": "¡Bienvenido a MirrorBuddy!",
+      "subtitleUpdated": "Nuestros términos han sido actualizados",
+      "subtitleWelcome": "Privacidad, cookies y términos de servicio",
+      "summaryTitle": "En resumen:",
+      "privacy": {
+        "title": "Privacidad y seguridad",
+        "description": "Sus datos están protegidos según RGPD y COPPA"
+      },
+      "cookies": {
+        "title": "Cookies esenciales",
+        "description": "Necesarias para el funcionamiento (sesiones, preferencias)"
+      },
+      "tos": {
+        "title": "Términos de servicio",
+        "description": "MirrorBuddy es gratis, la IA puede cometer errores, úsalo con un adulto si tienes menos de 14 años"
+      },
+      "links": {
+        "full": "Términos completos",
+        "privacy": "Política de Privacidad",
+        "cookies": "Política de Cookies"
+      },
+      "reconsentNotice": {
+        "lastAccepted": "Aceptado por última vez:",
+        "changed": "Qué cambió:",
+        "details": "Hemos actualizado los Términos de Servicio. Para continuar, por favor lee y acepta los nuevos términos."
+      },
+      "tosCheckbox": {
+        "label": "He leído y acepto",
+        "text": "los Términos de Servicio y el uso de cookies esenciales (requerido)"
+      },
+      "analytics": {
+        "label": "Cookies analíticas (opcional)",
+        "description": "Nos ayudan a mejorar MirrorBuddy"
+      },
+      "buttons": {
+        "disabled": "Aceptar (primero marca la casilla de términos)",
+        "accept": "Aceptar y continuar",
+        "submitting": "Guardando..."
+      },
+      "coppa": "MirrorBuddy cumple con las regulaciones RGPD y COPPA para la protección de menores.",
+      "screenReader": {
+        "required": "Debes aceptar los Términos de Servicio para continuar",
+        "submitting": "Guardando en progreso..."
+      }
+    },
+    "cookie": {
+      "title": "Privacidad y Cookies",
+      "subtitle": "MirrorBuddy respeta tu privacidad",
+      "explanation": "Para usar MirrorBuddy, debes aceptar las cookies esenciales que nos permiten:",
+      "list": {
+        "session": "Mantener tus sesiones seguras",
+        "preferences": "Guardar tus preferencias",
+        "protect": "Proteger tus datos"
+      },
+      "analytics": {
+        "label": "Cookies analíticas (opcional)",
+        "description": "Nos ayudan a mejorar MirrorBuddy",
+        "aria": "Habilitar cookies analíticas"
+      },
+      "button": "Aceptar y continuar",
+      "coppa": "MirrorBuddy cumple con las regulaciones RGPD y COPPA para la protección de menores. Tus datos están seguros con nosotros."
+    },
+    "tos": {
+      "modal": {
+        "title": {
+          "welcome": "¡Bienvenido a MirrorBuddy!",
+          "updated": "Términos Actualizados"
+        },
+        "description": {
+          "welcome": "Antes de comenzar, por favor lee nuestros Términos de Servicio.",
+          "updated": "Hemos actualizado nuestros Términos de Servicio. Para continuar usando MirrorBuddy, por favor lee y acepta los nuevos términos."
+        },
+        "warning": {
+          "title": "Qué cambió:",
+          "description": "Hemos actualizado la información sobre la recopilación de datos de rendimiento (Web Vitals) y la Política de Privacidad. Lee los términos completos para más detalles."
+        },
+        "summary": "Resumen rápido:",
+        "points": {
+          "free": "MirrorBuddy es gratis y está hecho para ayudar",
+          "aiCanErr": "No somos una escuela, la IA puede cometer errores",
+          "minors": "Si tienes menos de 14 años, usa la aplicación con un adulto cerca",
+          "respect": "Respeta a los demás, nosotros te respetamos"
+        },
+        "link": "Leer Términos Completos →",
+        "checkbox": "He leído y acepto los Términos de Servicio",
+        "buttons": {
+          "disabled": "Aceptar Términos de Servicio (marca la casilla primero)",
+          "accept": "Aceptar",
+          "submitting": "Guardando..."
+        },
+        "screenReader": {
+          "required": "Para continuar, debe aceptar los Términos de Servicio",
+          "submitting": "Guardando en progreso..."
+        }
+      },
+      "toast": {
+        "saved": "Aceptación guardada localmente",
+        "saveFailed": "La sincronización con el servidor falló. Reintentar más tarde."
+      }
+    }
+  },
+  "conversation": {
+    "handoff": {
+      "question": "¿Quieres hablar con {name}?",
+      "decline": "No, gracias",
+      "accept": "Hablar con {name}"
+    },
+    "detail": {
+      "error": {
+        "notFound": "Conversación no encontrada",
+        "loadingFailed": "Error al cargar la conversación",
+        "unknown": "Error desconocido"
+      },
+      "loading": "Cargando conversación...",
+      "back": "Atrás",
+      "backAriaLabel": "Volver a la lista de conversaciones",
+      "defaultTitle": "Conversación con {name}",
+      "timeAt": "a las {time}",
+      "summaryLabel": "Resumen:",
+      "emptyMessages": "Sin mensajes en esta conversación"
+    },
+    "sidebar": {
+      "deleteConfirm": {
+        "title": "¿Eliminar {count} conversación{plural}?",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "deleting": "Eliminando..."
+      },
+      "title": "Historial",
+      "search": {
+        "placeholder": "Buscar..."
+      },
+      "filters": {
+        "all": "Todas",
+        "today": "Hoy",
+        "week": "7d",
+        "month": "30d"
+      },
+      "empty": "Sin conversaciones"
+    },
+    "history": {
+      "dateFormat": {
+        "today": "Hoy",
+        "yesterday": "Ayer",
+        "daysAgo": "hace {count} días"
+      },
+      "loading": "Cargando...",
+      "title": "Historial de conversaciones",
+      "empty": {
+        "filtered": "Sin conversación con {maestroName}",
+        "all": "No hay conversaciones"
+      }
+    },
+    "inactivity": {
+      "title": "¿Todavía estás aquí?",
+      "description": "No hemos detectado actividad hace un tiempo. La conversación se cerrará automáticamente en:",
+      "message": "Si cierras la conversación, generaremos un resumen automático de tu sesión.",
+      "closeAriaLabel": "Cerrar advertencia",
+      "closeButton": "Cerrar y Resumir",
+      "continueButton": "Continuar Aprendiendo"
+    },
+    "toolSelection": {
+      "title": "Elige un Profesor",
+      "question": "¿Quién debería crear {toolName}?",
+      "closeAriaLabel": "Cerrar",
+      "search": "Buscar por nombre o materia...",
+      "empty": "No hay profesores encontrados"
+    }
+  },
+  "voice": {
+    "permission": {
+      "title": "Permiso de Micrófono Requerido",
+      "subtitle": "La voz requiere acceso al micrófono",
+      "enableLabel": "Para habilitar el micrófono:",
+      "steps": {
+        "lockIcon": "Haz clic en el icono de candado en la barra de direcciones",
+        "findMicrophone": "Encuentra \"Micrófono\" en la configuración del sitio",
+        "selectAllow": "Selecciona \"Permitir\"",
+        "reload": "Recarga la página"
+      },
+      "switchToChat": "Cambiar a Chat de Texto"
+    }
+  },
+  "session": {
+    "rating": {
+      "title": "¿Cómo te fue?",
+      "close": "Cerrar",
+      "sessionWith": "Sesión con",
+      "minutes": "minutos",
+      "topics": "Temas:",
+      "stars": "{count} estrellas",
+      "selectPlaceholder": "Selecciona una calificación",
+      "feedbackLabel": "¿Quieres agregar un comentario? (opcional)",
+      "feedbackPlaceholder": "¿Qué te gustó? ¿Qué podría mejorar?",
+      "selectError": "Por favor selecciona una calificación",
+      "savingError": "Error al guardar la calificación. Intenta de nuevo.",
+      "skip": "Omitir",
+      "submitting": "Enviando...",
+      "submit": "Enviar",
+      "labels": {
+        "1": "Nada satisfecho",
+        "2": "Poco satisfecho",
+        "3": "Promedio",
+        "4": "Satisfecho",
+        "5": "¡Muy satisfecho!"
+      }
+    }
+  },
+  "onboarding": {
+    "transcript": {
+      "conversationTitle": "Conversación con Melissa",
+      "messageSingular": "mensaje",
+      "messagePlural": "mensajes",
+      "noConversation": "La conversación aparecerá aquí...",
+      "userLabel": "Tú",
+      "conversationActive": "Conversación en progreso"
+    },
+    "checklist": {
+      "nameLabel": "Nombre",
+      "ageLabel": "Edad",
+      "schoolLabel": "Escuela",
+      "schoolElementary": "Primaria",
+      "schoolMiddle": "Secundaria",
+      "schoolHigh": "Preparatoria",
+      "differencesLabel": "Dificultades",
+      "differencesCount": "{count} indicadas"
+    },
+    "ageYears": "años",
+    "voicePanel": {
+      "speaking": "Está hablando...",
+      "microphoneMuted": "Micrófono apagado",
+      "listening": "Escuchando...",
+      "connected": "Conectada",
+      "speakWithMelissa": "Habla con Melissa...",
+      "melissa": "Melissa:",
+      "you": "Tú:",
+      "enableMicrophone": "Activar micrófono",
+      "disableMicrophone": "Desactivar micrófono",
+      "endCall": "Terminar llamada",
+      "cancel": "Cancelar"
+    },
+    "connecting": "Conectando..."
+  },
+  "profile": {
+    "genitori": {
+      "loadingProfile": "Cargando perfil...",
+      "error": "Error",
+      "retry": "Reintentar",
+      "welcomeTitle": "Bienvenido al Área de Padres",
+      "welcomeDescription": "Este panel se llenará automáticamente cuando el estudiante comience a estudiar con los Maestri. Mientras tanto, así es como se verá!",
+      "consentTitle": "Consentimiento para el Panel de Padres",
+      "consentDescription": "Para ver las observaciones de los Profesores, necesitamos su consentimiento.",
+      "consentButton": "Doy mi consentimiento a la visualización",
+      "deletionTitle": "Eliminación solicitada",
+      "deletionDescription": "Los datos serán eliminados dentro de 30 días, como lo requiere el GDPR."
+    },
+    "parentChat": {
+      "title": "Conversación con {name}",
+      "description": "Está a punto de comenzar una conversación con el Profesor {maestro} respecto al camino de aprendizaje de {student}.",
+      "disclaimerTitle": "Aviso importante",
+      "disclaimerText": "Los Profesores son asistentes de IA que proporcionan observaciones pedagógicas. Sus evaluaciones no reemplazan opiniones médicas, psicológicas o diagnósticos profesionales. Para cuestiones clínicas, consulte a especialistas calificados.",
+      "conversationTitle": "En esta conversación:",
+      "messagesSaved": "Los mensajes se guardan de forma segura",
+      "formalLanguage": "El Profesor utiliza un lenguaje formal",
+      "observationsStudySessions": "Las observaciones se basan en sesiones de estudio",
+      "cancel": "Cancelar",
+      "understood": "Entendido, continuar",
+      "loadingConversation": "Cargando conversación...",
+      "startConversation": "Iniciar conversación con {maestroName}",
+      "askAbout": "Preguntar sobre el progreso de {studentName}"
+    },
+    "studentLabel": "Estudiante:",
+    "activityOverview": "Descripción general de actividades de estudio",
+    "updateButton": "Actualizar",
+    "deleteButton": "Eliminar",
+    "confidenceNote": "Nota: Confiabilidad {score}%. Más sesiones mejorarán las observaciones.",
+    "settingsNote": "Nota: Estas configuraciones se aplican solo a la vista del Panel de control de padres.",
+    "dataDeletionRequestConfirm": "¿Está seguro de que desea solicitar la eliminación de datos?"
+  },
+  "maestros": {
+    "grid": {
+      "title": "Profesores",
+      "search-placeholder": "Buscar...",
+      "search-aria-label": "Buscar profesor o materia",
+      "all-button": "Todos",
+      "empty-title": "No se encontraron profesores",
+      "empty-description": "Intenta ajustar los filtros de búsqueda"
+    }
+  },
+  "aiTransparency": {
+    "page": {
+      "title": "Transparencia de la IA",
+      "version": "Versión {version}",
+      "lastUpdated": "Última actualización: {date}",
+      "backButton": "Volver al inicio"
+    },
+    "tldr": {
+      "heading": "En breve (TL;DR)",
+      "point1": "MirrorBuddy utiliza IA (Azure OpenAI) para la enseñanza, no para la toma de decisiones",
+      "point2": "Los 22 Maestri de IA tienen conocimientos verificados y controlados",
+      "point3": "Los maestros siempre ven todos los chats y pueden intervenir",
+      "point4": "Puede rechazar la IA cuando lo desee, sin consecuencias",
+      "point5": "Cumplimos con el GDPR y la ley española de protección de datos"
+    },
+    "relatedDocs": {
+      "heading": "Documentos relacionados",
+      "privacy": "Política de privacidad",
+      "privacyDescription": "Cómo protegemos sus datos",
+      "terms": "Términos de servicio",
+      "termsDescription": "Reglas de uso de MirrorBuddy"
+    },
+    "contact": {
+      "text": "¿Preguntas sobre la IA en MirrorBuddy? Escribanos: compliance@mirrorbuddy.it"
+    },
+    "sections": {
+      "section1": {
+        "title": "¿Qué hace la IA en MirrorBuddy?",
+        "para1": "MirrorBuddy utiliza inteligencia artificial (IA) para proporcionar una experiencia educativa personalizada. Los 22 Maestros de IA (tutores virtuales) están diseñados para enseñar, explicar conceptos difíciles, crear cuestionarios, mapas mentales y tarjetas de memoria.",
+        "para2": "Importante: La IA NO decide tu calificación, NO evalúa tu discapacidad, y NO reemplaza a tus maestros. Los maestros siguen siendo siempre los principales responsables de la evaluación y las decisiones pedagógicas."
+      },
+      "section2": {
+        "title": "El Sistema de IA",
+        "intro": "MirrorBuddy utiliza Azure OpenAI (GPT-4), un modelo de lenguaje de última generación desarrollado por OpenAI y alojado en los centros de datos europeos de Microsoft.",
+        "subtitle": "Cómo funciona:",
+        "item1Title": "Procesamiento de Texto",
+        "item1Desc": "Cuando haces una pregunta, el modelo analiza el texto y genera una respuesta basada en su entrenamiento",
+        "item2Title": "Conocimiento Verificado",
+        "item2Desc": "Los 22 Maestros tienen bases de conocimiento integradas - bibliotecas de conocimiento controladas y verificadas por expertos - que limitan lo que pueden decir",
+        "item3Title": "Retroalimentación Humana",
+        "item3Desc": "Cada respuesta puede ser revisada por maestros y padres a través del panel de control"
+      },
+      "section3": {
+        "title": "Los 22 Maestros de IA",
+        "intro": "MirrorBuddy tiene 22 tutores virtuales especializados en diferentes materias. Cada Maestro tiene una personalidad auténtica y conocimiento verificado en su campo.",
+        "subtitle": "Categorías de Maestros:",
+        "category1": "Ciencias y Matemáticas: Euclide (Geometría), Galileo (Astronomía), Feynman (Física), Curie (Química), Darwin (Biología)",
+        "category2": "Lenguas y Humanidades: Manzoni (Italiano), Shakespeare (Inglés), Alex Pina (Español), Omero (Narración)",
+        "category3": "Sociedad y Ambiente: Cicerone (Educación Cívica), Smith (Economía), Humboldt (Geografía), Erodoto (Historia)",
+        "category4": "Arte, Música y Bienestar: Leonardo (Arte), Mozart (Música), Ippocrate (Salud), Chris (Educación Física), Simone (Deporte)",
+        "category5": "Disciplinas Especializadas: Lovelace (Informática), Socrate (Filosofía), Cassese (Derecho Internacional)",
+        "outro": "Cada Maestro tiene una voz única (texto y audio), un estilo de enseñanza personalizado, y puede acceder a herramientas como cuestionarios, tarjetas de memoria, mapas mentales y PDFs para enseñar efectivamente.",
+        "category1Label": "Ciencias y Matemáticas",
+        "category2Label": "Lenguas y Humanidades",
+        "category3Label": "Sociedad y Ambiente",
+        "category4Label": "Arte, Música y Bienestar",
+        "category5Label": "Disciplinas Especializadas"
+      },
+      "section4": {
+        "title": "Tus Protecciones",
+        "subtitle": "Sistema de Seguridad de 5 Niveles:",
+        "protection1Title": "1. Transparencia Constante",
+        "protection1Desc": "Siempre sabrás cuándo estás hablando con IA. Un banner te lo recuerda en cada chat.",
+        "protection2Title": "2. Supervisión Humana",
+        "protection2Desc": "Los maestros y padres ven todos tus chats y pueden intervenir en cualquier momento",
+        "protection3Title": "3. Contenido Filtrado",
+        "protection3Desc": "La IA nunca generará contenido violento, explícito o inapropiado para tu edad",
+        "protection4Title": "4. Límites de Uso",
+        "protection4Desc": "Tienes un presupuesto diario de interacciones con IA para prevenir la adicción y mantener la concentración",
+        "protection5Title": "5. Consentimiento Doble (para menores)",
+        "protection5Desc": "Tanto tú como tus padres deben aprobar el uso de IA"
+      },
+      "section5": {
+        "title": "Tus Derechos",
+        "intro": "Según la ley italiana (Ley 132/2025) y el RGPD, tienes derecho a:",
+        "right1Title": "Saber que estás usando IA",
+        "right1Desc": "Ser informado siempre que un sistema automatizado genera respuestas",
+        "right2Title": "Entender cómo funciona",
+        "right2Desc": "Recibir explicaciones claras sobre cómo el Maestro de IA elige responder",
+        "right3Title": "Rechazar la IA",
+        "right3Desc": "Puedes elegir hablar solo con maestros humanos, sin perder acceso a la plataforma",
+        "right4Title": "Acceder a tus datos",
+        "right4Desc": "Solicitar copia de todos los chats, comentarios y datos que la IA procesó sobre ti",
+        "right5Title": "Corregir o eliminar datos",
+        "right5Desc": "Si los datos son inexactos, puedes solicitar que se corrijan o eliminen",
+        "right6Title": "Presentar reclamaciones",
+        "right6Desc": "Si crees que la IA no respeta tus derechos, puedes reportar el problema"
+      },
+      "section6": {
+        "title": "Cómo Se Protegen Tus Datos",
+        "intro": "Todos los datos que compartes con los Maestros están protegidos según lo requerido por el RGPD (ley de privacidad europea):",
+        "protection1Title": "Cifrado",
+        "protection1Desc": "Los datos se cifran tanto en tránsito como cuando se almacenan en servidores",
+        "protection2Title": "No Se Venden",
+        "protection2Desc": "Tus datos NUNCA se venden a terceros ni se utilizan para publicidad",
+        "protection3Title": "Acceso Restringido",
+        "protection3Desc": "Solo MirrorBuddy y Microsoft (que aloja los servidores) pueden acceder a los datos",
+        "protection4Title": "Retención Limitada",
+        "protection4Desc": "Los datos se mantienen solo mientras sea necesario para la educación",
+        "protection5Title": "Derecho al Olvido",
+        "protection5Desc": "Puedes solicitar que todos tus datos sean eliminados"
+      },
+      "section7": {
+        "title": "Riesgos y Cómo Los Gestionamos",
+        "intro": "Como con cualquier IA, hay riesgos. Así es como los abordamos:",
+        "tableHeader1": "Riesgo",
+        "tableHeader2": "Cómo Lo Prevenimos",
+        "risk1": "Contenido Inapropiado",
+        "mitigation1": "Filtros automáticos + revisión humana",
+        "risk2": "Respuestas Inexactas",
+        "mitigation2": "Bases de conocimiento verificadas, respaldo humano",
+        "risk3": "Sesgo o Discriminación",
+        "mitigation3": "Pruebas de sesgo bimensuales, conjuntos de datos diversos",
+        "risk4": "Violación de Privacidad",
+        "mitigation4": "Cifrado, auditorías de seguridad, cumplimiento del RGPD",
+        "risk5": "Adicción a la IA",
+        "mitigation5": "Presupuesto diario, controles parentales, opción de exclusión"
+      },
+      "section8": {
+        "title": "Conformidad Legal",
+        "intro": "MirrorBuddy cumple con las siguientes normas europeas e italianas:",
+        "law1": "AI Act (UE 2024/1689): Regulación europea sobre IA de alto riesgo en educación y protección infantil",
+        "law2": "Ley 132/2025: Implementación italiana del AI Act con derechos de usuarios y responsabilidades de proveedores",
+        "law3": "RGPD (UE 2016/679): Protección de datos personales y privacidad",
+        "law4": "Código de Privacidad Italiano: Implementación nacional de la protección de datos",
+        "classification": "MirrorBuddy se clasifica como un sistema de IA de alto riesgo porque apoya el aprendizaje de menores con dificultades cognitivas. En consecuencia, implementamos medidas rigurosas de transparencia, supervisión y protección."
+      },
+      "section9": {
+        "title": "Reportar Problemas",
+        "intro": "Si tienes preocupaciones sobre cómo MirrorBuddy usa la IA, contactanos:",
+        "emailLabel": "Correo Electrónico:",
+        "emailValue": "compliance@mirrorbuddy.it",
+        "formLabel": "Formulario en Línea:",
+        "formValue": "Disponible en el panel de control de la cuenta",
+        "authorityLabel": "Autoridad Reguladora:",
+        "authorityValue": "También puedes contactar directamente al Garante de la Privacidad (www.garanteprivacy.it)",
+        "commitment": "Respondemos a todos los reclamos dentro de 30 días hábiles."
+      },
+      "section10": {
+        "title": "Preguntas Frecuentes",
+        "faq1Title": "¿La IA lee mis chats con mis amigos?",
+        "faq1Answer": "No. La IA solo ve los chats que ocurren dentro de MirrorBuddy cuando hablas con los Maestros. Tus conversaciones privadas fuera de MirrorBuddy permanecen privadas.",
+        "faq2Title": "¿Puedo eliminar mis chats con los Maestros?",
+        "faq2Answer": "Sí. Puedes eliminar chats individuales de tu panel de control. Si deseas eliminar todo, puedes solicitar el 'derecho al olvido' a través de la dirección de correo de cumplimiento.",
+        "faq3Title": "¿La IA conoce mis diagnósticos (Dislexia, TDAH, etc.)?",
+        "faq3Answer": "Solo si eliges compartirlos en tu perfil. MirrorBuddy no recopila automáticamente diagnósticos médicos, pero los Maestros pueden personalizar la enseñanza si conocen tus necesidades de aprendizaje.",
+        "faq4Title": "¿Qué sucede si la IA comete un error?",
+        "faq4Answer": "Repórtalo a tu maestro, quien puede marcar la respuesta como incorrecta. Esto ayuda a mejorar el Maestro. Además, los maestros siempre pueden corregir o complementar la explicación de la IA.",
+        "faq5Title": "¿Cómo puedo rechazar el uso de IA?",
+        "faq5Answer": "Ve a la configuración de la cuenta y desactiva 'Usar Maestros de IA'. Aún tendrás acceso a todas las demás herramientas de MirrorBuddy (recursos, notas, etc.), y podrás hablar directamente con tus maestros."
+      },
+      "section11": {
+        "title": "Últimas Actualizaciones",
+        "intro": "Esta página se actualiza con la información más reciente sobre cumplimiento de IA. Por favor, verifica periódicamente para cualquier cambio en los sistemas utilizados o en la normativa.",
+        "nextReview": "Próxima revisión programada: 20 de enero de 2027"
+      }
+    }
+  },
+  "compliance": {
+    "page": {
+      "title": "Cumplimiento y Transparencia",
+      "subtitle": "MirrorBuddy está diseñado en cumplimiento con las regulaciones europeas y españolas sobre inteligencia artificial y protección de datos."
+    },
+    "badges": {
+      "conformity": "Cumplimiento normativo"
+    },
+    "sections": {
+      "publicDocs": "Documentos públicos",
+      "technicalDocs": "Documentación técnica",
+      "documentation": "Documentación detallada disponible en el repositorio de código abierto."
+    },
+    "contact": {
+      "title": "¿Preguntas sobre el cumplimiento?",
+      "text": "Para preguntas sobre privacidad, protección de datos o cumplimiento de IA, contáctenos:"
+    }
+  },
+  "supporti": {
+    "pageTitle": "Mochila",
+    "errorTitle": "Algo salió mal",
+    "reloadButton": "Recargar página",
+    "allSupports": "Todos los Materiales",
+    "favorites": "Favoritos",
+    "byType": "Por Tipo",
+    "bySubject": "Por Materia",
+    "byProfessor": "Por Profesor",
+    "search": {
+      "placeholder": "Buscar en tus materiales...",
+      "label": "Buscar materiales",
+      "clear": "Borrar búsqueda"
+    },
+    "results": {
+      "singular": "resultado",
+      "plural": "resultados"
+    },
+    "filters": {
+      "reset": "Restablecer filtros"
+    },
+    "sort": {
+      "label": "Ordenar por",
+      "placeholder": "Ordenar por"
+    },
+    "view": {
+      "grid": "Vista de cuadrícula",
+      "list": "Vista de lista"
+    },
+    "voiceSearch": {
+      "stop": "Detener búsqueda por voz",
+      "start": "Iniciar búsqueda por voz"
+    },
+    "emptyState": {
+      "backpackEmpty": "Tu Mochila está vacía",
+      "startCreating": "¡Comienza a crear materiales de estudio con los Maestros! Ve al Estuche para elegir una herramienta.",
+      "goToToolcase": "Ir al Estuche"
+    },
+    "loadingMaterials": "Cargando materiales..."
+  },
+  "admin": {
+    "dashboard": "Panel de administración",
+    "betaRequests": "Solicitudes Beta",
+    "users": {
+      "page-title": "Gestión de Usuarios",
+      "confirm-delete": "¿Confirmar eliminación?",
+      "tabs": {
+        "all": "Todos",
+        "active": "Activos",
+        "disabled": "Desactivados",
+        "trash": "Papelera"
+      },
+      "table": {
+        "username": "Nombre de usuario",
+        "email": "Email",
+        "role": "Rol",
+        "tier": "Tier",
+        "status": "Estado",
+        "created": "Creado",
+        "deleted": "Eliminado",
+        "actions": "Acciones"
+      },
+      "empty-message": "No se encontraron usuarios",
+      "trash-empty": "Papelera vacía",
+      "bulkActions": {
+        "selected": "seleccionados",
+        "changeTier": "Cambiar nivel",
+        "enable": "Habilitar",
+        "disable": "Deshabilitar",
+        "delete": "Eliminar",
+        "confirmDisable": "¿Deshabilitar {count} usuarios?",
+        "confirmEnable": "¿Habilitar {count} usuarios?",
+        "confirmDelete": "¿Eliminar permanentemente {count} usuarios?"
+      }
+    },
+    "tiers": {
+      "page": {
+        "title": "Tier Management",
+        "backToTiers": "Back to Tiers",
+        "newTier": "New Tier",
+        "createNew": "Create a new subscription plan",
+        "editTier": "Edit Tier",
+        "editMessage": "Edit tier: {name}",
+        "conversionFunnelButton": "Conversion Funnel",
+        "analyticsButton": "Analytics"
+      },
+      "table": {
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "monthlyPrice": "Monthly Price",
+        "position": "Position",
+        "status": "Status",
+        "actions": "Actions",
+        "active": "Active",
+        "inactive": "Inactive",
+        "edit": "Edit",
+        "search": "Search by code, name or description...",
+        "empty": "No tiers found",
+        "summary": "{current} of {total} tiers"
+      },
+      "form": {
+        "basicInfo": "Basic Information",
+        "code": "Code",
+        "codePlaceholder": "e.g. premium",
+        "codeReadOnly": "Code cannot be modified after creation",
+        "name": "Name",
+        "namePlaceholder": "e.g. Premium Plan",
+        "description": "Description",
+        "descriptionPlaceholder": "Plan description",
+        "monthlyPrice": "Monthly Price (EUR)",
+        "monthlyPricePlaceholder": "9.99",
+        "position": "Position",
+        "positionPlaceholder": "0",
+        "positionHelp": "Display order (0 = first)",
+        "isActive": "Tier active",
+        "limits": "Limits",
+        "chatMessagesDaily": "Daily Chat Messages",
+        "chatMessagesHelp": "Maximum number of messages a user can send per day",
+        "voiceMinutesDaily": "Daily Voice Minutes",
+        "voiceMinutesHelp": "Voice usage minutes available per day for the user",
+        "toolsDaily": "Daily Tools",
+        "toolsHelp": "Maximum number of tools that can be used per day",
+        "docsTotal": "Total Documents",
+        "docsHelp": "Maximum number of documents a user can upload in total",
+        "minError": "Minimum: {min}",
+        "maxError": "Maximum: {max}",
+        "invalidNumber": "Please enter a number",
+        "features": "Features",
+        "featuresNote": "Selected features will be available to users with this plan. Some features may require additional configuration.",
+        "models": "AI Models",
+        "modelsInfo": "Select AI models for each feature. ★ = recommended, ⚠ = not recommended",
+        "mainFeatures": "Main Features",
+        "toolFeatures": "Tools",
+        "notRecommended": "Not recommended for this feature",
+        "quality": "Quality",
+        "speed": "Speed",
+        "education": "Education",
+        "chatModel": "Chat (Conversation)",
+        "realtimeModel": "Voice (Realtime)",
+        "pdfModel": "PDF",
+        "mindmapModel": "Mind Maps",
+        "quizModel": "Quiz",
+        "flashcardsModel": "Flashcards",
+        "summaryModel": "Summaries",
+        "formulaModel": "Formulas",
+        "chartModel": "Charts",
+        "homeworkModel": "Homework",
+        "webcamModel": "Webcam/Vision",
+        "demoModel": "Demo",
+        "tools": "Available Tools",
+        "toolsSelected": "{current} / {total} selected",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all",
+        "maestri": "Available Maestri",
+        "maestriSelected": "{current} / {total} selected",
+        "coaches": "Available Coaches",
+        "coachesSelected": "{current} / {total} selected",
+        "buddies": "Available Buddies",
+        "buddiesSelected": "{current} / {total} selected",
+        "cancel": "Cancel",
+        "save": "Save",
+        "create": "Create Tier",
+        "update": "Save Changes",
+        "saving": "Saving...",
+        "error": "Error",
+        "requiredFields": "Code and name are required",
+        "saveFailed": "Error saving tier",
+        "success": "Success",
+        "successCreate": "Tier created successfully",
+        "successUpdate": "Tier updated successfully"
+      },
+      "analytics": {
+        "title": "Analytics per Tier",
+        "subtitle": "Usage statistics aggregated for each pricing tier",
+        "totalUsers": "Total Users",
+        "allPlans": "All tiers",
+        "activeUsers": "Active Users",
+        "lastDays": "Last 7 days",
+        "totalMessages": "Total Messages",
+        "allConversations": "All conversations",
+        "averagePerUser": "Average per User",
+        "messagesPerUser": "Messages/user",
+        "details": "Detail per Tier",
+        "plan": "Tier",
+        "code": "Code",
+        "totalUsersCol": "Total Users",
+        "activeUsersCol": "Active Users (7d)",
+        "totalMessagesCol": "Total Messages",
+        "averageCol": "Average/User",
+        "activityRate": "Activity Rate",
+        "status": "Status",
+        "active": "Active",
+        "inactive": "Inactive",
+        "noPlans": "No tiers available",
+        "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
+      },
+      "conversionFunnel": {
+        "title": "Tier Conversion Funnel",
+        "subtitle": "User progression through tier stages",
+        "backToTiers": "Back to Tiers",
+        "period": "{start} to {end}",
+        "trialToBase": "Trial → Base",
+        "baseToProRate": "Base → Pro",
+        "funnelEfficiency": "Funnel Efficiency",
+        "totalTracked": "Total Tracked",
+        "trialUsers": "Trial users",
+        "conversionRate": "Conversion rate",
+        "conversions": "→ {count} conversions",
+        "users": "{count} users",
+        "keyMetrics": "Key Metrics",
+        "detailedAnalysis": "Detailed conversion analysis",
+        "trialToPro": "Trial → Pro (Direct)"
+      },
+      "auditLog": {
+        "title": "Tier Audit Log",
+        "subtitle": "Complete audit trail of all tier and subscription changes",
+        "loading": "Loading audit logs...",
+        "refresh": "Refresh",
+        "adminRequired": "Admin access required",
+        "loadFailed": "Failed to fetch audit logs"
+      }
+    },
+    "terms": "Términos de Servicio",
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Configuración del sistema MirrorBuddy",
+      "system-info": {
+        "title": "System Info",
+        "description": "Información del sistema",
+        "version": "Versión",
+        "environment": "Entorno",
+        "node-version": "Node :",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Límite de presupuesto para usuarios de prueba",
+        "per-month": "/mes",
+        "configured-via": "Configurado mediante variable env",
+        "description-text": "Esta cantidad define el límite presupuestario mensual máximo para usuarios de prueba. El valor se lee de la variable de entorno y no se puede modificar desde esta interfaz."
+      }
+    },
+    "pendingBetaRequests": "{count} solicitudes beta pendientes",
+    "systemAlerts": "{count} alertas del sistema",
+    "collapseMenu": "Contraer menú",
+    "expandMenu": "Expandir menú",
+    "returnToApp": "Volver a la aplicación",
+    "invites": {
+      "unauthorized": "No autorizado. Inicia sesión como administrador.",
+      "loadingError": "Error de carga",
+      "approvalError": "Error durante la aprobación",
+      "rejectionError": "Error durante el rechazo",
+      "error": "Error",
+      "pending": "Pendiente",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "direct": "Directas (mías)",
+      "all": "Todas",
+      "directInvite": "Invitar directamente",
+      "refresh": "Actualizar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "rejectRequest": "Rechazar solicitud",
+      "rejectionReason": "Motivo del rechazo",
+      "optional": "Opcional",
+      "cancel": "Cancelar",
+      "confirmRejection": "Confirmar rechazo",
+      "reject-modal": {
+        "title": "Rechazar solicitud",
+        "reason-label": "Motivo del rechazo",
+        "placeholder": "Opcional",
+        "cancel-button": "Cancelar",
+        "confirm-button": "Confirmar rechazo"
+      }
+    },
+    "locales": {
+      "search": "Buscar por código de país, nombre, locale o maestro...",
+      "countryCode": "Código de País",
+      "countryName": "Nombre del País",
+      "primaryLocale": "Locale Primaria",
+      "languageMaestro": "Maestro de Idioma",
+      "secondaryLocales": "Locales Secundarias",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "edit": "Editar",
+      "notFound": "No se encontró configuración de locale",
+      "summary": "{count} de {total} configuraciones"
+    },
+    "components": {
+      "bulkActionBar": {
+        "selected": "{count} seleccionado(s)",
+        "deselect": "Deseleccionar",
+        "reject": "Rechazar",
+        "approve": "Aprobar",
+        "rejectReason": "Motivo del rechazo (opcional)",
+        "cancel": "Cancelar",
+        "completedAlert": "Completado: {processed} exitosos, {failed} fallidos"
+      },
+      "directInviteModal": {
+        "titleCreate": "Invitación directa",
+        "titleSuccess": "Usuario creado",
+        "successMessage": "El usuario ha sido creado y recibirá un correo electrónico con las credenciales de acceso.",
+        "generatedUsername": "Nombre de usuario generado",
+        "copyUsername": "Copiar nombre de usuario",
+        "close": "Cerrar",
+        "emailPlaceholder": "usuario@ejemplo.com",
+        "nameLabel": "Nombre (opcional)",
+        "namePlaceholder": "Juan García",
+        "emailHelpText": "El usuario recibirá un correo electrónico con el nombre de usuario y contraseña temporal para iniciar sesión.",
+        "cancel": "Cancelar",
+        "creating": "Creando...",
+        "createUser": "Crear usuario"
+      },
+      "localeForm": {
+        "backButton": "Volver a las configuraciones de región",
+        "titleCreate": "Nueva Configuración de Región",
+        "titleEdit": "Editar Configuración de Región",
+        "saving": "Guardando...",
+        "save": "Guardar",
+        "cancel": "Cancelar"
+      },
+      "localeFormFields": {
+        "countryCodeLabel": "Código de País (ISO 3166-1 alpha-2) *",
+        "countryCodeHelp": "Dos letras mayúsculas (p.ej.: IT, FR, DE, ES)",
+        "countryNameLabel": "Nombre del País *",
+        "countryNamePlaceholder": "España",
+        "primaryLocaleLabel": "Región Primaria *",
+        "primaryLocaleHelp": "Código de idioma ISO 639-1 (p.ej.: it, en, fr, de, es)",
+        "maestroLabel": "Maestro de Idioma Principal *",
+        "maestroPlaceholder": "Seleccione un maestro...",
+        "maestroHelp": "El maestro que enseñará el idioma principal del país",
+        "secondaryLocalesLabel": "Regiones Secundarias (opcional)",
+        "secondaryLocalesHelp": "Separados por coma (p.ej.: en, de, fr)",
+        "enabledLabel": "Configuración activa"
+      },
+      "localePreviewSelector": {
+        "previewLabel": "Vista previa",
+        "resetButton": "Restablecer región"
+      }
+    },
+    "analytics": {
+      "resetStats": "Reiniciar estadísticas",
+      "actionIrreversible": "⚠️ ACCIÓN IRREVERSIBLE",
+      "willDeleteAllStats": "Esta acción eliminará TODAS las estadísticas y datos de actividad:",
+      "userAccountsWillRemain": "Las cuentas de usuario y los perfiles PERMANECERÁN intactos.",
+      "typeToConfirm": "Escriba RESET_ALL_STATS para confirmar:",
+      "confirmReset": "Confirmar reinicio",
+      "pageWillReload": "La página se recargará en breve..."
+    },
+    "sentry": {
+      "unresolved": "sin resolver",
+      "notConfigured": "Sentry no configurado. Agregue SENTRY_AUTH_TOKEN a las variables de entorno.",
+      "noUnresolvedErrors": "Sin errores sin resolver"
+    },
+    "protectedUsers": {
+      "title": "Usuarios protegidos",
+      "noUsers": "No hay usuarios protegidos configurados"
+    }
+  },
+  "contact": {
+    "page": {
+      "title": "Contáctenos",
+      "subtitle": "Describa su tema y le responderemos lo antes posible."
+    },
+    "form": {
+      "nameLabel": "Nombre",
+      "emailLabel": "Correo electrónico",
+      "subjectLabel": "Asunto",
+      "messageLabel": "Mensaje",
+      "submitButtonDefault": "Enviar mensaje",
+      "submitButtonLoading": "Enviando...",
+      "nameRequired": "El nombre es obligatorio.",
+      "emailRequired": "El correo electrónico es obligatorio.",
+      "emailInvalid": "Ingrese un correo electrónico válido.",
+      "subjectRequired": "El asunto es obligatorio.",
+      "messageRequired": "El mensaje es obligatorio.",
+      "successTitle": "¡Mensaje enviado con éxito!",
+      "successMessage": "Gracias por contactarnos. Pronto le responderemos.",
+      "errorTitle": "Error al enviar el mensaje",
+      "errorMessage": "Ocurrió un error. Inténtelo más tarde.",
+      "placeholderMessage": "Describa su mensaje..."
+    },
+    "backButton": "Volver al inicio",
+    "layout": {
+      "title": {},
+      "description": {}
+    },
+    "enterprise": {
+      "successTitle": "¡Solicitud Enviada!",
+      "successDescription": "Nuestro equipo se pondrá en contacto contigo pronto para discutir tus necesidades.",
+      "submitting": "Enviando..."
+    },
+    "schools": {
+      "title": {},
+      "description": {},
+      "heading": {},
+      "subtitle": {},
+      "description2": {},
+      "support": {}
+    },
+    "schools_form": {
+      "solutions": {},
+      "features": {
+        "curriculum": "Personalización curricular",
+        "management": "Gestión de clases y estudiantes",
+        "reporting": "Informes y análisis para docentes",
+        "support": "Soporte dedicado"
+      },
+      "successTitle": {},
+      "successMessage": {},
+      "errorDefault": {},
+      "errorConnection": {},
+      "roleLabel": {},
+      "schoolTypeLabel": {},
+      "schoolNameLabel": {},
+      "studentCountLabel": {},
+      "specificNeedsLabel": {},
+      "messagePlaceholder": {},
+      "submitButtonDefault": {},
+      "submitButtonLoading": {},
+      "options": {
+        "roles": {
+          "dirigente": "Director",
+          "docente": "Docente",
+          "segreteria": "Administración",
+          "altro": "Otro"
+        },
+        "schoolTypes": {
+          "primaria": "Escuela Primaria",
+          "secondariaI": "Educación Secundaria I",
+          "secondariaII": "Educación Secundaria II",
+          "universita": "Universidad"
+        },
+        "studentCounts": {
+          "lessThan100": "Menos de 100",
+          "range100To500": "100-500",
+          "range500To1000": "500-1000",
+          "moreThan1000": "Más de 1000"
+        }
+      }
+    },
+    "error": "Error"
+  },
+  "ambientAudio": {
+    "title": "Audio Ambiental",
+    "mainVolume": "Volumen Principal",
+    "pause": "Pausa",
+    "advancedMixer": "Mezclador Avanzado",
+    "show": "Mostrar",
+    "hide": "Ocultar",
+    "activeLayers": "Capas Activas",
+    "addLayer": "Agregar Capa",
+    "noise": "Ruido",
+    "ambientSounds": "Sonidos Ambientales",
+    "comingSoon": "(Próximamente)",
+    "removeAllLayers": "Eliminar Todas las Capas",
+    "inPause": "En pausa",
+    "advancedSettings": "Configuración Avanzada",
+    "paused": "En pausa",
+    "presets": {
+      "creative": "Creatividad",
+      "rainyDay": "Día Lluvioso"
+    },
+    "info": "El audio ambiental puede mejorar la concentración mientras estudias. Los beats binaurales requieren auriculares estéreo para el efecto óptimo."
+  },
+  "dashboard": {
+    "azureCosts": "Costos de Azure",
+    "loading": "Cargando...",
+    "notAvailable": "No Disponible",
+    "authNotConfigured": "Autenticación de Azure No Configurada",
+    "loadingError": "Error al Cargar Costos",
+    "last30Days": "Últimos 30 Días",
+    "monthlyForecast": "Previsión Mensual",
+    "topServices": "Servicios Principales",
+    "description": "Análisis detallado de tu aprendizaje",
+    "periods": {
+      "today": "Hoy",
+      "week": "Semana",
+      "month": "Mes",
+      "season": "Temporada"
+    },
+    "studyTime": "Tiempo de Estudio",
+    "total": "Total",
+    "sessions": "Sesiones",
+    "maestriUsed": "maestros utilizados",
+    "tokenAI": "Token AI",
+    "calls": "llamadas",
+    "estimatedCost": "Costo Estimado",
+    "notConfigured": "No configurado",
+    "sessionsByMaestro": "Sesiones por Maestro",
+    "noSessions": "Ninguna sesión registrada",
+    "sessionSingular": "sesión",
+    "sessionPlural": "sesiones",
+    "tokenUsageByType": "Uso de Token por Tipo",
+    "noDataAvailable": "Sin datos disponibles",
+    "studyTrend": "Tendencia de Estudio",
+    "dailyCosts": "Costos Diarios",
+    "azureNotConfigured": "Gestión de Costos de Azure no configurada",
+    "configureAzure": "Configura las credenciales de Azure para ver los costos",
+    "noCostData": "Sin datos de costos disponibles",
+    "maestroUsage": "Uso de Profesores",
+    "maestroUsageChart": {
+      "title": "Profesores Más Utilizados"
+    }
+  },
+  "google-drive": {
+    "description": "Conecta Google Drive para importar materiales de estudio directamente desde la nube",
+    "loadingCheck": "Verificando conexión...",
+    "readOnlyAccess": "Acceso de solo lectura a los archivos de Google Drive",
+    "disconnectButton": "Desconectar Google Drive",
+    "disconnectTitle": "¿Desconectar Google Drive?",
+    "disconnectWarning": "No podrás importar archivos de Google Drive. Puedes reconectar tu cuenta en cualquier momento.",
+    "disconnectConfirm": "Desconectar",
+    "notConnected": "No conectado",
+    "connectPrompt": "Conecta tu cuenta de Google para importar archivos",
+    "capabilities": "Con Google Drive puedes:",
+    "capabilityPdf": "Importar PDFs para el Kit de Estudio",
+    "capabilityHomework": "Subir fotos de tareas desde Google Drive",
+    "capabilityDocuments": "Acceder a tus documentos escolares",
+    "privacyNotice": "Privacidad: MirrorBuddy solo requiere acceso de lectura a tus archivos. No modificamos ni eliminamos nada.",
+    "connectButton": "Conectar Google Drive",
+    "searchPlaceholder": "Buscar archivos...",
+    "myDrive": "Mi Drive",
+    "sharedWithMe": "Compartido conmigo",
+    "noFilesFound": "No se encontraron archivos",
+    "loadMore": "Cargar más archivos",
+    "dragOrChoose": "Arrastra un archivo aquí o",
+    "fromComputer": "Desde el equipo",
+    "fromGoogleDrive": "Desde Google Drive",
+    "maxFileSize": "Máximo {maxSizeMB}MB",
+    "select": "Seleccionar"
+  },
+  "parent-dashboard": {
+    "learningChannelVisual": "Visual",
+    "learningChannelAuditory": "Auditivo",
+    "learningChannelKinesthetic": "Kinestésico",
+    "learningChannelReadingWriting": "Lectura/Escritura",
+    "timeOfDayMorning": "Mañana",
+    "timeOfDayAfternoon": "Tarde",
+    "timeOfDayEvening": "Noche",
+    "profileTitle": "Perfil de {name}",
+    "lastUpdated": "Última actualización: {date}",
+    "studyMinutes": "Minutos de estudio",
+    "completedSessions": "Sesiones completadas",
+    "maestriMet": "Maestros encontrados"
+  },
+  "scheduler": {
+    "form": {
+      "titleEdit": "Editar sesión",
+      "titleNew": "Nueva sesión de estudio",
+      "day": "Día",
+      "time": "Hora",
+      "duration": "Duración",
+      "subject": "Materia",
+      "topic": "Tema (opcional)",
+      "topicPlaceholder": "Ej: Teorema de Pitágoras",
+      "cancel": "Cancelar",
+      "save": "Guardar",
+      "add": "Añadir",
+      "saving": "Guardando..."
+    }
+  },
+  "studyKit": {
+    "uploadProgress": {
+      "status": {
+        "uploading": "Carga en progreso...",
+        "processing": "Generando materiales...",
+        "success": "¡Kit de estudio generado con éxito!",
+        "error": "Error durante la generación"
+      },
+      "processingNote": "Este proceso puede tomar algunos minutos. Puede cerrar esta ventana y volver más tarde.",
+      "loadAnother": "Cargar otro PDF"
+    },
+    "exportModal": {
+      "title": "Exportar PDF accesible",
+      "description": "Seleccione un perfil DSA para optimizar el PDF",
+      "closeLabel": "Cerrar",
+      "profileLabel": "Perfil DSA",
+      "formatLabel": "Formato de página",
+      "success": {
+        "withZaino": "PDF descargado y guardado en la Mochila",
+        "default": "PDF descargado con éxito"
+      },
+      "error": "Error durante la exportación",
+      "cancel": "Cancelar",
+      "export": "Exportar PDF",
+      "generating": "Generando..."
+    },
+    "list": {
+      "deleteConfirm": "¿Está seguro de que desea eliminar \"{title}\"?",
+      "deleteError": "Error al eliminar. Por favor, intente de nuevo.",
+      "status": "Estado:",
+      "filters": {
+        "all": "Todos",
+        "processing": "En progreso",
+        "ready": "Listo",
+        "error": "Errores"
+      },
+      "empty": {
+        "title": "No se encontraron kits de estudio",
+        "description": "Cargue un PDF para empezar"
+      },
+      "processing": {
+        "title": "Generación en progreso...",
+        "description": "Este proceso puede tomar algunos minutos"
+      },
+      "error": {
+        "title": "Error de generación",
+        "description": "Puede eliminar este kit de estudio e intentar nuevamente con otro archivo."
+      },
+      "open": "Abrir",
+      "delete": "Eliminar",
+      "cancel": "Cancelar"
+    },
+    "view": {
+      "header": "Generador de kit de estudio",
+      "subtitle": "Cargue un PDF y genere resúmenes, mapas mentales, demostraciones y cuestionarios",
+      "newKit": "Nuevo kit de estudio",
+      "uploadTitle": "Cargar PDF",
+      "backToList": "Volver a la lista",
+      "back": "← Volver a la lista",
+      "myKits": "Mis kits de estudio",
+      "features": {
+        "summary": {
+          "title": "Resumen",
+          "description": "Resumen de conceptos clave"
+        },
+        "mindmap": {
+          "title": "Mapa mental",
+          "description": "Conexiones de conceptos"
+        },
+        "demo": {
+          "title": "Demostración",
+          "description": "Simulaciones STEM"
+        },
+        "quiz": {
+          "title": "Cuestionario",
+          "description": "Verificación de comprensión"
+        }
+      }
+    }
+  },
+  "ui": {
+    "skeleton": {
+      "viewLoading": "Página cargando",
+      "sessionLoading": "Sesión cargando",
+      "sessionLoadingText": "Cargando sesión..."
+    }
+  },
+  "typing": {
+    "oneHandedMode": {
+      "title": "Modo de una mano",
+      "help": "Ayuda",
+      "cursor": "Cursor"
+    },
+    "progressTracker": {
+      "wordsPerMinute": "Palabras por minuto",
+      "noBadges": "Sin insignias aún"
+    },
+    "stickyKeysHelper": {
+      "enable": "Habilitar teclas permanentes",
+      "description": "Las teclas permanecen activas hasta que se presionan de nuevo"
+    },
+    "visualImpairment": {
+      "readingGuide": "Guía de lectura",
+      "wcagLabel": "Cumplimiento WCAG 2.1 AA",
+      "wcagCompliance": "Cumplimiento WCAG 2.1 AA:"
+    },
+    "oneHanded": {
+      "title": "Modo de escritura",
+      "showInfo": "Mostrar información",
+      "hideInfo": "Ocultar información",
+      "modes": {
+        "both": {
+          "label": "Ambas manos",
+          "description": "Escritura estándar con 10 dedos"
+        },
+        "leftOnly": {
+          "label": "Solo izquierda",
+          "description": "Para usuarios con solo la mano izquierda"
+        },
+        "rightOnly": {
+          "label": "Solo derecha",
+          "description": "Para usuarios con solo la mano derecha"
+        }
+      },
+      "info": {
+        "active": "Modo de una sola mano activo:",
+        "description": "El teclado virtual mostrará solo las teclas para la mano seleccionada. Las lecciones se han modificado para una escritura eficiente con una sola mano.",
+        "tips": "Consejos para escribir con una sola mano:",
+        "tipItems": [
+          "Coloca tu mano en el centro del teclado",
+          "Usa Sticky Keys para combinaciones de teclas",
+          "Practica regularmente para mejorar la velocidad"
+        ]
+      }
+    },
+    "stickyKeys": {
+      "openSettings": "Abrir configuración",
+      "tip": "Para una escritura más eficiente, habilita Sticky Keys en la configuración de accesibilidad de tu sistema operativo.",
+      "tipLabel": "Consejo",
+      "activated": "Sticky Keys activadas",
+      "restartRequired": "Los cambios requieren un reinicio del navegador",
+      "enableFailed": "Error al activar Sticky Keys",
+      "enableManually": "Actívalo manualmente en la configuración del sistema",
+      "windowsInfo": "Habilitar Sticky Keys en Windows",
+      "windowsHint": "Presiona Mayús 5 veces para alternar",
+      "linuxSettings": "Configuración de accesibilidad",
+      "linuxInfo": "Abre la configuración de tu sistema Linux",
+      "unsupported": "Sticky Keys no están disponibles en este sistema operativo",
+      "active": "Activo",
+      "title": "Sticky Keys",
+      "description": "Sticky Keys te permite presionar las teclas modificadoras (Mayús, Ctrl, Alt, Cmd) una a la vez en lugar de mantenerlas presionadas.",
+      "enableButton": "Habilitar Sticky Keys"
+    }
+  },
+  "compliance": {
+    "pageTitle": "Cumplimiento y Transparencia",
+    "pageDescription": "MirrorBuddy está diseñado en cumplimiento con las regulaciones europeas e italianas sobre inteligencia artificial y protección de datos.",
+    "complianceBadgeTitle": "Cumplimiento Regulatorio",
+    "publicDocuments": "Documentos Públicos",
+    "technicalDocuments": "Documentación Técnica",
+    "technicalDescription": "Documentación detallada disponible en el repositorio de código abierto.",
+    "questionsTitle": "¿Preguntas sobre Cumplimiento?",
+    "questionsDescription": "Para preguntas sobre privacidad, protección de datos o cumplimiento de IA, contáctenos:",
+    "aiTransparency": "Transparencia de IA",
+    "aiTransparencyDesc": "Cómo funciona la inteligencia artificial en MirrorBuddy y qué datos utiliza",
+    "aiPolicy": "Política de IA",
+    "aiPolicyDesc": "Nuestros principios éticos y garantías para el uso responsable de la IA",
+    "privacyPolicy": "Política de Privacidad",
+    "privacyPolicyDesc": "Cómo recopilamos, utilizamos y protegemos sus datos personales",
+    "termsOfService": "Términos de Servicio",
+    "termsDesc": "Las condiciones de uso de la plataforma MirrorBuddy",
+    "cookiePolicy": "Política de Cookies",
+    "cookieDesc": "Qué cookies utilizamos y cómo gestionarlos",
+    "dpia": "DPIA",
+    "dpiaDesc": "Evaluación de Impacto en la Protección de Datos (RGPD Art. 35)",
+    "modelCard": "Tarjeta de Modelo",
+    "modelCardDesc": "Especificaciones técnicas del sistema de IA, rendimiento y limitaciones",
+    "aiLiteracy": "Alfabetización en IA",
+    "aiLiteracyDesc": "Guía educativa sobre cómo funciona la IA y cómo utilizarla críticamente",
+    "biasAudit": "Informe de Auditoría de Sesgo",
+    "biasAuditDesc": "Análisis de equidad y no discriminación del sistema de IA",
+    "riskManagement": "Gestión de Riesgos",
+    "riskManagementDesc": "Marco de gestión de riesgos y registro de riesgos de IA"
+  },
+  "supporti": {
+    "pageTitle": "Mochila",
+    "errorTitle": "Algo salió mal",
+    "reloadButton": "Recargar página"
+  },
+  "admin": {
+    "invites": {
+      "unauthorized": "No autorizado. Inicia sesión como administrador.",
+      "loadingError": "Error de carga",
+      "approvalError": "Error durante la aprobación",
+      "rejectionError": "Error durante el rechazo",
+      "error": "Error",
+      "pending": "Pendiente",
+      "approved": "Aprobadas",
+      "rejected": "Rechazadas",
+      "direct": "Directas (mías)",
+      "all": "Todas",
+      "directInvite": "Invitar directamente",
+      "refresh": "Actualizar",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "rejectRequest": "Rechazar solicitud",
+      "rejectionReason": "Motivo del rechazo",
+      "optional": "Opcional",
+      "cancel": "Cancelar",
+      "confirmRejection": "Confirmar rechazo"
+    },
+    "locales": {
+      "search": "Buscar por código de país, nombre, locale o maestro...",
+      "countryCode": "Código de País",
+      "countryName": "Nombre del País",
+      "primaryLocale": "Locale Primaria",
+      "languageMaestro": "Maestro de Idioma",
+      "secondaryLocales": "Locales Secundarias",
+      "status": "Estado",
+      "actions": "Acciones",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "edit": "Editar",
+      "notFound": "No se encontró configuración de locale",
+      "summary": "{count} de {total} configuraciones"
+    },
+    "settings": {
+      "title": "Configuración",
+      "subtitle": "Configuración del sistema MirrorBuddy"
+    },
+    "tiers": {
+      "page": {
+        "title": "Tier Management",
+        "backToTiers": "Back to Tiers",
+        "newTier": "New Tier",
+        "createNew": "Create a new subscription plan",
+        "editTier": "Edit Tier",
+        "editMessage": "Edit tier: {name}"
+      },
+      "table": {
+        "code": "Code",
+        "name": "Name",
+        "description": "Description",
+        "monthlyPrice": "Monthly Price",
+        "position": "Position",
+        "status": "Status",
+        "actions": "Actions",
+        "active": "Active",
+        "inactive": "Inactive",
+        "edit": "Edit",
+        "search": "Search by code, name or description...",
+        "empty": "No tiers found",
+        "summary": "{current} of {total} tiers"
+      },
+      "form": {
+        "basicInfo": "Basic Information",
+        "code": "Code",
+        "codePlaceholder": "e.g. premium",
+        "codeReadOnly": "Code cannot be modified after creation",
+        "name": "Name",
+        "namePlaceholder": "e.g. Premium Plan",
+        "description": "Description",
+        "descriptionPlaceholder": "Plan description",
+        "monthlyPrice": "Monthly Price (EUR)",
+        "monthlyPricePlaceholder": "9.99",
+        "position": "Position",
+        "positionPlaceholder": "0",
+        "positionHelp": "Display order (0 = first)",
+        "isActive": "Tier active",
+        "limits": "Limits",
+        "chatMessagesDaily": "Daily Chat Messages",
+        "chatMessagesHelp": "Maximum number of messages a user can send per day",
+        "voiceMinutesDaily": "Daily Voice Minutes",
+        "voiceMinutesHelp": "Voice usage minutes available per day for the user",
+        "toolsDaily": "Daily Tools",
+        "toolsHelp": "Maximum number of tools that can be used per day",
+        "docsTotal": "Total Documents",
+        "docsHelp": "Maximum number of documents a user can upload in total",
+        "minError": "Minimum: {min}",
+        "maxError": "Maximum: {max}",
+        "invalidNumber": "Please enter a number",
+        "features": "Features",
+        "featuresNote": "Selected features will be available to users with this plan. Some features may require additional configuration.",
+        "models": "AI Models",
+        "modelsInfo": "Select AI models for each feature. ★ = recommended, ⚠ = not recommended",
+        "mainFeatures": "Main Features",
+        "toolFeatures": "Tools",
+        "notRecommended": "Not recommended for this feature",
+        "quality": "Quality",
+        "speed": "Speed",
+        "education": "Education",
+        "chatModel": "Chat (Conversation)",
+        "realtimeModel": "Voice (Realtime)",
+        "pdfModel": "PDF",
+        "mindmapModel": "Mind Maps",
+        "quizModel": "Quiz",
+        "flashcardsModel": "Flashcards",
+        "summaryModel": "Summaries",
+        "formulaModel": "Formulas",
+        "chartModel": "Charts",
+        "homeworkModel": "Homework",
+        "webcamModel": "Webcam/Vision",
+        "demoModel": "Demo",
+        "tools": "Available Tools",
+        "toolsSelected": "{current} / {total} selected",
+        "selectAll": "Select all",
+        "deselectAll": "Deselect all",
+        "maestri": "Available Maestri",
+        "maestriSelected": "{current} / {total} selected",
+        "coaches": "Available Coaches",
+        "coachesSelected": "{current} / {total} selected",
+        "buddies": "Available Buddies",
+        "buddiesSelected": "{current} / {total} selected",
+        "cancel": "Cancel",
+        "save": "Save",
+        "create": "Create Tier",
+        "update": "Save Changes",
+        "saving": "Saving...",
+        "error": "Error",
+        "requiredFields": "Code and name are required",
+        "saveFailed": "Error saving tier",
+        "success": "Success",
+        "successCreate": "Tier created successfully",
+        "successUpdate": "Tier updated successfully"
+      },
+      "analytics": {
+        "title": "Analytics per Tier",
+        "subtitle": "Usage statistics aggregated for each pricing tier",
+        "totalUsers": "Total Users",
+        "allPlans": "All tiers",
+        "activeUsers": "Active Users",
+        "lastDays": "Last 7 days",
+        "totalMessages": "Total Messages",
+        "allConversations": "All conversations",
+        "averagePerUser": "Average per User",
+        "messagesPerUser": "Messages/user",
+        "details": "Detail per Tier",
+        "plan": "Tier",
+        "code": "Code",
+        "totalUsersCol": "Total Users",
+        "activeUsersCol": "Active Users (7d)",
+        "totalMessagesCol": "Total Messages",
+        "averageCol": "Average/User",
+        "activityRate": "Activity Rate",
+        "noPlans": "No tiers available",
+        "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
+      },
+      "conversionFunnel": {
+        "title": "Tier Conversion Funnel",
+        "subtitle": "User progression through tier stages",
+        "period": "{start} to {end}",
+        "trialToBase": "Trial → Base",
+        "baseToProRate": "Base → Pro",
+        "funnelEfficiency": "Funnel Efficiency",
+        "totalTracked": "Total Tracked",
+        "trialUsers": "Trial users",
+        "conversionRate": "Conversion rate",
+        "conversions": "→ {count} conversions",
+        "users": "{count} users",
+        "keyMetrics": "Key Metrics",
+        "detailedAnalysis": "Detailed conversion analysis",
+        "trialToPro": "Trial → Pro (Direct)"
+      },
+      "auditLog": {
+        "title": "Tier Audit Log",
+        "subtitle": "Complete audit trail of all tier and subscription changes",
+        "loading": "Loading audit logs...",
+        "refresh": "Refresh",
+        "adminRequired": "Admin access required",
+        "loadFailed": "Failed to fetch audit logs"
+      }
+    }
+  }
+}
