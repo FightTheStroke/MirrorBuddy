@@ -5,9 +5,9 @@
     },
     "page": {
       "backButton": "Back Button",
-      "lastUpdated": "Last Updated",
+      "lastUpdated": "Última actualización: {date}",
       "title": "Titolo",
-      "version": "Version"
+      "version": "Versión {version}"
     },
     "relatedDocs": {
       "heading": "Heading",
@@ -309,7 +309,140 @@
     "accessibilityTitle": "Declaración de Accesibilidad",
     "aiTransparencyTitle": "Transparencia de IA",
     "dataSubjectRights": "Derechos de los Interesados",
-    "aiRegulatoryContacts": "[TRANSLATE] Contatti Normativi AI"
+    "aiRegulatoryContacts": "Contactos Regulatorios de IA"
+  },
+  "aiRegulatoryContacts": {
+    "page": {
+      "title": "Contactos Regulatorios de IA por País",
+      "subtitle": "Autoridades reguladoras de IA para cada nación",
+      "description": "Información de contacto oficial para las autoridades responsables del cumplimiento normativo de IA",
+      "lastUpdated": "Última actualización",
+      "version": "Versión",
+      "backButton": "Volver"
+    },
+    "introduction": {
+      "title": "Autoridades Reguladoras de IA",
+      "content": "MirrorBuddy opera en cumplimiento con las regulaciones de IA en varios países. Si tiene preguntas sobre nuestro cumplimiento normativo o desea informar un problema, puede contactar directamente a las autoridades competentes en su país."
+    },
+    "countries": {
+      "italy": {
+        "name": "Italia",
+        "authorities": [
+          {
+            "name": "AgID (Agenzia per l'Italia Digitale)",
+            "role": "Autoridad Principal de Cumplimiento de IA",
+            "website": "https://www.agid.gov.it",
+            "email": "ai.policy@agid.gov.it",
+            "phone": "+39 06 8526 1",
+            "address": "Via della Transatlantica 31, 00144 Roma, Italia"
+          },
+          {
+            "name": "Garante per la Protezione dei Dati Personali",
+            "role": "Autoridad de Protección de Datos con Supervisión de IA",
+            "website": "https://www.garanteprivacy.it",
+            "email": "garante@gpdp.it",
+            "phone": "+39 06 696771",
+            "address": "Piazza di Monte Citorio 121, 00186 Roma, Italia"
+          }
+        ]
+      },
+      "uk": {
+        "name": "Reino Unido",
+        "authorities": [
+          {
+            "name": "AISI UK (AI Safety Institute)",
+            "role": "Autoridad Principal de Seguridad de IA",
+            "website": "https://www.aisi.gov.uk",
+            "email": "hello@aisi.gov.uk",
+            "phone": "+44 20 3897 8000",
+            "address": "55 Whitehall, London SW1A 2EY, Reino Unido"
+          },
+          {
+            "name": "ICO (Information Commissioner's Office)",
+            "role": "Autoridad de Protección de Datos",
+            "website": "https://ico.org.uk",
+            "email": "contact@ico.org.uk",
+            "phone": "+44 1625 545745",
+            "address": "Water Lane, Wilmslow, Cheshire SK9 5AF, Reino Unido"
+          }
+        ]
+      },
+      "germany": {
+        "name": "Alemania",
+        "authorities": [
+          {
+            "name": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+            "role": "Autoridad Federal de Protección de Datos",
+            "website": "https://www.bfdi.bund.de",
+            "email": "poststelle@bfdi.bund.de",
+            "phone": "+49 228 9977-9",
+            "address": "Husarenstr. 30, 53117 Bonn, Alemania"
+          },
+          {
+            "name": "Bundesnetzagentur (División de Servicios Digitales)",
+            "role": "Autoridad Reguladora de Servicios Digitales",
+            "website": "https://www.bundesnetzagentur.de",
+            "email": "kontakt@bnetza.de",
+            "phone": "+49 228 14-0",
+            "address": "Bundesnetzagentur, Alemania"
+          }
+        ]
+      },
+      "spain": {
+        "name": "España",
+        "authorities": [
+          {
+            "name": "AESIA (Autoridad Española Supervisora de Inteligencia Artificial)",
+            "role": "Autoridad Principal de Supervisión de IA",
+            "website": "https://www.aesia.es",
+            "email": "info@aesia.es",
+            "phone": "[REQUIERE VERIFICACIÓN]",
+            "address": "Madrid, España [REQUIERE VERIFICACIÓN]"
+          },
+          {
+            "name": "AEPD (Agencia Española de Protección de Datos)",
+            "role": "Autoridad de Protección de Datos",
+            "website": "https://www.aepd.es",
+            "email": "consultas@aepd.es",
+            "phone": "+34 91 266 35 00",
+            "address": "C/ Jorge Juan, 6, 28001 Madrid, España"
+          },
+          {
+            "name": "Defensoría del Pueblo",
+            "role": "Oficina del Defensor del Pueblo",
+            "website": "https://www.defensordelpueblo.es",
+            "email": "defensor@defensordelpueblo.es",
+            "phone": "+34 91 432 01 00",
+            "address": "Calle Zurbano, 42, 28010 Madrid, España"
+          }
+        ]
+      },
+      "france": {
+        "name": "Francia",
+        "authorities": [
+          {
+            "name": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+            "role": "Autoridad Principal de Cumplimiento de IA y Protección de Datos",
+            "website": "https://www.cnil.fr",
+            "email": "contact@cnil.fr",
+            "phone": "+33 1 53 73 22 22",
+            "address": "3 Place de Fontenoy, 75007 París, Francia"
+          },
+          {
+            "name": "Défenseur des droits",
+            "role": "Oficina del Defensor de los Derechos",
+            "website": "https://www.defenseurdesdroits.fr",
+            "email": "contact@defenseurdesdroits.fr",
+            "phone": "+33 1 42 76 58 00",
+            "address": "7 rue Saint-Florentin, 75008 París, Francia"
+          }
+        ]
+      }
+    },
+    "reportingProcess": {
+      "title": "Informar Problemas",
+      "content": "Si encuentra un problema de cumplimiento de IA, puede informarlo a una de las autoridades reguladoras de su país. Las autoridades investigarán su queja y tomarán las medidas apropiadas."
+    }
   },
   "dataSubjectRights": {
     "page": {
@@ -402,6 +535,14 @@
         "website": "www.bfdi.bund.de",
         "responseTime": "30 días",
         "escalationTime": "Puede presentar una reclamación ante la BfDI si tiene preocupaciones sobre la protección de datos."
+      },
+      "uk": {
+        "name": "Reino Unido",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 días",
+        "escalationTime": "Puede presentar una reclamación ante la ICO si se violan sus derechos de protección de datos en el Reino Unido."
       }
     },
     "howToExercise": {

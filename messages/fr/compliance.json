@@ -535,6 +535,14 @@
         "website": "www.aepd.es",
         "responseTime": "30 jours",
         "escalationTime": "Vous pouvez déposer une plainte auprès de l'AEPD pour des questions de protection des données."
+      },
+      "uk": {
+        "name": "Royaume-Uni",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 jours",
+        "escalationTime": "Vous pouvez déposer une plainte auprès de l'ICO si vos droits de protection des données au Royaume-Uni sont violés."
       }
     },
     "howToExercise": {

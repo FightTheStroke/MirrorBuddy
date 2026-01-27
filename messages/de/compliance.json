@@ -5,9 +5,9 @@
     },
     "page": {
       "backButton": "Back Button",
-      "lastUpdated": "Last Updated",
+      "lastUpdated": "Zuletzt aktualisiert: {date}",
       "title": "Titolo",
-      "version": "Version"
+      "version": "Version {version}"
     },
     "relatedDocs": {
       "heading": "Heading",
@@ -535,6 +535,14 @@
         "website": "www.aepd.es",
         "responseTime": "30 Tage",
         "escalationTime": "Sie können bei der AEPD Beschwerde für Datenschutzfragen einreichen."
+      },
+      "uk": {
+        "name": "Vereinigtes Königreich",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 Tage",
+        "escalationTime": "Sie können bei der ICO Beschwerde einreichen, wenn Ihre Datenschutzrechte im Vereinigten Königreich verletzt werden."
       }
     },
     "howToExercise": {

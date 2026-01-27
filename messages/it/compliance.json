@@ -311,6 +311,139 @@
     "dataSubjectRights": "Diritti dell'Interessato",
     "aiRegulatoryContacts": "Contatti Normativi AI"
   },
+  "aiRegulatoryContacts": {
+    "page": {
+      "title": "Contatti Normativi IA per Paese",
+      "subtitle": "Autorità di regolamentazione IA per ogni nazione",
+      "description": "Informazioni di contatto ufficiali per le autorità responsabili della conformità normativa IA",
+      "lastUpdated": "Ultimo aggiornamento",
+      "version": "Versione",
+      "backButton": "Indietro"
+    },
+    "introduction": {
+      "title": "Autorità di Regolamentazione IA",
+      "content": "MirrorBuddy opera in conformità con le normative IA in più paesi. Se hai domande sulla nostra conformità normativa o desideri segnalare un problema, puoi contattare direttamente le autorità competenti nel tuo paese."
+    },
+    "countries": {
+      "italy": {
+        "name": "Italia",
+        "authorities": [
+          {
+            "name": "AgID (Agenzia per l'Italia Digitale)",
+            "role": "Autorità Principale di Conformità IA",
+            "website": "https://www.agid.gov.it",
+            "email": "ai.policy@agid.gov.it",
+            "phone": "+39 06 8526 1",
+            "address": "Via della Transatlantica 31, 00144 Roma, Italia"
+          },
+          {
+            "name": "Garante per la Protezione dei Dati Personali",
+            "role": "Autorità di Protezione dei Dati con Supervisione IA",
+            "website": "https://www.garanteprivacy.it",
+            "email": "garante@gpdp.it",
+            "phone": "+39 06 696771",
+            "address": "Piazza di Monte Citorio 121, 00186 Roma, Italia"
+          }
+        ]
+      },
+      "uk": {
+        "name": "Regno Unito",
+        "authorities": [
+          {
+            "name": "AISI UK (AI Safety Institute)",
+            "role": "Autorità Principale di Sicurezza IA",
+            "website": "https://www.aisi.gov.uk",
+            "email": "hello@aisi.gov.uk",
+            "phone": "+44 20 3897 8000",
+            "address": "55 Whitehall, London SW1A 2EY, Regno Unito"
+          },
+          {
+            "name": "ICO (Information Commissioner's Office)",
+            "role": "Autorità di Protezione dei Dati",
+            "website": "https://ico.org.uk",
+            "email": "contact@ico.org.uk",
+            "phone": "+44 1625 545745",
+            "address": "Water Lane, Wilmslow, Cheshire SK9 5AF, Regno Unito"
+          }
+        ]
+      },
+      "germany": {
+        "name": "Germania",
+        "authorities": [
+          {
+            "name": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+            "role": "Autorità Federale di Protezione dei Dati",
+            "website": "https://www.bfdi.bund.de",
+            "email": "poststelle@bfdi.bund.de",
+            "phone": "+49 228 9977-9",
+            "address": "Husarenstr. 30, 53117 Bonn, Germania"
+          },
+          {
+            "name": "Bundesnetzagentur (Divisione Servizi Digitali)",
+            "role": "Autorità di Regolamentazione dei Servizi Digitali",
+            "website": "https://www.bundesnetzagentur.de",
+            "email": "kontakt@bnetza.de",
+            "phone": "+49 228 14-0",
+            "address": "Bundesnetzagentur, Germania"
+          }
+        ]
+      },
+      "spain": {
+        "name": "Spagna",
+        "authorities": [
+          {
+            "name": "AESIA (Autoridad Española Supervisora de Inteligencia Artificial)",
+            "role": "Autorità Principale di Supervisione IA",
+            "website": "https://www.aesia.es",
+            "email": "info@aesia.es",
+            "phone": "[RICHiede VERIFICA]",
+            "address": "Madrid, Spagna [RICHiede VERIFICA]"
+          },
+          {
+            "name": "AEPD (Agencia Española de Protección de Datos)",
+            "role": "Autorità di Protezione dei Dati",
+            "website": "https://www.aepd.es",
+            "email": "consultas@aepd.es",
+            "phone": "+34 91 266 35 00",
+            "address": "C/ Jorge Juan, 6, 28001 Madrid, Spagna"
+          },
+          {
+            "name": "Defensoría del Pueblo",
+            "role": "Ufficio del Difensore Civico",
+            "website": "https://www.defensordelpueblo.es",
+            "email": "defensor@defensordelpueblo.es",
+            "phone": "+34 91 432 01 00",
+            "address": "Calle Zurbano, 42, 28010 Madrid, Spagna"
+          }
+        ]
+      },
+      "france": {
+        "name": "Francia",
+        "authorities": [
+          {
+            "name": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+            "role": "Autorità Principale di Conformità IA e Protezione dei Dati",
+            "website": "https://www.cnil.fr",
+            "email": "contact@cnil.fr",
+            "phone": "+33 1 53 73 22 22",
+            "address": "3 Place de Fontenoy, 75007 Parigi, Francia"
+          },
+          {
+            "name": "Défenseur des droits",
+            "role": "Ufficio del Difensore dei Diritti",
+            "website": "https://www.defenseurdesdroits.fr",
+            "email": "contact@defenseurdesdroits.fr",
+            "phone": "+33 1 42 76 58 00",
+            "address": "7 rue Saint-Florentin, 75008 Parigi, Francia"
+          }
+        ]
+      }
+    },
+    "reportingProcess": {
+      "title": "Segnalazione di Problemi",
+      "content": "Se riscontri un problema di conformità IA, puoi segnalarlo a una delle autorità di regolamentazione del tuo paese. Le autorità indagheranno sulla tua segnalazione e prenderanno le misure appropriate."
+    }
+  },
   "dataSubjectRights": {
     "page": {
       "title": "Diritti dell'Interessato ai Sensi del RGPD",
@@ -402,6 +535,14 @@
         "website": "www.aepd.es",
         "responseTime": "30 giorni",
         "escalationTime": "Puoi presentare reclamo all'AEPD per questioni relative alla protezione dei dati."
+      },
+      "uk": {
+        "name": "Regno Unito",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 giorni",
+        "escalationTime": "Puoi presentare reclamo all'ICO se i tuoi diritti di protezione dei dati nel Regno Unito sono violati."
       }
     },
     "howToExercise": {
