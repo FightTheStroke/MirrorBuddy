@@ -104,10 +104,50 @@ function cleanConnectionString(url: string): string {
 }
 ```
 
+## Static Assets & i18n Middleware (CRITICAL)
+
+**Problem**: The i18n middleware can intercept static asset requests and redirect them to localized paths that don't exist:
+
+```
+/logo-brain.png → 307 redirect → /it/logo-brain.png → 404 Not Found
+/maestri/euclide.webp → 307 redirect → /it/maestri/euclide.webp → 404 Not Found
+```
+
+**Symptom**: All images show broken image icons (❓) in production.
+
+**Root cause**: The matcher pattern in `proxy.ts` was not correctly excluding files with extensions.
+
+**Correct pattern** (from next-intl docs):
+
+```typescript
+// proxy.ts - matcher must exclude ALL files with extensions
+export const config = {
+  matcher: [
+    // Pattern .*\\..* excludes any path containing a dot followed by extension
+    "/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)",
+  ],
+};
+```
+
+**Prevention**:
+
+- E2E test CP-07 verifies images return 200 (not 307 redirect)
+- Test runs on every PR via CI
+- Never use specific extension lists like `.*\\.(?:png|jpg|...)` - use `.*\\..*` instead
+
+**Verification**:
+
+```bash
+# Should return 200, NOT 307
+curl -sI https://mirrorbuddy.vercel.app/logo-brain.png | head -1
+curl -sI https://mirrorbuddy.vercel.app/maestri/euclide.webp | head -1
+```
+
 ## Common Deployment Failures
 
 | Error                       | Cause                | Fix                                         |
 | --------------------------- | -------------------- | ------------------------------------------- |
+| Images show ❓ placeholder  | i18n redirect        | Fix proxy.ts matcher (see above)            |
 | `self-signed certificate`   | Wrong SSL config     | Use `rejectUnauthorized: false`             |
 | `Database X does not exist` | sslmode conflict     | Strip sslmode, use explicit ssl             |
 | `NODE_TLS_REJECT warning`   | Global env var set   | Remove NODE_TLS_REJECT_UNAUTHORIZED         |

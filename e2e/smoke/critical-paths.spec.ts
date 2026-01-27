@@ -159,14 +159,42 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     expect(redirectedAway || authCookieCleared).toBe(true);
   });
 
-  test("CP-07: Static assets load correctly", async ({ request }) => {
-    // Check critical static assets
-    const criticalAssets = ["/favicon.ico", "/logo-brain.png"];
+  test("CP-07: Static assets load correctly (no i18n redirect)", async ({
+    request,
+  }) => {
+    // Critical regression test: i18n middleware was incorrectly redirecting
+    // static assets like /logo-brain.png to /it/logo-brain.png (404)
+    // See proxy.ts matcher pattern for the fix
+    const criticalAssets = [
+      "/favicon.ico",
+      "/logo-brain.png",
+      "/maestri/euclide.webp",
+      "/maestri/galileo.webp",
+      "/avatars/melissa.webp",
+    ];
 
     for (const asset of criticalAssets) {
-      const response = await request.get(asset);
-      // 200 OK or 304 Not Modified are both acceptable
-      expect([200, 304]).toContain(response.status());
+      const response = await request.get(asset, {
+        // Don't follow redirects - we want to catch 307s
+        maxRedirects: 0,
+      });
+
+      // MUST be 200 OK directly, NOT a redirect
+      // If we get 307, the i18n middleware is incorrectly intercepting images
+      expect(
+        response.status(),
+        `Asset ${asset} should return 200, not redirect`,
+      ).toBe(200);
+
+      // Verify content-type is correct for images
+      const contentType = response.headers()["content-type"];
+      if (asset.endsWith(".png")) {
+        expect(contentType).toContain("image/png");
+      } else if (asset.endsWith(".webp")) {
+        expect(contentType).toContain("image/webp");
+      } else if (asset.endsWith(".ico")) {
+        expect(contentType).toContain("image");
+      }
     }
   });
 

@@ -70,16 +70,24 @@ export default function proxy(request: NextRequest) {
  *
  * This proxy runs on all routes EXCEPT:
  * - API routes (/api/*)
+ * - Admin routes (/admin/*) - handled separately
  * - Static files (_next/static/*)
  * - Internal Next.js routes (_next/*)
+ * - Vercel internal routes (_vercel/*)
  * - Monitoring routes (/monitoring)
- * - Public assets that don't need localization (manifest.json, favicons, etc.)
+ * - Any file with an extension (images, fonts, etc.)
+ *
+ * CRITICAL: The pattern .*\\..*  excludes ALL files with extensions.
+ * This prevents the i18n middleware from redirecting static assets
+ * like /logo-brain.png to /it/logo-brain.png (which doesn't exist).
+ *
+ * See: https://next-intl-docs.vercel.app/docs/routing/middleware#matcher
  */
 export const config = {
   matcher: [
     // Match all pathnames EXCEPT static assets and internal routes
-    // The pattern .*\\.[\\w]+ ensures files with extensions are excluded
-    // Using explicit exclusions for reliability across Next.js versions
-    "/((?!api|admin|_next|_vercel|monitoring|favicon|icon|apple-touch-icon|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot|css|js|map|json)).*)",
+    // Pattern .*\\..* matches any file with an extension (e.g., .png, .webp, .css)
+    // This is the recommended pattern from next-intl documentation
+    "/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)",
   ],
 };

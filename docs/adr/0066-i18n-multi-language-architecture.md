@@ -113,6 +113,83 @@ model LocaleConfig {
 - 10/10 tests passing
 - Detects Italian patterns, ignores English/code/expressions
 
+### 6. Static Asset Exclusion (CRITICAL)
+
+**Problem discovered 2026-01-27**: The i18n middleware was incorrectly intercepting static asset requests
+and redirecting them to localized paths:
+
+```
+GET /logo-brain.png
+→ 307 Redirect → /it/logo-brain.png
+→ 404 Not Found (file doesn't exist at localized path)
+```
+
+This caused ALL images (maestri avatars, coach avatars, logos) to display as broken placeholder icons.
+
+**Root cause**: The matcher pattern `.*\\.(?:png|jpg|jpeg|...)` was supposed to exclude files by extension,
+but this pattern doesn't work correctly in Next.js matchers. The lookahead `(?!pattern)` with `.*` inside
+has inconsistent behavior.
+
+**Incorrect pattern** (caused the bug):
+
+```typescript
+// ❌ BROKEN - specific extension list doesn't work reliably
+matcher: [
+  "/((?!api|admin|_next|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)).*)",
+];
+```
+
+**Correct pattern** (fix applied):
+
+```typescript
+// ✅ CORRECT - matches ANY file with an extension
+// Pattern .*\\..* = "anything.anything" (any path with a dot)
+matcher: ["/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)"]; // proxy.ts
+```
+
+**Why `.*\\..*` works**:
+
+- `.*` matches any characters (including path segments)
+- `\\.` matches a literal dot
+- `.*` matches any extension
+- Together: matches `/foo/bar.png`, `/logo.svg`, `/css/style.css`, etc.
+
+**Files affected**:
+
+| File                               | Change                               |
+| ---------------------------------- | ------------------------------------ |
+| `proxy.ts`                         | Updated matcher pattern              |
+| `e2e/smoke/critical-paths.spec.ts` | Added regression test CP-07          |
+| `.claude/rules/vercel-deployment`  | Added documentation                  |
+| This ADR                           | Documented root cause and prevention |
+
+**Prevention (CI enforcement)**:
+
+E2E test CP-07 verifies static assets return 200 (not 307 redirect):
+
+```typescript
+test("CP-07: Static assets load correctly (no i18n redirect)", async ({
+  request,
+}) => {
+  const assets = [
+    "/logo-brain.png",
+    "/maestri/euclide.webp",
+    "/avatars/melissa.webp",
+  ];
+  for (const asset of assets) {
+    const response = await request.get(asset, { maxRedirects: 0 });
+    expect(response.status()).toBe(200); // NOT 307
+  }
+});
+```
+
+**Never repeat this bug**:
+
+1. Always use `.*\\..*` pattern to exclude ALL files with extensions
+2. Never use specific extension lists like `.*\\.(?:png|jpg|...)`
+3. E2E test CP-07 catches regressions automatically
+4. Verify with: `curl -sI https://mirrorbuddy.vercel.app/logo-brain.png | head -1`
+
 ## Consequences
 
 ### Positive
