@@ -45,7 +45,7 @@
       },
       "timeline": {
         "default-title": "Timeline",
-        "no-events": "No events"
+        "no-events": "No events available"
       },
       "mindmap": {
         "default-title": "Mind Map"
@@ -81,6 +81,7 @@
       },
       "error-title": "Display Error",
       "error-message-default": "An error occurred while displaying the content.",
+      "error-message-with-type": "Unable to display material of type \"{type}\".",
       "retry-button": "Retry",
       "sidebar": {
         "navigation-aria-label": "Materials Navigation",
@@ -91,17 +92,58 @@
         "archived": "Archived",
         "collections-title": "Folders",
         "collections-aria-label": "Folders",
-        "create-collection-aria-label": "Crea nuova cartella",
+        "create-collection-aria-label": "Create new folder",
         "no-collections": "No folders",
         "tags-title": "Tags",
         "tags-aria-label": "Tags",
-        "create-tag-aria-label": "Crea nuovo tag",
+        "create-tag-aria-label": "Create new tag",
         "no-tags": "No tags"
       },
       "renderers": {
-        "noEvents": "Nessun evento disponibile",
-        "noData": "Nessun dato disponibile",
-        "noItems": "Nessun elemento disponibile"
+        "noEvents": "No events available",
+        "noData": "No data available",
+        "noItems": "No items available"
+      },
+      "header": {
+        "search": {
+          "placeholder": "Search materials...",
+          "aria-label": "Search materials",
+          "clear-aria-label": "Clear search",
+          "announcement": "Search: {value}"
+        },
+        "filter": {
+          "aria-label": "Filter by type",
+          "listbox-aria-label": "Select material type"
+        }
+      },
+      "types": {
+        "all": "All",
+        "mindmap": "Mind Map",
+        "quiz": "Quiz",
+        "flashcard": "Flashcard",
+        "summary": "Summary",
+        "demo": "Demo",
+        "diagram": "Diagram",
+        "timeline": "Timeline",
+        "formula": "Formula",
+        "calculator": "Calculator",
+        "chart": "Chart",
+        "pdf": "PDF",
+        "webcam": "Webcam",
+        "homework": "Homework",
+        "search": "Search",
+        "typing": "Typing",
+        "study-kit": "Study Kit"
+      },
+      "material-menu": {
+        "aria-label": "Material actions",
+        "open": "Open",
+        "duplicate": "Duplicate",
+        "move": "Move",
+        "add-tags": "Add tags",
+        "find-similar": "Find similar",
+        "archive": "Archive",
+        "delete": "Delete"
       }
     },
     "quiz": {
@@ -133,9 +175,27 @@
     },
     "toolSelection": {
       "back": "Back",
-      "chooseProfessor": "Choose Professor",
-      "chooseSubject": "Choose Subject",
+      "chooseProfessor": "Choose Professor for {tool}",
+      "chooseSubject": "Choose Subject for {tool}",
       "close": "Close"
+    },
+    "tools": {
+      "mindmap": "Mind Map",
+      "quiz": "Quiz",
+      "flashcard": "Flashcard",
+      "summary": "Summary",
+      "demo": "Simulation",
+      "diagram": "Diagram",
+      "timeline": "Timeline",
+      "formula": "Formula",
+      "calculator": "Calculator",
+      "chart": "Chart",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Homework",
+      "search": "Search",
+      "typing": "Typing",
+      "study-kit": "Study Kit"
     },
     "archive": {
       "emptyDescription": "Empty Description",
@@ -586,12 +646,12 @@
   },
   "maestros": {
     "grid": {
-      "allButton": "All button",
-      "emptyDescription": "Empty description",
-      "emptyTitle": "Empty title",
-      "searchAriaLabel": "Search aria label",
-      "searchPlaceholder": "Search placeholder",
-      "title": "Titolo"
+      "all-button": "All",
+      "empty-description": "No professor found",
+      "empty-title": "No results",
+      "search-aria-label": "Search professor or subject",
+      "search-placeholder": "Search professor or subject...",
+      "title": "Professors"
     }
   },
   "supporti": {

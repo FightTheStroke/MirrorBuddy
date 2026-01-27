@@ -40,68 +40,110 @@
   "education": {
     "knowledge-hub": {
       "homework": {
-        "default-title": "Compiti",
-        "no-tasks": "Nessun compito"
+        "default-title": "Deberes",
+        "no-tasks": "Sin tareas"
       },
       "timeline": {
-        "default-title": "Linea del Tempo",
-        "no-events": "Nessun evento"
+        "default-title": "Línea de Tiempo",
+        "no-events": "Sin eventos disponibles"
       },
       "mindmap": {
-        "default-title": "Mappa Mentale"
+        "default-title": "Mapa Mental"
       },
       "quiz": {
-        "default-title": "Quiz",
-        "no-questions": "Nessuna domanda"
+        "default-title": "Cuestionario",
+        "no-questions": "Sin preguntas"
       },
       "flashcard": {
-        "default-title": "Flashcard",
-        "no-cards": "Nessuna flashcard"
+        "default-title": "Tarjetas",
+        "no-cards": "Sin tarjetas"
       },
       "summary": {
-        "default-title": "Riassunto"
+        "default-title": "Resumen"
       },
       "demo": {
-        "default-title": "Simulazione"
+        "default-title": "Simulación"
       },
       "diagram": {
-        "default-title": "Diagramma"
+        "default-title": "Diagrama"
       },
       "formula": {
-        "default-title": "Formula"
+        "default-title": "Fórmula"
       },
       "chart": {
-        "default-title": "Grafico"
+        "default-title": "Gráfico"
       },
       "image": {
-        "default-title": "Immagine"
+        "default-title": "Imagen"
       },
       "pdf": {
         "default-title": "PDF"
       },
-      "error-title": "Errore di visualizzazione",
-      "error-message-default": "Si è verificato un errore durante la visualizzazione del contenuto.",
-      "retry-button": "Riprova",
+      "error-title": "Error de visualización",
+      "error-message-default": "Se ha producido un error al mostrar el contenido.",
+      "error-message-with-type": "No se puede mostrar el material de tipo \"{type}\".",
+      "retry-button": "Reintentar",
       "sidebar": {
-        "navigation-aria-label": "Navigazione materiali",
-        "quick-filters-title": "Filtri rapidi",
-        "quick-filters-aria-label": "Filtri rapidi",
-        "recent": "Recenti",
-        "favorites": "Preferiti",
-        "archived": "Archiviati",
-        "collections-title": "Cartelle",
-        "collections-aria-label": "Cartelle",
-        "create-collection-aria-label": "Crea nuova cartella",
-        "no-collections": "Nessuna cartella",
-        "tags-title": "Tag",
-        "tags-aria-label": "Tag",
-        "create-tag-aria-label": "Crea nuovo tag",
-        "no-tags": "Nessun tag"
+        "navigation-aria-label": "Navegación de materiales",
+        "quick-filters-title": "Filtros rápidos",
+        "quick-filters-aria-label": "Filtros rápidos",
+        "recent": "Recientes",
+        "favorites": "Favoritos",
+        "archived": "Archivados",
+        "collections-title": "Carpetas",
+        "collections-aria-label": "Carpetas",
+        "create-collection-aria-label": "Crear nueva carpeta",
+        "no-collections": "Sin carpetas",
+        "tags-title": "Etiquetas",
+        "tags-aria-label": "Etiquetas",
+        "create-tag-aria-label": "Crear nueva etiqueta",
+        "no-tags": "Sin etiquetas"
       },
       "renderers": {
-        "noEvents": "Nessun evento disponibile",
-        "noData": "Nessun dato disponibile",
-        "noItems": "Nessun elemento disponibile"
+        "noEvents": "Sin eventos disponibles",
+        "noData": "Sin datos disponibles",
+        "noItems": "Sin elementos disponibles"
+      },
+      "header": {
+        "search": {
+          "placeholder": "Buscar en materiales...",
+          "aria-label": "Buscar en materiales",
+          "clear-aria-label": "Borrar búsqueda",
+          "announcement": "Búsqueda: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtrar por tipo",
+          "listbox-aria-label": "Seleccionar tipo de material"
+        }
+      },
+      "types": {
+        "all": "Todos",
+        "mindmap": "Mapa mental",
+        "quiz": "Cuestionario",
+        "flashcard": "Tarjeta",
+        "summary": "Resumen",
+        "demo": "Demo",
+        "diagram": "Diagrama",
+        "timeline": "Línea de tiempo",
+        "formula": "Fórmula",
+        "calculator": "Calculadora",
+        "chart": "Gráfico",
+        "pdf": "PDF",
+        "webcam": "Webcam",
+        "homework": "Deberes",
+        "search": "Búsqueda",
+        "typing": "Mecanografía",
+        "study-kit": "Kit de estudio"
+      },
+      "material-menu": {
+        "aria-label": "Acciones del material",
+        "open": "Abrir",
+        "duplicate": "Duplicar",
+        "move": "Mover",
+        "add-tags": "Añadir etiquetas",
+        "find-similar": "Buscar similares",
+        "archive": "Archivar",
+        "delete": "Eliminar"
       }
     },
     "quiz": {
@@ -132,10 +174,28 @@
       "suggestionsTitle": "Suggestions Title"
     },
     "toolSelection": {
-      "back": "Indietro",
-      "chooseProfessor": "Choose Professor",
-      "chooseSubject": "Choose Subject",
-      "close": "Chiudi"
+      "back": "Atrás",
+      "chooseProfessor": "Elegir Profesor para {tool}",
+      "chooseSubject": "Elegir Materia para {tool}",
+      "close": "Cerrar"
+    },
+    "tools": {
+      "mindmap": "Mapa Mental",
+      "quiz": "Quiz",
+      "flashcard": "Flashcard",
+      "summary": "Resumen",
+      "demo": "Simulación",
+      "diagram": "Diagrama",
+      "timeline": "Línea de Tiempo",
+      "formula": "Fórmula",
+      "calculator": "Calculadora",
+      "chart": "Gráfico",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Deberes",
+      "search": "Búsqueda",
+      "typing": "Escritura",
+      "study-kit": "Kit de Estudio"
     },
     "archive": {
       "emptyDescription": "Empty Description",
@@ -586,12 +646,12 @@
   },
   "maestros": {
     "grid": {
-      "allButton": "All button",
-      "emptyDescription": "Empty description",
-      "emptyTitle": "Empty title",
-      "searchAriaLabel": "Search aria label",
-      "searchPlaceholder": "Search placeholder",
-      "title": "Titolo"
+      "all-button": "Todos",
+      "empty-description": "No se encontró ningún profesor",
+      "empty-title": "Sin resultados",
+      "search-aria-label": "Buscar profesor o materia",
+      "search-placeholder": "Buscar profesor o materia...",
+      "title": "Profesores"
     }
   },
   "supporti": {

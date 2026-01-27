@@ -45,7 +45,7 @@
       },
       "timeline": {
         "default-title": "Zeitstrahl",
-        "no-events": "Keine Ereignisse"
+        "no-events": "Keine Ereignisse verfügbar"
       },
       "mindmap": {
         "default-title": "Mindmap"
@@ -81,6 +81,7 @@
       },
       "error-title": "Anzeigefehler",
       "error-message-default": "Ein Fehler ist beim Anzeigen aufgetreten.",
+      "error-message-with-type": "Material vom Typ \"{type}\" kann nicht angezeigt werden.",
       "retry-button": "Wiederholen",
       "sidebar": {
         "navigation-aria-label": "Materialnavigation",
@@ -91,17 +92,58 @@
         "archived": "Archiviert",
         "collections-title": "Ordner",
         "collections-aria-label": "Ordner",
-        "create-collection-aria-label": "Crea nuova cartella",
+        "create-collection-aria-label": "Neuen Ordner erstellen",
         "no-collections": "Keine Ordner",
         "tags-title": "Tags",
         "tags-aria-label": "Tags",
-        "create-tag-aria-label": "Crea nuovo tag",
+        "create-tag-aria-label": "Neuen Tag erstellen",
         "no-tags": "Keine Tags"
       },
       "renderers": {
-        "noEvents": "Nessun evento disponibile",
-        "noData": "Nessun dato disponibile",
-        "noItems": "Nessun elemento disponibile"
+        "noEvents": "Keine Ereignisse verfügbar",
+        "noData": "Keine Daten verfügbar",
+        "noItems": "Keine Elemente verfügbar"
+      },
+      "header": {
+        "search": {
+          "placeholder": "Materialien durchsuchen...",
+          "aria-label": "Materialien durchsuchen",
+          "clear-aria-label": "Suche löschen",
+          "announcement": "Suche: {value}"
+        },
+        "filter": {
+          "aria-label": "Nach Typ filtern",
+          "listbox-aria-label": "Materialtyp auswählen"
+        }
+      },
+      "types": {
+        "all": "Alle",
+        "mindmap": "Mindmap",
+        "quiz": "Quiz",
+        "flashcard": "Karteikarte",
+        "summary": "Zusammenfassung",
+        "demo": "Demo",
+        "diagram": "Diagramm",
+        "timeline": "Zeitleiste",
+        "formula": "Formel",
+        "calculator": "Rechner",
+        "chart": "Diagramm",
+        "pdf": "PDF",
+        "webcam": "Webcam",
+        "homework": "Hausaufgaben",
+        "search": "Suche",
+        "typing": "Tippen",
+        "study-kit": "Lernset"
+      },
+      "material-menu": {
+        "aria-label": "Materialaktionen",
+        "open": "Öffnen",
+        "duplicate": "Duplizieren",
+        "move": "Verschieben",
+        "add-tags": "Tags hinzufügen",
+        "find-similar": "Ähnliche finden",
+        "archive": "Archivieren",
+        "delete": "Löschen"
       }
     },
     "quiz": {
@@ -133,9 +175,27 @@
     },
     "toolSelection": {
       "back": "Zurück",
-      "chooseProfessor": "Choose Professor",
-      "chooseSubject": "Choose Subject",
+      "chooseProfessor": "Professor für {tool} auswählen",
+      "chooseSubject": "Fach für {tool} auswählen",
       "close": "Schließen"
+    },
+    "tools": {
+      "mindmap": "Mindmap",
+      "quiz": "Quiz",
+      "flashcard": "Lernkarte",
+      "summary": "Zusammenfassung",
+      "demo": "Simulation",
+      "diagram": "Diagramm",
+      "timeline": "Zeitstrahl",
+      "formula": "Formel",
+      "calculator": "Rechner",
+      "chart": "Grafik",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Hausaufgaben",
+      "search": "Suche",
+      "typing": "Tippen",
+      "study-kit": "Lernkit"
     },
     "archive": {
       "emptyDescription": "Empty Description",
@@ -586,12 +646,12 @@
   },
   "maestros": {
     "grid": {
-      "allButton": "All button",
-      "emptyDescription": "Empty description",
-      "emptyTitle": "Empty title",
-      "searchAriaLabel": "Search aria label",
-      "searchPlaceholder": "Search placeholder",
-      "title": "Titolo"
+      "all-button": "Alle",
+      "empty-description": "Kein Professor gefunden",
+      "empty-title": "Keine Ergebnisse",
+      "search-aria-label": "Professor oder Fach suchen",
+      "search-placeholder": "Professor oder Fach suchen...",
+      "title": "Professoren"
     }
   },
   "supporti": {

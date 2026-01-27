@@ -242,7 +242,7 @@
       "motorTimeoutDisableHint": "Motor Timeout Disable Hint",
       "motorTimeoutLabel": "Motor Timeout Label",
       "motorTitle": "Motor Title",
-      "panelTitle": "Panel Title",
+      "panelTitle": "Accessibilità",
       "pomodoroDesc": "Pomodoro Desc",
       "pomodoroTimer": "Pomodoro Timer",
       "presetADHD": "Preset A D H D",
@@ -692,7 +692,7 @@
   },
   "ambientAudio": {
     "activeLayers": "Livelli Attivi",
-    "addLayer": "Aggiungi Livello",
+    "addLayer": "Aggiungi Layer",
     "advancedMixer": "Mixer Avanzato",
     "advancedSettings": "Impostazioni avanzate",
     "ambientSounds": "Suoni Ambientali",

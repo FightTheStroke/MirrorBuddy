@@ -45,7 +45,7 @@
       },
       "timeline": {
         "default-title": "Chronologie",
-        "no-events": "Aucun événement"
+        "no-events": "Aucun événement disponible"
       },
       "mindmap": {
         "default-title": "Carte mentale"
@@ -81,6 +81,7 @@
       },
       "error-title": "Erreur d'affichage",
       "error-message-default": "Une erreur s'est produite lors de l'affichage du contenu.",
+      "error-message-with-type": "Impossible d'afficher le matériel de type \"{type}\".",
       "retry-button": "Réessayer",
       "sidebar": {
         "navigation-aria-label": "Navigation des matériaux",
@@ -91,17 +92,58 @@
         "archived": "Archivés",
         "collections-title": "Dossiers",
         "collections-aria-label": "Dossiers",
-        "create-collection-aria-label": "Crea nuova cartella",
+        "create-collection-aria-label": "Créer un nouveau dossier",
         "no-collections": "Aucun dossier",
         "tags-title": "Tags",
         "tags-aria-label": "Tags",
-        "create-tag-aria-label": "Crea nuovo tag",
+        "create-tag-aria-label": "Créer un nouveau tag",
         "no-tags": "Aucun tag"
       },
       "renderers": {
-        "noEvents": "Nessun evento disponibile",
-        "noData": "Nessun dato disponibile",
-        "noItems": "Nessun elemento disponibile"
+        "noEvents": "Aucun événement disponible",
+        "noData": "Aucune donnée disponible",
+        "noItems": "Aucun élément disponible"
+      },
+      "header": {
+        "search": {
+          "placeholder": "Rechercher dans les matériels...",
+          "aria-label": "Rechercher dans les matériels",
+          "clear-aria-label": "Effacer la recherche",
+          "announcement": "Recherche: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtrer par type",
+          "listbox-aria-label": "Sélectionner le type de matériel"
+        }
+      },
+      "types": {
+        "all": "Tous",
+        "mindmap": "Carte mentale",
+        "quiz": "Quiz",
+        "flashcard": "Carte mémoire",
+        "summary": "Résumé",
+        "demo": "Démo",
+        "diagram": "Diagramme",
+        "timeline": "Chronologie",
+        "formula": "Formule",
+        "calculator": "Calculatrice",
+        "chart": "Graphique",
+        "pdf": "PDF",
+        "webcam": "Webcam",
+        "homework": "Devoirs",
+        "search": "Recherche",
+        "typing": "Dactylographie",
+        "study-kit": "Kit d'étude"
+      },
+      "material-menu": {
+        "aria-label": "Actions sur le matériel",
+        "open": "Ouvrir",
+        "duplicate": "Dupliquer",
+        "move": "Déplacer",
+        "add-tags": "Ajouter des tags",
+        "find-similar": "Trouver similaires",
+        "archive": "Archiver",
+        "delete": "Supprimer"
       }
     },
     "quiz": {
@@ -133,9 +175,27 @@
     },
     "toolSelection": {
       "back": "Retour",
-      "chooseProfessor": "Choose Professor",
-      "chooseSubject": "Choose Subject",
+      "chooseProfessor": "Choisir un Professeur pour {tool}",
+      "chooseSubject": "Choisir une Matière pour {tool}",
       "close": "Fermer"
+    },
+    "tools": {
+      "mindmap": "Carte Mentale",
+      "quiz": "Quiz",
+      "flashcard": "Flashcard",
+      "summary": "Résumé",
+      "demo": "Simulation",
+      "diagram": "Diagramme",
+      "timeline": "Chronologie",
+      "formula": "Formule",
+      "calculator": "Calculatrice",
+      "chart": "Graphique",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Devoirs",
+      "search": "Recherche",
+      "typing": "Frappe",
+      "study-kit": "Kit d'Étude"
     },
     "archive": {
       "emptyDescription": "Empty Description",
@@ -586,12 +646,12 @@
   },
   "maestros": {
     "grid": {
-      "allButton": "All button",
-      "emptyDescription": "Empty description",
-      "emptyTitle": "Empty title",
-      "searchAriaLabel": "Search aria label",
-      "searchPlaceholder": "Search placeholder",
-      "title": "Titolo"
+      "all-button": "Tous",
+      "empty-description": "Aucun professeur trouvé",
+      "empty-title": "Aucun résultat",
+      "search-aria-label": "Rechercher professeur ou matière",
+      "search-placeholder": "Rechercher professeur ou matière...",
+      "title": "Professeurs"
     }
   },
   "supporti": {

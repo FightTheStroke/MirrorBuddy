@@ -45,7 +45,7 @@
       },
       "timeline": {
         "default-title": "Linea del Tempo",
-        "no-events": "Nessun evento"
+        "no-events": "Nessun evento disponibile"
       },
       "mindmap": {
         "default-title": "Mappa Mentale"
@@ -80,7 +80,8 @@
         "default-title": "PDF"
       },
       "error-title": "Errore di visualizzazione",
-      "error-message-default": "Si è verificato un errore durante la visualizzazione del contenuto.",
+      "error-message-default": "Impossibile visualizzare questo materiale.",
+      "error-message-with-type": "Impossibile visualizzare il materiale di tipo \"{type}\".",
       "retry-button": "Riprova",
       "sidebar": {
         "navigation-aria-label": "Navigazione materiali",
@@ -102,6 +103,47 @@
         "noEvents": "Nessun evento disponibile",
         "noData": "Nessun dato disponibile",
         "noItems": "Nessun elemento disponibile"
+      },
+      "header": {
+        "search": {
+          "placeholder": "Cerca nei materiali...",
+          "aria-label": "Cerca materiali",
+          "clear-aria-label": "Cancella ricerca",
+          "announcement": "Ricerca: {value}"
+        },
+        "filter": {
+          "aria-label": "Filtra per tipo",
+          "listbox-aria-label": "Seleziona tipo materiale"
+        }
+      },
+      "types": {
+        "all": "Tutti",
+        "mindmap": "Mappe mentali",
+        "quiz": "Quiz",
+        "flashcard": "Flashcard",
+        "summary": "Riassunto",
+        "demo": "Demo",
+        "diagram": "Diagramma",
+        "timeline": "Linea temporale",
+        "formula": "Formula",
+        "calculator": "Calcolatrice",
+        "chart": "Grafico",
+        "pdf": "PDF",
+        "webcam": "Webcam",
+        "homework": "Compiti",
+        "search": "Ricerca",
+        "typing": "Digitazione",
+        "study-kit": "Kit di studio"
+      },
+      "material-menu": {
+        "aria-label": "Azioni materiale",
+        "open": "Apri",
+        "duplicate": "Duplica",
+        "move": "Sposta",
+        "add-tags": "Aggiungi tag",
+        "find-similar": "Trova simili",
+        "archive": "Archivia",
+        "delete": "Elimina"
       }
     },
     "quiz": {
@@ -133,9 +175,27 @@
     },
     "toolSelection": {
       "back": "Indietro",
-      "chooseProfessor": "Choose Professor",
-      "chooseSubject": "Choose Subject",
+      "chooseProfessor": "Scegli Maestro per {tool}",
+      "chooseSubject": "Scegli Materia per {tool}",
       "close": "Chiudi"
+    },
+    "tools": {
+      "mindmap": "Mappa Mentale",
+      "quiz": "Quiz",
+      "flashcard": "Flashcard",
+      "summary": "Riassunto",
+      "demo": "Simulazione",
+      "diagram": "Diagramma",
+      "timeline": "Linea Temporale",
+      "formula": "Formula",
+      "calculator": "Calcolatrice",
+      "chart": "Grafico",
+      "pdf": "PDF",
+      "webcam": "Webcam",
+      "homework": "Compiti",
+      "search": "Ricerca",
+      "typing": "Digitazione",
+      "study-kit": "Kit di Studio"
     },
     "archive": {
       "emptyDescription": "Empty Description",
@@ -586,12 +646,12 @@
   },
   "maestros": {
     "grid": {
-      "allButton": "All button",
-      "emptyDescription": "Empty description",
-      "emptyTitle": "Empty title",
-      "searchAriaLabel": "Search aria label",
-      "searchPlaceholder": "Search placeholder",
-      "title": "Titolo"
+      "all-button": "Tutti",
+      "empty-description": "Nessun professore trovato",
+      "empty-title": "Nessun risultato",
+      "search-aria-label": "Cerca professore o materia",
+      "search-placeholder": "Cerca professore o materia...",
+      "title": "Professori"
     }
   },
   "supporti": {

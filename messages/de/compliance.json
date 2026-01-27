@@ -317,9 +317,18 @@
       "description": "Hai domande o feedback? Compila il modulo sottostante e ti risponderemo il prima possibile."
     },
     "enterprise": {
-      "submitting": "Submitting",
-      "successDescription": "Success Description",
-      "successTitle": "Success Title"
+      "heading": "Kontaktieren Sie uns Enterprise",
+      "subtitle": "Maßgeschneiderte Lösungen für Unternehmensschulungen",
+      "title": "Enterprise - Kontakt",
+      "description": "Entdecken Sie unsere Enterprise-Lösungen für maßgeschneiderte Unternehmensschulungen",
+      "features": {
+        "customization": "Vollständige Anpassung der Schulungswege",
+        "analytics": "Erweitertes Analytics-Dashboard und Berichterstattung",
+        "integration": "Integration mit HR-Systemen des Unternehmens"
+      },
+      "submitting": "Wird gesendet...",
+      "successDescription": "Unser Enterprise-Team wird Sie innerhalb von 24 Geschäftsstunden kontaktieren.",
+      "successTitle": "Anfrage gesendet"
     },
     "form": {
       "emailInvalid": "Email Invalid",
@@ -340,25 +349,47 @@
       "subjectLabel": "Oggetto"
     },
     "schools_form": {
-      "errorConnection": "Error Connection",
-      "errorDefault": "Error Default",
+      "errorConnection": "Verbindungsfehler",
+      "errorDefault": "Fehler beim Senden",
       "features": {
-        "curriculum": "Curriculum",
-        "management": "Management",
-        "reporting": "Reporting",
-        "support": "Support"
+        "curriculum": "Lehrplananpassung",
+        "management": "Klassenverwaltung",
+        "reporting": "Berichte und Analysen",
+        "support": "Dedizierter Support"
       },
-      "messagePlaceholder": "Message Placeholder",
-      "roleLabel": "Role Label",
-      "schoolNameLabel": "School Name Label",
-      "schoolTypeLabel": "School Type Label",
-      "solutions": "Solutions",
-      "specificNeedsLabel": "Specific Needs Label",
-      "studentCountLabel": "Student Count Label",
-      "submitButtonDefault": "Submit Button Default",
-      "submitButtonLoading": "Submit Button Loading",
-      "successMessage": "Success Message",
-      "successTitle": "Success Title"
+      "intro": "Wir bieten maßgeschneiderte Lösungen für die Lehrplananpassung und die spezifischen Bedürfnisse Ihrer Schule.",
+      "messagePlaceholder": "Beschreiben Sie die Bedürfnisse Ihrer Schule...",
+      "nameLabel": "Name",
+      "emailLabel": "E-Mail",
+      "roleLabel": "Rolle",
+      "roleOptions": {
+        "dirigente": "Schulleiter",
+        "docente": "Lehrer",
+        "coordinatore": "Koordinator",
+        "altro": "Andere"
+      },
+      "schoolNameLabel": "Schulname",
+      "schoolTypeLabel": "Schultyp",
+      "schoolTypeOptions": {
+        "primaria": "Grundschule",
+        "secondaria1": "Sekundarschule I",
+        "secondaria2": "Sekundarschule II",
+        "altro": "Andere"
+      },
+      "solutions": "Lösungen",
+      "specificNeedsLabel": "Spezifische Bedürfnisse",
+      "studentCountLabel": "Anzahl Schüler",
+      "studentCountOptions": {
+        "small": "Weniger als 200",
+        "medium": "200-500",
+        "large": "500-1000",
+        "xlarge": "Über 1000"
+      },
+      "messageLabel": "Nachricht",
+      "submitButtonDefault": "Anfrage senden",
+      "submitButtonLoading": "Wird gesendet...",
+      "successMessage": "Ihre Anfrage wurde erfolgreich gesendet. Wir werden Sie bald kontaktieren.",
+      "successTitle": "Anfrage gesendet"
     }
   },
   "legal": {

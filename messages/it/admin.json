@@ -10,40 +10,55 @@
       "subtitle": "Sottotitolo",
       "title": "Titolo",
       "systemInfo": {
-        "buildDate": "Build date",
-        "description": "Descrizione",
-        "environment": "Environment",
-        "nodeVersion": "Node version",
-        "title": "Titolo",
-        "version": "Version"
+        "buildDate": "Build",
+        "description": "Informazioni sul sistema e versioni",
+        "environment": "Ambiente",
+        "nodeVersion": "Node:",
+        "title": "Informazioni Sistema",
+        "version": "Versione"
       },
       "trialBudget": {
-        "configuredVia": "Configured via",
-        "description": "Descrizione",
-        "descriptionText": "Description text",
-        "perMonth": "Per month",
-        "title": "Titolo"
+        "configuredVia": "Configurato via env var",
+        "description": "Budget mensile per utenti trial",
+        "descriptionText": "Testo descrizione",
+        "perMonth": "al mese",
+        "title": "Budget Trial"
+      },
+      "system-info": {
+        "title": "System Info",
+        "description": "Informazioni sul sistema",
+        "version": "Version",
+        "environment": "Environment",
+        "node-version": "Node:",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Budget mensile per utenti trial",
+        "per-month": "al mese",
+        "configured-via": "Configurato via env var",
+        "description-text": "Il budget massimo mensile per gli utenti in prova"
       }
     },
     "systemAlerts": "System Alerts",
     "terms": "Termini",
     "tiers": {
       "conversionFunnel": {
-        "backToTiers": "Back To Tiers",
-        "baseToProRate": "Base To Pro Rate",
-        "conversionRate": "Conversion Rate",
-        "conversions": "Conversions",
-        "detailedAnalysis": "Detailed Analysis",
+        "backToTiers": "Back to Tiers",
+        "baseToProRate": "Base → Pro",
+        "conversionRate": "Tasso di conversione",
+        "conversions": "{count} conversioni",
+        "detailedAnalysis": "Detailed conversion analysis",
         "funnelEfficiency": "Funnel Efficiency",
         "keyMetrics": "Key Metrics",
-        "period": "Period",
-        "subtitle": "Sottotitolo",
-        "title": "Titolo",
+        "period": "{start} to {end}",
+        "subtitle": "Conversion Funnel",
+        "title": "Tier Conversion Funnel",
         "totalTracked": "Total Tracked",
-        "trialToBase": "Trial To Base",
-        "trialToPro": "Trial To Pro",
+        "trialToBase": "Trial → Base",
+        "trialToPro": "Trial → Pro (Direct)",
         "trialUsers": "Trial Users",
-        "users": "Utenti"
+        "users": "{count} utenti"
       },
       "form": {
         "basicInfo": "Basic Info",
@@ -56,16 +71,18 @@
         "create": "Crea",
         "description": "Descrizione",
         "descriptionPlaceholder": "Description Placeholder",
-        "docsHelp": "Docs Help",
-        "docsTotal": "Docs Total",
+        "chatMessagesDaily": "Messaggi Chat Giornalieri",
+        "chatMessagesHelp": "Numero massimo di messaggi chat al giorno",
+        "docsHelp": "Numero massimo di documenti caricabili",
+        "docsTotal": "Documenti Totali",
         "error": "Errore",
         "features": "Funzionalità",
-        "featuresNote": "Features Note",
-        "invalidNumber": "Invalid Number",
-        "isActive": "Is Active",
-        "limits": "Limits",
-        "maxError": "Max Error",
-        "minError": "Min Error",
+        "featuresNote": "Nota sulle funzionalità incluse in questo tier",
+        "invalidNumber": "Inserisci un numero valido",
+        "isActive": "Attivo",
+        "limits": "Limiti",
+        "maxError": "Il valore massimo è {max}",
+        "minError": "Il valore minimo è {min}",
         "monthlyPrice": "Monthly Price",
         "monthlyPricePlaceholder": "Monthly Price Placeholder",
         "name": "Nome",
@@ -79,11 +96,11 @@
         "success": "Completato",
         "successCreate": "Success Create",
         "successUpdate": "Success Update",
-        "toolsDaily": "Tools Daily",
-        "toolsHelp": "Tools Help",
+        "toolsDaily": "Strumenti Giornalieri",
+        "toolsHelp": "Numero massimo di strumenti utilizzabili al giorno",
         "update": "Aggiorna",
-        "voiceMinutesDaily": "Voice Minutes Daily",
-        "voiceMinutesHelp": "Voice Minutes Help"
+        "voiceMinutesDaily": "Minuti Voce Giornalieri",
+        "voiceMinutesHelp": "Minuti di utilizzo voce al giorno"
       },
       "table": {
         "actions": "Azioni",
@@ -115,12 +132,12 @@
         "username": "Username"
       },
       "tabs": {
-        "active": "Attivo",
+        "active": "Attivi",
         "all": "Tutti",
         "disabled": "Disabilitato",
-        "trash": "Trash"
+        "trash": "Cestino"
       },
-      "trashEmpty": "Trash empty",
+      "trashEmpty": "Cestino vuoto",
       "bulkActions": {
         "changeTier": "Change Tier",
         "confirmDelete": "Confirm Delete",
@@ -266,8 +283,8 @@
       "summary": "Summary"
     },
     "protectedUsers": {
-      "noUsers": "No Users",
-      "title": "Utenti Protetti",
+      "noUsers": "Nessun utente protetto configurato",
+      "title": "Protected Users",
       "empty": "Nessun utente protetto configurato",
       "description": "Questi utenti sono protetti dalla pulizia automatica dei dati di test.",
       "add": "Aggiungi utente",

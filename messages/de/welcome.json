@@ -343,25 +343,35 @@
   },
   "onboarding": {
     "transcript": {
-      "conversationActive": "Conversation Active",
-      "conversationTitle": "Conversation Title",
-      "messagePlural": "Message Plural",
-      "messageSingular": "Message Singular",
-      "noConversation": "No Conversation",
-      "userLabel": "User Label"
+      "conversationActive": "Gespräch aktiv",
+      "conversationTitle": "Gesprächstitel",
+      "messagePlural": "Nachrichten",
+      "messageSingular": "Nachricht",
+      "noConversation": "Kein Gespräch",
+      "userLabel": "Du"
+    },
+    "checklist": {
+      "nameLabel": "Name",
+      "ageLabel": "Alter",
+      "schoolLabel": "Schule",
+      "schoolElementary": "Grundschule",
+      "schoolMiddle": "Mittelschule",
+      "schoolHigh": "Gymnasium",
+      "differencesLabel": "Lernschwierigkeiten",
+      "differencesCount": "{count} ausgewählt"
     },
     "voicePanel": {
       "cancel": "Abbrechen",
-      "connected": "Connesso",
-      "disableMicrophone": "Disable Microphone",
-      "enableMicrophone": "Enable Microphone",
-      "endCall": "End Call",
-      "listening": "In ascolto",
+      "connected": "Verbunden",
+      "disableMicrophone": "Mikrofon deaktivieren",
+      "enableMicrophone": "Mikrofon aktivieren",
+      "endCall": "Anruf beenden",
+      "listening": "Hört zu",
       "melissa": "Melissa",
-      "microphoneMuted": "Microphone Muted",
-      "speakWithMelissa": "Speak With Melissa",
-      "speaking": "Sta parlando",
-      "you": "You"
+      "microphoneMuted": "Mikrofon stummgeschaltet",
+      "speakWithMelissa": "Mit Melissa sprechen",
+      "speaking": "Spricht",
+      "you": "Du"
     }
   }
 }

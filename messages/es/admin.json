@@ -23,27 +23,42 @@
         "descriptionText": "Description text",
         "perMonth": "Per month",
         "title": "Titolo"
+      },
+      "system-info": {
+        "title": "System Info",
+        "description": "Información del sistema",
+        "version": "Version",
+        "environment": "Environment",
+        "node-version": "Node:",
+        "build-date": "Build"
+      },
+      "trial-budget": {
+        "title": "Trial Budget",
+        "description": "Presupuesto mensual para usuarios de prueba",
+        "per-month": "al mes",
+        "configured-via": "Configurado via env var",
+        "description-text": "Presupuesto mensual máximo para usuarios de prueba"
       }
     },
     "systemAlerts": "System Alerts",
     "terms": "Termini",
     "tiers": {
       "conversionFunnel": {
-        "backToTiers": "Back To Tiers",
-        "baseToProRate": "Base To Pro Rate",
-        "conversionRate": "Conversion Rate",
-        "conversions": "Conversions",
-        "detailedAnalysis": "Detailed Analysis",
+        "backToTiers": "Back to Tiers",
+        "baseToProRate": "Base → Pro",
+        "conversionRate": "Tasa de conversión",
+        "conversions": "{count} conversiones",
+        "detailedAnalysis": "Detailed conversion analysis",
         "funnelEfficiency": "Funnel Efficiency",
         "keyMetrics": "Key Metrics",
-        "period": "Period",
-        "subtitle": "Sottotitolo",
-        "title": "Titolo",
+        "period": "{start} to {end}",
+        "subtitle": "Conversion Funnel",
+        "title": "Tier Conversion Funnel",
         "totalTracked": "Total Tracked",
-        "trialToBase": "Trial To Base",
-        "trialToPro": "Trial To Pro",
+        "trialToBase": "Trial → Base",
+        "trialToPro": "Trial → Pro (Direct)",
         "trialUsers": "Trial Users",
-        "users": "Utenti"
+        "users": "{count} usuarios"
       },
       "form": {
         "basicInfo": "Basic Info",

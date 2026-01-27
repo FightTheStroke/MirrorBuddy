@@ -178,24 +178,24 @@
       "topics": "Topics"
     },
     "controls": {
-      "cancelResponseAriaLabel": "Cancel Response Aria Label",
-      "cancelResponseTooltip": "Cancel Response Tooltip",
-      "endSessionAriaLabel": "End Session Aria Label",
-      "endSessionTooltip": "End Session Tooltip",
-      "inputPlaceholder": "Input Placeholder",
+      "cancelResponseAriaLabel": "Annulla risposta",
+      "cancelResponseTooltip": "Annulla risposta in corso",
+      "endSessionAriaLabel": "Termina sessione",
+      "endSessionTooltip": "Termina la sessione vocale",
+      "inputPlaceholder": "Scrivi un messaggio...",
       "muteAriaLabel": {
-        "muted": "Muted",
-        "unmuted": "Unmuted"
+        "muted": "Audio disattivato",
+        "unmuted": "Audio attivo"
       },
       "muteTooltip": {
-        "muted": "Muted",
-        "unmuted": "Unmuted"
+        "muted": "Attiva audio",
+        "unmuted": "Disattiva audio"
       },
-      "sendButton": "Send Button",
-      "sendMessageAriaLabel": "Send Message Aria Label",
-      "sendMessageTooltip": "Send Message Tooltip",
-      "switchToChatAriaLabel": "Switch To Chat Aria Label",
-      "switchToChatTooltip": "Switch To Chat Tooltip"
+      "sendButton": "Invia",
+      "sendMessageAriaLabel": "Invia messaggio",
+      "sendMessageTooltip": "Invia il messaggio",
+      "switchToChatAriaLabel": "Passa alla chat",
+      "switchToChatTooltip": "Torna alla chat testuale"
     }
   },
   "typing": {
@@ -303,13 +303,16 @@
       "connected": "Connesso",
       "connecting": "Connessione...",
       "listening": "In ascolto",
-      "microphoneDisabled": "Microphone Disabled",
-      "mutedLabel": "Muted Label",
-      "speakNow": "Speak Now",
+      "microphoneDisabled": "Microfono disabilitato",
+      "mutedLabel": "Audio disattivato",
+      "muteLabel": "Disattiva audio",
+      "speakNow": "Parla ora",
       "speaking": "Sta parlando",
-      "startingCall": "Starting Call",
-      "unmuteLabel": "Unmute Label"
+      "startingCall": "Avvio chiamata...",
+      "unmuteLabel": "Attiva audio"
     },
+    "connectionError": "Errore di connessione vocale",
+    "microphoneUnauthorized": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
     "permission": {
       "enableLabel": "Enable Label",
       "steps": {

@@ -317,9 +317,18 @@
       "description": "Hai domande o feedback? Compila il modulo sottostante e ti risponderemo il prima possibile."
     },
     "enterprise": {
-      "submitting": "Submitting",
-      "successDescription": "Success Description",
-      "successTitle": "Success Title"
+      "heading": "Contact Us Enterprise",
+      "subtitle": "Customized solutions for corporate training",
+      "title": "Enterprise - Contact Us",
+      "description": "Discover our enterprise solutions for customized corporate training",
+      "features": {
+        "customization": "Full customization of training paths",
+        "analytics": "Advanced analytics dashboard and reporting",
+        "integration": "Integration with corporate HR systems"
+      },
+      "submitting": "Submitting...",
+      "successDescription": "Our enterprise team will contact you within 24 business hours.",
+      "successTitle": "Request sent"
     },
     "form": {
       "emailInvalid": "Email Invalid",
@@ -340,25 +349,47 @@
       "subjectLabel": "Oggetto"
     },
     "schools_form": {
-      "errorConnection": "Error Connection",
-      "errorDefault": "Error Default",
+      "errorConnection": "Connection error",
+      "errorDefault": "Error submitting",
       "features": {
-        "curriculum": "Curriculum",
-        "management": "Management",
-        "reporting": "Reporting",
-        "support": "Support"
+        "curriculum": "Curriculum customization",
+        "management": "Class management",
+        "reporting": "Reports and analytics",
+        "support": "Dedicated support"
       },
-      "messagePlaceholder": "Message Placeholder",
-      "roleLabel": "Role Label",
-      "schoolNameLabel": "School Name Label",
-      "schoolTypeLabel": "School Type Label",
+      "intro": "We offer customized solutions for curriculum personalization and the specific needs of your school.",
+      "messagePlaceholder": "Describe your school's needs...",
+      "nameLabel": "Name",
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "roleOptions": {
+        "dirigente": "School principal",
+        "docente": "Teacher",
+        "coordinatore": "Coordinator",
+        "altro": "Other"
+      },
+      "schoolNameLabel": "School name",
+      "schoolTypeLabel": "School type",
+      "schoolTypeOptions": {
+        "primaria": "Primary school",
+        "secondaria1": "Middle school",
+        "secondaria2": "High school",
+        "altro": "Other"
+      },
       "solutions": "Solutions",
-      "specificNeedsLabel": "Specific Needs Label",
-      "studentCountLabel": "Student Count Label",
-      "submitButtonDefault": "Submit Button Default",
-      "submitButtonLoading": "Submit Button Loading",
-      "successMessage": "Success Message",
-      "successTitle": "Success Title"
+      "specificNeedsLabel": "Specific needs",
+      "studentCountLabel": "Number of students",
+      "studentCountOptions": {
+        "small": "Less than 200",
+        "medium": "200-500",
+        "large": "500-1000",
+        "xlarge": "Over 1000"
+      },
+      "messageLabel": "Message",
+      "submitButtonDefault": "Submit request",
+      "submitButtonLoading": "Submitting...",
+      "successMessage": "Your request has been submitted successfully. We will contact you soon.",
+      "successTitle": "Request submitted"
     }
   },
   "legal": {

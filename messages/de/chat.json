@@ -156,46 +156,46 @@
   "session": {
     "rating": {
       "close": "Schließen",
-      "feedbackLabel": "Feedback Label",
-      "feedbackPlaceholder": "Feedback Placeholder",
+      "feedbackLabel": "Ihr Feedback",
+      "feedbackPlaceholder": "Teilen Sie Ihre Meinung...",
       "labels": {
-        "1": "1",
-        "2": "2",
-        "3": "3",
-        "4": "4",
-        "5": "5"
+        "1": "Sehr schlecht",
+        "2": "Schlecht",
+        "3": "Okay",
+        "4": "Gut",
+        "5": "Ausgezeichnet"
       },
-      "minutes": "Minutes",
-      "savingError": "Saving Error",
-      "selectError": "Select Error",
-      "selectPlaceholder": "Select Placeholder",
-      "sessionWith": "Session With",
-      "skip": "Skip",
-      "stars": "Stars",
+      "minutes": "Minuten",
+      "savingError": "Fehler beim Speichern",
+      "selectError": "Bitte wählen Sie eine Bewertung",
+      "selectPlaceholder": "Thema auswählen",
+      "sessionWith": "Sitzung mit",
+      "skip": "Überspringen",
+      "stars": "Sterne",
       "submit": "Absenden",
-      "submitting": "Submitting",
-      "title": "Titolo",
-      "topics": "Topics"
+      "submitting": "Wird gesendet",
+      "title": "Bewerten Sie Ihre Sitzung",
+      "topics": "Besprochene Themen"
     },
     "controls": {
-      "cancelResponseAriaLabel": "Cancel Response Aria Label",
-      "cancelResponseTooltip": "Cancel Response Tooltip",
-      "endSessionAriaLabel": "End Session Aria Label",
-      "endSessionTooltip": "End Session Tooltip",
-      "inputPlaceholder": "Input Placeholder",
+      "cancelResponseAriaLabel": "Antwort abbrechen",
+      "cancelResponseTooltip": "Aktuelle Antwort abbrechen",
+      "endSessionAriaLabel": "Sitzung beenden",
+      "endSessionTooltip": "Sprachsitzung beenden",
+      "inputPlaceholder": "Nachricht eingeben...",
       "muteAriaLabel": {
-        "muted": "Muted",
-        "unmuted": "Unmuted"
+        "muted": "Stummgeschaltet",
+        "unmuted": "Ton aktiviert"
       },
       "muteTooltip": {
-        "muted": "Muted",
-        "unmuted": "Unmuted"
+        "muted": "Stummschaltung aufheben",
+        "unmuted": "Stummschalten"
       },
-      "sendButton": "Send Button",
-      "sendMessageAriaLabel": "Send Message Aria Label",
-      "sendMessageTooltip": "Send Message Tooltip",
-      "switchToChatAriaLabel": "Switch To Chat Aria Label",
-      "switchToChatTooltip": "Switch To Chat Tooltip"
+      "sendButton": "Senden",
+      "sendMessageAriaLabel": "Nachricht senden",
+      "sendMessageTooltip": "Nachricht senden",
+      "switchToChatAriaLabel": "Zum Chat wechseln",
+      "switchToChatTooltip": "Zurück zum Textchat"
     }
   },
   "typing": {
@@ -300,16 +300,19 @@
   },
   "voice": {
     "panel": {
-      "connected": "Connesso",
-      "connecting": "Connessione...",
-      "listening": "In ascolto",
-      "microphoneDisabled": "Microphone Disabled",
-      "mutedLabel": "Muted Label",
-      "speakNow": "Speak Now",
-      "speaking": "Sta parlando",
-      "startingCall": "Starting Call",
-      "unmuteLabel": "Unmute Label"
+      "connected": "Verbunden",
+      "connecting": "Verbindung wird hergestellt...",
+      "listening": "Hört zu",
+      "microphoneDisabled": "Mikrofon deaktiviert",
+      "mutedLabel": "Stummgeschaltet",
+      "muteLabel": "Stummschalten",
+      "speakNow": "Jetzt sprechen",
+      "speaking": "Spricht",
+      "startingCall": "Anruf wird gestartet...",
+      "unmuteLabel": "Stummschaltung aufheben"
     },
+    "connectionError": "Sprachverbindungsfehler",
+    "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in den Browsereinstellungen.",
     "permission": {
       "enableLabel": "Enable Label",
       "steps": {

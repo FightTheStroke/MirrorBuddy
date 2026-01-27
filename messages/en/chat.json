@@ -178,24 +178,24 @@
       "topics": "Topics"
     },
     "controls": {
-      "cancelResponseAriaLabel": "Cancel Response Aria Label",
-      "cancelResponseTooltip": "Cancel Response Tooltip",
-      "endSessionAriaLabel": "End Session Aria Label",
-      "endSessionTooltip": "End Session Tooltip",
-      "inputPlaceholder": "Input Placeholder",
+      "cancelResponseAriaLabel": "Cancel response",
+      "cancelResponseTooltip": "Cancel current response",
+      "endSessionAriaLabel": "End session",
+      "endSessionTooltip": "End voice session",
+      "inputPlaceholder": "Type a message...",
       "muteAriaLabel": {
         "muted": "Muted",
         "unmuted": "Unmuted"
       },
       "muteTooltip": {
-        "muted": "Muted",
-        "unmuted": "Unmuted"
+        "muted": "Unmute",
+        "unmuted": "Mute"
       },
-      "sendButton": "Send Button",
-      "sendMessageAriaLabel": "Send Message Aria Label",
-      "sendMessageTooltip": "Send Message Tooltip",
-      "switchToChatAriaLabel": "Switch To Chat Aria Label",
-      "switchToChatTooltip": "Switch To Chat Tooltip"
+      "sendButton": "Send",
+      "sendMessageAriaLabel": "Send message",
+      "sendMessageTooltip": "Send the message",
+      "switchToChatAriaLabel": "Switch to chat",
+      "switchToChatTooltip": "Return to text chat"
     }
   },
   "typing": {
@@ -300,16 +300,19 @@
   },
   "voice": {
     "panel": {
-      "connected": "Connesso",
-      "connecting": "Connessione...",
-      "listening": "In ascolto",
-      "microphoneDisabled": "Microphone Disabled",
-      "mutedLabel": "Muted Label",
-      "speakNow": "Speak Now",
-      "speaking": "Sta parlando",
-      "startingCall": "Starting Call",
-      "unmuteLabel": "Unmute Label"
+      "connected": "Connected",
+      "connecting": "Connecting...",
+      "listening": "Listening",
+      "microphoneDisabled": "Microphone disabled",
+      "mutedLabel": "Muted",
+      "muteLabel": "Mute",
+      "speakNow": "Speak now",
+      "speaking": "Speaking",
+      "startingCall": "Starting call...",
+      "unmuteLabel": "Unmute"
     },
+    "connectionError": "Voice connection error",
+    "microphoneUnauthorized": "Microphone not authorized. Enable microphone in browser settings.",
     "permission": {
       "enableLabel": "Enable Label",
       "steps": {
