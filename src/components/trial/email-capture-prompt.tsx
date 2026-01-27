@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import {
   Card,
   CardContent,
@@ -116,9 +117,9 @@ export function EmailCapturePrompt({
         <Mail className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mt-0.5" />
         <p className="text-sm text-indigo-800 dark:text-indigo-200">
           Abbiamo inviato un codice di verifica. Inseriscilo su{" "}
-          <a href="/trial/verify" className="underline">
+          <Link href="/trial/verify" className="underline">
             /trial/verify
-          </a>{" "}
+          </Link>{" "}
           per sbloccare gli strumenti della prova.
         </p>
       </div>

@@ -185,6 +185,7 @@ export default function TrialVerifyPage() {
     <Suspense
       fallback={
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
+          {/* eslint-disable-next-line local-rules/no-hardcoded-italian -- Loading text in suspense fallback */}
           <div className="animate-pulse text-gray-500">Caricamento...</div>
         </div>
       }
