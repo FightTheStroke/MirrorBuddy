@@ -23,14 +23,14 @@ Sentry.init({
     /^https:\/\/www\.mirrorbuddy\.org/,
   ],
 
-  // Replay is disabled by default - enable in production if needed
+  // Replay for debugging production issues
   replaysOnErrorSampleRate: 1.0,
-  replaysSessionSampleRate: 0,
+  replaysSessionSampleRate: 0.1,
 
-  // Integrations for comprehensive error capture
+  // Comprehensive integrations for maximum error capture
   integrations: [
+    // Session replay for debugging
     Sentry.replayIntegration({
-      // Additional Replay configuration goes in here
       maskAllText: true,
       blockAllMedia: true,
     }),
@@ -38,24 +38,93 @@ Sentry.init({
     Sentry.captureConsoleIntegration({
       levels: ["error", "warn"],
     }),
+    // Browser tracing for performance
+    Sentry.browserTracingIntegration({
+      enableInp: true,
+    }),
+    // Feedback widget for user reports
+    Sentry.feedbackIntegration({
+      colorScheme: "system",
+      autoInject: false,
+    }),
+    // HTTP client errors (fetch failures)
+    Sentry.httpClientIntegration(),
+    // Global handlers for unhandled errors
+    Sentry.globalHandlersIntegration({
+      onerror: true,
+      onunhandledrejection: true,
+    }),
+    // Linked errors for better stack traces
+    Sentry.linkedErrorsIntegration({
+      key: "cause",
+      limit: 5,
+    }),
+    // Dedupe to prevent duplicate errors
+    Sentry.dedupeIntegration(),
   ],
 
   // ZERO TOLERANCE: Capture ALL errors, filter nothing
-  // Errors from browser extensions are rare and worth knowing about
-  // User can create Sentry alerts/filters as needed
   ignoreErrors: [],
 
   // Only send errors in production
   enabled: process.env.NODE_ENV === "production",
 
-  // Also capture fetch errors and XHR failures
-  beforeSend(event, _hint) {
-    // Always send - zero tolerance
+  // Add context before sending
+  beforeSend(event, hint) {
+    // Capture hydration errors with special tag
+    const error = hint.originalException;
+    if (error && error instanceof Error) {
+      if (
+        error.message.includes("Hydration") ||
+        error.message.includes("hydrat")
+      ) {
+        event.tags = {
+          ...event.tags,
+          errorType: "hydration",
+        };
+      }
+
+      // Capture Next.js digest errors
+      if ("digest" in error) {
+        event.tags = {
+          ...event.tags,
+          digest: String((error as { digest?: string }).digest),
+          errorType: "next-digest",
+        };
+      }
+
+      // Capture chunk load failures
+      if (
+        error.message.includes("Loading chunk") ||
+        error.message.includes("ChunkLoadError")
+      ) {
+        event.tags = {
+          ...event.tags,
+          errorType: "chunk-load",
+        };
+      }
+    }
+
+    // Add browser context
+    event.tags = {
+      ...event.tags,
+      userAgent: navigator.userAgent.substring(0, 100),
+      viewport: `${window.innerWidth}x${window.innerHeight}`,
+      online: navigator.onLine ? "yes" : "no",
+    };
+
     return event;
   },
 
   // Capture all breadcrumbs for better debugging context
   beforeBreadcrumb(breadcrumb) {
+    // Keep all breadcrumbs for maximum context
     return breadcrumb;
   },
+
+  // Environment tagging
+  environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
+
+  // Release tracking
+  release: process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA || "local",
 });

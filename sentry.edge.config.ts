@@ -20,6 +20,36 @@ Sentry.init({
     /^https:\/\/www\.mirrorbuddy\.org/,
   ],
 
+  // ZERO TOLERANCE: Capture ALL edge errors
+  ignoreErrors: [],
+
+  // Add context before sending
+  beforeSend(event, hint) {
+    // Tag edge errors
+    event.tags = {
+      ...event.tags,
+      runtime: "edge",
+      errorType: event.tags?.errorType || "edge-error",
+    };
+
+    // Capture Next.js digest if present
+    const error = hint.originalException;
+    if (error && typeof error === "object" && "digest" in error) {
+      event.tags = {
+        ...event.tags,
+        digest: String((error as { digest?: string }).digest),
+      };
+    }
+
+    return event;
+  },
+
   // Only send errors in production
   enabled: process.env.NODE_ENV === "production",
+
+  // Environment tagging
+  environment: process.env.VERCEL_ENV || process.env.NODE_ENV || "development",
+
+  // Release tracking
+  release: process.env.VERCEL_GIT_COMMIT_SHA || "local",
 });
