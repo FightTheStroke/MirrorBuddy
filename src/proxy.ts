@@ -239,7 +239,7 @@ function shouldSkipI18n(pathname: string): boolean {
   return false;
 }
 
-export function proxy(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const startTime = Date.now();
 
