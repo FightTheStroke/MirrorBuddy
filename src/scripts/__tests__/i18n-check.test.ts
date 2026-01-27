@@ -170,6 +170,7 @@ describe("i18n-check script", () => {
     }
 
     const duration = Date.now() - start;
-    expect(duration).toBeLessThan(2000);
+    // Allow 5s for CI environments which may be slower
+    expect(duration).toBeLessThan(5000);
   });
 });

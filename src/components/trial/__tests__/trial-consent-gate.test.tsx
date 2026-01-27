@@ -24,8 +24,10 @@ describe("TrialConsentGate", () => {
   beforeEach(() => {
     // Reset mocks before each test
     vi.clearAllMocks();
-    // Clear localStorage
-    localStorage.clear();
+    // Clear localStorage (check if available in jsdom)
+    if (typeof localStorage !== "undefined" && localStorage.clear) {
+      localStorage.clear();
+    }
     // Clear trial consent cookie (set by handleAccept)
     document.cookie =
       "mirrorbuddy-trial-consent=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
