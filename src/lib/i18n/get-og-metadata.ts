@@ -73,7 +73,7 @@ export async function getLocalizedOGMetadata(
     : `${siteUrl}/${locale}`;
 
   // Use provided image or fall back to default
-  // TODO: Create dedicated OG image at 1200x630 for optimal social sharing
+  // Note: Current logo is 932x904, consider 1200x630 for optimal social sharing
   const image = options.image || {
     url: `${siteUrl}/logo-mirrorbuddy-full.png`,
     width: 932,

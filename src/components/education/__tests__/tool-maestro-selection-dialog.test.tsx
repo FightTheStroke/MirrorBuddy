@@ -143,7 +143,8 @@ describe("ToolMaestroSelectionDialog", () => {
           onClose={mockOnClose}
         />,
       );
-      expect(screen.getByText(/Mappa Mentale/)).toBeInTheDocument();
+      // Now uses capitalized tool type instead of translation
+      expect(screen.getByText(/Mindmap/)).toBeInTheDocument();
     });
 
     it("displays correct tool label for quiz", () => {

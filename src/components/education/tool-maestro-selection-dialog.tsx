@@ -93,8 +93,8 @@ export function ToolMaestroSelectionDialog({
     ? getMaestriBySubject(selectedSubject)
     : [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const toolLabel = t(`tools.${toolType}` as any) || toolType;
+  // Capitalize tool type for display (e.g., "mindmap" → "Mindmap")
+  const toolLabel = toolType.charAt(0).toUpperCase() + toolType.slice(1);
 
   const handleSubjectSelect = useCallback(
     (subject: Subject) => {

@@ -1,6 +1,4 @@
-/* eslint-disable */
-// @ts-nocheck
-import { describe, it, expect, beforeAll, afterAll, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
 
@@ -83,7 +81,7 @@ describe("Release Manager - i18n Validation", () => {
   });
 
   it("should verify all locales have matching keys", () => {
-    const keySets = {};
+    const keySets: Record<string, Set<string>> = {};
 
     for (const locale of locales) {
       const messages = loadLocaleMessages(locale);
@@ -180,7 +178,7 @@ describe("Release Manager - Locale Loading Test", () => {
   });
 
   it("should have consistent structure across all locales", () => {
-    const structures = {};
+    const structures: Record<string, string[]> = {};
 
     for (const locale of LOCALES) {
       const messages = loadLocaleMessages(locale);
@@ -237,14 +235,19 @@ describe("Release Manager - SEO Validation", () => {
 });
 
 // Helper functions
-function extractKeysFromObject(obj, prefix = "") {
-  const keys = new Set();
+function extractKeysFromObject(
+  obj: Record<string, unknown>,
+  prefix = "",
+): Set<string> {
+  const keys = new Set<string>();
 
   Object.entries(obj).forEach(([key, value]) => {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      extractKeysFromObject(value, fullKey).forEach((k) => keys.add(k));
+      extractKeysFromObject(value as Record<string, unknown>, fullKey).forEach(
+        (k) => keys.add(k),
+      );
     } else {
       keys.add(fullKey);
     }
@@ -253,14 +256,14 @@ function extractKeysFromObject(obj, prefix = "") {
   return keys;
 }
 
-function getStructureKeys(obj, prefix = "") {
-  const keys = [];
+function getStructureKeys(obj: Record<string, unknown>, prefix = ""): string[] {
+  const keys: string[] = [];
 
   Object.entries(obj).forEach(([key, value]) => {
     const fullKey = prefix ? `${prefix}.${key}` : key;
 
     if (typeof value === "object" && value !== null && !Array.isArray(value)) {
-      keys.push(...getStructureKeys(value, fullKey));
+      keys.push(...getStructureKeys(value as Record<string, unknown>, fullKey));
     } else {
       keys.push(fullKey);
     }
