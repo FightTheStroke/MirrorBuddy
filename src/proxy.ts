@@ -331,7 +331,16 @@ export default function proxy(request: NextRequest) {
   // for serverless compatibility. See src/lib/telemetry/use-activity-tracker.ts
 
   // Auth public routes - allow without auth but add CSP
-  if (AUTH_PUBLIC_ROUTES.some((r) => pathname.startsWith(r))) {
+  // Strip locale prefix for matching (e.g., /it/welcome → /welcome)
+  const locales = ["it", "en", "fr", "de", "es"];
+  const localePrefix = locales.find(
+    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
+  );
+  const pathWithoutLocale = localePrefix
+    ? pathname.slice(localePrefix.length + 1) || "/"
+    : pathname;
+
+  if (AUTH_PUBLIC_ROUTES.some((r) => pathWithoutLocale.startsWith(r))) {
     return finalizeResponse(
       NextResponse.next({ request: { headers: requestHeaders } }),
     );
