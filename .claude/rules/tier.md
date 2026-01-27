@@ -105,6 +105,23 @@ const { isSimulating, simulatedTier } = await res.json();
 
 **UI Location:** Admin header → Flask icon dropdown (`TierSimulator` component)
 
+## Tier Flexibility
+
+**All tier limits are stored in the database via TierService, not hardcoded.**
+
+Admins can modify any tier limit at any time through:
+
+- Admin panel: `/admin/tiers`
+- Direct database: `TierDefinition` table
+
+Changes take effect immediately after cache invalidation:
+
+```typescript
+tierService.invalidateCache();
+```
+
+No code deployment required to adjust limits.
+
 ## Header Tier Badge
 
 All users see their current tier in the home header:

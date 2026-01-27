@@ -19,6 +19,10 @@ import {
   applyDefaultRetentionSystemWide,
 } from "@/lib/privacy/data-retention-service";
 import { purgeExpiredUserBackups } from "@/lib/admin/user-trash-service";
+import {
+  cleanupExpiredTrialSessions,
+  cleanupNurturingTrialSessions,
+} from "@/lib/trial/trial-cleanup";
 
 const log = logger.child({ module: "cron-data-retention" });
 
@@ -38,6 +42,10 @@ interface CronResponse {
       conversations: number;
       messages: number;
       embeddings: number;
+    };
+    trial_sessions: {
+      deleted: number;
+      anonymized: number;
     };
     users_processed: number;
     errors: string[];
@@ -78,6 +86,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       default_retention: { conversations_marked: 0 },
       marked_for_deletion: { conversations: 0, embeddings: 0 },
       executed_deletions: { conversations: 0, messages: 0, embeddings: 0 },
+      trial_sessions: { deleted: 0, anonymized: 0 },
       users_processed: 0,
       errors: [],
     },
@@ -177,6 +186,41 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       response.summary.errors.push(`Backup purge: ${errorMsg}`);
     }
 
+    // Phase 4: Cleanup expired trial sessions (F-01)
+    // 4a: Delete sessions WITHOUT email after 30 days
+    try {
+      const deletionResult = await cleanupExpiredTrialSessions();
+      response.summary.trial_sessions.deleted = deletionResult.deletedCount;
+
+      if (deletionResult.deletedCount > 0) {
+        log.info("Trial sessions deleted (30-day)", {
+          deleted: deletionResult.deletedCount,
+        });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      log.error("Failed to cleanup trial sessions", { error: errorMsg });
+      response.summary.errors.push(`Trial cleanup: ${errorMsg}`);
+    }
+
+    // 4b: Anonymize sessions WITH email after 90 days (nurturing)
+    try {
+      const anonymizeResult = await cleanupNurturingTrialSessions();
+      // skippedWithEmail in this context = sessions that were anonymized
+      response.summary.trial_sessions.anonymized =
+        anonymizeResult.skippedWithEmail;
+
+      if (anonymizeResult.skippedWithEmail > 0) {
+        log.info("Trial sessions anonymized (90-day nurturing)", {
+          anonymized: anonymizeResult.skippedWithEmail,
+        });
+      }
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      log.error("Failed to anonymize nurturing sessions", { error: errorMsg });
+      response.summary.errors.push(`Nurturing anonymize: ${errorMsg}`);
+    }
+
     // Set duration
     response.duration_ms = Date.now() - startTime;
 
@@ -196,6 +240,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       users_processed: response.summary.users_processed,
       custom_marked: response.summary.marked_for_deletion.conversations,
       deleted_conversations: response.summary.executed_deletions.conversations,
+      trial_deleted: response.summary.trial_sessions.deleted,
+      trial_anonymized: response.summary.trial_sessions.anonymized,
     });
 
     return NextResponse.json(response, { status: 200 });

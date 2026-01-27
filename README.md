@@ -227,6 +227,8 @@ Try MirrorBuddy instantly without creating an account. Trial mode provides limit
 | Documents     | 1         | PDF/image upload for homework help        |
 | Maestri       | 3         | Randomly assigned AI tutors               |
 
+**Trial limits are configurable via TierService in the database.** Admins can adjust trial tier limits in the admin panel without code changes.
+
 **Anti-abuse protection:** Trial sessions are tracked by IP hash + cookie to prevent repeated trials via incognito browsing.
 
 **Admin Features (ADR 0061):** Collapsible sidebar, bulk invite actions, direct invite creation, real-time KPI dashboard.
@@ -315,6 +317,40 @@ npx tsx scripts/test-grafana-push.ts
 - `GET /api/health` — Load balancer health check
 - `GET /api/health/detailed` — Full system metrics
 - `GET /api/metrics` — Prometheus format (Grafana scrape)
+
+**Health Status Values:**
+
+| Status      | Meaning                                                   | HTTP Status |
+| ----------- | --------------------------------------------------------- | ----------- |
+| `healthy`   | All checks passed                                         | 200         |
+| `degraded`  | One or more checks warning (high latency, etc.)           | 200         |
+| `unhealthy` | One or more checks failed (database down, AI unavailable) | 503         |
+
+**Example Response:**
+
+```json
+{
+  "status": "healthy",
+  "version": "0.10.0",
+  "timestamp": "2025-01-26T21:50:00.000Z",
+  "uptime": 3600,
+  "checks": {
+    "database": {
+      "status": "pass",
+      "message": "Connected",
+      "latency_ms": 45
+    },
+    "ai_provider": {
+      "status": "pass",
+      "message": "Azure OpenAI configured"
+    },
+    "memory": {
+      "status": "pass",
+      "message": "128MB / 512MB (25%)"
+    }
+  }
+}
+```
 
 ---
 

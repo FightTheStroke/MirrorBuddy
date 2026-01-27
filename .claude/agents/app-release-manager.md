@@ -158,6 +158,102 @@ Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:
 
 **If adding new compliance section** (beyond 19.21): Update `COMPLIANCE_EXPECTED` in same script
 
+## DOCUMENTATION/CODE AUDIT VALIDATION
+
+The `doc-code-audit` check in release-brutal.sh detects documentation/code mismatches before release, ensuring README and docs accurately reflect current codebase values.
+
+### Purpose
+
+Prevents release of stale documentation that could confuse users, mislead customers, or violate compliance claims. Each check compares code-of-truth against public documentation.
+
+### Location
+
+```bash
+./scripts/doc-code-audit.sh
+```
+
+### Checks Performed
+
+| Check                | Code Source                      | Doc Source | Purpose                                   |
+| -------------------- | -------------------------------- | ---------- | ----------------------------------------- |
+| Trial chat limit     | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 daily chats documented          |
+| Trial voice limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 5 minutes documented               |
+| Trial tools limit    | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 10 tool uses documented            |
+| Trial maestri limit  | `src/lib/tier/tier-fallbacks.ts` | README.md  | Verify 3 maestri documented               |
+| Health status values | `src/app/api/health/route.ts`    | README.md  | Verify healthy/degraded/unhealthy exist   |
+| Voice model name     | `src/lib/tier/tier-fallbacks.ts` | Code only  | Detect deprecated gpt-4o-realtime-preview |
+| Metrics push cadence | `vercel.json` + code             | Docs/Ops   | Verify 5-minute push schedule documented  |
+
+### Exit Codes
+
+| Code | Meaning                                |
+| ---- | -------------------------------------- |
+| 0    | All checks PASSED - safe to release    |
+| 1    | One or more mismatches FOUND - BLOCKED |
+
+### Usage
+
+```bash
+# Run manually to debug mismatches
+./scripts/doc-code-audit.sh
+
+# Expected output on success
+✓ Trial chat limit: 10 (README ✓, code ✓)
+✓ Trial voice limit: 5 minutes (README ✓, code ✓)
+✓ Trial tools limit: 10 (README ✓, code ✓)
+✓ Trial maestri limit: 3 (README ✓, code ✓)
+✓ Health status 'healthy' found in code and README
+✓ Health status 'degraded' found in code and README
+✓ Health status 'unhealthy' found in code and README
+✓ No deprecated voice model names found
+✓ Found correct voice model name 'gpt-realtime'
+✓ Metrics push cadence: every 5 minutes (vercel.json ✓)
+✓ Operations docs mention 5 minute cadence
+
+✓ All documentation matches code!
+```
+
+### Blocking Behavior
+
+**Release BLOCKED if** `doc-code-audit` returns exit code 1.
+
+When a mismatch is detected:
+
+1. **README mismatch**: Update README.md trial limits table to match code values
+2. **Health status mismatch**: Add missing status values to README or code
+3. **Voice model mismatch**: Fix deprecated model name in tier-fallbacks.ts
+4. **Metrics cadence mismatch**: Update vercel.json schedule or operations docs
+5. Re-run script until all checks PASS
+6. Commit fixes: `git add README.md docs/ && git commit -m "docs: fix doc-code mismatches"`
+7. Proceed with release
+
+### Integration with release-brutal.sh
+
+This check is automatically included in the release flow:
+
+```bash
+./scripts/release-brutal.sh --json
+# Includes doc-code-audit as part of compliance/documentation checks
+```
+
+### Common Fixes
+
+| Mismatch                        | Fix                                                                        |
+| ------------------------------- | -------------------------------------------------------------------------- |
+| Trial chat 10 → 15 in README    | Update README table: `\| Chat messages \| 10 /month \|`                    |
+| Trial voice 5 → 3 in README     | Update README table: `\| Voice time \| 5 min /month \|`                    |
+| Missing health status in README | Add "healthy, degraded, unhealthy" to health endpoint docs                 |
+| Deprecated model name found     | Replace `gpt-4o-realtime-preview` with `gpt-realtime` in tier-fallbacks.ts |
+| Metrics cadence wrong schedule  | Update vercel.json cron: `"schedule": "*/5 * * * *"`                       |
+
+### References
+
+- Script: `scripts/doc-code-audit.sh`
+- Tier fallbacks: `src/lib/tier/tier-fallbacks.ts`
+- Health endpoint: `src/app/api/health/route.ts`
+- README trial mode section: `README.md` (Trial Mode table)
+- Cron jobs: `vercel.json` + `docs/operations/CRON-JOBS.md`
+
 ## VERSION + RELEASE
 
 ```bash

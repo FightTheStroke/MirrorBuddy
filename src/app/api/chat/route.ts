@@ -33,6 +33,8 @@ import { normalizeUnicode } from "@/lib/safety/versioning";
 import "@/lib/tools/handlers";
 
 import { requireCSRF } from "@/lib/security/csrf";
+import { isSessionBlocked } from "@/lib/trial/anti-abuse";
+import { prisma } from "@/lib/db";
 
 import { ChatRequest } from "./types";
 import { TOOL_CONTEXT } from "./constants";
@@ -129,6 +131,35 @@ export async function POST(request: NextRequest) {
       return response;
     }
     const trialSessionId = trialCheck.sessionId;
+
+    // F-03: Check if trial session is blocked due to abuse
+    if (trialSessionId && !userId) {
+      // Adapter for anti-abuse db interface
+      const dbAdapter = {
+        session: {
+          findUnique: (args: unknown) =>
+            prisma.trialSession.findUnique(
+              args as Parameters<typeof prisma.trialSession.findUnique>[0],
+            ),
+        },
+      };
+      const blocked = await isSessionBlocked(trialSessionId, dbAdapter);
+      if (blocked) {
+        log.warn("Trial session blocked for abuse", {
+          sessionId: trialSessionId.slice(0, 8),
+        });
+        const response = NextResponse.json(
+          {
+            error:
+              "Sessione bloccata per attività sospetta. Riprova tra 24 ore.",
+            code: "TRIAL_ABUSE_BLOCKED",
+          },
+          { status: 429 },
+        );
+        response.headers.set("X-Request-ID", getRequestId(request));
+        return response;
+      }
+    }
 
     // Load user settings and check budget
     let providerPreference: AIProvider | "auto" | undefined;

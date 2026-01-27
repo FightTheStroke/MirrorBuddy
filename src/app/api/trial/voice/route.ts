@@ -17,6 +17,8 @@ import {
 } from "@/lib/trial/trial-service";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { isSessionBlocked } from "@/lib/trial/anti-abuse";
+import { prisma } from "@/lib/db";
 
 const log = logger.child({ module: "api/trial/voice" });
 
@@ -41,6 +43,7 @@ export async function POST(request: NextRequest) {
 
     // Get trial session
     const cookieStore = await cookies();
+    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
@@ -57,6 +60,30 @@ export async function POST(request: NextRequest) {
       visitorId,
       auth.userId || undefined,
     );
+
+    // F-03: Check if trial session is blocked due to abuse
+    // Adapter for anti-abuse db interface
+    const dbAdapter = {
+      session: {
+        findUnique: (args: unknown) =>
+          prisma.trialSession.findUnique(
+            args as Parameters<typeof prisma.trialSession.findUnique>[0],
+          ),
+      },
+    };
+    const blocked = await isSessionBlocked(session.id, dbAdapter);
+    if (blocked) {
+      log.warn("Trial voice session blocked for abuse", {
+        sessionId: session.id.slice(0, 8),
+      });
+      return NextResponse.json(
+        {
+          error: "Sessione bloccata per attività sospetta. Riprova tra 24 ore.",
+          code: "TRIAL_ABUSE_BLOCKED",
+        },
+        { status: 429 },
+      );
+    }
 
     // Parse request body
     const body = await request.json();
@@ -115,6 +142,7 @@ export async function GET() {
 
     // Get trial session
     const cookieStore = await cookies();
+    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
