@@ -77,15 +77,17 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     });
     await expect(acceptButton).toBeDisabled();
 
-    // Check the checkbox (force: true bypasses decorative div overlay)
-    const checkbox = trialPage.getByRole("checkbox");
-    await checkbox.check({ force: true });
+    // Click the label to toggle the checkbox (shadcn/ui Checkbox uses controlled state)
+    const checkboxLabel = trialPage.getByText(
+      /Ho letto e accetto l'informativa privacy/i,
+    );
+    await checkboxLabel.click();
 
     // Accept button should now be enabled
     await expect(acceptButton).toBeEnabled();
 
-    // Uncheck the checkbox
-    await checkbox.uncheck({ force: true });
+    // Click label again to uncheck
+    await checkboxLabel.click();
 
     // Accept button should be disabled again
     await expect(acceptButton).toBeDisabled();
@@ -106,9 +108,10 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
 
     await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
 
-    // Accept consent (force: true bypasses decorative div overlay)
-    const checkbox = trialPage.getByRole("checkbox");
-    await checkbox.check({ force: true });
+    // Click the label to check the checkbox (shadcn/ui Checkbox uses controlled state)
+    await trialPage
+      .getByText(/Ho letto e accetto l'informativa privacy/i)
+      .click();
 
     const acceptButton = trialPage.getByRole("button", {
       name: /Inizia la prova/i,
@@ -201,9 +204,8 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       timeout: 10000,
     });
 
-    // Accept consent (force: true bypasses decorative div overlay)
-    const checkbox = page.getByRole("checkbox");
-    await checkbox.check({ force: true });
+    // Click the label to check the checkbox (shadcn/ui Checkbox uses controlled state)
+    await page.getByText(/Ho letto e accetto l'informativa privacy/i).click();
 
     const acceptButton = page.getByRole("button", {
       name: /Inizia la prova/i,
