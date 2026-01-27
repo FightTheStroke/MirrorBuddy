@@ -73,15 +73,13 @@ export default function proxy(request: NextRequest) {
  * - Static files (_next/static/*)
  * - Internal Next.js routes (_next/*)
  * - Monitoring routes (/monitoring)
- * - Public assets that don't need localization
+ * - Public assets that don't need localization (manifest.json, favicons, etc.)
  */
 export const config = {
   matcher: [
-    // Match all pathnames except:
-    // - API routes
-    // - Admin routes (not localized)
-    // - Next.js internals
-    // - Static files (images, fonts, etc.)
-    "/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)",
+    // Match all pathnames EXCEPT static assets and internal routes
+    // The pattern .*\\.[\\w]+ ensures files with extensions are excluded
+    // Using explicit exclusions for reliability across Next.js versions
+    "/((?!api|admin|_next|_vercel|monitoring|favicon|icon|apple-touch-icon|manifest\\.json|robots\\.txt|sitemap\\.xml|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot|css|js|map|json)).*)",
   ],
 };

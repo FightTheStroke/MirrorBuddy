@@ -4,7 +4,7 @@
  * React Error Boundary for MirrorBuddy
  *
  * Catches React rendering errors and displays a fallback UI.
- * Logs errors for observability.
+ * Logs errors to both structured logger and Sentry for monitoring.
  *
  * Usage:
  *   <ErrorBoundary fallback={<ErrorFallback />}>
@@ -13,6 +13,7 @@
  */
 
 import React, { Component, type ReactNode } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { logger } from "@/lib/logger";
 
 interface ErrorBoundaryProps {
@@ -50,6 +51,18 @@ export class ErrorBoundary extends Component<
       },
       error,
     );
+
+    // Report to Sentry for monitoring
+    Sentry.captureException(error, {
+      tags: {
+        errorType: "react-error-boundary",
+      },
+      contexts: {
+        react: {
+          componentStack: errorInfo.componentStack,
+        },
+      },
+    });
 
     this.props.onError?.(error, errorInfo);
   }

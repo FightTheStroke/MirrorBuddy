@@ -71,6 +71,55 @@ const nextConfig: NextConfig = {
     // Minimize browser memory usage
     minimumCacheTTL: 60 * 60 * 24, // 24 hours
   },
+  // Rewrite localized static files to their root locations
+  // Fix: i18n middleware redirects /manifest.json to /it/manifest.json which doesn't exist
+  // This rewrite serves the root manifest.json for all localized paths
+  async rewrites() {
+    return [
+      // Manifest.json - serve from root for all locales
+      {
+        source: "/:locale(it|en|fr|de|es)/manifest.json",
+        destination: "/manifest.json",
+      },
+      // Favicons - serve from root for all locales
+      {
+        source: "/:locale(it|en|fr|de|es)/favicon-16.png",
+        destination: "/favicon-16.png",
+      },
+      {
+        source: "/:locale(it|en|fr|de|es)/favicon-32.png",
+        destination: "/favicon-32.png",
+      },
+      {
+        source: "/:locale(it|en|fr|de|es)/favicon-48.png",
+        destination: "/favicon-48.png",
+      },
+      // Icons - serve from root for all locales
+      {
+        source: "/:locale(it|en|fr|de|es)/icon-192.png",
+        destination: "/icon-192.png",
+      },
+      {
+        source: "/:locale(it|en|fr|de|es)/icon-512.png",
+        destination: "/icon-512.png",
+      },
+      // Apple touch icon - serve from root for all locales
+      {
+        source: "/:locale(it|en|fr|de|es)/apple-touch-icon.png",
+        destination: "/apple-touch-icon.png",
+      },
+      // Robots and sitemap
+      {
+        source: "/:locale(it|en|fr|de|es)/robots.txt",
+        destination: "/robots.txt",
+      },
+      {
+        source: "/:locale(it|en|fr|de|es)/sitemap.xml",
+        destination: "/sitemap.xml",
+      },
+    ];
+  },
+
   // Add security headers for proper permissions handling
   async headers() {
     const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:3000";

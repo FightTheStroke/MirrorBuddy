@@ -5,6 +5,40 @@ import { LimitsSection } from "../tiers/components/limits-section";
 import { AuditFilters } from "../tiers/audit-log/components/audit-filters";
 import { UsersSearch } from "../users/users-search";
 
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      basicInfo: "Basic Info",
+      code: "Code",
+      codePlaceholder: "e.g. premium",
+      codeReadOnly: "Code cannot be changed",
+      name: "Name",
+      namePlaceholder: "e.g. Premium Plan",
+      description: "Description",
+      descriptionPlaceholder: "Plan description",
+      monthlyPrice: "Monthly Price",
+      pricePlaceholder: "e.g. 9.99",
+      sortOrder: "Sort Order",
+      positionHelp: "Position Help",
+      active: "Attivo",
+      limits: "Limits",
+      maxMessages: "Max Messages",
+      maxConversations: "Max Conversations",
+      maxChats: "Max Chats",
+      unlimited: "Unlimited",
+      messagesPerDay: "Messages Per Day",
+      conversationsPerDay: "Conversations Per Day",
+      filterAll: "All",
+      filterToday: "Today",
+      filterWeek: "This Week",
+      filterMonth: "This Month",
+      selectRange: "Select Range",
+    };
+    return translations[key] || key;
+  },
+}));
+
 describe("Admin Form Inputs - Mobile Responsiveness (F-47)", () => {
   describe("BasicInfoSection", () => {
     it("should render all inputs with full width on mobile", () => {
@@ -143,12 +177,12 @@ describe("Admin Form Inputs - Mobile Responsiveness (F-47)", () => {
       );
 
       const codeInput = screen.getByPlaceholderText(
-        "es. premium",
+        "e.g. premium",
       ) as HTMLInputElement;
       expect(codeInput).toHaveAttribute("required");
 
       const nameInput = screen.getByPlaceholderText(
-        "es. Piano Premium",
+        "e.g. Premium Plan",
       ) as HTMLInputElement;
       expect(nameInput).toHaveAttribute("required");
     });
