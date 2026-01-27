@@ -163,6 +163,29 @@ if (typeof global.ResizeObserver === "undefined") {
   };
 }
 
+// Mock localStorage for tests (Plan 091 - Tech Debt fix)
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] ?? null,
+    setItem: (key: string, value: string) => {
+      store[key] = value;
+    },
+    removeItem: (key: string) => {
+      delete store[key];
+    },
+    clear: () => {
+      store = {};
+    },
+    get length() {
+      return Object.keys(store).length;
+    },
+    key: (i: number) => Object.keys(store)[i] ?? null,
+  };
+})();
+
+Object.defineProperty(globalThis, "localStorage", { value: localStorageMock });
+
 // Polyfill Blob methods for jsdom environment
 if (typeof Blob !== "undefined") {
   // Polyfill Blob.text() (needed for svg-generator tests)

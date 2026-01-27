@@ -94,7 +94,7 @@ describe("no-hardcoded-italian rule - Detection Logic", () => {
   describe("rule metadata", () => {
     it("should have correct rule metadata", async () => {
       const ruleModule = await import("../../../eslint-local-rules/index.js");
-      const rule = ruleModule.rules["no-hardcoded-italian"];
+      const rule = ruleModule.default.rules["no-hardcoded-italian"];
       expect(rule.meta.type).toBe("suggestion");
       expect(rule.meta.docs.description).toMatch(/hardcoded|italian/i);
       expect(rule.meta.docs.category).toBe("Best Practices");
@@ -102,7 +102,7 @@ describe("no-hardcoded-italian rule - Detection Logic", () => {
 
     it("should have JSXText visitor", async () => {
       const ruleModule = await import("../../../eslint-local-rules/index.js");
-      const rule = ruleModule.rules["no-hardcoded-italian"];
+      const rule = ruleModule.default.rules["no-hardcoded-italian"];
       const context = rule.create({
         report: () => {},
       });
