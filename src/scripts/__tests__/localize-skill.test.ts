@@ -70,11 +70,12 @@ describe("Localize Skill", () => {
         encoding: "utf-8",
         stdio: "pipe",
       });
-      expect(result).toMatch(/it\.json/);
-      expect(result).toMatch(/en\.json/);
-      expect(result).toMatch(/fr\.json/);
-      expect(result).toMatch(/de\.json/);
-      expect(result).toMatch(/es\.json/);
+      // Script now uses namespace structure, reports locale names
+      expect(result).toMatch(/it:/);
+      expect(result).toMatch(/en:/);
+      expect(result).toMatch(/fr:/);
+      expect(result).toMatch(/de:/);
+      expect(result).toMatch(/es:/);
     });
 
     it("should show key counts for each locale", () => {
@@ -136,29 +137,70 @@ describe("Localize Skill", () => {
   });
 
   describe("Message Files Structure", () => {
+    const NAMESPACES = [
+      "common",
+      "auth",
+      "admin",
+      "chat",
+      "tools",
+      "settings",
+      "compliance",
+      "education",
+      "navigation",
+      "errors",
+      "welcome",
+      "metadata",
+    ];
+
+    /**
+     * Load all namespace files for a locale and merge them
+     */
+    function loadLocaleMessages(locale: string): Record<string, unknown> {
+      const localeDir = path.join(messagesDir, locale);
+      const merged: Record<string, unknown> = {};
+
+      for (const ns of NAMESPACES) {
+        const filePath = path.join(localeDir, `${ns}.json`);
+        if (fs.existsSync(filePath)) {
+          const content = fs.readFileSync(filePath, "utf-8");
+          Object.assign(merged, JSON.parse(content));
+        }
+      }
+
+      return merged;
+    }
+
     it("should have message files for all locales", () => {
       const locales = ["it", "en", "fr", "de", "es"];
       for (const locale of locales) {
-        const filePath = path.join(messagesDir, `${locale}.json`);
-        expect(fs.existsSync(filePath)).toBe(true);
+        // Namespace structure: messages/{locale}/{namespace}.json
+        const localeDir = path.join(messagesDir, locale);
+        expect(fs.existsSync(localeDir)).toBe(true);
+        expect(fs.statSync(localeDir).isDirectory()).toBe(true);
+
+        // Check at least common.json exists
+        const commonFile = path.join(localeDir, "common.json");
+        expect(fs.existsSync(commonFile)).toBe(true);
       }
     });
 
     it("should have valid JSON in all message files", () => {
       const locales = ["it", "en", "fr", "de", "es"];
       for (const locale of locales) {
-        const filePath = path.join(messagesDir, `${locale}.json`);
-        const content = fs.readFileSync(filePath, "utf-8");
-        expect(() => JSON.parse(content)).not.toThrow();
+        const localeDir = path.join(messagesDir, locale);
+        for (const ns of NAMESPACES) {
+          const filePath = path.join(localeDir, `${ns}.json`);
+          if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, "utf-8");
+            expect(() => JSON.parse(content)).not.toThrow();
+          }
+        }
       }
     });
 
     it("should have matching key structure across locales", () => {
-      const itPath = path.join(messagesDir, "it.json");
-      const enPath = path.join(messagesDir, "en.json");
-
-      const itContent = JSON.parse(fs.readFileSync(itPath, "utf-8"));
-      const enContent = JSON.parse(fs.readFileSync(enPath, "utf-8"));
+      const itContent = loadLocaleMessages("it");
+      const enContent = loadLocaleMessages("en");
 
       // Get all keys from Italian (reference)
       const getKeys = (

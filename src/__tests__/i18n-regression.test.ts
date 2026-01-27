@@ -18,6 +18,22 @@ type SupportedLocale = (typeof SUPPORTED_LOCALES)[number];
 
 const MESSAGES_DIR = path.join(process.cwd(), "messages");
 
+// Namespace files (ADR 0082)
+const NAMESPACES = [
+  "common",
+  "auth",
+  "admin",
+  "chat",
+  "tools",
+  "settings",
+  "compliance",
+  "education",
+  "navigation",
+  "errors",
+  "welcome",
+  "metadata",
+] as const;
+
 // Historical professors use formal address (Lei, Sie, Vous)
 const FORMAL_PROFESSORS = [
   "manzoni",
@@ -54,7 +70,30 @@ const LANGUAGE_MAESTRI = {
 
 // === HELPER FUNCTIONS ===
 
+/**
+ * Load all namespace files for a locale and merge them into a single object.
+ * Supports both old monolithic structure and new namespace-based structure.
+ */
 function loadMessageFile(locale: string): Record<string, unknown> {
+  const localeDir = path.join(MESSAGES_DIR, locale);
+
+  // New namespace-based structure: messages/{locale}/{namespace}.json
+  if (fs.existsSync(localeDir) && fs.statSync(localeDir).isDirectory()) {
+    const messages: Record<string, unknown> = {};
+
+    for (const namespace of NAMESPACES) {
+      const nsPath = path.join(localeDir, `${namespace}.json`);
+      if (fs.existsSync(nsPath)) {
+        const content = fs.readFileSync(nsPath, "utf-8");
+        const nsData = JSON.parse(content);
+        Object.assign(messages, nsData);
+      }
+    }
+
+    return messages;
+  }
+
+  // Fallback: old monolithic structure messages/{locale}.json
   const filePath = path.join(MESSAGES_DIR, `${locale}.json`);
   const content = fs.readFileSync(filePath, "utf-8");
   return JSON.parse(content);
@@ -90,10 +129,21 @@ function getNestedValue(obj: Record<string, unknown>, path: string): unknown {
 
 describe("i18n Regression Tests", () => {
   describe("1. Message File Consistency", () => {
-    it("should have all 5 language files", () => {
+    it("should have all 5 language directories with namespace files", () => {
       SUPPORTED_LOCALES.forEach((locale) => {
-        const filePath = path.join(MESSAGES_DIR, `${locale}.json`);
-        expect(fs.existsSync(filePath), `Missing ${locale}.json`).toBe(true);
+        const localeDir = path.join(MESSAGES_DIR, locale);
+        expect(
+          fs.existsSync(localeDir) && fs.statSync(localeDir).isDirectory(),
+          `Missing ${locale}/ directory`,
+        ).toBe(true);
+
+        // Check that all namespace files exist
+        NAMESPACES.forEach((ns) => {
+          const nsPath = path.join(localeDir, `${ns}.json`);
+          expect(fs.existsSync(nsPath), `Missing ${locale}/${ns}.json`).toBe(
+            true,
+          );
+        });
       });
     });
 
