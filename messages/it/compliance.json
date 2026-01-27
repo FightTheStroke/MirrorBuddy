@@ -535,6 +535,14 @@
         "website": "www.aepd.es",
         "responseTime": "30 giorni",
         "escalationTime": "Puoi presentare reclamo all'AEPD per questioni relative alla protezione dei dati."
+      },
+      "uk": {
+        "name": "Regno Unito",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 giorni",
+        "escalationTime": "Puoi presentare reclamo all'ICO se i tuoi diritti di protezione dei dati nel Regno Unito sono violati."
       }
     },
     "howToExercise": {

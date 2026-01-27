@@ -535,6 +535,22 @@
         "website": "www.bfdi.bund.de",
         "responseTime": "30 días",
         "escalationTime": "Puede presentar una reclamación ante la BfDI si tiene preocupaciones sobre la protección de datos."
+      },
+      "spain": {
+        "name": "España",
+        "authority": "AEPD (Agencia Española de Protección de Datos)",
+        "email": "consultas@aepd.es",
+        "website": "www.aepd.es",
+        "responseTime": "30 días",
+        "escalationTime": "Puede presentar una reclamación ante la AEPD por cuestiones relacionadas con la protección de datos."
+      },
+      "uk": {
+        "name": "Reino Unido",
+        "authority": "ICO (Information Commissioner's Office)",
+        "email": "mail@ico.org.uk",
+        "website": "www.ico.org.uk",
+        "responseTime": "30 días",
+        "escalationTime": "Puede presentar una reclamación ante la ICO si se violan sus derechos de protección de datos en el Reino Unido."
       }
     },
     "howToExercise": {
