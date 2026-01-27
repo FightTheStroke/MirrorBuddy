@@ -21,6 +21,7 @@ export function useToolSSE(
   useEffect(() => {
     if (!sessionId) return;
 
+    // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: eventSource.close() called in useEffect return (line 116)
     const eventSource = new EventSource(
       `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`,
     );

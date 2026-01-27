@@ -269,8 +269,8 @@ const eslintConfig = defineConfig([
       ],
     },
   },
-  // ADR 0075: Prefer validateAuth() over direct cookie reads in API routes
-  // Warns about direct cookies().get() calls to encourage using validateAuth/validateAdminAuth
+  // ADR 0075: Prefer validateAuth() over direct AUTH cookie reads in API routes
+  // Only warns about AUTH_COOKIE_NAME reads, not VISITOR_COOKIE_NAME (valid for trial)
   {
     files: ["src/app/api/**/*.ts"],
     ignores: [
@@ -288,13 +288,14 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "warn",
-        {
-          selector: "CallExpression[callee.object.name='cookieStore'][callee.property.name='get']",
-          message: "Prefer validateAuth() or validateAdminAuth() from '@/lib/auth/session-auth' instead of direct cookie reads. See ADR 0075.",
-        },
-      ],
+      "local-rules/prefer-validate-auth": "error",
+    },
+  },
+  // Local rules plugin - define once for all custom rules
+  // See: eslint-local-rules/index.js for rule implementations
+  {
+    plugins: {
+      "local-rules": { rules: localRules.rules },
     },
   },
   // i18n: Detect hardcoded Italian text in JSX - enforce translation usage
@@ -305,11 +306,19 @@ const eslintConfig = defineConfig([
       "src/**/*.test.tsx",
       "src/**/__tests__/**",
     ],
-    plugins: {
-      "local-rules": { rules: localRules.rules },
-    },
     rules: {
       "local-rules/no-hardcoded-italian": "error",
+    },
+  },
+  // ADR 0083: Prevent next-intl hooks in files outside LocaleProvider context
+  // providers.tsx and root layout run BEFORE LocaleProvider is mounted
+  {
+    files: [
+      "src/components/providers.tsx",
+      "src/app/layout.tsx",
+    ],
+    rules: {
+      "local-rules/no-i18n-in-providers": "error",
     },
   },
 ]);

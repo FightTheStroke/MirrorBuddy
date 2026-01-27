@@ -16,6 +16,7 @@ import { locales, defaultLocale } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
 import { getLocalizedOGMetadata } from "@/lib/i18n/get-og-metadata";
 import { LocaleProvider } from "@/i18n/locale-provider";
+import { A11yInstantAccess } from "@/components/accessibility";
 import type { Metadata } from "next";
 
 // Type for route params
@@ -58,6 +59,8 @@ export default async function LocaleLayout({
 
   return (
     <LocaleProvider locale={locale} messages={messages}>
+      {/* A11yInstantAccess requires i18n context, must be inside LocaleProvider */}
+      <A11yInstantAccess />
       {children}
     </LocaleProvider>
   );

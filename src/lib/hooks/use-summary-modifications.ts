@@ -216,6 +216,7 @@ export function useSummaryModifications({
     }
 
     const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
+    // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: eventSourceRef.current.close() in useEffect return (line 266)
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 

@@ -43,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     // Get trial session
     const cookieStore = await cookies();
-    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
@@ -142,7 +141,6 @@ export async function GET() {
 
     // Get trial session
     const cookieStore = await cookies();
-    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {

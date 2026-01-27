@@ -3,10 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "next-themes";
-import {
-  AccessibilityProvider,
-  A11yInstantAccess,
-} from "@/components/accessibility";
+import { AccessibilityProvider } from "@/components/accessibility";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
 import { UnifiedConsentWall } from "@/components/consent";
@@ -172,7 +169,7 @@ export function Providers({ children, nonce }: ProvidersProps) {
       nonce={nonce}
     >
       <AccessibilityProvider>
-        <A11yInstantAccess />
+        {/* A11yInstantAccess moved to [locale]/layout.tsx for i18n context */}
         <ConditionalUnifiedConsent>
           <StoreInitializer />
           <AccentColorApplier />

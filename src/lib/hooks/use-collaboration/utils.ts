@@ -3,17 +3,17 @@
  * Handles mindmap refresh and SSE connection setup
  */
 
-import { logger } from '@/lib/logger';
-import type { MindmapData } from '@/lib/tools/mindmap-export';
-import type { CollabSSEEvent } from '@/app/api/collab/sse/route';
-import type { CollaborationState } from './types';
+import { logger } from "@/lib/logger";
+import type { MindmapData } from "@/lib/tools/mindmap-export";
+import type { CollabSSEEvent } from "@/app/api/collab/sse/route";
+import type { CollaborationState } from "./types";
 
 /**
  * Refresh mindmap from server
  */
 export async function refreshMindmapFromServer(
   roomId: string,
-  onMindmapUpdate?: (mindmap: MindmapData) => void
+  onMindmapUpdate?: (mindmap: MindmapData) => void,
 ): Promise<void> {
   try {
     const response = await fetch(`/api/collab/rooms/${roomId}`);
@@ -24,7 +24,7 @@ export async function refreshMindmapFromServer(
       }
     }
   } catch (error) {
-    logger.warn('Failed to refresh mindmap', { error, roomId });
+    logger.warn("Failed to refresh mindmap", { error, roomId });
   }
 }
 
@@ -35,9 +35,12 @@ export function setupSSEConnection(
   roomId: string,
   userId: string,
   eventHandler: (event: CollabSSEEvent, roomId: string) => void,
-  setState: React.Dispatch<React.SetStateAction<CollaborationState>>
+  setState: React.Dispatch<React.SetStateAction<CollaborationState>>,
 ): EventSource {
-  const es = new EventSource(`/api/collab/sse?roomId=${roomId}&userId=${userId}`);
+  // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: caller (main.ts) stores ref and closes in useEffect cleanup (line 52-56)
+  const es = new EventSource(
+    `/api/collab/sse?roomId=${roomId}&userId=${userId}`,
+  );
 
   es.onopen = () => {
     setState((prev) => ({
@@ -46,15 +49,15 @@ export function setupSSEConnection(
       isConnecting: false,
       roomId,
     }));
-    logger.info('Connected to collaboration room', { roomId });
+    logger.info("Connected to collaboration room", { roomId });
   };
 
   es.onerror = () => {
-    logger.error('Collaboration SSE error', { roomId });
+    logger.error("Collaboration SSE error", { roomId });
     setState((prev) => ({
       ...prev,
       isConnected: false,
-      error: 'Connection lost',
+      error: "Connection lost",
     }));
   };
 
@@ -63,7 +66,7 @@ export function setupSSEConnection(
       const data: CollabSSEEvent = JSON.parse(event.data);
       eventHandler(data, roomId);
     } catch (error) {
-      logger.warn('Failed to parse collab event', { error });
+      logger.warn("Failed to parse collab event", { error });
     }
   };
 

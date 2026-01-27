@@ -24,7 +24,6 @@ export async function POST(request: NextRequest) {
   try {
     // F-02: Check GDPR consent before creating trial session
     const cookieStore = await cookies();
-    // eslint-disable-next-line no-restricted-syntax -- consent cookie, not auth
     const trialConsentCookie = cookieStore.get("mirrorbuddy-trial-consent");
 
     // Validate that consent was explicitly given
@@ -73,7 +72,6 @@ export async function POST(request: NextRequest) {
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     // Get or create visitor ID from cookie
-    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     let visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {
@@ -145,7 +143,6 @@ export async function POST(request: NextRequest) {
       verificationPending: isTrialVerificationPending(session),
     });
 
-    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     if (!cookieStore.get(VISITOR_COOKIE_NAME)) {
       response.cookies.set(VISITOR_COOKIE_NAME, visitorId, {
         httpOnly: true,
@@ -184,7 +181,6 @@ export async function GET() {
     const ip = forwarded?.split(",")[0].trim() || realIp || "unknown";
 
     const cookieStore = await cookies();
-    // eslint-disable-next-line no-restricted-syntax -- visitor cookie, not auth
     const visitorId = cookieStore.get(VISITOR_COOKIE_NAME)?.value;
 
     if (!visitorId) {

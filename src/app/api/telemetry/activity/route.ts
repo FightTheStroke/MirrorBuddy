@@ -22,8 +22,10 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const route = body.route || "/";
 
-    // Get user identification from cookies
+    // Get user identification from cookies for classification (not authentication)
+    // This endpoint accepts all users (logged, trial, anonymous) and classifies them
     const cookieStore = await cookies();
+    // eslint-disable-next-line local-rules/prefer-validate-auth -- Classification only, not authentication. Accepts all user types.
     const userCookie = cookieStore.get(AUTH_COOKIE_NAME);
     const visitorCookie = cookieStore.get(VISITOR_COOKIE_NAME);
 
