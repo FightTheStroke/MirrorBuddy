@@ -1,21 +1,21 @@
 # Vercel Deployment Rules - MirrorBuddy
 
-## Deployment Architecture (Deployment Checks)
+## Deployment Architecture (CI-Controlled via Vercel CLI)
 
-**Vercel waits for GitHub CI checks before promoting to production.**
+**Vercel builds ONLY after CI passes. Saves build minutes.**
 
 ### How It Works
 
 ```
-Push to main → Vercel builds (preview) → CI runs 14 checks → deployment-gate passes → Vercel promotes to production
+Push to main → Vercel SKIPS build (ignoreCommand) → CI runs 14 checks → deployment-gate passes → CI deploys via Vercel CLI
 ```
 
-1. **Push triggers** both Vercel build AND GitHub CI in parallel
-2. **Vercel builds** but holds deployment in preview state
+1. **Push triggers** Vercel (skipped) AND GitHub CI
+2. **Vercel ignoreCommand** returns exit 0 → NO build, NO minutes used
 3. **CI runs ALL checks** (build, tests, security, quality)
 4. **deployment-gate** aggregates results
-5. **Vercel Deployment Checks** waits for `deployment-gate` to pass
-6. **Only then** Vercel promotes to production
+5. **deploy-to-vercel job** uses Vercel CLI to build and deploy
+6. **Only then** code reaches production
 
 ### Why This Architecture (The proxy.ts Disaster)
 

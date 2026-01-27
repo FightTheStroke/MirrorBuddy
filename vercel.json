@@ -1,5 +1,5 @@
 {
-  "ignoreCommand": "[ \"$VERCEL_GIT_COMMIT_REF\" != \"main\" ]",
+  "ignoreCommand": "echo 'Build skipped - CI will deploy after checks pass' && exit 0",
   "crons": [
     {
       "path": "/api/cron/data-retention",

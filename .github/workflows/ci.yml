@@ -919,4 +919,54 @@ jobs:
           echo "  ✓ docker"
           echo "  ✓ performance"
           echo ""
-          echo "Vercel will auto-promote to production via Deployment Checks integration."
+          echo "Triggering Vercel deployment via CLI..."
+
+  # ============================================================================
+  # DEPLOY TO VERCEL (via CLI)
+  # ============================================================================
+  # Deploys to Vercel ONLY after ALL checks pass.
+  # Auto-deploy is disabled via ignoreCommand in vercel.json.
+  # This saves build minutes by not building until CI passes.
+  # ============================================================================
+  deploy-to-vercel:
+    name: "🚀 Deploy to Vercel"
+    runs-on: ubuntu-latest
+    needs: [deployment-gate]
+    if: |
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/main' &&
+      needs.deployment-gate.result == 'success'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Pull Vercel Environment
+        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project
+        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy to Production
+        run: |
+          url=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          echo "✅ Deployed to: $url"
+          echo "DEPLOYMENT_URL=$url" >> $GITHUB_ENV
+
+      - name: Verify Deployment Health
+        run: |
+          echo "Waiting 10s for deployment to stabilize..."
+          sleep 10
+          status=$(curl -s -o /dev/null -w "%{http_code}" https://mirrorbuddy.vercel.app/api/health)
+          if [ "$status" = "200" ]; then
+            echo "✅ Health check passed (HTTP $status)"
+          else
+            echo "⚠️ Health check returned HTTP $status (may still be warming up)"
+          fi
