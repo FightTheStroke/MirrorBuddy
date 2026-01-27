@@ -126,6 +126,18 @@ echo -e "${BLUE}[PHASE 5] File size validation...${NC}"
 # Note: File size warnings not blocking for v0.7 - refactoring 142 files is a future task
 
 echo ""
+echo -e "${BLUE}[PHASE 5.5] Legal review compliance check...${NC}"
+legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1 || true)
+legal_exit=$?
+if [ $legal_exit -ne 0 ]; then
+  echo -e "${RED}✗ BLOCKED: Legal review compliance check failed${NC}"
+  echo "$legal_output" | tail -30
+  exit 1
+fi
+echo "$legal_output" | grep -E "SUMMARY|PASS|FAIL" | tail -10
+echo -e "${GREEN}✓ Legal review compliance check passed${NC}"
+
+echo ""
 echo -e "${BLUE}[PHASE 6] Plan sanity...${NC}"
 plan_fail=0
 

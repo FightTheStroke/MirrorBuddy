@@ -59,17 +59,21 @@ const AUTH_PUBLIC_ROUTES = [
   "/welcome",
   "/login",
   "/landing",
+  // Legal pages (GDPR, EU AI Act - legally required to be public)
   "/privacy",
   "/terms",
   "/cookies",
+  "/accessibility",
   "/ai-transparency",
   "/ai-policy",
   "/compliance",
   "/contact",
   "/showcase",
   "/demo",
+  // Invite and trial flow
   "/invite",
   "/trial",
+  // Static assets (images)
   "/maestri",
   "/avatars",
 ];

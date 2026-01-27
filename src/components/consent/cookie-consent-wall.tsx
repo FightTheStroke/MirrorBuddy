@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useSyncExternalStore } from "react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Cookie, Shield, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,19 +14,34 @@ import {
   getServerConsentSnapshot,
   updateConsentSnapshot,
 } from "@/lib/consent/consent-store";
+import {
+  getCookieConsentConfigFromLocale,
+  type CookieConsentConfig,
+} from "@/lib/compliance/cookie-consent-config";
 
 interface CookieConsentWallProps {
   children: React.ReactNode;
 }
 
 /**
- * Cookie Consent Wall - GDPR Compliant
+ * Cookie Consent Wall - GDPR Compliant with Geo-based Variations
  *
  * Blocks access to the application until user accepts essential cookies.
  * Required for GDPR/COPPA compliance.
+ *
+ * Plan 90: Implements country-specific cookie consent requirements:
+ * - Spain (LOPDGDD): Spanish language, "Rechazar Todo" prominent
+ * - France (Law 78-17): French language, "Tout Refuser" prominent
+ * - Germany (TTDSG): German language, "Alle Ablehnen" prominent
+ * - UK (UK GDPR): English language, "Reject All" prominent
+ * - Italy (GDPR): Italian language, "Rifiuta Tutto" prominent
  */
 export function CookieConsentWall({ children }: CookieConsentWallProps) {
   const t = useTranslations("consent.cookie");
+  const locale = useLocale();
+
+  // Get country-specific configuration
+  const config: CookieConsentConfig = getCookieConsentConfigFromLocale(locale);
 
   // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(
@@ -59,10 +74,10 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
           </div>
           <div>
             <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-              {t("title")}
+              {config.titleText}
             </h1>
             <p className="text-sm text-slate-500 dark:text-slate-400">
-              {t("subtitle")}
+              {config.subtitleText}
             </p>
           </div>
         </div>
@@ -116,10 +131,47 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
           </button>
         </div>
 
-        {/* Accept button */}
-        <Button onClick={handleAccept} className="w-full" size="lg">
-          {t("button")}
-        </Button>
+        {/* Action buttons - Reject All must be equally prominent */}
+        <div
+          className={`flex gap-3 ${config.rejectAllProminent ? "flex-col sm:flex-row" : ""}`}
+        >
+          <Button
+            onClick={() => {
+              // Reject all = only essential cookies
+              const consent = saveConsent(false);
+              syncConsentToServer(consent);
+              updateConsentSnapshot(true);
+            }}
+            variant={config.rejectAllProminent ? "outline" : "ghost"}
+            className={config.rejectAllProminent ? "flex-1" : ""}
+            size="lg"
+          >
+            {config.rejectAllText}
+          </Button>
+          <Button
+            onClick={handleAccept}
+            className={config.rejectAllProminent ? "flex-1" : "w-full"}
+            size="lg"
+          >
+            {config.acceptAllText}
+          </Button>
+        </div>
+
+        {/* Customize option */}
+        <div className="text-center">
+          <button
+            onClick={() => {
+              // TODO: Open detailed cookie preferences modal
+              // For now, just accept with analytics disabled
+              const consent = saveConsent(false);
+              syncConsentToServer(consent);
+              updateConsentSnapshot(true);
+            }}
+            className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+          >
+            {config.customizeText}
+          </button>
+        </div>
 
         {/* Links */}
         <div className="flex items-center justify-center gap-4 text-xs">
@@ -129,7 +181,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
             rel="noopener"
             className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Privacy Policy
+            {t("privacyPolicy")}
             <ExternalLink className="w-3 h-3" />
           </a>
           <span className="text-slate-300 dark:text-slate-600">|</span>
@@ -139,15 +191,26 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
             rel="noopener"
             className="flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline"
           >
-            Cookie Policy
+            {t("cookiePolicy")}
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
 
-        {/* COPPA note */}
-        <p className="text-[10px] text-slate-500 dark:text-slate-400 text-center">
-          {t("coppa")}
-        </p>
+        {/* Regulatory note */}
+        <div className="text-[10px] text-slate-500 dark:text-slate-400 text-center space-y-1">
+          <p>{t("coppa")}</p>
+          <p>
+            {config.regulation} -{" "}
+            <a
+              href={config.authority.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-slate-700 dark:hover:text-slate-300"
+            >
+              {config.authority.name}
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

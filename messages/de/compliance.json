@@ -542,7 +542,7 @@
         "email": "mail@ico.org.uk",
         "website": "www.ico.org.uk",
         "responseTime": "30 Tage",
-        "escalationTime": "Sie können bei der ICO Beschwerde einreichen, wenn Ihre Datenschutzrechte im Vereinigten Königreich verletzt werden."
+        "escalationTime": "Sie können bei der ICO Beschwerde einreichen, wenn Ihre Datenschutzrechte im Vereinigten Königreich verletzt wurden."
       }
     },
     "howToExercise": {
@@ -1422,6 +1422,74 @@
         "Rückmeldung von mindestens 50 Benutzern zu Genauigkeit oder Bias"
       ],
       "contact": "Für Fragen zur Modell-Karte kontaktieren Sie: compliance@mirrorbuddy.com"
+    }
+  },
+  "accessibility": {
+    "page": {
+      "title": "[TRANSLATE] Dichiarazione di Accessibilità",
+      "version": "[TRANSLATE] Versione {version}",
+      "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
+      "backHome": "[TRANSLATE] Torna alla home",
+      "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+    },
+    "compliance": {
+      "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
+      "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
+      "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
+      "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
+      "screenReader": "[TRANSLATE] Supporto per screen reader",
+      "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+    },
+    "features": {
+      "heading": "[TRANSLATE] Funzionalità di Accessibilità",
+      "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
+      "dyslexia": "[TRANSLATE] Dislessia",
+      "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
+      "adhd": "[TRANSLATE] ADHD",
+      "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
+      "visual": "[TRANSLATE] Deficit visivo",
+      "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
+      "motor": "[TRANSLATE] Difficoltà motorie",
+      "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
+      "autism": "[TRANSLATE] Autismo",
+      "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
+      "dyscalculia": "[TRANSLATE] Discalculia",
+      "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
+      "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
+      "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+    },
+    "keyboard": {
+      "heading": "[TRANSLATE] Navigazione da Tastiera",
+      "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
+      "tab": "[TRANSLATE] per navigare tra gli elementi",
+      "enter": "[TRANSLATE] per attivare pulsanti e link",
+      "escape": "[TRANSLATE] per chiudere modali e menu",
+      "space": "[TRANSLATE] per selezionare checkbox e toggle"
+    },
+    "screenReader": {
+      "heading": "[TRANSLATE] Supporto Screen Reader",
+      "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
+      "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
+      "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
+      "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
+      "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+    },
+    "limitations": {
+      "heading": "[TRANSLATE] Limitazioni Conosciute",
+      "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+    },
+    "regulatory": {
+      "heading": "[TRANSLATE] Conformità Normativa",
+      "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
+      "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+    },
+    "feedback": {
+      "heading": "[TRANSLATE] Feedback e Segnalazioni",
+      "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
+      "emailLabel": "[TRANSLATE] Email",
+      "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
+      "responseTime": "[TRANSLATE] Tempo di risposta",
+      "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
     }
   }
 }

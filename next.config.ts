@@ -149,8 +149,8 @@ const nextConfig: NextConfig = {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
-          // Content-Security-Policy moved to src/middleware.ts (nonce-based)
-          // See F-03: CSP middleware for XSS protection
+          // Content-Security-Policy moved to src/proxy.ts (nonce-based)
+          // See F-03: CSP proxy for XSS protection
         ],
       },
       {

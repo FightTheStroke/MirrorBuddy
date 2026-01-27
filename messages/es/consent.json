@@ -1,0 +1,21 @@
+{
+  "cookie": {
+    "title": "Protegiendo Tu Privacidad",
+    "subtitle": "Utilizamos cookies esenciales",
+    "explanation": "MirrorBuddy utiliza cookies para protegerte y mejorar tu experiencia de aprendizaje. Las cookies esenciales son necesarias para que la aplicación funcione de forma segura.",
+    "list": {
+      "session": "Cookies de sesión para mantener tu inicio de sesión seguro",
+      "preferences": "Cookies para recordar tus preferencias de accesibilidad e idioma",
+      "protect": "Cookies de seguridad para protegerte de ataques y abusos"
+    },
+    "analytics": {
+      "label": "Análisis Opcional",
+      "description": "Ayúdanos a entender cómo utilizas MirrorBuddy para poder mejorar la aplicación (completamente anónimo)",
+      "aria": "Alternar para habilitar o deshabilitar análisis"
+    },
+    "button": "Aceptar y Continuar",
+    "coppa": "Si tienes menos de 13 años, tus padres recibieron un aviso para aprobar las cookies esenciales.",
+    "privacyPolicy": "Política de Privacidad",
+    "cookiePolicy": "Política de Cookies"
+  }
+}
