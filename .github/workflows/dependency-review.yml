@@ -24,6 +24,6 @@ jobs:
           # Using allow-licenses instead of deprecated deny-licenses (removed in v5)
           # AGPL-3.0 allowed for CI-only tools (TruffleHog) - not distributed with app
           allow-licenses: >-
-            MIT, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD,
+            MIT, MIT-0, Apache-2.0, BSD-2-Clause, BSD-3-Clause, ISC, 0BSD,
             Unlicense, CC0-1.0, CC-BY-3.0, CC-BY-4.0, MPL-2.0,
             Python-2.0, BlueOak-1.0.0, Zlib, AGPL-3.0
