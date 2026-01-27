@@ -134,9 +134,7 @@ has inconsistent behavior.
 
 ```typescript
 // ❌ BROKEN - specific extension list doesn't work reliably
-matcher: [
-  "/((?!api|admin|_next|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)).*)",
-];
+matcher: ["/((?!api|admin|_next|.*\\.(?:png|jpg|jpeg|gif|svg|webp|ico)).*)"];
 ```
 
 **Correct pattern** (fix applied):
@@ -189,6 +187,113 @@ test("CP-07: Static assets load correctly (no i18n redirect)", async ({
 2. Never use specific extension lists like `.*\\.(?:png|jpg|...)`
 3. E2E test CP-07 catches regressions automatically
 4. Verify with: `curl -sI https://mirrorbuddy.vercel.app/logo-brain.png | head -1`
+
+### 7. Consolidated Middleware Architecture (CRITICAL - 2026-01-27)
+
+**Problem discovered**: Separate middleware chains caused i18n routing to intercept
+requests that should NOT be localized (API routes, static files), causing 307 redirects
+to non-existent localized paths:
+
+```
+GET /api/session → 307 → /fr/api/session → 404
+GET /logo-brain.png → 307 → /fr/logo-brain.png → 404
+```
+
+**Solution**: Consolidate ALL middleware logic into a single `proxy.ts` file that:
+
+1. Explicitly excludes paths that should NOT be handled by i18n
+2. Calls `createIntlMiddleware` from next-intl only for pages that need localization
+3. Maintains all existing functionality (auth, CSP, metrics)
+
+**Implementation** (`src/proxy.ts`):
+
+```typescript
+import createIntlMiddleware from "next-intl/middleware";
+import { routing } from "@/i18n/routing";
+
+// Paths that should NEVER be handled by i18n middleware
+const I18N_EXCLUDE_PATHS = [
+  "/api", // API routes
+  "/admin", // Admin routes (outside [locale])
+  "/_next", // Next.js internals
+  "/monitoring", // Sentry tunnel
+  "/favicon",
+  "/icon",
+  "/maestri", // Static avatar images
+  "/avatars", // Static avatar images
+  "/logo", // Logo images
+];
+
+// Create the i18n middleware instance
+const intlMiddleware = createIntlMiddleware(routing);
+
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // 1. Skip static files entirely (images, fonts, etc.)
+  if (STATIC_EXTENSIONS.some((ext) => pathname.endsWith(ext))) {
+    return NextResponse.next();
+  }
+
+  // 2. Only apply i18n for paths that need localization
+  if (!shouldSkipI18n(pathname)) {
+    const locales = ["it", "en", "fr", "de", "es"];
+    const hasLocalePrefix = locales.some(
+      (locale) =>
+        pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
+    );
+
+    // Redirect to localized path if no locale prefix
+    if (!hasLocalePrefix) {
+      return intlMiddleware(request);
+    }
+  }
+
+  // 3. Continue with auth, CSP, metrics, etc.
+  // ... rest of proxy logic
+}
+```
+
+**Why consolidation matters**:
+
+| Separate Middleware             | Consolidated Proxy             |
+| ------------------------------- | ------------------------------ |
+| Multiple files, order-dependent | Single file, explicit control  |
+| Easy to break exclusion rules   | Exclusions checked FIRST       |
+| next-intl intercepts everything | next-intl only for page routes |
+| Hidden in framework behavior    | Visible in code                |
+
+**Key principle**: i18n middleware should ONLY handle paths under `src/app/[locale]/`.
+Everything else (API, admin, static) must be excluded explicitly.
+
+### 8. resend Package TypeScript Bug (2026-01-27)
+
+**Problem**: resend@6.7.0-6.9.0 has broken TypeScript types causing build failure:
+
+```
+node_modules/resend/dist/index.d.mts(220,15): error TS1005: ';' expected.
+```
+
+The bug is in the package source: `react: void 0;` instead of a proper type definition.
+
+**NOT a workaround - proper solution**: Pin to last working version:
+
+```json
+{
+  "dependencies": {
+    "resend": "^6.6.0"
+  }
+}
+```
+
+**Why this is correct**:
+
+1. `skipLibCheck: true` is already set in tsconfig.json (standard practice)
+2. The bug is in `.d.mts` file (not `.d.ts`), so skipLibCheck doesn't help
+3. `ignoreBuildErrors: true` in next.config is a workaround (ignores ALL type errors)
+4. Version pinning is the correct fix for upstream bugs
+
+**Never use `ignoreBuildErrors: true`** - it hides legitimate type errors in YOUR code.
 
 ## Consequences
 

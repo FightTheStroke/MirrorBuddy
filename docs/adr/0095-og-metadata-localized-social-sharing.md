@@ -1,4 +1,4 @@
-# ADR 0079: Localized Open Graph Metadata for Social Media Sharing
+# ADR 0095: Localized Open Graph Metadata for Social Media Sharing
 
 ## Status: IMPLEMENTED
 

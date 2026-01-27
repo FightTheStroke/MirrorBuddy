@@ -1,4 +1,4 @@
-# ADR 0078: Language Preference Synchronization
+# ADR 0094: Language Preference Synchronization
 
 ## Status
 

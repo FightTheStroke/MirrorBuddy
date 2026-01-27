@@ -1,4 +1,4 @@
-# ADR 0076: Redirect Metadata + E2E Guardrails
+# ADR 0093: Redirect Metadata + E2E Guardrails
 
 ## Status
 

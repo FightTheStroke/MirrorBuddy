@@ -1,4 +1,4 @@
-# ADR 0082: Tier-Specific Memory System
+# ADR 0097: Tier-Specific Memory System
 
 ## Status
 

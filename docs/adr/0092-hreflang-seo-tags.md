@@ -1,4 +1,4 @@
-# ADR 0074: Hreflang SEO Tags for Multi-Locale Pages
+# ADR 0092: Hreflang SEO Tags for Multi-Locale Pages
 
 ## Status: IMPLEMENTED
 

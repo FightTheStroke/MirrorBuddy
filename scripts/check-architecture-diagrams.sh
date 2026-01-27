@@ -132,56 +132,50 @@ else
 fi
 
 # =============================================================================
-# ADR CROSS-REFERENCE CHECK (Dynamic - scans docs/adr/)
+# ADR CROSS-REFERENCE CHECK (BLOCKING - ALL ADRs must be referenced)
 # =============================================================================
 echo ""
-echo "=== ADR Cross-Reference Validation ==="
+echo "=== ADR Cross-Reference Validation (BLOCKING) ==="
 
-# Core ADRs that MUST be referenced (blocking)
-declare -a REQUIRED_ADRS=(
-    "0004" "0008" "0015" "0028" "0031" "0033"
-    "0056" "0057" "0062" "0063" "0064" "0071" "0073" "0075"
-)
-
+# Scan docs/adr/ for ALL ADRs - ALL must be referenced (blocking)
+ADR_TOTAL=0
 ADR_FOUND=0
-ADR_REQUIRED=${#REQUIRED_ADRS[@]}
+ADR_MISSING=0
+MISSING_LIST=""
 
-for adr_num in "${REQUIRED_ADRS[@]}"; do
-    if /usr/bin/grep -q "$adr_num" "$ARCH_FILE" 2>/dev/null; then
-        pass "ADR $adr_num referenced"
-        ADR_FOUND=$((ADR_FOUND + 1))
-    else
-        fail "ADR $adr_num not referenced (required)"
-    fi
-done
-
-echo ""
-echo "--- Scanning for unreferenced ADRs ---"
-
-# Scan docs/adr/ for all ADRs and check if referenced
 if [ -d "$ADR_DIR" ]; then
-    UNREFERENCED=0
-    for adr_file in "$ADR_DIR"/*.md; do
-        [ -f "$adr_file" ] || continue
-        # Extract ADR number from filename (0001, 0056, etc.)
-        adr_num=$(basename "$adr_file" | /usr/bin/grep -oE '^[0-9]+')
-        [ -z "$adr_num" ] && continue
+    # Collect unique ADR numbers (some files have duplicate numbers)
+    UNIQUE_ADRS=$(for f in "$ADR_DIR"/*.md; do basename "$f" 2>/dev/null; done | /usr/bin/grep -oE '^[0-9]+' | sort -u)
+    ADR_TOTAL=$(echo "$UNIQUE_ADRS" | /usr/bin/grep -c . || echo 0)
 
-        # Check if this ADR is referenced in ARCHITECTURE-DIAGRAMS.md
-        if ! /usr/bin/grep -q "$adr_num" "$ARCH_FILE" 2>/dev/null; then
-            adr_title=$(head -1 "$adr_file" | sed 's/^# //')
-            warn "ADR $adr_num not in diagrams: $adr_title"
-            UNREFERENCED=$((UNREFERENCED + 1))
+    for adr_num in $UNIQUE_ADRS; do
+        [ -z "$adr_num" ] && continue
+        if /usr/bin/grep -q "$adr_num" "$ARCH_FILE" 2>/dev/null; then
+            ADR_FOUND=$((ADR_FOUND + 1))
+        else
+            # Get title for error message
+            adr_file=$(ls "$ADR_DIR"/${adr_num}*.md 2>/dev/null | head -1)
+            if [ -f "$adr_file" ]; then
+                adr_title=$(head -1 "$adr_file" | sed 's/^# //' | cut -c1-50)
+            else
+                adr_title="Unknown"
+            fi
+            fail "ADR $adr_num not referenced: $adr_title"
+            ADR_MISSING=$((ADR_MISSING + 1))
+            MISSING_LIST="$MISSING_LIST $adr_num"
         fi
     done
 
-    if [ "$UNREFERENCED" -eq 0 ]; then
-        pass "All ADRs from $ADR_DIR are referenced"
+    if [ "$ADR_MISSING" -eq 0 ]; then
+        pass "All $ADR_TOTAL ADRs referenced in $ARCH_FILE"
     else
-        warn "$UNREFERENCED ADRs not referenced (non-blocking, but should be added)"
+        fail "$ADR_MISSING/$ADR_TOTAL ADRs NOT referenced (BLOCKING)"
+        echo ""
+        echo "To fix, run: ./scripts/sync-architecture-diagrams.sh"
+        echo "Missing ADRs:$MISSING_LIST"
     fi
 else
-    warn "$ADR_DIR not found - skipping dynamic ADR check"
+    fail "$ADR_DIR not found - cannot validate ADRs"
 fi
 
 # =============================================================================
@@ -233,12 +227,14 @@ if [ "$FAILED" -eq 0 ]; then
     echo "- $EXPECTED_SECTIONS/$EXPECTED_SECTIONS main sections"
     echo "- $COMPLIANCE_FOUND/$COMPLIANCE_EXPECTED compliance subsections"
     echo "- $TOTAL_DIAGRAMS Mermaid diagrams"
-    echo "- $ADR_FOUND/$ADR_REQUIRED required ADRs"
+    echo "- $ADR_FOUND/$ADR_TOTAL ADRs referenced"
     [ "$WARNINGS" -gt 0 ] && echo -e "${YELLOW}$WARNINGS warnings (review recommended)${NC}"
     exit 0
 else
     echo -e "${RED}ARCHITECTURE DIAGRAMS: FAIL${NC}"
     echo "$FAILED issues found:"
     echo -e "$ISSUES"
+    echo ""
+    echo "If ADRs missing, run: ./scripts/sync-architecture-diagrams.sh"
     exit 1
 fi

@@ -137,14 +137,16 @@ The `arch-diagrams` check in release-brutal.sh validates:
 | Main sections       | 25    | Yes      |
 | Compliance sections | 21    | Yes      |
 | Mermaid diagrams    | ≥40   | Yes      |
-| Required ADRs       | 14    | Yes      |
-| Unreferenced ADRs   | \*    | Warning  |
+| ALL ADRs referenced | 100%  | **Yes**  |
+
+**ALL ADRs must be referenced** - no exceptions. Missing ADRs block release.
 
 ```bash
-# Run comprehensive check
-./scripts/check-architecture-diagrams.sh
+# Step 1: Auto-sync missing ADRs (run BEFORE check)
+./scripts/sync-architecture-diagrams.sh
 
-# If warnings about unreferenced ADRs, add them to Section 25 (ADR Index)
+# Step 2: Run comprehensive check
+./scripts/check-architecture-diagrams.sh
 ```
 
 Before version bump, update `ARCHITECTURE-DIAGRAMS.md`:

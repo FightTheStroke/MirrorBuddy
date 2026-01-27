@@ -1,4 +1,4 @@
-# ADR 0066: SSE Push Architecture for Admin Dashboard
+# ADR 0091: SSE Push Architecture for Admin Dashboard
 
 ## Status
 

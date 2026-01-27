@@ -1,4 +1,4 @@
-# ADR 0080: i18n Implementation and Merge Risks
+# ADR 0096: i18n Implementation and Merge Risks
 
 ## Status
 

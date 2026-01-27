@@ -3056,6 +3056,68 @@ graph TB
 
 ---
 
+### 25.2 Recently Added ADRs
+
+```mermaid
+graph TB
+    subgraph New_ADRs["Recently Added"]
+        ADR0002[0002 Use MarkMap for Mind Map ]
+        ADR0006[0006 Telemetry System with Pro]
+        ADR0007[0007 Server-Side Notification ]
+        ADR0010[0010 Separate Conversations Pe]
+        ADR0011[0011 Voice Commands for Mindma]
+        ADR0012[0012 Unified Maestri Voice Exp]
+        ADR0013[0013 Platform Support Handled ]
+        ADR0014[0014 PWA Push Notifications]
+        ADR0016[0016 Component Modularization ]
+        ADR0017[0017 Voice Commands for Summar]
+        ADR0018[0018 Audio Coordination Archit]
+        ADR0019[0019 Session Summaries & Unifi]
+        ADR0020[0020 Mindmap Data Structure an]
+        ADR0021[0021 Conversational Memory Inj]
+        ADR0022[0022 Knowledge Hub Architectur]
+        ADR0023[0023 Apache 2.0 License]
+        ADR0024[0024 Demo HTML Builder Central]
+        ADR0026[0026 Maestro-Agent Communicati]
+        ADR0027[0027 Bilingual Voice Recogniti]
+        ADR0029[0029 Claude Code Optimization ]
+        ADR0030[0030 E2E Test Optimization]
+        ADR0032[0032 E2E Conversation Test Fra]
+        ADR0035[0035 Voice Session Context Con]
+        ADR0036[0036 Per-Character Conversatio]
+        ADR0039[0039 Deferred Production Items]
+        ADR0040[0040 Google Drive Integration]
+        ADR0041[0041 Adaptive Difficulty Engin]
+        ADR0042[0042 Vocal Prosody Frustration]
+        ADR0043[0043 Brave Search API Integrat]
+        ADR0044[0044 Performance Optimizations]
+        ADR0045[0045 Domain Boundaries and Mod]
+        ADR0046[0046 Production Hardening (Pla]
+        ADR0049[0049 Enterprise Reliability Fe]
+        ADR0050[0050 Voice Cost Guards]
+        ADR0051[0051 CLAUDE.md Optimization]
+        ADR0052[0052 Vercel Deployment Configu]
+        ADR0053[0053 Supabase Migration]
+        ADR0054[0054 Upstash Redis for Distrib]
+        ADR0061[0061 Admin Section Redesign]
+        ADR0065[0065 Service Limits Monitoring]
+        ADR0066[0066 Multi-Language i18n Archi]
+        ADR0068[0068 Conversion Funnel Dashboa]
+        ADR0074[0074 Contact Form Security and]
+        ADR0082[0082 i18n Namespace-Based Stru]
+        ADR0083[0083 i18n Context Architecture]
+        ADR0090[0090 Total Memory System]
+        ADR0091[0091 SSE Push Architecture for]
+        ADR0092[0092 Hreflang SEO Tags for Mul]
+        ADR0093[0093 Redirect Metadata + E2E G]
+        ADR0094[0094 Language Preference Synch]
+        ADR0095[0095 Localized Open Graph Meta]
+        ADR0096[0096 i18n Implementation and M]
+        ADR0097[0097 Tier-Specific Memory Syst]
+        ADR0098[0098 Trial Security Implementa]
+    end
+```
+
 ## Quick Reference
 
 | Category   | Key Files                                                     | ADRs                   |

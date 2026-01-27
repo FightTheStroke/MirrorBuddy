@@ -140,7 +140,9 @@ pass "rate-limit"
 [ -d src/app/privacy ] && pass "privacy-page" || fail "privacy-page" "Missing src/app/privacy/"
 [ -d src/app/terms ] && pass "terms-page" || fail "terms-page" "Missing src/app/terms/"
 
-# Architecture diagrams check (25 sections + 21 compliance subsections)
+# Architecture diagrams check (25 sections + 21 compliance + ALL ADRs)
+# First sync any missing ADRs, then validate
+./scripts/sync-architecture-diagrams.sh > /tmp/release-arch-sync.log 2>&1 || true
 ./scripts/check-architecture-diagrams.sh > /tmp/release-arch-diagrams.log 2>&1 && pass "arch-diagrams" || fail "arch-diagrams" "\`\`\`\n$(/usr/bin/grep -E '✗|FAIL|MISSING' /tmp/release-arch-diagrams.log | head -10)\n\`\`\`"
 
 # Documentation/Code audit (trial limits, health status, voice model, metrics cadence)
