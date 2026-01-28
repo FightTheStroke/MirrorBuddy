@@ -156,16 +156,17 @@ test.describe("Smoke Test", () => {
   });
 
   test("navigation has expected elements", async ({ page }) => {
-    await page.goto("/");
+    // Go to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/");
     await page.waitForLoadState("networkidle");
 
     // Wait for hydration to complete - loading screen shows "Caricamento..."
-    // After hydration, the main heading "Professori" appears (it's an h1, not a button)
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
+    // After hydration, main content and navigation appear
+    await page.waitForSelector('main, [role="main"]', {
       timeout: 15000,
     });
 
-    // Should have main navigation buttons
+    // Should have main navigation buttons (after hydration)
     const navButtons = page
       .locator("button")
       .filter({ hasText: /Professori|Astuccio|Zaino|Impostazioni/i });
@@ -174,7 +175,8 @@ test.describe("Smoke Test", () => {
   });
 
   test("navigation sidebar works", async ({ page }) => {
-    await page.goto("/");
+    // Go to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/");
     await page.waitForLoadState("networkidle");
 
     // Click astuccio nav - should show astuccio content
@@ -193,7 +195,8 @@ test.describe("Smoke Test", () => {
   });
 
   test("settings page loads", async ({ page }) => {
-    await page.goto("/");
+    // Go to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/");
     await page.waitForLoadState("networkidle");
 
     const settingsBtn = page

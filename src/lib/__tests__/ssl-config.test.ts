@@ -85,6 +85,9 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
   });
 
   describe("buildSSLConfig", () => {
+    // Remote DB URL for production tests (isLocalDatabase returns false)
+    const remoteDbUrl = "postgresql://user:pass@db.supabase.co:5432/postgres";
+
     it("should return undefined in development", async () => {
       vi.stubEnv("NODE_ENV", "development");
       delete process.env.VERCEL;
@@ -95,8 +98,22 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
       expect(config).toBeUndefined();
     });
 
-    it("should return SSL config with cert in production", async () => {
+    it("should return undefined for local database in production", async () => {
       vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv(
+        "DATABASE_URL",
+        "postgresql://postgres:postgres@localhost:5432/mirrorbuddy",
+      );
+
+      const { buildSSLConfig } = await import("../ssl-config");
+      const config = buildSSLConfig();
+
+      expect(config).toBeUndefined();
+    });
+
+    it("should return SSL config with cert in production with remote DB", async () => {
+      vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("DATABASE_URL", remoteDbUrl);
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(mockCertChain);
 
@@ -111,8 +128,9 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
       });
     });
 
-    it("should return SSL config with VERCEL=1", async () => {
+    it("should return SSL config with VERCEL=1 and remote DB", async () => {
       vi.stubEnv("VERCEL", "1");
+      vi.stubEnv("DATABASE_URL", remoteDbUrl);
       vi.mocked(fs.existsSync).mockReturnValue(true);
       vi.mocked(fs.readFileSync).mockReturnValue(mockCertChain);
 
@@ -126,8 +144,9 @@ MIIC1TCCAb2gAwIBAgIJANqb7VHfN
       });
     });
 
-    it("should fallback to rejectUnauthorized:false without cert", async () => {
+    it("should fallback to rejectUnauthorized:false without cert on remote DB", async () => {
       vi.stubEnv("NODE_ENV", "production");
+      vi.stubEnv("DATABASE_URL", remoteDbUrl);
       vi.mocked(fs.existsSync).mockReturnValue(false);
       delete process.env.SUPABASE_CA_CERT;
 

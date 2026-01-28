@@ -17,11 +17,11 @@ test.describe("Mobile Regression Guard (375px Viewport)", () => {
     // Set viewport to iPhone SE (375px width)
     await page.setViewportSize({ width: 375, height: 667 });
 
-    // Navigate and wait for DOM to be ready
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    // Navigate to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
 
-    // Wait for hydration to complete - "Professori" heading appears after hydration
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
+    // Wait for hydration to complete - main content and navigation appear
+    await page.waitForSelector('main, [role="main"]', {
       timeout: 20000,
     });
   });
@@ -168,7 +168,8 @@ test.describe("Mobile Regression Guard (375px Viewport)", () => {
   }) => {
     // Test sidebar sizing on homepage (only page with sidebar hamburger menu)
     // Note: /astuccio and other pages don't have the same header/sidebar structure
-    await page.goto("/", { waitUntil: "domcontentloaded" });
+    // Go to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
     await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
     // Open sidebar

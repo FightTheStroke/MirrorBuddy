@@ -344,12 +344,14 @@ describe("i18n Regression Tests", () => {
             value,
             `${locale}.json missing critical key: ${key}`,
           ).toBeDefined();
-          if (typeof value === "string") {
-            expect(
-              value.length > 0,
-              `${locale}.json has empty value for: ${key}`,
-            ).toBe(true);
-          }
+          expect(
+            typeof value === "string",
+            `${locale}.json key ${key} must be a string, got ${typeof value}`,
+          ).toBe(true);
+          expect(
+            (value as string).length > 0,
+            `${locale}.json has empty value for: ${key}`,
+          ).toBe(true);
         });
       });
     });

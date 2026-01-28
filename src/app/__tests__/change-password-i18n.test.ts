@@ -38,7 +38,7 @@ describe("change-password i18n compliance", () => {
     "Cambio in corso",
   ];
 
-  const requiredI18nKeys = ["auth.password"];
+  const requiredI18nKeys = ["auth.passwordChange"];
 
   it("should not contain hardcoded Italian strings in change-password pages", () => {
     files.forEach((filePath) => {
@@ -62,7 +62,7 @@ describe("change-password i18n compliance", () => {
       const content = fs.readFileSync(fullPath, "utf-8");
 
       expect(content, `File ${filePath} should import useTranslations`).toMatch(
-        /useTranslations\(["']auth\.password["']\)/,
+        /useTranslations\(["']auth\.passwordChange["']\)/,
       );
     });
   });
@@ -94,8 +94,8 @@ describe("change-password i18n compliance", () => {
       });
 
       expect(
-        Object.keys(content.auth.password ?? {}),
-        `Missing auth.password keys in ${filePath}`,
+        Object.keys(content.auth.passwordChange ?? {}),
+        `Missing auth.passwordChange keys in ${filePath}`,
       ).not.toHaveLength(0);
     });
   });

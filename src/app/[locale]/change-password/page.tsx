@@ -16,7 +16,7 @@ interface PasswordRequirement {
 
 export default function ChangePasswordPage() {
   const router = useRouter();
-  const t = useTranslations("auth.password");
+  const t = useTranslations("auth.passwordChange");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

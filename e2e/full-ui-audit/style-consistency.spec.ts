@@ -221,14 +221,11 @@ test.describe("Style Consistency - Dark Mode", () => {
 
 test.describe("Style Consistency - Spacing", () => {
   test("content areas have appropriate spacing", async ({ page }) => {
-    await page.goto("/");
+    // Go to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/");
     await page.waitForLoadState("networkidle");
-    // Wait for hydration - either landing page or main app
-    // "Professori" is an h1 heading in the main app, "Prova gratis" is a button on landing page
-    await page.waitForSelector(
-      'h1:has-text("Professori"), button:has-text("Prova gratis")',
-      { timeout: 15000 },
-    );
+    // Wait for hydration - main content area appears after hydration
+    await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
     const spacing = await page.evaluate(() => {
       // Check main (app) or first content div (landing page) for padding/margin
@@ -334,14 +331,11 @@ test.describe("Style Consistency - Responsive", () => {
         width: viewport.width,
         height: viewport.height,
       });
-      await page.goto("/");
+      // Go to Italian locale home page directly (/ redirects to /landing)
+      await page.goto("/it/");
       await page.waitForLoadState("networkidle");
-      // Wait for hydration - either landing page or main app
-      // "Professori" is an h1 heading in the main app, "Prova gratis" is a button on landing page
-      await page.waitForSelector(
-        'h1:has-text("Professori"), button:has-text("Prova gratis")',
-        { timeout: 15000 },
-      );
+      // Wait for hydration - main content area appears after hydration
+      await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
       // Check that content doesn't overflow horizontally
       const hasHorizontalScroll = await page.evaluate(() => {

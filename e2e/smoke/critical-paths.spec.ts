@@ -49,16 +49,27 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     // - Onboarding completed
     // - Consent accepted
     // The test user is created by global-setup with a valid signed cookie
-    // NOTE: Home page is at "/" (root), not "/home"
+    // NOTE: Home page is at "/{locale}/" (e.g., /it/), "/" redirects to /landing
 
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
 
-    await page.goto("/");
+    // Go to Italian locale home page directly (/ redirects to /landing for all users)
+    await page.goto("/it/");
     await page.waitForLoadState("domcontentloaded");
-    await page.waitForSelector('h1:has-text("Professori"), main h1', {
+
+    // Wait for the main app to load (h1 is sr-only with app title, or nav has Professori)
+    // The home page shows a loading state first, then renders the main content
+    await page.waitForSelector('main, [role="main"]', {
       timeout: 20000,
     });
+
+    // Wait for hydration - the main content should have navigation or maestri grid
+    // After hydration, either "Professori" nav item or maestri cards are visible
+    await page
+      .locator('nav, [class*="maestr"], [class*="grid"]')
+      .first()
+      .waitFor({ timeout: 15000 });
 
     // Should not redirect to login (auth from storage state should work)
     const currentUrl = page.url();

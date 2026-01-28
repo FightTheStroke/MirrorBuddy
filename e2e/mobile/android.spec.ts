@@ -10,10 +10,9 @@ import { waitForHomeReady } from "./helpers/wait-for-home";
 test.describe("Android Pixel 7 Mobile UX", () => {
   // NOTE: mobile fixture MUST be destructured to trigger route mocking BEFORE navigation
   test.beforeEach(async ({ page, mobile: _mobile }) => {
-    // Navigate and wait for DOM to be ready (networkidle doesn't work with HMR)
-    await page.goto("/", { waitUntil: "domcontentloaded" });
-    // Wait for hydration to complete - loading screen shows "Caricamento..."
-    // After hydration, the main heading "Professori" appears (it's an h1, not a button)
+    // Navigate to Italian locale home page directly (/ redirects to /landing)
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
+    // Wait for hydration to complete - main content and navigation appear
     await waitForHomeReady(page);
   });
 
