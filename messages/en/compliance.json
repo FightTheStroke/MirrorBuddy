@@ -1426,70 +1426,70 @@
   },
   "accessibility": {
     "page": {
-      "title": "[TRANSLATE] Dichiarazione di Accessibilità",
-      "version": "[TRANSLATE] Versione {version}",
-      "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
-      "backHome": "[TRANSLATE] Torna alla home",
-      "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+      "title": "Accessibility Statement",
+      "version": "Version {version}",
+      "lastUpdated": "Last updated: {date}",
+      "backHome": "Back to home",
+      "pageNavAriaLabel": "Accessibility page navigation"
     },
     "compliance": {
-      "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
-      "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
-      "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
-      "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
-      "screenReader": "[TRANSLATE] Supporto per screen reader",
-      "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+      "heading": "WCAG 2.1 Level AA Compliance",
+      "declaration": "MirrorBuddy complies with the Web Content Accessibility Guidelines (WCAG) 2.1 at Level AA, as required by Law 4/2004 (Stanca Law) and EU Directive 2016/2102.",
+      "wcag": "WCAG 2.1 Level AA compliance verified",
+      "keyboard": "Full keyboard navigation",
+      "screenReader": "Screen reader support",
+      "colorContrast": "Compliant color contrast (4.5:1 minimum)"
     },
     "features": {
-      "heading": "[TRANSLATE] Funzionalità di Accessibilità",
-      "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
-      "dyslexia": "[TRANSLATE] Dislessia",
-      "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
-      "adhd": "[TRANSLATE] ADHD",
-      "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
-      "visual": "[TRANSLATE] Deficit visivo",
-      "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
-      "motor": "[TRANSLATE] Difficoltà motorie",
-      "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
-      "autism": "[TRANSLATE] Autismo",
-      "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
-      "dyscalculia": "[TRANSLATE] Discalculia",
-      "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
-      "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
-      "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+      "heading": "Accessibility Features",
+      "description": "MirrorBuddy includes 7 SLD (Specific Learning Disability) profiles designed to support different learning styles:",
+      "dyslexia": "Dyslexia",
+      "dyslexiaDesc": "OpenDyslexic font, extra spacing, assisted reading support",
+      "adhd": "ADHD",
+      "adhdDesc": "Focus mode, distraction reduction, break reminders",
+      "visual": "Visual impairment",
+      "visualDesc": "High contrast, screen reader support, zoomable text",
+      "motor": "Motor difficulties",
+      "motorDesc": "Full keyboard navigation, voice control",
+      "autism": "Autism",
+      "autismDesc": "Predictable layouts, reduced animations, clear structure",
+      "dyscalculia": "Dyscalculia",
+      "dyscalculiaDesc": "Visual number representation, calculation support",
+      "cerebralPalsy": "Cerebral palsy",
+      "cerebralPalsyDesc": "Large targets, keyboard navigation, assistive technology support"
     },
     "keyboard": {
-      "heading": "[TRANSLATE] Navigazione da Tastiera",
-      "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
-      "tab": "[TRANSLATE] per navigare tra gli elementi",
-      "enter": "[TRANSLATE] per attivare pulsanti e link",
-      "escape": "[TRANSLATE] per chiudere modali e menu",
-      "space": "[TRANSLATE] per selezionare checkbox e toggle"
+      "heading": "Keyboard Navigation",
+      "description": "All MirrorBuddy features are accessible via keyboard:",
+      "tab": "to navigate between elements",
+      "enter": "to activate buttons and links",
+      "escape": "to close modals and menus",
+      "space": "to select checkboxes and toggles"
     },
     "screenReader": {
-      "heading": "[TRANSLATE] Supporto Screen Reader",
-      "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
-      "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
-      "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
-      "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
-      "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+      "heading": "Screen Reader Support",
+      "description": "MirrorBuddy is compatible with common screen readers (NVDA, JAWS, VoiceOver):",
+      "aria": "ARIA labels for all interactive elements",
+      "headings": "Correct heading hierarchy (H1-H6)",
+      "altText": "Alt text for all images",
+      "labels": "Labels associated with all form fields"
     },
     "limitations": {
-      "heading": "[TRANSLATE] Limitazioni Conosciute",
-      "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+      "heading": "Known Limitations",
+      "description": "Currently there are no known significant limitations. If you encounter accessibility issues, please contact us through the feedback form."
     },
     "regulatory": {
-      "heading": "[TRANSLATE] Conformità Normativa",
-      "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
-      "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+      "heading": "Regulatory Compliance",
+      "description": "MirrorBuddy complies with the following regulatory standards:",
+      "eudirective": "EU Directive 2016/2102 (Public sector accessibility)"
     },
     "feedback": {
-      "heading": "[TRANSLATE] Feedback e Segnalazioni",
-      "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
-      "emailLabel": "[TRANSLATE] Email",
-      "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
-      "responseTime": "[TRANSLATE] Tempo di risposta",
-      "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+      "heading": "Feedback and Reports",
+      "description": "If you encounter accessibility issues or have suggestions to improve the experience, contact us:",
+      "emailLabel": "Email",
+      "authorityLabel": "Supervisory Authority",
+      "responseTime": "Response time",
+      "responseTimeValue": "5 business days"
     }
   }
 }
