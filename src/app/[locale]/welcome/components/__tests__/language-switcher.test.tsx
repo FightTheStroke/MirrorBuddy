@@ -18,12 +18,17 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { LanguageSwitcher } from "../language-switcher";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
-  useRouter: vi.fn(),
   usePathname: vi.fn(),
+}));
+
+// Mock next-intl navigation wrapper
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: vi.fn(),
 }));
 
 describe("LanguageSwitcher - F-69", () => {
@@ -119,7 +124,7 @@ describe("LanguageSwitcher - F-69", () => {
         fireEvent.click(frenchOption);
       });
 
-      expect(mockPush).toHaveBeenCalledWith("/fr/welcome");
+      expect(mockPush).toHaveBeenCalledWith("/welcome", { locale: "fr" });
     });
 
     it("should close dropdown after selection", async () => {
@@ -281,7 +286,7 @@ describe("LanguageSwitcher - F-69", () => {
       });
 
       // Should still redirect properly
-      expect(mockPush).toHaveBeenCalledWith("/en/welcome");
+      expect(mockPush).toHaveBeenCalledWith("/welcome", { locale: "en" });
     });
   });
 });
