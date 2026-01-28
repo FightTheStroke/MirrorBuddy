@@ -91,6 +91,7 @@ async function globalSetup() {
   const testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
 
   // Create the test user in the database (ADR 0081: isTestData=true)
+  // Also create OnboardingState to bypass onboarding wall (ADR 0059)
   const prisma = getPrismaClient();
   try {
     await prisma.user.upsert({
@@ -111,6 +112,22 @@ async function globalSetup() {
         },
         settings: {
           create: {},
+        },
+        // ADR 0059: /api/onboarding checks OnboardingState, not localStorage
+        onboarding: {
+          create: {
+            hasCompletedOnboarding: true,
+            onboardingCompletedAt: new Date(),
+            currentStep: "ready",
+            isReplayMode: false,
+            data: JSON.stringify({
+              name: "E2E Test User",
+              age: 12,
+              schoolLevel: "media",
+              learningDifferences: [],
+              gender: "other",
+            }),
+          },
         },
       },
     });
