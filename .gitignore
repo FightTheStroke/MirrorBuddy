@@ -120,3 +120,5 @@ docs/.archive/
 # CodeGraph: keep DB ignored, allow config to be tracked/read
 .codegraph/**
 !.codegraph/config.json
+
+Top10.md

@@ -948,6 +948,96 @@ jobs:
           path: .lighthouseci/
           retention-days: 30
 
+  # Lane 5d: ACCESSIBILITY TESTS (BLOCKING)
+  # Ensures WCAG 2.1 AA compliance and screen reader support on every change.
+  accessibility-tests:
+    name: Accessibility Audit (BLOCKING)
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      # Download pre-built .next from build job
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Accessibility Tests
+        run: |
+          echo "Running automated accessibility audit..."
+          npx playwright test e2e/accessibility.spec.ts --reporter=list
+        env:
+          CI: true
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
+
+      - name: Upload Accessibility Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-report
+          path: playwright-report/
+          retention-days: 30
+
   # ==========================================================================
   # PR GATE - Single status check for PRs (fast feedback)
   # ==========================================================================
@@ -966,6 +1056,7 @@ jobs:
       - quality
       - smoke-tests
       - mobile-smoke
+      - accessibility-tests
     if: always() && github.event_name == 'pull_request'
     steps:
       - name: Check all PR jobs passed
@@ -980,7 +1071,8 @@ jobs:
           needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
-          needs.mobile-smoke.result != 'success'
+          needs.mobile-smoke.result != 'success' ||
+          needs.accessibility-tests.result != 'success'
         run: |
           echo "::error::PR BLOCKED - One or more checks failed"
           echo ""
@@ -996,6 +1088,7 @@ jobs:
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
           echo "  mobile-smoke: ${{ needs.mobile-smoke.result }}"
+          echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
           exit 1
 
       - name: PR approved
@@ -1010,7 +1103,8 @@ jobs:
           needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
-          needs.mobile-smoke.result == 'success'
+          needs.mobile-smoke.result == 'success' &&
+          needs.accessibility-tests.result == 'success'
         run: |
           echo "✅ PR gate passed - Safe to merge"
 
@@ -1038,6 +1132,7 @@ jobs:
       - docker
       - performance
       - sentry-config
+      - accessibility-tests
     if: always() && github.event_name != 'pull_request'
     steps:
       - name: Check all jobs passed
@@ -1055,7 +1150,8 @@ jobs:
           needs.e2e-tests.result != 'success' ||
           needs.mobile-e2e.result != 'success' ||
           needs.docker.result != 'success' ||
-          needs.performance.result != 'success'
+          needs.performance.result != 'success' ||
+          needs.accessibility-tests.result != 'success'
         run: |
           echo "::error::DEPLOYMENT BLOCKED - One or more checks failed"
           echo ""
@@ -1074,6 +1170,7 @@ jobs:
           echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
+          echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
           exit 1
 
       - name: Deployment approved
@@ -1091,9 +1188,10 @@ jobs:
           needs.e2e-tests.result == 'success' &&
           needs.mobile-e2e.result == 'success' &&
           needs.docker.result == 'success' &&
-          needs.performance.result == 'success'
+          needs.performance.result == 'success' &&
+          needs.accessibility-tests.result == 'success'
         run: |
-          echo "✅ All 14 checks passed - Safe to deploy to production"
+          echo "✅ All 15 checks passed - Safe to deploy to production"
           echo ""
           echo "Verified jobs:"
           echo "  ✓ build"
@@ -1110,6 +1208,7 @@ jobs:
           echo "  ✓ mobile-e2e"
           echo "  ✓ docker"
           echo "  ✓ performance"
+          echo "  ✓ accessibility-tests"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 

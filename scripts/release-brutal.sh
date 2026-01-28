@@ -106,6 +106,9 @@ npm run build > /tmp/release-build.log 2>&1 && pass "build" || fail "build" "\`\
 # =============================================================================
 npm run test:coverage > /tmp/release-unit.log 2>&1 && pass "unit" || fail "unit" "\`\`\`\n$(grep -E 'FAIL|Error|failed' /tmp/release-unit.log | head -10)\n\`\`\`"
 
+# Mandatory Accessibility Audit
+npx playwright test e2e/accessibility.spec.ts > /tmp/release-a11y.log 2>&1 && pass "accessibility-test" || fail "accessibility-test" "\`\`\`\n$(grep -E 'FAIL|Error|failed' /tmp/release-a11y.log | head -10)\n\`\`\`"
+
 npm run test > /tmp/release-e2e.log 2>&1
 E2E_EXIT=$?
 # Strip ANSI codes for reliable parsing
@@ -153,6 +156,13 @@ pass "rate-limit"
 # =============================================================================
 [ -f docs/compliance/DPIA.md ] && pass "dpia" || fail "dpia" "Missing docs/compliance/DPIA.md"
 [ -f docs/compliance/AI-POLICY.md ] && pass "ai-policy" || fail "ai-policy" "Missing docs/compliance/AI-POLICY.md"
+[ -f docs/compliance/INCIDENT-RESPONSE-PLAN.md ] && pass "irp" || fail "irp" "Missing docs/compliance/INCIDENT-RESPONSE-PLAN.md"
+[ -f docs/compliance/PILOT-RESEARCH-PROTOCOL.md ] && pass "pilot-protocol" || fail "pilot-protocol" "Missing docs/compliance/PILOT-RESEARCH-PROTOCOL.md"
+[ -f docs/compliance/VPAT-ACCESSIBILITY-REPORT.md ] && pass "vpat" || fail "vpat" "Missing docs/compliance/VPAT-ACCESSIBILITY-REPORT.md"
+
+# Warning for "To Do" items in critical compliance docs
+grep -q "❌ To Do" docs/compliance/INCIDENT-RESPONSE-PLAN.md docs/compliance/PILOT-RESEARCH-PROTOCOL.md docs/compliance/VPAT-ACCESSIBILITY-REPORT.md && echo "WARN: Critical compliance documents contain To Do items."
+
 [ -d src/app/privacy ] && pass "privacy-page" || fail "privacy-page" "Missing src/app/privacy/"
 [ -d src/app/terms ] && pass "terms-page" || fail "terms-page" "Missing src/app/terms/"
 
