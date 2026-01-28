@@ -15,6 +15,15 @@ Before running release script:
 ./scripts/verify-vercel-env.sh
 # Must pass all checks (vars, permissions, staging)
 
+# Verify Sentry + Vercel production configuration (NO EXCEPTIONS)
+npm run sentry:verify
+# This MUST pass before any production release:
+# - NEXT_PUBLIC_SENTRY_DSN format and project id
+# - SENTRY_ORG / SENTRY_PROJECT / SENTRY_AUTH_TOKEN presence
+# - sentry.*.config.ts enabled only for VERCEL_ENV=production
+# - /monitoring tunnel route + CSP domain whitelist
+# - @sentry/nextjs installed
+
 # Optional: sync local .env → GitHub Actions secrets (only when intentional)
 npm run secrets:sync  # uses gh secret set for each KEY=VALUE in .env
 ```

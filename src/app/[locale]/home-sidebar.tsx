@@ -179,6 +179,7 @@ export function HomeSidebar({
             return (
               <button
                 key={item.id}
+                data-testid={`home-nav-${item.id}`}
                 onClick={() => handleViewChange(item.id)}
                 className={cn(
                   "w-full flex items-center gap-3 rounded-xl transition-all",

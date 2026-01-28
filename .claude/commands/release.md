@@ -48,14 +48,21 @@ Execute full release gate:
 4. Security audit (secrets, dependencies)
 5. Accessibility audit (WCAG 2.1 AA)
 6. Compliance check (GDPR, EU AI Act)
-7. AI tutor verification (all 22 maestri)
-8. Documentation review (CHANGELOG, ADRs)
+7. Sentry + deployment configuration verification (CI + Vercel env)
+8. AI tutor verification (all 22 maestri)
+9. Documentation review (CHANGELOG, ADRs)
+
+Sentry + deployment checks MUST include:
+- Running \`npm run sentry:verify\` locally
+- Ensuring \`.github/workflows/ci.yml\` \`sentry-config\` job installs dependencies and has \`VERCEL_TOKEN\` wired
+- Verifying GitHub Actions secrets and Vercel production env contain all required Sentry and core app variables
 
 Zero tolerance policy:
 - ANY test failure = BLOCK
 - ANY security issue = BLOCK
 - ANY a11y violation = BLOCK
 - ANY compliance gap = BLOCK
+- ANY Sentry misconfiguration or missing env var = BLOCK
 
 Output: Release report with APPROVE or BLOCK decision.
 `,
@@ -119,6 +126,9 @@ npm run release:fast
 
 # Full release validation (pre-production)
 npm run release:gate
+
+# Sentry + deployment configuration verification (must be clean)
+npm run sentry:verify
 
 # Agent-driven full release validation
 /release           # Auto-detect version
