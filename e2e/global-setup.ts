@@ -3,11 +3,13 @@
  *
  * Creates a storageState with onboarding completed
  * so tests skip the welcome flow.
+ * Also creates the test user in the database (ADR 0081).
  */
 
 import path from "path";
 import fs from "fs";
 import { createHmac, randomUUID } from "crypto";
+import { getPrismaClient, disconnectPrisma } from "./helpers/prisma-setup";
 
 const STORAGE_STATE_PATH = path.join(__dirname, ".auth", "storage-state.json");
 
@@ -87,6 +89,38 @@ async function globalSetup() {
   // All workers share this ID (loaded from storage-state.json)
   const randomSuffix = randomUUID().replace(/-/g, "").substring(0, 9);
   const testUserId = `e2e-test-user-${Date.now()}-${randomSuffix}`;
+
+  // Create the test user in the database (ADR 0081: isTestData=true)
+  const prisma = getPrismaClient();
+  try {
+    await prisma.user.upsert({
+      where: { id: testUserId },
+      update: {},
+      create: {
+        id: testUserId,
+        email: `e2e-test-${randomSuffix}@example.com`,
+        username: `e2e_test_${randomSuffix}`,
+        isTestData: true,
+        role: "USER",
+        disabled: false,
+        profile: {
+          create: {
+            name: "E2E Test User",
+            age: 12,
+          },
+        },
+        settings: {
+          create: {},
+        },
+      },
+    });
+    console.log("✅ Test user created in database:", testUserId);
+  } catch (error) {
+    console.error("⚠️ Failed to create test user (may already exist):", error);
+    // Continue anyway - the test might still work
+  } finally {
+    await disconnectPrisma();
+  }
 
   // Sign the test user cookie
   const signedCookie = signCookieValue(testUserId);
