@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ArrowLeft, BadgeCheck, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,6 +13,7 @@ const CODE_MIN_LENGTH = 4;
 const CODE_MAX_LENGTH = 12;
 
 function TrialVerifyContent() {
+  const t = useTranslations("auth");
   const searchParams = useSearchParams();
   const initialCode = searchParams.get("code") || "";
   const [sessionId, setSessionId] = useState("");
@@ -38,7 +40,7 @@ function TrialVerifyContent() {
     const trimmedCode = code.trim();
     if (!sessionId.trim()) {
       setStatus("error");
-      setMessage("Inserisci il codice sessione della tua prova.");
+      setMessage(t("trialVerify.sessionRequired"));
       return;
     }
 
@@ -47,7 +49,7 @@ function TrialVerifyContent() {
       trimmedCode.length > CODE_MAX_LENGTH
     ) {
       setStatus("error");
-      setMessage("Inserisci un codice valido.");
+      setMessage(t("trialVerify.codeInvalid"));
       return;
     }
 
@@ -65,17 +67,17 @@ function TrialVerifyContent() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Verifica fallita");
+        throw new Error(data.error || t("trialVerify.verifyFailed"));
       }
 
       setStatus("success");
-      setMessage("Email verificata! Ora puoi usare gli strumenti della prova.");
+      setMessage(t("trialVerify.verifySuccess"));
     } catch (error) {
       setStatus("error");
       setMessage(
         error instanceof Error
           ? error.message
-          : "Verifica fallita. Riprova più tardi.",
+          : t("trialVerify.verifyFailedLater"),
       );
     } finally {
       setIsSubmitting(false);
@@ -86,16 +88,16 @@ function TrialVerifyContent() {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
       <nav
         className="bg-white dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700"
-        aria-label="Navigazione pagina"
+        aria-label={t("trialVerify.navLabel")}
       >
         <div className="max-w-3xl mx-auto px-4 py-6">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-slate-600 dark:text-gray-300 hover:text-slate-900 dark:hover:text-white transition-colors"
-            aria-label="Torna alla home page di MirrorBuddy"
+            aria-label={t("trialVerify.backHomeAria")}
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            Torna alla home
+            {t("trialVerify.backHome")}
           </Link>
         </div>
       </nav>
@@ -105,13 +107,12 @@ function TrialVerifyContent() {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center gap-2">
               <BadgeCheck className="h-5 w-5 text-indigo-500" />
-              Verifica email prova
+              {t("trialVerify.title")}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-slate-600 dark:text-gray-300 mb-6">
-              Inserisci il codice inviato via email per sbloccare gli strumenti
-              della prova gratuita.
+              {t("trialVerify.subtitle")}
             </p>
 
             {status !== "idle" && message && (
@@ -134,12 +135,12 @@ function TrialVerifyContent() {
                   htmlFor="sessionId"
                   className="block text-sm font-medium text-slate-700 dark:text-gray-200"
                 >
-                  Codice sessione prova
+                  {t("trialVerify.sessionLabel")}
                 </label>
                 <Input
                   id="sessionId"
                   type="text"
-                  placeholder="Inserisci il tuo session ID"
+                  placeholder={t("trialVerify.sessionPlaceholder")}
                   value={sessionId}
                   onChange={(event) => setSessionId(event.target.value)}
                   className="mt-2"
@@ -152,12 +153,12 @@ function TrialVerifyContent() {
                   htmlFor="code"
                   className="block text-sm font-medium text-slate-700 dark:text-gray-200"
                 >
-                  Codice di verifica
+                  {t("trialVerify.codeLabel")}
                 </label>
                 <Input
                   id="code"
                   type="text"
-                  placeholder="ABC123"
+                  placeholder={t("trialVerify.codePlaceholder")}
                   value={code}
                   onChange={(event) => setCode(event.target.value)}
                   className="mt-2 uppercase tracking-widest"
@@ -170,7 +171,9 @@ function TrialVerifyContent() {
                 disabled={isSubmitting}
                 className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white hover:from-indigo-700 hover:to-purple-700"
               >
-                {isSubmitting ? "Verifica in corso..." : "Verifica email"}
+                {isSubmitting
+                  ? t("trialVerify.submitLoading")
+                  : t("trialVerify.submit")}
               </Button>
             </form>
           </CardContent>
@@ -181,12 +184,12 @@ function TrialVerifyContent() {
 }
 
 export function TrialVerifyClient() {
+  const t = useTranslations("common");
   return (
     <Suspense
       fallback={
         <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-          {/* eslint-disable-next-line local-rules/no-hardcoded-italian -- Loading text in suspense fallback */}
-          <div className="animate-pulse text-gray-500">Caricamento...</div>
+          <div className="animate-pulse text-gray-500">{t("loading")}</div>
         </div>
       }
     >

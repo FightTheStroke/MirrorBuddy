@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
 // Force dynamic rendering to avoid i18n static generation issues
 export const dynamic = "force-dynamic";
 
-import { HomeClient } from "./home-client";
+export const metadata: Metadata = {
+  title: "MirrorBuddy",
+};
 
 export default function Home() {
-  return <HomeClient />;
+  redirect("/landing");
 }

@@ -6,7 +6,7 @@ import {
   getStepIndex,
   getTotalSteps,
 } from "@/lib/stores/onboarding-store";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import type { VoiceConnectionInfo } from "../types";
 import { VoiceModeIndicator, useVoiceModeInfo } from "./voice-mode-indicator";
 

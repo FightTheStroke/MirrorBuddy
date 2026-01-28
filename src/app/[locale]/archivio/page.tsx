@@ -3,13 +3,18 @@
  * Route: /archivio -> /supporti
  */
 
-import { redirect } from "next/navigation";
+import { redirectLocale } from "@/i18n/navigation";
 
 export const metadata = {
   title: "Zaino | MirrorBuddy",
   description: "Tutti i tuoi materiali di studio salvati",
 };
 
-export default function ArchivioPage() {
-  redirect("/supporti");
+export default async function ArchivioPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  redirectLocale("/supporti", locale);
 }

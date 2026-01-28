@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function DemoPage() {
-  redirect("/?view=astuccio");
+  redirect("/landing");
 }

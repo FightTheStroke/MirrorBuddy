@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function QuizPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

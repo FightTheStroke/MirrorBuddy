@@ -8,8 +8,6 @@ import { getMessages } from "next-intl/server";
 const isVercel = process.env.VERCEL === "1";
 import { Providers } from "@/components/providers";
 import { getNonce } from "@/lib/security/csp-nonce";
-import { JsonLdScript } from "@/components/structured-data";
-import { HreflangLinks } from "@/components/seo/hreflang-links";
 import { getRootOGMetadata } from "@/lib/i18n/get-og-metadata";
 import { headers } from "next/headers";
 import {
@@ -117,8 +115,6 @@ export default async function RootLayout({
           name="viewport"
           content="width=device-width, initial-scale=1.0, viewport-fit=cover"
         />
-        <JsonLdScript locale={locale} variant="organization" />
-        <HreflangLinks />
       </head>
       <body className={`${inter.className} antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>

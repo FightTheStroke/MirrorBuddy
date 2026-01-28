@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
 // Force dynamic rendering to avoid i18n static generation issues
 export const dynamic = "force-dynamic";
 
-import { SupportiPageClient } from "./supporti-page-client";
+export const metadata: Metadata = {
+  title: "Supporti | MirrorBuddy",
+};
 
 export default function SupportiPage() {
-  return <SupportiPageClient />;
+  redirect("/landing");
 }

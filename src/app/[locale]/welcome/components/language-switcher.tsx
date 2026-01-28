@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { Globe } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { locales, localeNames, localeFlags, type Locale } from "@/i18n/config";
@@ -67,7 +68,7 @@ export function LanguageSwitcher() {
     setIsOpen(false);
 
     // Redirect to new locale path
-    router.push(`/${locale}/welcome`);
+    router.push("/welcome", { locale });
   };
 
   const toggleDropdown = () => {

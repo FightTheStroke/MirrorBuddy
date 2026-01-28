@@ -1,8 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useTranslations, useLocale } from "next-intl";
+import { useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
 import { motion } from "framer-motion";
 import {
@@ -42,7 +42,6 @@ const MB_PER_LEVEL = 1000;
 
 export default function Home() {
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations("home");
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
     useOnboardingStore();
@@ -53,9 +52,9 @@ export default function Home() {
 
   useEffect(() => {
     if (isHydrated && !hasCompletedOnboarding) {
-      router.push(`/${locale}/welcome`);
+      router.push("/welcome");
     }
-  }, [isHydrated, hasCompletedOnboarding, router, locale]);
+  }, [isHydrated, hasCompletedOnboarding, router]);
 
   const [currentView, setCurrentView] = useState<View>("maestri");
   const [sidebarOpen, setSidebarOpen] = useState(true);

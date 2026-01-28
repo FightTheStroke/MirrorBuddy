@@ -16,15 +16,13 @@ The `no-hardcoded-italian` rule warns on Italian text in JSX, common Italian wor
 
 ### 2. Extract Strings to Translation Files
 
-Add strings to `src/i18n/messages/it.json`:
+Add strings to `messages/it/{namespace}.json`:
 
 ```json
 {
-  "common": {
-    "save": "Salva",
-    "cancel": "Annulla",
-    "loading": "Caricamento in corso"
-  }
+  "save": "Salva",
+  "cancel": "Annulla",
+  "loading": "Caricamento in corso"
 }
 ```
 
@@ -133,7 +131,7 @@ Result: FAIL (5 missing keys)
 
 - [ ] Run `npm run lint` to identify hardcoded strings
 - [ ] Determine namespace (common, auth, errors, validation, etc.)
-- [ ] Add keys to `src/i18n/messages/it.json`
+- [ ] Add keys to `messages/it/{namespace}.json`
 - [ ] Add keys to all locales (en, fr, de, es)
 - [ ] Import `useTranslations` hook
 - [ ] Replace hardcoded strings with `t('key')`

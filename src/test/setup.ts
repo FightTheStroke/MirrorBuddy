@@ -7,6 +7,7 @@
  */
 
 import { vi } from "vitest";
+import React from "react";
 import "@testing-library/jest-dom/vitest";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
@@ -159,6 +160,21 @@ vi.mock("@/lib/logger", () => {
   };
 });
 
+// Mock next-intl navigation helpers to avoid Next.js runtime imports in tests
+vi.mock("next-intl/navigation", () => ({
+  createNavigation: () => ({
+    Link: ({ children, ...props }: { children: React.ReactNode }) =>
+      React.createElement("a", props, children),
+    redirect: vi.fn(),
+    usePathname: () => "/",
+    useRouter: () => ({
+      push: vi.fn(),
+      replace: vi.fn(),
+      prefetch: vi.fn(),
+    }),
+    getPathname: () => "/",
+  }),
+}));
 // Mock console methods for cleaner test output
 global.console = {
   ...console,

@@ -1,9 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useLocale, useTranslations } from "next-intl";
-import Link from "next/link";
+import { Link, useRouter } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import { Send, CheckCircle, AlertCircle, ArrowLeft, LogIn } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -13,7 +12,6 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 export default function InviteRequestPage() {
   const router = useRouter();
-  const locale = useLocale();
   const t = useTranslations("invite");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -77,10 +75,7 @@ export default function InviteRequestPage() {
           <p className="text-slate-600 dark:text-slate-300">
             {t("successMessage")}
           </p>
-          <Button
-            onClick={() => router.push(`/${locale}/welcome`)}
-            className="w-full"
-          >
+          <Button onClick={() => router.push("/welcome")} className="w-full">
             {t("backToHome")}
           </Button>
         </div>

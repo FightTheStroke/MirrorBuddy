@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 import {
   Card,
   CardContent,
@@ -32,6 +33,7 @@ export function EmailCapturePrompt({
   showOnLimit = false,
   threshold = 5,
 }: EmailCapturePromptProps) {
+  const t = useTranslations("auth");
   const [email, setEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +70,7 @@ export function EmailCapturePrompt({
     // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address");
+      setError(t("trialVerify.emailInvalid"));
       return;
     }
 
@@ -84,13 +86,13 @@ export function EmailCapturePrompt({
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || "Failed to save email");
+        throw new Error(data.error || t("trialVerify.errorSave"));
       }
 
       localStorage.setItem("mirrorbuddy-trial-session-id", sessionId);
       setVerificationSent(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save email");
+      setError(err instanceof Error ? err.message : t("trialVerify.errorSave"));
     } finally {
       setIsSubmitting(false);
     }
@@ -105,7 +107,7 @@ export function EmailCapturePrompt({
       <div className="flex items-center gap-2 p-4 bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-800 rounded-lg">
         <Mail className="h-4 w-4 text-green-600 dark:text-green-400" />
         <p className="text-sm text-green-800 dark:text-green-200">
-          Thanks! We will notify you when full features are available.
+          {t("trialVerify.successNotification")}
         </p>
       </div>
     );
@@ -116,11 +118,11 @@ export function EmailCapturePrompt({
       <div className="flex items-start gap-2 p-4 bg-indigo-50 border border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 rounded-lg">
         <Mail className="h-4 w-4 text-indigo-600 dark:text-indigo-400 mt-0.5" />
         <p className="text-sm text-indigo-800 dark:text-indigo-200">
-          Abbiamo inviato un codice di verifica. Inseriscilo su{" "}
+          {t("trialVerify.verificationSent")}{" "}
           <Link href="/trial/verify" className="underline">
             /trial/verify
           </Link>{" "}
-          per sbloccare gli strumenti della prova.
+          {t("trialVerify.verificationSentSuffix")}
         </p>
       </div>
     );
@@ -133,12 +135,14 @@ export function EmailCapturePrompt({
           <div>
             <CardTitle className="text-lg flex items-center gap-2">
               <Mail className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              {showOnLimit ? "Upgrade to Continue" : "Unlock Full Features"}
+              {showOnLimit
+                ? t("trialVerify.upgradeTitle")
+                : t("trialVerify.unlockTitle")}
             </CardTitle>
             <CardDescription className="mt-1">
               {showOnLimit
-                ? "Enter your email to learn about upgrading and continue learning"
-                : "Get notified when more features become available"}
+                ? t("trialVerify.upgradeDescription")
+                : t("trialVerify.unlockDescription")}
             </CardDescription>
           </div>
           <Button
@@ -146,7 +150,7 @@ export function EmailCapturePrompt({
             size="icon"
             onClick={handleDismiss}
             className="h-6 w-6 rounded-full"
-            aria-label="Maybe later"
+            aria-label={t("trialVerify.maybeLater")}
           >
             <X className="h-4 w-4" />
           </Button>
@@ -156,12 +160,12 @@ export function EmailCapturePrompt({
         <form onSubmit={handleSubmit} className="space-y-3">
           <Input
             type="email"
-            placeholder="your.email@example.com"
+            placeholder={t("trialVerify.emailPlaceholder")}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={isSubmitting}
             className="w-full"
-            aria-label="Email address"
+            aria-label={t("trialVerify.emailLabel")}
           />
           {error && (
             <div className="p-2 bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-800 rounded text-sm text-red-800 dark:text-red-200">
@@ -173,18 +177,20 @@ export function EmailCapturePrompt({
               type="submit"
               disabled={isSubmitting}
               className="flex-1"
-              aria-label="Submit"
+              aria-label={t("trialVerify.submit")}
             >
-              {isSubmitting ? "Saving..." : "Notify Me"}
+              {isSubmitting
+                ? t("trialVerify.submitSaving")
+                : t("trialVerify.submit")}
             </Button>
             <Button
               type="button"
               variant="outline"
               onClick={handleDismiss}
               className="flex-1"
-              aria-label="Maybe later"
+              aria-label={t("trialVerify.maybeLater")}
             >
-              Maybe Later
+              {t("trialVerify.maybeLater")}
             </Button>
           </div>
         </form>

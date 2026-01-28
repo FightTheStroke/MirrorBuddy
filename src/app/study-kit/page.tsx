@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function StudyKitPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

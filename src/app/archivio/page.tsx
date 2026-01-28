@@ -14,5 +14,5 @@ export const metadata = {
 };
 
 export default function ArchivioPage() {
-  redirect("/supporti");
+  redirect("/landing");
 }

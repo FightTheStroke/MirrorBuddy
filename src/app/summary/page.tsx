@@ -5,9 +5,9 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Riassunto | MirrorBuddy",
+  title: "Summary | MirrorBuddy",
 };
 
 export default function SummaryPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

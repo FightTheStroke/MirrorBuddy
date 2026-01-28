@@ -42,7 +42,9 @@ describe("EmailCapturePrompt", () => {
   it("renders email capture prompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
-    expect(screen.getByText(/unlock full features/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/sblocca tutte le funzionalità/i),
+    ).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
   });
 
@@ -55,7 +57,9 @@ describe("EmailCapturePrompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
     const emailInput = screen.getByPlaceholderText(/email/i);
-    const submitButton = screen.getByRole("button", { name: /submit/i });
+    const submitButton = screen.getByRole("button", {
+      name: /verifica email/i,
+    });
 
     fireEvent.change(emailInput, { target: { value: "user@example.com" } });
     fireEvent.click(submitButton);
@@ -78,7 +82,7 @@ describe("EmailCapturePrompt", () => {
     const emailInput = screen.getByPlaceholderText(
       /email/i,
     ) as HTMLInputElement;
-    const submitButton = screen.getByText(/notify me/i);
+    const submitButton = screen.getByText(/verifica email/i);
 
     // Change the input value
     fireEvent.change(emailInput, { target: { value: "invalid-email" } });
@@ -100,7 +104,7 @@ describe("EmailCapturePrompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
     // Use the button in the form, not the X icon
-    const dismissButton = screen.getByText(/maybe later/i);
+    const dismissButton = screen.getByText(/forse più tardi/i);
     fireEvent.click(dismissButton);
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -131,7 +135,7 @@ describe("EmailCapturePrompt", () => {
 
     // Should render at threshold
     expect(container.firstChild).not.toBeNull();
-    expect(screen.getByText(/notify me/i)).toBeInTheDocument();
+    expect(screen.getByText(/verifica email/i)).toBeInTheDocument();
   });
 
   it("shows when hitting limit", () => {
@@ -143,6 +147,6 @@ describe("EmailCapturePrompt", () => {
       />,
     );
 
-    expect(screen.getByText(/upgrade to continue/i)).toBeInTheDocument();
+    expect(screen.getByText(/continua con la beta/i)).toBeInTheDocument();
   });
 });

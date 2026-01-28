@@ -12,8 +12,7 @@
 // See: https://nextjs.org/docs/app/api-reference/file-conventions/proxy
 // ============================================================================
 
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
 import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
 import { metricsStore } from "@/lib/observability/metrics-store";
@@ -22,6 +21,10 @@ import {
   VISITOR_COOKIE_NAME,
 } from "@/lib/auth/cookie-constants";
 import { routing } from "@/i18n/routing";
+import {
+  detectLocaleFromRequest,
+  extractLocaleFromUrl,
+} from "@/lib/i18n/locale-detection";
 
 const REQUEST_ID_HEADER = "x-request-id";
 const RESPONSE_TIME_HEADER = "x-response-time";
@@ -49,6 +52,7 @@ const I18N_EXCLUDE_PATHS = [
   "/maestri", // Static avatar images
   "/avatars", // Static avatar images
   "/logo", // Logo images
+  "/contact",
 ];
 
 // Public routes that don't require authentication (ADR 0055, 0056)
@@ -283,21 +287,31 @@ export default function proxy(request: NextRequest) {
     return response;
   }
 
+  const localeFromPath = extractLocaleFromUrl(pathname);
+  const detectedLocale =
+    localeFromPath ??
+    detectLocaleFromRequest({
+      cookieHeader: request.headers.get("cookie"),
+      acceptLanguageHeader: request.headers.get("accept-language"),
+    });
+  requestHeaders.set("X-NEXT-INTL-LOCALE", detectedLocale);
+  requestHeaders.set("x-locale-detected", detectedLocale);
+
   // ==========================================================================
   // i18n ROUTING - Handle locale detection for localized pages ONLY
   // CRITICAL: Skip for /api, /admin, static files to prevent 307 redirects
   // ==========================================================================
   if (!shouldSkipI18n(pathname)) {
-    // Check if pathname already has a locale prefix
-    const locales = ["it", "en", "fr", "de", "es"];
-    const hasLocalePrefix = locales.some(
-      (locale) =>
-        pathname === `/${locale}` || pathname.startsWith(`/${locale}/`),
-    );
+    const hasLocalePrefix = Boolean(localeFromPath);
 
     // Only apply i18n middleware if no locale prefix (needs redirect)
     if (!hasLocalePrefix) {
-      return intlMiddleware(request);
+      const response = intlMiddleware(
+        new NextRequest(request.url, { headers: requestHeaders }),
+      );
+      response.headers.set("X-NEXT-INTL-LOCALE", detectedLocale);
+      response.headers.set("x-locale-detected", detectedLocale);
+      return response;
     }
   }
 
@@ -306,6 +320,8 @@ export default function proxy(request: NextRequest) {
     response.headers.set(CSP_NONCE_HEADER, nonce);
     response.headers.set("Content-Security-Policy", buildCSPHeader(nonce));
     response.headers.set(REQUEST_ID_HEADER, requestId);
+    response.headers.set("X-NEXT-INTL-LOCALE", detectedLocale);
+    response.headers.set("x-locale-detected", detectedLocale);
 
     // Record metrics for API routes
     if (trackMetrics) {
@@ -346,12 +362,9 @@ export default function proxy(request: NextRequest) {
 
   // Auth public routes - allow without auth but add CSP
   // Strip locale prefix for matching (e.g., /it/welcome → /welcome)
-  const locales = ["it", "en", "fr", "de", "es"];
-  const localePrefix = locales.find(
-    (l) => pathname === `/${l}` || pathname.startsWith(`/${l}/`),
-  );
+  const localePrefix = extractLocaleFromUrl(pathname);
   const pathWithoutLocale = localePrefix
-    ? pathname.slice(localePrefix.length + 1) || "/"
+    ? pathname.replace(`/${localePrefix}`, "") || "/"
     : pathname;
 
   if (AUTH_PUBLIC_ROUTES.some((r) => pathWithoutLocale.startsWith(r))) {
@@ -363,7 +376,10 @@ export default function proxy(request: NextRequest) {
   // Admin routes - require authenticated user
   if (pathname.startsWith(ADMIN_PREFIX)) {
     if (!isAuthenticated) {
-      const loginUrl = new URL("/login", request.url);
+      const loginUrl = new URL(
+        localePrefix ? `/${localePrefix}/login` : "/login",
+        request.url,
+      );
       loginUrl.searchParams.set("redirect", pathname);
       return NextResponse.redirect(loginUrl);
     }
@@ -376,7 +392,10 @@ export default function proxy(request: NextRequest) {
   // Protected routes - require EITHER authenticated user OR trial session
   if (!isAuthenticated && !hasTrialSession) {
     // No valid access - redirect to welcome to create trial session
-    const welcomeUrl = new URL("/welcome", request.url);
+    const welcomeUrl = new URL(
+      localePrefix ? `/${localePrefix}/welcome` : "/welcome",
+      request.url,
+    );
     return NextResponse.redirect(welcomeUrl);
   }
 

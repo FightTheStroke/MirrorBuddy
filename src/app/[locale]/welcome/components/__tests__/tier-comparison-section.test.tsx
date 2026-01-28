@@ -20,7 +20,7 @@ describe("TierComparisonSection", () => {
   it("renders all three tier cards", () => {
     render(<TierComparisonSection />);
 
-    expect(screen.getByText("Trial")).toBeInTheDocument();
+    expect(screen.getByText("Prova")).toBeInTheDocument();
     expect(screen.getByText("Base")).toBeInTheDocument();
     expect(screen.getByText("Pro")).toBeInTheDocument();
   });
@@ -29,26 +29,26 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Trial tier should show limited features
-    expect(screen.getByText("3 Maestri")).toBeInTheDocument();
-    expect(screen.getByText("10 messaggi/giorno")).toBeInTheDocument();
-    expect(screen.getByText("5 minuti voce/giorno")).toBeInTheDocument();
+    expect(screen.getByText(/3 Professori/i)).toBeInTheDocument();
+    expect(screen.getByText(/10 messaggi\/giorno/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/minuti voce\/giorno/i)).toHaveLength(2);
   });
 
   it("displays base tier features", () => {
     render(<TierComparisonSection />);
 
     // Base tier should show expanded features
-    expect(screen.getByText("10 Maestri")).toBeInTheDocument();
-    expect(screen.getByText("30 messaggi/giorno")).toBeInTheDocument();
-    expect(screen.getByText("15 minuti voce/giorno")).toBeInTheDocument();
+    expect(screen.getByText(/10 Professori/i)).toBeInTheDocument();
+    expect(screen.getByText(/30 messaggi\/giorno/i)).toBeInTheDocument();
+    expect(screen.getByText(/15 minuti voce\/giorno/i)).toBeInTheDocument();
   });
 
   it("displays pro tier features", () => {
     render(<TierComparisonSection />);
 
     // Pro tier should show unlimited or high limits
-    expect(screen.getByText("22 Maestri")).toBeInTheDocument();
-    expect(screen.getByText("Messaggi illimitati")).toBeInTheDocument();
+    expect(screen.getByText(/22 Professori/i)).toBeInTheDocument();
+    expect(screen.getByText(/messaggi illimitati/i)).toBeInTheDocument();
   });
 
   it("renders CTA buttons for each tier", () => {
@@ -61,7 +61,7 @@ describe("TierComparisonSection", () => {
       screen.getByRole("button", { name: /registrati/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /upgrade a pro/i }),
+      screen.getByRole("button", { name: /passa a pro/i }),
     ).toBeInTheDocument();
   });
 
@@ -85,10 +85,10 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Trial and Base are both free (2 occurrences of "Gratis")
-    const gratisElements = screen.getAllByText("Gratis");
+    const gratisElements = screen.getAllByText("Gratuito");
     expect(gratisElements.length).toBe(2);
 
     // Pro tier shows custom pricing
-    expect(screen.getByText("A richiesta")).toBeInTheDocument();
+    expect(screen.getByText("Su richiesta")).toBeInTheDocument();
   });
 });

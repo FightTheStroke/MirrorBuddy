@@ -1,4 +1,5 @@
 import { Check, Users, MessageCircle, Mic, Star } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { ReactNode } from "react";
 
 export interface TierFeature {
@@ -21,94 +22,98 @@ export interface TierCard {
   badge?: string;
 }
 
-export const tierCards: TierCard[] = [
-  {
-    name: "Trial",
-    tagline: "Esplora senza impegno",
-    price: "Gratis",
-    badge: undefined,
-    features: [
-      {
-        icon: <Users className="w-4 h-4" />,
-        text: "3 Maestri",
+export function useTierCards(): TierCard[] {
+  const t = useTranslations("welcome.tierComparison");
+
+  return [
+    {
+      name: t("tiers.trial.name"),
+      tagline: t("tiers.trial.tagline"),
+      price: t("tiers.trial.price"),
+      badge: undefined,
+      features: [
+        {
+          icon: <Users className="w-4 h-4" />,
+          text: t("tiers.trial.features.maestri"),
+        },
+        {
+          icon: <MessageCircle className="w-4 h-4" />,
+          text: t("tiers.trial.features.messages"),
+        },
+        {
+          icon: <Mic className="w-4 h-4" />,
+          text: t("tiers.trial.features.voice"),
+        },
+        {
+          icon: <Check className="w-4 h-4" />,
+          text: t("tiers.trial.features.noRegistration"),
+        },
+      ],
+      cta: {
+        text: t("tiers.trial.cta"),
+        href: "/welcome?skip=true",
       },
-      {
-        icon: <MessageCircle className="w-4 h-4" />,
-        text: "10 messaggi/giorno",
-      },
-      {
-        icon: <Mic className="w-4 h-4" />,
-        text: "5 minuti voce/giorno",
-      },
-      {
-        icon: <Check className="w-4 h-4" />,
-        text: "Nessuna registrazione",
-      },
-    ],
-    cta: {
-      text: "Prova gratis",
-      href: "/welcome?skip=true",
     },
-  },
-  {
-    name: "Base",
-    tagline: "Per studenti registrati",
-    price: "Gratis",
-    badge: undefined,
-    features: [
-      {
-        icon: <Users className="w-4 h-4" />,
-        text: "10 Maestri",
+    {
+      name: t("tiers.base.name"),
+      tagline: t("tiers.base.tagline"),
+      price: t("tiers.base.price"),
+      badge: undefined,
+      features: [
+        {
+          icon: <Users className="w-4 h-4" />,
+          text: t("tiers.base.features.maestri"),
+        },
+        {
+          icon: <MessageCircle className="w-4 h-4" />,
+          text: t("tiers.base.features.messages"),
+        },
+        {
+          icon: <Mic className="w-4 h-4" />,
+          text: t("tiers.base.features.voice"),
+        },
+        {
+          icon: <Check className="w-4 h-4" />,
+          text: t("tiers.base.features.savedProgress"),
+          highlight: true,
+        },
+      ],
+      cta: {
+        text: t("tiers.base.cta"),
+        href: "/login",
       },
-      {
-        icon: <MessageCircle className="w-4 h-4" />,
-        text: "30 messaggi/giorno",
-      },
-      {
-        icon: <Mic className="w-4 h-4" />,
-        text: "15 minuti voce/giorno",
-      },
-      {
-        icon: <Check className="w-4 h-4" />,
-        text: "Progressi salvati",
-        highlight: true,
-      },
-    ],
-    cta: {
-      text: "Registrati",
-      href: "/login",
     },
-  },
-  {
-    name: "Pro",
-    tagline: "Esperienza completa",
-    price: "A richiesta",
-    badge: "Consigliato",
-    highlight: true,
-    features: [
-      {
-        icon: <Users className="w-4 h-4" />,
-        text: "22 Maestri",
+    {
+      name: t("tiers.pro.name"),
+      tagline: t("tiers.pro.tagline"),
+      price: t("tiers.pro.price"),
+      badge: t("tiers.pro.badge"),
+      highlight: true,
+      features: [
+        {
+          icon: <Users className="w-4 h-4" />,
+          text: t("tiers.pro.features.maestri"),
+        },
+        {
+          icon: <MessageCircle className="w-4 h-4" />,
+          text: t("tiers.pro.features.messagesUnlimited"),
+          highlight: true,
+        },
+        {
+          icon: <Mic className="w-4 h-4" />,
+          text: t("tiers.pro.features.voiceUnlimited"),
+          highlight: true,
+        },
+        {
+          icon: <Star className="w-4 h-4" />,
+          text: t("tiers.pro.features.allTools"),
+          highlight: true,
+        },
+      ],
+      cta: {
+        text: t("tiers.pro.cta"),
+        href: "/login",
       },
-      {
-        icon: <MessageCircle className="w-4 h-4" />,
-        text: "Messaggi illimitati",
-        highlight: true,
-      },
-      {
-        icon: <Mic className="w-4 h-4" />,
-        text: "Voce illimitata",
-        highlight: true,
-      },
-      {
-        icon: <Star className="w-4 h-4" />,
-        text: "Tutti gli strumenti",
-        highlight: true,
-      },
-    ],
-    cta: {
-      text: "Upgrade a Pro",
-      href: "/login",
     },
-  },
-];
+  ];
+}

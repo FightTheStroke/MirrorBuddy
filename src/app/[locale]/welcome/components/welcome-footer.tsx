@@ -1,9 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Shield, Bot, Lock, AlertTriangle, Github, Brain } from "lucide-react";
 import { InlineConsent } from "@/components/consent/inline-consent";
+import { useTranslations } from "next-intl";
 
 const GITHUB_REPO_URL = "https://github.com/robdll/mirrorbuddy";
 
@@ -12,38 +13,6 @@ interface ComplianceBadge {
   label: string;
   description: string;
 }
-
-const COMPLIANCE_BADGES: ComplianceBadge[] = [
-  {
-    icon: <Shield className="w-4 h-4" />,
-    label: "GDPR",
-    description: "Conforme al regolamento europeo",
-  },
-  {
-    icon: <Brain className="w-4 h-4" />,
-    label: "AI Act",
-    description: "EU 2024/1689",
-  },
-  {
-    icon: <Lock className="w-4 h-4" />,
-    label: "COPPA",
-    description: "Protezione minori",
-  },
-  {
-    icon: <AlertTriangle className="w-4 h-4" />,
-    label: "L.132/2025",
-    description: "Legge italiana sull'IA",
-  },
-];
-
-const LEGAL_LINKS = [
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/terms", label: "Termini di Servizio" },
-  { href: "/cookies", label: "Cookie Policy" },
-  { href: "/ai-transparency", label: "Trasparenza AI" },
-  { href: "/ai-policy", label: "Politica AI" },
-  { href: "/compliance", label: "Compliance" },
-];
 
 /**
  * Welcome Footer - Comprehensive footer with compliance elements
@@ -57,6 +26,39 @@ const LEGAL_LINKS = [
  */
 export function WelcomeFooter() {
   const currentYear = new Date().getFullYear();
+  const t = useTranslations("welcome.footer");
+
+  const complianceBadges: ComplianceBadge[] = [
+    {
+      icon: <Shield className="w-4 h-4" />,
+      label: t("compliance.gdpr.label"),
+      description: t("compliance.gdpr.description"),
+    },
+    {
+      icon: <Brain className="w-4 h-4" />,
+      label: t("compliance.aiAct.label"),
+      description: t("compliance.aiAct.description"),
+    },
+    {
+      icon: <Lock className="w-4 h-4" />,
+      label: t("compliance.coppa.label"),
+      description: t("compliance.coppa.description"),
+    },
+    {
+      icon: <AlertTriangle className="w-4 h-4" />,
+      label: t("compliance.italianLaw.label"),
+      description: t("compliance.italianLaw.description"),
+    },
+  ];
+
+  const legalLinks = [
+    { href: "/privacy", label: t("legal.privacy") },
+    { href: "/terms", label: t("legal.terms") },
+    { href: "/cookies", label: t("legal.cookies") },
+    { href: "/ai-transparency", label: t("legal.aiTransparency") },
+    { href: "/ai-policy", label: t("legal.aiPolicy") },
+    { href: "/compliance", label: t("legal.compliance") },
+  ];
 
   return (
     <motion.footer
@@ -72,7 +74,7 @@ export function WelcomeFooter() {
         <div className="flex items-center justify-center gap-2 mb-6 px-4 py-2 bg-blue-50 dark:bg-blue-900/50 rounded-lg border border-blue-200 dark:border-blue-700">
           <Bot className="w-4 h-4 text-blue-600 dark:text-blue-300" />
           <span className="text-sm text-blue-900 dark:text-blue-100">
-            Creato con AI - le risposte possono contenere errori
+            {t("aiDisclaimer")}
           </span>
         </div>
 
@@ -83,7 +85,7 @@ export function WelcomeFooter() {
 
         {/* Compliance Badges */}
         <div className="flex flex-wrap items-center justify-center gap-4 mb-6">
-          {COMPLIANCE_BADGES.map((badge, index) => (
+          {complianceBadges.map((badge, index) => (
             <div
               key={index}
               className="flex items-center gap-2 px-3 py-1.5 bg-gray-100 dark:bg-gray-800 rounded-full"
@@ -104,7 +106,7 @@ export function WelcomeFooter() {
           className="flex flex-wrap items-center justify-center gap-4 mb-6"
           aria-label="Link legali"
         >
-          {LEGAL_LINKS.map((link, index) => (
+          {legalLinks.map((link, index) => (
             <Link
               key={index}
               href={link.href}
@@ -122,16 +124,16 @@ export function WelcomeFooter() {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
-            aria-label="Vedi il codice sorgente su GitHub"
+            aria-label={t("openSource.ariaLabel")}
           >
             <Github className="w-5 h-5" aria-hidden="true" />
-            <span className="text-sm font-medium">Open Source</span>
+            <span className="text-sm font-medium">{t("openSource.label")}</span>
           </a>
         </div>
 
         {/* Copyright */}
         <p className="text-center text-xs text-gray-500 dark:text-gray-500">
-          © {currentYear} MirrorBuddy. Progetto open source su GitHub.
+          {t("copyright", { year: currentYear })}
         </p>
 
         {/* Made in Europe - intentionally not localized */}

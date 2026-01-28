@@ -5,13 +5,12 @@ import { redirect } from "next/navigation";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Politica AI | MirrorBuddy",
+  title: "AI Policy | MirrorBuddy",
 };
 
 /**
- * /ai-policy route - redirects to /ai-transparency
- * AI Policy is covered in the AI Transparency document.
+ * /ai-policy route - redirects to localized landing
  */
 export default function AIPolicyRedirect() {
-  redirect("/ai-transparency");
+  redirect("/landing");
 }

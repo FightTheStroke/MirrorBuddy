@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
 // Force dynamic rendering to avoid i18n static generation issues
 export const dynamic = "force-dynamic";
 
-import { CookiesClient } from "./cookies-client";
+export const metadata: Metadata = {
+  title: "Cookies | MirrorBuddy",
+};
 
 export default function CookiesPage() {
-  return <CookiesClient />;
+  redirect("/landing");
 }

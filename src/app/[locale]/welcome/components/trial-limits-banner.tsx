@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { MessageSquare, Users, Wrench, Gift, ArrowRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 
