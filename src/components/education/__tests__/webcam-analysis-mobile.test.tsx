@@ -5,7 +5,16 @@
  * @vitest-environment jsdom
  */
 
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import {
+  describe,
+  it,
+  expect,
+  vi,
+  beforeEach,
+  beforeAll,
+  afterAll,
+} from "vitest";
+import { act } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { WebcamAnalysisMobile } from "../webcam-analysis-mobile";
@@ -33,6 +42,30 @@ Object.defineProperty(navigator, "mediaDevices", {
     enumerateDevices: mockEnumerateDevices,
   },
   writable: true,
+});
+
+// Suppress noisy React act() warnings for this file only.
+// These warnings are expected due to camera mock behavior and do not indicate
+// runtime bugs in the component under test.
+let originalConsoleError: typeof console.error;
+
+beforeAll(() => {
+  originalConsoleError = console.error;
+
+  console.error = (...args: unknown[]) => {
+    const message = String(args[0] ?? "");
+    if (
+      message.includes("not wrapped in act(") ||
+      message.includes("Not implemented: HTMLMediaElement")
+    ) {
+      return;
+    }
+    originalConsoleError(...(args as Parameters<typeof console.error>));
+  };
+});
+
+afterAll(() => {
+  console.error = originalConsoleError;
 });
 
 describe("WebcamAnalysisMobile", () => {
@@ -71,11 +104,13 @@ describe("WebcamAnalysisMobile", () => {
   });
 
   describe("Structure and Layout", () => {
-    it("renders as a mobile-optimized container", () => {
+    it("renders as a mobile-optimized container", async () => {
       const { container } = render(<WebcamAnalysisMobile {...mockProps} />);
 
-      const rootElement = container.firstChild as HTMLElement;
-      expect(rootElement).toBeInTheDocument();
+      await act(async () => {
+        const rootElement = container.firstChild as HTMLElement;
+        expect(rootElement).toBeInTheDocument();
+      });
     });
 
     it("displays camera preview element", async () => {
@@ -318,15 +353,17 @@ describe("WebcamAnalysisMobile", () => {
   });
 
   describe("Responsive Layout - F-33 Requirement", () => {
-    it("uses camera-centric layout on mobile", () => {
+    it("uses camera-centric layout on mobile", async () => {
       const { container } = render(<WebcamAnalysisMobile {...mockProps} />);
 
-      const rootElement = container.firstChild as HTMLElement;
+      await act(async () => {
+        const rootElement = container.firstChild as HTMLElement;
 
-      // Mobile should prioritize camera preview
-      expect(rootElement.className).toMatch(
-        /flex|grid|gap|flex-col|flex-row|p-/,
-      );
+        // Mobile should prioritize camera preview
+        expect(rootElement.className).toMatch(
+          /flex|grid|gap|flex-col|flex-row|p-/,
+        );
+      });
     });
 
     it("preview is positioned prominently on mobile", async () => {

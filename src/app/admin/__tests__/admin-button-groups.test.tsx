@@ -31,15 +31,19 @@ describe("Admin Button Groups - Mobile Responsive", () => {
       };
 
       const { container } = render(
-        <UsersTableRow
-          user={mockUser}
-          isSelected={false}
-          isLoading={false}
-          onSelect={() => {}}
-          onToggle={() => {}}
-          onDelete={() => {}}
-          availableTiers={[]}
-        />,
+        <table>
+          <tbody>
+            <UsersTableRow
+              user={mockUser}
+              isSelected={false}
+              isLoading={false}
+              onSelect={() => {}}
+              onToggle={() => {}}
+              onDelete={() => {}}
+              availableTiers={[]}
+            />
+          </tbody>
+        </table>,
       );
 
       const buttonContainer = container.querySelector(".flex.gap-1");
@@ -73,15 +77,19 @@ describe("Admin Button Groups - Mobile Responsive", () => {
       };
 
       const { container } = render(
-        <UsersTableRow
-          user={mockUser}
-          isSelected={false}
-          isLoading={false}
-          onSelect={() => {}}
-          onToggle={() => {}}
-          onDelete={() => {}}
-          availableTiers={[]}
-        />,
+        <table>
+          <tbody>
+            <UsersTableRow
+              user={mockUser}
+              isSelected={false}
+              isLoading={false}
+              onSelect={() => {}}
+              onToggle={() => {}}
+              onDelete={() => {}}
+              availableTiers={[]}
+            />
+          </tbody>
+        </table>,
       );
 
       const buttons = container.querySelectorAll("button");

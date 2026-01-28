@@ -209,11 +209,9 @@ describe("PdfInputMobile", () => {
       });
 
       await user.upload(fileInput, file);
-
-      // The component simulates upload with setTimeout, so we wait for it
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      expect(mockOnUpload).toHaveBeenCalledWith(file);
+      await waitFor(() => {
+        expect(mockOnUpload).toHaveBeenCalledWith(file);
+      });
     });
 
     it("accepts image files", async () => {
@@ -226,10 +224,9 @@ describe("PdfInputMobile", () => {
       const file = new File(["image"], "scan.jpg", { type: "image/jpeg" });
 
       await user.upload(fileInput, file);
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      expect(mockOnUpload).toHaveBeenCalledWith(file);
+      await waitFor(() => {
+        expect(mockOnUpload).toHaveBeenCalledWith(file);
+      });
     });
 
     it("calls onUpload callback with selected file", async () => {
@@ -242,11 +239,10 @@ describe("PdfInputMobile", () => {
       const file = new File(["test"], "test.pdf", { type: "application/pdf" });
 
       await user.upload(fileInput, file);
-
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      expect(mockOnUpload).toHaveBeenCalledTimes(1);
-      expect(mockOnUpload).toHaveBeenCalledWith(file);
+      await waitFor(() => {
+        expect(mockOnUpload).toHaveBeenCalledTimes(1);
+        expect(mockOnUpload).toHaveBeenCalledWith(file);
+      });
     });
 
     it("file input accepts only PDF and image files", () => {

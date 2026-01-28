@@ -4,6 +4,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
+import { act } from "react";
 import { renderHook, waitFor } from "@testing-library/react";
 import {
   useLanguageSync,
@@ -100,7 +101,9 @@ describe("useLanguageSync", () => {
         expect(result.current.isInitialized).toBe(true);
       });
 
-      await result.current.changeLanguage("de");
+      await act(async () => {
+        await result.current.changeLanguage("de");
+      });
 
       // Should update cookie
       expect(languageCookie.setLanguageCookie).toHaveBeenCalledWith("de");
@@ -120,7 +123,9 @@ describe("useLanguageSync", () => {
         expect(result.current.isInitialized).toBe(true);
       });
 
-      await result.current.changeLanguage("fr");
+      await act(async () => {
+        await result.current.changeLanguage("fr");
+      });
 
       expect(result.current.currentLanguage).toBe("fr");
     });
@@ -154,7 +159,9 @@ describe("useLanguageSync", () => {
       syncToServerMock.mockClear();
 
       // Now user sets a cookie (e.g., from settings) and we sync
-      await result.current.syncCookieToProfile();
+      await act(async () => {
+        await result.current.syncCookieToProfile();
+      });
 
       const state = useSettingsStore.getState();
       expect(state.appearance.language).toBe("fr");
@@ -200,7 +207,9 @@ describe("useLanguageSyncAfterLogin", () => {
 
     const { result } = renderHook(() => useLanguageSyncAfterLogin());
 
-    await result.current.syncAfterLogin();
+    await act(async () => {
+      await result.current.syncAfterLogin();
+    });
 
     const state = useSettingsStore.getState();
     expect(state.appearance.language).toBe("fr");

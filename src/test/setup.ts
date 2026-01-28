@@ -128,6 +128,33 @@ vi.mock("next-intl", () => ({
     children,
 }));
 
+// -----------------------------------------------------------------------------
+// Centralized logger mocking
+// -----------------------------------------------------------------------------
+// Tests should use the shared logger instead of console.log.
+// We mock the logger here so that domain-level error/warn logs do not flood
+// the test output, while still allowing DEBUG runs to see full logs.
+vi.mock("@/lib/logger", () => {
+  const shouldLog = Boolean(process.env.DEBUG);
+
+  const makeMethod =
+    (name: "info" | "warn" | "error" | "debug") =>
+    (...args: unknown[]) => {
+      if (shouldLog) {
+        console[name](...args);
+      }
+    };
+
+  return {
+    logger: {
+      info: makeMethod("info"),
+      warn: makeMethod("warn"),
+      error: makeMethod("error"),
+      debug: makeMethod("debug"),
+    },
+  };
+});
+
 // Mock console methods for cleaner test output
 global.console = {
   ...console,
@@ -209,5 +236,30 @@ if (typeof Blob !== "undefined") {
         reader.readAsArrayBuffer(this);
       });
     };
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Media element polyfills (video/audio) for jsdom
+// -----------------------------------------------------------------------------
+// Prevent "Not implemented: HTMLMediaElement.play" warnings in tests that
+// exercise video/audio components (e.g. WebcamAnalysisMobile).
+const mediaPrototype =
+  (globalThis.HTMLMediaElement as HTMLMediaElement["constructor"] | undefined)
+    ?.prototype ??
+  (globalThis.HTMLVideoElement as HTMLVideoElement["constructor"] | undefined)
+    ?.prototype ??
+  (globalThis.HTMLAudioElement as HTMLAudioElement["constructor"] | undefined)
+    ?.prototype;
+
+if (mediaPrototype) {
+  if (typeof mediaPrototype.play !== "function") {
+    mediaPrototype.play = vi.fn().mockResolvedValue(undefined);
+  }
+  if (typeof mediaPrototype.pause !== "function") {
+    mediaPrototype.pause = vi.fn();
+  }
+  if (typeof mediaPrototype.load !== "function") {
+    mediaPrototype.load = vi.fn();
   }
 }

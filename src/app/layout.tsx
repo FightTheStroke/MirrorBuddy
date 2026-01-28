@@ -10,8 +10,11 @@ import { headers } from "next/headers";
 import {
   detectLocaleFromRequest,
   extractLocaleFromUrl,
+  isValidLocale,
 } from "@/lib/i18n/locale-detection";
 import { defaultLocale } from "@/i18n/config";
+import type { Locale } from "@/i18n/config";
+import { getLocale } from "next-intl/server";
 import "./globals.css";
 import "@/styles/safe-area.css";
 
@@ -73,6 +76,14 @@ export default async function RootLayout({
   // Next.js will automatically add this nonce to inline scripts when available
   const nonce = await getNonce();
 
+  let localeFromNextIntl: Locale | null = null;
+  try {
+    const maybeLocale = await getLocale();
+    localeFromNextIntl = isValidLocale(maybeLocale) ? maybeLocale : null;
+  } catch {
+    localeFromNextIntl = null;
+  }
+
   const headersList = await headers();
   const pathnameCandidate =
     headersList.get("x-pathname") ||
@@ -83,6 +94,7 @@ export default async function RootLayout({
 
   const localeFromPath = extractLocaleFromUrl(pathnameCandidate);
   const locale =
+    localeFromNextIntl ??
     localeFromPath ??
     detectLocaleFromRequest({
       cookieHeader: headersList.get("cookie"),
