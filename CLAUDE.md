@@ -16,6 +16,7 @@ npm run lint         # ESLint
 npm run typecheck    # TypeScript
 npm run test         # Playwright E2E
 npm run test:unit    # Vitest unit tests
+npm run release:fast # Fast gate: lint+typecheck+unit+smoke(+build)
 npm run pre-push     # Vercel simulation (~45s) - AUTO on git push
 npm run release:gate # Full 10/10 release gate
 npx prisma generate  # After schema changes
@@ -249,15 +250,15 @@ See: `.claude/rules/maestri.md` | `docs/maestri/language-maestri.md`
 ## Release Process
 
 ```bash
-/release                    # Full validation via app-release-manager
+/release             # Full validation via app-release-manager
 ```
 
 **What it does** (automatic):
 
-1. Build/lint/typecheck validation
-2. Unit + E2E test execution
-3. Security audit
-4. Code quality scan
+1. Runs local gates (`npm run release:fast`, `npm run release:gate`) as needed
+2. Build/lint/typecheck validation
+3. Unit + E2E test execution (including smoke, full, and mobile where configured)
+4. Security and quality audits
 5. Auto-fix where possible
 6. Push + verify CI/Vercel
 

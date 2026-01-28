@@ -49,8 +49,12 @@ echo -e "${GREEN}✓ Smoke E2E passed${NC}"
 
 echo ""
 echo -e "${BLUE}[5/5] Build (optional parity)...${NC}"
-npm run build
-echo -e "${GREEN}✓ Build passed${NC}"
+if [ "${RELEASE_FAST_SKIP_BUILD:-0}" = "1" ]; then
+  echo -e "${YELLOW}↪ Skipping build (RELEASE_FAST_SKIP_BUILD=1)${NC}"
+else
+  npm run build
+  echo -e "${GREEN}✓ Build passed${NC}"
+fi
 
 echo ""
 echo -e "${GREEN}✓ RELEASE FAST PASSED${NC}"

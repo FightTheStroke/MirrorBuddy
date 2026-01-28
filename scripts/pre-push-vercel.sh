@@ -51,6 +51,16 @@ fi
 echo -e "${GREEN}✓ Proxy architecture OK${NC}"
 
 # =============================================================================
+# PHASE 0.9: FAST RELEASE GATE (lint + typecheck + unit + smoke)
+# =============================================================================
+echo -e "${BLUE}[0.9/5] Fast release gate (release:fast)...${NC}"
+if ! RELEASE_FAST_SKIP_BUILD=1 npm run release:fast; then
+    echo -e "${RED}✗ release:fast failed${NC}"
+    exit 1
+fi
+echo -e "${GREEN}✓ release:fast passed${NC}"
+
+# =============================================================================
 # PHASE 1: SIMULATE FRESH PRISMA (like Vercel)
 # =============================================================================
 echo -e "${BLUE}[1/5] Simulating Vercel fresh Prisma...${NC}"
@@ -67,21 +77,9 @@ fi
 echo -e "${GREEN}✓ Prisma generated fresh${NC}"
 
 # =============================================================================
-# PHASE 2: PARALLEL CHECKS (lint + typecheck + audit)
+# PHASE 2: SECURITY AUDIT (npm audit) - runs in parallel with later steps
 # =============================================================================
-echo -e "${BLUE}[2/5] Parallel checks (lint, typecheck, audit)...${NC}"
-
-(
-    npm run lint > "$TEMP_DIR/lint.log" 2>&1
-    echo $? > "$TEMP_DIR/lint.exit"
-) &
-LINT_PID=$!
-
-(
-    npm run typecheck > "$TEMP_DIR/typecheck.log" 2>&1
-    echo $? > "$TEMP_DIR/typecheck.exit"
-) &
-TYPE_PID=$!
+echo -e "${BLUE}[2/5] Security audit (npm audit)...${NC}"
 
 (
     npm audit --audit-level=high > "$TEMP_DIR/audit.log" 2>&1
@@ -91,34 +89,16 @@ AUDIT_PID=$!
 
 # Wait with progress
 echo -n "   Running: "
-while kill -0 $LINT_PID 2>/dev/null || kill -0 $TYPE_PID 2>/dev/null || kill -0 $AUDIT_PID 2>/dev/null; do
+while kill -0 $AUDIT_PID 2>/dev/null; do
     echo -n "."
     sleep 0.3
 done
 echo " done"
 
 # Check results
-LINT_EXIT=$(cat "$TEMP_DIR/lint.exit" 2>/dev/null || echo 1)
-TYPE_EXIT=$(cat "$TEMP_DIR/typecheck.exit" 2>/dev/null || echo 1)
 AUDIT_EXIT=$(cat "$TEMP_DIR/audit.exit" 2>/dev/null || echo 1)
 
 FAILED=0
-
-if [ "$LINT_EXIT" -ne 0 ]; then
-    echo -e "${RED}✗ ESLint failed${NC}"
-    cat "$TEMP_DIR/lint.log"
-    FAILED=1
-else
-    echo -e "${GREEN}✓ ESLint passed${NC}"
-fi
-
-if [ "$TYPE_EXIT" -ne 0 ]; then
-    echo -e "${RED}✗ TypeScript failed${NC}"
-    cat "$TEMP_DIR/typecheck.log"
-    FAILED=1
-else
-    echo -e "${GREEN}✓ TypeScript passed${NC}"
-fi
 
 if [ "$AUDIT_EXIT" -ne 0 ]; then
     echo -e "${RED}✗ Security audit failed${NC}"

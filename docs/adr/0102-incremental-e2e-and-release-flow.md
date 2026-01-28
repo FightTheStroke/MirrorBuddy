@@ -84,15 +84,17 @@ The existing `npm run release:gate` and `scripts/release-brutal.sh` remain the *
 To reduce duplication and make the pipeline easier to maintain:
 
 - `scripts/pre-release-check.sh` no longer runs the `lint-redirect-metadata` script directly; this check is already enforced via `npm run lint`.
-- `scripts/pre-push-vercel.sh` similarly no longer runs `lint-redirect-metadata` separately and relies on `npm run lint`.
+- `scripts/pre-push-vercel.sh` has been updated to:
+  - Run `npm run release:fast` (with build skipped) as an early phase, reusing its lint/typecheck/unit/smoke checks instead of reimplementing them.
+  - Keep the Prisma, security, Vercel env, CSRF/TODO/console/secrets checks and a single production build step.
 - `scripts/release-gate.sh` now:
   - Runs `npm run test:e2e:smoke` before the full `npm run test` run, improving failure visibility (fast smoke failure stops the release earlier).
 
 The goal is to keep:
 
 - **One place** (`npm run lint`) that wires in custom lint scripts like `lint-redirect-metadata`.
+- **One fast gate** (`release:fast`) for local iteration, pre-PR validation, and as part of the pre-push Vercel simulation (with build delegated to the pre-push script).
 - **One full gate** (`release:gate` / `release-brutal.sh`) for exhaustive checks.
-- **One fast gate** (`release:fast`) for local iteration and pre-PR validation.
 
 ### 4) CI alignment (direction)
 
@@ -147,5 +149,5 @@ Follow-ups:
   - Use `npm run test:e2e:smoke` for smoke jobs.
   - Reserve full E2E/mobile/performance for `main` and/or nightly runs.
 - Extend `app-release-manager` documentation to recommend:
-  - `release:fast` during development and PR reviews.
+  - `release:fast` during development and PR reviews, and as part of local pre-push checks.
   - `release:gate` / `release-brutal` before cutting a production release.
