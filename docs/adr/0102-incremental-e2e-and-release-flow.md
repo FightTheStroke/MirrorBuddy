@@ -140,6 +140,9 @@ Risks and mitigations:
 
 Follow-ups:
 
+- CI updates in `.github/workflows/ci.yml`:
+  - PRs run fast lanes (smoke + mobile smoke + core checks).
+  - Full E2E, full mobile matrix, Docker build, and performance budgets run on push events.
 - Update CI workflows to:
   - Use `npm run test:e2e:smoke` for smoke jobs.
   - Reserve full E2E/mobile/performance for `main` and/or nightly runs.

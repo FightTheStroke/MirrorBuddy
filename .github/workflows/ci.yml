@@ -485,7 +485,7 @@ jobs:
       - name: Run Smoke Tests
         run: |
           echo "Running critical path smoke tests..."
-          npx playwright test e2e/smoke/ --reporter=list
+          npm run test:e2e:smoke -- --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -502,16 +502,108 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  # Lane 6a: Mobile Smoke - Fast PR feedback
+  # Runs the smallest supported viewport to catch obvious mobile regressions early.
+  mobile-smoke:
+    name: Mobile Smoke (PR)
+    runs-on: ubuntu-latest
+    needs: [build]
+    if: github.event_name == 'pull_request'
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      # Download pre-built .next from build job
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Mobile Smoke tests
+        run: |
+          echo "Running mobile smoke tests (iPhone SE)..."
+          npx playwright test --project=iphone-se --reporter=list
+        env:
+          CI: true
+          CI_MOBILE_TESTS: "1"
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mobile-smoke-report
+          path: playwright-report/
+          retention-days: 7
+
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
-  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents broken releases)
-  # NOTE: Runs AFTER e2e-tests to avoid database conflicts (shared test DB)
+  # Runs on push (full mobile matrix). PRs use mobile-smoke for fast feedback.
   mobile-e2e:
     name: Mobile E2E Tests (BLOCKING)
     runs-on: ubuntu-latest
-    needs: [build, e2e-tests]
-    # NO CONDITION - Always runs to prevent broken mobile releases
+    needs: [build]
+    if: github.event_name != 'pull_request'
 
     services:
       postgres:
@@ -620,12 +712,12 @@ jobs:
           exit 1
 
   # Lane 6b: E2E Tests - Full end-to-end test suite
-  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents broken releases)
+  # Runs on push. PRs rely on smoke-tests for fast feedback.
   e2e-tests:
     name: E2E Tests (BLOCKING)
     runs-on: ubuntu-latest
     needs: [build]
-    # NO CONDITION - Always runs to prevent broken releases
+    if: github.event_name != 'pull_request'
 
     services:
       postgres:
@@ -713,6 +805,7 @@ jobs:
   docker:
     name: Docker Build
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
 
@@ -729,12 +822,12 @@ jobs:
           tags: mirrorbuddy:test
 
   # Lane 8: Performance Budgets
-  # MANDATORY on ALL pushes and PRs - NO EXCEPTIONS (prevents performance regressions)
+  # Runs on push. PRs skip this lane to prioritize fast feedback.
   performance:
     name: Performance Budgets (BLOCKING)
     runs-on: ubuntu-latest
     needs: [build]
-    # NO CONDITION - Always runs to catch performance regressions
+    if: github.event_name != 'pull_request'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -824,6 +917,72 @@ jobs:
           retention-days: 30
 
   # ==========================================================================
+  # PR GATE - Single status check for PRs (fast feedback)
+  # ==========================================================================
+  pr-gate:
+    name: "✅ PR Gate"
+    runs-on: ubuntu-latest
+    needs:
+      - build
+      - secret-scanning
+      - debt-check
+      - security
+      - llm-safety-tests
+      - unit-tests
+      - docs
+      - migrations
+      - quality
+      - smoke-tests
+      - mobile-smoke
+    if: always() && github.event_name == 'pull_request'
+    steps:
+      - name: Check all PR jobs passed
+        if: |
+          needs.build.result != 'success' ||
+          needs.secret-scanning.result != 'success' ||
+          needs.debt-check.result != 'success' ||
+          needs.security.result != 'success' ||
+          needs.llm-safety-tests.result != 'success' ||
+          needs.unit-tests.result != 'success' ||
+          needs.docs.result != 'success' ||
+          needs.migrations.result != 'success' ||
+          needs.quality.result != 'success' ||
+          needs.smoke-tests.result != 'success' ||
+          needs.mobile-smoke.result != 'success'
+        run: |
+          echo "::error::PR BLOCKED - One or more checks failed"
+          echo ""
+          echo "Job results:"
+          echo "  build: ${{ needs.build.result }}"
+          echo "  secret-scanning: ${{ needs.secret-scanning.result }}"
+          echo "  debt-check: ${{ needs.debt-check.result }}"
+          echo "  security: ${{ needs.security.result }}"
+          echo "  llm-safety-tests: ${{ needs.llm-safety-tests.result }}"
+          echo "  unit-tests: ${{ needs.unit-tests.result }}"
+          echo "  docs: ${{ needs.docs.result }}"
+          echo "  migrations: ${{ needs.migrations.result }}"
+          echo "  quality: ${{ needs.quality.result }}"
+          echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
+          echo "  mobile-smoke: ${{ needs.mobile-smoke.result }}"
+          exit 1
+
+      - name: PR approved
+        if: |
+          needs.build.result == 'success' &&
+          needs.secret-scanning.result == 'success' &&
+          needs.debt-check.result == 'success' &&
+          needs.security.result == 'success' &&
+          needs.llm-safety-tests.result == 'success' &&
+          needs.unit-tests.result == 'success' &&
+          needs.docs.result == 'success' &&
+          needs.migrations.result == 'success' &&
+          needs.quality.result == 'success' &&
+          needs.smoke-tests.result == 'success' &&
+          needs.mobile-smoke.result == 'success'
+        run: |
+          echo "✅ PR gate passed - Safe to merge"
+
+  # ==========================================================================
   # DEPLOYMENT GATE - Single status check for Vercel
   # This job MUST pass before Vercel deploys to production
   # Configure in Vercel: Settings → Git → "Wait for Deployment Checks"
@@ -846,7 +1005,7 @@ jobs:
       - mobile-e2e
       - docker
       - performance
-    if: always()
+    if: always() && github.event_name != 'pull_request'
     steps:
       - name: Check all jobs passed
         if: |
