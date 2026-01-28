@@ -62,6 +62,22 @@ Output: Release report with APPROVE or BLOCK decision.
 });
 ```
 
+### Optional Pre-Flight: GitHub Secrets Sync
+
+Before running the full release gate you MAY want to sync your local `.env` into GitHub Actions secrets (for example after adding `VERCEL_TOKEN`, `SENTRY_DSN`, or other critical config). This is a **manual, explicit step** and should only be used when you are sure your local `.env` reflects the intended production values.
+
+```bash
+# Sync all KEY=VALUE pairs from .env to GitHub Actions secrets
+# Requires GitHub CLI (gh auth login)
+npm run secrets:sync
+```
+
+Notes:
+
+- This script never logs secret values (only names and lengths).
+- It can overwrite existing secrets with the same keys; use it carefully.
+- It is NOT run automatically by the release agent to avoid accidental propagation of local-only values.
+
 ### Phase 2: Review Results
 
 Agent returns comprehensive report with MirrorBuddy-specific checks.

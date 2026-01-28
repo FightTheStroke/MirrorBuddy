@@ -410,6 +410,27 @@ jobs:
             echo "No circular imports detected"
           fi
 
+  # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
+  sentry-config:
+    name: Sentry Config (Vercel)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: Verify Sentry configuration against Vercel production env
+        run: bash ./scripts/verify-sentry-config.sh
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+
   # Lane 5b: SMOKE TESTS - Critical Path Validation (BLOCKING)
   # Runs on EVERY PR - fast, high-value tests that catch regressions
   # Must pass before any merge to main
@@ -1005,6 +1026,7 @@ jobs:
       - mobile-e2e
       - docker
       - performance
+      - sentry-config
     if: always() && github.event_name != 'pull_request'
     steps:
       - name: Check all jobs passed

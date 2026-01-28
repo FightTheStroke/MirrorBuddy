@@ -4,14 +4,19 @@
 
 import * as Sentry from "@sentry/nextjs";
 
-// STRICT: Only enable Sentry on Vercel production deployments
+// STRICT: Only enable Sentry on Vercel production deployments by default
 // VERCEL_ENV === "production" is the ONLY reliable way to detect production
 // - VERCEL === "1" is true for ALL Vercel deployments (preview + production)
 // - NODE_ENV can be "production" locally or in preview builds
 const isVercelProduction = process.env.VERCEL_ENV === "production";
 
-// Only initialize if DSN is present
-const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+// Optional debug escape hatch:
+// Set SENTRY_FORCE_ENABLE=true in Preview/local to test Sentry
+const isForceEnabled = process.env.SENTRY_FORCE_ENABLE === "true";
+
+// Only initialize if DSN is present (support both public and server-side names)
+const dsn =
+  process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || undefined;
 
 if (!dsn && isVercelProduction) {
   console.warn(
@@ -23,9 +28,13 @@ if (!dsn && isVercelProduction) {
   console.log(
     "[Sentry] Initialized for Vercel production - error tracking enabled",
   );
-} else if (dsn && !isVercelProduction) {
+} else if (dsn && !isVercelProduction && !isForceEnabled) {
   console.log(
     `[Sentry] DSN present but environment is not Vercel production (VERCEL_ENV=${process.env.VERCEL_ENV || "undefined"}) - error tracking disabled`,
+  );
+} else if (dsn && isForceEnabled) {
+  console.log(
+    "[Sentry] DSN present and SENTRY_FORCE_ENABLE=true - server error tracking enabled for debugging",
   );
 }
 
@@ -75,8 +84,8 @@ if (dsn) {
     // Add context before sending
     beforeSend(event, hint) {
       // DOUBLE CHECK: Block errors from non-production environments
-      // This is a safety net in case enabled flag doesn't work
-      if (!isVercelProduction) {
+      // unless SENTRY_FORCE_ENABLE is explicitly set for debugging
+      if (!isVercelProduction && !isForceEnabled) {
         console.warn(
           `[Sentry] Blocked error from non-production environment: ${process.env.VERCEL_ENV || "local"}`,
         );
@@ -112,8 +121,9 @@ if (dsn) {
       return breadcrumb;
     },
 
-    // STRICT: Only send errors from Vercel production deployments
-    enabled: isVercelProduction && !!dsn,
+    // STRICT: Only send errors from Vercel production deployments by default
+    // Allow SENTRY_FORCE_ENABLE escape hatch for debugging on Preview/local
+    enabled: !!dsn && (isVercelProduction || isForceEnabled),
 
     // Environment tagging
     environment:

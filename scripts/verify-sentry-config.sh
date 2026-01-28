@@ -18,17 +18,25 @@ if ! command -v vercel &> /dev/null; then
 else
   TEMP_FILE=$(mktemp)
   if vercel env pull "$TEMP_FILE" --environment production --yes 2>/dev/null; then
+    # Prefer NEXT_PUBLIC_SENTRY_DSN, fall back to SENTRY_DSN
+    DSN_VAR=""
     if grep -q "^NEXT_PUBLIC_SENTRY_DSN=" "$TEMP_FILE"; then
-      DSN=$(grep "^NEXT_PUBLIC_SENTRY_DSN=" "$TEMP_FILE" | cut -d'=' -f2- | tr -d '"')
+      DSN_VAR="NEXT_PUBLIC_SENTRY_DSN"
+    elif grep -q "^SENTRY_DSN=" "$TEMP_FILE"; then
+      DSN_VAR="SENTRY_DSN"
+    fi
+
+    if [ -n "$DSN_VAR" ]; then
+      DSN=$(grep "^${DSN_VAR}=" "$TEMP_FILE" | cut -d'=' -f2- | tr -d '"')
       if [ -n "$DSN" ] && [[ "$DSN" =~ ^https://.*@.*\.ingest\.(us|de|eu)\.sentry\.io/[0-9]+$ ]]; then
-        echo "✅ NEXT_PUBLIC_SENTRY_DSN: Valid format"
+        echo "✅ ${DSN_VAR}: Valid format"
         echo "   Project: $(echo "$DSN" | cut -d'/' -f4)"
       else
-        echo "❌ NEXT_PUBLIC_SENTRY_DSN: Invalid format"
+        echo "❌ ${DSN_VAR}: Invalid format"
         FAILED=$((FAILED + 1))
       fi
     else
-      echo "❌ NEXT_PUBLIC_SENTRY_DSN: NOT SET"
+      echo "❌ Sentry DSN: NOT SET (expected NEXT_PUBLIC_SENTRY_DSN or SENTRY_DSN)"
       FAILED=$((FAILED + 1))
     fi
     

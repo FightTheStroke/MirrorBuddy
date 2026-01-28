@@ -14,6 +14,9 @@ Before running release script:
 # Verify Vercel environment variables are set
 ./scripts/verify-vercel-env.sh
 # Must pass all checks (vars, permissions, staging)
+
+# Optional: sync local .env → GitHub Actions secrets (only when intentional)
+npm run secrets:sync  # uses gh secret set for each KEY=VALUE in .env
 ```
 
 **Required Vercel env vars**:
