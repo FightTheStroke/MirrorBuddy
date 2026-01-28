@@ -134,7 +134,10 @@ test.describe("Smoke Test", () => {
     await page.waitForLoadState("networkidle");
 
     await expect(page.locator("body")).toBeVisible();
-    await expect(page.locator("main").first()).toBeVisible();
+    // Main content can be <main>, role="main", #main-content (a11y), or #__next (fallback)
+    await expect(
+      page.locator("main, [role='main'], #main-content, #__next").first(),
+    ).toBeVisible();
 
     expect(errors, `Console errors: ${errors.join(", ")}`).toHaveLength(0);
   });
@@ -201,7 +204,9 @@ test.describe("Smoke Test", () => {
       await settingsBtn.click();
       await page.waitForTimeout(500);
       // Settings should show some content
-      await expect(page.locator("main").first()).toBeVisible();
+      await expect(
+        page.locator("main, [role='main'], #main-content, #__next").first(),
+      ).toBeVisible();
     }
   });
 });

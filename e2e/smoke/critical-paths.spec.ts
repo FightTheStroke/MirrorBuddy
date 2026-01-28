@@ -37,8 +37,10 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
     // No JavaScript errors
     expect(errors).toHaveLength(0);
 
-    // Should have main content area
-    await expect(page.locator("main, [role='main'], #__next")).toBeVisible();
+    // Should have main content area (could be <main>, role="main", #main-content, or #__next)
+    await expect(
+      page.locator("main, [role='main'], #main-content, #__next"),
+    ).toBeVisible();
   });
 
   test("CP-02: Home page loads for authenticated users", async ({ page }) => {
