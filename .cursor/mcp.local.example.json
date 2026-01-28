@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "grafana": {
+      "command": "mcp-grafana",
+      "args": ["-t", "stdio"],
+      "env": {
+        "GRAFANA_URL": "https://mirrorbuddy.grafana.net",
+        "GRAFANA_SERVICE_ACCOUNT_TOKEN": "PUT_YOUR_TOKEN_HERE"
+      }
+    }
+  }
+}

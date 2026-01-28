@@ -101,6 +101,9 @@ audit-report.txt
 Plan20Jan.md
 25JanCodexPlan.md
 
+# Cursor project MCP config (local, may contain secrets)
+.cursor/mcp.local.json
+
 # Local database sync (machine-specific)
 scripts/sync-databases.sh
 
@@ -114,3 +117,6 @@ docs/.archive/
 .env.production
 .env.vercel
 .env.vercel.*
+# CodeGraph: keep DB ignored, allow config to be tracked/read
+.codegraph/**
+!.codegraph/config.json
