@@ -145,13 +145,17 @@ vi.mock("@/lib/logger", () => {
       }
     };
 
+  const baseLogger = {
+    info: makeMethod("info"),
+    warn: makeMethod("warn"),
+    error: makeMethod("error"),
+    debug: makeMethod("debug"),
+    // Child logger for scoped logging (same mock instance is fine for tests)
+    child: (_context?: unknown) => baseLogger,
+  };
+
   return {
-    logger: {
-      info: makeMethod("info"),
-      warn: makeMethod("warn"),
-      error: makeMethod("error"),
-      debug: makeMethod("debug"),
-    },
+    logger: baseLogger,
   };
 });
 
