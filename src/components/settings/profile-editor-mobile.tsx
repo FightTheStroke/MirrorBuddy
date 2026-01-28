@@ -200,7 +200,7 @@ export function ProfileEditorMobile({
                 <div className="flex gap-3">
                   <Button
                     onClick={capturePhoto}
-                    className="flex-1 min-h-12 text-base font-medium bg-blue-500 hover:bg-blue-600 text-white"
+                    className="flex-1 min-h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 text-white"
                   >
                     Capture
                   </Button>
@@ -220,7 +220,7 @@ export function ProfileEditorMobile({
               <Button
                 onClick={startCamera}
                 disabled={isCameraActive}
-                className="min-h-12 text-base font-medium flex items-center justify-center gap-2 bg-blue-500 hover:bg-blue-600 text-white"
+                className="min-h-12 text-base font-medium flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
                 data-testid="camera-button"
               >
                 <Camera className="w-5 h-5" />
@@ -329,7 +329,7 @@ export function ProfileEditorMobile({
         <Button
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full min-h-12 text-base font-medium bg-blue-500 hover:bg-blue-600 disabled:bg-blue-300 text-white rounded-lg"
+          className="w-full min-h-12 text-base font-medium bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white rounded-lg"
         >
           <Save className="w-4 h-4 mr-2" />
           {isSaving ? "Saving..." : "Save"}

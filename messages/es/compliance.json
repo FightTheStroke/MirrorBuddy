@@ -4,10 +4,10 @@
       "text": "Text"
     },
     "page": {
-      "backButton": "Back Button",
-      "lastUpdated": "Last Updated",
-      "title": "Titolo",
-      "version": "Version"
+      "backButton": "Volver al inicio",
+      "lastUpdated": "Última actualización: {date}",
+      "title": "Transparencia de la Inteligencia Artificial",
+      "version": "Versión {version}"
     },
     "relatedDocs": {
       "heading": "Heading",

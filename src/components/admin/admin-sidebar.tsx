@@ -205,7 +205,7 @@ export function AdminSidebar({
                     open ? "right-3" : "top-1 right-1",
                     item.badgeColor === "amber" && "bg-amber-500 text-white",
                     item.badgeColor === "red" && "bg-red-500 text-white",
-                    item.badgeColor === "blue" && "bg-blue-500 text-white",
+                    item.badgeColor === "blue" && "bg-blue-600 text-white",
                   )}
                 >
                   {item.badge > 99 ? "99+" : item.badge}

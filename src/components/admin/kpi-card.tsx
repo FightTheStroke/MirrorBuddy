@@ -34,7 +34,7 @@ const badgeColorClasses = {
   amber: "bg-amber-500 text-white",
   red: "bg-red-500 text-white",
   green: "bg-green-500 text-white",
-  blue: "bg-blue-500 text-white",
+  blue: "bg-blue-600 text-white",
 };
 
 export function KpiCard({

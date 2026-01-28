@@ -21,7 +21,7 @@ export default async function NotFound() {
         </p>
         <Link
           href="/"
-          className="inline-flex items-center justify-center px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors"
+          className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors"
         >
           {t("backHome")}
         </Link>

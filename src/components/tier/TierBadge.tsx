@@ -55,7 +55,7 @@ export function TierBadge({
     },
     base: {
       label: "Base",
-      classes: "bg-blue-500 text-white text-xs",
+      classes: "bg-blue-600 text-white text-xs",
       ariaLabel: "Base tier subscription",
     },
     trial: {

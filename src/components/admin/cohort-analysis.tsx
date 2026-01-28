@@ -33,7 +33,7 @@ function getCellColor(value: number, type: "conversion" | "retention"): string {
     return "bg-red-100 text-red-900";
   }
   // retention
-  if (value >= 40) return "bg-blue-500 text-white";
+  if (value >= 40) return "bg-blue-600 text-white";
   if (value >= 25) return "bg-blue-300 text-blue-900";
   if (value >= 10) return "bg-blue-100 text-blue-900";
   return "bg-slate-100 text-slate-600";

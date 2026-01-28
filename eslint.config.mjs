@@ -72,6 +72,9 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Coverage reports
     "coverage/**",
+    // Playwright reports (generated files)
+    "playwright-report/**",
+    "test-results/**",
   ]),
   // Custom rules
   {

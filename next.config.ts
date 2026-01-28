@@ -62,6 +62,10 @@ const nextConfig: NextConfig = {
 
   // Image optimization settings
   images: {
+    // E2E/test runs must not depend on native image tooling (sharp).
+    // In production (Vercel), sharp is available and optimization stays enabled.
+    unoptimized:
+      process.env.E2E_TESTS === "1" || process.env.NODE_ENV === "test",
     // Enable modern formats for smaller sizes
     formats: ["image/avif", "image/webp"],
     // Device sizes for responsive images

@@ -13,6 +13,13 @@
       "description": "Hilf uns zu verstehen, wie du MirrorBuddy nutzt, damit wir die App verbessern können (vollständig anonym)",
       "aria": "Schalter zum Aktivieren oder Deaktivieren von Analytik"
     },
+    "customize": {
+      "title": "Cookie-Einstellungen",
+      "description": "Wähle aus, welche Cookies du akzeptieren möchtest. Wesentliche Cookies sind immer erforderlich, damit die App funktioniert.",
+      "essentialDesc": "Erforderlich für Sicherheit und Funktionalität. Kann nicht deaktiviert werden.",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    },
     "button": "Akzeptieren und Fortfahren",
     "coppa": "Wenn du unter 13 Jahre alt bist, haben deine Eltern eine Benachrichtigung erhalten, um wesentliche Cookies zu genehmigen.",
     "privacyPolicy": "Datenschutzrichtlinie",

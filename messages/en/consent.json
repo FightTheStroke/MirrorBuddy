@@ -13,6 +13,13 @@
       "description": "Help us understand how you use MirrorBuddy so we can improve the app (completely anonymous)",
       "aria": "Toggle to enable or disable analytics"
     },
+    "customize": {
+      "title": "Cookie Preferences",
+      "description": "Choose which cookies you want to accept. Essential cookies are always required for the app to work.",
+      "essentialDesc": "Required for security and functionality. Cannot be disabled.",
+      "cancel": "Cancel",
+      "save": "Save Preferences"
+    },
     "button": "Accept and Continue",
     "coppa": "If you are under 13, your parents received a notice to approve essential cookies.",
     "privacyPolicy": "Privacy Policy",

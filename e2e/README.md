@@ -6,10 +6,51 @@ Comprehensive E2E testing using Playwright for accessibility, navigation, securi
 
 ```bash
 npm run test         # Run all E2E tests
+npm run test:e2e:smoke     # Run fast smoke subset (recommended first)
+npm run test:e2e:last-failed # Re-run only tests that failed last time
 npm run test:ui      # Run with Playwright UI
 npm run test:debug   # Run in debug mode
 npx playwright test e2e/trial.spec.ts  # Run specific file
 ```
+
+## Incremental Runs (Recommended Workflow)
+
+Use the iteration config to run focused sets of tests, fix failures, and iterate quickly.
+
+```bash
+# 1) Start with smoke (fast feedback)
+npm run test:e2e:smoke
+
+# 2) Run one set at a time
+npm run test:e2e:admin
+npm run test:e2e:i18n
+npm run test:e2e:security
+npm run test:e2e:api
+
+# 3) Only re-run failures while iterating
+npm run test:e2e:last-failed
+
+# 4) Full suite (CI-like)
+npm run test
+```
+
+### Suite Scripts
+
+All scripts below use `playwright.config.iteration.ts` unless noted:
+
+| Script                    | What it runs                                     |
+| ------------------------- | ------------------------------------------------ |
+| `test:e2e:smoke`          | Critical smoke paths                             |
+| `test:e2e:admin`          | Admin UI and admin flows                         |
+| `test:e2e:i18n`           | Locale switching, hreflang, i18n regression      |
+| `test:e2e:compliance`     | GDPR/AI Act/legal pages and compliance checks    |
+| `test:e2e:security`       | CSRF, cookies, debug endpoint security           |
+| `test:e2e:cookie-signing` | Dedicated cookie-signing project (fresh session) |
+| `test:e2e:api`            | API route checks and backend integration         |
+| `test:e2e:ai`             | AI-provider dependent tests (requires env)       |
+| `test:e2e:voice`          | Voice/WebSocket dependent tests (requires proxy) |
+| `test:e2e:visual`         | Visual regression tests (requires baselines)     |
+| `test:e2e:last-failed`    | Only last failed tests                           |
 
 ## Architecture
 

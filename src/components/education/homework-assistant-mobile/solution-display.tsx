@@ -56,7 +56,7 @@ export function SolutionDisplay({
               transition={{ delay: idx * 0.1 }}
               className="flex gap-4 p-3 xs:p-4 bg-slate-50 dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800"
             >
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-500 dark:bg-blue-400 flex items-center justify-center text-white font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-blue-600 dark:bg-blue-500 flex items-center justify-center text-white font-bold text-sm">
                 {idx + 1}
               </div>
               <p className="flex-1 text-sm xs:text-base text-slate-700 dark:text-slate-300 break-words">

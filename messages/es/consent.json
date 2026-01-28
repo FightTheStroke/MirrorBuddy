@@ -13,6 +13,13 @@
       "description": "Ayúdanos a entender cómo utilizas MirrorBuddy para poder mejorar la aplicación (completamente anónimo)",
       "aria": "Alternar para habilitar o deshabilitar análisis"
     },
+    "customize": {
+      "title": "Preferencias de Cookies",
+      "description": "Elige qué cookies quieres aceptar. Las cookies esenciales siempre son necesarias para que la aplicación funcione.",
+      "essentialDesc": "Necesario para seguridad y funcionalidad. No se puede desactivar.",
+      "cancel": "Cancelar",
+      "save": "Guardar Preferencias"
+    },
     "button": "Aceptar y Continuar",
     "coppa": "Si tienes menos de 13 años, tus padres recibieron un aviso para aprobar las cookies esenciales.",
     "privacyPolicy": "Política de Privacidad",

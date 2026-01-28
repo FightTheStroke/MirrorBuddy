@@ -3118,6 +3118,17 @@ graph TB
     end
 ```
 
+### 25.2 Recently Added ADRs
+
+```mermaid
+graph TB
+    subgraph New_ADRs["Recently Added"]
+        ADR0099[0099 Vercel Deployment Checks ]
+        ADR0100[0100 Multi-Country Compliance ]
+        ADR0101[0101 i18n Translation Key Nami]
+    end
+```
+
 ## Quick Reference
 
 | Category   | Key Files                                                     | ADRs                   |

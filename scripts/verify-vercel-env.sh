@@ -19,18 +19,34 @@ FAILED_CHECKS=0
 echo "1. Required environment variables:"
 echo "-----------------------------------"
 
-# Check DATABASE_URL (required)
+# Detect if we're in CI or production environment
+IS_CI="${CI:-false}"
+VERCEL_ENV_VALUE="${VERCEL_ENV:-}"
+IS_PRODUCTION=false
+if [ "$IS_CI" = "true" ] || [ "$VERCEL_ENV_VALUE" = "production" ]; then
+  IS_PRODUCTION=true
+fi
+
+# Check DATABASE_URL (required in CI/production, optional in local dev)
 if [ -z "$DATABASE_URL" ]; then
-  echo "❌ DATABASE_URL: MISSING (required)"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+  if [ "$IS_PRODUCTION" = "true" ]; then
+    echo "❌ DATABASE_URL: MISSING (required in CI/production)"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+  else
+    echo "⚠️  DATABASE_URL: NOT SET (optional in local dev, required in CI/production)"
+  fi
 else
   echo "✅ DATABASE_URL: SET"
 fi
 
-# Check NODE_ENV (required)
+# Check NODE_ENV (required in CI/production, optional in local dev)
 if [ -z "$NODE_ENV" ]; then
-  echo "❌ NODE_ENV: MISSING (required)"
-  FAILED_CHECKS=$((FAILED_CHECKS + 1))
+  if [ "$IS_PRODUCTION" = "true" ]; then
+    echo "❌ NODE_ENV: MISSING (required in CI/production)"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+  else
+    echo "⚠️  NODE_ENV: NOT SET (optional in local dev, required in CI/production)"
+  fi
 else
   echo "✅ NODE_ENV: SET ($NODE_ENV)"
 fi
@@ -83,9 +99,11 @@ if command -v vercel &> /dev/null; then
   if vercel env ls > "$TEMP_FILE" 2>/dev/null || vercel env pull "$TEMP_FILE" --environment production > /dev/null 2>&1; then
     if [ -s "$TEMP_FILE" ]; then
       echo "Environment variables available:"
-      head -20 "$TEMP_FILE" | sed 's/^/  /'
-      if [ $(wc -l < "$TEMP_FILE") -gt 20 ]; then
-        echo "  ... and $(($(wc -l < "$TEMP_FILE") - 20)) more"
+      /usr/bin/head -20 "$TEMP_FILE" | /usr/bin/sed 's/^/  /'
+      LINE_COUNT=$(/usr/bin/wc -l < "$TEMP_FILE" 2>/dev/null || echo "0")
+      if [ -n "$LINE_COUNT" ] && [ "$LINE_COUNT" -gt 20 ] 2>/dev/null; then
+        REMAINING=$((LINE_COUNT - 20))
+        echo "  ... and $REMAINING more"
       fi
     else
       echo "⚠️  No output from Vercel command"

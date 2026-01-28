@@ -64,7 +64,7 @@ export const CHIP_COLORS: Record<
     bg: "bg-blue-50 dark:bg-blue-900/30",
     text: "text-blue-700 dark:text-blue-300",
     border: "border-blue-200 dark:border-blue-800",
-    activeBg: "bg-blue-500 dark:bg-blue-400 text-white dark:text-blue-950",
+    activeBg: "bg-blue-600 dark:bg-blue-500 text-white dark:text-blue-950",
   },
   green: {
     bg: "bg-green-50 dark:bg-green-900/30",

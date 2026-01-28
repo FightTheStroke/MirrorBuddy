@@ -13,6 +13,13 @@
       "description": "Aiutaci a capire come usi MirrorBuddy per migliorare l'app (completamente anonimo)",
       "aria": "Toggle per abilitare o disabilitare analytics"
     },
+    "customize": {
+      "title": "Preferenze Cookie",
+      "description": "Scegli quali cookie vuoi accettare. I cookie essenziali sono sempre necessari per il funzionamento dell'app.",
+      "essentialDesc": "Necessario per sicurezza e funzionalità. Non può essere disabilitato.",
+      "cancel": "Annulla",
+      "save": "Salva Preferenze"
+    },
     "button": "Accetta e Continua",
     "coppa": "Se hai meno di 13 anni, i tuoi genitori hanno ricevuto un avviso per approvare i cookie essenziali.",
     "privacyPolicy": "Informativa sulla Privacy",

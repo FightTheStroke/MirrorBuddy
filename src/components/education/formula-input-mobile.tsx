@@ -124,7 +124,7 @@ export function FormulaInputMobile({
         {/* Toggle Math Keyboard Button */}
         <button
           onClick={() => setShowKeyboard(!showKeyboard)}
-          className="min-h-[44px] min-w-[44px] px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 sm:self-start"
+          className="min-h-[44px] min-w-[44px] px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors flex items-center justify-center gap-2 sm:self-start"
           aria-label="Toggle math keyboard"
           aria-pressed={showKeyboard}
         >

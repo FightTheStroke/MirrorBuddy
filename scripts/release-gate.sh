@@ -108,6 +108,7 @@ npm run test:coverage
 
 echo ""
 echo -e "${BLUE}[PHASE 3] E2E tests...${NC}"
+npm run test:e2e:smoke
 npm run test
 
 echo ""

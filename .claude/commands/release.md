@@ -98,14 +98,15 @@ If BLOCKED → fix issues, re-run `/release`
 ## Quick Reference
 
 ```bash
-# Full release validation
-/release
+# Fast local gate (PR-like)
+npm run release:fast
 
-# Validate specific version
-/release 1.5.0
-
-# Run release gate script directly
+# Full release validation (pre-production)
 npm run release:gate
+
+# Agent-driven full release validation
+/release           # Auto-detect version
+/release 1.5.0    # Validate specific version
 ```
 
 ## Related
@@ -113,4 +114,4 @@ npm run release:gate
 - Agent: `app-release-manager`
 - Hardening: `mirrorbuddy-hardening-checks`
 - Thor: `thor-quality-assurance-guardian`
-- Gate script: `npm run release:gate`
+- Gate scripts: `npm run release:fast`, `npm run release:gate`

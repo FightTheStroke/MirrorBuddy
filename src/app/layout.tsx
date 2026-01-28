@@ -68,7 +68,7 @@ export default async function RootLayout({
   const nonce = await getNonce();
 
   return (
-    <html lang="it" suppressHydrationWarning>
+    <html lang="it" dir="ltr" suppressHydrationWarning>
       <head>
         <meta
           name="viewport"

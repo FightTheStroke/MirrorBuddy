@@ -18,6 +18,7 @@ import {
   getCookieConsentConfigFromLocale,
   type CookieConsentConfig,
 } from "@/lib/compliance/cookie-consent-config";
+import { CookiePreferencesModal } from "./cookie-preferences-modal";
 
 interface CookieConsentWallProps {
   children: React.ReactNode;
@@ -50,6 +51,7 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
     getServerConsentSnapshot,
   );
   const [analyticsEnabled, setAnalyticsEnabled] = useState(true);
+  const [showCustomizeModal, setShowCustomizeModal] = useState(false);
 
   const handleAccept = async () => {
     const consent = saveConsent(analyticsEnabled);
@@ -160,18 +162,20 @@ export function CookieConsentWall({ children }: CookieConsentWallProps) {
         {/* Customize option */}
         <div className="text-center">
           <button
-            onClick={() => {
-              // TODO: Open detailed cookie preferences modal
-              // For now, just accept with analytics disabled
-              const consent = saveConsent(false);
-              syncConsentToServer(consent);
-              updateConsentSnapshot(true);
-            }}
+            onClick={() => setShowCustomizeModal(true)}
             className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             {config.customizeText}
           </button>
         </div>
+
+        {/* Customize Modal */}
+        <CookiePreferencesModal
+          open={showCustomizeModal}
+          onOpenChange={setShowCustomizeModal}
+          analyticsEnabled={analyticsEnabled}
+          onAnalyticsEnabledChange={setAnalyticsEnabled}
+        />
 
         {/* Links */}
         <div className="flex items-center justify-center gap-4 text-xs">

@@ -46,7 +46,7 @@ describe("TierBadge", () => {
     it("applies base tier styles", () => {
       const { container } = render(<TierBadge tier="base" />);
       const badge = container.querySelector('[role="img"]');
-      expect(badge).toHaveClass("bg-blue-500", "text-white", "text-xs");
+      expect(badge).toHaveClass("bg-blue-600", "text-white", "text-xs");
     });
 
     it("applies trial tier styles", () => {

@@ -112,6 +112,14 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
   const tTools = useTranslations("tools");
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
 
+  const getToolI18nKey = useCallback((toolType: ToolType) => {
+    // Tool i18n keys are camelCase in messages (ADR 0091).
+    // ToolType includes kebab-case values (e.g., "study-kit") which must be mapped.
+    return toolType.replace(/-([a-z])/g, (_, letter: string) =>
+      letter.toUpperCase(),
+    );
+  }, []);
+
   const handleToolClick = useCallback((toolType: ToolType) => {
     // Standalone tools have their own flow (no maestro selection)
     if (!toolRequiresMaestro(toolType)) {
@@ -221,8 +229,10 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
                     transition={{ delay: index * 0.05 }}
                   >
                     <ToolCard
-                      title={tTools(`${tool.type}.label`)}
-                      description={tTools(`${tool.type}.description`)}
+                      title={tTools(`${getToolI18nKey(tool.type)}.label`)}
+                      description={tTools(
+                        `${getToolI18nKey(tool.type)}.description`,
+                      )}
                       icon={tool.icon}
                       onClick={() => handleToolClick(tool.type)}
                       isActive={state.selectedToolType === tool.type}
