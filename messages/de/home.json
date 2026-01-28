@@ -1,0 +1,15 @@
+{
+  "home": {
+    "appTitle": "MirrorBuddy",
+    "loading": "Wird geladen...",
+    "seasonDefault": "Herbst",
+    "navigation": {
+      "professors": "Professoren",
+      "calendar": "Kalender",
+      "progress": "Fortschritt",
+      "settings": "Einstellungen",
+      "zaino": "Rucksack",
+      "astuccio": "Federmäppchen"
+    }
+  }
+}

@@ -129,6 +129,15 @@ async function globalSetup() {
             }),
           },
         },
+        // F-13: ToS acceptance to bypass consent wall
+        tosAcceptances: {
+          create: {
+            version: "1.0",
+            acceptedAt: new Date(),
+            ipAddress: "127.0.0.1",
+            userAgent: "Playwright E2E Test",
+          },
+        },
       },
     });
     console.log("✅ Test user created in database:", testUserId);

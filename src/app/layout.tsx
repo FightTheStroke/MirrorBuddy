@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages } from "next-intl/server";
+
+// Only render Analytics on Vercel (VERCEL env var is set by Vercel)
+const isVercel = process.env.VERCEL === "1";
 import { Providers } from "@/components/providers";
 import { getNonce } from "@/lib/security/csp-nonce";
 import { JsonLdScript } from "@/components/structured-data";
@@ -102,6 +107,9 @@ export default async function RootLayout({
     }) ??
     defaultLocale;
 
+  // Load messages for the root layout (needed for consent wall and other shared components)
+  const messages = await getMessages();
+
   return (
     <html lang={locale} dir="ltr" suppressHydrationWarning>
       <head>
@@ -113,12 +121,14 @@ export default async function RootLayout({
         <HreflangLinks />
       </head>
       <body className={`${inter.className} antialiased`}>
-        <Providers nonce={nonce}>
-          <div id="main-content" data-testid="main-content">
-            {children}
-          </div>
-        </Providers>
-        <Analytics />
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <Providers nonce={nonce}>
+            <div id="main-content" data-testid="main-content">
+              {children}
+            </div>
+          </Providers>
+        </NextIntlClientProvider>
+        {isVercel && <Analytics />}
       </body>
     </html>
   );

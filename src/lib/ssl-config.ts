@@ -57,13 +57,39 @@ export function loadSupabaseCertificate(): string | undefined {
 }
 
 /**
+ * Check if a database URL points to localhost (no SSL needed)
+ */
+function isLocalDatabase(url?: string): boolean {
+  if (!url) return true; // Default to local if not specified
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1" ||
+      host.endsWith(".local")
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Build SSL configuration based on environment.
- * - Production: Full SSL with certificate chain
- * - Development: No SSL (localhost)
+ * - Production with remote DB: Full SSL with certificate chain
+ * - Development or local DB: No SSL
  */
 export function buildSSLConfig(): SSLConfig | undefined {
+  const dbUrl = process.env.DATABASE_URL;
   const isProduction =
     process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+
+  // Never use SSL for local databases (localhost, 127.0.0.1, etc.)
+  // This allows running production builds locally for testing
+  if (isLocalDatabase(dbUrl)) {
+    return undefined;
+  }
 
   if (!isProduction) {
     return undefined;

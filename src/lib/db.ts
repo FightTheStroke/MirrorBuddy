@@ -121,6 +121,25 @@ function loadSupabaseCertificate(): string | undefined {
 
 const supabaseCaCert = loadSupabaseCertificate();
 
+/**
+ * Check if the database URL points to a local database (no SSL needed)
+ */
+function isLocalDatabase(url?: string): boolean {
+  if (!url) return true; // Default to local if not specified
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+    return (
+      host === "localhost" ||
+      host === "127.0.0.1" ||
+      host === "::1" ||
+      host.endsWith(".local")
+    );
+  } catch {
+    return false;
+  }
+}
+
 // Build SSL configuration
 function buildSslConfig(): PoolConfig["ssl"] {
   // E2E Tests: NO SSL (local PostgreSQL in CI doesn't support SSL)
@@ -128,7 +147,13 @@ function buildSslConfig(): PoolConfig["ssl"] {
     return undefined;
   }
 
-  // Production: SSL configuration with Supabase certificate chain (ADR 0067)
+  // Local databases: NO SSL (localhost, 127.0.0.1, etc.)
+  // This allows running production builds locally for testing
+  if (isLocalDatabase(connectionString)) {
+    return undefined;
+  }
+
+  // Production with remote DB: SSL configuration with Supabase certificate chain (ADR 0067)
   if (isProduction) {
     // If certificate chain is available, enable full SSL verification
     if (supabaseCaCert) {
