@@ -164,7 +164,7 @@
     "jsdom": "^27.4.0",
     "lint-staged": "^16.2.7",
     "magicast": "^0.3.5",
-    "node-gyp": "^10.0.1",
+    "node-gyp": "^12.2.0",
     "playwright": "^1.57.0",
     "prettier": "^3.5.0",
     "prisma": "^7.2.0",
