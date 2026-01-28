@@ -4,7 +4,7 @@
  */
 
 import { motion } from "framer-motion";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { Backpack } from "lucide-react";
 import { Button } from "@/components/ui/button";

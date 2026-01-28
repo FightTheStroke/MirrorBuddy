@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function FlashcardsPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

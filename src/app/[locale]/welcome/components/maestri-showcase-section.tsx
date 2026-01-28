@@ -3,7 +3,7 @@
 import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { maestri, SUBJECT_NAMES } from "@/data/maestri";
 

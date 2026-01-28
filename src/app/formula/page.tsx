@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function FormulaPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

@@ -289,7 +289,14 @@
     },
     "ready": {
       "chooseProfessor": "Scegli un professore",
-      "chooseProfessorDesc": "Descrizione scelta del professore"
+      "chooseProfessorDesc": "Descrizione scelta del professore",
+      "speakAnytimeTitle": "Puoi sempre parlarmi",
+      "speakAnytimeDescription": "sono qui per aiutarti con il metodo di studio",
+      "earnXpTitle": "Guadagna XP",
+      "earnXpDescription": "ogni lezione ti fa salire di livello!",
+      "backButton": "Indietro",
+      "startButton": "Iniziamo!",
+      "replayModeMessage": "Fine del tutorial. Clicca \"{action}\" per tornare all'app."
     },
     "trialLimits": {
       "base": "Base",

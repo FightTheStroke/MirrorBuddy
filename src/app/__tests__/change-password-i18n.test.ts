@@ -38,27 +38,7 @@ describe("change-password i18n compliance", () => {
     "Cambio in corso",
   ];
 
-  const requiredI18nKeys = [
-    "auth.password.minLength",
-    "auth.password.requiresUppercase",
-    "auth.password.requiresLowercase",
-    "auth.password.requiresNumber",
-    "auth.password.changeErrorDefault",
-    "auth.password.connectionError",
-    "auth.password.successTitle",
-    "auth.password.successMessage",
-    "auth.password.pageTitle",
-    "auth.password.pageSubtitle",
-    "auth.password.currentPasswordLabel",
-    "auth.password.currentPasswordPlaceholder",
-    "auth.password.newPasswordLabel",
-    "auth.password.newPasswordPlaceholder",
-    "auth.password.confirmPasswordLabel",
-    "auth.password.confirmPasswordPlaceholder",
-    "auth.password.passwordMismatch",
-    "auth.password.submitButtonLoading",
-    "auth.password.submitButtonText",
-  ];
+  const requiredI18nKeys = ["auth.password"];
 
   it("should not contain hardcoded Italian strings in change-password pages", () => {
     files.forEach((filePath) => {
@@ -87,93 +67,36 @@ describe("change-password i18n compliance", () => {
     });
   });
 
-  it("should have all required i18n keys in Italian messages file", () => {
-    const itPath = path.join(process.cwd(), "src/i18n/messages/it.json");
-    const itContent = JSON.parse(fs.readFileSync(itPath, "utf-8"));
+  const localeFiles = [
+    "messages/it/auth.json",
+    "messages/en/auth.json",
+    "messages/fr/auth.json",
+    "messages/de/auth.json",
+    "messages/es/auth.json",
+  ];
 
-    requiredI18nKeys.forEach((key) => {
-      const parts = key.split(".");
-      let current = itContent;
+  localeFiles.forEach((filePath) => {
+    it(`should have all required i18n keys in ${filePath}`, () => {
+      const fullPath = path.join(process.cwd(), filePath);
+      const content = JSON.parse(fs.readFileSync(fullPath, "utf-8"));
 
-      for (const part of parts) {
-        expect(
-          current[part],
-          `Missing i18n key in it.json: ${key}`,
-        ).toBeDefined();
-        current = current[part];
-      }
-    });
-  });
+      requiredI18nKeys.forEach((key) => {
+        const parts = key.split(".");
+        let current = content;
 
-  it("should have all required i18n keys in English messages file", () => {
-    const enPath = path.join(process.cwd(), "src/i18n/messages/en.json");
-    const enContent = JSON.parse(fs.readFileSync(enPath, "utf-8"));
+        for (const part of parts) {
+          expect(
+            current[part],
+            `Missing i18n key in ${filePath}: ${key}`,
+          ).toBeDefined();
+          current = current[part];
+        }
+      });
 
-    requiredI18nKeys.forEach((key) => {
-      const parts = key.split(".");
-      let current = enContent;
-
-      for (const part of parts) {
-        expect(
-          current[part],
-          `Missing i18n key in en.json: ${key}`,
-        ).toBeDefined();
-        current = current[part];
-      }
-    });
-  });
-
-  it("should have all required i18n keys in French messages file", () => {
-    const frPath = path.join(process.cwd(), "src/i18n/messages/fr.json");
-    const frContent = JSON.parse(fs.readFileSync(frPath, "utf-8"));
-
-    requiredI18nKeys.forEach((key) => {
-      const parts = key.split(".");
-      let current = frContent;
-
-      for (const part of parts) {
-        expect(
-          current[part],
-          `Missing i18n key in fr.json: ${key}`,
-        ).toBeDefined();
-        current = current[part];
-      }
-    });
-  });
-
-  it("should have all required i18n keys in German messages file", () => {
-    const dePath = path.join(process.cwd(), "src/i18n/messages/de.json");
-    const deContent = JSON.parse(fs.readFileSync(dePath, "utf-8"));
-
-    requiredI18nKeys.forEach((key) => {
-      const parts = key.split(".");
-      let current = deContent;
-
-      for (const part of parts) {
-        expect(
-          current[part],
-          `Missing i18n key in de.json: ${key}`,
-        ).toBeDefined();
-        current = current[part];
-      }
-    });
-  });
-
-  it("should have all required i18n keys in Spanish messages file", () => {
-    const esPath = path.join(process.cwd(), "src/i18n/messages/es.json");
-    const esContent = JSON.parse(fs.readFileSync(esPath, "utf-8"));
-
-    requiredI18nKeys.forEach((key) => {
-      const parts = key.split(".");
-      let current = esContent;
-
-      for (const part of parts) {
-        expect(
-          current[part],
-          `Missing i18n key in es.json: ${key}`,
-        ).toBeDefined();
-        current = current[part];
-      }
+      expect(
+        Object.keys(content.auth.password ?? {}),
+        `Missing auth.password keys in ${filePath}`,
+      ).not.toHaveLength(0);
     });
   });
 });

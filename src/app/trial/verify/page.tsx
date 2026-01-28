@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { TrialVerifyClient } from "./trial-verify-client";
+import { redirect } from "next/navigation";
 
 // Force dynamic rendering to avoid prerender errors with useSearchParams
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Verifica Email | MirrorBuddy",
-  description: "Verifica la tua email per sbloccare gli strumenti della prova",
+  title: "Trial Verify | MirrorBuddy",
 };
 
 export default function TrialVerifyPage() {
-  return <TrialVerifyClient />;
+  redirect("/landing");
 }

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { HeroSection } from "./hero-section";
 import { MaestriShowcaseSection } from "./maestri-showcase-section";
 import { SupportSection } from "./support-section";

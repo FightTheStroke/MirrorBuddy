@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ChevronUp, ChevronDown, LogIn, UserPlus, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";

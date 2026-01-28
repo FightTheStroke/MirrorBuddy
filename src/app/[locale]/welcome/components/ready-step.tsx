@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import {
   Rocket,
@@ -199,8 +199,8 @@ export function ReadyStep(_props: ReadyStepProps) {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-pink-50 dark:bg-pink-950/30">
                 <span className="text-2xl">💬</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Puoi sempre parlarmi</strong> - sono qui per aiutarti
-                  con il metodo di studio
+                  <strong>{t("speakAnytimeTitle")}</strong> -{" "}
+                  {t("speakAnytimeDescription")}
                 </p>
               </div>
               <div className="flex items-start gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/30">
@@ -213,8 +213,7 @@ export function ReadyStep(_props: ReadyStepProps) {
               <div className="flex items-start gap-3 p-3 rounded-lg bg-purple-50 dark:bg-purple-950/30">
                 <span className="text-2xl">🎮</span>
                 <p className="text-sm text-gray-700 dark:text-gray-300">
-                  <strong>Guadagna XP</strong> - ogni lezione ti fa salire di
-                  livello!
+                  <strong>{t("earnXpTitle")}</strong> - {t("earnXpDescription")}
                 </p>
               </div>
             </div>
@@ -234,7 +233,7 @@ export function ReadyStep(_props: ReadyStepProps) {
               className="flex-none"
             >
               <ArrowLeft className="mr-2 w-4 h-4" />
-              Indietro
+              {t("backButton")}
             </Button>
             <Button
               onClick={handleStart}
@@ -242,14 +241,13 @@ export function ReadyStep(_props: ReadyStepProps) {
               className="flex-1 bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500 hover:from-pink-600 hover:via-purple-600 hover:to-blue-600 text-white py-6 text-lg font-semibold shadow-lg"
             >
               <Rocket className="mr-2 w-5 h-5" />
-              Iniziamo!
+              {t("startButton")}
             </Button>
           </motion.div>
 
           {isReplayMode && (
             <p className="text-center text-sm text-gray-500 dark:text-gray-400">
-              Fine del tutorial. Clicca &ldquo;Iniziamo!&rdquo; per tornare
-              all&apos;app.
+              {t("replayModeMessage", { action: t("startButton") })}
             </p>
           )}
         </div>

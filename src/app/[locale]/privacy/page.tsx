@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { ArrowLeft } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PrivacyContent } from "./content";

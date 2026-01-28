@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { ArrowRight, Settings, LogIn, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,7 @@ export function QuickStart({
       aria-labelledby="quickstart-heading"
     >
       <h2 id="quickstart-heading" className="sr-only">
-        Inizia
+        {t("heading")}
       </h2>
 
       {isReturningUser ? (
@@ -48,7 +48,7 @@ export function QuickStart({
             onClick={onSkip}
             className="w-full sm:w-auto bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white px-8 py-6 text-lg rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all"
           >
-            Vai all&apos;app
+            {t("returningUser.goToApp")}
             <ArrowRight className="w-5 h-5 ml-2" aria-hidden="true" />
           </Button>
           {onUpdateProfile && (
@@ -59,7 +59,7 @@ export function QuickStart({
               className="w-full sm:w-auto px-8 py-6 text-lg rounded-xl border-2"
             >
               <Settings className="w-5 h-5 mr-2" aria-hidden="true" />
-              {t("updateProfile")}
+              {t("returningUser.updateProfile")}
             </Button>
           )}
         </div>
@@ -75,11 +75,11 @@ export function QuickStart({
             <div className="flex flex-col items-center text-center mb-6">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 dark:bg-purple-800/50 rounded-full mb-4">
                 <span className="text-sm font-bold text-purple-700 dark:text-purple-300">
-                  ACCESSO COMPLETO
+                  {t("betaAccess.badge")}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Hai un account?
+                {t("betaAccess.title")}
               </h3>
             </div>
 
@@ -90,7 +90,9 @@ export function QuickStart({
                     ✓
                   </span>
                 </span>
-                <span className="text-base font-medium">22 Maestri AI</span>
+                <span className="text-base font-medium">
+                  {t("betaAccess.feature1")}
+                </span>
               </li>
               <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
                 <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">
@@ -99,7 +101,7 @@ export function QuickStart({
                   </span>
                 </span>
                 <span className="text-base font-medium">
-                  Tutti gli strumenti
+                  {t("betaAccess.feature2")}
                 </span>
               </li>
               <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
@@ -108,7 +110,9 @@ export function QuickStart({
                     ✓
                   </span>
                 </span>
-                <span className="text-base font-medium">Progressi salvati</span>
+                <span className="text-base font-medium">
+                  {t("betaAccess.feature3")}
+                </span>
               </li>
             </ul>
 
@@ -122,7 +126,7 @@ export function QuickStart({
                 className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-md py-6 text-lg"
               >
                 <LogIn className="w-5 h-5 mr-2" aria-hidden="true" />
-                {t("login")}
+                {t("betaAccess.cta")}
               </Button>
             </Link>
           </motion.div>
@@ -141,11 +145,11 @@ export function QuickStart({
                   aria-hidden="true"
                 />
                 <span className="text-sm font-bold text-pink-700 dark:text-pink-300">
-                  PROVA GRATUITA
+                  {t("trial.badge")}
                 </span>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-                Esplora subito
+                {t("trial.title")}
               </h3>
             </div>
 
@@ -156,15 +160,9 @@ export function QuickStart({
                     •
                   </span>
                 </span>
-                <span className="text-base font-medium">3 Maestri</span>
-              </li>
-              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
-                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
-                  <span className="text-blue-600 dark:text-blue-400 text-sm">
-                    •
-                  </span>
+                <span className="text-base font-medium">
+                  {t("trial.feature1")}
                 </span>
-                <span className="text-base font-medium">10 messaggi</span>
               </li>
               <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
                 <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
@@ -173,7 +171,17 @@ export function QuickStart({
                   </span>
                 </span>
                 <span className="text-base font-medium">
-                  Nessuna registrazione
+                  {t("trial.feature2")}
+                </span>
+              </li>
+              <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
+                <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-blue-100 dark:bg-blue-900/30 rounded-full">
+                  <span className="text-blue-600 dark:text-blue-400 text-sm">
+                    •
+                  </span>
+                </span>
+                <span className="text-base font-medium">
+                  {t("trial.feature3")}
                 </span>
               </li>
             </ul>
@@ -184,7 +192,7 @@ export function QuickStart({
               className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-md py-6 text-lg"
             >
               <Sparkles className="w-5 h-5 mr-2" aria-hidden="true" />
-              Prova gratis
+              {t("trial.cta")}
             </Button>
           </motion.div>
         </div>

@@ -115,11 +115,11 @@ function MyClientComponent() {
 
 All translations are stored in:
 
-- `/src/i18n/messages/it.json` (Italian - default)
-- `/src/i18n/messages/en.json` (English)
-- `/src/i18n/messages/fr.json` (French)
-- `/src/i18n/messages/de.json` (German)
-- `/src/i18n/messages/es.json` (Spanish)
+- `/messages/it/*.json` (Italian - default)
+- `/messages/en/*.json` (English)
+- `/messages/fr/*.json` (French)
+- `/messages/de/*.json` (German)
+- `/messages/es/*.json` (Spanish)
 
 Each file contains a `tools` namespace with the structure:
 
@@ -208,4 +208,4 @@ When adding a new tool:
 - `/src/lib/tools/tool-configs.ts` - Original tool configuration (now source of truth for structure)
 - `/src/lib/tools/tool-i18n.ts` - Localization helper functions
 - `/src/i18n/types.ts` - TypeScript type definitions
-- `/src/i18n/messages/*.json` - Translation files
+- `/messages/*/*.json` - Translation files

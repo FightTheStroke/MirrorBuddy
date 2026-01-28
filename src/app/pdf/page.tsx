@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function PDFPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

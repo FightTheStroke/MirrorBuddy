@@ -3,12 +3,13 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import { tierCards } from "./tier-data";
+import { useTierCards } from "./tier-data";
 
 export function TierComparisonSection() {
   const t = useTranslations("welcome.tierComparison");
+  const tierCards = useTierCards();
 
   return (
     <motion.section
@@ -100,7 +101,7 @@ export function TierComparisonSection() {
                       : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
                   }`}
                 >
-                  {tier.name === "Trial" && (
+                  {tier.name === t("tiers.trial.name") && (
                     <Sparkles className="w-4 h-4 mr-2" aria-hidden="true" />
                   )}
                   {tier.cta.text}

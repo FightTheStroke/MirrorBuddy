@@ -1,8 +1,13 @@
+import type { Metadata } from "next";
+import { redirect } from "next/navigation";
+
 // Force dynamic rendering to avoid i18n static generation issues
 export const dynamic = "force-dynamic";
 
-import { InviteRequestClient } from "./invite-request-client";
+export const metadata: Metadata = {
+  title: "Invite Request | MirrorBuddy",
+};
 
 export default function InviteRequestPage() {
-  return <InviteRequestClient />;
+  redirect("/landing");
 }

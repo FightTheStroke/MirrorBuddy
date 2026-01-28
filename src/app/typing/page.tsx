@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function TypingPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }

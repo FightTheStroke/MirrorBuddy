@@ -289,7 +289,14 @@
     },
     "ready": {
       "chooseProfessor": "Professor wählen",
-      "chooseProfessorDesc": "Beschreibung der Professorenwahl"
+      "chooseProfessorDesc": "Beschreibung der Professorenwahl",
+      "speakAnytimeTitle": "[TRANSLATE] Puoi sempre parlarmi",
+      "speakAnytimeDescription": "[TRANSLATE] sono qui per aiutarti con il metodo di studio",
+      "earnXpTitle": "[TRANSLATE] Guadagna XP",
+      "earnXpDescription": "[TRANSLATE] ogni lezione ti fa salire di livello!",
+      "backButton": "[TRANSLATE] Indietro",
+      "startButton": "[TRANSLATE] Iniziamo!",
+      "replayModeMessage": "[TRANSLATE] Fine del tutorial. Clicca \"{action}\" per tornare all'app."
     },
     "trialLimits": {
       "base": "Basis",

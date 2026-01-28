@@ -5,7 +5,8 @@
  * Navigation for filtering materials by type, subject, maestro
  */
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import {
   Brain,
   HelpCircle,
@@ -70,7 +71,8 @@ export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
         current.delete(key);
       }
     }
-    router.push(`/supporti?${current.toString()}`);
+    const query = current.toString();
+    router.push(query ? `/supporti?${query}` : "/supporti");
   };
 
   const toggleSection = (section: keyof typeof expandedSections) => {

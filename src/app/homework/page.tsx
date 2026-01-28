@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomeworkPage() {
-  redirect("/astuccio");
+  redirect("/landing");
 }
