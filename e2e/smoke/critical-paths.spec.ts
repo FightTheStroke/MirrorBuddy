@@ -118,22 +118,41 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   });
 
   test("CP-05: Admin dashboard requires authentication", async ({ page }) => {
-    // Clear all cookies
+    // Clear all cookies so request is unauthenticated
     await page.context().clearCookies();
 
-    await page.goto("/admin");
-    await page.waitForLoadState("domcontentloaded");
+    // Navigate to admin - proxy should redirect to login if not authenticated
+    await page.goto("/admin", { waitUntil: "domcontentloaded" });
 
-    // Should redirect away from admin OR show unauthorized message
+    // Wait for redirect to login (proxy redirect) or for unauthorized message (layout guard)
+    const loginOrRedirected = await page
+      .waitForURL(
+        (url) =>
+          url.pathname.includes("/login") || !url.pathname.includes("/admin"),
+        { timeout: 8000 },
+      )
+      .then(() => true)
+      .catch(() => false);
+
     const currentUrl = page.url();
-    const isOnLogin = currentUrl.includes("/login");
+    const isOnLogin =
+      currentUrl.includes("/login") || /\/[a-z]{2}\/login/.test(currentUrl);
     const redirectedAwayFromAdmin = !currentUrl.includes("/admin");
+
     const hasUnauthorized = await page
-      .locator("text=/unauthorized|accesso negato|login required/i")
+      .locator(
+        "text=/unauthorized|non autorizzato|accesso negato|login required|admin access required/i",
+      )
       .isVisible({ timeout: 2000 })
       .catch(() => false);
 
-    expect(isOnLogin || redirectedAwayFromAdmin || hasUnauthorized).toBe(true);
+    expect(
+      loginOrRedirected ||
+        isOnLogin ||
+        redirectedAwayFromAdmin ||
+        hasUnauthorized,
+      `Expected redirect to login or unauthorized message, but URL is ${currentUrl}`,
+    ).toBe(true);
   });
 
   test("CP-06: Logout clears session and redirects", async ({ page }) => {

@@ -357,8 +357,19 @@ export default function proxy(request: NextRequest) {
   // Validate visitor ID is a proper UUID v4 (prevents trivial forgery)
   const hasTrialSession = isValidVisitorId(visitorCookie?.value);
 
-  // Note: Real-time activity tracking moved to client-side (database-backed)
-  // for serverless compatibility. See src/lib/telemetry/use-activity-tracker.ts
+  // Admin routes - require authenticated user (check BEFORE public routes so
+  // /admin is never matched by AUTH_PUBLIC_ROUTES["/"] via path.startsWith("/"))
+  if (pathname.startsWith(ADMIN_PREFIX)) {
+    if (!isAuthenticated) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      const redirectResponse = NextResponse.redirect(loginUrl);
+      return finalizeResponse(redirectResponse, 307);
+    }
+    return finalizeResponse(
+      NextResponse.next({ request: { headers: requestHeaders } }),
+    );
+  }
 
   // Auth public routes - allow without auth but add CSP
   // Strip locale prefix for matching (e.g., /it/welcome → /welcome)
@@ -368,22 +379,6 @@ export default function proxy(request: NextRequest) {
     : pathname;
 
   if (AUTH_PUBLIC_ROUTES.some((r) => pathWithoutLocale.startsWith(r))) {
-    return finalizeResponse(
-      NextResponse.next({ request: { headers: requestHeaders } }),
-    );
-  }
-
-  // Admin routes - require authenticated user
-  if (pathname.startsWith(ADMIN_PREFIX)) {
-    if (!isAuthenticated) {
-      const loginUrl = new URL(
-        localePrefix ? `/${localePrefix}/login` : "/login",
-        request.url,
-      );
-      loginUrl.searchParams.set("redirect", pathname);
-      return NextResponse.redirect(loginUrl);
-    }
-    // Admin check is done server-side in API handlers
     return finalizeResponse(
       NextResponse.next({ request: { headers: requestHeaders } }),
     );
