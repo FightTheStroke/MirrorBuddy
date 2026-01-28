@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { ActiveMaestroAvatar } from "@/components/conversation";
 import { useAdminStatus } from "@/lib/hooks/use-admin-status";
 import type { View } from "@/app/types";
+import { LogoBrain } from "@/components/branding/logo-brain";
 
 interface NavItem {
   id: View;
@@ -87,16 +88,7 @@ export function HomeSidebar({
             className="flex items-center gap-3 h-11 min-w-11 hover:opacity-80 transition-opacity"
             aria-label={t("returnHome")}
           >
-            <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0">
-              <Image
-                src="/logo-brain.png"
-                alt="MirrorBuddy"
-                width={36}
-                height={36}
-                className="object-cover"
-                style={{ width: "100%", height: "100%" }}
-              />
-            </div>
+            <LogoBrain alt="MirrorBuddy" size={36} priority />
             {open && (
               <span className="font-bold text-lg text-slate-900 dark:text-white">
                 MirrorBuddy

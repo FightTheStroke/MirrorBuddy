@@ -18,9 +18,9 @@ import {
   ScrollText,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LogoBrain } from "@/components/branding/logo-brain";
 
 interface NavItem {
   id: string;
@@ -145,15 +145,13 @@ export function AdminSidebar({
           href="/admin"
           className="flex items-center gap-3 hover:opacity-80 transition-opacity"
         >
-          <div className="w-9 h-9 rounded-xl overflow-hidden flex-shrink-0 bg-slate-900 dark:bg-slate-100 flex items-center justify-center">
-            <Image
-              src="/logo-brain.png"
-              alt="MirrorBuddy Admin"
-              width={28}
-              height={28}
-              className="object-cover"
-            />
-          </div>
+          <LogoBrain
+            alt="MirrorBuddy Admin"
+            size={36}
+            wrapperClassName="bg-slate-900 dark:bg-slate-100 flex items-center justify-center"
+            className="object-contain"
+            priority
+          />
           {open && (
             <span className="font-bold text-lg text-slate-900 dark:text-white">
               Admin
