@@ -12,6 +12,7 @@ import { TrialStatusIndicator } from "@/components/trial";
 import { useAdminStatus } from "@/lib/hooks/use-admin-status";
 import type { View } from "@/app/[locale]/types";
 import { LogoBrain } from "@/components/branding/logo-brain";
+import { WebLLMStatus } from "@/components/ai/web-llm-status";
 
 interface NavItem {
   id: View;
@@ -236,6 +237,13 @@ export function HomeSidebar({
               </button>
             );
           })}
+          
+          {/* Edge AI Status - Only when expanded */}
+          {open && (
+            <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+              <WebLLMStatus />
+            </div>
+          )}
         </nav>
 
         {/* Active Maestro Avatar */}

@@ -1,103 +1,92 @@
 "use client";
 
 /**
- * 🤝 Social Study Room
- * Collaborative environment with WebRTC and AI Co-Pilot.
+ * 🤝 Social Study Room (LIVEKIT REAL CONNECTION)
  */
 
 import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { 
+  LiveKitRoom, 
+  VideoConference, 
+  RoomAudioRenderer,
+  ControlBar,
+  useTracks
+} from "@livekit/components-react";
+import { Track } from "livekit-client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Video, Mic, Share2, MessageSquare, Bot } from "lucide-react";
+import { Bot, Users, Video } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { aiCopilot } from "@/lib/social/ai-copilot";
 
 export default function StudyRoomPage() {
-  const [participants, setParticipants] = useState(["You", "Alex (ADHD Student)"]);
-  const [isLive, setIsLive] = useState(false);
+  const [token, setToken] = useState<string | null>(null);
+  const [serverUrl, setServerUrl] = useState<string | null>(null);
+  const [roomName, setRoomName] = useState<string>("general-study");
   const [lastIntervention, setLastIntervention] = useState<string | null>(null);
 
-  // Simulate AI Moderator checking the session
-  useEffect(() => {
-    if (isLive) {
-      const interval = setInterval(async () => {
-        // In a real app, we would pass the actual transcript from WebRTC
-        const intervention = await aiCopilot.checkIntervention({
-          transcript: [
-            { user: "Alex", text: "Wait, what was the next step for this triangle?" },
-            { user: "You", text: "I'm not sure, maybe we use the Pythagorean theorem?" }
-          ],
-          topic: "Geometry",
-          isStuck: true
-        });
-        
-        if (intervention) setLastIntervention(intervention);
-      }, 10000);
-      return () => clearInterval(interval);
+  const handleJoin = async () => {
+    const identity = `student-${Math.floor(Math.random() * 1000)}`;
+    try {
+      const response = await fetch("/api/social/webrtc/token", {
+        method: "POST",
+        body: JSON.stringify({ roomName, identity }),
+        headers: { "Content-Type": "application/json" }
+      });
+      const data = await response.json();
+      setToken(data.participantToken);
+      setServerUrl(data.serverUrl);
+    } catch (err) {
+      console.error("Failed to join room", err);
     }
-  }, [isLive]);
+  };
+
+  if (!token || !serverUrl) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen space-y-4">
+        <Users className="w-16 h-16 text-blue-600" />
+        <h1 className="text-2xl font-bold">Social Study Room</h1>
+        <p className="text-slate-500">Collaborate with other students in real-time.</p>
+        <Button onClick={handleJoin} className="bg-blue-600">Join Study Session</Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="p-6 max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white">
-            <Users className="w-6 h-6" />
-          </div>
-          <div>
-            <h1 className="text-xl font-bold">Group Study: Geometry</h1>
-            <p className="text-sm text-slate-500">{participants.length} Participants</p>
-          </div>
-        </div>
-        <div className="flex gap-2">
-          {!isLive ? (
-            <Button onClick={() => setIsLive(true)} className="bg-green-600 hover:bg-green-700">
-              <Video className="w-4 h-4 mr-2" /> Start Session
-            </Button>
-          ) : (
-            <Badge className="bg-red-500 text-white px-4 py-1 animate-pulse">LIVE</Badge>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Video Grid Area */}
-        <div className="md:col-span-2 space-y-4">
-          <div className="grid grid-cols-2 gap-4 h-96">
-            <div className="bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-slate-700">
-              <span className="text-white font-medium">Local Camera</span>
-            </div>
-            <div className="bg-slate-800 rounded-2xl flex items-center justify-center border-2 border-slate-700">
-              <span className="text-white font-medium">Alex (Remote)</span>
-            </div>
-          </div>
+    <div className="h-screen bg-slate-950 text-white flex flex-col">
+      <LiveKitRoom
+        video={true}
+        audio={true}
+        token={token}
+        serverUrl={serverUrl}
+        connect={true}
+        data-lk-theme="default"
+        style={{ height: '100dvh' }}
+      >
+        {/* TOP BAR */}
+        <div className="absolute top-4 left-4 right-4 z-10 flex justify-between items-center pointer-events-none">
+          <Badge className="bg-red-600 pointer-events-auto">LIVE: {roomName}</Badge>
           
-          {/* AI INTERVENTION BOX */}
+          {/* AI MODERATOR OVERLAY */}
           {lastIntervention && (
-            <Card className="bg-indigo-50 border-indigo-200 animate-in slide-in-from-bottom">
-              <CardContent className="p-4 flex items-start gap-3">
-                <Bot className="w-6 h-6 text-indigo-600 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-bold text-indigo-900">AI Co-Pilot Suggestion</p>
-                  <p className="text-sm text-indigo-800 mt-1 italic">"{lastIntervention}"</p>
-                </div>
+            <Card className="bg-indigo-900/80 border-indigo-500 text-white w-96 pointer-events-auto">
+              <CardContent className="p-3 flex items-start gap-2">
+                <Bot className="w-5 h-5 text-indigo-400" />
+                <p className="text-xs italic">"{lastIntervention}"</p>
               </CardContent>
             </Card>
           )}
         </div>
 
-        {/* Sidebar: Collaborative Tools */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader><CardTitle className="text-sm">Study Tools</CardTitle></CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="outline" className="w-full justify-start"><Share2 className="w-4 h-4 mr-2" /> Share Mind Map</Button>
-              <Button variant="outline" className="w-full justify-start"><MessageSquare className="w-4 h-4 mr-2" /> Chat History</Button>
-            </CardContent>
-          </Card>
+        {/* MAIN VIDEO GRID */}
+        <VideoConference />
+        
+        {/* TOOLS */}
+        <RoomAudioRenderer />
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center">
+          <ControlBar />
         </div>
-      </div>
+      </LiveKitRoom>
     </div>
   );
 }
