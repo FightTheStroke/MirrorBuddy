@@ -437,6 +437,21 @@ jobs:
       - name: Install Vercel CLI
         run: npm install -g vercel@latest
 
+      - name: Validate VERCEL_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not configured in GitHub secrets"
+            echo ""
+            echo "This token is required to access Vercel API for deployment and Sentry configuration."
+            echo ""
+            echo "To fix:"
+            echo "1. Regenerate personal access token: https://vercel.com/account/tokens"
+            echo "2. Update GitHub secret: https://github.com/FightTheStroke/MirrorBuddy/settings/secrets/actions"
+            echo "3. Set VERCEL_TOKEN to the new token value"
+            exit 1
+          fi
+          echo "✅ VERCEL_TOKEN is configured"
+
       - name: Verify Sentry configuration against Vercel production env
         run: bash ./scripts/verify-sentry-config.sh
         env:
@@ -1130,6 +1145,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
+
+      - name: Validate VERCEL_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ]; then
+            echo "::error::VERCEL_TOKEN is not configured in GitHub secrets"
+            echo ""
+            echo "This token is required to deploy to production."
+            echo ""
+            echo "To fix:"
+            echo "1. Regenerate personal access token: https://vercel.com/account/tokens"
+            echo "   - Go to https://vercel.com/account/tokens"
+            echo "   - Create a new token with scope: full"
+            echo "   - Copy the token value"
+            echo "2. Update GitHub secret: https://github.com/FightTheStroke/MirrorBuddy/settings/secrets/actions"
+            echo "   - Click 'New repository secret'"
+            echo "   - Name: VERCEL_TOKEN"
+            echo "   - Value: (paste the token from step 1)"
+            echo "   - Click 'Add secret'"
+            echo "3. The next push to main will use the new token"
+            exit 1
+          fi
+          echo "✅ VERCEL_TOKEN is configured (length: ${{ secrets.VERCEL_TOKEN && 'present' || 'missing' }})"
 
       - name: Install Vercel CLI
         run: npm install -g vercel@latest

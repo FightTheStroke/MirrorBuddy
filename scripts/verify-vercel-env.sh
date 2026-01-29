@@ -51,6 +51,22 @@ else
   echo "✅ NODE_ENV: SET ($NODE_ENV)"
 fi
 
+# Check VERCEL_TOKEN (required in CI/production for deployment, required on main branch push)
+if [ -z "$VERCEL_TOKEN" ]; then
+  if [ "$IS_PRODUCTION" = "true" ] || [ "${GITHUB_REF:-}" = "refs/heads/main" ]; then
+    echo "❌ VERCEL_TOKEN: MISSING (required in CI/production and for main branch deployments)"
+    echo "   How to fix:"
+    echo "   1. Regenerate token: https://vercel.com/account/tokens"
+    echo "   2. Update GitHub secret: https://github.com/FightTheStroke/MirrorBuddy/settings/secrets/actions"
+    echo "   3. Set: VERCEL_TOKEN to the new personal access token"
+    FAILED_CHECKS=$((FAILED_CHECKS + 1))
+  else
+    echo "⚠️  VERCEL_TOKEN: NOT SET (optional for local dev, required for production deployments)"
+  fi
+else
+  echo "✅ VERCEL_TOKEN: SET (token length: ${#VERCEL_TOKEN} chars)"
+fi
+
 # ============================================================================
 # SECTION 2: Check optional but recommended variables
 # ============================================================================
