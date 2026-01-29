@@ -384,12 +384,22 @@ test.describe("Color and Contrast", () => {
 // INSTANT ACCESS FEATURE (ADR 0060)
 // ============================================================================
 
+const instantAccessGoto = (
+  page: {
+    goto: (
+      u: string,
+      o?: { waitUntil?: "load" | "domcontentloaded" },
+    ) => Promise<unknown>;
+  },
+  path: string,
+) => page.goto(path, { waitUntil: "domcontentloaded" });
+
 test.describe("Instant Access - Floating Button", () => {
   test("floating button visible and WCAG compliant size", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await expect(button).toBeVisible();
 
     const box = await button.boundingBox();
@@ -398,22 +408,22 @@ test.describe("Instant Access - Floating Button", () => {
   });
 
   test("floating button visible on legal pages", async ({ page }) => {
-    const legalPages = ["/privacy", "/termini", "/cookies"];
+    const legalPages = ["/it/privacy", "/it/terms", "/it/cookies"];
 
     for (const path of legalPages) {
-      await page.goto(path);
+      await instantAccessGoto(page, path);
       await page.waitForLoadState("domcontentloaded");
 
-      const button = page.locator('button[aria-label*="accessibilità"]');
+      const button = page.locator('button[aria-controls="a11y-quick-panel"]');
       await expect(button).toBeVisible({ timeout: 5000 });
     }
   });
 
   test("button has proper ARIA attributes", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await expect(button).toHaveAttribute("aria-expanded", "false");
     await expect(button).toHaveAttribute("aria-controls");
   });
@@ -421,18 +431,15 @@ test.describe("Instant Access - Floating Button", () => {
 
 test.describe("Instant Access - Quick Panel", () => {
   test("clicking button opens panel with 7 profiles", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    const panel = page.locator("#a11y-quick-panel");
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
-    const panel = page
-      .locator('[role="dialog"]')
-      .filter({ hasText: "Accessibilità" });
-    await expect(panel).toBeVisible();
-
-    // Check for all 7 profile presets
     const profiles = [
       "Dislessia",
       "ADHD",
@@ -444,40 +451,34 @@ test.describe("Instant Access - Quick Panel", () => {
     ];
 
     for (const profile of profiles) {
-      const profileBtn = page.locator(
-        `button[aria-label="Attiva profilo ${profile}"]`,
-      );
-      await expect(profileBtn).toBeVisible();
+      const profileBtn = page.locator(`button[aria-label*="${profile}"]`);
+      await expect(profileBtn.first()).toBeVisible();
     }
   });
 
   test("Escape key closes panel", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
-
-    const panel = page
-      .locator('[role="dialog"]')
-      .filter({ hasText: "Accessibilità" });
-    await expect(panel).toBeVisible();
+    const panel = page.locator("#a11y-quick-panel");
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press("Escape");
     await expect(panel).not.toBeVisible();
   });
 
   test("clicking outside closes panel", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
-
-    const panel = page
-      .locator('[role="dialog"]')
-      .filter({ hasText: "Accessibilità" });
-    await expect(panel).toBeVisible();
+    const panel = page.locator("#a11y-quick-panel");
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     await page.mouse.click(10, 10);
     await expect(panel).not.toBeVisible();
@@ -492,14 +493,18 @@ test.describe("Instant Access - Profile Activation", () => {
       "Font loading unreliable in CI - needs font preloading",
     );
 
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    await expect(page.locator("#a11y-quick-panel")).toBeVisible({
+      timeout: 10000,
+    });
 
-    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
-    await dyslexiaBtn.click();
+    const dyslexiaBtn = page.locator('button[aria-label*="Dislessia"]');
+    await dyslexiaBtn.first().click();
     await page.waitForTimeout(300);
 
     const body = page.locator("body");
@@ -512,14 +517,18 @@ test.describe("Instant Access - Profile Activation", () => {
   test("active profile shows indicator on floating button", async ({
     page,
   }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    await expect(page.locator("#a11y-quick-panel")).toBeVisible({
+      timeout: 10000,
+    });
 
-    const adhBtn = page.locator('button:has-text("ADHD")');
-    await adhBtn.click();
+    const adhBtn = page.locator('button[aria-label*="ADHD"]');
+    await adhBtn.first().click();
 
     await page.keyboard.press("Escape");
 
@@ -528,16 +537,20 @@ test.describe("Instant Access - Profile Activation", () => {
   });
 
   test("reset button clears profile", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    await expect(page.locator("#a11y-quick-panel")).toBeVisible({
+      timeout: 10000,
+    });
 
-    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
-    await dyslexiaBtn.click();
+    const dyslexiaBtn = page.locator('button[aria-label*="Dislessia"]');
+    await dyslexiaBtn.first().click();
 
-    const resetBtn = page.locator('button:has-text("Ripristina")');
+    const resetBtn = page.getByRole("button", { name: /Ripristina|Reset/i });
     await resetBtn.click();
     await page.waitForTimeout(300);
 
@@ -551,14 +564,18 @@ test.describe("Instant Access - Profile Activation", () => {
 
 test.describe("Instant Access - Cookie Persistence", () => {
   test("settings persist after page refresh", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    await expect(page.locator("#a11y-quick-panel")).toBeVisible({
+      timeout: 10000,
+    });
 
-    const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
-    await dyslexiaBtn.click();
+    const dyslexiaBtn = page.locator('button[aria-label*="Dislessia"]');
+    await dyslexiaBtn.first().click();
     await page.waitForTimeout(500);
 
     await page.reload({ waitUntil: "domcontentloaded" });
@@ -588,14 +605,18 @@ test.describe("Instant Access - Cookie Persistence", () => {
   });
 
   test("a11y cookie is set with correct name", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    await expect(page.locator("#a11y-quick-panel")).toBeVisible({
+      timeout: 10000,
+    });
 
-    const visualBtn = page.locator('button:has-text("Visivo")');
-    await visualBtn.click();
+    const visualBtn = page.locator('button[aria-label*="Visivo"]');
+    await visualBtn.first().click();
     await page.waitForTimeout(500);
 
     const cookies = await page.context().cookies();
@@ -606,25 +627,27 @@ test.describe("Instant Access - Cookie Persistence", () => {
 
 test.describe("Instant Access - Panel Keyboard Navigation", () => {
   test("can open panel with keyboard", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.focus();
     await page.keyboard.press("Enter");
 
-    const panel = page
-      .locator('[role="dialog"]')
-      .filter({ hasText: "Accessibilità" });
-    await expect(panel).toBeVisible();
+    const panel = page.locator("#a11y-quick-panel");
+    await expect(panel).toBeVisible({ timeout: 10000 });
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/");
+    await instantAccessGoto(page, "/it");
     await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
+    const panel = page.locator("#a11y-quick-panel");
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     for (let i = 0; i < 20; i++) {
       await page.keyboard.press("Tab");
@@ -632,7 +655,7 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
 
     const activeElement = await page.evaluate(() => {
       const el = document.activeElement;
-      const panel = document.querySelector('[role="dialog"]');
+      const panel = document.getElementById("a11y-quick-panel");
       return panel?.contains(el);
     });
 

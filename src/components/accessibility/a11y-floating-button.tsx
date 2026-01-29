@@ -31,10 +31,11 @@ export function A11yFloatingButton({
   return (
     <button
       onClick={onClick}
+      data-testid="a11y-floating-button"
       className={cn(
         "fixed bottom-4 right-4 z-50",
         "flex items-center justify-center",
-        "w-11 h-11 rounded-full", // 44x44px for WCAG touch target
+        "min-w-[44px] min-h-[44px] w-12 h-12 rounded-full", // WCAG 2.1 AA 44x44px min touch target
         "bg-violet-600 dark:bg-violet-500",
         "hover:bg-violet-700 dark:hover:bg-violet-400",
         "text-white",
