@@ -24,5 +24,18 @@
     "coppa": "Se hai meno di 13 anni, i tuoi genitori hanno ricevuto un avviso per approvare i cookie essenziali.",
     "privacyPolicy": "Informativa sulla Privacy",
     "cookiePolicy": "Informativa sui Cookie"
+  },
+  "trialConsent": {
+    "title": "Benvenuto nella Prova Gratuita",
+    "subtitle": "Informazioni importanti sulla tua privacy",
+    "description": "Per iniziare a usare MirrorBuddy gratuitamente, abbiamo bisogno del tuo consenso al trattamento di alcuni dati minimi necessari per far funzionare l'IA.",
+    "processingIntro": "Tratteremo i seguenti dati in modo sicuro e anonimo:",
+    "dataConversations": "Il testo delle conversazioni (usato per generare le risposte)",
+    "dataProgress": "I tuoi progressi di studio (salvati localmente)",
+    "dataCookies": "Cookie tecnici essenziali per la sessione",
+    "privacyLink": "Leggi l'Informativa Privacy completa",
+    "checkboxLabel": "Ho letto e accetto l'informativa sul trattamento dei dati",
+    "startButton": "Inizia ora",
+    "gdprNote": "MirrorBuddy è conforme al GDPR. Non vendiamo mai i tuoi dati a terzi."
   }
 }

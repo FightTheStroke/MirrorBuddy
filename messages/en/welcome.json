@@ -67,6 +67,56 @@
       "school-elementary": "Elementary",
       "school-middle": "Middle school",
       "school-high": "High school"
+    },
+    "ageYears": "years old",
+    "trial": {
+      "title": "Free trial limits",
+      "trialDescription": "You are using the free trial version. To unlock unlimited use and all features, request full access.",
+      "messagesDay": "messages / day",
+      "voiceMinutes": "voice minutes / day",
+      "toolsDay": "tools / day",
+      "maestriAvailable": "professors available"
+    },
+    "tiers": {
+      "heading": "Choose the right plan for you",
+      "subtitle": "MirrorBuddy is free for all students during the beta phase.",
+      "recommended": "Recommended",
+      "trial": {
+        "name": "Trial",
+        "tagline": "To start right away",
+        "price": "Free",
+        "cta": "Start Now",
+        "features": {
+          "maestri": "3 Professors",
+          "messages": "10 messages / day",
+          "voice": "5 voice minutes / day",
+          "tools": "10 tools / day"
+        }
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "For those who want more",
+        "price": "Free",
+        "cta": "Try for Free",
+        "features": {
+          "maestri": "10 Professors",
+          "messages": "30 messages / day",
+          "voice": "15 voice minutes / day",
+          "tools": "Unlimited"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "The full experience",
+        "price": "Free",
+        "cta": "Try for Free",
+        "features": {
+          "maestri": "22 Professors",
+          "messages": "Unlimited messages",
+          "voice": "Unlimited voice",
+          "tools": "Unlimited"
+        }
+      }
     }
   }
 }

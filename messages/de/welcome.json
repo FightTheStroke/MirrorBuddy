@@ -82,6 +82,56 @@
       "school-elementary": "Grundschule",
       "school-middle": "Mittelschule",
       "school-high": "Gymnasium"
+    },
+    "ageYears": "Jahre alt",
+    "trial": {
+      "title": "Kostenlose Testlimits",
+      "trialDescription": "Sie verwenden die kostenlose Testversion. Um unbegrenzte Nutzung und alle Funktionen freizuschalten, fordern Sie vollen Zugriff an.",
+      "messagesDay": "Nachrichten / Tag",
+      "voiceMinutes": "Sprachminuten / Tag",
+      "toolsDay": "Tools / Tag",
+      "maestriAvailable": "verfügbare Professoren"
+    },
+    "tiers": {
+      "heading": "Wählen Sie den richtigen Plan für sich",
+      "subtitle": "MirrorBuddy ist während der Beta-Phase für alle Schüler kostenlos.",
+      "recommended": "Empfohlen",
+      "trial": {
+        "name": "Testversion",
+        "tagline": "Um sofort loszulegen",
+        "price": "Kostenlos",
+        "cta": "Jetzt Starten",
+        "features": {
+          "maestri": "3 Professoren",
+          "messages": "10 Nachrichten / Tag",
+          "voice": "5 Sprachminuten / Tag",
+          "tools": "10 Tools / Tag"
+        }
+      },
+      "base": {
+        "name": "Basis",
+        "tagline": "Für diejenigen, die mehr wollen",
+        "price": "Kostenlos",
+        "cta": "Kostenlos Testen",
+        "features": {
+          "maestri": "10 Professoren",
+          "messages": "30 Nachrichten / Tag",
+          "voice": "15 Sprachminuten / Tag",
+          "tools": "Unbegrenzt"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Das volle Erlebnis",
+        "price": "Kostenlos",
+        "cta": "Kostenlos Testen",
+        "features": {
+          "maestri": "22 Professoren",
+          "messages": "unbegrenzte Nachrichten",
+          "voice": "unbegrenzte Sprache",
+          "tools": "Unbegrenzt"
+        }
+      }
     }
   }
 }

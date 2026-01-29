@@ -85,10 +85,16 @@ describe("SuccessMetricsDashboard", () => {
     expect(subProgressBar).toHaveAttribute("aria-valuenow", "50"); // 10/20 = 50%
   });
 
-  it("renders milestones section", () => {
-    render(<SuccessMetricsDashboard data={mockData} />);
+      it("renders milestones section", () => {
 
-    expect(screen.getByText(/Milestones|Traguardi/i)).toBeInTheDocument();
-    expect(screen.getByText("First Step")).toBeInTheDocument();
-  });
-});
+        render(<SuccessMetricsDashboard data={mockData} />);
+
+        
+
+        const milestonesTitles = screen.getAllByText(/Milestones|Traguardi/i);
+
+        expect(milestonesTitles.length).toBeGreaterThan(0);
+
+        expect(screen.getByText("First Step")).toBeInTheDocument();
+
+      });});

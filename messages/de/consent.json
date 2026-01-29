@@ -24,5 +24,18 @@
     "coppa": "Wenn du unter 13 Jahre alt bist, haben deine Eltern eine Benachrichtigung erhalten, um wesentliche Cookies zu genehmigen.",
     "privacyPolicy": "Datenschutzrichtlinie",
     "cookiePolicy": "Cookie-Richtlinie"
+  },
+  "trialConsent": {
+    "title": "Willkommen zur Kostenlosen Testversion",
+    "subtitle": "Wichtige Informationen zu Deiner Privatsphäre",
+    "description": "Um MirrorBuddy kostenlos nutzen zu können, benötigen wir Dein Einverständnis zur Verarbeitung einiger minimaler Daten, die für das Funktionieren der KI erforderlich sind.",
+    "processingIntro": "Wir werden die folgenden Daten sicher und anonym verarbeiten:",
+    "dataConversations": "Der Text der Konversationen (verwendet zur Generierung von Antworten)",
+    "dataProgress": "Dein Lernfortschritt (lokal gespeichert)",
+    "dataCookies": "Wesentliche technische Cookies für die Sitzung",
+    "privacyLink": "Lies die vollständige Datenschutzrichtlinie",
+    "checkboxLabel": "Ich habe die Datenverarbeitungsrichtlinie gelesen und akzeptiere sie",
+    "startButton": "Jetzt starten",
+    "gdprNote": "MirrorBuddy ist DSGVO-konform. Wir verkaufen Deine Daten niemals an Dritte."
   }
 }

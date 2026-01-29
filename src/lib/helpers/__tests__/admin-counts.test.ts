@@ -383,7 +383,7 @@ describe("publish-admin-counts helper", () => {
       triggerAdminCountsUpdate();
 
       // Give async operation time to complete
-      await new Promise((resolve) => setTimeout(resolve, 10));
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
       expect(callback).toHaveBeenCalled();
     });

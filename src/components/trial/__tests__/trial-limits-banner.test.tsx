@@ -26,10 +26,10 @@ describe("TrialLimitsBanner", () => {
       ).toBeInTheDocument();
 
       // Check all limit labels
-      expect(screen.getByText("Messaggi/giorno")).toBeInTheDocument();
-      expect(screen.getByText("Minuti vocali")).toBeInTheDocument();
-      expect(screen.getByText("Strumenti/giorno")).toBeInTheDocument();
-      expect(screen.getByText("Maestri disponibili")).toBeInTheDocument();
+      expect(screen.getByText("messaggi / giorno")).toBeInTheDocument();
+      expect(screen.getByText("minuti voce / giorno")).toBeInTheDocument();
+      expect(screen.getByText("strumenti / giorno")).toBeInTheDocument();
+      expect(screen.getByText("professori disponibili")).toBeInTheDocument();
     });
 
     it("displays correct daily chat limit (10)", () => {
@@ -95,9 +95,9 @@ describe("TrialLimitsBanner", () => {
       render(<TrialLimitsBanner variant="compact" />);
 
       // Check limits are shown in compact form
-      expect(screen.getByText("10 chats")).toBeInTheDocument();
-      expect(screen.getByText("5 min")).toBeInTheDocument();
-      expect(screen.getByText("3 maestri")).toBeInTheDocument();
+      expect(screen.getByText("10 messaggi / giorno")).toBeInTheDocument();
+      expect(screen.getByText("5 minuti voce / giorno")).toBeInTheDocument();
+      expect(screen.getByText("3 professori disponibili")).toBeInTheDocument();
     });
 
     it("uses inline-flex layout", () => {

@@ -67,6 +67,56 @@
       "school-elementary": "Primaire",
       "school-middle": "Collège",
       "school-high": "Lycée"
+    },
+    "ageYears": "ans",
+    "trial": {
+      "title": "Limites de l'essai gratuit",
+      "trialDescription": "Vous utilisez la version d'essai gratuite. Pour débloquer une utilisation illimitée et toutes les fonctionnalités, demandez l'accès complet.",
+      "messagesDay": "messages / jour",
+      "voiceMinutes": "minutes voix / jour",
+      "toolsDay": "outils / jour",
+      "maestriAvailable": "professeurs disponibles"
+    },
+    "tiers": {
+      "heading": "Choisissez le plan qui vous convient",
+      "subtitle": "MirrorBuddy est gratuit pour tous les étudiants pendant la phase bêta.",
+      "recommended": "Recommandé",
+      "trial": {
+        "name": "Essai",
+        "tagline": "Pour commencer tout de suite",
+        "price": "Gratuit",
+        "cta": "Commencer Maintenant",
+        "features": {
+          "maestri": "3 Professeurs",
+          "messages": "10 messages / jour",
+          "voice": "5 minutes voix / jour",
+          "tools": "10 outils / jour"
+        }
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "Pour ceux qui en veulent plus",
+        "price": "Gratuit",
+        "cta": "Essayer Gratuitement",
+        "features": {
+          "maestri": "10 Professeurs",
+          "messages": "30 messages / jour",
+          "voice": "15 minutes voix / jour",
+          "tools": "Sans limites"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "L'expérience complète",
+        "price": "Gratuit",
+        "cta": "Essayer Gratuitement",
+        "features": {
+          "maestri": "22 Professeurs",
+          "messages": "messages illimités",
+          "voice": "voix illimitée",
+          "tools": "Sans limites"
+        }
+      }
     }
   }
 }
