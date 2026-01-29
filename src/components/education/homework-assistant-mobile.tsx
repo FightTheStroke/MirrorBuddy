@@ -1,17 +1,5 @@
 /**
- * HomeworkAssistantMobile Component
- *
- * Camera-first mobile homework assistant with step-by-step solution display.
- * Requirement: F-31 - Homework assistant supports camera-first workflow on mobile
- *
- * Features:
- * - Camera button prominent on mobile (top action)
- * - Quick photo capture → analysis workflow
- * - Gallery picker as alternative
- * - Subject selection with large touch targets (44px+)
- * - Step-by-step solution display readable on mobile
- * - Responsive: camera-first on mobile, text-first on desktop
- * - Uses TouchTarget and xs: breakpoint
+ * HomeworkAssistantMobile Component (REAL VISION INTEGRATION)
  */
 
 "use client";
@@ -25,15 +13,15 @@ import {
   SolutionDisplay,
   Solution,
 } from "./homework-assistant-mobile/solution-display";
+import { logger } from "@/lib/logger";
 
 interface AnalysisPayload {
   file: File;
   subject?: string;
-  imageData?: string;
 }
 
 interface HomeworkAssistantMobileProps {
-  onAnalyze: (payload: AnalysisPayload) => void;
+  onAnalyze?: (payload: AnalysisPayload) => void;
   onError?: (error: string) => void;
   className?: string;
 }
@@ -50,56 +38,59 @@ export function HomeworkAssistantMobile({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [analysisSuccess, setAnalysisSuccess] = useState(false);
 
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = (error) => reject(error);
+    });
+  };
+
   const handleFileSelect = useCallback(
-    (file: File) => {
-      // Reset state
+    async (file: File) => {
       setError(null);
-      setAnalysisSuccess(false);
       setSolution(null);
       setIsAnalyzing(true);
-      setUploadProgress(0);
+      setUploadProgress(10);
 
-      // Simulate progress
-      const progressInterval = setInterval(() => {
-        setUploadProgress((prev) =>
-          prev >= 90 ? prev : prev + Math.random() * 30,
-        );
-      }, 200);
+      try {
+        const base64Image = await fileToBase64(file);
+        setUploadProgress(30);
 
-      // Trigger analysis callback
-      onAnalyze({
-        file,
-        subject: selectedSubject || undefined,
-      });
-
-      // Simulate analysis completion
-      setTimeout(() => {
-        clearInterval(progressInterval);
-        setUploadProgress(100);
-        setIsAnalyzing(false);
-        setAnalysisSuccess(true);
-
-        // Mock solution display
-        setSolution({
-          steps: [
-            "Step 1: Identify the problem type",
-            "Step 2: Gather necessary information",
-            "Step 3: Apply relevant formulas",
-            "Step 4: Calculate the answer",
-            "Step 5: Verify the result",
-          ],
-          answer: "The solution is displayed here",
-          explanation:
-            "Detailed explanation of the solution process and approach",
+        const response = await fetch("/api/homework/analyze", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image: base64Image,
+            subject: selectedSubject,
+          }),
         });
 
-        setTimeout(() => {
-          setAnalysisSuccess(false);
-          setUploadProgress(0);
-        }, 2000);
-      }, 1500);
+        setUploadProgress(70);
+
+        if (!response.ok) {
+          throw new Error("Failed to analyze homework. Please try again.");
+        }
+
+        const data = await response.json();
+        setSolution(data);
+        setAnalysisSuccess(true);
+        setUploadProgress(100);
+        
+        onAnalyze?.({ file, subject: selectedSubject });
+
+      } catch (err) {
+        const msg = String(err);
+        setError(msg);
+        onError?.(msg);
+        logger.error("Homework analysis UI failed", { error: msg });
+      } finally {
+        setIsAnalyzing(false);
+        setTimeout(() => setAnalysisSuccess(false), 2000);
+      }
     },
-    [selectedSubject, onAnalyze],
+    [selectedSubject, onAnalyze, onError],
   );
 
   const handleReset = () => {
@@ -109,32 +100,15 @@ export function HomeworkAssistantMobile({
     setUploadProgress(0);
   };
 
-  const handleError = useCallback(
-    (err: string) => {
-      setError(err);
-      onError?.(err);
-    },
-    [onError],
-  );
-
   return (
-    <div
-      className={cn(
-        "w-full max-w-2xl mx-auto p-4 xs:p-6",
-        "bg-white dark:bg-slate-950",
-        "rounded-lg border border-slate-200 dark:border-slate-800",
-        "shadow-sm dark:shadow-lg",
-        className,
-      )}
-    >
-      {/* Header */}
+    <div className={cn("w-full max-w-2xl mx-auto p-4 xs:p-6 bg-white dark:bg-slate-950 rounded-lg border border-slate-200 dark:border-slate-800 shadow-sm dark:shadow-lg", className)}>
       <div className="mb-6">
         <h2 className="text-xl xs:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
           <Zap className="w-6 h-6 text-amber-500" />
-          Homework Assistant
+          Homework Assistant (AI Vision)
         </h2>
         <p className="text-sm xs:text-base text-slate-600 dark:text-slate-400 mt-2">
-          Capture or upload your homework to get step-by-step solutions
+          Capture your homework and I'll guide you through the solution
         </p>
       </div>
 
@@ -143,7 +117,7 @@ export function HomeworkAssistantMobile({
           <InputSection
             key="input"
             onFileSelect={handleFileSelect}
-            onError={handleError}
+            onError={setError}
             isAnalyzing={isAnalyzing}
             uploadProgress={uploadProgress}
             error={error}

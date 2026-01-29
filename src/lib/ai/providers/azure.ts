@@ -207,3 +207,59 @@ export async function azureChatCompletion(
     filteredCategories: responseWithFilter.filteredCategories,
   };
 }
+
+/**
+ * Perform vision-based completion using Azure OpenAI
+ */
+export async function azureVisionCompletion(
+  config: ProviderConfig,
+  imageUrl: string,
+  systemPrompt: string,
+  temperature: number = 0.5,
+): Promise<ChatCompletionResult> {
+  const apiVersion =
+    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
+  const url = `${config.endpoint}/openai/deployments/${config.model}/chat/completions?api-version=${apiVersion}`;
+
+  const requestBody = {
+    messages: [
+      { role: "system", content: systemPrompt },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Analyze this image and guide me through the solution using the socratic method. Do not give the direct answer immediately.",
+          },
+          { type: "image_url", image_url: { url: imageUrl } },
+        ],
+      },
+    ],
+    temperature,
+    max_tokens: 4096,
+  };
+
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "api-key": config.apiKey!,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Azure Vision error (${response.status}): ${errorText}`);
+  }
+
+  const data = await response.json();
+  const message = data.choices[0]?.message;
+
+  return {
+    content: message?.content || "",
+    provider: "azure",
+    model: config.model,
+    usage: data.usage,
+  };
+}
