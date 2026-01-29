@@ -33,7 +33,7 @@
       },
       "studyTip": {
         "title": "Consiglio per Studiare",
-        "description": "Inizia con una <strong>Mappa Mentale</strong> per avere una visione d'insieme, poi crea delle <strong>Flashcard</strong> per memorizzare i concetti chiave, e infine verifica la tua preparazione con un <strong>Quiz</strong>. Tutti i materiali saranno salvati nel tuo <strong>Zaino</strong>!"
+        "description": "Inizia con una <strongNode>Mappa Mentale</strongNode> per avere una visione d'insieme, poi crea delle <strongNode>Flashcard</strongNode> per memorizzare i concetti chiave, e infine verifica la tua preparazione con un <strongNode>Quiz</strongNode>. Tutti i materiali saranno salvati nel tuo <strongNode>Zaino</strongNode>!"
       }
     },
     "backButton": "Back Button",

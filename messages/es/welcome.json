@@ -1,6 +1,6 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - La Escuela que Quiero",
+    "appTitle": "MirrorBuddy - La escuela que quiero",
     "loading": "Cargando...",
     "seasonDefault": "Otoño",
     "mirrorBucksShort": "MB",
@@ -9,393 +9,70 @@
       "astuccio": "Estuche",
       "zaino": "Mochila",
       "calendar": "Calendario",
-      "progress": "Progreso",
-      "settings": "Configuración",
-      "features": "Características",
-      "pricing": "Precios",
-      "about": "Quiénes somos",
-      "contact": "Contacto",
-      "login": "Iniciar sesión",
-      "signup": "Registrarse",
-      "dashboard": "Panel",
-      "logout": "Cerrar sesión"
-    },
-    "header": {
-      "openMenu": "Abrir menú",
-      "streak": "Racha",
-      "sessionsThisWeek": "Sesiones esta semana",
-      "studyTime": "Tiempo de estudio",
-      "questionsAsked": "Preguntas realizadas",
-      "trial": "Prueba",
-      "trialClickToRequest": "Haz clic para solicitar acceso completo"
-    },
-    "sidebar": {
-      "backToHome": "Volver al inicio",
-      "appName": "MirrorBuddy",
-      "closeMenu": "Cerrar menú",
-      "trialMode": "Modo Prueba",
-      "login": "Iniciar sesión",
-      "requestAccess": "Solicitar Acceso",
-      "adminDashboard": "Panel de Administración",
-      "adminDashboardAria": "Panel de administrador",
-      "parentArea": "Área de Padres"
-    },
-    "adminDashboard": "Panel de Administración",
-    "closeMenu": "Cerrar Menú",
-    "logout": "Cerrar Sesión",
-    "openMenu": "Abrir Menú",
-    "parentArea": "Área de Padres",
-    "returnHome": "Volver al Inicio",
-    "season": {
-      "autumn": "Otoño"
-    },
-    "title": "Título",
-    "hero": {
-      "title": "Aprende mejor con MirrorBuddy",
-      "subtitle": "Tu compañero de estudio basado en inteligencia artificial",
-      "cta": "Comienza ahora",
-      "secondaryCta": "Descubre más"
+      "progress": "Progresos",
+      "settings": "Ajustes",
+      "skipToContent": "Saltar al contenido principal"
     }
   },
   "welcome": {
     "page": {
       "loading": "Cargando...",
-      "resetConfirm": "¿Quieres empezar de nuevo? Se eliminarán todos los datos ingresados."
+      "resetConfirm": "¿Quieres empezar de cero? Todos los datos introducidos serán eliminados."
     },
     "hero": {
-      "betaBadge": "Beta Privada",
-      "betaSubtitle": "Solo con invitación",
-      "welcomeBack": "Bienvenido de nuevo,",
-      "welcomeBackSubtitle": "¿Listo para tu próxima aventura de aprendizaje?",
-      "welcomeNew": "Bienvenido a",
-      "tagline": "Aprende",
-      "taglineWith": "CON los Grandes Maestros",
-      "taglineAbilities": "sean cuales sean tus habilidades",
-      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 22 profesores históricos te acompañan personalmente.",
-      "accessibility": {
-        "title": "Diseñado para todos los estilos de aprendizaje",
-        "readableFonts": "Fuentes legibles",
-        "mindMaps": "Mapas mentales",
-        "textToSpeech": "Texto a voz",
-        "adaptiveQuizzes": "Cuestionarios adaptativos"
-      },
-      "adaptiveQuizzes": "Cuestionarios adaptativos",
-      "anyAbility": "Cualquier habilidad",
+      "welcome": "Bienvenido a",
       "learn": "Aprende",
-      "mindMaps": "Mapas mentales",
-      "readableFonts": "Fuentes legibles",
-      "textToSpeech": "Texto a voz",
-      "welcome": "Bienvenido",
-      "withTeachers": "Con profesores"
-    },
-    "quickStart": {
-      "heading": "Comenzar",
-      "returningUser": {
-        "goToApp": "Ir a la aplicación",
-        "updateProfile": "Actualizar perfil"
-      },
-      "betaAccess": {
-        "badge": "ACCESO COMPLETO",
-        "title": "¿Tienes una cuenta?",
-        "feature1": "22 Profesores IA",
-        "feature2": "Todas las herramientas",
-        "feature3": "Progreso guardado",
-        "cta": "Iniciar sesión"
-      },
-      "trial": {
-        "badge": "PRUEBA GRATUITA",
-        "title": "Explora ahora",
-        "feature1": "3 Profesores",
-        "feature2": "10 mensajes",
-        "feature3": "Sin registro",
-        "cta": "Probar gratis"
-      },
-      "login": "Iniciar sesión",
-      "updateProfile": "Actualizar perfil"
-    },
-    "tierComparison": {
-      "heading": "Elige el plan perfecto para ti",
-      "subtitle": "Comienza con una prueba gratuita o regístrate para desbloquear más funciones",
-      "footer": "Todos los planes incluyen acceso a 22 Profesores IA y herramientas de aprendizaje personalizadas",
-      "tiers": {
-        "trial": {
-          "name": "Prueba",
-          "tagline": "Explora sin compromiso",
-          "price": "Gratis",
-          "features": {
-            "maestri": "3 Profesores",
-            "messages": "10 mensajes/día",
-            "voice": "5 minutos de voz/día",
-            "noRegistration": "Sin registro"
-          },
-          "cta": "Probar gratis"
-        },
-        "base": {
-          "name": "Base",
-          "tagline": "Para estudiantes registrados",
-          "price": "Gratis",
-          "features": {
-            "maestri": "10 Profesores",
-            "messages": "30 mensajes/día",
-            "voice": "15 minutos de voz/día",
-            "savedProgress": "Progreso guardado"
-          },
-          "cta": "Registrarse"
-        },
-        "pro": {
-          "name": "Pro",
-          "tagline": "Experiencia completa",
-          "price": "A solicitud",
-          "badge": "Recomendado",
-          "features": {
-            "maestri": "22 Profesores",
-            "messagesUnlimited": "Mensajes ilimitados",
-            "voiceUnlimited": "Voz ilimitada",
-            "allTools": "Todas las herramientas"
-          },
-          "cta": "Actualizar a Pro"
-        }
-      },
-      "footerNote": "Nota al pie",
-      "subheading": "Subtítulo"
-    },
-    "maestri": {
-      "heading": "Tus",
-      "headingHighlight": "Profesores",
-      "subtitle": "{count} mentes extraordinarias de la historia se convierten en tus profesores personales.",
-      "scrollLeft": "Desplazar a la izquierda",
-      "scrollRight": "Desplazar a la derecha",
-      "carouselLabel": "Carrusel de profesores - usa las flechas para navegar",
-      "scrollHint": "← Desplaza para ver los profesores →",
-      "disclaimer": "Los profesores IA se crean con fines educativos y demostrativos. En el futuro, cada estudiante podrá crear sus propios profesores personalizados.",
-      "disclaimerLink": "Descubre más"
-    },
-    "support": {
-      "heading": "Siempre a tu",
-      "headingHighlight": "lado",
-      "subtitle": "Entrenadores para el método de estudio y Compañeros para el apoyo emocional",
-      "carouselLabel": "Carrusel de entrenadores y compañeros - usa las flechas para navegar",
-      "scrollHint": "← Desplaza para ver todos →",
-      "coach": "Entrenador",
-      "buddy": "Compañero"
-    },
-    "features": {
-      "heading": "Herramientas para cada estilo de aprendizaje",
-      "subtitle": "Una plataforma completa y accesible diseñada para ti",
-      "voiceConversation": {
-        "label": "Conversación por Voz",
-        "description": "Habla con tus Profesores en tiempo real"
-      },
-      "mindMaps": {
-        "label": "Mapas Mentales",
-        "description": "Visualiza y organiza conceptos"
-      },
-      "flashcards": {
-        "label": "Tarjetas FSRS",
-        "description": "Memoriza con repetición espaciada"
-      },
-      "interactiveQuizzes": {
-        "label": "Cuestionarios Interactivos",
-        "description": "Verifica tus conocimientos"
-      },
-      "gamification": {
-        "label": "Gamificación",
-        "description": "Gana XP y desbloquea logros"
-      },
-      "adaptiveLearning": {
-        "label": "Aprendizaje Adaptativo",
-        "description": "Se adapta a tu estilo y ritmo"
-      },
-      "totalAccessibility": {
-        "label": "Accesibilidad Total",
-        "description": "Diseñado para dislexia, TDAH y todos"
-      },
-      "integratedPlatform": {
-        "label": "Plataforma Integrada",
-        "description": "Todo en un solo lugar"
-      }
-    },
-    "compliance": {
-      "heading": "Cumplimiento y",
-      "headingHighlight": "Transparencia",
-      "subtitle": "Seguridad, privacidad y transparencia están en el corazón de MirrorBuddy",
-      "items": {
-        "gdpr": {
-          "label": "RGPD",
-          "description": "Protección y privacidad de datos UE"
-        },
-        "aiAct": {
-          "label": "Ley IA UE",
-          "description": "Cumplimiento de normativas sobre IA"
-        },
-        "coppa": {
-          "label": "COPPA",
-          "description": "Protección en línea de menores"
-        },
-        "aiTransparency": {
-          "label": "Transparencia IA",
-          "description": "Política de transparencia sobre IA"
-        },
-        "openSource": {
-          "label": "Código Abierto",
-          "description": "Código abierto en GitHub"
-        },
-        "apache": {
-          "label": "Apache 2.0",
-          "description": "Licencia de código abierto"
-        }
-      },
-      "footer": "MirrorBuddy es desarrollado por la <link>Fundación FightTheStroke</link>, una organización sin fines de lucro para niños y familias afectados por parálisis cerebral y accidente cerebrovascular pediátrico."
-    },
-    "footer": {
-      "aiDisclaimer": "Creado con IA - las respuestas pueden contener errores",
-      "compliance": {
-        "gdpr": {
-          "label": "RGPD",
-          "description": "Conforme a la normativa europea"
-        },
-        "aiAct": {
-          "label": "Ley IA",
-          "description": "UE 2024/1689"
-        },
-        "coppa": {
-          "label": "COPPA",
-          "description": "Protección de menores"
-        },
-        "italianLaw": {
-          "label": "L.132/2025",
-          "description": "Ley italiana sobre IA"
-        }
-      },
-      "legal": {
-        "privacy": "Política de Privacidad",
-        "terms": "Términos de Servicio",
-        "cookies": "Política de Cookies",
-        "aiTransparency": "Transparencia IA",
-        "aiPolicy": "Política IA",
-        "compliance": "Cumplimiento"
-      },
-      "openSource": {
-        "label": "Código Abierto",
-        "ariaLabel": "Ver el código fuente en GitHub"
-      },
-      "copyright": "© {year} MirrorBuddy. Proyecto de código abierto en GitHub."
+      "with-teachers": "CON los Grandes Profesores",
+      "any-ability": "sean cuales sean tus habilidades",
+      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 22 Profesores históricos te acompañan personalmente.",
+      "readable-fonts": "Fuentes legibles",
+      "mind-maps": "Mapas mentales",
+      "text-to-speech": "Síntesis de voz",
+      "adaptive-quizzes": "Cuestionarios adaptativos",
+      "cta": "Empezar Ahora"
     },
     "principles": {
-      "howItWorks": "Cómo funciona",
-      "howItWorksDesc": "Descripción de cómo funciona",
-      "welcomeToSchool": "Bienvenido a la escuela",
-      "whatMakesUsSpecial": "Qué nos hace especiales"
+      "welcome-to-school": "¡Bienvenido a La escuela que quiero, {name}!",
+      "what-makes-us-special": "Esto es lo que nos hace especiales",
+      "accessible-learning": "Aprende a tu manera",
+      "accessible-learning-desc": "Cada uno tiene su forma de aprender. Aquí respetamos tu ritmo y tu estilo.",
+      "ai-teachers": "22 Maestros a tu lado",
+      "ai-teachers-desc": "De Leonardo a Marie Curie, los mayores genios de la historia te explicarán cada materia.",
+      "your-pace": "Nunca solo",
+      "your-pace-desc": "Coaches, amigos virtuales y herramientas pensadas para ti. ¡Juntos se aprende mejor!",
+      "no-judgment": "Diviértete aprendiendo",
+      "no-judgment-desc": "Cuestionarios, fichas, mapas mentales y XP para ganar. ¡Estudiar se convierte en una aventura!",
+      "melissa-quote": "Recuerda, {name}: no hay una forma incorrecta de aprender. ¡Estoy aquí para ayudarte a encontrar la tuya!",
+      "how-it-works": "¿Cómo funciona?",
+      "how-it-works-desc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pregunta a Euclides. Para inglés, ¡está Shakespeare! Yo te ayudaré a elegir al Profesor adecuado para cada situación."
     },
     "ready": {
-      "chooseProfessor": "Elige profesor",
-      "chooseProfessorDesc": "Descripción de elegir profesor",
-      "speakAnytimeTitle": "[TRANSLATE] Puoi sempre parlarmi",
-      "speakAnytimeDescription": "[TRANSLATE] sono qui per aiutarti con il metodo di studio",
-      "earnXpTitle": "[TRANSLATE] Guadagna XP",
-      "earnXpDescription": "[TRANSLATE] ogni lezione ti fa salire di livello!",
-      "backButton": "[TRANSLATE] Indietro",
-      "startButton": "[TRANSLATE] Iniziamo!",
-      "replayModeMessage": "[TRANSLATE] Fine del tutorial. Clicca \"{action}\" per tornare all'app."
+      "perfect": "¡Perfecto, {name}!",
+      "ready-to-start": "¡Estás listo para empezar tu aventura!",
+      "prepared-for-you": "¡He preparado todo para ti! Recuerda:",
+      "always-talk": "Siempre puedes hablar conmigo; estoy aquí para ayudarte con el método de estudio",
+      "choose-professor": "Elige un Profesor",
+      "choose-professor-desc": "para cada materia hay un experto adecuado",
+      "earn-xp": "Gana XP: ¡cada lección te hace subir de nivel!",
+      "back": "Atrás",
+      "lets-start": "¡Empecemos!",
+      "tutorial-end": "Fin del tutorial. Haz clic en \"¡Empecemos!\" para volver a la aplicación."
     },
-    "trialLimits": {
-      "base": "Base",
-      "ctaButton": "Botón de llamada a la acción",
-      "ctaQuestion": "Pregunta de llamada a la acción",
-      "exploreNoRegistration": "Explora sin registro",
-      "freeTrialMode": "Modo de prueba gratuita",
-      "maestri": "Profesores",
-      "messages": "Mensajes",
-      "requestBeta": "Solicitar beta",
-      "subtitle": "Subtítulo",
-      "tenPerSession": "Diez por sesión",
-      "threeAvailable": "Tres disponibles",
-      "title": "Título",
-      "tools": "Herramientas",
-      "wantFullAccess": "¿Quieres acceso completo?"
-    },
-    "voiceFallback": {
-      "message": "Mensaje",
-      "title": "Título"
-    },
-    "welcomeForm": {
-      "age": "Edad",
-      "collectedData": "Datos recopilados",
-      "disableVoice": "Desactivar voz",
-      "dontWorry": "No te preocupes",
-      "enableVoice": "Activar voz",
-      "enterYourNamePlaceholder": "Ingresa tu nombre",
-      "helloMelissa": "Hola Melissa",
-      "helpPersonalize": "Ayuda a personalizar",
-      "learningDifferences": "Dificultades de aprendizaje",
-      "learningDifferencesHint": "Pista sobre dificultades de aprendizaje",
-      "learningDifferencesLabel": "Etiqueta de dificultades de aprendizaje",
-      "niceToMeetYou": "Encantado de conocerte",
-      "optional": "Opcional",
-      "replayModeMessage": "Mensaje de modo repetición",
-      "school": "Escuela",
-      "schoolElementary": "Primaria",
-      "schoolHigh": "Bachillerato",
-      "schoolMiddle": "Secundaria",
-      "tellMeAboutYou": "Cuéntame sobre ti",
-      "welcomeIntro": "Introducción de bienvenida",
-      "whatIsYourName": "¿Cuál es tu nombre?",
-      "years": "Años",
-      "yourSupportTeacher": "Tu profesor de apoyo"
+    "welcome-form": {
+      "hello-melissa": "¡Hola! Soy Melissa",
+      "your-support-teacher": "Tu profesora de apoyo",
+      "welcome-intro": "¡Bienvenido a La escuela que quiero! Estoy aquí para ayudarte a estudiar de la forma que mejor te funcione.",
+      "dont-worry": "No te preocupes si algo te parece difícil: ¡juntos siempre encontraremos la manera de entenderlo!",
+      "what-is-your-name": "¿Cómo te llamas?",
+      "enter-your-name-placeholder": "Escribe tu nombre...",
+      "nice-to-meet-you": "¡Encantada de conocerte!",
+      "tell-me-about-you": "¡Cuéntame un poco de ti, {name}!",
+      "help-personalize": "Esto me ayudará a personalizar tu experiencia",
+      "learning-differences-label": "¿Tienes alguna dificultad particular? (opcional)",
+      "learning-differences-hint": "Esto nos ayuda a hacer la aplicación más accesible para ti",
+      "school-elementary": "Primaria",
+      "school-middle": "Secundaria",
+      "school-high": "Bachillerato"
     }
-  },
-  "onboarding": {
-    "transcript": {
-      "conversationActive": "Conversación activa",
-      "conversationTitle": "Título de la conversación",
-      "messagePlural": "mensajes",
-      "messageSingular": "mensaje",
-      "noConversation": "Sin conversación",
-      "userLabel": "Tú"
-    },
-    "checklist": {
-      "nameLabel": "Nombre",
-      "ageLabel": "Edad",
-      "schoolLabel": "Escuela",
-      "schoolElementary": "Primaria",
-      "schoolMiddle": "Secundaria",
-      "schoolHigh": "Bachillerato",
-      "differencesLabel": "Dificultades de aprendizaje",
-      "differencesCount": "{count} seleccionadas"
-    },
-    "voicePanel": {
-      "cancel": "Cancelar",
-      "connected": "Conectado",
-      "disableMicrophone": "Desactivar micrófono",
-      "enableMicrophone": "Activar micrófono",
-      "endCall": "Terminar llamada",
-      "listening": "Escuchando",
-      "melissa": "Melissa",
-      "microphoneMuted": "Micrófono silenciado",
-      "speakWithMelissa": "Hablar con Melissa",
-      "speaking": "Hablando",
-      "you": "Tú"
-    }
-  },
-  "trialConsent": {
-    "title": "Modo de Prueba Gratuita",
-    "subtitle": "Privacidad y consentimiento RGPD",
-    "description": "Para usar el modo de prueba gratuita, debes aceptar nuestra política de privacidad y las cookies esenciales.",
-    "processingIntro": "Durante la prueba gratuita, procesaremos los datos necesarios para proporcionarte el servicio educativo:",
-    "dataConversations": "Tus conversaciones con los Maestros IA",
-    "dataProgress": "Tu progreso de aprendizaje y preferencias",
-    "dataCookies": "Cookies esenciales para la seguridad de la sesión",
-    "privacyLink": "Leer la política de privacidad completa",
-    "checkboxLabel": "He leído y acepto la política de privacidad para la prueba gratuita",
-    "startButton": "Iniciar prueba",
-    "gdprNote": "Cumplimiento RGPD: Puedes revocar el consentimiento en cualquier momento desde la configuración. Tus datos serán eliminados según las regulaciones de protección de datos."
-  },
-  "trialLimits": {
-    "title": "Límites de la prueba gratuita",
-    "messagesDay": "Mensajes/día",
-    "voiceMinutes": "Minutos de voz",
-    "toolsDay": "Herramientas/día",
-    "maestriAvailable": "Maestros disponibles",
-    "trialDescription": "Estás usando la versión de prueba gratuita. Solicita acceso beta para límites ilimitados y funciones avanzadas."
   }
 }

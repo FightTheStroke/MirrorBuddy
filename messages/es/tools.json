@@ -33,7 +33,7 @@
       },
       "studyTip": {
         "title": "Consejo de estudio",
-        "description": "Comienza con un <strong>Mapa mental</strong> para tener una visión general, luego crea <strong>Tarjetas</strong> para memorizar los conceptos clave, y finalmente verifica tu preparación con un <strong>Quiz</strong>. ¡Todos los materiales se guardarán en tu <strong>mochila</strong>!"
+        "description": "Comienza con un <strongNode>Mapa mental</strongNode> para tener una visión general, luego crea <strongNode>Tarjetas</strongNode> para memorizar los conceptos clave, y finalmente verifica tu preparación con un <strongNode>Quiz</strongNode>. ¡Todos los materiales se guardarán en tu <strongNode>mochila</strongNode>!"
       }
     },
     "backButton": "Botón atrás",

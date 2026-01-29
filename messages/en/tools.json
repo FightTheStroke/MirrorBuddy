@@ -33,7 +33,7 @@
       },
       "studyTip": {
         "title": "Study Tip",
-        "description": "Start with a <strong>Mind Map</strong> to get an overview, then create <strong>Flashcards</strong> to memorize key concepts, and finally test your preparation with a <strong>Quiz</strong>. All materials will be saved in your <strong>Backpack</strong>!"
+        "description": "Start with a <strongNode>Mind Map</strongNode> to get an overview, then create <strongNode>Flashcards</strongNode> to memorize key concepts, and finally test your preparation with a <strongNode>Quiz</strongNode>. All materials will be saved in your <strongNode>Backpack</strongNode>!"
       }
     },
     "backButton": "Back Button",

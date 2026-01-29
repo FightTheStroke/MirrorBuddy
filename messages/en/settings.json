@@ -168,9 +168,9 @@
         "reducedMotion": "Reduced animations",
         "keyboardNav": "Keyboard navigation"
       },
-      "a11yActivateProfile": "A11y Activate Profile",
-      "a11yActiveProfile": "A11y Active Profile",
-      "a11yOpenSettings": "A11y Open Settings",
+      "a11yActivateProfile": "Activate accessibility profile",
+      "a11yActiveProfile": "Accessibility profile active",
+      "a11yOpenSettings": "Open accessibility settings",
       "adhdInfo": "Adhd Info",
       "adhdTitle": "Adhd Title",
       "allSettings": "All Settings",

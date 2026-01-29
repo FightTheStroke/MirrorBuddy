@@ -4,6 +4,7 @@
     "loading": "Cargando...",
     "seasonDefault": "Otoño",
     "navigation": {
+      "skipToContent": "Saltar al contenido principal",
       "professors": "Profesores",
       "calendar": "Calendario",
       "progress": "Progreso",

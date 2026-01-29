@@ -841,6 +841,12 @@
       "section4": {
         "title": "Come usiamo i tuoi dati",
         "intro": "Usiamo i tuoi dati solo per questi scopi legittimi:",
+        "itemLabels": {
+          "appFunctionality": "Funzionalità dell'app",
+          "personalization": "Personalizzazione",
+          "improvement": "Miglioramento del servizio",
+          "support": "Assistenza e supporto"
+        },
         "items": {
           "appFunctionality": "Caricare le tue conversazioni, flashcard e progresso",
           "personalization": "Adattare i maestri ai tuoi interessi e livello di apprendimento",
@@ -866,6 +872,11 @@
       "section6": {
         "title": "Chi accede ai tuoi dati",
         "intro": "I tuoi dati personali sono accessibili a:",
+        "itemLabels": {
+          "you": "Tu (Utente)",
+          "parents": "Genitori",
+          "team": "Team MirrorBuddy"
+        },
         "items": {
           "you": "Tu hai sempre il controllo totale dei tuoi dati e puoi scaricarli, modificarli o eliminarli",
           "parents": "I tuoi genitori possono monitorare il tuo progresso tramite il Parent Dashboard (se minore)",

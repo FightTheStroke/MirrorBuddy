@@ -847,7 +847,13 @@
           "improvement": "Verstehe, wie du MirrorBuddy nutzt, um neue Funktionen hinzuzufügen (mit optionalen Analysen)",
           "support": "Helfe dir bei technischen oder pädagogischen Problemen"
         },
-        "disclaimer": "Wir verwenden deine Daten nicht für automatische Profilierung, gezielte Werbung oder Entscheidungen über dich ohne menschliche Beteiligung."
+        "disclaimer": "Wir verwenden deine Daten nicht für automatische Profilierung, gezielte Werbung oder Entscheidungen über dich ohne menschliche Beteiligung.",
+        "itemLabels": {
+          "appFunctionality": "App-Funktionalität",
+          "personalization": "Personalisierung",
+          "improvement": "Serviceverbesserung",
+          "support": "Hilfe und Support"
+        }
       },
       "section5": {
         "title": "Optionale Analysen und Tracking",
@@ -885,7 +891,12 @@
           "ollama": "Ollama (optionale lokale KI-Modelle, alles auf dem Gerät)"
         },
         "noOtherAccess": "Kein anderer Dienst hat Zugriff auf deine Daten. Wir verkaufen Daten nicht an Dritte.",
-        "extraEUNote": "Hinweis: Azure OpenAI verarbeitet einige Gesprächsdaten in den USA mit Standard Contractual Clauses (SCC) gemäß DSGVO Art. 46."
+        "extraEUNote": "Hinweis: Azure OpenAI verarbeitet einige Gesprächsdaten in den USA mit Standard Contractual Clauses (SCC) gemäß DSGVO Art. 46.",
+        "itemLabels": {
+          "you": "Sie (Benutzer)",
+          "parents": "Eltern",
+          "team": "MirrorBuddy-Team"
+        }
       },
       "section7": {
         "title": "Rechtsgrundlagen für die Verarbeitung",

@@ -4,6 +4,7 @@
     "loading": "Loading...",
     "seasonDefault": "Autumn",
     "navigation": {
+      "skipToContent": "Skip to content",
       "professors": "Professors",
       "calendar": "Calendar",
       "progress": "Progress",

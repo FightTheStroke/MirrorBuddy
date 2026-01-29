@@ -510,7 +510,7 @@
         "email": "consultas@aepd.es",
         "website": "www.aepd.es",
         "responseTime": "30 días",
-        "escalationTime": "Puede presentar una reclamación ante la AEPD si considera que sus derechos no se respetan."
+        "escalationTime": "Puede presentar una reclamación ante la AEPD por cuestiones relacionadas con la protección de datos."
       },
       "italy": {
         "name": "Italia",
@@ -535,14 +535,6 @@
         "website": "www.bfdi.bund.de",
         "responseTime": "30 días",
         "escalationTime": "Puede presentar una reclamación ante la BfDI si tiene preocupaciones sobre la protección de datos."
-      },
-      "spain": {
-        "name": "España",
-        "authority": "AEPD (Agencia Española de Protección de Datos)",
-        "email": "consultas@aepd.es",
-        "website": "www.aepd.es",
-        "responseTime": "30 días",
-        "escalationTime": "Puede presentar una reclamación ante la AEPD por cuestiones relacionadas con la protección de datos."
       },
       "uk": {
         "name": "Reino Unido",
@@ -855,7 +847,13 @@
           "improvement": "Comprender cómo utilizas MirrorBuddy para agregar nuevas funciones (con análisis opcionales)",
           "support": "Ayudarte si experimentas problemas técnicos o pedagógicos"
         },
-        "disclaimer": "No utilizamos tus datos para perfiles automatizados, publicidad dirigida o decisiones sobre ti sin intervención humana."
+        "disclaimer": "No utilizamos tus datos para perfiles automatizados, publicidad dirigida o decisiones sobre ti sin intervención humana.",
+        "itemLabels": {
+          "appFunctionality": "Funcionalidad de la aplicación",
+          "personalization": "Personalización",
+          "improvement": "Mejora del servicio",
+          "support": "Asistencia y soporte"
+        }
       },
       "section5": {
         "title": "Análisis Opcionales y Seguimiento",
@@ -893,7 +891,12 @@
           "ollama": "Ollama (modelos de IA locales opcionales, todo en el dispositivo)"
         },
         "noOtherAccess": "Ningún otro servicio tiene acceso a tus datos. No vendemos datos a terceros.",
-        "extraEUNote": "Nota: Azure OpenAI procesa algunos datos conversacionales en EE.UU. con Cláusulas Contractuales Estándar (CCE) según RGPD Art. 46."
+        "extraEUNote": "Nota: Azure OpenAI procesa algunos datos conversacionales en EE.UU. con Cláusulas Contractuales Estándar (CCE) según RGPD Art. 46.",
+        "itemLabels": {
+          "you": "Tú (Usuario)",
+          "parents": "Padres",
+          "team": "Equipo MirrorBuddy"
+        }
       },
       "section7": {
         "title": "Bases Legales del Tratamiento",

@@ -33,7 +33,7 @@
       },
       "studyTip": {
         "title": "Lerntipp",
-        "description": "Beginnen Sie mit einer <strong>Mind Map</strong> für einen Überblick, erstellen Sie dann <strong>Flashcards</strong>, um Schlüsselkonzepte zu merken, und testen Sie schließlich Ihre Vorbereitung mit einem <strong>Quiz</strong>. Alle Materialien werden in Ihrem <strong>Rucksack</strong> gespeichert!"
+        "description": "Beginnen Sie mit einer <strongNode>Mind Map</strongNode> für einen Überblick, erstellen Sie dann <strongNode>Flashcards</strongNode>, um Schlüsselkonzepte zu merken, und testen Sie schließlich Ihre Vorbereitung mit einem <strongNode>Quiz</strongNode>. Alle Materialien werden in Ihrem <strongNode>Rucksack</strongNode> gespeichert!"
       }
     },
     "backButton": "Zurück",

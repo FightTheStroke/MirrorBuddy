@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
@@ -46,6 +46,8 @@ export default function Home() {
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
     useOnboardingStore();
 
+  const mainContentRef = useRef<HTMLElement>(null);
+
   useEffect(() => {
     hydrateFromApi();
   }, [hydrateFromApi]);
@@ -75,6 +77,13 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Handle focus when view changes to improve accessibility
+  useEffect(() => {
+    if (mainContentRef.current && isHydrated) {
+      mainContentRef.current.focus();
+    }
+  }, [currentView, isHydrated]);
 
   const {
     seasonMirrorBucks,
@@ -189,6 +198,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      {/* Skip Link for Accessibility */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent-themed focus:text-white focus:rounded-lg focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-accent-themed"
+      >
+        {t("navigation.skipToContent")}
+      </a>
+
       <h1 className="sr-only">{t("appTitle")}</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
@@ -225,7 +242,12 @@ export default function Home() {
           sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
       >
-        <main className="min-h-screen flex-1">
+        <main
+          id="main-content"
+          ref={mainContentRef}
+          tabIndex={-1}
+          className="min-h-screen flex-1 outline-none"
+        >
           {/* Trial mode banner */}
           {trialStatus.isTrialMode && !trialStatus.isLoading && (
             <TrialHomeBanner

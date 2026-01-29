@@ -841,6 +841,12 @@
       "section4": {
         "title": "How We Use Your Data",
         "intro": "We use your data only for these legitimate purposes:",
+        "itemLabels": {
+          "appFunctionality": "App Functionality",
+          "personalization": "Personalization",
+          "improvement": "Service Improvement",
+          "support": "Assistance and Support"
+        },
         "items": {
           "appFunctionality": "Load your conversations, flashcards and progress",
           "personalization": "Adapt the maestri to your interests and learning level",
@@ -866,6 +872,11 @@
       "section6": {
         "title": "Who Can Access Your Data",
         "intro": "Your personal data is accessible to:",
+        "itemLabels": {
+          "you": "You (User)",
+          "parents": "Parents",
+          "team": "MirrorBuddy Team"
+        },
         "items": {
           "you": "You have complete control of your data and can download, modify or delete it",
           "parents": "Your parents can monitor your progress via the Parent Dashboard (if you are a minor)",

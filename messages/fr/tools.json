@@ -33,7 +33,7 @@
       },
       "studyTip": {
         "title": "Conseil d'étude",
-        "description": "Commencez par une <strong>Carte Mentale</strong> pour avoir une vue d'ensemble, puis créez des <strong>Flashcards</strong> pour mémoriser les concepts clés, et enfin testez votre préparation avec un <strong>Quiz</strong>. Tous les supports seront enregistrés dans votre <strong>Sac à dos</strong> !"
+        "description": "Commencez par une <strongNode>Carte Mentale</strongNode> pour avoir une vue d'ensemble, puis créez des <strongNode>Flashcards</strongNode> pour mémoriser les concepts clés, et enfin testez votre préparation avec un <strongNode>Quiz</strongNode>. Tous les supports seront enregistrés dans votre <strongNode>Sac à dos</strongNode> !"
       }
     },
     "backButton": "Back Button",
