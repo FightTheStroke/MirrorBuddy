@@ -86,7 +86,7 @@ describe("providers", () => {
       expect(result).toEqual({
         provider: "ollama",
         endpoint: "http://localhost:11434",
-        model: process.env.OLLAMA_MODEL || "llama3.2",
+        model: "llama3.2",
       });
     });
 

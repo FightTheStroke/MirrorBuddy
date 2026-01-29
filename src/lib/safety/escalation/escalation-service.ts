@@ -164,9 +164,7 @@ export async function escalateCrisisDetected(
   });
 
   escalationBuffer.push(event);
-  if (escalationConfig.autoNotifyAdmin) {
-    await notifyAdmin(event, escalationConfig.adminEmail);
-  }
+  await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
   log.warn("CRISIS ESCALATION", { eventId: event.id });
@@ -195,9 +193,7 @@ export async function escalateRepeatedJailbreak(
   });
 
   escalationBuffer.push(event);
-  if (escalationConfig.autoNotifyAdmin) {
-    await notifyAdmin(event, escalationConfig.adminEmail);
-  }
+  await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
   log.warn("JAILBREAK ESCALATION", { eventId: event.id, attemptCount });
@@ -230,9 +226,7 @@ export async function escalateSevereContentFilter(
   });
 
   escalationBuffer.push(event);
-  if (escalationConfig.autoNotifyAdmin) {
-    await notifyAdmin(event, escalationConfig.adminEmail);
-  }
+  await notifyAdmin(event, escalationConfig.adminEmail);
   await storeEscalationEvent(event, escalationConfig.storeInDatabase);
 
   log.warn("CONTENT FILTER ESCALATION", {

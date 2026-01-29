@@ -212,14 +212,12 @@ export async function calculateAndPublishAdminCounts(
  */
 export function triggerAdminCountsUpdate(eventType: string = "manual"): void {
   // Fire and forget - don't await
-  // We return the promise internally to allow tests to await it if needed,
-  // but the type signature remains 'void' for app code compatibility.
-  return calculateAndPublishAdminCounts(eventType).catch((error) => {
+  calculateAndPublishAdminCounts(eventType).catch((error) => {
     log.error("Unhandled error in async admin counts trigger", {
       eventType,
       error,
     });
-  }) as unknown as void;
+  });
 }
 
 /**
