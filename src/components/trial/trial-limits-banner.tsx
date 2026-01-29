@@ -75,9 +75,9 @@ export function TrialLimitsBanner({
         className,
       )}
     >
-      <h3 className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-3">
+      <p className="font-semibold text-sm text-purple-900 dark:text-purple-100 mb-3">
         {t("title")}
-      </h3>
+      </p>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {/* Daily chats */}

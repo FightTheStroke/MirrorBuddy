@@ -157,9 +157,9 @@ describe("TrialLimitsBanner", () => {
     it("renders with semantic structure", () => {
       render(<TrialLimitsBanner />);
 
-      // Check for heading
-      const heading = screen.getByText("Limiti della prova gratuita");
-      expect(heading.tagName).toBe("H3");
+      // Check for title (p instead of h3 to avoid heading-order violations)
+      const title = screen.getByText("Limiti della prova gratuita");
+      expect(title.tagName).toBe("P");
     });
 
     it("provides icons for visual context", () => {

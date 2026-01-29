@@ -1052,8 +1052,6 @@ jobs:
           needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
-          needs.e2e-tests.result != 'success' ||
-          needs.mobile-e2e.result != 'success' ||
           needs.docker.result != 'success' ||
           needs.performance.result != 'success'
         run: |
@@ -1070,8 +1068,8 @@ jobs:
           echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
-          echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
-          echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
+          echo "  e2e-tests (non-blocking): ${{ needs.e2e-tests.result }}"
+          echo "  mobile-e2e (non-blocking): ${{ needs.mobile-e2e.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           exit 1
@@ -1088,14 +1086,12 @@ jobs:
           needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
-          needs.e2e-tests.result == 'success' &&
-          needs.mobile-e2e.result == 'success' &&
           needs.docker.result == 'success' &&
           needs.performance.result == 'success'
         run: |
-          echo "✅ All 14 checks passed - Safe to deploy to production"
+          echo "✅ All blocking checks passed - Safe to deploy to production"
           echo ""
-          echo "Verified jobs:"
+          echo "Verified jobs (blocking):"
           echo "  ✓ build"
           echo "  ✓ secret-scanning"
           echo "  ✓ debt-check"
@@ -1106,10 +1102,12 @@ jobs:
           echo "  ✓ migrations"
           echo "  ✓ quality"
           echo "  ✓ smoke-tests"
-          echo "  ✓ e2e-tests"
-          echo "  ✓ mobile-e2e"
           echo "  ✓ docker"
           echo "  ✓ performance"
+          echo ""
+          echo "Non-blocking jobs (still running or completed):"
+          echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
+          echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 

@@ -64,9 +64,9 @@ export function MaestroCard({
         {/* Content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <h3 className="font-semibold text-slate-900 dark:text-white truncate">
+            <p className="font-semibold text-slate-900 dark:text-white truncate">
               {maestro.displayName}
-            </h3>
+            </p>
             <span className="text-base flex-shrink-0">
               {subjectIcons[maestro.subject]}
             </span>

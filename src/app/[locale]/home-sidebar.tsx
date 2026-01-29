@@ -116,7 +116,7 @@ export function HomeSidebar({
           <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
             <div className="flex flex-col gap-2">
               {open && (
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
                   {t("sidebar.trialMode")}
                 </span>
               )}

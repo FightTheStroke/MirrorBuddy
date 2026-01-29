@@ -84,7 +84,7 @@ export function TrialHomeBanner({
           </div>
 
           <div className="flex-1 min-w-0">
-            <h3
+            <p
               className={cn(
                 "font-semibold text-sm",
                 isLow
@@ -95,7 +95,7 @@ export function TrialHomeBanner({
               {isLow
                 ? "Messaggi quasi esauriti!"
                 : "Stai usando la versione di prova"}
-            </h3>
+            </p>
 
             {/* Progress bar */}
             <div className="mt-2 flex items-center gap-3">
