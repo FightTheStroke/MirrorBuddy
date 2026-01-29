@@ -10,8 +10,10 @@ export default defineConfig({
     setupFiles: ["./src/test/setup.ts"],
     // Retry flaky tests on CI (F-07)
     retry: process.env.CI ? 2 : 0,
-    // JSON reporter for flaky test tracking
-    reporters: process.env.CI ? ["default", "json"] : ["default"],
+    // Bail on first failure locally for fast feedback; run all in CI
+    bail: process.env.CI ? 0 : 1,
+    // Minimal reporter locally (dot) to reduce token usage; full in CI
+    reporters: process.env.CI ? ["default", "json"] : ["dot"],
     outputFile: process.env.CI ? "./coverage/test-results.json" : undefined,
     // Tests that modify i18n files should run with proper isolation
     // Using hooks: "list" ensures beforeAll/afterAll run in correct order
