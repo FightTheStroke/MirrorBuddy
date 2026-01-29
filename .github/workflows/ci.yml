@@ -1033,8 +1033,6 @@ jobs:
       - migrations
       - quality
       - smoke-tests
-      - e2e-tests
-      - mobile-e2e
       - docker
       - performance
       - sentry-config
@@ -1068,8 +1066,6 @@ jobs:
           echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
-          echo "  e2e-tests (non-blocking): ${{ needs.e2e-tests.result }}"
-          echo "  mobile-e2e (non-blocking): ${{ needs.mobile-e2e.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           exit 1
@@ -1105,9 +1101,9 @@ jobs:
           echo "  ✓ docker"
           echo "  ✓ performance"
           echo ""
-          echo "Non-blocking jobs (still running or completed):"
-          echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
-          echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
+          echo "Non-blocking jobs (run independently):"
+          echo "  e2e-tests: runs separately, does not block deploy"
+          echo "  mobile-e2e: runs separately, does not block deploy"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 
