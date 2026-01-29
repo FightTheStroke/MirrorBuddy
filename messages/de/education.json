@@ -440,13 +440,19 @@
         "suggestedBy": "Suggested by"
       },
       "tabs": {
-        "accessibility": "Accessibility",
-        "guide": "Guide",
-        "observations": "Observations",
-        "overview": "Overview",
-        "progress": "Progresso"
+        "accessibility": "Barrierefreiheit",
+        "guide": "Leitfaden",
+        "observations": "Beobachtungen",
+        "overview": "Übersicht",
+        "progress": "Fortschritt"
       },
-      "profileTitle": "Profile Title"
+      "strengths": "Stärken",
+      "growthAreas": "Wachstumsbereiche",
+      "strategies": "Vorgeschlagene Strategien",
+      "learningStyle": "Lernstil",
+      "motivators": "Was sie motiviert",
+      "lastUpdated": "Zuletzt aktualisiert: {date}",
+      "profileTitle": "Profil von {studentName}"
     },
     "quizCompletion": {
       "continueButton": "Continue button",

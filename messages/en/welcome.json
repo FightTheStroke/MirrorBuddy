@@ -1,19 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - The School I Want",
-    "loading": "Loading...",
-    "seasonDefault": "Autumn",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professors",
-      "astuccio": "Pencil Case",
-      "zaino": "Backpack",
-      "calendar": "Calendar",
-      "progress": "Progress",
-      "settings": "Settings",
-      "skipToContent": "Skip to content"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Loading...",
@@ -21,15 +6,24 @@
     },
     "hero": {
       "welcome": "Welcome to",
+      "welcomeBack": "Welcome back,",
+      "welcomeBackSubtitle": "What are we learning new today?",
+      "betaBadge": "Private Beta",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Learn",
-      "with-teachers": "WITH the Great Professors",
-      "any-ability": "regardless of your abilities",
+      "withTeachers": "with the Great Professors",
+      "anyAbility": "regardless of your abilities",
+      "tagline": "Your tailored school, with history's masters",
       "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historic Professors accompany you personally.",
-      "readable-fonts": "Readable fonts",
-      "mind-maps": "Mind maps",
-      "text-to-speech": "Text to speech",
-      "adaptive-quizzes": "Adaptive quizzes",
-      "cta": "Start Now"
+      "readableFonts": "Readable fonts",
+      "mindMaps": "Mind maps",
+      "textToSpeech": "Text to speech",
+      "adaptiveQuizzes": "Adaptive quizzes",
+      "cta": "Start Now",
+      "welcomeNew": "Welcome to MirrorBuddy",
+      "accessibility": {
+        "title": "Tailored accessibility for you"
+      }
     },
     "principles": {
       "welcome-to-school": "Welcome to The School I Want, {name}!",
@@ -73,6 +67,56 @@
       "school-elementary": "Elementary",
       "school-middle": "Middle school",
       "school-high": "High school"
+    },
+    "ageYears": "years old",
+    "trial": {
+      "title": "Free trial limits",
+      "trialDescription": "You are using the free trial version. To unlock unlimited use and all features, request full access.",
+      "messagesDay": "messages / day",
+      "voiceMinutes": "voice minutes / day",
+      "toolsDay": "tools / day",
+      "maestriAvailable": "professors available"
+    },
+    "tiers": {
+      "heading": "Choose the right plan for you",
+      "subtitle": "MirrorBuddy is free for all students during the beta phase.",
+      "recommended": "Recommended",
+      "trial": {
+        "name": "Trial",
+        "tagline": "To start right away",
+        "price": "Free",
+        "cta": "Start Now",
+        "features": {
+          "maestri": "3 Professors",
+          "messages": "10 messages / day",
+          "voice": "5 voice minutes / day",
+          "tools": "10 tools / day"
+        }
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "For those who want more",
+        "price": "Free",
+        "cta": "Try for Free",
+        "features": {
+          "maestri": "10 Professors",
+          "messages": "30 messages / day",
+          "voice": "15 voice minutes / day",
+          "tools": "Unlimited"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "The full experience",
+        "price": "Free",
+        "cta": "Try for Free",
+        "features": {
+          "maestri": "22 Professors",
+          "messages": "Unlimited messages",
+          "voice": "Unlimited voice",
+          "tools": "Unlimited"
+        }
+      }
     }
   }
 }

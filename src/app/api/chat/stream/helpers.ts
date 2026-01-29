@@ -187,7 +187,10 @@ export function checkInputSafety(
   content: string,
 ): { blocked: true; response: string } | null {
   const filterResult = filterInput(content);
-  if (!filterResult.safe && filterResult.action === "block") {
+  if (
+    !filterResult.safe &&
+    (filterResult.action === "block" || filterResult.action === "redirect")
+  ) {
     return {
       blocked: true,
       response: filterResult.suggestedResponse || "Content blocked.",

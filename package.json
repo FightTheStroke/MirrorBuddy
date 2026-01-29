@@ -69,7 +69,9 @@
     "postinstall": "prisma generate",
     "seed:admin": "tsx scripts/seed-admin.ts",
     "seed:tiers": "tsx prisma/seed-tiers.ts",
-    "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
+    "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'",
+    "research:nightly": "tsx scripts/research/nightly-sim-runner.ts",
+    "research:benchmark": "tsx src/lib/research/edge-vs-cloud.ts"
   },
   "overrides": {
     "hono": "4.11.7",

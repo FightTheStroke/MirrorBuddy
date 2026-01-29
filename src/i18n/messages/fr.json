@@ -1877,62 +1877,39 @@
     }
   },
   "compliance": {
-    "page": {
-      "title": "Conformité et transparence",
-      "subtitle": "MirrorBuddy est conçu en conformité avec les réglementations européennes et françaises sur l'intelligence artificielle et la protection des données."
-    },
-    "badges": {
-      "conformity": "Conformité réglementaire"
-    },
-    "sections": {
-      "publicDocs": "Documents publics",
-      "technicalDocs": "Documentation technique",
-      "documentation": "Documentation détaillée disponible dans le dépôt open source."
-    },
-    "contact": {
-      "title": "Questions sur la conformité ?",
-      "text": "Pour des questions sur la confidentialité, la protection des données ou la conformité de l'IA, contactez-nous :"
-    }
+    "pageTitle": "Conformité et Transparence",
+    "pageDescription": "MirrorBuddy est conçu en conformité avec les réglementations européennes et italiennes en matière d'intelligence artificielle et de protection des données.",
+    "complianceBadgeTitle": "Conformité Réglementaire",
+    "publicDocuments": "Documents Publics",
+    "technicalDocuments": "Documentation Technique",
+    "technicalDescription": "Documentation détaillée disponible dans le référentiel open source.",
+    "questionsTitle": "Questions sur la Conformité?",
+    "questionsDescription": "Pour des questions sur la confidentialité, la protection des données ou la conformité IA, contactez-nous:",
+    "aiTransparency": "Transparence IA",
+    "aiTransparencyDesc": "Comment fonctionne l'intelligence artificielle dans MirrorBuddy et quelles données elle utilise",
+    "aiPolicy": "Politique IA",
+    "aiPolicyDesc": "Nos principes éthiques et garanties pour une utilisation responsable de l'IA",
+    "privacyPolicy": "Politique de Confidentialité",
+    "privacyPolicyDesc": "Comment nous collectons, utilisons et protégeons vos données personnelles",
+    "termsOfService": "Conditions d'Utilisation",
+    "termsDesc": "Les conditions d'utilisation de la plateforme MirrorBuddy",
+    "cookiePolicy": "Politique sur les Cookies",
+    "cookieDesc": "Quels cookies nous utilisons et comment les gérer",
+    "dpia": "DPIA",
+    "dpiaDesc": "Analyse d'impact sur la protection des données (RGPD Art. 35)",
+    "modelCard": "Fiche Technique du Modèle",
+    "modelCardDesc": "Spécifications techniques du système IA, performances et limitations",
+    "aiLiteracy": "Littératie IA",
+    "aiLiteracyDesc": "Guide éducatif sur le fonctionnement de l'IA et comment l'utiliser de manière critique",
+    "biasAudit": "Rapport d'Audit de Biais",
+    "biasAuditDesc": "Analyse d'équité et de non-discrimination du système IA",
+    "riskManagement": "Gestion des Risques",
+    "riskManagementDesc": "Cadre de gestion des risques et registre des risques IA"
   },
   "supporti": {
     "pageTitle": "Cartable",
     "errorTitle": "Quelque chose s'est mal passé",
-    "reloadButton": "Recharger la page",
-    "allSupports": "Tous les Matériaux",
-    "favorites": "Favoris",
-    "byType": "Par Type",
-    "bySubject": "Par Matière",
-    "byProfessor": "Par Professeur",
-    "search": {
-      "placeholder": "Rechercher vos matériaux...",
-      "label": "Rechercher les matériaux",
-      "clear": "Effacer la recherche"
-    },
-    "results": {
-      "singular": "résultat",
-      "plural": "résultats"
-    },
-    "filters": {
-      "reset": "Réinitialiser les filtres"
-    },
-    "sort": {
-      "label": "Trier par",
-      "placeholder": "Trier par"
-    },
-    "view": {
-      "grid": "Vue grille",
-      "list": "Vue liste"
-    },
-    "voiceSearch": {
-      "stop": "Arrêter la recherche vocale",
-      "start": "Démarrer la recherche vocale"
-    },
-    "emptyState": {
-      "backpackEmpty": "Votre Sac est vide",
-      "startCreating": "Commencez à créer du matériel d'étude avec les Maîtres ! Allez à la Trousse pour choisir un outil.",
-      "goToToolcase": "Aller à la Trousse"
-    },
-    "loadingMaterials": "Chargement du matériel..."
+    "reloadButton": "Recharger la page"
   },
   "admin": {
     "invites": {
@@ -1954,14 +1931,7 @@
       "rejectionReason": "Motif du rejet",
       "optional": "Optionnel",
       "cancel": "Annuler",
-      "confirmRejection": "Confirmer le rejet",
-      "reject-modal": {
-        "title": "Rejeter la demande",
-        "reason-label": "Motif du rejet",
-        "placeholder": "Optionnel",
-        "cancel-button": "Annuler",
-        "confirm-button": "Confirmer le rejet"
-      }
+      "confirmRejection": "Confirmer le rejet"
     },
     "locales": {
       "search": "Rechercher par code pays, nom, locale ou maestro...",
@@ -1980,54 +1950,7 @@
     },
     "settings": {
       "title": "Paramètres",
-      "subtitle": "Configuration du système MirrorBuddy",
-      "system-info": {
-        "title": "System Info",
-        "description": "Informations système",
-        "version": "Version",
-        "environment": "Environnement",
-        "node-version": "Node :",
-        "build-date": "Build"
-      },
-      "trial-budget": {
-        "title": "Trial Budget",
-        "description": "Limite de budget pour les utilisateurs en essai",
-        "per-month": "/mois",
-        "configured-via": "Configuré via var env",
-        "description-text": "Ce montant définit la limite budgétaire mensuelle maximale pour les utilisateurs en essai. La valeur est lue à partir de la variable d'environnement et ne peut pas être modifiée à partir de cette interface."
-      }
-    },
-    "users": {
-      "page-title": "Gestion des Utilisateurs",
-      "confirm-delete": "Confirmer la suppression ?",
-      "tabs": {
-        "all": "Tous",
-        "active": "Actifs",
-        "disabled": "Désactivés",
-        "trash": "Corbeille"
-      },
-      "table": {
-        "username": "Nom d'utilisateur",
-        "email": "Email",
-        "role": "Rôle",
-        "tier": "Tier",
-        "status": "Statut",
-        "created": "Créé",
-        "deleted": "Supprimé",
-        "actions": "Actions"
-      },
-      "empty-message": "Aucun utilisateur trouvé",
-      "trash-empty": "Corbeille vide",
-      "bulkActions": {
-        "selected": "sélectionnés",
-        "changeTier": "Changer le niveau",
-        "enable": "Activer",
-        "disable": "Désactiver",
-        "delete": "Supprimer",
-        "confirmDisable": "Désactiver {count} utilisateurs ?",
-        "confirmEnable": "Activer {count} utilisateurs ?",
-        "confirmDelete": "Supprimer définitivement {count} utilisateurs ?"
-      }
+      "subtitle": "Configuration du système MirrorBuddy"
     },
     "tiers": {
       "page": {
@@ -2036,9 +1959,7 @@
         "newTier": "New Tier",
         "createNew": "Create a new subscription plan",
         "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}",
-        "conversionFunnelButton": "Conversion Funnel",
-        "analyticsButton": "Analytics"
+        "editMessage": "Edit tier: {name}"
       },
       "table": {
         "code": "Code",
@@ -2145,16 +2066,12 @@
         "totalMessagesCol": "Total Messages",
         "averageCol": "Average/User",
         "activityRate": "Activity Rate",
-        "status": "Status",
-        "active": "Active",
-        "inactive": "Inactive",
         "noPlans": "No tiers available",
         "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
       },
       "conversionFunnel": {
         "title": "Tier Conversion Funnel",
         "subtitle": "User progression through tier stages",
-        "backToTiers": "Back to Tiers",
         "period": "{start} to {end}",
         "trialToBase": "Trial → Base",
         "baseToProRate": "Base → Pro",
@@ -2176,76 +2093,6 @@
         "adminRequired": "Admin access required",
         "loadFailed": "Failed to fetch audit logs"
       }
-    },
-    "components": {
-      "bulkActionBar": {
-        "selected": "{count} sélectionné(s)",
-        "deselect": "Désélectionner",
-        "reject": "Refuser",
-        "approve": "Approuver",
-        "rejectReason": "Motif du refus (optionnel)",
-        "cancel": "Annuler",
-        "completedAlert": "Terminé : {processed} réussi(s), {failed} échoué(s)"
-      },
-      "directInviteModal": {
-        "titleCreate": "Invitation directe",
-        "titleSuccess": "Utilisateur créé",
-        "successMessage": "L'utilisateur a été créé et recevra un e-mail avec les identifiants d'accès.",
-        "generatedUsername": "Nom d'utilisateur généré",
-        "copyUsername": "Copier le nom d'utilisateur",
-        "close": "Fermer",
-        "emailPlaceholder": "utilisateur@exemple.com",
-        "nameLabel": "Nom (optionnel)",
-        "namePlaceholder": "Jean Dupont",
-        "emailHelpText": "L'utilisateur recevra un e-mail contenant le nom d'utilisateur et un mot de passe temporaire pour se connecter.",
-        "cancel": "Annuler",
-        "creating": "Création en cours...",
-        "createUser": "Créer un utilisateur"
-      },
-      "localeForm": {
-        "backButton": "Retour aux configurations régionales",
-        "titleCreate": "Nouvelle Configuration Régionale",
-        "titleEdit": "Modifier la Configuration Régionale",
-        "saving": "Enregistrement...",
-        "save": "Enregistrer",
-        "cancel": "Annuler"
-      },
-      "localeFormFields": {
-        "countryCodeLabel": "Code Pays (ISO 3166-1 alpha-2) *",
-        "countryCodeHelp": "Deux lettres majuscules (ex: IT, FR, DE, ES)",
-        "countryNameLabel": "Nom du Pays *",
-        "countryNamePlaceholder": "France",
-        "primaryLocaleLabel": "Locale Primaire *",
-        "primaryLocaleHelp": "Code langue ISO 639-1 (ex: it, en, fr, de, es)",
-        "maestroLabel": "Maestro de Langue Primaire *",
-        "maestroPlaceholder": "Sélectionnez un maestro...",
-        "maestroHelp": "Le maestro qui enseignera la langue primaire du pays",
-        "secondaryLocalesLabel": "Locales Secondaires (optionnel)",
-        "secondaryLocalesHelp": "Séparées par une virgule (ex: en, de, fr)",
-        "enabledLabel": "Configuration Active"
-      },
-      "localePreviewSelector": {
-        "previewLabel": "Aperçu",
-        "resetButton": "Réinitialiser la locale"
-      }
-    },
-    "analytics": {
-      "resetStats": "Réinitialiser les statistiques",
-      "actionIrreversible": "⚠️ ACTION IRRÉVERSIBLE",
-      "willDeleteAllStats": "Cette action supprimera TOUTES les statistiques et données d'activité :",
-      "userAccountsWillRemain": "Les comptes utilisateurs et les profils RESTERONT intacts.",
-      "typeToConfirm": "Tapez RESET_ALL_STATS pour confirmer :",
-      "confirmReset": "Confirmer la réinitialisation",
-      "pageWillReload": "La page sera rechargée bientôt..."
-    },
-    "sentry": {
-      "unresolved": "non résolu",
-      "notConfigured": "Sentry non configuré. Ajoutez SENTRY_AUTH_TOKEN aux variables d'environnement.",
-      "noUnresolvedErrors": "Aucune erreur non résolue"
-    },
-    "protectedUsers": {
-      "title": "Utilisateurs protégés",
-      "noUsers": "Aucun utilisateur protégé configuré"
     }
   },
   "contact": {
@@ -2350,20 +2197,43 @@
     }
   },
   "home": {
-    "title": "L'École Que Je Veux",
+    "appTitle": "MirrorBuddy",
     "loading": "Chargement...",
+    "seasonDefault": "Automne",
+    "navigation": {
+      "skipToContent": "Aller au contenu principal",
+      "professors": "Professeurs",
+      "calendar": "Calendrier",
+      "progress": "Progrès",
+      "settings": "Paramètres",
+      "zaino": "Sac à dos",
+      "astuccio": "Trousse"
+    },
+    "header": {
+      "openMenu": "Open menu",
+      "streak": "Daily streak",
+      "sessionsThisWeek": "Sessions this week",
+      "studyTime": "Total study time",
+      "questionsAsked": "Questions asked",
+      "trial": "Trial",
+      "trialClickToRequest": "Click to request full access"
+    },
+    "sidebar": {
+      "backToHome": "Back to home",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Close menu",
+      "trialMode": "Trial Mode",
+      "login": "Login",
+      "requestAccess": "Request Access",
+      "adminDashboard": "Admin Dashboard",
+      "adminDashboardAria": "Go to admin dashboard",
+      "parentArea": "Parent Area"
+    },
+    "mirrorBucksShort": "MB",
     "returnHome": "Retour à l'accueil",
-    "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu",
-    "trialMode": "Mode Essai",
-    "login": "Se Connecter",
-    "requestAccess": "Demander l'accès",
-    "parentArea": "Espace Parents",
-    "adminDashboard": "Tableau de Bord Admin",
-    "logout": "Se Déconnecter",
-    "season": {
-      "autumn": "Automne"
-    }
+    "parentArea": "Espace parents",
+    "logout": "Se déconnecter"
   },
   "ambientAudio": {
     "title": "Audio Ambiant",
@@ -2636,225 +2506,6 @@
       "title": "Sticky Keys",
       "description": "Sticky Keys vous permet d'appuyer sur les touches de modification (Maj, Ctrl, Alt, Cmd) une à la fois au lieu de les maintenir enfoncées.",
       "enableButton": "Activer Sticky Keys"
-    }
-  },
-  "compliance": {
-    "pageTitle": "Conformité et Transparence",
-    "pageDescription": "MirrorBuddy est conçu en conformité avec les réglementations européennes et italiennes en matière d'intelligence artificielle et de protection des données.",
-    "complianceBadgeTitle": "Conformité Réglementaire",
-    "publicDocuments": "Documents Publics",
-    "technicalDocuments": "Documentation Technique",
-    "technicalDescription": "Documentation détaillée disponible dans le référentiel open source.",
-    "questionsTitle": "Questions sur la Conformité?",
-    "questionsDescription": "Pour des questions sur la confidentialité, la protection des données ou la conformité IA, contactez-nous:",
-    "aiTransparency": "Transparence IA",
-    "aiTransparencyDesc": "Comment fonctionne l'intelligence artificielle dans MirrorBuddy et quelles données elle utilise",
-    "aiPolicy": "Politique IA",
-    "aiPolicyDesc": "Nos principes éthiques et garanties pour une utilisation responsable de l'IA",
-    "privacyPolicy": "Politique de Confidentialité",
-    "privacyPolicyDesc": "Comment nous collectons, utilisons et protégeons vos données personnelles",
-    "termsOfService": "Conditions d'Utilisation",
-    "termsDesc": "Les conditions d'utilisation de la plateforme MirrorBuddy",
-    "cookiePolicy": "Politique sur les Cookies",
-    "cookieDesc": "Quels cookies nous utilisons et comment les gérer",
-    "dpia": "DPIA",
-    "dpiaDesc": "Analyse d'impact sur la protection des données (RGPD Art. 35)",
-    "modelCard": "Fiche Technique du Modèle",
-    "modelCardDesc": "Spécifications techniques du système IA, performances et limitations",
-    "aiLiteracy": "Littératie IA",
-    "aiLiteracyDesc": "Guide éducatif sur le fonctionnement de l'IA et comment l'utiliser de manière critique",
-    "biasAudit": "Rapport d'Audit de Biais",
-    "biasAuditDesc": "Analyse d'équité et de non-discrimination du système IA",
-    "riskManagement": "Gestion des Risques",
-    "riskManagementDesc": "Cadre de gestion des risques et registre des risques IA"
-  },
-  "supporti": {
-    "pageTitle": "Cartable",
-    "errorTitle": "Quelque chose s'est mal passé",
-    "reloadButton": "Recharger la page"
-  },
-  "admin": {
-    "invites": {
-      "unauthorized": "Non autorisé. Connectez-vous en tant qu'administrateur.",
-      "loadingError": "Erreur de chargement",
-      "approvalError": "Erreur lors de l'approbation",
-      "rejectionError": "Erreur lors du rejet",
-      "error": "Erreur",
-      "pending": "En attente",
-      "approved": "Approuvées",
-      "rejected": "Rejetées",
-      "direct": "Directs (miens)",
-      "all": "Toutes",
-      "directInvite": "Inviter directement",
-      "refresh": "Actualiser",
-      "approve": "Approuver",
-      "reject": "Rejeter",
-      "rejectRequest": "Rejeter la demande",
-      "rejectionReason": "Motif du rejet",
-      "optional": "Optionnel",
-      "cancel": "Annuler",
-      "confirmRejection": "Confirmer le rejet"
-    },
-    "locales": {
-      "search": "Rechercher par code pays, nom, locale ou maestro...",
-      "countryCode": "Code Pays",
-      "countryName": "Nom du Pays",
-      "primaryLocale": "Locale Principale",
-      "languageMaestro": "Maestro de Langue",
-      "secondaryLocales": "Locales Secondaires",
-      "status": "Statut",
-      "actions": "Actions",
-      "active": "Actif",
-      "inactive": "Inactif",
-      "edit": "Modifier",
-      "notFound": "Aucune configuration locale trouvée",
-      "summary": "{count} sur {total} configurations"
-    },
-    "settings": {
-      "title": "Paramètres",
-      "subtitle": "Configuration du système MirrorBuddy"
-    },
-    "tiers": {
-      "page": {
-        "title": "Tier Management",
-        "backToTiers": "Back to Tiers",
-        "newTier": "New Tier",
-        "createNew": "Create a new subscription plan",
-        "editTier": "Edit Tier",
-        "editMessage": "Edit tier: {name}"
-      },
-      "table": {
-        "code": "Code",
-        "name": "Name",
-        "description": "Description",
-        "monthlyPrice": "Monthly Price",
-        "position": "Position",
-        "status": "Status",
-        "actions": "Actions",
-        "active": "Active",
-        "inactive": "Inactive",
-        "edit": "Edit",
-        "search": "Search by code, name or description...",
-        "empty": "No tiers found",
-        "summary": "{current} of {total} tiers"
-      },
-      "form": {
-        "basicInfo": "Basic Information",
-        "code": "Code",
-        "codePlaceholder": "e.g. premium",
-        "codeReadOnly": "Code cannot be modified after creation",
-        "name": "Name",
-        "namePlaceholder": "e.g. Premium Plan",
-        "description": "Description",
-        "descriptionPlaceholder": "Plan description",
-        "monthlyPrice": "Monthly Price (EUR)",
-        "monthlyPricePlaceholder": "9.99",
-        "position": "Position",
-        "positionPlaceholder": "0",
-        "positionHelp": "Display order (0 = first)",
-        "isActive": "Tier active",
-        "limits": "Limits",
-        "chatMessagesDaily": "Daily Chat Messages",
-        "chatMessagesHelp": "Maximum number of messages a user can send per day",
-        "voiceMinutesDaily": "Daily Voice Minutes",
-        "voiceMinutesHelp": "Voice usage minutes available per day for the user",
-        "toolsDaily": "Daily Tools",
-        "toolsHelp": "Maximum number of tools that can be used per day",
-        "docsTotal": "Total Documents",
-        "docsHelp": "Maximum number of documents a user can upload in total",
-        "minError": "Minimum: {min}",
-        "maxError": "Maximum: {max}",
-        "invalidNumber": "Please enter a number",
-        "features": "Features",
-        "featuresNote": "Selected features will be available to users with this plan. Some features may require additional configuration.",
-        "models": "AI Models",
-        "modelsInfo": "Select AI models for each feature. ★ = recommended, ⚠ = not recommended",
-        "mainFeatures": "Main Features",
-        "toolFeatures": "Tools",
-        "notRecommended": "Not recommended for this feature",
-        "quality": "Quality",
-        "speed": "Speed",
-        "education": "Education",
-        "chatModel": "Chat (Conversation)",
-        "realtimeModel": "Voice (Realtime)",
-        "pdfModel": "PDF",
-        "mindmapModel": "Mind Maps",
-        "quizModel": "Quiz",
-        "flashcardsModel": "Flashcards",
-        "summaryModel": "Summaries",
-        "formulaModel": "Formulas",
-        "chartModel": "Charts",
-        "homeworkModel": "Homework",
-        "webcamModel": "Webcam/Vision",
-        "demoModel": "Demo",
-        "tools": "Available Tools",
-        "toolsSelected": "{current} / {total} selected",
-        "selectAll": "Select all",
-        "deselectAll": "Deselect all",
-        "maestri": "Available Maestri",
-        "maestriSelected": "{current} / {total} selected",
-        "coaches": "Available Coaches",
-        "coachesSelected": "{current} / {total} selected",
-        "buddies": "Available Buddies",
-        "buddiesSelected": "{current} / {total} selected",
-        "cancel": "Cancel",
-        "save": "Save",
-        "create": "Create Tier",
-        "update": "Save Changes",
-        "saving": "Saving...",
-        "error": "Error",
-        "requiredFields": "Code and name are required",
-        "saveFailed": "Error saving tier",
-        "success": "Success",
-        "successCreate": "Tier created successfully",
-        "successUpdate": "Tier updated successfully"
-      },
-      "analytics": {
-        "title": "Analytics per Tier",
-        "subtitle": "Usage statistics aggregated for each pricing tier",
-        "totalUsers": "Total Users",
-        "allPlans": "All tiers",
-        "activeUsers": "Active Users",
-        "lastDays": "Last 7 days",
-        "totalMessages": "Total Messages",
-        "allConversations": "All conversations",
-        "averagePerUser": "Average per User",
-        "messagesPerUser": "Messages/user",
-        "details": "Detail per Tier",
-        "plan": "Tier",
-        "code": "Code",
-        "totalUsersCol": "Total Users",
-        "activeUsersCol": "Active Users (7d)",
-        "totalMessagesCol": "Total Messages",
-        "averageCol": "Average/User",
-        "activityRate": "Activity Rate",
-        "noPlans": "No tiers available",
-        "note": "\"Active Users\" are calculated based on activity in the last 7 days. \"Activity Rate\" indicates the percentage of tier users who were recently active."
-      },
-      "conversionFunnel": {
-        "title": "Tier Conversion Funnel",
-        "subtitle": "User progression through tier stages",
-        "period": "{start} to {end}",
-        "trialToBase": "Trial → Base",
-        "baseToProRate": "Base → Pro",
-        "funnelEfficiency": "Funnel Efficiency",
-        "totalTracked": "Total Tracked",
-        "trialUsers": "Trial users",
-        "conversionRate": "Conversion rate",
-        "conversions": "→ {count} conversions",
-        "users": "{count} users",
-        "keyMetrics": "Key Metrics",
-        "detailedAnalysis": "Detailed conversion analysis",
-        "trialToPro": "Trial → Pro (Direct)"
-      },
-      "auditLog": {
-        "title": "Tier Audit Log",
-        "subtitle": "Complete audit trail of all tier and subscription changes",
-        "loading": "Loading audit logs...",
-        "refresh": "Refresh",
-        "adminRequired": "Admin access required",
-        "loadFailed": "Failed to fetch audit logs"
-      }
     }
   }
 }

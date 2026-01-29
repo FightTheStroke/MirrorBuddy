@@ -1,19 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - La escuela que quiero",
-    "loading": "Cargando...",
-    "seasonDefault": "Otoño",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Profesores",
-      "astuccio": "Estuche",
-      "zaino": "Mochila",
-      "calendar": "Calendario",
-      "progress": "Progresos",
-      "settings": "Ajustes",
-      "skipToContent": "Saltar al contenido principal"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Cargando...",
@@ -21,15 +6,24 @@
     },
     "hero": {
       "welcome": "Bienvenido a",
+      "welcomeBack": "Bienvenido de nuevo,",
+      "welcomeBackSubtitle": "¿Qué vamos a aprender de nuevo hoy?",
+      "betaBadge": "Beta Privada",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Aprende",
-      "with-teachers": "CON los Grandes Profesores",
-      "any-ability": "sean cuales sean tus habilidades",
-      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 22 Profesores históricos te acompañan personalmente.",
-      "readable-fonts": "Fuentes legibles",
-      "mind-maps": "Mapas mentales",
-      "text-to-speech": "Síntesis de voz",
-      "adaptive-quizzes": "Cuestionarios adaptativos",
-      "cta": "Empezar Ahora"
+      "withTeachers": "con los Grandes Profesores",
+      "anyAbility": "sean cuales sean tus habilidades",
+      "tagline": "Tu escuela a medida, con los maestros de la historia",
+      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 22 Profesores históricos te acompañano personalmente.",
+      "readableFonts": "Fuentes legibles",
+      "mindMaps": "Mapas mentales",
+      "textToSpeech": "Síntesis de voz",
+      "adaptiveQuizzes": "Cuestionarios adaptativos",
+      "cta": "Empezar Ahora",
+      "welcomeNew": "Bienvenido a MirrorBuddy",
+      "accessibility": {
+        "title": "Accesibilidad a tu medida"
+      }
     },
     "principles": {
       "welcome-to-school": "¡Bienvenido a La escuela que quiero, {name}!",
@@ -44,7 +38,7 @@
       "no-judgment-desc": "Cuestionarios, fichas, mapas mentales y XP para ganar. ¡Estudiar se convierte en una aventura!",
       "melissa-quote": "Recuerda, {name}: no hay una forma incorrecta de aprender. ¡Estoy aquí para ayudarte a encontrar la tuya!",
       "how-it-works": "¿Cómo funciona?",
-      "how-it-works-desc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pregunta a Euclides. Para inglés, ¡está Shakespeare! Yo te ayudaré a elegir al Profesor adecuado para cada situación."
+      "how-it-works-desc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pregunta a Euclide. Para inglés, ¡está Shakespeare! Yo te ayudaré a elegir al Profesor adecuado para cada situación."
     },
     "ready": {
       "perfect": "¡Perfecto, {name}!",
@@ -73,6 +67,56 @@
       "school-elementary": "Primaria",
       "school-middle": "Secundaria",
       "school-high": "Bachillerato"
+    },
+    "ageYears": "años",
+    "trial": {
+      "title": "Límites de la prueba gratuita",
+      "trialDescription": "Estás usando la versión de prueba gratuita. Para desbloquear el uso ilimitado y todas las funciones, solicita el acceso completo.",
+      "messagesDay": "mensajes / día",
+      "voiceMinutes": "minutos de voz / día",
+      "toolsDay": "herramientas / día",
+      "maestriAvailable": "profesores disponibles"
+    },
+    "tiers": {
+      "heading": "Elige el plan adecuado para ti",
+      "subtitle": "MirrorBuddy es gratuito para todos los estudiantes durante la fase beta.",
+      "recommended": "Recomendado",
+      "trial": {
+        "name": "Prueba",
+        "tagline": "Para empezar enseguida",
+        "price": "Gratis",
+        "cta": "Empezar Ahora",
+        "features": {
+          "maestri": "3 Profesores",
+          "messages": "10 mensajes / día",
+          "voice": "5 minutos de voz / día",
+          "tools": "10 herramientas / día"
+        }
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "Para los que quieren más",
+        "price": "Gratis",
+        "cta": "Probar Gratis",
+        "features": {
+          "maestri": "10 Profesores",
+          "messages": "30 mensajes / día",
+          "voice": "15 minutos de voz / día",
+          "tools": "Sin límites"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "La experiencia completa",
+        "price": "Gratis",
+        "cta": "Probar Gratis",
+        "features": {
+          "maestri": "22 Profesores",
+          "messages": "mensajes ilimitados",
+          "voice": "voz ilimitada",
+          "tools": "Sin límites"
+        }
+      }
     }
   }
 }

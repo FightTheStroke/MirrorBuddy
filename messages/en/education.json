@@ -444,9 +444,15 @@
         "guide": "Guide",
         "observations": "Observations",
         "overview": "Overview",
-        "progress": "Progresso"
+        "progress": "Progress"
       },
-      "profileTitle": "Profile Title"
+      "strengths": "Strengths",
+      "growthAreas": "Growth Areas",
+      "strategies": "Suggested Strategies",
+      "learningStyle": "Learning Style",
+      "motivators": "What motivates them",
+      "lastUpdated": "Last updated: {date}",
+      "profileTitle": "{studentName}'s Profile"
     },
     "quizCompletion": {
       "continueButton": "Continue button",

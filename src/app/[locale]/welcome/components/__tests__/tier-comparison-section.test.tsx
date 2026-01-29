@@ -13,7 +13,7 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     expect(
-      screen.getByRole("heading", { name: /scegli il piano/i }),
+      screen.getByRole("heading", { name: /Scegli il piano giusto per te/i }),
     ).toBeInTheDocument();
   });
 
@@ -30,8 +30,8 @@ describe("TierComparisonSection", () => {
 
     // Trial tier should show limited features
     expect(screen.getByText(/3 Professori/i)).toBeInTheDocument();
-    expect(screen.getByText(/10 messaggi\/giorno/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/minuti voce\/giorno/i)).toHaveLength(2);
+    expect(screen.getByText(/10 messaggi \/ giorno/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/minuti voce \/ giorno/i)).toHaveLength(2);
   });
 
   it("displays base tier features", () => {
@@ -39,8 +39,8 @@ describe("TierComparisonSection", () => {
 
     // Base tier should show expanded features
     expect(screen.getByText(/10 Professori/i)).toBeInTheDocument();
-    expect(screen.getByText(/30 messaggi\/giorno/i)).toBeInTheDocument();
-    expect(screen.getByText(/15 minuti voce\/giorno/i)).toBeInTheDocument();
+    expect(screen.getByText(/30 messaggi \/ giorno/i)).toBeInTheDocument();
+    expect(screen.getByText(/15 minuti voce \/ giorno/i)).toBeInTheDocument();
   });
 
   it("displays pro tier features", () => {
@@ -55,13 +55,10 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     expect(
-      screen.getByRole("button", { name: /prova gratis/i }),
+      screen.getByRole("button", { name: /Inizia Ora/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /registrati/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole("button", { name: /passa a pro/i }),
+      screen.getByRole("button", { name: /Prova Gratis/i }),
     ).toBeInTheDocument();
   });
 
@@ -69,7 +66,7 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Pro card should have a "Consigliato" badge
-    expect(screen.getByText(/consigliato/i)).toBeInTheDocument();
+    expect(screen.getByText(/Consigliato/i)).toBeInTheDocument();
   });
 
   it("is responsive on mobile", () => {
@@ -84,11 +81,8 @@ describe("TierComparisonSection", () => {
   it("displays pricing information", () => {
     render(<TierComparisonSection />);
 
-    // Trial and Base are both free (2 occurrences of "Gratis")
+    // All tiers are free during beta
     const gratisElements = screen.getAllByText("Gratuito");
-    expect(gratisElements.length).toBe(2);
-
-    // Pro tier shows custom pricing
-    expect(screen.getByText("Su richiesta")).toBeInTheDocument();
+    expect(gratisElements.length).toBe(3);
   });
 });

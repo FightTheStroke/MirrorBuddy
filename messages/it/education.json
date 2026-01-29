@@ -446,7 +446,13 @@
         "overview": "Overview",
         "progress": "Progresso"
       },
-      "profileTitle": "Profile Title"
+      "strengths": "Punti di Forza",
+      "growthAreas": "Aree di Crescita",
+      "strategies": "Strategie Suggerite",
+      "learningStyle": "Stile di Apprendimento",
+      "motivators": "Cosa lo motiva",
+      "lastUpdated": "Ultimo aggiornamento: {date}",
+      "profileTitle": "Profilo di {studentName}"
     },
     "quizCompletion": {
       "continueButton": "Continue button",

@@ -12,18 +12,8 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { Accessibility } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { A11yStatsData } from "@/app/api/dashboard/a11y-stats/route";
-
-// Profile display names
-const PROFILE_LABELS: Record<string, string> = {
-  dyslexia: "Dislessia",
-  adhd: "ADHD",
-  visual: "Visivo",
-  motor: "Motorio",
-  autism: "Autismo",
-  auditory: "Uditivo",
-  cerebral: "Motorio+",
-};
 
 // Profile colors
 const PROFILE_COLORS: Record<string, string> = {
@@ -41,6 +31,7 @@ interface A11yStatsWidgetProps {
 }
 
 export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
+  const t = useTranslations("accessibilityAnalytics");
   if (!data) return null;
 
   const totalProfiles = Object.values(data.byProfile).reduce(
@@ -52,33 +43,34 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Accessibility className="h-5 w-5 text-violet-500" />
-          Accessibility Usage
+          <Accessibility
+            className="h-5 w-5 text-violet-500"
+            aria-hidden="true"
+          />
+          {t("title")}
         </CardTitle>
-        <CardDescription>
-          Profile activations and accessibility feature usage
-        </CardDescription>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Summary stats */}
-        <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-3 bg-muted rounded-lg">
+        <div className="grid grid-cols-3 gap-4" role="list">
+          <div className="text-center p-3 bg-muted rounded-lg" role="listitem">
             <p className="text-2xl font-bold text-violet-600">
               {data.summary.totalActivations}
             </p>
-            <p className="text-xs text-muted-foreground">Profile Activations</p>
+            <p className="text-xs text-muted-foreground">{t("activations")}</p>
           </div>
-          <div className="text-center p-3 bg-muted rounded-lg">
+          <div className="text-center p-3 bg-muted rounded-lg" role="listitem">
             <p className="text-2xl font-bold text-blue-600">
               {data.summary.uniqueSessions}
             </p>
-            <p className="text-xs text-muted-foreground">Unique Sessions</p>
+            <p className="text-xs text-muted-foreground">{t("sessions")}</p>
           </div>
-          <div className="text-center p-3 bg-muted rounded-lg">
+          <div className="text-center p-3 bg-muted rounded-lg" role="listitem">
             <p className="text-2xl font-bold text-foreground">
               {data.summary.resetCount}
             </p>
-            <p className="text-xs text-muted-foreground">Resets</p>
+            <p className="text-xs text-muted-foreground">{t("resets")}</p>
           </div>
         </div>
 
@@ -86,41 +78,52 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {totalProfiles > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Profile Distribution
+              {t("distribution")}
             </p>
-            <div className="flex h-4 rounded-full overflow-hidden bg-muted">
+            <div
+              className="flex h-4 rounded-full overflow-hidden bg-muted"
+              role="img"
+              aria-label="Profile distribution chart"
+            >
               {Object.entries(data.byProfile).map(([profile, count]) => {
                 const percentage = (count / totalProfiles) * 100;
-                if (percentage === 0) return null;
+                const label = t(
+                  `profiles.${profile}` as Parameters<typeof t>[0],
+                );
                 return (
                   <div
                     key={profile}
-                    className={`${PROFILE_COLORS[profile] ?? "bg-muted0"} transition-all`}
+                    className={`${PROFILE_COLORS[profile] ?? "bg-muted"} transition-all`}
                     style={{ width: `${percentage}%` }}
-                    title={`${PROFILE_LABELS[profile] ?? profile}: ${count} (${percentage.toFixed(1)}%)`}
+                    title={`${label}: ${count} (${percentage.toFixed(1)}%)`}
                   />
                 );
               })}
             </div>
-            <div className="flex flex-wrap gap-2 mt-2">
+            <div className="flex flex-wrap gap-2 mt-2" role="list">
               {Object.entries(data.byProfile)
                 .sort((a, b) => b[1] - a[1])
-                .map(([profile, count]) => (
-                  <div
-                    key={profile}
-                    className="flex items-center gap-1 text-xs"
-                  >
+                .map(([profile, count]) => {
+                  const label = t(
+                    `profiles.${profile}` as Parameters<typeof t>[0],
+                  );
+                  return (
                     <div
-                      className={`w-2 h-2 rounded-full ${PROFILE_COLORS[profile] ?? "bg-muted0"}`}
-                    />
-                    <span className="text-muted-foreground">
-                      {PROFILE_LABELS[profile] ?? profile}
-                    </span>
-                    <span className="font-mono text-muted-foreground">
-                      {count}
-                    </span>
-                  </div>
-                ))}
+                      key={profile}
+                      className="flex items-center gap-1 text-xs"
+                      role="listitem"
+                    >
+                      <div
+                        className={`w-2 h-2 rounded-full ${PROFILE_COLORS[profile] ?? "bg-muted"}`}
+                        aria-hidden="true"
+                      />
+                      <span className="text-muted-foreground">{label}</span>
+                      <span className="font-mono text-muted-foreground">
+                        {count}
+                      </span>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         )}
@@ -129,20 +132,23 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
         {Object.keys(data.byToggle).length > 0 && (
           <div className="space-y-2">
             <p className="text-sm font-medium text-muted-foreground">
-              Most Used Toggles
+              {t("toggles")}
             </p>
-            {Object.entries(data.byToggle)
-              .sort((a, b) => b[1] - a[1])
-              .slice(0, 5)
-              .map(([toggle, count]) => (
-                <div
-                  key={toggle}
-                  className="flex items-center justify-between text-sm"
-                >
-                  <span className="text-muted-foreground">{toggle}</span>
-                  <span className="font-mono">{count}</span>
-                </div>
-              ))}
+            <div className="space-y-1" role="list">
+              {Object.entries(data.byToggle)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(([toggle, count]) => (
+                  <div
+                    key={toggle}
+                    className="flex items-center justify-between text-sm"
+                    role="listitem"
+                  >
+                    <span className="text-muted-foreground">{toggle}</span>
+                    <span className="font-mono">{count}</span>
+                  </div>
+                ))}
+            </div>
           </div>
         )}
 
@@ -151,7 +157,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
           Object.keys(data.byToggle).length === 0 &&
           data.summary.resetCount === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4">
-              No accessibility events recorded yet
+              {t("empty")}
             </p>
           )}
       </CardContent>

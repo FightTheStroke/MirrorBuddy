@@ -36,6 +36,30 @@ async function loadNamespace(
   }
 }
 
+function mergeMessages(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>,
+): Record<string, unknown> {
+  for (const [key, value] of Object.entries(source)) {
+    if (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      target[key] &&
+      typeof target[key] === "object" &&
+      !Array.isArray(target[key])
+    ) {
+      target[key] = mergeMessages(
+        target[key] as Record<string, unknown>,
+        value as Record<string, unknown>,
+      );
+    } else {
+      target[key] = value;
+    }
+  }
+  return target;
+}
+
 export default getRequestConfig(async ({ requestLocale }) => {
   // Await the locale from the request (next-intl 4.x API)
   let locale = await requestLocale;
@@ -59,7 +83,7 @@ export default getRequestConfig(async ({ requestLocale }) => {
   // Each namespace file contains original top-level keys that map to that namespace
   const messages: Record<string, unknown> = {};
   for (const nsData of namespaceResults) {
-    Object.assign(messages, nsData);
+    mergeMessages(messages, nsData);
   }
 
   return {

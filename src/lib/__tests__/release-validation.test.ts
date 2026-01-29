@@ -23,6 +23,9 @@ const NAMESPACES = [
   "errors",
   "welcome",
   "metadata",
+  "home",
+  "voice",
+  "consent",
 ];
 
 // Helper to load all namespace files and merge into single object

@@ -440,13 +440,19 @@
         "suggestedBy": "Suggested by"
       },
       "tabs": {
-        "accessibility": "Accessibility",
-        "guide": "Guide",
-        "observations": "Observations",
-        "overview": "Overview",
-        "progress": "Progresso"
+        "accessibility": "Accesibilidad",
+        "guide": "Guía",
+        "observations": "Observaciones",
+        "overview": "Resumen",
+        "progress": "Progreso"
       },
-      "profileTitle": "Profile Title"
+      "strengths": "Puntos Fuertes",
+      "growthAreas": "Áreas de Mejora",
+      "strategies": "Estrategias Sugeridas",
+      "learningStyle": "Estilo de Aprendizaje",
+      "motivators": "Qué le motiva",
+      "lastUpdated": "Última actualización: {date}",
+      "profileTitle": "Perfil de {studentName}"
     },
     "quizCompletion": {
       "continueButton": "Continue button",

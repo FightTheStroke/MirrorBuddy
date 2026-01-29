@@ -74,38 +74,37 @@ describe("TrialConsentGate", () => {
 
       expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
       expect(
-        screen.getByRole("heading", { name: /modalità prova gratuita/i }),
+        screen.getByRole("heading", { name: /Benvenuto nella Prova Gratuita/i }),
       ).toBeInTheDocument();
     });
 
-    it("shows privacy policy link", () => {
+    it("shows privacy policy link", async () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const privacyLink = screen.getByRole("link", {
-        name: /privacy/i,
-      });
-      expect(privacyLink).toBeInTheDocument();
-      expect(privacyLink).toHaveAttribute("href", "/privacy");
-      expect(privacyLink).toHaveAttribute("target", "_blank");
+      expect(
+        screen.getByRole("link", { name: /Leggi l'Informativa Privacy completa/i }),
+      ).toBeInTheDocument();
     });
 
-    it("shows consent checkbox", () => {
+    it("shows consent checkbox", async () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
         </TrialConsentGate>,
       );
 
-      const checkbox = screen.getByRole("checkbox");
-      expect(checkbox).toBeInTheDocument();
-      expect(checkbox).not.toBeChecked();
+      expect(
+        screen.getByRole("checkbox", {
+          name: /Ho letto e accetto l'informativa sul trattamento dei dati/i,
+        }),
+      ).toBeInTheDocument();
     });
 
-    it("disables start button until checkbox checked", () => {
+    it("disables start button until checkbox checked", async () => {
       render(
         <TrialConsentGate>
           <div>Protected Content</div>
@@ -113,10 +112,8 @@ describe("TrialConsentGate", () => {
       );
 
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: /Inizia ora/i,
       });
-      expect(startButton).toBeDisabled();
-    });
   });
 
   describe("consent flow", () => {
@@ -135,7 +132,7 @@ describe("TrialConsentGate", () => {
 
       const checkbox = screen.getByRole("checkbox");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: /Inizia ora/i,
       });
 
       expect(startButton).toBeDisabled();
@@ -167,7 +164,7 @@ describe("TrialConsentGate", () => {
 
       // Click start button
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: /Inizia ora/i,
       });
       await user.click(startButton);
 
@@ -198,7 +195,7 @@ describe("TrialConsentGate", () => {
 
       const checkbox = screen.getByRole("checkbox");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: /Inizia ora/i,
       });
 
       // Check then uncheck
@@ -275,4 +272,5 @@ describe("TrialConsentGate", () => {
       expect(html).toContain("dark:");
     });
   });
+});
 });

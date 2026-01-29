@@ -1,19 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - La Scuola Che Vorrei",
-    "loading": "Caricamento...",
-    "seasonDefault": "Autunno",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professori",
-      "astuccio": "Astuccio",
-      "zaino": "Zaino",
-      "calendar": "Calendario",
-      "progress": "Progressi",
-      "settings": "Impostazioni",
-      "skipToContent": "Vai al contenuto principale"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Caricamento...",
@@ -21,15 +6,24 @@
     },
     "hero": {
       "welcome": "Benvenuto in",
+      "welcomeBack": "Bentornato,",
+      "welcomeBackSubtitle": "Cosa impariamo di nuovo oggi?",
+      "betaBadge": "Beta Privata",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Impara",
-      "with-teachers": "CON i Grandi Professori",
-      "any-ability": "qualunque siano le tue abilità",
+      "withTeachers": "con i Grandi Professori",
+      "anyAbility": "qualunque siano le tue abilità",
+      "tagline": "La tua scuola su misura, con i maestri della storia",
       "description": "Studia matematica <strong>con Euclide</strong>, fisica <strong>con Feynman</strong>, chimica <strong>con Marie Curie</strong>. 22 Professori storici ti accompagnano personalmente.",
-      "readable-fonts": "Font leggibili",
-      "mind-maps": "Mappe mentali",
-      "text-to-speech": "Sintesi vocale",
-      "adaptive-quizzes": "Quiz adattivi",
-      "cta": "Inizia Ora"
+      "readableFonts": "Font leggibili",
+      "mindMaps": "Mappe mentali",
+      "textToSpeech": "Sintesi vocale",
+      "adaptiveQuizzes": "Quiz adattivi",
+      "cta": "Inizia Ora",
+      "welcomeNew": "Benvenuto in MirrorBuddy",
+      "accessibility": {
+        "title": "Accessibilità su misura per te"
+      }
     },
     "principles": {
       "welcome-to-school": "Benvenuto nella Scuola Che Vorrei, {name}!",
@@ -73,6 +67,56 @@
       "school-elementary": "Elementare",
       "school-middle": "Media",
       "school-high": "Superiore"
+    },
+    "ageYears": "anni",
+    "trial": {
+      "title": "Limiti della prova gratuita",
+      "trialDescription": "Stai usando la versione di prova gratuita. Per sbloccare l'uso illimitato e tutte le funzionalità, richiedi l'accesso completo.",
+      "messagesDay": "messaggi / giorno",
+      "voiceMinutes": "minuti voce / giorno",
+      "toolsDay": "strumenti / giorno",
+      "maestriAvailable": "professori disponibili"
+    },
+    "tiers": {
+      "heading": "Scegli il piano giusto per te",
+      "subtitle": "MirrorBuddy è gratuito per tutti gli studenti durante la fase beta.",
+      "recommended": "Consigliato",
+      "trial": {
+        "name": "Prova",
+        "tagline": "Per iniziare subito",
+        "price": "Gratuito",
+        "cta": "Inizia Ora",
+        "features": {
+          "maestri": "3 Professori",
+          "messages": "10 messaggi / giorno",
+          "voice": "5 minuti voce / giorno",
+          "tools": "10 strumenti / giorno"
+        }
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "Per chi vuole di più",
+        "price": "Gratuito",
+        "cta": "Prova Gratis",
+        "features": {
+          "maestri": "10 Professori",
+          "messages": "30 messaggi / giorno",
+          "voice": "15 minuti voce / giorno",
+          "tools": "Senza limiti"
+        }
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "L'esperienza completa",
+        "price": "Gratuito",
+        "cta": "Prova Gratis",
+        "features": {
+          "maestri": "22 Professori",
+          "messages": "messaggi illimitati",
+          "voice": "voce illimitata",
+          "tools": "Senza limiti"
+        }
+      }
     }
   }
 }

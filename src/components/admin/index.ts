@@ -10,3 +10,5 @@ export { FunnelUsersTable } from "./funnel-users-table";
 export { UserDrilldownModal } from "./user-drill-down-modal";
 export { UserActions } from "./user-actions";
 export { ResponsiveTable } from "./responsive-table";
+export { ResearchDashboard } from "./research-dashboard";
+export { SchoolPortal } from "./school-portal";

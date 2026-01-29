@@ -1,16 +1,16 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
-import { ChevronUp, ChevronDown, LogIn, UserPlus, Shield } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { ChevronUp, ChevronDown, LogOut, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ActiveMaestroAvatar } from "@/components/conversation";
-import { TrialStatusIndicator } from "@/components/trial";
 import { useAdminStatus } from "@/lib/hooks/use-admin-status";
-import type { View } from "@/app/[locale]/types";
+import type { View } from "@/app/types";
 import { LogoBrain } from "@/components/branding/logo-brain";
 import { WebLLMStatus } from "@/components/ai/web-llm-status";
 
@@ -22,19 +22,6 @@ interface NavItem {
   avatar?: string;
 }
 
-interface TrialStatus {
-  isTrialMode: boolean;
-  chatsUsed: number;
-  chatsRemaining: number;
-  maxChats: number;
-  voiceSecondsUsed: number;
-  voiceSecondsRemaining: number;
-  maxVoiceSeconds: number;
-  toolsUsed: number;
-  toolsRemaining: number;
-  maxTools: number;
-}
-
 interface HomeSidebarProps {
   open: boolean;
   onToggle: () => void;
@@ -43,7 +30,7 @@ interface HomeSidebarProps {
   navItems: NavItem[];
   hasNewInsights: boolean;
   onParentAccess: () => void;
-  trialStatus?: TrialStatus;
+  isTrialMode?: boolean;
 }
 
 export function HomeSidebar({
@@ -54,14 +41,26 @@ export function HomeSidebar({
   navItems,
   hasNewInsights,
   onParentAccess,
-  trialStatus,
+  isTrialMode,
 }: HomeSidebarProps) {
-  const t = useTranslations("home");
+  const router = useRouter();
   const { isAdmin } = useAdminStatus();
+  const t = useTranslations("home");
+
   const handleViewChange = async (view: View) => {
     await onViewChange(view);
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       onToggle();
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/welcome");
+    } catch {
+      // Redirect anyway on error
+      router.push("/welcome");
     }
   };
 
@@ -77,7 +76,7 @@ export function HomeSidebar({
       <aside
         className={cn(
           "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-40 transition-all duration-300 flex flex-col",
-          "w-64 max-w-[85vw] lg:max-w-none lg:w-64",
+          "w-[min(16rem,85vw)] lg:w-64",
           open
             ? "translate-x-0 lg:w-64"
             : "-translate-x-full lg:translate-x-0 lg:w-20",
@@ -87,13 +86,13 @@ export function HomeSidebar({
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <button
             onClick={() => handleViewChange("maestri")}
-            className="flex items-center gap-3 h-11 hover:opacity-80 transition-opacity"
-            aria-label={t("sidebar.backToHome")}
+            className="flex items-center gap-3 h-11 min-w-11 hover:opacity-80 transition-opacity"
+            aria-label={t("returnHome")}
           >
-            <LogoBrain alt={t("sidebar.appName")} size={36} priority />
+            <LogoBrain alt="MirrorBuddy" size={36} priority />
             {open && (
               <span className="font-bold text-lg text-slate-900 dark:text-white">
-                {t("sidebar.appName")}
+                MirrorBuddy
               </span>
             )}
           </button>
@@ -102,7 +101,7 @@ export function HomeSidebar({
             size="icon"
             onClick={onToggle}
             className="text-slate-500"
-            aria-label={open ? t("sidebar.closeMenu") : t("header.openMenu")}
+            aria-label={open ? t("closeMenu") : t("openMenu")}
           >
             {open ? (
               <ChevronUp className="h-4 w-4" />
@@ -111,54 +110,6 @@ export function HomeSidebar({
             )}
           </Button>
         </div>
-
-        {/* Trial Status Indicator */}
-        {trialStatus?.isTrialMode && (
-          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
-            <div className="flex flex-col gap-2">
-              {open && (
-                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
-                  {t("sidebar.trialMode")}
-                </span>
-              )}
-              <TrialStatusIndicator
-                chatsUsed={trialStatus.chatsUsed}
-                maxChats={trialStatus.maxChats}
-                voiceSecondsUsed={trialStatus.voiceSecondsUsed}
-                maxVoiceSeconds={trialStatus.maxVoiceSeconds}
-                toolsUsed={trialStatus.toolsUsed}
-                maxTools={trialStatus.maxTools}
-                showVoice={true}
-                showTools={true}
-                className={cn(!open && "justify-center")}
-              />
-              {open && (
-                <div className="flex flex-col gap-1 mt-2">
-                  <Link href="/login">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-xs"
-                    >
-                      <LogIn className="w-3 h-3 mr-2" />
-                      {t("sidebar.login")}
-                    </Button>
-                  </Link>
-                  <Link href="/invite/request">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
-                    >
-                      <UserPlus className="w-3 h-3 mr-2" />
-                      {t("sidebar.requestAccess")}
-                    </Button>
-                  </Link>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
@@ -172,7 +123,6 @@ export function HomeSidebar({
             return (
               <button
                 key={item.id}
-                data-testid={`home-nav-${item.id}`}
                 onClick={() => handleViewChange(item.id)}
                 className={cn(
                   "w-full flex items-center gap-3 rounded-xl transition-all",
@@ -266,10 +216,10 @@ export function HomeSidebar({
                   "text-sm font-medium transition-all duration-200",
                   "focus:outline-none focus:ring-2 focus:ring-amber-500 focus:ring-offset-2",
                 )}
-                aria-label={t("sidebar.adminDashboardAria")}
+                aria-label={t("adminDashboard")}
               >
                 <Shield className="w-4 h-4" />
-                {open && <span>{t("sidebar.adminDashboard")}</span>}
+                {open && <span>{t("adminDashboard")}</span>}
               </button>
             </Link>
           )}
@@ -292,8 +242,27 @@ export function HomeSidebar({
                 <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
               )}
             </span>
-            {open && <span>{t("sidebar.parentArea")}</span>}
+            {open && <span>{t("parentArea")}</span>}
           </button>
+
+          {/* Logout Button - only show for authenticated users (not trial) */}
+          {!isTrialMode && (
+            <button
+              onClick={handleLogout}
+              className={cn(
+                "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
+                "bg-slate-100 dark:bg-slate-800 hover:bg-red-100 dark:hover:bg-red-900/40",
+                "border border-slate-200 dark:border-slate-700 hover:border-red-200 dark:hover:border-red-700",
+                "text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400",
+                "text-sm font-medium transition-all duration-200",
+                "focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2",
+              )}
+              aria-label={t("logout")}
+            >
+              <LogOut className="w-4 h-4" />
+              {open && <span>{t("logout")}</span>}
+            </button>
+          )}
         </div>
       </aside>
     </>
