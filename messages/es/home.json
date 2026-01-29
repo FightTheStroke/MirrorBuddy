@@ -1,15 +1,60 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy",
+    "appTitle": "MirrorBuddy - La Escuela que Quiero",
     "loading": "Cargando...",
     "seasonDefault": "Otoño",
+    "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Profesores",
+      "astuccio": "Estuche",
+      "zaino": "Mochila",
       "calendar": "Calendario",
       "progress": "Progreso",
       "settings": "Configuración",
-      "zaino": "Mochila",
-      "astuccio": "Estuche"
+      "features": "Características",
+      "pricing": "Precios",
+      "about": "Quiénes somos",
+      "contact": "Contacto",
+      "login": "Iniciar sesión",
+      "signup": "Registrarse",
+      "dashboard": "Panel",
+      "logout": "Cerrar sesión"
+    },
+    "header": {
+      "openMenu": "Abrir menú",
+      "streak": "Racha",
+      "sessionsThisWeek": "Sesiones esta semana",
+      "studyTime": "Tiempo de estudio",
+      "questionsAsked": "Preguntas realizadas",
+      "trial": "Prueba",
+      "trialClickToRequest": "Haz clic para solicitar acceso completo"
+    },
+    "sidebar": {
+      "backToHome": "Volver al inicio",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Cerrar menú",
+      "trialMode": "Modo Prueba",
+      "login": "Iniciar sesión",
+      "requestAccess": "Solicitar Acceso",
+      "adminDashboard": "Panel de Administración",
+      "adminDashboardAria": "Panel de administrador",
+      "parentArea": "Área de Padres"
+    },
+    "adminDashboard": "Panel de Administración",
+    "closeMenu": "Cerrar Menú",
+    "logout": "Cerrar Sesión",
+    "openMenu": "Abrir Menú",
+    "parentArea": "Área de Padres",
+    "returnHome": "Volver al Inicio",
+    "season": {
+      "autumn": "Otoño"
+    },
+    "title": "Título",
+    "hero": {
+      "title": "Aprende mejor con MirrorBuddy",
+      "subtitle": "Tu compañero de estudio basado en inteligencia artificial",
+      "cta": "Comienza ahora",
+      "secondaryCta": "Descubre más"
     }
   }
 }

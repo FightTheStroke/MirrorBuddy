@@ -100,7 +100,9 @@
       "selectModels": "Select Models"
     },
     "create": "Crea",
-    "update": "Aggiorna"
+    "update": "Aggiorna",
+    "skipToMainContent": "Vai al contenuto principale",
+    "skipLinkFocused": "Focus spostato al contenuto principale"
   },
   "status": {
     "active": "Attivo",

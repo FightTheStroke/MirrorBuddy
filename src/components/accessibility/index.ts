@@ -12,3 +12,4 @@ export {
   getProfileConfigs,
   PROFILE_CONFIGS_BASE,
 } from "./a11y-profile-button";
+export { SkipLink } from "./skip-link";

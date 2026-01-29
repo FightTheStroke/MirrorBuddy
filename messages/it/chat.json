@@ -324,6 +324,82 @@
       "subtitle": "Sottotitolo",
       "switchToChat": "Switch To Chat",
       "title": "Titolo"
+    },
+    "label": "Voce",
+    "description": "Attiva la conversazione vocale con i Maestri",
+    "chatUI": {
+      "startRecording": "Avvia registrazione",
+      "stopRecording": "Ferma registrazione",
+      "sendVoiceMessage": "Invia messaggio vocale",
+      "cancel": "Annulla",
+      "recordingInProgress": "Registrazione in corso...",
+      "microphonePermission": "Consenti accesso al microfono per usare la voce",
+      "grantPermission": "Consenti microfono",
+      "denyPermission": "Nega accesso"
+    },
+    "status": {
+      "listening": "In ascolto...",
+      "processing": "Elaborazione...",
+      "speaking": "Sto parlando...",
+      "connecting": "Connessione...",
+      "ready": "Pronto",
+      "initializing": "Inizializzazione...",
+      "processing_text": "Trascrizione in corso..."
+    },
+    "settings": {
+      "title": "Impostazioni vocali",
+      "speed": "Velocità di riproduzione",
+      "pitch": "Tonalità",
+      "voiceSelection": "Seleziona voce",
+      "volume": "Volume",
+      "enableCaptions": "Abilita sottotitoli",
+      "textToSpeech": "Testo a voce",
+      "speechToText": "Riconoscimento vocale",
+      "language": "Lingua di ascolto",
+      "reset": "Ripristina predefiniti"
+    },
+    "errors": {
+      "microphoneDenied": "Accesso al microfono negato. Abilita il microfono nelle impostazioni.",
+      "microphoneNotFound": "Nessun microfono rilevato. Controlla il tuo dispositivo.",
+      "connectionError": "Errore di connessione. Controlla la tua connessione internet.",
+      "timeout": "Timeout della connessione. Riprova.",
+      "recordingFailed": "Errore durante la registrazione. Riprova.",
+      "processingError": "Errore durante l'elaborazione. Riprova.",
+      "permissionError": "Errore di autorizzazione. Controlla le impostazioni.",
+      "unsupportedBrowser": "Il tuo browser non supporta la registrazione vocale.",
+      "unknownError": "Errore sconosciuto. Riprova più tardi."
+    },
+    "trialLimits": {
+      "voiceTitle": "Limite voce",
+      "minutesRemaining": "{minutes} minuti rimasti",
+      "secondsRemaining": "{seconds} secondi rimasti",
+      "limitReached": "Limite voce raggiunto",
+      "limitReachedMessage": "Hai esaurito i tuoi minuti di voce. Effettua l'upgrade per utilizzare la voce illimitata.",
+      "upgradePrompt": "Vuoi accesso illimitato alla voce?",
+      "upgrade": "Effettua upgrade"
+    },
+    "accessibility": {
+      "voiceToText": "Converti voce in testo",
+      "textAlternative": "Usa il testo come alternativa",
+      "captionsToggle": "Attiva/disattiva sottotitoli",
+      "enableSubtitles": "Abilita sottotitoli per tutte le risposte",
+      "voiceSpeed": "Velocità di lettura",
+      "slow": "Lento",
+      "normal": "Normale",
+      "fast": "Veloce",
+      "veryFast": "Molto veloce",
+      "screenReaderSupport": "Questo strumento supporta i lettori di schermo"
+    },
+    "confirmations": {
+      "deleteRecording": "Elimina registrazione?",
+      "discardMessage": "Scartare il messaggio?",
+      "confirmSend": "Invia messaggio vocale?"
+    },
+    "help": {
+      "title": "Guida vocale",
+      "howToRecord": "Come registrare: Premi il pulsante microfono e parla chiaramente.",
+      "tips": "Suggerimenti: Parla in un ambiente tranquillo per migliori risultati.",
+      "troubleshooting": "Risoluzione dei problemi: Verifica che il microfono funzioni nel browser."
     }
   }
 }

@@ -31,6 +31,7 @@ export function A11yFloatingButton({
   return (
     <button
       onClick={onClick}
+      data-testid="a11y-floating-button"
       className={cn(
         "fixed bottom-4 right-4 z-50",
         "flex items-center justify-center",

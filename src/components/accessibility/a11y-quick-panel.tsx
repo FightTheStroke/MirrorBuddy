@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * A11y Quick Panel
- * Slide-out panel with accessibility profile presets and quick settings
- */
-
 import { useRef, useEffect } from "react";
 import { X, RotateCcw, Settings } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -27,49 +22,26 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
   const updateSettings = useAccessibilityStore((state) => state.updateSettings);
   const resetSettings = useAccessibilityStore((state) => state.resetSettings);
 
-  // Get translated profile configs
   const PROFILE_CONFIGS = getProfileConfigs(t);
-
-  // Profile apply functions
-  const applyDyslexia = useAccessibilityStore((s) => s.applyDyslexiaProfile);
-  const applyADHD = useAccessibilityStore((s) => s.applyADHDProfile);
-  const applyVisual = useAccessibilityStore(
-    (s) => s.applyVisualImpairmentProfile,
-  );
-  const applyMotor = useAccessibilityStore(
-    (s) => s.applyMotorImpairmentProfile,
-  );
-  const applyAutism = useAccessibilityStore((s) => s.applyAutismProfile);
-  const applyAuditory = useAccessibilityStore(
-    (s) => s.applyAuditoryImpairmentProfile,
-  );
-  const applyCerebral = useAccessibilityStore(
-    (s) => s.applyCerebralPalsyProfile,
-  );
-
   const profileAppliers: Record<string, () => void> = {
-    dyslexia: applyDyslexia,
-    adhd: applyADHD,
-    visual: applyVisual,
-    motor: applyMotor,
-    autism: applyAutism,
-    auditory: applyAuditory,
-    cerebral: applyCerebral,
+    dyslexia: useAccessibilityStore((s) => s.applyDyslexiaProfile),
+    adhd: useAccessibilityStore((s) => s.applyADHDProfile),
+    visual: useAccessibilityStore((s) => s.applyVisualImpairmentProfile),
+    motor: useAccessibilityStore((s) => s.applyMotorImpairmentProfile),
+    autism: useAccessibilityStore((s) => s.applyAutismProfile),
+    auditory: useAccessibilityStore((s) => s.applyAuditoryImpairmentProfile),
+    cerebral: useAccessibilityStore((s) => s.applyCerebralPalsyProfile),
   };
 
-  // Close on Escape key
   useEffect(() => {
     if (!isOpen) return;
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
-
     document.addEventListener("keydown", handleKeyDown);
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Focus trap
   useEffect(() => {
     if (!isOpen || !panelRef.current) return;
 
@@ -101,7 +73,6 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
     <AnimatePresence>
       {isOpen && (
         <>
-          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -110,11 +81,10 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
             className="fixed inset-0 bg-black/30 z-40"
             aria-hidden="true"
           />
-
-          {/* Panel */}
           <motion.div
             ref={panelRef}
             id="a11y-quick-panel"
+            data-testid="a11y-quick-panel"
             role="dialog"
             aria-modal="true"
             aria-labelledby="a11y-panel-title"
@@ -131,7 +101,6 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
               "overflow-y-auto",
             )}
           >
-            {/* Header */}
             <div className="sticky top-0 bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
               <h2
                 id="a11y-panel-title"
@@ -141,16 +110,14 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
               </h2>
               <button
                 onClick={onClose}
-                className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                data-testid="a11y-close-panel-btn"
+                className="min-h-11 min-w-11 flex items-center justify-center rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 aria-label={t("closePanel")}
               >
                 <X className="w-5 h-5 text-gray-500 dark:text-gray-400" />
               </button>
             </div>
-
-            {/* Content */}
             <div className="p-4 space-y-6">
-              {/* Profile Presets */}
               <section aria-labelledby="profiles-heading">
                 <h3
                   id="profiles-heading"
@@ -158,19 +125,21 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                 >
                   {t("quickProfiles")}
                 </h3>
-                <div className="grid grid-cols-3 gap-2">
+                <div
+                  className="grid grid-cols-3 gap-2"
+                  data-testid="a11y-profile-buttons"
+                >
                   {PROFILE_CONFIGS.map((profile) => (
                     <A11yProfileButton
                       key={profile.id}
                       profile={profile}
                       isActive={activeProfile === profile.id}
                       onClick={() => profileAppliers[profile.id]?.()}
+                      data-testid={`a11y-profile-${profile.id}`}
                     />
                   ))}
                 </div>
               </section>
-
-              {/* Quick Toggles */}
               <section aria-labelledby="toggles-heading">
                 <h3
                   id="toggles-heading"
@@ -201,11 +170,10 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                   />
                 </div>
               </section>
-
-              {/* Actions */}
               <div className="flex flex-col gap-2 pt-2">
                 <button
                   onClick={resetSettings}
+                  data-testid="a11y-reset-btn"
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-violet-500"
                 >
                   <RotateCcw className="w-4 h-4" />
@@ -214,6 +182,7 @@ export function A11yQuickPanel({ isOpen, onClose }: A11yQuickPanelProps) {
                 <Link
                   href="/settings?section=accessibility"
                   onClick={onClose}
+                  data-testid="a11y-full-settings-link"
                   className="flex items-center justify-center gap-2 w-full py-2 px-4 rounded-lg bg-violet-600 text-white hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2"
                 >
                   <Settings className="w-4 h-4" />
@@ -236,22 +205,25 @@ interface QuickToggleProps {
 
 function QuickToggle({ label, checked, onChange }: QuickToggleProps) {
   const id = `toggle-${label.toLowerCase().replace(/\s/g, "-")}`;
+  const testId = `a11y-toggle-${label.toLowerCase().replace(/\s/g, "-")}`;
 
   return (
-    <div className="flex items-center justify-between">
+    <div className="flex items-center justify-between gap-4">
       <label
         htmlFor={id}
-        className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer"
+        className="text-sm text-gray-600 dark:text-gray-400 cursor-pointer flex-1"
       >
         {label}
       </label>
       <button
         id={id}
+        data-testid={testId}
         role="switch"
         aria-checked={checked}
+        aria-label={`${label}: ${checked ? "on" : "off"}`}
         onClick={() => onChange(!checked)}
         className={cn(
-          "relative w-11 h-6 rounded-full transition-colors duration-200",
+          "relative min-h-11 w-16 rounded-full transition-colors duration-200 flex-shrink-0",
           "focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2",
           checked
             ? "bg-violet-600 dark:bg-violet-500"
@@ -260,7 +232,7 @@ function QuickToggle({ label, checked, onChange }: QuickToggleProps) {
       >
         <span
           className={cn(
-            "absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200",
+            "absolute top-0.5 left-0.5 w-9 h-9 rounded-full bg-white shadow transition-transform duration-200",
             checked && "translate-x-5",
           )}
         />
