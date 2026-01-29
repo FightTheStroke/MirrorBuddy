@@ -91,10 +91,14 @@ export function SuccessMetricsDashboard({
                 ? "text-yellow-400"
                 : "text-slate-900 dark:text-white",
             )}
+            id="dashboard-title"
           >
             {t("title")}
           </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
+          <p
+            className="text-sm text-slate-500 dark:text-slate-400"
+            aria-describedby="dashboard-title"
+          >
             {t("progressDescription", { studentName: metricsData.studentName })}
           </p>
         </div>
@@ -105,6 +109,8 @@ export function SuccessMetricsDashboard({
               ? "bg-gray-900 border border-yellow-400"
               : "bg-white dark:bg-slate-900 shadow-lg",
           )}
+          role="status"
+          aria-label={t("overallScore")}
         >
           <div
             className={cn(
@@ -118,7 +124,9 @@ export function SuccessMetricsDashboard({
           >
             {metricsData.overallScore}
           </div>
-          <div className="text-xs text-slate-500">{t("overallScore")}</div>
+          <div className="text-xs text-slate-500" aria-hidden="true">
+            {t("overallScore")}
+          </div>
         </div>
       </div>
 
@@ -129,6 +137,8 @@ export function SuccessMetricsDashboard({
             ? "border-yellow-400 bg-gray-900"
             : "border-blue-500 bg-blue-50 dark:bg-blue-950/30",
         )}
+        role="complementary"
+        aria-label="Inspirational Quote"
       >
         <CardContent className="py-4">
           <p
@@ -141,11 +151,15 @@ export function SuccessMetricsDashboard({
           >
             &ldquo;{t("quote")}&rdquo;
           </p>
-          <p className="text-xs text-slate-500 mt-1">{t("quoteAuthor")}</p>
+          <p className="text-xs text-slate-500 mt-1">— {t("quoteAuthor")}</p>
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div
+        className="grid md:grid-cols-2 gap-4"
+        role="list"
+        aria-label="Learning Metrics"
+      >
         {metricsData.metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />
         ))}

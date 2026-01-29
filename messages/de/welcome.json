@@ -21,15 +21,24 @@
     },
     "hero": {
       "welcome": "Willkommen bei",
+      "welcomeBack": "Willkommen zurück,",
+      "welcomeBackSubtitle": "Was lernen wir heute Neues?",
+      "betaBadge": "Private Beta",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Lerne",
-      "with-teachers": "MIT den großen Professoren",
-      "any-ability": "unabhängig von deinen Fähigkeiten",
+      "withTeachers": "mit den großen Professoren",
+      "anyAbility": "unabhängig von deinen Fähigkeiten",
+      "tagline": "Deine maßgeschneiderte Schule mit den Meistern der Geschichte",
       "description": "Lerne Mathe <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 22 historische Professoren begleiten dich persönlich.",
-      "readable-fonts": "Lesbare Schriftarten",
-      "mind-maps": "Mindmaps",
-      "text-to-speech": "Sprachausgabe",
-      "adaptive-quizzes": "Adaptive Quizze",
-      "cta": "Jetzt Starten"
+      "readableFonts": "Lesbare Schriftarten",
+      "mindMaps": "Mindmaps",
+      "textToSpeech": "Sprachausgabe",
+      "adaptiveQuizzes": "Adaptive Quizze",
+      "cta": "Jetzt Starten",
+      "welcomeNew": "Willkommen bei MirrorBuddy",
+      "accessibility": {
+        "title": "Maßgeschneiderte Barrierefreiheit für dich"
+      }
     },
     "principles": {
       "welcome-to-school": "Willkommen in der Schule, die ich will, {name}!",

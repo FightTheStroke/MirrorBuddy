@@ -1,0 +1,36 @@
+{
+  "panel": {
+    "connected": "Verbunden",
+    "connecting": "Verbinde...",
+    "listening": "Zuhören",
+    "microphoneDisabled": "Mikrofon deaktiviert",
+    "mutedLabel": "Stummgeschaltet",
+    "muteLabel": "Stumm schalten",
+    "speakNow": "Jetzt sprechen",
+    "speaking": "Spricht",
+    "startingCall": "Anruf starten...",
+    "unmuteLabel": "Stummschaltung aufheben"
+  },
+  "connectionError": "Sprachverbindungsfehler",
+  "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in den Browsereinstellungen.",
+  "onboarding": {
+    "transcript": {
+      "conversationTitle": "Gesprächsprotokoll",
+      "messageSingular": "Nachricht",
+      "messagePlural": "Nachrichten",
+      "noConversation": "Noch kein Gespräch",
+      "userLabel": "Du",
+      "conversationActive": "Gespräch aktiv"
+    },
+    "checklist": {
+      "nameLabel": "Name",
+      "ageLabel": "Alter",
+      "schoolLabel": "Schule",
+      "schoolElementary": "Grundschule",
+      "schoolMiddle": "Mittelschule",
+      "schoolHigh": "Gymnasium",
+      "differencesLabel": "Lernunterschiede",
+      "differencesCount": "{count} ausgewählt"
+    }
+  }
+}

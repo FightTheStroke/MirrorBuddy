@@ -10,21 +10,26 @@ import { describe, test, expect } from "vitest";
 // Import namespace files for each locale
 import itWelcome from "../../messages/it/welcome.json";
 import itNavigation from "../../messages/it/navigation.json";
+import itHome from "../../messages/it/home.json";
 import enWelcome from "../../messages/en/welcome.json";
 import enNavigation from "../../messages/en/navigation.json";
+import enHome from "../../messages/en/home.json";
 import frWelcome from "../../messages/fr/welcome.json";
 import frNavigation from "../../messages/fr/navigation.json";
+import frHome from "../../messages/fr/home.json";
 import deWelcome from "../../messages/de/welcome.json";
 import deNavigation from "../../messages/de/navigation.json";
+import deHome from "../../messages/de/home.json";
 import esWelcome from "../../messages/es/welcome.json";
 import esNavigation from "../../messages/es/navigation.json";
+import esHome from "../../messages/es/home.json";
 
 // Merge namespace files to simulate runtime behavior
-const itMessages = { ...itWelcome, ...itNavigation };
-const enMessages = { ...enWelcome, ...enNavigation };
-const frMessages = { ...frWelcome, ...frNavigation };
-const deMessages = { ...deWelcome, ...deNavigation };
-const esMessages = { ...esWelcome, ...esNavigation };
+const itMessages = { ...itWelcome, ...itNavigation, ...itHome };
+const enMessages = { ...enWelcome, ...enNavigation, ...enHome };
+const frMessages = { ...frWelcome, ...frNavigation, ...frHome };
+const deMessages = { ...deWelcome, ...deNavigation, ...deHome };
+const esMessages = { ...esWelcome, ...esNavigation, ...esHome };
 
 const languages = {
   it: itMessages,

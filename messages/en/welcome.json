@@ -1,19 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - The School I Want",
-    "loading": "Loading...",
-    "seasonDefault": "Autumn",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professors",
-      "astuccio": "Pencil Case",
-      "zaino": "Backpack",
-      "calendar": "Calendar",
-      "progress": "Progress",
-      "settings": "Settings",
-      "skipToContent": "Skip to content"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Loading...",
@@ -21,15 +6,24 @@
     },
     "hero": {
       "welcome": "Welcome to",
+      "welcomeBack": "Welcome back,",
+      "welcomeBackSubtitle": "What are we learning new today?",
+      "betaBadge": "Private Beta",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Learn",
-      "with-teachers": "WITH the Great Professors",
-      "any-ability": "regardless of your abilities",
+      "withTeachers": "with the Great Professors",
+      "anyAbility": "regardless of your abilities",
+      "tagline": "Your tailored school, with history's masters",
       "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historic Professors accompany you personally.",
-      "readable-fonts": "Readable fonts",
-      "mind-maps": "Mind maps",
-      "text-to-speech": "Text to speech",
-      "adaptive-quizzes": "Adaptive quizzes",
-      "cta": "Start Now"
+      "readableFonts": "Readable fonts",
+      "mindMaps": "Mind maps",
+      "textToSpeech": "Text to speech",
+      "adaptiveQuizzes": "Adaptive quizzes",
+      "cta": "Start Now",
+      "welcomeNew": "Welcome to MirrorBuddy",
+      "accessibility": {
+        "title": "Tailored accessibility for you"
+      }
     },
     "principles": {
       "welcome-to-school": "Welcome to The School I Want, {name}!",

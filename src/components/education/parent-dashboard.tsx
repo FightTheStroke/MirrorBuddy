@@ -69,19 +69,21 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
             {t("profileTitle", { studentName: insights.studentName })}
           </h1>
           <p className="text-sm text-slate-500 dark:text-slate-400">
-            Ultimo aggiornamento:{" "}
-            {insights.lastUpdated.toLocaleDateString("it-IT")}
+            {t("lastUpdated", {
+              date: insights.lastUpdated.toLocaleDateString(),
+            })}
           </p>
         </div>
       </div>
 
       {stats && <StatsOverview {...stats} />}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6" role="list">
         <Card
           className={
             settings.highContrast ? "border-yellow-400 bg-gray-900" : ""
           }
+          role="listitem"
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -92,9 +94,10 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                     ? "text-yellow-400"
                     : "text-emerald-600 dark:text-emerald-400",
                 )}
+                aria-hidden="true"
               />
               <span className={settings.highContrast ? "text-yellow-400" : ""}>
-                Punti di Forza
+                {t("strengths")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -113,6 +116,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
           className={
             settings.highContrast ? "border-yellow-400 bg-gray-900" : ""
           }
+          role="listitem"
         >
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -123,9 +127,10 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                     ? "text-yellow-400"
                     : "text-amber-600 dark:text-amber-400",
                 )}
+                aria-hidden="true"
               />
               <span className={settings.highContrast ? "text-yellow-400" : ""}>
-                Aree di Crescita
+                {t("growthAreas")}
               </span>
             </CardTitle>
           </CardHeader>
@@ -153,9 +158,10 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                   ? "text-yellow-400"
                   : "text-blue-600 dark:text-blue-400",
               )}
+              aria-hidden="true"
             />
             <span className={settings.highContrast ? "text-yellow-400" : ""}>
-              Strategie Suggerite
+              {t("strategies")}
             </span>
           </CardTitle>
         </CardHeader>
@@ -178,9 +184,10 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                   ? "text-yellow-400"
                   : "text-purple-600 dark:text-purple-400",
               )}
+              aria-hidden="true"
             />
             <span className={settings.highContrast ? "text-yellow-400" : ""}>
-              Stile di Apprendimento
+              {t("learningStyle")}
             </span>
           </CardTitle>
         </CardHeader>
@@ -189,9 +196,13 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
 
           <div className="mt-6">
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">
-              Cosa lo motiva:
+              {t("motivators")}:
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div
+              className="flex flex-wrap gap-2"
+              role="list"
+              aria-label={t("motivators")}
+            >
               {insights.learningStyle.motivators.map((motivator, idx) => (
                 <span
                   key={idx}
@@ -201,6 +212,7 @@ export function ParentDashboard({ insights, className }: ParentDashboardProps) {
                       ? "bg-yellow-400/20 text-yellow-400"
                       : "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300",
                   )}
+                  role="listitem"
                 >
                   {motivator}
                 </span>

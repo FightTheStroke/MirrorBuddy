@@ -273,13 +273,7 @@ const mediaPrototype =
     ?.prototype;
 
 if (mediaPrototype) {
-  if (typeof mediaPrototype.play !== "function") {
-    mediaPrototype.play = vi.fn().mockResolvedValue(undefined);
-  }
-  if (typeof mediaPrototype.pause !== "function") {
-    mediaPrototype.pause = vi.fn();
-  }
-  if (typeof mediaPrototype.load !== "function") {
-    mediaPrototype.load = vi.fn();
-  }
+  mediaPrototype.play = vi.fn().mockResolvedValue(undefined);
+  mediaPrototype.pause = vi.fn();
+  mediaPrototype.load = vi.fn();
 }

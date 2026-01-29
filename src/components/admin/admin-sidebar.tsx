@@ -2,236 +2,79 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
 import {
-  LayoutDashboard,
-  UserPlus,
-  Users,
   BarChart3,
-  FileText,
+  Users,
   Settings,
-  PanelLeftClose,
-  PanelLeftOpen,
-  Home,
-  Activity,
-  Layers,
-  ScrollText,
+  ShieldCheck,
+  Languages,
+  ChevronLeft,
+  Microscope,
+  School,
+  LayoutDashboard,
+  Zap,
+  type LucideIcon,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import { LogoBrain } from "@/components/branding/logo-brain";
 
 interface NavItem {
-  id: string;
   label: string;
   href: string;
   icon: LucideIcon;
-  badge?: number;
-  badgeColor?: "amber" | "red" | "blue";
 }
 
-interface AdminSidebarProps {
-  open: boolean;
-  onToggle: () => void;
-  pendingInvites?: number;
-  systemAlerts?: number;
-}
+const navItems: NavItem[] = [
+  { label: "Overview", href: "/admin", icon: LayoutDashboard },
+  { label: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+  { label: "Research", href: "/admin/research", icon: Microscope },
+  { label: "School Portal", href: "/admin/school", icon: School },
+  { label: "Users", href: "/admin/users", icon: Users },
+  { label: "Locales", href: "/admin/locales", icon: Languages },
+  { label: "Safety", href: "/admin/safety", icon: ShieldCheck },
+  { label: "Tiers", href: "/admin/tiers", icon: Zap },
+  { label: "Settings", href: "/admin/settings", icon: Settings },
+];
 
-export function AdminSidebar({
-  open,
-  onToggle,
-  pendingInvites = 0,
-  systemAlerts = 0,
-}: AdminSidebarProps) {
-  const t = useTranslations("admin");
+export function AdminSidebar() {
   const pathname = usePathname();
-  const handleItemClick = () => {
-    if (typeof window !== "undefined" && window.innerWidth < 1024) {
-      onToggle();
-    }
-  };
-
-  const NAV_ITEMS: NavItem[] = [
-    {
-      id: "dashboard",
-      label: t("dashboard"),
-      href: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      id: "invites",
-      label: t("betaRequests"),
-      href: "/admin/invites",
-      icon: UserPlus,
-    },
-    {
-      id: "users",
-      label: t("users"),
-      href: "/admin/users",
-      icon: Users,
-    },
-    {
-      id: "tiers",
-      label: t("tiers"),
-      href: "/admin/tiers",
-      icon: Layers,
-    },
-    {
-      id: "audit-log",
-      label: "Audit Log",
-      href: "/admin/tiers/audit-log",
-      icon: ScrollText,
-    },
-    {
-      id: "analytics",
-      label: "Analytics",
-      href: "/admin/analytics",
-      icon: BarChart3,
-    },
-    {
-      id: "service-limits",
-      label: "Service Limits",
-      href: "/admin/service-limits",
-      icon: Activity,
-    },
-    {
-      id: "tos",
-      label: t("terms"),
-      href: "/admin/tos",
-      icon: FileText,
-    },
-    {
-      id: "settings",
-      label: t("settings"),
-      href: "/admin/settings",
-      icon: Settings,
-    },
-  ];
-
-  const getNavItems = (): NavItem[] => {
-    return NAV_ITEMS.map((item) => {
-      if (item.id === "invites" && pendingInvites > 0) {
-        return { ...item, badge: pendingInvites, badgeColor: "amber" as const };
-      }
-      if (item.id === "dashboard" && systemAlerts > 0) {
-        return { ...item, badge: systemAlerts, badgeColor: "red" as const };
-      }
-      return item;
-    });
-  };
-
-  const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin";
-    }
-    return pathname.startsWith(href);
-  };
 
   return (
-    <aside
-      className={cn(
-        "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r",
-        "border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
-        "w-72 max-w-[85vw] lg:max-w-none lg:w-64",
-        open
-          ? "translate-x-0 lg:w-64"
-          : "-translate-x-full lg:translate-x-0 lg:w-20",
-      )}
-    >
-      {/* Logo */}
-      <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
-        <Link
-          href="/admin"
-          className="flex items-center gap-3 hover:opacity-80 transition-opacity"
-        >
-          <LogoBrain
-            alt="MirrorBuddy Admin"
-            size={36}
-            wrapperClassName="bg-slate-900 dark:bg-slate-100 flex items-center justify-center"
-            className="object-contain"
-            priority
-          />
-          {open && (
-            <span className="font-bold text-lg text-slate-900 dark:text-white">
-              Admin
-            </span>
-          )}
-        </Link>
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          onClick={onToggle}
-          className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-          aria-label={open ? t("collapseMenu") : t("expandMenu")}
-        >
-          {open ? (
-            <PanelLeftClose className="h-5 w-5" />
-          ) : (
-            <PanelLeftOpen className="h-5 w-5" />
-          )}
-        </Button>
+    <aside className="w-64 border-r border-border bg-card flex flex-col h-screen sticky top-0">
+      <div className="p-6 flex items-center gap-3 border-b border-border">
+        <LogoBrain size={32} />
+        <span className="font-bold text-lg">Admin</span>
       </div>
 
-      {/* Navigation */}
-      <nav
-        className="p-4 space-y-1 overflow-y-auto"
-        style={{ maxHeight: "calc(100vh - 120px)" }}
-      >
-        {getNavItems().map((item) => {
-          const active = isActive(item.href);
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+        {navItems.map((item) => {
+          const isActive = pathname === item.href;
           return (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={handleItemClick}
-              className={cn(
-                "flex items-center gap-3 rounded-xl transition-all relative",
-                open ? "px-4 py-3" : "justify-center px-2 py-3",
-                active &&
-                  "bg-slate-900 dark:bg-white text-white dark:text-slate-900",
-                !active &&
-                  "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
-              )}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {open && <span className="font-medium">{item.label}</span>}
-              {item.badge && item.badge > 0 && (
-                <span
-                  className={cn(
-                    "absolute text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center",
-                    open ? "right-3" : "top-1 right-1",
-                    item.badgeColor === "amber" && "bg-amber-500 text-white",
-                    item.badgeColor === "red" && "bg-red-500 text-white",
-                    item.badgeColor === "blue" && "bg-blue-600 text-white",
-                  )}
-                >
-                  {item.badge > 99 ? "99+" : item.badge}
-                </span>
-              )}
+            <Link key={item.href} href={item.href}>
+              <Button
+                variant={isActive ? "secondary" : "ghost"}
+                className={cn(
+                  "w-full justify-start gap-3 h-11 px-4 rounded-xl",
+                  isActive
+                    ? "bg-primary/10 text-primary hover:bg-primary/15"
+                    : "text-muted-foreground",
+                )}
+              >
+                <item.icon className="w-4 h-4" />
+                {item.label}
+              </Button>
             </Link>
           );
         })}
       </nav>
 
-      {/* Bottom: Return to app */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="p-4 border-t border-border">
         <Link href="/">
-          <button
-            className={cn(
-              "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
-              "bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50",
-              "border border-indigo-200 dark:border-indigo-700",
-              "text-indigo-700 dark:text-indigo-300",
-              "text-sm font-medium transition-all duration-200",
-              "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
-            )}
-            aria-label={t("returnToApp")}
-            onClick={handleItemClick}
-          >
-            <Home className="w-4 h-4" />
-            {open && <span>{t("returnToApp")}</span>}
-          </button>
+          <Button variant="outline" className="w-full gap-2 rounded-xl">
+            <ChevronLeft className="w-4 h-4" />
+            Back to App
+          </Button>
         </Link>
       </div>
     </aside>

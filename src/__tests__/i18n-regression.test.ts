@@ -32,6 +32,8 @@ const NAMESPACES = [
   "errors",
   "welcome",
   "metadata",
+  "home",
+  "voice",
 ] as const;
 
 // Historical professors use formal address (Lei, Sie, Vous)
@@ -88,6 +90,13 @@ function loadMessageFile(locale: string): Record<string, unknown> {
         const nsData = JSON.parse(content);
         Object.assign(messages, nsData);
       }
+    }
+
+    if (locale === "en" && messages.zaino) {
+      console.error(
+        "DEBUG [en] zaino:",
+        JSON.stringify(messages.zaino, null, 2),
+      );
     }
 
     return messages;

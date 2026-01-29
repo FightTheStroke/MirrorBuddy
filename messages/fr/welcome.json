@@ -1,19 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - L'école que je veux",
-    "loading": "Chargement...",
-    "seasonDefault": "Automne",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professeurs",
-      "astuccio": "Trousse",
-      "zaino": "Sac à dos",
-      "calendar": "Calendrier",
-      "progress": "Progrès",
-      "settings": "Paramètres",
-      "skipToContent": "Aller au contenu principal"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Chargement...",
@@ -21,15 +6,24 @@
     },
     "hero": {
       "welcome": "Bienvenue sur",
+      "welcomeBack": "Bon retour,",
+      "welcomeBackSubtitle": "Qu'allons-nous apprendre de nouveau aujourd'hui ?",
+      "betaBadge": "Bêta Privée",
+      "betaSubtitle": "MirrorBuddy v0.10",
       "learn": "Apprends",
-      "with-teachers": "AVEC les Grands Professeurs",
-      "any-ability": "quelles que soient tes capacités",
+      "withTeachers": "avec les Grands Professeurs",
+      "anyAbility": "quelles que soient tes capacités",
+      "tagline": "Ton école sur mesure, avec les maîtres de l'histoire",
       "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 22 Professeurs historiques t'accompagnent personnellement.",
-      "readable-fonts": "Polices lisibles",
-      "mind-maps": "Cartes mentales",
-      "text-to-speech": "Synthèse vocale",
-      "adaptive-quizzes": "Quiz adaptatifs",
-      "cta": "Commencer Maintenant"
+      "readableFonts": "Polices lisibles",
+      "mindMaps": "Cartes mentales",
+      "textToSpeech": "Synthèse vocale",
+      "adaptiveQuizzes": "Quiz adaptatifs",
+      "cta": "Commencer Maintenant",
+      "welcomeNew": "Bienvenue sur MirrorBuddy",
+      "accessibility": {
+        "title": "Une accessibilité sur mesure pour toi"
+      }
     },
     "principles": {
       "welcome-to-school": "Bienvenue dans L'école que je veux, {name} !",
@@ -56,7 +50,7 @@
       "earn-xp": "Gagne des XP - chaque leçon te fait monter de niveau !",
       "back": "Retour",
       "lets-start": "C'est parti !",
-      "tutorial-end": "Fin du tutoriel. Clique sur \"C'est parti !\" pour revenir à l'application."
+      "tutorial-end": "Fin du tutorial. Clique sur \"C'est parti !\" pour revenir à l'application."
     },
     "welcome-form": {
       "hello-melissa": "Salut ! Je suis Melissa",

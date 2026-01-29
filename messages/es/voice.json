@@ -1,0 +1,36 @@
+{
+  "panel": {
+    "connected": "Conectado",
+    "connecting": "Conectando...",
+    "listening": "Escuchando",
+    "microphoneDisabled": "Micrófono desactivado",
+    "mutedLabel": "Silenciado",
+    "muteLabel": "Silenciar",
+    "speakNow": "Habla ahora",
+    "speaking": "Hablando",
+    "startingCall": "Iniciando llamada...",
+    "unmuteLabel": "Activar sonido"
+  },
+  "connectionError": "Error de conexión de voz",
+  "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
+  "onboarding": {
+    "transcript": {
+      "conversationTitle": "Transcripción de la conversación",
+      "messageSingular": "mensaje",
+      "messagePlural": "mensajes",
+      "noConversation": "Aún no hay conversación",
+      "userLabel": "Tú",
+      "conversationActive": "Conversación activa"
+    },
+    "checklist": {
+      "nameLabel": "Nombre",
+      "ageLabel": "Edad",
+      "schoolLabel": "Escuela",
+      "schoolElementary": "Primaria",
+      "schoolMiddle": "Secundaria",
+      "schoolHigh": "Bachillerato",
+      "differencesLabel": "Diferencias de aprendizaje",
+      "differencesCount": "{count} seleccionadas"
+    }
+  }
+}

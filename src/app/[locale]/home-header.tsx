@@ -1,23 +1,24 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Link } from "@/i18n/navigation";
-import { useTranslations } from "next-intl";
+import Link from "next/link";
 import {
   Flame,
   Coins,
   BookOpen,
   Clock,
   Star,
-  Gift,
-  MessageCircle,
   Menu,
+  MessageCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PomodoroHeaderWidget } from "@/components/pomodoro";
 import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
 import { CalculatorHeaderWidget } from "@/components/calculator";
+import { TierBadge } from "@/components/tier/TierBadge";
+import { TrialHeaderDropdown } from "@/components/trial";
+import type { TierName } from "@/types/tier-types";
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -39,6 +40,8 @@ interface HomeHeaderProps {
   totalStudyMinutes: number;
   questionsAsked: number;
   trialStatus?: TrialStatus;
+  userTier?: TierName;
+  isSimulatedTier?: boolean;
 }
 
 export function HomeHeader({
@@ -54,8 +57,9 @@ export function HomeHeader({
   totalStudyMinutes,
   questionsAsked,
   trialStatus,
+  userTier,
+  isSimulatedTier,
 }: HomeHeaderProps) {
-  const t = useTranslations("home");
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
@@ -72,7 +76,7 @@ export function HomeHeader({
         <button
           onClick={onMenuClick}
           className="lg:hidden flex items-center justify-center h-11 w-11 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label={t("header.openMenu")}
+          aria-label="Apri menu"
         >
           <Menu className="h-5 w-5" />
         </button>
@@ -88,10 +92,10 @@ export function HomeHeader({
               {seasonName}
             </span>
             <span className="text-xs text-slate-500">
-              {mbInLevel}/{mbNeeded} {t("mirrorBucksShort")}
+              {mbInLevel}/{mbNeeded} MB
             </span>
           </div>
-          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-24 sm:w-36">
+          <div className="h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden mt-0.5 w-24 sm:w-36 md:w-40">
             <motion.div
               className="h-full bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full"
               initial={{ width: 0 }}
@@ -102,9 +106,44 @@ export function HomeHeader({
         </div>
       </div>
 
-      {/* Quick Stats */}
+      {/* Mobile Stats - Compact version for small screens */}
+      <div className="flex md:hidden items-center gap-2 text-sm">
+        {/* Streak indicator */}
+        {streak.current > 0 && (
+          <div className="flex items-center gap-1" title="Streak">
+            <Flame className="w-4 h-4 text-orange-500" />
+            <span className="font-semibold text-orange-500 text-xs">
+              {streak.current}
+            </span>
+          </div>
+        )}
+
+        {/* Trial mode badge - mobile version */}
+        {trialStatus?.isTrialMode && (
+          <Link
+            href="/invite/request"
+            className={cn(
+              "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-colors",
+              trialStatus.chatsRemaining <= 3
+                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
+                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300",
+            )}
+            title="Clicca per richiedere accesso completo"
+          >
+            <MessageCircle className="w-3 h-3" />
+            <span className="font-semibold">
+              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
+            </span>
+          </Link>
+        )}
+
+        {/* Notifications bell - mobile */}
+        <NotificationBell />
+      </div>
+
+      {/* Desktop Stats - Full version for medium screens and up */}
       <div className="hidden md:flex items-center gap-4 text-sm">
-        <div className="flex items-center gap-1.5" title={t("header.streak")}>
+        <div className="flex items-center gap-1.5" title="Streak">
           <Flame
             className={cn(
               "w-4 h-4",
@@ -123,7 +162,7 @@ export function HomeHeader({
 
         <div
           className="flex items-center gap-1.5"
-          title={t("header.sessionsThisWeek")}
+          title="Sessioni questa settimana"
         >
           <BookOpen className="w-4 h-4 text-accent-themed" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
@@ -131,20 +170,14 @@ export function HomeHeader({
           </span>
         </div>
 
-        <div
-          className="flex items-center gap-1.5"
-          title={t("header.studyTime")}
-        >
+        <div className="flex items-center gap-1.5" title="Tempo di studio">
           <Clock className="w-4 h-4 text-green-500" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
             {studyTimeStr}
           </span>
         </div>
 
-        <div
-          className="flex items-center gap-1.5"
-          title={t("header.questionsAsked")}
-        >
+        <div className="flex items-center gap-1.5" title="Domande fatte">
           <Star className="w-4 h-4 text-purple-500" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
             {questionsAsked}
@@ -155,34 +188,32 @@ export function HomeHeader({
         {streak.current >= 3 && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
             <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}%
-            {t("mirrorBucksShort")}
+            MB
           </div>
         )}
 
-        {/* Trial mode badge */}
+        {/* Trial mode dropdown */}
         {trialStatus?.isTrialMode && (
-          <Link
-            href="/invite/request"
-            className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
-              trialStatus.chatsRemaining <= 3
-                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-800/40"
-                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 hover:bg-purple-200 dark:hover:bg-purple-800/40",
-            )}
-            title={t("header.trialClickToRequest")}
-          >
-            <Gift className="w-3.5 h-3.5" />
-            <span>{t("header.trial")}</span>
-            <span className="flex items-center gap-1 pl-1.5 border-l border-current/20">
-              <MessageCircle className="w-3 h-3" />
-              {trialStatus.chatsRemaining}/{trialStatus.maxChats}
-            </span>
-          </Link>
+          <TrialHeaderDropdown
+            chatsRemaining={trialStatus.chatsRemaining}
+            maxChats={trialStatus.maxChats}
+          />
         )}
       </div>
 
-      {/* Right section: calculator + ambient audio + pomodoro + notifications + version */}
+      {/* Right section: tier badge + calculator + ambient audio + pomodoro + notifications + version */}
+      {/* Note: TierBadge hidden when trial dropdown is shown to avoid redundancy */}
       <div className="hidden lg:flex items-center gap-3">
+        {userTier && !trialStatus?.isTrialMode && (
+          <div className="flex items-center gap-1">
+            <TierBadge tier={userTier} showIcon={userTier === "pro"} />
+            {isSimulatedTier && (
+              <span className="text-[10px] text-amber-500 font-medium">
+                (SIM)
+              </span>
+            )}
+          </div>
+        )}
         <CalculatorHeaderWidget />
         <AmbientAudioHeaderWidget />
         <PomodoroHeaderWidget />

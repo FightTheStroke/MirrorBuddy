@@ -3,6 +3,7 @@
     "appTitle": "MirrorBuddy",
     "loading": "Cargando...",
     "seasonDefault": "Otoño",
+    "mirrorBucksShort": "MB",
     "navigation": {
       "skipToContent": "Saltar al contenido principal",
       "professors": "Profesores",
@@ -11,6 +12,30 @@
       "settings": "Configuración",
       "zaino": "Mochila",
       "astuccio": "Estuche"
-    }
+    },
+    "header": {
+      "openMenu": "Abrir menú",
+      "streak": "Racha diaria",
+      "sessionsThisWeek": "Sesiones esta semana",
+      "studyTime": "Tiempo total de estudio",
+      "questionsAsked": "Preguntas hechas",
+      "trial": "Prueba",
+      "trialClickToRequest": "Haz clic para solicitar acceso completo"
+    },
+    "sidebar": {
+      "backToHome": "Volver al inicio",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Cerrar menú",
+      "trialMode": "Modo de prueba",
+      "login": "Iniciar sesión",
+      "requestAccess": "Solicitar Acceso",
+      "adminDashboard": "Panel de Admin",
+      "adminDashboardAria": "Ir al panel de administrador",
+      "parentArea": "Área de Padres"
+    },
+    "returnHome": "Volver al inicio",
+    "closeMenu": "Cerrar menú",
+    "parentArea": "Área de padres",
+    "logout": "Cerrar sesión"
   }
 }
