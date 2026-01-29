@@ -111,6 +111,54 @@ export function HomeSidebar({
           </Button>
         </div>
 
+        {/* Trial Status Indicator */}
+        {trialStatus?.isTrialMode && (
+          <div className="px-4 py-3 border-b border-slate-200 dark:border-slate-800">
+            <div className="flex flex-col gap-2">
+              {open && (
+                <span className="text-xs font-medium text-amber-700 dark:text-amber-400">
+                  {t("sidebar.trialMode")}
+                </span>
+              )}
+              <TrialStatusIndicator
+                chatsUsed={trialStatus.chatsUsed}
+                maxChats={trialStatus.maxChats}
+                voiceSecondsUsed={trialStatus.voiceSecondsUsed}
+                maxVoiceSeconds={trialStatus.maxVoiceSeconds}
+                toolsUsed={trialStatus.toolsUsed}
+                maxTools={trialStatus.maxTools}
+                showVoice={true}
+                showTools={true}
+                className={cn(!open && "justify-center")}
+              />
+              {open && (
+                <div className="flex flex-col gap-1 mt-2">
+                  <Link href="/login">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-xs"
+                    >
+                      <LogIn className="w-3 h-3 mr-2" />
+                      {t("sidebar.login")}
+                    </Button>
+                  </Link>
+                  <Link href="/invite/request">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-start text-xs text-purple-600 dark:text-purple-400"
+                    >
+                      <UserPlus className="w-3 h-3 mr-2" />
+                      {t("sidebar.requestAccess")}
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Navigation */}
         <nav className="flex-1 p-4 space-y-3 overflow-y-auto">
           {navItems.map((item) => {
