@@ -24,5 +24,67 @@
     "coppa": "Se hai meno di 13 anni, i tuoi genitori hanno ricevuto un avviso per approvare i cookie essenziali.",
     "privacyPolicy": "Informativa sulla Privacy",
     "cookiePolicy": "Informativa sui Cookie"
+  },
+  "privacy": {
+    "title": "Accordo sulla Privacy",
+    "description": "La tua privacy è fondamentale per noi",
+    "dataProcessing": "Processamento dei Dati",
+    "processingText": "MirrorBuddy processa solo i dati necessari per fornirti un'esperienza di apprendimento personalizzata e sicura.",
+    "dataStorage": "Dove Memorizziamo i Tuoi Dati",
+    "storageText": "I tuoi dati vengono archiviati su server sicuri in Europa, con conformità GDPR garantita.",
+    "retention": "Periodo di Conservazione",
+    "retentionText": "Conserviamo i tuoi dati per il tempo necessario al servizio. Puoi richiedere l'eliminazione in qualsiasi momento.",
+    "accept": "Ho Letto e Accetto",
+    "decline": "Rifiuta"
+  },
+  "terms": {
+    "title": "Condizioni di Servizio",
+    "description": "Leggere i nostri termini e condizioni",
+    "acceptance": "Accetto le Condizioni di Servizio",
+    "acceptanceText": "Confermo di aver letto e accettato i termini di servizio e le politiche della piattaforma.",
+    "linkLabel": "Visualizza Condizioni Complete",
+    "required": "È necessario accettare i Termini di Servizio per continuare."
+  },
+  "ageVerification": {
+    "title": "Verifica dell'Età",
+    "description": "Conformità GDPR - Protezione dei Minori",
+    "statement": "Dichiaro di avere almeno 14 anni di età",
+    "europeanMinor": "Se hai meno di 14 anni, è necessario il consenso di un genitore o tutore.",
+    "confirm": "Confermo di avere almeno 14 anni",
+    "under14": "Sono un utente Under-14 - Richiedo il Consenso Parentale"
+  },
+  "parentalConsent": {
+    "title": "Consenso Parentale",
+    "description": "Richiesta di Consenso per Utenti Minori",
+    "intro": "Se sei un genitore o tutore di un utente minore, per favore leggi attentamente le nostre politiche.",
+    "statement": "Dichiaro di essere un genitore o tutore legale e autorizzo l'uso della piattaforma",
+    "responsibilities": "Responsabilità del Genitore",
+    "responsibilitiesText": "Come genitore, accetti di supervisionare l'uso della piattaforma e sei responsabile dell'attività del minore.",
+    "contactUs": "Per domande sul consenso parentale, contattaci all'indirizzo di supporto.",
+    "confirm": "Do il Mio Consenso",
+    "decline": "Non Autorizzo"
+  },
+  "aiDisclosure": {
+    "title": "Divulgazione sull'IA",
+    "description": "Trasparenza nell'Uso dell'Intelligenza Artificiale",
+    "statement": "Questa piattaforma utilizza Intelligenza Artificiale (IA) per personalizzare il tuo apprendimento.",
+    "howWeUseAI": "Come Utilizziamo l'IA",
+    "howWeUseAIText": "L'IA viene utilizzata per fornire tutoraggio personalizzato, feedback adattivo e raccomandazioni didattiche. Le decisioni critiche rimangono sempre sotto controllo umano.",
+    "aiLimitations": "Limitazioni dell'IA",
+    "aiLimitationsText": "L'IA non è perfetta. Può fare errori e non dovrebbe sostituire il giudizio umano. Incoraggiamo domande e feedback critici.",
+    "humanOversight": "Supervisione Umana",
+    "humanOversightText": "Tutte le funzioni critiche di IA sono supervisionate da insegnanti qualificati e specialisti pedagogici.",
+    "acknowledge": "Ho Compreso l'Uso dell'IA"
+  },
+  "withdrawal": {
+    "title": "Ritiro del Consenso",
+    "description": "Come Revocare il Consenso",
+    "howToWithdraw": "Puoi ritirare il consenso in qualsiasi momento accedendo alle tue impostazioni di privacy.",
+    "withdrawalProcess": "Processo di Ritiro",
+    "withdrawalSteps": "1. Accedi al tuo account\n2. Vai a Impostazioni > Privacy e Consenso\n3. Seleziona i consensi che desideri ritirare\n4. Conferma la richiesta di ritiro\n5. I tuoi dati verranno eliminati secondo le normative GDPR",
+    "emailWithdrawal": "In alternativa, puoi inviarci un'email di richiesta formale di ritiro.",
+    "consequences": "Conseguenze",
+    "consequencesText": "Il ritiro di determinati consensi potrebbe impedire l'accesso a specifiche funzioni della piattaforma.",
+    "contactSupport": "Contatta il Supporto"
   }
 }

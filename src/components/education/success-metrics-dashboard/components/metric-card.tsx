@@ -1,10 +1,16 @@
-import { motion } from 'framer-motion';
-import { TrendingUp, TrendingDown, Minus, Star } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { SuccessMetric } from '../types';
-import { METRIC_ICONS, METRIC_COLORS } from '../constants';
+import { motion } from "framer-motion";
+import { TrendingUp, TrendingDown, Minus, Star } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import type { SuccessMetric } from "../types";
+import { METRIC_ICONS, METRIC_COLORS } from "../constants";
 
 interface MetricCardProps {
   metric: SuccessMetric;
@@ -16,45 +22,56 @@ export function MetricCard({ metric }: MetricCardProps) {
   const colors = METRIC_COLORS[metric.id];
   const change = metric.currentScore - metric.previousScore;
 
-  const TrendIcon = metric.trend === 'up' ? TrendingUp : metric.trend === 'down' ? TrendingDown : Minus;
+  const TrendIcon =
+    metric.trend === "up"
+      ? TrendingUp
+      : metric.trend === "down"
+        ? TrendingDown
+        : Minus;
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
       <Card
         className={cn(
-          'overflow-hidden',
-          settings.highContrast ? 'border-yellow-400 bg-gray-900' : colors.border
+          "overflow-hidden",
+          settings.highContrast
+            ? "border-yellow-400 bg-gray-900"
+            : colors.border,
         )}
+        role="region"
+        aria-labelledby={`metric-title-${metric.id}`}
       >
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div
                 className={cn(
-                  'p-2 rounded-lg',
-                  settings.highContrast ? 'bg-yellow-400/20' : colors.bg
+                  "p-2 rounded-lg",
+                  settings.highContrast ? "bg-yellow-400/20" : colors.bg,
                 )}
+                aria-hidden="true"
               >
                 <Icon
                   className={cn(
-                    'w-5 h-5',
-                    settings.highContrast ? 'text-yellow-400' : colors.primary
+                    "w-5 h-5",
+                    settings.highContrast ? "text-yellow-400" : colors.primary,
                   )}
                 />
               </div>
               <div>
                 <CardTitle
+                  id={`metric-title-${metric.id}`}
                   className={cn(
-                    'text-lg',
-                    settings.highContrast ? 'text-yellow-400' : ''
+                    "text-lg",
+                    settings.highContrast ? "text-yellow-400" : "",
                   )}
                 >
                   {metric.name}
                 </CardTitle>
-                <CardDescription className="text-xs">
+                <CardDescription
+                  id={`metric-desc-${metric.id}`}
+                  className="text-xs"
+                >
                   {metric.description}
                 </CardDescription>
               </div>
@@ -62,24 +79,36 @@ export function MetricCard({ metric }: MetricCardProps) {
             <div className="text-right">
               <div
                 className={cn(
-                  'text-3xl font-bold',
-                  settings.highContrast ? 'text-white' : 'text-slate-900 dark:text-white'
+                  "text-3xl font-bold",
+                  settings.highContrast
+                    ? "text-white"
+                    : "text-slate-900 dark:text-white",
                 )}
+                aria-label={`Current score: ${metric.currentScore} out of 100`}
               >
                 {metric.currentScore}
               </div>
               <div
                 className={cn(
-                  'flex items-center gap-1 text-xs',
+                  "flex items-center gap-1 text-xs",
                   change > 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? "text-emerald-600 dark:text-emerald-400"
                     : change < 0
-                      ? 'text-red-600 dark:text-red-400'
-                      : 'text-slate-500'
+                      ? "text-red-600 dark:text-red-400"
+                      : "text-slate-500",
                 )}
+                aria-label={`Trend: ${change > 0 ? "up" : change < 0 ? "down" : "stable"} by ${Math.abs(change)}%`}
               >
-                <TrendIcon className="w-3 h-3" />
-                {change > 0 ? '+' : ''}
+                <TrendIcon className="w-3 h-3" aria-hidden="true" />
+                <span className="sr-only">
+                  {change > 0
+                    ? "Increase"
+                    : change < 0
+                      ? "Decrease"
+                      : "No change"}{" "}
+                  of{" "}
+                </span>
+                {change > 0 ? "+" : ""}
                 {change}%
               </div>
             </div>
@@ -89,17 +118,24 @@ export function MetricCard({ metric }: MetricCardProps) {
           <div className="mb-4">
             <div
               className={cn(
-                'h-2 rounded-full overflow-hidden',
-                settings.highContrast ? 'bg-gray-800' : 'bg-slate-200 dark:bg-slate-700'
+                "h-2 rounded-full overflow-hidden",
+                settings.highContrast
+                  ? "bg-gray-800"
+                  : "bg-slate-200 dark:bg-slate-700",
               )}
+              role="progressbar"
+              aria-valuenow={metric.currentScore}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-labelledby={`metric-title-${metric.id}`}
             >
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${metric.currentScore}%` }}
-                transition={{ duration: 1, ease: 'easeOut' }}
+                transition={{ duration: 1, ease: "easeOut" }}
                 className={cn(
-                  'h-full rounded-full',
-                  settings.highContrast ? 'bg-yellow-400' : colors.progress
+                  "h-full rounded-full",
+                  settings.highContrast ? "bg-yellow-400" : colors.progress,
                 )}
               />
             </div>
@@ -114,24 +150,37 @@ export function MetricCard({ metric }: MetricCardProps) {
                 <div
                   key={sub.id}
                   className={cn(
-                    'p-2 rounded-lg',
-                    settings.highContrast ? 'bg-gray-800' : 'bg-slate-50 dark:bg-slate-800/50'
+                    "p-2 rounded-lg",
+                    settings.highContrast
+                      ? "bg-gray-800"
+                      : "bg-slate-50 dark:bg-slate-800/50",
                   )}
+                  role="region"
+                  aria-labelledby={`submetric-${sub.id}`}
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                    <span
+                      id={`submetric-${sub.id}`}
+                      className="text-xs text-slate-500 dark:text-slate-400 truncate font-medium"
+                    >
                       {sub.name}
                     </span>
                     {isAchieved && (
-                      <Star className="w-3 h-3 text-amber-500 shrink-0" />
+                      <Star
+                        className="w-3 h-3 text-amber-500 shrink-0"
+                        aria-label="Goal achieved"
+                      />
                     )}
                   </div>
                   <div className="flex items-baseline gap-1">
                     <span
                       className={cn(
-                        'text-lg font-semibold',
-                        settings.highContrast ? 'text-white' : 'text-slate-900 dark:text-white'
+                        "text-lg font-semibold",
+                        settings.highContrast
+                          ? "text-white"
+                          : "text-slate-900 dark:text-white",
                       )}
+                      aria-label={`${sub.value} out of ${sub.target} ${sub.unit}`}
                     >
                       {sub.value}
                     </span>
@@ -141,20 +190,28 @@ export function MetricCard({ metric }: MetricCardProps) {
                   </div>
                   <div
                     className={cn(
-                      'h-1 mt-1 rounded-full overflow-hidden',
-                      settings.highContrast ? 'bg-gray-700' : 'bg-slate-200 dark:bg-slate-700'
+                      "h-1 mt-1 rounded-full overflow-hidden",
+                      settings.highContrast
+                        ? "bg-gray-700"
+                        : "bg-slate-200 dark:bg-slate-700",
                     )}
+                    role="progressbar"
+                    aria-valuenow={sub.value}
+                    aria-valuemin={0}
+                    aria-valuemax={sub.target}
+                    aria-labelledby={`submetric-${sub.id}`}
                   >
                     <div
                       className={cn(
-                        'h-full rounded-full transition-all',
+                        "h-full rounded-full transition-all",
                         isAchieved
-                          ? 'bg-emerald-500'
+                          ? "bg-emerald-500"
                           : settings.highContrast
-                            ? 'bg-yellow-400'
-                            : colors.progress
+                            ? "bg-yellow-400"
+                            : colors.progress,
                       )}
                       style={{ width: `${percentage}%` }}
+                      aria-hidden="true"
                     />
                   </div>
                 </div>
@@ -166,4 +223,3 @@ export function MetricCard({ metric }: MetricCardProps) {
     </motion.div>
   );
 }
-

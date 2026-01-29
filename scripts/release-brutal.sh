@@ -156,6 +156,20 @@ pass "rate-limit"
 [ -d src/app/privacy ] && pass "privacy-page" || fail "privacy-page" "Missing src/app/privacy/"
 [ -d src/app/terms ] && pass "terms-page" || fail "terms-page" "Missing src/app/terms/"
 
+# Compliance documentation gate (F-04)
+COMPLIANCE_DOCS_FAIL=false
+COMPLIANCE_DOCS_MISSING=""
+for doc in "INCIDENT-RESPONSE-PLAN.md" "PILOT-RESEARCH-PROTOCOL.md" "VPAT-ACCESSIBILITY-REPORT.md" "SOC2-ISO27001-ROADMAP.md" "AI-ACT-CONFORMITY-ASSESSMENT.md"; do
+  if [ ! -f "docs/compliance/$doc" ]; then
+    COMPLIANCE_DOCS_FAIL=true
+    COMPLIANCE_DOCS_MISSING="$COMPLIANCE_DOCS_MISSING\n- docs/compliance/$doc"
+  fi
+done
+$COMPLIANCE_DOCS_FAIL && fail "compliance-docs" "Missing compliance documentation:$COMPLIANCE_DOCS_MISSING" || pass "compliance-docs"
+
+# i18n namespace completeness (all 5 locales synced)
+npm run i18n:check > /tmp/release-i18n.log 2>&1 && pass "i18n-completeness" || fail "i18n-completeness" "\`\`\`\n$(tail -10 /tmp/release-i18n.log)\n\`\`\`"
+
 # Architecture diagrams check (25 sections + 21 compliance + ALL ADRs)
 # First sync any missing ADRs, then validate
 ./scripts/sync-architecture-diagrams.sh > /tmp/release-arch-sync.log 2>&1 || true
@@ -177,6 +191,14 @@ if [ -d docs/plans/done ]; then
   done
 fi
 $PLAN_OK && pass "plans" || fail "plans" "$PLAN_FAIL"
+
+# =============================================================================
+# PHASE 9: COMPLIANCE GATE SUMMARY (F-04)
+# =============================================================================
+COMPLIANCE_CHECKS=$(grep "^compliance\|^i18n\|^dpia\|^ai-policy\|^privacy\|^terms" "$RESULTS_FILE" 2>/dev/null || echo "")
+COMPLIANCE_PASS=$(echo "$COMPLIANCE_CHECKS" | /usr/bin/grep -c ":PASS$" 2>/dev/null || echo 0)
+COMPLIANCE_TOTAL=$(echo "$COMPLIANCE_CHECKS" | /usr/bin/wc -l | tr -d ' ')
+[ "$COMPLIANCE_TOTAL" -gt 0 ] && echo "## Compliance Gate Summary" >> "$ISSUES_FILE" && echo "Passed: $COMPLIANCE_PASS/$COMPLIANCE_TOTAL compliance checks" >> "$ISSUES_FILE" && echo "" >> "$ISSUES_FILE"
 
 # =============================================================================
 # OUTPUT

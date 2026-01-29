@@ -99,8 +99,10 @@
       "notRecommended": "Not Recommended",
       "selectModels": "Select Models"
     },
-    "create": "Crea",
-    "update": "Aggiorna"
+    "create": "Crear",
+    "update": "Actualizar",
+    "skipToMainContent": "Ir al contenido principal",
+    "skipLinkFocused": "Enfoque movido al contenido principal"
   },
   "status": {
     "active": "Attivo",

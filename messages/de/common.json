@@ -100,7 +100,9 @@
     },
     "create": "Erstellen",
     "update": "Aktualisieren",
-    "loading": "Laden..."
+    "loading": "Laden...",
+    "skipToMainContent": "Zum Hauptinhalt springen",
+    "skipLinkFocused": "Fokus zum Hauptinhalt bewegt"
   },
   "status": {
     "active": "Aktiv",

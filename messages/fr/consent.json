@@ -24,5 +24,67 @@
     "coppa": "Si vous avez moins de 13 ans, vos parents ont reçu un avis pour approuver les cookies essentiels.",
     "privacyPolicy": "Politique de Confidentialité",
     "cookiePolicy": "Politique en Matière de Cookies"
+  },
+  "privacy": {
+    "title": "Accord de Confidentialité",
+    "description": "Votre confidentialité est importante pour nous",
+    "dataProcessing": "Traitement des Données",
+    "processingText": "MirrorBuddy traite uniquement les données nécessaires pour vous offrir une expérience d'apprentissage personnalisée et sécurisée.",
+    "dataStorage": "Où Nous Stockons Vos Données",
+    "storageText": "Vos données sont stockées sur des serveurs sécurisés en Europe avec conformité RGPD garantie.",
+    "retention": "Période de Rétention des Données",
+    "retentionText": "Nous conservons vos données aussi longtemps que nécessaire pour le service. Vous pouvez demander la suppression à tout moment.",
+    "accept": "J'ai Lu et J'Accepte",
+    "decline": "Refuser"
+  },
+  "terms": {
+    "title": "Conditions d'Utilisation",
+    "description": "Lisez nos conditions générales",
+    "acceptance": "J'Accepte les Conditions d'Utilisation",
+    "acceptanceText": "Je confirme que j'ai lu et accepté les conditions d'utilisation et les politiques de la plateforme.",
+    "linkLabel": "Afficher les Conditions Complètes",
+    "required": "Vous devez accepter les Conditions d'Utilisation pour continuer."
+  },
+  "ageVerification": {
+    "title": "Vérification de l'Âge",
+    "description": "Conformité RGPD - Protection des Mineurs",
+    "statement": "Je confirme que j'ai au moins 14 ans",
+    "europeanMinor": "Si vous avez moins de 14 ans, le consentement d'un parent ou d'un tuteur est requis.",
+    "confirm": "Je confirme que j'ai au moins 14 ans",
+    "under14": "Je suis un Utilisateur Mineur - Je Demande le Consentement Parental"
+  },
+  "parentalConsent": {
+    "title": "Consentement Parental",
+    "description": "Demande de Consentement pour les Utilisateurs Mineurs",
+    "intro": "Si vous êtes parent ou tuteur d'un utilisateur mineur, veuillez lire attentivement nos politiques.",
+    "statement": "Je confirme que je suis parent ou tuteur légal et autorise l'utilisation de la plateforme",
+    "responsibilities": "Responsabilités du Parent",
+    "responsibilitiesText": "En tant que parent, vous acceptez de surveiller l'utilisation de la plateforme et êtes responsable de l'activité du mineur.",
+    "contactUs": "Pour toute question concernant le consentement parental, contactez notre équipe d'assistance.",
+    "confirm": "Je Donne Mon Consentement",
+    "decline": "Je N'Autorise Pas"
+  },
+  "aiDisclosure": {
+    "title": "Divulgation sur l'IA",
+    "description": "Transparence dans l'Utilisation de l'Intelligence Artificielle",
+    "statement": "Cette plateforme utilise l'Intelligence Artificielle (IA) pour personnaliser votre apprentissage.",
+    "howWeUseAI": "Comment Nous Utilisons l'IA",
+    "howWeUseAIText": "L'IA est utilisée pour fournir un tutorat personnalisé, des commentaires adaptatifs et des recommandations d'apprentissage. Les décisions critiques restent sous contrôle humain.",
+    "aiLimitations": "Limitations de l'IA",
+    "aiLimitationsText": "L'IA n'est pas parfaite. Elle peut faire des erreurs et ne devrait pas remplacer le jugement humain. Nous encourageons les questions et commentaires critiques.",
+    "humanOversight": "Supervision Humaine",
+    "humanOversightText": "Toutes les fonctions critiques d'IA sont supervisées par des enseignants qualifiés et des spécialistes pédagogiques.",
+    "acknowledge": "J'Ai Compris l'Utilisation de l'IA"
+  },
+  "withdrawal": {
+    "title": "Retrait du Consentement",
+    "description": "Comment Révoquer le Consentement",
+    "howToWithdraw": "Vous pouvez retirer votre consentement à tout moment en accédant à vos paramètres de confidentialité.",
+    "withdrawalProcess": "Processus de Retrait",
+    "withdrawalSteps": "1. Connectez-vous à votre compte\n2. Allez à Paramètres > Confidentialité et Consentement\n3. Sélectionnez les consentements que vous souhaitez retirer\n4. Confirmez la demande de retrait\n5. Vos données seront supprimées conformément aux réglementations RGPD",
+    "emailWithdrawal": "Vous pouvez également nous envoyer un email formel de demande de retrait.",
+    "consequences": "Conséquences",
+    "consequencesText": "Le retrait de certains consentements peut empêcher l'accès à des fonctionnalités spécifiques de la plateforme.",
+    "contactSupport": "Contacter le Support"
   }
 }

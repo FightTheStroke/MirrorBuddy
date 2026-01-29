@@ -81,10 +81,15 @@ export function SuccessMetricsDashboard({
         settings.highContrast ? "bg-black" : "bg-slate-50 dark:bg-slate-950",
         className,
       )}
+      role="main"
     >
-      <div className="flex items-center justify-between">
+      <section
+        aria-labelledby="dashboard-title"
+        className="flex items-center justify-between"
+      >
         <div>
           <h1
+            id="dashboard-title"
             className={cn(
               "text-2xl font-bold",
               settings.highContrast
@@ -105,6 +110,8 @@ export function SuccessMetricsDashboard({
               ? "bg-gray-900 border border-yellow-400"
               : "bg-white dark:bg-slate-900 shadow-lg",
           )}
+          role="region"
+          aria-label={t("overallScore")}
         >
           <div
             className={cn(
@@ -115,12 +122,13 @@ export function SuccessMetricsDashboard({
                   ? "text-amber-600"
                   : "text-red-600",
             )}
+            aria-label={`${t("overallScore")}: ${metricsData.overallScore} out of 100`}
           >
             {metricsData.overallScore}
           </div>
           <div className="text-xs text-slate-500">{t("overallScore")}</div>
         </div>
-      </div>
+      </section>
 
       <Card
         className={cn(
@@ -145,17 +153,22 @@ export function SuccessMetricsDashboard({
         </CardContent>
       </Card>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <section
+        aria-label={t("metricsSection")}
+        className="grid md:grid-cols-2 gap-4"
+      >
         {metricsData.metrics.map((metric) => (
           <MetricCard key={metric.id} metric={metric} />
         ))}
-      </div>
+      </section>
 
       <Card
         className={settings.highContrast ? "border-yellow-400 bg-gray-900" : ""}
+        role="region"
+        aria-labelledby="milestones-title"
       >
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle id="milestones-title" className="flex items-center gap-2">
             <Trophy
               className={cn(
                 "w-5 h-5",
@@ -163,6 +176,7 @@ export function SuccessMetricsDashboard({
                   ? "text-yellow-400"
                   : "text-amber-600 dark:text-amber-400",
               )}
+              aria-hidden="true"
             />
             <span className={settings.highContrast ? "text-yellow-400" : ""}>
               {t("milestones")}
@@ -176,18 +190,26 @@ export function SuccessMetricsDashboard({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="sr-only">
+            {achievedMilestones.length} milestones achieved,{" "}
+            {pendingMilestones.length} pending
+          </div>
           {achievedMilestones.map((milestone) => (
             <MilestoneItem key={milestone.id} milestone={milestone} />
           ))}
 
           {pendingMilestones.length > 0 && (
             <>
-              <div className="text-xs text-slate-500 pt-2">
+              <h3 className="text-xs text-slate-500 pt-2" id="upcoming-heading">
                 {t("upcomingMilestones")}
+              </h3>
+              <div role="list" aria-labelledby="upcoming-heading">
+                {pendingMilestones.map((milestone) => (
+                  <div key={milestone.id} role="listitem">
+                    <MilestoneItem milestone={milestone} />
+                  </div>
+                ))}
               </div>
-              {pendingMilestones.map((milestone) => (
-                <MilestoneItem key={milestone.id} milestone={milestone} />
-              ))}
             </>
           )}
         </CardContent>

@@ -24,5 +24,67 @@
     "coppa": "If you are under 13, your parents received a notice to approve essential cookies.",
     "privacyPolicy": "Privacy Policy",
     "cookiePolicy": "Cookie Policy"
+  },
+  "privacy": {
+    "title": "Privacy Agreement",
+    "description": "Your privacy is important to us",
+    "dataProcessing": "Data Processing",
+    "processingText": "MirrorBuddy processes only the data necessary to provide you with a personalized and secure learning experience.",
+    "dataStorage": "Where We Store Your Data",
+    "storageText": "Your data is stored on secure servers in Europe with guaranteed GDPR compliance.",
+    "retention": "Data Retention Period",
+    "retentionText": "We retain your data for as long as necessary for the service. You can request deletion at any time.",
+    "accept": "I Have Read and Accept",
+    "decline": "Decline"
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "description": "Read our terms and conditions",
+    "acceptance": "I Accept the Terms of Service",
+    "acceptanceText": "I confirm that I have read and accepted the terms of service and platform policies.",
+    "linkLabel": "View Full Terms",
+    "required": "You must accept the Terms of Service to continue."
+  },
+  "ageVerification": {
+    "title": "Age Verification",
+    "description": "GDPR Compliance - Minor Protection",
+    "statement": "I confirm I am at least 14 years old",
+    "europeanMinor": "If you are under 14, parental or guardian consent is required.",
+    "confirm": "I confirm I am at least 14 years old",
+    "under14": "I am an Under-14 User - I Request Parental Consent"
+  },
+  "parentalConsent": {
+    "title": "Parental Consent",
+    "description": "Consent Request for Minor Users",
+    "intro": "If you are a parent or guardian of a minor user, please read our policies carefully.",
+    "statement": "I confirm I am a legal parent or guardian and authorize platform usage",
+    "responsibilities": "Parent Responsibilities",
+    "responsibilitiesText": "As a parent, you agree to supervise platform use and are responsible for the minor's activity.",
+    "contactUs": "For questions about parental consent, contact our support team.",
+    "confirm": "I Give My Consent",
+    "decline": "I Do Not Authorize"
+  },
+  "aiDisclosure": {
+    "title": "AI Disclosure",
+    "description": "Transparency in Artificial Intelligence Use",
+    "statement": "This platform uses Artificial Intelligence (AI) to personalize your learning.",
+    "howWeUseAI": "How We Use AI",
+    "howWeUseAIText": "AI is used to provide personalized tutoring, adaptive feedback, and learning recommendations. Critical decisions remain under human control.",
+    "aiLimitations": "AI Limitations",
+    "aiLimitationsText": "AI is not perfect. It can make mistakes and should not replace human judgment. We encourage critical questions and feedback.",
+    "humanOversight": "Human Oversight",
+    "humanOversightText": "All critical AI functions are supervised by qualified teachers and educational specialists.",
+    "acknowledge": "I Understand AI Use"
+  },
+  "withdrawal": {
+    "title": "Consent Withdrawal",
+    "description": "How to Revoke Consent",
+    "howToWithdraw": "You can withdraw consent at any time by accessing your privacy settings.",
+    "withdrawalProcess": "Withdrawal Process",
+    "withdrawalSteps": "1. Sign in to your account\n2. Go to Settings > Privacy and Consent\n3. Select which consents you want to withdraw\n4. Confirm the withdrawal request\n5. Your data will be deleted per GDPR regulations",
+    "emailWithdrawal": "Alternatively, you can send us a formal withdrawal request email.",
+    "consequences": "Consequences",
+    "consequencesText": "Withdrawing certain consents may prevent access to specific platform features.",
+    "contactSupport": "Contact Support"
   }
 }

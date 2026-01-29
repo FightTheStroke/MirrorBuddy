@@ -1,15 +1,60 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy",
+    "appTitle": "MirrorBuddy - L'École que je veux",
     "loading": "Chargement...",
     "seasonDefault": "Automne",
+    "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Professeurs",
+      "astuccio": "Trousse",
+      "zaino": "Sac à dos",
       "calendar": "Calendrier",
       "progress": "Progrès",
       "settings": "Paramètres",
-      "zaino": "Sac à dos",
-      "astuccio": "Trousse"
+      "features": "Fonctionnalités",
+      "pricing": "Tarifs",
+      "about": "À propos",
+      "contact": "Contact",
+      "login": "Se connecter",
+      "signup": "S'inscrire",
+      "dashboard": "Tableau de bord",
+      "logout": "Se déconnecter"
+    },
+    "header": {
+      "openMenu": "Ouvrir le menu",
+      "streak": "Série",
+      "sessionsThisWeek": "Sessions cette semaine",
+      "studyTime": "Temps d'étude",
+      "questionsAsked": "Questions posées",
+      "trial": "Essai",
+      "trialClickToRequest": "Cliquez pour demander l'accès complet"
+    },
+    "sidebar": {
+      "backToHome": "Retour à l'accueil",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Fermer le menu",
+      "trialMode": "Mode Essai",
+      "login": "Se connecter",
+      "requestAccess": "Demander l'accès",
+      "adminDashboard": "Tableau de bord Admin",
+      "adminDashboardAria": "Tableau de bord administrateur",
+      "parentArea": "Espace Parents"
+    },
+    "adminDashboard": "Tableau de bord Admin",
+    "closeMenu": "Fermer le menu",
+    "logout": "Se déconnecter",
+    "openMenu": "Ouvrir le menu",
+    "parentArea": "Espace Parents",
+    "returnHome": "Retour à l'accueil",
+    "season": {
+      "autumn": "Automne"
+    },
+    "title": "Titre",
+    "hero": {
+      "title": "Apprends mieux avec MirrorBuddy",
+      "subtitle": "Ton compagnon d'étude basé sur l'intelligence artificielle",
+      "cta": "Commencer maintenant",
+      "secondaryCta": "En savoir plus"
     }
   }
 }

@@ -324,6 +324,82 @@
       "subtitle": "Subtítulo",
       "switchToChat": "Cambiar a Chat",
       "title": "Título"
+    },
+    "label": "Voz",
+    "description": "Habilita la conversación de voz con Maestri",
+    "chatUI": {
+      "startRecording": "Iniciar grabación",
+      "stopRecording": "Detener grabación",
+      "sendVoiceMessage": "Enviar mensaje de voz",
+      "cancel": "Cancelar",
+      "recordingInProgress": "Grabación en curso...",
+      "microphonePermission": "Permita el acceso del micrófono para usar la voz",
+      "grantPermission": "Permitir micrófono",
+      "denyPermission": "Denegar acceso"
+    },
+    "status": {
+      "listening": "Escuchando...",
+      "processing": "Procesando...",
+      "speaking": "Hablando...",
+      "connecting": "Conectando...",
+      "ready": "Listo",
+      "initializing": "Inicializando...",
+      "processing_text": "Transcribiendo..."
+    },
+    "settings": {
+      "title": "Configuración de voz",
+      "speed": "Velocidad de reproducción",
+      "pitch": "Tono",
+      "voiceSelection": "Seleccionar voz",
+      "volume": "Volumen",
+      "enableCaptions": "Habilitar subtítulos",
+      "textToSpeech": "Texto a voz",
+      "speechToText": "Reconocimiento de voz",
+      "language": "Idioma de escucha",
+      "reset": "Restablecer valores predeterminados"
+    },
+    "errors": {
+      "microphoneDenied": "Acceso de micrófono denegado. Habilite el micrófono en la configuración.",
+      "microphoneNotFound": "No se detectó micrófono. Verifique su dispositivo.",
+      "connectionError": "Error de conexión. Verifique su conexión a Internet.",
+      "timeout": "Tiempo de conexión agotado. Intente de nuevo.",
+      "recordingFailed": "La grabación falló. Intente de nuevo.",
+      "processingError": "Error de procesamiento. Intente de nuevo.",
+      "permissionError": "Error de permiso. Verifique su configuración.",
+      "unsupportedBrowser": "Su navegador no admite grabación de voz.",
+      "unknownError": "Error desconocido. Intente más tarde."
+    },
+    "trialLimits": {
+      "voiceTitle": "Límite de voz",
+      "minutesRemaining": "{minutes} minutos restantes",
+      "secondsRemaining": "{seconds} segundos restantes",
+      "limitReached": "Límite de voz alcanzado",
+      "limitReachedMessage": "Ha utilizado todos sus minutos de voz. Actualice para acceso ilimitado a voz.",
+      "upgradePrompt": "¿Desea acceso ilimitado a voz?",
+      "upgrade": "Actualizar ahora"
+    },
+    "accessibility": {
+      "voiceToText": "Convertir voz a texto",
+      "textAlternative": "Usar texto como alternativa",
+      "captionsToggle": "Alternar subtítulos",
+      "enableSubtitles": "Habilitar subtítulos para todas las respuestas",
+      "voiceSpeed": "Velocidad de lectura",
+      "slow": "Lento",
+      "normal": "Normal",
+      "fast": "Rápido",
+      "veryFast": "Muy rápido",
+      "screenReaderSupport": "Esta herramienta admite lectores de pantalla"
+    },
+    "confirmations": {
+      "deleteRecording": "¿Eliminar grabación?",
+      "discardMessage": "¿Descartar mensaje?",
+      "confirmSend": "¿Enviar mensaje de voz?"
+    },
+    "help": {
+      "title": "Guía de voz",
+      "howToRecord": "Cómo grabar: Presione el botón de micrófono y hable claramente.",
+      "tips": "Consejos: Hable en un ambiente tranquilo para mejores resultados.",
+      "troubleshooting": "Solución de problemas: Verifique que el micrófono funcione en su navegador."
     }
   }
 }
