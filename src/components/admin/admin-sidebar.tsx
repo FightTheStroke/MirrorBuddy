@@ -16,6 +16,8 @@ import {
   Activity,
   Layers,
   ScrollText,
+  FlaskConical,
+  School,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -58,6 +60,18 @@ export function AdminSidebar({
       label: t("dashboard"),
       href: "/admin",
       icon: LayoutDashboard,
+    },
+    {
+      id: "research",
+      label: "Research Lab",
+      href: "/admin/research",
+      icon: FlaskConical,
+    },
+    {
+      id: "school",
+      label: "School Admin",
+      href: "/admin/school",
+      icon: School,
     },
     {
       id: "invites",

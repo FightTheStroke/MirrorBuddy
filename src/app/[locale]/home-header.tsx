@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
+import { useEffect, useRef } from "react";
 import {
   Flame,
   Coins,
@@ -18,6 +19,7 @@ import { NotificationBell } from "@/components/notifications/notification-bell";
 import { PomodoroHeaderWidget } from "@/components/pomodoro";
 import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
 import { CalculatorHeaderWidget } from "@/components/calculator";
+import { juice, CELEBRATION_TYPES } from "@/lib/utils/juice-effects";
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -56,9 +58,18 @@ export function HomeHeader({
   trialStatus,
 }: HomeHeaderProps) {
   const t = useTranslations("home");
+  const prevLevelRef = useRef(seasonLevel);
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
+
+  // Trigger JUICE effect on Level Up
+  useEffect(() => {
+    if (seasonLevel > prevLevelRef.current) {
+      juice.trigger(CELEBRATION_TYPES.LEVEL_UP, { newLevel: seasonLevel });
+      prevLevelRef.current = seasonLevel;
+    }
+  }, [seasonLevel]);
 
   return (
     <header
