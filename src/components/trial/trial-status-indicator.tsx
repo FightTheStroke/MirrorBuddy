@@ -55,15 +55,15 @@ export function TrialStatusIndicator({
     (showVoice && voiceRemaining === 0) ||
     (showTools && toolsRemaining === 0);
 
-  let colorClass = "text-green-800 dark:text-green-400";
+  let colorClass = "text-green-600 dark:text-green-400";
   let bgClass = "bg-green-100 dark:bg-green-900/30";
 
   if (isLow) {
-    colorClass = "text-amber-800 dark:text-amber-400";
+    colorClass = "text-amber-600 dark:text-amber-400";
     bgClass = "bg-amber-100 dark:bg-amber-900/30";
   }
   if (isCritical) {
-    colorClass = "text-red-800 dark:text-red-400";
+    colorClass = "text-red-600 dark:text-red-400";
     bgClass = "bg-red-100 dark:bg-red-900/30";
   }
 
