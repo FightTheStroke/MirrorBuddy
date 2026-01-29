@@ -35,9 +35,9 @@ export {
 // Implementation functions
 import { azureChatCompletion } from "./azure";
 import { ollamaChatCompletion } from "./ollama";
+import { edgeAI } from "./web-llm";
 import {
   getActiveProvider,
-  getRealtimeProvider,
   isOllamaAvailable,
   isOllamaModelAvailable,
 } from "./config";
@@ -46,10 +46,6 @@ import type { ChatCompletionResult, ToolDefinition, AIProvider } from "./types";
 
 /**
  * Perform chat completion using the active provider
- *
- * @param messages - Conversation messages
- * @param systemPrompt - System prompt for the AI
- * @param options - Optional configuration including tier-based model routing
  */
 export async function chatCompletion(
   messages: Array<{ role: string; content: string }>,
@@ -62,12 +58,10 @@ export async function chatCompletion(
       | "auto"
       | "none"
       | { type: "function"; function: { name: string } };
-    providerPreference?: AIProvider | "auto"; // #87: User's provider preference
-    model?: string; // Tier-based model override (Azure deployment name)
+    providerPreference?: AIProvider | "auto"; 
+    model?: string; 
   },
 ): Promise<ChatCompletionResult> {
-  // #87: Use user's provider preference if specified
-  // Pass model override for tier-based routing
   const config = getActiveProvider(options?.providerPreference, options?.model);
   if (!config) {
     throw new Error("No AI provider configured");
@@ -97,21 +91,8 @@ export async function chatCompletion(
   }
 
   if (config.provider === "ollama") {
-    // Check if Ollama is actually running
     const available = await isOllamaAvailable();
-    if (!available) {
-      throw new Error(
-        "Ollama is not running. Start it with: ollama serve && ollama pull llama3.2",
-      );
-    }
-    // Validate the model exists
-    const modelAvailable = await isOllamaModelAvailable(config.model);
-    if (!modelAvailable) {
-      throw new Error(
-        `Ollama model "${config.model}" not found. Install it with: ollama pull ${config.model}`,
-      );
-    }
-    // Note: Ollama supports tools for some models (llama3.1+, mistral)
+    if (!available) throw new Error("Ollama is not running.");
     return withAITracing(
       "ollama",
       config.model,
@@ -130,39 +111,17 @@ export async function chatCompletion(
     );
   }
 
-  throw new Error(`Unknown provider: ${config.provider}`);
-}
-
-/**
- * Get provider status for UI display
- */
-export async function getProviderStatus(): Promise<{
-  chat: {
-    available: boolean;
-    provider: AIProvider | null;
-    model: string | null;
-  };
-  voice: { available: boolean; provider: AIProvider | null };
-}> {
-  const chatConfig = getActiveProvider();
-  const voiceConfig = getRealtimeProvider();
-
-  let chatAvailable = false;
-  if (chatConfig?.provider === "azure") {
-    chatAvailable = true; // Assume Azure is available if configured
-  } else if (chatConfig?.provider === "ollama") {
-    chatAvailable = await isOllamaAvailable();
+  // # STAGE 3: Edge AI Integration
+  if (config.provider === "web-llm") {
+    return withAITracing(
+      "web-llm",
+      config.model,
+      messages,
+      systemPrompt,
+      { temperature, maxTokens },
+      () => edgeAI.chatCompletion(messages, systemPrompt, temperature)
+    );
   }
 
-  return {
-    chat: {
-      available: chatAvailable,
-      provider: chatConfig?.provider ?? null,
-      model: chatConfig?.model ?? null,
-    },
-    voice: {
-      available: voiceConfig !== null,
-      provider: voiceConfig?.provider ?? null,
-    },
-  };
+  throw new Error(`Unknown provider: ${config.provider}`);
 }

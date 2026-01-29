@@ -3,7 +3,7 @@
  * @brief Types and interfaces for AI providers
  */
 
-export type AIProvider = 'azure' | 'ollama';
+export type AIProvider = 'azure' | 'ollama' | 'web-llm';
 
 export interface ProviderConfig {
   provider: AIProvider;
