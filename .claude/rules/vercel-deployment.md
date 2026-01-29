@@ -1,283 +1,36 @@
 # Vercel Deployment Rules - MirrorBuddy
 
-## Deployment Architecture (CI-Controlled via Vercel CLI)
+## Architecture: CI-Controlled
 
-**Vercel builds ONLY after CI passes. Saves build minutes.**
+Push to main -> Vercel SKIPS build (ignoreCommand) -> CI runs 14 checks -> deployment-gate -> CI deploys via Vercel CLI
 
-### How It Works
+## Required Env Vars
 
-```
-Push to main → Vercel SKIPS build (ignoreCommand) → CI runs 14 checks → deployment-gate passes → CI deploys via Vercel CLI
-```
+DATABASE_URL, ADMIN_EMAIL, ADMIN_PASSWORD, SESSION_SECRET, CRON_SECRET, SUPABASE_CA_CERT, AZURE_OPENAI_API_KEY, TOKEN_ENCRYPTION_KEY
 
-1. **Push triggers** Vercel (skipped) AND GitHub CI
-2. **Vercel ignoreCommand** returns exit 0 → NO build, NO minutes used
-3. **CI runs ALL checks** (build, tests, security, quality)
-4. **deployment-gate** aggregates results
-5. **deploy-to-vercel job** uses Vercel CLI to build and deploy
-6. **Only then** code reaches production
+## SSL - CRITICAL
 
-### Why This Architecture (The proxy.ts Disaster)
+- **NEVER** use `NODE_TLS_REJECT_UNAUTHORIZED=0`
+- Use per-connection `ssl: { rejectUnauthorized: false }` only
+- Certificate format: `cat config/supabase-chain.pem | tr '\n' '|'`
+- Strip sslmode from connection string (handled by `cleanConnectionString()`)
 
-On 2026-01-27:
+## Static Assets - CRITICAL
 
-- Push to main → Vercel deployed IMMEDIATELY (before CI finished)
-- CI was still running E2E tests
-- Tests would have caught the bug, but deployment was already live
-- Result: ALL images broken, ALL API routes returning 404
+proxy.ts matcher MUST exclude files with extensions: `/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)`
+Wrong pattern = ALL images broken (307 redirect to /it/\*.png = 404).
 
-**Solution**: Vercel Deployment Checks integration waits for CI.
+## Pre-push: `npm run pre-push` (automatic on git push)
 
-## Setup Instructions (Vercel Pro Required)
+## Build: `prisma generate && npm run build && npm run seed:admin`
 
-### Configure Deployment Checks
+## Common Failures
 
-1. Go to: **Project → Settings → Deployment Protection**
-2. Find: **"Deployment Checks"** section
-3. Click: **"+ Add"** → Select **"GitHub"**
-4. Import check: `✅ Deployment Gate`
+| Error            | Fix                                     |
+| ---------------- | --------------------------------------- |
+| Images broken    | Fix proxy.ts matcher                    |
+| self-signed cert | Use rejectUnauthorized: false           |
+| sslmode conflict | Strip sslmode from URL                  |
+| Prisma stale     | Delete node_modules/.prisma, regenerate |
 
-### CI Jobs
-
-The `deployment-gate` job aggregates ALL 14 checks:
-
-| Category    | Checks                                         |
-| ----------- | ---------------------------------------------- |
-| Build       | build                                          |
-| Security    | secret-scanning, security, llm-safety-tests    |
-| Quality     | debt-check, quality, docs, migrations          |
-| Tests       | unit-tests, smoke-tests, e2e-tests, mobile-e2e |
-| Performance | docker, performance                            |
-
-**Production deployment blocked if ANY check fails.**
-
-### GitHub Branch Protection (Configured)
-
-Branch protection on `main` requires:
-
-- `✅ Deployment Gate`
-- `Build & Lint`
-- `E2E Tests (BLOCKING)`
-- `Mobile E2E Tests (BLOCKING)`
-
-Admins can bypass for emergencies (logged).
-
-## Pre-Deployment Checklist (MANDATORY)
-
-Before ANY push to main or release:
-
-```bash
-npm run pre-push   # Runs automatically on git push via hook
-```
-
-**What it validates**:
-| Check | Description | Blocking |
-|-------|-------------|----------|
-| Migration naming | `YYYYMMDDHHMMSS_name` format | Yes |
-| Prisma generate | Fresh client generation | Yes |
-| ESLint | No lint errors | Yes |
-| TypeScript | No type errors | Yes |
-| npm audit | No high/critical vulnerabilities | Yes |
-| Build | Production build passes | Yes |
-| Vercel env vars | Required vars exist | Yes |
-| CSRF protection | csrfFetch for mutations | Yes |
-| Critical TODOs | None in safety/security | Yes |
-| console.log | None in production code | Yes |
-| Secrets exposure | No hardcoded secrets | Yes |
-
-## Required Vercel Environment Variables
-
-```bash
-DATABASE_URL          # Supabase pooler connection string (with ?pgbouncer=true)
-ADMIN_EMAIL           # Admin user email
-ADMIN_PASSWORD        # Admin password (>= 8 characters)
-SESSION_SECRET        # 64-char hex (openssl rand -hex 32)
-CRON_SECRET           # 64-char hex (openssl rand -hex 32)
-SUPABASE_CA_CERT      # Certificate chain (pipe-separated, see below)
-AZURE_OPENAI_API_KEY  # Azure OpenAI authentication
-TOKEN_ENCRYPTION_KEY  # 64-char hex for AES-256-GCM
-```
-
-### Certificate Format for SUPABASE_CA_CERT
-
-**CRITICAL**: Use pipe `|` as newline separator, NOT base64:
-
-```bash
-# Convert PEM to pipe-format for Vercel
-cat config/supabase-chain.pem | tr '\n' '|'
-
-# Paste the output directly into Vercel env var
-```
-
-**Why pipe format**: Vercel preserves the string as-is. Our ssl-config.ts converts it back:
-
-```typescript
-envCert.split("|").join("\n");
-```
-
-## SSL Configuration (ADR 0063, 0067)
-
-### NEVER Use NODE_TLS_REJECT_UNAUTHORIZED
-
-```bash
-# WRONG - NEVER USE THIS
-NODE_TLS_REJECT_UNAUTHORIZED=0
-```
-
-This disables TLS verification **globally** for ALL connections (database, HTTP APIs, everything). Security nightmare.
-
-### Correct Approach: Per-Connection SSL
-
-```typescript
-// CORRECT - Only affects database connection
-const pool = new Pool({
-  connectionString: cleanConnectionString(connStr),
-  ssl: {
-    rejectUnauthorized: false, // Per-connection only
-    ca: certificateChain, // Optional
-  },
-});
-```
-
-### Why rejectUnauthorized: false is Acceptable
-
-Supabase uses their own CA (Supabase Root 2021 CA) which is NOT in system trust stores:
-
-- ❌ `rejectUnauthorized: true` fails with "self-signed certificate"
-- ✅ `rejectUnauthorized: false` works, traffic still TLS encrypted
-
-**Security posture**:
-
-- ✅ Traffic encrypted (TLS)
-- ⚠️ Server identity not verified (theoretical MITM, mitigated by AWS internal network)
-- ✅ Credentials authenticate the connection
-
-### sslmode Conflict
-
-**Problem**: `?sslmode=require` in connection string conflicts with explicit `ssl` option.
-
-**Solution**: Strip sslmode from URL (handled by `cleanConnectionString()`):
-
-```typescript
-function cleanConnectionString(url: string): string {
-  const parsed = new URL(url);
-  parsed.searchParams.delete("sslmode");
-  return parsed.toString();
-}
-```
-
-## Static Assets & i18n Middleware (CRITICAL)
-
-**Problem**: The i18n middleware can intercept static asset requests and redirect them to localized paths that don't exist:
-
-```
-/logo-brain.png → 307 redirect → /it/logo-brain.png → 404 Not Found
-/maestri/euclide.webp → 307 redirect → /it/maestri/euclide.webp → 404 Not Found
-```
-
-**Symptom**: All images show broken image icons (❓) in production.
-
-**Root cause**: The matcher pattern in `proxy.ts` was not correctly excluding files with extensions.
-
-**Correct pattern** (from next-intl docs):
-
-```typescript
-// proxy.ts - matcher must exclude ALL files with extensions
-export const config = {
-  matcher: [
-    // Pattern .*\\..* excludes any path containing a dot followed by extension
-    "/((?!api|admin|_next|_vercel|monitoring|.*\\..*).*)",
-  ],
-};
-```
-
-**Prevention**:
-
-- E2E test CP-07 verifies images return 200 (not 307 redirect)
-- Test runs on every PR via CI
-- Never use specific extension lists like `.*\\.(?:png|jpg|...)` - use `.*\\..*` instead
-
-**Verification**:
-
-```bash
-# Should return 200, NOT 307
-curl -sI https://mirrorbuddy.vercel.app/logo-brain.png | head -1
-curl -sI https://mirrorbuddy.vercel.app/maestri/euclide.webp | head -1
-```
-
-## Common Deployment Failures
-
-| Error                       | Cause                | Fix                                         |
-| --------------------------- | -------------------- | ------------------------------------------- |
-| Images show ❓ placeholder  | i18n redirect        | Fix proxy.ts matcher (see above)            |
-| `self-signed certificate`   | Wrong SSL config     | Use `rejectUnauthorized: false`             |
-| `Database X does not exist` | sslmode conflict     | Strip sslmode, use explicit ssl             |
-| `NODE_TLS_REJECT warning`   | Global env var set   | Remove NODE_TLS_REJECT_UNAUTHORIZED         |
-| `Seed failed`               | Missing env vars     | Add ADMIN_EMAIL, ADMIN_PASSWORD             |
-| `Prisma types stale`        | Cached .prisma       | Delete node_modules/.prisma, regenerate     |
-| `CRON_SECRET mismatch`      | Whitespace in env    | Use `printf` not `echo` when setting        |
-| 232 Sentry warnings         | Manifest source maps | Set `silent: true` in Sentry config (fixed) |
-
-## Vercel Build Process
-
-The `vercel-build` script in package.json:
-
-```bash
-prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'
-```
-
-**Order matters**:
-
-1. `prisma generate` - Generate fresh Prisma client
-2. `npm run build` - Next.js production build
-3. `npm run seed:admin` - Create/update admin user (optional, can fail)
-
-## Health Check Verification
-
-After deployment, verify:
-
-```bash
-curl -s https://mirrorbuddy.vercel.app/api/health | jq '.'
-```
-
-**Expected response**:
-
-```json
-{
-  "status": "healthy",
-  "checks": {
-    "database": { "status": "pass", "latency_ms": < 1000 },
-    "ai_provider": { "status": "pass" },
-    "memory": { "status": "pass" }
-  }
-}
-```
-
-**Database latency thresholds**:
-
-- < 1000ms = pass (includes cold start)
-- ≥ 1000ms = warn (investigate if persistent)
-
-## Deployment Verification Commands
-
-```bash
-# Check Vercel env vars
-vercel env ls
-
-# List recent deployments
-vercel ls mirrorbuddy
-
-# Check production health
-curl -s https://mirrorbuddy.vercel.app/api/health | jq '.'
-
-# View deployment logs (requires deployment URL)
-vercel logs <deployment-url>
-```
-
-## References
-
-- **ADR 0063**: Supabase SSL Certificate Requirements
-- **ADR 0067**: Database Performance Optimization for Serverless
-- **scripts/pre-push-vercel.sh**: Pre-push validation script
-- **src/lib/ssl-config.ts**: Centralized SSL configuration
-- **src/lib/db.ts**: Database connection with SSL
+## Full reference: `@docs/claude/vercel-deployment.md`
