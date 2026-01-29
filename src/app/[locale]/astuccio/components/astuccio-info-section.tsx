@@ -70,10 +70,11 @@ export function AstuccioInfoSection() {
         <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-3 flex items-center gap-2">
           <Sparkles className="w-5 h-5" /> {t("studyTip.title")}
         </h3>
-        <p
-          className="text-sm text-blue-700 dark:text-blue-300"
-          dangerouslySetInnerHTML={{ __html: t("studyTip.description") }}
-        />
+        <p className="text-sm text-blue-700 dark:text-blue-300">
+          {t.rich("studyTip.description", {
+            strong: (chunks) => <strong>{chunks}</strong>,
+          })}
+        </p>
       </motion.div>
     </>
   );

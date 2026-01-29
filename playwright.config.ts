@@ -312,6 +312,8 @@ export default defineConfig({
 
   webServer: {
     // Use production server in CI (pre-built), dev server locally
+    // IMPORTANT: Disable Turbopack for E2E tests due to stability issues (panics during hot reload)
+    // Next.js 15+ uses Turbopack by default in dev mode, which has known panic issues
     command: process.env.CI ? "npm run start" : "npm run dev",
     url: "http://localhost:3000",
     reuseExistingServer: !process.env.CI,
@@ -319,6 +321,8 @@ export default defineConfig({
     env: {
       // Override PORT to ensure Next.js starts on 3000 (may differ in .env)
       PORT: "3000",
+      // CRITICAL: Disable Turbopack for E2E stability (use webpack instead)
+      TURBOPACK: "0",
       // CRITICAL: OVERRIDE DATABASE_URL with test database
       // This prevents accidental contamination of production Supabase database
       // BOTH values set to same test DB to ensure no fallback to production

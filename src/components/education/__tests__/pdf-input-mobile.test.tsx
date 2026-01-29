@@ -239,9 +239,10 @@ describe("PdfInputMobile", () => {
       const user = userEvent.setup({ delay: null });
       const { container } = render(<PdfInputMobile {...mockProps} />);
 
-      const fileInput = container.querySelector(
+      // Use the specific file input (first one)
+      const fileInput = container.querySelectorAll(
         'input[type="file"]',
-      ) as HTMLInputElement;
+      )[0] as HTMLInputElement;
       const file = new File(["test"], "test.pdf", { type: "application/pdf" });
 
       await user.upload(fileInput, file);
