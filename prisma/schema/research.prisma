@@ -1,0 +1,49 @@
+// ============================================================================
+// RESEARCH & SCIENCE DOMAIN
+// Automated pedagogical simulations and scientific benchmarking
+// ============================================================================
+
+model ResearchSimulation {
+  id        String   @id @default(cuid())
+  sessionId String   @unique
+  timestamp DateTime @default(now())
+
+  // Configuration
+  maestroId        String
+  studentProfileId String   // e.g., 'student-adhd-01'
+  subject          String
+  modelUsed        String   // e.g., 'gpt-4o', 'llama3.2'
+  turns            Int
+
+  // Results
+  transcript String?  @db.Text
+  critique   String?  @db.Text
+  
+  // Pedagogical Metrics (0-1)
+  scaffoldingScore      Float
+  hintingQuality        Float
+  misconceptionHandling Float
+  conciseness           Float
+  engagementRetained    Float
+
+  // Experimental context
+  experimentId String?
+  bucket       String?  // 'Control' | 'Test-A' | 'Test-B'
+
+  @@index([maestroId])
+  @@index([studentProfileId])
+  @@index([timestamp])
+  @@index([experimentId])
+}
+
+model ModelBenchmark {
+  id        String   @id @default(cuid())
+  modelName String
+  dimension String   // 'latency' | 'accuracy' | 'cost' | 'pedagogical_score'
+  value     Float
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([modelName])
+  @@index([dimension])
+}
