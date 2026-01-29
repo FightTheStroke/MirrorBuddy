@@ -392,6 +392,59 @@
       "saveButton": "Speichern",
       "ratingQuestion": "Wie leicht war es, sich zu erinnern?"
     },
+    "successMetrics": {
+      "title": "Erfolgsmetriken",
+      "progressDescription": "Analyse der Fortschritte von {studentName}",
+      "overallScore": "Gesamtpunktzahl",
+      "quote": "Der einzige wahre Misserfolg ist, es nicht mehr zu versuchen.",
+      "quoteAuthor": "Anonym",
+      "milestones": "Meilensteine",
+      "milestonesDescription": "{achieved} erreicht, {pending} anstehend",
+      "upcomingMilestones": "Anstehende Meilensteine",
+      "metrics": {
+        "engagement": "Engagement",
+        "engagementDesc": "Wie aktiv und beständig sie teilnehmen",
+        "autonomy": "Autonomie",
+        "autonomyDesc": "Fähigkeit, unabhängig zu lernen",
+        "method": "Lernmethode",
+        "methodDesc": "Entwicklung und Anwendung von Lerntechniken",
+        "emotional": "Emotionale Bindung",
+        "emotionalDesc": "Positive Beziehung zum Lernen"
+      }
+    },
+    "parentDashboard": {
+      "profileTitle": "Profil von {studentName}",
+      "lastUpdated": "Zuletzt aktualisiert: {date}",
+      "stats": {
+        "hours": "Lernstunden",
+        "sessions": "Sitzungen insgesamt",
+        "maestri": "Getroffene Maestri"
+      },
+      "strengths": "Stärken",
+      "growthAreas": "Wachstumsbereiche",
+      "strategies": "Vorgeschlagene Strategien",
+      "learningStyle": "Lernstil",
+      "motivators": "Was sie motiviert"
+    },
+    "accessibilityAnalytics": {
+      "title": "Barrierefreiheit-Nutzung",
+      "description": "Profilaktivierung und Nutzung von Barrierefreiheitsfunktionen",
+      "activations": "Profil-Aktivierungen",
+      "sessions": "Einzigartige Sitzungen",
+      "resets": "Zurücksetzungen",
+      "distribution": "Profil-Verteilung",
+      "toggles": "Meistgenutzte Optionen",
+      "empty": "Noch keine Barrierefreiheits-Ereignisse aufgezeichnet",
+      "profiles": {
+        "dyslexia": "Legasthenie",
+        "adhd": "ADHS",
+        "visual": "Visuell",
+        "motor": "Motorisch",
+        "autism": "Autismus",
+        "auditory": "Auditiv",
+        "cerebral": "Motorisch+"
+      }
+    },
     "calendar": {
       "title": "Kalender",
       "newEvent": "Neues Ereignis",

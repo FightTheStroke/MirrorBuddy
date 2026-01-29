@@ -392,6 +392,59 @@
       "saveButton": "Enregistrer",
       "ratingQuestion": "Quelle a été la facilité à se souvenir ?"
     },
+    "successMetrics": {
+      "title": "Indicateurs de Succès",
+      "progressDescription": "Analyse des progrès de {studentName}",
+      "overallScore": "Score Global",
+      "quote": "Le seul véritable échec est dx27arrêter dx27essayer.",
+      "quoteAuthor": "Anonyme",
+      "milestones": "Étapes",
+      "milestonesDescription": "{achieved} atteintes, {pending} à venir",
+      "upcomingMilestones": "Prochaines étapes",
+      "metrics": {
+        "engagement": "Engagement",
+        "engagementDesc": "Niveau et régularité de la participation active",
+        "autonomy": "Autonomie",
+        "autonomyDesc": "Capacité à étudier de manière indépendante",
+        "method": "Méthode dx27Étude",
+        "methodDesc": "Développement et application des techniques dx27étude",
+        "emotional": "Connexion Émotionnelle",
+        "emotionalDesc": "Relation positive avec lx27apprentissage"
+      }
+    },
+    "parentDashboard": {
+      "profileTitle": "Profil de {studentName}",
+      "lastUpdated": "Dernière mise à jour: {date}",
+      "stats": {
+        "hours": "Heures dx27étude",
+        "sessions": "Sessions totales",
+        "maestri": "Maestri rencontrés"
+      },
+      "strengths": "Points Forts",
+      "growthAreas": "Axes dx27Amélioration",
+      "strategies": "Stratégies Suggérées",
+      "learningStyle": "Style dx27Apprentissage",
+      "motivators": "Ce qui le motive"
+    },
+    "accessibilityAnalytics": {
+      "title": "Utilisation de lx27Accessibilité",
+      "description": "Activation des profils et utilisation des fonctions dx27accessibilité",
+      "activations": "Activations de Profil",
+      "sessions": "Sessions Uniques",
+      "resets": "Réinitialisations",
+      "distribution": "Distribution des Profils",
+      "toggles": "Options les plus Utilisées",
+      "empty": "Aucun événement dx27accessibilité enregistré",
+      "profiles": {
+        "dyslexia": "Dyslexie",
+        "adhd": "TDAH",
+        "visual": "Visuel",
+        "motor": "Moteur",
+        "autism": "Autisme",
+        "auditory": "Auditif",
+        "cerebral": "Moteur+"
+      }
+    },
     "calendar": {
       "title": "Calendrier",
       "newEvent": "Nouvel événement",

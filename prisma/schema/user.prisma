@@ -94,6 +94,10 @@ model User {
   // Tier Subscription System (ADR 0071)
   subscription UserSubscription?
 
+  // B2B Domain
+  classroomId       String? 
+  classroom         Classroom? @relation(fields: [classroomId], references: [id])
+
   // User-level feature AI config overrides (ADR 0073)
   featureConfigs UserFeatureConfig[] @relation("UserFeatureConfigs")
 }
