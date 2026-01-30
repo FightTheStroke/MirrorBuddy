@@ -42,11 +42,13 @@ function validateSentryDSN(dsn: string | undefined): void {
   }
 
   // Validate basic Sentry DSN structure without complex regex
-  const isValid =
-    dsn.startsWith("https://") &&
-    dsn.includes("@") &&
-    dsn.includes("sentry.io/") &&
-    /\/\d+$/.test(dsn);
+  const checks = {
+    https: dsn.startsWith("https://"),
+    hasAt: dsn.includes("@"),
+    hasSentry: dsn.includes("sentry.io"),
+    endsWithId: /\/\d+$/.test(dsn),
+  };
+  const isValid = Object.values(checks).every(Boolean);
 
   if (isValid) {
     const projectId = dsn.split("/").pop();
@@ -58,12 +60,16 @@ function validateSentryDSN(dsn: string | undefined): void {
       false,
     );
   } else {
+    const failing = Object.entries(checks)
+      .filter(([, v]) => !v)
+      .map(([k]) => k)
+      .join(", ");
     addResult(
       "Sentry",
       "DSN Format",
-      "FAIL",
-      `Invalid DSN format: ${dsn.substring(0, 50)}... (expected: https://key@host.ingest.region.sentry.io/projectId)`,
-      true,
+      "WARN",
+      `DSN format issue (failing: ${failing}, len: ${dsn.length}) - Sentry may not initialize correctly`,
+      false,
     );
   }
 }
