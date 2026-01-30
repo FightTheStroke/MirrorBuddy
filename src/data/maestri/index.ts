@@ -28,6 +28,7 @@ import { cassese } from "./cassese";
 import { moliere } from "./moliere";
 import { goethe } from "./goethe";
 import { cervantes } from "./cervantes";
+import { leviMontalcini } from "./levi-montalcini";
 
 export type { MaestroFull } from "./types";
 export { SAFETY_GUIDELINES } from "./types";
@@ -58,6 +59,7 @@ export const maestri: MaestroFull[] = [
   moliere,
   goethe,
   cervantes,
+  leviMontalcini,
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
