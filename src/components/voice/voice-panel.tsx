@@ -56,7 +56,7 @@ export function VoicePanel({
   onToggleMute,
   onEndCall,
 }: VoicePanelProps) {
-  const t = useTranslations("voice");
+  const t = useTranslations("settings.voice");
 
   const getStatusText = () => {
     if (configError) return configError;

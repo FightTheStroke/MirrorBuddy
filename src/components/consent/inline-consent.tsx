@@ -34,7 +34,7 @@ export function InlineConsent({
   onConsentChange,
   compact = false,
 }: InlineConsentProps) {
-  const t = useTranslations("consent.inline");
+  const t = useTranslations("compliance.consent.inline");
 
   // Use useSyncExternalStore to avoid setState-in-effect issues
   const consented = useSyncExternalStore(

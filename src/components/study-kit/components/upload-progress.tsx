@@ -18,7 +18,7 @@ export function UploadProgress({
   errorMessage,
   onReset,
 }: UploadProgressProps) {
-  const t = useTranslations("studyKit.uploadProgress");
+  const t = useTranslations("tools.studyKit.uploadProgress");
 
   if (status === "idle") {
     return null;

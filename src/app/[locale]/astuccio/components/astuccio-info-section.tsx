@@ -5,7 +5,7 @@ import { Sparkles } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 export function AstuccioInfoSection() {
-  const t = useTranslations("astuccio.info");
+  const t = useTranslations("tools.astuccio.info");
 
   return (
     <>

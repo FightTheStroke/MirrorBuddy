@@ -284,39 +284,40 @@
       "whatIsYourName": "What is your name?",
       "years": "Years",
       "yourSupportTeacher": "Your support teacher"
-    }
-  },
-  "onboarding": {
-    "transcript": {
-      "conversationActive": "Active conversation",
-      "conversationTitle": "Conversation title",
-      "messagePlural": "messages",
-      "messageSingular": "message",
-      "noConversation": "No conversation",
-      "userLabel": "You"
     },
-    "checklist": {
-      "nameLabel": "Name",
-      "ageLabel": "Age",
-      "schoolLabel": "School",
-      "schoolElementary": "Elementary",
-      "schoolMiddle": "Middle School",
-      "schoolHigh": "High School",
-      "differencesLabel": "Learning differences",
-      "differencesCount": "{count} selected"
-    },
-    "voicePanel": {
-      "cancel": "Cancel",
-      "connected": "Connected",
-      "disableMicrophone": "Disable microphone",
-      "enableMicrophone": "Enable microphone",
-      "endCall": "End call",
-      "listening": "Listening",
-      "melissa": "Melissa",
-      "microphoneMuted": "Microphone muted",
-      "speakWithMelissa": "Speak with Melissa",
-      "speaking": "Speaking",
-      "you": "You"
+    "onboarding": {
+      "transcript": {
+        "conversationActive": "Active conversation",
+        "conversationTitle": "Conversation title",
+        "messagePlural": "messages",
+        "messageSingular": "message",
+        "noConversation": "No conversation",
+        "userLabel": "You"
+      },
+      "checklist": {
+        "nameLabel": "Name",
+        "ageLabel": "Age",
+        "schoolLabel": "School",
+        "schoolElementary": "Elementary",
+        "schoolMiddle": "Middle School",
+        "schoolHigh": "High School",
+        "differencesLabel": "Learning differences",
+        "differencesCount": "{count} selected"
+      },
+      "voicePanel": {
+        "cancel": "Cancel",
+        "connected": "Connected",
+        "disableMicrophone": "Disable microphone",
+        "enableMicrophone": "Enable microphone",
+        "endCall": "End call",
+        "listening": "Listening",
+        "melissa": "Melissa",
+        "microphoneMuted": "Microphone muted",
+        "speakWithMelissa": "Speak with Melissa",
+        "speaking": "Speaking",
+        "you": "You"
+      },
+      "ageYears": "years"
     }
   },
   "trialConsent": {

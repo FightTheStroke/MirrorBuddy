@@ -79,6 +79,7 @@
     "loadingCheck": "Loading Check",
     "maxFileSize": "Max File Size",
     "minLength": "Min Length",
+    "maxLength": "Lunghezza massima",
     "notConnected": "Not Connected",
     "privacyNotice": "Privacy Notice",
     "readOnlyAccess": "Read Only Access",
@@ -102,34 +103,59 @@
     "create": "Crea",
     "update": "Aggiorna",
     "skipToMainContent": "Vai al contenuto principale",
-    "skipLinkFocused": "Focus spostato al contenuto principale"
-  },
-  "status": {
-    "active": "Attivo",
-    "inactive": "Inattivo",
-    "pending": "In attesa",
-    "completed": "Completato",
-    "cancelled": "Annullato",
-    "draft": "Bozza",
-    "published": "Pubblicato",
-    "archived": "Archiviato",
-    "deleted": "Eliminato",
-    "enabled": "Abilitato",
-    "disabled": "Disabilitato",
-    "online": "Online",
-    "offline": "Offline",
-    "available": "Disponibile",
-    "unavailable": "Non disponibile",
-    "processing": "In elaborazione",
-    "success": "Successo",
-    "failed": "Fallito",
-    "error": "Errore"
-  },
-  "ui": {
-    "skeleton": {
-      "sessionLoading": "Session Loading",
-      "sessionLoadingText": "Session Loading Text",
-      "viewLoading": "View Loading"
+    "skipLinkFocused": "Focus spostato al contenuto principale",
+    "accessibility": {
+      "skipToContent": "Salta al contenuto"
+    },
+    "status": {
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "pending": "In attesa",
+      "completed": "Completato",
+      "cancelled": "Annullato",
+      "draft": "Bozza",
+      "published": "Pubblicato",
+      "archived": "Archiviato",
+      "deleted": "Eliminato",
+      "enabled": "Abilitato",
+      "disabled": "Disabilitato",
+      "online": "Online",
+      "offline": "Offline",
+      "available": "Disponibile",
+      "unavailable": "Non disponibile",
+      "processing": "In elaborazione",
+      "success": "Successo",
+      "failed": "Fallito",
+      "error": "Errore"
+    },
+    "ui": {
+      "skeleton": {
+        "loading": "Caricamento...",
+        "placeholder": "Placeholder",
+        "sessionLoading": "[EN] Session Loading",
+        "sessionLoadingText": "[EN] Session Loading Text",
+        "viewLoading": "[EN] View Loading"
+      }
+    },
+    "validation": {
+      "required": "Questo campo è obbligatorio",
+      "email": "Inserisci un'email valida",
+      "minLength": "Minimo {min} caratteri",
+      "maxLength": "Massimo {max} caratteri",
+      "pattern": "Formato non valido",
+      "numeric": "Deve essere un numero",
+      "common": {
+        "save": "Salva"
+      },
+      "auth": {
+        "login": "Accedi"
+      },
+      "errors": {
+        "notFound": "Non trovato"
+      },
+      "accessibility": {
+        "skipToContent": "Vai al contenuto"
+      }
     }
   }
 }

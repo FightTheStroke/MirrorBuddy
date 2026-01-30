@@ -78,6 +78,7 @@
     "loadingCheck": "Ladeprüfung",
     "maxFileSize": "Maximale Dateigröße",
     "minLength": "Mindestlänge",
+    "maxLength": "Maximale Länge",
     "notConnected": "Nicht verbunden",
     "privacyNotice": "Datenschutzhinweis",
     "readOnlyAccess": "Nur-Lese-Zugriff",
@@ -102,34 +103,59 @@
     "update": "Aktualisieren",
     "loading": "Laden...",
     "skipToMainContent": "Zum Hauptinhalt springen",
-    "skipLinkFocused": "Fokus zum Hauptinhalt bewegt"
-  },
-  "status": {
-    "active": "Aktiv",
-    "inactive": "Inaktiv",
-    "pending": "Ausstehend",
-    "completed": "Abgeschlossen",
-    "cancelled": "Abgebrochen",
-    "draft": "Entwurf",
-    "published": "Veröffentlicht",
-    "archived": "Archiviert",
-    "deleted": "Gelöscht",
-    "enabled": "Aktiviert",
-    "disabled": "Deaktiviert",
-    "online": "Online",
-    "offline": "Offline",
-    "available": "Verfügbar",
-    "unavailable": "Nicht verfügbar",
-    "processing": "Verarbeitung",
-    "success": "Erfolgreich",
-    "failed": "Fehlgeschlagen",
-    "error": "Fehler"
-  },
-  "ui": {
-    "skeleton": {
-      "sessionLoading": "Sitzung wird geladen",
-      "sessionLoadingText": "Sitzung wird geladen...",
-      "viewLoading": "Ansicht wird geladen"
+    "skipLinkFocused": "Fokus zum Hauptinhalt bewegt",
+    "accessibility": {
+      "skipToContent": "Zum Inhalt springen"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "cancelled": "Abgebrochen",
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert",
+      "deleted": "Gelöscht",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "online": "Online",
+      "offline": "Offline",
+      "available": "Verfügbar",
+      "unavailable": "Nicht verfügbar",
+      "processing": "Verarbeitung",
+      "success": "Erfolgreich",
+      "failed": "Fehlgeschlagen",
+      "error": "Fehler"
+    },
+    "ui": {
+      "skeleton": {
+        "loading": "[TRANSLATE] Caricamento...",
+        "placeholder": "[TRANSLATE] Placeholder",
+        "sessionLoading": "Sitzung wird geladen",
+        "sessionLoadingText": "Sitzung wird geladen...",
+        "viewLoading": "Ansicht wird geladen"
+      }
+    },
+    "validation": {
+      "required": "[TRANSLATE] Questo campo è obbligatorio",
+      "email": "[TRANSLATE] Inserisci un'email valida",
+      "minLength": "[TRANSLATE] Minimo {min} caratteri",
+      "maxLength": "[TRANSLATE] Massimo {max} caratteri",
+      "pattern": "[TRANSLATE] Formato non valido",
+      "numeric": "[TRANSLATE] Deve essere un numero",
+      "common": {
+        "save": "Speichern"
+      },
+      "auth": {
+        "login": "Anmelden"
+      },
+      "errors": {
+        "notFound": "Nicht gefunden"
+      },
+      "accessibility": {
+        "skipToContent": "Zum Inhalt springen"
+      }
     }
   }
 }

@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import type { StudyKit } from "@/types/study-kit";
 
 export function StudyKitView() {
-  const t = useTranslations("studyKit.view");
+  const t = useTranslations("tools.studyKit.view");
   const [view, setView] = useState<"list" | "upload" | "viewer">("list");
   const [selectedKit, setSelectedKit] = useState<StudyKit | null>(null);
 

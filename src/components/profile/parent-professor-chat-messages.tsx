@@ -42,7 +42,7 @@ export function ChatMessages({
   studentName,
   messagesEndRef,
 }: ChatMessagesProps) {
-  const t = useTranslations("profile.parentChat");
+  const t = useTranslations("settings.profile.parentChat");
 
   return (
     <CardContent className="flex-1 overflow-y-auto p-4 space-y-4">

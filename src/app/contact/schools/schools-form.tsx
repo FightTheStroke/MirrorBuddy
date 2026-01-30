@@ -23,7 +23,7 @@ import {
 type FormState = "idle" | "submitting" | "success" | "error";
 
 export function SchoolsContactForm() {
-  const t = useTranslations("contact.schools_form");
+  const t = useTranslations("compliance.contact.schools_form");
   const [formData, setFormData] = useState<FormData>({
     name: "",
     email: "",

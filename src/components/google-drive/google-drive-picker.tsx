@@ -40,7 +40,7 @@ export function GoogleDrivePicker({
   acceptedTypes,
   className,
 }: GoogleDrivePickerProps) {
-  const t = useTranslations("googleDrive");
+  const t = useTranslations("tools.googleDrive");
   const [searchInput, setSearchInput] = useState("");
   const [selectedFile, setSelectedFile] = useState<DriveFileUI | null>(null);
 

@@ -28,7 +28,7 @@ export function ExportPDFModal({
   isOpen,
   onClose,
 }: ExportPDFModalProps) {
-  const t = useTranslations("studyKit.exportModal");
+  const t = useTranslations("tools.studyKit.exportModal");
   const [selectedProfile, setSelectedProfile] =
     useState<DSAProfile>("dyslexia");
   const [isExporting, setIsExporting] = useState(false);

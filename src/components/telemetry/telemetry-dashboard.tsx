@@ -34,7 +34,7 @@ interface TelemetryDashboardProps {
 }
 
 export function TelemetryDashboard({ className }: TelemetryDashboardProps) {
-  const t = useTranslations("telemetry");
+  const t = useTranslations("settings.telemetry");
   const {
     localStats,
     usageStats,

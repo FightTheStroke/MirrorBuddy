@@ -9,7 +9,7 @@ interface FeatureUsageBarProps {
 }
 
 export function FeatureUsageBar({ data }: FeatureUsageBarProps) {
-  const t = useTranslations("telemetry");
+  const t = useTranslations("settings.telemetry");
 
   if (!data.length) {
     return <div className="text-sm text-slate-400">{t("noData")}</div>;

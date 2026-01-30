@@ -13,7 +13,7 @@ type FormState = "idle" | "submitting" | "success" | "error";
 
 export function InviteRequestClient() {
   const router = useRouter();
-  const t = useTranslations("invite.request");
+  const t = useTranslations("auth.invite.request");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [motivation, setMotivation] = useState("");

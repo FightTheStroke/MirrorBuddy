@@ -21,7 +21,7 @@ export function VisualImpairmentA11y({
   onSettingsChange: (settings: VisualImpairmentSettings) => void;
 }) {
   const t = useTranslations("settings.accessibility");
-  const tTyping = useTranslations("typing.visualImpairment");
+  const tTyping = useTranslations("tools.typing.visualImpairment");
   const [showTTSSettings, setShowTTSSettings] = useState(false);
 
   const updateSetting = <K extends keyof VisualImpairmentSettings>(

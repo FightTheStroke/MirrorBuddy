@@ -52,7 +52,7 @@ export function ConversationSidebar({
   onSelectConversation,
   onNewConversation,
 }: ConversationDrawerProps) {
-  const t = useTranslations("conversation.sidebar");
+  const t = useTranslations("chat.conversation.sidebar");
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");

@@ -26,7 +26,7 @@ export function MasterControls({
   onStop,
   onVolumeChange,
 }: MasterControlsProps) {
-  const t = useTranslations("ambientAudio");
+  const t = useTranslations("settings.ambientAudio");
 
   return (
     <Card>

@@ -24,7 +24,7 @@ export function HandoffBanner({
   onAccept,
   onDismiss,
 }: HandoffBannerProps) {
-  const t = useTranslations("conversation.handoff");
+  const t = useTranslations("chat.conversation.handoff");
 
   return (
     <motion.div

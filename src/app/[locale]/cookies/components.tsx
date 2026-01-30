@@ -39,7 +39,7 @@ export interface CookieInfo {
 }
 
 export function CookieTable({ cookies }: { cookies: CookieInfo[] }) {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <div className="overflow-x-auto my-4">

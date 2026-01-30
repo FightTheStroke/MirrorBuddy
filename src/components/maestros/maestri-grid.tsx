@@ -64,7 +64,7 @@ interface MaestriGridProps {
 }
 
 export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
-  const t = useTranslations("maestros.grid");
+  const t = useTranslations("education.maestros.grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedSubject, setSelectedSubject] = useState<Subject | "all">(
     "all",

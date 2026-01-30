@@ -18,7 +18,7 @@ interface ZainoViewProps {
 }
 
 export function ZainoView({ initialType, initialSubject }: ZainoViewProps) {
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
   const {
     sortBy,
     setSortBy,

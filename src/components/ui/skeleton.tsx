@@ -26,7 +26,7 @@ export function Skeleton({
 }
 
 export function ViewSkeleton() {
-  const t = useTranslations("ui.skeleton");
+  const t = useTranslations("common.ui.skeleton");
   // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div
@@ -51,7 +51,7 @@ export function ViewSkeleton() {
 }
 
 export function SessionSkeleton() {
-  const t = useTranslations("ui.skeleton");
+  const t = useTranslations("common.ui.skeleton");
   // role="status" implies aria-live="polite" - no need for aria-busy
   return (
     <div

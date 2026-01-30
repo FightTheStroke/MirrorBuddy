@@ -27,7 +27,7 @@ export function InactivityWarningDialog({
   onClose,
   className,
 }: InactivityWarningDialogProps) {
-  const t = useTranslations("conversation.inactivity");
+  const t = useTranslations("chat.conversation.inactivity");
   const [tick, setTick] = useState(0);
 
   // Calculate countdown based on elapsed time since start

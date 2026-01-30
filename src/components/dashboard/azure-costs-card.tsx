@@ -35,7 +35,7 @@ interface AzureCostsCardProps {
 }
 
 export function AzureCostsCard({ className }: AzureCostsCardProps) {
-  const t = useTranslations("dashboard");
+  const t = useTranslations("admin.dashboard");
   const [summary, setSummary] = useState<CostSummary | null>(null);
   const [forecast, setForecast] = useState<CostForecast | null>(null);
   const [loading, setLoading] = useState(true);

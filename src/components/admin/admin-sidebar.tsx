@@ -56,7 +56,7 @@ export function AdminSidebar({
   const NAV_ITEMS: NavItem[] = [
     {
       id: "dashboard",
-      label: t("dashboard"),
+      label: t("sidebar.dashboard"),
       href: "/admin",
       icon: LayoutDashboard,
     },

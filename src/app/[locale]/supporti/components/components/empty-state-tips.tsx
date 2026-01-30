@@ -15,7 +15,7 @@ interface EmptyStateTipsProps {
 
 export function EmptyStateTips({ show }: EmptyStateTipsProps) {
   const router = useRouter();
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
 
   if (!show) return null;
 

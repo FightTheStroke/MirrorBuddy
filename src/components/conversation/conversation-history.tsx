@@ -38,7 +38,7 @@ interface ConversationHistoryProps {
 export function ConversationHistory({
   onConversationSelect,
 }: ConversationHistoryProps) {
-  const t = useTranslations("conversation.history");
+  const t = useTranslations("chat.conversation.history");
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [pagination, setPagination] = useState<PaginationData>({
     page: 1,

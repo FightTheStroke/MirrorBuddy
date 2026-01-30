@@ -28,7 +28,7 @@ export function AdvancedMixer({
   onLayerVolumeChange,
   onClearLayers,
 }: AdvancedMixerProps) {
-  const t = useTranslations("ambientAudio");
+  const t = useTranslations("settings.ambientAudio");
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   const noiseModesData = AUDIO_MODES.filter((m) => m.category === "noise");

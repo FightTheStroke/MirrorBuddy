@@ -10,7 +10,7 @@ interface ContactFormMessagesProps {
 export function ContactFormMessages({
   submitStatus,
 }: ContactFormMessagesProps) {
-  const t = useTranslations("contact.form");
+  const t = useTranslations("compliance.contact.form");
 
   if (submitStatus === "success") {
     return (

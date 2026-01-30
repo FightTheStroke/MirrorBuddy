@@ -56,5 +56,32 @@
       "cta": "Commencer maintenant",
       "secondaryCta": "En savoir plus"
     }
+  },
+  "appTitle": "[TRANSLATE] MirrorBuddy",
+  "loading": "[TRANSLATE] Caricamento...",
+  "seasonDefault": "[TRANSLATE] Stagione Corrente",
+  "header": {
+    "openMenu": "[TRANSLATE] Apri menu",
+    "mirrorBucksShort": "[TRANSLATE] MB",
+    "streak": "[TRANSLATE] Serie",
+    "sessionsThisWeek": "[TRANSLATE] Sessioni questa settimana",
+    "studyTime": "[TRANSLATE] Tempo di studio",
+    "questionsAsked": "[TRANSLATE] Domande poste",
+    "trialClickToRequest": "[TRANSLATE] Clicca per richiedere accesso",
+    "trial": "[TRANSLATE] Prova"
+  },
+  "sidebar": {
+    "backToHome": "[TRANSLATE] Torna alla Home",
+    "appName": "[TRANSLATE] MirrorBuddy",
+    "closeMenu": "[TRANSLATE] Chiudi menu",
+    "trialMode": "[TRANSLATE] Modalità Prova",
+    "login": "[TRANSLATE] Accedi",
+    "requestAccess": "[TRANSLATE] Richiedi Accesso",
+    "adminDashboardAria": "[TRANSLATE] Vai alla Dashboard Amministrazione",
+    "adminDashboard": "[TRANSLATE] Dashboard Admin",
+    "parentArea": "[TRANSLATE] Area Genitori"
+  },
+  "navigation": {
+    "professors": "[TRANSLATE] Professori"
   }
 }

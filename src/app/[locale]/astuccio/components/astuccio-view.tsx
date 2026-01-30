@@ -108,7 +108,7 @@ interface AstuccioViewProps {
 }
 
 export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
-  const t = useTranslations("astuccio");
+  const t = useTranslations("tools.astuccio");
   const tTools = useTranslations("tools");
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
 

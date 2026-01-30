@@ -73,7 +73,108 @@
       "microphonePermission": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
       "sessionTitle": "Sesión de voz con {name}",
       "studyMethod": "Método de estudio",
-      "emotionalSupport": "Apoyo emocional"
+      "emotionalSupport": "Apoyo emocional",
+      "panel": {
+        "connected": "Conectado",
+        "connecting": "Conectando...",
+        "listening": "Escuchando",
+        "microphoneDisabled": "Micrófono desactivado",
+        "mutedLabel": "Silenciado",
+        "muteLabel": "Silenciar",
+        "speakNow": "Habla ahora",
+        "speaking": "Hablando",
+        "startingCall": "Iniciando llamada...",
+        "unmuteLabel": "Activar sonido"
+      },
+      "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
+      "permission": {
+        "enableLabel": "Etiqueta de Activación",
+        "steps": {
+          "findMicrophone": "Buscar Micrófono",
+          "lockIcon": "Icono de Candado",
+          "reload": "Recargar",
+          "selectAllow": "Seleccionar Permitir"
+        },
+        "subtitle": "Subtítulo",
+        "switchToChat": "Cambiar a Chat",
+        "title": "Título"
+      },
+      "label": "Voz",
+      "description": "Habilita la conversación de voz con Maestri",
+      "chatUI": {
+        "startRecording": "Iniciar grabación",
+        "stopRecording": "Detener grabación",
+        "sendVoiceMessage": "Enviar mensaje de voz",
+        "cancel": "Cancelar",
+        "recordingInProgress": "Grabación en curso...",
+        "microphonePermission": "Permita el acceso del micrófono para usar la voz",
+        "grantPermission": "Permitir micrófono",
+        "denyPermission": "Denegar acceso"
+      },
+      "status": {
+        "listening": "Escuchando...",
+        "processing": "Procesando...",
+        "speaking": "Hablando...",
+        "connecting": "Conectando...",
+        "ready": "Listo",
+        "initializing": "Inicializando...",
+        "processing_text": "Transcribiendo..."
+      },
+      "settings": {
+        "title": "Configuración de voz",
+        "speed": "Velocidad de reproducción",
+        "pitch": "Tono",
+        "voiceSelection": "Seleccionar voz",
+        "volume": "Volumen",
+        "enableCaptions": "Habilitar subtítulos",
+        "textToSpeech": "Texto a voz",
+        "speechToText": "Reconocimiento de voz",
+        "language": "Idioma de escucha",
+        "reset": "Restablecer valores predeterminados"
+      },
+      "errors": {
+        "microphoneDenied": "Acceso de micrófono denegado. Habilite el micrófono en la configuración.",
+        "microphoneNotFound": "No se detectó micrófono. Verifique su dispositivo.",
+        "connectionError": "Error de conexión. Verifique su conexión a Internet.",
+        "timeout": "Tiempo de conexión agotado. Intente de nuevo.",
+        "recordingFailed": "La grabación falló. Intente de nuevo.",
+        "processingError": "Error de procesamiento. Intente de nuevo.",
+        "permissionError": "Error de permiso. Verifique su configuración.",
+        "unsupportedBrowser": "Su navegador no admite grabación de voz.",
+        "unknownError": "Error desconocido. Intente más tarde."
+      },
+      "trialLimits": {
+        "voiceTitle": "Límite de voz",
+        "minutesRemaining": "{minutes} minutos restantes",
+        "secondsRemaining": "{seconds} segundos restantes",
+        "limitReached": "Límite de voz alcanzado",
+        "limitReachedMessage": "Ha utilizado todos sus minutos de voz. Actualice para acceso ilimitado a voz.",
+        "upgradePrompt": "¿Desea acceso ilimitado a voz?",
+        "upgrade": "Actualizar ahora"
+      },
+      "accessibility": {
+        "voiceToText": "Convertir voz a texto",
+        "textAlternative": "Usar texto como alternativa",
+        "captionsToggle": "Alternar subtítulos",
+        "enableSubtitles": "Habilitar subtítulos para todas las respuestas",
+        "voiceSpeed": "Velocidad de lectura",
+        "slow": "Lento",
+        "normal": "Normal",
+        "fast": "Rápido",
+        "veryFast": "Muy rápido",
+        "screenReaderSupport": "Esta herramienta admite lectores de pantalla"
+      },
+      "confirmations": {
+        "deleteRecording": "¿Eliminar grabación?",
+        "discardMessage": "¿Descartar mensaje?",
+        "confirmSend": "¿Enviar mensaje de voz?"
+      },
+      "help": {
+        "title": "Guía de voz",
+        "howToRecord": "Cómo grabar: Presione el botón de micrófono y hable claramente.",
+        "tips": "Consejos: Hable en un ambiente tranquilo para mejores resultados.",
+        "troubleshooting": "Solución de problemas: Verifique que el micrófono funcione en su navegador."
+      }
     },
     "handoff": {
       "askToSwitch": "¿Quieres hablar con {name}?",
@@ -83,323 +184,237 @@
     "loading": "Cargando...",
     "error": "Error al cargar el chat",
     "newChat": "Nuevo chat",
-    "clearChat": "Limpiar chat"
-  },
-  "conversation": {
-    "detail": {
-      "back": "Atrás",
-      "backAriaLabel": "Etiqueta Aria de Atrás",
-      "defaultTitle": "Título Predeterminado",
-      "emptyMessages": "Mensajes Vacíos",
-      "error": {
-        "loadingFailed": "Error al Cargar",
-        "notFound": "No Encontrado",
-        "unknown": "Desconocido"
+    "clearChat": "Limpiar chat",
+    "conversation": {
+      "handoff": {
+        "title": "[TRANSLATE] Passaggio di Consegne",
+        "description": "[TRANSLATE] Il professore sta passando la conversazione",
+        "continue": "[TRANSLATE] Continua",
+        "accept": "Aceptar",
+        "decline": "Rechazar",
+        "question": "Pregunta"
       },
-      "loading": "Cargando...",
-      "summaryLabel": "Etiqueta de Resumen",
-      "timeAt": "Hora a"
-    },
-    "handoff": {
-      "accept": "Aceptar",
-      "decline": "Rechazar",
-      "question": "Pregunta"
-    },
-    "history": {
-      "dateFormat": {
-        "daysAgo": "Días Atrás",
-        "today": "Hoy",
-        "yesterday": "Ayer"
-      },
-      "empty": {
-        "all": "Todos",
-        "filtered": "Filtrado"
-      },
-      "loading": "Cargando...",
-      "title": "Título"
-    },
-    "inactivity": {
-      "closeAriaLabel": "Cerrar Etiqueta Aria",
-      "closeButton": "Botón Cerrar",
-      "continueButton": "Botón Continuar",
-      "description": "Descripción",
-      "message": "Mensaje",
-      "title": "Título"
-    },
-    "sidebar": {
-      "deleteConfirm": {
-        "cancel": "Cancelar",
-        "delete": "Eliminar",
-        "deleting": "Eliminando",
-        "title": "Título"
-      },
-      "empty": "Vacío",
-      "filters": {
-        "all": "Todos",
-        "month": "Mes",
-        "today": "Hoy",
-        "week": "Semana"
-      },
-      "search": {
-        "placeholder": "Marcador"
-      },
-      "title": "Título"
-    },
-    "toolSelection": {
-      "closeAriaLabel": "Cerrar Etiqueta Aria",
-      "empty": "Vacío",
-      "question": "Pregunta",
-      "search": "Buscar",
-      "title": "Título"
-    }
-  },
-  "session": {
-    "rating": {
-      "close": "Cerrar",
-      "feedbackLabel": "Tu opinión",
-      "feedbackPlaceholder": "Comparte tus comentarios...",
-      "labels": {
-        "1": "Muy malo",
-        "2": "Malo",
-        "3": "Regular",
-        "4": "Bueno",
-        "5": "Excelente"
-      },
-      "minutes": "minutos",
-      "savingError": "Error al guardar",
-      "selectError": "Por favor selecciona una calificación",
-      "selectPlaceholder": "Seleccionar tema",
-      "sessionWith": "Sesión con",
-      "skip": "Omitir",
-      "stars": "estrellas",
-      "submit": "Enviar",
-      "submitting": "Enviando",
-      "title": "Califica tu sesión",
-      "topics": "Temas tratados"
-    },
-    "controls": {
-      "cancelResponseAriaLabel": "Cancelar respuesta",
-      "cancelResponseTooltip": "Cancelar respuesta actual",
-      "endSessionAriaLabel": "Terminar sesión",
-      "endSessionTooltip": "Terminar sesión de voz",
-      "inputPlaceholder": "Escribe un mensaje...",
-      "muteAriaLabel": {
-        "muted": "Silenciado",
-        "unmuted": "Sonido activado"
-      },
-      "muteTooltip": {
-        "muted": "Activar sonido",
-        "unmuted": "Silenciar"
-      },
-      "sendButton": "Enviar",
-      "sendMessageAriaLabel": "Enviar mensaje",
-      "sendMessageTooltip": "Enviar el mensaje",
-      "switchToChatAriaLabel": "Cambiar a chat",
-      "switchToChatTooltip": "Volver al chat de texto"
-    }
-  },
-  "typing": {
-    "advanced": "Avanzado",
-    "azerty": "Azerty",
-    "backToGames": "Volver a Juegos",
-    "backToLessons": "Volver a Lecciones",
-    "beginner": "Principiante",
-    "dvorak": "Dvorak",
-    "games": "Juegos",
-    "infoDSA": "Información TEA",
-    "infoDSADesc": "Descripción de información TEA",
-    "infoGamification": "Información de Gamificación",
-    "infoGamificationDesc": "Descripción de información de gamificación",
-    "infoMultiLanguage": "Información de Multiidioma",
-    "infoMultiLanguageDesc": "Descripción de información de multiidioma",
-    "infoOneHanded": "Información de Una Mano",
-    "infoOneHandedDesc": "Descripción de información de una mano",
-    "intermediate": "Intermedio",
-    "keyboardLayout": "Diseño de Teclado",
-    "lessons": "Lecciones",
-    "level": "Nivel",
-    "progress": "Progreso",
-    "qwerty": "Qwerty",
-    "qwertz": "Qwertz",
-    "subtitle": "Subtítulo",
-    "title": "Título",
-    "lessonSelector": {
-      "completed": "Completado",
-      "completedBadge": "Insignia de Completado",
-      "inProgress": "En Progreso",
-      "title": "Título"
-    },
-    "oneHanded": {
-      "hideInfo": "Ocultar Información",
-      "info": {
-        "active": "Activo",
-        "description": "Descripción",
-        "tips": "Consejos"
-      },
-      "modes": {
-        "both": {
-          "description": "Descripción",
-          "label": "Etiqueta"
+      "detail": {
+        "title": "[TRANSLATE] Dettagli Conversazione",
+        "created": "[TRANSLATE] Creata il",
+        "messages": "[TRANSLATE] Messaggi",
+        "back": "Atrás",
+        "backAriaLabel": "Etiqueta Aria de Atrás",
+        "defaultTitle": "Título Predeterminado",
+        "emptyMessages": "Mensajes Vacíos",
+        "error": {
+          "loadingFailed": "Error al Cargar",
+          "notFound": "No Encontrado",
+          "unknown": "Desconocido"
         },
-        "leftOnly": {
-          "description": "Descripción",
-          "label": "Etiqueta"
+        "loading": "Cargando...",
+        "summaryLabel": "Etiqueta de Resumen",
+        "timeAt": "Hora a"
+      },
+      "sidebar": {
+        "title": "Título",
+        "new": "[TRANSLATE] Nuova Conversazione",
+        "search": {
+          "placeholder": "Buscar conversaciones..."
         },
-        "rightOnly": {
-          "description": "Descripción",
-          "label": "Etiqueta"
+        "deleteConfirm": {
+          "cancel": "Cancelar",
+          "delete": "Eliminar",
+          "deleting": "Eliminando",
+          "title": "Título"
+        },
+        "empty": "Vacío",
+        "filters": {
+          "all": "Todos",
+          "month": "Mes",
+          "today": "Hoy",
+          "week": "Semana"
         }
       },
-      "showInfo": "Mostrar Información",
-      "title": "Título"
-    },
-    "progressTracker": {
-      "noBadges": "Sin Insignias"
-    },
-    "speedGame": {
-      "instructions": "Instrucciones",
-      "scoreLabel": "Etiqueta de Puntuación",
-      "startButton": "Botón Iniciar",
-      "wordsLabel": "Etiqueta de Palabras"
-    },
-    "stickyKeys": {
-      "activated": "Activado",
-      "active": "Activo",
-      "description": "Descripción",
-      "enableButton": "Botón Activar",
-      "enableFailed": "Error al Activar",
-      "enableManually": "Activar Manualmente",
-      "linuxInfo": "Información de Linux",
-      "linuxSettings": "Configuración de Linux",
-      "openSettings": "Abrir Configuración",
-      "restartRequired": "Reinicio Requerido",
-      "tip": "Consejo",
-      "tipLabel": "Etiqueta de Consejo",
-      "title": "Título",
-      "unsupported": "No Soportado",
-      "windowsHint": "Sugerencia de Windows",
-      "windowsInfo": "Información de Windows"
-    },
-    "visualImpairment": {
-      "visualDesc": "Descripción Visual",
-      "visualFocusIndicators": "Indicadores de Enfoque Visual",
-      "visualFocusIndicatorsDesc": "Descripción de Indicadores de Enfoque Visual",
-      "visualHideTTSSettings": "Ocultar Configuración de TTS Visual",
-      "visualHighContrast": "Alto Contraste Visual",
-      "visualHighContrastDesc": "Descripción de Alto Contraste Visual",
-      "visualShowTTSSettings": "Mostrar Configuración de TTS Visual",
-      "visualSpeechRateLabel": "Etiqueta de Velocidad de Habla Visual",
-      "visualSpeechVolumeLabel": "Etiqueta de Volumen de Habla Visual",
-      "visualTTS": "TTS Visual",
-      "visualTTSDesc": "Descripción de TTS Visual",
-      "visualTextSizeLabel": "Etiqueta de Tamaño de Texto Visual",
-      "visualTextSizeRange": "Rango de Tamaño de Texto Visual",
-      "visualTitle": "Título Visual",
-      "visualWCAGCompliance": "Cumplimiento WCAG Visual"
-    }
-  },
-  "voice": {
-    "panel": {
-      "connected": "Conectado",
-      "connecting": "Conectando...",
-      "listening": "Escuchando",
-      "microphoneDisabled": "Micrófono desactivado",
-      "mutedLabel": "Silenciado",
-      "muteLabel": "Silenciar",
-      "speakNow": "Habla ahora",
-      "speaking": "Hablando",
-      "startingCall": "Iniciando llamada...",
-      "unmuteLabel": "Activar sonido"
-    },
-    "connectionError": "Error de conexión de voz",
-    "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
-    "permission": {
-      "enableLabel": "Etiqueta de Activación",
-      "steps": {
-        "findMicrophone": "Buscar Micrófono",
-        "lockIcon": "Icono de Candado",
-        "reload": "Recargar",
-        "selectAllow": "Seleccionar Permitir"
+      "history": {
+        "title": "Título",
+        "empty": {
+          "filtered": "No se encontraron conversaciones con estos filtros",
+          "all": "Aún no hay conversaciones. ¡Empieza a chatear con un Maestro!"
+        },
+        "loadMore": "[TRANSLATE] Carica Altro",
+        "dateFormat": {
+          "daysAgo": "Días Atrás",
+          "today": "Hoy",
+          "yesterday": "Ayer"
+        },
+        "loading": "Cargando..."
       },
+      "inactivity": {
+        "title": "Título",
+        "message": "Mensaje",
+        "continue": "[TRANSLATE] Continua",
+        "end": "[TRANSLATE] Termina Sessione",
+        "closeAriaLabel": "Cerrar Etiqueta Aria",
+        "closeButton": "Botón Cerrar",
+        "continueButton": "Botón Continuar",
+        "description": "Descripción"
+      },
+      "toolSelection": {
+        "title": "Título",
+        "description": "[TRANSLATE] Scegli uno strumento per continuare",
+        "closeAriaLabel": "Cerrar Etiqueta Aria",
+        "empty": "Vacío",
+        "question": "Pregunta",
+        "search": "Buscar"
+      }
+    },
+    "session": {
+      "title": "[TRANSLATE] Sessione",
+      "start": "[TRANSLATE] Inizia Sessione",
+      "end": "[TRANSLATE] Termina Sessione",
+      "duration": "[TRANSLATE] Durata",
+      "controls": {
+        "mute": "[TRANSLATE] Disattiva Audio",
+        "unmute": "[TRANSLATE] Attiva Audio",
+        "endSession": "[TRANSLATE] Termina",
+        "cancelResponseAriaLabel": "Cancelar respuesta",
+        "cancelResponseTooltip": "Cancelar respuesta actual",
+        "endSessionAriaLabel": "Terminar sesión",
+        "endSessionTooltip": "Terminar sesión de voz",
+        "inputPlaceholder": "Escribe un mensaje...",
+        "muteAriaLabel": {
+          "muted": "Silenciado",
+          "unmuted": "Sonido activado"
+        },
+        "muteTooltip": {
+          "muted": "Activar sonido",
+          "unmuted": "Silenciar"
+        },
+        "sendButton": "Enviar",
+        "sendMessageAriaLabel": "Enviar mensaje",
+        "sendMessageTooltip": "Enviar el mensaje",
+        "switchToChatAriaLabel": "Cambiar a chat",
+        "switchToChatTooltip": "Volver al chat de texto"
+      },
+      "rating": {
+        "close": "Cerrar",
+        "feedbackLabel": "Tu opinión",
+        "feedbackPlaceholder": "Comparte tus comentarios...",
+        "labels": {
+          "1": "Muy malo",
+          "2": "Malo",
+          "3": "Regular",
+          "4": "Bueno",
+          "5": "Excelente"
+        },
+        "minutes": "minutos",
+        "savingError": "Error al guardar",
+        "selectError": "Por favor selecciona una calificación",
+        "selectPlaceholder": "Seleccionar tema",
+        "sessionWith": "Sesión con",
+        "skip": "Omitir",
+        "stars": "estrellas",
+        "submit": "Enviar",
+        "submitting": "Enviando",
+        "title": "Califica tu sesión",
+        "topics": "Temas tratados"
+      }
+    },
+    "typing": {
+      "advanced": "Avanzado",
+      "azerty": "Azerty",
+      "backToGames": "Volver a Juegos",
+      "backToLessons": "Volver a Lecciones",
+      "beginner": "Principiante",
+      "dvorak": "Dvorak",
+      "games": "Juegos",
+      "infoDSA": "Información TEA",
+      "infoDSADesc": "Descripción de información TEA",
+      "infoGamification": "Información de Gamificación",
+      "infoGamificationDesc": "Descripción de información de gamificación",
+      "infoMultiLanguage": "Información de Multiidioma",
+      "infoMultiLanguageDesc": "Descripción de información de multiidioma",
+      "infoOneHanded": "Información de Una Mano",
+      "infoOneHandedDesc": "Descripción de información de una mano",
+      "intermediate": "Intermedio",
+      "keyboardLayout": "Diseño de Teclado",
+      "lessons": "Lecciones",
+      "level": "Nivel",
+      "progress": "Progreso",
+      "qwerty": "Qwerty",
+      "qwertz": "Qwertz",
       "subtitle": "Subtítulo",
-      "switchToChat": "Cambiar a Chat",
-      "title": "Título"
-    },
-    "label": "Voz",
-    "description": "Habilita la conversación de voz con Maestri",
-    "chatUI": {
-      "startRecording": "Iniciar grabación",
-      "stopRecording": "Detener grabación",
-      "sendVoiceMessage": "Enviar mensaje de voz",
-      "cancel": "Cancelar",
-      "recordingInProgress": "Grabación en curso...",
-      "microphonePermission": "Permita el acceso del micrófono para usar la voz",
-      "grantPermission": "Permitir micrófono",
-      "denyPermission": "Denegar acceso"
-    },
-    "status": {
-      "listening": "Escuchando...",
-      "processing": "Procesando...",
-      "speaking": "Hablando...",
-      "connecting": "Conectando...",
-      "ready": "Listo",
-      "initializing": "Inicializando...",
-      "processing_text": "Transcribiendo..."
-    },
-    "settings": {
-      "title": "Configuración de voz",
-      "speed": "Velocidad de reproducción",
-      "pitch": "Tono",
-      "voiceSelection": "Seleccionar voz",
-      "volume": "Volumen",
-      "enableCaptions": "Habilitar subtítulos",
-      "textToSpeech": "Texto a voz",
-      "speechToText": "Reconocimiento de voz",
-      "language": "Idioma de escucha",
-      "reset": "Restablecer valores predeterminados"
-    },
-    "errors": {
-      "microphoneDenied": "Acceso de micrófono denegado. Habilite el micrófono en la configuración.",
-      "microphoneNotFound": "No se detectó micrófono. Verifique su dispositivo.",
-      "connectionError": "Error de conexión. Verifique su conexión a Internet.",
-      "timeout": "Tiempo de conexión agotado. Intente de nuevo.",
-      "recordingFailed": "La grabación falló. Intente de nuevo.",
-      "processingError": "Error de procesamiento. Intente de nuevo.",
-      "permissionError": "Error de permiso. Verifique su configuración.",
-      "unsupportedBrowser": "Su navegador no admite grabación de voz.",
-      "unknownError": "Error desconocido. Intente más tarde."
-    },
-    "trialLimits": {
-      "voiceTitle": "Límite de voz",
-      "minutesRemaining": "{minutes} minutos restantes",
-      "secondsRemaining": "{seconds} segundos restantes",
-      "limitReached": "Límite de voz alcanzado",
-      "limitReachedMessage": "Ha utilizado todos sus minutos de voz. Actualice para acceso ilimitado a voz.",
-      "upgradePrompt": "¿Desea acceso ilimitado a voz?",
-      "upgrade": "Actualizar ahora"
-    },
-    "accessibility": {
-      "voiceToText": "Convertir voz a texto",
-      "textAlternative": "Usar texto como alternativa",
-      "captionsToggle": "Alternar subtítulos",
-      "enableSubtitles": "Habilitar subtítulos para todas las respuestas",
-      "voiceSpeed": "Velocidad de lectura",
-      "slow": "Lento",
-      "normal": "Normal",
-      "fast": "Rápido",
-      "veryFast": "Muy rápido",
-      "screenReaderSupport": "Esta herramienta admite lectores de pantalla"
-    },
-    "confirmations": {
-      "deleteRecording": "¿Eliminar grabación?",
-      "discardMessage": "¿Descartar mensaje?",
-      "confirmSend": "¿Enviar mensaje de voz?"
-    },
-    "help": {
-      "title": "Guía de voz",
-      "howToRecord": "Cómo grabar: Presione el botón de micrófono y hable claramente.",
-      "tips": "Consejos: Hable en un ambiente tranquilo para mejores resultados.",
-      "troubleshooting": "Solución de problemas: Verifique que el micrófono funcione en su navegador."
+      "title": "Título",
+      "lessonSelector": {
+        "completed": "Completado",
+        "completedBadge": "Insignia de Completado",
+        "inProgress": "En Progreso",
+        "title": "Título"
+      },
+      "oneHanded": {
+        "hideInfo": "Ocultar Información",
+        "info": {
+          "active": "Activo",
+          "description": "Descripción",
+          "tips": "Consejos"
+        },
+        "modes": {
+          "both": {
+            "description": "Descripción",
+            "label": "Etiqueta"
+          },
+          "leftOnly": {
+            "description": "Descripción",
+            "label": "Etiqueta"
+          },
+          "rightOnly": {
+            "description": "Descripción",
+            "label": "Etiqueta"
+          }
+        },
+        "showInfo": "Mostrar Información",
+        "title": "Título"
+      },
+      "progressTracker": {
+        "noBadges": "Sin Insignias"
+      },
+      "speedGame": {
+        "instructions": "Instrucciones",
+        "scoreLabel": "Etiqueta de Puntuación",
+        "startButton": "Botón Iniciar",
+        "wordsLabel": "Etiqueta de Palabras"
+      },
+      "stickyKeys": {
+        "activated": "Activado",
+        "active": "Activo",
+        "description": "Descripción",
+        "enableButton": "Botón Activar",
+        "enableFailed": "Error al Activar",
+        "enableManually": "Activar Manualmente",
+        "linuxInfo": "Información de Linux",
+        "linuxSettings": "Configuración de Linux",
+        "openSettings": "Abrir Configuración",
+        "restartRequired": "Reinicio Requerido",
+        "tip": "Consejo",
+        "tipLabel": "Etiqueta de Consejo",
+        "title": "Título",
+        "unsupported": "No Soportado",
+        "windowsHint": "Sugerencia de Windows",
+        "windowsInfo": "Información de Windows"
+      },
+      "visualImpairment": {
+        "visualDesc": "Descripción Visual",
+        "visualFocusIndicators": "Indicadores de Enfoque Visual",
+        "visualFocusIndicatorsDesc": "Descripción de Indicadores de Enfoque Visual",
+        "visualHideTTSSettings": "Ocultar Configuración de TTS Visual",
+        "visualHighContrast": "Alto Contraste Visual",
+        "visualHighContrastDesc": "Descripción de Alto Contraste Visual",
+        "visualShowTTSSettings": "Mostrar Configuración de TTS Visual",
+        "visualSpeechRateLabel": "Etiqueta de Velocidad de Habla Visual",
+        "visualSpeechVolumeLabel": "Etiqueta de Volumen de Habla Visual",
+        "visualTTS": "TTS Visual",
+        "visualTTSDesc": "Descripción de TTS Visual",
+        "visualTextSizeLabel": "Etiqueta de Tamaño de Texto Visual",
+        "visualTextSizeRange": "Rango de Tamaño de Texto Visual",
+        "visualTitle": "Título Visual",
+        "visualWCAGCompliance": "Cumplimiento WCAG Visual"
+      }
     }
   }
 }

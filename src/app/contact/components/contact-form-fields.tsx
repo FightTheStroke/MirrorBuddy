@@ -31,7 +31,7 @@ export function ContactFormFields({
   isSubmitting,
   onChange,
 }: ContactFormFieldsProps) {
-  const t = useTranslations("contact.form");
+  const t = useTranslations("compliance.contact.form");
 
   const renderField = (
     id: string,

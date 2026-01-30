@@ -30,7 +30,7 @@ export function TosAcceptanceModal({
 }: TosAcceptanceModalProps) {
   const [accepted, setAccepted] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const t = useTranslations("consent.tos");
+  const t = useTranslations("compliance.consent.tos");
 
   const handleAccept = async () => {
     if (!accepted) return;

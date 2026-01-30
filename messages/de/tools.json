@@ -1,74 +1,4 @@
 {
-  "astuccio": {
-    "title": "Federmäppchen",
-    "backToAstuccio": "← Zurück zum Federmäppchen",
-    "toolsCount": "{count} Werkzeuge",
-    "categories": {
-      "upload": {
-        "title": "Hochladen",
-        "subtitle": "Importieren Sie Ihre Materialien zur Erstellung von Lernhilfen"
-      },
-      "create": {
-        "title": "Erstellen",
-        "subtitle": "Generieren Sie Lernmaterialien mit Hilfe der Professoren"
-      },
-      "search": {
-        "title": "Suchen",
-        "subtitle": "Finden Sie Ressourcen und Informationen im Web"
-      }
-    },
-    "info": {
-      "howItWorks": "Wie funktioniert es?",
-      "step1": {
-        "title": "Wählen Sie das Werkzeug",
-        "description": "Wählen Sie das Werkzeug, das am besten zu Ihrem Lernziel passt"
-      },
-      "step2": {
-        "title": "Wählen Sie den Professor",
-        "description": "Jeder Professor hat einen einzigartigen Ansatz, um Ihnen beim Lernen zu helfen"
-      },
-      "step3": {
-        "title": "Im Rucksack speichern",
-        "description": "Erstellte Materialien werden in Ihrem Rucksack gespeichert, um sie jederzeit wiederzuverwenden"
-      },
-      "studyTip": {
-        "title": "Lerntipp",
-        "description": "Beginnen Sie mit einer <strong>Mind Map</strong> für einen Überblick, erstellen Sie dann <strong>Flashcards</strong>, um Schlüsselkonzepte zu merken, und testen Sie schließlich Ihre Vorbereitung mit einem <strong>Quiz</strong>. Alle Materialien werden in Ihrem <strong>Rucksack</strong> gespeichert!"
-      }
-    },
-    "backButton": "Zurück",
-    "how_it_works": {
-      "step1_desc": "Beschreibung Schritt 1",
-      "step1_title": "Schritt 1",
-      "step2_desc": "Beschreibung Schritt 2",
-      "step2_title": "Schritt 2",
-      "step3_desc": "Beschreibung Schritt 3",
-      "step3_title": "Schritt 3",
-      "title": "Wie es funktioniert"
-    },
-    "itemCount": "Anzahl Elemente",
-    "study_tip": {
-      "description": "Beginnen Sie mit einer Mind Map für einen Überblick, erstellen Sie dann Flashcards, um Schlüsselkonzepte zu merken",
-      "title": "Lerntipp"
-    }
-  },
-  "zaino": {
-    "print": {
-      "success": "Druck gestartet",
-      "successDescription": "Das Dokument wird im Druckfenster geöffnet.",
-      "error": "Druckfehler",
-      "errorDescription": "Druckfenster kann nicht geöffnet werden. Überprüfen Sie die Popup-Einstellungen.",
-      "downloadSuccess": "Datei heruntergeladen",
-      "downloadSuccessDescription": "Die HTML-Datei wurde heruntergeladen.",
-      "downloadError": "Fehler",
-      "downloadErrorDescription": "Datei kann nicht heruntergeladen werden.",
-      "ariaLabel": "Drucken {title}",
-      "button": "Drucken",
-      "optionsAriaLabel": "Druckoptionen für {title}",
-      "printPdf": "PDF drucken",
-      "downloadHtml": "HTML herunterladen"
-    }
-  },
   "tools": {
     "pdf": {
       "label": "PDF hochladen",
@@ -105,7 +35,94 @@
     },
     "studyKit": {
       "label": "Lernkit",
-      "description": "Laden Sie ein PDF hoch und generieren Sie automatisch Zusammenfassungen, Karten, Demos und Quiz"
+      "description": "Laden Sie ein PDF hoch und generieren Sie automatisch Zusammenfassungen, Karten, Demos und Quiz",
+      "title": "[TRANSLATE] Kit di Studio",
+      "exportModal": {
+        "title": "Titel",
+        "format": "[TRANSLATE] Formato",
+        "export": "Exportieren",
+        "cancel": "Abbrechen",
+        "closeLabel": "Schließen",
+        "description": "Beschreibung",
+        "error": "Fehler",
+        "formatLabel": "Format",
+        "generating": "Generierung...",
+        "profileLabel": "Profil",
+        "success": {
+          "default": "Standard",
+          "withZaino": "Mit Rucksack"
+        }
+      },
+      "list": {
+        "empty": {
+          "title": "Keine Dokumente",
+          "description": "Laden Sie Ihr erstes Dokument hoch, um mit dem Lernen zu beginnen"
+        },
+        "create": "[TRANSLATE] Crea Nuovo Kit",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "deleteConfirm": "Löschen bestätigen",
+        "deleteError": "Löschfehler",
+        "error": {
+          "description": "Fehler beim Laden",
+          "title": "Fehler"
+        },
+        "filters": {
+          "all": "Alle",
+          "error": "Fehler",
+          "processing": "Verarbeitung...",
+          "ready": "Bereit"
+        },
+        "open": "Öffnen",
+        "processing": {
+          "description": "Wird verarbeitet",
+          "title": "Verarbeitung"
+        },
+        "status": "Status"
+      },
+      "view": {
+        "title": "[TRANSLATE] Visualizza Kit",
+        "edit": "[TRANSLATE] Modifica",
+        "delete": "[TRANSLATE] Elimina",
+        "back": "Zurück",
+        "backToList": "Zurück zur Liste",
+        "features": {
+          "demo": {
+            "description": "Interaktive Demonstration",
+            "title": "Demo"
+          },
+          "mindmap": {
+            "description": "Visuelle Mind-Map",
+            "title": "Mind-Map"
+          },
+          "quiz": {
+            "description": "Interaktives Quiz",
+            "title": "Quiz"
+          },
+          "summary": {
+            "description": "Strukturierte Zusammenfassung",
+            "title": "Zusammenfassung"
+          }
+        },
+        "header": "Kopfzeile",
+        "myKits": "Meine Kits",
+        "newKit": "Neues Kit",
+        "subtitle": "Untertitel",
+        "uploadTitle": "Upload-Titel"
+      },
+      "uploadProgress": {
+        "uploading": "[TRANSLATE] Caricamento...",
+        "progress": "[TRANSLATE] Progresso: {percent}%",
+        "complete": "[TRANSLATE] Completato",
+        "loadAnother": "Weiteres laden",
+        "processingNote": "Verarbeitungshinweis",
+        "status": {
+          "error": "Fehler",
+          "processing": "Verarbeitung...",
+          "success": "Abgeschlossen",
+          "uploading": "Hochladen"
+        }
+      }
     },
     "mindmap": {
       "label": "Mind Map",
@@ -181,7 +198,109 @@
       "level": "Stufe",
       "none": "Keine",
       "recommendedLesson": "Empfohlene Lektion",
-      "title": "Titel"
+      "title": "[TRANSLATE] Dattilografia",
+      "speedGame": {
+        "instructions": "Tippen Sie die Wörter so schnell wie möglich! Sie haben 60 Sekunden.",
+        "startButton": "Spiel starten",
+        "scoreLabel": "Punktzahl",
+        "wordsLabel": "Wörter"
+      },
+      "lessonSelector": {
+        "title": "Lektionen - Stufe {level}",
+        "completed": "abgeschlossen",
+        "completedBadge": "Abgeschlossen",
+        "inProgress": "In Bearbeitung"
+      },
+      "stickyKeys": {
+        "activated": "Einrastfunktion aktiviert",
+        "restartRequired": "Starten Sie die Anwendung neu, um die Änderungen zu übernehmen",
+        "enableFailed": "Aktivierung fehlgeschlagen",
+        "enableManually": "Manuell in den Systemeinstellungen aktivieren",
+        "windowsInfo": "Drücken Sie die Umschalttaste 5 Mal",
+        "windowsHint": "Oder öffnen Sie Einstellungen > Erleichterte Bedienung > Tastatur",
+        "linuxSettings": "Linux-Einstellungen",
+        "linuxInfo": "Öffnen Sie Systemeinstellungen > Barrierefreiheit > Tippen",
+        "title": "Einrastfunktion",
+        "unsupported": "Auf dieser Plattform nicht unterstützt",
+        "active": "Aktiv",
+        "description": "Ermöglicht das Drücken von Modifikatortasten nacheinander statt gleichzeitig",
+        "enableButton": "Einrastfunktion aktivieren",
+        "openSettings": "Systemeinstellungen öffnen",
+        "tipLabel": "Tipp",
+        "tip": "Drücken Sie die Umschalttaste unter Windows 5 Mal schnell, um die Einrastfunktion zu aktivieren"
+      },
+      "progressTracker": {
+        "noBadges": "Noch keine Abzeichen"
+      },
+      "visualImpairment": {
+        "wcagCompliance": "WCAG 2.1 AA-Konformität:",
+        "visualTitle": "[TRANSLATE] Disabilità Visiva",
+        "visualDesc": "[TRANSLATE] Impostazioni per utenti ipovedenti",
+        "visualHighContrast": "[TRANSLATE] Alto Contrasto",
+        "visualHighContrastDesc": "[TRANSLATE] Aumenta il contrasto dei colori",
+        "visualTextSizeLabel": "[TRANSLATE] Dimensione Testo",
+        "visualTextSizeRange": "[TRANSLATE] Da {min} a {max}",
+        "visualTTS": "[TRANSLATE] Sintesi Vocale (TTS)",
+        "visualTTSDesc": "[TRANSLATE] Leggi il testo ad alta voce",
+        "visualHideTTSSettings": "[TRANSLATE] Nascondi Impostazioni TTS",
+        "visualShowTTSSettings": "[TRANSLATE] Mostra Impostazioni TTS",
+        "visualSpeechRateLabel": "[TRANSLATE] Velocità Voce",
+        "visualSpeechVolumeLabel": "[TRANSLATE] Volume Voce",
+        "visualFocusIndicators": "[TRANSLATE] Indicatori di Focus",
+        "visualFocusIndicatorsDesc": "[TRANSLATE] Evidenzia l'elemento con focus",
+        "visualWCAGCompliance": "[TRANSLATE] Conformità WCAG 2.1 AA"
+      },
+      "oneHanded": {
+        "title": "Tipp-Modus",
+        "hideInfo": "Info ausblenden",
+        "showInfo": "Info anzeigen",
+        "modes": {
+          "both": {
+            "label": "Zwei Hände",
+            "description": "Standard-Tippen mit beiden Händen"
+          },
+          "leftOnly": {
+            "label": "Nur Linke Hand",
+            "description": "Lektionen mit Tasten, die von der linken Hand erreichbar sind"
+          },
+          "rightOnly": {
+            "label": "Nur Rechte Hand",
+            "description": "Lektionen mit Tasten, die von der rechten Hand erreichbar sind"
+          }
+        },
+        "info": {
+          "active": "Aktiver Modus:",
+          "description": "Die Lektionen zeigen nur die Tasten an, die mit der ausgewählten Hand erreichbar sind.",
+          "tips": "Tipps:",
+          "tipItems": [
+            "Positionieren Sie die Tastatur bequem vor sich",
+            "Verwenden Sie bei Bedarf Modifikatortasten (Umschalt, Strg)",
+            "Machen Sie regelmäßig Pausen, um Ermüdung zu vermeiden"
+          ]
+        }
+      },
+      "subtitle": "[TRANSLATE] Impara a digitare velocemente",
+      "beginner": "[TRANSLATE] Principiante",
+      "intermediate": "[TRANSLATE] Intermedio",
+      "advanced": "[TRANSLATE] Avanzato",
+      "qwertz": "[TRANSLATE] QWERTZ",
+      "qwerty": "[TRANSLATE] QWERTY",
+      "azerty": "[TRANSLATE] AZERTY",
+      "dvorak": "[TRANSLATE] Dvorak",
+      "backToGames": "[TRANSLATE] Torna ai Giochi",
+      "backToLessons": "[TRANSLATE] Torna alle Lezioni",
+      "keyboardLayout": "[TRANSLATE] Layout Tastiera",
+      "lessons": "[TRANSLATE] Lezioni",
+      "games": "[TRANSLATE] Giochi",
+      "progress": "[TRANSLATE] Progresso",
+      "infoMultiLanguage": "[TRANSLATE] Supporto Multilingua",
+      "infoMultiLanguageDesc": "[TRANSLATE] Disponibile in italiano, inglese, tedesco, francese, spagnolo",
+      "infoOneHanded": "[TRANSLATE] Modalità Una Mano",
+      "infoOneHandedDesc": "[TRANSLATE] Supporto per digitazione con una sola mano",
+      "infoDSA": "[TRANSLATE] Supporto DSA",
+      "infoDSADesc": "[TRANSLATE] Ottimizzato per studenti con DSA",
+      "infoGamification": "[TRANSLATE] Gamificazione",
+      "infoGamificationDesc": "[TRANSLATE] Guadagna punti e sblocca achievement"
     },
     "search": {
       "label": "Websuche",
@@ -190,9 +309,9 @@
       "resultCount": "Anzahl Ergebnisse",
       "wikipediaOnly": "Nur Wikipedia"
     },
-    "backToAstuccio": "Zurück zum Federmäppchen",
-    "title": "Titel",
-    "toolsCount": "Anzahl Werkzeuge",
+    "backToAstuccio": "[TRANSLATE] Torna all'Astuccio",
+    "title": "[TRANSLATE] Strumenti",
+    "toolsCount": "[TRANSLATE] {count} strumenti",
     "connection": {
       "connected": "Verbunden",
       "connecting": "Verbindung wird hergestellt...",
@@ -292,86 +411,107 @@
     "voice": {
       "label": "Sprache",
       "description": "Sprachkonversation aktivieren"
-    }
-  },
-  "studyKit": {
-    "exportModal": {
-      "cancel": "Abbrechen",
-      "closeLabel": "Schließen",
-      "description": "Beschreibung",
-      "error": "Fehler",
-      "export": "Exportieren",
-      "formatLabel": "Format",
-      "generating": "Generierung...",
-      "profileLabel": "Profil",
-      "success": {
-        "default": "Standard",
-        "withZaino": "Mit Rucksack"
-      },
-      "title": "Titel"
     },
-    "list": {
-      "cancel": "Abbrechen",
-      "delete": "Löschen",
-      "deleteConfirm": "Löschen bestätigen",
-      "deleteError": "Löschfehler",
-      "empty": {
-        "description": "Keine Lernkits verfügbar",
-        "title": "Keine Kits"
-      },
-      "error": {
-        "description": "Fehler beim Laden",
-        "title": "Fehler"
-      },
-      "filters": {
-        "all": "Alle",
-        "error": "Fehler",
-        "processing": "Verarbeitung...",
-        "ready": "Bereit"
-      },
-      "open": "Öffnen",
-      "processing": {
-        "description": "Wird verarbeitet",
-        "title": "Verarbeitung"
-      },
-      "status": "Status"
+    "googleDrive": {
+      "dragOrChoose": "Ziehen Sie eine Datei hierher oder wählen Sie, von wo Sie hochladen möchten",
+      "fromComputer": "Vom Computer",
+      "fromGoogleDrive": "Von Google Drive",
+      "maxFileSize": "Maximale Größe: {maxSizeMB} MB",
+      "connectButton": "Google Drive verbinden",
+      "connectPrompt": "Melden Sie sich an, um Dateien von Ihrem Google Drive zu importieren",
+      "searchPlaceholder": "Dateien suchen...",
+      "myDrive": "Meine Ablage",
+      "sharedWithMe": "Für mich freigegeben",
+      "noFilesFound": "Keine Dateien gefunden",
+      "loadMore": "Mehr laden",
+      "select": "Auswählen",
+      "description": "Verbinden Sie Ihr Google-Konto, um Dateien von Drive hochzuladen",
+      "loadingCheck": "Verbindung wird überprüft...",
+      "readOnlyAccess": "Nur-Lese-Zugriff auf Ihre Dateien",
+      "disconnectButton": "Konto trennen",
+      "disconnectTitle": "Google Drive trennen?",
+      "disconnectWarning": "Sie können nicht mehr auf Dateien von Google Drive zugreifen. Sie können sich jederzeit wieder verbinden.",
+      "disconnectConfirm": "Trennen",
+      "notConnected": "Nicht verbunden",
+      "capabilities": "Was Sie mit Google Drive tun können:",
+      "capabilityPdf": "PDFs von Drive hochladen, um Lernmaterialien zu generieren",
+      "capabilityHomework": "Dokumente für den Hausaufgaben-Assistenten importieren",
+      "capabilityDocuments": "Auf Ihre Dokumente zugreifen, ohne sie herunterladen zu müssen",
+      "privacyNotice": "MirrorBuddy greift nur mit Ihrer Genehmigung auf Dateien zu. Wir speichern Ihre Drive-Dateien nicht."
     },
-    "uploadProgress": {
-      "loadAnother": "Weiteres laden",
-      "processingNote": "Verarbeitungshinweis",
-      "status": {
-        "error": "Fehler",
-        "processing": "Verarbeitung...",
-        "success": "Abgeschlossen",
-        "uploading": "Hochladen"
-      }
-    },
-    "view": {
-      "back": "Zurück",
-      "backToList": "Zurück zur Liste",
-      "features": {
-        "demo": {
-          "description": "Interaktive Demonstration",
-          "title": "Demo"
+    "astuccio": {
+      "title": "Federmäppchen",
+      "description": "[TRANSLATE] I tuoi strumenti educativi",
+      "empty": "[TRANSLATE] Nessuno strumento disponibile",
+      "info": {
+        "title": "[TRANSLATE] Informazioni Astuccio",
+        "description": "[TRANSLATE] Qui trovi tutti i tuoi strumenti",
+        "howItWorks": "Wie funktioniert es?",
+        "step1": {
+          "title": "Wählen Sie das Werkzeug",
+          "description": "Wählen Sie das Werkzeug, das am besten zu Ihrem Lernziel passt"
         },
-        "mindmap": {
-          "description": "Visuelle Mind-Map",
-          "title": "Mind-Map"
+        "step2": {
+          "title": "Wählen Sie den Professor",
+          "description": "Jeder Professor hat einen einzigartigen Ansatz, um Ihnen beim Lernen zu helfen"
         },
-        "quiz": {
-          "description": "Interaktives Quiz",
-          "title": "Quiz"
+        "step3": {
+          "title": "Im Rucksack speichern",
+          "description": "Erstellte Materialien werden in Ihrem Rucksack gespeichert, um sie jederzeit wiederzuverwenden"
         },
-        "summary": {
-          "description": "Strukturierte Zusammenfassung",
-          "title": "Zusammenfassung"
+        "studyTip": {
+          "title": "Lerntipp",
+          "description": "Beginnen Sie mit einer <strong>Mind Map</strong> für einen Überblick, erstellen Sie dann <strong>Flashcards</strong>, um Schlüsselkonzepte zu merken, und testen Sie schließlich Ihre Vorbereitung mit einem <strong>Quiz</strong>. Alle Materialien werden in Ihrem <strong>Rucksack</strong> gespeichert!"
         }
       },
-      "header": "Kopfzeile",
-      "myKits": "Meine Kits",
-      "newKit": "Neues Kit",
-      "subtitle": "Untertitel",
-      "uploadTitle": "Upload-Titel"
+      "backToAstuccio": "← Zurück zum Federmäppchen",
+      "toolsCount": "{count} Werkzeuge",
+      "categories": {
+        "upload": {
+          "title": "Hochladen",
+          "subtitle": "Importieren Sie Ihre Materialien zur Erstellung von Lernhilfen"
+        },
+        "create": {
+          "title": "Erstellen",
+          "subtitle": "Generieren Sie Lernmaterialien mit Hilfe der Professoren"
+        },
+        "search": {
+          "title": "Suchen",
+          "subtitle": "Finden Sie Ressourcen und Informationen im Web"
+        }
+      },
+      "backButton": "Zurück",
+      "how_it_works": {
+        "step1_desc": "Beschreibung Schritt 1",
+        "step1_title": "Schritt 1",
+        "step2_desc": "Beschreibung Schritt 2",
+        "step2_title": "Schritt 2",
+        "step3_desc": "Beschreibung Schritt 3",
+        "step3_title": "Schritt 3",
+        "title": "Wie es funktioniert"
+      },
+      "itemCount": "Anzahl Elemente",
+      "study_tip": {
+        "description": "Beginnen Sie mit einer Mind Map für einen Überblick, erstellen Sie dann Flashcards, um Schlüsselkonzepte zu merken",
+        "title": "Lerntipp"
+      }
+    },
+    "zaino": {
+      "print": {
+        "success": "Druck gestartet",
+        "successDescription": "Das Dokument wird im Druckfenster geöffnet.",
+        "error": "Druckfehler",
+        "errorDescription": "Druckfenster kann nicht geöffnet werden. Überprüfen Sie die Popup-Einstellungen.",
+        "downloadSuccess": "Datei heruntergeladen",
+        "downloadSuccessDescription": "Die HTML-Datei wurde heruntergeladen.",
+        "downloadError": "Fehler",
+        "downloadErrorDescription": "Datei kann nicht heruntergeladen werden.",
+        "ariaLabel": "Drucken {title}",
+        "button": "Drucken",
+        "optionsAriaLabel": "Druckoptionen für {title}",
+        "printPdf": "PDF drucken",
+        "downloadHtml": "HTML herunterladen"
+      }
     }
   }
 }

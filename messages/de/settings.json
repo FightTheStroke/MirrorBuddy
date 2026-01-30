@@ -1,36 +1,4 @@
 {
-  "accessibility": {
-    "skipToContent": "Skip to content",
-    "skipToNavigation": "Skip to navigation",
-    "openMenu": "Open menu",
-    "closeMenu": "Close menu",
-    "toggleMenu": "Toggle menu",
-    "openDialog": "Open dialog",
-    "closeDialog": "Close dialog",
-    "loading": "Loading",
-    "loadingComplete": "Loading complete",
-    "searchResults": "Search results",
-    "noResults": "No results",
-    "currentPage": "Current page",
-    "page": "Page",
-    "of": "of",
-    "selected": "selected",
-    "sortAscending": "Sort ascending",
-    "sortDescending": "Sort descending",
-    "expandSection": "Expand section",
-    "collapseSection": "Collapse section",
-    "showMore": "Show more",
-    "showLess": "Show less",
-    "required": "required",
-    "optional": "optional",
-    "errorMessage": "Error message",
-    "warningMessage": "Warning message",
-    "successMessage": "Success message",
-    "infoMessage": "Info message",
-    "screenReaderOnly": "Screen reader only",
-    "newWindow": "opens in new window",
-    "externalLink": "external link"
-  },
   "settings": {
     "title": "Settings",
     "save": "Save",
@@ -113,7 +81,32 @@
       "nameLabel": "Name Label",
       "personalInfoTitle": "Personal Info Title",
       "reviewIntroductionButton": "Review Introduction Button",
-      "teachingStyleTitle": "Teaching Style Title"
+      "teachingStyleTitle": "Teaching Style Title",
+      "genitori": {
+        "consentButton": "Consent Button",
+        "consentDescription": "Consent Description",
+        "consentTitle": "Consent Title",
+        "error": "Fehler",
+        "loadingProfile": "Loading Profile",
+        "retry": "Retry",
+        "welcomeDescription": "Welcome Description",
+        "welcomeTitle": "Welcome Title"
+      },
+      "parentChat": {
+        "askAbout": "Ask About",
+        "cancel": "Abbrechen",
+        "conversationTitle": "Conversation Title",
+        "description": "Descrizione",
+        "disclaimerText": "Disclaimer Text",
+        "disclaimerTitle": "Disclaimer Title",
+        "formalLanguage": "Formal Language",
+        "loadingConversation": "Loading Conversation",
+        "messagesSaved": "Messages Saved",
+        "observationsStudySessions": "Observations Study Sessions",
+        "startConversation": "Start Conversation",
+        "title": "Titolo",
+        "understood": "Understood"
+      }
     },
     "appearance": {
       "theme": "Theme",
@@ -295,7 +288,37 @@
       "visualWCAGCompliance": "Visual W C A G Compliance",
       "workLabel": "Work Label",
       "title": "Accessibilità",
-      "description": "Personalizza l'esperienza in base alle tue esigenze"
+      "description": "Personalizza l'esperienza in base alle tue esigenze",
+      "skipToContent": "Skip to content",
+      "skipToNavigation": "Skip to navigation",
+      "openMenu": "Open menu",
+      "closeMenu": "Close menu",
+      "toggleMenu": "Toggle menu",
+      "openDialog": "Open dialog",
+      "closeDialog": "Close dialog",
+      "loading": "Loading",
+      "loadingComplete": "Loading complete",
+      "searchResults": "Search results",
+      "noResults": "No results",
+      "currentPage": "Current page",
+      "page": "Page",
+      "of": "of",
+      "selected": "selected",
+      "sortAscending": "Sort ascending",
+      "sortDescending": "Sort descending",
+      "expandSection": "Expand section",
+      "collapseSection": "Collapse section",
+      "showMore": "Show more",
+      "showLess": "Show less",
+      "required": "required",
+      "optional": "optional",
+      "errorMessage": "Error message",
+      "warningMessage": "Warning message",
+      "successMessage": "Success message",
+      "infoMessage": "Info message",
+      "screenReaderOnly": "Screen reader only",
+      "newWindow": "opens in new window",
+      "externalLink": "external link"
     },
     "notifications": {
       "title": "Notifications",
@@ -395,7 +418,7 @@
       "permissionsDescription": "Grant microphone and camera permissions to use voice features"
     },
     "ambientAudio": {
-      "title": "Ambient Audio",
+      "title": "Titolo",
       "description": "Background sounds to help concentration",
       "enable": "Enable ambient audio",
       "volume": "Volume",
@@ -406,7 +429,30 @@
         "cafe": "Café",
         "library": "Library"
       },
-      "futureVideoFeatures": "Future Video Features"
+      "futureVideoFeatures": "Future Video Features",
+      "activeLayers": "Active Layers",
+      "addLayer": "Add Layer",
+      "advancedMixer": "Advanced Mixer",
+      "advancedSettings": "Advanced Settings",
+      "ambientSounds": "Ambient Sounds",
+      "comingSoon": "Coming Soon",
+      "hide": "Hide",
+      "info": "Informazione",
+      "mainVolume": "Main Volume",
+      "noise": "Noise",
+      "pause": "Pause",
+      "paused": "Paused",
+      "presets": {
+        "creative": "Creative",
+        "rainyDay": "Rainy Day"
+      },
+      "removeAllLayers": "Remove All Layers",
+      "show": "Show",
+      "infoShort": "Binaural beats richiedono cuffie stereo",
+      "binaural": "Binaural",
+      "whitenoise": "Rumore Bianco",
+      "pinknoise": "Rumore Rosa",
+      "brownnoise": "Rumore Marrone"
     },
     "ai": {
       "title": "AI Provider",
@@ -533,301 +579,273 @@
       "description": "Seleziona la lingua dell'interfaccia",
       "currentLanguage": "Lingua corrente",
       "selectLanguage": "Seleziona lingua"
-    }
-  },
-  "consent": {
-    "cookie": {
-      "title": "Datenschutz & Cookies",
-      "subtitle": "MirrorBuddy respektiert Ihre Privatsphäre",
-      "intro": "Um MirrorBuddy zu nutzen, müssen Sie wesentliche Cookies akzeptieren, die uns erlauben:",
-      "features": {
-        "session": "Ihre Sitzung sicher zu halten",
-        "preferences": "Ihre Einstellungen zu speichern",
-        "protection": "Ihre Daten zu schützen"
+    },
+    "voice": {
+      "permission": {
+        "title": "Mikrofon-Berechtigung Erforderlich",
+        "subtitle": "Aktivieren Sie das Mikrofon, um den Sprachmodus zu verwenden",
+        "enableLabel": "So aktivieren Sie das Mikrofon:",
+        "steps": {
+          "lockIcon": "Klicken Sie auf das Schloss-Symbol in der Adressleiste",
+          "findMicrophone": "Finden Sie 'Mikrofon' in den Seiten-Einstellungen",
+          "selectAllow": "Wählen Sie 'Zulassen'",
+          "reload": "Laden Sie die Seite neu"
+        },
+        "switchToChat": "Zum Chat wechseln"
       },
-      "analytics": {
-        "title": "Analyse-Cookies (optional)",
-        "description": "Helfen Sie uns, MirrorBuddy zu verbessern",
-        "ariaLabel": "Analyse-Cookies aktivieren",
-        "aria": "Aria",
-        "label": "Label"
-      },
-      "acceptButton": "Akzeptieren und fortfahren",
-      "links": {
-        "privacy": "Datenschutzerklärung",
-        "cookies": "Cookie-Richtlinie"
-      },
-      "complianceNote": "MirrorBuddy entspricht den DSGVO- und COPPA-Bestimmungen zum Schutz von Minderjährigen. Ihre Daten sind bei uns sicher.",
-      "button": "Button",
-      "coppa": "Coppa",
-      "explanation": "Explanation",
-      "list": {
-        "preferences": "Preferences",
-        "protect": "Protect",
-        "session": "Session"
+      "panel": {
+        "connecting": "[TRANSLATE] Connessione in corso...",
+        "speaking": "[TRANSLATE] Parla ora",
+        "listening": "[TRANSLATE] In ascolto...",
+        "connected": "[TRANSLATE] Connesso",
+        "startingCall": "[TRANSLATE] Avvio chiamata...",
+        "mutedLabel": "[TRANSLATE] Microfono disattivato",
+        "unmuteLabel": "[TRANSLATE] Attiva microfono",
+        "microphoneDisabled": "[TRANSLATE] Microfono disabilitato",
+        "speakNow": "[TRANSLATE] Parla ora"
       }
     },
-    "tos": {
-      "titleWelcome": "Willkommen bei MirrorBuddy!",
-      "titleUpdated": "Aktualisierte Bedingungen",
-      "descriptionWelcome": "Bevor Sie beginnen, lesen Sie bitte unsere Nutzungsbedingungen.",
-      "descriptionUpdated": "Wir haben unsere Nutzungsbedingungen aktualisiert. Um MirrorBuddy weiterhin zu nutzen, lesen und akzeptieren Sie bitte die neuen Bedingungen.",
-      "updateNotice": {
-        "title": "Was hat sich geändert:",
-        "description": "Wir haben Informationen zur Erfassung von Leistungsdaten (Web Vitals) und die Datenschutzerklärung aktualisiert. Lesen Sie die vollständigen Bedingungen für Details."
+    "telemetry": {
+      "active": "Attivo",
+      "dataCollection": "Data Collection",
+      "dataCollectionDesc": "Data Collection Desc",
+      "engagementDesc": "Engagement Desc",
+      "engagementHigh": "Engagement High",
+      "engagementLow": "Engagement Low",
+      "engagementMedium": "Engagement Medium",
+      "engagementScore": "Engagement Score",
+      "featureUsage": "Feature Usage",
+      "featureUsageDesc": "Feature Usage Desc",
+      "inactive": "Inattivo",
+      "lastUpdated": "Last Updated",
+      "maestriUsed": "Maestri Used",
+      "minutes": "Minutes",
+      "noData": "No Data",
+      "noDataAvailable": "No Data Available",
+      "noUsage": "No Usage",
+      "pageViews": "Page Views",
+      "questions": "Questions",
+      "refresh": "Aggiorna",
+      "sessions": "Sessions",
+      "statsDesc": "Stats Desc",
+      "statsTitle": "Stats Title",
+      "studyTime": "Study Time",
+      "telemetryDesc": "Telemetry Desc",
+      "telemetrySettings": "Telemetry Settings",
+      "today": "Oggi",
+      "totalTime": "Total Time",
+      "trend": {
+        "decreasing": "Decreasing",
+        "increasing": "Increasing",
+        "stable": "Stable"
       },
-      "summaryTitle": "Kurz gesagt:",
-      "summary": {
-        "free": "MirrorBuddy ist kostenlos und zum Helfen gemacht",
-        "notSchool": "Wir sind keine Schule, KI kann Fehler machen",
-        "ageWarning": "Wenn Sie unter 14 sind, nutzen Sie die App mit einem Erwachsenen in der Nähe",
-        "respect": "Respektieren Sie andere, wir respektieren Sie"
+      "weeklyActivity": "Weekly Activity",
+      "weeklyStats": "Weekly Stats"
+    },
+    "crossMaestroMemory": {
+      "title": "Cross-Disciplinary Memory",
+      "badge": "Pro",
+      "description": "Allow your teachers to access what you have learned from other maestros. This improves the quality of personalized teaching.",
+      "enableLabel": "Enable cross-disciplinary memory",
+      "enableDescription": "Your teachers will be able to see your learning path"
+    },
+    "consent": {
+      "cookie": {
+        "title": "Datenschutz & Cookies",
+        "subtitle": "MirrorBuddy respektiert Ihre Privatsphäre",
+        "intro": "Um MirrorBuddy zu nutzen, müssen Sie wesentliche Cookies akzeptieren, die uns erlauben:",
+        "features": {
+          "session": "Ihre Sitzung sicher zu halten",
+          "preferences": "Ihre Einstellungen zu speichern",
+          "protection": "Ihre Daten zu schützen"
+        },
+        "analytics": {
+          "title": "Analyse-Cookies (optional)",
+          "description": "Helfen Sie uns, MirrorBuddy zu verbessern",
+          "ariaLabel": "Analyse-Cookies aktivieren",
+          "aria": "Aria",
+          "label": "Label"
+        },
+        "acceptButton": "Akzeptieren und fortfahren",
+        "links": {
+          "privacy": "Datenschutzerklärung",
+          "cookies": "Cookie-Richtlinie"
+        },
+        "complianceNote": "MirrorBuddy entspricht den DSGVO- und COPPA-Bestimmungen zum Schutz von Minderjährigen. Ihre Daten sind bei uns sicher.",
+        "button": "Button",
+        "coppa": "Coppa",
+        "explanation": "Explanation",
+        "list": {
+          "preferences": "Preferences",
+          "protect": "Protect",
+          "session": "Session"
+        }
       },
-      "readFullTerms": "Vollständige Bedingungen lesen →",
-      "checkboxLabel": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie",
-      "acceptButton": "Ich akzeptiere",
-      "acceptButtonDisabled": "Nutzungsbedingungen akzeptieren (Kästchen zuerst ankreuzen)",
-      "acceptButtonEnabled": "Nutzungsbedingungen akzeptieren",
-      "saving": "Speichern...",
-      "srRequired": "Um fortzufahren, müssen Sie die Nutzungsbedingungen akzeptieren",
-      "srSaving": "Speichervorgang läuft...",
-      "toastSavedLocally": "Akzeptierung lokal gespeichert",
-      "toastSyncFailed": "Server-Synchronisierung fehlgeschlagen. Wir versuchen es später erneut.",
-      "modal": {
+      "tos": {
+        "titleWelcome": "Willkommen bei MirrorBuddy!",
+        "titleUpdated": "Aktualisierte Bedingungen",
+        "descriptionWelcome": "Bevor Sie beginnen, lesen Sie bitte unsere Nutzungsbedingungen.",
+        "descriptionUpdated": "Wir haben unsere Nutzungsbedingungen aktualisiert. Um MirrorBuddy weiterhin zu nutzen, lesen und akzeptieren Sie bitte die neuen Bedingungen.",
+        "updateNotice": {
+          "title": "Was hat sich geändert:",
+          "description": "Wir haben Informationen zur Erfassung von Leistungsdaten (Web Vitals) und die Datenschutzerklärung aktualisiert. Lesen Sie die vollständigen Bedingungen für Details."
+        },
+        "summaryTitle": "Kurz gesagt:",
+        "summary": {
+          "free": "MirrorBuddy ist kostenlos und zum Helfen gemacht",
+          "notSchool": "Wir sind keine Schule, KI kann Fehler machen",
+          "ageWarning": "Wenn Sie unter 14 sind, nutzen Sie die App mit einem Erwachsenen in der Nähe",
+          "respect": "Respektieren Sie andere, wir respektieren Sie"
+        },
+        "readFullTerms": "Vollständige Bedingungen lesen →",
+        "checkboxLabel": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie",
+        "acceptButton": "Ich akzeptiere",
+        "acceptButtonDisabled": "Nutzungsbedingungen akzeptieren (Kästchen zuerst ankreuzen)",
+        "acceptButtonEnabled": "Nutzungsbedingungen akzeptieren",
+        "saving": "Speichern...",
+        "srRequired": "Um fortzufahren, müssen Sie die Nutzungsbedingungen akzeptieren",
+        "srSaving": "Speichervorgang läuft...",
+        "toastSavedLocally": "Akzeptierung lokal gespeichert",
+        "toastSyncFailed": "Server-Synchronisierung fehlgeschlagen. Wir versuchen es später erneut.",
+        "modal": {
+          "buttons": {
+            "accept": "Accept",
+            "disabled": "Disabilitato",
+            "submitting": "Submitting"
+          },
+          "checkbox": "Checkbox",
+          "description": {
+            "updated": "Updated",
+            "welcome": "Welcome"
+          },
+          "link": "Link",
+          "points": {
+            "aiCanErr": "Ai Can Err",
+            "free": "Free",
+            "minors": "Minors",
+            "respect": "Respect"
+          },
+          "screenReader": {
+            "required": "Richiesto",
+            "submitting": "Submitting"
+          },
+          "summary": "Summary",
+          "title": {
+            "updated": "Updated",
+            "welcome": "Welcome"
+          },
+          "warning": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          }
+        },
+        "toast": {
+          "saveFailed": "Save Failed",
+          "saved": "Saved"
+        }
+      },
+      "inline": {
+        "acceptButton": "Accept Button",
+        "acceptedText": "Accepted Text",
+        "analyticsLabel": "Analytics Label",
+        "description": "Descrizione",
+        "info": "Informazione",
+        "learnMore": "Learn More",
+        "manage": "Manage",
+        "submitButton": "Submit Button",
+        "title": "Titolo"
+      },
+      "unified": {
+        "analytics": {
+          "description": "Descrizione",
+          "label": "Label"
+        },
         "buttons": {
           "accept": "Accept",
           "disabled": "Disabilitato",
           "submitting": "Submitting"
         },
-        "checkbox": "Checkbox",
-        "description": {
-          "updated": "Updated",
-          "welcome": "Welcome"
+        "cookies": {
+          "description": "Descrizione",
+          "title": "Titolo"
         },
-        "link": "Link",
-        "points": {
-          "aiCanErr": "Ai Can Err",
-          "free": "Free",
-          "minors": "Minors",
-          "respect": "Respect"
+        "coppa": "Coppa",
+        "links": {
+          "cookies": "Cookies",
+          "full": "Full",
+          "privacy": "Privacy"
+        },
+        "loading": "Laden...",
+        "privacy": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "reconsentNotice": {
+          "changed": "Changed",
+          "details": "Details",
+          "lastAccepted": "Last Accepted"
         },
         "screenReader": {
           "required": "Richiesto",
           "submitting": "Submitting"
         },
-        "summary": "Summary",
-        "title": {
-          "updated": "Updated",
-          "welcome": "Welcome"
-        },
-        "warning": {
+        "subtitleUpdated": "Subtitle Updated",
+        "subtitleWelcome": "Subtitle Welcome",
+        "summaryTitle": "Summary Title",
+        "titleUpdated": "Title Updated",
+        "titleWelcome": "Title Welcome",
+        "tos": {
           "description": "Descrizione",
           "title": "Titolo"
+        },
+        "tosCheckbox": {
+          "label": "Label",
+          "text": "Text"
         }
-      },
-      "toast": {
-        "saveFailed": "Save Failed",
-        "saved": "Saved"
       }
     },
-    "inline": {
-      "acceptButton": "Accept Button",
-      "acceptedText": "Accepted Text",
-      "analyticsLabel": "Analytics Label",
+    "googleDrive": {
+      "capabilities": "Capabilities",
+      "capabilityDocuments": "Capability Documents",
+      "capabilityHomework": "Capability Homework",
+      "capabilityPdf": "Capability Pdf",
+      "connectButton": "Connect Button",
+      "connectPrompt": "Connect Prompt",
       "description": "Descrizione",
-      "info": "Informazione",
-      "learnMore": "Learn More",
-      "manage": "Manage",
-      "submitButton": "Submit Button",
-      "title": "Titolo"
+      "disconnectButton": "Disconnect Button",
+      "disconnectConfirm": "Disconnect Confirm",
+      "disconnectTitle": "Disconnect Title",
+      "disconnectWarning": "Disconnect Warning",
+      "dragOrChoose": "Drag Or Choose",
+      "fromComputer": "From Computer",
+      "fromGoogleDrive": "From Google Drive",
+      "loadMore": "Load More",
+      "loadingCheck": "Loading Check",
+      "maxFileSize": "Max File Size",
+      "myDrive": "My Drive",
+      "noFilesFound": "No Files Found",
+      "notConnected": "Not Connected",
+      "privacyNotice": "Privacy Notice",
+      "readOnlyAccess": "Read Only Access",
+      "searchPlaceholder": "Search Placeholder",
+      "select": "Seleziona",
+      "sharedWithMe": "Shared With Me"
     },
-    "unified": {
-      "analytics": {
-        "description": "Descrizione",
-        "label": "Label"
-      },
-      "buttons": {
-        "accept": "Accept",
-        "disabled": "Disabilitato",
-        "submitting": "Submitting"
-      },
-      "cookies": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "coppa": "Coppa",
-      "links": {
-        "cookies": "Cookies",
-        "full": "Full",
-        "privacy": "Privacy"
-      },
-      "loading": "Laden...",
-      "privacy": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "reconsentNotice": {
-        "changed": "Changed",
-        "details": "Details",
-        "lastAccepted": "Last Accepted"
-      },
-      "screenReader": {
-        "required": "Richiesto",
-        "submitting": "Submitting"
-      },
-      "subtitleUpdated": "Subtitle Updated",
-      "subtitleWelcome": "Subtitle Welcome",
-      "summaryTitle": "Summary Title",
-      "titleUpdated": "Title Updated",
-      "titleWelcome": "Title Welcome",
-      "tos": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "tosCheckbox": {
-        "label": "Label",
-        "text": "Text"
+    "scheduler": {
+      "form": {
+        "add": "Hinzufügen",
+        "cancel": "Abbrechen",
+        "day": "Day",
+        "duration": "Duration",
+        "save": "Speichern",
+        "saving": "Salvataggio...",
+        "subject": "Subject",
+        "time": "Time",
+        "titleEdit": "Title Edit",
+        "titleNew": "Title New",
+        "topic": "Topic",
+        "topicPlaceholder": "Topic Placeholder"
       }
     }
-  },
-  "ambientAudio": {
-    "activeLayers": "Active Layers",
-    "addLayer": "Add Layer",
-    "advancedMixer": "Advanced Mixer",
-    "advancedSettings": "Advanced Settings",
-    "ambientSounds": "Ambient Sounds",
-    "comingSoon": "Coming Soon",
-    "hide": "Hide",
-    "info": "Informazione",
-    "mainVolume": "Main Volume",
-    "noise": "Noise",
-    "pause": "Pause",
-    "paused": "Paused",
-    "presets": {
-      "creative": "Creative",
-      "rainyDay": "Rainy Day"
-    },
-    "removeAllLayers": "Remove All Layers",
-    "show": "Show",
-    "title": "Titolo",
-    "infoShort": "Binaural beats richiedono cuffie stereo",
-    "binaural": "Binaural",
-    "whitenoise": "Rumore Bianco",
-    "pinknoise": "Rumore Rosa",
-    "brownnoise": "Rumore Marrone"
-  },
-  "googleDrive": {
-    "capabilities": "Capabilities",
-    "capabilityDocuments": "Capability Documents",
-    "capabilityHomework": "Capability Homework",
-    "capabilityPdf": "Capability Pdf",
-    "connectButton": "Connect Button",
-    "connectPrompt": "Connect Prompt",
-    "description": "Descrizione",
-    "disconnectButton": "Disconnect Button",
-    "disconnectConfirm": "Disconnect Confirm",
-    "disconnectTitle": "Disconnect Title",
-    "disconnectWarning": "Disconnect Warning",
-    "dragOrChoose": "Drag Or Choose",
-    "fromComputer": "From Computer",
-    "fromGoogleDrive": "From Google Drive",
-    "loadMore": "Load More",
-    "loadingCheck": "Loading Check",
-    "maxFileSize": "Max File Size",
-    "myDrive": "My Drive",
-    "noFilesFound": "No Files Found",
-    "notConnected": "Not Connected",
-    "privacyNotice": "Privacy Notice",
-    "readOnlyAccess": "Read Only Access",
-    "searchPlaceholder": "Search Placeholder",
-    "select": "Seleziona",
-    "sharedWithMe": "Shared With Me"
-  },
-  "profile": {
-    "genitori": {
-      "consentButton": "Consent Button",
-      "consentDescription": "Consent Description",
-      "consentTitle": "Consent Title",
-      "error": "Fehler",
-      "loadingProfile": "Loading Profile",
-      "retry": "Retry",
-      "welcomeDescription": "Welcome Description",
-      "welcomeTitle": "Welcome Title"
-    },
-    "parentChat": {
-      "askAbout": "Ask About",
-      "cancel": "Abbrechen",
-      "conversationTitle": "Conversation Title",
-      "description": "Descrizione",
-      "disclaimerText": "Disclaimer Text",
-      "disclaimerTitle": "Disclaimer Title",
-      "formalLanguage": "Formal Language",
-      "loadingConversation": "Loading Conversation",
-      "messagesSaved": "Messages Saved",
-      "observationsStudySessions": "Observations Study Sessions",
-      "startConversation": "Start Conversation",
-      "title": "Titolo",
-      "understood": "Understood"
-    }
-  },
-  "scheduler": {
-    "form": {
-      "add": "Hinzufügen",
-      "cancel": "Abbrechen",
-      "day": "Day",
-      "duration": "Duration",
-      "save": "Speichern",
-      "saving": "Salvataggio...",
-      "subject": "Subject",
-      "time": "Time",
-      "titleEdit": "Title Edit",
-      "titleNew": "Title New",
-      "topic": "Topic",
-      "topicPlaceholder": "Topic Placeholder"
-    }
-  },
-  "telemetry": {
-    "active": "Attivo",
-    "dataCollection": "Data Collection",
-    "dataCollectionDesc": "Data Collection Desc",
-    "engagementDesc": "Engagement Desc",
-    "engagementHigh": "Engagement High",
-    "engagementLow": "Engagement Low",
-    "engagementMedium": "Engagement Medium",
-    "engagementScore": "Engagement Score",
-    "featureUsage": "Feature Usage",
-    "featureUsageDesc": "Feature Usage Desc",
-    "inactive": "Inattivo",
-    "lastUpdated": "Last Updated",
-    "maestriUsed": "Maestri Used",
-    "minutes": "Minutes",
-    "noData": "No Data",
-    "noDataAvailable": "No Data Available",
-    "noUsage": "No Usage",
-    "pageViews": "Page Views",
-    "questions": "Questions",
-    "refresh": "Aggiorna",
-    "sessions": "Sessions",
-    "statsDesc": "Stats Desc",
-    "statsTitle": "Stats Title",
-    "studyTime": "Study Time",
-    "telemetryDesc": "Telemetry Desc",
-    "telemetrySettings": "Telemetry Settings",
-    "today": "Oggi",
-    "totalTime": "Total Time",
-    "trend": {
-      "decreasing": "Decreasing",
-      "increasing": "Increasing",
-      "stable": "Stable"
-    },
-    "weeklyActivity": "Weekly Activity",
-    "weeklyStats": "Weekly Stats"
-  },
-  "crossMaestroMemory": {
-    "title": "Cross-Disciplinary Memory",
-    "badge": "Pro",
-    "description": "Allow your teachers to access what you have learned from other maestros. This improves the quality of personalized teaching.",
-    "enableLabel": "Enable cross-disciplinary memory",
-    "enableDescription": "Your teachers will be able to see your learning path"
   }
 }

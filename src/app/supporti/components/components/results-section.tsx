@@ -35,7 +35,7 @@ export function ResultsSection({
   onBookmark,
   onRate,
 }: ResultsSectionProps) {
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
   return (
     <>
       <motion.div

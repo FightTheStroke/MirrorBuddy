@@ -25,7 +25,7 @@ export function TrialLimitsBanner({
   className,
   variant = "full",
 }: TrialLimitsBannerProps) {
-  const t = useTranslations("trialLimits");
+  const t = useTranslations("auth.trialLimits");
   // Trial tier limits (from TierService tier-fallbacks.ts)
   const limits = {
     dailyChats: 10,

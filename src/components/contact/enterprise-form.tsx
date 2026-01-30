@@ -47,7 +47,7 @@ interface FormErrors {
 }
 
 export function EnterpriseForm() {
-  const t = useTranslations("contact.enterprise");
+  const t = useTranslations("compliance.contact.enterprise");
   const [formState, setFormState] = useState<FormState>("idle");
   const [errors, setErrors] = useState<FormErrors>({});
   const [formData, setFormData] = useState({

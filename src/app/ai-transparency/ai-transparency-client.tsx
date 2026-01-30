@@ -9,7 +9,7 @@ const AI_TRANSPARENCY_VERSION = "1.0";
 const LAST_UPDATED = "20 Gennaio 2026";
 
 export function AITransparencyClient() {
-  const t = useTranslations("aiTransparency");
+  const t = useTranslations("compliance.aiTransparency");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">

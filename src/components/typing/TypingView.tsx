@@ -28,7 +28,7 @@ type ViewMode = "lessons" | "practice" | "games" | "progress";
 type GameType = "speed" | "accuracy" | "exploration" | null;
 
 export function TypingView() {
-  const t = useTranslations("typing");
+  const t = useTranslations("tools.typing");
 
   const LEVEL_OPTIONS: { value: TypingLevel; label: string }[] = [
     { value: "beginner", label: t("beginner") },

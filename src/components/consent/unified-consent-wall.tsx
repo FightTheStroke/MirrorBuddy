@@ -41,7 +41,7 @@ interface UnifiedConsentWallProps {
  * GDPR/COPPA compliant.
  */
 export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
-  const t = useTranslations("consent.unified");
+  const t = useTranslations("compliance.consent.unified");
 
   // Use useSyncExternalStore to avoid setState-in-effect
   const consented = useSyncExternalStore(

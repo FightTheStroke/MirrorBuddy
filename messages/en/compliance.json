@@ -1,293 +1,113 @@
 {
-  "aiTransparency": {
-    "contact": {
-      "text": "Questions about how we use AI? Contact us at"
-    },
-    "page": {
-      "backButton": "Back to Home",
-      "lastUpdated": "Last updated: {date}",
-      "title": "AI Transparency & System Disclosure",
-      "version": "Version {version}"
-    },
-    "relatedDocs": {
-      "heading": "Related Documents",
-      "privacy": "Privacy Policy",
-      "privacyDescription": "Learn how we protect your personal data",
-      "terms": "Terms of Service",
-      "termsDescription": "Read our terms of use and liability limitations"
-    },
-    "tldr": {
-      "heading": "Quick Summary (TL;DR)",
-      "point1": "MirrorBuddy uses artificial intelligence to personalize teaching and support inclusive learning",
-      "point2": "All significant AI decisions are subject to human oversight per the EU AI Act",
-      "point3": "You have the right to request an explanation of how AI has affected your educational experience",
-      "point4": "Your data is protected and never used to discriminate or profile without your consent",
-      "point5": "You can disable personalized AI at any time and continue using the app with generic settings"
-    },
-    "aiSystem": {
-      "section1Title": "1. AI System Disclosure (Article 50 - EU AI Act 2024/1689)",
-      "section1Para1": "[REQUIRES LEGAL VERIFICATION] In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 26 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
-      "section1Para2Intro": "MirrorBuddy's AI systems include three main categories:",
-      "section1Para2Item1": "Educational Personalization Systems - Azure OpenAI GPT to adapt content to student learning level and style",
-      "section1Para2Item2": "Progress Analysis Systems - Spaced repetition (FSRS) algorithms to track knowledge retention",
-      "section1Para2Item3": "Emotional Support Systems - Text generation models to provide personalized encouragement and constructive feedback",
-      "section1Para2Conclusion": "All these systems are described in detail in the following sections with information on their functionality, risks, and protections.",
-      "section2Title": "2. AI Classification & Regulatory Compliance",
-      "section2Para1": "[REQUIRES LEGAL VERIFICATION] The EU AI Act classifies AI systems by risk level. MirrorBuddy has conducted a Data Protection Impact Assessment (DPIA) and AI Risk Assessment to determine required compliance level.",
-      "section2Heading": "MirrorBuddy's Risk Classification",
-      "section2List1Title": "Limited Risk - Personalization Systems",
-      "section2List1Text": "Educational personalization systems (maestro recommendations, difficulty adjustments) are classified as limited risk. We use transparent warnings and enable parent monitoring of AI decisions.",
-      "section2List2Title": "High Risk - Where Applicable",
-      "section2List2Text": "[REQUIRES LEGAL VERIFICATION] If MirrorBuddy integrates automated assessment features that could significantly impact educational pathway (Art. 6 AI Act), high-risk controls including mandatory human oversight will be implemented.",
-      "section2List3Title": "Compliance with EU & National Law",
-      "section2List3Text": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy complies with Italian Law 132/2025 (EU AI Act implementation). Compliance records are publicly available and subject to regular audit by data protection authorities.",
-      "section3Title": "3. Primary AI System Functions",
-      "section3Para1": "The following AI systems are used in MirrorBuddy to support inclusive teaching:",
-      "section3Heading": "Described AI Systems",
-      "section3Cat1Title": "Educational Personalization Engine",
-      "section3Cat1Items": "Uses Azure OpenAI to analyze student comprehension level and adapt maestro explanations. Produces tailored text output and personalized feedback.",
-      "section3Cat2Title": "FSRS Progress Tracking System",
-      "section3Cat2Items": "Spaced repetition algorithm that determines when to review flashcards for optimal memory retention. Input: historical performance; Output: personalized review schedule.",
-      "section3Cat3Title": "Encouragement Message Generator",
-      "section3Cat3Items": "AI model that creates motivational messages when students face difficulty. Always context-personalized but generic in logic.",
-      "section3Cat4Title": "Learning Difficulty Detector",
-      "section3Cat4Items": "[REQUIRES LEGAL VERIFICATION] Monitoring system that identifies difficulty patterns and triggers educator alerts. NOT used to automatically categorize students without human review.",
-      "section3Cat5Title": "Semantic Document Search",
-      "section3Cat5Items": "Uses vector embeddings for intelligent search across student documents. Supports smart search without storing document content in AI vectors.",
-      "section3Para2": "All systems are designed with integrated human oversight and can be disabled in privacy settings.",
-      "section4Title": "4. Human Oversight & Human Control (Article 14 - EU AI Act)",
-      "section4Heading": "[REQUIRES LEGAL VERIFICATION] Per Article 14 of the EU AI Act, educational AI systems require meaningful human supervision. MirrorBuddy implements:",
-      "section4Item1Title": "Parental Oversight",
-      "section4Item1Text": "Parents have access to a Parent Dashboard showing all AI decisions about their child, including maestro recommendations and suggested learning paths.",
-      "section4Item2Title": "Educator Oversight",
-      "section4Item2Text": "Teachers can view and manually modify AI decisions. No AI decision is final without human approval.",
-      "section4Item3Title": "Mandatory Human Intervention",
-      "section4Item3Text": "If significant difficulty is identified, an educator must intervene within 7 days with personalized support. AI provides suggestions only, not decisions.",
-      "section4Item4Title": "Fairness & Transparency Audits",
-      "section4Item4Text": "Quarterly audits verify AI recommendations don't discriminate based on gender, ethnicity, disability, or socioeconomic status.",
-      "section4Item5Title": "AI Disablement",
-      "section4Item5Subtitle": "Right to Opt Out",
-      "section4Item5Text": "Students and parents can fully disable AI personalization at any time. All core educational features remain available with generic settings."
-    },
-    "faqSupport": {
-      "faq1Answer": "Faq1 Answer",
-      "faq1Question": "Faq1 Question",
-      "faq2Answer": "Faq2 Answer",
-      "faq2Question": "Faq2 Question",
-      "faq3Answer": "Faq3 Answer",
-      "faq3Question": "Faq3 Question",
-      "faq4Answer": "Faq4 Answer",
-      "faq4Question": "Faq4 Question",
-      "faq5Answer": "Faq5 Answer",
-      "faq5Question": "Faq5 Question",
-      "section10Title": "Section10 Title",
-      "section11NextReview": "Section11 Next Review",
-      "section11Para1": "Section11 Para1",
-      "section11ReviewDate": "Section11 Review Date",
-      "section11Title": "Section11 Title",
-      "section9AuthorityLabel": "Section9 Authority Label",
-      "section9AuthorityText": "Section9 Authority Text",
-      "section9EmailAddress": "Section9 Email Address",
-      "section9EmailLabel": "Section9 Email Label",
-      "section9FormLabel": "Section9 Form Label",
-      "section9FormText": "Section9 Form Text",
-      "section9Para1": "Section9 Para1",
-      "section9Para2": "Section9 Para2",
-      "section9Title": "Section9 Title"
-    },
-    "rightsCompliance": {
-      "section5Item1Text": "Section5 Item1 Text",
-      "section5Item1Title": "Section5 Item1 Title",
-      "section5Item2Text": "Section5 Item2 Text",
-      "section5Item2Title": "Section5 Item2 Title",
-      "section5Item3Text": "Section5 Item3 Text",
-      "section5Item3Title": "Section5 Item3 Title",
-      "section5Item4Text": "Section5 Item4 Text",
-      "section5Item4Title": "Section5 Item4 Title",
-      "section5Item5Text": "Section5 Item5 Text",
-      "section5Item5Title": "Section5 Item5 Title",
-      "section5Item6Text": "Section5 Item6 Text",
-      "section5Item6Title": "Section5 Item6 Title",
-      "section5Para1": "Section5 Para1",
-      "section5Title": "Section5 Title",
-      "section6Item1Text": "Section6 Item1 Text",
-      "section6Item1Title": "Section6 Item1 Title",
-      "section6Item2Text": "Section6 Item2 Text",
-      "section6Item2Title": "Section6 Item2 Title",
-      "section6Item3Text": "Section6 Item3 Text",
-      "section6Item3Title": "Section6 Item3 Title",
-      "section6Item4Text": "Section6 Item4 Text",
-      "section6Item4Title": "Section6 Item4 Title",
-      "section6Item5Text": "Section6 Item5 Text",
-      "section6Item5Title": "Section6 Item5 Title",
-      "section6Para1": "Section6 Para1",
-      "section6Title": "Section6 Title",
-      "section7Para1": "Section7 Para1",
-      "section7Risk1": "Section7 Risk1",
-      "section7Risk1Mitigation": "Section7 Risk1 Mitigation",
-      "section7Risk2": "Section7 Risk2",
-      "section7Risk2Mitigation": "Section7 Risk2 Mitigation",
-      "section7Risk3": "Section7 Risk3",
-      "section7Risk3Mitigation": "Section7 Risk3 Mitigation",
-      "section7Risk4": "Section7 Risk4",
-      "section7Risk4Mitigation": "Section7 Risk4 Mitigation",
-      "section7Risk5": "Section7 Risk5",
-      "section7Risk5Mitigation": "Section7 Risk5 Mitigation",
-      "section7TableHeaderMitigation": "Section7 Table Header Mitigation",
-      "section7TableHeaderRisk": "Section7 Table Header Risk",
-      "section7Title": "Section7 Title",
-      "section8Item1Text": "Section8 Item1 Text",
-      "section8Item1Title": "Section8 Item1 Title",
-      "section8Item2Text": "Section8 Item2 Text",
-      "section8Item2Title": "Section8 Item2 Title",
-      "section8Item3Text": "Section8 Item3 Text",
-      "section8Item3Title": "Section8 Item3 Title",
-      "section8Item4Text": "Section8 Item4 Text",
-      "section8Item4Title": "Section8 Item4 Title",
-      "section8Para1": "Section8 Para1",
-      "section8Para2": "Section8 Para2",
-      "section8Title": "Section8 Title"
-    },
-    "sections": {
-      "section1": {
-        "para1": "Para1",
-        "para2": "Para2",
-        "title": "Titolo"
-      },
-      "section10": {
-        "faq1Answer": "Faq1 Answer",
-        "faq1Title": "Faq1 Title",
-        "faq2Answer": "Faq2 Answer",
-        "faq2Title": "Faq2 Title",
-        "faq3Answer": "Faq3 Answer",
-        "faq3Title": "Faq3 Title",
-        "faq4Answer": "Faq4 Answer",
-        "faq4Title": "Faq4 Title",
-        "faq5Answer": "Faq5 Answer",
-        "faq5Title": "Faq5 Title",
-        "title": "Titolo"
-      },
-      "section11": {
-        "intro": "Intro",
-        "nextReview": "Next Review",
-        "title": "Titolo"
-      },
-      "section2": {
-        "intro": "Intro",
-        "item1Desc": "Item1 Desc",
-        "item1Title": "Item1 Title",
-        "item2Desc": "Item2 Desc",
-        "item2Title": "Item2 Title",
-        "item3Desc": "Item3 Desc",
-        "item3Title": "Item3 Title",
-        "subtitle": "Sottotitolo",
-        "title": "Titolo"
-      },
-      "section3": {
-        "category1": "Category1",
-        "category1Label": "Category1 Label",
-        "category2": "Category2",
-        "category2Label": "Category2 Label",
-        "category3": "Category3",
-        "category3Label": "Category3 Label",
-        "category4": "Category4",
-        "category4Label": "Category4 Label",
-        "category5": "Category5",
-        "category5Label": "Category5 Label",
-        "intro": "Intro",
-        "outro": "Outro",
-        "subtitle": "Sottotitolo",
-        "title": "Titolo"
-      },
-      "section4": {
-        "protection1Desc": "Protection1 Desc",
-        "protection1Title": "Protection1 Title",
-        "protection2Desc": "Protection2 Desc",
-        "protection2Title": "Protection2 Title",
-        "protection3Desc": "Protection3 Desc",
-        "protection3Title": "Protection3 Title",
-        "protection4Desc": "Protection4 Desc",
-        "protection4Title": "Protection4 Title",
-        "protection5Desc": "Protection5 Desc",
-        "protection5Title": "Protection5 Title",
-        "subtitle": "Sottotitolo",
-        "title": "Titolo"
-      },
-      "section5": {
-        "intro": "Intro",
-        "right1Desc": "Right1 Desc",
-        "right1Title": "Right1 Title",
-        "right2Desc": "Right2 Desc",
-        "right2Title": "Right2 Title",
-        "right3Desc": "Right3 Desc",
-        "right3Title": "Right3 Title",
-        "right4Desc": "Right4 Desc",
-        "right4Title": "Right4 Title",
-        "right5Desc": "Right5 Desc",
-        "right5Title": "Right5 Title",
-        "right6Desc": "Right6 Desc",
-        "right6Title": "Right6 Title",
-        "title": "Titolo"
-      },
-      "section6": {
-        "intro": "Intro",
-        "protection1Desc": "Protection1 Desc",
-        "protection1Title": "Protection1 Title",
-        "protection2Desc": "Protection2 Desc",
-        "protection2Title": "Protection2 Title",
-        "protection3Desc": "Protection3 Desc",
-        "protection3Title": "Protection3 Title",
-        "protection4Desc": "Protection4 Desc",
-        "protection4Title": "Protection4 Title",
-        "protection5Desc": "Protection5 Desc",
-        "protection5Title": "Protection5 Title",
-        "title": "Titolo"
-      },
-      "section7": {
-        "intro": "Intro",
-        "mitigation1": "Mitigation1",
-        "mitigation2": "Mitigation2",
-        "mitigation3": "Mitigation3",
-        "mitigation4": "Mitigation4",
-        "mitigation5": "Mitigation5",
-        "risk1": "Risk1",
-        "risk2": "Risk2",
-        "risk3": "Risk3",
-        "risk4": "Risk4",
-        "risk5": "Risk5",
-        "tableHeader1": "Table Header1",
-        "tableHeader2": "Table Header2",
-        "title": "Titolo"
-      },
-      "section8": {
-        "classification": "Classification",
-        "intro": "Intro",
-        "law1": "Law1",
-        "law2": "Law2",
-        "law3": "Law3",
-        "law4": "Law4",
-        "title": "Titolo"
-      },
-      "section9": {
-        "authorityLabel": "Authority Label",
-        "authorityValue": "Authority Value",
-        "commitment": "Commitment",
-        "emailLabel": "Email Label",
-        "emailValue": "Email Value",
-        "formLabel": "Form Label",
-        "formValue": "Form Value",
-        "intro": "Intro",
-        "title": "Titolo"
-      }
-    }
-  },
   "compliance": {
     "badges": {
       "conformity": "Conformity"
     },
     "contact": {
       "text": "Text",
-      "title": "Titolo"
+      "title": "Titolo",
+      "page": {
+        "title": "Titolo",
+        "subtitle": "Sottotitolo",
+        "description": "Hai domande o feedback? Compila il modulo sottostante e ti risponderemo il prima possibile."
+      },
+      "backButton": "Back Button",
+      "form": {
+        "name": "[TRANSLATE] Nome",
+        "email": "[TRANSLATE] Email",
+        "message": "[TRANSLATE] Messaggio",
+        "send": "[TRANSLATE] Invia",
+        "sending": "[TRANSLATE] Invio...",
+        "success": "[TRANSLATE] Messaggio inviato!",
+        "error": "[TRANSLATE] Errore nell'invio",
+        "emailInvalid": "Email Invalid",
+        "emailRequired": "Email Required",
+        "errorMessage": "Error Message",
+        "errorTitle": "Error Title",
+        "messageLabel": "Message Label",
+        "messageRequired": "Message Required",
+        "nameRequired": "Name Required",
+        "placeholderMessage": "Placeholder Message",
+        "subjectRequired": "Subject Required",
+        "submitButtonDefault": "Submit Button Default",
+        "submitButtonLoading": "Submit Button Loading",
+        "successMessage": "Success Message",
+        "successTitle": "Success Title",
+        "nameLabel": "Nome",
+        "emailLabel": "Email",
+        "subjectLabel": "Oggetto"
+      },
+      "enterprise": {
+        "title": "Enterprise - Contact Us",
+        "description": "Discover our enterprise solutions for customized corporate training",
+        "heading": "Contact Us Enterprise",
+        "subtitle": "Customized solutions for corporate training",
+        "features": {
+          "customization": "Full customization of training paths",
+          "analytics": "Advanced analytics dashboard and reporting",
+          "integration": "Integration with corporate HR systems"
+        },
+        "submitting": "Submitting...",
+        "successDescription": "Our enterprise team will contact you within 24 business hours.",
+        "successTitle": "Request sent"
+      },
+      "layout": {
+        "title": "Contact Us - MirrorBuddy",
+        "description": "Have questions or feedback? Contact the MirrorBuddy team for support, information or partnerships."
+      },
+      "schools": {
+        "title": "Schools - Contact Us",
+        "description": "Customized solutions for schools and educational institutions",
+        "heading": "MirrorBuddy for Schools",
+        "subtitle": "Bring inclusive teaching to your school",
+        "description2": "Fill out the form to request information about custom plans, teacher training and dedicated support.",
+        "support": "Need help? Write to"
+      },
+      "schools_form": {
+        "schoolName": "[TRANSLATE] Nome Scuola",
+        "students": "[TRANSLATE] Numero Studenti",
+        "errorConnection": "Connection error",
+        "errorDefault": "Error submitting",
+        "features": {
+          "curriculum": "Curriculum customization",
+          "management": "Class management",
+          "reporting": "Reports and analytics",
+          "support": "Dedicated support"
+        },
+        "intro": "We offer customized solutions for curriculum personalization and the specific needs of your school.",
+        "messagePlaceholder": "Describe your school's needs...",
+        "nameLabel": "Name",
+        "emailLabel": "Email",
+        "roleLabel": "Role",
+        "roleOptions": {
+          "dirigente": "School principal",
+          "docente": "Teacher",
+          "coordinatore": "Coordinator",
+          "altro": "Other"
+        },
+        "schoolNameLabel": "School name",
+        "schoolTypeLabel": "School type",
+        "schoolTypeOptions": {
+          "primaria": "Primary school",
+          "secondaria1": "Middle school",
+          "secondaria2": "High school",
+          "altro": "Other"
+        },
+        "solutions": "Solutions",
+        "specificNeedsLabel": "Specific needs",
+        "studentCountLabel": "Number of students",
+        "studentCountOptions": {
+          "small": "Less than 200",
+          "medium": "200-500",
+          "large": "500-1000",
+          "xlarge": "Over 1000"
+        },
+        "messageLabel": "Message",
+        "submitButtonDefault": "Submit request",
+        "submitButtonLoading": "Submitting...",
+        "successMessage": "Your request has been submitted successfully. We will contact you soon.",
+        "successTitle": "Request submitted"
+      }
     },
     "page": {
       "subtitle": "Sottotitolo",
@@ -301,1197 +121,1687 @@
     "privacy": "Privacy Policy",
     "terms": "Termini di Servizio",
     "cookies": "Cookie Policy",
-    "accessibility": "Accessibility Statement",
-    "aiTransparency": "AI Transparency",
+    "accessibility": {
+      "page": {
+        "title": "[TRANSLATE] Dichiarazione di Accessibilità",
+        "version": "[TRANSLATE] Versione {version}",
+        "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
+        "backHome": "[TRANSLATE] Torna alla home",
+        "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+      },
+      "compliance": {
+        "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
+        "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
+        "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
+        "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
+        "screenReader": "[TRANSLATE] Supporto per screen reader",
+        "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+      },
+      "features": {
+        "heading": "[TRANSLATE] Funzionalità di Accessibilità",
+        "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
+        "dyslexia": "[TRANSLATE] Dislessia",
+        "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
+        "adhd": "[TRANSLATE] ADHD",
+        "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
+        "visual": "[TRANSLATE] Deficit visivo",
+        "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
+        "motor": "[TRANSLATE] Difficoltà motorie",
+        "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
+        "autism": "[TRANSLATE] Autismo",
+        "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
+        "dyscalculia": "[TRANSLATE] Discalculia",
+        "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
+        "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
+        "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+      },
+      "keyboard": {
+        "heading": "[TRANSLATE] Navigazione da Tastiera",
+        "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
+        "tab": "[TRANSLATE] per navigare tra gli elementi",
+        "enter": "[TRANSLATE] per attivare pulsanti e link",
+        "escape": "[TRANSLATE] per chiudere modali e menu",
+        "space": "[TRANSLATE] per selezionare checkbox e toggle"
+      },
+      "screenReader": {
+        "heading": "[TRANSLATE] Supporto Screen Reader",
+        "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
+        "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
+        "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
+        "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
+        "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+      },
+      "limitations": {
+        "heading": "[TRANSLATE] Limitazioni Conosciute",
+        "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+      },
+      "regulatory": {
+        "heading": "[TRANSLATE] Conformità Normativa",
+        "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
+        "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+      },
+      "feedback": {
+        "heading": "[TRANSLATE] Feedback e Segnalazioni",
+        "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
+        "emailLabel": "[TRANSLATE] Email",
+        "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
+        "responseTime": "[TRANSLATE] Tempo di risposta",
+        "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+      }
+    },
+    "aiTransparency": {
+      "contact": {
+        "text": "Questions about how we use AI? Contact us at"
+      },
+      "page": {
+        "backButton": "Back to Home",
+        "lastUpdated": "Last updated: {date}",
+        "title": "AI Transparency & System Disclosure",
+        "version": "Version {version}"
+      },
+      "relatedDocs": {
+        "heading": "Related Documents",
+        "privacy": "Privacy Policy",
+        "privacyDescription": "Learn how we protect your personal data",
+        "terms": "Terms of Service",
+        "termsDescription": "Read our terms of use and liability limitations"
+      },
+      "tldr": {
+        "heading": "Quick Summary (TL;DR)",
+        "point1": "MirrorBuddy uses artificial intelligence to personalize teaching and support inclusive learning",
+        "point2": "All significant AI decisions are subject to human oversight per the EU AI Act",
+        "point3": "You have the right to request an explanation of how AI has affected your educational experience",
+        "point4": "Your data is protected and never used to discriminate or profile without your consent",
+        "point5": "You can disable personalized AI at any time and continue using the app with generic settings"
+      },
+      "aiSystem": {
+        "section1Title": "1. AI System Disclosure (Article 50 - EU AI Act 2024/1689)",
+        "section1Para1": "[REQUIRES LEGAL VERIFICATION] In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 22 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
+        "section1Para2Intro": "MirrorBuddy's AI systems include three main categories:",
+        "section1Para2Item1": "Educational Personalization Systems - Azure OpenAI GPT to adapt content to student learning level and style",
+        "section1Para2Item2": "Progress Analysis Systems - Spaced repetition (FSRS) algorithms to track knowledge retention",
+        "section1Para2Item3": "Emotional Support Systems - Text generation models to provide personalized encouragement and constructive feedback",
+        "section1Para2Conclusion": "All these systems are described in detail in the following sections with information on their functionality, risks, and protections.",
+        "section2Title": "2. AI Classification & Regulatory Compliance",
+        "section2Para1": "[REQUIRES LEGAL VERIFICATION] The EU AI Act classifies AI systems by risk level. MirrorBuddy has conducted a Data Protection Impact Assessment (DPIA) and AI Risk Assessment to determine required compliance level.",
+        "section2Heading": "MirrorBuddy's Risk Classification",
+        "section2List1Title": "Limited Risk - Personalization Systems",
+        "section2List1Text": "Educational personalization systems (maestro recommendations, difficulty adjustments) are classified as limited risk. We use transparent warnings and enable parent monitoring of AI decisions.",
+        "section2List2Title": "High Risk - Where Applicable",
+        "section2List2Text": "[REQUIRES LEGAL VERIFICATION] If MirrorBuddy integrates automated assessment features that could significantly impact educational pathway (Art. 6 AI Act), high-risk controls including mandatory human oversight will be implemented.",
+        "section2List3Title": "Compliance with EU & National Law",
+        "section2List3Text": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy complies with Italian Law 132/2025 (EU AI Act implementation). Compliance records are publicly available and subject to regular audit by data protection authorities.",
+        "section3Title": "3. Primary AI System Functions",
+        "section3Para1": "The following AI systems are used in MirrorBuddy to support inclusive teaching:",
+        "section3Heading": "Described AI Systems",
+        "section3Cat1Title": "Educational Personalization Engine",
+        "section3Cat1Items": "Uses Azure OpenAI to analyze student comprehension level and adapt maestro explanations. Produces tailored text output and personalized feedback.",
+        "section3Cat2Title": "FSRS Progress Tracking System",
+        "section3Cat2Items": "Spaced repetition algorithm that determines when to review flashcards for optimal memory retention. Input: historical performance; Output: personalized review schedule.",
+        "section3Cat3Title": "Encouragement Message Generator",
+        "section3Cat3Items": "AI model that creates motivational messages when students face difficulty. Always context-personalized but generic in logic.",
+        "section3Cat4Title": "Learning Difficulty Detector",
+        "section3Cat4Items": "[REQUIRES LEGAL VERIFICATION] Monitoring system that identifies difficulty patterns and triggers educator alerts. NOT used to automatically categorize students without human review.",
+        "section3Cat5Title": "Semantic Document Search",
+        "section3Cat5Items": "Uses vector embeddings for intelligent search across student documents. Supports smart search without storing document content in AI vectors.",
+        "section3Para2": "All systems are designed with integrated human oversight and can be disabled in privacy settings.",
+        "section4Title": "4. Human Oversight & Human Control (Article 14 - EU AI Act)",
+        "section4Heading": "[REQUIRES LEGAL VERIFICATION] Per Article 14 of the EU AI Act, educational AI systems require meaningful human supervision. MirrorBuddy implements:",
+        "section4Item1Title": "Parental Oversight",
+        "section4Item1Text": "Parents have access to a Parent Dashboard showing all AI decisions about their child, including maestro recommendations and suggested learning paths.",
+        "section4Item2Title": "Educator Oversight",
+        "section4Item2Text": "Teachers can view and manually modify AI decisions. No AI decision is final without human approval.",
+        "section4Item3Title": "Mandatory Human Intervention",
+        "section4Item3Text": "If significant difficulty is identified, an educator must intervene within 7 days with personalized support. AI provides suggestions only, not decisions.",
+        "section4Item4Title": "Fairness & Transparency Audits",
+        "section4Item4Text": "Quarterly audits verify AI recommendations don't discriminate based on gender, ethnicity, disability, or socioeconomic status.",
+        "section4Item5Title": "AI Disablement",
+        "section4Item5Subtitle": "Right to Opt Out",
+        "section4Item5Text": "Students and parents can fully disable AI personalization at any time. All core educational features remain available with generic settings."
+      },
+      "faqSupport": {
+        "section9Title": "Section9 Title",
+        "section9Para1": "Section9 Para1",
+        "section9EmailLabel": "Section9 Email Label",
+        "section9EmailAddress": "Section9 Email Address",
+        "section9FormLabel": "Section9 Form Label",
+        "section9FormText": "Section9 Form Text",
+        "section9AuthorityLabel": "Section9 Authority Label",
+        "section9AuthorityText": "Section9 Authority Text",
+        "section9Para2": "Section9 Para2",
+        "section10Title": "Section10 Title",
+        "faq1Question": "Faq1 Question",
+        "faq1Answer": "Faq1 Answer",
+        "faq2Question": "Faq2 Question",
+        "faq2Answer": "Faq2 Answer",
+        "faq3Question": "Faq3 Question",
+        "faq3Answer": "Faq3 Answer",
+        "faq4Question": "Faq4 Question",
+        "faq4Answer": "Faq4 Answer",
+        "faq5Question": "Faq5 Question",
+        "faq5Answer": "Faq5 Answer",
+        "section11Title": "Section11 Title",
+        "section11Para1": "Section11 Para1",
+        "section11NextReview": "Section11 Next Review",
+        "section11ReviewDate": "Section11 Review Date"
+      },
+      "rightsCompliance": {
+        "section5Title": "Section5 Title",
+        "section5Para1": "Section5 Para1",
+        "section5Item1Title": "Section5 Item1 Title",
+        "section5Item1Text": "Section5 Item1 Text",
+        "section5Item2Title": "Section5 Item2 Title",
+        "section5Item2Text": "Section5 Item2 Text",
+        "section5Item3Title": "Section5 Item3 Title",
+        "section5Item3Text": "Section5 Item3 Text",
+        "section5Item4Title": "Section5 Item4 Title",
+        "section5Item4Text": "Section5 Item4 Text",
+        "section5Item5Title": "Section5 Item5 Title",
+        "section5Item5Text": "Section5 Item5 Text",
+        "section5Item6Title": "Section5 Item6 Title",
+        "section5Item6Text": "Section5 Item6 Text",
+        "section6Title": "Section6 Title",
+        "section6Para1": "Section6 Para1",
+        "section6Item1Title": "Section6 Item1 Title",
+        "section6Item1Text": "Section6 Item1 Text",
+        "section6Item2Title": "Section6 Item2 Title",
+        "section6Item2Text": "Section6 Item2 Text",
+        "section6Item3Title": "Section6 Item3 Title",
+        "section6Item3Text": "Section6 Item3 Text",
+        "section6Item4Title": "Section6 Item4 Title",
+        "section6Item4Text": "Section6 Item4 Text",
+        "section6Item5Title": "Section6 Item5 Title",
+        "section6Item5Text": "Section6 Item5 Text",
+        "section7Title": "Section7 Title",
+        "section7Para1": "Section7 Para1",
+        "section7TableHeaderRisk": "Section7 Table Header Risk",
+        "section7TableHeaderMitigation": "Section7 Table Header Mitigation",
+        "section7Risk1": "Section7 Risk1",
+        "section7Risk1Mitigation": "Section7 Risk1 Mitigation",
+        "section7Risk2": "Section7 Risk2",
+        "section7Risk2Mitigation": "Section7 Risk2 Mitigation",
+        "section7Risk3": "Section7 Risk3",
+        "section7Risk3Mitigation": "Section7 Risk3 Mitigation",
+        "section7Risk4": "Section7 Risk4",
+        "section7Risk4Mitigation": "Section7 Risk4 Mitigation",
+        "section7Risk5": "Section7 Risk5",
+        "section7Risk5Mitigation": "Section7 Risk5 Mitigation",
+        "section8Item1Text": "Section8 Item1 Text",
+        "section8Item1Title": "Section8 Item1 Title",
+        "section8Item2Text": "Section8 Item2 Text",
+        "section8Item2Title": "Section8 Item2 Title",
+        "section8Item3Text": "Section8 Item3 Text",
+        "section8Item3Title": "Section8 Item3 Title",
+        "section8Item4Text": "Section8 Item4 Text",
+        "section8Item4Title": "Section8 Item4 Title",
+        "section8Title": "Section8 Title",
+        "section8Para1": "Section8 Para1",
+        "section8Para2": "Section8 Para2"
+      },
+      "sections": {
+        "section1": {
+          "para1": "Para1",
+          "para2": "Para2",
+          "title": "Titolo"
+        },
+        "section10": {
+          "faq1Answer": "Faq1 Answer",
+          "faq1Title": "Faq1 Title",
+          "faq2Answer": "Faq2 Answer",
+          "faq2Title": "Faq2 Title",
+          "faq3Answer": "Faq3 Answer",
+          "faq3Title": "Faq3 Title",
+          "faq4Answer": "Faq4 Answer",
+          "faq4Title": "Faq4 Title",
+          "faq5Answer": "Faq5 Answer",
+          "faq5Title": "Faq5 Title",
+          "title": "Titolo"
+        },
+        "section11": {
+          "intro": "Intro",
+          "nextReview": "Next Review",
+          "title": "Titolo"
+        },
+        "section2": {
+          "intro": "Intro",
+          "item1Desc": "Item1 Desc",
+          "item1Title": "Item1 Title",
+          "item2Desc": "Item2 Desc",
+          "item2Title": "Item2 Title",
+          "item3Desc": "Item3 Desc",
+          "item3Title": "Item3 Title",
+          "subtitle": "Sottotitolo",
+          "title": "Titolo"
+        },
+        "section3": {
+          "category1": "Category1",
+          "category1Label": "Category1 Label",
+          "category2": "Category2",
+          "category2Label": "Category2 Label",
+          "category3": "Category3",
+          "category3Label": "Category3 Label",
+          "category4": "Category4",
+          "category4Label": "Category4 Label",
+          "category5": "Category5",
+          "category5Label": "Category5 Label",
+          "intro": "Intro",
+          "outro": "Outro",
+          "subtitle": "Sottotitolo",
+          "title": "Titolo"
+        },
+        "section4": {
+          "protection1Desc": "Protection1 Desc",
+          "protection1Title": "Protection1 Title",
+          "protection2Desc": "Protection2 Desc",
+          "protection2Title": "Protection2 Title",
+          "protection3Desc": "Protection3 Desc",
+          "protection3Title": "Protection3 Title",
+          "protection4Desc": "Protection4 Desc",
+          "protection4Title": "Protection4 Title",
+          "protection5Desc": "Protection5 Desc",
+          "protection5Title": "Protection5 Title",
+          "subtitle": "Sottotitolo",
+          "title": "Titolo"
+        },
+        "section5": {
+          "intro": "Intro",
+          "right1Desc": "Right1 Desc",
+          "right1Title": "Right1 Title",
+          "right2Desc": "Right2 Desc",
+          "right2Title": "Right2 Title",
+          "right3Desc": "Right3 Desc",
+          "right3Title": "Right3 Title",
+          "right4Desc": "Right4 Desc",
+          "right4Title": "Right4 Title",
+          "right5Desc": "Right5 Desc",
+          "right5Title": "Right5 Title",
+          "right6Desc": "Right6 Desc",
+          "right6Title": "Right6 Title",
+          "title": "Titolo"
+        },
+        "section6": {
+          "intro": "Intro",
+          "protection1Desc": "Protection1 Desc",
+          "protection1Title": "Protection1 Title",
+          "protection2Desc": "Protection2 Desc",
+          "protection2Title": "Protection2 Title",
+          "protection3Desc": "Protection3 Desc",
+          "protection3Title": "Protection3 Title",
+          "protection4Desc": "Protection4 Desc",
+          "protection4Title": "Protection4 Title",
+          "protection5Desc": "Protection5 Desc",
+          "protection5Title": "Protection5 Title",
+          "title": "Titolo"
+        },
+        "section7": {
+          "intro": "Intro",
+          "mitigation1": "Mitigation1",
+          "mitigation2": "Mitigation2",
+          "mitigation3": "Mitigation3",
+          "mitigation4": "Mitigation4",
+          "mitigation5": "Mitigation5",
+          "risk1": "Risk1",
+          "risk2": "Risk2",
+          "risk3": "Risk3",
+          "risk4": "Risk4",
+          "risk5": "Risk5",
+          "tableHeader1": "Table Header1",
+          "tableHeader2": "Table Header2",
+          "title": "Titolo"
+        },
+        "section8": {
+          "classification": "Classification",
+          "intro": "Intro",
+          "law1": "Law1",
+          "law2": "Law2",
+          "law3": "Law3",
+          "law4": "Law4",
+          "title": "Titolo"
+        },
+        "section9": {
+          "authorityLabel": "Authority Label",
+          "authorityValue": "Authority Value",
+          "commitment": "Commitment",
+          "emailLabel": "Email Label",
+          "emailValue": "Email Value",
+          "formLabel": "Form Label",
+          "formValue": "Form Value",
+          "intro": "Intro",
+          "title": "Titolo"
+        }
+      }
+    },
     "privacyTitle": "Privacy Policy",
     "termsTitle": "Terms of Service",
     "cookiesTitle": "Cookie Policy",
     "accessibilityTitle": "Accessibility Statement",
     "aiTransparencyTitle": "AI Transparency",
-    "dataSubjectRights": "Data Subject Rights",
-    "aiRegulatoryContacts": "AI Regulatory Contacts"
-  },
-  "aiRegulatoryContacts": {
-    "page": {
-      "title": "AI Regulatory Contacts by Country",
-      "subtitle": "AI regulatory authorities for each nation",
-      "description": "Official contact information for regulatory authorities responsible for AI compliance",
-      "lastUpdated": "Last Updated",
-      "version": "Version",
-      "backButton": "Back"
-    },
-    "introduction": {
-      "title": "AI Regulatory Authorities",
-      "content": "MirrorBuddy operates in compliance with AI regulations in multiple countries. If you have questions about our regulatory compliance or wish to report an issue, you can contact the competent authorities directly in your country."
-    },
-    "countries": {
-      "italy": {
-        "name": "Italy",
-        "authorities": [
-          {
-            "name": "AgID (Agenzia per l'Italia Digitale)",
-            "role": "Primary AI Compliance Authority",
-            "website": "https://www.agid.gov.it",
-            "email": "ai.policy@agid.gov.it",
-            "phone": "+39 06 8526 1",
-            "address": "Via della Transatlantica 31, 00144 Rome, Italy"
-          },
-          {
-            "name": "Garante per la Protezione dei Dati Personali",
-            "role": "Data Protection Authority with AI Oversight",
-            "website": "https://www.garanteprivacy.it",
-            "email": "garante@gpdp.it",
-            "phone": "+39 06 696771",
-            "address": "Piazza di Monte Citorio 121, 00186 Rome, Italy"
-          }
-        ]
-      },
-      "uk": {
-        "name": "United Kingdom",
-        "authorities": [
-          {
-            "name": "AISI UK (AI Safety Institute)",
-            "role": "Primary AI Safety Authority",
-            "website": "https://www.aisi.gov.uk",
-            "email": "hello@aisi.gov.uk",
-            "phone": "+44 20 3897 8000",
-            "address": "55 Whitehall, London SW1A 2EY, United Kingdom"
-          },
-          {
-            "name": "ICO (Information Commissioner's Office)",
-            "role": "Data Protection Authority",
-            "website": "https://ico.org.uk",
-            "email": "contact@ico.org.uk",
-            "phone": "+44 1625 545745",
-            "address": "Water Lane, Wilmslow, Cheshire SK9 5AF, United Kingdom"
-          }
-        ]
-      },
-      "germany": {
-        "name": "Germany",
-        "authorities": [
-          {
-            "name": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-            "role": "Federal Data Protection Authority",
-            "website": "https://www.bfdi.bund.de",
-            "email": "poststelle@bfdi.bund.de",
-            "phone": "+49 228 9977-9",
-            "address": "Husarenstr. 30, 53117 Bonn, Germany"
-          },
-          {
-            "name": "Bundesnetzagentur (Digital Services Division)",
-            "role": "Digital Services Regulatory Authority",
-            "website": "https://www.bundesnetzagentur.de",
-            "email": "kontakt@bnetza.de",
-            "phone": "+49 228 14-0",
-            "address": "Bundesnetzagentur, Germany"
-          }
-        ]
-      },
-      "spain": {
-        "name": "Spain",
-        "authorities": [
-          {
-            "name": "AESIA (Autoridad Española Supervisora de Inteligencia Artificial)",
-            "role": "Primary AI Supervisory Authority",
-            "website": "https://www.aesia.es",
-            "email": "info@aesia.es",
-            "phone": "[REQUIRES VERIFICATION]",
-            "address": "Madrid, Spain [REQUIRES VERIFICATION]"
-          },
-          {
-            "name": "AEPD (Agencia Española de Protección de Datos)",
-            "role": "Data Protection Authority",
-            "website": "https://www.aepd.es",
-            "email": "consultas@aepd.es",
-            "phone": "+34 91 266 35 00",
-            "address": "C/ Jorge Juan, 6, 28001 Madrid, Spain"
-          },
-          {
-            "name": "Defensoría del Pueblo",
-            "role": "Office of the Ombudsman",
-            "website": "https://www.defensordelpueblo.es",
-            "email": "defensor@defensordelpueblo.es",
-            "phone": "+34 91 432 01 00",
-            "address": "Calle Zurbano, 42, 28010 Madrid, Spain"
-          }
-        ]
-      },
-      "france": {
-        "name": "France",
-        "authorities": [
-          {
-            "name": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-            "role": "Primary AI Compliance and Data Protection Authority",
-            "website": "https://www.cnil.fr",
-            "email": "contact@cnil.fr",
-            "phone": "+33 1 53 73 22 22",
-            "address": "3 Place de Fontenoy, 75007 Paris, France"
-          },
-          {
-            "name": "Défenseur des droits",
-            "role": "Office of the Rights Defender",
-            "website": "https://www.defenseurdesdroits.fr",
-            "email": "contact@defenseurdesdroits.fr",
-            "phone": "+33 1 42 76 58 00",
-            "address": "7 rue Saint-Florentin, 75008 Paris, France"
-          }
-        ]
-      }
-    },
-    "reportingProcess": {
-      "title": "Reporting Issues",
-      "content": "If you encounter an AI compliance issue, you can report it to one of the regulatory authorities in your country. The authorities will investigate your complaint and take appropriate action."
-    }
-  },
-  "dataSubjectRights": {
-    "page": {
-      "title": "Data Subject Rights Under GDPR",
-      "subtitle": "Understand your privacy rights and how to exercise them",
-      "description": "MirrorBuddy fully respects your rights as a data subject under the General Data Protection Regulation (GDPR). This page explains each right and how you can request it.",
-      "lastUpdated": "Last Updated",
-      "version": "Version",
-      "backButton": "Back"
-    },
-    "introduction": {
-      "title": "Your Privacy Rights",
-      "content": "As a data subject, you have important rights regarding your personal data. GDPR ensures you have full control over your data and the right to know how it's used.",
-      "contactText": "Questions about your rights? Contact us at:"
-    },
-    "rights": {
-      "access": {
-        "title": "Right of Access (Art. 15 GDPR)",
-        "description": "You have the right to access your personal data at any time.",
-        "details": "You can request a copy of all personal data we hold about you in a readable format. We will provide information about how your data is used, with whom it is shared, and how long we retain it.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "To exercise this right, contact our support team with a written data access request."
-      },
-      "rectification": {
-        "title": "Right of Rectification (Art. 16 GDPR)",
-        "description": "You have the right to correct your data if it's inaccurate or incomplete.",
-        "details": "If you discover that your personal data is inaccurate, incomplete, or outdated, you can request immediate correction. This includes updating your profile information, educational preferences, or contact details.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "Log into your account and modify your data directly, or contact us for assistance."
-      },
-      "erasure": {
-        "title": "Right to be Forgotten - Erasure (Art. 17 GDPR)",
-        "description": "You have the right to obtain deletion of your personal data.",
-        "details": "Under certain circumstances, you can request complete removal of your personal data from our systems. This includes your account, chat history, learning data, and all associated information.",
-        "limitations": "Limitations: Some data must be retained for legal or contractual purposes (e.g., billing). When you delete your account, your data is removed within 30 days unless required by law.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "Contact our privacy support team with a written deletion request."
-      },
-      "portability": {
-        "title": "Right to Data Portability (Art. 20 GDPR)",
-        "description": "You have the right to receive your data in a structured format and transfer it to other services.",
-        "details": "You can request a copy of your personal data in a machine-readable format (such as JSON or CSV), allowing you to transfer it to another service without information loss. This includes your profile, learning history, progress, and preferences.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "Contact our team with a data portability request."
-      },
-      "object": {
-        "title": "Right to Object (Art. 21 GDPR)",
-        "description": "You have the right to object to the processing of your data.",
-        "details": "You can object to your data being processed for marketing, profiling, or other purposes. If you exercise this right, we will stop processing your data for the specified purpose, except where we have legitimate reasons to continue.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "Contact our support team to specify which uses you wish to object to."
-      },
-      "restriction": {
-        "title": "Right to Restrict Processing (Art. 18 GDPR)",
-        "description": "You have the right to restrict processing of your data.",
-        "details": "In some circumstances, you can request that your data be 'frozen' and used only in a limited way. This is useful if you dispute the accuracy of your data or disagree with its processing.",
-        "responseTime": "Response time: 30 days (UK: 30 days)",
-        "howToRequest": "Contact our privacy team to request processing restriction."
-      }
-    },
-    "countriesInfo": {
-      "italy": {
-        "name": "Italy",
-        "authority": "Garante per la Protezione dei Dati Personali (Data Protection Authority)",
-        "email": "garante@gpdp.it",
-        "website": "www.garanteprivacy.it",
-        "responseTime": "30 days",
-        "escalationTime": "If unsatisfied with our response, you can file a complaint with the supervisory authority within 12 months."
-      },
-      "france": {
-        "name": "France",
-        "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-        "email": "cnil@cnil.fr",
-        "website": "www.cnil.fr",
-        "responseTime": "30 days",
-        "escalationTime": "You can file a complaint with CNIL if you believe your rights are not respected."
-      },
-      "germany": {
-        "name": "Germany",
-        "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-        "email": "kontakt@bfdi.bund.de",
-        "website": "www.bfdi.bund.de",
-        "responseTime": "30 days",
-        "escalationTime": "You can file a complaint with BfDI if you have data protection concerns."
-      },
-      "spain": {
-        "name": "Spain",
-        "authority": "AEPD (Agencia Española de Protección de Datos)",
-        "email": "consultas@aepd.es",
-        "website": "www.aepd.es",
-        "responseTime": "30 days",
-        "escalationTime": "You can file a complaint with AEPD for data protection issues."
-      },
-      "uk": {
-        "name": "United Kingdom",
-        "authority": "ICO (Information Commissioner's Office)",
-        "email": "mail@ico.org.uk",
-        "website": "www.ico.org.uk",
-        "responseTime": "30 days",
-        "escalationTime": "You can file a complaint with the ICO if your UK data protection rights are violated."
-      }
-    },
-    "howToExercise": {
-      "title": "How to Exercise Your Rights",
-      "steps": {
-        "step1": "Send a written request to privacy@mirrorbuddy.com specifying which right you wish to exercise.",
-        "step2": "Provide as much detail as possible about which data or aspects you want to address.",
-        "step3": "We verify your identity to protect your data.",
-        "step4": "We process your request within 30 days and contact you with a response."
-      },
-      "contactInfo": "If you have questions during the process, our team is available to assist you."
-    },
-    "faq": {
-      "q1": "How long does it take to respond?",
-      "a1": "We are required to respond within 30 days of receiving your request. If your request is complex, we may extend this by an additional 60 days.",
-      "q2": "Do I have to pay to exercise my rights?",
-      "a2": "No, you don't have to pay. However, if we believe your request is manifestly unfounded or excessive, we may charge a reasonable fee.",
-      "q3": "What if you don't grant my request?",
-      "a3": "If we refuse your request, we will explain why and provide information on how to contest the decision.",
-      "q4": "Can I complain after receiving a response?",
-      "a4": "Yes, if you're unsatisfied with our response, you can file a complaint with your country's data protection authority."
-    }
-  },
-  "contact": {
-    "backButton": "Back Button",
-    "page": {
-      "subtitle": "Sottotitolo",
-      "title": "Titolo",
-      "description": "Hai domande o feedback? Compila il modulo sottostante e ti risponderemo il prima possibile."
-    },
-    "enterprise": {
-      "heading": "Contact Us Enterprise",
-      "subtitle": "Customized solutions for corporate training",
-      "title": "Enterprise - Contact Us",
-      "description": "Discover our enterprise solutions for customized corporate training",
-      "features": {
-        "customization": "Full customization of training paths",
-        "analytics": "Advanced analytics dashboard and reporting",
-        "integration": "Integration with corporate HR systems"
-      },
-      "submitting": "Submitting...",
-      "successDescription": "Our enterprise team will contact you within 24 business hours.",
-      "successTitle": "Request sent"
-    },
-    "form": {
-      "emailInvalid": "Email Invalid",
-      "emailRequired": "Email Required",
-      "errorMessage": "Error Message",
-      "errorTitle": "Error Title",
-      "messageLabel": "Message Label",
-      "messageRequired": "Message Required",
-      "nameRequired": "Name Required",
-      "placeholderMessage": "Placeholder Message",
-      "subjectRequired": "Subject Required",
-      "submitButtonDefault": "Submit Button Default",
-      "submitButtonLoading": "Submit Button Loading",
-      "successMessage": "Success Message",
-      "successTitle": "Success Title",
-      "nameLabel": "Nome",
-      "emailLabel": "Email",
-      "subjectLabel": "Oggetto"
-    },
-    "schools_form": {
-      "errorConnection": "Connection error",
-      "errorDefault": "Error submitting",
-      "features": {
-        "curriculum": "Curriculum customization",
-        "management": "Class management",
-        "reporting": "Reports and analytics",
-        "support": "Dedicated support"
-      },
-      "intro": "We offer customized solutions for curriculum personalization and the specific needs of your school.",
-      "messagePlaceholder": "Describe your school's needs...",
-      "nameLabel": "Name",
-      "emailLabel": "Email",
-      "roleLabel": "Role",
-      "roleOptions": {
-        "dirigente": "School principal",
-        "docente": "Teacher",
-        "coordinatore": "Coordinator",
-        "altro": "Other"
-      },
-      "schoolNameLabel": "School name",
-      "schoolTypeLabel": "School type",
-      "schoolTypeOptions": {
-        "primaria": "Primary school",
-        "secondaria1": "Middle school",
-        "secondaria2": "High school",
-        "altro": "Other"
-      },
-      "solutions": "Solutions",
-      "specificNeedsLabel": "Specific needs",
-      "studentCountLabel": "Number of students",
-      "studentCountOptions": {
-        "small": "Less than 200",
-        "medium": "200-500",
-        "large": "500-1000",
-        "xlarge": "Over 1000"
-      },
-      "messageLabel": "Message",
-      "submitButtonDefault": "Submit request",
-      "submitButtonLoading": "Submitting...",
-      "successMessage": "Your request has been submitted successfully. We will contact you soon.",
-      "successTitle": "Request submitted"
-    }
-  },
-  "legal": {
-    "cookies": {
+    "dataSubjectRights": {
       "page": {
-        "backHome": "Back Home",
-        "contactEmail": "Contact Email",
-        "contactQuestion": "Contact Question",
+        "title": "Data Subject Rights Under GDPR",
+        "subtitle": "Understand your privacy rights and how to exercise them",
+        "description": "MirrorBuddy fully respects your rights as a data subject under the General Data Protection Regulation (GDPR). This page explains each right and how you can request it.",
         "lastUpdated": "Last Updated",
-        "pageNavAriaLabel": "Page Nav Aria Label",
-        "title": "Titolo",
-        "version": "Version"
+        "version": "Version",
+        "backButton": "Back"
       },
-      "sections": {
-        "changes": {
-          "importantChanges": "Important Changes",
-          "intro": "Intro",
-          "title": "Titolo",
-          "updateDate": "Update Date",
-          "updatePage": "Update Page"
+      "introduction": {
+        "title": "Your Privacy Rights",
+        "content": "As a data subject, you have important rights regarding your personal data. GDPR ensures you have full control over your data and the right to know how it's used.",
+        "contactText": "Questions about your rights? Contact us at:"
+      },
+      "rights": {
+        "access": {
+          "title": "Right of Access (Art. 15 GDPR)",
+          "description": "You have the right to access your personal data at any time.",
+          "details": "You can request a copy of all personal data we hold about you in a readable format. We will provide information about how your data is used, with whom it is shared, and how long we retain it.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "To exercise this right, contact our support team with a written data access request."
         },
-        "cookieManagement": {
-          "chromeInstructions": "Chrome Instructions",
-          "edgeInstructions": "Edge Instructions",
-          "firefoxInstructions": "Firefox Instructions",
-          "h3Browser": "H3 Browser",
-          "h3InApp": "H3 In App",
-          "pBrowser": "P Browser",
-          "pInApp": "P In App",
-          "safariInstructions": "Safari Instructions",
-          "title": "Titolo",
-          "warningAriaLabel": "Warning Aria Label",
-          "warningText": "Warning Text",
-          "warningTitle": "Warning Title"
+        "rectification": {
+          "title": "Right of Rectification (Art. 16 GDPR)",
+          "description": "You have the right to correct your data if it's inaccurate or incomplete.",
+          "details": "If you discover that your personal data is inaccurate, incomplete, or outdated, you can request immediate correction. This includes updating your profile information, educational preferences, or contact details.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "Log into your account and modify your data directly, or contact us for assistance."
         },
-        "duration": {
-          "clearCookies": "Clear Cookies",
-          "intro": "Intro",
-          "persistentCookies": "Persistent Cookies",
-          "persistentCookiesDesc": "Persistent Cookies Desc",
-          "sessionCookies": "Session Cookies",
-          "sessionCookiesDesc": "Session Cookies Desc",
-          "title": "Titolo"
+        "erasure": {
+          "title": "Right to be Forgotten - Erasure (Art. 17 GDPR)",
+          "description": "You have the right to obtain deletion of your personal data.",
+          "details": "Under certain circumstances, you can request complete removal of your personal data from our systems. This includes your account, chat history, learning data, and all associated information.",
+          "limitations": "Limitations: Some data must be retained for legal or contractual purposes (e.g., billing). When you delete your account, your data is removed within 30 days unless required by law.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "Contact our privacy support team with a written deletion request."
         },
-        "essentialCookies": {
-          "intro": "Intro",
-          "note": "Note",
-          "title": "Titolo"
+        "portability": {
+          "title": "Right to Data Portability (Art. 20 GDPR)",
+          "description": "You have the right to receive your data in a structured format and transfer it to other services.",
+          "details": "You can request a copy of your personal data in a machine-readable format (such as JSON or CSV), allowing you to transfer it to another service without information loss. This includes your profile, learning history, progress, and preferences.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "Contact our team with a data portability request."
+        },
+        "object": {
+          "title": "Right to Object (Art. 21 GDPR)",
+          "description": "You have the right to object to the processing of your data.",
+          "details": "You can object to your data being processed for marketing, profiling, or other purposes. If you exercise this right, we will stop processing your data for the specified purpose, except where we have legitimate reasons to continue.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "Contact our support team to specify which uses you wish to object to."
+        },
+        "restriction": {
+          "title": "Right to Restrict Processing (Art. 18 GDPR)",
+          "description": "You have the right to restrict processing of your data.",
+          "details": "In some circumstances, you can request that your data be 'frozen' and used only in a limited way. This is useful if you dispute the accuracy of your data or disagree with its processing.",
+          "responseTime": "Response time: 30 days (UK: 30 days)",
+          "howToRequest": "Contact our privacy team to request processing restriction."
+        }
+      },
+      "countriesInfo": {
+        "italy": {
+          "name": "Italy",
+          "authority": "Garante per la Protezione dei Dati Personali (Data Protection Authority)",
+          "email": "garante@gpdp.it",
+          "website": "www.garanteprivacy.it",
+          "responseTime": "30 days",
+          "escalationTime": "If unsatisfied with our response, you can file a complaint with the supervisory authority within 12 months."
+        },
+        "france": {
+          "name": "France",
+          "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+          "email": "cnil@cnil.fr",
+          "website": "www.cnil.fr",
+          "responseTime": "30 days",
+          "escalationTime": "You can file a complaint with CNIL if you believe your rights are not respected."
+        },
+        "germany": {
+          "name": "Germany",
+          "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+          "email": "kontakt@bfdi.bund.de",
+          "website": "www.bfdi.bund.de",
+          "responseTime": "30 days",
+          "escalationTime": "You can file a complaint with BfDI if you have data protection concerns."
+        },
+        "spain": {
+          "name": "Spain",
+          "authority": "AEPD (Agencia Española de Protección de Datos)",
+          "email": "consultas@aepd.es",
+          "website": "www.aepd.es",
+          "responseTime": "30 days",
+          "escalationTime": "You can file a complaint with AEPD for data protection issues."
+        },
+        "uk": {
+          "name": "United Kingdom",
+          "authority": "ICO (Information Commissioner's Office)",
+          "email": "mail@ico.org.uk",
+          "website": "www.ico.org.uk",
+          "responseTime": "30 days",
+          "escalationTime": "You can file a complaint with the ICO if your UK data protection rights are violated."
+        }
+      },
+      "howToExercise": {
+        "title": "How to Exercise Your Rights",
+        "steps": {
+          "step1": "Send a written request to privacy@mirrorbuddy.com specifying which right you wish to exercise.",
+          "step2": "Provide as much detail as possible about which data or aspects you want to address.",
+          "step3": "We verify your identity to protect your data.",
+          "step4": "We process your request within 30 days and contact you with a response."
+        },
+        "contactInfo": "If you have questions during the process, our team is available to assist you."
+      },
+      "faq": {
+        "q1": "How long does it take to respond?",
+        "a1": "We are required to respond within 30 days of receiving your request. If your request is complex, we may extend this by an additional 60 days.",
+        "q2": "Do I have to pay to exercise my rights?",
+        "a2": "No, you don't have to pay. However, if we believe your request is manifestly unfounded or excessive, we may charge a reasonable fee.",
+        "q3": "What if you don't grant my request?",
+        "a3": "If we refuse your request, we will explain why and provide information on how to contest the decision.",
+        "q4": "Can I complain after receiving a response?",
+        "a4": "Yes, if you're unsatisfied with our response, you can file a complaint with your country's data protection authority."
+      }
+    },
+    "aiRegulatoryContacts": {
+      "page": {
+        "title": "AI Regulatory Contacts by Country",
+        "subtitle": "AI regulatory authorities for each nation",
+        "description": "Official contact information for regulatory authorities responsible for AI compliance",
+        "lastUpdated": "Last Updated",
+        "version": "Version",
+        "backButton": "Back"
+      },
+      "introduction": {
+        "title": "AI Regulatory Authorities",
+        "content": "MirrorBuddy operates in compliance with AI regulations in multiple countries. If you have questions about our regulatory compliance or wish to report an issue, you can contact the competent authorities directly in your country."
+      },
+      "countries": {
+        "italy": {
+          "name": "Italy",
+          "authorities": [
+            {
+              "name": "AgID (Agenzia per l'Italia Digitale)",
+              "role": "Primary AI Compliance Authority",
+              "website": "https://www.agid.gov.it",
+              "email": "ai.policy@agid.gov.it",
+              "phone": "+39 06 8526 1",
+              "address": "Via della Transatlantica 31, 00144 Rome, Italy"
+            },
+            {
+              "name": "Garante per la Protezione dei Dati Personali",
+              "role": "Data Protection Authority with AI Oversight",
+              "website": "https://www.garanteprivacy.it",
+              "email": "garante@gpdp.it",
+              "phone": "+39 06 696771",
+              "address": "Piazza di Monte Citorio 121, 00186 Rome, Italy"
+            }
+          ]
+        },
+        "uk": {
+          "name": "United Kingdom",
+          "authorities": [
+            {
+              "name": "AISI UK (AI Safety Institute)",
+              "role": "Primary AI Safety Authority",
+              "website": "https://www.aisi.gov.uk",
+              "email": "hello@aisi.gov.uk",
+              "phone": "+44 20 3897 8000",
+              "address": "55 Whitehall, London SW1A 2EY, United Kingdom"
+            },
+            {
+              "name": "ICO (Information Commissioner's Office)",
+              "role": "Data Protection Authority",
+              "website": "https://ico.org.uk",
+              "email": "contact@ico.org.uk",
+              "phone": "+44 1625 545745",
+              "address": "Water Lane, Wilmslow, Cheshire SK9 5AF, United Kingdom"
+            }
+          ]
+        },
+        "germany": {
+          "name": "Germany",
+          "authorities": [
+            {
+              "name": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+              "role": "Federal Data Protection Authority",
+              "website": "https://www.bfdi.bund.de",
+              "email": "poststelle@bfdi.bund.de",
+              "phone": "+49 228 9977-9",
+              "address": "Husarenstr. 30, 53117 Bonn, Germany"
+            },
+            {
+              "name": "Bundesnetzagentur (Digital Services Division)",
+              "role": "Digital Services Regulatory Authority",
+              "website": "https://www.bundesnetzagentur.de",
+              "email": "kontakt@bnetza.de",
+              "phone": "+49 228 14-0",
+              "address": "Bundesnetzagentur, Germany"
+            }
+          ]
+        },
+        "spain": {
+          "name": "Spain",
+          "authorities": [
+            {
+              "name": "AESIA (Autoridad Española Supervisora de Inteligencia Artificial)",
+              "role": "Primary AI Supervisory Authority",
+              "website": "https://www.aesia.es",
+              "email": "info@aesia.es",
+              "phone": "[REQUIRES VERIFICATION]",
+              "address": "Madrid, Spain [REQUIRES VERIFICATION]"
+            },
+            {
+              "name": "AEPD (Agencia Española de Protección de Datos)",
+              "role": "Data Protection Authority",
+              "website": "https://www.aepd.es",
+              "email": "consultas@aepd.es",
+              "phone": "+34 91 266 35 00",
+              "address": "C/ Jorge Juan, 6, 28001 Madrid, Spain"
+            },
+            {
+              "name": "Defensoría del Pueblo",
+              "role": "Office of the Ombudsman",
+              "website": "https://www.defensordelpueblo.es",
+              "email": "defensor@defensordelpueblo.es",
+              "phone": "+34 91 432 01 00",
+              "address": "Calle Zurbano, 42, 28010 Madrid, Spain"
+            }
+          ]
+        },
+        "france": {
+          "name": "France",
+          "authorities": [
+            {
+              "name": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+              "role": "Primary AI Compliance and Data Protection Authority",
+              "website": "https://www.cnil.fr",
+              "email": "contact@cnil.fr",
+              "phone": "+33 1 53 73 22 22",
+              "address": "3 Place de Fontenoy, 75007 Paris, France"
+            },
+            {
+              "name": "Défenseur des droits",
+              "role": "Office of the Rights Defender",
+              "website": "https://www.defenseurdesdroits.fr",
+              "email": "contact@defenseurdesdroits.fr",
+              "phone": "+33 1 42 76 58 00",
+              "address": "7 rue Saint-Florentin, 75008 Paris, France"
+            }
+          ]
+        }
+      },
+      "reportingProcess": {
+        "title": "Reporting Issues",
+        "content": "If you encounter an AI compliance issue, you can report it to one of the regulatory authorities in your country. The authorities will investigate your complaint and take appropriate action."
+      }
+    },
+    "consent": {
+      "inline": {
+        "acceptedText": "Cookies accepted",
+        "manage": "Manage",
+        "acceptButton": "Accept cookies",
+        "info": "Info",
+        "title": "Cookies & Privacy",
+        "description": "We use essential cookies for site functionality and analytics cookies to improve your experience.",
+        "learnMore": "Learn more",
+        "analyticsLabel": "Enable analytics cookies",
+        "submitButton": "Save preferences"
+      },
+      "tos": {
+        "toast": {
+          "saved": "Saved",
+          "saveFailed": "Could not save acceptance. You can continue anyway."
+        },
+        "modal": {
+          "title": {
+            "updated": "Terms Updated",
+            "welcome": "Welcome to MirrorBuddy"
+          },
+          "description": {
+            "updated": "Our terms of service have been updated. Read the changes and accept to continue.",
+            "welcome": "Before you start, please read and accept the terms of service."
+          },
+          "warning": {
+            "title": "What changed?",
+            "description": "We updated the terms for better clarity and transparency. No substantial change to your rights."
+          },
+          "summary": "What This Means (TL;DR)",
+          "points": {
+            "free": "MirrorBuddy is free during beta, with reasonable usage limits",
+            "aiCanErr": "AI can make mistakes - use your critical judgment",
+            "minors": "We require parental consent for users under 13",
+            "respect": "We respect privacy and don't sell your data"
+          },
+          "link": "Read Full Terms",
+          "checkbox": "I accept the Terms of Service and Privacy Policy",
+          "buttons": {
+            "disabled": "Accept terms to continue",
+            "accept": "Accept and Continue",
+            "submitting": "Saving..."
+          },
+          "screenReader": {
+            "required": "You must accept the terms to continue",
+            "submitting": "Saving acceptance in progress"
+          }
+        }
+      },
+      "unified": {
+        "loading": "Checking consent...",
+        "titleUpdated": "Terms Updated",
+        "titleWelcome": "Welcome to MirrorBuddy",
+        "subtitleUpdated": "Our terms have been updated",
+        "subtitleWelcome": "Before you start, read and accept the terms",
+        "reconsentNotice": {
+          "lastAccepted": "Last accepted:",
+          "changed": "What changed?",
+          "details": "We updated the terms for clarity. No substantial change to your rights."
+        },
+        "summaryTitle": "What You Accept",
+        "privacy": {
+          "title": "Privacy & Data Protection",
+          "description": "We respect your privacy. We don't sell your data."
+        },
+        "cookies": {
+          "title": "Essential Cookies",
+          "description": "We use cookies for authentication and site functionality."
+        },
+        "tos": {
+          "title": "Terms of Service",
+          "description": "Usage rules, limitations and your rights."
         },
         "links": {
-          "intro": "Intro",
-          "privacyPolicyDesc": "Privacy Policy Desc",
-          "privacyPolicyLabel": "Privacy Policy Label",
-          "termsDesc": "Terms Desc",
-          "termsLabel": "Terms Label",
-          "title": "Titolo"
+          "full": "Full Terms",
+          "privacy": "Privacy",
+          "cookies": "Cookies"
         },
-        "metricsAnalytics": {
-          "aggregated": "Aggregated",
-          "aggregatedDesc": "Aggregated Desc",
-          "gdprCompliant": "Gdpr Compliant",
-          "gdprCompliantDesc": "Gdpr Compliant Desc",
-          "h3Collection": "H3 Collection",
-          "p1": "P1",
-          "p2": "P2",
-          "readMore": "Read More",
-          "serverSide": "Server Side",
-          "serverSideDesc": "Server Side Desc",
-          "technicalOnly": "Technical Only",
-          "technicalOnlyDesc": "Technical Only Desc",
-          "title": "Titolo"
+        "tosCheckbox": {
+          "label": "I accept",
+          "text": "the Terms of Service and Privacy Policy"
         },
-        "thirdParty": {
-          "completeList": "Complete List",
-          "googleDriveLabel": "Google Drive Label",
-          "googleDriveNote": "Google Drive Note",
-          "noThirdParty": "No Third Party",
-          "noThirdPartyReason": "No Third Party Reason",
+        "analytics": {
+          "label": "Analytics Cookies (optional)",
+          "description": "Help us improve the service with anonymous usage data"
+        },
+        "buttons": {
+          "disabled": "Accept terms to continue",
+          "accept": "Accept and Continue",
+          "submitting": "Saving..."
+        },
+        "coppa": "If you're under 13, please ask your parents for permission.",
+        "screenReader": {
+          "required": "You must accept the terms to continue",
+          "submitting": "Saving consent in progress"
+        }
+      }
+    },
+    "pageTitle": "Compliance & Transparency",
+    "pageDescription": "MirrorBuddy is committed to complying with European and Italian regulations on AI, privacy, and accessibility. Here you can find all our compliance and transparency documents.",
+    "complianceBadgeTitle": "Regulatory Compliance",
+    "publicDocuments": "Public Documents",
+    "technicalDocuments": "Technical Documents",
+    "technicalDescription": "These technical documents are available on GitHub to ensure maximum transparency about our compliance implementations.",
+    "questionsTitle": "Questions about Compliance?",
+    "questionsDescription": "We are here to answer all your questions about compliance, privacy, or AI transparency.",
+    "legal": {
+      "cookies": {
+        "page": {
           "title": "Titolo",
-          "vendors": {
-            "azureOpenAI": "Azure Open A I",
-            "resend": "Resend",
-            "sentry": "Sentry",
-            "supabase": "Supabase",
-            "upstash": "Upstash",
-            "vercel": "Vercel"
+          "description": "[TRANSLATE] Informazioni sull'uso dei cookie su MirrorBuddy",
+          "lastUpdated": "Last Updated",
+          "contactQuestion": "Contact Question",
+          "contactEmail": "Contact Email",
+          "backHome": "Back Home",
+          "pageNavAriaLabel": "Page Nav Aria Label",
+          "version": "Version",
+          "subtitle": "[TRANSLATE] Come utilizziamo i cookie in MirrorBuddy"
+        },
+        "essential": {
+          "title": "[TRANSLATE] Cookie Essenziali",
+          "description": "[TRANSLATE] Necessari per il funzionamento del sito",
+          "heading": "[TRANSLATE] Cookie essenziali"
+        },
+        "analytics": {
+          "title": "[TRANSLATE] Cookie Analitici",
+          "description": "[TRANSLATE] Ci aiutano a capire come migliorare il servizio",
+          "heading": "[TRANSLATE] Cookie di analisi"
+        },
+        "sections": {
+          "changes": {
+            "importantChanges": "Important Changes",
+            "intro": "Intro",
+            "title": "Titolo",
+            "updateDate": "Update Date",
+            "updatePage": "Update Page"
           },
-          "vendorsIntro": "Vendors Intro",
-          "vendorsNoInstall": "Vendors No Install"
-        },
-        "whatAreCookies": {
-          "p1": "P1",
-          "p2": "P2",
-          "title": "Titolo"
-        },
-        "whichCookies": {
-          "analytics": "Analytics",
-          "analyticsDesc": "Analytics Desc",
-          "disclaimer": "Disclaimer",
-          "essential": "Essential",
-          "essentialDesc": "Essential Desc",
-          "intro": "Intro",
-          "title": "Titolo"
-        }
-      },
-      "table": {
-        "ariaLabel": "Aria Label",
-        "headers": {
-          "duration": "Duration",
-          "name": "Nome",
-          "purpose": "Purpose"
-        },
-        "rows": {
-          "a11y": {
-            "duration": "Duration",
-            "purpose": "Purpose"
+          "cookieManagement": {
+            "chromeInstructions": "Chrome Instructions",
+            "edgeInstructions": "Edge Instructions",
+            "firefoxInstructions": "Firefox Instructions",
+            "h3Browser": "H3 Browser",
+            "h3InApp": "H3 In App",
+            "pBrowser": "P Browser",
+            "pInApp": "P In App",
+            "safariInstructions": "Safari Instructions",
+            "title": "Titolo",
+            "warningAriaLabel": "Warning Aria Label",
+            "warningText": "Warning Text",
+            "warningTitle": "Warning Title"
           },
-          "admin": {
-            "duration": "Duration",
-            "purpose": "Purpose"
+          "duration": {
+            "clearCookies": "Clear Cookies",
+            "intro": "Intro",
+            "persistentCookies": "Persistent Cookies",
+            "persistentCookiesDesc": "Persistent Cookies Desc",
+            "sessionCookies": "Session Cookies",
+            "sessionCookiesDesc": "Session Cookies Desc",
+            "title": "Titolo"
           },
-          "userId": {
-            "duration": "Duration",
-            "purpose": "Purpose"
+          "essentialCookies": {
+            "intro": "Intro",
+            "note": "Note",
+            "title": "Titolo"
           },
-          "userIdClient": {
-            "duration": "Duration",
-            "purpose": "Purpose"
-          }
-        }
-      },
-      "tldr": {
-        "heading": "Heading",
-        "point1": "Point1",
-        "point2": "Point2",
-        "point3": "Point3",
-        "point4": "Point4"
-      }
-    },
-    "privacy": {
-      "page": {
-        "backToHome": "Back to Home",
-        "lastUpdated": "Last Updated",
-        "pageNavigation": "Page Navigation",
-        "questionAriaLabel": "Privacy Questions",
-        "questionText": "Questions about our privacy policy?",
-        "title": "Privacy Policy",
-        "tldrHeading": "Quick Summary",
-        "version": "Version",
-        "tldrItems": {
-          "dataCollection": "We collect only the data necessary to help you learn and improve MirrorBuddy",
-          "noDataSale": "We never sell your data to third parties",
-          "deleteAnytime": "You can delete your account and data anytime",
-          "europeanData": "Your data is protected by UK GDPR and UK data protection law",
-          "optionalAnalytics": "Optional analytics help us understand how you use the app, but you can refuse"
-        }
-      },
-      "section1": {
-        "title": "Who We Are and How This Policy Works",
-        "content": "MirrorBuddy is an educational app for students with learning differences, developed by an international team with UK representation. This privacy policy explains how we collect, use, and protect your personal data. As your data controller, we are responsible for protecting your personal information in compliance with the UK General Data Protection Regulation (GDPR) and the Data Protection Act 2018."
-      },
-      "section2": {
-        "title": "What Data We Collect",
-        "intro": "To provide our service, we collect these personal data:",
-        "itemLabels": {
-          "email": "Email",
-          "name": "Name",
-          "conversations": "Conversations",
-          "flashcards": "Flashcards",
-          "progress": "Learning Progress",
-          "settings": "User Preferences"
-        },
-        "items": {
-          "email": "Used for login and notifications",
-          "name": "Used to personalise your experience",
-          "conversations": "Saved to continue learning from where you left off",
-          "flashcards": "Used to track your learning via FSRS algorithm",
-          "progress": "Recorded to give you personalised feedback",
-          "settings": "Saved to remember your accessibility and language choices"
-        }
-      },
-      "section3": {
-        "title": "Sensitive Data We Never Collect",
-        "intro": "To protect your privacy, we never collect sensitive data such as:",
-        "items": {
-          "health": "Health information (unless you voluntarily share it in a conversation)",
-          "payments": "Direct payment details (we use certified third parties)",
-          "media": "Personal photos or videos",
-          "gps": "Your geographical location"
-        }
-      },
-      "section4": {
-        "title": "How We Use Your Data",
-        "intro": "We use your data only for these legitimate purposes:",
-        "itemLabels": {
-          "appFunctionality": "App Functionality",
-          "personalization": "Personalization",
-          "improvement": "Improvement",
-          "support": "Support"
-        },
-        "items": {
-          "appFunctionality": "Load your conversations, flashcards and progress",
-          "personalization": "Adapt the maestri to your interests and learning level",
-          "improvement": "Understand how you use MirrorBuddy to add new features (with optional analytics)",
-          "support": "Help you if you experience technical or pedagogical issues"
-        },
-        "disclaimer": "We do not use your data for automated profiling, targeted advertising, or decisions about you without human involvement."
-      },
-      "section5": {
-        "title": "Optional Analytics and Tracking",
-        "intro": "As a user, you can choose to participate in our analytics to help us improve the app.",
-        "labels": {
-          "collect": "What We Collect",
-          "why": "Why",
-          "retention": "How Long",
-          "optOut": "How to Refuse"
-        },
-        "weCollect": "Pages visited, time spent, features used, errors encountered. No personal data is stored in logs.",
-        "why": "To understand which features are helpful, where students struggle, and how to make MirrorBuddy better for everyone.",
-        "retention": "Analytics data is retained for 12 months, then aggregated and removed.",
-        "optOut": "You can disable analytics in privacy settings without losing any functionality."
-      },
-      "section6": {
-        "title": "Who Can Access Your Data",
-        "intro": "Your personal data is accessible to:",
-        "itemLabels": {
-          "you": "You",
-          "parents": "Parents",
-          "team": "MirrorBuddy Team"
-        },
-        "items": {
-          "you": "You have complete control of your data and can download, modify or delete it",
-          "parents": "Your parents can monitor your progress via the Parent Dashboard (if you are a minor)",
-          "team": "The MirrorBuddy team accesses data for technical support, only when necessary"
-        },
-        "thirdPartyHeading": "Trusted Partners",
-        "thirdPartyIntro": "We use these certified services to run MirrorBuddy safely:",
-        "vendors": {
-          "vercel": "Vercel (server hosting, GDPR compliant, EU-based)",
-          "supabase": "Supabase (PostgreSQL database, encrypted, GDPR compliant)",
-          "azure": "Azure OpenAI (conversational data processing, GDPR compliant)",
-          "resend": "Resend (transactional email sending, GDPR compliant)",
-          "upstash": "Upstash (Redis cache, GDPR compliant)",
-          "brave": "Brave (optional privacy-first search, doesn't collect IP)",
-          "google": "Google Drive (optional for document uploads, only when you choose to connect)",
-          "grafana": "Grafana (system metrics only, no personal data)",
-          "ollama": "Ollama (optional local AI models, all on-device)"
-        },
-        "noOtherAccess": "No other service has access to your data. We do not sell data to third parties.",
-        "extraEUNote": "Note: Azure OpenAI processes some conversational data in the USA with Standard Contractual Clauses (SCC) as per UK GDPR Art. 46."
-      },
-      "section7": {
-        "title": "Legal Basis for Processing",
-        "primary": "We process your personal data on these legal bases under UK GDPR: (1) Contractual necessity (Art. 6.1.b) - to provide the service; (2) Explicit consent (Art. 6.1.a) - for optional analytics and communications; (3) Legitimate interest (Art. 6.1.f) - for security, fraud prevention, service improvement.",
-        "transfers": "Data transfers to non-UK countries (such as the USA) only occur for services with approved Standard Contractual Clauses (SCC) or UK adequacy decisions.",
-        "legalBasis": "Your legal basis for data processing is consent to the service (contract) and, where applicable, explicit consent you have given in settings."
-      },
-      "section8": {
-        "title": "Data Controller and Processors",
-        "intro": "MirrorBuddy is the data controller. However, some services are processed by data processors who process data on our behalf under DPA (Data Processing Agreements) compliant with UK GDPR Art. 28.",
-        "subprocessorsHeading": "Our certified data processors:",
-        "subprocessors": {
-          "vercel": "Hosting and global CDN - EU-based, SOC 2 Type II certified",
-          "supabase": "Managed PostgreSQL database - EU-based, ISO 27001 certified",
-          "resend": "Transactional email service - EU-based, with UK GDPR compliant DPA",
-          "azure": "Conversational AI processing - USA-based but with SCC and OneTrust compliant"
-        },
-        "gdprObligations": "All data processors have signed DPA contracts compliant with UK GDPR Art. 28 and 32. You can request a copy of our DPAs by writing to info@fightthestroke.org."
-      },
-      "section9": {
-        "title": "How Long We Keep Your Data",
-        "items": {
-          "activeAccount": "While your account is active, we retain all your data (email, conversations, flashcards, progress) to provide the service",
-          "conversations": "Conversations with maestri are retained for 90 days of inactivity, then archived for 1 year, then deleted",
-          "webVitals": "Technical data (Web Vitals, errors) is retained for 12 months for improvement, then aggregated and deleted",
-          "deletedAccount": "When you delete your account, all data is deleted within 30 days (backup: 90 days by law). Aggregated research data remains pseudonymised"
-        }
-      },
-      "section10": {
-        "title": "Your Privacy Rights",
-        "intro": "You have the right to exercise your privacy rights at any time. These rights include access, rectification, erasure, portability, objection, and restriction of processing.",
-        "itemLabels": {
-          "access": "Right to Access",
-          "correct": "Right to Rectification",
-          "delete": "Right to Erasure",
-          "export": "Right to Portability",
-          "oppose": "Right to Object"
-        },
-        "items": {
-          "access": "You can request a copy of all your personal data in a readable format",
-          "correct": "You can request correction of inaccurate or incomplete data",
-          "delete": "You can request complete deletion of your personal data",
-          "export": "You can receive your data in a structured format (JSON, CSV)",
-          "oppose": "You can object to processing your data for certain purposes"
-        },
-        "exerciseRights": "To exercise your rights, contact us at:"
-      },
-      "section11": {
-        "title": "Cookies and Analytics",
-        "intro": "We use cookies and analytics services to improve your experience.",
-        "cookieTypeLabels": {
-          "essential": "Essential Cookies",
-          "analytics": "Analytics Cookies"
-        },
-        "cookieTypes": {
-          "essential": "Required for website functionality (authentication, security)",
-          "analytics": "Optional - help us understand how you use MirrorBuddy"
-        },
-        "vercelAnalytics": "Vercel Analytics collects technical data to monitor site performance",
-        "vercelFeatureLabels": {
-          "noCookies": "No Cookies",
-          "anonymous": "Anonymous Data",
-          "gdprCompliant": "GDPR Compliant",
-          "technicalOnly": "Technical Data Only"
-        },
-        "vercelFeatures": {
-          "noCookies": "Does not use tracking cookies",
-          "anonymous": "All data is anonymous and aggregated",
-          "gdprCompliant": "Compliant with GDPR and doesn't require consent",
-          "technicalOnly": "Collects only technical metrics, no personal data"
-        },
-        "sentry": "Sentry monitors errors and performance to ensure service reliability",
-        "sentryFeatureLabels": {
-          "errors": "Error Monitoring",
-          "performance": "Performance Monitoring",
-          "aiMonitoring": "AI Monitoring",
-          "sessionReplay": "Session Replay",
-          "noPii": "No PII",
-          "euServers": "EU Servers",
-          "improvement": "Service Improvement"
-        },
-        "sentryFeatures": {
-          "errors": "Detects and logs errors for quick fixes",
-          "performance": "Measures speed and responsiveness",
-          "aiMonitoring": "Monitors AI interactions for quality",
-          "sessionReplay": "Records sessions (only with explicit consent)",
-          "noPii": "Does not collect personally identifiable data",
-          "euServers": "Data remains on European servers",
-          "improvement": "Helps improve global reliability"
-        },
-        "noTracking": "MirrorBuddy does not use advertising tracking or commercial profiling."
-      },
-      "section12": {
-        "title": "Google Drive and Integrations",
-        "intro": "If you choose to connect Google Drive to upload documents, you must read Google's privacy policy.",
-        "items": {
-          "permission": "Grant MirrorBuddy permission to access your files",
-          "readPolicy": "Read Google Drive's privacy policy",
-          "access": "MirrorBuddy only accesses files you choose to upload"
-        },
-        "recommendation": "We recommend reviewing Google's privacy settings before connecting your account."
-      },
-      "section13": {
-        "title": "Data Security",
-        "intro": "We implement technical and organisational security measures to protect your data:",
-        "items": {
-          "https": "We use HTTPS/TLS for encryption in transit",
-          "password": "Passwords are hashed with secure algorithms",
-          "backups": "We perform regular backups for disaster recovery",
-          "access": "Data access is limited to our necessary team members"
-        },
-        "disclaimer": "While we implement strong security measures, no system is completely immune from risks. We encourage you to use strong passwords and protect your account."
-      },
-      "section14": {
-        "title": "Changes to This Policy",
-        "intro": "We may update this privacy policy from time to time. We will notify you of significant changes via:",
-        "items": {
-          "email": "Email to your registered address",
-          "banner": "Banner in our app",
-          "accept": "You may be asked to accept the updated version"
-        }
-      },
-      "section15": {
-        "title": "Contacts and Data Protection Authorities",
-        "intro": "If you have questions about our privacy policy or wish to exercise your rights, contact us at:",
-        "ourDpo": {
-          "title": "Our Data Protection Officer (DPO)",
-          "email": "dpo@mirrorbuddy.com",
-          "description": "Our Data Protection Officer is available for privacy consultations and complaints"
-        },
-        "authorities": {
-          "title": "Data Protection Authority by Country",
-          "intro": "If you are not satisfied with our response, you can lodge a complaint with the competent authority in your country:",
-          "italy": {
-            "country": "Italy",
-            "authority": "Garante per la Protezione dei Dati Personali",
-            "email": "garante@gpdp.it",
-            "phone": "+39 06 696 771",
-            "website": "www.garanteprivacy.it"
+          "links": {
+            "intro": "Intro",
+            "privacyPolicyDesc": "Privacy Policy Desc",
+            "privacyPolicyLabel": "Privacy Policy Label",
+            "termsDesc": "Terms Desc",
+            "termsLabel": "Terms Label",
+            "title": "Titolo"
           },
-          "france": {
-            "country": "France",
-            "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-            "email": "contact@cnil.fr",
-            "phone": "+33 1 53 73 22 22",
-            "website": "www.cnil.fr"
+          "metricsAnalytics": {
+            "aggregated": "Aggregated",
+            "aggregatedDesc": "Aggregated Desc",
+            "gdprCompliant": "Gdpr Compliant",
+            "gdprCompliantDesc": "Gdpr Compliant Desc",
+            "h3Collection": "H3 Collection",
+            "p1": "P1",
+            "p2": "P2",
+            "readMore": "Read More",
+            "serverSide": "Server Side",
+            "serverSideDesc": "Server Side Desc",
+            "technicalOnly": "Technical Only",
+            "technicalOnlyDesc": "Technical Only Desc",
+            "title": "Titolo"
           },
-          "germany": {
-            "country": "Germany",
-            "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-            "email": "poststelle@bfdi.bund.de",
-            "phone": "+49 228 997799",
-            "website": "www.bfdi.bund.de"
+          "thirdParty": {
+            "completeList": "Complete List",
+            "googleDriveLabel": "Google Drive Label",
+            "googleDriveNote": "Google Drive Note",
+            "noThirdParty": "No Third Party",
+            "noThirdPartyReason": "No Third Party Reason",
+            "title": "Titolo",
+            "vendors": {
+              "azureOpenAI": "Azure Open A I",
+              "resend": "Resend",
+              "sentry": "Sentry",
+              "supabase": "Supabase",
+              "upstash": "Upstash",
+              "vercel": "Vercel"
+            },
+            "vendorsIntro": "Vendors Intro",
+            "vendorsNoInstall": "Vendors No Install"
           },
-          "spain": {
-            "country": "Spain",
-            "authority": "AEPD (Agencia Española de Protección de Datos)",
-            "email": "consultas@aepd.es",
-            "phone": "+34 91 266 35 00",
-            "website": "www.aepd.es"
+          "whatAreCookies": {
+            "p1": "P1",
+            "p2": "P2",
+            "title": "Titolo"
           },
-          "uk": {
-            "country": "United Kingdom",
-            "authority": "ICO (Information Commissioner's Office)",
-            "email": "contact@ico.org.uk",
-            "phone": "+44 1625 545 745",
-            "website": "www.ico.org.uk"
+          "whichCookies": {
+            "analytics": "Analytics",
+            "analyticsDesc": "Analytics Desc",
+            "disclaimer": "Disclaimer",
+            "essential": "Essential",
+            "essentialDesc": "Essential Desc",
+            "intro": "Intro",
+            "title": "Titolo"
           }
         },
-        "closing": "We appreciate your trust in protecting your privacy and remain available for any questions you may have."
+        "table": {
+          "ariaLabel": "Aria Label",
+          "headers": {
+            "duration": "Duration",
+            "name": "Nome",
+            "purpose": "Purpose"
+          },
+          "rows": {
+            "a11y": {
+              "duration": "Duration",
+              "purpose": "Purpose"
+            },
+            "admin": {
+              "duration": "Duration",
+              "purpose": "Purpose"
+            },
+            "userId": {
+              "duration": "Duration",
+              "purpose": "Purpose"
+            },
+            "userIdClient": {
+              "duration": "Duration",
+              "purpose": "Purpose"
+            }
+          }
+        },
+        "tldr": {
+          "heading": "Heading",
+          "point1": "Point1",
+          "point2": "Point2",
+          "point3": "Point3",
+          "point4": "Point4"
+        },
+        "intro": {
+          "heading": "[TRANSLATE] Cosa sono i cookie",
+          "description": "[TRANSLATE] I cookie sono piccoli file di testo memorizzati sul tuo dispositivo"
+        },
+        "preferences": {
+          "heading": "[TRANSLATE] Le tue preferenze",
+          "description": "[TRANSLATE] Puoi gestire i tuoi consensi in qualsiasi momento"
+        },
+        "contact": {
+          "heading": "[TRANSLATE] Domande sui cookie",
+          "description": "[TRANSLATE] Per domande contattaci all'indirizzo privacy@mirrorbuddy.it"
+        }
       },
-      "section16": {
-        "title": "16. Artificial Intelligence Systems and User Rights",
-        "aiSystemsHeading": "AI Systems in Use",
-        "aiSystems": "MirrorBuddy uses artificial intelligence systems to personalize your educational experience. All our AI systems are transparent, controllable, and designed with integrated human oversight. We do not make automated decisions that significantly impact your education without human review.",
-        "aiDataHeading": "Which Data We Process with AI",
-        "aiDataIntro": "The following personal data is processed by our AI systems:",
-        "aiDataItemLabels": {
-          "messages": "Conversation Messages",
-          "context": "Educational Context",
-          "profile": "Educational Profile"
+      "privacy": {
+        "page": {
+          "title": "Privacy Policy",
+          "description": "[TRANSLATE] Come proteggiamo i tuoi dati personali",
+          "tldrItems": {
+            "dataCollection": "We only collect data necessary for the service to work",
+            "noDataSale": "We never sell your data to third parties",
+            "deleteAnytime": "You can delete your account and all data at any time",
+            "europeanData": "Your data is stored in European data centers (GDPR)",
+            "optionalAnalytics": "Optional analytics, only with your explicit consent"
+          },
+          "backToHome": "Back to home",
+          "lastUpdated": "Last updated",
+          "pageNavigation": "Privacy page navigation",
+          "questionAriaLabel": "Privacy questions",
+          "questionText": "Questions about our privacy policy?",
+          "tldrHeading": "Quick Summary (TL;DR)",
+          "version": "Version"
         },
-        "aiDataItems": {
-          "messages": "Your conversations with teachers are analyzed to personalize the tone and difficulty level",
-          "context": "Your grade level, subjects of interest, and learning style are used to adapt content",
-          "profile": "Your progress data (flashcards, quizzes, exercises) is used to recommend the next topic to learn"
-        },
-        "notProcessed": "Your sensitive information (health data, location, biometric information) is never processed with AI, even if shared voluntarily.",
-        "aiDecisionsHeading": "How We Make Decisions with AI",
-        "aiDecisions": "AI-based decisions affect your learning experience in these ways:",
-        "aiDecisionsItems": {
-          "access": "Teacher Access: AI recommends which teachers might be most helpful to you based on your interests",
-          "benefits": "Educational Benefits: AI identifies your strengths and areas where you might need extra support",
-          "education": "Learning Path: AI suggests which topic to learn next to optimize memory retention"
-        },
-        "aiDecisionsNote": "Note: None of these decisions are final without human intervention. Parents and teachers can always override AI suggestions.",
-        "aiRightsHeading": "Your Rights on AI-Based Decisions",
-        "aiRightsIntro": "According to the EU AI Act, you have the following rights regarding automated decisions:",
-        "aiRightsItemLabels": {
-          "humanReview": "Right to Human Review",
-          "feedback": "Right to Feedback",
-          "transparency": "Right to Transparency",
-          "oppose": "Right to Object"
-        },
-        "aiRightsItems": {
-          "humanReview": "You can request that a person (teacher or parent) review any AI-based decision",
-          "feedback": "You can share feedback on how AI has impacted your learning, and we will use this feedback to improve",
-          "transparency": "You can request an explanation of how and why AI made a particular decision about your learning",
-          "oppose": "You can object to the processing of your data with AI systems at any time"
-        },
-        "transparencyHeading": "How We Stay Transparent",
-        "transparencyIntro": "We implement these measures to remain transparent about our AI systems:",
-        "transparencyItemLabels": {
-          "review": "Regular Review",
-          "monitoring": "Quality Monitoring",
-          "reporting": "Public Reports",
-          "retention": "Data Retention"
-        },
-        "transparencyItems": {
-          "review": "We review our AI systems quarterly to ensure they work correctly and fairly for all students",
-          "monitoring": "We continuously monitor AI outcomes to detect and correct any bias or errors",
-          "reporting": "We publish quarterly reports on our Model Card that describe how our AI systems work",
-          "retention": "We retain logs of AI decisions for 90 days for review and improvement, then delete them"
-        },
-        "learnMoreHeading": "Want to Know More?",
-        "learnMoreText": "for complete information about our AI architecture, bias testing, and how we use conversational data."
-      }
-    },
-    "terms": {
-      "backToHome": "Back To Home",
-      "backToHomeAriaLabel": "Back To Home Aria Label",
-      "lastUpdated": "Last Updated",
-      "pageNavAriaLabel": "Page Nav Aria Label",
-      "questionsEmail": "Questions Email",
-      "questionsPrefix": "Questions Prefix",
-      "title": "Titolo",
-      "tldrHeading": "Tldr Heading",
-      "tldrItems": {
-        "feedback": "Feedback",
-        "free": "Free",
-        "notSchool": "Not School",
-        "respect": "Respect",
-        "supervised": "Supervised"
-      },
-      "version": "Version",
-      "sections": {
         "section1": {
-          "content1": "Content1",
-          "content2": "Content2",
-          "title": "Titolo"
-        },
-        "section10": {
-          "intro": "Intro",
-          "item1": "Item1",
-          "item2": "Item2",
-          "item3": "Item3",
-          "title": "Titolo"
-        },
-        "section11": {
-          "line1": "Line1",
-          "line2": "Line2",
-          "title": "Titolo"
+          "title": "Who We Are and How This Policy Works",
+          "content": "MirrorBuddy is an educational app for students with learning differences, developed by an international team with UK representation. This privacy policy explains how we collect, use, and protect your personal data. As your data controller, we are responsible for protecting your personal information in compliance with the UK General Data Protection Regulation (GDPR) and the Data Protection Act 2018."
         },
         "section2": {
-          "item1": "Item1",
-          "item2": "Item2",
-          "item3": "Item3",
-          "item4": "Item4",
-          "title": "Titolo"
+          "title": "What Data We Collect",
+          "content": "[TRANSLATE] Contenuto sezione 2",
+          "intro": "To provide our service, we collect these personal data:",
+          "itemLabels": {
+            "email": "Email",
+            "name": "Name",
+            "conversations": "Conversations",
+            "flashcards": "Flashcards",
+            "progress": "Learning Progress",
+            "settings": "User Preferences"
+          },
+          "items": {
+            "email": "Used for login and notifications",
+            "name": "Used to personalise your experience",
+            "conversations": "Saved to continue learning from where you left off",
+            "flashcards": "Used to track your learning via FSRS algorithm",
+            "progress": "Recorded to give you personalised feedback",
+            "settings": "Saved to remember your accessibility and language choices"
+          }
         },
         "section3": {
-          "ai": {
-            "content": "Content",
-            "heading": "Heading"
-          },
-          "beta": {
-            "content": "Content",
-            "heading": "Heading"
-          },
-          "intro": "Intro",
-          "school": {
-            "content": "Content",
-            "heading": "Heading"
-          },
-          "title": "Titolo"
+          "title": "Sensitive Data We Never Collect",
+          "content": "[TRANSLATE] Contenuto sezione 3",
+          "intro": "To protect your privacy, we never collect sensitive data such as:",
+          "items": {
+            "health": "Health information (unless you voluntarily share it in a conversation)",
+            "payments": "Direct payment details (we use certified third parties)",
+            "media": "Personal photos or videos",
+            "gps": "Your geographical location"
+          }
         },
         "section4": {
-          "changeable": {
-            "content": "Content",
-            "heading": "Heading"
+          "title": "How We Use Your Data",
+          "content": "[TRANSLATE] Contenuto sezione 4",
+          "intro": "We use your data only for these legitimate purposes:",
+          "itemLabels": {
+            "appFunctionality": "App Functionality",
+            "personalization": "Personalization",
+            "improvement": "Improvement",
+            "support": "Support"
           },
-          "demo": {
-            "content": "Content",
-            "heading": "Heading"
+          "items": {
+            "appFunctionality": "Load your conversations, flashcards and progress",
+            "personalization": "Adapt the maestri to your interests and learning level",
+            "improvement": "Understand how you use MirrorBuddy to add new features (with optional analytics)",
+            "support": "Help you if you experience technical or pedagogical issues"
           },
-          "educational": {
-            "content": "Content",
-            "heading": "Heading"
-          },
-          "intro": "Intro",
-          "title": "Titolo"
+          "disclaimer": "We do not use your data for automated profiling, targeted advertising, or decisions about you without human involvement."
         },
         "section5": {
-          "intro": "Intro",
-          "item1": "Item1",
-          "item2": "Item2",
-          "item3": "Item3",
-          "item4": "Item4",
-          "note": "Note",
-          "title": "Titolo"
+          "title": "Optional Analytics and Tracking",
+          "content": "[TRANSLATE] Contenuto sezione 5",
+          "intro": "As a user, you can choose to participate in our analytics to help us improve the app.",
+          "labels": {
+            "collect": "What We Collect",
+            "why": "Why",
+            "retention": "How Long",
+            "optOut": "How to Refuse"
+          },
+          "weCollect": "Pages visited, time spent, features used, errors encountered. No personal data is stored in logs.",
+          "why": "To understand which features are helpful, where students struggle, and how to make MirrorBuddy better for everyone.",
+          "retention": "Analytics data is retained for 12 months, then aggregated and removed.",
+          "optOut": "You can disable analytics in privacy settings without losing any functionality."
         },
         "section6": {
-          "intro": "Intro",
-          "noAbuse": {
-            "content": "Content",
-            "label": "Label"
+          "title": "Who Can Access Your Data",
+          "content": "[TRANSLATE] Contenuto sezione 6",
+          "intro": "Your personal data is accessible to:",
+          "itemLabels": {
+            "you": "You",
+            "parents": "Parents",
+            "team": "MirrorBuddy Team"
           },
-          "notShare": {
-            "content": "Content",
-            "label": "Label"
+          "items": {
+            "you": "You have complete control of your data and can download, modify or delete it",
+            "parents": "Your parents can monitor your progress via the Parent Dashboard (if you are a minor)",
+            "team": "The MirrorBuddy team accesses data for technical support, only when necessary"
           },
-          "report": {
-            "content": "Content",
-            "label": "Label"
+          "thirdPartyHeading": "Trusted Partners",
+          "thirdPartyIntro": "We use these certified services to run MirrorBuddy safely:",
+          "vendors": {
+            "vercel": "Vercel (server hosting, GDPR compliant, EU-based)",
+            "supabase": "Supabase (PostgreSQL database, encrypted, GDPR compliant)",
+            "azure": "Azure OpenAI (conversational data processing, GDPR compliant)",
+            "resend": "Resend (transactional email sending, GDPR compliant)",
+            "upstash": "Upstash (Redis cache, GDPR compliant)",
+            "brave": "Brave (optional privacy-first search, doesn't collect IP)",
+            "google": "Google Drive (optional for document uploads, only when you choose to connect)",
+            "grafana": "Grafana (system metrics only, no personal data)",
+            "ollama": "Ollama (optional local AI models, all on-device)"
           },
-          "respect": {
-            "content": "Content",
-            "label": "Label"
-          },
-          "title": "Titolo"
+          "noOtherAccess": "No other service has access to your data. We do not sell data to third parties.",
+          "extraEUNote": "Note: Azure OpenAI processes some conversational data in the USA with Standard Contractual Clauses (SCC) as per UK GDPR Art. 46."
         },
         "section7": {
-          "check": {
-            "content": "Content",
-            "label": "Label"
-          },
-          "contact": {
-            "content": "Content",
-            "label": "Label"
-          },
-          "intro": "Intro",
-          "responsible": {
-            "content": "Content",
-            "label": "Label"
-          },
-          "supervise": {
-            "content": "Content",
-            "label": "Label"
-          },
-          "title": "Titolo"
+          "title": "Legal Basis for Processing",
+          "content": "[TRANSLATE] Contenuto sezione 7",
+          "primary": "We process your personal data on these legal bases under UK GDPR: (1) Contractual necessity (Art. 6.1.b) - to provide the service; (2) Explicit consent (Art. 6.1.a) - for optional analytics and communications; (3) Legitimate interest (Art. 6.1.f) - for security, fraud prevention, service improvement.",
+          "transfers": "Data transfers to non-UK countries (such as the USA) only occur for services with approved Standard Contractual Clauses (SCC) or UK adequacy decisions.",
+          "legalBasis": "Your legal basis for data processing is consent to the service (contract) and, where applicable, explicit consent you have given in settings."
         },
         "section8": {
-          "brief": "Brief",
-          "intro": "Intro",
-          "item1": "Item1",
-          "item2": "Item2",
-          "item3": "Item3",
-          "item4": "Item4",
-          "privacyLink": "Privacy Link",
-          "title": "Titolo"
+          "title": "Data Controller and Processors",
+          "content": "[TRANSLATE] Contenuto sezione 8",
+          "intro": "MirrorBuddy is the data controller. However, some services are processed by data processors who process data on our behalf under DPA (Data Processing Agreements) compliant with UK GDPR Art. 28.",
+          "subprocessorsHeading": "Our certified data processors:",
+          "subprocessors": {
+            "vercel": "Hosting and global CDN - EU-based, SOC 2 Type II certified",
+            "supabase": "Managed PostgreSQL database - EU-based, ISO 27001 certified",
+            "resend": "Transactional email service - EU-based, with UK GDPR compliant DPA",
+            "azure": "Conversational AI processing - USA-based but with SCC and OneTrust compliant"
+          },
+          "gdprObligations": "All data processors have signed DPA contracts compliant with UK GDPR Art. 28 and 32. You can request a copy of our DPAs by writing to info@fightthestroke.org."
         },
         "section9": {
-          "intro": "Intro",
-          "item1": "Item1",
-          "item2": "Item2",
-          "item3": "Item3",
-          "note": "Note",
-          "title": "Titolo"
+          "title": "How Long We Keep Your Data",
+          "content": "[TRANSLATE] Contenuto sezione 9",
+          "items": {
+            "activeAccount": "While your account is active, we retain all your data (email, conversations, flashcards, progress) to provide the service",
+            "conversations": "Conversations with maestri are retained for 90 days of inactivity, then archived for 1 year, then deleted",
+            "webVitals": "Technical data (Web Vitals, errors) is retained for 12 months for improvement, then aggregated and deleted",
+            "deletedAccount": "When you delete your account, all data is deleted within 30 days (backup: 90 days by law). Aggregated research data remains pseudonymised"
+          }
+        },
+        "section10": {
+          "title": "Your Privacy Rights",
+          "content": "[TRANSLATE] Contenuto sezione 10",
+          "intro": "You have the right to exercise your privacy rights at any time. These rights include access, rectification, erasure, portability, objection, and restriction of processing.",
+          "itemLabels": {
+            "access": "Right to Access",
+            "correct": "Right to Rectification",
+            "delete": "Right to Erasure",
+            "export": "Right to Portability",
+            "oppose": "Right to Object"
+          },
+          "items": {
+            "access": "You can request a copy of all your personal data in a readable format",
+            "correct": "You can request correction of inaccurate or incomplete data",
+            "delete": "You can request complete deletion of your personal data",
+            "export": "You can receive your data in a structured format (JSON, CSV)",
+            "oppose": "You can object to processing your data for certain purposes"
+          },
+          "exerciseRights": "To exercise your rights, contact us at:"
+        },
+        "section11": {
+          "title": "Cookies and Analytics",
+          "content": "[TRANSLATE] Contenuto sezione 11",
+          "intro": "We use cookies and analytics services to improve your experience.",
+          "cookieTypeLabels": {
+            "essential": "Essential Cookies",
+            "analytics": "Analytics Cookies"
+          },
+          "cookieTypes": {
+            "essential": "Required for website functionality (authentication, security)",
+            "analytics": "Optional - help us understand how you use MirrorBuddy"
+          },
+          "vercelAnalytics": "Vercel Analytics collects technical data to monitor site performance",
+          "vercelFeatureLabels": {
+            "noCookies": "No Cookies",
+            "anonymous": "Anonymous Data",
+            "gdprCompliant": "GDPR Compliant",
+            "technicalOnly": "Technical Data Only"
+          },
+          "vercelFeatures": {
+            "noCookies": "Does not use tracking cookies",
+            "anonymous": "All data is anonymous and aggregated",
+            "gdprCompliant": "Compliant with GDPR and doesn't require consent",
+            "technicalOnly": "Collects only technical metrics, no personal data"
+          },
+          "sentry": "Sentry monitors errors and performance to ensure service reliability",
+          "sentryFeatureLabels": {
+            "errors": "Error Monitoring",
+            "performance": "Performance Monitoring",
+            "aiMonitoring": "AI Monitoring",
+            "sessionReplay": "Session Replay",
+            "noPii": "No PII",
+            "euServers": "EU Servers",
+            "improvement": "Service Improvement"
+          },
+          "sentryFeatures": {
+            "errors": "Detects and logs errors for quick fixes",
+            "performance": "Measures speed and responsiveness",
+            "aiMonitoring": "Monitors AI interactions for quality",
+            "sessionReplay": "Records sessions (only with explicit consent)",
+            "noPii": "Does not collect personally identifiable data",
+            "euServers": "Data remains on European servers",
+            "improvement": "Helps improve global reliability"
+          },
+          "noTracking": "MirrorBuddy does not use advertising tracking or commercial profiling."
+        },
+        "section12": {
+          "title": "Google Drive and Integrations",
+          "content": "[TRANSLATE] Contenuto sezione 12",
+          "intro": "If you choose to connect Google Drive to upload documents, you must read Google's privacy policy.",
+          "items": {
+            "permission": "Grant MirrorBuddy permission to access your files",
+            "readPolicy": "Read Google Drive's privacy policy",
+            "access": "MirrorBuddy only accesses files you choose to upload"
+          },
+          "recommendation": "We recommend reviewing Google's privacy settings before connecting your account."
+        },
+        "section13": {
+          "title": "Data Security",
+          "content": "[TRANSLATE] Contenuto sezione 13",
+          "intro": "We implement technical and organisational security measures to protect your data:",
+          "items": {
+            "https": "We use HTTPS/TLS for encryption in transit",
+            "password": "Passwords are hashed with secure algorithms",
+            "backups": "We perform regular backups for disaster recovery",
+            "access": "Data access is limited to our necessary team members"
+          },
+          "disclaimer": "While we implement strong security measures, no system is completely immune from risks. We encourage you to use strong passwords and protect your account."
+        },
+        "section14": {
+          "title": "Changes to This Policy",
+          "content": "[TRANSLATE] Contenuto sezione 14",
+          "intro": "We may update this privacy policy from time to time. We will notify you of significant changes via:",
+          "items": {
+            "email": "Email to your registered address",
+            "banner": "Banner in our app",
+            "accept": "You may be asked to accept the updated version"
+          }
+        },
+        "section15": {
+          "title": "Contacts and Data Protection Authorities",
+          "content": "[TRANSLATE] Contenuto sezione 15",
+          "intro": "If you have questions about our privacy policy or wish to exercise your rights, contact us at:",
+          "ourDpo": {
+            "title": "Our Data Protection Officer (DPO)",
+            "email": "dpo@mirrorbuddy.com",
+            "description": "Our Data Protection Officer is available for privacy consultations and complaints"
+          },
+          "authorities": {
+            "title": "Data Protection Authority by Country",
+            "intro": "If you are not satisfied with our response, you can lodge a complaint with the competent authority in your country:",
+            "italy": {
+              "country": "Italy",
+              "authority": "Garante per la Protezione dei Dati Personali",
+              "email": "garante@gpdp.it",
+              "phone": "+39 06 696 771",
+              "website": "www.garanteprivacy.it"
+            },
+            "france": {
+              "country": "France",
+              "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
+              "email": "contact@cnil.fr",
+              "phone": "+33 1 53 73 22 22",
+              "website": "www.cnil.fr"
+            },
+            "germany": {
+              "country": "Germany",
+              "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
+              "email": "poststelle@bfdi.bund.de",
+              "phone": "+49 228 997799",
+              "website": "www.bfdi.bund.de"
+            },
+            "spain": {
+              "country": "Spain",
+              "authority": "AEPD (Agencia Española de Protección de Datos)",
+              "email": "consultas@aepd.es",
+              "phone": "+34 91 266 35 00",
+              "website": "www.aepd.es"
+            },
+            "uk": {
+              "country": "United Kingdom",
+              "authority": "ICO (Information Commissioner's Office)",
+              "email": "contact@ico.org.uk",
+              "phone": "+44 1625 545 745",
+              "website": "www.ico.org.uk"
+            }
+          },
+          "closing": "We appreciate your trust in protecting your privacy and remain available for any questions you may have."
+        },
+        "section16": {
+          "title": "16. Artificial Intelligence Systems and User Rights",
+          "content": "[TRANSLATE] Contenuto sezione 16",
+          "aiSystemsHeading": "AI Systems in Use",
+          "aiSystems": "MirrorBuddy uses artificial intelligence systems to personalize your educational experience. All our AI systems are transparent, controllable, and designed with integrated human oversight. We do not make automated decisions that significantly impact your education without human review.",
+          "aiDataHeading": "Which Data We Process with AI",
+          "aiDataIntro": "The following personal data is processed by our AI systems:",
+          "aiDataItemLabels": {
+            "messages": "Conversation Messages",
+            "context": "Educational Context",
+            "profile": "Educational Profile"
+          },
+          "aiDataItems": {
+            "messages": "Your conversations with teachers are analyzed to personalize the tone and difficulty level",
+            "context": "Your grade level, subjects of interest, and learning style are used to adapt content",
+            "profile": "Your progress data (flashcards, quizzes, exercises) is used to recommend the next topic to learn"
+          },
+          "notProcessed": "Your sensitive information (health data, location, biometric information) is never processed with AI, even if shared voluntarily.",
+          "aiDecisionsHeading": "How We Make Decisions with AI",
+          "aiDecisions": "AI-based decisions affect your learning experience in these ways:",
+          "aiDecisionsItems": {
+            "access": "Teacher Access: AI recommends which teachers might be most helpful to you based on your interests",
+            "benefits": "Educational Benefits: AI identifies your strengths and areas where you might need extra support",
+            "education": "Learning Path: AI suggests which topic to learn next to optimize memory retention"
+          },
+          "aiDecisionsNote": "Note: None of these decisions are final without human intervention. Parents and teachers can always override AI suggestions.",
+          "aiRightsHeading": "Your Rights on AI-Based Decisions",
+          "aiRightsIntro": "According to the EU AI Act, you have the following rights regarding automated decisions:",
+          "aiRightsItemLabels": {
+            "humanReview": "Right to Human Review",
+            "feedback": "Right to Feedback",
+            "transparency": "Right to Transparency",
+            "oppose": "Right to Object"
+          },
+          "aiRightsItems": {
+            "humanReview": "You can request that a person (teacher or parent) review any AI-based decision",
+            "feedback": "You can share feedback on how AI has impacted your learning, and we will use this feedback to improve",
+            "transparency": "You can request an explanation of how and why AI made a particular decision about your learning",
+            "oppose": "You can object to the processing of your data with AI systems at any time"
+          },
+          "transparencyHeading": "How We Stay Transparent",
+          "transparencyIntro": "We implement these measures to remain transparent about our AI systems:",
+          "transparencyItemLabels": {
+            "review": "Regular Review",
+            "monitoring": "Quality Monitoring",
+            "reporting": "Public Reports",
+            "retention": "Data Retention"
+          },
+          "transparencyItems": {
+            "review": "We review our AI systems quarterly to ensure they work correctly and fairly for all students",
+            "monitoring": "We continuously monitor AI outcomes to detect and correct any bias or errors",
+            "reporting": "We publish quarterly reports on our Model Card that describe how our AI systems work",
+            "retention": "We retain logs of AI decisions for 90 days for review and improvement, then delete them"
+          },
+          "learnMoreHeading": "Want to Know More?",
+          "learnMoreText": "for complete information about our AI architecture, bias testing, and how we use conversational data."
         }
+      },
+      "terms": {
+        "page": {
+          "title": "[TRANSLATE] Termini di Servizio",
+          "description": "[TRANSLATE] I nostri termini e condizioni d'uso"
+        },
+        "sections": {
+          "acceptance": "[TRANSLATE] Accettazione dei Termini",
+          "services": "[TRANSLATE] Descrizione dei Servizi",
+          "userRights": "[TRANSLATE] Diritti e Responsabilità dell'Utente",
+          "limitations": "[TRANSLATE] Limitazioni di Responsabilità",
+          "section1": {
+            "content1": "Content1",
+            "content2": "Content2",
+            "title": "Titolo"
+          },
+          "section10": {
+            "intro": "Intro",
+            "item1": "Item1",
+            "item2": "Item2",
+            "item3": "Item3",
+            "title": "Titolo"
+          },
+          "section11": {
+            "line1": "Line1",
+            "line2": "Line2",
+            "title": "Titolo"
+          },
+          "section2": {
+            "item1": "Item1",
+            "item2": "Item2",
+            "item3": "Item3",
+            "item4": "Item4",
+            "title": "Titolo"
+          },
+          "section3": {
+            "ai": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "beta": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "intro": "Intro",
+            "school": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "title": "Titolo"
+          },
+          "section4": {
+            "changeable": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "demo": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "educational": {
+              "content": "Content",
+              "heading": "Heading"
+            },
+            "intro": "Intro",
+            "title": "Titolo"
+          },
+          "section5": {
+            "intro": "Intro",
+            "item1": "Item1",
+            "item2": "Item2",
+            "item3": "Item3",
+            "item4": "Item4",
+            "note": "Note",
+            "title": "Titolo"
+          },
+          "section6": {
+            "intro": "Intro",
+            "noAbuse": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "notShare": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "report": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "respect": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "title": "Titolo"
+          },
+          "section7": {
+            "check": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "contact": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "intro": "Intro",
+            "responsible": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "supervise": {
+              "content": "Content",
+              "label": "Label"
+            },
+            "title": "Titolo"
+          },
+          "section8": {
+            "brief": "Brief",
+            "intro": "Intro",
+            "item1": "Item1",
+            "item2": "Item2",
+            "item3": "Item3",
+            "item4": "Item4",
+            "privacyLink": "Privacy Link",
+            "title": "Titolo"
+          },
+          "section9": {
+            "intro": "Intro",
+            "item1": "Item1",
+            "item2": "Item2",
+            "item3": "Item3",
+            "note": "Note",
+            "title": "Titolo"
+          }
+        },
+        "backToHome": "Back To Home",
+        "backToHomeAriaLabel": "Back To Home Aria Label",
+        "lastUpdated": "Last Updated",
+        "pageNavAriaLabel": "Page Nav Aria Label",
+        "questionsEmail": "Questions Email",
+        "questionsPrefix": "Questions Prefix",
+        "title": "Titolo",
+        "tldrHeading": "Tldr Heading",
+        "tldrItems": {
+          "feedback": "Feedback",
+          "free": "Free",
+          "notSchool": "Not School",
+          "respect": "Respect",
+          "supervised": "Supervised"
+        },
+        "version": "Version"
+      },
+      "accessibility": {
+        "title": "[TRANSLATE] Accessibilità",
+        "description": "[TRANSLATE] Le nostre funzionalità di accessibilità conformi WCAG 2.1 AA",
+        "features": {
+          "heading": "[TRANSLATE] Funzionalità di Accessibilità",
+          "description": "[TRANSLATE] MirrorBuddy supporta 7 profili DSA",
+          "dyslexia": "[TRANSLATE] Dislessia",
+          "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura ottimizzata",
+          "adhd": "[TRANSLATE] ADHD",
+          "adhdDesc": "[TRANSLATE] Timer Pomodoro, modalità focus",
+          "visual": "[TRANSLATE] Disabilità Visiva",
+          "visualDesc": "[TRANSLATE] Alto contrasto, testo grande, TTS",
+          "motor": "[TRANSLATE] Disabilità Motoria",
+          "motorDesc": "[TRANSLATE] Navigazione tastiera, target grandi",
+          "autism": "[TRANSLATE] Autismo",
+          "autismDesc": "[TRANSLATE] Layout prevedibili, animazioni ridotte",
+          "dyscalculia": "[TRANSLATE] Discalculia",
+          "dyscalculiaDesc": "[TRANSLATE] Calcolatrice visiva, supporto formule",
+          "cerebralPalsy": "[TRANSLATE] Paralisi Cerebrale",
+          "cerebralPalsyDesc": "[TRANSLATE] TTS + tastiera + spaziatura"
+        },
+        "keyboard": {
+          "heading": "[TRANSLATE] Scorciatoie da Tastiera",
+          "description": "[TRANSLATE] Tutte le funzioni accessibili da tastiera",
+          "tab": "[TRANSLATE] Tab: Naviga tra elementi",
+          "enter": "[TRANSLATE] Invio: Attiva elemento",
+          "escape": "[TRANSLATE] Esc: Chiudi dialogo",
+          "space": "[TRANSLATE] Spazio: Seleziona/Deseleziona"
+        },
+        "screenReader": {
+          "heading": "[TRANSLATE] Supporto Screen Reader",
+          "description": "[TRANSLATE] Ottimizzato per NVDA, JAWS, VoiceOver",
+          "aria": "[TRANSLATE] Etichette ARIA su tutti i controlli",
+          "headings": "[TRANSLATE] Struttura gerarchica heading",
+          "altText": "[TRANSLATE] Testo alternativo per immagini",
+          "labels": "[TRANSLATE] Label descrittive per form"
+        },
+        "limitations": {
+          "heading": "[TRANSLATE] Limitazioni Note",
+          "description": "[TRANSLATE] Alcune funzionalità potrebbero non essere completamente accessibili in modalità vocale con screen reader abilitato."
+        },
+        "regulatory": {
+          "heading": "[TRANSLATE] Conformità Normativa",
+          "description": "[TRANSLATE] WCAG 2.1 AA, EN 301 549, Legge Stanca",
+          "eudirective": "[TRANSLATE] Direttiva UE 2016/2102"
+        },
+        "page": {
+          "pageNavAriaLabel": "[TRANSLATE] Navigazione dichiarazione di accessibilità",
+          "backHome": "[TRANSLATE] Torna alla home",
+          "title": "[TRANSLATE] Dichiarazione di Accessibilità",
+          "version": "[TRANSLATE] Versione {version}",
+          "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}"
+        },
+        "compliance": {
+          "heading": "[TRANSLATE] Conformità WCAG 2.1 AA",
+          "declaration": "[TRANSLATE] MirrorBuddy è conforme agli standard WCAG 2.1 livello AA",
+          "wcag": "[TRANSLATE] WCAG 2.1 AA per contrasto e leggibilità",
+          "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
+          "screenReader": "[TRANSLATE] Compatibilità screen reader",
+          "colorContrast": "[TRANSLATE] Contrasto colori ottimale"
+        },
+        "feedback": {
+          "heading": "[TRANSLATE] Segnala problemi di accessibilità",
+          "description": "[TRANSLATE] Se incontri barriere di accessibilità, contattaci",
+          "emailLabel": "[TRANSLATE] Email",
+          "authorityLabel": "[TRANSLATE] Autorità di riferimento",
+          "responseTime": "[TRANSLATE] Tempo di risposta",
+          "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+        }
+      }
+    },
+    "modelCard": {
+      "title": "AI Model Technical Card",
+      "description": "[TRANSLATE] Informazioni sui modelli di intelligenza artificiale utilizzati",
+      "version": "1.0",
+      "provider": {
+        "name": "Microsoft / OpenAI",
+        "description": "Azure OpenAI services integrated via enterprise API",
+        "website": "https://azure.microsoft.com/services/openai/",
+        "euCompliance": "GDPR compliant - EU data center (West Europe)"
+      },
+      "purpose": "[TRANSLATE] Scopo",
+      "lastUpdated": "27 January 2026",
+      "models": {
+        "title": "Available Models",
+        "description": "MirrorBuddy uses the following Azure OpenAI models based on subscription tier",
+        "modelsList": {
+          "gpt4oMini": {
+            "name": "GPT-4o Mini",
+            "tier": "Trial",
+            "contextWindow": "128k token",
+            "latency": "< 500ms",
+            "knowledgeCutoff": "October 2024",
+            "capabilities": "Conversational chat, understanding educational texts, quizzes and flashcards"
+          },
+          "gpt52mini": {
+            "name": "GPT-5.2 Mini",
+            "tier": "Base",
+            "contextWindow": "200k token",
+            "latency": "< 300ms",
+            "knowledgeCutoff": "December 2024",
+            "capabilities": "Personalized teaching, text analysis, advanced quiz creation"
+          },
+          "gpt52edu": {
+            "name": "GPT-5.2 Education",
+            "tier": "Base",
+            "contextWindow": "256k token",
+            "latency": "< 200ms",
+            "knowledgeCutoff": "December 2024",
+            "capabilities": "Specialized teaching for students with learning difficulties, adaptive exercises"
+          },
+          "gpt52chat": {
+            "name": "GPT-5.2 Chat",
+            "tier": "Pro",
+            "contextWindow": "256k token",
+            "latency": "< 150ms",
+            "knowledgeCutoff": "December 2024",
+            "capabilities": "Complex multi-turn conversations, advanced reasoning, multilingual support"
+          },
+          "gptRealtimeMini": {
+            "name": "GPT Realtime Mini",
+            "tier": "Pro",
+            "contextWindow": "128k token",
+            "latency": "< 300ms (audio)",
+            "knowledgeCutoff": "November 2024",
+            "capabilities": "Real-time voice conversation, hybrid text-audio interactions"
+          }
+        }
+      },
+      "capabilities": {
+        "title": "Model Capabilities",
+        "description": "What the model DOES well",
+        "items": [
+          "Natural conversation in Italian, English, French, German and Spanish",
+          "Explanation of complex concepts in an accessible way for neurodivergent students",
+          "Personalization of teaching based on learning style",
+          "Creation of adaptive flashcards and quizzes based on FSRS",
+          "Generation of mind maps and summaries",
+          "Emotional support and encouragement during learning",
+          "Processing PDF documents for knowledge extraction"
+        ]
+      },
+      "limitations": {
+        "title": "Model Limitations",
+        "description": "What the model DOES NOT do well - [REQUIRES LEGAL VERIFICATION]",
+        "items": [
+          "Does not replace a human teacher or medical professional",
+          "Cannot diagnose health conditions or learning disorders",
+          "Has no access to real-time information (internet searches, current prices)",
+          "Cannot make critical decisions autonomously - always requires human supervision",
+          "Does not guarantee 100% accuracy in complex technical answers",
+          "Cannot read image files beyond text and graphics"
+        ]
+      },
+      "trainingData": {
+        "title": "Training Data",
+        "description": "[REQUIRES LEGAL VERIFICATION] - Information about the data sources used to train the model",
+        "items": [
+          "Trained on public corpora and educational books until October/December 2024",
+          "Includes Italian texts from public sources (not GDPR compliant, not AI Act compliant) - [REQUIRES LEGAL VERIFICATION]",
+          "Contains texts from Wikipedia, open educational resources and public domain books",
+          "Does NOT include personally identifiable information (PII) like names, addresses, phone numbers",
+          "Microsoft does not retain user input data for additional training - compliant with GDPR Art. 5"
+        ]
+      },
+      "intendedUse": {
+        "title": "Intended Use",
+        "description": "How MirrorBuddy intends to use the model",
+        "items": [
+          "Support for personalized learning for students with SLD (Specific Learning Disorders)",
+          "Interactive tutoring in mathematics, sciences, languages, history and art",
+          "Creation of adaptive educational content",
+          "Support for teachers in preparing teaching materials",
+          "Assistance for parents in monitoring school progress",
+          "Emotional support and motivation during study"
+        ]
+      },
+      "outOfScope": {
+        "title": "Prohibited Uses (Out-of-Scope)",
+        "description": "What is PROHIBITED with the model according to EU AI Act Art. 6",
+        "items": [
+          "Discrimination or profiling based on race, gender, religion, disability",
+          "Collection of biometric data without explicit consent",
+          "Use for military purposes, weapons, or violence",
+          "Emotional manipulation or ideological indoctrination",
+          "Privacy violations by collecting personal data beyond what is necessary",
+          "Fully automated decisions without human intervention (e.g. grade assignment)",
+          "Use for mass surveillance monitoring without consent",
+          "Commercial use for non-educational purposes"
+        ]
+      },
+      "safetyMeasures": {
+        "title": "Integrated Safety Measures",
+        "description": "How MirrorBuddy protects the use of the model",
+        "items": [
+          "Safety filters against harmful, violent or sexual content - integrated in Azure OpenAI",
+          "Real-time monitoring of interactions to detect abuse",
+          "Automatic timeout after 2 hours of inactivity",
+          "Audit logs to track all model usage - compliant with GDPR Art. 5(f)",
+          "Rate limiting to prevent abuse (max 100 requests/hour for Trial users)",
+          "Human intervention required for critical educational decisions (grade assignment, level progression)",
+          "Explicit disclaimer that AI supports but does not replace human teachers"
+        ]
+      },
+      "biasAndFairness": {
+        "title": "Bias and Fairness",
+        "description": "[REQUIRES LEGAL VERIFICATION] - How MirrorBuddy assesses and mitigates bias",
+        "items": [
+          "Regular testing for gender, race and ethnicity bias in educational responses - [REQUIRES LEGAL VERIFICATION]",
+          "Balanced representation of cultures, religions and historical perspectives in content",
+          "Monitoring equity in access to premium features for disadvantaged students",
+          "Quarterly fairness audit conducted by external experts - [REQUIRES LEGAL VERIFICATION]",
+          "Reporting mechanism for students and parents to flag responses seen as unfair or discriminatory",
+          "Correlation between model performance and demographic factors tracked to identify disparities",
+          "Mitigation through fine-tuning and prompt engineering to reduce stereotypes"
+        ]
+      },
+      "performanceMetrics": {
+        "title": "Performance Metrics",
+        "description": "[REQUIRES LEGAL VERIFICATION] - How we measure model effectiveness",
+        "items": [
+          "Accuracy in pedagogical responses: 92% (calculated on expert educators test set) - [REQUIRES LEGAL VERIFICATION]",
+          "User satisfaction rate: 4.2/5 stars (1,247 responses) - [REQUIRES LEGAL VERIFICATION]",
+          "Average latency: 245ms per chat request, < 150ms for GPT-5.2 Chat",
+          "Uptime: 99.95% over the past 12 months",
+          "Content error rate: < 2% (significant factual errors in 50,000+ responses analyzed) - [REQUIRES LEGAL VERIFICATION]",
+          "Response time for security emergencies: < 5 minutes for team escalation",
+          "Language coverage: 5 languages (IT, EN, FR, DE, ES) with Tier-1 quality"
+        ]
+      },
+      "ethicsAndCompliance": {
+        "title": "Ethics and Regulatory Compliance",
+        "description": "Compliance with international laws and standards",
+        "regulations": [
+          {
+            "name": "EU AI Act 2024/1689",
+            "status": "COMPLIANT",
+            "details": "Registered as high-risk AI system in education. Article 6: transparency on training data. Article 15: data subject rights. Article 22: no automated discrimination."
+          },
+          {
+            "name": "GDPR (EU 2016/679)",
+            "status": "COMPLIANT",
+            "details": "Art. 5: Principles of lawfulness, fairness and transparency. Art. 6: Legal basis for processing. Art. 22: Right to object to automated decisions. Art. 35: DPIA available upon request."
+          },
+          {
+            "name": "Italian Data Protection (D.Lgs. 196/2003 et seq.)",
+            "status": "COMPLIANT",
+            "details": "Compliant with Italian national regulations on education and minor protection."
+          },
+          {
+            "name": "Italian AI Law (Law 132/2025)",
+            "status": "COMPLIANT",
+            "details": "Implementation of national requirements for AI systems in educational context."
+          },
+          {
+            "name": "WCAG 2.1 Level AA",
+            "status": "COMPLIANT",
+            "details": "Accessible interface for users with visual, motor and hearing disabilities."
+          },
+          {
+            "name": "COPPA (US - if applicable)",
+            "status": "COMPLIANT FOR US USE",
+            "details": "[REQUIRES LEGAL VERIFICATION] - If we use US users < 13 years, we comply with COPPA with parental consent."
+          }
+        ]
+      },
+      "userControl": {
+        "title": "User Control",
+        "description": "What users can control",
+        "items": [
+          "Completely disable personalized AI in settings - historical data access remains",
+          "Select which mentor (person to chat with)",
+          "Export all conversations in JSON format",
+          "Delete specific conversations from history",
+          "Adjust 'character intensity' level (from professional to immersive)",
+          "Choose between different models for specific features (quiz, mindmap, etc.)",
+          "Disable monitoring via analytics",
+          "Request explanation of how AI influenced an educational decision"
+        ]
+      },
+      "reviewCycle": {
+        "title": "Review Cycle",
+        "description": "When and how we review this documentation",
+        "reviewFrequency": "Quarterly (every 3 months)",
+        "nextReview": "27 April 2026",
+        "triggerEvents": [
+          "Significant update to an Azure OpenAI base model",
+          "Discovery of relevant bias in testing",
+          "Security incident report",
+          "Change in regulations (EU AI Act, GDPR, Law 132/2025)",
+          "Feedback from at least 50 users on accuracy or bias"
+        ],
+        "contact": "For questions about this model card, contact: compliance@mirrorbuddy.com"
       }
     }
   },
-  "modelCard": {
-    "title": "AI Model Technical Card",
-    "version": "1.0",
-    "lastUpdated": "27 January 2026",
-    "provider": {
-      "name": "Microsoft Azure OpenAI",
-      "description": "Primary provider of conversational AI models for MirrorBuddy",
-      "website": "https://azure.microsoft.com/services/cognitive-services/openai-service/",
-      "euCompliance": "Compliant with GDPR, RGPD and EU AI Act (2024/1689)"
-    },
-    "models": {
-      "title": "Available Models",
-      "description": "MirrorBuddy uses the following Azure OpenAI models based on subscription tier",
-      "modelsList": {
-        "gpt4oMini": {
-          "name": "GPT-4o Mini",
-          "tier": "Trial",
-          "contextWindow": "128k token",
-          "latency": "< 500ms",
-          "knowledgeCutoff": "October 2024",
-          "capabilities": "Conversational chat, understanding educational texts, quizzes and flashcards"
-        },
-        "gpt52mini": {
-          "name": "GPT-5.2 Mini",
-          "tier": "Base",
-          "contextWindow": "200k token",
-          "latency": "< 300ms",
-          "knowledgeCutoff": "December 2024",
-          "capabilities": "Personalized teaching, text analysis, advanced quiz creation"
-        },
-        "gpt52edu": {
-          "name": "GPT-5.2 Education",
-          "tier": "Base",
-          "contextWindow": "256k token",
-          "latency": "< 200ms",
-          "knowledgeCutoff": "December 2024",
-          "capabilities": "Specialized teaching for students with learning difficulties, adaptive exercises"
-        },
-        "gpt52chat": {
-          "name": "GPT-5.2 Chat",
-          "tier": "Pro",
-          "contextWindow": "256k token",
-          "latency": "< 150ms",
-          "knowledgeCutoff": "December 2024",
-          "capabilities": "Complex multi-turn conversations, advanced reasoning, multilingual support"
-        },
-        "gptRealtimeMini": {
-          "name": "GPT Realtime Mini",
-          "tier": "Pro",
-          "contextWindow": "128k token",
-          "latency": "< 300ms (audio)",
-          "knowledgeCutoff": "November 2024",
-          "capabilities": "Real-time voice conversation, hybrid text-audio interactions"
-        }
-      }
-    },
-    "capabilities": {
-      "title": "Model Capabilities",
-      "description": "What the model DOES well",
-      "items": [
-        "Natural conversation in Italian, English, French, German and Spanish",
-        "Explanation of complex concepts in an accessible way for neurodivergent students",
-        "Personalization of teaching based on learning style",
-        "Creation of adaptive flashcards and quizzes based on FSRS",
-        "Generation of mind maps and summaries",
-        "Emotional support and encouragement during learning",
-        "Processing PDF documents for knowledge extraction"
-      ]
-    },
-    "limitations": {
-      "title": "Model Limitations",
-      "description": "What the model DOES NOT do well - [REQUIRES LEGAL VERIFICATION]",
-      "items": [
-        "Does not replace a human teacher or medical professional",
-        "Cannot diagnose health conditions or learning disorders",
-        "Has no access to real-time information (internet searches, current prices)",
-        "Cannot make critical decisions autonomously - always requires human supervision",
-        "Does not guarantee 100% accuracy in complex technical answers",
-        "Cannot read image files beyond text and graphics"
-      ]
-    },
-    "trainingData": {
-      "title": "Training Data",
-      "description": "[REQUIRES LEGAL VERIFICATION] - Information about the data sources used to train the model",
-      "items": [
-        "Trained on public corpora and educational books until October/December 2024",
-        "Includes Italian texts from public sources (not GDPR compliant, not AI Act compliant) - [REQUIRES LEGAL VERIFICATION]",
-        "Contains texts from Wikipedia, open educational resources and public domain books",
-        "Does NOT include personally identifiable information (PII) like names, addresses, phone numbers",
-        "Microsoft does not retain user input data for additional training - compliant with GDPR Art. 5"
-      ]
-    },
-    "intendedUse": {
-      "title": "Intended Use",
-      "description": "How MirrorBuddy intends to use the model",
-      "items": [
-        "Support for personalized learning for students with SLD (Specific Learning Disorders)",
-        "Interactive tutoring in mathematics, sciences, languages, history and art",
-        "Creation of adaptive educational content",
-        "Support for teachers in preparing teaching materials",
-        "Assistance for parents in monitoring school progress",
-        "Emotional support and motivation during study"
-      ]
-    },
-    "outOfScope": {
-      "title": "Prohibited Uses (Out-of-Scope)",
-      "description": "What is PROHIBITED with the model according to EU AI Act Art. 6",
-      "items": [
-        "Discrimination or profiling based on race, gender, religion, disability",
-        "Collection of biometric data without explicit consent",
-        "Use for military purposes, weapons, or violence",
-        "Emotional manipulation or ideological indoctrination",
-        "Privacy violations by collecting personal data beyond what is necessary",
-        "Fully automated decisions without human intervention (e.g. grade assignment)",
-        "Use for mass surveillance monitoring without consent",
-        "Commercial use for non-educational purposes"
-      ]
-    },
-    "safetyMeasures": {
-      "title": "Integrated Safety Measures",
-      "description": "How MirrorBuddy protects the use of the model",
-      "items": [
-        "Safety filters against harmful, violent or sexual content - integrated in Azure OpenAI",
-        "Real-time monitoring of interactions to detect abuse",
-        "Automatic timeout after 2 hours of inactivity",
-        "Audit logs to track all model usage - compliant with GDPR Art. 5(f)",
-        "Rate limiting to prevent abuse (max 100 requests/hour for Trial users)",
-        "Human intervention required for critical educational decisions (grade assignment, level progression)",
-        "Explicit disclaimer that AI supports but does not replace human teachers"
-      ]
-    },
-    "biasAndFairness": {
-      "title": "Bias and Fairness",
-      "description": "[REQUIRES LEGAL VERIFICATION] - How MirrorBuddy assesses and mitigates bias",
-      "items": [
-        "Regular testing for gender, race and ethnicity bias in educational responses - [REQUIRES LEGAL VERIFICATION]",
-        "Balanced representation of cultures, religions and historical perspectives in content",
-        "Monitoring equity in access to premium features for disadvantaged students",
-        "Quarterly fairness audit conducted by external experts - [REQUIRES LEGAL VERIFICATION]",
-        "Reporting mechanism for students and parents to flag responses seen as unfair or discriminatory",
-        "Correlation between model performance and demographic factors tracked to identify disparities",
-        "Mitigation through fine-tuning and prompt engineering to reduce stereotypes"
-      ]
-    },
-    "performanceMetrics": {
-      "title": "Performance Metrics",
-      "description": "[REQUIRES LEGAL VERIFICATION] - How we measure model effectiveness",
-      "items": [
-        "Accuracy in pedagogical responses: 92% (calculated on expert educators test set) - [REQUIRES LEGAL VERIFICATION]",
-        "User satisfaction rate: 4.2/5 stars (1,247 responses) - [REQUIRES LEGAL VERIFICATION]",
-        "Average latency: 245ms per chat request, < 150ms for GPT-5.2 Chat",
-        "Uptime: 99.95% over the past 12 months",
-        "Content error rate: < 2% (significant factual errors in 50,000+ responses analyzed) - [REQUIRES LEGAL VERIFICATION]",
-        "Response time for security emergencies: < 5 minutes for team escalation",
-        "Language coverage: 5 languages (IT, EN, FR, DE, ES) with Tier-1 quality"
-      ]
-    },
-    "ethicsAndCompliance": {
-      "title": "Ethics and Regulatory Compliance",
-      "description": "Compliance with international laws and standards",
-      "regulations": [
-        {
-          "name": "EU AI Act 2024/1689",
-          "status": "COMPLIANT",
-          "details": "Registered as high-risk AI system in education. Article 6: transparency on training data. Article 15: data subject rights. Article 22: no automated discrimination."
-        },
-        {
-          "name": "GDPR (EU 2016/679)",
-          "status": "COMPLIANT",
-          "details": "Art. 5: Principles of lawfulness, fairness and transparency. Art. 6: Legal basis for processing. Art. 22: Right to object to automated decisions. Art. 35: DPIA available upon request."
-        },
-        {
-          "name": "Italian Data Protection (D.Lgs. 196/2003 et seq.)",
-          "status": "COMPLIANT",
-          "details": "Compliant with Italian national regulations on education and minor protection."
-        },
-        {
-          "name": "Italian AI Law (Law 132/2025)",
-          "status": "COMPLIANT",
-          "details": "Implementation of national requirements for AI systems in educational context."
-        },
-        {
-          "name": "WCAG 2.1 Level AA",
-          "status": "COMPLIANT",
-          "details": "Accessible interface for users with visual, motor and hearing disabilities."
-        },
-        {
-          "name": "COPPA (US - if applicable)",
-          "status": "COMPLIANT FOR US USE",
-          "details": "[REQUIRES LEGAL VERIFICATION] - If we use US users < 13 years, we comply with COPPA with parental consent."
-        }
-      ]
-    },
-    "userControl": {
-      "title": "User Control",
-      "description": "What users can control",
-      "items": [
-        "Completely disable personalized AI in settings - historical data access remains",
-        "Select which mentor (person to chat with)",
-        "Export all conversations in JSON format",
-        "Delete specific conversations from history",
-        "Adjust 'character intensity' level (from professional to immersive)",
-        "Choose between different models for specific features (quiz, mindmap, etc.)",
-        "Disable monitoring via analytics",
-        "Request explanation of how AI influenced an educational decision"
-      ]
-    },
-    "reviewCycle": {
-      "title": "Review Cycle",
-      "description": "When and how we review this documentation",
-      "reviewFrequency": "Quarterly (every 3 months)",
-      "nextReview": "27 April 2026",
-      "triggerEvents": [
-        "Significant update to an Azure OpenAI base model",
-        "Discovery of relevant bias in testing",
-        "Security incident report",
-        "Change in regulations (EU AI Act, GDPR, Law 132/2025)",
-        "Feedback from at least 50 users on accuracy or bias"
-      ],
-      "contact": "For questions about this model card, contact: compliance@mirrorbuddy.com"
-    }
-  },
-  "accessibility": {
+  "accessibilityStatement": {
     "page": {
       "title": "Accessibility Statement",
       "version": "Version {version}",

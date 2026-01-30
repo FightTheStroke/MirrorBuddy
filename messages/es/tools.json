@@ -1,74 +1,4 @@
 {
-  "astuccio": {
-    "title": "Estuche de herramientas",
-    "backToAstuccio": "← Volver al estuche",
-    "toolsCount": "{count} herramientas",
-    "categories": {
-      "upload": {
-        "title": "Cargar",
-        "subtitle": "Importa tus materiales para generar apoyos de estudio"
-      },
-      "create": {
-        "title": "Crear",
-        "subtitle": "Genera materiales de estudio con la ayuda de los profesores"
-      },
-      "search": {
-        "title": "Buscar",
-        "subtitle": "Encuentra recursos y conocimientos en la web"
-      }
-    },
-    "info": {
-      "howItWorks": "¿Cómo funciona?",
-      "step1": {
-        "title": "Elige la herramienta",
-        "description": "Selecciona la herramienta más adecuada para tu objetivo de aprendizaje"
-      },
-      "step2": {
-        "title": "Elige el profesor",
-        "description": "Cada profesor tiene un enfoque único para ayudarte a aprender"
-      },
-      "step3": {
-        "title": "Guarda en la mochila",
-        "description": "Los materiales creados se guardan en tu mochila para reutilizarlos cuando quieras"
-      },
-      "studyTip": {
-        "title": "Consejo de estudio",
-        "description": "Comienza con un <strong>Mapa mental</strong> para tener una visión general, luego crea <strong>Tarjetas</strong> para memorizar los conceptos clave, y finalmente verifica tu preparación con un <strong>Quiz</strong>. ¡Todos los materiales se guardarán en tu <strong>mochila</strong>!"
-      }
-    },
-    "backButton": "Botón atrás",
-    "how_it_works": {
-      "step1_desc": "Elige una herramienta",
-      "step1_title": "Paso 1: Selecciona una herramienta",
-      "step2_desc": "Elige un profesor",
-      "step2_title": "Paso 2: Selecciona un profesor",
-      "step3_desc": "Guarda en tu mochila",
-      "step3_title": "Paso 3: Guarda en la mochila",
-      "title": "Cómo funciona"
-    },
-    "itemCount": "Cantidad de elementos",
-    "study_tip": {
-      "description": "Consejos de estudio personalizados",
-      "title": "Consejo de estudio"
-    }
-  },
-  "zaino": {
-    "print": {
-      "success": "Impresión iniciada",
-      "successDescription": "El documento se abrirá en la ventana de impresión.",
-      "error": "Error de impresión",
-      "errorDescription": "No se puede abrir la ventana de impresión. Verifica la configuración de ventanas emergentes.",
-      "downloadSuccess": "Archivo descargado",
-      "downloadSuccessDescription": "El archivo HTML ha sido descargado.",
-      "downloadError": "Error de descarga",
-      "downloadErrorDescription": "No se puede descargar el archivo.",
-      "ariaLabel": "Imprimir {title}",
-      "button": "Imprimir",
-      "optionsAriaLabel": "Opciones de impresión para {title}",
-      "printPdf": "Imprimir PDF",
-      "downloadHtml": "Descargar HTML"
-    }
-  },
   "tools": {
     "pdf": {
       "label": "PDF",
@@ -105,7 +35,94 @@
     },
     "studyKit": {
       "label": "Study Kit",
-      "description": "Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz"
+      "description": "Carica un PDF e genera automaticamente riassunti, mappe, demo e quiz",
+      "title": "[TRANSLATE] Kit di Studio",
+      "exportModal": {
+        "title": "Exportar",
+        "format": "[TRANSLATE] Formato",
+        "export": "Exportar",
+        "cancel": "Cancelar",
+        "closeLabel": "Cerrar",
+        "description": "Descripción",
+        "error": "Error",
+        "formatLabel": "Formato",
+        "generating": "Generando...",
+        "profileLabel": "Perfil",
+        "success": {
+          "default": "Predeterminado",
+          "withZaino": "Con mochila"
+        }
+      },
+      "list": {
+        "empty": {
+          "title": "Sin documentos",
+          "description": "Sube tu primer documento para empezar a estudiar"
+        },
+        "create": "[TRANSLATE] Crea Nuovo Kit",
+        "cancel": "Cancelar",
+        "delete": "Eliminar",
+        "deleteConfirm": "Confirmar eliminación",
+        "deleteError": "Error de eliminación",
+        "error": {
+          "description": "Error al cargar los kits",
+          "title": "Error"
+        },
+        "filters": {
+          "all": "Todos",
+          "error": "Error",
+          "processing": "Procesando...",
+          "ready": "Listo"
+        },
+        "open": "Abrir",
+        "processing": {
+          "description": "Procesando kit...",
+          "title": "Procesando"
+        },
+        "status": "Estado"
+      },
+      "view": {
+        "title": "[TRANSLATE] Visualizza Kit",
+        "edit": "[TRANSLATE] Modifica",
+        "delete": "[TRANSLATE] Elimina",
+        "back": "Atrás",
+        "backToList": "Volver a la lista",
+        "features": {
+          "demo": {
+            "description": "Simulación interactiva",
+            "title": "Demo"
+          },
+          "mindmap": {
+            "description": "Mapa mental visual",
+            "title": "Mapa mental"
+          },
+          "quiz": {
+            "description": "Preguntas de práctica",
+            "title": "Quiz"
+          },
+          "summary": {
+            "description": "Resumen del contenido",
+            "title": "Resumen"
+          }
+        },
+        "header": "Encabezado",
+        "myKits": "Mis kits",
+        "newKit": "Nuevo kit",
+        "subtitle": "Subtítulo",
+        "uploadTitle": "Cargar PDF"
+      },
+      "uploadProgress": {
+        "uploading": "[TRANSLATE] Caricamento...",
+        "progress": "[TRANSLATE] Progresso: {percent}%",
+        "complete": "[TRANSLATE] Completato",
+        "loadAnother": "Cargar otro",
+        "processingNote": "Se está procesando tu PDF. Esto puede tardar unos minutos.",
+        "status": {
+          "error": "Error",
+          "processing": "Procesando...",
+          "success": "Completado",
+          "uploading": "Cargando"
+        }
+      }
     },
     "mindmap": {
       "label": "Mappa Mentale",
@@ -181,7 +198,109 @@
       "level": "Nivel",
       "none": "Ninguno",
       "recommendedLesson": "Lección recomendada",
-      "title": "Aprende a escribir"
+      "title": "[TRANSLATE] Dattilografia",
+      "speedGame": {
+        "instructions": "¡Escribe las palabras lo más rápido que puedas! Tienes 60 segundos.",
+        "startButton": "Comenzar Juego",
+        "scoreLabel": "Puntuación",
+        "wordsLabel": "Palabras"
+      },
+      "lessonSelector": {
+        "title": "Lecciones - Nivel {level}",
+        "completed": "completadas",
+        "completedBadge": "Completada",
+        "inProgress": "En curso"
+      },
+      "stickyKeys": {
+        "activated": "Teclas persistentes activadas",
+        "restartRequired": "Reinicia la aplicación para aplicar los cambios",
+        "enableFailed": "Activación fallida",
+        "enableManually": "Activa manualmente desde la Configuración del Sistema",
+        "windowsInfo": "Presiona Mayús 5 veces",
+        "windowsHint": "O abre Configuración > Accesibilidad > Teclado",
+        "linuxSettings": "Configuración de Linux",
+        "linuxInfo": "Abre Configuración del Sistema > Accesibilidad > Escritura",
+        "title": "Teclas Persistentes",
+        "unsupported": "No compatible con esta plataforma",
+        "active": "Activo",
+        "description": "Permite presionar las teclas modificadoras una a la vez en lugar de simultáneamente",
+        "enableButton": "Activar Teclas Persistentes",
+        "openSettings": "Abrir Configuración del Sistema",
+        "tipLabel": "Consejo",
+        "tip": "Presiona Mayús 5 veces rápidamente para activar las teclas persistentes en Windows"
+      },
+      "progressTracker": {
+        "noBadges": "Aún no hay insignias"
+      },
+      "visualImpairment": {
+        "wcagCompliance": "Cumplimiento WCAG 2.1 AA:",
+        "visualTitle": "[TRANSLATE] Disabilità Visiva",
+        "visualDesc": "[TRANSLATE] Impostazioni per utenti ipovedenti",
+        "visualHighContrast": "[TRANSLATE] Alto Contrasto",
+        "visualHighContrastDesc": "[TRANSLATE] Aumenta il contrasto dei colori",
+        "visualTextSizeLabel": "[TRANSLATE] Dimensione Testo",
+        "visualTextSizeRange": "[TRANSLATE] Da {min} a {max}",
+        "visualTTS": "[TRANSLATE] Sintesi Vocale (TTS)",
+        "visualTTSDesc": "[TRANSLATE] Leggi il testo ad alta voce",
+        "visualHideTTSSettings": "[TRANSLATE] Nascondi Impostazioni TTS",
+        "visualShowTTSSettings": "[TRANSLATE] Mostra Impostazioni TTS",
+        "visualSpeechRateLabel": "[TRANSLATE] Velocità Voce",
+        "visualSpeechVolumeLabel": "[TRANSLATE] Volume Voce",
+        "visualFocusIndicators": "[TRANSLATE] Indicatori di Focus",
+        "visualFocusIndicatorsDesc": "[TRANSLATE] Evidenzia l'elemento con focus",
+        "visualWCAGCompliance": "[TRANSLATE] Conformità WCAG 2.1 AA"
+      },
+      "oneHanded": {
+        "title": "Modo de Escritura",
+        "hideInfo": "Ocultar info",
+        "showInfo": "Mostrar info",
+        "modes": {
+          "both": {
+            "label": "Dos Manos",
+            "description": "Escritura estándar con ambas manos"
+          },
+          "leftOnly": {
+            "label": "Solo Mano Izquierda",
+            "description": "Lecciones con teclas accesibles desde la mano izquierda"
+          },
+          "rightOnly": {
+            "label": "Solo Mano Derecha",
+            "description": "Lecciones con teclas accesibles desde la mano derecha"
+          }
+        },
+        "info": {
+          "active": "Modo activo:",
+          "description": "Las lecciones mostrarán solo las teclas alcanzables con la mano seleccionada.",
+          "tips": "Consejos:",
+          "tipItems": [
+            "Posiciona el teclado cómodamente frente a ti",
+            "Usa las teclas modificadoras (Mayús, Ctrl) si es necesario",
+            "Haz pausas regulares para evitar la fatiga"
+          ]
+        }
+      },
+      "subtitle": "[TRANSLATE] Impara a digitare velocemente",
+      "beginner": "[TRANSLATE] Principiante",
+      "intermediate": "[TRANSLATE] Intermedio",
+      "advanced": "[TRANSLATE] Avanzato",
+      "qwertz": "[TRANSLATE] QWERTZ",
+      "qwerty": "[TRANSLATE] QWERTY",
+      "azerty": "[TRANSLATE] AZERTY",
+      "dvorak": "[TRANSLATE] Dvorak",
+      "backToGames": "[TRANSLATE] Torna ai Giochi",
+      "backToLessons": "[TRANSLATE] Torna alle Lezioni",
+      "keyboardLayout": "[TRANSLATE] Layout Tastiera",
+      "lessons": "[TRANSLATE] Lezioni",
+      "games": "[TRANSLATE] Giochi",
+      "progress": "[TRANSLATE] Progresso",
+      "infoMultiLanguage": "[TRANSLATE] Supporto Multilingua",
+      "infoMultiLanguageDesc": "[TRANSLATE] Disponibile in italiano, inglese, tedesco, francese, spagnolo",
+      "infoOneHanded": "[TRANSLATE] Modalità Una Mano",
+      "infoOneHandedDesc": "[TRANSLATE] Supporto per digitazione con una sola mano",
+      "infoDSA": "[TRANSLATE] Supporto DSA",
+      "infoDSADesc": "[TRANSLATE] Ottimizzato per studenti con DSA",
+      "infoGamification": "[TRANSLATE] Gamificazione",
+      "infoGamificationDesc": "[TRANSLATE] Guadagna punti e sblocca achievement"
     },
     "search": {
       "label": "Búsqueda web",
@@ -190,9 +309,9 @@
       "resultCount": "Cantidad de resultados",
       "wikipediaOnly": "Solo Wikipedia"
     },
-    "backToAstuccio": "Volver al estuche",
-    "title": "Herramientas",
-    "toolsCount": "Cantidad de herramientas",
+    "backToAstuccio": "[TRANSLATE] Torna all'Astuccio",
+    "title": "[TRANSLATE] Strumenti",
+    "toolsCount": "[TRANSLATE] {count} strumenti",
     "connection": {
       "connected": "Conectado",
       "connecting": "Conectando...",
@@ -292,86 +411,107 @@
     "voice": {
       "label": "Voce",
       "description": "Attiva la conversazione vocale"
-    }
-  },
-  "studyKit": {
-    "exportModal": {
-      "cancel": "Cancelar",
-      "closeLabel": "Cerrar",
-      "description": "Descripción",
-      "error": "Error",
-      "export": "Exportar",
-      "formatLabel": "Formato",
-      "generating": "Generando...",
-      "profileLabel": "Perfil",
-      "success": {
-        "default": "Predeterminado",
-        "withZaino": "Con mochila"
-      },
-      "title": "Exportar"
     },
-    "list": {
-      "cancel": "Cancelar",
-      "delete": "Eliminar",
-      "deleteConfirm": "Confirmar eliminación",
-      "deleteError": "Error de eliminación",
-      "empty": {
-        "description": "No hay kits de estudio",
-        "title": "Sin kits"
-      },
-      "error": {
-        "description": "Error al cargar los kits",
-        "title": "Error"
-      },
-      "filters": {
-        "all": "Todos",
-        "error": "Error",
-        "processing": "Procesando...",
-        "ready": "Listo"
-      },
-      "open": "Abrir",
-      "processing": {
-        "description": "Procesando kit...",
-        "title": "Procesando"
-      },
-      "status": "Estado"
+    "googleDrive": {
+      "dragOrChoose": "Arrastra un archivo aquí o elige desde dónde cargarlo",
+      "fromComputer": "Desde la Computadora",
+      "fromGoogleDrive": "Desde Google Drive",
+      "maxFileSize": "Tamaño máximo: {maxSizeMB} MB",
+      "connectButton": "Conectar Google Drive",
+      "connectPrompt": "Inicia sesión para importar archivos desde tu Google Drive",
+      "searchPlaceholder": "Buscar archivos...",
+      "myDrive": "Mi Drive",
+      "sharedWithMe": "Compartidos conmigo",
+      "noFilesFound": "No se encontraron archivos",
+      "loadMore": "Cargar más",
+      "select": "Seleccionar",
+      "description": "Conecta tu cuenta de Google para cargar archivos desde Drive",
+      "loadingCheck": "Verificando conexión...",
+      "readOnlyAccess": "Acceso de solo lectura a tus archivos",
+      "disconnectButton": "Desconectar Cuenta",
+      "disconnectTitle": "¿Desconectar Google Drive?",
+      "disconnectWarning": "Ya no podrás acceder a los archivos de Google Drive. Puedes reconectarte en cualquier momento.",
+      "disconnectConfirm": "Desconectar",
+      "notConnected": "No Conectado",
+      "capabilities": "Qué puedes hacer con Google Drive:",
+      "capabilityPdf": "Cargar PDFs desde Drive para generar materiales de estudio",
+      "capabilityHomework": "Importar documentos para el asistente de tareas",
+      "capabilityDocuments": "Acceder a tus documentos sin tener que descargarlos",
+      "privacyNotice": "MirrorBuddy accede a los archivos solo con tu autorización. No almacenamos tus archivos de Drive."
     },
-    "uploadProgress": {
-      "loadAnother": "Cargar otro",
-      "processingNote": "Se está procesando tu PDF. Esto puede tardar unos minutos.",
-      "status": {
-        "error": "Error",
-        "processing": "Procesando...",
-        "success": "Completado",
-        "uploading": "Cargando"
-      }
-    },
-    "view": {
-      "back": "Atrás",
-      "backToList": "Volver a la lista",
-      "features": {
-        "demo": {
-          "description": "Simulación interactiva",
-          "title": "Demo"
+    "astuccio": {
+      "title": "Estuche de herramientas",
+      "description": "[TRANSLATE] I tuoi strumenti educativi",
+      "empty": "[TRANSLATE] Nessuno strumento disponibile",
+      "info": {
+        "title": "[TRANSLATE] Informazioni Astuccio",
+        "description": "[TRANSLATE] Qui trovi tutti i tuoi strumenti",
+        "howItWorks": "¿Cómo funciona?",
+        "step1": {
+          "title": "Elige la herramienta",
+          "description": "Selecciona la herramienta más adecuada para tu objetivo de aprendizaje"
         },
-        "mindmap": {
-          "description": "Mapa mental visual",
-          "title": "Mapa mental"
+        "step2": {
+          "title": "Elige el profesor",
+          "description": "Cada profesor tiene un enfoque único para ayudarte a aprender"
         },
-        "quiz": {
-          "description": "Preguntas de práctica",
-          "title": "Quiz"
+        "step3": {
+          "title": "Guarda en la mochila",
+          "description": "Los materiales creados se guardan en tu mochila para reutilizarlos cuando quieras"
         },
-        "summary": {
-          "description": "Resumen del contenido",
-          "title": "Resumen"
+        "studyTip": {
+          "title": "Consejo de estudio",
+          "description": "Comienza con un <strong>Mapa mental</strong> para tener una visión general, luego crea <strong>Tarjetas</strong> para memorizar los conceptos clave, y finalmente verifica tu preparación con un <strong>Quiz</strong>. ¡Todos los materiales se guardarán en tu <strong>mochila</strong>!"
         }
       },
-      "header": "Encabezado",
-      "myKits": "Mis kits",
-      "newKit": "Nuevo kit",
-      "subtitle": "Subtítulo",
-      "uploadTitle": "Cargar PDF"
+      "backToAstuccio": "← Volver al estuche",
+      "toolsCount": "{count} herramientas",
+      "categories": {
+        "upload": {
+          "title": "Cargar",
+          "subtitle": "Importa tus materiales para generar apoyos de estudio"
+        },
+        "create": {
+          "title": "Crear",
+          "subtitle": "Genera materiales de estudio con la ayuda de los profesores"
+        },
+        "search": {
+          "title": "Buscar",
+          "subtitle": "Encuentra recursos y conocimientos en la web"
+        }
+      },
+      "backButton": "Botón atrás",
+      "how_it_works": {
+        "step1_desc": "Elige una herramienta",
+        "step1_title": "Paso 1: Selecciona una herramienta",
+        "step2_desc": "Elige un profesor",
+        "step2_title": "Paso 2: Selecciona un profesor",
+        "step3_desc": "Guarda en tu mochila",
+        "step3_title": "Paso 3: Guarda en la mochila",
+        "title": "Cómo funciona"
+      },
+      "itemCount": "Cantidad de elementos",
+      "study_tip": {
+        "description": "Consejos de estudio personalizados",
+        "title": "Consejo de estudio"
+      }
+    },
+    "zaino": {
+      "print": {
+        "success": "Impresión iniciada",
+        "successDescription": "El documento se abrirá en la ventana de impresión.",
+        "error": "Error de impresión",
+        "errorDescription": "No se puede abrir la ventana de impresión. Verifica la configuración de ventanas emergentes.",
+        "downloadSuccess": "Archivo descargado",
+        "downloadSuccessDescription": "El archivo HTML ha sido descargado.",
+        "downloadError": "Error de descarga",
+        "downloadErrorDescription": "No se puede descargar el archivo.",
+        "ariaLabel": "Imprimir {title}",
+        "button": "Imprimir",
+        "optionsAriaLabel": "Opciones de impresión para {title}",
+        "printPdf": "Imprimir PDF",
+        "downloadHtml": "Descargar HTML"
+      }
     }
   }
 }

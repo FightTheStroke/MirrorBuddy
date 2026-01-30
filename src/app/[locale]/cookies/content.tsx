@@ -18,7 +18,7 @@ import {
 } from "@/lib/auth/cookie-constants";
 
 export function CookiesContent() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none prose-headings:text-slate-900 dark:prose-headings:text-white prose-p:text-slate-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-li:text-slate-700 dark:prose-li:text-gray-300">

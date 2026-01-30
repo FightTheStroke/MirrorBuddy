@@ -49,7 +49,7 @@ export function ConversationDetail({
   conversationId,
   onBack,
 }: ConversationDetailProps) {
-  const t = useTranslations("conversation.detail");
+  const t = useTranslations("chat.conversation.detail");
   const [conversation, setConversation] = useState<ConversationData | null>(
     null,
   );

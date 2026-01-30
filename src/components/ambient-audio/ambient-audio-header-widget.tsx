@@ -19,7 +19,7 @@ import type { AudioPreset } from "@/types";
 import { cn } from "@/lib/utils";
 
 export function AmbientAudioHeaderWidget() {
-  const t = useTranslations("ambientAudio");
+  const t = useTranslations("settings.ambientAudio");
 
   const QUICK_PRESETS: { id: AudioPreset; label: string; icon: string }[] = [
     { id: "focus", label: "Focus", icon: "🎯" },

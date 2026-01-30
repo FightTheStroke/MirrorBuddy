@@ -24,7 +24,7 @@ interface TrialConsentGateProps {
  * - WCAG 2.1 AA accessible
  */
 export function TrialConsentGate({ children }: TrialConsentGateProps) {
-  const t = useTranslations("trialConsent");
+  const t = useTranslations("auth.trialConsent");
   const [consented, setConsented] = useState<boolean>(false);
   const [checkboxChecked, setCheckboxChecked] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);

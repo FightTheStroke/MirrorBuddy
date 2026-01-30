@@ -17,7 +17,7 @@ export function ConnectingState({
   onCancel,
   className,
 }: ConnectingStateProps) {
-  const t = useTranslations("onboarding.voicePanel");
+  const t = useTranslations("welcome.onboarding.voicePanel");
   return (
     <motion.div
       initial={{ opacity: 0 }}

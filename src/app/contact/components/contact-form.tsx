@@ -15,7 +15,7 @@ interface FormErrors {
 }
 
 export function ContactForm() {
-  const t = useTranslations("contact.form");
+  const t = useTranslations("compliance.contact.form");
   const [formData, setFormData] = useState({
     name: "",
     email: "",

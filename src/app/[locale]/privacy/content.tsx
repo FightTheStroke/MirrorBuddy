@@ -4,15 +4,15 @@ import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContent() {
-  const s1 = useTranslations("legal.privacy.section1");
-  const s2 = useTranslations("legal.privacy.section2");
-  const s3 = useTranslations("legal.privacy.section3");
-  const s4 = useTranslations("legal.privacy.section4");
-  const s5 = useTranslations("legal.privacy.section5");
-  const s6 = useTranslations("legal.privacy.section6");
-  const s7 = useTranslations("legal.privacy.section7");
-  const s8 = useTranslations("legal.privacy.section8");
-  const s9 = useTranslations("legal.privacy.section9");
+  const s1 = useTranslations("compliance.legal.privacy.section1");
+  const s2 = useTranslations("compliance.legal.privacy.section2");
+  const s3 = useTranslations("compliance.legal.privacy.section3");
+  const s4 = useTranslations("compliance.legal.privacy.section4");
+  const s5 = useTranslations("compliance.legal.privacy.section5");
+  const s6 = useTranslations("compliance.legal.privacy.section6");
+  const s7 = useTranslations("compliance.legal.privacy.section7");
+  const s8 = useTranslations("compliance.legal.privacy.section8");
+  const s9 = useTranslations("compliance.legal.privacy.section9");
 
   return (
     <>

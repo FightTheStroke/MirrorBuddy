@@ -19,7 +19,7 @@ export function PermissionErrorView({
   onSwitchToChat,
   onClose,
 }: PermissionErrorViewProps) {
-  const t = useTranslations("voice.permission");
+  const t = useTranslations("settings.voice.permission");
   const tCommon = useTranslations("common");
 
   return (

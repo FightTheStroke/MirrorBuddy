@@ -17,7 +17,7 @@ export function LessonSelector({
   onSelectLesson,
   selectedLevel = "beginner",
 }: LessonSelectorProps) {
-  const t = useTranslations("typing.lessonSelector");
+  const t = useTranslations("tools.typing.lessonSelector");
   const lessons = useMemo(() => {
     return getLessonsByLevel(selectedLevel);
   }, [selectedLevel]);
@@ -56,7 +56,7 @@ interface LessonCardProps {
 }
 
 function LessonCard({ lesson, isCurrent, onSelect }: LessonCardProps) {
-  const t = useTranslations("typing.lessonSelector");
+  const t = useTranslations("tools.typing.lessonSelector");
   const isCompleted = lesson.completed;
   const isUnlocked = lesson.unlocked;
 

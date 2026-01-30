@@ -335,39 +335,40 @@
       "whatIsYourName": "¿Cómo te llamas?",
       "years": "Años",
       "yourSupportTeacher": "Tu profesora de apoyo"
-    }
-  },
-  "onboarding": {
-    "transcript": {
-      "conversationActive": "Conversación activa",
-      "conversationTitle": "Título de la conversación",
-      "messagePlural": "mensajes",
-      "messageSingular": "mensaje",
-      "noConversation": "Sin conversación",
-      "userLabel": "Tú"
     },
-    "checklist": {
-      "nameLabel": "Nombre",
-      "ageLabel": "Edad",
-      "schoolLabel": "Escuela",
-      "schoolElementary": "Primaria",
-      "schoolMiddle": "Secundaria",
-      "schoolHigh": "Bachillerato",
-      "differencesLabel": "Dificultades de aprendizaje",
-      "differencesCount": "{count} seleccionadas"
-    },
-    "voicePanel": {
-      "cancel": "Cancelar",
-      "connected": "Conectado",
-      "disableMicrophone": "Desactivar micrófono",
-      "enableMicrophone": "Activar micrófono",
-      "endCall": "Terminar llamada",
-      "listening": "Escuchando",
-      "melissa": "Melissa",
-      "microphoneMuted": "Micrófono silenciado",
-      "speakWithMelissa": "Hablar con Melissa",
-      "speaking": "Hablando",
-      "you": "Tú"
+    "onboarding": {
+      "transcript": {
+        "conversationActive": "Conversación activa",
+        "conversationTitle": "Título de la conversación",
+        "messagePlural": "mensajes",
+        "messageSingular": "mensaje",
+        "noConversation": "Sin conversación",
+        "userLabel": "Tú"
+      },
+      "checklist": {
+        "nameLabel": "Nombre",
+        "ageLabel": "Edad",
+        "schoolLabel": "Escuela",
+        "schoolElementary": "Primaria",
+        "schoolMiddle": "Secundaria",
+        "schoolHigh": "Bachillerato",
+        "differencesLabel": "Dificultades de aprendizaje",
+        "differencesCount": "{count} seleccionadas"
+      },
+      "voicePanel": {
+        "cancel": "Cancelar",
+        "connected": "Conectado",
+        "disableMicrophone": "Desactivar micrófono",
+        "enableMicrophone": "Activar micrófono",
+        "endCall": "Terminar llamada",
+        "listening": "Escuchando",
+        "melissa": "Melissa",
+        "microphoneMuted": "Micrófono silenciado",
+        "speakWithMelissa": "Hablar con Melissa",
+        "speaking": "Hablando",
+        "you": "Tú"
+      },
+      "ageYears": "años"
     }
   },
   "trialConsent": {

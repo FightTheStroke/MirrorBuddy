@@ -64,7 +64,7 @@ import {
 } from "./parent-dashboard/index";
 
 export function GenitoriView() {
-  const tProfile = useTranslations("profile");
+  const tProfile = useTranslations("settings.profile");
   const [pageState, setPageState] = useState<PageState>("loading");
   const [insights, setInsights] = useState<StudentInsights | null>(null);
   const [diaryEntries, setDiaryEntries] = useState<DiaryEntry[]>([]);
