@@ -12,8 +12,8 @@ import {
 export const ACCESSIBILITY_VERSION = "1.0";
 
 export function AccessibilityClient() {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
-  const t = useTranslations("compliance.accessibility");
+  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "accessibility" is a top-level key in compliance.json, flattened at runtime
+  const t = useTranslations("accessibility");
   const locale = useLocale();
 
   // Get country-specific configuration for authority contact

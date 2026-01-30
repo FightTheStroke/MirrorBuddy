@@ -223,10 +223,10 @@ async function main(): Promise<void> {
   console.log("Starting pre-deploy validation...");
 
   // Validate Sentry DSN
-  validateSentryDSN(process.env.NEXT_PUBLIC_SENTRY_DSN);
+  validateSentryDSN(process.env.NEXT_PUBLIC_SENTRY_DSN?.trim());
 
   // Validate Vercel token
-  validateVercelToken(process.env.VERCEL_TOKEN);
+  validateVercelToken(process.env.VERCEL_TOKEN?.trim());
 
   // Validate critical environment variables
   validateCriticalEnvVars();

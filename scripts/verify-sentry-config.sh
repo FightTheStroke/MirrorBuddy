@@ -27,7 +27,7 @@ else
     fi
 
     if [ -n "$DSN_VAR" ]; then
-      DSN=$(grep "^${DSN_VAR}=" "$TEMP_FILE" | cut -d'=' -f2- | tr -d '"')
+      DSN=$(grep "^${DSN_VAR}=" "$TEMP_FILE" | cut -d'=' -f2- | tr -d '"' | tr -d '[:space:]')
       if [ -n "$DSN" ] && [[ "$DSN" =~ ^https://.*@.*\.ingest\.(us|de|eu)\.sentry\.io/[0-9]+$ ]]; then
         echo "✅ ${DSN_VAR}: Valid format"
         echo "   Project: $(echo "$DSN" | cut -d'/' -f4)"
