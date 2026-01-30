@@ -34,6 +34,7 @@ const EXPECTED_SCHEMA_FILES = [
   "tier.prisma", // TierDefinition (subscription tiers)
   "b2b.prisma", // ContactRequest (B2B contact form submissions)
   "locale.prisma", // LocaleConfig (i18n locale configuration)
+  "vault.prisma", // SecretVault (encrypted API key storage)
 ];
 
 // Expected models that should be present across all schema files
@@ -112,6 +113,8 @@ const EXPECTED_MODELS = [
   // locale.prisma
   "LocaleConfig",
   "LocaleAuditLog",
+  // vault.prisma
+  "SecretVault",
 ];
 
 describe("Prisma Schema Split", () => {
