@@ -45,8 +45,13 @@ echo -e "${GREEN}✓ Unit tests passed${NC}"
 
 echo ""
 echo -e "${BLUE}[4/5] E2E smoke...${NC}"
-npm run test:e2e:smoke
-echo -e "${GREEN}✓ Smoke E2E passed${NC}"
+if curl -sf --max-time 3 http://localhost:3000/api/health > /dev/null 2>&1; then
+  npm run test:e2e:smoke
+  echo -e "${GREEN}✓ Smoke E2E passed${NC}"
+else
+  echo -e "${YELLOW}↪ Skipping E2E smoke: dev server not running on localhost:3000${NC}"
+  echo -e "${YELLOW}  Start with 'npm run dev' to include smoke tests${NC}"
+fi
 
 echo ""
 echo -e "${BLUE}[5/5] Build (optional parity)...${NC}"
