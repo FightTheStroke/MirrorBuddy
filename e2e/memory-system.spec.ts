@@ -18,7 +18,7 @@ test.describe("Memory System", () => {
     trialPage: page,
   }) => {
     await page.goto("/settings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Trial users cannot access cross-maestro toggle
     const toggle = page.locator('[data-testid="memory-cross-maestro"]');
@@ -30,7 +30,7 @@ test.describe("Memory System", () => {
     adminPage: page,
   }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     expect(page.url()).toContain("/");
   });
 
@@ -38,7 +38,7 @@ test.describe("Memory System", () => {
     adminPage: page,
   }) => {
     await page.goto("/settings");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Pro users should see memory settings
     const toggle = page.locator('[data-testid="memory-cross-maestro"]');
@@ -49,10 +49,10 @@ test.describe("Memory System", () => {
     trialPage: page,
   }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     await page.reload();
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const urlAfter = page.url();
     expect(urlAfter).toBeDefined();
@@ -62,13 +62,13 @@ test.describe("Memory System", () => {
     trialPage: page,
   }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     await page.goto("/astuccio");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     expect(page.url()).toContain("/");
   });

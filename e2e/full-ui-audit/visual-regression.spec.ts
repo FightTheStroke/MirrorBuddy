@@ -44,14 +44,14 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== HOME PAGE ==========
   test("home page - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("home-desktop.png");
   });
 
   test("home page - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("home-mobile.png");
   });
@@ -59,14 +59,14 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== WELCOME PAGE ==========
   test("welcome page - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/welcome", { waitUntil: "networkidle" });
+    await page.goto("/welcome", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("welcome-desktop.png");
   });
 
   test("welcome page - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/welcome", { waitUntil: "networkidle" });
+    await page.goto("/welcome", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("welcome-mobile.png");
   });
@@ -74,14 +74,14 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== ASTUCCIO PAGE ==========
   test("astuccio page - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/astuccio", { waitUntil: "networkidle" });
+    await page.goto("/astuccio", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("astuccio-desktop.png");
   });
 
   test("astuccio page - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/astuccio", { waitUntil: "networkidle" });
+    await page.goto("/astuccio", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("astuccio-mobile.png");
   });
@@ -89,14 +89,14 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== ADMIN DASHBOARD ==========
   test("admin dashboard - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/admin", { waitUntil: "networkidle" });
+    await page.goto("/admin", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("admin-dashboard-desktop.png");
   });
 
   test("admin dashboard - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/admin", { waitUntil: "networkidle" });
+    await page.goto("/admin", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("admin-dashboard-mobile.png");
   });
@@ -104,7 +104,7 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== SETTINGS (via home page interaction) ==========
   test("settings modal - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(500);
 
     // Click settings button if visible
@@ -121,7 +121,7 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
 
   test("settings modal - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/", { waitUntil: "networkidle" });
+    await page.goto("/", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(500);
 
     // Click settings button if visible
@@ -139,14 +139,14 @@ test.describe("Visual Regression - Baseline Snapshots", () => {
   // ========== LANDING PAGE ==========
   test("landing page - desktop baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.desktop);
-    await page.goto("/landing", { waitUntil: "networkidle" });
+    await page.goto("/landing", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("landing-desktop.png");
   });
 
   test("landing page - mobile baseline", async ({ page }) => {
     await page.setViewportSize(VIEWPORTS.mobile);
-    await page.goto("/landing", { waitUntil: "networkidle" });
+    await page.goto("/landing", { waitUntil: "domcontentloaded" });
     await page.waitForTimeout(WAIT_FOR_STABLE);
     await expect(page).toHaveScreenshot("landing-mobile.png");
   });

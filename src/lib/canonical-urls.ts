@@ -18,14 +18,14 @@ import type { Locale } from "@/i18n/config";
  *
  * @example
  * generateCanonicalUrl('it', '/maestri')
- * // => 'https://mirrorbuddy.edu/it/maestri'
+ * // => 'https://mirrorbuddy.org/it/maestri'
  *
  * generateCanonicalUrl('en', '/search?q=test')
- * // => 'https://mirrorbuddy.edu/en/search?q=test'
+ * // => 'https://mirrorbuddy.org/en/search?q=test'
  */
 export function generateCanonicalUrl(locale: Locale, pathname: string): string {
   // Get base URL from environment, fallback to production domain
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.edu";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org";
 
   // Remove hash fragments (SEO compliance - fragments should not be in canonical)
   const pathWithoutHash = pathname.split("#")[0];

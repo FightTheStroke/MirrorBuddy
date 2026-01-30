@@ -28,7 +28,7 @@ test.describe("AI Act - AI Transparency Page", () => {
 
   test("contains required disclosure sections", async ({ page }) => {
     await page.goto("/ai-transparency");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     const content = await page.textContent("article");
     expect(content).toBeTruthy();
 
@@ -40,7 +40,7 @@ test.describe("AI Act - AI Transparency Page", () => {
 
   test("has model information heading", async ({ page }) => {
     await page.goto("/ai-transparency");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const headings = await page
       .locator("article h1, article h2, article h3")

@@ -21,7 +21,7 @@ interface HreflangLinksProps {
  */
 export function HreflangLinks({
   locales = ["it", "en", "fr", "de", "es"] as const,
-  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.edu",
+  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org",
 }: HreflangLinksProps) {
   const pathname = usePathname();
 

@@ -9,7 +9,7 @@ import type { Locale } from "@/i18n/config";
 
 describe("canonical-urls", () => {
   // Test base URL from environment
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.edu";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org";
 
   describe("generateCanonicalUrl", () => {
     it("generates canonical URL for root path with locale", () => {

@@ -41,7 +41,7 @@ test.describe("Admin Mode - Login Flow", () => {
     await dismissBlockingModals(page);
 
     await page.goto("/login");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Dismiss any TOS modal if still present
     const tosModal = page.locator('[role="dialog"]');
@@ -85,7 +85,7 @@ test.describe("Admin Mode - Login Flow", () => {
     await usernameInput.fill(adminEmail);
     await passwordInput.fill(adminPassword);
     await submitButton.click();
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     expect(
       errors,

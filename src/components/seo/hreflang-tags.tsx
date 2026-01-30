@@ -29,7 +29,7 @@ interface HreflangTagsProps {
 export function HreflangTags({
   pathname,
   locales = ["it", "en", "fr", "de", "es"] as const,
-  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.edu",
+  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org",
 }: HreflangTagsProps) {
   const tags = generateHreflangTags(baseUrl, pathname, locales);
 

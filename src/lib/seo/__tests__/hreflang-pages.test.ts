@@ -8,7 +8,7 @@ import { generateHreflangTags } from "../hreflang";
 import type { Locale } from "../hreflang.types";
 
 describe("F-74: Hreflang tags on specific pages", () => {
-  const baseUrl = "https://mirrorbuddy.edu";
+  const baseUrl = "https://mirrorbuddy.org";
   const locales: readonly Locale[] = ["it", "en", "fr", "de", "es"];
 
   describe("Welcome page", () => {
@@ -27,7 +27,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
       const itTag = tags.find((tag) => tag.hreflang === "it");
 
       expect(itTag).toBeDefined();
-      expect(itTag?.href).toBe("https://mirrorbuddy.edu/it/welcome");
+      expect(itTag?.href).toBe("https://mirrorbuddy.org/it/welcome");
     });
 
     it("should include English welcome variant", () => {
@@ -35,7 +35,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
       const enTag = tags.find((tag) => tag.hreflang === "en");
 
       expect(enTag).toBeDefined();
-      expect(enTag?.href).toBe("https://mirrorbuddy.edu/en/welcome");
+      expect(enTag?.href).toBe("https://mirrorbuddy.org/en/welcome");
     });
   });
 
@@ -61,7 +61,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
       const tags = generateHreflangTags(baseUrl, "/", locales);
       const xDefault = tags.find((tag) => tag.hreflang === "x-default");
 
-      expect(xDefault?.href).toBe("https://mirrorbuddy.edu/it");
+      expect(xDefault?.href).toBe("https://mirrorbuddy.org/it");
     });
   });
 
@@ -90,7 +90,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
         const tags = generateHreflangTags(baseUrl, page, locales);
 
         tags.forEach((tag) => {
-          expect(tag.href).toMatch(/^https:\/\/mirrorbuddy\.edu/);
+          expect(tag.href).toMatch(/^https:\/\/mirrorbuddy\.org/);
           if (tag.hreflang !== "x-default") {
             expect(tag.href).toContain(`/${tag.hreflang}${page}`);
           }
@@ -119,7 +119,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
       const xDefault = tags.find((tag) => tag.hreflang === "x-default");
 
       expect(xDefault).toBeDefined();
-      expect(xDefault?.href).toBe("https://mirrorbuddy.edu/it/welcome");
+      expect(xDefault?.href).toBe("https://mirrorbuddy.org/it/welcome");
     });
 
     it('AC4: Tags should be <link rel="alternate" hreflang="..." href="..." />', () => {
@@ -136,7 +136,7 @@ describe("F-74: Hreflang tags on specific pages", () => {
       const welcomeTags = generateHreflangTags(baseUrl, "/welcome", locales);
       const itWelcomeTag = welcomeTags.find((tag) => tag.hreflang === "it");
 
-      expect(itWelcomeTag?.href).toBe("https://mirrorbuddy.edu/it/welcome");
+      expect(itWelcomeTag?.href).toBe("https://mirrorbuddy.org/it/welcome");
     });
 
     it("AC6: Test on multiple pages (welcome, home, tools)", () => {

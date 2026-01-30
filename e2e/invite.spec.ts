@@ -194,7 +194,7 @@ test.describe("Beta Invite System", () => {
 
     test("should show invite details", async ({ page }) => {
       await page.goto("/admin/invites");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Wait for the invite list to load (mock data or real data)
       // Use longer timeout for API response
@@ -230,7 +230,7 @@ test.describe("Beta Invite System", () => {
 
     test("should open reject modal with reason field", async ({ page }) => {
       await page.goto("/admin/invites");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Wait for the invite list to load (with longer timeout for API response)
       const userOne = page.locator("text=User One");

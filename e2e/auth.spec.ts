@@ -103,12 +103,12 @@ test.describe("Login/Logout Authentication Flow", () => {
     await page.goto("/");
 
     // Wait for app to load and navigate to settings
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Click settings in sidebar (or navigate directly)
     // The logout button is in Settings > Privacy
     // For simplicity, check if we can access settings page
-    await page.goto("/settings", { waitUntil: "networkidle" });
+    await page.goto("/settings", { waitUntil: "domcontentloaded" });
 
     // If user-menu (account section) is visible, we can logout
     const userMenu = page.locator('[data-testid="user-menu"]');
@@ -154,7 +154,7 @@ test.describe("Login/Logout Authentication Flow", () => {
 
     // Navigate to home page where sidebar is available
     await page.goto("/home");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Find and click the logout button in sidebar (has aria-label="Esci")
     const logoutButton = page.locator('button[aria-label="Esci"]');

@@ -11,7 +11,7 @@ import type { Page } from "@playwright/test";
  * Wait for page to be fully rendered and animations complete
  */
 export async function waitForPageReady(page: Page) {
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("domcontentloaded");
   // Wait for any CSS transitions to complete
   await page.waitForTimeout(500);
 }

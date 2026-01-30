@@ -59,7 +59,7 @@ const SKIP_RULES: string[] = [
 /**
  * Constant for waiting for network idle state
  */
-const WAIT_FOR_NETWORK_IDLE = "networkidle";
+const WAIT_FOR_NETWORK_IDLE = "domcontentloaded";
 
 // ============================================================================
 // WCAG 2.1 AA COMPLIANCE - ALL LOCALES

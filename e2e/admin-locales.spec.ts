@@ -22,7 +22,7 @@ test.describe("Admin Locales Management", () => {
     // Mock TOS API to bypass modal
     dismissBlockingModals(adminPage);
     await adminPage.goto("/admin/locales");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
   });
 
   test.describe("Locale List Display", () => {
@@ -88,7 +88,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.reload();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Verify empty state message
       await expect(
@@ -132,7 +132,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.reload();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Get search input
       const searchInput = adminPage.locator(
@@ -188,7 +188,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.reload();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Verify active status badge
       await expect(adminPage.locator("text=Attivo").first()).toBeVisible();
@@ -208,7 +208,7 @@ test.describe("Admin Locales Management", () => {
         .first();
       await createButton.click();
 
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
       expect(adminPage.url()).toContain("/admin/locales/new");
     });
 
@@ -216,7 +216,7 @@ test.describe("Admin Locales Management", () => {
       adminPage,
     }) => {
       await adminPage.goto("/admin/locales/new");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Verify form title
       await expect(
@@ -280,7 +280,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/new");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Fill form
       await adminPage.locator('input[name="id"]').fill("fr");
@@ -305,14 +305,14 @@ test.describe("Admin Locales Management", () => {
       adminPage,
     }) => {
       await adminPage.goto("/admin/locales/new");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       const cancelButton = adminPage
         .locator("button, a")
         .filter({ hasText: /Annulla|Indietro|Cancel/i });
       await cancelButton.click();
 
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
       expect(adminPage.url()).toContain("/admin/locales");
     });
 
@@ -320,7 +320,7 @@ test.describe("Admin Locales Management", () => {
       adminPage,
     }) => {
       await adminPage.goto("/admin/locales/new");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Try to submit empty form
       const submitButton = adminPage
@@ -365,7 +365,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.reload();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Click edit button
       const editButton = adminPage
@@ -374,7 +374,7 @@ test.describe("Admin Locales Management", () => {
         .first();
       await editButton.click();
 
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
       expect(adminPage.url()).toContain("/admin/locales/it/edit");
     });
 
@@ -403,7 +403,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Verify form title indicates edit mode
       await expect(
@@ -476,7 +476,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Update country name
       const countryInput = adminPage.locator('input[name="countryName"]');
@@ -522,7 +522,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.reload();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Look for delete button or context menu
       const deleteButton = adminPage
@@ -556,7 +556,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Look for delete button
       const deleteButton = adminPage
@@ -612,7 +612,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Look for preview button or functionality
       const previewButton = adminPage
@@ -644,7 +644,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Look for preview section
       const previewSection = adminPage
@@ -718,7 +718,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/new");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Create locale
       await adminPage.locator('input[name="id"]').fill("es");
@@ -809,7 +809,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/it/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Update locale
       const countryInput = adminPage.locator('input[name="countryName"]');
@@ -880,7 +880,7 @@ test.describe("Admin Locales Management", () => {
       });
 
       await adminPage.goto("/admin/locales/test/edit");
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       // Look for delete button
       const deleteButton = adminPage

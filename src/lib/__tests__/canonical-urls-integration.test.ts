@@ -202,7 +202,7 @@ describe("canonical-urls integration", () => {
         delete process.env.NEXT_PUBLIC_SITE_URL;
 
         const canonical = generateCanonicalUrl("it", "/maestri");
-        expect(canonical).toContain("mirrorbuddy.edu");
+        expect(canonical).toContain("mirrorbuddy.org");
       } finally {
         process.env.NEXT_PUBLIC_SITE_URL = originalEnv;
       }

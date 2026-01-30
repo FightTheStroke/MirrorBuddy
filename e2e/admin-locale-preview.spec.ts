@@ -40,7 +40,7 @@ test.describe("Admin Locale Preview Functionality", () => {
   }) => {
     // Navigate to admin dashboard
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Locate the locale preview dropdown
     const localeSelect = page.locator(
@@ -60,7 +60,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Get all options
     const options = page.locator(
@@ -88,7 +88,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Select a different locale (English)
     const localeSelect = page.locator(
@@ -114,7 +114,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Change locale to English
     const localeSelect = page.locator(
@@ -135,7 +135,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // No indicator when no preview
     let indicator = page.locator("span:has-text('Anteprima')");
@@ -158,7 +158,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Set preview locale
     const localeSelect = page.locator(
@@ -178,7 +178,7 @@ test.describe("Admin Locale Preview Functionality", () => {
 
   test("F-08-07: reset button clears preview locale", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Set a preview locale
     const localeSelect = page.locator(
@@ -213,7 +213,7 @@ test.describe("Admin Locale Preview Functionality", () => {
 
   test("F-08-08: selecting current locale clears preview", async ({ page }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Get current locale (should be 'it')
     const currentLocale = await page.evaluate(() =>
@@ -252,7 +252,7 @@ test.describe("Admin Locale Preview Functionality", () => {
   }) => {
     // Start in admin dashboard
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Set preview locale to French
     const localeSelect = page.locator(
@@ -275,7 +275,7 @@ test.describe("Admin Locale Preview Functionality", () => {
       // Click first internal link that's not current page
       const firstLink = adminLinks.nth(1);
       await firstLink.click();
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Verify preview is still set
       expect(
@@ -290,7 +290,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const localeSelect = page.locator(
       'select[name="locale-preview"], [data-testid="locale-preview"]',
@@ -321,7 +321,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Set up event listener
     const eventFired = page.evaluate(() => {
@@ -354,7 +354,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const localeSelect = page.locator(
       'select[name="locale-preview"], [data-testid="locale-preview"]',
@@ -378,7 +378,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const resetButton = page.locator(
       'button[aria-label*="Ripristina"], button[title*="Ripristina"], button[aria-label*="Reset"]',
@@ -406,7 +406,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const localeSelect = page.locator(
       'select[name="locale-preview"], [data-testid="locale-preview"]',
@@ -435,7 +435,7 @@ test.describe("Admin Locale Preview Functionality", () => {
     page,
   }) => {
     await page.goto("/admin");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const localeSelect = page.locator(
       'select[name="locale-preview"], [data-testid="locale-preview"]',

@@ -59,7 +59,7 @@ test.describe("Trial Mode - GDPR Compliance", () => {
     // WITHOUT blocking consent wall - this is a GDPR requirement
     // Users must be able to read privacy/terms BEFORE accepting cookies
     await trialPage.goto("/terms");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Terms content should be immediately visible (no blocking wall)
     await expect(
@@ -81,7 +81,7 @@ test.describe("Trial Mode - GDPR Compliance", () => {
 
     // Privacy page must be accessible without blocking consent wall
     await trialPage.goto("/privacy");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Privacy content should be immediately visible
     await expect(
@@ -90,7 +90,7 @@ test.describe("Trial Mode - GDPR Compliance", () => {
 
     // Navigate to terms and verify privacy link exists
     await trialPage.goto("/terms");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const privacyLink = trialPage.locator('a[href*="/privacy"]').first();
     await expect(privacyLink).toBeVisible();
@@ -98,7 +98,7 @@ test.describe("Trial Mode - GDPR Compliance", () => {
 
   test("cookie policy page accessible", async ({ trialPage }) => {
     await trialPage.goto("/cookies");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Cookie policy should be visible
     await expect(
@@ -158,7 +158,7 @@ test.describe("Trial Mode - Status & Limits", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Trial indicator should show remaining chats
     const trialIndicator = trialPage.locator("[data-testid='trial-status']");
@@ -188,7 +188,7 @@ test.describe("Trial Mode - Status & Limits", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Navigate to coach chat
     const coachButton = trialPage
@@ -219,7 +219,7 @@ test.describe("Trial Mode - Status & Limits", () => {
 
   test("trial mode restrictions are in place", async ({ trialPage }) => {
     await trialPage.goto("/", { waitUntil: "domcontentloaded" });
-    await trialPage.waitForLoadState("networkidle").catch(() => {});
+    await trialPage.waitForLoadState("domcontentloaded").catch(() => {});
 
     // Check that page loaded with content
     const visibleContent = trialPage
@@ -297,7 +297,7 @@ test.describe("Trial Mode - Route Audit", () => {
         }
 
         await trialPage
-          .waitForLoadState("networkidle", { timeout: 3000 })
+          .waitForLoadState("domcontentloaded", { timeout: 3000 })
           .catch(() => {});
 
         // F-05: Check for console errors

@@ -122,7 +122,7 @@ export async function testLocaleDetection(
   await page.goto("/");
 
   // Wait for redirect
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("domcontentloaded");
 
   // Check if redirected to correct locale
   const verification = await verifyPageLocale(page, expectedLocale);

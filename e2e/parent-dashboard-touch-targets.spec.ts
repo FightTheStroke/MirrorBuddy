@@ -33,7 +33,7 @@ test.describe("Parent Dashboard - Touch Targets (F-51)", () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to parent dashboard
     await page.goto("/genitori");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(500);
   });
 

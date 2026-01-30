@@ -45,7 +45,7 @@ test.describe("Admin Sidebar Navigation", () => {
     });
 
     await adminPage.goto("/admin");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     await closeOpenDialogs(adminPage);
 
     for (const navItem of ADMIN_NAV_ITEMS) {
@@ -77,7 +77,7 @@ test.describe("Admin Sidebar Navigation", () => {
         ),
         sidebarLink.click({ force: true }),
       ]).catch(() => {});
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
       await closeOpenDialogs(adminPage);
 
       const pathname = new URL(adminPage.url()).pathname;
@@ -143,7 +143,7 @@ test.describe("Admin Sidebar Navigation", () => {
     });
 
     await adminPage.goto("/admin");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     await closeOpenDialogs(adminPage);
 
     const tornaLink = adminPage.locator("aside").locator('a[href="/"]').first();
@@ -166,7 +166,7 @@ test.describe("Admin Sidebar Navigation", () => {
       }),
       tornaButton.click({ force: true }),
     ]);
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     const pathname = new URL(adminPage.url()).pathname;
     const validDestinations = ["/", "/welcome", "/landing"];
@@ -190,7 +190,7 @@ test.describe("Admin Sidebar Navigation", () => {
     await dismissBlockingModals(adminPage);
 
     await adminPage.goto("/admin");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     await closeOpenDialogs(adminPage);
 
     const sidebar = adminPage.locator("aside").first();
@@ -231,7 +231,7 @@ test.describe("Admin Sidebar Navigation", () => {
     await dismissBlockingModals(adminPage);
 
     await adminPage.goto("/admin/users");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     await closeOpenDialogs(adminPage);
 
     const logoLink = adminPage
@@ -241,7 +241,7 @@ test.describe("Admin Sidebar Navigation", () => {
 
     if (await logoLink.isVisible().catch(() => false)) {
       await logoLink.click({ force: true });
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
       await adminPage.waitForTimeout(500);
 
       const pathname = new URL(adminPage.url()).pathname;
@@ -269,7 +269,7 @@ test.describe("Admin Sidebar Navigation", () => {
     });
 
     await adminPage.goto("/admin");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     await closeOpenDialogs(adminPage);
 
     for (const navItem of ADMIN_NAV_ITEMS) {
@@ -289,7 +289,7 @@ test.describe("Admin Sidebar Navigation", () => {
           ),
           link.click({ force: true }),
         ]).catch(() => {});
-        await adminPage.waitForLoadState("networkidle");
+        await adminPage.waitForLoadState("domcontentloaded");
         await closeOpenDialogs(adminPage);
       }
     }

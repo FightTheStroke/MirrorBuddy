@@ -55,7 +55,7 @@ test.describe("hreflang tags", () => {
         .locator('link[rel="alternate"][hreflang="en"]')
         .first();
       const href = await enLink.getAttribute("href");
-      expect(href).toBe("https://mirrorbuddy.edu/en/welcome");
+      expect(href).toContain("/en/welcome");
     });
   });
 

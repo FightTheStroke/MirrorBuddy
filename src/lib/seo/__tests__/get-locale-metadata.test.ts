@@ -31,13 +31,13 @@ describe("getLocaleMetadata", () => {
   it("should set canonical to x-default URL", () => {
     const metadata = getLocaleMetadata("/welcome", locales);
     const canonical = metadata.alternates?.canonical;
-    expect(canonical).toBe("https://mirrorbuddy.edu/it/welcome");
+    expect(canonical).toBe("https://mirrorbuddy.org/it/welcome");
   });
 
   it("should handle root path", () => {
     const metadata = getLocaleMetadata("/", locales);
     const canonical = metadata.alternates?.canonical;
-    expect(canonical).toBe("https://mirrorbuddy.edu/it");
+    expect(canonical).toBe("https://mirrorbuddy.org/it");
   });
 
   it("should use NEXT_PUBLIC_SITE_URL from env if available", () => {

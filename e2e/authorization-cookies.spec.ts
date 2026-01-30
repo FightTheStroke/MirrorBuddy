@@ -189,7 +189,7 @@ test.describe("Cookie Consistency", () => {
 
     // Create user through /api/user
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const cookies = await context.cookies();
 
@@ -220,7 +220,7 @@ test.describe("Cookie Consistency", () => {
   test("Cookies cleared on logout", async ({ page, context }) => {
     // First create a user
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Verify cookies exist
     let cookies = await context.cookies();
@@ -231,7 +231,7 @@ test.describe("Cookie Consistency", () => {
     expect(logoutResponse).not.toBeNull();
 
     // Wait for cookies to be cleared
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Check cookies are cleared
     cookies = await context.cookies();

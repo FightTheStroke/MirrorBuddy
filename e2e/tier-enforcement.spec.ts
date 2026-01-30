@@ -32,7 +32,7 @@ import { test, expect } from "./fixtures/auth-fixtures";
 test.describe("@tier-enforcement Trial Tier - Limits Enforcement", () => {
   test("trial user sees chat limit indicator in UI", async ({ trialPage }) => {
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Check for trial indicator or limit display
     // Trial tier typically shows usage badges/counters
@@ -112,7 +112,7 @@ test.describe("@tier-enforcement Trial Tier - Limits Enforcement", () => {
     });
 
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for upgrade prompt
     const upgradePrompt = trialPage.locator(
@@ -254,7 +254,7 @@ test.describe("@tier-enforcement Pro Tier - Feature Unlocks", () => {
 test.describe("@tier-enforcement Locked Features - Pro Badge", () => {
   test("locked feature shows pro badge in UI", async ({ trialPage }) => {
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for locked/pro badge on features
     const proBadge = trialPage.locator(
@@ -270,7 +270,7 @@ test.describe("@tier-enforcement Locked Features - Pro Badge", () => {
 
   test("voice feature locked for trial tier", async ({ trialPage }) => {
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for voice button or feature
     const voiceButton = trialPage.locator(
@@ -291,7 +291,7 @@ test.describe("@tier-enforcement Locked Features - Pro Badge", () => {
 
   test("pdf export feature locked for trial tier", async ({ trialPage }) => {
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for export button
     const exportButton = trialPage.locator(
@@ -308,7 +308,7 @@ test.describe("@tier-enforcement Locked Features - Pro Badge", () => {
     trialPage,
   }) => {
     await trialPage.goto("/home");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Click on mindmap if visible
     const mindmapButton = trialPage.locator(
@@ -389,7 +389,7 @@ test.describe("@tier-enforcement Upgrade Prompts - 80% Usage", () => {
 test.describe("@tier-enforcement Tier Comparison & Feature Matrix", () => {
   test("tier comparison table displays all tiers", async ({ trialPage }) => {
     await trialPage.goto("/pricing");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for tier cards
     const tierCards = trialPage.locator(
@@ -402,7 +402,7 @@ test.describe("@tier-enforcement Tier Comparison & Feature Matrix", () => {
 
   test("tier comparison shows feature differences", async ({ trialPage }) => {
     await trialPage.goto("/pricing");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for feature rows
     const featureRows = trialPage.locator(
@@ -424,7 +424,7 @@ test.describe("@tier-enforcement Tier Comparison & Feature Matrix", () => {
     trialPage,
   }) => {
     await trialPage.goto("/pricing");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Look for upgrade buttons
     const upgradeButtons = trialPage.locator(
@@ -437,7 +437,7 @@ test.describe("@tier-enforcement Tier Comparison & Feature Matrix", () => {
 
   test("pro tier card shows all features enabled", async ({ trialPage }) => {
     await trialPage.goto("/pricing");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Find pro tier card
     const proCard = trialPage.locator(
@@ -571,7 +571,7 @@ test.describe("@tier-enforcement Tier Transitions", () => {
 test.describe("@tier-enforcement Admin Tier Management", () => {
   test("admin can create new tier", async ({ adminPage }) => {
     await adminPage.goto("/admin/tiers/new");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Form should be visible
     await expect(adminPage.locator('input[name="code"]')).toBeVisible();
@@ -580,7 +580,7 @@ test.describe("@tier-enforcement Admin Tier Management", () => {
 
   test("admin can view tier definitions", async ({ adminPage }) => {
     await adminPage.goto("/admin/tiers");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Should show tier list
     const tierRows = adminPage.locator("table tbody tr");
@@ -591,7 +591,7 @@ test.describe("@tier-enforcement Admin Tier Management", () => {
 
   test("admin sees tier usage metrics", async ({ adminPage }) => {
     await adminPage.goto("/admin/tiers");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Look for metrics display
     const metrics = adminPage.locator(

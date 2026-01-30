@@ -46,7 +46,7 @@ testAllLocales(
   "hero section displays correct beta badge text",
   async ({ localePage }) => {
     await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("networkidle");
+    await localePage.page.waitForLoadState("domcontentloaded");
 
     // Find the beta badge (uppercase span with font-bold)
     const badgeSpan = localePage.page.locator(".uppercase.font-bold").first();
@@ -68,7 +68,7 @@ testAllLocales(
   "hero section displays correct beta subtitle text",
   async ({ localePage }) => {
     await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("networkidle");
+    await localePage.page.waitForLoadState("domcontentloaded");
 
     // Find the beta subtitle (small text inside the badge)
     const badgeDiv = localePage.page
@@ -94,7 +94,7 @@ testAllLocales(
   "hero section aria-label uses translation",
   async ({ localePage }) => {
     await localePage.goto("/welcome");
-    await localePage.page.waitForLoadState("networkidle");
+    await localePage.page.waitForLoadState("domcontentloaded");
 
     // Find the beta badge motion.div
     const betaBadgeMotion = localePage.page
@@ -116,7 +116,7 @@ test("@it: verify Italian beta badge uses correct translations", async ({
   page,
 }) => {
   await page.goto("/it/welcome");
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("domcontentloaded");
 
   // Verify Italian translations are displayed
   const badgeText = await page
@@ -139,7 +139,7 @@ test("@en: verify English beta badge uses correct translations", async ({
   page,
 }) => {
   await page.goto("/en/welcome");
-  await page.waitForLoadState("networkidle");
+  await page.waitForLoadState("domcontentloaded");
 
   // Verify English translations are displayed
   const badgeText = await page

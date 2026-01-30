@@ -21,7 +21,6 @@
  */
 
 import { test, expect, testAllLocales } from "./fixtures";
-import { buildLocalizedPath } from "./fixtures";
 import type { Locale } from "@/i18n/config";
 
 /**
@@ -114,7 +113,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
       const locale = localePage.locale;
 
       // Make API call with locale in URL
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await localePage.page.request.get(url);
 
       expect(response.ok()).toBeTruthy();
@@ -141,7 +140,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     page,
   }) => {
     const locale: Locale = "it";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -172,7 +171,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     page,
   }) => {
     const locale: Locale = "fr";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -204,7 +203,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     page,
   }) => {
     const locale: Locale = "it";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -246,7 +245,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
 
     // Fetch greeting for each locale
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
 
@@ -275,7 +274,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
    */
   test("language teachers should show bilingual content", async ({ page }) => {
     const locale: Locale = "it";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -300,7 +299,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
    */
   test("English locale should show English greetings", async ({ page }) => {
     const locale: Locale = "en";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -325,7 +324,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
    */
   test("Spanish locale should show Spanish greetings", async ({ page }) => {
     const locale: Locale = "es";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -353,7 +352,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
    */
   test("German locale should return German greetings", async ({ page }) => {
     const locale: Locale = "de";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -379,7 +378,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     const locales: Locale[] = ["it", "en", "es", "fr", "de"];
 
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
 
@@ -409,7 +408,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     // Italian test
     {
       const locale: Locale = "it";
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -423,7 +422,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     // French test
     {
       const locale: Locale = "fr";
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -447,7 +446,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     // Italian test
     {
       const locale: Locale = "it";
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -462,7 +461,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     // French test
     {
       const locale: Locale = "fr";
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
       const maestro = maestri.find((m: { id: string }) =>
@@ -483,7 +482,7 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
     "all maestri should have greetings in locale",
     async ({ localePage }) => {
       const locale = localePage.locale;
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await localePage.page.request.get(url);
       const maestri = await response.json();
 
@@ -543,7 +542,7 @@ test.describe("Maestri Greetings - Edge Cases", () => {
    */
   test("should provide fallback greeting for all maestri", async ({ page }) => {
     const locale: Locale = "it";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -563,7 +562,7 @@ test.describe("Maestri Greetings - Edge Cases", () => {
     page,
   }) => {
     const locale: Locale = "it";
-    const url = buildLocalizedPath(locale, "/api/maestri");
+    const url = `/api/maestri?locale=${locale}`;
     const response = await page.request.get(url);
     const maestri = await response.json();
 
@@ -588,7 +587,7 @@ test.describe("Maestri Greetings - Edge Cases", () => {
     const locales: Locale[] = ["it", "en", "es", "fr", "de"];
 
     for (const locale of locales) {
-      const url = buildLocalizedPath(locale, "/api/maestri");
+      const url = `/api/maestri?locale=${locale}`;
       const response = await page.request.get(url);
       const maestri = await response.json();
 

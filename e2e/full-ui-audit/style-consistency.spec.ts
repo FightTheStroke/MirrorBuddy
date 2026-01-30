@@ -50,7 +50,7 @@ test.describe("Style Consistency - Fonts", () => {
       page: playwrightPage,
     }) => {
       await playwrightPage.goto(page.path);
-      await playwrightPage.waitForLoadState("networkidle");
+      await playwrightPage.waitForLoadState("domcontentloaded");
 
       const fontFamily = await playwrightPage.evaluate(() => {
         const body = document.body;
@@ -89,7 +89,7 @@ test.describe("Style Consistency - Fonts", () => {
     });
 
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(500);
 
     // Check if body or main content has OpenDyslexic applied
@@ -123,7 +123,7 @@ test.describe("Style Consistency - Fonts", () => {
 test.describe("Style Consistency - CSS Variables", () => {
   test("light mode CSS variables are set correctly", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const cssVars = await page.evaluate(() => {
       const root = document.documentElement;
@@ -156,7 +156,7 @@ test.describe("Style Consistency - CSS Variables", () => {
     // Emulate dark color scheme
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Add dark class (simulating next-themes)
     await page.evaluate(() => {
@@ -187,7 +187,7 @@ test.describe("Style Consistency - Dark Mode", () => {
     }) => {
       await playwrightPage.emulateMedia({ colorScheme: "dark" });
       await playwrightPage.goto(page.path);
-      await playwrightPage.waitForLoadState("networkidle");
+      await playwrightPage.waitForLoadState("domcontentloaded");
 
       // Simulate next-themes dark class
       await playwrightPage.evaluate(() => {
@@ -220,7 +220,7 @@ test.describe("Style Consistency - Spacing", () => {
   test("content areas have appropriate spacing", async ({ page }) => {
     // Go to Italian locale home page directly (/ redirects to /landing)
     await page.goto("/it/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     // Wait for hydration - main content area appears after hydration
     await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
@@ -282,7 +282,7 @@ test.describe("Style Consistency - Spacing", () => {
 
   test("border radius uses design token", async ({ page }) => {
     await page.goto("/astuccio");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Find cards/buttons and check border radius
     const radiusValues = await page.evaluate(() => {
@@ -330,7 +330,7 @@ test.describe("Style Consistency - Responsive", () => {
       });
       // Go to Italian locale home page directly (/ redirects to /landing)
       await page.goto("/it/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
       // Wait for hydration - main content area appears after hydration
       await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
@@ -361,7 +361,7 @@ test.describe("Style Consistency - Responsive", () => {
 test.describe("Style Consistency - Text Readability", () => {
   test("body text has readable line height", async ({ page }) => {
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const lineHeight = await page.evaluate(() => {
       const body = document.body;
@@ -386,7 +386,7 @@ test.describe("Style Consistency - Text Readability", () => {
   test("text is not too small on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const fontSizes = await page.evaluate(() => {
       const textElements = document.querySelectorAll("p, span, a, button, li");
@@ -425,7 +425,7 @@ test.describe("Style Consistency - Cross-Page Uniformity", () => {
 
     for (const testPage of PAGES_TO_TEST.slice(0, 5)) {
       await page.goto(testPage.path);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const primary = await page.evaluate(() => {
         const root = document.documentElement;
@@ -450,7 +450,7 @@ test.describe("Style Consistency - Cross-Page Uniformity", () => {
 
     for (const testPage of [PAGES_TO_TEST[0], PAGES_TO_TEST[2]]) {
       await page.goto(testPage.path);
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const styles = await page.evaluate(() => {
         const h1 = document.querySelector("h1");

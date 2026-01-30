@@ -132,7 +132,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Find trial badge button in header
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -157,7 +157,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Click trial badge to open dropdown
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -178,7 +178,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Open dropdown
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -200,7 +200,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Open dropdown
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -221,7 +221,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Open dropdown
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -246,7 +246,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Find trial badge
     const trialBadge = trialPage.locator('button:has-text("Trial")');
@@ -266,7 +266,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Open dropdown
     const trialBadge = trialPage.locator('button:has-text("Trial")');

@@ -33,7 +33,7 @@ test.describe("Admin Funnel Dashboard", () => {
     adminPage,
   }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Page title should be visible
     await expect(adminPage.locator("h1")).toContainText("Conversion Funnel");
@@ -50,7 +50,7 @@ test.describe("Admin Funnel Dashboard", () => {
 
   test("F-06: KPI cards display metrics", async ({ adminPage }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Wait for data to load (loading state to disappear)
     await expect(adminPage.locator(".animate-pulse")).toHaveCount(0, {
@@ -69,7 +69,7 @@ test.describe("Admin Funnel Dashboard", () => {
 
   test("F-05: funnel stages section exists", async ({ adminPage }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Wait for data to load
     await expect(adminPage.locator(".animate-pulse")).toHaveCount(0, {
@@ -82,7 +82,7 @@ test.describe("Admin Funnel Dashboard", () => {
 
   test("F-07: users table section exists", async ({ adminPage }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Wait for data to load
     await expect(adminPage.locator(".animate-pulse")).toHaveCount(0, {
@@ -95,7 +95,7 @@ test.describe("Admin Funnel Dashboard", () => {
 
   test("F-07: stage filter dropdown exists", async ({ adminPage }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Wait for data to load
     await expect(adminPage.locator(".animate-pulse")).toHaveCount(0, {
@@ -109,7 +109,7 @@ test.describe("Admin Funnel Dashboard", () => {
 
   test("F-07: search input exists", async ({ adminPage }) => {
     await adminPage.goto("/admin/funnel");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     // Wait for data to load
     await expect(adminPage.locator(".animate-pulse")).toHaveCount(0, {

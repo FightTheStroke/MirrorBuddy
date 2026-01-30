@@ -36,7 +36,7 @@ test.describe("Settings Page Interactions", () => {
       trialPage: page,
     }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Click settings button in sidebar (may be labeled differently)
       const settingsBtn = page
@@ -93,7 +93,7 @@ test.describe("Settings Page Interactions", () => {
       });
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")
@@ -111,7 +111,7 @@ test.describe("Settings Page Interactions", () => {
   test.describe("Interactive Elements", () => {
     test("character selection toggles work", async ({ trialPage: page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")
@@ -158,7 +158,7 @@ test.describe("Settings Page Interactions", () => {
       });
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")
@@ -187,7 +187,7 @@ test.describe("Settings Page Interactions", () => {
       trialPage: page,
     }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")
@@ -229,7 +229,7 @@ test.describe("Settings Page Interactions", () => {
       trialPage: page,
     }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")
@@ -251,7 +251,7 @@ test.describe("Settings Page Interactions", () => {
 
             // Refresh page
             await page.reload();
-            await page.waitForLoadState("networkidle");
+            await page.waitForLoadState("domcontentloaded");
 
             // Navigate back to settings
             const settingsBtnAfter = page
@@ -290,7 +290,7 @@ test.describe("Settings Page Interactions", () => {
       });
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       const settingsBtn = page
         .locator("button")

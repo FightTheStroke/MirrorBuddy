@@ -45,7 +45,7 @@ test.describe("Navigation and Button Functionality", () => {
   test.describe("Welcome Page", () => {
     test("welcome page loads and displays buttons", async ({ page }) => {
       await page.goto("/welcome");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Should have a main heading
       const heading = page.locator("h1, h2").first();
@@ -78,7 +78,7 @@ test.describe("Navigation and Button Functionality", () => {
       });
 
       await page.goto("/welcome");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Click any visible primary buttons
       const buttons = page
@@ -113,7 +113,7 @@ test.describe("Navigation and Button Functionality", () => {
       });
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Test each nav section
       const navItems = ["Professori", "Astuccio", "Zaino", "Impostazioni"];
@@ -134,7 +134,7 @@ test.describe("Navigation and Button Functionality", () => {
 
     test("tool sections are accessible", async ({ page }) => {
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Navigate to Astuccio
       const astuccioBtn = page
@@ -166,7 +166,7 @@ test.describe("Navigation and Button Functionality", () => {
       });
 
       await page.goto("/");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // Navigate to Settings
       const settingsBtn = page
@@ -195,7 +195,7 @@ test.describe("Navigation and Button Functionality", () => {
   test.describe("Interactive Pages", () => {
     test("quiz page redirects to astuccio", async ({ page }) => {
       await page.goto("/quiz");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // /quiz redirects to /astuccio
       await expect(page).toHaveURL(/\/astuccio/);
@@ -206,7 +206,7 @@ test.describe("Navigation and Button Functionality", () => {
 
     test("flashcards page redirects to astuccio", async ({ page }) => {
       await page.goto("/flashcards");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // /flashcards redirects to /astuccio (flashcards are part of astuccio)
       await expect(page).toHaveURL(/\/astuccio/);
@@ -217,7 +217,7 @@ test.describe("Navigation and Button Functionality", () => {
 
     test("study-kit page redirects to home", async ({ page }) => {
       await page.goto("/study-kit");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       // /study-kit redirects to /?view=astuccio which then may redirect to landing/welcome
       // without auth. Just verify the redirect happens and content loads.
@@ -234,7 +234,7 @@ test.describe("Navigation and Button Functionality", () => {
       });
 
       await page.goto("/parent-dashboard");
-      await page.waitForLoadState("networkidle");
+      await page.waitForLoadState("domcontentloaded");
 
       await expect(page.locator("body")).toBeVisible();
       expect(networkErrors).toHaveLength(0);

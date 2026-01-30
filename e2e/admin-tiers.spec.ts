@@ -14,7 +14,7 @@ test.describe("Admin Tiers - Create New Tier", () => {
     adminPage,
   }) => {
     await adminPage.goto("/admin/tiers/new");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     await expect(
       adminPage
@@ -47,7 +47,7 @@ test.describe("Admin Tiers - Create New Tier", () => {
     adminPage,
   }) => {
     await adminPage.goto("/admin/tiers/new");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     const cancelButton = adminPage
       .locator("button, a")
@@ -55,7 +55,7 @@ test.describe("Admin Tiers - Create New Tier", () => {
       .first();
     await cancelButton.click();
 
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
     expect(adminPage.url()).toContain("/admin/tiers");
   });
 
@@ -76,7 +76,7 @@ test.describe("Admin Tiers - Create New Tier", () => {
     });
 
     await adminPage.goto("/admin/tiers/new");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     await adminPage.locator('input[name="code"]').fill("test-tier");
     await adminPage.locator('input[name="name"]').fill("Test Tier");
@@ -116,7 +116,7 @@ test.describe("Admin Tiers - Edit Existing Tier", () => {
     });
 
     await adminPage.goto("/admin/tiers/tier-123/edit");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     await expect(
       adminPage.locator("h1, h2").filter({ hasText: /Modifica Piano/i }),
@@ -165,7 +165,7 @@ test.describe("Admin Tiers - Edit Existing Tier", () => {
     });
 
     await adminPage.goto("/admin/tiers/tier-123/edit");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     const nameInput = adminPage.locator('input[name="name"]');
     await nameInput.clear();
@@ -187,7 +187,7 @@ test.describe("Admin Tiers - Edit Existing Tier", () => {
     adminPage,
   }) => {
     await adminPage.goto("/admin/tiers");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     const editButton = adminPage
       .locator("button, a")
@@ -197,7 +197,7 @@ test.describe("Admin Tiers - Edit Existing Tier", () => {
     const buttonCount = await editButton.count();
     if (buttonCount > 0) {
       await editButton.click();
-      await adminPage.waitForLoadState("networkidle");
+      await adminPage.waitForLoadState("domcontentloaded");
 
       expect(adminPage.url()).toMatch(/\/admin\/tiers\/[^\/]+\/edit/);
 
@@ -245,7 +245,7 @@ test.describe("Admin Tiers - Features Section", () => {
     });
 
     await adminPage.goto("/admin/tiers/tier-123/edit");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     await expect(
       adminPage.locator("h2").filter({ hasText: /Funzionalità/i }),
@@ -322,7 +322,7 @@ test.describe("Admin Tiers - Features Section", () => {
     });
 
     await adminPage.goto("/admin/tiers/tier-123/edit");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     const pdfExportCheckbox = adminPage.locator(
       'input[name="feature-pdf_export"]',
@@ -368,7 +368,7 @@ test.describe("Admin Tiers - Features Section", () => {
     });
 
     await adminPage.goto("/admin/tiers/tier-123/edit");
-    await adminPage.waitForLoadState("networkidle");
+    await adminPage.waitForLoadState("domcontentloaded");
 
     await expect(adminPage.locator("text=Video Vision")).toBeVisible();
     await expect(
