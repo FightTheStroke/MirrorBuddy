@@ -1,11 +1,18 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { maestri, SUBJECT_NAMES } from "@/data/maestri";
+interface MaestroCard {
+  id: string;
+  name: string;
+  displayName: string;
+  avatar: string;
+  color: string;
+  subject: string;
+}
 
 /**
  * Professori Showcase Section - Horizontal Carousel
@@ -19,9 +26,27 @@ import { maestri, SUBJECT_NAMES } from "@/data/maestri";
 export function MaestriShowcaseSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [displayedMaestri, setDisplayedMaestri] = useState<MaestroCard[]>([]);
+  const [subjectNames, setSubjectNames] = useState<Record<string, string>>({});
 
-  // Show all professors - carousel allows scrolling to see them all
-  const displayedMaestri = useMemo(() => maestri, []);
+  // Lazy-load maestri to avoid pulling in heavy systemPrompt chain at compile time
+  useEffect(() => {
+    import("@/data/maestri").then((mod) => {
+      setDisplayedMaestri(
+        mod.maestri.map(
+          ({ id, name, displayName, avatar, color, subject }: MaestroCard) => ({
+            id,
+            name,
+            displayName,
+            avatar,
+            color,
+            subject,
+          }),
+        ),
+      );
+      setSubjectNames(mod.SUBJECT_NAMES ?? {});
+    });
+  }, []);
 
   // Card width (w-44 = 176px) + gap (16px) = 192px per card
   const CARD_WIDTH = 192;
@@ -84,8 +109,8 @@ export function MaestriShowcaseSection() {
         </h2>
 
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {maestri.length} menti straordinarie della storia diventano i tuoi
-          professori personali.
+          {displayedMaestri.length} menti straordinarie della storia diventano i
+          tuoi professori personali.
         </p>
       </motion.div>
 
@@ -140,7 +165,7 @@ export function MaestriShowcaseSection() {
                   <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                     <Image
                       src={maestro.avatar}
-                      alt={`${maestro.displayName} - Professore di ${SUBJECT_NAMES[maestro.subject] || maestro.subject}`}
+                      alt={`${maestro.displayName} - Professore di ${subjectNames[maestro.subject] || maestro.subject}`}
                       width={64}
                       height={64}
                       className="w-full h-full object-cover"
@@ -153,7 +178,7 @@ export function MaestriShowcaseSection() {
                   {maestro.displayName}
                 </h3>
                 <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                  {SUBJECT_NAMES[maestro.subject] || maestro.subject}
+                  {subjectNames[maestro.subject] || maestro.subject}
                 </p>
               </motion.div>
             ))}

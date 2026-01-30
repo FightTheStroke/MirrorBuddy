@@ -13,6 +13,7 @@ interface HeroSectionProps {
  * Hero Section for MirrorBuddy Welcome Page
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
+  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
   const t = useTranslations("welcome.hero");
 
   return (
@@ -114,8 +115,11 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
               className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6"
-              dangerouslySetInnerHTML={{ __html: t("description") }}
-            />
+            >
+              {t.rich("description", {
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
+            </motion.p>
             <AccessibilityFeatures t={t} />
           </>
         )}

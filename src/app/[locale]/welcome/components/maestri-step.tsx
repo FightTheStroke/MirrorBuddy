@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -16,7 +16,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { maestri } from "@/data";
 import { cn } from "@/lib/utils";
 import {
   useOnboardingTTS,
@@ -44,13 +43,41 @@ interface MaestriStepProps {
  * Shows the 16 historical figure tutors available in the platform.
  * Highlights a few featured ones and allows scrolling through all.
  */
+// Lightweight maestro shape for the carousel (no systemPrompt)
+interface MaestroCard {
+  id: string;
+  name: string;
+  avatar: string;
+  color: string;
+  specialty: string;
+  subject: string;
+}
+
 export function MaestriStep(_props: MaestriStepProps) {
+  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
   const t = useTranslations("welcome.principles");
   const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } =
     useOnboardingStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [maestri, setMaestri] = useState<MaestroCard[]>([]);
+
+  // Lazy-load maestri data to avoid pulling in heavy systemPrompt chain
+  useEffect(() => {
+    import("@/data").then(({ maestri: all }) => {
+      setMaestri(
+        all.map(({ id, name, avatar, color, specialty, subject }) => ({
+          id,
+          name,
+          avatar,
+          color,
+          specialty,
+          subject,
+        })),
+      );
+    });
+  }, []);
 
   // Auto-speak Melissa's maestri message
   const { isPlaying, stop } = useOnboardingTTS({
@@ -75,16 +102,20 @@ export function MaestriStep(_props: MaestriStepProps) {
   };
 
   // Sort maestri: featured first, then alphabetically
-  const sortedMaestri = [...maestri].sort((a, b) => {
-    const aFeatured = FEATURED_IDS.includes(a.id);
-    const bFeatured = FEATURED_IDS.includes(b.id);
-    if (aFeatured && !bFeatured) return -1;
-    if (!aFeatured && bFeatured) return 1;
-    if (aFeatured && bFeatured) {
-      return FEATURED_IDS.indexOf(a.id) - FEATURED_IDS.indexOf(b.id);
-    }
-    return a.name.localeCompare(b.name);
-  });
+  const sortedMaestri = useMemo(
+    () =>
+      [...maestri].sort((a, b) => {
+        const aFeatured = FEATURED_IDS.includes(a.id);
+        const bFeatured = FEATURED_IDS.includes(b.id);
+        if (aFeatured && !bFeatured) return -1;
+        if (!aFeatured && bFeatured) return 1;
+        if (aFeatured && bFeatured) {
+          return FEATURED_IDS.indexOf(a.id) - FEATURED_IDS.indexOf(b.id);
+        }
+        return a.name.localeCompare(b.name);
+      }),
+    [maestri],
+  );
 
   const updateScrollButtons = () => {
     if (scrollRef.current) {

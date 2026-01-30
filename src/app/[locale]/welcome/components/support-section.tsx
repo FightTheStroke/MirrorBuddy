@@ -1,12 +1,9 @@
 "use client";
 
-import { useRef, useMemo, useEffect, useState, useCallback } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Lightbulb, Heart } from "lucide-react";
-import { getAllSupportTeachers } from "@/data/support-teachers";
-import { getAllBuddies } from "@/data/buddy-profiles";
-
 interface SupportMember {
   id: string;
   name: string;
@@ -26,32 +23,51 @@ interface SupportMember {
 export function SupportSection() {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
+  const [supportMembers, setSupportMembers] = useState<SupportMember[]>([]);
 
-  // Get all coaches and buddies, combine them
-  const supportMembers = useMemo(() => {
-    const coaches = getAllSupportTeachers();
-    const buddies = getAllBuddies();
-
-    const members: SupportMember[] = [
-      ...coaches.map((c) => ({
-        id: c.id,
-        name: c.name,
-        role: "coach" as const,
-        description: c.personality,
-        avatar: c.avatar,
-        color: c.color,
-      })),
-      ...buddies.map((b) => ({
-        id: b.id,
-        name: b.name,
-        role: "buddy" as const,
-        description: b.personality,
-        avatar: b.avatar,
-        color: b.color,
-      })),
-    ];
-
-    return members;
+  // Lazy-load coaches and buddies to avoid heavy import chain at compile time
+  useEffect(() => {
+    Promise.all([
+      import("@/data/support-teachers"),
+      import("@/data/buddy-profiles"),
+    ]).then(([teachersMod, buddiesMod]) => {
+      const coaches = teachersMod.getAllSupportTeachers();
+      const buddies = buddiesMod.getAllBuddies();
+      setSupportMembers([
+        ...coaches.map(
+          (c: {
+            id: string;
+            name: string;
+            personality: string;
+            avatar: string;
+            color: string;
+          }) => ({
+            id: c.id,
+            name: c.name,
+            role: "coach" as const,
+            description: c.personality,
+            avatar: c.avatar,
+            color: c.color,
+          }),
+        ),
+        ...buddies.map(
+          (b: {
+            id: string;
+            name: string;
+            personality: string;
+            avatar: string;
+            color: string;
+          }) => ({
+            id: b.id,
+            name: b.name,
+            role: "buddy" as const,
+            description: b.personality,
+            avatar: b.avatar,
+            color: b.color,
+          }),
+        ),
+      ]);
+    });
   }, []);
 
   // Card width (w-44 = 176px) + gap (16px) = 192px per card
