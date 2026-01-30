@@ -2,20 +2,24 @@
   "welcome": {
     "page": {
       "loading": "Loading...",
-      "resetConfirm": "Want to start over? All entered data will be deleted."
+      "resetConfirm": "Do you want to start over? All entered data will be deleted."
     },
     "hero": {
       "betaBadge": "Private Beta",
       "betaSubtitle": "MirrorBuddy v0.10",
+      "primaryHeadline": "It doesn't do your homework for you. It helps you understand how to do it.",
+      "primarySubtitle": "MirrorBuddy is a learning companion designed to support studying and critical thinking, not to replace them.",
       "welcomeBack": "Welcome back,",
       "welcomeBackSubtitle": "What are we learning new today?",
       "welcomeNew": "Welcome to MirrorBuddy",
       "tagline": "Your tailored school, with history's masters",
       "taglineWith": "with the Great Professors",
       "taglineAbilities": "whatever your abilities",
-      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historic Professors accompany you personally.",
+      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 26 historic Professors accompany you personally.",
       "accessibility": {
         "title": "Tailored accessibility for you",
+        "introLine1": "Every person learns differently.",
+        "introLine2": "MirrorBuddy adapts — it doesn't force.",
         "readableFonts": "Readable fonts",
         "mindMaps": "Mind maps",
         "textToSpeech": "Text to speech",
@@ -39,9 +43,9 @@
       "betaAccess": {
         "badge": "FULL ACCESS",
         "title": "Have an account?",
-        "feature1": "22 AI Professors",
+        "feature1": "26 AI Professors",
         "feature2": "All tools",
-        "feature3": "Progress saved",
+        "feature3": "Saved progress",
         "cta": "Sign In"
       },
       "trial": {
@@ -52,13 +56,13 @@
         "feature3": "No registration",
         "cta": "Try for free"
       },
-      "login": "Sign In",
+      "login": "Login",
       "updateProfile": "Update profile"
     },
     "tierComparison": {
       "heading": "Choose the perfect plan for you",
-      "subtitle": "Start with a free trial or sign up to unlock more features",
-      "footer": "All plans include access to 22 AI Professors and personalized learning tools",
+      "subtitle": "Start with a free trial or register to unlock more features",
+      "footer": "All plans include access to 26 AI Professors and personalized learning tools",
       "tiers": {
         "trial": {
           "name": "Trial",
@@ -76,11 +80,12 @@
           "name": "Base",
           "tagline": "For registered students",
           "price": "Free",
+          "badge": "Recommended",
           "features": {
             "maestri": "10 Professors",
             "messages": "30 messages/day",
             "voice": "15 minutes voice/day",
-            "savedProgress": "Progress saved"
+            "savedProgress": "Saved progress"
           },
           "cta": "Register"
         },
@@ -90,16 +95,51 @@
           "price": "On request",
           "badge": "Recommended",
           "features": {
-            "maestri": "22 Professors",
+            "maestri": "26 Professors",
             "messagesUnlimited": "Unlimited messages",
             "voiceUnlimited": "Unlimited voice",
             "allTools": "All tools"
           },
           "cta": "Upgrade to Pro"
+        },
+        "schools": {
+          "name": "Schools",
+          "tagline": "For educational institutions",
+          "price": "Custom",
+          "badge": "For Schools",
+          "features": {
+            "curriculum": "Curriculum customization",
+            "classManagement": "Class management",
+            "teacherReports": "Teacher reports",
+            "dedicatedSupport": "Dedicated support"
+          },
+          "cta": "Contact us"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "tagline": "For companies and organizations",
+          "price": "Custom",
+          "features": {
+            "customThemes": "Custom themes (Leadership, AI, Soft Skills)",
+            "customBranding": "Custom branding",
+            "advancedAnalytics": "Advanced analytics",
+            "accountManager": "Dedicated account manager"
+          },
+          "cta": "Contact us"
         }
       },
       "footerNote": "Footer note",
-      "subheading": "Subheading"
+      "subheading": "Subheading",
+      "accessIntroLine1": "You can start without registering.",
+      "accessIntroLine2": "No pressure. No judgment.",
+      "organizationsHeading": "Solutions for your organization",
+      "organizationsSubtitle": "Complete customization for schools and businesses",
+      "organizationsFooter": "Contact us for personalized consulting and a tailored quote",
+      "toggle": {
+        "individuals": "Students & Families",
+        "organizations": "Schools & Businesses",
+        "ariaLabel": "Toggle between students and organizations"
+      }
     },
     "maestri": {
       "heading": "Your",
@@ -109,21 +149,30 @@
       "scrollRight": "Scroll right",
       "carouselLabel": "Professors carousel - use arrows to navigate",
       "scrollHint": "← Scroll to see professors →",
-      "disclaimer": "AI professors are created for educational and demonstration purposes. In the future, each student will be able to create their own personalized professors.",
-      "disclaimerLink": "Learn more"
+      "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
+      "disclaimerLink": "Learn more",
+      "introText": "Inspired by the great minds of history, designed to help you understand.",
+      "educationalDisclaimer": "AI professors are educational tools inspired by historical figures. They do not replace real teachers."
     },
     "support": {
       "heading": "Always by your",
       "headingHighlight": "side",
-      "subtitle": "Coaches for study method and Buddies for emotional support",
+      "subtitle": "Coaches for study methods and Buddies for emotional support",
       "carouselLabel": "Coaches and buddies carousel - use arrows to navigate",
       "scrollHint": "← Scroll to see all →",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right",
       "coach": "Coach",
-      "buddy": "Buddy"
+      "buddy": "Buddy",
+      "introLine1": "Coaches for study methods.",
+      "introLine2": "Buddies for emotional support.",
+      "introDisclaimer": "They don't tell you what to think. They help you find your own way to do it."
     },
     "features": {
       "heading": "Tools for every learning style",
-      "subtitle": "A complete and accessible platform designed for you",
+      "subtitle": "A complete, accessible platform designed for you",
+      "introLine1": "Every tool has a single goal:",
+      "introLine2": "making studying clearer, step by step.",
       "voiceConversation": {
         "label": "Voice Conversation",
         "description": "Talk with your Professors in real time"
@@ -138,7 +187,7 @@
       },
       "interactiveQuizzes": {
         "label": "Interactive Quizzes",
-        "description": "Check your knowledge"
+        "description": "Test your knowledge"
       },
       "gamification": {
         "label": "Gamification",
@@ -150,7 +199,7 @@
       },
       "totalAccessibility": {
         "label": "Total Accessibility",
-        "description": "Designed for dyslexia, ADHD and all"
+        "description": "Designed for dyslexia, ADHD and everyone"
       },
       "integratedPlatform": {
         "label": "Integrated Platform",
@@ -161,18 +210,20 @@
       "heading": "Compliance and",
       "headingHighlight": "Transparency",
       "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
+      "trustIntroLine1": "MirrorBuddy is built for students and families.",
+      "trustIntroLine2": "That's why trust, safety, and transparency come first.",
       "items": {
         "gdpr": {
           "label": "GDPR",
           "description": "EU data protection and privacy"
         },
         "aiAct": {
-          "label": "EU AI Law",
-          "description": "AI regulatory compliance"
+          "label": "EU AI Act",
+          "description": "AI regulation compliance"
         },
         "coppa": {
           "label": "COPPA",
-          "description": "Online protection for minors"
+          "description": "Online child protection"
         },
         "aiTransparency": {
           "label": "AI Transparency",
@@ -180,29 +231,29 @@
         },
         "openSource": {
           "label": "Open Source",
-          "description": "Open source code on GitHub"
+          "description": "Open code on GitHub"
         },
         "apache": {
           "label": "Apache 2.0",
           "description": "Open source license"
         }
       },
-      "footer": "MirrorBuddy is developed by the <link>FightTheStroke Foundation</link>, a non-profit organization for children and families affected by cerebral palsy and pediatric stroke."
+      "footer": "MirrorBuddy is developed by <link>Fightthestroke Foundation</link>, a non-profit organization for children and families affected by cerebral palsy and pediatric stroke."
     },
     "footer": {
       "aiDisclaimer": "Created with AI - responses may contain errors",
       "compliance": {
         "gdpr": {
           "label": "GDPR",
-          "description": "Compliant with European regulations"
+          "description": "European regulation compliant"
         },
         "aiAct": {
-          "label": "AI Law",
+          "label": "AI Act",
           "description": "EU 2024/1689"
         },
         "coppa": {
           "label": "COPPA",
-          "description": "Minor protection"
+          "description": "Child protection"
         },
         "italianLaw": {
           "label": "L.132/2025",
@@ -242,23 +293,23 @@
     },
     "trialLimits": {
       "base": "Base",
-      "ctaButton": "Call to action button",
-      "ctaQuestion": "Call to action question",
-      "exploreNoRegistration": "Explore without registration",
+      "ctaButton": "Cta button",
+      "ctaQuestion": "Cta question",
+      "exploreNoRegistration": "Explore no registration",
       "freeTrialMode": "Free trial mode",
-      "maestri": "Professors",
+      "maestri": "Maestri",
       "messages": "Messages",
       "requestBeta": "Request beta",
-      "subtitle": "Subtitle",
+      "subtitle": "Sottotitolo",
       "tenPerSession": "Ten per session",
       "threeAvailable": "Three available",
-      "title": "Title",
+      "title": "Titolo",
       "tools": "Tools",
-      "wantFullAccess": "Want full access?"
+      "wantFullAccess": "Want full access"
     },
     "voiceFallback": {
       "message": "Message",
-      "title": "Title"
+      "title": "Titolo"
     },
     "welcomeForm": {
       "age": "Age",
@@ -299,7 +350,7 @@
         "ageLabel": "Age",
         "schoolLabel": "School",
         "schoolElementary": "Elementary",
-        "schoolMiddle": "Middle School",
+        "schoolMiddle": "Middle",
         "schoolHigh": "High School",
         "differencesLabel": "Learning differences",
         "differencesCount": "{count} selected"
@@ -323,9 +374,9 @@
   "trialConsent": {
     "title": "Free Trial Mode",
     "subtitle": "Privacy and GDPR consent",
-    "description": "To use free trial mode, you must accept our privacy policy and essential cookies.",
-    "processingIntro": "During free trial, we will process the necessary data to provide you the educational service:",
-    "dataConversations": "Your conversations with AI Professors",
+    "description": "To use the free trial mode, you must accept our privacy policy and essential cookies.",
+    "processingIntro": "During the free trial, we will process the data necessary to provide you with the educational service:",
+    "dataConversations": "Your conversations with the AI Maestros",
     "dataProgress": "Your learning progress and preferences",
     "dataCookies": "Essential cookies for session security",
     "privacyLink": "Read the full privacy policy",
@@ -338,7 +389,7 @@
     "messagesDay": "Messages/day",
     "voiceMinutes": "Voice minutes",
     "toolsDay": "Tools/day",
-    "maestriAvailable": "Professors available",
+    "maestriAvailable": "Maestri available",
     "trialDescription": "You are using the free trial version. Request beta access for unlimited limits and advanced features."
   },
   "hero": {
@@ -348,9 +399,9 @@
     "welcomeBackSubtitle": "Ready for your next learning adventure?",
     "welcomeNew": "Welcome to",
     "tagline": "Learn",
-    "taglineWith": "WITH the Great Teachers",
+    "taglineWith": "WITH the Great Masters",
     "taglineAbilities": "whatever your abilities",
-    "description": "Study with 22 historic Professors. Voice access. Full support for dyslexia, ADHD, and other learning styles.",
+    "description": "Study with 22 historical Professors. Voice access. Full support for dyslexia, ADHD, and other learning styles.",
     "accessibility": {
       "title": "Designed for ALL learning styles",
       "subtitle": "Dedicated support for learning differences"
@@ -361,15 +412,15 @@
     "items": {
       "maestri": {
         "title": "22 AI Professors",
-        "description": "From Euclid to Darwin, learn from extraordinary minds throughout history"
+        "description": "From Euclid to Darwin, learn from extraordinary minds of history"
       },
       "accessibility": {
-        "title": "Accessible to All",
+        "title": "Accessible to Everyone",
         "description": "Readable fonts, text-to-speech, mind maps, adaptive quizzes"
       },
       "voice": {
         "title": "Voice Conversation",
-        "description": "Talk in real-time with your Professors without barriers"
+        "description": "Speak in real-time with your Professors without barriers"
       },
       "personalized": {
         "title": "Personalized Learning",
@@ -395,7 +446,7 @@
       },
       "motorImpairment": {
         "label": "Motor impairment",
-        "features": "Voice commands, large keys, easy control"
+        "features": "Voice commands, large buttons, easy control"
       },
       "autism": {
         "label": "Autism",
@@ -403,7 +454,7 @@
       },
       "auditoryImpairment": {
         "label": "Auditory impairment",
-        "features": "Captions, visual indicators, no audio-only content"
+        "features": "Subtitles, visual indicators, no audio-only content"
       },
       "cerebralPalsy": {
         "label": "Cerebral palsy",
@@ -414,10 +465,10 @@
   "features": {
     "heading": "Tools for every learning style",
     "subtitle": "A complete and accessible platform designed for you",
-    "voiceConversation": "Voice Conversation - Talk with your Professors in real time",
+    "voiceConversation": "Voice Conversation - Speak with your Professors in real-time",
     "mindMaps": "Mind Maps - Visualize and organize concepts",
     "flashcards": "FSRS Flashcards - Memorize with spaced repetition",
-    "interactiveQuizzes": "Interactive Quizzes - Check your knowledge",
+    "interactiveQuizzes": "Interactive Quizzes - Test your knowledge",
     "gamification": "Gamification - Earn XP and unlock achievements",
     "adaptiveLearning": "Adaptive Learning - Adapts to your style and pace"
   },
@@ -437,8 +488,8 @@
       "title": "Have an account?",
       "feature1": "22 AI Professors",
       "feature2": "All tools",
-      "feature3": "Progress saved",
-      "cta": "Sign In"
+      "feature3": "Saved progress",
+      "cta": "Log in"
     },
     "trial": {
       "badge": "FREE TRIAL",
@@ -446,12 +497,12 @@
       "feature1": "3 Professors",
       "feature2": "10 messages/day",
       "feature3": "No registration",
-      "cta": "Try for free"
+      "cta": "Try free"
     }
   },
   "tierComparison": {
     "heading": "Choose the perfect plan for you",
-    "subtitle": "Start with a free trial or sign up to unlock more features",
+    "subtitle": "Start with a free trial or register to unlock more features",
     "tiers": {
       "trial": {
         "name": "Trial",
@@ -463,7 +514,7 @@
           "voice": "5 minutes voice/day",
           "noRegistration": "No registration"
         },
-        "cta": "Try for free"
+        "cta": "Try free"
       },
       "base": {
         "name": "Base",
@@ -473,9 +524,9 @@
           "maestri": "20 Professors",
           "messages": "Unlimited messages",
           "voice": "Unlimited voice",
-          "savedProgress": "Progress saved"
+          "savedProgress": "Saved progress"
         },
-        "cta": "Register"
+        "cta": "Sign up"
       },
       "pro": {
         "name": "Pro",
@@ -499,12 +550,12 @@
     "buddy": "Buddy - They support you emotionally"
   },
   "compliance": {
-    "heading": "Compliance, privacy and transparency",
-    "subtitle": "MirrorBuddy adheres to international regulations",
+    "heading": "Compliance, privacy, and transparency",
+    "subtitle": "MirrorBuddy complies with international regulations",
     "items": {
       "gdpr": "GDPR - EU data protection",
       "aiAct": "EU AI Act - AI regulatory compliance",
-      "coppa": "COPPA - Child protection",
+      "coppa": "COPPA - Children's protection",
       "aiTransparency": "AI Transparency - Public policies",
       "openSource": "Open Source - Code on GitHub"
     }
