@@ -16,7 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 
 export function LoadingState() {
-  const t = useTranslations("profile.genitori");
+  const t = useTranslations("settings.profile.genitori");
   return (
     <div className="flex flex-col items-center justify-center min-h-[300px] gap-4">
       <Loader2 className="h-8 w-8 animate-spin text-primary" />
@@ -31,7 +31,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({ error, onRetry }: ErrorStateProps) {
-  const t = useTranslations("profile.genitori");
+  const t = useTranslations("settings.profile.genitori");
   return (
     <div className="flex flex-col items-center gap-4 text-center py-8">
       <div className="w-14 h-14 rounded-full bg-destructive/10 flex items-center justify-center">
@@ -58,7 +58,7 @@ interface WelcomeBannerProps {
  * Displays above the empty dashboard to explain the current state.
  */
 export function WelcomeBanner({ highContrast = false }: WelcomeBannerProps) {
-  const t = useTranslations("profile.genitori");
+  const t = useTranslations("settings.profile.genitori");
   return (
     <div
       className={cn(
@@ -110,7 +110,7 @@ interface NeedsConsentStateProps {
 }
 
 export function NeedsConsentState({ onConsent }: NeedsConsentStateProps) {
-  const t = useTranslations("profile.genitori");
+  const t = useTranslations("settings.profile.genitori");
   return (
     <Card className="border-border">
       <CardHeader className="text-center pb-2">

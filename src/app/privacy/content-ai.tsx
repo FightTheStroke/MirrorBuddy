@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Section } from "./section";
 
 export function PrivacyContentAI() {
-  const s16 = useTranslations("legal.privacy.section16");
+  const s16 = useTranslations("compliance.legal.privacy.section16");
 
   return (
     <Section number={16} title={s16("title")}>

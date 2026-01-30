@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { useSettingsStore } from "@/lib/stores/settings-store";
 
 export function CrossMaestroMemorySettings() {
-  const t = useTranslations("crossMaestroMemory");
+  const t = useTranslations("settings.crossMaestroMemory");
   const { studentProfile, updateStudentProfile } = useSettingsStore();
   const crossMaestroEnabled = studentProfile.crossMaestroEnabled;
 

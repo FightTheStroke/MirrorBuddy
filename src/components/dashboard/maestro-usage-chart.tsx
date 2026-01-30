@@ -34,7 +34,7 @@ export function MaestroUsageChart({
   sessions,
   className,
 }: MaestroUsageChartProps) {
-  const t = useTranslations("dashboard.maestroUsageChart");
+  const t = useTranslations("admin.dashboard.maestroUsageChart");
   const maestroStats = useMemo(() => {
     const stats = new Map<
       string,

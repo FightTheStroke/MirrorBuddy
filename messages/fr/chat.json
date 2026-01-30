@@ -73,7 +73,108 @@
       "microphonePermission": "Microphone non autorisé. Activez le microphone dans les paramètres de votre navigateur.",
       "sessionTitle": "Session vocale avec {name}",
       "studyMethod": "Méthode d'étude",
-      "emotionalSupport": "Soutien émotionnel"
+      "emotionalSupport": "Soutien émotionnel",
+      "panel": {
+        "connected": "Connecté",
+        "connecting": "Connexion...",
+        "listening": "Écoute",
+        "microphoneDisabled": "Microphone désactivé",
+        "mutedLabel": "Son coupé",
+        "muteLabel": "Couper le son",
+        "speakNow": "Parlez maintenant",
+        "speaking": "En train de parler",
+        "startingCall": "Démarrage de l'appel...",
+        "unmuteLabel": "Activer le son"
+      },
+      "microphoneUnauthorized": "Microphone non autorisé. Activez le microphone dans les paramètres du navigateur.",
+      "permission": {
+        "enableLabel": "Enable Label",
+        "steps": {
+          "findMicrophone": "Find Microphone",
+          "lockIcon": "Lock Icon",
+          "reload": "Reload",
+          "selectAllow": "Select Allow"
+        },
+        "subtitle": "Sottotitolo",
+        "switchToChat": "Switch To Chat",
+        "title": "Titolo"
+      },
+      "label": "Voix",
+      "description": "Activez la conversation vocale avec les Maestri",
+      "chatUI": {
+        "startRecording": "Commencer l'enregistrement",
+        "stopRecording": "Arrêter l'enregistrement",
+        "sendVoiceMessage": "Envoyer message vocal",
+        "cancel": "Annuler",
+        "recordingInProgress": "Enregistrement en cours...",
+        "microphonePermission": "Autorisez l'accès au microphone pour utiliser la voix",
+        "grantPermission": "Autoriser le microphone",
+        "denyPermission": "Refuser l'accès"
+      },
+      "status": {
+        "listening": "À l'écoute...",
+        "processing": "Traitement...",
+        "speaking": "En train de parler...",
+        "connecting": "Connexion...",
+        "ready": "Prêt",
+        "initializing": "Initialisation...",
+        "processing_text": "Transcription..."
+      },
+      "settings": {
+        "title": "Paramètres vocaux",
+        "speed": "Vitesse de lecture",
+        "pitch": "Tonalité",
+        "voiceSelection": "Sélectionner la voix",
+        "volume": "Volume",
+        "enableCaptions": "Activer les sous-titres",
+        "textToSpeech": "Synthèse vocale",
+        "speechToText": "Reconnaissance vocale",
+        "language": "Langue d'écoute",
+        "reset": "Réinitialiser les paramètres"
+      },
+      "errors": {
+        "microphoneDenied": "Accès au microphone refusé. Activez le microphone dans les paramètres.",
+        "microphoneNotFound": "Aucun microphone détecté. Vérifiez votre appareil.",
+        "connectionError": "Erreur de connexion. Vérifiez votre connexion Internet.",
+        "timeout": "Délai d'attente dépassé. Réessayez.",
+        "recordingFailed": "Enregistrement échoué. Réessayez.",
+        "processingError": "Erreur de traitement. Réessayez.",
+        "permissionError": "Erreur de permission. Vérifiez vos paramètres.",
+        "unsupportedBrowser": "Votre navigateur ne supporte pas l'enregistrement vocal.",
+        "unknownError": "Erreur inconnue. Réessayez plus tard."
+      },
+      "trialLimits": {
+        "voiceTitle": "Limite vocale",
+        "minutesRemaining": "{minutes} minutes restantes",
+        "secondsRemaining": "{seconds} secondes restantes",
+        "limitReached": "Limite vocale atteinte",
+        "limitReachedMessage": "Vous avez utilisé tous vos minutes de voix. Mettez à niveau pour un accès vocal illimité.",
+        "upgradePrompt": "Voulez-vous un accès vocal illimité?",
+        "upgrade": "Mettre à niveau"
+      },
+      "accessibility": {
+        "voiceToText": "Convertir la voix en texte",
+        "textAlternative": "Utiliser le texte comme alternative",
+        "captionsToggle": "Basculer les sous-titres",
+        "enableSubtitles": "Activer les sous-titres pour toutes les réponses",
+        "voiceSpeed": "Vitesse de lecture",
+        "slow": "Lent",
+        "normal": "Normal",
+        "fast": "Rapide",
+        "veryFast": "Très rapide",
+        "screenReaderSupport": "Cet outil supporte les lecteurs d'écran"
+      },
+      "confirmations": {
+        "deleteRecording": "Supprimer l'enregistrement?",
+        "discardMessage": "Ignorer le message?",
+        "confirmSend": "Envoyer le message vocal?"
+      },
+      "help": {
+        "title": "Guide vocal",
+        "howToRecord": "Comment enregistrer: Appuyez sur le bouton microphone et parlez clairement.",
+        "tips": "Conseils: Parlez dans un environnement calme pour de meilleurs résultats.",
+        "troubleshooting": "Dépannage: Vérifiez que le microphone fonctionne dans votre navigateur."
+      }
     },
     "handoff": {
       "askToSwitch": "Veux-tu parler avec {name} ?",
@@ -83,247 +184,237 @@
     "loading": "Chargement...",
     "error": "Errore nel caricamento della chat",
     "newChat": "Nuova chat",
-    "clearChat": "Cancella chat"
-  },
-  "conversation": {
-    "detail": {
-      "back": "Retour",
-      "backAriaLabel": "Back Aria Label",
-      "defaultTitle": "Default Title",
-      "emptyMessages": "Empty Messages",
-      "error": {
-        "loadingFailed": "Loading Failed",
-        "notFound": "Not Found",
-        "unknown": "Unknown"
+    "clearChat": "Cancella chat",
+    "conversation": {
+      "handoff": {
+        "title": "Passation de consignes",
+        "description": "Le professeur transfère la conversation",
+        "continue": "Continuer",
+        "accept": "Accept",
+        "decline": "Decline",
+        "question": "Question"
       },
-      "loading": "Chargement...",
-      "summaryLabel": "Summary Label",
-      "timeAt": "Time At"
-    },
-    "handoff": {
-      "accept": "Accept",
-      "decline": "Decline",
-      "question": "Question"
-    },
-    "history": {
-      "dateFormat": {
-        "daysAgo": "Days Ago",
-        "today": "Oggi",
-        "yesterday": "Yesterday"
-      },
-      "empty": {
-        "all": "Tutti",
-        "filtered": "Filtered"
-      },
-      "loading": "Chargement...",
-      "title": "Titolo"
-    },
-    "inactivity": {
-      "closeAriaLabel": "Close Aria Label",
-      "closeButton": "Close Button",
-      "continueButton": "Continue Button",
-      "description": "Descrizione",
-      "message": "Message",
-      "title": "Titolo"
-    },
-    "sidebar": {
-      "deleteConfirm": {
-        "cancel": "Annuler",
-        "delete": "Supprimer",
-        "deleting": "Deleting",
-        "title": "Titolo"
-      },
-      "empty": "Empty",
-      "filters": {
-        "all": "Tutti",
-        "month": "Month",
-        "today": "Oggi",
-        "week": "Week"
-      },
-      "search": {
-        "placeholder": "Placeholder"
-      },
-      "title": "Titolo"
-    },
-    "toolSelection": {
-      "closeAriaLabel": "Close Aria Label",
-      "empty": "Empty",
-      "question": "Question",
-      "search": "Rechercher",
-      "title": "Titolo"
-    }
-  },
-  "session": {
-    "rating": {
-      "close": "Fermer",
-      "feedbackLabel": "Votre avis",
-      "feedbackPlaceholder": "Partagez vos commentaires...",
-      "labels": {
-        "1": "Très mauvais",
-        "2": "Mauvais",
-        "3": "Correct",
-        "4": "Bon",
-        "5": "Excellent"
-      },
-      "minutes": "minutes",
-      "savingError": "Erreur lors de l'enregistrement",
-      "selectError": "Veuillez sélectionner une note",
-      "selectPlaceholder": "Sélectionner un sujet",
-      "sessionWith": "Session avec",
-      "skip": "Passer",
-      "stars": "étoiles",
-      "submit": "Envoyer",
-      "submitting": "Envoi en cours",
-      "title": "Évaluez votre session",
-      "topics": "Sujets abordés"
-    },
-    "controls": {
-      "cancelResponseAriaLabel": "Annuler la réponse",
-      "cancelResponseTooltip": "Annuler la réponse en cours",
-      "endSessionAriaLabel": "Terminer la session",
-      "endSessionTooltip": "Terminer la session vocale",
-      "inputPlaceholder": "Écrivez un message...",
-      "muteAriaLabel": {
-        "muted": "Son coupé",
-        "unmuted": "Son activé"
-      },
-      "muteTooltip": {
-        "muted": "Activer le son",
-        "unmuted": "Couper le son"
-      },
-      "sendButton": "Envoyer",
-      "sendMessageAriaLabel": "Envoyer le message",
-      "sendMessageTooltip": "Envoyer le message",
-      "switchToChatAriaLabel": "Passer au chat",
-      "switchToChatTooltip": "Retourner au chat texte"
-    }
-  },
-  "typing": {
-    "advanced": "Advanced",
-    "azerty": "Azerty",
-    "backToGames": "Back To Games",
-    "backToLessons": "Back To Lessons",
-    "beginner": "Beginner",
-    "dvorak": "Dvorak",
-    "games": "Giochi",
-    "infoDSA": "Info D S A",
-    "infoDSADesc": "Info D S A Desc",
-    "infoGamification": "Info Gamification",
-    "infoGamificationDesc": "Info Gamification Desc",
-    "infoMultiLanguage": "Info Multi Language",
-    "infoMultiLanguageDesc": "Info Multi Language Desc",
-    "infoOneHanded": "Info One Handed",
-    "infoOneHandedDesc": "Info One Handed Desc",
-    "intermediate": "Intermediate",
-    "keyboardLayout": "Keyboard Layout",
-    "lessons": "Lezioni",
-    "level": "Livello",
-    "progress": "Progresso",
-    "qwerty": "Qwerty",
-    "qwertz": "Qwertz",
-    "subtitle": "Sottotitolo",
-    "title": "Titolo",
-    "lessonSelector": {
-      "completed": "Completed",
-      "completedBadge": "Completed Badge",
-      "inProgress": "In Progress",
-      "title": "Titolo"
-    },
-    "oneHanded": {
-      "hideInfo": "Hide Info",
-      "info": {
-        "active": "Attivo",
-        "description": "Descrizione",
-        "tips": "Tips"
-      },
-      "modes": {
-        "both": {
-          "description": "Descrizione",
-          "label": "Label"
+      "detail": {
+        "title": "Détails de la conversation",
+        "created": "Créée le",
+        "messages": "Messages",
+        "back": "Retour",
+        "backAriaLabel": "Back Aria Label",
+        "defaultTitle": "Default Title",
+        "emptyMessages": "Empty Messages",
+        "error": {
+          "loadingFailed": "Loading Failed",
+          "notFound": "Not Found",
+          "unknown": "Unknown"
         },
-        "leftOnly": {
-          "description": "Descrizione",
-          "label": "Label"
+        "loading": "Chargement...",
+        "summaryLabel": "Summary Label",
+        "timeAt": "Time At"
+      },
+      "sidebar": {
+        "title": "Titolo",
+        "new": "Nouvelle conversation",
+        "search": {
+          "placeholder": "Rechercher des conversations..."
         },
-        "rightOnly": {
-          "description": "Descrizione",
-          "label": "Label"
+        "deleteConfirm": {
+          "cancel": "Annuler",
+          "delete": "Supprimer",
+          "deleting": "Deleting",
+          "title": "Titolo"
+        },
+        "empty": "Empty",
+        "filters": {
+          "all": "Tutti",
+          "month": "Month",
+          "today": "Oggi",
+          "week": "Week"
         }
       },
-      "showInfo": "Show Info",
-      "title": "Titolo"
-    },
-    "progressTracker": {
-      "noBadges": "No Badges"
-    },
-    "speedGame": {
-      "instructions": "Instructions",
-      "scoreLabel": "Score Label",
-      "startButton": "Start Button",
-      "wordsLabel": "Words Label"
-    },
-    "stickyKeys": {
-      "activated": "Activated",
-      "active": "Attivo",
-      "description": "Descrizione",
-      "enableButton": "Enable Button",
-      "enableFailed": "Enable Failed",
-      "enableManually": "Enable Manually",
-      "linuxInfo": "Linux Info",
-      "linuxSettings": "Linux Settings",
-      "openSettings": "Open Settings",
-      "restartRequired": "Restart Required",
-      "tip": "Tip",
-      "tipLabel": "Tip Label",
-      "title": "Titolo",
-      "unsupported": "Unsupported",
-      "windowsHint": "Windows Hint",
-      "windowsInfo": "Windows Info"
-    },
-    "visualImpairment": {
-      "visualDesc": "Visual Desc",
-      "visualFocusIndicators": "Visual Focus Indicators",
-      "visualFocusIndicatorsDesc": "Visual Focus Indicators Desc",
-      "visualHideTTSSettings": "Visual Hide T T S Settings",
-      "visualHighContrast": "Visual High Contrast",
-      "visualHighContrastDesc": "Visual High Contrast Desc",
-      "visualShowTTSSettings": "Visual Show T T S Settings",
-      "visualSpeechRateLabel": "Visual Speech Rate Label",
-      "visualSpeechVolumeLabel": "Visual Speech Volume Label",
-      "visualTTS": "Visual T T S",
-      "visualTTSDesc": "Visual T T S Desc",
-      "visualTextSizeLabel": "Visual Text Size Label",
-      "visualTextSizeRange": "Visual Text Size Range",
-      "visualTitle": "Visual Title",
-      "visualWCAGCompliance": "Visual W C A G Compliance"
-    }
-  },
-  "voice": {
-    "panel": {
-      "connected": "Connecté",
-      "connecting": "Connexion...",
-      "listening": "Écoute",
-      "microphoneDisabled": "Microphone désactivé",
-      "mutedLabel": "Son coupé",
-      "muteLabel": "Couper le son",
-      "speakNow": "Parlez maintenant",
-      "speaking": "En train de parler",
-      "startingCall": "Démarrage de l'appel...",
-      "unmuteLabel": "Activer le son"
-    },
-    "connectionError": "Erreur de connexion vocale",
-    "microphoneUnauthorized": "Microphone non autorisé. Activez le microphone dans les paramètres du navigateur.",
-    "permission": {
-      "enableLabel": "Enable Label",
-      "steps": {
-        "findMicrophone": "Find Microphone",
-        "lockIcon": "Lock Icon",
-        "reload": "Reload",
-        "selectAllow": "Select Allow"
+      "history": {
+        "title": "Titolo",
+        "empty": {
+          "filtered": "Aucune conversation trouvée avec ces filtres",
+          "all": "Aucune conversation encore. Commencez à discuter avec un Maestro !"
+        },
+        "loadMore": "Charger plus",
+        "dateFormat": {
+          "daysAgo": "Days Ago",
+          "today": "Oggi",
+          "yesterday": "Yesterday"
+        },
+        "loading": "Chargement..."
       },
+      "inactivity": {
+        "title": "Titolo",
+        "message": "Message",
+        "continue": "Continuer",
+        "end": "Terminer la session",
+        "closeAriaLabel": "Close Aria Label",
+        "closeButton": "Close Button",
+        "continueButton": "Continue Button",
+        "description": "Descrizione"
+      },
+      "toolSelection": {
+        "title": "Titolo",
+        "description": "Choisissez un outil pour continuer",
+        "closeAriaLabel": "Close Aria Label",
+        "empty": "Empty",
+        "question": "Question",
+        "search": "Rechercher"
+      }
+    },
+    "session": {
+      "title": "Session",
+      "start": "Démarrer la session",
+      "end": "Terminer la session",
+      "duration": "Durée",
+      "controls": {
+        "mute": "Couper le son",
+        "unmute": "Activer le son",
+        "endSession": "Terminer",
+        "cancelResponseAriaLabel": "Annuler la réponse",
+        "cancelResponseTooltip": "Annuler la réponse en cours",
+        "endSessionAriaLabel": "Terminer la session",
+        "endSessionTooltip": "Terminer la session vocale",
+        "inputPlaceholder": "Écrivez un message...",
+        "muteAriaLabel": {
+          "muted": "Son coupé",
+          "unmuted": "Son activé"
+        },
+        "muteTooltip": {
+          "muted": "Activer le son",
+          "unmuted": "Couper le son"
+        },
+        "sendButton": "Envoyer",
+        "sendMessageAriaLabel": "Envoyer le message",
+        "sendMessageTooltip": "Envoyer le message",
+        "switchToChatAriaLabel": "Passer au chat",
+        "switchToChatTooltip": "Retourner au chat texte"
+      },
+      "rating": {
+        "close": "Fermer",
+        "feedbackLabel": "Votre avis",
+        "feedbackPlaceholder": "Partagez vos commentaires...",
+        "labels": {
+          "1": "Très mauvais",
+          "2": "Mauvais",
+          "3": "Correct",
+          "4": "Bon",
+          "5": "Excellent"
+        },
+        "minutes": "minutes",
+        "savingError": "Erreur lors de l'enregistrement",
+        "selectError": "Veuillez sélectionner une note",
+        "selectPlaceholder": "Sélectionner un sujet",
+        "sessionWith": "Session avec",
+        "skip": "Passer",
+        "stars": "étoiles",
+        "submit": "Envoyer",
+        "submitting": "Envoi en cours",
+        "title": "Évaluez votre session",
+        "topics": "Sujets abordés"
+      }
+    },
+    "typing": {
+      "advanced": "Advanced",
+      "azerty": "Azerty",
+      "backToGames": "Back To Games",
+      "backToLessons": "Back To Lessons",
+      "beginner": "Beginner",
+      "dvorak": "Dvorak",
+      "games": "Giochi",
+      "infoDSA": "Info D S A",
+      "infoDSADesc": "Info D S A Desc",
+      "infoGamification": "Info Gamification",
+      "infoGamificationDesc": "Info Gamification Desc",
+      "infoMultiLanguage": "Info Multi Language",
+      "infoMultiLanguageDesc": "Info Multi Language Desc",
+      "infoOneHanded": "Info One Handed",
+      "infoOneHandedDesc": "Info One Handed Desc",
+      "intermediate": "Intermediate",
+      "keyboardLayout": "Keyboard Layout",
+      "lessons": "Lezioni",
+      "level": "Livello",
+      "progress": "Progresso",
+      "qwerty": "Qwerty",
+      "qwertz": "Qwertz",
       "subtitle": "Sottotitolo",
-      "switchToChat": "Switch To Chat",
-      "title": "Titolo"
+      "title": "Titolo",
+      "lessonSelector": {
+        "completed": "Completed",
+        "completedBadge": "Completed Badge",
+        "inProgress": "In Progress",
+        "title": "Titolo"
+      },
+      "oneHanded": {
+        "hideInfo": "Hide Info",
+        "info": {
+          "active": "Attivo",
+          "description": "Descrizione",
+          "tips": "Tips"
+        },
+        "modes": {
+          "both": {
+            "description": "Descrizione",
+            "label": "Label"
+          },
+          "leftOnly": {
+            "description": "Descrizione",
+            "label": "Label"
+          },
+          "rightOnly": {
+            "description": "Descrizione",
+            "label": "Label"
+          }
+        },
+        "showInfo": "Show Info",
+        "title": "Titolo"
+      },
+      "progressTracker": {
+        "noBadges": "No Badges"
+      },
+      "speedGame": {
+        "instructions": "Instructions",
+        "scoreLabel": "Score Label",
+        "startButton": "Start Button",
+        "wordsLabel": "Words Label"
+      },
+      "stickyKeys": {
+        "activated": "Activated",
+        "active": "Attivo",
+        "description": "Descrizione",
+        "enableButton": "Enable Button",
+        "enableFailed": "Enable Failed",
+        "enableManually": "Enable Manually",
+        "linuxInfo": "Linux Info",
+        "linuxSettings": "Linux Settings",
+        "openSettings": "Open Settings",
+        "restartRequired": "Restart Required",
+        "tip": "Tip",
+        "tipLabel": "Tip Label",
+        "title": "Titolo",
+        "unsupported": "Unsupported",
+        "windowsHint": "Windows Hint",
+        "windowsInfo": "Windows Info"
+      },
+      "visualImpairment": {
+        "visualDesc": "Visual Desc",
+        "visualFocusIndicators": "Visual Focus Indicators",
+        "visualFocusIndicatorsDesc": "Visual Focus Indicators Desc",
+        "visualHideTTSSettings": "Visual Hide T T S Settings",
+        "visualHighContrast": "Visual High Contrast",
+        "visualHighContrastDesc": "Visual High Contrast Desc",
+        "visualShowTTSSettings": "Visual Show T T S Settings",
+        "visualSpeechRateLabel": "Visual Speech Rate Label",
+        "visualSpeechVolumeLabel": "Visual Speech Volume Label",
+        "visualTTS": "Visual T T S",
+        "visualTTSDesc": "Visual T T S Desc",
+        "visualTextSizeLabel": "Visual Text Size Label",
+        "visualTextSizeRange": "Visual Text Size Range",
+        "visualTitle": "Visual Title",
+        "visualWCAGCompliance": "Visual W C A G Compliance"
+      }
     }
   }
 }

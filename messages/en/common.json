@@ -79,6 +79,7 @@
     "loadingCheck": "Loading Check",
     "maxFileSize": "Max File Size",
     "minLength": "Min Length",
+    "maxLength": "Maximum length",
     "notConnected": "Not Connected",
     "privacyNotice": "Privacy Notice",
     "readOnlyAccess": "Read Only Access",
@@ -100,34 +101,61 @@
       "selectModels": "Select Models"
     },
     "create": "Create",
-    "update": "Aggiorna"
-  },
-  "status": {
-    "active": "Active",
-    "inactive": "Inactive",
-    "pending": "Pending",
-    "completed": "Completed",
-    "cancelled": "Cancelled",
-    "draft": "Draft",
-    "published": "Published",
-    "archived": "Archived",
-    "deleted": "Deleted",
-    "enabled": "Enabled",
-    "disabled": "Disabled",
-    "online": "Online",
-    "offline": "Offline",
-    "available": "Available",
-    "unavailable": "Unavailable",
-    "processing": "Processing",
-    "success": "Success",
-    "failed": "Failed",
-    "error": "Error"
-  },
-  "ui": {
-    "skeleton": {
-      "sessionLoading": "Session Loading",
-      "sessionLoadingText": "Session Loading Text",
-      "viewLoading": "View Loading"
+    "update": "Update",
+    "skipToMainContent": "Skip to main content",
+    "skipLinkFocused": "Focus moved to main content",
+    "accessibility": {
+      "skipToContent": "Skip to content"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "completed": "Completed",
+      "cancelled": "Cancelled",
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived",
+      "deleted": "Deleted",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "online": "Online",
+      "offline": "Offline",
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "processing": "Processing",
+      "success": "Success",
+      "failed": "Failed",
+      "error": "Error"
+    },
+    "ui": {
+      "skeleton": {
+        "loading": "Loading...",
+        "placeholder": "Placeholder",
+        "sessionLoading": "Session Loading",
+        "sessionLoadingText": "Session Loading Text",
+        "viewLoading": "View Loading"
+      }
+    },
+    "validation": {
+      "required": "This field is required",
+      "email": "Enter a valid email",
+      "minLength": "Minimum {min} characters",
+      "maxLength": "Maximum {max} characters",
+      "pattern": "Invalid format",
+      "numeric": "Must be a number",
+      "common": {
+        "save": "Save"
+      },
+      "auth": {
+        "login": "Login"
+      },
+      "errors": {
+        "notFound": "Not found"
+      },
+      "accessibility": {
+        "skipToContent": "Skip to content"
+      }
     }
   }
 }

@@ -1,74 +1,4 @@
 {
-  "astuccio": {
-    "title": "Pencil Case",
-    "backToAstuccio": "← Back to Pencil Case",
-    "toolsCount": "{count} tools",
-    "categories": {
-      "upload": {
-        "title": "Upload",
-        "subtitle": "Import your materials to generate study aids"
-      },
-      "create": {
-        "title": "Create",
-        "subtitle": "Generate study materials with the help of Professors"
-      },
-      "search": {
-        "title": "Search",
-        "subtitle": "Find resources and insights on the web"
-      }
-    },
-    "info": {
-      "howItWorks": "How It Works?",
-      "step1": {
-        "title": "Choose the Tool",
-        "description": "Select the tool best suited to your learning goal"
-      },
-      "step2": {
-        "title": "Choose the Professor",
-        "description": "Each professor has a unique approach to help you learn"
-      },
-      "step3": {
-        "title": "Save to Backpack",
-        "description": "Created materials are saved in your Backpack to reuse whenever you want"
-      },
-      "studyTip": {
-        "title": "Study Tip",
-        "description": "Start with a <strong>Mind Map</strong> to get an overview, then create <strong>Flashcards</strong> to memorize key concepts, and finally test your preparation with a <strong>Quiz</strong>. All materials will be saved in your <strong>Backpack</strong>!"
-      }
-    },
-    "backButton": "Back Button",
-    "how_it_works": {
-      "step1_desc": "Step1 desc",
-      "step1_title": "Step1 title",
-      "step2_desc": "Step2 desc",
-      "step2_title": "Step2 title",
-      "step3_desc": "Step3 desc",
-      "step3_title": "Step3 title",
-      "title": "Titolo"
-    },
-    "itemCount": "Item Count",
-    "study_tip": {
-      "description": "Descrizione",
-      "title": "Titolo"
-    }
-  },
-  "zaino": {
-    "print": {
-      "success": "Print started",
-      "successDescription": "The document will open in the print window.",
-      "error": "Print error",
-      "errorDescription": "Unable to open print window. Check popup settings.",
-      "downloadSuccess": "File downloaded",
-      "downloadSuccessDescription": "The HTML file has been downloaded.",
-      "downloadError": "Error",
-      "downloadErrorDescription": "Unable to download file.",
-      "ariaLabel": "Print {title}",
-      "button": "Print",
-      "optionsAriaLabel": "Print options for {title}",
-      "printPdf": "Print PDF",
-      "downloadHtml": "Download HTML"
-    }
-  },
   "tools": {
     "pdf": {
       "label": "Upload PDF",
@@ -105,7 +35,94 @@
     },
     "studyKit": {
       "label": "Study Kit",
-      "description": "Upload a PDF and automatically generate summaries, maps, demos, and quizzes"
+      "description": "Upload a PDF and automatically generate summaries, maps, demos, and quizzes",
+      "title": "Study Kit",
+      "exportModal": {
+        "title": "Titolo",
+        "format": "Format",
+        "export": "Export",
+        "cancel": "Cancel",
+        "closeLabel": "Close Label",
+        "description": "Descrizione",
+        "error": "Error",
+        "formatLabel": "Format Label",
+        "generating": "Generazione...",
+        "profileLabel": "Profile Label",
+        "success": {
+          "default": "Default",
+          "withZaino": "With Zaino"
+        }
+      },
+      "list": {
+        "empty": {
+          "title": "No documents",
+          "description": "Upload your first document to start studying"
+        },
+        "create": "Create New Kit",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "deleteConfirm": "Delete Confirm",
+        "deleteError": "Delete Error",
+        "error": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "filters": {
+          "all": "Tutti",
+          "error": "Error",
+          "processing": "Elaborazione...",
+          "ready": "Ready"
+        },
+        "open": "Apri",
+        "processing": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "status": "Stato"
+      },
+      "view": {
+        "title": "View Kit",
+        "edit": "Edit",
+        "delete": "Delete",
+        "back": "Back",
+        "backToList": "Back To List",
+        "features": {
+          "demo": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "mindmap": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "quiz": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "summary": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          }
+        },
+        "header": "Header",
+        "myKits": "My Kits",
+        "newKit": "New Kit",
+        "subtitle": "Sottotitolo",
+        "uploadTitle": "Upload Title"
+      },
+      "uploadProgress": {
+        "uploading": "Uploading...",
+        "progress": "Progress: {percent}%",
+        "complete": "Complete",
+        "loadAnother": "Load Another",
+        "processingNote": "Processing Note",
+        "status": {
+          "error": "Error",
+          "processing": "Elaborazione...",
+          "success": "Completato",
+          "uploading": "Uploading"
+        }
+      }
     },
     "mindmap": {
       "label": "Mind Map",
@@ -181,7 +198,109 @@
       "level": "Livello",
       "none": "Nessuno",
       "recommendedLesson": "Recommended Lesson",
-      "title": "Titolo"
+      "title": "Typing",
+      "speedGame": {
+        "instructions": "Type the words as fast as you can! You have 60 seconds.",
+        "startButton": "Start Game",
+        "scoreLabel": "Score",
+        "wordsLabel": "Words"
+      },
+      "lessonSelector": {
+        "title": "Lessons - Level {level}",
+        "completed": "completed",
+        "completedBadge": "Completed",
+        "inProgress": "In Progress"
+      },
+      "stickyKeys": {
+        "activated": "Sticky Keys activated",
+        "restartRequired": "Restart the application to apply changes",
+        "enableFailed": "Activation failed",
+        "enableManually": "Enable manually from System Settings",
+        "windowsInfo": "Press Shift 5 times",
+        "windowsHint": "Or open Settings > Accessibility > Keyboard",
+        "linuxSettings": "Linux Settings",
+        "linuxInfo": "Open System Settings > Accessibility > Typing",
+        "title": "Sticky Keys",
+        "unsupported": "Not supported on this platform",
+        "active": "Active",
+        "description": "Allows pressing modifier keys one at a time instead of simultaneously",
+        "enableButton": "Enable Sticky Keys",
+        "openSettings": "Open System Settings",
+        "tipLabel": "Tip",
+        "tip": "Press Shift 5 times quickly to activate sticky keys on Windows"
+      },
+      "progressTracker": {
+        "noBadges": "No badges yet"
+      },
+      "visualImpairment": {
+        "wcagCompliance": "WCAG 2.1 AA Compliance:",
+        "visualTitle": "Visual Impairment",
+        "visualDesc": "Settings for users with low vision",
+        "visualHighContrast": "High Contrast",
+        "visualHighContrastDesc": "Increase color contrast",
+        "visualTextSizeLabel": "Text Size",
+        "visualTextSizeRange": "From {min} to {max}",
+        "visualTTS": "Text-to-Speech (TTS)",
+        "visualTTSDesc": "Read text aloud",
+        "visualHideTTSSettings": "Hide TTS Settings",
+        "visualShowTTSSettings": "Show TTS Settings",
+        "visualSpeechRateLabel": "Voice Speed",
+        "visualSpeechVolumeLabel": "Voice Volume",
+        "visualFocusIndicators": "Focus Indicators",
+        "visualFocusIndicatorsDesc": "Highlight the focused element",
+        "visualWCAGCompliance": "WCAG 2.1 AA Compliance"
+      },
+      "oneHanded": {
+        "title": "Typing Mode",
+        "hideInfo": "Hide info",
+        "showInfo": "Show info",
+        "modes": {
+          "both": {
+            "label": "Two Hands",
+            "description": "Standard typing with both hands"
+          },
+          "leftOnly": {
+            "label": "Left Hand Only",
+            "description": "Lessons with keys accessible from left hand"
+          },
+          "rightOnly": {
+            "label": "Right Hand Only",
+            "description": "Lessons with keys accessible from right hand"
+          }
+        },
+        "info": {
+          "active": "Active mode:",
+          "description": "Lessons will show only the keys reachable with the selected hand.",
+          "tips": "Tips:",
+          "tipItems": [
+            "Position the keyboard comfortably in front of you",
+            "Use modifier keys (Shift, Ctrl) if needed",
+            "Take regular breaks to avoid fatigue"
+          ]
+        }
+      },
+      "subtitle": "Learn to type quickly",
+      "beginner": "Beginner",
+      "intermediate": "Intermediate",
+      "advanced": "Advanced",
+      "qwertz": "QWERTZ",
+      "qwerty": "QWERTY",
+      "azerty": "AZERTY",
+      "dvorak": "Dvorak",
+      "backToGames": "Back to Games",
+      "backToLessons": "Back to Lessons",
+      "keyboardLayout": "Keyboard Layout",
+      "lessons": "Lessons",
+      "games": "Games",
+      "progress": "Progress",
+      "infoMultiLanguage": "Multilingual Support",
+      "infoMultiLanguageDesc": "Available in Italian, English, German, French, Spanish",
+      "infoOneHanded": "One-Handed Mode",
+      "infoOneHandedDesc": "Support for one-handed typing",
+      "infoDSA": "DSA Support",
+      "infoDSADesc": "Optimized for students with learning differences",
+      "infoGamification": "Gamification",
+      "infoGamificationDesc": "Earn points and unlock achievements"
     },
     "search": {
       "label": "Web Search",
@@ -190,9 +309,9 @@
       "resultCount": "Result Count",
       "wikipediaOnly": "Wikipedia Only"
     },
-    "backToAstuccio": "Back To Astuccio",
-    "title": "Titolo",
-    "toolsCount": "Tools Count",
+    "backToAstuccio": "Back to Pencil Case",
+    "title": "Tools",
+    "toolsCount": "{count} tools",
     "connection": {
       "connected": "Connesso",
       "connecting": "Connessione...",
@@ -292,86 +411,107 @@
     "voice": {
       "label": "Voce",
       "description": "Attiva la conversazione vocale"
-    }
-  },
-  "studyKit": {
-    "exportModal": {
-      "cancel": "Cancel",
-      "closeLabel": "Close Label",
-      "description": "Descrizione",
-      "error": "Error",
-      "export": "Export",
-      "formatLabel": "Format Label",
-      "generating": "Generazione...",
-      "profileLabel": "Profile Label",
-      "success": {
-        "default": "Default",
-        "withZaino": "With Zaino"
-      },
-      "title": "Titolo"
     },
-    "list": {
-      "cancel": "Cancel",
-      "delete": "Delete",
-      "deleteConfirm": "Delete Confirm",
-      "deleteError": "Delete Error",
-      "empty": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "error": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "filters": {
-        "all": "Tutti",
-        "error": "Error",
-        "processing": "Elaborazione...",
-        "ready": "Ready"
-      },
-      "open": "Apri",
-      "processing": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "status": "Stato"
+    "googleDrive": {
+      "dragOrChoose": "Drag a file here or choose where to upload from",
+      "fromComputer": "From Computer",
+      "fromGoogleDrive": "From Google Drive",
+      "maxFileSize": "Max size: {maxSizeMB} MB",
+      "connectButton": "Connect Google Drive",
+      "connectPrompt": "Sign in to import files from your Google Drive",
+      "searchPlaceholder": "Search files...",
+      "myDrive": "My Drive",
+      "sharedWithMe": "Shared with me",
+      "noFilesFound": "No files found",
+      "loadMore": "Load more",
+      "select": "Select",
+      "description": "Connect your Google account to upload files from Drive",
+      "loadingCheck": "Checking connection...",
+      "readOnlyAccess": "Read-only access to your files",
+      "disconnectButton": "Disconnect Account",
+      "disconnectTitle": "Disconnect Google Drive?",
+      "disconnectWarning": "You will no longer be able to access files from Google Drive. You can reconnect at any time.",
+      "disconnectConfirm": "Disconnect",
+      "notConnected": "Not Connected",
+      "capabilities": "What you can do with Google Drive:",
+      "capabilityPdf": "Upload PDFs from Drive to generate study materials",
+      "capabilityHomework": "Import documents for homework assistant",
+      "capabilityDocuments": "Access your documents without having to download them",
+      "privacyNotice": "MirrorBuddy only accesses files with your authorization. We do not store your Drive files."
     },
-    "uploadProgress": {
-      "loadAnother": "Load Another",
-      "processingNote": "Processing Note",
-      "status": {
-        "error": "Error",
-        "processing": "Elaborazione...",
-        "success": "Completato",
-        "uploading": "Uploading"
-      }
-    },
-    "view": {
-      "back": "Back",
-      "backToList": "Back To List",
-      "features": {
-        "demo": {
-          "description": "Descrizione",
-          "title": "Titolo"
+    "astuccio": {
+      "title": "Pencil Case",
+      "description": "Your educational tools",
+      "empty": "No tools available",
+      "info": {
+        "title": "Pencil Case Information",
+        "description": "Here you'll find all your tools",
+        "howItWorks": "How It Works?",
+        "step1": {
+          "title": "Choose the Tool",
+          "description": "Select the tool best suited to your learning goal"
         },
-        "mindmap": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "step2": {
+          "title": "Choose the Professor",
+          "description": "Each professor has a unique approach to help you learn"
         },
-        "quiz": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "step3": {
+          "title": "Save to Backpack",
+          "description": "Created materials are saved in your Backpack to reuse whenever you want"
         },
-        "summary": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "studyTip": {
+          "title": "Study Tip",
+          "description": "Start with a <strong>Mind Map</strong> to get an overview, then create <strong>Flashcards</strong> to memorize key concepts, and finally test your preparation with a <strong>Quiz</strong>. All materials will be saved in your <strong>Backpack</strong>!"
         }
       },
-      "header": "Header",
-      "myKits": "My Kits",
-      "newKit": "New Kit",
-      "subtitle": "Sottotitolo",
-      "uploadTitle": "Upload Title"
+      "backToAstuccio": "← Back to Pencil Case",
+      "toolsCount": "{count} tools",
+      "categories": {
+        "upload": {
+          "title": "Upload",
+          "subtitle": "Import your materials to generate study aids"
+        },
+        "create": {
+          "title": "Create",
+          "subtitle": "Generate study materials with the help of Professors"
+        },
+        "search": {
+          "title": "Search",
+          "subtitle": "Find resources and insights on the web"
+        }
+      },
+      "backButton": "Back Button",
+      "how_it_works": {
+        "step1_desc": "Step1 desc",
+        "step1_title": "Step1 title",
+        "step2_desc": "Step2 desc",
+        "step2_title": "Step2 title",
+        "step3_desc": "Step3 desc",
+        "step3_title": "Step3 title",
+        "title": "Titolo"
+      },
+      "itemCount": "Item Count",
+      "study_tip": {
+        "description": "Descrizione",
+        "title": "Titolo"
+      }
+    },
+    "zaino": {
+      "print": {
+        "success": "Print started",
+        "successDescription": "The document will open in the print window.",
+        "error": "Print error",
+        "errorDescription": "Unable to open print window. Check popup settings.",
+        "downloadSuccess": "File downloaded",
+        "downloadSuccessDescription": "The HTML file has been downloaded.",
+        "downloadError": "Error",
+        "downloadErrorDescription": "Unable to download file.",
+        "ariaLabel": "Print {title}",
+        "button": "Print",
+        "optionsAriaLabel": "Print options for {title}",
+        "printPdf": "Print PDF",
+        "downloadHtml": "Download HTML"
+      }
     }
   }
 }

@@ -28,7 +28,7 @@ export function BetaRequestForm({
   trialSessionId,
   onSuccess,
 }: BetaRequestFormProps) {
-  const t = useTranslations("invite.form");
+  const t = useTranslations("auth.invite.form");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [motivation, setMotivation] = useState("");

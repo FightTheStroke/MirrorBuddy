@@ -30,7 +30,7 @@ interface StudyKitListProps {
 }
 
 export function StudyKitList({ onSelect, className }: StudyKitListProps) {
-  const t = useTranslations("studyKit.list");
+  const t = useTranslations("tools.studyKit.list");
   const [studyKits, setStudyKits] = useState<StudyKit[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");

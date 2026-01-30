@@ -27,7 +27,7 @@ export function VoiceSearch({
   onSearchUpdate,
   onFilterUpdate,
 }: VoiceSearchProps) {
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
   const [isListening, setIsListening] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [transcript, setTranscript] = useState("");

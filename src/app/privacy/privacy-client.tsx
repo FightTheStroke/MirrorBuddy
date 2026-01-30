@@ -10,8 +10,8 @@ import { PrivacyContentAI } from "./content-ai";
 export const PRIVACY_VERSION = "1.4";
 
 export function PrivacyClient() {
-  const t = useTranslations("legal.privacy.page");
-  const tldr = useTranslations("legal.privacy.page.tldrItems");
+  const tldr = useTranslations("compliance.legal.privacy.page.tldrItems");
+  const t = useTranslations("compliance.legal.privacy.page");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">

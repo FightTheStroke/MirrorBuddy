@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/no-missing-i18n-keys -- admin keys are nested under admin.admin in JSON, resolved at runtime */
 "use client";
 
 import Link from "next/link";
@@ -56,7 +55,7 @@ export function AdminSidebar({
   const NAV_ITEMS: NavItem[] = [
     {
       id: "dashboard",
-      label: t("dashboard"),
+      label: t("sidebar.dashboard"),
       href: "/admin",
       icon: LayoutDashboard,
     },

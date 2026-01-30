@@ -11,7 +11,7 @@ import { AdvancedMixer } from "./advanced-mixer";
 import type { AudioMode, AudioPreset } from "@/types";
 
 export function AmbientAudioControl() {
-  const t = useTranslations("ambientAudio");
+  const t = useTranslations("settings.ambientAudio");
   const {
     playbackState,
     masterVolume,

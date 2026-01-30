@@ -24,5 +24,67 @@
     "coppa": "Si tienes menos de 13 años, tus padres recibieron un aviso para aprobar las cookies esenciales.",
     "privacyPolicy": "Política de Privacidad",
     "cookiePolicy": "Política de Cookies"
+  },
+  "privacy": {
+    "title": "Acuerdo de Privacidad",
+    "description": "Tu privacidad es importante para nosotros",
+    "dataProcessing": "Procesamiento de Datos",
+    "processingText": "MirrorBuddy procesa solo los datos necesarios para proporcionarte una experiencia de aprendizaje personalizada y segura.",
+    "dataStorage": "Dónde Almacenamos Tus Datos",
+    "storageText": "Tus datos se almacenan en servidores seguros en Europa con cumplimiento garantizado del RGPD.",
+    "retention": "Período de Retención de Datos",
+    "retentionText": "Mantenemos tus datos el tiempo necesario para el servicio. Puedes solicitar la eliminación en cualquier momento.",
+    "accept": "He Leído y Acepto",
+    "decline": "Rechazar"
+  },
+  "terms": {
+    "title": "Términos de Servicio",
+    "description": "Lee nuestros términos y condiciones",
+    "acceptance": "Acepto los Términos de Servicio",
+    "acceptanceText": "Confirmo que he leído y aceptado los términos de servicio y las políticas de la plataforma.",
+    "linkLabel": "Ver Términos Completos",
+    "required": "Debes aceptar los Términos de Servicio para continuar."
+  },
+  "ageVerification": {
+    "title": "Verificación de Edad",
+    "description": "Cumplimiento del RGPD - Protección de Menores",
+    "statement": "Confirmo que tengo al menos 14 años de edad",
+    "europeanMinor": "Si tienes menos de 14 años, se requiere el consentimiento de un padre o tutor.",
+    "confirm": "Confirmo que tengo al menos 14 años de edad",
+    "under14": "Soy un Usuario Menor de Edad - Solicito Consentimiento Parental"
+  },
+  "parentalConsent": {
+    "title": "Consentimiento Parental",
+    "description": "Solicitud de Consentimiento para Usuarios Menores",
+    "intro": "Si eres padre o tutor de un usuario menor de edad, por favor lee nuestras políticas cuidadosamente.",
+    "statement": "Confirmo que soy padre o tutor legal y autorizo el uso de la plataforma",
+    "responsibilities": "Responsabilidades de los Padres",
+    "responsibilitiesText": "Como padre, aceptas supervisar el uso de la plataforma y eres responsable de la actividad del menor.",
+    "contactUs": "Para preguntas sobre el consentimiento parental, contacta a nuestro equipo de soporte.",
+    "confirm": "Doy Mi Consentimiento",
+    "decline": "No Autorizo"
+  },
+  "aiDisclosure": {
+    "title": "Divulgación de IA",
+    "description": "Transparencia en el Uso de Inteligencia Artificial",
+    "statement": "Esta plataforma utiliza Inteligencia Artificial (IA) para personalizar tu aprendizaje.",
+    "howWeUseAI": "Cómo Utilizamos la IA",
+    "howWeUseAIText": "La IA se utiliza para proporcionar tutoría personalizada, retroalimentación adaptativa y recomendaciones de aprendizaje. Las decisiones críticas permanecen bajo control humano.",
+    "aiLimitations": "Limitaciones de la IA",
+    "aiLimitationsText": "La IA no es perfecta. Puede cometer errores y no debería reemplazar el juicio humano. Alentamos preguntas y comentarios críticos.",
+    "humanOversight": "Supervisión Humana",
+    "humanOversightText": "Todas las funciones críticas de IA son supervisadas por maestros calificados y especialistas en educación.",
+    "acknowledge": "Entiendo el Uso de la IA"
+  },
+  "withdrawal": {
+    "title": "Retiro del Consentimiento",
+    "description": "Cómo Revocar tu Consentimiento",
+    "howToWithdraw": "Puedes retirar tu consentimiento en cualquier momento accediendo a tu configuración de privacidad.",
+    "withdrawalProcess": "Proceso de Retiro",
+    "withdrawalSteps": "1. Inicia sesión en tu cuenta\n2. Ve a Configuración > Privacidad y Consentimiento\n3. Selecciona los consentimientos que deseas retirar\n4. Confirma la solicitud de retiro\n5. Tus datos serán eliminados de acuerdo con las regulaciones del RGPD",
+    "emailWithdrawal": "Alternativamente, puedes enviarnos un email de solicitud formal de retiro.",
+    "consequences": "Consecuencias",
+    "consequencesText": "Retirar ciertos consentimientos puede prevenir el acceso a características específicas de la plataforma.",
+    "contactSupport": "Contacta al Soporte"
   }
 }

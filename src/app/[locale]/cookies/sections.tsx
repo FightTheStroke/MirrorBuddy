@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl";
  */
 
 export function ManagementSection() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <Section number={5} title={t("sections.cookieManagement.title")}>
@@ -58,7 +58,7 @@ export function ManagementSection() {
 }
 
 export function ThirdPartySection() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <Section number={6} title={t("sections.thirdParty.title")}>
@@ -111,7 +111,7 @@ export function ThirdPartySection() {
 }
 
 export function DurationSection() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <Section number={7} title={t("sections.duration.title")}>
@@ -132,7 +132,7 @@ export function DurationSection() {
 }
 
 export function ChangesSection() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <Section number={8} title={t("sections.changes.title")}>
@@ -147,7 +147,7 @@ export function ChangesSection() {
 }
 
 export function LinksSection() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <Section number={9} title={t("sections.links.title")}>

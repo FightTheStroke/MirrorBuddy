@@ -12,7 +12,35 @@ import "@testing-library/jest-dom/vitest";
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 
-// Load all Italian namespace files and merge them (ADR 0082)
+// Deep merge utility to avoid top-level key collisions between namespace files
+// (e.g., compliance.json and welcome.json both export a "compliance" key)
+function deepMerge(
+  target: Record<string, unknown>,
+  source: Record<string, unknown>,
+): Record<string, unknown> {
+  for (const key of Object.keys(source)) {
+    const tVal = target[key];
+    const sVal = source[key];
+    if (
+      tVal &&
+      sVal &&
+      typeof tVal === "object" &&
+      typeof sVal === "object" &&
+      !Array.isArray(tVal) &&
+      !Array.isArray(sVal)
+    ) {
+      target[key] = deepMerge(
+        { ...(tVal as Record<string, unknown>) },
+        sVal as Record<string, unknown>,
+      );
+    } else {
+      target[key] = sVal;
+    }
+  }
+  return target;
+}
+
+// Load all Italian namespace files and deep-merge them (ADR 0082)
 function loadItalianMessages(): Record<string, unknown> {
   const localeDir = join(process.cwd(), "messages", "it");
   const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
@@ -21,7 +49,7 @@ function loadItalianMessages(): Record<string, unknown> {
     const filePath = join(localeDir, file);
     // eslint-disable-next-line security/detect-non-literal-fs-filename -- Safe: file is from controlled readdirSync
     const content = readFileSync(filePath, "utf-8");
-    Object.assign(merged, JSON.parse(content));
+    deepMerge(merged, JSON.parse(content));
   }
   return merged;
 }

@@ -58,8 +58,8 @@ export function VoiceOnboardingPanel({
   onboardingMelissa,
   existingUserData: _existingUserData,
 }: VoiceOnboardingPanelProps) {
-  const tOnboarding = useTranslations("onboarding");
-  const tVoice = useTranslations("voice");
+  const tOnboarding = useTranslations("welcome.onboarding");
+  const tVoice = useTranslations("settings.voice");
   const { data, voiceTranscript, clearVoiceTranscript } = useOnboardingStore();
   const hasInitializedRef = useRef(false);
   const hasAttemptedConnectionRef = useRef(false);

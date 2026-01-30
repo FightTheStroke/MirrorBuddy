@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Section } from "../sections";
 
 export function FAQSupportSections() {
-  const t = useTranslations("aiTransparency.faqSupport");
+  const t = useTranslations("compliance.aiTransparency.faqSupport");
 
   return (
     <>

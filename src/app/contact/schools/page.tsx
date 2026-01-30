@@ -6,7 +6,7 @@ import { getTranslations } from "next-intl/server";
 import { SchoolsContactForm } from "./schools-form";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("contact.schools");
+  const t = await getTranslations("compliance.contact.schools");
   return {
     title: t("title"),
     description: t("description"),
@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function SchoolsContactPage() {
-  const t = await getTranslations("contact.schools");
+  const t = await getTranslations("compliance.contact.schools");
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 py-12 px-4 sm:px-6 lg:px-8">

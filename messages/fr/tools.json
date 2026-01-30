@@ -1,74 +1,4 @@
 {
-  "astuccio": {
-    "title": "Trousse",
-    "backToAstuccio": "← Retour à la Trousse",
-    "toolsCount": "{count} outils",
-    "categories": {
-      "upload": {
-        "title": "Charger",
-        "subtitle": "Importez vos documents pour générer des supports d'étude"
-      },
-      "create": {
-        "title": "Créer",
-        "subtitle": "Générez des supports d'étude avec l'aide des Professeurs"
-      },
-      "search": {
-        "title": "Rechercher",
-        "subtitle": "Trouvez des ressources et des informations sur le web"
-      }
-    },
-    "info": {
-      "howItWorks": "Comment ça marche ?",
-      "step1": {
-        "title": "Choisissez l'outil",
-        "description": "Sélectionnez l'outil le mieux adapté à votre objectif d'apprentissage"
-      },
-      "step2": {
-        "title": "Choisissez le Professeur",
-        "description": "Chaque professeur a une approche unique pour vous aider à apprendre"
-      },
-      "step3": {
-        "title": "Enregistrez dans le Sac à dos",
-        "description": "Les supports créés sont enregistrés dans votre Sac à dos pour les réutiliser quand vous voulez"
-      },
-      "studyTip": {
-        "title": "Conseil d'étude",
-        "description": "Commencez par une <strong>Carte Mentale</strong> pour avoir une vue d'ensemble, puis créez des <strong>Flashcards</strong> pour mémoriser les concepts clés, et enfin testez votre préparation avec un <strong>Quiz</strong>. Tous les supports seront enregistrés dans votre <strong>Sac à dos</strong> !"
-      }
-    },
-    "backButton": "Back Button",
-    "how_it_works": {
-      "step1_desc": "Step1 desc",
-      "step1_title": "Step1 title",
-      "step2_desc": "Step2 desc",
-      "step2_title": "Step2 title",
-      "step3_desc": "Step3 desc",
-      "step3_title": "Step3 title",
-      "title": "Titolo"
-    },
-    "itemCount": "Item Count",
-    "study_tip": {
-      "description": "Descrizione",
-      "title": "Titolo"
-    }
-  },
-  "zaino": {
-    "print": {
-      "success": "Impression lancée",
-      "successDescription": "Le document s'ouvrira dans la fenêtre d'impression.",
-      "error": "Erreur d'impression",
-      "errorDescription": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres popup.",
-      "downloadSuccess": "Fichier téléchargé",
-      "downloadSuccessDescription": "Le fichier HTML a été téléchargé.",
-      "downloadError": "Erreur",
-      "downloadErrorDescription": "Impossible de télécharger le fichier.",
-      "ariaLabel": "Imprimer {title}",
-      "button": "Imprimer",
-      "optionsAriaLabel": "Options d'impression pour {title}",
-      "printPdf": "Imprimer PDF",
-      "downloadHtml": "Télécharger HTML"
-    }
-  },
   "tools": {
     "pdf": {
       "label": "Charger PDF",
@@ -105,7 +35,94 @@
     },
     "studyKit": {
       "label": "Kit d'étude",
-      "description": "Chargez un PDF et générez automatiquement des résumés, cartes, démos et quiz"
+      "description": "Chargez un PDF et générez automatiquement des résumés, cartes, démos et quiz",
+      "title": "Kit d'Étude",
+      "exportModal": {
+        "title": "Titolo",
+        "format": "Format",
+        "export": "Export",
+        "cancel": "Annuler",
+        "closeLabel": "Close Label",
+        "description": "Descrizione",
+        "error": "Erreur",
+        "formatLabel": "Format Label",
+        "generating": "Generazione...",
+        "profileLabel": "Profile Label",
+        "success": {
+          "default": "Default",
+          "withZaino": "With Zaino"
+        }
+      },
+      "list": {
+        "empty": {
+          "title": "Aucun document",
+          "description": "Téléchargez votre premier document pour commencer à étudier"
+        },
+        "create": "Créer un nouveau kit",
+        "cancel": "Annuler",
+        "delete": "Supprimer",
+        "deleteConfirm": "Delete Confirm",
+        "deleteError": "Delete Error",
+        "error": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "filters": {
+          "all": "Tutti",
+          "error": "Erreur",
+          "processing": "Elaborazione...",
+          "ready": "Ready"
+        },
+        "open": "Apri",
+        "processing": {
+          "description": "Descrizione",
+          "title": "Titolo"
+        },
+        "status": "Stato"
+      },
+      "view": {
+        "title": "Voir le kit",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "back": "Retour",
+        "backToList": "Back To List",
+        "features": {
+          "demo": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "mindmap": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "quiz": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          },
+          "summary": {
+            "description": "Descrizione",
+            "title": "Titolo"
+          }
+        },
+        "header": "Header",
+        "myKits": "My Kits",
+        "newKit": "New Kit",
+        "subtitle": "Sottotitolo",
+        "uploadTitle": "Upload Title"
+      },
+      "uploadProgress": {
+        "uploading": "Téléchargement...",
+        "progress": "Progression : {percent} %",
+        "complete": "Terminé",
+        "loadAnother": "Load Another",
+        "processingNote": "Processing Note",
+        "status": {
+          "error": "Erreur",
+          "processing": "Elaborazione...",
+          "success": "Completato",
+          "uploading": "Uploading"
+        }
+      }
     },
     "mindmap": {
       "label": "Carte Mentale",
@@ -181,7 +198,109 @@
       "level": "Livello",
       "none": "Nessuno",
       "recommendedLesson": "Recommended Lesson",
-      "title": "Titolo"
+      "title": "Dactylographie",
+      "speedGame": {
+        "instructions": "Tapez les mots aussi vite que possible ! Vous avez 60 secondes.",
+        "startButton": "Commencer le Jeu",
+        "scoreLabel": "Score",
+        "wordsLabel": "Mots"
+      },
+      "lessonSelector": {
+        "title": "Leçons - Niveau {level}",
+        "completed": "terminées",
+        "completedBadge": "Terminée",
+        "inProgress": "En cours"
+      },
+      "stickyKeys": {
+        "activated": "Touches rémanentes activées",
+        "restartRequired": "Redémarrez l'application pour appliquer les modifications",
+        "enableFailed": "Échec de l'activation",
+        "enableManually": "Activez manuellement depuis les Paramètres Système",
+        "windowsInfo": "Appuyez sur Maj 5 fois",
+        "windowsHint": "Ou ouvrez Paramètres > Accessibilité > Clavier",
+        "linuxSettings": "Paramètres Linux",
+        "linuxInfo": "Ouvrez Paramètres Système > Accessibilité > Saisie",
+        "title": "Touches Rémanentes",
+        "unsupported": "Non pris en charge sur cette plateforme",
+        "active": "Actif",
+        "description": "Permet d'appuyer sur les touches de modification une à la fois au lieu de simultanément",
+        "enableButton": "Activer les Touches Rémanentes",
+        "openSettings": "Ouvrir les Paramètres Système",
+        "tipLabel": "Astuce",
+        "tip": "Appuyez rapidement sur Maj 5 fois pour activer les touches rémanentes sous Windows"
+      },
+      "progressTracker": {
+        "noBadges": "Aucun badge pour le moment"
+      },
+      "visualImpairment": {
+        "wcagCompliance": "Conformité WCAG 2.1 AA :",
+        "visualTitle": "Déficience visuelle",
+        "visualDesc": "Paramètres pour utilisateurs malvoyants",
+        "visualHighContrast": "Contraste élevé",
+        "visualHighContrastDesc": "Augmente le contraste des couleurs",
+        "visualTextSizeLabel": "Taille du texte",
+        "visualTextSizeRange": "De {min} à {max}",
+        "visualTTS": "Synthèse vocale (TTS)",
+        "visualTTSDesc": "Lire le texte à voix haute",
+        "visualHideTTSSettings": "Masquer les paramètres TTS",
+        "visualShowTTSSettings": "Afficher les paramètres TTS",
+        "visualSpeechRateLabel": "Vitesse de la voix",
+        "visualSpeechVolumeLabel": "Volume de la voix",
+        "visualFocusIndicators": "Indicateurs de focus",
+        "visualFocusIndicatorsDesc": "Mettre en évidence l'élément avec le focus",
+        "visualWCAGCompliance": "Conformité WCAG 2.1 AA"
+      },
+      "oneHanded": {
+        "title": "Mode de Frappe",
+        "hideInfo": "Masquer les infos",
+        "showInfo": "Afficher les infos",
+        "modes": {
+          "both": {
+            "label": "Deux Mains",
+            "description": "Frappe standard avec les deux mains"
+          },
+          "leftOnly": {
+            "label": "Main Gauche Uniquement",
+            "description": "Leçons avec touches accessibles depuis la main gauche"
+          },
+          "rightOnly": {
+            "label": "Main Droite Uniquement",
+            "description": "Leçons avec touches accessibles depuis la main droite"
+          }
+        },
+        "info": {
+          "active": "Mode actif :",
+          "description": "Les leçons n'afficheront que les touches accessibles avec la main sélectionnée.",
+          "tips": "Conseils :",
+          "tipItems": [
+            "Positionnez le clavier confortablement devant vous",
+            "Utilisez les touches de modification (Maj, Ctrl) si nécessaire",
+            "Faites des pauses régulières pour éviter la fatigue"
+          ]
+        }
+      },
+      "subtitle": "Apprenez à taper rapidement",
+      "beginner": "Débutant",
+      "intermediate": "Intermédiaire",
+      "advanced": "Avancé",
+      "qwertz": "QWERTZ",
+      "qwerty": "QWERTY",
+      "azerty": "AZERTY",
+      "dvorak": "Dvorak",
+      "backToGames": "Retour aux jeux",
+      "backToLessons": "Retour aux leçons",
+      "keyboardLayout": "Disposition du clavier",
+      "lessons": "Leçons",
+      "games": "Jeux",
+      "progress": "Progression",
+      "infoMultiLanguage": "Support multilingue",
+      "infoMultiLanguageDesc": "Disponible en italien, anglais, allemand, français, espagnol",
+      "infoOneHanded": "Mode une main",
+      "infoOneHandedDesc": "Support pour la frappe d'une seule main",
+      "infoDSA": "Support DSA",
+      "infoDSADesc": "Optimisé pour les étudiants avec DSA",
+      "infoGamification": "Gamification",
+      "infoGamificationDesc": "Gagnez des points et débloquez des succès"
     },
     "search": {
       "label": "Recherche Web",
@@ -190,9 +309,9 @@
       "resultCount": "Result Count",
       "wikipediaOnly": "Wikipedia Only"
     },
-    "backToAstuccio": "Back To Astuccio",
-    "title": "Titolo",
-    "toolsCount": "Tools Count",
+    "backToAstuccio": "Retour à la trousse",
+    "title": "Outils",
+    "toolsCount": "{count} outils",
     "connection": {
       "connected": "Connesso",
       "connecting": "Connessione...",
@@ -292,86 +411,107 @@
     "voice": {
       "label": "Voce",
       "description": "Attiva la conversazione vocale"
-    }
-  },
-  "studyKit": {
-    "exportModal": {
-      "cancel": "Annuler",
-      "closeLabel": "Close Label",
-      "description": "Descrizione",
-      "error": "Erreur",
-      "export": "Export",
-      "formatLabel": "Format Label",
-      "generating": "Generazione...",
-      "profileLabel": "Profile Label",
-      "success": {
-        "default": "Default",
-        "withZaino": "With Zaino"
-      },
-      "title": "Titolo"
     },
-    "list": {
-      "cancel": "Annuler",
-      "delete": "Supprimer",
-      "deleteConfirm": "Delete Confirm",
-      "deleteError": "Delete Error",
-      "empty": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "error": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "filters": {
-        "all": "Tutti",
-        "error": "Erreur",
-        "processing": "Elaborazione...",
-        "ready": "Ready"
-      },
-      "open": "Apri",
-      "processing": {
-        "description": "Descrizione",
-        "title": "Titolo"
-      },
-      "status": "Stato"
+    "googleDrive": {
+      "dragOrChoose": "Glissez un fichier ici ou choisissez d'où le charger",
+      "fromComputer": "Depuis l'Ordinateur",
+      "fromGoogleDrive": "Depuis Google Drive",
+      "maxFileSize": "Taille maximale : {maxSizeMB} MB",
+      "connectButton": "Connecter Google Drive",
+      "connectPrompt": "Connectez-vous pour importer des fichiers depuis votre Google Drive",
+      "searchPlaceholder": "Rechercher des fichiers...",
+      "myDrive": "Mon Drive",
+      "sharedWithMe": "Partagés avec moi",
+      "noFilesFound": "Aucun fichier trouvé",
+      "loadMore": "Charger plus",
+      "select": "Sélectionner",
+      "description": "Connectez votre compte Google pour charger des fichiers depuis Drive",
+      "loadingCheck": "Vérification de la connexion...",
+      "readOnlyAccess": "Accès en lecture seule à vos fichiers",
+      "disconnectButton": "Déconnecter le Compte",
+      "disconnectTitle": "Déconnecter Google Drive ?",
+      "disconnectWarning": "Vous ne pourrez plus accéder aux fichiers de Google Drive. Vous pourrez vous reconnecter à tout moment.",
+      "disconnectConfirm": "Déconnecter",
+      "notConnected": "Non Connecté",
+      "capabilities": "Ce que vous pouvez faire avec Google Drive :",
+      "capabilityPdf": "Charger des PDF depuis Drive pour générer du matériel d'étude",
+      "capabilityHomework": "Importer des documents pour l'assistant aux devoirs",
+      "capabilityDocuments": "Accéder à vos documents sans avoir à les télécharger",
+      "privacyNotice": "MirrorBuddy accède aux fichiers uniquement avec votre autorisation. Nous ne stockons pas vos fichiers Drive."
     },
-    "uploadProgress": {
-      "loadAnother": "Load Another",
-      "processingNote": "Processing Note",
-      "status": {
-        "error": "Erreur",
-        "processing": "Elaborazione...",
-        "success": "Completato",
-        "uploading": "Uploading"
-      }
-    },
-    "view": {
-      "back": "Retour",
-      "backToList": "Back To List",
-      "features": {
-        "demo": {
-          "description": "Descrizione",
-          "title": "Titolo"
+    "astuccio": {
+      "title": "Trousse",
+      "description": "Vos outils éducatifs",
+      "empty": "Aucun outil disponible",
+      "info": {
+        "title": "Informations sur la trousse",
+        "description": "Ici vous trouverez tous vos outils",
+        "howItWorks": "Comment ça marche ?",
+        "step1": {
+          "title": "Choisissez l'outil",
+          "description": "Sélectionnez l'outil le mieux adapté à votre objectif d'apprentissage"
         },
-        "mindmap": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "step2": {
+          "title": "Choisissez le Professeur",
+          "description": "Chaque professeur a une approche unique pour vous aider à apprendre"
         },
-        "quiz": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "step3": {
+          "title": "Enregistrez dans le Sac à dos",
+          "description": "Les supports créés sont enregistrés dans votre Sac à dos pour les réutiliser quand vous voulez"
         },
-        "summary": {
-          "description": "Descrizione",
-          "title": "Titolo"
+        "studyTip": {
+          "title": "Conseil d'étude",
+          "description": "Commencez par une <strong>Carte Mentale</strong> pour avoir une vue d'ensemble, puis créez des <strong>Flashcards</strong> pour mémoriser les concepts clés, et enfin testez votre préparation avec un <strong>Quiz</strong>. Tous les supports seront enregistrés dans votre <strong>Sac à dos</strong> !"
         }
       },
-      "header": "Header",
-      "myKits": "My Kits",
-      "newKit": "New Kit",
-      "subtitle": "Sottotitolo",
-      "uploadTitle": "Upload Title"
+      "backToAstuccio": "← Retour à la Trousse",
+      "toolsCount": "{count} outils",
+      "categories": {
+        "upload": {
+          "title": "Charger",
+          "subtitle": "Importez vos documents pour générer des supports d'étude"
+        },
+        "create": {
+          "title": "Créer",
+          "subtitle": "Générez des supports d'étude avec l'aide des Professeurs"
+        },
+        "search": {
+          "title": "Rechercher",
+          "subtitle": "Trouvez des ressources et des informations sur le web"
+        }
+      },
+      "backButton": "Back Button",
+      "how_it_works": {
+        "step1_desc": "Step1 desc",
+        "step1_title": "Step1 title",
+        "step2_desc": "Step2 desc",
+        "step2_title": "Step2 title",
+        "step3_desc": "Step3 desc",
+        "step3_title": "Step3 title",
+        "title": "Titolo"
+      },
+      "itemCount": "Item Count",
+      "study_tip": {
+        "description": "Descrizione",
+        "title": "Titolo"
+      }
+    },
+    "zaino": {
+      "print": {
+        "success": "Impression lancée",
+        "successDescription": "Le document s'ouvrira dans la fenêtre d'impression.",
+        "error": "Erreur d'impression",
+        "errorDescription": "Impossible d'ouvrir la fenêtre d'impression. Vérifiez les paramètres popup.",
+        "downloadSuccess": "Fichier téléchargé",
+        "downloadSuccessDescription": "Le fichier HTML a été téléchargé.",
+        "downloadError": "Erreur",
+        "downloadErrorDescription": "Impossible de télécharger le fichier.",
+        "ariaLabel": "Imprimer {title}",
+        "button": "Imprimer",
+        "optionsAriaLabel": "Options d'impression pour {title}",
+        "printPdf": "Imprimer PDF",
+        "downloadHtml": "Télécharger HTML"
+      }
     }
   }
 }

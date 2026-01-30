@@ -56,7 +56,7 @@ interface AzureCostData {
 }
 
 export function AnalyticsDashboard() {
-  const t = useTranslations("dashboard");
+  const t = useTranslations("admin.dashboard");
   const [period, setPeriod] = useState<TimePeriod>("week");
   const [tokenData, setTokenData] = useState<TokenUsageData | null>(null);
   const [azureCosts, setAzureCosts] = useState<AzureCostData | null>(null);

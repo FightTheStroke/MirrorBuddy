@@ -7,7 +7,7 @@ import { TermsContent } from "./content";
 import { TOS_VERSION, TOS_LAST_UPDATED } from "@/lib/tos/constants";
 
 export function TermsClient() {
-  const t = useTranslations("legal.terms");
+  const t = useTranslations("compliance.legal.terms");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">

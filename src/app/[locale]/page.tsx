@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
 import { motion } from "framer-motion";
+import { SkipLink } from "@/components/accessibility/skip-link";
 import {
   GraduationCap,
   Trophy,
@@ -43,6 +44,7 @@ const MB_PER_LEVEL = 1000;
 export default function Home() {
   const router = useRouter();
   const t = useTranslations("home");
+  const mainContentRef = useRef<HTMLDivElement>(null);
   const { hasCompletedOnboarding, isHydrated, hydrateFromApi } =
     useOnboardingStore();
 
@@ -75,6 +77,20 @@ export default function Home() {
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Focus management: move focus to main content heading when view changes
+  useEffect(() => {
+    if (mainContentRef.current && isHydrated && hasCompletedOnboarding) {
+      const mainHeading = mainContentRef.current.querySelector(
+        "h1:not(.sr-only), h2",
+      );
+      if (mainHeading instanceof HTMLElement) {
+        mainHeading.setAttribute("tabindex", "-1");
+        mainHeading.focus();
+        mainHeading.removeAttribute("tabindex");
+      }
+    }
+  }, [currentView, isHydrated, hasCompletedOnboarding]);
 
   const {
     seasonMirrorBucks,
@@ -189,6 +205,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
+      <SkipLink targetId="main-content" />
       <h1 className="sr-only">{t("appTitle")}</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
@@ -224,8 +241,9 @@ export default function Home() {
           "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
           sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
+        ref={mainContentRef}
       >
-        <main className="min-h-screen flex-1">
+        <main id="main-content" className="min-h-screen flex-1">
           {/* Trial mode banner */}
           {trialStatus.isTrialMode && !trialStatus.isLoading && (
             <TrialHomeBanner

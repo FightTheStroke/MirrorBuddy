@@ -16,7 +16,7 @@ export function OneHandedMode({
   onModeChange,
   disabled = false,
 }: OneHandedModeProps) {
-  const t = useTranslations("typing.oneHanded");
+  const t = useTranslations("tools.typing.oneHanded");
   const [showInfo, setShowInfo] = useState(false);
 
   const modes: { value: TypingHandMode; label: string; description: string }[] =

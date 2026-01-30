@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { useTypingStore } from "@/lib/stores";
 
 export function ProgressTracker() {
-  const t = useTranslations("typing.progressTracker");
+  const t = useTranslations("tools.typing.progressTracker");
   const { progress } = useTypingStore();
 
   if (!progress) return null;

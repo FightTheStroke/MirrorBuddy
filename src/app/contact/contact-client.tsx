@@ -6,7 +6,7 @@ import { ArrowLeft } from "lucide-react";
 import { ContactForm } from "./components/contact-form";
 
 export function ContactClient() {
-  const t = useTranslations("contact");
+  const t = useTranslations("compliance.contact");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">

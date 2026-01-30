@@ -1,62 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - La Scuola che Voglio",
-    "loading": "Caricamento...",
-    "seasonDefault": "Autunno",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professori",
-      "astuccio": "Astuccio",
-      "zaino": "Zaino",
-      "calendar": "Calendario",
-      "progress": "Progressi",
-      "settings": "Impostazioni",
-      "features": "Funzionalità",
-      "pricing": "Prezzi",
-      "about": "Chi siamo",
-      "contact": "Contatti",
-      "login": "Accedi",
-      "signup": "Registrati",
-      "dashboard": "Dashboard",
-      "logout": "Esci"
-    },
-    "header": {
-      "openMenu": "Apri menu",
-      "streak": "Serie",
-      "sessionsThisWeek": "Sessioni questa settimana",
-      "studyTime": "Tempo di studio",
-      "questionsAsked": "Domande fatte",
-      "trial": "Prova",
-      "trialClickToRequest": "Clicca per richiedere accesso completo"
-    },
-    "sidebar": {
-      "backToHome": "Torna alla home",
-      "appName": "MirrorBuddy",
-      "closeMenu": "Chiudi menu",
-      "trialMode": "Modalità Prova",
-      "login": "Accedi",
-      "requestAccess": "Richiedi Accesso",
-      "adminDashboard": "Dashboard Admin",
-      "adminDashboardAria": "Dashboard amministratore",
-      "parentArea": "Area Genitori"
-    },
-    "adminDashboard": "Dashboard Admin",
-    "closeMenu": "Chiudi menu",
-    "logout": "Esci",
-    "openMenu": "Apri menu",
-    "parentArea": "Area Genitori",
-    "returnHome": "Torna alla home",
-    "season": {
-      "autumn": "Autunno"
-    },
-    "title": "Titolo",
-    "hero": {
-      "title": "Impara meglio con MirrorBuddy",
-      "subtitle": "Il tuo compagno di studio basato su intelligenza artificiale",
-      "cta": "Inizia ora",
-      "secondaryCta": "Scopri di più"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Caricamento...",
@@ -393,39 +335,40 @@
       "whatIsYourName": "Come ti chiami?",
       "years": "Anni",
       "yourSupportTeacher": "La tua insegnante di sostegno"
-    }
-  },
-  "onboarding": {
-    "transcript": {
-      "conversationActive": "Conversazione attiva",
-      "conversationTitle": "Titolo conversazione",
-      "messagePlural": "messaggi",
-      "messageSingular": "messaggio",
-      "noConversation": "Nessuna conversazione",
-      "userLabel": "Tu"
     },
-    "checklist": {
-      "nameLabel": "Nome",
-      "ageLabel": "Età",
-      "schoolLabel": "Scuola",
-      "schoolElementary": "Elementare",
-      "schoolMiddle": "Media",
-      "schoolHigh": "Superiore",
-      "differencesLabel": "Difficoltà di apprendimento",
-      "differencesCount": "{count} selezionate"
-    },
-    "voicePanel": {
-      "cancel": "Annulla",
-      "connected": "Connesso",
-      "disableMicrophone": "Disattiva microfono",
-      "enableMicrophone": "Attiva microfono",
-      "endCall": "Termina chiamata",
-      "listening": "In ascolto",
-      "melissa": "Melissa",
-      "microphoneMuted": "Microfono disattivato",
-      "speakWithMelissa": "Parla con Melissa",
-      "speaking": "Sta parlando",
-      "you": "Tu"
+    "onboarding": {
+      "transcript": {
+        "conversationActive": "Conversazione attiva",
+        "conversationTitle": "Titolo conversazione",
+        "messagePlural": "messaggi",
+        "messageSingular": "messaggio",
+        "noConversation": "Nessuna conversazione",
+        "userLabel": "Tu"
+      },
+      "checklist": {
+        "nameLabel": "Nome",
+        "ageLabel": "Età",
+        "schoolLabel": "Scuola",
+        "schoolElementary": "Elementare",
+        "schoolMiddle": "Media",
+        "schoolHigh": "Superiore",
+        "differencesLabel": "Difficoltà di apprendimento",
+        "differencesCount": "{count} selezionate"
+      },
+      "voicePanel": {
+        "cancel": "Annulla",
+        "connected": "Connesso",
+        "disableMicrophone": "Disattiva microfono",
+        "enableMicrophone": "Attiva microfono",
+        "endCall": "Termina chiamata",
+        "listening": "In ascolto",
+        "melissa": "Melissa",
+        "microphoneMuted": "Microfono disattivato",
+        "speakWithMelissa": "Parla con Melissa",
+        "speaking": "Sta parlando",
+        "you": "Tu"
+      },
+      "ageYears": "anni"
     }
   },
   "trialConsent": {
@@ -448,5 +391,184 @@
     "toolsDay": "Strumenti/giorno",
     "maestriAvailable": "Maestri disponibili",
     "trialDescription": "Stai usando la versione di prova gratuita. Richiedi accesso alla beta per limiti illimitati e funzionalità avanzate."
+  },
+  "hero": {
+    "betaBadge": "Beta Privata",
+    "betaSubtitle": "Solo su invito",
+    "welcomeBack": "Bentornato,",
+    "welcomeBackSubtitle": "Pronto per la tua prossima avventura di apprendimento?",
+    "welcomeNew": "Benvenuto in",
+    "tagline": "Impara",
+    "taglineWith": "CON i Grandi Maestri",
+    "taglineAbilities": "qualunque siano le tue abilità",
+    "description": "Studia con 22 Professori storici. Accesso vocale. Supporto completo per dislessia, ADHD, e altri stili di apprendimento.",
+    "accessibility": {
+      "title": "Progettato per TUTTI gli stili di apprendimento",
+      "subtitle": "Supporto dedicato per difficoltà di apprendimento"
+    }
+  },
+  "valueProposition": {
+    "title": "Perché scegliere MirrorBuddy",
+    "items": {
+      "maestri": {
+        "title": "22 Professori AI",
+        "description": "Da Euclide a Darwin, impara da menti straordinarie della storia"
+      },
+      "accessibility": {
+        "title": "Accessibile a Tutti",
+        "description": "Font leggibili, sintesi vocale, mappe mentali, quiz adattivi"
+      },
+      "voice": {
+        "title": "Conversazione Vocale",
+        "description": "Parla in tempo reale con i tuoi Professori senza barriere"
+      },
+      "personalized": {
+        "title": "Apprendimento Personalizzato",
+        "description": "Si adatta al tuo stile, ritmo e bisogni specifici"
+      }
+    }
+  },
+  "accessibilityFirstSection": {
+    "heading": "Progettato specificamente per chi ha difficoltà di apprendimento",
+    "subheading": "7 profili di accessibilità, tutti configurabili al 100%",
+    "profiles": {
+      "dyslexia": {
+        "label": "Dislessia",
+        "features": "Font OpenDyslexic, spaziatura, contrasto aumentato"
+      },
+      "adhd": {
+        "label": "ADHD",
+        "features": "Sessioni Pomodoro, modalità distrazione-libera, supporto focus"
+      },
+      "visualImpairment": {
+        "label": "Disabilità visiva",
+        "features": "Sintesi vocale, contrasto elevato, navigazione tastiera"
+      },
+      "motorImpairment": {
+        "label": "Disabilità motoria",
+        "features": "Comandi vocali, tasti grandi, controllo facile"
+      },
+      "autism": {
+        "label": "Autismo",
+        "features": "Movimento ridotto, layout prevedibile, struttura chiara"
+      },
+      "auditoryImpairment": {
+        "label": "Disabilità uditiva",
+        "features": "Sottotitoli, indicatori visivi, nessun contenuto solo audio"
+      },
+      "cerebralPalsy": {
+        "label": "Paralisi cerebrale",
+        "features": "Adattamenti combinati motori e cognitivi"
+      }
+    }
+  },
+  "features": {
+    "heading": "Strumenti per ogni stile di apprendimento",
+    "subtitle": "Una piattaforma completa e accessibile progettata per te",
+    "voiceConversation": "Conversazione Vocale - Parla con i tuoi Professori in tempo reale",
+    "mindMaps": "Mappe Mentali - Visualizza e organizza i concetti",
+    "flashcards": "Flashcard FSRS - Memorizza con la ripetizione spaziata",
+    "interactiveQuizzes": "Quiz Interattivi - Verifica le tue conoscenze",
+    "gamification": "Gamification - Guadagna XP e sblocca obiettivi",
+    "adaptiveLearning": "Apprendimento Adattivo - Si adatta al tuo stile e ritmo"
+  },
+  "socialProof": {
+    "heading": "Studenti con DSA stanno imparando meglio",
+    "tagline": "Le famiglie scelgono MirrorBuddy per supporto inclusivo e divertente",
+    "testimonialPrompt": "Leggi le storie di successo dei nostri studenti"
+  },
+  "quickStart": {
+    "heading": "Inizia il tuo percorso",
+    "returningUser": {
+      "goToApp": "Vai all'app",
+      "updateProfile": "Aggiorna profilo"
+    },
+    "betaAccess": {
+      "badge": "ACCESSO COMPLETO",
+      "title": "Hai un account?",
+      "feature1": "22 Professori AI",
+      "feature2": "Tutti gli strumenti",
+      "feature3": "Progressi salvati",
+      "cta": "Accedi"
+    },
+    "trial": {
+      "badge": "PROVA GRATUITA",
+      "title": "Esplora ora",
+      "feature1": "3 Professori",
+      "feature2": "10 messaggi/giorno",
+      "feature3": "Nessuna registrazione",
+      "cta": "Prova gratis"
+    }
+  },
+  "tierComparison": {
+    "heading": "Scegli il piano perfetto per te",
+    "subtitle": "Inizia con una prova gratuita o registrati per sbloccare più funzionalità",
+    "tiers": {
+      "trial": {
+        "name": "Prova",
+        "tagline": "Esplora senza impegno",
+        "price": "Gratuito",
+        "features": {
+          "maestri": "3 Professori",
+          "messages": "10 messaggi/giorno",
+          "voice": "5 minuti voce/giorno",
+          "noRegistration": "Nessuna registrazione"
+        },
+        "cta": "Prova gratis"
+      },
+      "base": {
+        "name": "Base",
+        "tagline": "Per studenti registrati",
+        "price": "Gratuito",
+        "features": {
+          "maestri": "20 Professori",
+          "messages": "Messaggi illimitati",
+          "voice": "Voce illimitata",
+          "savedProgress": "Progressi salvati"
+        },
+        "cta": "Registrati"
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Esperienza completa",
+        "price": "Su richiesta",
+        "badge": "Consigliato",
+        "features": {
+          "maestri": "22 Professori",
+          "messagesUnlimited": "Messaggi illimitati",
+          "voiceUnlimited": "Voce illimitata",
+          "allTools": "Tutti gli strumenti"
+        },
+        "cta": "Passa a Pro"
+      }
+    }
+  },
+  "support": {
+    "heading": "Sempre al tuo fianco",
+    "subtitle": "Coach per il metodo di studio e Amici per il supporto emotivo",
+    "coach": "Coach - Ti insegnano il metodo di studio",
+    "buddy": "Amico - Ti supportano emotivamente"
+  },
+  "compliance": {
+    "heading": "Conformità, privacy e trasparenza",
+    "subtitle": "MirrorBuddy aderisce alle normative internazionali",
+    "items": {
+      "gdpr": "GDPR - Protezione dati UE",
+      "aiAct": "EU AI Act - Conformità normativa IA",
+      "coppa": "COPPA - Protezione minori",
+      "aiTransparency": "Trasparenza IA - Politiche pubbliche",
+      "openSource": "Open Source - Codice su GitHub"
+    }
+  },
+  "footer": {
+    "aiDisclaimer": "Creato con IA - le risposte potrebbero contenere errori",
+    "complianceLinks": {
+      "privacy": "Privacy Policy",
+      "terms": "Termini di Servizio",
+      "cookies": "Cookie",
+      "aiTransparency": "Trasparenza IA",
+      "compliance": "Conformità"
+    },
+    "copyright": "© {year} MirrorBuddy. Progetto open source su GitHub."
   }
 }

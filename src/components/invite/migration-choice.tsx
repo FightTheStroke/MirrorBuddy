@@ -26,7 +26,7 @@ export function MigrationChoice({
   userId,
   onComplete,
 }: MigrationChoiceProps) {
-  const t = useTranslations("invite.migration");
+  const t = useTranslations("auth.invite.migration");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [completed, setCompleted] = useState(false);

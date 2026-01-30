@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl";
 import { Section } from "../sections";
 
 export function ModelCardSections() {
-  const t = useTranslations("modelCard");
+  const t = useTranslations("compliance.modelCard");
 
   // Get model names dynamically - they're stored as a JSON-like structure
   const models = [

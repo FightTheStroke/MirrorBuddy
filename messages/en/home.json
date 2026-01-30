@@ -1,15 +1,87 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy",
+    "appTitle": "MirrorBuddy - The School I Want",
     "loading": "Loading...",
     "seasonDefault": "Autumn",
+    "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Professors",
+      "astuccio": "Pencil Case",
+      "zaino": "Backpack",
       "calendar": "Calendar",
       "progress": "Progress",
       "settings": "Settings",
-      "zaino": "Backpack",
-      "astuccio": "Pencil Case"
+      "features": "Funzionalità",
+      "pricing": "Prezzi",
+      "about": "Chi siamo",
+      "contact": "Contatti",
+      "login": "Accedi",
+      "signup": "Registrati",
+      "dashboard": "Dashboard",
+      "logout": "Esci"
+    },
+    "header": {
+      "openMenu": "Open menu",
+      "streak": "Streak",
+      "sessionsThisWeek": "Sessions this week",
+      "studyTime": "Study time",
+      "questionsAsked": "Questions asked",
+      "trial": "Trial",
+      "trialClickToRequest": "Click to request full access"
+    },
+    "sidebar": {
+      "backToHome": "Back to home",
+      "appName": "MirrorBuddy",
+      "closeMenu": "Close menu",
+      "trialMode": "Trial Mode",
+      "login": "Login",
+      "requestAccess": "Request Access",
+      "adminDashboard": "Admin Dashboard",
+      "adminDashboardAria": "Administrator dashboard",
+      "parentArea": "Parent Area"
+    },
+    "adminDashboard": "Admin Dashboard",
+    "closeMenu": "Close Menu",
+    "logout": "Logout",
+    "openMenu": "Open Menu",
+    "parentArea": "Parent Area",
+    "returnHome": "Return Home",
+    "season": {
+      "autumn": "Autumn"
+    },
+    "title": "Titolo",
+    "hero": {
+      "title": "Impara meglio con MirrorBuddy",
+      "subtitle": "Il tuo compagno di studio basato su intelligenza artificiale",
+      "cta": "Inizia ora",
+      "secondaryCta": "Scopri di più"
     }
+  },
+  "appTitle": "MirrorBuddy",
+  "loading": "Loading...",
+  "seasonDefault": "Current Season",
+  "header": {
+    "openMenu": "Open menu",
+    "mirrorBucksShort": "MB",
+    "streak": "Streak",
+    "sessionsThisWeek": "Sessions this week",
+    "studyTime": "Study time",
+    "questionsAsked": "Questions asked",
+    "trialClickToRequest": "Click to request access",
+    "trial": "Trial"
+  },
+  "sidebar": {
+    "backToHome": "Back to Home",
+    "appName": "MirrorBuddy",
+    "closeMenu": "Close menu",
+    "trialMode": "Trial Mode",
+    "login": "Sign In",
+    "requestAccess": "Request Access",
+    "adminDashboardAria": "Go to Admin Dashboard",
+    "adminDashboard": "Admin Dashboard",
+    "parentArea": "Parent Area"
+  },
+  "navigation": {
+    "professors": "Professors"
   }
 }

@@ -12,7 +12,7 @@ export interface StickyKeysStatus {
 }
 
 export function useStickyKeys() {
-  const t = useTranslations("typing.stickyKeys");
+  const t = useTranslations("tools.typing.stickyKeys");
   const [status, setStatus] = useState<StickyKeysStatus>({
     isSupported: false,
     isEnabled: false,
@@ -124,7 +124,7 @@ function detectPlatform(): "macos" | "windows" | "linux" | "unknown" {
 }
 
 export function StickyKeysHelper() {
-  const t = useTranslations("typing.stickyKeys");
+  const t = useTranslations("tools.typing.stickyKeys");
   const { status, enableStickyKeys, openAccessibilitySettings } =
     useStickyKeys();
 

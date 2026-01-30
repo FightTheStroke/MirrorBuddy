@@ -49,7 +49,7 @@ export function ToolMaestroSelectionDialog({
   onSelect,
   onClose,
 }: ToolMaestroSelectionDialogProps) {
-  const t = useTranslations("conversation.toolSelection");
+  const t = useTranslations("chat.conversation.toolSelection");
   const [searchQuery, setSearchQuery] = useState("");
   const maestri = getAllMaestri();
 

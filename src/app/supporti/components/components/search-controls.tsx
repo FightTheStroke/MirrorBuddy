@@ -42,7 +42,7 @@ export function SearchControls({
   filteredCount,
   onClearFilters,
 }: SearchControlsProps) {
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
 
   return (
     <motion.div

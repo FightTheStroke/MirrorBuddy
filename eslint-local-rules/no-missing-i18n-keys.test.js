@@ -4,7 +4,7 @@
  * Validates that the rule correctly detects missing translation keys
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it } from "vitest";
 import { RuleTester } from "eslint";
 import { noMissingI18nKeys } from "./no-missing-i18n-keys.js";
 

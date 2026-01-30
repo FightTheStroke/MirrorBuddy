@@ -10,7 +10,7 @@ interface MiniBarChartProps {
 }
 
 export function MiniBarChart({ data, height = 80 }: MiniBarChartProps) {
-  const t = useTranslations("telemetry");
+  const t = useTranslations("settings.telemetry");
 
   if (!data.length || !data[0]?.data.length) {
     return (

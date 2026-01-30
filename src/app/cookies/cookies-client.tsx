@@ -6,7 +6,7 @@ import { CookiesContent } from "./content";
 import { useTranslations } from "next-intl";
 
 export function CookiesClient() {
-  const t = useTranslations("legal.cookies");
+  const t = useTranslations("compliance.legal.cookies");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">

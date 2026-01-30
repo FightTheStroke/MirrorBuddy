@@ -32,7 +32,7 @@ interface ParentDashboardProps {
 }
 
 export function ParentDashboard({ insights }: ParentDashboardProps) {
-  const t = useTranslations("parentDashboard");
+  const t = useTranslations("education.parentDashboard");
   const [expandedStrengths, setExpandedStrengths] = useState(false);
   const [expandedGrowth, setExpandedGrowth] = useState(false);
 

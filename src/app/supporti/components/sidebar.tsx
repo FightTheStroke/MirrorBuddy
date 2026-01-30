@@ -49,7 +49,7 @@ const TOOL_ICON_MAP: Partial<Record<ToolType, typeof Brain>> = {
 };
 
 export function Sidebar({ counts, subjects, maestros }: SidebarProps) {
-  const t = useTranslations("supporti");
+  const t = useTranslations("education.supporti");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [expandedSections, setExpandedSections] = useState({

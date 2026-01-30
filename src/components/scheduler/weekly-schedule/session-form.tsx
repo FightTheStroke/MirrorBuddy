@@ -42,7 +42,7 @@ export function SessionForm({
   onCancel,
   onFormChange,
 }: SessionFormProps) {
-  const t = useTranslations("scheduler");
+  const t = useTranslations("education.scheduler");
   return (
     <AnimatePresence>
       {showForm && (

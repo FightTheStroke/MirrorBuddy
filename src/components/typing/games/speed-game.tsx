@@ -30,7 +30,7 @@ interface SpeedGameProps {
 }
 
 export function SpeedGame({ onGameEnd }: SpeedGameProps) {
-  const t = useTranslations("typing.speedGame");
+  const t = useTranslations("tools.typing.speedGame");
   const [words] = useState<string[]>(() =>
     shuffle([...GAME_WORDS]).slice(0, 10),
   );

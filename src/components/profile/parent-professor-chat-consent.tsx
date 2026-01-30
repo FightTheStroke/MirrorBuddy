@@ -31,7 +31,7 @@ export function ConsentModal({
   onConsent,
   onCancel,
 }: ConsentModalProps) {
-  const t = useTranslations("profile.parentChat");
+  const t = useTranslations("settings.profile.parentChat");
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
       <DialogContent className="sm:max-w-lg">

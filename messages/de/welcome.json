@@ -1,62 +1,4 @@
 {
-  "home": {
-    "appTitle": "MirrorBuddy - Die Schule, die ich will",
-    "loading": "Laden...",
-    "seasonDefault": "Herbst",
-    "mirrorBucksShort": "MB",
-    "navigation": {
-      "professors": "Professoren",
-      "astuccio": "Federmäppchen",
-      "zaino": "Rucksack",
-      "calendar": "Kalender",
-      "progress": "Fortschritt",
-      "settings": "Einstellungen",
-      "features": "Funktionen",
-      "pricing": "Preise",
-      "about": "Über uns",
-      "contact": "Kontakt",
-      "login": "Anmelden",
-      "signup": "Registrieren",
-      "dashboard": "Dashboard",
-      "logout": "Abmelden"
-    },
-    "header": {
-      "openMenu": "Menü öffnen",
-      "streak": "Serie",
-      "sessionsThisWeek": "Sitzungen diese Woche",
-      "studyTime": "Lernzeit",
-      "questionsAsked": "Gestellte Fragen",
-      "trial": "Testversion",
-      "trialClickToRequest": "Klicken Sie, um vollen Zugriff anzufordern"
-    },
-    "sidebar": {
-      "backToHome": "Zurück zur Startseite",
-      "appName": "MirrorBuddy",
-      "closeMenu": "Menü schließen",
-      "trialMode": "Testmodus",
-      "login": "Anmelden",
-      "requestAccess": "Zugriff anfordern",
-      "adminDashboard": "Admin-Dashboard",
-      "adminDashboardAria": "Administrator-Dashboard",
-      "parentArea": "Elternbereich"
-    },
-    "adminDashboard": "Admin-Dashboard",
-    "closeMenu": "Menü schließen",
-    "logout": "Abmelden",
-    "openMenu": "Menü öffnen",
-    "parentArea": "Elternbereich",
-    "returnHome": "Zurück zur Startseite",
-    "season": {
-      "autumn": "Herbst"
-    },
-    "title": "Titel",
-    "hero": {
-      "title": "Besser lernen mit MirrorBuddy",
-      "subtitle": "Ihr KI-gestützter Lernbegleiter",
-      "cta": "Jetzt starten",
-      "secondaryCta": "Mehr erfahren"
-    }
-  },
   "welcome": {
     "page": {
       "loading": "Laden...",
@@ -393,39 +335,40 @@
       "whatIsYourName": "Wie heißt du?",
       "years": "Jahre",
       "yourSupportTeacher": "Deine Förderlehrerin"
-    }
-  },
-  "onboarding": {
-    "transcript": {
-      "conversationActive": "Gespräch aktiv",
-      "conversationTitle": "Gesprächstitel",
-      "messagePlural": "Nachrichten",
-      "messageSingular": "Nachricht",
-      "noConversation": "Kein Gespräch",
-      "userLabel": "Du"
     },
-    "checklist": {
-      "nameLabel": "Name",
-      "ageLabel": "Alter",
-      "schoolLabel": "Schule",
-      "schoolElementary": "Grundschule",
-      "schoolMiddle": "Mittelschule",
-      "schoolHigh": "Gymnasium",
-      "differencesLabel": "Lernschwierigkeiten",
-      "differencesCount": "{count} ausgewählt"
-    },
-    "voicePanel": {
-      "cancel": "Abbrechen",
-      "connected": "Verbunden",
-      "disableMicrophone": "Mikrofon deaktivieren",
-      "enableMicrophone": "Mikrofon aktivieren",
-      "endCall": "Anruf beenden",
-      "listening": "Hört zu",
-      "melissa": "Melissa",
-      "microphoneMuted": "Mikrofon stummgeschaltet",
-      "speakWithMelissa": "Mit Melissa sprechen",
-      "speaking": "Spricht",
-      "you": "Du"
+    "onboarding": {
+      "transcript": {
+        "conversationActive": "Aktive Unterhaltung",
+        "conversationTitle": "Unterhaltungstitel",
+        "messagePlural": "Nachrichten",
+        "messageSingular": "Nachricht",
+        "noConversation": "Keine Unterhaltung",
+        "userLabel": "Du"
+      },
+      "checklist": {
+        "nameLabel": "Name",
+        "ageLabel": "Alter",
+        "schoolLabel": "Schule",
+        "schoolElementary": "Grundschule",
+        "schoolMiddle": "Mittelschule",
+        "schoolHigh": "Oberschule",
+        "differencesLabel": "Lernschwierigkeiten",
+        "differencesCount": "{count} ausgewählt"
+      },
+      "voicePanel": {
+        "cancel": "Abbrechen",
+        "connected": "Verbunden",
+        "disableMicrophone": "Mikrofon deaktivieren",
+        "enableMicrophone": "Mikrofon aktivieren",
+        "endCall": "Anruf beenden",
+        "listening": "Hört zu",
+        "melissa": "Melissa",
+        "microphoneMuted": "Mikrofon deaktiviert",
+        "speakWithMelissa": "Sprich mit Melissa",
+        "speaking": "Spricht",
+        "you": "Du"
+      },
+      "ageYears": "Jahre"
     }
   },
   "trialConsent": {
@@ -448,5 +391,184 @@
     "toolsDay": "Tools/Tag",
     "maestriAvailable": "Verfügbare Professoren",
     "trialDescription": "Sie nutzen die kostenlose Testversion. Fordern Sie Beta-Zugang für unbegrenzte Limits und erweiterte Funktionen an."
+  },
+  "hero": {
+    "betaBadge": "Private Beta",
+    "betaSubtitle": "Nur auf Einladung",
+    "welcomeBack": "Willkommen zurück,",
+    "welcomeBackSubtitle": "Bereit für dein nächstes Lernabenteuer?",
+    "welcomeNew": "Willkommen bei",
+    "tagline": "Lerne",
+    "taglineWith": "MIT den großen Meistern",
+    "taglineAbilities": "unabhängig von deinen Fähigkeiten",
+    "description": "Lerne mit 22 historischen Professoren. Sprachzugang. Vollständige Unterstützung für Legasthenie, ADHS und andere Lernstile.",
+    "accessibility": {
+      "title": "Entwickelt für ALLE Lernstile",
+      "subtitle": "Gezielte Unterstützung bei Lernschwierigkeiten"
+    }
+  },
+  "valueProposition": {
+    "title": "Warum MirrorBuddy wählen",
+    "items": {
+      "maestri": {
+        "title": "22 KI-Professoren",
+        "description": "Von Euklid bis Darwin, lerne von außergewöhnlichen Köpfen der Geschichte"
+      },
+      "accessibility": {
+        "title": "Für alle zugänglich",
+        "description": "Lesbare Schriftarten, Sprachsynthese, Mindmaps, adaptive Quiz"
+      },
+      "voice": {
+        "title": "Sprachunterhaltung",
+        "description": "Sprich in Echtzeit mit deinen Professoren ohne Barrieren"
+      },
+      "personalized": {
+        "title": "Personalisiertes Lernen",
+        "description": "Passt sich deinem Stil, Tempo und spezifischen Bedürfnissen an"
+      }
+    }
+  },
+  "accessibilityFirstSection": {
+    "heading": "Speziell entwickelt für Menschen mit Lernschwierigkeiten",
+    "subheading": "7 Barrierefreiheitsprofile, alle 100% konfigurierbar",
+    "profiles": {
+      "dyslexia": {
+        "label": "Legasthenie",
+        "features": "OpenDyslexic-Schrift, Abstände, erhöhter Kontrast"
+      },
+      "adhd": {
+        "label": "ADHS",
+        "features": "Pomodoro-Sitzungen, ablenkungsfreier Modus, Fokusunterstützung"
+      },
+      "visualImpairment": {
+        "label": "Sehbehinderung",
+        "features": "Sprachsynthese, hoher Kontrast, Tastaturnavigation"
+      },
+      "motorImpairment": {
+        "label": "Motorische Behinderung",
+        "features": "Sprachbefehle, große Schaltflächen, einfache Steuerung"
+      },
+      "autism": {
+        "label": "Autismus",
+        "features": "Reduzierte Bewegung, vorhersehbares Layout, klare Struktur"
+      },
+      "auditoryImpairment": {
+        "label": "Hörbehinderung",
+        "features": "Untertitel, visuelle Indikatoren, keine reinen Audio-Inhalte"
+      },
+      "cerebralPalsy": {
+        "label": "Zerebralparese",
+        "features": "Kombinierte motorische und kognitive Anpassungen"
+      }
+    }
+  },
+  "features": {
+    "heading": "Werkzeuge für jeden Lernstil",
+    "subtitle": "Eine umfassende und barrierefreie Plattform für dich entwickelt",
+    "voiceConversation": "Sprachunterhaltung - Sprich in Echtzeit mit deinen Professoren",
+    "mindMaps": "Mindmaps - Visualisiere und organisiere Konzepte",
+    "flashcards": "FSRS-Karteikarten - Lerne mit verteilter Wiederholung",
+    "interactiveQuizzes": "Interaktive Quiz - Teste dein Wissen",
+    "gamification": "Gamification - Verdiene XP und schalte Ziele frei",
+    "adaptiveLearning": "Adaptives Lernen - Passt sich deinem Stil und Tempo an"
+  },
+  "socialProof": {
+    "heading": "Schüler mit Lernstörungen lernen besser",
+    "tagline": "Familien wählen MirrorBuddy für inklusive und unterhaltsame Unterstützung",
+    "testimonialPrompt": "Lies die Erfolgsgeschichten unserer Schüler"
+  },
+  "quickStart": {
+    "heading": "Starte deine Reise",
+    "returningUser": {
+      "goToApp": "Zur App gehen",
+      "updateProfile": "Profil aktualisieren"
+    },
+    "betaAccess": {
+      "badge": "VOLLZUGANG",
+      "title": "Hast du ein Konto?",
+      "feature1": "22 KI-Professoren",
+      "feature2": "Alle Werkzeuge",
+      "feature3": "Gespeicherte Fortschritte",
+      "cta": "Anmelden"
+    },
+    "trial": {
+      "badge": "KOSTENLOSE TESTVERSION",
+      "title": "Jetzt erkunden",
+      "feature1": "3 Professoren",
+      "feature2": "10 Nachrichten/Tag",
+      "feature3": "Keine Registrierung",
+      "cta": "Kostenlos testen"
+    }
+  },
+  "tierComparison": {
+    "heading": "Wähle den perfekten Plan für dich",
+    "subtitle": "Beginne mit einer kostenlosen Testversion oder registriere dich, um weitere Funktionen freizuschalten",
+    "tiers": {
+      "trial": {
+        "name": "Testversion",
+        "tagline": "Erkunde ohne Verpflichtung",
+        "price": "Kostenlos",
+        "features": {
+          "maestri": "3 Professoren",
+          "messages": "10 Nachrichten/Tag",
+          "voice": "5 Minuten Sprache/Tag",
+          "noRegistration": "Keine Registrierung"
+        },
+        "cta": "Kostenlos testen"
+      },
+      "base": {
+        "name": "Basis",
+        "tagline": "Für registrierte Schüler",
+        "price": "Kostenlos",
+        "features": {
+          "maestri": "20 Professoren",
+          "messages": "Unbegrenzte Nachrichten",
+          "voice": "Unbegrenzte Sprache",
+          "savedProgress": "Gespeicherte Fortschritte"
+        },
+        "cta": "Registrieren"
+      },
+      "pro": {
+        "name": "Pro",
+        "tagline": "Vollständiges Erlebnis",
+        "price": "Auf Anfrage",
+        "badge": "Empfohlen",
+        "features": {
+          "maestri": "22 Professoren",
+          "messagesUnlimited": "Unbegrenzte Nachrichten",
+          "voiceUnlimited": "Unbegrenzte Sprache",
+          "allTools": "Alle Werkzeuge"
+        },
+        "cta": "Auf Pro upgraden"
+      }
+    }
+  },
+  "support": {
+    "heading": "Immer an deiner Seite",
+    "subtitle": "Coaches für Lernmethoden und Buddies für emotionale Unterstützung",
+    "coach": "Coach - Lehrt dir Lernmethoden",
+    "buddy": "Buddy - Unterstützt dich emotional"
+  },
+  "compliance": {
+    "heading": "Compliance, Datenschutz und Transparenz",
+    "subtitle": "MirrorBuddy hält sich an internationale Vorschriften",
+    "items": {
+      "gdpr": "DSGVO - EU-Datenschutz",
+      "aiAct": "EU AI Act - KI-Rechtskonformität",
+      "coppa": "COPPA - Kinderschutz",
+      "aiTransparency": "KI-Transparenz - Öffentliche Richtlinien",
+      "openSource": "Open Source - Code auf GitHub"
+    }
+  },
+  "footer": {
+    "aiDisclaimer": "Mit KI erstellt - Antworten können Fehler enthalten",
+    "complianceLinks": {
+      "privacy": "Datenschutzerklärung",
+      "terms": "Nutzungsbedingungen",
+      "cookies": "Cookies",
+      "aiTransparency": "KI-Transparenz",
+      "compliance": "Compliance"
+    },
+    "copyright": "© {year} MirrorBuddy. Open-Source-Projekt auf GitHub."
   }
 }

@@ -38,7 +38,7 @@ export function SessionControls({
   onSwitchToChat,
   onClose,
 }: SessionControlsProps) {
-  const t = useTranslations("session.controls");
+  const t = useTranslations("chat.session.controls");
   const [showTextInput, setShowTextInput] = useState(false);
   const [textInput, setTextInput] = useState("");
 

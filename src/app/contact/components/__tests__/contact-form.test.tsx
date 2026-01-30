@@ -198,7 +198,7 @@ describe("ContactForm", () => {
       await user.click(screen.getByRole("button", { name: /invia/i }));
 
       await waitFor(() => {
-        expect(screen.getByText(/errore nell'invio/i)).toBeInTheDocument();
+        expect(screen.getByText(/errore durante l'invio/i)).toBeInTheDocument();
       });
     });
   });

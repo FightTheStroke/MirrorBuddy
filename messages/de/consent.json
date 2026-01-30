@@ -24,5 +24,67 @@
     "coppa": "Wenn du unter 13 Jahre alt bist, haben deine Eltern eine Benachrichtigung erhalten, um wesentliche Cookies zu genehmigen.",
     "privacyPolicy": "Datenschutzrichtlinie",
     "cookiePolicy": "Cookie-Richtlinie"
+  },
+  "privacy": {
+    "title": "Datenschutzvereinbarung",
+    "description": "Dein Datenschutz ist uns wichtig",
+    "dataProcessing": "Datenverarbeitung",
+    "processingText": "MirrorBuddy verarbeitet nur die Daten, die zur Bereitstellung einer personalisierten und sicheren Lernerfahrung erforderlich sind.",
+    "dataStorage": "Wo Wir Deine Daten Speichern",
+    "storageText": "Deine Daten werden auf sicheren Servern in Europa mit garantierter DSGVO-Konformität gespeichert.",
+    "retention": "Datenspeicherzeitraum",
+    "retentionText": "Wir speichern deine Daten so lange wie für den Dienst erforderlich. Du kannst die Löschung jederzeit anfordern.",
+    "accept": "Ich Habe Gelesen und Akzeptiert",
+    "decline": "Ablehnen"
+  },
+  "terms": {
+    "title": "Nutzungsbedingungen",
+    "description": "Lese unsere Geschäftsbedingungen",
+    "acceptance": "Ich Akzeptiere die Nutzungsbedingungen",
+    "acceptanceText": "Ich bestätige, dass ich die Nutzungsbedingungen und Plattformrichtlinien gelesen und akzeptiert habe.",
+    "linkLabel": "Vollständige Bedingungen Anzeigen",
+    "required": "Du musst den Nutzungsbedingungen zustimmen, um fortzufahren."
+  },
+  "ageVerification": {
+    "title": "Altersverifikation",
+    "description": "DSGVO-Konformität - Schutz von Minderjährigen",
+    "statement": "Ich bestätige, dass ich mindestens 14 Jahre alt bin",
+    "europeanMinor": "Wenn du unter 14 Jahren alt bist, ist die Zustimmung eines Erziehungsberechtigten erforderlich.",
+    "confirm": "Ich bestätige, dass ich mindestens 14 Jahre alt bin",
+    "under14": "Ich bin ein Minderjähriger Nutzer - Ich Fordere Elterliche Zustimmung An"
+  },
+  "parentalConsent": {
+    "title": "Elterliche Zustimmung",
+    "description": "Zustimmungsantrag für Minderjährige Nutzer",
+    "intro": "Wenn du ein Elternteil oder Erziehungsberechtigter eines minderjährigen Benutzers bist, lies bitte unsere Richtlinien sorgfältig.",
+    "statement": "Ich bestätige, dass ich der Elternteil oder legale Erziehungsberechtigte bin und die Nutzung der Plattform autorisiere",
+    "responsibilities": "Verantwortungen der Eltern",
+    "responsibilitiesText": "Als Elternteil stimmst du zu, die Nutzung der Plattform zu überwachen und bist für die Aktivität des Minderjährigen verantwortlich.",
+    "contactUs": "Bei Fragen zur elterlichen Zustimmung kontaktiere bitte unser Support-Team.",
+    "confirm": "Ich Gebe Meine Zustimmung",
+    "decline": "Ich Autorisiere Nicht"
+  },
+  "aiDisclosure": {
+    "title": "KI-Offenlegung",
+    "description": "Transparenz bei der Verwendung von Künstlicher Intelligenz",
+    "statement": "Diese Plattform nutzt Künstliche Intelligenz (KI), um dein Lernen zu personalisieren.",
+    "howWeUseAI": "Wie Wir KI Nutzen",
+    "howWeUseAIText": "KI wird verwendet, um personalisiertes Tutoring, adaptive Rückmeldungen und Lernempfehlungen zu bieten. Kritische Entscheidungen bleiben unter menschlicher Kontrolle.",
+    "aiLimitations": "KI-Einschränkungen",
+    "aiLimitationsText": "KI ist nicht perfekt. Sie kann Fehler machen und sollte menschliches Urteilsvermögen nicht ersetzen. Wir begrüßen kritische Fragen und Feedback.",
+    "humanOversight": "Menschliche Überwachung",
+    "humanOversightText": "Alle kritischen KI-Funktionen werden von qualifizierten Lehrkräften und Pädagogik-Spezialisten überwacht.",
+    "acknowledge": "Ich Verstehe Die KI-Nutzung"
+  },
+  "withdrawal": {
+    "title": "Widerrufer der Zustimmung",
+    "description": "Wie Du Die Zustimmung Widerrufst",
+    "howToWithdraw": "Du kannst deine Zustimmung jederzeit durch Zugriff auf deine Datenschutzeinstellungen widerrufen.",
+    "withdrawalProcess": "Widerrufsprozess",
+    "withdrawalSteps": "1. Melde dich bei deinem Konto an\n2. Gehe zu Einstellungen > Datenschutz und Zustimmung\n3. Wähle die Zustimmungen aus, die du widerrufen möchtest\n4. Bestätige die Widerrufanfrage\n5. Deine Daten werden gemäß DSGVO-Vorschriften gelöscht",
+    "emailWithdrawal": "Alternativ kannst du uns eine formale Widerrufanfrage per E-Mail senden.",
+    "consequences": "Auswirkungen",
+    "consequencesText": "Der Widerruf bestimmter Zustimmungen kann den Zugriff auf spezifische Plattformfunktionen verhindern.",
+    "contactSupport": "Kontaktiere Den Support"
   }
 }

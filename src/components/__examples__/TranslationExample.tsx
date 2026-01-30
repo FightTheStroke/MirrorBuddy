@@ -34,7 +34,7 @@ export function TranslationExampleBasic() {
 
 export function TranslationExampleWithVariables() {
   // Using translations with variables
-  const t = useTranslations("validation");
+  const t = useTranslations("common.validation");
 
   return (
     <div>

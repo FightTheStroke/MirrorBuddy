@@ -27,7 +27,7 @@ export function SessionRatingModal({
   onSubmit,
   sessionInfo,
 }: SessionRatingModalProps) {
-  const t = useTranslations("session");
+  const t = useTranslations("chat.session");
   const [rating, setRating] = useState<number>(0);
   const [hoveredRating, setHoveredRating] = useState<number>(0);
   const [feedback, setFeedback] = useState<string>("");

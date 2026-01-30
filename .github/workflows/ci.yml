@@ -524,6 +524,93 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+  # Lane 5.5: Accessibility Tests - WCAG 2.1 AA compliance (BLOCKING)
+  accessibility-tests:
+    name: Accessibility Tests (BLOCKING)
+    runs-on: ubuntu-latest
+    needs: [build]
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      # Download pre-built .next from build job
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Accessibility Tests
+        run: npx playwright test e2e/accessibility/ --reporter=list
+        env:
+          CI: true
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-report
+          path: playwright-report/
+          retention-days: 7
+
   # Lane 6a: Mobile Smoke - Fast PR feedback
   # Runs the smallest supported viewport to catch obvious mobile regressions early.
   mobile-smoke:
@@ -1023,6 +1110,7 @@ jobs:
       - migrations
       - quality
       - smoke-tests
+      - accessibility-tests
       - docker
       - performance
       - sentry-config
@@ -1040,6 +1128,7 @@ jobs:
           needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
+          needs.accessibility-tests.result != 'success' ||
           needs.docker.result != 'success' ||
           needs.performance.result != 'success'
         run: |
@@ -1056,6 +1145,7 @@ jobs:
           echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
+          echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           exit 1
@@ -1072,6 +1162,7 @@ jobs:
           needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
+          needs.accessibility-tests.result == 'success' &&
           needs.docker.result == 'success' &&
           needs.performance.result == 'success'
         run: |
@@ -1088,6 +1179,7 @@ jobs:
           echo "  ✓ migrations"
           echo "  ✓ quality"
           echo "  ✓ smoke-tests"
+          echo "  ✓ accessibility-tests"
           echo "  ✓ docker"
           echo "  ✓ performance"
           echo ""

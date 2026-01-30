@@ -78,6 +78,7 @@
     "loadingCheck": "Ladeprüfung",
     "maxFileSize": "Maximale Dateigröße",
     "minLength": "Mindestlänge",
+    "maxLength": "Maximale Länge",
     "notConnected": "Nicht verbunden",
     "privacyNotice": "Datenschutzhinweis",
     "readOnlyAccess": "Nur-Lese-Zugriff",
@@ -100,34 +101,61 @@
     },
     "create": "Erstellen",
     "update": "Aktualisieren",
-    "loading": "Laden..."
-  },
-  "status": {
-    "active": "Aktiv",
-    "inactive": "Inaktiv",
-    "pending": "Ausstehend",
-    "completed": "Abgeschlossen",
-    "cancelled": "Abgebrochen",
-    "draft": "Entwurf",
-    "published": "Veröffentlicht",
-    "archived": "Archiviert",
-    "deleted": "Gelöscht",
-    "enabled": "Aktiviert",
-    "disabled": "Deaktiviert",
-    "online": "Online",
-    "offline": "Offline",
-    "available": "Verfügbar",
-    "unavailable": "Nicht verfügbar",
-    "processing": "Verarbeitung",
-    "success": "Erfolgreich",
-    "failed": "Fehlgeschlagen",
-    "error": "Fehler"
-  },
-  "ui": {
-    "skeleton": {
-      "sessionLoading": "Sitzung wird geladen",
-      "sessionLoadingText": "Sitzung wird geladen...",
-      "viewLoading": "Ansicht wird geladen"
+    "loading": "Laden...",
+    "skipToMainContent": "Zum Hauptinhalt springen",
+    "skipLinkFocused": "Fokus zum Hauptinhalt bewegt",
+    "accessibility": {
+      "skipToContent": "Zum Inhalt springen"
+    },
+    "status": {
+      "active": "Aktiv",
+      "inactive": "Inaktiv",
+      "pending": "Ausstehend",
+      "completed": "Abgeschlossen",
+      "cancelled": "Abgebrochen",
+      "draft": "Entwurf",
+      "published": "Veröffentlicht",
+      "archived": "Archiviert",
+      "deleted": "Gelöscht",
+      "enabled": "Aktiviert",
+      "disabled": "Deaktiviert",
+      "online": "Online",
+      "offline": "Offline",
+      "available": "Verfügbar",
+      "unavailable": "Nicht verfügbar",
+      "processing": "Verarbeitung",
+      "success": "Erfolgreich",
+      "failed": "Fehlgeschlagen",
+      "error": "Fehler"
+    },
+    "ui": {
+      "skeleton": {
+        "loading": "Laden...",
+        "placeholder": "Platzhalter",
+        "sessionLoading": "Sitzung wird geladen",
+        "sessionLoadingText": "Sitzung wird geladen...",
+        "viewLoading": "Ansicht wird geladen"
+      }
+    },
+    "validation": {
+      "required": "Dieses Feld ist erforderlich",
+      "email": "Geben Sie eine gültige E-Mail ein",
+      "minLength": "Mindestens {min} Zeichen",
+      "maxLength": "Maximal {max} Zeichen",
+      "pattern": "Ungültiges Format",
+      "numeric": "Muss eine Zahl sein",
+      "common": {
+        "save": "Speichern"
+      },
+      "auth": {
+        "login": "Anmelden"
+      },
+      "errors": {
+        "notFound": "Nicht gefunden"
+      },
+      "accessibility": {
+        "skipToContent": "Zum Inhalt springen"
+      }
     }
   }
 }

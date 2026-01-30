@@ -42,7 +42,7 @@ export function DropZone({
   onOpenDrivePicker,
   onOpenDriveModal,
 }: DropZoneProps) {
-  const t = useTranslations("googleDrive");
+  const t = useTranslations("tools.googleDrive");
   const tCommon = useTranslations("common");
   const fileInputRef = useRef<HTMLInputElement>(null);
 

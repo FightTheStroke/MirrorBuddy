@@ -25,7 +25,7 @@ export function OnboardingTranscript({
   className,
   defaultExpanded = false,
 }: OnboardingTranscriptProps) {
-  const t = useTranslations("onboarding.transcript");
+  const t = useTranslations("welcome.onboarding.transcript");
   const { voiceTranscript, voiceSessionActive } = useOnboardingStore();
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const scrollRef = useRef<HTMLDivElement>(null);

@@ -7,7 +7,7 @@ import { getTranslations } from "next-intl/server";
 import { EnterpriseForm } from "@/components/contact/enterprise-form";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("contact.enterprise");
+  const t = await getTranslations("compliance.contact.enterprise");
   return {
     title: t("title"),
     description: t("description"),
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function EnterpriseContactPage() {
-  const t = await getTranslations("contact.enterprise");
+  const t = await getTranslations("compliance.contact.enterprise");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 p-4">
