@@ -20,7 +20,7 @@ import {
  * GET /api/admin/control-panel
  * Retrieve all control panel state
  */
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
@@ -106,10 +106,7 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        return NextResponse.json(
-          { error: "Invalid action" },
-          { status: 400 },
-        );
+        return NextResponse.json({ error: "Invalid action" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, data: result });

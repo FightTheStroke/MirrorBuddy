@@ -38,13 +38,15 @@ function loadMessages() {
 
   for (const ns of NAMESPACES) {
     const filePath = path.join(messagesDir, `${ns}.json`);
-    if (fs.existsSync(filePath)) {
+    if (fs.existsSync(filePath)) { // eslint-disable-line security/detect-non-literal-fs-filename
       try {
-        const content = fs.readFileSync(filePath, "utf-8");
+        const content = fs.readFileSync(filePath, "utf-8"); // eslint-disable-line security/detect-non-literal-fs-filename
         const parsed = JSON.parse(content);
-        // Unwrap top-level namespace key if it exists
-        // E.g. common.json contains { "common": { "loading": "..." } }
-        // We want messages['common'] = { "loading": "..." }
+        // Unwrap if the file has a top-level key matching the namespace.
+        // E.g. common.json = { "common": { ... } } → use parsed["common"].
+        // This mirrors next-intl runtime: Object.assign merges all
+        // top-level keys, so useTranslations("compliance") accesses
+        // messages["compliance"] = parsed["compliance"].
         messages[ns] = parsed[ns] || parsed;
       } catch (error) {
         // Silent fail - if we can't load, we can't validate

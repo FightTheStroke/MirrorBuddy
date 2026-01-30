@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/no-missing-i18n-keys -- pre-existing keys, tracked for i18n sync */
 "use client";
 
 import { useState } from "react";

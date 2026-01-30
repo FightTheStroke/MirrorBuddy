@@ -1,4 +1,3 @@
-/* eslint-disable local-rules/no-missing-i18n-keys -- admin keys are nested under admin.admin in JSON, resolved at runtime */
 "use client";
 
 import Link from "next/link";
