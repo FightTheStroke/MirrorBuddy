@@ -1,15 +1,7 @@
 /**
- * ESLint Rule: no-missing-i18n-keys
- *
- * Validates that translation keys used in code exist in the message files.
- * Prevents deploying code with missing translations.
- *
- * Checks:
- * - t("key") calls reference existing keys
- * - useTranslations("namespace") calls reference existing namespaces
- * - getTranslations("namespace") calls reference existing namespaces
- *
- * ADR: Task T7-02 - Block missing i18n keys at build time
+ * ESLint Rule: no-missing-i18n-keys (T7-02)
+ * Validates translation keys/namespaces exist in message files.
+ * Supports dotted sub-path namespaces (e.g. "education.knowledgeHub").
  */
 
 import fs from "fs";
@@ -49,7 +41,11 @@ function loadMessages() {
     if (fs.existsSync(filePath)) {
       try {
         const content = fs.readFileSync(filePath, "utf-8");
-        messages[ns] = JSON.parse(content);
+        const parsed = JSON.parse(content);
+        // Unwrap top-level namespace key if it exists
+        // E.g. common.json contains { "common": { "loading": "..." } }
+        // We want messages['common'] = { "loading": "..." }
+        messages[ns] = parsed[ns] || parsed;
       } catch (error) {
         // Silent fail - if we can't load, we can't validate
         console.warn(
@@ -87,36 +83,77 @@ function extractKeys(obj, prefix = "") {
 }
 
 /**
- * Check if a key exists in the messages.
- * Supports dot-notation namespaces (e.g. "welcome.hero" + key "title"
- * resolves to "welcome.hero.title" within the "welcome" message file).
- * The full namespace is used as the key prefix because next-intl scopes
- * into the JSON tree using the complete namespace path.
+ * Resolve a namespace string to its file and optional sub-path.
+ * "education" -> { file: "education", subPath: null }
+ * "education.knowledgeHub" -> { file: "education", subPath: "knowledgeHub" }
+ * Returns null if no matching file exists.
+ */
+function resolveNamespace(namespace) {
+  if (NAMESPACES.includes(namespace)) {
+    return { file: namespace, subPath: null };
+  }
+
+  const dotIndex = namespace.indexOf(".");
+  if (dotIndex > 0) {
+    const fileNs = namespace.substring(0, dotIndex);
+    const subPath = namespace.substring(dotIndex + 1);
+    if (NAMESPACES.includes(fileNs)) {
+      return { file: fileNs, subPath };
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Navigate into a nested object following a dot-separated path.
+ * Returns the nested value or undefined if path is invalid.
+ */
+function getNestedValue(obj, dotPath) {
+  const parts = dotPath.split(".");
+  let current = obj;
+  for (const part of parts) {
+    if (!current || typeof current !== "object" || !(part in current)) {
+      return undefined;
+    }
+    current = current[part];
+  }
+  return current;
+}
+
+/**
+ * Check if a key exists in the messages for a given namespace.
+ * Handles dotted sub-path namespaces (e.g. "education.knowledgeHub").
  */
 function keyExists(namespace, key) {
   const messages = loadMessages();
+  const resolved = resolveNamespace(namespace);
 
-  const base = namespace.includes(".")
-    ? namespace.substring(0, namespace.indexOf("."))
-    : namespace;
-
-  if (!messages[base]) {
+  if (!resolved || !messages[resolved.file]) {
     return false;
   }
 
-  const allKeys = extractKeys(messages[base]);
-  const fullKey = `${namespace}.${key}`;
+  const allKeys = extractKeys(messages[resolved.file]);
+  const fullKey = resolved.subPath ? `${resolved.subPath}.${key}` : key;
   return allKeys.has(fullKey);
 }
 
 /**
  * Check if a namespace exists.
- * Supports dot-notation (e.g. "welcome.hero") by validating
- * the top-level namespace (before the first dot).
+ * Supports dotted sub-paths: "education.knowledgeHub" checks that
+ * education.json exists AND has a "knowledgeHub" object key.
  */
 function namespaceExists(namespace) {
-  const base = namespace.includes(".") ? namespace.split(".")[0] : namespace;
-  return NAMESPACES.includes(base);
+  const resolved = resolveNamespace(namespace);
+  if (!resolved) return false;
+  if (!resolved.subPath) return true;
+
+  const messages = loadMessages();
+  const nsMessages = messages[resolved.file];
+  if (!nsMessages) return false;
+
+  const nested = getNestedValue(nsMessages, resolved.subPath);
+  return typeof nested === "object" && nested !== null;
 }
 
 export const noMissingI18nKeys = {
