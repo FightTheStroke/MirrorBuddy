@@ -11,6 +11,11 @@ import type {
   CountryMetric,
   MaestroMetric,
 } from "./business-kpi-types";
+import {
+  getMockCountries,
+  getMockMaestri,
+  getMockKPIs,
+} from "./business-kpi-mock-data";
 
 interface CachedKPIs {
   data: BusinessKPIResponse;
@@ -45,7 +50,9 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
     logger.info("Business KPIs computed successfully");
     return data;
   } catch (error) {
-    logger.error("Failed to compute business KPIs, using mock data", { error });
+    logger.error("Failed to compute business KPIs, using mock data", {
+      error,
+    });
     return getMockKPIs();
   }
 }
@@ -53,29 +60,19 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
 async function getRevenueMetrics(): Promise<RevenueMetrics> {
   try {
     const subscriptions = await prisma.userSubscription.findMany({
-      where: {
-        status: "active",
-      },
-      select: {
-        priceEur: true,
-      },
+      where: { status: "ACTIVE" },
+      include: { tier: { select: { monthlyPriceEur: true } } },
     });
 
     const mrr = subscriptions.reduce(
-      (sum, sub) => sum + (sub.priceEur || 0),
+      (sum, sub) => sum + Number(sub.tier?.monthlyPriceEur || 0),
       0,
     );
     const arr = mrr * 12;
     const growthRate = 8.5;
     const totalRevenue = arr * 1.2;
 
-    return {
-      mrr,
-      arr,
-      growthRate,
-      totalRevenue,
-      currency: "EUR",
-    };
+    return { mrr, arr, growthRate, totalRevenue, currency: "EUR" };
   } catch (error) {
     logger.warn("Using mock revenue metrics", { error });
     return {
@@ -96,21 +93,13 @@ async function getUserMetrics(): Promise<UserMetrics> {
     const [totalUsers, activeUsers, trialUsers, paidUsers] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({
-        where: {
-          lastSeenAt: {
-            gte: thirtyDaysAgo,
-          },
-        },
-      }),
-      prisma.user.count({
-        where: {
-          tier: "trial",
-        },
+        where: { updatedAt: { gte: thirtyDaysAgo } },
       }),
       prisma.userSubscription.count({
-        where: {
-          status: "active",
-        },
+        where: { status: "TRIAL" },
+      }),
+      prisma.userSubscription.count({
+        where: { status: "ACTIVE" },
       }),
     ]);
 
@@ -141,14 +130,10 @@ async function getUserMetrics(): Promise<UserMetrics> {
 
 async function getTopCountries(): Promise<CountryMetric[]> {
   try {
-    const users = await prisma.user.groupBy({
-      by: ["locale"],
+    const settings = await prisma.settings.groupBy({
+      by: ["language"],
       _count: true,
-      orderBy: {
-        _count: {
-          locale: "desc",
-        },
-      },
+      orderBy: { _count: { language: "desc" } },
       take: 10,
     });
 
@@ -161,16 +146,16 @@ async function getTopCountries(): Promise<CountryMetric[]> {
         en: { country: "United Kingdom", countryCode: "GB" },
       };
 
-    return users.map((u) => {
-      const info = countryMap[u.locale || "it"] || {
+    return settings.map((s) => {
+      const info = countryMap[s.language || "it"] || {
         country: "Other",
         countryCode: "XX",
       };
       return {
         country: info.country,
         countryCode: info.countryCode,
-        users: u._count,
-        revenue: u._count * 9.99,
+        users: s._count,
+        revenue: s._count * 9.99,
       };
     });
   } catch (error) {
@@ -182,18 +167,14 @@ async function getTopCountries(): Promise<CountryMetric[]> {
 async function getTopMaestri(): Promise<MaestroMetric[]> {
   try {
     const sessions = await prisma.conversation.groupBy({
-      by: ["professorId"],
+      by: ["maestroId"],
       _count: true,
-      orderBy: {
-        _count: {
-          professorId: "desc",
-        },
-      },
+      orderBy: { _count: { maestroId: "desc" } },
       take: 10,
     });
 
     return sessions.map((s) => ({
-      name: s.professorId || "Unknown",
+      name: s.maestroId || "Unknown",
       subject: "Various",
       sessions: s._count,
       avgDuration: 15.5,
@@ -202,104 +183,4 @@ async function getTopMaestri(): Promise<MaestroMetric[]> {
     logger.warn("Using mock maestri metrics", { error });
     return getMockMaestri();
   }
-}
-
-function getMockCountries(): CountryMetric[] {
-  return [
-    { country: "Italy", countryCode: "IT", users: 748, revenue: 7470 },
-    { country: "Germany", countryCode: "DE", users: 187, revenue: 1870 },
-    { country: "France", countryCode: "FR", users: 125, revenue: 1250 },
-    { country: "Spain", countryCode: "ES", users: 87, revenue: 870 },
-    { country: "United Kingdom", countryCode: "GB", users: 54, revenue: 540 },
-    { country: "Switzerland", countryCode: "CH", users: 23, revenue: 230 },
-    { country: "Austria", countryCode: "AT", users: 15, revenue: 150 },
-    { country: "Netherlands", countryCode: "NL", users: 8, revenue: 80 },
-  ];
-}
-
-function getMockMaestri(): MaestroMetric[] {
-  return [
-    {
-      name: "Leonardo da Vinci",
-      subject: "Art & Science",
-      sessions: 342,
-      avgDuration: 18.5,
-    },
-    {
-      name: "Marie Curie",
-      subject: "Chemistry",
-      sessions: 298,
-      avgDuration: 16.2,
-    },
-    {
-      name: "Galileo Galilei",
-      subject: "Physics",
-      sessions: 276,
-      avgDuration: 15.8,
-    },
-    {
-      name: "Ada Lovelace",
-      subject: "Mathematics",
-      sessions: 234,
-      avgDuration: 14.3,
-    },
-    {
-      name: "Albert Einstein",
-      subject: "Physics",
-      sessions: 221,
-      avgDuration: 17.1,
-    },
-    {
-      name: "Jane Goodall",
-      subject: "Biology",
-      sessions: 198,
-      avgDuration: 13.9,
-    },
-    {
-      name: "Carl Sagan",
-      subject: "Astronomy",
-      sessions: 187,
-      avgDuration: 16.7,
-    },
-    {
-      name: "Maya Angelou",
-      subject: "Literature",
-      sessions: 165,
-      avgDuration: 12.4,
-    },
-    {
-      name: "Nikola Tesla",
-      subject: "Engineering",
-      sessions: 154,
-      avgDuration: 15.2,
-    },
-    {
-      name: "Rachel Carson",
-      subject: "Environmental Science",
-      sessions: 142,
-      avgDuration: 14.6,
-    },
-  ];
-}
-
-function getMockKPIs(): BusinessKPIResponse {
-  return {
-    revenue: {
-      mrr: 2450,
-      arr: 29400,
-      growthRate: 8.5,
-      totalRevenue: 35280,
-      currency: "EUR",
-    },
-    users: {
-      totalUsers: 1247,
-      activeUsers: 892,
-      trialUsers: 523,
-      paidUsers: 245,
-      churnRate: 3.2,
-      trialConversionRate: 46.8,
-    },
-    topCountries: getMockCountries(),
-    topMaestri: getMockMaestri(),
-  };
 }
