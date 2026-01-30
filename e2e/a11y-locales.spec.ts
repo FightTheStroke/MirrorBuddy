@@ -18,6 +18,10 @@
  */
 
 import { test, expect, testAllLocales, SUPPORTED_LOCALES } from "./fixtures";
+
+// IMPORTANT: These tests check unauthenticated pages (welcome, legal)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
 import AxeBuilder from "@axe-core/playwright";
 
 /**

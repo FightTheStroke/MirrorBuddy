@@ -5,6 +5,10 @@
  */
 
 import { test, expect, testAllLocales } from "./fixtures";
+
+// IMPORTANT: These tests check unauthenticated pages (welcome, legal)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
 import {
   localePatterns,
   verifyPageLocale,

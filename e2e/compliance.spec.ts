@@ -13,16 +13,18 @@
 import { test, expect, testAllLocales } from "./fixtures";
 import AxeBuilder from "@axe-core/playwright";
 
+// IMPORTANT: These tests check unauthenticated pages (legal, compliance)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Compliance Pages - Accessibility", () => {
   test("privacy policy page is accessible", async ({ page }) => {
     await page.goto("/privacy");
     await expect(page).toHaveTitle(/privacy|privacy policy/i);
 
     const mainContent = page.getByRole("main");
-    const isVisible = await mainContent.isVisible().catch(() => false);
-    if (isVisible) {
-      await expect(mainContent).toBeVisible();
-    }
+    await mainContent.waitFor({ state: "visible", timeout: 10000 });
+    await expect(mainContent).toBeVisible();
   });
 
   test("terms of service page is accessible", async ({ page }) => {
@@ -30,10 +32,8 @@ test.describe("Compliance Pages - Accessibility", () => {
     await expect(page).toHaveTitle(/terms|condizioni|termini/i);
 
     const mainContent = page.getByRole("main");
-    const isVisible = await mainContent.isVisible().catch(() => false);
-    if (isVisible) {
-      await expect(mainContent).toBeVisible();
-    }
+    await mainContent.waitFor({ state: "visible", timeout: 10000 });
+    await expect(mainContent).toBeVisible();
   });
 
   test("cookie policy page is accessible", async ({ page }) => {
@@ -41,10 +41,8 @@ test.describe("Compliance Pages - Accessibility", () => {
     await expect(page).toHaveTitle(/cookie|policy/i);
 
     const mainContent = page.getByRole("main");
-    const isVisible = await mainContent.isVisible().catch(() => false);
-    if (isVisible) {
-      await expect(mainContent).toBeVisible();
-    }
+    await mainContent.waitFor({ state: "visible", timeout: 10000 });
+    await expect(mainContent).toBeVisible();
   });
 
   test("AI transparency page is accessible", async ({ page }) => {
@@ -52,10 +50,8 @@ test.describe("Compliance Pages - Accessibility", () => {
     await expect(page).toHaveTitle(/trasparenza|transparency|ai/i);
 
     const mainContent = page.getByRole("main");
-    const isVisible = await mainContent.isVisible().catch(() => false);
-    if (isVisible) {
-      await expect(mainContent).toBeVisible();
-    }
+    await mainContent.waitFor({ state: "visible", timeout: 10000 });
+    await expect(mainContent).toBeVisible();
   });
 });
 
@@ -141,10 +137,10 @@ test.describe("Compliance Pages - Multi-Locale", () => {
         const title = await playwrightPage.title();
         expect(title).toBeTruthy();
 
-        // Verify main content is visible
+        // Verify main content is visible (wait for React hydration after domcontentloaded)
         const mainContent = playwrightPage.getByRole("main");
-        const isVisible = await mainContent.isVisible().catch(() => false);
-        expect(isVisible).toBeTruthy();
+        await mainContent.waitFor({ state: "visible", timeout: 10000 });
+        await expect(mainContent).toBeVisible();
       },
     );
 

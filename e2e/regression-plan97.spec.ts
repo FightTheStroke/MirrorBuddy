@@ -14,6 +14,10 @@
 import { test, expect, testAllLocales } from "./fixtures";
 import type { Page } from "@playwright/test";
 
+// IMPORTANT: These tests check unauthenticated pages (welcome, legal, compliance)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 async function mockTosAccepted(page: Page): Promise<void> {
   await page.route("/api/tos", async (route) => {
     await route.fulfill({

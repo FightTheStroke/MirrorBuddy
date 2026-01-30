@@ -13,6 +13,10 @@
 
 import { test, expect } from "@playwright/test";
 
+// IMPORTANT: These tests check unauthenticated /ai-transparency page
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 // ============================================================================
 // AI ACT COMPLIANCE (EU 2024/1689)
 // ============================================================================
