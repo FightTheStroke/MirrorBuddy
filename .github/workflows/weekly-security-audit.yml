@@ -1,0 +1,63 @@
+name: Weekly Security Audit
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run npm audit
+        id: audit
+        run: |
+          npm audit --audit-level=high > audit-report.txt 2>&1 || echo "AUDIT_FAILED=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create issue on failure
+        if: steps.audit.outputs.AUDIT_FAILED == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('audit-report.txt', 'utf8');
+            const truncated = report.length > 3000
+              ? report.substring(0, 3000) + '\n\n... (truncated)'
+              : report;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Security: npm audit found high-severity vulnerabilities`,
+              body: [
+                '## Weekly Security Audit Failed',
+                '',
+                '`npm audit --audit-level=high` found vulnerabilities:',
+                '',
+                '```',
+                truncated,
+                '```',
+                '',
+                '**Action required**: Review and update affected packages.',
+                '',
+                'Run locally: `npm audit` for full report.',
+              ].join('\n'),
+              labels: ['security', 'dependencies'],
+            });

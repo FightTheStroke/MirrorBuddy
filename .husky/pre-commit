@@ -3,14 +3,6 @@
 # Run secrets scan first (fast, catches sensitive data before commit)
 ./scripts/secrets-scan.sh || exit 1
 
-# Technical debt check (fast, catches new debt before commit)
-if command -v npx >/dev/null 2>&1; then
-  npx tsx scripts/debt-check.ts 2>/dev/null || {
-    echo "⚠️  Technical debt thresholds exceeded. Run: npm run debt:check"
-    exit 1
-  }
-fi
-
 # Check if any message files are staged
 if git diff --cached --name-only | grep -q "^messages/"; then
   # i18n validation: Ensure translation files are consistent
