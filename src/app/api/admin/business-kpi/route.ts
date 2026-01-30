@@ -12,7 +12,7 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   try {
     const adminAuth = await validateAdminAuth();
-    if (!adminAuth.isValid) {
+    if (!adminAuth.authenticated || !adminAuth.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 

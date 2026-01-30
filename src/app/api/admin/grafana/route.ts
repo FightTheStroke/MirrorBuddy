@@ -14,7 +14,7 @@ export async function GET(_request: NextRequest) {
   try {
     // Validate admin authentication
     const adminAuth = await validateAdminAuth();
-    if (!adminAuth) {
+    if (!adminAuth.authenticated || !adminAuth.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
