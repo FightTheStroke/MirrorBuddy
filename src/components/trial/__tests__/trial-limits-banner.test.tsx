@@ -22,13 +22,13 @@ describe("TrialLimitsBanner", () => {
 
       // Check header
       expect(
-        screen.getByText("Limiti della prova gratuita"),
+        screen.getByText("Limiti della Prova Gratuita"),
       ).toBeInTheDocument();
 
       // Check all limit labels
-      expect(screen.getByText("Messaggi/giorno")).toBeInTheDocument();
-      expect(screen.getByText("Minuti vocali")).toBeInTheDocument();
-      expect(screen.getByText("Strumenti/giorno")).toBeInTheDocument();
+      expect(screen.getByText("messaggi/giorno")).toBeInTheDocument();
+      expect(screen.getByText("min voce/giorno")).toBeInTheDocument();
+      expect(screen.getByText("strumenti/giorno")).toBeInTheDocument();
       expect(screen.getByText("Maestri disponibili")).toBeInTheDocument();
     });
 
@@ -68,7 +68,7 @@ describe("TrialLimitsBanner", () => {
       render(<TrialLimitsBanner />);
 
       expect(
-        screen.getByText(/Stai usando la versione di prova gratuita/),
+        screen.getByText(/Registrati per rimuovere tutti i limiti/),
       ).toBeInTheDocument();
     });
 
@@ -158,7 +158,7 @@ describe("TrialLimitsBanner", () => {
       render(<TrialLimitsBanner />);
 
       // Check for title (p instead of h3 to avoid heading-order violations)
-      const title = screen.getByText("Limiti della prova gratuita");
+      const title = screen.getByText("Limiti della Prova Gratuita");
       expect(title.tagName).toBe("P");
     });
 

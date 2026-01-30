@@ -132,9 +132,9 @@
       "skeleton": {
         "loading": "Caricamento...",
         "placeholder": "Placeholder",
-        "sessionLoading": "[EN] Session Loading",
-        "sessionLoadingText": "[EN] Session Loading Text",
-        "viewLoading": "[EN] View Loading"
+        "sessionLoading": "Caricamento sessione",
+        "sessionLoadingText": "Caricamento della sessione in corso",
+        "viewLoading": "Caricamento vista"
       }
     },
     "validation": {

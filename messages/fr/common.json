@@ -130,20 +130,20 @@
     },
     "ui": {
       "skeleton": {
-        "loading": "[TRANSLATE] Caricamento...",
-        "placeholder": "[TRANSLATE] Placeholder",
+        "loading": "Chargement...",
+        "placeholder": "Espace réservé",
         "sessionLoading": "Session Loading",
         "sessionLoadingText": "Session Loading Text",
         "viewLoading": "View Loading"
       }
     },
     "validation": {
-      "required": "[TRANSLATE] Questo campo è obbligatorio",
-      "email": "[TRANSLATE] Inserisci un'email valida",
-      "minLength": "[TRANSLATE] Minimo {min} caratteri",
-      "maxLength": "[TRANSLATE] Massimo {max} caratteri",
-      "pattern": "[TRANSLATE] Formato non valido",
-      "numeric": "[TRANSLATE] Deve essere un numero",
+      "required": "Ce champ est obligatoire",
+      "email": "Entrez une adresse email valide",
+      "minLength": "Minimum {min} caractères",
+      "maxLength": "Maximum {max} caractères",
+      "pattern": "Format non valide",
+      "numeric": "Doit être un nombre",
       "common": {
         "save": "Enregistrer"
       },

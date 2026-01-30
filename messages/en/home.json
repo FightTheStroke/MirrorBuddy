@@ -57,31 +57,31 @@
       "secondaryCta": "Scopri di più"
     }
   },
-  "appTitle": "[TRANSLATE] MirrorBuddy",
-  "loading": "[TRANSLATE] Caricamento...",
-  "seasonDefault": "[TRANSLATE] Stagione Corrente",
+  "appTitle": "MirrorBuddy",
+  "loading": "Loading...",
+  "seasonDefault": "Current Season",
   "header": {
-    "openMenu": "[TRANSLATE] Apri menu",
-    "mirrorBucksShort": "[TRANSLATE] MB",
-    "streak": "[TRANSLATE] Serie",
-    "sessionsThisWeek": "[TRANSLATE] Sessioni questa settimana",
-    "studyTime": "[TRANSLATE] Tempo di studio",
-    "questionsAsked": "[TRANSLATE] Domande poste",
-    "trialClickToRequest": "[TRANSLATE] Clicca per richiedere accesso",
-    "trial": "[TRANSLATE] Prova"
+    "openMenu": "Open menu",
+    "mirrorBucksShort": "MB",
+    "streak": "Streak",
+    "sessionsThisWeek": "Sessions this week",
+    "studyTime": "Study time",
+    "questionsAsked": "Questions asked",
+    "trialClickToRequest": "Click to request access",
+    "trial": "Trial"
   },
   "sidebar": {
-    "backToHome": "[TRANSLATE] Torna alla Home",
-    "appName": "[TRANSLATE] MirrorBuddy",
-    "closeMenu": "[TRANSLATE] Chiudi menu",
-    "trialMode": "[TRANSLATE] Modalità Prova",
-    "login": "[TRANSLATE] Accedi",
-    "requestAccess": "[TRANSLATE] Richiedi Accesso",
-    "adminDashboardAria": "[TRANSLATE] Vai alla Dashboard Amministrazione",
-    "adminDashboard": "[TRANSLATE] Dashboard Admin",
-    "parentArea": "[TRANSLATE] Area Genitori"
+    "backToHome": "Back to Home",
+    "appName": "MirrorBuddy",
+    "closeMenu": "Close menu",
+    "trialMode": "Trial Mode",
+    "login": "Sign In",
+    "requestAccess": "Request Access",
+    "adminDashboardAria": "Go to Admin Dashboard",
+    "adminDashboard": "Admin Dashboard",
+    "parentArea": "Parent Area"
   },
   "navigation": {
-    "professors": "[TRANSLATE] Professori"
+    "professors": "Professors"
   }
 }

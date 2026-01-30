@@ -57,31 +57,31 @@
       "secondaryCta": "Descubre más"
     }
   },
-  "appTitle": "[TRANSLATE] MirrorBuddy",
-  "loading": "[TRANSLATE] Caricamento...",
-  "seasonDefault": "[TRANSLATE] Stagione Corrente",
+  "appTitle": "MirrorBuddy",
+  "loading": "Cargando...",
+  "seasonDefault": "Temporada Actual",
   "header": {
-    "openMenu": "[TRANSLATE] Apri menu",
-    "mirrorBucksShort": "[TRANSLATE] MB",
-    "streak": "[TRANSLATE] Serie",
-    "sessionsThisWeek": "[TRANSLATE] Sessioni questa settimana",
-    "studyTime": "[TRANSLATE] Tempo di studio",
-    "questionsAsked": "[TRANSLATE] Domande poste",
-    "trialClickToRequest": "[TRANSLATE] Clicca per richiedere accesso",
-    "trial": "[TRANSLATE] Prova"
+    "openMenu": "Abrir menú",
+    "mirrorBucksShort": "MB",
+    "streak": "Racha",
+    "sessionsThisWeek": "Sesiones esta semana",
+    "studyTime": "Tiempo de estudio",
+    "questionsAsked": "Preguntas realizadas",
+    "trialClickToRequest": "Haz clic para solicitar acceso",
+    "trial": "Prueba"
   },
   "sidebar": {
-    "backToHome": "[TRANSLATE] Torna alla Home",
-    "appName": "[TRANSLATE] MirrorBuddy",
-    "closeMenu": "[TRANSLATE] Chiudi menu",
-    "trialMode": "[TRANSLATE] Modalità Prova",
-    "login": "[TRANSLATE] Accedi",
-    "requestAccess": "[TRANSLATE] Richiedi Accesso",
-    "adminDashboardAria": "[TRANSLATE] Vai alla Dashboard Amministrazione",
-    "adminDashboard": "[TRANSLATE] Dashboard Admin",
-    "parentArea": "[TRANSLATE] Area Genitori"
+    "backToHome": "Volver al Inicio",
+    "appName": "MirrorBuddy",
+    "closeMenu": "Cerrar menú",
+    "trialMode": "Modo Prueba",
+    "login": "Iniciar sesión",
+    "requestAccess": "Solicitar Acceso",
+    "adminDashboardAria": "Ir al Panel de Administración",
+    "adminDashboard": "Panel de Administración",
+    "parentArea": "Área de Padres"
   },
   "navigation": {
-    "professors": "[TRANSLATE] Professori"
+    "professors": "Profesores"
   }
 }

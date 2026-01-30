@@ -594,15 +594,15 @@
         "switchToChat": "Cambiar a Chat"
       },
       "panel": {
-        "connecting": "[TRANSLATE] Connessione in corso...",
-        "speaking": "[TRANSLATE] Parla ora",
-        "listening": "[TRANSLATE] In ascolto...",
-        "connected": "[TRANSLATE] Connesso",
-        "startingCall": "[TRANSLATE] Avvio chiamata...",
-        "mutedLabel": "[TRANSLATE] Microfono disattivato",
-        "unmuteLabel": "[TRANSLATE] Attiva microfono",
-        "microphoneDisabled": "[TRANSLATE] Microfono disabilitato",
-        "speakNow": "[TRANSLATE] Parla ora"
+        "connecting": "Conectando...",
+        "speaking": "Habla ahora",
+        "listening": "Escuchando...",
+        "connected": "Conectado",
+        "startingCall": "Iniciando llamada...",
+        "mutedLabel": "Micrófono silenciado",
+        "unmuteLabel": "Activar micrófono",
+        "microphoneDisabled": "Micrófono desactivado",
+        "speakNow": "Habla ahora"
       }
     },
     "telemetry": {

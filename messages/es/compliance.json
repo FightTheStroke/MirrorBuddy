@@ -13,13 +13,13 @@
       },
       "backButton": "Back Button",
       "form": {
-        "name": "[TRANSLATE] Nome",
-        "email": "[TRANSLATE] Email",
-        "message": "[TRANSLATE] Messaggio",
-        "send": "[TRANSLATE] Invia",
-        "sending": "[TRANSLATE] Invio...",
-        "success": "[TRANSLATE] Messaggio inviato!",
-        "error": "[TRANSLATE] Errore nell'invio",
+        "name": "Nombre",
+        "email": "Correo electrónico",
+        "message": "Mensaje",
+        "send": "Enviar",
+        "sending": "Enviando...",
+        "success": "¡Mensaje enviado!",
+        "error": "Error al enviar",
         "emailInvalid": "L'email non è valida",
         "emailRequired": "L'email è obbligatoria",
         "errorMessage": "Si è verificato un errore durante l'invio del messaggio. Riprova più tardi.",
@@ -64,8 +64,8 @@
         "support": "¿Necesitas ayuda? Escribe a"
       },
       "schools_form": {
-        "schoolName": "[TRANSLATE] Nome Scuola",
-        "students": "[TRANSLATE] Numero Studenti",
+        "schoolName": "Nombre de la Escuela",
+        "students": "Número de Estudiantes",
         "errorConnection": "Error de conexión",
         "errorDefault": "Error al enviar",
         "features": {
@@ -123,70 +123,70 @@
     "cookies": "Política de Cookies",
     "accessibility": {
       "page": {
-        "title": "[TRANSLATE] Dichiarazione di Accessibilità",
-        "version": "[TRANSLATE] Versione {version}",
-        "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
-        "backHome": "[TRANSLATE] Torna alla home",
-        "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+        "title": "Declaración de Accesibilidad",
+        "version": "Versión {version}",
+        "lastUpdated": "Última actualización: {date}",
+        "backHome": "Volver al inicio",
+        "pageNavAriaLabel": "Navegación de la página de accesibilidad"
       },
       "compliance": {
-        "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
-        "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
-        "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
-        "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
-        "screenReader": "[TRANSLATE] Supporto per screen reader",
-        "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+        "heading": "Conformidad con WCAG 2.1 Nivel AA",
+        "declaration": "MirrorBuddy cumple con las Pautas de Accesibilidad para el Contenido Web (WCAG) 2.1 en el nivel AA, según lo requerido por la Ley 4/2004 (Ley Stanca) y la Directiva UE 2016/2102.",
+        "wcag": "Conformidad con WCAG 2.1 Nivel AA verificada",
+        "keyboard": "Navegación completa por teclado",
+        "screenReader": "Compatibilidad con lectores de pantalla",
+        "colorContrast": "Contraste de colores conforme (mínimo 4.5:1)"
       },
       "features": {
-        "heading": "[TRANSLATE] Funzionalità di Accessibilità",
-        "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
-        "dyslexia": "[TRANSLATE] Dislessia",
-        "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
-        "adhd": "[TRANSLATE] ADHD",
-        "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
-        "visual": "[TRANSLATE] Deficit visivo",
-        "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
-        "motor": "[TRANSLATE] Difficoltà motorie",
-        "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
-        "autism": "[TRANSLATE] Autismo",
-        "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
-        "dyscalculia": "[TRANSLATE] Discalculia",
-        "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
-        "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
-        "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+        "heading": "Funcionalidades de Accesibilidad",
+        "description": "MirrorBuddy incluye 7 perfiles TEA (Trastornos Específicos del Aprendizaje) diseñados para apoyar diferentes estilos de aprendizaje:",
+        "dyslexia": "Dislexia",
+        "dyslexiaDesc": "Fuente OpenDyslexic, espaciado extra, soporte para lectura facilitada",
+        "adhd": "TDAH",
+        "adhdDesc": "Modo de concentración, reducción de distracciones, recordatorios de pausas",
+        "visual": "Deficiencia visual",
+        "visualDesc": "Alto contraste, soporte para lectores de pantalla, texto ampliable",
+        "motor": "Dificultades motoras",
+        "motorDesc": "Navegación completa por teclado, control por voz",
+        "autism": "Autismo",
+        "autismDesc": "Diseños predecibles, reducción de animaciones, estructura clara",
+        "dyscalculia": "Discalculia",
+        "dyscalculiaDesc": "Representación visual de números, soporte para cálculos",
+        "cerebralPalsy": "Parálisis cerebral",
+        "cerebralPalsyDesc": "Objetivos grandes, navegación por teclado, soporte para tecnologías de asistencia"
       },
       "keyboard": {
-        "heading": "[TRANSLATE] Navigazione da Tastiera",
-        "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
-        "tab": "[TRANSLATE] per navigare tra gli elementi",
-        "enter": "[TRANSLATE] per attivare pulsanti e link",
-        "escape": "[TRANSLATE] per chiudere modali e menu",
-        "space": "[TRANSLATE] per selezionare checkbox e toggle"
+        "heading": "Navegación por Teclado",
+        "description": "Todas las funcionalidades de MirrorBuddy son accesibles mediante teclado:",
+        "tab": "para navegar entre elementos",
+        "enter": "para activar botones y enlaces",
+        "escape": "para cerrar modales y menús",
+        "space": "para seleccionar casillas de verificación e interruptores"
       },
       "screenReader": {
-        "heading": "[TRANSLATE] Supporto Screen Reader",
-        "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
-        "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
-        "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
-        "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
-        "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+        "heading": "Compatibilidad con Lectores de Pantalla",
+        "description": "MirrorBuddy es compatible con lectores de pantalla comunes (NVDA, JAWS, VoiceOver):",
+        "aria": "Etiquetas ARIA para todos los elementos interactivos",
+        "headings": "Jerarquía de encabezados correcta (H1-H6)",
+        "altText": "Texto alternativo para todas las imágenes",
+        "labels": "Etiquetas asociadas a todos los campos de formulario"
       },
       "limitations": {
-        "heading": "[TRANSLATE] Limitazioni Conosciute",
-        "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+        "heading": "Limitaciones Conocidas",
+        "description": "Actualmente no se conocen limitaciones significativas. Si encuentra problemas de accesibilidad, contáctenos a través del formulario de comentarios."
       },
       "regulatory": {
-        "heading": "[TRANSLATE] Conformità Normativa",
-        "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
-        "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+        "heading": "Conformidad Normativa",
+        "description": "MirrorBuddy cumple con los siguientes estándares normativos:",
+        "eudirective": "Directiva UE 2016/2102 (Accesibilidad del sector público)"
       },
       "feedback": {
-        "heading": "[TRANSLATE] Feedback e Segnalazioni",
-        "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
-        "emailLabel": "[TRANSLATE] Email",
-        "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
-        "responseTime": "[TRANSLATE] Tempo di risposta",
-        "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+        "heading": "Comentarios y Reportes",
+        "description": "Si encuentra problemas de accesibilidad o tiene sugerencias para mejorar la experiencia, contáctenos:",
+        "emailLabel": "Correo electrónico",
+        "authorityLabel": "Autoridad de Supervisión",
+        "responseTime": "Tiempo de respuesta",
+        "responseTimeValue": "5 días laborables"
       }
     },
     "aiTransparency": {
@@ -842,24 +842,24 @@
       "cookies": {
         "page": {
           "title": "Titolo",
-          "description": "[TRANSLATE] Informazioni sull'uso dei cookie su MirrorBuddy",
+          "description": "Información sobre el uso de cookies en MirrorBuddy",
           "lastUpdated": "Last Updated",
           "contactQuestion": "Contact Question",
           "contactEmail": "Contact Email",
           "backHome": "Back Home",
           "pageNavAriaLabel": "Page Nav Aria Label",
           "version": "Version",
-          "subtitle": "[TRANSLATE] Come utilizziamo i cookie in MirrorBuddy"
+          "subtitle": "Cómo utilizamos las cookies en MirrorBuddy"
         },
         "essential": {
-          "title": "[TRANSLATE] Cookie Essenziali",
-          "description": "[TRANSLATE] Necessari per il funzionamento del sito",
-          "heading": "[TRANSLATE] Cookie essenziali"
+          "title": "Cookies Esenciales",
+          "description": "Necesarias para el funcionamiento del sitio",
+          "heading": "Cookies esenciales"
         },
         "analytics": {
-          "title": "[TRANSLATE] Cookie Analitici",
-          "description": "[TRANSLATE] Ci aiutano a capire come migliorare il servizio",
-          "heading": "[TRANSLATE] Cookie di analisi"
+          "title": "Cookies Analíticas",
+          "description": "Nos ayudan a entender cómo mejorar el servicio",
+          "heading": "Cookies de análisis"
         },
         "sections": {
           "changes": {
@@ -987,22 +987,22 @@
           "point4": "Point4"
         },
         "intro": {
-          "heading": "[TRANSLATE] Cosa sono i cookie",
-          "description": "[TRANSLATE] I cookie sono piccoli file di testo memorizzati sul tuo dispositivo"
+          "heading": "Qué son las cookies",
+          "description": "Las cookies son pequeños archivos de texto almacenados en su dispositivo"
         },
         "preferences": {
-          "heading": "[TRANSLATE] Le tue preferenze",
-          "description": "[TRANSLATE] Puoi gestire i tuoi consensi in qualsiasi momento"
+          "heading": "Sus preferencias",
+          "description": "Puede gestionar sus consentimientos en cualquier momento"
         },
         "contact": {
-          "heading": "[TRANSLATE] Domande sui cookie",
-          "description": "[TRANSLATE] Per domande contattaci all'indirizzo privacy@mirrorbuddy.it"
+          "heading": "Preguntas sobre cookies",
+          "description": "Para preguntas contáctenos en privacy@mirrorbuddy.it"
         }
       },
       "privacy": {
         "page": {
           "title": "Política de Privacidad",
-          "description": "[TRANSLATE] Come proteggiamo i tuoi dati personali",
+          "description": "Cómo protegemos sus datos personales",
           "tldrItems": {
             "dataCollection": "Solo recopilamos los datos necesarios para el funcionamiento del servicio",
             "noDataSale": "Nunca vendemos tus datos a terceros",
@@ -1024,7 +1024,7 @@
         },
         "section2": {
           "title": "Qué datos recopilamos",
-          "content": "[TRANSLATE] Contenuto sezione 2",
+          "content": "Contenido de la sección 2",
           "intro": "Para proporcionarte nuestro servicio, recopilamos estos datos personales:",
           "itemLabels": {
             "email": "Correo Electrónico",
@@ -1045,7 +1045,7 @@
         },
         "section3": {
           "title": "Datos sensibles que NUNCA recopilamos",
-          "content": "[TRANSLATE] Contenuto sezione 3",
+          "content": "Contenido de la sección 3",
           "intro": "Para proteger tu privacidad, nunca recopilamos datos sensibles como:",
           "items": {
             "health": "Información de salud (a menos que la compartas voluntariamente en una conversación)",
@@ -1056,7 +1056,7 @@
         },
         "section4": {
           "title": "Cómo utilizamos tus datos",
-          "content": "[TRANSLATE] Contenuto sezione 4",
+          "content": "Contenido de la sección 4",
           "intro": "Utilizamos tus datos solo para estos propósitos legítimos:",
           "itemLabels": {
             "appFunctionality": "Funcionalidad de la App",
@@ -1074,7 +1074,7 @@
         },
         "section5": {
           "title": "Análisis Opcionales y Seguimiento",
-          "content": "[TRANSLATE] Contenuto sezione 5",
+          "content": "Contenido de la sección 5",
           "intro": "Como usuario, puedes elegir participar en nuestros análisis para ayudarnos a mejorar la aplicación.",
           "labels": {
             "collect": "Qué recopilamos",
@@ -1089,7 +1089,7 @@
         },
         "section6": {
           "title": "Quién puede acceder a tus datos",
-          "content": "[TRANSLATE] Contenuto sezione 6",
+          "content": "Contenido de la sección 6",
           "intro": "Tus datos personales son accesibles para:",
           "itemLabels": {
             "you": "Tú",
@@ -1119,14 +1119,14 @@
         },
         "section7": {
           "title": "Bases Legales del Tratamiento",
-          "content": "[TRANSLATE] Contenuto sezione 7",
+          "content": "Contenido de la sección 7",
           "primary": "Procesamos tus datos personales en estas bases legales según el RGPD: (1) Necesidad contractual (Art. 6.1.b) - para proporcionar el servicio; (2) Consentimiento explícito (Art. 6.1.a) - para análisis y comunicaciones opcionales; (3) Interés legítimo (Art. 6.1.f) - para seguridad, prevención de fraude, mejora del servicio.",
           "transfers": "Las transferencias de datos a países fuera de la UE (como EE.UU.) solo ocurren para servicios con Cláusulas Contractuales Estándar (CCE) aprobadas o decisiones de adecuación de la UE.",
           "legalBasis": "Tu base legal para el procesamiento de datos es el consentimiento al servicio (contrato) y, donde corresponda, el consentimiento explícito que has proporcionado en la configuración."
         },
         "section8": {
           "title": "Responsable del Tratamiento y Encargados",
-          "content": "[TRANSLATE] Contenuto sezione 8",
+          "content": "Contenido de la sección 8",
           "intro": "MirrorBuddy es el responsable del tratamiento. Sin embargo, algunos servicios se procesan por encargados del tratamiento que procesan datos en nuestro nombre bajo Acuerdos de Tratamiento de Datos (ATD) conformes al RGPD Art. 28.",
           "subprocessorsHeading": "Nuestros encargados del tratamiento certificados:",
           "subprocessors": {
@@ -1139,7 +1139,7 @@
         },
         "section9": {
           "title": "Cuánto tiempo conservamos tus datos",
-          "content": "[TRANSLATE] Contenuto sezione 9",
+          "content": "Contenido de la sección 9",
           "items": {
             "activeAccount": "Mientras tu cuenta esté activa, conservamos todos tus datos (correo, conversaciones, tarjetas didácticas, progreso) para proporcionar el servicio",
             "conversations": "Las conversaciones con maestros se conservan durante 90 días de inactividad, luego se archivan durante 1 año, luego se eliminan",
@@ -1149,7 +1149,7 @@
         },
         "section10": {
           "title": "Tus Derechos de Privacidad",
-          "content": "[TRANSLATE] Contenuto sezione 10",
+          "content": "Contenido de la sección 10",
           "intro": "Tienes derecho a ejercer tus derechos de privacidad en cualquier momento. Estos derechos incluyen acceso, rectificación, eliminación, portabilidad, objeción y restricción del tratamiento.",
           "itemLabels": {
             "access": "Derecho de Acceso",
@@ -1169,7 +1169,7 @@
         },
         "section11": {
           "title": "Cookies y Análisis",
-          "content": "[TRANSLATE] Contenuto sezione 11",
+          "content": "Contenido de la sección 11",
           "intro": "Utilizamos cookies y servicios de análisis para mejorar tu experiencia.",
           "cookieTypeLabels": {
             "essential": "Cookies Esenciales",
@@ -1215,7 +1215,7 @@
         },
         "section12": {
           "title": "Google Drive e Integraciones",
-          "content": "[TRANSLATE] Contenuto sezione 12",
+          "content": "Contenido de la sección 12",
           "intro": "Si eliges conectar Google Drive para cargar documentos, debes leer la política de privacidad de Google.",
           "items": {
             "permission": "Otorga a MirrorBuddy permiso para acceder a tus archivos",
@@ -1226,7 +1226,7 @@
         },
         "section13": {
           "title": "Seguridad de Datos",
-          "content": "[TRANSLATE] Contenuto sezione 13",
+          "content": "Contenido de la sección 13",
           "intro": "Implementamos medidas de seguridad técnicas y organizacionales para proteger tus datos:",
           "items": {
             "https": "Utilizamos HTTPS/TLS para el cifrado en tránsito",
@@ -1238,7 +1238,7 @@
         },
         "section14": {
           "title": "Cambios en esta Política",
-          "content": "[TRANSLATE] Contenuto sezione 14",
+          "content": "Contenido de la sección 14",
           "intro": "Podemos actualizar esta política de privacidad de vez en cuando. Te notificaremos sobre cambios significativos a través de:",
           "items": {
             "email": "Correo electrónico a tu dirección registrada",
@@ -1248,7 +1248,7 @@
         },
         "section15": {
           "title": "Contactos y Autoridades de Protección de Datos",
-          "content": "[TRANSLATE] Contenuto sezione 15",
+          "content": "Contenido de la sección 15",
           "intro": "Si tienes preguntas sobre nuestra política de privacidad o deseas ejercer tus derechos, contáctanos en:",
           "ourDpo": {
             "title": "Nuestro Oficial de Protección de Datos (DPO)",
@@ -1298,7 +1298,7 @@
         },
         "section16": {
           "title": "16. Sistemas de Inteligencia Artificial y Derechos del Usuario",
-          "content": "[TRANSLATE] Contenuto sezione 16",
+          "content": "Contenido de la sección 16",
           "aiSystemsHeading": "Sistemas de IA en Uso",
           "aiSystems": "MirrorBuddy utiliza sistemas de inteligencia artificial para personalizar tu experiencia educativa. Todos nuestros sistemas de IA son transparentes, controlables y están diseñados con supervisión humana integrada. No tomamos decisiones automatizadas que impacten significativamente tu educación sin revisión humana.",
           "aiDataHeading": "Qué Datos Procesamos con IA",
@@ -1356,14 +1356,14 @@
       },
       "terms": {
         "page": {
-          "title": "[TRANSLATE] Termini di Servizio",
-          "description": "[TRANSLATE] I nostri termini e condizioni d'uso"
+          "title": "Términos de Servicio",
+          "description": "Nuestros términos y condiciones de uso"
         },
         "sections": {
-          "acceptance": "[TRANSLATE] Accettazione dei Termini",
-          "services": "[TRANSLATE] Descrizione dei Servizi",
-          "userRights": "[TRANSLATE] Diritti e Responsabilità dell'Utente",
-          "limitations": "[TRANSLATE] Limitazioni di Responsabilità",
+          "acceptance": "Aceptación de los Términos",
+          "services": "Descripción de los Servicios",
+          "userRights": "Derechos y Responsabilidades del Usuario",
+          "limitations": "Limitaciones de Responsabilidad",
           "section1": {
             "content1": "Content1",
             "content2": "Content2",
@@ -1506,79 +1506,79 @@
         "version": "Version"
       },
       "accessibility": {
-        "title": "[TRANSLATE] Accessibilità",
-        "description": "[TRANSLATE] Le nostre funzionalità di accessibilità conformi WCAG 2.1 AA",
+        "title": "Accesibilidad",
+        "description": "Nuestras funcionalidades de accesibilidad conformes con WCAG 2.1 AA",
         "features": {
-          "heading": "[TRANSLATE] Funzionalità di Accessibilità",
-          "description": "[TRANSLATE] MirrorBuddy supporta 7 profili DSA",
-          "dyslexia": "[TRANSLATE] Dislessia",
-          "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura ottimizzata",
-          "adhd": "[TRANSLATE] ADHD",
-          "adhdDesc": "[TRANSLATE] Timer Pomodoro, modalità focus",
-          "visual": "[TRANSLATE] Disabilità Visiva",
-          "visualDesc": "[TRANSLATE] Alto contrasto, testo grande, TTS",
-          "motor": "[TRANSLATE] Disabilità Motoria",
-          "motorDesc": "[TRANSLATE] Navigazione tastiera, target grandi",
-          "autism": "[TRANSLATE] Autismo",
-          "autismDesc": "[TRANSLATE] Layout prevedibili, animazioni ridotte",
-          "dyscalculia": "[TRANSLATE] Discalculia",
-          "dyscalculiaDesc": "[TRANSLATE] Calcolatrice visiva, supporto formule",
-          "cerebralPalsy": "[TRANSLATE] Paralisi Cerebrale",
-          "cerebralPalsyDesc": "[TRANSLATE] TTS + tastiera + spaziatura"
+          "heading": "Funcionalidades de Accesibilidad",
+          "description": "MirrorBuddy soporta 7 perfiles TEA",
+          "dyslexia": "Dislexia",
+          "dyslexiaDesc": "Fuente OpenDyslexic, espaciado optimizado",
+          "adhd": "TDAH",
+          "adhdDesc": "Temporizador Pomodoro, modo de concentración",
+          "visual": "Discapacidad Visual",
+          "visualDesc": "Alto contraste, texto grande, TTS",
+          "motor": "Discapacidad Motora",
+          "motorDesc": "Navegación por teclado, objetivos grandes",
+          "autism": "Autismo",
+          "autismDesc": "Diseños predecibles, animaciones reducidas",
+          "dyscalculia": "Discalculia",
+          "dyscalculiaDesc": "Calculadora visual, soporte de fórmulas",
+          "cerebralPalsy": "Parálisis Cerebral",
+          "cerebralPalsyDesc": "TTS + teclado + espaciado"
         },
         "keyboard": {
-          "heading": "[TRANSLATE] Scorciatoie da Tastiera",
-          "description": "[TRANSLATE] Tutte le funzioni accessibili da tastiera",
-          "tab": "[TRANSLATE] Tab: Naviga tra elementi",
-          "enter": "[TRANSLATE] Invio: Attiva elemento",
-          "escape": "[TRANSLATE] Esc: Chiudi dialogo",
-          "space": "[TRANSLATE] Spazio: Seleziona/Deseleziona"
+          "heading": "Atajos de Teclado",
+          "description": "Todas las funciones accesibles por teclado",
+          "tab": "Tab: Navegar entre elementos",
+          "enter": "Enter: Activar elemento",
+          "escape": "Esc: Cerrar diálogo",
+          "space": "Espacio: Seleccionar/Deseleccionar"
         },
         "screenReader": {
-          "heading": "[TRANSLATE] Supporto Screen Reader",
-          "description": "[TRANSLATE] Ottimizzato per NVDA, JAWS, VoiceOver",
-          "aria": "[TRANSLATE] Etichette ARIA su tutti i controlli",
-          "headings": "[TRANSLATE] Struttura gerarchica heading",
-          "altText": "[TRANSLATE] Testo alternativo per immagini",
-          "labels": "[TRANSLATE] Label descrittive per form"
+          "heading": "Compatibilidad con Lectores de Pantalla",
+          "description": "Optimizado para NVDA, JAWS, VoiceOver",
+          "aria": "Etiquetas ARIA en todos los controles",
+          "headings": "Estructura jerárquica de encabezados",
+          "altText": "Texto alternativo para imágenes",
+          "labels": "Etiquetas descriptivas para formularios"
         },
         "limitations": {
-          "heading": "[TRANSLATE] Limitazioni Note",
-          "description": "[TRANSLATE] Alcune funzionalità potrebbero non essere completamente accessibili in modalità vocale con screen reader abilitato."
+          "heading": "Limitaciones Conocidas",
+          "description": "Algunas funcionalidades podrían no ser completamente accesibles en modo de voz con lector de pantalla habilitado."
         },
         "regulatory": {
-          "heading": "[TRANSLATE] Conformità Normativa",
-          "description": "[TRANSLATE] WCAG 2.1 AA, EN 301 549, Legge Stanca",
-          "eudirective": "[TRANSLATE] Direttiva UE 2016/2102"
+          "heading": "Conformidad Normativa",
+          "description": "WCAG 2.1 AA, EN 301 549, Ley Stanca",
+          "eudirective": "Directiva UE 2016/2102"
         },
         "page": {
-          "pageNavAriaLabel": "[TRANSLATE] Navigazione dichiarazione di accessibilità",
-          "backHome": "[TRANSLATE] Torna alla home",
-          "title": "[TRANSLATE] Dichiarazione di Accessibilità",
-          "version": "[TRANSLATE] Versione {version}",
-          "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}"
+          "pageNavAriaLabel": "Navegación de la declaración de accesibilidad",
+          "backHome": "Volver al inicio",
+          "title": "Declaración de Accesibilidad",
+          "version": "Versión {version}",
+          "lastUpdated": "Última actualización: {date}"
         },
         "compliance": {
-          "heading": "[TRANSLATE] Conformità WCAG 2.1 AA",
-          "declaration": "[TRANSLATE] MirrorBuddy è conforme agli standard WCAG 2.1 livello AA",
-          "wcag": "[TRANSLATE] WCAG 2.1 AA per contrasto e leggibilità",
-          "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
-          "screenReader": "[TRANSLATE] Compatibilità screen reader",
-          "colorContrast": "[TRANSLATE] Contrasto colori ottimale"
+          "heading": "Conformidad con WCAG 2.1 AA",
+          "declaration": "MirrorBuddy cumple con los estándares WCAG 2.1 nivel AA",
+          "wcag": "WCAG 2.1 AA para contraste y legibilidad",
+          "keyboard": "Navegación completa por teclado",
+          "screenReader": "Compatibilidad con lectores de pantalla",
+          "colorContrast": "Contraste de colores óptimo"
         },
         "feedback": {
-          "heading": "[TRANSLATE] Segnala problemi di accessibilità",
-          "description": "[TRANSLATE] Se incontri barriere di accessibilità, contattaci",
-          "emailLabel": "[TRANSLATE] Email",
-          "authorityLabel": "[TRANSLATE] Autorità di riferimento",
-          "responseTime": "[TRANSLATE] Tempo di risposta",
-          "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+          "heading": "Reportar problemas de accesibilidad",
+          "description": "Si encuentra barreras de accesibilidad, contáctenos",
+          "emailLabel": "Correo electrónico",
+          "authorityLabel": "Autoridad de referencia",
+          "responseTime": "Tiempo de respuesta",
+          "responseTimeValue": "5 días laborables"
         }
       }
     },
     "modelCard": {
       "title": "Tarjeta Técnica del Modelo de Inteligencia Artificial",
-      "description": "[TRANSLATE] Informazioni sui modelli di intelligenza artificiale utilizzati",
+      "description": "Información sobre los modelos de inteligencia artificial utilizados",
       "version": "1.0",
       "provider": {
         "name": "Microsoft / OpenAI",
@@ -1586,7 +1586,7 @@
         "website": "https://azure.microsoft.com/services/openai/",
         "euCompliance": "Conforme al RGPD - Centro de datos UE (Europa Occidental)"
       },
-      "purpose": "[TRANSLATE] Scopo",
+      "purpose": "Propósito",
       "lastUpdated": "27 de enero de 2026",
       "models": {
         "title": "Modelos Disponibles",
@@ -1803,70 +1803,70 @@
   },
   "accessibilityStatement": {
     "page": {
-      "title": "[TRANSLATE] Dichiarazione di Accessibilità",
-      "version": "[TRANSLATE] Versione {version}",
-      "lastUpdated": "[TRANSLATE] Ultimo aggiornamento: {date}",
-      "backHome": "[TRANSLATE] Torna alla home",
-      "pageNavAriaLabel": "[TRANSLATE] Navigazione pagina accessibilità"
+      "title": "Declaración de Accesibilidad",
+      "version": "Versión {version}",
+      "lastUpdated": "Última actualización: {date}",
+      "backHome": "Volver al inicio",
+      "pageNavAriaLabel": "Navegación de la página de accesibilidad"
     },
     "compliance": {
-      "heading": "[TRANSLATE] Conformità WCAG 2.1 Level AA",
-      "declaration": "[TRANSLATE] MirrorBuddy è conforme alle Linee Guida per l'Accessibilità dei Contenuti Web (WCAG) 2.1 al livello AA, come richiesto dalla Legge 4/2004 (Legge Stanca) e dalla Direttiva UE 2016/2102.",
-      "wcag": "[TRANSLATE] Conformità WCAG 2.1 Level AA verificata",
-      "keyboard": "[TRANSLATE] Navigazione completa da tastiera",
-      "screenReader": "[TRANSLATE] Supporto per screen reader",
-      "colorContrast": "[TRANSLATE] Contrasto colori conforme (4.5:1 minimo)"
+      "heading": "Conformidad con WCAG 2.1 Nivel AA",
+      "declaration": "MirrorBuddy cumple con las Pautas de Accesibilidad para el Contenido Web (WCAG) 2.1 en el nivel AA, según lo requerido por la Ley 4/2004 (Ley Stanca) y la Directiva UE 2016/2102.",
+      "wcag": "Conformidad con WCAG 2.1 Nivel AA verificada",
+      "keyboard": "Navegación completa por teclado",
+      "screenReader": "Compatibilidad con lectores de pantalla",
+      "colorContrast": "Contraste de colores conforme (mínimo 4.5:1)"
     },
     "features": {
-      "heading": "[TRANSLATE] Funzionalità di Accessibilità",
-      "description": "[TRANSLATE] MirrorBuddy include 7 profili DSA (Disturbi Specifici dell'Apprendimento) progettati per supportare diversi stili di apprendimento:",
-      "dyslexia": "[TRANSLATE] Dislessia",
-      "dyslexiaDesc": "[TRANSLATE] Font OpenDyslexic, spaziatura extra, supporto per lettura facilitata",
-      "adhd": "[TRANSLATE] ADHD",
-      "adhdDesc": "[TRANSLATE] Modalità focus, riduzione distrazioni, promemoria per pause",
-      "visual": "[TRANSLATE] Deficit visivo",
-      "visualDesc": "[TRANSLATE] Alto contrasto, supporto screen reader, testo ingrandibile",
-      "motor": "[TRANSLATE] Difficoltà motorie",
-      "motorDesc": "[TRANSLATE] Navigazione da tastiera completa, controllo vocale",
-      "autism": "[TRANSLATE] Autismo",
-      "autismDesc": "[TRANSLATE] Layout prevedibili, riduzione animazioni, struttura chiara",
-      "dyscalculia": "[TRANSLATE] Discalculia",
-      "dyscalculiaDesc": "[TRANSLATE] Rappresentazione visiva dei numeri, supporto per calcoli",
-      "cerebralPalsy": "[TRANSLATE] Paralisi cerebrale",
-      "cerebralPalsyDesc": "[TRANSLATE] Target grandi, navigazione da tastiera, supporto assistive technology"
+      "heading": "Funcionalidades de Accesibilidad",
+      "description": "MirrorBuddy incluye 7 perfiles TEA (Trastornos Específicos del Aprendizaje) diseñados para apoyar diferentes estilos de aprendizaje:",
+      "dyslexia": "Dislexia",
+      "dyslexiaDesc": "Fuente OpenDyslexic, espaciado extra, soporte para lectura facilitada",
+      "adhd": "TDAH",
+      "adhdDesc": "Modo de concentración, reducción de distracciones, recordatorios de pausas",
+      "visual": "Deficiencia visual",
+      "visualDesc": "Alto contraste, soporte para lectores de pantalla, texto ampliable",
+      "motor": "Dificultades motoras",
+      "motorDesc": "Navegación completa por teclado, control por voz",
+      "autism": "Autismo",
+      "autismDesc": "Diseños predecibles, reducción de animaciones, estructura clara",
+      "dyscalculia": "Discalculia",
+      "dyscalculiaDesc": "Representación visual de números, soporte para cálculos",
+      "cerebralPalsy": "Parálisis cerebral",
+      "cerebralPalsyDesc": "Objetivos grandes, navegación por teclado, soporte para tecnologías de asistencia"
     },
     "keyboard": {
-      "heading": "[TRANSLATE] Navigazione da Tastiera",
-      "description": "[TRANSLATE] Tutte le funzionalità di MirrorBuddy sono accessibili tramite tastiera:",
-      "tab": "[TRANSLATE] per navigare tra gli elementi",
-      "enter": "[TRANSLATE] per attivare pulsanti e link",
-      "escape": "[TRANSLATE] per chiudere modali e menu",
-      "space": "[TRANSLATE] per selezionare checkbox e toggle"
+      "heading": "Navegación por Teclado",
+      "description": "Todas las funcionalidades de MirrorBuddy son accesibles mediante teclado:",
+      "tab": "para navegar entre elementos",
+      "enter": "para activar botones y enlaces",
+      "escape": "para cerrar modales y menús",
+      "space": "para seleccionar casillas de verificación e interruptores"
     },
     "screenReader": {
-      "heading": "[TRANSLATE] Supporto Screen Reader",
-      "description": "[TRANSLATE] MirrorBuddy è compatibile con screen reader comuni (NVDA, JAWS, VoiceOver):",
-      "aria": "[TRANSLATE] Etichette ARIA per tutti gli elementi interattivi",
-      "headings": "[TRANSLATE] Gerarchia di intestazioni corretta (H1-H6)",
-      "altText": "[TRANSLATE] Testo alternativo per tutte le immagini",
-      "labels": "[TRANSLATE] Etichette associate a tutti i campi modulo"
+      "heading": "Compatibilidad con Lectores de Pantalla",
+      "description": "MirrorBuddy es compatible con lectores de pantalla comunes (NVDA, JAWS, VoiceOver):",
+      "aria": "Etiquetas ARIA para todos los elementos interactivos",
+      "headings": "Jerarquía de encabezados correcta (H1-H6)",
+      "altText": "Texto alternativo para todas las imágenes",
+      "labels": "Etiquetas asociadas a todos los campos de formulario"
     },
     "limitations": {
-      "heading": "[TRANSLATE] Limitazioni Conosciute",
-      "description": "[TRANSLATE] Attualmente non sono note limitazioni significative. Se riscontri problemi di accessibilità, contattaci tramite il modulo di feedback."
+      "heading": "Limitaciones Conocidas",
+      "description": "Actualmente no se conocen limitaciones significativas. Si encuentra problemas de accesibilidad, contáctenos a través del formulario de comentarios."
     },
     "regulatory": {
-      "heading": "[TRANSLATE] Conformità Normativa",
-      "description": "[TRANSLATE] MirrorBuddy rispetta i seguenti standard normativi:",
-      "eudirective": "[TRANSLATE] Direttiva UE 2016/2102 (Accessibilità settore pubblico)"
+      "heading": "Conformidad Normativa",
+      "description": "MirrorBuddy cumple con los siguientes estándares normativos:",
+      "eudirective": "Directiva UE 2016/2102 (Accesibilidad del sector público)"
     },
     "feedback": {
-      "heading": "[TRANSLATE] Feedback e Segnalazioni",
-      "description": "[TRANSLATE] Se riscontri problemi di accessibilità o hai suggerimenti per migliorare l'esperienza, contattaci:",
-      "emailLabel": "[TRANSLATE] Email",
-      "authorityLabel": "[TRANSLATE] Autorità di Supervisione",
-      "responseTime": "[TRANSLATE] Tempo di risposta",
-      "responseTimeValue": "[TRANSLATE] 5 giorni lavorativi"
+      "heading": "Comentarios y Reportes",
+      "description": "Si encuentra problemas de accesibilidad o tiene sugerencias para mejorar la experiencia, contáctenos:",
+      "emailLabel": "Correo electrónico",
+      "authorityLabel": "Autoridad de Supervisión",
+      "responseTime": "Tiempo de respuesta",
+      "responseTimeValue": "5 días laborables"
     }
   }
 }

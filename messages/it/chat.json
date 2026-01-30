@@ -170,11 +170,11 @@
         "tips": "Suggerimenti: Parla in un ambiente tranquillo per migliori risultati.",
         "troubleshooting": "Risoluzione dei problemi: Verifica che il microfono funzioni nel browser."
       },
-      "serviceUnavailable": "[EN] Unable to connect to voice service",
-      "microphonePermission": "[EN] Microphone not authorized. Enable the microphone in your browser settings.",
-      "sessionTitle": "[EN] Voice session with {name}",
-      "studyMethod": "[EN] Study method",
-      "emotionalSupport": "[EN] Emotional support"
+      "serviceUnavailable": "Impossibile connettersi al servizio vocale",
+      "microphonePermission": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
+      "sessionTitle": "Sessione vocale con {name}",
+      "studyMethod": "Metodo di studio",
+      "emotionalSupport": "Supporto emotivo"
     },
     "handoff": {
       "askToSwitch": "Vuoi parlare con {name}?",
@@ -190,26 +190,26 @@
         "title": "Passaggio di Consegne",
         "description": "Il professore sta passando la conversazione",
         "continue": "Continua",
-        "accept": "[EN] Accept",
-        "decline": "[EN] Decline",
-        "question": "[EN] Question"
+        "accept": "Accetta",
+        "decline": "Rifiuta",
+        "question": "Domanda"
       },
       "detail": {
         "title": "Dettagli Conversazione",
         "created": "Creata il",
         "messages": "Messaggi",
-        "back": "[EN] Back",
-        "backAriaLabel": "[EN] Back Aria Label",
-        "defaultTitle": "[EN] Default Title",
-        "emptyMessages": "[EN] Empty Messages",
+        "back": "Indietro",
+        "backAriaLabel": "Torna indietro",
+        "defaultTitle": "Titolo predefinito",
+        "emptyMessages": "Nessun messaggio",
         "error": {
-          "loadingFailed": "[EN] Loading Failed",
-          "notFound": "[EN] Not Found",
-          "unknown": "[EN] Unknown"
+          "loadingFailed": "Caricamento fallito",
+          "notFound": "Non trovato",
+          "unknown": "Sconosciuto"
         },
-        "loading": "[EN] Loading...",
-        "summaryLabel": "[EN] Summary Label",
-        "timeAt": "[EN] Time At"
+        "loading": "Caricamento...",
+        "summaryLabel": "Riepilogo",
+        "timeAt": "Alle"
       },
       "sidebar": {
         "title": "Conversazioni",
@@ -218,17 +218,17 @@
           "placeholder": "Cerca conversazioni..."
         },
         "deleteConfirm": {
-          "cancel": "[EN] Cancel",
-          "delete": "[EN] Delete",
-          "deleting": "[EN] Deleting",
-          "title": "[EN] Titolo"
+          "cancel": "Annulla",
+          "delete": "Elimina",
+          "deleting": "Eliminazione...",
+          "title": "Titolo"
         },
-        "empty": "[EN] Empty",
+        "empty": "Vuoto",
         "filters": {
-          "all": "[EN] Tutti",
-          "month": "[EN] Month",
-          "today": "[EN] Oggi",
-          "week": "[EN] Week"
+          "all": "Tutti",
+          "month": "Mese",
+          "today": "Oggi",
+          "week": "Settimana"
         }
       },
       "history": {
@@ -239,29 +239,29 @@
         },
         "loadMore": "Carica Altro",
         "dateFormat": {
-          "daysAgo": "[EN] Days Ago",
-          "today": "[EN] Oggi",
-          "yesterday": "[EN] Yesterday"
+          "daysAgo": "Giorni fa",
+          "today": "Oggi",
+          "yesterday": "Ieri"
         },
-        "loading": "[EN] Loading..."
+        "loading": "Caricamento..."
       },
       "inactivity": {
         "title": "Inattività",
         "message": "Sei ancora qui?",
         "continue": "Continua",
         "end": "Termina Sessione",
-        "closeAriaLabel": "[EN] Close Aria Label",
-        "closeButton": "[EN] Close Button",
-        "continueButton": "[EN] Continue Button",
-        "description": "[EN] Descrizione"
+        "closeAriaLabel": "Chiudi",
+        "closeButton": "Chiudi",
+        "continueButton": "Continua",
+        "description": "Descrizione"
       },
       "toolSelection": {
         "title": "Selezione Strumento",
         "description": "Scegli uno strumento per continuare",
-        "closeAriaLabel": "[EN] Close Aria Label",
-        "empty": "[EN] Empty",
-        "question": "[EN] Question",
-        "search": "[EN] Search"
+        "closeAriaLabel": "Chiudi",
+        "empty": "Vuoto",
+        "question": "Domanda",
+        "search": "Cerca"
       }
     },
     "session": {
@@ -273,47 +273,47 @@
         "mute": "Disattiva Audio",
         "unmute": "Attiva Audio",
         "endSession": "Termina",
-        "cancelResponseAriaLabel": "[EN] Cancel response",
-        "cancelResponseTooltip": "[EN] Cancel current response",
-        "endSessionAriaLabel": "[EN] End session",
-        "endSessionTooltip": "[EN] End voice session",
-        "inputPlaceholder": "[EN] Type a message...",
+        "cancelResponseAriaLabel": "Annulla risposta",
+        "cancelResponseTooltip": "Annulla la risposta corrente",
+        "endSessionAriaLabel": "Termina sessione",
+        "endSessionTooltip": "Termina sessione vocale",
+        "inputPlaceholder": "Scrivi un messaggio...",
         "muteAriaLabel": {
-          "muted": "[EN] Muted",
-          "unmuted": "[EN] Unmuted"
+          "muted": "Disattivato",
+          "unmuted": "Attivato"
         },
         "muteTooltip": {
-          "muted": "[EN] Unmute",
-          "unmuted": "[EN] Mute"
+          "muted": "Attiva",
+          "unmuted": "Disattiva"
         },
-        "sendButton": "[EN] Send",
-        "sendMessageAriaLabel": "[EN] Send message",
-        "sendMessageTooltip": "[EN] Send the message",
-        "switchToChatAriaLabel": "[EN] Switch to chat",
-        "switchToChatTooltip": "[EN] Return to text chat"
+        "sendButton": "Invia",
+        "sendMessageAriaLabel": "Invia messaggio",
+        "sendMessageTooltip": "Invia il messaggio",
+        "switchToChatAriaLabel": "Passa alla chat",
+        "switchToChatTooltip": "Torna alla chat testuale"
       },
       "rating": {
-        "close": "[EN] Close",
-        "feedbackLabel": "[EN] Feedback Label",
-        "feedbackPlaceholder": "[EN] Feedback Placeholder",
+        "close": "Chiudi",
+        "feedbackLabel": "Feedback",
+        "feedbackPlaceholder": "Inserisci il tuo feedback...",
         "labels": {
-          "1": "[EN] 1",
-          "2": "[EN] 2",
-          "3": "[EN] 3",
-          "4": "[EN] 4",
-          "5": "[EN] 5"
+          "1": "1",
+          "2": "2",
+          "3": "3",
+          "4": "4",
+          "5": "5"
         },
-        "minutes": "[EN] Minutes",
-        "savingError": "[EN] Saving Error",
-        "selectError": "[EN] Select Error",
-        "selectPlaceholder": "[EN] Select Placeholder",
-        "sessionWith": "[EN] Session With",
-        "skip": "[EN] Skip",
-        "stars": "[EN] Stars",
-        "submit": "[EN] Submit",
-        "submitting": "[EN] Submitting",
-        "title": "[EN] Titolo",
-        "topics": "[EN] Topics"
+        "minutes": "Minuti",
+        "savingError": "Errore durante il salvataggio",
+        "selectError": "Errore durante la selezione",
+        "selectPlaceholder": "Seleziona un'opzione...",
+        "sessionWith": "Sessione con",
+        "skip": "Salta",
+        "stars": "Stelle",
+        "submit": "Invia",
+        "submitting": "Invio in corso...",
+        "title": "Titolo",
+        "topics": "Argomenti"
       }
     },
     "typing": {

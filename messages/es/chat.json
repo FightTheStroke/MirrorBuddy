@@ -187,17 +187,17 @@
     "clearChat": "Limpiar chat",
     "conversation": {
       "handoff": {
-        "title": "[TRANSLATE] Passaggio di Consegne",
-        "description": "[TRANSLATE] Il professore sta passando la conversazione",
-        "continue": "[TRANSLATE] Continua",
+        "title": "Traspaso",
+        "description": "El profesor está transfiriendo la conversación",
+        "continue": "Continuar",
         "accept": "Aceptar",
         "decline": "Rechazar",
         "question": "Pregunta"
       },
       "detail": {
-        "title": "[TRANSLATE] Dettagli Conversazione",
-        "created": "[TRANSLATE] Creata il",
-        "messages": "[TRANSLATE] Messaggi",
+        "title": "Detalles de Conversación",
+        "created": "Creada el",
+        "messages": "Mensajes",
         "back": "Atrás",
         "backAriaLabel": "Etiqueta Aria de Atrás",
         "defaultTitle": "Título Predeterminado",
@@ -213,7 +213,7 @@
       },
       "sidebar": {
         "title": "Título",
-        "new": "[TRANSLATE] Nuova Conversazione",
+        "new": "Nueva Conversación",
         "search": {
           "placeholder": "Buscar conversaciones..."
         },
@@ -237,7 +237,7 @@
           "filtered": "No se encontraron conversaciones con estos filtros",
           "all": "Aún no hay conversaciones. ¡Empieza a chatear con un Maestro!"
         },
-        "loadMore": "[TRANSLATE] Carica Altro",
+        "loadMore": "Cargar Más",
         "dateFormat": {
           "daysAgo": "Días Atrás",
           "today": "Hoy",
@@ -248,8 +248,8 @@
       "inactivity": {
         "title": "Título",
         "message": "Mensaje",
-        "continue": "[TRANSLATE] Continua",
-        "end": "[TRANSLATE] Termina Sessione",
+        "continue": "Continuar",
+        "end": "Terminar Sesión",
         "closeAriaLabel": "Cerrar Etiqueta Aria",
         "closeButton": "Botón Cerrar",
         "continueButton": "Botón Continuar",
@@ -257,7 +257,7 @@
       },
       "toolSelection": {
         "title": "Título",
-        "description": "[TRANSLATE] Scegli uno strumento per continuare",
+        "description": "Elige una herramienta para continuar",
         "closeAriaLabel": "Cerrar Etiqueta Aria",
         "empty": "Vacío",
         "question": "Pregunta",
@@ -265,14 +265,14 @@
       }
     },
     "session": {
-      "title": "[TRANSLATE] Sessione",
-      "start": "[TRANSLATE] Inizia Sessione",
-      "end": "[TRANSLATE] Termina Sessione",
-      "duration": "[TRANSLATE] Durata",
+      "title": "Sesión",
+      "start": "Iniciar Sesión",
+      "end": "Terminar Sesión",
+      "duration": "Duración",
       "controls": {
-        "mute": "[TRANSLATE] Disattiva Audio",
-        "unmute": "[TRANSLATE] Attiva Audio",
-        "endSession": "[TRANSLATE] Termina",
+        "mute": "Silenciar Audio",
+        "unmute": "Activar Audio",
+        "endSession": "Terminar",
         "cancelResponseAriaLabel": "Cancelar respuesta",
         "cancelResponseTooltip": "Cancelar respuesta actual",
         "endSessionAriaLabel": "Terminar sesión",

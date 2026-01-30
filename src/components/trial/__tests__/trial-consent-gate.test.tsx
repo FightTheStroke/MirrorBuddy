@@ -74,7 +74,7 @@ describe("TrialConsentGate", () => {
 
       expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
       expect(
-        screen.getByRole("heading", { name: /modalità prova gratuita/i }),
+        screen.getByRole("heading", { name: /protezione della privacy/i }),
       ).toBeInTheDocument();
     });
 

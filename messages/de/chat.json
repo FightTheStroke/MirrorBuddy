@@ -187,17 +187,17 @@
     "clearChat": "Chat löschen",
     "conversation": {
       "handoff": {
-        "title": "[TRANSLATE] Passaggio di Consegne",
-        "description": "[TRANSLATE] Il professore sta passando la conversazione",
-        "continue": "[TRANSLATE] Continua",
+        "title": "Übergabe",
+        "description": "Der Professor übergibt das Gespräch",
+        "continue": "Fortfahren",
         "accept": "Akzeptieren",
         "decline": "Ablehnen",
         "question": "Frage"
       },
       "detail": {
-        "title": "[TRANSLATE] Dettagli Conversazione",
-        "created": "[TRANSLATE] Creata il",
-        "messages": "[TRANSLATE] Messaggi",
+        "title": "Gesprächsdetails",
+        "created": "Erstellt am",
+        "messages": "Nachrichten",
         "back": "Zurück",
         "backAriaLabel": "Zurück zur Übersicht",
         "defaultTitle": "Standardtitel",
@@ -213,7 +213,7 @@
       },
       "sidebar": {
         "title": "Titel",
-        "new": "[TRANSLATE] Nuova Conversazione",
+        "new": "Neues Gespräch",
         "search": {
           "placeholder": "Gespräche suchen..."
         },
@@ -237,7 +237,7 @@
           "filtered": "Keine Gespräche mit diesen Filtern gefunden",
           "all": "Noch keine Gespräche. Starten Sie einen Chat mit einem Maestro!"
         },
-        "loadMore": "[TRANSLATE] Carica Altro",
+        "loadMore": "Mehr Laden",
         "dateFormat": {
           "daysAgo": "Vor {count} Tagen",
           "today": "Heute",
@@ -248,8 +248,8 @@
       "inactivity": {
         "title": "Inaktivität",
         "message": "Nachricht",
-        "continue": "[TRANSLATE] Continua",
-        "end": "[TRANSLATE] Termina Sessione",
+        "continue": "Fortfahren",
+        "end": "Sitzung Beenden",
         "closeAriaLabel": "Warnung schließen",
         "closeButton": "Schließen",
         "continueButton": "Fortfahren",
@@ -257,7 +257,7 @@
       },
       "toolSelection": {
         "title": "Werkzeug auswählen",
-        "description": "[TRANSLATE] Scegli uno strumento per continuare",
+        "description": "Wählen Sie ein Werkzeug zum Fortfahren",
         "closeAriaLabel": "Werkzeugauswahl schließen",
         "empty": "Keine Werkzeuge",
         "question": "Frage",
@@ -265,14 +265,14 @@
       }
     },
     "session": {
-      "title": "[TRANSLATE] Sessione",
-      "start": "[TRANSLATE] Inizia Sessione",
-      "end": "[TRANSLATE] Termina Sessione",
-      "duration": "[TRANSLATE] Durata",
+      "title": "Sitzung",
+      "start": "Sitzung Starten",
+      "end": "Sitzung Beenden",
+      "duration": "Dauer",
       "controls": {
-        "mute": "[TRANSLATE] Disattiva Audio",
-        "unmute": "[TRANSLATE] Attiva Audio",
-        "endSession": "[TRANSLATE] Termina",
+        "mute": "Ton Deaktivieren",
+        "unmute": "Ton Aktivieren",
+        "endSession": "Beenden",
         "cancelResponseAriaLabel": "Antwort abbrechen",
         "cancelResponseTooltip": "Aktuelle Antwort abbrechen",
         "endSessionAriaLabel": "Sitzung beenden",
