@@ -8,7 +8,8 @@ interface AccessibilityContentProps {
 }
 
 export function AccessibilityContent({ config }: AccessibilityContentProps) {
-  const t = useTranslations("legal.accessibility");
+  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
+  const t = useTranslations("compliance.accessibility");
 
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">

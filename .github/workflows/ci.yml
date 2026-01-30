@@ -72,8 +72,15 @@ jobs:
           rm -rf .next/cache
           # Remove files with colons in names (Turbopack externals) - not supported by GitHub artifact upload
           find .next -name "*:*" -delete 2>/dev/null || true
+          # Copy static assets into standalone directory (required by Next.js standalone server)
+          # See: https://nextjs.org/docs/app/api-reference/config/next-config-js/output#automatically-copying-traced-files
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
           echo "After cleanup:"
           ls -la .next/ || echo ".next directory missing after cleanup!"
+          echo "Standalone static assets:"
+          ls -la .next/standalone/.next/static/ || echo "static copy failed!"
+          ls -la .next/standalone/public/ | head -5 || echo "public copy failed!"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

@@ -41,7 +41,7 @@ vi.mock("next/image", () => ({
 
 describe("HeroSection - Translation Keys F-92", () => {
   const createMockTranslations = (keyMap: Record<string, string>) => {
-    return (key: string) => {
+    const t = (key: string) => {
       // Handle nested keys like "accessibility.title"
       if (key.includes(".")) {
         const parts = key.split(".");
@@ -56,6 +56,9 @@ describe("HeroSection - Translation Keys F-92", () => {
       }
       return keyMap[key] || `MISSING: ${key}`;
     };
+    // next-intl rich text API: t.rich(key, tags) returns rendered content
+    t.rich = (key: string, _tags?: Record<string, unknown>) => t(key);
+    return t;
   };
 
   it("should use camelCase 'withTeachers' key instead of kebab-case", () => {
@@ -184,6 +187,7 @@ describe("HeroSection - Translation Keys F-92", () => {
       learn: "Learn",
       withTeachers: "With teachers",
       anyAbility: "Any ability",
+      description: "Study with the best teachers",
       readableFonts: "Readable fonts",
       mindMaps: "Mind maps",
       textToSpeech: "Text to speech",
