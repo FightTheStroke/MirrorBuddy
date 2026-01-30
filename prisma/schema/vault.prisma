@@ -1,0 +1,20 @@
+// ============================================================================
+// SECRET VAULT - Encrypted API Key Storage
+// Stores external service credentials with AES-256-GCM encryption
+// ============================================================================
+
+model SecretVault {
+  id        String   @id @default(cuid())
+  service   String   // e.g. "azure_openai", "stripe", "resend"
+  keyName   String   // e.g. "AZURE_OPENAI_API_KEY"
+  encrypted String   @db.Text // AES-256-GCM encrypted value
+  iv        String   // initialization vector (hex)
+  authTag   String   // GCM authentication tag (hex)
+  status    String   @default("active") // active, expired, rotated
+  lastUsed  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([service, keyName])
+  @@map("secret_vault")
+}
