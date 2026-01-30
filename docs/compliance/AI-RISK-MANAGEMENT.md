@@ -6,7 +6,7 @@ MirrorBuddy risk management framework for AI systems, aligned with EU AI Act Art
 
 This document defines the risk management process for AI systems used in MirrorBuddy, focusing on:
 
-- Educational AI safety (22 Maestros + coaches)
+- Educational AI safety (26 Maestros + coaches)
 - Student data protection (minors under 16)
 - System reliability and performance
 - Compliance with EU AI Act and GDPR

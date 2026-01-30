@@ -76,7 +76,7 @@ const mockTiers = [
       parentDashboard: true,
       prioritySupport: true,
     },
-    availableMaestri: Array.from({ length: 22 }, (_, i) => `maestro-${i}`),
+    availableMaestri: Array.from({ length: 26 }, (_, i) => `maestro-${i}`),
     sortOrder: 2,
   },
 ];
@@ -155,7 +155,7 @@ describe("TierComparisonTable", () => {
         if (row.textContent?.includes("Maestri Available")) {
           expect(row.textContent).toContain("5");
           expect(row.textContent).toContain("15");
-          expect(row.textContent).toContain("22");
+          expect(row.textContent).toContain("26");
           foundMaestri = true;
         }
       });

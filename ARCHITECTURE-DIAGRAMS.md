@@ -608,7 +608,7 @@ graph TB
     Student[Student]
 
     subgraph Vertical_Relationships["Vertical Relationships"]
-        Professors["22 Professors (Subject Experts)"]
+        Professors["26 Professors (Subject Experts)"]
         Coaches["6 Coaches (Learning Method)"]
     end
 
@@ -956,7 +956,7 @@ graph TB
         B1[Registered Free]
         B2[50 chats/month]
         B3[100 min voice]
-        B4[All 22 Professors]
+        B4[All 25 Professors]
         B5[All tools]
         B6[gpt-5.2-edu]
     end
@@ -965,7 +965,7 @@ graph TB
         P1[Paid Subscriber]
         P2[Unlimited chats]
         P3[Unlimited voice]
-        P4[All 22 Professors]
+        P4[All 26 Professors]
         P5[All tools + priority]
         P6[gpt-5.2-chat]
     end

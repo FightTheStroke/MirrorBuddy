@@ -825,14 +825,14 @@
     "tier-comparison": {
       "heading": "Choisissez le plan parfait pour vous",
       "subheading": "Commencez avec un essai gratuit ou inscrivez-vous pour débloquer plus de fonctionnalités",
-      "footer-note": "Tous les plans incluent l'accès aux 22 Maestri IA et aux outils d'apprentissage personnalisés"
+      "footer-note": "Tous les plans incluent l'accès aux 26 Maestri IA et aux outils d'apprentissage personnalisés"
     },
     "principles": {
       "welcome-to-school": "Bienvenue à l'École que je souhaite, {name} !",
       "what-makes-us-special": "Voici ce qui nous rend spéciaux",
       "accessible-learning": "Apprentissage Accessible",
       "accessible-learning-desc": "Parcours d'apprentissage personnalisés selon vos besoins",
-      "ai-teachers": "22 Enseignants IA",
+      "ai-teachers": "26 Enseignants IA",
       "ai-teachers-desc": "Des experts dans chaque matière, toujours disponibles",
       "your-pace": "À Votre Rythme",
       "your-pace-desc": "Apprenez quand vous voulez, aussi longtemps que vous le voulez",
@@ -862,7 +862,7 @@
       "free-trial": "ESSAI GRATUIT",
       "have-account": "Avez-vous un compte ?",
       "try-now": "Explorez maintenant",
-      "22-maestri": "22 Maestri IA",
+      "22-maestri": "26 Maestri IA",
       "all-tools": "Tous les outils",
       "unlimited-chats": "Chats illimités",
       "login": "Se connecter",
@@ -1728,7 +1728,7 @@
     "tldr": {
       "heading": "En bref (TL;DR)",
       "point1": "MirrorBuddy utilise l'IA (Azure OpenAI) pour l'enseignement, pas pour la prise de décision",
-      "point2": "Les 22 Maestri IA possèdent des connaissances vérifiées et contrôlées",
+      "point2": "Les 26 Maestri IA possèdent des connaissances vérifiées et contrôlées",
       "point3": "Les enseignants voient toujours tous les messages et peuvent intervenir",
       "point4": "Vous pouvez refuser l'IA quand vous le souhaitez, sans conséquences",
       "point5": "Nous respectons le RGPD et la loi française sur la vie privée"
@@ -1746,7 +1746,7 @@
     "sections": {
       "section1": {
         "title": "Qu'est-ce que l'IA fait dans MirrorBuddy?",
-        "para1": "MirrorBuddy utilise l'intelligence artificielle (IA) pour offrir une expérience éducative personnalisée. Les 22 Maestri IA (tuteurs virtuels) sont conçus pour enseigner, expliquer les concepts difficiles, créer des quiz, des cartes mentales et des flashcards.",
+        "para1": "MirrorBuddy utilise l'intelligence artificielle (IA) pour offrir une expérience éducative personnalisée. Les 26 Maestri IA (tuteurs virtuels) sont conçus pour enseigner, expliquer les concepts difficiles, créer des quiz, des cartes mentales et des flashcards.",
         "para2": "Important : l'IA ne décide PAS votre note, n'évalue PAS votre handicap, et ne remplace PAS vos enseignants. Les enseignants restent toujours les principaux responsables de l'évaluation et des décisions pédagogiques."
       },
       "section2": {
@@ -1756,16 +1756,16 @@
         "item1Title": "Traitement du Texte",
         "item1Desc": "Quand vous posez une question, le modèle analyse le texte et génère une réponse basée sur son entraînement",
         "item2Title": "Connaissances Vérifiées",
-        "item2Desc": "Les 22 Maestri ont des bases de connaissances intégrées - des bibliothèques de connaissances contrôlées et vérifiées par des experts - qui limitent ce qu'ils peuvent dire",
+        "item2Desc": "Les 26 Maestri ont des bases de connaissances intégrées - des bibliothèques de connaissances contrôlées et vérifiées par des experts - qui limitent ce qu'ils peuvent dire",
         "item3Title": "Retour Humain",
         "item3Desc": "Chaque réponse peut être examinée par les enseignants et les parents via le tableau de bord de contrôle"
       },
       "section3": {
-        "title": "Les 22 Maestri IA",
-        "intro": "MirrorBuddy dispose de 22 tuteurs virtuels spécialisés dans différentes matières. Chaque Maestro a une personnalité authentique et des connaissances vérifiées dans son domaine.",
+        "title": "Les 26 Maestri IA",
+        "intro": "MirrorBuddy dispose de 26 tuteurs virtuels spécialisés dans différentes matières. Chaque Maestro a une personnalité authentique et des connaissances vérifiées dans son domaine.",
         "subtitle": "Catégories de Maestri :",
-        "category1": "Sciences et Mathématiques : Euclide (Géométrie), Galileo (Astronomie), Feynman (Physique), Curie (Chimie), Darwin (Biologie)",
-        "category2": "Langues et Humanités : Manzoni (Italien), Shakespeare (Anglais), Alex Pina (Espagnol), Omero (Narration)",
+        "category1": "Sciences et Mathématiques : Euclide (Géométrie), Galileo (Astronomie), Feynman (Physique), Curie (Chimie), Darwin (Biologie), Levi-Montalcini (Sciences)",
+        "category2": "Langues et Humanités : Manzoni (Italien), Shakespeare (Anglais), Alex Pina (Espagnol), Molière (Français), Goethe (Allemand), Cervantes (Littérature), Omero (Narration)",
         "category3": "Société et Environnement : Cicerone (Éducation Civique), Smith (Économie), Humboldt (Géographie), Erodoto (Histoire)",
         "category4": "Art, Musique et Bien-être : Leonardo (Art), Mozart (Musique), Ippocrate (Santé), Chris (Éducation Physique), Simone (Sport)",
         "category5": "Disciplines Spécialisées : Lovelace (Informatique), Socrate (Philosophie), Cassese (Droit International)",

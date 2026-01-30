@@ -825,14 +825,14 @@
     "tier-comparison": {
       "heading": "Wähle den perfekten Plan für dich",
       "subheading": "Starte mit einer kostenlosen Testversion oder registriere dich, um mehr Funktionen freizuschalten",
-      "footer-note": "Alle Pläne beinhalten Zugang zu 22 KI-Maestri und personalisierten Lernwerkzeugen"
+      "footer-note": "Alle Pläne beinhalten Zugang zu 26 KI-Maestri und personalisierten Lernwerkzeugen"
     },
     "principles": {
       "welcome-to-school": "Willkommen in der Schule, die ich mir wünsche, {name}!",
       "what-makes-us-special": "Das macht uns besonders",
       "accessible-learning": "Zugängliches Lernen",
       "accessible-learning-desc": "Personalisierte Lernwege für deine Bedürfnisse",
-      "ai-teachers": "22 KI-Lehrer",
+      "ai-teachers": "26 KI-Lehrer",
       "ai-teachers-desc": "Experten in jedem Fach, immer verfügbar",
       "your-pace": "In Deinem Tempo",
       "your-pace-desc": "Lerne wann du möchtest, so lange du möchtest",
@@ -862,7 +862,7 @@
       "free-trial": "KOSTENLOSE TESTVERSION",
       "have-account": "Hast du ein Konto?",
       "try-now": "Jetzt erkunden",
-      "22-maestri": "22 KI-Maestri",
+      "22-maestri": "26 KI-Maestri",
       "all-tools": "Alle Werkzeuge",
       "unlimited-chats": "Unbegrenzte Chats",
       "login": "Anmelden",
@@ -1728,7 +1728,7 @@
     "tldr": {
       "heading": "Kurz gesagt (TL;DR)",
       "point1": "MirrorBuddy nutzt KI (Azure OpenAI) zum Unterrichten, nicht zur Entscheidungsfindung",
-      "point2": "Die 22 KI-Maestri verfügen über verifiziertes und kontrolliertes Wissen",
+      "point2": "Die 26 KI-Maestri verfügen über verifiziertes und kontrolliertes Wissen",
       "point3": "Lehrer sehen immer alle Chats und können eingreifen",
       "point4": "Sie können KI jederzeit ablehnen, ohne Konsequenzen",
       "point5": "Wir respektieren die DSGVO und deutsches Datenschutzrecht"
@@ -1746,7 +1746,7 @@
     "sections": {
       "section1": {
         "title": "Was macht KI in MirrorBuddy?",
-        "para1": "MirrorBuddy nutzt künstliche Intelligenz (KI), um ein personalisiertes Lernentlebnis zu bieten. Die 22 KI-Maestri (virtuelle Tutoren) sind dafür konzipiert, zu unterrichten, schwierige Konzepte zu erklären, Quiz, Mindmaps und Karteikarten zu erstellen.",
+        "para1": "MirrorBuddy nutzt künstliche Intelligenz (KI), um ein personalisiertes Lernentlebnis zu bieten. Die 26 KI-Maestri (virtuelle Tutoren) sind dafür konzipiert, zu unterrichten, schwierige Konzepte zu erklären, Quiz, Mindmaps und Karteikarten zu erstellen.",
         "para2": "Wichtig: KI entscheidet NICHT über deine Note, bewertet NICHT deine Behinderung und ersetzt NICHT deine Lehrer. Lehrer bleiben immer die Hauptverantwortlichen für die Bewertung und pädagogischen Entscheidungen."
       },
       "section2": {
@@ -1756,16 +1756,16 @@
         "item1Title": "Textverarbeitung",
         "item1Desc": "Wenn du eine Frage stellst, analysiert das Modell den Text und generiert eine Antwort basierend auf seinem Training",
         "item2Title": "Verifiziertes Wissen",
-        "item2Desc": "Die 22 Maestri haben eingebettete Wissensdatenbanken - von Experten kontrollierte und verifizierte Wissensbibliotheken - die begrenzen, was sie sagen können",
+        "item2Desc": "Die 26 Maestri haben eingebettete Wissensdatenbanken - von Experten kontrollierte und verifizierte Wissensbibliotheken - die begrenzen, was sie sagen können",
         "item3Title": "Menschliches Feedback",
         "item3Desc": "Jede Antwort kann von Lehrern und Eltern über das Kontroll-Dashboard überprüft werden"
       },
       "section3": {
-        "title": "Die 22 KI-Maestri",
-        "intro": "MirrorBuddy hat 22 virtuelle Tutoren, die auf verschiedene Fächer spezialisiert sind. Jeder Maestro hat eine authentische Persönlichkeit und verifiziertes Wissen in seinem Bereich.",
+        "title": "Die 26 KI-Maestri",
+        "intro": "MirrorBuddy hat 26 virtuelle Tutoren, die auf verschiedene Fächer spezialisiert sind. Jeder Maestro hat eine authentische Persönlichkeit und verifiziertes Wissen in seinem Bereich.",
         "subtitle": "Kategorien von Maestri:",
-        "category1": "Naturwissenschaften und Mathematik: Euclide (Geometrie), Galileo (Astronomie), Feynman (Physik), Curie (Chemie), Darwin (Biologie)",
-        "category2": "Sprachen und Geisteswissenschaften: Manzoni (Italienisch), Shakespeare (Englisch), Alex Pina (Spanisch), Omero (Geschichtenerzählen)",
+        "category1": "Naturwissenschaften und Mathematik: Euclide (Geometrie), Galileo (Astronomie), Feynman (Physik), Curie (Chemie), Darwin (Biologie), Levi-Montalcini (Wissenschaften)",
+        "category2": "Sprachen und Geisteswissenschaften: Manzoni (Italienisch), Shakespeare (Englisch), Alex Pina (Spanisch), Molière (Französisch), Goethe (Deutsch), Cervantes (Literatur), Omero (Geschichtenerzählen)",
         "category3": "Gesellschaft und Umwelt: Cicerone (Bürgerkunde), Smith (Wirtschaft), Humboldt (Geographie), Erodoto (Geschichte)",
         "category4": "Kunst, Musik und Wohlbefinden: Leonardo (Kunst), Mozart (Musik), Ippocrate (Gesundheit), Chris (Sportunterricht), Simone (Sport)",
         "category5": "Spezialdisziplinen: Lovelace (Informatik), Socrate (Philosophie), Cassese (Internationales Recht)",

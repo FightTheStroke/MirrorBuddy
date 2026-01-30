@@ -39,7 +39,7 @@ export function AccessibilityClient() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12 print:py-8">
+      <main className="max-w-4xl mx-auto px-4 py-12 print:py-8">
         <article className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 print:shadow-none print:rounded-none">
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
@@ -147,7 +147,7 @@ export function AccessibilityClient() {
             </div>
           </section>
         </article>
-      </div>
+      </main>
     </div>
   );
 }

@@ -98,7 +98,7 @@ If BLOCKED → fix issues, re-run `/release`
 
 | Check   | Validation                                |
 | ------- | ----------------------------------------- |
-| Maestri | All 22 load correctly, knowledge embedded |
+| Maestri | All 26 load correctly, knowledge embedded |
 | Coaches | 6 coaches with valid prompts              |
 | Buddies | 6 buddies with age-adaptive prompts       |
 | Tools   | All 16 learning tools functional          |

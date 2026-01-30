@@ -202,7 +202,7 @@ describe("Tier Seeding", () => {
       expect(999999).toBeGreaterThan(100000);
     });
 
-    it("should include all maestri for pro tier (22 total)", async () => {
+    it("should include all maestri for pro tier (26 total)", async () => {
       const proMaestri = [
         "leonardo-art",
         "galileo-physics",
@@ -225,10 +225,14 @@ describe("Tier Seeding", () => {
         "alex-pina-spanish",
         "simone-sport",
         "cassese-international-law",
+        "moliere-french",
+        "goethe-german",
+        "cervantes-literature",
+        "levi-montalcini-biology",
         "mascetti-supercazzola",
       ];
 
-      expect(proMaestri).toHaveLength(22);
+      expect(proMaestri).toHaveLength(26);
     });
 
     it("should provide all coaches and buddies for pro tier", async () => {
@@ -305,8 +309,8 @@ describe("Tier Seeding", () => {
     });
 
     it("should escalate maestri access from trial to base to pro", async () => {
-      expect(3).toBeLessThan(20); // trial < base
-      expect(20).toBeLessThan(22); // base < pro
+      expect(3).toBeLessThan(25); // trial < base
+      expect(25).toBeLessThan(26); // base < pro
     });
   });
 

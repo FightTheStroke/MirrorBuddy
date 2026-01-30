@@ -90,7 +90,7 @@ export function QuickStart({
                     ✓
                   </span>
                 </span>
-                <span className="text-base font-medium">22 Maestri AI</span>
+                <span className="text-base font-medium">26 Maestri AI</span>
               </li>
               <li className="flex items-center gap-3 text-gray-700 dark:text-gray-200">
                 <span className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-100 dark:bg-green-900/30 rounded-full">

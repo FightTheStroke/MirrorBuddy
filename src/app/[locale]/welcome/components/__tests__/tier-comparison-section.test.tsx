@@ -47,7 +47,7 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Pro tier should show unlimited or high limits
-    expect(screen.getByText(/22 Professori/i)).toBeInTheDocument();
+    expect(screen.getByText(/26 Professori/i)).toBeInTheDocument();
     expect(screen.getByText(/messaggi illimitati/i)).toBeInTheDocument();
   });
 

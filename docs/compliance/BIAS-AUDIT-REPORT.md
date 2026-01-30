@@ -28,8 +28,8 @@ Comprehensive bias audit of embedded knowledge bases for 26 AI educational maest
 
 **Status**: Mixed representation
 
-- **Female Maestri**: 2 of 22 (9%) - Lovelace (CS), Curie (Chemistry)
-- **Male Maestri**: 20 of 22 (91%)
+- **Female Maestri**: 3 of 26 (12%) - Lovelace (CS), Curie (Chemistry), Levi-Montalcini (Biology)
+- **Male Maestri**: 23 of 26 (88%)
 - **Issue**: While female maestri are celebrated, underrepresentation reflects historical academic demographics
 
 **Mitigation**:

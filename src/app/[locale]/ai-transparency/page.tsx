@@ -28,7 +28,7 @@ export default function AITransparencyPage() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12 print:py-8">
+      <main className="max-w-4xl mx-auto px-4 py-12 print:py-8">
         <article className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 print:shadow-none print:rounded-none">
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
@@ -68,7 +68,7 @@ export default function AITransparencyPage() {
                   ✓
                 </span>
                 <span>
-                  I 22 Maestri IA hanno conoscenze verificate e controllate
+                  I 26 Maestri IA hanno conoscenze verificate e controllate
                 </span>
               </li>
               <li className="flex items-start gap-2">
@@ -147,7 +147,7 @@ export default function AITransparencyPage() {
             </p>
           </footer>
         </article>
-      </div>
+      </main>
     </div>
   );
 }

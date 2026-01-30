@@ -68,7 +68,7 @@ const mockTiers = [
       pdfexport: true,
       advancedfeatures: true,
     },
-    availableMaestri: Array.from({ length: 22 }, (_, i) => `maestro-${i}`),
+    availableMaestri: Array.from({ length: 26 }, (_, i) => `maestro-${i}`),
     sortOrder: 2,
   },
 ];

@@ -110,7 +110,7 @@ vercel ls --prod | head -20
 
 **Current Usage** (MirrorBuddy):
 
-- Maestro avatars: `public/maestri/*.png` (22 images)
+- Maestro avatars: `public/maestri/*.png` (26 images)
 - Coach avatars: `public/avatars/*.webp` (6 images)
 - Buddy avatars: `public/avatars/*.webp` (6 images)
 - Static assets served via CDN

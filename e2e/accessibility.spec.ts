@@ -453,7 +453,7 @@ test.describe("Instant Access - Floating Button", () => {
   });
 
   test("floating button visible on legal pages", async ({ page }) => {
-    const legalPages = ["/privacy", "/termini", "/cookies"];
+    const legalPages = ["/privacy", "/terms", "/cookies"];
 
     for (const path of legalPages) {
       await page.goto(path);

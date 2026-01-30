@@ -247,7 +247,7 @@ MirrorBuddy offers three tiers to meet different needs:
 | **Chat messages/month**        | 10           | 50          | Unlimited |
 | **Voice sessions/month**       | 5 min        | 100 min     | Unlimited |
 | **Tools** (mind maps, quizzes) | Limited (10) | All         | All       |
-| **Maestri access**             | 3 random     | All 22      | All 22    |
+| **Maestri access**             | 3 random     | All 25      | All 26    |
 | **Flashcards (FSRS)**          | —            | ✓           | ✓         |
 | **Progress analytics**         | —            | ✓           | ✓         |
 | **Homework help (PDF/photos)** | —            | ✓           | ✓         |

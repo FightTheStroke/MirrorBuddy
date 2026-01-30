@@ -1035,14 +1035,14 @@
     "tier-comparison": {
       "heading": "Scegli il piano perfetto per te",
       "subheading": "Inizia con una prova gratuita oppure registrati per sbloccare più funzionalità",
-      "footer-note": "Tutti i piani includono accesso ai 22 Maestri AI e strumenti di apprendimento personalizzati"
+      "footer-note": "Tutti i piani includono accesso ai 26 Maestri AI e strumenti di apprendimento personalizzati"
     },
     "principles": {
       "welcome-to-school": "Benvenuto nella Scuola Che Vorrei, {name}!",
       "what-makes-us-special": "Ecco cosa ci rende speciali",
       "accessible-learning": "Apprendimento Accessibile",
       "accessible-learning-desc": "Percorsi di studio personalizzati per le tue esigenze",
-      "ai-teachers": "22 Insegnanti AI",
+      "ai-teachers": "26 Insegnanti AI",
       "ai-teachers-desc": "Esperti in ogni materia, sempre disponibili",
       "your-pace": "Al Tuo Ritmo",
       "your-pace-desc": "Impara quando vuoi, per il tempo che vuoi",
@@ -1072,7 +1072,7 @@
       "free-trial": "PROVA GRATUITA",
       "have-account": "Hai un account?",
       "try-now": "Esplora subito",
-      "22-maestri": "22 Maestri AI",
+      "22-maestri": "26 Maestri AI",
       "all-tools": "Tutti gli strumenti",
       "unlimited-chats": "Chat illimitate",
       "login": "Accedi",
@@ -2233,7 +2233,7 @@
     "tldr": {
       "heading": "In breve (TL;DR)",
       "point1": "MirrorBuddy usa IA (Azure OpenAI) per insegnare, non per decidere",
-      "point2": "I 22 Maestri IA hanno conoscenze verificate e controllate",
+      "point2": "I 26 Maestri IA hanno conoscenze verificate e controllate",
       "point3": "Gli insegnanti vedono sempre tutte le chat e possono intervenire",
       "point4": "Puoi rifiutare l'IA quando vuoi, senza conseguenze",
       "point5": "Rispettiamo il GDPR e la legge italiana sulla privacy"
@@ -2251,7 +2251,7 @@
     "sections": {
       "section1": {
         "title": "Cosa fa l'IA in MirrorBuddy?",
-        "para1": "MirrorBuddy utilizza l'intelligenza artificiale (IA) per offrire un'esperienza educativa personalizzata. I 22 Maestri IA (tutori virtuali) sono progettati per insegnare, spiegare concetti difficili, creare quiz, mappe mentali e flashcard.",
+        "para1": "MirrorBuddy utilizza l'intelligenza artificiale (IA) per offrire un'esperienza educativa personalizzata. I 26 Maestri IA (tutori virtuali) sono progettati per insegnare, spiegare concetti difficili, creare quiz, mappe mentali e flashcard.",
         "para2": "Importante: L'IA NON decide il tuo voto, NON valuta la tua disabilità, e NON sostituisce i tuoi insegnanti. Gli insegnanti rimangono sempre i responsabili principali della valutazione e delle decisioni pedagogiche."
       },
       "section2": {
@@ -2261,16 +2261,16 @@
         "item1Title": "Elaborazione del Testo",
         "item1Desc": "Quando scrivi una domanda, il modello analizza il testo e genera una risposta basata sul suo addestramento",
         "item2Title": "Conoscenza Verificata",
-        "item2Desc": "I 22 Maestri hanno embedded knowledge bases - librerie di conoscenza controllate e verificate da esperti - che limitano cosa possono dire",
+        "item2Desc": "I 26 Maestri hanno embedded knowledge bases - librerie di conoscenza controllate e verificate da esperti - che limitano cosa possono dire",
         "item3Title": "Feedback Umano",
         "item3Desc": "Ogni risposta è revisionabile da insegnanti e genitori tramite il dashboard di controllo"
       },
       "section3": {
-        "title": "I 22 Maestri IA",
-        "intro": "MirrorBuddy ha 22 tutori virtuali specializzati in diverse materie. Ogni Maestro ha una personalità autentica e una conoscenza verificata nel suo ambito.",
+        "title": "I 26 Maestri IA",
+        "intro": "MirrorBuddy ha 26 tutori virtuali specializzati in diverse materie. Ogni Maestro ha una personalità autentica e una conoscenza verificata nel suo ambito.",
         "subtitle": "Categorie di Maestri:",
-        "category1": "Scienze e Matematica: Euclide (Geometria), Galileo (Astronomia), Feynman (Fisica), Curie (Chimica), Darwin (Biologia)",
-        "category2": "Lingue e Umanistica: Manzoni (Italiano), Shakespeare (Inglese), Alex Pina (Spagnolo), Omero (Storytelling)",
+        "category1": "Scienze e Matematica: Euclide (Geometria), Galileo (Astronomia), Feynman (Fisica), Curie (Chimica), Darwin (Biologia), Levi-Montalcini (Scienze)",
+        "category2": "Lingue e Umanistica: Manzoni (Italiano), Shakespeare (Inglese), Alex Pina (Spagnolo), Molière (Francese), Goethe (Tedesco), Cervantes (Letteratura), Omero (Storytelling)",
         "category3": "Società e Ambiente: Cicerone (Educazione Civica), Smith (Economia), Humboldt (Geografia), Erodoto (Storia)",
         "category4": "Arte, Musica e Benessere: Leonardo (Arte), Mozart (Musica), Ippocrate (Salute), Chris (Educazione Fisica), Simone (Sport)",
         "category5": "Discipline Specialistiche: Lovelace (Informatica), Socrate (Filosofia), Cassese (Diritto Internazionale)",
