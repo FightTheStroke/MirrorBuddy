@@ -4,33 +4,27 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Sparkles, Zap } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { tierCards } from "./tier-data";
-import { b2bTierCards } from "./b2b-tier-data";
+import { createTierCards } from "./tier-data";
+import { createB2bTierCards } from "./b2b-tier-data";
 import { SegmentedToggle } from "./segmented-toggle";
 
 type ViewMode = "individuals" | "organizations";
 
 export function TierComparisonSection() {
+  const t = useTranslations("welcome.tierComparison");
   const [viewMode, setViewMode] = useState<ViewMode>("individuals");
 
   const isB2BView = viewMode === "organizations";
-  const currentCards = isB2BView ? b2bTierCards : tierCards;
+  const currentCards = isB2BView ? createB2bTierCards(t) : createTierCards(t);
 
-  // Dynamic content based on view mode
-  const content = {
-    individuals: {
-      heading: "Scegli il piano perfetto per te",
-      subtitle:
-        "Inizia con una prova gratuita oppure registrati per sbloccare più funzionalità",
-    },
-    organizations: {
-      heading: "Soluzioni per la tua organizzazione",
-      subtitle: "Personalizzazione completa per scuole e aziende",
-    },
-  };
-
-  const currentContent = content[viewMode];
+  const currentContent = isB2BView
+    ? {
+        heading: t("organizationsHeading"),
+        subtitle: t("organizationsSubtitle"),
+      }
+    : { heading: t("heading"), subtitle: t("subtitle") };
 
   return (
     <motion.section
@@ -40,6 +34,16 @@ export function TierComparisonSection() {
       className="w-full max-w-7xl mx-auto px-4 mt-16 mb-12"
       aria-labelledby="tier-comparison-heading"
     >
+      {/* Access intro */}
+      <div className="text-center mb-6">
+        <p className="text-base text-gray-700 dark:text-gray-300 font-medium">
+          {t("accessIntroLine1")}
+        </p>
+        <p className="text-base text-gray-700 dark:text-gray-300 font-medium">
+          {t("accessIntroLine2")}
+        </p>
+      </div>
+
       {/* Toggle Section */}
       <div className="flex justify-center mb-8">
         <SegmentedToggle value={viewMode} onChange={setViewMode} />
@@ -149,7 +153,7 @@ export function TierComparisonSection() {
                             : "bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white"
                         }`}
                       >
-                        {tier.name === "Trial" && (
+                        {index === 0 && !isB2BView && (
                           <Sparkles
                             className="w-4 h-4 mr-2"
                             aria-hidden="true"
@@ -178,11 +182,7 @@ export function TierComparisonSection() {
 
           {/* Footer Text */}
           <div className="mt-8 text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>
-              {isB2BView
-                ? "Contattaci per una consulenza personalizzata e un preventivo su misura"
-                : "Tutti i piani includono accesso ai 22 Maestri AI e strumenti di apprendimento personalizzati"}
-            </p>
+            <p>{isB2BView ? t("organizationsFooter") : t("footer")}</p>
           </div>
         </motion.div>
       </AnimatePresence>

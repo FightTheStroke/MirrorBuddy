@@ -26,7 +26,7 @@
     },
     "aiSystem": {
       "section1Title": "1. AI System Disclosure (Article 50 - EU AI Act 2024/1689)",
-      "section1Para1": "[REQUIRES LEGAL VERIFICATION] In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 22 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
+      "section1Para1": "[REQUIRES LEGAL VERIFICATION] In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 26 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
       "section1Para2Intro": "MirrorBuddy's AI systems include three main categories:",
       "section1Para2Item1": "Educational Personalization Systems - Azure OpenAI GPT to adapt content to student learning level and style",
       "section1Para2Item2": "Progress Analysis Systems - Spaced repetition (FSRS) algorithms to track knowledge retention",

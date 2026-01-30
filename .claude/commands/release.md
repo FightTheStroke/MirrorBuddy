@@ -24,7 +24,7 @@ Launches `app-release-manager` subagent with MirrorBuddy-specific validations:
 3. **GDPR Compliance** - Data handling, privacy, consent mechanisms
 4. **Accessibility (WCAG 2.1 AA)** - 7 DSA profiles, contrast, keyboard nav
 5. **ISE Engineering Fundamentals** - Code quality, testing, documentation
-6. **AI Tutor Readiness** - All 22 maestri verified, tools working
+6. **AI Tutor Readiness** - All 26 maestri verified, tools working
 
 ## Workflow
 
@@ -49,7 +49,7 @@ Execute full release gate:
 5. Accessibility audit (WCAG 2.1 AA)
 6. Compliance check (GDPR, EU AI Act)
 7. Sentry + deployment configuration verification (CI + Vercel env)
-8. AI tutor verification (all 22 maestri)
+8. AI tutor verification (all 26 maestri)
 9. Documentation review (CHANGELOG, ADRs)
 
 Sentry + deployment checks MUST include:

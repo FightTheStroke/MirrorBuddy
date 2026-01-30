@@ -13,7 +13,6 @@ interface HeroSectionProps {
  * Hero Section for MirrorBuddy Welcome Page
  */
 export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
   const t = useTranslations("welcome.hero");
 
   return (

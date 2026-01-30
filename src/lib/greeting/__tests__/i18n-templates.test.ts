@@ -177,7 +177,7 @@ describe("i18n-templates", () => {
       });
     });
 
-    it("should have personalized greetings for all 22 maestri", () => {
+    it("should have personalized greetings for all 26 maestri", () => {
       const expectedMaestri = [
         "leonardo",
         "galileo",

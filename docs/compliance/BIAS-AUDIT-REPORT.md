@@ -1,10 +1,10 @@
 # Bias Audit Report - MirrorBuddy Maestri Knowledge Bases
 
-**Date**: January 20, 2026 | **Scope**: 22 AI Maestri | **Standard**: AI Act Art.10 (Data Quality)
+**Date**: January 20, 2026 | **Scope**: 26 AI Maestri | **Standard**: AI Act Art.10 (Data Quality)
 
 ## Executive Summary
 
-Comprehensive bias audit of embedded knowledge bases for 22 AI educational maestri. Audit confirms generally balanced, inclusive, and culturally-aware content with identified mitigation areas for gender representation and geographic diversity.
+Comprehensive bias audit of embedded knowledge bases for 26 AI educational maestri. Audit confirms generally balanced, inclusive, and culturally-aware content with identified mitigation areas for gender representation and geographic diversity.
 
 **Overall Risk**: LOW - Effective pedagogical principles with DSA adaptations minimize bias propagation.
 
@@ -95,7 +95,7 @@ Comprehensive bias audit of embedded knowledge bases for 22 AI educational maest
 
 ### RISK 1: Underrepresentation of Female Scientists (MODERATE)
 
-**Evidence**: 2/22 maestri (9% female)
+**Evidence**: 3/26 maestri (12% female)
 **Recommendation**:
 
 - Add female mathematician (Émilie du Châtelet, Sofia Kovalevskaya)

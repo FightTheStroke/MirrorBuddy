@@ -15,7 +15,7 @@ The Trial tier is configured in the `TierDefinition` table with the code `TRIAL`
 | Tool calls     | 10 per day              | `toolsLimitDaily` in TierDefinition                 |
 | Documents      | 1 total                 | `docsLimitTotal` in TierDefinition                  |
 | AI Model       | gpt-4o-mini             | `chatModel` in TierDefinition                       |
-| Maestri Access | All 22 maestri/amici    | `availableMaestri` in TierDefinition (unrestricted) |
+| Maestri Access | All 26 maestri/amici    | `availableMaestri` in TierDefinition (unrestricted) |
 
 **Key behavior:**
 

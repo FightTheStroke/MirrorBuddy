@@ -3,7 +3,7 @@
  * Central module for child-safe AI guardrails
  *
  * CRITICAL: This module MUST be used by ALL AI characters:
- * - All 22 Maestri (historical tutors + amici)
+ * - All 26 Maestri (historical tutors + amici)
  * - All 6 Coaches (learning method coaches)
  * - Mario/Maria (peer buddies)
  * - Any future character

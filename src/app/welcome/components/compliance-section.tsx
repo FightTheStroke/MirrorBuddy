@@ -2,58 +2,52 @@
 
 import { motion } from "framer-motion";
 import { Shield, Scale, Baby, Eye, Github, FileText } from "lucide-react";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 
-interface ComplianceItem {
+interface ComplianceItemConfig {
   icon: React.ElementType;
-  label: string;
-  description: string;
+  key: string;
   href?: string;
   color: string;
 }
 
-const COMPLIANCE_ITEMS: ComplianceItem[] = [
+const COMPLIANCE_CONFIGS: ComplianceItemConfig[] = [
   {
     icon: Shield,
-    label: "GDPR",
-    description: "Privacy e protezione dati UE",
+    key: "gdpr",
     href: "/privacy",
     color: "text-blue-600 bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30",
   },
   {
     icon: Scale,
-    label: "EU AI Act",
-    description: "Conformita regolamento AI",
+    key: "aiAct",
     href: "/ai-transparency",
     color:
       "text-purple-600 bg-purple-100 dark:text-purple-400 dark:bg-purple-900/30",
   },
   {
     icon: Baby,
-    label: "COPPA",
-    description: "Protezione minori online",
+    key: "coppa",
     href: "/privacy#coppa",
     color:
       "text-green-600 bg-green-100 dark:text-green-400 dark:bg-green-900/30",
   },
   {
     icon: Eye,
-    label: "AI Transparency",
-    description: "Policy trasparenza AI",
+    key: "aiTransparency",
     href: "/ai-policy",
     color: "text-pink-600 bg-pink-100 dark:text-pink-400 dark:bg-pink-900/30",
   },
   {
     icon: Github,
-    label: "Open Source",
-    description: "Codice aperto su GitHub",
+    key: "openSource",
     href: "https://github.com/FightTheStroke/MirrorBuddy",
     color: "text-gray-800 bg-gray-100 dark:text-gray-300 dark:bg-gray-800",
   },
   {
     icon: FileText,
-    label: "Apache 2.0",
-    description: "Licenza open source",
+    key: "apache",
     href: "https://github.com/FightTheStroke/MirrorBuddy/blob/main/LICENSE",
     color:
       "text-orange-600 bg-orange-100 dark:text-orange-400 dark:bg-orange-900/30",
@@ -71,6 +65,8 @@ const COMPLIANCE_ITEMS: ComplianceItem[] = [
  * - Open source (GitHub + Apache 2.0)
  */
 export function ComplianceSection() {
+  const t = useTranslations("welcome.compliance");
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -86,23 +82,29 @@ export function ComplianceSection() {
         transition={{ delay: 1.3 }}
         className="text-center mb-8"
       >
+        <p className="text-base text-gray-700 dark:text-gray-300 mb-1 font-medium">
+          {t("trustIntroLine1")}
+        </p>
+        <p className="text-base text-gray-700 dark:text-gray-300 mb-4 font-medium">
+          {t("trustIntroLine2")}
+        </p>
         <h2
           id="compliance-heading"
           className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          Compliance e{" "}
+          {t("heading")}{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-            Trasparenza
+            {t("headingHighlight")}
           </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Sicurezza, privacy e trasparenza sono al centro di MirrorBuddy
+          {t("subtitle")}
         </p>
       </motion.div>
 
       {/* Compliance Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        {COMPLIANCE_ITEMS.map((item, i) => {
+        {COMPLIANCE_CONFIGS.map((item, i) => {
           const Icon = item.icon;
           const isExternal = item.href?.startsWith("http");
 
@@ -119,10 +121,10 @@ export function ComplianceSection() {
                 <Icon className="w-5 h-5" aria-hidden="true" />
               </div>
               <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                {item.label}
+                {t(`items.${item.key}.label`)}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {item.description}
+                {t(`items.${item.key}.description`)}
               </p>
             </motion.div>
           );
@@ -130,7 +132,7 @@ export function ComplianceSection() {
           if (item.href) {
             return isExternal ? (
               <a
-                key={item.label}
+                key={item.key}
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -139,13 +141,13 @@ export function ComplianceSection() {
                 {content}
               </a>
             ) : (
-              <Link key={item.label} href={item.href} className="block">
+              <Link key={item.key} href={item.href} className="block">
                 {content}
               </Link>
             );
           }
 
-          return <div key={item.label}>{content}</div>;
+          return <div key={item.key}>{content}</div>;
         })}
       </div>
 
@@ -156,17 +158,18 @@ export function ComplianceSection() {
         transition={{ delay: 1.7 }}
         className="text-center text-xs text-gray-400 dark:text-gray-500 mt-6 max-w-2xl mx-auto"
       >
-        MirrorBuddy e sviluppato da{" "}
-        <a
-          href="https://fightthestroke.org"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline hover:text-gray-600"
-        >
-          Fondazione Fightthestroke
-        </a>
-        , organizzazione non-profit per bambini e famiglie colpite da paralisi
-        cerebrali e ictus pediatrici.
+        {t.rich("footer", {
+          link: (chunks) => (
+            <a
+              href="https://fightthestroke.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-gray-600"
+            >
+              {chunks}
+            </a>
+          ),
+        })}
       </motion.p>
     </motion.section>
   );

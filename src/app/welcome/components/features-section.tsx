@@ -1,67 +1,48 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { GraduationCap, Map, BookOpen, Gamepad2, Mic, Sparkles, Brain, Target } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { motion } from "framer-motion";
+import {
+  GraduationCap,
+  Map,
+  BookOpen,
+  Gamepad2,
+  Mic,
+  Sparkles,
+  Brain,
+  Target,
+} from "lucide-react";
+import { useTranslations } from "next-intl";
+import type { LucideIcon } from "lucide-react";
 
-interface Feature {
-  icon: LucideIcon;
-  label: string;
-  description: string;
-}
-
-const FEATURES: Feature[] = [
-  {
-    icon: Mic,
-    label: 'Conversazione Vocale',
-    description: 'Parla con i tuoi Maestri in tempo reale',
-  },
-  {
-    icon: Map,
-    label: 'Mappe Mentali',
-    description: 'Visualizza e organizza i concetti',
-  },
-  {
-    icon: BookOpen,
-    label: 'Flashcard FSRS',
-    description: 'Memorizza con la ripetizione spaziata',
-  },
-  {
-    icon: Sparkles,
-    label: 'Quiz Interattivi',
-    description: 'Metti alla prova le tue conoscenze',
-  },
-  {
-    icon: Gamepad2,
-    label: 'Gamification',
-    description: 'Guadagna XP e sblocca traguardi',
-  },
-  {
-    icon: Brain,
-    label: 'Apprendimento Adattivo',
-    description: 'Si adatta al tuo stile e ritmo',
-  },
-  {
-    icon: Target,
-    label: 'Accessibilità Totale',
-    description: 'Progettato per DSA, ADHD e tutti',
-  },
-  {
-    icon: GraduationCap,
-    label: 'Piattaforma Integrata',
-    description: 'Tutto in un unico posto',
-  },
+const FEATURE_ICONS: LucideIcon[] = [
+  Mic,
+  Map,
+  BookOpen,
+  Sparkles,
+  Gamepad2,
+  Brain,
+  Target,
+  GraduationCap,
 ];
+const FEATURE_KEYS = [
+  "voiceConversation",
+  "mindMaps",
+  "flashcards",
+  "interactiveQuizzes",
+  "gamification",
+  "adaptiveLearning",
+  "totalAccessibility",
+  "integratedPlatform",
+] as const;
 
 /**
  * Features Section for MirrorBuddy Welcome Page
  *
  * TERTIARY SECTION: Displays platform tools and accessibility features.
  * This is the integrated platform that supports learning with Maestri.
- *
- * Part of Wave 3: Welcome Experience Enhancement
  */
 export function FeaturesSection() {
+  const t = useTranslations("welcome.features");
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -76,33 +57,45 @@ export function FeaturesSection() {
         transition={{ delay: 1.1 }}
         className="text-center mb-8"
       >
-        <h2 id="features-heading" className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
-          Strumenti per ogni stile di apprendimento
+        <p className="text-base text-gray-700 dark:text-gray-300 mb-1 font-medium">
+          {t("introLine1")}
+        </p>
+        <p className="text-base text-gray-700 dark:text-gray-300 mb-4 font-medium">
+          {t("introLine2")}
+        </p>
+        <h2
+          id="features-heading"
+          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
+        >
+          {t("heading")}
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400">
-          Una piattaforma completa, accessibile e progettata per te
+          {t("subtitle")}
         </p>
       </motion.div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {FEATURES.map((feature, i) => {
-          const Icon = feature.icon;
+        {FEATURE_KEYS.map((key, i) => {
+          const Icon = FEATURE_ICONS[i];
           return (
             <motion.div
-              key={feature.label}
+              key={key}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1.2 + i * 0.05 }}
               className="group bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-4 shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md hover:border-blue-200 dark:hover:border-blue-800 transition-all"
             >
               <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-pink-100 to-purple-100 dark:from-pink-900/30 dark:to-purple-900/30 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
-                <Icon className="w-5 h-5 text-pink-600 dark:text-pink-400" aria-hidden="true" />
+                <Icon
+                  className="w-5 h-5 text-pink-600 dark:text-pink-400"
+                  aria-hidden="true"
+                />
               </div>
               <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                {feature.label}
+                {t(`${key}.label`)}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {feature.description}
+                {t(`${key}.description`)}
               </p>
             </motion.div>
           );

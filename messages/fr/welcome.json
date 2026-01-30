@@ -65,15 +65,19 @@
     "hero": {
       "betaBadge": "Bêta Privée",
       "betaSubtitle": "MirrorBuddy v0.10",
+      "primaryHeadline": "Il ne fait pas tes devoirs à ta place. Il t'aide à comprendre comment les faire.",
+      "primarySubtitle": "MirrorBuddy est un compagnon d'apprentissage conçu pour soutenir l'étude et la pensée critique, pas pour les remplacer.",
       "welcomeBack": "Bon retour,",
       "welcomeBackSubtitle": "Qu'allons-nous apprendre de nouveau aujourd'hui ?",
       "welcomeNew": "Bienvenue sur MirrorBuddy",
       "tagline": "Ton école sur mesure, avec les maîtres de l'histoire",
       "taglineWith": "avec les Grands Professeurs",
       "taglineAbilities": "quelles que soient vos capacités",
-      "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 22 Professeurs historiques t'accompagnent personnellement.",
+      "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 26 Professeurs historiques t'accompagnent personnellement.",
       "accessibility": {
         "title": "Une accessibilité sur mesure pour toi",
+        "introLine1": "Chaque personne apprend différemment.",
+        "introLine2": "MirrorBuddy s'adapte — il ne contraint pas.",
         "readableFonts": "Polices lisibles",
         "mindMaps": "Cartes mentales",
         "textToSpeech": "Synthèse vocale",
@@ -97,7 +101,7 @@
       "betaAccess": {
         "badge": "ACCÈS COMPLET",
         "title": "Vous avez un compte ?",
-        "feature1": "22 Professeurs IA",
+        "feature1": "26 Professeurs IA",
         "feature2": "Tous les outils",
         "feature3": "Progrès sauvegardés",
         "cta": "Se connecter"
@@ -116,7 +120,9 @@
     "tierComparison": {
       "heading": "Choisissez le forfait parfait pour vous",
       "subtitle": "Commencez avec un essai gratuit ou inscrivez-vous pour débloquer plus de fonctionnalités",
-      "footer": "Tous les forfaits incluent l'accès à 22 Professeurs IA et des outils d'apprentissage personnalisés",
+      "footer": "Tous les forfaits incluent l'accès à 26 Professeurs IA et des outils d'apprentissage personnalisés",
+      "accessIntroLine1": "Tu peux commencer sans t'inscrire.",
+      "accessIntroLine2": "Aucune pression. Aucun jugement.",
       "tiers": {
         "trial": {
           "name": "Essai",
@@ -134,6 +140,7 @@
           "name": "Base",
           "tagline": "Pour les étudiants inscrits",
           "price": "Gratuit",
+          "badge": "Recommandé",
           "features": {
             "maestri": "10 Professeurs",
             "messages": "30 messages/jour",
@@ -148,16 +155,49 @@
           "price": "Sur demande",
           "badge": "Recommandé",
           "features": {
-            "maestri": "22 Professeurs",
+            "maestri": "26 Professeurs",
             "messagesUnlimited": "Messages illimités",
             "voiceUnlimited": "Voix illimitée",
             "allTools": "Tous les outils"
           },
           "cta": "Passer à Pro"
+        },
+        "schools": {
+          "name": "Écoles",
+          "tagline": "Pour les établissements scolaires",
+          "price": "Personnalisé",
+          "badge": "Pour les Écoles",
+          "features": {
+            "curriculum": "Personnalisation du programme",
+            "classManagement": "Gestion des classes",
+            "teacherReports": "Rapports enseignants",
+            "dedicatedSupport": "Support dédié"
+          },
+          "cta": "Contactez-nous"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "tagline": "Pour les entreprises et organisations",
+          "price": "Personnalisé",
+          "features": {
+            "customThemes": "Thèmes personnalisés (Leadership, IA, Soft Skills)",
+            "customBranding": "Branding personnalisé",
+            "advancedAnalytics": "Analytics avancées",
+            "accountManager": "Account manager dédié"
+          },
+          "cta": "Contactez-nous"
         }
       },
       "footerNote": "Note de bas de page",
-      "subheading": "Sous-titre"
+      "subheading": "Sous-titre",
+      "organizationsHeading": "Solutions pour votre organisation",
+      "organizationsSubtitle": "Personnalisation complète pour écoles et entreprises",
+      "organizationsFooter": "Contactez-nous pour un conseil personnalisé et un devis sur mesure",
+      "toggle": {
+        "individuals": "Étudiants & Familles",
+        "organizations": "Écoles & Entreprises",
+        "ariaLabel": "Basculer entre étudiants et organisations"
+      }
     },
     "maestri": {
       "heading": "Vos",
@@ -168,7 +208,9 @@
       "carouselLabel": "Carrousel des professeurs - utilisez les flèches pour naviguer",
       "scrollHint": "← Faites défiler pour voir les professeurs →",
       "disclaimer": "Les professeurs IA sont créés à des fins éducatives et démonstratives. À l'avenir, chaque étudiant pourra créer ses propres professeurs personnalisés.",
-      "disclaimerLink": "En savoir plus"
+      "disclaimerLink": "En savoir plus",
+      "introText": "Inspiré par les grands esprits de l'histoire, conçu pour t'aider à comprendre.",
+      "educationalDisclaimer": "Les professeurs IA sont des outils éducatifs inspirés de figures historiques. Ils ne remplacent pas les vrais enseignants."
     },
     "support": {
       "heading": "Toujours à vos",
@@ -176,12 +218,19 @@
       "subtitle": "Des Coachs pour les méthodes d'étude et des Amis pour le soutien émotionnel",
       "carouselLabel": "Carrousel des coachs et amis - utilisez les flèches pour naviguer",
       "scrollHint": "← Faites défiler pour voir tous →",
+      "scrollLeft": "Défiler à gauche",
+      "scrollRight": "Défiler à droite",
       "coach": "Coach",
-      "buddy": "Ami"
+      "buddy": "Ami",
+      "introLine1": "Des Coachs pour la méthode d'étude.",
+      "introLine2": "Des Amis pour le soutien émotionnel.",
+      "introDisclaimer": "Ils ne te disent pas quoi penser. Ils t'aident à trouver ta propre façon de le faire."
     },
     "features": {
       "heading": "Des outils pour chaque style d'apprentissage",
       "subtitle": "Une plateforme complète et accessible conçue pour vous",
+      "introLine1": "Chaque outil a un seul objectif :",
+      "introLine2": "rendre l'étude plus claire, étape par étape.",
       "voiceConversation": {
         "label": "Conversation Vocale",
         "description": "Parlez avec vos Professeurs en temps réel"
@@ -219,6 +268,8 @@
       "heading": "Conformité et",
       "headingHighlight": "Transparence",
       "subtitle": "La sécurité, la confidentialité et la transparence sont au cœur de MirrorBuddy",
+      "trustIntroLine1": "MirrorBuddy est né pour les étudiants et les familles.",
+      "trustIntroLine2": "C'est pourquoi la confiance, la sécurité et la transparence passent avant tout.",
       "items": {
         "gdpr": {
           "label": "RGPD",

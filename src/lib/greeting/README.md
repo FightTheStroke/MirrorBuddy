@@ -85,7 +85,7 @@ Templates are organized by language in `MAESTRI_GREETING_TEMPLATES`:
     maestri: {
       euclide: "Χαῖρε! Sono Euclide. Costruiamo insieme le basi della matematica?",
       shakespeare: "Good morrow! Sono Shakespeare. Parliamo insieme di inglese?",
-      // ... 22 maestri total
+      // ... 26 maestri total
     }
   },
   en: { /* ... */ },
@@ -180,7 +180,7 @@ export const MAESTRI_GREETING_TEMPLATES: Record<SupportedLanguage, ...> = {
     coach: "Olá! Sou {name}. Como posso te ajudar a aprender algo novo hoje?",
     maestri: {
       euclide: "Χαῖρε! Sou Euclides. Vamos construir as bases da matemática juntos?",
-      // ... all 22 maestri
+      // ... all 26 maestri
     }
   }
 }

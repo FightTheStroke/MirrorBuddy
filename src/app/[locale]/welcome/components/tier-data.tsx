@@ -58,7 +58,7 @@ export function useTierCards(): TierCard[] {
       name: t("tiers.base.name"),
       tagline: t("tiers.base.tagline"),
       price: t("tiers.base.price"),
-      badge: undefined,
+      badge: t("tiers.base.badge"),
       features: [
         {
           icon: <Users className="w-4 h-4" />,

@@ -64,6 +64,11 @@ const FORMAL_MAESTRI = [
   { id: "curie", displayName: "Curie", subject: "Chemistry" },
   { id: "leonardo", displayName: "Leonardo", subject: "Art" },
   { id: "euclide", displayName: "Euclide", subject: "Mathematics" },
+  {
+    id: "levi-montalcini",
+    displayName: "Rita Levi-Montalcini",
+    subject: "Biology",
+  },
 ];
 
 const INFORMAL_MAESTRI = [

@@ -26,9 +26,9 @@ When your child talks to a Master:
 
 **It's not magic**: it's advanced mathematics that recognizes patterns in data.
 
-## 3. Our 22 AI Masters
+## 3. Our 26 AI Masters
 
-MirrorBuddy contains 22 specialized Masters:
+MirrorBuddy contains 26 specialized Masters:
 
 - **Galileo** (Physics) - Explains movement and the universe
 - **Euclid** (Mathematics) - Teaches shapes and numbers

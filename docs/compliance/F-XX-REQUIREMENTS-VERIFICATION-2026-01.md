@@ -507,7 +507,7 @@ All F-xx functional requirements for Plan 64 (Service Limits & Compliance Audit)
 
 - Document: `docs/compliance/MODEL-CARD.md`
 - Content: Maestro capabilities, training approach, performance data, bias testing results
-- Coverage: 22 maestri (20 maestri + 2 amici)
+- Coverage: 26 maestri (25 maestri + 1 amico)
 - Language: Italian, technical but accessible
 
 **Verification**: Model card documented in compliance README

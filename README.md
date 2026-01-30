@@ -26,7 +26,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/AI%20Maestri-22-purple" alt="22 AI Maestri">
+  <img src="https://img.shields.io/badge/AI%20Maestri-26-purple" alt="26 AI Maestri">
   <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
   <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
@@ -82,7 +82,7 @@ Every student in MirrorBuddy has access to three types of AI support:
               v             v             v
         +-----------+ +-----------+ +-----------+
         |   COACH   | |   BUDDY   | |  MAESTRI  |
-        |  (6 AI)   | |  (6 AI)   | |  (22 AI)  |
+        |  (6 AI)   | |  (6 AI)   | |  (26 AI)  |
         |           | |           | |           |
         |  Method   | |   Peer    | |  Content  |
         |  Support  | |  Support  | |  Experts  |
@@ -91,7 +91,7 @@ Every student in MirrorBuddy has access to three types of AI support:
 
 | Type        | Characters                                     | Relationship              | Goal                                |
 | ----------- | ---------------------------------------------- | ------------------------- | ----------------------------------- |
-| **Maestri** | 22 historical figures                          | Mentor (vertical)         | Teach subjects with passion         |
+| **Maestri** | 26 historical & modern figures                 | Mentor (vertical)         | Teach subjects with passion         |
 | **Coaches** | Melissa, Roberto, Chiara, Andrea, Favij, Laura | Learning coach (vertical) | Develop METHOD and autonomy         |
 | **Buddies** | Mario, Noemi, Enea, Bruno, Sofia, Marta        | Peer friend (horizontal)  | Emotional support, shared struggles |
 
@@ -101,7 +101,7 @@ Instead of reading _about_ Euclid in a textbook, students learn mathematics **wi
 
 Each **Maestro** is an AI tutor embodying a legendary figure from history:
 
-**22 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law)
+**26 Maestri:** Euclide (Math), Leonardo (Art), Darwin (Biology), Curie (Chemistry), Feynman (Physics), Galileo (Astronomy), Lovelace (CS), Shakespeare (English), Mozart (Music), Socrate (Philosophy), Erodoto (History), Manzoni (Italian), Cicerone (Civic Ed), Humboldt (Geography), Ippocrate (Health), Smith (Economics), Chris (PE), Omero (Storytelling), Alex Pina (Spanish), Mascetti (Supercazzola), Simone (Sport), Cassese (International Law), Moliere (French), Goethe (German), Cervantes (Spanish), Levi-Montalcini (Biology)
 
 ---
 

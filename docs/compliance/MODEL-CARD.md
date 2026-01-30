@@ -17,7 +17,7 @@
 **Capabilities**:
 
 - Educational tutoring in 20+ subjects (Math, Science, Languages, History, etc.)
-- 22 AI "Maestros" (tutors) with character-based embedded knowledge
+- 26 AI "Maestros" (tutors) with character-based embedded knowledge
 - Voice conversation (text-to-speech, speech-to-text)
 - FSRS adaptive learning, flashcards, quizzes, mind maps
 - Accessibility: WCAG 2.1 AA, 7 disability profiles (dyslexia, ADHD, visual impairment, motor, autism, auditory, cerebral palsy)

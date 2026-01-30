@@ -65,15 +65,19 @@
     "hero": {
       "betaBadge": "Private Beta",
       "betaSubtitle": "MirrorBuddy v0.10",
+      "primaryHeadline": "Es macht deine Hausaufgaben nicht für dich. Es hilft dir zu verstehen, wie du sie machen kannst.",
+      "primarySubtitle": "MirrorBuddy ist ein Lernbegleiter, der das Lernen und kritisches Denken unterstützt, nicht ersetzt.",
       "welcomeBack": "Willkommen zurück,",
       "welcomeBackSubtitle": "Was lernen wir heute Neues?",
       "welcomeNew": "Willkommen bei MirrorBuddy",
       "tagline": "Deine maßgeschneiderte Schule mit den Meistern der Geschichte",
       "taglineWith": "mit den großen Professoren",
       "taglineAbilities": "unabhängig von Ihren Fähigkeiten",
-      "description": "Lerne Mathe <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 22 historische Professoren begleiten dich persönlich.",
+      "description": "Lerne Mathe <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 26 historische Professoren begleiten dich persönlich.",
       "accessibility": {
         "title": "Maßgeschneiderte Barrierefreiheit für dich",
+        "introLine1": "Jeder Mensch lernt anders.",
+        "introLine2": "MirrorBuddy passt sich an — es zwingt nicht.",
         "readableFonts": "Lesbare Schriftarten",
         "mindMaps": "Mind-Maps",
         "textToSpeech": "Text-zu-Sprache",
@@ -97,7 +101,7 @@
       "betaAccess": {
         "badge": "VOLLZUGRIFF",
         "title": "Haben Sie ein Konto?",
-        "feature1": "22 KI-Professoren",
+        "feature1": "26 KI-Professoren",
         "feature2": "Alle Tools",
         "feature3": "Gespeicherter Fortschritt",
         "cta": "Anmelden"
@@ -116,7 +120,7 @@
     "tierComparison": {
       "heading": "Wählen Sie den perfekten Plan für Sie",
       "subtitle": "Beginnen Sie mit einer kostenlosen Testversion oder registrieren Sie sich, um mehr Funktionen freizuschalten",
-      "footer": "Alle Pläne beinhalten Zugang zu 22 KI-Professoren und personalisierten Lerntools",
+      "footer": "Alle Pläne beinhalten Zugang zu 26 KI-Professoren und personalisierten Lerntools",
       "tiers": {
         "trial": {
           "name": "Testversion",
@@ -134,6 +138,7 @@
           "name": "Basis",
           "tagline": "Für registrierte Studenten",
           "price": "Kostenlos",
+          "badge": "Empfohlen",
           "features": {
             "maestri": "10 Professoren",
             "messages": "30 Nachrichten/Tag",
@@ -148,16 +153,51 @@
           "price": "Auf Anfrage",
           "badge": "Empfohlen",
           "features": {
-            "maestri": "22 Professoren",
+            "maestri": "26 Professoren",
             "messagesUnlimited": "Unbegrenzte Nachrichten",
             "voiceUnlimited": "Unbegrenzte Sprache",
             "allTools": "Alle Tools"
           },
           "cta": "Auf Pro upgraden"
+        },
+        "schools": {
+          "name": "Schulen",
+          "tagline": "Für Bildungseinrichtungen",
+          "price": "Individuell",
+          "badge": "Für Schulen",
+          "features": {
+            "curriculum": "Lehrplananpassung",
+            "classManagement": "Klassenverwaltung",
+            "teacherReports": "Lehrerberichte",
+            "dedicatedSupport": "Dedizierter Support"
+          },
+          "cta": "Kontaktieren Sie uns"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "tagline": "Für Unternehmen und Organisationen",
+          "price": "Individuell",
+          "features": {
+            "customThemes": "Individuelle Themen (Leadership, KI, Soft Skills)",
+            "customBranding": "Individuelles Branding",
+            "advancedAnalytics": "Erweiterte Analysen",
+            "accountManager": "Dedizierter Account-Manager"
+          },
+          "cta": "Kontaktieren Sie uns"
         }
       },
       "footerNote": "Fußnote",
-      "subheading": "Unterüberschrift"
+      "subheading": "Unterüberschrift",
+      "accessIntroLine1": "Du kannst ohne Registrierung beginnen.",
+      "accessIntroLine2": "Kein Druck. Kein Urteil.",
+      "organizationsHeading": "Lösungen für Ihre Organisation",
+      "organizationsSubtitle": "Vollständige Anpassung für Schulen und Unternehmen",
+      "organizationsFooter": "Kontaktieren Sie uns für eine persönliche Beratung und ein maßgeschneidertes Angebot",
+      "toggle": {
+        "individuals": "Schüler & Familien",
+        "organizations": "Schulen & Unternehmen",
+        "ariaLabel": "Zwischen Schülern und Organisationen wechseln"
+      }
     },
     "maestri": {
       "heading": "Ihre",
@@ -168,7 +208,9 @@
       "carouselLabel": "Professoren-Karussell - verwenden Sie die Pfeile zur Navigation",
       "scrollHint": "← Scrollen Sie, um Professoren zu sehen →",
       "disclaimer": "KI-Professoren werden zu pädagogischen und demonstrativen Zwecken erstellt. In Zukunft wird jeder Student in der Lage sein, seine eigenen personalisierten Professoren zu erstellen.",
-      "disclaimerLink": "Mehr erfahren"
+      "disclaimerLink": "Mehr erfahren",
+      "introText": "Inspiriert von den großen Köpfen der Geschichte, entwickelt um dir beim Verstehen zu helfen.",
+      "educationalDisclaimer": "Die KI-Professoren sind Lernwerkzeuge, die von historischen Persönlichkeiten inspiriert sind. Sie ersetzen keine echten Lehrer."
     },
     "support": {
       "heading": "Immer an Ihrer",
@@ -176,12 +218,19 @@
       "subtitle": "Coaches für Lernmethoden und Buddies für emotionale Unterstützung",
       "carouselLabel": "Coaches- und Buddies-Karussell - verwenden Sie die Pfeile zur Navigation",
       "scrollHint": "← Scrollen Sie, um alle zu sehen →",
+      "scrollLeft": "Nach links scrollen",
+      "scrollRight": "Nach rechts scrollen",
       "coach": "Coach",
-      "buddy": "Freund"
+      "buddy": "Freund",
+      "introLine1": "Coaches für die Lernmethode.",
+      "introLine2": "Buddies für emotionale Unterstützung.",
+      "introDisclaimer": "Sie sagen dir nicht, was du denken sollst. Sie helfen dir, deinen eigenen Weg zu finden."
     },
     "features": {
       "heading": "Tools für jeden Lernstil",
       "subtitle": "Eine vollständige, zugängliche Plattform, die für Sie entwickelt wurde",
+      "introLine1": "Jedes Werkzeug hat ein einziges Ziel:",
+      "introLine2": "das Lernen klarer zu machen, Schritt für Schritt.",
       "voiceConversation": {
         "label": "Sprachkonversation",
         "description": "Sprechen Sie in Echtzeit mit Ihren Professoren"
@@ -219,6 +268,8 @@
       "heading": "Compliance und",
       "headingHighlight": "Transparenz",
       "subtitle": "Sicherheit, Datenschutz und Transparenz stehen im Mittelpunkt von MirrorBuddy",
+      "trustIntroLine1": "MirrorBuddy ist für Schüler und Familien gemacht.",
+      "trustIntroLine2": "Deshalb stehen Vertrauen, Sicherheit und Transparenz an erster Stelle.",
       "items": {
         "gdpr": {
           "label": "DSGVO",

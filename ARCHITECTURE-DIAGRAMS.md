@@ -54,7 +54,7 @@ graph TB
     end
 
     subgraph Conversation_Engine["Conversation Engine (Shared Core)"]
-        Characters["Characters: 22 Professors + 6 Coaches + 6 Buddies"]
+        Characters["Characters: 26 Professors + 6 Coaches + 6 Buddies"]
         Safety["Safety Guardrails (5-layer protection)"]
         Tools["Tool Orchestrator (15+ tools)"]
         RAG["RAG Engine (Context injection)"]

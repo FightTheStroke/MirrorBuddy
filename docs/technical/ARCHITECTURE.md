@@ -108,7 +108,7 @@ src/
 │   └── [features]/        # Page routes (astuccio, flashcard, quiz, etc.)
 ├── components/            # React components (60+ features)
 ├── data/                  # Static data
-│   ├── maestri/           # 20 AI maestro definitions
+│   ├── maestri/           # 26 AI maestro definitions
 │   ├── buddy-profiles/    # 5 buddy definitions
 │   └── support-teachers/  # 5 coach definitions
 ├── lib/
@@ -376,7 +376,7 @@ flowchart LR
 
 ## Character System
 
-### 20 Maestri (18 Teaching + 2 Amici)
+### 26 Maestri (25 Teaching + 1 Amico)
 
 | Maestro                 | Subject            | Type      | Voice   |
 | ----------------------- | ------------------ | --------- | ------- |

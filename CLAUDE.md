@@ -3,7 +3,7 @@
 icon: public/logo-brain.png
 
 AI-powered educational platform for students with learning differences.
-22 AI "Maestri" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
+26 AI "Maestri" with embedded knowledge, voice, FSRS flashcards, mind maps, quizzes, gamification.
 
 ---
 

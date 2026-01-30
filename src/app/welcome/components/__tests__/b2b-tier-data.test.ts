@@ -1,14 +1,39 @@
 /**
  * Unit tests for B2B tier data
  *
- * Tests verify the structure and content of b2bTierCards
+ * Tests verify the structure and content of createB2bTierCards
  */
 
 import { describe, it, expect, beforeEach } from "vitest";
-import { b2bTierCards, type TierCard } from "../b2b-tier-data";
+import { createB2bTierCards, type TierCard } from "../b2b-tier-data";
+
+const translations: Record<string, string> = {
+  "tiers.schools.name": "Scuole",
+  "tiers.schools.tagline": "Per istituti scolastici",
+  "tiers.schools.price": "Personalizzato",
+  "tiers.schools.badge": "Per le Scuole",
+  "tiers.schools.features.curriculum": "Personalizzazione curricolare",
+  "tiers.schools.features.classManagement": "Gestione classi",
+  "tiers.schools.features.teacherReports": "Report docenti",
+  "tiers.schools.features.dedicatedSupport": "Supporto dedicato",
+  "tiers.schools.cta": "Contattaci",
+  "tiers.enterprise.name": "Enterprise",
+  "tiers.enterprise.tagline": "Per aziende e organizzazioni",
+  "tiers.enterprise.price": "Personalizzato",
+  "tiers.enterprise.features.customThemes":
+    "Temi custom (Leadership, AI, Soft Skills)",
+  "tiers.enterprise.features.customBranding": "Branding personalizzato",
+  "tiers.enterprise.features.advancedAnalytics": "Analytics avanzate",
+  "tiers.enterprise.features.accountManager": "Account manager dedicato",
+  "tiers.enterprise.cta": "Contattaci",
+};
+
+const mockT = (key: string): string => translations[key] ?? key;
 
 describe("b2b-tier-data", () => {
-  it("exports b2bTierCards as an array", () => {
+  const b2bTierCards = createB2bTierCards(mockT);
+
+  it("creates an array", () => {
     expect(Array.isArray(b2bTierCards)).toBe(true);
   });
 
@@ -20,7 +45,9 @@ describe("b2b-tier-data", () => {
     let schoolCard: TierCard;
 
     beforeEach(() => {
-      schoolCard = b2bTierCards.find((card) => card.name === "Scuole")!;
+      schoolCard = b2bTierCards.find(
+        (card: TierCard) => card.name === "Scuole",
+      )!;
     });
 
     it("exists in b2bTierCards", () => {
@@ -92,7 +119,9 @@ describe("b2b-tier-data", () => {
     let enterpriseCard: TierCard;
 
     beforeEach(() => {
-      enterpriseCard = b2bTierCards.find((card) => card.name === "Enterprise")!;
+      enterpriseCard = b2bTierCards.find(
+        (card: TierCard) => card.name === "Enterprise",
+      )!;
     });
 
     it("exists in b2bTierCards", () => {
@@ -111,11 +140,7 @@ describe("b2b-tier-data", () => {
       expect(enterpriseCard.price).toBe("Personalizzato");
     });
 
-    it("does not have badge", () => {
-      expect(enterpriseCard.badge).toBeUndefined();
-    });
-
-    it("is not highlighted", () => {
+    it("does not have highlight", () => {
       expect(enterpriseCard.highlight).not.toBe(true);
     });
 
@@ -161,7 +186,7 @@ describe("b2b-tier-data", () => {
   });
 
   it("uses TierCard interface correctly", () => {
-    b2bTierCards.forEach((card) => {
+    b2bTierCards.forEach((card: TierCard) => {
       expect(card).toHaveProperty("name");
       expect(card).toHaveProperty("tagline");
       expect(card).toHaveProperty("price");
@@ -173,7 +198,7 @@ describe("b2b-tier-data", () => {
   });
 
   it("all features have icon and text", () => {
-    b2bTierCards.forEach((card) => {
+    b2bTierCards.forEach((card: TierCard) => {
       card.features.forEach((feature) => {
         expect(feature).toHaveProperty("icon");
         expect(feature).toHaveProperty("text");

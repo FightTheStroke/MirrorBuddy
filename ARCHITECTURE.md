@@ -137,7 +137,7 @@ src/
 │   ├── observability/# Prometheus push to Grafana
 │   └── tools/        # Tool handlers & plugins
 ├── data/
-│   ├── maestri/      # 22 AI Maestri definitions (modular)
+│   ├── maestri/      # 26 AI Maestri definitions (modular)
 │   ├── buddy-profiles/
 │   └── support-teachers/
 ├── hooks/            # 20+ React hooks

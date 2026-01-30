@@ -4,6 +4,7 @@ import { useRef, useMemo, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Lightbulb, Heart } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { getAllSupportTeachers } from "@/data/support-teachers";
 import { getAllBuddies } from "@/data/buddy-profiles";
 
@@ -24,6 +25,7 @@ interface SupportMember {
  * Coaches help with study methods, Buddies provide peer emotional support.
  */
 export function SupportSection() {
+  const t = useTranslations("welcome.support");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
 
@@ -106,15 +108,17 @@ export function SupportSection() {
       >
         <h2
           id="support-heading"
-          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
+          className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2"
         >
-          Sempre al tuo{" "}
+          {t("introLine1")}
+        </h2>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3">
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-orange-500">
-            fianco
+            {t("introLine2")}
           </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Coach per il metodo di studio e Buddy per il supporto emotivo
+          {t("introDisclaimer")}
         </p>
       </motion.div>
 
@@ -128,7 +132,7 @@ export function SupportSection() {
         <button
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -ml-2"
-          aria-label="Scorri a sinistra"
+          aria-label={t("scrollLeft")}
         >
           <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
@@ -144,7 +148,7 @@ export function SupportSection() {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             tabIndex={0}
             role="region"
-            aria-label="Carosello coach e buddy - usa le frecce per navigare"
+            aria-label={t("carouselLabel")}
           >
             {supportMembers.map((member, i) => {
               const isCoach = member.role === "coach";
@@ -172,7 +176,7 @@ export function SupportSection() {
                     }`}
                   >
                     <RoleIcon className="w-3 h-3" aria-hidden="true" />
-                    {isCoach ? "Coach" : "Buddy"}
+                    {isCoach ? t("coach") : t("buddy")}
                   </div>
 
                   {/* Avatar */}
@@ -185,7 +189,7 @@ export function SupportSection() {
                     <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                       <Image
                         src={member.avatar}
-                        alt={`${member.name} - ${isCoach ? "Coach" : "Buddy"}`}
+                        alt={`${member.name} - ${isCoach ? t("coach") : t("buddy")}`}
                         width={64}
                         height={64}
                         className="w-full h-full object-cover"
@@ -210,7 +214,7 @@ export function SupportSection() {
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -mr-2"
-          aria-label="Scorri a destra"
+          aria-label={t("scrollRight")}
         >
           <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
@@ -218,7 +222,7 @@ export function SupportSection() {
 
       {/* Scroll hint for mobile */}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
-        ← Scorri per vedere tutti →
+        {t("scrollHint")}
       </p>
     </motion.section>
   );

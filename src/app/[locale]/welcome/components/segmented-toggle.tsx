@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useRef } from "react";
+import { useTranslations } from "next-intl";
 
 interface SegmentedToggleProps {
   value: "individuals" | "organizations";
@@ -9,11 +10,12 @@ interface SegmentedToggleProps {
 }
 
 export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
+  const t = useTranslations("welcome.tierComparison.toggle");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const options = [
-    { id: "individuals", label: "Individui" },
-    { id: "organizations", label: "Organizzazioni" },
+    { id: "individuals", label: t("individuals") },
+    { id: "organizations", label: t("organizations") },
   ] as const;
 
   const handleKeyDown = (e: React.KeyboardEvent, optionId: string) => {
@@ -30,7 +32,7 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
       ref={containerRef}
       className="inline-flex gap-0 p-1 bg-gray-100 dark:bg-gray-800 rounded-full shadow-md border border-gray-200 dark:border-gray-700"
       role="tablist"
-      aria-label="Toggle between individuals and organizations"
+      aria-label={t("ariaLabel")}
     >
       {options.map((option) => {
         const isActive = value === option.id;

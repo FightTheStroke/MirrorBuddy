@@ -1,6 +1,6 @@
 # Maestri Rules - MirrorBuddy
 
-## 22 AI Characters: 20 Maestri + 2 Amici
+## 26 AI Characters: 25 Maestri + 1 Amico
 
 Data: `src/data/maestri/` | Types: `src/data/maestri/types.ts`
 

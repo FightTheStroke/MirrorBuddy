@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useRef } from "react";
 import { User, Building2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 interface SegmentedToggleProps {
   value: "individuals" | "organizations";
@@ -10,11 +11,12 @@ interface SegmentedToggleProps {
 }
 
 export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
+  const t = useTranslations("welcome.tierComparison.toggle");
   const containerRef = useRef<HTMLDivElement>(null);
 
   const options = [
-    { id: "individuals", label: "Studenti & Famiglie", icon: User },
-    { id: "organizations", label: "Scuole & Aziende", icon: Building2 },
+    { id: "individuals", label: t("individuals"), icon: User },
+    { id: "organizations", label: t("organizations"), icon: Building2 },
   ] as const;
 
   const handleKeyDown = (e: React.KeyboardEvent, optionId: string) => {
@@ -42,7 +44,7 @@ export function SegmentedToggle({ value, onChange }: SegmentedToggleProps) {
       ref={containerRef}
       className="inline-flex gap-0 p-1 bg-gray-100 dark:bg-gray-800 rounded-full shadow-md border border-gray-200 dark:border-gray-700"
       role="tablist"
-      aria-label="Toggle between individuals and organizations"
+      aria-label={t("ariaLabel")}
     >
       {options.map((option) => {
         const isActive = value === option.id;

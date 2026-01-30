@@ -65,15 +65,19 @@
     "hero": {
       "betaBadge": "Private Beta",
       "betaSubtitle": "MirrorBuddy v0.10",
+      "primaryHeadline": "It doesn't do your homework for you. It helps you understand how to do it.",
+      "primarySubtitle": "MirrorBuddy is a learning companion designed to support studying and critical thinking, not to replace them.",
       "welcomeBack": "Welcome back,",
       "welcomeBackSubtitle": "What are we learning new today?",
       "welcomeNew": "Welcome to MirrorBuddy",
       "tagline": "Your tailored school, with history's masters",
       "taglineWith": "with the Great Professors",
       "taglineAbilities": "whatever your abilities",
-      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historic Professors accompany you personally.",
+      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 26 historic Professors accompany you personally.",
       "accessibility": {
         "title": "Tailored accessibility for you",
+        "introLine1": "Every person learns differently.",
+        "introLine2": "MirrorBuddy adapts — it doesn't force.",
         "readableFonts": "Readable fonts",
         "mindMaps": "Mind maps",
         "textToSpeech": "Text to speech",
@@ -97,7 +101,7 @@
       "betaAccess": {
         "badge": "FULL ACCESS",
         "title": "Have an account?",
-        "feature1": "22 AI Professors",
+        "feature1": "26 AI Professors",
         "feature2": "All tools",
         "feature3": "Saved progress",
         "cta": "Sign In"
@@ -116,7 +120,7 @@
     "tierComparison": {
       "heading": "Choose the perfect plan for you",
       "subtitle": "Start with a free trial or register to unlock more features",
-      "footer": "All plans include access to 22 AI Professors and personalized learning tools",
+      "footer": "All plans include access to 26 AI Professors and personalized learning tools",
       "tiers": {
         "trial": {
           "name": "Trial",
@@ -134,6 +138,7 @@
           "name": "Base",
           "tagline": "For registered students",
           "price": "Free",
+          "badge": "Recommended",
           "features": {
             "maestri": "10 Professors",
             "messages": "30 messages/day",
@@ -148,16 +153,51 @@
           "price": "On request",
           "badge": "Recommended",
           "features": {
-            "maestri": "22 Professors",
+            "maestri": "26 Professors",
             "messagesUnlimited": "Unlimited messages",
             "voiceUnlimited": "Unlimited voice",
             "allTools": "All tools"
           },
           "cta": "Upgrade to Pro"
+        },
+        "schools": {
+          "name": "Schools",
+          "tagline": "For educational institutions",
+          "price": "Custom",
+          "badge": "For Schools",
+          "features": {
+            "curriculum": "Curriculum customization",
+            "classManagement": "Class management",
+            "teacherReports": "Teacher reports",
+            "dedicatedSupport": "Dedicated support"
+          },
+          "cta": "Contact us"
+        },
+        "enterprise": {
+          "name": "Enterprise",
+          "tagline": "For companies and organizations",
+          "price": "Custom",
+          "features": {
+            "customThemes": "Custom themes (Leadership, AI, Soft Skills)",
+            "customBranding": "Custom branding",
+            "advancedAnalytics": "Advanced analytics",
+            "accountManager": "Dedicated account manager"
+          },
+          "cta": "Contact us"
         }
       },
       "footerNote": "Footer note",
-      "subheading": "Subheading"
+      "subheading": "Subheading",
+      "accessIntroLine1": "You can start without registering.",
+      "accessIntroLine2": "No pressure. No judgment.",
+      "organizationsHeading": "Solutions for your organization",
+      "organizationsSubtitle": "Complete customization for schools and businesses",
+      "organizationsFooter": "Contact us for personalized consulting and a tailored quote",
+      "toggle": {
+        "individuals": "Students & Families",
+        "organizations": "Schools & Businesses",
+        "ariaLabel": "Toggle between students and organizations"
+      }
     },
     "maestri": {
       "heading": "Your",
@@ -168,7 +208,9 @@
       "carouselLabel": "Professors carousel - use arrows to navigate",
       "scrollHint": "← Scroll to see professors →",
       "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
-      "disclaimerLink": "Learn more"
+      "disclaimerLink": "Learn more",
+      "introText": "Inspired by the great minds of history, designed to help you understand.",
+      "educationalDisclaimer": "AI professors are educational tools inspired by historical figures. They do not replace real teachers."
     },
     "support": {
       "heading": "Always by your",
@@ -176,12 +218,19 @@
       "subtitle": "Coaches for study methods and Buddies for emotional support",
       "carouselLabel": "Coaches and buddies carousel - use arrows to navigate",
       "scrollHint": "← Scroll to see all →",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right",
       "coach": "Coach",
-      "buddy": "Buddy"
+      "buddy": "Buddy",
+      "introLine1": "Coaches for study methods.",
+      "introLine2": "Buddies for emotional support.",
+      "introDisclaimer": "They don't tell you what to think. They help you find your own way to do it."
     },
     "features": {
       "heading": "Tools for every learning style",
       "subtitle": "A complete, accessible platform designed for you",
+      "introLine1": "Every tool has a single goal:",
+      "introLine2": "making studying clearer, step by step.",
       "voiceConversation": {
         "label": "Voice Conversation",
         "description": "Talk with your Professors in real time"
@@ -219,6 +268,8 @@
       "heading": "Compliance and",
       "headingHighlight": "Transparency",
       "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
+      "trustIntroLine1": "MirrorBuddy is built for students and families.",
+      "trustIntroLine2": "That's why trust, safety, and transparency come first.",
       "items": {
         "gdpr": {
           "label": "GDPR",

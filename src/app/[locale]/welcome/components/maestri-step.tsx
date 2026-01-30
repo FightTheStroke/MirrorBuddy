@@ -54,7 +54,6 @@ interface MaestroCard {
 }
 
 export function MaestriStep(_props: MaestriStepProps) {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- nested namespace path valid in next-intl
   const t = useTranslations("welcome.principles");
   const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } =
     useOnboardingStore();

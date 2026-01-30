@@ -87,24 +87,36 @@ function extractKeys(obj, prefix = "") {
 }
 
 /**
- * Check if a key exists in the messages
+ * Check if a key exists in the messages.
+ * Supports dot-notation namespaces (e.g. "welcome.hero" + key "title"
+ * resolves to "welcome.hero.title" within the "welcome" message file).
+ * The full namespace is used as the key prefix because next-intl scopes
+ * into the JSON tree using the complete namespace path.
  */
 function keyExists(namespace, key) {
   const messages = loadMessages();
 
-  if (!messages[namespace]) {
+  const base = namespace.includes(".")
+    ? namespace.substring(0, namespace.indexOf("."))
+    : namespace;
+
+  if (!messages[base]) {
     return false;
   }
 
-  const allKeys = extractKeys(messages[namespace]);
-  return allKeys.has(key);
+  const allKeys = extractKeys(messages[base]);
+  const fullKey = `${namespace}.${key}`;
+  return allKeys.has(fullKey);
 }
 
 /**
- * Check if a namespace exists
+ * Check if a namespace exists.
+ * Supports dot-notation (e.g. "welcome.hero") by validating
+ * the top-level namespace (before the first dot).
  */
 function namespaceExists(namespace) {
-  return NAMESPACES.includes(namespace);
+  const base = namespace.includes(".") ? namespace.split(".")[0] : namespace;
+  return NAMESPACES.includes(base);
 }
 
 export const noMissingI18nKeys = {

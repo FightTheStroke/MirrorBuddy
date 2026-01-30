@@ -44,6 +44,10 @@ export const FORMAL_PROFESSORS = [
   "lovelace", // Victorian era mathematician
   "cassese", // Distinguished international jurist
   "omero", // Ancient Greek epic poet
+  "moliere", // 17th century French playwright and dramatist
+  "goethe", // 18th-19th century German poet and writer
+  "cervantes", // 16th-17th century Spanish author
+  "levi-montalcini", // Nobel laureate, Senator for life
 ] as const;
 
 /**

@@ -87,35 +87,18 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="text-5xl md:text-6xl font-bold text-gray-900 dark:text-white mb-6"
+              className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6 leading-tight"
             >
-              {t("welcome")}{" "}
-              <span className="bg-gradient-to-r from-pink-500 to-purple-600 bg-clip-text text-transparent">
-                MirrorBuddy
-              </span>
+              {t("primaryHeadline")}
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="text-2xl md:text-3xl text-gray-700 dark:text-gray-200 mb-8 font-semibold"
+              className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-8"
             >
-              {t("learn")}{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
-                {t("withTeachers")}
-              </span>
-              ,{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
-                {t("anyAbility")}
-              </span>
+              {t("primarySubtitle")}
             </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              className="text-lg text-gray-600 dark:text-gray-300 max-w-2xl mx-auto mb-6"
-              dangerouslySetInnerHTML={{ __html: t("description") }}
-            />
             <AccessibilityFeatures t={t} />
           </>
         )}
@@ -148,6 +131,12 @@ function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
         <div className="relative z-10">
+          <p className="text-center text-base text-gray-700 dark:text-gray-200 mb-2 font-medium">
+            {t("accessibility.introLine1")}
+          </p>
+          <p className="text-center text-base text-gray-700 dark:text-gray-200 mb-4 font-medium">
+            {t("accessibility.introLine2")}
+          </p>
           <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
             <span aria-hidden="true">♿</span>
             {t("accessibility.title")}
