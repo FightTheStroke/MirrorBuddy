@@ -45,6 +45,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
 
       onUpdate(flagId, newStatus);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error updating feature flag:", error);
       alert("Failed to update feature flag");
     } finally {
@@ -74,6 +75,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
         throw new Error("Failed to update percentage");
       }
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error updating percentage:", error);
       alert("Failed to update percentage");
     } finally {
@@ -81,9 +83,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
     }
   };
 
-  const getStatusBadgeColor = (
-    status: "enabled" | "disabled" | "degraded",
-  ) => {
+  const getStatusBadgeColor = (status: "enabled" | "disabled" | "degraded") => {
     switch (status) {
       case "enabled":
         return "bg-green-100 text-green-800";
@@ -103,10 +103,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {flags.map((flag) => (
-          <div
-            key={flag.id}
-            className="border rounded-lg p-4 space-y-2"
-          >
+          <div key={flag.id} className="border rounded-lg p-4 space-y-2">
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="font-semibold">{flag.name}</h3>
@@ -152,9 +149,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
 
             <button
               onClick={() =>
-                setExpandedFlag(
-                  expandedFlag === flag.id ? null : flag.id,
-                )
+                setExpandedFlag(expandedFlag === flag.id ? null : flag.id)
               }
               className="text-sm text-blue-600 hover:underline"
             >
@@ -165,7 +160,8 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
               <div className="bg-gray-50 p-3 rounded space-y-2">
                 <div>
                   <label className="text-sm font-medium">
-                    Enabled Percentage: {percentages[flag.id] ?? flag.enabledPercentage}%
+                    Enabled Percentage:{" "}
+                    {percentages[flag.id] ?? flag.enabledPercentage}%
                   </label>
                   <input
                     type="range"

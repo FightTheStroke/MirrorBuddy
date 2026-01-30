@@ -60,6 +60,7 @@ export function SystemControls({
       onUpdate("maintenance");
       setShowMaintenanceModal(false);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error updating maintenance mode:", error);
       alert("Failed to update maintenance mode");
     } finally {
@@ -81,7 +82,9 @@ export function SystemControls({
           action: "kill-switch",
           data: {
             isEnabled: !globalKillSwitch.isEnabled,
-            reason: globalKillSwitch.isEnabled ? "Restarting" : "Emergency shutdown",
+            reason: globalKillSwitch.isEnabled
+              ? "Restarting"
+              : "Emergency shutdown",
           },
         }),
       });
@@ -92,6 +95,7 @@ export function SystemControls({
 
       onUpdate("kill-switch");
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error toggling kill switch:", error);
       alert("Failed to toggle kill switch");
     } finally {
@@ -99,7 +103,7 @@ export function SystemControls({
     }
   };
 
-  const getSeverityColor = (severity: "low" | "medium" | "high") => {
+  const _getSeverityColor = (severity: "low" | "medium" | "high") => {
     switch (severity) {
       case "low":
         return "bg-blue-100 text-blue-800";
@@ -170,7 +174,9 @@ export function SystemControls({
               <select
                 value={maintenanceSeverity}
                 onChange={(e) =>
-                  setMaintenanceSeverity(e.target.value as "low" | "medium" | "high")
+                  setMaintenanceSeverity(
+                    e.target.value as "low" | "medium" | "high",
+                  )
                 }
                 className="w-full mt-1 border rounded px-3 py-2 text-sm"
               >

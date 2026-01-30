@@ -58,6 +58,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
       onUpdate(tierId);
       setEditingTier(null);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error("Error updating tier limits:", error);
       alert("Failed to update tier limits");
     } finally {
@@ -83,10 +84,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                 <p className="text-sm text-gray-600">{tier.code}</p>
               </div>
               {editingTier !== tier.tierId && (
-                <Button
-                  size="sm"
-                  onClick={() => startEdit(tier)}
-                >
+                <Button size="sm" onClick={() => startEdit(tier)}>
                   Edit
                 </Button>
               )}
@@ -146,9 +144,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">
-                    Total Documents
-                  </label>
+                  <label className="text-sm font-medium">Total Documents</label>
                   <input
                     type="number"
                     min="0"
@@ -183,7 +179,9 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <span className="text-gray-600">Chat/day:</span>
-                  <span className="font-medium ml-1">{tier.chatLimitDaily}</span>
+                  <span className="font-medium ml-1">
+                    {tier.chatLimitDaily}
+                  </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Voice mins/day:</span>
@@ -193,11 +191,15 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                 </div>
                 <div>
                   <span className="text-gray-600">Tools/day:</span>
-                  <span className="font-medium ml-1">{tier.toolsLimitDaily}</span>
+                  <span className="font-medium ml-1">
+                    {tier.toolsLimitDaily}
+                  </span>
                 </div>
                 <div>
                   <span className="text-gray-600">Docs total:</span>
-                  <span className="font-medium ml-1">{tier.docsLimitTotal}</span>
+                  <span className="font-medium ml-1">
+                    {tier.docsLimitTotal}
+                  </span>
                 </div>
               </div>
             )}
