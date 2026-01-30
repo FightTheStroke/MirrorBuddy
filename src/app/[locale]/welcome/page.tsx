@@ -21,6 +21,7 @@ import { useExistingUserData } from "./hooks/use-existing-user-data";
 import { useVoiceConnection } from "./hooks/use-voice-connection";
 import { useWelcomeVoice } from "./hooks/use-welcome-voice";
 import { createOnboardingMelissa } from "./utils/create-onboarding-melissa";
+import { TrialConsentGate } from "@/components/trial/trial-consent-gate";
 import type { ExistingUserData as _ExistingUserData } from "./types";
 
 function WelcomeContent() {
@@ -180,7 +181,9 @@ function LoadingFallback() {
 export default function WelcomePage() {
   return (
     <Suspense fallback={<LoadingFallback />}>
-      <WelcomeContent />
+      <TrialConsentGate>
+        <WelcomeContent />
+      </TrialConsentGate>
     </Suspense>
   );
 }

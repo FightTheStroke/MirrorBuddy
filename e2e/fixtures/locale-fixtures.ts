@@ -104,6 +104,46 @@ export const test = base.extend<LocaleFixtures>({
       });
     }
 
+    // Mock ToS API to bypass TosGateProvider (ADR 0059)
+    await page.route("**/api/tos", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      });
+    });
+
+    // Set localStorage to bypass wall components (cookie consent, onboarding store)
+    await page.context().addInitScript(() => {
+      localStorage.setItem(
+        "mirrorbuddy-consent",
+        JSON.stringify({
+          version: "1.0",
+          acceptedAt: new Date().toISOString(),
+          essential: true,
+          analytics: false,
+          marketing: false,
+        }),
+      );
+    });
+
+    // Set trial consent cookie to bypass TrialConsentGate on /welcome
+    await context.addCookies([
+      {
+        name: "mirrorbuddy-trial-consent",
+        value: encodeURIComponent(
+          JSON.stringify({
+            accepted: true,
+            version: "1.0",
+            acceptedAt: new Date().toISOString(),
+          }),
+        ),
+        domain: "localhost",
+        path: "/",
+        sameSite: "Lax",
+      },
+    ]);
+
     // Set NEXT_LOCALE cookie if requested (simulates user preference)
     if (setLocaleCookie) {
       await context.addCookies([

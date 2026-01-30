@@ -519,7 +519,7 @@ test.describe("Instant Access - Quick Panel", () => {
   });
 
   test("Escape key closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -535,7 +535,7 @@ test.describe("Instant Access - Quick Panel", () => {
   });
 
   test("clicking outside closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');

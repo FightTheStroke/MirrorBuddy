@@ -7,6 +7,7 @@ import { TermsContent } from "./content";
 import { TOS_VERSION, TOS_LAST_UPDATED } from "@/lib/tos/constants";
 
 export default function TermsPage() {
+  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "legal.terms" is a top-level key in compliance.json, flattened at runtime
   const t = useTranslations("legal.terms");
 
   return (
@@ -29,7 +30,7 @@ export default function TermsPage() {
       </nav>
 
       {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 py-12 print:py-8">
+      <main className="max-w-4xl mx-auto px-4 py-12 print:py-8">
         <article className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 md:p-12 print:shadow-none print:rounded-none">
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
@@ -105,7 +106,7 @@ export default function TermsPage() {
             </p>
           </footer>
         </article>
-      </div>
+      </main>
     </div>
   );
 }
