@@ -23,7 +23,21 @@ export function HreflangLinks({
   locales = ["it", "en", "fr", "de", "es"] as const,
   baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org",
 }: HreflangLinksProps) {
-  const pathname = usePathname();
+  const rawPathname = usePathname();
+
+  // Strip locale prefix from pathname since usePathname() returns /it/welcome
+  // but generateHreflangTags expects /welcome (without locale prefix)
+  const pathname = (() => {
+    for (const locale of locales) {
+      if (rawPathname.startsWith(`/${locale}/`)) {
+        return rawPathname.slice(locale.length + 1);
+      }
+      if (rawPathname === `/${locale}`) {
+        return "/";
+      }
+    }
+    return rawPathname;
+  })();
 
   useEffect(() => {
     const tags = generateHreflangTags(baseUrl, pathname, locales);

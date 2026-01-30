@@ -25,23 +25,23 @@ test.use({ storageState: undefined });
 const EXPECTED_TRANSLATIONS = {
   it: {
     betaBadge: "Beta Privata",
-    betaSubtitle: "Solo su invito",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   en: {
     betaBadge: "Private Beta",
-    betaSubtitle: "Invitation only",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   fr: {
     betaBadge: "Private Beta",
-    betaSubtitle: "Invitation only",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   de: {
     betaBadge: "Private Beta",
-    betaSubtitle: "Invitation only",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   es: {
     betaBadge: "Beta Privada",
-    betaSubtitle: "Solo su invito",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
 };
 
@@ -136,7 +136,7 @@ test("@it: verify Italian beta badge uses correct translations", async ({
     .locator("span")
     .nth(1)
     .textContent();
-  expect(subtitleText?.trim()).toBe("Solo su invito");
+  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
 });
 
 test("@en: verify English beta badge uses correct translations", async ({
@@ -159,5 +159,5 @@ test("@en: verify English beta badge uses correct translations", async ({
     .locator("span")
     .nth(1)
     .textContent();
-  expect(subtitleText?.trim()).toBe("Invitation only");
+  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
 });

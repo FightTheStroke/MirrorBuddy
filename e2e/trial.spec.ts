@@ -67,7 +67,9 @@ test.describe("Trial Mode - GDPR Compliance", () => {
     ).toBeVisible();
 
     // Inline consent mechanism should be available (floating a11y button)
-    const a11yButton = trialPage.locator('button[aria-label*="accessibilità"]');
+    const a11yButton = trialPage.locator(
+      'button[aria-controls="a11y-quick-panel"]',
+    );
     await expect(a11yButton).toBeVisible();
   });
 

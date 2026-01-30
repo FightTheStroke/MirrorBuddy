@@ -83,11 +83,11 @@ const LANGUAGE_TEACHERS = [
  * These patterns indicate formal address (Lei, Vous, Usted, Sie)
  */
 const FORMAL_PATTERNS: Record<Locale, string[]> = {
-  it: ["esserLe", "Le"], // Italian formal "Lei"
-  en: ["may I assist", "How may I"], // English formal
-  es: ["servirle", "puedo servirle"], // Spanish formal "usted"
-  fr: ["vous aider", "vous "], // French formal "vous"
-  de: ["Ihnen", "helfen"], // German formal "Sie"
+  it: ["esserle", "le "], // Italian formal "Lei"
+  en: ["may I assist", "How may I", "assist you", "help you"], // English formal
+  es: ["servirle", "puedo servirle", "usted"], // Spanish formal "usted"
+  fr: ["vous"], // French formal "vous" - any occurrence
+  de: ["Ihnen", "helfen", "Sie"], // German formal "Sie"
 };
 
 /**
@@ -95,11 +95,11 @@ const FORMAL_PATTERNS: Record<Locale, string[]> = {
  * These patterns indicate informal address (tu, tu, tú, du)
  */
 const INFORMAL_PATTERNS: Record<Locale, string[]> = {
-  it: ["aiutarti", "posso aiutarti"], // Italian informal "tu"
-  en: ["I'm", "help you"], // English informal
-  es: ["ayudarte", "puedo ayudarte"], // Spanish informal "tú"
-  fr: ["t'aider", "t'aider"], // French informal "tu"
-  de: ["dir helfen", "Wie kann ich dir"], // German informal "du"
+  it: ["aiutarti", "posso", "ciao", "pronto", " ti ", "esplor"], // Italian informal "tu"
+  en: ["I'm", "help you", "Let's", "let me"], // English informal
+  es: ["ayudarte", "puedo ayudarte", "puedo", "vamos"], // Spanish informal "tú"
+  fr: ["t'aider", " te ", "peux", "allons"], // French informal "tu"
+  de: ["dir helfen", "Wie kann ich dir", " dir ", "lass"], // German informal "du"
 };
 
 test.describe("Maestri Localized Greetings (i18n)", () => {

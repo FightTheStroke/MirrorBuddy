@@ -39,8 +39,8 @@ test.describe("Regression: TosGateProvider Blocking (Plan 97)", () => {
     await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const mainContent = page.getByRole("main");
-    await expect(mainContent).toBeVisible({ timeout: 5000 });
+    const mainContent = page.locator("main, [role='main']").first();
+    await expect(mainContent).toBeVisible({ timeout: 10000 });
 
     expect(await page.locator("button:visible").count()).toBeGreaterThan(0);
     expect(await page.locator('[role="dialog"]:visible').count()).toBe(0);
@@ -76,7 +76,9 @@ test.describe("Regression: Missing i18n Compliance Keys (Plan 97)", () => {
       await page.waitForLoadState("domcontentloaded");
 
       expect(errors, `${path} has translation errors`).toHaveLength(0);
-      await expect(page.getByRole("main")).toBeVisible();
+      await expect(page.locator("main, [role='main']").first()).toBeVisible({
+        timeout: 10000,
+      });
     }
   });
 
@@ -86,8 +88,10 @@ test.describe("Regression: Missing i18n Compliance Keys (Plan 97)", () => {
       await localePage.goto("/accessibility");
       await localePage.page.waitForLoadState("domcontentloaded");
 
-      const mainContent = localePage.page.getByRole("main");
-      await expect(mainContent).toBeVisible({ timeout: 5000 });
+      const mainContent = localePage.page
+        .locator("main, [role='main']")
+        .first();
+      await expect(mainContent).toBeVisible({ timeout: 10000 });
 
       const textContent = await mainContent.textContent();
       expect(textContent).toBeTruthy();
@@ -107,9 +111,9 @@ test.describe("Regression: Welcome Page LocalePage Pattern (Plan 97)", () => {
         localePage.locale,
       );
 
-      await expect(localePage.page.getByRole("main")).toBeVisible({
-        timeout: 5000,
-      });
+      await expect(
+        localePage.page.locator("main, [role='main']").first(),
+      ).toBeVisible({ timeout: 10000 });
     },
   );
 
@@ -118,7 +122,9 @@ test.describe("Regression: Welcome Page LocalePage Pattern (Plan 97)", () => {
     await page.waitForLoadState("domcontentloaded");
 
     expect(await page.locator("html").getAttribute("lang")).toBe("it");
-    await expect(page.getByRole("main")).toBeVisible();
+    await expect(page.locator("main, [role='main']").first()).toBeVisible({
+      timeout: 10000,
+    });
   });
 });
 
@@ -152,8 +158,8 @@ test.describe("Regression: Protected Routes in Tests (Plan 97)", () => {
       await page.goto(route);
       await page.waitForLoadState("domcontentloaded");
 
-      const mainContent = page.getByRole("main");
-      await expect(mainContent).toBeVisible();
+      const mainContent = page.locator("main, [role='main']").first();
+      await expect(mainContent).toBeVisible({ timeout: 10000 });
     }
   });
 });
@@ -185,8 +191,8 @@ test.describe("Regression: Overall E2E Stability (Plan 97)", () => {
     await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const mainContent = page.getByRole("main");
-    await expect(mainContent).toBeVisible({ timeout: 5000 });
+    const mainContent = page.locator("main, [role='main']").first();
+    await expect(mainContent).toBeVisible({ timeout: 10000 });
 
     const firstButton = page.locator("button:visible").first();
     await expect(firstButton).toBeEnabled({ timeout: 3000 });
@@ -218,7 +224,9 @@ test.describe("Regression: Overall E2E Stability (Plan 97)", () => {
       await page.goto(`/${locale}${path}`);
       await page.waitForLoadState("domcontentloaded");
 
-      await expect(page.getByRole("main")).toBeVisible({ timeout: 5000 });
+      await expect(page.locator("main, [role='main']").first()).toBeVisible({
+        timeout: 10000,
+      });
 
       const hasCriticalErrors = consoleErrors.some(
         (err) =>

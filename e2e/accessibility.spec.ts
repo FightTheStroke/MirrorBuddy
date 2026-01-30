@@ -56,6 +56,16 @@ const SKIP_RULES: string[] = [
 // ============================================================================
 
 test.describe("WCAG 2.1 AA Compliance", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   for (const page of PAGES_TO_TEST) {
     test(`${page.name} (${page.path}) passes axe-core`, async ({
       page: playwrightPage,
@@ -98,6 +108,16 @@ test.describe("WCAG 2.1 AA Compliance", () => {
 // ============================================================================
 
 test.describe("Keyboard Navigation", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("can navigate homepage with keyboard only", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
@@ -243,6 +263,16 @@ test.describe("Keyboard Navigation", () => {
 // ============================================================================
 
 test.describe("Screen Reader Support", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("page has proper heading hierarchy", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
@@ -354,6 +384,16 @@ test.describe("Screen Reader Support", () => {
 // ============================================================================
 
 test.describe("Color and Contrast", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("respects prefers-reduced-motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/");
@@ -389,11 +429,21 @@ test.describe("Color and Contrast", () => {
 // ============================================================================
 
 test.describe("Instant Access - Floating Button", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("floating button visible and WCAG compliant size", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toBeVisible();
 
@@ -409,7 +459,7 @@ test.describe("Instant Access - Floating Button", () => {
       await page.goto(path);
       await page.waitForLoadState("domcontentloaded");
 
-      const button = page.locator('button[aria-label*="accessibilità"]');
+      const button = page.locator('button[aria-controls="a11y-quick-panel"]');
       await button.waitFor({ state: "visible", timeout: 10000 });
       await expect(button).toBeVisible();
     }
@@ -419,7 +469,7 @@ test.describe("Instant Access - Floating Button", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toHaveAttribute("aria-expanded", "false");
     await expect(button).toHaveAttribute("aria-controls");
@@ -427,11 +477,21 @@ test.describe("Instant Access - Floating Button", () => {
 });
 
 test.describe("Instant Access - Quick Panel", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("clicking button opens panel with 7 profiles", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const panel = page
@@ -462,7 +522,7 @@ test.describe("Instant Access - Quick Panel", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const panel = page
@@ -478,7 +538,7 @@ test.describe("Instant Access - Quick Panel", () => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const panel = page
@@ -492,6 +552,16 @@ test.describe("Instant Access - Quick Panel", () => {
 });
 
 test.describe("Instant Access - Profile Activation", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("selecting dyslexia profile changes font", async ({ page }) => {
     // Font loading is unreliable in CI environment - OpenDyslexic may not be cached
     test.skip(
@@ -499,10 +569,10 @@ test.describe("Instant Access - Profile Activation", () => {
       "Font loading unreliable in CI - needs font preloading",
     );
 
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -519,10 +589,10 @@ test.describe("Instant Access - Profile Activation", () => {
   test("active profile shows indicator on floating button", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const adhBtn = page.locator('button:has-text("ADHD")');
@@ -535,10 +605,10 @@ test.describe("Instant Access - Profile Activation", () => {
   });
 
   test("reset button clears profile", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -557,11 +627,21 @@ test.describe("Instant Access - Profile Activation", () => {
 });
 
 test.describe("Instant Access - Cookie Persistence", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("settings persist after page refresh", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -595,10 +675,10 @@ test.describe("Instant Access - Cookie Persistence", () => {
   });
 
   test("a11y cookie is set with correct name", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     const visualBtn = page.locator('button:has-text("Visivo")');
@@ -612,11 +692,21 @@ test.describe("Instant Access - Cookie Persistence", () => {
 });
 
 test.describe("Instant Access - Panel Keyboard Navigation", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("can open panel with keyboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.focus();
     await page.keyboard.press("Enter");
 
@@ -627,10 +717,10 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-label*="accessibilità"]');
+    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
     await button.click();
 
     for (let i = 0; i < 20; i++) {
@@ -652,8 +742,18 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
 // ============================================================================
 
 test.describe("DSA Profile Support", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("**/api/tos", (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      }),
+    );
+  });
+
   test("dyslexia font toggle works", async ({ page }) => {
-    await page.goto("/");
+    await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
 
     const body = page.locator("body");
