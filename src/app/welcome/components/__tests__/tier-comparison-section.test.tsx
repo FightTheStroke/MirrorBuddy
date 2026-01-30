@@ -39,7 +39,7 @@ describe("TierComparisonSection", () => {
     it("renders all three B2C tier cards", () => {
       render(<TierComparisonSection />);
 
-      expect(screen.getByText("Trial")).toBeInTheDocument();
+      expect(screen.getByText("Prova")).toBeInTheDocument();
       expect(screen.getByText("Base")).toBeInTheDocument();
       expect(screen.getByText("Pro")).toBeInTheDocument();
     });
@@ -47,7 +47,7 @@ describe("TierComparisonSection", () => {
     it("displays trial tier features", () => {
       render(<TierComparisonSection />);
 
-      expect(screen.getByText("3 Maestri")).toBeInTheDocument();
+      expect(screen.getByText("3 Professori")).toBeInTheDocument();
       expect(screen.getByText("10 messaggi/giorno")).toBeInTheDocument();
       expect(screen.getByText("5 minuti voce/giorno")).toBeInTheDocument();
     });
@@ -215,7 +215,7 @@ describe("TierComparisonSection", () => {
       fireEvent.click(individualsTab);
 
       await waitFor(() => {
-        expect(screen.getByText("Trial")).toBeInTheDocument();
+        expect(screen.getByText("Prova")).toBeInTheDocument();
         expect(screen.getByText("Base")).toBeInTheDocument();
         expect(screen.getByText("Pro")).toBeInTheDocument();
       });
@@ -268,7 +268,7 @@ describe("TierComparisonSection", () => {
       render(<TierComparisonSection />);
 
       expect(
-        screen.getByLabelText(/toggle between individuals and organizations/i),
+        screen.getByLabelText(/alterna tra studenti e organizzazioni/i),
       ).toBeInTheDocument();
     });
 

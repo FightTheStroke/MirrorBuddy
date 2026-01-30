@@ -69,7 +69,8 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Pro card should have a "Consigliato" badge
-    expect(screen.getByText(/consigliato/i)).toBeInTheDocument();
+    const consigliato = screen.getAllByText(/consigliato/i);
+    expect(consigliato.length).toBeGreaterThanOrEqual(1);
   });
 
   it("is responsive on mobile", () => {
