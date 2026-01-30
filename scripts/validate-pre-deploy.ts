@@ -41,9 +41,10 @@ function validateSentryDSN(dsn: string | undefined): void {
     return;
   }
 
-  // Sentry DSN format: https://<key>@<project>.ingest.<region>.sentry.io/<projectId>
+  // Sentry DSN format: https://<key>@<host>.ingest[.<region>].sentry.io/<projectId>
+  // Supports both regional (us/de/eu) and legacy (no region) formats
   const dsnRegex =
-    /^https:\/\/[a-f0-9]{32}@[a-z0-9-]+\.ingest\.(us|de|eu|custom)\.sentry\.io\/\d+$/;
+    /^https:\/\/[a-f0-9]{32}@[a-z0-9-]+\.ingest\.(?:(?:us|de|eu|custom)\.)?sentry\.io\/\d+$/;
 
   if (dsnRegex.test(dsn)) {
     const projectId = dsn.split("/").pop();
