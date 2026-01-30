@@ -53,7 +53,7 @@ export function KeyVaultTable({
       setRevealedSecret(data.value);
       setTimeout(() => setRevealedSecret(null), 10000);
     } catch (_error) {
-      // Failed to reveal secret - silently fail
+      alert("Failed to reveal secret");
     }
   };
 
@@ -66,7 +66,7 @@ export function KeyVaultTable({
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
     } catch (_error) {
-      // Failed to copy secret - silently fail
+      alert("Failed to copy secret");
     }
   };
 
