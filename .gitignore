@@ -124,3 +124,6 @@ business-plan/**
 
 # Git worktree directories (local only)
 feature/
+
+# Copilot tracking (local)
+.copilot-tracking/

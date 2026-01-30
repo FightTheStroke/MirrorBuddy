@@ -20,21 +20,19 @@ const testDatabaseUrl = process.env.TEST_DATABASE_URL;
 const isProduction =
   process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 
-// CRITICAL SAFETY CHECK: Block Supabase URLs in development/test
-// This prevents accidental contamination of production database
-// Exception: E2E tests override DATABASE_URL with TEST_DATABASE_URL
-if (
+// SAFETY CHECK: Auto-switch to local PostgreSQL in development
+// Prevents accidental writes to production Supabase database
+// Override with DEV_DATABASE_URL in .env for custom local setup
+const devLocalOverride =
   !isProduction &&
   !isE2E &&
-  process.env.DATABASE_URL &&
-  isSupabaseUrl(process.env.DATABASE_URL)
-) {
-  throw new Error(
-    `❌ SECURITY BLOCK: DATABASE_URL contains production Supabase URL in non-production environment!\n` +
-      `NODE_ENV: ${process.env.NODE_ENV}, VERCEL: ${process.env.VERCEL}\n` +
-      `To run E2E tests: Set E2E_TESTS=1 and TEST_DATABASE_URL=postgresql://localhost:5432/test\n` +
-      `To run dev server: Remove Supabase URL from .env or set NODE_ENV=production\n` +
-      `This safety check prevents accidental production database writes during development/testing.`,
+  !!process.env.DATABASE_URL &&
+  isSupabaseUrl(process.env.DATABASE_URL);
+
+if (devLocalOverride) {
+  logger.warn(
+    "[db] Supabase URL detected in development - auto-switching to local PostgreSQL. " +
+      "Set DEV_DATABASE_URL in .env to customize.",
   );
 }
 
@@ -71,8 +69,11 @@ const connectionString = isE2E
       }
       return testDatabaseUrl;
     })()
-  : process.env.DATABASE_URL ||
-    "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
+  : devLocalOverride
+    ? process.env.DEV_DATABASE_URL ||
+      "postgresql://postgres:postgres@localhost:5432/mirrorbuddy"
+    : process.env.DATABASE_URL ||
+      "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
 // Configure SSL for Supabase connection (ADR 0067)
 // ROOT CAUSE SOLUTION: Use full Supabase certificate chain
