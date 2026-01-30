@@ -297,12 +297,15 @@
     },
     "sidebar": {
       "dashboard": "Dashboard",
-      "users": "Utenti",
-      "invites": "Inviti",
-      "settings": "Impostazioni",
-      "localization": "Localizzazione",
-      "analytics": "Analytics",
-      "logs": "Log"
+      "users": "Benutzer",
+      "invites": "Einladungen",
+      "settings": "Einstellungen",
+      "tiers": "Stufen",
+      "localization": "Lokalisierung",
+      "analytics": "Analytik",
+      "logs": "Protokolle",
+      "auditLog": "Prüfprotokoll",
+      "serviceLimits": "Dienstgrenzen"
     },
     "header": {
       "title": "Pannello Amministrazione",

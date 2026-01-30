@@ -1,3 +1,4 @@
+/* eslint-disable local-rules/no-missing-i18n-keys -- admin keys are nested under admin.admin in JSON, resolved at runtime */
 "use client";
 
 import Link from "next/link";
@@ -67,31 +68,31 @@ export function AdminSidebar({
     },
     {
       id: "users",
-      label: t("users"),
+      label: t("sidebar.users"),
       href: "/admin/users",
       icon: Users,
     },
     {
       id: "tiers",
-      label: t("tiers"),
+      label: t("sidebar.tiers"),
       href: "/admin/tiers",
       icon: Layers,
     },
     {
       id: "audit-log",
-      label: "Audit Log",
+      label: t("sidebar.auditLog"),
       href: "/admin/tiers/audit-log",
       icon: ScrollText,
     },
     {
       id: "analytics",
-      label: "Analytics",
+      label: t("sidebar.analytics"),
       href: "/admin/analytics",
       icon: BarChart3,
     },
     {
       id: "service-limits",
-      label: "Service Limits",
+      label: t("sidebar.serviceLimits"),
       href: "/admin/service-limits",
       icon: Activity,
     },
@@ -103,7 +104,7 @@ export function AdminSidebar({
     },
     {
       id: "settings",
-      label: t("settings"),
+      label: t("sidebar.settings"),
       href: "/admin/settings",
       icon: Settings,
     },

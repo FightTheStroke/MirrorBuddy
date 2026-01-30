@@ -300,9 +300,12 @@
       "users": "Usuarios",
       "invites": "Invitaciones",
       "settings": "Configuración",
+      "tiers": "Niveles",
       "localization": "Localización",
       "analytics": "Análisis",
-      "logs": "Registros"
+      "logs": "Registros",
+      "auditLog": "Registro de Auditoría",
+      "serviceLimits": "Límites de Servicio"
     },
     "header": {
       "title": "Panel de administración",

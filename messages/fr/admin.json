@@ -296,13 +296,16 @@
       "error": "Errore nell'invio dell'invito"
     },
     "sidebar": {
-      "dashboard": "Dashboard",
-      "users": "Utenti",
-      "invites": "Inviti",
-      "settings": "Impostazioni",
-      "localization": "Localizzazione",
-      "analytics": "Analytics",
-      "logs": "Log"
+      "dashboard": "Tableau de bord",
+      "users": "Utilisateurs",
+      "invites": "Invitations",
+      "settings": "Paramètres",
+      "tiers": "Niveaux",
+      "localization": "Localisation",
+      "analytics": "Analytique",
+      "logs": "Journaux",
+      "auditLog": "Journal d'Audit",
+      "serviceLimits": "Limites de Service"
     },
     "header": {
       "title": "Pannello Amministrazione",

@@ -1,3 +1,4 @@
+/* eslint-disable local-rules/no-missing-i18n-keys -- admin keys are nested under admin.admin in JSON, resolved at runtime */
 "use client";
 
 import { usePathname } from "next/navigation";
@@ -27,10 +28,10 @@ export function AdminHeader({
   const SECTION_TITLES: Record<string, string> = {
     "/admin": t("dashboard"),
     "/admin/invites": t("betaRequests"),
-    "/admin/users": t("users"),
-    "/admin/analytics": "Analytics",
+    "/admin/users": t("sidebar.users"),
+    "/admin/analytics": t("sidebar.analytics"),
     "/admin/tos": t("terms"),
-    "/admin/settings": t("settings"),
+    "/admin/settings": t("sidebar.settings"),
   };
 
   const getBreadcrumbs = () => {

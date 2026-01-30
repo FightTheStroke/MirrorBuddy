@@ -131,8 +131,7 @@ test.describe("Smoke Test", () => {
 
     page.on("pageerror", (err) => errors.push(err.message));
 
-    await page.goto("/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
 
     await expect(page.locator("body")).toBeVisible();
     // Main content can be <main>, role="main", #main-content (a11y), or #__next (fallback)
@@ -164,8 +163,7 @@ test.describe("Smoke Test", () => {
     await page.setViewportSize({ width: 1280, height: 720 });
 
     // Go to Italian locale home page directly (/ redirects to /landing)
-    await page.goto("/it/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
 
     // Wait for hydration to complete - loading screen shows "Caricamento..."
     // After hydration, main content and navigation appear
@@ -184,8 +182,8 @@ test.describe("Smoke Test", () => {
 
   test("navigation sidebar works", async ({ page }) => {
     // Go to Italian locale home page directly (/ redirects to /landing)
-    await page.goto("/it/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
+    await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
     // Click astuccio nav - should show astuccio content
     const astuccioBtn = page
@@ -204,8 +202,8 @@ test.describe("Smoke Test", () => {
 
   test("settings page loads", async ({ page }) => {
     // Go to Italian locale home page directly (/ redirects to /landing)
-    await page.goto("/it/");
-    await page.waitForLoadState("networkidle");
+    await page.goto("/it/", { waitUntil: "domcontentloaded" });
+    await page.waitForSelector('main, [role="main"]', { timeout: 15000 });
 
     const settingsBtn = page
       .locator("button")
