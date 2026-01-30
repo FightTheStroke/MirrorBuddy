@@ -9,13 +9,7 @@ import { useEffect, useState } from "react";
 import { FeatureFlags } from "./feature-flags";
 import { SystemControls } from "./system-controls";
 import { TierLimits } from "./tier-limits";
-import {
-  ControlPanelState,
-  FeatureFlagState,
-  MaintenanceModeState,
-  GlobalKillSwitchState,
-  TierLimitConfig,
-} from "@/lib/admin/control-panel-types";
+import { ControlPanelState } from "@/lib/admin/control-panel-types";
 
 export const dynamic = "force-dynamic";
 
@@ -41,6 +35,7 @@ export default function ControlPanelPage() {
       setState(data.data);
       setError(null);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error("Error loading control panel:", err);
       setError(
         err instanceof Error ? err.message : "Failed to load control panel",
@@ -51,7 +46,7 @@ export default function ControlPanelPage() {
   };
 
   const handleUpdate = async (
-    type: "feature-flag" | "maintenance" | "kill-switch" | "tier-limit",
+    _type: "feature-flag" | "maintenance" | "kill-switch" | "tier-limit",
   ) => {
     await loadControlPanelState();
   };
@@ -67,7 +62,9 @@ export default function ControlPanelPage() {
   if (error || !state) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="text-lg font-semibold text-red-600">{error || "Failed to load control panel"}</div>
+        <div className="text-lg font-semibold text-red-600">
+          {error || "Failed to load control panel"}
+        </div>
         <button
           onClick={loadControlPanelState}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -96,12 +93,12 @@ export default function ControlPanelPage() {
 
         <FeatureFlags
           flags={state.featureFlags}
-          onUpdate={(flagId) => handleUpdate("feature-flag")}
+          onUpdate={(_flagId) => handleUpdate("feature-flag")}
         />
 
         <TierLimits
           tiers={state.tierLimits}
-          onUpdate={(tierId) => handleUpdate("tier-limit")}
+          onUpdate={(_tierId) => handleUpdate("tier-limit")}
         />
       </div>
     </div>
