@@ -1,1 +1,9 @@
+# Technical debt check (PR-level gate, not per-commit)
+if command -v npx >/dev/null 2>&1; then
+  npx tsx scripts/debt-check.ts 2>/dev/null || {
+    echo "Technical debt thresholds exceeded. Run: npm run debt:check"
+    exit 1
+  }
+fi
+
 ./scripts/pre-push-vercel.sh
