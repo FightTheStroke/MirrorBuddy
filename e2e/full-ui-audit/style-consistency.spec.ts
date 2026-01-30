@@ -12,7 +12,7 @@
 
 import { test, expect } from "@playwright/test";
 
-// Pages to test for style consistency
+// Pages to test for style consistency (public pages only, auth-required routes excluded)
 const PAGES_TO_TEST = [
   { path: "/", name: "Home" },
   { path: "/welcome", name: "Welcome" },
@@ -20,9 +20,6 @@ const PAGES_TO_TEST = [
   { path: "/astuccio", name: "Astuccio" },
   { path: "/study-kit", name: "Study Kit" },
   { path: "/homework", name: "Homework" },
-  { path: "/admin", name: "Admin Dashboard" },
-  { path: "/admin/users", name: "Admin Users" },
-  { path: "/genitori", name: "Parent Dashboard" },
 ];
 
 // Expected CSS custom properties (from globals.css)

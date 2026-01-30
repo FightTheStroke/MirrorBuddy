@@ -25,11 +25,23 @@ interface AuthFixtures {
 /**
  * Trial fixture - Anonymous user with wall bypasses
  * No authentication, just localStorage setup to skip onboarding/consent walls
+ * Includes /api/tos mock to bypass TosGateProvider blocking (F-03: ADR 0059)
  */
 async function trialFixture(
   { page }: { page: Page },
   use: (value: Page) => Promise<void>,
 ) {
+  // Mock ToS API to bypass TosGateProvider - required for all trial tests (ADR 0059)
+  // TosGateProvider checks both localStorage AND calls GET /api/tos on mount
+  // Without this mock, it receives {accepted: false}, shows modal, blocks pointer events
+  await page.route("**/api/tos", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ accepted: true, version: "1.0" }),
+    });
+  });
+
   // Set storage state before navigation
   await page.context().addInitScript(() => {
     // Inline localStorage setup to run before page loads
@@ -93,6 +105,7 @@ async function trialFixture(
 /**
  * Admin fixture - Authenticated admin user with all wall bypasses
  * F-11: Uses ADMIN_EMAIL and ADMIN_PASSWORD from .env
+ * Includes /api/tos mock to bypass TosGateProvider (ADR 0059)
  */
 async function adminFixture(
   { page }: { page: Page },
@@ -104,6 +117,15 @@ async function adminFixture(
   const randomSuffix = crypto.randomUUID().replace(/-/g, "").substring(0, 9);
   const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
   const signedCookie = signCookieValue(adminSessionId);
+
+  // Mock ToS API to bypass TosGateProvider (ADR 0059)
+  await page.route("**/api/tos", (route) => {
+    route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({ accepted: true, version: "1.0" }),
+    });
+  });
 
   // Set storage state before navigation
   await page.context().addInitScript(() => {

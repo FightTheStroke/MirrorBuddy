@@ -56,6 +56,7 @@ import {
 } from "./trial-handler";
 import { incrementTrialBudgetWithPublish } from "@/lib/trial/trial-budget-service";
 import { TOKEN_COST_PER_UNIT } from "./stream/helpers";
+import * as Sentry from "@sentry/nextjs";
 
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
@@ -443,6 +444,11 @@ export async function POST(request: NextRequest) {
       response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     } catch (providerError) {
+      // Report error to Sentry for monitoring and alerts
+      Sentry.captureException(providerError, {
+        tags: { api: "/api/chat" },
+      });
+
       const errorMessage =
         providerError instanceof Error
           ? providerError.message
@@ -474,6 +480,11 @@ export async function POST(request: NextRequest) {
       return response;
     }
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/chat" },
+    });
+
     log.error("Chat API error", { error: String(error) });
     const response = NextResponse.json(
       { error: "Internal server error" },

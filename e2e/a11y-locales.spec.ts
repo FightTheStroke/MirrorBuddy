@@ -31,6 +31,23 @@ const PAGES_TO_TEST = [
 ];
 
 /**
+ * Setup function to bypass ToS modal
+ * TosGateProvider checks both localStorage AND calls /api/tos
+ */
+async function setupTosModalBypass(page: import("@playwright/test").Page) {
+  await page.route("/api/tos", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        accepted: true,
+        version: "1.0",
+      }),
+    });
+  });
+}
+
+/**
  * Known accessibility rules to skip (document why each is excluded)
  * Should be empty for most projects - only exclude when violations have documented justification
  */
@@ -49,6 +66,10 @@ const WAIT_FOR_NETWORK_IDLE = "networkidle";
 // ============================================================================
 
 test.describe("WCAG 2.1 AA Compliance - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Test each page in each supported locale
    * Ensures accessibility standards are consistent across languages
@@ -102,6 +123,10 @@ test.describe("WCAG 2.1 AA Compliance - All Locales", () => {
 // ============================================================================
 
 test.describe("WCAG 2.1 AA per-page audit - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Test homepage specifically for each locale
    * Homepage is critical entry point for accessibility
@@ -176,6 +201,10 @@ test.describe("WCAG 2.1 AA per-page audit - All Locales", () => {
 // ============================================================================
 
 test.describe("Locale-Specific Accessibility Features", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Verify proper language direction for all locales
    * RTL languages may require special handling
@@ -250,6 +279,10 @@ test.describe("Locale-Specific Accessibility Features", () => {
 // ============================================================================
 
 test.describe("Color Contrast - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Test color contrast in all locales
    * Ensures text is readable regardless of language
@@ -286,6 +319,10 @@ test.describe("Color Contrast - All Locales", () => {
 // ============================================================================
 
 test.describe("Heading Hierarchy - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Verify proper heading hierarchy in all locales
    * Critical for screen reader users and document structure
@@ -331,6 +368,10 @@ test.describe("Heading Hierarchy - All Locales", () => {
 // ============================================================================
 
 test.describe("Form Accessibility - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Test that forms have accessible labels in all locales
    */
@@ -365,6 +406,10 @@ test.describe("Form Accessibility - All Locales", () => {
 // ============================================================================
 
 test.describe("Image Accessibility - All Locales", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Verify images have alt text in all locales
    * Alt text should be language-appropriate
@@ -401,6 +446,19 @@ test.describe("Image Accessibility - All Locales", () => {
 // ============================================================================
 
 test.describe("Comprehensive Accessibility Audit by Locale", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.route("/api/tos", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          accepted: true,
+          version: "1.0",
+        }),
+      });
+    });
+  });
+
   /**
    * Run full WCAG audit for each locale
    * Provides summary of all accessibility issues

@@ -9,7 +9,7 @@ import { test, expect } from "@playwright/test";
 
 const CRITICAL_ROUTES = [
   "/",
-  "/welcome",
+  "/it/welcome",
   "/astuccio",
   "/supporti",
   "/showcase",
@@ -144,8 +144,11 @@ test.describe("Smoke Test", () => {
   });
 
   test("critical routes load", async ({ page }) => {
+    // Welcome page triggers heavy Next.js compilation on cold start
+    test.setTimeout(90000);
+
     for (const route of CRITICAL_ROUTES) {
-      await page.goto(route, { timeout: 15000 });
+      await page.goto(route, { timeout: 60000, waitUntil: "domcontentloaded" });
       await expect(page.locator("body")).toBeVisible();
     }
   });

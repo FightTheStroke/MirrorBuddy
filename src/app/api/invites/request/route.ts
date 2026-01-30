@@ -8,6 +8,7 @@ import {
   RATE_LIMITS,
 } from "@/lib/rate-limit";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
+import * as Sentry from "@sentry/nextjs";
 
 interface InviteRequestBody {
   name: string;
@@ -111,6 +112,11 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/invites/request" },
+    });
+
     logger.error("Failed to create beta request", undefined, error as Error);
     return NextResponse.json(
       { error: "Errore durante la creazione della richiesta" },

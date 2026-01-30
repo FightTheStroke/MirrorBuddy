@@ -134,10 +134,12 @@ test.describe("Settings Page Interactions", () => {
             await firstCharacter.click();
             await page.waitForTimeout(200);
             // Verify it's selected (may have aria-checked, data-selected, or class)
-            await expect(firstCharacter).toHaveAttribute(
-              /aria-checked|data-selected|class/,
-              /.*/,
-            );
+            const isAriaChecked =
+              await firstCharacter.getAttribute("aria-checked");
+            const isDataSelected =
+              await firstCharacter.getAttribute("data-selected");
+            const hasClass = await firstCharacter.getAttribute("class");
+            expect(isAriaChecked || isDataSelected || hasClass).toBeTruthy();
           }
         }
       }

@@ -119,9 +119,14 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     // Should still be on Spanish version
     await expect(page).toHaveURL(/\/es\/welcome/);
 
-    // Switcher should show Spanish as selected
-    await switcher.click();
-    const currentOption = page.getByRole("menuitem", { current: true });
+    // Switcher should show Spanish as selected - re-query after reload
+    const switcherAfterReload = page.getByRole("button", {
+      name: /select language/i,
+    });
+    await switcherAfterReload.click();
+    const currentOption = page.locator(
+      '[role="menuitem"][aria-current="true"]',
+    );
     await expect(currentOption).toContainText("Español");
   });
 

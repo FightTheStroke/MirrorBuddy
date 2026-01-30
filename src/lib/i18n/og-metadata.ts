@@ -77,21 +77,19 @@ export function generateOGMetadata(input: OGMetadataInput): Metadata {
   // Build Twitter images (just URL array)
   const twitterImages = input.image ? [input.image.url] : undefined;
 
-  // Use type assertion to include locale:alternate which Next.js doesn't expose in types
-  // but is valid Open Graph metadata
-  const metadata: Metadata & {
-    openGraph?: Record<string, unknown>;
-    twitter?: Record<string, unknown>;
-  } = {
+  // Build metadata with og:locale:alternate using the alternateLocale property
+  // This property accepts an array of locale codes and generates multiple
+  // <meta property="og:locale:alternate" content="..." /> tags
+  const metadata: Metadata = {
     openGraph: {
       type: "website",
       locale: ogLocale,
-      "locale:alternate": alternateLocales,
+      alternateLocale: alternateLocales,
       title: input.title,
       description: input.description,
       url: input.url,
       images: ogImages,
-    },
+    } as Record<string, unknown>,
     twitter: {
       card: "summary_large_image",
       title: input.title,
@@ -100,7 +98,7 @@ export function generateOGMetadata(input: OGMetadataInput): Metadata {
     },
   };
 
-  return metadata as Metadata;
+  return metadata;
 }
 
 /**

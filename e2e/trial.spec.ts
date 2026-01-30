@@ -50,6 +50,7 @@ test.describe("Trial Mode - GDPR Compliance", () => {
     trialPage,
   }) => {
     // Clear consent - simulate user who hasn't accepted yet
+    // But keep TosGateProvider mock from fixture to prevent ToS modal blocking
     await trialPage.addInitScript(() => {
       localStorage.removeItem("mirrorbuddy-consent");
     });

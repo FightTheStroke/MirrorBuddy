@@ -34,14 +34,14 @@ if (process.env.NODE_ENV === "production") {
 | OnboardingStore   | `mirrorbuddy-onboarding` | No                   |
 | TosGateProvider   | `mirrorbuddy-consent`    | **Yes - `/api/tos`** |
 
-### TosGateProvider Special Case
+### TosGateProvider Special Case (CRITICAL)
 
 TosGateProvider checks **both** localStorage AND calls `GET /api/tos` on mount.
 
-**In test-specific contexts** (e.g., admin tests with manual auth setup):
+**MANDATORY IN ALL E2E TESTS**: Mock `/api/tos` to prevent modal blocking UI:
 
 ```typescript
-// Mock ToS acceptance status to prevent modal from blocking UI
+// Add to EVERY E2E test (not just auth tests)
 await page.route("/api/tos", async (route) => {
   await route.fulfill({
     status: 200,
@@ -81,6 +81,32 @@ await page.route("/api/tos", async (route) => {
 
 - **Cause**: Unsupported language in matrix (e.g., "actions")
 - **Fix**: Remove unsupported language from `.github/workflows/codeql.yml`
+
+### Mobile timeout failures (iPhone SE, Pixel 7)
+
+- **Cause**: Default 30s timeout too short for slow mobile rendering
+- **Fix**: Increase timeout to 60s for mobile viewports in `playwright.config.ts`
+  ```typescript
+  timeout: process.env.CI_MOBILE_TESTS === '1' ? 60000 : 30000,
+  ```
+
+## Test Skip Pattern (testIgnore)
+
+For specs needing complex authentication or multi-step setup that blocks CI:
+
+```typescript
+test.describe.configure({ mode: "parallel" });
+
+test.skip(
+  someCondition,
+  "Skipped: Requires manual admin setup",
+  async ({ page }) => {
+    // Complex multi-step test
+  },
+);
+```
+
+**When to use**: Admin-only flows with circular dependencies. Use `testIgnore` during wave development, mark as `@skip` once fixed.
 
 ## Quick Verification
 

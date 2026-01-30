@@ -326,14 +326,12 @@ test.describe("Admin Locale Preview Functionality", () => {
     // Set up event listener
     const eventFired = page.evaluate(() => {
       return new Promise<string>((resolve) => {
-        const listener = (event: CustomEvent<{ locale: string }>) => {
+        const listener = (event: Event) => {
           window.removeEventListener("admin_locale_preview_changed", listener);
-          resolve(event.detail.locale);
+          const customEvent = event as CustomEvent<{ locale: string }>;
+          resolve(customEvent.detail.locale);
         };
-        window.addEventListener(
-          "admin_locale_preview_changed",
-          listener as EventListener,
-        );
+        window.addEventListener("admin_locale_preview_changed", listener);
 
         // Timeout after 5 seconds
         setTimeout(() => resolve("timeout"), 5000);

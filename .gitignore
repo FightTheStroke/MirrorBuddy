@@ -120,3 +120,7 @@ docs/.archive/
 # CodeGraph: keep DB ignored, allow config to be tracked/read
 .codegraph/**
 !.codegraph/config.json
+business-plan/**
+
+# Git worktree directories (local only)
+feature/

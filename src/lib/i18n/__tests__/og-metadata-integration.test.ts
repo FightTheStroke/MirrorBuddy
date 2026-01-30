@@ -41,7 +41,7 @@ describe("og-metadata-integration", () => {
         expect(ogMetadata.url).toContain(`/${locale}`);
 
         // Should have 4 alternates
-        const alternates = ogMetadata["locale:alternate"] as string[];
+        const alternates = ogMetadata["alternateLocale"] as string[];
         expect(alternates).toHaveLength(4);
       }
     });

@@ -24,13 +24,34 @@ test.describe("SMOKE: Critical Paths @smoke", () => {
   test("CP-01: Welcome page loads without JavaScript errors", async ({
     page,
   }) => {
+    // Welcome page requires heavy Next.js compilation on first hit during
+    // pre-push hook; allow extra time for dev server cold compile.
+    test.setTimeout(90000);
+
     const errors: string[] = [];
     page.on("pageerror", (error) => errors.push(error.message));
 
     // Use Italian locale welcome page directly; root /welcome redirects
     // to /landing and does not render the onboarding UI.
-    await page.goto("/it/welcome");
-    await page.waitForLoadState("domcontentloaded");
+    // Retry once on ERR_ABORTED (common during dev server cold start)
+    let navigated = false;
+    for (let attempt = 0; attempt < 2 && !navigated; attempt++) {
+      try {
+        await page.goto("/it/welcome", {
+          timeout: 60000,
+          waitUntil: "domcontentloaded",
+        });
+        navigated = true;
+      } catch {
+        if (attempt === 0) {
+          await new Promise((r) => setTimeout(r, 3000));
+        }
+      }
+    }
+    expect(
+      navigated,
+      "Failed to navigate to /it/welcome after 2 attempts",
+    ).toBe(true);
 
     // Page should have content (not blank)
     const body = await page.locator("body").textContent();

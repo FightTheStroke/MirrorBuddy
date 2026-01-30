@@ -16,6 +16,9 @@ const baseEnvSchema = z.object({
     .enum(["development", "production", "test"])
     .default("development"),
   DATABASE_URL: z.string().min(1, "DATABASE_URL is required"),
+  SESSION_SECRET: z
+    .string()
+    .min(32, "SESSION_SECRET must be at least 32 characters"),
 });
 
 // Production-only requirements
@@ -26,6 +29,17 @@ const productionEnvSchema = baseEnvSchema.extend({
   // Azure OpenAI - at least one provider must be configured
   AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: z.string().optional(),
+  // Token encryption (required for OAuth features)
+  TOKEN_ENCRYPTION_KEY: z
+    .string()
+    .min(32, "TOKEN_ENCRYPTION_KEY must be at least 32 characters"),
+  // Cron job security
+  CRON_SECRET: z.string().min(32, "CRON_SECRET must be at least 32 characters"),
+  // Admin credentials
+  ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email"),
+  ADMIN_PASSWORD: z
+    .string()
+    .min(8, "ADMIN_PASSWORD must be at least 8 characters"),
 });
 
 // Development schema - more lenient
@@ -33,6 +47,10 @@ const developmentEnvSchema = baseEnvSchema.extend({
   SUPABASE_CA_CERT: z.string().optional(),
   AZURE_OPENAI_API_KEY: z.string().optional(),
   AZURE_OPENAI_ENDPOINT: z.string().optional(),
+  TOKEN_ENCRYPTION_KEY: z.string().optional(),
+  CRON_SECRET: z.string().optional(),
+  ADMIN_EMAIL: z.string().optional(),
+  ADMIN_PASSWORD: z.string().optional(),
 });
 
 /**
@@ -87,7 +105,22 @@ export const env = {
   get DATABASE_URL() {
     return process.env.DATABASE_URL!;
   },
+  get SESSION_SECRET() {
+    return process.env.SESSION_SECRET!;
+  },
   get SUPABASE_CA_CERT() {
     return process.env.SUPABASE_CA_CERT;
+  },
+  get TOKEN_ENCRYPTION_KEY() {
+    return process.env.TOKEN_ENCRYPTION_KEY;
+  },
+  get CRON_SECRET() {
+    return process.env.CRON_SECRET;
+  },
+  get ADMIN_EMAIL() {
+    return process.env.ADMIN_EMAIL;
+  },
+  get ADMIN_PASSWORD() {
+    return process.env.ADMIN_PASSWORD;
   },
 };

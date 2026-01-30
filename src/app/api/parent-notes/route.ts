@@ -14,6 +14,7 @@ import {
   getUnreadParentNotesCount,
 } from "@/lib/session/parent-note-generator";
 import { prisma } from "@/lib/db";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * GET /api/parent-notes
@@ -57,6 +58,11 @@ export async function GET(request: NextRequest) {
       unreadCount: notes.filter((n) => !n.viewedAt).length,
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/parent-notes" },
+    });
+
     logger.error("Failed to get parent notes", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to get parent notes" },
@@ -101,6 +107,11 @@ export async function PATCH(request: NextRequest) {
       { status: 400 },
     );
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/parent-notes" },
+    });
+
     logger.error("Failed to update parent note", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to update parent note" },
@@ -154,6 +165,11 @@ export async function DELETE(request: NextRequest) {
       deleted: true,
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/parent-notes" },
+    });
+
     logger.error("Failed to delete parent note", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to delete parent note" },

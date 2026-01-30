@@ -124,7 +124,11 @@ export default defineConfig({
         "**/tools-api.spec.ts", // Requires complex DB state (materials)
         "**/admin-dashboard.spec.ts", // Requires metrics tables + admin auth
         "**/admin-funnel.spec.ts", // Requires admin auth + funnel metrics
+        "**/admin-locale-preview.spec.ts", // Requires admin auth + locale setup
+        "**/admin-locales.spec.ts", // Requires admin auth + locale data
         "**/admin-sidebar.spec.ts", // Requires admin auth
+        "**/admin-sse-reconnection.spec.ts", // Requires admin auth + SSE server setup
+        "**/admin-sse.spec.ts", // Requires admin auth + SSE server setup
         "**/admin-visual-regression-*.spec.ts", // Requires admin auth + visual baselines
         "**/admin.spec.ts", // Requires admin credentials setup
         "**/gdpr-compliance.spec.ts", // Requires complex DB state (user data)
@@ -133,8 +137,8 @@ export default defineConfig({
         "**/auth.spec.ts", // Requires proper auth flow setup
         "**/authorization-cookies.spec.ts", // Requires cookie/session setup
         "**/critical-api-routes.spec.ts", // Requires proper API environment + auth
+        "**/invite.spec.ts", // Requires invite system + admin auth
         "**/maestri-data.spec.ts", // Requires full UI rendering
-        "**/trial-dashboard.spec.ts", // Requires proper trial state setup
         "**/test-data-cleanup.spec.ts", // Requires DB state
         "**/tier-enforcement.spec.ts", // Requires tier seeding + /pricing page (Plan 073)
         "**/admin-tiers.spec.ts", // Requires tier seeding (Plan 073)

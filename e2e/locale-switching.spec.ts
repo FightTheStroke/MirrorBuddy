@@ -14,6 +14,19 @@ import {
 import type { Locale } from "@/i18n/config";
 
 test.describe("Locale Switching and Content Localization", () => {
+  test.beforeEach(async ({ localePage }) => {
+    // Mock ToS acceptance to bypass modal
+    await localePage.page.route("/api/tos", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          accepted: true,
+          version: "1.0",
+        }),
+      });
+    });
+  });
   /**
    * Test 1: User can switch language from settings
    * Verifies that language selector in settings dialog changes the locale

@@ -19,6 +19,7 @@ import {
 } from "@/lib/rate-limit";
 import { requireCSRF } from "@/lib/security/csrf";
 import { TOS_VERSION } from "@/lib/tos/constants";
+import * as Sentry from "@sentry/nextjs";
 
 const log = logger.child({ module: "api/tos" });
 
@@ -87,6 +88,11 @@ export async function GET(_request: NextRequest) {
       previousVersion: previousAcceptance?.version,
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/tos" },
+    });
+
     log.error("ToS check error", {
       userId: auth.userId,
       error: String(error),
@@ -186,6 +192,11 @@ export async function POST(request: NextRequest) {
       acceptedAt: acceptance.acceptedAt,
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/tos" },
+    });
+
     log.error("ToS acceptance error", {
       userId: auth.userId,
       error: String(error),

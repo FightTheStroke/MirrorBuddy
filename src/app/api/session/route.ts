@@ -6,6 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { generateCSRFToken, CSRF_TOKEN_COOKIE } from "@/lib/security/csrf";
+import * as Sentry from "@sentry/nextjs";
 
 interface SessionResponse {
   csrfToken: string;
@@ -48,6 +49,11 @@ export async function GET() {
 
     return response;
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/session" },
+    });
+
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(

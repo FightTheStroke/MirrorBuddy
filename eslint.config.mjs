@@ -75,6 +75,8 @@ const eslintConfig = defineConfig([
     // Playwright reports (generated files)
     "playwright-report/**",
     "test-results/**",
+    // Git worktree directories (local only)
+    "feature/**",
   ]),
   // Custom rules
   {
@@ -335,6 +337,20 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "local-rules/no-kebab-case-i18n-keys": "error",
+    },
+  },
+  // T7-02: Block missing i18n namespace keys at build time
+  // Validates that all t("key") calls reference keys that exist in message files
+  // TODO: Change to "error" after fixing all existing violations
+  {
+    files: ["src/**/*.tsx", "src/**/*.ts"],
+    ignores: [
+      "src/**/*.test.tsx",
+      "src/**/*.test.ts",
+      "src/**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-missing-i18n-keys": "warn",
     },
   },
 ]);

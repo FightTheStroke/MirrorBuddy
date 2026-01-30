@@ -25,6 +25,22 @@ import { buildLocalizedPath } from "./fixtures";
 import type { Locale } from "@/i18n/config";
 
 /**
+ * Setup function to bypass ToS modal
+ */
+async function setupTosModalBypass(page: import("@playwright/test").Page) {
+  await page.route("/api/tos", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        accepted: true,
+        version: "1.0",
+      }),
+    });
+  });
+}
+
+/**
  * Maestri test data including formal/informal information
  *
  * FORMAL_PROFESSORS (historical/classical): manzoni, shakespeare, erodoto,
@@ -84,6 +100,10 @@ const INFORMAL_PATTERNS: Record<Locale, string[]> = {
 };
 
 test.describe("Maestri Localized Greetings (i18n)", () => {
+  test.beforeEach(async ({ localePage }) => {
+    await setupTosModalBypass(localePage.page);
+  });
+
   /**
    * Test 1: Maestri greetings load in all locales via API
    * Verifies the /api/maestri endpoint returns locale-aware greetings
@@ -513,6 +533,10 @@ test.describe("Maestri Localized Greetings (i18n)", () => {
 });
 
 test.describe("Maestri Greetings - Edge Cases", () => {
+  test.beforeEach(async ({ page }) => {
+    await setupTosModalBypass(page);
+  });
+
   /**
    * Test 15: Fallback greeting when personalized not available
    * Some maestri may not have personalized greetings

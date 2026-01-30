@@ -50,7 +50,7 @@ describe("og-metadata", () => {
       const ogMetadata = metadata.openGraph as
         | Record<string, unknown>
         | undefined;
-      const alternates = ogMetadata?.["locale:alternate"] as
+      const alternates = ogMetadata?.["alternateLocale"] as
         | string[]
         | undefined;
 
@@ -155,7 +155,7 @@ describe("og-metadata", () => {
         expect(ogMetadata?.locale).toBe(getLocaleCode(locale));
 
         // Each should have 4 alternates (all others)
-        const alternates = ogMetadata?.["locale:alternate"] as
+        const alternates = ogMetadata?.["alternateLocale"] as
           | string[]
           | undefined;
         expect(alternates).toHaveLength(4);

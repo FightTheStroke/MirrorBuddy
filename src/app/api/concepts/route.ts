@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import * as Sentry from "@sentry/nextjs";
 
 async function getUserId(): Promise<string | null> {
   const auth = await validateAuth();
@@ -82,6 +83,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       },
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/concepts" },
+    });
+
     logger.error("Failed to fetch concepts", undefined, error);
     return NextResponse.json(
       { error: "Failed to fetch concepts" },
@@ -122,6 +128,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     return NextResponse.json({ concept }, { status: 201 });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/concepts" },
+    });
+
     // Handle unique constraint violation
     if (error instanceof Error && error.message.includes("Unique constraint")) {
       return NextResponse.json(

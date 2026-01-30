@@ -12,6 +12,7 @@ import { ConversationCreateSchema } from "@/lib/validation/schemas/conversations
 import { validateAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import type { Conversation, Message } from "@prisma/client";
+import * as Sentry from "@sentry/nextjs";
 
 export async function GET(request: NextRequest) {
   try {
@@ -81,6 +82,11 @@ export async function GET(request: NextRequest) {
     response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/conversations" },
+    });
+
     logger.error("Conversations GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
@@ -157,6 +163,11 @@ export async function POST(request: NextRequest) {
     response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/conversations" },
+    });
+
     logger.error("Conversations POST error", { error: String(error) });
     const response = NextResponse.json(
       { error: "Failed to create conversation" },

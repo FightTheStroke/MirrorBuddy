@@ -841,6 +841,12 @@
       "section4": {
         "title": "Come usiamo i tuoi dati",
         "intro": "Usiamo i tuoi dati solo per questi scopi legittimi:",
+        "itemLabels": {
+          "appFunctionality": "Funzionalità App",
+          "personalization": "Personalizzazione",
+          "improvement": "Miglioramento",
+          "support": "Supporto"
+        },
         "items": {
           "appFunctionality": "Caricare le tue conversazioni, flashcard e progresso",
           "personalization": "Adattare i maestri ai tuoi interessi e livello di apprendimento",
@@ -866,6 +872,11 @@
       "section6": {
         "title": "Chi accede ai tuoi dati",
         "intro": "I tuoi dati personali sono accessibili a:",
+        "itemLabels": {
+          "you": "Tu",
+          "parents": "Genitori",
+          "team": "Team MirrorBuddy"
+        },
         "items": {
           "you": "Tu hai sempre il controllo totale dei tuoi dati e puoi scaricarli, modificarli o eliminarli",
           "parents": "I tuoi genitori possono monitorare il tuo progresso tramite il Parent Dashboard (se minore)",
@@ -1056,6 +1067,62 @@
           }
         },
         "closing": "Apprezziamo la tua fiducia nella protezione della tua privacy e rimaniamo a tua disposizione per qualsiasi domanda."
+      },
+      "section16": {
+        "title": "16. Sistemi di Intelligenza Artificiale e Diritti dell'Utente",
+        "aiSystemsHeading": "Sistemi di IA Utilizzati",
+        "aiSystems": "MirrorBuddy utilizza sistemi di intelligenza artificiale per personalizzare l'esperienza educativa. Tutti i nostri sistemi di IA sono trasparenti, controllabili e progettati con supervisione umana integrata. Non prendiamo decisioni automatiche che influiscono significativamente sulla tua educazione senza revisione umana.",
+        "aiDataHeading": "Quali Dati Elaboriamo con l'IA",
+        "aiDataIntro": "I seguenti dati personali vengono elaborati dai nostri sistemi di IA:",
+        "aiDataItemLabels": {
+          "messages": "Messaggi di Conversazione",
+          "context": "Contesto Educativo",
+          "profile": "Profilo Educativo"
+        },
+        "aiDataItems": {
+          "messages": "Le tue conversazioni con i maestri vengono analizzate per personalizzare il tono e il livello di difficoltà",
+          "context": "Il tuo livello scolastico, materie di interesse e stile di apprendimento vengono utilizzati per adattare i contenuti",
+          "profile": "I tuoi dati di progresso (flashcard, quiz, esercizi) vengono utilizzati per consigliare il prossimo argomento da imparare"
+        },
+        "notProcessed": "Le tue informazioni sensibili (dati di salute, locazione, informazioni biometriche) non vengono mai elaborate con l'IA, anche se condivise volontariamente.",
+        "aiDecisionsHeading": "Come Prendiamo Decisioni con l'IA",
+        "aiDecisions": "Le decisioni basate sull'IA influenzano la tua esperienza di apprendimento in questi modi:",
+        "aiDecisionsItems": {
+          "access": "Accesso ai Maestri: L'IA consiglia quali maestri potrebbero essere più utili per te in base ai tuoi interessi",
+          "benefits": "Vantaggi Educativi: L'IA identifica i tuoi punti di forza e le aree dove potresti aver bisogno di supporto extra",
+          "education": "Percorso Educativo: L'IA suggerisce quale argomento imparare successivamente per ottimizzare la ritenzione della memoria"
+        },
+        "aiDecisionsNote": "Nota: Nessuna di queste decisioni è finale senza intervento umano. Genitori e insegnanti possono sempre sovrascrivere i suggerimenti dell'IA.",
+        "aiRightsHeading": "I Tuoi Diritti su Decisioni Basate su IA",
+        "aiRightsIntro": "Secondo la Legge sull'IA dell'UE, hai i seguenti diritti riguardanti le decisioni automatizzate:",
+        "aiRightsItemLabels": {
+          "humanReview": "Diritto di Revisione Umana",
+          "feedback": "Diritto di Feedback",
+          "transparency": "Diritto di Trasparenza",
+          "oppose": "Diritto di Opposizione"
+        },
+        "aiRightsItems": {
+          "humanReview": "Puoi richiedere che una persona (insegnante o genitore) riveda qualsiasi decisione basata su IA",
+          "feedback": "Puoi condividere feedback su come l'IA ha influenzato il tuo apprendimento, e noi useremo questo feedback per migliorare",
+          "transparency": "Puoi richiedere una spiegazione di come e perché l'IA ha preso una particolare decisione riguardo al tuo apprendimento",
+          "oppose": "Puoi opporti al trattamento dei tuoi dati con sistemi di IA in qualsiasi momento"
+        },
+        "transparencyHeading": "Come Rimaniamo Trasparenti",
+        "transparencyIntro": "Implementiamo queste misure per rimanere trasparenti sui nostri sistemi di IA:",
+        "transparencyItemLabels": {
+          "review": "Revisione Regolare",
+          "monitoring": "Monitoraggio della Qualità",
+          "reporting": "Rapporti Pubblici",
+          "retention": "Conservazione dei Dati"
+        },
+        "transparencyItems": {
+          "review": "Rivediamo i nostri sistemi di IA trimestralmente per assicurarci che funzionino correttamente e equamente per tutti gli studenti",
+          "monitoring": "Monitoriamo continuamente i risultati dell'IA per rilevare e correggere eventuali bias o errori",
+          "reporting": "Pubblichiamo report trimestrali sulla nostra Carta Modello (Model Card) che descrivono come funzionano i nostri sistemi di IA",
+          "retention": "Conserviamo i log delle decisioni di IA per 90 giorni per revisione e miglioramento, poi li eliminiamo"
+        },
+        "learnMoreHeading": "Vuoi Sapere di Più?",
+        "learnMoreText": "per informazioni complete sulla nostra architettura di IA, bias testing, e come usiamo i dati conversazionali."
       }
     },
     "terms": {

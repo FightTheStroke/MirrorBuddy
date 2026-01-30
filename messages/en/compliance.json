@@ -841,6 +841,12 @@
       "section4": {
         "title": "How We Use Your Data",
         "intro": "We use your data only for these legitimate purposes:",
+        "itemLabels": {
+          "appFunctionality": "App Functionality",
+          "personalization": "Personalization",
+          "improvement": "Improvement",
+          "support": "Support"
+        },
         "items": {
           "appFunctionality": "Load your conversations, flashcards and progress",
           "personalization": "Adapt the maestri to your interests and learning level",
@@ -866,6 +872,11 @@
       "section6": {
         "title": "Who Can Access Your Data",
         "intro": "Your personal data is accessible to:",
+        "itemLabels": {
+          "you": "You",
+          "parents": "Parents",
+          "team": "MirrorBuddy Team"
+        },
         "items": {
           "you": "You have complete control of your data and can download, modify or delete it",
           "parents": "Your parents can monitor your progress via the Parent Dashboard (if you are a minor)",
@@ -1056,6 +1067,62 @@
           }
         },
         "closing": "We appreciate your trust in protecting your privacy and remain available for any questions you may have."
+      },
+      "section16": {
+        "title": "16. Artificial Intelligence Systems and User Rights",
+        "aiSystemsHeading": "AI Systems in Use",
+        "aiSystems": "MirrorBuddy uses artificial intelligence systems to personalize your educational experience. All our AI systems are transparent, controllable, and designed with integrated human oversight. We do not make automated decisions that significantly impact your education without human review.",
+        "aiDataHeading": "Which Data We Process with AI",
+        "aiDataIntro": "The following personal data is processed by our AI systems:",
+        "aiDataItemLabels": {
+          "messages": "Conversation Messages",
+          "context": "Educational Context",
+          "profile": "Educational Profile"
+        },
+        "aiDataItems": {
+          "messages": "Your conversations with teachers are analyzed to personalize the tone and difficulty level",
+          "context": "Your grade level, subjects of interest, and learning style are used to adapt content",
+          "profile": "Your progress data (flashcards, quizzes, exercises) is used to recommend the next topic to learn"
+        },
+        "notProcessed": "Your sensitive information (health data, location, biometric information) is never processed with AI, even if shared voluntarily.",
+        "aiDecisionsHeading": "How We Make Decisions with AI",
+        "aiDecisions": "AI-based decisions affect your learning experience in these ways:",
+        "aiDecisionsItems": {
+          "access": "Teacher Access: AI recommends which teachers might be most helpful to you based on your interests",
+          "benefits": "Educational Benefits: AI identifies your strengths and areas where you might need extra support",
+          "education": "Learning Path: AI suggests which topic to learn next to optimize memory retention"
+        },
+        "aiDecisionsNote": "Note: None of these decisions are final without human intervention. Parents and teachers can always override AI suggestions.",
+        "aiRightsHeading": "Your Rights on AI-Based Decisions",
+        "aiRightsIntro": "According to the EU AI Act, you have the following rights regarding automated decisions:",
+        "aiRightsItemLabels": {
+          "humanReview": "Right to Human Review",
+          "feedback": "Right to Feedback",
+          "transparency": "Right to Transparency",
+          "oppose": "Right to Object"
+        },
+        "aiRightsItems": {
+          "humanReview": "You can request that a person (teacher or parent) review any AI-based decision",
+          "feedback": "You can share feedback on how AI has impacted your learning, and we will use this feedback to improve",
+          "transparency": "You can request an explanation of how and why AI made a particular decision about your learning",
+          "oppose": "You can object to the processing of your data with AI systems at any time"
+        },
+        "transparencyHeading": "How We Stay Transparent",
+        "transparencyIntro": "We implement these measures to remain transparent about our AI systems:",
+        "transparencyItemLabels": {
+          "review": "Regular Review",
+          "monitoring": "Quality Monitoring",
+          "reporting": "Public Reports",
+          "retention": "Data Retention"
+        },
+        "transparencyItems": {
+          "review": "We review our AI systems quarterly to ensure they work correctly and fairly for all students",
+          "monitoring": "We continuously monitor AI outcomes to detect and correct any bias or errors",
+          "reporting": "We publish quarterly reports on our Model Card that describe how our AI systems work",
+          "retention": "We retain logs of AI decisions for 90 days for review and improvement, then delete them"
+        },
+        "learnMoreHeading": "Want to Know More?",
+        "learnMoreText": "for complete information about our AI architecture, bias testing, and how we use conversational data."
       }
     },
     "terms": {

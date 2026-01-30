@@ -44,12 +44,12 @@ const EXPECTED_TRANSLATIONS = {
 // Test new user welcome page (shows hero section)
 testAllLocales(
   "hero section displays correct beta badge text",
-  async ({ locale, page }) => {
-    await page.goto(`/${locale}/welcome`);
-    await page.waitForLoadState("networkidle");
+  async ({ localePage }) => {
+    await localePage.goto("/welcome");
+    await localePage.page.waitForLoadState("networkidle");
 
     // Find the beta badge (uppercase span with font-bold)
-    const badgeSpan = page.locator(".uppercase.font-bold").first();
+    const badgeSpan = localePage.page.locator(".uppercase.font-bold").first();
     await expect(badgeSpan).toBeVisible();
 
     // Get the text content
@@ -57,20 +57,24 @@ testAllLocales(
 
     // Verify the translation is being used
     const expectedBadge =
-      EXPECTED_TRANSLATIONS[locale as keyof typeof EXPECTED_TRANSLATIONS]
-        ?.betaBadge || EXPECTED_TRANSLATIONS.it.betaBadge;
+      EXPECTED_TRANSLATIONS[
+        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
+      ]?.betaBadge || EXPECTED_TRANSLATIONS.it.betaBadge;
     expect(badgeText?.trim()).toBe(expectedBadge);
   },
 );
 
 testAllLocales(
   "hero section displays correct beta subtitle text",
-  async ({ locale, page }) => {
-    await page.goto(`/${locale}/welcome`);
-    await page.waitForLoadState("networkidle");
+  async ({ localePage }) => {
+    await localePage.goto("/welcome");
+    await localePage.page.waitForLoadState("networkidle");
 
     // Find the beta subtitle (small text inside the badge)
-    const badgeDiv = page.locator(".uppercase.font-bold").first().locator("..");
+    const badgeDiv = localePage.page
+      .locator(".uppercase.font-bold")
+      .first()
+      .locator("..");
     const subtitleSpan = badgeDiv.locator("span").nth(1); // Second span in the badge
     await expect(subtitleSpan).toBeVisible();
 
@@ -79,22 +83,25 @@ testAllLocales(
 
     // Verify the translation is being used
     const expectedSubtitle =
-      EXPECTED_TRANSLATIONS[locale as keyof typeof EXPECTED_TRANSLATIONS]
-        ?.betaSubtitle || EXPECTED_TRANSLATIONS.it.betaSubtitle;
+      EXPECTED_TRANSLATIONS[
+        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
+      ]?.betaSubtitle || EXPECTED_TRANSLATIONS.it.betaSubtitle;
     expect(subtitleText?.trim()).toBe(expectedSubtitle);
   },
 );
 
 testAllLocales(
   "hero section aria-label uses translation",
-  async ({ locale, page }) => {
-    await page.goto(`/${locale}/welcome`);
-    await page.waitForLoadState("networkidle");
+  async ({ localePage }) => {
+    await localePage.goto("/welcome");
+    await localePage.page.waitForLoadState("networkidle");
 
     // Find the beta badge motion.div
-    const betaBadgeMotion = page.locator("[role='presentation']").filter({
-      has: page.locator(".uppercase:has-text(Beta)"),
-    });
+    const betaBadgeMotion = localePage.page
+      .locator("[role='presentation']")
+      .filter({
+        has: localePage.page.locator(".uppercase:has-text(Beta)"),
+      });
 
     // Check aria-label includes the translated text
     const ariaLabel = await betaBadgeMotion.first().getAttribute("aria-label");

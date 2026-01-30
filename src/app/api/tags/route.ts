@@ -11,6 +11,7 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { CreateTagSchema } from "@/lib/validation/schemas/organization";
 import { requireCSRF } from "@/lib/security/csrf";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * GET /api/tags
@@ -61,6 +62,11 @@ export async function GET(request: NextRequest) {
       pagination: { total, page, limit, hasNext: skip + tags.length < total },
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/tags" },
+    });
+
     logger.error("Tags GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
@@ -130,6 +136,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(tag, { status: 201 });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/tags" },
+    });
+
     logger.error("Tags POST error", { error: String(error) });
 
     // Handle unique constraint violation

@@ -236,4 +236,125 @@ describe("POST /api/auth/login", () => {
     expect(response.status).toBe(200);
     expect(data.user.role).toBe("ADMIN");
   });
+
+  it("includes valid redirect URL in response when provided", async () => {
+    const mockUser = {
+      id: "user-123",
+      username: "testuser",
+      passwordHash: "hashed-password",
+      disabled: false,
+      mustChangePassword: false,
+      role: "USER",
+    };
+
+    mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
+    mockVerifyPassword.mockResolvedValueOnce(true);
+    mockSignCookieValue.mockReturnValueOnce({ signed: "signed-cookie-value" });
+
+    const request = new NextRequest("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password",
+        redirect: "/admin/dashboard",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.redirect).toBe("/admin/dashboard");
+  });
+
+  it("rejects open redirect attempts with absolute URLs", async () => {
+    const mockUser = {
+      id: "user-123",
+      username: "testuser",
+      passwordHash: "hashed-password",
+      disabled: false,
+      mustChangePassword: false,
+      role: "USER",
+    };
+
+    mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
+    mockVerifyPassword.mockResolvedValueOnce(true);
+    mockSignCookieValue.mockReturnValueOnce({ signed: "signed-cookie-value" });
+
+    const request = new NextRequest("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password",
+        redirect: "https://evil.com/phish",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    // Should NOT include redirect for absolute URLs
+    expect(data.redirect).toBeUndefined();
+  });
+
+  it("rejects open redirect attempts with protocol-relative URLs", async () => {
+    const mockUser = {
+      id: "user-123",
+      username: "testuser",
+      passwordHash: "hashed-password",
+      disabled: false,
+      mustChangePassword: false,
+      role: "USER",
+    };
+
+    mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
+    mockVerifyPassword.mockResolvedValueOnce(true);
+    mockSignCookieValue.mockReturnValueOnce({ signed: "signed-cookie-value" });
+
+    const request = new NextRequest("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password",
+        redirect: "//evil.com/phish",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    // Should NOT include redirect for protocol-relative URLs
+    expect(data.redirect).toBeUndefined();
+  });
+
+  it("omits redirect from response when not provided", async () => {
+    const mockUser = {
+      id: "user-123",
+      username: "testuser",
+      passwordHash: "hashed-password",
+      disabled: false,
+      mustChangePassword: false,
+      role: "USER",
+    };
+
+    mockPrismaFindFirst.mockResolvedValueOnce(mockUser);
+    mockVerifyPassword.mockResolvedValueOnce(true);
+    mockSignCookieValue.mockReturnValueOnce({ signed: "signed-cookie-value" });
+
+    const request = new NextRequest("http://localhost:3000/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({
+        email: "test@example.com",
+        password: "password",
+      }),
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.redirect).toBeUndefined();
+  });
 });

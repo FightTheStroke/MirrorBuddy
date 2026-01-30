@@ -29,6 +29,19 @@ const IGNORE_ERRORS = [
 ];
 
 test.describe("Navigation and Button Functionality", () => {
+  test.beforeEach(async ({ page }) => {
+    // Mock ToS acceptance to bypass modal
+    await page.route("/api/tos", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          accepted: true,
+          version: "1.0",
+        }),
+      });
+    });
+  });
   test.describe("Welcome Page", () => {
     test("welcome page loads and displays buttons", async ({ page }) => {
       await page.goto("/welcome");

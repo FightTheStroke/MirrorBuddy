@@ -457,6 +457,16 @@ jobs:
         env:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
 
+      - name: Pre-deploy validation (DSN, tokens, env vars)
+        run: npx tsx scripts/validate-pre-deploy.ts
+        env:
+          NEXT_PUBLIC_SENTRY_DSN: ${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+
   # Lane 5b: SMOKE TESTS - Critical Path Validation (BLOCKING)
   # Runs on EVERY PR - fast, high-value tests that catch regressions
   # Must pass before any merge to main

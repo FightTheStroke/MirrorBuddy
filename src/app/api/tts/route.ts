@@ -8,19 +8,20 @@
  * @module api/tts
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from "next/server";
 import {
   checkRateLimit,
   getClientIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
-} from '@/lib/rate-limit';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { requireCSRF } from '@/lib/security/csrf';
+} from "@/lib/rate-limit";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import * as Sentry from "@sentry/nextjs";
 
 // OpenAI TTS voices
-type TTSVoice = 'alloy' | 'echo' | 'fable' | 'onyx' | 'nova' | 'shimmer';
+type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
 
 interface TTSRequest {
   text: string;
@@ -30,19 +31,19 @@ interface TTSRequest {
 /**
  * Check which TTS provider is configured
  */
-function getTTSProvider(): 'azure' | 'openai' | null {
+function getTTSProvider(): "azure" | "openai" | null {
   // Check for Azure OpenAI TTS deployment
   if (
     process.env.AZURE_OPENAI_ENDPOINT &&
     process.env.AZURE_OPENAI_API_KEY &&
     process.env.AZURE_OPENAI_TTS_DEPLOYMENT
   ) {
-    return 'azure';
+    return "azure";
   }
 
   // Check for direct OpenAI API
   if (process.env.OPENAI_API_KEY) {
-    return 'openai';
+    return "openai";
   }
 
   return null;
@@ -51,32 +52,39 @@ function getTTSProvider(): 'azure' | 'openai' | null {
 /**
  * Generate speech using Azure OpenAI TTS
  */
-async function generateAzureTTS(text: string, voice: TTSVoice): Promise<ArrayBuffer> {
+async function generateAzureTTS(
+  text: string,
+  voice: TTSVoice,
+): Promise<ArrayBuffer> {
   const endpoint = process.env.AZURE_OPENAI_ENDPOINT!;
   const apiKey = process.env.AZURE_OPENAI_API_KEY!;
-  const apiVersion = process.env.AZURE_OPENAI_API_VERSION || '2024-08-01-preview';
+  const apiVersion =
+    process.env.AZURE_OPENAI_API_VERSION || "2024-08-01-preview";
   const deployment = process.env.AZURE_OPENAI_TTS_DEPLOYMENT!;
 
   const url = `${endpoint}/openai/deployments/${deployment}/audio/speech?api-version=${apiVersion}`;
 
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'api-key': apiKey,
-      'Content-Type': 'application/json',
+      "api-key": apiKey,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
       model: deployment,
       input: text,
       voice: voice,
-      response_format: 'mp3',
+      response_format: "mp3",
       speed: 1.0,
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[TTS] Azure API error', { status: response.status, errorMessage: errorText });
+    logger.error("[TTS] Azure API error", {
+      status: response.status,
+      errorMessage: errorText,
+    });
     throw new Error(`Azure TTS failed: ${response.status}`);
   }
 
@@ -86,27 +94,33 @@ async function generateAzureTTS(text: string, voice: TTSVoice): Promise<ArrayBuf
 /**
  * Generate speech using direct OpenAI API
  */
-async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBuffer> {
+async function generateOpenAITTS(
+  text: string,
+  voice: TTSVoice,
+): Promise<ArrayBuffer> {
   const apiKey = process.env.OPENAI_API_KEY!;
 
-  const response = await fetch('https://api.openai.com/v1/audio/speech', {
-    method: 'POST',
+  const response = await fetch("https://api.openai.com/v1/audio/speech", {
+    method: "POST",
     headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: 'tts-1',
+      model: "tts-1",
       input: text,
       voice: voice,
-      response_format: 'mp3',
+      response_format: "mp3",
       speed: 1.0,
     }),
   });
 
   if (!response.ok) {
     const errorText = await response.text();
-    logger.error('[TTS] OpenAI API error', { status: response.status, errorMessage: errorText });
+    logger.error("[TTS] OpenAI API error", {
+      status: response.status,
+      errorMessage: errorText,
+    });
     throw new Error(`OpenAI TTS failed: ${response.status}`);
   }
 
@@ -122,7 +136,7 @@ async function generateOpenAITTS(text: string, voice: TTSVoice): Promise<ArrayBu
 export async function POST(request: NextRequest) {
   // CSRF validation (double-submit cookie pattern)
   if (!requireCSRF(request)) {
-    return NextResponse.json({ error: 'Invalid CSRF token' }, { status: 403 });
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
   // Rate limit check (before auth to prevent DDoS on auth lookup)
@@ -136,8 +150,8 @@ export async function POST(request: NextRequest) {
   const auth = await validateAuth();
   if (!auth.authenticated) {
     return NextResponse.json(
-      { error: 'Authentication required' },
-      { status: 401 }
+      { error: "Authentication required" },
+      { status: 401 },
     );
   }
 
@@ -146,32 +160,33 @@ export async function POST(request: NextRequest) {
 
     if (!provider) {
       return NextResponse.json(
-        { error: 'TTS not configured. Set OPENAI_API_KEY or AZURE_OPENAI_TTS_DEPLOYMENT', fallback: true },
-        { status: 503 }
+        {
+          error:
+            "TTS not configured. Set OPENAI_API_KEY or AZURE_OPENAI_TTS_DEPLOYMENT",
+          fallback: true,
+        },
+        { status: 503 },
       );
     }
 
     const body = (await request.json()) as TTSRequest;
-    const { text, voice = 'shimmer' } = body;
+    const { text, voice = "shimmer" } = body;
 
-    if (!text || typeof text !== 'string') {
-      return NextResponse.json(
-        { error: 'Text is required' },
-        { status: 400 }
-      );
+    if (!text || typeof text !== "string") {
+      return NextResponse.json({ error: "Text is required" }, { status: 400 });
     }
 
     // Limit text length to prevent abuse
     if (text.length > 4096) {
       return NextResponse.json(
-        { error: 'Text too long (max 4096 characters)' },
-        { status: 400 }
+        { error: "Text too long (max 4096 characters)" },
+        { status: 400 },
       );
     }
 
     let audioData: ArrayBuffer;
 
-    if (provider === 'azure') {
+    if (provider === "azure") {
       audioData = await generateAzureTTS(text, voice);
     } else {
       audioData = await generateOpenAITTS(text, voice);
@@ -180,16 +195,21 @@ export async function POST(request: NextRequest) {
     return new NextResponse(audioData, {
       status: 200,
       headers: {
-        'Content-Type': 'audio/mpeg',
-        'Content-Length': audioData.byteLength.toString(),
-        'Cache-Control': 'public, max-age=3600', // Cache for 1 hour
+        "Content-Type": "audio/mpeg",
+        "Content-Length": audioData.byteLength.toString(),
+        "Cache-Control": "public, max-age=3600", // Cache for 1 hour
       },
     });
   } catch (error) {
-    logger.error('[TTS] Error', undefined, error);
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/tts" },
+    });
+
+    logger.error("[TTS] Error", undefined, error);
     return NextResponse.json(
-      { error: 'Internal server error', fallback: true },
-      { status: 500 }
+      { error: "Internal server error", fallback: true },
+      { status: 500 },
     );
   }
 }
@@ -205,6 +225,8 @@ export async function GET() {
   return NextResponse.json({
     available: provider !== null,
     provider: provider,
-    voices: provider ? ['alloy', 'echo', 'fable', 'onyx', 'nova', 'shimmer'] : [],
+    voices: provider
+      ? ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
+      : [],
   });
 }

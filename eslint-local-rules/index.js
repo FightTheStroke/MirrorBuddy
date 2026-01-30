@@ -6,6 +6,7 @@
  */
 
 import { noTodoWithoutIssue } from "./no-todo-without-issue.js";
+import { noMissingI18nKeys } from "./no-missing-i18n-keys.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -360,6 +361,7 @@ const localRules = {
     "no-hardcoded-italian": noHardcodedItalian,
     "no-i18n-in-providers": noI18nInProviders,
     "no-kebab-case-i18n-keys": noKebabCaseI18nKeys,
+    "no-missing-i18n-keys": noMissingI18nKeys,
     "prefer-validate-auth": preferValidateAuth,
     "no-todo-without-issue": noTodoWithoutIssue,
   },

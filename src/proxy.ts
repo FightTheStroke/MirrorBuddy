@@ -298,6 +298,19 @@ export default function proxy(request: NextRequest) {
   requestHeaders.set("x-locale-detected", detectedLocale);
 
   // ==========================================================================
+  // LOCALE-PREFIXED ADMIN REDIRECT
+  // Admin panel doesn't support locale prefixes. If someone accesses
+  // /it/admin, /en/admin, etc., redirect to /admin without locale prefix.
+  // ==========================================================================
+  if (localeFromPath) {
+    const pathWithoutLocale = pathname.replace(`/${localeFromPath}`, "") || "/";
+    if (pathWithoutLocale.startsWith(ADMIN_PREFIX)) {
+      const adminUrl = new URL(pathWithoutLocale, request.url);
+      return NextResponse.redirect(adminUrl);
+    }
+  }
+
+  // ==========================================================================
   // i18n ROUTING - Handle locale detection for localized pages ONLY
   // CRITICAL: Skip for /api, /admin, static files to prevent 307 redirects
   // ==========================================================================

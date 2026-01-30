@@ -31,5 +31,5 @@
     "**/*.mts",
     ".next/dev/dev/types/**/*.ts"
   ],
-  "exclude": ["node_modules", "MirrorBuddy-Memory", "e2e", "scripts"]
+  "exclude": ["node_modules", "MirrorBuddy-Memory", "e2e", "scripts", "feature"]
 }

@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
 import type { TypingProgress } from "@/types/tools";
+import * as Sentry from "@sentry/nextjs";
 
 export async function GET(request: NextRequest) {
   try {
@@ -39,6 +40,11 @@ export async function GET(request: NextRequest) {
       data: progress,
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/typing" },
+    });
+
     logger.error("Failed to get typing progress", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to get typing progress" },
@@ -73,6 +79,11 @@ export async function POST(request: NextRequest) {
       message: "Typing progress saved",
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/typing" },
+    });
+
     logger.error("Failed to save typing progress", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to save typing progress" },
@@ -116,6 +127,11 @@ export async function PATCH(request: NextRequest) {
       message: "Typing progress updated",
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/typing" },
+    });
+
     logger.error("Failed to update typing progress", { error: String(error) });
     return NextResponse.json(
       { error: "Failed to update typing progress" },

@@ -17,6 +17,7 @@
 
 import { NextResponse } from "next/server";
 import { CRITICAL_ASSETS, captureMessage } from "@/lib/sentry";
+import * as Sentry from "@sentry/nextjs";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -57,6 +58,11 @@ export async function GET(): Promise<NextResponse> {
           latencyMs: Date.now() - assetStart,
         });
       } catch (error) {
+        // Report error to Sentry for monitoring and alerts
+        Sentry.captureException(error, {
+          tags: { api: "/api/health/assets" },
+        });
+
         results.push({
           asset,
           status: "fail",

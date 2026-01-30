@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { verifyPassword } from "@/lib/auth/password";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
+import * as Sentry from "@sentry/nextjs";
 import {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
@@ -15,6 +16,18 @@ import {
 } from "@/lib/rate-limit";
 
 const log = logger.child({ module: "auth/login" });
+
+/**
+ * Validate redirect URL - must be relative (start with /) to prevent open redirect
+ */
+function isValidRedirectUrl(url: string | undefined): boolean {
+  if (!url) return false;
+  // Only allow relative URLs starting with /
+  // Prevent open redirects (e.g., https://evil.com, //evil.com, \/\/evil.com)
+  return (
+    typeof url === "string" && url.startsWith("/") && !url.startsWith("//")
+  );
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +42,7 @@ export async function POST(request: NextRequest) {
       return rateLimitResponse(rateLimitResult);
     }
 
-    const { username, email, password } = await request.json();
+    const { username, email, password, redirect } = await request.json();
 
     // Accept either email or username (email preferred)
     const identifier = email || username;
@@ -92,17 +105,21 @@ export async function POST(request: NextRequest) {
     const signed = signCookieValue(user.id);
     log.info("User logged in successfully", { userId: user.id });
 
-    const response = NextResponse.json(
-      {
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role,
-          mustChangePassword: user.mustChangePassword,
-        },
+    const responseData: Record<string, unknown> = {
+      user: {
+        id: user.id,
+        username: user.username,
+        role: user.role,
+        mustChangePassword: user.mustChangePassword,
       },
-      { status: 200 },
-    );
+    };
+
+    // Include redirect in response if it's valid (relative URL starting with /)
+    if (isValidRedirectUrl(redirect)) {
+      responseData.redirect = redirect;
+    }
+
+    const response = NextResponse.json(responseData, { status: 200 });
 
     // Server-side auth cookie (httpOnly, signed)
     response.cookies.set(AUTH_COOKIE_NAME, signed.signed, {
@@ -124,6 +141,11 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/auth/login" },
+    });
+
     log.error("Login error", { error: String(error) });
     return NextResponse.json(
       { error: "Authentication failed" },

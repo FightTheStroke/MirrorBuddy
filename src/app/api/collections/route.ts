@@ -11,6 +11,7 @@ import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { CreateCollectionSchema } from "@/lib/validation/schemas/organization";
 import { requireCSRF } from "@/lib/security/csrf";
+import * as Sentry from "@sentry/nextjs";
 
 /**
  * GET /api/collections
@@ -85,6 +86,11 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/collections" },
+    });
+
     logger.error("Collections GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
@@ -176,6 +182,11 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(collection, { status: 201 });
   } catch (error) {
+    // Report error to Sentry for monitoring and alerts
+    Sentry.captureException(error, {
+      tags: { api: "/api/collections" },
+    });
+
     logger.error("Collections POST error", { error: String(error) });
 
     // Handle unique constraint violation

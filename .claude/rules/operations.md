@@ -87,6 +87,29 @@ curl http://localhost:3000/api/health/detailed
 curl http://localhost:3000/api/metrics
 ```
 
+## Sentry Error Tracking
+
+**DSN Configuration** (required for all environments):
+
+```bash
+SENTRY_DSN=https://xxxxx@o123456.ingest.sentry.io/123456
+SENTRY_ENVIRONMENT=production  # or staging, development
+```
+
+**Validation**:
+
+- **Non-empty**: If empty, Sentry is disabled (no errors captured)
+- **Format**: Must start with `https://` and contain `@o` marker
+- **Environment mismatch**: DSN and SENTRY_ENVIRONMENT must align (e.g., prod DSN in staging = data pollution)
+
+**Common issues**:
+
+- Empty DSN in Vercel → no error tracking in production
+- Staging DSN used in production → errors sent to wrong project
+- Always verify: `echo $SENTRY_DSN | grep -q '@o'` returns 0
+
+**Test locally**: `curl http://localhost:3000/api/health/detailed | grep sentry`
+
 ## ADR References
 
 - ADR 0037: Deferred production items (auth, Redis, IaC)

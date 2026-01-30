@@ -841,6 +841,12 @@
       "section4": {
         "title": "Wie wir deine Daten nutzen",
         "intro": "Wir nutzen deine Daten nur für diese legitimen Zwecke:",
+        "itemLabels": {
+          "appFunctionality": "App-Funktionalität",
+          "personalization": "Personalisierung",
+          "improvement": "Verbesserung",
+          "support": "Unterstützung"
+        },
         "items": {
           "appFunctionality": "Laden deine Unterhaltungen, Lernkarten und Fortschritt",
           "personalization": "Passe die Maestri an deine Interessen und Lernstände an",
@@ -866,6 +872,11 @@
       "section6": {
         "title": "Wer kann auf deine Daten zugreifen",
         "intro": "Deine persönlichen Daten sind zugänglich für:",
+        "itemLabels": {
+          "you": "Du",
+          "parents": "Eltern",
+          "team": "MirrorBuddy-Team"
+        },
         "items": {
           "you": "Du hast immer die vollständige Kontrolle über deine Daten und kannst sie herunterladen, ändern oder löschen",
           "parents": "Deine Eltern können deinen Fortschritt über das Eltern-Dashboard überwachen (wenn du Minderjährig bist)",
@@ -1056,6 +1067,62 @@
           }
         },
         "closing": "Wir schätzen dein Vertrauen in den Schutz deiner Privatsphäre und bleiben für alle Fragen verfügbar, die du haben könntest."
+      },
+      "section16": {
+        "title": "16. Künstliche-Intelligenz-Systeme und Benutzerrechte",
+        "aiSystemsHeading": "Verwendete KI-Systeme",
+        "aiSystems": "MirrorBuddy nutzt Künstliche-Intelligenz-Systeme, um dein Lernererlebnis zu personalisieren. Alle unsere KI-Systeme sind transparent, kontrollierbar und mit integrierter menschlicher Aufsicht konzipiert. Wir treffen keine automatisierten Entscheidungen, die deine Ausbildung erheblich beeinflussen, ohne menschliche Überprüfung.",
+        "aiDataHeading": "Welche Daten Wir mit KI Verarbeiten",
+        "aiDataIntro": "Die folgenden personenbezogenen Daten werden von unseren KI-Systemen verarbeitet:",
+        "aiDataItemLabels": {
+          "messages": "Gesprächsnachrichten",
+          "context": "Lernkontext",
+          "profile": "Lernprofil"
+        },
+        "aiDataItems": {
+          "messages": "Deine Gespräche mit Lehrern werden analysiert, um den Ton und die Schwierigkeitsstufe zu personalisieren",
+          "context": "Deine Klassenstufe, deine Interessensfächer und dein Lernstil werden verwendet, um Inhalte anzupassen",
+          "profile": "Deine Fortschrittsdaten (Lernkarten, Quizze, Übungen) werden verwendet, um das nächste Lernthema zu empfehlen"
+        },
+        "notProcessed": "Deine sensiblen Informationen (Gesundheitsdaten, Standort, biometrische Informationen) werden niemals mit KI verarbeitet, auch wenn sie freiwillig geteilt werden.",
+        "aiDecisionsHeading": "Wie Wir mit KI Entscheidungen Treffen",
+        "aiDecisions": "KI-basierte Entscheidungen beeinflussen dein Lernererlebnis auf diese Weisen:",
+        "aiDecisionsItems": {
+          "access": "Lehrerzugang: KI empfiehlt, welche Lehrer dir basierend auf deinen Interessen am meisten helfen könnten",
+          "benefits": "Lernvorteile: KI identifiziert deine Stärken und Bereiche, in denen du möglicherweise zusätzliche Unterstützung benötigst",
+          "education": "Lernpfad: KI schlägt vor, welches Thema du als nächstes lernen solltest, um die Merkfähigkeit zu optimieren"
+        },
+        "aiDecisionsNote": "Hinweis: Keine dieser Entscheidungen ist endgültig ohne menschliches Eingreifen. Eltern und Lehrer können KI-Vorschläge jederzeit außer Kraft setzen.",
+        "aiRightsHeading": "Deine Rechte bei KI-basierten Entscheidungen",
+        "aiRightsIntro": "Gemäß dem EU-Kunstgesetz hast du folgende Rechte in Bezug auf automatisierte Entscheidungen:",
+        "aiRightsItemLabels": {
+          "humanReview": "Recht auf menschliche Überprüfung",
+          "feedback": "Recht auf Rückmeldung",
+          "transparency": "Recht auf Transparenz",
+          "oppose": "Widerspruchsrecht"
+        },
+        "aiRightsItems": {
+          "humanReview": "Du kannst anfordern, dass eine Person (Lehrer oder Elternteil) eine KI-basierte Entscheidung überprüft",
+          "feedback": "Du kannst Rückmeldungen dazu geben, wie KI dein Lernen beeinflusst hat, und wir werden dieses Feedback verwenden, um zu verbessern",
+          "transparency": "Du kannst eine Erklärung anfordern, wie und warum KI eine bestimmte Entscheidung über dein Lernen getroffen hat",
+          "oppose": "Du kannst dich jederzeit der Verarbeitung deiner Daten mit KI-Systemen widersetzen"
+        },
+        "transparencyHeading": "Wie Wir Transparent Bleiben",
+        "transparencyIntro": "Wir implementieren diese Maßnahmen, um in Bezug auf unsere KI-Systeme transparent zu bleiben:",
+        "transparencyItemLabels": {
+          "review": "Regelmäßige Überprüfung",
+          "monitoring": "Qualitätsüberwachung",
+          "reporting": "Öffentliche Berichte",
+          "retention": "Datenspeicherung"
+        },
+        "transparencyItems": {
+          "review": "Wir überprüfen unsere KI-Systeme vierteljährlich, um sicherzustellen, dass sie korrekt und fair für alle Schüler funktionieren",
+          "monitoring": "Wir überwachen kontinuierlich KI-Ergebnisse, um Vorurteile oder Fehler zu erkennen und zu korrigieren",
+          "reporting": "Wir veröffentlichen vierteljährliche Berichte zu unserem Modellkarte, die beschreiben, wie unsere KI-Systeme funktionieren",
+          "retention": "Wir behalten Protokolle von KI-Entscheidungen 90 Tage lang zur Überprüfung und Verbesserung und löschen sie dann"
+        },
+        "learnMoreHeading": "Möchtest du Mehr Erfahren?",
+        "learnMoreText": "für vollständige Informationen über unsere KI-Architektur, Bias-Tests und wie wir Gesprächsdaten verwenden."
       }
     },
     "terms": {
