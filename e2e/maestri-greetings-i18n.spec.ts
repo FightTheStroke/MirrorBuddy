@@ -23,6 +23,10 @@
 import { test, expect, testAllLocales } from "./fixtures";
 import type { Locale } from "@/i18n/config";
 
+// IMPORTANT: These tests check authenticated pages but need fresh state for API calls
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 /**
  * Setup function to bypass ToS modal
  */

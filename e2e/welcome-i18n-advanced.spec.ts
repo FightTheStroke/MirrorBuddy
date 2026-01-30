@@ -14,6 +14,10 @@ import { test, expect, testAllLocales } from "./fixtures";
 import { verifyPageLocale, waitForLocale } from "./fixtures";
 import type { Locale } from "@/i18n/config";
 
+// IMPORTANT: These tests check unauthenticated /welcome page
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Welcome Flow - Advanced i18n Tests", () => {
   /**
    * Test 1: Accept-Language header influences initial locale

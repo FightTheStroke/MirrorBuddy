@@ -14,6 +14,10 @@
 
 import { test, expect } from "@playwright/test";
 
+// IMPORTANT: These tests check unauthenticated /welcome page
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Welcome Page Language Switcher - F-69", () => {
   test.beforeEach(async ({ page }) => {
     // Clear cookies to start fresh

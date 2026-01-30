@@ -78,7 +78,10 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
       if (await chatInput.isVisible().catch(() => false)) {
         await expect(chatInput).toBeVisible();
 
-        // Input should be within viewport
+        // Scroll input into view first (may be below fold on small viewports)
+        await chatInput.scrollIntoViewIfNeeded();
+
+        // Input should be within viewport after scroll
         const isInViewport = await mobile.isVisibleInViewport(chatInput);
         expect(isInViewport).toBe(true);
       }

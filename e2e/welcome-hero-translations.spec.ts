@@ -18,6 +18,10 @@
 
 import { test, expect, testAllLocales } from "./fixtures";
 
+// IMPORTANT: These tests check unauthenticated /welcome page
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 const EXPECTED_TRANSLATIONS = {
   it: {
     betaBadge: "Beta Privata",

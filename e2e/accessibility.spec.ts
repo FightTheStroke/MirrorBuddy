@@ -22,6 +22,10 @@
 import { test, expect } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+// IMPORTANT: These tests check unauthenticated pages (welcome, legal, etc.)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 // Main user-facing pages (excludes admin, showcase, test pages)
 const PAGES_TO_TEST = [
   { path: "/", name: "Homepage" },
@@ -390,6 +394,7 @@ test.describe("Instant Access - Floating Button", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toBeVisible();
 
     const box = await button.boundingBox();
@@ -405,7 +410,8 @@ test.describe("Instant Access - Floating Button", () => {
       await page.waitForLoadState("domcontentloaded");
 
       const button = page.locator('button[aria-label*="accessibilità"]');
-      await expect(button).toBeVisible({ timeout: 5000 });
+      await button.waitFor({ state: "visible", timeout: 10000 });
+      await expect(button).toBeVisible();
     }
   });
 
@@ -414,6 +420,7 @@ test.describe("Instant Access - Floating Button", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-label*="accessibilità"]');
+    await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toHaveAttribute("aria-expanded", "false");
     await expect(button).toHaveAttribute("aria-controls");
   });

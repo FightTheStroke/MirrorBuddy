@@ -25,6 +25,10 @@ import {
 } from "./fixtures";
 import type { Locale } from "@/i18n/config";
 
+// IMPORTANT: These tests check unauthenticated /welcome page
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Welcome Flow - Internationalization (i18n)", () => {
   /**
    * Test 1: Welcome page loads in all 5 languages

@@ -18,6 +18,10 @@
 
 import { test, expect } from "../fixtures/auth-fixtures";
 
+// IMPORTANT: These tests check unauthenticated /welcome page with trial consent gate
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Trial Consent Gate - GDPR Compliance", () => {
   test("blocks trial without consent on /welcome page", async ({
     trialPage,

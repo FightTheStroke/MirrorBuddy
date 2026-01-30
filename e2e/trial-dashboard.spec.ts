@@ -16,6 +16,10 @@
 
 import { test, expect } from "./fixtures/auth-fixtures";
 
+// IMPORTANT: These tests check trial mode (unauthenticated)
+// Override global storageState to start without authentication
+test.use({ storageState: undefined });
+
 test.describe("Trial Mode - Header Dropdown (F-05)", () => {
   // Set viewport to large screen size
   test.use({ viewport: { width: 1920, height: 1080 } });
