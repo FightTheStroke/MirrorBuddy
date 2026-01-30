@@ -16,6 +16,8 @@ npm run lint         # ESLint
 npm run typecheck    # TypeScript
 npm run test         # Playwright E2E
 npm run test:unit    # Vitest unit tests
+npm run ci:summary   # PREFERRED: compact lint+typecheck+build (token-efficient)
+npm run ci:summary:full # Same + unit tests
 npm run release:fast # Fast gate: lint+typecheck+unit+smoke(+build)
 npm run pre-push     # Vercel simulation - AUTO on git push
 npm run release:gate # Full 10/10 release gate
@@ -149,9 +151,23 @@ Before modifying: run `npm run test:unit -- csp-validation`. Scripts need `nonce
 
 ## Verification
 
+**Token-efficient (PREFERRED for Claude sessions):**
+
+```bash
+npm run ci:summary        # lint+typecheck+build, ~20 lines output
+npm run ci:summary:full   # same + unit tests
+./scripts/ci-summary.sh --lint   # single step
+./scripts/ci-summary.sh --types  # single step
+./scripts/ci-summary.sh --i18n   # i18n only
+```
+
+**Full verbose (use only when summary is insufficient):**
+
 ```bash
 npm run lint && npm run typecheck && npm run build && npm run test
 ```
+
+**RULE: Always use `npm run ci:summary` first. Only fall back to verbose commands if the summary output is unclear.**
 
 ## Closure Protocol
 

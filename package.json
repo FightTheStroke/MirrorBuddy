@@ -54,6 +54,8 @@
     "release:gate": "./scripts/release-gate.sh",
     "release:fast": "./scripts/release-fast.sh",
     "release:brutal": "./scripts/release-brutal.sh",
+    "ci:summary": "./scripts/ci-summary.sh",
+    "ci:summary:full": "./scripts/ci-summary.sh --full",
     "build:analyze": "ANALYZE=true npm run build",
     "check:bundle": "tsx scripts/check-bundle-size.ts",
     "i18n:check": "npx tsx scripts/i18n-check.ts",
