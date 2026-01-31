@@ -1,43 +1,36 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - L'École que je veux",
+    "appTitle": "MirrorBuddy",
     "loading": "Chargement...",
-    "seasonDefault": "Automne",
+    "seasonDefault": "Saison actuelle",
     "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Professeurs",
-      "astuccio": "Trousse",
-      "zaino": "Sac à dos",
-      "calendar": "Calendrier",
-      "progress": "Progrès",
-      "settings": "Paramètres",
-      "features": "Fonctionnalités",
-      "pricing": "Tarifs",
-      "about": "À propos",
-      "contact": "Contact",
-      "login": "Se connecter",
-      "signup": "S'inscrire",
-      "dashboard": "Tableau de bord",
-      "logout": "Se déconnecter"
+      "astuccio": "[TRANSLATE] Astuccio",
+      "zaino": "[TRANSLATE] Zaino",
+      "calendar": "[TRANSLATE] Calendario",
+      "progress": "[TRANSLATE] Progresso",
+      "settings": "[TRANSLATE] Impostazioni"
     },
     "header": {
       "openMenu": "Ouvrir le menu",
+      "mirrorBucksShort": "MB",
       "streak": "Série",
       "sessionsThisWeek": "Sessions cette semaine",
       "studyTime": "Temps d'étude",
       "questionsAsked": "Questions posées",
-      "trial": "Essai",
-      "trialClickToRequest": "Cliquez pour demander l'accès complet"
+      "trialClickToRequest": "Cliquez pour demander l'accès",
+      "trial": "Essai"
     },
     "sidebar": {
       "backToHome": "Retour à l'accueil",
       "appName": "MirrorBuddy",
       "closeMenu": "Fermer le menu",
-      "trialMode": "Mode Essai",
+      "trialMode": "Mode essai",
       "login": "Se connecter",
       "requestAccess": "Demander l'accès",
+      "adminDashboardAria": "Aller au tableau de bord d'administration",
       "adminDashboard": "Tableau de bord Admin",
-      "adminDashboardAria": "Tableau de bord administrateur",
       "parentArea": "Espace Parents"
     },
     "adminDashboard": "Tableau de bord Admin",
@@ -56,32 +49,5 @@
       "cta": "Commencer maintenant",
       "secondaryCta": "En savoir plus"
     }
-  },
-  "appTitle": "MirrorBuddy",
-  "loading": "Chargement...",
-  "seasonDefault": "Saison actuelle",
-  "header": {
-    "openMenu": "Ouvrir le menu",
-    "mirrorBucksShort": "MB",
-    "streak": "Série",
-    "sessionsThisWeek": "Sessions cette semaine",
-    "studyTime": "Temps d'étude",
-    "questionsAsked": "Questions posées",
-    "trialClickToRequest": "Cliquez pour demander l'accès",
-    "trial": "Essai"
-  },
-  "sidebar": {
-    "backToHome": "Retour à l'accueil",
-    "appName": "MirrorBuddy",
-    "closeMenu": "Fermer le menu",
-    "trialMode": "Mode essai",
-    "login": "Se connecter",
-    "requestAccess": "Demander l'accès",
-    "adminDashboardAria": "Aller au tableau de bord d'administration",
-    "adminDashboard": "Tableau de bord Admin",
-    "parentArea": "Espace Parents"
-  },
-  "navigation": {
-    "professors": "Professeurs"
   }
 }

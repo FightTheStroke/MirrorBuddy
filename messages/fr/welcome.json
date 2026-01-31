@@ -6,88 +6,84 @@
     },
     "hero": {
       "betaBadge": "Bêta Privée",
-      "betaSubtitle": "MirrorBuddy v0.10",
-      "primaryHeadline": "Il ne fait pas tes devoirs à ta place. Il t'aide à comprendre comment les faire.",
-      "primarySubtitle": "MirrorBuddy est un compagnon d'apprentissage conçu pour soutenir l'étude et la pensée critique, pas pour les remplacer.",
+      "betaSubtitle": "Sur invitation uniquement",
       "welcomeBack": "Bon retour,",
-      "welcomeBackSubtitle": "Qu'allons-nous apprendre de nouveau aujourd'hui ?",
-      "welcomeNew": "Bienvenue sur MirrorBuddy",
-      "tagline": "Ton école sur mesure, avec les maîtres de l'histoire",
-      "taglineWith": "avec les Grands Professeurs",
-      "taglineAbilities": "quelles que soient vos capacités",
-      "description": "Étudie les mathématiques <strong>avec Euclide</strong>, la physique <strong>avec Feynman</strong>, la chimie <strong>avec Marie Curie</strong>. 26 Professeurs historiques t'accompagnent personnellement.",
+      "welcomeBackSubtitle": "Prêt pour ta prochaine aventure d'apprentissage ?",
+      "welcomeNew": "Bienvenue sur",
+      "tagline": "Apprends",
+      "taglineWith": "AVEC les Grands Maîtres",
+      "taglineAbilities": "quelles que soient tes capacités",
+      "description": "Étudie avec 22 Professeurs historiques. Accès vocal. Support complet pour la dyslexie, le TDAH et autres styles d'apprentissage.",
       "accessibility": {
-        "title": "Une accessibilité sur mesure pour toi",
-        "introLine1": "Chaque personne apprend différemment.",
-        "introLine2": "MirrorBuddy s'adapte — il ne contraint pas.",
-        "readableFonts": "Polices lisibles",
-        "mindMaps": "Cartes mentales",
-        "textToSpeech": "Synthèse vocale",
-        "adaptiveQuizzes": "Quiz adaptatifs"
+        "title": "Conçu pour TOUS les styles d'apprentissage",
+        "subtitle": "Support dédié pour les difficultés d'apprentissage",
+        "introLine1": "[TRANSLATE] Accessibile",
+        "introLine2": "[TRANSLATE] per tutti"
       },
-      "adaptiveQuizzes": "Quiz adaptatifs",
-      "anyAbility": "quelles que soient tes capacités",
-      "learn": "Apprendre",
-      "mindMaps": "Cartes mentales",
-      "readableFonts": "Polices lisibles",
-      "textToSpeech": "Synthèse vocale",
-      "welcome": "Bienvenue sur",
-      "withTeachers": "avec les Grands Professeurs"
+      "primaryHeadline": "[TRANSLATE] Impara con l IA",
+      "primarySubtitle": "[TRANSLATE] Maestri virtuali per il tuo successo",
+      "readableFonts": "[TRANSLATE] Font leggibili",
+      "mindMaps": "[TRANSLATE] Mappe mentali",
+      "textToSpeech": "[TRANSLATE] Text-to-speech",
+      "adaptiveQuizzes": "[TRANSLATE] Quiz adattivi",
+      "welcome": "[TRANSLATE] Benvenuto",
+      "learn": "[TRANSLATE] Impara",
+      "withTeachers": "[TRANSLATE] con Maestri virtuali",
+      "anyAbility": "[TRANSLATE] per ogni abilità"
     },
     "quickStart": {
-      "heading": "Commencer",
+      "heading": "Commence ton parcours",
       "returningUser": {
         "goToApp": "Aller à l'application",
         "updateProfile": "Mettre à jour le profil"
       },
       "betaAccess": {
         "badge": "ACCÈS COMPLET",
-        "title": "Vous avez un compte ?",
-        "feature1": "26 Professeurs IA",
+        "title": "Tu as un compte ?",
+        "feature1": "22 Professeurs IA",
         "feature2": "Tous les outils",
         "feature3": "Progrès sauvegardés",
         "cta": "Se connecter"
       },
       "trial": {
         "badge": "ESSAI GRATUIT",
-        "title": "Explorez maintenant",
+        "title": "Explore maintenant",
         "feature1": "3 Professeurs",
-        "feature2": "10 messages",
-        "feature3": "Sans inscription",
-        "cta": "Essayer gratuitement"
+        "feature2": "10 messages/jour",
+        "feature3": "Aucune inscription",
+        "cta": "Essaie gratuitement"
       },
-      "login": "Se connecter",
-      "updateProfile": "Mettre à jour le profil"
+      "updateProfile": "[TRANSLATE] Aggiorna profilo",
+      "login": "[TRANSLATE] Accedi"
     },
     "tierComparison": {
-      "heading": "Choisissez le forfait parfait pour vous",
-      "subtitle": "Commencez avec un essai gratuit ou inscrivez-vous pour débloquer plus de fonctionnalités",
-      "footer": "Tous les forfaits incluent l'accès à 26 Professeurs IA et des outils d'apprentissage personnalisés",
+      "heading": "Choisis le plan parfait pour toi",
+      "subtitle": "Commence avec un essai gratuit ou inscris-toi pour débloquer plus de fonctionnalités",
       "tiers": {
         "trial": {
           "name": "Essai",
-          "tagline": "Explorez sans engagement",
+          "tagline": "Explore sans engagement",
           "price": "Gratuit",
           "features": {
             "maestri": "3 Professeurs",
             "messages": "10 messages/jour",
-            "voice": "5 minutes voix/jour",
-            "noRegistration": "Sans inscription"
+            "voice": "5 minutes de voix/jour",
+            "noRegistration": "Aucune inscription"
           },
-          "cta": "Essayer gratuitement"
+          "cta": "Essaie gratuitement"
         },
         "base": {
           "name": "Base",
-          "tagline": "Pour les étudiants inscrits",
+          "tagline": "Pour les élèves inscrits",
           "price": "Gratuit",
-          "badge": "Recommandé",
           "features": {
-            "maestri": "10 Professeurs",
-            "messages": "30 messages/jour",
-            "voice": "15 minutes voix/jour",
+            "maestri": "20 Professeurs",
+            "messages": "Messages illimités",
+            "voice": "Voix illimitée",
             "savedProgress": "Progrès sauvegardés"
           },
-          "cta": "S'inscrire"
+          "cta": "Inscris-toi",
+          "badge": "[TRANSLATE] Popolare"
         },
         "pro": {
           "name": "Pro",
@@ -95,7 +91,7 @@
           "price": "Sur demande",
           "badge": "Recommandé",
           "features": {
-            "maestri": "26 Professeurs",
+            "maestri": "22 Professeurs",
             "messagesUnlimited": "Messages illimités",
             "voiceUnlimited": "Voix illimitée",
             "allTools": "Tous les outils"
@@ -105,10 +101,10 @@
         "schools": {
           "name": "Écoles",
           "tagline": "Pour les établissements scolaires",
-          "price": "Personnalisé",
+          "price": "Sur demande",
           "badge": "Pour les Écoles",
           "features": {
-            "curriculum": "Personnalisation du programme",
+            "curriculum": "Programme personnalisé",
             "classManagement": "Gestion des classes",
             "teacherReports": "Rapports enseignants",
             "dedicatedSupport": "Support dédié"
@@ -117,29 +113,31 @@
         },
         "enterprise": {
           "name": "Enterprise",
-          "tagline": "Pour les entreprises et organisations",
-          "price": "Personnalisé",
+          "tagline": "Pour les grandes organisations",
+          "price": "Sur demande",
+          "badge": "Enterprise",
           "features": {
             "customThemes": "Thèmes personnalisés (Leadership, IA, Soft Skills)",
             "customBranding": "Branding personnalisé",
-            "advancedAnalytics": "Analytics avancées",
-            "accountManager": "Account manager dédié"
+            "advancedAnalytics": "Analyses avancées",
+            "accountManager": "Responsable de compte dédié"
           },
           "cta": "Contactez-nous"
         }
       },
-      "footerNote": "Note de bas de page",
-      "subheading": "Sous-titre",
-      "accessIntroLine1": "Tu peux commencer sans t'inscrire.",
-      "accessIntroLine2": "Aucune pression. Aucun jugement.",
       "organizationsHeading": "Solutions pour votre organisation",
-      "organizationsSubtitle": "Personnalisation complète pour écoles et entreprises",
-      "organizationsFooter": "Contactez-nous pour un conseil personnalisé et un devis sur mesure",
+      "organizationsSubtitle": "Personnalisation complète pour les écoles et les entreprises",
+      "accessIntroLine1": "[TRANSLATE] Accedi rapidamente:",
+      "accessIntroLine2": "[TRANSLATE] Nessuna registrazione richiesta",
+      "organizationsFooter": "[TRANSLATE] Contattaci per un piano aziendale",
+      "footer": "[TRANSLATE] Termini e condizioni",
       "toggle": {
-        "individuals": "Étudiants & Familles",
+        "students": "[TRANSLATE] Studenti",
         "organizations": "Écoles & Entreprises",
+        "individuals": "Étudiants & Familles",
         "ariaLabel": "Basculer entre étudiants et organisations"
-      }
+      },
+      "footerNote": "[TRANSLATE] Termini e condizioni applicabili"
     },
     "maestri": {
       "heading": "Vos",
@@ -155,124 +153,103 @@
       "educationalDisclaimer": "Les professeurs IA sont des outils éducatifs inspirés de figures historiques. Ils ne remplacent pas les vrais enseignants."
     },
     "support": {
-      "heading": "Toujours à vos",
-      "headingHighlight": "côtés",
-      "subtitle": "Des Coachs pour les méthodes d'étude et des Amis pour le soutien émotionnel",
-      "carouselLabel": "Carrousel des coachs et amis - utilisez les flèches pour naviguer",
-      "scrollHint": "← Faites défiler pour voir tous →",
-      "scrollLeft": "Défiler à gauche",
-      "scrollRight": "Défiler à droite",
-      "coach": "Coach",
-      "buddy": "Ami",
-      "introLine1": "Des Coachs pour la méthode d'étude.",
-      "introLine2": "Des Amis pour le soutien émotionnel.",
-      "introDisclaimer": "Ils ne te disent pas quoi penser. Ils t'aident à trouver ta propre façon de le faire."
+      "heading": "Toujours à tes côtés",
+      "subtitle": "Coachs pour la méthode d'étude et Amis pour le soutien émotionnel",
+      "coach": "Coach - Ils t'enseignent la méthode d'étude",
+      "buddy": "Ami - Ils te soutiennent émotionnellement",
+      "scrollHint": "[TRANSLATE] Scorri per ulteriori informazioni",
+      "introLine1": "[TRANSLATE] Supporto",
+      "introLine2": "[TRANSLATE] sempre disponibile",
+      "introDisclaimer": "[TRANSLATE] Ti aiutiamo in ogni momento",
+      "scrollLeft": "[TRANSLATE] Scorri a sinistra",
+      "scrollRight": "[TRANSLATE] Scorri a destra",
+      "carouselLabel": "[TRANSLATE] Canali di supporto"
     },
     "features": {
-      "heading": "Des outils pour chaque style d'apprentissage",
-      "subtitle": "Une plateforme complète et accessible conçue pour vous",
-      "introLine1": "Chaque outil a un seul objectif :",
-      "introLine2": "rendre l'étude plus claire, étape par étape.",
-      "voiceConversation": {
-        "label": "Conversation Vocale",
-        "description": "Parlez avec vos Professeurs en temps réel"
-      },
-      "mindMaps": {
-        "label": "Cartes Mentales",
-        "description": "Visualisez et organisez les concepts"
-      },
-      "flashcards": {
-        "label": "Cartes Mémoire FSRS",
-        "description": "Mémorisez avec la répétition espacée"
-      },
-      "interactiveQuizzes": {
-        "label": "Quiz Interactifs",
-        "description": "Testez vos connaissances"
-      },
-      "gamification": {
-        "label": "Gamification",
-        "description": "Gagnez de l'XP et débloquez des succès"
-      },
-      "adaptiveLearning": {
-        "label": "Apprentissage Adaptatif",
-        "description": "S'adapte à votre style et rythme"
-      },
-      "totalAccessibility": {
-        "label": "Accessibilité Totale",
-        "description": "Conçu pour la dyslexie, le TDAH et tous"
-      },
-      "integratedPlatform": {
-        "label": "Plateforme Intégrée",
-        "description": "Tout en un seul endroit"
-      }
+      "heading": "Outils pour chaque style d'apprentissage",
+      "subtitle": "Une plateforme complète et accessible conçue pour toi",
+      "voiceConversation": "Conversation Vocale - Parle avec tes Professeurs en temps réel",
+      "mindMaps": "Cartes Mentales - Visualise et organise les concepts",
+      "flashcards": "Flashcards FSRS - Mémorise avec la répétition espacée",
+      "interactiveQuizzes": "Quiz Interactifs - Vérifie tes connaissances",
+      "gamification": "Gamification - Gagne de l'XP et débloque des objectifs",
+      "adaptiveLearning": "Apprentissage Adaptatif - S'adapte à ton style et ton rythme",
+      "introLine1": "[TRANSLATE] Strumenti potenti",
+      "introLine2": "[TRANSLATE] per il tuo apprendimento"
     },
     "compliance": {
-      "heading": "Conformité et",
-      "headingHighlight": "Transparence",
-      "subtitle": "La sécurité, la confidentialité et la transparence sont au cœur de MirrorBuddy",
-      "trustIntroLine1": "MirrorBuddy est né pour les étudiants et les familles.",
-      "trustIntroLine2": "C'est pourquoi la confiance, la sécurité et la transparence passent avant tout.",
+      "heading": "Conformité, confidentialité et transparence",
+      "subtitle": "MirrorBuddy adhère aux réglementations internationales",
       "items": {
         "gdpr": {
-          "label": "RGPD",
-          "description": "Protection et confidentialité des données UE"
+          "label": "[TRANSLATE] GDPR",
+          "description": "[TRANSLATE] Conformità GDPR garantita"
         },
         "aiAct": {
-          "label": "Loi IA de l'UE",
-          "description": "Conformité à la réglementation sur l'IA"
+          "label": "[TRANSLATE] EU AI Act",
+          "description": "[TRANSLATE] Conforme alla normativa IA"
         },
         "coppa": {
-          "label": "COPPA",
-          "description": "Protection en ligne des mineurs"
+          "label": "[TRANSLATE] COPPA",
+          "description": "[TRANSLATE] Protezione minori"
         },
         "aiTransparency": {
-          "label": "Transparence IA",
-          "description": "Politique de transparence sur l'IA"
+          "label": "[TRANSLATE] Trasparenza IA",
+          "description": "[TRANSLATE] IA trasparente e verificabile"
         },
         "openSource": {
-          "label": "Open Source",
-          "description": "Code ouvert sur GitHub"
+          "label": "[TRANSLATE] Open Source",
+          "description": "[TRANSLATE] Codice aperto e verificabile"
         },
         "apache": {
-          "label": "Apache 2.0",
-          "description": "Licence open source"
+          "label": "[TRANSLATE] Apache 2.0",
+          "description": "[TRANSLATE] Licenza Apache 2.0"
         }
       },
-      "footer": "MirrorBuddy est développé par la <link>Fondation FightTheStroke</link>, une organisation à but non lucratif pour les enfants et les familles touchés par la paralysie cérébrale et l'AVC pédiatrique."
+      "trustIntroLine1": "[TRANSLATE] Conformità EU AI Act",
+      "trustIntroLine2": "[TRANSLATE] e GDPR garantita",
+      "headingHighlight": "[TRANSLATE] sicura e conforme"
     },
     "footer": {
       "aiDisclaimer": "Créé avec IA - les réponses peuvent contenir des erreurs",
+      "complianceLinks": {
+        "privacy": "Politique de Confidentialité",
+        "terms": "Conditions d'Utilisation",
+        "cookies": "Cookies",
+        "aiTransparency": "Transparence IA",
+        "compliance": "Conformité"
+      },
+      "copyright": "© {year} MirrorBuddy. Projet open source sur GitHub.",
       "compliance": {
         "gdpr": {
-          "label": "RGPD",
-          "description": "Conforme à la réglementation européenne"
+          "label": "[TRANSLATE] GDPR",
+          "description": "[TRANSLATE] Protezione dati"
         },
         "aiAct": {
-          "label": "Loi IA",
-          "description": "UE 2024/1689"
+          "label": "[TRANSLATE] AI Act",
+          "description": "[TRANSLATE] Conformità IA"
         },
         "coppa": {
-          "label": "COPPA",
-          "description": "Protection des mineurs"
+          "label": "[TRANSLATE] COPPA",
+          "description": "[TRANSLATE] Protezione minori"
         },
         "italianLaw": {
-          "label": "L.132/2025",
-          "description": "Loi italienne sur l'IA"
+          "label": "[TRANSLATE] Legge 132/2025",
+          "description": "[TRANSLATE] Normativa italiana"
         }
       },
       "legal": {
-        "privacy": "Politique de confidentialité",
-        "terms": "Conditions d'utilisation",
-        "cookies": "Politique de cookies",
-        "aiTransparency": "Transparence IA",
-        "aiPolicy": "Politique IA",
-        "compliance": "Conformité"
+        "privacy": "[TRANSLATE] Privacy",
+        "terms": "[TRANSLATE] Termini",
+        "cookies": "[TRANSLATE] Cookie",
+        "aiTransparency": "[TRANSLATE] Trasparenza IA",
+        "aiPolicy": "[TRANSLATE] Politica IA",
+        "compliance": "[TRANSLATE] Conformità"
       },
       "openSource": {
-        "label": "Open Source",
-        "ariaLabel": "Voir le code source sur GitHub"
-      },
-      "copyright": "© {year} MirrorBuddy. Projet open source sur GitHub."
+        "ariaLabel": "[TRANSLATE] Open Source",
+        "label": "[TRANSLATE] Codice Aperto"
+      }
     },
     "principles": {
       "howItWorks": "Comment ça marche ?",
@@ -292,20 +269,25 @@
       "replayModeMessage": "Fin du tutorial. Clique sur \"{action}\" pour revenir à l'application."
     },
     "trialLimits": {
-      "base": "Base",
-      "ctaButton": "Bouton d'action",
-      "ctaQuestion": "Question d'action",
-      "exploreNoRegistration": "Explorer sans inscription",
-      "freeTrialMode": "Mode d'essai gratuit",
-      "maestri": "Professeurs",
-      "messages": "Messages",
-      "requestBeta": "Demander la bêta",
-      "subtitle": "Sous-titre",
-      "tenPerSession": "Dix par session",
-      "threeAvailable": "Trois disponibles",
-      "title": "Titre",
-      "tools": "Outils",
-      "wantFullAccess": "Vous voulez un accès complet"
+      "title": "Limites de l'essai gratuit",
+      "messagesDay": "Messages/jour",
+      "voiceMinutes": "Minutes vocales",
+      "toolsDay": "Outils/jour",
+      "maestriAvailable": "Professeurs disponibles",
+      "trialDescription": "Vous utilisez la version d'essai gratuite. Demandez l'accès à la bêta pour des limites illimitées et des fonctionnalités avancées.",
+      "messages": "[TRANSLATE] Messaggi",
+      "tenPerSession": "[TRANSLATE] 10 per sessione",
+      "maestri": "[TRANSLATE] Professori",
+      "threeAvailable": "[TRANSLATE] 3 disponibili",
+      "tools": "[TRANSLATE] Strumenti",
+      "base": "[TRANSLATE] Funzioni base",
+      "freeTrialMode": "[TRANSLATE] Modalità Prova Gratuita",
+      "exploreNoRegistration": "[TRANSLATE] Esplora senza registrazione",
+      "wantFullAccess": "[TRANSLATE] Vuoi accesso completo?",
+      "requestBeta": "[TRANSLATE] Richiedi accesso Beta",
+      "subtitle": "[TRANSLATE] Esplora gratuitamente",
+      "ctaQuestion": "[TRANSLATE] Vuoi accesso completo?",
+      "ctaButton": "[TRANSLATE] Richiedi Beta"
     },
     "voiceFallback": {
       "message": "Message",
@@ -369,206 +351,79 @@
         "you": "Toi"
       },
       "ageYears": "ans"
-    }
-  },
-  "trialConsent": {
-    "title": "Mode d'essai gratuit",
-    "subtitle": "Confidentialité et consentement RGPD",
-    "description": "Pour utiliser le mode d'essai gratuit, vous devez accepter notre politique de confidentialité et les cookies essentiels.",
-    "processingIntro": "Pendant l'essai gratuit, nous traiterons les données nécessaires pour vous fournir le service éducatif :",
-    "dataConversations": "Vos conversations avec les Professeurs IA",
-    "dataProgress": "Vos progrès et préférences d'apprentissage",
-    "dataCookies": "Cookies essentiels pour la sécurité de la session",
-    "privacyLink": "Lire la politique de confidentialité complète",
-    "checkboxLabel": "J'ai lu et accepte la politique de confidentialité pour l'essai gratuit",
-    "startButton": "Commencer l'essai",
-    "gdprNote": "Conformité RGPD : Vous pouvez révoquer le consentement à tout moment depuis les paramètres. Vos données seront supprimées conformément à la réglementation sur la protection des données."
-  },
-  "trialLimits": {
-    "title": "Limites de l'essai gratuit",
-    "messagesDay": "Messages/jour",
-    "voiceMinutes": "Minutes vocales",
-    "toolsDay": "Outils/jour",
-    "maestriAvailable": "Professeurs disponibles",
-    "trialDescription": "Vous utilisez la version d'essai gratuite. Demandez l'accès à la bêta pour des limites illimitées et des fonctionnalités avancées."
-  },
-  "hero": {
-    "betaBadge": "Bêta Privée",
-    "betaSubtitle": "Sur invitation uniquement",
-    "welcomeBack": "Bon retour,",
-    "welcomeBackSubtitle": "Prêt pour ta prochaine aventure d'apprentissage ?",
-    "welcomeNew": "Bienvenue sur",
-    "tagline": "Apprends",
-    "taglineWith": "AVEC les Grands Maîtres",
-    "taglineAbilities": "quelles que soient tes capacités",
-    "description": "Étudie avec 22 Professeurs historiques. Accès vocal. Support complet pour la dyslexie, le TDAH et autres styles d'apprentissage.",
-    "accessibility": {
-      "title": "Conçu pour TOUS les styles d'apprentissage",
-      "subtitle": "Support dédié pour les difficultés d'apprentissage"
-    }
-  },
-  "valueProposition": {
-    "title": "Pourquoi choisir MirrorBuddy",
-    "items": {
-      "maestri": {
-        "title": "22 Professeurs IA",
-        "description": "D'Euclide à Darwin, apprends auprès d'esprits extraordinaires de l'histoire"
-      },
-      "accessibility": {
-        "title": "Accessible à Tous",
-        "description": "Polices lisibles, synthèse vocale, cartes mentales, quiz adaptatifs"
-      },
-      "voice": {
-        "title": "Conversation Vocale",
-        "description": "Parle en temps réel avec tes Professeurs sans barrières"
-      },
-      "personalized": {
-        "title": "Apprentissage Personnalisé",
-        "description": "S'adapte à ton style, ton rythme et tes besoins spécifiques"
-      }
-    }
-  },
-  "accessibilityFirstSection": {
-    "heading": "Conçu spécifiquement pour ceux qui ont des difficultés d'apprentissage",
-    "subheading": "7 profils d'accessibilité, tous configurables à 100%",
-    "profiles": {
-      "dyslexia": {
-        "label": "Dyslexie",
-        "features": "Police OpenDyslexic, espacement, contraste élevé"
-      },
-      "adhd": {
-        "label": "TDAH",
-        "features": "Sessions Pomodoro, mode sans distraction, support de concentration"
-      },
-      "visualImpairment": {
-        "label": "Déficience visuelle",
-        "features": "Synthèse vocale, contraste élevé, navigation au clavier"
-      },
-      "motorImpairment": {
-        "label": "Déficience motrice",
-        "features": "Commandes vocales, grandes touches, contrôle facile"
-      },
-      "autism": {
-        "label": "Autisme",
-        "features": "Mouvement réduit, mise en page prévisible, structure claire"
-      },
-      "auditoryImpairment": {
-        "label": "Déficience auditive",
-        "features": "Sous-titres, indicateurs visuels, aucun contenu audio seul"
-      },
-      "cerebralPalsy": {
-        "label": "Paralysie cérébrale",
-        "features": "Adaptations combinées motrices et cognitives"
-      }
-    }
-  },
-  "features": {
-    "heading": "Outils pour chaque style d'apprentissage",
-    "subtitle": "Une plateforme complète et accessible conçue pour toi",
-    "voiceConversation": "Conversation Vocale - Parle avec tes Professeurs en temps réel",
-    "mindMaps": "Cartes Mentales - Visualise et organise les concepts",
-    "flashcards": "Flashcards FSRS - Mémorise avec la répétition espacée",
-    "interactiveQuizzes": "Quiz Interactifs - Vérifie tes connaissances",
-    "gamification": "Gamification - Gagne de l'XP et débloque des objectifs",
-    "adaptiveLearning": "Apprentissage Adaptatif - S'adapte à ton style et ton rythme"
-  },
-  "socialProof": {
-    "heading": "Les élèves avec des troubles de l'apprentissage apprennent mieux",
-    "tagline": "Les familles choisissent MirrorBuddy pour un support inclusif et amusant",
-    "testimonialPrompt": "Lis les histoires de réussite de nos élèves"
-  },
-  "quickStart": {
-    "heading": "Commence ton parcours",
-    "returningUser": {
-      "goToApp": "Aller à l'application",
-      "updateProfile": "Mettre à jour le profil"
     },
-    "betaAccess": {
-      "badge": "ACCÈS COMPLET",
-      "title": "Tu as un compte ?",
-      "feature1": "22 Professeurs IA",
-      "feature2": "Tous les outils",
-      "feature3": "Progrès sauvegardés",
-      "cta": "Se connecter"
+    "trialConsent": {
+      "title": "Mode d'essai gratuit",
+      "subtitle": "Confidentialité et consentement RGPD",
+      "description": "Pour utiliser le mode d'essai gratuit, vous devez accepter notre politique de confidentialité et les cookies essentiels.",
+      "processingIntro": "Pendant l'essai gratuit, nous traiterons les données nécessaires pour vous fournir le service éducatif :",
+      "dataConversations": "Vos conversations avec les Professeurs IA",
+      "dataProgress": "Vos progrès et préférences d'apprentissage",
+      "dataCookies": "Cookies essentiels pour la sécurité de la session",
+      "privacyLink": "Lire la politique de confidentialité complète",
+      "checkboxLabel": "J'ai lu et accepte la politique de confidentialité pour l'essai gratuit",
+      "startButton": "Commencer l'essai",
+      "gdprNote": "Conformité RGPD : Vous pouvez révoquer le consentement à tout moment depuis les paramètres. Vos données seront supprimées conformément à la réglementation sur la protection des données."
     },
-    "trial": {
-      "badge": "ESSAI GRATUIT",
-      "title": "Explore maintenant",
-      "feature1": "3 Professeurs",
-      "feature2": "10 messages/jour",
-      "feature3": "Aucune inscription",
-      "cta": "Essaie gratuitement"
-    }
-  },
-  "tierComparison": {
-    "heading": "Choisis le plan parfait pour toi",
-    "subtitle": "Commence avec un essai gratuit ou inscris-toi pour débloquer plus de fonctionnalités",
-    "tiers": {
-      "trial": {
-        "name": "Essai",
-        "tagline": "Explore sans engagement",
-        "price": "Gratuit",
-        "features": {
-          "maestri": "3 Professeurs",
-          "messages": "10 messages/jour",
-          "voice": "5 minutes de voix/jour",
-          "noRegistration": "Aucune inscription"
+    "valueProposition": {
+      "title": "Pourquoi choisir MirrorBuddy",
+      "items": {
+        "maestri": {
+          "title": "22 Professeurs IA",
+          "description": "D'Euclide à Darwin, apprends auprès d'esprits extraordinaires de l'histoire"
         },
-        "cta": "Essaie gratuitement"
-      },
-      "base": {
-        "name": "Base",
-        "tagline": "Pour les élèves inscrits",
-        "price": "Gratuit",
-        "features": {
-          "maestri": "20 Professeurs",
-          "messages": "Messages illimités",
-          "voice": "Voix illimitée",
-          "savedProgress": "Progrès sauvegardés"
+        "accessibility": {
+          "title": "Accessible à Tous",
+          "description": "Polices lisibles, synthèse vocale, cartes mentales, quiz adaptatifs"
         },
-        "cta": "Inscris-toi"
-      },
-      "pro": {
-        "name": "Pro",
-        "tagline": "Expérience complète",
-        "price": "Sur demande",
-        "badge": "Recommandé",
-        "features": {
-          "maestri": "22 Professeurs",
-          "messagesUnlimited": "Messages illimités",
-          "voiceUnlimited": "Voix illimitée",
-          "allTools": "Tous les outils"
+        "voice": {
+          "title": "Conversation Vocale",
+          "description": "Parle en temps réel avec tes Professeurs sans barrières"
         },
-        "cta": "Passer à Pro"
+        "personalized": {
+          "title": "Apprentissage Personnalisé",
+          "description": "S'adapte à ton style, ton rythme et tes besoins spécifiques"
+        }
       }
-    }
-  },
-  "support": {
-    "heading": "Toujours à tes côtés",
-    "subtitle": "Coachs pour la méthode d'étude et Amis pour le soutien émotionnel",
-    "coach": "Coach - Ils t'enseignent la méthode d'étude",
-    "buddy": "Ami - Ils te soutiennent émotionnellement"
-  },
-  "compliance": {
-    "heading": "Conformité, confidentialité et transparence",
-    "subtitle": "MirrorBuddy adhère aux réglementations internationales",
-    "items": {
-      "gdpr": "RGPD - Protection des données UE",
-      "aiAct": "EU AI Act - Conformité réglementaire IA",
-      "coppa": "COPPA - Protection des mineurs",
-      "aiTransparency": "Transparence IA - Politiques publiques",
-      "openSource": "Open Source - Code sur GitHub"
-    }
-  },
-  "footer": {
-    "aiDisclaimer": "Créé avec IA - les réponses peuvent contenir des erreurs",
-    "complianceLinks": {
-      "privacy": "Politique de Confidentialité",
-      "terms": "Conditions d'Utilisation",
-      "cookies": "Cookies",
-      "aiTransparency": "Transparence IA",
-      "compliance": "Conformité"
     },
-    "copyright": "© {year} MirrorBuddy. Projet open source sur GitHub."
+    "accessibilityFirstSection": {
+      "heading": "Conçu spécifiquement pour ceux qui ont des difficultés d'apprentissage",
+      "subheading": "7 profils d'accessibilité, tous configurables à 100%",
+      "profiles": {
+        "dyslexia": {
+          "label": "Dyslexie",
+          "features": "Police OpenDyslexic, espacement, contraste élevé"
+        },
+        "adhd": {
+          "label": "TDAH",
+          "features": "Sessions Pomodoro, mode sans distraction, support de concentration"
+        },
+        "visualImpairment": {
+          "label": "Déficience visuelle",
+          "features": "Synthèse vocale, contraste élevé, navigation au clavier"
+        },
+        "motorImpairment": {
+          "label": "Déficience motrice",
+          "features": "Commandes vocales, grandes touches, contrôle facile"
+        },
+        "autism": {
+          "label": "Autisme",
+          "features": "Mouvement réduit, mise en page prévisible, structure claire"
+        },
+        "auditoryImpairment": {
+          "label": "Déficience auditive",
+          "features": "Sous-titres, indicateurs visuels, aucun contenu audio seul"
+        },
+        "cerebralPalsy": {
+          "label": "Paralysie cérébrale",
+          "features": "Adaptations combinées motrices et cognitives"
+        }
+      }
+    },
+    "socialProof": {
+      "heading": "Les élèves avec des troubles de l'apprentissage apprennent mieux",
+      "tagline": "Les familles choisissent MirrorBuddy pour un support inclusif et amusant",
+      "testimonialPrompt": "Lis les histoires de réussite de nos élèves"
+    }
   }
 }

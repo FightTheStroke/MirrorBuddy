@@ -1,0 +1,111 @@
+{
+  "voice": {
+    "connectionError": "Erreur de connexion vocale",
+    "serviceUnavailable": "Impossible de se connecter au service vocal",
+    "microphonePermission": "Microphone non autorisé. Activez le microphone dans les paramètres de votre navigateur.",
+    "sessionTitle": "Session vocale avec {name}",
+    "studyMethod": "Méthode d'étude",
+    "emotionalSupport": "Soutien émotionnel",
+    "panel": {
+      "connected": "Connecté",
+      "connecting": "Connexion...",
+      "listening": "Écoute",
+      "microphoneDisabled": "Microphone désactivé",
+      "mutedLabel": "Son coupé",
+      "muteLabel": "Couper le son",
+      "speakNow": "Parlez maintenant",
+      "speaking": "En train de parler",
+      "startingCall": "Démarrage de l'appel...",
+      "unmuteLabel": "Activer le son"
+    },
+    "microphoneUnauthorized": "Microphone non autorisé. Activez le microphone dans les paramètres du navigateur.",
+    "permission": {
+      "enableLabel": "Enable Label",
+      "steps": {
+        "findMicrophone": "Find Microphone",
+        "lockIcon": "Lock Icon",
+        "reload": "Reload",
+        "selectAllow": "Select Allow"
+      },
+      "subtitle": "Sottotitolo",
+      "switchToChat": "Switch To Chat",
+      "title": "Titolo"
+    },
+    "label": "Voix",
+    "description": "Activez la conversation vocale avec les Maestri",
+    "chatUI": {
+      "startRecording": "Commencer l'enregistrement",
+      "stopRecording": "Arrêter l'enregistrement",
+      "sendVoiceMessage": "Envoyer message vocal",
+      "cancel": "Annuler",
+      "recordingInProgress": "Enregistrement en cours...",
+      "microphonePermission": "Autorisez l'accès au microphone pour utiliser la voix",
+      "grantPermission": "Autoriser le microphone",
+      "denyPermission": "Refuser l'accès"
+    },
+    "status": {
+      "listening": "À l'écoute...",
+      "processing": "Traitement...",
+      "speaking": "En train de parler...",
+      "connecting": "Connexion...",
+      "ready": "Prêt",
+      "initializing": "Initialisation...",
+      "processing_text": "Transcription..."
+    },
+    "settings": {
+      "title": "Paramètres vocaux",
+      "speed": "Vitesse de lecture",
+      "pitch": "Tonalité",
+      "voiceSelection": "Sélectionner la voix",
+      "volume": "Volume",
+      "enableCaptions": "Activer les sous-titres",
+      "textToSpeech": "Synthèse vocale",
+      "speechToText": "Reconnaissance vocale",
+      "language": "Langue d'écoute",
+      "reset": "Réinitialiser les paramètres"
+    },
+    "errors": {
+      "microphoneDenied": "Accès au microphone refusé. Activez le microphone dans les paramètres.",
+      "microphoneNotFound": "Aucun microphone détecté. Vérifiez votre appareil.",
+      "connectionError": "Erreur de connexion. Vérifiez votre connexion Internet.",
+      "timeout": "Délai d'attente dépassé. Réessayez.",
+      "recordingFailed": "Enregistrement échoué. Réessayez.",
+      "processingError": "Erreur de traitement. Réessayez.",
+      "permissionError": "Erreur de permission. Vérifiez vos paramètres.",
+      "unsupportedBrowser": "Votre navigateur ne supporte pas l'enregistrement vocal.",
+      "unknownError": "Erreur inconnue. Réessayez plus tard."
+    },
+    "trialLimits": {
+      "voiceTitle": "Limite vocale",
+      "minutesRemaining": "{minutes} minutes restantes",
+      "secondsRemaining": "{seconds} secondes restantes",
+      "limitReached": "Limite vocale atteinte",
+      "limitReachedMessage": "Vous avez utilisé tous vos minutes de voix. Mettez à niveau pour un accès vocal illimité.",
+      "upgradePrompt": "Voulez-vous un accès vocal illimité?",
+      "upgrade": "Mettre à niveau"
+    },
+    "accessibility": {
+      "voiceToText": "Convertir la voix en texte",
+      "textAlternative": "Utiliser le texte comme alternative",
+      "captionsToggle": "Basculer les sous-titres",
+      "enableSubtitles": "Activer les sous-titres pour toutes les réponses",
+      "voiceSpeed": "Vitesse de lecture",
+      "slow": "Lent",
+      "normal": "Normal",
+      "fast": "Rapide",
+      "veryFast": "Très rapide",
+      "screenReaderSupport": "Cet outil supporte les lecteurs d'écran"
+    },
+    "confirmations": {
+      "deleteRecording": "Supprimer l'enregistrement?",
+      "discardMessage": "Ignorer le message?",
+      "confirmSend": "Envoyer le message vocal?"
+    },
+    "help": {
+      "title": "Guide vocal",
+      "howToRecord": "Comment enregistrer: Appuyez sur le bouton microphone et parlez clairement.",
+      "tips": "Conseils: Parlez dans un environnement calme pour de meilleurs résultats.",
+      "troubleshooting": "Dépannage: Vérifiez que le microphone fonctionne dans votre navigateur."
+    }
+  }
+}

@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { FeatureFlagState } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 interface FeatureFlagsProps {
   flags: FeatureFlagState[];
@@ -45,8 +46,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
 
       onUpdate(flagId, newStatus);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error updating feature flag:", error);
+      logger.error("Error updating feature flag", undefined, error);
       alert("Failed to update feature flag");
     } finally {
       setLoading(null);
@@ -75,8 +75,7 @@ export function FeatureFlags({ flags, onUpdate }: FeatureFlagsProps) {
         throw new Error("Failed to update percentage");
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error updating percentage:", error);
+      logger.error("Error updating percentage", undefined, error);
       alert("Failed to update percentage");
     } finally {
       setLoading(null);

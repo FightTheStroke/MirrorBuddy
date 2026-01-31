@@ -4,12 +4,69 @@
     "unknown": "Unknown error",
     "network": "Network error",
     "timeout": "Request timeout",
-    "notFound": "Not found",
+    "notFound": "Non trouvé",
     "forbidden": "Access denied",
     "unauthorized": "Unauthorized",
     "serverError": "Server error",
     "badRequest": "Bad request",
-    "validation": "Validation error",
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email address",
+      "minLength": "Must be at least {min} characters",
+      "maxLength": "Cannot exceed {max} characters",
+      "pattern": "Invalid format",
+      "numeric": "Must be a number",
+      "url": "Please enter a valid URL",
+      "date": "Please enter a valid date",
+      "phone": "Please enter a valid phone number",
+      "password": {
+        "minLength": "Password must be at least 8 characters",
+        "requireUppercase": "Password must contain at least one uppercase letter",
+        "requireLowercase": "Password must contain at least one lowercase letter",
+        "requireNumber": "Password must contain at least one number",
+        "requireSpecial": "Password must contain at least one special character",
+        "mismatch": "Passwords do not match"
+      },
+      "add": "Ajouter",
+      "auth": {
+        "login": "Login"
+      },
+      "back": "Retour",
+      "breadcrumbs": {
+        "home": "Home"
+      },
+      "cancel": "Annuler",
+      "clear": "Cancella",
+      "close": "Fermer",
+      "common": {
+        "save": "Sauvegarder"
+      },
+      "confirm": "Confirmer",
+      "delete": "Supprimer",
+      "edit": "Modifier",
+      "error": "Erreur",
+      "errors": {
+        "notFound": "Not Found"
+      },
+      "filter": "Filtrer",
+      "info": "Informazione",
+      "loading": "Chargement...",
+      "next": "Suivant",
+      "no": "Non",
+      "ok": "OK",
+      "previous": "Precedente",
+      "refresh": "Aggiorna",
+      "remove": "Retirer",
+      "reset": "Reimposta",
+      "save": "Sauvegarder",
+      "search": "Rechercher",
+      "select": "Seleziona",
+      "sort": "Ordina",
+      "submit": "Envoyer",
+      "success": "Completato",
+      "warning": "Attenzione",
+      "yes": "Oui"
+    },
     "required": "This field is required",
     "invalidFormat": "Invalid format",
     "tooShort": "Too short",
@@ -32,69 +89,5 @@
       "description": "La page que vous recherchez n'existe pas ou a été déplacée.",
       "backHome": "Retour à l'accueil"
     }
-  },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "minLength": "Must be at least {min} characters",
-    "maxLength": "Cannot exceed {max} characters",
-    "pattern": "Invalid format",
-    "numeric": "Must be a number",
-    "url": "Please enter a valid URL",
-    "date": "Please enter a valid date",
-    "phone": "Please enter a valid phone number",
-    "password": {
-      "minLength": "Password must be at least 8 characters",
-      "requireUppercase": "Password must contain at least one uppercase letter",
-      "requireLowercase": "Password must contain at least one lowercase letter",
-      "requireNumber": "Password must contain at least one number",
-      "requireSpecial": "Password must contain at least one special character",
-      "mismatch": "Passwords do not match"
-    },
-    "add": "Ajouter",
-    "auth": {
-      "login": "Login"
-    },
-    "back": "Retour",
-    "breadcrumbs": {
-      "home": "Home"
-    },
-    "cancel": "Annuler",
-    "clear": "Cancella",
-    "close": "Fermer",
-    "common": {
-      "save": "Sauvegarder"
-    },
-    "confirm": "Confirmer",
-    "delete": "Supprimer",
-    "edit": "Modifier",
-    "error": "Erreur",
-    "errors": {
-      "notFound": "Not Found"
-    },
-    "filter": "Filtrer",
-    "info": "Informazione",
-    "loading": "Chargement...",
-    "next": "Suivant",
-    "no": "Non",
-    "ok": "OK",
-    "previous": "Precedente",
-    "refresh": "Aggiorna",
-    "remove": "Retirer",
-    "reset": "Reimposta",
-    "save": "Sauvegarder",
-    "search": "Rechercher",
-    "select": "Seleziona",
-    "sort": "Ordina",
-    "submit": "Envoyer",
-    "success": "Completato",
-    "warning": "Attenzione",
-    "yes": "Oui"
-  },
-  "notFound": {
-    "title": "Pagina non trovata",
-    "description": "La pagina che stai cercando non esiste.",
-    "backHome": "Torna alla home",
-    "goBack": "Torna indietro"
   }
 }

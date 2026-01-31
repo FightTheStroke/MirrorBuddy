@@ -1,0 +1,36 @@
+{
+  "onboarding": {
+    "transcript": {
+      "conversationActive": "Aktive Unterhaltung",
+      "conversationTitle": "Unterhaltungstitel",
+      "messagePlural": "Nachrichten",
+      "messageSingular": "Nachricht",
+      "noConversation": "Keine Unterhaltung",
+      "userLabel": "Du"
+    },
+    "checklist": {
+      "nameLabel": "Name",
+      "ageLabel": "Alter",
+      "schoolLabel": "Schule",
+      "schoolElementary": "Grundschule",
+      "schoolMiddle": "Mittelschule",
+      "schoolHigh": "Oberschule",
+      "differencesLabel": "Lernschwierigkeiten",
+      "differencesCount": "{count} ausgewählt"
+    },
+    "voicePanel": {
+      "cancel": "Abbrechen",
+      "connected": "Verbunden",
+      "disableMicrophone": "Mikrofon deaktivieren",
+      "enableMicrophone": "Mikrofon aktivieren",
+      "endCall": "Anruf beenden",
+      "listening": "Hört zu",
+      "melissa": "Melissa",
+      "microphoneMuted": "Mikrofon deaktiviert",
+      "speakWithMelissa": "Sprich mit Melissa",
+      "speaking": "Spricht",
+      "you": "Du"
+    },
+    "ageYears": "Jahre"
+  }
+}

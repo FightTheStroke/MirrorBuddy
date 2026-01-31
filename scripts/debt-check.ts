@@ -21,7 +21,7 @@ const SRC_DIR = join(ROOT, "src");
 
 // Thresholds - adjust as needed
 const THRESHOLDS = {
-  MAX_TODO: 10,
+  MAX_MARKERS: 10, // Max technical debt markers (was MAX_TODO)
   MAX_DEPRECATED: 15, // Currently have 12, allow buffer
   MAX_BACKUP_FILES: 0,
   MAX_LARGE_FILES: 10, // Currently have 8 files >500 lines
@@ -129,9 +129,9 @@ function runAudit(): AuditResult[] {
   results.push({
     category: "TODO/FIXME comments",
     count: todos.count,
-    threshold: THRESHOLDS.MAX_TODO,
+    threshold: THRESHOLDS.MAX_MARKERS,
     items: todos.items,
-    passed: todos.count <= THRESHOLDS.MAX_TODO,
+    passed: todos.count <= THRESHOLDS.MAX_MARKERS,
   });
 
   // @deprecated

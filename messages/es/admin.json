@@ -2,7 +2,48 @@
   "admin": {
     "betaRequests": "Solicitudes Beta",
     "collapseMenu": "Contraer menú",
-    "dashboard": "Panel de control",
+    "dashboard": {
+      "authNotConfigured": "[TRANSLATE] Auth Not Configured",
+      "azureCosts": "[TRANSLATE] Azure Costs",
+      "azureNotConfigured": "[TRANSLATE] Azure Not Configured",
+      "calls": "[TRANSLATE] Calls",
+      "configureAzure": "[TRANSLATE] Configure Azure",
+      "dailyCosts": "[TRANSLATE] Daily Costs",
+      "description": "[TRANSLATE] Descrizione",
+      "estimatedCost": "[TRANSLATE] Estimated Cost",
+      "last30Days": "[TRANSLATE] Last30 Days",
+      "loading": "[TRANSLATE] Caricamento...",
+      "loadingError": "[TRANSLATE] Loading Error",
+      "maestriUsed": "[TRANSLATE] Maestri Used",
+      "monthlyForecast": "[TRANSLATE] Monthly Forecast",
+      "noCostData": "[TRANSLATE] No Cost Data",
+      "noDataAvailable": "[TRANSLATE] No Data Available",
+      "noSessions": "[TRANSLATE] No Sessions",
+      "notAvailable": "[TRANSLATE] Not Available",
+      "notConfigured": "[TRANSLATE] Not Configured",
+      "periods": {
+        "month": "[TRANSLATE] Month",
+        "season": "[TRANSLATE] Season",
+        "today": "[TRANSLATE] Oggi",
+        "week": "[TRANSLATE] Week"
+      },
+      "sessionPlural": "[TRANSLATE] Session Plural",
+      "sessionSingular": "[TRANSLATE] Session Singular",
+      "sessions": "[TRANSLATE] Sessions",
+      "sessionsByMaestro": "[TRANSLATE] Sessions By Maestro",
+      "studyTime": "[TRANSLATE] Study Time",
+      "studyTrend": "[TRANSLATE] Study Trend",
+      "tokenAI": "[TRANSLATE] Token A I",
+      "tokenUsageByType": "[TRANSLATE] Token Usage By Type",
+      "topServices": "[TRANSLATE] Top Services",
+      "total": "[TRANSLATE] Total",
+      "maestroUsageChart": {
+        "title": "[TRANSLATE] Uso Maestri",
+        "description": "[TRANSLATE] Grafico utilizzo maestri",
+        "loading": "[TRANSLATE] Caricamento...",
+        "noData": "[TRANSLATE] Nessun dato"
+      }
+    },
     "expandMenu": "Expandir menú",
     "pendingBetaRequests": "Solicitudes Beta pendientes",
     "returnToApp": "Volver a la aplicación",
@@ -43,7 +84,9 @@
         "trialToBase": "Trial → Base",
         "trialToPro": "Trial → Pro (Direct)",
         "trialUsers": "Trial Users",
-        "users": "{count} usuarios"
+        "users": "{count} usuarios",
+        "description": "[TRANSLATE] Analisi conversione utenti",
+        "stages": "[TRANSLATE] Fasi"
       },
       "form": {
         "basicInfo": "Información básica",
@@ -83,7 +126,9 @@
         "toolsHelp": "Número máximo de herramientas que se pueden usar por día",
         "update": "Actualizar",
         "voiceMinutesDaily": "Minutos de voz diarios",
-        "voiceMinutesHelp": "Número máximo de minutos de voz por día"
+        "voiceMinutesHelp": "Número máximo de minutos de voz por día",
+        "title": "[TRANSLATE] Modulo Tier",
+        "save": "[TRANSLATE] Salva"
       },
       "table": {
         "actions": "Acciones",
@@ -98,7 +143,46 @@
         "position": "Posición",
         "search": "Buscar",
         "status": "Estado",
-        "summary": "Resumen"
+        "summary": "{count} tiers au total",
+        "users": "[TRANSLATE] Utenti",
+        "delete": "[TRANSLATE] Elimina"
+      },
+      "page": {
+        "backToTiers": "[TRANSLATE] Torna ai Tier",
+        "editTier": "[TRANSLATE] Modifica Tier",
+        "editMessage": "[TRANSLATE] Modifica configurazione tier",
+        "newTier": "[TRANSLATE] Nuovo Tier",
+        "createNew": "[TRANSLATE] Crea Nuovo",
+        "title": "[TRANSLATE] Gestione Tier",
+        "analyticsButton": "[TRANSLATE] Analytics",
+        "conversionFunnelButton": "[TRANSLATE] Funnel Conversione"
+      },
+      "analytics": {
+        "title": "[TRANSLATE] Analytics Tier",
+        "description": "[TRANSLATE] Statistiche utilizzo tier",
+        "active": "[TRANSLATE] Attivi",
+        "activeUsers": "[TRANSLATE] Utenti Attivi",
+        "activeUsersCol": "[TRANSLATE] Utenti Attivi",
+        "activityRate": "[TRANSLATE] Tasso Attività",
+        "allConversations": "[TRANSLATE] Tutte le Conversazioni",
+        "allPlans": "[TRANSLATE] Tutti i Piani",
+        "averageCol": "[TRANSLATE] Media",
+        "averagePerUser": "[TRANSLATE] Media per Utente",
+        "backToTiers": "[TRANSLATE] Torna ai Tier",
+        "code": "[TRANSLATE] Codice",
+        "details": "[TRANSLATE] Dettagli",
+        "inactive": "[TRANSLATE] Inattivi",
+        "lastDays": "[TRANSLATE] Ultimi {days} giorni",
+        "messagesPerUser": "[TRANSLATE] Messaggi per Utente",
+        "noPlans": "[TRANSLATE] Nessun Piano",
+        "note": "[TRANSLATE] Nota",
+        "plan": "[TRANSLATE] Piano",
+        "status": "[TRANSLATE] Stato",
+        "subtitle": "[TRANSLATE] Sottotitolo",
+        "totalMessages": "[TRANSLATE] Messaggi Totali",
+        "totalMessagesCol": "[TRANSLATE] Messaggi Totali",
+        "totalUsers": "[TRANSLATE] Utenti Totali",
+        "totalUsersCol": "[TRANSLATE] Utenti Totali"
       }
     },
     "users": {
@@ -129,7 +213,7 @@
         "delete": "Eliminar",
         "disable": "Deshabilitar",
         "enable": "Habilitar",
-        "selected": "Seleccionado"
+        "selected": "{count} sélectionné(s)"
       },
       "create": {
         "title": "Crear usuario",
@@ -141,7 +225,8 @@
         "directInvite": "Invitación directa",
         "emailRequired": "El email es obligatorio",
         "nameOptional": "Nombre (opcional)"
-      }
+      },
+      "pageTitle": "[TRANSLATE] Gestione Utenti"
     },
     "analytics": {
       "actionIrreversible": "Acción irreversible",
@@ -310,59 +395,60 @@
     "header": {
       "title": "Panel de administración",
       "logout": "Cerrar sesión"
-    }
-  },
-  "dashboard": {
-    "authNotConfigured": "Autenticación no configurada",
-    "azureCosts": "Costos de Azure",
-    "azureNotConfigured": "Azure no configurado",
-    "calls": "Llamadas",
-    "configureAzure": "Configurar Azure",
-    "dailyCosts": "Costos diarios",
-    "description": "Descripción",
-    "estimatedCost": "Costo estimado",
-    "last30Days": "Últimos 30 días",
-    "loading": "Cargando...",
-    "loadingError": "Error de carga",
-    "maestriUsed": "Profesores utilizados",
-    "monthlyForecast": "Pronóstico mensual",
-    "noCostData": "Sin datos de costos",
-    "noDataAvailable": "Sin datos disponibles",
-    "noSessions": "Sin sesiones",
-    "notAvailable": "No disponible",
-    "notConfigured": "No configurado",
-    "periods": {
-      "month": "Mes",
-      "season": "Estación",
-      "today": "Hoy",
-      "week": "Semana"
     },
-    "sessionPlural": "sesiones",
-    "sessionSingular": "sesión",
-    "sessions": "Sesiones",
-    "sessionsByMaestro": "Sesiones por profesor",
-    "studyTime": "Tiempo de estudio",
-    "studyTrend": "Tendencia de estudio",
-    "tokenAI": "Tokens de IA",
-    "tokenUsageByType": "Uso de tokens por tipo",
-    "topServices": "Servicios principales",
-    "total": "Total",
-    "maestroUsageChart": {
-      "title": "Uso de profesores"
-    }
-  },
-  "parentDashboard": {
-    "completedSessions": "Sesiones completadas",
-    "lastUpdated": "Última actualización",
-    "learningChannelAuditory": "Canal de aprendizaje auditivo",
-    "learningChannelKinesthetic": "Canal de aprendizaje cinestésico",
-    "learningChannelReadingWriting": "Canal de aprendizaje de lectura-escritura",
-    "learningChannelVisual": "Canal de aprendizaje visual",
-    "maestriMet": "Profesores conocidos",
-    "profileTitle": "Título del perfil",
-    "studyMinutes": "Minutos de estudio",
-    "timeOfDayAfternoon": "Tarde",
-    "timeOfDayEvening": "Noche",
-    "timeOfDayMorning": "Mañana"
+    "parentDashboard": {
+      "completedSessions": "Sesiones completadas",
+      "lastUpdated": "Última actualización",
+      "learningChannelAuditory": "Canal de aprendizaje auditivo",
+      "learningChannelKinesthetic": "Canal de aprendizaje cinestésico",
+      "learningChannelReadingWriting": "Canal de aprendizaje de lectura-escritura",
+      "learningChannelVisual": "Canal de aprendizaje visual",
+      "maestriMet": "Profesores conocidos",
+      "profileTitle": "Título del perfil",
+      "studyMinutes": "Minutos de estudio",
+      "timeOfDayAfternoon": "Tarde",
+      "timeOfDayEvening": "Noche",
+      "timeOfDayMorning": "Mañana"
+    },
+    "dashboardMetrics": {
+      "authNotConfigured": "[TRANSLATE] Auth Not Configured",
+      "azureCosts": "[TRANSLATE] Azure Costs",
+      "azureNotConfigured": "[TRANSLATE] Azure Not Configured",
+      "calls": "[TRANSLATE] Calls",
+      "configureAzure": "[TRANSLATE] Configure Azure",
+      "dailyCosts": "[TRANSLATE] Daily Costs",
+      "description": "[TRANSLATE] Descrizione",
+      "estimatedCost": "[TRANSLATE] Estimated Cost",
+      "last30Days": "[TRANSLATE] Last30 Days",
+      "loading": "[TRANSLATE] Caricamento...",
+      "loadingError": "[TRANSLATE] Loading Error",
+      "maestriUsed": "[TRANSLATE] Maestri Used",
+      "monthlyForecast": "[TRANSLATE] Monthly Forecast",
+      "noCostData": "[TRANSLATE] No Cost Data",
+      "noDataAvailable": "[TRANSLATE] No Data Available",
+      "noSessions": "[TRANSLATE] No Sessions",
+      "notAvailable": "[TRANSLATE] Not Available",
+      "notConfigured": "[TRANSLATE] Not Configured",
+      "periods": {
+        "month": "[TRANSLATE] Month",
+        "season": "[TRANSLATE] Season",
+        "today": "[TRANSLATE] Oggi",
+        "week": "[TRANSLATE] Week"
+      },
+      "sessionPlural": "[TRANSLATE] Session Plural",
+      "sessionSingular": "[TRANSLATE] Session Singular",
+      "sessions": "[TRANSLATE] Sessions",
+      "sessionsByMaestro": "[TRANSLATE] Sessions By Maestro",
+      "studyTime": "[TRANSLATE] Study Time",
+      "studyTrend": "[TRANSLATE] Study Trend",
+      "tokenAI": "[TRANSLATE] Token A I",
+      "tokenUsageByType": "[TRANSLATE] Token Usage By Type",
+      "topServices": "[TRANSLATE] Top Services",
+      "total": "[TRANSLATE] Total",
+      "maestroUsageChart": {
+        "title": "[TRANSLATE] Titolo"
+      }
+    },
+    "dashboardTitle": "[TRANSLATE] Dashboard"
   }
 }

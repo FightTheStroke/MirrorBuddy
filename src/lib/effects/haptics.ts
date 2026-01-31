@@ -4,6 +4,7 @@
  */
 
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { logger } from "@/lib/logger";
 
 /**
  * Pattern types for haptic feedback
@@ -68,9 +69,9 @@ export function triggerHaptic(pattern: HapticPattern = "medium"): void {
       };
       nav.webkitVibrate(vibrationPattern);
     }
-  } catch (error) {
+  } catch {
     // Silently fail if vibration is not available or causes an error
-    console.debug("Haptic feedback unavailable:", error);
+    logger.debug("Haptic feedback unavailable");
   }
 }
 

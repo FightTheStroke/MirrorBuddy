@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TierLimitConfig } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 interface TierLimitsProps {
   tiers: TierLimitConfig[];
@@ -58,8 +59,7 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
       onUpdate(tierId);
       setEditingTier(null);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error updating tier limits:", error);
+      logger.error("Error updating tier limits", undefined, error);
       alert("Failed to update tier limits");
     } finally {
       setLoading(false);

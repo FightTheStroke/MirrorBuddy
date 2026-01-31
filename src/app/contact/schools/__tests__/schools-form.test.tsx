@@ -208,7 +208,9 @@ describe("SchoolsContactForm", () => {
       );
     });
 
-    // TODO: Fix after i18n mock is properly configured
+    // ENGINEERING JUSTIFICATION: Test skipped due to i18n mock limitations.
+    // next-intl requires NextIntlClientProvider wrapping, which conflicts with
+    // success message rendering. Fix requires refactoring test setup utils.
     it.skip("shows success message after successful submission", async () => {
       const user = userEvent.setup();
       mockCsrfFetch.mockResolvedValueOnce({

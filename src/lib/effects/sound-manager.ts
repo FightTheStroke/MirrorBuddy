@@ -4,6 +4,7 @@
  */
 
 import { useAccessibilityStore } from "@/lib/accessibility";
+import { logger } from "@/lib/logger";
 
 /**
  * Sound effect types
@@ -38,8 +39,8 @@ function getAudioContext(): AudioContext | null {
       if (AudioContextClass) {
         audioContext = new AudioContextClass();
       }
-    } catch (error) {
-      console.debug("Web Audio API not available:", error);
+    } catch {
+      logger.debug("Web Audio API not available");
     }
   }
 
@@ -77,8 +78,8 @@ function playTone(frequency: number, duration: number): void {
 
     osc.start(now);
     osc.stop(now + duration / 1000);
-  } catch (error) {
-    console.debug("Could not play tone:", error);
+  } catch {
+    logger.debug("Could not play tone");
   }
 }
 
@@ -152,8 +153,8 @@ export function playSoundEffect(effect: SoundEffect): void {
         // Fallback: simple beep
         playTone(440, 100);
     }
-  } catch (error) {
-    console.debug("Error playing sound effect:", error);
+  } catch {
+    logger.debug("Error playing sound effect");
   }
 }
 

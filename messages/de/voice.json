@@ -1,0 +1,111 @@
+{
+  "voice": {
+    "connectionError": "Sprachverbindungsfehler",
+    "serviceUnavailable": "Verbindung zum Sprachdienst nicht möglich",
+    "microphonePermission": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in Ihren Browsereinstellungen.",
+    "sessionTitle": "Sprachsitzung mit {name}",
+    "studyMethod": "Lernmethode",
+    "emotionalSupport": "Emotionale Unterstützung",
+    "panel": {
+      "connected": "Verbunden",
+      "connecting": "Verbindung wird hergestellt...",
+      "listening": "Hört zu",
+      "microphoneDisabled": "Mikrofon deaktiviert",
+      "mutedLabel": "Stummgeschaltet",
+      "muteLabel": "Stummschalten",
+      "speakNow": "Jetzt sprechen",
+      "speaking": "Spricht",
+      "startingCall": "Anruf wird gestartet...",
+      "unmuteLabel": "Stummschaltung aufheben"
+    },
+    "microphoneUnauthorized": "Mikrofon nicht autorisiert. Aktivieren Sie das Mikrofon in den Browsereinstellungen.",
+    "permission": {
+      "enableLabel": "Aktivieren",
+      "steps": {
+        "findMicrophone": "Mikrofon finden",
+        "lockIcon": "Schlosssymbol",
+        "reload": "Neu laden",
+        "selectAllow": "Erlauben auswählen"
+      },
+      "subtitle": "Untertitel",
+      "switchToChat": "Zu Chat wechseln",
+      "title": "Mikrofon-Berechtigung"
+    },
+    "label": "Stimme",
+    "description": "Aktivieren Sie die Sprachkonversation mit Maestri",
+    "chatUI": {
+      "startRecording": "Aufzeichnung starten",
+      "stopRecording": "Aufzeichnung beenden",
+      "sendVoiceMessage": "Sprachnachricht senden",
+      "cancel": "Abbrechen",
+      "recordingInProgress": "Aufzeichnung läuft...",
+      "microphonePermission": "Mikrofon erlauben, um die Sprachfunktion zu nutzen",
+      "grantPermission": "Mikrofon erlauben",
+      "denyPermission": "Zugriff verweigern"
+    },
+    "status": {
+      "listening": "Höre zu...",
+      "processing": "Wird verarbeitet...",
+      "speaking": "Spreche...",
+      "connecting": "Verbindung wird hergestellt...",
+      "ready": "Bereit",
+      "initializing": "Initialisierung läuft...",
+      "processing_text": "Transkription läuft..."
+    },
+    "settings": {
+      "title": "Spracheinstellungen",
+      "speed": "Wiedergabegeschwindigkeit",
+      "pitch": "Tonhöhe",
+      "voiceSelection": "Stimme wählen",
+      "volume": "Lautstärke",
+      "enableCaptions": "Untertitel aktivieren",
+      "textToSpeech": "Text-zu-Sprache",
+      "speechToText": "Spracherkennung",
+      "language": "Hörsprache",
+      "reset": "Auf Standardwerte zurücksetzen"
+    },
+    "errors": {
+      "microphoneDenied": "Mikrofonzugriff verweigert. Aktivieren Sie das Mikrofon in den Einstellungen.",
+      "microphoneNotFound": "Kein Mikrofon erkannt. Überprüfen Sie Ihr Gerät.",
+      "connectionError": "Verbindungsfehler. Überprüfen Sie Ihre Internetverbindung.",
+      "timeout": "Verbindungszeitüberschreitung. Versuchen Sie es erneut.",
+      "recordingFailed": "Aufzeichnung fehlgeschlagen. Versuchen Sie es erneut.",
+      "processingError": "Verarbeitungsfehler. Versuchen Sie es erneut.",
+      "permissionError": "Berechtigungsfehler. Überprüfen Sie Ihre Einstellungen.",
+      "unsupportedBrowser": "Ihr Browser unterstützt keine Sprachaufzeichnung.",
+      "unknownError": "Unbekannter Fehler. Versuchen Sie es später erneut."
+    },
+    "trialLimits": {
+      "voiceTitle": "Sprachlimit",
+      "minutesRemaining": "{minutes} Minuten verbleibend",
+      "secondsRemaining": "{seconds} Sekunden verbleibend",
+      "limitReached": "Sprachlimit erreicht",
+      "limitReachedMessage": "Sie haben alle Ihre Sprachminuten verbraucht. Aktualisieren Sie für unbegrenzten Sprachzugriff.",
+      "upgradePrompt": "Möchten Sie unbegrenzten Sprachzugriff?",
+      "upgrade": "Jetzt aktualisieren"
+    },
+    "accessibility": {
+      "voiceToText": "Sprache in Text konvertieren",
+      "textAlternative": "Text als Alternative verwenden",
+      "captionsToggle": "Untertitel ein/aus",
+      "enableSubtitles": "Untertitel für alle Antworten aktivieren",
+      "voiceSpeed": "Lesegeschwindigkeit",
+      "slow": "Langsam",
+      "normal": "Normal",
+      "fast": "Schnell",
+      "veryFast": "Sehr schnell",
+      "screenReaderSupport": "Dieses Tool unterstützt Bildschirmleser"
+    },
+    "confirmations": {
+      "deleteRecording": "Aufzeichnung löschen?",
+      "discardMessage": "Nachricht verwerfen?",
+      "confirmSend": "Sprachnachricht senden?"
+    },
+    "help": {
+      "title": "Sprachanleitung",
+      "howToRecord": "So zeichnen Sie auf: Drücken Sie die Mikrofontaste und sprechen Sie deutlich.",
+      "tips": "Tipps: Sprechen Sie in einer ruhigen Umgebung für beste Ergebnisse.",
+      "troubleshooting": "Fehlerbehebung: Überprüfen Sie, dass das Mikrofon in Ihrem Browser funktioniert."
+    }
+  }
+}

@@ -25,7 +25,7 @@ export function AdminHeader({
   const pathname = usePathname();
 
   const SECTION_TITLES: Record<string, string> = {
-    "/admin": t("dashboard"),
+    "/admin": t("dashboardTitle"),
     "/admin/invites": t("betaRequests"),
     "/admin/users": t("sidebar.users"),
     "/admin/analytics": t("sidebar.analytics"),

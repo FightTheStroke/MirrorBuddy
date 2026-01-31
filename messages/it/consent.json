@@ -1,90 +1,187 @@
 {
-  "cookie": {
-    "title": "Protezione della tua Privacy",
-    "subtitle": "Utilizziamo i cookie essenziali",
-    "explanation": "MirrorBuddy utilizza cookie per proteggerti e migliorare la tua esperienza di apprendimento. I cookie essenziali sono necessari per far funzionare l'app in modo sicuro.",
-    "list": {
-      "session": "Cookie di sessione per mantenere il tuo login sicuro",
-      "preferences": "Cookie per ricordare le tue preferenze di accessibilità e lingua",
-      "protect": "Cookie di sicurezza per proteggerti da attacchi e abusi"
+  "consent": {
+    "cookie": {
+      "title": "Protezione della tua Privacy",
+      "subtitle": "Utilizziamo i cookie essenziali",
+      "explanation": "MirrorBuddy utilizza cookie per proteggerti e migliorare la tua esperienza di apprendimento. I cookie essenziali sono necessari per far funzionare l'app in modo sicuro.",
+      "list": {
+        "session": "Cookie di sessione per mantenere il tuo login sicuro",
+        "preferences": "Cookie per ricordare le tue preferenze di accessibilità e lingua",
+        "protect": "Cookie di sicurezza per proteggerti da attacchi e abusi"
+      },
+      "analytics": {
+        "label": "Analytics Opzionali",
+        "description": "Aiutaci a capire come usi MirrorBuddy per migliorare l'app (completamente anonimo)",
+        "aria": "Toggle per abilitare o disabilitare analytics"
+      },
+      "customize": {
+        "title": "Preferenze Cookie",
+        "description": "Scegli quali cookie vuoi accettare. I cookie essenziali sono sempre necessari per il funzionamento dell'app.",
+        "essentialDesc": "Necessario per sicurezza e funzionalità. Non può essere disabilitato.",
+        "cancel": "Annulla",
+        "save": "Salva Preferenze"
+      },
+      "button": "Accetta e Continua",
+      "coppa": "Se hai meno di 13 anni, i tuoi genitori hanno ricevuto un avviso per approvare i cookie essenziali.",
+      "privacyPolicy": "Informativa sulla Privacy",
+      "cookiePolicy": "Informativa sui Cookie"
     },
-    "analytics": {
-      "label": "Analytics Opzionali",
-      "description": "Aiutaci a capire come usi MirrorBuddy per migliorare l'app (completamente anonimo)",
-      "aria": "Toggle per abilitare o disabilitare analytics"
+    "privacy": {
+      "title": "Accordo sulla Privacy",
+      "description": "La tua privacy è fondamentale per noi",
+      "dataProcessing": "Processamento dei Dati",
+      "processingText": "MirrorBuddy processa solo i dati necessari per fornirti un'esperienza di apprendimento personalizzata e sicura.",
+      "dataStorage": "Dove Memorizziamo i Tuoi Dati",
+      "storageText": "I tuoi dati vengono archiviati su server sicuri in Europa, con conformità GDPR garantita.",
+      "retention": "Periodo di Conservazione",
+      "retentionText": "Conserviamo i tuoi dati per il tempo necessario al servizio. Puoi richiedere l'eliminazione in qualsiasi momento.",
+      "accept": "Ho Letto e Accetto",
+      "decline": "Rifiuta"
     },
-    "customize": {
-      "title": "Preferenze Cookie",
-      "description": "Scegli quali cookie vuoi accettare. I cookie essenziali sono sempre necessari per il funzionamento dell'app.",
-      "essentialDesc": "Necessario per sicurezza e funzionalità. Non può essere disabilitato.",
-      "cancel": "Annulla",
-      "save": "Salva Preferenze"
+    "terms": {
+      "title": "Condizioni di Servizio",
+      "description": "Leggere i nostri termini e condizioni",
+      "acceptance": "Accetto le Condizioni di Servizio",
+      "acceptanceText": "Confermo di aver letto e accettato i termini di servizio e le politiche della piattaforma.",
+      "linkLabel": "Visualizza Condizioni Complete",
+      "required": "È necessario accettare i Termini di Servizio per continuare.",
+      "toast": {
+        "saved": "Termini accettati con successo",
+        "saveFailed": "Errore nel salvataggio"
+      },
+      "modal": {
+        "title": {
+          "updated": "Termini Aggiornati",
+          "welcome": "Benvenuto su MirrorBuddy"
+        },
+        "description": {
+          "updated": "I nostri termini di servizio sono stati aggiornati",
+          "welcome": "Prima di iniziare, accetta i nostri termini"
+        },
+        "warning": {
+          "title": "Importante",
+          "description": "L accettazione è necessaria per utilizzare la piattaforma"
+        },
+        "summary": "Punti chiave",
+        "points": {
+          "free": "Servizio gratuito per studenti",
+          "aiCanErr": "L IA può commettere errori",
+          "minors": "Consenso parentale per under-14",
+          "respect": "Rispetto reciproco e comportamento etico"
+        },
+        "link": "Leggi i termini completi",
+        "checkbox": "Accetto i Termini di Servizio",
+        "buttons": {
+          "disabled": "Accetta per continuare",
+          "accept": "Accetta e Continua",
+          "submitting": "Salvataggio..."
+        },
+        "screenReader": {
+          "required": "È necessario accettare i Termini di Servizio",
+          "submitting": "Salvataggio in corso..."
+        }
+      }
     },
-    "button": "Accetta e Continua",
-    "coppa": "Se hai meno di 13 anni, i tuoi genitori hanno ricevuto un avviso per approvare i cookie essenziali.",
-    "privacyPolicy": "Informativa sulla Privacy",
-    "cookiePolicy": "Informativa sui Cookie"
-  },
-  "privacy": {
-    "title": "Accordo sulla Privacy",
-    "description": "La tua privacy è fondamentale per noi",
-    "dataProcessing": "Processamento dei Dati",
-    "processingText": "MirrorBuddy processa solo i dati necessari per fornirti un'esperienza di apprendimento personalizzata e sicura.",
-    "dataStorage": "Dove Memorizziamo i Tuoi Dati",
-    "storageText": "I tuoi dati vengono archiviati su server sicuri in Europa, con conformità GDPR garantita.",
-    "retention": "Periodo di Conservazione",
-    "retentionText": "Conserviamo i tuoi dati per il tempo necessario al servizio. Puoi richiedere l'eliminazione in qualsiasi momento.",
-    "accept": "Ho Letto e Accetto",
-    "decline": "Rifiuta"
-  },
-  "terms": {
-    "title": "Condizioni di Servizio",
-    "description": "Leggere i nostri termini e condizioni",
-    "acceptance": "Accetto le Condizioni di Servizio",
-    "acceptanceText": "Confermo di aver letto e accettato i termini di servizio e le politiche della piattaforma.",
-    "linkLabel": "Visualizza Condizioni Complete",
-    "required": "È necessario accettare i Termini di Servizio per continuare."
-  },
-  "ageVerification": {
-    "title": "Verifica dell'Età",
-    "description": "Conformità GDPR - Protezione dei Minori",
-    "statement": "Dichiaro di avere almeno 14 anni di età",
-    "europeanMinor": "Se hai meno di 14 anni, è necessario il consenso di un genitore o tutore.",
-    "confirm": "Confermo di avere almeno 14 anni",
-    "under14": "Sono un utente Under-14 - Richiedo il Consenso Parentale"
-  },
-  "parentalConsent": {
-    "title": "Consenso Parentale",
-    "description": "Richiesta di Consenso per Utenti Minori",
-    "intro": "Se sei un genitore o tutore di un utente minore, per favore leggi attentamente le nostre politiche.",
-    "statement": "Dichiaro di essere un genitore o tutore legale e autorizzo l'uso della piattaforma",
-    "responsibilities": "Responsabilità del Genitore",
-    "responsibilitiesText": "Come genitore, accetti di supervisionare l'uso della piattaforma e sei responsabile dell'attività del minore.",
-    "contactUs": "Per domande sul consenso parentale, contattaci all'indirizzo di supporto.",
-    "confirm": "Do il Mio Consenso",
-    "decline": "Non Autorizzo"
-  },
-  "aiDisclosure": {
-    "title": "Divulgazione sull'IA",
-    "description": "Trasparenza nell'Uso dell'Intelligenza Artificiale",
-    "statement": "Questa piattaforma utilizza Intelligenza Artificiale (IA) per personalizzare il tuo apprendimento.",
-    "howWeUseAI": "Come Utilizziamo l'IA",
-    "howWeUseAIText": "L'IA viene utilizzata per fornire tutoraggio personalizzato, feedback adattivo e raccomandazioni didattiche. Le decisioni critiche rimangono sempre sotto controllo umano.",
-    "aiLimitations": "Limitazioni dell'IA",
-    "aiLimitationsText": "L'IA non è perfetta. Può fare errori e non dovrebbe sostituire il giudizio umano. Incoraggiamo domande e feedback critici.",
-    "humanOversight": "Supervisione Umana",
-    "humanOversightText": "Tutte le funzioni critiche di IA sono supervisionate da insegnanti qualificati e specialisti pedagogici.",
-    "acknowledge": "Ho Compreso l'Uso dell'IA"
-  },
-  "withdrawal": {
-    "title": "Ritiro del Consenso",
-    "description": "Come Revocare il Consenso",
-    "howToWithdraw": "Puoi ritirare il consenso in qualsiasi momento accedendo alle tue impostazioni di privacy.",
-    "withdrawalProcess": "Processo di Ritiro",
-    "withdrawalSteps": "1. Accedi al tuo account\n2. Vai a Impostazioni > Privacy e Consenso\n3. Seleziona i consensi che desideri ritirare\n4. Conferma la richiesta di ritiro\n5. I tuoi dati verranno eliminati secondo le normative GDPR",
-    "emailWithdrawal": "In alternativa, puoi inviarci un'email di richiesta formale di ritiro.",
-    "consequences": "Conseguenze",
-    "consequencesText": "Il ritiro di determinati consensi potrebbe impedire l'accesso a specifiche funzioni della piattaforma.",
-    "contactSupport": "Contatta il Supporto"
+    "ageVerification": {
+      "title": "Verifica dell'Età",
+      "description": "Conformità GDPR - Protezione dei Minori",
+      "statement": "Dichiaro di avere almeno 14 anni di età",
+      "europeanMinor": "Se hai meno di 14 anni, è necessario il consenso di un genitore o tutore.",
+      "confirm": "Confermo di avere almeno 14 anni",
+      "under14": "Sono un utente Under-14 - Richiedo il Consenso Parentale"
+    },
+    "parentalConsent": {
+      "title": "Consenso Parentale",
+      "description": "Richiesta di Consenso per Utenti Minori",
+      "intro": "Se sei un genitore o tutore di un utente minore, per favore leggi attentamente le nostre politiche.",
+      "statement": "Dichiaro di essere un genitore o tutore legale e autorizzo l'uso della piattaforma",
+      "responsibilities": "Responsabilità del Genitore",
+      "responsibilitiesText": "Come genitore, accetti di supervisionare l'uso della piattaforma e sei responsabile dell'attività del minore.",
+      "contactUs": "Per domande sul consenso parentale, contattaci all'indirizzo di supporto.",
+      "confirm": "Do il Mio Consenso",
+      "decline": "Non Autorizzo"
+    },
+    "aiDisclosure": {
+      "title": "Divulgazione sull'IA",
+      "description": "Trasparenza nell'Uso dell'Intelligenza Artificiale",
+      "statement": "Questa piattaforma utilizza Intelligenza Artificiale (IA) per personalizzare il tuo apprendimento.",
+      "howWeUseAI": "Come Utilizziamo l'IA",
+      "howWeUseAIText": "L'IA viene utilizzata per fornire tutoraggio personalizzato, feedback adattivo e raccomandazioni didattiche. Le decisioni critiche rimangono sempre sotto controllo umano.",
+      "aiLimitations": "Limitazioni dell'IA",
+      "aiLimitationsText": "L'IA non è perfetta. Può fare errori e non dovrebbe sostituire il giudizio umano. Incoraggiamo domande e feedback critici.",
+      "humanOversight": "Supervisione Umana",
+      "humanOversightText": "Tutte le funzioni critiche di IA sono supervisionate da insegnanti qualificati e specialisti pedagogici.",
+      "acknowledge": "Ho Compreso l'Uso dell'IA"
+    },
+    "withdrawal": {
+      "title": "Ritiro del Consenso",
+      "description": "Come Revocare il Consenso",
+      "howToWithdraw": "Puoi ritirare il consenso in qualsiasi momento accedendo alle tue impostazioni di privacy.",
+      "withdrawalProcess": "Processo di Ritiro",
+      "withdrawalSteps": "1. Accedi al tuo account\n2. Vai a Impostazioni > Privacy e Consenso\n3. Seleziona i consensi che desideri ritirare\n4. Conferma la richiesta di ritiro\n5. I tuoi dati verranno eliminati secondo le normative GDPR",
+      "emailWithdrawal": "In alternativa, puoi inviarci un'email di richiesta formale di ritiro.",
+      "consequences": "Conseguenze",
+      "consequencesText": "Il ritiro di determinati consensi potrebbe impedire l'accesso a specifiche funzioni della piattaforma.",
+      "contactSupport": "Contatta il Supporto"
+    },
+    "inline": {
+      "acceptedText": "Consenso accettato",
+      "manage": "Gestisci preferenze",
+      "acceptButton": "Accetta Cookie",
+      "info": "Informazioni",
+      "title": "Cookie e Privacy",
+      "description": "Utilizziamo cookie essenziali per il funzionamento del sito",
+      "learnMore": "Scopri di più",
+      "analyticsLabel": "Analytics (opzionale)",
+      "submitButton": "Accetta"
+    },
+    "unified": {
+      "loading": "Caricamento...",
+      "titleWelcome": "Benvenuto su MirrorBuddy",
+      "subtitleWelcome": "Prima di iniziare, accetta i nostri termini",
+      "titleUpdated": "Termini Aggiornati",
+      "subtitleUpdated": "I nostri termini sono stati aggiornati",
+      "reconsentNotice": {
+        "lastAccepted": "Ultima accettazione:",
+        "changed": "Cosa è cambiato:",
+        "details": "Abbiamo aggiornato la nostra politica sulla privacy"
+      },
+      "summaryTitle": "Cosa accetti",
+      "privacy": {
+        "title": "Privacy e Dati",
+        "description": "Come trattiamo i tuoi dati personali"
+      },
+      "cookies": {
+        "title": "Cookie Essenziali",
+        "description": "Necessari per il funzionamento dell'app"
+      },
+      "tos": {
+        "title": "Termini di Servizio",
+        "description": "Regole d'uso della piattaforma"
+      },
+      "links": {
+        "full": "Termini Completi",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy"
+      },
+      "tosCheckbox": {
+        "label": "Accetto i Termini di Servizio",
+        "text": "e confermo di aver letto la privacy policy"
+      },
+      "analytics": {
+        "label": "Analytics Opzionali",
+        "description": "Aiutaci a migliorare l'app (anonimo)"
+      },
+      "buttons": {
+        "disabled": "Accetta i termini per continuare",
+        "accept": "Accetta e Continua",
+        "submitting": "Salvataggio..."
+      },
+      "coppa": "Se hai meno di 13 anni, è necessario il consenso dei genitori",
+      "screenReader": {
+        "required": "È necessario accettare i Termini di Servizio per continuare",
+        "submitting": "Salvataggio del consenso in corso..."
+      }
+    }
   }
 }

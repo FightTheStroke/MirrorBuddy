@@ -1,7 +1,8 @@
 /**
  * i18n Pages Translation Tests
  *
- * Updated for namespace-based structure (ADR 0082)
+ * Updated for single-wrapper namespace structure (ADR 0082)
+ * Each JSON file has a single wrapper key matching the namespace name.
  */
 import { describe, it, expect } from "vitest";
 
@@ -24,45 +25,55 @@ const frMessages = { ...frCompliance, ...frTools };
 const deMessages = { ...deCompliance, ...deTools };
 const esMessages = { ...esCompliance, ...esTools };
 
+/**
+ * Resolves a dot-separated key path from a messages object.
+ * Example: "compliance.contact.page.title" navigates to
+ *   obj["compliance"]["contact"]["page"]["title"]
+ */
+function getValue(obj: Record<string, unknown>, key: string): unknown {
+  const parts = key.split(".");
+  let current: unknown = obj;
+  for (const part of parts) {
+    if (current && typeof current === "object") {
+      current = (current as Record<string, unknown>)[part];
+    } else {
+      return undefined;
+    }
+  }
+  return current;
+}
+
 describe("i18n Non-Locale Pages", () => {
   describe("Contact page translations", () => {
     it("should have all contact form label keys in all languages", () => {
+      // Keys are under compliance.contact (single-wrapper structure)
       const keys = [
-        "contact.page.title",
-        "contact.page.subtitle",
-        "contact.form.nameLabel",
-        "contact.form.emailLabel",
-        "contact.form.subjectLabel",
-        "contact.form.messageLabel",
-        "contact.form.submitButtonDefault",
-        "contact.form.submitButtonLoading",
-        "contact.form.nameRequired",
-        "contact.form.emailRequired",
-        "contact.form.emailInvalid",
-        "contact.form.subjectRequired",
-        "contact.form.messageRequired",
-        "contact.form.successTitle",
-        "contact.form.successMessage",
-        "contact.form.errorTitle",
-        "contact.form.errorMessage",
-        "contact.backButton",
+        "compliance.contact.page.title",
+        "compliance.contact.page.subtitle",
+        "compliance.contact.form.nameLabel",
+        "compliance.contact.form.emailLabel",
+        "compliance.contact.form.subjectLabel",
+        "compliance.contact.form.messageLabel",
+        "compliance.contact.form.submitButtonDefault",
+        "compliance.contact.form.submitButtonLoading",
+        "compliance.contact.form.nameRequired",
+        "compliance.contact.form.emailRequired",
+        "compliance.contact.form.emailInvalid",
+        "compliance.contact.form.subjectRequired",
+        "compliance.contact.form.messageRequired",
+        "compliance.contact.form.successTitle",
+        "compliance.contact.form.successMessage",
+        "compliance.contact.form.errorTitle",
+        "compliance.contact.form.errorMessage",
+        "compliance.contact.backButton",
       ];
 
       keys.forEach((key) => {
-        const [namespace, ...path] = key.split(".");
-        const getValue = (obj: any) => {
-          let current = obj[namespace];
-          for (const part of path) {
-            current = current?.[part];
-          }
-          return current;
-        };
-
-        expect(getValue(itMessages)).toBeDefined();
-        expect(getValue(enMessages)).toBeDefined();
-        expect(getValue(frMessages)).toBeDefined();
-        expect(getValue(deMessages)).toBeDefined();
-        expect(getValue(esMessages)).toBeDefined();
+        expect(getValue(itMessages, key), `it: ${key}`).toBeDefined();
+        expect(getValue(enMessages, key), `en: ${key}`).toBeDefined();
+        expect(getValue(frMessages, key), `fr: ${key}`).toBeDefined();
+        expect(getValue(deMessages, key), `de: ${key}`).toBeDefined();
+        expect(getValue(esMessages, key), `es: ${key}`).toBeDefined();
       });
     });
   });
@@ -81,83 +92,58 @@ describe("i18n Non-Locale Pages", () => {
       ];
 
       keys.forEach((key) => {
-        const [namespace, ...path] = key.split(".");
-        const getValue = (obj: any) => {
-          let current = obj[namespace];
-          for (const part of path) {
-            current = current?.[part];
-          }
-          return current;
-        };
-
-        expect(getValue(itMessages)).toBeDefined();
-        expect(getValue(enMessages)).toBeDefined();
-        expect(getValue(frMessages)).toBeDefined();
-        expect(getValue(deMessages)).toBeDefined();
-        expect(getValue(esMessages)).toBeDefined();
+        expect(getValue(itMessages, key), `it: ${key}`).toBeDefined();
+        expect(getValue(enMessages, key), `en: ${key}`).toBeDefined();
+        expect(getValue(frMessages, key), `fr: ${key}`).toBeDefined();
+        expect(getValue(deMessages, key), `de: ${key}`).toBeDefined();
+        expect(getValue(esMessages, key), `es: ${key}`).toBeDefined();
       });
     });
   });
 
   describe("Astuccio page translations", () => {
     it("should have astuccio translations in all languages", () => {
-      const keys = ["astuccio.backButton", "astuccio.itemCount"];
+      // Astuccio is now under tools.astuccio (single-wrapper)
+      const keys = ["tools.astuccio.backButton", "tools.astuccio.itemCount"];
 
       keys.forEach((key) => {
-        const [namespace, ...path] = key.split(".");
-        const getValue = (obj: any) => {
-          let current = obj[namespace];
-          for (const part of path) {
-            current = current?.[part];
-          }
-          return current;
-        };
-
-        expect(getValue(itMessages)).toBeDefined();
-        expect(getValue(enMessages)).toBeDefined();
-        expect(getValue(frMessages)).toBeDefined();
-        expect(getValue(deMessages)).toBeDefined();
-        expect(getValue(esMessages)).toBeDefined();
+        expect(getValue(itMessages, key), `it: ${key}`).toBeDefined();
+        expect(getValue(enMessages, key), `en: ${key}`).toBeDefined();
+        expect(getValue(frMessages, key), `fr: ${key}`).toBeDefined();
+        expect(getValue(deMessages, key), `de: ${key}`).toBeDefined();
+        expect(getValue(esMessages, key), `es: ${key}`).toBeDefined();
       });
     });
   });
 
   describe("AI Transparency page translations", () => {
     it("should have all aiTransparency keys in all languages", () => {
+      // aiTransparency is under compliance.aiTransparency (single-wrapper)
       const keys = [
-        "aiTransparency.page.title",
-        "aiTransparency.page.version",
-        "aiTransparency.page.lastUpdated",
-        "aiTransparency.page.backButton",
-        "aiTransparency.tldr.heading",
-        "aiTransparency.tldr.point1",
-        "aiTransparency.tldr.point2",
-        "aiTransparency.tldr.point3",
-        "aiTransparency.tldr.point4",
-        "aiTransparency.tldr.point5",
-        "aiTransparency.relatedDocs.heading",
-        "aiTransparency.relatedDocs.privacy",
-        "aiTransparency.relatedDocs.privacyDescription",
-        "aiTransparency.relatedDocs.terms",
-        "aiTransparency.relatedDocs.termsDescription",
-        "aiTransparency.contact.text",
+        "compliance.aiTransparency.page.title",
+        "compliance.aiTransparency.page.version",
+        "compliance.aiTransparency.page.lastUpdated",
+        "compliance.aiTransparency.page.backButton",
+        "compliance.aiTransparency.tldr.heading",
+        "compliance.aiTransparency.tldr.point1",
+        "compliance.aiTransparency.tldr.point2",
+        "compliance.aiTransparency.tldr.point3",
+        "compliance.aiTransparency.tldr.point4",
+        "compliance.aiTransparency.tldr.point5",
+        "compliance.aiTransparency.relatedDocs.heading",
+        "compliance.aiTransparency.relatedDocs.privacy",
+        "compliance.aiTransparency.relatedDocs.privacyDescription",
+        "compliance.aiTransparency.relatedDocs.terms",
+        "compliance.aiTransparency.relatedDocs.termsDescription",
+        "compliance.aiTransparency.contact.text",
       ];
 
       keys.forEach((key) => {
-        const [namespace, ...path] = key.split(".");
-        const getValue = (obj: any) => {
-          let current = obj[namespace];
-          for (const part of path) {
-            current = current?.[part];
-          }
-          return current;
-        };
-
-        expect(getValue(itMessages)).toBeDefined();
-        expect(getValue(enMessages)).toBeDefined();
-        expect(getValue(frMessages)).toBeDefined();
-        expect(getValue(deMessages)).toBeDefined();
-        expect(getValue(esMessages)).toBeDefined();
+        expect(getValue(itMessages, key), `it: ${key}`).toBeDefined();
+        expect(getValue(enMessages, key), `en: ${key}`).toBeDefined();
+        expect(getValue(frMessages, key), `fr: ${key}`).toBeDefined();
+        expect(getValue(deMessages, key), `de: ${key}`).toBeDefined();
+        expect(getValue(esMessages, key), `es: ${key}`).toBeDefined();
       });
     });
   });

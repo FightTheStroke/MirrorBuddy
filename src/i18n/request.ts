@@ -55,11 +55,16 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
   const namespaceResults = await Promise.all(namespacePromises);
 
-  // Merge all namespace data into single messages object
-  // Each namespace file contains original top-level keys that map to that namespace
+  // Scope each namespace file under its namespace key
+  // This eliminates cross-file collisions (compliance, tools, parentDashboard, navigation)
+  // UNWRAP: JSON files have wrapper key matching filename, we need the inner content
   const messages: Record<string, unknown> = {};
-  for (const nsData of namespaceResults) {
-    Object.assign(messages, nsData);
+  for (let i = 0; i < namespaceResults.length; i++) {
+    const ns = NAMESPACES[i];
+    const nsData = namespaceResults[i];
+    // If JSON has wrapper key matching namespace, unwrap it
+    // e.g., compliance.json: { "compliance": {...} } -> use {...}
+    messages[ns] = (nsData as Record<string, unknown>)[ns] || nsData;
   }
 
   return {

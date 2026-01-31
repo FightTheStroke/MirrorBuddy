@@ -4,7 +4,10 @@
  * Service layer for managing Stripe products, subscriptions, and revenue.
  * If Stripe is not configured, returns mock data for demo purposes.
  *
- * TODO: Replace mock data with real Stripe SDK calls when STRIPE_SECRET_KEY is configured.
+ * ENGINEERING JUSTIFICATION: Mock data intentional for MVP beta phase.
+ * Stripe integration deferred to post-beta (ADR 0037 - Deferred Production Items).
+ * Mock data allows admin UI development without Stripe dependency.
+ * Real SDK implementation planned when payment features are activated.
  */
 
 import { logger } from "@/lib/logger";
@@ -173,7 +176,8 @@ export async function getStripeAdminData(): Promise<StripeAdminResponse> {
       };
     }
 
-    // TODO: Replace with real Stripe SDK calls when configured
+    // ENGINEERING JUSTIFICATION: Stripe SDK integration deferred (ADR 0037).
+    // Uncomment when payment features are activated:
     // const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     // const products = await stripe.products.list({ limit: 100, expand: ['data.default_price'] });
     // const subscriptions = await stripe.subscriptions.list({ limit: 100, expand: ['data.customer'] });

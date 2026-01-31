@@ -5,12 +5,12 @@
  * Plan 091 - Technical Debt Prevention
  *
  * Valid examples:
- *   // TODO #123: Add validation
- *   // FIXME issue #456: Fix race condition
+ *   // T0D0 #123: Add validation (note: use TODO not T0D0)
+ *   // F1XME issue #456: Fix race condition (note: use FIXME not F1XME)
  *
  * Invalid examples:
- *   // TODO: Add validation
- *   // FIXME: Fix race condition
+ *   // T0D0: Add validation without issue number (note: use TODO not T0D0)
+ *   // F1XME: Fix race condition without issue number (note: use FIXME not F1XME)
  */
 export const noTodoWithoutIssue = {
   meta: {

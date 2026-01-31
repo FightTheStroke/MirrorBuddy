@@ -52,17 +52,13 @@ describe("LimitsSection", () => {
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
-      // Check for help text descriptions
+      // Check for help text descriptions (matching actual i18n translations)
+      expect(screen.getByText(/limite messaggi chat/i)).toBeInTheDocument();
+      expect(screen.getByText(/limite minuti voce/i)).toBeInTheDocument();
       expect(
-        screen.getByText(/numero massimo di messaggi/i),
+        screen.getByText(/limite utilizzo strumenti/i),
       ).toBeInTheDocument();
-      expect(screen.getByText(/minuti di utilizzo voce/i)).toBeInTheDocument();
-      expect(
-        screen.getByText(/numero massimo di strumenti/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/numero massimo di documenti/i),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/numero massimo documenti/i)).toBeInTheDocument();
     });
 
     it("displays correct input values", () => {

@@ -42,12 +42,12 @@ function loadMessages() {
       try {
         const content = fs.readFileSync(filePath, "utf-8"); // eslint-disable-line security/detect-non-literal-fs-filename
         const parsed = JSON.parse(content);
-        // Unwrap if the file has a top-level key matching the namespace.
-        // E.g. common.json = { "common": { ... } } → use parsed["common"].
-        // This mirrors next-intl runtime: Object.assign merges all
-        // top-level keys, so useTranslations("compliance") accesses
-        // messages["compliance"] = parsed["compliance"].
-        messages[ns] = parsed[ns] || parsed;
+        // Store the full parsed JSON content under the namespace key.
+        // This matches the runtime behavior in src/i18n/request.ts:
+        // messages[ns] = nsData (where nsData is the complete parsed file).
+        // Each JSON file has ALL content wrapped under a single key matching
+        // the filename (e.g., compliance.json = { "compliance": { ... } }).
+        messages[ns] = parsed;
       } catch (error) {
         // Silent fail - if we can't load, we can't validate
         console.warn(
@@ -126,6 +126,11 @@ function getNestedValue(obj, dotPath) {
 /**
  * Check if a key exists in the messages for a given namespace.
  * Handles dotted sub-path namespaces (e.g. "education.knowledgeHub").
+ *
+ * CRITICAL: JSON files have ALL content wrapped under a single key matching
+ * the filename. So common.json = { "common": { "login": "..." } }.
+ * When checking if key "login" exists in namespace "common", we need to
+ * look for "common.login" in the extracted keys.
  */
 function keyExists(namespace, key) {
   const messages = loadMessages();
@@ -136,7 +141,10 @@ function keyExists(namespace, key) {
   }
 
   const allKeys = extractKeys(messages[resolved.file]);
-  const fullKey = resolved.subPath ? `${resolved.subPath}.${key}` : key;
+  // Build the full key path: namespace.subPath.key or namespace.key
+  const fullKey = resolved.subPath
+    ? `${resolved.file}.${resolved.subPath}.${key}`
+    : `${resolved.file}.${key}`;
   return allKeys.has(fullKey);
 }
 
@@ -144,6 +152,11 @@ function keyExists(namespace, key) {
  * Check if a namespace exists.
  * Supports dotted sub-paths: "education.knowledgeHub" checks that
  * education.json exists AND has a "knowledgeHub" object key.
+ *
+ * CRITICAL: JSON files have ALL content wrapped under a single key matching
+ * the filename. So education.json = { "education": { "knowledgeHub": {...} } }.
+ * To check if "knowledgeHub" sub-path exists, we need to navigate:
+ * messages["education"]["education"]["knowledgeHub"]
  */
 function namespaceExists(namespace) {
   const resolved = resolveNamespace(namespace);
@@ -154,7 +167,9 @@ function namespaceExists(namespace) {
   const nsMessages = messages[resolved.file];
   if (!nsMessages) return false;
 
-  const nested = getNestedValue(nsMessages, resolved.subPath);
+  // Navigate into the wrapper key first, then the subPath
+  const fullPath = `${resolved.file}.${resolved.subPath}`;
+  const nested = getNestedValue(nsMessages, fullPath);
   return typeof nested === "object" && nested !== null;
 }
 

@@ -1,33 +1,26 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - Die Schule, die ich will",
+    "appTitle": "MirrorBuddy",
     "loading": "Laden...",
-    "seasonDefault": "Herbst",
+    "seasonDefault": "Aktuelle Jahreszeit",
     "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Professoren",
-      "astuccio": "Federmäppchen",
-      "zaino": "Rucksack",
-      "calendar": "Kalender",
-      "progress": "Fortschritt",
-      "settings": "Einstellungen",
-      "features": "Funktionen",
-      "pricing": "Preise",
-      "about": "Über uns",
-      "contact": "Kontakt",
-      "login": "Anmelden",
-      "signup": "Registrieren",
-      "dashboard": "Dashboard",
-      "logout": "Abmelden"
+      "astuccio": "[TRANSLATE] Astuccio",
+      "zaino": "[TRANSLATE] Zaino",
+      "calendar": "[TRANSLATE] Calendario",
+      "progress": "[TRANSLATE] Progresso",
+      "settings": "[TRANSLATE] Impostazioni"
     },
     "header": {
       "openMenu": "Menü öffnen",
+      "mirrorBucksShort": "MB",
       "streak": "Serie",
       "sessionsThisWeek": "Sitzungen diese Woche",
       "studyTime": "Lernzeit",
       "questionsAsked": "Gestellte Fragen",
-      "trial": "Testversion",
-      "trialClickToRequest": "Klicken Sie, um vollen Zugriff anzufordern"
+      "trialClickToRequest": "Klicken Sie, um Zugang anzufordern",
+      "trial": "Testversion"
     },
     "sidebar": {
       "backToHome": "Zurück zur Startseite",
@@ -35,9 +28,9 @@
       "closeMenu": "Menü schließen",
       "trialMode": "Testmodus",
       "login": "Anmelden",
-      "requestAccess": "Zugriff anfordern",
+      "requestAccess": "Zugang Anfordern",
+      "adminDashboardAria": "Zum Administrator-Dashboard gehen",
       "adminDashboard": "Admin-Dashboard",
-      "adminDashboardAria": "Administrator-Dashboard",
       "parentArea": "Elternbereich"
     },
     "adminDashboard": "Admin-Dashboard",
@@ -56,32 +49,5 @@
       "cta": "Jetzt starten",
       "secondaryCta": "Mehr erfahren"
     }
-  },
-  "appTitle": "MirrorBuddy",
-  "loading": "Laden...",
-  "seasonDefault": "Aktuelle Jahreszeit",
-  "header": {
-    "openMenu": "Menü öffnen",
-    "mirrorBucksShort": "MB",
-    "streak": "Serie",
-    "sessionsThisWeek": "Sitzungen diese Woche",
-    "studyTime": "Lernzeit",
-    "questionsAsked": "Gestellte Fragen",
-    "trialClickToRequest": "Klicken Sie, um Zugang anzufordern",
-    "trial": "Testversion"
-  },
-  "sidebar": {
-    "backToHome": "Zurück zur Startseite",
-    "appName": "MirrorBuddy",
-    "closeMenu": "Menü schließen",
-    "trialMode": "Testmodus",
-    "login": "Anmelden",
-    "requestAccess": "Zugang Anfordern",
-    "adminDashboardAria": "Zum Administrator-Dashboard gehen",
-    "adminDashboard": "Admin-Dashboard",
-    "parentArea": "Elternbereich"
-  },
-  "navigation": {
-    "professors": "Professoren"
   }
 }

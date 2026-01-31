@@ -9,7 +9,64 @@
     "unauthorized": "No autorizado",
     "serverError": "Error del servidor",
     "badRequest": "Solicitud no válida",
-    "validation": "Error de validación",
+    "validation": {
+      "required": "Este campo es obligatorio",
+      "email": "Introduce una dirección de email válida",
+      "minLength": "Debe contener al menos {min} caracteres",
+      "maxLength": "No puede superar {max} caracteres",
+      "pattern": "Formato no válido",
+      "numeric": "Debe ser un número",
+      "url": "Introduce una URL válida",
+      "date": "Introduce una fecha válida",
+      "phone": "Introduce un número de teléfono válido",
+      "password": {
+        "minLength": "La contraseña debe contener al menos 8 caracteres",
+        "requireUppercase": "La contraseña debe contener al menos una letra mayúscula",
+        "requireLowercase": "La contraseña debe contener al menos una letra minúscula",
+        "requireNumber": "La contraseña debe contener al menos un número",
+        "requireSpecial": "La contraseña debe contener al menos un carácter especial",
+        "mismatch": "Las contraseñas no coinciden"
+      },
+      "add": "Añadir",
+      "auth": {
+        "login": "Iniciar sesión"
+      },
+      "back": "Atrás",
+      "breadcrumbs": {
+        "home": "Inicio"
+      },
+      "cancel": "Cancelar",
+      "clear": "Limpiar",
+      "close": "Cerrar",
+      "common": {
+        "save": "Guardar"
+      },
+      "confirm": "Confirmar",
+      "delete": "Eliminar",
+      "edit": "Editar",
+      "error": "Error",
+      "errors": {
+        "notFound": "No Encontrado"
+      },
+      "filter": "Filtrar",
+      "info": "Información",
+      "loading": "Cargando...",
+      "next": "Siguiente",
+      "no": "No",
+      "ok": "OK",
+      "previous": "Anterior",
+      "refresh": "Actualizar",
+      "remove": "Quitar",
+      "reset": "Restablecer",
+      "save": "Guardar",
+      "search": "Buscar",
+      "select": "Seleccionar",
+      "sort": "Ordenar",
+      "submit": "Enviar",
+      "success": "Completado",
+      "warning": "Advertencia",
+      "yes": "Sí"
+    },
     "required": "Este campo es obligatorio",
     "invalidFormat": "Formato no válido",
     "tooShort": "Demasiado corto",
@@ -32,69 +89,5 @@
       "description": "La página que estás buscando no existe o ha sido movida.",
       "backHome": "Volver al Inicio"
     }
-  },
-  "validation": {
-    "required": "Este campo es obligatorio",
-    "email": "Introduce una dirección de email válida",
-    "minLength": "Debe contener al menos {min} caracteres",
-    "maxLength": "No puede superar {max} caracteres",
-    "pattern": "Formato no válido",
-    "numeric": "Debe ser un número",
-    "url": "Introduce una URL válida",
-    "date": "Introduce una fecha válida",
-    "phone": "Introduce un número de teléfono válido",
-    "password": {
-      "minLength": "La contraseña debe contener al menos 8 caracteres",
-      "requireUppercase": "La contraseña debe contener al menos una letra mayúscula",
-      "requireLowercase": "La contraseña debe contener al menos una letra minúscula",
-      "requireNumber": "La contraseña debe contener al menos un número",
-      "requireSpecial": "La contraseña debe contener al menos un carácter especial",
-      "mismatch": "Las contraseñas no coinciden"
-    },
-    "add": "Añadir",
-    "auth": {
-      "login": "Iniciar sesión"
-    },
-    "back": "Atrás",
-    "breadcrumbs": {
-      "home": "Inicio"
-    },
-    "cancel": "Cancelar",
-    "clear": "Limpiar",
-    "close": "Cerrar",
-    "common": {
-      "save": "Guardar"
-    },
-    "confirm": "Confirmar",
-    "delete": "Eliminar",
-    "edit": "Editar",
-    "error": "Error",
-    "errors": {
-      "notFound": "No Encontrado"
-    },
-    "filter": "Filtrar",
-    "info": "Información",
-    "loading": "Cargando...",
-    "next": "Siguiente",
-    "no": "No",
-    "ok": "OK",
-    "previous": "Anterior",
-    "refresh": "Actualizar",
-    "remove": "Quitar",
-    "reset": "Restablecer",
-    "save": "Guardar",
-    "search": "Buscar",
-    "select": "Seleccionar",
-    "sort": "Ordenar",
-    "submit": "Enviar",
-    "success": "Completado",
-    "warning": "Advertencia",
-    "yes": "Sí"
-  },
-  "notFound": {
-    "title": "Página no encontrada",
-    "description": "La página que estás buscando no existe o ha sido movida.",
-    "backHome": "Volver al inicio",
-    "goBack": "Volver atrás"
   }
 }

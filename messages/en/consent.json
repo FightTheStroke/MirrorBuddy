@@ -1,90 +1,187 @@
 {
-  "cookie": {
-    "title": "Protecting Your Privacy",
-    "subtitle": "We use essential cookies",
-    "explanation": "MirrorBuddy uses cookies to protect you and improve your learning experience. Essential cookies are necessary for the app to work securely.",
-    "list": {
-      "session": "Session cookies to keep your login secure",
-      "preferences": "Cookies to remember your accessibility and language preferences",
-      "protect": "Security cookies to protect you from attacks and abuse"
+  "consent": {
+    "cookie": {
+      "title": "Protecting Your Privacy",
+      "subtitle": "We use essential cookies",
+      "explanation": "MirrorBuddy uses cookies to protect you and improve your learning experience. Essential cookies are necessary for the app to work securely.",
+      "list": {
+        "session": "Session cookies to keep your login secure",
+        "preferences": "Cookies to remember your accessibility and language preferences",
+        "protect": "Security cookies to protect you from attacks and abuse"
+      },
+      "analytics": {
+        "label": "Optional Analytics",
+        "description": "Help us understand how you use MirrorBuddy so we can improve the app (completely anonymous)",
+        "aria": "Toggle to enable or disable analytics"
+      },
+      "customize": {
+        "title": "Cookie Preferences",
+        "description": "Choose which cookies you want to accept. Essential cookies are always required for the app to work.",
+        "essentialDesc": "Required for security and functionality. Cannot be disabled.",
+        "cancel": "Cancel",
+        "save": "Save Preferences"
+      },
+      "button": "Accept and Continue",
+      "coppa": "If you are under 13, your parents received a notice to approve essential cookies.",
+      "privacyPolicy": "Privacy Policy",
+      "cookiePolicy": "Cookie Policy"
     },
-    "analytics": {
-      "label": "Optional Analytics",
-      "description": "Help us understand how you use MirrorBuddy so we can improve the app (completely anonymous)",
-      "aria": "Toggle to enable or disable analytics"
+    "privacy": {
+      "title": "Privacy Agreement",
+      "description": "Your privacy is important to us",
+      "dataProcessing": "Data Processing",
+      "processingText": "MirrorBuddy processes only the data necessary to provide you with a personalized and secure learning experience.",
+      "dataStorage": "Where We Store Your Data",
+      "storageText": "Your data is stored on secure servers in Europe with guaranteed GDPR compliance.",
+      "retention": "Data Retention Period",
+      "retentionText": "We retain your data for as long as necessary for the service. You can request deletion at any time.",
+      "accept": "I Have Read and Accept",
+      "decline": "Decline"
     },
-    "customize": {
-      "title": "Cookie Preferences",
-      "description": "Choose which cookies you want to accept. Essential cookies are always required for the app to work.",
-      "essentialDesc": "Required for security and functionality. Cannot be disabled.",
-      "cancel": "Cancel",
-      "save": "Save Preferences"
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Read our terms and conditions",
+      "acceptance": "I Accept the Terms of Service",
+      "acceptanceText": "I confirm that I have read and accepted the terms of service and platform policies.",
+      "linkLabel": "View Full Terms",
+      "required": "You must accept the Terms of Service to continue.",
+      "toast": {
+        "saved": "[TRANSLATE] Termini accettati con successo",
+        "saveFailed": "[TRANSLATE] Errore nel salvataggio"
+      },
+      "modal": {
+        "title": {
+          "updated": "[TRANSLATE] Termini Aggiornati",
+          "welcome": "[TRANSLATE] Benvenuto su MirrorBuddy"
+        },
+        "description": {
+          "updated": "[TRANSLATE] I nostri termini di servizio sono stati aggiornati",
+          "welcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini"
+        },
+        "warning": {
+          "title": "[TRANSLATE] Importante",
+          "description": "[TRANSLATE] L accettazione è necessaria per utilizzare la piattaforma"
+        },
+        "summary": "[TRANSLATE] Punti chiave",
+        "points": {
+          "free": "[TRANSLATE] Servizio gratuito per studenti",
+          "aiCanErr": "[TRANSLATE] L IA può commettere errori",
+          "minors": "[TRANSLATE] Consenso parentale per under-14",
+          "respect": "[TRANSLATE] Rispetto reciproco e comportamento etico"
+        },
+        "link": "[TRANSLATE] Leggi i termini completi",
+        "checkbox": "[TRANSLATE] Accetto i Termini di Servizio",
+        "buttons": {
+          "disabled": "[TRANSLATE] Accetta per continuare",
+          "accept": "[TRANSLATE] Accetta e Continua",
+          "submitting": "[TRANSLATE] Salvataggio..."
+        },
+        "screenReader": {
+          "required": "[TRANSLATE] È necessario accettare i Termini di Servizio",
+          "submitting": "[TRANSLATE] Salvataggio in corso..."
+        }
+      }
     },
-    "button": "Accept and Continue",
-    "coppa": "If you are under 13, your parents received a notice to approve essential cookies.",
-    "privacyPolicy": "Privacy Policy",
-    "cookiePolicy": "Cookie Policy"
-  },
-  "privacy": {
-    "title": "Privacy Agreement",
-    "description": "Your privacy is important to us",
-    "dataProcessing": "Data Processing",
-    "processingText": "MirrorBuddy processes only the data necessary to provide you with a personalized and secure learning experience.",
-    "dataStorage": "Where We Store Your Data",
-    "storageText": "Your data is stored on secure servers in Europe with guaranteed GDPR compliance.",
-    "retention": "Data Retention Period",
-    "retentionText": "We retain your data for as long as necessary for the service. You can request deletion at any time.",
-    "accept": "I Have Read and Accept",
-    "decline": "Decline"
-  },
-  "terms": {
-    "title": "Terms of Service",
-    "description": "Read our terms and conditions",
-    "acceptance": "I Accept the Terms of Service",
-    "acceptanceText": "I confirm that I have read and accepted the terms of service and platform policies.",
-    "linkLabel": "View Full Terms",
-    "required": "You must accept the Terms of Service to continue."
-  },
-  "ageVerification": {
-    "title": "Age Verification",
-    "description": "GDPR Compliance - Minor Protection",
-    "statement": "I confirm I am at least 14 years old",
-    "europeanMinor": "If you are under 14, parental or guardian consent is required.",
-    "confirm": "I confirm I am at least 14 years old",
-    "under14": "I am an Under-14 User - I Request Parental Consent"
-  },
-  "parentalConsent": {
-    "title": "Parental Consent",
-    "description": "Consent Request for Minor Users",
-    "intro": "If you are a parent or guardian of a minor user, please read our policies carefully.",
-    "statement": "I confirm I am a legal parent or guardian and authorize platform usage",
-    "responsibilities": "Parent Responsibilities",
-    "responsibilitiesText": "As a parent, you agree to supervise platform use and are responsible for the minor's activity.",
-    "contactUs": "For questions about parental consent, contact our support team.",
-    "confirm": "I Give My Consent",
-    "decline": "I Do Not Authorize"
-  },
-  "aiDisclosure": {
-    "title": "AI Disclosure",
-    "description": "Transparency in Artificial Intelligence Use",
-    "statement": "This platform uses Artificial Intelligence (AI) to personalize your learning.",
-    "howWeUseAI": "How We Use AI",
-    "howWeUseAIText": "AI is used to provide personalized tutoring, adaptive feedback, and learning recommendations. Critical decisions remain under human control.",
-    "aiLimitations": "AI Limitations",
-    "aiLimitationsText": "AI is not perfect. It can make mistakes and should not replace human judgment. We encourage critical questions and feedback.",
-    "humanOversight": "Human Oversight",
-    "humanOversightText": "All critical AI functions are supervised by qualified teachers and educational specialists.",
-    "acknowledge": "I Understand AI Use"
-  },
-  "withdrawal": {
-    "title": "Consent Withdrawal",
-    "description": "How to Revoke Consent",
-    "howToWithdraw": "You can withdraw consent at any time by accessing your privacy settings.",
-    "withdrawalProcess": "Withdrawal Process",
-    "withdrawalSteps": "1. Sign in to your account\n2. Go to Settings > Privacy and Consent\n3. Select which consents you want to withdraw\n4. Confirm the withdrawal request\n5. Your data will be deleted per GDPR regulations",
-    "emailWithdrawal": "Alternatively, you can send us a formal withdrawal request email.",
-    "consequences": "Consequences",
-    "consequencesText": "Withdrawing certain consents may prevent access to specific platform features.",
-    "contactSupport": "Contact Support"
+    "ageVerification": {
+      "title": "Age Verification",
+      "description": "GDPR Compliance - Minor Protection",
+      "statement": "I confirm I am at least 14 years old",
+      "europeanMinor": "If you are under 14, parental or guardian consent is required.",
+      "confirm": "I confirm I am at least 14 years old",
+      "under14": "I am an Under-14 User - I Request Parental Consent"
+    },
+    "parentalConsent": {
+      "title": "Parental Consent",
+      "description": "Consent Request for Minor Users",
+      "intro": "If you are a parent or guardian of a minor user, please read our policies carefully.",
+      "statement": "I confirm I am a legal parent or guardian and authorize platform usage",
+      "responsibilities": "Parent Responsibilities",
+      "responsibilitiesText": "As a parent, you agree to supervise platform use and are responsible for the minor's activity.",
+      "contactUs": "For questions about parental consent, contact our support team.",
+      "confirm": "I Give My Consent",
+      "decline": "I Do Not Authorize"
+    },
+    "aiDisclosure": {
+      "title": "AI Disclosure",
+      "description": "Transparency in Artificial Intelligence Use",
+      "statement": "This platform uses Artificial Intelligence (AI) to personalize your learning.",
+      "howWeUseAI": "How We Use AI",
+      "howWeUseAIText": "AI is used to provide personalized tutoring, adaptive feedback, and learning recommendations. Critical decisions remain under human control.",
+      "aiLimitations": "AI Limitations",
+      "aiLimitationsText": "AI is not perfect. It can make mistakes and should not replace human judgment. We encourage critical questions and feedback.",
+      "humanOversight": "Human Oversight",
+      "humanOversightText": "All critical AI functions are supervised by qualified teachers and educational specialists.",
+      "acknowledge": "I Understand AI Use"
+    },
+    "withdrawal": {
+      "title": "Consent Withdrawal",
+      "description": "How to Revoke Consent",
+      "howToWithdraw": "You can withdraw consent at any time by accessing your privacy settings.",
+      "withdrawalProcess": "Withdrawal Process",
+      "withdrawalSteps": "1. Sign in to your account\n2. Go to Settings > Privacy and Consent\n3. Select which consents you want to withdraw\n4. Confirm the withdrawal request\n5. Your data will be deleted per GDPR regulations",
+      "emailWithdrawal": "Alternatively, you can send us a formal withdrawal request email.",
+      "consequences": "Consequences",
+      "consequencesText": "Withdrawing certain consents may prevent access to specific platform features.",
+      "contactSupport": "Contact Support"
+    },
+    "inline": {
+      "acceptedText": "[TRANSLATE] Consenso accettato",
+      "manage": "[TRANSLATE] Gestisci preferenze",
+      "acceptButton": "[TRANSLATE] Accetta Cookie",
+      "info": "[TRANSLATE] Informazioni",
+      "title": "[TRANSLATE] Cookie e Privacy",
+      "description": "[TRANSLATE] Utilizziamo cookie essenziali per il funzionamento del sito",
+      "learnMore": "[TRANSLATE] Scopri di più",
+      "analyticsLabel": "[TRANSLATE] Analytics (opzionale)",
+      "submitButton": "[TRANSLATE] Accetta"
+    },
+    "unified": {
+      "loading": "[TRANSLATE] Caricamento...",
+      "titleWelcome": "[TRANSLATE] Benvenuto su MirrorBuddy",
+      "subtitleWelcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini",
+      "titleUpdated": "[TRANSLATE] Termini Aggiornati",
+      "subtitleUpdated": "[TRANSLATE] I nostri termini sono stati aggiornati",
+      "reconsentNotice": {
+        "lastAccepted": "[TRANSLATE] Ultima accettazione:",
+        "changed": "[TRANSLATE] Cosa è cambiato:",
+        "details": "[TRANSLATE] Abbiamo aggiornato la nostra politica sulla privacy"
+      },
+      "summaryTitle": "[TRANSLATE] Cosa accetti",
+      "privacy": {
+        "title": "[TRANSLATE] Privacy e Dati",
+        "description": "[TRANSLATE] Come trattiamo i tuoi dati personali"
+      },
+      "cookies": {
+        "title": "[TRANSLATE] Cookie Essenziali",
+        "description": "[TRANSLATE] Necessari per il funzionamento dell'app"
+      },
+      "tos": {
+        "title": "[TRANSLATE] Termini di Servizio",
+        "description": "[TRANSLATE] Regole d'uso della piattaforma"
+      },
+      "links": {
+        "full": "[TRANSLATE] Termini Completi",
+        "privacy": "[TRANSLATE] Privacy Policy",
+        "cookies": "[TRANSLATE] Cookie Policy"
+      },
+      "tosCheckbox": {
+        "label": "[TRANSLATE] Accetto i Termini di Servizio",
+        "text": "[TRANSLATE] e confermo di aver letto la privacy policy"
+      },
+      "analytics": {
+        "label": "[TRANSLATE] Analytics Opzionali",
+        "description": "[TRANSLATE] Aiutaci a migliorare l'app (anonimo)"
+      },
+      "buttons": {
+        "disabled": "[TRANSLATE] Accetta i termini per continuare",
+        "accept": "[TRANSLATE] Accetta e Continua",
+        "submitting": "[TRANSLATE] Salvataggio..."
+      },
+      "coppa": "[TRANSLATE] Se hai meno di 13 anni, è necessario il consenso dei genitori",
+      "screenReader": {
+        "required": "[TRANSLATE] È necessario accettare i Termini di Servizio per continuare",
+        "submitting": "[TRANSLATE] Salvataggio del consenso in corso..."
+      }
+    }
   }
 }

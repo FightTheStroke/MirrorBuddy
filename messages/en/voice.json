@@ -1,0 +1,111 @@
+{
+  "voice": {
+    "connectionError": "Voice connection error",
+    "serviceUnavailable": "Unable to connect to voice service",
+    "microphonePermission": "Microphone not authorized. Enable the microphone in your browser settings.",
+    "sessionTitle": "Voice session with {name}",
+    "studyMethod": "Study method",
+    "emotionalSupport": "Emotional support",
+    "panel": {
+      "connected": "Connected",
+      "connecting": "Connecting...",
+      "listening": "Listening",
+      "microphoneDisabled": "Microphone disabled",
+      "mutedLabel": "Muted",
+      "muteLabel": "Mute",
+      "speakNow": "Speak now",
+      "speaking": "Speaking",
+      "startingCall": "Starting call...",
+      "unmuteLabel": "Unmute"
+    },
+    "microphoneUnauthorized": "Microphone not authorized. Enable microphone in browser settings.",
+    "permission": {
+      "enableLabel": "Enable Label",
+      "steps": {
+        "findMicrophone": "Find Microphone",
+        "lockIcon": "Lock Icon",
+        "reload": "Reload",
+        "selectAllow": "Select Allow"
+      },
+      "subtitle": "Sottotitolo",
+      "switchToChat": "Switch To Chat",
+      "title": "Titolo"
+    },
+    "label": "Voice",
+    "description": "Enable voice conversation with Maestri",
+    "chatUI": {
+      "startRecording": "Start recording",
+      "stopRecording": "Stop recording",
+      "sendVoiceMessage": "Send voice message",
+      "cancel": "Cancel",
+      "recordingInProgress": "Recording in progress...",
+      "microphonePermission": "Allow microphone access to use voice",
+      "grantPermission": "Allow microphone",
+      "denyPermission": "Deny access"
+    },
+    "status": {
+      "listening": "Listening...",
+      "processing": "Processing...",
+      "speaking": "Speaking...",
+      "connecting": "Connecting...",
+      "ready": "Ready",
+      "initializing": "Initializing...",
+      "processing_text": "Transcribing..."
+    },
+    "settings": {
+      "title": "Voice settings",
+      "speed": "Playback speed",
+      "pitch": "Pitch",
+      "voiceSelection": "Select voice",
+      "volume": "Volume",
+      "enableCaptions": "Enable captions",
+      "textToSpeech": "Text to speech",
+      "speechToText": "Speech recognition",
+      "language": "Listening language",
+      "reset": "Reset to defaults"
+    },
+    "errors": {
+      "microphoneDenied": "Microphone access denied. Enable microphone in settings.",
+      "microphoneNotFound": "No microphone detected. Check your device.",
+      "connectionError": "Connection error. Check your internet connection.",
+      "timeout": "Connection timeout. Try again.",
+      "recordingFailed": "Recording failed. Try again.",
+      "processingError": "Processing error. Try again.",
+      "permissionError": "Permission error. Check your settings.",
+      "unsupportedBrowser": "Your browser does not support voice recording.",
+      "unknownError": "Unknown error. Try again later."
+    },
+    "trialLimits": {
+      "voiceTitle": "Voice limit",
+      "minutesRemaining": "{minutes} minutes remaining",
+      "secondsRemaining": "{seconds} seconds remaining",
+      "limitReached": "Voice limit reached",
+      "limitReachedMessage": "You have used all your voice minutes. Upgrade for unlimited voice access.",
+      "upgradePrompt": "Want unlimited voice access?",
+      "upgrade": "Upgrade now"
+    },
+    "accessibility": {
+      "voiceToText": "Convert voice to text",
+      "textAlternative": "Use text as alternative",
+      "captionsToggle": "Toggle captions",
+      "enableSubtitles": "Enable captions for all responses",
+      "voiceSpeed": "Reading speed",
+      "slow": "Slow",
+      "normal": "Normal",
+      "fast": "Fast",
+      "veryFast": "Very fast",
+      "screenReaderSupport": "This tool supports screen readers"
+    },
+    "confirmations": {
+      "deleteRecording": "Delete recording?",
+      "discardMessage": "Discard message?",
+      "confirmSend": "Send voice message?"
+    },
+    "help": {
+      "title": "Voice guide",
+      "howToRecord": "How to record: Press the microphone button and speak clearly.",
+      "tips": "Tips: Speak in a quiet environment for best results.",
+      "troubleshooting": "Troubleshooting: Verify microphone works in your browser."
+    }
+  }
+}

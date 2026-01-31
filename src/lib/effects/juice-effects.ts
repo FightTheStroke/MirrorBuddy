@@ -11,6 +11,7 @@ import {
   playGrandConfetti,
 } from "./confetti";
 import { triggerHaptic, celebrationVibrate, lightVibrate } from "./haptics";
+import { logger } from "@/lib/logger";
 
 /**
  * Celebration context for tracking state and preventing duplicate calls
@@ -50,8 +51,8 @@ export function celebrateQuizComplete(): void {
     playGrandConfetti();
     playSoundEffect("quiz-complete");
     celebrationVibrate();
-  } catch (error) {
-    console.debug("Error in celebrateQuizComplete:", error);
+  } catch {
+    logger.debug("Error in celebrateQuizComplete");
   }
 }
 
@@ -74,8 +75,8 @@ export function celebrateLevelUp(): void {
     });
     playSoundEffect("level-up");
     celebrationVibrate();
-  } catch (error) {
-    console.debug("Error in celebrateLevelUp:", error);
+  } catch {
+    logger.debug("Error in celebrateLevelUp");
   }
 }
 
@@ -94,8 +95,8 @@ export function celebrateStreak(): void {
     playSubtleConfetti();
     playSoundEffect("streak");
     triggerHaptic("medium");
-  } catch (error) {
-    console.debug("Error in celebrateStreak:", error);
+  } catch {
+    logger.debug("Error in celebrateStreak");
   }
 }
 
@@ -114,8 +115,8 @@ export function celebrateBadge(): void {
     playSubtleConfetti();
     playSoundEffect("badge");
     lightVibrate();
-  } catch (error) {
-    console.debug("Error in celebrateBadge:", error);
+  } catch {
+    logger.debug("Error in celebrateBadge");
   }
 }
 
@@ -133,8 +134,8 @@ export function celebrateCorrectAnswer(): void {
     resumeAudioContext();
     playSoundEffect("correct");
     lightVibrate();
-  } catch (error) {
-    console.debug("Error in celebrateCorrectAnswer:", error);
+  } catch {
+    logger.debug("Error in celebrateCorrectAnswer");
   }
 }
 

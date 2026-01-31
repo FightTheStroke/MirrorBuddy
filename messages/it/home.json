@@ -1,43 +1,36 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - La Scuola che Voglio",
+    "appTitle": "MirrorBuddy",
     "loading": "Caricamento...",
-    "seasonDefault": "Autunno",
+    "seasonDefault": "Stagione Corrente",
     "mirrorBucksShort": "MB",
     "navigation": {
-      "professors": "Professori",
       "astuccio": "Astuccio",
       "zaino": "Zaino",
       "calendar": "Calendario",
-      "progress": "Progressi",
+      "progress": "Progresso",
       "settings": "Impostazioni",
-      "features": "Funzionalità",
-      "pricing": "Prezzi",
-      "about": "Chi siamo",
-      "contact": "Contatti",
-      "login": "Accedi",
-      "signup": "Registrati",
-      "dashboard": "Dashboard",
-      "logout": "Esci"
+      "professors": "Professori"
     },
     "header": {
       "openMenu": "Apri menu",
+      "mirrorBucksShort": "MB",
       "streak": "Serie",
       "sessionsThisWeek": "Sessioni questa settimana",
       "studyTime": "Tempo di studio",
-      "questionsAsked": "Domande fatte",
-      "trial": "Prova",
-      "trialClickToRequest": "Clicca per richiedere accesso completo"
+      "questionsAsked": "Domande poste",
+      "trialClickToRequest": "Clicca per richiedere accesso",
+      "trial": "Prova"
     },
     "sidebar": {
-      "backToHome": "Torna alla home",
+      "backToHome": "Torna alla Home",
       "appName": "MirrorBuddy",
       "closeMenu": "Chiudi menu",
       "trialMode": "Modalità Prova",
       "login": "Accedi",
       "requestAccess": "Richiedi Accesso",
+      "adminDashboardAria": "Vai alla Dashboard Amministrazione",
       "adminDashboard": "Dashboard Admin",
-      "adminDashboardAria": "Dashboard amministratore",
       "parentArea": "Area Genitori"
     },
     "adminDashboard": "Dashboard Admin",
@@ -56,32 +49,5 @@
       "cta": "Inizia ora",
       "secondaryCta": "Scopri di più"
     }
-  },
-  "appTitle": "MirrorBuddy",
-  "loading": "Caricamento...",
-  "seasonDefault": "Stagione Corrente",
-  "header": {
-    "openMenu": "Apri menu",
-    "mirrorBucksShort": "MB",
-    "streak": "Serie",
-    "sessionsThisWeek": "Sessioni questa settimana",
-    "studyTime": "Tempo di studio",
-    "questionsAsked": "Domande poste",
-    "trialClickToRequest": "Clicca per richiedere accesso",
-    "trial": "Prova"
-  },
-  "sidebar": {
-    "backToHome": "Torna alla Home",
-    "appName": "MirrorBuddy",
-    "closeMenu": "Chiudi menu",
-    "trialMode": "Modalità Prova",
-    "login": "Accedi",
-    "requestAccess": "Richiedi Accesso",
-    "adminDashboardAria": "Vai alla Dashboard Amministrazione",
-    "adminDashboard": "Dashboard Admin",
-    "parentArea": "Area Genitori"
-  },
-  "navigation": {
-    "professors": "Professori"
   }
 }

@@ -1,0 +1,54 @@
+{
+  "session": {
+    "title": "Sesión",
+    "start": "Iniciar Sesión",
+    "end": "Terminar Sesión",
+    "duration": "Duración",
+    "controls": {
+      "mute": "Silenciar Audio",
+      "unmute": "Activar Audio",
+      "endSession": "Terminar",
+      "cancelResponseAriaLabel": "Cancelar respuesta",
+      "cancelResponseTooltip": "Cancelar respuesta actual",
+      "endSessionAriaLabel": "Terminar sesión",
+      "endSessionTooltip": "Terminar sesión de voz",
+      "inputPlaceholder": "Escribe un mensaje...",
+      "muteAriaLabel": {
+        "muted": "Silenciado",
+        "unmuted": "Sonido activado"
+      },
+      "muteTooltip": {
+        "muted": "Activar sonido",
+        "unmuted": "Silenciar"
+      },
+      "sendButton": "Enviar",
+      "sendMessageAriaLabel": "Enviar mensaje",
+      "sendMessageTooltip": "Enviar el mensaje",
+      "switchToChatAriaLabel": "Cambiar a chat",
+      "switchToChatTooltip": "Volver al chat de texto"
+    },
+    "rating": {
+      "close": "Cerrar",
+      "feedbackLabel": "Tu opinión",
+      "feedbackPlaceholder": "Comparte tus comentarios...",
+      "labels": {
+        "1": "Muy malo",
+        "2": "Malo",
+        "3": "Regular",
+        "4": "Bueno",
+        "5": "Excelente"
+      },
+      "minutes": "minutos",
+      "savingError": "Error al guardar",
+      "selectError": "Por favor selecciona una calificación",
+      "selectPlaceholder": "Seleccionar tema",
+      "sessionWith": "Sesión con",
+      "skip": "Omitir",
+      "stars": "estrellas",
+      "submit": "Enviar",
+      "submitting": "Enviando",
+      "title": "Califica tu sesión",
+      "topics": "Temas tratados"
+    }
+  }
+}

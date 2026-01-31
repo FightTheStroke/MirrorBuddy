@@ -341,7 +341,7 @@ const eslintConfig = defineConfig([
   },
   // T7-02: Block missing i18n namespace keys at build time
   // Validates that all t("key") calls reference keys that exist in message files
-  // TODO: Change to "error" after fixing all existing violations
+  // NOTE: Set to "error" once all existing violations are fixed
   {
     files: ["src/**/*.tsx", "src/**/*.ts"],
     ignores: [

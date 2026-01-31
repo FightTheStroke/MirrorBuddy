@@ -10,6 +10,7 @@ import { FeatureFlags } from "./feature-flags";
 import { SystemControls } from "./system-controls";
 import { TierLimits } from "./tier-limits";
 import { ControlPanelState } from "@/lib/admin/control-panel-types";
+import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
@@ -35,8 +36,7 @@ export default function ControlPanelPage() {
       setState(data.data);
       setError(null);
     } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("Error loading control panel:", err);
+      logger.error("Error loading control panel", undefined, err);
       setError(
         err instanceof Error ? err.message : "Failed to load control panel",
       );

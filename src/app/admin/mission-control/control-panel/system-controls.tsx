@@ -14,6 +14,7 @@ import {
   GlobalKillSwitchState,
 } from "@/lib/admin/control-panel-types";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { logger } from "@/lib/logger";
 
 interface SystemControlsProps {
   maintenanceMode: MaintenanceModeState;
@@ -60,8 +61,7 @@ export function SystemControls({
       onUpdate("maintenance");
       setShowMaintenanceModal(false);
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error updating maintenance mode:", error);
+      logger.error("Error updating maintenance mode", undefined, error);
       alert("Failed to update maintenance mode");
     } finally {
       setLoading(false);
@@ -95,8 +95,7 @@ export function SystemControls({
 
       onUpdate("kill-switch");
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error("Error toggling kill switch:", error);
+      logger.error("Error toggling kill switch", undefined, error);
       alert("Failed to toggle kill switch");
     } finally {
       setLoading(false);

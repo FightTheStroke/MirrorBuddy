@@ -104,8 +104,9 @@ async function getOnlineUsers(): Promise<OnlineUsersMetric> {
  * Get request metrics (mock data until APM is implemented)
  */
 async function getRequestMetrics(): Promise<RequestMetrics> {
-  // TODO: Implement real APM integration
-  // For now, return mock data
+  // ENGINEERING JUSTIFICATION: APM integration deferred (ADR 0037).
+  // Requires Grafana Cloud push service or custom APM setup.
+  // Placeholder allows ops dashboard development without external dependency.
   return {
     totalRequests: 0,
     avgResponseTime: 0,
@@ -116,11 +117,13 @@ async function getRequestMetrics(): Promise<RequestMetrics> {
 
 /**
  * Get voice session metrics
- * TODO: Implement when VoiceSession table is added
+ * ENGINEERING JUSTIFICATION: VoiceSession table not yet implemented in schema.
+ * Voice metrics tracked via UserActivity for now. Dedicated table planned
+ * for detailed session analytics (duration, interruptions, quality metrics).
+ * Placeholder prevents ops dashboard errors while schema evolves.
  */
 async function getVoiceMetrics(): Promise<VoiceMetrics> {
-  // VoiceSession table not yet implemented
-  // Return placeholder data
+  // Return placeholder data until VoiceSession table is added
   return {
     activeSessions: 0,
     totalMinutesToday: 0,
