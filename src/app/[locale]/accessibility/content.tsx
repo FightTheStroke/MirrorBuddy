@@ -8,8 +8,7 @@ interface AccessibilityContentProps {
 }
 
 export function AccessibilityContent({ config }: AccessibilityContentProps) {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "accessibility" is a top-level key in compliance.json, flattened at runtime
-  const t = useTranslations("accessibility");
+  const t = useTranslations("compliance.accessibility");
 
   return (
     <div className="prose prose-slate dark:prose-invert max-w-none">

@@ -16,7 +16,7 @@ import { locales, defaultLocale } from "@/i18n/config";
 import type { Locale } from "@/i18n/config";
 import { getLocalizedOGMetadata } from "@/lib/i18n/get-og-metadata";
 import { LocaleProvider } from "@/i18n/locale-provider";
-import { A11yInstantAccess } from "@/components/accessibility";
+import { A11yInstantAccess, SkipLink } from "@/components/accessibility";
 import { HreflangLinks } from "@/components/seo/hreflang-links";
 import type { Metadata } from "next";
 
@@ -60,6 +60,8 @@ export default async function LocaleLayout({
 
   return (
     <LocaleProvider locale={locale} messages={messages}>
+      {/* WCAG 2.1 AA: Skip link for keyboard navigation */}
+      <SkipLink />
       {/* A11yInstantAccess requires i18n context, must be inside LocaleProvider */}
       <A11yInstantAccess />
       {/* HreflangLinks adds SEO hreflang tags for multi-language support */}

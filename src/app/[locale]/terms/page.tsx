@@ -7,8 +7,7 @@ import { TermsContent } from "./content";
 import { TOS_VERSION, TOS_LAST_UPDATED } from "@/lib/tos/constants";
 
 export default function TermsPage() {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "legal.terms" is a top-level key in compliance.json, flattened at runtime
-  const t = useTranslations("legal.terms");
+  const t = useTranslations("compliance.legal.terms");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
