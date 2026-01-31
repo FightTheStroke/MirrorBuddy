@@ -29,6 +29,7 @@ import {
   TableEmpty,
 } from "@/components/ui/table";
 import { ResponsiveTable } from "@/components/admin/responsive-table";
+import { ExportDropdown } from "@/components/admin/export-dropdown";
 import { UsersBulkActions } from "./users-bulk-actions";
 import { UsersSearch } from "./users-search";
 import { UsersTrashToolbar } from "./users-trash-toolbar";
@@ -210,7 +211,22 @@ export function UsersTable({
         </TabsList>
 
         {filter !== "trash" && (
-          <UsersSearch value={search} onChange={setSearch} />
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex-1">
+              <UsersSearch value={search} onChange={setSearch} />
+            </div>
+            <ExportDropdown
+              data={filteredUsers}
+              columns={[
+                { key: "username", label: "Username" },
+                { key: "email", label: "Email" },
+                { key: "role", label: "Role" },
+                { key: "disabled", label: "Disabled" },
+                { key: "createdAt", label: "Created" },
+              ]}
+              filenamePrefix="users"
+            />
+          </div>
         )}
         {filter === "trash" && (
           <UsersTrashToolbar
