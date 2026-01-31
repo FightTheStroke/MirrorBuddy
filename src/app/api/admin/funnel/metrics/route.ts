@@ -58,12 +58,15 @@ export async function GET(request: Request) {
 
     // Build stage metrics with conversion rates
     const stageCountMap = new Map(
-      stageCounts.map((s) => [s.stage, s._count._all]),
+      stageCounts.map((s: { stage: string; _count: { _all: number } }) => [
+        s.stage,
+        s._count._all,
+      ]),
     );
 
     const stages: StageMetrics[] = FUNNEL_STAGES.map((stage, idx) => {
-      const count = stageCountMap.get(stage) ?? 0;
-      const prevCount =
+      const count: number = stageCountMap.get(stage) ?? 0;
+      const prevCount: number | null =
         idx > 0 ? (stageCountMap.get(FUNNEL_STAGES[idx - 1]) ?? 0) : null;
 
       return {

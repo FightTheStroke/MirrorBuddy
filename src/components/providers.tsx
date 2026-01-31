@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import { ThemeProvider } from "next-themes";
 import { AccessibilityProvider } from "@/components/accessibility";
+import { StagingBanner } from "@/components/ui/staging-banner";
 import { ToastContainer } from "@/components/ui/toast";
 import { IOSInstallBanner } from "@/components/pwa";
 import { UnifiedConsentWall } from "@/components/consent";
@@ -170,6 +171,7 @@ export function Providers({ children, nonce }: ProvidersProps) {
     >
       <AccessibilityProvider>
         {/* A11yInstantAccess moved to [locale]/layout.tsx for i18n context */}
+        <StagingBanner />
         <ConditionalUnifiedConsent>
           <StoreInitializer />
           <AccentColorApplier />

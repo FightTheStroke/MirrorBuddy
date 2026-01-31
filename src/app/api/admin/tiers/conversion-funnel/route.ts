@@ -10,6 +10,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
+import type { TierAuditLog, TierDefinition } from "@prisma/client";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
 
@@ -87,24 +88,27 @@ export async function GET(request: NextRequest) {
     });
 
     const _tierMap = new Map(
-      tiers.map((t) => [t.code, { id: t.id, name: t.name }]),
+      tiers.map((t: Pick<TierDefinition, "id" | "code" | "name">) => [
+        t.code,
+        { id: t.id, name: t.name },
+      ]),
     );
 
     // Calculate funnel metrics
     const trialToBaseConversions = tierAuditLogs.filter(
-      (log) =>
+      (log: TierAuditLog) =>
         (log.changes as Record<string, string>)?.from === "trial" &&
         (log.changes as Record<string, string>)?.to === "base",
     ).length;
 
     const baseToProConversions = tierAuditLogs.filter(
-      (log) =>
+      (log: TierAuditLog) =>
         (log.changes as Record<string, string>)?.from === "base" &&
         (log.changes as Record<string, string>)?.to === "pro",
     ).length;
 
     const trialToProConversions = tierAuditLogs.filter(
-      (log) =>
+      (log: TierAuditLog) =>
         (log.changes as Record<string, string>)?.from === "trial" &&
         (log.changes as Record<string, string>)?.to === "pro",
     ).length;
@@ -113,21 +117,28 @@ export async function GET(request: NextRequest) {
     const uniqueTrialUsers = new Set(
       tierAuditLogs
         .filter(
-          (log) => (log.changes as Record<string, string>)?.from === "trial",
+          (log: TierAuditLog) =>
+            (log.changes as Record<string, string>)?.from === "trial",
         )
-        .map((log) => log.userId),
+        .map((log: TierAuditLog) => log.userId),
     ).size;
 
     const uniqueBaseUsers = new Set(
       tierAuditLogs
-        .filter((log) => (log.changes as Record<string, string>)?.to === "base")
-        .map((log) => log.userId),
+        .filter(
+          (log: TierAuditLog) =>
+            (log.changes as Record<string, string>)?.to === "base",
+        )
+        .map((log: TierAuditLog) => log.userId),
     ).size;
 
     const uniqueProUsers = new Set(
       tierAuditLogs
-        .filter((log) => (log.changes as Record<string, string>)?.to === "pro")
-        .map((log) => log.userId),
+        .filter(
+          (log: TierAuditLog) =>
+            (log.changes as Record<string, string>)?.to === "pro",
+        )
+        .map((log: TierAuditLog) => log.userId),
     ).size;
 
     // Calculate conversion rates
@@ -189,7 +200,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Populate time series
-    tierAuditLogs.forEach((log) => {
+    tierAuditLogs.forEach((log: TierAuditLog) => {
       const dateStr = log.createdAt.toISOString().split("T")[0];
       const entry = timeSeriesMap.get(dateStr);
 
@@ -209,7 +220,7 @@ export async function GET(request: NextRequest) {
     });
 
     // Count current tier distribution at each date
-    tierAuditLogs.forEach((log) => {
+    tierAuditLogs.forEach((log: TierAuditLog) => {
       const dateStr = log.createdAt.toISOString().split("T")[0];
       const entry = timeSeriesMap.get(dateStr);
 

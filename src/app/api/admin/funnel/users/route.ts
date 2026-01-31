@@ -10,6 +10,30 @@ import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { FunnelStage } from "@/lib/funnel/constants";
 import { logger } from "@/lib/logger";
 
+// Types for Prisma query results
+interface EventCountResult {
+  visitorId: string | null;
+  userId: string | null;
+  _count: { _all: number };
+}
+
+interface LatestEventResult {
+  visitorId: string | null;
+  userId: string | null;
+  stage: string;
+  createdAt: Date;
+}
+
+interface TrialSessionResult {
+  visitorId: string;
+  email: string | null;
+}
+
+interface UserResult {
+  id: string;
+  email: string | null;
+}
+
 export const dynamic = "force-dynamic";
 
 interface FunnelUser {
@@ -82,13 +106,16 @@ export async function GET(request: Request) {
       _count: { _all: true },
     });
     const countMap = new Map(
-      eventCounts.map((e) => [e.userId ?? e.visitorId, e._count._all]),
+      eventCounts.map((e: EventCountResult) => [
+        e.userId ?? e.visitorId,
+        e._count._all,
+      ]),
     );
 
     // Get trial session emails for visitors
     const visitorIds = latestEvents
-      .filter((e) => e.visitorId && !e.userId)
-      .map((e) => e.visitorId!);
+      .filter((e: LatestEventResult) => e.visitorId && !e.userId)
+      .map((e: LatestEventResult) => e.visitorId!);
 
     const trialSessions =
       visitorIds.length > 0
@@ -97,10 +124,14 @@ export async function GET(request: Request) {
             select: { visitorId: true, email: true },
           })
         : [];
-    const emailMap = new Map(trialSessions.map((t) => [t.visitorId, t.email]));
+    const emailMap = new Map(
+      trialSessions.map((t: TrialSessionResult) => [t.visitorId, t.email]),
+    );
 
     // Get user emails
-    const userIds = latestEvents.filter((e) => e.userId).map((e) => e.userId!);
+    const userIds = latestEvents
+      .filter((e: LatestEventResult) => e.userId)
+      .map((e: LatestEventResult) => e.userId!);
 
     const users =
       userIds.length > 0
@@ -109,14 +140,14 @@ export async function GET(request: Request) {
             select: { id: true, email: true },
           })
         : [];
-    const userEmailMap = new Map(users.map((u) => [u.id, u.email]));
+    const userEmailMap = new Map(users.map((u: UserResult) => [u.id, u.email]));
 
     // Build response with filtering
     let filteredEvents = latestEvents;
 
     if (search) {
       const searchLower = search.toLowerCase();
-      filteredEvents = filteredEvents.filter((e) => {
+      filteredEvents = filteredEvents.filter((e: LatestEventResult) => {
         const id = e.userId ?? e.visitorId ?? "";
         const email = e.userId
           ? userEmailMap.get(e.userId)
@@ -136,25 +167,27 @@ export async function GET(request: Request) {
       page * pageSize,
     );
 
-    const funnelUsers: FunnelUser[] = paginatedEvents.map((e) => {
-      const id = e.userId ?? e.visitorId ?? "unknown";
-      const isUser = !!e.userId;
-      const email = isUser
-        ? (userEmailMap.get(e.userId!) ?? null)
-        : e.visitorId
-          ? (emailMap.get(e.visitorId) ?? null)
-          : null;
+    const funnelUsers: FunnelUser[] = paginatedEvents.map(
+      (e: LatestEventResult) => {
+        const id = e.userId ?? e.visitorId ?? "unknown";
+        const isUser = !!e.userId;
+        const email = isUser
+          ? (userEmailMap.get(e.userId!) ?? null)
+          : e.visitorId
+            ? (emailMap.get(e.visitorId) ?? null)
+            : null;
 
-      return {
-        id,
-        type: isUser ? "user" : "visitor",
-        email,
-        currentStage: e.stage,
-        stageEnteredAt: e.createdAt.toISOString(),
-        eventsCount: countMap.get(id) ?? 0,
-        lastActivity: e.createdAt.toISOString(),
-      };
-    });
+        return {
+          id,
+          type: isUser ? "user" : "visitor",
+          email,
+          currentStage: e.stage,
+          stageEnteredAt: e.createdAt.toISOString(),
+          eventsCount: countMap.get(id) ?? 0,
+          lastActivity: e.createdAt.toISOString(),
+        };
+      },
+    );
 
     const response: FunnelUsersResponse = {
       users: funnelUsers,

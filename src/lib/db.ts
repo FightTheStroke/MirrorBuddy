@@ -10,6 +10,7 @@ import { PrismaPg } from "@prisma/adapter-pg";
 import { Pool, PoolConfig } from "pg";
 import { logger } from "@/lib/logger";
 import { isSupabaseUrl } from "@/lib/utils/url-validation";
+import { isStagingMode } from "@/lib/environment/staging-detector";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -229,12 +230,82 @@ const pool = new Pool({
 
 const adapter = new PrismaPg(pool);
 
+const basePrisma = new PrismaClient({
+  adapter,
+  log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+});
+
+// ============================================================================
+// STAGING MODE MIDDLEWARE (using Prisma Client Extensions)
+// Auto-set isTestData=true for all creates in staging/preview environments
+// This prevents test data from polluting production statistics
+// ============================================================================
+
+// Models that have isTestData field (must be kept in sync with schema)
+// Update this list when adding/removing isTestData from models
+const MODELS_WITH_TEST_DATA_FLAG = [
+  "User",
+  "Conversation",
+  "Message",
+  "FlashcardProgress",
+  "QuizResult",
+  "Material",
+  "SessionMetrics",
+  "UserActivity",
+  "TelemetryEvent",
+  "StudySession",
+  "FunnelEvent",
+] as const;
+
+type ModelWithTestData = (typeof MODELS_WITH_TEST_DATA_FLAG)[number];
+
+// Create extension for staging mode auto-tagging
+const stagingExtension = basePrisma.$extends({
+  name: "staging-test-data-tagger",
+  query: {
+    // Apply to all models that have isTestData field
+    $allModels: {
+      // Intercept create operations
+      async create({ model, operation: _operation, args, query }) {
+        if (
+          isStagingMode &&
+          MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)
+        ) {
+          args.data = {
+            ...args.data,
+            isTestData: true,
+          };
+        }
+        return query(args);
+      },
+      // Intercept createMany operations
+      async createMany({ model, operation: _operation2, args, query }) {
+        if (
+          isStagingMode &&
+          MODELS_WITH_TEST_DATA_FLAG.includes(model as ModelWithTestData)
+        ) {
+          if (Array.isArray(args.data)) {
+            args.data = args.data.map((item: Record<string, unknown>) => ({
+              ...item,
+              isTestData: true,
+            })) as typeof args.data;
+          } else {
+            args.data = {
+              ...args.data,
+              isTestData: true,
+            };
+          }
+        }
+        return query(args);
+      },
+    },
+  },
+});
+
+// Export the extended client (or base client if already initialized)
+// Type assertion is safe because $extends preserves the PrismaClient interface
 export const prisma =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    adapter,
-    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
-  });
+  globalForPrisma.prisma ?? (stagingExtension as unknown as PrismaClient);
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

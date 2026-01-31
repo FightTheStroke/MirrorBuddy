@@ -74,20 +74,30 @@ export async function GET(request: NextRequest) {
     }
 
     // Build journey with time differences
-    const journey: JourneyEvent[] = events.map((event, idx) => {
-      const prevEvent = idx > 0 ? events[idx - 1] : null;
-      const timeSincePrevious = prevEvent
-        ? event.createdAt.getTime() - prevEvent.createdAt.getTime()
-        : null;
+    const journey: JourneyEvent[] = events.map(
+      (
+        event: {
+          stage: string;
+          fromStage: string | null;
+          createdAt: Date;
+          metadata: unknown;
+        },
+        idx: number,
+      ) => {
+        const prevEvent = idx > 0 ? events[idx - 1] : null;
+        const timeSincePrevious = prevEvent
+          ? event.createdAt.getTime() - prevEvent.createdAt.getTime()
+          : null;
 
-      return {
-        stage: event.stage,
-        fromStage: event.fromStage,
-        createdAt: event.createdAt.toISOString(),
-        metadata: event.metadata as Record<string, unknown> | null,
-        timeSincePrevious,
-      };
-    });
+        return {
+          stage: event.stage,
+          fromStage: event.fromStage,
+          createdAt: event.createdAt.toISOString(),
+          metadata: event.metadata as Record<string, unknown> | null,
+          timeSincePrevious,
+        };
+      },
+    );
 
     const firstEvent = events[0];
     const lastEvent = events[events.length - 1];
@@ -95,7 +105,8 @@ export async function GET(request: NextRequest) {
 
     // Check if converted (reached ACTIVE or FIRST_LOGIN)
     const converted = events.some(
-      (e) => e.stage === "ACTIVE" || e.stage === "FIRST_LOGIN",
+      (e: { stage: string }) =>
+        e.stage === "ACTIVE" || e.stage === "FIRST_LOGIN",
     );
 
     // Check if churned (no activity in 14 days and not converted)

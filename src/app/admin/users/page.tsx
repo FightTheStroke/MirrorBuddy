@@ -14,6 +14,7 @@ interface User {
   email: string | null;
   role: "USER" | "ADMIN";
   disabled: boolean;
+  isTestData: boolean;
   createdAt: Date;
   subscription: {
     id: string;
@@ -54,6 +55,7 @@ export default async function AdminUsersPage() {
         email: true,
         role: true,
         disabled: true,
+        isTestData: true,
         createdAt: true,
         subscription: {
           select: {

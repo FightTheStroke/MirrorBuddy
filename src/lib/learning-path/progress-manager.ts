@@ -4,13 +4,14 @@
 // Plan 8 MVP - Wave 2: Learning Path Generation [F-14]
 // ============================================================================
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import type { LearningPathTopic } from "@prisma/client";
+import { logger } from "@/lib/logger";
 
 /**
  * Topic status values
  */
-export type TopicStatus = 'locked' | 'unlocked' | 'in_progress' | 'completed';
+export type TopicStatus = "locked" | "unlocked" | "in_progress" | "completed";
 
 /**
  * Result of completing a topic
@@ -29,34 +30,36 @@ export interface TopicCompletionResult {
  * Start a topic (mark as in_progress)
  * [F-14] Progressive unlock
  */
-export async function startTopic(topicId: string): Promise<{ success: boolean; error?: string }> {
-  logger.info('Starting topic', { topicId });
+export async function startTopic(
+  topicId: string,
+): Promise<{ success: boolean; error?: string }> {
+  logger.info("Starting topic", { topicId });
 
   const topic = await prisma.learningPathTopic.findUnique({
     where: { id: topicId },
   });
 
   if (!topic) {
-    return { success: false, error: 'Topic not found' };
+    return { success: false, error: "Topic not found" };
   }
 
-  if (topic.status === 'locked') {
-    return { success: false, error: 'Topic is locked' };
+  if (topic.status === "locked") {
+    return { success: false, error: "Topic is locked" };
   }
 
-  if (topic.status === 'completed') {
-    return { success: false, error: 'Topic already completed' };
+  if (topic.status === "completed") {
+    return { success: false, error: "Topic already completed" };
   }
 
   await prisma.learningPathTopic.update({
     where: { id: topicId },
     data: {
-      status: 'in_progress',
+      status: "in_progress",
       startedAt: new Date(),
     },
   });
 
-  logger.info('Topic started', { topicId });
+  logger.info("Topic started", { topicId });
   return { success: true };
 }
 
@@ -66,9 +69,9 @@ export async function startTopic(topicId: string): Promise<{ success: boolean; e
  */
 export async function completeTopic(
   topicId: string,
-  quizScore?: number
+  quizScore?: number,
 ): Promise<TopicCompletionResult> {
-  logger.info('Completing topic', { topicId, quizScore });
+  logger.info("Completing topic", { topicId, quizScore });
 
   // Use transaction to prevent race conditions
   return await prisma.$transaction(async (tx) => {
@@ -79,7 +82,7 @@ export async function completeTopic(
         path: {
           include: {
             topics: {
-              orderBy: { order: 'asc' },
+              orderBy: { order: "asc" },
             },
           },
         },
@@ -87,18 +90,18 @@ export async function completeTopic(
     });
 
     if (!topic) {
-      throw new Error('Topic not found');
+      throw new Error("Topic not found");
     }
 
-    if (topic.status === 'locked') {
-      throw new Error('Cannot complete a locked topic');
+    if (topic.status === "locked") {
+      throw new Error("Cannot complete a locked topic");
     }
 
     // Mark topic as completed
     await tx.learningPathTopic.update({
       where: { id: topicId },
       data: {
-        status: 'completed',
+        status: "completed",
         completedAt: new Date(),
         quizScore: quizScore ?? null,
       },
@@ -106,23 +109,26 @@ export async function completeTopic(
 
     // Find next topic
     const currentOrder = topic.order;
-    const nextTopic = topic.path.topics.find((t) => t.order === currentOrder + 1);
+    const nextTopic = topic.path.topics.find(
+      (t) => t.order === currentOrder + 1,
+    );
     let unlockedNext = false;
     let nextTopicId: string | undefined;
 
     // Unlock next topic if exists and is locked
-    if (nextTopic && nextTopic.status === 'locked') {
+    if (nextTopic && nextTopic.status === "locked") {
       await tx.learningPathTopic.update({
         where: { id: nextTopic.id },
-        data: { status: 'unlocked' },
+        data: { status: "unlocked" },
       });
       unlockedNext = true;
       nextTopicId = nextTopic.id;
-      logger.info('Next topic unlocked', { nextTopicId });
+      logger.info("Next topic unlocked", { nextTopicId });
     }
 
     // Calculate new progress
-    const completedCount = topic.path.topics.filter((t) => t.status === 'completed').length + 1;
+    const completedCount =
+      topic.path.topics.filter((t) => t.status === "completed").length + 1;
     const totalCount = topic.path.topics.length;
     const progressPercent = Math.round((completedCount / totalCount) * 100);
     const pathCompleted = completedCount === totalCount;
@@ -133,12 +139,12 @@ export async function completeTopic(
       data: {
         completedTopics: completedCount,
         progressPercent,
-        status: pathCompleted ? 'completed' : 'in_progress',
+        status: pathCompleted ? "completed" : "in_progress",
         completedAt: pathCompleted ? new Date() : null,
       },
     });
 
-    logger.info('Topic completed', {
+    logger.info("Topic completed", {
       topicId,
       progressPercent,
       pathCompleted,
@@ -147,7 +153,7 @@ export async function completeTopic(
 
     return {
       topicId,
-      newStatus: 'completed' as const,
+      newStatus: "completed" as const,
       quizScore,
       unlockedNext,
       nextTopicId,
@@ -160,9 +166,7 @@ export async function completeTopic(
 /**
  * Get learning path progress summary
  */
-export async function getPathProgress(
-  pathId: string
-): Promise<{
+export async function getPathProgress(pathId: string): Promise<{
   totalTopics: number;
   completedTopics: number;
   currentTopic: string | null;
@@ -173,17 +177,18 @@ export async function getPathProgress(
     where: { id: pathId },
     include: {
       topics: {
-        orderBy: { order: 'asc' },
+        orderBy: { order: "asc" },
       },
     },
   });
 
   if (!path) {
-    throw new Error('Path not found');
+    throw new Error("Path not found");
   }
 
   const currentTopic = path.topics.find(
-    (t) => t.status === 'in_progress' || t.status === 'unlocked'
+    (t: LearningPathTopic) =>
+      t.status === "in_progress" || t.status === "unlocked",
   );
 
   return {
@@ -191,28 +196,30 @@ export async function getPathProgress(
     completedTopics: path.completedTopics,
     currentTopic: currentTopic?.id ?? null,
     progressPercent: path.progressPercent,
-    isCompleted: path.status === 'completed',
+    isCompleted: path.status === "completed",
   };
 }
 
 /**
  * Reset a topic to unlocked state (for re-studying)
  */
-export async function resetTopic(topicId: string): Promise<{ success: boolean }> {
-  logger.info('Resetting topic', { topicId });
+export async function resetTopic(
+  topicId: string,
+): Promise<{ success: boolean }> {
+  logger.info("Resetting topic", { topicId });
 
   const topic = await prisma.learningPathTopic.findUnique({
     where: { id: topicId },
   });
 
-  if (!topic || topic.status === 'locked') {
+  if (!topic || topic.status === "locked") {
     return { success: false };
   }
 
   await prisma.learningPathTopic.update({
     where: { id: topicId },
     data: {
-      status: 'unlocked',
+      status: "unlocked",
       startedAt: null,
       completedAt: null,
       quizScore: null,

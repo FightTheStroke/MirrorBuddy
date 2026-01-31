@@ -26,6 +26,7 @@ import { SentryQuotaCard } from "@/components/admin/SentryQuotaCard";
 import { FunnelChart } from "@/components/admin/funnel-chart";
 import { FunnelUsersTable } from "@/components/admin/funnel-users-table";
 import { UserDrilldownModal } from "@/components/admin/user-drill-down-modal";
+import { PurgeStagingButton } from "@/components/admin/purge-staging-button";
 import { cn } from "@/lib/utils";
 import { useAdminCountsSSE } from "@/hooks/use-admin-counts-sse";
 
@@ -249,6 +250,7 @@ export default function AdminDashboardPage() {
 
         {/* Toolbar */}
         <div className="flex flex-wrap items-center justify-end gap-2 mb-6">
+          <PurgeStagingButton />
           <Button variant="outline" size="sm" asChild>
             <a
               href={GRAFANA_DASHBOARD_URL}

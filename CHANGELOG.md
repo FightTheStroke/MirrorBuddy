@@ -360,6 +360,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Privacy Disclosure**: Updated privacy policy v1.4 with Sentry transparency
 - **CSP Headers**: Support for Sentry EU and US regions
 
+#### Staging System on Vercel (ADR 0073)
+
+- **Logical Isolation**: Preview deployments use production DB with `isTestData` flag
+- **Environment Detection**: `src/lib/environment/staging-detector.ts` detects `VERCEL_ENV=preview`
+- **Auto-Tagging**: Prisma extension automatically sets `isTestData: true` for all creates in preview
+- **Cron Protection**: All 4 cron jobs skip execution in non-production environments
+- **StagingBanner Component**: Yellow warning banner in preview deployments
+- **Admin Tools**:
+  - Toggle to show/hide staging data in admin views
+  - Purge button to delete all test data with confirmation dialog
+  - API endpoints: `GET/DELETE /api/admin/purge-staging-data`
+- **Documentation**: `docs/claude/staging.md` workflow guide
+- **Zero Cost**: Reuses existing infrastructure, no additional database needed
+
 ## [0.10.0] - 2026-01-23
 
 ### Added

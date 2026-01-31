@@ -156,6 +156,21 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
   };
 
   try {
+    // Skip cron in non-production environments (staging/preview)
+    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+      log.info(
+        `[CRON] Skipping business-metrics-daily - not production (env: ${process.env.VERCEL_ENV})`,
+      );
+      return NextResponse.json(
+        {
+          skipped: true,
+          reason: "Not production environment",
+          environment: process.env.VERCEL_ENV,
+        },
+        { status: 200 },
+      );
+    }
+
     // Verify cron authenticity
     if (!verifyCronSecret(request)) {
       log.error("Invalid CRON_SECRET provided");

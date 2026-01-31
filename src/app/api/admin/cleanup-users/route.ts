@@ -38,54 +38,92 @@ export async function DELETE(request: NextRequest) {
       select: { id: true, email: true },
     });
 
-    const protectedIds: string[] = protectedUsers.map((u) => u.id);
+    const protectedIds: string[] = protectedUsers.map(
+      (u: { id: string; email: string | null }) => u.id,
+    );
 
-    // Count before deletion
-    const totalUsers = await prisma.user.count();
-    const usersToDelete = totalUsers - protectedUsers.length;
+    // Count before deletion - only test data users (safety: never delete production users)
+    const totalTestUsers = await prisma.user.count({
+      where: { isTestData: true },
+    });
+    const usersToDelete = await prisma.user.count({
+      where: {
+        isTestData: true,
+        id: { notIn: protectedIds },
+      },
+    });
 
     if (isDryRun) {
       const sample = await prisma.user.findMany({
-        where: { id: { notIn: protectedIds } },
+        where: {
+          isTestData: true,
+          id: { notIn: protectedIds },
+        },
         select: { id: true, email: true, createdAt: true },
         take: 20,
       });
 
       return NextResponse.json({
         dryRun: true,
-        totalUsers,
+        totalTestUsers,
         usersToDelete,
-        protectedUsers: protectedUsers.map((u): string | null => u.email),
+        protectedUsers: protectedUsers.map(
+          (u: { id: string; email: string | null }): string | null => u.email,
+        ),
         sampleToDelete: sample.map(
-          (u): { id: string; email: string; createdAt: Date } => ({
+          (u: {
+            id: string;
+            email: string | null;
+            createdAt: Date;
+          }): { id: string; email: string; createdAt: Date } => ({
             id: u.id,
             email: u.email || "no-email",
             createdAt: u.createdAt,
           }),
         ),
+        note: "Only isTestData=true users will be deleted (safety filter)",
       });
     }
 
-    // LIVE DELETE
-    logger.warn("Admin cleanup: deleting all users except protected", {
+    // LIVE DELETE - only test data users (safety: never delete production users)
+    logger.warn("Admin cleanup: deleting test data users except protected", {
       adminId: auth.userId,
       usersToDelete,
       protectedEmails,
     });
 
-    // 1. Clean UserActivity
+    // 1. Clean UserActivity for test users only
+    const testUserIds = (
+      await prisma.user.findMany({
+        where: { isTestData: true, id: { notIn: protectedIds } },
+        select: { id: true },
+      })
+    ).map((u: { id: string }) => u.id);
+
     const activityResult = await prisma.userActivity.deleteMany({
-      where: { identifier: { notIn: protectedIds } },
+      where: { identifier: { in: testUserIds } },
     });
 
-    // 2. Clean InviteRequests
+    // 2. Clean InviteRequests for test emails only
+    const testEmails = (
+      await prisma.user.findMany({
+        where: { isTestData: true, id: { notIn: protectedIds } },
+        select: { email: true },
+      })
+    )
+      .map((u: { email: string | null }) => u.email)
+      .filter((e): e is string => e !== null);
+
     const inviteResult = await prisma.inviteRequest.deleteMany({
-      where: { email: { notIn: protectedEmails } },
+      where: { email: { in: testEmails } },
     });
 
-    // 3. Delete users (cascade handles related records)
+    // 3. Delete test users only (cascade handles related records)
     const userResult = await prisma.user.deleteMany({
-      where: { id: { notIn: protectedIds } },
+      where: {
+        isTestData: true,
+        id: { notIn: protectedIds },
+      },
     });
 
     // Final count
@@ -107,6 +145,7 @@ export async function DELETE(request: NextRequest) {
       },
       remainingUsers,
       protectedEmails,
+      note: "Only isTestData=true users were deleted (safety filter)",
     });
   } catch (error) {
     logger.error("Admin cleanup failed", { error: String(error) });

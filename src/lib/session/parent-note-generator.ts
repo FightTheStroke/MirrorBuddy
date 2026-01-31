@@ -10,6 +10,7 @@ import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import { tierService } from "@/lib/tier/tier-service";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
+import type { ParentNote as PrismaParentNote } from "@prisma/client";
 import type { MaestroEvaluation } from "./maestro-evaluation";
 
 interface SessionInfo {
@@ -240,7 +241,7 @@ export async function getRecentParentNotes(
     take: limit,
   });
 
-  return notes.map((note) => ({
+  return notes.map((note: PrismaParentNote) => ({
     id: note.id,
     sessionId: note.sessionId,
     maestroId: note.maestroId,

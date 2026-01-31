@@ -1,6 +1,7 @@
-import 'server-only';
-import { prisma } from '@/lib/db';
-import type { SafetyEventType, EventSeverity } from './types';
+import "server-only";
+import { prisma } from "@/lib/db";
+import type { SafetyEvent } from "@prisma/client";
+import type { SafetyEventType, EventSeverity } from "./types";
 
 interface GetSafetyEventsFromDbOptions {
   startDate: Date;
@@ -10,7 +11,9 @@ interface GetSafetyEventsFromDbOptions {
   limit?: number;
 }
 
-export async function getSafetyEventsFromDb(options: GetSafetyEventsFromDbOptions) {
+export async function getSafetyEventsFromDb(
+  options: GetSafetyEventsFromDbOptions,
+) {
   const { startDate, endDate, severity, unresolvedOnly, limit = 100 } = options;
 
   const events = await prisma.safetyEvent.findMany({
@@ -22,12 +25,12 @@ export async function getSafetyEventsFromDb(options: GetSafetyEventsFromDbOption
       ...(severity && { severity }),
       ...(unresolvedOnly && { resolvedAt: null }),
     },
-    orderBy: { timestamp: 'desc' },
+    orderBy: { timestamp: "desc" },
     take: limit,
   });
 
   return {
-    events: events.map(e => ({
+    events: events.map((e: SafetyEvent) => ({
       id: e.id,
       type: e.type as SafetyEventType,
       severity: e.severity as EventSeverity,
@@ -78,7 +81,7 @@ export async function getSafetyStatsFromDb(startDate: Date, endDate: Date) {
     bySeverity[event.severity as EventSeverity]++;
     byType[event.type as SafetyEventType]++;
     if (!event.resolvedAt) unresolvedCount++;
-    if (event.severity === 'critical') criticalCount++;
+    if (event.severity === "critical") criticalCount++;
   }
 
   return {
@@ -93,7 +96,7 @@ export async function getSafetyStatsFromDb(startDate: Date, endDate: Date) {
 export async function resolveSafetyEvent(
   eventId: string,
   resolvedBy: string,
-  resolution: string
+  resolution: string,
 ): Promise<void> {
   await prisma.safetyEvent.update({
     where: { id: eventId },
@@ -104,4 +107,3 @@ export async function resolveSafetyEvent(
     },
   });
 }
-
