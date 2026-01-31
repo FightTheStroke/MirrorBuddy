@@ -4,26 +4,48 @@
  * Combines room management, event handling, presence, and node operations
  */
 
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { logger } from '@/lib/logger';
-import type { MindmapData, MindmapNode } from '@/lib/tools/mindmap-export';
-import type { CollabSSEEvent } from '@/app/api/collab/sse/route';
-import type { CollaborationState, CollaborationActions, UseCollaborationOptions } from './types';
-import { createEventHandler } from './event-handler';
-import { useCursorUpdater, useNodeSelector } from './presence';
-import { createCollabRoom, joinCollabRoom, leaveCollabRoom } from './room-operations';
-import { addNodeToRoom, updateNodeInRoom, deleteNodeFromRoom, moveNodeInRoom } from './node-operations';
-import { refreshMindmapFromServer, setupSSEConnection } from './utils';
+import { useState, useEffect, useCallback, useRef } from "react";
+import { logger } from "@/lib/logger";
+import type {
+  MindmapData,
+  MindmapNode,
+} from "@/lib/tools/mindmap-export/index";
+import type { CollabSSEEvent } from "@/app/api/collab/sse/route";
+import type {
+  CollaborationState,
+  CollaborationActions,
+  UseCollaborationOptions,
+} from "./types";
+import { createEventHandler } from "./event-handler";
+import { useCursorUpdater, useNodeSelector } from "./presence";
+import {
+  createCollabRoom,
+  joinCollabRoom,
+  leaveCollabRoom,
+} from "./room-operations";
+import {
+  addNodeToRoom,
+  updateNodeInRoom,
+  deleteNodeFromRoom,
+  moveNodeInRoom,
+} from "./node-operations";
+import { refreshMindmapFromServer, setupSSEConnection } from "./utils";
 
 /**
  * Main collaboration hook
  * Manages real-time collaboration for mindmaps
  */
 export function useCollaboration(
-  options: UseCollaborationOptions
+  options: UseCollaborationOptions,
 ): [CollaborationState, CollaborationActions] {
-  const { userId, userName, userAvatar = '', onMindmapUpdate, onParticipantJoin, onParticipantLeave } =
-    options;
+  const {
+    userId,
+    userName,
+    userAvatar = "",
+    onMindmapUpdate,
+    onParticipantJoin,
+    onParticipantLeave,
+  } = options;
 
   const [state, setState] = useState<CollaborationState>({
     isConnected: false,
@@ -56,12 +78,9 @@ export function useCollaboration(
     };
   }, []);
 
-  const refreshMindmap = useCallback(
-    async (roomId: string) => {
-      await refreshMindmapFromServer(roomId, onMindmapUpdateRef.current);
-    },
-    []
-  );
+  const refreshMindmap = useCallback(async (roomId: string) => {
+    await refreshMindmapFromServer(roomId, onMindmapUpdateRef.current);
+  }, []);
 
   const eventHandler = useCallback(
     (event: CollabSSEEvent, roomId: string) => {
@@ -71,10 +90,10 @@ export function useCollaboration(
         refreshMindmap,
         onMindmapUpdateRef.current,
         onParticipantJoinRef.current,
-        onParticipantLeaveRef.current
+        onParticipantLeaveRef.current,
       )(event, roomId);
     },
-    [userId, refreshMindmap]
+    [userId, refreshMindmap],
   );
 
   const connectToRoom = useCallback(
@@ -82,9 +101,14 @@ export function useCollaboration(
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
       }
-      eventSourceRef.current = setupSSEConnection(roomId, userId, eventHandler, setState);
+      eventSourceRef.current = setupSSEConnection(
+        roomId,
+        userId,
+        eventHandler,
+        setState,
+      );
     },
-    [userId, eventHandler]
+    [userId, eventHandler],
   );
 
   const createRoom = useCallback(
@@ -92,28 +116,34 @@ export function useCollaboration(
       setState((prev) => ({ ...prev, isConnecting: true, error: null }));
 
       try {
-        const result = await createCollabRoom(mindmap, userId, userName, userAvatar);
+        const result = await createCollabRoom(
+          mindmap,
+          userId,
+          userName,
+          userAvatar,
+        );
         if (!result) {
           setState((prev) => ({
             ...prev,
             isConnecting: false,
-            error: 'Failed to create room',
+            error: "Failed to create room",
           }));
           return null;
         }
         await connectToRoom(result.roomId);
         return result.roomId;
       } catch (error) {
-        logger.error('Failed to create collaboration room', undefined, error);
+        logger.error("Failed to create collaboration room", undefined, error);
         setState((prev) => ({
           ...prev,
           isConnecting: false,
-          error: error instanceof Error ? error.message : 'Failed to create room',
+          error:
+            error instanceof Error ? error.message : "Failed to create room",
         }));
         return null;
       }
     },
-    [userId, userName, userAvatar, connectToRoom]
+    [userId, userName, userAvatar, connectToRoom],
   );
 
   // Join room
@@ -122,12 +152,17 @@ export function useCollaboration(
       setState((prev) => ({ ...prev, isConnecting: true, error: null }));
 
       try {
-        const result = await joinCollabRoom(roomId, userId, userName, userAvatar);
+        const result = await joinCollabRoom(
+          roomId,
+          userId,
+          userName,
+          userAvatar,
+        );
         if (!result) {
           setState((prev) => ({
             ...prev,
             isConnecting: false,
-            error: 'Failed to join room',
+            error: "Failed to join room",
           }));
           return false;
         }
@@ -142,16 +177,16 @@ export function useCollaboration(
         await connectToRoom(roomId);
         return true;
       } catch (error) {
-        logger.error('Failed to join collaboration room', { roomId }, error);
+        logger.error("Failed to join collaboration room", { roomId }, error);
         setState((prev) => ({
           ...prev,
           isConnecting: false,
-          error: error instanceof Error ? error.message : 'Failed to join room',
+          error: error instanceof Error ? error.message : "Failed to join room",
         }));
         return false;
       }
     },
-    [userId, userName, userAvatar, connectToRoom]
+    [userId, userName, userAvatar, connectToRoom],
   );
 
   const leaveRoom = useCallback(async () => {
@@ -159,7 +194,7 @@ export function useCollaboration(
     try {
       await leaveCollabRoom(state.roomId, userId);
     } catch (error) {
-      logger.warn('Failed to leave room cleanly', { error });
+      logger.warn("Failed to leave room cleanly", { error });
     }
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
@@ -186,7 +221,7 @@ export function useCollaboration(
       if (!state.roomId) return false;
       return addNodeToRoom(state.roomId, userId, node, parentId);
     },
-    [state.roomId, userId]
+    [state.roomId, userId],
   );
 
   const updateNode = useCallback(
@@ -194,7 +229,7 @@ export function useCollaboration(
       if (!state.roomId) return false;
       return updateNodeInRoom(state.roomId, userId, nodeId, changes);
     },
-    [state.roomId, userId]
+    [state.roomId, userId],
   );
 
   const deleteNode = useCallback(
@@ -202,7 +237,7 @@ export function useCollaboration(
       if (!state.roomId) return false;
       return deleteNodeFromRoom(state.roomId, userId, nodeId);
     },
-    [state.roomId, userId]
+    [state.roomId, userId],
   );
 
   const moveNode = useCallback(
@@ -210,7 +245,7 @@ export function useCollaboration(
       if (!state.roomId) return false;
       return moveNodeInRoom(state.roomId, userId, nodeId, newParentId);
     },
-    [state.roomId, userId]
+    [state.roomId, userId],
   );
 
   const actions: CollaborationActions = {

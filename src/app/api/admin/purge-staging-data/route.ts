@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
@@ -114,10 +115,15 @@ export async function GET(
  * DELETE: Purge all staging data records
  */
 export async function DELETE(
-  _request: NextRequest,
+  request: NextRequest,
 ): Promise<
   NextResponse<{ success: boolean; deleted: number } | { error: string }>
 > {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {

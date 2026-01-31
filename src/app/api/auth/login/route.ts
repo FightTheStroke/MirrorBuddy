@@ -29,6 +29,7 @@ function isValidRedirectUrl(url: string | undefined): boolean {
   );
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Pre-authentication endpoint; no session to protect
 export async function POST(request: NextRequest) {
   try {
     // Rate limit by IP (strict: 5 per 15 minutes to prevent brute force)

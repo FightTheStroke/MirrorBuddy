@@ -65,6 +65,7 @@ export async function GET() {
  *
  * Note: No CSRF required - code-based verification from email link
  */
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Code-based verification from email; no cookie auth
 export async function POST(request: NextRequest) {
   // Rate limit COPPA verification attempts (5 per hour - email costs, strict)
   const clientId = getClientIdentifier(request);

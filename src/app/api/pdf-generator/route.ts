@@ -6,16 +6,20 @@
  * Supports 7 DSA profiles: dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   generateAccessiblePDF,
   isValidProfile,
   getAvailableProfiles,
-} from '@/lib/pdf-generator';
-import type { DSAProfile, PDFGeneratorRequest } from '@/lib/pdf-generator/types';
+} from "@/lib/pdf-generator";
+import type {
+  DSAProfile,
+  PDFGeneratorRequest,
+} from "@/lib/pdf-generator/types";
 
 /**
  * POST /api/pdf-generator
@@ -40,33 +44,43 @@ import type { DSAProfile, PDFGeneratorRequest } from '@/lib/pdf-generator/types'
  * }
  */
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Auth check
     const auth = await validateAuth();
     if (!auth.authenticated) {
       return NextResponse.json(
         { success: false, error: auth.error },
-        { status: 401 }
+        { status: 401 },
       );
     }
     const userId = auth.userId!;
 
     // Parse request body
     const body = await request.json();
-    const { kitId, materialId, profile, format = 'A4' } = body as PDFGeneratorRequest;
+    const {
+      kitId,
+      materialId,
+      profile,
+      format = "A4",
+    } = body as PDFGeneratorRequest;
 
     // Validate required fields
     if (!kitId) {
       return NextResponse.json(
-        { success: false, error: 'Missing kitId' },
-        { status: 400 }
+        { success: false, error: "Missing kitId" },
+        { status: 400 },
       );
     }
 
     if (!profile) {
       return NextResponse.json(
-        { success: false, error: 'Missing profile' },
-        { status: 400 }
+        { success: false, error: "Missing profile" },
+        { status: 400 },
       );
     }
 
@@ -76,7 +90,7 @@ export async function POST(request: NextRequest) {
           success: false,
           error: `Invalid profile: ${profile}. Valid profiles: dyslexia, dyscalculia, dysgraphia, dysorthography, adhd, dyspraxia, stuttering`,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -87,19 +101,19 @@ export async function POST(request: NextRequest) {
 
     if (!studyKit) {
       return NextResponse.json(
-        { success: false, error: 'Study Kit not found' },
-        { status: 404 }
+        { success: false, error: "Study Kit not found" },
+        { status: 404 },
       );
     }
 
-    if (studyKit.status !== 'ready') {
+    if (studyKit.status !== "ready") {
       return NextResponse.json(
-        { success: false, error: 'Study Kit is not ready for export' },
-        { status: 400 }
+        { success: false, error: "Study Kit is not ready for export" },
+        { status: 400 },
       );
     }
 
-    logger.info('Generating accessible PDF', {
+    logger.info("Generating accessible PDF", {
       userId,
       kitId,
       profile,
@@ -135,7 +149,7 @@ export async function POST(request: NextRequest) {
         data: {
           userId,
           toolId: `pdf-${kitId}-${profile}-${Date.now()}`,
-          toolType: 'pdf-export',
+          toolType: "pdf-export",
           title: filename,
           content: JSON.stringify({
             sourceKitId: kitId,
@@ -151,18 +165,20 @@ export async function POST(request: NextRequest) {
       });
       savedToZaino = true;
     } catch (saveError) {
-      logger.warn('Failed to save PDF metadata to Zaino', { error: String(saveError) });
+      logger.warn("Failed to save PDF metadata to Zaino", {
+        error: String(saveError),
+      });
       // Continue - PDF generation succeeded, just saving failed
     }
 
     // Return PDF as download response
     const headers = new Headers();
-    headers.set('Content-Type', 'application/pdf');
-    headers.set('Content-Disposition', `attachment; filename="${filename}"`);
-    headers.set('Content-Length', size.toString());
-    headers.set('X-Saved-To-Zaino', savedToZaino.toString());
+    headers.set("Content-Type", "application/pdf");
+    headers.set("Content-Disposition", `attachment; filename="${filename}"`);
+    headers.set("Content-Length", size.toString());
+    headers.set("X-Saved-To-Zaino", savedToZaino.toString());
 
-    logger.info('PDF generated successfully', {
+    logger.info("PDF generated successfully", {
       userId,
       kitId,
       profile,
@@ -176,13 +192,13 @@ export async function POST(request: NextRequest) {
       headers,
     });
   } catch (error) {
-    logger.error('PDF generation failed', { error: String(error) });
+    logger.error("PDF generation failed", { error: String(error) });
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : 'PDF generation failed',
+        error: error instanceof Error ? error.message : "PDF generation failed",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -199,10 +215,10 @@ export async function GET() {
       profiles,
     });
   } catch (error) {
-    logger.error('Failed to get profiles', { error: String(error) });
+    logger.error("Failed to get profiles", { error: String(error) });
     return NextResponse.json(
-      { success: false, error: 'Failed to get profiles' },
-      { status: 500 }
+      { success: false, error: "Failed to get profiles" },
+      { status: 500 },
     );
   }
 }

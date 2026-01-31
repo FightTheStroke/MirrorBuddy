@@ -3,10 +3,10 @@
  * @module rag/hybrid-retrieval
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
 // Mock logger
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
     debug: vi.fn(),
     info: vi.fn(),
@@ -16,7 +16,7 @@ vi.mock('@/lib/logger', () => ({
 }));
 
 // Mock embedding service
-vi.mock('../embedding-service', () => ({
+vi.mock("../embedding-service", () => ({
   generateEmbedding: vi.fn(),
   cosineSimilarity: vi.fn(),
 }));
@@ -26,103 +26,103 @@ const { mockSearchSimilar } = vi.hoisted(() => ({
   mockSearchSimilar: vi.fn(),
 }));
 
-vi.mock('../vector-store', () => ({
+vi.mock("../vector-store", () => ({
   searchSimilar: mockSearchSimilar,
 }));
 
 // Mock Prisma - use vi.hoisted
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
-    $queryRawUnsafe: vi.fn(),
+    $queryRaw: vi.fn(),
   },
 }));
 
-vi.mock('@/lib/db', () => ({
+vi.mock("@/lib/db", () => ({
   prisma: mockPrisma,
 }));
 
-import { hybridSearch, textSimilarity } from '../hybrid-retrieval';
-import { generateEmbedding, cosineSimilarity } from '../embedding-service';
+import { hybridSearch, textSimilarity } from "../hybrid-retrieval";
+import { generateEmbedding, cosineSimilarity } from "../embedding-service";
 
-describe('Hybrid Retrieval Service', () => {
+describe("Hybrid Retrieval Service", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('hybridSearch', () => {
-    it('should combine semantic and keyword search results', async () => {
+  describe("hybridSearch", () => {
+    it("should combine semantic and keyword search results", async () => {
       const mockVector = Array(1536).fill(0.1);
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: mockVector,
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       // Semantic results
       mockSearchSimilar.mockResolvedValue([
         {
-          id: 'emb-1',
-          sourceType: 'material',
-          sourceId: 'mat-1',
+          id: "emb-1",
+          sourceType: "material",
+          sourceId: "mat-1",
           chunkIndex: 0,
-          content: 'Roman Empire history and culture',
+          content: "Roman Empire history and culture",
           similarity: 0.9,
-          subject: 'history',
+          subject: "history",
           tags: [],
         },
       ]);
 
       // Keyword results
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([
+      mockPrisma.$queryRaw.mockResolvedValue([
         {
-          id: 'emb-2',
-          sourceType: 'material',
-          sourceId: 'mat-2',
+          id: "emb-2",
+          sourceType: "material",
+          sourceId: "mat-2",
           chunkIndex: 0,
-          content: 'Ancient Rome civilization',
-          subject: 'history',
+          content: "Ancient Rome civilization",
+          subject: "history",
           tags: '["rome"]',
         },
       ]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'Roman Empire history',
+        userId: "user-123",
+        query: "Roman Empire history",
         limit: 5,
       });
 
       expect(results.length).toBeGreaterThan(0);
-      expect(results[0]).toHaveProperty('combinedScore');
-      expect(results[0]).toHaveProperty('semanticScore');
-      expect(results[0]).toHaveProperty('keywordScore');
+      expect(results[0]).toHaveProperty("combinedScore");
+      expect(results[0]).toHaveProperty("semanticScore");
+      expect(results[0]).toHaveProperty("keywordScore");
     });
 
-    it('should weight semantic and keyword scores according to semanticWeight', async () => {
+    it("should weight semantic and keyword scores according to semanticWeight", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([
         {
-          id: 'emb-1',
-          sourceType: 'material',
-          sourceId: 'mat-1',
+          id: "emb-1",
+          sourceType: "material",
+          sourceId: "mat-1",
           chunkIndex: 0,
-          content: 'Test content',
+          content: "Test content",
           similarity: 1.0,
           subject: null,
           tags: [],
         },
       ]);
 
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       // With high semantic weight, semantic-only result should have high score
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
+        userId: "user-123",
+        query: "test",
         semanticWeight: 0.9,
       });
 
@@ -134,95 +134,95 @@ describe('Hybrid Retrieval Service', () => {
       }
     });
 
-    it('should filter by sourceType', async () => {
+    it("should filter by sourceType", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([]);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
-        sourceType: 'flashcard',
+        userId: "user-123",
+        query: "test",
+        sourceType: "flashcard",
       });
 
       expect(mockSearchSimilar).toHaveBeenCalledWith(
         expect.objectContaining({
-          sourceType: 'flashcard',
-        })
+          sourceType: "flashcard",
+        }),
       );
     });
 
-    it('should exclude specified source IDs', async () => {
+    it("should exclude specified source IDs", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([
         {
-          id: 'emb-1',
-          sourceType: 'material',
-          sourceId: 'mat-keep',
+          id: "emb-1",
+          sourceType: "material",
+          sourceId: "mat-keep",
           chunkIndex: 0,
-          content: 'Keep this',
+          content: "Keep this",
           similarity: 0.9,
           subject: null,
           tags: [],
         },
         {
-          id: 'emb-2',
-          sourceType: 'material',
-          sourceId: 'mat-exclude',
+          id: "emb-2",
+          sourceType: "material",
+          sourceId: "mat-exclude",
           chunkIndex: 0,
-          content: 'Exclude this',
+          content: "Exclude this",
           similarity: 0.85,
           subject: null,
           tags: [],
         },
       ]);
 
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
-        excludeSourceIds: ['mat-exclude'],
+        userId: "user-123",
+        query: "test",
+        excludeSourceIds: ["mat-exclude"],
       });
 
-      expect(results.every((r) => r.sourceId !== 'mat-exclude')).toBe(true);
+      expect(results.every((r) => r.sourceId !== "mat-exclude")).toBe(true);
     });
 
-    it('should respect minScore threshold', async () => {
+    it("should respect minScore threshold", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([
         {
-          id: 'emb-1',
-          sourceType: 'material',
-          sourceId: 'mat-1',
+          id: "emb-1",
+          sourceType: "material",
+          sourceId: "mat-1",
           chunkIndex: 0,
-          content: 'Low score content',
+          content: "Low score content",
           similarity: 0.2,
           subject: null,
           tags: [],
         },
       ]);
 
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
+        userId: "user-123",
+        query: "test",
         minScore: 0.5,
       });
 
@@ -231,28 +231,28 @@ describe('Hybrid Retrieval Service', () => {
       expect(results.length).toBe(0);
     });
 
-    it('should handle empty results gracefully', async () => {
+    it("should handle empty results gracefully", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([]);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'nonexistent topic',
+        userId: "user-123",
+        query: "nonexistent topic",
       });
 
       expect(results).toEqual([]);
     });
 
-    it('should limit results to specified limit', async () => {
+    it("should limit results to specified limit", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
@@ -261,7 +261,7 @@ describe('Hybrid Retrieval Service', () => {
         .fill(null)
         .map((_, i) => ({
           id: `emb-${i}`,
-          sourceType: 'material',
+          sourceType: "material",
           sourceId: `mat-${i}`,
           chunkIndex: 0,
           content: `Content ${i}`,
@@ -271,11 +271,11 @@ describe('Hybrid Retrieval Service', () => {
         }));
 
       mockSearchSimilar.mockResolvedValue(manyResults);
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
+        userId: "user-123",
+        query: "test",
         limit: 5,
       });
 
@@ -283,23 +283,23 @@ describe('Hybrid Retrieval Service', () => {
     });
   });
 
-  describe('textSimilarity', () => {
-    it('should calculate similarity between two texts', async () => {
+  describe("textSimilarity", () => {
+    it("should calculate similarity between two texts", async () => {
       vi.mocked(generateEmbedding)
         .mockResolvedValueOnce({
           vector: Array(1536).fill(0.5),
-          model: 'text-embedding-3-small',
+          model: "text-embedding-3-small",
           usage: { tokens: 10 },
         })
         .mockResolvedValueOnce({
           vector: Array(1536).fill(0.5),
-          model: 'text-embedding-3-small',
+          model: "text-embedding-3-small",
           usage: { tokens: 10 },
         });
 
       vi.mocked(cosineSimilarity).mockReturnValue(0.95);
 
-      const similarity = await textSimilarity('Hello world', 'Hello there');
+      const similarity = await textSimilarity("Hello world", "Hello there");
 
       expect(generateEmbedding).toHaveBeenCalledTimes(2);
       expect(cosineSimilarity).toHaveBeenCalled();
@@ -307,46 +307,46 @@ describe('Hybrid Retrieval Service', () => {
     });
   });
 
-  describe('HybridRetrievalResult interface', () => {
-    it('should have all required properties', async () => {
+  describe("HybridRetrievalResult interface", () => {
+    it("should have all required properties", async () => {
       vi.mocked(generateEmbedding).mockResolvedValue({
         vector: Array(1536).fill(0.1),
-        model: 'text-embedding-3-small',
+        model: "text-embedding-3-small",
         usage: { tokens: 10 },
       });
 
       mockSearchSimilar.mockResolvedValue([
         {
-          id: 'emb-1',
-          sourceType: 'material',
-          sourceId: 'mat-1',
+          id: "emb-1",
+          sourceType: "material",
+          sourceId: "mat-1",
           chunkIndex: 0,
-          content: 'Test content',
+          content: "Test content",
           similarity: 0.9,
-          subject: 'math',
-          tags: ['algebra'],
+          subject: "math",
+          tags: ["algebra"],
         },
       ]);
 
-      mockPrisma.$queryRawUnsafe.mockResolvedValue([]);
+      mockPrisma.$queryRaw.mockResolvedValue([]);
 
       const results = await hybridSearch({
-        userId: 'user-123',
-        query: 'test',
+        userId: "user-123",
+        query: "test",
       });
 
       if (results.length > 0) {
         const result = results[0];
-        expect(result).toHaveProperty('id');
-        expect(result).toHaveProperty('sourceType');
-        expect(result).toHaveProperty('sourceId');
-        expect(result).toHaveProperty('chunkIndex');
-        expect(result).toHaveProperty('content');
-        expect(result).toHaveProperty('combinedScore');
-        expect(result).toHaveProperty('semanticScore');
-        expect(result).toHaveProperty('keywordScore');
-        expect(result).toHaveProperty('subject');
-        expect(result).toHaveProperty('tags');
+        expect(result).toHaveProperty("id");
+        expect(result).toHaveProperty("sourceType");
+        expect(result).toHaveProperty("sourceId");
+        expect(result).toHaveProperty("chunkIndex");
+        expect(result).toHaveProperty("content");
+        expect(result).toHaveProperty("combinedScore");
+        expect(result).toHaveProperty("semanticScore");
+        expect(result).toHaveProperty("keywordScore");
+        expect(result).toHaveProperty("subject");
+        expect(result).toHaveProperty("tags");
       }
     });
   });

@@ -5,6 +5,7 @@
  * @module rag/hybrid-retrieval
  */
 
+import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import { generateEmbedding } from "./embedding-service";
@@ -105,35 +106,26 @@ async function keywordSearch(
     return [];
   }
 
-  // Build WHERE conditions with PostgreSQL $n placeholders
-  const params: (string | number)[] = [userId];
-  let paramIndex = 1;
-  const conditions: string[] = [`"userId" = $${paramIndex++}`];
+  // Build WHERE conditions with Prisma.sql fragments
+  const conditions: Prisma.Sql[] = [Prisma.sql`"userId" = ${userId}`];
 
   if (sourceType) {
-    conditions.push(`"sourceType" = $${paramIndex++}`);
-    params.push(sourceType);
+    conditions.push(Prisma.sql`"sourceType" = ${sourceType}`);
   }
 
   if (subject) {
-    conditions.push(`subject = $${paramIndex++}`);
-    params.push(subject);
+    conditions.push(Prisma.sql`subject = ${subject}`);
   }
 
   // Build keyword ILIKE conditions (OR) - PostgreSQL uses ILIKE for case-insensitive
   const keywordConditions = keywords.map(
-    () => `content ILIKE $${paramIndex++}`,
+    (kw) => Prisma.sql`content ILIKE ${`%${kw}%`}`,
   );
-  conditions.push(`(${keywordConditions.join(" OR ")})`);
-  keywords.forEach((kw) => params.push(`%${kw}%`));
+  conditions.push(Prisma.sql`(${Prisma.join(keywordConditions, " OR ")})`);
 
-  // Add limit parameter
-  params.push(limit * 2);
-  const limitParam = paramIndex;
+  const whereClause = Prisma.sql`WHERE ${Prisma.join(conditions, " AND ")}`;
 
-  const whereClause = conditions.join(" AND ");
-
-  // Query using raw SQL for PostgreSQL
+  // Query using $queryRaw with template literals
   type RawEmbedding = {
     id: string;
     sourceType: string;
@@ -144,13 +136,12 @@ async function keywordSearch(
     tags: string | null;
   };
 
-  const results = (await prisma.$queryRawUnsafe(
-    `SELECT id, "sourceType", "sourceId", "chunkIndex", content, subject, tags
-     FROM "ContentEmbedding"
-     WHERE ${whereClause}
-     LIMIT $${limitParam}`,
-    ...params,
-  )) as RawEmbedding[];
+  const results = await prisma.$queryRaw<RawEmbedding[]>`
+    SELECT id, "sourceType", "sourceId", "chunkIndex", content, subject, tags
+    FROM "ContentEmbedding"
+    ${whereClause}
+    LIMIT ${limit * 2}
+  `;
 
   // Calculate match count for each result
   return results.map((row) => {

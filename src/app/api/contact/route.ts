@@ -82,6 +82,7 @@ interface ContactResponse {
   emailSent?: boolean;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public contact form; no cookie auth
 export async function POST(
   request: NextRequest,
 ): Promise<NextResponse<ContactResponse>> {

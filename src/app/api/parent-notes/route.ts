@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { logger } from "@/lib/logger";
 import {
   getRecentParentNotes,
@@ -81,6 +82,10 @@ export async function GET(request: NextRequest) {
  * - action: 'markViewed'
  */
 export async function PATCH(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const body = await request.json();
     const { noteId, action } = body;
@@ -130,6 +135,10 @@ export async function PATCH(request: NextRequest) {
  * - userId: User ID for authorization
  */
 export async function DELETE(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Security: Get userId from authenticated session only
     const { userId, errorResponse } = await requireAuthenticatedUser();

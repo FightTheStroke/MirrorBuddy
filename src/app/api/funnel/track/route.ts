@@ -29,6 +29,7 @@ interface TrackRequest {
   metadata?: Record<string, unknown>;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public funnel tracking; no cookie auth
 export async function POST(request: NextRequest): Promise<Response> {
   try {
     const body = (await request.json()) as TrackRequest;

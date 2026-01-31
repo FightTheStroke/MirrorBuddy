@@ -383,6 +383,21 @@ const eslintConfig = defineConfig([
       "local-rules/require-e2e-fixtures": "warn",
     },
   },
+  // ADR 0078: Require CSRF validation in mutating API route handlers
+  // POST/PUT/PATCH/DELETE endpoints must call requireCSRF() to prevent CSRF attacks
+  // Exemptions: Cron jobs (use CRON_SECRET), webhooks (use signature verification)
+  {
+    files: ["src/app/api/**/route.ts"],
+    ignores: [
+      // Cron jobs use CRON_SECRET for authentication
+      "src/app/api/cron/**/*.ts",
+      // Webhooks use signature verification
+      "src/app/api/webhooks/**/*.ts",
+    ],
+    rules: {
+      "local-rules/require-csrf-mutating-routes": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;

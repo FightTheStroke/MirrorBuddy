@@ -3,8 +3,9 @@
 // Study scheduling with notifications for proactive learning (Issue #27)
 // ============================================================================
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -86,7 +87,12 @@ export async function GET(request: Request) {
 }
 
 // POST - Create a new scheduled session or reminder
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(
     `scheduler:${clientId}`,
@@ -167,7 +173,12 @@ export async function POST(request: Request) {
 }
 
 // PATCH - Update preferences or schedule item
-export async function PATCH(request: Request) {
+export async function PATCH(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(
     `scheduler:${clientId}`,
@@ -240,7 +251,12 @@ export async function PATCH(request: Request) {
 }
 
 // DELETE - Delete a session or reminder
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(
     `scheduler:${clientId}`,

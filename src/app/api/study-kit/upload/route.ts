@@ -11,6 +11,7 @@ import * as Sentry from "@sentry/nextjs";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { processStudyKit } from "@/lib/tools/handlers/study-kit-generators";
 import {
   saveMaterialsFromStudyKit,
@@ -26,6 +27,11 @@ export const maxDuration = 300; // 5 minutes for processing
  * Upload PDF and generate study kit
  */
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Auth check
     const auth = await validateAuth();

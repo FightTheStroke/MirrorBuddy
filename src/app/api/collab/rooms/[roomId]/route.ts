@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { logger } from "@/lib/logger";
 import { getRoom, getRoomState, closeRoom } from "@/lib/collab/mindmap-room";
 import {
@@ -58,6 +59,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 /**
  * POST /api/collab/rooms/[roomId] - Join room or perform action
  */
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Realtime collab; no cookie auth, user from body
 export async function POST(request: NextRequest, { params }: RouteParams) {
   const { roomId } = await params;
 
@@ -143,6 +145,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
  * DELETE /api/collab/rooms/[roomId] - Close room (host only)
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const { roomId } = await params;
 
   try {

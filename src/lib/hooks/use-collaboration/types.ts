@@ -2,8 +2,11 @@
  * Types for use-collaboration hook
  */
 
-import type { MindmapData, MindmapNode } from '@/lib/tools/mindmap-export';
-import type { RoomParticipant } from '@/lib/collab/mindmap-room';
+import type {
+  MindmapData,
+  MindmapNode,
+} from "@/lib/tools/mindmap-export/index";
+import type { RoomParticipant } from "@/lib/collab/mindmap-room";
 
 export interface CollaborationState {
   isConnected: boolean;
@@ -23,7 +26,10 @@ export interface CollaborationActions {
   updateCursor: (x: number, y: number) => void;
   selectNode: (nodeId: string | null) => void;
   addNode: (node: MindmapNode, parentId: string) => Promise<boolean>;
-  updateNode: (nodeId: string, changes: Partial<MindmapNode>) => Promise<boolean>;
+  updateNode: (
+    nodeId: string,
+    changes: Partial<MindmapNode>,
+  ) => Promise<boolean>;
   deleteNode: (nodeId: string) => Promise<boolean>;
   moveNode: (nodeId: string, newParentId: string) => Promise<boolean>;
 }

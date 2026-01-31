@@ -11,6 +11,7 @@ import { getRequestId } from "@/lib/tracing";
 import { serverNotifications } from "@/lib/notifications/server-triggers";
 import { ProgressUpdateSchema } from "@/lib/validation/schemas/progress";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function GET(request: NextRequest) {
   try {
@@ -66,6 +67,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PUT(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {

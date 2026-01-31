@@ -2,9 +2,9 @@
  * Type definitions for Archive components
  */
 
-import type { ChangeEvent } from 'react';
-import type { MaterialRecord } from '@/lib/storage/materials-db-utils';
-import type { FilterType, SortBy } from './constants';
+import type { ChangeEvent } from "react";
+import type { MaterialRecord } from "@/lib/storage/materials-db";
+import type { FilterType, SortBy } from "./constants";
 
 export interface ArchiveItem extends MaterialRecord {
   title?: string;
@@ -24,8 +24,8 @@ export interface UseArchiveViewReturn {
   sortBy: SortBy;
   setSortBy: (sort: SortBy) => void;
   searchQuery: string;
-  viewMode: 'grid' | 'list';
-  setViewMode: (mode: 'grid' | 'list') => void;
+  viewMode: "grid" | "list";
+  setViewMode: (mode: "grid" | "list") => void;
   subjectFilter: string;
   setSubjectFilter: (subject: string) => void;
   dateFrom: string;

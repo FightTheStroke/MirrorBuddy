@@ -2,7 +2,7 @@
  * Collaboration room action helpers
  */
 
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 import {
   getRoom,
   getRoomState,
@@ -12,11 +12,11 @@ import {
   updateNode,
   deleteNode,
   moveNode,
-} from '@/lib/collab/mindmap-room';
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { RoomUser } from '@/lib/collab/mindmap-room/types';
-import type { MindmapNode } from '@/types/tools';
-import { convertExportNodeToToolNode } from '@/lib/collab/mindmap-room/node-converter';
+} from "@/lib/collab/mindmap-room";
+import type { MindmapNode as ExportNode } from "@/lib/tools/mindmap-export/index";
+import type { RoomUser } from "@/lib/collab/mindmap-room/types";
+import type { MindmapNode } from "@/types/tools";
+import { convertExportNodeToToolNode } from "@/lib/collab/mindmap-room/node-converter";
 
 /**
  * Validate room exists and return it
@@ -26,10 +26,7 @@ export function validateRoomExists(roomId: string) {
   if (!room) {
     return {
       valid: false,
-      response: NextResponse.json(
-        { error: 'Room not found' },
-        { status: 404 }
-      ),
+      response: NextResponse.json({ error: "Room not found" }, { status: 404 }),
     };
   }
   return { valid: true, room };
@@ -44,8 +41,8 @@ export function handleJoinAction(roomId: string, user: unknown) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user with id and name is required' },
-        { status: 400 }
+        { error: "user with id and name is required" },
+        { status: 400 },
       ),
     };
   }
@@ -55,8 +52,8 @@ export function handleJoinAction(roomId: string, user: unknown) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'Failed to join room' },
-        { status: 500 }
+        { error: "Failed to join room" },
+        { status: 500 },
       ),
     };
   }
@@ -83,8 +80,8 @@ export function handleLeaveAction(roomId: string, user: unknown) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user.id is required' },
-        { status: 400 }
+        { error: "user.id is required" },
+        { status: 400 },
       ),
     };
   }
@@ -103,15 +100,15 @@ export function handleAddNodeAction(
   roomId: string,
   user: unknown,
   node: unknown,
-  parentId: unknown
+  parentId: unknown,
 ) {
   const userData = user as { id?: string };
   if (!userData?.id || !node || !parentId) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user.id, node, and parentId are required' },
-        { status: 400 }
+        { error: "user.id, node, and parentId are required" },
+        { status: 400 },
       ),
     };
   }
@@ -135,20 +132,25 @@ export function handleUpdateNodeAction(
   roomId: string,
   user: unknown,
   nodeId: unknown,
-  changes: unknown
+  changes: unknown,
 ) {
   const userData = user as { id?: string };
   if (!userData?.id || !nodeId || !changes) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user.id, nodeId, and changes are required' },
-        { status: 400 }
+        { error: "user.id, nodeId, and changes are required" },
+        { status: 400 },
       ),
     };
   }
 
-  const result = updateNode(roomId, userData.id, String(nodeId), changes as Partial<MindmapNode>);
+  const result = updateNode(
+    roomId,
+    userData.id,
+    String(nodeId),
+    changes as Partial<MindmapNode>,
+  );
 
   return {
     success: true,
@@ -165,15 +167,15 @@ export function handleUpdateNodeAction(
 export function handleDeleteNodeAction(
   roomId: string,
   user: unknown,
-  nodeId: unknown
+  nodeId: unknown,
 ) {
   const userData = user as { id?: string };
   if (!userData?.id || !nodeId) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user.id and nodeId are required' },
-        { status: 400 }
+        { error: "user.id and nodeId are required" },
+        { status: 400 },
       ),
     };
   }
@@ -196,20 +198,25 @@ export function handleMoveNodeAction(
   roomId: string,
   user: unknown,
   nodeId: unknown,
-  newParentId: unknown
+  newParentId: unknown,
 ) {
   const userData = user as { id?: string };
   if (!userData?.id || !nodeId || !newParentId) {
     return {
       success: false,
       response: NextResponse.json(
-        { error: 'user.id, nodeId, and newParentId are required' },
-        { status: 400 }
+        { error: "user.id, nodeId, and newParentId are required" },
+        { status: 400 },
       ),
     };
   }
 
-  const result = moveNode(roomId, userData.id, String(nodeId), String(newParentId));
+  const result = moveNode(
+    roomId,
+    userData.id,
+    String(nodeId),
+    String(newParentId),
+  );
 
   return {
     success: true,

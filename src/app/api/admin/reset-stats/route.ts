@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { Prisma } from "@prisma/client";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { logger } from "@/lib/logger";
 
 /**
@@ -10,6 +11,10 @@ import { logger } from "@/lib/logger";
  * Admin-only, requires explicit confirmation
  */
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Validate admin authentication
     const auth = await validateAdminAuth();

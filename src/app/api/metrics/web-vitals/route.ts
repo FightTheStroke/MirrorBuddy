@@ -4,22 +4,22 @@
 // F-05: Real-time client-side performance monitoring
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/lib/logger";
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   RATE_LIMITS,
   rateLimitResponse,
-} from '@/lib/rate-limit';
+} from "@/lib/rate-limit";
 
 interface WebVitalMetric {
-  name: 'CLS' | 'FCP' | 'INP' | 'LCP' | 'TTFB';
+  name: "CLS" | "FCP" | "INP" | "LCP" | "TTFB";
   value: number;
-  rating: 'good' | 'needs-improvement' | 'poor';
+  rating: "good" | "needs-improvement" | "poor";
   route: string;
-  deviceType: 'mobile' | 'tablet' | 'desktop';
-  connectionType?: '4g' | 'wifi' | 'unknown';
+  deviceType: "mobile" | "tablet" | "desktop";
+  connectionType?: "4g" | "wifi" | "unknown";
   userId?: string;
 }
 
@@ -31,22 +31,22 @@ interface WebVitalsPayload {
  * Validate Web Vitals payload
  */
 function validatePayload(data: unknown): data is WebVitalsPayload {
-  if (!data || typeof data !== 'object') return false;
+  if (!data || typeof data !== "object") return false;
 
   const payload = data as Partial<WebVitalsPayload>;
   if (!Array.isArray(payload.metrics)) return false;
 
   return payload.metrics.every((m) => {
     return (
-      typeof m === 'object' &&
-      typeof m.name === 'string' &&
-      ['CLS', 'FCP', 'INP', 'LCP', 'TTFB'].includes(m.name) &&
-      typeof m.value === 'number' &&
-      typeof m.rating === 'string' &&
-      ['good', 'needs-improvement', 'poor'].includes(m.rating) &&
-      typeof m.route === 'string' &&
-      typeof m.deviceType === 'string' &&
-      ['mobile', 'tablet', 'desktop'].includes(m.deviceType)
+      typeof m === "object" &&
+      typeof m.name === "string" &&
+      ["CLS", "FCP", "INP", "LCP", "TTFB"].includes(m.name) &&
+      typeof m.value === "number" &&
+      typeof m.rating === "string" &&
+      ["good", "needs-improvement", "poor"].includes(m.rating) &&
+      typeof m.route === "string" &&
+      typeof m.deviceType === "string" &&
+      ["mobile", "tablet", "desktop"].includes(m.deviceType)
     );
   });
 }
@@ -61,22 +61,22 @@ function formatMetricForGrafana(metric: WebVitalMetric): {
 } {
   // Convert metric name to Grafana metric name
   const nameMap: Record<string, string> = {
-    LCP: 'web_vitals_lcp_seconds',
-    CLS: 'web_vitals_cls_score',
-    INP: 'web_vitals_inp_seconds',
-    TTFB: 'web_vitals_ttfb_seconds',
-    FCP: 'web_vitals_fcp_seconds',
+    LCP: "web_vitals_lcp_seconds",
+    CLS: "web_vitals_cls_score",
+    INP: "web_vitals_inp_seconds",
+    TTFB: "web_vitals_ttfb_seconds",
+    FCP: "web_vitals_fcp_seconds",
   };
 
   // Convert milliseconds to seconds for time-based metrics
-  const needsConversion = ['LCP', 'INP', 'TTFB', 'FCP'].includes(metric.name);
+  const needsConversion = ["LCP", "INP", "TTFB", "FCP"].includes(metric.name);
   const value = needsConversion ? metric.value / 1000 : metric.value;
 
   // Build labels
   const labels: Record<string, string> = {
     route: metric.route,
     device_type: metric.deviceType,
-    connection_type: metric.connectionType || 'unknown',
+    connection_type: metric.connectionType || "unknown",
     rating: metric.rating,
   };
 
@@ -96,7 +96,11 @@ function formatMetricForGrafana(metric: WebVitalMetric): {
  * Format metrics as Influx Line Protocol
  */
 function formatInfluxLineProtocol(
-  metrics: Array<{ name: string; value: number; labels: Record<string, string> }>,
+  metrics: Array<{
+    name: string;
+    value: number;
+    labels: Record<string, string>;
+  }>,
   timestamp: number,
 ): string {
   return metrics
@@ -105,16 +109,16 @@ function formatInfluxLineProtocol(
         .map(([k, v]) => {
           // Influx Line Protocol requires escaping: backslash first, then comma/space/equals
           const escaped = v
-            .replace(/\\/g, '\\\\')  // Escape backslashes first
-            .replace(/,/g, '\\,')     // Escape commas
-            .replace(/ /g, '\\ ')     // Escape spaces
-            .replace(/=/g, '\\=');    // Escape equals
+            .replace(/\\/g, "\\\\") // Escape backslashes first
+            .replace(/,/g, "\\,") // Escape commas
+            .replace(/ /g, "\\ ") // Escape spaces
+            .replace(/=/g, "\\="); // Escape equals
           return `${k}=${escaped}`;
         })
-        .join(',');
+        .join(",");
       return `${m.name},${tags} value=${m.value} ${timestamp * 1000000}`;
     })
-    .join('\n');
+    .join("\n");
 }
 
 /**
@@ -126,7 +130,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
   const apiKey = process.env.GRAFANA_CLOUD_API_KEY;
 
   if (!url || !user || !apiKey) {
-    throw new Error('Grafana Cloud not configured');
+    throw new Error("Grafana Cloud not configured");
   }
 
   // Convert all metrics to Grafana format
@@ -138,10 +142,10 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
 
   // Push to Grafana Cloud
   const response = await fetch(url, {
-    method: 'POST',
+    method: "POST",
     headers: {
-      'Content-Type': 'text/plain',
-      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString('base64')}`,
+      "Content-Type": "text/plain",
+      Authorization: `Basic ${Buffer.from(`${user}:${apiKey}`).toString("base64")}`,
     },
     body,
   });
@@ -151,7 +155,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
     throw new Error(`Grafana push failed: ${response.status} ${text}`);
   }
 
-  logger.debug('Web Vitals pushed to Grafana', {
+  logger.debug("Web Vitals pushed to Grafana", {
     count: grafanaMetrics.length,
     metrics: grafanaMetrics.map((m) => m.name),
   });
@@ -161,6 +165,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * POST /api/metrics/web-vitals
  * Accept Web Vitals data and push to Grafana Cloud
  */
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Telemetry endpoint; no cookie auth, rate-limited
 export async function POST(request: NextRequest) {
   // Rate limiting: 60 req/min per IP (F-05 protection)
   const clientId = getClientIdentifier(request);
@@ -170,9 +175,9 @@ export async function POST(request: NextRequest) {
   );
 
   if (!rateLimit.success) {
-    logger.warn('Web Vitals rate limit exceeded', {
+    logger.warn("Web Vitals rate limit exceeded", {
       clientId,
-      endpoint: '/api/metrics/web-vitals',
+      endpoint: "/api/metrics/web-vitals",
     });
     return rateLimitResponse(rateLimit);
   }
@@ -183,7 +188,7 @@ export async function POST(request: NextRequest) {
     // Validate payload
     if (!validatePayload(body)) {
       return NextResponse.json(
-        { error: 'Invalid payload format' },
+        { error: "Invalid payload format" },
         { status: 400 },
       );
     }
@@ -196,11 +201,11 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
-    logger.error('Web Vitals POST error', { error: String(error) });
+    logger.error("Web Vitals POST error", { error: String(error) });
 
     // Don't expose internal error details to client
     return NextResponse.json(
-      { error: 'Failed to process metrics' },
+      { error: "Failed to process metrics" },
       { status: 500 },
     );
   }

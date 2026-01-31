@@ -14,6 +14,7 @@ const VerifySchema = z.object({
   code: z.string().min(4).max(12),
 });
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Code-based email verification; no cookie auth
 export async function POST(request: NextRequest) {
   const clientId = getClientIdentifier(request);
   const rateLimitResult = await checkRateLimitAsync(

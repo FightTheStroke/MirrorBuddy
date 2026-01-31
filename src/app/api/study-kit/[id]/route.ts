@@ -13,6 +13,7 @@ import { logger } from "@/lib/logger";
 import type { StudyKit } from "@/types/study-kit";
 import { deleteMaterialsFromStudyKit } from "@/lib/study-kit/sync-materials";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 /**
  * GET /api/study-kit/[id]
@@ -90,6 +91,11 @@ export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Auth check
     const auth = await validateAuth();

@@ -42,6 +42,7 @@ interface EventPayload {
   }>;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Optional auth + CORS; telemetry must work for unauthenticated users
 export async function POST(request: NextRequest) {
   // F-04: Get CORS headers based on request origin (no wildcard in production)
   const requestOrigin = request.headers.get("origin");

@@ -5,28 +5,17 @@
 // Related: ADR 0009 - Tool Execution Architecture
 // ============================================================================
 
-import { nanoid } from 'nanoid';
-import { logger } from '@/lib/logger';
-import { ToolRegistry } from '@/lib/tools/plugin/registry';
-import { ToolOrchestrator } from '@/lib/tools/plugin/orchestrator';
-import type { ToolExecutionResult, ToolContext } from '@/types/tools';
-import { saveToolOutput } from '@/lib/tools/tool-output-storage';
-import { getToolSchema } from './tool-executor-schemas';
-import { getToolTypeFromFunctionName } from './tool-executor-mapping';
-import {
-  getRegisteredHandlers,
-  clearHandlers,
-  hasToolHandler,
-  getRegisteredToolNames,
-  _setDeprecatedHandlers,
-  _setDeprecatedRegistry,
-} from './tool-executor-deprecated';
-import type { ToolHandler } from './tool-executor-plugin-factory';
-import { createPluginFromHandler } from './tool-executor-plugin-factory';
-import { executeViaOrchestrator } from './tool-executor-orchestration';
-
-// Re-export deprecated functions for backward compatibility
-export { getRegisteredHandlers, clearHandlers, hasToolHandler, getRegisteredToolNames };
+import { nanoid } from "nanoid";
+import { logger } from "@/lib/logger";
+import { ToolRegistry } from "@/lib/tools/plugin/registry";
+import { ToolOrchestrator } from "@/lib/tools/plugin/orchestrator";
+import type { ToolExecutionResult, ToolContext } from "@/types/tools";
+import { saveToolOutput } from "@/lib/tools/tool-output-storage";
+import { getToolSchema } from "./tool-executor-schemas";
+import { getToolTypeFromFunctionName } from "./tool-executor-mapping";
+import type { ToolHandler } from "./tool-executor-plugin-factory";
+import { createPluginFromHandler } from "./tool-executor-plugin-factory";
+import { executeViaOrchestrator } from "./tool-executor-orchestration";
 
 /**
  * LEGACY: Registry of tool handlers (maintained for backward compatibility only)
@@ -53,13 +42,22 @@ function initializeRegistry(): void {
   if (!registry) {
     registry = ToolRegistry.getInstance();
     orchestrator = new ToolOrchestrator(registry);
-    // Share references with deprecated module
-    _setDeprecatedHandlers(handlers);
-    _setDeprecatedRegistry(registry);
-    if (process.env.NODE_ENV === 'development') {
-      logger.debug('Tool executor: ToolRegistry and ToolOrchestrator initialized');
+    if (process.env.NODE_ENV === "development") {
+      logger.debug(
+        "Tool executor: ToolRegistry and ToolOrchestrator initialized",
+      );
     }
   }
+}
+
+/** Get all registered handlers (for testing) */
+export function getRegisteredHandlers(): Map<string, ToolHandler> {
+  return handlers;
+}
+
+/** Clear all handlers (for testing cleanup) */
+export function clearHandlers(): void {
+  handlers.clear();
 }
 
 /**
@@ -75,7 +73,7 @@ function initializeRegistry(): void {
  */
 export function registerToolHandler(
   functionName: string,
-  handler: ToolHandler
+  handler: ToolHandler,
 ): void {
   // Store in legacy handlers map for backward compatibility
   handlers.set(functionName, handler);
@@ -92,7 +90,9 @@ export function registerToolHandler(
         registry.register(plugin);
       }
     } catch (error) {
-      logger.warn(`Failed to register ${functionName} with ToolRegistry:`, { error: String(error) });
+      logger.warn(`Failed to register ${functionName} with ToolRegistry:`, {
+        error: String(error),
+      });
       // Continue with legacy handler even if registry sync fails
     }
   }
@@ -121,7 +121,7 @@ export function registerToolHandler(
 export async function executeToolCall(
   functionName: string,
   args: Record<string, unknown>,
-  context: ToolContext
+  context: ToolContext,
 ): Promise<ToolExecutionResult> {
   const toolId = nanoid();
   const toolType = getToolTypeFromFunctionName(functionName);
@@ -139,7 +139,7 @@ export async function executeToolCall(
       context,
       orchestrator,
       toolId,
-      registry.has(functionName)
+      registry.has(functionName),
     );
     if (orchestratorResult) {
       return orchestratorResult;
@@ -169,8 +169,8 @@ export async function executeToolCall(
     const validation = schema.safeParse(args);
     if (!validation.success) {
       const validationError = validation.error.issues
-        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-        .join('; ');
+        .map((issue) => `${issue.path.join(".")}: ${issue.message}`)
+        .join("; ");
       const error = `Invalid arguments for ${functionName}: ${validationError}`;
 
       logger.warn(`[Tool Validation] ${error}`);
@@ -201,11 +201,13 @@ export async function executeToolCall(
           toolType,
           result.data as Record<string, unknown>,
           result.toolId,
-          { userId: context.userId, enableRAG: true }
+          { userId: context.userId, enableRAG: true },
         );
       } catch (error) {
         // Log error but don't fail the tool execution
-        logger.warn('Failed to save tool output to database:', { error: String(error) });
+        logger.warn("Failed to save tool output to database:", {
+          error: String(error),
+        });
       }
     }
 

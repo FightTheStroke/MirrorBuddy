@@ -9,8 +9,13 @@ import { logger } from "@/lib/logger";
 import { extractLearnings } from "@/lib/ai/summarize";
 import type { Message, Prisma } from "@prisma/client";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {

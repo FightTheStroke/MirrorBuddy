@@ -3,10 +3,10 @@
  * Lazy retrieval, detection, and prompt generation
  */
 
-import type { KnowledgeCategory } from './knowledge-base-types';
-import { APP_VERSION } from './knowledge-base-types';
-import { FEATURE_INDEX } from './knowledge-base-index';
-import { KNOWLEDGE_CONTENT } from './knowledge-base-content';
+import type { KnowledgeCategory } from "./knowledge-base-types";
+import { APP_VERSION } from "./knowledge-base-types";
+import { FEATURE_INDEX } from "./knowledge-base-index";
+import { KNOWLEDGE_CONTENT } from "./knowledge-base-content";
 
 // ============================================================================
 // LAZY RETRIEVAL FUNCTIONS
@@ -39,12 +39,12 @@ export function detectCategories(query: string): KnowledgeCategory[] {
  * Returns concatenated content for the requested categories.
  */
 export function getKnowledgeForCategories(
-  categories: KnowledgeCategory[]
+  categories: KnowledgeCategory[],
 ): string {
-  if (categories.length === 0) return '';
+  if (categories.length === 0) return "";
 
   const uniqueCategories = [...new Set(categories)].slice(0, 3); // Max 3 categories
-  return uniqueCategories.map((cat) => KNOWLEDGE_CONTENT[cat]).join('\n\n');
+  return uniqueCategories.map((cat) => KNOWLEDGE_CONTENT[cat]).join("\n\n");
 }
 
 /**
@@ -53,7 +53,7 @@ export function getKnowledgeForCategories(
  */
 export function getRelevantKnowledge(query: string): string {
   const categories = detectCategories(query);
-  if (categories.length === 0) return '';
+  if (categories.length === 0) return "";
 
   return `## INFORMAZIONI RILEVANTI\n\n${getKnowledgeForCategories(categories)}`;
 }
@@ -89,28 +89,39 @@ Per problemi tecnici: verifica permessi browser, HTTPS, ricarica pagina.`;
 }
 
 // ============================================================================
-// LEGACY COMPATIBILITY
-// ============================================================================
-
-/**
- * @deprecated Use generateCompactIndexPrompt() + getRelevantKnowledge() instead.
- * Kept for backward compatibility during transition.
- */
-export function generateKnowledgeBasePrompt(): string {
-  // Return compact version instead of full dump
-  return generateCompactIndexPrompt();
-}
-
-// ============================================================================
 // TECH SUPPORT SUGGESTED PROMPTS
 // ============================================================================
 
 export const TECH_SUPPORT_SUGGESTED_PROMPTS = [
-  { icon: 'Phone', text: 'Come funzionano le chiamate vocali?', category: 'voice' },
-  { icon: 'BookOpen', text: 'Come creo le flashcard?', category: 'flashcards' },
-  { icon: 'Calendar', text: 'Come pianifico lo studio?', category: 'scheduler' },
-  { icon: 'Accessibility', text: 'Come attivo il font per dislessia?', category: 'accessibility' },
-  { icon: 'Bell', text: 'Come imposto le notifiche?', category: 'notifications' },
-  { icon: 'Trophy', text: 'Come funzionano XP e livelli?', category: 'gamification' },
-  { icon: 'Headphones', text: 'Come uso i suoni per concentrazione?', category: 'ambient_audio' },
+  {
+    icon: "Phone",
+    text: "Come funzionano le chiamate vocali?",
+    category: "voice",
+  },
+  { icon: "BookOpen", text: "Come creo le flashcard?", category: "flashcards" },
+  {
+    icon: "Calendar",
+    text: "Come pianifico lo studio?",
+    category: "scheduler",
+  },
+  {
+    icon: "Accessibility",
+    text: "Come attivo il font per dislessia?",
+    category: "accessibility",
+  },
+  {
+    icon: "Bell",
+    text: "Come imposto le notifiche?",
+    category: "notifications",
+  },
+  {
+    icon: "Trophy",
+    text: "Come funzionano XP e livelli?",
+    category: "gamification",
+  },
+  {
+    icon: "Headphones",
+    text: "Come uso i suoni per concentrazione?",
+    category: "ambient_audio",
+  },
 ];

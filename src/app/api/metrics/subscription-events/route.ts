@@ -16,6 +16,7 @@ interface SubscriptionEventPayload {
   metadata?: Record<string, unknown>;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Telemetry endpoint; no cookie auth
 export async function POST(request: NextRequest) {
   try {
     const body: SubscriptionEventPayload = await request.json();
