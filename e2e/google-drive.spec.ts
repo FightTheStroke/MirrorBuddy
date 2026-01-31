@@ -8,7 +8,7 @@
  * Run: npx playwright test e2e/google-drive.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // Test user ID - configure via E2E_TEST_USER_ID env var or use default
 // Default is a known test user in the development database

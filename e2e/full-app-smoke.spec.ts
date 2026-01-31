@@ -5,7 +5,7 @@
  * Run: npx playwright test e2e/full-app-smoke.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 const CRITICAL_ROUTES = [
   "/",

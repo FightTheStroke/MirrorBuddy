@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("hreflang tags", () => {
   test.describe("on welcome page", () => {

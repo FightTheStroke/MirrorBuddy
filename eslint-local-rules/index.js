@@ -7,6 +7,7 @@
 import { noMissingI18nKeys } from "./no-missing-i18n-keys.js";
 import { noKebabCaseI18nKeys } from "./no-kebab-case-i18n-keys.js";
 import noPrismaRaceCondition from "./no-prisma-race-condition.js";
+import requireE2eFixtures from "./require-e2e-fixtures.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -267,6 +268,7 @@ const rules = {
   "no-kebab-case-i18n-keys": noKebabCaseI18nKeys,
   "no-missing-i18n-keys": noMissingI18nKeys,
   "no-prisma-race-condition": noPrismaRaceCondition,
+  "require-e2e-fixtures": requireE2eFixtures,
 };
 
 const localRules = {
