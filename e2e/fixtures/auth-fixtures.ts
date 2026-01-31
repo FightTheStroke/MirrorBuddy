@@ -58,16 +58,6 @@ async function trialFixture(
       }),
     );
 
-    localStorage.setItem(
-      "mirrorbuddy-consent",
-      JSON.stringify({
-        version: "1.0",
-        acceptedAt: new Date().toISOString(),
-        essential: true,
-        analytics: false,
-        marketing: false,
-      }),
-    );
   });
 
   // Add cookies for accessibility
