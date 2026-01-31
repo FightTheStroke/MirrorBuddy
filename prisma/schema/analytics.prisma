@@ -143,3 +143,34 @@ model FunnelEvent {
   @@index([locale, createdAt])
   @@index([isTestData, createdAt])
 }
+
+// ============================================================================
+// ADMIN AUDIT LOG - Tracks all admin actions for accountability (F-33)
+// Separate from ComplianceAuditEntry (regulatory) - this is internal admin tracking
+// ============================================================================
+
+model AdminAuditLog {
+  id String @id @default(cuid())
+
+  // Action classification
+  action     String // e.g., "user_created", "user_deleted", "tier_changed", "invite_approved"
+  entityType String // e.g., "User", "Invite", "TierDefinition", "FeatureFlag"
+  entityId   String // ID of the affected entity
+
+  // Admin who performed the action
+  adminId String
+
+  // Additional context
+  details   Json?   // JSON-serialized additional data (old/new values, etc.)
+  ipAddress String? // IP address of the admin
+
+  // Timestamps
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([entityType])
+  @@index([adminId])
+  @@index([createdAt])
+  @@index([adminId, createdAt])
+  @@index([entityType, entityId])
+}

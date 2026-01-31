@@ -16,6 +16,7 @@ export interface UserBackupPayload {
   privacyPreferences: Record<string, unknown> | null;
   coppaConsent: Record<string, unknown> | null;
   googleAccount: Record<string, unknown> | null;
+  subscription: Record<string, unknown> | null;
   gamification: Record<string, unknown> | null;
   userAchievements: Record<string, unknown>[];
   dailyStreak: Record<string, unknown> | null;
@@ -81,6 +82,7 @@ export async function buildUserBackup(
     privacyPreferences,
     coppaConsent,
     googleAccount,
+    subscription,
     gamification,
     userAchievements,
     dailyStreak,
@@ -134,6 +136,7 @@ export async function buildUserBackup(
     prisma.userPrivacyPreferences.findUnique({ where: { userId } }),
     prisma.coppaConsent.findUnique({ where: { userId } }),
     prisma.googleAccount.findUnique({ where: { userId } }),
+    prisma.userSubscription.findUnique({ where: { userId } }),
     prisma.userGamification.findUnique({ where: { userId } }),
     prisma.userAchievement.findMany({
       where: { gamification: { userId } },
@@ -213,6 +216,7 @@ export async function buildUserBackup(
     privacyPreferences: toJson(privacyPreferences),
     coppaConsent: toJson(coppaConsent),
     googleAccount: toJson(googleAccount),
+    subscription: toJson(subscription),
     gamification: toJson(gamification),
     userAchievements: toJson(userAchievements),
     dailyStreak: toJson(dailyStreak),
@@ -395,6 +399,13 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
       await tx.googleAccount.create({
         data: asData<Prisma.GoogleAccountUncheckedCreateInput>(
           payload.googleAccount,
+        ),
+      });
+    }
+    if (payload.subscription) {
+      await tx.userSubscription.create({
+        data: asData<Prisma.UserSubscriptionUncheckedCreateInput>(
+          payload.subscription,
         ),
       });
     }
