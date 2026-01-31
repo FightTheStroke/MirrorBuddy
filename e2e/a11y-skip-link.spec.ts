@@ -10,7 +10,7 @@
  * Run: npx playwright test e2e/a11y-skip-link.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
   test("skip link is present on all pages", async ({ page }) => {

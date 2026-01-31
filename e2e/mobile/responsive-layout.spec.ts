@@ -104,7 +104,7 @@ test.describe("Mobile Responsive Layout", () => {
     await mobile.openMobileSidebar();
 
     const logoButton = page
-      .locator('button[aria-label="Torna alla home"]')
+      .locator('button[aria-label="Torna alla Home"]')
       .first();
     await expect(logoButton).toBeVisible();
 

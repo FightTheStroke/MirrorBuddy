@@ -9,7 +9,7 @@
  * Run: npx playwright test e2e/a11y-quick-panel-advanced.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   test("toggle switches have role=switch", async ({ page }) => {

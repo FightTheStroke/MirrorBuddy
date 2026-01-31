@@ -365,6 +365,16 @@ const eslintConfig = defineConfig([
       "local-rules/no-prisma-race-condition": "warn",
     },
   },
+  // ADR 0059: Require E2E specs to use fixtures instead of raw @playwright/test
+  // Fixtures provide /api/tos mock and wall bypasses. Without them, TosGateProvider
+  // blocks all pointer events, causing systematic test failures.
+  {
+    files: ["e2e/**/*.spec.ts"],
+    ignores: ["e2e/fixtures/**"],
+    rules: {
+      "local-rules/require-e2e-fixtures": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;

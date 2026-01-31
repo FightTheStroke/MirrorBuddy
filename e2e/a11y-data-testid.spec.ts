@@ -7,7 +7,7 @@
  * Run: npx playwright test e2e/a11y-data-testid.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // ============================================================================
 // SKIP LINK WITH DATA-TESTID

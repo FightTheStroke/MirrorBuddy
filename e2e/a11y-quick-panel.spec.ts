@@ -11,7 +11,7 @@
  * Run: npx playwright test e2e/a11y-quick-panel.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("quick panel has data-testid", async ({ page }) => {

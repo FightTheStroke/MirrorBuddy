@@ -10,7 +10,7 @@
  * Run: npx playwright test e2e/a11y-floating-button.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   test("floating button has data-testid attribute", async ({ page }) => {
