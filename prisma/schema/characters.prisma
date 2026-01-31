@@ -1,0 +1,35 @@
+// ============================================================================
+// CHARACTERS DOMAIN
+// Configuration for maestri, coaches, and buddies
+// ============================================================================
+
+enum CharacterType {
+  MAESTRO
+  COACH
+  BUDDY
+}
+
+model CharacterConfig {
+  id String @id @default(cuid())
+
+  // Character identification
+  characterId String       @unique // Matches the character ID from data files
+  type        CharacterType
+
+  // Configuration
+  isEnabled Boolean @default(true)
+
+  // Optional overrides for display
+  displayNameOverride  String?
+  descriptionOverride  String?
+
+  // Audit tracking
+  updatedBy String
+  updatedAt DateTime @updatedAt
+
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([isEnabled])
+  @@index([characterId])
+}

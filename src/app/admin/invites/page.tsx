@@ -4,9 +4,10 @@
 export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
-import { Check, X, Loader2, RefreshCw, UserPlus } from "lucide-react";
+import { Loader2, RefreshCw, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ExportDropdown } from "@/components/admin/export-dropdown";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import {
   InvitesTable,
@@ -14,6 +15,8 @@ import {
 } from "@/components/admin/invites-table";
 import { BulkActionBar } from "@/components/admin/bulk-action-bar";
 import { DirectInviteModal } from "@/components/admin/direct-invite-modal";
+import { RejectModal } from "@/components/admin/invites/reject-modal";
+import { InvitePendingActions } from "@/components/admin/invites/invite-pending-actions";
 import { cn } from "@/lib/utils";
 
 type TabStatus = "PENDING" | "APPROVED" | "REJECTED" | "ALL" | "DIRECT";
@@ -27,16 +30,14 @@ export default function AdminInvitesPage() {
   const [processingId, setProcessingId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [showDirectInvite, setShowDirectInvite] = useState(false);
-  const [showRejectModal, setShowRejectModal] = useState<string | null>(null);
-  const [rejectReason, setRejectReason] = useState("");
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
 
   const fetchInvites = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const adminResponse = await fetch("/api/admin/session");
-      const adminData = adminResponse.ok ? await adminResponse.json() : null;
+      const adminRes = await fetch("/api/admin/session");
+      const adminData = adminRes.ok ? await adminRes.json() : null;
       const adminId = adminData?.userId as string | undefined;
 
       const url =
@@ -45,8 +46,8 @@ export default function AdminInvitesPage() {
           : activeTab === "DIRECT"
             ? `/api/invites?isDirect=true${adminId ? `&reviewedBy=${adminId}` : ""}`
             : `/api/invites?status=${activeTab}`;
-      const response = await fetch(url);
 
+      const response = await fetch(url);
       if (!response.ok) {
         if (response.status === 401) {
           setError(t("unauthorized"));
@@ -54,10 +55,8 @@ export default function AdminInvitesPage() {
         }
         throw new Error("Failed to fetch invites");
       }
-
       const data = await response.json();
       setInvites(data.invites);
-      // Clear selection when data changes
       setSelectedIds(new Set());
     } catch (err) {
       setError(err instanceof Error ? err.message : t("loadingError"));
@@ -73,16 +72,14 @@ export default function AdminInvitesPage() {
   const handleApprove = async (id: string) => {
     setProcessingId(id);
     try {
-      const response = await csrfFetch("/api/invites/approve", {
+      const res = await csrfFetch("/api/invites/approve", {
         method: "POST",
         body: JSON.stringify({ requestId: id }),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
+      if (!res.ok) {
+        const data = await res.json();
         throw new Error(data.error || t("approvalError"));
       }
-
       await fetchInvites();
     } catch (err) {
       alert(err instanceof Error ? err.message : t("error"));
@@ -91,24 +88,18 @@ export default function AdminInvitesPage() {
     }
   };
 
-  const handleReject = async (id: string) => {
+  const handleReject = async (id: string, reason: string) => {
     setProcessingId(id);
     try {
-      const response = await csrfFetch("/api/invites/reject", {
+      const res = await csrfFetch("/api/invites/reject", {
         method: "POST",
-        body: JSON.stringify({
-          requestId: id,
-          reason: rejectReason || undefined,
-        }),
+        body: JSON.stringify({ requestId: id, reason: reason || undefined }),
       });
-
-      if (!response.ok) {
-        const data = await response.json();
+      if (!res.ok) {
+        const data = await res.json();
         throw new Error(data.error || t("rejectionError"));
       }
-
-      setShowRejectModal(null);
-      setRejectReason("");
+      setRejectingId(null);
       await fetchInvites();
     } catch (err) {
       alert(err instanceof Error ? err.message : t("error"));
@@ -129,15 +120,11 @@ export default function AdminInvitesPage() {
     { status: "ALL", label: t("all") },
   ];
 
-  // Show checkboxes only on PENDING or ALL tab
   const showCheckboxes = activeTab === "PENDING" || activeTab === "ALL";
-
-  // Get pending invites from current view for single actions
   const pendingInvites = invites.filter((i) => i.status === "PENDING");
 
   return (
     <div className="max-w-4xl mx-auto pb-20">
-      {/* Toolbar */}
       <div className="flex items-center justify-between mb-6">
         <Button
           onClick={() => setShowDirectInvite(true)}
@@ -147,64 +134,63 @@ export default function AdminInvitesPage() {
           <UserPlus className="w-4 h-4" />
           {t("directInvite")}
         </Button>
-
-        <Button
-          onClick={fetchInvites}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          disabled={loading}
-        >
-          <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          {t("refresh")}
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            data={invites}
+            columns={[
+              { key: "email", label: "Email" },
+              { key: "name", label: "Name" },
+              { key: "status", label: "Status" },
+              { key: "createdAt", label: "Date" },
+              { key: "motivation", label: "Motivation" },
+            ]}
+            filenamePrefix="invites"
+          />
+          <Button
+            onClick={fetchInvites}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={loading}
+          >
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            {t("refresh")}
+          </Button>
+        </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-2 mb-6 flex-wrap">
+      <div className="flex gap-1 mb-6 flex-wrap bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
         {tabs.map((tab) => (
           <button
             key={tab.status}
             onClick={() => setActiveTab(tab.status)}
             className={cn(
-              "px-4 py-2 rounded-lg text-sm font-medium transition-colors",
+              "px-3 py-1.5 rounded-md text-sm font-medium transition-colors",
               activeTab === tab.status
-                ? "bg-primary text-primary-foreground"
-                : "bg-card text-muted-foreground hover:bg-accent",
+                ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300",
             )}
           >
             {tab.label}
             {tab.count !== undefined && tab.count > 0 && (
-              <span
-                className={cn(
-                  "ml-2 px-1.5 py-0.5 text-xs rounded-full",
-                  activeTab === tab.status
-                    ? "bg-white/20"
-                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-                )}
-              >
-                {tab.count}
-              </span>
+              <span className="ml-1.5 text-xs opacity-60">{tab.count}</span>
             )}
           </button>
         ))}
       </div>
 
-      {/* Error */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/30 border border-red-200 dark:border-red-800 rounded-lg mb-6">
-          <p className="text-red-700 dark:text-red-300">{error}</p>
+        <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg mb-6">
+          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <Loader2 className="w-6 h-6 animate-spin text-slate-400" />
         </div>
       )}
 
-      {/* Table */}
       {!loading && (
         <InvitesTable
           invites={invites}
@@ -214,48 +200,15 @@ export default function AdminInvitesPage() {
         />
       )}
 
-      {/* Single item actions for pending invites */}
-      {!loading && pendingInvites.length > 0 && selectedIds.size === 0 && (
-        <div className="mt-4 space-y-2">
-          {pendingInvites.map((invite) => (
-            <div
-              key={invite.id}
-              className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
-            >
-              <span className="text-sm text-foreground">
-                {invite.name} ({invite.email})
-              </span>
-              <div className="flex gap-2">
-                <Button
-                  onClick={() => handleApprove(invite.id)}
-                  disabled={processingId === invite.id}
-                  size="sm"
-                  className="gap-1"
-                >
-                  {processingId === invite.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <Check className="w-4 h-4" />
-                  )}
-                  {t("approve")}
-                </Button>
-                <Button
-                  onClick={() => setShowRejectModal(invite.id)}
-                  disabled={processingId === invite.id}
-                  variant="outline"
-                  size="sm"
-                  className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
-                >
-                  <X className="w-4 h-4" />
-                  {t("reject")}
-                </Button>
-              </div>
-            </div>
-          ))}
-        </div>
+      {!loading && selectedIds.size === 0 && (
+        <InvitePendingActions
+          invites={pendingInvites}
+          processingId={processingId}
+          onApprove={handleApprove}
+          onReject={(id) => setRejectingId(id)}
+        />
       )}
 
-      {/* Bulk Action Bar */}
       <BulkActionBar
         selectedCount={selectedIds.size}
         selectedIds={Array.from(selectedIds)}
@@ -263,59 +216,19 @@ export default function AdminInvitesPage() {
         onActionComplete={fetchInvites}
       />
 
-      {/* Direct Invite Modal */}
       <DirectInviteModal
         isOpen={showDirectInvite}
         onClose={() => setShowDirectInvite(false)}
         onSuccess={fetchInvites}
       />
 
-      {/* Reject Modal */}
-      {showRejectModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
-          <div className="bg-card rounded-xl p-6 max-w-md w-full">
-            <h3 className="text-lg font-semibold text-foreground mb-4">
-              {t("rejectRequest")}
-            </h3>
-            <label
-              htmlFor="reject-reason"
-              className="block text-sm font-medium text-foreground mb-2"
-            >
-              {t("rejectionReason")}
-            </label>
-            <textarea
-              id="reject-reason"
-              value={rejectReason}
-              onChange={(e) => setRejectReason(e.target.value)}
-              placeholder={t("optional")}
-              className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
-              rows={3}
-            />
-            <div className="flex flex-wrap gap-2 sm:gap-3 mt-4">
-              <Button
-                onClick={() => {
-                  setShowRejectModal(null);
-                  setRejectReason("");
-                }}
-                variant="outline"
-                className="flex-1 min-w-20"
-              >
-                {t("cancel")}
-              </Button>
-              <Button
-                onClick={() => handleReject(showRejectModal)}
-                disabled={processingId === showRejectModal}
-                className="flex-1 min-w-20 bg-red-600 hover:bg-red-700"
-              >
-                {processingId === showRejectModal ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  t("confirmRejection")
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
+      {rejectingId && (
+        <RejectModal
+          inviteId={rejectingId}
+          processing={processingId === rejectingId}
+          onReject={handleReject}
+          onClose={() => setRejectingId(null)}
+        />
       )}
     </div>
   );
