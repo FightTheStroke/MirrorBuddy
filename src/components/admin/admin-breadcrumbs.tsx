@@ -130,6 +130,8 @@ function getBreadcrumbLabel(
     "/admin/service-limits": "sidebar.serviceLimits",
     "/admin/tiers/audit-log": "auditLog",
     "/admin/tiers/definitions": "tierDefinitions",
+    "/admin/characters": "characters.title",
+    "/admin/audit": "audit.title",
   };
 
   // Try to get translated label

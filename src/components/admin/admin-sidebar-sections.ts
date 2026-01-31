@@ -74,7 +74,7 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
         {
           id: "audit-log",
           label: t("sidebar.auditLog"),
-          href: "/admin/tiers/audit-log",
+          href: "/admin/audit",
           icon: ScrollText,
         },
         {
