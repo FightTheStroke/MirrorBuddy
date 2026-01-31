@@ -111,6 +111,7 @@
 | 0078 | Vercel Runtime Constraints                                | Edge function limits                   |
 | 0079 | Web Vitals Analytics and Legal Documentation Architecture | Performance monitoring                 |
 | 0105 | Prisma Race Condition Prevention                          | Transaction-based updates              |
+| 0106 | Documentation AI-Ready Architecture                       | 3-tier docs, 96% token reduction       |
 
 ## Features & Tools
 
@@ -158,6 +159,6 @@
 
 ---
 
-**Total Active ADRs**: 91
+**Total Active ADRs**: 92
 **Archived ADRs**: 7
 **Last Updated**: 2026-01-31

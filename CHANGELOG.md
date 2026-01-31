@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Documentation System (Plan 111)
+
+- `docs/claude/` on-demand documentation system (32 AI-optimized reference files)
+- `docs/adr/INDEX.md` domain-clustered ADR navigation index
+- `src/DOCS-INDEX.md` embedded source documentation index
+- ADR 0106: Documentation AI-Ready Architecture
+
+### Changed
+
+#### Documentation Optimization (Plan 111)
+
+- `CLAUDE.md` updated with complete @docs/claude/ file listing
+- `CHANGELOG.md` archived entries before v0.10.0 to `docs-archive/CHANGELOG-archive.md`
+- `ARCHITECTURE-DIAGRAMS.md` flagged as human-only (AI skip header)
+- Consolidated `docs/i18n/` from 10 to 4 files
+- Consolidated `docs/operations/` from 27 to 18 files
+
+### Fixed
+
+#### Documentation Corrections (Plan 111)
+
+- ADR 0034 mislabel in compliance rules (was "Safety", corrected to "Chat Streaming Architecture")
+- Duplicate ADR 0073 removed (kept `0073-staging-system-vercel.md`)
+
+### Archived (docs-archive/)
+
+#### Documentation Cleanup (Plan 111)
+
+- Business planning docs (busplan/)
+- Task verification logs
+- Country-specific compliance docs
+- FEATURES.md (redundant with README)
+- Release-specific operations docs
+- Redundant i18n documentation
+
 ## [0.11.0] - 2026-01-25 - Multi-Language & Internationalization (i18n)
 
 > **Branch**: `MirrorBuddy-i18n-multi-language` | **Plan**: `docs/plans/MirrorBuddy-i18n.md` | **ADR**: `docs/adr/0066-i18n-multi-language-architecture.md`
@@ -475,4 +512,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Security**: ✅ Full SSL verification enabled with AWS RDS certificate bundle
 
 ---
-
