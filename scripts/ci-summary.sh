@@ -37,6 +37,31 @@ result_details() {
 	fi
 }
 
+# Parse Playwright JSON report for failed test details (max 10 failures, 3 lines each)
+parse_pw_json() {
+	local json_file="$1"
+	[[ -f "$json_file" ]] || return 0
+	node -e '
+const fs = require("fs");
+const r = JSON.parse(fs.readFileSync(process.argv[1], "utf8"));
+const failed = (r.suites || []).flatMap(function gather(s) {
+  const own = (s.specs || []).flatMap(sp =>
+    sp.tests.filter(t => t.status === "unexpected" || t.status === "flaky")
+      .map(t => ({
+        title: sp.title,
+        file: sp.file + ":" + sp.line,
+        error: (t.results[0]?.error?.message || "").split("\n")[0].slice(0, 120)
+      }))
+  );
+  return own.concat((s.suites || []).flatMap(gather));
+});
+failed.slice(0, 10).forEach(f => {
+  console.log(f.file + " " + f.title);
+  if (f.error) console.log("  " + f.error);
+});
+' "$json_file" 2>/dev/null || true
+}
+
 run_lint() {
 	local tmp
 	tmp=$(mktemp)
@@ -160,9 +185,12 @@ run_e2e() {
 		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
 		result "[FAIL] E2E${s:+ ($s)}"
 		local d
-		d=$(strip_ansi "$tmp" |
-			grep -E "^\s+[0-9]+\)|Error:|expect\(|Timeout|\.spec\.ts:" |
-			sed 's/^\s*//' | head -15)
+		d=$(parse_pw_json "test-results/pw-results.json")
+		if [[ -z "$d" ]]; then
+			d=$(strip_ansi "$tmp" |
+				grep -E "^\s+[0-9]+\)|Error:|expect\(|Timeout|\.spec\.ts:" |
+				sed 's/^\s*//' | head -15)
+		fi
 		result_details "$d"
 	fi
 	rm -f "$tmp"
@@ -180,11 +208,13 @@ run_a11y() {
 		local s
 		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
 		result "[FAIL] A11y${s:+ ($s)}"
-		# Extract violation details from axe-core output
 		local d
-		d=$(strip_ansi "$tmp" |
-			grep -E "^\s+[0-9]+\)|violation|critical|serious|moderate|\[wcag" |
-			sed 's/^\s*//' | head -15)
+		d=$(parse_pw_json "test-results/pw-results.json")
+		if [[ -z "$d" ]]; then
+			d=$(strip_ansi "$tmp" |
+				grep -E "^\s+[0-9]+\)|violation|critical|serious|moderate|\[wcag" |
+				sed 's/^\s*//' | head -15)
+		fi
 		result_details "$d"
 	fi
 	rm -f "$tmp"
