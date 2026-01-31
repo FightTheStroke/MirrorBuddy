@@ -6,7 +6,8 @@ set -euo pipefail
 # Target: ~10-30 lines output regardless of codebase size.
 #
 # Usage:
-#   ./scripts/ci-summary.sh          # lint + typecheck + build
+#   ./scripts/ci-summary.sh          # lint + typecheck + build (default)
+#   ./scripts/ci-summary.sh --quick  # lint + typecheck ONLY (~30s vs ~3min)
 #   ./scripts/ci-summary.sh --full   # + unit tests
 #   ./scripts/ci-summary.sh --lint   # lint only
 #   ./scripts/ci-summary.sh --types  # typecheck only
@@ -15,6 +16,8 @@ set -euo pipefail
 #   ./scripts/ci-summary.sh --i18n   # i18n check only
 #   ./scripts/ci-summary.sh --e2e    # E2E tests (requires running app)
 #   ./scripts/ci-summary.sh --a11y   # Accessibility tests (requires running app)
+#
+# For AI agents: use --quick during development, default/--full for Thor/pre-commit.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -231,6 +234,10 @@ case "$MODE" in
 --i18n) run_i18n ;;
 --e2e) run_e2e "${2:-}" ;;
 --a11y) run_a11y ;;
+--quick)
+	run_lint
+	run_typecheck
+	;;
 --full)
 	run_lint
 	run_typecheck

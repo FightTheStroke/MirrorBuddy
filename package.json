@@ -55,6 +55,7 @@
     "release:fast": "./scripts/release-fast.sh",
     "release:brutal": "./scripts/release-brutal.sh",
     "ci:summary": "./scripts/ci-summary.sh",
+    "ci:summary:quick": "./scripts/ci-summary.sh --quick",
     "ci:summary:full": "./scripts/ci-summary.sh --full",
     "build:analyze": "ANALYZE=true npm run build",
     "check:bundle": "tsx scripts/check-bundle-size.ts",
