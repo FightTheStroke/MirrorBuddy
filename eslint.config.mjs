@@ -28,18 +28,12 @@ const eslintConfig = defineConfig([
       "security/detect-non-literal-regexp": "warn",
     },
   },
-  // jsx-a11y: Full WCAG accessibility rules for JSX (28 rules beyond Next.js defaults)
-  // eslint-config-next only enables 6/34 rules as "warn". This adds all recommended rules.
-  // NOTE: Set to "warn" initially to audit existing violations. Escalate to "error" once fixed.
+  // jsx-a11y: Full WCAG accessibility rules for JSX (34 rules, recommended preset)
+  // eslint-config-next only enables 6/34 rules as "warn". This enforces all recommended rules.
+  // All violations fixed — enforced as "error" to prevent regressions.
   {
     files: ["src/**/*.tsx"],
-    rules: Object.fromEntries(
-      Object.entries(jsxA11y.flatConfigs.recommended.rules).map(([key, val]) => {
-        // Preserve "off" rules as-is; downgrade "error" to "warn" for initial rollout
-        if (val === "off" || (Array.isArray(val) && val[0] === "off")) return [key, val];
-        return [key, Array.isArray(val) ? ["warn", ...val.slice(1)] : "warn"];
-      }),
-    ),
+    rules: jsxA11y.flatConfigs.recommended.rules,
   },
   // Scripts, e2e, tests, public - not production code or controlled paths
   {

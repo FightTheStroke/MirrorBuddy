@@ -3,19 +3,14 @@
  * @brief ADHD settings component
  */
 
-import { Brain } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { Toggle } from './toggle';
+import { Brain } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { Toggle } from "./toggle";
 
 export function ADHDSettings() {
-  const {
-    settings,
-    updateSettings,
-    adhdConfig,
-    updateADHDConfig,
-    adhdStats,
-  } = useAccessibilityStore();
+  const { settings, updateSettings, adhdConfig, updateADHDConfig, adhdStats } =
+    useAccessibilityStore();
 
   return (
     <div className="space-y-4">
@@ -43,18 +38,18 @@ export function ADHDSettings() {
 
       <div
         className={cn(
-          'p-4 rounded-lg',
+          "p-4 rounded-lg",
           settings.highContrast
-            ? 'bg-gray-900 border border-gray-700'
-            : 'bg-slate-50 dark:bg-slate-800/50'
+            ? "bg-gray-900 border border-gray-700"
+            : "bg-slate-50 dark:bg-slate-800/50",
         )}
       >
         <h4
           className={cn(
-            'font-medium mb-3',
+            "font-medium mb-3",
             settings.highContrast
-              ? 'text-yellow-400'
-              : 'text-slate-900 dark:text-white'
+              ? "text-yellow-400"
+              : "text-slate-900 dark:text-white",
           )}
         >
           Timer Sessione
@@ -62,11 +57,15 @@ export function ADHDSettings() {
 
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="text-sm text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="adhd-work-duration"
+              className="text-sm text-slate-500 dark:text-slate-400"
+            >
               Lavoro (min)
             </label>
             <input
               type="number"
+              id="adhd-work-duration"
               value={Math.floor(adhdConfig.workDuration / 60)}
               onChange={(e) =>
                 updateADHDConfig({
@@ -76,20 +75,24 @@ export function ADHDSettings() {
               min={5}
               max={60}
               className={cn(
-                'w-full mt-1 px-3 py-2 rounded-lg border',
+                "w-full mt-1 px-3 py-2 rounded-lg border",
                 settings.highContrast
-                  ? 'bg-black border-yellow-400 text-white'
-                  : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600'
+                  ? "bg-black border-yellow-400 text-white"
+                  : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600",
               )}
             />
           </div>
 
           <div>
-            <label className="text-sm text-slate-500 dark:text-slate-400">
+            <label
+              htmlFor="adhd-break-duration"
+              className="text-sm text-slate-500 dark:text-slate-400"
+            >
               Pausa (min)
             </label>
             <input
               type="number"
+              id="adhd-break-duration"
               value={Math.floor(adhdConfig.breakDuration / 60)}
               onChange={(e) =>
                 updateADHDConfig({
@@ -99,10 +102,10 @@ export function ADHDSettings() {
               min={3}
               max={30}
               className={cn(
-                'w-full mt-1 px-3 py-2 rounded-lg border',
+                "w-full mt-1 px-3 py-2 rounded-lg border",
                 settings.highContrast
-                  ? 'bg-black border-yellow-400 text-white'
-                  : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600'
+                  ? "bg-black border-yellow-400 text-white"
+                  : "bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600",
               )}
             />
           </div>
@@ -111,18 +114,18 @@ export function ADHDSettings() {
 
       <div
         className={cn(
-          'p-4 rounded-lg',
+          "p-4 rounded-lg",
           settings.highContrast
-            ? 'bg-gray-900 border border-gray-700'
-            : 'bg-slate-50 dark:bg-slate-800/50'
+            ? "bg-gray-900 border border-gray-700"
+            : "bg-slate-50 dark:bg-slate-800/50",
         )}
       >
         <h4
           className={cn(
-            'font-medium mb-3',
+            "font-medium mb-3",
             settings.highContrast
-              ? 'text-yellow-400'
-              : 'text-slate-900 dark:text-white'
+              ? "text-yellow-400"
+              : "text-slate-900 dark:text-white",
           )}
         >
           Le tue statistiche
@@ -133,9 +136,7 @@ export function ADHDSettings() {
             <span className="text-slate-500 dark:text-slate-400">
               Sessioni totali:
             </span>
-            <span className="ml-2 font-medium">
-              {adhdStats.totalSessions}
-            </span>
+            <span className="ml-2 font-medium">{adhdStats.totalSessions}</span>
           </div>
           <div>
             <span className="text-slate-500 dark:text-slate-400">
@@ -164,4 +165,3 @@ export function ADHDSettings() {
     </div>
   );
 }
-

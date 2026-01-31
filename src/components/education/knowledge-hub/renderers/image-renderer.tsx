@@ -129,7 +129,6 @@ export function ImageRenderer({ data, className }: BaseRendererProps) {
             src={url}
             alt={alt}
             className="max-w-full max-h-full object-contain"
-            onClick={(e) => e.stopPropagation()}
           />
         </motion.div>
       )}

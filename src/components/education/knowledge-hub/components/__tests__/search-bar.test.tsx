@@ -353,6 +353,7 @@ describe("SearchBar", () => {
 
   describe("Auto Focus", () => {
     it("should auto-focus when autoFocus is true", () => {
+      // eslint-disable-next-line jsx-a11y/no-autofocus
       render(<SearchBar value="" onChange={vi.fn()} autoFocus={true} />);
 
       const input = screen.getByRole("searchbox");
@@ -360,6 +361,7 @@ describe("SearchBar", () => {
     });
 
     it("should not auto-focus when autoFocus is false", () => {
+      // eslint-disable-next-line jsx-a11y/no-autofocus
       render(<SearchBar value="" onChange={vi.fn()} autoFocus={false} />);
 
       const input = screen.getByRole("searchbox");

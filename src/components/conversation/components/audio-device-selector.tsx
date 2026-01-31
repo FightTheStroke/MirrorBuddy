@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Settings2, Mic, Volume2, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useAudioDevices } from '@/lib/hooks/use-audio-devices';
-import { useSettingsStore } from '@/lib/stores';
-import { cn } from '@/lib/utils';
+import { useState } from "react";
+import { Settings2, Mic, Volume2, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useAudioDevices } from "@/lib/hooks/use-audio-devices";
+import { useSettingsStore } from "@/lib/stores";
+import { cn } from "@/lib/utils";
 
 interface AudioDeviceSelectorProps {
   /** Compact mode for overlay (default) vs expanded mode */
@@ -22,7 +22,8 @@ export function AudioDeviceSelector({
   className,
 }: AudioDeviceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { microphones, speakers, hasPermission, requestPermission } = useAudioDevices();
+  const { microphones, speakers, hasPermission, requestPermission } =
+    useAudioDevices();
   const {
     preferredMicrophoneId,
     preferredOutputId,
@@ -31,14 +32,16 @@ export function AudioDeviceSelector({
   } = useSettingsStore();
 
   // Find current device names
-  const currentMic = microphones.find(m => m.deviceId === preferredMicrophoneId)?.label
-    || (preferredMicrophoneId ? 'Microfono selezionato' : 'Predefinito');
-  const currentSpeaker = speakers.find(s => s.deviceId === preferredOutputId)?.label
-    || (preferredOutputId ? 'Altoparlante selezionato' : 'Predefinito');
+  const currentMic =
+    microphones.find((m) => m.deviceId === preferredMicrophoneId)?.label ||
+    (preferredMicrophoneId ? "Microfono selezionato" : "Predefinito");
+  const currentSpeaker =
+    speakers.find((s) => s.deviceId === preferredOutputId)?.label ||
+    (preferredOutputId ? "Altoparlante selezionato" : "Predefinito");
 
   if (compact) {
     return (
-      <div className={cn('relative', className)}>
+      <div className={cn("relative", className)}>
         <Button
           variant="ghost"
           size="sm"
@@ -53,10 +56,12 @@ export function AudioDeviceSelector({
           aria-label="Impostazioni audio"
         >
           <Settings2 className="w-4 h-4" />
-          <ChevronDown className={cn(
-            'w-3 h-3 ml-1 transition-transform',
-            isOpen && 'rotate-180'
-          )} />
+          <ChevronDown
+            className={cn(
+              "w-3 h-3 ml-1 transition-transform",
+              isOpen && "rotate-180",
+            )}
+          />
         </Button>
 
         {isOpen && (
@@ -64,11 +69,15 @@ export function AudioDeviceSelector({
             <div className="space-y-3">
               {/* Microphone */}
               <div className="space-y-1">
-                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                <label
+                  htmlFor="overlay-microphone"
+                  className="flex items-center gap-1.5 text-xs font-medium text-slate-400"
+                >
                   <Mic className="w-3 h-3" />
                   Microfono
                 </label>
                 <select
+                  id="overlay-microphone"
                   value={preferredMicrophoneId}
                   onChange={(e) => setPreferredMicrophone(e.target.value)}
                   className="w-full px-2 py-1.5 text-xs rounded border border-slate-600 bg-slate-700 text-white"
@@ -84,11 +93,15 @@ export function AudioDeviceSelector({
 
               {/* Speaker */}
               <div className="space-y-1">
-                <label className="flex items-center gap-1.5 text-xs font-medium text-slate-400">
+                <label
+                  htmlFor="overlay-speaker"
+                  className="flex items-center gap-1.5 text-xs font-medium text-slate-400"
+                >
                   <Volume2 className="w-3 h-3" />
                   Altoparlanti
                 </label>
                 <select
+                  id="overlay-speaker"
                   value={preferredOutputId}
                   onChange={(e) => setPreferredOutput(e.target.value)}
                   className="w-full px-2 py-1.5 text-xs rounded border border-slate-600 bg-slate-700 text-white"
@@ -114,7 +127,7 @@ export function AudioDeviceSelector({
 
   // Expanded mode (not used yet, but available)
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <div className="flex items-center gap-2 text-sm text-slate-300">
         <Mic className="w-4 h-4" />
         <span className="truncate">{currentMic}</span>

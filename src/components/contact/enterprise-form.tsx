@@ -324,10 +324,13 @@ export function EnterpriseForm() {
 
       {/* Topics */}
       <div>
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3">
+        <div
+          id="topics-label"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-3"
+        >
           Temi di interesse *
-        </label>
-        <div className="space-y-2">
+        </div>
+        <div className="space-y-2" role="group" aria-labelledby="topics-label">
           {TOPICS.map((topic) => (
             <div key={topic.value} className="flex items-center">
               <input

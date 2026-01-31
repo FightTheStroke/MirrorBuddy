@@ -93,11 +93,15 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
             {editingTier === tier.tierId ? (
               <div className="bg-gray-50 p-3 rounded space-y-3">
                 <div>
-                  <label className="text-sm font-medium">
+                  <label
+                    htmlFor={`tier-${tier.tierId}-chat-limit`}
+                    className="text-sm font-medium"
+                  >
                     Daily Chat Limit
                   </label>
                   <input
                     type="number"
+                    id={`tier-${tier.tierId}-chat-limit`}
                     min="0"
                     value={formData.chatLimitDaily}
                     onChange={(e) =>
@@ -110,11 +114,15 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">
+                  <label
+                    htmlFor={`tier-${tier.tierId}-voice-minutes`}
+                    className="text-sm font-medium"
+                  >
                     Daily Voice Minutes
                   </label>
                   <input
                     type="number"
+                    id={`tier-${tier.tierId}-voice-minutes`}
                     min="0"
                     value={formData.voiceMinutesDaily}
                     onChange={(e) =>
@@ -127,11 +135,15 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">
+                  <label
+                    htmlFor={`tier-${tier.tierId}-tools-limit`}
+                    className="text-sm font-medium"
+                  >
                     Daily Tools Limit
                   </label>
                   <input
                     type="number"
+                    id={`tier-${tier.tierId}-tools-limit`}
                     min="0"
                     value={formData.toolsLimitDaily}
                     onChange={(e) =>
@@ -144,9 +156,15 @@ export function TierLimits({ tiers, onUpdate }: TierLimitsProps) {
                   />
                 </div>
                 <div>
-                  <label className="text-sm font-medium">Total Documents</label>
+                  <label
+                    htmlFor={`tier-${tier.tierId}-docs-limit`}
+                    className="text-sm font-medium"
+                  >
+                    Total Documents
+                  </label>
                   <input
                     type="number"
+                    id={`tier-${tier.tierId}-docs-limit`}
                     min="0"
                     value={formData.docsLimitTotal}
                     onChange={(e) =>

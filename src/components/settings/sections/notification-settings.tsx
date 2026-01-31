@@ -51,16 +51,27 @@ export function NotificationSettings() {
         </CardHeader>
         <CardContent className="space-y-4">
           {/* Master enable toggle */}
-          <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
+          <label
+            htmlFor="notification-enable"
+            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+          >
+            <span className="sr-only">{t("notifications.enable")}</span>
             <div>
-              <span className="font-medium text-slate-900 dark:text-white block">
+              <span
+                className="font-medium text-slate-900 dark:text-white block"
+                aria-hidden="true"
+              >
                 {t("notifications.enable")}
               </span>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-500" aria-hidden="true">
                 {t("notifications.description")}
               </span>
             </div>
-            <div
+            <button
+              id="notification-enable"
+              type="button"
+              role="switch"
+              aria-checked={preferences.enabled}
               className={cn(
                 "relative w-12 h-7 rounded-full transition-colors",
                 preferences.enabled
@@ -75,12 +86,15 @@ export function NotificationSettings() {
                   preferences.enabled ? "translate-x-5" : "translate-x-0",
                 )}
               />
-            </div>
+            </button>
           </label>
 
           {/* Push notifications */}
           {isPushSupported() && (
-            <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
+            <label
+              htmlFor="notification-push"
+              className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+            >
               <div>
                 <span className="font-medium text-slate-900 dark:text-white block">
                   {t("notifications.push")}
@@ -95,6 +109,7 @@ export function NotificationSettings() {
               </div>
               {pushPermission !== "granted" ? (
                 <Button
+                  id="notification-push"
                   size="sm"
                   onClick={handleRequestPush}
                   disabled={isRequestingPush || pushPermission === "denied"}
@@ -106,7 +121,11 @@ export function NotificationSettings() {
                   )}
                 </Button>
               ) : (
-                <div
+                <button
+                  id="notification-push"
+                  type="button"
+                  role="switch"
+                  aria-checked={preferences.push}
                   className={cn(
                     "relative w-12 h-7 rounded-full transition-colors",
                     preferences.push
@@ -121,22 +140,33 @@ export function NotificationSettings() {
                       preferences.push ? "translate-x-5" : "translate-x-0",
                     )}
                   />
-                </div>
+                </button>
               )}
             </label>
           )}
 
           {/* Sound */}
-          <label className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
+          <label
+            htmlFor="notification-sound"
+            className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer"
+          >
+            <span className="sr-only">{t("notifications.sound")}</span>
             <div>
-              <span className="font-medium text-slate-900 dark:text-white block">
+              <span
+                className="font-medium text-slate-900 dark:text-white block"
+                aria-hidden="true"
+              >
                 {t("notifications.sound")}
               </span>
-              <span className="text-sm text-slate-500">
+              <span className="text-sm text-slate-500" aria-hidden="true">
                 {t("notifications.soundDescription")}
               </span>
             </div>
-            <div
+            <button
+              id="notification-sound"
+              type="button"
+              role="switch"
+              aria-checked={preferences.sound}
               className={cn(
                 "relative w-12 h-7 rounded-full transition-colors",
                 preferences.sound
@@ -151,7 +181,7 @@ export function NotificationSettings() {
                   preferences.sound ? "translate-x-5" : "translate-x-0",
                 )}
               />
-            </div>
+            </button>
           </label>
         </CardContent>
       </Card>
@@ -198,6 +228,7 @@ export function NotificationSettings() {
           ].map((item) => (
             <label
               key={item.key}
+              htmlFor={`notification-${item.key}`}
               className={cn(
                 "flex items-center justify-between p-4 rounded-lg cursor-pointer transition-opacity",
                 preferences.enabled
@@ -205,13 +236,24 @@ export function NotificationSettings() {
                   : "bg-slate-50/50 dark:bg-slate-800/25 opacity-50",
               )}
             >
+              <span className="sr-only">{item.label}</span>
               <div>
-                <span className="font-medium text-slate-900 dark:text-white block">
+                <span
+                  className="font-medium text-slate-900 dark:text-white block"
+                  aria-hidden="true"
+                >
                   {item.label}
                 </span>
-                <span className="text-sm text-slate-500">{item.desc}</span>
+                <span className="text-sm text-slate-500" aria-hidden="true">
+                  {item.desc}
+                </span>
               </div>
-              <div
+              <button
+                id={`notification-${item.key}`}
+                type="button"
+                role="switch"
+                aria-checked={preferences[item.key]}
+                disabled={!preferences.enabled}
                 className={cn(
                   "relative w-12 h-7 rounded-full transition-colors",
                   preferences[item.key] && preferences.enabled
@@ -228,7 +270,7 @@ export function NotificationSettings() {
                     preferences[item.key] ? "translate-x-5" : "translate-x-0",
                   )}
                 />
-              </div>
+              </button>
             </label>
           ))}
         </CardContent>

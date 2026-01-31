@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { createWPMCalculator } from "@/lib/typing/wpm-calculator";
 import { cn } from "@/lib/utils";
 
@@ -24,8 +24,15 @@ export function AccuracyGame({ onGameEnd }: AccuracyGameProps) {
   const [typedText, setTypedText] = useState("");
   const [isComplete, setIsComplete] = useState(false);
   const [score, setScore] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const wpmCalc = createWPMCalculator();
+
+  useEffect(() => {
+    if (!isComplete) {
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, isComplete]);
 
   const endGame = () => {
     setIsComplete(true);
@@ -93,10 +100,10 @@ export function AccuracyGame({ onGameEnd }: AccuracyGameProps) {
                   <div className="space-y-2">
                     <p className="text-lg">{sentence}</p>
                     <input
+                      ref={inputRef}
                       type="text"
                       value={typedText}
                       onChange={handleInput}
-                      autoFocus
                       className="w-full px-4 py-2 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                       placeholder="Digita la frase..."
                     />

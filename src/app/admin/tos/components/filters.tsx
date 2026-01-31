@@ -33,8 +33,14 @@ export function Filters({
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
-            <label className="block text-sm font-medium mb-2">Version</label>
+            <label
+              htmlFor="tos-version-filter"
+              className="block text-sm font-medium mb-2"
+            >
+              Version
+            </label>
             <select
+              id="tos-version-filter"
               className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={versionFilter}
               onChange={(e) => {
@@ -52,8 +58,14 @@ export function Filters({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Sort By</label>
+            <label
+              htmlFor="tos-sort-by"
+              className="block text-sm font-medium mb-2"
+            >
+              Sort By
+            </label>
             <select
+              id="tos-sort-by"
               className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -64,8 +76,14 @@ export function Filters({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2">Order</label>
+            <label
+              htmlFor="tos-sort-order"
+              className="block text-sm font-medium mb-2"
+            >
+              Order
+            </label>
             <select
+              id="tos-sort-order"
               className="w-full px-3 py-3 border rounded-lg min-h-11 bg-white dark:bg-slate-950 dark:border-slate-700"
               value={sortOrder}
               onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}

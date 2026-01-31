@@ -34,7 +34,7 @@ export function AIDisclosureBadge({
               "cursor-help focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-blue-500",
               className,
             )}
-            role="img"
+            role="button"
             aria-label="Risposta generata da intelligenza artificiale"
             tabIndex={0}
             onKeyDown={(e) => {

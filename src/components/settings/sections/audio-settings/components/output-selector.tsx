@@ -2,9 +2,9 @@
  * Audio output selector
  */
 
-'use client';
+"use client";
 
-import { Volume2 } from 'lucide-react';
+import { Volume2 } from "lucide-react";
 
 interface OutputSelectorProps {
   preferredOutputId: string | null;
@@ -19,12 +19,16 @@ export function OutputSelector({
 }: OutputSelectorProps) {
   return (
     <div className="space-y-2">
-      <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+      <label
+        htmlFor="settings-output"
+        className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"
+      >
         <Volume2 className="w-4 h-4 text-amber-500" />
         Altoparlanti
       </label>
       <select
-        value={preferredOutputId || ''}
+        id="settings-output"
+        value={preferredOutputId || ""}
         onChange={(e) => onOutputChange(e.target.value)}
         className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
       >

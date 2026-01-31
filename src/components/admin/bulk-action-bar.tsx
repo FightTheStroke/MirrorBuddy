@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,13 @@ export function BulkActionBar({
   const [loading, setLoading] = useState<"approve" | "reject" | null>(null);
   const [showRejectReason, setShowRejectReason] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
+  const rejectInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (showRejectReason) {
+      rejectInputRef.current?.focus();
+    }
+  }, [showRejectReason]);
 
   const handleBulkAction = async (action: "approve" | "reject") => {
     setLoading(action);
@@ -81,12 +88,12 @@ export function BulkActionBar({
           // Reject reason input
           <div className="flex flex-wrap gap-2 xs:flex-col sm:flex-row items-center">
             <input
+              ref={rejectInputRef}
               type="text"
               value={rejectReason}
               onChange={(e) => setRejectReason(e.target.value)}
               placeholder={t("rejectReason")}
               className="flex-1 min-h-11 px-3 py-2 border border-slate-200 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white text-sm"
-              autoFocus
             />
             <Button
               size="sm"

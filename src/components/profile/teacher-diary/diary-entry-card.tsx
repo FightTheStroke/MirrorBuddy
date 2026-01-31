@@ -2,8 +2,8 @@
  * Individual diary entry card component
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 import {
   ChevronDown,
   Lightbulb,
@@ -11,14 +11,17 @@ import {
   Star,
   Clock,
   Phone,
-} from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { getMaestroById, SUBJECT_NAMES } from '@/data/maestri';
-import { getParentSuggestion, getMaestroSubject } from '@/lib/profile/parent-suggestions';
-import { CATEGORY_LABELS } from './constants';
-import type { DiaryEntry } from './types';
+} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { getMaestroById, SUBJECT_NAMES } from "@/data/maestri";
+import {
+  getParentSuggestion,
+  getMaestroSubject,
+} from "@/lib/profile/parent-suggestions";
+import { CATEGORY_LABELS } from "./constants";
+import type { DiaryEntry } from "./types";
 
 interface DiaryEntryCardProps {
   entry: DiaryEntry;
@@ -50,22 +53,30 @@ export function DiaryEntryCard({
     >
       <Card
         className={cn(
-          'overflow-hidden transition-all duration-200',
+          "overflow-hidden transition-all duration-200",
           entry.isStrength
-            ? 'border-amber-200 dark:border-amber-800'
-            : 'border-blue-200 dark:border-blue-800'
+            ? "border-amber-200 dark:border-amber-800"
+            : "border-blue-200 dark:border-blue-800",
         )}
       >
         <CardContent className="p-0">
           {/* Header with Maestro info */}
           <div
+            role="button"
+            tabIndex={0}
             className={cn(
-              'p-4 cursor-pointer',
+              "p-4 cursor-pointer",
               entry.isStrength
-                ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20'
-                : 'bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20'
+                ? "bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20"
+                : "bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20",
             )}
             onClick={onToggle}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                onToggle();
+              }
+            }}
           >
             <div className="flex items-start gap-4">
               {/* Maestro avatar */}
@@ -81,8 +92,8 @@ export function DiaryEntryCard({
                 </div>
                 <div
                   className={cn(
-                    'absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center',
-                    entry.isStrength ? 'bg-amber-400' : 'bg-blue-400'
+                    "absolute -bottom-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center",
+                    entry.isStrength ? "bg-amber-400" : "bg-blue-400",
                   )}
                 >
                   {entry.isStrength ? (
@@ -110,10 +121,10 @@ export function DiaryEntryCard({
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 mt-2 text-xs text-slate-500">
                   <span
                     className={cn(
-                      'px-2 py-0.5 rounded-full',
+                      "px-2 py-0.5 rounded-full",
                       entry.isStrength
-                        ? 'bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200'
-                        : 'bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200'
+                        ? "bg-amber-200 dark:bg-amber-800 text-amber-800 dark:text-amber-200"
+                        : "bg-blue-200 dark:bg-blue-800 text-blue-800 dark:text-blue-200",
                     )}
                   >
                     {CATEGORY_LABELS[entry.category]}
@@ -134,8 +145,8 @@ export function DiaryEntryCard({
               {/* Expand indicator */}
               <ChevronDown
                 className={cn(
-                  'w-5 h-5 text-slate-400 transition-transform',
-                  isExpanded && 'rotate-180'
+                  "w-5 h-5 text-slate-400 transition-transform",
+                  isExpanded && "rotate-180",
                 )}
               />
             </div>
@@ -146,7 +157,7 @@ export function DiaryEntryCard({
             {isExpanded && (
               <motion.div
                 initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
+                animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
                 transition={{ duration: 0.2 }}
                 className="overflow-hidden"
@@ -198,13 +209,14 @@ export function DiaryEntryCard({
                               e.stopPropagation();
                               onTalkToMaestro(
                                 entry.maestroId,
-                                maestro?.displayName || entry.maestroName
+                                maestro?.displayName || entry.maestroName,
                               );
                             }}
                             className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white"
                           >
                             <Phone className="w-4 h-4 mr-2" />
-                            Parla con {maestro?.displayName || entry.maestroName}
+                            Parla con{" "}
+                            {maestro?.displayName || entry.maestroName}
                           </Button>
                           <p className="text-xs text-slate-500 mt-2">
                             Avvia una conversazione diretta con il Professore

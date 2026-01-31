@@ -222,7 +222,6 @@ export function MaestriStep(_props: MaestriStepProps) {
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2"
             style={{ scrollSnapType: "x mandatory" }}
-            tabIndex={0}
             role="region"
             aria-label="Carosello professori - usa le frecce per navigare"
           >

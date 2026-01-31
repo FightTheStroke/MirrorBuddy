@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { cn } from "@/lib/utils";
 
 interface SliderProps {
   value: number[];
@@ -32,14 +32,17 @@ export function Slider({
       if (!sliderRef.current || disabled) return;
 
       const rect = sliderRef.current.getBoundingClientRect();
-      const percent = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      const percent = Math.max(
+        0,
+        Math.min(1, (clientX - rect.left) / rect.width),
+      );
       const rawValue = min + percent * (max - min);
       const steppedValue = Math.round(rawValue / step) * step;
       const clampedValue = Math.max(min, Math.min(max, steppedValue));
 
       onValueChange([clampedValue]);
     },
-    [min, max, step, onValueChange, disabled]
+    [min, max, step, onValueChange, disabled],
   );
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -59,24 +62,47 @@ export function Slider({
       setIsDragging(false);
     };
 
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [isDragging, updateValue]);
 
   return (
     <div
       ref={sliderRef}
+      role="slider"
+      aria-valuemin={min}
+      aria-valuemax={max}
+      aria-valuenow={value[0]}
+      aria-disabled={disabled}
+      tabIndex={disabled ? -1 : 0}
       className={cn(
-        'relative flex w-full touch-none select-none items-center',
-        disabled && 'opacity-50 cursor-not-allowed',
-        className
+        "relative flex w-full touch-none select-none items-center",
+        disabled && "opacity-50 cursor-not-allowed",
+        className,
       )}
       onMouseDown={handleMouseDown}
+      onKeyDown={(e) => {
+        if (disabled) return;
+        const step = (max - min) / 10;
+        if (e.key === "ArrowLeft" || e.key === "ArrowDown") {
+          e.preventDefault();
+          onValueChange([Math.max(min, value[0] - step)]);
+        } else if (e.key === "ArrowRight" || e.key === "ArrowUp") {
+          e.preventDefault();
+          onValueChange([Math.min(max, value[0] + step)]);
+        } else if (e.key === "Home") {
+          e.preventDefault();
+          onValueChange([min]);
+        } else if (e.key === "End") {
+          e.preventDefault();
+          onValueChange([max]);
+        }
+      }}
     >
       {/* Track */}
       <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800 cursor-pointer">
@@ -90,8 +116,8 @@ export function Slider({
       {/* Thumb */}
       <div
         className={cn(
-          'absolute block h-5 w-5 rounded-full border-2 border-accent-themed bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed focus-visible:ring-offset-2 disabled:pointer-events-none dark:bg-slate-950 dark:ring-offset-slate-950',
-          isDragging && 'scale-110'
+          "absolute block h-5 w-5 rounded-full border-2 border-accent-themed bg-white ring-offset-white transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent-themed focus-visible:ring-offset-2 disabled:pointer-events-none dark:bg-slate-950 dark:ring-offset-slate-950",
+          isDragging && "scale-110",
         )}
         style={{ left: `calc(${percentage}% - 10px)` }}
       />

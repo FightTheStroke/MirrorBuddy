@@ -150,6 +150,7 @@ export function UnifiedConsentWall({ children }: UnifiedConsentWallProps) {
 
   // Show consent wall
   return (
+    // eslint-disable-next-line jsx-a11y/no-static-element-interactions -- Container with keyboard handler for Enter key submission
     <div
       className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900 dark:to-slate-800 p-4"
       onKeyDown={handleKeyDown}

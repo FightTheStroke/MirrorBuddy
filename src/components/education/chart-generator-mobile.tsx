@@ -258,10 +258,17 @@ export function ChartGeneratorMobile({
         <div className="flex flex-col gap-4 xs:gap-6">
           {/* Chart Type Selector */}
           <div className="space-y-2">
-            <label className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300">
+            <div
+              id="chart-type-label"
+              className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300"
+            >
               Chart Type
-            </label>
-            <div className="flex gap-2 flex-wrap">
+            </div>
+            <div
+              className="flex gap-2 flex-wrap"
+              role="group"
+              aria-labelledby="chart-type-label"
+            >
               {chartTypeOptions.map(({ type, label, icon: Icon }) => (
                 <button
                   key={type}
@@ -290,9 +297,12 @@ export function ChartGeneratorMobile({
 
           {/* Data Input Section */}
           <div className="space-y-3 xs:space-y-4">
-            <label className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300">
+            <div
+              id="data-input-label"
+              className="block text-sm xs:text-base font-medium text-slate-700 dark:text-slate-300"
+            >
               Add Data Point
-            </label>
+            </div>
 
             <input
               type="text"

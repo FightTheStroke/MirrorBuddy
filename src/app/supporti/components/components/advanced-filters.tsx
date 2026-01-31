@@ -3,11 +3,17 @@
  * @brief Advanced filters panel component
  */
 
-import { motion } from 'framer-motion';
-import { X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SUBJECT_LABELS } from '@/components/education/archive';
+import { motion } from "framer-motion";
+import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SUBJECT_LABELS } from "@/components/education/archive";
 
 interface AdvancedFiltersProps {
   subjectFilter: string | null;
@@ -34,7 +40,7 @@ export function AdvancedFilters({
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
-      animate={{ height: 'auto', opacity: 1 }}
+      animate={{ height: "auto", opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="overflow-hidden"
@@ -42,14 +48,23 @@ export function AdvancedFilters({
       <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-700">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+            <label
+              htmlFor="filter-subject-supporti"
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block"
+            >
               Materia
             </label>
             <Select
-              value={subjectFilter || 'all'}
-              onValueChange={(v) => onNavigate({ subject: v === 'all' ? null : v })}
+              value={subjectFilter || "all"}
+              onValueChange={(v) =>
+                onNavigate({ subject: v === "all" ? null : v })
+              }
             >
-              <SelectTrigger className="h-11" aria-label="Filtra per materia">
+              <SelectTrigger
+                id="filter-subject-supporti"
+                className="h-11"
+                aria-label="Filtra per materia"
+              >
                 <SelectValue placeholder="Tutte le materie" />
               </SelectTrigger>
               <SelectContent>
@@ -67,14 +82,23 @@ export function AdvancedFilters({
           </div>
 
           <div>
-            <label className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block">
+            <label
+              htmlFor="filter-maestro-supporti"
+              className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block"
+            >
               Maestro
             </label>
             <Select
-              value={maestroFilter || 'all'}
-              onValueChange={(v) => onNavigate({ maestro: v === 'all' ? null : v })}
+              value={maestroFilter || "all"}
+              onValueChange={(v) =>
+                onNavigate({ maestro: v === "all" ? null : v })
+              }
             >
-              <SelectTrigger className="h-11" aria-label="Filtra per maestro">
+              <SelectTrigger
+                id="filter-maestro-supporti"
+                className="h-11"
+                aria-label="Filtra per maestro"
+              >
                 <SelectValue placeholder="Tutti i maestri" />
               </SelectTrigger>
               <SelectContent>
@@ -109,4 +133,3 @@ export function AdvancedFilters({
     </motion.div>
   );
 }
-

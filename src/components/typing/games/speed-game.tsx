@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTranslations } from "next-intl";
 import { createWPMCalculator } from "@/lib/typing/wpm-calculator";
 import { cn } from "@/lib/utils";
@@ -39,8 +39,15 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [typedText, setTypedText] = useState("");
   const [score, setScore] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const wpmCalc = createWPMCalculator();
+
+  useEffect(() => {
+    if (isPlaying && currentIndex < words.length) {
+      inputRef.current?.focus();
+    }
+  }, [currentIndex, isPlaying, words.length]);
 
   const endGame = () => {
     setIsPlaying(false);
@@ -136,10 +143,10 @@ export function SpeedGame({ onGameEnd }: SpeedGameProps) {
               >
                 {index === currentIndex ? (
                   <input
+                    ref={inputRef}
                     type="text"
                     value={typedText}
                     onChange={handleInput}
-                    autoFocus
                     className="w-full bg-transparent text-center focus:outline-none"
                     placeholder={word}
                   />

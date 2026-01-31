@@ -250,11 +250,15 @@ export function ProfileEditorMobile({
           >
             {/* Name Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label
+                htmlFor="profile-name"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
                 Name *
               </label>
               <input
                 type="text"
+                id="profile-name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
@@ -278,10 +282,14 @@ export function ProfileEditorMobile({
 
             {/* Bio Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label
+                htmlFor="profile-bio"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
                 Bio
               </label>
               <textarea
+                id="profile-bio"
                 name="bio"
                 value={formData.bio || ""}
                 onChange={handleInputChange}
@@ -293,10 +301,14 @@ export function ProfileEditorMobile({
 
             {/* Grade Level Field */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+              <label
+                htmlFor="profile-grade-level"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
                 Grade Level
               </label>
               <select
+                id="profile-grade-level"
                 name="gradeLevel"
                 value={formData.gradeLevel || ""}
                 onChange={handleInputChange}

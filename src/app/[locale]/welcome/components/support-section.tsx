@@ -158,7 +158,6 @@ export function SupportSection() {
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
-            tabIndex={0}
             role="region"
             aria-label="Carosello coach e buddy - usa le frecce per navigare"
           >

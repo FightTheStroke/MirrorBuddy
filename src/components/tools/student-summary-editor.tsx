@@ -300,7 +300,7 @@ export const StudentSummaryEditor = forwardRef<
                   handleResolveComment(section.id, cid)
                 }
                 readOnly={readOnly}
-                autoFocus={i === 0 && !initialData?.sections[0]?.content}
+                shouldFocus={i === 0 && !initialData?.sections[0]?.content}
               />
             ))}
             {totalWordCount > 0 && (

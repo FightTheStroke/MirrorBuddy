@@ -1,8 +1,8 @@
-'use client';
+"use client";
 
-import * as React from 'react';
-import { ChevronDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import * as React from "react";
+import { ChevronDown } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SelectContextValue {
   value: string;
@@ -16,7 +16,7 @@ const SelectContext = React.createContext<SelectContextValue | null>(null);
 function useSelect() {
   const context = React.useContext(SelectContext);
   if (!context) {
-    throw new Error('Select components must be used within a Select provider');
+    throw new Error("Select components must be used within a Select provider");
   }
   return context;
 }
@@ -32,9 +32,7 @@ export function Select({ value, onValueChange, children }: SelectProps) {
 
   return (
     <SelectContext.Provider value={{ value, onValueChange, open, setOpen }}>
-      <div className="relative inline-block">
-        {children}
-      </div>
+      <div className="relative inline-block">{children}</div>
     </SelectContext.Provider>
   );
 }
@@ -42,23 +40,37 @@ export function Select({ value, onValueChange, children }: SelectProps) {
 interface SelectTriggerProps {
   children: React.ReactNode;
   className?: string;
+  id?: string;
+  "aria-label"?: string;
 }
 
-export function SelectTrigger({ children, className }: SelectTriggerProps) {
+export function SelectTrigger({
+  children,
+  className,
+  id,
+  "aria-label": ariaLabel,
+}: SelectTriggerProps) {
   const { open, setOpen } = useSelect();
 
   return (
     <button
       type="button"
+      id={id}
+      aria-label={ariaLabel}
       onClick={() => setOpen(!open)}
       className={cn(
-        'flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-themed focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 ',
-        className
+        "flex h-10 w-full items-center justify-between rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-accent-themed focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-800 dark:bg-slate-950 dark:ring-offset-slate-950 dark:placeholder:text-slate-400 ",
+        className,
       )}
       aria-expanded={open}
     >
       {children}
-      <ChevronDown className={cn('h-4 w-4 opacity-50 transition-transform', open && 'rotate-180')} />
+      <ChevronDown
+        className={cn(
+          "h-4 w-4 opacity-50 transition-transform",
+          open && "rotate-180",
+        )}
+      />
     </button>
   );
 }
@@ -91,8 +103,8 @@ export function SelectContent({ children, className }: SelectContentProps) {
       }
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [open, setOpen]);
 
   if (!open) return null;
@@ -101,8 +113,8 @@ export function SelectContent({ children, className }: SelectContentProps) {
     <div
       ref={ref}
       className={cn(
-        'absolute z-50 mt-1 max-h-60 w-full min-w-[8rem] overflow-auto rounded-xl border border-slate-200 bg-white p-1 text-slate-950 shadow-md animate-in fade-in-0 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50',
-        className
+        "absolute z-50 mt-1 max-h-60 w-full min-w-[8rem] overflow-auto rounded-xl border border-slate-200 bg-white p-1 text-slate-950 shadow-md animate-in fade-in-0 zoom-in-95 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-50",
+        className,
       )}
     >
       {children}
@@ -128,9 +140,9 @@ export function SelectItem({ value, children, className }: SelectItemProps) {
         setOpen(false);
       }}
       className={cn(
-        'relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800',
-        isSelected && 'bg-slate-100 dark:bg-slate-800',
-        className
+        "relative flex w-full cursor-pointer select-none items-center rounded-sm py-1.5 px-2 text-sm outline-none transition-colors hover:bg-slate-100 dark:hover:bg-slate-800",
+        isSelected && "bg-slate-100 dark:bg-slate-800",
+        className,
       )}
     >
       {children}

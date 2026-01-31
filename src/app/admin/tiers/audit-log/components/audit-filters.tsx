@@ -65,9 +65,14 @@ export function AuditFilters({
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 mb-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-2">Action Type</label>
+          <label
+            htmlFor="audit-action-filter"
+            className="block text-sm font-medium mb-2"
+          >
+            Action Type
+          </label>
           <Select value={actionFilter} onValueChange={handleActionChange}>
-            <SelectTrigger>
+            <SelectTrigger id="audit-action-filter">
               <SelectValue placeholder="All actions" />
             </SelectTrigger>
             <SelectContent>
@@ -90,9 +95,15 @@ export function AuditFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">User ID</label>
+          <label
+            htmlFor="audit-user-search"
+            className="block text-sm font-medium mb-2"
+          >
+            User ID
+          </label>
           <Input
             type="text"
+            id="audit-user-search"
             placeholder="Search by user ID"
             value={userSearch}
             onChange={(e) => handleUserSearchChange(e.target.value)}
@@ -100,18 +111,30 @@ export function AuditFilters({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Start Date</label>
+          <label
+            htmlFor="audit-start-date"
+            className="block text-sm font-medium mb-2"
+          >
+            Start Date
+          </label>
           <Input
             type="date"
+            id="audit-start-date"
             value={startDate}
             onChange={(e) => handleStartDateChange(e.target.value)}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">End Date</label>
+          <label
+            htmlFor="audit-end-date"
+            className="block text-sm font-medium mb-2"
+          >
+            End Date
+          </label>
           <Input
             type="date"
+            id="audit-end-date"
             value={endDate}
             onChange={(e) => handleEndDateChange(e.target.value)}
           />

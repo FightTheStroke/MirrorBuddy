@@ -2,11 +2,11 @@
  * Microphone selector with waveform visualization
  */
 
-'use client';
+"use client";
 
-import { Mic } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, XCircle } from 'lucide-react';
+import { Mic } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { RefreshCw, XCircle } from "lucide-react";
 
 interface MicrophoneSelectorProps {
   preferredMicrophoneId: string | null;
@@ -35,12 +35,16 @@ export function MicrophoneSelector({
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label
+            htmlFor="settings-microphone"
+            className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300"
+          >
             <Mic className="w-4 h-4 text-red-500" />
             Microfono
           </label>
           <select
-            value={preferredMicrophoneId || ''}
+            id="settings-microphone"
+            value={preferredMicrophoneId || ""}
             onChange={(e) => onMicChange(e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm"
           >

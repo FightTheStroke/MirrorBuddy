@@ -159,9 +159,15 @@ export function SystemControls({
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <label className="text-sm font-medium">Message</label>
+              <label
+                htmlFor="maintenance-message"
+                className="text-sm font-medium"
+              >
+                Message
+              </label>
               <input
                 type="text"
+                id="maintenance-message"
                 value={maintenanceMessage}
                 onChange={(e) => setMaintenanceMessage(e.target.value)}
                 placeholder="e.g., System maintenance in progress..."
@@ -169,8 +175,14 @@ export function SystemControls({
               />
             </div>
             <div>
-              <label className="text-sm font-medium">Severity</label>
+              <label
+                htmlFor="maintenance-severity"
+                className="text-sm font-medium"
+              >
+                Severity
+              </label>
               <select
+                id="maintenance-severity"
                 value={maintenanceSeverity}
                 onChange={(e) =>
                   setMaintenanceSeverity(
@@ -185,11 +197,15 @@ export function SystemControls({
               </select>
             </div>
             <div>
-              <label className="text-sm font-medium">
+              <label
+                htmlFor="maintenance-end-time"
+                className="text-sm font-medium"
+              >
                 Estimated End Time (optional)
               </label>
               <input
                 type="datetime-local"
+                id="maintenance-end-time"
                 value={estimatedEndTime}
                 onChange={(e) => setEstimatedEndTime(e.target.value)}
                 className="w-full mt-1 border rounded px-3 py-2 text-sm"

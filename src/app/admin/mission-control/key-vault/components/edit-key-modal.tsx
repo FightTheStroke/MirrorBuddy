@@ -90,13 +90,23 @@ export function EditKeyModal({
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-2">Service</label>
-              <Input value={secret.service} disabled />
+              <label
+                htmlFor="secret-service"
+                className="block text-sm font-medium mb-2"
+              >
+                Service
+              </label>
+              <Input id="secret-service" value={secret.service} disabled />
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-2">Key Name</label>
-              <Input value={secret.keyName} disabled />
+              <label
+                htmlFor="secret-key-name"
+                className="block text-sm font-medium mb-2"
+              >
+                Key Name
+              </label>
+              <Input id="secret-key-name" value={secret.keyName} disabled />
             </div>
 
             <div>

@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState, useRef } from 'react';
-import { Video, XCircle, RefreshCw } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { logger } from '@/lib/logger';
+import { useState, useRef } from "react";
+import { Video, XCircle, RefreshCw } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { logger } from "@/lib/logger";
 
 interface WebcamPreviewProps {
   availableCameras: MediaDeviceInfo[];
@@ -28,7 +28,9 @@ export function WebcamPreview({
       const videoConstraints: boolean | MediaTrackConstraints = selectedCamId
         ? { deviceId: { ideal: selectedCamId } }
         : true;
-      const stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: videoConstraints,
+      });
       webcamStreamRef.current = stream;
 
       if (videoPreviewRef.current) {
@@ -38,14 +40,14 @@ export function WebcamPreview({
 
       setWebcamActive(true);
     } catch (error) {
-      logger.error('Webcam error', undefined, error);
+      logger.error("Webcam error", undefined, error);
       setWebcamActive(false);
     }
   };
 
   const stopWebcam = () => {
     if (webcamStreamRef.current) {
-      webcamStreamRef.current.getTracks().forEach(t => t.stop());
+      webcamStreamRef.current.getTracks().forEach((t) => t.stop());
       webcamStreamRef.current = null;
     }
     if (videoPreviewRef.current) {
@@ -64,14 +66,20 @@ export function WebcamPreview({
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-slate-600 dark:text-slate-400">
-          Avvia il test per vedere l&apos;anteprima della webcam selezionata. Utile per verificare che macOS non stia usando la webcam sbagliata con Continuity Camera.
+          Avvia il test per vedere l&apos;anteprima della webcam selezionata.
+          Utile per verificare che macOS non stia usando la webcam sbagliata con
+          Continuity Camera.
         </p>
 
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
+          <label
+            htmlFor="webcam-select"
+            className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap"
+          >
             Webcam:
           </label>
           <select
+            id="webcam-select"
             value={selectedCamId}
             onChange={(e) => onCameraChange(e.target.value)}
             disabled={webcamActive}
@@ -127,7 +135,11 @@ export function WebcamPreview({
               Avvia Webcam
             </Button>
           ) : (
-            <Button onClick={stopWebcam} className="flex-1" variant="destructive">
+            <Button
+              onClick={stopWebcam}
+              className="flex-1"
+              variant="destructive"
+            >
               <XCircle className="w-4 h-4 mr-2" />
               Stop Webcam
             </Button>

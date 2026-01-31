@@ -92,7 +92,6 @@ export function RecentSessionsList({
             ? "divide-yellow-400/30 border-yellow-400 bg-black"
             : "divide-slate-200 dark:divide-slate-700 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800",
         )}
-        role="list"
       >
         {sessions.map((session) => (
           <li key={session.id} className="p-3">

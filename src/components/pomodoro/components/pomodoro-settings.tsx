@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 interface PomodoroSettingsProps {
   focusMinutes: number;
@@ -29,11 +29,15 @@ export function PomodoroSettings({
       className="space-y-4"
     >
       <div>
-        <label className="text-sm text-white/70 block mb-2">
+        <label
+          htmlFor="pomodoro-focus-minutes"
+          className="text-sm text-white/70 block mb-2"
+        >
           Focus (minuti)
         </label>
         <input
           type="range"
+          id="pomodoro-focus-minutes"
           min="5"
           max="60"
           step="5"
@@ -41,15 +45,21 @@ export function PomodoroSettings({
           onChange={(e) => onFocusChange(Number(e.target.value))}
           className="w-full accent-red-500"
         />
-        <div className="text-right text-sm text-white/50">{focusMinutes} min</div>
+        <div className="text-right text-sm text-white/50">
+          {focusMinutes} min
+        </div>
       </div>
 
       <div>
-        <label className="text-sm text-white/70 block mb-2">
+        <label
+          htmlFor="pomodoro-short-break"
+          className="text-sm text-white/70 block mb-2"
+        >
           Pausa breve (minuti)
         </label>
         <input
           type="range"
+          id="pomodoro-short-break"
           min="1"
           max="15"
           step="1"
@@ -57,15 +67,21 @@ export function PomodoroSettings({
           onChange={(e) => onShortBreakChange(Number(e.target.value))}
           className="w-full accent-green-500"
         />
-        <div className="text-right text-sm text-white/50">{shortBreakMinutes} min</div>
+        <div className="text-right text-sm text-white/50">
+          {shortBreakMinutes} min
+        </div>
       </div>
 
       <div>
-        <label className="text-sm text-white/70 block mb-2">
+        <label
+          htmlFor="pomodoro-long-break"
+          className="text-sm text-white/70 block mb-2"
+        >
           Pausa lunga (minuti)
         </label>
         <input
           type="range"
+          id="pomodoro-long-break"
           min="10"
           max="30"
           step="5"
@@ -73,7 +89,9 @@ export function PomodoroSettings({
           onChange={(e) => onLongBreakChange(Number(e.target.value))}
           className="w-full accent-blue-500"
         />
-        <div className="text-right text-sm text-white/50">{longBreakMinutes} min</div>
+        <div className="text-right text-sm text-white/50">
+          {longBreakMinutes} min
+        </div>
       </div>
 
       <p className="text-xs text-white/40 text-center pt-2">

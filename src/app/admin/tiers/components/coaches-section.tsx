@@ -67,19 +67,22 @@ export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
         {coaches.map((coach) => (
           <label
             key={coach.id}
+            htmlFor={`coach-${coach.id}`}
             className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
               isEnabled(coach.id)
                 ? "border-primary bg-primary/5"
                 : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"
             }`}
           >
+            <span className="sr-only">{coach.name}</span>
             <input
               type="checkbox"
+              id={`coach-${coach.id}`}
               checked={isEnabled(coach.id)}
               onChange={(e) => handleToggle(coach.id, e.target.checked)}
               className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-2 focus:ring-primary"
             />
-            <div>
+            <div aria-hidden="true">
               <div className="text-sm font-medium">{coach.name}</div>
               <div className="text-xs text-muted-foreground">
                 {coach.personality.slice(0, 50)}...

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { BookOpen, Trash2, AlertTriangle, RotateCcw } from "lucide-react";
@@ -33,6 +33,13 @@ export function OnboardingSettings() {
   const [resetConfirmStep, setResetConfirmStep] = useState<1 | 2 | 3>(1);
   const [resetInput, setResetInput] = useState("");
   const [isResetting, setIsResetting] = useState(false);
+  const resetInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (resetConfirmStep === 2) {
+      resetInputRef.current?.focus();
+    }
+  }, [resetConfirmStep]);
 
   const handleReplayTutorial = () => {
     startReplay();
@@ -151,13 +158,13 @@ export function OnboardingSettings() {
             {resetConfirmStep === 2 && (
               <div className="py-4">
                 <Input
+                  ref={resetInputRef}
                   value={resetInput}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                     setResetInput(e.target.value)
                   }
                   placeholder={t("confirmDialog.input")}
                   className="text-center uppercase"
-                  autoFocus
                 />
               </div>
             )}

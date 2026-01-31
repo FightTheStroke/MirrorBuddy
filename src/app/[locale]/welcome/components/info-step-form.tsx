@@ -105,11 +105,18 @@ export function InfoStepForm({
           transition={{ delay: 0.1 }}
           className="space-y-2"
         >
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div
+            id="age-label"
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             <User className="w-4 h-4" />
             Quanti anni hai?
-          </label>
-          <div className="flex gap-2 flex-wrap">
+          </div>
+          <div
+            className="flex gap-2 flex-wrap"
+            role="group"
+            aria-labelledby="age-label"
+          >
             {[8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18].map((a) => (
               <button
                 key={a}
@@ -134,11 +141,18 @@ export function InfoStepForm({
           transition={{ delay: 0.2 }}
           className="space-y-2"
         >
-          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div
+            id="school-level-label"
+            className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             <GraduationCap className="w-4 h-4" />
             Che scuola fai?
-          </label>
-          <div className="grid grid-cols-3 gap-3">
+          </div>
+          <div
+            className="grid grid-cols-3 gap-3"
+            role="group"
+            aria-labelledby="school-level-label"
+          >
             {SCHOOL_LEVELS.map((level) => (
               <button
                 key={level.id}

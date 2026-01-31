@@ -33,7 +33,7 @@ interface GuidedSectionProps {
   onChange: (content: string) => void;
   onResolveComment?: (commentId: string) => void;
   readOnly?: boolean;
-  autoFocus?: boolean;
+  shouldFocus?: boolean;
   className?: string;
 }
 
@@ -42,7 +42,7 @@ export function GuidedSection({
   onChange,
   onResolveComment,
   readOnly = false,
-  autoFocus = false,
+  shouldFocus = false,
   className,
 }: GuidedSectionProps) {
   const t = useTranslations("tools.summary");
@@ -51,8 +51,8 @@ export function GuidedSection({
   const editorRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (autoFocus) editorRef.current?.querySelector("textarea")?.focus();
-  }, [autoFocus]);
+    if (shouldFocus) editorRef.current?.querySelector("textarea")?.focus();
+  }, [shouldFocus]);
 
   const wordCount = countWords(section.content);
   const unresolvedCount = section.comments.filter((c) => !c.resolved).length;

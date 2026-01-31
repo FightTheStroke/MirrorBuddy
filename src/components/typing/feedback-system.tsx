@@ -87,6 +87,7 @@ export function FeedbackSystem({
       )}
 
       {config.enableAudio && result.correct && result.actual && (
+        // eslint-disable-next-line jsx-a11y/media-has-caption -- Decorative audio feedback for correct keystroke
         <audio
           src="/sounds/keystroke-correct.mp3"
           autoPlay
@@ -95,6 +96,7 @@ export function FeedbackSystem({
       )}
 
       {config.enableAudio && !result.correct && !result.isBackspace && (
+        // eslint-disable-next-line jsx-a11y/media-has-caption -- Decorative audio feedback for incorrect keystroke
         <audio src="/sounds/keystroke-error.mp3" autoPlay className="hidden" />
       )}
     </div>

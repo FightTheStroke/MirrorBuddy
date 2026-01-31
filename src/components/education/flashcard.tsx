@@ -222,7 +222,18 @@ export function FlashcardPreview({
   const [flipped, setFlipped] = useState(showBack);
 
   return (
-    <div className="cursor-pointer" onClick={() => setFlipped(!flipped)}>
+    <div
+      role="button"
+      tabIndex={0}
+      className="cursor-pointer"
+      onClick={() => setFlipped(!flipped)}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          setFlipped(!flipped);
+        }
+      }}
+    >
       <Card className="min-h-[200px]">
         <CardContent className="p-6 flex items-center justify-center min-h-[200px]">
           <AnimatePresence mode="wait">

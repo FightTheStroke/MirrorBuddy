@@ -214,6 +214,7 @@ export function DotMatrixVisualizer({
         height: dimensions.height,
       }}
       aria-hidden="true"
+      // eslint-disable-next-line jsx-a11y/no-interactive-element-to-noninteractive-role -- Canvas is decorative visualization, not interactive
       role="presentation"
     />
   );

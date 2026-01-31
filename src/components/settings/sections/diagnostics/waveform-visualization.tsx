@@ -161,10 +161,14 @@ export function WaveformVisualization({
         </p>
 
         <div className="flex items-center gap-3">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">
+          <label
+            htmlFor="waveform-microphone"
+            className="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap"
+          >
             Microfono:
           </label>
           <select
+            id="waveform-microphone"
             value={selectedMicId}
             onChange={(e) => onMicChange(e.target.value)}
             disabled={waveformActive}

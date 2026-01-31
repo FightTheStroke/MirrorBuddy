@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 /**
  * Section Content Component
@@ -9,12 +9,12 @@
  * - Add key point button
  */
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { Trash2, Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import type { SummarySection } from '@/types/tools';
-import type { EditState } from '../types';
+import { motion, AnimatePresence } from "framer-motion";
+import { Trash2, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import type { SummarySection } from "@/types/tools";
+import type { EditState } from "../types";
 
 interface SectionContentProps {
   section: SummarySection;
@@ -50,14 +50,15 @@ export function SectionContent({
   onKeyDown,
 }: SectionContentProps) {
   const isSectionContentEditing =
-    editState?.type === 'section-content' && editState.sectionIndex === sectionIndex;
+    editState?.type === "section-content" &&
+    editState.sectionIndex === sectionIndex;
 
   return (
     <AnimatePresence>
       {isExpanded && (
         <motion.div
           initial={{ height: 0, opacity: 0 }}
-          animate={{ height: 'auto', opacity: 1 }}
+          animate={{ height: "auto", opacity: 1 }}
           exit={{ height: 0, opacity: 0 }}
           transition={{ duration: 0.2 }}
           className="px-4 py-3 space-y-3"
@@ -69,7 +70,7 @@ export function SectionContent({
               value={editValue}
               onChange={(e) => onEditValueChange(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === 'Escape') onCancelEdit();
+                if (e.key === "Escape") onCancelEdit();
               }}
               onBlur={onSaveEdit}
               rows={3}
@@ -77,21 +78,34 @@ export function SectionContent({
               aria-label="Contenuto della sezione"
             />
           ) : (
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Paragraph used for semantic structure, made interactive for inline editing UX
             <p
+              role={!readOnly ? "button" : undefined}
+              tabIndex={!readOnly ? 0 : undefined}
               className={cn(
-                'text-slate-600 dark:text-slate-300',
-                !readOnly && 'cursor-pointer hover:text-slate-900 dark:hover:text-white',
-                !section.content && 'text-slate-400 italic'
+                "text-slate-600 dark:text-slate-300",
+                !readOnly &&
+                  "cursor-pointer hover:text-slate-900 dark:hover:text-white",
+                !section.content && "text-slate-400 italic",
               )}
               onClick={() =>
                 !readOnly &&
                 onStartEdit(
-                  { type: 'section-content', sectionIndex },
-                  section.content || ''
+                  { type: "section-content", sectionIndex },
+                  section.content || "",
                 )
               }
+              onKeyDown={(e) => {
+                if (!readOnly && (e.key === "Enter" || e.key === " ")) {
+                  e.preventDefault();
+                  onStartEdit(
+                    { type: "section-content", sectionIndex },
+                    section.content || "",
+                  );
+                }
+              }}
             >
-              {section.content || 'Clicca per aggiungere contenuto...'}
+              {section.content || "Clicca per aggiungere contenuto..."}
             </p>
           )}
 
@@ -99,9 +113,12 @@ export function SectionContent({
           {(section.keyPoints?.length ?? 0) > 0 && (
             <ul className="space-y-2">
               {section.keyPoints?.map((point, pointIndex) => (
-                <li key={pointIndex} className="flex items-start gap-2 group/point">
+                <li
+                  key={pointIndex}
+                  className="flex items-start gap-2 group/point"
+                >
                   <span className="w-1.5 h-1.5 mt-2 rounded-full bg-primary shrink-0" />
-                  {editState?.type === 'point' &&
+                  {editState?.type === "point" &&
                   editState.sectionIndex === sectionIndex &&
                   editState.pointIndex === pointIndex ? (
                     <input
@@ -116,17 +133,29 @@ export function SectionContent({
                     />
                   ) : (
                     <span
+                      role={!readOnly ? "button" : undefined}
+                      tabIndex={!readOnly ? 0 : undefined}
                       className={cn(
-                        'flex-1 text-sm text-slate-600 dark:text-slate-300',
-                        !readOnly && 'cursor-pointer hover:text-slate-900 dark:hover:text-white'
+                        "flex-1 text-sm text-slate-600 dark:text-slate-300",
+                        !readOnly &&
+                          "cursor-pointer hover:text-slate-900 dark:hover:text-white",
                       )}
                       onClick={() =>
                         !readOnly &&
                         onStartEdit(
-                          { type: 'point', sectionIndex, pointIndex },
-                          point
+                          { type: "point", sectionIndex, pointIndex },
+                          point,
                         )
                       }
+                      onKeyDown={(e) => {
+                        if (!readOnly && (e.key === "Enter" || e.key === " ")) {
+                          e.preventDefault();
+                          onStartEdit(
+                            { type: "point", sectionIndex, pointIndex },
+                            point,
+                          );
+                        }
+                      }}
                     >
                       {point}
                     </span>
@@ -150,6 +179,7 @@ export function SectionContent({
           {/* Add Key Point Button */}
           {!readOnly && (
             <button
+              type="button"
               onClick={onAddKeyPoint}
               className="flex items-center gap-2 text-sm text-slate-500 hover:text-primary transition-colors"
             >

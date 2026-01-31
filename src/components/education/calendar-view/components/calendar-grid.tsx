@@ -138,7 +138,15 @@ export function CalendarGrid({
                     return (
                       <div
                         key={event.id}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => onEventClick(event)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            onEventClick(event);
+                          }
+                        }}
                         className={cn(
                           "text-[10px] px-1 py-0.5 rounded truncate cursor-pointer transition-opacity",
                           typeConfig.color,

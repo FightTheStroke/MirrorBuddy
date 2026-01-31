@@ -3,10 +3,10 @@
  * Fullscreen overlay with celebration animation
  */
 
-'use client';
+"use client";
 
-import React, { useEffect, useState, useCallback } from 'react';
-import { createPortal } from 'react-dom';
+import React, { useEffect, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 
 // Pre-generate confetti positions at module load to avoid hydration issues
 // Uses seeded randomization based on index for reproducibility across SSR/client
@@ -70,14 +70,21 @@ export function LevelUpCelebration({
   }, [handleDismiss]);
 
   // SSR check
-  if (typeof window === 'undefined') return null;
+  if (typeof window === "undefined") return null;
 
   const content = (
+    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Dialog backdrop with click-to-dismiss is standard UX pattern
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${
-        isVisible ? 'opacity-100' : 'opacity-0'
+        isVisible ? "opacity-100" : "opacity-0"
       }`}
       onClick={handleDismiss}
+      onKeyDown={(e) => {
+        if (e.key === "Escape" || e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleDismiss();
+        }
+      }}
       role="dialog"
       aria-labelledby="level-up-title"
       aria-modal="true"
@@ -98,9 +105,10 @@ export function LevelUpCelebration({
         ))}
       </div>
 
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
       <div
         className={`relative max-w-md space-y-6 rounded-2xl bg-gradient-to-br from-purple-500/20 via-blue-500/20 to-cyan-500/20 p-8 text-center backdrop-blur-xl transition-transform duration-500 ${
-          isVisible ? 'scale-100' : 'scale-75'
+          isVisible ? "scale-100" : "scale-75"
         }`}
         onClick={(e) => e.stopPropagation()}
       >
@@ -117,7 +125,9 @@ export function LevelUpCelebration({
           >
             LEVEL UP!
           </h2>
-          <p className="text-xl font-semibold text-white">Livello {level} Raggiunto!</p>
+          <p className="text-xl font-semibold text-white">
+            Livello {level} Raggiunto!
+          </p>
         </div>
 
         {/* Coach message */}
@@ -194,7 +204,8 @@ export function LevelUpCelebration({
         }
 
         @keyframes pulse-slow {
-          0%, 100% {
+          0%,
+          100% {
             transform: scale(1);
           }
           50% {

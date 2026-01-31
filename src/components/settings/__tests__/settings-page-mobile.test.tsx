@@ -68,6 +68,7 @@ vi.mock("@/components/settings/settings-sections-mobile", () => ({
     <div data-testid="settings-sections">
       {sections.map((section: any) => (
         <div key={section.id} data-section-id={section.id}>
+          {/* eslint-disable-next-line jsx-a11y/no-redundant-roles -- Explicit role for test assertions */}
           <button
             role="button"
             className="w-full min-h-[44px] transition-colors dark:text-slate-100"

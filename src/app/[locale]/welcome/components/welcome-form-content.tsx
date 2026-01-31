@@ -1,5 +1,6 @@
 "use client";
 
+import { useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { Sparkles, ArrowRight, Volume2, VolumeX } from "lucide-react";
@@ -37,6 +38,11 @@ export function WelcomeFormContent({
     text: ONBOARDING_SCRIPTS.welcome,
     delay: 800,
   });
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
 
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl overflow-hidden">
@@ -124,6 +130,7 @@ export function WelcomeFormContent({
               {t("whatIsYourName")}
             </label>
             <Input
+              ref={inputRef}
               id="student-name"
               type="text"
               value={name}
@@ -133,7 +140,6 @@ export function WelcomeFormContent({
               placeholder={t("enterYourNamePlaceholder")}
               className="text-lg py-6 px-4 border-2 focus:border-pink-500 focus:ring-pink-500"
               aria-describedby={error ? "name-error" : undefined}
-              autoFocus
             />
             {error && (
               <p id="name-error" className="text-red-500 text-sm" role="alert">

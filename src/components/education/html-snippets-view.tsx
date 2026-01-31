@@ -163,12 +163,19 @@ export function HTMLSnippetsView() {
       <AnimatePresence>
         {previewSnippet && (
           <motion.div
+            role="presentation"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
             onClick={() => setPreviewSnippet(null)}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setPreviewSnippet(null);
+              }
+            }}
           >
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions -- stopPropagation container to prevent modal close */}
             <div onClick={(e) => e.stopPropagation()}>
               <HTMLPreview
                 code={previewSnippet.code}

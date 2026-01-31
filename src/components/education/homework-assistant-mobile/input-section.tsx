@@ -72,10 +72,17 @@ export function InputSection({
     >
       {/* Subject Selection */}
       <div className="space-y-3">
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+        <div
+          id="subject-selection-label"
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+        >
           Select Subject (Optional)
-        </label>
-        <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2">
+        </div>
+        <div
+          className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 gap-2"
+          role="group"
+          aria-labelledby="subject-selection-label"
+        >
           {SUBJECTS.map((subject) => (
             <TouchTarget key={subject} asChild>
               <button

@@ -109,6 +109,12 @@ export function TypingInput({
     <div
       className="relative"
       onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
       role="textbox"
       tabIndex={0}
       aria-label="Typing input area"
