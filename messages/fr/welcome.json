@@ -17,19 +17,19 @@
       "accessibility": {
         "title": "Conçu pour TOUS les styles d'apprentissage",
         "subtitle": "Support dédié pour les difficultés d'apprentissage",
-        "introLine1": "[TRANSLATE] Accessibile",
-        "introLine2": "[TRANSLATE] per tutti"
+        "introLine1": "Accessible",
+        "introLine2": "pour tous"
       },
-      "primaryHeadline": "[TRANSLATE] Impara con l IA",
-      "primarySubtitle": "[TRANSLATE] Maestri virtuali per il tuo successo",
-      "readableFonts": "[TRANSLATE] Font leggibili",
-      "mindMaps": "[TRANSLATE] Mappe mentali",
-      "textToSpeech": "[TRANSLATE] Text-to-speech",
-      "adaptiveQuizzes": "[TRANSLATE] Quiz adattivi",
-      "welcome": "[TRANSLATE] Benvenuto",
-      "learn": "[TRANSLATE] Impara",
-      "withTeachers": "[TRANSLATE] con Maestri virtuali",
-      "anyAbility": "[TRANSLATE] per ogni abilità"
+      "primaryHeadline": "Apprends avec l'IA",
+      "primarySubtitle": "Maîtres virtuels pour ta réussite",
+      "readableFonts": "Polices lisibles",
+      "mindMaps": "Cartes mentales",
+      "textToSpeech": "Synthèse vocale",
+      "adaptiveQuizzes": "Quiz adaptatifs",
+      "welcome": "Bienvenue",
+      "learn": "Apprends",
+      "withTeachers": "avec des Maîtres virtuels",
+      "anyAbility": "pour toutes les capacités"
     },
     "quickStart": {
       "heading": "Commence ton parcours",
@@ -53,8 +53,8 @@
         "feature3": "Aucune inscription",
         "cta": "Essaie gratuitement"
       },
-      "updateProfile": "[TRANSLATE] Aggiorna profilo",
-      "login": "[TRANSLATE] Accedi"
+      "updateProfile": "Mettre à jour le profil",
+      "login": "Se connecter"
     },
     "tierComparison": {
       "heading": "Choisis le plan parfait pour toi",
@@ -83,7 +83,7 @@
             "savedProgress": "Progrès sauvegardés"
           },
           "cta": "Inscris-toi",
-          "badge": "[TRANSLATE] Popolare"
+          "badge": "Populaire"
         },
         "pro": {
           "name": "Pro",
@@ -127,17 +127,17 @@
       },
       "organizationsHeading": "Solutions pour votre organisation",
       "organizationsSubtitle": "Personnalisation complète pour les écoles et les entreprises",
-      "accessIntroLine1": "[TRANSLATE] Accedi rapidamente:",
-      "accessIntroLine2": "[TRANSLATE] Nessuna registrazione richiesta",
-      "organizationsFooter": "[TRANSLATE] Contattaci per un piano aziendale",
-      "footer": "[TRANSLATE] Termini e condizioni",
+      "accessIntroLine1": "Accès rapide :",
+      "accessIntroLine2": "Aucune inscription requise",
+      "organizationsFooter": "Contactez-nous pour un plan entreprise",
+      "footer": "Conditions générales",
       "toggle": {
-        "students": "[TRANSLATE] Studenti",
+        "students": "Étudiants",
         "organizations": "Écoles & Entreprises",
         "individuals": "Étudiants & Familles",
         "ariaLabel": "Basculer entre étudiants et organisations"
       },
-      "footerNote": "[TRANSLATE] Termini e condizioni applicabili"
+      "footerNote": "Conditions générales applicables"
     },
     "maestri": {
       "heading": "Vos",
@@ -157,13 +157,13 @@
       "subtitle": "Coachs pour la méthode d'étude et Amis pour le soutien émotionnel",
       "coach": "Coach - Ils t'enseignent la méthode d'étude",
       "buddy": "Ami - Ils te soutiennent émotionnellement",
-      "scrollHint": "[TRANSLATE] Scorri per ulteriori informazioni",
-      "introLine1": "[TRANSLATE] Supporto",
-      "introLine2": "[TRANSLATE] sempre disponibile",
-      "introDisclaimer": "[TRANSLATE] Ti aiutiamo in ogni momento",
-      "scrollLeft": "[TRANSLATE] Scorri a sinistra",
-      "scrollRight": "[TRANSLATE] Scorri a destra",
-      "carouselLabel": "[TRANSLATE] Canali di supporto"
+      "scrollHint": "Fais défiler pour plus d'informations",
+      "introLine1": "Support",
+      "introLine2": "toujours disponible",
+      "introDisclaimer": "Nous t'aidons à tout moment",
+      "scrollLeft": "Défiler à gauche",
+      "scrollRight": "Défiler à droite",
+      "carouselLabel": "Canaux de support"
     },
     "features": {
       "heading": "Outils pour chaque style d'apprentissage",
@@ -174,40 +174,40 @@
       "interactiveQuizzes": "Quiz Interactifs - Vérifie tes connaissances",
       "gamification": "Gamification - Gagne de l'XP et débloque des objectifs",
       "adaptiveLearning": "Apprentissage Adaptatif - S'adapte à ton style et ton rythme",
-      "introLine1": "[TRANSLATE] Strumenti potenti",
-      "introLine2": "[TRANSLATE] per il tuo apprendimento"
+      "introLine1": "Outils puissants",
+      "introLine2": "pour ton apprentissage"
     },
     "compliance": {
       "heading": "Conformité, confidentialité et transparence",
       "subtitle": "MirrorBuddy adhère aux réglementations internationales",
       "items": {
         "gdpr": {
-          "label": "[TRANSLATE] GDPR",
-          "description": "[TRANSLATE] Conformità GDPR garantita"
+          "label": "GDPR",
+          "description": "Conformité RGPD garantie"
         },
         "aiAct": {
-          "label": "[TRANSLATE] EU AI Act",
-          "description": "[TRANSLATE] Conforme alla normativa IA"
+          "label": "EU AI Act",
+          "description": "Conforme à la réglementation IA"
         },
         "coppa": {
-          "label": "[TRANSLATE] COPPA",
-          "description": "[TRANSLATE] Protezione minori"
+          "label": "COPPA",
+          "description": "Protection des mineurs"
         },
         "aiTransparency": {
-          "label": "[TRANSLATE] Trasparenza IA",
-          "description": "[TRANSLATE] IA trasparente e verificabile"
+          "label": "Transparence IA",
+          "description": "IA transparente et vérifiable"
         },
         "openSource": {
-          "label": "[TRANSLATE] Open Source",
-          "description": "[TRANSLATE] Codice aperto e verificabile"
+          "label": "Open Source",
+          "description": "Code ouvert et vérifiable"
         },
         "apache": {
-          "label": "[TRANSLATE] Apache 2.0",
-          "description": "[TRANSLATE] Licenza Apache 2.0"
+          "label": "Apache 2.0",
+          "description": "Licence Apache 2.0"
         }
       },
-      "trustIntroLine1": "[TRANSLATE] Conformità EU AI Act",
-      "trustIntroLine2": "[TRANSLATE] e GDPR garantita",
+      "trustIntroLine1": "Conformité au EU AI Act",
+      "trustIntroLine2": "et conformité RGPD garantie",
       "headingHighlight": "sûre et conforme",
       "footer": "Un projet de la <link>Fondation FightTheStroke</link>, dédié à la technologie pour les différences d'apprentissage."
     },
@@ -223,33 +223,33 @@
       "copyright": "© {year} MirrorBuddy. Projet open source sur GitHub.",
       "compliance": {
         "gdpr": {
-          "label": "[TRANSLATE] GDPR",
-          "description": "[TRANSLATE] Protezione dati"
+          "label": "GDPR",
+          "description": "Protection des données"
         },
         "aiAct": {
-          "label": "[TRANSLATE] AI Act",
-          "description": "[TRANSLATE] Conformità IA"
+          "label": "AI Act",
+          "description": "Conformité IA"
         },
         "coppa": {
-          "label": "[TRANSLATE] COPPA",
-          "description": "[TRANSLATE] Protezione minori"
+          "label": "COPPA",
+          "description": "Protection des mineurs"
         },
         "italianLaw": {
-          "label": "[TRANSLATE] Legge 132/2025",
-          "description": "[TRANSLATE] Normativa italiana"
+          "label": "Loi 132/2025",
+          "description": "Réglementation italienne"
         }
       },
       "legal": {
-        "privacy": "[TRANSLATE] Privacy",
-        "terms": "[TRANSLATE] Termini",
-        "cookies": "[TRANSLATE] Cookie",
-        "aiTransparency": "[TRANSLATE] Trasparenza IA",
-        "aiPolicy": "[TRANSLATE] Politica IA",
-        "compliance": "[TRANSLATE] Conformità"
+        "privacy": "Confidentialité",
+        "terms": "Conditions",
+        "cookies": "Cookies",
+        "aiTransparency": "Transparence IA",
+        "aiPolicy": "Politique IA",
+        "compliance": "Conformité"
       },
       "openSource": {
-        "ariaLabel": "[TRANSLATE] Open Source",
-        "label": "[TRANSLATE] Codice Aperto"
+        "ariaLabel": "Open Source",
+        "label": "Open Source"
       }
     },
     "principles": {
@@ -276,19 +276,19 @@
       "toolsDay": "Outils/jour",
       "maestriAvailable": "Professeurs disponibles",
       "trialDescription": "Vous utilisez la version d'essai gratuite. Demandez l'accès à la bêta pour des limites illimitées et des fonctionnalités avancées.",
-      "messages": "[TRANSLATE] Messaggi",
-      "tenPerSession": "[TRANSLATE] 10 per sessione",
-      "maestri": "[TRANSLATE] Professori",
-      "threeAvailable": "[TRANSLATE] 3 disponibili",
-      "tools": "[TRANSLATE] Strumenti",
-      "base": "[TRANSLATE] Funzioni base",
-      "freeTrialMode": "[TRANSLATE] Modalità Prova Gratuita",
-      "exploreNoRegistration": "[TRANSLATE] Esplora senza registrazione",
-      "wantFullAccess": "[TRANSLATE] Vuoi accesso completo?",
-      "requestBeta": "[TRANSLATE] Richiedi accesso Beta",
-      "subtitle": "[TRANSLATE] Esplora gratuitamente",
-      "ctaQuestion": "[TRANSLATE] Vuoi accesso completo?",
-      "ctaButton": "[TRANSLATE] Richiedi Beta"
+      "messages": "Messages",
+      "tenPerSession": "10 par session",
+      "maestri": "Professeurs",
+      "threeAvailable": "3 disponibles",
+      "tools": "Outils",
+      "base": "Fonctions de base",
+      "freeTrialMode": "Mode Essai Gratuit",
+      "exploreNoRegistration": "Explore sans inscription",
+      "wantFullAccess": "Tu veux un accès complet ?",
+      "requestBeta": "Demander l'accès bêta",
+      "subtitle": "Explore gratuitement",
+      "ctaQuestion": "Tu veux un accès complet ?",
+      "ctaButton": "Demander la bêta"
     },
     "voiceFallback": {
       "message": "Message",

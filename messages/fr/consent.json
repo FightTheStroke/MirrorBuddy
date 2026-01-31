@@ -46,39 +46,39 @@
       "linkLabel": "Afficher les Conditions Complètes",
       "required": "Vous devez accepter les Conditions d'Utilisation pour continuer.",
       "toast": {
-        "saved": "[TRANSLATE] Termini accettati con successo",
-        "saveFailed": "[TRANSLATE] Errore nel salvataggio"
+        "saved": "Conditions acceptées avec succès",
+        "saveFailed": "Erreur d’enregistrement"
       },
       "modal": {
         "title": {
-          "updated": "[TRANSLATE] Termini Aggiornati",
-          "welcome": "[TRANSLATE] Benvenuto su MirrorBuddy"
+          "updated": "Conditions mises à jour",
+          "welcome": "Bienvenue sur MirrorBuddy"
         },
         "description": {
-          "updated": "[TRANSLATE] I nostri termini di servizio sono stati aggiornati",
-          "welcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini"
+          "updated": "Nos conditions d'utilisation ont été mises à jour",
+          "welcome": "Avant de commencer, acceptez nos conditions"
         },
         "warning": {
-          "title": "[TRANSLATE] Importante",
-          "description": "[TRANSLATE] L accettazione è necessaria per utilizzare la piattaforma"
+          "title": "Important",
+          "description": "L'acceptation est nécessaire pour utiliser la plateforme"
         },
-        "summary": "[TRANSLATE] Punti chiave",
+        "summary": "Points clés",
         "points": {
-          "free": "[TRANSLATE] Servizio gratuito per studenti",
-          "aiCanErr": "[TRANSLATE] L IA può commettere errori",
-          "minors": "[TRANSLATE] Consenso parentale per under-14",
-          "respect": "[TRANSLATE] Rispetto reciproco e comportamento etico"
+          "free": "Service gratuit pour les étudiants",
+          "aiCanErr": "L'IA peut faire des erreurs",
+          "minors": "Consentement parental pour les moins de 14 ans",
+          "respect": "Respect mutuel et comportement éthique"
         },
-        "link": "[TRANSLATE] Leggi i termini completi",
-        "checkbox": "[TRANSLATE] Accetto i Termini di Servizio",
+        "link": "Lire les conditions complètes",
+        "checkbox": "J'accepte les Conditions d'Utilisation",
         "buttons": {
-          "disabled": "[TRANSLATE] Accetta per continuare",
-          "accept": "[TRANSLATE] Accetta e Continua",
-          "submitting": "[TRANSLATE] Salvataggio..."
+          "disabled": "Accepter pour continuer",
+          "accept": "Accepter et Continuer",
+          "submitting": "Enregistrement..."
         },
         "screenReader": {
-          "required": "[TRANSLATE] È necessario accettare i Termini di Servizio",
-          "submitting": "[TRANSLATE] Salvataggio in corso..."
+          "required": "Il est nécessaire d'accepter les Conditions d'Utilisation",
+          "submitting": "Enregistrement en cours..."
         }
       }
     },
@@ -125,62 +125,62 @@
       "contactSupport": "Contacter le Support"
     },
     "inline": {
-      "acceptedText": "[TRANSLATE] Consenso accettato",
-      "manage": "[TRANSLATE] Gestisci preferenze",
-      "acceptButton": "[TRANSLATE] Accetta Cookie",
-      "info": "[TRANSLATE] Informazioni",
-      "title": "[TRANSLATE] Cookie e Privacy",
-      "description": "[TRANSLATE] Utilizziamo cookie essenziali per il funzionamento del sito",
-      "learnMore": "[TRANSLATE] Scopri di più",
-      "analyticsLabel": "[TRANSLATE] Analytics (opzionale)",
-      "submitButton": "[TRANSLATE] Accetta"
+      "acceptedText": "Consentement accepté",
+      "manage": "Gérer les préférences",
+      "acceptButton": "Accepter les cookies",
+      "info": "Informations",
+      "title": "Cookies et Confidentialité",
+      "description": "Nous utilisons des cookies essentiels pour le fonctionnement du site",
+      "learnMore": "En savoir plus",
+      "analyticsLabel": "Analytics (facultatif)",
+      "submitButton": "Accepter"
     },
     "unified": {
-      "loading": "[TRANSLATE] Caricamento...",
-      "titleWelcome": "[TRANSLATE] Benvenuto su MirrorBuddy",
-      "subtitleWelcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini",
-      "titleUpdated": "[TRANSLATE] Termini Aggiornati",
-      "subtitleUpdated": "[TRANSLATE] I nostri termini sono stati aggiornati",
+      "loading": "Chargement...",
+      "titleWelcome": "Bienvenue sur MirrorBuddy",
+      "subtitleWelcome": "Avant de commencer, acceptez nos conditions",
+      "titleUpdated": "Conditions mises à jour",
+      "subtitleUpdated": "Nos conditions ont été mises à jour",
       "reconsentNotice": {
-        "lastAccepted": "[TRANSLATE] Ultima accettazione:",
-        "changed": "[TRANSLATE] Cosa è cambiato:",
-        "details": "[TRANSLATE] Abbiamo aggiornato la nostra politica sulla privacy"
+        "lastAccepted": "Dernière acceptation :",
+        "changed": "Ce qui a changé :",
+        "details": "Nous avons mis à jour notre politique de confidentialité"
       },
-      "summaryTitle": "[TRANSLATE] Cosa accetti",
+      "summaryTitle": "Ce que vous acceptez",
       "privacy": {
-        "title": "[TRANSLATE] Privacy e Dati",
-        "description": "[TRANSLATE] Come trattiamo i tuoi dati personali"
+        "title": "Confidentialité et Données",
+        "description": "Comment nous traitons vos données personnelles"
       },
       "cookies": {
-        "title": "[TRANSLATE] Cookie Essenziali",
-        "description": "[TRANSLATE] Necessari per il funzionamento dell'app"
+        "title": "Cookies essentiels",
+        "description": "Nécessaires au fonctionnement de l'application"
       },
       "tos": {
-        "title": "[TRANSLATE] Termini di Servizio",
-        "description": "[TRANSLATE] Regole d'uso della piattaforma"
+        "title": "Conditions d'Utilisation",
+        "description": "Règles d'utilisation de la plateforme"
       },
       "links": {
-        "full": "[TRANSLATE] Termini Completi",
-        "privacy": "[TRANSLATE] Privacy Policy",
-        "cookies": "[TRANSLATE] Cookie Policy"
+        "full": "Conditions complètes",
+        "privacy": "Politique de confidentialité",
+        "cookies": "Politique relative aux cookies"
       },
       "tosCheckbox": {
-        "label": "[TRANSLATE] Accetto i Termini di Servizio",
-        "text": "[TRANSLATE] e confermo di aver letto la privacy policy"
+        "label": "J'accepte les Conditions d'Utilisation",
+        "text": "et je confirme avoir lu la politique de confidentialité"
       },
       "analytics": {
-        "label": "[TRANSLATE] Analytics Opzionali",
-        "description": "[TRANSLATE] Aiutaci a migliorare l'app (anonimo)"
+        "label": "Analytics facultatifs",
+        "description": "Aidez-nous à améliorer l'application (anonyme)"
       },
       "buttons": {
-        "disabled": "[TRANSLATE] Accetta i termini per continuare",
-        "accept": "[TRANSLATE] Accetta e Continua",
-        "submitting": "[TRANSLATE] Salvataggio..."
+        "disabled": "Acceptez les conditions pour continuer",
+        "accept": "Accepter et Continuer",
+        "submitting": "Enregistrement..."
       },
-      "coppa": "[TRANSLATE] Se hai meno di 13 anni, è necessario il consenso dei genitori",
+      "coppa": "Si vous avez moins de 13 ans, le consentement parental est requis",
       "screenReader": {
-        "required": "[TRANSLATE] È necessario accettare i Termini di Servizio per continuare",
-        "submitting": "[TRANSLATE] Salvataggio del consenso in corso..."
+        "required": "Il est nécessaire d'accepter les Conditions d'Utilisation pour continuer",
+        "submitting": "Enregistrement du consentement en cours..."
       }
     }
   }
