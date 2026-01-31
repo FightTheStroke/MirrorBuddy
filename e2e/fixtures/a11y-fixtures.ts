@@ -1,3 +1,16 @@
+/**
+ * A11y Testing Fixtures for E2E Tests
+ *
+ * Chains from base-fixtures.ts to inherit all wall bypasses
+ * (TOS mock, consent cookies, visitor ID, accessibility API mocks).
+ * Adds a11y-specific setup: NEXT_LOCALE cookie, mirrorbuddy-a11y cookie.
+ *
+ * Usage:
+ * ```typescript
+ * import { test, expect, toLocalePath } from './fixtures/a11y-fixtures';
+ * ```
+ */
+
 /* eslint-disable react-hooks/rules-of-hooks */
 // Note: 'use' is a Playwright fixture callback, not React's use hook
 import { test as base, expect } from "./base-fixtures";
@@ -47,10 +60,9 @@ export const test = base.extend({
         sameSite: "Lax",
       },
     ]);
+
     await use(page);
   },
 });
-
-test.use({ storageState: undefined });
 
 export { expect };
