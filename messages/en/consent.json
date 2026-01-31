@@ -46,39 +46,39 @@
       "linkLabel": "View Full Terms",
       "required": "You must accept the Terms of Service to continue.",
       "toast": {
-        "saved": "[TRANSLATE] Termini accettati con successo",
-        "saveFailed": "[TRANSLATE] Errore nel salvataggio"
+        "saved": "Terms accepted successfully",
+        "saveFailed": "Error saving"
       },
       "modal": {
         "title": {
-          "updated": "[TRANSLATE] Termini Aggiornati",
-          "welcome": "[TRANSLATE] Benvenuto su MirrorBuddy"
+          "updated": "Updated Terms",
+          "welcome": "Welcome to MirrorBuddy"
         },
         "description": {
-          "updated": "[TRANSLATE] I nostri termini di servizio sono stati aggiornati",
-          "welcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini"
+          "updated": "Our terms of service have been updated",
+          "welcome": "Before you start, accept our terms"
         },
         "warning": {
-          "title": "[TRANSLATE] Importante",
-          "description": "[TRANSLATE] L accettazione è necessaria per utilizzare la piattaforma"
+          "title": "Important",
+          "description": "Acceptance is required to use the platform"
         },
-        "summary": "[TRANSLATE] Punti chiave",
+        "summary": "Key points",
         "points": {
-          "free": "[TRANSLATE] Servizio gratuito per studenti",
-          "aiCanErr": "[TRANSLATE] L IA può commettere errori",
-          "minors": "[TRANSLATE] Consenso parentale per under-14",
-          "respect": "[TRANSLATE] Rispetto reciproco e comportamento etico"
+          "free": "Free service for students",
+          "aiCanErr": "AI can make mistakes",
+          "minors": "Parental consent for under-14s",
+          "respect": "Mutual respect and ethical behavior"
         },
-        "link": "[TRANSLATE] Leggi i termini completi",
-        "checkbox": "[TRANSLATE] Accetto i Termini di Servizio",
+        "link": "Read the full terms",
+        "checkbox": "I accept the Terms of Service",
         "buttons": {
-          "disabled": "[TRANSLATE] Accetta per continuare",
-          "accept": "[TRANSLATE] Accetta e Continua",
-          "submitting": "[TRANSLATE] Salvataggio..."
+          "disabled": "Accept to continue",
+          "accept": "Accept and Continue",
+          "submitting": "Saving..."
         },
         "screenReader": {
-          "required": "[TRANSLATE] È necessario accettare i Termini di Servizio",
-          "submitting": "[TRANSLATE] Salvataggio in corso..."
+          "required": "You must accept the Terms of Service",
+          "submitting": "Saving in progress..."
         }
       }
     },
@@ -125,62 +125,62 @@
       "contactSupport": "Contact Support"
     },
     "inline": {
-      "acceptedText": "[TRANSLATE] Consenso accettato",
-      "manage": "[TRANSLATE] Gestisci preferenze",
-      "acceptButton": "[TRANSLATE] Accetta Cookie",
-      "info": "[TRANSLATE] Informazioni",
-      "title": "[TRANSLATE] Cookie e Privacy",
-      "description": "[TRANSLATE] Utilizziamo cookie essenziali per il funzionamento del sito",
-      "learnMore": "[TRANSLATE] Scopri di più",
-      "analyticsLabel": "[TRANSLATE] Analytics (opzionale)",
-      "submitButton": "[TRANSLATE] Accetta"
+      "acceptedText": "Consent accepted",
+      "manage": "Manage preferences",
+      "acceptButton": "Accept cookies",
+      "info": "Information",
+      "title": "Cookies and Privacy",
+      "description": "We use essential cookies for the site to work",
+      "learnMore": "Learn more",
+      "analyticsLabel": "Analytics (optional)",
+      "submitButton": "Accept"
     },
     "unified": {
-      "loading": "[TRANSLATE] Caricamento...",
-      "titleWelcome": "[TRANSLATE] Benvenuto su MirrorBuddy",
-      "subtitleWelcome": "[TRANSLATE] Prima di iniziare, accetta i nostri termini",
-      "titleUpdated": "[TRANSLATE] Termini Aggiornati",
-      "subtitleUpdated": "[TRANSLATE] I nostri termini sono stati aggiornati",
+      "loading": "Loading...",
+      "titleWelcome": "Welcome to MirrorBuddy",
+      "subtitleWelcome": "Before you start, accept our terms",
+      "titleUpdated": "Updated Terms",
+      "subtitleUpdated": "Our terms have been updated",
       "reconsentNotice": {
-        "lastAccepted": "[TRANSLATE] Ultima accettazione:",
-        "changed": "[TRANSLATE] Cosa è cambiato:",
-        "details": "[TRANSLATE] Abbiamo aggiornato la nostra politica sulla privacy"
+        "lastAccepted": "Last acceptance:",
+        "changed": "What changed:",
+        "details": "We have updated our privacy policy"
       },
-      "summaryTitle": "[TRANSLATE] Cosa accetti",
+      "summaryTitle": "What you accept",
       "privacy": {
-        "title": "[TRANSLATE] Privacy e Dati",
-        "description": "[TRANSLATE] Come trattiamo i tuoi dati personali"
+        "title": "Privacy and Data",
+        "description": "How we process your personal data"
       },
       "cookies": {
-        "title": "[TRANSLATE] Cookie Essenziali",
-        "description": "[TRANSLATE] Necessari per il funzionamento dell'app"
+        "title": "Essential Cookies",
+        "description": "Required for the app to work"
       },
       "tos": {
-        "title": "[TRANSLATE] Termini di Servizio",
-        "description": "[TRANSLATE] Regole d'uso della piattaforma"
+        "title": "Terms of Service",
+        "description": "Platform usage rules"
       },
       "links": {
-        "full": "[TRANSLATE] Termini Completi",
-        "privacy": "[TRANSLATE] Privacy Policy",
-        "cookies": "[TRANSLATE] Cookie Policy"
+        "full": "Full Terms",
+        "privacy": "Privacy Policy",
+        "cookies": "Cookie Policy"
       },
       "tosCheckbox": {
-        "label": "[TRANSLATE] Accetto i Termini di Servizio",
-        "text": "[TRANSLATE] e confermo di aver letto la privacy policy"
+        "label": "I accept the Terms of Service",
+        "text": "and confirm I have read the privacy policy"
       },
       "analytics": {
-        "label": "[TRANSLATE] Analytics Opzionali",
-        "description": "[TRANSLATE] Aiutaci a migliorare l'app (anonimo)"
+        "label": "Optional Analytics",
+        "description": "Help us improve the app (anonymous)"
       },
       "buttons": {
-        "disabled": "[TRANSLATE] Accetta i termini per continuare",
-        "accept": "[TRANSLATE] Accetta e Continua",
-        "submitting": "[TRANSLATE] Salvataggio..."
+        "disabled": "Accept the terms to continue",
+        "accept": "Accept and Continue",
+        "submitting": "Saving..."
       },
-      "coppa": "[TRANSLATE] Se hai meno di 13 anni, è necessario il consenso dei genitori",
+      "coppa": "If you are under 13, parental consent is required",
       "screenReader": {
-        "required": "[TRANSLATE] È necessario accettare i Termini di Servizio per continuare",
-        "submitting": "[TRANSLATE] Salvataggio del consenso in corso..."
+        "required": "You must accept the Terms of Service to continue",
+        "submitting": "Consent saving in progress..."
       }
     }
   }

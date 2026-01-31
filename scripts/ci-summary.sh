@@ -13,6 +13,8 @@ set -euo pipefail
 #   ./scripts/ci-summary.sh --build  # build only
 #   ./scripts/ci-summary.sh --unit   # unit tests only
 #   ./scripts/ci-summary.sh --i18n   # i18n check only
+#   ./scripts/ci-summary.sh --e2e    # E2E tests (requires running app)
+#   ./scripts/ci-summary.sh --a11y   # Accessibility tests (requires running app)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -126,6 +128,45 @@ run_i18n() {
   rm -f "$tmp"
 }
 
+run_e2e() {
+  local tmp; tmp=$(mktemp)
+  local args="${1:-}"
+  if E2E_TESTS=1 npx playwright test $args > "$tmp" 2>&1; then
+    local s; s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1)
+    result "[PASS] E2E${s:+ ($s)}"
+  else
+    ERRORS=$((ERRORS + 1))
+    local s; s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
+    result "[FAIL] E2E${s:+ ($s)}"
+    local d; d=$(strip_ansi "$tmp" | \
+      grep -E "^\s+[0-9]+\)|Error:|expect\(|Timeout|\.spec\.ts:" | \
+      sed 's/^\s*//' | head -15)
+    result_details "$d"
+  fi
+  rm -f "$tmp"
+}
+
+run_a11y() {
+  local tmp; tmp=$(mktemp)
+  local specs="e2e/accessibility.spec.ts"
+  # Include all a11y specs if they exist
+  local extra; extra=$(find e2e -name "a11y-*.spec.ts" 2>/dev/null | tr '\n' ' ')
+  if E2E_TESTS=1 npx playwright test $specs $extra > "$tmp" 2>&1; then
+    local s; s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1)
+    result "[PASS] A11y${s:+ ($s)}"
+  else
+    ERRORS=$((ERRORS + 1))
+    local s; s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
+    result "[FAIL] A11y${s:+ ($s)}"
+    # Extract violation details from axe-core output
+    local d; d=$(strip_ansi "$tmp" | \
+      grep -E "^\s+[0-9]+\)|violation|critical|serious|moderate|\[wcag" | \
+      sed 's/^\s*//' | head -15)
+    result_details "$d"
+  fi
+  rm -f "$tmp"
+}
+
 # --- Main ---
 echo "=== CI Summary ==="
 
@@ -135,7 +176,10 @@ case "$MODE" in
   --build)  run_build ;;
   --unit)   run_unit ;;
   --i18n)   run_i18n ;;
+  --e2e)    run_e2e "${2:-}" ;;
+  --a11y)   run_a11y ;;
   --full)   run_lint; run_typecheck; run_build; run_unit ;;
+  --all)    run_lint; run_typecheck; run_build; run_unit; run_i18n; run_e2e; run_a11y ;;
   *)        run_lint; run_typecheck; run_build ;;
 esac
 

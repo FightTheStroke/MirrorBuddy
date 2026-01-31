@@ -6,11 +6,11 @@
     "mirrorBucksShort": "MB",
     "navigation": {
       "professors": "Professors",
-      "astuccio": "[TRANSLATE] Astuccio",
-      "zaino": "[TRANSLATE] Zaino",
-      "calendar": "[TRANSLATE] Calendario",
-      "progress": "[TRANSLATE] Progresso",
-      "settings": "[TRANSLATE] Impostazioni"
+      "astuccio": "Pencil case",
+      "zaino": "Backpack",
+      "calendar": "Calendar",
+      "progress": "Progress",
+      "settings": "Settings"
     },
     "header": {
       "openMenu": "Open menu",

@@ -17,6 +17,9 @@ Two scripts optimized for AI agent consumption: minimal output, only errors/warn
 | Build only      | `./scripts/ci-summary.sh --build` | ~5 lines  |
 | Unit tests only | `./scripts/ci-summary.sh --unit`  | ~5 lines  |
 | i18n only       | `./scripts/ci-summary.sh --i18n`  | ~5 lines  |
+| E2E tests       | `./scripts/ci-summary.sh --e2e`   | ~15 lines |
+| A11y tests      | `./scripts/ci-summary.sh --a11y`  | ~15 lines |
+| Everything      | `./scripts/ci-summary.sh --all`   | ~30 lines |
 
 ### GitHub CI verification
 
@@ -38,6 +41,8 @@ Two scripts optimized for AI agent consumption: minimal output, only errors/warn
 | `npm run test:unit`             | 10k-30k       | `ci-summary.sh --unit`  |
 | `gh run view <id> --log`        | 100k+         | `ci-check.sh <id>`      |
 | `gh run view <id> --log-failed` | 5k-50k        | `ci-check.sh <id>`      |
+| `npx playwright test`           | 20k-100k      | `ci-summary.sh --e2e`   |
+| `npm run test`                  | 20k-100k      | `ci-summary.sh --e2e`   |
 
 ## When verbose is allowed
 

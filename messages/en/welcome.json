@@ -17,19 +17,19 @@
       "accessibility": {
         "title": "Designed for ALL learning styles",
         "subtitle": "Dedicated support for learning differences",
-        "introLine1": "[TRANSLATE] Accessibile",
-        "introLine2": "[TRANSLATE] per tutti"
+        "introLine1": "Accessible",
+        "introLine2": "for everyone"
       },
-      "primaryHeadline": "[TRANSLATE] Impara con l IA",
-      "primarySubtitle": "[TRANSLATE] Maestri virtuali per il tuo successo",
-      "readableFonts": "[TRANSLATE] Font leggibili",
-      "mindMaps": "[TRANSLATE] Mappe mentali",
-      "textToSpeech": "[TRANSLATE] Text-to-speech",
-      "adaptiveQuizzes": "[TRANSLATE] Quiz adattivi",
-      "welcome": "[TRANSLATE] Benvenuto",
-      "learn": "[TRANSLATE] Impara",
-      "withTeachers": "[TRANSLATE] con Maestri virtuali",
-      "anyAbility": "[TRANSLATE] per ogni abilità"
+      "primaryHeadline": "Learn with AI",
+      "primarySubtitle": "Virtual Masters for your success",
+      "readableFonts": "Readable fonts",
+      "mindMaps": "Mind maps",
+      "textToSpeech": "Text-to-speech",
+      "adaptiveQuizzes": "Adaptive quizzes",
+      "welcome": "Welcome",
+      "learn": "Learn",
+      "withTeachers": "with Virtual Masters",
+      "anyAbility": "for every ability"
     },
     "quickStart": {
       "heading": "Start your journey",
@@ -53,8 +53,8 @@
         "feature3": "No registration",
         "cta": "Try free"
       },
-      "updateProfile": "[TRANSLATE] Aggiorna profilo",
-      "login": "[TRANSLATE] Accedi"
+      "updateProfile": "Update profile",
+      "login": "Log in"
     },
     "tierComparison": {
       "heading": "Choose the perfect plan for you",
@@ -83,7 +83,7 @@
             "savedProgress": "Saved progress"
           },
           "cta": "Sign up",
-          "badge": "[TRANSLATE] Popolare"
+          "badge": "Popular"
         },
         "pro": {
           "name": "Pro",
@@ -127,17 +127,17 @@
       },
       "organizationsHeading": "Solutions for your organization",
       "organizationsSubtitle": "Complete customization for schools and companies",
-      "accessIntroLine1": "[TRANSLATE] Accedi rapidamente:",
-      "accessIntroLine2": "[TRANSLATE] Nessuna registrazione richiesta",
-      "organizationsFooter": "[TRANSLATE] Contattaci per un piano aziendale",
-      "footer": "[TRANSLATE] Termini e condizioni",
+      "accessIntroLine1": "Quick access:",
+      "accessIntroLine2": "No registration required",
+      "organizationsFooter": "Contact us for a business plan",
+      "footer": "Terms and conditions",
       "toggle": {
-        "students": "[TRANSLATE] Studenti",
+        "students": "Students",
         "organizations": "Schools & Companies",
         "individuals": "Students & Families",
         "ariaLabel": "Toggle between students and organizations"
       },
-      "footerNote": "[TRANSLATE] Termini e condizioni applicabili"
+      "footerNote": "Terms and conditions apply"
     },
     "maestri": {
       "heading": "Your",
@@ -157,13 +157,13 @@
       "subtitle": "Coaches for study methods and Buddies for emotional support",
       "coach": "Coach - They teach you study methods",
       "buddy": "Buddy - They support you emotionally",
-      "scrollHint": "[TRANSLATE] Scorri per ulteriori informazioni",
-      "introLine1": "[TRANSLATE] Supporto",
-      "introLine2": "[TRANSLATE] sempre disponibile",
-      "introDisclaimer": "[TRANSLATE] Ti aiutiamo in ogni momento",
-      "scrollLeft": "[TRANSLATE] Scorri a sinistra",
-      "scrollRight": "[TRANSLATE] Scorri a destra",
-      "carouselLabel": "[TRANSLATE] Canali di supporto"
+      "scrollHint": "Scroll for more information",
+      "introLine1": "Support",
+      "introLine2": "always available",
+      "introDisclaimer": "We help you at any time",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right",
+      "carouselLabel": "Support channels"
     },
     "features": {
       "heading": "Tools for every learning style",
@@ -174,40 +174,40 @@
       "interactiveQuizzes": "Interactive Quizzes - Test your knowledge",
       "gamification": "Gamification - Earn XP and unlock achievements",
       "adaptiveLearning": "Adaptive Learning - Adapts to your style and pace",
-      "introLine1": "[TRANSLATE] Strumenti potenti",
-      "introLine2": "[TRANSLATE] per il tuo apprendimento"
+      "introLine1": "Powerful tools",
+      "introLine2": "for your learning"
     },
     "compliance": {
       "heading": "Compliance, privacy, and transparency",
       "subtitle": "MirrorBuddy complies with international regulations",
       "items": {
         "gdpr": {
-          "label": "[TRANSLATE] GDPR",
-          "description": "[TRANSLATE] Conformità GDPR garantita"
+          "label": "GDPR",
+          "description": "GDPR compliance guaranteed"
         },
         "aiAct": {
-          "label": "[TRANSLATE] EU AI Act",
-          "description": "[TRANSLATE] Conforme alla normativa IA"
+          "label": "EU AI Act",
+          "description": "Compliant with AI regulations"
         },
         "coppa": {
-          "label": "[TRANSLATE] COPPA",
-          "description": "[TRANSLATE] Protezione minori"
+          "label": "COPPA",
+          "description": "Child protection"
         },
         "aiTransparency": {
-          "label": "[TRANSLATE] Trasparenza IA",
-          "description": "[TRANSLATE] IA trasparente e verificabile"
+          "label": "AI Transparency",
+          "description": "Transparent and verifiable AI"
         },
         "openSource": {
-          "label": "[TRANSLATE] Open Source",
-          "description": "[TRANSLATE] Codice aperto e verificabile"
+          "label": "Open Source",
+          "description": "Open and verifiable code"
         },
         "apache": {
-          "label": "[TRANSLATE] Apache 2.0",
-          "description": "[TRANSLATE] Licenza Apache 2.0"
+          "label": "Apache 2.0",
+          "description": "Apache 2.0 license"
         }
       },
-      "trustIntroLine1": "[TRANSLATE] Conformità EU AI Act",
-      "trustIntroLine2": "[TRANSLATE] e GDPR garantita",
+      "trustIntroLine1": "EU AI Act compliance",
+      "trustIntroLine2": "and GDPR compliance guaranteed",
       "headingHighlight": "safe and compliant",
       "footer": "A project by <link>FightTheStroke Foundation</link>, dedicated to technology for learning differences."
     },
@@ -223,33 +223,33 @@
       "copyright": "© {year} MirrorBuddy. Open source project on GitHub.",
       "compliance": {
         "gdpr": {
-          "label": "[TRANSLATE] GDPR",
-          "description": "[TRANSLATE] Protezione dati"
+          "label": "GDPR",
+          "description": "Data protection"
         },
         "aiAct": {
-          "label": "[TRANSLATE] AI Act",
-          "description": "[TRANSLATE] Conformità IA"
+          "label": "AI Act",
+          "description": "AI compliance"
         },
         "coppa": {
-          "label": "[TRANSLATE] COPPA",
-          "description": "[TRANSLATE] Protezione minori"
+          "label": "COPPA",
+          "description": "Child protection"
         },
         "italianLaw": {
-          "label": "[TRANSLATE] Legge 132/2025",
-          "description": "[TRANSLATE] Normativa italiana"
+          "label": "Law 132/2025",
+          "description": "Italian regulation"
         }
       },
       "legal": {
-        "privacy": "[TRANSLATE] Privacy",
-        "terms": "[TRANSLATE] Termini",
-        "cookies": "[TRANSLATE] Cookie",
-        "aiTransparency": "[TRANSLATE] Trasparenza IA",
-        "aiPolicy": "[TRANSLATE] Politica IA",
-        "compliance": "[TRANSLATE] Conformità"
+        "privacy": "Privacy",
+        "terms": "Terms",
+        "cookies": "Cookies",
+        "aiTransparency": "AI Transparency",
+        "aiPolicy": "AI Policy",
+        "compliance": "Compliance"
       },
       "openSource": {
-        "ariaLabel": "[TRANSLATE] Open Source",
-        "label": "[TRANSLATE] Codice Aperto"
+        "ariaLabel": "Open Source",
+        "label": "Open Source"
       }
     },
     "principles": {
@@ -276,23 +276,23 @@
       "toolsDay": "Tools/day",
       "maestriAvailable": "Maestri available",
       "trialDescription": "You are using the free trial version. Request beta access for unlimited limits and advanced features.",
-      "messages": "[TRANSLATE] Messaggi",
-      "tenPerSession": "[TRANSLATE] 10 per sessione",
-      "maestri": "[TRANSLATE] Professori",
-      "threeAvailable": "[TRANSLATE] 3 disponibili",
-      "tools": "[TRANSLATE] Strumenti",
-      "base": "[TRANSLATE] Funzioni base",
-      "freeTrialMode": "[TRANSLATE] Modalità Prova Gratuita",
-      "exploreNoRegistration": "[TRANSLATE] Esplora senza registrazione",
-      "wantFullAccess": "[TRANSLATE] Vuoi accesso completo?",
-      "requestBeta": "[TRANSLATE] Richiedi accesso Beta",
-      "subtitle": "[TRANSLATE] Esplora gratuitamente",
-      "ctaQuestion": "[TRANSLATE] Vuoi accesso completo?",
-      "ctaButton": "[TRANSLATE] Richiedi Beta"
+      "messages": "Messages",
+      "tenPerSession": "10 per session",
+      "maestri": "Professors",
+      "threeAvailable": "3 available",
+      "tools": "Tools",
+      "base": "Basic features",
+      "freeTrialMode": "Free Trial Mode",
+      "exploreNoRegistration": "Explore without registration",
+      "wantFullAccess": "Want full access?",
+      "requestBeta": "Request Beta access",
+      "subtitle": "Explore for free",
+      "ctaQuestion": "Want full access?",
+      "ctaButton": "Request Beta"
     },
     "voiceFallback": {
       "message": "Message",
-      "title": "Titolo"
+      "title": "Title"
     },
     "welcomeForm": {
       "age": "Age",
