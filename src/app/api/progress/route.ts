@@ -4,34 +4,32 @@
 // PUT: Update progress
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { getRequestId } from '@/lib/tracing';
-import { serverNotifications } from '@/lib/notifications/server-triggers';
-import { ProgressUpdateSchema } from '@/lib/validation/schemas/progress';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { getRequestId } from "@/lib/tracing";
+import { serverNotifications } from "@/lib/notifications/server-triggers";
+import { ProgressUpdateSchema } from "@/lib/validation/schemas/progress";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 export async function GET(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
-      response.headers.set('X-Request-ID', getRequestId(request));
+      const response = NextResponse.json(
+        { error: auth.error || "No user" },
+        { status: 401 },
+      );
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
     const userId = auth.userId;
 
-    let progress = await prisma.progress.findUnique({
+    const progress = await prisma.progress.upsert({
       where: { userId },
+      update: {},
+      create: { userId },
     });
-
-    if (!progress) {
-      // Create default progress
-      progress = await prisma.progress.create({
-        data: { userId },
-      });
-    }
 
     // Parse JSON fields and add season data
     const response = NextResponse.json({
@@ -40,25 +38,29 @@ export async function GET(request: NextRequest) {
       seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
       seasonLevel: progress.seasonLevel ?? 1,
       allTimeLevel: progress.allTimeLevel ?? progress.level ?? 1,
-      currentSeason: progress.currentSeason ? JSON.parse(progress.currentSeason) : null,
-      seasonHistory: progress.seasonHistory ? JSON.parse(progress.seasonHistory) : [],
-      achievements: JSON.parse(progress.achievements || '[]'),
-      masteries: JSON.parse(progress.masteries || '[]'),
+      currentSeason: progress.currentSeason
+        ? JSON.parse(progress.currentSeason)
+        : null,
+      seasonHistory: progress.seasonHistory
+        ? JSON.parse(progress.seasonHistory)
+        : [],
+      achievements: JSON.parse(progress.achievements || "[]"),
+      masteries: JSON.parse(progress.masteries || "[]"),
       streak: {
         current: progress.streakCurrent,
         longest: progress.streakLongest,
         lastStudyDate: progress.lastStudyDate,
       },
     });
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Progress GET error', { error: String(error) });
+    logger.error("Progress GET error", { error: String(error) });
     const response = NextResponse.json(
-      { error: 'Failed to get progress' },
-      { status: 500 }
+      { error: "Failed to get progress" },
+      { status: 500 },
     );
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
 }
@@ -67,8 +69,11 @@ export async function PUT(request: NextRequest) {
   try {
     const auth = await validateAuth();
     if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json({ error: auth.error || 'No user' }, { status: 401 });
-      response.headers.set('X-Request-ID', getRequestId(request));
+      const response = NextResponse.json(
+        { error: auth.error || "No user" },
+        { status: 401 },
+      );
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
     const userId = auth.userId;
@@ -80,12 +85,12 @@ export async function PUT(request: NextRequest) {
     if (!validation.success) {
       const response = NextResponse.json(
         {
-          error: 'Invalid progress data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid progress data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
-      response.headers.set('X-Request-ID', getRequestId(request));
+      response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     }
 
@@ -113,9 +118,12 @@ export async function PUT(request: NextRequest) {
     }
 
     if (data.level !== undefined) updateData.level = data.level;
-    if (data.seasonMirrorBucks !== undefined) updateData.seasonMirrorBucks = data.seasonMirrorBucks;
-    if (data.seasonLevel !== undefined) updateData.seasonLevel = data.seasonLevel;
-    if (data.allTimeLevel !== undefined) updateData.allTimeLevel = data.allTimeLevel;
+    if (data.seasonMirrorBucks !== undefined)
+      updateData.seasonMirrorBucks = data.seasonMirrorBucks;
+    if (data.seasonLevel !== undefined)
+      updateData.seasonLevel = data.seasonLevel;
+    if (data.allTimeLevel !== undefined)
+      updateData.allTimeLevel = data.allTimeLevel;
 
     // Season data as JSON
     if (data.currentSeason !== undefined) {
@@ -126,14 +134,19 @@ export async function PUT(request: NextRequest) {
     }
 
     // Other fields
-    if (data.totalStudyMinutes !== undefined) updateData.totalStudyMinutes = data.totalStudyMinutes;
-    if (data.questionsAsked !== undefined) updateData.questionsAsked = data.questionsAsked;
-    if (data.sessionsThisWeek !== undefined) updateData.sessionsThisWeek = data.sessionsThisWeek;
+    if (data.totalStudyMinutes !== undefined)
+      updateData.totalStudyMinutes = data.totalStudyMinutes;
+    if (data.questionsAsked !== undefined)
+      updateData.questionsAsked = data.questionsAsked;
+    if (data.sessionsThisWeek !== undefined)
+      updateData.sessionsThisWeek = data.sessionsThisWeek;
 
     // Handle streak object
     if (data.streak) {
-      if (data.streak.current !== undefined) updateData.streakCurrent = data.streak.current;
-      if (data.streak.longest !== undefined) updateData.streakLongest = data.streak.longest;
+      if (data.streak.current !== undefined)
+        updateData.streakCurrent = data.streak.current;
+      if (data.streak.longest !== undefined)
+        updateData.streakLongest = data.streak.longest;
       if (data.streak.lastStudyDate !== undefined) {
         updateData.lastStudyDate = new Date(data.streak.lastStudyDate);
       }
@@ -159,7 +172,9 @@ export async function PUT(request: NextRequest) {
     const newLevel = data.level ?? oldLevel;
     if (newLevel > oldLevel) {
       serverNotifications.levelUp(userId, newLevel).catch((err) => {
-        logger.error('Failed to send level up notification', { error: String(err) });
+        logger.error("Failed to send level up notification", {
+          error: String(err),
+        });
       });
     }
 
@@ -167,22 +182,33 @@ export async function PUT(request: NextRequest) {
     const newStreak = data.streak?.current ?? oldStreak;
     if (newStreak > oldStreak) {
       serverNotifications.streakMilestone(userId, newStreak).catch((err) => {
-        logger.error('Failed to send streak notification', { error: String(err) });
+        logger.error("Failed to send streak notification", {
+          error: String(err),
+        });
       });
     }
 
     // New achievement notification
     if (data.achievements && Array.isArray(data.achievements)) {
-      const oldAchievementIds = new Set(oldAchievements.map((a: { id: string }) => a.id));
+      const oldAchievementIds = new Set(
+        oldAchievements.map((a: { id: string }) => a.id),
+      );
       const newAchievements = data.achievements.filter(
-        (a) => !oldAchievementIds.has(a.id)
+        (a) => !oldAchievementIds.has(a.id),
       );
 
       for (const achievement of newAchievements) {
         serverNotifications
-          .achievement(userId, achievement.id, achievement.name, achievement.description || '')
+          .achievement(
+            userId,
+            achievement.id,
+            achievement.name,
+            achievement.description || "",
+          )
           .catch((err) => {
-            logger.error('Failed to send achievement notification', { error: String(err) });
+            logger.error("Failed to send achievement notification", {
+              error: String(err),
+            });
           });
       }
     }
@@ -193,25 +219,29 @@ export async function PUT(request: NextRequest) {
       seasonMirrorBucks: progress.seasonMirrorBucks ?? 0,
       seasonLevel: progress.seasonLevel ?? 1,
       allTimeLevel: progress.allTimeLevel ?? progress.level ?? 1,
-      currentSeason: progress.currentSeason ? JSON.parse(progress.currentSeason) : null,
-      seasonHistory: progress.seasonHistory ? JSON.parse(progress.seasonHistory) : [],
-      achievements: JSON.parse(progress.achievements || '[]'),
-      masteries: JSON.parse(progress.masteries || '[]'),
+      currentSeason: progress.currentSeason
+        ? JSON.parse(progress.currentSeason)
+        : null,
+      seasonHistory: progress.seasonHistory
+        ? JSON.parse(progress.seasonHistory)
+        : [],
+      achievements: JSON.parse(progress.achievements || "[]"),
+      masteries: JSON.parse(progress.masteries || "[]"),
       streak: {
         current: progress.streakCurrent,
         longest: progress.streakLongest,
         lastStudyDate: progress.lastStudyDate,
       },
     });
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   } catch (error) {
-    logger.error('Progress PUT error', { error: String(error) });
+    logger.error("Progress PUT error", { error: String(error) });
     const response = NextResponse.json(
-      { error: 'Failed to update progress' },
-      { status: 500 }
+      { error: "Failed to update progress" },
+      { status: 500 },
     );
-    response.headers.set('X-Request-ID', getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
 }

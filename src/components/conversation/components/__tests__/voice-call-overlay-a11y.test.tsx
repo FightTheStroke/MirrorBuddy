@@ -9,6 +9,25 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { render, screen, cleanup } from "@testing-library/react";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock all external dependencies before importing the component
 
 // Mock framer-motion - track motion.div usage for animation detection
@@ -27,7 +46,7 @@ vi.mock("framer-motion", () => ({
           data-testid={
             hasScaleAnimation ? "pulsing-avatar-wrapper" : "motion-div"
           }
-          {...props}
+          {...stripMotionProps(props as Record<string, unknown>)}
         >
           {children}
         </div>
@@ -126,19 +145,8 @@ vi.mock("@/lib/accessibility", () => ({
   ) => selector({ shouldAnimate: mockShouldAnimate }),
 }));
 
-// Mock fetch for connection info
-global.fetch = vi.fn(() =>
-  Promise.resolve({
-    ok: true,
-    status: 200,
-    json: () =>
-      Promise.resolve({
-        provider: "azure",
-        proxyPort: 8080,
-        configured: true,
-      }),
-  }),
-) as unknown as typeof fetch;
+// Mock fetch for connection info (keep pending to avoid async state updates)
+global.fetch = vi.fn(() => new Promise(() => {})) as unknown as typeof fetch;
 
 // Mock sessionStorage
 const mockSessionStorage = {

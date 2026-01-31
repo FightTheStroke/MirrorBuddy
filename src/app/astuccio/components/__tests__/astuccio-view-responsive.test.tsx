@@ -10,6 +10,26 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { AstuccioView } from "../astuccio-view";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock framer-motion
 vi.mock("framer-motion", () => ({
   motion: {
@@ -17,19 +37,19 @@ vi.mock("framer-motion", () => ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
+      <div {...stripMotionProps(props)}>{children}</div>
     ),
     section: ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <section {...props}>{children}</section>
+      <section {...stripMotionProps(props)}>{children}</section>
     ),
     button: ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <button {...props}>{children}</button>
+      <button {...stripMotionProps(props)}>{children}</button>
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,

@@ -2,8 +2,8 @@
  * Profile consent helpers
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
 /**
  * Validate POST consent request
@@ -22,13 +22,14 @@ export function validateConsentInput(body: unknown): {
   const { userId, parentConsent, studentConsent, consentGivenBy } = payload;
 
   if (!userId) {
-    return { valid: false, error: 'userId is required' };
+    return { valid: false, error: "userId is required" };
   }
 
   if (parentConsent === undefined && studentConsent === undefined) {
     return {
       valid: false,
-      error: 'At least one consent type (parentConsent or studentConsent) is required',
+      error:
+        "At least one consent type (parentConsent or studentConsent) is required",
     };
   }
 
@@ -49,38 +50,27 @@ export function validateConsentInput(body: unknown): {
 export async function upsertConsentProfile(
   userId: string,
   parentConsent: boolean | undefined,
-  studentConsent: boolean | undefined
+  studentConsent: boolean | undefined,
 ) {
-  let profile = await prisma.studentInsightProfile.findUnique({
-    where: { userId },
-  });
-
   const userProfile = await prisma.profile.findUnique({
     where: { userId },
   });
 
-  if (!profile) {
-    profile = await prisma.studentInsightProfile.create({
-      data: {
-        userId,
-        studentName: userProfile?.name || 'Studente',
-        parentConsent: parentConsent ?? false,
-        studentConsent: studentConsent ?? false,
-        consentDate: new Date(),
-      },
-    });
-  } else {
-    profile = await prisma.studentInsightProfile.update({
-      where: { userId },
-      data: {
-        parentConsent: parentConsent ?? profile.parentConsent,
-        studentConsent: studentConsent ?? profile.studentConsent,
-        consentDate: new Date(),
-      },
-    });
-  }
-
-  return profile;
+  return prisma.studentInsightProfile.upsert({
+    where: { userId },
+    update: {
+      ...(parentConsent !== undefined ? { parentConsent } : {}),
+      ...(studentConsent !== undefined ? { studentConsent } : {}),
+      consentDate: new Date(),
+    },
+    create: {
+      userId,
+      studentName: userProfile?.name || "Studente",
+      parentConsent: parentConsent ?? false,
+      studentConsent: studentConsent ?? false,
+      consentDate: new Date(),
+    },
+  });
 }
 
 /**
@@ -89,10 +79,10 @@ export async function upsertConsentProfile(
 export async function logConsentAction(
   profileId: string,
   userId: string,
-  action: 'edit' | 'delete_request',
+  action: "edit" | "delete_request",
   details: string,
   ipAddress: string,
-  userAgent?: string
+  userAgent?: string,
 ) {
   await prisma.profileAccessLog.create({
     data: {
@@ -109,7 +99,12 @@ export async function logConsentAction(
 /**
  * Mark profile for deletion (GDPR 30-day period)
  */
-export async function markProfileForDeletion(profileId: string, userId: string, ipAddress: string, userAgent?: string) {
+export async function markProfileForDeletion(
+  profileId: string,
+  userId: string,
+  ipAddress: string,
+  userAgent?: string,
+) {
   const profile = await prisma.studentInsightProfile.update({
     where: { id: profileId },
     data: {
@@ -119,7 +114,14 @@ export async function markProfileForDeletion(profileId: string, userId: string, 
     },
   });
 
-  await logConsentAction(profileId, userId, 'delete_request', 'Deletion requested, will be processed within 30 days', ipAddress, userAgent);
+  await logConsentAction(
+    profileId,
+    userId,
+    "delete_request",
+    "Deletion requested, will be processed within 30 days",
+    ipAddress,
+    userAgent,
+  );
 
   return profile;
 }
@@ -127,7 +129,10 @@ export async function markProfileForDeletion(profileId: string, userId: string, 
 /**
  * Immediately delete profile and all data
  */
-export async function deleteProfileImmediately(profileId: string, userId: string) {
+export async function deleteProfileImmediately(
+  profileId: string,
+  userId: string,
+) {
   await prisma.profileAccessLog.deleteMany({
     where: { profileId },
   });
@@ -136,5 +141,5 @@ export async function deleteProfileImmediately(profileId: string, userId: string
     where: { id: profileId },
   });
 
-  logger.info('Profile deleted immediately', { userId });
+  logger.info("Profile deleted immediately", { userId });
 }

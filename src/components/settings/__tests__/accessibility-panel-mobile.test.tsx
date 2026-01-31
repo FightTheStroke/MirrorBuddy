@@ -4,10 +4,32 @@ import { userEvent } from "@testing-library/user-event";
 import { AccessibilityPanelMobile } from "@/components/settings/accessibility-panel-mobile";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock Framer Motion to simplify animations in tests
 vi.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: any) => (
+      <div {...stripMotionProps(props)}>{children}</div>
+    ),
   },
   AnimatePresence: ({ children }: any) => children,
 }));

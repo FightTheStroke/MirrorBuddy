@@ -208,7 +208,8 @@
       },
       "trustIntroLine1": "Conformità EU AI Act",
       "trustIntroLine2": "e GDPR garantita",
-      "headingHighlight": "sicura e conforme"
+      "headingHighlight": "sicura e conforme",
+      "footer": "Un progetto di <link>Fondazione FightTheStroke</link>, dedicato alla tecnologia per le differenze di apprendimento."
     },
     "footer": {
       "aiDisclaimer": "Creato con IA - le risposte potrebbero contenere errori",

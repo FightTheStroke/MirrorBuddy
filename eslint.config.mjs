@@ -353,6 +353,18 @@ const eslintConfig = defineConfig([
       "local-rules/no-missing-i18n-keys": "warn",
     },
   },
+  // ADR 0105: Detect Prisma find-then-create race conditions (P2002)
+  // Warns on prisma.model.create() preceded by prisma.model.find*() in same scope
+  {
+    files: ["src/**/*.ts"],
+    ignores: [
+      "src/**/*.test.ts",
+      "src/**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-prisma-race-condition": "warn",
+    },
+  },
 ]);
 
 export default eslintConfig;

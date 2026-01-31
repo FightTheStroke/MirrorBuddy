@@ -4,6 +4,26 @@ import { userEvent } from "@testing-library/user-event";
 import { AppearanceSettings } from "@/components/settings/sections/appearance-settings";
 import { useLocaleContext } from "@/i18n/locale-provider";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock the locale context
 vi.mock("@/i18n/locale-provider", () => ({
   useLocaleContext: vi.fn(),
@@ -38,7 +58,9 @@ vi.mock("next-intl", () => ({
 // Mock framer-motion
 vi.mock("framer-motion", () => ({
   motion: {
-    div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
+    div: ({ children, ...props }: any) => (
+      <div {...stripMotionProps(props)}>{children}</div>
+    ),
   },
 }));
 

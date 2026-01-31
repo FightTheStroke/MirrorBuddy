@@ -19,19 +19,6 @@ export async function assignBaseTierToNewUser(
   userId: string,
 ): Promise<{ id: string; tierId: string } | null> {
   try {
-    // Check if user already has a subscription
-    const existingSubscription = await prisma.userSubscription.findUnique({
-      where: { userId },
-    });
-
-    if (existingSubscription) {
-      logger.info("User already has subscription, skipping tier assignment", {
-        userId,
-        existingSubscriptionId: existingSubscription.id,
-      });
-      return null;
-    }
-
     // Find Base tier
     const baseTier = await prisma.tierDefinition.findUnique({
       where: { code: TierCode.BASE },
@@ -45,9 +32,11 @@ export async function assignBaseTierToNewUser(
       return null;
     }
 
-    // Create subscription with Base tier
-    const subscription = await prisma.userSubscription.create({
-      data: {
+    // Use upsert to prevent race condition (ADR 0105)
+    const subscription = await prisma.userSubscription.upsert({
+      where: { userId },
+      update: {}, // Already exists, no changes needed
+      create: {
         userId,
         tierId: baseTier.id,
         status: "ACTIVE",

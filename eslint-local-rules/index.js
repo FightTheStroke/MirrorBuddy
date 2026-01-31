@@ -2,11 +2,11 @@
  * ESLint Local Rules Plugin
  *
  * Exports custom ESLint rules for MirrorBuddy project.
- * All rules are ESM exports for compatibility with eslint.config.mjs.
  */
 
-import { noTodoWithoutIssue } from "./no-todo-without-issue.js";
 import { noMissingI18nKeys } from "./no-missing-i18n-keys.js";
+import { noKebabCaseI18nKeys } from "./no-kebab-case-i18n-keys.js";
+import noPrismaRaceCondition from "./no-prisma-race-condition.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -63,7 +63,7 @@ const containsItalian = (text) => {
     // eslint-disable-next-line security/detect-non-literal-regexp
     const wordPattern = new RegExp(
       `(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`,
-      "i",
+      "i"
     );
     if (wordPattern.test(lowercased)) {
       return true;
@@ -218,101 +218,6 @@ const preferValidateAuth = {
   },
 };
 
-/**
- * Rule: no-kebab-case-i18n-keys
- *
- * Prevents using kebab-case in translation keys.
- * All i18n keys must use camelCase for consistency.
- *
- * ADR: docs/adr/0091-i18n-key-naming-convention.md
- */
-const noKebabCaseI18nKeys = {
-  meta: {
-    type: "problem",
-    docs: {
-      description: "Prevent kebab-case in translation keys (use camelCase)",
-      category: "Possible Errors",
-      recommended: true,
-    },
-    messages: {
-      noKebabCase:
-        'Translation key "{{key}}" uses kebab-case. Use camelCase instead (e.g., "{{suggestion}}"). See ADR 0091.',
-    },
-    fixable: "code",
-  },
-  create(context) {
-    // Pattern to detect kebab-case (word-word pattern)
-    const KEBAB_CASE_PATTERN = /[a-z]+-[a-z]+/;
-
-    // Convert kebab-case to camelCase
-    const toCamelCase = (str) => {
-      return str.replace(/-([a-z])/g, (_, letter) => letter.toUpperCase());
-    };
-
-    const checkTranslationKey = (node, keyValue) => {
-      if (typeof keyValue !== "string") return;
-
-      // Check each segment of the key (e.g., "welcome.quick-start.title")
-      const segments = keyValue.split(".");
-      const hasKebabCase = segments.some((segment) =>
-        KEBAB_CASE_PATTERN.test(segment)
-      );
-
-      if (hasKebabCase) {
-        const suggestion = segments.map(toCamelCase).join(".");
-        context.report({
-          node,
-          messageId: "noKebabCase",
-          data: {
-            key: keyValue,
-            suggestion: suggestion,
-          },
-          fix(fixer) {
-            // Replace the string content
-            if (node.type === "Literal") {
-              return fixer.replaceText(node, `"${suggestion}"`);
-            }
-            return null;
-          },
-        });
-      }
-    };
-
-    return {
-      CallExpression(node) {
-        // Check t("key"), useTranslations("namespace")
-        if (node.callee.type === "Identifier") {
-          const funcName = node.callee.name;
-
-          // t() function calls
-          if (funcName === "t" && node.arguments.length > 0) {
-            const arg = node.arguments[0];
-            if (arg.type === "Literal" && typeof arg.value === "string") {
-              checkTranslationKey(arg, arg.value);
-            }
-          }
-
-          // useTranslations("namespace") calls
-          if (funcName === "useTranslations" && node.arguments.length > 0) {
-            const arg = node.arguments[0];
-            if (arg.type === "Literal" && typeof arg.value === "string") {
-              checkTranslationKey(arg, arg.value);
-            }
-          }
-
-          // getTranslations("namespace") calls
-          if (funcName === "getTranslations" && node.arguments.length > 0) {
-            const arg = node.arguments[0];
-            if (arg.type === "Literal" && typeof arg.value === "string") {
-              checkTranslationKey(arg, arg.value);
-            }
-          }
-        }
-      },
-    };
-  },
-};
-
 const noHardcodedItalian = {
   meta: {
     type: "suggestion",
@@ -355,16 +260,17 @@ const noHardcodedItalian = {
   },
 };
 
-// ESM export - no CommonJS
+const rules = {
+  "no-hardcoded-italian": noHardcodedItalian,
+  "no-i18n-in-providers": noI18nInProviders,
+  "prefer-validate-auth": preferValidateAuth,
+  "no-kebab-case-i18n-keys": noKebabCaseI18nKeys,
+  "no-missing-i18n-keys": noMissingI18nKeys,
+  "no-prisma-race-condition": noPrismaRaceCondition,
+};
+
 const localRules = {
-  rules: {
-    "no-hardcoded-italian": noHardcodedItalian,
-    "no-i18n-in-providers": noI18nInProviders,
-    "no-kebab-case-i18n-keys": noKebabCaseI18nKeys,
-    "no-missing-i18n-keys": noMissingI18nKeys,
-    "prefer-validate-auth": preferValidateAuth,
-    "no-todo-without-issue": noTodoWithoutIssue,
-  },
+  rules,
 };
 
 export default localRules;

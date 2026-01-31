@@ -42,18 +42,11 @@ export async function GET(request: NextRequest) {
     const settings = await getOrCompute(
       `settings:${userId}`,
       async () => {
-        let userSettings = await prisma.settings.findUnique({
+        return prisma.settings.upsert({
           where: { userId },
+          update: {},
+          create: { userId },
         });
-
-        if (!userSettings) {
-          // Create default settings
-          userSettings = await prisma.settings.create({
-            data: { userId },
-          });
-        }
-
-        return userSettings;
       },
       { ttl: CACHE_TTL.SETTINGS },
     );

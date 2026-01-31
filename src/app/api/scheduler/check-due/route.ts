@@ -4,17 +4,27 @@
 // This endpoint is called periodically by the client (Issue #27)
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
+import { NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import { Prisma } from "@prisma/client";
 import {
   type NotificationPreferences,
   DEFAULT_NOTIFICATION_PREFERENCES,
-} from '@/lib/scheduler/types';
-import { sendPushToUser, isPushConfigured } from '@/lib/push/send';
-import { parseTime, isQuietHours, getMelissaVoice } from './helpers';
+} from "@/lib/scheduler/types";
+import { sendPushToUser, isPushConfigured } from "@/lib/push/send";
+import { parseTime, isQuietHours, getMelissaVoice } from "./helpers";
+
+const isUniqueConstraintError = (error: unknown) =>
+  error instanceof Prisma.PrismaClientKnownRequestError &&
+  error.code === "P2002";
 
 // POST - Check for due items and create notifications
 export async function POST(request: Request) {
@@ -54,7 +64,7 @@ export async function POST(request: Request) {
       return NextResponse.json({
         checked: true,
         notificationsCreated: 0,
-        reason: !preferences.enabled ? 'notifications_disabled' : 'quiet_hours',
+        reason: !preferences.enabled ? "notifications_disabled" : "quiet_hours",
       });
     }
 
@@ -66,37 +76,32 @@ export async function POST(request: Request) {
       where: {
         userId,
         nextReview: { lte: now },
-        state: { not: 'new' }, // Only cards that have been reviewed before
+        state: { not: "new" }, // Only cards that have been reviewed before
       },
     });
 
     if (dueFlashcards.length >= 3) {
       // Only notify if 3+ cards are due
-      // Check if we already sent a flashcard notification recently
-      const recentFlashcardNotif = await prisma.notification.findFirst({
-        where: {
-          userId,
-          type: 'flashcard_due',
-          createdAt: {
-            gte: new Date(now.getTime() - preferences.minIntervalMinutes * 60 * 1000),
-          },
-        },
+      const intervalMs = preferences.minIntervalMinutes * 60 * 1000;
+      const intervalBucket = Math.floor(now.getTime() / intervalMs);
+      const notificationId = `flashcard_due:${userId}:${intervalBucket}`;
+      const melissaVoice = getMelissaVoice("flashcard_due", {
+        count: dueFlashcards.length,
       });
 
-      if (!recentFlashcardNotif) {
-        const melissaVoice = getMelissaVoice('flashcard_due', { count: dueFlashcards.length });
+      const flashcardTitle = "Flashcard pronte!";
+      const flashcardMessage = `Hai ${dueFlashcards.length} flashcard da ripassare.`;
 
-        const flashcardTitle = 'Flashcard pronte!';
-        const flashcardMessage = `Hai ${dueFlashcards.length} flashcard da ripassare.`;
-
+      try {
         await prisma.notification.create({
           data: {
+            id: notificationId,
             userId,
-            type: 'flashcard_due',
+            type: "flashcard_due",
             title: flashcardTitle,
             message: flashcardMessage,
-            actionUrl: '/flashcards',
-            priority: 'medium',
+            actionUrl: "/flashcards",
+            priority: "medium",
             melissaVoice,
             sentAt: now,
             expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000), // Expires in 24h
@@ -108,13 +113,20 @@ export async function POST(request: Request) {
           await sendPushToUser(userId, {
             title: flashcardTitle,
             body: flashcardMessage,
-            url: '/flashcards',
-            tag: 'flashcard_due',
+            url: "/flashcards",
+            tag: "flashcard_due",
           });
         }
 
-        notificationsCreated.push('flashcard_due');
-        logger.info('Created flashcard due notification', { userId, count: dueFlashcards.length });
+        notificationsCreated.push("flashcard_due");
+        logger.info("Created flashcard due notification", {
+          userId,
+          count: dueFlashcards.length,
+        });
+      } catch (error) {
+        if (!isUniqueConstraintError(error)) {
+          throw error;
+        }
       }
     }
 
@@ -122,18 +134,6 @@ export async function POST(request: Request) {
     const currentDayOfWeek = now.getDay();
 
     if (schedule?.sessions?.length) {
-      // Batch fetch all recent session notifications to avoid N+1
-      const sessionIds = schedule.sessions.map((s) => s.id);
-      const recentSessionNotifs = await prisma.notification.findMany({
-        where: {
-          userId,
-          type: 'scheduled_session',
-          relatedId: { in: sessionIds },
-          createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
-        },
-      });
-      const notifiedSessionIds = new Set(recentSessionNotifs.map((n) => n.relatedId));
-
       // Prepare batch creates
       const sessionNotifsToCreate: Array<{
         session: (typeof schedule.sessions)[0];
@@ -149,107 +149,123 @@ export async function POST(request: Request) {
         const minutesUntil = sessionMinutes - nowMinutes;
 
         if (minutesUntil > 0 && minutesUntil <= session.reminderOffset) {
-          if (!notifiedSessionIds.has(session.id)) {
-            sessionNotifsToCreate.push({ session, minutesUntil });
-          }
+          sessionNotifsToCreate.push({ session, minutesUntil });
         }
       }
 
       // Batch create notifications and send pushes
       for (const { session, minutesUntil } of sessionNotifsToCreate) {
-        const melissaVoice = getMelissaVoice('scheduled_session', {
+        const hourBucket = Math.floor(now.getTime() / (60 * 60 * 1000));
+        const notificationId = `scheduled_session:${userId}:${session.id}:${hourBucket}`;
+        const melissaVoice = getMelissaVoice("scheduled_session", {
           minutes: minutesUntil,
           subject: session.subject,
         });
 
         const sessionTitle = `Studio: ${session.subject}`;
         const sessionMessage = `Tra ${minutesUntil} minuti e' ora di studiare ${session.subject}!`;
-        const sessionUrl = session.maestroId ? `/maestro/${session.maestroId}` : '/maestri';
+        const sessionUrl = session.maestroId
+          ? `/maestro/${session.maestroId}`
+          : "/maestri";
 
-        await prisma.notification.create({
-          data: {
-            userId,
-            type: 'scheduled_session',
-            title: sessionTitle,
-            message: sessionMessage,
-            actionUrl: sessionUrl,
-            priority: 'high',
-            relatedId: session.id,
-            melissaVoice,
-            sentAt: now,
-            expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000),
-          },
-        });
-
-        if (isPushConfigured()) {
-          await sendPushToUser(userId, {
-            title: sessionTitle,
-            body: sessionMessage,
-            url: sessionUrl,
-            tag: `session_${session.id}`,
-            requireInteraction: true,
-          });
-        }
-
-        notificationsCreated.push('scheduled_session');
-        logger.info('Created session reminder', { userId, sessionId: session.id, subject: session.subject });
-      }
-    }
-
-    // 3. Check for custom reminders
-    if (schedule?.reminders?.length) {
-      // Batch fetch all recent reminder notifications to avoid N+1
-      const reminderIds = schedule.reminders.map((r) => r.id);
-      const recentReminderNotifs = await prisma.notification.findMany({
-        where: {
-          userId,
-          type: 'reminder',
-          relatedId: { in: reminderIds },
-          createdAt: { gte: new Date(now.getTime() - 60 * 60 * 1000) },
-        },
-      });
-      const notifiedReminderIds = new Set(recentReminderNotifs.map((n) => n.relatedId));
-
-      const remindersToDeactivate: string[] = [];
-
-      for (const reminder of schedule.reminders) {
-        const reminderTime = new Date(reminder.datetime);
-        const diffMinutes = (reminderTime.getTime() - now.getTime()) / (60 * 1000);
-
-        if (diffMinutes >= 0 && diffMinutes <= 5 && !notifiedReminderIds.has(reminder.id)) {
-          const reminderTitle = 'Promemoria';
-          const reminderUrl = reminder.maestroId ? `/maestro/${reminder.maestroId}` : '/';
-
+        try {
           await prisma.notification.create({
             data: {
+              id: notificationId,
               userId,
-              type: 'reminder',
-              title: reminderTitle,
-              message: reminder.message,
-              actionUrl: reminderUrl,
-              priority: 'medium',
-              relatedId: reminder.id,
+              type: "scheduled_session",
+              title: sessionTitle,
+              message: sessionMessage,
+              actionUrl: sessionUrl,
+              priority: "high",
+              relatedId: session.id,
+              melissaVoice,
               sentAt: now,
-              expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+              expiresAt: new Date(now.getTime() + 2 * 60 * 60 * 1000),
             },
           });
 
           if (isPushConfigured()) {
             await sendPushToUser(userId, {
-              title: reminderTitle,
-              body: reminder.message,
-              url: reminderUrl,
-              tag: `reminder_${reminder.id}`,
+              title: sessionTitle,
+              body: sessionMessage,
+              url: sessionUrl,
+              tag: `session_${session.id}`,
+              requireInteraction: true,
             });
           }
 
-          notificationsCreated.push('custom_reminder');
-
-          if (reminder.repeat === 'none') {
-            remindersToDeactivate.push(reminder.id);
+          notificationsCreated.push("scheduled_session");
+          logger.info("Created session reminder", {
+            userId,
+            sessionId: session.id,
+            subject: session.subject,
+          });
+        } catch (error) {
+          if (!isUniqueConstraintError(error)) {
+            throw error;
           }
+        }
+      }
+    }
 
-          logger.info('Created custom reminder notification', { userId, reminderId: reminder.id });
+    // 3. Check for custom reminders
+    if (schedule?.reminders?.length) {
+      const remindersToDeactivate: string[] = [];
+
+      for (const reminder of schedule.reminders) {
+        const reminderTime = new Date(reminder.datetime);
+        const diffMinutes =
+          (reminderTime.getTime() - now.getTime()) / (60 * 1000);
+
+        if (diffMinutes >= 0 && diffMinutes <= 5) {
+          const reminderTitle = "Promemoria";
+          const reminderUrl = reminder.maestroId
+            ? `/maestro/${reminder.maestroId}`
+            : "/";
+          const hourBucket = Math.floor(now.getTime() / (60 * 60 * 1000));
+          const notificationId = `reminder:${userId}:${reminder.id}:${hourBucket}`;
+
+          try {
+            await prisma.notification.create({
+              data: {
+                id: notificationId,
+                userId,
+                type: "reminder",
+                title: reminderTitle,
+                message: reminder.message,
+                actionUrl: reminderUrl,
+                priority: "medium",
+                relatedId: reminder.id,
+                sentAt: now,
+                expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+              },
+            });
+
+            if (isPushConfigured()) {
+              await sendPushToUser(userId, {
+                title: reminderTitle,
+                body: reminder.message,
+                url: reminderUrl,
+                tag: `reminder_${reminder.id}`,
+              });
+            }
+
+            notificationsCreated.push("custom_reminder");
+
+            if (reminder.repeat === "none") {
+              remindersToDeactivate.push(reminder.id);
+            }
+
+            logger.info("Created custom reminder notification", {
+              userId,
+              reminderId: reminder.id,
+            });
+          } catch (error) {
+            if (!isUniqueConstraintError(error)) {
+              throw error;
+            }
+          }
         }
       }
 
@@ -284,28 +300,25 @@ export async function POST(request: Request) {
 
         if (!isToday) {
           // No study today - streak at risk!
-          const recentStreakNotif = await prisma.notification.findFirst({
-            where: {
-              userId,
-              type: 'streak',
-              createdAt: { gte: new Date(now.getTime() - 4 * 60 * 60 * 1000) }, // Within 4 hours
-            },
+          const streakBucket = Math.floor(now.getTime() / (4 * 60 * 60 * 1000));
+          const notificationId = `streak_warning:${userId}:${streakBucket}`;
+          const melissaVoice = getMelissaVoice("streak_warning", {
+            days: progress.streakCurrent,
           });
 
-          if (!recentStreakNotif) {
-            const melissaVoice = getMelissaVoice('streak_warning', { days: progress.streakCurrent });
+          const streakTitle = "Streak a rischio!";
+          const streakMessage = `La tua streak di ${progress.streakCurrent} giorni sta per finire!`;
 
-            const streakTitle = 'Streak a rischio!';
-            const streakMessage = `La tua streak di ${progress.streakCurrent} giorni sta per finire!`;
-
+          try {
             await prisma.notification.create({
               data: {
+                id: notificationId,
                 userId,
-                type: 'streak',
+                type: "streak",
                 title: streakTitle,
                 message: streakMessage,
-                actionUrl: '/maestri',
-                priority: 'high',
+                actionUrl: "/maestri",
+                priority: "high",
                 melissaVoice,
                 sentAt: now,
                 expiresAt: new Date(now.getTime() + 3 * 60 * 60 * 1000), // Expires in 3h
@@ -317,14 +330,21 @@ export async function POST(request: Request) {
               await sendPushToUser(userId, {
                 title: streakTitle,
                 body: streakMessage,
-                url: '/maestri',
-                tag: 'streak_warning',
+                url: "/maestri",
+                tag: "streak_warning",
                 requireInteraction: true, // High priority - keep visible
               });
             }
 
-            notificationsCreated.push('streak_warning');
-            logger.info('Created streak warning', { userId, streak: progress.streakCurrent });
+            notificationsCreated.push("streak_warning");
+            logger.info("Created streak warning", {
+              userId,
+              streak: progress.streakCurrent,
+            });
+          } catch (error) {
+            if (!isUniqueConstraintError(error)) {
+              throw error;
+            }
           }
         }
       }
@@ -336,7 +356,10 @@ export async function POST(request: Request) {
       types: notificationsCreated,
     });
   } catch (error) {
-    logger.error('Check due error', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to check due items' }, { status: 500 });
+    logger.error("Check due error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to check due items" },
+      { status: 500 },
+    );
   }
 }

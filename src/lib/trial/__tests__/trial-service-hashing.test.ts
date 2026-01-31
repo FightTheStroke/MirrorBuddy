@@ -36,6 +36,7 @@ vi.mock("@/lib/db", () => ({
     trialSession: {
       findFirst: vi.fn(),
       create: vi.fn(),
+      upsert: vi.fn(),
     },
   },
 }));
@@ -77,12 +78,12 @@ describe("Trial Service - IP Hashing", () => {
 
       // Mock prisma to capture the hash
       vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
-      (vi.mocked(prisma.trialSession.create) as any).mockImplementation(
+      (vi.mocked(prisma.trialSession.upsert) as any).mockImplementation(
         async (args: any) => {
           // Return created session with the hash
           return {
             id: "test-session-id",
-            ipHash: args.data.ipHash,
+            ipHash: args.create.ipHash,
             visitorId: "test-visitor",
             chatsUsed: 0,
             docsUsed: 0,
@@ -103,9 +104,9 @@ describe("Trial Service - IP Hashing", () => {
       await getOrCreateTrialSession(TEST_IP, "test-visitor");
 
       // Verify prisma.create was called with salted hash
-      expect(prisma.trialSession.create).toHaveBeenCalledWith(
+      expect(prisma.trialSession.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          create: expect.objectContaining({
             ipHash: expectedHash,
           }),
         }),
@@ -125,9 +126,9 @@ describe("Trial Service - IP Hashing", () => {
 
       vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
       let hash1 = "";
-      (vi.mocked(prisma.trialSession.create) as any).mockImplementation(
+      (vi.mocked(prisma.trialSession.upsert) as any).mockImplementation(
         async (args: any) => {
-          hash1 = args.data.ipHash;
+          hash1 = args.create.ipHash;
           return {
             id: "session-1",
             ipHash: hash1,
@@ -160,9 +161,9 @@ describe("Trial Service - IP Hashing", () => {
       vi.clearAllMocks();
       vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
       let hash2 = "";
-      (vi.mocked(prisma.trialSession.create) as any).mockImplementation(
+      (vi.mocked(prisma.trialSession.upsert) as any).mockImplementation(
         async (args: any) => {
-          hash2 = args.data.ipHash;
+          hash2 = args.create.ipHash;
           return {
             id: "session-2",
             ipHash: hash2,
@@ -201,11 +202,11 @@ describe("Trial Service - IP Hashing", () => {
       const { prisma } = await import("@/lib/db");
 
       vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
-      (vi.mocked(prisma.trialSession.create) as any).mockImplementation(
+      (vi.mocked(prisma.trialSession.upsert) as any).mockImplementation(
         async (args: any) => {
           return {
             id: "test-session",
-            ipHash: args.data.ipHash,
+            ipHash: args.create.ipHash,
             visitorId: "test-visitor",
             chatsUsed: 0,
             docsUsed: 0,
@@ -231,9 +232,9 @@ describe("Trial Service - IP Hashing", () => {
       );
 
       // Verify a hash was still produced (64 hex chars)
-      expect(prisma.trialSession.create).toHaveBeenCalledWith(
+      expect(prisma.trialSession.upsert).toHaveBeenCalledWith(
         expect.objectContaining({
-          data: expect.objectContaining({
+          create: expect.objectContaining({
             ipHash: expect.stringMatching(/^[a-f0-9]{64}$/),
           }),
         }),

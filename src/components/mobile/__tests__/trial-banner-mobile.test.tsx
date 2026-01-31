@@ -2,6 +2,26 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TrialBannerMobile } from "../trial-banner-mobile";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock useDeviceType hook
 vi.mock("@/hooks/use-device-type", () => ({
   useDeviceType: vi.fn(),
@@ -13,7 +33,10 @@ vi.mock("framer-motion", () => ({
     div: (props: any) => {
       const { children, ...restProps } = props;
       return (
-        <div data-testid={props["data-testid"]} {...restProps}>
+        <div
+          data-testid={props["data-testid"]}
+          {...stripMotionProps(restProps)}
+        >
           {children}
         </div>
       );

@@ -59,6 +59,7 @@ describe("CostPanel", () => {
   });
 
   it("renders loading state initially", () => {
+    mockFetch.mockImplementationOnce(() => new Promise(() => {}));
     render(<CostPanel />);
     expect(document.querySelector(".animate-pulse")).toBeInTheDocument();
   });
@@ -219,8 +220,6 @@ describe("CostPanel", () => {
       expect(screen.getByText("Cost Monitoring (24h)")).toBeInTheDocument();
     });
 
-    expect(
-      screen.queryByText("Active Voice Sessions"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Active Voice Sessions")).not.toBeInTheDocument();
   });
 });

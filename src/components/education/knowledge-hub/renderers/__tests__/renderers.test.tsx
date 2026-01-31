@@ -9,6 +9,26 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock next-intl with Italian translations for internationalized renderers
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
@@ -26,10 +46,14 @@ vi.mock("next-intl", () => ({
 vi.mock("framer-motion", () => ({
   motion: {
     div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-      <div {...props}>{children}</div>
+      <div {...stripMotionProps(props as Record<string, unknown>)}>
+        {children}
+      </div>
     ),
     span: ({ children, ...props }: React.HTMLAttributes<HTMLSpanElement>) => (
-      <span {...props}>{children}</span>
+      <span {...stripMotionProps(props as Record<string, unknown>)}>
+        {children}
+      </span>
     ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => (

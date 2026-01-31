@@ -3,15 +3,15 @@
  * Handles persistence for points, achievements, streaks
  */
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   getCurrentSeason,
   calculateLevel,
   calculateTier,
   calculateStreakMultiplier,
   checkAchievementRequirement,
-} from './gamification-helpers';
+} from "./gamification-helpers";
 
 /**
  * Get or create user gamification record
@@ -27,8 +27,11 @@ export async function getOrCreateGamification(userId: string) {
 
   if (!gamification) {
     const currentSeason = getCurrentSeason();
-    gamification = await prisma.userGamification.create({
-      data: {
+    // Use upsert to prevent race condition (ADR 0105)
+    gamification = await prisma.userGamification.upsert({
+      where: { userId },
+      update: {},
+      create: {
         userId,
         currentSeason,
         seasonStartDate: new Date(),
@@ -39,19 +42,25 @@ export async function getOrCreateGamification(userId: string) {
       },
     });
 
-    // Create streak record
-    await prisma.dailyStreak.create({
-      data: { gamificationId: gamification.id },
-    });
+    // Create streak record if not exists (upsert by gamificationId)
+    if (!gamification.streak) {
+      try {
+        await prisma.dailyStreak.create({
+          data: { gamificationId: gamification.id },
+        });
+      } catch {
+        // Ignore duplicate key - streak already created by concurrent request
+      }
 
-    // Refetch with streak
-    gamification = await prisma.userGamification.findUnique({
-      where: { userId },
-      include: {
-        streak: true,
-        achievements: { include: { achievement: true } },
-      },
-    });
+      // Refetch with streak
+      gamification = await prisma.userGamification.findUnique({
+        where: { userId },
+        include: {
+          streak: true,
+          achievements: { include: { achievement: true } },
+        },
+      });
+    }
   }
 
   return gamification!;
@@ -65,13 +74,15 @@ export async function awardPoints(
   points: number,
   reason: string,
   sourceId?: string,
-  sourceType?: string
+  sourceType?: string,
 ) {
   const gamification = await getOrCreateGamification(userId);
   const streak = gamification.streak;
 
   // Calculate multiplier based on streak
-  const multiplier = streak ? calculateStreakMultiplier(streak.currentStreak) : 1.0;
+  const multiplier = streak
+    ? calculateStreakMultiplier(streak.currentStreak)
+    : 1.0;
 
   const finalPoints = Math.round(points * multiplier);
   const newTotal = gamification.totalPoints + finalPoints;
@@ -104,7 +115,12 @@ export async function awardPoints(
     },
   });
 
-  logger.info('Points awarded', { userId, points: finalPoints, reason, newTotal });
+  logger.info("Points awarded", {
+    userId,
+    points: finalPoints,
+    reason,
+    newTotal,
+  });
 
   return {
     pointsAwarded: finalPoints,
@@ -140,7 +156,7 @@ export async function updateStreak(userId: string, minutesStudied: number) {
   const lastActivity = new Date(streak.lastActivityAt);
   const isNewDay = now.toDateString() !== lastActivity.toDateString();
   const daysSinceLastActivity = Math.floor(
-    (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24)
+    (now.getTime() - lastActivity.getTime()) / (1000 * 60 * 60 * 24),
   );
 
   let newCurrentStreak = streak.currentStreak;
@@ -184,11 +200,15 @@ export async function checkAchievements(userId: string) {
 
   // Get all achievements not yet unlocked by user
   const allAchievements = await prisma.achievement.findMany();
-  const userAchievementIds = new Set(gamification.achievements.map(ua => ua.achievementId));
-  const lockedAchievements = allAchievements.filter(a => !userAchievementIds.has(a.id));
+  const userAchievementIds = new Set(
+    gamification.achievements.map((ua) => ua.achievementId),
+  );
+  const lockedAchievements = allAchievements.filter(
+    (a) => !userAchievementIds.has(a.id),
+  );
 
   // Collect achievements to unlock (single pass check)
-  const toUnlock: Array<{ achievement: typeof allAchievements[0] }> = [];
+  const toUnlock: Array<{ achievement: (typeof allAchievements)[0] }> = [];
   for (const achievement of lockedAchievements) {
     const requirement = JSON.parse(achievement.requirement);
     const shouldUnlock = checkAchievementRequirement(requirement, {
@@ -214,19 +234,36 @@ export async function checkAchievements(userId: string) {
           achievementId: achievement.id,
           progress: 100,
         },
-      })
-    )
+      }),
+    ),
   );
 
   // Calculate total bonus points and award once (avoid N calls to awardPoints)
-  const totalBonusPoints = toUnlock.reduce((sum, { achievement }) => sum + achievement.points, 0);
+  const totalBonusPoints = toUnlock.reduce(
+    (sum, { achievement }) => sum + achievement.points,
+    0,
+  );
   if (totalBonusPoints > 0) {
-    const achievementIds = toUnlock.map(({ achievement }) => achievement.id).join(',');
-    await awardPoints(userId, totalBonusPoints, 'achievement_bonus', achievementIds, 'Achievement');
+    const achievementIds = toUnlock
+      .map(({ achievement }) => achievement.id)
+      .join(",");
+    await awardPoints(
+      userId,
+      totalBonusPoints,
+      "achievement_bonus",
+      achievementIds,
+      "Achievement",
+    );
   }
 
-  const unlockedAchievements = toUnlock.map(({ achievement }) => achievement.code);
-  logger.info('Achievements unlocked', { userId, achievements: unlockedAchievements, bonusPoints: totalBonusPoints });
+  const unlockedAchievements = toUnlock.map(
+    ({ achievement }) => achievement.code,
+  );
+  logger.info("Achievements unlocked", {
+    userId,
+    achievements: unlockedAchievements,
+    bonusPoints: totalBonusPoints,
+  });
 
   return unlockedAchievements;
 }
@@ -237,9 +274,10 @@ export async function checkAchievements(userId: string) {
 export async function getProgression(userId: string) {
   const gamification = await getOrCreateGamification(userId);
 
-  const pointsToNextLevel = (gamification.level * 1000) - gamification.seasonPoints;
+  const pointsToNextLevel =
+    gamification.level * 1000 - gamification.seasonPoints;
   const progressPercent = Math.round(
-    ((gamification.seasonPoints % 1000) / 1000) * 100
+    ((gamification.seasonPoints % 1000) / 1000) * 100,
   );
 
   return {
@@ -251,12 +289,14 @@ export async function getProgression(userId: string) {
     currentSeason: gamification.currentSeason,
     pointsToNextLevel: Math.max(0, pointsToNextLevel),
     progressPercent,
-    streak: gamification.streak ? {
-      current: gamification.streak.currentStreak,
-      longest: gamification.streak.longestStreak,
-      todayMinutes: gamification.streak.todayMinutes,
-      goalMinutes: gamification.streak.dailyGoalMinutes,
-      goalMet: gamification.streak.goalMetToday,
-    } : null,
+    streak: gamification.streak
+      ? {
+          current: gamification.streak.currentStreak,
+          longest: gamification.streak.longestStreak,
+          todayMinutes: gamification.streak.todayMinutes,
+          goalMinutes: gamification.streak.dailyGoalMinutes,
+          goalMet: gamification.streak.goalMetToday,
+        }
+      : null,
   };
 }

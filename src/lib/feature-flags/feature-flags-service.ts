@@ -109,15 +109,15 @@ export async function initializeFlags(): Promise<void> {
   if (initialized) return;
 
   try {
-    // Load global config
-    const globalConfig = await prisma.globalConfig.findUnique({
+    // Load global config (create if missing)
+    const globalConfig = await prisma.globalConfig.upsert({
       where: { id: "global" },
+      update: {},
+      create: { id: "global", killSwitch: false },
     });
 
-    if (globalConfig) {
-      globalKillSwitch = globalConfig.killSwitch;
-      globalKillSwitchReason = globalConfig.killSwitchReason ?? undefined;
-    }
+    globalKillSwitch = globalConfig.killSwitch;
+    globalKillSwitchReason = globalConfig.killSwitchReason ?? undefined;
 
     // Load existing flags from DB
     const dbFlags = await prisma.featureFlag.findMany();
@@ -141,9 +141,11 @@ export async function initializeFlags(): Promise<void> {
           updatedBy: existing.updatedBy ?? undefined,
         });
       } else {
-        // Seed to DB and cache
-        const newFlag = await prisma.featureFlag.create({
-          data: {
+        // Seed to DB and cache (upsert for race condition safety - ADR 0105)
+        const newFlag = await prisma.featureFlag.upsert({
+          where: { id },
+          update: {},
+          create: {
             id,
             name: config.name,
             description: config.description,
@@ -163,13 +165,6 @@ export async function initializeFlags(): Promise<void> {
           updatedAt: newFlag.updatedAt,
         });
       }
-    }
-
-    // Ensure global config exists
-    if (!globalConfig) {
-      await prisma.globalConfig.create({
-        data: { id: "global", killSwitch: false },
-      });
     }
 
     initialized = true;

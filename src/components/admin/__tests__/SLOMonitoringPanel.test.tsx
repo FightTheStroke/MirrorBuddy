@@ -5,7 +5,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
-import { render, screen, fireEvent, waitFor, cleanup } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  cleanup,
+} from "@testing-library/react";
 import { SLOMonitoringPanel } from "../SLOMonitoringPanel";
 
 // Mock fetch
@@ -112,6 +118,7 @@ describe("SLOMonitoringPanel", () => {
   });
 
   it("renders loading state initially", () => {
+    mockFetch.mockImplementationOnce(() => new Promise(() => {}));
     render(<SLOMonitoringPanel />);
     expect(document.querySelector(".animate-pulse")).toBeInTheDocument();
   });

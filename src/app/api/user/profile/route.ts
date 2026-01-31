@@ -4,23 +4,31 @@
 // PUT: Update profile
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
 
 // #92: Zod schema for profile validation
-const ProfileUpdateSchema = z.object({
-  name: z.string().max(100).optional(),
-  age: z.number().int().min(5).max(100).optional(),
-  schoolYear: z.number().int().min(1).max(13).optional(),
-  schoolLevel: z.enum(['elementare', 'media', 'superiore']).optional(),
-  gradeLevel: z.string().max(20).optional(),
-  learningGoals: z.array(z.string().max(200)).max(20).optional(),
-  preferredCoach: z.enum(['melissa', 'roberto', 'chiara', 'andrea', 'favij']).nullable().optional(),
-  preferredBuddy: z.enum(['mario', 'noemi', 'enea', 'bruno', 'sofia']).nullable().optional(),
-}).strict();
+const ProfileUpdateSchema = z
+  .object({
+    name: z.string().max(100).optional(),
+    age: z.number().int().min(5).max(100).optional(),
+    schoolYear: z.number().int().min(1).max(13).optional(),
+    schoolLevel: z.enum(["elementare", "media", "superiore"]).optional(),
+    gradeLevel: z.string().max(20).optional(),
+    learningGoals: z.array(z.string().max(200)).max(20).optional(),
+    preferredCoach: z
+      .enum(["melissa", "roberto", "chiara", "andrea", "favij"])
+      .nullable()
+      .optional(),
+    preferredBuddy: z
+      .enum(["mario", "noemi", "enea", "bruno", "sofia"])
+      .nullable()
+      .optional(),
+  })
+  .strict();
 
 export async function GET() {
   try {
@@ -30,27 +38,22 @@ export async function GET() {
     }
     const userId = auth.userId!;
 
-    let profile = await prisma.profile.findUnique({
+    const profile = await prisma.profile.upsert({
       where: { userId },
+      update: {},
+      create: { userId },
     });
-
-    if (!profile) {
-      // Create default profile
-      profile = await prisma.profile.create({
-        data: { userId },
-      });
-    }
 
     // Parse learningGoals from JSON string
     return NextResponse.json({
       ...profile,
-      learningGoals: JSON.parse(profile.learningGoals || '[]'),
+      learningGoals: JSON.parse(profile.learningGoals || "[]"),
     });
   } catch (error) {
-    logger.error('Profile GET error', { error: String(error) });
+    logger.error("Profile GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get profile' },
-      { status: 500 }
+      { error: "Failed to get profile" },
+      { status: 500 },
     );
   }
 }
@@ -70,10 +73,10 @@ export async function PUT(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid profile data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid profile data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -95,13 +98,13 @@ export async function PUT(request: NextRequest) {
 
     return NextResponse.json({
       ...profile,
-      learningGoals: JSON.parse(profile.learningGoals || '[]'),
+      learningGoals: JSON.parse(profile.learningGoals || "[]"),
     });
   } catch (error) {
-    logger.error('Profile PUT error', { error: String(error) });
+    logger.error("Profile PUT error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to update profile' },
-      { status: 500 }
+      { error: "Failed to update profile" },
+      { status: 500 },
     );
   }
 }

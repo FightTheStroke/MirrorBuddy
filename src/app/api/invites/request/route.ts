@@ -60,9 +60,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check for existing request
+    // Use upsert to prevent race condition (ADR 0105)
+    // If request exists, return conflict. Otherwise create atomically.
+    const normalizedEmail = email.toLowerCase().trim();
     const existing = await prisma.inviteRequest.findUnique({
-      where: { email: email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (existing) {
@@ -72,15 +74,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create invite request
-    const inviteRequest = await prisma.inviteRequest.create({
-      data: {
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
-        motivation: motivation.trim(),
-        trialSessionId: trialSessionId || null,
-      },
-    });
+    let inviteRequest;
+    try {
+      inviteRequest = await prisma.inviteRequest.create({
+        data: {
+          name: name.trim(),
+          email: normalizedEmail,
+          motivation: motivation.trim(),
+          trialSessionId: trialSessionId || null,
+        },
+      });
+    } catch (err) {
+      // Handle race condition: concurrent request created the same email
+      if (err instanceof Error && err.message.includes("Unique constraint")) {
+        return NextResponse.json(
+          { error: "Questa email ha gia una richiesta in corso" },
+          { status: 409 },
+        );
+      }
+      throw err;
+    }
 
     logger.info("Beta request created", {
       inviteId: inviteRequest.id,

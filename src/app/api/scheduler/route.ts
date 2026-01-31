@@ -3,23 +3,34 @@
 // Study scheduling with notifications for proactive learning (Issue #27)
 // ============================================================================
 
-import { NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { checkRateLimit, getClientIdentifier, RATE_LIMITS, rateLimitResponse } from '@/lib/rate-limit';
-import { DEFAULT_NOTIFICATION_PREFERENCES, type NotificationPreferences } from '@/lib/scheduler/types';
+import { NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import {
+  checkRateLimit,
+  getClientIdentifier,
+  RATE_LIMITS,
+  rateLimitResponse,
+} from "@/lib/rate-limit";
+import {
+  DEFAULT_NOTIFICATION_PREFERENCES,
+  type NotificationPreferences,
+} from "@/lib/scheduler/types";
 import {
   createScheduleSessionData,
   createReminderData,
   updateSessionData,
   updateReminderData,
-} from './helpers';
+} from "./helpers";
 
 // GET - Get user's study schedule
 export async function GET(request: Request) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `scheduler:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -33,36 +44,29 @@ export async function GET(request: Request) {
     const userId = auth.userId!;
 
     // Get or create schedule
-    let schedule = await prisma.studySchedule.findUnique({
+    const schedule = await prisma.studySchedule.upsert({
       where: { userId },
+      update: {},
+      create: {
+        userId,
+        preferences: JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES),
+      },
       include: {
         sessions: {
           where: { active: true },
-          orderBy: [{ dayOfWeek: 'asc' }, { time: 'asc' }],
+          orderBy: [{ dayOfWeek: "asc" }, { time: "asc" }],
         },
         reminders: {
           where: { active: true },
-          orderBy: { datetime: 'asc' },
+          orderBy: { datetime: "asc" },
         },
       },
     });
 
-    if (!schedule) {
-      // Create default schedule
-      schedule = await prisma.studySchedule.create({
-        data: {
-          userId,
-          preferences: JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES),
-        },
-        include: {
-          sessions: true,
-          reminders: true,
-        },
-      });
-    }
-
     // Parse preferences
-    const preferences = JSON.parse(schedule.preferences || '{}') as NotificationPreferences;
+    const preferences = JSON.parse(
+      schedule.preferences || "{}",
+    ) as NotificationPreferences;
 
     return NextResponse.json({
       id: schedule.id,
@@ -73,15 +77,21 @@ export async function GET(request: Request) {
       updatedAt: schedule.updatedAt,
     });
   } catch (error) {
-    logger.error('Scheduler GET error', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to get schedule' }, { status: 500 });
+    logger.error("Scheduler GET error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to get schedule" },
+      { status: 500 },
+    );
   }
 }
 
 // POST - Create a new scheduled session or reminder
 export async function POST(request: Request) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `scheduler:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -98,20 +108,16 @@ export async function POST(request: Request) {
     const { type, ...data } = body;
 
     // Ensure schedule exists
-    let schedule = await prisma.studySchedule.findUnique({
+    const schedule = await prisma.studySchedule.upsert({
       where: { userId },
+      update: {},
+      create: {
+        userId,
+        preferences: JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES),
+      },
     });
 
-    if (!schedule) {
-      schedule = await prisma.studySchedule.create({
-        data: {
-          userId,
-          preferences: JSON.stringify(DEFAULT_NOTIFICATION_PREFERENCES),
-        },
-      });
-    }
-
-    if (type === 'session') {
+    if (type === "session") {
       // Create scheduled session
       const sessionData = createScheduleSessionData(data);
       const session = await prisma.scheduledSession.create({
@@ -122,11 +128,14 @@ export async function POST(request: Request) {
         },
       });
 
-      logger.info('Created scheduled session', { userId, sessionId: session.id });
+      logger.info("Created scheduled session", {
+        userId,
+        sessionId: session.id,
+      });
       return NextResponse.json(session, { status: 201 });
     }
 
-    if (type === 'reminder') {
+    if (type === "reminder") {
       // Create custom reminder
       const reminderData = createReminderData(data);
       const reminder = await prisma.customReminder.create({
@@ -137,21 +146,33 @@ export async function POST(request: Request) {
         },
       });
 
-      logger.info('Created custom reminder', { userId, reminderId: reminder.id });
+      logger.info("Created custom reminder", {
+        userId,
+        reminderId: reminder.id,
+      });
       return NextResponse.json(reminder, { status: 201 });
     }
 
-    return NextResponse.json({ error: 'Invalid type. Must be "session" or "reminder"' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Invalid type. Must be "session" or "reminder"' },
+      { status: 400 },
+    );
   } catch (error) {
-    logger.error('Scheduler POST error', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to create schedule item' }, { status: 500 });
+    logger.error("Scheduler POST error", { error: String(error) });
+    return NextResponse.json(
+      { error: "Failed to create schedule item" },
+      { status: 500 },
+    );
   }
 }
 
 // PATCH - Update preferences or schedule item
 export async function PATCH(request: Request) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `scheduler:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -167,26 +188,29 @@ export async function PATCH(request: Request) {
     const body = await request.json();
     const { type, id, ...data } = body;
 
-    if (type === 'preferences') {
+    if (type === "preferences") {
       // Update notification preferences
       const schedule = await prisma.studySchedule.upsert({
         where: { userId },
         create: {
           userId,
-          preferences: JSON.stringify({ ...DEFAULT_NOTIFICATION_PREFERENCES, ...data }),
+          preferences: JSON.stringify({
+            ...DEFAULT_NOTIFICATION_PREFERENCES,
+            ...data,
+          }),
         },
         update: {
           preferences: JSON.stringify(data),
         },
       });
 
-      logger.info('Updated notification preferences', { userId });
+      logger.info("Updated notification preferences", { userId });
       return NextResponse.json({
-        preferences: JSON.parse(schedule.preferences || '{}'),
+        preferences: JSON.parse(schedule.preferences || "{}"),
       });
     }
 
-    if (type === 'session' && id) {
+    if (type === "session" && id) {
       // Update session
       const sessionData = updateSessionData(data);
       const session = await prisma.scheduledSession.update({
@@ -197,7 +221,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json(session);
     }
 
-    if (type === 'reminder' && id) {
+    if (type === "reminder" && id) {
       // Update reminder
       const reminderData = updateReminderData(data);
       const reminder = await prisma.customReminder.update({
@@ -208,17 +232,20 @@ export async function PATCH(request: Request) {
       return NextResponse.json(reminder);
     }
 
-    return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
+    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   } catch (error) {
-    logger.error('Scheduler PATCH error', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to update' }, { status: 500 });
+    logger.error("Scheduler PATCH error", { error: String(error) });
+    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
 
 // DELETE - Delete a session or reminder
 export async function DELETE(request: Request) {
   const clientId = getClientIdentifier(request);
-  const rateLimit = checkRateLimit(`scheduler:${clientId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(
+    `scheduler:${clientId}`,
+    RATE_LIMITS.GENERAL,
+  );
 
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
@@ -232,33 +259,33 @@ export async function DELETE(request: Request) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const type = searchParams.get('type');
-    const id = searchParams.get('id');
+    const type = searchParams.get("type");
+    const id = searchParams.get("id");
 
     if (!type || !id) {
       return NextResponse.json(
-        { error: 'type and id are required' },
-        { status: 400 }
+        { error: "type and id are required" },
+        { status: 400 },
       );
     }
 
-    if (type === 'session') {
+    if (type === "session") {
       await prisma.scheduledSession.delete({
         where: { id, userId },
       });
-      logger.info('Deleted scheduled session', { userId, sessionId: id });
-    } else if (type === 'reminder') {
+      logger.info("Deleted scheduled session", { userId, sessionId: id });
+    } else if (type === "reminder") {
       await prisma.customReminder.delete({
         where: { id, userId },
       });
-      logger.info('Deleted custom reminder', { userId, reminderId: id });
+      logger.info("Deleted custom reminder", { userId, reminderId: id });
     } else {
-      return NextResponse.json({ error: 'Invalid type' }, { status: 400 });
+      return NextResponse.json({ error: "Invalid type" }, { status: 400 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Scheduler DELETE error', { error: String(error) });
-    return NextResponse.json({ error: 'Failed to delete' }, { status: 500 });
+    logger.error("Scheduler DELETE error", { error: String(error) });
+    return NextResponse.json({ error: "Failed to delete" }, { status: 500 });
   }
 }

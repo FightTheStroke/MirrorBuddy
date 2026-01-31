@@ -5,7 +5,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react";
 import { DirectInviteModal } from "../direct-invite-modal";
 
 // Mock csrfFetch
@@ -174,10 +180,16 @@ describe("DirectInviteModal", () => {
       expect(screen.getByText("testuser1a2b")).toBeInTheDocument();
     });
 
+    vi.useFakeTimers();
     const copyButton = screen.getByTitle("Copia username");
     fireEvent.click(copyButton);
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("testuser1a2b");
+
+    await act(async () => {
+      vi.runOnlyPendingTimers();
+    });
+    vi.useRealTimers();
   });
 
   it("closes modal on Escape key", () => {

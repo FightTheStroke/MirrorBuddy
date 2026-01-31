@@ -74,8 +74,14 @@ export async function getOrCreateTrialSession(
   if (!session) {
     const coach = getRandomItems(COACHES, 1)[0];
 
-    session = await prisma.trialSession.create({
-      data: {
+    // Use upsert to handle concurrent requests (race condition:
+    // two workers find null, both try create, second fails with duplicate key)
+    session = await prisma.trialSession.upsert({
+      where: {
+        ipHash_visitorId: { ipHash, visitorId },
+      },
+      update: {},
+      create: {
         ipHash,
         visitorId,
         chatsUsed: 0,

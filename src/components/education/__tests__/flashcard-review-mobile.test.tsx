@@ -11,6 +11,26 @@ import userEvent from "@testing-library/user-event";
 import { FlashcardReviewMobile } from "../flashcard-review-mobile";
 import type { FlashcardDeck } from "@/types";
 
+const stripMotionProps = (props: Record<string, unknown>) => {
+  const {
+    whileHover: _whileHover,
+    whileTap: _whileTap,
+    initial: _initial,
+    animate: _animate,
+    exit: _exit,
+    transition: _transition,
+    variants: _variants,
+    layout: _layout,
+    layoutId: _layoutId,
+    drag: _drag,
+    dragConstraints: _dragConstraints,
+    dragElastic: _dragElastic,
+    dragMomentum: _dragMomentum,
+    ...rest
+  } = props;
+  return rest;
+};
+
 // Mock framer-motion to avoid animation issues in tests
 vi.mock("framer-motion", () => ({
   motion: {
@@ -18,19 +38,19 @@ vi.mock("framer-motion", () => ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <div {...props}>{children}</div>
+      <div {...stripMotionProps(props)}>{children}</div>
     ),
     button: ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <button {...props}>{children}</button>
+      <button {...stripMotionProps(props)}>{children}</button>
     ),
     p: ({
       children,
       ...props
     }: React.PropsWithChildren<Record<string, unknown>>) => (
-      <p {...props}>{children}</p>
+      <p {...stripMotionProps(props)}>{children}</p>
     ),
   },
   AnimatePresence: ({ children }: React.PropsWithChildren) => <>{children}</>,

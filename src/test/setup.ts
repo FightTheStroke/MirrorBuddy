@@ -158,6 +158,73 @@ vi.mock("next-intl", () => ({
 }));
 
 // -----------------------------------------------------------------------------
+// DOM API stabilizers for jsdom
+// -----------------------------------------------------------------------------
+if (typeof window !== "undefined") {
+  // Avoid jsdom "Not implemented" warnings for media playback
+  Object.defineProperty(window.HTMLMediaElement.prototype, "play", {
+    configurable: true,
+    value: vi.fn().mockResolvedValue(undefined),
+  });
+  Object.defineProperty(window.HTMLMediaElement.prototype, "pause", {
+    configurable: true,
+    value: vi.fn(),
+  });
+  Object.defineProperty(window.HTMLMediaElement.prototype, "load", {
+    configurable: true,
+    value: vi.fn(),
+  });
+
+  // Prevent jsdom navigation warnings during tests
+  try {
+    const currentLocation = window.location;
+    // Ensure we can redefine location in jsdom
+    if (Object.prototype.hasOwnProperty.call(window, "location")) {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (window as any).location;
+      } catch {
+        // ignore delete failures
+      }
+    }
+    Object.defineProperty(window, "location", {
+      configurable: true,
+      writable: true,
+      value: {
+        ...currentLocation,
+        assign: vi.fn(),
+        replace: vi.fn(),
+        reload: vi.fn(),
+      },
+    });
+  } catch {
+    // Fallback for environments where window.location is non-configurable
+    Object.defineProperty(window.location, "assign", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    Object.defineProperty(window.location, "replace", {
+      configurable: true,
+      value: vi.fn(),
+    });
+    Object.defineProperty(window.location, "reload", {
+      configurable: true,
+      value: vi.fn(),
+    });
+  }
+
+  try {
+    Object.defineProperty(window.location, "href", {
+      configurable: true,
+      writable: true,
+      value: window.location.href,
+    });
+  } catch {
+    // If redefining href fails, ignore and rely on assign/replace mocks
+  }
+}
+
+// -----------------------------------------------------------------------------
 // Centralized logger mocking
 // -----------------------------------------------------------------------------
 // Tests should use the shared logger instead of console.log.

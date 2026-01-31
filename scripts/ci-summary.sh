@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# ci-summary.sh - Compact CI diagnostics for token-efficient log reading
-# Runs lint, typecheck, build (optionally unit tests) and outputs ONLY
-# errors/warnings in a compact summary. Designed to be read by Claude
-# instead of full verbose logs.
+# ci-summary.sh - Compact CI diagnostics (token-efficient)
+# ALL output captured silently. Only structured summary printed.
+# Target: ~10-30 lines output regardless of codebase size.
 #
 # Usage:
 #   ./scripts/ci-summary.sh          # lint + typecheck + build
@@ -19,145 +18,116 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_DIR"
 
-# Colors (only if terminal supports it)
-if [[ -t 1 ]]; then
-  RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'
-  BOLD='\033[1m'; NC='\033[0m'
-else
-  RED=''; GREEN=''; YELLOW=''; BOLD=''; NC=''
-fi
-
 MODE="${1:---default}"
-TOTAL_ERRORS=0
-TOTAL_WARNINGS=0
-SUMMARY=""
+ERRORS=0
+WARNINGS=0
+RESULTS=""
 
-# --- Helper functions ---
+strip_ansi() { perl -pe 's/\e\[[0-9;]*m//g' "$1"; }
 
-add_summary() {
-  local step="$1" status="$2" errors="$3" details="$4"
-  if [[ "$status" == "PASS" ]]; then
-    SUMMARY+="${GREEN}PASS${NC} ${step}"
-  elif [[ "$status" == "WARN" ]]; then
-    SUMMARY+="${YELLOW}WARN${NC} ${step} (${errors} warnings)"
-  else
-    SUMMARY+="${RED}FAIL${NC} ${step} (${errors} errors)"
-  fi
-  SUMMARY+=$'\n'
+result() { RESULTS+="$1"$'\n'; }
+
+# Append indented detail lines from a variable (avoids subshell pipe issue)
+result_details() {
+  local details="$1"
   if [[ -n "$details" ]]; then
-    SUMMARY+="$details"$'\n'
+    while IFS= read -r line; do result "  $line"; done <<< "$details"
   fi
 }
 
 run_lint() {
-  echo -e "${BOLD}[1/4] Lint${NC}"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  if npm run lint 2>&1 | tee "$tmpfile" | tail -1 > /dev/null 2>&1; then
-    local warn_count
-    warn_count=$(grep -c "warning" "$tmpfile" 2>/dev/null || echo "0")
-    if [[ "$warn_count" -gt 0 ]]; then
-      local details
-      details=$(grep -E "warning|error" "$tmpfile" | head -20)
-      TOTAL_WARNINGS=$((TOTAL_WARNINGS + warn_count))
-      add_summary "Lint" "WARN" "$warn_count" "$details"
+  local tmp; tmp=$(mktemp)
+  if npm run lint > "$tmp" 2>&1; then
+    local wc; wc=$(strip_ansi "$tmp" | grep -c " warning " || true)
+    if [[ "$wc" -gt 0 ]]; then
+      WARNINGS=$((WARNINGS + wc))
+      result "[WARN] Lint ($wc warnings)"
+      local d; d=$(strip_ansi "$tmp" | grep " warning " | \
+        sed 's/.*warning  //' | sort | uniq -c | sort -rn | head -5)
+      result_details "$d"
     else
-      add_summary "Lint" "PASS" "0" ""
+      result "[PASS] Lint"
     fi
   else
-    local err_count details
-    err_count=$(grep -c "error" "$tmpfile" 2>/dev/null || echo "?")
-    details=$(grep -E "error|warning" "$tmpfile" | head -30)
-    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-    add_summary "Lint" "FAIL" "$err_count" "$details"
+    local ec; ec=$(strip_ansi "$tmp" | grep -c " error " || true)
+    ERRORS=$((ERRORS + 1))
+    result "[FAIL] Lint ($ec errors)"
+    local d; d=$(strip_ansi "$tmp" | grep " error " | head -10)
+    result_details "$d"
   fi
-  rm -f "$tmpfile"
+  rm -f "$tmp"
 }
 
 run_typecheck() {
-  echo -e "${BOLD}[2/4] Typecheck${NC}"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  if npm run typecheck 2>&1 > "$tmpfile"; then
-    add_summary "Typecheck" "PASS" "0" ""
+  local tmp; tmp=$(mktemp)
+  if npm run typecheck > "$tmp" 2>&1; then
+    result "[PASS] Typecheck"
   else
-    local err_count details
-    err_count=$(grep -c "error TS" "$tmpfile" 2>/dev/null || echo "?")
-    # Show unique error codes + first occurrence
-    details=$(grep "error TS" "$tmpfile" | \
-      sed 's/.*\(error TS[0-9]*\)/\1/' | \
-      sort | uniq -c | sort -rn | head -15)
-    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-    add_summary "Typecheck" "FAIL" "$err_count" "$details"
+    local ec; ec=$(strip_ansi "$tmp" | grep -c "error TS" || true)
+    ERRORS=$((ERRORS + 1))
+    result "[FAIL] Typecheck ($ec errors)"
+    local d; d=$(strip_ansi "$tmp" | grep "error TS" | \
+      sed 's/.*\(error TS[0-9]*:.*\)/\1/' | sort | uniq -c | sort -rn | head -10)
+    result_details "$d"
   fi
-  rm -f "$tmpfile"
+  rm -f "$tmp"
 }
 
 run_build() {
-  echo -e "${BOLD}[3/4] Build${NC}"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  if npm run build 2>&1 > "$tmpfile"; then
-    local warn_count
-    warn_count=$(grep -ci "warn" "$tmpfile" 2>/dev/null || echo "0")
-    if [[ "$warn_count" -gt 0 ]]; then
-      local details
-      details=$(grep -i "warn" "$tmpfile" | head -10)
-      TOTAL_WARNINGS=$((TOTAL_WARNINGS + warn_count))
-      add_summary "Build" "WARN" "$warn_count" "$details"
+  local tmp; tmp=$(mktemp)
+  if npm run build > "$tmp" 2>&1; then
+    local wc; wc=$(strip_ansi "$tmp" | grep -ciE "^warn" || true)
+    if [[ "$wc" -gt 0 ]]; then
+      WARNINGS=$((WARNINGS + wc))
+      result "[WARN] Build ($wc warnings)"
+      local d; d=$(strip_ansi "$tmp" | grep -iE "^warn" | head -5)
+      result_details "$d"
     else
-      add_summary "Build" "PASS" "0" ""
+      result "[PASS] Build"
     fi
   else
-    local details
-    details=$(grep -iE "error|failed|Error:" "$tmpfile" | head -20)
-    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-    add_summary "Build" "FAIL" "?" "$details"
+    ERRORS=$((ERRORS + 1))
+    result "[FAIL] Build"
+    local d; d=$(strip_ansi "$tmp" | \
+      grep -iE "^error|Error:|Type error|Module not found" | head -10)
+    result_details "$d"
   fi
-  rm -f "$tmpfile"
+  rm -f "$tmp"
 }
 
 run_unit() {
-  echo -e "${BOLD}[4/4] Unit tests${NC}"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  if npm run test:unit 2>&1 > "$tmpfile"; then
-    local pass_line
-    pass_line=$(grep -E "Tests.*passed|Test Files" "$tmpfile" | tail -1)
-    add_summary "Unit tests" "PASS" "0" "$pass_line"
+  local tmp; tmp=$(mktemp)
+  if npm run test:unit > "$tmp" 2>&1; then
+    local s; s=$(strip_ansi "$tmp" | grep -E "Test(s| Files).*passed" | tail -1)
+    result "[PASS] Unit${s:+ ($s)}"
   else
-    local details
-    details=$(grep -E "FAIL|✗|AssertionError|Error|×" "$tmpfile" | head -20)
-    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-    add_summary "Unit tests" "FAIL" "?" "$details"
+    ERRORS=$((ERRORS + 1))
+    local fc; fc=$(strip_ansi "$tmp" | grep -cE "^ *(FAIL|×)" || true)
+    result "[FAIL] Unit ($fc failures)"
+    # Only actual failures - skip act() warnings, HTMLMediaElement noise
+    local d; d=$(strip_ansi "$tmp" | \
+      grep -E "^ *FAIL |^ *× |AssertionError|Expected.*Received" | \
+      grep -v "act()" | grep -v "HTMLMediaElement" | head -15)
+    result_details "$d"
   fi
-  rm -f "$tmpfile"
+  rm -f "$tmp"
 }
 
 run_i18n() {
-  echo -e "${BOLD}[i18n] Check${NC}"
-  local tmpfile
-  tmpfile=$(mktemp)
-
-  if npm run i18n:check 2>&1 > "$tmpfile"; then
-    add_summary "i18n check" "PASS" "0" ""
+  local tmp; tmp=$(mktemp)
+  if npm run i18n:check > "$tmp" 2>&1; then
+    result "[PASS] i18n"
   else
-    local details
-    details=$(grep -iE "missing|error|mismatch|warn" "$tmpfile" | head -20)
-    TOTAL_ERRORS=$((TOTAL_ERRORS + 1))
-    add_summary "i18n check" "FAIL" "?" "$details"
+    ERRORS=$((ERRORS + 1))
+    result "[FAIL] i18n"
+    local d; d=$(strip_ansi "$tmp" | grep -iE "missing|mismatch|error" | head -10)
+    result_details "$d"
   fi
-  rm -f "$tmpfile"
+  rm -f "$tmp"
 }
 
 # --- Main ---
-
-echo -e "${BOLD}=== CI Summary ===${NC}"
-echo ""
+echo "=== CI Summary ==="
 
 case "$MODE" in
   --lint)   run_lint ;;
@@ -169,17 +139,11 @@ case "$MODE" in
   *)        run_lint; run_typecheck; run_build ;;
 esac
 
-echo ""
-echo -e "${BOLD}=== Results ===${NC}"
-echo -e "$SUMMARY"
-
-if [[ "$TOTAL_ERRORS" -gt 0 ]]; then
-  echo -e "${RED}${BOLD}BLOCKED: ${TOTAL_ERRORS} step(s) failed${NC}"
-  exit 1
-elif [[ "$TOTAL_WARNINGS" -gt 0 ]]; then
-  echo -e "${YELLOW}${BOLD}OK with ${TOTAL_WARNINGS} warning(s)${NC}"
-  exit 0
+echo "$RESULTS"
+if [[ "$ERRORS" -gt 0 ]]; then
+  echo "BLOCKED: $ERRORS step(s) failed"; exit 1
+elif [[ "$WARNINGS" -gt 0 ]]; then
+  echo "OK with $WARNINGS warning(s)"; exit 0
 else
-  echo -e "${GREEN}${BOLD}ALL CLEAN${NC}"
-  exit 0
+  echo "ALL CLEAN"; exit 0
 fi

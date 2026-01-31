@@ -41,10 +41,12 @@ import {
 export async function loadAdaptiveProfile(
   userId: string,
 ): Promise<AdaptiveProfile> {
-  let progress = await prisma.progress.findUnique({ where: { userId } });
-  if (!progress) {
-    progress = await prisma.progress.create({ data: { userId } });
-  }
+  // Use upsert to prevent race condition (ADR 0105)
+  const progress = await prisma.progress.upsert({
+    where: { userId },
+    update: {},
+    create: { userId },
+  });
   return parseAdaptiveProfile(progress.adaptiveProfile);
 }
 

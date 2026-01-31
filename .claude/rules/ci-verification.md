@@ -2,39 +2,48 @@
 
 ## Token-Efficient Verification (MANDATORY)
 
-**ALWAYS** use `npm run ci:summary` instead of verbose CI commands.
+Two scripts optimized for AI agent consumption: minimal output, only errors/warnings.
 
-| Need            | Command                           | Output                          |
-| --------------- | --------------------------------- | ------------------------------- |
-| Full check      | `npm run ci:summary`              | lint+typecheck+build, ~20 lines |
-| With unit tests | `npm run ci:summary:full`         | + unit tests                    |
-| Lint only       | `./scripts/ci-summary.sh --lint`  | ~10 lines                       |
-| Types only      | `./scripts/ci-summary.sh --types` | ~10 lines                       |
-| Build only      | `./scripts/ci-summary.sh --build` | ~10 lines                       |
-| Unit tests only | `./scripts/ci-summary.sh --unit`  | ~10 lines                       |
-| i18n only       | `./scripts/ci-summary.sh --i18n`  | ~10 lines                       |
+### Local verification
+
+**ALWAYS** use `ci-summary.sh` instead of raw npm commands.
+
+| Need            | Command                           | Output    |
+| --------------- | --------------------------------- | --------- |
+| Full check      | `npm run ci:summary`              | ~10 lines |
+| With unit tests | `npm run ci:summary:full`         | ~15 lines |
+| Lint only       | `./scripts/ci-summary.sh --lint`  | ~5 lines  |
+| Types only      | `./scripts/ci-summary.sh --types` | ~5 lines  |
+| Build only      | `./scripts/ci-summary.sh --build` | ~5 lines  |
+| Unit tests only | `./scripts/ci-summary.sh --unit`  | ~5 lines  |
+| i18n only       | `./scripts/ci-summary.sh --i18n`  | ~5 lines  |
+
+### GitHub CI verification
+
+**ALWAYS** use `ci-check.sh` instead of raw gh commands.
+
+| Need                | Command                       | Output    |
+| ------------------- | ----------------------------- | --------- |
+| Latest run (branch) | `./scripts/ci-check.sh`       | ~25 lines |
+| Latest run (any)    | `./scripts/ci-check.sh --all` | ~25 lines |
+| Specific run        | `./scripts/ci-check.sh <id>`  | ~25 lines |
 
 ## NEVER use these standalone (token waste)
 
-- `npm run lint` (8k-15k tokens) -- use `ci:summary --lint`
-- `npm run typecheck` (5k-10k tokens) -- use `ci:summary --types`
-- `npm run build` (20k-50k tokens) -- use `ci:summary --build`
-- `npm run lint && npm run typecheck && npm run build` (35k-75k tokens)
+| Banned command                  | Tokens wasted | Use instead             |
+| ------------------------------- | ------------- | ----------------------- |
+| `npm run lint`                  | 8k-15k        | `ci-summary.sh --lint`  |
+| `npm run typecheck`             | 5k-10k        | `ci-summary.sh --types` |
+| `npm run build`                 | 20k-50k       | `ci-summary.sh --build` |
+| `npm run test:unit`             | 10k-30k       | `ci-summary.sh --unit`  |
+| `gh run view <id> --log`        | 100k+         | `ci-check.sh <id>`      |
+| `gh run view <id> --log-failed` | 5k-50k        | `ci-check.sh <id>`      |
 
 ## When verbose is allowed
 
 - Summary output is unclear and you need the full error context
 - Release scripts (`release:fast`, `release:gate`) -- they have own filtering
-- Piped commands with `| grep | head` (already filtered)
-
-## GitHub CI logs
-
-```bash
-# NEVER: gh run view <id> --log  (100k+ tokens)
-# ALWAYS:
-gh run view <id> --json conclusion,status,jobs
-gh run view <id> --log-failed | head -100
-```
+- Targeted test with pipe: `npm run test:unit -- path/file 2>&1 | tail -5`
 
 ## Enforcement
 

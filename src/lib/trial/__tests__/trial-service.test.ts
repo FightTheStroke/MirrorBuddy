@@ -15,6 +15,7 @@ vi.mock("@/lib/db", () => ({
       findFirst: vi.fn(),
       findUnique: vi.fn(),
       create: vi.fn(),
+      upsert: vi.fn(),
       update: vi.fn(),
     },
     user: {
@@ -26,14 +27,16 @@ vi.mock("@/lib/db", () => ({
 
 // Mock TierService to avoid actual DB calls
 vi.mock("@/lib/tier/tier-service", () => ({
-  TierService: vi.fn().mockImplementation(() => ({
-    getLimitsForUser: vi.fn().mockResolvedValue({
-      dailyMessages: 10,
-      dailyVoiceMinutes: 5,
-      dailyTools: 10,
-      maxDocuments: 1,
-    }),
-  })),
+  TierService: vi.fn().mockImplementation(function MockTierService() {
+    return {
+      getLimitsForUser: vi.fn().mockResolvedValue({
+        dailyMessages: 10,
+        dailyVoiceMinutes: 5,
+        dailyTools: 10,
+        maxDocuments: 1,
+      }),
+    };
+  }),
 }));
 
 import { prisma } from "@/lib/db";
@@ -123,28 +126,30 @@ describe("Trial Service", () => {
         assignedCoach: "melissa",
       };
 
-      vi.mocked(prisma.trialSession.create).mockResolvedValue(
+      vi.mocked(prisma.trialSession.upsert).mockResolvedValue(
         newSession as any,
       );
 
       const result = await getOrCreateTrialSession(mockIp, mockVisitorId);
 
-      expect(prisma.trialSession.create).toHaveBeenCalledWith({
-        data: expect.objectContaining({
-          visitorId: mockVisitorId,
-          chatsUsed: 0,
-          docsUsed: 0,
-          voiceSecondsUsed: 0,
-          toolsUsed: 0,
+      expect(prisma.trialSession.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({
+          create: expect.objectContaining({
+            visitorId: mockVisitorId,
+            chatsUsed: 0,
+            docsUsed: 0,
+            voiceSecondsUsed: 0,
+            toolsUsed: 0,
+          }),
         }),
-      });
+      );
 
       expect(result).toEqual(newSession);
     });
 
     it("assigns 3 random maestri to new session", async () => {
       vi.mocked(prisma.trialSession.findFirst).mockResolvedValue(null);
-      vi.mocked(prisma.trialSession.create).mockResolvedValue({
+      vi.mocked(prisma.trialSession.upsert).mockResolvedValue({
         id: "session-id",
         ipHash: "hash",
         visitorId: mockVisitorId,
@@ -158,11 +163,11 @@ describe("Trial Service", () => {
 
       await getOrCreateTrialSession(mockIp, mockVisitorId);
 
-      expect(prisma.trialSession.create).toHaveBeenCalled();
+      expect(prisma.trialSession.upsert).toHaveBeenCalled();
 
       // Verify maestri restrictions removed (empty array)
-      const createCall = vi.mocked(prisma.trialSession.create).mock.calls[0][0];
-      const maestriJson = createCall.data.assignedMaestri as string;
+      const upsertCall = vi.mocked(prisma.trialSession.upsert).mock.calls[0][0];
+      const maestriJson = upsertCall.create.assignedMaestri as string;
       const maestri = JSON.parse(maestriJson);
       expect(maestri).toHaveLength(0); // No maestri restrictions
     });
