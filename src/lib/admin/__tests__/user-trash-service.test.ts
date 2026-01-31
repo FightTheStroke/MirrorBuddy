@@ -19,6 +19,7 @@ vi.mock("@/lib/db", () => ({
     userPrivacyPreferences: { findUnique: vi.fn() },
     coppaConsent: { findUnique: vi.fn() },
     googleAccount: { findUnique: vi.fn() },
+    userSubscription: { findUnique: vi.fn() },
     userGamification: { findUnique: vi.fn() },
     userAchievement: { findMany: vi.fn() },
     dailyStreak: { findFirst: vi.fn() },
