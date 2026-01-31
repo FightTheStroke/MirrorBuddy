@@ -113,7 +113,7 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
             placeholder={t("searchPlaceholder")}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-8 pr-10 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm"
+            className="w-full pl-8 pr-10 py-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-violet-500 text-sm placeholder:text-slate-500 dark:placeholder:text-slate-400"
             aria-label={t("searchAriaLabel")}
           />
           {searchQuery && (
@@ -142,10 +142,10 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
         <button
           onClick={() => setSelectedSubject("all")}
           className={cn(
-            "px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+            "px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
             selectedSubject === "all"
-              ? "bg-violet-600 text-white"
-              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700",
+              ? "bg-violet-700 text-white"
+              : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700",
           )}
         >
           {t("allButton")}
@@ -158,10 +158,10 @@ export function MaestriGrid({ onMaestroSelect }: MaestriGridProps) {
               key={subject}
               onClick={() => setSelectedSubject(subject)}
               className={cn(
-                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all",
+                "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors",
                 isSelected
                   ? "text-white"
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700",
+                  : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700",
               )}
               style={
                 isSelected

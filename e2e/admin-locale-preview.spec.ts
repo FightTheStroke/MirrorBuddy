@@ -16,7 +16,7 @@
  * - Visual indicator shows when in preview mode
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 import { dismissBlockingModals } from "./admin-helpers";
 
 test.describe("Admin Locale Preview Functionality", () => {

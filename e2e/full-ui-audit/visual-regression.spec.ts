@@ -16,7 +16,7 @@
  * Threshold configured in playwright.config.ts (default: 10% pixel diff tolerance)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-fixtures";
 
 // Wait for content to stabilize before taking screenshots
 const WAIT_FOR_STABLE = 800; // ms

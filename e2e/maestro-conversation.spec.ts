@@ -17,7 +17,7 @@
  * - Dyscalculia (math anxiety, needs visual/concrete help)
  */
 
-import { test, expect, APIRequestContext } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "./fixtures/base-fixtures";
 
 // Skip AI-dependent tests in CI - Azure OpenAI not configured
 test.skip(!!process.env.CI, "Azure OpenAI not available in CI");

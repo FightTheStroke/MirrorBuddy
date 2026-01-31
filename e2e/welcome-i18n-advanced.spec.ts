@@ -87,6 +87,13 @@ test.describe("Welcome Flow - Advanced i18n Tests", () => {
       await localePage.goto("/welcome");
       await waitForLocale(localePage.page, localePage.locale);
 
+      // Wait for landing page sections to render
+      // TrialConsentGate has async useEffect that checks consent before rendering children
+      await localePage.page
+        .locator("section")
+        .first()
+        .waitFor({ state: "attached", timeout: 10000 });
+
       // Check for sections that should be present
       const sections = localePage.page.locator(
         "section, [role='region'], div[class*='section']",

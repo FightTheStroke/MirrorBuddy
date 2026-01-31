@@ -3,88 +3,88 @@
 // Tests for persistent data storage and retrieval
 // ============================================================================
 
-import { test, expect } from '@playwright/test';
+import { test, expect } from "./fixtures/base-fixtures";
 
-test.describe('Backend API: User & Settings', () => {
-  test('GET /api/user - creates user with cookie', async ({ request }) => {
-    const response = await request.get('/api/user');
+test.describe("Backend API: User & Settings", () => {
+  test("GET /api/user - creates user with cookie", async ({ request }) => {
+    const response = await request.get("/api/user");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
   });
 
-  test('GET /api/user/settings - returns settings', async ({ request }) => {
+  test("GET /api/user/settings - returns settings", async ({ request }) => {
     // First ensure user exists
-    await request.get('/api/user');
+    await request.get("/api/user");
 
-    const response = await request.get('/api/user/settings');
+    const response = await request.get("/api/user/settings");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     // Should return object (empty or with defaults)
-    expect(typeof data).toBe('object');
+    expect(typeof data).toBe("object");
   });
 
-  test('PUT /api/user/settings - updates settings', async ({ request }) => {
+  test("PUT /api/user/settings - updates settings", async ({ request }) => {
     // First ensure user exists
-    await request.get('/api/user');
+    await request.get("/api/user");
 
     const settings = {
-      theme: 'dark',
-      language: 'en',
-      accentColor: 'purple',
+      theme: "dark",
+      language: "en",
+      accentColor: "purple",
     };
 
-    const response = await request.put('/api/user/settings', {
+    const response = await request.put("/api/user/settings", {
       data: settings,
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(data.theme).toBe('dark');
-    expect(data.language).toBe('en');
-    expect(data.accentColor).toBe('purple');
+    expect(data.theme).toBe("dark");
+    expect(data.language).toBe("en");
+    expect(data.accentColor).toBe("purple");
 
     // Verify persistence
-    const getResponse = await request.get('/api/user/settings');
+    const getResponse = await request.get("/api/user/settings");
     const savedData = await getResponse.json();
-    expect(savedData.theme).toBe('dark');
+    expect(savedData.theme).toBe("dark");
   });
 
-  test('GET /api/user/profile - returns profile', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/user/profile - returns profile", async ({ request }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/user/profile');
+    const response = await request.get("/api/user/profile");
     expect(response.ok()).toBeTruthy();
   });
 
-  test('PUT /api/user/profile - updates profile', async ({ request }) => {
-    await request.get('/api/user');
+  test("PUT /api/user/profile - updates profile", async ({ request }) => {
+    await request.get("/api/user");
 
     const profile = {
-      name: 'Test Student',
+      name: "Test Student",
       age: 15,
-      schoolLevel: 'superiore',
-      learningGoals: ['Matematica', 'Fisica'],
+      schoolLevel: "superiore",
+      learningGoals: ["Matematica", "Fisica"],
     };
 
-    const response = await request.put('/api/user/profile', {
+    const response = await request.put("/api/user/profile", {
       data: profile,
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(data.name).toBe('Test Student');
+    expect(data.name).toBe("Test Student");
     expect(data.age).toBe(15);
   });
 });
 
-test.describe('Backend API: Progress & Gamification', () => {
-  test('GET /api/progress - returns progress', async ({ request }) => {
-    await request.get('/api/user');
+test.describe("Backend API: Progress & Gamification", () => {
+  test("GET /api/progress - returns progress", async ({ request }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/progress');
+    const response = await request.get("/api/progress");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -92,8 +92,8 @@ test.describe('Backend API: Progress & Gamification', () => {
     expect(data.level).toBeDefined();
   });
 
-  test('PUT /api/progress - updates progress', async ({ request }) => {
-    await request.get('/api/user');
+  test("PUT /api/progress - updates progress", async ({ request }) => {
+    await request.get("/api/user");
 
     const progress = {
       xp: 500,
@@ -103,7 +103,7 @@ test.describe('Backend API: Progress & Gamification', () => {
       questionsAsked: 25,
     };
 
-    const response = await request.put('/api/progress', {
+    const response = await request.put("/api/progress", {
       data: progress,
     });
     expect(response.ok()).toBeTruthy();
@@ -113,28 +113,32 @@ test.describe('Backend API: Progress & Gamification', () => {
     expect(data.level).toBe(3);
   });
 
-  test('POST /api/progress/sessions - creates study session', async ({ request }) => {
-    await request.get('/api/user');
+  test("POST /api/progress/sessions - creates study session", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     const session = {
-      maestroId: 'pythagoras',
-      subject: 'Mathematics',
+      maestroId: "pythagoras",
+      subject: "Mathematics",
     };
 
-    const response = await request.post('/api/progress/sessions', {
+    const response = await request.post("/api/progress/sessions", {
       data: session,
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
-    expect(data.maestroId).toBe('pythagoras');
+    expect(data.maestroId).toBe("pythagoras");
   });
 
-  test('GET /api/progress/sessions - retrieves sessions', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/progress/sessions - retrieves sessions", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/progress/sessions?limit=10');
+    const response = await request.get("/api/progress/sessions?limit=10");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -142,68 +146,77 @@ test.describe('Backend API: Progress & Gamification', () => {
   });
 });
 
-test.describe('Backend API: Conversations', () => {
+test.describe("Backend API: Conversations", () => {
   // _conversationId would be used for subsequent tests when implementing full conversation flow
   let _conversationId: string;
 
-  test('POST /api/conversations - creates conversation', async ({ request }) => {
-    await request.get('/api/user');
+  test("POST /api/conversations - creates conversation", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
-    const response = await request.post('/api/conversations', {
+    const response = await request.post("/api/conversations", {
       data: {
-        maestroId: 'prof-italiano',
-        title: 'Test Conversation',
+        maestroId: "prof-italiano",
+        title: "Test Conversation",
       },
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
-    expect(data.maestroId).toBe('prof-italiano');
+    expect(data.maestroId).toBe("prof-italiano");
     _conversationId = data.id;
   });
 
-  test('GET /api/conversations - lists conversations', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/conversations - lists conversations", async ({ request }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/conversations?limit=20');
+    const response = await request.get("/api/conversations?limit=20");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(Array.isArray(data.items)).toBeTruthy();
   });
 
-  test('POST /api/conversations/[id]/messages - adds message', async ({ request }) => {
-    await request.get('/api/user');
+  test("POST /api/conversations/[id]/messages - adds message", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Create conversation first
-    const convResponse = await request.post('/api/conversations', {
-      data: { maestroId: 'prof-storia' },
+    const convResponse = await request.post("/api/conversations", {
+      data: { maestroId: "prof-storia" },
     });
     const conv = await convResponse.json();
 
     const message = {
-      role: 'user',
-      content: 'Ciao, mi puoi spiegare la Rivoluzione Francese?',
+      role: "user",
+      content: "Ciao, mi puoi spiegare la Rivoluzione Francese?",
     };
 
-    const response = await request.post(`/api/conversations/${conv.id}/messages`, {
-      data: message,
-    });
+    const response = await request.post(
+      `/api/conversations/${conv.id}/messages`,
+      {
+        data: message,
+      },
+    );
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
-    expect(data.role).toBe('user');
-    expect(data.content).toContain('Rivoluzione Francese');
+    expect(data.role).toBe("user");
+    expect(data.content).toContain("Rivoluzione Francese");
   });
 
-  test('GET /api/conversations/[id] - retrieves single conversation', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/conversations/[id] - retrieves single conversation", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Create conversation
-    const convResponse = await request.post('/api/conversations', {
-      data: { maestroId: 'prof-scienze' },
+    const convResponse = await request.post("/api/conversations", {
+      data: { maestroId: "prof-scienze" },
     });
     const conv = await convResponse.json();
 
@@ -215,12 +228,14 @@ test.describe('Backend API: Conversations', () => {
     expect(data.messages).toBeDefined();
   });
 
-  test('DELETE /api/conversations/[id] - deletes conversation', async ({ request }) => {
-    await request.get('/api/user');
+  test("DELETE /api/conversations/[id] - deletes conversation", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Create conversation
-    const convResponse = await request.post('/api/conversations', {
-      data: { maestroId: 'prof-delete-test' },
+    const convResponse = await request.post("/api/conversations", {
+      data: { maestroId: "prof-delete-test" },
     });
     const conv = await convResponse.json();
 
@@ -233,45 +248,47 @@ test.describe('Backend API: Conversations', () => {
   });
 });
 
-test.describe('Backend API: Learnings', () => {
-  test('POST /api/learnings - creates learning', async ({ request }) => {
-    await request.get('/api/user');
+test.describe("Backend API: Learnings", () => {
+  test("POST /api/learnings - creates learning", async ({ request }) => {
+    await request.get("/api/user");
 
     const learning = {
-      category: 'preference',
-      insight: 'Preferisce esempi visivi per la matematica',
+      category: "preference",
+      insight: "Preferisce esempi visivi per la matematica",
       confidence: 0.7,
     };
 
-    const response = await request.post('/api/learnings', {
+    const response = await request.post("/api/learnings", {
       data: learning,
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
     expect(data.id).toBeDefined();
-    expect(data.category).toBe('preference');
-    expect(data.insight).toContain('esempi visivi');
+    expect(data.category).toBe("preference");
+    expect(data.insight).toContain("esempi visivi");
   });
 
-  test('POST /api/learnings - reinforces similar learning', async ({ request }) => {
-    await request.get('/api/user');
+  test("POST /api/learnings - reinforces similar learning", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Create first learning
     const learning1 = {
-      category: 'weakness',
-      insight: 'Difficoltà con le frazioni',
+      category: "weakness",
+      insight: "Difficoltà con le frazioni",
       confidence: 0.5,
     };
-    await request.post('/api/learnings', { data: learning1 });
+    await request.post("/api/learnings", { data: learning1 });
 
     // Try to add similar learning
     const learning2 = {
-      category: 'weakness',
-      insight: 'Difficoltà con le frazioni e i numeri decimali',
+      category: "weakness",
+      insight: "Difficoltà con le frazioni e i numeri decimali",
       confidence: 0.6,
     };
-    const response = await request.post('/api/learnings', { data: learning2 });
+    const response = await request.post("/api/learnings", { data: learning2 });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -279,10 +296,10 @@ test.describe('Backend API: Learnings', () => {
     expect(data.confidence).toBeGreaterThanOrEqual(0.5);
   });
 
-  test('GET /api/learnings - lists learnings', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/learnings - lists learnings", async ({ request }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/learnings');
+    const response = await request.get("/api/learnings");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -292,10 +309,12 @@ test.describe('Backend API: Learnings', () => {
     expect(data.pagination).toBeDefined();
   });
 
-  test('GET /api/learnings?category=preference - filters by category', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/learnings?category=preference - filters by category", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/learnings?category=preference');
+    const response = await request.get("/api/learnings?category=preference");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -304,18 +323,20 @@ test.describe('Backend API: Learnings', () => {
     expect(Array.isArray(data.learnings)).toBeTruthy();
     // All should be preferences if any exist
     data.learnings.forEach((l: { category: string }) => {
-      expect(l.category).toBe('preference');
+      expect(l.category).toBe("preference");
     });
   });
 
-  test('DELETE /api/learnings?id=xxx - deletes learning', async ({ request }) => {
-    await request.get('/api/user');
+  test("DELETE /api/learnings?id=xxx - deletes learning", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Create learning
-    const createResponse = await request.post('/api/learnings', {
+    const createResponse = await request.post("/api/learnings", {
       data: {
-        category: 'interest',
-        insight: 'Test learning to delete',
+        category: "interest",
+        insight: "Test learning to delete",
         confidence: 0.5,
       },
     });
@@ -327,22 +348,22 @@ test.describe('Backend API: Learnings', () => {
   });
 });
 
-test.describe('Backend API: Quiz Results', () => {
-  test('POST /api/quizzes/results - saves quiz result', async ({ request }) => {
-    await request.get('/api/user');
+test.describe("Backend API: Quiz Results", () => {
+  test("POST /api/quizzes/results - saves quiz result", async ({ request }) => {
+    await request.get("/api/user");
 
     const result = {
-      quizId: 'quiz-math-1',
-      subject: 'Matematica',
+      quizId: "quiz-math-1",
+      subject: "Matematica",
       score: 8,
       totalQuestions: 10,
       answers: [
-        { questionId: 'q1', answer: 'A', correct: true },
-        { questionId: 'q2', answer: 'B', correct: true },
+        { questionId: "q1", answer: "A", correct: true },
+        { questionId: "q2", answer: "B", correct: true },
       ],
     };
 
-    const response = await request.post('/api/quizzes/results', {
+    const response = await request.post("/api/quizzes/results", {
       data: result,
     });
     expect(response.ok()).toBeTruthy();
@@ -353,10 +374,10 @@ test.describe('Backend API: Quiz Results', () => {
     expect(data.percentage).toBe(80);
   });
 
-  test('GET /api/quizzes/results - retrieves results', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/quizzes/results - retrieves results", async ({ request }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/quizzes/results?limit=10');
+    const response = await request.get("/api/quizzes/results?limit=10");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -364,33 +385,37 @@ test.describe('Backend API: Quiz Results', () => {
   });
 });
 
-test.describe('Backend API: Flashcard Progress', () => {
-  test('POST /api/flashcards/progress - creates/updates progress', async ({ request }) => {
-    await request.get('/api/user');
+test.describe("Backend API: Flashcard Progress", () => {
+  test("POST /api/flashcards/progress - creates/updates progress", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     const progress = {
-      cardId: 'fc-vocab-1',
-      deckId: 'deck-english',
+      cardId: "fc-vocab-1",
+      deckId: "deck-english",
       difficulty: 0.3,
       stability: 1.5,
-      state: 'learning',
+      state: "learning",
       reps: 2,
     };
 
-    const response = await request.post('/api/flashcards/progress', {
+    const response = await request.post("/api/flashcards/progress", {
       data: progress,
     });
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    expect(data.cardId).toBe('fc-vocab-1');
-    expect(data.state).toBe('learning');
+    expect(data.cardId).toBe("fc-vocab-1");
+    expect(data.state).toBe("learning");
   });
 
-  test('GET /api/flashcards/progress - retrieves progress', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/flashcards/progress - retrieves progress", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/flashcards/progress');
+    const response = await request.get("/api/flashcards/progress");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
@@ -401,47 +426,52 @@ test.describe('Backend API: Flashcard Progress', () => {
   });
 });
 
-test.describe('Backend API: Data Persistence', () => {
-  test('Data persists across requests', async ({ request }) => {
+test.describe("Backend API: Data Persistence", () => {
+  test("Data persists across requests", async ({ request }) => {
     // Get user
-    await request.get('/api/user');
+    await request.get("/api/user");
 
     // Set some data
-    await request.put('/api/user/settings', {
-      data: { theme: 'light', language: 'it' },
+    await request.put("/api/user/settings", {
+      data: { theme: "light", language: "it" },
     });
-    await request.put('/api/progress', {
+    await request.put("/api/progress", {
       data: { xp: 1000, level: 5 },
     });
 
     // Verify persistence in new requests
-    const settingsRes = await request.get('/api/user/settings');
+    const settingsRes = await request.get("/api/user/settings");
     const settings = await settingsRes.json();
-    expect(settings.theme).toBe('light');
+    expect(settings.theme).toBe("light");
 
-    const progressRes = await request.get('/api/progress');
+    const progressRes = await request.get("/api/progress");
     const progress = await progressRes.json();
     expect(progress.xp).toBe(1000);
   });
 });
 
-test.describe('Backend API: Parent Dashboard Last Viewed (Issue #64)', () => {
-  test('GET /api/profile/last-viewed - returns null initially', async ({ request }) => {
-    await request.get('/api/user');
+test.describe("Backend API: Parent Dashboard Last Viewed (Issue #64)", () => {
+  test("GET /api/profile/last-viewed - returns null initially", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
-    const response = await request.get('/api/profile/last-viewed');
+    const response = await request.get("/api/profile/last-viewed");
     expect(response.ok()).toBeTruthy();
 
     const data = await response.json();
-    const isNullOrDate = data.lastViewed === null || typeof data.lastViewed === 'string';
+    const isNullOrDate =
+      data.lastViewed === null || typeof data.lastViewed === "string";
     expect(isNullOrDate).toBeTruthy();
   });
 
-  test('POST /api/profile/last-viewed - sets timestamp', async ({ request }) => {
-    await request.get('/api/user');
+  test("POST /api/profile/last-viewed - sets timestamp", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     const timestamp = new Date().toISOString();
-    const response = await request.post('/api/profile/last-viewed', {
+    const response = await request.post("/api/profile/last-viewed", {
       data: { timestamp },
     });
     expect(response.ok()).toBeTruthy();
@@ -450,17 +480,19 @@ test.describe('Backend API: Parent Dashboard Last Viewed (Issue #64)', () => {
     expect(data.success).toBe(true);
   });
 
-  test('GET /api/profile/last-viewed - returns saved timestamp', async ({ request }) => {
-    await request.get('/api/user');
+  test("GET /api/profile/last-viewed - returns saved timestamp", async ({
+    request,
+  }) => {
+    await request.get("/api/user");
 
     // Set timestamp
     const timestamp = new Date().toISOString();
-    await request.post('/api/profile/last-viewed', {
+    await request.post("/api/profile/last-viewed", {
       data: { timestamp },
     });
 
     // Retrieve and verify
-    const response = await request.get('/api/profile/last-viewed');
+    const response = await request.get("/api/profile/last-viewed");
     const data = await response.json();
     expect(data.lastViewed).toBeDefined();
     expect(new Date(data.lastViewed).getTime()).toBeGreaterThan(0);

@@ -10,7 +10,7 @@
  * Run: npx playwright test e2e/full-ui-audit/style-consistency.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-fixtures";
 
 // Pages to test for style consistency (public pages only, auth-required routes excluded)
 const PAGES_TO_TEST = [

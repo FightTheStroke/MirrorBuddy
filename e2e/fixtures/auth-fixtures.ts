@@ -10,7 +10,8 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 // Note: 'use' is a Playwright fixture callback, not React's use hook
-import { test as base, expect, Page } from "@playwright/test";
+import { test as base, expect } from "./base-fixtures";
+import type { Page } from "@playwright/test";
 import {
   signCookieValue,
   getTrialStorageState,
@@ -31,18 +32,10 @@ async function trialFixture(
   { page }: { page: Page },
   use: (value: Page) => Promise<void>,
 ) {
-  // Mock ToS API to bypass TosGateProvider - required for all trial tests (ADR 0059)
-  // TosGateProvider checks both localStorage AND calls GET /api/tos on mount
-  // Without this mock, it receives {accepted: false}, shows modal, blocks pointer events
-  await page.route("**/api/tos", (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ accepted: true, version: "1.0" }),
-    });
-  });
+  // Wall bypasses (TOS mock, consent cookie/localStorage) are handled
+  // by base-fixtures.ts automatically via the page fixture chain.
 
-  // Set storage state before navigation
+  // Set additional storage state before navigation
   await page.context().addInitScript(() => {
     // Inline localStorage setup to run before page loads
     localStorage.setItem(
@@ -62,17 +55,6 @@ async function trialFixture(
           },
         },
         version: 0,
-      }),
-    );
-
-    localStorage.setItem(
-      "mirrorbuddy-consent",
-      JSON.stringify({
-        version: "1.0",
-        acceptedAt: new Date().toISOString(),
-        essential: true,
-        analytics: false,
-        marketing: false,
       }),
     );
   });
@@ -117,15 +99,6 @@ async function adminFixture(
   const randomSuffix = crypto.randomUUID().replace(/-/g, "").substring(0, 9);
   const adminSessionId = `admin-test-session-${Date.now()}-${randomSuffix}`;
   const signedCookie = signCookieValue(adminSessionId);
-
-  // Mock ToS API to bypass TosGateProvider (ADR 0059)
-  await page.route("**/api/tos", (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ accepted: true, version: "1.0" }),
-    });
-  });
 
   // Set storage state before navigation
   await page.context().addInitScript(() => {

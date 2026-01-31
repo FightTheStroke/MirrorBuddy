@@ -16,7 +16,7 @@
  * 5. Logout works correctly (no redirect loops)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures/base-fixtures";
 
 test.describe("SMOKE: Critical Paths @smoke", () => {
   test.describe.configure({ mode: "serial" });

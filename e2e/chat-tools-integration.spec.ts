@@ -16,7 +16,7 @@
  * Run with: npm run test -- e2e/chat-tools-integration.spec.ts
  */
 
-import { test, expect, APIRequestContext } from "@playwright/test";
+import { test, expect, type APIRequestContext } from "./fixtures/base-fixtures";
 
 // Skip AI-dependent tests in CI - no provider configured
 test.skip(!!process.env.CI, "AI provider not available in CI");

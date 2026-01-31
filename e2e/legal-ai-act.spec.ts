@@ -11,7 +11,7 @@
  * Run: npx playwright test e2e/legal-ai-act.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // IMPORTANT: These tests check unauthenticated /ai-transparency page
 // Override global storageState to start without authentication

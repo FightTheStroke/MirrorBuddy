@@ -17,7 +17,14 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("quick panel has data-testid", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
+    // Ensure floating button is attached before interactions
+    await page.locator('[data-testid="a11y-floating-button"]').waitFor({
+      state: "visible",
+      timeout: 5000,
+    });
+  });
 
+  test("quick panel has data-testid", async ({ page }) => {
     const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
@@ -184,7 +191,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await button.click();
     await page.waitForTimeout(300);
 
-    const toggles = page.locator('[data-testid*="a11y-toggle"]');
+    const toggles = page.locator('[data-testid*=\"a11y-toggle\"]');
     const count = await toggles.count();
 
     expect(count).toBeGreaterThan(0);

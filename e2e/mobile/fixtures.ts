@@ -6,7 +6,8 @@
 
 /* eslint-disable react-hooks/rules-of-hooks */
 
-import { test as base, expect, type Locator } from "@playwright/test";
+import { test as base, expect } from "../fixtures/base-fixtures";
+import type { Locator } from "@playwright/test";
 
 /**
  * Viewport dimensions for mobile devices

@@ -4,7 +4,7 @@
  * F-11: Cron Job Security
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // CRON_SECRET is set in playwright.config.ts as 'e2e-test-cron-secret'
 const VALID_CRON_SECRET = "e2e-test-cron-secret";
