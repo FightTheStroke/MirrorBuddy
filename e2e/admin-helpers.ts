@@ -25,15 +25,17 @@ export const ADMIN_IGNORE_ERRORS = [
 export const ADMIN_ROUTES = [
   "/admin",
   "/admin/analytics",
+  "/admin/audit",
+  "/admin/characters",
   "/admin/funnel",
   "/admin/invites",
+  "/admin/tiers",
   "/admin/tos",
   "/admin/users",
   "/change-password",
 ];
 
 // Admin sidebar links for click-based navigation
-// NOTE: /admin/settings doesn't exist yet - link in sidebar but page missing
 export const ADMIN_NAV_ITEMS = [
   { label: "Dashboard", href: "/admin", exact: true },
   { label: "Funnel", href: "/admin/funnel", exact: false },
@@ -41,6 +43,8 @@ export const ADMIN_NAV_ITEMS = [
   { label: "Utenti", href: "/admin/users", exact: false },
   { label: "Analytics", href: "/admin/analytics", exact: false },
   { label: "Termini Servizio", href: "/admin/tos", exact: false },
+  { label: "Audit Log", href: "/admin/audit", exact: false },
+  { label: "Characters", href: "/admin/characters", exact: false },
 ];
 
 export interface AuditIssue {
