@@ -122,7 +122,7 @@ test.describe("iPad Mini Responsive UX", () => {
     await mobile.openMobileSidebar();
 
     const logoButton = page
-      .locator('button[aria-label="Torna alla home"]')
+      .locator('button[aria-label="Torna alla Home"]')
       .first();
     if (await logoButton.isVisible()) {
       await mobile.verifyTouchTarget(logoButton);
@@ -187,13 +187,13 @@ test.describe("iPad Mini Responsive UX", () => {
     await mobile.openMobileSidebar();
 
     const logoButton = page
-      .locator('button[aria-label="Torna alla home"]')
+      .locator('button[aria-label="Torna alla Home"]')
       .first();
     await expect(logoButton).toBeVisible();
 
     // Hover should work (button has hover:opacity-80)
     await logoButton.hover();
-    await page.locator('button[aria-label="Torna alla home"]').first().waitFor({
+    await page.locator('button[aria-label="Torna alla Home"]').first().waitFor({
       state: "visible",
     });
 

@@ -122,7 +122,7 @@ test.describe("iPhone SE / iPhone 13 Mobile UX", () => {
 
     // Test logo button
     const logoButton = page
-      .locator('button[aria-label="Torna alla home"]')
+      .locator('button[aria-label="Torna alla Home"]')
       .first();
     await mobile.verifyTouchTarget(logoButton);
 
