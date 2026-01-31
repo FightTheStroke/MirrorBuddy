@@ -35,6 +35,7 @@ const EXPECTED_SCHEMA_FILES = [
   "b2b.prisma", // ContactRequest (B2B contact form submissions)
   "locale.prisma", // LocaleConfig (i18n locale configuration)
   "vault.prisma", // SecretVault (encrypted API key storage)
+  "characters.prisma", // CharacterConfig (admin character management)
 ];
 
 // Expected models that should be present across all schema files
@@ -115,6 +116,8 @@ const EXPECTED_MODELS = [
   "LocaleAuditLog",
   // vault.prisma
   "SecretVault",
+  // characters.prisma
+  "CharacterConfig",
 ];
 
 describe("Prisma Schema Split", () => {

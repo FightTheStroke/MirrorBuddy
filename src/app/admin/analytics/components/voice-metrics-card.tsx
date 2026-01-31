@@ -50,7 +50,7 @@ export function VoiceMetricsCard({ data }: { data: VoiceMetricsData | null }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <MetricBox
             label="Voice Sessions"
             value={data?.voice.totalSessions ?? 0}

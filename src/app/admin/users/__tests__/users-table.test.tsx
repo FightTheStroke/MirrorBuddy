@@ -11,6 +11,10 @@ vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+}));
+
 const users = [
   {
     id: "user-1",
@@ -95,6 +99,10 @@ describe("UsersTable", () => {
 
     const deleteButton = screen.getAllByLabelText("Delete user")[0];
     fireEvent.click(deleteButton);
+
+    // Click confirmation button in dialog
+    const confirmButton = await screen.findByText("Delete User");
+    fireEvent.click(confirmButton);
 
     await waitFor(() => {
       expect(mockCsrfFetch).toHaveBeenCalledWith(

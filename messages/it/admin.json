@@ -513,6 +513,32 @@
       "colEntity": "Entita'",
       "colAdmin": "Admin",
       "colIp": "IP"
+    },
+    "commandPalette": {
+      "title": "Palette comandi",
+      "placeholder": "Cerca pagine e azioni...",
+      "noResults": "Nessun risultato",
+      "pages": "Pagine",
+      "actions": "Azioni",
+      "navigate": "naviga",
+      "select": "seleziona",
+      "close": "chiudi"
+    },
+    "knowledge": {
+      "searchPlaceholder": "Cerca maestri...",
+      "count": "{filtered} / {total} maestri",
+      "noResults": "Nessun maestro trovato",
+      "contentUnavailable": "Contenuto non disponibile",
+      "ragTitle": "RAG Embeddings",
+      "totalEmbeddings": "Embeddings Totali",
+      "noEmbeddingData": "Nessun dato embedding disponibile",
+      "reindexTriggered": "Reindex avviato",
+      "reindexFailed": "Reindex fallito"
+    },
+    "export": {
+      "csv": "CSV",
+      "json": "JSON",
+      "reportPdf": "Report PDF"
     }
   }
 }

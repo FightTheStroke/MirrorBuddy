@@ -513,6 +513,32 @@
       "colEntity": "[TRANSLATE] Entita'",
       "colAdmin": "[TRANSLATE] Admin",
       "colIp": "[TRANSLATE] IP"
+    },
+    "commandPalette": {
+      "title": "[TRANSLATE] Palette comandi",
+      "placeholder": "[TRANSLATE] Cerca pagine e azioni...",
+      "noResults": "[TRANSLATE] Nessun risultato",
+      "pages": "[TRANSLATE] Pagine",
+      "actions": "[TRANSLATE] Azioni",
+      "navigate": "[TRANSLATE] naviga",
+      "select": "[TRANSLATE] seleziona",
+      "close": "[TRANSLATE] chiudi"
+    },
+    "knowledge": {
+      "searchPlaceholder": "[TRANSLATE] Cerca maestri...",
+      "count": "[TRANSLATE] {filtered} / {total} maestri",
+      "noResults": "[TRANSLATE] Nessun maestro trovato",
+      "contentUnavailable": "[TRANSLATE] Contenuto non disponibile",
+      "ragTitle": "[TRANSLATE] RAG Embeddings",
+      "totalEmbeddings": "[TRANSLATE] Embeddings Totali",
+      "noEmbeddingData": "[TRANSLATE] Nessun dato embedding disponibile",
+      "reindexTriggered": "[TRANSLATE] Reindex avviato",
+      "reindexFailed": "[TRANSLATE] Reindex fallito"
+    },
+    "export": {
+      "csv": "[TRANSLATE] CSV",
+      "json": "[TRANSLATE] JSON",
+      "reportPdf": "[TRANSLATE] Report PDF"
     }
   }
 }
