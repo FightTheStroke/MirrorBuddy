@@ -99,55 +99,29 @@ describe("CI Workflow - TruffleHog Secret Scanning (F-09)", () => {
   });
 
   describe("Job Dependencies", () => {
-    it("security job should depend on secret-scanning", () => {
-      const securityJob = ciWorkflow.jobs.security;
-      expect(securityJob.needs).toBeDefined();
-      expect(securityJob.needs).toContain("secret-scanning");
+    it("secret-scanning job exists independently", () => {
+      // Note: As of d26201de, legacy secret checks were removed from security job
+      // as redundant (covered by dependency-review.yml + weekly-security-audit.yml)
+      // secret-scanning runs independently via TruffleHog
+      expect(ciWorkflow.jobs["secret-scanning"]).toBeDefined();
+      expect(ciWorkflow.jobs.security).toBeDefined();
     });
 
-    it("secret-scanning should come before security in workflow order", () => {
-      const jobKeys = Object.keys(ciWorkflow.jobs);
-      const secretScanIndex = jobKeys.indexOf("secret-scanning");
-      const securityIndex = jobKeys.indexOf("security");
-      // Just verify both exist (order in YAML doesn't guarantee execution order)
-      expect(secretScanIndex).toBeGreaterThanOrEqual(0);
-      expect(securityIndex).toBeGreaterThan(secretScanIndex);
-    });
-  });
-
-  describe("Existing Secret Checks Preserved", () => {
-    it("security job should still have legacy secret check", () => {
+    it("security job has SBOM and env safety checks", () => {
       const securityJob = ciWorkflow.jobs.security;
-      const secretCheckStep = securityJob.steps.find(
-        (s: any) => s.name?.includes("secret") || s.run?.includes("grep"),
+      expect(securityJob.name).toBe("SBOM & Env Safety");
+
+      // Should have SBOM generation
+      const sbomStep = securityJob.steps.find(
+        (s: any) => s.name?.includes("SBOM") || s.run?.includes("cyclonedx"),
       );
-      expect(secretCheckStep).toBeDefined();
-    });
+      expect(sbomStep).toBeDefined();
 
-    it("legacy check should be renamed or marked as secondary", () => {
-      const securityJob = ciWorkflow.jobs.security;
-      const secretCheckStep = securityJob.steps.find(
-        (s: any) =>
-          s.name?.toLocaleLowerCase().includes("legacy") ||
-          s.name?.toLocaleLowerCase().includes("check for secrets"),
+      // Should check for exposed .env files
+      const envCheckStep = securityJob.steps.find(
+        (s: any) => s.name?.includes("env") && s.run?.includes("git ls-files"),
       );
-      expect(secretCheckStep).toBeDefined();
-    });
-
-    it("legacy check should still scan for API keys", () => {
-      const securityJob = ciWorkflow.jobs.security;
-      const secretCheckStep = securityJob.steps.find(
-        (s: any) => s.run?.includes("grep") && s.run?.includes("sk-"),
-      );
-      expect(secretCheckStep).toBeDefined();
-    });
-
-    it("legacy check should still scan for AWS keys", () => {
-      const securityJob = ciWorkflow.jobs.security;
-      const secretCheckStep = securityJob.steps.find(
-        (s: any) => s.run?.includes("grep") && s.run?.includes("AKIA"),
-      );
-      expect(secretCheckStep).toBeDefined();
+      expect(envCheckStep).toBeDefined();
     });
   });
 
