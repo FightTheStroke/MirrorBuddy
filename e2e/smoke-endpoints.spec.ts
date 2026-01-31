@@ -15,7 +15,7 @@
  * 4. Health endpoint response structure validation
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("SMOKE: Endpoint Health & Status @smoke", () => {
   test.describe.configure({ mode: "serial" });

@@ -7,7 +7,7 @@
  * Run: npx playwright test e2e/test-data-cleanup.spec.ts
  */
 
-import { test, expect, afterEach } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 import {
   createTestUser,
   createTestConversation,
@@ -20,7 +20,7 @@ import {
  * Cleanup hook: F-04 automatic cleanup after each test
  * Removes all test data marked with isTestData=true
  */
-afterEach(async () => {
+test.afterEach(async () => {
   await cleanupTestData();
 });
 

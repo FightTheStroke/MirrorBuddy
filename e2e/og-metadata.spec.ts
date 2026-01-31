@@ -9,7 +9,7 @@
  * - Twitter Card metadata
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 const locales = ["it", "en", "fr", "de", "es"] as const;
 

@@ -3,7 +3,7 @@
 // F-04: End-to-end GDPR compliance verification
 // ============================================================================
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
   test("GET /api/privacy/delete-my-data - returns data summary for authenticated user", async ({

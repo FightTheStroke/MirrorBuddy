@@ -4,10 +4,12 @@
  * Tests feature flags, cost monitoring, and SLO monitoring APIs
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Admin Feature Flags API", () => {
-  test("GET /api/admin/feature-flags returns all flags", async ({ request }) => {
+  test("GET /api/admin/feature-flags returns all flags", async ({
+    request,
+  }) => {
     const response = await request.get("/api/admin/feature-flags");
 
     expect(response.ok()).toBe(true);
@@ -21,9 +23,7 @@ test.describe("Admin Feature Flags API", () => {
   test("GET with health=true includes degradation state", async ({
     request,
   }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?health=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?health=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -34,9 +34,7 @@ test.describe("Admin Feature Flags API", () => {
   });
 
   test("GET with gonogo=true includes GO/NO-GO result", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?gonogo=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?gonogo=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -48,9 +46,7 @@ test.describe("Admin Feature Flags API", () => {
   });
 
   test("GET with costs=true includes cost metrics", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?costs=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?costs=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -176,9 +172,7 @@ test.describe("Admin Feature Flags API", () => {
 
 test.describe("Admin Voice Cost Guards", () => {
   test("Voice limits are correctly configured", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?costs=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?costs=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -190,9 +184,7 @@ test.describe("Admin Voice Cost Guards", () => {
   });
 
   test("Active voice sessions are tracked", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?costs=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?costs=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -211,9 +203,7 @@ test.describe("Admin Voice Cost Guards", () => {
 
 test.describe("Admin SLO Monitoring", () => {
   test("SLO statuses include all required metrics", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?health=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?health=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -230,9 +220,7 @@ test.describe("Admin SLO Monitoring", () => {
   });
 
   test("GO/NO-GO checks evaluate correctly", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?gonogo=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?gonogo=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -252,9 +240,7 @@ test.describe("Admin SLO Monitoring", () => {
   });
 
   test("Active alerts have required fields", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?health=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?health=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -273,9 +259,7 @@ test.describe("Admin SLO Monitoring", () => {
 
 test.describe("Admin Degradation State", () => {
   test("Degradation state is properly structured", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?health=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?health=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -288,9 +272,7 @@ test.describe("Admin Degradation State", () => {
   });
 
   test("Recent events are returned", async ({ request }) => {
-    const response = await request.get(
-      "/api/admin/feature-flags?health=true",
-    );
+    const response = await request.get("/api/admin/feature-flags?health=true");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();
@@ -354,9 +336,7 @@ test.describe("Admin Session Metrics Dashboard", () => {
   test("Session metrics include time-based aggregations", async ({
     request,
   }) => {
-    const response = await request.get(
-      "/api/dashboard/session-metrics?days=1",
-    );
+    const response = await request.get("/api/dashboard/session-metrics?days=1");
 
     expect(response.ok()).toBe(true);
     const data = await response.json();

@@ -12,7 +12,7 @@
  * - Browser preference respected as default
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // IMPORTANT: These tests check unauthenticated /welcome page
 // Override global storageState to start without authentication

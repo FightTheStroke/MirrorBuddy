@@ -16,7 +16,7 @@
  * - tos-modal-interaction.spec.ts (UI tests)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // ============================================================================
 // API ENDPOINTS (F-12)

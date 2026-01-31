@@ -4,7 +4,7 @@
 // Related: ADR 0075 Cookie Handling Standards
 // ============================================================================
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Visitor ID Validation (UUID v4)", () => {
   test("Invalid visitor ID format - should be rejected", async ({

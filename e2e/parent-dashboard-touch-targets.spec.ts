@@ -14,7 +14,7 @@
  * Run: npx playwright test e2e/parent-dashboard-touch-targets.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 // Minimum touch target size in pixels (WCAG 2.5.5 Enhanced)
 const MIN_TOUCH_TARGET = 44;

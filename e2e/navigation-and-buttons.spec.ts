@@ -12,7 +12,7 @@
  * Run: npx playwright test e2e/navigation-and-buttons.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 const IGNORE_ERRORS = [
   /ResizeObserver loop/i,

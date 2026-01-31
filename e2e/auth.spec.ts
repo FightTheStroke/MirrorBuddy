@@ -4,7 +4,7 @@
  * F-06: Auth Flow Tests
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Login/Logout Authentication Flow", () => {
   test.beforeEach(async ({ context }) => {

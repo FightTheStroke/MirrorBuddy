@@ -4,7 +4,7 @@
 // Related: #013 Implement Cryptographically Signed Session Cookies
 // ============================================================================
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Signed Cookie Authentication", () => {
   test("GET /api/user - sets signed cookie for new user", async ({

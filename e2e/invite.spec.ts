@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 import { signCookieValue } from "./fixtures/auth-fixtures-helpers";
 
 test.describe("Beta Invite System", () => {
