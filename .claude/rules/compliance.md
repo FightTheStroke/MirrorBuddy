@@ -31,4 +31,4 @@ Bias detection (`src/lib/safety/bias-detector.ts`), content filtering, no PII in
 
 ## Verification: `npx tsx scripts/compliance-check.ts`
 
-## ADRs: 0034 (Safety), 0037 (Deferred), 0047 (Observability), 0058 (KPIs)
+## ADRs: 0004 (Safety Guardrails), 0034 (Chat Streaming Architecture), 0047 (Grafana Cloud Enterprise Observability), 0058 (Observability and KPIs)
