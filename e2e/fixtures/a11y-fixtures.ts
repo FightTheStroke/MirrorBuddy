@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 // Note: 'use' is a Playwright fixture callback, not React's use hook
-import { test as base, expect, type Page } from "@playwright/test";
+import { test as base, expect } from "./base-fixtures";
 import type { Locale } from "@/i18n/config";
 
 const DEFAULT_LOCALE: Locale = "it";
@@ -13,72 +13,40 @@ export const toLocalePath = (path: string, locale: Locale = DEFAULT_LOCALE) => {
   return `/${locale}${cleanPath}`;
 };
 
-const buildTrialConsentValue = () =>
-  encodeURIComponent(
-    JSON.stringify({
-      accepted: true,
-      version: "1.0",
-      acceptedAt: new Date().toISOString(),
-    }),
-  );
-
-const setupA11yPage = async (page: Page) => {
-  await page.route("**/api/tos", (route) => {
-    route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({ accepted: true, version: "1.0" }),
-    });
-  });
-
-  await page.context().addInitScript(() => {
-    localStorage.setItem(
-      "mirrorbuddy-consent",
-      JSON.stringify({
-        version: "1.0",
-        acceptedAt: new Date().toISOString(),
-        essential: true,
-        analytics: false,
-        marketing: false,
-      }),
-    );
-  });
-
-  await page.context().addCookies([
-    {
-      name: "mirrorbuddy-trial-consent",
-      value: buildTrialConsentValue(),
-      domain: "localhost",
-      path: "/",
-      sameSite: "Lax",
-    },
-    {
-      name: "NEXT_LOCALE",
-      value: DEFAULT_LOCALE,
-      domain: "localhost",
-      path: "/",
-      sameSite: "Lax",
-    },
-    {
-      name: "mirrorbuddy-a11y",
-      value: encodeURIComponent(
-        JSON.stringify({
-          version: "1",
-          activeProfile: null,
-          overrides: {},
-          browserDetectedApplied: true,
-        }),
-      ),
-      domain: "localhost",
-      path: "/",
-      sameSite: "Lax",
-    },
-  ]);
-};
-
+/**
+ * A11y test fixture extending base-fixtures.
+ *
+ * Base-fixtures already provides: TOS mock, consent localStorage,
+ * trial consent cookie, visitor cookie, trial session mock,
+ * accessibility settings API mocks.
+ *
+ * This adds a11y-specific cookies: NEXT_LOCALE and mirrorbuddy-a11y.
+ */
 export const test = base.extend({
   page: async ({ page }, use) => {
-    await setupA11yPage(page);
+    await page.context().addCookies([
+      {
+        name: "NEXT_LOCALE",
+        value: DEFAULT_LOCALE,
+        domain: "localhost",
+        path: "/",
+        sameSite: "Lax",
+      },
+      {
+        name: "mirrorbuddy-a11y",
+        value: encodeURIComponent(
+          JSON.stringify({
+            version: "1",
+            activeProfile: null,
+            overrides: {},
+            browserDetectedApplied: true,
+          }),
+        ),
+        domain: "localhost",
+        path: "/",
+        sameSite: "Lax",
+      },
+    ]);
     await use(page);
   },
 });

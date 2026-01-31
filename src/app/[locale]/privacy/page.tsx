@@ -11,10 +11,7 @@ export const PRIVACY_VERSION = "1.4";
 const LAST_UPDATED = "24 Gennaio 2026";
 
 export default function PrivacyPage() {
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "legal.privacy.page" is a top-level key in compliance.json, flattened at runtime
-  const t = useTranslations("legal.privacy.page");
-  // eslint-disable-next-line local-rules/no-missing-i18n-keys -- "legal.privacy.page.tldrItems" is a top-level key in compliance.json, flattened at runtime
-  const tldr = useTranslations("legal.privacy.page.tldrItems");
+  const t = useTranslations("compliance.legal.privacy.page");
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
@@ -70,31 +67,31 @@ export default function PrivacyPage() {
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{tldr("dataCollection")}</span>
+                <span>{t("tldrItems.dataCollection")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{tldr("noDataSale")}</span>
+                <span>{t("tldrItems.noDataSale")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{tldr("deleteAnytime")}</span>
+                <span>{t("tldrItems.deleteAnytime")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{tldr("europeanData")}</span>
+                <span>{t("tldrItems.europeanData")}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{tldr("optionalAnalytics")}</span>
+                <span>{t("tldrItems.optionalAnalytics")}</span>
               </li>
             </ul>
           </section>
