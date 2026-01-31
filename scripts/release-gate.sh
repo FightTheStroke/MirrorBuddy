@@ -9,6 +9,9 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT_DIR"
 
+# shellcheck source=lib/checks.sh
+source "$ROOT_DIR/scripts/lib/checks.sh"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -33,7 +36,7 @@ echo -e "${BLUE}[PHASE 0] Pre-release checks (lint+typecheck+build+hygiene+i18n+
 npm run pre-release
 
 echo ""
-echo -e "${BLUE}[PHASE 0.8] Technical debt check...${NC}"
+echo -e "${BLUE}[PHASE 1] Technical debt check...${NC}"
 debt_output=$(npx tsx scripts/debt-check.ts 2>&1)
 debt_exit=$?
 if [ $debt_exit -ne 0 ]; then
@@ -45,65 +48,44 @@ echo "$debt_output" | tail -10
 echo -e "${GREEN}✓ Technical debt check passed${NC}"
 
 echo ""
-echo -e "${BLUE}[PHASE 1] TypeScript rigor...${NC}"
-ts_ignore=$(rg -n "@ts-ignore|@ts-nocheck" src -g "*.ts" -g "*.tsx" 2>/dev/null || true)
-if [ -n "$ts_ignore" ]; then
-	ts_count=$(echo "$ts_ignore" | grep -c '' || echo 0)
-	echo -e "${RED}✗ BLOCKED: $ts_count @ts-ignore/@ts-nocheck found${NC}"
-	if [[ "$SUMMARY_ONLY" == "1" ]]; then
-		echo "$ts_ignore" | head -3
-	else
-		echo "$ts_ignore"
-	fi
-	exit 1
-fi
-
-prod_any=$(rg -g '*.ts' -g '*.tsx' ": any\b|as any\b" src -g '!**/__tests__/**' -g '!*.test.*' --no-heading 2>/dev/null | rg -v "//.*any\b|has any\b|avoid.*any\b|eslint-disable" || true)
-if [ -n "$prod_any" ]; then
-	any_count=$(echo "$prod_any" | grep -c '' || echo 0)
-	echo -e "${RED}✗ BLOCKED: $any_count 'any' in production code${NC}"
-	if [[ "$SUMMARY_ONLY" == "1" ]]; then
-		echo "$prod_any" | head -3
-	else
-		echo "$prod_any" | head -20
-	fi
-	exit 1
-fi
-
-# Check Zod validation for routes with state-changing methods (POST/PUT/PATCH)
-routes_needing_validation=0
-routes_with_validation=0
-missing_validation=""
-while IFS= read -r route; do
-	# Check if route has POST, PUT, or PATCH (state-changing methods that need input validation)
-	if rg -q "export.*(async function (POST|PUT|PATCH)|const (POST|PUT|PATCH))" "$route" 2>/dev/null; then
-		routes_needing_validation=$((routes_needing_validation + 1))
-		# Check for validation: zod import, @/lib/validation import, or z.object/safeParse usage
-		if rg -q "from ['\"]zod['\"]|from ['\"]@/lib/validation|safeParse|z\.object|z\.string|z\.number" "$route" 2>/dev/null; then
-			routes_with_validation=$((routes_with_validation + 1))
+echo -e "${BLUE}[PHASE 2] TypeScript rigor...${NC}"
+check_ts_rigor
+if [ "$_EXIT" -ne 0 ]; then
+	if [[ -n "${_TS_IGNORE:-}" ]]; then
+		ts_count=$(echo "$_TS_IGNORE" | grep -c '' || echo 0)
+		echo -e "${RED}✗ BLOCKED: $ts_count @ts-ignore/@ts-nocheck found${NC}"
+		if [[ "$SUMMARY_ONLY" == "1" ]]; then
+			echo "$_TS_IGNORE" | head -3
 		else
-			missing_validation="$missing_validation\n  - $route"
+			echo "$_TS_IGNORE"
 		fi
 	fi
-done < <(/usr/bin/find src/app/api -name "route.ts" 2>/dev/null)
-if [ "$routes_needing_validation" -ne "$routes_with_validation" ]; then
-	echo -e "${YELLOW}⚠ WARNING: $((routes_needing_validation - routes_with_validation)) API routes missing Zod validation${NC}"
-	echo -e "Routes with validation: $routes_with_validation / $routes_needing_validation"
-	# Note: Not blocking for v0.7 - to be addressed in v0.8
+	if [[ -n "${_PROD_ANY:-}" ]]; then
+		any_count=$(echo "$_PROD_ANY" | grep -c '' || echo 0)
+		echo -e "${RED}✗ BLOCKED: $any_count 'any' in production code${NC}"
+		if [[ "$SUMMARY_ONLY" == "1" ]]; then
+			echo "$_PROD_ANY" | head -3
+		else
+			echo "$_PROD_ANY" | head -20
+		fi
+	fi
+	rm -f "$_OUTPUT"
+	exit 1
 fi
+rm -f "$_OUTPUT"
 echo -e "${GREEN}✓ TypeScript rigor passed${NC}"
 
 echo ""
-echo -e "${BLUE}[PHASE 2] Unit tests + coverage...${NC}"
+echo -e "${BLUE}[PHASE 3] Unit tests + coverage...${NC}"
 npm run test:coverage
 
 echo ""
-echo -e "${BLUE}[PHASE 3] E2E tests...${NC}"
+echo -e "${BLUE}[PHASE 4] E2E tests...${NC}"
 npm run test:e2e:smoke
 npm run test
 
 echo ""
-echo -e "${BLUE}[PHASE 4] Legal review compliance check...${NC}"
+echo -e "${BLUE}[PHASE 5] Legal review compliance check...${NC}"
 legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1 || true)
 legal_exit=$?
 if [ $legal_exit -ne 0 ]; then
@@ -115,7 +97,7 @@ echo "$legal_output" | grep -E "SUMMARY|PASS|FAIL" | tail -10
 echo -e "${GREEN}✓ Legal review compliance check passed${NC}"
 
 echo ""
-echo -e "${BLUE}[PHASE 5] Plan sanity...${NC}"
+echo -e "${BLUE}[PHASE 6] Plan sanity...${NC}"
 plan_fail=0
 
 if [ -d "docs/plans/done" ]; then
