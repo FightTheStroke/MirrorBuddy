@@ -1,35 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  LayoutDashboard,
-  UserPlus,
-  Users,
-  BarChart3,
-  FileText,
-  Settings,
   PanelLeftClose,
   PanelLeftOpen,
   Home,
-  Activity,
-  Layers,
-  ScrollText,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LogoBrain } from "@/components/branding/logo-brain";
-
-interface NavItem {
-  id: string;
-  label: string;
-  href: string;
-  icon: LucideIcon;
-  badge?: number;
-  badgeColor?: "amber" | "red" | "blue";
-}
+import { createNavSections } from "./admin-sidebar-sections";
 
 interface AdminSidebarProps {
   open: boolean;
@@ -46,79 +31,45 @@ export function AdminSidebar({
 }: AdminSidebarProps) {
   const t = useTranslations("admin");
   const pathname = usePathname();
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(
+    new Set(["people", "content", "analytics", "system", "ops"]),
+  );
+
   const handleItemClick = () => {
     if (typeof window !== "undefined" && window.innerWidth < 1024) {
       onToggle();
     }
   };
 
-  const NAV_ITEMS: NavItem[] = [
-    {
-      id: "dashboard",
-      label: t("sidebar.dashboard"),
-      href: "/admin",
-      icon: LayoutDashboard,
-    },
-    {
-      id: "invites",
-      label: t("betaRequests"),
-      href: "/admin/invites",
-      icon: UserPlus,
-    },
-    {
-      id: "users",
-      label: t("sidebar.users"),
-      href: "/admin/users",
-      icon: Users,
-    },
-    {
-      id: "tiers",
-      label: t("sidebar.tiers"),
-      href: "/admin/tiers",
-      icon: Layers,
-    },
-    {
-      id: "audit-log",
-      label: t("sidebar.auditLog"),
-      href: "/admin/tiers/audit-log",
-      icon: ScrollText,
-    },
-    {
-      id: "analytics",
-      label: t("sidebar.analytics"),
-      href: "/admin/analytics",
-      icon: BarChart3,
-    },
-    {
-      id: "service-limits",
-      label: t("sidebar.serviceLimits"),
-      href: "/admin/service-limits",
-      icon: Activity,
-    },
-    {
-      id: "tos",
-      label: t("terms"),
-      href: "/admin/tos",
-      icon: FileText,
-    },
-    {
-      id: "settings",
-      label: t("sidebar.settings"),
-      href: "/admin/settings",
-      icon: Settings,
-    },
-  ];
-
-  const getNavItems = (): NavItem[] => {
-    return NAV_ITEMS.map((item) => {
-      if (item.id === "invites" && pendingInvites > 0) {
-        return { ...item, badge: pendingInvites, badgeColor: "amber" as const };
+  const toggleSection = (sectionId: string) => {
+    setExpandedSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(sectionId)) {
+        next.delete(sectionId);
+      } else {
+        next.add(sectionId);
       }
-      if (item.id === "dashboard" && systemAlerts > 0) {
-        return { ...item, badge: systemAlerts, badgeColor: "red" as const };
-      }
-      return item;
+      return next;
     });
+  };
+
+  const getNavSections = () => {
+    return createNavSections(t).map((section) => ({
+      ...section,
+      items: section.items.map((item) => {
+        if (item.id === "invites" && pendingInvites > 0) {
+          return {
+            ...item,
+            badge: pendingInvites,
+            badgeColor: "amber" as const,
+          };
+        }
+        if (item.id === "dashboard" && systemAlerts > 0) {
+          return { ...item, badge: systemAlerts, badgeColor: "red" as const };
+        }
+        return item;
+      }),
+    }));
   };
 
   const isActive = (href: string) => {
@@ -173,43 +124,82 @@ export function AdminSidebar({
         </Button>
       </div>
 
-      {/* Navigation */}
       <nav
-        className="p-4 space-y-1 overflow-y-auto"
+        className="p-4 space-y-3 overflow-y-auto"
         style={{ maxHeight: "calc(100vh - 120px)" }}
       >
-        {getNavItems().map((item) => {
-          const active = isActive(item.href);
+        {getNavSections().map((section) => {
+          const isExpanded = expandedSections.has(section.id);
           return (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={handleItemClick}
-              className={cn(
-                "flex items-center gap-3 rounded-xl transition-all relative",
-                open ? "px-4 py-3" : "justify-center px-2 py-3",
-                active &&
-                  "bg-slate-900 dark:bg-white text-white dark:text-slate-900",
-                !active &&
-                  "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
+            <div key={section.id}>
+              <button
+                onClick={() => toggleSection(section.id)}
+                className={cn(
+                  "w-full flex items-center gap-3 rounded-lg transition-all",
+                  open ? "px-3 py-2" : "justify-center px-2 py-2",
+                  "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800",
+                )}
+              >
+                <section.icon className="h-4 w-4 shrink-0" />
+                {open && (
+                  <>
+                    <span className="font-semibold text-xs uppercase tracking-wider flex-1 text-left">
+                      {section.label}
+                    </span>
+                    {isExpanded ? (
+                      <ChevronDown className="h-4 w-4" />
+                    ) : (
+                      <ChevronRight className="h-4 w-4" />
+                    )}
+                  </>
+                )}
+              </button>
+              {isExpanded && (
+                <div className="mt-1 space-y-1">
+                  {section.items.map((item) => {
+                    const active = isActive(item.href);
+                    return (
+                      <Link
+                        key={item.id}
+                        href={item.href}
+                        onClick={handleItemClick}
+                        className={cn(
+                          "flex items-center gap-3 rounded-xl transition-all relative",
+                          open ? "px-4 py-2.5" : "justify-center px-2 py-2.5",
+                          active &&
+                            "bg-slate-900 dark:bg-white text-white dark:text-slate-900",
+                          !active &&
+                            "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
+                        )}
+                      >
+                        <item.icon className="h-5 w-5 shrink-0" />
+                        {open && (
+                          <span className="font-medium text-sm">
+                            {item.label}
+                          </span>
+                        )}
+                        {item.badge && item.badge > 0 && (
+                          <span
+                            className={cn(
+                              "absolute text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center",
+                              open ? "right-3" : "top-1 right-1",
+                              item.badgeColor === "amber" &&
+                                "bg-amber-500 text-white",
+                              item.badgeColor === "red" &&
+                                "bg-red-500 text-white",
+                              item.badgeColor === "blue" &&
+                                "bg-blue-600 text-white",
+                            )}
+                          >
+                            {item.badge > 99 ? "99+" : item.badge}
+                          </span>
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               )}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {open && <span className="font-medium">{item.label}</span>}
-              {item.badge && item.badge > 0 && (
-                <span
-                  className={cn(
-                    "absolute text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center",
-                    open ? "right-3" : "top-1 right-1",
-                    item.badgeColor === "amber" && "bg-amber-500 text-white",
-                    item.badgeColor === "red" && "bg-red-500 text-white",
-                    item.badgeColor === "blue" && "bg-blue-600 text-white",
-                  )}
-                >
-                  {item.badge > 99 ? "99+" : item.badge}
-                </span>
-              )}
-            </Link>
+            </div>
           );
         })}
       </nav>
