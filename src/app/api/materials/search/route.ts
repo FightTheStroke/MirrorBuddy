@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { isPostgreSQL } from "@/lib/db/database-utils";
@@ -20,6 +21,9 @@ interface SearchParams {
 }
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
   try {
     // Security: Get userId from authenticated session only
     const { userId, errorResponse } = await requireAuthenticatedUser();

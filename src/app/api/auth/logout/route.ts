@@ -1,5 +1,7 @@
+import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
@@ -9,7 +11,10 @@ import {
 
 const log = logger.child({ module: "api/auth/logout" });
 
-export async function POST(_request: Request) {
+export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
   try {
     const cookieStore = await cookies();
     const isProduction = process.env.NODE_ENV === "production";

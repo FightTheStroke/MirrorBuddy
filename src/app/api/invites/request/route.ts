@@ -18,6 +18,7 @@ interface InviteRequestBody {
   trialSessionId?: string;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public beta request form; no cookie auth
 export async function POST(request: NextRequest) {
   try {
     // Rate limit invite requests (3 per hour - public endpoint, strict)

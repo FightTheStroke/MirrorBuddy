@@ -19,6 +19,7 @@ import { analyzeHomeworkWithAzure } from "./helpers";
 /**
  * POST - Analyze homework image
  */
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public endpoint; no cookie auth, rate-limited
 export async function POST(request: Request) {
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(

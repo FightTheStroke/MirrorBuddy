@@ -1,10 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { approveInviteRequest } from "@/lib/invite/invite-service";
 import { logger } from "@/lib/logger";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
   try {
     // Verify admin
     const auth = await validateAdminAuth();

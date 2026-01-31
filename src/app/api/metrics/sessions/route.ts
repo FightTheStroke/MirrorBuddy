@@ -39,6 +39,7 @@ interface MetricsRequest {
   severity?: "S0" | "S1" | "S2" | "S3";
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Telemetry endpoint; no cookie auth
 export async function POST(request: NextRequest) {
   const log = getRequestLogger(request);
 

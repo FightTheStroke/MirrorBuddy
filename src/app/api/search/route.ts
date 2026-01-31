@@ -90,6 +90,7 @@ interface SafeSearchResponse {
   safeSearchEnabled: boolean;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public safe search; no cookie auth, rate-limited
 export async function POST(request: NextRequest) {
   // Rate limit check
   const clientId = getClientIdentifier(request);

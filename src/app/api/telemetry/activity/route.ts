@@ -17,6 +17,7 @@ import {
   VISITOR_COOKIE_NAME,
 } from "@/lib/auth/cookie-constants";
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Telemetry endpoint; classifies activity type only
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

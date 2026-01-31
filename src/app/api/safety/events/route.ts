@@ -24,6 +24,7 @@ interface SafetyEventBody {
   category?: string;
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Optional auth; safety events must work for unauthenticated users too
 export async function POST(request: NextRequest) {
   try {
     const auth = await validateAuth();

@@ -4,18 +4,16 @@
 // Part of Phase 8: Multi-User Collaboration
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { getRoom, updateSelection } from '@/lib/collab/mindmap-room';
-import { broadcastCollabEvent } from '@/app/api/collab/sse/route';
+import { NextRequest, NextResponse } from "next/server";
+import { getRoom, updateSelection } from "@/lib/collab/mindmap-room";
+import { broadcastCollabEvent } from "@/app/api/collab/sse/route";
 
 interface RouteParams {
   params: Promise<{ roomId: string }>;
 }
 
-export async function POST(
-  request: NextRequest,
-  { params }: RouteParams
-) {
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Realtime collab; no cookie auth, userId from body
+export async function POST(request: NextRequest, { params }: RouteParams) {
   const { roomId } = await params;
 
   try {
@@ -23,36 +21,36 @@ export async function POST(
 
     if (!userId) {
       return NextResponse.json(
-        { error: 'userId is required' },
-        { status: 400 }
+        { error: "userId is required" },
+        { status: 400 },
       );
     }
 
     const room = getRoom(roomId);
     if (!room) {
-      return NextResponse.json(
-        { error: 'Room not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Room not found" }, { status: 404 });
     }
 
     // Update selection in room state
     updateSelection(roomId, userId, nodeId || undefined);
 
     // Broadcast to other participants
-    broadcastCollabEvent({
-      type: 'user:select',
-      roomId,
+    broadcastCollabEvent(
+      {
+        type: "user:select",
+        roomId,
+        userId,
+        timestamp: Date.now(),
+        data: { nodeId: nodeId || null },
+      },
       userId,
-      timestamp: Date.now(),
-      data: { nodeId: nodeId || null },
-    }, userId);
+    );
 
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json(
-      { error: 'Failed to broadcast selection', message: String(error) },
-      { status: 500 }
+      { error: "Failed to broadcast selection", message: String(error) },
+      { status: 500 },
     );
   }
 }

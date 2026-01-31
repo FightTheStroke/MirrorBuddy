@@ -19,6 +19,7 @@ const log = logger.child({ module: "api/trial/email" });
  * Save email to trial session for nurturing/conversion tracking.
  * Email capture is optional and can be triggered after X messages or at limit.
  */
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public trial email capture; visitor cookie only, no session auth
 export async function PATCH(request: NextRequest) {
   const clientId = getClientIdentifier(request);
   const rateLimitResult = await checkRateLimitAsync(
