@@ -202,7 +202,7 @@ cp .env.example .env.local
 
 # Initialize database
 npx prisma generate
-npx prisma db push
+npx prisma migrate dev
 
 # Start development server
 npm run dev

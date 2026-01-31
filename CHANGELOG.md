@@ -1013,8 +1013,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Location: `src/lib/tools/plugin/`
 - Files: types.ts, registry.ts, orchestrator.ts, trigger-detector.ts, voice-feedback.ts, data-channel-protocol.ts
-- `@docs/claude/tool-plugins.md` - Reference guide
-- `@docs/claude/tool-architecture.md` - System architecture diagram (Mermaid)
+- `@/claude/tool-plugins.md` - Reference guide
+- `@/claude/tool-architecture.md` - System architecture diagram (Mermaid)
 
 **Benefits**:
 
@@ -1420,8 +1420,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ADR 0021: Conversational Memory Injection - Status: Accepted
   - ADR 0022: Knowledge Hub Architecture - Status: Accepted
 - Created Claude docs:
-  - `docs/claude/conversation-memory.md`: Memory injection reference
-  - Updated `docs/claude/knowledge-hub.md`: Full implementation reference
+  - `/claude/conversation-memory.md`: Memory injection reference
+  - Updated `/claude/knowledge-hub.md`: Full implementation reference
 
 #### Knowledge Hub UI Components (Phase 5, Tasks 5.17-5.22)
 
@@ -1646,7 +1646,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ADR 0020: Mindmap Data Structure Fix
 - ADR 0021: Conversational Memory Injection
 - ADR 0022: Knowledge Hub Architecture
-- Claude docs: `docs/claude/session-summaries.md`
+- Claude docs: `/claude/session-summaries.md`
 
 ---
 

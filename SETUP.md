@@ -1,6 +1,6 @@
 # MirrorBuddy Setup Guide
 
-> Complete installation and configuration guide
+> Complete installation and configuration guide (aligned to .env.example defaults)
 
 ---
 
@@ -13,7 +13,7 @@ npm install
 cp .env.example .env.local
 # Edit .env.local with your API keys
 npx prisma generate
-npx prisma db push
+npx prisma migrate dev
 npm run dev
 ```
 
@@ -35,26 +35,28 @@ Open http://localhost:3000
 
 1. [Azure Portal](https://portal.azure.com) → Create Azure OpenAI resource
 2. Deploy models:
-   - `gpt-4o` (chat)
-   - `gpt-realtime` (voice)
-   - `text-embedding-ada-002` (RAG semantic search, optional)
+   - `gpt-4o-mini` (chat, cost-effective default)
+   - `gpt-realtime` (voice, premium)
+   - `gpt-realtime-mini` (voice, cheaper default)
+   - `text-embedding-3-small` (RAG semantic search, recommended)
 3. Configure `.env.local`:
 
 ```bash
 # Chat
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini
+AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_API_VERSION=2024-08-01-preview
 
 # Voice
 AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
-AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
 # RAG Embeddings (optional - enables semantic search)
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 ```
 
 4. Verify: Settings → AI Provider → Diagnostics → Test Connection
@@ -64,8 +66,8 @@ AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
 ```bash
 az cognitiveservices account deployment create \
   --name your-resource --resource-group your-rg \
-  --deployment-name text-embedding-ada-002 \
-  --model-name text-embedding-ada-002 \
+  --deployment-name text-embedding-3-small \
+  --model-name text-embedding-3-small \
   --model-version 2 --model-format OpenAI \
   --sku-capacity 10 --sku-name Standard
 ```
@@ -132,7 +134,7 @@ psql -d mirrorbuddy -c "CREATE EXTENSION vector;"
 DATABASE_URL="postgresql://user@localhost:5432/mirrorbuddy"
 ```
 
-**Migrations:** `npx prisma generate` | `npx prisma db push` (dev) | `npx prisma migrate dev` (prod) | `npx prisma migrate reset` (deletes data)
+**Migrations:** `npx prisma generate` | `npx prisma migrate dev` (local) | `npx prisma migrate deploy` (prod/CI) | `npx prisma migrate reset` (deletes data)
 
 ---
 
@@ -144,11 +146,13 @@ See `.env.example` for all options. Key variables:
 # Azure OpenAI (Chat + Voice)
 AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_API_KEY=your-api-key
-AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini
+AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-4o
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
+AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini
 
 # RAG Embeddings (optional)
-AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002
+AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small
 
 # Ollama (Optional)
 OLLAMA_URL=http://localhost:11434
@@ -186,7 +190,7 @@ npm run test         # Run Playwright E2E tests
 
 **Ollama Failed:** Verify `ollama serve` running, check `OLLAMA_URL`, test `curl http://localhost:11434/api/tags`, ensure `ollama pull llama3.2`.
 
-**Database Errors:** `npx prisma generate && npx prisma db push` (or `npx prisma migrate reset` if needed)
+**Database Errors:** `npx prisma generate && npx prisma migrate dev` (or `npx prisma migrate reset` if needed)
 
 **→ For detailed troubleshooting, see [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
 

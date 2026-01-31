@@ -95,20 +95,25 @@ Create accounts and have credentials ready:
 2. **Deploy Models**
 
    ```bash
-   az cognitiveservices account deployment create \
-     --name {resource-name} --resource-group {rg-name} \
-     --deployment-name gpt-4o-mini --model-name gpt-4o-mini --model-version 2024-07-18 \
-     --sku-name Standard --sku-capacity 10
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-4o-mini --model-name gpt-4o-mini --model-version 2024-07-18 \
+      --sku-name Standard --sku-capacity 10
 
-   az cognitiveservices account deployment create \
-     --name {resource-name} --resource-group {rg-name} \
-     --deployment-name gpt-realtime --model-name gpt-realtime --model-version 2025-08-28 \
-     --sku-name GlobalStandard --sku-capacity 1
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-realtime --model-name gpt-realtime --model-version 2025-08-28 \
+      --sku-name GlobalStandard --sku-capacity 1
 
-   az cognitiveservices account deployment create \
-     --name {resource-name} --resource-group {rg-name} \
-     --deployment-name text-embedding-ada-002 --model-name text-embedding-ada-002 --model-version 2 \
-     --sku-name Standard --sku-capacity 10
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name gpt-realtime-mini --model-name gpt-realtime-mini --model-version 2025-12-15 \
+      --sku-name Standard --sku-capacity 1
+
+    az cognitiveservices account deployment create \
+      --name {resource-name} --resource-group {rg-name} \
+      --deployment-name text-embedding-3-small --model-name text-embedding-3-small --model-version 1 \
+      --sku-name Standard --sku-capacity 10
    ```
 
 3. **Get Credentials**
@@ -119,8 +124,10 @@ Create accounts and have credentials ready:
 4. **Deployment Names**
    - Set environment variables:
      - `AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini`
+     - `AZURE_OPENAI_GPT4O_DEPLOYMENT=gpt-4o` (optional premium)
      - `AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime`
-     - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-ada-002`
+     - `AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI=gpt-realtime-mini`
+     - `AZURE_OPENAI_EMBEDDING_DEPLOYMENT=text-embedding-3-small`
 
 ---
 
@@ -151,9 +158,11 @@ Create accounts and have credentials ready:
    # Azure OpenAI
    vercel env add AZURE_OPENAI_ENDPOINT production --sensitive <<< "https://..."
    vercel env add AZURE_OPENAI_API_KEY production --sensitive <<< "your-api-key"
-   vercel env add AZURE_OPENAI_CHAT_DEPLOYMENT production <<< "gpt-4o-mini"
-   vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT production <<< "gpt-realtime"
-   vercel env add AZURE_OPENAI_EMBEDDING_DEPLOYMENT production <<< "text-embedding-ada-002"
+    vercel env add AZURE_OPENAI_CHAT_DEPLOYMENT production <<< "gpt-4o-mini"
+    vercel env add AZURE_OPENAI_GPT4O_DEPLOYMENT production <<< "gpt-4o"
+    vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT production <<< "gpt-realtime"
+    vercel env add AZURE_OPENAI_REALTIME_DEPLOYMENT_MINI production <<< "gpt-realtime-mini"
+    vercel env add AZURE_OPENAI_EMBEDDING_DEPLOYMENT production <<< "text-embedding-3-small"
 
    # Upstash
    vercel env add UPSTASH_REDIS_REST_URL production --sensitive <<< "https://..."

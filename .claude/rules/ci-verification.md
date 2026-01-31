@@ -1,12 +1,13 @@
 # CI Verification Rules - MirrorBuddy
 
-## Token-Efficient Verification (MANDATORY)
+## Project Health (PREFERRED starting point)
 
-Two scripts optimized for AI agent consumption: minimal output, only errors/warnings.
+`./scripts/health-check.sh` — single triage, ~6 lines: build + debt + compliance + i18n + git.
+Drill down: `./scripts/health-check.sh --drill [ci|debt|i18n|comp]`
 
-### Local verification
+## ALWAYS use `ci-summary.sh` / `ci-check.sh` instead of raw commands.
 
-**ALWAYS** use `ci-summary.sh` instead of raw npm commands.
+### Local
 
 | Need            | Command                           | Output    |
 | --------------- | --------------------------------- | --------- |
@@ -21,35 +22,23 @@ Two scripts optimized for AI agent consumption: minimal output, only errors/warn
 | A11y tests      | `./scripts/ci-summary.sh --a11y`  | ~15 lines |
 | Everything      | `./scripts/ci-summary.sh --all`   | ~30 lines |
 
-### GitHub CI verification
+### GitHub CI
 
-**ALWAYS** use `ci-check.sh` instead of raw gh commands.
+| Need                | Command                       |
+| ------------------- | ----------------------------- |
+| Latest run (branch) | `./scripts/ci-check.sh`       |
+| Latest run (any)    | `./scripts/ci-check.sh --all` |
+| Specific run        | `./scripts/ci-check.sh <id>`  |
 
-| Need                | Command                       | Output    |
-| ------------------- | ----------------------------- | --------- |
-| Latest run (branch) | `./scripts/ci-check.sh`       | ~25 lines |
-| Latest run (any)    | `./scripts/ci-check.sh --all` | ~25 lines |
-| Specific run        | `./scripts/ci-check.sh <id>`  | ~25 lines |
+## NEVER use standalone: `npm run lint|typecheck|build|test:unit` or `gh run view --log` (8k-100k+ token waste each). Hook enforces this.
 
-## NEVER use these standalone (token waste)
+## Quiet modes for scripts
 
-| Banned command                  | Tokens wasted | Use instead             |
-| ------------------------------- | ------------- | ----------------------- |
-| `npm run lint`                  | 8k-15k        | `ci-summary.sh --lint`  |
-| `npm run typecheck`             | 5k-10k        | `ci-summary.sh --types` |
-| `npm run build`                 | 20k-50k       | `ci-summary.sh --build` |
-| `npm run test:unit`             | 10k-30k       | `ci-summary.sh --unit`  |
-| `gh run view <id> --log`        | 100k+         | `ci-check.sh <id>`      |
-| `gh run view <id> --log-failed` | 5k-50k        | `ci-check.sh <id>`      |
-| `npx playwright test`           | 20k-100k      | `ci-summary.sh --e2e`   |
-| `npm run test`                  | 20k-100k      | `ci-summary.sh --e2e`   |
+| Script                    | Flag             | Output                              |
+| ------------------------- | ---------------- | ----------------------------------- |
+| `compliance-check.ts`     | `--fail-only`    | Only FAIL/WARN, skip PASS           |
+| `debt-check.ts`           | `--summary`      | Counts only, no file list           |
+| `i18n-sync-namespaces.ts` | `--quiet`        | 1-line pass/fail                    |
+| `release-gate.sh`         | `--summary-only` | Counts + top 3 instead of full list |
 
-## When verbose is allowed
-
-- Summary output is unclear and you need the full error context
-- Release scripts (`release:fast`, `release:gate`) -- they have own filtering
-- Targeted test with pipe: `npm run test:unit -- path/file 2>&1 | tail -5`
-
-## Enforcement
-
-A PreToolUse hook (`prefer-ci-summary.sh`) warns on verbose commands.
+Verbose allowed only when summary output is unclear, or targeted: `npm run test:unit -- path/file 2>&1 | tail -5`

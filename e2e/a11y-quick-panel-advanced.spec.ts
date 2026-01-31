@@ -9,11 +9,11 @@
  * Run: npx playwright test e2e/a11y-quick-panel-advanced.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   test("toggle switches have role=switch", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -30,7 +30,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("toggle switches have aria-checked", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -46,7 +46,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("toggle switches have aria-label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -63,7 +63,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("panel sections have aria-labelledby", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -83,7 +83,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("clicking outside panel closes it", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -100,7 +100,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("reset button clears all settings", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -128,7 +128,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("full settings link navigates correctly", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -145,7 +145,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("profile buttons accessible with keyboard", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -167,7 +167,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
   });
 
   test("panel maintains height constraint", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');

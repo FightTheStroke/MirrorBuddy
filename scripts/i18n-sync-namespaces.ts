@@ -149,13 +149,16 @@ function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
   const addMissing = args.includes("--add-missing");
+  const quiet = args.includes("--quiet");
 
-  console.log("🔄 i18n Sync Namespaces Script");
-  console.log(`   Reference locale: ${REFERENCE_LOCALE}`);
-  console.log(
-    `   Mode: ${dryRun ? "DRY RUN" : addMissing ? "ADD MISSING" : "REPORT ONLY"}`,
-  );
-  console.log("");
+  if (!quiet) {
+    console.log("🔄 i18n Sync Namespaces Script");
+    console.log(`   Reference locale: ${REFERENCE_LOCALE}`);
+    console.log(
+      `   Mode: ${dryRun ? "DRY RUN" : addMissing ? "ADD MISSING" : "REPORT ONLY"}`,
+    );
+    console.log("");
+  }
 
   let totalMissing = 0;
   let totalExtra = 0;
@@ -165,9 +168,10 @@ function main() {
     const refData = loadNamespaceFile(REFERENCE_LOCALE, namespace);
 
     if (!refData) {
-      console.warn(
-        `⚠️  Reference file missing: ${REFERENCE_LOCALE}/${namespace}.json`,
-      );
+      if (!quiet)
+        console.warn(
+          `⚠️  Reference file missing: ${REFERENCE_LOCALE}/${namespace}.json`,
+        );
       continue;
     }
 
@@ -175,7 +179,8 @@ function main() {
       let targetData = loadNamespaceFile(locale, namespace);
 
       if (!targetData) {
-        console.log(`❌ ${locale}/${namespace}.json - FILE MISSING`);
+        if (!quiet)
+          console.log(`❌ ${locale}/${namespace}.json - FILE MISSING`);
         if (addMissing && !dryRun) {
           // Create file with reference data, marked for translation
           const newData = syncNamespace(refData, {}, getAllKeys(refData));
@@ -191,56 +196,67 @@ function main() {
       reports.push(report);
 
       if (report.missingKeys.length === 0 && report.extraKeys.length === 0) {
-        console.log(`✅ ${locale}/${namespace}.json - OK`);
+        if (!quiet) console.log(`✅ ${locale}/${namespace}.json - OK`);
         continue;
       }
 
-      console.log(`⚠️  ${locale}/${namespace}.json:`);
-
       if (report.missingKeys.length > 0) {
-        console.log(`   Missing ${report.missingKeys.length} keys:`);
-        report.missingKeys
-          .slice(0, 5)
-          .forEach((k) => console.log(`     - ${k}`));
-        if (report.missingKeys.length > 5) {
-          console.log(`     ... and ${report.missingKeys.length - 5} more`);
+        if (!quiet) {
+          console.log(`⚠️  ${locale}/${namespace}.json:`);
+          console.log(`   Missing ${report.missingKeys.length} keys:`);
+          report.missingKeys
+            .slice(0, 5)
+            .forEach((k) => console.log(`     - ${k}`));
+          if (report.missingKeys.length > 5) {
+            console.log(`     ... and ${report.missingKeys.length - 5} more`);
+          }
         }
         totalMissing += report.missingKeys.length;
 
         if (addMissing && !dryRun) {
           targetData = syncNamespace(refData, targetData, report.missingKeys);
           saveNamespaceFile(locale, namespace, targetData);
-          console.log(`   ✅ Added missing keys (marked [TRANSLATE])`);
+          if (!quiet)
+            console.log(`   ✅ Added missing keys (marked [TRANSLATE])`);
         }
       }
 
       if (report.extraKeys.length > 0) {
-        console.log(
-          `   Extra ${report.extraKeys.length} keys (not in reference):`,
-        );
-        report.extraKeys.slice(0, 3).forEach((k) => console.log(`     + ${k}`));
-        if (report.extraKeys.length > 3) {
-          console.log(`     ... and ${report.extraKeys.length - 3} more`);
+        if (!quiet) {
+          console.log(
+            `   Extra ${report.extraKeys.length} keys (not in reference):`,
+          );
+          report.extraKeys
+            .slice(0, 3)
+            .forEach((k) => console.log(`     + ${k}`));
+          if (report.extraKeys.length > 3) {
+            console.log(`     ... and ${report.extraKeys.length - 3} more`);
+          }
         }
         totalExtra += report.extraKeys.length;
       }
     }
 
-    console.log("");
+    if (!quiet) console.log("");
   }
 
-  console.log("📊 Summary:");
-  console.log(`   Total missing keys: ${totalMissing}`);
-  console.log(`   Total extra keys: ${totalExtra}`);
-
-  if (totalMissing > 0 && !addMissing) {
+  if (quiet) {
+    const status = totalMissing === 0 && totalExtra === 0 ? "[PASS]" : "[FAIL]";
     console.log(
-      "\n💡 Run with --add-missing to add missing keys from reference.",
+      `${status} i18n sync: ${totalMissing} missing, ${totalExtra} extra`,
     );
-  }
-
-  if (dryRun) {
-    console.log("\n   Run without --dry-run to apply changes.");
+  } else {
+    console.log("📊 Summary:");
+    console.log(`   Total missing keys: ${totalMissing}`);
+    console.log(`   Total extra keys: ${totalExtra}`);
+    if (totalMissing > 0 && !addMissing) {
+      console.log(
+        "\n💡 Run with --add-missing to add missing keys from reference.",
+      );
+    }
+    if (dryRun) {
+      console.log("\n   Run without --dry-run to apply changes.");
+    }
   }
 
   // Exit with error code if there are issues

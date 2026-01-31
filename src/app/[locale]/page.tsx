@@ -5,7 +5,6 @@ import { useRouter } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
 import { motion } from "framer-motion";
-import { SkipLink } from "@/components/accessibility/skip-link";
 import {
   GraduationCap,
   Trophy,
@@ -205,7 +204,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-      <SkipLink targetId="main-content" />
       <h1 className="sr-only">{t("appTitle")}</h1>
       <HomeHeader
         sidebarOpen={sidebarOpen}
@@ -243,7 +241,7 @@ export default function Home() {
         )}
         ref={mainContentRef}
       >
-        <main id="main-content" className="min-h-screen flex-1">
+        <main className="min-h-screen flex-1">
           {/* Trial mode banner */}
           {trialStatus.isTrialMode && !trialStatus.isLoading && (
             <TrialHomeBanner

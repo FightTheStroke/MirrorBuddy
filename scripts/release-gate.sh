@@ -15,9 +15,12 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m'
 
-if ! command -v rg &> /dev/null; then
-  echo -e "${RED}✗ BLOCKED: ripgrep (rg) is required${NC}"
-  exit 1
+SUMMARY_ONLY="${SUMMARY_ONLY:-0}"
+[[ "${1:-}" == "--summary-only" ]] && SUMMARY_ONLY=1
+
+if ! command -v rg &>/dev/null; then
+	echo -e "${RED}✗ BLOCKED: ripgrep (rg) is required${NC}"
+	exit 1
 fi
 
 echo ""
@@ -33,9 +36,15 @@ echo ""
 echo -e "${BLUE}[PHASE 0.5] Repo hygiene (non-docs)...${NC}"
 repo_todos=$(rg -n "(TODO|FIXME|HACK|XXX):" -g "*.{ts,tsx,js,jsx,mjs,cjs,sh}" -g "!docs/**" -g "!node_modules/**" -g "!.next/**" -g "!coverage/**" -g "!playwright-report/**" -g "!test-results/**" -g "!logs/**" -g "!**/__tests__/**" -g "!**/*.test.*" -g "!**/*.spec.*" . 2>/dev/null || true)
 if [ -n "$repo_todos" ]; then
-  echo -e "${RED}✗ BLOCKED: TODO/FIXME/HACK outside docs${NC}"
-  echo "$repo_todos" | head -50
-  exit 1
+	todo_count=$(echo "$repo_todos" | grep -c '' || echo 0)
+	echo -e "${RED}✗ BLOCKED: $todo_count TODO/FIXME/HACK outside docs${NC}"
+	if [[ "$SUMMARY_ONLY" == "1" ]]; then
+		echo "$repo_todos" | head -3
+		[[ "$todo_count" -gt 3 ]] && echo "  ... and $((todo_count - 3)) more"
+	else
+		echo "$repo_todos" | head -50
+	fi
+	exit 1
 fi
 echo -e "${GREEN}✓ Repo hygiene passed${NC}"
 
@@ -44,9 +53,9 @@ echo -e "${BLUE}[PHASE 0.75] i18n verification...${NC}"
 i18n_output=$(npx tsx scripts/i18n-check.ts 2>&1)
 i18n_exit=$?
 if [ $i18n_exit -ne 0 ]; then
-  echo -e "${RED}✗ BLOCKED: i18n completeness check failed${NC}"
-  echo "$i18n_output"
-  exit 1
+	echo -e "${RED}✗ BLOCKED: i18n completeness check failed${NC}"
+	echo "$i18n_output"
+	exit 1
 fi
 echo "$i18n_output" | tail -10
 echo -e "${GREEN}✓ i18n verification passed${NC}"
@@ -56,9 +65,9 @@ echo -e "${BLUE}[PHASE 0.8] Technical debt check...${NC}"
 debt_output=$(npx tsx scripts/debt-check.ts 2>&1)
 debt_exit=$?
 if [ $debt_exit -ne 0 ]; then
-  echo -e "${RED}✗ BLOCKED: Technical debt thresholds exceeded${NC}"
-  echo "$debt_output"
-  exit 1
+	echo -e "${RED}✗ BLOCKED: Technical debt thresholds exceeded${NC}"
+	echo "$debt_output"
+	exit 1
 fi
 echo "$debt_output" | tail -10
 echo -e "${GREEN}✓ Technical debt check passed${NC}"
@@ -67,16 +76,26 @@ echo ""
 echo -e "${BLUE}[PHASE 1] TypeScript rigor...${NC}"
 ts_ignore=$(rg -n "@ts-ignore|@ts-nocheck" src -g "*.ts" -g "*.tsx" 2>/dev/null || true)
 if [ -n "$ts_ignore" ]; then
-  echo -e "${RED}✗ BLOCKED: @ts-ignore/@ts-nocheck found${NC}"
-  echo "$ts_ignore"
-  exit 1
+	ts_count=$(echo "$ts_ignore" | grep -c '' || echo 0)
+	echo -e "${RED}✗ BLOCKED: $ts_count @ts-ignore/@ts-nocheck found${NC}"
+	if [[ "$SUMMARY_ONLY" == "1" ]]; then
+		echo "$ts_ignore" | head -3
+	else
+		echo "$ts_ignore"
+	fi
+	exit 1
 fi
 
 prod_any=$(rg -g '*.ts' -g '*.tsx' ": any\b|as any\b" src -g '!**/__tests__/**' -g '!*.test.*' --no-heading 2>/dev/null | rg -v "//.*any\b|has any\b|avoid.*any\b|eslint-disable" || true)
 if [ -n "$prod_any" ]; then
-  echo -e "${RED}✗ BLOCKED: 'any' in production code${NC}"
-  echo "$prod_any" | head -20
-  exit 1
+	any_count=$(echo "$prod_any" | grep -c '' || echo 0)
+	echo -e "${RED}✗ BLOCKED: $any_count 'any' in production code${NC}"
+	if [[ "$SUMMARY_ONLY" == "1" ]]; then
+		echo "$prod_any" | head -3
+	else
+		echo "$prod_any" | head -20
+	fi
+	exit 1
 fi
 
 # Check Zod validation for routes with state-changing methods (POST/PUT/PATCH)
@@ -84,21 +103,21 @@ routes_needing_validation=0
 routes_with_validation=0
 missing_validation=""
 while IFS= read -r route; do
-  # Check if route has POST, PUT, or PATCH (state-changing methods that need input validation)
-  if rg -q "export.*(async function (POST|PUT|PATCH)|const (POST|PUT|PATCH))" "$route" 2>/dev/null; then
-    routes_needing_validation=$((routes_needing_validation + 1))
-    # Check for validation: zod import, @/lib/validation import, or z.object/safeParse usage
-    if rg -q "from ['\"]zod['\"]|from ['\"]@/lib/validation|safeParse|z\.object|z\.string|z\.number" "$route" 2>/dev/null; then
-      routes_with_validation=$((routes_with_validation + 1))
-    else
-      missing_validation="$missing_validation\n  - $route"
-    fi
-  fi
+	# Check if route has POST, PUT, or PATCH (state-changing methods that need input validation)
+	if rg -q "export.*(async function (POST|PUT|PATCH)|const (POST|PUT|PATCH))" "$route" 2>/dev/null; then
+		routes_needing_validation=$((routes_needing_validation + 1))
+		# Check for validation: zod import, @/lib/validation import, or z.object/safeParse usage
+		if rg -q "from ['\"]zod['\"]|from ['\"]@/lib/validation|safeParse|z\.object|z\.string|z\.number" "$route" 2>/dev/null; then
+			routes_with_validation=$((routes_with_validation + 1))
+		else
+			missing_validation="$missing_validation\n  - $route"
+		fi
+	fi
 done < <(/usr/bin/find src/app/api -name "route.ts" 2>/dev/null)
 if [ "$routes_needing_validation" -ne "$routes_with_validation" ]; then
-  echo -e "${YELLOW}⚠ WARNING: $((routes_needing_validation - routes_with_validation)) API routes missing Zod validation${NC}"
-  echo -e "Routes with validation: $routes_with_validation / $routes_needing_validation"
-  # Note: Not blocking for v0.7 - to be addressed in v0.8
+	echo -e "${YELLOW}⚠ WARNING: $((routes_needing_validation - routes_with_validation)) API routes missing Zod validation${NC}"
+	echo -e "Routes with validation: $routes_with_validation / $routes_needing_validation"
+	# Note: Not blocking for v0.7 - to be addressed in v0.8
 fi
 echo -e "${GREEN}✓ TypeScript rigor passed${NC}"
 
@@ -116,7 +135,7 @@ echo -e "${BLUE}[PHASE 4] Performance checks...${NC}"
 perf_output=$(./scripts/perf-check.sh 2>&1 || true)
 echo "$perf_output"
 if echo "$perf_output" | rg -q "PERFORMANCE CHECKS FAILED"; then
-  exit 1
+	exit 1
 fi
 # Note: Performance warnings (N+1 heuristic, bundle size) are not blocking for v0.7
 echo -e "${GREEN}✓ Performance checks passed${NC}"
@@ -131,9 +150,9 @@ echo -e "${BLUE}[PHASE 5.5] Legal review compliance check...${NC}"
 legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1 || true)
 legal_exit=$?
 if [ $legal_exit -ne 0 ]; then
-  echo -e "${RED}✗ BLOCKED: Legal review compliance check failed${NC}"
-  echo "$legal_output" | tail -30
-  exit 1
+	echo -e "${RED}✗ BLOCKED: Legal review compliance check failed${NC}"
+	echo "$legal_output" | tail -30
+	exit 1
 fi
 echo "$legal_output" | grep -E "SUMMARY|PASS|FAIL" | tail -10
 echo -e "${GREEN}✓ Legal review compliance check passed${NC}"
@@ -143,36 +162,36 @@ echo -e "${BLUE}[PHASE 6] Plan sanity...${NC}"
 plan_fail=0
 
 if [ -d "docs/plans/done" ]; then
-  for f in docs/plans/done/*.md; do
-    [ -f "$f" ] || continue
-    unchecked=$(grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
-    if [ "$unchecked" -gt 0 ]; then
-      echo -e "${RED}✗ BLOCKED: $f has $unchecked unchecked items${NC}"
-      plan_fail=1
-    fi
-  done
+	for f in docs/plans/done/*.md; do
+		[ -f "$f" ] || continue
+		unchecked=$(grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
+		if [ "$unchecked" -gt 0 ]; then
+			echo -e "${RED}✗ BLOCKED: $f has $unchecked unchecked items${NC}"
+			plan_fail=1
+		fi
+	done
 fi
 
 if [ -f "docs/plans/README.md" ]; then
-  while IFS= read -r rel; do
-    [ -z "$rel" ] && continue
-    plan_path="docs/plans/$rel"
-    if [ ! -f "$plan_path" ]; then
-      echo -e "${RED}✗ BLOCKED: missing plan referenced in README: $plan_path${NC}"
-      plan_fail=1
-    fi
-  done < <(rg -o "todo/[^)]+\.md|doing/[^)]+\.md" docs/plans/README.md 2>/dev/null || true)
+	while IFS= read -r rel; do
+		[ -z "$rel" ] && continue
+		plan_path="docs/plans/$rel"
+		if [ ! -f "$plan_path" ]; then
+			echo -e "${RED}✗ BLOCKED: missing plan referenced in README: $plan_path${NC}"
+			plan_fail=1
+		fi
+	done < <(rg -o "todo/[^)]+\.md|doing/[^)]+\.md" docs/plans/README.md 2>/dev/null || true)
 fi
 
 p0_hits=$(rg -n "CRITICAL|BLOCKS PR merge|P0" docs/plans/todo docs/plans/doing 2>/dev/null || true)
 if [ -n "$p0_hits" ]; then
-  echo -e "${RED}✗ BLOCKED: P0/CRITICAL plans still open${NC}"
-  echo "$p0_hits"
-  plan_fail=1
+	echo -e "${RED}✗ BLOCKED: P0/CRITICAL plans still open${NC}"
+	echo "$p0_hits"
+	plan_fail=1
 fi
 
 if [ "$plan_fail" -ne 0 ]; then
-  exit 1
+	exit 1
 fi
 echo -e "${GREEN}✓ Plan sanity passed${NC}"
 

@@ -10,26 +10,8 @@
 
 ## Fallback: null userId = Trial | No subscription = Base | Expired = Base
 
-## TierService
+## TierService: `import { tierService } from "@/lib/tier/tier-service"`
 
-```typescript
-import { tierService } from "@/lib/tier/tier-service";
-const tier = await tierService.getEffectiveTier(userId);
-const canUse = await tierService.checkFeatureAccess(userId, "voice");
-const model = await tierService.getModelForUserFeature(userId, "mindmap");
-tierService.invalidateCache(); // After admin updates
-```
-
-## Feature Keys
-
-`chat`, `voice`, `tools`, `documents`, `maestri`, `coaches`, `buddies`, `mindmap`, `quiz`, `flashcards`, `homework`, `formula`, `chart`, `summary`, `pdf`, `webcam`, `parent_dashboard`, `learning_path`, `analytics`
-
-## Frontend
-
-```typescript
-const { hasFeature, tier, isSimulated } = useTierFeatures();
-```
-
-## DB Tables: TierDefinition, UserSubscription, TierAuditLog, ModelCatalog
+## Frontend: `const { hasFeature, tier, isSimulated } = useTierFeatures()`
 
 ## Full reference: `@docs/claude/tier.md`

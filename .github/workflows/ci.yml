@@ -595,7 +595,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Run Accessibility Tests
-        run: npx playwright test e2e/accessibility.spec.ts e2e/a11y-*.spec.ts --reporter=list
+        run: npx playwright test e2e/accessibility.spec.ts e2e/a11y-*.spec.ts --reporter=html
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -604,7 +604,6 @@ jobs:
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
 
       - name: Upload Playwright report
-        if: failure()
         uses: actions/upload-artifact@v4
         with:
           name: accessibility-test-report

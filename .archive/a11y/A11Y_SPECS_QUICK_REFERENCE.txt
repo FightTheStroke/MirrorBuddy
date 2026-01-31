@@ -1,0 +1,141 @@
+═══════════════════════════════════════════════════════════════════════════════
+                    A11Y SPEC FILES - QUICK REFERENCE GUIDE
+═══════════════════════════════════════════════════════════════════════════════
+
+PROBLEM STATEMENT
+─────────────────────────────────────────────────────────────────────────────
+8 accessibility spec files have 3 main issues:
+  1) Duplicated TOS modal bypass code (8 times across describe blocks)
+  2) Hardcoded locale paths (/it/welcome instead of /welcome)
+  3) Missing storageState overrides in 6 files
+
+SOLUTION OVERVIEW
+─────────────────────────────────────────────────────────────────────────────
+Consolidate setup patterns and use unlocalized paths to match best practices
+established in a11y-locales.spec.ts
+
+
+FILE-BY-FILE ACTION ITEMS
+═══════════════════════════════════════════════════════════════════════════════
+
+1️⃣  accessibility.spec.ts  [23 CHANGES - HIGH PRIORITY]
+    ├─ Add setupTosModalBypass() function after line 27
+    ├─ Replace 11 beforeEach blocks (lines 61-69, 113-121, 268-276, 388-396,
+    │  434-442, 482-490, 557-565, 632-640, 697-705, 747-754)
+    └─ Replace 12 hardcoded paths: /it/welcome → /welcome
+       (lines 445, 493, 524, 540, 574, 594, 610, 643, 680, 708, 722, 758)
+
+2️⃣  a11y-data-testid.spec.ts  [1 CHANGE - MEDIUM]
+    └─ Add after line 10: test.use({ storageState: undefined });
+
+3️⃣  a11y-floating-button.spec.ts  [1 CHANGE - MEDIUM]
+    └─ Add after line 13: test.use({ storageState: undefined });
+
+4️⃣  a11y-quick-panel.spec.ts  [1 CHANGE - MEDIUM]
+    └─ Add after line 14: test.use({ storageState: undefined });
+
+5️⃣  a11y-skip-link.spec.ts  [2 CHANGES - MEDIUM]
+    ├─ Add after line 13: test.use({ storageState: undefined });
+    ├─ Add setupTosModalBypass() function
+    └─ Add beforeEach block to first describe block
+
+6️⃣  a11y-new-features.spec.ts  [1 CHANGE - MEDIUM]
+    └─ Add after line 13: test.use({ storageState: undefined });
+
+7️⃣  a11y-quick-panel-advanced.spec.ts  [1 CHANGE - MEDIUM]
+    └─ Add after line 12: test.use({ storageState: undefined });
+
+8️⃣  a11y-locales.spec.ts  [✅ NO CHANGES - ALREADY COMPLIANT]
+    └─ This file is the reference implementation - others should match it
+
+
+CONSOLIDATION PATTERN (Add to accessibility.spec.ts & a11y-skip-link.spec.ts)
+═══════════════════════════════════════════════════════════════════════════════
+
+async function setupTosModalBypass(page: import("@playwright/test").Page) {
+  await page.route("/api/tos", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        accepted: true,
+        version: "1.0",
+      }),
+    });
+  });
+}
+
+Then replace all beforeEach blocks that mock /api/tos with:
+  test.beforeEach(async ({ page }) => {
+    await setupTosModalBypass(page);
+  });
+
+
+PATH REPLACEMENTS (accessibility.spec.ts only)
+═══════════════════════════════════════════════════════════════════════════════
+
+Replace all 12 instances of:
+  await page.goto("/it/welcome");
+With:
+  await page.goto("/welcome");
+
+Lines: 445, 493, 524, 540, 574, 594, 610, 643, 680, 708, 722, 758
+
+
+STORAGESTATE OVERRIDE (Add to 6 files after imports)
+═══════════════════════════════════════════════════════════════════════════════
+
+Add after the imports section (before first describe or function):
+
+test.use({ storageState: undefined });
+
+Files needing this:
+  • a11y-data-testid.spec.ts
+  • a11y-floating-button.spec.ts
+  • a11y-quick-panel.spec.ts
+  • a11y-skip-link.spec.ts
+  • a11y-new-features.spec.ts
+  • a11y-quick-panel-advanced.spec.ts
+
+
+STATISTICS
+═══════════════════════════════════════════════════════════════════════════════
+
+Code Changes:         31 modifications across 8 files
+Duplicated Lines:     64 lines to consolidate
+New Code:             +15 lines (setupTosModalBypass function)
+Path Replacements:    12 single-line changes
+Net Impact:           -47 lines (64 removed, 15 added + minor additions)
+Priority Files:       1 HIGH (accessibility.spec.ts), 6 MEDIUM (others)
+
+
+TESTING COMMAND
+═══════════════════════════════════════════════════════════════════════════════
+
+After changes, run:
+  npx playwright test e2e/accessibility.spec.ts
+  npx playwright test e2e/a11y-*.spec.ts
+
+Or test all:
+  npx playwright test e2e/ --grep "a11y|accessibility"
+
+
+REFERENCE DOCUMENTS
+═══════════════════════════════════════════════════════════════════════════════
+
+For detailed before/after code:     A11Y_SPECS_EXACT_CHANGES.md
+For analysis & explanation:         A11Y_SPECS_REVIEW.md
+For this quick reference:           A11Y_SPECS_QUICK_REFERENCE.txt
+
+
+BENEFITS ACHIEVED
+═══════════════════════════════════════════════════════════════════════════════
+
+✓ Consistency:      All a11y specs match a11y-locales.spec.ts pattern
+✓ DRY Code:         Consolidates 64 lines into 1 reusable function
+✓ Maintainability:  Single source of truth for TOS modal bypass
+✓ Correctness:      Proper auth state handling across all tests
+✓ Future-Ready:     Unlocalized paths enable multi-locale testing
+✓ Quality:          Follows test best practices consistently
+
+═══════════════════════════════════════════════════════════════════════════════

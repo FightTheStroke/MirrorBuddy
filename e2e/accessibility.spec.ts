@@ -19,32 +19,27 @@
  * - a11y-instant-access.spec.ts (instant access feature tests)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 import AxeBuilder from "@axe-core/playwright";
-
-// IMPORTANT: These tests check unauthenticated pages (welcome, legal, etc.)
-// Override global storageState to start without authentication
-test.use({ storageState: undefined });
 
 // Main user-facing pages (excludes admin, showcase, test pages)
 const PAGES_TO_TEST = [
-  { path: "/", name: "Homepage" },
-  { path: "/welcome", name: "Welcome/Onboarding" },
-  { path: "/astuccio", name: "Astuccio (Tools)" },
-  { path: "/supporti", name: "Supporti (Materials)" },
-  { path: "/archivio", name: "Archivio" },
-  { path: "/genitori", name: "Parent Dashboard" },
-  { path: "/study-kit", name: "Study Kit" },
+  { path: toLocalePath("/"), name: "Homepage" },
+  { path: toLocalePath("/welcome"), name: "Welcome/Onboarding" },
+  { path: toLocalePath("/astuccio"), name: "Astuccio (Tools)" },
+  { path: toLocalePath("/supporti"), name: "Supporti (Materials)" },
+  { path: toLocalePath("/archivio"), name: "Archivio" },
+  { path: toLocalePath("/study-kit"), name: "Study Kit" },
   // Skipped: /homework redirects to /supporti, has color-contrast issues with empty state
   // ENGINEERING JUSTIFICATION: Button component in empty-state.tsx fails WCAG 2.1 AA
   // contrast requirements (4.5:1 for normal text). Requires design system update
   // for disabled/secondary button states. Tracked for next accessibility sprint.
-  { path: "/mindmap", name: "Mindmap" },
-  { path: "/quiz", name: "Quiz" },
-  { path: "/flashcard", name: "Flashcard" },
+  { path: toLocalePath("/mindmap"), name: "Mindmap" },
+  { path: toLocalePath("/quiz"), name: "Quiz" },
+  { path: toLocalePath("/flashcard"), name: "Flashcard" },
   // Redirect-only routes can return transient markup; exercise the destination instead.
-  { path: "/astuccio", name: "Summary (redirects to Astuccio)" },
-  { path: "/landing", name: "Landing" },
+  { path: toLocalePath("/astuccio"), name: "Summary (redirects to Astuccio)" },
+  { path: toLocalePath("/landing"), name: "Landing" },
 ];
 
 // Known issues to skip (document why each is excluded)
@@ -58,16 +53,6 @@ const SKIP_RULES: string[] = [
 // ============================================================================
 
 test.describe("WCAG 2.1 AA Compliance", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   for (const page of PAGES_TO_TEST) {
     test(`${page.name} (${page.path}) passes axe-core`, async ({
       page: playwrightPage,
@@ -110,18 +95,8 @@ test.describe("WCAG 2.1 AA Compliance", () => {
 // ============================================================================
 
 test.describe("Keyboard Navigation", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("can navigate homepage with keyboard only", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(300);
 
@@ -150,7 +125,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("navigation links have visible focus indicators", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const firstInteractive = page.locator("a, button").first();
@@ -173,7 +148,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("Escape key closes modals/dialogs", async ({ page }) => {
-    await page.goto("/astuccio");
+    await page.goto(toLocalePath("/astuccio"));
     await page.waitForLoadState("domcontentloaded");
 
     for (let i = 0; i < 3; i++) {
@@ -234,7 +209,7 @@ test.describe("Keyboard Navigation", () => {
   });
 
   test("skip link available for keyboard users", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.keyboard.press("Tab");
 
     const activeElement = await page.evaluate(() => {
@@ -265,18 +240,8 @@ test.describe("Keyboard Navigation", () => {
 // ============================================================================
 
 test.describe("Screen Reader Support", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("page has proper heading hierarchy", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const headings = await page.evaluate(() => {
@@ -302,7 +267,7 @@ test.describe("Screen Reader Support", () => {
   });
 
   test("images have alt text", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const imagesWithoutAlt = await page.evaluate(() => {
@@ -319,7 +284,7 @@ test.describe("Screen Reader Support", () => {
   });
 
   test("form inputs have labels", async ({ page }) => {
-    await page.goto("/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const inputsWithoutLabels = await page.evaluate(() => {
@@ -343,7 +308,7 @@ test.describe("Screen Reader Support", () => {
   });
 
   test("buttons have accessible names", async ({ page }) => {
-    await page.goto("/astuccio");
+    await page.goto(toLocalePath("/astuccio"));
     await page.waitForLoadState("domcontentloaded");
 
     const buttonsWithoutNames = await page.evaluate(() => {
@@ -366,7 +331,7 @@ test.describe("Screen Reader Support", () => {
   });
 
   test("interactive elements have ARIA roles", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const landmarks = await page.evaluate(() => {
@@ -386,19 +351,9 @@ test.describe("Screen Reader Support", () => {
 // ============================================================================
 
 test.describe("Color and Contrast", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("respects prefers-reduced-motion", async ({ page }) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const hasMotion = await page.evaluate(() => {
@@ -431,18 +386,8 @@ test.describe("Color and Contrast", () => {
 // ============================================================================
 
 test.describe("Instant Access - Floating Button", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("floating button visible and WCAG compliant size", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -455,7 +400,11 @@ test.describe("Instant Access - Floating Button", () => {
   });
 
   test("floating button visible on legal pages", async ({ page }) => {
-    const legalPages = ["/privacy", "/terms", "/cookies"];
+    const legalPages = [
+      toLocalePath("/privacy"),
+      toLocalePath("/terms"),
+      toLocalePath("/cookies"),
+    ];
 
     for (const path of legalPages) {
       await page.goto(path);
@@ -468,7 +417,7 @@ test.describe("Instant Access - Floating Button", () => {
   });
 
   test("button has proper ARIA attributes", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -479,18 +428,8 @@ test.describe("Instant Access - Floating Button", () => {
 });
 
 test.describe("Instant Access - Quick Panel", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("clicking button opens panel with 7 profiles", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -521,7 +460,7 @@ test.describe("Instant Access - Quick Panel", () => {
   });
 
   test("Escape key closes panel", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -537,7 +476,7 @@ test.describe("Instant Access - Quick Panel", () => {
   });
 
   test("clicking outside closes panel", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -554,16 +493,6 @@ test.describe("Instant Access - Quick Panel", () => {
 });
 
 test.describe("Instant Access - Profile Activation", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("selecting dyslexia profile changes font", async ({ page }) => {
     // Font loading is unreliable in CI environment - OpenDyslexic may not be cached
     test.skip(
@@ -571,7 +500,7 @@ test.describe("Instant Access - Profile Activation", () => {
       "Font loading unreliable in CI - needs font preloading",
     );
 
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -591,7 +520,7 @@ test.describe("Instant Access - Profile Activation", () => {
   test("active profile shows indicator on floating button", async ({
     page,
   }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -607,7 +536,7 @@ test.describe("Instant Access - Profile Activation", () => {
   });
 
   test("reset button clears profile", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -629,18 +558,8 @@ test.describe("Instant Access - Profile Activation", () => {
 });
 
 test.describe("Instant Access - Cookie Persistence", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("settings persist after page refresh", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -677,7 +596,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
   });
 
   test("a11y cookie is set with correct name", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -694,18 +613,8 @@ test.describe("Instant Access - Cookie Persistence", () => {
 });
 
 test.describe("Instant Access - Panel Keyboard Navigation", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("can open panel with keyboard", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -719,7 +628,7 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('button[aria-controls="a11y-quick-panel"]');
@@ -744,18 +653,8 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
 // ============================================================================
 
 test.describe("DSA Profile Support", () => {
-  test.beforeEach(async ({ page }) => {
-    await page.route("**/api/tos", (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify({ accepted: true, version: "1.0" }),
-      }),
-    );
-  });
-
   test("dyslexia font toggle works", async ({ page }) => {
-    await page.goto("/it/welcome");
+    await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const body = page.locator("body");

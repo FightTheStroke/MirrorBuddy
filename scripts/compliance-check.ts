@@ -13,6 +13,7 @@ interface CheckResult {
 
 const results: CheckResult[] = [];
 const projectRoot = process.cwd();
+const failOnly = process.argv.includes("--fail-only");
 
 // Utility functions
 function checkFileExists(filePath: string, relativeTo = projectRoot): boolean {
@@ -44,6 +45,7 @@ function printResults(): void {
   console.log("\n=== MirrorBuddy Compliance Check ===\n");
 
   for (const result of results) {
+    if (failOnly && result.status === "PASS") continue;
     const icon =
       result.status === "PASS"
         ? "[PASS]"
@@ -71,10 +73,10 @@ function getExitCode(): number {
 }
 
 async function runChecks(): Promise<void> {
-  console.log("Starting MirrorBuddy Compliance Check...\n");
+  if (!failOnly) console.log("Starting MirrorBuddy Compliance Check...\n");
 
   // ===== 1. DOCUMENTATION CHECKS =====
-  console.log("Checking compliance documentation...");
+  if (!failOnly) console.log("Checking compliance documentation...");
 
   const docChecks = [
     { file: "docs/compliance/DPIA.md", name: "DPIA document" },
@@ -100,7 +102,7 @@ async function runChecks(): Promise<void> {
   }
 
   // ===== 2. PAGES ACCESSIBILITY CHECKS =====
-  console.log("Checking compliance pages...");
+  if (!failOnly) console.log("Checking compliance pages...");
 
   const pageChecks = [
     { path: "src/app/ai-transparency", name: "AI Transparency page" },
@@ -117,7 +119,7 @@ async function runChecks(): Promise<void> {
   }
 
   // ===== 3. API ENDPOINTS CHECKS =====
-  console.log("Checking compliance API endpoints...");
+  if (!failOnly) console.log("Checking compliance API endpoints...");
 
   const apiChecks = [
     {
@@ -139,7 +141,7 @@ async function runChecks(): Promise<void> {
   }
 
   // ===== 4. SAFETY SYSTEMS CHECKS =====
-  console.log("Checking safety systems...");
+  if (!failOnly) console.log("Checking safety systems...");
 
   const safetyChecks = [
     {
@@ -161,7 +163,7 @@ async function runChecks(): Promise<void> {
   }
 
   // ===== 5. ENVIRONMENT VARIABLES CHECKS =====
-  console.log("Checking environment variables...");
+  if (!failOnly) console.log("Checking environment variables...");
 
   const envChecks = [
     { name: "ADMIN_EMAIL", critical: true },

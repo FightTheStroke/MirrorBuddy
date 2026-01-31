@@ -151,6 +151,7 @@ npm run test
   - Verify error messages are user-friendly
 
 - [ ] **Database changes applied** (if applicable)
+
   ```bash
   npx prisma generate
   npx prisma db push
@@ -200,7 +201,7 @@ npm run test
   - Context, decision, and consequences documented
 
 - [ ] **Claude docs updated** (if complex feature)
-  - Create new file in `@docs/claude/` if needed
+  - Create new file in `@/claude/` if needed
   - Update `CLAUDE.md` to reference new doc
   - Include usage examples and gotchas
 
@@ -404,7 +405,7 @@ npm run test
 ## Questions?
 
 - **Process questions**: See [CONTRIBUTING.md](../CONTRIBUTING.md)
-- **Technical questions**: Check `CLAUDE.md` and `@docs/claude/`
+- **Technical questions**: Check `CLAUDE.md` and `@/claude/`
 - **Accessibility questions**: See `src/lib/accessibility/` and WCAG 2.1 AA guidelines
 - **Contact**: roberdan@fightthestroke.org
 

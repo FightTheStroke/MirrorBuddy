@@ -103,10 +103,7 @@ export function LandingPage({
         <LanguageSwitcher />
       </div>
 
-      <main
-        className="min-h-screen flex flex-col items-center px-4 py-12"
-        id="main-content"
-      >
+      <main className="min-h-screen flex flex-col items-center px-4 py-12">
         <motion.div
           initial={{ y: 20 }}
           animate={{ y: 0 }}

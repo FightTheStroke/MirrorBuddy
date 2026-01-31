@@ -119,8 +119,10 @@ function findLargeFiles(): string[] {
 }
 
 function runAudit(): AuditResult[] {
-  console.log("🔍 Technical Debt Audit\n");
-  console.log("=".repeat(50));
+  if (!process.argv.includes("--summary")) {
+    console.log("🔍 Technical Debt Audit\n");
+    console.log("=".repeat(50));
+  }
 
   const results: AuditResult[] = [];
 
@@ -168,16 +170,17 @@ function runAudit(): AuditResult[] {
 }
 
 function printResults(results: AuditResult[]): boolean {
+  const summaryMode = process.argv.includes("--summary");
   let allPassed = true;
 
   for (const result of results) {
-    const icon = result.passed ? "✅" : "❌";
     const status = result.passed ? "PASS" : "FAIL";
+    const icon = result.passed ? "✅" : "❌";
     console.log(
-      `\n${icon} ${result.category}: ${result.count}/${result.threshold} [${status}]`,
+      `${summaryMode ? "" : "\n"}${icon} ${result.category}: ${result.count}/${result.threshold} [${status}]`,
     );
 
-    if (result.items.length > 0 && !result.passed) {
+    if (!summaryMode && result.items.length > 0 && !result.passed) {
       console.log("   Examples:");
       result.items.forEach((item) => {
         const truncated = item.length > 80 ? item.slice(0, 80) + "..." : item;
@@ -188,7 +191,7 @@ function printResults(results: AuditResult[]): boolean {
     if (!result.passed) allPassed = false;
   }
 
-  console.log("\n" + "=".repeat(50));
+  if (!summaryMode) console.log("\n" + "=".repeat(50));
   console.log(allPassed ? "✅ All checks passed!" : "❌ Some checks failed.");
 
   return allPassed;

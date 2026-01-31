@@ -99,10 +99,7 @@ export function LandingPage({
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-blue-50/20 to-purple-50/20 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden">
-      <main
-        className="min-h-screen flex flex-col items-center px-4 py-12"
-        id="main-content"
-      >
+      <main className="min-h-screen flex flex-col items-center px-4 py-12">
         <motion.div
           initial={{ y: 20 }}
           animate={{ y: 0 }}

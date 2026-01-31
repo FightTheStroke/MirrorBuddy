@@ -11,11 +11,11 @@
  * Run: npx playwright test e2e/a11y-quick-panel.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("quick panel has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -27,7 +27,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("quick panel has role=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -39,7 +39,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("quick panel has aria-modal=true", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -53,7 +53,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("quick panel has aria-labelledby pointing to title", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -70,7 +70,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -90,7 +90,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("escape key closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -107,7 +107,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("close button has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -119,7 +119,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("close button closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -137,7 +137,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("profile buttons container has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -151,7 +151,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("reset button has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -163,7 +163,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("full settings link has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -177,7 +177,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("toggle switches visible in panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -191,7 +191,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("panel does not interfere with page content", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const mainCountBefore = await page.locator("main").count();

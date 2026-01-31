@@ -7,7 +7,7 @@
  * Run: npx playwright test e2e/a11y-data-testid.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 // ============================================================================
 // SKIP LINK WITH DATA-TESTID
@@ -15,7 +15,7 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Skip Link - data-testid Selectors", () => {
   test("skip link is present and has correct data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -23,7 +23,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link becomes visible on focus", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -38,7 +38,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link navigates to main content on click", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -53,7 +53,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link has proper ARIA label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -63,7 +63,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link has visible focus ring", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -89,7 +89,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
 
 test.describe("A11y Floating Button - data-testid Selectors", () => {
   test("floating button has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -97,7 +97,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("floating button has aria-expanded attribute", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -105,7 +105,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("floating button has aria-haspopup=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -113,7 +113,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("floating button has aria-controls", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -123,7 +123,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("aria-expanded becomes true when panel opens", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -140,7 +140,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("floating button has accessible label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -150,7 +150,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("button meets WCAG 44x44px touch target", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -161,7 +161,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
   });
 
   test("button is positioned in bottom-right corner", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -178,7 +178,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
 
 test.describe("A11y Quick Panel - data-testid Selectors", () => {
   test("quick panel has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -190,7 +190,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("panel has role=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -202,7 +202,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("panel has aria-modal=true", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -214,7 +214,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("panel has aria-labelledby", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -228,7 +228,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("close button has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -240,7 +240,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("close button closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -258,7 +258,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("escape key closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -275,7 +275,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("profile buttons container has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -289,7 +289,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("reset button has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -301,7 +301,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("full settings link has data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -315,7 +315,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("toggle switches have data-testid", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -331,7 +331,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("toggle switches have aria-checked", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -349,7 +349,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -380,7 +380,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
 
 test.describe("A11y Features Integration with data-testid", () => {
   test("skip link first in tab order", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     await page.keyboard.press("Tab");
@@ -393,7 +393,7 @@ test.describe("A11y Features Integration with data-testid", () => {
   });
 
   test("can cycle through accessibility features", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     // Tab to skip link
@@ -421,7 +421,7 @@ test.describe("A11y Features Integration with data-testid", () => {
   });
 
   test("all accessibility elements have testids", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');

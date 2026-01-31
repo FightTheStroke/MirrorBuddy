@@ -35,7 +35,7 @@ npx prisma migrate dev --name xyz  # Create migration (local only)
 
 `.claude/rules/`: accessibility | compliance | e2e-testing | tier | cookies | i18n | proxy-architecture | ci-verification
 
-## On-Demand Docs (`@docs/claude/<name>.md`)
+## On-Demand Docs (`@/claude/<name>.md`)
 
 **Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub | rag | safety | validation
 **Features**: voice-api | ambient-audio | onboarding | learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator | gamification
@@ -63,4 +63,4 @@ Before modifying: `npm run test:unit -- csp-validation`. "Caricamento..." foreve
 
 ## Verification
 
-`npm run ci:summary` (preferred). Details: `.claude/rules/ci-verification.md`.
+`./scripts/health-check.sh` (full triage, ~6 lines) or `npm run ci:summary` (build only). Details: `.claude/rules/ci-verification.md`.

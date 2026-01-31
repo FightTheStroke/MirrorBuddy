@@ -1,9 +1,11 @@
 # ADR 0029: Claude Code Optimization Strategy
 
 ## Status
+
 Accepted
 
 ## Date
+
 2026-01-10
 
 ## Context
@@ -23,11 +25,11 @@ Implement a multi-layer optimization strategy leveraging Claude Code's configura
 
 Auto-loaded rules for domain-specific patterns:
 
-| File | Purpose |
-|------|---------|
-| `accessibility.md` | 7 DSA profiles, WCAG 2.1 AA, store patterns |
-| `api-patterns.md` | Next.js API routes, Prisma, error handling |
-| `maestri.md` | 17 AI tutors, data structure, voice integration |
+| File               | Purpose                                         |
+| ------------------ | ----------------------------------------------- |
+| `accessibility.md` | 7 DSA profiles, WCAG 2.1 AA, store patterns     |
+| `api-patterns.md`  | Next.js API routes, Prisma, error handling      |
+| `maestri.md`       | 17 AI tutors, data structure, voice integration |
 
 ### 2. Mandatory Workflow
 
@@ -54,6 +56,7 @@ Bad: "Add an economics teacher"
 ### 4. Thor Enforcement
 
 Before any "done" declaration:
+
 - Verification command output shown (lint, typecheck, build)
 - All F-xx requirements listed with [x] or [ ] status
 - All deliverables listed with file paths
@@ -62,18 +65,21 @@ Before any "done" declaration:
 ### 5. Context Optimization
 
 **`.claudeignore`** excludes from scanning:
+
 - `e2e/` - 40+ test files
 - `testingcase/` - Test fixtures
 - `logs/` - Runtime logs
 - `coverage/`, `playwright-report/`, `test-results/`
 
 **Summary instructions** specify:
+
 - KEEP: Code changes with paths, F-xx status, test results, decisions, blockers
 - DISCARD: Verbose listings, debug output, intermediate exploration
 
 ### 6. TypeScript LSP
 
 Plugin installed for:
+
 - Go-to-definition without grep
 - Find-references across 1300+ files
 - Safe symbol renaming
@@ -81,7 +87,8 @@ Plugin installed for:
 
 ### 7. On-Demand Documentation
 
-19 specialized docs in `docs/claude/` loaded only when needed:
+19 specialized docs in `/claude/` loaded only when needed:
+
 - Core: mirrorbuddy, tools, database, api-routes
 - Voice: voice-api, ambient-audio, onboarding
 - Features: learning-path, pdf-generator, etc.
@@ -89,6 +96,7 @@ Plugin installed for:
 ## Consequences
 
 ### Positive
+
 - **Reduced token usage**: ~30-40% less per session (50-60% with LSP)
 - **Faster responses**: Rules eliminate "rediscovery" phase
 - **Higher accuracy**: Structured requests reduce misunderstanding
@@ -96,28 +104,31 @@ Plugin installed for:
 - **Better memory**: Specific summary instructions preserve critical context
 
 ### Negative
+
 - **Stricter workflow**: Non-trivial tasks require full pipeline
 - **Learning curve**: Users must structure requests properly
 - **Maintenance**: Rules need updates as codebase evolves
 
 ### Metrics (estimated)
 
-| Metric | Before | After |
-|--------|--------|-------|
-| Tokens per session | ~15,000 | ~9,000 |
-| "Incomplete done" rate | ~40% | ~5% |
-| Instruction misunderstanding | ~30% | ~10% |
-| Context retention | Poor | Good |
+| Metric                       | Before  | After  |
+| ---------------------------- | ------- | ------ |
+| Tokens per session           | ~15,000 | ~9,000 |
+| "Incomplete done" rate       | ~40%    | ~5%    |
+| Instruction misunderstanding | ~30%    | ~10%   |
+| Context retention            | Poor    | Good   |
 
 ## Files Changed
 
 ### New Files
+
 - `.claude/rules/accessibility.md`
 - `.claude/rules/api-patterns.md`
 - `.claude/rules/maestri.md`
 - `.claude/rules/README.md`
 
 ### Modified Files
+
 - `CLAUDE.md` - Added workflow, request format, Thor enforcement, summary instructions
 - `.claudeignore` - Added e2e/, testingcase/, logs/
 

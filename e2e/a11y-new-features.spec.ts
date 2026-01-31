@@ -10,7 +10,7 @@
  * Run: npx playwright test e2e/a11y-new-features.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 // ============================================================================
 // SKIP LINK TESTS
@@ -18,7 +18,13 @@ import { test, expect } from "@playwright/test";
 
 test.describe("Skip Link - WCAG 2.1 AA", () => {
   test("skip link is present on all pages", async ({ page }) => {
-    const pages = ["/", "/welcome", "/astuccio", "/supporti", "/mindmap"];
+    const pages = [
+      toLocalePath("/"),
+      toLocalePath("/welcome"),
+      toLocalePath("/astuccio"),
+      toLocalePath("/supporti"),
+      toLocalePath("/mindmap"),
+    ];
 
     for (const path of pages) {
       await page.goto(path);
@@ -30,7 +36,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link is hidden by default (sr-only)", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('a[href="#main-content"]');
@@ -50,7 +56,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link becomes visible on focus", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('a[href="#main-content"]');
@@ -74,7 +80,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   test("skip link has proper contrast and focus indicator", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('a[href="#main-content"]');
@@ -99,7 +105,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('a[href="#main-content"]');
@@ -117,7 +123,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link announces navigation to screen readers", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('a[href="#main-content"]');
@@ -140,7 +146,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
 
 test.describe("A11y Floating Button - ARIA Attributes", () => {
   test("floating button has aria-expanded attribute", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -151,7 +157,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
   });
 
   test("floating button has aria-haspopup=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -164,7 +170,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
   test("floating button has aria-controls pointing to panel", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -180,7 +186,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
   });
 
   test("aria-expanded changes to true when panel opens", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -199,7 +205,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
   });
 
   test("button has proper accessibility label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -211,7 +217,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
   });
 
   test("button meets WCAG 44x44px touch target", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -230,7 +236,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
 
 test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("quick panel has role=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -244,7 +250,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("quick panel has aria-modal=true", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -258,7 +264,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("quick panel has aria-labelledby", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -278,7 +284,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -305,7 +311,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("escape key closes panel", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -324,7 +330,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("close button has proper accessibility label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -342,7 +348,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("panel contains profile buttons with aria-label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -363,7 +369,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   test("toggle switches have role=switch and aria-checked", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -385,7 +391,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("sections have proper aria-labelledby", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator(
@@ -414,7 +420,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
 
 test.describe("A11y Features Integration", () => {
   test("skip link and floating button both work together", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     // Tab to skip link
@@ -441,7 +447,7 @@ test.describe("A11y Features Integration", () => {
   test("accessibility panel does not interfere with page content", async ({
     page,
   }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     // Get main content element count before opening panel

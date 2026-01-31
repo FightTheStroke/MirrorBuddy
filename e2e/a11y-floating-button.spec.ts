@@ -10,11 +10,11 @@
  * Run: npx playwright test e2e/a11y-floating-button.spec.ts
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   test("floating button has data-testid attribute", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -22,7 +22,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("floating button has aria-expanded attribute", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -30,7 +30,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("aria-expanded is initially false", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -38,7 +38,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("floating button has aria-haspopup=dialog", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -46,7 +46,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("floating button has aria-controls attribute", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -57,7 +57,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("aria-expanded becomes true when panel opens", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -69,7 +69,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("aria-expanded becomes false when panel closes", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -86,7 +86,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button has accessible aria-label", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -96,7 +96,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button meets WCAG 44x44px touch target minimum", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -107,7 +107,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button is positioned in bottom-right corner", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -119,7 +119,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button has visible focus indicator", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -140,7 +140,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button toggles panel with Enter key", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -154,7 +154,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button toggles panel with Space key", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -168,7 +168,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   });
 
   test("button has icon with aria-hidden", async ({ page }) => {
-    await page.goto("/");
+    await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');

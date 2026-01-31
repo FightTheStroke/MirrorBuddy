@@ -119,7 +119,7 @@ export default async function RootLayout({
       <body className={`${inter.className} antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <Providers nonce={nonce}>
-            <div data-testid="main-content">{children}</div>
+            <main id="main-content">{children}</main>
           </Providers>
         </NextIntlClientProvider>
         {isVercel && <Analytics />}

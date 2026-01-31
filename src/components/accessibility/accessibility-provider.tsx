@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { SkipLink } from "./skip-link";
 
 interface AccessibilityProviderProps {
   children: React.ReactNode;
@@ -170,11 +171,7 @@ export function AccessibilityProvider({
 
   return (
     <>
-      {/* Skip to content link */}
-      <a href="#main-content" className="skip-link" tabIndex={0}>
-        Salta al contenuto principale
-      </a>
-
+      <SkipLink targetId="main-content" />
       {children}
     </>
   );

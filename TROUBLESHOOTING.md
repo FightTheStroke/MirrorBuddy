@@ -31,7 +31,7 @@
 | "Deployment not found"                 | Wrong deployment name         | Check Azure Portal deployment name                     | [Azure OpenAI](#azure-openai-issues)              |
 | Database connection failed             | PostgreSQL not running        | Start PostgreSQL: `brew services start postgresql`     | [Database](#database-issues)                      |
 | "pgvector extension not found"         | pgvector not installed        | Install: `brew install pgvector` (macOS)               | [Database](#database-issues)                      |
-| Prisma errors on startup               | Schema out of sync            | Run: `npx prisma generate && npx prisma db push`       | [Database](#database-issues)                      |
+| Prisma errors on startup               | Schema out of sync            | Run: `npx prisma generate && npx prisma migrate dev`   | [Database](#database-issues)                      |
 | Microphone not working                 | Browser permissions denied    | Enable mic in browser settings                         | [Voice Sessions](#voice-session-issues)           |
 | Voice cuts out after 5 sec             | Wrong audio format            | Check sample rate: 24000 Hz, PCM16                     | [Voice Sessions](#voice-session-issues)           |
 | WebSocket connection failed            | Not using HTTPS in prod       | Deploy with HTTPS or use localhost                     | [Voice Sessions](#voice-session-issues)           |
@@ -79,7 +79,7 @@
 
 4. Test connection:
    ```bash
-   curl https://your-resource.openai.azure.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-08-01-preview \
+   curl https://your-resource.openai.azure.com/openai/deployments/gpt-4o-mini/chat/completions?api-version=2024-08-01-preview \
      -H "api-key: your-key" \
      -H "Content-Type: application/json" \
      -d '{"messages":[{"role":"user","content":"test"}]}'
@@ -100,8 +100,8 @@
 2. Match `.env.local` to deployment names:
 
    ```bash
-   AZURE_OPENAI_DEPLOYMENT=gpt-4o              # For chat
-   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime  # For voice
+    AZURE_OPENAI_CHAT_DEPLOYMENT=gpt-4o-mini        # For chat
+    AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime  # For voice
    ```
 
 3. **IMPORTANT:** Use deployment name, NOT model name:
@@ -154,9 +154,9 @@
 1. Ensure ALL three vars are set:
 
    ```bash
-   AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
-   AZURE_OPENAI_REALTIME_API_KEY=your-key
-   AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime
+    AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
+    AZURE_OPENAI_REALTIME_API_KEY=your-key
+    AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-realtime
    ```
 
 2. Verify deployment exists in Azure Portal
@@ -173,7 +173,7 @@
 - `gpt-4o-transcribe` is only for `/audio/transcriptions` endpoint
 - Our code uses correct model (`src/lib/hooks/use-voice-session.ts:524`)
 
-**Reference:** See `docs/claude/voice-api.md` → "Trascrizione Audio" section
+**Reference:** See `/claude/voice-api.md` → "Trascrizione Audio" section
 
 #### Problem: Voice session config fails with "Invalid session"
 
@@ -241,7 +241,7 @@
 | Emotional support    | `gpt-realtime`      | ~$0.30      | When nuance matters           |
 | Testing              | `gpt-realtime-mini` | ~$0.03-0.05 | Always use for dev            |
 
-**Reference:** See `docs/claude/voice-api.md` → "Modelli Disponibili" for full comparison
+**Reference:** See `/claude/voice-api.md` → "Modelli Disponibili" for full comparison
 
 ---
 
@@ -290,7 +290,7 @@
 ### Related Documentation
 
 - **Full API reference:** `docs/technical/AZURE_REALTIME_API.md`
-- **Voice configuration:** `docs/claude/voice-api.md`
+- **Voice configuration:** `/claude/voice-api.md`
 - **Setup guide:** `SETUP.md` → "Azure OpenAI Configuration"
 
 ---
@@ -941,7 +941,7 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 - Deploy with HTTPS (Vercel, Netlify, etc. handle this automatically)
 - Ensure WebSocket proxy also uses `wss://` (not `ws://`)
 
-**Reference:** See `docs/claude/voice-api.md` → "Requisito HTTPS per Microfono"
+**Reference:** See `/claude/voice-api.md` → "Requisito HTTPS per Microfono"
 
 ---
 
@@ -1326,7 +1326,7 @@ Our test-voice page includes device selection:
 ### Related Documentation
 
 - **Full API reference:** `docs/technical/AZURE_REALTIME_API.md`
-- **Voice configuration:** `docs/claude/voice-api.md`
+- **Voice configuration:** `/claude/voice-api.md`
 - **Test page implementation:** `src/app/test-voice/page.tsx`
 - **Voice hook:** `src/lib/hooks/use-voice-session.ts`
 - **WebSocket proxy:** `src/server/realtime-proxy.ts`
@@ -3010,7 +3010,7 @@ Rate limits by endpoint:
    - [`README.md`](README.md) - Project overview
    - [`SETUP.md`](SETUP.md) - Installation and setup guide
    - [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development guidelines
-   - [`docs/claude/`](docs/claude/) - Feature-specific documentation
+   - [`/claude/`](/claude/) - Feature-specific documentation
    - [`docs/technical/`](docs/technical/) - Technical deep dives
 
 3. **Run verification commands:**
@@ -3364,7 +3364,7 @@ ollama pull llama3.2
 - Use `gpt-realtime` only for MirrorBuddy (emotional support)
 - Monitor costs in Settings → AI Provider
 
-**See:** [docs/claude/voice-api.md](docs/claude/voice-api.md) → "Modelli Disponibili"
+**See:** [/claude/voice-api.md](/claude/voice-api.md) → "Modelli Disponibili"
 
 ---
 
@@ -3456,7 +3456,7 @@ npm run dev
 
 **Feature documentation:**
 
-- [`docs/claude/`](docs/claude/) - Feature-specific docs
+- [`/claude/`](/claude/) - Feature-specific docs
   - `voice-api.md` - Voice configuration
   - `ambient-audio.md` - Ambient audio system
   - `learning-path.md` - Learning paths
