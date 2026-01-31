@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { ChevronRight, Menu, Bell, UserPlus } from "lucide-react";
+import { ChevronRight, Menu, Bell, UserPlus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { TierSimulator } from "./tier-simulator";
@@ -100,8 +100,25 @@ export function AdminHeader({
         </h1>
       </div>
 
-      {/* Stats badges and tier simulator */}
+      {/* Search trigger, stats badges, and tier simulator */}
       <div className="flex items-center gap-2 shrink-0">
+        {/* Cmd+K search trigger */}
+        <button
+          onClick={() => {
+            document.dispatchEvent(
+              new KeyboardEvent("keydown", { key: "k", metaKey: true }),
+            );
+          }}
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 hover:border-slate-300 dark:hover:border-slate-600 transition-colors text-sm"
+          aria-label="Open command palette (Cmd+K)"
+        >
+          <Search className="h-4 w-4" />
+          <span className="hidden md:inline">Search...</span>
+          <kbd className="hidden md:inline-flex items-center gap-0.5 rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 text-xs font-mono">
+            ⌘K
+          </kbd>
+        </button>
+
         {/* Tier simulator for admin testing */}
         <TierSimulator />
 

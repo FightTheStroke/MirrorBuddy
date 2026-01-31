@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useAdminCountsSSE } from "@/hooks/use-admin-counts-sse";
 import { AdminSidebar } from "./admin-sidebar";
 import { AdminHeader } from "./admin-header";
+import { AdminBreadcrumbs } from "./admin-breadcrumbs";
+import { CommandPalette } from "./command-palette";
 import { cn } from "@/lib/utils";
 
 interface AdminLayoutClientProps {
@@ -85,8 +87,13 @@ export function AdminLayoutClient({ children }: AdminLayoutClientProps) {
           pendingInvites={counts.pendingInvites}
           systemAlerts={counts.systemAlerts}
         />
-        <main className="p-4 md:p-6">{children}</main>
+        <main className="p-4 md:p-6">
+          <AdminBreadcrumbs />
+          {children}
+        </main>
       </div>
+
+      <CommandPalette />
     </div>
   );
 }
