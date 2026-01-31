@@ -11,6 +11,10 @@ vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));
 
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+}));
+
 // Helper to create valid subscription data
 const createSubscription = (tierCode: string, tierName: string) => ({
   id: `sub-${tierCode.toLowerCase()}`,

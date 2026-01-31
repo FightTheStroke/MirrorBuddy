@@ -23,7 +23,7 @@ export function SafetyEventsCard({ data }: { data: SafetyEventsData | null }) {
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div className="text-center p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
             <p className="text-xl font-bold text-slate-900 dark:text-white">
               {data?.summary.totalEvents ?? 0}

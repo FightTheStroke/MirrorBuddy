@@ -61,7 +61,7 @@ export function A11yStatsWidget({ data }: A11yStatsWidgetProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Summary stats */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="text-center p-3 bg-muted rounded-lg">
             <p className="text-2xl font-bold text-violet-600">
               {data.summary.totalActivations}

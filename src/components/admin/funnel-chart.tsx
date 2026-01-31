@@ -70,7 +70,7 @@ export function FunnelChart({
         return (
           <div key={stage.stage}>
             <div className="flex items-center gap-3">
-              <div className="w-24 text-[11px] font-medium text-slate-600 dark:text-slate-400 text-right truncate">
+              <div className="w-16 sm:w-24 text-[11px] font-medium text-slate-600 dark:text-slate-400 text-right truncate">
                 {label}
               </div>
               <div className="flex-1 flex justify-center">
@@ -99,7 +99,7 @@ export function FunnelChart({
                 </div>
               </div>
               {showVelocity && stage.avgTimeFromPrevious != null && (
-                <div className="w-14 text-[10px] text-slate-400 text-right font-mono">
+                <div className="hidden sm:block w-14 text-[10px] text-slate-400 text-right font-mono">
                   {formatDuration(stage.avgTimeFromPrevious)}
                 </div>
               )}
