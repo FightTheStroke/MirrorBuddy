@@ -521,7 +521,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: smoke-test-report
-          path: playwright-report/
+          path: test-results/
           retention-days: 7
 
   # Lane 5.5: Accessibility Tests - WCAG 2.1 AA compliance (BLOCKING)
@@ -607,7 +607,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: accessibility-test-report
-          path: playwright-report/
+          path: test-results/
           retention-days: 7
 
   # Lane 6a: Mobile Smoke - Fast PR feedback
@@ -700,7 +700,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mobile-smoke-report
-          path: playwright-report/
+          path: test-results/
           retention-days: 7
 
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
@@ -795,7 +795,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: mobile-e2e-report
-          path: playwright-report/
+          path: test-results/
           retention-days: 30
 
       - name: Mobile E2E failure check
