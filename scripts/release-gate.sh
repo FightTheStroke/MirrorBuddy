@@ -29,36 +29,8 @@ echo " RELEASE GATE (10/10) - MIRRORBUDDY"
 echo "=========================================="
 echo ""
 
-echo -e "${BLUE}[PHASE 0] Pre-release checks...${NC}"
+echo -e "${BLUE}[PHASE 0] Pre-release checks (lint+typecheck+build+hygiene+i18n+perf+filesize)...${NC}"
 npm run pre-release
-
-echo ""
-echo -e "${BLUE}[PHASE 0.5] Repo hygiene (non-docs)...${NC}"
-repo_todos=$(rg -n "(TODO|FIXME|HACK|XXX):" -g "*.{ts,tsx,js,jsx,mjs,cjs,sh}" -g "!docs/**" -g "!node_modules/**" -g "!.next/**" -g "!coverage/**" -g "!playwright-report/**" -g "!test-results/**" -g "!logs/**" -g "!**/__tests__/**" -g "!**/*.test.*" -g "!**/*.spec.*" . 2>/dev/null || true)
-if [ -n "$repo_todos" ]; then
-	todo_count=$(echo "$repo_todos" | grep -c '' || echo 0)
-	echo -e "${RED}✗ BLOCKED: $todo_count TODO/FIXME/HACK outside docs${NC}"
-	if [[ "$SUMMARY_ONLY" == "1" ]]; then
-		echo "$repo_todos" | head -3
-		[[ "$todo_count" -gt 3 ]] && echo "  ... and $((todo_count - 3)) more"
-	else
-		echo "$repo_todos" | head -50
-	fi
-	exit 1
-fi
-echo -e "${GREEN}✓ Repo hygiene passed${NC}"
-
-echo ""
-echo -e "${BLUE}[PHASE 0.75] i18n verification...${NC}"
-i18n_output=$(npx tsx scripts/i18n-check.ts 2>&1)
-i18n_exit=$?
-if [ $i18n_exit -ne 0 ]; then
-	echo -e "${RED}✗ BLOCKED: i18n completeness check failed${NC}"
-	echo "$i18n_output"
-	exit 1
-fi
-echo "$i18n_output" | tail -10
-echo -e "${GREEN}✓ i18n verification passed${NC}"
 
 echo ""
 echo -e "${BLUE}[PHASE 0.8] Technical debt check...${NC}"
@@ -131,22 +103,7 @@ npm run test:e2e:smoke
 npm run test
 
 echo ""
-echo -e "${BLUE}[PHASE 4] Performance checks...${NC}"
-perf_output=$(./scripts/perf-check.sh 2>&1 || true)
-echo "$perf_output"
-if echo "$perf_output" | rg -q "PERFORMANCE CHECKS FAILED"; then
-	exit 1
-fi
-# Note: Performance warnings (N+1 heuristic, bundle size) are not blocking for v0.7
-echo -e "${GREEN}✓ Performance checks passed${NC}"
-
-echo ""
-echo -e "${BLUE}[PHASE 5] File size validation...${NC}"
-./scripts/check-file-size.sh
-# Note: File size warnings not blocking for v0.7 - refactoring 142 files is a future task
-
-echo ""
-echo -e "${BLUE}[PHASE 5.5] Legal review compliance check...${NC}"
+echo -e "${BLUE}[PHASE 4] Legal review compliance check...${NC}"
 legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1 || true)
 legal_exit=$?
 if [ $legal_exit -ne 0 ]; then
@@ -158,7 +115,7 @@ echo "$legal_output" | grep -E "SUMMARY|PASS|FAIL" | tail -10
 echo -e "${GREEN}✓ Legal review compliance check passed${NC}"
 
 echo ""
-echo -e "${BLUE}[PHASE 6] Plan sanity...${NC}"
+echo -e "${BLUE}[PHASE 5] Plan sanity...${NC}"
 plan_fail=0
 
 if [ -d "docs/plans/done" ]; then
