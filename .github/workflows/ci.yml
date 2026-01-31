@@ -595,7 +595,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Run Accessibility Tests
-        run: npx playwright test e2e/accessibility.spec.ts e2e/a11y-*.spec.ts --reporter=html
+        run: npx playwright test --project=a11y --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test

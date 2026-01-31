@@ -147,7 +147,16 @@ export default defineConfig({
         "**/debug-endpoints-security.spec.ts", // Tests dev-only debug endpoints
         "**/legal-ai-act.spec.ts", // Requires /ai-transparency page setup
         "**/mobile/**", // Mobile tests run in dedicated projects
+        "**/accessibility.spec.ts", // A11y tests run in dedicated project
+        "**/a11y-*.spec.ts", // A11y tests run in dedicated project
       ],
+    },
+    {
+      // Accessibility tests run in a dedicated project to avoid duplication
+      // with the accessibility-tests CI job (WCAG 2.1 AA compliance)
+      name: "a11y",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: ["**/accessibility.spec.ts", "**/a11y-*.spec.ts"],
     },
     {
       // Cookie-signing tests need to run without storage state to test fresh cookies
