@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useTranslations } from "next-intl";
 import { Loader2, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExportDropdown } from "@/components/admin/export-dropdown";
 import { AuditLogFilters } from "./audit-log-filters";
 import { AuditLogTable } from "./audit-log-table";
 
@@ -82,10 +83,23 @@ export function AuditLogView() {
         <p className="text-sm text-slate-500">
           {total} {t("audit.totalEntries")}
         </p>
-        <Button variant="outline" size="sm" onClick={fetchLogs}>
-          <RefreshCw className="h-4 w-4 mr-1.5" />
-          {t("audit.refresh")}
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            data={logs}
+            columns={[
+              { key: "action", label: "Action" },
+              { key: "entityType", label: "Entity Type" },
+              { key: "entityId", label: "Entity ID" },
+              { key: "adminId", label: "Admin ID" },
+              { key: "createdAt", label: "Date" },
+            ]}
+            filenamePrefix="audit-log"
+          />
+          <Button variant="outline" size="sm" onClick={fetchLogs}>
+            <RefreshCw className="h-4 w-4 mr-1.5" />
+            {t("audit.refresh")}
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

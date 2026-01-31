@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { RefreshCw, ExternalLink, Loader2 } from "lucide-react";
+import { RefreshCw, ExternalLink, Loader2, FileDown } from "lucide-react";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Button } from "@/components/ui/button";
 import { CostPanel } from "@/components/admin/CostPanel";
@@ -84,6 +84,12 @@ export default function AdminDashboardPage() {
 
         <div className="flex flex-wrap items-center justify-end gap-2">
           <PurgeStagingButton />
+          <Button variant="outline" size="sm" asChild>
+            <a href="/api/admin/reports/summary" download>
+              <FileDown className="h-4 w-4 mr-1.5" />
+              Report PDF
+            </a>
+          </Button>
           <Button variant="outline" size="sm" asChild>
             <a href={GRAFANA_URL} target="_blank" rel="noopener noreferrer">
               <ExternalLink className="h-4 w-4 mr-1.5" />

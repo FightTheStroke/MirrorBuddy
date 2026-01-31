@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { ResponsiveTable } from "@/components/admin/responsive-table";
 import { Button } from "@/components/ui/button";
+import { ExportDropdown } from "@/components/admin/export-dropdown";
 
 interface Tier {
   id: string;
@@ -44,7 +45,7 @@ export function TiersTable({ tiers }: { tiers: Tier[] }) {
 
   return (
     <div className="space-y-4">
-      {/* Search */}
+      {/* Search + Export */}
       <div className="flex items-center gap-3">
         <input
           type="text"
@@ -52,6 +53,17 @@ export function TiersTable({ tiers }: { tiers: Tier[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="flex-1 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary focus:border-transparent"
+        />
+        <ExportDropdown
+          data={filteredTiers}
+          columns={[
+            { key: "code", label: "Code" },
+            { key: "name", label: "Name" },
+            { key: "description", label: "Description" },
+            { key: "monthlyPriceEur", label: "Monthly Price (EUR)" },
+            { key: "isActive", label: "Active" },
+          ]}
+          filenamePrefix="tiers"
         />
       </div>
 

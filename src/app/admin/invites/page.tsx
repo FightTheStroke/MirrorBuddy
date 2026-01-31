@@ -7,6 +7,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Loader2, RefreshCw, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
+import { ExportDropdown } from "@/components/admin/export-dropdown";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import {
   InvitesTable,
@@ -133,16 +134,29 @@ export default function AdminInvitesPage() {
           <UserPlus className="w-4 h-4" />
           {t("directInvite")}
         </Button>
-        <Button
-          onClick={fetchInvites}
-          variant="outline"
-          size="sm"
-          className="gap-2"
-          disabled={loading}
-        >
-          <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
-          {t("refresh")}
-        </Button>
+        <div className="flex gap-2">
+          <ExportDropdown
+            data={invites}
+            columns={[
+              { key: "email", label: "Email" },
+              { key: "name", label: "Name" },
+              { key: "status", label: "Status" },
+              { key: "createdAt", label: "Date" },
+              { key: "motivation", label: "Motivation" },
+            ]}
+            filenamePrefix="invites"
+          />
+          <Button
+            onClick={fetchInvites}
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={loading}
+          >
+            <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
+            {t("refresh")}
+          </Button>
+        </div>
       </div>
 
       <div className="flex gap-1 mb-6 flex-wrap bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
