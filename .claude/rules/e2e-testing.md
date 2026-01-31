@@ -24,6 +24,9 @@ Without it: ToS modal blocks pointer events, tests timeout.
 // CORRECT - base fixtures (auto TOS mock + wall bypasses)
 import { test, expect } from "./fixtures/base-fixtures";
 
+// CORRECT - a11y fixtures (adds a11y support on top of base)
+import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
+
 // CORRECT - locale fixtures (adds locale support on top of base)
 import { test, expect, testAllLocales } from "./fixtures";
 
@@ -34,12 +37,13 @@ import { test, expect } from "./fixtures/auth-fixtures";
 import { test, expect } from "@playwright/test";
 ```
 
-**Enforced by**: ESLint rule `local-rules/require-e2e-fixtures` (warns on `e2e/**/*.spec.ts`).
+**Enforced by**: ESLint rule `local-rules/require-e2e-fixtures`.
 
 ### Fixture Chain Architecture
 
 ```
 base-fixtures.ts          -- /api/tos mock + consent cookie + localStorage
+  |-- a11y-fixtures.ts    -- + toLocalePath, a11y test helpers
   |-- locale-fixtures.ts  -- + Accept-Language, NEXT_LOCALE cookie, LocalePage
   |-- auth-fixtures.ts    -- + trialPage (onboarding bypass), adminPage (auth cookies)
 ```
@@ -49,14 +53,6 @@ All fixtures chain from `base-fixtures.ts`, which automatically applies:
 1. `/api/tos` route mock (bypasses TosGateProvider)
 2. `mirrorbuddy-consent` localStorage (bypasses CookieConsentWall)
 3. `mirrorbuddy-trial-consent` cookie (bypasses TrialConsentGate)
-
-### Why This Matters (ADR 0059)
-
-TosGateProvider checks **both** localStorage AND calls `GET /api/tos` on mount.
-Without the mock, it receives `{accepted: false}`, shows a modal overlay, and
-**blocks ALL pointer events** on the page.
-
-**Symptom**: Test timeout with error "element intercepts pointer events" showing ToS modal heading.
 
 ## Adding New Walls
 

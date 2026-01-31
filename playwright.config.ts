@@ -75,7 +75,10 @@ export default defineConfig({
   retries: process.env.CI ? 2 : 0,
   // Use 2 workers for mobile tests (CI_MOBILE_TESTS=1) to reduce resource contention
   workers: process.env.CI ? (process.env.CI_MOBILE_TESTS ? 2 : 4) : undefined,
-  reporter: "html",
+  reporter: [
+    ["list"],
+    ["json", { outputFile: "test-results/pw-results.json" }],
+  ],
 
   // Global setup: sets onboarding as completed
   globalSetup: path.join(__dirname, "e2e", "global-setup.ts"),
@@ -147,7 +150,16 @@ export default defineConfig({
         "**/debug-endpoints-security.spec.ts", // Tests dev-only debug endpoints
         "**/legal-ai-act.spec.ts", // Requires /ai-transparency page setup
         "**/mobile/**", // Mobile tests run in dedicated projects
+        "**/accessibility.spec.ts", // A11y tests run in dedicated project
+        "**/a11y-*.spec.ts", // A11y tests run in dedicated project
       ],
+    },
+    {
+      // Accessibility tests run in a dedicated project to avoid duplication
+      // with the accessibility-tests CI job (WCAG 2.1 AA compliance)
+      name: "a11y",
+      use: { ...devices["Desktop Chrome"] },
+      testMatch: ["**/accessibility.spec.ts", "**/a11y-*.spec.ts"],
     },
     {
       // Cookie-signing tests need to run without storage state to test fresh cookies

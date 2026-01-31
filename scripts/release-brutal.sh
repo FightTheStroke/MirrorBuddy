@@ -7,6 +7,9 @@
 set -o pipefail
 cd "$(dirname "$0")/.."
 
+# shellcheck source=lib/checks.sh
+source "$(dirname "$0")/lib/checks.sh"
+
 JSON_MODE=false
 [ "${1:-}" = "--json" ] && JSON_MODE=true
 
@@ -18,115 +21,119 @@ trap "rm -f $RESULTS_FILE" EXIT
 TOTAL_FAILED=0
 START=$(date +%s)
 
-pass() { echo "$1:PASS" >> "$RESULTS_FILE"; }
+pass() { echo "$1:PASS" >>"$RESULTS_FILE"; }
 fail() {
-  echo "$1:FAIL" >> "$RESULTS_FILE"
-  TOTAL_FAILED=$((TOTAL_FAILED + 1))
-  echo "## $1" >> "$ISSUES_FILE"
-  [ -n "${2:-}" ] && echo -e "$2\n" >> "$ISSUES_FILE"
+	echo "$1:FAIL" >>"$RESULTS_FILE"
+	TOTAL_FAILED=$((TOTAL_FAILED + 1))
+	echo "## $1" >>"$ISSUES_FILE"
+	[ -n "${2:-}" ] && echo -e "$2\n" >>"$ISSUES_FILE"
 }
 
-# Header for issues file
-echo "# Release Brutal - Issues to Fix" > "$ISSUES_FILE"
-echo "Generated: $(date)" >> "$ISSUES_FILE"
-echo "" >> "$ISSUES_FILE"
+echo "# Release Brutal - Issues to Fix" >"$ISSUES_FILE"
+echo "Generated: $(date)" >>"$ISSUES_FILE"
+echo "" >>"$ISSUES_FILE"
 
 # =============================================================================
 # PHASE 0: ENVIRONMENT VARIABLES CHECK
 # =============================================================================
-# Database URL is required, but local release runs may load it from .env via dotenv.
-# We avoid reading .env contents here; presence is enough for local execution.
 if [ -z "$DATABASE_URL" ] && [ -z "$TEST_DATABASE_URL" ] && [ ! -f ".env" ]; then
-  fail "env-vars-db" "DATABASE_URL/TEST_DATABASE_URL not set and .env not found. Configure database env vars for tests/deployment."
+	fail "env-vars-db" "DATABASE_URL/TEST_DATABASE_URL not set and .env not found."
 else
-  pass "env-vars-db"
+	pass "env-vars-db"
 fi
 
-# NODE_ENV must be explicit (release runs should never rely on implicit defaults)
 if [ -z "$NODE_ENV" ]; then
-  fail "env-vars-node" "NODE_ENV is not set. Set NODE_ENV=test (local) or NODE_ENV=production (deployment)."
+	fail "env-vars-node" "NODE_ENV is not set. Set NODE_ENV=test or NODE_ENV=production."
 else
-  pass "env-vars-node"
+	pass "env-vars-node"
 fi
 
 if [ -z "$SUPABASE_CA_CERT" ] && [ ! -f "config/supabase-chain.pem" ]; then
-  fail "env-vars-ssl" "SUPABASE_CA_CERT not set and config/supabase-chain.pem not found. SSL certificate configuration is missing."
+	fail "env-vars-ssl" "SUPABASE_CA_CERT not set and config/supabase-chain.pem not found."
 else
-  pass "env-vars-ssl"
+	pass "env-vars-ssl"
 fi
 
 # =============================================================================
 # PHASE 0.5: VERCEL/SENTRY CONFIGURATION CHECK
 # =============================================================================
-# Verify Vercel environment variables (if Vercel CLI available)
-if command -v vercel &> /dev/null; then
-  ./scripts/verify-vercel-env.sh > /tmp/release-vercel-env.log 2>&1 && pass "vercel-env" || fail "vercel-env" "\`\`\`\n$(tail -20 /tmp/release-vercel-env.log)\n\`\`\`"
+if command -v vercel &>/dev/null; then
+	./scripts/verify-vercel-env.sh >/tmp/release-vercel-env.log 2>&1 && pass "vercel-env" || fail "vercel-env" "\`\`\`\n$(tail -20 /tmp/release-vercel-env.log)\n\`\`\`"
 else
-  pass "vercel-env"  # Skip if Vercel CLI not available (local dev)
+	pass "vercel-env"
 fi
 
-# Verify Sentry configuration (critical for production error tracking)
-./scripts/verify-sentry-config.sh > /tmp/release-sentry-config.log 2>&1 && pass "sentry-config" || fail "sentry-config" "\`\`\`\n$(tail -20 /tmp/release-sentry-config.log)\n\`\`\`"
+./scripts/verify-sentry-config.sh >/tmp/release-sentry-config.log 2>&1 && pass "sentry-config" || fail "sentry-config" "\`\`\`\n$(tail -20 /tmp/release-sentry-config.log)\n\`\`\`"
 
 # =============================================================================
-# PHASE 1: INSTANT CHECKS
+# PHASE 1: INSTANT CHECKS (uses shared lib)
 # =============================================================================
-[ -f README.md ] && [ -f CHANGELOG.md ] && [ -f CLAUDE.md ] && pass "docs" || fail "docs" "Missing: README.md, CHANGELOG.md, or CLAUDE.md"
+exec_docs_exist
+[ "$_EXIT" -eq 0 ] && pass "docs" || fail "docs" "$(cat "$_OUTPUT")"
+rm -f "$_OUTPUT"
 
-HYGIENE_MATCH=$(rg '(TODO|FIXME|HACK):' -g '*.ts' -g '*.tsx' src/ 2>/dev/null | rg -v '__tests__|\.test\.|\.spec\.' | head -3)
-[ -z "$HYGIENE_MATCH" ] && pass "hygiene" || fail "hygiene" "\`\`\`\n$HYGIENE_MATCH\n\`\`\`"
+exec_hygiene
+[ "$_EXIT" -eq 0 ] && pass "hygiene" || fail "hygiene" "\`\`\`\n$(cat "$_OUTPUT")\n\`\`\`"
+rm -f "$_OUTPUT"
 
-TS_IGNORE=$(rg '@ts-ignore|@ts-nocheck' src/ 2>/dev/null | head -3)
-[ -z "$TS_IGNORE" ] && pass "ts-ignore" || fail "ts-ignore" "\`\`\`\n$TS_IGNORE\n\`\`\`"
-
-ANY_MATCH=$(rg ': any\b|as any\b' -g '*.ts' -g '*.tsx' src/ 2>/dev/null | rg -v '__tests__|\.test\.|\.spec\.' | rg -v '//.*any|/\*|\* .*any|eslint-disable' | head -3)
-[ -z "$ANY_MATCH" ] && pass "any-type" || fail "any-type" "\`\`\`\n$ANY_MATCH\n\`\`\`"
+check_ts_rigor
+if [ "$_EXIT" -eq 0 ]; then
+	pass "ts-ignore"
+	pass "any-type"
+else
+	[[ -n "${_TS_IGNORE:-}" ]] && fail "ts-ignore" "\`\`\`\n$(echo "$_TS_IGNORE" | head -3)\n\`\`\`" || pass "ts-ignore"
+	[[ -n "${_PROD_ANY:-}" ]] && fail "any-type" "\`\`\`\n$(echo "$_PROD_ANY" | head -3)\n\`\`\`" || pass "any-type"
+fi
+rm -f "$_OUTPUT"
 
 # =============================================================================
 # PHASE 2: PARALLEL STATIC ANALYSIS
 # =============================================================================
-npm run lint > /tmp/release-lint.log 2>&1 &
+npm run lint >/tmp/release-lint.log 2>&1 &
 PID_LINT=$!
-npm run typecheck > /tmp/release-typecheck.log 2>&1 &
+npm run typecheck >/tmp/release-typecheck.log 2>&1 &
 PID_TYPE=$!
-npm audit --audit-level=high > /tmp/release-audit.log 2>&1 &
+npm audit --audit-level=high >/tmp/release-audit.log 2>&1 &
 PID_AUDIT=$!
 
 wait $PID_LINT && pass "lint" || fail "lint" "\`\`\`\n$(tail -20 /tmp/release-lint.log)\n\`\`\`"
-wait $PID_TYPE && pass "typecheck" || fail "typecheck" "\`\`\`\n$(cat /tmp/release-typecheck.log | grep -E 'error TS|Cannot find' | head -10)\n\`\`\`"
+wait $PID_TYPE && pass "typecheck" || fail "typecheck" "\`\`\`\n$(grep -E 'error TS|Cannot find' /tmp/release-typecheck.log | head -10)\n\`\`\`"
 wait $PID_AUDIT && pass "audit" || fail "audit" "\`\`\`\n$(tail -20 /tmp/release-audit.log)\n\`\`\`"
 
 # =============================================================================
 # PHASE 3: BUILD
 # =============================================================================
-npm run build > /tmp/release-build.log 2>&1 && pass "build" || fail "build" "\`\`\`\n$(grep -E 'Error:|error' /tmp/release-build.log | head -10)\n\`\`\`"
+npm run build >/tmp/release-build.log 2>&1 && pass "build" || fail "build" "\`\`\`\n$(grep -E 'Error:|error' /tmp/release-build.log | head -10)\n\`\`\`"
 
 # =============================================================================
 # PHASE 4: TESTS
 # =============================================================================
-npm run test:coverage > /tmp/release-unit.log 2>&1 && pass "unit" || fail "unit" "\`\`\`\n$(grep -E 'FAIL|Error|failed' /tmp/release-unit.log | head -10)\n\`\`\`"
+npm run test:coverage >/tmp/release-unit.log 2>&1 && pass "unit" || fail "unit" "\`\`\`\n$(grep -E 'FAIL|Error|failed' /tmp/release-unit.log | head -10)\n\`\`\`"
 
-npm run test > /tmp/release-e2e.log 2>&1
+npm run test >/tmp/release-e2e.log 2>&1
 E2E_EXIT=$?
-# Strip ANSI codes for reliable parsing
-E2E_CLEAN=$(cat /tmp/release-e2e.log | sed 's/\x1b\[[0-9;]*m//g' | sed 's/\x1b\[[0-9]*[A-Z]//g')
+E2E_CLEAN=$(sed 's/\x1b\[[0-9;]*m//g; s/\x1b\[[0-9]*[A-Z]//g' /tmp/release-e2e.log)
 E2E_PASSED=$(echo "$E2E_CLEAN" | /usr/bin/grep -oE '[0-9]+ passed' | tail -1 | /usr/bin/grep -oE '[0-9]+')
 E2E_FAILED=$(echo "$E2E_CLEAN" | /usr/bin/grep -oE '[0-9]+ failed' | tail -1 | /usr/bin/grep -oE '[0-9]+')
 E2E_FAILED=${E2E_FAILED:-0}
 E2E_PASSED=${E2E_PASSED:-0}
-# Must have passed > 0 AND failed = 0 AND exit code 0
 if [ "$E2E_EXIT" -eq 0 ] && [ "$E2E_PASSED" -gt 0 ] && [ "$E2E_FAILED" -eq 0 ] 2>/dev/null; then
-  pass "e2e"
+	pass "e2e"
 else
-  FAILED_TESTS=$(echo "$E2E_CLEAN" | /usr/bin/grep -E "^\s+[0-9]+\)|Error:" | head -10)
-  fail "e2e" "**Exit**: $E2E_EXIT, **Passed**: $E2E_PASSED, **Failed**: $E2E_FAILED\n\n\`\`\`\n$FAILED_TESTS\n\`\`\`"
+	FAILED_TESTS=$(echo "$E2E_CLEAN" | /usr/bin/grep -E "^\s+[0-9]+\)|Error:" | head -10)
+	fail "e2e" "**Exit**: $E2E_EXIT, **Passed**: $E2E_PASSED, **Failed**: $E2E_FAILED\n\n\`\`\`\n$FAILED_TESTS\n\`\`\`"
 fi
 
 # =============================================================================
-# PHASE 5: PERFORMANCE + FILE SIZE
+# PHASE 5: PERFORMANCE + FILE SIZE (uses shared lib)
 # =============================================================================
-./scripts/perf-check.sh > /tmp/release-perf.log 2>&1 && pass "perf" || fail "perf" "\`\`\`\n$(cat /tmp/release-perf.log)\n\`\`\`"
-./scripts/check-file-size.sh > /tmp/release-filesize.log 2>&1 && pass "filesize" || fail "filesize" "\`\`\`\n$(cat /tmp/release-filesize.log)\n\`\`\`"
+exec_perf
+[ "$_EXIT" -eq 0 ] && pass "perf" || fail "perf" "\`\`\`\n$(cat "$_OUTPUT")\n\`\`\`"
+rm -f "$_OUTPUT"
+
+exec_filesize
+[ "$_EXIT" -eq 0 ] && pass "filesize" || fail "filesize" "\`\`\`\n$(cat "$_OUTPUT")\n\`\`\`"
+rm -f "$_OUTPUT"
 
 # =============================================================================
 # PHASE 6: SECURITY
@@ -137,13 +144,13 @@ rg -q 'csrf' src/lib/auth/ 2>/dev/null && pass "csrf" || fail "csrf" "Missing CS
 DEBUG_UNSAFE=false
 UNSAFE_ROUTE=""
 if [ -d src/app/api/debug ]; then
-  for route in $(find src/app/api/debug -name "route.ts" 2>/dev/null); do
-    if ! /usr/bin/grep -q "NODE_ENV" "$route" 2>/dev/null; then
-      DEBUG_UNSAFE=true
-      UNSAFE_ROUTE="$route"
-      break
-    fi
-  done
+	for route in $(find src/app/api/debug -name "route.ts" 2>/dev/null); do
+		if ! /usr/bin/grep -q "NODE_ENV" "$route" 2>/dev/null; then
+			DEBUG_UNSAFE=true
+			UNSAFE_ROUTE="$route"
+			break
+		fi
+	done
 fi
 $DEBUG_UNSAFE && fail "no-debug" "Unprotected: $UNSAFE_ROUTE" || pass "no-debug"
 pass "rate-limit"
@@ -156,27 +163,22 @@ pass "rate-limit"
 [ -d src/app/privacy ] && pass "privacy-page" || fail "privacy-page" "Missing src/app/privacy/"
 [ -d src/app/terms ] && pass "terms-page" || fail "terms-page" "Missing src/app/terms/"
 
-# Compliance documentation gate (F-04)
 COMPLIANCE_DOCS_FAIL=false
 COMPLIANCE_DOCS_MISSING=""
 for doc in "INCIDENT-RESPONSE-PLAN.md" "PILOT-RESEARCH-PROTOCOL.md" "VPAT-ACCESSIBILITY-REPORT.md" "SOC2-ISO27001-ROADMAP.md" "AI-ACT-CONFORMITY-ASSESSMENT.md"; do
-  if [ ! -f "docs/compliance/$doc" ]; then
-    COMPLIANCE_DOCS_FAIL=true
-    COMPLIANCE_DOCS_MISSING="$COMPLIANCE_DOCS_MISSING\n- docs/compliance/$doc"
-  fi
+	if [ ! -f "docs/compliance/$doc" ]; then
+		COMPLIANCE_DOCS_FAIL=true
+		COMPLIANCE_DOCS_MISSING="$COMPLIANCE_DOCS_MISSING\n- docs/compliance/$doc"
+	fi
 done
 $COMPLIANCE_DOCS_FAIL && fail "compliance-docs" "Missing compliance documentation:$COMPLIANCE_DOCS_MISSING" || pass "compliance-docs"
 
-# i18n namespace completeness (all 5 locales synced)
-npm run i18n:check > /tmp/release-i18n.log 2>&1 && pass "i18n-completeness" || fail "i18n-completeness" "\`\`\`\n$(tail -10 /tmp/release-i18n.log)\n\`\`\`"
+npm run i18n:check >/tmp/release-i18n.log 2>&1 && pass "i18n-completeness" || fail "i18n-completeness" "\`\`\`\n$(tail -10 /tmp/release-i18n.log)\n\`\`\`"
 
-# Architecture diagrams check (25 sections + 21 compliance + ALL ADRs)
-# First sync any missing ADRs, then validate
-./scripts/sync-architecture-diagrams.sh > /tmp/release-arch-sync.log 2>&1 || true
-./scripts/check-architecture-diagrams.sh > /tmp/release-arch-diagrams.log 2>&1 && pass "arch-diagrams" || fail "arch-diagrams" "\`\`\`\n$(/usr/bin/grep -E '✗|FAIL|MISSING' /tmp/release-arch-diagrams.log | head -10)\n\`\`\`"
+./scripts/sync-architecture-diagrams.sh >/tmp/release-arch-sync.log 2>&1 || true
+./scripts/check-architecture-diagrams.sh >/tmp/release-arch-diagrams.log 2>&1 && pass "arch-diagrams" || fail "arch-diagrams" "\`\`\`\n$(/usr/bin/grep -E '✗|FAIL|MISSING' /tmp/release-arch-diagrams.log | head -10)\n\`\`\`"
 
-# Documentation/Code audit (trial limits, health status, voice model, metrics cadence)
-./scripts/doc-code-audit.sh > /tmp/release-doc-code-audit.log 2>&1 && pass "doc-code-audit" || fail "doc-code-audit" "\`\`\`\n$(/usr/bin/grep -E '✗ FAIL' /tmp/release-doc-code-audit.log | head -10)\n\`\`\`"
+./scripts/doc-code-audit.sh >/tmp/release-doc-code-audit.log 2>&1 && pass "doc-code-audit" || fail "doc-code-audit" "\`\`\`\n$(/usr/bin/grep -E '✗ FAIL' /tmp/release-doc-code-audit.log | head -10)\n\`\`\`"
 
 # =============================================================================
 # PHASE 8: PLAN SANITY
@@ -184,11 +186,11 @@ npm run i18n:check > /tmp/release-i18n.log 2>&1 && pass "i18n-completeness" || f
 PLAN_OK=true
 PLAN_FAIL=""
 if [ -d docs/plans/done ]; then
-  for f in docs/plans/done/*.md; do
-    [ -f "$f" ] || continue
-    unchecked=$(/usr/bin/grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
-    [ "$unchecked" -gt 0 ] && PLAN_OK=false && PLAN_FAIL="$f has $unchecked unchecked items"
-  done
+	for f in docs/plans/done/*.md; do
+		[ -f "$f" ] || continue
+		unchecked=$(/usr/bin/grep -c '\[ \]' "$f" 2>/dev/null || echo 0)
+		[ "$unchecked" -gt 0 ] && PLAN_OK=false && PLAN_FAIL="$f has $unchecked unchecked items"
+	done
 fi
 $PLAN_OK && pass "plans" || fail "plans" "$PLAN_FAIL"
 
@@ -198,7 +200,7 @@ $PLAN_OK && pass "plans" || fail "plans" "$PLAN_FAIL"
 COMPLIANCE_CHECKS=$(grep "^compliance\|^i18n\|^dpia\|^ai-policy\|^privacy\|^terms" "$RESULTS_FILE" 2>/dev/null || echo "")
 COMPLIANCE_PASS=$(echo "$COMPLIANCE_CHECKS" | /usr/bin/grep -c ":PASS$" 2>/dev/null || echo 0)
 COMPLIANCE_TOTAL=$(echo "$COMPLIANCE_CHECKS" | /usr/bin/wc -l | tr -d ' ')
-[ "$COMPLIANCE_TOTAL" -gt 0 ] && echo "## Compliance Gate Summary" >> "$ISSUES_FILE" && echo "Passed: $COMPLIANCE_PASS/$COMPLIANCE_TOTAL compliance checks" >> "$ISSUES_FILE" && echo "" >> "$ISSUES_FILE"
+[ "$COMPLIANCE_TOTAL" -gt 0 ] && echo "## Compliance Gate Summary" >>"$ISSUES_FILE" && echo "Passed: $COMPLIANCE_PASS/$COMPLIANCE_TOTAL compliance checks" >>"$ISSUES_FILE" && echo "" >>"$ISSUES_FILE"
 
 # =============================================================================
 # OUTPUT
@@ -208,13 +210,12 @@ TOTAL_CHECKS=$(cat "$RESULTS_FILE" | /usr/bin/wc -l | tr -d ' ')
 STATUS="PASS"
 [ "$TOTAL_FAILED" -gt 0 ] && STATUS="FAIL"
 
-# Clean up issues file if no failures
 [ "$TOTAL_FAILED" -eq 0 ] && rm -f "$ISSUES_FILE"
 
 if $JSON_MODE; then
-  echo "{\"status\":\"$STATUS\",\"duration\":$TOTAL,\"checks\":$TOTAL_CHECKS,\"failed\":$TOTAL_FAILED}"
+	echo "{\"status\":\"$STATUS\",\"duration\":$TOTAL,\"checks\":$TOTAL_CHECKS,\"failed\":$TOTAL_FAILED}"
 else
-  [ "$STATUS" = "PASS" ] && echo "✓ RELEASE BRUTAL PASS ($TOTAL_CHECKS checks, ${TOTAL}s)" || echo "✗ RELEASE BRUTAL FAIL ($TOTAL_FAILED/$TOTAL_CHECKS failed, ${TOTAL}s) → /tmp/release-brutal-issues.md"
+	[ "$STATUS" = "PASS" ] && echo "✓ RELEASE BRUTAL PASS ($TOTAL_CHECKS checks, ${TOTAL}s)" || echo "✗ RELEASE BRUTAL FAIL ($TOTAL_FAILED/$TOTAL_CHECKS failed, ${TOTAL}s) → /tmp/release-brutal-issues.md"
 fi
 
 [ "$TOTAL_FAILED" -gt 0 ] && exit 1
