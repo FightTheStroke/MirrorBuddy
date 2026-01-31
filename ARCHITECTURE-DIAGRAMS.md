@@ -1,5 +1,7 @@
 # MirrorBuddy Architecture Diagrams
 
+> **AI agents**: Skip this file. Use `ARCHITECTURE.md` and `@docs/claude/` instead. This file contains Mermaid diagrams for human visual reference only.
+
 > Complete visual documentation of the MirrorBuddy platform architecture.
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
