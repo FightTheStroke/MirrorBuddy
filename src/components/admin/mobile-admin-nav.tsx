@@ -66,7 +66,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: "audit-log",
     label: "Audit Log",
-    href: "/admin/tiers/audit-log",
+    href: "/admin/audit",
     icon: ScrollText,
   },
   {

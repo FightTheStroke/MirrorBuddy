@@ -77,7 +77,7 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
       label: t("sidebar.auditLog"),
       section: "navigation",
       icon: ScrollText,
-      href: "/admin/tiers/audit-log",
+      href: "/admin/audit",
       keywords: ["log", "history"],
     },
     {

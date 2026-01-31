@@ -449,6 +449,47 @@
       "tokenUsageByType": "Utilizzo token per tipo",
       "topServices": "Servizi principali",
       "total": "Totale"
+    },
+    "characters": {
+      "title": "Gestione Personaggi",
+      "description": "Gestisci maestri, coach e buddy: abilita, disabilita e personalizza.",
+      "all": "Tutti",
+      "refresh": "Aggiorna",
+      "noResults": "Nessun personaggio trovato.",
+      "tools": "strumenti",
+      "edit": "Modifica",
+      "enable": "Abilita personaggio",
+      "disable": "Disabilita personaggio",
+      "editTitle": "Modifica Personaggio",
+      "displayNameOverride": "Nome Visualizzato",
+      "displayNameHint": "Lascia vuoto per usare il nome predefinito.",
+      "descriptionOverride": "Descrizione",
+      "descriptionHint": "Descrizione personalizzata opzionale.",
+      "cancel": "Annulla",
+      "save": "Salva"
+    },
+    "audit": {
+      "title": "Registro Audit",
+      "description": "Log di tutte le azioni admin per accountability e compliance.",
+      "totalEntries": "voci totali",
+      "refresh": "Aggiorna",
+      "filters": "Filtri",
+      "clearFilters": "Pulisci",
+      "actionType": "Tipo Azione",
+      "allActions": "Tutte le azioni",
+      "entityType": "Tipo Entita'",
+      "allEntities": "Tutte le entita'",
+      "from": "Da",
+      "to": "A",
+      "page": "Pagina",
+      "prev": "Precedente",
+      "next": "Successiva",
+      "noLogs": "Nessuna voce nel registro audit.",
+      "colDate": "Data",
+      "colAction": "Azione",
+      "colEntity": "Entita'",
+      "colAdmin": "Admin",
+      "colIp": "IP"
     }
   }
 }
