@@ -35,14 +35,15 @@ npx prisma migrate dev --name xyz  # Create migration (local only)
 
 `.claude/rules/`: accessibility | compliance | e2e-testing | tier | cookies | i18n | proxy-architecture | ci-verification
 
-## On-Demand Docs (`@/claude/<name>.md`)
+## On-Demand Docs (`@docs/claude/<name>.md`)
 
-**Core**: mirrorbuddy | tools | database | api-routes | knowledge-hub | rag | safety | validation
-**Features**: voice-api | ambient-audio | onboarding | learning-path | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | conversation-memory | pdf-generator | gamification
-**Beta**: trial-mode
+**Core**: mirrorbuddy | tools | database | api-routes
+**Learning**: knowledge-hub | rag | learning-path | conversation-memory
+**Characters**: coaches | buddies | adding-maestri | safety
+**Features**: voice-api | ambient-audio | onboarding | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | pdf-generator | gamification | validation
 **Compliance**: accessibility
-**Characters**: buddies | coaches | adding-maestri
-**Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations
+**Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations | staging
+**Beta**: trial-mode | google-drive
 **Setup**: `docs/setup/` — database.md | docker.md
 
 ## CSP (Content Security Policy) — CRITICAL
