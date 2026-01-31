@@ -19,7 +19,7 @@
  * - a11y-instant-access.spec.ts (instant access feature tests)
  */
 
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./fixtures/base-fixtures";
 import AxeBuilder from "@axe-core/playwright";
 
 // IMPORTANT: These tests check unauthenticated pages (welcome, legal, etc.)
