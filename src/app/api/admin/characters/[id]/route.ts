@@ -9,6 +9,7 @@ import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
+import { getClientIp, logAdminAction } from "@/lib/admin/audit-service";
 import { getAllMaestri } from "@/data/maestri";
 import { getAllSupportTeachers } from "@/data/support-teachers";
 import { getAllBuddies } from "@/data/buddy-profiles";
@@ -70,6 +71,10 @@ export async function PATCH(
       );
     }
 
+    const existingConfig = await prisma.characterConfig.findUnique({
+      where: { characterId },
+    });
+
     // Upsert CharacterConfig
     const config = await prisma.characterConfig.upsert({
       where: { characterId },
@@ -97,6 +102,37 @@ export async function PATCH(
       characterId,
       isEnabled: config.isEnabled,
       updatedBy: auth.userId,
+    });
+
+    const action =
+      body.isEnabled !== undefined &&
+      body.displayNameOverride === undefined &&
+      body.descriptionOverride === undefined
+        ? "character.toggle"
+        : "character.update";
+
+    await logAdminAction({
+      action,
+      entityType: "CharacterConfig",
+      entityId: config.id,
+      adminId: auth.userId || "unknown",
+      ipAddress: getClientIp(request),
+      details: {
+        characterId,
+        characterType,
+        previous: existingConfig
+          ? {
+              isEnabled: existingConfig.isEnabled,
+              displayNameOverride: existingConfig.displayNameOverride,
+              descriptionOverride: existingConfig.descriptionOverride,
+            }
+          : null,
+        current: {
+          isEnabled: config.isEnabled,
+          displayNameOverride: config.displayNameOverride,
+          descriptionOverride: config.descriptionOverride,
+        },
+      },
     });
 
     return NextResponse.json({ success: true, config });
