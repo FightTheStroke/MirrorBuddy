@@ -1,10 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { migrateTrialData } from "@/lib/invite/trial-migration";
 import { trackInviteFirstLogin } from "@/lib/telemetry/invite-events";
 import { logger } from "@/lib/logger";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Verify authentication
     const auth = await validateAuth();

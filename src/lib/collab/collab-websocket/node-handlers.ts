@@ -3,119 +3,140 @@
  * @brief Node operation handlers
  */
 
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { MindmapNode } from '@/types/tools';
-import { addNode, updateNode, deleteNode, moveNode, getRoomState } from '../mindmap-room';
-import { connections } from './connection-manager';
-import { sendToConnection, broadcastToRoom } from './messaging-utils';
-import { convertExportNodeToToolNode } from '../mindmap-room/node-converter';
+import type { MindmapNode as ExportNode } from "@/lib/tools/mindmap-export/index";
+import type { MindmapNode } from "@/types/tools";
+import {
+  addNode,
+  updateNode,
+  deleteNode,
+  moveNode,
+  getRoomState,
+} from "../mindmap-room";
+import { connections } from "./connection-manager";
+import { sendToConnection, broadcastToRoom } from "./messaging-utils";
+import { convertExportNodeToToolNode } from "../mindmap-room/node-converter";
 
 export function handleNodeAdd(
   connectionId: string,
-  data: { node: MindmapNode; parentId: string }
+  data: { node: MindmapNode; parentId: string },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
 
-  const toolNode = 'text' in data.node ? convertExportNodeToToolNode(data.node as ExportNode) : data.node;
-  const result = addNode(connection.roomId, connection.userId, toolNode, data.parentId);
+  const toolNode =
+    "text" in data.node
+      ? convertExportNodeToToolNode(data.node as ExportNode)
+      : data.node;
+  const result = addNode(
+    connection.roomId,
+    connection.userId,
+    toolNode,
+    data.parentId,
+  );
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:added',
+      type: "node:added",
       roomId: connection.roomId,
-      data: { nodeId: toolNode.id, node: toolNode, parentId: data.parentId, userId: connection.userId },
+      data: {
+        nodeId: toolNode.id,
+        node: toolNode,
+        parentId: data.parentId,
+        userId: connection.userId,
+      },
       timestamp: Date.now(),
     });
 
     sendToConnection(connectionId, {
-      type: 'sync:ack',
+      type: "sync:ack",
       roomId: connection.roomId,
       data: { version: result.version },
     });
   } else {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Failed to add node' },
+      type: "error",
+      data: { message: "Failed to add node" },
     });
   }
 }
 
 export function handleNodeUpdate(
   connectionId: string,
-  data: { nodeId: string; changes: Partial<MindmapNode> | Partial<ExportNode> }
+  data: { nodeId: string; changes: Partial<MindmapNode> | Partial<ExportNode> },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
 
   const toolChanges: Partial<MindmapNode> =
-    'text' in data.changes && data.changes.text ? { label: data.changes.text } : (data.changes as Partial<MindmapNode>);
+    "text" in data.changes && data.changes.text
+      ? { label: data.changes.text }
+      : (data.changes as Partial<MindmapNode>);
 
   const result = updateNode(
     connection.roomId,
     connection.userId,
     data.nodeId,
-    toolChanges
+    toolChanges,
   );
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:updated',
+      type: "node:updated",
       roomId: connection.roomId,
-      data: { nodeId: data.nodeId, changes: toolChanges, userId: connection.userId },
+      data: {
+        nodeId: data.nodeId,
+        changes: toolChanges,
+        userId: connection.userId,
+      },
       timestamp: Date.now(),
     });
 
     sendToConnection(connectionId, {
-      type: 'sync:ack',
+      type: "sync:ack",
       roomId: connection.roomId,
       data: { version: result.version },
     });
   } else {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Failed to update node' },
+      type: "error",
+      data: { message: "Failed to update node" },
     });
   }
 }
 
 export function handleNodeDelete(
   connectionId: string,
-  data: { nodeId: string }
+  data: { nodeId: string },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
 
-  const result = deleteNode(
-    connection.roomId,
-    connection.userId,
-    data.nodeId
-  );
+  const result = deleteNode(connection.roomId, connection.userId, data.nodeId);
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:deleted',
+      type: "node:deleted",
       roomId: connection.roomId,
       data: { nodeId: data.nodeId, userId: connection.userId },
       timestamp: Date.now(),
     });
 
     sendToConnection(connectionId, {
-      type: 'sync:ack',
+      type: "sync:ack",
       roomId: connection.roomId,
       data: { version: result.version },
     });
   } else {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Failed to delete node' },
+      type: "error",
+      data: { message: "Failed to delete node" },
     });
   }
 }
 
 export function handleNodeMove(
   connectionId: string,
-  data: { nodeId: string; newParentId: string }
+  data: { nodeId: string; newParentId: string },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection || !connection.roomId) return;
@@ -124,26 +145,30 @@ export function handleNodeMove(
     connection.roomId,
     connection.userId,
     data.nodeId,
-    data.newParentId
+    data.newParentId,
   );
 
   if (result.success) {
     broadcastToRoom(connection.roomId, {
-      type: 'node:moved',
+      type: "node:moved",
       roomId: connection.roomId,
-      data: { nodeId: data.nodeId, newParentId: data.newParentId, userId: connection.userId },
+      data: {
+        nodeId: data.nodeId,
+        newParentId: data.newParentId,
+        userId: connection.userId,
+      },
       timestamp: Date.now(),
     });
 
     sendToConnection(connectionId, {
-      type: 'sync:ack',
+      type: "sync:ack",
       roomId: connection.roomId,
       data: { version: result.version },
     });
   } else {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Failed to move node' },
+      type: "error",
+      data: { message: "Failed to move node" },
     });
   }
 }
@@ -155,7 +180,7 @@ export function handleSyncRequest(connectionId: string): void {
   const state = getRoomState(connection.roomId);
   if (state) {
     sendToConnection(connectionId, {
-      type: 'sync:full',
+      type: "sync:full",
       roomId: connection.roomId,
       data: {
         mindmap: state.mindmap,
@@ -165,4 +190,3 @@ export function handleSyncRequest(connectionId: string): void {
     });
   }
 }
-

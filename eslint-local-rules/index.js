@@ -8,6 +8,7 @@ import { noMissingI18nKeys } from "./no-missing-i18n-keys.js";
 import { noKebabCaseI18nKeys } from "./no-kebab-case-i18n-keys.js";
 import noPrismaRaceCondition from "./no-prisma-race-condition.js";
 import requireE2eFixtures from "./require-e2e-fixtures.js";
+import requireCsrfMutatingRoutes from "./require-csrf-mutating-routes.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -62,10 +63,7 @@ const containsItalian = (text) => {
   for (const word of ITALIAN_COMMON_WORDS) {
     // Use word boundary that includes punctuation and end of string
     // eslint-disable-next-line security/detect-non-literal-regexp
-    const wordPattern = new RegExp(
-      `(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`,
-      "i"
-    );
+    const wordPattern = new RegExp(`(^|\\s)${word}(\\s|[^a-zàèéìòùù]|$)`, "i");
     if (wordPattern.test(lowercased)) {
       return true;
     }
@@ -204,10 +202,7 @@ const preferValidateAuth = {
             });
           }
           // Check if argument is the literal string
-          if (
-            arg.type === "Literal" &&
-            arg.value === "mirrorbuddy-user-id"
-          ) {
+          if (arg.type === "Literal" && arg.value === "mirrorbuddy-user-id") {
             context.report({
               node,
               messageId: "preferValidateAuth",
@@ -269,6 +264,7 @@ const rules = {
   "no-missing-i18n-keys": noMissingI18nKeys,
   "no-prisma-race-condition": noPrismaRaceCondition,
   "require-e2e-fixtures": requireE2eFixtures,
+  "require-csrf-mutating-routes": requireCsrfMutatingRoutes,
 };
 
 const localRules = {

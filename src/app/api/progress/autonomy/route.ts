@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { DEFAULT_METHOD_PROGRESS } from "@/lib/method-progress/types";
@@ -159,6 +160,11 @@ export async function GET(_request: NextRequest) {
 // ============================================================================
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Security: Get userId from authenticated session only
     const auth = await validateAuth();

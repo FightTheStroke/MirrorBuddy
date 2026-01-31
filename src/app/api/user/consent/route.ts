@@ -11,6 +11,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 const log = logger.child({ module: "api/user/consent" });
 
@@ -23,6 +24,10 @@ interface ConsentPayload {
 }
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Use proper auth validation (handles signed cookies correctly)
     const auth = await validateAuth();

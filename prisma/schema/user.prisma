@@ -54,7 +54,6 @@ model User {
   materials         Material[]
   collections       Collection[]
   tags              Tag[]
-  createdTools      CreatedTool[]
   studyKits         StudyKit[]
   contentEmbeddings ContentEmbedding[]
 

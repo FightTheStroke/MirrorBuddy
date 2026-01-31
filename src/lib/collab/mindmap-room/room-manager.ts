@@ -1,16 +1,26 @@
-import { logger } from '@/lib/logger';
-import type { MindmapNode as ToolMindmapNode } from '@/types/tools';
-import type { MindmapNode as ExportMindmapNode } from '@/lib/tools/mindmap-export';
-import type { MindmapRoom, RoomUser, RoomParticipant, MindmapData as _MindmapData } from './types';
-import { convertExportNodeToToolNode } from './node-converter';
+import { logger } from "@/lib/logger";
+import type { MindmapNode as ToolMindmapNode } from "@/types/tools";
+import type { MindmapNode as ExportMindmapNode } from "@/lib/tools/mindmap-export/index";
+import type {
+  MindmapRoom,
+  RoomUser,
+  RoomParticipant,
+  MindmapData as _MindmapData,
+} from "./types";
+import { convertExportNodeToToolNode } from "./node-converter";
 
 const rooms = new Map<string, MindmapRoom>();
 const PARTICIPANT_COLORS = [
-  '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899',
+  "#3b82f6",
+  "#10b981",
+  "#f59e0b",
+  "#ef4444",
+  "#8b5cf6",
+  "#ec4899",
 ];
 
 function getParticipantColor(room: MindmapRoom): string {
-  const usedColors = Array.from(room.participants.values()).map(p => p.color);
+  const usedColors = Array.from(room.participants.values()).map((p) => p.color);
   for (const color of PARTICIPANT_COLORS) {
     if (!usedColors.includes(color)) {
       return color;
@@ -19,8 +29,10 @@ function getParticipantColor(room: MindmapRoom): string {
   return PARTICIPANT_COLORS[room.participants.size % PARTICIPANT_COLORS.length];
 }
 
-function normalizeRoot(root: ToolMindmapNode | ExportMindmapNode): ToolMindmapNode {
-  if ('text' in root) {
+function normalizeRoot(
+  root: ToolMindmapNode | ExportMindmapNode,
+): ToolMindmapNode {
+  if ("text" in root) {
     return convertExportNodeToToolNode(root as ExportMindmapNode);
   }
   return root as ToolMindmapNode;
@@ -29,7 +41,7 @@ function normalizeRoot(root: ToolMindmapNode | ExportMindmapNode): ToolMindmapNo
 export function createRoom(
   roomId: string,
   user: RoomUser,
-  root: ToolMindmapNode | ExportMindmapNode
+  root: ToolMindmapNode | ExportMindmapNode,
 ): MindmapRoom {
   const now = Date.now();
   const normalizedRoot = normalizeRoot(root);
@@ -57,7 +69,7 @@ export function createRoom(
   room.participants.set(user.id, participant);
   rooms.set(roomId, room);
 
-  logger.info('Collaboration room created', {
+  logger.info("Collaboration room created", {
     roomId,
     userId: user.id,
   });
@@ -72,18 +84,21 @@ export function getRoom(roomId: string): MindmapRoom | undefined {
 export function closeRoom(roomId: string): boolean {
   const removed = rooms.delete(roomId);
   if (removed) {
-    logger.info('Collaboration room closed', { roomId });
+    logger.info("Collaboration room closed", { roomId });
   }
   return removed;
 }
 
 export function joinRoom(
   roomId: string,
-  user: RoomUser
+  user: RoomUser,
 ): { room: MindmapRoom; participant: RoomParticipant } | null {
   const room = rooms.get(roomId);
   if (!room) {
-    logger.warn('Attempted to join non-existent room', { roomId, userId: user.id });
+    logger.warn("Attempted to join non-existent room", {
+      roomId,
+      userId: user.id,
+    });
     return null;
   }
 
@@ -100,7 +115,7 @@ export function joinRoom(
   room.participants.set(user.id, participant);
   room.updatedAt = now;
 
-  logger.info('User joined collaboration room', {
+  logger.info("User joined collaboration room", {
     roomId,
     userId: user.id,
     participantCount: room.participants.size,
@@ -117,7 +132,7 @@ export function leaveRoom(roomId: string, userId: string): boolean {
   room.updatedAt = Date.now();
 
   if (removed) {
-    logger.info('User left collaboration room', {
+    logger.info("User left collaboration room", {
       roomId,
       userId,
       participantCount: room.participants.size,
@@ -132,4 +147,3 @@ export function leaveRoom(roomId: string, userId: string): boolean {
 }
 
 export { rooms };
-

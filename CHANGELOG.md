@@ -16,6 +16,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `src/DOCS-INDEX.md` embedded source documentation index
 - ADR 0106: Documentation AI-Ready Architecture
 
+### Security
+
+#### Tech Debt Cleanup (Plan 112)
+
+- Added CSRF protection (`requireCSRF`) to 39 authenticated mutating API endpoints per ADR 0077
+- Created ESLint rule `require-csrf-mutating-routes` to enforce CSRF on new routes
+- Documented all 22 CSRF-exempt routes with eslint-disable and justification
+
 ### Changed
 
 #### Documentation Optimization (Plan 111)
@@ -26,12 +34,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Consolidated `docs/i18n/` from 10 to 4 files
 - Consolidated `docs/operations/` from 27 to 18 files
 
+#### Tech Debt Cleanup (Plan 112)
+
+- Consolidated materials storage: removed duplicate flat files, single modular barrel export (`@/lib/storage/materials-db`)
+- Extracted shared `useMaterialsView` hook from `useZainoView` and `useArchiveView` (-321 lines of duplication)
+- Refactored RAG `$queryRawUnsafe` to type-safe `$queryRaw` with Prisma.sql template literals in hybrid-retrieval.ts
+- Migrated 16 mindmap wrapper consumers to direct subdirectory imports
+
+### Removed
+
+#### Tech Debt Cleanup (Plan 112)
+
+- Deprecated `tool-executor-deprecated.ts` (merged test-used functions into main module)
+- Deprecated `scheduler-service.ts` re-export wrapper (0 callers)
+- Deprecated `generateKnowledgeBasePrompt()` function and re-export
+- Deprecated `CreatedTool` Prisma model and all references (migrated to Material per ADR 0019)
+- Deprecated mindmap re-export wrappers (`mindmap-import.ts`, `mindmap-export.ts`)
+- Old flat material storage files (`materials-db-crud.ts`, `materials-db-schema.ts`, `materials-db-utils.ts`)
+
 ### Fixed
 
 #### Documentation Corrections (Plan 111)
 
 - ADR 0034 mislabel in compliance rules (was "Safety", corrected to "Chat Streaming Architecture")
 - Duplicate ADR 0073 removed (kept `0073-staging-system-vercel.md`)
+
+#### Tech Debt Cleanup (Plan 112)
+
+- Broken TIERS.md link in README.md now points to `.claude/rules/tier.md`
 
 ### Archived (docs-archive/)
 

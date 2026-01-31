@@ -3,57 +3,57 @@
  * @brief Main message handler router
  */
 
-import { logger } from '@/lib/logger';
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { MindmapNode as _MindmapNode } from '@/types/tools';
-import { convertExportNodeToToolNode } from '../mindmap-room/node-converter';
-import type { CollabMessage } from './types';
-import { connections } from './connection-manager';
-import { sendToConnection } from './messaging-utils';
+import { logger } from "@/lib/logger";
+import type { MindmapNode as ExportNode } from "@/lib/tools/mindmap-export/index";
+import type { MindmapNode as _MindmapNode } from "@/types/tools";
+import { convertExportNodeToToolNode } from "../mindmap-room/node-converter";
+import type { CollabMessage } from "./types";
+import { connections } from "./connection-manager";
+import { sendToConnection } from "./messaging-utils";
 import {
   handleCreateRoom,
   handleJoinRoom,
   handleLeaveRoom,
   handleCloseRoom,
-} from './room-handlers';
-import { handleCursorMove, handleNodeSelect } from './cursor-handlers';
+} from "./room-handlers";
+import { handleCursorMove, handleNodeSelect } from "./cursor-handlers";
 import {
   handleNodeAdd,
   handleNodeUpdate,
   handleNodeDelete,
   handleNodeMove,
   handleSyncRequest,
-} from './node-handlers';
+} from "./node-handlers";
 
 export function handleMessage(
   connectionId: string,
-  message: CollabMessage
+  message: CollabMessage,
 ): void {
   const connection = connections.get(connectionId);
   if (!connection) {
-    logger.warn('Message from unknown connection', { connectionId });
+    logger.warn("Message from unknown connection", { connectionId });
     return;
   }
 
   connection.lastPing = Date.now();
   connection.isAlive = true;
 
-  logger.debug('WebSocket message received', {
+  logger.debug("WebSocket message received", {
     connectionId,
     userId: connection.userId,
     type: message.type,
   });
 
   switch (message.type) {
-    case 'ping':
-      sendToConnection(connectionId, { type: 'pong', data: {} });
+    case "ping":
+      sendToConnection(connectionId, { type: "pong", data: {} });
       break;
 
-    case 'pong':
+    case "pong":
       connection.isAlive = true;
       break;
 
-    case 'room:create': {
+    case "room:create": {
       const data = message.data as {
         mindmap: { title: string; root: ExportNode };
         user: { id: string; name: string; avatar: string };
@@ -62,33 +62,43 @@ export function handleMessage(
       break;
     }
 
-    case 'room:join':
-      handleJoinRoom(connectionId, message.roomId!, message.data as {
-        user: { id: string; name: string; avatar: string };
-      });
+    case "room:join":
+      handleJoinRoom(
+        connectionId,
+        message.roomId!,
+        message.data as {
+          user: { id: string; name: string; avatar: string };
+        },
+      );
       break;
 
-    case 'room:leave':
+    case "room:leave":
       handleLeaveRoom(connectionId);
       break;
 
-    case 'room:close':
+    case "room:close":
       handleCloseRoom(connectionId);
       break;
 
-    case 'cursor:move':
-      handleCursorMove(connectionId, message.data as {
-        cursor: { x: number; y: number };
-      });
+    case "cursor:move":
+      handleCursorMove(
+        connectionId,
+        message.data as {
+          cursor: { x: number; y: number };
+        },
+      );
       break;
 
-    case 'node:select':
-      handleNodeSelect(connectionId, message.data as {
-        nodeId?: string;
-      });
+    case "node:select":
+      handleNodeSelect(
+        connectionId,
+        message.data as {
+          nodeId?: string;
+        },
+      );
       break;
 
-    case 'node:add': {
+    case "node:add": {
       const data = message.data as {
         node: ExportNode;
         parentId: string;
@@ -100,7 +110,7 @@ export function handleMessage(
       break;
     }
 
-    case 'node:update': {
+    case "node:update": {
       const data = message.data as {
         nodeId: string;
         changes: Partial<ExportNode>;
@@ -112,25 +122,30 @@ export function handleMessage(
       break;
     }
 
-    case 'node:delete':
-      handleNodeDelete(connectionId, message.data as {
-        nodeId: string;
-      });
+    case "node:delete":
+      handleNodeDelete(
+        connectionId,
+        message.data as {
+          nodeId: string;
+        },
+      );
       break;
 
-    case 'node:move':
-      handleNodeMove(connectionId, message.data as {
-        nodeId: string;
-        newParentId: string;
-      });
+    case "node:move":
+      handleNodeMove(
+        connectionId,
+        message.data as {
+          nodeId: string;
+          newParentId: string;
+        },
+      );
       break;
 
-    case 'sync:request':
+    case "sync:request":
       handleSyncRequest(connectionId);
       break;
 
     default:
-      logger.warn('Unknown message type', { type: message.type });
+      logger.warn("Unknown message type", { type: message.type });
   }
 }
-

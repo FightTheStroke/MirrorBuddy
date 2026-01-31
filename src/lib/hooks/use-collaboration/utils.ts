@@ -4,7 +4,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import type { MindmapData } from "@/lib/tools/mindmap-export";
+import type { MindmapData } from "@/lib/tools/mindmap-export/index";
 import type { CollabSSEEvent } from "@/app/api/collab/sse/route";
 import type { CollaborationState } from "./types";
 

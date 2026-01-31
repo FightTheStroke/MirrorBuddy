@@ -4,15 +4,16 @@
 // POST: Create new session
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { NextRequest, NextResponse } from "next/server";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   SessionsGetQuerySchema,
   SessionsPostSchema,
   SessionsPatchSchema,
-} from '@/lib/validation/schemas/progress';
+} from "@/lib/validation/schemas/progress";
 
 export async function GET(request: NextRequest) {
   try {
@@ -23,8 +24,8 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const rawLimit = searchParams.get('limit');
-    const rawMaestroId = searchParams.get('maestroId');
+    const rawLimit = searchParams.get("limit");
+    const rawMaestroId = searchParams.get("maestroId");
 
     // Validate query parameters
     const validation = SessionsGetQuerySchema.safeParse({
@@ -35,10 +36,10 @@ export async function GET(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid query parameters',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid query parameters",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -49,21 +50,26 @@ export async function GET(request: NextRequest) {
         userId,
         ...(maestroId && { maestroId }),
       },
-      orderBy: { startedAt: 'desc' },
+      orderBy: { startedAt: "desc" },
       take: limit,
     });
 
     return NextResponse.json(sessions);
   } catch (error) {
-    logger.error('Sessions GET error', { error: String(error) });
+    logger.error("Sessions GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get sessions' },
-      { status: 500 }
+      { error: "Failed to get sessions" },
+      { status: 500 },
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -78,10 +84,10 @@ export async function POST(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid session data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid session data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -97,16 +103,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(session);
   } catch (error) {
-    logger.error('Sessions POST error', { error: String(error) });
+    logger.error("Sessions POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to create session' },
-      { status: 500 }
+      { error: "Failed to create session" },
+      { status: 500 },
     );
   }
 }
 
 // PATCH to end a session
 export async function PATCH(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -121,10 +132,10 @@ export async function PATCH(request: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         {
-          error: 'Invalid session update data',
-          details: validation.error.issues.map(i => i.message),
+          error: "Invalid session update data",
+          details: validation.error.issues.map((i) => i.message),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -136,10 +147,7 @@ export async function PATCH(request: NextRequest) {
     });
 
     if (!existingSession) {
-      return NextResponse.json(
-        { error: 'Session not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
     }
 
     const session = await prisma.studySession.update({
@@ -154,10 +162,10 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(session);
   } catch (error) {
-    logger.error('Sessions PATCH error', { error: String(error) });
+    logger.error("Sessions PATCH error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to update session' },
-      { status: 500 }
+      { error: "Failed to update session" },
+      { status: 500 },
     );
   }
 }

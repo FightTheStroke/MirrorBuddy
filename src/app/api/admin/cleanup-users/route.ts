@@ -13,10 +13,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { logger } from "@/lib/logger";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
 
 export async function DELETE(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {

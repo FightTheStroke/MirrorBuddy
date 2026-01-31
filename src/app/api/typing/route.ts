@@ -7,6 +7,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { logger } from "@/lib/logger";
 import type { TypingProgress } from "@/types/tools";
 import * as Sentry from "@sentry/nextjs";
@@ -54,6 +55,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -93,6 +98,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {

@@ -8,6 +8,7 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { tierService } from "@/lib/tier/tier-service";
 import type { FeatureType, UserFeatureConfigInput } from "@/lib/tier/types";
 import { logger } from "@/lib/logger";
@@ -71,6 +72,11 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
  * - expiresAt?: string (ISO date)
  */
 export async function POST(request: NextRequest, { params }: RouteParams) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
@@ -156,6 +162,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
  * - feature: FeatureType (required)
  */
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {

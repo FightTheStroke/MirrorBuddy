@@ -3,14 +3,21 @@
  * @brief Custom hook for mindmaps view state management
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { logger } from '@/lib/logger';
-import { useMindmaps, type SavedMindmap } from '@/lib/hooks/use-saved-materials';
-import { createMindmapFromTopics } from '@/components/tools/markmap';
-import { exportMindmap, downloadExport, type ExportFormat } from '@/lib/tools/mindmap-export';
-import { importMindmapFromFile } from '@/lib/tools/mindmap-import';
-import type { Subject } from '@/types';
-import type { MindmapNode } from '../types';
+import { useState, useEffect, useCallback } from "react";
+import { logger } from "@/lib/logger";
+import {
+  useMindmaps,
+  type SavedMindmap,
+} from "@/lib/hooks/use-saved-materials";
+import { createMindmapFromTopics } from "@/components/tools/markmap";
+import {
+  exportMindmap,
+  downloadExport,
+  type ExportFormat,
+} from "@/lib/tools/mindmap-export/index";
+import { importMindmapFromFile } from "@/lib/tools/mindmap-import/index";
+import type { Subject } from "@/types";
+import type { MindmapNode } from "../types";
 
 interface Topic {
   name: string;
@@ -20,7 +27,9 @@ interface Topic {
 export function useMindmapsView() {
   const { mindmaps, loading, saveMindmap, deleteMindmap } = useMindmaps();
 
-  const [selectedMindmap, setSelectedMindmap] = useState<SavedMindmap | null>(null);
+  const [selectedMindmap, setSelectedMindmap] = useState<SavedMindmap | null>(
+    null,
+  );
   const [showExamples, setShowExamples] = useState(false);
   const [selectedExample, setSelectedExample] = useState<{
     title: string;
@@ -28,10 +37,10 @@ export function useMindmapsView() {
     subject: string;
   } | null>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [newMapTitle, setNewMapTitle] = useState('');
-  const [newMapSubject, setNewMapSubject] = useState<Subject>('mathematics');
+  const [newMapTitle, setNewMapTitle] = useState("");
+  const [newMapSubject, setNewMapSubject] = useState<Subject>("mathematics");
   const [newMapTopics, setNewMapTopics] = useState<Topic[]>([
-    { name: '', subtopics: [''] },
+    { name: "", subtopics: [""] },
   ]);
 
   // Grouped by subject - computed in MindmapsGrid component
@@ -60,7 +69,7 @@ export function useMindmapsView() {
 
   const saveExampleAsMindmap = async (
     example: { title: string; nodes: MindmapNode[] },
-    subject: string
+    subject: string,
   ) => {
     await saveMindmap({
       title: example.title,
@@ -82,7 +91,7 @@ export function useMindmapsView() {
       validTopics.map((t) => ({
         name: t.name,
         subtopics: t.subtopics.filter((s) => s.trim()),
-      }))
+      })),
     );
 
     await saveMindmap({
@@ -92,9 +101,9 @@ export function useMindmapsView() {
     });
 
     setShowCreateModal(false);
-    setNewMapTitle('');
-    setNewMapSubject('mathematics');
-    setNewMapTopics([{ name: '', subtopics: [''] }]);
+    setNewMapTitle("");
+    setNewMapSubject("mathematics");
+    setNewMapTopics([{ name: "", subtopics: [""] }]);
   };
 
   const handleExport = useCallback(
@@ -104,7 +113,7 @@ export function useMindmapsView() {
           title: mindmap.title,
           topic: mindmap.subject,
           root: {
-            id: 'root',
+            id: "root",
             text: mindmap.title,
             children: mindmap.nodes.map((node) => ({
               id: node.id,
@@ -123,17 +132,17 @@ export function useMindmapsView() {
 
         const result = await exportMindmap(mindmapData, { format });
         downloadExport(result);
-        logger.info('Mindmap exported', { format, title: mindmap.title });
+        logger.info("Mindmap exported", { format, title: mindmap.title });
       } catch (error) {
-        logger.error('Export failed', undefined, error);
+        logger.error("Export failed", undefined, error);
         alert(
           `Errore durante l'esportazione: ${
-            error instanceof Error ? error.message : 'Errore sconosciuto'
-          }`
+            error instanceof Error ? error.message : "Errore sconosciuto"
+          }`,
         );
       }
     },
-    []
+    [],
   );
 
   const handleImport = useCallback(
@@ -145,7 +154,7 @@ export function useMindmapsView() {
         const result = await importMindmapFromFile(file);
 
         if (!result.success || !result.mindmap) {
-          throw new Error(result.error || 'Import failed');
+          throw new Error(result.error || "Import failed");
         }
 
         const convertNode = (node: {
@@ -164,8 +173,8 @@ export function useMindmapsView() {
                 text: string;
                 color?: string;
                 children?: unknown[];
-              }
-            )
+              },
+            ),
           ),
         });
 
@@ -177,10 +186,10 @@ export function useMindmapsView() {
                 text: string;
                 color?: string;
                 children?: unknown[];
-              }
-            )
+              },
+            ),
           ) || [];
-        const subject = (result.mindmap.topic as Subject) || 'mathematics';
+        const subject = (result.mindmap.topic as Subject) || "mathematics";
 
         await saveMindmap({
           title: result.mindmap.title,
@@ -190,26 +199,26 @@ export function useMindmapsView() {
 
         if (result.warnings?.length) {
           alert(
-            `Importazione completata con avvisi:\n${result.warnings.join('\n')}`
+            `Importazione completata con avvisi:\n${result.warnings.join("\n")}`,
           );
         }
 
-        logger.info('Mindmap imported', {
+        logger.info("Mindmap imported", {
           title: result.mindmap.title,
           file: file.name,
         });
       } catch (error) {
-        logger.error('Import failed', { file: file.name }, error);
+        logger.error("Import failed", { file: file.name }, error);
         alert(
           `Errore durante l'importazione: ${
-            error instanceof Error ? error.message : 'Errore sconosciuto'
-          }`
+            error instanceof Error ? error.message : "Errore sconosciuto"
+          }`,
         );
       }
 
-      event.target.value = '';
+      event.target.value = "";
     },
-    [saveMindmap]
+    [saveMindmap],
   );
 
   useEffect(() => {
@@ -218,13 +227,19 @@ export function useMindmapsView() {
     if (!hasOpenModal) return;
 
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModals();
       }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, [selectedMindmap, showExamples, selectedExample, showCreateModal, closeModals]);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [
+    selectedMindmap,
+    showExamples,
+    selectedExample,
+    showCreateModal,
+    closeModals,
+  ]);
 
   return {
     mindmaps,
@@ -250,4 +265,3 @@ export function useMindmapsView() {
     handleImport,
   };
 }
-

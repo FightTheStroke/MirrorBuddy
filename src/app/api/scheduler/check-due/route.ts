@@ -4,8 +4,9 @@
 // This endpoint is called periodically by the client (Issue #27)
 // ============================================================================
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -27,7 +28,12 @@ const isUniqueConstraintError = (error: unknown) =>
   error.code === "P2002";
 
 // POST - Check for due items and create notifications
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const clientId = getClientIdentifier(request);
   const rateLimit = checkRateLimit(`scheduler-check:${clientId}`, {
     ...RATE_LIMITS.GENERAL,

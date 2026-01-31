@@ -13,6 +13,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   getAllFlags,
   getFlag,
@@ -55,6 +57,12 @@ interface KillSwitchRequest {
  * Returns all flags with system health status
  */
 export async function GET(request: NextRequest) {
+  // Require admin authentication
+  const auth = await validateAdminAuth();
+  if (!auth.authenticated || !auth.isAdmin) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const includeHealth = searchParams.get("health") === "true";
@@ -102,6 +110,17 @@ export async function GET(request: NextRequest) {
  * Update a feature flag or toggle kill-switch
  */
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
+  // Require admin authentication
+  const auth = await validateAdminAuth();
+  if (!auth.authenticated || !auth.isAdmin) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
 
@@ -133,6 +152,17 @@ export async function POST(request: NextRequest) {
  * Activate kill-switch for a feature (emergency disable)
  */
 export async function DELETE(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
+  // Require admin authentication
+  const auth = await validateAdminAuth();
+  if (!auth.authenticated || !auth.isAdmin) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     const { searchParams } = new URL(request.url);
     const featureId = searchParams.get("id") as KnownFeatureFlag | null;

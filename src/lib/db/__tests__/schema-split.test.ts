@@ -62,7 +62,6 @@ const EXPECTED_MODELS = [
   "Collection",
   "Tag",
   "MaterialTag",
-  "CreatedTool",
   "HtmlSnippet",
   "StudyKit",
   // gamification.prisma

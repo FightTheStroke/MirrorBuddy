@@ -1,5 +1,5 @@
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { MindmapNode as ToolNode } from '@/types/tools';
+import type { MindmapNode as ExportNode } from "@/lib/tools/mindmap-export/index";
+import type { MindmapNode as ToolNode } from "@/types/tools";
 
 /**
  * Convert MindmapNode from export format (text) to tool format (label)
@@ -32,4 +32,3 @@ export function convertToolNodeToExportNode(node: ToolNode): ExportNode {
 
   return result;
 }
-

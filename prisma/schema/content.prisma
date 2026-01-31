@@ -116,34 +116,6 @@ model MaterialTag {
   @@index([tagId])
 }
 
-// DEPRECATED: Use Material table instead
-model CreatedTool {
-  id     String @id @default(cuid())
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  type    String
-  title   String
-  topic   String?
-  content String  @default("{}")
-
-  maestroId      String?
-  conversationId String?
-  sessionId      String?
-
-  userRating   Int?
-  isBookmarked Boolean @default(false)
-  viewCount    Int     @default(0)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([type])
-  @@index([createdAt])
-  @@index([isBookmarked])
-}
-
 model HtmlSnippet {
   id     String @id @default(cuid())
   userId String

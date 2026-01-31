@@ -255,7 +255,7 @@ MirrorBuddy offers three tiers to meet different needs:
 | **Custom learning paths**      | —            | —           | ✓         |
 | **Priority support**           | —            | —           | ✓         |
 
-**→ See detailed tier comparison: [TIERS.md](TIERS.md)**
+**→ See detailed tier comparison: [Tier Rules](.claude/rules/tier.md)**
 
 ---
 

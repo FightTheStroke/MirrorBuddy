@@ -10,8 +10,9 @@
  * F-32: Rate limiting (max 1 push/min per event type)
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import {
   calculateAndPublishAdminCounts,
   type AdminCountsResult,
@@ -20,7 +21,12 @@ import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "admin-counts-refresh" });
 
-export async function POST() {
+export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   const auth = await validateAdminAuth();
 
   if (!auth.authenticated || !auth.isAdmin) {

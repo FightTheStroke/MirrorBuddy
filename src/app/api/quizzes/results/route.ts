@@ -4,13 +4,14 @@
 // POST: Save new quiz result
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import type { QuizResult } from '@prisma/client';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { recordAdaptiveSignal } from '@/lib/education/adaptive-difficulty';
-import type { AdaptiveSignalSource } from '@/types';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import type { QuizResult } from "@prisma/client";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
+import { recordAdaptiveSignal } from "@/lib/education/adaptive-difficulty";
+import type { AdaptiveSignalSource } from "@/types";
 
 export async function GET(request: NextRequest) {
   try {
@@ -21,9 +22,9 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const quizId = searchParams.get('quizId');
-    const subject = searchParams.get('subject');
+    const limit = parseInt(searchParams.get("limit") || "20");
+    const quizId = searchParams.get("quizId");
+    const subject = searchParams.get("subject");
 
     const results = await prisma.quizResult.findMany({
       where: {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
         ...(quizId && { quizId }),
         ...(subject && { subject }),
       },
-      orderBy: { completedAt: 'desc' },
+      orderBy: { completedAt: "desc" },
       take: limit,
     });
 
@@ -39,19 +40,24 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       results.map((r: QuizResult) => ({
         ...r,
-        answers: JSON.parse(r.answers || '[]'),
-      }))
+        answers: JSON.parse(r.answers || "[]"),
+      })),
     );
   } catch (error) {
-    logger.error('Quiz results GET error', { error: String(error) });
+    logger.error("Quiz results GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get quiz results' },
-      { status: 500 }
+      { error: "Failed to get quiz results" },
+      { status: 500 },
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -63,23 +69,21 @@ export async function POST(request: NextRequest) {
 
     if (!data.quizId || data.score === undefined || !data.totalQuestions) {
       return NextResponse.json(
-        { error: 'quizId, score, and totalQuestions are required' },
-        { status: 400 }
+        { error: "quizId, score, and totalQuestions are required" },
+        { status: 400 },
       );
     }
 
     const percentage = (data.score / data.totalQuestions) * 100;
     const allowedSources: AdaptiveSignalSource[] = [
-      'chat',
-      'voice',
-      'quiz',
-      'flashcard',
-      'summary',
-      'study-kit',
+      "chat",
+      "voice",
+      "quiz",
+      "flashcard",
+      "summary",
+      "study-kit",
     ];
-    const source = allowedSources.includes(data.source)
-      ? data.source
-      : 'quiz';
+    const source = allowedSources.includes(data.source) ? data.source : "quiz";
 
     const result = await prisma.quizResult.create({
       data: {
@@ -98,7 +102,7 @@ export async function POST(request: NextRequest) {
 
     if (data.subject) {
       await recordAdaptiveSignal(userId, {
-        type: 'quiz_result',
+        type: "quiz_result",
         source,
         subject: data.subject,
         topic: data.topic,
@@ -109,13 +113,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ...result,
-      answers: JSON.parse(result.answers || '[]'),
+      answers: JSON.parse(result.answers || "[]"),
     });
   } catch (error) {
-    logger.error('Quiz results POST error', { error: String(error) });
+    logger.error("Quiz results POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to save quiz result' },
-      { status: 500 }
+      { error: "Failed to save quiz result" },
+      { status: 500 },
     );
   }
 }

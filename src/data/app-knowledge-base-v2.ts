@@ -10,14 +10,14 @@
  */
 
 // Re-export types
-export type { KnowledgeCategory } from './knowledge-base-types';
-export { APP_VERSION } from './knowledge-base-types';
+export type { KnowledgeCategory } from "./knowledge-base-types";
+export { APP_VERSION } from "./knowledge-base-types";
 
 // Re-export index
-export { FEATURE_INDEX } from './knowledge-base-index';
+export { FEATURE_INDEX } from "./knowledge-base-index";
 
 // Re-export content
-export { KNOWLEDGE_CONTENT } from './knowledge-base-content';
+export { KNOWLEDGE_CONTENT } from "./knowledge-base-content";
 
 // Re-export functions
 export {
@@ -25,6 +25,5 @@ export {
   getKnowledgeForCategories,
   getRelevantKnowledge,
   generateCompactIndexPrompt,
-  generateKnowledgeBasePrompt,
   TECH_SUPPORT_SUGGESTED_PROMPTS,
-} from './knowledge-base-functions';
+} from "./knowledge-base-functions";

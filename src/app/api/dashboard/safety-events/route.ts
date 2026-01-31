@@ -5,7 +5,7 @@
 // SECURITY: Requires authentication
 // ============================================================================
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import {
   getSafetyEventsFromDb,
   getSafetyStatsFromDb,
@@ -13,6 +13,7 @@ import {
 } from "@/lib/safety/monitoring/db-queries";
 import { logger } from "@/lib/logger";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 
 export async function GET(request: Request) {
@@ -92,7 +93,12 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     // Require admin authentication for admin action
     const auth = await validateAdminAuth();

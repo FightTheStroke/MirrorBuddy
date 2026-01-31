@@ -3,11 +3,11 @@
  * @brief Room operation handlers
  */
 
-import { logger as _logger } from '@/lib/logger';
-import type { MindmapNode as ExportNode } from '@/lib/tools/mindmap-export';
-import type { MindmapNode as _MindmapNode } from '@/types/tools';
-import type { RoomParticipant } from '../mindmap-room/types';
-import { convertExportNodeToToolNode } from '../mindmap-room/node-converter';
+import { logger as _logger } from "@/lib/logger";
+import type { MindmapNode as ExportNode } from "@/lib/tools/mindmap-export/index";
+import type { MindmapNode as _MindmapNode } from "@/types/tools";
+import type { RoomParticipant } from "../mindmap-room/types";
+import { convertExportNodeToToolNode } from "../mindmap-room/node-converter";
 import {
   createRoom,
   getRoom,
@@ -15,17 +15,17 @@ import {
   joinRoom,
   leaveRoom,
   getRoomState,
-} from '../mindmap-room';
-import type { CollabEvent as _CollabEvent } from '../mindmap-room/events';
-import { connections, roomConnections } from './connection-manager';
-import { sendToConnection, broadcastToRoom } from './messaging-utils';
+} from "../mindmap-room";
+import type { CollabEvent as _CollabEvent } from "../mindmap-room/events";
+import { connections, roomConnections } from "./connection-manager";
+import { sendToConnection, broadcastToRoom } from "./messaging-utils";
 
 export function handleCreateRoom(
   connectionId: string,
   data: {
     mindmap: { title: string; root: ExportNode };
     user: { id: string; name: string; avatar: string };
-  }
+  },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection) return;
@@ -46,21 +46,21 @@ export function handleCreateRoom(
   roomConnections.get(room.id)!.add(connectionId);
 
   sendToConnection(connectionId, {
-    type: 'room:created',
+    type: "room:created",
     roomId: room.id,
-      data: {
-        mindmap: room.mindmapState,
-        participants: Array.from(room.participants.values()),
-        version: room.version,
-        userId: data.user.id,
-      },
+    data: {
+      mindmap: room.mindmapState,
+      participants: Array.from(room.participants.values()),
+      version: room.version,
+      userId: data.user.id,
+    },
   });
 }
 
 export function handleJoinRoom(
   connectionId: string,
   roomId: string,
-  data: { user: { id: string; name: string; avatar: string } }
+  data: { user: { id: string; name: string; avatar: string } },
 ): void {
   const connection = connections.get(connectionId);
   if (!connection) return;
@@ -72,8 +72,8 @@ export function handleJoinRoom(
   const result = joinRoom(roomId, data.user);
   if (!result) {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Room not found' },
+      type: "error",
+      data: { message: "Room not found" },
     });
     return;
   }
@@ -88,7 +88,7 @@ export function handleJoinRoom(
   const state = getRoomState(roomId);
   if (state) {
     sendToConnection(connectionId, {
-      type: 'sync:full',
+      type: "sync:full",
       roomId,
       data: {
         mindmap: state.mindmap,
@@ -101,12 +101,15 @@ export function handleJoinRoom(
   broadcastToRoom(
     roomId,
     {
-      type: 'room:joined',
+      type: "room:joined",
       roomId,
-      data: { userId: data.user.id, user: result.participant as unknown as RoomParticipant },
+      data: {
+        userId: data.user.id,
+        user: result.participant as unknown as RoomParticipant,
+      },
       timestamp: Date.now(),
     },
-    connectionId
+    connectionId,
   );
 }
 
@@ -125,7 +128,7 @@ export function handleLeaveRoom(connectionId: string): void {
   connection.roomId = null;
 
   broadcastToRoom(roomId, {
-    type: 'room:left',
+    type: "room:left",
     roomId,
     data: { userId: connection.userId },
     timestamp: Date.now(),
@@ -140,12 +143,13 @@ export function handleCloseRoom(connectionId: string): void {
   if (!room) return;
 
   const participants = Array.from(room.participants.values());
-  const isHost = participants.length > 0 && participants[0].id === connection.userId;
-  
+  const isHost =
+    participants.length > 0 && participants[0].id === connection.userId;
+
   if (!isHost) {
     sendToConnection(connectionId, {
-      type: 'error',
-      data: { message: 'Only host can close room' },
+      type: "error",
+      data: { message: "Only host can close room" },
     });
     return;
   }
@@ -153,7 +157,7 @@ export function handleCloseRoom(connectionId: string): void {
   const roomId = connection.roomId;
 
   broadcastToRoom(roomId, {
-    type: 'room:closed',
+    type: "room:closed",
     roomId,
     data: { userId: connection.userId },
     timestamp: Date.now(),
@@ -167,4 +171,3 @@ export function handleCloseRoom(connectionId: string): void {
 
   closeRoom(roomId);
 }
-

@@ -8,6 +8,7 @@ import { prisma } from "@/lib/db";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import * as Sentry from "@sentry/nextjs";
 
 async function getUserId(): Promise<string | null> {
@@ -101,6 +102,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
  * Create a new concept
  */
 export async function POST(request: NextRequest): Promise<NextResponse> {
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const userId = await getUserId();
     if (!userId) {

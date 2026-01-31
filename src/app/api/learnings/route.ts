@@ -4,10 +4,11 @@
 // POST: Create new learning
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAuth } from '@/lib/auth/session-auth';
+import { NextRequest, NextResponse } from "next/server";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
+import { validateAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 
 export async function GET(request: NextRequest) {
   try {
@@ -18,14 +19,17 @@ export async function GET(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const maestroId = searchParams.get('maestroId');
-    const subject = searchParams.get('subject');
-    const minConfidence = parseFloat(searchParams.get('minConfidence') || '0');
+    const category = searchParams.get("category");
+    const maestroId = searchParams.get("maestroId");
+    const subject = searchParams.get("subject");
+    const minConfidence = parseFloat(searchParams.get("minConfidence") || "0");
 
     // Pagination parameters (defaults: page 1, limit 50, max 200)
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const limit = Math.min(200, Math.max(1, parseInt(searchParams.get('limit') || '50', 10)));
+    const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+    const limit = Math.min(
+      200,
+      Math.max(1, parseInt(searchParams.get("limit") || "50", 10)),
+    );
     const skip = (page - 1) * limit;
 
     const whereClause = {
@@ -41,7 +45,7 @@ export async function GET(request: NextRequest) {
       prisma.learning.count({ where: whereClause }),
       prisma.learning.findMany({
         where: whereClause,
-        orderBy: { confidence: 'desc' },
+        orderBy: { confidence: "desc" },
         skip,
         take: limit,
       }),
@@ -58,15 +62,20 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    logger.error('Learnings GET error', { error: String(error) });
+    logger.error("Learnings GET error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to get learnings' },
-      { status: 500 }
+      { error: "Failed to get learnings" },
+      { status: 500 },
     );
   }
 }
 
 export async function POST(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -78,8 +87,8 @@ export async function POST(request: NextRequest) {
 
     if (!data.category || !data.insight) {
       return NextResponse.json(
-        { error: 'category and insight are required' },
-        { status: 400 }
+        { error: "category and insight are required" },
+        { status: 400 },
       );
     }
 
@@ -120,16 +129,21 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ...learning, reinforced: false });
   } catch (error) {
-    logger.error('Learnings POST error', { error: String(error) });
+    logger.error("Learnings POST error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to create learning' },
-      { status: 500 }
+      { error: "Failed to create learning" },
+      { status: 500 },
     );
   }
 }
 
 // DELETE: Remove a learning
 export async function DELETE(request: NextRequest) {
+  // CSRF protection
+  if (!requireCSRF(request)) {
+    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  }
+
   try {
     const auth = await validateAuth();
     if (!auth.authenticated) {
@@ -138,13 +152,10 @@ export async function DELETE(request: NextRequest) {
     const userId = auth.userId!;
 
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id');
+    const id = searchParams.get("id");
 
     if (!id) {
-      return NextResponse.json(
-        { error: 'id is required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "id is required" }, { status: 400 });
     }
 
     // Verify ownership
@@ -154,8 +165,8 @@ export async function DELETE(request: NextRequest) {
 
     if (!existing) {
       return NextResponse.json(
-        { error: 'Learning not found' },
-        { status: 404 }
+        { error: "Learning not found" },
+        { status: 404 },
       );
     }
 
@@ -165,10 +176,10 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    logger.error('Learnings DELETE error', { error: String(error) });
+    logger.error("Learnings DELETE error", { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to delete learning' },
-      { status: 500 }
+      { error: "Failed to delete learning" },
+      { status: 500 },
     );
   }
 }

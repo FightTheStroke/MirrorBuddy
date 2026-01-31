@@ -34,7 +34,6 @@ export interface UserBackupPayload {
   materialConcepts: Record<string, unknown>[];
   collections: Record<string, unknown>[];
   tags: Record<string, unknown>[];
-  createdTools: Record<string, unknown>[];
   studyKits: Record<string, unknown>[];
   learningPaths: Record<string, unknown>[];
   learningPathTopics: Record<string, unknown>[];
@@ -99,7 +98,6 @@ export async function buildUserBackup(
     materialConcepts,
     collections,
     tags,
-    createdTools,
     studyKits,
     learningPaths,
     learningPathTopics,
@@ -164,7 +162,6 @@ export async function buildUserBackup(
     }),
     prisma.collection.findMany({ where: { userId } }),
     prisma.tag.findMany({ where: { userId } }),
-    prisma.createdTool.findMany({ where: { userId } }),
     prisma.studyKit.findMany({ where: { userId } }),
     prisma.learningPath.findMany({ where: { userId } }),
     prisma.learningPathTopic.findMany({
@@ -231,7 +228,6 @@ export async function buildUserBackup(
     materialConcepts: toJson(materialConcepts),
     collections: toJson(collections),
     tags: toJson(tags),
-    createdTools: toJson(createdTools),
     studyKits: toJson(studyKits),
     learningPaths: toJson(learningPaths),
     learningPathTopics: toJson(learningPathTopics),
@@ -551,13 +547,6 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
       await tx.materialConcept.createMany({
         data: asArr<Prisma.MaterialConceptUncheckedCreateInput>(
           payload.materialConcepts,
-        ),
-      });
-    }
-    if (payload.createdTools.length) {
-      await tx.createdTool.createMany({
-        data: asArr<Prisma.CreatedToolUncheckedCreateInput>(
-          payload.createdTools,
         ),
       });
     }
