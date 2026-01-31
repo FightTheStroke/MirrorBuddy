@@ -9,6 +9,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Admin Panel Redesign (Plan P110, ADR 0106)
+
+- **Sidebar navigation**: Grouped collapsible sections (Overview, Users, Content, Analytics, System)
+- **Command palette**: Cmd+K global search across all admin pages
+- **Breadcrumb navigation**: Path-aware breadcrumbs with human-readable labels
+- **Character management**: DB-driven CharacterConfig with CRUD API, seed from code, visibility toggle
+- **Audit log**: Centralized audit service with filterable table (date range, action, entity type)
+- **Knowledge base viewer**: Browse maestro system prompts with search, on-demand loading
+- **RAG management panel**: Embedding counts by source type, per-maestro reindex
+- **Export infrastructure**: CSV/JSON export on Users, Invites, Tiers, Audit Log tables
+- **PDF summary report**: Downloadable admin dashboard report via react-pdf
+- **Funnel analytics**: Visual funnel chart with conversion rates, cohort analysis, churn tracking
+- **Analytics cards**: FSRS stats, safety events, session costs, voice metrics, a11y stats
+
 #### Documentation System (Plan 111)
 
 - `docs/claude/` on-demand documentation system (32 AI-optimized reference files)
@@ -25,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Documented all 22 CSRF-exempt routes with eslint-disable and justification
 
 ### Changed
+
+- **Dashboard**: Redesigned with KPI cards, quick actions, recent activity feed
+- **Users page**: Tier column, confirmation dialog for delete, responsive grid
+- **Invites page**: Status filters, bulk actions toolbar
+- **Tiers page**: Inline editing, feature matrix display
 
 #### Documentation Optimization (Plan 111)
 
@@ -53,6 +72,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Old flat material storage files (`materials-db-crud.ts`, `materials-db-schema.ts`, `materials-db-utils.ts`)
 
 ### Fixed
+
+- **User deletion**: Soft-delete with 30-day trash + subscription restore on undelete
+- **Test alignment**: Schema-split, tier-column, users-table tests updated for new structure
 
 #### Documentation Corrections (Plan 111)
 
