@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { requireCSRF } from "@/lib/security/csrf";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
@@ -7,6 +8,8 @@ const log = logger.child({ module: "admin-knowledge-reindex" });
 
 export async function POST(request: NextRequest) {
   try {
+    requireCSRF(request);
+
     const auth = await validateAdminAuth();
     if (!auth.authenticated || !auth.isAdmin) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
