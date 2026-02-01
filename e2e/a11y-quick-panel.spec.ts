@@ -19,11 +19,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 10000 });
   });
 
   test("quick panel has role=dialog", async ({ page }) => {
@@ -31,10 +30,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
     await expect(dialog).toHaveAttribute("role", "dialog");
   });
 
@@ -43,10 +42,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
     await expect(dialog).toHaveAttribute("aria-modal", "true");
   });
 
@@ -57,10 +56,11 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+
     const labelledBy = await dialog.getAttribute("aria-labelledby");
 
     expect(labelledBy).toBeTruthy();
@@ -74,8 +74,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     for (let i = 0; i < 20; i++) {
       await page.keyboard.press("Tab");
@@ -94,16 +96,13 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(300);
-
-    await expect(panel).not.toBeVisible();
+    await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
   test("close button has data-testid", async ({ page }) => {
@@ -111,8 +110,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
     await expect(closeBtn).toBeVisible();
@@ -123,17 +124,14 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
+
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
-
-    await expect(panel).toBeVisible();
     await closeBtn.click();
-    await page.waitForTimeout(300);
-
-    await expect(panel).not.toBeVisible();
+    await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
   test("profile buttons container has data-testid", async ({ page }) => {
@@ -141,8 +139,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const profilesContainer = page.locator(
       '[data-testid="a11y-profile-buttons"]',
@@ -155,8 +155,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const resetBtn = page.locator('[data-testid="a11y-reset-btn"]');
     await expect(resetBtn).toBeVisible();
@@ -167,8 +169,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const settingsLink = page.locator(
       '[data-testid="a11y-full-settings-link"]',
@@ -181,8 +185,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const toggles = page.locator('[data-testid*="a11y-toggle"]');
     const count = await toggles.count();
@@ -197,14 +203,13 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     const mainCountBefore = await page.locator("main").count();
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     const mainCountAfter = await page.locator("main").count();
 
     expect(mainCountAfter).toBe(mainCountBefore);
-
-    const dialog = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(dialog).toBeVisible();
   });
 });

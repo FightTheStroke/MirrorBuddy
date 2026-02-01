@@ -148,6 +148,8 @@ export function SupportSection() {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             role="region"
             aria-label={t("carouselLabel")}
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
+            tabIndex={0}
           >
             {supportMembers.map((member, i) => {
               const isCoach = member.role === "coach";

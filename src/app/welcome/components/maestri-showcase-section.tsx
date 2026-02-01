@@ -119,6 +119,8 @@ export function MaestriShowcaseSection() {
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             role="region"
             aria-label={t("carouselLabel")}
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
+            tabIndex={0}
           >
             {displayedMaestri.map((maestro, i) => (
               <motion.div

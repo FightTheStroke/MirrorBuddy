@@ -95,11 +95,18 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
 
   test("skip link navigates to main content", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
+    // Focus first to make visible (opacity-0 -> opacity-100 on focus)
+    await skipLink.focus();
     await skipLink.click();
-    await page.waitForTimeout(500);
+
+    // Wait for focus to move to main content (handler runs after hydration)
+    await page.waitForFunction(
+      () => document.activeElement?.id === "main-content",
+      { timeout: 5000 },
+    );
 
     const focusedElement = await page.evaluate(() => {
       return document.activeElement?.id;

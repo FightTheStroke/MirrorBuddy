@@ -50,6 +50,7 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
 
     // aria-controls is only present when panel is expanded (WCAG: reference existing elements)
     const controlsBefore = await button.getAttribute("aria-controls");
@@ -57,7 +58,8 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
 
     // Open panel — aria-controls should now reference the panel
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
     const controlsAfter = await button.getAttribute("aria-controls");
     expect(controlsAfter).toBe("a11y-quick-panel");
   });
@@ -150,13 +152,13 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
 
     await button.focus();
     await page.keyboard.press("Enter");
-    await page.waitForTimeout(300);
 
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 10000 });
   });
 
   test("button toggles panel with Space key", async ({ page }) => {
@@ -164,13 +166,13 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
 
     await button.focus();
     await page.keyboard.press("Space");
-    await page.waitForTimeout(300);
 
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 10000 });
   });
 
   test("button has icon with aria-hidden", async ({ page }) => {

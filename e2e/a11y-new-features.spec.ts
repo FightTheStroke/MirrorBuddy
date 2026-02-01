@@ -107,15 +107,20 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
 
   test("skip link navigates to main content", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
 
     const skipLink = page.locator('a[href="#main-content"]');
 
-    // Click the skip link
+    // Focus first to ensure visibility, then click
+    await skipLink.focus();
     await skipLink.click();
-    await page.waitForTimeout(500);
 
-    // Check that focus is moved to main content
+    // Wait for focus to move to main content (handler runs after hydration)
+    await page.waitForFunction(
+      () => document.activeElement?.id === "main-content",
+      { timeout: 5000 },
+    );
+
     const focusedElement = await page.evaluate(() => {
       return document.activeElement?.id;
     });
@@ -177,8 +182,10 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     expect(controlsAttr).toBeNull();
 
     // Open panel — aria-controls should now reference the panel
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const controlsAfter = await button.getAttribute("aria-controls");
     expect(controlsAfter).toBe("a11y-quick-panel");
@@ -197,8 +204,10 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
     // Click to open
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     // Should be true
     await expect(button).toHaveAttribute("aria-expanded", "true");
@@ -236,11 +245,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({ timeout: 10000 });
   });
 
   test("quick panel has aria-modal=true", async ({ page }) => {
@@ -248,10 +256,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
     await expect(dialog).toHaveAttribute("aria-modal", "true");
   });
 
@@ -260,10 +268,11 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
+
     const labelledBy = await dialog.getAttribute("aria-labelledby");
 
     expect(labelledBy).toBeTruthy();
@@ -278,8 +287,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Tab through multiple times
     for (let i = 0; i < 20; i++) {
@@ -303,16 +314,13 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
-
     const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(300);
-
-    await expect(dialog).not.toBeVisible();
+    await expect(dialog).not.toBeVisible({ timeout: 10000 });
   });
 
   test("close button has proper accessibility label", async ({ page }) => {
@@ -320,8 +328,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const closeButton = page.locator('[data-testid="a11y-close-panel-btn"]');
     await expect(closeButton).toBeAttached();
@@ -335,8 +345,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Check for profile buttons with aria-label
     const profileButtons = page.locator(
@@ -354,8 +366,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     const toggles = page.locator('[role="dialog"] [role="switch"]');
     const count = await toggles.count();
@@ -374,8 +388,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     const sections = page.locator('[role="dialog"] section');
     const count = await sections.count();
@@ -398,7 +414,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
 test.describe("A11y Features Integration", () => {
   test("skip link and floating button both work together", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
 
     // Tab to skip link
     await page.keyboard.press("Tab");
@@ -411,9 +427,13 @@ test.describe("A11y Features Integration", () => {
     if (isSkipLink) {
       // Skip link is first, activate it
       await page.keyboard.press("Enter");
-      await page.waitForTimeout(300);
 
-      // Verify main content has focus
+      // Wait for focus to move to main content (handler runs after hydration)
+      await page.waitForFunction(
+        () => document.activeElement?.id === "main-content",
+        { timeout: 5000 },
+      );
+
       const focusedId = await page.evaluate(
         () => document.activeElement?.id || "",
       );
@@ -432,8 +452,10 @@ test.describe("A11y Features Integration", () => {
 
     // Open accessibility panel
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
     await button.click();
-    await page.waitForTimeout(300);
+    const dialog = page.locator('[role="dialog"]');
+    await expect(dialog).toBeVisible({ timeout: 10000 });
 
     // Get main content element count after opening panel
     const mainCountAfter = await page.locator("main").count();
@@ -442,7 +464,6 @@ test.describe("A11y Features Integration", () => {
     expect(mainCountAfter).toBe(mainCountBefore);
 
     // Panel should be a separate dialog element
-    const dialog = page.locator('[role="dialog"]');
     await expect(dialog).toBeVisible();
   });
 });

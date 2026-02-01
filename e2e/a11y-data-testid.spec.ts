@@ -119,6 +119,7 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
 
     // aria-controls is only set when panel is expanded
     const controlsBefore = await button.getAttribute("aria-controls");
@@ -126,7 +127,8 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
 
     // Open panel
     await button.click();
-    await page.waitForTimeout(300);
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
 
     const controlsAfter = await button.getAttribute("aria-controls");
     expect(controlsAfter).toBe("a11y-quick-panel");
@@ -137,13 +139,16 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
 
     // Initially false
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
     // Click to open
     await button.click();
-    await page.waitForTimeout(300);
+    await page
+      .locator('[data-testid="a11y-quick-panel"]')
+      .waitFor({ state: "visible", timeout: 10000 });
 
     // Should be true
     await expect(button).toHaveAttribute("aria-expanded", "true");
@@ -190,15 +195,21 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
   // Panel tests open a dialog and interact with it — slow under load
   test.setTimeout(60000);
 
+  // Helper: open the a11y panel reliably (wait for button visible, then wait for panel)
+  async function openPanel(page: import("@playwright/test").Page) {
+    const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 10000 });
+    await button.click();
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    await expect(panel).toBeVisible({ timeout: 10000 });
+    return { button, panel };
+  }
+
   test("quick panel has data-testid", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     await expect(panel).toBeVisible();
   });
 
@@ -206,11 +217,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     await expect(panel).toHaveAttribute("role", "dialog");
   });
 
@@ -218,11 +225,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     await expect(panel).toHaveAttribute("aria-modal", "true");
   });
 
@@ -230,11 +233,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     const labelledBy = await panel.getAttribute("aria-labelledby");
 
     expect(labelledBy?.length).toBeGreaterThan(0);
@@ -244,10 +243,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
     await expect(closeBtn).toBeVisible();
   });
@@ -256,45 +252,32 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     await expect(panel).toBeVisible();
 
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
     await closeBtn.click();
-    await page.waitForTimeout(300);
 
-    await expect(panel).not.toBeVisible();
+    await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
   test("escape key closes panel", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const { panel } = await openPanel(page);
     await expect(panel).toBeVisible();
 
     await page.keyboard.press("Escape");
-    await page.waitForTimeout(300);
 
-    await expect(panel).not.toBeVisible();
+    await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
   test("profile buttons container has data-testid", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     const profilesContainer = page.locator(
       '[data-testid="a11y-profile-buttons"]',
     );
@@ -305,10 +288,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     const resetBtn = page.locator('[data-testid="a11y-reset-btn"]');
     await expect(resetBtn).toBeVisible();
   });
@@ -317,10 +297,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     const settingsLink = page.locator(
       '[data-testid="a11y-full-settings-link"]',
     );
@@ -331,10 +308,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     // Large text toggle
     const largeTextToggle = page
       .locator('[data-testid*="a11y-toggle"]')
@@ -347,10 +321,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
-
+    await openPanel(page);
     const toggles = page.locator('[data-testid*="a11y-toggle"]');
     const count = await toggles.count();
 
@@ -365,9 +336,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await button.click();
-    await page.waitForTimeout(300);
+    await openPanel(page);
 
     // Tab multiple times
     for (let i = 0; i < 20; i++) {
@@ -375,10 +344,6 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     }
 
     // Focus should still be in panel
-    const _panelId = await page
-      .locator('[data-testid="a11y-quick-panel"]')
-      .getAttribute("id");
-
     const focusedParent = await page.evaluate(() =>
       document.activeElement?.closest('[data-testid="a11y-quick-panel"]'),
     );
