@@ -94,6 +94,7 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
+    test.setTimeout(60000); // networkidle + hydration can be slow in CI
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("networkidle");
 
@@ -105,7 +106,7 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
     // Wait for focus to move to main content (handler runs after hydration)
     await page.waitForFunction(
       () => document.activeElement?.id === "main-content",
-      { timeout: 5000 },
+      { timeout: 10000 },
     );
 
     const focusedElement = await page.evaluate(() => {

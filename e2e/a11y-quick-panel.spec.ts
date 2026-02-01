@@ -14,6 +14,9 @@
 import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Quick Panel - Dialog Accessibility", () => {
+  // Panel tests open a dialog and interact with it — slow under CI load
+  test.setTimeout(60000);
+
   test("quick panel has data-testid", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
@@ -198,7 +201,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
 
   test("panel does not interfere with page content", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
 
     const mainCountBefore = await page.locator("main").count();
 

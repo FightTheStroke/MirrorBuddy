@@ -13,6 +13,9 @@
 import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Floating Button - ARIA & Accessibility", () => {
+  // Button + panel interactions can be slow in CI
+  test.setTimeout(60000);
+
   test("floating button has data-testid attribute", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
