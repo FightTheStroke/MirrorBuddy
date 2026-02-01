@@ -9,18 +9,24 @@
 import path from "path";
 import fs from "fs";
 import { createHmac, randomUUID } from "crypto";
+import { config } from "dotenv";
 import { getPrismaClient, disconnectPrisma } from "./helpers/prisma-setup";
+
+// Load .env so we can read SESSION_SECRET (must match running dev server)
+config();
 
 const STORAGE_STATE_PATH = path.join(__dirname, ".auth", "storage-state.json");
 
-// Must match playwright.config.ts SESSION_SECRET
-const E2E_SESSION_SECRET = "e2e-test-session-secret-32-characters-min";
+// Use the actual SESSION_SECRET from environment (matches running dev server).
+// Falls back to E2E test secret when Playwright starts its own server.
+const SESSION_SECRET =
+  process.env.SESSION_SECRET || "e2e-test-session-secret-32-characters-min";
 
 /**
  * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
  */
 function signCookieValue(value: string): string {
-  const hmac = createHmac("sha256", E2E_SESSION_SECRET);
+  const hmac = createHmac("sha256", SESSION_SECRET);
   hmac.update(value);
   const signature = hmac.digest("hex");
   return `${value}.${signature}`;

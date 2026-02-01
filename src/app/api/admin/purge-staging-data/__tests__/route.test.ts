@@ -118,6 +118,10 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 import { GET, DELETE } from "../route";
 
 describe("admin purge-staging-data API", () => {

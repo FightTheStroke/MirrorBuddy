@@ -18,9 +18,11 @@ import AxeBuilder from "@axe-core/playwright";
 test.use({ storageState: undefined });
 
 test.describe("Compliance Pages - Accessibility", () => {
+  // Root compliance paths (e.g. /privacy) redirect to /landing, not to locale
+  // versions. Always use locale-prefixed paths for reliable navigation.
   test("privacy policy page is accessible", async ({ page }) => {
-    await page.goto("/privacy");
-    await expect(page).toHaveTitle(/privacy|privacy policy/i);
+    await page.goto("/it/privacy");
+    await expect(page).toHaveTitle(/privacy/i);
 
     const mainContent = page.getByRole("main");
     await mainContent.waitFor({ state: "visible", timeout: 10000 });
@@ -28,8 +30,8 @@ test.describe("Compliance Pages - Accessibility", () => {
   });
 
   test("terms of service page is accessible", async ({ page }) => {
-    await page.goto("/terms");
-    await expect(page).toHaveTitle(/terms|condizioni|termini/i);
+    await page.goto("/it/terms");
+    await expect(page).toHaveTitle(/termini|terms/i);
 
     const mainContent = page.getByRole("main");
     await mainContent.waitFor({ state: "visible", timeout: 10000 });
@@ -37,8 +39,8 @@ test.describe("Compliance Pages - Accessibility", () => {
   });
 
   test("cookie policy page is accessible", async ({ page }) => {
-    await page.goto("/cookies");
-    await expect(page).toHaveTitle(/cookie|policy/i);
+    await page.goto("/it/cookies");
+    await expect(page).toHaveTitle(/cookie/i);
 
     const mainContent = page.getByRole("main");
     await mainContent.waitFor({ state: "visible", timeout: 10000 });
@@ -46,8 +48,8 @@ test.describe("Compliance Pages - Accessibility", () => {
   });
 
   test("AI transparency page is accessible", async ({ page }) => {
-    await page.goto("/ai-transparency");
-    await expect(page).toHaveTitle(/trasparenza|transparency|ai/i);
+    await page.goto("/it/ai-transparency");
+    await expect(page).toHaveTitle(/trasparenza|transparency/i);
 
     const mainContent = page.getByRole("main");
     await mainContent.waitFor({ state: "visible", timeout: 10000 });
@@ -57,38 +59,52 @@ test.describe("Compliance Pages - Accessibility", () => {
 
 test.describe("Compliance Pages - Content Verification", () => {
   test("privacy policy contains privacy commitment", async ({ page }) => {
-    await page.goto("/privacy");
+    await page.goto("/it/privacy");
+    await page.waitForLoadState("domcontentloaded");
     const content = await page.textContent("body");
-    if (content) {
-      const hasPrivacyContent = /data|privacy|protection|gdpr/i.test(content);
-      expect(hasPrivacyContent).toBeTruthy();
-    }
+    expect(content).toBeTruthy();
+    const hasPrivacyContent =
+      /data|privacy|protection|gdpr|dati|protezione/i.test(content!);
+    expect(hasPrivacyContent).toBeTruthy();
   });
 
   test("AI transparency page has required sections", async ({ page }) => {
-    await page.goto("/ai-transparency");
+    await page.goto("/it/ai-transparency");
+    await page.waitForLoadState("domcontentloaded");
     const content = await page.textContent("body");
-    if (content) {
-      const hasAIContent = /AI|system|azure|openai|disclosure/i.test(content);
-      expect(hasAIContent).toBeTruthy();
-    }
+    expect(content).toBeTruthy();
+    const hasAIContent =
+      /AI|intelligenza artificiale|azure|openai|trasparenza/i.test(content!);
+    expect(hasAIContent).toBeTruthy();
   });
 
   test("compliance pages have page headers", async ({ page }) => {
-    const pages = ["/privacy", "/terms", "/cookies", "/ai-transparency"];
+    test.setTimeout(60000); // 4 page navigations
+    const pages = [
+      "/it/privacy",
+      "/it/terms",
+      "/it/cookies",
+      "/it/ai-transparency",
+    ];
 
-    for (const path of pages) {
-      await page.goto(path);
+    for (const pagePath of pages) {
+      await page.goto(pagePath);
+      await page.waitForLoadState("domcontentloaded");
       const heading = page.getByRole("heading").first();
-      const isVisible = await heading.isVisible().catch(() => false);
-      expect(isVisible || path).toBeTruthy();
+      const isVisible = await heading
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
+      expect(isVisible, `Page ${pagePath} should have a visible heading`).toBe(
+        true,
+      );
     }
   });
 });
 
 test.describe("Compliance Pages - Keyboard Navigation", () => {
   test("privacy policy is keyboard navigable", async ({ page }) => {
-    await page.goto("/privacy");
+    await page.goto("/it/privacy");
+    await page.waitForLoadState("domcontentloaded");
 
     // Test Tab key navigation
     await page.keyboard.press("Tab");
@@ -99,7 +115,8 @@ test.describe("Compliance Pages - Keyboard Navigation", () => {
   test("AI transparency page links are keyboard accessible", async ({
     page,
   }) => {
-    await page.goto("/ai-transparency");
+    await page.goto("/it/ai-transparency");
+    await page.waitForLoadState("domcontentloaded");
 
     const links = await page.locator("a").count();
     if (links > 0) {
@@ -126,32 +143,32 @@ test.describe("Compliance Pages - Multi-Locale", () => {
     { path: "/ai-transparency", name: "AI Transparency" },
   ];
 
-  for (const page of compliancePages) {
+  for (const compliancePage of compliancePages) {
     testAllLocales(
-      `${page.name} loads in all locales`,
-      async ({ page: playwrightPage, locale }) => {
-        await playwrightPage.goto(`/${locale}${page.path}`);
-        await playwrightPage.waitForLoadState("domcontentloaded");
+      `${compliancePage.name} loads in all locales`,
+      async ({ localePage }) => {
+        await localePage.goto(compliancePage.path);
+        await localePage.page.waitForLoadState("domcontentloaded");
 
         // Verify page loads without errors
-        const title = await playwrightPage.title();
+        const title = await localePage.page.title();
         expect(title).toBeTruthy();
 
-        // Verify main content is visible (wait for React hydration after domcontentloaded)
-        const mainContent = playwrightPage.getByRole("main");
+        // Verify main content is visible (wait for React hydration)
+        const mainContent = localePage.page.getByRole("main");
         await mainContent.waitFor({ state: "visible", timeout: 10000 });
         await expect(mainContent).toBeVisible();
       },
     );
 
     testAllLocales(
-      `${page.name} has correct language content`,
-      async ({ page: playwrightPage, locale }) => {
-        await playwrightPage.goto(`/${locale}${page.path}`);
-        await playwrightPage.waitForLoadState("domcontentloaded");
+      `${compliancePage.name} has correct language content`,
+      async ({ localePage }) => {
+        await localePage.goto(compliancePage.path);
+        await localePage.page.waitForLoadState("domcontentloaded");
 
         // Verify page content is in correct language
-        const bodyText = await playwrightPage.textContent("body");
+        const bodyText = await localePage.page.textContent("body");
         expect(bodyText).toBeTruthy();
 
         // Basic language verification (not comprehensive, but checks page loaded)
@@ -169,22 +186,22 @@ test.describe("Compliance Pages - Accessibility per Locale", () => {
     { path: "/accessibility", name: "Accessibility Statement" },
   ];
 
-  for (const page of compliancePages) {
+  for (const compliancePage of compliancePages) {
     testAllLocales(
-      `${page.name} passes WCAG 2.1 AA in @${page.path}`,
-      async ({ page: playwrightPage, locale }) => {
-        await playwrightPage.goto(`/${locale}${page.path}`);
-        await playwrightPage.waitForLoadState("domcontentloaded");
-        await playwrightPage.waitForTimeout(500);
+      `${compliancePage.name} passes WCAG 2.1 AA in @${compliancePage.path}`,
+      async ({ localePage }) => {
+        await localePage.goto(compliancePage.path);
+        await localePage.page.waitForLoadState("domcontentloaded");
+        await localePage.page.waitForTimeout(500);
 
-        const results = await new AxeBuilder({ page: playwrightPage })
+        const results = await new AxeBuilder({ page: localePage.page })
           .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
           .disableRules(["color-contrast"]) // Known issue, tracked separately
           .analyze();
 
         if (results.violations.length > 0) {
           console.log(
-            `\n=== Accessibility violations on ${page.path} (${locale}) ===`,
+            `\n=== Accessibility violations on ${compliancePage.path} (${localePage.locale}) ===`,
           );
           for (const violation of results.violations) {
             console.log(
@@ -195,7 +212,7 @@ test.describe("Compliance Pages - Accessibility per Locale", () => {
 
         expect(
           results.violations,
-          `${page.name} (${locale}) has ${results.violations.length} accessibility violations`,
+          `${compliancePage.name} (${localePage.locale}) has ${results.violations.length} accessibility violations`,
         ).toHaveLength(0);
       },
     );

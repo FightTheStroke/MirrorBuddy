@@ -18,6 +18,9 @@ import {
 import type { Locale } from "@/i18n/config";
 
 test.describe("Locale Switching and Content Localization", () => {
+  // Locale switching tests navigate multiple pages per locale, slow under load
+  test.setTimeout(60000);
+
   test.beforeEach(async ({ localePage }) => {
     // Mock ToS acceptance to bypass modal
     await localePage.page.route("/api/tos", async (route) => {
@@ -198,29 +201,33 @@ test.describe("Locale Switching and Content Localization", () => {
    * Test 8: Browser Accept-Language header is respected
    * Verifies that Accept-Language header influences initial locale
    */
-  test("browser Accept-Language header is respected", async ({
-    page,
-    context,
-  }) => {
-    // Set Accept-Language header to French
-    await context.setExtraHTTPHeaders({
-      "Accept-Language": "fr-FR,fr;q=0.9",
+  test("browser Accept-Language header is respected", async ({ browser }) => {
+    // Use a completely fresh context with French locale setting.
+    // Playwright's `locale` option sets the browser locale AND Accept-Language
+    // header, which is more reliable than extraHTTPHeaders alone.
+    const context = await browser.newContext({
+      locale: "fr-FR",
     });
+    const page = await context.newPage();
 
-    // Navigate to root (should detect French)
-    await page.goto("/");
-
-    // Should redirect to French version or detect French
-    // Give it time to process
+    // Navigate to /welcome — proxy should detect French from Accept-Language
+    await page.goto("/welcome");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(1000);
 
     // Check if page is in French or redirected to /fr/
     const url = page.url();
     const htmlLang = await page.locator("html").getAttribute("lang");
 
-    // Either URL contains /fr/ or html lang is fr
-    const isFrench = url.includes("/fr/") || htmlLang === "fr";
-    expect(isFrench).toBeTruthy();
+    // URL should contain /fr/ or html lang should be fr
+    const isFrench =
+      url.includes("/fr/") || url.includes("/fr") || htmlLang === "fr";
+    expect(
+      isFrench,
+      `Expected French locale, got URL: ${url}, lang: ${htmlLang}`,
+    ).toBeTruthy();
+
+    await context.close();
   });
 
   /**

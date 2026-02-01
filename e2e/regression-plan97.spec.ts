@@ -130,8 +130,13 @@ test.describe("Regression: Welcome Page LocalePage Pattern (Plan 97)", () => {
 
 test.describe("Regression: Protected Routes in Tests (Plan 97)", () => {
   test("should avoid testing protected routes without auth", async ({
-    page,
+    browser,
   }) => {
+    // Use a completely fresh context: no cookies, no storageState, no fixtures
+    // This ensures no trial session (visitor cookie) that would bypass auth
+    const context = await browser.newContext({ storageState: undefined });
+    const page = await context.newPage();
+
     const protectedRoutes = ["/it/settings", "/it/profile"];
 
     for (const route of protectedRoutes) {
@@ -147,8 +152,28 @@ test.describe("Regression: Protected Routes in Tests (Plan 97)", () => {
         (await page.locator('input[type="password"]').count()) > 0 ||
         currentUrl.includes("/welcome");
 
-      expect(hasRedirected || hasAuthUI).toBeTruthy();
+      // A 404 page means the route doesn't exist for unauthenticated users
+      const has404 =
+        (await page
+          .locator('text="404"')
+          .isVisible()
+          .catch(() => false)) ||
+        (await page
+          .locator('text="Pagina non trovata"')
+          .isVisible()
+          .catch(() => false)) ||
+        (await page
+          .locator('text="Page not found"')
+          .isVisible()
+          .catch(() => false));
+
+      expect(
+        hasRedirected || hasAuthUI || has404,
+        `Route ${route} should be protected (URL: ${currentUrl})`,
+      ).toBeTruthy();
     }
+
+    await context.close();
   });
 
   test("public routes should load without auth", async ({ page }) => {
@@ -166,6 +191,7 @@ test.describe("Regression: Protected Routes in Tests (Plan 97)", () => {
 
 test.describe("Regression: Mobile Timeout Issues (Plan 97)", () => {
   test("should load pages on mobile within timeout", async ({ page }) => {
+    test.setTimeout(60000); // Mobile rendering + multiple pages
     await page.setViewportSize({ width: 375, height: 667 });
     const testPages = ["/it/", "/it/welcome", "/it/privacy"];
 

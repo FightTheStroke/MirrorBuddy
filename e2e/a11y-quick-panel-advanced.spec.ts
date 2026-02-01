@@ -93,7 +93,13 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
     await expect(panel).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    // Click left side of viewport to hit the backdrop overlay
+    // (avoid top-left where skip-link sits, and right side where panel is)
+    const viewport = page.viewportSize();
+    await page.mouse.click(
+      (viewport?.width ?? 800) / 4,
+      (viewport?.height ?? 600) / 2,
+    );
     await page.waitForTimeout(300);
 
     await expect(panel).not.toBeVisible();
@@ -157,13 +163,15 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
       await page.keyboard.press("Tab");
     }
 
-    const activeElement = await page.evaluate(
-      () =>
-        document.activeElement?.closest('[data-testid*="a11y-profile"]')
-          ?.tagName || "",
-    );
+    // Check that a profile button inside the profiles container is focused
+    const isProfileButton = await page.evaluate(() => {
+      const el = document.activeElement;
+      if (!el || el.tagName !== "BUTTON") return false;
+      const container = el.closest('[data-testid="a11y-profile-buttons"]');
+      return container !== null;
+    });
 
-    expect(activeElement).toBe("BUTTON");
+    expect(isProfileButton).toBe(true);
   });
 
   test("panel maintains height constraint", async ({ page }) => {
@@ -178,6 +186,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
     const box = await panel.boundingBox();
 
     // Panel should not exceed viewport height
-    expect(box?.height).toBeLessThan(window.innerHeight || 1000);
+    const viewportHeight = await page.evaluate(() => window.innerHeight);
+    expect(box?.height).toBeLessThan(viewportHeight || 1000);
   });
 });

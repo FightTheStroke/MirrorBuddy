@@ -45,10 +45,12 @@ export function SkipLink({
       onClick={handleClick}
       data-testid="skip-link"
       className={cn(
-        // Position: absolute top-left, off-screen by default
-        "absolute -top-12 left-0 z-[9999]",
-        // Visible on focus only (sr-only but with focus visible)
-        "sr-only focus:not-sr-only",
+        // Position: fixed top-left, accessible but visually hidden
+        "fixed top-1 left-1 z-[9999]",
+        // Hidden but accessible: opacity 0, then visible on focus
+        "opacity-0 focus:opacity-100",
+        // Keep element dimensions for clickability
+        "pointer-events-auto focus:pointer-events-auto",
         // Styling: high contrast, visible focus ring
         "px-4 py-2 bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900",
         "rounded-b-md shadow-lg",

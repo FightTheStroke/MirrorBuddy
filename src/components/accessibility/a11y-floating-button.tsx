@@ -48,7 +48,7 @@ export function A11yFloatingButton({
       )}
       aria-label={t("a11yOpenSettings")}
       aria-expanded={isExpanded}
-      aria-controls="a11y-quick-panel"
+      aria-controls={isExpanded ? "a11y-quick-panel" : undefined}
       aria-haspopup="dialog"
     >
       <Accessibility className="w-5 h-5" aria-hidden="true" />

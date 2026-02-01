@@ -48,6 +48,7 @@ test.describe("Memory System", () => {
   test("F-10: memory persists across page reload", async ({
     trialPage: page,
   }) => {
+    test.setTimeout(60000); // Page reload can be slow under load
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 
@@ -61,6 +62,7 @@ test.describe("Memory System", () => {
   test("F-10: memory state loads on subsequent visits", async ({
     trialPage: page,
   }) => {
+    test.setTimeout(60000); // Multiple page navigations
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
 

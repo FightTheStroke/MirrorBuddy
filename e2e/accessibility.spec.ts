@@ -390,7 +390,7 @@ test.describe("Instant Access - Floating Button", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toBeVisible();
 
@@ -410,7 +410,7 @@ test.describe("Instant Access - Floating Button", () => {
       await page.goto(path);
       await page.waitForLoadState("domcontentloaded");
 
-      const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+      const button = page.locator('[data-testid="a11y-floating-button"]');
       await button.waitFor({ state: "visible", timeout: 10000 });
       await expect(button).toBeVisible();
     }
@@ -420,10 +420,10 @@ test.describe("Instant Access - Floating Button", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.waitFor({ state: "visible", timeout: 10000 });
     await expect(button).toHaveAttribute("aria-expanded", "false");
-    await expect(button).toHaveAttribute("aria-controls");
+    await expect(button).toHaveAttribute("aria-haspopup", "dialog");
   });
 });
 
@@ -432,7 +432,7 @@ test.describe("Instant Access - Quick Panel", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const panel = page
@@ -463,7 +463,7 @@ test.describe("Instant Access - Quick Panel", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const panel = page
@@ -479,7 +479,7 @@ test.describe("Instant Access - Quick Panel", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const panel = page
@@ -487,7 +487,12 @@ test.describe("Instant Access - Quick Panel", () => {
       .filter({ hasText: "Accessibilità" });
     await expect(panel).toBeVisible();
 
-    await page.mouse.click(10, 10);
+    // Click left side of viewport (avoid top-left skip-link and right-side panel)
+    const viewport = page.viewportSize();
+    await page.mouse.click(
+      (viewport?.width ?? 800) / 4,
+      (viewport?.height ?? 600) / 2,
+    );
     await expect(panel).not.toBeVisible();
   });
 });
@@ -503,7 +508,7 @@ test.describe("Instant Access - Profile Activation", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -523,7 +528,7 @@ test.describe("Instant Access - Profile Activation", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const adhBtn = page.locator('button:has-text("ADHD")');
@@ -539,7 +544,7 @@ test.describe("Instant Access - Profile Activation", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -562,7 +567,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
@@ -599,7 +604,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     const visualBtn = page.locator('button:has-text("Visivo")');
@@ -617,7 +622,7 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.focus();
     await page.keyboard.press("Enter");
 
@@ -631,7 +636,7 @@ test.describe("Instant Access - Panel Keyboard Navigation", () => {
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('button[aria-controls="a11y-quick-panel"]');
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
     for (let i = 0; i < 20; i++) {

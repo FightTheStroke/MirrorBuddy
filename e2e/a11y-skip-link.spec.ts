@@ -40,6 +40,7 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
       const styles = window.getComputedStyle(el);
       const classList = el.className;
       return (
+        styles.opacity === "0" ||
         (styles.position === "absolute" && styles.clip !== "auto") ||
         classList.includes("sr-only")
       );

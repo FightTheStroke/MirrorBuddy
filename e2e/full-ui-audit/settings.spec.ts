@@ -31,6 +31,10 @@ const IGNORE_ERRORS = [
 ];
 
 test.describe("Settings Page Interactions", () => {
+  // Settings tests navigate through home page + open settings panel + interact
+  // Multiple page loads + hydration can exceed default 30s under load
+  test.setTimeout(60000);
+
   test.describe("Navigation and Access", () => {
     test("settings page is accessible via sidebar navigation", async ({
       trialPage: page,

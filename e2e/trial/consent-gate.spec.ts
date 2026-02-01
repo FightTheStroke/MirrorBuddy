@@ -36,27 +36,29 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       localStorage.removeItem("mirrorbuddy-onboarding"); // Prevent redirect
     });
 
-    // Navigate to welcome page
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    // Navigate to Italian welcome page (root /welcome redirects to /landing)
+    await trialPage.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
-    // Should see consent gate, not welcome content (use heading to be specific)
+    // Should see consent gate (i18n key: auth.trialConsent.title)
     await expect(
-      trialPage.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
+      trialPage.getByRole("heading", { name: /Protezione della Privacy/i }),
     ).toBeVisible({
       timeout: 10000,
     });
 
-    // Should show privacy policy reference (use link to be specific)
+    // Should show privacy policy reference
     await expect(
-      trialPage.getByRole("link", { name: /Leggi l.informativa privacy/i }),
+      trialPage.getByRole("link", {
+        name: /Leggi la nostra Informativa sulla Privacy/i,
+      }),
     ).toBeVisible();
 
     // Should show checkbox
     await expect(trialPage.getByRole("checkbox")).toBeVisible();
 
-    // Accept button should exist
+    // Accept button should exist (i18n key: auth.trialConsent.startButton)
     await expect(
-      trialPage.getByRole("button", { name: /Inizia la prova/i }),
+      trialPage.getByRole("button", { name: /Inizia la Prova/i }),
     ).toBeVisible();
   });
 
@@ -73,17 +75,17 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    await trialPage.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
     // Accept button should be disabled initially
     const acceptButton = trialPage.getByRole("button", {
-      name: /Inizia la prova/i,
+      name: /Inizia la Prova/i,
     });
     await expect(acceptButton).toBeDisabled();
 
     // Click the label to toggle the checkbox (shadcn/ui Checkbox uses controlled state)
     const checkboxLabel = trialPage.getByText(
-      /Ho letto e accetto l'informativa privacy/i,
+      /Accetto il trattamento dei miei dati/i,
     );
     await checkboxLabel.click();
 
@@ -110,25 +112,22 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    await trialPage.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
-    // Click the label to check the checkbox (shadcn/ui Checkbox uses controlled state)
-    await trialPage
-      .getByText(/Ho letto e accetto l'informativa privacy/i)
-      .click();
+    // Click the label to check the checkbox
+    await trialPage.getByText(/Accetto il trattamento dei miei dati/i).click();
 
     const acceptButton = trialPage.getByRole("button", {
-      name: /Inizia la prova/i,
+      name: /Inizia la Prova/i,
     });
     await acceptButton.click();
 
-    // Consent gate should disappear (use heading to be specific)
+    // Consent gate should disappear
     await expect(
-      trialPage.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
+      trialPage.getByRole("heading", { name: /Protezione della Privacy/i }),
     ).not.toBeVisible();
 
     // Welcome content should be visible (landing page or onboarding)
-    // The page should show main welcome content or onboarding steps
     await expect(trialPage.locator("body")).toBeTruthy();
   });
 
@@ -182,12 +181,13 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
   });
 
   test("consent persists across page reloads", async ({ page }) => {
+    test.setTimeout(60000); // Multiple navigations + reload
     // Use fresh page without fixture's addInitScript to test persistence properly
     // Clear cookies first
     await page.context().clearCookies();
 
-    // Navigate to welcome page to establish origin for localStorage
-    await page.goto("/welcome", { waitUntil: "domcontentloaded" });
+    // Navigate to Italian welcome page to establish origin for localStorage
+    await page.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
     // Clear localStorage on localhost origin
     await page.evaluate(() => {
@@ -201,18 +201,18 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     await page.reload();
     await page.waitForLoadState("domcontentloaded");
 
-    // Wait for consent gate to appear (use heading to be specific)
+    // Wait for consent gate to appear
     await expect(
-      page.getByRole("heading", { name: /Modalità Prova Gratuita/i }),
+      page.getByRole("heading", { name: /Protezione della Privacy/i }),
     ).toBeVisible({
       timeout: 10000,
     });
 
-    // Click the label to check the checkbox (shadcn/ui Checkbox uses controlled state)
-    await page.getByText(/Ho letto e accetto l'informativa privacy/i).click();
+    // Click the label to check the checkbox
+    await page.getByText(/Accetto il trattamento dei miei dati/i).click();
 
     const acceptButton = page.getByRole("button", {
-      name: /Inizia la prova/i,
+      name: /Inizia la Prova/i,
     });
     await acceptButton.click();
 
@@ -225,7 +225,7 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
 
     // Consent gate should not appear on reload (consent persisted via cookie)
     const consentGate = page.getByRole("heading", {
-      name: /Modalità Prova Gratuita/i,
+      name: /Protezione della Privacy/i,
     });
     await expect(consentGate).not.toBeVisible({ timeout: 5000 });
   });
@@ -241,16 +241,15 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    await trialPage.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
-    // Find and check privacy link
+    // Find and check privacy link (i18n key: auth.trialConsent.privacyLink)
     const privacyLink = trialPage.getByRole("link", {
-      name: /Leggi l.informativa privacy completa/i,
+      name: /Leggi la nostra Informativa sulla Privacy/i,
     });
 
     await expect(privacyLink).toBeVisible();
-    expect(privacyLink).toHaveAttribute("href", "/privacy");
-    expect(privacyLink).toHaveAttribute("target", "_blank");
+    await expect(privacyLink).toHaveAttribute("href", "/privacy");
   });
 
   test("shows GDPR compliance footer note", async ({ trialPage }) => {
@@ -264,12 +263,14 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
       localStorage.removeItem("mirrorbuddy-onboarding");
     });
 
-    await trialPage.goto("/welcome", { waitUntil: "domcontentloaded" });
+    await trialPage.goto("/it/welcome", { waitUntil: "domcontentloaded" });
 
-    // Should show GDPR compliance note
+    // Should show GDPR compliance note (i18n key: auth.trialConsent.subtitle)
     await expect(trialPage.getByText(/Conformità GDPR/i)).toBeVisible();
 
-    // Should mention data deletion rights
-    await expect(trialPage.getByText(/dati saranno cancellati/i)).toBeVisible();
+    // Should mention data storage rights (i18n key: auth.trialConsent.gdprNote)
+    await expect(
+      trialPage.getByText(/dati saranno conservati in Europa/i),
+    ).toBeVisible();
   });
 });

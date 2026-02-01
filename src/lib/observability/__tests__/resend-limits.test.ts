@@ -166,12 +166,17 @@ describe("Resend Limits API", () => {
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
-    // Mock 1500 emails this month
+    // Mock 1500 emails this month - spread across the month from start to now
+    const timeRange = now.getTime() - startOfMonth.getTime();
+    const interval = Math.max(1000, timeRange / 1501);
+
     const emailsMonth = Array(1500)
       .fill(null)
       .map((_, i) => ({
         id: `email-${i}`,
-        created_at: new Date(startOfMonth.getTime() + i * 60000).toISOString(),
+        created_at: new Date(
+          startOfMonth.getTime() + (i + 1) * interval,
+        ).toISOString(),
       }));
 
     global.fetch = vi.fn().mockResolvedValue({

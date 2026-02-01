@@ -48,6 +48,8 @@ test.describe("Locale Patterns", () => {
 // ==================================================
 
 test.describe("Real World Locale Scenarios", () => {
+  // Multi-page locale navigation tests can be slow under full suite load
+  test.setTimeout(60000);
   test("user visits from Italy (Accept-Language: it)", async ({
     page,
     context,

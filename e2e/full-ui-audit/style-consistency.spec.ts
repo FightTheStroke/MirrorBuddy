@@ -121,6 +121,9 @@ test.describe("Style Consistency - Fonts", () => {
 });
 
 test.describe("Style Consistency - CSS Variables", () => {
+  // CSS variable tests navigate pages + compute styles, slow under full suite load
+  test.setTimeout(60000);
+
   test("light mode CSS variables are set correctly", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
@@ -359,6 +362,7 @@ test.describe("Style Consistency - Responsive", () => {
 });
 
 test.describe("Style Consistency - Text Readability", () => {
+  test.setTimeout(60000);
   test("body text has readable line height", async ({ page }) => {
     await page.goto("/");
     await page.waitForLoadState("domcontentloaded");
@@ -420,6 +424,7 @@ test.describe("Style Consistency - Text Readability", () => {
 });
 
 test.describe("Style Consistency - Cross-Page Uniformity", () => {
+  test.setTimeout(60000);
   test("primary color is consistent across pages", async ({ page }) => {
     const primaryColors: string[] = [];
 

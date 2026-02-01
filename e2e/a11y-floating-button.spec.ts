@@ -50,10 +50,16 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
-    const controlsAttr = await button.getAttribute("aria-controls");
 
-    expect(controlsAttr).toBeTruthy();
-    expect(controlsAttr).toBe("a11y-quick-panel");
+    // aria-controls is only present when panel is expanded (WCAG: reference existing elements)
+    const controlsBefore = await button.getAttribute("aria-controls");
+    expect(controlsBefore).toBeNull();
+
+    // Open panel — aria-controls should now reference the panel
+    await button.click();
+    await page.waitForTimeout(300);
+    const controlsAfter = await button.getAttribute("aria-controls");
+    expect(controlsAfter).toBe("a11y-quick-panel");
   });
 
   test("aria-expanded becomes true when panel opens", async ({ page }) => {

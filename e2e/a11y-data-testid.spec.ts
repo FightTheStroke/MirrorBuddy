@@ -112,14 +112,24 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
     await expect(button).toHaveAttribute("aria-haspopup", "dialog");
   });
 
-  test("floating button has aria-controls", async ({ page }) => {
+  test("floating button has aria-controls when panel opens", async ({
+    page,
+  }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
-    const controlsAttr = await button.getAttribute("aria-controls");
 
-    expect(controlsAttr).toBeTruthy();
+    // aria-controls is only set when panel is expanded
+    const controlsBefore = await button.getAttribute("aria-controls");
+    expect(controlsBefore).toBeNull();
+
+    // Open panel
+    await button.click();
+    await page.waitForTimeout(300);
+
+    const controlsAfter = await button.getAttribute("aria-controls");
+    expect(controlsAfter).toBe("a11y-quick-panel");
   });
 
   test("aria-expanded becomes true when panel opens", async ({ page }) => {
@@ -177,6 +187,9 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
 // ============================================================================
 
 test.describe("A11y Quick Panel - data-testid Selectors", () => {
+  // Panel tests open a dialog and interact with it — slow under load
+  test.setTimeout(60000);
+
   test("quick panel has data-testid", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");

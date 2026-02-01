@@ -224,6 +224,8 @@ export function MaestriStep(_props: MaestriStepProps) {
             style={{ scrollSnapType: "x mandatory" }}
             role="region"
             aria-label="Carosello professori - usa le frecce per navigare"
+            // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
+            tabIndex={0}
           >
             {sortedMaestri.map((maestro, index) => (
               <motion.div

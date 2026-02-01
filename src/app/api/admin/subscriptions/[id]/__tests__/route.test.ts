@@ -35,6 +35,10 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 describe("GET /api/admin/subscriptions/[id]", () => {
   beforeEach(() => {
     vi.clearAllMocks();

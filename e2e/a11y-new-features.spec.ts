@@ -18,6 +18,7 @@ import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
 
 test.describe("Skip Link - WCAG 2.1 AA", () => {
   test("skip link is present on all pages", async ({ page }) => {
+    test.setTimeout(60000); // 5 page navigations need more time
     const pages = [
       toLocalePath("/"),
       toLocalePath("/welcome"),
@@ -41,12 +42,12 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
 
     const skipLink = page.locator('a[href="#main-content"]');
 
-    // Check that skip link has sr-only class (hidden visually)
+    // Check that skip link is visually hidden (sr-only or opacity-0)
     const isHidden = await skipLink.evaluate((el) => {
       const styles = window.getComputedStyle(el);
       const classList = el.className;
-      // sr-only typically uses position: absolute + clip or similar
       return (
+        styles.opacity === "0" ||
         (styles.position === "absolute" && styles.clip !== "auto") ||
         classList.includes("sr-only")
       );
@@ -149,9 +150,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
     await expect(button).toHaveAttribute("aria-expanded", /true|false/);
   });
@@ -160,9 +159,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
     await expect(button).toHaveAttribute("aria-haspopup", "dialog");
   });
@@ -173,15 +170,20 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
+    // aria-controls is only set when panel is expanded
     const controlsAttr = await button.getAttribute("aria-controls");
-    expect(controlsAttr).toBeTruthy();
+    expect(controlsAttr).toBeNull();
 
-    // The controlled element should exist
-    const controlledElement = page.locator(`#${controlsAttr}`);
+    // Open panel — aria-controls should now reference the panel
+    await button.click();
+    await page.waitForTimeout(300);
+
+    const controlsAfter = await button.getAttribute("aria-controls");
+    expect(controlsAfter).toBe("a11y-quick-panel");
+
+    const controlledElement = page.locator(`#${controlsAfter}`);
     await expect(controlledElement).toBeAttached();
   });
 
@@ -189,9 +191,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
     // Initially false
     await expect(button).toHaveAttribute("aria-expanded", "false");
@@ -208,9 +208,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
     const label = await button.getAttribute("aria-label");
     expect(label?.length).toBeGreaterThan(0);
@@ -220,9 +218,7 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
 
     const box = await button.boundingBox();
     expect(box?.width).toBeGreaterThanOrEqual(44);
@@ -239,9 +235,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -253,9 +247,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -267,9 +259,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -287,9 +277,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -314,9 +302,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -333,15 +319,12 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
-    const closeButton = page.locator(
-      'button[aria-label*="close"], button[aria-label*="chiudi"]',
-    );
+    const closeButton = page.locator('[data-testid="a11y-close-panel-btn"]');
+    await expect(closeButton).toBeAttached();
 
     const label = await closeButton.getAttribute("aria-label");
     expect(label?.length).toBeGreaterThan(0);
@@ -351,9 +334,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -372,9 +353,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -394,9 +373,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 
@@ -454,9 +431,7 @@ test.describe("A11y Features Integration", () => {
     const mainCountBefore = await page.locator("main").count();
 
     // Open accessibility panel
-    const button = page.locator(
-      'button[aria-label*="accessibilità"], button[aria-label*="accessibility"]',
-    );
+    const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
     await page.waitForTimeout(300);
 

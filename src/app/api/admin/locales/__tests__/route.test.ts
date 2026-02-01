@@ -31,6 +31,10 @@ vi.mock("@/lib/locale/locale-audit-service", () => ({
   logLocaleDelete: vi.fn(),
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 import { GET as GET_LIST, POST } from "../route";
 
 const mockLocaleConfigFindMany = prisma.localeConfig

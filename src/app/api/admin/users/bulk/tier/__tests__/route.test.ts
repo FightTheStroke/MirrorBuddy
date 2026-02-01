@@ -23,6 +23,10 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 describe("POST /api/admin/users/bulk/tier", () => {
   beforeEach(() => {
     vi.clearAllMocks();
