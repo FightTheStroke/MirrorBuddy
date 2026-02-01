@@ -140,6 +140,22 @@ git commit -m "feat: description of change"
 4. **No parallel execution**: Can't spawn multiple agents.
    Execute tasks sequentially within a wave.
 
+## What Copilot Gets Automatically
+
+The `.github/copilot-instructions.md` file includes:
+
+- Coding standards (TS/React style, max 250 lines, TDD, conventional commits)
+- Architecture constraints (Prisma, Zustand, no localStorage, CSP, auth)
+- Domain rules extracted from `.claude/rules/` (cookies, i18n, e2e, proxy,
+  admin, tiers, compliance) — Copilot doesn't read `.claude/rules/` directly
+- Documentation format templates (ADR compact format, CHANGELOG)
+- Available scripts (ci-summary, release gates, plan-db, git-digest)
+- Plan execution workflow (7-step TDD process)
+- ADR references for key architectural decisions
+
+This means Copilot has the same knowledge as Claude Code for MirrorBuddy
+code and documentation, minus the enforcement layer (hooks).
+
 ## Best Practice
 
 Use Claude Code for: planning, architecture, debugging, Thor validation,

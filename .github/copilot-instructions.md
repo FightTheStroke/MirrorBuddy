@@ -124,14 +124,92 @@ When executing a task from a plan:
 - Proxy/CSP: `src/proxy.ts`
 - Accessibility profiles: `src/lib/accessibility/`
 
+## Domain Rules (from .claude/rules/)
+
+### Cookies & Auth
+
+- NEVER hardcode cookie names — import from `src/lib/auth/cookie-constants.ts`
+- NEVER read auth cookies with `cookieStore.get()` — use `validateAuth()`
+- CSRF check BEFORE auth: `requireCSRF(request)` before `validateAuth()`
+
+### i18n
+
+- ALL UI text in 5 locales (it/en/fr/de/es). No hardcoded strings.
+- JSON files MUST wrap content: `{ "namespace": { ...content... } }`
+- camelCase keys only. Italian first, then `i18n-sync-namespaces.ts --add-missing`
+
+### E2E Testing
+
+- NEVER import `test`/`expect` from `@playwright/test` — use fixtures
+- MANDATORY: mock `/api/tos` in ALL tests (returns `{accepted:true}`)
+- All fixtures chain from `base-fixtures.ts`
+
+### Proxy
+
+- ONLY ONE proxy at `src/proxy.ts`. NEVER create root `proxy.ts`
+- Proxy skips i18n for: `/api/*`, `/admin/*`, `/_next/*`, static files
+
+### Admin
+
+- `validateAdminAuth()` at function entry + `requireCSRF` before auth on mutations
+- `auditService.log()` mandatory after mutations (format: `VERB_ENTITY`)
+
+### Tiers
+
+- Trial (null userId) | Base (free registered) | Pro (9.99/mo)
+- NEVER hardcode tier logic — use `tierService` / `useTierFeatures()`
+
+### Compliance
+
+- EU AI Act + GDPR + COPPA + WCAG 2.1 AA mandatory
+- No PII in logs or vector DB. Parameterized queries only.
+
+## Documentation Format
+
+### ADR (max 20 lines, `docs/adr/{NNNN}-{slug}.md`)
+
+```markdown
+# ADR {NNNN}: {Title}
+
+Status: Accepted | Date: {DD Mon YYYY} | Plan: {plan_id or "none"}
+
+## Context
+
+{2-3 sentences: what problem, when encountered}
+
+## Decision
+
+{2-3 sentences: what we chose, why}
+
+## Consequences
+
+- Positive: {outcome}
+- Negative: {tradeoff}
+
+## Enforcement
+
+- Rule: `{eslint-rule-or-grep-pattern}`
+- Check: `{verification command}`
+```
+
+### CHANGELOG (append to `## [Unreleased]`)
+
+```markdown
+### {Wave or Category}
+
+- Added: {new feature/file}
+- Changed: {modification}
+- Fixed: {bug fix}
+```
+
 ## ADR References
 
-Key decisions documented in `docs/adr/`:
+Key decisions in `docs/adr/`:
 
-- **ADR 0015**: No localStorage for user data
-- **ADR 0028**: PostgreSQL + pgvector
-- **ADR 0033**: RAG semantic search
-- **ADR 0065**: Tier system (Trial/Base/Pro)
-- **ADR 0075**: Session-based auth
+- **0015**: No localStorage for user data
+- **0028**: PostgreSQL + pgvector
+- **0033**: RAG semantic search
+- **0065**: Tier system (Trial/Base/Pro)
+- **0075**: Session-based auth
 
 Check `docs/adr/` before making architectural decisions.
