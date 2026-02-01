@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { TableCell } from "@/components/ui/table";
-import { Lock, Unlock, Trash2, RefreshCw, Settings } from "lucide-react";
+import {
+  Lock,
+  Unlock,
+  Trash2,
+  RefreshCw,
+  Settings,
+  ExternalLink,
+} from "lucide-react";
 import { TierChangeModal } from "@/components/admin/tier-change-modal";
 import { UserLimitOverrideModal } from "@/components/admin/user-limit-override-modal";
 
@@ -75,13 +83,29 @@ export function UsersTableRow({
   onDelete,
   availableTiers,
 }: UsersTableRowProps) {
+  const router = useRouter();
   const [showTierModal, setShowTierModal] = useState(false);
   const [showLimitModal, setShowLimitModal] = useState(false);
   const tierDisplay = getTierDisplay(user);
 
+  const handleRowClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "BUTTON" ||
+      target.closest("button")
+    ) {
+      return;
+    }
+    router.push(`/admin/users/${user.id}`);
+  };
+
   return (
     <>
-      <tr className="border-b hover:bg-accent">
+      <tr
+        className="border-b hover:bg-accent cursor-pointer"
+        onClick={handleRowClick}
+      >
         <TableCell className="px-3 py-3 w-10">
           <input
             type="checkbox"
@@ -159,6 +183,16 @@ export function UsersTableRow({
               aria-label="Delete user"
             >
               <Trash2 className="w-3 h-3" />
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push(`/admin/users/${user.id}`)}
+              className="text-xs"
+              aria-label="View user details"
+              title="View details"
+            >
+              <ExternalLink className="w-3 h-3" />
             </Button>
           </div>
         </TableCell>

@@ -230,13 +230,18 @@
       "trashEmpty": "Trash empty",
       "bulkActions": {
         "changeTier": "Change Tier",
-        "confirmDelete": "Confirm Delete",
-        "confirmDisable": "Confirm Disable",
-        "confirmEnable": "Confirm Enable",
+        "confirmDelete": "Are you sure you want to delete {count} users?",
+        "confirmDisable": "Are you sure you want to disable {count} users?",
+        "confirmEnable": "Are you sure you want to enable {count} users?",
         "delete": "Delete",
         "disable": "Disable",
         "enable": "Enable",
-        "selected": "{count} selected"
+        "selected": "selected",
+        "disabling": "Disabling users",
+        "enabling": "Enabling users",
+        "deleting": "Deleting users",
+        "failed": "failed",
+        "partialFailure": "{failed} of {total} operations failed"
       },
       "create": {
         "title": "Create user",

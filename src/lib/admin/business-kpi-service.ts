@@ -39,21 +39,26 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
       getTopMaestri(),
     ]);
 
+    const isEstimated =
+      revenue.isEstimated || users.isEstimated || countries.length === 0;
+
     const data: BusinessKPIResponse = {
       revenue,
       users,
       topCountries: countries,
       topMaestri: maestri,
+      isEstimated,
     };
 
     cache = { data, timestamp: Date.now() };
-    logger.info("Business KPIs computed successfully");
+    logger.info("Business KPIs computed successfully", { isEstimated });
     return data;
   } catch (error) {
     logger.error("Failed to compute business KPIs, using mock data", {
       error,
     });
-    return getMockKPIs();
+    const mockData = getMockKPIs();
+    return { ...mockData, isEstimated: true };
   }
 }
 
@@ -69,10 +74,18 @@ async function getRevenueMetrics(): Promise<RevenueMetrics> {
       0,
     );
     const arr = mrr * 12;
+    // Growth rate is estimated until we have historical data
     const growthRate = 8.5;
     const totalRevenue = arr * 1.2;
 
-    return { mrr, arr, growthRate, totalRevenue, currency: "EUR" };
+    return {
+      mrr,
+      arr,
+      growthRate,
+      totalRevenue,
+      currency: "EUR",
+      isEstimated: true, // growthRate and totalRevenue are estimated
+    };
   } catch (error) {
     logger.warn("Using mock revenue metrics", { error });
     return {
@@ -81,6 +94,7 @@ async function getRevenueMetrics(): Promise<RevenueMetrics> {
       growthRate: 8.5,
       totalRevenue: 35280,
       currency: "EUR",
+      isEstimated: true,
     };
   }
 }
@@ -103,6 +117,7 @@ async function getUserMetrics(): Promise<UserMetrics> {
       }),
     ]);
 
+    // Churn rate requires historical data - estimated for now
     const churnRate = 3.2;
     const trialConversionRate =
       trialUsers > 0 ? (paidUsers / trialUsers) * 100 : 0;
@@ -114,6 +129,7 @@ async function getUserMetrics(): Promise<UserMetrics> {
       paidUsers,
       churnRate,
       trialConversionRate,
+      isEstimated: true, // churnRate is estimated
     };
   } catch (error) {
     logger.warn("Using mock user metrics", { error });
@@ -124,6 +140,7 @@ async function getUserMetrics(): Promise<UserMetrics> {
       paidUsers: 245,
       churnRate: 3.2,
       trialConversionRate: 46.8,
+      isEstimated: true,
     };
   }
 }

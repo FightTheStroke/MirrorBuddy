@@ -37,6 +37,7 @@ vi.mock("@/lib/auth/cookie-signing", () => ({
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true }),
   getClientIdentifier: vi.fn().mockReturnValue("test-ip"),
+  getRateLimitIdentifier: vi.fn().mockReturnValue("test-ip"),
   rateLimitResponse: vi.fn(),
   RATE_LIMITS: { AUTH_LOGIN: { limit: 5, window: 900 } },
 }));

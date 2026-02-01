@@ -215,10 +215,15 @@
         "disable": "Disabilita selezionati",
         "enable": "Abilita selezionati",
         "changeTier": "Cambia Tier",
-        "confirmDelete": "Conferma eliminazione",
-        "confirmDisable": "Conferma disabilitazione",
-        "confirmEnable": "Conferma abilitazione",
-        "selected": "{count} selezionati"
+        "confirmDelete": "Sei sicuro di voler eliminare {count} utenti?",
+        "confirmDisable": "Sei sicuro di voler disabilitare {count} utenti?",
+        "confirmEnable": "Sei sicuro di voler abilitare {count} utenti?",
+        "selected": "selezionati",
+        "disabling": "Disabilitando utenti",
+        "enabling": "Abilitando utenti",
+        "deleting": "Eliminando utenti",
+        "failed": "falliti",
+        "partialFailure": "{failed} operazioni su {total} sono fallite"
       },
       "confirmDelete": "Conferma eliminazione",
       "tabs": {

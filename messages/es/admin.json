@@ -236,7 +236,12 @@
         "delete": "Eliminar",
         "disable": "Deshabilitar",
         "enable": "Habilitar",
-        "selected": "{count} seleccionados"
+        "selected": "{count} seleccionados",
+        "disabling": "[TRANSLATE] Disabilitando utenti",
+        "enabling": "[TRANSLATE] Abilitando utenti",
+        "deleting": "[TRANSLATE] Eliminando utenti",
+        "failed": "[TRANSLATE] falliti",
+        "partialFailure": "[TRANSLATE] {failed} operazioni su {total} sono fallite"
       },
       "create": {
         "title": "Crear usuario",

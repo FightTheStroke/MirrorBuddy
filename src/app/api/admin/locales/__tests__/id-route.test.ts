@@ -79,8 +79,8 @@ function createMockLocale(overrides = {}) {
 
 describe("GET /api/admin/locales/[id]", () => {
   beforeEach(() => {
-    mockValidateAdminAuth.mockClear();
-    mockLocaleConfigFindUnique.mockClear();
+    mockValidateAdminAuth.mockReset();
+    mockLocaleConfigFindUnique.mockReset();
   });
 
   it("returns 401 without admin auth", async () => {
@@ -101,6 +101,7 @@ describe("GET /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     const request = new NextRequest(
@@ -150,9 +151,9 @@ describe("GET /api/admin/locales/[id]", () => {
 
 describe("PUT /api/admin/locales/[id]", () => {
   beforeEach(() => {
-    mockValidateAdminAuth.mockClear();
-    mockLocaleConfigFindUnique.mockClear();
-    mockLocaleConfigUpdate.mockClear();
+    mockValidateAdminAuth.mockReset();
+    mockLocaleConfigFindUnique.mockReset();
+    mockLocaleConfigUpdate.mockReset();
   });
 
   it("returns 401 without admin auth", async () => {
@@ -280,9 +281,9 @@ describe("PUT /api/admin/locales/[id]", () => {
 
 describe("DELETE /api/admin/locales/[id]", () => {
   beforeEach(() => {
-    mockValidateAdminAuth.mockClear();
-    mockLocaleConfigFindUnique.mockClear();
-    mockLocaleConfigDelete.mockClear();
+    mockValidateAdminAuth.mockReset();
+    mockLocaleConfigFindUnique.mockReset();
+    mockLocaleConfigDelete.mockReset();
   });
 
   it("returns 401 without admin auth", async () => {

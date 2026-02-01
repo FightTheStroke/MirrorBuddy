@@ -80,8 +80,8 @@ function createMockLocale(overrides = {}) {
 
 describe("GET /api/admin/locales", () => {
   beforeEach(() => {
-    mockValidateAdminAuth.mockClear();
-    mockLocaleConfigFindMany.mockClear();
+    mockValidateAdminAuth.mockReset();
+    mockLocaleConfigFindMany.mockReset();
   });
 
   it("returns 401 without admin auth", async () => {
@@ -142,9 +142,9 @@ describe("GET /api/admin/locales", () => {
 
 describe("POST /api/admin/locales", () => {
   beforeEach(() => {
-    mockValidateAdminAuth.mockClear();
-    mockLocaleConfigFindUnique.mockClear();
-    mockLocaleConfigCreate.mockClear();
+    mockValidateAdminAuth.mockReset();
+    mockLocaleConfigFindUnique.mockReset();
+    mockLocaleConfigCreate.mockReset();
   });
 
   it("returns 401 without admin auth", async () => {

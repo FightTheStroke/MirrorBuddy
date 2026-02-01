@@ -2,7 +2,7 @@
  * Revenue metrics card component
  */
 
-import { TrendingUp } from "lucide-react";
+import { TrendingUp, AlertTriangle } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -33,7 +33,15 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
       <CardHeader>
         <div className="flex items-center justify-between">
           <CardTitle>Revenue</CardTitle>
-          <TrendingUp className="h-5 w-5 text-muted-foreground" />
+          <div className="flex items-center gap-2">
+            {revenue.isEstimated && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400">
+                <AlertTriangle className="h-3 w-3" />
+                Estimated
+              </span>
+            )}
+            <TrendingUp className="h-5 w-5 text-muted-foreground" />
+          </div>
         </div>
         <CardDescription>Monthly and annual recurring revenue</CardDescription>
       </CardHeader>

@@ -8,6 +8,7 @@ export interface RevenueMetrics {
   growthRate: number;
   totalRevenue: number;
   currency: string;
+  isEstimated?: boolean;
 }
 
 export interface UserMetrics {
@@ -17,6 +18,7 @@ export interface UserMetrics {
   paidUsers: number;
   churnRate: number;
   trialConversionRate: number;
+  isEstimated?: boolean;
 }
 
 export interface CountryMetric {
@@ -38,4 +40,5 @@ export interface BusinessKPIResponse {
   users: UserMetrics;
   topCountries: CountryMetric[];
   topMaestri: MaestroMetric[];
+  isEstimated?: boolean;
 }

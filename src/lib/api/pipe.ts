@@ -78,7 +78,8 @@ export type RouteHandler = (
  * Extract route info for logging and Sentry tags
  */
 function getRouteInfo(req: NextRequest): { path: string; method: string } {
-  const { pathname } = req.nextUrl;
+  // Use optional chaining for test compatibility (plain Request objects lack nextUrl)
+  const pathname = req.nextUrl?.pathname ?? new URL(req.url).pathname;
   return {
     path: pathname,
     method: req.method,
