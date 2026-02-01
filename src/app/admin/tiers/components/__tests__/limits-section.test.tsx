@@ -53,12 +53,10 @@ describe("LimitsSection", () => {
       );
 
       // Check for help text descriptions (matching actual i18n translations)
-      expect(screen.getByText(/limite messaggi chat/i)).toBeInTheDocument();
-      expect(screen.getByText(/limite minuti voce/i)).toBeInTheDocument();
-      expect(
-        screen.getByText(/limite utilizzo strumenti/i),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/numero massimo documenti/i)).toBeInTheDocument();
+      expect(screen.getByText(/massimo di messaggi chat/i)).toBeInTheDocument();
+      expect(screen.getByText(/minuti di utilizzo voce/i)).toBeInTheDocument();
+      expect(screen.getByText(/strumenti utilizzabili/i)).toBeInTheDocument();
+      expect(screen.getByText(/massimo di documenti/i)).toBeInTheDocument();
     });
 
     it("displays correct input values", () => {
