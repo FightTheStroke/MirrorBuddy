@@ -71,6 +71,8 @@ export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
+  // 3 min default timeout in CI — dev server + hydration under GH Actions load
+  timeout: process.env.CI ? 180000 : 30000,
   // 2 retries in CI to handle flaky mobile tests (hydration timing varies)
   retries: process.env.CI ? 2 : 0,
   // Use 2 workers for mobile tests (CI_MOBILE_TESTS=1) to reduce resource contention
