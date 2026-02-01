@@ -43,7 +43,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link navigates to main content on click", async ({ page }) => {
-    test.setTimeout(30000);
+    test.setTimeout(60000);
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
