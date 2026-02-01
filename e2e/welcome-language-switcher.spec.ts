@@ -191,12 +191,12 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
 
     // If redirect didn't happen, navigate manually to test persistence
     if (!page.url().includes("/es/welcome")) {
-      await page.goto("/es/welcome", { waitUntil: "networkidle" });
+      await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
       await page.waitForTimeout(2000);
     }
 
     // Reload page with extra stabilization
-    await page.reload({ waitUntil: "networkidle" });
+    await page.reload({ waitUntil: "domcontentloaded" });
     await page.waitForTimeout(3000);
 
     // Should still be on Spanish version

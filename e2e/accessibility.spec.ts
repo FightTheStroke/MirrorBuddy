@@ -604,7 +604,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
     await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 
-    await page.reload({ waitUntil: "networkidle" });
+    await page.reload({ waitUntil: "domcontentloaded" });
     await page.waitForTimeout(3000);
 
     // Wait for accessibility store to hydrate and apply font
