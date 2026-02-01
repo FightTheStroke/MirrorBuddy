@@ -6,16 +6,18 @@ set -euo pipefail
 # Target: ~10-30 lines output regardless of codebase size.
 #
 # Usage:
-#   ./scripts/ci-summary.sh          # lint + typecheck + build (default)
-#   ./scripts/ci-summary.sh --quick  # lint + typecheck ONLY (~30s vs ~3min)
-#   ./scripts/ci-summary.sh --full   # + unit tests
-#   ./scripts/ci-summary.sh --lint   # lint only
-#   ./scripts/ci-summary.sh --types  # typecheck only
-#   ./scripts/ci-summary.sh --build  # build only
-#   ./scripts/ci-summary.sh --unit   # unit tests only
-#   ./scripts/ci-summary.sh --i18n   # i18n check only
-#   ./scripts/ci-summary.sh --e2e    # E2E tests (requires running app)
-#   ./scripts/ci-summary.sh --a11y   # Accessibility tests (requires running app)
+#   ./scripts/ci-summary.sh                 # lint + typecheck + build + unsafe queries
+#   ./scripts/ci-summary.sh --quick         # lint + typecheck ONLY (~30s vs ~3min)
+#   ./scripts/ci-summary.sh --full          # + unit tests
+#   ./scripts/ci-summary.sh --lint          # lint only
+#   ./scripts/ci-summary.sh --types         # typecheck only
+#   ./scripts/ci-summary.sh --build         # build only
+#   ./scripts/ci-summary.sh --unit          # unit tests only
+#   ./scripts/ci-summary.sh --i18n          # i18n check only
+#   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only
+#   ./scripts/ci-summary.sh --links         # markdown link check only
+#   ./scripts/ci-summary.sh --e2e           # E2E tests (requires running app)
+#   ./scripts/ci-summary.sh --a11y          # Accessibility tests (requires running app)
 #
 # For AI agents: use --quick during development, default/--full for Thor/pre-commit.
 
@@ -223,6 +225,48 @@ run_a11y() {
 	rm -f "$tmp"
 }
 
+run_unsafe_query_check() {
+	local ALLOWLIST="$SCRIPT_DIR/.queryraw-allowlist"
+	local EXCLUDE_ARGS=()
+
+	if [[ -f "$ALLOWLIST" ]]; then
+		while IFS= read -r excl; do
+			[[ -n "$excl" && "$excl" != \#* ]] && EXCLUDE_ARGS+=(--exclude="$excl")
+		done <"$ALLOWLIST"
+	fi
+
+	local FOUND
+	if [[ ${#EXCLUDE_ARGS[@]} -gt 0 ]]; then
+		FOUND=$(grep -r --include='*.ts' '\$queryRawUnsafe' "${EXCLUDE_ARGS[@]}" src/ 2>/dev/null || true)
+	else
+		FOUND=$(grep -r --include='*.ts' '\$queryRawUnsafe' src/ 2>/dev/null || true)
+	fi
+
+	if [[ -n "$FOUND" ]]; then
+		local fc
+		fc=$(echo "$FOUND" | wc -l | tr -d ' ')
+		ERRORS=$((ERRORS + 1))
+		result "[FAIL] Unsafe queries ($fc files with \$queryRawUnsafe)"
+		result_details "$FOUND"
+	else
+		result "[PASS] Unsafe queries"
+	fi
+}
+
+run_link_check() {
+	local OUTPUT
+	OUTPUT=$("$SCRIPT_DIR/check-links.sh" 2>&1) || true
+	local EXIT=$?
+
+	if [[ $EXIT -eq 0 ]]; then
+		result "[PASS] Links"
+	else
+		result "[FAIL] Links"
+		result_details "$OUTPUT"
+		((ERRORS++))
+	fi
+}
+
 # --- Main ---
 echo "=== CI Summary ==="
 
@@ -232,6 +276,8 @@ case "$MODE" in
 --build) run_build ;;
 --unit) run_unit ;;
 --i18n) run_i18n ;;
+--unsafe-queries) run_unsafe_query_check ;;
+--links) run_link_check ;;
 --e2e) run_e2e "${2:-}" ;;
 --a11y) run_a11y ;;
 --quick)
@@ -242,14 +288,17 @@ case "$MODE" in
 	run_lint
 	run_typecheck
 	run_build
+	run_unsafe_query_check
 	run_unit
 	;;
 --all)
 	run_lint
 	run_typecheck
 	run_build
+	run_unsafe_query_check
 	run_unit
 	run_i18n
+	run_link_check
 	run_e2e
 	run_a11y
 	;;
@@ -257,6 +306,7 @@ case "$MODE" in
 	run_lint
 	run_typecheck
 	run_build
+	run_unsafe_query_check
 	;;
 esac
 

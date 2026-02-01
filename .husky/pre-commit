@@ -9,6 +9,14 @@ if git diff --cached --name-only | grep -q "^messages/"; then
   npm run i18n:check || exit 1
 fi
 
+# Check for broken links in staged markdown files
+STAGED_MD=$(git diff --cached --name-only --diff-filter=ACM | grep '\.md$' || true)
+if [ -n "$STAGED_MD" ]; then
+  echo "Checking markdown links..."
+  echo "$STAGED_MD" | xargs ./scripts/check-links.sh || exit 1
+  echo "Markdown links OK"
+fi
+
 # Run lint-staged (formatting, linting)
 npx lint-staged
 

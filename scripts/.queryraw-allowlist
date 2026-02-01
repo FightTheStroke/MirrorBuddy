@@ -1,0 +1,4 @@
+# Allowlist for $queryRawUnsafe usage
+# Add file paths (relative to repo root) that legitimately need $queryRawUnsafe
+# One path per line. Lines starting with # are comments.
+# Example: src/lib/some-legacy-file.ts
