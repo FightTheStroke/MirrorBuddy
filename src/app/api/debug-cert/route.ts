@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
-export async function GET() {
+export const GET = pipe(withSentry("/api/debug-cert"))(async () => {
   const cert = process.env.SUPABASE_CA_CERT;
 
   if (!cert) {
@@ -17,4 +18,4 @@ export async function GET() {
     hasRealNewline: cert.includes("\n"),
     matchCount: (cert.match(/\\n/g) || []).length,
   });
-}
+});

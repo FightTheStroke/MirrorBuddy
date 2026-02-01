@@ -4,11 +4,14 @@
 // ADR: 0021-conversational-memory-injection.md
 // ============================================================================
 
-import { NextRequest, NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { z } from 'zod';
-import { loadPreviousContext, formatRelativeDate } from '@/lib/conversation/memory-loader';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { z } from "zod";
+import {
+  loadPreviousContext,
+  formatRelativeDate,
+} from "@/lib/conversation/memory-loader";
+import { logger } from "@/lib/logger";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
 // Zod schema for query parameter validation
 const MemoryQuerySchema = z.object({
@@ -26,60 +29,46 @@ const MemoryQuerySchema = z.object({
  * - Validates maestroId query parameter (input validation)
  * - Uses Prisma for parameterized queries (SQL injection prevention)
  */
-export async function GET(request: NextRequest) {
-  try {
-    // 1. Auth check - verify user cookie
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      logger.warn('Memory API: Unauthorized access attempt');
-      return NextResponse.json(
-        { error: auth.error },
-        { status: 401 }
-      );
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/conversations/memory"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    // 2. Input validation with Zod
-    const { searchParams } = new URL(request.url);
-    const maestroId = searchParams.get('maestroId');
+  // Input validation with Zod
+  const { searchParams } = new URL(ctx.req.url);
+  const maestroId = searchParams.get("maestroId");
 
-    const validation = MemoryQuerySchema.safeParse({ maestroId });
-    if (!validation.success) {
-      logger.warn('Memory API: Invalid input', {
-        userId,
-        errors: validation.error.issues
-      });
-      return NextResponse.json(
-        {
-          error: 'Invalid request',
-          details: validation.error.issues.map(e => e.message)
-        },
-        { status: 400 }
-      );
-    }
-
-    // 3. Load memory using the library function (uses Prisma parameterized queries)
-    const memory = await loadPreviousContext(userId, validation.data.maestroId);
-
-    // 4. Audit logging
-    logger.info('Memory API: Context loaded', {
+  const validation = MemoryQuerySchema.safeParse({ maestroId });
+  if (!validation.success) {
+    logger.warn("Memory API: Invalid input", {
       userId,
-      maestroId: validation.data.maestroId,
-      hasSummary: !!memory.recentSummary,
-      keyFactCount: memory.keyFacts.length,
-      topicCount: memory.topics.length,
+      errors: validation.error.issues,
     });
-
-    // 5. Return formatted response
-    return NextResponse.json({
-      ...memory,
-      lastSessionFormatted: formatRelativeDate(memory.lastSessionDate),
-    });
-  } catch (error) {
-    logger.error('Memory API: Unexpected error', { error: String(error) });
     return NextResponse.json(
-      { error: 'Failed to load conversation memory' },
-      { status: 500 }
+      {
+        error: "Invalid request",
+        details: validation.error.issues.map((e) => e.message),
+      },
+      { status: 400 },
     );
   }
-}
+
+  // Load memory using the library function (uses Prisma parameterized queries)
+  const memory = await loadPreviousContext(userId, validation.data.maestroId);
+
+  // Audit logging
+  logger.info("Memory API: Context loaded", {
+    userId,
+    maestroId: validation.data.maestroId,
+    hasSummary: !!memory.recentSummary,
+    keyFactCount: memory.keyFacts.length,
+    topicCount: memory.topics.length,
+  });
+
+  // Return formatted response
+  return NextResponse.json({
+    ...memory,
+    lastSessionFormatted: formatRelativeDate(memory.lastSessionDate),
+  });
+});

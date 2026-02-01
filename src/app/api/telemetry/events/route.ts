@@ -3,20 +3,22 @@
 // POST: Receive and store batched telemetry events
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import type { TelemetryCategory } from "@/lib/telemetry/types";
 import { getCorsHeaders } from "@/lib/security/cors-config";
 
 // Handle CORS preflight
 // F-04: Get CORS headers based on request origin (no wildcard in production)
-export async function OPTIONS(request: NextRequest) {
-  const requestOrigin = request.headers.get("origin");
+export const OPTIONS = pipe(withSentry("/api/telemetry/events"))(async (
+  ctx,
+) => {
+  const requestOrigin = ctx.req.headers.get("origin");
   const corsHeaders = getCorsHeaders(requestOrigin);
   return NextResponse.json({}, { headers: corsHeaders });
-}
+});
 
 const VALID_CATEGORIES: TelemetryCategory[] = [
   "navigation",
@@ -42,89 +44,76 @@ interface EventPayload {
   }>;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Optional auth + CORS; telemetry must work for unauthenticated users
-export async function POST(request: NextRequest) {
+export const POST = pipe(withSentry("/api/telemetry/events"))(async (ctx) => {
   // F-04: Get CORS headers based on request origin (no wildcard in production)
-  const requestOrigin = request.headers.get("origin");
+  const requestOrigin = ctx.req.headers.get("origin");
   const corsHeaders = getCorsHeaders(requestOrigin);
+  const auth = await validateAuth();
+  const userId = auth.authenticated ? auth.userId : null;
 
+  // Handle empty or malformed JSON body gracefully
+  let body: EventPayload;
   try {
-    const auth = await validateAuth();
-    const userId = auth.authenticated ? auth.userId : null;
-
-    // Handle empty or malformed JSON body gracefully
-    let body: EventPayload;
-    try {
-      const text = await request.text();
-      if (!text || text.trim() === "") {
-        return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
-      }
-      body = JSON.parse(text);
-    } catch {
-      // Empty body or cancelled request - not an error, just nothing to store
+    const text = await ctx.req.text();
+    if (!text || text.trim() === "") {
       return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
     }
+    body = JSON.parse(text);
+  } catch {
+    // Empty body or cancelled request - not an error, just nothing to store
+    return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
+  }
 
-    if (!body.events || !Array.isArray(body.events)) {
-      return NextResponse.json(
-        { error: "Invalid events payload" },
-        { status: 400, headers: corsHeaders },
-      );
-    }
-
-    // Validate and filter events
-    const validEvents = body.events.filter((event) => {
-      if (!event.id || !event.category || !event.action || !event.sessionId) {
-        return false;
-      }
-      if (!VALID_CATEGORIES.includes(event.category as TelemetryCategory)) {
-        return false;
-      }
-      return true;
-    });
-
-    if (validEvents.length === 0) {
-      return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
-    }
-
-    // Filter out already existing events (avoid duplicates on retry)
-    const existingIds = await prisma.telemetryEvent.findMany({
-      where: {
-        eventId: { in: validEvents.map((e) => e.id) },
-      },
-      select: { eventId: true },
-    });
-    const existingIdSet = new Set(existingIds.map((e) => e.eventId));
-    const newEvents = validEvents.filter((e) => !existingIdSet.has(e.id));
-
-    if (newEvents.length === 0) {
-      return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
-    }
-
-    // Store events in database
-    const created = await prisma.telemetryEvent.createMany({
-      data: newEvents.map((event) => ({
-        eventId: event.id,
-        timestamp: new Date(event.timestamp),
-        category: event.category,
-        action: event.action,
-        label: event.label || null,
-        value: event.value || null,
-        metadata: event.metadata ? JSON.stringify(event.metadata) : null,
-        sessionId: event.sessionId,
-        userId: userId || null,
-      })),
-    });
-
+  if (!body.events || !Array.isArray(body.events)) {
     return NextResponse.json(
-      { stored: created.count },
-      { headers: corsHeaders },
-    );
-  } catch (error) {
-    logger.error("Telemetry events POST error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to store telemetry events" },
-      { status: 500, headers: corsHeaders },
+      { error: "Invalid events payload" },
+      { status: 400, headers: corsHeaders },
     );
   }
-}
+
+  // Validate and filter events
+  const validEvents = body.events.filter((event) => {
+    if (!event.id || !event.category || !event.action || !event.sessionId) {
+      return false;
+    }
+    if (!VALID_CATEGORIES.includes(event.category as TelemetryCategory)) {
+      return false;
+    }
+    return true;
+  });
+
+  if (validEvents.length === 0) {
+    return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
+  }
+
+  // Filter out already existing events (avoid duplicates on retry)
+  const existingIds = await prisma.telemetryEvent.findMany({
+    where: {
+      eventId: { in: validEvents.map((e) => e.id) },
+    },
+    select: { eventId: true },
+  });
+  const existingIdSet = new Set(existingIds.map((e) => e.eventId));
+  const newEvents = validEvents.filter((e) => !existingIdSet.has(e.id));
+
+  if (newEvents.length === 0) {
+    return NextResponse.json({ stored: 0 }, { headers: corsHeaders });
+  }
+
+  // Store events in database
+  const created = await prisma.telemetryEvent.createMany({
+    data: newEvents.map((event) => ({
+      eventId: event.id,
+      timestamp: new Date(event.timestamp),
+      category: event.category,
+      action: event.action,
+      label: event.label || null,
+      value: event.value || null,
+      metadata: event.metadata ? JSON.stringify(event.metadata) : null,
+      sessionId: event.sessionId,
+      userId: userId || null,
+    })),
+  });
+
+  return NextResponse.json({ stored: created.count }, { headers: corsHeaders });
+});

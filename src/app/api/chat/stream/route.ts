@@ -8,7 +8,7 @@
  * @see ADR 0034 for streaming architecture
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   azureStreamingCompletion,
   getActiveProvider,
@@ -23,7 +23,7 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { StreamingSanitizer } from "@/lib/safety";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 import type { ChatRequest } from "../types";
 import {
@@ -39,16 +39,11 @@ import {
 /** Feature flag for streaming - can be disabled via env var */
 const STREAMING_ENABLED = process.env.ENABLE_CHAT_STREAMING !== "false";
 
-export async function POST(request: NextRequest) {
-  // CSRF validation (double-submit cookie pattern)
-  if (!requireCSRF(request)) {
-    const response = NextResponse.json(
-      { error: "Invalid CSRF token" },
-      { status: 403 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
+export const POST = pipe(
+  withSentry("/api/chat/stream"),
+  withCSRF,
+)(async (ctx) => {
+  const request = ctx.req;
 
   if (!STREAMING_ENABLED) {
     const response = NextResponse.json(
@@ -322,10 +317,10 @@ export async function POST(request: NextRequest) {
     response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
-}
+});
 
 /** GET endpoint for connection test */
-export async function GET(request: NextRequest) {
+export const GET = pipe(withSentry("/api/chat/stream"))(async (ctx) => {
   const config = getActiveProvider();
   const providerSupportsStreaming = config?.provider === "azure";
   const streamingAvailable = STREAMING_ENABLED && providerSupportsStreaming;
@@ -337,6 +332,6 @@ export async function GET(request: NextRequest) {
     method: "POST",
     note: "Tool calls not supported - use /api/chat for tools",
   });
-  response.headers.set("X-Request-ID", getRequestId(request));
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
   return response;
-}
+});

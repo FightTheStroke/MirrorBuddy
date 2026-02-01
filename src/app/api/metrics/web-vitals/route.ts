@@ -4,8 +4,9 @@
 // F-05: Real-time client-side performance monitoring
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import {
   checkRateLimitAsync,
   getClientIdentifier,
@@ -165,10 +166,10 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * POST /api/metrics/web-vitals
  * Accept Web Vitals data and push to Grafana Cloud
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Telemetry endpoint; no cookie auth, rate-limited
-export async function POST(request: NextRequest) {
+
+export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
   // Rate limiting: 60 req/min per IP (F-05 protection)
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = await checkRateLimitAsync(
     `web-vitals:${clientId}`,
     RATE_LIMITS.WEB_VITALS,
@@ -182,31 +183,21 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  try {
-    const body = await request.json();
+  const body = await ctx.req.json();
 
-    // Validate payload
-    if (!validatePayload(body)) {
-      return NextResponse.json(
-        { error: "Invalid payload format" },
-        { status: 400 },
-      );
-    }
-
-    // Push to Grafana immediately (no batching)
-    await pushToGrafana(body);
-
+  // Validate payload
+  if (!validatePayload(body)) {
     return NextResponse.json(
-      { success: true, count: body.metrics.length },
-      { status: 201 },
-    );
-  } catch (error) {
-    logger.error("Web Vitals POST error", { error: String(error) });
-
-    // Don't expose internal error details to client
-    return NextResponse.json(
-      { error: "Failed to process metrics" },
-      { status: 500 },
+      { error: "Invalid payload format" },
+      { status: 400 },
     );
   }
-}
+
+  // Push to Grafana immediately (no batching)
+  await pushToGrafana(body);
+
+  return NextResponse.json(
+    { success: true, count: body.metrics.length },
+    { status: 201 },
+  );
+});

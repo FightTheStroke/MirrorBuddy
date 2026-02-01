@@ -4,8 +4,7 @@
  * GDPR: Right of access - data portability
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -13,6 +12,7 @@ import {
   getClientIdentifier,
   rateLimitResponse,
 } from "@/lib/rate-limit";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import type {
   MaestroObservation,
   LearningStrategy,
@@ -30,8 +30,12 @@ const EXPORT_RATE_LIMIT = {
  * GET /api/profile/export
  * Export the student profile in JSON or PDF format
  */
-export async function GET(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
+export const GET = pipe(
+  withSentry("/api/profile/export"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`export:${clientId}`, EXPORT_RATE_LIMIT);
 
   if (!rateLimit.success) {
@@ -42,110 +46,96 @@ export async function GET(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  try {
-    // Security: Get userId from authenticated session only
-    const { userId, errorResponse } = await requireAuthenticatedUser();
-    if (errorResponse) return errorResponse;
+  const { searchParams } = new URL(ctx.req.url);
+  const format = searchParams.get("format") || "json";
 
-    const { searchParams } = new URL(request.url);
-    const format = searchParams.get("format") || "json";
+  const profile = await prisma.studentInsightProfile.findUnique({
+    where: { userId },
+    select: {
+      id: true,
+      userId: true,
+      studentName: true,
+      createdAt: true,
+      updatedAt: true,
+      strengths: true,
+      growthAreas: true,
+      strategies: true,
+      learningStyle: true,
+      sessionCount: true,
+      confidenceScore: true,
+      parentConsent: true,
+      studentConsent: true,
+      consentDate: true,
+    },
+  });
 
-    const profile = await prisma.studentInsightProfile.findUnique({
-      where: { userId: userId! },
-      select: {
-        id: true,
-        userId: true,
-        studentName: true,
-        createdAt: true,
-        updatedAt: true,
-        strengths: true,
-        growthAreas: true,
-        strategies: true,
-        learningStyle: true,
-        sessionCount: true,
-        confidenceScore: true,
-        parentConsent: true,
-        studentConsent: true,
-        consentDate: true,
-      },
-    });
+  if (!profile) {
+    return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+  }
 
-    if (!profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    if (!profile.parentConsent) {
-      return NextResponse.json(
-        { error: "Consent required to export profile" },
-        { status: 403 },
-      );
-    }
-
-    await prisma.profileAccessLog.create({
-      data: {
-        profileId: profile.id,
-        userId: clientId,
-        action: "download",
-        details: `Exported as ${format.toUpperCase()}`,
-        ipAddress: clientId,
-        userAgent: request.headers.get("user-agent") || undefined,
-      },
-    });
-
-    const parsedProfile = {
-      studentId: profile.userId,
-      studentName: profile.studentName,
-      createdAt: profile.createdAt,
-      lastUpdated: profile.updatedAt,
-      consent: {
-        parentConsent: profile.parentConsent,
-        studentConsent: profile.studentConsent,
-        consentDate: profile.consentDate,
-      },
-      insights: {
-        strengths: JSON.parse(profile.strengths) as MaestroObservation[],
-        growthAreas: JSON.parse(profile.growthAreas) as MaestroObservation[],
-        strategies: JSON.parse(profile.strategies) as LearningStrategy[],
-        learningStyle: JSON.parse(
-          profile.learningStyle,
-        ) as LearningStyleProfile,
-      },
-      statistics: {
-        sessionCount: profile.sessionCount,
-        confidenceScore: profile.confidenceScore,
-      },
-      accessHistory: [],
-    };
-
-    if (format === "pdf") {
-      const html = generateProfileHTML(parsedProfile);
-
-      return new NextResponse(html, {
-        headers: {
-          "Content-Type": "text/html; charset=utf-8",
-          "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.html"`,
-        },
-      });
-    }
-
+  if (!profile.parentConsent) {
     return NextResponse.json(
-      {
-        success: true,
-        exportDate: new Date().toISOString(),
-        format: "json",
-        data: parsedProfile,
-      },
-      {
-        headers: {
-          "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.json"`,
-        },
-      },
-    );
-  } catch (error) {
-    logger.error("Profile export error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      { error: "Consent required to export profile" },
+      { status: 403 },
     );
   }
-}
+
+  await prisma.profileAccessLog.create({
+    data: {
+      profileId: profile.id,
+      userId: clientId,
+      action: "download",
+      details: `Exported as ${format.toUpperCase()}`,
+      ipAddress: clientId,
+      userAgent: ctx.req.headers.get("user-agent") || undefined,
+    },
+  });
+
+  const parsedProfile = {
+    studentId: profile.userId,
+    studentName: profile.studentName,
+    createdAt: profile.createdAt,
+    lastUpdated: profile.updatedAt,
+    consent: {
+      parentConsent: profile.parentConsent,
+      studentConsent: profile.studentConsent,
+      consentDate: profile.consentDate,
+    },
+    insights: {
+      strengths: JSON.parse(profile.strengths) as MaestroObservation[],
+      growthAreas: JSON.parse(profile.growthAreas) as MaestroObservation[],
+      strategies: JSON.parse(profile.strategies) as LearningStrategy[],
+      learningStyle: JSON.parse(profile.learningStyle) as LearningStyleProfile,
+    },
+    statistics: {
+      sessionCount: profile.sessionCount,
+      confidenceScore: profile.confidenceScore,
+    },
+    accessHistory: [],
+  };
+
+  if (format === "pdf") {
+    const html = generateProfileHTML(parsedProfile);
+
+    return new NextResponse(html, {
+      headers: {
+        "Content-Type": "text/html; charset=utf-8",
+        "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.html"`,
+      },
+    });
+  }
+
+  return NextResponse.json(
+    {
+      success: true,
+      exportDate: new Date().toISOString(),
+      format: "json",
+      data: parsedProfile,
+    },
+    {
+      headers: {
+        "Content-Disposition": `attachment; filename="profilo-${profile.studentName}-${new Date().toISOString().split("T")[0]}.json"`,
+      },
+    },
+  );
+});

@@ -4,78 +4,58 @@
  * POST: Update the last viewed timestamp
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
 /**
  * GET /api/profile/last-viewed
  * Returns the timestamp when parent dashboard was last viewed
  */
-export async function GET() {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ lastViewed: null });
-    }
-    const userId = auth.userId!;
-
-    const settings = await prisma.settings.findUnique({
-      where: { userId },
-      select: { parentDashboardLastViewed: true },
-    });
-
-    return NextResponse.json({
-      lastViewed: settings?.parentDashboardLastViewed?.toISOString() || null,
-    });
-  } catch (error) {
-    logger.error("Failed to get last viewed timestamp", {
-      error: String(error),
-    });
+export const GET = pipe(withSentry("/api/profile/last-viewed"))(async () => {
+  const auth = await validateAuth();
+  if (!auth.authenticated) {
     return NextResponse.json({ lastViewed: null });
   }
-}
+  const userId = auth.userId!;
+
+  const settings = await prisma.settings.findUnique({
+    where: { userId },
+    select: { parentDashboardLastViewed: true },
+  });
+
+  return NextResponse.json({
+    lastViewed: settings?.parentDashboardLastViewed?.toISOString() || null,
+  });
+});
 
 /**
  * POST /api/profile/last-viewed
  * Updates the last viewed timestamp
  */
-export async function POST(request: NextRequest) {
-  // Validate CSRF token
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const POST = pipe(
+  withSentry("/api/profile/last-viewed"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  const body = await ctx.req.json();
+  const timestamp = body.timestamp ? new Date(body.timestamp) : new Date();
 
-    const body = await request.json();
-    const timestamp = body.timestamp ? new Date(body.timestamp) : new Date();
+  // Upsert settings with the new timestamp
+  await prisma.settings.upsert({
+    where: { userId },
+    update: { parentDashboardLastViewed: timestamp },
+    create: {
+      userId,
+      parentDashboardLastViewed: timestamp,
+    },
+  });
 
-    // Upsert settings with the new timestamp
-    await prisma.settings.upsert({
-      where: { userId },
-      update: { parentDashboardLastViewed: timestamp },
-      create: {
-        userId,
-        parentDashboardLastViewed: timestamp,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      lastViewed: timestamp.toISOString(),
-    });
-  } catch (error) {
-    logger.error("Failed to update last viewed timestamp", {
-      error: String(error),
-    });
-    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
-  }
-}
+  return NextResponse.json({
+    success: true,
+    lastViewed: timestamp.toISOString(),
+  });
+});

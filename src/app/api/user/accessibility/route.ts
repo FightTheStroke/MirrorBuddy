@@ -4,130 +4,87 @@
  * PUT: Update accessibility settings
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getRequestLogger, getRequestId } from "@/lib/tracing";
+import { getRequestId } from "@/lib/tracing";
 import { getOrCompute, del, CACHE_TTL } from "@/lib/cache";
 import { AccessibilitySettingsSchema } from "@/lib/validation/schemas/accessibility";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
-export async function GET(request: NextRequest) {
-  const log = getRequestLogger(request);
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json(
-        { error: auth.error || "Not authenticated" },
-        { status: 401 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-    const userId = auth.userId;
+export const GET = pipe(
+  withSentry("/api/user/accessibility"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const settings = await getOrCompute(
-      `a11y:${userId}`,
-      async () => {
-        // Use upsert with retry to handle race condition when multiple requests
-        // try to create settings for the same user simultaneously.
-        // Even upsert can fail under extreme concurrency due to non-atomic check.
-        try {
-          const a11ySettings = await prisma.accessibilitySettings.upsert({
+  const settings = await getOrCompute(
+    `a11y:${userId}`,
+    async () => {
+      // Use upsert with retry to handle race condition when multiple requests
+      // try to create settings for the same user simultaneously.
+      // Even upsert can fail under extreme concurrency due to non-atomic check.
+      try {
+        const a11ySettings = await prisma.accessibilitySettings.upsert({
+          where: { userId },
+          update: {}, // No update needed, just return existing
+          create: { userId },
+        });
+        return a11ySettings;
+      } catch (error) {
+        // If unique constraint violation (Prisma or PostgreSQL error), fetch existing
+        if (
+          error instanceof Error &&
+          (error.message.includes("Unique constraint") ||
+            error.message.includes("duplicate key"))
+        ) {
+          const existing = await prisma.accessibilitySettings.findUnique({
             where: { userId },
-            update: {}, // No update needed, just return existing
-            create: { userId },
           });
-          return a11ySettings;
-        } catch (error) {
-          // If unique constraint violation (Prisma or PostgreSQL error), fetch existing
-          if (
-            error instanceof Error &&
-            (error.message.includes("Unique constraint") ||
-              error.message.includes("duplicate key"))
-          ) {
-            const existing = await prisma.accessibilitySettings.findUnique({
-              where: { userId },
-            });
-            if (existing) return existing;
-          }
-          throw error;
+          if (existing) return existing;
         }
+        throw error;
+      }
+    },
+    { ttl: CACHE_TTL.SETTINGS },
+  );
+
+  const response = NextResponse.json(settings);
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  return response;
+});
+
+export const PUT = pipe(
+  withSentry("/api/user/accessibility"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+
+  const body = await ctx.req.json();
+
+  const validation = AccessibilitySettingsSchema.safeParse(body);
+  if (!validation.success) {
+    const response = NextResponse.json(
+      {
+        error: "Invalid accessibility settings",
+        details: validation.error.issues.map((i) => i.message),
       },
-      { ttl: CACHE_TTL.SETTINGS },
+      { status: 400 },
     );
-
-    const response = NextResponse.json(settings);
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  } catch (error) {
-    log.error("Accessibility GET error", { error: String(error) });
-    const response = NextResponse.json(
-      { error: "Failed to get accessibility settings" },
-      { status: 500 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(ctx.req));
     return response;
   }
-}
 
-export async function PUT(request: NextRequest) {
-  const log = getRequestLogger(request);
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json(
-        { error: auth.error || "Not authenticated" },
-        { status: 401 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-    const userId = auth.userId;
+  const settings = await prisma.accessibilitySettings.upsert({
+    where: { userId },
+    update: validation.data,
+    create: { userId, ...validation.data },
+  });
 
-    if (!requireCSRF(request)) {
-      const response = NextResponse.json(
-        { error: "Invalid CSRF token" },
-        { status: 403 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
+  // Invalidate cache
+  del(`a11y:${userId}`);
 
-    const body = await request.json();
-
-    const validation = AccessibilitySettingsSchema.safeParse(body);
-    if (!validation.success) {
-      const response = NextResponse.json(
-        {
-          error: "Invalid accessibility settings",
-          details: validation.error.issues.map((i) => i.message),
-        },
-        { status: 400 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-
-    const settings = await prisma.accessibilitySettings.upsert({
-      where: { userId },
-      update: validation.data,
-      create: { userId, ...validation.data },
-    });
-
-    // Invalidate cache
-    del(`a11y:${userId}`);
-
-    const response = NextResponse.json(settings);
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  } catch (error) {
-    log.error("Accessibility PUT error", { error: String(error) });
-    const response = NextResponse.json(
-      { error: "Failed to update accessibility settings" },
-      { status: 500 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
-}
+  const response = NextResponse.json(settings);
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  return response;
+});

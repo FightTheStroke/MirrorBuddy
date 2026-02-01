@@ -11,12 +11,13 @@
  * 2. IP allowlist: localhost, private networks, or HEALTH_ALLOWED_IPS
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { getAppVersion } from "@/lib/version";
 import { prometheusPushService } from "@/lib/observability";
 import { getPoolMetrics, getPoolUtilization } from "@/lib/metrics/pool-metrics";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 /** Secret for health endpoint auth (optional) */
 const HEALTH_SECRET = process.env.HEALTH_SECRET;
@@ -248,10 +249,10 @@ function formatUptime(seconds: number): string {
   return parts.join(" ") || "< 1m";
 }
 
-export async function GET(request: NextRequest) {
-  const log = getRequestLogger(request);
+export const GET = pipe(withSentry("/api/health/detailed"))(async (ctx) => {
+  const log = getRequestLogger(ctx.req);
   // F-15: Check authorization
-  if (!isAuthorized(request, log)) {
+  if (!isAuthorized(ctx.req, log)) {
     const response = NextResponse.json(
       {
         error: "Unauthorized",
@@ -259,7 +260,7 @@ export async function GET(request: NextRequest) {
       },
       { status: 401 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(ctx.req));
     return response;
   }
 
@@ -292,6 +293,6 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.json(health, {
     status: health.status === "unhealthy" ? 503 : 200,
   });
-  response.headers.set("X-Request-ID", getRequestId(request));
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
   return response;
-}
+});

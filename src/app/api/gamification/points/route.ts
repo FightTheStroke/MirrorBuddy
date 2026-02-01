@@ -4,101 +4,78 @@
  * GET /api/gamification/points - Get points history
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import {
   awardPoints,
   getOrCreateGamification,
   checkAchievements,
 } from "@/lib/gamification/db";
-import { logger } from "@/lib/logger";
 import { validateJsonRequest } from "@/lib/validation/middleware";
 import { AwardPointsRequestSchema } from "@/lib/validation/schemas/gamification";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/gamification/points"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const gamification = await getOrCreateGamification(userId);
+  const gamification = await getOrCreateGamification(userId);
 
-    // Get recent transactions
-    const transactions = await prisma.pointsTransaction.findMany({
-      where: { gamificationId: gamification.id },
-      orderBy: { createdAt: "desc" },
-      take: 50,
-    });
+  // Get recent transactions
+  const transactions = await prisma.pointsTransaction.findMany({
+    where: { gamificationId: gamification.id },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
 
-    return NextResponse.json({
-      success: true,
-      totalPoints: gamification.totalPoints,
-      seasonPoints: gamification.seasonPoints,
-      mirrorBucks: gamification.mirrorBucks,
-      transactions: transactions.map((t) => ({
-        points: t.points,
-        reason: t.reason,
-        multiplier: t.multiplier,
-        createdAt: t.createdAt,
-      })),
-    });
-  } catch (error) {
-    logger.error("Failed to get points", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to get points" },
-      { status: 500 },
-    );
+  return NextResponse.json({
+    success: true,
+    totalPoints: gamification.totalPoints,
+    seasonPoints: gamification.seasonPoints,
+    mirrorBucks: gamification.mirrorBucks,
+    transactions: transactions.map((t) => ({
+      points: t.points,
+      reason: t.reason,
+      multiplier: t.multiplier,
+      createdAt: t.createdAt,
+    })),
+  });
+});
+
+export const POST = pipe(
+  withSentry("/api/gamification/points"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+
+  // Validate request body
+  const validation = await validateJsonRequest(
+    ctx.req,
+    AwardPointsRequestSchema,
+  );
+  if (!validation.success) {
+    return validation.response;
   }
-}
 
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+  const { points, reason, sourceId, sourceType } = validation.data;
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  const result = await awardPoints(
+    userId,
+    points,
+    reason,
+    sourceId,
+    sourceType,
+  );
 
-    // Validate request body
-    const validation = await validateJsonRequest(
-      request,
-      AwardPointsRequestSchema,
-    );
-    if (!validation.success) {
-      return validation.response;
-    }
+  // Check for new achievements after awarding points
+  const newAchievements = await checkAchievements(userId);
 
-    const { points, reason, sourceId, sourceType } = validation.data;
-
-    const result = await awardPoints(
-      userId,
-      points,
-      reason,
-      sourceId,
-      sourceType,
-    );
-
-    // Check for new achievements after awarding points
-    const newAchievements = await checkAchievements(userId);
-
-    return NextResponse.json({
-      success: true,
-      ...result,
-      newAchievements,
-    });
-  } catch (error) {
-    logger.error("Failed to award points", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to award points" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    success: true,
+    ...result,
+    newAchievements,
+  });
+});

@@ -9,7 +9,7 @@
  * Related: Issue #31 Collaborative Student Profile
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -22,7 +22,7 @@ import {
   formatValidationErrors,
 } from "@/lib/validation/middleware";
 import { ProfileGenerateSchema } from "@/lib/validation/schemas/profile";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 import {
   generateStudentProfile,
   type MaestroInsightInput,
@@ -42,13 +42,11 @@ const GENERATE_RATE_LIMIT = {
 /**
  * POST - Generate student insight profile from all Learning data
  */
-export async function POST(request: NextRequest) {
-  // Validate CSRF token
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const clientId = getClientIdentifier(request);
+export const POST = pipe(
+  withSentry("/api/profile/generate"),
+  withCSRF,
+)(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(
     `profile-gen:${clientId}`,
     GENERATE_RATE_LIMIT,
@@ -62,156 +60,148 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimit);
   }
 
-  try {
-    const body = await request.json();
+  const body = await ctx.req.json();
 
-    const validation = validateRequest(ProfileGenerateSchema, body);
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: "Validation failed",
-          details: formatValidationErrors(validation.error),
-        },
-        { status: 400 },
-      );
-    }
-
-    const { userId, forceRegenerate = false } = validation.data;
-
-    // Check if recent profile exists and forceRegenerate is false
-    if (!forceRegenerate) {
-      const existingProfile = await prisma.studentInsightProfile.findUnique({
-        where: { userId },
-      });
-
-      if (existingProfile && isProfileUpToDate(existingProfile.updatedAt)) {
-        return NextResponse.json({
-          success: true,
-          message: "Profile is up to date (less than 24h old)",
-          data: {
-            id: existingProfile.id,
-            lastUpdated: existingProfile.updatedAt,
-            useForceRegenerate: true,
-          },
-        });
-      }
-    }
-
-    const userProfile = await prisma.profile.findUnique({
-      where: { userId },
-    });
-
-    const studentName = userProfile?.name || "Studente";
-
-    const learnings = await prisma.learning.findMany({
-      where: { userId },
-      orderBy: { createdAt: "desc" },
-      take: 2000,
-    });
-
-    if (learnings.length === 0) {
-      return NextResponse.json(
-        {
-          error: "No learning data",
-          message:
-            "No conversation insights found. The student needs to interact with Maestri first.",
-        },
-        { status: 404 },
-      );
-    }
-
-    const sessions = await prisma.studySession.findMany({
-      where: { userId },
-      take: 1000,
-    });
-
-    const totalMinutes = sessions.reduce(
-      (sum: number, s) => sum + (s.duration || 0),
-      0,
-    );
-    const maestriInteracted = [
-      ...new Set(
-        sessions
-          .map((s) => s.maestroId)
-          .filter((id): id is string => id !== null),
-      ),
-    ];
-
-    const insights: MaestroInsightInput[] = learnings.map((learning) => ({
-      maestroId: learning.maestroId || "unknown",
-      maestroName: getMaestroDisplayName(learning.maestroId || "unknown"),
-      category: mapCategoryFromLearning(learning.category),
-      content: learning.insight,
-      isStrength: learning.confidence >= 0.7,
-      confidence: learning.confidence,
-      createdAt: learning.createdAt,
-    }));
-
-    const generatedProfile = generateStudentProfile(
-      userId,
-      studentName,
-      insights,
-      {
-        totalSessions: sessions.length,
-        totalMinutes,
-        maestriInteracted,
-      },
-    );
-
-    const savedProfile = await prisma.studentInsightProfile.upsert({
-      where: { userId },
-      create: {
-        userId,
-        studentName,
-        insights: JSON.stringify(insights),
-        strengths: JSON.stringify(generatedProfile.strengths),
-        growthAreas: JSON.stringify(generatedProfile.growthAreas),
-        strategies: JSON.stringify(generatedProfile.strategies),
-        learningStyle: JSON.stringify(generatedProfile.learningStyle),
-        sessionCount: sessions.length,
-        confidenceScore: calculateConfidenceScore(insights),
-      },
-      update: {
-        studentName,
-        insights: JSON.stringify(insights),
-        strengths: JSON.stringify(generatedProfile.strengths),
-        growthAreas: JSON.stringify(generatedProfile.growthAreas),
-        strategies: JSON.stringify(generatedProfile.strategies),
-        learningStyle: JSON.stringify(generatedProfile.learningStyle),
-        sessionCount: sessions.length,
-        confidenceScore: calculateConfidenceScore(insights),
-        updatedAt: new Date(),
-      },
-    });
-
-    logger.info("Profile generated", {
-      userId,
-      insightsCount: insights.length,
-      strengthsCount: generatedProfile.strengths.length,
-      growthAreasCount: generatedProfile.growthAreas.length,
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Profile generated successfully",
-      data: {
-        id: savedProfile.id,
-        updatedAt: savedProfile.updatedAt,
-        stats: {
-          insightsProcessed: insights.length,
-          strengthsIdentified: generatedProfile.strengths.length,
-          growthAreasIdentified: generatedProfile.growthAreas.length,
-          strategiesSuggested: generatedProfile.strategies.length,
-          sessionsAnalyzed: sessions.length,
-          maestriContributing: maestriInteracted.length,
-        },
-      },
-    });
-  } catch (error) {
-    logger.error("Profile generation error", { error: String(error) });
+  const validation = validateRequest(ProfileGenerateSchema, body);
+  if (!validation.success) {
     return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
+      {
+        error: "Validation failed",
+        details: formatValidationErrors(validation.error),
+      },
+      { status: 400 },
     );
   }
-}
+
+  const { userId, forceRegenerate = false } = validation.data;
+
+  // Check if recent profile exists and forceRegenerate is false
+  if (!forceRegenerate) {
+    const existingProfile = await prisma.studentInsightProfile.findUnique({
+      where: { userId },
+    });
+
+    if (existingProfile && isProfileUpToDate(existingProfile.updatedAt)) {
+      return NextResponse.json({
+        success: true,
+        message: "Profile is up to date (less than 24h old)",
+        data: {
+          id: existingProfile.id,
+          lastUpdated: existingProfile.updatedAt,
+          useForceRegenerate: true,
+        },
+      });
+    }
+  }
+
+  const userProfile = await prisma.profile.findUnique({
+    where: { userId },
+  });
+
+  const studentName = userProfile?.name || "Studente";
+
+  const learnings = await prisma.learning.findMany({
+    where: { userId },
+    orderBy: { createdAt: "desc" },
+    take: 2000,
+  });
+
+  if (learnings.length === 0) {
+    return NextResponse.json(
+      {
+        error: "No learning data",
+        message:
+          "No conversation insights found. The student needs to interact with Maestri first.",
+      },
+      { status: 404 },
+    );
+  }
+
+  const sessions = await prisma.studySession.findMany({
+    where: { userId },
+    take: 1000,
+  });
+
+  const totalMinutes = sessions.reduce(
+    (sum: number, s) => sum + (s.duration || 0),
+    0,
+  );
+  const maestriInteracted = [
+    ...new Set(
+      sessions
+        .map((s) => s.maestroId)
+        .filter((id): id is string => id !== null),
+    ),
+  ];
+
+  const insights: MaestroInsightInput[] = learnings.map((learning) => ({
+    maestroId: learning.maestroId || "unknown",
+    maestroName: getMaestroDisplayName(learning.maestroId || "unknown"),
+    category: mapCategoryFromLearning(learning.category),
+    content: learning.insight,
+    isStrength: learning.confidence >= 0.7,
+    confidence: learning.confidence,
+    createdAt: learning.createdAt,
+  }));
+
+  const generatedProfile = generateStudentProfile(
+    userId,
+    studentName,
+    insights,
+    {
+      totalSessions: sessions.length,
+      totalMinutes,
+      maestriInteracted,
+    },
+  );
+
+  const savedProfile = await prisma.studentInsightProfile.upsert({
+    where: { userId },
+    create: {
+      userId,
+      studentName,
+      insights: JSON.stringify(insights),
+      strengths: JSON.stringify(generatedProfile.strengths),
+      growthAreas: JSON.stringify(generatedProfile.growthAreas),
+      strategies: JSON.stringify(generatedProfile.strategies),
+      learningStyle: JSON.stringify(generatedProfile.learningStyle),
+      sessionCount: sessions.length,
+      confidenceScore: calculateConfidenceScore(insights),
+    },
+    update: {
+      studentName,
+      insights: JSON.stringify(insights),
+      strengths: JSON.stringify(generatedProfile.strengths),
+      growthAreas: JSON.stringify(generatedProfile.growthAreas),
+      strategies: JSON.stringify(generatedProfile.strategies),
+      learningStyle: JSON.stringify(generatedProfile.learningStyle),
+      sessionCount: sessions.length,
+      confidenceScore: calculateConfidenceScore(insights),
+      updatedAt: new Date(),
+    },
+  });
+
+  logger.info("Profile generated", {
+    userId,
+    insightsCount: insights.length,
+    strengthsCount: generatedProfile.strengths.length,
+    growthAreasCount: generatedProfile.growthAreas.length,
+  });
+
+  return NextResponse.json({
+    success: true,
+    message: "Profile generated successfully",
+    data: {
+      id: savedProfile.id,
+      updatedAt: savedProfile.updatedAt,
+      stats: {
+        insightsProcessed: insights.length,
+        strengthsIdentified: generatedProfile.strengths.length,
+        growthAreasIdentified: generatedProfile.growthAreas.length,
+        strategiesSuggested: generatedProfile.strategies.length,
+        sessionsAnalyzed: sessions.length,
+        maestriContributing: maestriInteracted.length,
+      },
+    },
+  });
+});

@@ -4,12 +4,10 @@
 // PUT: Update profile
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 // #92: Zod schema for profile validation
 const ProfileUpdateSchema = z
@@ -31,85 +29,64 @@ const ProfileUpdateSchema = z
   })
   .strict();
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/user/profile"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const profile = await prisma.profile.upsert({
-      where: { userId },
-      update: {},
-      create: { userId },
-    });
+  const profile = await prisma.profile.upsert({
+    where: { userId },
+    update: {},
+    create: { userId },
+  });
 
-    // Parse learningGoals from JSON string
-    return NextResponse.json({
-      ...profile,
-      learningGoals: JSON.parse(profile.learningGoals || "[]"),
-    });
-  } catch (error) {
-    logger.error("Profile GET error", { error: String(error) });
+  // Parse learningGoals from JSON string
+  return NextResponse.json({
+    ...profile,
+    learningGoals: JSON.parse(profile.learningGoals || "[]"),
+  });
+});
+
+export const PUT = pipe(
+  withSentry("/api/user/profile"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+
+  const body = await ctx.req.json();
+
+  // #92: Validate with Zod before processing
+  const validation = ProfileUpdateSchema.safeParse(body);
+  if (!validation.success) {
     return NextResponse.json(
-      { error: "Failed to get profile" },
-      { status: 500 },
+      {
+        error: "Invalid profile data",
+        details: validation.error.issues.map((i) => i.message),
+      },
+      { status: 400 },
     );
   }
-}
 
-export async function PUT(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  const data = validation.data;
+
+  // Prepare update data
+  const updateData: Record<string, unknown> = { ...data };
+
+  // Stringify learningGoals if it's an array
+  if (Array.isArray(updateData.learningGoals)) {
+    updateData.learningGoals = JSON.stringify(updateData.learningGoals);
   }
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  const profile = await prisma.profile.upsert({
+    where: { userId },
+    update: updateData,
+    create: { userId, ...updateData },
+  });
 
-    const body = await request.json();
-
-    // #92: Validate with Zod before processing
-    const validation = ProfileUpdateSchema.safeParse(body);
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid profile data",
-          details: validation.error.issues.map((i) => i.message),
-        },
-        { status: 400 },
-      );
-    }
-
-    const data = validation.data;
-
-    // Prepare update data
-    const updateData: Record<string, unknown> = { ...data };
-
-    // Stringify learningGoals if it's an array
-    if (Array.isArray(updateData.learningGoals)) {
-      updateData.learningGoals = JSON.stringify(updateData.learningGoals);
-    }
-
-    const profile = await prisma.profile.upsert({
-      where: { userId },
-      update: updateData,
-      create: { userId, ...updateData },
-    });
-
-    return NextResponse.json({
-      ...profile,
-      learningGoals: JSON.parse(profile.learningGoals || "[]"),
-    });
-  } catch (error) {
-    logger.error("Profile PUT error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to update profile" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    ...profile,
+    learningGoals: JSON.parse(profile.learningGoals || "[]"),
+  });
+});

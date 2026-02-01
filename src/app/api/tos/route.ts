@@ -7,19 +7,17 @@
  * F-13: Terms of Service tracking with versioning and audit trail
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
 import {
   checkRateLimit,
   RATE_LIMITS,
   rateLimitResponse,
   getClientIdentifier,
 } from "@/lib/rate-limit";
-import { requireCSRF } from "@/lib/security/csrf";
 import { TOS_VERSION } from "@/lib/tos/constants";
-import * as Sentry from "@sentry/nextjs";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/tos" });
 
@@ -32,18 +30,16 @@ const log = logger.child({ module: "api/tos" });
  * - version: string (current ToS version)
  * - acceptedAt?: Date (when user accepted, if they have)
  */
-export async function GET(_request: NextRequest) {
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export const GET = pipe(
+  withSentry("/api/tos"),
+  withAuth,
+)(async (ctx) => {
   // Rate limit: 60 req/min (same as general API)
-  const rateLimit = checkRateLimit(`tos:${auth.userId}`, RATE_LIMITS.GENERAL);
+  const rateLimit = checkRateLimit(`tos:${ctx.userId}`, RATE_LIMITS.GENERAL);
 
   if (!rateLimit.success) {
     log.warn("Rate limit exceeded", {
-      userId: auth.userId,
+      userId: ctx.userId,
       endpoint: "/api/tos",
     });
     return rateLimitResponse(rateLimit);
@@ -54,7 +50,7 @@ export async function GET(_request: NextRequest) {
     const acceptance = await prisma.tosAcceptance.findUnique({
       where: {
         userId_version: {
-          userId: auth.userId,
+          userId: ctx.userId!,
           version: TOS_VERSION,
         },
       },
@@ -71,7 +67,7 @@ export async function GET(_request: NextRequest) {
     // User hasn't accepted current version - check if they have any previous acceptance
     const previousAcceptance = await prisma.tosAcceptance.findFirst({
       where: {
-        userId: auth.userId,
+        userId: ctx.userId,
         version: {
           not: TOS_VERSION,
         },
@@ -88,13 +84,8 @@ export async function GET(_request: NextRequest) {
       previousVersion: previousAcceptance?.version,
     });
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/tos" },
-    });
-
     log.error("ToS check error", {
-      userId: auth.userId,
+      userId: ctx.userId,
       error: String(error),
     });
     return NextResponse.json(
@@ -102,7 +93,7 @@ export async function GET(_request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 /**
  * POST /api/tos
@@ -115,33 +106,27 @@ export async function GET(_request: NextRequest) {
  * - success: boolean
  * - acceptedAt: Date
  */
-export async function POST(request: NextRequest) {
-  // Validate CSRF token
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export const POST = pipe(
+  withSentry("/api/tos"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
   // Rate limit: 10 req/min (prevent abuse, ToS acceptance is rare)
-  const rateLimit = checkRateLimit(`tos:post:${auth.userId}`, {
+  const rateLimit = checkRateLimit(`tos:post:${ctx.userId}`, {
     maxRequests: 10,
     windowMs: 60 * 1000,
   });
 
   if (!rateLimit.success) {
     log.warn("Rate limit exceeded", {
-      userId: auth.userId,
+      userId: ctx.userId,
       endpoint: "POST /api/tos",
     });
     return rateLimitResponse(rateLimit);
   }
 
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { version } = body;
 
     // Validate version
@@ -153,8 +138,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Get client info for audit trail
-    const ipAddress = getClientIdentifier(request);
-    const userAgent = request.headers.get("user-agent") || undefined;
+    const ipAddress = getClientIdentifier(ctx.req);
+    const userAgent = ctx.req.headers.get("user-agent") || undefined;
 
     // Extract only last segment of IP for privacy
     const ipLastSegment = ipAddress.split(".").pop() || undefined;
@@ -163,12 +148,12 @@ export async function POST(request: NextRequest) {
     const acceptance = await prisma.tosAcceptance.upsert({
       where: {
         userId_version: {
-          userId: auth.userId,
+          userId: ctx.userId!,
           version,
         },
       },
       create: {
-        userId: auth.userId,
+        userId: ctx.userId!,
         version,
         ipAddress: ipLastSegment,
         userAgent,
@@ -182,7 +167,7 @@ export async function POST(request: NextRequest) {
     });
 
     log.info("ToS accepted", {
-      userId: auth.userId,
+      userId: ctx.userId,
       version,
       acceptedAt: acceptance.acceptedAt,
     });
@@ -192,13 +177,8 @@ export async function POST(request: NextRequest) {
       acceptedAt: acceptance.acceptedAt,
     });
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/tos" },
-    });
-
     log.error("ToS acceptance error", {
-      userId: auth.userId,
+      userId: ctx.userId,
       error: String(error),
     });
     return NextResponse.json(
@@ -206,4 +186,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

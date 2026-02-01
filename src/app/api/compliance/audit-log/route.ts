@@ -21,10 +21,10 @@
  * }
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
 interface ComplianceAuditEntryResponse {
   id: string;
@@ -56,23 +56,13 @@ interface AuditLogResponse {
  * GET /api/compliance/audit-log
  * Retrieve paginated compliance audit entries with filtering
  */
-export async function GET(request: NextRequest): Promise<Response> {
+export const GET = pipe(
+  withSentry("/api/compliance/audit-log"),
+  withAdmin,
+)(async (ctx): Promise<Response> => {
   try {
-    // Admin-only authorization
-    const adminAuth = await validateAdminAuth();
-    if (!adminAuth.authenticated || !adminAuth.isAdmin) {
-      logger.warn("Unauthorized audit log access attempt", {
-        userId: adminAuth.userId,
-        error: adminAuth.error,
-      });
-      return NextResponse.json(
-        { error: "Forbidden: admin access required" },
-        { status: 403 },
-      );
-    }
-
     // Extract and validate query parameters
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(ctx.req.url);
     const fromParam = searchParams.get("from");
     const toParam = searchParams.get("to");
     const typeFilter = searchParams.get("type");
@@ -186,7 +176,7 @@ export async function GET(request: NextRequest): Promise<Response> {
 
     // Log access for compliance trail
     logger.info("Audit log retrieved", {
-      adminId: adminAuth.userId,
+      adminId: ctx.userId,
       dateRange: { from: fromParam, to: toParam },
       filters: {
         type: typeFilter,
@@ -204,4 +194,4 @@ export async function GET(request: NextRequest): Promise<Response> {
       { status: 500 },
     );
   }
-}
+});

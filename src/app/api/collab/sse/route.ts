@@ -5,11 +5,11 @@
 // Uses Redis for metadata (multi-instance aware), local Map for controllers
 // ============================================================================
 
-import { NextRequest } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
 import { nanoid } from "nanoid";
 import { getSSEStore, getInstanceId } from "@/lib/realtime";
+import { pipe } from "@/lib/api/pipe";
+import { withSentry, withAuth } from "@/lib/api/middlewares";
 
 // ============================================================================
 // TYPES
@@ -203,12 +203,12 @@ export async function cleanupStaleCollabClients(): Promise<number> {
 // SSE ROUTE HANDLER
 // ============================================================================
 
-export async function GET(request: NextRequest) {
-  // Security: Get userId from authenticated session only
-  const { userId, errorResponse } = await requireAuthenticatedUser();
-  if (errorResponse) return errorResponse;
-
-  const { searchParams } = new URL(request.url);
+export const GET = pipe(
+  withSentry("/api/collab/sse"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { searchParams } = new URL(ctx.req.url);
   const roomId = searchParams.get("roomId");
 
   if (!roomId) {
@@ -221,7 +221,7 @@ export async function GET(request: NextRequest) {
   // Validate IDs
   if (
     !/^[a-zA-Z0-9_-]{1,64}$/.test(roomId) ||
-    !/^[a-zA-Z0-9_-]{1,64}$/.test(userId!)
+    !/^[a-zA-Z0-9_-]{1,64}$/.test(userId)
   ) {
     return new Response(
       JSON.stringify({ error: "Invalid roomId or userId format" }),
@@ -231,19 +231,18 @@ export async function GET(request: NextRequest) {
 
   const clientId = nanoid();
   let heartbeatInterval: NodeJS.Timeout | null = null;
-  const finalUserId = userId!;
 
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       // Register client (async, fire-and-forget for Redis metadata)
-      void registerCollabClient(clientId, roomId, finalUserId, controller);
+      void registerCollabClient(clientId, roomId, userId, controller);
 
       // Send initial connection event
       const connectEvent = `data: ${JSON.stringify({
         type: "connected",
         clientId,
         roomId,
-        userId: finalUserId,
+        userId,
         timestamp: Date.now(),
         storeMode: getSSEStore().getMode(),
       })}\n\n`;
@@ -254,11 +253,11 @@ export async function GET(request: NextRequest) {
         {
           type: "user:online",
           roomId,
-          userId: finalUserId,
+          userId,
           timestamp: Date.now(),
           data: { clientId },
         },
-        finalUserId,
+        userId,
       );
 
       // Setup heartbeat
@@ -285,11 +284,11 @@ export async function GET(request: NextRequest) {
         {
           type: "user:offline",
           roomId,
-          userId: finalUserId,
+          userId,
           timestamp: Date.now(),
           data: { clientId },
         },
-        finalUserId,
+        userId,
       );
 
       void unregisterCollabClient(clientId);
@@ -304,4 +303,4 @@ export async function GET(request: NextRequest) {
       "X-Accel-Buffering": "no",
     },
   });
-}
+});

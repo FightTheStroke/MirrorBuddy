@@ -5,7 +5,7 @@
  * FEATURE: Function calling for tool execution (Issue #39)
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   chatCompletion,
   getActiveProvider,
@@ -32,7 +32,6 @@ import { normalizeUnicode } from "@/lib/safety/versioning";
 // Import handlers to register them
 import "@/lib/tools/handlers";
 
-import { requireCSRF } from "@/lib/security/csrf";
 import { isSessionBlocked } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
 
@@ -56,14 +55,13 @@ import {
 } from "./trial-handler";
 import { incrementTrialBudgetWithPublish } from "@/lib/trial/trial-budget-service";
 import { TOKEN_COST_PER_UNIT } from "./stream/helpers";
-import * as Sentry from "@sentry/nextjs";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
-export async function POST(request: NextRequest) {
-  // CSRF validation (double-submit cookie pattern)
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
+export const POST = pipe(
+  withSentry("/api/chat"),
+  withCSRF,
+)(async (ctx) => {
+  const request = ctx.req;
   const log = getRequestLogger(request);
   const clientId = getClientIdentifier(request);
   const rateLimit = await checkRateLimitAsync(
@@ -444,11 +442,6 @@ export async function POST(request: NextRequest) {
       response.headers.set("X-Request-ID", getRequestId(request));
       return response;
     } catch (providerError) {
-      // Report error to Sentry for monitoring and alerts
-      Sentry.captureException(providerError, {
-        tags: { api: "/api/chat" },
-      });
-
       const errorMessage =
         providerError instanceof Error
           ? providerError.message
@@ -480,11 +473,6 @@ export async function POST(request: NextRequest) {
       return response;
     }
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/chat" },
-    });
-
     log.error("Chat API error", { error: String(error) });
     const response = NextResponse.json(
       { error: "Internal server error" },
@@ -493,9 +481,9 @@ export async function POST(request: NextRequest) {
     response.headers.set("X-Request-ID", getRequestId(request));
     return response;
   }
-}
+});
 
-export async function GET(request: NextRequest) {
+export const GET = pipe(withSentry("/api/chat"))(async (ctx) => {
   const provider = getActiveProvider();
 
   if (!provider) {
@@ -504,7 +492,7 @@ export async function GET(request: NextRequest) {
       provider: null,
       message: "No AI provider configured",
     });
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(ctx.req));
     return response;
   }
 
@@ -513,6 +501,6 @@ export async function GET(request: NextRequest) {
     provider: provider.provider,
     model: provider.model,
   });
-  response.headers.set("X-Request-ID", getRequestId(request));
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
   return response;
-}
+});

@@ -7,6 +7,11 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 // Mock dependencies
 vi.mock("next/headers", () => ({
   cookies: vi.fn(),
@@ -78,7 +83,9 @@ describe("Trial Voice API", () => {
         userId: "user-123",
       } as any);
 
-      const response = await GET();
+      const response = await GET(
+        new NextRequest("http://localhost/api/trial/voice"),
+      );
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -94,7 +101,9 @@ describe("Trial Voice API", () => {
         get: vi.fn().mockReturnValue(undefined),
       } as any);
 
-      const response = await GET();
+      const response = await GET(
+        new NextRequest("http://localhost/api/trial/voice"),
+      );
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -115,7 +124,9 @@ describe("Trial Voice API", () => {
       } as any);
       vi.mocked(checkTrialLimits).mockResolvedValue({ allowed: true });
 
-      const response = await GET();
+      const response = await GET(
+        new NextRequest("http://localhost/api/trial/voice"),
+      );
       const data = await response.json();
 
       expect(data.allowed).toBe(true);
@@ -141,7 +152,9 @@ describe("Trial Voice API", () => {
         reason: "Limite voce raggiunto",
       });
 
-      const response = await GET();
+      const response = await GET(
+        new NextRequest("http://localhost/api/trial/voice"),
+      );
       const data = await response.json();
 
       expect(data.allowed).toBe(false);

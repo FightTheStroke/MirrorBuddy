@@ -5,11 +5,11 @@
  * Body: { level, message, context?, stack?, url? }
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { debugLog } from "@/lib/debug-logger";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Dev-only debug logging; disabled in production
-export async function POST(request: NextRequest) {
+export const POST = pipe(withSentry("/api/debug/log"))(async (ctx) => {
   // Only in development
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json(
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
 
     const entry = {
       level: body.level || "error",
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
       context: body.context,
       stack: body.stack,
       url: body.url,
-      userAgent: request.headers.get("user-agent") || undefined,
+      userAgent: ctx.req.headers.get("user-agent") || undefined,
     };
 
     debugLog.clientError(entry);
@@ -37,12 +37,12 @@ export async function POST(request: NextRequest) {
   } catch (_error) {
     return NextResponse.json({ error: "Failed to log" }, { status: 500 });
   }
-}
+});
 
 /**
  * GET /api/debug/log - Read current log file
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/debug/log"))(async () => {
   if (process.env.NODE_ENV !== "development") {
     return NextResponse.json(
       { error: "Debug logging disabled in production" },
@@ -72,4 +72,4 @@ export async function GET() {
   } catch (_error) {
     return NextResponse.json({ error: "Failed to read log" }, { status: 500 });
   }
-}
+});

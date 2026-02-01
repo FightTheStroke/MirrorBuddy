@@ -3,30 +3,20 @@
  * GET /api/gamification/progression
  */
 
-import { NextResponse } from 'next/server';
-import { validateAuth } from '@/lib/auth/session-auth';
-import { getProgression } from '@/lib/gamification/db';
-import { logger } from '@/lib/logger';
+import { NextResponse } from "next/server";
+import { getProgression } from "@/lib/gamification/db";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/gamification/progression"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const progression = await getProgression(userId);
+  const progression = await getProgression(userId);
 
-    return NextResponse.json({
-      success: true,
-      ...progression,
-    });
-  } catch (error) {
-    logger.error('Failed to get progression', { error: String(error) });
-    return NextResponse.json(
-      { error: 'Failed to get progression' },
-      { status: 500 }
-    );
-  }
-}
+  return NextResponse.json({
+    success: true,
+    ...progression,
+  });
+});

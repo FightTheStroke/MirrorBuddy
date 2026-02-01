@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   requestTrialEmailVerification,
   updateTrialEmail,
@@ -10,6 +10,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/trial/email" });
 
@@ -19,9 +20,9 @@ const log = logger.child({ module: "api/trial/email" });
  * Save email to trial session for nurturing/conversion tracking.
  * Email capture is optional and can be triggered after X messages or at limit.
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public trial email capture; visitor cookie only, no session auth
-export async function PATCH(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
+
+export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(
     `trial:email:${clientId}`,
     RATE_LIMITS.CONTACT_FORM,
@@ -32,7 +33,7 @@ export async function PATCH(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { sessionId, email } = body;
 
     // Validate input
@@ -104,4 +105,4 @@ export async function PATCH(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

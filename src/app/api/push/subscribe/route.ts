@@ -3,8 +3,7 @@
 // Manages push notification subscriptions for PWA
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import {
@@ -13,7 +12,7 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from "@/lib/rate-limit";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 interface SubscriptionBody {
   endpoint: string;
@@ -23,12 +22,12 @@ interface SubscriptionBody {
 }
 
 // POST - Save a new push subscription
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const clientId = getClientIdentifier(request);
+export const POST = pipe(
+  withSentry("/api/push/subscribe"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(
     `push-subscribe:${clientId}`,
     RATE_LIMITS.GENERAL,
@@ -39,13 +38,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const authResult = await validateAuth();
-    if (!authResult.authenticated) {
-      return NextResponse.json({ error: authResult.error }, { status: 401 });
-    }
-    const userId = authResult.userId!;
-
-    const body: SubscriptionBody = await request.json();
+    const body: SubscriptionBody = await ctx.req.json();
     const { endpoint, p256dh, auth, userAgent } = body;
 
     // Validate required fields
@@ -70,14 +63,14 @@ export async function POST(request: NextRequest) {
     const subscription = await prisma.pushSubscription.upsert({
       where: { endpoint },
       create: {
-        userId,
+        userId: ctx.userId!,
         endpoint,
         p256dh,
         auth,
         userAgent,
       },
       update: {
-        userId, // Update userId in case subscription was from different session
+        userId: ctx.userId!, // Update userId in case subscription was from different session
         p256dh,
         auth,
         userAgent,
@@ -85,7 +78,7 @@ export async function POST(request: NextRequest) {
     });
 
     logger.info("Push subscription saved", {
-      userId,
+      userId: ctx.userId,
       subscriptionId: subscription.id,
       endpoint: endpoint.slice(0, 50) + "...",
     });
@@ -104,15 +97,15 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 // DELETE - Remove a push subscription
-export async function DELETE(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const clientId = getClientIdentifier(request);
+export const DELETE = pipe(
+  withSentry("/api/push/subscribe"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(
     `push-unsubscribe:${clientId}`,
     RATE_LIMITS.GENERAL,
@@ -123,13 +116,7 @@ export async function DELETE(request: NextRequest) {
   }
 
   try {
-    const authResult = await validateAuth();
-    if (!authResult.authenticated) {
-      return NextResponse.json({ error: authResult.error }, { status: 401 });
-    }
-    const userId = authResult.userId!;
-
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { endpoint } = body;
 
     if (!endpoint) {
@@ -140,20 +127,20 @@ export async function DELETE(request: NextRequest) {
     const result = await prisma.pushSubscription.deleteMany({
       where: {
         endpoint,
-        userId,
+        userId: ctx.userId!,
       },
     });
 
     if (result.count === 0) {
       logger.warn("Push subscription not found for deletion", {
-        userId,
+        userId: ctx.userId,
         endpoint: endpoint.slice(0, 50),
       });
       return NextResponse.json({ success: true }); // Idempotent - already deleted
     }
 
     logger.info("Push subscription deleted", {
-      userId,
+      userId: ctx.userId,
       endpoint: endpoint.slice(0, 50) + "...",
     });
 
@@ -165,11 +152,14 @@ export async function DELETE(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 // GET - Check if user has any push subscriptions
-export async function GET(request: Request) {
-  const clientId = getClientIdentifier(request);
+export const GET = pipe(
+  withSentry("/api/push/subscribe"),
+  withAuth,
+)(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(
     `push-check:${clientId}`,
     RATE_LIMITS.GENERAL,
@@ -180,14 +170,8 @@ export async function GET(request: Request) {
   }
 
   try {
-    const authResult = await validateAuth();
-    if (!authResult.authenticated) {
-      return NextResponse.json({ error: authResult.error }, { status: 401 });
-    }
-    const userId = authResult.userId!;
-
     const subscriptions = await prisma.pushSubscription.findMany({
-      where: { userId },
+      where: { userId: ctx.userId! },
       select: {
         id: true,
         userAgent: true,
@@ -211,7 +195,7 @@ export async function GET(request: Request) {
       { status: 500 },
     );
   }
-}
+});
 
 // Helper to parse user agent into friendly device name
 function parseUserAgent(ua?: string | null): string {

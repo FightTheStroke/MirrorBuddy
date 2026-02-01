@@ -8,7 +8,7 @@
  * @module api/tts
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import {
   checkRateLimit,
   getClientIdentifier,
@@ -16,9 +16,8 @@ import {
   RATE_LIMITS,
 } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
-import * as Sentry from "@sentry/nextjs";
+import { pipe } from "@/lib/api/pipe";
+import { withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
 // OpenAI TTS voices
 type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
@@ -133,93 +132,70 @@ async function generateOpenAITTS(
  * Generate speech from text using OpenAI TTS.
  * Returns audio/mpeg stream.
  */
-export async function POST(request: NextRequest) {
-  // CSRF validation (double-submit cookie pattern)
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  // Rate limit check (before auth to prevent DDoS on auth lookup)
-  const clientId = getClientIdentifier(request);
+export const POST = pipe(
+  withSentry("/api/tts"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  // Rate limit check (before heavy processing)
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`tts:${clientId}`, RATE_LIMITS.TTS);
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
   }
 
-  // #84: Authentication check - TTS requires authenticated user
-  const auth = await validateAuth();
-  if (!auth.authenticated) {
+  const provider = getTTSProvider();
+
+  if (!provider) {
     return NextResponse.json(
-      { error: "Authentication required" },
-      { status: 401 },
-    );
-  }
-
-  try {
-    const provider = getTTSProvider();
-
-    if (!provider) {
-      return NextResponse.json(
-        {
-          error:
-            "TTS not configured. Set OPENAI_API_KEY or AZURE_OPENAI_TTS_DEPLOYMENT",
-          fallback: true,
-        },
-        { status: 503 },
-      );
-    }
-
-    const body = (await request.json()) as TTSRequest;
-    const { text, voice = "shimmer" } = body;
-
-    if (!text || typeof text !== "string") {
-      return NextResponse.json({ error: "Text is required" }, { status: 400 });
-    }
-
-    // Limit text length to prevent abuse
-    if (text.length > 4096) {
-      return NextResponse.json(
-        { error: "Text too long (max 4096 characters)" },
-        { status: 400 },
-      );
-    }
-
-    let audioData: ArrayBuffer;
-
-    if (provider === "azure") {
-      audioData = await generateAzureTTS(text, voice);
-    } else {
-      audioData = await generateOpenAITTS(text, voice);
-    }
-
-    return new NextResponse(audioData, {
-      status: 200,
-      headers: {
-        "Content-Type": "audio/mpeg",
-        "Content-Length": audioData.byteLength.toString(),
-        "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+      {
+        error:
+          "TTS not configured. Set OPENAI_API_KEY or AZURE_OPENAI_TTS_DEPLOYMENT",
+        fallback: true,
       },
-    });
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/tts" },
-    });
-
-    logger.error("[TTS] Error", undefined, error);
-    return NextResponse.json(
-      { error: "Internal server error", fallback: true },
-      { status: 500 },
+      { status: 503 },
     );
   }
-}
+
+  const body = (await ctx.req.json()) as TTSRequest;
+  const { text, voice = "shimmer" } = body;
+
+  if (!text || typeof text !== "string") {
+    return NextResponse.json({ error: "Text is required" }, { status: 400 });
+  }
+
+  // Limit text length to prevent abuse
+  if (text.length > 4096) {
+    return NextResponse.json(
+      { error: "Text too long (max 4096 characters)" },
+      { status: 400 },
+    );
+  }
+
+  let audioData: ArrayBuffer;
+
+  if (provider === "azure") {
+    audioData = await generateAzureTTS(text, voice);
+  } else {
+    audioData = await generateOpenAITTS(text, voice);
+  }
+
+  return new NextResponse(audioData, {
+    status: 200,
+    headers: {
+      "Content-Type": "audio/mpeg",
+      "Content-Length": audioData.byteLength.toString(),
+      "Cache-Control": "public, max-age=3600", // Cache for 1 hour
+    },
+  });
+});
 
 /**
  * GET /api/tts
  *
  * Check if TTS is available.
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/tts"))(async () => {
   const provider = getTTSProvider();
 
   return NextResponse.json({
@@ -229,4 +205,4 @@ export async function GET() {
       ? ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]
       : [],
   });
-}
+});

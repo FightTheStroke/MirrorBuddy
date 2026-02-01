@@ -7,7 +7,7 @@
  * COPPA compliance for children under 13
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
 import { logger } from "@/lib/logger";
 import {
@@ -15,13 +15,13 @@ import {
   denyParentalConsentByCode,
   checkCoppaStatus,
 } from "@/lib/compliance/coppa-service";
-import { validateAuth } from "@/lib/auth/session-auth";
 import {
   checkRateLimitAsync,
   getClientIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
 const VerifySchema = z.object({
   code: z.string().length(6),
@@ -32,14 +32,12 @@ const VerifySchema = z.object({
  * GET /api/coppa/verify
  * Check COPPA consent status for the current user
  */
-export async function GET() {
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export const GET = pipe(
+  withSentry("/api/coppa/verify"),
+  withAuth,
+)(async (ctx) => {
   try {
-    const status = await checkCoppaStatus(auth.userId);
+    const status = await checkCoppaStatus(ctx.userId!);
 
     return NextResponse.json({
       success: true,
@@ -57,7 +55,7 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});
 
 /**
  * POST /api/coppa/verify
@@ -65,10 +63,10 @@ export async function GET() {
  *
  * Note: No CSRF required - code-based verification from email link
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Code-based verification from email; no cookie auth
-export async function POST(request: NextRequest) {
+
+export const POST = pipe(withSentry("/api/coppa/verify"))(async (ctx) => {
   // Rate limit COPPA verification attempts (5 per hour - email costs, strict)
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(
     `coppa:verify:${clientId}`,
     RATE_LIMITS.COPPA,
@@ -79,7 +77,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
 
     const parseResult = VerifySchema.safeParse(body);
     if (!parseResult.success) {
@@ -93,8 +91,8 @@ export async function POST(request: NextRequest) {
 
     // Get IP address for audit logging
     const ipAddress =
-      request.headers.get("x-forwarded-for")?.split(",")[0] ||
-      request.headers.get("x-real-ip") ||
+      ctx.req.headers.get("x-forwarded-for")?.split(",")[0] ||
+      ctx.req.headers.get("x-real-ip") ||
       "unknown";
 
     if (action === "approve") {
@@ -149,7 +147,7 @@ export async function POST(request: NextRequest) {
     logger.error("COPPA verification error", { error: String(error) });
     return NextResponse.json({ error: "Verification failed" }, { status: 500 });
   }
-}
+});
 
 function getErrorMessage(error: string): string {
   switch (error) {

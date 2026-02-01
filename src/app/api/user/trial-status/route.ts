@@ -8,33 +8,29 @@
 import { NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
+export const GET = pipe(withSentry("/api/user/trial-status"))(async () => {
+  const auth = await validateAuth();
 
-    // No session = trial user
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ isTrialUser: true });
-    }
-
-    // Check if user has credentials
-    const user = await prisma.user.findUnique({
-      where: { id: auth.userId },
-      select: { username: true, passwordHash: true },
-    });
-
-    // No user found = trial
-    if (!user) {
-      return NextResponse.json({ isTrialUser: true });
-    }
-
-    // User has credentials = not trial
-    const hasCredentials = Boolean(user.username && user.passwordHash);
-
-    return NextResponse.json({ isTrialUser: !hasCredentials });
-  } catch {
-    // On error, assume trial (safer default)
+  // No session = trial user
+  if (!auth.authenticated || !auth.userId) {
     return NextResponse.json({ isTrialUser: true });
   }
-}
+
+  // Check if user has credentials
+  const user = await prisma.user.findUnique({
+    where: { id: auth.userId },
+    select: { username: true, passwordHash: true },
+  });
+
+  // No user found = trial
+  if (!user) {
+    return NextResponse.json({ isTrialUser: true });
+  }
+
+  // User has credentials = not trial
+  const hasCredentials = Boolean(user.username && user.passwordHash);
+
+  return NextResponse.json({ isTrialUser: !hasCredentials });
+});

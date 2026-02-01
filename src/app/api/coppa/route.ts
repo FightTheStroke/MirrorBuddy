@@ -7,29 +7,26 @@
  * POST - Request parental consent (sends verification email)
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import {
   checkCoppaStatus,
   requestParentalConsent,
   COPPA_AGE_THRESHOLD,
 } from "@/lib/compliance/coppa-service";
 import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api-coppa" });
 
 /**
  * GET /api/coppa - Check COPPA status
  */
-export async function GET() {
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: auth.error }, { status: 401 });
-  }
-
+export const GET = pipe(
+  withSentry("/api/coppa"),
+  withAuth,
+)(async (ctx) => {
   try {
-    const status = await checkCoppaStatus(auth.userId);
+    const status = await checkCoppaStatus(ctx.userId!);
     return NextResponse.json({
       ...status,
       ageThreshold: COPPA_AGE_THRESHOLD,
@@ -41,25 +38,20 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});
 
 /**
  * POST /api/coppa - Request parental consent
  *
  * Body: { parentEmail: string, age: number }
  */
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  const auth = await validateAuth();
-  if (!auth.authenticated || !auth.userId) {
-    return NextResponse.json({ error: auth.error }, { status: 401 });
-  }
-
+export const POST = pipe(
+  withSentry("/api/coppa"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { parentEmail, age } = body;
 
     if (!parentEmail || typeof parentEmail !== "string") {
@@ -98,10 +90,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const result = await requestParentalConsent(auth.userId, age, parentEmail);
+    const result = await requestParentalConsent(ctx.userId!, age, parentEmail);
 
     log.info("Parental consent requested", {
-      userId: auth.userId,
+      userId: ctx.userId,
       age,
       expiresAt: result.expiresAt.toISOString(),
     });
@@ -124,4 +116,4 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

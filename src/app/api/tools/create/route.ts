@@ -5,7 +5,8 @@
  * Part of I-02: Voice Tool Commands.
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 import {
   createToolState,
@@ -13,11 +14,7 @@ import {
   completeToolState,
 } from "@/lib/realtime/tool-state";
 import { broadcastToolEvent, type ToolType } from "@/lib/realtime/tool-events";
-import {
-  validateAuth,
-  validateSessionOwnership,
-} from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { validateSessionOwnership } from "@/lib/auth/session-auth";
 import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
 import {
   checkRateLimitAsync,
@@ -57,183 +54,165 @@ interface CreateToolRequest {
  * - subject: Optional subject
  * - content: Tool content/arguments
  */
-export async function POST(request: NextRequest) {
-  try {
-    // #83: Authentication check - tool creation requires authenticated user
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json(
-        { error: "Authentication required" },
-        { status: 401 },
-      );
-    }
+export const POST = pipe(
+  withSentry("/api/tools/create"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const rateLimitIdentifier = getRateLimitIdentifier(request, auth.userId);
-    const rateLimitResult = await checkRateLimitAsync(
-      `tools:create:${rateLimitIdentifier}`,
-      RATE_LIMITS.GENERAL,
-    );
-    if (!rateLimitResult.success) {
-      logger.warn("Tool create rate limited", {
-        identifier: rateLimitIdentifier,
-      });
-      return rateLimitResponse(rateLimitResult);
-    }
-
-    // COPPA compliance check - under-13 users require parental consent
-    const canAccess = await canAccessFullFeatures(auth.userId);
-    if (!canAccess) {
-      return NextResponse.json(
-        {
-          error: "Parental consent required",
-          code: "COPPA_CONSENT_REQUIRED",
-          message:
-            "Users under 13 require parental consent to create learning materials.",
-        },
-        { status: 403 },
-      );
-    }
-
-    // F-02: CSRF check - prevent cross-site request forgery
-    if (!requireCSRF(request)) {
-      return NextResponse.json(
-        { error: "Invalid CSRF token" },
-        { status: 403 },
-      );
-    }
-
-    const body: CreateToolRequest = await request.json();
-    const { sessionId, maestroId, toolType, title, subject, content } = body;
-
-    // Validate required fields
-    if (!sessionId || !maestroId || !toolType || !title) {
-      return NextResponse.json(
-        {
-          error: "Missing required fields",
-          required: ["sessionId", "maestroId", "toolType", "title"],
-        },
-        { status: 400 },
-      );
-    }
-
-    // Validate tool type
-    if (!VALID_TOOL_TYPES.includes(toolType)) {
-      return NextResponse.json(
-        {
-          error: "Invalid tool type",
-          validTypes: VALID_TOOL_TYPES,
-        },
-        { status: 400 },
-      );
-    }
-
-    // Validate session ID format
-    if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
-      return NextResponse.json(
-        { error: "Invalid sessionId format" },
-        { status: 400 },
-      );
-    }
-
-    // #83: Verify session ownership - user can only create tools in their own sessions
-    const ownsSession = await validateSessionOwnership(sessionId, auth.userId);
-    if (!ownsSession) {
-      return NextResponse.json(
-        { error: "Session not found or access denied" },
-        { status: 403 },
-      );
-    }
-
-    // Generate tool ID
-    const toolId = `voice-tool-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
-
-    // Create tool state
-    const toolState = createToolState({
-      id: toolId,
-      type: toolType,
-      sessionId,
-      maestroId,
-      title,
-      subject,
+  // Rate limiting
+  const rateLimitIdentifier = getRateLimitIdentifier(ctx.req, userId);
+  const rateLimitResult = await checkRateLimitAsync(
+    `tools:create:${rateLimitIdentifier}`,
+    RATE_LIMITS.GENERAL,
+  );
+  if (!rateLimitResult.success) {
+    logger.warn("Tool create rate limited", {
+      identifier: rateLimitIdentifier,
     });
+    return rateLimitResponse(rateLimitResult);
+  }
 
-    // Broadcast tool:created event
-    broadcastToolEvent({
-      id: toolId,
-      type: "tool:created",
-      toolType,
-      sessionId,
-      maestroId,
-      timestamp: Date.now(),
-      data: {
-        title,
-        subject,
-      },
-    });
-
-    logger.info("Tool created from voice command", {
-      toolId,
-      toolType,
-      sessionId,
-      maestroId,
-      title,
-    });
-
-    // If content is provided, update the tool state with it
-    if (content && Object.keys(content).length > 0) {
-      updateToolState(toolId, {
-        content,
-        progress: 50,
-      });
-
-      // Broadcast progress update
-      broadcastToolEvent({
-        id: toolId,
-        type: "tool:update",
-        toolType,
-        sessionId,
-        maestroId,
-        timestamp: Date.now(),
-        data: {
-          progress: 50,
-        },
-      });
-    }
-
-    // Complete the tool (for voice commands, content is usually complete)
-    // Cast through unknown since voice content may not exactly match ToolContent types
-    completeToolState(
-      toolId,
-      content as unknown as Parameters<typeof completeToolState>[1],
-    );
-
-    // Broadcast completion
-    broadcastToolEvent({
-      id: toolId,
-      type: "tool:complete",
-      toolType,
-      sessionId,
-      maestroId,
-      timestamp: Date.now(),
-      data: {
-        content,
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      toolId,
-      toolType,
-      status: toolState.status,
-    });
-  } catch (error) {
-    logger.error("Failed to create tool", { error: String(error) });
+  // COPPA compliance check - under-13 users require parental consent
+  const canAccess = await canAccessFullFeatures(userId);
+  if (!canAccess) {
     return NextResponse.json(
-      { error: "Failed to create tool" },
-      { status: 500 },
+      {
+        error: "Parental consent required",
+        code: "COPPA_CONSENT_REQUIRED",
+        message:
+          "Users under 13 require parental consent to create learning materials.",
+      },
+      { status: 403 },
     );
   }
-}
+
+  const body: CreateToolRequest = await ctx.req.json();
+  const { sessionId, maestroId, toolType, title, subject, content } = body;
+
+  // Validate required fields
+  if (!sessionId || !maestroId || !toolType || !title) {
+    return NextResponse.json(
+      {
+        error: "Missing required fields",
+        required: ["sessionId", "maestroId", "toolType", "title"],
+      },
+      { status: 400 },
+    );
+  }
+
+  // Validate tool type
+  if (!VALID_TOOL_TYPES.includes(toolType)) {
+    return NextResponse.json(
+      {
+        error: "Invalid tool type",
+        validTypes: VALID_TOOL_TYPES,
+      },
+      { status: 400 },
+    );
+  }
+
+  // Validate session ID format
+  if (!/^[a-zA-Z0-9_-]{1,64}$/.test(sessionId)) {
+    return NextResponse.json(
+      { error: "Invalid sessionId format" },
+      { status: 400 },
+    );
+  }
+
+  // #83: Verify session ownership - user can only create tools in their own sessions
+  const ownsSession = await validateSessionOwnership(sessionId, userId);
+  if (!ownsSession) {
+    return NextResponse.json(
+      { error: "Session not found or access denied" },
+      { status: 403 },
+    );
+  }
+
+  // Generate tool ID
+  const toolId = `voice-tool-${Date.now()}-${crypto.randomUUID().slice(0, 8)}`;
+
+  // Create tool state
+  const toolState = createToolState({
+    id: toolId,
+    type: toolType,
+    sessionId,
+    maestroId,
+    title,
+    subject,
+  });
+
+  // Broadcast tool:created event
+  broadcastToolEvent({
+    id: toolId,
+    type: "tool:created",
+    toolType,
+    sessionId,
+    maestroId,
+    timestamp: Date.now(),
+    data: {
+      title,
+      subject,
+    },
+  });
+
+  logger.info("Tool created from voice command", {
+    toolId,
+    toolType,
+    sessionId,
+    maestroId,
+    title,
+  });
+
+  // If content is provided, update the tool state with it
+  if (content && Object.keys(content).length > 0) {
+    updateToolState(toolId, {
+      content,
+      progress: 50,
+    });
+
+    // Broadcast progress update
+    broadcastToolEvent({
+      id: toolId,
+      type: "tool:update",
+      toolType,
+      sessionId,
+      maestroId,
+      timestamp: Date.now(),
+      data: {
+        progress: 50,
+      },
+    });
+  }
+
+  // Complete the tool (for voice commands, content is usually complete)
+  // Cast through unknown since voice content may not exactly match ToolContent types
+  completeToolState(
+    toolId,
+    content as unknown as Parameters<typeof completeToolState>[1],
+  );
+
+  // Broadcast completion
+  broadcastToolEvent({
+    id: toolId,
+    type: "tool:complete",
+    toolType,
+    sessionId,
+    maestroId,
+    timestamp: Date.now(),
+    data: {
+      content,
+    },
+  });
+
+  return NextResponse.json({
+    success: true,
+    toolId,
+    toolType,
+    status: toolState.status,
+  });
+});
 
 /**
  * Get tool creation info

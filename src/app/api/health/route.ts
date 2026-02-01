@@ -7,6 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAppVersion } from "@/lib/version";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Track server start time for uptime calculation
 const startTime = Date.now();
@@ -161,7 +162,7 @@ function getOverallStatus(
   return "healthy";
 }
 
-export async function GET() {
+export const GET = pipe(withSentry("/api/health"))(async () => {
   const [database, ai_provider] = await Promise.all([
     checkDatabase(),
     checkAIProvider(),
@@ -184,9 +185,9 @@ export async function GET() {
   const httpStatus = status === "unhealthy" ? 503 : 200;
 
   return NextResponse.json(health, { status: httpStatus });
-}
+});
 
 // HEAD request for simple alive check (used by load balancers)
-export async function HEAD() {
+export const HEAD = pipe(withSentry("/api/health"))(async () => {
   return new NextResponse(null, { status: 200 });
-}
+});

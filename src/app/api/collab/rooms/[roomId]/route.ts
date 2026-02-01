@@ -4,9 +4,7 @@
  * Part of Phase 8: Multi-User Collaboration
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { getRoom, getRoomState, closeRoom } from "@/lib/collab/mindmap-room";
 import {
@@ -18,176 +16,139 @@ import {
   handleDeleteNodeAction,
   handleMoveNodeAction,
 } from "./helpers";
-
-interface RouteParams {
-  params: Promise<{ roomId: string }>;
-}
+import { pipe } from "@/lib/api/pipe";
+import { withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 
 /**
  * GET /api/collab/rooms/[roomId] - Get room state
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  const { roomId } = await params;
+export const GET = pipe(withSentry("/api/collab/rooms/:roomId"))(async (
+  ctx,
+) => {
+  const { roomId } = await ctx.params;
 
-  try {
-    const state = getRoomState(roomId);
+  const state = getRoomState(roomId);
 
-    if (!state) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    }
-
-    return NextResponse.json({
-      success: true,
-      roomId,
-      mindmap: state.mindmap,
-      participants: state.participants,
-      version: state.version,
-    });
-  } catch (error) {
-    logger.error("Failed to get room state", {
-      roomId,
-      error: String(error),
-    });
-
-    return NextResponse.json(
-      { error: "Failed to get room", message: String(error) },
-      { status: 500 },
-    );
+  if (!state) {
+    return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
-}
+
+  return NextResponse.json({
+    success: true,
+    roomId,
+    mindmap: state.mindmap,
+    participants: state.participants,
+    version: state.version,
+  });
+});
 
 /**
  * POST /api/collab/rooms/[roomId] - Join room or perform action
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Realtime collab; no cookie auth, user from body
-export async function POST(request: NextRequest, { params }: RouteParams) {
-  const { roomId } = await params;
 
-  try {
-    const validation = validateRoomExists(roomId);
-    if (!validation.valid) {
-      return validation.response;
-    }
+export const POST = pipe(withSentry("/api/collab/rooms/:roomId"))(async (
+  ctx,
+): Promise<NextResponse> => {
+  const { roomId } = await ctx.params;
 
-    const body = await request.json();
-    const { action, user, nodeId, node, parentId, changes, newParentId } = body;
+  const validation = validateRoomExists(roomId);
+  if (!validation.valid) {
+    return validation.response!;
+  }
 
-    let result;
+  const body = await ctx.req.json();
+  const { action, user, nodeId, node, parentId, changes, newParentId } = body;
 
-    switch (action) {
-      case "join":
-        result = handleJoinAction(roomId, user);
-        break;
+  let result: { response: NextResponse };
 
-      case "leave":
-        result = handleLeaveAction(roomId, user);
-        logger.info("User left room via API", {
-          roomId,
-          userId: (user as { id?: string })?.id,
-        });
-        break;
+  switch (action) {
+    case "join":
+      result = handleJoinAction(roomId, user);
+      break;
 
-      case "add_node":
-        result = handleAddNodeAction(roomId, user, node, parentId);
-        break;
-
-      case "update_node":
-        result = handleUpdateNodeAction(roomId, user, nodeId, changes);
-        break;
-
-      case "delete_node":
-        result = handleDeleteNodeAction(roomId, user, nodeId);
-        break;
-
-      case "move_node":
-        result = handleMoveNodeAction(roomId, user, nodeId, newParentId);
-        break;
-
-      default:
-        return NextResponse.json(
-          {
-            error: "Invalid action",
-            validActions: [
-              "join",
-              "leave",
-              "add_node",
-              "update_node",
-              "delete_node",
-              "move_node",
-            ],
-          },
-          { status: 400 },
-        );
-    }
-
-    if (action === "join") {
-      logger.info("User joined room via API", {
+    case "leave":
+      result = handleLeaveAction(roomId, user);
+      logger.info("User left room via API", {
         roomId,
         userId: (user as { id?: string })?.id,
       });
-    }
+      break;
 
-    return result.response;
-  } catch (error) {
-    logger.error("Failed to perform room action", {
-      roomId,
-      error: String(error),
-    });
+    case "add_node":
+      result = handleAddNodeAction(roomId, user, node, parentId);
+      break;
 
-    return NextResponse.json(
-      { error: "Failed to perform action", message: String(error) },
-      { status: 500 },
-    );
+    case "update_node":
+      result = handleUpdateNodeAction(roomId, user, nodeId, changes);
+      break;
+
+    case "delete_node":
+      result = handleDeleteNodeAction(roomId, user, nodeId);
+      break;
+
+    case "move_node":
+      result = handleMoveNodeAction(roomId, user, nodeId, newParentId);
+      break;
+
+    default:
+      return NextResponse.json(
+        {
+          error: "Invalid action",
+          validActions: [
+            "join",
+            "leave",
+            "add_node",
+            "update_node",
+            "delete_node",
+            "move_node",
+          ],
+        },
+        { status: 400 },
+      );
   }
-}
+
+  if (action === "join") {
+    logger.info("User joined room via API", {
+      roomId,
+      userId: (user as { id?: string })?.id,
+    });
+  }
+
+  return result.response;
+});
 
 /**
  * DELETE /api/collab/rooms/[roomId] - Close room (host only)
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+export const DELETE = pipe(
+  withSentry("/api/collab/rooms/:roomId"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const { roomId } = await ctx.params;
+  const userId = ctx.userId!;
+
+  const room = getRoom(roomId);
+  if (!room) {
+    return NextResponse.json({ error: "Room not found" }, { status: 404 });
   }
 
-  const { roomId } = await params;
+  const participants = Array.from(room.participants.values());
+  const isHost = participants.length > 0 && participants[0].id === userId;
 
-  try {
-    // Security: Get userId from authenticated session only
-    const { userId, errorResponse } = await requireAuthenticatedUser();
-    if (errorResponse) return errorResponse;
-
-    const room = getRoom(roomId);
-    if (!room) {
-      return NextResponse.json({ error: "Room not found" }, { status: 404 });
-    }
-
-    const participants = Array.from(room.participants.values());
-    const isHost = participants.length > 0 && participants[0].id === userId;
-
-    if (!isHost) {
-      return NextResponse.json(
-        { error: "Only host can close room" },
-        { status: 403 },
-      );
-    }
-
-    closeRoom(roomId);
-
-    logger.info("Room closed via API", {
-      roomId,
-      hostId: userId,
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    logger.error("Failed to close room", {
-      roomId,
-      error: String(error),
-    });
-
+  if (!isHost) {
     return NextResponse.json(
-      { error: "Failed to close room", message: String(error) },
-      { status: 500 },
+      { error: "Only host can close room" },
+      { status: 403 },
     );
   }
-}
+
+  closeRoom(roomId);
+
+  logger.info("Room closed via API", {
+    roomId,
+    hostId: userId,
+  });
+
+  return NextResponse.json({ success: true });
+});

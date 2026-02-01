@@ -9,7 +9,7 @@
  * Covered by F-11: GET /api/user/usage returns trial status with percentages
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import {
   getOrCreateTrialSession,
@@ -18,6 +18,7 @@ import {
 import { validateAuth } from "@/lib/auth/session-auth";
 import { logger } from "@/lib/logger";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/user/usage" });
 
@@ -44,8 +45,8 @@ interface UsageResponse {
  *
  * Returns trial usage with percentages for dashboard display
  */
-export async function GET(_request: NextRequest): Promise<NextResponse> {
-  try {
+export const GET = pipe(withSentry("/api/user/usage"))(
+  async (): Promise<NextResponse> => {
     // Validate authentication
     const auth = await validateAuth();
 
@@ -119,14 +120,5 @@ export async function GET(_request: NextRequest): Promise<NextResponse> {
     });
 
     return NextResponse.json(usageData, { status: 200 });
-  } catch (error) {
-    log.error("Error retrieving usage", {
-      error: error instanceof Error ? error.message : String(error),
-    });
-
-    return NextResponse.json(
-      { error: "Failed to retrieve usage" },
-      { status: 500 },
-    );
-  }
-}
+  },
+);

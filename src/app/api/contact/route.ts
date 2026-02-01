@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { extractFormData, sendAdminNotification } from "./helpers";
 import { logger } from "@/lib/logger";
@@ -8,6 +8,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "contact-api" });
 
@@ -82,13 +83,12 @@ interface ContactResponse {
   emailSent?: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public contact form; no cookie auth
-export async function POST(
-  request: NextRequest,
-): Promise<NextResponse<ContactResponse>> {
+export const POST = pipe(withSentry("/api/contact"))(async (
+  ctx,
+): Promise<NextResponse<ContactResponse>> => {
   try {
     // Rate limit contact form submissions (5 per hour - public endpoint)
-    const clientId = getClientIdentifier(request);
+    const clientId = getClientIdentifier(ctx.req);
     const rateLimitResult = await checkRateLimitAsync(
       `contact:form:${clientId}`,
       RATE_LIMITS.CONTACT_FORM,
@@ -100,7 +100,7 @@ export async function POST(
       ) as NextResponse<ContactResponse>;
     }
 
-    const body = (await request.json()) as ContactRequest;
+    const body = (await ctx.req.json()) as ContactRequest;
 
     // Validate required fields
     if (!body.name || !body.email || !body.type) {
@@ -287,4 +287,4 @@ export async function POST(
       { status: 500 },
     );
   }
-}
+});

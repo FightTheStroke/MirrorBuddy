@@ -3,250 +3,179 @@
  * Wave 3: GET, POST, DELETE concept links for a material
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { z } from "zod";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
-import { logger } from "@/lib/logger";
 
 const ConceptLinkSchema = z.object({
   conceptId: z.string().min(1),
   relevance: z.number().min(0).max(1).optional().default(1.0),
 });
 
-type RouteContext = { params: Promise<{ toolId: string }> };
-
 /**
  * GET /api/materials/[toolId]/concepts
  * Get all concepts linked to this material
  */
-export async function GET(
-  _request: NextRequest,
-  context: RouteContext,
-): Promise<NextResponse> {
-  try {
-    const { toolId } = await context.params;
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const GET = pipe(
+  withSentry("/api/materials/[toolId]/concepts"),
+  withAuth,
+)(async (ctx) => {
+  const { toolId } = await ctx.params;
+  const userId = ctx.userId!;
 
-    const userId = auth.userId;
+  const material = await prisma.material.findUnique({
+    where: { toolId },
+    select: { id: true, userId: true },
+  });
 
-    const material = await prisma.material.findUnique({
-      where: { toolId },
-      select: { id: true, userId: true },
-    });
+  if (!material || material.userId !== userId) {
+    return NextResponse.json({ error: "Material not found" }, { status: 404 });
+  }
 
-    if (!material || material.userId !== userId) {
-      return NextResponse.json(
-        { error: "Material not found" },
-        { status: 404 },
-      );
-    }
-
-    const concepts = await prisma.materialConcept.findMany({
-      where: { materialId: material.id },
-      include: {
-        concept: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            subject: true,
-          },
+  const concepts = await prisma.materialConcept.findMany({
+    where: { materialId: material.id },
+    include: {
+      concept: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          subject: true,
         },
       },
-      orderBy: { relevance: "desc" },
-    });
+    },
+    orderBy: { relevance: "desc" },
+  });
 
-    return NextResponse.json({
-      concepts: concepts.map((mc) => ({
-        ...mc.concept,
-        relevance: mc.relevance,
-      })),
-    });
-  } catch (error) {
-    logger.error("Failed to fetch concepts", {
-      toolId: (await context.params).toolId,
-    }, error);
-    return NextResponse.json(
-      { error: "Failed to fetch concepts" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    concepts: concepts.map((mc) => ({
+      ...mc.concept,
+      relevance: mc.relevance,
+    })),
+  });
+});
 
 /**
  * POST /api/materials/[toolId]/concepts
  * Link a concept to this material
  */
-export async function POST(
-  request: NextRequest,
-  context: RouteContext,
-): Promise<NextResponse> {
-  try {
-    // CSRF check
-    if (!requireCSRF(request)) {
-      return NextResponse.json(
-        { error: "Invalid CSRF token" },
-        { status: 403 },
-      );
-    }
+export const POST = pipe(
+  withSentry("/api/materials/[toolId]/concepts"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const { toolId } = await ctx.params;
+  const body = await ctx.req.json();
+  const userId = ctx.userId!;
 
-    const { toolId } = await context.params;
-    const body = await request.json();
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = auth.userId;
-
-    const parsed = ConceptLinkSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid request body", details: parsed.error.flatten() },
-        { status: 400 },
-      );
-    }
-
-    const material = await prisma.material.findUnique({
-      where: { toolId },
-      select: { id: true, userId: true },
-    });
-
-    if (!material || material.userId !== userId) {
-      return NextResponse.json(
-        { error: "Material not found" },
-        { status: 404 },
-      );
-    }
-
-    // Verify concept exists
-    const concept = await prisma.concept.findUnique({
-      where: { id: parsed.data.conceptId, userId },
-    });
-
-    if (!concept) {
-      return NextResponse.json({ error: "Concept not found" }, { status: 404 });
-    }
-
-    // Create or update link
-    const link = await prisma.materialConcept.upsert({
-      where: {
-        materialId_conceptId: {
-          materialId: material.id,
-          conceptId: parsed.data.conceptId,
-        },
-      },
-      create: {
-        materialId: material.id,
-        conceptId: parsed.data.conceptId,
-        relevance: parsed.data.relevance,
-      },
-      update: {
-        relevance: parsed.data.relevance,
-      },
-      include: {
-        concept: {
-          select: { id: true, name: true, description: true, subject: true },
-        },
-      },
-    });
-
+  const parsed = ConceptLinkSchema.safeParse(body);
+  if (!parsed.success) {
     return NextResponse.json(
-      {
-        concept: {
-          ...link.concept,
-          relevance: link.relevance,
-        },
-      },
-      { status: 201 },
-    );
-  } catch (error) {
-    logger.error("Failed to link concept", {
-      toolId: (await context.params).toolId,
-    }, error);
-    return NextResponse.json(
-      { error: "Failed to link concept" },
-      { status: 500 },
+      { error: "Invalid request body", details: parsed.error.flatten() },
+      { status: 400 },
     );
   }
-}
+
+  const material = await prisma.material.findUnique({
+    where: { toolId },
+    select: { id: true, userId: true },
+  });
+
+  if (!material || material.userId !== userId) {
+    return NextResponse.json({ error: "Material not found" }, { status: 404 });
+  }
+
+  // Verify concept exists
+  const concept = await prisma.concept.findUnique({
+    where: { id: parsed.data.conceptId, userId },
+  });
+
+  if (!concept) {
+    return NextResponse.json({ error: "Concept not found" }, { status: 404 });
+  }
+
+  // Create or update link
+  const link = await prisma.materialConcept.upsert({
+    where: {
+      materialId_conceptId: {
+        materialId: material.id,
+        conceptId: parsed.data.conceptId,
+      },
+    },
+    create: {
+      materialId: material.id,
+      conceptId: parsed.data.conceptId,
+      relevance: parsed.data.relevance,
+    },
+    update: {
+      relevance: parsed.data.relevance,
+    },
+    include: {
+      concept: {
+        select: { id: true, name: true, description: true, subject: true },
+      },
+    },
+  });
+
+  return NextResponse.json(
+    {
+      concept: {
+        ...link.concept,
+        relevance: link.relevance,
+      },
+    },
+    { status: 201 },
+  );
+});
 
 /**
  * DELETE /api/materials/[toolId]/concepts
  * Unlink a concept from this material (conceptId in query params)
  */
-export async function DELETE(
-  request: NextRequest,
-  context: RouteContext,
-): Promise<NextResponse> {
-  try {
-    // CSRF check
-    if (!requireCSRF(request)) {
-      return NextResponse.json(
-        { error: "Invalid CSRF token" },
-        { status: 403 },
-      );
-    }
+export const DELETE = pipe(
+  withSentry("/api/materials/[toolId]/concepts"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const { toolId } = await ctx.params;
+  const { searchParams } = new URL(ctx.req.url);
+  const conceptId = searchParams.get("conceptId");
+  const userId = ctx.userId!;
 
-    const { toolId } = await context.params;
-    const { searchParams } = new URL(request.url);
-    const conceptId = searchParams.get("conceptId");
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = auth.userId;
-    if (!conceptId) {
-      return NextResponse.json(
-        { error: "Missing conceptId query param" },
-        { status: 400 },
-      );
-    }
-
-    const material = await prisma.material.findUnique({
-      where: { toolId },
-      select: { id: true, userId: true },
-    });
-
-    if (!material || material.userId !== userId) {
-      return NextResponse.json(
-        { error: "Material not found" },
-        { status: 404 },
-      );
-    }
-
-    const concept = await prisma.concept.findUnique({
-      where: { id: conceptId, userId },
-      select: { id: true },
-    });
-
-    if (!concept) {
-      return NextResponse.json({ error: "Concept not found" }, { status: 404 });
-    }
-
-    await prisma.materialConcept.delete({
-      where: {
-        materialId_conceptId: {
-          materialId: material.id,
-          conceptId: concept.id,
-        },
-      },
-    });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    logger.error("Failed to unlink concept", {
-      toolId: (await context.params).toolId,
-    }, error);
+  if (!conceptId) {
     return NextResponse.json(
-      { error: "Failed to unlink concept" },
-      { status: 500 },
+      { error: "Missing conceptId query param" },
+      { status: 400 },
     );
   }
-}
+
+  const material = await prisma.material.findUnique({
+    where: { toolId },
+    select: { id: true, userId: true },
+  });
+
+  if (!material || material.userId !== userId) {
+    return NextResponse.json({ error: "Material not found" }, { status: 404 });
+  }
+
+  const concept = await prisma.concept.findUnique({
+    where: { id: conceptId, userId },
+    select: { id: true },
+  });
+
+  if (!concept) {
+    return NextResponse.json({ error: "Concept not found" }, { status: 404 });
+  }
+
+  await prisma.materialConcept.delete({
+    where: {
+      materialId_conceptId: {
+        materialId: material.id,
+        conceptId: concept.id,
+      },
+    },
+  });
+
+  return NextResponse.json({ success: true });
+});

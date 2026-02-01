@@ -5,149 +5,95 @@
  * PATCH /api/typing - Update partial progress
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
-import { logger } from "@/lib/logger";
+import { NextResponse } from "next/server";
 import type { TypingProgress } from "@/types/tools";
-import * as Sentry from "@sentry/nextjs";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
-export async function GET(request: NextRequest) {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/typing"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const searchParams = request.nextUrl.searchParams;
-    const requestedUserId = searchParams.get("userId");
+  const searchParams = ctx.req.nextUrl.searchParams;
+  const requestedUserId = searchParams.get("userId");
 
-    if (requestedUserId && requestedUserId !== userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  if (requestedUserId && requestedUserId !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
 
-    const progress = await getTypingProgress(userId);
+  const progress = await getTypingProgress(userId);
 
-    if (!progress) {
-      return NextResponse.json({
-        success: true,
-        data: null,
-      });
-    }
-
+  if (!progress) {
     return NextResponse.json({
       success: true,
-      data: progress,
+      data: null,
     });
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/typing" },
-    });
-
-    logger.error("Failed to get typing progress", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to get typing progress" },
-      { status: 500 },
-    );
-  }
-}
-
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
   }
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  return NextResponse.json({
+    success: true,
+    data: progress,
+  });
+});
 
-    const body: TypingProgress & { userId?: string } = await request.json();
+export const POST = pipe(
+  withSentry("/api/typing"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    if (body.userId && body.userId !== userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  const body: TypingProgress & { userId?: string } = await ctx.req.json();
 
-    const progress = {
-      ...body,
-      userId,
-    };
-
-    await saveTypingProgress(progress);
-
-    return NextResponse.json({
-      success: true,
-      message: "Typing progress saved",
-    });
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/typing" },
-    });
-
-    logger.error("Failed to save typing progress", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to save typing progress" },
-      { status: 500 },
-    );
-  }
-}
-
-export async function PATCH(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  if (body.userId && body.userId !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  const progress = {
+    ...body,
+    userId,
+  };
 
-    const body: Partial<TypingProgress> & { userId?: string } =
-      await request.json();
+  await saveTypingProgress(progress);
 
-    if (body.userId && body.userId !== userId) {
-      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
+  return NextResponse.json({
+    success: true,
+    message: "Typing progress saved",
+  });
+});
 
-    const existingProgress = await getTypingProgress(userId);
-    if (!existingProgress) {
-      return NextResponse.json(
-        { error: "Progress not found" },
-        { status: 404 },
-      );
-    }
+export const PATCH = pipe(
+  withSentry("/api/typing"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const updatedProgress = {
-      ...existingProgress,
-      ...body,
-    };
+  const body: Partial<TypingProgress> & { userId?: string } =
+    await ctx.req.json();
 
-    await saveTypingProgress(updatedProgress);
-
-    return NextResponse.json({
-      success: true,
-      message: "Typing progress updated",
-    });
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/typing" },
-    });
-
-    logger.error("Failed to update typing progress", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to update typing progress" },
-      { status: 500 },
-    );
+  if (body.userId && body.userId !== userId) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
-}
+
+  const existingProgress = await getTypingProgress(userId);
+  if (!existingProgress) {
+    return NextResponse.json({ error: "Progress not found" }, { status: 404 });
+  }
+
+  const updatedProgress = {
+    ...existingProgress,
+    ...body,
+  };
+
+  await saveTypingProgress(updatedProgress);
+
+  return NextResponse.json({
+    success: true,
+    message: "Typing progress updated",
+  });
+});
 
 async function getTypingProgress(
   _userId: string,

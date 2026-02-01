@@ -120,10 +120,6 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       currentStep: "welcome",
     });
 
-    const mockRequest = {
-      headers: new Headers({ "x-csrf-token": "valid-token" }),
-    } as NextRequest;
-
     const requestData = {
       data: {
         name: "Test User",
@@ -135,8 +131,14 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       isReplayMode: false,
     };
 
+    const mockRequest = new Request("http://localhost:3000/api/onboarding", {
+      method: "POST",
+      headers: { "x-csrf-token": "valid-token" },
+      body: JSON.stringify(requestData),
+    });
+
     // Call the endpoint
-    const response = await POST(mockRequest, requestData);
+    const response = (await POST(mockRequest as any)) as unknown as Response;
     const data = await response.json();
 
     expect(data.success).toBe(true);
@@ -164,7 +166,7 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       currentStep: "profile",
     });
 
-    const mockRequest = {
+    const _mockRequest = {
       headers: new Headers({ "x-csrf-token": "valid-token" }),
     } as NextRequest;
 
@@ -179,7 +181,13 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       isReplayMode: false,
     };
 
-    await POST(mockRequest, requestData);
+    const request = new Request("http://localhost:3000/api/onboarding", {
+      method: "POST",
+      headers: { "x-csrf-token": "valid-token" },
+      body: JSON.stringify(requestData),
+    });
+
+    await POST(request as any);
 
     // Verify assignBaseTier was not called for existing users
     expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
@@ -209,10 +217,6 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       currentStep: "welcome",
     });
 
-    const mockRequest = {
-      headers: new Headers({ "x-csrf-token": "valid-token" }),
-    } as NextRequest;
-
     const requestData = {
       data: {
         name: "Cookie Test User",
@@ -224,7 +228,13 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       isReplayMode: false,
     };
 
-    await POST(mockRequest, requestData);
+    const request = new Request("http://localhost:3000/api/onboarding", {
+      method: "POST",
+      headers: { "x-csrf-token": "valid-token" },
+      body: JSON.stringify(requestData),
+    });
+
+    await POST(request as any);
 
     // CRITICAL: Both cookies must be set
     const cookieCalls = mockCookiesSet.mock.calls;
@@ -269,7 +279,7 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       currentStep: "welcome",
     });
 
-    const mockRequest = {
+    const _mockRequest = {
       headers: new Headers({ "x-csrf-token": "valid-token" }),
     } as NextRequest;
 
@@ -284,8 +294,14 @@ describe("POST /api/onboarding - Base tier assignment on registration", () => {
       isReplayMode: false,
     };
 
+    const request = new Request("http://localhost:3000/api/onboarding", {
+      method: "POST",
+      headers: { "x-csrf-token": "valid-token" },
+      body: JSON.stringify(requestData),
+    });
+
     // Should not crash
-    const response = await POST(mockRequest, requestData);
+    const response = (await POST(request as any)) as unknown as Response;
     const data = await response.json();
     expect(data.success).toBe(true);
 

@@ -9,8 +9,8 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { withAdmin } from "@/lib/auth/middleware";
 import { logger } from "@/lib/logger";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/trial/analytics" });
 
@@ -34,7 +34,7 @@ interface TrialFunnelMetrics {
   avgToolsPerTrial: number;
 }
 
-async function getTrialAnalytics(): Promise<Response> {
+async function getTrialAnalytics(_ctx: unknown): Promise<Response> {
   try {
     // Get trial sessions created in last 30 days
     const thirtyDaysAgo = new Date();
@@ -179,4 +179,7 @@ function getDailyBreakdown(
 }
 
 // Admin-only endpoint
-export const GET = withAdmin(getTrialAnalytics);
+export const GET = pipe(
+  withSentry("/api/trial/analytics"),
+  withAdmin,
+)(getTrialAnalytics);

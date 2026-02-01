@@ -6,130 +6,110 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
-export async function GET(request: Request) {
-  try {
-    // Require admin authentication for dashboard
-    const auth = await validateAdminAuth();
+export const GET = pipe(
+  withSentry("/api/dashboard/voice-metrics"),
+  withAdmin,
+)(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
+  const days = parseInt(searchParams.get("days") ?? "7", 10);
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() - days);
 
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    if (!auth.isAdmin) {
-      return NextResponse.json(
-        { error: "Forbidden: Admin access required" },
-        { status: 403 },
-      );
-    }
-
-    const { searchParams } = new URL(request.url);
-    const days = parseInt(searchParams.get("days") ?? "7", 10);
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - days);
-
-    // F-06: Exclude test data from voice metrics statistics
-    // Get voice-related events from telemetry
-    const [voiceEvents, ttsEvents, realtimeEvents] = await Promise.all([
-      // Voice input/transcription events (exclude test data)
-      prisma.telemetryEvent.findMany({
-        where: {
-          category: "voice",
-          timestamp: { gte: startDate },
-          isTestData: false,
-        },
-        select: {
-          action: true,
-          value: true,
-          timestamp: true,
-        },
-      }),
-      // TTS events (exclude test data)
-      prisma.telemetryEvent.findMany({
-        where: {
-          category: "ai",
-          action: "tts_generation",
-          timestamp: { gte: startDate },
-          isTestData: false,
-        },
-        select: {
-          value: true,
-          timestamp: true,
-        },
-      }),
-      // Realtime session events (exclude test data)
-      prisma.telemetryEvent.findMany({
-        where: {
-          category: "realtime",
-          timestamp: { gte: startDate },
-          isTestData: false,
-        },
-        select: {
-          action: true,
-          value: true,
-          timestamp: true,
-        },
-      }),
-    ]);
-
-    // Calculate metrics
-    const voiceSessions = voiceEvents.filter(
-      (e) => e.action === "session_started",
-    ).length;
-    const voiceMinutes =
-      voiceEvents
-        .filter((e) => e.action === "session_duration")
-        .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
-
-    const ttsGenerations = ttsEvents.length;
-    const ttsCharacters = ttsEvents.reduce((sum, e) => sum + (e.value || 0), 0);
-
-    const realtimeSessions = realtimeEvents.filter(
-      (e) => e.action === "session_started",
-    ).length;
-    const realtimeMinutes =
-      realtimeEvents
-        .filter((e) => e.action === "session_duration")
-        .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
-
-    // Daily breakdown
-    const dailySessions: Record<string, number> = {};
-    for (const event of [...voiceEvents, ...realtimeEvents]) {
-      if (event.action === "session_started") {
-        const day = event.timestamp.toISOString().split("T")[0];
-        dailySessions[day] = (dailySessions[day] || 0) + 1;
-      }
-    }
-
-    return NextResponse.json({
-      period: { days, startDate: startDate.toISOString() },
-      voice: {
-        totalSessions: voiceSessions,
-        totalMinutes: Math.round(voiceMinutes * 10) / 10,
-        avgSessionMinutes:
-          voiceSessions > 0
-            ? Math.round((voiceMinutes / voiceSessions) * 10) / 10
-            : 0,
+  // F-06: Exclude test data from voice metrics statistics
+  // Get voice-related events from telemetry
+  const [voiceEvents, ttsEvents, realtimeEvents] = await Promise.all([
+    // Voice input/transcription events (exclude test data)
+    prisma.telemetryEvent.findMany({
+      where: {
+        category: "voice",
+        timestamp: { gte: startDate },
+        isTestData: false,
       },
-      tts: {
-        totalGenerations: ttsGenerations,
-        totalCharacters: ttsCharacters,
-        avgCharactersPerGeneration:
-          ttsGenerations > 0 ? Math.round(ttsCharacters / ttsGenerations) : 0,
+      select: {
+        action: true,
+        value: true,
+        timestamp: true,
       },
-      realtime: {
-        totalSessions: realtimeSessions,
-        totalMinutes: Math.round(realtimeMinutes * 10) / 10,
+    }),
+    // TTS events (exclude test data)
+    prisma.telemetryEvent.findMany({
+      where: {
+        category: "ai",
+        action: "tts_generation",
+        timestamp: { gte: startDate },
+        isTestData: false,
       },
-      dailySessions,
-    });
-  } catch (error) {
-    logger.error("Dashboard voice-metrics error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to fetch voice metrics" },
-      { status: 500 },
-    );
+      select: {
+        value: true,
+        timestamp: true,
+      },
+    }),
+    // Realtime session events (exclude test data)
+    prisma.telemetryEvent.findMany({
+      where: {
+        category: "realtime",
+        timestamp: { gte: startDate },
+        isTestData: false,
+      },
+      select: {
+        action: true,
+        value: true,
+        timestamp: true,
+      },
+    }),
+  ]);
+
+  // Calculate metrics
+  const voiceSessions = voiceEvents.filter(
+    (e) => e.action === "session_started",
+  ).length;
+  const voiceMinutes =
+    voiceEvents
+      .filter((e) => e.action === "session_duration")
+      .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
+
+  const ttsGenerations = ttsEvents.length;
+  const ttsCharacters = ttsEvents.reduce((sum, e) => sum + (e.value || 0), 0);
+
+  const realtimeSessions = realtimeEvents.filter(
+    (e) => e.action === "session_started",
+  ).length;
+  const realtimeMinutes =
+    realtimeEvents
+      .filter((e) => e.action === "session_duration")
+      .reduce((sum, e) => sum + (e.value || 0), 0) / 60;
+
+  // Daily breakdown
+  const dailySessions: Record<string, number> = {};
+  for (const event of [...voiceEvents, ...realtimeEvents]) {
+    if (event.action === "session_started") {
+      const day = event.timestamp.toISOString().split("T")[0];
+      dailySessions[day] = (dailySessions[day] || 0) + 1;
+    }
   }
-}
+
+  return NextResponse.json({
+    period: { days, startDate: startDate.toISOString() },
+    voice: {
+      totalSessions: voiceSessions,
+      totalMinutes: Math.round(voiceMinutes * 10) / 10,
+      avgSessionMinutes:
+        voiceSessions > 0
+          ? Math.round((voiceMinutes / voiceSessions) * 10) / 10
+          : 0,
+    },
+    tts: {
+      totalGenerations: ttsGenerations,
+      totalCharacters: ttsCharacters,
+      avgCharactersPerGeneration:
+        ttsGenerations > 0 ? Math.round(ttsCharacters / ttsGenerations) : 0,
+    },
+    realtime: {
+      totalSessions: realtimeSessions,
+      totalMinutes: Math.round(realtimeMinutes * 10) / 10,
+    },
+    dailySessions,
+  });
+});

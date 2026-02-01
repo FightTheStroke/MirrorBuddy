@@ -90,7 +90,8 @@ describe("GET /api/user - Base tier assignment on registration", () => {
     });
 
     // Call the endpoint
-    const response = await GET();
+    const request = new Request("http://localhost:3000/api/user");
+    const response = (await GET(request as any)) as unknown as Response;
     const data = await response.json();
 
     // Verify user was created
@@ -119,7 +120,8 @@ describe("GET /api/user - Base tier assignment on registration", () => {
     mockUserFindUnique.mockResolvedValue(mockUser);
 
     // Call the endpoint
-    await GET();
+    const request = new Request("http://localhost:3000/api/user");
+    await GET(request as any);
 
     // Verify assignBaseTier was not called for existing users
     expect(mockAssignBaseTierToNewUser).not.toHaveBeenCalled();
@@ -145,7 +147,8 @@ describe("GET /api/user - Base tier assignment on registration", () => {
     mockAssignBaseTierToNewUser.mockResolvedValue(null); // Null indicates tier assignment failed
 
     // Call the endpoint - should not crash
-    const response = await GET();
+    const request = new Request("http://localhost:3000/api/user");
+    const response = (await GET(request as any)) as unknown as Response;
     const data = await response.json();
 
     // Verify user was created even without subscription

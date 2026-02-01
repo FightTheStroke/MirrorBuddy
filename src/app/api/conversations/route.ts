@@ -4,41 +4,32 @@
 // POST: Create new conversation
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { prisma, isDatabaseNotInitialized } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { getRequestId } from "@/lib/tracing";
 import { ConversationCreateSchema } from "@/lib/validation/schemas/conversations";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
 import type { Conversation, Message } from "@prisma/client";
-import * as Sentry from "@sentry/nextjs";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
-export async function GET(request: NextRequest) {
+export const GET = pipe(
+  withSentry("/api/conversations"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+
+  const { searchParams } = new URL(ctx.req.url);
+  const page = parseInt(searchParams.get("page") || "1");
+  const limit = parseInt(searchParams.get("limit") || "20");
+  const maestroId = searchParams.get("maestroId");
+  const activeOnly = searchParams.get("active") === "true";
+
+  const where = {
+    userId,
+    ...(maestroId && { maestroId }),
+    ...(activeOnly && { isActive: true }),
+  };
+
   try {
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json(
-        { error: auth.error || "No user" },
-        { status: 401 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-    const userId = auth.userId;
-
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get("page") || "1");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const maestroId = searchParams.get("maestroId");
-    const activeOnly = searchParams.get("active") === "true";
-
-    const where = {
-      userId,
-      ...(maestroId && { maestroId }),
-      ...(activeOnly && { isActive: true }),
-    };
-
     // Get total count for pagination
     const total = await prisma.conversation.count({ where });
 
@@ -68,7 +59,7 @@ export async function GET(request: NextRequest) {
       }),
     );
 
-    const response = NextResponse.json({
+    return NextResponse.json({
       items,
       pagination: {
         page,
@@ -79,101 +70,59 @@ export async function GET(request: NextRequest) {
         hasPrevPage: page > 1,
       },
     });
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/conversations" },
-    });
-
     logger.error("Conversations GET error", { error: String(error) });
 
     if (isDatabaseNotInitialized(error)) {
-      const response = NextResponse.json(
+      return NextResponse.json(
         {
           error: "Database not initialized",
           message: "Run: npx prisma db push",
         },
         { status: 503 },
       );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
     }
 
-    const response = NextResponse.json(
+    return NextResponse.json(
       { error: "Failed to get conversations" },
       { status: 500 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
   }
-}
+});
 
-export async function POST(request: NextRequest) {
-  try {
-    if (!requireCSRF(request)) {
-      return NextResponse.json(
-        { error: "Invalid CSRF token" },
-        { status: 403 },
-      );
-    }
+export const POST = pipe(
+  withSentry("/api/conversations"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      const response = NextResponse.json(
-        { error: auth.error || "No user" },
-        { status: 401 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-    const userId = auth.userId;
+  const body = await ctx.req.json();
 
-    const body = await request.json();
-
-    // #92: Validate with Zod before processing
-    const validation = ConversationCreateSchema.safeParse(body);
-    if (!validation.success) {
-      const response = NextResponse.json(
-        {
-          error: "Invalid conversation data",
-          details: validation.error.issues.map((i) => i.message),
-        },
-        { status: 400 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
-
-    const data = validation.data;
-
-    const conversation = await prisma.conversation.create({
-      data: {
-        userId,
-        maestroId: data.maestroId,
-        title: data.title,
+  // #92: Validate with Zod before processing
+  const validation = ConversationCreateSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(
+      {
+        error: "Invalid conversation data",
+        details: validation.error.issues.map((i) => i.message),
       },
-    });
-
-    const response = NextResponse.json({
-      ...conversation,
-      topics: JSON.parse(conversation.topics || "[]"),
-    });
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/conversations" },
-    });
-
-    logger.error("Conversations POST error", { error: String(error) });
-    const response = NextResponse.json(
-      { error: "Failed to create conversation" },
-      { status: 500 },
+      { status: 400 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
   }
-}
+
+  const data = validation.data;
+
+  const conversation = await prisma.conversation.create({
+    data: {
+      userId,
+      maestroId: data.maestroId,
+      title: data.title,
+    },
+  });
+
+  return NextResponse.json({
+    ...conversation,
+    topics: JSON.parse(conversation.topics || "[]"),
+  });
+});

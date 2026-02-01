@@ -3,15 +3,15 @@
 // Kid-friendly filtered search using Bing Safe Search
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import * as Sentry from "@sentry/nextjs";
 import {
   checkRateLimit,
   getClientIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Blocked domains that are inappropriate for educational context
 const BLOCKED_DOMAINS = [
@@ -90,17 +90,16 @@ interface SafeSearchResponse {
   safeSearchEnabled: boolean;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public safe search; no cookie auth, rate-limited
-export async function POST(request: NextRequest) {
+export const POST = pipe(withSentry("/api/search"))(async (ctx) => {
   // Rate limit check
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`search:${clientId}`, RATE_LIMITS.SEARCH);
   if (!rateLimit.success) {
     return rateLimitResponse(rateLimit);
   }
 
   try {
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { query, subject, maxResults = 5 } = body;
 
     if (!query || typeof query !== "string") {
@@ -196,18 +195,13 @@ export async function POST(request: NextRequest) {
       safeSearchEnabled: true,
     } as SafeSearchResponse);
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/search" },
-    });
-
     logger.error("Safe search error", { error: String(error) });
     return NextResponse.json(
       { error: "Search failed", message: String(error) },
       { status: 500 },
     );
   }
-}
+});
 
 // Fallback results when no API key is configured
 function getFallbackResults(query: string, subject?: string): SearchResult[] {

@@ -5,10 +5,9 @@
  * GET: Check remaining voice time for trial users
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies, headers } from "next/headers";
 import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
 import {
   getOrCreateTrialSession,
   checkTrialLimits,
@@ -19,6 +18,7 @@ import { validateAuth } from "@/lib/auth/session-auth";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import { isSessionBlocked } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/trial/voice" });
 
@@ -28,12 +28,10 @@ const log = logger.child({ module: "api/trial/voice" });
  * Reports voice session duration for trial users.
  * Called when a voice session ends.
  */
-export async function POST(request: NextRequest) {
-  // CSRF validation
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
+export const POST = pipe(
+  withSentry("/api/trial/voice"),
+  withCSRF,
+)(async (ctx) => {
   try {
     // Check if authenticated user (skip trial tracking)
     const auth = await validateAuth();
@@ -85,7 +83,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Parse request body
-    const body = await request.json();
+    const body = await ctx.req.json();
     const { durationSeconds } = body;
 
     if (typeof durationSeconds !== "number" || durationSeconds < 0) {
@@ -120,14 +118,14 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 
 /**
  * GET /api/trial/voice
  *
  * Check if voice is allowed for trial users and get remaining time.
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/trial/voice"))(async () => {
   try {
     // Check if authenticated user (no trial limits)
     const auth = await validateAuth();
@@ -186,4 +184,4 @@ export async function GET() {
       { status: 500 },
     );
   }
-}
+});

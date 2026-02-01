@@ -18,6 +18,7 @@
 import { NextResponse } from "next/server";
 import { CRITICAL_ASSETS, captureMessage } from "@/lib/sentry";
 import * as Sentry from "@sentry/nextjs";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -30,89 +31,91 @@ interface AssetCheckResult {
   latencyMs?: number;
 }
 
-export async function GET(): Promise<NextResponse> {
-  const startTime = Date.now();
-  const results: AssetCheckResult[] = [];
+export const GET = pipe(withSentry("/api/health/assets"))(
+  async (): Promise<NextResponse> => {
+    const startTime = Date.now();
+    const results: AssetCheckResult[] = [];
 
-  // Get base URL from environment or use relative paths
-  const baseUrl = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+    // Get base URL from environment or use relative paths
+    const baseUrl = process.env.VERCEL_URL
+      ? `https://${process.env.VERCEL_URL}`
+      : process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
-  // Check each critical asset
-  await Promise.all(
-    CRITICAL_ASSETS.map(async (asset) => {
-      const assetStart = Date.now();
-      try {
-        const response = await fetch(`${baseUrl}${asset}`, {
-          method: "HEAD",
-          cache: "no-cache",
-          // Short timeout to fail fast
-          signal: AbortSignal.timeout(5000),
-        });
+    // Check each critical asset
+    await Promise.all(
+      CRITICAL_ASSETS.map(async (asset) => {
+        const assetStart = Date.now();
+        try {
+          const response = await fetch(`${baseUrl}${asset}`, {
+            method: "HEAD",
+            cache: "no-cache",
+            // Short timeout to fail fast
+            signal: AbortSignal.timeout(5000),
+          });
 
-        results.push({
-          asset,
-          status: response.ok ? "pass" : "fail",
-          httpStatus: response.status,
-          latencyMs: Date.now() - assetStart,
-        });
-      } catch (error) {
-        // Report error to Sentry for monitoring and alerts
-        Sentry.captureException(error, {
-          tags: { api: "/api/health/assets" },
-        });
+          results.push({
+            asset,
+            status: response.ok ? "pass" : "fail",
+            httpStatus: response.status,
+            latencyMs: Date.now() - assetStart,
+          });
+        } catch (error) {
+          // Report error to Sentry for monitoring and alerts
+          Sentry.captureException(error, {
+            tags: { api: "/api/health/assets" },
+          });
 
-        results.push({
-          asset,
-          status: "fail",
-          error: error instanceof Error ? error.message : "Unknown error",
-          latencyMs: Date.now() - assetStart,
-        });
-      }
-    }),
-  );
+          results.push({
+            asset,
+            status: "fail",
+            error: error instanceof Error ? error.message : "Unknown error",
+            latencyMs: Date.now() - assetStart,
+          });
+        }
+      }),
+    );
 
-  const failures = results.filter((r) => r.status === "fail");
-  const allPassed = failures.length === 0;
+    const failures = results.filter((r) => r.status === "fail");
+    const allPassed = failures.length === 0;
 
-  // Report failures to Sentry
-  if (!allPassed) {
-    captureMessage(
-      `Critical assets health check failed: ${failures.length}/${results.length}`,
-      "error",
-      {
-        errorType: "health-check-assets",
-        tags: {
-          failureCount: String(failures.length),
-          totalAssets: String(results.length),
+    // Report failures to Sentry
+    if (!allPassed) {
+      captureMessage(
+        `Critical assets health check failed: ${failures.length}/${results.length}`,
+        "error",
+        {
+          errorType: "health-check-assets",
+          tags: {
+            failureCount: String(failures.length),
+            totalAssets: String(results.length),
+          },
+          extra: {
+            failures,
+            baseUrl,
+            checkDurationMs: Date.now() - startTime,
+          },
         },
-        extra: {
-          failures,
-          baseUrl,
-          checkDurationMs: Date.now() - startTime,
+      );
+    }
+
+    return NextResponse.json(
+      {
+        status: allPassed ? "healthy" : "unhealthy",
+        timestamp: new Date().toISOString(),
+        summary: {
+          total: results.length,
+          passed: results.filter((r) => r.status === "pass").length,
+          failed: failures.length,
+        },
+        assets: results,
+        checkDurationMs: Date.now() - startTime,
+      },
+      {
+        status: allPassed ? 200 : 503,
+        headers: {
+          "Cache-Control": "no-store, max-age=0",
         },
       },
     );
-  }
-
-  return NextResponse.json(
-    {
-      status: allPassed ? "healthy" : "unhealthy",
-      timestamp: new Date().toISOString(),
-      summary: {
-        total: results.length,
-        passed: results.filter((r) => r.status === "pass").length,
-        failed: failures.length,
-      },
-      assets: results,
-      checkDurationMs: Date.now() - startTime,
-    },
-    {
-      status: allPassed ? 200 : 503,
-      headers: {
-        "Cache-Control": "no-store, max-age=0",
-      },
-    },
-  );
-}
+  },
+);
