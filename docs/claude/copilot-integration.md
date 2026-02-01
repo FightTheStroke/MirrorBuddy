@@ -18,13 +18,13 @@ gates. This document explains what works, what doesn't, and how to use it.
 | Write/edit code      | Standard Copilot capabilities                   |
 | Run tests            | `npm run test:unit`, E2E suites                 |
 | Conventional commits | Follows rules from copilot-instructions.md      |
+| PreToolUse hooks     | `~/.copilot/hooks.json` + enforce-standards.sh  |
 
 ## What Copilot CLI CANNOT Do
 
 | Capability         | Why Not              | Workaround                       |
 | ------------------ | -------------------- | -------------------------------- |
 | Spawn subagents    | No Task tool         | Use bash scripts directly        |
-| PreToolUse hooks   | Claude Code-specific | Manual discipline                |
 | Skills/commands    | Claude Code-specific | Rules in copilot-instructions.md |
 | Dashboard UI       | Separate service     | `plan-db.sh kanban` in terminal  |
 | Parallel execution | Single-threaded      | Sequential task execution        |
@@ -125,19 +125,33 @@ git commit -m "feat: description of change"
 | `build-digest.sh`   | Build with error capture           |
 | `test-digest.sh`    | Test runner with fails-only output |
 
-## Limitations vs Claude Code
+## Enforcement Hooks (Active)
 
-1. **No enforcement**: Copilot won't be blocked from running `git diff`
-   or `npm run lint` directly. The digest scripts are recommendations,
-   not enforced via hooks.
+Copilot CLI supports preToolUse hooks, same architecture as Claude Code.
+Config: `~/.copilot/hooks.json` + `~/.copilot/hooks/enforce-standards.sh`
 
-2. **No context isolation**: Copilot doesn't start fresh per task.
+**What gets blocked (same as Claude Code):**
+
+- `git diff` (except `--stat`) -> use `git-digest.sh` / `diff-digest.sh`
+- `git status` / `git log` -> use `git-digest.sh`
+- `npm run lint|typecheck|build` -> use `ci-summary.sh --quick`
+- `npm install|ci` -> use `npm-digest.sh install`
+- `npm audit` -> use `audit-digest.sh`
+- `gh run view|pr view` -> use `service-digest.sh ci|pr`
+- `npx vitest|jest|playwright` -> use `test-digest.sh`
+- `prisma migrate` -> use `migration-digest.sh`
+
+**Hook output format**: JSON `{"permissionDecision":"deny","permissionDecisionReason":"..."}`
+
+## Remaining Limitations vs Claude Code
+
+1. **No context isolation**: Copilot doesn't start fresh per task.
    Be mindful of context accumulation on long sessions.
 
-3. **No model routing**: Copilot uses whichever model you select.
+2. **No model routing**: Copilot uses whichever model you select.
    Claude Code routes tasks to Sonnet/Opus based on complexity.
 
-4. **No parallel execution**: Can't spawn multiple agents.
+3. **No parallel execution**: Can't spawn multiple agents.
    Execute tasks sequentially within a wave.
 
 ## What Copilot Gets Automatically
@@ -153,8 +167,8 @@ The `.github/copilot-instructions.md` file includes:
 - Plan execution workflow (7-step TDD process)
 - ADR references for key architectural decisions
 
-This means Copilot has the same knowledge as Claude Code for MirrorBuddy
-code and documentation, minus the enforcement layer (hooks).
+Combined with preToolUse hooks (`~/.copilot/hooks.json`), Copilot CLI
+now has the same knowledge AND enforcement as Claude Code for MirrorBuddy.
 
 ## Best Practice
 
