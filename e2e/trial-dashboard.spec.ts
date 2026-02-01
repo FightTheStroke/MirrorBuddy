@@ -133,7 +133,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Trial badge is a Link with data-testid in the locale header
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -153,7 +153,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
     await expect(trialBadge).toBeVisible({ timeout: 15000 });
@@ -164,7 +164,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
     await expect(trialBadge).toBeVisible({ timeout: 15000 });
@@ -182,7 +182,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
     await expect(trialBadge).toBeVisible({ timeout: 15000 });
@@ -201,7 +201,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
     await expect(trialBadge).toBeVisible({ timeout: 15000 });
@@ -214,7 +214,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
     await expect(trialBadge).toBeVisible({ timeout: 15000 });
@@ -256,7 +256,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("networkidle");
+    await trialPage.waitForLoadState("domcontentloaded");
 
     // Wait for page to fully hydrate
     await trialPage.waitForTimeout(3000);

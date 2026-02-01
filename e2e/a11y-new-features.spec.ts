@@ -115,7 +115,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     // Extra wait for full hydration
     await page.waitForTimeout(3000);
 
@@ -404,7 +404,7 @@ test.describe("A11y Features Integration", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     // Tab to skip link

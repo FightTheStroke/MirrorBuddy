@@ -174,7 +174,7 @@ test.describe("Signed Cookie Authentication", () => {
   }) => {
     // Create a user through normal flow first to get a real user ID
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Get the signed cookie from browser context
     const cookies = await context.cookies();
@@ -215,7 +215,7 @@ test.describe("Signed Cookie Authentication", () => {
 
     // Navigate to user endpoint
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Should have set signed cookie in browser context
     const cookies = await context.cookies();
@@ -231,7 +231,7 @@ test.describe("Cookie Security Properties", () => {
   test("Cookie has correct security flags", async ({ page, context }) => {
     // Create user via browser navigation
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // Check cookie properties from browser context
     const cookies = await context.cookies();
@@ -250,7 +250,7 @@ test.describe("Cookie Security Properties", () => {
   test("Signature format is consistent", async ({ page, context }) => {
     // Create user via browser navigation
     await page.goto("/api/user");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     const cookies = await context.cookies();
     const userCookie = cookies.find((c) => c.name === "mirrorbuddy-user-id");

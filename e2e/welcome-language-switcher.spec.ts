@@ -160,7 +160,7 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     test.setTimeout(300000);
 
     await page.goto("/it/welcome");
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     // Select Spanish
@@ -186,7 +186,7 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     expect(localeCookie?.value).toBe("es");
 
     // Wait for page to settle before navigating
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 
     // If redirect didn't happen, navigate manually to test persistence

@@ -166,7 +166,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     const mainCountBefore = await page.locator("main").count();

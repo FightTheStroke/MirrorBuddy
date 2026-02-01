@@ -141,7 +141,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
 
   test("profile buttons accessible with keyboard", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     await openA11yPanel(page);

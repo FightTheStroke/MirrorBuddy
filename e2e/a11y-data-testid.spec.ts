@@ -47,7 +47,7 @@ test.describe("Skip Link - data-testid Selectors", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');
@@ -286,7 +286,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
 
   test("close button closes panel", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 
     const { panel } = await openA11yPanel(page);
@@ -440,7 +440,7 @@ test.describe("A11y Features Integration with data-testid", () => {
 
   test("all accessibility elements have testids", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');

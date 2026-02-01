@@ -296,7 +296,7 @@ test.describe("Color Contrast - All Locales", () => {
     "homepage has sufficient color contrast",
     async ({ localePage }) => {
       await localePage.goto("/");
-      await localePage.page.waitForLoadState("networkidle");
+      await localePage.page.waitForLoadState("domcontentloaded");
       // Extra wait for CSS animations and font loading in CI
       await localePage.page.waitForTimeout(2000);
 

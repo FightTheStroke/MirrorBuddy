@@ -97,7 +97,7 @@ test.describe("WCAG 2.1 AA Compliance", () => {
 test.describe("Keyboard Navigation", () => {
   test("can navigate homepage with keyboard only", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     const focusableSelector =
@@ -570,7 +570,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/welcome"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(3000);
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
@@ -601,7 +601,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
     );
 
     // Extra stabilization before reload
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 
     await page.reload({ waitUntil: "networkidle" });

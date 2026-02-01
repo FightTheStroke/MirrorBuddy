@@ -184,7 +184,7 @@ test.describe("iPad Mini Responsive UX", () => {
     }
 
     // Wait for page to be fully loaded before interacting
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
     // First check if hamburger menu button exists and is visible
     const menuButton = page

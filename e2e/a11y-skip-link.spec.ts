@@ -98,7 +98,7 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
     test.setTimeout(300000);
 
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
     // Extra wait for full hydration
     await page.waitForTimeout(3000);
 
