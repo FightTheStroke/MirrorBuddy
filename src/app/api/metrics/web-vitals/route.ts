@@ -167,6 +167,7 @@ async function pushToGrafana(payload: WebVitalsPayload): Promise<void> {
  * Accept Web Vitals data and push to Grafana Cloud
  */
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public metrics endpoint, no session auth, rate-limited by IP
 export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
   // Rate limiting: 60 req/min per IP (F-05 protection)
   const clientId = getClientIdentifier(ctx.req);
@@ -194,7 +195,17 @@ export const POST = pipe(withSentry("/api/metrics/web-vitals"))(async (ctx) => {
   }
 
   // Push to Grafana immediately (no batching)
-  await pushToGrafana(body);
+  try {
+    await pushToGrafana(body);
+  } catch (error) {
+    logger.error("Failed to push Web Vitals to Grafana", {
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return NextResponse.json(
+      { error: "Failed to process metrics" },
+      { status: 500 },
+    );
+  }
 
   return NextResponse.json(
     { success: true, count: body.metrics.length },
