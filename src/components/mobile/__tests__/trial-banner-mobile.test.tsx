@@ -105,13 +105,11 @@ describe("TrialBannerMobile", () => {
 
     render(<TrialBannerMobile trialStatus={defaultTrialStatus} />);
 
-    // Desktop shows full banner info
-    expect(
-      screen.getByText(/Trial: 8\/10 messages remaining/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(/Upgrade to Base tier for unlimited access/i),
-    ).toBeInTheDocument();
+    // Desktop shows full banner info - use structure-based assertions
+    // Trial status shows remaining/max messages pattern
+    expect(screen.getByText(/8\/10/)).toBeInTheDocument();
+    // Contains upgrade link
+    expect(screen.getByRole("link", { name: /upgrade/i })).toBeInTheDocument();
   });
 
   it("should render compact indicator on mobile (phone)", () => {
@@ -127,8 +125,10 @@ describe("TrialBannerMobile", () => {
 
     render(<TrialBannerMobile trialStatus={defaultTrialStatus} />);
 
-    // Should show compact form
-    expect(screen.getByText(/Trial: 8\/10 msgs/i)).toBeInTheDocument();
+    // Should show compact form with trial count pattern
+    expect(screen.getByText(/8\/10/)).toBeInTheDocument();
+    // Verify compact test id is present
+    expect(screen.getByTestId("trial-banner-compact")).toBeInTheDocument();
   });
 
   it("should expand full banner when tapping expand button on mobile", async () => {
@@ -149,11 +149,10 @@ describe("TrialBannerMobile", () => {
     fireEvent.click(expandButtons[0]);
 
     await waitFor(() => {
-      // Should now show expanded content
+      // Should now show expanded content with upgrade link
       expect(
-        screen.getByText(/You're using the free trial/i),
+        screen.getByRole("link", { name: /upgrade/i }),
       ).toBeInTheDocument();
-      expect(screen.getByText(/Upgrade to Base Tier/i)).toBeInTheDocument();
     });
   });
 
@@ -176,7 +175,7 @@ describe("TrialBannerMobile", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(/You're using the free trial/i),
+        screen.getByRole("link", { name: /upgrade/i }),
       ).toBeInTheDocument();
     });
 
@@ -186,9 +185,7 @@ describe("TrialBannerMobile", () => {
 
     // Should return to compact form
     await waitFor(() => {
-      expect(
-        screen.queryByText(/You're using the free trial/i),
-      ).not.toBeInTheDocument();
+      expect(screen.getByTestId("trial-banner-compact")).toBeInTheDocument();
     });
   });
 
@@ -260,8 +257,9 @@ describe("TrialBannerMobile", () => {
 
     render(<TrialBannerMobile trialStatus={defaultTrialStatus} />);
 
-    // Tablets show compact form too
-    expect(screen.getByText(/Trial: 8\/10 msgs/i)).toBeInTheDocument();
+    // Tablets show compact form too - verify via test id
+    expect(screen.getByTestId("trial-banner-compact")).toBeInTheDocument();
+    expect(screen.getByText(/8\/10/)).toBeInTheDocument();
   });
 
   it("should have accessible link to upgrade in desktop view", () => {

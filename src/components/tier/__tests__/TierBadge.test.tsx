@@ -4,6 +4,9 @@
  * Tests for tier-level indicator badge component.
  * Verifies rendering of tier badges with appropriate styling.
  *
+ * i18n-agnostic: Tier names (Pro, Base, Trial) are tier code identifiers
+ * from mock data, not user-facing translated strings.
+ *
  * @vitest-environment jsdom
  */
 

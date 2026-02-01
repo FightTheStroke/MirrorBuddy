@@ -13,6 +13,7 @@ import {
   act,
 } from "@testing-library/react";
 import { DirectInviteModal } from "../direct-invite-modal";
+import { getTranslation } from "@/test/i18n-helpers";
 
 // Mock csrfFetch
 const mockCsrfFetch = vi.fn();
@@ -45,15 +46,27 @@ describe("DirectInviteModal", () => {
   it("does not render when closed", () => {
     render(<DirectInviteModal isOpen={false} onClose={vi.fn()} />);
 
-    expect(screen.queryByText("Invito diretto")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(
+        getTranslation("admin.components.directInviteModal.titleCreate"),
+      ),
+    ).not.toBeInTheDocument();
   });
 
   it("renders form when open", () => {
     render(<DirectInviteModal isOpen={true} onClose={vi.fn()} />);
 
-    expect(screen.getByText("Invito diretto")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        getTranslation("admin.components.directInviteModal.titleCreate"),
+      ),
+    ).toBeInTheDocument();
     expect(screen.getByLabelText("Email *")).toBeInTheDocument();
-    expect(screen.getByLabelText("Nome (opzionale)")).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(
+        getTranslation("admin.components.directInviteModal.nameLabel"),
+      ),
+    ).toBeInTheDocument();
   });
 
   it("submits form with email only", async () => {
@@ -62,7 +75,9 @@ describe("DirectInviteModal", () => {
     const emailInput = screen.getByLabelText("Email *");
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -80,12 +95,16 @@ describe("DirectInviteModal", () => {
     render(<DirectInviteModal isOpen={true} onClose={vi.fn()} />);
 
     const emailInput = screen.getByLabelText("Email *");
-    const nameInput = screen.getByLabelText("Nome (opzionale)");
+    const nameInput = screen.getByLabelText(
+      getTranslation("admin.components.directInviteModal.nameLabel"),
+    );
 
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
     fireEvent.change(nameInput, { target: { value: "Test User" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -108,11 +127,17 @@ describe("DirectInviteModal", () => {
     const emailInput = screen.getByLabelText("Email *");
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(screen.getByText("Utente creato")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("admin.components.directInviteModal.titleSuccess"),
+        ),
+      ).toBeInTheDocument();
     });
     expect(screen.getByText("testuser1a2b")).toBeInTheDocument();
   });
@@ -128,7 +153,9 @@ describe("DirectInviteModal", () => {
     const emailInput = screen.getByLabelText("Email *");
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -140,7 +167,9 @@ describe("DirectInviteModal", () => {
     const onClose = vi.fn();
     render(<DirectInviteModal isOpen={true} onClose={onClose} />);
 
-    const cancelButton = screen.getByRole("button", { name: "Annulla" });
+    const cancelButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.cancel"),
+    });
     fireEvent.click(cancelButton);
 
     expect(onClose).toHaveBeenCalled();
@@ -159,7 +188,9 @@ describe("DirectInviteModal", () => {
     const emailInput = screen.getByLabelText("Email *");
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -173,7 +204,9 @@ describe("DirectInviteModal", () => {
     const emailInput = screen.getByLabelText("Email *");
     fireEvent.change(emailInput, { target: { value: "test@example.com" } });
 
-    const submitButton = screen.getByRole("button", { name: "Crea utente" });
+    const submitButton = screen.getByRole("button", {
+      name: getTranslation("admin.components.directInviteModal.createUser"),
+    });
     fireEvent.click(submitButton);
 
     await waitFor(() => {
@@ -181,7 +214,9 @@ describe("DirectInviteModal", () => {
     });
 
     vi.useFakeTimers();
-    const copyButton = screen.getByTitle("Copia username");
+    const copyButton = screen.getByTitle(
+      getTranslation("admin.components.directInviteModal.copyUsername"),
+    );
     fireEvent.click(copyButton);
 
     expect(navigator.clipboard.writeText).toHaveBeenCalledWith("testuser1a2b");

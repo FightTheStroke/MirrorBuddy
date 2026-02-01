@@ -5,28 +5,40 @@
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { SidebarNavigation, Collection, TagItem } from "../sidebar-navigation";
+import { getTranslation } from "@/test/i18n-helpers";
 
-// Mock next-intl to return Italian translations
-// Note: sidebar-navigation uses camelCase keys per ADR 0091
+// Mock next-intl to return Italian translations dynamically from actual i18n files
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      "sidebar.navigationAriaLabel": "Navigazione materiali",
-      "sidebar.quickFiltersTitle": "Filtri rapidi",
-      "sidebar.quickFiltersAriaLabel": "Filtri rapidi",
-      "sidebar.recent": "Recenti",
-      "sidebar.favorites": "Preferiti",
-      "sidebar.archived": "Archiviati",
-      "sidebar.collectionsTitle": "Cartelle",
-      "sidebar.collectionsAriaLabel": "Cartelle",
-      "sidebar.noCollections": "Nessuna cartella",
-      "sidebar.tagsTitle": "Tag",
-      "sidebar.tagsAriaLabel": "Tag",
-      "sidebar.noTags": "Nessun tag",
-      "sidebar.createCollectionAriaLabel": "Crea nuova cartella",
-      "sidebar.createTagAriaLabel": "Crea nuovo tag",
+    // Map component keys to actual translation paths
+    const keyMap: Record<string, string> = {
+      "sidebar.navigationAriaLabel":
+        "education.knowledgeHub.sidebar.navigationAriaLabel",
+      "sidebar.quickFiltersTitle":
+        "education.knowledgeHub.sidebar.quickFiltersTitle",
+      "sidebar.quickFiltersAriaLabel":
+        "education.knowledgeHub.sidebar.quickFiltersAriaLabel",
+      "sidebar.recent": "education.knowledgeHub.sidebar.recent",
+      "sidebar.favorites": "education.knowledgeHub.sidebar.favorites",
+      "sidebar.archived": "education.knowledgeHub.sidebar.archived",
+      "sidebar.collectionsTitle":
+        "education.knowledgeHub.sidebar.collectionsTitle",
+      "sidebar.collectionsAriaLabel":
+        "education.knowledgeHub.sidebar.collectionsAriaLabel",
+      "sidebar.noCollections": "education.knowledgeHub.sidebar.noCollections",
+      "sidebar.tagsTitle": "education.knowledgeHub.sidebar.tagsTitle",
+      "sidebar.tagsAriaLabel": "education.knowledgeHub.sidebar.tagsAriaLabel",
+      "sidebar.noTags": "education.knowledgeHub.sidebar.noTags",
+      "sidebar.createCollectionAriaLabel":
+        "education.knowledgeHub.sidebar.createCollectionAriaLabel",
+      "sidebar.createTagAriaLabel":
+        "education.knowledgeHub.sidebar.createTagAriaLabel",
     };
-    return translations[key] || key;
+    const translationKey = keyMap[key];
+    if (translationKey) {
+      return getTranslation(translationKey);
+    }
+    return key;
   },
 }));
 
@@ -67,7 +79,10 @@ describe("SidebarNavigation", () => {
 
       const nav = screen.getByRole("navigation");
       expect(nav).toBeInTheDocument();
-      expect(nav).toHaveAttribute("aria-label", "Navigazione materiali");
+      expect(nav).toHaveAttribute(
+        "aria-label",
+        getTranslation("education.knowledgeHub.sidebar.navigationAriaLabel"),
+      );
     });
 
     it("should render quick filters section", () => {
@@ -80,9 +95,21 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Filtri rapidi")).toBeInTheDocument();
-      expect(screen.getByText("Recenti")).toBeInTheDocument();
-      expect(screen.getByText("Preferiti")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.quickFiltersTitle"),
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.recent"),
+        ),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.favorites"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should render collections section header", () => {
@@ -95,7 +122,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Cartelle")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.collectionsTitle"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should render tags section header", () => {
@@ -108,7 +139,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Tag")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.tagsTitle"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should show empty state for collections", () => {
@@ -121,7 +156,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Nessuna cartella")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.noCollections"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should show empty state for tags", () => {
@@ -134,7 +173,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Nessun tag")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.noTags"),
+        ),
+      ).toBeInTheDocument();
     });
   });
 
@@ -149,6 +192,7 @@ describe("SidebarNavigation", () => {
         />,
       );
 
+      // Collections use mock data names (not i18n)
       expect(screen.getByText("Matematica")).toBeInTheDocument();
       expect(screen.getByText("Scienze")).toBeInTheDocument();
     });
@@ -212,9 +256,13 @@ describe("SidebarNavigation", () => {
       // Children not visible initially
       expect(screen.queryByText("Algebra")).not.toBeInTheDocument();
 
-      // Click expand button
-      const expandButton = screen.getByLabelText("Apri cartella");
-      fireEvent.click(expandButton);
+      // Find the treeitem with aria-expanded="false" and click its chevron button
+      const treeItems = screen.getAllByRole("treeitem");
+      const expandableItem = treeItems.find(
+        (item) => item.getAttribute("aria-expanded") === "false",
+      );
+      const expandButton = expandableItem?.querySelector("button");
+      if (expandButton) fireEvent.click(expandButton);
 
       // Children visible now
       expect(screen.getByText("Algebra")).toBeInTheDocument();
@@ -231,14 +279,21 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      // Expand
-      const expandButton = screen.getByLabelText("Apri cartella");
-      fireEvent.click(expandButton);
+      // Find the treeitem with aria-expanded="false" and click its chevron button
+      const treeItems = screen.getAllByRole("treeitem");
+      const expandableItem = treeItems.find(
+        (item) => item.getAttribute("aria-expanded") === "false",
+      );
+      const expandButton = expandableItem?.querySelector("button");
+      if (expandButton) fireEvent.click(expandButton);
       expect(screen.getByText("Algebra")).toBeInTheDocument();
 
-      // Collapse
-      const collapseButton = screen.getByLabelText("Chiudi cartella");
-      fireEvent.click(collapseButton);
+      // Collapse - find item with aria-expanded="true" and click its chevron button
+      const expandedItem = screen
+        .getAllByRole("treeitem")
+        .find((item) => item.getAttribute("aria-expanded") === "true");
+      const collapseButton = expandedItem?.querySelector("button");
+      if (collapseButton) fireEvent.click(collapseButton);
       expect(screen.queryByText("Algebra")).not.toBeInTheDocument();
     });
   });
@@ -254,6 +309,7 @@ describe("SidebarNavigation", () => {
         />,
       );
 
+      // Tags use mock data names (not i18n)
       expect(screen.getByText("Importante")).toBeInTheDocument();
       expect(screen.getByText("Da rivedere")).toBeInTheDocument();
       expect(screen.getByText("Esame")).toBeInTheDocument();
@@ -311,7 +367,7 @@ describe("SidebarNavigation", () => {
   });
 
   describe("Quick Filters", () => {
-    it("should call onSelectCollection with null for Recenti", () => {
+    it("should call onSelectCollection with null for Recent filter", () => {
       const onSelectCollection = vi.fn();
       render(
         <SidebarNavigation
@@ -322,11 +378,15 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      fireEvent.click(screen.getByText("Recenti"));
+      fireEvent.click(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.recent"),
+        ),
+      );
       expect(onSelectCollection).toHaveBeenCalledWith(null);
     });
 
-    it("should call onSelectCollection with favorites for Preferiti", () => {
+    it("should call onSelectCollection with favorites for Favorites filter", () => {
       const onSelectCollection = vi.fn();
       render(
         <SidebarNavigation
@@ -337,7 +397,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      fireEvent.click(screen.getByText("Preferiti"));
+      fireEvent.click(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.favorites"),
+        ),
+      );
       expect(onSelectCollection).toHaveBeenCalledWith("favorites");
     });
 
@@ -352,7 +416,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByText("Archiviati")).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.archived"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should call onToggleArchived when clicked", () => {
@@ -367,7 +435,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      fireEvent.click(screen.getByText("Archiviati"));
+      fireEvent.click(
+        screen.getByText(
+          getTranslation("education.knowledgeHub.sidebar.archived"),
+        ),
+      );
       expect(onToggleArchived).toHaveBeenCalled();
     });
 
@@ -384,7 +456,7 @@ describe("SidebarNavigation", () => {
       );
 
       const archivedItem = screen
-        .getByText("Archiviati")
+        .getByText(getTranslation("education.knowledgeHub.sidebar.archived"))
         .closest('[role="treeitem"]');
       expect(archivedItem).toHaveAttribute("aria-selected", "true");
     });
@@ -402,7 +474,13 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByLabelText("Crea nuova cartella")).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(
+          getTranslation(
+            "education.knowledgeHub.sidebar.createCollectionAriaLabel",
+          ),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should call onCreateCollection when button is clicked", () => {
@@ -417,7 +495,13 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      fireEvent.click(screen.getByLabelText("Crea nuova cartella"));
+      fireEvent.click(
+        screen.getByLabelText(
+          getTranslation(
+            "education.knowledgeHub.sidebar.createCollectionAriaLabel",
+          ),
+        ),
+      );
       expect(onCreateCollection).toHaveBeenCalled();
     });
 
@@ -432,7 +516,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      expect(screen.getByLabelText("Crea nuovo tag")).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(
+          getTranslation("education.knowledgeHub.sidebar.createTagAriaLabel"),
+        ),
+      ).toBeInTheDocument();
     });
 
     it("should call onCreateTag when button is clicked", () => {
@@ -447,7 +535,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      fireEvent.click(screen.getByLabelText("Crea nuovo tag"));
+      fireEvent.click(
+        screen.getByLabelText(
+          getTranslation("education.knowledgeHub.sidebar.createTagAriaLabel"),
+        ),
+      );
       expect(onCreateTag).toHaveBeenCalled();
     });
   });
@@ -481,9 +573,13 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      // First expand
-      const expandButton = screen.getByLabelText("Apri cartella");
-      fireEvent.click(expandButton);
+      // First expand using treeitem-based selector
+      const treeItems = screen.getAllByRole("treeitem");
+      const expandableItem = treeItems.find(
+        (item) => item.getAttribute("aria-expanded") === "false",
+      );
+      const expandButton = expandableItem?.querySelector("button");
+      if (expandButton) fireEvent.click(expandButton);
 
       // Then collapse with keyboard
       const matematicaButton = screen
@@ -544,7 +640,11 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      const tree = screen.getByRole("tree", { name: "Cartelle" });
+      const tree = screen.getByRole("tree", {
+        name: getTranslation(
+          "education.knowledgeHub.sidebar.collectionsAriaLabel",
+        ),
+      });
       expect(tree).toBeInTheDocument();
     });
 
@@ -602,7 +702,9 @@ describe("SidebarNavigation", () => {
         />,
       );
 
-      const group = screen.getByRole("group", { name: "Tag" });
+      const group = screen.getByRole("group", {
+        name: getTranslation("education.knowledgeHub.sidebar.tagsAriaLabel"),
+      });
       expect(group).toBeInTheDocument();
     });
   });

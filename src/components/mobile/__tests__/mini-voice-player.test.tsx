@@ -94,24 +94,32 @@ describe("MiniVoicePlayer", () => {
   });
 
   describe("Voice Status Display", () => {
-    it("shows 'Speaking...' when isSpeaking is true", () => {
+    it("shows speaking status when isSpeaking is true", () => {
       const props = { ...mockProps, isSpeaking: true };
-      render(<MiniVoicePlayer {...props} />);
+      const { container } = render(<MiniVoicePlayer {...props} />);
 
-      expect(screen.getByText("Speaking...")).toBeInTheDocument();
+      // Verify speaking indicator (green pulsing)
+      const indicator = container.querySelector(".bg-green-500");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.className).toMatch(/animate-pulse/);
     });
 
-    it("shows 'Listening...' when isListening is true", () => {
+    it("shows listening status when isListening is true", () => {
       const props = { ...mockProps, isListening: true };
-      render(<MiniVoicePlayer {...props} />);
+      const { container } = render(<MiniVoicePlayer {...props} />);
 
-      expect(screen.getByText("Listening...")).toBeInTheDocument();
+      // Verify listening indicator (blue pulsing)
+      const indicator = container.querySelector(".bg-blue-500");
+      expect(indicator).toBeInTheDocument();
+      expect(indicator?.className).toMatch(/animate-pulse/);
     });
 
-    it("shows 'Voice active' when neither speaking nor listening", () => {
-      render(<MiniVoicePlayer {...mockProps} />);
+    it("shows idle status when neither speaking nor listening", () => {
+      const { container } = render(<MiniVoicePlayer {...mockProps} />);
 
-      expect(screen.getByText("Voice active")).toBeInTheDocument();
+      // Verify idle indicator (gray, no pulse)
+      const indicator = container.querySelector(".bg-gray-400");
+      expect(indicator).toBeInTheDocument();
     });
 
     it("shows status indicator with pulse animation when speaking", () => {

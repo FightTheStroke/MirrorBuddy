@@ -3,6 +3,7 @@ import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { AccessibilityPanelMobile } from "@/components/settings/accessibility-panel-mobile";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { getTranslation } from "@/test/i18n-helpers";
 
 const stripMotionProps = (props: Record<string, unknown>) => {
   const {
@@ -81,14 +82,22 @@ describe("AccessibilityPanelMobile", () => {
   describe("Rendering", () => {
     it("renders the accessibility panel title", () => {
       render(<AccessibilityPanelMobile />);
-      expect(screen.getByText(/Accessibilità/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(getTranslation("settings.accessibility.title")),
+      ).toBeInTheDocument();
     });
 
     it("renders profile preset cards", () => {
-      render(<AccessibilityPanelMobile />);
-      expect(screen.getByText(/Profilo Dislessia/i)).toBeInTheDocument();
-      expect(screen.getByText(/Profilo ADHD/i)).toBeInTheDocument();
-      expect(screen.getByText(/Profilo Visivo/i)).toBeInTheDocument();
+      const { container } = render(<AccessibilityPanelMobile />);
+      // Check that profile cards exist by test-id
+      const profilesContainer = container.querySelector(
+        "[data-testid='profiles-container']",
+      );
+      expect(profilesContainer).toBeInTheDocument();
+      const profileCards = profilesContainer?.querySelectorAll(
+        "[data-testid*='profile-card']",
+      );
+      expect(profileCards?.length).toBeGreaterThanOrEqual(3);
     });
 
     it("renders toggle switches for individual settings", () => {
@@ -96,46 +105,43 @@ describe("AccessibilityPanelMobile", () => {
       // Check for toggle labels that should exist (by role)
       expect(
         screen.getByRole("checkbox", {
-          name: /Testo grande/i,
+          name: new RegExp(
+            getTranslation("settings.accessibility.features.largeText"),
+          ),
         }),
       ).toBeInTheDocument();
     });
 
     it("renders text size preview section", () => {
-      render(<AccessibilityPanelMobile />);
-      expect(
-        screen.getByText(/Anteprima dimensione testo/i),
-      ).toBeInTheDocument();
+      const { container } = render(<AccessibilityPanelMobile />);
+      // Find preview by test-id instead of translated text
+      const preview = container.querySelector(
+        "[data-testid='text-size-preview']",
+      );
+      expect(preview).toBeInTheDocument();
     });
   });
 
   describe("Profile Presets (Mobile Cards)", () => {
     it("displays all 7 accessibility profiles as selectable cards", () => {
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const profiles = [
-        /Profilo Dislessia/i,
-        /Profilo ADHD/i,
-        /Profilo Autismo/i,
-        /Profilo Visivo/i,
-        /Profilo Uditivo/i,
-        /Profilo Motorio/i,
-        /Paralisi Cerebrale/i,
-      ];
-
-      profiles.forEach((profileName) => {
-        expect(screen.getByText(profileName)).toBeInTheDocument();
-      });
+      // Find all profile cards by test-id pattern
+      const profileCards = container.querySelectorAll(
+        "[data-testid*='profile-card']",
+      );
+      expect(profileCards.length).toBe(7);
     });
 
     it("applies profile when card is clicked", async () => {
       const user = userEvent.setup();
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const dyslexiaCard = screen.getByRole("button", {
-        name: /Profilo Dislessia/i,
-      });
-      await user.click(dyslexiaCard);
+      const dyslexiaCard = container.querySelector(
+        "[data-testid='profile-card-dyslexia']",
+      );
+      expect(dyslexiaCard).toBeInTheDocument();
+      await user.click(dyslexiaCard!);
 
       expect(mockStore.applyDyslexiaProfile).toHaveBeenCalled();
     });
@@ -149,11 +155,9 @@ describe("AccessibilityPanelMobile", () => {
       const { container } = render(<AccessibilityPanelMobile />);
 
       // The selected profile card should have visual indication
-      const cards = container.querySelectorAll("[data-testid*='profile-card']");
-      const selectedCard = Array.from(cards).find((card) =>
-        card.textContent?.includes("Dislessia"),
+      const selectedCard = container.querySelector(
+        "[data-testid='profile-card-dyslexia']",
       );
-
       expect(selectedCard).toBeDefined();
       expect(selectedCard?.className).toMatch(/border|ring|bg/);
     });
@@ -187,7 +191,9 @@ describe("AccessibilityPanelMobile", () => {
       render(<AccessibilityPanelMobile />);
 
       const largeTextToggle = screen.getByRole("checkbox", {
-        name: /Testo grande/i,
+        name: new RegExp(
+          getTranslation("settings.accessibility.features.largeText"),
+        ),
       });
       await user.click(largeTextToggle);
 
@@ -209,7 +215,9 @@ describe("AccessibilityPanelMobile", () => {
       render(<AccessibilityPanelMobile />);
 
       const largeTextToggle = screen.getByRole("checkbox", {
-        name: /Testo grande/i,
+        name: new RegExp(
+          getTranslation("settings.accessibility.features.largeText"),
+        ),
       });
       expect(largeTextToggle).toBeChecked();
     });
@@ -217,14 +225,16 @@ describe("AccessibilityPanelMobile", () => {
 
   describe("Text Size Preview", () => {
     it("displays text size preview with current settings", () => {
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const preview = screen.getByText(/Anteprima dimensione testo/i);
+      const preview = container.querySelector(
+        "[data-testid='text-size-preview']",
+      );
       expect(preview).toBeInTheDocument();
     });
 
     it("updates preview when font size setting changes", async () => {
-      const { rerender } = render(<AccessibilityPanelMobile />);
+      const { container, rerender } = render(<AccessibilityPanelMobile />);
 
       // Simulate changing font size
       (useAccessibilityStore as any).mockReturnValue({
@@ -239,9 +249,10 @@ describe("AccessibilityPanelMobile", () => {
       rerender(<AccessibilityPanelMobile />);
 
       // Preview element should still exist and be updated
-      expect(
-        screen.getByText(/Anteprima dimensione testo/i),
-      ).toBeInTheDocument();
+      const preview = container.querySelector(
+        "[data-testid='text-size-preview']",
+      );
+      expect(preview).toBeInTheDocument();
     });
 
     it("shows sample text in preview section", () => {
@@ -347,15 +358,14 @@ describe("AccessibilityPanelMobile", () => {
 
   describe("Visual Feedback", () => {
     it("shows visual feedback when profile card is hovered", () => {
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const profileCard = screen.getByRole("button", {
-        name: /Profilo Dislessia/i,
-      });
+      const profileCard = container.querySelector(
+        "[data-testid='profile-card-dyslexia']",
+      );
 
       // Card should have hover styles
-      const classString = profileCard.className;
-      expect(classString).toMatch(/hover/);
+      expect(profileCard?.className).toMatch(/hover/);
     });
 
     it("indicates active/selected profile with distinct styling", () => {
@@ -364,26 +374,25 @@ describe("AccessibilityPanelMobile", () => {
         activeProfile: "dyslexia",
       });
 
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const selectedCard = screen.getByRole("button", {
-        name: /Profilo Dislessia/i,
-      });
+      const selectedCard = container.querySelector(
+        "[data-testid='profile-card-dyslexia']",
+      );
 
       // Should have selected indicator (border, ring, or color change)
-      const classString = selectedCard.className;
-      expect(classString).toMatch(/border|ring|bg.*-500|bg.*-600/);
+      expect(selectedCard?.className).toMatch(/border|ring|bg.*-500|bg.*-600/);
     });
 
     it("applies theme colors to profile cards", () => {
-      render(<AccessibilityPanelMobile />);
+      const { container } = render(<AccessibilityPanelMobile />);
 
-      const dyslexiaCard = screen.getByRole("button", {
-        name: /Profilo Dislessia/i,
-      });
+      const dyslexiaCard = container.querySelector(
+        "[data-testid='profile-card-dyslexia']",
+      );
 
       // Should have color-related classes
-      expect(dyslexiaCard.className).toMatch(/text-|bg-|border-/);
+      expect(dyslexiaCard?.className).toMatch(/text-|bg-|border-/);
     });
   });
 
@@ -418,7 +427,9 @@ describe("AccessibilityPanelMobile", () => {
       render(<AccessibilityPanelMobile />);
 
       // Elements should have dyslexia-related styling
-      const title = screen.getByText(/Accessibilità/i);
+      const title = screen.getByText(
+        getTranslation("settings.accessibility.title"),
+      );
       expect(title.className).toMatch(/tracking/);
     });
   });

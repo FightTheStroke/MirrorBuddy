@@ -7,44 +7,73 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { TierComparisonSection } from "../tier-comparison-section";
+import { getTranslation } from "@/test/i18n-helpers";
 
 describe("TierComparisonSection", () => {
   it("renders the section heading", () => {
     render(<TierComparisonSection />);
 
+    const heading = getTranslation("welcome.tierComparison.heading");
     expect(
-      screen.getByRole("heading", { name: /scegli il piano/i }),
+      screen.getByRole("heading", {
+        name: new RegExp(heading.split(" ")[0], "i"),
+      }),
     ).toBeInTheDocument();
   });
 
   it("renders all three tier cards", () => {
     render(<TierComparisonSection />);
 
-    expect(screen.getByText("Prova")).toBeInTheDocument();
-    expect(screen.getByText("Base")).toBeInTheDocument();
-    expect(screen.getByText("Pro")).toBeInTheDocument();
+    const trialName = getTranslation("welcome.tierComparison.tiers.trial.name");
+    const baseName = getTranslation("welcome.tierComparison.tiers.base.name");
+    const proName = getTranslation("welcome.tierComparison.tiers.pro.name");
+    expect(screen.getByText(trialName)).toBeInTheDocument();
+    expect(screen.getByText(baseName)).toBeInTheDocument();
+    expect(screen.getByText(proName)).toBeInTheDocument();
   });
 
   it("displays trial tier features", () => {
     render(<TierComparisonSection />);
 
     // Trial tier should show limited features
-    expect(screen.getByText(/3 Professori/i)).toBeInTheDocument();
-    expect(screen.getByText(/10 messaggi\/giorno/i)).toBeInTheDocument();
-    expect(screen.getByText(/5 minuti voce\/giorno/i)).toBeInTheDocument();
+    const maestriFeature = getTranslation(
+      "welcome.tierComparison.tiers.trial.features.maestri",
+    );
+    const messagesFeature = getTranslation(
+      "welcome.tierComparison.tiers.trial.features.messages",
+    );
+    const voiceFeature = getTranslation(
+      "welcome.tierComparison.tiers.trial.features.voice",
+    );
+    expect(
+      screen.getByText(new RegExp(maestriFeature, "i")),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(new RegExp(messagesFeature, "i")),
+    ).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(voiceFeature, "i"))).toBeInTheDocument();
   });
 
   it("displays base tier features", () => {
     render(<TierComparisonSection />);
 
     // Base tier should show expanded features (matching actual i18n translations)
-    // Multiple tiers share "illimitati/a" text so use getAllByText
-    expect(screen.getByText(/20 Professori/i)).toBeInTheDocument();
+    const baseMaestri = getTranslation(
+      "welcome.tierComparison.tiers.base.features.maestri",
+    );
+    const baseMessages = getTranslation(
+      "welcome.tierComparison.tiers.base.features.messages",
+    );
+    const baseVoice = getTranslation(
+      "welcome.tierComparison.tiers.base.features.voice",
+    );
+    expect(screen.getByText(new RegExp(baseMaestri, "i"))).toBeInTheDocument();
+    // Multiple tiers share unlimited text so use getAllByText
     expect(
-      screen.getAllByText(/messaggi illimitati/i).length,
+      screen.getAllByText(new RegExp(baseMessages, "i")).length,
     ).toBeGreaterThanOrEqual(1);
     expect(
-      screen.getAllByText(/voce illimitata/i).length,
+      screen.getAllByText(new RegExp(baseVoice, "i")).length,
     ).toBeGreaterThanOrEqual(1);
   });
 
@@ -52,32 +81,42 @@ describe("TierComparisonSection", () => {
     render(<TierComparisonSection />);
 
     // Pro tier should show unlimited or high limits (matching actual i18n translations)
-    expect(screen.getByText(/22 Professori/i)).toBeInTheDocument();
+    const proMaestri = getTranslation(
+      "welcome.tierComparison.tiers.pro.features.maestri",
+    );
+    const proMessages = getTranslation(
+      "welcome.tierComparison.tiers.pro.features.messagesUnlimited",
+    );
+    expect(screen.getByText(new RegExp(proMaestri, "i"))).toBeInTheDocument();
     expect(
-      screen.getAllByText(/messaggi illimitati/i).length,
+      screen.getAllByText(new RegExp(proMessages, "i")).length,
     ).toBeGreaterThanOrEqual(1);
   });
 
   it("renders CTA buttons for each tier", () => {
     render(<TierComparisonSection />);
 
+    const trialCta = getTranslation("welcome.tierComparison.tiers.trial.cta");
+    const baseCta = getTranslation("welcome.tierComparison.tiers.base.cta");
+    const proCta = getTranslation("welcome.tierComparison.tiers.pro.cta");
     expect(
-      screen.getByRole("button", { name: /prova gratis/i }),
+      screen.getByRole("button", { name: new RegExp(trialCta, "i") }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /registrati/i }),
+      screen.getByRole("button", { name: new RegExp(baseCta, "i") }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /passa a pro/i }),
+      screen.getByRole("button", { name: new RegExp(proCta, "i") }),
     ).toBeInTheDocument();
   });
 
   it("highlights pro tier as recommended", () => {
     render(<TierComparisonSection />);
 
-    // Pro card should have a "Consigliato" badge
-    const consigliato = screen.getAllByText(/consigliato/i);
-    expect(consigliato.length).toBeGreaterThanOrEqual(1);
+    // Pro card should have a badge
+    const proBadge = getTranslation("welcome.tierComparison.tiers.pro.badge");
+    const badges = screen.getAllByText(new RegExp(proBadge, "i"));
+    expect(badges.length).toBeGreaterThanOrEqual(1);
   });
 
   it("is responsive on mobile", () => {
@@ -92,11 +131,15 @@ describe("TierComparisonSection", () => {
   it("displays pricing information", () => {
     render(<TierComparisonSection />);
 
-    // Trial and Base are both free (2 occurrences of "Gratis")
-    const gratisElements = screen.getAllByText("Gratuito");
+    // Trial and Base are both free (2 occurrences)
+    const trialPrice = getTranslation(
+      "welcome.tierComparison.tiers.trial.price",
+    );
+    const gratisElements = screen.getAllByText(trialPrice);
     expect(gratisElements.length).toBe(2);
 
     // Pro tier shows custom pricing
-    expect(screen.getByText("Su richiesta")).toBeInTheDocument();
+    const proPrice = getTranslation("welcome.tierComparison.tiers.pro.price");
+    expect(screen.getByText(proPrice)).toBeInTheDocument();
   });
 });

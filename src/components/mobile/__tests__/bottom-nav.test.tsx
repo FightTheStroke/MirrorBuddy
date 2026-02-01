@@ -24,14 +24,19 @@ describe("BottomNav", () => {
   describe("Structure and Visibility", () => {
     it("renders navigation with all 5 items", () => {
       vi.mocked(usePathname).mockReturnValue("/");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      // All 5 navigation items should be present
-      expect(screen.getByText("Home")).toBeInTheDocument();
-      expect(screen.getByText("Chat")).toBeInTheDocument();
-      expect(screen.getByText("Tools")).toBeInTheDocument();
-      expect(screen.getByText("Settings")).toBeInTheDocument();
-      expect(screen.getByText("Profile")).toBeInTheDocument();
+      // All 5 navigation items should be present (structure-based assertion)
+      const links = container.querySelectorAll("a");
+      expect(links.length).toBe(5);
+
+      // Verify expected hrefs are present (i18n-agnostic)
+      const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
+      expect(hrefs).toContain("/");
+      expect(hrefs).toContain("/chat");
+      expect(hrefs).toContain("/astuccio");
+      expect(hrefs).toContain("/settings");
+      expect(hrefs).toContain("/profile");
     });
 
     it("renders as navigation landmark", () => {
@@ -71,28 +76,19 @@ describe("BottomNav", () => {
   describe("Navigation Items", () => {
     it("renders correct hrefs for each item", () => {
       vi.mocked(usePathname).mockReturnValue("/");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      expect(screen.getByText("Home").closest("a")).toHaveAttribute(
-        "href",
-        "/",
+      // Use href-based assertions (i18n-agnostic)
+      const links = container.querySelectorAll("a");
+      const linkMap = new Map(
+        Array.from(links).map((a) => [a.getAttribute("href"), a]),
       );
-      expect(screen.getByText("Chat").closest("a")).toHaveAttribute(
-        "href",
-        "/chat",
-      );
-      expect(screen.getByText("Tools").closest("a")).toHaveAttribute(
-        "href",
-        "/astuccio",
-      );
-      expect(screen.getByText("Settings").closest("a")).toHaveAttribute(
-        "href",
-        "/settings",
-      );
-      expect(screen.getByText("Profile").closest("a")).toHaveAttribute(
-        "href",
-        "/profile",
-      );
+
+      expect(linkMap.get("/")).toBeTruthy();
+      expect(linkMap.get("/chat")).toBeTruthy();
+      expect(linkMap.get("/astuccio")).toBeTruthy();
+      expect(linkMap.get("/settings")).toBeTruthy();
+      expect(linkMap.get("/profile")).toBeTruthy();
     });
 
     it("renders correct icons for each item", () => {
@@ -112,41 +108,42 @@ describe("BottomNav", () => {
   describe("Active State", () => {
     it("marks home as active when on home page", () => {
       vi.mocked(usePathname).mockReturnValue("/");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      const homeLink = screen.getByText("Home").closest("a");
+      // Find link by href (i18n-agnostic)
+      const homeLink = container.querySelector('a[href="/"]');
       expect(homeLink?.className).toMatch(/text-primary/);
     });
 
     it("marks chat as active when on chat page", () => {
       vi.mocked(usePathname).mockReturnValue("/chat");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      const chatLink = screen.getByText("Chat").closest("a");
+      const chatLink = container.querySelector('a[href="/chat"]');
       expect(chatLink?.className).toMatch(/text-primary/);
     });
 
     it("marks tools as active when on astuccio page", () => {
       vi.mocked(usePathname).mockReturnValue("/astuccio");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      const toolsLink = screen.getByText("Tools").closest("a");
+      const toolsLink = container.querySelector('a[href="/astuccio"]');
       expect(toolsLink?.className).toMatch(/text-primary/);
     });
 
     it("marks settings as active when on settings subpage", () => {
       vi.mocked(usePathname).mockReturnValue("/settings/profile");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      const settingsLink = screen.getByText("Settings").closest("a");
+      const settingsLink = container.querySelector('a[href="/settings"]');
       expect(settingsLink?.className).toMatch(/text-primary/);
     });
 
     it("marks non-active items with muted color", () => {
       vi.mocked(usePathname).mockReturnValue("/");
-      render(<BottomNav />);
+      const { container } = render(<BottomNav />);
 
-      const chatLink = screen.getByText("Chat").closest("a");
+      const chatLink = container.querySelector('a[href="/chat"]');
       expect(chatLink?.className).toMatch(/text-muted-foreground/);
     });
   });

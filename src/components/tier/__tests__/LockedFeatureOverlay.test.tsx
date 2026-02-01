@@ -4,6 +4,9 @@
  * Tests for feature access restriction overlay component.
  * Verifies rendering of overlay with lock indicators and upgrade prompts.
  *
+ * i18n-agnostic: Uses data-testid, roles, and structure-based assertions.
+ * "Pro" appears as a tier badge label (mock data identifier, not translated).
+ *
  * @vitest-environment jsdom
  */
 
@@ -65,9 +68,11 @@ describe("LockedFeatureOverlay", () => {
         </LockedFeatureOverlay>,
       );
 
-      const upgradeButton =
-        screen.getByRole("button", { name: /upgrade/i }) ||
-        screen.getByText(/upgrade/i);
+      // i18n-agnostic: find button with gradient background (upgrade button)
+      const buttons = screen.getAllByRole("button");
+      const upgradeButton = buttons.find((btn) =>
+        btn.className.includes("bg-gradient"),
+      );
       expect(upgradeButton).toBeInTheDocument();
     });
 
@@ -133,9 +138,13 @@ describe("LockedFeatureOverlay", () => {
         </LockedFeatureOverlay>,
       );
 
-      const upgradeButton = screen.getByRole("button", { name: /upgrade/i });
+      // i18n-agnostic: find button with gradient background (upgrade button)
+      const buttons = screen.getAllByRole("button");
+      const upgradeButton = buttons.find((btn) =>
+        btn.className.includes("bg-gradient"),
+      );
       expect(upgradeButton).not.toBeDisabled();
-      await user.click(upgradeButton);
+      await user.click(upgradeButton!);
     });
 
     it("overlay prevents interaction with locked feature", () => {
@@ -199,7 +208,7 @@ describe("LockedFeatureOverlay", () => {
 
       const overlay = container.querySelector('[data-testid="locked-overlay"]');
       if (overlay) {
-        // Should indicate locked status
+        // i18n-agnostic: check for any ARIA attribute (role or aria-label)
         expect(
           overlay.getAttribute("aria-label") || overlay.getAttribute("role"),
         ).toBeTruthy();
@@ -213,9 +222,9 @@ describe("LockedFeatureOverlay", () => {
         </LockedFeatureOverlay>,
       );
 
-      // Lock icon should be in the DOM (potentially hidden from screen readers if label is elsewhere)
-      const svg = document.querySelector("svg");
-      expect(svg).toBeInTheDocument();
+      // Lock icon should be in the DOM (via data-icon attribute)
+      const lockIcon = document.querySelector('[data-icon="lock"]');
+      expect(lockIcon).toBeInTheDocument();
     });
 
     it("upgrade button is keyboard accessible", async () => {
@@ -226,7 +235,11 @@ describe("LockedFeatureOverlay", () => {
         </LockedFeatureOverlay>,
       );
 
-      const upgradeButton = screen.getByRole("button", { name: /upgrade/i });
+      // i18n-agnostic: find button with gradient background (upgrade button)
+      const buttons = screen.getAllByRole("button");
+      const upgradeButton = buttons.find((btn) =>
+        btn.className.includes("bg-gradient"),
+      );
       await user.tab();
       expect(upgradeButton).toHaveFocus();
     });

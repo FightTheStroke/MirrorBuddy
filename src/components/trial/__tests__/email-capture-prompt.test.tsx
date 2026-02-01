@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { EmailCapturePrompt } from "../email-capture-prompt";
+import { getTranslation } from "@/test/i18n-helpers";
 
 // Mock fetch
 global.fetch = vi.fn();
@@ -42,9 +43,8 @@ describe("EmailCapturePrompt", () => {
   it("renders email capture prompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
-    expect(
-      screen.getByText(/sblocca tutte le funzionalità/i),
-    ).toBeInTheDocument();
+    const unlockTitle = getTranslation("auth.trialVerify.unlockTitle");
+    expect(screen.getByText(unlockTitle)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/email/i)).toBeInTheDocument();
   });
 
@@ -57,8 +57,9 @@ describe("EmailCapturePrompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
     const emailInput = screen.getByPlaceholderText(/email/i);
+    const submitText = getTranslation("auth.trialVerify.submit");
     const submitButton = screen.getByRole("button", {
-      name: /verifica email/i,
+      name: new RegExp(submitText, "i"),
     });
 
     fireEvent.change(emailInput, { target: { value: "user@example.com" } });
@@ -82,7 +83,8 @@ describe("EmailCapturePrompt", () => {
     const emailInput = screen.getByPlaceholderText(
       /email/i,
     ) as HTMLInputElement;
-    const submitButton = screen.getByText(/verifica email/i);
+    const submitText = getTranslation("auth.trialVerify.submit");
+    const submitButton = screen.getByText(new RegExp(submitText, "i"));
 
     // Change the input value
     fireEvent.change(emailInput, { target: { value: "invalid-email" } });
@@ -104,7 +106,8 @@ describe("EmailCapturePrompt", () => {
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
     // Use the button in the form, not the X icon
-    const dismissButton = screen.getByText(/forse più tardi/i);
+    const maybeLater = getTranslation("auth.trialVerify.maybeLater");
+    const dismissButton = screen.getByText(new RegExp(maybeLater, "i"));
     fireEvent.click(dismissButton);
 
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -135,7 +138,8 @@ describe("EmailCapturePrompt", () => {
 
     // Should render at threshold
     expect(container.firstChild).not.toBeNull();
-    expect(screen.getByText(/verifica email/i)).toBeInTheDocument();
+    const submitText = getTranslation("auth.trialVerify.submit");
+    expect(screen.getByText(new RegExp(submitText, "i"))).toBeInTheDocument();
   });
 
   it("shows when hitting limit", () => {
@@ -147,6 +151,7 @@ describe("EmailCapturePrompt", () => {
       />,
     );
 
-    expect(screen.getByText(/continua con la beta/i)).toBeInTheDocument();
+    const upgradeTitle = getTranslation("auth.trialVerify.upgradeTitle");
+    expect(screen.getByText(upgradeTitle)).toBeInTheDocument();
   });
 });

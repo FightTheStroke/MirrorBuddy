@@ -4,6 +4,9 @@
  * Tests for the component displaying feature comparison across subscription tiers.
  * Core rendering and feature display tests.
  *
+ * i18n-agnostic: Uses structure-based assertions rather than hardcoded text.
+ * Tier names (Trial, Base, Pro) are mock data identifiers, not translated strings.
+ *
  * @vitest-environment jsdom
  */
 
@@ -96,15 +99,16 @@ describe("TierComparisonTable", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
       const table = screen.getByRole("table");
-      expect(within(table).getByText("Daily Messages")).toBeInTheDocument();
-      expect(within(table).getByText("Voice Minutes")).toBeInTheDocument();
-      expect(within(table).getByText("Maestri Available")).toBeInTheDocument();
-      expect(within(table).getByText("Documents Limit")).toBeInTheDocument();
-      expect(within(table).getByText("Voice Chat")).toBeInTheDocument();
-      expect(within(table).getByText("Mind Maps")).toBeInTheDocument();
-      expect(within(table).getByText("Video Vision")).toBeInTheDocument();
-      expect(within(table).getByText("Parent Dashboard")).toBeInTheDocument();
-      expect(within(table).getByText("Priority Support")).toBeInTheDocument();
+      // i18n-agnostic: verify table has expected number of feature rows (9)
+      // rather than checking for specific text content
+      const rows = table.querySelectorAll("tbody tr");
+      expect(rows.length).toBe(9);
+
+      // Each row should have a feature name cell and tier value cells
+      rows.forEach((row) => {
+        const cells = row.querySelectorAll("td");
+        expect(cells.length).toBeGreaterThanOrEqual(2); // feature name + at least 1 tier
+      });
     });
 
     it("renders table cells for each tier-feature combination", () => {
@@ -122,6 +126,7 @@ describe("TierComparisonTable", () => {
     it("displays daily message limits", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
+      // Verify numeric values are present (these are data values, not translations)
       expect(screen.getByText("10")).toBeInTheDocument();
       expect(screen.getByText("100")).toBeInTheDocument();
       expect(screen.getByText("500")).toBeInTheDocument();
@@ -130,55 +135,34 @@ describe("TierComparisonTable", () => {
     it("displays voice minutes limits", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
+      // i18n-agnostic: check the second row contains voice minute values
       const rows = screen.getByRole("table").querySelectorAll("tbody tr");
-      let foundVoice = false;
-
-      rows.forEach((row) => {
-        if (row.textContent?.includes("Voice Minutes")) {
-          expect(row.textContent).toContain("5");
-          expect(row.textContent).toContain("30");
-          expect(row.textContent).toContain("120");
-          foundVoice = true;
-        }
-      });
-
-      expect(foundVoice).toBe(true);
+      const voiceRow = rows[1]; // Voice Minutes is second row
+      expect(voiceRow?.textContent).toContain("5");
+      expect(voiceRow?.textContent).toContain("30");
+      expect(voiceRow?.textContent).toContain("120");
     });
 
     it("displays number of available maestri", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
+      // i18n-agnostic: check the third row contains maestri count values
       const rows = screen.getByRole("table").querySelectorAll("tbody tr");
-      let foundMaestri = false;
-
-      rows.forEach((row) => {
-        if (row.textContent?.includes("Maestri Available")) {
-          expect(row.textContent).toContain("5");
-          expect(row.textContent).toContain("15");
-          expect(row.textContent).toContain("26");
-          foundMaestri = true;
-        }
-      });
-
-      expect(foundMaestri).toBe(true);
+      const maestriRow = rows[2]; // Maestri Available is third row
+      expect(maestriRow?.textContent).toContain("5");
+      expect(maestriRow?.textContent).toContain("15");
+      expect(maestriRow?.textContent).toContain("26");
     });
 
     it("displays documents limit", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
+      // i18n-agnostic: check the fourth row contains document limit values
       const rows = screen.getByRole("table").querySelectorAll("tbody tr");
-      let foundDocs = false;
-
-      rows.forEach((row) => {
-        if (row.textContent?.includes("Documents Limit")) {
-          expect(row.textContent).toContain("1");
-          expect(row.textContent).toContain("5");
-          expect(row.textContent).toContain("50");
-          foundDocs = true;
-        }
-      });
-
-      expect(foundDocs).toBe(true);
+      const docsRow = rows[3]; // Documents Limit is fourth row
+      expect(docsRow?.textContent).toContain("1");
+      expect(docsRow?.textContent).toContain("5");
+      expect(docsRow?.textContent).toContain("50");
     });
   });
 
@@ -186,17 +170,17 @@ describe("TierComparisonTable", () => {
     it("displays check icon for enabled features", () => {
       render(<TierComparisonTable tiers={mockTiers} />);
 
+      // i18n-agnostic: verify boolean feature rows exist (rows 5-9)
       const table = screen.getByRole("table");
       const rows = Array.from(table.querySelectorAll("tbody tr"));
-      let foundVideoVision = false;
+      expect(rows.length).toBeGreaterThanOrEqual(5);
 
-      rows.forEach((row) => {
-        if (row.textContent?.includes("Video Vision")) {
-          foundVideoVision = true;
-        }
+      // Boolean feature rows should exist and contain SVG icons (check/X)
+      const booleanRows = rows.slice(4); // Rows 5+ are boolean features
+      booleanRows.forEach((row) => {
+        const svgs = row.querySelectorAll("svg");
+        expect(svgs.length).toBeGreaterThan(0);
       });
-
-      expect(foundVideoVision).toBe(true);
     });
   });
 

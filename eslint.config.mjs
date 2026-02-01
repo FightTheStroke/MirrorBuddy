@@ -71,6 +71,18 @@ const eslintConfig = defineConfig([
       "security/detect-non-literal-regexp": "off", // Dynamic regex from controlled sources
     },
   },
+  // Test files - allow dynamic regex (from i18n helpers, patterns, etc.)
+  {
+    files: [
+      "src/**/*.test.ts",
+      "src/**/*.test.tsx",
+      "src/test/**/*.ts",
+      "e2e/**/*.spec.ts",
+    ],
+    rules: {
+      "security/detect-non-literal-regexp": "off", // Tests use dynamic patterns from translations
+    },
+  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:

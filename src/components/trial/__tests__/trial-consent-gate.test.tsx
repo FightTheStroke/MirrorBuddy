@@ -11,6 +11,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { TrialConsentGate } from "../trial-consent-gate";
+import { getTranslation } from "@/test/i18n-helpers";
 
 // Mock the trial consent helpers
 vi.mock("@/lib/consent/trial-consent", () => ({
@@ -56,7 +57,8 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
-      expect(screen.queryByText(/prova gratuita/i)).not.toBeInTheDocument();
+      const consentTitle = getTranslation("auth.trialConsent.title");
+      expect(screen.queryByText(consentTitle)).not.toBeInTheDocument();
     });
   });
 
@@ -72,9 +74,10 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
+      const consentTitle = getTranslation("auth.trialConsent.title");
       expect(screen.queryByText("Protected Content")).not.toBeInTheDocument();
       expect(
-        screen.getByRole("heading", { name: /protezione della privacy/i }),
+        screen.getByRole("heading", { name: new RegExp(consentTitle, "i") }),
       ).toBeInTheDocument();
     });
 
@@ -112,8 +115,9 @@ describe("TrialConsentGate", () => {
         </TrialConsentGate>,
       );
 
+      const startButtonText = getTranslation("auth.trialConsent.startButton");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: new RegExp(startButtonText, "i"),
       });
       expect(startButton).toBeDisabled();
     });
@@ -134,8 +138,9 @@ describe("TrialConsentGate", () => {
       );
 
       const checkbox = screen.getByRole("checkbox");
+      const startButtonText = getTranslation("auth.trialConsent.startButton");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: new RegExp(startButtonText, "i"),
       });
 
       expect(startButton).toBeDisabled();
@@ -166,8 +171,9 @@ describe("TrialConsentGate", () => {
       await user.click(checkbox);
 
       // Click start button
+      const startButtonText = getTranslation("auth.trialConsent.startButton");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: new RegExp(startButtonText, "i"),
       });
       await user.click(startButton);
 
@@ -197,8 +203,9 @@ describe("TrialConsentGate", () => {
       );
 
       const checkbox = screen.getByRole("checkbox");
+      const startButtonText = getTranslation("auth.trialConsent.startButton");
       const startButton = screen.getByRole("button", {
-        name: /inizia/i,
+        name: new RegExp(startButtonText, "i"),
       });
 
       // Check then uncheck

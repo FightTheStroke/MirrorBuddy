@@ -9,6 +9,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import { CrossMaestroMemorySettings } from "../cross-maestro-memory-settings";
 import { useSettingsStore } from "@/lib/stores/settings-store";
+import { getTranslation } from "@/test/i18n-helpers";
 
 // Mock the settings store
 vi.mock("@/lib/stores/settings-store", () => {
@@ -46,8 +47,12 @@ describe("CrossMaestroMemorySettings Component", () => {
   it("renders the component with title and badge", () => {
     render(<CrossMaestroMemorySettings />);
 
-    expect(screen.getByText("Memoria Interdisciplinare")).toBeInTheDocument();
-    expect(screen.getByText("Pro")).toBeInTheDocument();
+    expect(
+      screen.getByText(getTranslation("settings.crossMaestroMemory.title")),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(getTranslation("settings.crossMaestroMemory.badge")),
+    ).toBeInTheDocument();
   });
 
   it("displays description text", () => {
@@ -55,7 +60,12 @@ describe("CrossMaestroMemorySettings Component", () => {
 
     expect(
       screen.getByText(
-        /Consenti ai tuoi professori di accedere a ciò che hai imparato da altri maestri/,
+        new RegExp(
+          getTranslation("settings.crossMaestroMemory.description").slice(
+            0,
+            30,
+          ),
+        ),
       ),
     ).toBeInTheDocument();
   });
@@ -218,7 +228,12 @@ describe("CrossMaestroMemorySettings Component", () => {
 
     expect(
       screen.getByText(
-        /I tuoi insegnanti potranno conoscere il tuo percorso di apprendimento/,
+        new RegExp(
+          getTranslation("settings.crossMaestroMemory.enableDescription").slice(
+            0,
+            30,
+          ),
+        ),
       ),
     ).toBeInTheDocument();
   });
@@ -263,7 +278,9 @@ describe("CrossMaestroMemorySettings Component", () => {
   it("matches Pro tier badge styling", () => {
     render(<CrossMaestroMemorySettings />);
 
-    const badge = screen.getByText("Pro");
+    const badge = screen.getByText(
+      getTranslation("settings.crossMaestroMemory.badge"),
+    );
     expect(badge).toHaveClass("bg-purple-600");
     expect(badge).toHaveClass("hover:bg-purple-700");
   });

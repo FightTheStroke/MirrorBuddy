@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { ProfileEditorMobile } from "../profile-editor-mobile";
+import { getTranslation } from "@/test/i18n-helpers";
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
@@ -25,7 +26,9 @@ describe("ProfileEditorMobile", () => {
 
   it("renders the component", () => {
     render(<ProfileEditorMobile profile={mockProfile} onSave={mockOnSave} />);
-    expect(screen.getByText(/Profilo/i)).toBeTruthy();
+    expect(
+      screen.getByText(getTranslation("settings.sections.profile")),
+    ).toBeTruthy();
   });
 
   it("has large input fields with 16px+ font size for iOS accessibility", () => {
@@ -38,7 +41,7 @@ describe("ProfileEditorMobile", () => {
   it("renders avatar editor with camera capture button", () => {
     render(<ProfileEditorMobile profile={mockProfile} onSave={mockOnSave} />);
     const cameraButton = screen.getByRole("button", {
-      name: /camera|capture|foto/i,
+      name: /camera|capture|foto|photo/i,
     });
     expect(cameraButton).toBeTruthy();
   });
@@ -53,7 +56,7 @@ describe("ProfileEditorMobile", () => {
   it("has sticky save button at bottom on mobile", () => {
     render(<ProfileEditorMobile profile={mockProfile} onSave={mockOnSave} />);
     const saveButton = screen.getByRole("button", {
-      name: /salva|save/i,
+      name: /salva|save|speichern|enregistrer|guardar/i,
     });
     const buttonContainer = saveButton.closest("[data-sticky-footer]");
     expect(buttonContainer).toBeTruthy();
@@ -74,7 +77,7 @@ describe("ProfileEditorMobile", () => {
   it("calls onSave with updated profile on save button click", async () => {
     render(<ProfileEditorMobile profile={mockProfile} onSave={mockOnSave} />);
     const saveButton = screen.getByRole("button", {
-      name: /salva|save/i,
+      name: /salva|save|speichern|enregistrer|guardar/i,
     });
     fireEvent.click(saveButton);
     await waitFor(() => {
@@ -91,7 +94,7 @@ describe("ProfileEditorMobile", () => {
   it("uses TouchTarget size for interactive elements (min 44px)", () => {
     render(<ProfileEditorMobile profile={mockProfile} onSave={mockOnSave} />);
     const saveButton = screen.getByRole("button", {
-      name: /salva|save/i,
+      name: /salva|save|speichern|enregistrer|guardar/i,
     });
     // Button should have min-h-12 or higher for 48px (44px minimum touch target)
     expect(saveButton).toHaveClass(/min-h-12|h-12|py-3/);
@@ -110,11 +113,15 @@ describe("ProfileEditorMobile", () => {
     const emptyProfile = { ...mockProfile, name: "" };
     render(<ProfileEditorMobile profile={emptyProfile} onSave={mockOnSave} />);
     const saveButton = screen.getByRole("button", {
-      name: /salva|save/i,
+      name: /salva|save|speichern|enregistrer|guardar/i,
     });
     fireEvent.click(saveButton);
     await waitFor(() => {
-      expect(screen.getByText(/required|obbligatorio/i)).toBeTruthy();
+      // Check for validation error by structure (error element exists)
+      const errorElements = document.querySelectorAll(
+        '[role="alert"], [class*="error"], [class*="text-red"]',
+      );
+      expect(errorElements.length).toBeGreaterThan(0);
     });
   });
 

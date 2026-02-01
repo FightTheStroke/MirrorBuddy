@@ -8,32 +8,41 @@ import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SegmentedToggle } from "../segmented-toggle";
+import { getTranslation } from "@/test/i18n-helpers";
 
 describe("SegmentedToggle", () => {
   it("renders both toggle options", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    expect(screen.getByText("Studenti & Famiglie")).toBeInTheDocument();
-    expect(screen.getByText("Scuole & Aziende")).toBeInTheDocument();
+    const individualsLabel = getTranslation(
+      "welcome.tierComparison.toggle.individuals",
+    );
+    const organizationsLabel = getTranslation(
+      "welcome.tierComparison.toggle.organizations",
+    );
+    expect(screen.getByText(individualsLabel)).toBeInTheDocument();
+    expect(screen.getByText(organizationsLabel)).toBeInTheDocument();
   });
 
   it("displays the correct active option when value is 'individuals'", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const individualsButton = screen.getByRole("tab", {
-      name: /studenti.*famiglie/i,
-    });
-    expect(individualsButton).toHaveAttribute("aria-selected", "true");
+    // Use role-based query which is language-agnostic
+    const tabs = screen.getAllByRole("tab");
+    const individualsTab = tabs[0]; // First tab is individuals
+    expect(individualsTab).toHaveAttribute("aria-selected", "true");
   });
 
   it("displays the correct active option when value is 'organizations'", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="organizations" onChange={onChange} />);
 
-    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
-    expect(orgsButton).toHaveAttribute("aria-selected", "true");
+    // Use role-based query which is language-agnostic
+    const tabs = screen.getAllByRole("tab");
+    const orgsTab = tabs[1]; // Second tab is organizations
+    expect(orgsTab).toHaveAttribute("aria-selected", "true");
   });
 
   it("calls onChange with 'organizations' when clicking organizations button", async () => {
@@ -41,8 +50,8 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
-    await user.click(orgsButton);
+    const tabs = screen.getAllByRole("tab");
+    await user.click(tabs[1]); // Click organizations tab
 
     expect(onChange).toHaveBeenCalledWith("organizations");
   });
@@ -52,10 +61,8 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="organizations" onChange={onChange} />);
 
-    const individualsButton = screen.getByRole("tab", {
-      name: /studenti.*famiglie/i,
-    });
-    await user.click(individualsButton);
+    const tabs = screen.getAllByRole("tab");
+    await user.click(tabs[0]); // Click individuals tab
 
     expect(onChange).toHaveBeenCalledWith("individuals");
   });
@@ -64,13 +71,9 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const individualsButton = screen.getByRole("tab", {
-      name: /studenti.*famiglie/i,
-    });
-    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
-
-    expect(individualsButton).toHaveAttribute("aria-selected");
-    expect(orgsButton).toHaveAttribute("aria-selected");
+    const tabs = screen.getAllByRole("tab");
+    expect(tabs[0]).toHaveAttribute("aria-selected");
+    expect(tabs[1]).toHaveAttribute("aria-selected");
   });
 
   it("supports keyboard navigation with Tab", async () => {
@@ -78,28 +81,25 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const individualsButton = screen.getByRole("tab", {
-      name: /studenti.*famiglie/i,
-    });
-    const orgsButton = screen.getByRole("tab", { name: /scuole.*aziende/i });
+    const tabs = screen.getAllByRole("tab");
 
-    individualsButton.focus();
-    expect(individualsButton).toHaveFocus();
+    tabs[0].focus();
+    expect(tabs[0]).toHaveFocus();
 
     await user.tab();
-    expect(orgsButton).toHaveFocus();
+    expect(tabs[1]).toHaveFocus();
   });
 
   it("has visible focus state", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const button = screen.getByRole("tab", { name: /studenti.*famiglie/i });
-    button.focus();
+    const tabs = screen.getAllByRole("tab");
+    tabs[0].focus();
 
     // Check for focus ring or focus state styling
-    expect(button).toHaveFocus();
-    expect(button).toHaveClass("focus:ring-2");
+    expect(tabs[0]).toHaveFocus();
+    expect(tabs[0]).toHaveClass("focus:ring-2");
   });
 
   it("has a pill-style container with proper styling", () => {
@@ -123,10 +123,8 @@ describe("SegmentedToggle", () => {
     const onChange = vi.fn();
     render(<SegmentedToggle value="individuals" onChange={onChange} />);
 
-    const individualsButton = screen.getByRole("tab", {
-      name: /studenti.*famiglie/i,
-    });
-    await user.click(individualsButton);
+    const tabs = screen.getAllByRole("tab");
+    await user.click(tabs[0]); // Click already active tab
 
     expect(onChange).toHaveBeenCalledWith("individuals");
   });
