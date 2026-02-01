@@ -95,11 +95,17 @@ test.describe("Welcome Flow - Internationalization (i18n)", () => {
     async ({ localePage }) => {
       await localePage.goto("/welcome");
       await waitForLocale(localePage.page, localePage.locale);
+      // Extra wait for hydration in CI
+      await localePage.page.waitForTimeout(2000);
 
       // Look for primary CTAs (buttons with role='button' or <button> tag)
       const buttons = localePage.page.locator(
         "button:visible, [role='button']:visible",
       );
+
+      // Wait for at least one button to appear
+      await expect(buttons.first()).toBeVisible({ timeout: 30000 });
+
       const buttonCount = await buttons.count();
 
       // Expect at least one button on welcome page

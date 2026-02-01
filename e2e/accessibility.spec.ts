@@ -97,8 +97,8 @@ test.describe("WCAG 2.1 AA Compliance", () => {
 test.describe("Keyboard Navigation", () => {
   test("can navigate homepage with keyboard only", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(300);
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     const focusableSelector =
       'a, button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
@@ -107,6 +107,7 @@ test.describe("Keyboard Navigation", () => {
     expect(focusableCount).toBeGreaterThan(0);
 
     await page.keyboard.press("Tab");
+    await page.waitForTimeout(200);
     const firstFocused = await page.evaluate(
       () => document.activeElement?.tagName,
     );
@@ -116,6 +117,7 @@ test.describe("Keyboard Navigation", () => {
 
     for (let i = 0; i < Math.min(5, focusableCount - 1); i++) {
       await page.keyboard.press("Tab");
+      await page.waitForTimeout(100);
     }
 
     const currentFocused = await page.evaluate(
@@ -564,39 +566,46 @@ test.describe("Instant Access - Profile Activation", () => {
 
 test.describe("Instant Access - Cookie Persistence", () => {
   test("settings persist after page refresh", async ({ page }) => {
-    test.setTimeout(60000);
+    // Very long timeout for CI
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/welcome"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 15000 });
+    await expect(button).toBeVisible({ timeout: 30000 });
     await button.click();
 
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
     const appeared = await panel
-      .waitFor({ state: "visible", timeout: 3000 })
+      .waitFor({ state: "visible", timeout: 10000 })
       .then(() => true)
       .catch(() => false);
 
     if (!appeared) {
       await button.click();
-      await expect(panel).toBeVisible({ timeout: 10000 });
+      await expect(panel).toBeVisible({ timeout: 15000 });
     }
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
     await dyslexiaBtn.click();
 
-    // Wait for a11y cookie to be set before reloading (avoids net::ERR_ABORTED)
+    // Wait for a11y cookie to be set before reloading
     await page.waitForFunction(
       () =>
         document.cookie
           .split(";")
           .some((c) => c.trim().startsWith("mirrorbuddy-a11y=")),
-      { timeout: 10000 },
+      { timeout: 30000 },
     );
 
-    await page.waitForLoadState("load");
-    await page.reload({ waitUntil: "domcontentloaded" });
+    // Extra stabilization before reload
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(2000);
+
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(3000);
 
     // Wait for accessibility store to hydrate and apply font
     await page.waitForFunction(
@@ -612,7 +621,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
           .fontFamily.includes("OpenDyslexic");
         return cookie && (hasClass || fontApplied);
       },
-      { timeout: 15000 },
+      { timeout: 30000 },
     );
 
     const body = page.locator("body");

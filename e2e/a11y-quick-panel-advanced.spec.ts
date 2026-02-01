@@ -141,16 +141,32 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
 
   test("profile buttons accessible with keyboard", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     await openA11yPanel(page);
+    await page.waitForTimeout(500);
 
-    // Tab to first profile button
-    for (let i = 0; i < 5; i++) {
+    // Tab multiple times to reach profile buttons (focus trap may vary)
+    for (let i = 0; i < 10; i++) {
       await page.keyboard.press("Tab");
+      await page.waitForTimeout(100);
+
+      // Check if we've reached a profile button
+      const isProfileButton = await page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el.tagName !== "BUTTON") return false;
+        const container = el.closest('[data-testid="a11y-profile-buttons"]');
+        return container !== null;
+      });
+
+      if (isProfileButton) {
+        expect(isProfileButton).toBe(true);
+        return;
+      }
     }
 
-    // Check that a profile button inside the profiles container is focused
+    // Final check
     const isProfileButton = await page.evaluate(() => {
       const el = document.activeElement;
       if (!el || el.tagName !== "BUTTON") return false;

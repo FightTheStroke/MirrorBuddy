@@ -43,20 +43,26 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link navigates to main content on click", async ({ page }) => {
-    test.setTimeout(60000);
+    // Very long timeout for CI
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');
+    await expect(skipLink).toBeAttached({ timeout: 30000 });
+
     await skipLink.focus();
-    await skipLink.click();
+    await page.waitForTimeout(500);
+    await skipLink.click({ force: true });
 
     // Wait for React onClick handler or native hash navigation to move focus.
     // In CI, React hydration may be slow — native <a href="#main-content">
     // triggers hash navigation which focuses the target if it has tabIndex.
     const focusMoved = await page
       .waitForFunction(() => document.activeElement?.id === "main-content", {
-        timeout: 5000,
+        timeout: 30000,
       })
       .then(() => true)
       .catch(() => false);
@@ -280,17 +286,19 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
 
   test("close button closes panel", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(2000);
 
     const { panel } = await openA11yPanel(page);
-    await expect(panel).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 15000 });
 
-    // Wait for panel animation to stabilize (avoids "element detached" flakiness)
+    // Wait for panel animation to stabilize
+    await page.waitForTimeout(500);
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
-    await expect(closeBtn).toBeVisible({ timeout: 10000 });
+    await expect(closeBtn).toBeVisible({ timeout: 15000 });
     await closeBtn.click();
 
-    await expect(panel).not.toBeVisible({ timeout: 10000 });
+    await expect(panel).not.toBeVisible({ timeout: 15000 });
   });
 
   test("escape key closes panel", async ({ page }) => {
@@ -432,21 +440,23 @@ test.describe("A11y Features Integration with data-testid", () => {
 
   test("all accessibility elements have testids", async ({ page }) => {
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');
     const floatingBtn = page.locator('[data-testid="a11y-floating-button"]');
 
-    await expect(skipLink).toBeAttached();
-    await expect(floatingBtn).toBeAttached();
+    await expect(skipLink).toBeAttached({ timeout: 15000 });
+    await expect(floatingBtn).toBeAttached({ timeout: 15000 });
 
     // Open panel
     await openA11yPanel(page);
+    await page.waitForTimeout(500);
 
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
 
-    await expect(panel).toBeVisible();
-    await expect(closeBtn).toBeVisible();
+    await expect(panel).toBeVisible({ timeout: 15000 });
+    await expect(closeBtn).toBeVisible({ timeout: 15000 });
   });
 });

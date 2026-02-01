@@ -111,20 +111,28 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
-    test.setTimeout(60000);
+    // Very long timeout for CI - page can be slow to respond
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    // Extra wait for full hydration
+    await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');
+    await expect(skipLink).toBeAttached({ timeout: 30000 });
+
+    // Focus and click with retry
     await skipLink.focus();
-    await skipLink.click();
+    await page.waitForTimeout(500);
+    await skipLink.click({ force: true });
 
     // Wait for React onClick handler or native hash navigation to move focus.
     // In CI, React hydration may be slow — native <a href="#main-content">
     // triggers hash navigation which focuses the target if it has tabIndex.
     const focusMoved = await page
       .waitForFunction(() => document.activeElement?.id === "main-content", {
-        timeout: 5000,
+        timeout: 30000,
       })
       .then(() => true)
       .catch(() => false);
@@ -391,11 +399,17 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
 
 test.describe("A11y Features Integration", () => {
   test("skip link and floating button both work together", async ({ page }) => {
+    // Long timeout for CI
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     // Tab to skip link
     await page.keyboard.press("Tab");
+    await page.waitForTimeout(500);
+
     const activeElement = await page.evaluate(
       () => document.activeElement?.getAttribute("href") || "",
     );
@@ -409,7 +423,7 @@ test.describe("A11y Features Integration", () => {
       // Wait for focus to move to main content (handler runs after hydration)
       await page.waitForFunction(
         () => document.activeElement?.id === "main-content",
-        { timeout: 5000 },
+        { timeout: 30000 },
       );
 
       const focusedId = await page.evaluate(

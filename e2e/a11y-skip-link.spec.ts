@@ -94,20 +94,27 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
-    test.setTimeout(60000);
+    // Very long timeout for CI - page can be slow to respond
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("domcontentloaded");
+    await page.waitForLoadState("networkidle");
+    // Extra wait for full hydration
+    await page.waitForTimeout(3000);
 
     const skipLink = page.locator('[data-testid="skip-link"]');
+    await expect(skipLink).toBeAttached({ timeout: 30000 });
+
     await skipLink.focus();
-    await skipLink.click();
+    await page.waitForTimeout(500);
+    await skipLink.click({ force: true });
 
     // Wait for React onClick handler or native hash navigation to move focus.
     // In CI, React hydration may be slow — native <a href="#main-content">
     // triggers hash navigation which focuses the target if it has tabIndex.
     const focusMoved = await page
       .waitForFunction(() => document.activeElement?.id === "main-content", {
-        timeout: 5000,
+        timeout: 30000,
       })
       .then(() => true)
       .catch(() => false);

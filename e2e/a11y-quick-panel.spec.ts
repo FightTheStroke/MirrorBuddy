@@ -118,11 +118,13 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     await openA11yPanel(page);
+    // Wait for panel animation to complete
+    await page.waitForTimeout(500);
 
     const profilesContainer = page.locator(
       '[data-testid="a11y-profile-buttons"]',
     );
-    await expect(profilesContainer).toBeVisible();
+    await expect(profilesContainer).toBeVisible({ timeout: 10000 });
   });
 
   test("reset button has data-testid", async ({ page }) => {
@@ -160,12 +162,17 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   });
 
   test("panel does not interfere with page content", async ({ page }) => {
+    // Long timeout for CI
+    test.setTimeout(300000);
+
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     const mainCountBefore = await page.locator("main").count();
 
     await openA11yPanel(page);
+    await page.waitForTimeout(500);
 
     const mainCountAfter = await page.locator("main").count();
 

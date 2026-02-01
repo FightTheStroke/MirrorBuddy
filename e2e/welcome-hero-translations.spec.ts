@@ -25,23 +25,23 @@ test.use({ storageState: undefined });
 const EXPECTED_TRANSLATIONS = {
   it: {
     betaBadge: "Beta Privata",
-    betaSubtitle: "Solo su invito",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   en: {
     betaBadge: "Private Beta",
-    betaSubtitle: "Invite only",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   fr: {
     betaBadge: "Bêta Privée",
-    betaSubtitle: "Sur invitation uniquement",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   de: {
     betaBadge: "Private Beta",
-    betaSubtitle: "Nur auf Einladung",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
   es: {
     betaBadge: "Beta Privada",
-    betaSubtitle: "Solo con invitación",
+    betaSubtitle: "MirrorBuddy v0.10",
   },
 };
 

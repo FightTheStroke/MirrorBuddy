@@ -156,10 +156,16 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
   });
 
   test("should persist language across page reloads", async ({ page }) => {
+    // Long timeout for CI
+    test.setTimeout(300000);
+
     await page.goto("/it/welcome");
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(3000);
 
     // Select Spanish
     const switcher = page.getByRole("button", { name: /select language/i });
+    await expect(switcher).toBeVisible({ timeout: 30000 });
     await switcher.click();
     const spanishOption = page.getByRole("menuitem", { name: /español/i });
     await spanishOption.click();
@@ -167,7 +173,7 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     // Wait for redirect with extended timeout for CI
     // If redirect fails, fallback to cookie verification
     try {
-      await page.waitForURL("**/es/welcome", { timeout: 15000 });
+      await page.waitForURL("**/es/welcome", { timeout: 30000 });
     } catch (_error) {
       // Redirect may be slow in CI - verify cookie was set instead
       console.warn("URL redirect timeout - verifying cookie fallback");
@@ -179,16 +185,19 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     expect(localeCookie).toBeDefined();
     expect(localeCookie?.value).toBe("es");
 
-    // Wait for page to settle before navigating (avoids net::ERR_ABORTED)
-    await page.waitForLoadState("load");
+    // Wait for page to settle before navigating
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(2000);
 
     // If redirect didn't happen, navigate manually to test persistence
     if (!page.url().includes("/es/welcome")) {
-      await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
+      await page.goto("/es/welcome", { waitUntil: "networkidle" });
+      await page.waitForTimeout(2000);
     }
 
-    // Reload page
-    await page.reload({ waitUntil: "domcontentloaded" });
+    // Reload page with extra stabilization
+    await page.reload({ waitUntil: "networkidle" });
+    await page.waitForTimeout(3000);
 
     // Should still be on Spanish version
     await expect(page).toHaveURL(/\/es\/welcome/);
