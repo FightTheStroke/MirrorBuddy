@@ -127,9 +127,9 @@
       },
       "organizationsHeading": "Lösungen für Ihre Organisation",
       "organizationsSubtitle": "Vollständige Anpassung für Schulen und Unternehmen",
-      "accessIntroLine1": "Schneller Zugang:",
-      "accessIntroLine2": "Keine Registrierung erforderlich",
-      "organizationsFooter": "Kontaktiere uns für einen Unternehmensplan",
+      "accessIntroLine1": "Du kannst ohne Registrierung beginnen.",
+      "accessIntroLine2": "Kein Druck. Kein Urteil.",
+      "organizationsFooter": "Kontaktieren Sie uns für eine persönliche Beratung und ein maßgeschneidertes Angebot",
       "footer": "Allgemeine Geschäftsbedingungen",
       "toggle": {
         "students": "Schüler",
@@ -157,13 +157,13 @@
       "subtitle": "Coaches für Lernmethoden und Buddies für emotionale Unterstützung",
       "coach": "Coach - Lehrt dir Lernmethoden",
       "buddy": "Buddy - Unterstützt dich emotional",
-      "scrollHint": "Für weitere Informationen scrollen",
-      "introLine1": "Support",
-      "introLine2": "immer verfügbar",
-      "introDisclaimer": "Wir helfen dir jederzeit",
+      "scrollHint": "← Scrollen Sie, um alle zu sehen →",
+      "introLine1": "Coaches für die Lernmethode.",
+      "introLine2": "Buddies für emotionale Unterstützung.",
+      "introDisclaimer": "Sie sagen dir nicht, was du denken sollst. Sie helfen dir, deinen eigenen Weg zu finden.",
       "scrollLeft": "Nach links scrollen",
       "scrollRight": "Nach rechts scrollen",
-      "carouselLabel": "Support-Kanäle"
+      "carouselLabel": "Coaches- und Buddies-Karussell - verwenden Sie die Pfeile zur Navigation"
     },
     "features": {
       "heading": "Werkzeuge für jeden Lernstil",
@@ -174,12 +174,12 @@
       "interactiveQuizzes": "Interaktive Quiz - Teste dein Wissen",
       "gamification": "Gamification - Verdiene XP und schalte Ziele frei",
       "adaptiveLearning": "Adaptives Lernen - Passt sich deinem Stil und Tempo an",
-      "introLine1": "Leistungsstarke Tools",
-      "introLine2": "für dein Lernen"
+      "introLine1": "Jedes Werkzeug hat ein einziges Ziel:",
+      "introLine2": "das Lernen klarer zu machen, Schritt für Schritt."
     },
     "compliance": {
       "heading": "Compliance, Datenschutz und Transparenz",
-      "subtitle": "MirrorBuddy hält sich an internationale Vorschriften",
+      "subtitle": "Sicherheit, Datenschutz und Transparenz stehen im Mittelpunkt von MirrorBuddy",
       "items": {
         "gdpr": {
           "label": "GDPR",
@@ -206,8 +206,8 @@
           "description": "Apache-2.0-Lizenz"
         }
       },
-      "trustIntroLine1": "EU AI Act-Konformität",
-      "trustIntroLine2": "und DSGVO-Konformität garantiert",
+      "trustIntroLine1": "MirrorBuddy ist für Schüler und Familien gemacht.",
+      "trustIntroLine2": "Deshalb stehen Vertrauen, Sicherheit und Transparenz an erster Stelle.",
       "headingHighlight": "sicher und konform",
       "footer": "Ein Projekt der <link>FightTheStroke-Stiftung</link>, gewidmet der Technologie für Lernunterschiede."
     },

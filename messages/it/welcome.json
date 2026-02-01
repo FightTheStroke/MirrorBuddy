@@ -127,9 +127,9 @@
       },
       "organizationsHeading": "Soluzioni per la tua organizzazione",
       "organizationsSubtitle": "Personalizzazione completa per scuole e aziende",
-      "accessIntroLine1": "Accedi rapidamente:",
-      "accessIntroLine2": "Nessuna registrazione richiesta",
-      "organizationsFooter": "Contattaci per un piano aziendale",
+      "accessIntroLine1": "Puoi iniziare senza registrarti.",
+      "accessIntroLine2": "Nessuna pressione. Nessun giudizio.",
+      "organizationsFooter": "Contattaci per una consulenza personalizzata e un preventivo su misura",
       "footer": "Termini e condizioni",
       "toggle": {
         "students": "Studenti",
@@ -157,13 +157,13 @@
       "subtitle": "Coach per il metodo di studio e Amici per il supporto emotivo",
       "coach": "Coach - Ti insegnano il metodo di studio",
       "buddy": "Amico - Ti supportano emotivamente",
-      "scrollHint": "Scorri per ulteriori informazioni",
-      "introLine1": "Supporto",
-      "introLine2": "sempre disponibile",
-      "introDisclaimer": "Ti aiutiamo in ogni momento",
+      "scrollHint": "\u2190 Scorri per vedere tutti \u2192",
+      "introLine1": "Coach per il metodo di studio.",
+      "introLine2": "Buddy per il supporto emotivo.",
+      "introDisclaimer": "Non ti dicono cosa pensare. Ti aiutano a trovare il tuo modo di farlo.",
       "scrollLeft": "Scorri a sinistra",
       "scrollRight": "Scorri a destra",
-      "carouselLabel": "Canali di supporto"
+      "carouselLabel": "Carosello coach e buddies - usa le frecce per navigare"
     },
     "features": {
       "heading": "Strumenti per ogni stile di apprendimento",
@@ -174,12 +174,12 @@
       "interactiveQuizzes": "Quiz Interattivi - Verifica le tue conoscenze",
       "gamification": "Gamification - Guadagna XP e sblocca obiettivi",
       "adaptiveLearning": "Apprendimento Adattivo - Si adatta al tuo stile e ritmo",
-      "introLine1": "Strumenti potenti",
-      "introLine2": "per il tuo apprendimento"
+      "introLine1": "Ogni strumento ha un solo obiettivo:",
+      "introLine2": "rendere lo studio pi\u00f9 chiaro, passo dopo passo."
     },
     "compliance": {
       "heading": "Conformità, privacy e trasparenza",
-      "subtitle": "MirrorBuddy aderisce alle normative internazionali",
+      "subtitle": "Sicurezza, privacy e trasparenza sono al cuore di MirrorBuddy",
       "items": {
         "gdpr": {
           "label": "GDPR",
@@ -206,8 +206,8 @@
           "description": "Licenza Apache 2.0"
         }
       },
-      "trustIntroLine1": "Conformità EU AI Act",
-      "trustIntroLine2": "e GDPR garantita",
+      "trustIntroLine1": "MirrorBuddy nasce per studenti e famiglie.",
+      "trustIntroLine2": "Per questo fiducia, sicurezza e trasparenza vengono prima di tutto.",
       "headingHighlight": "sicura e conforme",
       "footer": "Un progetto di <link>Fondazione FightTheStroke</link>, dedicato alla tecnologia per le differenze di apprendimento."
     },

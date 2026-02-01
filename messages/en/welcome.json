@@ -127,9 +127,9 @@
       },
       "organizationsHeading": "Solutions for your organization",
       "organizationsSubtitle": "Complete customization for schools and companies",
-      "accessIntroLine1": "Quick access:",
-      "accessIntroLine2": "No registration required",
-      "organizationsFooter": "Contact us for a business plan",
+      "accessIntroLine1": "You can start without registering.",
+      "accessIntroLine2": "No pressure. No judgment.",
+      "organizationsFooter": "Contact us for personalized consulting and a tailored quote",
       "footer": "Terms and conditions",
       "toggle": {
         "students": "Students",
@@ -157,13 +157,13 @@
       "subtitle": "Coaches for study methods and Buddies for emotional support",
       "coach": "Coach - They teach you study methods",
       "buddy": "Buddy - They support you emotionally",
-      "scrollHint": "Scroll for more information",
-      "introLine1": "Support",
-      "introLine2": "always available",
-      "introDisclaimer": "We help you at any time",
+      "scrollHint": "\u2190 Scroll to see all \u2192",
+      "introLine1": "Coaches for study methods.",
+      "introLine2": "Buddies for emotional support.",
+      "introDisclaimer": "They don't tell you what to think. They help you find your own way to do it.",
       "scrollLeft": "Scroll left",
       "scrollRight": "Scroll right",
-      "carouselLabel": "Support channels"
+      "carouselLabel": "Coaches and buddies carousel - use arrows to navigate"
     },
     "features": {
       "heading": "Tools for every learning style",
@@ -174,12 +174,12 @@
       "interactiveQuizzes": "Interactive Quizzes - Test your knowledge",
       "gamification": "Gamification - Earn XP and unlock achievements",
       "adaptiveLearning": "Adaptive Learning - Adapts to your style and pace",
-      "introLine1": "Powerful tools",
-      "introLine2": "for your learning"
+      "introLine1": "Every tool has a single goal:",
+      "introLine2": "making studying clearer, step by step."
     },
     "compliance": {
       "heading": "Compliance, privacy, and transparency",
-      "subtitle": "MirrorBuddy complies with international regulations",
+      "subtitle": "Security, privacy and transparency are at the heart of MirrorBuddy",
       "items": {
         "gdpr": {
           "label": "GDPR",
@@ -206,8 +206,8 @@
           "description": "Apache 2.0 license"
         }
       },
-      "trustIntroLine1": "EU AI Act compliance",
-      "trustIntroLine2": "and GDPR compliance guaranteed",
+      "trustIntroLine1": "MirrorBuddy is built for students and families.",
+      "trustIntroLine2": "That's why trust, safety, and transparency come first.",
       "headingHighlight": "safe and compliant",
       "footer": "A project by <link>FightTheStroke Foundation</link>, dedicated to technology for learning differences."
     },
