@@ -167,8 +167,54 @@ The `.github/copilot-instructions.md` file includes:
 - Plan execution workflow (7-step TDD process)
 - ADR references for key architectural decisions
 
-Combined with preToolUse hooks (`~/.copilot/hooks.json`), Copilot CLI
+Combined with preToolUse hooks (`.copilot/hooks.json` in repo), Copilot CLI
 now has the same knowledge AND enforcement as Claude Code for MirrorBuddy.
+
+## Quick Start: Switching from Claude Code to Copilot CLI
+
+When Claude Code tokens run out, switch to Copilot CLI:
+
+```bash
+# 1. Open MirrorBuddy directory
+cd ~/GitHub/MirrorBuddy
+
+# 2. Add scripts to PATH (add to ~/.zshrc for persistence)
+export PATH="$HOME/.claude/scripts:$PATH"
+
+# 3. Launch Copilot CLI with Opus
+gh copilot -p "your task here"
+
+# Or start interactive session
+gh copilot
+```
+
+Copilot will automatically:
+
+- Read `.github/copilot-instructions.md` (coding standards + domain rules)
+- Enforce `.copilot/hooks.json` (blocks token-wasteful commands)
+- Have access to all scripts via PATH
+
+### If you have an active plan
+
+```bash
+# See where you left off
+plan-db.sh list-tasks {plan_id}
+
+# Tell Copilot what to do
+gh copilot -p "Execute task T1-03 from plan {plan_id}. \
+  Read the task: plan-db.sh get-task {task_db_id}. \
+  Follow TDD: write test first, then implement. \
+  Use ci-summary.sh --quick to validate. \
+  Mark done: plan-db.sh update-task {task_db_id} done 'Summary'"
+```
+
+### If no plan is active
+
+```bash
+# Direct task execution
+gh copilot -p "Fix the bug in src/lib/auth/... \
+  Follow TDD. Use ci-summary.sh --quick to validate."
+```
 
 ## Best Practice
 
@@ -176,4 +222,5 @@ Use Claude Code for: planning, architecture, debugging, Thor validation,
 multi-wave coordination, security-sensitive tasks.
 
 Use Copilot CLI for: mechanical task execution, single-file changes,
-test writing, documentation updates, bulk operations.
+test writing, documentation updates, bulk operations, continuing work
+when Claude Code tokens are exhausted.

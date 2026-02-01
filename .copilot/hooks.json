@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "preToolUse": [
+      {
+        "type": "command",
+        "bash": ".copilot/hooks/enforce-standards.sh",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}
