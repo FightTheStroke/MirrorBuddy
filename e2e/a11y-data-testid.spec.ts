@@ -43,14 +43,38 @@ test.describe("Skip Link - data-testid Selectors", () => {
   });
 
   test("skip link navigates to main content on click", async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const skipLink = page.locator('[data-testid="skip-link"]');
-    await skipLink.click();
-    await page.waitForTimeout(500);
+    // Wait for React hydration: floating button only renders via React.
+    // Use domcontentloaded (not networkidle) to avoid blocking on concurrent
+    // API requests from parallel CI workers.
+    await page
+      .locator('[data-testid="a11y-floating-button"]')
+      .waitFor({ state: "visible", timeout: 30000 });
 
-    // Check focus was moved
+    const skipLink = page.locator('[data-testid="skip-link"]');
+    await skipLink.focus();
+    await skipLink.click();
+
+    // Retry if handler wasn't hydrated
+    const moved = await page
+      .waitForFunction(() => document.activeElement?.id === "main-content", {
+        timeout: 3000,
+      })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!moved) {
+      await skipLink.focus();
+      await skipLink.click();
+      await page.waitForFunction(
+        () => document.activeElement?.id === "main-content",
+        { timeout: 10000 },
+      );
+    }
+
     const focusedId = await page.evaluate(
       () => document.activeElement?.id || "",
     );

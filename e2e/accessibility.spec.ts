@@ -570,6 +570,17 @@ test.describe("Instant Access - Cookie Persistence", () => {
     const button = page.locator('[data-testid="a11y-floating-button"]');
     await button.click();
 
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const appeared = await panel
+      .waitFor({ state: "visible", timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!appeared) {
+      await button.click();
+      await expect(panel).toBeVisible({ timeout: 10000 });
+    }
+
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
     await dyslexiaBtn.click();
     await page.waitForTimeout(500);

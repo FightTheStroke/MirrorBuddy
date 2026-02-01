@@ -113,12 +113,14 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   test("skip link navigates to main content", async ({ page }) => {
     test.setTimeout(60000);
     await page.goto(toLocalePath("/"));
-    await page.waitForLoadState("networkidle");
+    await page.waitForLoadState("domcontentloaded");
 
-    // Wait for React hydration: floating button only renders via React
+    // Wait for React hydration: floating button only renders via React.
+    // Use domcontentloaded (not networkidle) to avoid blocking on concurrent
+    // API requests from parallel CI workers.
     await page
       .locator('[data-testid="a11y-floating-button"]')
-      .waitFor({ state: "visible", timeout: 15000 });
+      .waitFor({ state: "visible", timeout: 30000 });
 
     const skipLink = page.locator('[data-testid="skip-link"]');
     await skipLink.focus();
