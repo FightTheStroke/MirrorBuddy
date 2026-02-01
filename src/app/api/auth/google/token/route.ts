@@ -6,16 +6,15 @@
  * Token is refreshed automatically if expired.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import { getValidAccessToken } from "@/lib/google/oauth";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
-export async function GET(_request: NextRequest) {
-  // Security: Get userId from authenticated session only
-  const { userId, errorResponse } = await requireAuthenticatedUser();
-  if (errorResponse) return errorResponse;
-
-  const accessToken = await getValidAccessToken(userId!);
+export const GET = pipe(
+  withSentry("/api/auth/google/token"),
+  withAuth,
+)(async (ctx) => {
+  const accessToken = await getValidAccessToken(ctx.userId!);
 
   if (!accessToken) {
     return NextResponse.json(
@@ -25,4 +24,4 @@ export async function GET(_request: NextRequest) {
   }
 
   return NextResponse.json({ accessToken });
-}
+});

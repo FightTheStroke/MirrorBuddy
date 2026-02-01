@@ -5,43 +5,34 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { logger } from "@/lib/logger";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
+export const GET = pipe(
+  withSentry("/api/auth/me"),
+  withAuth,
+)(async (ctx) => {
+  const user = await prisma.user.findUnique({
+    where: { id: ctx.userId },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      role: true,
+    },
+  });
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: auth.userId },
-      select: {
-        id: true,
-        email: true,
-        username: true,
-        role: true,
-      },
-    });
-
-    if (!user) {
-      return NextResponse.json({ authenticated: false }, { status: 401 });
-    }
-
-    return NextResponse.json({
-      authenticated: true,
-      user: {
-        id: user.id,
-        email: user.email,
-        username: user.username,
-        role: user.role,
-        isAdmin: user.role === "ADMIN",
-      },
-    });
-  } catch (error) {
-    logger.error("Auth me endpoint error", { error: String(error) });
-    return NextResponse.json({ authenticated: false }, { status: 500 });
+  if (!user) {
+    return NextResponse.json({ authenticated: false }, { status: 401 });
   }
-}
+
+  return NextResponse.json({
+    authenticated: true,
+    user: {
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      role: user.role,
+      isAdmin: user.role === "ADMIN",
+    },
+  });
+});

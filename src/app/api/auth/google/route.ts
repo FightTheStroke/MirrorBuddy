@@ -6,32 +6,26 @@
  * Requires userId in query params (from session/cookie in production).
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
 import {
   generateAuthUrl,
   generateNonce,
   generateCodeVerifier,
   isGoogleOAuthConfigured,
 } from "@/lib/google";
+import { RATE_LIMITS } from "@/lib/rate-limit";
 import {
-  checkRateLimitAsync,
-  getClientIdentifier,
-  rateLimitResponse,
-  RATE_LIMITS,
-} from "@/lib/rate-limit";
+  pipe,
+  withSentry,
+  withAuth,
+  withRateLimit,
+} from "@/lib/api/middlewares";
 
-export async function GET(request: NextRequest) {
-  // Rate limit OAuth initiation (10 per minute)
-  const clientId = getClientIdentifier(request);
-  const rateLimitResult = await checkRateLimitAsync(
-    `auth:oauth:${clientId}`,
-    RATE_LIMITS.AUTH_OAUTH,
-  );
-  if (!rateLimitResult.success) {
-    return rateLimitResponse(rateLimitResult);
-  }
-
+export const GET = pipe(
+  withSentry("/api/auth/google"),
+  withAuth,
+  withRateLimit(RATE_LIMITS.AUTH_OAUTH),
+)(async (ctx) => {
   // Check if Google OAuth is configured
   if (!isGoogleOAuthConfigured()) {
     return NextResponse.json(
@@ -40,11 +34,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Security: Get userId from authenticated session only
-  const { userId, errorResponse } = await requireAuthenticatedUser();
-  if (errorResponse) return errorResponse;
-
-  const { searchParams } = new URL(request.url);
+  const { searchParams } = new URL(ctx.req.url);
   const returnUrl = searchParams.get("returnUrl") || "/settings";
 
   // Generate PKCE code verifier for secure authorization code exchange
@@ -52,7 +42,7 @@ export async function GET(request: NextRequest) {
 
   // Generate OAuth URL with state for CSRF protection and PKCE
   const authUrl = generateAuthUrl({
-    userId: userId!,
+    userId: ctx.userId!,
     returnUrl,
     nonce: generateNonce(),
     codeVerifier,
@@ -68,4 +58,4 @@ export async function GET(request: NextRequest) {
 
   // Redirect to Google consent screen
   return NextResponse.redirect(authUrl);
-}
+});

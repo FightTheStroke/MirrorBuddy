@@ -56,6 +56,10 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 import { prisma } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
@@ -88,7 +92,8 @@ describe("POST /api/auth/login", () => {
       body: JSON.stringify({ email: "test@example.com", password: "password" }),
     });
 
-    const response = (await POST(request)) as NextResponse;
+    const routeContext = { params: Promise.resolve({}) };
+    const response = (await POST(request, routeContext)) as NextResponse;
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -125,7 +130,8 @@ describe("POST /api/auth/login", () => {
       body: JSON.stringify({ email: "wrong@example.com", password: "wrong" }),
     });
 
-    const response = (await POST(request)) as NextResponse;
+    const routeContext = { params: Promise.resolve({}) };
+    const response = (await POST(request, routeContext)) as NextResponse;
     expect(response.status).toBe(401);
 
     // No cookies should be set on failed login
@@ -154,7 +160,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = (await POST(request)) as NextResponse;
+    const routeContext = { params: Promise.resolve({}) };
+    const response = (await POST(request, routeContext)) as NextResponse;
     expect(response.status).toBe(401);
 
     // No cookies should be set on failed login
@@ -179,7 +186,8 @@ describe("POST /api/auth/login", () => {
       body: JSON.stringify({ email: "test@example.com", password: "password" }),
     });
 
-    const response = (await POST(request)) as NextResponse;
+    const routeContext = { params: Promise.resolve({}) };
+    const response = (await POST(request, routeContext)) as NextResponse;
     expect(response.status).toBe(403);
 
     // No cookies should be set for disabled users
@@ -206,7 +214,8 @@ describe("POST /api/auth/login", () => {
       body: JSON.stringify({ email: "test@example.com", password: "password" }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -235,7 +244,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -265,7 +275,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -295,7 +306,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -326,7 +338,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
@@ -356,7 +369,8 @@ describe("POST /api/auth/login", () => {
       }),
     });
 
-    const response = await POST(request);
+    const routeContext = { params: Promise.resolve({}) };
+    const response = await POST(request, routeContext);
     const data = await response.json();
 
     expect(response.status).toBe(200);
