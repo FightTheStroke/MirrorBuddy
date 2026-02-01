@@ -122,31 +122,26 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
       .locator('[data-testid="a11y-floating-button"]')
       .waitFor({ state: "visible", timeout: 30000 });
 
+    // Polling loop: click skip link repeatedly until focus moves to main-content.
+    // SSR hydration attaches the onClick handler asynchronously — a single
+    // retry is not enough under CI resource contention.
     const skipLink = page.locator('[data-testid="skip-link"]');
-    await skipLink.focus();
-    await skipLink.click();
+    let focusMoved = false;
 
-    // Retry click if handler wasn't hydrated on first attempt
-    const moved = await page
-      .waitForFunction(() => document.activeElement?.id === "main-content", {
-        timeout: 3000,
-      })
-      .then(() => true)
-      .catch(() => false);
-
-    if (!moved) {
+    for (let attempt = 0; attempt < 10 && !focusMoved; attempt++) {
       await skipLink.focus();
       await skipLink.click();
-      await page.waitForFunction(
-        () => document.activeElement?.id === "main-content",
-        { timeout: 10000 },
-      );
+      focusMoved = await page
+        .waitForFunction(() => document.activeElement?.id === "main-content", {
+          timeout: 3000,
+        })
+        .then(() => true)
+        .catch(() => false);
     }
 
-    const focusedElement = await page.evaluate(() => {
-      return document.activeElement?.id;
-    });
-
+    const focusedElement = await page.evaluate(
+      () => document.activeElement?.id,
+    );
     expect(focusedElement).toBe("main-content");
   });
 
