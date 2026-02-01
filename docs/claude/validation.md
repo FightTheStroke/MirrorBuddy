@@ -60,15 +60,22 @@ Common schemas (`common.ts`) define reusable validators like `NonEmptyString`, `
 ## Code Patterns
 
 ```typescript
-// In API route - validate JSON body
+// In API route - validate JSON body with pipe() middleware
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { validateJsonRequest } from "@/lib/validation";
 import { chatRequestSchema } from "@/lib/validation/schemas/chat";
 
-export async function POST(request: NextRequest) {
-  const validation = await validateJsonRequest(request, chatRequestSchema);
+export const POST = pipe(
+  withSentry("/api/chat"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const validation = await validateJsonRequest(ctx.req, chatRequestSchema);
   if (!validation.success) return validation.response; // 400 with details
   const data = validation.data; // typed and validated
-}
+  // ...business logic...
+});
 
 // Creating a new schema
 import { z } from "zod";

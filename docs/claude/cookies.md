@@ -27,25 +27,30 @@
 | mirrorbuddy-a11y           | No       | No     | 90 days | A11y preferences  |
 | mirrorbuddy-theme          | No       | No     | 1 year  | Theme preference  |
 
-## Auth Flow (Session-Based)
+## Auth Flow (pipe middleware)
 
 ```typescript
-// Server: validate authenticated user
-import { validateAuth, validateAdminAuth } from "@/lib/auth/session-auth";
+// Authenticated endpoint — withAuth adds ctx.userId
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
-const auth = await validateAuth();
-if (!auth.authenticated)
-  return NextResponse.json({ error: auth.error }, { status: 401 });
-const userId = auth.userId; // NEVER trust userId from request body
+export const GET = pipe(
+  withSentry("/api/resource"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!; // Set by withAuth middleware
+  // ...business logic...
+});
 
-// Admin-only endpoints
-const admin = await validateAdminAuth();
-if (!admin.isAdmin)
-  return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+// Admin-only endpoint — withAdmin adds ctx.userId + ctx.isAdmin
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 
-// Convenience helper (returns errorResponse if not authenticated)
-const { userId, errorResponse } = await requireAuthenticatedUser();
-if (errorResponse) return errorResponse;
+export const POST = pipe(
+  withSentry("/api/admin/resource"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  // ctx.userId and ctx.isAdmin guaranteed by withAdmin
+});
 ```
 
 ## Cookie Signing (HMAC-SHA256)
@@ -56,11 +61,16 @@ Format: `{value}.{signature}` where signature = HMAC-SHA256(value, SESSION_SECRE
 ## CSRF Double-Submit Pattern
 
 ```typescript
-// Server: validate on POST/PUT/PATCH/DELETE (BEFORE auth check)
-import { requireCSRF } from "@/lib/security/csrf";
-if (!requireCSRF(request)) {
-  return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-}
+// Server: withCSRF middleware validates CSRF before auth
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
+
+export const POST = pipe(
+  withSentry("/api/resource"),
+  withCSRF, // Validates CSRF token automatically
+  withAuth,
+)(async (ctx) => {
+  // CSRF already validated by middleware
+});
 
 // Client: use csrfFetch for all mutations
 import { csrfFetch } from "@/lib/auth/csrf-client";

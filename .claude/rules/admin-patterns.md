@@ -6,30 +6,33 @@ All admin API routes under `src/app/api/admin/`:
 
 | Pattern  | Requirement                                     |
 | -------- | ----------------------------------------------- |
-| Auth     | `validateAdminAuth()` at function entry         |
-| CSRF     | `requireCSRF(request)` BEFORE auth on mutations |
+| Auth     | `withAdmin` middleware in pipe()                |
+| CSRF     | `withCSRF` middleware BEFORE withAdmin          |
 | Audit    | `auditService.log()` after successful mutations |
 | Response | Standard error format `{ error: string }`       |
 
 ## Mutation Template
 
 ```typescript
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/auth/csrf";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { auditService } from "@/lib/admin/audit-service";
 
-export async function POST(request: NextRequest) {
-  requireCSRF(request);
-  const admin = await validateAdminAuth();
-  // ... business logic ...
+export const POST = pipe(
+  withSentry("/api/admin/resource"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  // Business logic — ctx.userId and ctx.isAdmin available
+  const resource = await createResource(ctx.userId!);
   await auditService.log({
     action: "CREATE_RESOURCE",
     entityType: "Resource",
     entityId: resource.id,
-    adminId: admin.id,
+    adminId: ctx.userId!,
   });
   return NextResponse.json(resource, { status: 201 });
-}
+});
 ```
 
 ## UI Patterns

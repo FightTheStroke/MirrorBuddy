@@ -1,66 +1,71 @@
 # API Routes
 
-> Next.js 16 App Router API routes with session-based auth and CSRF protection
+> Next.js 16 App Router API routes with composable pipe() middleware (ADR 0113)
 
 ## Quick Reference
 
-| Key    | Value                                         |
-| ------ | --------------------------------------------- |
-| Path   | `src/app/api/`                                |
-| Auth   | Session cookies (httpOnly, signed)            |
-| CSRF   | `requireCSRF()` + `csrfFetch()`               |
-| Health | `GET /api/health`, `GET /api/health/detailed` |
-| ADRs   | 0075 (Cookies)                                |
+| Key     | Value                                             |
+| ------- | ------------------------------------------------- |
+| Path    | `src/app/api/`                                    |
+| Pattern | `pipe()` composable middleware (ADR 0113)         |
+| Auth    | Session cookies (httpOnly, signed)                |
+| CSRF    | `withCSRF` middleware + `csrfFetch()` client-side |
+| Health  | `GET /api/health`, `GET /api/health/detailed`     |
+| ADRs    | 0075 (Cookies), 0078 (CSRF), 0113 (pipe)          |
 
 ## Standard Structure
 
 ```typescript
 // src/app/api/[resource]/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/csrf";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 
-export async function GET(request: NextRequest) {
-  const session = await validateAuth();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = pipe(
+  withSentry("/api/resource"),
+  withAuth,
+)(async (ctx) => {
   const data = await prisma.resource.findMany({
-    where: { userId: session.userId },
+    where: { userId: ctx.userId },
   });
   return NextResponse.json(data);
-}
+});
 
-export async function POST(request: NextRequest) {
-  // CSRF check BEFORE auth (important!)
-  const csrfValid = await requireCSRF(request);
-  if (!csrfValid)
-    return NextResponse.json({ error: "Invalid CSRF" }, { status: 403 });
-
-  const session = await validateAuth();
-  if (!session)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const body = await request.json();
+export const POST = pipe(
+  withSentry("/api/resource"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const body = await ctx.req.json();
   const created = await prisma.resource.create({
-    data: { ...body, userId: session.userId },
+    data: { ...body, userId: ctx.userId },
   });
   return NextResponse.json(created, { status: 201 });
-}
+});
 ```
+
+## Available Middleware
+
+| Middleware           | Purpose                     | Adds to ctx         |
+| -------------------- | --------------------------- | ------------------- |
+| `withSentry(path)`   | Error capture + logging     | —                   |
+| `withAuth`           | Session auth (cookie)       | `userId`            |
+| `withAdmin`          | Admin auth (email list)     | `userId`, `isAdmin` |
+| `withCSRF`           | CSRF token validation       | —                   |
+| `withRateLimit(cfg)` | Rate limiting               | —                   |
+| `withCron`           | Cron job auth (CRON_SECRET) | —                   |
+
+**Middleware order**: `withSentry` first, then `withCSRF`, then `withAuth`/`withAdmin`.
 
 ## CSRF Protection
 
-| Endpoint Type                       | Server Check             | Client Call              |
-| ----------------------------------- | ------------------------ | ------------------------ |
-| Authenticated POST/PUT/PATCH/DELETE | `requireCSRF()` required | `csrfFetch()` required   |
-| Public endpoints                    | Not needed               | Optional                 |
-| Cron jobs                           | Not needed               | N/A (uses `CRON_SECRET`) |
+| Endpoint Type                       | Server Middleware    | Client Call              |
+| ----------------------------------- | -------------------- | ------------------------ |
+| Authenticated POST/PUT/PATCH/DELETE | `withCSRF` in pipe() | `csrfFetch()` required   |
+| Public endpoints                    | Not needed           | Optional                 |
+| Cron jobs                           | Not needed           | N/A (uses `CRON_SECRET`) |
 
-**Order**: CSRF check -> Auth check -> Business logic
-
-## Key Routes (50+ Total)
+## Key Routes (210+ Total)
 
 | Route                  | Method   | Purpose                      |
 | ---------------------- | -------- | ---------------------------- |
@@ -77,6 +82,13 @@ export async function POST(request: NextRequest) {
 | `/api/admin/*`         | Various  | Admin-only routes            |
 | `/api/cron/*`          | POST     | Scheduled jobs (CRON_SECRET) |
 
+## ESLint Enforcement
+
+| Rule                           | Level | Catches                                |
+| ------------------------------ | ----- | -------------------------------------- |
+| `require-pipe-handler`         | warn  | `export async function` in route files |
+| `require-csrf-mutating-routes` | warn  | Missing `withCSRF` on POST/PUT/DELETE  |
+
 ## Error Responses
 
 | Status  | Use Case                                  |
@@ -88,6 +100,6 @@ export async function POST(request: NextRequest) {
 
 ## See Also
 
-- `.claude/rules/api-patterns.md` — API route patterns
+- `docs/adr/0113-composable-api-handler-pattern.md` — Architecture decision
 - `.claude/rules/cookies.md` — Cookie security and auth patterns
 - `docs/adr/0075-cookie-auth.md` — Session auth architecture
