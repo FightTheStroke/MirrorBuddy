@@ -32,13 +32,16 @@ vi.mock("@sentry/nextjs", () => ({
 
 vi.mock("@/lib/logger", () => ({
   logger: {
-    error: vi.fn(),
+    info: vi.fn(),
     warn: vi.fn(),
-    child: vi.fn(() => ({
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
-      info: vi.fn(),
-    })),
+      debug: vi.fn(),
+    }),
   },
 }));
 

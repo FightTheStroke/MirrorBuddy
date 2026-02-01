@@ -45,13 +45,13 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    error: vi.fn(),
     warn: vi.fn(),
+    error: vi.fn(),
     debug: vi.fn(),
-    child: vi.fn().mockReturnValue({
+    child: () => ({
       info: vi.fn(),
-      error: vi.fn(),
       warn: vi.fn(),
+      error: vi.fn(),
       debug: vi.fn(),
     }),
   },

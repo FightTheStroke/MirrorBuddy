@@ -16,16 +16,16 @@ vi.mock("@sentry/nextjs", () => ({
 // Mock logger for all cron tests
 vi.mock("@/lib/logger", () => ({
   logger: {
-    error: vi.fn(),
-    warn: vi.fn(),
     info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
     debug: vi.fn(),
-    child: vi.fn(() => ({
+    child: () => ({
       info: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
-    })),
+    }),
   },
 }));
 
