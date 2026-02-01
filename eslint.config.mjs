@@ -71,18 +71,6 @@ const eslintConfig = defineConfig([
       "security/detect-non-literal-regexp": "off", // Dynamic regex from controlled sources
     },
   },
-  // Test files - allow dynamic regex (from i18n helpers, patterns, etc.)
-  {
-    files: [
-      "src/**/*.test.ts",
-      "src/**/*.test.tsx",
-      "src/test/**/*.ts",
-      "e2e/**/*.spec.ts",
-    ],
-    rules: {
-      "security/detect-non-literal-regexp": "off", // Tests use dynamic patterns from translations
-    },
-  },
   // Override default ignores of eslint-config-next.
   globalIgnores([
     // Default ignores of eslint-config-next:
@@ -408,6 +396,14 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "local-rules/require-csrf-mutating-routes": "warn",
+    },
+  },
+  // Require complete logger mock in test files
+  // Prevents "logger.X is not a function" errors from incomplete mocks
+  {
+    files: ["**/*.test.ts", "**/*.test.tsx"],
+    rules: {
+      "local-rules/require-complete-logger-mock": "error",
     },
   },
 ]);

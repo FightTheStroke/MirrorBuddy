@@ -98,9 +98,9 @@ test.describe("Welcome Flow - Internationalization (i18n)", () => {
       // Extra wait for hydration in CI
       await localePage.page.waitForTimeout(2000);
 
-      // Look for primary CTAs (buttons with role='button' or <button> tag)
+      // Look for primary CTAs (buttons with visible text, exclude icon-only buttons)
       const buttons = localePage.page.locator(
-        "button:visible, [role='button']:visible",
+        "button:visible:not([aria-label]):not(:has(svg:only-child)), [role='button']:visible:not([aria-label]):not(:has(svg:only-child))",
       );
 
       // Wait for at least one button to appear

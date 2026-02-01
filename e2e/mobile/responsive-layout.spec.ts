@@ -167,11 +167,37 @@ test.describe("Mobile Responsive Layout", () => {
     await page.waitForTimeout(500);
 
     // Check body scroll width vs client width
-    const hasHorizontalScroll = await page.evaluate(() => {
-      return document.body.scrollWidth > document.body.clientWidth;
+    const result = await page.evaluate(() => {
+      const bodyWidth = document.body.clientWidth;
+      const scrollWidth = document.body.scrollWidth;
+      const overflowing: { tag: string; cls: string; overflow: number }[] = [];
+
+      if (scrollWidth > bodyWidth) {
+        document.querySelectorAll("*").forEach((el) => {
+          const rect = el.getBoundingClientRect();
+          if (rect.right > bodyWidth + 2) {
+            overflowing.push({
+              tag: el.tagName,
+              cls: (el.className?.toString?.() || "").slice(0, 60),
+              overflow: Math.round(rect.right - bodyWidth),
+            });
+          }
+        });
+      }
+
+      return { bodyWidth, scrollWidth, overflowing: overflowing.slice(0, 10) };
     });
 
-    expect(hasHorizontalScroll).toBe(false);
+    if (result.scrollWidth > result.bodyWidth) {
+      console.log(
+        "OVERFLOW DETECTED:",
+        result.scrollWidth - result.bodyWidth,
+        "px",
+      );
+      console.log("Overflowing elements:", result.overflowing);
+    }
+
+    expect(result.scrollWidth).toBeLessThanOrEqual(result.bodyWidth);
   });
 
   test("all interactive elements should be keyboard accessible", async ({

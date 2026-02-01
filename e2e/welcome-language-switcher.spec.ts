@@ -220,8 +220,10 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
 
       const switcher = page.getByRole("button", { name: /select language/i });
       await expect(switcher).toBeVisible({ timeout: 10000 });
-      await switcher.focus();
-      await page.keyboard.press("Enter");
+
+      // Use press on the element directly instead of page.keyboard
+      await switcher.press("Enter");
+      await page.waitForTimeout(200); // Wait for animation
 
       await expect(page.getByRole("menu")).toBeVisible({ timeout: 10000 });
     });

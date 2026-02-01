@@ -3,15 +3,21 @@
  * @module tools/svg-overview-generator
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi } from "vitest";
 
 // Mock logger
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
-    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 
@@ -22,101 +28,101 @@ import {
   type OverviewData,
   type OverviewNode,
   type SVGGenerationOptions,
-} from '../svg-overview-generator';
+} from "../svg-overview-generator";
 
-describe('SVG Overview Generator', () => {
-  describe('generateOverviewSVG', () => {
+describe("SVG Overview Generator", () => {
+  describe("generateOverviewSVG", () => {
     const sampleData: OverviewData = {
-      title: 'Test Overview',
-      subject: 'Mathematics',
+      title: "Test Overview",
+      subject: "Mathematics",
       root: {
-        id: 'root',
-        label: 'Main Topic',
-        type: 'main',
+        id: "root",
+        label: "Main Topic",
+        type: "main",
         children: [
           {
-            id: 'section1',
-            label: 'Section 1',
-            type: 'section',
+            id: "section1",
+            label: "Section 1",
+            type: "section",
             children: [
-              { id: 'concept1', label: 'Concept A', type: 'concept' },
-              { id: 'concept2', label: 'Concept B', type: 'concept' },
+              { id: "concept1", label: "Concept A", type: "concept" },
+              { id: "concept2", label: "Concept B", type: "concept" },
             ],
           },
           {
-            id: 'section2',
-            label: 'Section 2',
-            type: 'section',
+            id: "section2",
+            label: "Section 2",
+            type: "section",
           },
         ],
       },
     };
 
-    it('should generate valid SVG with XML declaration', () => {
+    it("should generate valid SVG with XML declaration", () => {
       const svg = generateOverviewSVG(sampleData);
 
       expect(svg).toContain('<?xml version="1.0" encoding="UTF-8"?>');
       expect(svg).toContain('<svg xmlns="http://www.w3.org/2000/svg"');
-      expect(svg).toContain('</svg>');
+      expect(svg).toContain("</svg>");
     });
 
-    it('should include the title in the SVG', () => {
+    it("should include the title in the SVG", () => {
       const svg = generateOverviewSVG(sampleData);
 
-      expect(svg).toContain('Test Overview');
+      expect(svg).toContain("Test Overview");
     });
 
-    it('should include the subject badge when provided', () => {
+    it("should include the subject badge when provided", () => {
       const svg = generateOverviewSVG(sampleData);
 
-      expect(svg).toContain('Mathematics');
+      expect(svg).toContain("Mathematics");
     });
 
-    it('should use dark theme by default', () => {
+    it("should use dark theme by default", () => {
       const svg = generateOverviewSVG(sampleData);
 
-      expect(svg).toContain('#1e293b'); // Dark background
+      expect(svg).toContain("#1e293b"); // Dark background
     });
 
-    it('should support light theme', () => {
-      const options: SVGGenerationOptions = { theme: 'light' };
+    it("should support light theme", () => {
+      const options: SVGGenerationOptions = { theme: "light" };
       const svg = generateOverviewSVG(sampleData, options);
 
-      expect(svg).toContain('#ffffff'); // Light background
+      expect(svg).toContain("#ffffff"); // Light background
     });
 
-    it('should render all nodes', () => {
+    it("should render all nodes", () => {
       const svg = generateOverviewSVG(sampleData);
 
-      expect(svg).toContain('Main Topic');
-      expect(svg).toContain('Section 1');
-      expect(svg).toContain('Section 2');
-      expect(svg).toContain('Concept A');
-      expect(svg).toContain('Concept B');
+      expect(svg).toContain("Main Topic");
+      expect(svg).toContain("Section 1");
+      expect(svg).toContain("Section 2");
+      expect(svg).toContain("Concept A");
+      expect(svg).toContain("Concept B");
     });
 
-    it('should include connection paths', () => {
+    it("should include connection paths", () => {
       const svg = generateOverviewSVG(sampleData);
 
       expect(svg).toContain('<path class="connection"');
     });
 
-    it('should show icons when showIcons is true', () => {
+    it("should show icons when showIcons is true", () => {
       const options: SVGGenerationOptions = { showIcons: true };
       const svg = generateOverviewSVG(sampleData, options);
 
-      expect(svg).toContain('🎯'); // Main icon
+      expect(svg).toContain("🎯"); // Main icon
     });
 
-    it('should hide icons when showIcons is false', () => {
+    it("should hide icons when showIcons is false", () => {
       const options: SVGGenerationOptions = { showIcons: false };
       const svg = generateOverviewSVG(sampleData, options);
 
-      expect(svg).not.toContain('🎯');
-      expect(svg).not.toContain('📑');
+      expect(svg).not.toContain("🎯");
+      expect(svg).not.toContain("📑");
     });
 
-    it('should respect custom dimensions', () => {
+    it("should respect custom dimensions", () => {
       const options: SVGGenerationOptions = { width: 800, height: 600 };
       const svg = generateOverviewSVG(sampleData, options);
 
@@ -125,99 +131,98 @@ describe('SVG Overview Generator', () => {
       expect(svg).toContain('viewBox="0 0 800 600"');
     });
 
-    it('should truncate long labels', () => {
+    it("should truncate long labels", () => {
       const longLabelData: OverviewData = {
-        title: 'Test',
+        title: "Test",
         root: {
-          id: 'root',
-          label: 'This is a very long label that should be truncated to fit the node',
-          type: 'main',
+          id: "root",
+          label:
+            "This is a very long label that should be truncated to fit the node",
+          type: "main",
         },
       };
       const options: SVGGenerationOptions = { maxLabelLength: 20 };
       const svg = generateOverviewSVG(longLabelData, options);
 
-      expect(svg).toContain('...');
-      expect(svg).not.toContain('that should be truncated to fit the node');
+      expect(svg).toContain("...");
+      expect(svg).not.toContain("that should be truncated to fit the node");
     });
 
-    it('should escape XML special characters', () => {
+    it("should escape XML special characters", () => {
       const xmlCharsData: OverviewData = {
-        title: 'Test <>&"\'',
+        title: "Test <>&\"'",
         root: {
-          id: 'root',
+          id: "root",
           label: 'Node with <special> & "chars"',
-          type: 'main',
+          type: "main",
         },
       };
       const svg = generateOverviewSVG(xmlCharsData);
 
-      expect(svg).toContain('&lt;');
-      expect(svg).toContain('&gt;');
-      expect(svg).toContain('&amp;');
-      expect(svg).toContain('&quot;');
+      expect(svg).toContain("&lt;");
+      expect(svg).toContain("&gt;");
+      expect(svg).toContain("&amp;");
+      expect(svg).toContain("&quot;");
     });
 
-    it('should use tree layout when specified', () => {
-      const options: SVGGenerationOptions = { layout: 'tree' };
+    it("should use tree layout when specified", () => {
+      const options: SVGGenerationOptions = { layout: "tree" };
       const svg = generateOverviewSVG(sampleData, options);
 
-      expect(svg).toContain('<svg');
+      expect(svg).toContain("<svg");
       // Tree layout positions nodes differently but still generates valid SVG
     });
 
-    it('should handle single node without children', () => {
+    it("should handle single node without children", () => {
       const singleNode: OverviewData = {
-        title: 'Single',
+        title: "Single",
         root: {
-          id: 'root',
-          label: 'Only Node',
-          type: 'main',
+          id: "root",
+          label: "Only Node",
+          type: "main",
         },
       };
       const svg = generateOverviewSVG(singleNode);
 
-      expect(svg).toContain('Only Node');
+      expect(svg).toContain("Only Node");
       expect(svg).not.toContain('<path class="connection"');
     });
   });
 
-  describe('generateMermaidCode', () => {
+  describe("generateMermaidCode", () => {
     const sampleData: OverviewData = {
-      title: 'Test',
+      title: "Test",
       root: {
-        id: 'root',
-        label: 'Main Topic',
-        type: 'main',
+        id: "root",
+        label: "Main Topic",
+        type: "main",
         children: [
           {
-            id: 'sec-1',
-            label: 'Section 1',
-            type: 'section',
-            children: [
-              { id: 'con-1', label: 'Concept', type: 'concept' },
-            ],
+            id: "sec-1",
+            label: "Section 1",
+            type: "section",
+            children: [{ id: "con-1", label: "Concept", type: "concept" }],
           },
         ],
       },
     };
 
-    it('should generate flowchart TD header', () => {
+    it("should generate flowchart TD header", () => {
       const mermaid = generateMermaidCode(sampleData);
 
-      expect(mermaid).toContain('flowchart TD');
+      expect(mermaid).toContain("flowchart TD");
     });
 
-    it('should define class styles', () => {
+    it("should define class styles", () => {
       const mermaid = generateMermaidCode(sampleData);
 
-      expect(mermaid).toContain('classDef main');
-      expect(mermaid).toContain('classDef section');
-      expect(mermaid).toContain('classDef concept');
-      expect(mermaid).toContain('classDef detail');
+      expect(mermaid).toContain("classDef main");
+      expect(mermaid).toContain("classDef section");
+      expect(mermaid).toContain("classDef concept");
+      expect(mermaid).toContain("classDef detail");
     });
 
-    it('should generate nodes with labels', () => {
+    it("should generate nodes with labels", () => {
       const mermaid = generateMermaidCode(sampleData);
 
       expect(mermaid).toContain('root["Main Topic"]');
@@ -225,28 +230,28 @@ describe('SVG Overview Generator', () => {
       expect(mermaid).toContain('con_1["Concept"]');
     });
 
-    it('should generate connections', () => {
+    it("should generate connections", () => {
       const mermaid = generateMermaidCode(sampleData);
 
-      expect(mermaid).toContain('root --> sec_1');
-      expect(mermaid).toContain('sec_1 --> con_1');
+      expect(mermaid).toContain("root --> sec_1");
+      expect(mermaid).toContain("sec_1 --> con_1");
     });
 
-    it('should assign class to nodes', () => {
+    it("should assign class to nodes", () => {
       const mermaid = generateMermaidCode(sampleData);
 
-      expect(mermaid).toContain('class root main');
-      expect(mermaid).toContain('class sec_1 section');
-      expect(mermaid).toContain('class con_1 concept');
+      expect(mermaid).toContain("class root main");
+      expect(mermaid).toContain("class sec_1 section");
+      expect(mermaid).toContain("class con_1 concept");
     });
 
-    it('should sanitize node IDs', () => {
+    it("should sanitize node IDs", () => {
       const specialIdData: OverviewData = {
-        title: 'Test',
+        title: "Test",
         root: {
-          id: 'root-with-special.chars',
-          label: 'Root',
-          type: 'main',
+          id: "root-with-special.chars",
+          label: "Root",
+          type: "main",
         },
       };
       const mermaid = generateMermaidCode(specialIdData);
@@ -254,13 +259,13 @@ describe('SVG Overview Generator', () => {
       expect(mermaid).toContain('root_with_special_chars["Root"]');
     });
 
-    it('should truncate long labels', () => {
+    it("should truncate long labels", () => {
       const longData: OverviewData = {
-        title: 'Test',
+        title: "Test",
         root: {
-          id: 'root',
-          label: 'This is a very long label that exceeds the maximum length',
-          type: 'main',
+          id: "root",
+          label: "This is a very long label that exceeds the maximum length",
+          type: "main",
         },
       };
       const mermaid = generateMermaidCode(longData);
@@ -271,8 +276,8 @@ describe('SVG Overview Generator', () => {
     });
   });
 
-  describe('parseTextToOverview', () => {
-    it('should parse markdown headers into sections', () => {
+  describe("parseTextToOverview", () => {
+    it("should parse markdown headers into sections", () => {
       const text = `
 ## Introduction
 This is the introduction.
@@ -284,18 +289,18 @@ Details about A.
 ### Concept B
 Details about B.
 `;
-      const result = parseTextToOverview('Study Guide', text);
+      const result = parseTextToOverview("Study Guide", text);
 
-      expect(result.title).toBe('Study Guide');
-      expect(result.root.label).toBe('Study Guide');
-      expect(result.root.type).toBe('main');
+      expect(result.title).toBe("Study Guide");
+      expect(result.root.label).toBe("Study Guide");
+      expect(result.root.type).toBe("main");
       expect(result.root.children).toHaveLength(2);
-      expect(result.root.children?.[0].label).toBe('Introduction');
-      expect(result.root.children?.[0].type).toBe('section');
-      expect(result.root.children?.[1].label).toBe('Main Concepts');
+      expect(result.root.children?.[0].label).toBe("Introduction");
+      expect(result.root.children?.[0].type).toBe("section");
+      expect(result.root.children?.[1].label).toBe("Main Concepts");
     });
 
-    it('should parse bullet points into details', () => {
+    it("should parse bullet points into details", () => {
       const text = `
 ## Section
 ### Concept
@@ -303,22 +308,22 @@ Details about B.
 - Point 2
 * Point 3
 `;
-      const result = parseTextToOverview('Test', text);
+      const result = parseTextToOverview("Test", text);
 
       const section = result.root.children?.[0];
       const concept = section?.children?.[0];
       expect(concept?.children).toHaveLength(3);
-      expect(concept?.children?.[0].type).toBe('detail');
-      expect(concept?.children?.[0].label).toBe('Point 1');
+      expect(concept?.children?.[0].type).toBe("detail");
+      expect(concept?.children?.[0].label).toBe("Point 1");
     });
 
-    it('should include subject when provided', () => {
-      const result = parseTextToOverview('Title', 'Content', 'History');
+    it("should include subject when provided", () => {
+      const result = parseTextToOverview("Title", "Content", "History");
 
-      expect(result.subject).toBe('History');
+      expect(result.subject).toBe("History");
     });
 
-    it('should handle text without markdown structure', () => {
+    it("should handle text without markdown structure", () => {
       const plainText = `
 This is just a paragraph of text.
 
@@ -326,39 +331,42 @@ And here is another paragraph with more content.
 
 A third paragraph for good measure.
 `;
-      const result = parseTextToOverview('Plain Text', plainText);
+      const result = parseTextToOverview("Plain Text", plainText);
 
       expect(result.root.children?.length).toBeGreaterThan(0);
-      expect(result.root.children?.[0].type).toBe('concept');
+      expect(result.root.children?.[0].type).toBe("concept");
     });
 
-    it('should limit paragraphs to 5 when no structure found', () => {
+    it("should limit paragraphs to 5 when no structure found", () => {
       const manyParagraphs = Array(10)
         .fill(null)
         .map((_, i) => `Paragraph ${i + 1} with some content.`)
-        .join('\n\n');
+        .join("\n\n");
 
-      const result = parseTextToOverview('Many Paragraphs', manyParagraphs);
+      const result = parseTextToOverview("Many Paragraphs", manyParagraphs);
 
       expect(result.root.children?.length).toBeLessThanOrEqual(5);
     });
 
-    it('should truncate long paragraph labels', () => {
-      const longParagraph = 'A'.repeat(100);
-      const result = parseTextToOverview('Long', `${longParagraph}\n\n${longParagraph}`);
+    it("should truncate long paragraph labels", () => {
+      const longParagraph = "A".repeat(100);
+      const result = parseTextToOverview(
+        "Long",
+        `${longParagraph}\n\n${longParagraph}`,
+      );
 
       const firstChild = result.root.children?.[0];
       expect(firstChild?.label.length).toBeLessThanOrEqual(53); // 50 + "..."
     });
 
-    it('should assign unique IDs to nodes', () => {
+    it("should assign unique IDs to nodes", () => {
       const text = `
 ## Section 1
 ### Concept
 ## Section 2
 ### Concept
 `;
-      const result = parseTextToOverview('Test', text);
+      const result = parseTextToOverview("Test", text);
 
       const allIds = new Set<string>();
       function collectIds(node: OverviewNode) {
@@ -370,47 +378,47 @@ A third paragraph for good measure.
     });
   });
 
-  describe('edge cases', () => {
-    it('should handle empty children array', () => {
+  describe("edge cases", () => {
+    it("should handle empty children array", () => {
       const data: OverviewData = {
-        title: 'Test',
+        title: "Test",
         root: {
-          id: 'root',
-          label: 'Root',
-          type: 'main',
+          id: "root",
+          label: "Root",
+          type: "main",
           children: [],
         },
       };
       const svg = generateOverviewSVG(data);
 
-      expect(svg).toContain('Root');
+      expect(svg).toContain("Root");
       expect(svg).not.toContain('<path class="connection"');
     });
 
-    it('should handle deeply nested structure', () => {
+    it("should handle deeply nested structure", () => {
       const deepData: OverviewData = {
-        title: 'Deep',
+        title: "Deep",
         root: {
-          id: 'l0',
-          label: 'Level 0',
-          type: 'main',
+          id: "l0",
+          label: "Level 0",
+          type: "main",
           children: [
             {
-              id: 'l1',
-              label: 'Level 1',
-              type: 'section',
+              id: "l1",
+              label: "Level 1",
+              type: "section",
               children: [
                 {
-                  id: 'l2',
-                  label: 'Level 2',
-                  type: 'concept',
+                  id: "l2",
+                  label: "Level 2",
+                  type: "concept",
                   children: [
                     {
-                      id: 'l3',
-                      label: 'Level 3',
-                      type: 'detail',
+                      id: "l3",
+                      label: "Level 3",
+                      type: "detail",
                       children: [
-                        { id: 'l4', label: 'Level 4', type: 'detail' },
+                        { id: "l4", label: "Level 4", type: "detail" },
                       ],
                     },
                   ],
@@ -422,19 +430,19 @@ A third paragraph for good measure.
       };
       const svg = generateOverviewSVG(deepData);
 
-      expect(svg).toContain('Level 0');
-      expect(svg).toContain('Level 4');
+      expect(svg).toContain("Level 0");
+      expect(svg).toContain("Level 4");
     });
 
-    it('should handle empty text input', () => {
-      const result = parseTextToOverview('Empty', '');
+    it("should handle empty text input", () => {
+      const result = parseTextToOverview("Empty", "");
 
-      expect(result.root.label).toBe('Empty');
+      expect(result.root.label).toBe("Empty");
       expect(result.root.children?.length).toBe(0);
     });
 
-    it('should handle whitespace-only text', () => {
-      const result = parseTextToOverview('Whitespace', '   \n\n   \t   ');
+    it("should handle whitespace-only text", () => {
+      const result = parseTextToOverview("Whitespace", "   \n\n   \t   ");
 
       expect(result.root.children?.length).toBe(0);
     });

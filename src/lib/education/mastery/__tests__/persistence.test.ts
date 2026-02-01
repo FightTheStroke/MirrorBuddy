@@ -3,41 +3,51 @@
  * Tests for mastery state persistence functions
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { saveMasteryState, loadMasteryState, clearMasteryState } from '../persistence';
-import { SkillStatus } from '../types';
-import type { MasteryState, TopicProgress } from '../types';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
+import {
+  saveMasteryState,
+  loadMasteryState,
+  clearMasteryState,
+} from "../persistence";
+import { SkillStatus } from "../types";
+import type { MasteryState, TopicProgress } from "../types";
 
 // Mock logger
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    error: vi.fn(),
     warn: vi.fn(),
+    error: vi.fn(),
     debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 
 // Mock csrfFetch - used for mutations (PUT/POST/DELETE)
 const mockCsrfFetch = vi.fn();
-vi.mock('@/lib/auth/csrf-client', () => ({
+vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));
 
 const createProgress = (overrides: Partial<TopicProgress>): TopicProgress => ({
-  topicId: 'test-topic',
+  topicId: "test-topic",
   totalQuestions: 10,
   correctAnswers: 8,
   masteryLevel: 80,
   isMastered: true,
   attempts: 10,
-  lastAttempt: new Date('2024-01-15'),
+  lastAttempt: new Date("2024-01-15"),
   currentDifficulty: 1.0,
   status: SkillStatus.MASTERED,
   ...overrides,
 });
 
-describe('mastery persistence', () => {
+describe("mastery persistence", () => {
   const originalFetch = global.fetch;
 
   beforeEach(() => {
@@ -49,31 +59,32 @@ describe('mastery persistence', () => {
     global.fetch = originalFetch;
   });
 
-  describe('saveMasteryState', () => {
-    it('should serialize and save state', async () => {
+  describe("saveMasteryState", () => {
+    it("should serialize and save state", async () => {
       mockCsrfFetch.mockResolvedValue({ ok: true });
 
       const state: MasteryState = {
-        topics: new Map([
-          ['topic1', createProgress({ topicId: 'topic1' })],
-        ]),
+        topics: new Map([["topic1", createProgress({ topicId: "topic1" })]]),
       };
 
       await saveMasteryState(state);
 
-      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
-        method: 'PUT',
-        body: expect.any(String),
-      }));
+      expect(mockCsrfFetch).toHaveBeenCalledWith(
+        "/api/progress",
+        expect.objectContaining({
+          method: "PUT",
+          body: expect.any(String),
+        }),
+      );
     });
 
-    it('should serialize masteredAt date', async () => {
+    it("should serialize masteredAt date", async () => {
       mockCsrfFetch.mockResolvedValue({ ok: true });
 
-      const masteredAt = new Date('2024-01-20');
+      const masteredAt = new Date("2024-01-20");
       const state: MasteryState = {
         topics: new Map([
-          ['topic1', createProgress({ topicId: 'topic1', masteredAt })],
+          ["topic1", createProgress({ topicId: "topic1", masteredAt })],
         ]),
       };
 
@@ -83,8 +94,8 @@ describe('mastery persistence', () => {
       expect(body.masteries[0].masteredAt).toBe(masteredAt.toISOString());
     });
 
-    it('should handle fetch errors gracefully', async () => {
-      mockCsrfFetch.mockRejectedValue(new Error('Network error'));
+    it("should handle fetch errors gracefully", async () => {
+      mockCsrfFetch.mockRejectedValue(new Error("Network error"));
 
       const state: MasteryState = { topics: new Map() };
 
@@ -93,21 +104,21 @@ describe('mastery persistence', () => {
     });
   });
 
-  describe('loadMasteryState', () => {
-    it('should load and deserialize state', async () => {
+  describe("loadMasteryState", () => {
+    it("should load and deserialize state", async () => {
       const mockData = {
         masteries: [
           {
-            id: 'topic1',
-            topicId: 'topic1',
+            id: "topic1",
+            topicId: "topic1",
             totalQuestions: 10,
             correctAnswers: 8,
             masteryLevel: 80,
             isMastered: true,
             attempts: 10,
-            lastAttempt: '2024-01-15T00:00:00.000Z',
+            lastAttempt: "2024-01-15T00:00:00.000Z",
             currentDifficulty: 1.0,
-            status: 'mastered',
+            status: "mastered",
           },
         ],
       };
@@ -120,25 +131,25 @@ describe('mastery persistence', () => {
       const state = await loadMasteryState();
 
       expect(state.topics.size).toBe(1);
-      expect(state.topics.get('topic1')).toBeDefined();
-      expect(state.topics.get('topic1')?.lastAttempt).toBeInstanceOf(Date);
+      expect(state.topics.get("topic1")).toBeDefined();
+      expect(state.topics.get("topic1")?.lastAttempt).toBeInstanceOf(Date);
     });
 
-    it('should handle masteredAt date in loaded data', async () => {
+    it("should handle masteredAt date in loaded data", async () => {
       const mockData = {
         masteries: [
           {
-            id: 'topic1',
-            topicId: 'topic1',
+            id: "topic1",
+            topicId: "topic1",
             totalQuestions: 10,
             correctAnswers: 8,
             masteryLevel: 80,
             isMastered: true,
             attempts: 10,
-            lastAttempt: '2024-01-15T00:00:00.000Z',
+            lastAttempt: "2024-01-15T00:00:00.000Z",
             currentDifficulty: 1.0,
-            status: 'mastered',
-            masteredAt: '2024-01-20T00:00:00.000Z',
+            status: "mastered",
+            masteredAt: "2024-01-20T00:00:00.000Z",
           },
         ],
       };
@@ -150,10 +161,10 @@ describe('mastery persistence', () => {
 
       const state = await loadMasteryState();
 
-      expect(state.topics.get('topic1')?.masteredAt).toBeInstanceOf(Date);
+      expect(state.topics.get("topic1")?.masteredAt).toBeInstanceOf(Date);
     });
 
-    it('should return empty state on non-ok response', async () => {
+    it("should return empty state on non-ok response", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: false,
       });
@@ -163,15 +174,15 @@ describe('mastery persistence', () => {
       expect(state.topics.size).toBe(0);
     });
 
-    it('should return empty state on fetch error', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network error'));
+    it("should return empty state on fetch error", async () => {
+      global.fetch = vi.fn().mockRejectedValue(new Error("Network error"));
 
       const state = await loadMasteryState();
 
       expect(state.topics.size).toBe(0);
     });
 
-    it('should handle missing masteries in response', async () => {
+    it("should handle missing masteries in response", async () => {
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve({}),
@@ -182,18 +193,18 @@ describe('mastery persistence', () => {
       expect(state.topics.size).toBe(0);
     });
 
-    it('should default to NOT_STARTED for missing status', async () => {
+    it("should default to NOT_STARTED for missing status", async () => {
       const mockData = {
         masteries: [
           {
-            id: 'topic1',
-            topicId: 'topic1',
+            id: "topic1",
+            topicId: "topic1",
             totalQuestions: 10,
             correctAnswers: 8,
             masteryLevel: 80,
             isMastered: true,
             attempts: 10,
-            lastAttempt: '2024-01-15T00:00:00.000Z',
+            lastAttempt: "2024-01-15T00:00:00.000Z",
             currentDifficulty: 1.0,
             // No status field
           },
@@ -207,24 +218,27 @@ describe('mastery persistence', () => {
 
       const state = await loadMasteryState();
 
-      expect(state.topics.get('topic1')?.status).toBe(SkillStatus.NOT_STARTED);
+      expect(state.topics.get("topic1")?.status).toBe(SkillStatus.NOT_STARTED);
     });
   });
 
-  describe('clearMasteryState', () => {
-    it('should clear all mastery data', async () => {
+  describe("clearMasteryState", () => {
+    it("should clear all mastery data", async () => {
       mockCsrfFetch.mockResolvedValue({ ok: true });
 
       await clearMasteryState();
 
-      expect(mockCsrfFetch).toHaveBeenCalledWith('/api/progress', expect.objectContaining({
-        method: 'PUT',
-        body: JSON.stringify({ masteries: [] }),
-      }));
+      expect(mockCsrfFetch).toHaveBeenCalledWith(
+        "/api/progress",
+        expect.objectContaining({
+          method: "PUT",
+          body: JSON.stringify({ masteries: [] }),
+        }),
+      );
     });
 
-    it('should handle fetch errors gracefully', async () => {
-      mockCsrfFetch.mockRejectedValue(new Error('Network error'));
+    it("should handle fetch errors gracefully", async () => {
+      mockCsrfFetch.mockRejectedValue(new Error("Network error"));
 
       // Should not throw
       await expect(clearMasteryState()).resolves.toBeUndefined();

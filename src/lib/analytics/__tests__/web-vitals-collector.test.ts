@@ -3,24 +3,30 @@
  * Tests GDPR compliance, sessionId, device detection, and consent checking
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   initWebVitalsWithConsent,
   setWebVitalsConsent,
-} from '../web-vitals-collector';
+} from "../web-vitals-collector";
 
 // Mock logger
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
-    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 
 // Mock web-vitals
-vi.mock('web-vitals', () => ({
+vi.mock("web-vitals", () => ({
   onCLS: vi.fn(),
   onINP: vi.fn(),
   onFCP: vi.fn(),
@@ -28,17 +34,17 @@ vi.mock('web-vitals', () => ({
   onTTFB: vi.fn(),
 }));
 
-describe('Web Vitals Collector (F-05)', () => {
+describe("Web Vitals Collector (F-05)", () => {
   // ============================================================================
   // CONSENT MANAGEMENT
   // ============================================================================
 
-  describe('Consent Management', () => {
+  describe("Consent Management", () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
 
-    it('should set consent state correctly', () => {
+    it("should set consent state correctly", () => {
       const consentState = {
         hasAnalyticsConsent: () => true,
       };
@@ -47,7 +53,7 @@ describe('Web Vitals Collector (F-05)', () => {
       expect(setWebVitalsConsent).toBeDefined();
     });
 
-    it('should return cleanup function from initialization', () => {
+    it("should return cleanup function from initialization", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -56,13 +62,13 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', mockConsentStore);
+      const cleanup = initWebVitalsWithConsent("user-123", mockConsentStore);
 
       // In Node environment, function may return empty cleanup, but should return function
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
 
-    it('should set consent state for both true and false', () => {
+    it("should set consent state for both true and false", () => {
       const falseState = {
         hasAnalyticsConsent: () => false,
       };
@@ -76,7 +82,7 @@ describe('Web Vitals Collector (F-05)', () => {
       expect(setWebVitalsConsent).toBeDefined();
     });
 
-    it('should accept mock consent store with any interface', () => {
+    it("should accept mock consent store with any interface", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -85,13 +91,13 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', mockConsentStore);
+      const cleanup = initWebVitalsWithConsent("user-123", mockConsentStore);
 
-      expect(typeof cleanup).toBe('function');
-      expect(typeof mockConsentStore.getState).toBe('function');
+      expect(typeof cleanup).toBe("function");
+      expect(typeof mockConsentStore.getState).toBe("function");
     });
 
-    it('should handle consent store without loadConsent gracefully', () => {
+    it("should handle consent store without loadConsent gracefully", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -101,12 +107,12 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', mockConsentStore);
+      const cleanup = initWebVitalsWithConsent("user-123", mockConsentStore);
 
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
 
-    it('should handle null userId gracefully', () => {
+    it("should handle null userId gracefully", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -117,21 +123,20 @@ describe('Web Vitals Collector (F-05)', () => {
 
       const cleanup = initWebVitalsWithConsent(null, mockConsentStore);
 
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
   });
-
 
   // ============================================================================
   // INITIALIZATION
   // ============================================================================
 
-  describe('Initialization', () => {
+  describe("Initialization", () => {
     beforeEach(() => {
       vi.clearAllMocks();
     });
 
-    it('should return cleanup function from initWebVitalsWithConsent', () => {
+    it("should return cleanup function from initWebVitalsWithConsent", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -140,12 +145,12 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => vi.fn()),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', mockConsentStore);
+      const cleanup = initWebVitalsWithConsent("user-123", mockConsentStore);
 
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
 
-    it('should return function even without browser environment', () => {
+    it("should return function even without browser environment", () => {
       const mockConsentStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -154,15 +159,15 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup1 = initWebVitalsWithConsent('user-123', mockConsentStore);
-      const cleanup2 = initWebVitalsWithConsent('user-456', mockConsentStore);
+      const cleanup1 = initWebVitalsWithConsent("user-123", mockConsentStore);
+      const cleanup2 = initWebVitalsWithConsent("user-456", mockConsentStore);
 
       // Both should return callable functions
-      expect(typeof cleanup1).toBe('function');
-      expect(typeof cleanup2).toBe('function');
+      expect(typeof cleanup1).toBe("function");
+      expect(typeof cleanup2).toBe("function");
     });
 
-    it('should accept various consentStore configurations', () => {
+    it("should accept various consentStore configurations", () => {
       // Test with full config
       const fullStore = {
         getState: () => ({
@@ -173,11 +178,11 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', fullStore);
-      expect(typeof cleanup).toBe('function');
+      const cleanup = initWebVitalsWithConsent("user-123", fullStore);
+      expect(typeof cleanup).toBe("function");
     });
 
-    it('should handle consentStore without loadConsent method', () => {
+    it("should handle consentStore without loadConsent method", () => {
       const minimalStore = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -186,12 +191,12 @@ describe('Web Vitals Collector (F-05)', () => {
         subscribe: vi.fn(() => () => {}),
       };
 
-      const cleanup = initWebVitalsWithConsent('user-123', minimalStore);
+      const cleanup = initWebVitalsWithConsent("user-123", minimalStore);
 
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
 
-    it('should work with null userId', () => {
+    it("should work with null userId", () => {
       const storeWithoutLoadConsent = {
         getState: () => ({
           hasAnalyticsConsent: () => true,
@@ -202,8 +207,7 @@ describe('Web Vitals Collector (F-05)', () => {
 
       const cleanup = initWebVitalsWithConsent(null, storeWithoutLoadConsent);
 
-      expect(typeof cleanup).toBe('function');
+      expect(typeof cleanup).toBe("function");
     });
   });
-
 });

@@ -3,29 +3,35 @@
  * Verifies WebRTC DataChannel message receiving and event dispatch
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   ToolDataChannelReceiver,
   createToolDataChannelReceiver,
   ToolEventCallback,
-} from '../data-channel-receiver';
-import { MAX_MESSAGE_SIZE } from '../constants';
+} from "../data-channel-receiver";
+import { MAX_MESSAGE_SIZE } from "../constants";
 
 // Mock logger - must use inline object for vi.mock hoisting
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
-    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 
 // Get reference to mocked logger for assertions
-import { logger as mockLogger } from '@/lib/logger';
+import { logger as mockLogger } from "@/lib/logger";
 
 // Mock data-channel-protocol
-vi.mock('../data-channel-protocol', () => ({
+vi.mock("../data-channel-protocol", () => ({
   deserializeMessage: vi.fn((data: string) => {
     try {
       const parsed = JSON.parse(data);
@@ -47,12 +53,12 @@ function createMockDataChannel(): RTCDataChannel {
     onerror: null,
     send: vi.fn(),
     close: vi.fn(),
-    readyState: 'open',
-    label: 'test-channel',
+    readyState: "open",
+    label: "test-channel",
   } as unknown as RTCDataChannel;
 }
 
-describe('ToolDataChannelReceiver', () => {
+describe("ToolDataChannelReceiver", () => {
   let receiver: ToolDataChannelReceiver;
   let mockCallback: ToolEventCallback;
   let mockChannel: RTCDataChannel;
@@ -68,35 +74,35 @@ describe('ToolDataChannelReceiver', () => {
     vi.clearAllMocks();
   });
 
-  describe('constructor', () => {
-    it('should initialize with callback', () => {
+  describe("constructor", () => {
+    it("should initialize with callback", () => {
       expect(receiver).toBeDefined();
       expect(receiver.isChannelAttached()).toBe(false);
     });
   });
 
-  describe('attachToChannel', () => {
-    it('should attach to RTCDataChannel', () => {
+  describe("attachToChannel", () => {
+    it("should attach to RTCDataChannel", () => {
       receiver.attachToChannel(mockChannel);
       expect(receiver.isChannelAttached()).toBe(true);
     });
 
-    it('should set up message handler', () => {
+    it("should set up message handler", () => {
       receiver.attachToChannel(mockChannel);
       expect(mockChannel.onmessage).toBeDefined();
     });
 
-    it('should set up close handler', () => {
+    it("should set up close handler", () => {
       receiver.attachToChannel(mockChannel);
       expect(mockChannel.onclose).toBeDefined();
     });
 
-    it('should set up error handler', () => {
+    it("should set up error handler", () => {
       receiver.attachToChannel(mockChannel);
       expect(mockChannel.onerror).toBeDefined();
     });
 
-    it('should detach from previous channel when attaching to new one', () => {
+    it("should detach from previous channel when attaching to new one", () => {
       const firstChannel = createMockDataChannel();
       const secondChannel = createMockDataChannel();
 
@@ -108,9 +114,9 @@ describe('ToolDataChannelReceiver', () => {
     });
   });
 
-  describe('handleMessage', () => {
-    it('should process valid message and call callback', () => {
-      const validMessage = { toolId: 'test_tool', type: 'completion' };
+  describe("handleMessage", () => {
+    it("should process valid message and call callback", () => {
+      const validMessage = { toolId: "test_tool", type: "completion" };
       const messageEvent = {
         data: JSON.stringify(validMessage),
       } as MessageEvent<string>;
@@ -120,8 +126,8 @@ describe('ToolDataChannelReceiver', () => {
       expect(mockCallback).toHaveBeenCalledWith(validMessage);
     });
 
-    it('should reject messages exceeding size limit', () => {
-            const largeData = 'x'.repeat(MAX_MESSAGE_SIZE + 1);
+    it("should reject messages exceeding size limit", () => {
+      const largeData = "x".repeat(MAX_MESSAGE_SIZE + 1);
       const messageEvent = {
         data: largeData,
       } as MessageEvent<string>;
@@ -132,9 +138,9 @@ describe('ToolDataChannelReceiver', () => {
       expect(mockLogger.warn).toHaveBeenCalled();
     });
 
-    it('should handle invalid message format', () => {
-            const messageEvent = {
-        data: JSON.stringify({ invalid: 'data' }),
+    it("should handle invalid message format", () => {
+      const messageEvent = {
+        data: JSON.stringify({ invalid: "data" }),
       } as MessageEvent<string>;
 
       receiver.handleMessage(messageEvent);
@@ -143,9 +149,9 @@ describe('ToolDataChannelReceiver', () => {
       expect(mockLogger.warn).toHaveBeenCalled();
     });
 
-    it('should handle parse errors gracefully', () => {
-            const messageEvent = {
-        data: 'not-valid-json{{{',
+    it("should handle parse errors gracefully", () => {
+      const messageEvent = {
+        data: "not-valid-json{{{",
       } as MessageEvent<string>;
 
       receiver.handleMessage(messageEvent);
@@ -155,31 +161,31 @@ describe('ToolDataChannelReceiver', () => {
     });
   });
 
-  describe('channel event handlers', () => {
-    it('should handle channel close', () => {
-            receiver.attachToChannel(mockChannel);
+  describe("channel event handlers", () => {
+    it("should handle channel close", () => {
+      receiver.attachToChannel(mockChannel);
 
       // Simulate channel close
       (mockChannel.onclose as Function)();
 
       expect(receiver.isChannelAttached()).toBe(false);
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining('channel closed')
+        expect.stringContaining("channel closed"),
       );
     });
 
-    it('should handle channel error', () => {
-            receiver.attachToChannel(mockChannel);
+    it("should handle channel error", () => {
+      receiver.attachToChannel(mockChannel);
 
       // Simulate channel error
-      const errorEvent = { error: { message: 'Connection failed' } };
+      const errorEvent = { error: { message: "Connection failed" } };
       (mockChannel.onerror as Function)(errorEvent);
 
       expect(mockLogger.error).toHaveBeenCalled();
     });
 
-    it('should handle channel error without error object', () => {
-            receiver.attachToChannel(mockChannel);
+    it("should handle channel error without error object", () => {
+      receiver.attachToChannel(mockChannel);
 
       // Simulate channel error without details
       (mockChannel.onerror as Function)({});
@@ -188,8 +194,8 @@ describe('ToolDataChannelReceiver', () => {
     });
   });
 
-  describe('detach', () => {
-    it('should detach from channel', () => {
+  describe("detach", () => {
+    it("should detach from channel", () => {
       receiver.attachToChannel(mockChannel);
       expect(receiver.isChannelAttached()).toBe(true);
 
@@ -199,19 +205,19 @@ describe('ToolDataChannelReceiver', () => {
       expect(mockChannel.onmessage).toBeNull();
     });
 
-    it('should do nothing if not attached', () => {
+    it("should do nothing if not attached", () => {
       // Should not throw
       receiver.detach();
       expect(receiver.isChannelAttached()).toBe(false);
     });
   });
 
-  describe('setEventCallback', () => {
-    it('should update callback', () => {
+  describe("setEventCallback", () => {
+    it("should update callback", () => {
       const newCallback = vi.fn();
       receiver.setEventCallback(newCallback);
 
-      const validMessage = { toolId: 'test', type: 'start' };
+      const validMessage = { toolId: "test", type: "start" };
       const messageEvent = {
         data: JSON.stringify(validMessage),
       } as MessageEvent<string>;
@@ -223,8 +229,8 @@ describe('ToolDataChannelReceiver', () => {
     });
   });
 
-  describe('createToolDataChannelReceiver factory', () => {
-    it('should create ToolDataChannelReceiver instance', () => {
+  describe("createToolDataChannelReceiver factory", () => {
+    it("should create ToolDataChannelReceiver instance", () => {
       const callback = vi.fn();
       const instance = createToolDataChannelReceiver(callback);
 

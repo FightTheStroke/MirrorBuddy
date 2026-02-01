@@ -142,6 +142,8 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const skipLink = page.locator('[data-testid="skip-link"]');
+    // Must focus first since skip-link has pointer-events-none until focused
+    await skipLink.focus();
     await skipLink.click();
     await page.waitForTimeout(100);
 

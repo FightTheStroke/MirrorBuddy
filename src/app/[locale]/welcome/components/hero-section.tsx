@@ -16,13 +16,13 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
   const t = useTranslations("welcome.hero");
 
   return (
-    <div className="text-center max-w-4xl mx-auto relative mb-8">
+    <div className="text-center max-w-4xl mx-auto relative mb-8 overflow-hidden">
       {/* BETA PRIVATA - Overlay Sticker Style */}
       <motion.div
         initial={{ scale: 0, rotate: -15 }}
         animate={{ scale: 1, rotate: -12 }}
         transition={{ delay: 0.3, type: "spring", stiffness: 200 }}
-        className="absolute -top-4 -right-4 md:-right-12 z-10"
+        className="absolute -top-4 right-0 sm:-right-4 md:-right-12 z-10"
         aria-label={`${t("betaBadge")} - ${t("betaSubtitle")}`}
       >
         <div className="relative">

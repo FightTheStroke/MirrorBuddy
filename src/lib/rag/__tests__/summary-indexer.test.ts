@@ -24,10 +24,16 @@ const { mockGenerateEmbedding, mockStoreEmbedding, mockPrisma } = vi.hoisted(
 // Mock logger
 vi.mock("@/lib/logger", () => ({
   logger: {
-    debug: vi.fn(),
-    error: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 

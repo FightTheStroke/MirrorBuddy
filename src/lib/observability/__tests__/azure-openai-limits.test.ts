@@ -5,7 +5,10 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { getAzureOpenAILimits, isAzureOpenAIStressed } from "../azure-openai-limits";
+import {
+  getAzureOpenAILimits,
+  isAzureOpenAIStressed,
+} from "../azure-openai-limits";
 
 // Mock the Azure costs helpers
 vi.mock("@/app/api/azure/costs/helpers", () => ({
@@ -21,12 +24,12 @@ vi.mock("@/lib/logger", () => ({
     warn: vi.fn(),
     error: vi.fn(),
     debug: vi.fn(),
-    child: vi.fn(() => ({
+    child: () => ({
       info: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
-    })),
+    }),
   },
 }));
 
@@ -54,13 +57,16 @@ describe("azure-openai-limits", () => {
       process.env.AZURE_OPENAI_ENDPOINT = "https://test.openai.azure.com";
       process.env.AZURE_SUBSCRIPTION_ID = "test-sub";
 
-      const { getCached, getAzureToken } = await import("@/app/api/azure/costs/helpers");
+      const { getCached, getAzureToken } =
+        await import("@/app/api/azure/costs/helpers");
       vi.mocked(getCached).mockReturnValue(null);
       vi.mocked(getAzureToken).mockResolvedValue(null);
 
       const result = await getAzureOpenAILimits();
 
-      expect(result.error).toBe("Azure authentication failed - configure service principal credentials");
+      expect(result.error).toBe(
+        "Azure authentication failed - configure service principal credentials",
+      );
     });
 
     it("should return cached limits when available", async () => {
@@ -83,7 +89,8 @@ describe("azure-openai-limits", () => {
       process.env.AZURE_SUBSCRIPTION_ID = "test-sub";
       process.env.AZURE_OPENAI_RESOURCE_GROUP = "test-rg";
 
-      const { getCached, getAzureToken, setCache } = await import("@/app/api/azure/costs/helpers");
+      const { getCached, getAzureToken, setCache } =
+        await import("@/app/api/azure/costs/helpers");
       vi.mocked(getCached).mockReturnValue(null);
       vi.mocked(getAzureToken).mockResolvedValue("test-token");
 
@@ -106,7 +113,10 @@ describe("azure-openai-limits", () => {
       expect(result.tpm.used).toBe(8000);
       expect(result.tpm.limit).toBe(10000);
       expect(result.tpm.usagePercent).toBe(80);
-      expect(vi.mocked(setCache)).toHaveBeenCalledWith("azure_openai_limits", result);
+      expect(vi.mocked(setCache)).toHaveBeenCalledWith(
+        "azure_openai_limits",
+        result,
+      );
     });
   });
 

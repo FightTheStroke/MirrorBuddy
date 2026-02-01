@@ -11,10 +11,16 @@ import { PATCH } from "../route";
 
 vi.mock("@/lib/logger", () => ({
   logger: {
-    child: vi.fn(() => ({
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
       info: vi.fn(),
+      warn: vi.fn(),
       error: vi.fn(),
-    })),
+      debug: vi.fn(),
+    }),
   },
 }));
 

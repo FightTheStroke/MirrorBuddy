@@ -10,6 +10,7 @@ import noPrismaRaceCondition from "./no-prisma-race-condition.js";
 import requireE2eFixtures from "./require-e2e-fixtures.js";
 import requireCsrfMutatingRoutes from "./require-csrf-mutating-routes.js";
 import noHardcodedStringsInTests from "./no-hardcoded-strings-in-tests.js";
+import requireCompleteLoggerMock from "./require-complete-logger-mock.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -267,6 +268,7 @@ const rules = {
   "require-e2e-fixtures": requireE2eFixtures,
   "require-csrf-mutating-routes": requireCsrfMutatingRoutes,
   "no-hardcoded-strings-in-tests": noHardcodedStringsInTests,
+  "require-complete-logger-mock": requireCompleteLoggerMock,
 };
 
 const localRules = {

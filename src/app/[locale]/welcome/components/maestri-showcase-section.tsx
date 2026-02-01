@@ -116,7 +116,7 @@ export function MaestriShowcaseSection() {
 
       {/* Carousel Container */}
       <div
-        className="relative"
+        className="relative overflow-hidden"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >

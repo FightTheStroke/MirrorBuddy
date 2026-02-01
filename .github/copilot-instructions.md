@@ -12,6 +12,9 @@
 3. **Tests first**: Write failing test, then implement, then pass (TDD).
 4. **No workarounds**: No TODO, FIXME, @ts-ignore, `any` casts.
 5. **Conventional commits**: `feat:`, `fix:`, `chore:`, `docs:` prefixes.
+6. **NEVER commit to main**: Always create branch `codex/{task_id}` first.
+7. **ONE commit per task**: Never combine multiple tasks in one commit.
+8. **Strict file scope**: Only touch files listed in the task. No "bonus" fixes.
 
 ## TypeScript/React Style
 
@@ -149,10 +152,42 @@ When executing a task from a plan:
 - ONLY ONE proxy at `src/proxy.ts`. NEVER create root `proxy.ts`
 - Proxy skips i18n for: `/api/*`, `/admin/*`, `/_next/*`, static files
 
-### Admin
+### Admin (pipe() migration — Plan 113+)
 
-- `validateAdminAuth()` at function entry + `requireCSRF` before auth on mutations
-- `auditService.log()` mandatory after mutations (format: `VERB_ENTITY`)
+Admin routes use composable middleware instead of inline auth:
+
+```typescript
+// CORRECT — pipe() with middleware composition
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+
+// GET (read-only): withSentry + withAdmin
+export const GET = pipe(
+  withSentry("/api/admin/..."),
+  withAdmin,
+)(async (ctx) => {
+  // ctx.userId and ctx.isAdmin available, no manual auth check
+  return NextResponse.json(data);
+});
+
+// POST/PUT/DELETE (mutations): withSentry + withCSRF + withAdmin
+export const POST = pipe(
+  withSentry("/api/admin/..."),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  // auditService.log() still mandatory after mutations
+  return NextResponse.json(data);
+});
+```
+
+**WRONG patterns** (remove these during migration):
+
+- `const auth = await validateAdminAuth()` — handled by `withAdmin`
+- `if (!auth.authenticated)` — handled by `withAdmin`
+- `requireCSRF(request)` — handled by `withCSRF`
+- `try { ... } catch (error) { ... }` — handled by `withSentry`
+- `request.nextUrl` — use `ctx.req.nextUrl`
+- `request` parameter — use `ctx.req`
 
 ### Tiers
 

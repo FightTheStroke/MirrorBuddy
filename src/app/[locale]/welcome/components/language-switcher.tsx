@@ -82,6 +82,7 @@ export function LanguageSwitcher() {
         onClick={toggleDropdown}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
+            e.preventDefault(); // Prevent default button activation (which also triggers onClick)
             toggleDropdown();
           }
         }}

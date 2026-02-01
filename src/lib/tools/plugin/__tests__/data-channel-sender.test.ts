@@ -3,28 +3,38 @@
  * Verifies WebRTC DataChannel message sending and connection management
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import {
   ToolDataChannelSender,
   createToolDataChannelSender,
-} from '../data-channel-sender';
-import { ToolEventType, type ToolDataChannelMessage } from '../data-channel-protocol';
+} from "../data-channel-sender";
+import {
+  ToolEventType,
+  type ToolDataChannelMessage,
+} from "../data-channel-protocol";
 
 // Mock logger
-vi.mock('@/lib/logger', () => ({
+vi.mock("@/lib/logger", () => ({
   logger: {
-    debug: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
     error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
   },
 }));
 
-import { logger as mockLogger } from '@/lib/logger';
+import { logger as mockLogger } from "@/lib/logger";
 
 // Mock data-channel-protocol (preserve ToolEventType enum)
-vi.mock('../data-channel-protocol', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('../data-channel-protocol')>();
+vi.mock("../data-channel-protocol", async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import("../data-channel-protocol")>();
   return {
     ...actual,
     serializeMessage: vi.fn((msg) => JSON.stringify(msg)),
@@ -32,7 +42,9 @@ vi.mock('../data-channel-protocol', async (importOriginal) => {
 });
 
 // Create mock RTCDataChannel
-function createMockDataChannel(readyState: RTCDataChannelState = 'open'): RTCDataChannel {
+function createMockDataChannel(
+  readyState: RTCDataChannelState = "open",
+): RTCDataChannel {
   return {
     onopen: null,
     onclose: null,
@@ -40,19 +52,19 @@ function createMockDataChannel(readyState: RTCDataChannelState = 'open'): RTCDat
     send: vi.fn(),
     close: vi.fn(),
     readyState,
-    label: 'test-channel',
+    label: "test-channel",
   } as unknown as RTCDataChannel;
 }
 
-describe('ToolDataChannelSender', () => {
+describe("ToolDataChannelSender", () => {
   let sender: ToolDataChannelSender;
   let mockChannel: RTCDataChannel;
 
   const testEvent: ToolDataChannelMessage = {
-    toolId: 'test_tool',
+    toolId: "test_tool",
     type: ToolEventType.TOOL_COMPLETED,
     timestamp: Date.now(),
-    payload: { result: 'success' },
+    payload: { result: "success" },
   };
 
   beforeEach(() => {
@@ -64,19 +76,19 @@ describe('ToolDataChannelSender', () => {
     vi.clearAllMocks();
   });
 
-  describe('constructor', () => {
-    it('should initialize without channel', () => {
+  describe("constructor", () => {
+    it("should initialize without channel", () => {
       sender = new ToolDataChannelSender();
       expect(sender.isConnected()).toBe(false);
     });
 
-    it('should initialize with channel', () => {
+    it("should initialize with channel", () => {
       sender = new ToolDataChannelSender(mockChannel);
       // Channel is connected but not open until onopen fires
       expect(sender.isConnected()).toBe(false);
     });
 
-    it('should attach handlers when initialized with channel', () => {
+    it("should attach handlers when initialized with channel", () => {
       sender = new ToolDataChannelSender(mockChannel);
       expect(mockChannel.onopen).toBeDefined();
       expect(mockChannel.onclose).toBeDefined();
@@ -84,14 +96,14 @@ describe('ToolDataChannelSender', () => {
     });
   });
 
-  describe('setChannel', () => {
-    it('should set a new channel', () => {
+  describe("setChannel", () => {
+    it("should set a new channel", () => {
       sender = new ToolDataChannelSender();
       sender.setChannel(mockChannel);
       expect(mockChannel.onopen).toBeDefined();
     });
 
-    it('should detach from old channel when setting new one', () => {
+    it("should detach from old channel when setting new one", () => {
       const oldChannel = createMockDataChannel();
       const newChannel = createMockDataChannel();
 
@@ -102,15 +114,15 @@ describe('ToolDataChannelSender', () => {
       expect(newChannel.onopen).toBeDefined();
     });
 
-    it('should handle null channel', () => {
+    it("should handle null channel", () => {
       sender = new ToolDataChannelSender(mockChannel);
       sender.setChannel(null);
       expect(sender.isConnected()).toBe(false);
     });
   });
 
-  describe('sendEvent', () => {
-    it('should send event when connected', () => {
+  describe("sendEvent", () => {
+    it("should send event when connected", () => {
       sender = new ToolDataChannelSender(mockChannel);
       // Simulate channel open
       (mockChannel.onopen as Function)();
@@ -121,7 +133,7 @@ describe('ToolDataChannelSender', () => {
       expect(mockChannel.send).toHaveBeenCalled();
     });
 
-    it('should return false when not connected', () => {
+    it("should return false when not connected", () => {
       sender = new ToolDataChannelSender();
 
       const result = sender.sendEvent(testEvent);
@@ -130,11 +142,11 @@ describe('ToolDataChannelSender', () => {
       expect(mockLogger.warn).toHaveBeenCalled();
     });
 
-    it('should handle send errors gracefully', () => {
+    it("should handle send errors gracefully", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onopen as Function)();
       (mockChannel.send as ReturnType<typeof vi.fn>).mockImplementation(() => {
-        throw new Error('Send failed');
+        throw new Error("Send failed");
       });
 
       const result = sender.sendEvent(testEvent);
@@ -144,20 +156,20 @@ describe('ToolDataChannelSender', () => {
     });
   });
 
-  describe('isConnected', () => {
-    it('should return false when no channel', () => {
+  describe("isConnected", () => {
+    it("should return false when no channel", () => {
       sender = new ToolDataChannelSender();
       expect(sender.isConnected()).toBe(false);
     });
 
-    it('should return true when channel open', () => {
+    it("should return true when channel open", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onopen as Function)();
 
       expect(sender.isConnected()).toBe(true);
     });
 
-    it('should return false when channel closed', () => {
+    it("should return false when channel closed", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onopen as Function)();
       (mockChannel.onclose as Function)();
@@ -165,16 +177,16 @@ describe('ToolDataChannelSender', () => {
       expect(sender.isConnected()).toBe(false);
     });
 
-    it('should return false when channel errors', () => {
+    it("should return false when channel errors", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onopen as Function)();
-      (mockChannel.onerror as Function)({ error: { message: 'Error' } });
+      (mockChannel.onerror as Function)({ error: { message: "Error" } });
 
       expect(sender.isConnected()).toBe(false);
     });
 
-    it('should return false when readyState is not open', () => {
-      const closingChannel = createMockDataChannel('closing');
+    it("should return false when readyState is not open", () => {
+      const closingChannel = createMockDataChannel("closing");
       sender = new ToolDataChannelSender(closingChannel);
       (closingChannel.onopen as Function)();
 
@@ -182,33 +194,35 @@ describe('ToolDataChannelSender', () => {
     });
   });
 
-  describe('channel event handlers', () => {
-    it('should log on channel open', () => {
+  describe("channel event handlers", () => {
+    it("should log on channel open", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onopen as Function)();
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining('opened')
+        expect.stringContaining("opened"),
       );
     });
 
-    it('should log on channel close', () => {
+    it("should log on channel close", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onclose as Function)();
 
       expect(mockLogger.debug).toHaveBeenCalledWith(
-        expect.stringContaining('closed')
+        expect.stringContaining("closed"),
       );
     });
 
-    it('should log on channel error with message', () => {
+    it("should log on channel error with message", () => {
       sender = new ToolDataChannelSender(mockChannel);
-      (mockChannel.onerror as Function)({ error: { message: 'Connection lost' } });
+      (mockChannel.onerror as Function)({
+        error: { message: "Connection lost" },
+      });
 
       expect(mockLogger.error).toHaveBeenCalled();
     });
 
-    it('should log on channel error without message', () => {
+    it("should log on channel error without message", () => {
       sender = new ToolDataChannelSender(mockChannel);
       (mockChannel.onerror as Function)({});
 
@@ -216,13 +230,13 @@ describe('ToolDataChannelSender', () => {
     });
   });
 
-  describe('createToolDataChannelSender factory', () => {
-    it('should create sender without channel', () => {
+  describe("createToolDataChannelSender factory", () => {
+    it("should create sender without channel", () => {
       const instance = createToolDataChannelSender();
       expect(instance).toBeInstanceOf(ToolDataChannelSender);
     });
 
-    it('should create sender with channel', () => {
+    it("should create sender with channel", () => {
       const instance = createToolDataChannelSender(mockChannel);
       expect(instance).toBeInstanceOf(ToolDataChannelSender);
     });

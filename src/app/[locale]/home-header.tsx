@@ -63,7 +63,7 @@ export function HomeHeader({
   return (
     <header
       className={cn(
-        "fixed top-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300",
+        "fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300",
         sidebarOpen ? "lg:left-64" : "lg:left-20",
       )}
     >
