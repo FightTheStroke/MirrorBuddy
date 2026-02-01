@@ -6,11 +6,10 @@
  * Allows users to request complete deletion of their personal data.
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies as getCookies } from "next/headers";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
 import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import {
   executeUserDataDeletion,
@@ -25,12 +24,6 @@ interface DeleteRequestBody {
   reason?: string;
 }
 
-/**
- * POST /api/privacy/delete-my-data
- *
- * Deletes all personal data for the authenticated user.
- * This is irreversible and complies with GDPR Art. 17.
- */
 interface DeleteResult {
   success: boolean;
   deletedData: {
@@ -43,78 +36,55 @@ interface DeleteResult {
   message: string;
 }
 
-export async function POST(
-  request: NextRequest,
-): Promise<NextResponse<DeleteResult | { error: string }>> {
-  // CSRF validation (double-submit cookie pattern)
-  if (!requireCSRF(request)) {
+/**
+ * POST /api/privacy/delete-my-data
+ *
+ * Deletes all personal data for the authenticated user.
+ * This is irreversible and complies with GDPR Art. 17.
+ */
+export const POST = pipe(
+  withSentry("/api/privacy/delete-my-data"),
+  withCSRF,
+  withAuth,
+)(async (ctx): Promise<Response> => {
+  const log = getRequestLogger(ctx.req);
+  const userId = ctx.userId!;
+
+  const body = (await ctx.req.json()) as DeleteRequestBody;
+
+  if (!body.confirmDeletion) {
     const response = NextResponse.json(
-      { error: "Invalid CSRF token" },
-      { status: 403 },
+      { error: "Deletion must be explicitly confirmed" },
+      { status: 400 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(ctx.req));
     return response;
   }
 
-  const log = getRequestLogger(request);
-  const auth = await validateAuth();
+  log.info("GDPR deletion request initiated", {
+    userId: userId.slice(0, 8),
+    reason: body.reason || "not provided",
+  });
 
-  if (!auth.authenticated || !auth.userId) {
-    const response = NextResponse.json(
-      { error: "Unauthorized - no user session found" },
-      { status: 401 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
+  // Execute deletion in transaction for atomicity
+  const result = await executeUserDataDeletion(userId);
 
-  const userId = auth.userId;
+  // Log the deletion for audit (without PII)
+  logDeletionAudit(userId, body.reason);
 
-  try {
-    const body = (await request.json()) as DeleteRequestBody;
+  // Clear the user cookie
+  const cookieStore = await getCookies();
+  cookieStore.delete(AUTH_COOKIE_NAME);
 
-    if (!body.confirmDeletion) {
-      const response = NextResponse.json(
-        { error: "Deletion must be explicitly confirmed" },
-        { status: 400 },
-      );
-      response.headers.set("X-Request-ID", getRequestId(request));
-      return response;
-    }
+  log.info("GDPR deletion completed", {
+    userId: userId.slice(0, 8),
+    ...result.deletedData,
+  });
 
-    log.info("GDPR deletion request initiated", {
-      userId: userId.slice(0, 8),
-      reason: body.reason || "not provided",
-    });
-
-    // Execute deletion in transaction for atomicity
-    const result = await executeUserDataDeletion(userId);
-
-    // Log the deletion for audit (without PII)
-    logDeletionAudit(userId, body.reason);
-
-    // Clear the user cookie
-    const cookieStore = await getCookies();
-    cookieStore.delete(AUTH_COOKIE_NAME);
-
-    log.info("GDPR deletion completed", {
-      userId: userId.slice(0, 8),
-      ...result.deletedData,
-    });
-
-    const response = NextResponse.json(result);
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  } catch (error) {
-    log.error("GDPR deletion failed", { error, userId: userId.slice(0, 8) });
-    const response = NextResponse.json(
-      { error: "Failed to delete user data. Please contact support." },
-      { status: 500 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
-}
+  const response = NextResponse.json(result as DeleteResult);
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  return response;
+});
 
 /**
  * GET /api/privacy/delete-my-data
@@ -122,38 +92,19 @@ export async function POST(
  * Returns a summary of data that would be deleted.
  * Helps users understand what deletion will remove.
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  const log = getRequestLogger(request);
-  const auth = await validateAuth();
+export const GET = pipe(
+  withSentry("/api/privacy/delete-my-data"),
+  withAuth,
+)(async (ctx): Promise<Response> => {
+  const userId = ctx.userId!;
 
-  if (!auth.authenticated || !auth.userId) {
-    const response = NextResponse.json(
-      { error: "Unauthorized - no user session found" },
-      { status: 401 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
-
-  const userId = auth.userId;
-
-  try {
-    const summary = await getUserDataSummary(userId);
-    const response = NextResponse.json({
-      userId: userId.slice(0, 8) + "...",
-      dataToBeDeleted: summary,
-      warning:
-        "This action is irreversible. All your learning progress, conversations, and preferences will be permanently deleted.",
-    });
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  } catch (error) {
-    log.error("Failed to get data summary", { error });
-    const response = NextResponse.json(
-      { error: "Failed to retrieve data summary" },
-      { status: 500 },
-    );
-    response.headers.set("X-Request-ID", getRequestId(request));
-    return response;
-  }
-}
+  const summary = await getUserDataSummary(userId);
+  const response = NextResponse.json({
+    userId: userId.slice(0, 8) + "...",
+    dataToBeDeleted: summary,
+    warning:
+      "This action is irreversible. All your learning progress, conversations, and preferences will be permanently deleted.",
+  });
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
+  return response;
+});

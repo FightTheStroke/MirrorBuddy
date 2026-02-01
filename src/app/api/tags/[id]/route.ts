@@ -5,185 +5,138 @@
 // DELETE: Delete tag
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
 import { UpdateTagSchema } from "@/lib/validation/schemas/organization";
-import { requireCSRF } from "@/lib/security/csrf";
-
-type RouteParams = { params: Promise<{ id: string }> };
 
 /**
  * GET /api/tags/[id]
  *
  * Get a single tag with its materials.
  */
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  try {
-    const auth = await validateAuth();
-    const { id } = await params;
+export const GET = pipe(
+  withSentry("/api/tags/:id"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id } = await ctx.params;
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = auth.userId;
-
-    const tag = await prisma.tag.findFirst({
-      where: { id, userId },
-      include: {
-        materials: {
-          include: {
-            material: {
-              select: {
-                id: true,
-                toolType: true,
-                title: true,
-                createdAt: true,
-              },
+  const tag = await prisma.tag.findFirst({
+    where: { id, userId },
+    include: {
+      materials: {
+        include: {
+          material: {
+            select: {
+              id: true,
+              toolType: true,
+              title: true,
+              createdAt: true,
             },
           },
-          orderBy: { createdAt: "desc" },
-          take: 50,
         },
-        _count: {
-          select: { materials: true },
-        },
+        orderBy: { createdAt: "desc" },
+        take: 50,
       },
-    });
+      _count: {
+        select: { materials: true },
+      },
+    },
+  });
 
-    if (!tag) {
-      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
-    }
-
-    // Flatten materials for easier consumption
-    const response = {
-      ...tag,
-      materials: tag.materials.map((mt) => mt.material),
-    };
-
-    return NextResponse.json(response);
-  } catch (error) {
-    logger.error("Tag GET error", { error: String(error) });
-    return NextResponse.json({ error: "Failed to fetch tag" }, { status: 500 });
+  if (!tag) {
+    return NextResponse.json({ error: "Tag not found" }, { status: 404 });
   }
-}
+
+  // Flatten materials for easier consumption
+  const response = {
+    ...tag,
+    materials: tag.materials.map((mt) => mt.material),
+  };
+
+  return NextResponse.json(response);
+});
 
 /**
  * PUT /api/tags/[id]
  *
  * Update a tag.
  */
-export async function PUT(request: NextRequest, { params }: RouteParams) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+export const PUT = pipe(
+  withSentry("/api/tags/:id"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id } = await ctx.params;
+
+  // Verify ownership
+  const existing = await prisma.tag.findFirst({
+    where: { id, userId },
+  });
+
+  if (!existing) {
+    return NextResponse.json({ error: "Tag not found" }, { status: 404 });
   }
 
-  try {
-    const auth = await validateAuth();
-    const { id } = await params;
+  // Validate input
+  const body = await ctx.req.json();
+  const validation = UpdateTagSchema.safeParse(body);
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = auth.userId;
-
-    // Verify ownership
-    const existing = await prisma.tag.findFirst({
-      where: { id, userId },
-    });
-
-    if (!existing) {
-      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
-    }
-
-    // Validate input
-    const body = await request.json();
-    const validation = UpdateTagSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid request",
-          details: validation.error.issues.map((e) => e.message),
-        },
-        { status: 400 },
-      );
-    }
-
-    const tag = await prisma.tag.update({
-      where: { id },
-      data: validation.data,
-      include: {
-        _count: {
-          select: { materials: true },
-        },
-      },
-    });
-
-    logger.info("Tag updated", { userId, tagId: id });
-
-    return NextResponse.json(tag);
-  } catch (error) {
-    logger.error("Tag PUT error", { error: String(error) });
-
-    if (error instanceof Error && error.message.includes("Unique constraint")) {
-      return NextResponse.json(
-        { error: "A tag with this name already exists" },
-        { status: 409 },
-      );
-    }
-
+  if (!validation.success) {
     return NextResponse.json(
-      { error: "Failed to update tag" },
-      { status: 500 },
+      {
+        error: "Invalid request",
+        details: validation.error.issues.map((e) => e.message),
+      },
+      { status: 400 },
     );
   }
-}
+
+  const tag = await prisma.tag.update({
+    where: { id },
+    data: validation.data,
+    include: {
+      _count: {
+        select: { materials: true },
+      },
+    },
+  });
+
+  logger.info("Tag updated", { userId, tagId: id });
+
+  return NextResponse.json(tag);
+});
 
 /**
  * DELETE /api/tags/[id]
  *
  * Delete a tag. MaterialTag relations are cascade deleted.
  */
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+export const DELETE = pipe(
+  withSentry("/api/tags/:id"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id } = await ctx.params;
+
+  // Verify ownership
+  const existing = await prisma.tag.findFirst({
+    where: { id, userId },
+  });
+
+  if (!existing) {
+    return NextResponse.json({ error: "Tag not found" }, { status: 404 });
   }
 
-  try {
-    const auth = await validateAuth();
-    const { id } = await params;
+  await prisma.tag.delete({
+    where: { id },
+  });
 
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  logger.info("Tag deleted", { userId, tagId: id });
 
-    const userId = auth.userId;
-
-    // Verify ownership
-    const existing = await prisma.tag.findFirst({
-      where: { id, userId },
-    });
-
-    if (!existing) {
-      return NextResponse.json({ error: "Tag not found" }, { status: 404 });
-    }
-
-    await prisma.tag.delete({
-      where: { id },
-    });
-
-    logger.info("Tag deleted", { userId, tagId: id });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    logger.error("Tag DELETE error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to delete tag" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({ success: true });
+});

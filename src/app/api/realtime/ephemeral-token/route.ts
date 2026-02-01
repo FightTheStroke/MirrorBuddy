@@ -6,7 +6,8 @@
 //       multiple clients sharing the same session (security/privacy issue)
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 import {
   checkRateLimitAsync,
   getClientIdentifier,
@@ -14,7 +15,6 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
 
 interface AzureSessionResponse {
   client_secret: {
@@ -56,14 +56,12 @@ function checkPerIPRateLimit(clientId: string): boolean {
   return true;
 }
 
-export async function POST(request: NextRequest) {
-  // CSRF validation (double-submit cookie pattern)
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
+export const POST = pipe(
+  withSentry("/api/realtime/ephemeral-token"),
+  withCSRF,
+)(async (ctx) => {
   // Get client identifier for rate limiting and caching
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(ctx.req);
 
   // Per-IP rate limit: 1 request per second maximum
   if (!checkPerIPRateLimit(clientId)) {
@@ -134,82 +132,68 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  try {
-    // Call Azure REST API to create ephemeral session
-    // POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
-    const url = new URL(azureEndpoint);
-    const azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
+  // Call Azure REST API to create ephemeral session
+  // POST https://{endpoint}/openai/realtimeapi/sessions?api-version=2025-04-01-preview
+  const url = new URL(azureEndpoint);
+  const azureUrl = `${url.protocol}//${url.hostname}/openai/realtimeapi/sessions?api-version=2025-04-01-preview`;
 
-    const response = await fetch(azureUrl, {
-      method: "POST",
-      headers: {
-        "api-key": azureApiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: azureDeployment,
-      }),
-    });
+  const response = await fetch(azureUrl, {
+    method: "POST",
+    headers: {
+      "api-key": azureApiKey,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: azureDeployment,
+    }),
+  });
 
-    // Handle Azure API errors
-    if (!response.ok) {
-      const errorData = await response.text();
-      logger.error("Azure ephemeral token request failed", {
-        status: response.status,
-        errorDetails: errorData,
-      });
-
-      return NextResponse.json(
-        {
-          error: "Failed to get ephemeral token from Azure",
-          status: response.status,
-        },
-        { status: response.status >= 500 ? 503 : 400 },
-      );
-    }
-
-    const sessionData: AzureSessionResponse = await response.json();
-
-    // Extract ephemeral token details
-    const { client_secret, id: sessionId } = sessionData;
-    if (!client_secret || !client_secret.value || !client_secret.expires_at) {
-      logger.error("Invalid Azure session response - missing client_secret", {
-        sessionData,
-      });
-
-      return NextResponse.json(
-        {
-          error: "Invalid response from Azure - missing ephemeral token",
-        },
-        { status: 503 },
-      );
-    }
-
-    // Return ephemeral token to client (unique session per request)
-    const payload: EphemeralTokenResponse = {
-      token: client_secret.value,
-      expiresAt: client_secret.expires_at,
-      sessionId: sessionId || "",
-    };
-
-    logger.info("Ephemeral token issued (unique session)", {
-      clientId,
-      sessionId,
-      expiresAt: client_secret.expires_at,
-    });
-
-    return NextResponse.json(payload, { status: 200 });
-  } catch (error) {
-    logger.error("Unexpected error in ephemeral token endpoint", {
-      error: error instanceof Error ? error.message : String(error),
+  // Handle Azure API errors
+  if (!response.ok) {
+    const errorData = await response.text();
+    logger.error("Azure ephemeral token request failed", {
+      status: response.status,
+      errorDetails: errorData,
     });
 
     return NextResponse.json(
       {
-        error: "Internal server error",
-        message: "Failed to get ephemeral token",
+        error: "Failed to get ephemeral token from Azure",
+        status: response.status,
       },
-      { status: 500 },
+      { status: response.status >= 500 ? 503 : 400 },
     );
   }
-}
+
+  const sessionData: AzureSessionResponse = await response.json();
+
+  // Extract ephemeral token details
+  const { client_secret, id: sessionId } = sessionData;
+  if (!client_secret || !client_secret.value || !client_secret.expires_at) {
+    logger.error("Invalid Azure session response - missing client_secret", {
+      sessionData,
+    });
+
+    return NextResponse.json(
+      {
+        error: "Invalid response from Azure - missing ephemeral token",
+      },
+      { status: 503 },
+    );
+  }
+
+  // Return ephemeral token to client (unique session per request)
+  const payload: EphemeralTokenResponse = {
+    token: client_secret.value,
+    expiresAt: client_secret.expires_at,
+    sessionId: sessionId || "",
+  };
+
+  logger.info("Ephemeral token issued (unique session)", {
+    clientId,
+    sessionId,
+    expiresAt: client_secret.expires_at,
+  });
+
+  return NextResponse.json(payload, { status: 200 });
+});

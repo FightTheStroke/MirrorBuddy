@@ -8,7 +8,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { getRequestId } from "@/lib/tracing";
+import { getRequestId, getRequestLogger } from "@/lib/tracing";
 import { getOrCompute, del, CACHE_TTL } from "@/lib/cache";
 import { SettingsUpdateSchema } from "@/lib/validation/schemas/user";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
@@ -60,6 +60,7 @@ export const PUT = pipe(
   withAuth,
 )(async (ctx) => {
   const userId = ctx.userId!;
+  const log = getRequestLogger(ctx.req);
 
   const body = await ctx.req.json();
 

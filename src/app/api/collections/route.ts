@@ -5,13 +5,11 @@
 // ADR: 0022-knowledge-hub-material-organization.md
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma, isDatabaseNotInitialized } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
 import { CreateCollectionSchema } from "@/lib/validation/schemas/organization";
-import { requireCSRF } from "@/lib/security/csrf";
-import * as Sentry from "@sentry/nextjs";
 
 /**
  * GET /api/collections
@@ -19,18 +17,15 @@ import * as Sentry from "@sentry/nextjs";
  * Returns all collections for the current user.
  * Optionally filtered by parentId for nested navigation.
  */
-export async function GET(request: NextRequest) {
+export const GET = pipe(
+  withSentry("/api/collections"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+
   try {
-    // 1. Auth check
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = auth.userId;
-
     // 2. Parse query params
-    const { searchParams } = new URL(request.url);
+    const { searchParams } = new URL(ctx.req.url);
     const parentId = searchParams.get("parentId") || undefined;
     const includeChildren = searchParams.get("includeChildren") === "true";
 
@@ -86,120 +81,81 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/collections" },
-    });
-
-    logger.error("Collections GET error", { error: String(error) });
-
     if (isDatabaseNotInitialized(error)) {
       return NextResponse.json(
         { error: "Database not initialized" },
         { status: 503 },
       );
     }
-
-    return NextResponse.json(
-      { error: "Failed to fetch collections" },
-      { status: 500 },
-    );
+    throw error;
   }
-}
+});
 
 /**
  * POST /api/collections
  *
  * Create a new collection for the current user.
  */
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const POST = pipe(
+  withSentry("/api/collections"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-  try {
-    // 1. Auth check
-    const auth = await validateAuth();
-    if (!auth.authenticated || !auth.userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+  // 2. Validate input
+  const body = await ctx.req.json();
+  const validation = CreateCollectionSchema.safeParse(body);
 
-    const userId = auth.userId;
-
-    // 2. Validate input
-    const body = await request.json();
-    const validation = CreateCollectionSchema.safeParse(body);
-
-    if (!validation.success) {
-      return NextResponse.json(
-        {
-          error: "Invalid request",
-          details: validation.error.issues.map((e) => e.message),
-        },
-        { status: 400 },
-      );
-    }
-
-    const { name, description, color, icon, parentId, sortOrder } =
-      validation.data;
-
-    // 3. If parentId provided, verify it belongs to user
-    if (parentId) {
-      const parent = await prisma.collection.findFirst({
-        where: { id: parentId, userId },
-      });
-      if (!parent) {
-        return NextResponse.json(
-          { error: "Parent collection not found" },
-          { status: 404 },
-        );
-      }
-    }
-
-    // 4. Create collection
-    const collection = await prisma.collection.create({
-      data: {
-        userId,
-        name,
-        description,
-        color,
-        icon,
-        parentId,
-        sortOrder: sortOrder ?? 0,
-      },
-      include: {
-        _count: {
-          select: { materials: true },
-        },
-      },
-    });
-
-    logger.info("Collection created", {
-      userId,
-      collectionId: collection.id,
-      name: collection.name,
-    });
-
-    return NextResponse.json(collection, { status: 201 });
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/collections" },
-    });
-
-    logger.error("Collections POST error", { error: String(error) });
-
-    // Handle unique constraint violation
-    if (error instanceof Error && error.message.includes("Unique constraint")) {
-      return NextResponse.json(
-        { error: "A collection with this name already exists" },
-        { status: 409 },
-      );
-    }
-
+  if (!validation.success) {
     return NextResponse.json(
-      { error: "Failed to create collection" },
-      { status: 500 },
+      {
+        error: "Invalid request",
+        details: validation.error.issues.map((e) => e.message),
+      },
+      { status: 400 },
     );
   }
-}
+
+  const { name, description, color, icon, parentId, sortOrder } =
+    validation.data;
+
+  // 3. If parentId provided, verify it belongs to user
+  if (parentId) {
+    const parent = await prisma.collection.findFirst({
+      where: { id: parentId, userId },
+    });
+    if (!parent) {
+      return NextResponse.json(
+        { error: "Parent collection not found" },
+        { status: 404 },
+      );
+    }
+  }
+
+  // 4. Create collection
+  const collection = await prisma.collection.create({
+    data: {
+      userId,
+      name,
+      description,
+      color,
+      icon,
+      parentId,
+      sortOrder: sortOrder ?? 0,
+    },
+    include: {
+      _count: {
+        select: { materials: true },
+      },
+    },
+  });
+
+  logger.info("Collection created", {
+    userId,
+    collectionId: collection.id,
+    name: collection.name,
+  });
+
+  return NextResponse.json(collection, { status: 201 });
+});

@@ -1,17 +1,12 @@
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { getMaestroById } from "@/data/maestri";
 
-export async function GET(
-  _request: NextRequest,
-  { params }: { params: Promise<{ maestroId: string }> },
-) {
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { maestroId } = await params;
+export const GET = pipe(
+  withSentry("/api/admin/knowledge/:maestroId"),
+  withAdmin,
+)(async (ctx) => {
+  const { maestroId } = await ctx.params;
   const maestro = getMaestroById(maestroId);
 
   if (!maestro) {
@@ -25,4 +20,4 @@ export async function GET(
     tools: maestro.tools,
     systemPrompt: maestro.systemPrompt,
   });
-}
+});

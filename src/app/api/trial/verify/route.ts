@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { z } from "zod";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 import {
   checkRateLimitAsync,
@@ -14,9 +15,9 @@ const VerifySchema = z.object({
   code: z.string().min(4).max(12),
 });
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Code-based email verification; no cookie auth
-export async function POST(request: NextRequest) {
-  const clientId = getClientIdentifier(request);
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public verification endpoint, rate-limited, no cookie auth
+export const POST = pipe(withSentry("/api/trial/verify"))(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(
     `trial:verify:${clientId}`,
     RATE_LIMITS.COPPA,
@@ -26,17 +27,18 @@ export async function POST(request: NextRequest) {
     return rateLimitResponse(rateLimitResult);
   }
 
-  try {
-    const body = await request.json();
-    const parsed = VerifySchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json(
-        { error: "Invalid request", details: parsed.error.issues },
-        { status: 400 },
-      );
-    }
+  const body = await ctx.req.json();
+  const parsed = VerifySchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Invalid request", details: parsed.error.issues },
+      { status: 400 },
+    );
+  }
 
-    const { sessionId, code } = parsed.data;
+  const { sessionId, code } = parsed.data;
+
+  try {
     const result = await verifyTrialEmailCode(sessionId, code);
 
     return NextResponse.json({
@@ -55,4 +57,4 @@ export async function POST(request: NextRequest) {
           : 500;
     return NextResponse.json({ error: message }, { status });
   }
-}
+});

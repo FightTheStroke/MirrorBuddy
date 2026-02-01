@@ -11,7 +11,7 @@
  * 2. IP allowlist: localhost, private networks, or HEALTH_ALLOWED_IPS
  */
 
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import { getAppVersion } from "@/lib/version";

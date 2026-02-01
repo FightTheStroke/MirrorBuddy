@@ -8,9 +8,8 @@
  * Generates credentials and sends welcome email.
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { hashPassword, generateRandomPassword } from "@/lib/auth/password";
 import { sendEmail } from "@/lib/email";
@@ -40,142 +39,128 @@ function generateUsername(email: string): string {
   return `${clean}${suffix}`;
 }
 
-export async function POST(request: NextRequest) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const POST = pipe(
+  withSentry("/api/invites/direct"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  const adminUserId = ctx.userId!;
+  const body: DirectInviteBody = await ctx.req.json();
 
-  // Admin auth check
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin || !auth.userId) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const body: DirectInviteBody = await request.json();
-
-    // Validate email with safe linear-time check (no nested quantifiers)
-    const rawEmail = body.email?.trim().toLowerCase() || "";
-    if (
-      !rawEmail ||
-      rawEmail.length > 254 ||
-      !rawEmail.includes("@") ||
-      rawEmail.indexOf("@") === 0 ||
-      rawEmail.indexOf("@") !== rawEmail.lastIndexOf("@") ||
-      !rawEmail.substring(rawEmail.indexOf("@") + 1).includes(".")
-    ) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 },
-      );
-    }
-
-    const email = rawEmail;
-
-    // Check for existing user
-    const existingUser = await prisma.user.findFirst({
-      where: {
-        OR: [{ email }, { googleAccount: { email } }],
-      },
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: "A user with this email already exists" },
-        { status: 409 },
-      );
-    }
-
-    // Generate credentials
-    const username = generateUsername(email);
-    const temporaryPassword = generateRandomPassword(12);
-    const passwordHash = await hashPassword(temporaryPassword);
-    const displayName = body.name?.trim() || email.split("@")[0];
-
-    // Create user + invite record in transaction
-    const user = await prisma.$transaction(
-      async (tx: Prisma.TransactionClient) => {
-        const newUser = await tx.user.create({
-          data: {
-            username,
-            email,
-            passwordHash,
-            mustChangePassword: true,
-            profile: {
-              create: {
-                name: displayName,
-              },
-            },
-            settings: {
-              create: {},
-            },
-          },
-        });
-
-        await tx.inviteRequest.upsert({
-          where: { email },
-          update: {
-            name: displayName,
-            motivation: "Invito diretto admin",
-            status: "APPROVED",
-            reviewedAt: new Date(),
-            reviewedBy: auth.userId,
-            generatedUsername: username,
-            createdUserId: newUser.id,
-            isDirect: true,
-          },
-          create: {
-            name: displayName,
-            email,
-            motivation: "Invito diretto admin",
-            status: "APPROVED",
-            reviewedAt: new Date(),
-            reviewedBy: auth.userId,
-            generatedUsername: username,
-            createdUserId: newUser.id,
-            isDirect: true,
-          },
-        });
-
-        return newUser;
-      },
-    );
-
-    // Send welcome email
-    const template = getApprovalTemplate({
-      name: displayName,
-      email,
-      username,
-      temporaryPassword,
-      loginUrl: `${APP_URL}/auth/login`,
-    });
-
-    await sendEmail({
-      to: template.to,
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
-    });
-
-    logger.info("Direct invite created", {
-      userId: user.id,
-      username,
-      email,
-      adminUserId: auth.userId,
-    });
-
-    return NextResponse.json({
-      success: true,
-      userId: user.id,
-      username,
-      email,
-    });
-  } catch (error) {
-    logger.error("Direct invite failed", {}, error as Error);
+  // Validate email with safe linear-time check (no nested quantifiers)
+  const rawEmail = body.email?.trim().toLowerCase() || "";
+  if (
+    !rawEmail ||
+    rawEmail.length > 254 ||
+    !rawEmail.includes("@") ||
+    rawEmail.indexOf("@") === 0 ||
+    rawEmail.indexOf("@") !== rawEmail.lastIndexOf("@") ||
+    !rawEmail.substring(rawEmail.indexOf("@") + 1).includes(".")
+  ) {
     return NextResponse.json(
-      { error: "Failed to create user" },
-      { status: 500 },
+      { error: "Invalid email format" },
+      { status: 400 },
     );
   }
-}
+
+  const email = rawEmail;
+
+  // Check for existing user
+  const existingUser = await prisma.user.findFirst({
+    where: {
+      OR: [{ email }, { googleAccount: { email } }],
+    },
+  });
+
+  if (existingUser) {
+    return NextResponse.json(
+      { error: "A user with this email already exists" },
+      { status: 409 },
+    );
+  }
+
+  // Generate credentials
+  const username = generateUsername(email);
+  const temporaryPassword = generateRandomPassword(12);
+  const passwordHash = await hashPassword(temporaryPassword);
+  const displayName = body.name?.trim() || email.split("@")[0];
+
+  // Create user + invite record in transaction
+  const user = await prisma.$transaction(
+    async (tx: Prisma.TransactionClient) => {
+      const newUser = await tx.user.create({
+        data: {
+          username,
+          email,
+          passwordHash,
+          mustChangePassword: true,
+          profile: {
+            create: {
+              name: displayName,
+            },
+          },
+          settings: {
+            create: {},
+          },
+        },
+      });
+
+      await tx.inviteRequest.upsert({
+        where: { email },
+        update: {
+          name: displayName,
+          motivation: "Invito diretto admin",
+          status: "APPROVED",
+          reviewedAt: new Date(),
+          reviewedBy: adminUserId,
+          generatedUsername: username,
+          createdUserId: newUser.id,
+          isDirect: true,
+        },
+        create: {
+          name: displayName,
+          email,
+          motivation: "Invito diretto admin",
+          status: "APPROVED",
+          reviewedAt: new Date(),
+          reviewedBy: adminUserId,
+          generatedUsername: username,
+          createdUserId: newUser.id,
+          isDirect: true,
+        },
+      });
+
+      return newUser;
+    },
+  );
+
+  // Send welcome email
+  const template = getApprovalTemplate({
+    name: displayName,
+    email,
+    username,
+    temporaryPassword,
+    loginUrl: `${APP_URL}/auth/login`,
+  });
+
+  await sendEmail({
+    to: template.to,
+    subject: template.subject,
+    html: template.html,
+    text: template.text,
+  });
+
+  logger.info("Direct invite created", {
+    userId: user.id,
+    username,
+    email,
+    adminUserId,
+  });
+
+  return NextResponse.json({
+    success: true,
+    userId: user.id,
+    username,
+    email,
+  });
+});

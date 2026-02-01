@@ -383,8 +383,22 @@ const eslintConfig = defineConfig([
       "local-rules/require-e2e-fixtures": "warn",
     },
   },
+  // Prefer pipe() middleware pattern over export async function in API routes
+  // pipe() provides automatic error handling, Sentry, logging, and composable middleware
+  {
+    files: ["src/app/api/**/route.ts"],
+    ignores: [
+      // Cron jobs use withCron middleware (already pipe-based)
+      "src/app/api/cron/**/*.ts",
+    ],
+    rules: {
+      "local-rules/require-pipe-handler": "warn",
+    },
+  },
   // ADR 0078: Require CSRF validation in mutating API route handlers
-  // POST/PUT/PATCH/DELETE endpoints must call requireCSRF() to prevent CSRF attacks
+  // POST/PUT/PATCH/DELETE endpoints must include CSRF protection:
+  //   - pipe() pattern: withCSRF in middleware chain
+  //   - Legacy pattern: requireCSRF() call inside handler
   // Exemptions: Cron jobs (use CRON_SECRET), webhooks (use signature verification)
   {
     files: ["src/app/api/**/route.ts"],

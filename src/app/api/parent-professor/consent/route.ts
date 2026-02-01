@@ -4,71 +4,49 @@
 // POST: Record consent
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
 
-export async function GET() {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const GET = pipe(
+  withSentry("/api/parent-professor/consent"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-    const settings = await prisma.settings.findUnique({
-      where: { userId },
-      select: { parentChatConsentAt: true },
-    });
+  const settings = await prisma.settings.findUnique({
+    where: { userId },
+    select: { parentChatConsentAt: true },
+  });
 
-    return NextResponse.json({
-      hasConsented: !!settings?.parentChatConsentAt,
-      consentedAt: settings?.parentChatConsentAt || null,
-    });
-  } catch (error) {
-    logger.error("Parent consent GET error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to check consent" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    hasConsented: !!settings?.parentChatConsentAt,
+    consentedAt: settings?.parentChatConsentAt || null,
+  });
+});
 
-export async function POST(request: NextRequest) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const POST = pipe(
+  withSentry("/api/parent-professor/consent"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+  // Upsert settings with consent timestamp
+  const settings = await prisma.settings.upsert({
+    where: { userId },
+    update: { parentChatConsentAt: new Date() },
+    create: {
+      userId,
+      parentChatConsentAt: new Date(),
+    },
+  });
 
-    // Upsert settings with consent timestamp
-    const settings = await prisma.settings.upsert({
-      where: { userId },
-      update: { parentChatConsentAt: new Date() },
-      create: {
-        userId,
-        parentChatConsentAt: new Date(),
-      },
-    });
+  logger.info("Parent chat consent recorded", { userId });
 
-    logger.info("Parent chat consent recorded", { userId });
-
-    return NextResponse.json({
-      success: true,
-      consentedAt: settings.parentChatConsentAt,
-    });
-  } catch (error) {
-    logger.error("Parent consent POST error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to record consent" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    success: true,
+    consentedAt: settings.parentChatConsentAt,
+  });
+});

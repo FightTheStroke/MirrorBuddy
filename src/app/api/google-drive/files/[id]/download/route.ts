@@ -9,50 +9,37 @@
  * - userId: Required user ID
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuthenticatedUser } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import { downloadDriveFile } from "@/lib/google";
-import { logger } from "@/lib/logger";
 
-interface RouteParams {
-  params: Promise<{ id: string }>;
-}
-
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  // Security: Get userId from authenticated session only
-  const { userId, errorResponse } = await requireAuthenticatedUser();
-  if (errorResponse) return errorResponse;
-
-  const { id: fileId } = await params;
+export const GET = pipe(
+  withSentry("/api/google-drive/files/[id]/download"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id: fileId } = await ctx.params;
 
   if (!fileId) {
     return NextResponse.json({ error: "fileId is required" }, { status: 400 });
   }
 
-  try {
-    const result = await downloadDriveFile(userId!, fileId);
+  const result = await downloadDriveFile(userId, fileId);
 
-    if (!result) {
-      return NextResponse.json(
-        { error: "Failed to download file. Please reconnect Google Drive." },
-        { status: 401 },
-      );
-    }
-
-    // Return file as response
-    return new NextResponse(result.content, {
-      status: 200,
-      headers: {
-        "Content-Type": result.mimeType,
-        "Content-Disposition": `attachment; filename="${encodeURIComponent(result.fileName)}"`,
-        "Content-Length": String(result.size),
-      },
-    });
-  } catch (error) {
-    logger.error("Google Drive download failed", { fileId, userId }, error);
+  if (!result) {
     return NextResponse.json(
-      { error: "Failed to download file" },
-      { status: 500 },
+      { error: "Failed to download file. Please reconnect Google Drive." },
+      { status: 401 },
     );
   }
-}
+
+  // Return file as response
+  return new NextResponse(result.content, {
+    status: 200,
+    headers: {
+      "Content-Type": result.mimeType,
+      "Content-Disposition": `attachment; filename="${encodeURIComponent(result.fileName)}"`,
+      "Content-Length": String(result.size),
+    },
+  });
+});

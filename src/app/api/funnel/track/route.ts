@@ -4,7 +4,8 @@
  * Plan 069 - Conversion Funnel Dashboard
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import { recordFunnelEvent, type FunnelStage } from "@/lib/funnel";
 import { logger } from "@/lib/logger";
 import { getVisitorIdFromCookie } from "@/lib/trial/visitor-id";
@@ -29,48 +30,40 @@ interface TrackRequest {
   metadata?: Record<string, unknown>;
 }
 
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public funnel tracking; no cookie auth
-export async function POST(request: NextRequest): Promise<Response> {
-  try {
-    const body = (await request.json()) as TrackRequest;
-    const { stage, fromStage, metadata } = body;
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public analytics endpoint, visitor cookie only, no session auth
+export const POST = pipe(withSentry("/api/funnel/track"))(async (ctx) => {
+  const body = (await ctx.req.json()) as TrackRequest;
+  const { stage, fromStage, metadata } = body;
 
-    // Validate stage
-    if (!stage || !VALID_STAGES.includes(stage)) {
-      return NextResponse.json(
-        { error: "Invalid stage", validStages: VALID_STAGES },
-        { status: 400 },
-      );
-    }
-
-    // Get visitor ID from cookie
-    const visitorId = getVisitorIdFromCookie(request);
-
-    if (!visitorId) {
-      log.warn("No visitor ID for funnel tracking");
-      return NextResponse.json({ error: "No visitor ID" }, { status: 400 });
-    }
-
-    // Record the funnel event
-    await recordFunnelEvent({
-      visitorId,
-      stage,
-      fromStage,
-      metadata: {
-        ...metadata,
-        userAgent: request.headers.get("user-agent") || undefined,
-        referrer: request.headers.get("referer") || undefined,
-      },
-    });
-
-    log.info("Funnel event recorded", { visitorId, stage, fromStage });
-
-    return NextResponse.json({ success: true, stage });
-  } catch (error) {
-    log.error("Failed to record funnel event", { error: String(error) });
+  // Validate stage
+  if (!stage || !VALID_STAGES.includes(stage)) {
     return NextResponse.json(
-      { error: "Failed to record event" },
-      { status: 500 },
+      { error: "Invalid stage", validStages: VALID_STAGES },
+      { status: 400 },
     );
   }
-}
+
+  // Get visitor ID from cookie
+  const visitorId = getVisitorIdFromCookie(ctx.req);
+
+  if (!visitorId) {
+    log.warn("No visitor ID for funnel tracking");
+    return NextResponse.json({ error: "No visitor ID" }, { status: 400 });
+  }
+
+  // Record the funnel event
+  await recordFunnelEvent({
+    visitorId,
+    stage,
+    fromStage,
+    metadata: {
+      ...metadata,
+      userAgent: ctx.req.headers.get("user-agent") || undefined,
+      referrer: ctx.req.headers.get("referer") || undefined,
+    },
+  });
+
+  log.info("Funnel event recorded", { visitorId, stage, fromStage });
+
+  return NextResponse.json({ success: true, stage });
+});

@@ -4,7 +4,8 @@
 // SECURITY: API key is NEVER exposed to client
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import {
   checkRateLimitAsync,
   getClientIdentifier,
@@ -16,10 +17,10 @@ import { getRequestLogger, getRequestId } from "@/lib/tracing";
 // WebSocket proxy port (must match instrumentation.ts)
 const WS_PROXY_PORT = parseInt(process.env.WS_PROXY_PORT || "3001", 10);
 
-export async function GET(request: NextRequest) {
-  const log = getRequestLogger(request);
+export const GET = pipe(withSentry("/api/realtime/token"))(async (ctx) => {
+  const log = getRequestLogger(ctx.req);
   // Rate limiting: 10 requests per minute per IP
-  const clientId = getClientIdentifier(request);
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = await checkRateLimitAsync(
     `realtime-token:${clientId}`,
     RATE_LIMITS.REALTIME_TOKEN,
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
       },
       { status: 503 },
     );
-    response.headers.set("X-Request-ID", getRequestId(request));
+    response.headers.set("X-Request-ID", getRequestId(ctx.req));
     return response;
   }
 
@@ -92,12 +93,12 @@ export async function GET(request: NextRequest) {
         }),
     configured: true,
   });
-  response.headers.set("X-Request-ID", getRequestId(request));
+  response.headers.set("X-Request-ID", getRequestId(ctx.req));
   return response;
-}
+});
 
 // Check configuration status (for settings page)
-export async function HEAD() {
+export const HEAD = pipe(withSentry("/api/realtime/token"))(async () => {
   const azureEndpoint = process.env.AZURE_OPENAI_REALTIME_ENDPOINT;
   const azureApiKey = process.env.AZURE_OPENAI_REALTIME_API_KEY;
   const azureDeployment = process.env.AZURE_OPENAI_REALTIME_DEPLOYMENT;
@@ -106,4 +107,4 @@ export async function HEAD() {
     return new NextResponse(null, { status: 503 });
   }
   return new NextResponse(null, { status: 200 });
-}
+});

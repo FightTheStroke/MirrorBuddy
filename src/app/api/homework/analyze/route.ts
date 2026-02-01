@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import { getActiveProvider } from "@/lib/ai/providers";
 import { logger } from "@/lib/logger";
 import {
@@ -13,15 +14,14 @@ import {
   RATE_LIMITS,
   rateLimitResponse,
 } from "@/lib/rate-limit";
-import * as Sentry from "@sentry/nextjs";
 import { analyzeHomeworkWithAzure } from "./helpers";
 
 /**
  * POST - Analyze homework image
  */
-// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- Public endpoint; no cookie auth, rate-limited
-export async function POST(request: Request) {
-  const clientId = getClientIdentifier(request);
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public endpoint with rate limiting, no cookie auth
+export const POST = pipe(withSentry("/api/homework/analyze"))(async (ctx) => {
+  const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(
     `homework:${clientId}`,
     RATE_LIMITS.HOMEWORK,
@@ -35,60 +35,47 @@ export async function POST(request: Request) {
     return rateLimitResponse(rateLimit);
   }
 
-  try {
-    const { image, systemPrompt } = await request.json();
+  const { image, systemPrompt } = await ctx.req.json();
 
-    if (!image) {
-      return NextResponse.json({ error: "Image is required" }, { status: 400 });
-    }
+  if (!image) {
+    return NextResponse.json({ error: "Image is required" }, { status: 400 });
+  }
 
-    const provider = getActiveProvider();
-    if (!provider) {
-      return NextResponse.json(
-        { error: "No AI provider configured" },
-        { status: 503 },
-      );
-    }
-
-    if (provider.provider === "azure") {
-      const result = await analyzeHomeworkWithAzure(
-        image,
-        systemPrompt,
-        provider,
-      );
-
-      if (!result.success) {
-        return NextResponse.json({ error: result.error }, { status: 500 });
-      }
-
-      return NextResponse.json(result.analysis);
-    }
-
+  const provider = getActiveProvider();
+  if (!provider) {
     return NextResponse.json(
-      {
-        error:
-          "Vision analysis requires Azure OpenAI with GPT-4o. Ollama does not support image analysis.",
-      },
-      { status: 501 },
-    );
-  } catch (error) {
-    // Report error to Sentry for monitoring and alerts
-    Sentry.captureException(error, {
-      tags: { api: "/api/homework/analyze" },
-    });
-
-    logger.error("Homework analyze error", { error: String(error) });
-    return NextResponse.json(
-      { error: "Failed to analyze homework" },
-      { status: 500 },
+      { error: "No AI provider configured" },
+      { status: 503 },
     );
   }
-}
+
+  if (provider.provider === "azure") {
+    const result = await analyzeHomeworkWithAzure(
+      image,
+      systemPrompt,
+      provider,
+    );
+
+    if (!result.success) {
+      return NextResponse.json({ error: result.error }, { status: 500 });
+    }
+
+    return NextResponse.json(result.analysis);
+  }
+
+  return NextResponse.json(
+    {
+      error:
+        "Vision analysis requires Azure OpenAI with GPT-4o. Ollama does not support image analysis.",
+    },
+    { status: 501 },
+  );
+});
 
 /**
  * GET - Check if vision is available
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/homework/analyze"))(async () => {
   const provider = getActiveProvider();
 
   if (!provider) {
@@ -111,4 +98,4 @@ export async function GET() {
     provider: provider.provider,
     model: process.env.AZURE_OPENAI_VISION_DEPLOYMENT || provider.model,
   });
-}
+});

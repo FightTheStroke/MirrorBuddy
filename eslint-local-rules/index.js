@@ -9,6 +9,7 @@ import { noKebabCaseI18nKeys } from "./no-kebab-case-i18n-keys.js";
 import noPrismaRaceCondition from "./no-prisma-race-condition.js";
 import requireE2eFixtures from "./require-e2e-fixtures.js";
 import requireCsrfMutatingRoutes from "./require-csrf-mutating-routes.js";
+import requirePipeHandler from "./require-pipe-handler.js";
 import noHardcodedStringsInTests from "./no-hardcoded-strings-in-tests.js";
 import requireCompleteLoggerMock from "./require-complete-logger-mock.js";
 
@@ -267,6 +268,7 @@ const rules = {
   "no-prisma-race-condition": noPrismaRaceCondition,
   "require-e2e-fixtures": requireE2eFixtures,
   "require-csrf-mutating-routes": requireCsrfMutatingRoutes,
+  "require-pipe-handler": requirePipeHandler,
   "no-hardcoded-strings-in-tests": noHardcodedStringsInTests,
   "require-complete-logger-mock": requireCompleteLoggerMock,
 };

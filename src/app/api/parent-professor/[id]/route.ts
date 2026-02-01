@@ -4,115 +4,87 @@
 // DELETE: Delete conversation
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { requireCSRF } from "@/lib/security/csrf";
 
-interface RouteParams {
-  params: Promise<{ id: string }>;
-}
+export const GET = pipe(
+  withSentry("/api/parent-professor/:id"),
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id } = await ctx.params;
 
-export async function GET(request: NextRequest, { params }: RouteParams) {
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
-
-    const { id } = await params;
-
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id,
-        userId,
-        isParentMode: true,
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id,
+      userId,
+      isParentMode: true,
+    },
+    include: {
+      messages: {
+        orderBy: { createdAt: "asc" },
       },
-      include: {
-        messages: {
-          orderBy: { createdAt: "asc" },
-        },
-      },
-    });
+    },
+  });
 
-    if (!conversation) {
-      return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json({
-      id: conversation.id,
-      maestroId: conversation.maestroId,
-      studentId: conversation.studentId,
-      title: conversation.title,
-      messageCount: conversation.messageCount,
-      messages: conversation.messages.map(
-        (m: (typeof conversation.messages)[number]) => ({
-          id: m.id,
-          role: m.role,
-          content: m.content,
-          createdAt: m.createdAt,
-        }),
-      ),
-      createdAt: conversation.createdAt,
-      updatedAt: conversation.updatedAt,
-    });
-  } catch (error) {
-    logger.error("Parent conversation GET error", { error: String(error) });
+  if (!conversation) {
     return NextResponse.json(
-      { error: "Failed to get conversation" },
-      { status: 500 },
+      { error: "Conversation not found" },
+      { status: 404 },
     );
   }
-}
 
-export async function DELETE(request: NextRequest, { params }: RouteParams) {
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+  return NextResponse.json({
+    id: conversation.id,
+    maestroId: conversation.maestroId,
+    studentId: conversation.studentId,
+    title: conversation.title,
+    messageCount: conversation.messageCount,
+    messages: conversation.messages.map(
+      (m: (typeof conversation.messages)[number]) => ({
+        id: m.id,
+        role: m.role,
+        content: m.content,
+        createdAt: m.createdAt,
+      }),
+    ),
+    createdAt: conversation.createdAt,
+    updatedAt: conversation.updatedAt,
+  });
+});
 
-  try {
-    const auth = await validateAuth();
-    if (!auth.authenticated) {
-      return NextResponse.json({ error: auth.error }, { status: 401 });
-    }
-    const userId = auth.userId!;
+export const DELETE = pipe(
+  withSentry("/api/parent-professor/:id"),
+  withCSRF,
+  withAuth,
+)(async (ctx) => {
+  const userId = ctx.userId!;
+  const { id } = await ctx.params;
 
-    const { id } = await params;
+  // Verify ownership
+  const conversation = await prisma.conversation.findFirst({
+    where: {
+      id,
+      userId,
+      isParentMode: true,
+    },
+  });
 
-    // Verify ownership
-    const conversation = await prisma.conversation.findFirst({
-      where: {
-        id,
-        userId,
-        isParentMode: true,
-      },
-    });
-
-    if (!conversation) {
-      return NextResponse.json(
-        { error: "Conversation not found" },
-        { status: 404 },
-      );
-    }
-
-    // Delete conversation (messages cascade)
-    await prisma.conversation.delete({
-      where: { id },
-    });
-
-    logger.info("Parent conversation deleted", { conversationId: id, userId });
-
-    return NextResponse.json({ success: true });
-  } catch (error) {
-    logger.error("Parent conversation DELETE error", { error: String(error) });
+  if (!conversation) {
     return NextResponse.json(
-      { error: "Failed to delete conversation" },
-      { status: 500 },
+      { error: "Conversation not found" },
+      { status: 404 },
     );
   }
-}
+
+  // Delete conversation (messages cascade)
+  await prisma.conversation.delete({
+    where: { id },
+  });
+
+  logger.info("Parent conversation deleted", { conversationId: id, userId });
+
+  return NextResponse.json({ success: true });
+});

@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import { maestri } from "@/data/index";
 import { getOrCompute, CACHE_TTL } from "@/lib/cache";
-import { apiHandler } from "@/lib/api";
 import { generateMaestroGreeting } from "@/lib/greeting/greeting-generator";
 import type { SupportedLanguage } from "@/app/api/chat/types";
 
@@ -11,8 +11,8 @@ const VALID_LOCALES = ["it", "en", "fr", "de", "es"];
  * GET /api/maestri?locale=it
  * Returns all maestri data with locale-aware greetings
  */
-export const GET = apiHandler(async (request: NextRequest) => {
-  const locale = request.nextUrl.searchParams.get("locale") || "it";
+export const GET = pipe(withSentry("/api/maestri"))(async (ctx) => {
+  const locale = ctx.req.nextUrl.searchParams.get("locale") || "it";
   const lang = (
     VALID_LOCALES.includes(locale) ? locale : "it"
   ) as SupportedLanguage;
