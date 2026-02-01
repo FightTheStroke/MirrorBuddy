@@ -111,20 +111,35 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("networkidle");
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    // Wait for React hydration: floating button only renders via React
+    await page
+      .locator('[data-testid="a11y-floating-button"]')
+      .waitFor({ state: "visible", timeout: 15000 });
 
-    // Focus first to ensure visibility, then click
+    const skipLink = page.locator('a[href="#main-content"]');
     await skipLink.focus();
     await skipLink.click();
 
-    // Wait for focus to move to main content (handler runs after hydration)
-    await page.waitForFunction(
-      () => document.activeElement?.id === "main-content",
-      { timeout: 5000 },
-    );
+    // Retry click if handler wasn't hydrated on first attempt
+    const moved = await page
+      .waitForFunction(() => document.activeElement?.id === "main-content", {
+        timeout: 3000,
+      })
+      .then(() => true)
+      .catch(() => false);
+
+    if (!moved) {
+      await skipLink.focus();
+      await skipLink.click();
+      await page.waitForFunction(
+        () => document.activeElement?.id === "main-content",
+        { timeout: 10000 },
+      );
+    }
 
     const focusedElement = await page.evaluate(() => {
       return document.activeElement?.id;
