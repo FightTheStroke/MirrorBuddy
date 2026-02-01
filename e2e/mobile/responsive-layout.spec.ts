@@ -163,6 +163,9 @@ test.describe("Mobile Responsive Layout", () => {
   });
 
   test("no horizontal scroll should be present", async ({ page }) => {
+    // Wait for layout to stabilize after hydration
+    await page.waitForTimeout(500);
+
     // Check body scroll width vs client width
     const hasHorizontalScroll = await page.evaluate(() => {
       return document.body.scrollWidth > document.body.clientWidth;

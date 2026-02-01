@@ -16,7 +16,7 @@
  * F-05b: All operational metrics collected every 5 minutes
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import { metricsStore } from "@/lib/observability/metrics-store";
@@ -40,27 +40,6 @@ interface MetricSample {
   labels: Record<string, string>;
   value: number;
   timestamp: number;
-}
-
-/**
- * Verify cron request authenticity via CRON_SECRET header
- */
-function verifyCronSecret(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    log.warn("CRON_SECRET not configured - allowing all requests");
-    return true;
-  }
-
-  const authHeader = request.headers.get("authorization");
-  const expectedHeader = `Bearer ${cronSecret}`;
-
-  if (!authHeader || authHeader !== expectedHeader) {
-    return false;
-  }
-
-  return true;
 }
 
 /**
@@ -435,7 +414,10 @@ async function pushToGrafana(samples: MetricSample[]): Promise<void> {
   }
 }
 
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export const POST = pipe(
+  withSentry("/api/cron/metrics-push"),
+  withCron,
+)(async () => {
   const startTime = Date.now();
   const response: PushResponse = {
     status: "success",
@@ -443,79 +425,51 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     duration_ms: 0,
   };
 
-  try {
-    // Skip cron in non-production environments (staging/preview)
-    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-      log.info(
-        `[CRON] Skipping metrics-push - not production (env: ${process.env.VERCEL_ENV})`,
-      );
-      return NextResponse.json(
-        {
-          skipped: true,
-          reason: "Not production environment",
-          environment: process.env.VERCEL_ENV,
-        },
-        { status: 200 },
-      );
-    }
-
-    // Verify cron authenticity
-    if (!verifyCronSecret(request)) {
-      log.error("Invalid CRON_SECRET provided");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if Grafana Cloud is configured
-    if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
-      response.status = "skipped";
-      response.duration_ms = Date.now() - startTime;
-      log.info("Metrics push skipped (Grafana Cloud not configured)");
-      return NextResponse.json(response, { status: 200 });
-    }
-
-    // Collect and push light metrics (HTTP/SLI + real-time active users)
-    const samples = await collectLightMetrics();
-
-    if (samples.length === 0) {
-      response.status = "skipped";
-      response.duration_ms = Date.now() - startTime;
-      log.info("No metrics to push");
-      return NextResponse.json(response, { status: 200 });
-    }
-
-    await pushToGrafana(samples);
-
-    response.metrics_pushed = samples.length;
-    response.duration_ms = Date.now() - startTime;
-
-    log.info("Metrics pushed to Grafana Cloud", {
-      metrics_count: samples.length,
-      duration_ms: response.duration_ms,
-    });
-
-    return NextResponse.json(response, { status: 200 });
-  } catch (error) {
-    response.status = "error";
-    response.duration_ms = Date.now() - startTime;
-    response.error = error instanceof Error ? error.message : String(error);
-
-    log.error("Metrics push failed", {
-      error: response.error,
-      duration_ms: response.duration_ms,
-    });
-
-    return NextResponse.json(response, { status: 500 });
-  }
-}
-
-// Vercel Cron uses GET by default
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  // Verify cron secret for production security
-  if (!verifyCronSecret(request)) {
-    return NextResponse.json(
-      { error: "Unauthorized - invalid or missing CRON_SECRET" },
-      { status: 401 },
+  // Skip cron in non-production environments (staging/preview)
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+    log.info(
+      `[CRON] Skipping metrics-push - not production (env: ${process.env.VERCEL_ENV})`,
+    );
+    return Response.json(
+      {
+        skipped: true,
+        reason: "Not production environment",
+        environment: process.env.VERCEL_ENV,
+      },
+      { status: 200 },
     );
   }
-  return POST(request);
-}
+
+  // Check if Grafana Cloud is configured
+  if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
+    response.status = "skipped";
+    response.duration_ms = Date.now() - startTime;
+    log.info("Metrics push skipped (Grafana Cloud not configured)");
+    return Response.json(response, { status: 200 });
+  }
+
+  // Collect and push light metrics (HTTP/SLI + real-time active users)
+  const samples = await collectLightMetrics();
+
+  if (samples.length === 0) {
+    response.status = "skipped";
+    response.duration_ms = Date.now() - startTime;
+    log.info("No metrics to push");
+    return Response.json(response, { status: 200 });
+  }
+
+  await pushToGrafana(samples);
+
+  response.metrics_pushed = samples.length;
+  response.duration_ms = Date.now() - startTime;
+
+  log.info("Metrics pushed to Grafana Cloud", {
+    metrics_count: samples.length,
+    duration_ms: response.duration_ms,
+  });
+
+  return Response.json(response, { status: 200 });
+});
+
+// Vercel Cron uses GET by default
+export const GET = POST;

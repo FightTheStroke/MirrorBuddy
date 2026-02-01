@@ -8,7 +8,7 @@
  * Schedule: 0 0 1 * * (First day of month at midnight UTC)
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
 import crypto from "crypto";
 import { Redis } from "@upstash/redis";
 import { Resend } from "resend";
@@ -32,34 +32,30 @@ function getResend() {
   return resend;
 }
 
-export async function POST(request: NextRequest) {
-  // Validate cron secret header
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const POST = pipe(
+  withSentry("/api/cron/rotate-ip-salt"),
+  withCron,
+)(async () => {
+  // Generate new salt (32 bytes = 256 bits = 64 hex chars)
+  const newSalt = crypto.randomBytes(32).toString("hex");
+  const rotationDate = new Date().toISOString();
 
-  try {
-    // Generate new salt (32 bytes = 256 bits = 64 hex chars)
-    const newSalt = crypto.randomBytes(32).toString("hex");
-    const rotationDate = new Date().toISOString();
+  // Store in Redis as pending (admin must apply to env var)
+  await getRedis().set("mirrorbuddy:ip-salt:pending", {
+    salt: newSalt,
+    generatedAt: rotationDate,
+    appliedToEnv: false,
+  });
 
-    // Store in Redis as pending (admin must apply to env var)
-    await getRedis().set("mirrorbuddy:ip-salt:pending", {
-      salt: newSalt,
-      generatedAt: rotationDate,
-      appliedToEnv: false,
-    });
-
-    // Send admin notification email
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const resendClient = getResend();
-    if (adminEmail && resendClient) {
-      await resendClient.emails.send({
-        from: "MirrorBuddy <noreply@mirrorbuddy.it>",
-        to: adminEmail,
-        subject: "[Action Required] Monthly IP Salt Rotation",
-        text: `New IP hash salt generated for monthly rotation.
+  // Send admin notification email
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const resendClient = getResend();
+  if (adminEmail && resendClient) {
+    await resendClient.emails.send({
+      from: "MirrorBuddy <noreply@mirrorbuddy.it>",
+      to: adminEmail,
+      subject: "[Action Required] Monthly IP Salt Rotation",
+      text: `New IP hash salt generated for monthly rotation.
 
 NEW SALT: ${newSalt}
 
@@ -71,21 +67,14 @@ Please update the IP_HASH_SALT environment variable in Vercel:
 Generated: ${rotationDate}
 
 This is a security measure to prevent IP hash rainbow table attacks.`,
-      });
-    }
-
-    logger.info("IP salt rotation completed", { rotationDate });
-
-    return NextResponse.json({
-      success: true,
-      message: "Salt rotation completed. Admin notified.",
-      rotationDate,
     });
-  } catch (error) {
-    logger.error("IP salt rotation failed", { error: String(error) });
-    return NextResponse.json(
-      { error: "Salt rotation failed" },
-      { status: 500 },
-    );
   }
-}
+
+  logger.info("IP salt rotation completed", { rotationDate });
+
+  return Response.json({
+    success: true,
+    message: "Salt rotation completed. Admin notified.",
+    rotationDate,
+  });
+});

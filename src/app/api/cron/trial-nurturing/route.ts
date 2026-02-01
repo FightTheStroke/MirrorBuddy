@@ -9,7 +9,7 @@
  * F-13: Reminder email dopo 7 giorni inattività trial
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { sendEmail } from "@/lib/email";
@@ -35,20 +35,6 @@ interface NurturingResult {
   nudgesSent: number;
   remindersSent: number;
   errors: string[];
-}
-
-/**
- * Verify cron secret for security
- */
-function verifyCronSecret(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-  if (!cronSecret) {
-    log.warn("CRON_SECRET not configured - allowing request");
-    return true;
-  }
-
-  const authHeader = request.headers.get("authorization");
-  return authHeader === `Bearer ${cronSecret}`;
 }
 
 /**
@@ -87,7 +73,10 @@ function extractNameFromEmail(email: string): string {
 /**
  * Main cron handler - runs daily
  */
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export const POST = pipe(
+  withSentry("/api/cron/trial-nurturing"),
+  withCron,
+)(async () => {
   const result: NurturingResult = {
     status: "success",
     nudgesSent: 0,
@@ -95,161 +84,155 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     errors: [],
   };
 
-  try {
-    // Skip cron in non-production environments (staging/preview)
-    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-      log.info(
-        `[CRON] Skipping trial-nurturing - not production (env: ${process.env.VERCEL_ENV})`,
-      );
-      return NextResponse.json(
-        {
-          skipped: true,
-          reason: "Not production environment",
-          environment: process.env.VERCEL_ENV,
-        },
-        { status: 200 },
-      );
-    }
-
-    if (!verifyCronSecret(request)) {
-      log.warn("Cron request unauthorized");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    log.info("Trial nurturing cron started");
-
-    const now = new Date();
-    const sevenDaysAgo = new Date(
-      now.getTime() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000,
+  // Skip cron in non-production environments (staging/preview)
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+    log.info(
+      `[CRON] Skipping trial-nurturing - not production (env: ${process.env.VERCEL_ENV})`,
     );
-
-    // ============================================
-    // 1. USAGE NUDGES (F-12): 70%+ usage emails
-    // ============================================
-    const trialsToNudge = await prisma.trialSession.findMany({
-      where: {
-        email: { not: null },
-        emailCollectedAt: { not: null },
+    return Response.json(
+      {
+        skipped: true,
+        reason: "Not production environment",
+        environment: process.env.VERCEL_ENV,
       },
-      select: {
-        id: true,
-        visitorId: true,
-        email: true,
-        chatsUsed: true,
-        voiceSecondsUsed: true,
-        toolsUsed: true,
+      { status: 200 },
+    );
+  }
+
+  log.info("Trial nurturing cron started");
+
+  const now = new Date();
+  const sevenDaysAgo = new Date(
+    now.getTime() - INACTIVITY_DAYS * 24 * 60 * 60 * 1000,
+  );
+
+  // ============================================
+  // 1. USAGE NUDGES (F-12): 70%+ usage emails
+  // ============================================
+  const trialsToNudge = await prisma.trialSession.findMany({
+    where: {
+      email: { not: null },
+      emailCollectedAt: { not: null },
+    },
+    select: {
+      id: true,
+      visitorId: true,
+      email: true,
+      chatsUsed: true,
+      voiceSecondsUsed: true,
+      toolsUsed: true,
+    },
+  });
+
+  log.info(`Found ${trialsToNudge.length} trials with email to check`);
+
+  for (const session of trialsToNudge) {
+    const usagePercent = calculateUsagePercent(session);
+
+    // Skip if below 70% threshold
+    if (usagePercent < USAGE_THRESHOLD) continue;
+
+    // Check if already sent nudge via funnel event
+    // Use string_contains for JSON field filtering (Prisma PostgreSQL)
+    const alreadyNudged = await prisma.funnelEvent.findFirst({
+      where: {
+        visitorId: session.visitorId,
+        stage: "LIMIT_HIT",
+        metadata: {
+          string_contains: '"emailSent":true',
+        },
       },
     });
 
-    log.info(`Found ${trialsToNudge.length} trials with email to check`);
+    if (alreadyNudged) continue;
 
-    for (const session of trialsToNudge) {
-      const usagePercent = calculateUsagePercent(session);
+    try {
+      const name = extractNameFromEmail(session.email!);
+      const emailData: TrialUsageNudgeData = {
+        email: session.email!,
+        name,
+        usagePercent: Math.round(usagePercent * 100),
+        chatsUsed: session.chatsUsed,
+        chatsLimit: TRIAL_LIMITS.chats,
+        voiceMinutesUsed: Math.round(session.voiceSecondsUsed / 60),
+        voiceMinutesLimit: TRIAL_LIMITS.voiceMinutes,
+        betaRequestUrl: `${process.env.NEXT_PUBLIC_APP_URL}/beta-request`,
+      };
 
-      // Skip if below 70% threshold
-      if (usagePercent < USAGE_THRESHOLD) continue;
+      const emailTemplate = getTrialUsageNudgeTemplate(emailData);
 
-      // Check if already sent nudge via funnel event
-      // Use string_contains for JSON field filtering (Prisma PostgreSQL)
-      const alreadyNudged = await prisma.funnelEvent.findFirst({
-        where: {
-          visitorId: session.visitorId,
-          stage: "LIMIT_HIT",
-          metadata: {
-            string_contains: '"emailSent":true',
-          },
-        },
+      const sendResult = await sendEmail({
+        to: emailTemplate.to,
+        subject: emailTemplate.subject,
+        html: emailTemplate.html,
+        text: emailTemplate.text,
       });
 
-      if (alreadyNudged) continue;
-
-      try {
-        const name = extractNameFromEmail(session.email!);
-        const emailData: TrialUsageNudgeData = {
-          email: session.email!,
-          name,
-          usagePercent: Math.round(usagePercent * 100),
-          chatsUsed: session.chatsUsed,
-          chatsLimit: TRIAL_LIMITS.chats,
-          voiceMinutesUsed: Math.round(session.voiceSecondsUsed / 60),
-          voiceMinutesLimit: TRIAL_LIMITS.voiceMinutes,
-          betaRequestUrl: `${process.env.NEXT_PUBLIC_APP_URL}/beta-request`,
-        };
-
-        const emailTemplate = getTrialUsageNudgeTemplate(emailData);
-
-        const sendResult = await sendEmail({
-          to: emailTemplate.to,
-          subject: emailTemplate.subject,
-          html: emailTemplate.html,
-          text: emailTemplate.text,
-        });
-
-        if (!sendResult.success) {
-          throw new Error(sendResult.error || "Unknown email error");
-        }
-
-        // Record in funnel
-        await recordStageTransition(
-          { visitorId: session.visitorId },
-          "LIMIT_HIT",
-          { emailSent: true, usagePercent: emailData.usagePercent },
-        );
-
-        result.nudgesSent++;
-        log.info("Sent trial nudge email", {
-          visitorId: session.visitorId,
-          email: session.email,
-          usagePercent: emailData.usagePercent,
-        });
-      } catch (err) {
-        const errorMsg = `Nudge to ${session.email}: ${err}`;
-        result.errors.push(errorMsg);
-        log.error("Failed to send nudge", {
-          error: String(err),
-          email: session.email,
-        });
+      if (!sendResult.success) {
+        throw new Error(sendResult.error || "Unknown email error");
       }
-    }
 
-    // ============================================
-    // 2. INACTIVITY REMINDERS (F-13): 7 days
-    // ============================================
-    const inactiveTrials = await prisma.trialSession.findMany({
+      // Record in funnel
+      await recordStageTransition(
+        { visitorId: session.visitorId },
+        "LIMIT_HIT",
+        { emailSent: true, usagePercent: emailData.usagePercent },
+      );
+
+      result.nudgesSent++;
+      log.info("Sent trial nudge email", {
+        visitorId: session.visitorId,
+        email: session.email,
+        usagePercent: emailData.usagePercent,
+      });
+    } catch (err) {
+      const errorMsg = `Nudge to ${session.email}: ${err}`;
+      result.errors.push(errorMsg);
+      log.error("Failed to send nudge", {
+        error: String(err),
+        email: session.email,
+      });
+    }
+  }
+
+  // ============================================
+  // 2. INACTIVITY REMINDERS (F-13): 7 days
+  // ============================================
+  const inactiveTrials = await prisma.trialSession.findMany({
+    where: {
+      email: { not: null },
+      lastActivityAt: { lt: sevenDaysAgo },
+      chatsUsed: { gt: 0 }, // Only remind users who actually used the trial
+    },
+    select: {
+      id: true,
+      visitorId: true,
+      email: true,
+      lastActivityAt: true,
+    },
+  });
+
+  log.info(`Found ${inactiveTrials.length} inactive trials to remind`);
+
+  for (const session of inactiveTrials) {
+    // Check if already sent reminder
+    // Use string_contains for JSON field filtering (Prisma PostgreSQL)
+    const alreadyReminded = await prisma.funnelEvent.findFirst({
       where: {
-        email: { not: null },
-        lastActivityAt: { lt: sevenDaysAgo },
-        chatsUsed: { gt: 0 }, // Only remind users who actually used the trial
-      },
-      select: {
-        id: true,
-        visitorId: true,
-        email: true,
-        lastActivityAt: true,
+        visitorId: session.visitorId,
+        metadata: {
+          string_contains: '"inactivityReminder":true',
+        },
       },
     });
 
-    log.info(`Found ${inactiveTrials.length} inactive trials to remind`);
+    if (alreadyReminded) continue;
 
-    for (const session of inactiveTrials) {
-      // Check if already sent reminder
-      // Use string_contains for JSON field filtering (Prisma PostgreSQL)
-      const alreadyReminded = await prisma.funnelEvent.findFirst({
-        where: {
-          visitorId: session.visitorId,
-          metadata: {
-            string_contains: '"inactivityReminder":true',
-          },
-        },
-      });
-
-      if (alreadyReminded) continue;
-
-      try {
-        const sendResult = await sendEmail({
-          to: session.email!,
-          subject: "Ti manca MirrorBuddy! 🎓",
-          html: `
+    try {
+      const sendResult = await sendEmail({
+        to: session.email!,
+        subject: "Ti manca MirrorBuddy! 🎓",
+        html: `
 <!DOCTYPE html>
 <html>
 <head>
@@ -286,60 +269,48 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 </body>
 </html>
           `.trim(),
-          text: `Ciao! Non ti vediamo su MirrorBuddy da un po'. I tuoi maestri virtuali ti aspettano per continuare a imparare insieme!\n\nTorna a trovarci: ${process.env.NEXT_PUBLIC_APP_URL}`,
-        });
+        text: `Ciao! Non ti vediamo su MirrorBuddy da un po'. I tuoi maestri virtuali ti aspettano per continuare a imparare insieme!\n\nTorna a trovarci: ${process.env.NEXT_PUBLIC_APP_URL}`,
+      });
 
-        if (!sendResult.success) {
-          throw new Error(sendResult.error || "Unknown email error");
-        }
-
-        await recordStageTransition(
-          { visitorId: session.visitorId },
-          "TRIAL_ENGAGED",
-          { inactivityReminder: true, daysInactive: INACTIVITY_DAYS },
-        );
-
-        result.remindersSent++;
-        log.info("Sent inactivity reminder", {
-          visitorId: session.visitorId,
-          email: session.email,
-        });
-      } catch (err) {
-        const errorMsg = `Reminder to ${session.email}: ${err}`;
-        result.errors.push(errorMsg);
-        log.error("Failed to send reminder", {
-          error: String(err),
-          email: session.email,
-        });
+      if (!sendResult.success) {
+        throw new Error(sendResult.error || "Unknown email error");
       }
-    }
 
-    if (result.errors.length > 0) {
-      result.status = "error";
-    }
+      await recordStageTransition(
+        { visitorId: session.visitorId },
+        "TRIAL_ENGAGED",
+        { inactivityReminder: true, daysInactive: INACTIVITY_DAYS },
+      );
 
-    log.info("Trial nurturing completed", {
-      status: result.status,
-      nudgesSent: result.nudgesSent,
-      remindersSent: result.remindersSent,
-      errorCount: result.errors.length,
-    });
-    return NextResponse.json(result);
-  } catch (error) {
-    log.error("Trial nurturing cron failed", { error: String(error) });
-    return NextResponse.json(
-      {
-        status: "error",
-        error: String(error),
-      },
-      { status: 500 },
-    );
+      result.remindersSent++;
+      log.info("Sent inactivity reminder", {
+        visitorId: session.visitorId,
+        email: session.email,
+      });
+    } catch (err) {
+      const errorMsg = `Reminder to ${session.email}: ${err}`;
+      result.errors.push(errorMsg);
+      log.error("Failed to send reminder", {
+        error: String(err),
+        email: session.email,
+      });
+    }
   }
-}
+
+  if (result.errors.length > 0) {
+    result.status = "error";
+  }
+
+  log.info("Trial nurturing completed", {
+    status: result.status,
+    nudgesSent: result.nudgesSent,
+    remindersSent: result.remindersSent,
+    errorCount: result.errors.length,
+  });
+  return Response.json(result);
+});
 
 /**
  * Vercel Cron uses GET
  */
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  return POST(request);
-}
+export const GET = POST;

@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Architecture (Plan 113)
+
+- Added: Composable API handler pipeline `pipe()` with middleware system (`src/lib/api/pipe.ts`, `src/lib/api/middlewares/`)
+- Added: CI guard for `$queryRawUnsafe` with allowlist (`scripts/.queryraw-allowlist`, `--unsafe-queries` flag in ci-summary.sh)
+- Added: Markdown broken link checker with pre-commit hook (`scripts/check-links.sh`, `--links` flag in ci-summary.sh)
+- Changed: Admin routes migrated from inline `validateAdminAuth()+requireCSRF()+try/catch` to composable `pipe()` middleware
+- Changed: Cron routes migrated from inline CRON_SECRET validation to `withCron` middleware
+- Changed: RAG `hybrid-retrieval.ts` migrated from `$queryRawUnsafe` to Prisma.sql template literals
+
 ### Added
 
 #### Admin Panel Redesign (Plan P110, ADR 0106)

@@ -12,7 +12,7 @@
  * F-05a: Business/behavioral metrics collected and pushed daily at 3 AM
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 import { generateBusinessMetrics } from "@/app/api/metrics/business-metrics";
 import { generateBehavioralMetrics } from "@/app/api/metrics/behavioral-metrics";
@@ -33,27 +33,6 @@ interface CronResponse {
   business_metrics?: number;
   behavioral_metrics?: number;
   error?: string;
-}
-
-/**
- * Verify cron request authenticity via CRON_SECRET header
- */
-function verifyCronSecret(request: NextRequest): boolean {
-  const cronSecret = process.env.CRON_SECRET;
-
-  if (!cronSecret) {
-    log.warn("CRON_SECRET not configured - allowing all requests");
-    return true;
-  }
-
-  const authHeader = request.headers.get("authorization");
-  const expectedHeader = `Bearer ${cronSecret}`;
-
-  if (!authHeader || authHeader !== expectedHeader) {
-    return false;
-  }
-
-  return true;
 }
 
 /**
@@ -147,7 +126,10 @@ async function collectDailyMetrics(): Promise<{
 /**
  * POST: Main cron handler - collects and pushes daily metrics
  */
-export async function POST(request: NextRequest): Promise<NextResponse> {
+export const POST = pipe(
+  withSentry("/api/cron/business-metrics-daily"),
+  withCron,
+)(async () => {
   const startTime = Date.now();
   const response: CronResponse = {
     status: "success",
@@ -155,85 +137,61 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     duration_ms: 0,
   };
 
-  try {
-    // Skip cron in non-production environments (staging/preview)
-    if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
-      log.info(
-        `[CRON] Skipping business-metrics-daily - not production (env: ${process.env.VERCEL_ENV})`,
-      );
-      return NextResponse.json(
-        {
-          skipped: true,
-          reason: "Not production environment",
-          environment: process.env.VERCEL_ENV,
-        },
-        { status: 200 },
-      );
-    }
-
-    // Verify cron authenticity
-    if (!verifyCronSecret(request)) {
-      log.error("Invalid CRON_SECRET provided");
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Check if Grafana Cloud is configured
-    if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
-      response.status = "skipped";
-      response.duration_ms = Date.now() - startTime;
-      log.info(
-        "Daily metrics collection skipped (Grafana Cloud not configured)",
-      );
-      return NextResponse.json(response, { status: 200 });
-    }
-
-    // Collect daily metrics (business + behavioral)
-    const { samples, businessCount, behavioralCount } =
-      await collectDailyMetrics();
-
-    if (samples.length === 0) {
-      response.status = "skipped";
-      response.duration_ms = Date.now() - startTime;
-      log.info("No daily metrics to push");
-      return NextResponse.json(response, { status: 200 });
-    }
-
-    // Push to Grafana Cloud
-    await pushToGrafana(samples);
-
-    response.status = "success";
-    response.business_metrics = businessCount;
-    response.behavioral_metrics = behavioralCount;
-    response.duration_ms = Date.now() - startTime;
-
-    log.info("Daily metrics pushed to Grafana Cloud (F-05a)", {
-      business_metrics: businessCount,
-      behavioral_metrics: behavioralCount,
-      total_samples: samples.length,
-      duration_ms: response.duration_ms,
-    });
-
-    return NextResponse.json(response, { status: 200 });
-  } catch (error) {
-    response.status = "error";
-    response.duration_ms = Date.now() - startTime;
-    response.error = error instanceof Error ? error.message : String(error);
-
-    log.error("Daily metrics collection failed", {
-      error: response.error,
-      duration_ms: response.duration_ms,
-    });
-
-    // Log errors but allow graceful degradation - don't break the cron schedule
-    return NextResponse.json(response, { status: 500 });
+  // Skip cron in non-production environments (staging/preview)
+  if (process.env.VERCEL_ENV && process.env.VERCEL_ENV !== "production") {
+    log.info(
+      `[CRON] Skipping business-metrics-daily - not production (env: ${process.env.VERCEL_ENV})`,
+    );
+    return Response.json(
+      {
+        skipped: true,
+        reason: "Not production environment",
+        environment: process.env.VERCEL_ENV,
+      },
+      { status: 200 },
+    );
   }
-}
+
+  // Check if Grafana Cloud is configured
+  if (!process.env.GRAFANA_CLOUD_PROMETHEUS_URL) {
+    response.status = "skipped";
+    response.duration_ms = Date.now() - startTime;
+    log.info("Daily metrics collection skipped (Grafana Cloud not configured)");
+    return Response.json(response, { status: 200 });
+  }
+
+  // Collect daily metrics (business + behavioral)
+  const { samples, businessCount, behavioralCount } =
+    await collectDailyMetrics();
+
+  if (samples.length === 0) {
+    response.status = "skipped";
+    response.duration_ms = Date.now() - startTime;
+    log.info("No daily metrics to push");
+    return Response.json(response, { status: 200 });
+  }
+
+  // Push to Grafana Cloud
+  await pushToGrafana(samples);
+
+  response.status = "success";
+  response.business_metrics = businessCount;
+  response.behavioral_metrics = behavioralCount;
+  response.duration_ms = Date.now() - startTime;
+
+  log.info("Daily metrics pushed to Grafana Cloud (F-05a)", {
+    business_metrics: businessCount,
+    behavioral_metrics: behavioralCount,
+    total_samples: samples.length,
+    duration_ms: response.duration_ms,
+  });
+
+  return Response.json(response, { status: 200 });
+});
 
 /**
  * GET: Manual testing endpoint (dev only)
  * Allows manual trigger of daily metrics collection during development
  */
 // Vercel Cron uses GET by default
-export async function GET(request: NextRequest): Promise<NextResponse> {
-  return POST(request);
-}
+export const GET = POST;
