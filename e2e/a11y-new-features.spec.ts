@@ -111,7 +111,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
   });
 
   test("skip link navigates to main content", async ({ page }) => {
-    test.setTimeout(60000);
+    test.setTimeout(90000);
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 

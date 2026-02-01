@@ -283,7 +283,9 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     const { panel } = await openA11yPanel(page);
     await expect(panel).toBeVisible();
 
+    // Wait for panel animation to stabilize (avoids "element detached" flakiness)
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
+    await expect(closeBtn).toBeVisible({ timeout: 10000 });
     await closeBtn.click();
 
     await expect(panel).not.toBeVisible({ timeout: 10000 });
