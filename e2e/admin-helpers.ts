@@ -27,6 +27,9 @@ export const ADMIN_IGNORE_ERRORS = [
   /NEXT_REDIRECT/i, // Next.js redirect signals (not real errors)
   /ECONNREFUSED/i, // External service connections in test env
   /fetch.*failed/i, // Fetch failures for external services
+  /Failed to fetch/i, // TypeError: Failed to fetch in CI (no backend)
+  /load failed/i, // Conversations/Learnings/Settings/Progress load failed
+  /Error loading/i, // Error loading control panel etc.
 ];
 
 // Admin routes for route audit

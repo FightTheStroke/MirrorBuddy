@@ -130,10 +130,17 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
     const controlsBefore = await button.getAttribute("aria-controls");
     expect(controlsBefore).toBeNull();
 
-    // Open panel
+    // Open panel (retry-click for SSR hydration — onClick may not be attached yet)
     await button.click();
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible({ timeout: 10000 });
+    const appeared = await panel
+      .waitFor({ state: "visible", timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!appeared) {
+      await button.click();
+      await expect(panel).toBeVisible({ timeout: 10000 });
+    }
 
     const controlsAfter = await button.getAttribute("aria-controls");
     expect(controlsAfter).toBe("a11y-quick-panel");
@@ -149,11 +156,17 @@ test.describe("A11y Floating Button - data-testid Selectors", () => {
     // Initially false
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
-    // Click to open
+    // Click to open (retry-click for SSR hydration — onClick may not be attached yet)
     await button.click();
-    await page
-      .locator('[data-testid="a11y-quick-panel"]')
-      .waitFor({ state: "visible", timeout: 10000 });
+    const panel = page.locator('[data-testid="a11y-quick-panel"]');
+    const appeared = await panel
+      .waitFor({ state: "visible", timeout: 3000 })
+      .then(() => true)
+      .catch(() => false);
+    if (!appeared) {
+      await button.click();
+      await panel.waitFor({ state: "visible", timeout: 10000 });
+    }
 
     // Should be true
     await expect(button).toHaveAttribute("aria-expanded", "true");

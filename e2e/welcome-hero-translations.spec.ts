@@ -104,7 +104,7 @@ testAllLocales(
     const betaBadgeContainer = localePage.page
       .locator("div[aria-label]")
       .filter({
-        has: localePage.page.locator(".uppercase:has-text(Beta)"),
+        has: localePage.page.locator(".uppercase.font-bold"),
       });
 
     // Check aria-label includes the translated text
