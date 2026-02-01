@@ -25,23 +25,23 @@ test.use({ storageState: undefined });
 const EXPECTED_TRANSLATIONS = {
   it: {
     betaBadge: "Beta Privata",
-    betaSubtitle: "MirrorBuddy v0.10",
+    betaSubtitle: "Solo su invito",
   },
   en: {
     betaBadge: "Private Beta",
-    betaSubtitle: "MirrorBuddy v0.10",
+    betaSubtitle: "Invite only",
   },
   fr: {
-    betaBadge: "Private Beta",
-    betaSubtitle: "MirrorBuddy v0.10",
+    betaBadge: "Bêta Privée",
+    betaSubtitle: "Sur invitation uniquement",
   },
   de: {
     betaBadge: "Private Beta",
-    betaSubtitle: "MirrorBuddy v0.10",
+    betaSubtitle: "Nur auf Einladung",
   },
   es: {
     betaBadge: "Beta Privada",
-    betaSubtitle: "MirrorBuddy v0.10",
+    betaSubtitle: "Solo con invitación",
   },
 };
 
@@ -74,7 +74,7 @@ testAllLocales(
     await localePage.goto("/welcome");
     await localePage.page.waitForLoadState("domcontentloaded");
 
-    // Find the beta subtitle (small text inside the badge)
+    // Find the beta subtitle (small text inside the badge container)
     const badgeDiv = localePage.page
       .locator(".uppercase.font-bold")
       .first()
@@ -100,18 +100,25 @@ testAllLocales(
     await localePage.goto("/welcome");
     await localePage.page.waitForLoadState("domcontentloaded");
 
-    // Find the beta badge motion.div
-    const betaBadgeMotion = localePage.page
-      .locator("[role='presentation']")
+    // Find the beta badge container with aria-label (motion.div renders as div)
+    const betaBadgeContainer = localePage.page
+      .locator("div[aria-label]")
       .filter({
         has: localePage.page.locator(".uppercase:has-text(Beta)"),
       });
 
     // Check aria-label includes the translated text
-    const ariaLabel = await betaBadgeMotion.first().getAttribute("aria-label");
+    const ariaLabel = await betaBadgeContainer
+      .first()
+      .getAttribute("aria-label");
     expect(ariaLabel).toBeDefined();
-    // Should not be hardcoded "Beta Privata - Accesso su invito" in all languages
-    expect(ariaLabel).not.toBe("Beta Privata - Accesso su invito");
+
+    // Verify it uses the correct locale translation, not hardcoded Italian
+    const expectedBadge =
+      EXPECTED_TRANSLATIONS[
+        localePage.locale as keyof typeof EXPECTED_TRANSLATIONS
+      ]?.betaBadge || EXPECTED_TRANSLATIONS.it.betaBadge;
+    expect(ariaLabel).toContain(expectedBadge);
   },
 );
 
@@ -136,7 +143,7 @@ test("@it: verify Italian beta badge uses correct translations", async ({
     .locator("span")
     .nth(1)
     .textContent();
-  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
+  expect(subtitleText?.trim()).toBe("Solo su invito");
 });
 
 test("@en: verify English beta badge uses correct translations", async ({
@@ -159,5 +166,5 @@ test("@en: verify English beta badge uses correct translations", async ({
     .locator("span")
     .nth(1)
     .textContent();
-  expect(subtitleText?.trim()).toBe("MirrorBuddy v0.10");
+  expect(subtitleText?.trim()).toBe("Invite only");
 });

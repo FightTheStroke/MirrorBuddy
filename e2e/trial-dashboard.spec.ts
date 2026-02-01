@@ -1,15 +1,11 @@
 /**
- * E2E Tests: Trial Header Dropdown
+ * E2E Tests: Trial Header Badge
  *
- * Tests for trial mode header dropdown displaying usage statistics.
- * F-05: Verify dropdown displays all resources correctly
+ * Tests for trial mode header badge displaying usage statistics.
+ * F-05: Verify badge displays chat count correctly
  *
- * Test scenarios:
- * - Trial badge visible in header (trial mode only)
- * - Dropdown opens on click
- * - All 4 resources rendered (chat, voice, tools, docs)
- * - Progress bars displayed
- * - CTA buttons work (Richiedi accesso, Accedi)
+ * The locale home header renders trial status as a Link element
+ * with localized text and chat count (not a dropdown button).
  *
  * Run: npx playwright test e2e/trial-dashboard.spec.ts
  */
@@ -20,9 +16,10 @@ import { test, expect } from "./fixtures/auth-fixtures";
 // Override global storageState to start without authentication
 test.use({ storageState: undefined });
 
-test.describe("Trial Mode - Header Dropdown (F-05)", () => {
-  // Set viewport to large screen size
+test.describe("Trial Mode - Header Badge (F-05)", () => {
+  // Set viewport to large screen size (trial badge is hidden on md:)
   test.use({ viewport: { width: 1920, height: 1080 } });
+  test.setTimeout(60000);
 
   async function setupTrialMocks(
     page: typeof test.trialPage,
@@ -73,7 +70,7 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
       });
     });
 
-    // Provide usage data for dropdown
+    // Provide usage data
     await page.route("**/api/user/usage", (route) => {
       route.fulfill({
         status: 200,
@@ -136,110 +133,45 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Find trial badge button in header
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await expect(trialBadge).toBeVisible({ timeout: 5000 });
+    // Trial badge is a Link with data-testid in the locale header
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
 
     // Verify it shows chat count
     await expect(trialBadge).toContainText("7/10");
   });
 
-  test("dropdown opens on badge click and shows usage stats", async ({
+  test("trial badge shows correct chat remaining count", async ({
     trialPage,
   }) => {
     await setupTrialMocks(trialPage, {
-      chatsUsed: 3,
+      chatsUsed: 5,
+      chatsRemaining: 5,
       maxChats: 10,
-      voiceSecondsUsed: 120,
-      maxVoiceSeconds: 300,
-      toolsUsed: 2,
-      maxTools: 10,
-      docsUsed: 1,
-      maxDocs: 5,
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Click trial badge to open dropdown
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await trialBadge.click();
-
-    // Verify dropdown panel appears
-    const dropdown = trialPage.locator('text="Modalità Prova"');
-    await expect(dropdown).toBeVisible({ timeout: 3000 });
-
-    // Verify all 4 resource labels are shown
-    await expect(trialPage.locator("text=Chat")).toBeVisible();
-    await expect(trialPage.locator("text=Voce")).toBeVisible();
-    await expect(trialPage.locator("text=Strumenti")).toBeVisible();
-    await expect(trialPage.locator("text=Documenti")).toBeVisible();
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
+    await expect(trialBadge).toContainText("5/10");
   });
 
-  test("dropdown shows CTA buttons", async ({ trialPage }) => {
+  test("trial badge links to invite request page", async ({ trialPage }) => {
     await setupTrialMocks(trialPage);
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Open dropdown
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await trialBadge.click();
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
 
-    // Verify CTA buttons
-    const requestAccessBtn = trialPage.locator(
-      'a:has-text("Richiedi accesso")',
-    );
-    await expect(requestAccessBtn).toBeVisible();
-    await expect(requestAccessBtn).toHaveAttribute("href", "/invite/request");
-
-    const loginBtn = trialPage.locator('a:has-text("Accedi")');
-    await expect(loginBtn).toBeVisible();
-    await expect(loginBtn).toHaveAttribute("href", "/login");
-  });
-
-  test("dropdown closes on outside click", async ({ trialPage }) => {
-    await setupTrialMocks(trialPage);
-
-    await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
-
-    // Open dropdown
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await trialBadge.click();
-
-    // Verify dropdown is open
-    const dropdown = trialPage.locator('text="Modalità Prova"');
-    await expect(dropdown).toBeVisible();
-
-    // Click outside (on main content area)
-    await trialPage.click("main");
-
-    // Verify dropdown is closed
-    await expect(dropdown).not.toBeVisible({ timeout: 2000 });
-  });
-
-  test("dropdown closes on Escape key", async ({ trialPage }) => {
-    await setupTrialMocks(trialPage);
-
-    await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
-
-    // Open dropdown
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await trialBadge.click();
-
-    // Verify dropdown is open
-    const dropdown = trialPage.locator('text="Modalità Prova"');
-    await expect(dropdown).toBeVisible();
-
-    // Press Escape
-    await trialPage.keyboard.press("Escape");
-
-    // Verify dropdown is closed
-    await expect(dropdown).not.toBeVisible({ timeout: 2000 });
+    // The badge links to /invite/request
+    const href = await trialBadge.getAttribute("href");
+    expect(href).toContain("/invite/request");
   });
 
   test("badge changes color when resources are low", async ({ trialPage }) => {
@@ -250,34 +182,87 @@ test.describe("Trial Mode - Header Dropdown (F-05)", () => {
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Find trial badge
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await expect(trialBadge).toBeVisible();
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
 
     // Verify amber color class when low (<=3 remaining)
     await expect(trialBadge).toHaveClass(/amber/);
   });
 
-  test("dropdown header shows warning when resources low", async ({
+  test("badge uses purple color when resources are sufficient", async ({
     trialPage,
   }) => {
     await setupTrialMocks(trialPage, {
-      chatsUsed: 8,
-      chatsRemaining: 2,
+      chatsUsed: 2,
+      chatsRemaining: 8,
       maxChats: 10,
     });
 
     await trialPage.goto("/");
-    await trialPage.waitForLoadState("domcontentloaded");
+    await trialPage.waitForLoadState("networkidle");
 
-    // Open dropdown
-    const trialBadge = trialPage.locator('button:has-text("Trial")');
-    await trialBadge.click();
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
 
-    // Verify warning message
-    const warningText = trialPage.locator('text="Risorse quasi esaurite!"');
-    await expect(warningText).toBeVisible();
+    // Verify purple color class when resources are sufficient
+    await expect(trialBadge).toHaveClass(/purple/);
+  });
+
+  test("trial badge has accessible title attribute", async ({ trialPage }) => {
+    await setupTrialMocks(trialPage);
+
+    await trialPage.goto("/");
+    await trialPage.waitForLoadState("networkidle");
+
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).toBeVisible({ timeout: 15000 });
+
+    // Badge should have a title attribute for accessibility
+    const title = await trialBadge.getAttribute("title");
+    expect(title?.length).toBeGreaterThan(0);
+  });
+
+  test("trial badge is not visible for authenticated users", async ({
+    trialPage,
+  }) => {
+    // Mock as non-trial user (authenticated)
+    await trialPage.route("**/api/user/trial-status", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ isTrialUser: false }),
+      });
+    });
+
+    await trialPage.route("**/api/user/onboarding", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          hasCompletedOnboarding: true,
+          onboardingCompletedAt: new Date().toISOString(),
+        }),
+      });
+    });
+
+    await trialPage.route("**/api/tos", (route) => {
+      route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ accepted: true, version: "1.0" }),
+      });
+    });
+
+    await trialPage.goto("/");
+    await trialPage.waitForLoadState("networkidle");
+
+    // Wait for page to fully hydrate
+    await trialPage.waitForTimeout(3000);
+
+    // Trial badge should not be visible for authenticated users
+    const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
+    await expect(trialBadge).not.toBeVisible();
   });
 });

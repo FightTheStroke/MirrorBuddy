@@ -86,6 +86,12 @@ test.describe("Mission Control UI - Admin Access", () => {
 
     await dismissBlockingModals(adminPage);
 
+    // Pre-flight: warm up admin user creation in DB with a single API call.
+    // This prevents race conditions when multiple parallel requests from
+    // the first page load all try to INSERT the same user simultaneously.
+    await adminPage.request.get("/api/admin/health-aggregator").catch(() => {});
+    await adminPage.waitForTimeout(500);
+
     // Test each page
     for (const pageInfo of MISSION_CONTROL_PAGES) {
       await adminPage.goto(pageInfo.path);

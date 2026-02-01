@@ -163,6 +163,7 @@ export function HomeHeader({
         {trialStatus?.isTrialMode && (
           <Link
             href="/invite/request"
+            data-testid="trial-badge"
             className={cn(
               "flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-colors",
               trialStatus.chatsRemaining <= 3
