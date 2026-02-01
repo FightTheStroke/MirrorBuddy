@@ -62,7 +62,13 @@ test.describe("hreflang tags", () => {
   test.describe("on home page", () => {
     test("should have hreflang tags on home page", async ({ page }) => {
       await page.goto("/it");
-      await page.waitForTimeout(500);
+      await page.waitForLoadState("domcontentloaded");
+
+      // Wait for hreflang tags to be rendered (SSR may inject them async)
+      await page
+        .locator('link[rel="alternate"][hreflang]')
+        .first()
+        .waitFor({ state: "attached", timeout: 10000 });
 
       const hreflangLinks = await page
         .locator('link[rel="alternate"][hreflang]')

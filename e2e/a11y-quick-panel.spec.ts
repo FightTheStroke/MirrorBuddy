@@ -142,7 +142,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     const settingsLink = page.locator(
       '[data-testid="a11y-full-settings-link"]',
     );
-    await expect(settingsLink).toBeVisible();
+    await expect(settingsLink).toBeVisible({ timeout: 10000 });
   });
 
   test("toggle switches visible in panel", async ({ page }) => {

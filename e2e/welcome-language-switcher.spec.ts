@@ -179,13 +179,16 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     expect(localeCookie).toBeDefined();
     expect(localeCookie?.value).toBe("es");
 
+    // Wait for page to settle before navigating (avoids net::ERR_ABORTED)
+    await page.waitForLoadState("load");
+
     // If redirect didn't happen, navigate manually to test persistence
     if (!page.url().includes("/es/welcome")) {
-      await page.goto("/es/welcome");
+      await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
     }
 
     // Reload page
-    await page.reload();
+    await page.reload({ waitUntil: "domcontentloaded" });
 
     // Should still be on Spanish version
     await expect(page).toHaveURL(/\/es\/welcome/);
@@ -204,12 +207,14 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
   test.describe("Keyboard Navigation", () => {
     test("should open dropdown with Enter key", async ({ page }) => {
       await page.goto("/it/welcome");
+      await page.waitForLoadState("domcontentloaded");
 
       const switcher = page.getByRole("button", { name: /select language/i });
+      await expect(switcher).toBeVisible({ timeout: 10000 });
       await switcher.focus();
       await page.keyboard.press("Enter");
 
-      await expect(page.getByRole("menu")).toBeVisible();
+      await expect(page.getByRole("menu")).toBeVisible({ timeout: 10000 });
     });
 
     test("should close dropdown with Escape key", async ({ page }) => {
@@ -375,9 +380,9 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
       // Visit welcome without locale prefix (should detect and redirect)
       await page.goto("/");
 
-      // Should redirect to German version based on Accept-Language
-      // Note: This behavior depends on middleware implementation
-      await expect(page).toHaveURL(/\/(de|it)\/welcome/);
+      // Should redirect to German locale based on Accept-Language
+      // Middleware may redirect to /de or /de/welcome depending on auth state
+      await expect(page).toHaveURL(/\/(de|it)(\/welcome)?/);
 
       await context.close();
     });

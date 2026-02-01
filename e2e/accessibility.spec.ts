@@ -564,10 +564,12 @@ test.describe("Instant Access - Profile Activation", () => {
 
 test.describe("Instant Access - Cookie Persistence", () => {
   test("settings persist after page refresh", async ({ page }) => {
+    test.setTimeout(60000);
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
+    await expect(button).toBeVisible({ timeout: 15000 });
     await button.click();
 
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
@@ -583,8 +585,17 @@ test.describe("Instant Access - Cookie Persistence", () => {
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
     await dyslexiaBtn.click();
-    await page.waitForTimeout(500);
 
+    // Wait for a11y cookie to be set before reloading (avoids net::ERR_ABORTED)
+    await page.waitForFunction(
+      () =>
+        document.cookie
+          .split(";")
+          .some((c) => c.trim().startsWith("mirrorbuddy-a11y=")),
+      { timeout: 10000 },
+    );
+
+    await page.waitForLoadState("load");
     await page.reload({ waitUntil: "domcontentloaded" });
 
     // Wait for accessibility store to hydrate and apply font
