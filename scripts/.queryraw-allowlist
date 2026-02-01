@@ -2,3 +2,5 @@
 # Add file paths (relative to repo root) that legitimately need $queryRawUnsafe
 # One path per line. Lines starting with # are comments.
 # Example: src/lib/some-legacy-file.ts
+# Funnel users: uses parameterized $queryRawUnsafe with $1 placeholder (DISTINCT ON not supported by Prisma ORM)
+src/app/api/admin/funnel/users/route.ts

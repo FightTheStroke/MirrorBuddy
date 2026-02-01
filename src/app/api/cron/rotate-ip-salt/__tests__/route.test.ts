@@ -8,6 +8,11 @@
 import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 // Mock crypto
 vi.mock("crypto", () => ({
   default: {
@@ -51,13 +56,13 @@ vi.mock("resend", () => ({
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    warn: vi.fn(),
     error: vi.fn(),
+    warn: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn().mockReturnValue({
       info: vi.fn(),
-      warn: vi.fn(),
       error: vi.fn(),
+      warn: vi.fn(),
       debug: vi.fn(),
     }),
   },
@@ -274,8 +279,8 @@ describe("POST /api/cron/rotate-ip-salt", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    // pipe() middleware returns generic error message for internal errors
-    expect(data.error).toBeDefined();
+    expect(data.error).toBe("Internal server error");
+    expect(data.message).toBe("Crypto error");
   });
 
   it("should return success when all operations complete", async () => {

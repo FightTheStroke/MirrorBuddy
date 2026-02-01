@@ -4,6 +4,27 @@ import { POST } from "../route";
 import { validateAdminAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+    })),
+  },
+}));
+
 // Mock dependencies
 vi.mock("@/lib/auth/session-auth");
 vi.mock("@/lib/db", () => ({
@@ -54,8 +75,8 @@ describe("POST /api/admin/users/bulk/tier", () => {
     const response = await POST(request);
     const data = await response.json();
 
-    expect(response.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
+    expect(response.status).toBe(403);
+    expect(data.error).toBe("Forbidden: admin access required");
   });
 
   it("should validate required fields", async () => {

@@ -11,10 +11,9 @@
  * DELETE /api/admin/feature-flags?id=xxx - Activate kill-switch
  */
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import {
   getAllFlags,
   getFlag,
@@ -56,148 +55,104 @@ interface KillSwitchRequest {
  * GET /api/admin/feature-flags
  * Returns all flags with system health status
  */
-export async function GET(request: NextRequest) {
-  // Require admin authentication
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const GET = pipe(
+  withSentry("/api/admin/feature-flags"),
+  withAdmin,
+)(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
+  const includeHealth = searchParams.get("health") === "true";
+  const includeGoNogo = searchParams.get("gonogo") === "true";
+  const includeCosts = searchParams.get("costs") === "true";
+
+  const flags = getAllFlags();
+  const globalKillSwitch = isGlobalKillSwitchActive();
+
+  const response: Record<string, unknown> = {
+    flags,
+    globalKillSwitch,
+    timestamp: new Date().toISOString(),
+  };
+
+  if (includeHealth) {
+    response.degradation = getDegradationState();
+    response.recentEvents = getRecentEvents(10);
+    response.activeAlerts = getActiveAlerts();
+    response.sloStatuses = getAllSLOStatuses();
   }
 
-  try {
-    const { searchParams } = new URL(request.url);
-    const includeHealth = searchParams.get("health") === "true";
-    const includeGoNogo = searchParams.get("gonogo") === "true";
-    const includeCosts = searchParams.get("costs") === "true";
-
-    const flags = getAllFlags();
-    const globalKillSwitch = isGlobalKillSwitchActive();
-
-    const response: Record<string, unknown> = {
-      flags,
-      globalKillSwitch,
-      timestamp: new Date().toISOString(),
-    };
-
-    if (includeHealth) {
-      response.degradation = getDegradationState();
-      response.recentEvents = getRecentEvents(10);
-      response.activeAlerts = getActiveAlerts();
-      response.sloStatuses = getAllSLOStatuses();
-    }
-
-    if (includeGoNogo) {
-      response.goNoGoResult = runGoNoGoChecks();
-    }
-
-    if (includeCosts) {
-      response.costStats = await getCostMetricsSummary();
-      response.activeVoiceSessions = getActiveVoiceSessions();
-      response.voiceLimits = getVoiceLimits();
-    }
-
-    return NextResponse.json(response);
-  } catch (error) {
-    logger.error("Failed to fetch feature flags", {}, error as Error);
-    return NextResponse.json(
-      { error: "Failed to fetch feature flags" },
-      { status: 500 },
-    );
+  if (includeGoNogo) {
+    response.goNoGoResult = runGoNoGoChecks();
   }
-}
+
+  if (includeCosts) {
+    response.costStats = await getCostMetricsSummary();
+    response.activeVoiceSessions = getActiveVoiceSessions();
+    response.voiceLimits = getVoiceLimits();
+  }
+
+  return NextResponse.json(response);
+});
 
 /**
  * POST /api/admin/feature-flags
  * Update a feature flag or toggle kill-switch
  */
-export async function POST(request: NextRequest) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+export const POST = pipe(
+  withSentry("/api/admin/feature-flags"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  const body = await ctx.req.json();
+
+  // Kill-switch operation
+  if ("enabled" in body && (body.featureId || body.global)) {
+    return handleKillSwitch(body as KillSwitchRequest);
   }
 
-  // Require admin authentication
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  // Flag update operation
+  if (body.featureId && body.update) {
+    return handleFlagUpdate(body as UpdateFlagRequest);
   }
 
-  try {
-    const body = await request.json();
-
-    // Kill-switch operation
-    if ("enabled" in body && (body.featureId || body.global)) {
-      return handleKillSwitch(body as KillSwitchRequest);
-    }
-
-    // Flag update operation
-    if (body.featureId && body.update) {
-      return handleFlagUpdate(body as UpdateFlagRequest);
-    }
-
-    return NextResponse.json(
-      { error: "Invalid request body" },
-      { status: 400 },
-    );
-  } catch (error) {
-    logger.error("Failed to update feature flag", {}, error as Error);
-    return NextResponse.json(
-      { error: "Failed to update feature flag" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
+});
 
 /**
  * DELETE /api/admin/feature-flags?id=xxx
  * Activate kill-switch for a feature (emergency disable)
  */
-export async function DELETE(request: NextRequest) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const DELETE = pipe(
+  withSentry("/api/admin/feature-flags"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
+  const featureId = searchParams.get("id") as KnownFeatureFlag | null;
+  const reason = searchParams.get("reason") || "Emergency disable via API";
 
-  // Require admin authentication
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const { searchParams } = new URL(request.url);
-    const featureId = searchParams.get("id") as KnownFeatureFlag | null;
-    const reason = searchParams.get("reason") || "Emergency disable via API";
-
-    if (!featureId) {
-      return NextResponse.json(
-        { error: "Feature ID is required" },
-        { status: 400 },
-      );
-    }
-
-    const flag = getFlag(featureId);
-    if (!flag) {
-      return NextResponse.json({ error: "Feature not found" }, { status: 404 });
-    }
-
-    activateKillSwitch(featureId, reason, "admin-api");
-
-    logger.warn("Kill-switch activated via API", { featureId, reason });
-
-    return NextResponse.json({
-      success: true,
-      featureId,
-      killSwitch: true,
-      message: `Kill-switch activated for ${featureId}`,
-    });
-  } catch (error) {
-    logger.error("Failed to activate kill-switch", {}, error as Error);
+  if (!featureId) {
     return NextResponse.json(
-      { error: "Failed to activate kill-switch" },
-      { status: 500 },
+      { error: "Feature ID is required" },
+      { status: 400 },
     );
   }
-}
+
+  const flag = getFlag(featureId);
+  if (!flag) {
+    return NextResponse.json({ error: "Feature not found" }, { status: 404 });
+  }
+
+  activateKillSwitch(featureId, reason, "admin-api");
+
+  logger.warn("Kill-switch activated via API", { featureId, reason });
+
+  return NextResponse.json({
+    success: true,
+    featureId,
+    killSwitch: true,
+    message: `Kill-switch activated for ${featureId}`,
+  });
+});
 
 // Handle flag update
 function handleFlagUpdate(body: UpdateFlagRequest) {

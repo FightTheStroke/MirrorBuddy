@@ -1,48 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from "next/server";
+
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
 
 /**
  * GET /api/admin/subscriptions
  * List all subscriptions with optional filters
  * Query params: userId, tierId, status
  */
-export async function GET(request: NextRequest) {
-  try {
-    const auth = await validateAdminAuth();
-    if (!auth.authenticated || !auth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const GET = pipe(
+  withSentry("/api/admin/subscriptions"),
+  withAdmin,
+)(async (ctx) => {
+  const searchParams = ctx.req.nextUrl.searchParams;
+  const userId = searchParams.get("userId");
+  const tierId = searchParams.get("tierId");
+  const status = searchParams.get("status");
 
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get("userId");
-    const tierId = searchParams.get("tierId");
-    const status = searchParams.get("status");
+  // Build filter object
+  const where: Record<string, unknown> = {};
+  if (userId) where.userId = userId;
+  if (tierId) where.tierId = tierId;
+  if (status) where.status = status;
 
-    // Build filter object
-    const where: Record<string, unknown> = {};
-    if (userId) where.userId = userId;
-    if (tierId) where.tierId = tierId;
-    if (status) where.status = status;
+  const subscriptions = await prisma.userSubscription.findMany({
+    where,
+    include: {
+      tier: true,
+    },
+  });
 
-    const subscriptions = await prisma.userSubscription.findMany({
-      where,
-      include: {
-        tier: true,
-      },
-    });
-
-    return NextResponse.json(subscriptions);
-  } catch (error) {
-    logger.error(
-      "Error listing subscriptions",
-      { component: "admin-subscriptions" },
-      error,
-    );
-    return NextResponse.json(
-      { error: "Failed to list subscriptions" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json(subscriptions);
+});

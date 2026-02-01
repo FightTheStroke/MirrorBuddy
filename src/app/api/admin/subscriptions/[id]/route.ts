@@ -1,264 +1,107 @@
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { subscriptionTelemetry } from "@/lib/analytics/subscription-telemetry";
-import { logger } from "@/lib/logger";
 
-/**
- * GET /api/admin/subscriptions/[id]
- * Get a single subscription by ID
- */
-export async function GET(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  try {
-    const auth = await validateAdminAuth();
-    if (!auth.authenticated || !auth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id: subscriptionId } = await params;
-
-    const subscription = await prisma.userSubscription.findUnique({
-      where: { id: subscriptionId },
-      include: {
-        tier: true,
-      },
-    });
-
-    if (!subscription) {
-      return NextResponse.json(
-        { error: "Subscription not found" },
-        { status: 404 },
-      );
-    }
-
-    return NextResponse.json(subscription);
-  } catch (error) {
-    logger.error(
-      "Error retrieving subscription",
-      { component: "admin-subscriptions" },
-      error,
-    );
+export const GET = pipe(
+  withSentry("/api/admin/subscriptions/[id]"),
+  withAdmin,
+)(async (ctx) => {
+  const { id: subscriptionId } = await ctx.params;
+  const subscription = await prisma.userSubscription.findUnique({
+    where: { id: subscriptionId },
+    include: { tier: true },
+  });
+  if (!subscription) {
     return NextResponse.json(
-      { error: "Failed to retrieve subscription" },
-      { status: 500 },
+      { error: "Subscription not found" },
+      { status: 404 },
     );
   }
-}
+  return NextResponse.json(subscription);
+});
 
-/**
- * PUT /api/admin/subscriptions/[id]
- * Update subscription (status, expiresAt, overrideLimits, overrideFeatures)
- */
-export async function PUT(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
-
-  try {
-    const auth = await validateAdminAuth();
-    if (!auth.authenticated || !auth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const body = await request.json();
-    const { id: subscriptionId } = await params;
-
-    // Validate that at least one field is being updated
-    const { status, expiresAt, overrideLimits, overrideFeatures, notes } = body;
-
-    if (!status && !expiresAt && !overrideLimits && !overrideFeatures) {
-      return NextResponse.json(
-        { error: "No fields to update provided" },
-        { status: 400 },
-      );
-    }
-
-    // Check if subscription exists
-    const existingSubscription = await prisma.userSubscription.findUnique({
-      where: { id: subscriptionId },
-    });
-
-    if (!existingSubscription) {
-      return NextResponse.json(
-        { error: "Subscription not found" },
-        { status: 404 },
-      );
-    }
-
-    // Build update object
-    const updateData: Record<string, unknown> = {};
-    if (status !== undefined) updateData.status = status;
-    if (expiresAt !== undefined) {
-      updateData.expiresAt = expiresAt ? new Date(expiresAt) : null;
-    }
-    if (overrideLimits !== undefined)
-      updateData.overrideLimits = overrideLimits;
-    if (overrideFeatures !== undefined)
-      updateData.overrideFeatures = overrideFeatures;
-
-    // Update subscription
-    const updatedSubscription = await prisma.userSubscription.update({
-      where: { id: subscriptionId },
-      data: updateData,
-      include: {
-        tier: true,
-      },
-    });
-
-    // Create audit log entry
-    await prisma.tierAuditLog.create({
-      data: {
-        userId: existingSubscription.userId,
-        adminId: auth.userId || "unknown",
-        action: "SUBSCRIPTION_UPDATE",
-        changes: {
-          fields: Object.keys(updateData),
-          ...(status !== undefined && {
-            status: {
-              from: existingSubscription.status,
-              to: status,
-            },
-          }),
-          ...(expiresAt !== undefined && {
-            expiresAt: {
-              from: existingSubscription.expiresAt?.toISOString() || null,
-              to: expiresAt ? new Date(expiresAt).toISOString() : null,
-            },
-          }),
-        },
-        notes: notes || null,
-      },
-    });
-
-    // Emit telemetry events for status changes
-    if (status === "CANCELLED" && existingSubscription.status !== "CANCELLED") {
-      subscriptionTelemetry.track({
-        type: "subscription.cancelled",
-        userId: existingSubscription.userId,
-        tierId: updatedSubscription.tierId,
-        previousTierId: null,
-        timestamp: new Date(),
-        metadata: {
-          subscriptionId: subscriptionId,
-          previousStatus: existingSubscription.status,
-          reason: notes || "admin_action",
-        },
-      });
-    }
-
-    if (status === "EXPIRED" && existingSubscription.status !== "EXPIRED") {
-      subscriptionTelemetry.track({
-        type: "subscription.expired",
-        userId: existingSubscription.userId,
-        tierId: updatedSubscription.tierId,
-        previousTierId: null,
-        timestamp: new Date(),
-        metadata: {
-          subscriptionId: subscriptionId,
-          previousStatus: existingSubscription.status,
-          reason: notes || "manual_expiration",
-        },
-      });
-    }
-
-    return NextResponse.json(updatedSubscription);
-  } catch (error) {
-    logger.error(
-      "Error updating subscription",
-      { component: "admin-subscriptions" },
-      error,
-    );
+export const PUT = pipe(
+  withSentry("/api/admin/subscriptions/[id]"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  const body = await ctx.req.json();
+  const { id: subscriptionId } = await ctx.params;
+  const { status, expiresAt, overrideLimits, overrideFeatures, notes } = body;
+  if (!status && !expiresAt && !overrideLimits && !overrideFeatures) {
     return NextResponse.json(
-      { error: "Failed to update subscription" },
-      { status: 500 },
+      { error: "At least one field must be provided" },
+      { status: 400 },
     );
   }
-}
-
-/**
- * DELETE /api/admin/subscriptions/[id]
- * Delete a subscription
- */
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
+  const existing = await prisma.userSubscription.findUnique({
+    where: { id: subscriptionId },
+  });
+  if (!existing) {
+    return NextResponse.json(
+      { error: "Subscription not found" },
+      { status: 404 },
+    );
   }
-
-  try {
-    const auth = await validateAdminAuth();
-    if (!auth.authenticated || !auth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const { id: subscriptionId } = await params;
-
-    // Check if subscription exists
-    const existingSubscription = await prisma.userSubscription.findUnique({
-      where: { id: subscriptionId },
-    });
-
-    if (!existingSubscription) {
-      return NextResponse.json(
-        { error: "Subscription not found" },
-        { status: 404 },
-      );
-    }
-
-    // Delete subscription
-    await prisma.userSubscription.delete({
-      where: { id: subscriptionId },
-    });
-
-    // Create audit log entry
-    await prisma.tierAuditLog.create({
-      data: {
-        userId: existingSubscription.userId,
-        adminId: auth.userId || "unknown",
-        action: "SUBSCRIPTION_DELETE",
-        changes: {
-          id: subscriptionId,
-          tierId: existingSubscription.tierId,
-          status: existingSubscription.status,
-        },
-      },
-    });
-
-    // Emit telemetry event for subscription deletion
+  const updateData: Record<string, unknown> = {};
+  if (status) updateData.status = status;
+  if (expiresAt) updateData.expiresAt = new Date(expiresAt);
+  if (overrideLimits !== undefined) updateData.overrideLimits = overrideLimits;
+  if (overrideFeatures !== undefined)
+    updateData.overrideFeatures = overrideFeatures;
+  if (notes !== undefined) updateData.notes = notes;
+  const subscription = await prisma.userSubscription.update({
+    where: { id: subscriptionId },
+    data: updateData,
+    include: { tier: true },
+  });
+  if (status && status !== existing.status) {
     subscriptionTelemetry.track({
       type: "subscription.cancelled",
-      userId: existingSubscription.userId,
-      tierId: existingSubscription.tierId,
+      userId: subscription.userId,
+      tierId: subscription.tierId,
       previousTierId: null,
       timestamp: new Date(),
       metadata: {
-        subscriptionId: subscriptionId,
-        status: existingSubscription.status,
-        reason: "admin_deletion",
+        subscriptionId: subscription.id,
+        previousStatus: existing.status,
+        newStatus: subscription.status,
+        adminId: ctx.userId || "unknown",
       },
     });
+  }
+  return NextResponse.json(subscription);
+});
 
-    return NextResponse.json({ success: true, id: subscriptionId });
-  } catch (error) {
-    logger.error(
-      "Error deleting subscription",
-      { component: "admin-subscriptions" },
-      error,
-    );
+export const DELETE = pipe(
+  withSentry("/api/admin/subscriptions/[id]"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  const { id: subscriptionId } = await ctx.params;
+  const subscription = await prisma.userSubscription.findUnique({
+    where: { id: subscriptionId },
+  });
+  if (!subscription) {
     return NextResponse.json(
-      { error: "Failed to delete subscription" },
-      { status: 500 },
+      { error: "Subscription not found" },
+      { status: 404 },
     );
   }
-}
+  await prisma.userSubscription.delete({ where: { id: subscriptionId } });
+  subscriptionTelemetry.track({
+    type: "subscription.cancelled",
+    userId: subscription.userId,
+    tierId: subscription.tierId,
+    previousTierId: null,
+    timestamp: new Date(),
+    metadata: {
+      subscriptionId: subscription.id,
+      status: subscription.status,
+      reason: "admin_deletion",
+      adminId: ctx.userId || "unknown",
+    },
+  });
+  return NextResponse.json({ success: true });
+});

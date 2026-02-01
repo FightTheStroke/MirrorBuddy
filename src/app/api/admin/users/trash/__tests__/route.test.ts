@@ -5,16 +5,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 vi.mock("@/lib/auth/session-auth", () => ({
   validateAdminAuth: vi.fn().mockResolvedValue({
     authenticated: true,
     isAdmin: true,
     userId: "admin-1",
   }),
-}));
-
-vi.mock("@/lib/auth/middleware", () => ({
-  withAdmin: (handler: any) => handler,
 }));
 
 vi.mock("@/lib/security/csrf", () => ({
@@ -44,13 +45,13 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    warn: vi.fn(),
     error: vi.fn(),
+    warn: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn().mockReturnValue({
       info: vi.fn(),
-      warn: vi.fn(),
       error: vi.fn(),
+      warn: vi.fn(),
       debug: vi.fn(),
     }),
   },

@@ -10,9 +10,8 @@
  * F-32: Rate limiting (max 1 push/min per event type)
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { requireCSRF } from "@/lib/security/csrf";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import {
   calculateAndPublishAdminCounts,
   type AdminCountsResult,
@@ -21,66 +20,46 @@ import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "admin-counts-refresh" });
 
-export async function POST(request: NextRequest) {
-  // CSRF protection
-  if (!requireCSRF(request)) {
-    return NextResponse.json({ error: "Invalid CSRF token" }, { status: 403 });
-  }
+export const POST = pipe(
+  withSentry("/api/admin/counts/refresh"),
+  withCSRF,
+  withAdmin,
+)(async (ctx) => {
+  log.info("Admin counts refresh requested", { userId: ctx.userId });
 
-  const auth = await validateAdminAuth();
+  // Calculate fresh counts and publish to Redis pub/sub
+  // F-05c: Endpoint performs manual on-demand refresh
+  // F-32: Rate limiting handled in calculateAndPublishAdminCounts
+  const result: AdminCountsResult =
+    await calculateAndPublishAdminCounts("manual");
 
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    log.info("Admin counts refresh requested", { userId: auth.userId });
-
-    // Calculate fresh counts and publish to Redis pub/sub
-    // F-05c: Endpoint performs manual on-demand refresh
-    // F-32: Rate limiting handled in calculateAndPublishAdminCounts
-    const result: AdminCountsResult =
-      await calculateAndPublishAdminCounts("manual");
-
-    if (!result.success || !result.counts) {
-      log.warn("Admin counts refresh failed", {
-        error: result.error,
-        duration: result.duration,
-      });
-      return NextResponse.json(
-        { error: result.error || "Failed to refresh counts" },
-        { status: 500 },
-      );
-    }
-
-    log.info("Admin counts refreshed successfully", {
-      userId: auth.userId,
+  if (!result.success || !result.counts) {
+    log.warn("Admin counts refresh failed", {
+      error: result.error,
       duration: result.duration,
-      counts: {
-        pendingInvites: result.counts.pendingInvites,
-        totalUsers: result.counts.totalUsers,
-        activeUsers24h: result.counts.activeUsers24h,
-        systemAlerts: result.counts.systemAlerts,
-      },
     });
-
-    // Return fresh counts along with metadata
-    return NextResponse.json({
-      success: true,
-      counts: result.counts,
-      duration: result.duration,
-      refreshedAt: new Date().toISOString(),
-    });
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    log.error("Admin counts refresh error", {
-      userId: auth.userId,
-      error: errorMessage,
-    });
-
     return NextResponse.json(
-      { error: "Failed to refresh counts" },
+      { error: result.error || "Failed to refresh counts" },
       { status: 500 },
     );
   }
-}
+
+  log.info("Admin counts refreshed successfully", {
+    userId: ctx.userId,
+    duration: result.duration,
+    counts: {
+      pendingInvites: result.counts.pendingInvites,
+      totalUsers: result.counts.totalUsers,
+      activeUsers24h: result.counts.activeUsers24h,
+      systemAlerts: result.counts.systemAlerts,
+    },
+  });
+
+  // Return fresh counts along with metadata
+  return NextResponse.json({
+    success: true,
+    counts: result.counts,
+    duration: result.duration,
+    refreshedAt: new Date().toISOString(),
+  });
+});

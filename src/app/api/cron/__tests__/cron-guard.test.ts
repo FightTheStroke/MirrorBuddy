@@ -8,19 +8,24 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 // Mock logger for all cron tests
 vi.mock("@/lib/logger", () => ({
   logger: {
-    info: vi.fn(),
-    warn: vi.fn(),
     error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn(() => ({
       info: vi.fn(),
       warn: vi.fn(),
       error: vi.fn(),
       debug: vi.fn(),
-    }),
+    })),
   },
 }));
 

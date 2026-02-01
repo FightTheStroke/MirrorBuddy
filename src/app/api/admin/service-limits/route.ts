@@ -12,7 +12,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getAllExternalServiceUsage } from "@/lib/metrics/external-service-metrics";
@@ -56,24 +56,20 @@ export interface ServiceLimitsResponse {
   timestamp: string;
 }
 
-export async function GET(): Promise<
-  NextResponse<ServiceLimitsResponse | { error: string }>
-> {
-  // Validate admin authentication
-  const auth = await validateAdminAuth();
-
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
+export const GET = pipe(
+  withSentry("/api/admin/service-limits"),
+  withAdmin,
+)(
+  async (): Promise<
+    NextResponse<ServiceLimitsResponse | { error: string }>
+  > => {
     // Fetch Azure OpenAI usage from telemetry
     const azureUsage = await getAllExternalServiceUsage();
 
     // Get Supabase database size
     const dbSizeResult = await prisma.$queryRaw<Array<{ size: bigint }>>`
-      SELECT pg_database_size(current_database()) as size;
-    `;
+    SELECT pg_database_size(current_database()) as size;
+  `;
     const dbSizeMB = Number(dbSizeResult[0].size) / (1024 * 1024);
 
     // Get Redis usage estimate (count rate limit keys from last 24h)
@@ -85,7 +81,13 @@ export async function GET(): Promise<
         // Vercel limits require manual dashboard checks - returning static limits
         bandwidth: createLimit(0, 1000, "GB", "month", true),
         buildMinutes: createLimit(0, 6000, "minutes", "month", true),
-        functionInvocations: createLimit(0, 1000000, "invocations", "month", true),
+        functionInvocations: createLimit(
+          0,
+          1000000,
+          "invocations",
+          "month",
+          true,
+        ),
       },
       supabase: {
         databaseSize: createLimit(dbSizeMB, 500, "MB", "total"),
@@ -100,25 +102,28 @@ export async function GET(): Promise<
       azureOpenAI: {
         chatTPM: extractAzureMetric(azureUsage, "Chat Tokens/min", 120000),
         chatRPM: extractAzureMetric(azureUsage, "Chat Requests/min", 720),
-        embeddingTPM: extractAzureMetric(azureUsage, "Embedding Tokens/min", 350000),
+        embeddingTPM: extractAzureMetric(
+          azureUsage,
+          "Embedding Tokens/min",
+          350000,
+        ),
         ttsRPM: extractAzureMetric(azureUsage, "TTS Requests/min", 150),
       },
       redis: {
         storage: createLimit(5, 256, "MB", "total"),
-        commandsPerDay: createLimit(redisCommandsToday, 10000, "commands", "day"),
+        commandsPerDay: createLimit(
+          redisCommandsToday,
+          10000,
+          "commands",
+          "day",
+        ),
       },
       timestamp: new Date().toISOString(),
     };
 
     return NextResponse.json(response);
-  } catch (error) {
-    log.error("Failed to fetch service limits", undefined, error);
-    return NextResponse.json(
-      { error: "Failed to fetch service limits" },
-      { status: 500 },
-    );
-  }
-}
+  },
+);
 
 /**
  * Create a service limit object with status calculation
@@ -156,7 +161,13 @@ function createLimit(
  * Extract Azure metric from external service usage
  */
 function extractAzureMetric(
-  usage: Array<{ service: string; metric: string; currentValue: number; limit: number; status: string }>,
+  usage: Array<{
+    service: string;
+    metric: string;
+    currentValue: number;
+    limit: number;
+    status: string;
+  }>,
   metricName: string,
   defaultLimit: number,
 ): ServiceLimit {
@@ -168,7 +179,8 @@ function extractAzureMetric(
     return {
       usage: metric.currentValue,
       limit: metric.limit,
-      percentage: Math.round((metric.currentValue / metric.limit) * 10000) / 100,
+      percentage:
+        Math.round((metric.currentValue / metric.limit) * 10000) / 100,
       status: metric.status as ServiceLimit["status"],
       unit: metricName.includes("Token") ? "tokens" : "requests",
       period: "1m",
@@ -176,7 +188,12 @@ function extractAzureMetric(
   }
 
   // Fallback if metric not found
-  return createLimit(0, defaultLimit, metricName.includes("Token") ? "tokens" : "requests", "1m");
+  return createLimit(
+    0,
+    defaultLimit,
+    metricName.includes("Token") ? "tokens" : "requests",
+    "1m",
+  );
 }
 
 /**

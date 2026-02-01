@@ -8,7 +8,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { logger } from "@/lib/logger";
 
 const SENTRY_API_BASE = "https://sentry.io/api/0";
@@ -39,14 +39,11 @@ interface SentryIssueResponse {
   hasMore: boolean;
 }
 
-export async function GET(request: Request) {
-  // Validate admin access
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { searchParams } = new URL(request.url);
+export const GET = pipe(
+  withSentry("/api/admin/sentry/issues"),
+  withAdmin,
+)(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
   const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 25);
   const query = searchParams.get("query") || "is:unresolved";
 
@@ -127,4 +124,4 @@ export async function GET(request: Request) {
       { status: 200 },
     );
   }
-}
+});

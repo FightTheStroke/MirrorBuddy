@@ -5,6 +5,11 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 vi.mock("@/lib/auth/session-auth", () => ({
   validateAdminAuth: vi.fn().mockResolvedValue({
     authenticated: true,
@@ -110,13 +115,13 @@ vi.mock("@/lib/db", () => ({
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    warn: vi.fn(),
     error: vi.fn(),
+    warn: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn().mockReturnValue({
       info: vi.fn(),
-      warn: vi.fn(),
       error: vi.fn(),
+      warn: vi.fn(),
       debug: vi.fn(),
     }),
   },
@@ -177,7 +182,7 @@ describe("admin purge-staging-data API", () => {
       expect(body).toHaveProperty("error", "Unauthorized");
     });
 
-    it("returns 401 if not admin", async () => {
+    it("returns 403 if not admin", async () => {
       const { validateAdminAuth } = await import("@/lib/auth/session-auth");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: true,
@@ -192,8 +197,8 @@ describe("admin purge-staging-data API", () => {
       const response = await GET(request);
       const body = await response.json();
 
-      expect(response.status).toBe(401);
-      expect(body).toHaveProperty("error", "Unauthorized");
+      expect(response.status).toBe(403);
+      expect(body).toHaveProperty("error", "Forbidden: admin access required");
     });
   });
 
@@ -248,7 +253,7 @@ describe("admin purge-staging-data API", () => {
       expect(body).toHaveProperty("error", "Unauthorized");
     });
 
-    it("returns 401 if not admin", async () => {
+    it("returns 403 if not admin", async () => {
       const { validateAdminAuth } = await import("@/lib/auth/session-auth");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: true,
@@ -263,8 +268,8 @@ describe("admin purge-staging-data API", () => {
       const response = await DELETE(request);
       const body = await response.json();
 
-      expect(response.status).toBe(401);
-      expect(body).toHaveProperty("error", "Unauthorized");
+      expect(response.status).toBe(403);
+      expect(body).toHaveProperty("error", "Forbidden: admin access required");
     });
   });
 });

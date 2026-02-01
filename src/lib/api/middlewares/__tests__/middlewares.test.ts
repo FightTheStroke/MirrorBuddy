@@ -380,7 +380,7 @@ describe("Middleware modules", () => {
 
   describe("Index exports", () => {
     it("should export all middlewares", async () => {
-      const _middlewares = await import("../index");
+      const middlewares = await import("../index");
 
       expect(middlewares.withCSRF).toBeDefined();
       expect(middlewares.withAuth).toBeDefined();
@@ -393,13 +393,13 @@ describe("Middleware modules", () => {
     it("should export types", async () => {
       // Type exports are compile-time only and verified by TypeScript
       // This test just ensures the import doesn't fail
-      const _middlewares = await import("../index");
+      const _m = await import("../index");
 
       // Verify that types are available at compile time (TypeScript will fail if not)
-      type _Middleware = typeof middlewares extends { Middleware: unknown }
+      type _Middleware = typeof _m extends { Middleware: unknown }
         ? never
         : "ok";
-      type _Context = typeof middlewares extends { MiddlewareContext: unknown }
+      type _Context = typeof _m extends { MiddlewareContext: unknown }
         ? never
         : "ok";
 

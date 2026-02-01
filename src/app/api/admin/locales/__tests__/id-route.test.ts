@@ -7,6 +7,27 @@ import { describe, it, expect, beforeEach, vi, type Mock } from "vitest";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+    })),
+  },
+}));
+
 const mockValidateAdminAuth = vi.fn();
 vi.mock("@/lib/auth/session-auth", () => ({
   validateAdminAuth: () => mockValidateAdminAuth(),
@@ -95,6 +116,7 @@ describe("GET /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     const request = new NextRequest(
@@ -113,6 +135,7 @@ describe("GET /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockRejectedValueOnce(new Error("DB error"));
     const request = new NextRequest(
@@ -154,6 +177,7 @@ describe("PUT /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     const request = new NextRequest(
@@ -235,6 +259,7 @@ describe("PUT /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     mockLocaleConfigUpdate.mockRejectedValueOnce(new Error("DB error"));
@@ -281,6 +306,7 @@ describe("DELETE /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(null);
     const request = new NextRequest(
@@ -324,6 +350,7 @@ describe("DELETE /api/admin/locales/[id]", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
     mockLocaleConfigFindUnique.mockResolvedValueOnce(createMockLocale());
     mockLocaleConfigDelete.mockRejectedValueOnce(new Error("DB error"));

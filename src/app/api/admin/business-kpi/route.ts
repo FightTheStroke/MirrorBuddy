@@ -3,27 +3,16 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { getBusinessKPIs } from "@/lib/admin/business-kpi-service";
-import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  try {
-    const adminAuth = await validateAdminAuth();
-    if (!adminAuth.authenticated || !adminAuth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const GET = pipe(
+  withSentry("/api/admin/business-kpi"),
+  withAdmin,
+)(async (_ctx) => {
+  const data = await getBusinessKPIs();
 
-    const data = await getBusinessKPIs();
-
-    return NextResponse.json({ data });
-  } catch (error) {
-    logger.error("Failed to fetch business KPIs", { error });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({ data });
+});

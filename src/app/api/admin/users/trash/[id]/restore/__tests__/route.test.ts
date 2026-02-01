@@ -5,8 +5,17 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 
-vi.mock("@/lib/auth/middleware", () => ({
-  withAdmin: (handler: any) => handler,
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+vi.mock("@/lib/auth/session-auth", () => ({
+  validateAdminAuth: vi.fn().mockResolvedValue({
+    authenticated: true,
+    isAdmin: true,
+    userId: "admin-1",
+  }),
 }));
 
 vi.mock("@/lib/security/csrf", () => ({
@@ -21,13 +30,13 @@ vi.mock("@/lib/admin/user-trash-service", () => ({
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
-    warn: vi.fn(),
     error: vi.fn(),
+    warn: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn().mockReturnValue({
       info: vi.fn(),
-      warn: vi.fn(),
       error: vi.fn(),
+      warn: vi.fn(),
       debug: vi.fn(),
     }),
   },
@@ -46,10 +55,8 @@ describe("admin users trash restore API", () => {
     );
 
     const response = await POST(request, {
-      userId: "admin-1",
-      isAdmin: true,
       params: Promise.resolve({ id: "user-1" }),
-    } as any);
+    });
 
     const body = await response.json();
 

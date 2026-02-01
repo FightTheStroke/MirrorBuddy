@@ -3,28 +3,17 @@
  * GET /api/admin/ai-email
  */
 
-import { NextRequest, NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { getAIEmailMetrics } from "@/lib/admin/ai-email-service";
-import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(_request: NextRequest) {
-  try {
-    const adminAuth = await validateAdminAuth();
-    if (!adminAuth.authenticated || !adminAuth.isAdmin) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
+export const GET = pipe(
+  withSentry("/api/admin/ai-email"),
+  withAdmin,
+)(async (_ctx) => {
+  const data = await getAIEmailMetrics();
 
-    const data = await getAIEmailMetrics();
-
-    return NextResponse.json({ data });
-  } catch (error) {
-    logger.error("Failed to fetch AI/Email metrics", { error });
-    return NextResponse.json(
-      { error: "Internal server error" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({ data });
+});

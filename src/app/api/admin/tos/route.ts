@@ -6,12 +6,12 @@
  * F-13: Admin panel to view ToS acceptances (who, when, version)
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
-import { validateAdminAuth } from '@/lib/auth/session-auth';
+import { NextResponse } from "next/server";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 
-const log = logger.child({ module: 'api/admin/tos' });
+const log = logger.child({ module: "api/admin/tos" });
 
 interface TosAcceptanceWithUser {
   id: string;
@@ -56,115 +56,93 @@ interface GetResponse {
  * - sortBy: "acceptedAt" | "version" (default: "acceptedAt")
  * - sortOrder: "asc" | "desc" (default: "desc")
  */
-export async function GET(request: NextRequest) {
-  // Require admin authentication
-  const auth = await validateAdminAuth();
+export const GET = pipe(
+  withSentry("/api/admin/tos"),
+  withAdmin,
+)(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
+  const page = Math.max(1, parseInt(searchParams.get("page") || "1", 10));
+  const pageSize = Math.min(
+    100,
+    Math.max(1, parseInt(searchParams.get("pageSize") || "50", 10)),
+  );
+  const version = searchParams.get("version") || undefined;
+  const sortBy = searchParams.get("sortBy") || "acceptedAt";
+  const sortOrder = searchParams.get("sortOrder") || "desc";
 
-  if (!auth.authenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  }
+  // Build where clause
+  const where = version ? { version } : {};
 
-  if (!auth.isAdmin) {
-    return NextResponse.json(
-      { error: 'Forbidden: Admin access required' },
-      { status: 403 }
-    );
-  }
+  // Get total count
+  const totalCount = await prisma.tosAcceptance.count({ where });
 
-  try {
-    const { searchParams } = new URL(request.url);
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10));
-    const pageSize = Math.min(
-      100,
-      Math.max(1, parseInt(searchParams.get('pageSize') || '50', 10))
-    );
-    const version = searchParams.get('version') || undefined;
-    const sortBy = searchParams.get('sortBy') || 'acceptedAt';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
-
-    // Build where clause
-    const where = version ? { version } : {};
-
-    // Get total count
-    const totalCount = await prisma.tosAcceptance.count({ where });
-
-    // Get paginated acceptances with user info
-    const acceptances = await prisma.tosAcceptance.findMany({
-      where,
-      include: {
-        user: {
-          select: {
-            profile: {
-              select: {
-                name: true,
-              },
+  // Get paginated acceptances with user info
+  const acceptances = await prisma.tosAcceptance.findMany({
+    where,
+    include: {
+      user: {
+        select: {
+          profile: {
+            select: {
+              name: true,
             },
-            googleAccount: {
-              select: {
-                email: true,
-              },
+          },
+          googleAccount: {
+            select: {
+              email: true,
             },
           },
         },
       },
-      orderBy: {
-        [sortBy]: sortOrder,
-      },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-    });
+    },
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    skip: (page - 1) * pageSize,
+    take: pageSize,
+  });
 
-    // Get summary stats
-    const [uniqueUsersCount, versionGroups] = await Promise.all([
-      prisma.tosAcceptance.groupBy({
-        by: ['userId'],
-        _count: true,
-      }),
-      prisma.tosAcceptance.groupBy({
-        by: ['version'],
-        _count: true,
-      }),
-    ]);
+  // Get summary stats
+  const [uniqueUsersCount, versionGroups] = await Promise.all([
+    prisma.tosAcceptance.groupBy({
+      by: ["userId"],
+      _count: true,
+    }),
+    prisma.tosAcceptance.groupBy({
+      by: ["version"],
+      _count: true,
+    }),
+  ]);
 
-    const versionCounts = versionGroups.reduce(
-      (acc, group) => {
-        acc[group.version] = group._count;
-        return acc;
-      },
-      {} as Record<string, number>
-    );
+  const versionCounts = versionGroups.reduce(
+    (acc, group) => {
+      acc[group.version] = group._count;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
-    const response: GetResponse = {
-      acceptances,
-      summary: {
-        totalAcceptances: totalCount,
-        uniqueUsers: uniqueUsersCount.length,
-        versionCounts,
-      },
-      pagination: {
-        page,
-        pageSize,
-        totalPages: Math.ceil(totalCount / pageSize),
-        totalCount,
-      },
-    };
-
-    log.info('Admin ToS list accessed', {
-      adminId: auth.userId,
+  const response: GetResponse = {
+    acceptances,
+    summary: {
+      totalAcceptances: totalCount,
+      uniqueUsers: uniqueUsersCount.length,
+      versionCounts,
+    },
+    pagination: {
       page,
       pageSize,
-      version,
-    });
+      totalPages: Math.ceil(totalCount / pageSize),
+      totalCount,
+    },
+  };
 
-    return NextResponse.json(response);
-  } catch (error) {
-    log.error('Admin ToS list error', {
-      adminId: auth.userId,
-      error: String(error),
-    });
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
-  }
-}
+  log.info("Admin ToS list accessed", {
+    adminId: ctx.userId,
+    page,
+    pageSize,
+    version,
+  });
+
+  return NextResponse.json(response);
+});

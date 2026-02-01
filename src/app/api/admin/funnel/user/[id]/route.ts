@@ -6,8 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
-import { logger } from "@/lib/logger";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 
 export const dynamic = "force-dynamic";
 
@@ -53,136 +52,118 @@ interface UserDrilldownResponse {
   } | null;
 }
 
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> },
-) {
-  const adminAuth = await validateAdminAuth();
-  if (!adminAuth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+export const GET = pipe(
+  withSentry("/api/admin/funnel/user/[id]"),
+  withAdmin,
+)(async (ctx) => {
+  const { id } = await ctx.params;
+  // Determine if this is a userId or visitorId
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: { id: true, email: true, createdAt: true },
+  });
 
-  const { id } = await params;
+  const isUser = !!user;
 
-  try {
-    // Determine if this is a userId or visitorId
-    const user = await prisma.user.findUnique({
-      where: { id },
-      select: { id: true, email: true, createdAt: true },
-    });
+  // Get funnel journey
+  const journey = await prisma.funnelEvent.findMany({
+    where: isUser
+      ? { userId: id, isTestData: false }
+      : { visitorId: id, isTestData: false },
+    orderBy: { createdAt: "asc" },
+    select: {
+      stage: true,
+      fromStage: true,
+      createdAt: true,
+      metadata: true,
+    },
+  });
 
-    const isUser = !!user;
-
-    // Get funnel journey
-    const journey = await prisma.funnelEvent.findMany({
-      where: isUser
-        ? { userId: id, isTestData: false }
-        : { visitorId: id, isTestData: false },
-      orderBy: { createdAt: "asc" },
-      select: {
-        stage: true,
-        fromStage: true,
-        createdAt: true,
-        metadata: true,
-      },
-    });
-
-    if (journey.length === 0) {
-      return NextResponse.json(
-        { error: "User not found in funnel" },
-        { status: 404 },
-      );
-    }
-
-    const currentStage = journey[journey.length - 1].stage;
-
-    // Get trial session data
-    const trialSession = await prisma.trialSession.findFirst({
-      where: { visitorId: id },
-      select: {
-        id: true,
-        email: true,
-        chatsUsed: true,
-        voiceSecondsUsed: true,
-        toolsUsed: true,
-        docsUsed: true,
-        assignedMaestri: true,
-        assignedCoach: true,
-        createdAt: true,
-        lastActivityAt: true,
-      },
-    });
-
-    // Get invite request if exists
-    const inviteRequest = await prisma.inviteRequest.findFirst({
-      where: isUser
-        ? { email: user?.email ?? undefined }
-        : { trialSessionId: trialSession?.id },
-      select: {
-        id: true,
-        status: true,
-        createdAt: true,
-        reviewedAt: true,
-      },
-    });
-
-    // Build usage metrics
-    const usage: UsageMetrics = {
-      chatsUsed: trialSession?.chatsUsed ?? 0,
-      voiceSecondsUsed: trialSession?.voiceSecondsUsed ?? 0,
-      toolsUsed: trialSession?.toolsUsed ?? 0,
-      docsUsed: trialSession?.docsUsed ?? 0,
-    };
-
-    const response: UserDrilldownResponse = {
-      id,
-      type: isUser ? "user" : "visitor",
-      email: user?.email ?? trialSession?.email ?? null,
-      currentStage,
-      journey: journey.map((e) => ({
-        stage: e.stage,
-        fromStage: e.fromStage,
-        createdAt: e.createdAt.toISOString(),
-        metadata: e.metadata,
-      })),
-      usage,
-      inviteRequest: inviteRequest
-        ? {
-            id: inviteRequest.id,
-            status: inviteRequest.status,
-            createdAt: inviteRequest.createdAt.toISOString(),
-            reviewedAt: inviteRequest.reviewedAt?.toISOString() ?? null,
-          }
-        : null,
-      trialSession: trialSession
-        ? {
-            id: trialSession.id,
-            createdAt: trialSession.createdAt.toISOString(),
-            lastActivityAt: trialSession.lastActivityAt.toISOString(),
-            assignedMaestri: JSON.parse(trialSession.assignedMaestri || "[]"),
-            assignedCoach: trialSession.assignedCoach,
-          }
-        : null,
-      userAccount: user
-        ? {
-            id: user.id,
-            email: user.email ?? "",
-            createdAt: user.createdAt.toISOString(),
-            lastLoginAt: null, // Would need Session table lookup
-          }
-        : null,
-    };
-
-    return NextResponse.json(response);
-  } catch (error) {
-    logger.error(
-      "Failed to fetch user funnel data",
-      { component: "funnel-user-detail" },
-      error,
-    );
+  if (journey.length === 0) {
     return NextResponse.json(
-      { error: "Failed to fetch user data" },
-      { status: 500 },
+      { error: "User not found in funnel" },
+      { status: 404 },
     );
   }
-}
+
+  const currentStage = journey[journey.length - 1].stage;
+
+  // Get trial session data
+  const trialSession = await prisma.trialSession.findFirst({
+    where: { visitorId: id },
+    select: {
+      id: true,
+      email: true,
+      chatsUsed: true,
+      voiceSecondsUsed: true,
+      toolsUsed: true,
+      docsUsed: true,
+      assignedMaestri: true,
+      assignedCoach: true,
+      createdAt: true,
+      lastActivityAt: true,
+    },
+  });
+
+  // Get invite request if exists
+  const inviteRequest = await prisma.inviteRequest.findFirst({
+    where: isUser
+      ? { email: user?.email ?? undefined }
+      : { trialSessionId: trialSession?.id },
+    select: {
+      id: true,
+      status: true,
+      createdAt: true,
+      reviewedAt: true,
+    },
+  });
+
+  // Build usage metrics
+  const usage: UsageMetrics = {
+    chatsUsed: trialSession?.chatsUsed ?? 0,
+    voiceSecondsUsed: trialSession?.voiceSecondsUsed ?? 0,
+    toolsUsed: trialSession?.toolsUsed ?? 0,
+    docsUsed: trialSession?.docsUsed ?? 0,
+  };
+
+  const response: UserDrilldownResponse = {
+    id,
+    type: isUser ? "user" : "visitor",
+    email: user?.email ?? trialSession?.email ?? null,
+    currentStage,
+    journey: journey.map((e) => ({
+      stage: e.stage,
+      fromStage: e.fromStage,
+      createdAt: e.createdAt.toISOString(),
+      metadata: e.metadata,
+    })),
+    usage,
+    inviteRequest: inviteRequest
+      ? {
+          id: inviteRequest.id,
+          status: inviteRequest.status,
+          createdAt: inviteRequest.createdAt.toISOString(),
+          reviewedAt: inviteRequest.reviewedAt?.toISOString() ?? null,
+        }
+      : null,
+    trialSession: trialSession
+      ? {
+          id: trialSession.id,
+          createdAt: trialSession.createdAt.toISOString(),
+          lastActivityAt: trialSession.lastActivityAt.toISOString(),
+          assignedMaestri: JSON.parse(trialSession.assignedMaestri || "[]"),
+          assignedCoach: trialSession.assignedCoach,
+        }
+      : null,
+    userAccount: user
+      ? {
+          id: user.id,
+          email: user.email ?? "",
+          createdAt: user.createdAt.toISOString(),
+          lastLoginAt: null, // Would need Session table lookup
+        }
+      : null,
+  };
+
+  return NextResponse.json(response);
+});

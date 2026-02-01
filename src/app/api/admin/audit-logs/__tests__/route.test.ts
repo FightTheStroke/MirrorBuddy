@@ -7,6 +7,27 @@ import { GET } from "../route";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+    })),
+  },
+}));
+
 // Type assertions for mocked prisma methods
 const mockTierAuditLogFindMany = prisma.tierAuditLog
   .findMany as unknown as Mock;
@@ -54,6 +75,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     const mockLogs = [
@@ -101,6 +123,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     const mockLogs = [
@@ -143,6 +166,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockResolvedValueOnce([]);
@@ -169,6 +193,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockResolvedValueOnce([]);
@@ -195,6 +220,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockResolvedValueOnce([]);
@@ -227,6 +253,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockResolvedValueOnce([]);
@@ -257,6 +284,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockResolvedValueOnce([]);
@@ -281,6 +309,7 @@ describe("GET /api/admin/audit-logs", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockTierAuditLogFindMany.mockRejectedValueOnce(
@@ -296,6 +325,6 @@ describe("GET /api/admin/audit-logs", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toContain("Failed to fetch audit logs");
+    expect(data.error).toBe("Internal server error");
   });
 });

@@ -7,6 +7,27 @@ import { GET } from "../route";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+    })),
+  },
+}));
+
 // Type assertions for mocked prisma methods
 const mockUserSubscriptionFindMany = prisma.userSubscription
   .findMany as unknown as Mock;
@@ -48,10 +69,11 @@ describe("GET /api/admin/subscriptions", () => {
     expect(data.error).toBe("Unauthorized");
   });
 
-  it("returns 401 if not admin", async () => {
+  it("returns 403 if not admin", async () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: false,
+      userId: "user-1",
     });
 
     const request = new NextRequest(
@@ -62,8 +84,8 @@ describe("GET /api/admin/subscriptions", () => {
     const response = await GET(request);
     const data = await response.json();
 
-    expect(response.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
+    expect(response.status).toBe(403);
+    expect(data.error).toBe("Forbidden: admin access required");
   });
 
   it("lists all subscriptions without filters", async () => {
@@ -111,6 +133,7 @@ describe("GET /api/admin/subscriptions", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockUserSubscriptionFindMany.mockResolvedValueOnce([
@@ -145,6 +168,7 @@ describe("GET /api/admin/subscriptions", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockUserSubscriptionFindMany.mockResolvedValueOnce([]);
@@ -170,6 +194,7 @@ describe("GET /api/admin/subscriptions", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockUserSubscriptionFindMany.mockResolvedValueOnce([]);
@@ -195,6 +220,7 @@ describe("GET /api/admin/subscriptions", () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: true,
+      userId: "admin-1",
     });
 
     mockUserSubscriptionFindMany.mockRejectedValueOnce(
@@ -210,6 +236,6 @@ describe("GET /api/admin/subscriptions", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("Failed to list subscriptions");
+    expect(data.error).toBe("Internal server error");
   });
 });

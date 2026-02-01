@@ -6,8 +6,7 @@
 // F-21: Heartbeat every 30s to keep connection alive
 // ============================================================================
 
-import { NextRequest } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { getLatestAdminCounts } from "@/lib/redis/admin-counts-storage";
 import { subscribeToAdminCounts } from "@/lib/redis/admin-counts-subscriber";
 import { type AdminCounts } from "@/lib/redis/admin-counts-types";
@@ -33,22 +32,15 @@ export const dynamic = "force-dynamic";
  * - Data events: `data: {...}\n\n`
  * - Heartbeat: `: heartbeat\n\n` (comment, ignored by EventSource)
  */
-export async function GET(request: NextRequest) {
+export const GET = pipe(
+  withSentry("/api/admin/counts/stream"),
+  withAdmin,
+)(async (ctx) => {
   // ============================================================================
-  // 1. AUTHENTICATION (admin only)
+  // 1. AUTHENTICATION (admin only) - handled by withAdmin middleware
   // ============================================================================
 
-  const auth = await validateAdminAuth();
-
-  if (!auth.authenticated || !auth.isAdmin) {
-    log.warn("Unauthorized SSE connection attempt", {
-      authenticated: auth.authenticated,
-      isAdmin: auth.isAdmin,
-    });
-    return new Response("Unauthorized", { status: 401 });
-  }
-
-  log.info("Admin SSE connection established", { userId: auth.userId });
+  log.info("Admin SSE connection established", { userId: ctx.userId });
 
   // ============================================================================
   // 2. CREATE SSE STREAM
@@ -122,9 +114,9 @@ export async function GET(request: NextRequest) {
         // 2.4 CLEANUP ON DISCONNECT
         // ============================================================================
 
-        request.signal.addEventListener("abort", () => {
+        ctx.req.signal.addEventListener("abort", () => {
           log.info("SSE connection closed by client", {
-            userId: auth.userId,
+            userId: ctx.userId,
           });
 
           // Unsubscribe from Redis Pub/Sub
@@ -173,7 +165,7 @@ export async function GET(request: NextRequest) {
       "X-Accel-Buffering": "no", // Disable nginx buffering
     },
   });
-}
+});
 
 // ============================================================================
 // HELPER: Fetch counts from database (fallback when Redis cache is empty)

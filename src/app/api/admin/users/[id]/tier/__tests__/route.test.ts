@@ -7,6 +7,27 @@ import { POST } from "../route";
 import { NextRequest } from "next/server";
 import { prisma } from "@/lib/db";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
+// Mock logger
+vi.mock("@/lib/logger", () => ({
+  logger: {
+    debug: vi.fn(),
+    error: vi.fn(),
+    warn: vi.fn(),
+    info: vi.fn(),
+    child: vi.fn(() => ({
+      debug: vi.fn(),
+      error: vi.fn(),
+      warn: vi.fn(),
+      info: vi.fn(),
+    })),
+  },
+}));
+
 // Type assertions for mocked prisma methods
 const mockUserFindUnique = prisma.user.findUnique as unknown as Mock;
 const mockTierDefinitionFindUnique = prisma.tierDefinition
@@ -70,10 +91,11 @@ describe("POST /api/admin/users/[id]/tier", () => {
     expect(data.error).toBe("Unauthorized");
   });
 
-  it("returns 401 if not admin", async () => {
+  it("returns 403 if not admin", async () => {
     mockValidateAdminAuth.mockResolvedValueOnce({
       authenticated: true,
       isAdmin: false,
+      userId: "user-1",
     });
 
     const request = new NextRequest(
@@ -89,8 +111,8 @@ describe("POST /api/admin/users/[id]/tier", () => {
     });
     const data = await response.json();
 
-    expect(response.status).toBe(401);
-    expect(data.error).toBe("Unauthorized");
+    expect(response.status).toBe(403);
+    expect(data.error).toBe("Forbidden: admin access required");
   });
 
   it("returns 400 if tierId is missing", async () => {
@@ -364,6 +386,6 @@ describe("POST /api/admin/users/[id]/tier", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    expect(data.error).toBe("Failed to change tier");
+    expect(data.error).toBe("Internal server error");
   });
 });

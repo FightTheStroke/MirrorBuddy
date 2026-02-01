@@ -2,6 +2,11 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { NextRequest } from "next/server";
 import { POST } from "../hierarchical-summary/route";
 
+// Mock Sentry
+vi.mock("@sentry/nextjs", () => ({
+  captureException: vi.fn(),
+}));
+
 // Mock the cron function
 vi.mock("@/lib/cron/cron-hierarchical-summary", () => ({
   runHierarchicalSummarization: vi.fn().mockResolvedValue(undefined),
@@ -10,14 +15,14 @@ vi.mock("@/lib/cron/cron-hierarchical-summary", () => ({
 // Mock logger
 vi.mock("@/lib/logger", () => ({
   logger: {
+    error: vi.fn(),
     info: vi.fn(),
     warn: vi.fn(),
-    error: vi.fn(),
     debug: vi.fn(),
-    child: () => ({
+    child: vi.fn().mockReturnValue({
+      error: vi.fn(),
       info: vi.fn(),
       warn: vi.fn(),
-      error: vi.fn(),
       debug: vi.fn(),
     }),
   },
@@ -33,7 +38,7 @@ describe("POST /api/cron/hierarchical-summary", () => {
     process.env.CRON_SECRET = validCronSecret;
   });
 
-  it("should allow requests when CRON_SECRET is not configured (dev mode)", async () => {
+  it("should allow requests without CRON_SECRET configured (development mode)", async () => {
     delete process.env.CRON_SECRET;
 
     const request = new NextRequest(
@@ -47,9 +52,10 @@ describe("POST /api/cron/hierarchical-summary", () => {
     );
 
     const response = await POST(request);
+    const data = await response.json();
 
-    // In dev mode (no CRON_SECRET), requests are allowed through
     expect(response.status).toBe(200);
+    expect(data.success).toBe(true);
   });
 
   it("should reject requests with missing authorization header", async () => {
@@ -158,8 +164,8 @@ describe("POST /api/cron/hierarchical-summary", () => {
     const data = await response.json();
 
     expect(response.status).toBe(500);
-    // pipe() middleware returns error message
-    expect(data.error).toBeDefined();
+    expect(data.error).toBe("Internal server error");
+    expect(data.message).toBe("Database connection failed");
   });
 
   it("should return 200 status for successful execution", async () => {

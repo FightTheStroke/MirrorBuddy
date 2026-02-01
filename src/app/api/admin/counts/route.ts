@@ -9,29 +9,20 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { logger } from "@/lib/logger";
 
-export async function GET() {
-  const auth = await validateAdminAuth();
+export const GET = pipe(
+  withSentry("/api/admin/counts"),
+  withAdmin,
+)(async () => {
+  const now = new Date();
+  const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
 
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
-    const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-
-    // Run all queries in parallel for performance
-    // F-06: Exclude test data from statistics (isTestData = false)
-    const [
-      pendingInvites,
-      totalUsers,
-      activeUsersResult,
-      criticalSafetyEvents,
-    ] = await Promise.all([
+  // Run all queries in parallel for performance
+  // F-06: Exclude test data from statistics (isTestData = false)
+  const [pendingInvites, totalUsers, activeUsersResult, criticalSafetyEvents] =
+    await Promise.all([
       // Pending invite requests
       prisma.inviteRequest.count({
         where: { status: "PENDING" },
@@ -62,19 +53,12 @@ export async function GET() {
         .catch(() => 0), // May not exist in schema
     ]);
 
-    const activeUsers24h = activeUsersResult.length;
+  const activeUsers24h = activeUsersResult.length;
 
-    return NextResponse.json({
-      pendingInvites,
-      totalUsers,
-      activeUsers24h,
-      systemAlerts: criticalSafetyEvents,
-    });
-  } catch (error) {
-    logger.error("Failed to fetch admin counts", undefined, error);
-    return NextResponse.json(
-      { error: "Failed to fetch counts" },
-      { status: 500 },
-    );
-  }
-}
+  return NextResponse.json({
+    pendingInvites,
+    totalUsers,
+    activeUsers24h,
+    systemAlerts: criticalSafetyEvents,
+  });
+});

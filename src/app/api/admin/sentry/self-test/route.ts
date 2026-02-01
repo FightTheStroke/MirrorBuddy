@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { Sentry } from "@/lib/sentry";
 
 interface SentrySelfTestResult {
@@ -11,12 +11,10 @@ interface SentrySelfTestResult {
   testEventId?: string;
 }
 
-export async function GET() {
-  const auth = await validateAdminAuth();
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+export const GET = pipe(
+  withSentry("/api/admin/sentry/self-test"),
+  withAdmin,
+)(async (_ctx) => {
   const dsnEnv =
     process.env.NEXT_PUBLIC_SENTRY_DSN || process.env.SENTRY_DSN || "";
 
@@ -56,4 +54,4 @@ export async function GET() {
     },
     { status: 200 },
   );
-}
+});

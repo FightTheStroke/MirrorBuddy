@@ -10,7 +10,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import {
   getComplianceEntries,
   getComplianceStatistics,
@@ -19,9 +19,6 @@ import {
   getRecentEscalations,
   getUnresolvedEscalations,
 } from "@/lib/safety/escalation/escalation-service";
-import { logger } from "@/lib/logger";
-
-const log = logger.child({ module: "safety-api" });
 
 export interface SafetyDashboardResponse {
   overview: {
@@ -69,17 +66,13 @@ export interface SafetyDashboardResponse {
   };
 }
 
-export async function GET(): Promise<
-  NextResponse<SafetyDashboardResponse | { error: string }>
-> {
-  // Validate admin authentication
-  const auth = await validateAdminAuth();
-
-  if (!auth.authenticated || !auth.isAdmin) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  try {
+export const GET = pipe(
+  withSentry("/api/admin/safety"),
+  withAdmin,
+)(
+  async (): Promise<
+    NextResponse<SafetyDashboardResponse | { error: string }>
+  > => {
     // Get compliance audit statistics
     const statistics = getComplianceStatistics(30); // Last 30 days
 
@@ -138,11 +131,5 @@ export async function GET(): Promise<
     };
 
     return NextResponse.json(response);
-  } catch (error) {
-    log.error("Failed to fetch safety dashboard data", undefined, error);
-    return NextResponse.json(
-      { error: "Failed to fetch safety data" },
-      { status: 500 },
-    );
-  }
-}
+  },
+);
