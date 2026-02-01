@@ -36,7 +36,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
       await page.goto(path);
       await page.waitForLoadState("domcontentloaded");
 
-      const skipLink = page.locator('a[href="#main-content"]');
+      const skipLink = page.locator('[data-testid="skip-link"]');
       await expect(skipLink).toBeAttached();
     }
   });
@@ -45,7 +45,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    const skipLink = page.locator('[data-testid="skip-link"]');
 
     // Check that skip link is visually hidden (sr-only or opacity-0)
     const isHidden = await skipLink.evaluate((el) => {
@@ -65,7 +65,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    const skipLink = page.locator('[data-testid="skip-link"]');
 
     // Focus the skip link
     await skipLink.focus();
@@ -89,7 +89,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    const skipLink = page.locator('[data-testid="skip-link"]');
     await skipLink.focus();
 
     const focusStyles = await skipLink.evaluate((el) => {
@@ -120,7 +120,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
       .locator('[data-testid="a11y-floating-button"]')
       .waitFor({ state: "visible", timeout: 15000 });
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    const skipLink = page.locator('[data-testid="skip-link"]');
     await skipLink.focus();
     await skipLink.click();
 
@@ -152,7 +152,7 @@ test.describe("Skip Link - WCAG 2.1 AA", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const skipLink = page.locator('a[href="#main-content"]');
+    const skipLink = page.locator('[data-testid="skip-link"]');
 
     // Click skip link
     await skipLink.click();
