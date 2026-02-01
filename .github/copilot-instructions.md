@@ -25,11 +25,12 @@
 ## Architecture Constraints
 
 - **Database**: PostgreSQL + Prisma. Parameterized queries only.
-- **State**: Zustand + REST. NO localStorage for user data.
-- **Auth**: Session-based `validateAuth()`. Admin via `ADMIN_EMAIL`.
-- **AI**: Azure OpenAI (primary), Ollama (fallback). Config in `src/lib/ai/providers.ts`.
+- **State**: Zustand + REST. NO localStorage for user data (ADR 0015).
+- **Auth**: Session-based `validateAuth()`. Admin via `ADMIN_EMAIL` (ADR 0075).
+- **AI**: Azure OpenAI (primary), Ollama (fallback). Config: `src/lib/ai/providers.ts`.
 - **Path aliases**: `@/lib/...`, `@/components/...`, `@/types`
-- **i18n**: next-intl, 5 locales. See `.claude/rules/i18n.md`.
+- **i18n**: next-intl, 5 locales (it/en/fr/de/es). See `.claude/rules/i18n.md`.
+- **Tiers**: Trial/Base/Pro. Logic in `src/lib/tier/` (ADR 0065).
 
 ## Quality Standards
 
@@ -52,14 +53,64 @@ Before modifying CSP: `npm run test:unit -- csp-validation`.
 - Database: no N+1 queries, use `$transaction` for batch ops
 - NO localStorage for user data (ADR 0015)
 
-## Verification
+## Available Scripts
+
+### Validation (use these, not raw npm commands)
 
 ```bash
-npm run ci:summary       # lint + typecheck + build (preferred)
-npm run ci:summary:full  # + unit tests
-npm run test:unit        # Vitest unit tests
-npm run test             # Playwright E2E (full suite)
+./scripts/ci-summary.sh          # lint + typecheck + build (default)
+./scripts/ci-summary.sh --quick  # lint + typecheck only (fast)
+./scripts/ci-summary.sh --full   # + unit tests
+./scripts/ci-summary.sh --lint   # lint only
+./scripts/ci-summary.sh --types  # typecheck only
+./scripts/ci-summary.sh --build  # build only
+./scripts/ci-summary.sh --unit   # unit tests only
+./scripts/health-check.sh        # full triage (~6 lines output)
 ```
+
+### Release Gates
+
+```bash
+./scripts/release-fast.sh        # fast gate: lint+typecheck+unit+smoke
+./scripts/release-gate.sh        # full 10/10 release gate
+./scripts/release-brutal.sh      # paranoid mode
+```
+
+### Plan Execution (local CLI only)
+
+```bash
+export PATH="$HOME/.claude/scripts:$PATH"
+plan-db.sh list-tasks {plan_id}         # see tasks to execute
+plan-db.sh update-task {id} in_progress # mark started
+plan-db.sh update-task {id} done "Summary" # mark complete
+git-digest.sh                           # git status (compact JSON)
+git-digest.sh --full                    # + file lists + recent commits
+thor-validate.sh {plan_id}              # Thor validation (lint+types+build+F-xx)
+diff-digest.sh main {branch}            # diff summary (compact)
+```
+
+### Testing
+
+```bash
+npm run test:unit                # Vitest unit tests
+npm run test:e2e:smoke           # Playwright smoke tests
+npm run test:e2e:i18n            # i18n tests
+npm run test:e2e:security        # security tests
+npm run test:e2e:compliance      # compliance tests
+npm run test:e2e:api             # API tests
+```
+
+## Workflow for Plan Tasks
+
+When executing a task from a plan:
+
+1. **Read task**: `plan-db.sh get-task {task_id}` for full details
+2. **Mark started**: `plan-db.sh update-task {id} in_progress "Started"`
+3. **TDD RED**: Write failing test based on task criteria
+4. **TDD GREEN**: Implement minimum code to pass
+5. **Validate**: `./scripts/ci-summary.sh --quick`
+6. **Mark done**: `plan-db.sh update-task {id} done "Summary"`
+7. **Wave complete?**: `thor-validate.sh {plan_id}` for full validation
 
 ## File Organization
 
@@ -70,3 +121,17 @@ npm run test             # Playwright E2E (full suite)
 - PDF generation: `src/lib/pdf-generator/`
 - RAG/embeddings: `src/lib/rag/`
 - Tier logic: `src/lib/tier/`
+- Proxy/CSP: `src/proxy.ts`
+- Accessibility profiles: `src/lib/accessibility/`
+
+## ADR References
+
+Key decisions documented in `docs/adr/`:
+
+- **ADR 0015**: No localStorage for user data
+- **ADR 0028**: PostgreSQL + pgvector
+- **ADR 0033**: RAG semantic search
+- **ADR 0065**: Tier system (Trial/Base/Pro)
+- **ADR 0075**: Session-based auth
+
+Check `docs/adr/` before making architectural decisions.
