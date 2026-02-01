@@ -10,7 +10,12 @@
  * Run: npx playwright test e2e/a11y-new-features.spec.ts
  */
 
-import { test, expect, toLocalePath } from "./fixtures/a11y-fixtures";
+import {
+  test,
+  expect,
+  toLocalePath,
+  openA11yPanel,
+} from "./fixtures/a11y-fixtures";
 
 // ============================================================================
 // SKIP LINK TESTS
@@ -182,12 +187,9 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     expect(controlsAttr).toBeNull();
 
     // Open panel — aria-controls should now reference the panel
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible({ timeout: 10000 });
+    const { button: openedButton } = await openA11yPanel(page);
 
-    const controlsAfter = await button.getAttribute("aria-controls");
+    const controlsAfter = await openedButton.getAttribute("aria-controls");
     expect(controlsAfter).toBe("a11y-quick-panel");
 
     const controlledElement = page.locator(`#${controlsAfter}`);
@@ -204,13 +206,10 @@ test.describe("A11y Floating Button - ARIA Attributes", () => {
     await expect(button).toHaveAttribute("aria-expanded", "false");
 
     // Click to open
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible({ timeout: 10000 });
+    const { button: openedButton } = await openA11yPanel(page);
 
     // Should be true
-    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(openedButton).toHaveAttribute("aria-expanded", "true");
   });
 
   test("button has proper accessibility label", async ({ page }) => {
@@ -244,22 +243,15 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    const { panel: dialog } = await openA11yPanel(page);
+    await expect(dialog).toBeVisible();
   });
 
   test("quick panel has aria-modal=true", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    const { panel: dialog } = await openA11yPanel(page);
     await expect(dialog).toHaveAttribute("aria-modal", "true");
   });
 
@@ -267,11 +259,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    const { panel: dialog } = await openA11yPanel(page);
 
     const labelledBy = await dialog.getAttribute("aria-labelledby");
 
@@ -286,11 +274,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await openA11yPanel(page);
 
     // Tab through multiple times
     for (let i = 0; i < 20; i++) {
@@ -313,11 +297,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    const { panel: dialog } = await openA11yPanel(page);
 
     await page.keyboard.press("Escape");
     await expect(dialog).not.toBeVisible({ timeout: 10000 });
@@ -327,11 +307,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const panel = page.locator('[data-testid="a11y-quick-panel"]');
-    await expect(panel).toBeVisible({ timeout: 10000 });
+    await openA11yPanel(page);
 
     const closeButton = page.locator('[data-testid="a11y-close-panel-btn"]');
     await expect(closeButton).toBeAttached();
@@ -344,11 +320,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await openA11yPanel(page);
 
     // Check for profile buttons with aria-label
     const profileButtons = page.locator(
@@ -365,11 +337,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await openA11yPanel(page);
 
     const toggles = page.locator('[role="dialog"] [role="switch"]');
     const count = await toggles.count();
@@ -387,11 +355,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
 
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    await openA11yPanel(page);
 
     const sections = page.locator('[role="dialog"] section');
     const count = await sections.count();
@@ -451,11 +415,7 @@ test.describe("A11y Features Integration", () => {
     const mainCountBefore = await page.locator("main").count();
 
     // Open accessibility panel
-    const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
-    await button.click();
-    const dialog = page.locator('[role="dialog"]');
-    await expect(dialog).toBeVisible({ timeout: 10000 });
+    const { panel: dialog } = await openA11yPanel(page);
 
     // Get main content element count after opening panel
     const mainCountAfter = await page.locator("main").count();

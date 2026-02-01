@@ -65,4 +65,32 @@ export const test = base.extend({
   },
 });
 
+/**
+ * Open the a11y quick panel reliably in CI.
+ *
+ * SSR renders the floating button before React hydrates the onClick handler.
+ * A single click may fire before hydration completes, leaving the panel closed.
+ * This helper retries the click once if the panel doesn't appear promptly.
+ */
+export async function openA11yPanel(page: import("@playwright/test").Page) {
+  const button = page.locator('[data-testid="a11y-floating-button"]');
+  await expect(button).toBeVisible({ timeout: 10000 });
+  await button.click();
+
+  const panel = page.locator('[data-testid="a11y-quick-panel"]');
+
+  // First attempt: wait 3s for panel. If not visible, click again (hydration lag).
+  const appeared = await panel
+    .waitFor({ state: "visible", timeout: 3000 })
+    .then(() => true)
+    .catch(() => false);
+
+  if (!appeared) {
+    await button.click();
+    await expect(panel).toBeVisible({ timeout: 10000 });
+  }
+
+  return { button, panel };
+}
+
 export { expect };
