@@ -1,7 +1,11 @@
 import { render } from "@testing-library/react";
-import { expect, describe, it } from "vitest";
+import { expect, describe, it, vi } from "vitest";
 import { UsersTableRow } from "../users/users-table-row";
 import { PendingActions } from "../invites/pending-actions";
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+}));
 
 describe("Admin Button Groups - Mobile Responsive", () => {
   describe("UsersTableRow Button Group", () => {

@@ -230,9 +230,9 @@
       "trashEmpty": "Papelera vacía",
       "bulkActions": {
         "changeTier": "Cambiar nivel",
-        "confirmDelete": "Confirmar eliminación",
-        "confirmDisable": "Confirmar deshabilitación",
-        "confirmEnable": "Confirmar habilitación",
+        "confirmDelete": "¿Está seguro de que desea eliminar {count} usuarios?",
+        "confirmDisable": "¿Está seguro de que desea deshabilitar {count} usuarios?",
+        "confirmEnable": "¿Está seguro de que desea habilitar {count} usuarios?",
         "delete": "Eliminar",
         "disable": "Deshabilitar",
         "enable": "Habilitar",
