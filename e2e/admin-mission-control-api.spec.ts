@@ -25,8 +25,13 @@ const MISSION_CONTROL_APIS = [
 
 test.describe("Mission Control API - Authentication", () => {
   test("all mission control APIs return 401 for unauthenticated requests", async ({
-    page,
+    browser,
+    baseURL,
   }) => {
+    // Create a fresh context with NO cookies to ensure truly unauthenticated requests
+    const context = await browser.newContext({ storageState: undefined });
+    const page = await context.newPage();
+
     // Mock ToS API (required by project rules)
     await page.route("**/api/tos", (route) => {
       route.fulfill({
@@ -38,7 +43,7 @@ test.describe("Mission Control API - Authentication", () => {
 
     // Test each API without authentication
     for (const api of MISSION_CONTROL_APIS) {
-      const response = await page.request.get(api.path);
+      const response = await page.request.get(`${baseURL}${api.path}`);
       expect(
         response.status(),
         `${api.path} should return 401 for unauthenticated request`,
@@ -48,6 +53,8 @@ test.describe("Mission Control API - Authentication", () => {
       expect(data.error).toBeDefined();
       expect(data.error.toLowerCase()).toContain("unauthorized");
     }
+
+    await context.close();
   });
 });
 
