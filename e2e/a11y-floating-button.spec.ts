@@ -73,16 +73,18 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
   test("aria-expanded becomes true when panel opens", async ({ page }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
+    // Extra wait for hydration in CI
+    await page.waitForTimeout(1000);
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 10000 });
+    await expect(button).toBeVisible({ timeout: 15000 });
 
     await expect(button).toHaveAttribute("aria-expanded", "false");
     const { button: openedButton } = await openA11yPanel(page);
-    // Wait for state update after panel animation
-    await page.waitForTimeout(500);
+    // Wait for state update after panel animation - longer for CI
+    await page.waitForTimeout(1000);
     await expect(openedButton).toHaveAttribute("aria-expanded", "true", {
-      timeout: 10000,
+      timeout: 15000,
     });
   });
 

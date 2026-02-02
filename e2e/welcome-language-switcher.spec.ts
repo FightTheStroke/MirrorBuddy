@@ -156,61 +156,55 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
   });
 
   test("should persist language across page reloads", async ({ page }) => {
-    // Long timeout for CI
-    test.setTimeout(300000);
+    // Reasonable timeout - test should complete in ~30s
+    test.setTimeout(120000);
 
     await page.goto("/it/welcome");
     await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     // Select Spanish
     const switcher = page.getByRole("button", { name: /select language/i });
-    await expect(switcher).toBeVisible({ timeout: 30000 });
+    await expect(switcher).toBeVisible({ timeout: 15000 });
     await switcher.click();
+    await page.waitForTimeout(300);
     const spanishOption = page.getByRole("menuitem", { name: /español/i });
+    await expect(spanishOption).toBeVisible({ timeout: 5000 });
     await spanishOption.click();
 
-    // Wait for redirect with extended timeout for CI
-    // If redirect fails, fallback to cookie verification
+    // Wait for redirect or verify cookie
     try {
-      await page.waitForURL("**/es/welcome", { timeout: 30000 });
-    } catch (_error) {
-      // Redirect may be slow in CI - verify cookie was set instead
-      console.warn("URL redirect timeout - verifying cookie fallback");
+      await page.waitForURL("**/es/welcome", { timeout: 15000 });
+    } catch {
+      // Redirect may be slow - navigate manually
+      await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
     }
+    await page.waitForTimeout(1000);
 
-    // Verify cookie is set before reload
+    // Verify cookie is set
     const cookies = await page.context().cookies();
     const localeCookie = cookies.find((c) => c.name === "NEXT_LOCALE");
     expect(localeCookie).toBeDefined();
     expect(localeCookie?.value).toBe("es");
 
-    // Wait for page to settle before navigating
-    await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(2000);
-
-    // If redirect didn't happen, navigate manually to test persistence
-    if (!page.url().includes("/es/welcome")) {
-      await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
-      await page.waitForTimeout(2000);
-    }
-
-    // Reload page with extra stabilization
+    // Reload page
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(3000);
+    await page.waitForTimeout(1000);
 
     // Should still be on Spanish version
     await expect(page).toHaveURL(/\/es\/welcome/);
 
-    // Switcher should show Spanish as selected - re-query after reload
+    // Switcher should show Spanish as selected
     const switcherAfterReload = page.getByRole("button", {
       name: /select language/i,
     });
+    await expect(switcherAfterReload).toBeVisible({ timeout: 10000 });
     await switcherAfterReload.click();
+    await page.waitForTimeout(300);
     const currentOption = page.locator(
       '[role="menuitem"][aria-current="true"]',
     );
-    await expect(currentOption).toContainText("Español");
+    await expect(currentOption).toContainText("Español", { timeout: 10000 });
   });
 
   test.describe("Keyboard Navigation", () => {

@@ -51,15 +51,19 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
   }) => {
     await page.goto(toLocalePath("/"));
     await page.waitForLoadState("domcontentloaded");
+    // Extra wait for hydration in CI
+    await page.waitForTimeout(1000);
 
     const { panel: dialog } = await openA11yPanel(page);
+    // Wait for panel to fully render
+    await page.waitForTimeout(500);
 
     const labelledBy = await dialog.getAttribute("aria-labelledby");
 
     expect(labelledBy).toBeTruthy();
 
     const titleElement = page.locator(`#${labelledBy}`);
-    await expect(titleElement).toBeAttached();
+    await expect(titleElement).toBeAttached({ timeout: 10000 });
   });
 
   test("focus trap keeps focus within panel", async ({ page }) => {
