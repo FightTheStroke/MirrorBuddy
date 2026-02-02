@@ -70,12 +70,8 @@ const WAIT_FOR_NETWORK_IDLE = "domcontentloaded";
 // ============================================================================
 
 test.describe("WCAG 2.1 AA Compliance - All Locales", () => {
-  // Skip in CI - this test is too slow and times out
-  // WCAG compliance is verified by Accessibility Tests job separately
-  test.skip(
-    !!process.env.CI,
-    "Skipped in CI - too slow, covered by Accessibility Tests job",
-  );
+  // Long timeout for axe-core analysis across multiple pages
+  test.setTimeout(600000); // 10 minutes per locale test
 
   test.beforeEach(async ({ localePage }) => {
     await setupTosModalBypass(localePage.page);
@@ -92,7 +88,7 @@ test.describe("WCAG 2.1 AA Compliance - All Locales", () => {
         // Navigate to page in current locale
         await localePage.goto(page.path);
         await localePage.page.waitForLoadState(WAIT_FOR_NETWORK_IDLE);
-        await localePage.page.waitForTimeout(500);
+        await localePage.page.waitForTimeout(1000); // Extra wait for CI
 
         // Run axe-core accessibility audit
         const results = await new AxeBuilder({ page: localePage.page })

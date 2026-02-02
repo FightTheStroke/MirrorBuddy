@@ -566,46 +566,45 @@ test.describe("Instant Access - Profile Activation", () => {
 
 test.describe("Instant Access - Cookie Persistence", () => {
   test("settings persist after page refresh", async ({ page }) => {
-    // Skip in CI where cookie persistence and page reload are unreliable
-    test.skip(
-      !!process.env.CI,
-      "Cookie persistence tests are flaky in CI environment",
-    );
+    // Long timeout for CI
+    test.setTimeout(600000); // 10 minutes
 
     await page.goto(toLocalePath("/welcome"));
     await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000); // Extra wait for hydration in CI
 
     const button = page.locator('[data-testid="a11y-floating-button"]');
-    await expect(button).toBeVisible({ timeout: 15000 });
+    await expect(button).toBeVisible({ timeout: 30000 });
     await button.click();
 
     const panel = page.locator('[data-testid="a11y-quick-panel"]');
     const appeared = await panel
-      .waitFor({ state: "visible", timeout: 5000 })
+      .waitFor({ state: "visible", timeout: 10000 })
       .then(() => true)
       .catch(() => false);
 
     if (!appeared) {
+      // Retry click if panel didn't appear (hydration issue)
       await button.click();
-      await expect(panel).toBeVisible({ timeout: 10000 });
+      await expect(panel).toBeVisible({ timeout: 30000 });
     }
 
     const dyslexiaBtn = page.locator('button:has-text("Dislessia")');
-    await expect(dyslexiaBtn).toBeVisible({ timeout: 5000 });
+    await expect(dyslexiaBtn).toBeVisible({ timeout: 30000 });
     await dyslexiaBtn.click();
 
     // Wait for cookie to be set
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
 
     // Verify cookie exists via context
     const cookies = await page.context().cookies();
     const a11yCookie = cookies.find((c) => c.name === "mirrorbuddy-a11y");
-    expect(a11yCookie).toBeDefined();
+    expect(a11yCookie, "mirrorbuddy-a11y cookie should be set").toBeDefined();
 
     // Reload page
     await page.reload({ waitUntil: "domcontentloaded" });
-    await page.waitForTimeout(2000);
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(3000); // Extra wait after reload
 
     // Verify font is applied after reload
     const body = page.locator("body");
@@ -614,7 +613,7 @@ test.describe("Instant Access - Cookie Persistence", () => {
         (el) => window.getComputedStyle(el).fontFamily,
       );
       expect(fontFamily.includes("OpenDyslexic")).toBe(true);
-    }).toPass({ timeout: 15000 });
+    }).toPass({ timeout: 60000 });
   });
 
   test("a11y cookie is set with correct name", async ({ page }) => {
