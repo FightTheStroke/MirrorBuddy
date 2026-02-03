@@ -31,6 +31,10 @@ vi.mock("@/lib/rate-limit", () => ({
   RATE_LIMITS: { CONTACT_FORM: { maxRequests: 5, windowMs: 3600000 } },
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 vi.mock("@/lib/trial/trial-service", () => ({
   updateTrialEmail: vi.fn(),
   requestTrialEmailVerification: vi.fn(),

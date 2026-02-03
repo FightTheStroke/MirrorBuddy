@@ -61,6 +61,10 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 import { prisma } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/password";
 import { signCookieValue } from "@/lib/auth/cookie-signing";
