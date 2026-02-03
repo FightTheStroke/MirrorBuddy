@@ -30,7 +30,7 @@ export function PendingActions({
       {invites.map((invite) => (
         <div
           key={invite.id}
-          className="flex items-center justify-between p-3 bg-card rounded-lg border border-border"
+          className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between p-3 bg-card rounded-lg border border-border"
         >
           <span className="text-sm text-foreground">
             {invite.name} ({invite.email})
@@ -40,7 +40,7 @@ export function PendingActions({
               onClick={() => onApprove(invite.id)}
               disabled={processingId === invite.id}
               size="sm"
-              className="gap-1"
+              className="gap-1 h-11 px-3"
             >
               {processingId === invite.id ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -54,7 +54,7 @@ export function PendingActions({
               disabled={processingId === invite.id}
               variant="outline"
               size="sm"
-              className="gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+              className="gap-1 h-11 px-3 text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <X className="w-4 h-4" />
               {t("reject")}
