@@ -410,6 +410,17 @@
       "topicsLabel": "Topics Label"
     },
     "parentDashboard": {
+      "error": {
+        "title": "Erreur de chargement",
+        "message": "Une erreur s'est produite lors du chargement du tableau de bord. Veuillez réessayer plus tard.",
+        "backHome": "Retour à l'accueil"
+      },
+      "consent": {
+        "title": "Consentement requis",
+        "description": "Pour consulter les progrès et observations de votre élève, le consentement est requis.",
+        "grantButton": "Accorder le consentement"
+      },
+      "generateProfile": "Générer le profil",
       "activity": {
         "ariaLabel": "Aria label",
         "mirrorBucks": "Mirror bucks",

@@ -205,6 +205,7 @@ export default function Home() {
       <HomeHeader
         sidebarOpen={sidebarOpen}
         onMenuClick={() => setSidebarOpen(true)}
+        userName={studentProfile?.name}
         seasonLevel={seasonLevel}
         mbInLevel={mbInLevel}
         mbNeeded={MB_PER_LEVEL}

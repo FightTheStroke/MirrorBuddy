@@ -14,6 +14,7 @@
     },
     "header": {
       "openMenu": "Abrir menú",
+      "greeting": "Hola",
       "mirrorBucksShort": "MB",
       "streak": "Racha",
       "sessionsThisWeek": "Sesiones esta semana",

@@ -391,11 +391,11 @@
       "reviewAndModifyConsents": "Review And Modify Consents"
     },
     "parents": {
-      "title": "Parents Area",
-      "description": "Access the parent dashboard to monitor your child's progress and activities safely and respectfully of privacy (GDPR).",
-      "consentRequired": "Consent required:",
-      "consentDescription": "The parent dashboard requires consent from both the parent and the student to comply with GDPR regulations on minor data protection.",
-      "openDashboard": "Open Parent Dashboard"
+      "title": "Espace Parents",
+      "description": "Accédez au tableau de bord parental pour suivre les progrès et les activités de votre enfant en toute sécurité et dans le respect de la vie privée (RGPD).",
+      "consentRequired": "Consentement requis :",
+      "consentDescription": "Le tableau de bord parental nécessite le consentement du parent et de l'élève pour se conformer aux réglementations RGPD sur la protection des données des mineurs.",
+      "openDashboard": "Ouvrir le Tableau de Bord Parental"
     },
     "integrations": {
       "title": "Integrations",

@@ -230,7 +230,7 @@
       "trashEmpty": "Trash empty",
       "bulkActions": {
         "changeTier": "Change Tier",
-        "confirmDelete": "Confirm Delete",
+        "confirmDelete": "Êtes-vous sûr de vouloir supprimer {count} utilisateurs?",
         "confirmDisable": "Confirm Disable",
         "confirmEnable": "Confirm Enable",
         "delete": "Supprimer",

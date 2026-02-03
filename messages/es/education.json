@@ -410,6 +410,17 @@
       "topicsLabel": "Topics Label"
     },
     "parentDashboard": {
+      "error": {
+        "title": "Error de carga",
+        "message": "Se produjo un error al cargar el panel de control. Inténtelo de nuevo más tarde.",
+        "backHome": "Volver al inicio"
+      },
+      "consent": {
+        "title": "Consentimiento requerido",
+        "description": "Para ver el progreso y las observaciones de su estudiante, se requiere consentimiento.",
+        "grantButton": "Otorgar consentimiento"
+      },
+      "generateProfile": "Generar perfil",
       "activity": {
         "ariaLabel": "Aria label",
         "mirrorBucks": "Mirror bucks",

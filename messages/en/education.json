@@ -410,6 +410,17 @@
       "topicsLabel": "Topics Label"
     },
     "parentDashboard": {
+      "error": {
+        "title": "Loading error",
+        "message": "An error occurred while loading the dashboard. Please try again later.",
+        "backHome": "Back to home"
+      },
+      "consent": {
+        "title": "Consent required",
+        "description": "To view your student's progress and observations, consent is required.",
+        "grantButton": "Grant consent"
+      },
+      "generateProfile": "Generate profile",
       "activity": {
         "ariaLabel": "Aria label",
         "mirrorBucks": "Mirror bucks",

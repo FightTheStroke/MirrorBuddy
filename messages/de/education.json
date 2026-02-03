@@ -410,6 +410,17 @@
       "topicsLabel": "Topics Label"
     },
     "parentDashboard": {
+      "error": {
+        "title": "Ladefehler",
+        "message": "Beim Laden des Dashboards ist ein Fehler aufgetreten. Bitte versuchen Sie es später erneut.",
+        "backHome": "Zurück zur Startseite"
+      },
+      "consent": {
+        "title": "Zustimmung erforderlich",
+        "description": "Um die Fortschritte und Beobachtungen Ihres Schülers zu sehen, ist eine Zustimmung erforderlich.",
+        "grantButton": "Zustimmung erteilen"
+      },
+      "generateProfile": "Profil generieren",
       "activity": {
         "ariaLabel": "Aria label",
         "mirrorBucks": "Mirror bucks",
