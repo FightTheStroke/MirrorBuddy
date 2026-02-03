@@ -3,6 +3,7 @@
  * @brief Webcam header component
  */
 
+import { useTranslations } from "next-intl";
 import { Camera, X, ChevronDown, Smartphone, Loader2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -41,6 +42,8 @@ export function WebcamHeader({
   onClose,
   getCameraIcon,
 }: WebcamHeaderProps) {
+  const t = useTranslations("tools.webcam");
+
   return (
     <div className="bg-slate-900 p-4 border-b border-slate-700 flex items-center justify-between gap-2">
       <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -61,8 +64,9 @@ export function WebcamHeader({
             variant="outline"
             size="sm"
             onClick={onToggleMenu}
-            className="border-slate-600 bg-slate-800 text-white hover:bg-slate-700 text-sm"
+            className="border-slate-600 bg-slate-800 text-white hover:bg-slate-700 text-sm focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             disabled={isSwitchingCamera}
+            aria-label="Select camera"
           >
             {isSwitchingCamera ? (
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -86,7 +90,7 @@ export function WebcamHeader({
                 className="absolute right-0 top-full mt-2 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg overflow-hidden z-50"
               >
                 <div className="p-2 text-xs text-slate-400 border-b border-slate-700">
-                  Seleziona fotocamera
+                  {t("selectCamera")}
                 </div>
                 {availableCameras.map((camera) => (
                   <button
@@ -117,8 +121,8 @@ export function WebcamHeader({
         variant="ghost"
         size="icon"
         onClick={onClose}
-        className="text-white hover:bg-slate-800 flex-shrink-0"
-        aria-label="Chiudi fotocamera"
+        className="text-white hover:bg-slate-800 flex-shrink-0 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+        aria-label="Close camera"
       >
         <X className="w-5 h-5" />
       </Button>

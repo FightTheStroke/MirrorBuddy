@@ -3,6 +3,7 @@
  * @brief Webcam error display component
  */
 
+import { useTranslations } from "next-intl";
 import { AlertCircle, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { ErrorType } from "../constants";
@@ -20,6 +21,8 @@ export function WebcamError({
   onRetry,
   onClose,
 }: WebcamErrorProps) {
+  const t = useTranslations("tools.webcam");
+
   return (
     <div className="absolute inset-0 flex items-center justify-center">
       <div className="text-center p-6 max-w-md">
@@ -30,12 +33,12 @@ export function WebcamError({
 
         {errorType === "permission" && (
           <div className="text-sm text-slate-500 dark:text-slate-400 mb-4 space-y-1">
-            <p>Per abilitare la fotocamera:</p>
+            <p>{t("errors.howToEnable")}</p>
             <ol className="list-decimal list-inside text-left">
-              <li>Clicca l&apos;icona 🔒 nella barra degli indirizzi</li>
-              <li>Trova &quot;Fotocamera&quot; o &quot;Camera&quot;</li>
-              <li>Seleziona &quot;Consenti&quot;</li>
-              <li>Ricarica la pagina</li>
+              <li>{t("errors.permission.instruction1")}</li>
+              <li>{t("errors.permission.instruction2")}</li>
+              <li>{t("errors.permission.instruction3")}</li>
+              <li>{t("errors.permission.instruction4")}</li>
             </ol>
           </div>
         )}
@@ -47,14 +50,14 @@ export function WebcamError({
             className="border-slate-300 dark:border-slate-600"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
-            Riprova
+            {t("errors.retry")}
           </Button>
           <Button
             variant="outline"
             onClick={onClose}
             className="border-slate-300 dark:border-slate-600"
           >
-            Chiudi
+            {t("errors.close")}
           </Button>
         </div>
       </div>

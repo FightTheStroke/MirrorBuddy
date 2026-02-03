@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { Smartphone, Monitor } from "lucide-react";
 import { useWebcamCapture } from "./webcam-capture/hooks/use-webcam-capture";
@@ -61,12 +62,40 @@ export function WebcamCapture({
     return <Monitor className="w-4 h-4 text-slate-400" />;
   };
 
+  const dialogRef = useRef<HTMLDivElement>(null);
+
+  // Keyboard navigation: Escape to close, Enter to capture
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      } else if (e.key === "Enter" && !capturedImage && !isLoading && !error) {
+        handleCapture();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [capturedImage, isLoading, error, handleCapture, onClose]);
+
+  // Focus trap: focus dialog on mount
+  useEffect(() => {
+    const element = dialogRef.current;
+    if (element && "focus" in element && typeof element.focus === "function") {
+      element.focus();
+    }
+  }, []);
+
   return (
     <motion.div
+      ref={dialogRef}
+      role="dialog"
+      aria-label={`${purpose}${instructions ? `: ${instructions}` : ""}`}
+      tabIndex={-1}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex flex-col bg-black h-screen"
+      className="fixed inset-0 z-[60] flex flex-col bg-black h-screen outline-none overflow-hidden"
     >
       <WebcamHeader
         purpose={purpose}
@@ -85,7 +114,7 @@ export function WebcamCapture({
         getCameraIcon={getCameraIcon}
       />
 
-      <div className="flex-1 relative">
+      <div className="flex-1 relative min-h-0 sm:min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
         <WebcamPreview
           videoRef={videoRef}
           canvasRef={canvasRef}

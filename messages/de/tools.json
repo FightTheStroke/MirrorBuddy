@@ -56,7 +56,8 @@
         "retry": "[TRANSLATE] Riprova",
         "close": "[TRANSLATE] Chiudi",
         "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
-      }
+      },
+      "selectCamera": "[TRANSLATE] Seleziona fotocamera"
     },
     "homework": {
       "label": "Hausaufgabenhilfe",
