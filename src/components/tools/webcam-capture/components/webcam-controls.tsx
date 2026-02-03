@@ -69,7 +69,7 @@ export function WebcamControls({
               onClick={onCapture}
               disabled={isLoading || !!error || countdown !== null}
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 px-8 h-14 text-lg"
+              className="bg-blue-600 hover:bg-blue-700 px-8 h-16 min-h-[64px] text-lg"
             >
               <Camera className="w-6 h-6 mr-2" />
               {countdown !== null ? t("inProgress") : t("takePhoto")}
@@ -82,7 +82,7 @@ export function WebcamControls({
             onClick={onRetake}
             variant="outline"
             size="lg"
-            className="border-slate-300 dark:border-slate-600 h-14 px-6"
+            className="border-slate-300 dark:border-slate-600 h-16 min-h-[64px] px-6 text-base"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
             {t("retake")}
@@ -90,7 +90,7 @@ export function WebcamControls({
           <Button
             onClick={onConfirm}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 px-8 h-14"
+            className="bg-green-600 hover:bg-green-700 px-8 h-16 min-h-[64px] text-base shadow-lg"
           >
             <Check className="w-5 h-5 mr-2" />
             {t("confirm")}

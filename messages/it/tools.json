@@ -27,7 +27,43 @@
       "startingCamera": "Avvio fotocamera",
       "switchCamera": "Cambia fotocamera",
       "switchingCamera": "Cambio fotocamera",
-      "takePhoto": "Scatta foto"
+      "takePhoto": "Scatta foto",
+      "errors": {
+        "permission": {
+          "title": "Permesso fotocamera negato",
+          "message": "Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
+          "instruction1": "Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
+          "instruction2": "Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
+          "instruction3": "Seleziona \"Consenti\"",
+          "instruction4": "Ricarica la pagina o premi il pulsante Riprova"
+        },
+        "unavailable": {
+          "title": "Fotocamera non disponibile",
+          "message": "Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+        },
+        "inUse": {
+          "title": "Fotocamera in uso",
+          "message": "La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app che potrebbero utilizzarla e riprova."
+        },
+        "timeout": {
+          "title": "Timeout fotocamera",
+          "message": "La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+        },
+        "generic": {
+          "title": "Errore fotocamera",
+          "message": "Impossibile accedere alla fotocamera. Verifica le impostazioni e riprova."
+        },
+        "retry": "Riprova",
+        "close": "Chiudi",
+        "howToEnable": "Come abilitare la fotocamera:"
+      }
+    },
+    "webcamStandalone": {
+      "savedTitle": "Foto salvata",
+      "saveSuccess": "La foto è stata salvata nell'archivio",
+      "saveError": "Errore nel salvataggio della foto",
+      "purpose": "Scatta una foto",
+      "instructions": "Inquadra il documento o la lavagna e scatta"
     },
     "homework": {
       "label": "Compiti",

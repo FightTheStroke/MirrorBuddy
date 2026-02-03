@@ -69,6 +69,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored RAG `$queryRawUnsafe` to type-safe `$queryRaw` with Prisma.sql template literals in hybrid-retrieval.ts
 - Migrated 16 mindmap wrapper consumers to direct subdirectory imports
 
+#### Webcam Fix (Plan 117)
+
+##### W1: Webcam Core
+
+- Changed: WebcamCapture refactored from Card modal to fullscreen overlay (fixed inset-0)
+- Changed: webcam-header redesigned with app design system (bg-slate-900, text-white)
+- Changed: webcam-controls with large capture button (w-16 h-16), clear retry/confirm
+- Changed: Default to rear camera (environment) on mobile devices
+- Changed: webcam-error with clear permission denied messages and instructions
+- Changed: MaestroSessionWebcam simplified (removed max-w-lg wrapper)
+- Added: webcam-standalone tool for direct photo capture without maestro selection
+- Added: Dual webcam flow in Astuccio (with maestro / standalone)
+
 ### Removed
 
 #### Tech Debt Cleanup (Plan 112)

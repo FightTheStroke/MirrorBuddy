@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Card } from "@/components/ui/card";
 import { Smartphone, Monitor } from "lucide-react";
 import { useWebcamCapture } from "./webcam-capture/hooks/use-webcam-capture";
 import { WebcamHeader } from "./webcam-capture/components/webcam-header";
@@ -67,26 +66,26 @@ export function WebcamCapture({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 dark:bg-black/80 backdrop-blur-sm p-2 sm:p-4"
+      className="fixed inset-0 z-[60] flex flex-col bg-black h-screen"
     >
-      <Card className="w-full max-w-4xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white overflow-hidden">
-        <WebcamHeader
-          purpose={purpose}
-          instructions={instructions}
-          availableCameras={availableCameras}
-          selectedCameraId={selectedCameraId}
-          activeCameraLabel={activeCameraLabel}
-          currentCameraName={currentCameraName}
-          showCameraMenu={showCameraMenu}
-          isSwitchingCamera={isSwitchingCamera}
-          capturedImage={capturedImage}
-          error={error}
-          onToggleMenu={() => setShowCameraMenu(!showCameraMenu)}
-          onSwitchCamera={switchCamera}
-          onClose={onClose}
-          getCameraIcon={getCameraIcon}
-        />
+      <WebcamHeader
+        purpose={purpose}
+        instructions={instructions}
+        availableCameras={availableCameras}
+        selectedCameraId={selectedCameraId}
+        activeCameraLabel={activeCameraLabel}
+        currentCameraName={currentCameraName}
+        showCameraMenu={showCameraMenu}
+        isSwitchingCamera={isSwitchingCamera}
+        capturedImage={capturedImage}
+        error={error}
+        onToggleMenu={() => setShowCameraMenu(!showCameraMenu)}
+        onSwitchCamera={switchCamera}
+        onClose={onClose}
+        getCameraIcon={getCameraIcon}
+      />
 
+      <div className="flex-1 relative">
         <WebcamPreview
           videoRef={videoRef}
           canvasRef={canvasRef}
@@ -105,20 +104,20 @@ export function WebcamCapture({
           onCancelCountdown={handleCancelCountdown}
           onToggleFrontBack={toggleFrontBack}
         />
+      </div>
 
-        <WebcamControls
-          showTimer={showTimer}
-          selectedTimer={selectedTimer}
-          onTimerChange={setSelectedTimer}
-          countdown={countdown}
-          capturedImage={capturedImage}
-          isLoading={isLoading}
-          error={error}
-          onCapture={handleCapture}
-          onRetake={handleRetake}
-          onConfirm={handleConfirm}
-        />
-      </Card>
+      <WebcamControls
+        showTimer={showTimer}
+        selectedTimer={selectedTimer}
+        onTimerChange={setSelectedTimer}
+        countdown={countdown}
+        capturedImage={capturedImage}
+        isLoading={isLoading}
+        error={error}
+        onCapture={handleCapture}
+        onRetake={handleRetake}
+        onConfirm={handleConfirm}
+      />
     </motion.div>
   );
 }
