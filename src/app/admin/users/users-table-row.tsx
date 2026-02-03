@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { RouterContext } from "next/dist/shared/lib/router-context.shared-runtime";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { TableCell } from "@/components/ui/table";
@@ -102,101 +103,105 @@ export function UsersTableRow({
 
   return (
     <>
-      <tr
-        className="border-b hover:bg-accent cursor-pointer"
-        onClick={handleRowClick}
-      >
-        <TableCell className="px-3 py-3 w-10">
-          <input
-            type="checkbox"
-            checked={isSelected}
-            onChange={onSelect}
-            className="rounded"
-          />
-        </TableCell>
-        <TableCell className="font-medium">{user.username || "—"}</TableCell>
-        <TableCell className="text-muted-foreground">
-          {user.email || "—"}
-        </TableCell>
-        <TableCell>
-          <StatusBadge variant={user.role === "ADMIN" ? "warning" : "neutral"}>
-            {user.role}
-          </StatusBadge>
-        </TableCell>
-        <TableCell>
-          <StatusBadge variant={tierDisplay.variant}>
-            {tierDisplay.name}
-          </StatusBadge>
-        </TableCell>
-        <TableCell>
-          <StatusBadge variant={user.disabled ? "disabled" : "active"}>
-            {user.disabled ? "Disabled" : "Active"}
-          </StatusBadge>
-        </TableCell>
-        <TableCell className="text-muted-foreground">
-          {new Date(user.createdAt).toLocaleDateString()}
-        </TableCell>
-        <TableCell>
-          <div className="flex flex-wrap items-center gap-1 sm:gap-2">
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowTierModal(true)}
-              disabled={isLoading}
-              className="text-xs"
-              aria-label="Change tier"
-              title="Change tier"
+      <RouterContext.Provider value={router}>
+        <tr
+          className="border-b hover:bg-accent cursor-pointer"
+          onClick={handleRowClick}
+        >
+          <TableCell className="px-3 py-3 w-10">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              onChange={onSelect}
+              className="rounded"
+            />
+          </TableCell>
+          <TableCell className="font-medium">{user.username || "—"}</TableCell>
+          <TableCell className="text-muted-foreground">
+            {user.email || "—"}
+          </TableCell>
+          <TableCell>
+            <StatusBadge
+              variant={user.role === "ADMIN" ? "warning" : "neutral"}
             >
-              <RefreshCw className="w-3 h-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setShowLimitModal(true)}
-              disabled={isLoading || !user.subscription}
-              className="text-xs"
-              aria-label="Override limits"
-              title="Override limits"
-            >
-              <Settings className="w-3 h-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onToggle}
-              disabled={isLoading}
-              className="text-xs"
-              aria-label={user.disabled ? "Enable user" : "Disable user"}
-            >
-              {user.disabled ? (
-                <Unlock className="w-3 h-3" />
-              ) : (
-                <Lock className="w-3 h-3" />
-              )}
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onDelete}
-              disabled={isLoading}
-              className="text-xs text-red-600"
-              aria-label="Delete user"
-            >
-              <Trash2 className="w-3 h-3" />
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => router.push(`/admin/users/${user.id}`)}
-              className="text-xs"
-              aria-label="View user details"
-              title="View details"
-            >
-              <ExternalLink className="w-3 h-3" />
-            </Button>
-          </div>
-        </TableCell>
-      </tr>
+              {user.role}
+            </StatusBadge>
+          </TableCell>
+          <TableCell>
+            <StatusBadge variant={tierDisplay.variant}>
+              {tierDisplay.name}
+            </StatusBadge>
+          </TableCell>
+          <TableCell>
+            <StatusBadge variant={user.disabled ? "disabled" : "active"}>
+              {user.disabled ? "Disabled" : "Active"}
+            </StatusBadge>
+          </TableCell>
+          <TableCell className="text-muted-foreground">
+            {new Date(user.createdAt).toLocaleDateString()}
+          </TableCell>
+          <TableCell>
+            <div className="flex flex-wrap items-center gap-1 sm:gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowTierModal(true)}
+                disabled={isLoading}
+                className="text-xs h-11 px-3"
+                aria-label="Change tier"
+                title="Change tier"
+              >
+                <RefreshCw className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowLimitModal(true)}
+                disabled={isLoading || !user.subscription}
+                className="text-xs h-11 px-3"
+                aria-label="Override limits"
+                title="Override limits"
+              >
+                <Settings className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onToggle}
+                disabled={isLoading}
+                className="text-xs h-11 px-3"
+                aria-label={user.disabled ? "Enable user" : "Disable user"}
+              >
+                {user.disabled ? (
+                  <Unlock className="w-3 h-3" />
+                ) : (
+                  <Lock className="w-3 h-3" />
+                )}
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={onDelete}
+                disabled={isLoading}
+                className="text-xs h-11 px-3 text-red-600"
+                aria-label="Delete user"
+              >
+                <Trash2 className="w-3 h-3" />
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => router.push(`/admin/users/${user.id}`)}
+                className="text-xs h-11 px-3"
+                aria-label="View user details"
+                title="View details"
+              >
+                <ExternalLink className="w-3 h-3" />
+              </Button>
+            </div>
+          </TableCell>
+        </tr>
+      </RouterContext.Provider>
 
       <TierChangeModal
         isOpen={showTierModal}

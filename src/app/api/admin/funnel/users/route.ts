@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/db";
+import { prisma, Prisma } from "@/lib/db";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { FunnelStage } from "@/lib/funnel/constants";
 
@@ -72,28 +72,22 @@ export const GET = pipe(
   const stage = url.searchParams.get("stage") as FunnelStage | null;
   const search = url.searchParams.get("search");
 
-  // Get latest event per user/visitor to determine current stage
-  // Using raw query for performance with DISTINCT ON
-  const latestEventsQuery = stage
-    ? `SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
-         "visitorId", "userId", "stage", "createdAt"
-       FROM "FunnelEvent"
-       WHERE "isTestData" = false AND "stage" = $1
-       ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC`
-    : `SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
-         "visitorId", "userId", "stage", "createdAt"
-       FROM "FunnelEvent"
-       WHERE "isTestData" = false
-       ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC`;
-
-  const latestEvents = await prisma.$queryRawUnsafe<
+  // Get latest event per user/visitor to determine current stage using parameterized query
+  const latestEvents = await prisma.$queryRaw<
     Array<{
       visitorId: string | null;
       userId: string | null;
       stage: string;
       createdAt: Date;
     }>
-  >(latestEventsQuery, ...(stage ? [stage] : []));
+  >`
+    SELECT DISTINCT ON (COALESCE("userId", "visitorId"))
+      "visitorId", "userId", "stage", "createdAt"
+    FROM "FunnelEvent"
+    WHERE "isTestData" = false
+    ${stage ? Prisma.raw(`AND "stage" = ${stage}`) : Prisma.empty}
+    ORDER BY COALESCE("userId", "visitorId"), "createdAt" DESC
+  `;
 
   // Get event counts per user
   const eventCounts = await prisma.funnelEvent.groupBy({
