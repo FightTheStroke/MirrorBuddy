@@ -69,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored RAG `$queryRawUnsafe` to type-safe `$queryRaw` with Prisma.sql template literals in hybrid-retrieval.ts
 - Migrated 16 mindmap wrapper consumers to direct subdirectory imports
 
-#### Webcam Fix (Plan 117)
+#### Webcam Fix (Plan 117, ADR 0114)
 
 ##### W1: Webcam Core
 
@@ -81,6 +81,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed: MaestroSessionWebcam simplified (removed max-w-lg wrapper)
 - Added: webcam-standalone tool for direct photo capture without maestro selection
 - Added: Dual webcam flow in Astuccio (with maestro / standalone)
+
+##### W2: Accessibility & i18n
+
+- Added: WCAG 2.1 AA compliance for webcam (keyboard nav, focus indicators, aria-live)
+- Added: i18n support for webcam component (5 locales)
+- Added: Responsive breakpoints for webcam fullscreen
 
 ### Removed
 

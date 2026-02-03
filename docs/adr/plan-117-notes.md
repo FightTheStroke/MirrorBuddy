@@ -25,3 +25,44 @@
 - Fullscreen overlay pattern ensures consistent UX across devices
 - Environment-facing camera default improves document capture workflow on mobile
 - Dual-flow architecture allows flexibility in tool access patterns
+
+## W2: Accessibility & Internationalization
+
+### Decisions & Patterns
+
+- **Decision**: WCAG 2.1 AA compliance mandatory for all interactive elements
+- **Pattern**: Full keyboard navigation support (Tab, Enter, Escape)
+- **Pattern**: i18n messages namespace following ADR 0104 wrapper key convention
+- **Pattern**: Responsive breakpoints for mobile-first fullscreen experience
+
+### Key Changes
+
+#### Accessibility (WCAG 2.1 AA)
+
+- Added keyboard navigation support for all webcam controls
+- Implemented visible focus indicators with focus-visible rings
+- Added aria-live regions for dynamic status announcements (capturing, processing)
+- Ensured proper focus management (auto-focus capture button, trap focus in modal)
+- Added aria-labels for icon-only buttons (close, retry, confirm)
+- Tested with screen readers for proper announcement flow
+
+#### Internationalization
+
+- Added webcam messages namespace (`messages/{locale}/webcam.json`)
+- Wrapper key convention: `{ "webcam": { ...keys... } }` per ADR 0104
+- Translated all UI strings for 5 locales (it, en, fr, de, es)
+- i18n check validation passed (100% completion for webcam namespace)
+
+#### Responsive Design
+
+- Added breakpoint-specific layouts (mobile/tablet/desktop)
+- Optimized touch targets for mobile devices (min 44x44px)
+- Improved fullscreen overlay on small viewports
+- Enhanced camera preview sizing for different screen sizes
+
+### Technical Notes
+
+- Focus management prevents focus loss when modal opens/closes
+- Aria-live announcements inform users of capture state changes
+- i18n keys follow camelCase convention enforced by ESLint
+- All accessibility features tested with keyboard-only navigation
