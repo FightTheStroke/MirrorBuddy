@@ -148,9 +148,7 @@ test.describe("Skip Link - WCAG 2.1 AA Compliance", () => {
     await page.waitForTimeout(100);
 
     const liveRegion = page.locator('[role="status"][aria-live="polite"]');
-    const isPresent = await liveRegion.count().then((c) => c > 0);
-
-    expect(isPresent).toBe(true);
+    await expect(liveRegion).toHaveCount(1, { timeout: 5000 });
   });
 
   test("skip link is first focusable element", async ({ page }) => {

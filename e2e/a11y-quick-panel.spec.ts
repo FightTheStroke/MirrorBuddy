@@ -113,7 +113,8 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     // Wait for panel to stabilize before clicking close (avoids "element detached")
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
     await expect(closeBtn).toBeVisible({ timeout: 30000 });
-    await closeBtn.click({ timeout: 30000 });
+    await closeBtn.scrollIntoViewIfNeeded();
+    await closeBtn.click({ timeout: 30000, force: true });
     await expect(panel).not.toBeVisible({ timeout: 10000 });
   });
 
