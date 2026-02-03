@@ -173,7 +173,7 @@
 - `gpt-4o-transcribe` is only for `/audio/transcriptions` endpoint
 - Our code uses correct model (`src/lib/hooks/use-voice-session.ts:524`)
 
-**Reference:** See `/claude/voice-api.md` → "Trascrizione Audio" section
+**Reference:** See `docs/claude/voice-api.md` → "Trascrizione Audio" section
 
 #### Problem: Voice session config fails with "Invalid session"
 
@@ -241,7 +241,7 @@
 | Emotional support    | `gpt-realtime`      | ~$0.30      | When nuance matters           |
 | Testing              | `gpt-realtime-mini` | ~$0.03-0.05 | Always use for dev            |
 
-**Reference:** See `/claude/voice-api.md` → "Modelli Disponibili" for full comparison
+**Reference:** See `docs/claude/voice-api.md` → "Modelli Disponibili" for full comparison
 
 ---
 
@@ -290,7 +290,7 @@
 ### Related Documentation
 
 - **Full API reference:** `docs/technical/AZURE_REALTIME_API.md`
-- **Voice configuration:** `/claude/voice-api.md`
+- **Voice configuration:** `docs/claude/voice-api.md`
 - **Setup guide:** `SETUP.md` → "Azure OpenAI Configuration"
 
 ---
@@ -941,7 +941,7 @@ DATABASE_URL="postgresql://mirrorbuddy:mirrorbuddy@localhost:5432/mirrorbuddy"
 - Deploy with HTTPS (Vercel, Netlify, etc. handle this automatically)
 - Ensure WebSocket proxy also uses `wss://` (not `ws://`)
 
-**Reference:** See `/claude/voice-api.md` → "Requisito HTTPS per Microfono"
+**Reference:** See `docs/claude/voice-api.md` → "Requisito HTTPS per Microfono"
 
 ---
 
@@ -1326,7 +1326,7 @@ Our test-voice page includes device selection:
 ### Related Documentation
 
 - **Full API reference:** `docs/technical/AZURE_REALTIME_API.md`
-- **Voice configuration:** `/claude/voice-api.md`
+- **Voice configuration:** `docs/claude/voice-api.md`
 - **Test page implementation:** `src/app/test-voice/page.tsx`
 - **Voice hook:** `src/lib/hooks/use-voice-session.ts`
 - **WebSocket proxy:** `src/server/realtime-proxy.ts`
@@ -2874,6 +2874,77 @@ psql $DATABASE_URL -c "SELECT 1"
 
 > See [ADR 0059](docs/adr/0059-e2e-test-setup-requirements.md) for full E2E test setup requirements.
 
+### Flaky CI Navigation (net::ERR_ABORTED / timeouts)
+
+#### Problem: E2E tests fail with `page.goto` or `page.reload` (ERR_ABORTED / timeout)
+
+**Cause:** CI runners are slower; hydration or redirects can detach frames during navigation/reload.
+
+**Solution:**
+
+1. Avoid `page.reload()` in CI-sensitive tests. Re-navigate with explicit waits:
+
+   ```typescript
+   await page.goto(currentUrl, {
+     waitUntil: "domcontentloaded",
+     timeout: 120000,
+   });
+   await page.waitForLoadState("networkidle", { timeout: 90000 });
+   ```
+
+2. Use locale-aware navigation helper with retry for transient errors:
+
+   ```typescript
+   await localePage.goto("/welcome"); // handles retries + load-state waits
+   ```
+
+---
+
+### A11y Quick Panel Flakiness (missing panel/close/toggles)
+
+#### Problem: A11y panel elements not found or aria attributes missing in CI
+
+**Cause:** Panel relies on client hydration; a single click can fire before handlers attach.
+
+**Solution:**
+
+1. Always open the panel via `openA11yPanel()` helper (retries + waits).
+2. Add explicit visibility timeouts before aria assertions:
+
+   ```typescript
+   const { panel } = await openA11yPanel(page);
+   await expect(panel).toBeVisible({ timeout: 30000 });
+   await expect(panel).toHaveAttribute("aria-modal", "true");
+   ```
+
+3. For close button tests, ensure stability before click:
+
+   ```typescript
+   await expect(closeBtn).toBeVisible({ timeout: 30000 });
+   await closeBtn.click({ timeout: 30000 });
+   ```
+
+---
+
+### A11y Sections/Labels (aria-labelledby)
+
+#### Problem: Sections have no aria-labelledby in CI tests
+
+**Cause:** Panel content not fully rendered before assertions.
+
+**Solution:**
+
+1. Wait for section visibility before reading attributes.
+2. Verify the referenced label exists:
+
+   ```typescript
+   await expect(sections.first()).toBeVisible({ timeout: 30000 });
+   const labelledBy = await section.getAttribute("aria-labelledby");
+   await expect(page.locator(`#${labelledBy}`)).toBeAttached();
+   ```
+
+---
+
 ### Wall Component Blocking Content
 
 #### Problem: "Page should have main landmark" accessibility test fails
@@ -3010,7 +3081,7 @@ Rate limits by endpoint:
    - [`README.md`](README.md) - Project overview
    - [`SETUP.md`](SETUP.md) - Installation and setup guide
    - [`CONTRIBUTING.md`](CONTRIBUTING.md) - Development guidelines
-   - [`/claude/`](/claude/) - Feature-specific documentation
+   - [`docs/claude/`](docs/claude/) - Feature-specific documentation
    - [`docs/technical/`](docs/technical/) - Technical deep dives
 
 3. **Run verification commands:**
@@ -3364,7 +3435,7 @@ ollama pull llama3.2
 - Use `gpt-realtime` only for MirrorBuddy (emotional support)
 - Monitor costs in Settings → AI Provider
 
-**See:** [/claude/voice-api.md](/claude/voice-api.md) → "Modelli Disponibili"
+**See:** [docs/claude/voice-api.md](docs/claude/voice-api.md) → "Modelli Disponibili"
 
 ---
 
@@ -3456,7 +3527,7 @@ npm run dev
 
 **Feature documentation:**
 
-- [`/claude/`](/claude/) - Feature-specific docs
+- [`docs/claude/`](docs/claude/) - Feature-specific docs
   - `voice-api.md` - Voice configuration
   - `ambient-audio.md` - Ambient audio system
   - `learning-path.md` - Learning paths

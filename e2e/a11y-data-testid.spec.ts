@@ -273,9 +273,12 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const { panel } = await openA11yPanel(page);
+    await expect(panel).toBeVisible({ timeout: 30000 });
     const labelledBy = await panel.getAttribute("aria-labelledby");
-
     expect(labelledBy?.length).toBeGreaterThan(0);
+    if (labelledBy) {
+      await expect(page.locator(`#${labelledBy}`)).toBeAttached();
+    }
   });
 
   test("close button has data-testid", async ({ page }) => {

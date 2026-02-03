@@ -75,25 +75,37 @@ export const test = base.extend({
 export async function openA11yPanel(page: import("@playwright/test").Page) {
   const button = page.locator('[data-testid="a11y-floating-button"]');
   await expect(button).toBeVisible({ timeout: 20000 });
+  await button.scrollIntoViewIfNeeded();
   await button.click();
 
   const panel = page.locator('[data-testid="a11y-quick-panel"]');
 
   // First attempt: wait 3s for panel. If not visible, click again (hydration lag).
-  const appeared = await panel
-    .waitFor({ state: "visible", timeout: 3000 })
+  let appeared = await panel
+    .waitFor({ state: "visible", timeout: 5000 })
     .then(() => true)
     .catch(() => false);
 
   if (!appeared) {
+    await button.scrollIntoViewIfNeeded();
+    await button.click();
+    appeared = await panel
+      .waitFor({ state: "visible", timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
+  }
+
+  if (!appeared) {
+    await page.reload({ waitUntil: "domcontentloaded" });
+    await expect(button).toBeVisible({ timeout: 20000 });
     await button.click();
     await expect(panel).toBeVisible({ timeout: 20000 });
   }
 
   await expect(button).toHaveAttribute("aria-expanded", "true", {
-    timeout: 15000,
+    timeout: 30000,
   });
-  await expect(panel).toBeVisible({ timeout: 20000 });
+  await expect(panel).toBeVisible({ timeout: 30000 });
 
   return { button, panel };
 }

@@ -603,8 +603,22 @@ test.describe("Instant Access - Cookie Persistence", () => {
 
     // Re-navigate to avoid net::ERR_ABORTED on reload in CI
     const currentUrl = page.url();
-    await page.goto(currentUrl, { waitUntil: "domcontentloaded" });
-    await page.waitForLoadState("domcontentloaded");
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
+        await page.goto(currentUrl, {
+          waitUntil: "domcontentloaded",
+          timeout: 120000,
+        });
+        await page.waitForLoadState("networkidle", { timeout: 90000 });
+        break;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        if (attempt === 2 || !message.includes("net::ERR_ABORTED")) {
+          throw error;
+        }
+        await page.waitForTimeout(2000);
+      }
+    }
     await page.waitForTimeout(3000); // Extra wait after navigation
 
     // Verify font is applied after reload

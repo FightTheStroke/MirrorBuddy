@@ -384,15 +384,19 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await openA11yPanel(page);
 
     const sections = page.locator('[role="dialog"] section');
-    await expect(sections.first()).toBeVisible({ timeout: 15000 });
+    await expect(sections.first()).toBeVisible({ timeout: 30000 });
     const count = await sections.count();
     expect(count).toBeGreaterThan(0);
 
     // Each section should have aria-labelledby
     for (let i = 0; i < count; i++) {
       const section = sections.nth(i);
+      await expect(section).toBeVisible({ timeout: 30000 });
       const labelledBy = await section.getAttribute("aria-labelledby");
       expect(labelledBy?.length).toBeGreaterThan(0);
+      if (labelledBy) {
+        await expect(page.locator(`#${labelledBy}`)).toBeAttached();
+      }
     }
   });
 });
@@ -448,6 +452,7 @@ test.describe("A11y Features Integration", () => {
 
     // Open accessibility panel
     const { panel: dialog } = await openA11yPanel(page);
+    await expect(dialog).toBeVisible({ timeout: 30000 });
 
     // Get main content element count after opening panel
     const mainCountAfter = await page.locator("main").count();
@@ -456,6 +461,6 @@ test.describe("A11y Features Integration", () => {
     expect(mainCountAfter).toBe(mainCountBefore);
 
     // Panel should be a separate dialog element
-    await expect(dialog).toBeVisible();
+    await expect(dialog).toBeVisible({ timeout: 30000 });
   });
 });

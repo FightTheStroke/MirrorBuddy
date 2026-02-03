@@ -31,22 +31,25 @@ export class LocalePage {
     const navigate = async () => {
       await this.page.goto(localizedPath, {
         waitUntil: "domcontentloaded",
-        timeout: 60000,
+        timeout: 120000,
       });
+      await this.page.waitForLoadState("networkidle", { timeout: 90000 });
     };
-    try {
-      await navigate();
-    } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
-      if (
-        message.includes("net::ERR_ABORTED") ||
-        message.includes("detached")
-      ) {
-        await this.page.waitForTimeout(1000);
+    for (let attempt = 1; attempt <= 2; attempt += 1) {
+      try {
         await navigate();
         return;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        const retriable =
+          message.includes("net::ERR_ABORTED") ||
+          message.includes("detached") ||
+          message.includes("Timeout");
+        if (!retriable || attempt === 2) {
+          throw error;
+        }
+        await this.page.waitForTimeout(2000);
       }
-      throw error;
     }
   }
 
