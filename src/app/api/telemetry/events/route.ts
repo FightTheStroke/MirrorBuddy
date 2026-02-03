@@ -6,7 +6,7 @@
 import { NextResponse } from "next/server";
 import { validateAuth } from "@/lib/auth/session-auth";
 import { prisma } from "@/lib/db";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import type { TelemetryCategory } from "@/lib/telemetry/types";
 import { getCorsHeaders } from "@/lib/security/cors-config";
 
@@ -44,10 +44,8 @@ interface EventPayload {
   }>;
 }
 
-export const POST = pipe(
-  withSentry("/api/telemetry/events"),
-  withCSRF,
-)(async (ctx) => {
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
+export const POST = pipe(withSentry("/api/telemetry/events"))(async (ctx) => {
   // F-04: Get CORS headers based on request origin (no wildcard in production)
   const requestOrigin = ctx.req.headers.get("origin");
   const corsHeaders = getCorsHeaders(requestOrigin);

@@ -11,7 +11,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Blocked domains that are inappropriate for educational context
 const BLOCKED_DOMAINS = [
@@ -90,10 +90,8 @@ interface SafeSearchResponse {
   safeSearchEnabled: boolean;
 }
 
-export const POST = pipe(
-  withSentry("/api/search"),
-  withCSRF,
-)(async (ctx) => {
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public search endpoint, uses rate limiting
+export const POST = pipe(withSentry("/api/search"))(async (ctx) => {
   // Rate limit check
   const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`search:${clientId}`, RATE_LIMITS.SEARCH);

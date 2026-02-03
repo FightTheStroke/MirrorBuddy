@@ -18,7 +18,7 @@ import { validateAuth } from "@/lib/auth/session-auth";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import { isSessionBlocked } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/trial/voice" });
 
@@ -28,10 +28,8 @@ const log = logger.child({ module: "api/trial/voice" });
  * Reports voice session duration for trial users.
  * Called when a voice session ends.
  */
-export const POST = pipe(
-  withSentry("/api/trial/voice"),
-  withCSRF,
-)(async (ctx) => {
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- trial voice tracking, public endpoint
+export const POST = pipe(withSentry("/api/trial/voice"))(async (ctx) => {
   try {
     // Check if authenticated user (skip trial tracking)
     const auth = await validateAuth();

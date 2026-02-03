@@ -174,14 +174,35 @@ describe("Trial Voice API", () => {
       });
     }
 
-    it("returns 403 when CSRF check fails", async () => {
-      vi.mocked(requireCSRF).mockReturnValue(false);
+    it("accepts requests without CSRF (public endpoint)", async () => {
+      vi.mocked(validateAuth).mockResolvedValue({
+        authenticated: false,
+      } as any);
+      vi.mocked(cookies).mockResolvedValue({
+        get: vi.fn().mockReturnValue({ value: "visitor-123" }),
+      } as any);
+      vi.mocked(headers).mockResolvedValue({
+        get: vi.fn().mockReturnValue(null),
+      } as any);
+      vi.mocked(getOrCreateTrialSession).mockResolvedValue({
+        id: "session-123",
+        visitorId: "visitor-123",
+        voiceSecondsUsed: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      } as any);
+      vi.mocked(checkTrialLimits).mockResolvedValue({
+        allowed: true,
+      });
+      vi.mocked(addVoiceSeconds).mockResolvedValue(60);
 
       const response = await POST(createRequest({ durationSeconds: 60 }));
 
-      expect(response.status).toBe(403);
+      expect(response.status).toBe(200);
       const data = await response.json();
-      expect(data.error).toContain("CSRF");
+      expect(data.success).toBe(true);
+      expect(data.voiceSecondsUsed).toBe(60);
+      expect(data.voiceSecondsRemaining).toBe(240);
     });
 
     it("skips tracking for authenticated users", async () => {

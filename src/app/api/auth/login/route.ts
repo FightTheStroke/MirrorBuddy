@@ -8,12 +8,7 @@ import {
   AUTH_COOKIE_CLIENT,
 } from "@/lib/auth/cookie-constants";
 import { RATE_LIMITS } from "@/lib/rate-limit";
-import {
-  pipe,
-  withSentry,
-  withCSRF,
-  withRateLimit,
-} from "@/lib/api/middlewares";
+import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "auth/login" });
 
@@ -29,9 +24,9 @@ function isValidRedirectUrl(url: string | undefined): boolean {
   );
 }
 
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public login endpoint, uses rate limiting
 export const POST = pipe(
   withSentry("/api/auth/login"),
-  withCSRF,
   withRateLimit(RATE_LIMITS.AUTH_LOGIN),
 )(async (ctx) => {
   const { username, email, password, redirect } = await ctx.req.json();

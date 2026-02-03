@@ -11,16 +11,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { cookies } from "next/headers";
-import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 import {
   AUTH_COOKIE_NAME,
   VISITOR_COOKIE_NAME,
 } from "@/lib/auth/cookie-constants";
 
-export const POST = pipe(
-  withSentry("/api/telemetry/activity"),
-  withCSRF,
-)(async (ctx) => {
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
+export const POST = pipe(withSentry("/api/telemetry/activity"))(async (ctx) => {
   const body = await ctx.req.json();
   const route = body.route || "/";
 
