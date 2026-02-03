@@ -5,7 +5,8 @@
  */
 
 import { NextResponse } from "next/server";
-import { prisma, Prisma } from "@/lib/db";
+import { prisma } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import { FunnelStage } from "@/lib/funnel/constants";
 
