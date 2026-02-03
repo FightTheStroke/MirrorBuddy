@@ -2882,20 +2882,20 @@ psql $DATABASE_URL -c "SELECT 1"
 
 **Solution:**
 
-1. Avoid `page.reload()` in CI-sensitive tests. Re-navigate with explicit waits:
+1. Avoid `page.reload()` in CI-sensitive tests. Re-navigate with explicit waits and longer timeouts:
 
    ```typescript
    await page.goto(currentUrl, {
      waitUntil: "domcontentloaded",
-     timeout: 120000,
+     timeout: 300000, // 5 minutes in CI
    });
-   await page.waitForLoadState("networkidle", { timeout: 90000 });
+   await page.waitForLoadState("networkidle", { timeout: 300000 });
    ```
 
-2. Use locale-aware navigation helper with retry for transient errors:
+2. Use locale-aware navigation helper with retry and long timeouts for transient errors:
 
    ```typescript
-   await localePage.goto("/welcome"); // handles retries + load-state waits
+   await localePage.goto("/welcome"); // handles retries + long load-state waits
    ```
 
 ---
@@ -2908,7 +2908,7 @@ psql $DATABASE_URL -c "SELECT 1"
 
 **Solution:**
 
-1. Always open the panel via `openA11yPanel()` helper (retries + waits).
+1. Always open the panel via `openA11yPanel()` helper (retries + longer waits).
 2. Add explicit visibility timeouts before aria assertions:
 
    ```typescript

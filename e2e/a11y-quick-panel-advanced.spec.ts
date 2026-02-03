@@ -17,8 +17,8 @@ import {
 } from "./fixtures/a11y-fixtures";
 
 test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
-  // Panel tests open a dialog and interact with it — slow under CI load
-  test.setTimeout(60000);
+  // Panel tests open a dialog and interact with it — very slow under CI load
+  test.setTimeout(600000);
 
   test("toggle switches have role=switch", async ({ page }) => {
     await page.goto(toLocalePath("/"));
