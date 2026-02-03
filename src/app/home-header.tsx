@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   Flame,
   Coins,
@@ -13,9 +14,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
-import { PomodoroHeaderWidget } from "@/components/pomodoro";
-import { AmbientAudioHeaderWidget } from "@/components/ambient-audio";
-import { CalculatorHeaderWidget } from "@/components/calculator";
+import { ToolsDropdown } from "@/components/tools";
 import { TierBadge } from "@/components/tier/TierBadge";
 import { TrialHeaderDropdown } from "@/components/trial";
 import type { TierName } from "@/types/tier-types";
@@ -30,6 +29,7 @@ interface TrialStatus {
 interface HomeHeaderProps {
   sidebarOpen: boolean;
   onMenuClick?: () => void;
+  userName?: string;
   seasonLevel: number;
   mbInLevel: number;
   mbNeeded: number;
@@ -47,6 +47,7 @@ interface HomeHeaderProps {
 export function HomeHeader({
   sidebarOpen,
   onMenuClick,
+  userName,
   seasonLevel,
   mbInLevel,
   mbNeeded,
@@ -60,6 +61,7 @@ export function HomeHeader({
   userTier,
   isSimulatedTier,
 }: HomeHeaderProps) {
+  const t = useTranslations("home");
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
@@ -71,7 +73,7 @@ export function HomeHeader({
         sidebarOpen ? "lg:left-64" : "lg:left-20",
       )}
     >
-      {/* Level + MirrorBucks Progress */}
+      {/* Greeting + Level + MirrorBucks Progress */}
       <div className="flex items-center gap-3 min-w-0">
         <button
           onClick={onMenuClick}
@@ -80,6 +82,16 @@ export function HomeHeader({
         >
           <Menu className="h-5 w-5" />
         </button>
+        {userName && (
+          <div className="hidden sm:flex items-baseline gap-1 mr-2">
+            <span className="text-sm text-slate-600 dark:text-slate-400">
+              {t("header.greeting")}
+            </span>
+            <span className="text-sm font-semibold text-slate-900 dark:text-white">
+              {userName}
+            </span>
+          </div>
+        )}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
           <Coins className="w-4 h-4 text-white" />
         </div>
@@ -201,7 +213,7 @@ export function HomeHeader({
         )}
       </div>
 
-      {/* Right section: tier badge + calculator + ambient audio + pomodoro + notifications + version */}
+      {/* Right section: tier badge + tools dropdown + notifications + version */}
       {/* Note: TierBadge hidden when trial dropdown is shown to avoid redundancy */}
       <div className="hidden lg:flex items-center gap-3">
         {userTier && !trialStatus?.isTrialMode && (
@@ -214,9 +226,7 @@ export function HomeHeader({
             )}
           </div>
         )}
-        <CalculatorHeaderWidget />
-        <AmbientAudioHeaderWidget />
-        <PomodoroHeaderWidget />
+        <ToolsDropdown />
         <NotificationBell />
         <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
           v{process.env.APP_VERSION}

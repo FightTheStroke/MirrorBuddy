@@ -410,6 +410,17 @@
       "topicsLabel": "Topics Label"
     },
     "parentDashboard": {
+      "error": {
+        "title": "Errore di caricamento",
+        "message": "Si è verificato un errore durante il caricamento della dashboard. Riprova più tardi.",
+        "backHome": "Torna alla home"
+      },
+      "consent": {
+        "title": "Consenso richiesto",
+        "description": "Per visualizzare i progressi e le osservazioni del tuo studente, è necessario il consenso.",
+        "grantButton": "Concedi consenso"
+      },
+      "generateProfile": "Genera profilo",
       "activity": {
         "ariaLabel": "Aria label",
         "mirrorBucks": "Mirror bucks",

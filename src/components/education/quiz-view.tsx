@@ -22,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Quiz } from "./quiz";
 import { useProgressStore } from "@/lib/stores";
 import { useQuizzes } from "@/lib/hooks/use-saved-materials";
+import { useTelemetryStore } from "@/lib/telemetry/telemetry-store";
 import type { Quiz as QuizType, QuizResult, Subject, Maestro } from "@/types";
 import { subjectNames, subjectIcons, subjectColors } from "@/data";
 import { cn } from "@/lib/utils";
@@ -34,6 +35,7 @@ export type { QuizViewProps } from "./quiz-view/types";
 export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();
   const t = useTranslations("education");
+  const { trackEvent } = useTelemetryStore();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
   const { addXP } = useProgressStore();
@@ -98,6 +100,25 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
           source: "quiz",
         }),
       }).catch(() => undefined);
+
+      // Track telemetry
+      const accuracy = Math.round(
+        (result.correctAnswers / result.totalQuestions) * 100,
+      );
+      trackEvent(
+        "education",
+        "quiz_completed",
+        selectedQuiz.id,
+        result.correctAnswers,
+        {
+          score: result.correctAnswers,
+          totalQuestions: result.totalQuestions,
+          accuracy,
+          timeSpent: result.timeSpent,
+          xpEarned: result.xpEarned,
+          subject: selectedQuiz.subject,
+        },
+      );
     }
     addXP(result.xpEarned);
     setCompletedQuizzes((prev) => [...prev, result.quizId]);

@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { TouchTarget } from "@/components/ui/touch-target";
 import { cn } from "@/lib/utils";
+import { useTelemetryStore } from "@/lib/telemetry/telemetry-store";
 import type { FlashcardDeck, Rating } from "@/types";
 import { RATING_CONFIG } from "./flashcard-review-mobile/rating-config";
 import {
@@ -58,6 +59,7 @@ export function FlashcardReviewMobile({
   onComplete,
 }: FlashcardReviewMobileProps) {
   const t = useTranslations("tools.flashcards");
+  const { trackEvent } = useTelemetryStore();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [cardsReviewed, setCardsReviewed] = useState(0);
@@ -95,13 +97,38 @@ export function FlashcardReviewMobile({
       setIsFlipped(false);
       setSwipeState(resetSwipeState());
 
+      // Track telemetry
+      trackEvent(
+        "education",
+        "flashcard_reviewed",
+        deck.id,
+        cardsReviewed + 1,
+        {
+          rating,
+          subject: deck.subject,
+          cardIndex: currentIndex,
+          totalCards: cardsToReview.length,
+        },
+      );
+
       if (hasMoreCards) {
         setCurrentIndex((prev) => prev + 1);
       } else {
         onComplete();
       }
     },
-    [currentCard, hasMoreCards, onRating, onComplete],
+    [
+      currentCard,
+      hasMoreCards,
+      onRating,
+      onComplete,
+      trackEvent,
+      deck.id,
+      deck.subject,
+      cardsReviewed,
+      currentIndex,
+      cardsToReview.length,
+    ],
   );
 
   // Touch handlers

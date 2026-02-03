@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
 
 interface LoginResponse {
@@ -21,6 +21,7 @@ export function LoginClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const t = useTranslations("auth");
+  const locale = useLocale();
   const redirectParam = searchParams.get("redirect");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -51,8 +52,8 @@ export function LoginClient() {
       if (data.user?.mustChangePassword) {
         router.push("/change-password");
       } else {
-        // Use redirect from API if available and valid, otherwise default to "/"
-        const redirectTo = data.redirect || "/";
+        // Use redirect from API if available, otherwise go to main maestri page
+        const redirectTo = data.redirect || `/${locale}`;
         router.push(redirectTo);
       }
     } catch (err) {

@@ -391,11 +391,11 @@
       "reviewAndModifyConsents": "Review And Modify Consents"
     },
     "parents": {
-      "title": "Area Genitori",
-      "description": "Accedi alla dashboard genitori per monitorare i progressi e le attività di tuo figlio in modo sicuro e rispettoso della privacy (GDPR).",
-      "consentRequired": "Consenso richiesto:",
-      "consentDescription": "La dashboard genitori richiede il consenso sia del genitore che dello studente per conformarsi alle normative GDPR sulla protezione dei dati dei minori.",
-      "openDashboard": "Apri Dashboard Genitori"
+      "title": "Área de Padres",
+      "description": "Acceda al panel de padres para monitorear el progreso y las actividades de su hijo de manera segura y respetuosa con la privacidad (RGPD).",
+      "consentRequired": "Consentimiento requerido:",
+      "consentDescription": "El panel de padres requiere el consentimiento tanto del padre como del estudiante para cumplir con las regulaciones RGPD sobre protección de datos de menores.",
+      "openDashboard": "Abrir Panel de Padres"
     },
     "integrations": {
       "title": "Integrazioni",
