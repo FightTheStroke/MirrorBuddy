@@ -5,7 +5,7 @@ import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { nanoid } from "nanoid";
-import { toast } from "sonner";
+import { toast } from "@/components/ui/toast";
 import { logger } from "@/lib/logger";
 import { ToolCard } from "./tool-card";
 import { AstuccioInfoSection } from "./astuccio-info-section";

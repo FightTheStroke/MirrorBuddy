@@ -175,6 +175,7 @@ export const TOOL_TYPE_PATTERNS: Record<ToolType, RegExp[]> = {
   pdf: [],
   homework: [],
   webcam: [],
+  "webcam-standalone": [],
   typing: [],
   "study-kit": [],
 };

@@ -86,6 +86,7 @@ export function useMaestroSessionLogic({
         search: `Ciao! Cosa vorresti cercare?`,
         pdf: `Ciao! Sono pronto ad aiutarti. Cosa vuoi caricare?`,
         webcam: `Ciao! Sono pronto ad aiutarti. Cosa vuoi fotografare?`,
+        "webcam-standalone": `Ciao! Sono pronto ad aiutarti. Cosa vuoi fotografare?`,
         homework: `Ciao! Sono pronto ad aiutarti con i compiti. Cosa vuoi caricare?`,
         diagram: `Ciao! Creiamo un diagramma insieme. Quale concetto vuoi visualizzare?`,
         timeline: `Ciao! Creiamo una linea temporale. Quale periodo storico o sequenza di eventi vuoi organizzare?`,

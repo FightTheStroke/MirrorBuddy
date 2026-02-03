@@ -37,6 +37,7 @@ const TOOL_NAMES: Record<ToolType, string> = {
   chart: "Grafico",
   search: "Ricerca",
   webcam: "Foto",
+  "webcam-standalone": "Foto Standalone",
   pdf: "PDF",
   typing: "Impara a Digitare",
   homework: "Compiti",

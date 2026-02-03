@@ -7,6 +7,7 @@ export const TOOL_PROMPTS: Record<ToolType, string> = {
   demo: "Crea una demo interattiva per visualizzare",
   search: "Cerca risorse educative su questo argomento",
   webcam: "Voglio scattare una foto",
+  "webcam-standalone": "Voglio scattare una foto senza maestro",
   diagram: "Crea un diagramma",
   timeline: "Crea una linea del tempo",
   summary: "Crea un riassunto",

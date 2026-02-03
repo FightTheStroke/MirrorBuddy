@@ -70,6 +70,7 @@ export const TYPE_LABELS: Record<ToolType, string> = {
   chart: "Grafici",
   pdf: "PDF",
   webcam: "Immagini",
+  "webcam-standalone": "Immagini Standalone",
   homework: "Compiti",
   search: "Ricerche",
   typing: "Digitazione",

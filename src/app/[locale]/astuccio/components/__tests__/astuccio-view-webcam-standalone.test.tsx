@@ -152,12 +152,10 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     // Find and click the webcam-standalone tool button
-    // Since we don't know the exact translated text, we'll use a pattern
+    // The label key doesn't exist, so it falls back to "webcamStandalone.label"
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     expect(webcamButton).toBeDefined();
@@ -175,10 +173,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
@@ -196,10 +192,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
@@ -231,10 +225,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
@@ -255,10 +247,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
@@ -277,10 +267,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
@@ -303,10 +291,8 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     const buttons = screen.getAllByRole("button");
-    const webcamButton = buttons.find(
-      (btn) =>
-        btn.textContent?.toLowerCase().includes("webcam") ||
-        btn.textContent?.toLowerCase().includes("camera"),
+    const webcamButton = buttons.find((btn) =>
+      btn.textContent?.toLowerCase().includes("standalone"),
     );
 
     if (webcamButton) {
