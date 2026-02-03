@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Investigation
+
+#### W1: Tracking Investigation (Plan 116)
+
+- **Verified**: Telemetry system functional (useTelemetryStore, API writes to DB via /api/telemetry/events)
+- **Verified**: Gamification XP tracking via addMirrorBucks() → /api/gamification/points → UserGamification table
+- **Verified**: Stats APIs operational (/api/telemetry/stats, /api/progress) using real Prisma queries
+- **Finding**: Telemetry infrastructure complete but underused in chat, flashcard, and quiz flows
+- **Pattern**: useTelemetryStore().trackEvent() for custom events, addMirrorBucks() for XP synchronization
+
+#### W2: Routes (Plan 116)
+
+- **Added**: `/parent-dashboard` route with GDPR consent flow and profile components
+- **Fixed**: Post-login redirect now goes to main maestri page (`/{locale}`) instead of landing page
+- **Verified**: All 26 maestri available (tier filtering working correctly)
+- **Added**: Parent dashboard i18n keys in all 5 locales (it/en/fr/de/es)
+
+#### W3: Header Redesign (Plan 116)
+
+- **Added**: Personalized greeting "Ciao {userName}" in header left section
+- **Added**: ToolsDropdown component grouping Calculator, Pomodoro, Ambient Audio
+- **Changed**: Header layout - greeting left, metrics center, tools dropdown right
+- **Added**: i18n support for header greeting and tools menu (5 locales)
+- **Verified**: WCAG 2.1 AA accessibility (keyboard nav, aria-labels)
+
+#### W4: Testing & Validation (Plan 116)
+
+- **Added**: Unit tests for HomeHeader (F-08 greeting, F-14 accessibility)
+- **Added**: Unit tests for ToolsDropdown (rendering, keyboard, aria-expanded)
+- **Added**: E2E tests for login redirect and parent dashboard routes
+- **Added**: Telemetry tracking for chat (chat_sent), flashcard (flashcard_reviewed), quiz (quiz_completed)
+- **Fixed**: TypeScript type compliance for ActiveCharacter, FlashcardDeck, QuizResult mocks
+- **Fixed**: French i18n key admin.users.bulkActions.confirmDelete missing {count} variable
+- **Validated**: CI passes (lint, typecheck, build, i18n 4056 keys in 5 locales)
+
 ### Architecture (Plan 113)
 
 - Added: Composable API handler pipeline `pipe()` with middleware system (`src/lib/api/pipe.ts`, `src/lib/api/middlewares/`)
