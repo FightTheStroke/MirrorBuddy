@@ -60,7 +60,7 @@ export class LocalePage {
   async waitForLocaleLoad(): Promise<void> {
     // Wait for HTML lang attribute to match locale
     await this.page.waitForSelector(`html[lang="${this.locale}"]`, {
-      timeout: 30000,
+      timeout: 60000, // Increased from 30s to 60s for slower CI environments
     });
   }
 

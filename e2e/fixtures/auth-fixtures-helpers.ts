@@ -13,10 +13,10 @@ import { config } from "dotenv";
 // Load .env so we can read SESSION_SECRET
 config();
 
-// Use the actual SESSION_SECRET from environment (matches running dev server).
-// Falls back to E2E test secret when Playwright starts its own server.
-const SESSION_SECRET =
-  process.env.SESSION_SECRET || "e2e-test-session-secret-32-characters-min";
+// CRITICAL: E2E tests ALWAYS use the test secret, never the production secret
+// This matches playwright.config.ts webServer.env.SESSION_SECRET
+// Cookie signatures must match between fixtures and the running server
+const SESSION_SECRET = "e2e-test-session-secret-32-characters-min";
 
 /**
  * Sign cookie value for E2E tests (matches src/lib/auth/cookie-signing.ts)
