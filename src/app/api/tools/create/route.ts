@@ -217,7 +217,7 @@ export const POST = pipe(
 /**
  * Get tool creation info
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/tools/create"))(async () => {
   return NextResponse.json({
     endpoint: "/api/tools/create",
     method: "POST",
@@ -239,4 +239,4 @@ export async function GET() {
       },
     },
   });
-}
+});

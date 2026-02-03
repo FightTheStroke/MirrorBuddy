@@ -8,7 +8,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "contact-api" });
 
@@ -83,9 +83,10 @@ interface ContactResponse {
   emailSent?: boolean;
 }
 
-export const POST = pipe(withSentry("/api/contact"))(async (
-  ctx,
-): Promise<NextResponse<ContactResponse>> => {
+export const POST = pipe(
+  withSentry("/api/contact"),
+  withCSRF,
+)(async (ctx): Promise<NextResponse<ContactResponse>> => {
   try {
     // Rate limit contact form submissions (5 per hour - public endpoint)
     const clientId = getClientIdentifier(ctx.req);

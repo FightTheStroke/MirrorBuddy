@@ -11,7 +11,7 @@ import type { MindmapData as ExportMindmapData } from "@/lib/tools/mindmap-expor
 import type { MindmapData as _MindmapData } from "@/lib/collab/mindmap-room";
 import { convertExportNodeToToolNode } from "@/lib/collab/mindmap-room/node-converter";
 import { pipe } from "@/lib/api/pipe";
-import { withSentry } from "@/lib/api/middlewares";
+import { withSentry, withCSRF } from "@/lib/api/middlewares";
 
 interface CreateRoomRequest {
   mindmap: ExportMindmapData;
@@ -26,7 +26,10 @@ interface CreateRoomRequest {
  * POST /api/collab/rooms - Create a new collaboration room
  */
 
-export const POST = pipe(withSentry("/api/collab/rooms"))(async (ctx) => {
+export const POST = pipe(
+  withSentry("/api/collab/rooms"),
+  withCSRF,
+)(async (ctx) => {
   const body: CreateRoomRequest = await ctx.req.json();
   const { mindmap, user } = body;
 

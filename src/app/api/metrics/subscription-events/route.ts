@@ -6,7 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 interface SubscriptionEventPayload {
   type: string;
@@ -17,9 +17,10 @@ interface SubscriptionEventPayload {
   metadata?: Record<string, unknown>;
 }
 
-export const POST = pipe(withSentry("/api/metrics/subscription-events"))(async (
-  ctx,
-) => {
+export const POST = pipe(
+  withSentry("/api/metrics/subscription-events"),
+  withCSRF,
+)(async (ctx) => {
   const body: SubscriptionEventPayload = await ctx.req.json();
 
   // Validate required fields

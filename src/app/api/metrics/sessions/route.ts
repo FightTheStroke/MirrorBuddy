@@ -7,7 +7,7 @@
 
 import { NextResponse } from "next/server";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 import {
   startSession,
   recordTurn,
@@ -40,7 +40,10 @@ interface MetricsRequest {
   severity?: "S0" | "S1" | "S2" | "S3";
 }
 
-export const POST = pipe(withSentry("/api/metrics/sessions"))(async (ctx) => {
+export const POST = pipe(
+  withSentry("/api/metrics/sessions"),
+  withCSRF,
+)(async (ctx) => {
   const log = getRequestLogger(ctx.req);
   const body: MetricsRequest = await ctx.req.json();
   const { action, sessionId } = body;

@@ -46,9 +46,10 @@ export const GET = pipe(withSentry("/api/collab/rooms/:roomId"))(async (
  * POST /api/collab/rooms/[roomId] - Join room or perform action
  */
 
-export const POST = pipe(withSentry("/api/collab/rooms/:roomId"))(async (
-  ctx,
-): Promise<NextResponse> => {
+export const POST = pipe(
+  withSentry("/api/collab/rooms/:roomId"),
+  withCSRF,
+)(async (ctx): Promise<NextResponse> => {
   const { roomId } = await ctx.params;
 
   const validation = validateRoomExists(roomId);

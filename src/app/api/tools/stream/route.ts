@@ -4,7 +4,7 @@
 // Used by Tool Canvas component to show Maestro building tools live
 // ============================================================================
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
@@ -22,6 +22,7 @@ import {
 } from "@/lib/realtime/tool-events";
 import { getCorsHeaders } from "@/lib/security/cors-config";
 import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Generate unique client ID
 function generateClientId(): string {
@@ -107,8 +108,8 @@ async function verifySessionOwnershipForSSE(
  * - tool:error - Error occurred
  * - :heartbeat - Keep-alive ping (every 30s)
  */
-export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+export const GET = pipe(withSentry("/api/tools/stream"))(async (ctx) => {
+  const { searchParams } = new URL(ctx.req.url);
   const sessionId = searchParams.get("sessionId");
 
   // Validate session ID
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
   logger.info("SSE connection request", {
     clientId,
     sessionId,
-    userAgent: request.headers.get("user-agent")?.substring(0, 50),
+    userAgent: ctx.req.headers.get("user-agent")?.substring(0, 50),
   });
 
   // Create readable stream for SSE
@@ -164,7 +165,7 @@ export async function GET(request: NextRequest) {
       }, HEARTBEAT_INTERVAL_MS);
 
       // Clean up on abort (client disconnect)
-      request.signal.addEventListener("abort", () => {
+      ctx.req.signal.addEventListener("abort", () => {
         clearInterval(heartbeatInterval);
         unregisterClient(clientId);
         try {
@@ -182,7 +183,7 @@ export async function GET(request: NextRequest) {
   });
 
   // F-04: Get CORS headers based on request origin (no wildcard in production)
-  const requestOrigin = request.headers.get("origin");
+  const requestOrigin = ctx.req.headers.get("origin");
   const corsHeaders = getCorsHeaders(requestOrigin);
 
   // Return SSE response with proper headers
@@ -195,12 +196,12 @@ export async function GET(request: NextRequest) {
       ...corsHeaders,
     },
   });
-}
+});
 
 /**
  * Get SSE connection stats (for monitoring)
  */
-export async function HEAD() {
+export const HEAD = pipe(withSentry("/api/tools/stream"))(async () => {
   const totalClients = getTotalClientCount();
 
   return new Response(null, {
@@ -209,4 +210,4 @@ export async function HEAD() {
       "X-SSE-Total-Clients": totalClients.toString(),
     },
   });
-}
+});

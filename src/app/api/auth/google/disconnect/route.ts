@@ -7,11 +7,12 @@
 
 import { NextResponse } from "next/server";
 import { disconnectGoogleAccount } from "@/lib/google";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
-export const POST = pipe(withSentry("/api/auth/google/disconnect"))(async (
-  ctx,
-) => {
+export const POST = pipe(
+  withSentry("/api/auth/google/disconnect"),
+  withCSRF,
+)(async (ctx) => {
   const body = await ctx.req.json();
   const { userId } = body;
 

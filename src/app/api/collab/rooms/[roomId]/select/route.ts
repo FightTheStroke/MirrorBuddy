@@ -8,11 +8,12 @@ import { NextResponse } from "next/server";
 import { getRoom, updateSelection } from "@/lib/collab/mindmap-room";
 import { broadcastCollabEvent } from "@/app/api/collab/sse/route";
 import { pipe } from "@/lib/api/pipe";
-import { withSentry } from "@/lib/api/middlewares";
+import { withSentry, withCSRF } from "@/lib/api/middlewares";
 
-export const POST = pipe(withSentry("/api/collab/rooms/:roomId/select"))(async (
-  ctx,
-) => {
+export const POST = pipe(
+  withSentry("/api/collab/rooms/:roomId/select"),
+  withCSRF,
+)(async (ctx) => {
   const { roomId } = await ctx.params;
   const { userId, nodeId } = await ctx.req.json();
 

@@ -222,6 +222,7 @@ export function getTranslationRegex(key: string, flags = "i"): RegExp {
   const text = getTranslation(key);
   // Escape special regex characters
   const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  // eslint-disable-next-line security/detect-non-literal-regexp -- safe: escaped translation text for testing
   return new RegExp(escaped, flags);
 }
 

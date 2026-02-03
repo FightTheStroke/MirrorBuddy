@@ -93,6 +93,7 @@ function containsItalianText(text) {
   // Check for common Italian words
   for (const word of ITALIAN_WORDS) {
     // Word boundary check that handles Italian characters
+    // eslint-disable-next-line security/detect-non-literal-regexp -- safe: word is from hardcoded ITALIAN_WORDS array
     const wordPattern = new RegExp(`(^|[^a-zàèéìòù])${word}([^a-zàèéìòù]|$)`, "i");
     if (wordPattern.test(lowercased)) {
       return true;

@@ -1,3 +1,4 @@
+/* eslint-disable security/detect-non-literal-regexp -- test file uses getTranslation() helper which escapes all regex chars */
 /**
  * MIRRORBUDDY - Trial Limits Banner Tests
  *

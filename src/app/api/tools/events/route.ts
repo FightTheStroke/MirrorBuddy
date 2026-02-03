@@ -234,7 +234,7 @@ export const POST = pipe(
 /**
  * Get event publishing info
  */
-export async function GET() {
+export const GET = pipe(withSentry("/api/tools/events"))(async () => {
   return NextResponse.json({
     endpoint: "/api/tools/events",
     method: "POST",
@@ -252,4 +252,4 @@ export async function GET() {
       },
     },
   });
-}
+});

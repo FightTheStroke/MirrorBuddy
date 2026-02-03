@@ -10,7 +10,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/trial/email" });
 
@@ -21,7 +21,10 @@ const log = logger.child({ module: "api/trial/email" });
  * Email capture is optional and can be triggered after X messages or at limit.
  */
 
-export const PATCH = pipe(withSentry("/api/trial/email"))(async (ctx) => {
+export const PATCH = pipe(
+  withSentry("/api/trial/email"),
+  withCSRF,
+)(async (ctx) => {
   const clientId = getClientIdentifier(ctx.req);
   const rateLimitResult = await checkRateLimitAsync(
     `trial:email:${clientId}`,

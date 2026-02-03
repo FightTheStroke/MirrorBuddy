@@ -63,7 +63,7 @@ export const GET = pipe(
  *
  * Note: No CSRF required - code-based verification from email link
  */
-
+// eslint-disable-next-line local-rules/require-csrf-mutating-routes -- code-based verification from email
 export const POST = pipe(withSentry("/api/coppa/verify"))(async (ctx) => {
   // Rate limit COPPA verification attempts (5 per hour - email costs, strict)
   const clientId = getClientIdentifier(ctx.req);

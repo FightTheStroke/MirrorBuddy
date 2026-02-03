@@ -11,7 +11,7 @@ import {
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { pipe, withSentry } from "@/lib/api/middlewares";
+import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 // Blocked domains that are inappropriate for educational context
 const BLOCKED_DOMAINS = [
@@ -90,7 +90,10 @@ interface SafeSearchResponse {
   safeSearchEnabled: boolean;
 }
 
-export const POST = pipe(withSentry("/api/search"))(async (ctx) => {
+export const POST = pipe(
+  withSentry("/api/search"),
+  withCSRF,
+)(async (ctx) => {
   // Rate limit check
   const clientId = getClientIdentifier(ctx.req);
   const rateLimit = checkRateLimit(`search:${clientId}`, RATE_LIMITS.SEARCH);
