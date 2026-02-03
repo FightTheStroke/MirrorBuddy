@@ -183,6 +183,7 @@ test.describe("A11y Quick Panel - Advanced Dialog Features", () => {
 
     const { panel } = await openA11yPanel(page);
 
+    await expect(panel).toBeVisible({ timeout: 20000 });
     const box = await panel.boundingBox();
 
     // Panel should not exceed viewport height

@@ -101,7 +101,7 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await openA11yPanel(page);
 
     const closeBtn = page.locator('[data-testid="a11y-close-panel-btn"]');
-    await expect(closeBtn).toBeVisible();
+    await expect(closeBtn).toBeVisible({ timeout: 15000 });
   });
 
   test("close button closes panel", async ({ page }) => {

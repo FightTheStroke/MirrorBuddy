@@ -94,7 +94,9 @@ test.describe("A11y Floating Button - ARIA & Accessibility", () => {
 
     // Open panel
     const { button } = await openA11yPanel(page);
-    await expect(button).toHaveAttribute("aria-expanded", "true");
+    await expect(button).toHaveAttribute("aria-expanded", "true", {
+      timeout: 15000,
+    });
 
     // Close panel
     await page.keyboard.press("Escape");

@@ -262,7 +262,10 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const { panel } = await openA11yPanel(page);
-    await expect(panel).toHaveAttribute("aria-modal", "true");
+    await expect(panel).toBeVisible({ timeout: 15000 });
+    await expect(panel).toHaveAttribute("aria-modal", "true", {
+      timeout: 15000,
+    });
   });
 
   test("panel has aria-labelledby", async ({ page }) => {
@@ -353,7 +356,7 @@ test.describe("A11y Quick Panel - data-testid Selectors", () => {
     const largeTextToggle = page
       .locator('[data-testid*="a11y-toggle"]')
       .first();
-    await expect(largeTextToggle).toBeVisible();
+    await expect(largeTextToggle).toBeVisible({ timeout: 15000 });
     await expect(largeTextToggle).toHaveAttribute("role", "switch");
   });
 

@@ -219,8 +219,8 @@ test.describe("Trial Consent Gate - GDPR Compliance", () => {
     // Wait for consent to be saved (cookie is set)
     await page.waitForTimeout(500);
 
-    // Reload the page - consent should persist via cookie
-    await page.reload();
+    // Re-navigate to avoid net::ERR_ABORTED on reload in CI
+    await page.goto("/it/welcome", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("domcontentloaded");
 
     // Consent gate should not appear on reload (consent persisted via cookie)

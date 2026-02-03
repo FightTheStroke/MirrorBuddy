@@ -601,10 +601,11 @@ test.describe("Instant Access - Cookie Persistence", () => {
     const a11yCookie = cookies.find((c) => c.name === "mirrorbuddy-a11y");
     expect(a11yCookie, "mirrorbuddy-a11y cookie should be set").toBeDefined();
 
-    // Reload page
-    await page.reload({ waitUntil: "domcontentloaded" });
+    // Re-navigate to avoid net::ERR_ABORTED on reload in CI
+    const currentUrl = page.url();
+    await page.goto(currentUrl, { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(3000); // Extra wait after reload
+    await page.waitForTimeout(3000); // Extra wait after navigation
 
     // Verify font is applied after reload
     const body = page.locator("body");

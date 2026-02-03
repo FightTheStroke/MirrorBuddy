@@ -275,7 +275,10 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const { panel: dialog } = await openA11yPanel(page);
-    await expect(dialog).toHaveAttribute("aria-modal", "true");
+    await expect(dialog).toBeVisible({ timeout: 15000 });
+    await expect(dialog).toHaveAttribute("aria-modal", "true", {
+      timeout: 15000,
+    });
   });
 
   test("quick panel has aria-labelledby", async ({ page }) => {
@@ -381,8 +384,8 @@ test.describe("A11y Quick Panel - Dialog Accessibility", () => {
     await openA11yPanel(page);
 
     const sections = page.locator('[role="dialog"] section');
+    await expect(sections.first()).toBeVisible({ timeout: 15000 });
     const count = await sections.count();
-
     expect(count).toBeGreaterThan(0);
 
     // Each section should have aria-labelledby

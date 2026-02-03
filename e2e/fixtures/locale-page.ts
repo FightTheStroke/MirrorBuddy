@@ -28,7 +28,26 @@ export class LocalePage {
     // Ensure path starts with /
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     const localizedPath = `/${this.locale}${cleanPath}`;
-    await this.page.goto(localizedPath);
+    const navigate = async () => {
+      await this.page.goto(localizedPath, {
+        waitUntil: "domcontentloaded",
+        timeout: 60000,
+      });
+    };
+    try {
+      await navigate();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      if (
+        message.includes("net::ERR_ABORTED") ||
+        message.includes("detached")
+      ) {
+        await this.page.waitForTimeout(1000);
+        await navigate();
+        return;
+      }
+      throw error;
+    }
   }
 
   /**

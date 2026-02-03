@@ -185,8 +185,8 @@ test.describe("Welcome Page Language Switcher - F-69", () => {
     expect(localeCookie, "NEXT_LOCALE cookie should be set").toBeDefined();
     expect(localeCookie?.value).toBe("es");
 
-    // Reload page
-    await page.reload({ waitUntil: "domcontentloaded" });
+    // Re-navigate to avoid net::ERR_ABORTED on reload in CI
+    await page.goto("/es/welcome", { waitUntil: "domcontentloaded" });
     await page.waitForLoadState("domcontentloaded");
     await page.waitForTimeout(2000);
 

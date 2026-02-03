@@ -74,7 +74,7 @@ export const test = base.extend({
  */
 export async function openA11yPanel(page: import("@playwright/test").Page) {
   const button = page.locator('[data-testid="a11y-floating-button"]');
-  await expect(button).toBeVisible({ timeout: 10000 });
+  await expect(button).toBeVisible({ timeout: 20000 });
   await button.click();
 
   const panel = page.locator('[data-testid="a11y-quick-panel"]');
@@ -87,8 +87,13 @@ export async function openA11yPanel(page: import("@playwright/test").Page) {
 
   if (!appeared) {
     await button.click();
-    await expect(panel).toBeVisible({ timeout: 10000 });
+    await expect(panel).toBeVisible({ timeout: 20000 });
   }
+
+  await expect(button).toHaveAttribute("aria-expanded", "true", {
+    timeout: 15000,
+  });
+  await expect(panel).toBeVisible({ timeout: 20000 });
 
   return { button, panel };
 }

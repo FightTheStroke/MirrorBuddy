@@ -73,16 +73,13 @@ test.describe("Settings Page Interactions", () => {
         await settingsBtn.click();
       }
 
-      await page.waitForTimeout(300);
+      await page.waitForTimeout(500);
 
       // Settings panel/page should be visible
       const settingsContent = page.locator(
         '[data-testid="settings-panel"], [aria-label*="settings" i], h1:has-text("Impostazioni"), [role="dialog"]',
       );
-      const hasSettingsContent =
-        (await settingsContent.count()) > 0 ||
-        (await page.locator("text=/Impostazioni|Settings/i").isVisible());
-      expect(hasSettingsContent).toBeTruthy();
+      await expect(settingsContent.first()).toBeVisible({ timeout: 15000 });
     });
 
     test("settings page loads without 403 errors", async ({
