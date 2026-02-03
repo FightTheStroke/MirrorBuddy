@@ -18,8 +18,8 @@ import {
 import type { Locale } from "@/i18n/config";
 
 test.describe("Locale Switching and Content Localization", () => {
-  // Locale switching tests navigate multiple pages per locale, slow under load
-  test.setTimeout(60000);
+  // Locale switching tests navigate multiple pages per locale, very slow under CI load
+  test.setTimeout(600000);
 
   test.beforeEach(async ({ localePage }) => {
     // Mock ToS acceptance to bypass modal

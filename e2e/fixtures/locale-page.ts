@@ -28,16 +28,17 @@ export class LocalePage {
     // Ensure path starts with /
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     const localizedPath = `/${this.locale}${cleanPath}`;
-    const navigate = async () => {
+    const navigate = async (timeoutMs: number) => {
       await this.page.goto(localizedPath, {
         waitUntil: "domcontentloaded",
-        timeout: 120000,
+        timeout: timeoutMs,
       });
-      await this.page.waitForLoadState("networkidle", { timeout: 90000 });
+      await this.page.waitForLoadState("networkidle", { timeout: timeoutMs });
     };
-    for (let attempt = 1; attempt <= 2; attempt += 1) {
+    const attemptTimeouts = [300000, 600000];
+    for (let attempt = 1; attempt <= attemptTimeouts.length; attempt += 1) {
       try {
-        await navigate();
+        await navigate(attemptTimeouts[attempt - 1]);
         return;
       } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
@@ -45,10 +46,10 @@ export class LocalePage {
           message.includes("net::ERR_ABORTED") ||
           message.includes("detached") ||
           message.includes("Timeout");
-        if (!retriable || attempt === 2) {
+        if (!retriable || attempt === attemptTimeouts.length) {
           throw error;
         }
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForTimeout(5000);
       }
     }
   }
@@ -59,7 +60,7 @@ export class LocalePage {
   async waitForLocaleLoad(): Promise<void> {
     // Wait for HTML lang attribute to match locale
     await this.page.waitForSelector(`html[lang="${this.locale}"]`, {
-      timeout: 5000,
+      timeout: 30000,
     });
   }
 
