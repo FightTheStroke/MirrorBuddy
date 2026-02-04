@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Trophy,
   Flame,
@@ -12,10 +12,11 @@ import {
   Zap,
   Lock,
   Check,
-} from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import type { Achievement } from '@/types';
+  Users,
+} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import type { Achievement } from "@/types";
 
 interface AchievementsGridProps {
   achievements: Achievement[];
@@ -23,7 +24,7 @@ interface AchievementsGridProps {
 }
 
 // Icon mapping for achievement categories
-const categoryIcons: Record<Achievement['category'], React.ReactNode> = {
+const categoryIcons: Record<Achievement["category"], React.ReactNode> = {
   study: <BookOpen className="w-6 h-6" />,
   mastery: <Star className="w-6 h-6" />,
   streak: <Flame className="w-6 h-6" />,
@@ -32,21 +33,27 @@ const categoryIcons: Record<Achievement['category'], React.ReactNode> = {
   xp: <Zap className="w-6 h-6" />,
   onboarding: <Trophy className="w-6 h-6" />,
   time: <BookOpen className="w-6 h-6" />,
+  independence: <Users className="w-6 h-6" />,
 };
 
-const categoryColors: Record<Achievement['category'], string> = {
-  study: 'from-blue-400 to-blue-600',
-  mastery: 'from-amber-400 to-amber-600',
-  streak: 'from-orange-400 to-red-500',
-  social: 'from-pink-400 to-pink-600',
-  exploration: 'from-cyan-400 to-cyan-600',
-  xp: 'from-purple-400 to-purple-600',
-  onboarding: 'from-green-400 to-green-600',
-  time: 'from-indigo-400 to-indigo-600',
+const categoryColors: Record<Achievement["category"], string> = {
+  study: "from-blue-400 to-blue-600",
+  mastery: "from-amber-400 to-amber-600",
+  streak: "from-orange-400 to-red-500",
+  social: "from-pink-400 to-pink-600",
+  exploration: "from-cyan-400 to-cyan-600",
+  xp: "from-purple-400 to-purple-600",
+  onboarding: "from-green-400 to-green-600",
+  time: "from-indigo-400 to-indigo-600",
+  independence: "from-teal-400 to-teal-600",
 };
 
-export function AchievementsGrid({ achievements, className }: AchievementsGridProps) {
-  const [selectedAchievement, setSelectedAchievement] = useState<Achievement | null>(null);
+export function AchievementsGrid({
+  achievements,
+  className,
+}: AchievementsGridProps) {
+  const [selectedAchievement, setSelectedAchievement] =
+    useState<Achievement | null>(null);
 
   // C-19 FIX: Handle Escape key to close modal
   const closeModal = useCallback(() => setSelectedAchievement(null), []);
@@ -54,15 +61,15 @@ export function AchievementsGrid({ achievements, className }: AchievementsGridPr
   useEffect(() => {
     if (!selectedAchievement) return;
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === "Escape") {
         closeModal();
       }
     };
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, [selectedAchievement, closeModal]);
 
-  const unlockedCount = achievements.filter(a => a.unlockedAt).length;
+  const unlockedCount = achievements.filter((a) => a.unlockedAt).length;
 
   return (
     <Card className={className}>
@@ -127,10 +134,10 @@ function AchievementBadge({ achievement, onClick }: AchievementBadgeProps) {
     <motion.button
       onClick={onClick}
       className={cn(
-        'relative w-14 h-14 rounded-xl flex items-center justify-center transition-all',
+        "relative w-14 h-14 rounded-xl flex items-center justify-center transition-all",
         isUnlocked
           ? `bg-gradient-to-br ${categoryColors[achievement.category]} text-white shadow-lg`
-          : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+          : "bg-slate-200 dark:bg-slate-700 text-slate-400",
       )}
       whileHover={{ scale: 1.1 }}
       whileTap={{ scale: 0.95 }}
@@ -167,10 +174,10 @@ function AchievementDetail({ achievement }: AchievementDetailProps) {
       {/* Badge */}
       <div
         className={cn(
-          'w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4',
+          "w-20 h-20 mx-auto rounded-2xl flex items-center justify-center mb-4",
           isUnlocked
             ? `bg-gradient-to-br ${categoryColors[achievement.category]} text-white`
-            : 'bg-slate-200 dark:bg-slate-700 text-slate-400'
+            : "bg-slate-200 dark:bg-slate-700 text-slate-400",
         )}
       >
         {isUnlocked ? (
@@ -189,13 +196,16 @@ function AchievementDetail({ achievement }: AchievementDetailProps) {
       {/* XP Reward */}
       <div className="flex items-center justify-center gap-2 mb-4">
         <Zap className="w-4 h-4 text-purple-500" />
-        <span className="text-purple-600 font-medium">+{achievement.xpReward} XP</span>
+        <span className="text-purple-600 font-medium">
+          +{achievement.xpReward} XP
+        </span>
       </div>
 
       {/* Status */}
       {isUnlocked ? (
         <div className="text-sm text-green-600 dark:text-green-400">
-          Sbloccato il {new Date(achievement.unlockedAt!).toLocaleDateString('it-IT')}
+          Sbloccato il{" "}
+          {new Date(achievement.unlockedAt!).toLocaleDateString("it-IT")}
         </div>
       ) : (
         <div className="text-sm text-slate-500">
@@ -209,28 +219,172 @@ function AchievementDetail({ achievement }: AchievementDetailProps) {
 // Predefined achievements for the app
 export const defaultAchievements: Achievement[] = [
   // Study achievements
-  { id: 'first_session', name: 'Prima Lezione', description: 'Completa la tua prima sessione di studio', icon: '📚', category: 'study', requirement: 1, xpReward: 50, mirrorBucksReward: 50 },
-  { id: 'study_10', name: 'Studente Attivo', description: 'Completa 10 sessioni di studio', icon: '📖', category: 'study', requirement: 10, xpReward: 100, mirrorBucksReward: 100 },
-  { id: 'study_50', name: 'Studente Dedicato', description: 'Completa 50 sessioni di studio', icon: '🎓', category: 'study', requirement: 50, xpReward: 250, mirrorBucksReward: 250 },
-  { id: 'study_100', name: 'Studioso', description: 'Completa 100 sessioni di studio', icon: '🏆', category: 'study', requirement: 100, xpReward: 500, mirrorBucksReward: 500 },
+  {
+    id: "first_session",
+    name: "Prima Lezione",
+    description: "Completa la tua prima sessione di studio",
+    icon: "📚",
+    category: "study",
+    requirement: 1,
+    xpReward: 50,
+    mirrorBucksReward: 50,
+  },
+  {
+    id: "study_10",
+    name: "Studente Attivo",
+    description: "Completa 10 sessioni di studio",
+    icon: "📖",
+    category: "study",
+    requirement: 10,
+    xpReward: 100,
+    mirrorBucksReward: 100,
+  },
+  {
+    id: "study_50",
+    name: "Studente Dedicato",
+    description: "Completa 50 sessioni di studio",
+    icon: "🎓",
+    category: "study",
+    requirement: 50,
+    xpReward: 250,
+    mirrorBucksReward: 250,
+  },
+  {
+    id: "study_100",
+    name: "Studioso",
+    description: "Completa 100 sessioni di studio",
+    icon: "🏆",
+    category: "study",
+    requirement: 100,
+    xpReward: 500,
+    mirrorBucksReward: 500,
+  },
 
   // Streak achievements
-  { id: 'streak_3', name: 'Tre Giorni!', description: 'Mantieni una serie di 3 giorni', icon: '🔥', category: 'streak', requirement: 3, xpReward: 75, mirrorBucksReward: 100 },
-  { id: 'streak_7', name: 'Una Settimana!', description: 'Mantieni una serie di 7 giorni', icon: '🔥', category: 'streak', requirement: 7, xpReward: 150, mirrorBucksReward: 250 },
-  { id: 'streak_30', name: 'Un Mese!', description: 'Mantieni una serie di 30 giorni', icon: '🔥', category: 'streak', requirement: 30, xpReward: 500, mirrorBucksReward: 1000 },
-  { id: 'streak_100', name: 'Leggenda!', description: 'Mantieni una serie di 100 giorni', icon: '🔥', category: 'streak', requirement: 100, xpReward: 1000, mirrorBucksReward: 5000 },
+  {
+    id: "streak_3",
+    name: "Tre Giorni!",
+    description: "Mantieni una serie di 3 giorni",
+    icon: "🔥",
+    category: "streak",
+    requirement: 3,
+    xpReward: 75,
+    mirrorBucksReward: 100,
+  },
+  {
+    id: "streak_7",
+    name: "Una Settimana!",
+    description: "Mantieni una serie di 7 giorni",
+    icon: "🔥",
+    category: "streak",
+    requirement: 7,
+    xpReward: 150,
+    mirrorBucksReward: 250,
+  },
+  {
+    id: "streak_30",
+    name: "Un Mese!",
+    description: "Mantieni una serie di 30 giorni",
+    icon: "🔥",
+    category: "streak",
+    requirement: 30,
+    xpReward: 500,
+    mirrorBucksReward: 1000,
+  },
+  {
+    id: "streak_100",
+    name: "Leggenda!",
+    description: "Mantieni una serie di 100 giorni",
+    icon: "🔥",
+    category: "streak",
+    requirement: 100,
+    xpReward: 1000,
+    mirrorBucksReward: 5000,
+  },
 
   // Mastery achievements
-  { id: 'master_1', name: 'Primo Professore', description: 'Raggiungi la padronanza in una materia', icon: '⭐', category: 'mastery', requirement: 1, xpReward: 200, mirrorBucksReward: 1000 },
-  { id: 'master_5', name: 'Multidisciplinare', description: 'Raggiungi la padronanza in 5 materie', icon: '⭐', category: 'mastery', requirement: 5, xpReward: 500, mirrorBucksReward: 2500 },
-  { id: 'perfect_quiz', name: 'Perfezionista', description: 'Completa un quiz con il 100%', icon: '💯', category: 'mastery', requirement: 1, xpReward: 100, mirrorBucksReward: 200 },
+  {
+    id: "master_1",
+    name: "Primo Professore",
+    description: "Raggiungi la padronanza in una materia",
+    icon: "⭐",
+    category: "mastery",
+    requirement: 1,
+    xpReward: 200,
+    mirrorBucksReward: 1000,
+  },
+  {
+    id: "master_5",
+    name: "Multidisciplinare",
+    description: "Raggiungi la padronanza in 5 materie",
+    icon: "⭐",
+    category: "mastery",
+    requirement: 5,
+    xpReward: 500,
+    mirrorBucksReward: 2500,
+  },
+  {
+    id: "perfect_quiz",
+    name: "Perfezionista",
+    description: "Completa un quiz con il 100%",
+    icon: "💯",
+    category: "mastery",
+    requirement: 1,
+    xpReward: 100,
+    mirrorBucksReward: 200,
+  },
 
   // Exploration achievements
-  { id: 'all_maestros', name: 'Collezionista', description: 'Studia con tutti i 17 professori', icon: '🧭', category: 'exploration', requirement: 17, xpReward: 300, mirrorBucksReward: 500 },
-  { id: 'curious', name: 'Curioso', description: 'Fai 50 domande ai professori', icon: '❓', category: 'exploration', requirement: 50, xpReward: 150, mirrorBucksReward: 200 },
+  {
+    id: "all_maestros",
+    name: "Collezionista",
+    description: "Studia con tutti i 17 professori",
+    icon: "🧭",
+    category: "exploration",
+    requirement: 17,
+    xpReward: 300,
+    mirrorBucksReward: 500,
+  },
+  {
+    id: "curious",
+    name: "Curioso",
+    description: "Fai 50 domande ai professori",
+    icon: "❓",
+    category: "exploration",
+    requirement: 50,
+    xpReward: 150,
+    mirrorBucksReward: 200,
+  },
 
   // XP achievements
-  { id: 'xp_1000', name: 'Mille Punti', description: 'Accumula 1000 XP', icon: '⚡', category: 'xp', requirement: 1000, xpReward: 100, mirrorBucksReward: 100 },
-  { id: 'xp_5000', name: 'Cinquemila', description: 'Accumula 5000 XP', icon: '⚡', category: 'xp', requirement: 5000, xpReward: 250, mirrorBucksReward: 250 },
-  { id: 'xp_10000', name: 'Diecimila!', description: 'Accumula 10000 XP', icon: '⚡', category: 'xp', requirement: 10000, xpReward: 500, mirrorBucksReward: 500 },
+  {
+    id: "xp_1000",
+    name: "Mille Punti",
+    description: "Accumula 1000 XP",
+    icon: "⚡",
+    category: "xp",
+    requirement: 1000,
+    xpReward: 100,
+    mirrorBucksReward: 100,
+  },
+  {
+    id: "xp_5000",
+    name: "Cinquemila",
+    description: "Accumula 5000 XP",
+    icon: "⚡",
+    category: "xp",
+    requirement: 5000,
+    xpReward: 250,
+    mirrorBucksReward: 250,
+  },
+  {
+    id: "xp_10000",
+    name: "Diecimila!",
+    description: "Accumula 10000 XP",
+    icon: "⚡",
+    category: "xp",
+    requirement: 10000,
+    xpReward: 500,
+    mirrorBucksReward: 500,
+  },
 ];

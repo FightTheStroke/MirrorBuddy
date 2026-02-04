@@ -97,7 +97,40 @@ To report concerns about AI use in MirrorBuddy:
 
 We respond to complaints within 30 business days.
 
-## 11. Review and Update
+## 11. Philosophical Foundations
+
+### 11.1 Inspiration from AI Safety Research
+
+MirrorBuddy's safety approach is informed by contemporary AI safety research, including Dario Amodei's essay ["The Adolescence of Technology"](https://www.darioamodei.com/essay/the-adolescence-of-technology) (January 2026), which highlights:
+
+- **AI Influence Risk**: Personalized AI agents pose unique risks for opinion formation, especially for minors
+- **Dependency Concerns**: Risk of users becoming emotionally or socially dependent on AI systems
+- **STEM Knowledge Dangers**: AI democratizing dangerous knowledge in biology, chemistry, and physics
+- **Constitutional AI**: Values-based training over purely rules-based constraints
+
+### 11.2 The Professors' Constitution
+
+Our 26 AI Professors operate under a philosophical constitution that prioritizes:
+
+1. **Autonomy First**: Every interaction leaves the student more capable of independent learning
+2. **Human Relationships Are Irreplaceable**: AI does not compete with parents, teachers, or friends
+3. **No Opinions, Only Knowledge**: Facts and perspectives, never personal opinions on controversial topics
+4. **Protection from Dependency**: Excessive usage is monitored and flagged as a concern
+5. **Responsible Knowledge**: Science education without instructions for harm
+6. **Total Transparency**: Always clear that students are interacting with AI
+
+Full document: [The Professors' Constitution](./PROFESSORS-CONSTITUTION.md)
+
+### 11.3 Implementation
+
+These principles are technically enforced through:
+
+- **Anti-Influence Module**: Detects and redirects requests for opinions or AI preference patterns
+- **Dependency Detection System**: Monitors usage patterns and alerts parents when thresholds are exceeded
+- **STEM Safety Guardrails**: Subject-specific blocklists for chemistry, physics, and biology
+- **Human First Prompts**: Periodic encouragement to talk to parents, teachers, and friends
+
+## 12. Review and Update
 
 This policy is subject to:
 
@@ -106,8 +139,8 @@ This policy is subject to:
 - **Stakeholder Feedback**: Annual consultation with teachers, parents, regulators
 - **Communication**: Significant changes communicated via email to all active users
 
-**Date of last update**: January 20, 2026
-**Date of next review**: January 20, 2027
+**Date of last update**: February 4, 2026
+**Date of next review**: February 4, 2027
 
 ---
 

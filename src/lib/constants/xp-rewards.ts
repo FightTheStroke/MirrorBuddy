@@ -19,17 +19,17 @@
  * Index = level number (0-indexed), value = total XP needed to reach that level.
  */
 export const XP_PER_LEVEL = [
-  0,      // Level 1
-  100,    // Level 2
-  250,    // Level 3
-  500,    // Level 4
-  1000,   // Level 5
-  2000,   // Level 6
-  4000,   // Level 7
-  8000,   // Level 8
-  16000,  // Level 9
-  32000,  // Level 10
-  64000,  // Level 11 (max)
+  0, // Level 1
+  100, // Level 2
+  250, // Level 3
+  500, // Level 4
+  1000, // Level 5
+  2000, // Level 6
+  4000, // Level 7
+  8000, // Level 8
+  16000, // Level 9
+  32000, // Level 10
+  64000, // Level 11 (max)
 ] as const;
 
 // ============================================================================
@@ -87,12 +87,35 @@ export const FLASHCARD_XP = {
  * XP rewards indexed by rating string.
  * For use in components that need Record<Rating, number> type.
  */
-export const FLASHCARD_XP_BY_RATING: Record<'again' | 'hard' | 'good' | 'easy', number> = {
+export const FLASHCARD_XP_BY_RATING: Record<
+  "again" | "hard" | "good" | "easy",
+  number
+> = {
   again: FLASHCARD_XP.AGAIN,
   hard: FLASHCARD_XP.HARD,
   good: FLASHCARD_XP.GOOD,
   easy: FLASHCARD_XP.EASY,
 };
+
+// ============================================================================
+// Independence XP (Amodei 2026)
+// Reference: Professors' Constitution Article II & IV
+// ============================================================================
+
+/**
+ * XP rewards for independence behaviors.
+ * Encourages human relationships over AI dependency.
+ */
+export const INDEPENDENCE_XP = {
+  /** XP for solving a problem independently before asking AI */
+  SOLVED_INDEPENDENTLY: 25,
+  /** XP for mentioning getting help from parent/teacher */
+  HUMAN_HELP_MENTION: 15,
+  /** XP for mentioning studying with classmates */
+  STUDY_GROUP_MENTION: 15,
+  /** Daily bonus for balanced AI usage (<60 min) */
+  BALANCED_USAGE_BONUS: 20,
+} as const;
 
 // ============================================================================
 // Helper Functions

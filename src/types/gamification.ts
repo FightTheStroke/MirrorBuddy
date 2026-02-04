@@ -2,14 +2,14 @@
 // GAMIFICATION TYPES - Progress, Achievements, Streaks, Mastery
 // ============================================================================
 
-import type { Subject } from './content';
+import type { Subject } from "./content";
 
 export type MasteryTier =
-  | 'beginner'
-  | 'intermediate'
-  | 'advanced'
-  | 'expert'
-  | 'master';
+  | "beginner"
+  | "intermediate"
+  | "advanced"
+  | "expert"
+  | "master";
 
 export interface SubjectMastery {
   subject: Subject;
@@ -31,7 +31,16 @@ export interface Achievement {
   name: string;
   description: string;
   icon: string;
-  category: 'study' | 'mastery' | 'streak' | 'social' | 'exploration' | 'xp' | 'onboarding' | 'time';
+  category:
+    | "study"
+    | "mastery"
+    | "streak"
+    | "social"
+    | "exploration"
+    | "xp"
+    | "onboarding"
+    | "time"
+    | "independence";
   requirement: number;
   xpReward: number;
   mirrorBucksReward: number;
@@ -66,7 +75,7 @@ export interface Progress {
 
 // === SEASON TYPES ===
 
-export type SeasonName = 'Autunno' | 'Inverno' | 'Primavera' | 'Estate';
+export type SeasonName = "Autunno" | "Inverno" | "Primavera" | "Estate";
 
 export interface Season {
   name: SeasonName;
@@ -87,12 +96,12 @@ export interface SeasonHistory {
 // === GRADE TYPES (Italian System) ===
 
 export type GradeType =
-  | 'quiz'
-  | 'homework'
-  | 'test'
-  | 'participation'
-  | 'project'
-  | 'oral';
+  | "quiz"
+  | "homework"
+  | "test"
+  | "participation"
+  | "project"
+  | "oral";
 
 export interface Grade {
   id: string;
@@ -107,5 +116,5 @@ export interface SubjectGrades {
   subject: Subject;
   grades: Grade[];
   average: number;
-  trend: 'improving' | 'stable' | 'declining';
+  trend: "improving" | "stable" | "declining";
 }

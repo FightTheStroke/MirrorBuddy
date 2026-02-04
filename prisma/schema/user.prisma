@@ -95,6 +95,10 @@ model User {
 
   // User-level feature AI config overrides (ADR 0073)
   featureConfigs UserFeatureConfig[] @relation("UserFeatureConfigs")
+
+  // Dependency Monitoring (Amodei 2026)
+  usagePatterns    UsagePattern[]
+  dependencyAlerts DependencyAlert[]
 }
 
 model Profile {

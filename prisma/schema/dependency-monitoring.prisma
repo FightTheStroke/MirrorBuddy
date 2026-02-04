@@ -1,0 +1,85 @@
+// ============================================================================
+// DEPENDENCY MONITORING DOMAIN
+// AI usage pattern tracking and dependency alert system
+// Reference: Amodei "The Adolescence of Technology" (2026)
+// ============================================================================
+
+// Daily usage pattern aggregation for dependency analysis
+model UsagePattern {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  date DateTime @db.Date
+
+  // Session metrics
+  sessionCount Int @default(0)
+  totalMinutes Int @default(0)
+  messageCount Int @default(0)
+
+  // Behavioral indicators
+  emotionalVentCount Int @default(0) // Messages expressing loneliness, frustration, anxiety
+  aiPreferenceCount  Int @default(0) // "I prefer talking to you" patterns
+
+  // Night usage tracking (>22:00)
+  nightMinutes Int @default(0)
+
+  // Statistical analysis
+  weekdayAverage Float? // Rolling 7-day average for this user
+  stdDeviation   Float? // Standard deviation for anomaly detection
+
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+  @@index([isTestData, date])
+  @@map("usage_patterns")
+}
+
+// Dependency alerts for parents/admins
+model DependencyAlert {
+  id String @id @default(cuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Alert classification
+  alertType String // excessive_usage | emotional_venting | ai_preference | night_usage
+  severity  String // warning | concern | critical
+
+  // Statistical context
+  sigmaDeviation Float? // How many standard deviations from normal
+  triggerValue   Int? // The value that triggered the alert
+  threshold      Int? // The threshold that was exceeded
+
+  // Alert context
+  description String?
+  details     Json? // Additional data (patterns, timestamps, etc.)
+
+  // Resolution tracking
+  parentNotified   Boolean   @default(false)
+  parentNotifiedAt DateTime?
+  resolved         Boolean   @default(false)
+  resolvedAt       DateTime?
+  resolvedBy       String?
+  resolution       String?
+
+  // F-06: Test data isolation
+  isTestData Boolean @default(false)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([alertType])
+  @@index([severity])
+  @@index([resolved])
+  @@index([createdAt])
+  @@index([isTestData, createdAt])
+  @@map("dependency_alerts")
+}
