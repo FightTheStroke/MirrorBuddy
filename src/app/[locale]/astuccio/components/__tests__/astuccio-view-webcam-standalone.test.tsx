@@ -152,10 +152,10 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
     render(<AstuccioView />);
 
     // Find and click the webcam-standalone tool button
-    // The label key doesn't exist, so it falls back to "webcamStandalone.label"
+    // Italian label is "Scatta Foto" (from tools.webcamStandalone.label)
     const buttons = screen.getAllByRole("button");
     const webcamButton = buttons.find((btn) =>
-      btn.textContent?.toLowerCase().includes("standalone"),
+      btn.textContent?.toLowerCase().includes("scatta foto"),
     );
 
     expect(webcamButton).toBeDefined();
@@ -174,7 +174,7 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
 
     const buttons = screen.getAllByRole("button");
     const webcamButton = buttons.find((btn) =>
-      btn.textContent?.toLowerCase().includes("standalone"),
+      btn.textContent?.toLowerCase().includes("scatta foto"),
     );
 
     if (webcamButton) {
@@ -193,7 +193,7 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
 
     const buttons = screen.getAllByRole("button");
     const webcamButton = buttons.find((btn) =>
-      btn.textContent?.toLowerCase().includes("standalone"),
+      btn.textContent?.toLowerCase().includes("scatta foto"),
     );
 
     if (webcamButton) {
@@ -227,7 +227,7 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
 
     const buttons = screen.getAllByRole("button");
     const webcamButton = buttons.find((btn) =>
-      btn.textContent?.toLowerCase().includes("standalone"),
+      btn.textContent?.toLowerCase().includes("scatta foto"),
     );
 
     if (webcamButton) {
@@ -251,7 +251,7 @@ describe("AstuccioView - Webcam Standalone (T1-08)", () => {
 
     const buttons = screen.getAllByRole("button");
     const webcamButton = buttons.find((btn) =>
-      btn.textContent?.toLowerCase().includes("standalone"),
+      btn.textContent?.toLowerCase().includes("scatta foto"),
     );
 
     if (webcamButton) {

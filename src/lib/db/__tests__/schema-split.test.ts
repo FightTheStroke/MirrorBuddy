@@ -36,6 +36,7 @@ const EXPECTED_SCHEMA_FILES = [
   "locale.prisma", // LocaleConfig (i18n locale configuration)
   "vault.prisma", // SecretVault (encrypted API key storage)
   "characters.prisma", // CharacterConfig (admin character management)
+  "dependency-monitoring.prisma", // UsagePattern, DependencyAlert (AI safety)
 ];
 
 // Expected models that should be present across all schema files
@@ -117,6 +118,9 @@ const EXPECTED_MODELS = [
   "SecretVault",
   // characters.prisma
   "CharacterConfig",
+  // dependency-monitoring.prisma
+  "UsagePattern",
+  "DependencyAlert",
 ];
 
 describe("Prisma Schema Split", () => {
