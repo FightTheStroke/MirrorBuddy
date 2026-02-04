@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+- **Fixed**: Debug endpoints (`/api/debug-env`, `/api/debug-cert`) now return 404 in production (previously exposed environment info)
+
 ### Investigation
 
 #### W1: Tracking Investigation (Plan 116)
