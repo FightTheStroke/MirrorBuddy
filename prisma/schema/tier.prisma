@@ -198,3 +198,17 @@ model TierConfigSnapshot {
   @@index([isActive])
   @@index([createdAt])
 }
+
+// Tax configuration per country (F-30)
+model TaxConfig {
+  id                   String   @id @default(cuid())
+  countryCode          String   @unique // IT, FR, DE, ES, GB
+  vatRate              Float    @default(0)
+  reverseChargeEnabled Boolean  @default(false)
+  stripeTaxId          String?  // Stripe Tax rate ID
+  isActive             Boolean  @default(true)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@index([isActive])
+}
