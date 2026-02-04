@@ -6,7 +6,7 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     include: ["src/**/*.test.ts", "src/**/*.test.tsx", "src/**/*.spec.ts"],
-    exclude: ["node_modules", "e2e/**"],
+    exclude: ["node_modules", "e2e/**", "feat/**"],
     setupFiles: ["./src/test/setup.ts"],
     // Retry flaky tests on CI (F-07)
     retry: process.env.CI ? 2 : 0,
