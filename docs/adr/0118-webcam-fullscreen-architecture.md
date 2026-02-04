@@ -1,4 +1,4 @@
-# ADR 0114: Webcam Fullscreen Architecture
+# ADR 0118: Webcam Fullscreen Architecture
 
 ## Status
 

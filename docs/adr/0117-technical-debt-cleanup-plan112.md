@@ -1,4 +1,4 @@
-# ADR 0106: Technical Debt Cleanup - Plan 112
+# ADR 0117: Technical Debt Cleanup - Plan 112
 
 **Status**: Accepted
 **Date**: 31 January 2026

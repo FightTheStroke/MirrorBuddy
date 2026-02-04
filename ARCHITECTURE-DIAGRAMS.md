@@ -3131,6 +3131,27 @@ graph TB
     end
 ```
 
+### 25.2 Recently Added ADRs
+
+```mermaid
+graph TB
+    subgraph New_ADRs["Recently Added"]
+        ADR0102[0102 0102 - Incremental E2E Ex]
+        ADR0103[0103 0103 - E2E Test Stability]
+        ADR0104[0104 i18n Namespace Wrapper Ke]
+        ADR0105[0105 Prisma Race Condition Pre]
+        ADR0106[0106 Admin Panel Redesign]
+        ADR0107[0107 Composable API Handler Pi]
+        ADR0113[0113 Composable API Handler Pa]
+        ADR0114[0114 Query Raw Elimination]
+        ADR0115[0115 Amodei Safety Enhancement]
+        ADR0116[0116 Documentation AI-Ready Ar]
+        ADR0117[0117 Technical Debt Cleanup - ]
+        ADR0118[0118 Webcam Fullscreen Archite]
+        ADR0119[0119 Stripe Payment Integratio]
+    end
+```
+
 ## Quick Reference
 
 | Category   | Key Files                                                     | ADRs                   |

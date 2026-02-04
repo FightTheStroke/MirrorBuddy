@@ -1,4 +1,4 @@
-# ADR 0106: Documentation AI-Ready Architecture
+# ADR 0116: Documentation AI-Ready Architecture
 
 **Status**: Accepted
 **Date**: 31 January 2026

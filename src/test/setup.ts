@@ -181,8 +181,7 @@ if (typeof window !== "undefined") {
     // Ensure we can redefine location in jsdom
     if (Object.prototype.hasOwnProperty.call(window, "location")) {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        delete (window as any).location;
+        Reflect.deleteProperty(window, "location");
       } catch {
         // ignore delete failures
       }
