@@ -52,5 +52,5 @@ CREATE INDEX "dependency_alerts_severity_idx" ON "dependency_alerts"("severity")
 CREATE INDEX "dependency_alerts_parent_notified_idx" ON "dependency_alerts"("parent_notified");
 
 -- Foreign keys to User table
-ALTER TABLE "usage_patterns" ADD CONSTRAINT "usage_patterns_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE "dependency_alerts" ADD CONSTRAINT "dependency_alerts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "usage_patterns" ADD CONSTRAINT "usage_patterns_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "dependency_alerts" ADD CONSTRAINT "dependency_alerts_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
