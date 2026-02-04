@@ -60,6 +60,8 @@
       }
     },
     "webcamStandalone": {
+      "label": "Scatta Foto",
+      "description": "Scatta una foto per l'analisi",
       "savedTitle": "Foto salvata",
       "saveSuccess": "La foto è stata salvata nell'archivio",
       "saveError": "Errore nel salvataggio della foto",

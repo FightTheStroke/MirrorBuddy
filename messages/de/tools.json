@@ -544,11 +544,13 @@
       }
     },
     "webcamStandalone": {
-      "savedTitle": "[TRANSLATE] Foto salvata",
-      "saveSuccess": "[TRANSLATE] La foto è stata salvata nell'archivio",
-      "saveError": "[TRANSLATE] Errore nel salvataggio della foto",
-      "purpose": "[TRANSLATE] Scatta una foto",
-      "instructions": "[TRANSLATE] Inquadra il documento o la lavagna e scatta"
+      "label": "Foto aufnehmen",
+      "description": "Machen Sie ein Foto zur Analyse",
+      "savedTitle": "Foto gespeichert",
+      "saveSuccess": "Das Foto wurde im Archiv gespeichert",
+      "saveError": "Fehler beim Speichern des Fotos",
+      "purpose": "Ein Foto aufnehmen",
+      "instructions": "Rahmen Sie das Dokument oder die Tafel ein und fotografieren Sie"
     }
   }
 }

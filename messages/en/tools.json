@@ -544,11 +544,13 @@
       }
     },
     "webcamStandalone": {
-      "savedTitle": "[TRANSLATE] Foto salvata",
-      "saveSuccess": "[TRANSLATE] La foto è stata salvata nell'archivio",
-      "saveError": "[TRANSLATE] Errore nel salvataggio della foto",
-      "purpose": "[TRANSLATE] Scatta una foto",
-      "instructions": "[TRANSLATE] Inquadra il documento o la lavagna e scatta"
+      "label": "Take Photo",
+      "description": "Take a photo for analysis",
+      "savedTitle": "Photo saved",
+      "saveSuccess": "The photo has been saved to archive",
+      "saveError": "Error saving photo",
+      "purpose": "Take a photo",
+      "instructions": "Frame the document or whiteboard and snap"
     }
   }
 }
