@@ -10,7 +10,17 @@ import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendInstance: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resendInstance) {
+    if (!process.env.RESEND_API_KEY) {
+      throw new Error("RESEND_API_KEY environment variable is not set");
+    }
+    resendInstance = new Resend(process.env.RESEND_API_KEY);
+  }
+  return resendInstance;
+}
 
 interface DunningNotification {
   userId: string;
@@ -156,7 +166,7 @@ export class DunningService {
     `;
 
     try {
-      await resend.emails.send({
+      await getResend().emails.send({
         from: "MirrorBuddy <noreply@mirrorbuddy.app>",
         to: email,
         subject,
@@ -181,7 +191,7 @@ export class DunningService {
     `;
 
     try {
-      await resend.emails.send({
+      await getResend().emails.send({
         from: "MirrorBuddy <noreply@mirrorbuddy.app>",
         to: email,
         subject: "Subscription Downgraded",
