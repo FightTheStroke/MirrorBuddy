@@ -2,10 +2,14 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 export const GET = pipe(withSentry("/api/debug-env"))(async () => {
+  // Block in production - only allow in development
+  if (process.env.NODE_ENV !== "development") {
+    return NextResponse.json({ error: "Not Found" }, { status: 404 });
+  }
+
   return NextResponse.json({
     NODE_ENV: process.env.NODE_ENV,
     VERCEL: process.env.VERCEL,
-    isProduction:
-      process.env.NODE_ENV === "production" || process.env.VERCEL === "1",
+    isProduction: false, // Always false since this endpoint only works in development
   });
 });
