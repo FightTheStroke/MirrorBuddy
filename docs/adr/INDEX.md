@@ -139,11 +139,12 @@
 
 ## Tier & Business
 
-| #    | Decision                              | Impact                   |
-| ---- | ------------------------------------- | ------------------------ |
-| 0056 | Trial Mode Architecture               | Anonymous trial access   |
-| 0057 | Beta Invite System and Data Migration | Invite-based beta access |
-| 0071 | Tier Subscription System              | Trial/Base/Pro tiers     |
+| #    | Decision                              | Impact                                              |
+| ---- | ------------------------------------- | --------------------------------------------------- |
+| 0056 | Trial Mode Architecture               | Anonymous trial access                              |
+| 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
+| 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
+| 0115 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
 
 ## Archived
 
