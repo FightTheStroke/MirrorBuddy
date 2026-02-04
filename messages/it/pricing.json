@@ -1,0 +1,51 @@
+{
+  "pricing": {
+    "title": "Prezzi",
+    "subtitle": "Scegli il piano perfetto per te",
+    "tiers": {
+      "trial": {
+        "name": "Trial",
+        "description": "Prova gratuita con funzionalità limitate",
+        "price": "Gratis",
+        "features": [
+          "5 messaggi chat al giorno",
+          "3 minuti voce al giorno",
+          "1 Maestro disponibile",
+          "Strumenti di base"
+        ],
+        "cta": "Inizia ora"
+      },
+      "base": {
+        "name": "Base",
+        "description": "Piano gratuito con funzionalità standard",
+        "price": "Gratis",
+        "features": [
+          "10 messaggi chat al giorno",
+          "5 minuti voce al giorno",
+          "3 Maestri disponibili",
+          "Tutti gli strumenti",
+          "Mind map e quiz"
+        ],
+        "cta": "Registrati gratis"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Piano premium con tutto sbloccato",
+        "price": "€9,99",
+        "period": "/mese",
+        "features": [
+          "Chat illimitata",
+          "Voce illimitata",
+          "Tutti i 26 Maestri",
+          "Tutti gli strumenti",
+          "Dashboard genitori",
+          "Supporto prioritario",
+          "Analitiche avanzate"
+        ],
+        "cta": "Passa a Pro"
+      }
+    },
+    "loading": "Caricamento...",
+    "error": "Errore nel caricamento dei prezzi"
+  }
+}
