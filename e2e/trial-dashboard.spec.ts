@@ -101,14 +101,27 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       });
     });
 
-    // Allow onboarding
-    await page.route("**/api/user/onboarding", (route) => {
+    // Mock onboarding API - IMPORTANT: hydrateFromApi() calls /api/onboarding (not /api/user/onboarding)
+    // This mock prevents redirect to /welcome by reporting onboarding as completed
+    await page.route("**/api/onboarding", (route) => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          hasCompletedOnboarding: true,
-          onboardingCompletedAt: new Date().toISOString(),
+          onboardingState: {
+            hasCompletedOnboarding: true,
+            onboardingCompletedAt: new Date().toISOString(),
+            currentStep: "ready",
+            isReplayMode: false,
+          },
+          hasExistingData: true,
+          data: {
+            name: "Trial User",
+            age: 15,
+            schoolLevel: "media",
+            learningDifferences: [],
+            gender: "other",
+          },
         }),
       });
     });
@@ -132,7 +145,8 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       maxChats: 10,
     });
 
-    await trialPage.goto("/");
+    // Navigate to locale home page (not "/" which redirects to /landing → /welcome)
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     // Trial badge is a Link with data-testid in the locale header
@@ -152,7 +166,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       maxChats: 10,
     });
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -163,7 +177,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
   test("trial badge links to invite request page", async ({ trialPage }) => {
     await setupTrialMocks(trialPage);
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -181,7 +195,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       maxChats: 10,
     });
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -200,7 +214,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       maxChats: 10,
     });
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -213,7 +227,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
   test("trial badge has accessible title attribute", async ({ trialPage }) => {
     await setupTrialMocks(trialPage);
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     const trialBadge = trialPage.locator('[data-testid="trial-badge"]');
@@ -236,13 +250,26 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       });
     });
 
-    await trialPage.route("**/api/user/onboarding", (route) => {
+    // Mock onboarding API - hydrateFromApi() calls /api/onboarding (not /api/user/onboarding)
+    await trialPage.route("**/api/onboarding", (route) => {
       route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify({
-          hasCompletedOnboarding: true,
-          onboardingCompletedAt: new Date().toISOString(),
+          onboardingState: {
+            hasCompletedOnboarding: true,
+            onboardingCompletedAt: new Date().toISOString(),
+            currentStep: "ready",
+            isReplayMode: false,
+          },
+          hasExistingData: true,
+          data: {
+            name: "Test User",
+            age: 15,
+            schoolLevel: "media",
+            learningDifferences: [],
+            gender: "other",
+          },
         }),
       });
     });
@@ -255,7 +282,7 @@ test.describe("Trial Mode - Header Badge (F-05)", () => {
       });
     });
 
-    await trialPage.goto("/");
+    await trialPage.goto("/it");
     await trialPage.waitForLoadState("domcontentloaded");
 
     // Wait for page to fully hydrate
