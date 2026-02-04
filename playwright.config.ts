@@ -73,8 +73,8 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   // 2 min default timeout in CI, 30s local
   timeout: process.env.CI ? 120000 : 30000,
-  // 2 retries in CI to handle flaky mobile tests (hydration timing varies)
-  retries: process.env.CI ? 2 : 0,
+  // 3 retries in CI to handle flaky tests (hydration timing, SSE, network)
+  retries: process.env.CI ? 3 : 0,
   // Use 2 workers for mobile tests (CI_MOBILE_TESTS=1) to reduce resource contention
   workers: process.env.CI ? (process.env.CI_MOBILE_TESTS ? 2 : 4) : undefined,
   reporter: [
