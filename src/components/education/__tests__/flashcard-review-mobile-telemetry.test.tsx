@@ -30,6 +30,9 @@ vi.mock("framer-motion", () => ({
     div: ({ children, ...props }: React.PropsWithChildren<unknown>) => (
       <div {...props}>{children}</div>
     ),
+    p: ({ children, ...props }: React.PropsWithChildren<unknown>) => (
+      <p {...props}>{children}</p>
+    ),
   },
   AnimatePresence: ({ children }: { children: React.ReactNode }) => (
     <>{children}</>
@@ -106,8 +109,8 @@ describe("FlashcardReviewMobile - Telemetry Tracking", () => {
       expect(screen.getByText("to be")).toBeInTheDocument();
     });
 
-    // Rate the card as "good"
-    const goodButton = screen.getByRole("button", { name: /good/i });
+    // Rate the card as "good" (Italian label: "Bene")
+    const goodButton = screen.getByRole("button", { name: /bene/i });
     fireEvent.click(goodButton);
 
     // Verify telemetry event
@@ -136,7 +139,13 @@ describe("FlashcardReviewMobile - Telemetry Tracking", () => {
       />,
     );
 
-    // Test each rating
+    // Test each rating (map rating to Italian label)
+    const ratingToLabel: Record<string, string> = {
+      again: "ripeti",
+      hard: "difficile",
+      good: "bene",
+      easy: "facile",
+    };
     const ratings = ["again", "hard", "good", "easy"] as const;
 
     for (const rating of ratings) {
@@ -150,10 +159,11 @@ describe("FlashcardReviewMobile - Telemetry Tracking", () => {
         expect(screen.getByText(/to be|to have/)).toBeInTheDocument();
       });
 
-      // Click rating button
+      // Click rating button (using Italian label)
+      const italianLabel = ratingToLabel[rating];
       const button = screen
         .getAllByRole("button")
-        .find((btn) => btn.textContent?.toLowerCase().includes(rating));
+        .find((btn) => btn.textContent?.toLowerCase().includes(italianLabel));
       if (button) {
         fireEvent.click(button);
 
@@ -194,9 +204,10 @@ describe("FlashcardReviewMobile - Telemetry Tracking", () => {
     fireEvent.click(screen.getByText("essere"));
     await waitFor(() => screen.getByText("to be"));
 
+    // Click "good" button (Italian label: "Bene")
     const goodButton = screen
       .getAllByRole("button")
-      .find((btn) => btn.textContent?.toLowerCase().includes("good"));
+      .find((btn) => btn.textContent?.toLowerCase().includes("bene"));
     if (goodButton) {
       fireEvent.click(goodButton);
     }

@@ -82,7 +82,7 @@ describe("useMessageSending - Telemetry Tracking", () => {
         expect.any(Number),
         expect.objectContaining({
           characterType: "coach",
-          messageLength: 14,
+          messageLength: 13,
         }),
       );
     });

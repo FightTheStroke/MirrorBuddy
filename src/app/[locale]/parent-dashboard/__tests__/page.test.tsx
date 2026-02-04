@@ -9,8 +9,16 @@ import { redirect } from "next/navigation";
 import ParentDashboardPage from "../page";
 
 // Mock next/navigation
+// redirect() in Next.js throws to stop execution
+class RedirectError extends Error {
+  constructor(public url: string) {
+    super(`NEXT_REDIRECT:${url}`);
+  }
+}
 vi.mock("next/navigation", () => ({
-  redirect: vi.fn(),
+  redirect: vi.fn((url: string) => {
+    throw new RedirectError(url);
+  }),
 }));
 
 // Mock next-intl
@@ -48,7 +56,11 @@ describe("Parent Dashboard Page", () => {
       });
 
       const params = Promise.resolve({ locale: "it" });
-      await ParentDashboardPage({ params });
+
+      // redirect() throws in Next.js to stop execution
+      await expect(ParentDashboardPage({ params })).rejects.toThrow(
+        "NEXT_REDIRECT:/it/login",
+      );
 
       expect(redirect).toHaveBeenCalledWith("/it/login");
     });
