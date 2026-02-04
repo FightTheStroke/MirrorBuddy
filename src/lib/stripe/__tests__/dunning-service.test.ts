@@ -70,6 +70,8 @@ describe("DunningService", () => {
   let dunningService: DunningService;
 
   beforeAll(() => {
+    // Set required env var for Resend lazy init
+    process.env.RESEND_API_KEY = "re_test_key";
     dunningService = new DunningService();
   });
 
