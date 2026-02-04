@@ -151,10 +151,10 @@ function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
         <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
         <div className="relative z-10">
-          <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
+          <h2 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
             <span aria-hidden="true">♿</span>
             {t("accessibility.title")}
-          </h3>
+          </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {ACCESSIBILITY_FEATURES.map((feature, idx) => (
               <div

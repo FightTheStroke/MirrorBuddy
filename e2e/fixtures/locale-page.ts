@@ -28,30 +28,13 @@ export class LocalePage {
     // Ensure path starts with /
     const cleanPath = path.startsWith("/") ? path : `/${path}`;
     const localizedPath = `/${this.locale}${cleanPath}`;
-    const navigate = async (timeoutMs: number) => {
-      await this.page.goto(localizedPath, {
-        waitUntil: "domcontentloaded",
-        timeout: timeoutMs,
-      });
-      await this.page.waitForLoadState("networkidle", { timeout: timeoutMs });
-    };
-    const attemptTimeouts = [300000, 600000];
-    for (let attempt = 1; attempt <= attemptTimeouts.length; attempt += 1) {
-      try {
-        await navigate(attemptTimeouts[attempt - 1]);
-        return;
-      } catch (error) {
-        const message = error instanceof Error ? error.message : String(error);
-        const retriable =
-          message.includes("net::ERR_ABORTED") ||
-          message.includes("detached") ||
-          message.includes("Timeout");
-        if (!retriable || attempt === attemptTimeouts.length) {
-          throw error;
-        }
-        await this.page.waitForTimeout(5000);
-      }
-    }
+    // Use domcontentloaded instead of networkidle to avoid timeout on slow resources
+    // networkidle waits for ALL network requests to finish, which can timeout on
+    // analytics, websockets, or slow third-party resources
+    await this.page.goto(localizedPath, {
+      waitUntil: "domcontentloaded",
+      timeout: 30000,
+    });
   }
 
   /**
