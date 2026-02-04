@@ -69,6 +69,7 @@
 | 0080 | Security Audit Hardening                      | Post-audit security fixes         |
 | 0098 | Trial Security Implementation                 | Secure anonymous trial access     |
 | 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance          |
+| 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety |
 
 ## Observability & Operations
 

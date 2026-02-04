@@ -30,6 +30,7 @@
   <img src="https://img.shields.io/badge/DSA%20Profiles-7-orange" alt="7 DSA Profiles">
   <img src="https://img.shields.io/badge/GDPR-Compliant-blue" alt="GDPR Compliant">
   <img src="https://img.shields.io/badge/Child%20Safe-5%20Layer%20Security-brightgreen" alt="Child Safe">
+  <a href="docs/compliance/PROFESSORS-CONSTITUTION.md"><img src="https://img.shields.io/badge/Amodei%202026-Constitution%20Compliant-blueviolet" alt="Amodei Constitution"></a>
   <a href="https://mirrorbuddy.grafana.net/d/dashboard/"><img src="https://img.shields.io/badge/Grafana-Dashboard-F46800?logo=grafana" alt="Grafana Dashboard"></a>
   <a href="https://sentry.io"><img src="https://img.shields.io/badge/Sentry-Error%20Tracking-362D59?logo=sentry" alt="Sentry Error Tracking"></a>
 </p>
@@ -132,7 +133,7 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 - **📊 Progress Tracking** — Subject mastery, session history, analytics
 - **♿ Accessibility** — WCAG 2.1 AA, 7 specialized profiles for neurodiversity
 
-**→ See full feature documentation: [FEATURES.md](FEATURES.md)**
+**→ See detailed feature documentation in [docs/claude/](docs/claude/)**
 
 ---
 
@@ -332,7 +333,7 @@ git push
 
 ### Incident Response
 
-For i18n-specific incidents, see [I18N-RUNBOOK.md](docs/operations/I18N-RUNBOOK.md):
+For i18n-specific incidents:
 
 - **INC-005**: Missing translations or broken language packs
 - **INC-006**: Locale detection failures, wrong language displayed
@@ -488,7 +489,7 @@ print(f'Last 7 days: \${result.total_cost:.2f}')
 
 | Document                                             | Description                               |
 | ---------------------------------------------------- | ----------------------------------------- |
-| [FEATURES.md](FEATURES.md)                           | Comprehensive feature documentation       |
+| [docs/claude/](docs/claude/)                         | Comprehensive feature documentation       |
 | [SETUP.md](SETUP.md)                                 | Installation and configuration guide      |
 | [SETUP-PRODUCTION.md](SETUP-PRODUCTION.md)           | Production deployment guide               |
 | [TROUBLESHOOTING.md](TROUBLESHOOTING.md)             | Common issues and solutions               |

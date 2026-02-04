@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Safety (ADR 0115 - Amodei 2026)
+
+- **Added**: Professors' Constitution (`docs/compliance/PROFESSORS-CONSTITUTION.md`) - 6 articles governing AI behavior in education
+- **Added**: Dependency detection system (`src/lib/safety/dependency/`) - tracks usage patterns, detects emotional dependency, generates alerts
+- **Added**: STEM safety blocklists (`src/lib/safety/stem-safety/`) - blocks dangerous chemistry, physics, biology knowledge queries
+- **Added**: Independence gamification - XP rewards for mentioning human help, study groups, independent problem solving
+- **Added**: Anti-influence guardrails in safety prompts (no opinions, redirect to humans for life decisions)
+- **Added**: Philosophy section on `/ai-transparency` page explaining AI principles
+- **Changed**: Chat API now integrates all safety modules (STEM check, dependency tracking, independence XP)
+
 ### Security
 
 - **Fixed**: Debug endpoints (`/api/debug-env`, `/api/debug-cert`) now return 404 in production (previously exposed environment info)
