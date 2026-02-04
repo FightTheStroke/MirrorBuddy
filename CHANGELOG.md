@@ -11,6 +11,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - **Fixed**: Debug endpoints (`/api/debug-env`, `/api/debug-cert`) now return 404 in production (previously exposed environment info)
 
+### Documentation (Plan 118)
+
+- **Added**: Security Whitepaper (`docs/SECURITY-WHITEPAPER.md`) - investor-facing security overview covering authentication, data protection, AI safety, GDPR/COPPA/EU AI Act compliance
+- **Added**: Pentest Scope Document (`docs/compliance/PENTEST-SCOPE.md`) - 180+ API endpoints inventoried by risk level, OWASP Top 10 checklist, testing boundaries for external security assessments
+
 ### Investigation
 
 #### W1: Tracking Investigation (Plan 116)
