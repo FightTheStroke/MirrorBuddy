@@ -27,7 +27,37 @@
       "startingCamera": "Starting Camera",
       "switchCamera": "Switch Camera",
       "switchingCamera": "Switching Camera",
-      "takePhoto": "Take Photo"
+      "takePhoto": "Take Photo",
+      "errors": {
+        "permission": {
+          "title": "[TRANSLATE] Permesso fotocamera negato",
+          "message": "[TRANSLATE] Per utilizzare la webcam, è necessario abilitare l'accesso alla fotocamera nelle impostazioni del browser.",
+          "instruction1": "[TRANSLATE] Clicca l'icona del lucchetto 🔒 nella barra degli indirizzi",
+          "instruction2": "[TRANSLATE] Trova \"Fotocamera\" o \"Camera\" nelle impostazioni",
+          "instruction3": "[TRANSLATE] Seleziona \"Consenti\"",
+          "instruction4": "[TRANSLATE] Ricarica la pagina o premi il pulsante Riprova"
+        },
+        "unavailable": {
+          "title": "[TRANSLATE] Fotocamera non disponibile",
+          "message": "[TRANSLATE] Nessuna fotocamera trovata. Collega una webcam o usa un dispositivo con fotocamera integrata."
+        },
+        "inUse": {
+          "title": "[TRANSLATE] Fotocamera in uso",
+          "message": "[TRANSLATE] La fotocamera è già in uso da un'altra applicazione. Chiudi le altre app che potrebbero utilizzarla e riprova."
+        },
+        "timeout": {
+          "title": "[TRANSLATE] Timeout fotocamera",
+          "message": "[TRANSLATE] La fotocamera non risponde. Controlla che sia collegata correttamente e riprova."
+        },
+        "generic": {
+          "title": "[TRANSLATE] Errore fotocamera",
+          "message": "[TRANSLATE] Impossibile accedere alla fotocamera. Verifica le impostazioni e riprova."
+        },
+        "retry": "[TRANSLATE] Riprova",
+        "close": "[TRANSLATE] Chiudi",
+        "howToEnable": "[TRANSLATE] Come abilitare la fotocamera:"
+      },
+      "selectCamera": "[TRANSLATE] Seleziona fotocamera"
     },
     "homework": {
       "label": "Homework Help",
@@ -512,6 +542,13 @@
         "printPdf": "Print PDF",
         "downloadHtml": "Download HTML"
       }
+    },
+    "webcamStandalone": {
+      "savedTitle": "[TRANSLATE] Foto salvata",
+      "saveSuccess": "[TRANSLATE] La foto è stata salvata nell'archivio",
+      "saveError": "[TRANSLATE] Errore nel salvataggio della foto",
+      "purpose": "[TRANSLATE] Scatta una foto",
+      "instructions": "[TRANSLATE] Inquadra il documento o la lavagna e scatta"
     }
   }
 }

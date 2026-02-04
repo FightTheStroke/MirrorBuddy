@@ -49,8 +49,30 @@ export function WebcamPreview({
 }: WebcamPreviewProps) {
   const t = useTranslations("tools.webcam");
   const _selectedCameraId = selectedCameraId; // Mark as unused
+
+  // Determine status message for screen readers
+  const getStatusMessage = () => {
+    if (error) return `Error: ${error}`;
+    if (isLoading) return "Starting camera...";
+    if (isSwitchingCamera) return "Switching camera...";
+    if (capturedImage) return "Photo captured successfully";
+    if (countdown !== null && countdown > 0)
+      return `Taking photo in ${countdown}`;
+    return "Camera ready";
+  };
+
   return (
     <div className="relative aspect-video bg-black">
+      {/* Screen reader status announcements */}
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {getStatusMessage()}
+      </div>
+
       {error ? (
         <WebcamError
           error={error}
@@ -144,7 +166,7 @@ export function WebcamPreview({
                     variant="outline"
                     size="sm"
                     onClick={onCancelCountdown}
-                    className="mt-6 border-white/50 text-white hover:bg-white/20"
+                    className="mt-6 border-white/50 text-white hover:bg-white/20 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                   >
                     {t("cancel")}
                   </Button>
@@ -161,7 +183,7 @@ export function WebcamPreview({
                 variant="outline"
                 size="icon"
                 onClick={onToggleFrontBack}
-                className="absolute top-4 right-4 bg-black/50 border-white/30 text-white hover:bg-black/70 z-10"
+                className="absolute top-4 right-4 bg-black/50 border-white/30 text-white hover:bg-black/70 z-10 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2"
                 aria-label={t("switchCamera")}
               >
                 <SwitchCamera className="w-5 h-5" />

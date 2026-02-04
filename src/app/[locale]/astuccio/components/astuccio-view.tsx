@@ -4,11 +4,16 @@ import { useReducer, useCallback } from "react";
 import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { nanoid } from "nanoid";
+import { toast } from "@/components/ui/toast";
+import { logger } from "@/lib/logger";
 import { ToolCard } from "./tool-card";
 import { AstuccioInfoSection } from "./astuccio-info-section";
 import { ToolMaestroSelectionDialog } from "@/components/education/tool-maestro-selection-dialog";
 import { StudyKitView } from "@/components/study-kit/StudyKitView";
 import { TypingView } from "@/components/typing/TypingView";
+import { WebcamCapture } from "@/components/tools/webcam-capture";
+import { forceSaveMaterial } from "@/lib/hooks/use-saved-materials";
 import type { ToolType } from "@/types/tools";
 import type { Maestro } from "@/types";
 import { cn } from "@/lib/utils";
@@ -23,7 +28,12 @@ import {
 // STATE MANAGEMENT - Unified with useReducer
 // ============================================================================
 
-type DialogState = "closed" | "selecting_maestro" | "study_kit" | "typing";
+type DialogState =
+  | "closed"
+  | "selecting_maestro"
+  | "study_kit"
+  | "typing"
+  | "webcam_standalone";
 
 interface AstuccioState {
   selectedToolType: ToolType | null;
@@ -57,6 +67,7 @@ function astuccioReducer(
       const dialogStateMap: Record<string, DialogState> = {
         "study-kit": "study_kit",
         typing: "typing",
+        "webcam-standalone": "webcam_standalone",
       };
       return {
         selectedToolType: action.toolType,
@@ -143,6 +154,40 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
     dispatch({ type: "CLOSE_DIALOG" });
   }, []);
 
+  const handleWebcamCapture = useCallback(
+    async (imageBase64: string) => {
+      try {
+        const toolId = nanoid();
+        const timestamp = new Date().toISOString();
+        const title = t("webcamStandalone.savedTitle", {
+          date: new Date().toLocaleDateString(),
+        });
+
+        const content = {
+          imageBase64,
+          extractedText: "",
+          imageDescription: "",
+          analysisTimestamp: timestamp,
+        };
+
+        const success = await forceSaveMaterial("webcam", title, content, {
+          toolId,
+        });
+
+        if (success) {
+          toast.success(t("webcamStandalone.saveSuccess"));
+          dispatch({ type: "CLOSE_DIALOG" });
+        } else {
+          toast.error(t("webcamStandalone.saveError"));
+        }
+      } catch (error) {
+        logger.error("Error saving webcam capture", { error });
+        toast.error(t("webcamStandalone.saveError"));
+      }
+    },
+    [t],
+  );
+
   // Show Study Kit view if selected
   if (state.dialogState === "study_kit") {
     return (
@@ -170,6 +215,19 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
         </button>
         <TypingView />
       </div>
+    );
+  }
+
+  // Show WebcamCapture if webcam-standalone is selected
+  if (state.dialogState === "webcam_standalone") {
+    return (
+      <WebcamCapture
+        purpose={t("webcamStandalone.purpose")}
+        instructions={t("webcamStandalone.instructions")}
+        onCapture={handleWebcamCapture}
+        onClose={handleDialogClose}
+        showTimer={true}
+      />
     );
   }
 

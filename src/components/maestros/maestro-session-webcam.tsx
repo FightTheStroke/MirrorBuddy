@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { WebcamCapture } from '@/components/tools/webcam-capture';
+import { motion, AnimatePresence } from "framer-motion";
+import { WebcamCapture } from "@/components/tools/webcam-capture";
 
 interface WebcamRequest {
   purpose: string;
@@ -29,16 +29,14 @@ export function MaestroSessionWebcam({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 z-40 bg-black/90 flex items-center justify-center rounded-2xl"
+          className="absolute inset-0 z-40 bg-black/90 rounded-2xl"
         >
-          <div className="w-full max-w-lg">
-            <WebcamCapture
-              purpose={webcamRequest.purpose}
-              onCapture={onCapture}
-              onClose={onClose}
-              instructions={webcamRequest.instructions}
-            />
-          </div>
+          <WebcamCapture
+            purpose={webcamRequest.purpose}
+            onCapture={onCapture}
+            onClose={onClose}
+            instructions={webcamRequest.instructions}
+          />
         </motion.div>
       )}
     </AnimatePresence>

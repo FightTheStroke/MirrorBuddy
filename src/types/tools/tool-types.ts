@@ -6,22 +6,23 @@
  * All supported tool types in MirrorBuddy
  */
 export type ToolType =
-  | 'mindmap'      // Mappa mentale interattiva (MarkMap)
-  | 'quiz'         // Quiz con domande a risposta multipla
-  | 'flashcard'    // Set di flashcard per ripasso (FSRS)
-  | 'demo'         // Simulazione HTML/JS interattiva
-  | 'search'       // Ricerca web/YouTube
-  | 'diagram'      // Diagramma (Mermaid)
-  | 'timeline'     // Linea temporale
-  | 'summary'      // Riassunto strutturato
-  | 'formula'      // Formula matematica (KaTeX)
-  | 'chart'        // Grafico (Chart.js)
-  | 'webcam'       // Foto da webcam
-  | 'pdf'          // PDF caricato
-  | 'homework'     // Compiti con metodo maieutico
-  | 'study-kit'    // Bulk PDF processing with study materials
-  | 'calculator'   // Calcolatrice scientifica con supporto dyscalculia
-  | 'typing';      // Typing tutor con accessibilità DSA
+  | "mindmap" // Mappa mentale interattiva (MarkMap)
+  | "quiz" // Quiz con domande a risposta multipla
+  | "flashcard" // Set di flashcard per ripasso (FSRS)
+  | "demo" // Simulazione HTML/JS interattiva
+  | "search" // Ricerca web/YouTube
+  | "diagram" // Diagramma (Mermaid)
+  | "timeline" // Linea temporale
+  | "summary" // Riassunto strutturato
+  | "formula" // Formula matematica (KaTeX)
+  | "chart" // Grafico (Chart.js)
+  | "webcam" // Foto da webcam
+  | "webcam-standalone" // Foto da webcam standalone (no maestro, saves to archive)
+  | "pdf" // PDF caricato
+  | "homework" // Compiti con metodo maieutico
+  | "study-kit" // Bulk PDF processing with study materials
+  | "calculator" // Calcolatrice scientifica con supporto dyscalculia
+  | "typing"; // Typing tutor con accessibilità DSA
 
 /**
  * Tool state for real-time UI updates
@@ -29,7 +30,7 @@ export type ToolType =
 export interface ToolState {
   id: string;
   type: ToolType;
-  status: 'initializing' | 'building' | 'completed' | 'error';
+  status: "initializing" | "building" | "completed" | "error";
   progress: number; // 0-1
   content: unknown;
   error?: string;
@@ -62,11 +63,11 @@ export interface ToolExecutionResult {
  * Re-exported for convenience
  */
 export type ToolEventType =
-  | 'tool:created'      // New tool started
-  | 'tool:update'       // Incremental update (content chunk)
-  | 'tool:complete'     // Tool finished building
-  | 'tool:error'        // Error during creation
-  | 'tool:cancelled';   // User cancelled
+  | "tool:created" // New tool started
+  | "tool:update" // Incremental update (content chunk)
+  | "tool:complete" // Tool finished building
+  | "tool:error" // Error during creation
+  | "tool:cancelled"; // User cancelled
 
 /**
  * Tool call tracking (for voice/chat sessions)
@@ -77,7 +78,7 @@ export interface ToolCall {
   type: ToolType;
   name: string;
   arguments: Record<string, unknown>;
-  status: 'pending' | 'running' | 'completed' | 'error';
+  status: "pending" | "running" | "completed" | "error";
   result?: ToolResult;
 }
 
@@ -98,12 +99,12 @@ export interface ToolResult {
  * Use ToolCall for runtime state, ToolCallRef for persistence.
  */
 export interface ToolCallRef {
-  id: string;              // Same as Material.toolId
-  type: ToolType;          // Tool type for routing
-  name: string;            // Function name (e.g., 'create_mindmap')
-  status: 'pending' | 'running' | 'completed' | 'error';
-  error?: string;          // Error message if status is 'error'
-  materialId?: string;     // FK to Material (if saved)
+  id: string; // Same as Material.toolId
+  type: ToolType; // Tool type for routing
+  name: string; // Function name (e.g., 'create_mindmap')
+  status: "pending" | "running" | "completed" | "error";
+  error?: string; // Error message if status is 'error'
+  materialId?: string; // FK to Material (if saved)
 }
 
 /**
@@ -125,21 +126,22 @@ export function toToolCallRef(toolCall: ToolCall): ToolCallRef {
  */
 export function functionNameToToolType(functionName: string): ToolType {
   const map: Record<string, ToolType> = {
-    'create_mindmap': 'mindmap',
-    'create_quiz': 'quiz',
-    'create_flashcards': 'flashcard',
-    'create_demo': 'demo',
-    'web_search': 'search',
-    'create_summary': 'summary',
-    'create_diagram': 'diagram',
-    'create_timeline': 'timeline',
-    'create_formula': 'formula',
-    'create_chart': 'chart',
-    'upload_pdf': 'pdf',
-    'capture_webcam': 'webcam',
-    'homework_help': 'homework',
-    'study_kit': 'study-kit',
-    'typing_tutor': 'typing',
+    create_mindmap: "mindmap",
+    create_quiz: "quiz",
+    create_flashcards: "flashcard",
+    create_demo: "demo",
+    web_search: "search",
+    create_summary: "summary",
+    create_diagram: "diagram",
+    create_timeline: "timeline",
+    create_formula: "formula",
+    create_chart: "chart",
+    upload_pdf: "pdf",
+    capture_webcam: "webcam",
+    capture_webcam_standalone: "webcam-standalone",
+    homework_help: "homework",
+    study_kit: "study-kit",
+    typing_tutor: "typing",
   };
   return map[functionName] || (functionName as ToolType);
 }

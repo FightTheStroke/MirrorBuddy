@@ -53,6 +53,7 @@ function getTypeLabels(
     chart: t("types.chart"),
     pdf: t("types.pdf"),
     webcam: t("types.webcam"),
+    "webcam-standalone": t("types.webcamStandalone"),
     homework: t("types.homework"),
     search: t("types.search"),
     typing: t("types.typing"),

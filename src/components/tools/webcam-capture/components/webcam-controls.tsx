@@ -48,6 +48,7 @@ export function WebcamControls({
                   disabled={countdown !== null}
                   className={`
                     flex flex-col items-center justify-center w-16 h-16 rounded-xl transition-all
+                    focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
                     ${
                       selectedTimer === opt.value
                         ? "bg-blue-600 text-white scale-105 shadow-lg shadow-blue-500/30"
@@ -69,7 +70,7 @@ export function WebcamControls({
               onClick={onCapture}
               disabled={isLoading || !!error || countdown !== null}
               size="lg"
-              className="bg-blue-600 hover:bg-blue-700 px-8 h-14 text-lg"
+              className="bg-blue-600 hover:bg-blue-700 px-8 h-16 min-h-[64px] text-lg focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
             >
               <Camera className="w-6 h-6 mr-2" />
               {countdown !== null ? t("inProgress") : t("takePhoto")}
@@ -82,7 +83,7 @@ export function WebcamControls({
             onClick={onRetake}
             variant="outline"
             size="lg"
-            className="border-slate-300 dark:border-slate-600 h-14 px-6"
+            className="border-slate-300 dark:border-slate-600 h-16 min-h-[64px] px-6 text-base focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
           >
             <RotateCcw className="w-5 h-5 mr-2" />
             {t("retake")}
@@ -90,7 +91,7 @@ export function WebcamControls({
           <Button
             onClick={onConfirm}
             size="lg"
-            className="bg-green-600 hover:bg-green-700 px-8 h-14"
+            className="bg-green-600 hover:bg-green-700 px-8 h-16 min-h-[64px] text-base shadow-lg focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
           >
             <Check className="w-5 h-5 mr-2" />
             {t("confirm")}

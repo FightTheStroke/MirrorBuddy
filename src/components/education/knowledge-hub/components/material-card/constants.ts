@@ -20,6 +20,7 @@ export const TYPE_ICONS: Record<ToolType, React.ReactElement> = {
   chart: React.createElement(FileText, { className: "w-4 h-4" }),
   pdf: React.createElement(FileText, { className: "w-4 h-4" }),
   webcam: React.createElement(FileText, { className: "w-4 h-4" }),
+  "webcam-standalone": React.createElement(FileText, { className: "w-4 h-4" }),
   homework: React.createElement(FileText, { className: "w-4 h-4" }),
   search: React.createElement(FileText, { className: "w-4 h-4" }),
   typing: React.createElement(FileText, { className: "w-4 h-4" }),
@@ -44,6 +45,8 @@ export const TYPE_COLORS: Record<ToolType, string> = {
     "bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400",
   pdf: "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400",
   webcam: "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
+  "webcam-standalone":
+    "bg-pink-100 text-pink-600 dark:bg-pink-900/30 dark:text-pink-400",
   homework:
     "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400",
   search: "bg-teal-100 text-teal-600 dark:bg-teal-900/30 dark:text-teal-400",
@@ -66,6 +69,7 @@ export const TYPE_LABELS: Record<ToolType, string> = {
   chart: "Grafico",
   pdf: "PDF",
   webcam: "Immagine",
+  "webcam-standalone": "Immagine Standalone",
   homework: "Compito",
   search: "Ricerca",
   typing: "Impara a Digitare",
