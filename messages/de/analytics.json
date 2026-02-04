@@ -1,0 +1,46 @@
+{
+  "analytics": {
+    "title": "Ihre Analysen",
+    "description": "Entdecken Sie Ihre Lernmuster und erhalten Sie personalisierte Empfehlungen",
+    "proOnly": "Funktion nur für Pro-Abonnenten",
+    "upgradeToPro": "Upgrade auf Pro für Zugriff auf Ihre Analysen",
+    "loading": "Analysen werden geladen...",
+    "error": "Fehler beim Laden der Analysen",
+    "noData": "Noch nicht genug Daten für Analysen vorhanden",
+    "refresh": "Aktualisieren",
+    "overallScore": {
+      "title": "Gesamtbewertung",
+      "description": "Bewertung Ihres Lernfortschritts",
+      "excellent": "Ausgezeichnet",
+      "good": "Gut",
+      "fair": "Befriedigend",
+      "needsWork": "Verbesserungsbedarf"
+    },
+    "strengths": {
+      "title": "Ihre Stärken",
+      "description": "Bereiche, in denen Sie hervorragend sind",
+      "empty": "Lernen Sie weiter, um Ihre Stärken zu identifizieren"
+    },
+    "weaknesses": {
+      "title": "Verbesserungsbereiche",
+      "description": "Konzepte zum Vertiefen",
+      "empty": "Keine kritischen Bereiche identifiziert"
+    },
+    "recommendedTopics": {
+      "title": "Empfohlene Themen",
+      "description": "Nächste Schritte auf Ihrer Lernreise",
+      "empty": "Keine Empfehlungen verfügbar"
+    },
+    "focusAreas": {
+      "title": "Worauf Sie sich konzentrieren sollten",
+      "description": "Konkrete Maßnahmen zur Verbesserung",
+      "empty": "Keine spezifischen Maßnahmen empfohlen"
+    },
+    "confidenceLevel": {
+      "title": "Vertrauensniveau",
+      "low": "Niedrig - Mehr Daten erforderlich",
+      "medium": "Mittel - Gute Datenbasis",
+      "high": "Hoch - Sehr zuverlässige Daten"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "analytics": {
+    "title": "Your Analytics",
+    "description": "Discover your learning patterns and get personalized recommendations",
+    "proOnly": "Feature reserved for Pro subscribers",
+    "upgradeToPro": "Upgrade to Pro to access your analytics",
+    "loading": "Loading analytics...",
+    "error": "Error loading analytics",
+    "noData": "Not enough data yet to generate analytics",
+    "refresh": "Refresh",
+    "overallScore": {
+      "title": "Overall Score",
+      "description": "Assessment of your learning progress",
+      "excellent": "Excellent",
+      "good": "Good",
+      "fair": "Fair",
+      "needsWork": "Needs Work"
+    },
+    "strengths": {
+      "title": "Your Strengths",
+      "description": "Areas where you excel",
+      "empty": "Keep studying to identify your strengths"
+    },
+    "weaknesses": {
+      "title": "Areas for Improvement",
+      "description": "Concepts to deepen",
+      "empty": "No critical areas identified"
+    },
+    "recommendedTopics": {
+      "title": "Recommended Topics",
+      "description": "Next steps in your learning journey",
+      "empty": "No recommendations available"
+    },
+    "focusAreas": {
+      "title": "What to Focus On",
+      "description": "Concrete actions to improve",
+      "empty": "No specific actions recommended"
+    },
+    "confidenceLevel": {
+      "title": "Confidence Level",
+      "low": "Low - More data needed",
+      "medium": "Medium - Good data foundation",
+      "high": "High - Very reliable data"
+    }
+  }
+}

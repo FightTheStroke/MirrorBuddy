@@ -1,0 +1,46 @@
+{
+  "analytics": {
+    "title": "Le Tue Analytics",
+    "description": "Scopri i tuoi pattern di apprendimento e ricevi raccomandazioni personalizzate",
+    "proOnly": "Funzionalità riservata agli abbonati Pro",
+    "upgradeToPro": "Passa a Pro per accedere alle tue analytics",
+    "loading": "Caricamento analytics...",
+    "error": "Errore nel caricamento delle analytics",
+    "noData": "Non ci sono ancora dati sufficienti per generare le analytics",
+    "refresh": "Aggiorna",
+    "overallScore": {
+      "title": "Punteggio Complessivo",
+      "description": "Valutazione del tuo progresso di apprendimento",
+      "excellent": "Eccellente",
+      "good": "Buono",
+      "fair": "Discreto",
+      "needsWork": "Da migliorare"
+    },
+    "strengths": {
+      "title": "I Tuoi Punti di Forza",
+      "description": "Aree in cui eccelli",
+      "empty": "Continua a studiare per identificare i tuoi punti di forza"
+    },
+    "weaknesses": {
+      "title": "Aree di Miglioramento",
+      "description": "Concetti da approfondire",
+      "empty": "Nessuna area critica identificata"
+    },
+    "recommendedTopics": {
+      "title": "Argomenti Consigliati",
+      "description": "Prossimi passi nel tuo percorso di apprendimento",
+      "empty": "Nessuna raccomandazione disponibile"
+    },
+    "focusAreas": {
+      "title": "Su Cosa Concentrarti",
+      "description": "Azioni concrete per migliorare",
+      "empty": "Nessuna azione specifica consigliata"
+    },
+    "confidenceLevel": {
+      "title": "Livello di Confidenza",
+      "low": "Basso - Servono più dati",
+      "medium": "Medio - Buona base di dati",
+      "high": "Alto - Dati molto affidabili"
+    }
+  }
+}

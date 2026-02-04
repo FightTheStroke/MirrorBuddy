@@ -1,0 +1,46 @@
+{
+  "analytics": {
+    "title": "Vos Analyses",
+    "description": "Découvrez vos habitudes d'apprentissage et recevez des recommandations personnalisées",
+    "proOnly": "Fonctionnalité réservée aux abonnés Pro",
+    "upgradeToPro": "Passez à Pro pour accéder à vos analyses",
+    "loading": "Chargement des analyses...",
+    "error": "Erreur lors du chargement des analyses",
+    "noData": "Pas encore assez de données pour générer les analyses",
+    "refresh": "Actualiser",
+    "overallScore": {
+      "title": "Score Global",
+      "description": "Évaluation de vos progrès d'apprentissage",
+      "excellent": "Excellent",
+      "good": "Bien",
+      "fair": "Correct",
+      "needsWork": "À améliorer"
+    },
+    "strengths": {
+      "title": "Vos Points Forts",
+      "description": "Domaines où vous excellez",
+      "empty": "Continuez à étudier pour identifier vos points forts"
+    },
+    "weaknesses": {
+      "title": "Domaines d'Amélioration",
+      "description": "Concepts à approfondir",
+      "empty": "Aucun domaine critique identifié"
+    },
+    "recommendedTopics": {
+      "title": "Sujets Recommandés",
+      "description": "Prochaines étapes dans votre parcours d'apprentissage",
+      "empty": "Aucune recommandation disponible"
+    },
+    "focusAreas": {
+      "title": "Sur Quoi Se Concentrer",
+      "description": "Actions concrètes pour améliorer",
+      "empty": "Aucune action spécifique recommandée"
+    },
+    "confidenceLevel": {
+      "title": "Niveau de Confiance",
+      "low": "Faible - Plus de données nécessaires",
+      "medium": "Moyen - Bonne base de données",
+      "high": "Élevé - Données très fiables"
+    }
+  }
+}

@@ -1,0 +1,46 @@
+{
+  "analytics": {
+    "title": "Tus Análisis",
+    "description": "Descubre tus patrones de aprendizaje y recibe recomendaciones personalizadas",
+    "proOnly": "Función reservada para suscriptores Pro",
+    "upgradeToPro": "Actualiza a Pro para acceder a tus análisis",
+    "loading": "Cargando análisis...",
+    "error": "Error al cargar los análisis",
+    "noData": "Aún no hay suficientes datos para generar análisis",
+    "refresh": "Actualizar",
+    "overallScore": {
+      "title": "Puntuación General",
+      "description": "Evaluación de tu progreso de aprendizaje",
+      "excellent": "Excelente",
+      "good": "Bueno",
+      "fair": "Regular",
+      "needsWork": "Necesita mejorar"
+    },
+    "strengths": {
+      "title": "Tus Fortalezas",
+      "description": "Áreas en las que sobresales",
+      "empty": "Sigue estudiando para identificar tus fortalezas"
+    },
+    "weaknesses": {
+      "title": "Áreas de Mejora",
+      "description": "Conceptos para profundizar",
+      "empty": "No se identificaron áreas críticas"
+    },
+    "recommendedTopics": {
+      "title": "Temas Recomendados",
+      "description": "Próximos pasos en tu viaje de aprendizaje",
+      "empty": "No hay recomendaciones disponibles"
+    },
+    "focusAreas": {
+      "title": "En Qué Enfocarte",
+      "description": "Acciones concretas para mejorar",
+      "empty": "No se recomiendan acciones específicas"
+    },
+    "confidenceLevel": {
+      "title": "Nivel de Confianza",
+      "low": "Bajo - Se necesitan más datos",
+      "medium": "Medio - Buena base de datos",
+      "high": "Alto - Datos muy confiables"
+    }
+  }
+}
