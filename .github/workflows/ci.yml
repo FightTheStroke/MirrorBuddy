@@ -531,6 +531,7 @@ jobs:
     name: Accessibility Tests
     continue-on-error: true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [build]
 
     services:
@@ -830,6 +831,7 @@ jobs:
     name: E2E Tests
     continue-on-error: true
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     needs: [build]
     if: github.event_name != 'pull_request'
 
@@ -898,7 +900,7 @@ jobs:
         run: npx playwright install-deps chromium
 
       - name: Run E2E tests
-        run: npm run test
+        run: npx playwright test --project=chromium --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
