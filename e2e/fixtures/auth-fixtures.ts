@@ -159,7 +159,8 @@ async function adminFixture(
   ]);
 
   // Set storage state after cookies (for localStorage access)
-  await page.context().addInitScript(() => {
+  // Note: addInitScript runs in browser context, so we must pass adminEmail as argument
+  await page.context().addInitScript((email: string) => {
     // Inline localStorage setup
     localStorage.setItem(
       "mirrorbuddy-onboarding",
@@ -192,8 +193,8 @@ async function adminFixture(
       }),
     );
 
-    localStorage.setItem("mirrorbuddy-admin-user", adminEmail);
-  });
+    localStorage.setItem("mirrorbuddy-admin-user", email);
+  }, adminEmail);
 
   // Use the page for the test
   await use(page);

@@ -34,7 +34,8 @@ test.describe("Login Redirect with Locale (F-16)", () => {
 
     const currentUrl = page.url();
     expect(currentUrl).toContain("/it/login");
-    expect(currentUrl).not.toContain("/login"); // Should not be bare /login
+    // Verify locale is preserved (not bare /login without locale)
+    expect(currentUrl).toMatch(/\/[a-z]{2}\/login/);
   });
 
   test("unauthenticated access to /en/parent-dashboard redirects to /en/login", async ({
@@ -111,10 +112,10 @@ test.describe("Login Redirect with Locale (F-16)", () => {
         waitUntil: "domcontentloaded",
       });
 
-      // Should not show 404 error
-      const pageContent = await page.textContent("body");
-      expect(pageContent).not.toContain("404");
-      expect(pageContent).not.toContain("Not Found");
+      // Should not show 404 error (use innerText to get visible text only)
+      const visibleText = await page.locator("body").innerText();
+      expect(visibleText).not.toMatch(/\b404\b/);
+      expect(visibleText).not.toContain("Not Found");
 
       // Page should be visible
       const bodyVisible = await page.locator("body").isVisible();

@@ -25,11 +25,12 @@ test.describe("Parent Dashboard Route (F-16)", () => {
     await adminPage.goto("/it/parent-dashboard");
     await adminPage.waitForLoadState("domcontentloaded");
 
-    // Should not show 404 error
-    const pageContent = await adminPage.textContent("body");
-    expect(pageContent).not.toContain("404");
-    expect(pageContent).not.toContain("Not Found");
-    expect(pageContent).not.toContain("Non trovato");
+    // Should not show 404 error page (check visible text, not script content)
+    // Use innerText to get only visible text, excluding script tags
+    const visibleText = await adminPage.locator("body").innerText();
+    expect(visibleText).not.toMatch(/\b404\b/);
+    expect(visibleText).not.toContain("Not Found");
+    expect(visibleText).not.toContain("Non trovato");
 
     // Page should be visible (not blank)
     const bodyVisible = await adminPage.locator("body").isVisible();
@@ -50,10 +51,10 @@ test.describe("Parent Dashboard Route (F-16)", () => {
     await adminPage.goto("/en/parent-dashboard");
     await adminPage.waitForLoadState("domcontentloaded");
 
-    // Should not show 404 error
-    const pageContent = await adminPage.textContent("body");
-    expect(pageContent).not.toContain("404");
-    expect(pageContent).not.toContain("Not Found");
+    // Should not show 404 error page (check visible text, not script content)
+    const visibleText = await adminPage.locator("body").innerText();
+    expect(visibleText).not.toMatch(/\b404\b/);
+    expect(visibleText).not.toContain("Not Found");
 
     // Page should be visible
     const bodyVisible = await adminPage.locator("body").isVisible();
