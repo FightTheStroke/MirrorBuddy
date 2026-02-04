@@ -515,6 +515,8 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          # Bypass provider check redirect to /landing (no Azure keys in CI)
+          OLLAMA_URL: http://localhost:11434
 
       - name: Upload smoke test report
         if: failure()
@@ -606,6 +608,8 @@ jobs:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          # Bypass provider check redirect to /landing (no Azure keys in CI)
+          OLLAMA_URL: http://localhost:11434
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
@@ -698,6 +702,8 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          # Bypass provider check redirect to /landing (no Azure keys in CI)
+          OLLAMA_URL: http://localhost:11434
 
       - name: Upload Playwright report
         if: failure()
@@ -794,6 +800,8 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          # Bypass provider check redirect to /landing (no Azure keys in CI)
+          OLLAMA_URL: http://localhost:11434
 
       - name: Upload Playwright report
         if: always()
@@ -908,6 +916,8 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          # Bypass provider check redirect to /landing (no Azure keys in CI)
+          OLLAMA_URL: http://localhost:11434
 
       - name: Upload Playwright report
         if: always()
