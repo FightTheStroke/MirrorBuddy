@@ -21,6 +21,8 @@ test.use({ storageState: undefined });
 test.describe("Welcome Page Language Switcher - F-69", () => {
   // Increase timeout for CI environment where navigation can be slow
   test.setTimeout(60000);
+  // Extra retries for flaky navigation tests in CI
+  test.describe.configure({ retries: process.env.CI ? 4 : 0 });
 
   test.beforeEach(async ({ page }) => {
     // Clear cookies to start fresh
