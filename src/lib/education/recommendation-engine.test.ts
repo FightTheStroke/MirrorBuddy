@@ -24,11 +24,21 @@ vi.mock("@/lib/db", () => ({
     flashcardReview: {
       findMany: vi.fn(),
     },
+    flashcardProgress: {
+      findMany: vi.fn(),
+    },
+    quizResult: {
+      findMany: vi.fn(),
+    },
   },
 }));
 
 vi.mock("@/lib/ai/providers", () => ({
   chatCompletion: vi.fn(),
+}));
+
+vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
+  getDeploymentForModel: vi.fn().mockReturnValue("gpt-4o-mini"),
 }));
 
 vi.mock("@/lib/tier/tier-service", () => ({
@@ -87,6 +97,8 @@ describe("recommendation-engine", () => {
         maxTokens: 2000,
       });
 
+      const now = new Date();
+      const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000);
       vi.mocked(prisma.conversation.findMany).mockResolvedValue([
         {
           id: "conv-1",
@@ -94,7 +106,8 @@ describe("recommendation-engine", () => {
           keyFacts: JSON.stringify({
             learned: ["algebra basics", "quadratic equations"],
           }),
-          updatedAt: new Date(),
+          createdAt: oneHourAgo,
+          updatedAt: now,
         },
       ] as never);
 
