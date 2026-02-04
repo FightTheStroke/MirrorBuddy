@@ -21,6 +21,10 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { filterInput, sanitizeOutput } from "@/lib/safety";
+import { checkSTEMSafety } from "@/lib/safety/stem-safety";
+import { recordMessage, recordSessionStart } from "@/lib/safety/dependency";
+import { analyzeIndependence } from "@/lib/gamification/independence-tracker";
+import { awardPoints } from "@/lib/gamification/db";
 import { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
 import {
   assessResponseTransparency,
@@ -112,6 +116,17 @@ export const POST = pipe(
       return response;
     }
     const userId = coppaCheck.userId;
+
+    // Dependency Detection (Amodei 2026) - track session start
+    // Detect new session: only 1 user message means this is the start
+    const userMessages = messages.filter((m) => m.role === "user");
+    if (userId && userMessages.length === 1) {
+      recordSessionStart(userId).catch((err) => {
+        log.debug("Session start tracking failed (non-blocking)", {
+          error: String(err),
+        });
+      });
+    }
 
     // Trial limit check for anonymous users (ADR 0056)
     const trialCheck = await checkTrialForAnonymous(!!userId, userId);
@@ -238,6 +253,65 @@ export const POST = pipe(
         });
         response.headers.set("X-Request-ID", getRequestId(request));
         return response;
+      }
+
+      // STEM Safety Check (Amodei 2026) - block dangerous STEM queries
+      if (maestroId) {
+        const stemResult = checkSTEMSafety(lastUserMessage.content, maestroId);
+        if (stemResult.blocked) {
+          log.warn("STEM safety filter triggered", {
+            clientId,
+            subject: stemResult.subject,
+            category: stemResult.category,
+          });
+          recordContentFiltered("stem_safety", {
+            userId,
+            maestroId,
+            actionTaken: "blocked",
+          });
+          const response = NextResponse.json({
+            content: stemResult.safeResponse,
+            provider: "safety_filter",
+            model: "stem-safety",
+            blocked: true,
+            category: `stem_${stemResult.category}`,
+            alternatives: stemResult.alternatives,
+          });
+          response.headers.set("X-Request-ID", getRequestId(request));
+          return response;
+        }
+      }
+
+      // Dependency Detection (Amodei 2026) - track usage patterns
+      if (userId) {
+        recordMessage(userId, lastUserMessage.content).catch((err) => {
+          log.debug("Dependency tracking failed (non-blocking)", {
+            error: String(err),
+          });
+        });
+      }
+
+      // Independence Gamification (Amodei 2026) - reward human connections
+      if (userId) {
+        const independence = analyzeIndependence(lastUserMessage.content);
+        if (independence.xpToAward > 0) {
+          awardPoints(
+            userId,
+            independence.xpToAward,
+            "independence_behavior",
+            undefined,
+            "IndependenceTracker",
+          ).catch((err) => {
+            log.debug("Independence XP award failed (non-blocking)", {
+              error: String(err),
+            });
+          });
+          log.info("Independence behavior detected", {
+            userId,
+            xp: independence.xpToAward,
+            patterns: independence.detectedPatterns,
+          });
+        }
       }
     }
 

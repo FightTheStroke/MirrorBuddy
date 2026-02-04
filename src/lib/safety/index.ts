@@ -105,3 +105,13 @@ export type {
   EscalationMetadata,
   EscalationConfig,
 } from "./escalation/types";
+
+// ============================================================================
+// AMODEI SAFETY ENHANCEMENTS (Reference: "The Adolescence of Technology" 2026)
+// ============================================================================
+// STEM Safety - Block dangerous chemistry/physics/biology queries:
+//   import { checkSTEMSafety, isSTEMProfessor } from '@/lib/safety/stem-safety';
+//
+// Dependency Detection - Track usage patterns and emotional dependency:
+//   import { recordSessionStart, recordMessage, runDependencyAnalysis } from '@/lib/safety/dependency';
+// ============================================================================
