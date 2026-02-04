@@ -159,9 +159,11 @@ export default defineConfig({
     {
       // Accessibility tests run in a dedicated project to avoid duplication
       // with the accessibility-tests CI job (WCAG 2.1 AA compliance)
+      // Higher retries due to hydration timing sensitivity in CI
       name: "a11y",
       use: { ...devices["Desktop Chrome"] },
       testMatch: ["**/accessibility.spec.ts", "**/a11y-*.spec.ts"],
+      retries: process.env.CI ? 3 : 0,
     },
     {
       // Cookie-signing tests need to run without storage state to test fresh cookies
