@@ -122,3 +122,37 @@ export async function closeOpenDialogs(page: import("@playwright/test").Page) {
     }
   }
 }
+
+/**
+ * Login as admin user for billing/tier management tests
+ * Uses test admin credentials from environment or defaults
+ */
+export async function loginAsAdmin(page: import("@playwright/test").Page) {
+  const adminEmail = process.env.TEST_ADMIN_EMAIL || "admin@mirrorbuddy.test";
+  const adminPassword = process.env.TEST_ADMIN_PASSWORD || "testadmin123";
+
+  await page.goto("/login");
+
+  // Fill login form
+  await page.fill('input[name="email"], input[type="email"]', adminEmail);
+  await page.fill(
+    'input[name="password"], input[type="password"]',
+    adminPassword,
+  );
+
+  // Submit
+  await page.click('button[type="submit"]');
+
+  // Wait for redirect to admin or dashboard
+  await page.waitForURL(/\/(admin|dashboard)/, { timeout: 10000 }).catch(() => {
+    // May already be on admin page via session
+  });
+
+  // Navigate to admin if not already there
+  if (!page.url().includes("/admin")) {
+    await page.goto("/admin");
+  }
+
+  // Wait for admin page to load
+  await page.waitForSelector("h1", { timeout: 5000 });
+}

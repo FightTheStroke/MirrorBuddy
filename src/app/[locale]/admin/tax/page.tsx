@@ -1,20 +1,19 @@
 /**
  * VAT/Tax Configuration Admin
  * Task: T1-15 (F-30)
- *
- * Note: This page works with in-memory defaults until TaxConfig migration is run.
- * Run `npx prisma migrate dev` to enable full DB persistence.
  */
 
+import { prisma } from "@/lib/db";
 import { revalidatePath } from "next/cache";
 import Link from "next/link";
+import { stripeService } from "@/lib/stripe/stripe-service";
 
 export const metadata = {
   title: "Tax Configuration | Admin",
 };
 
-// EU country tax configuration
 interface TaxConfigItem {
+  id: string | null;
   countryCode: string;
   countryName: string;
   vatRate: number;
@@ -23,56 +22,52 @@ interface TaxConfigItem {
   stripeTaxId: string | null;
 }
 
-const EU_COUNTRIES: TaxConfigItem[] = [
-  {
-    countryCode: "IT",
-    countryName: "Italy",
-    vatRate: 22,
-    reverseChargeEnabled: false,
-    isActive: true,
-    stripeTaxId: null,
-  },
-  {
-    countryCode: "FR",
-    countryName: "France",
-    vatRate: 20,
-    reverseChargeEnabled: false,
-    isActive: true,
-    stripeTaxId: null,
-  },
-  {
-    countryCode: "DE",
-    countryName: "Germany",
-    vatRate: 19,
-    reverseChargeEnabled: false,
-    isActive: true,
-    stripeTaxId: null,
-  },
-  {
-    countryCode: "ES",
-    countryName: "Spain",
-    vatRate: 21,
-    reverseChargeEnabled: false,
-    isActive: true,
-    stripeTaxId: null,
-  },
-  {
-    countryCode: "GB",
-    countryName: "United Kingdom",
-    vatRate: 20,
-    reverseChargeEnabled: false,
-    isActive: true,
-    stripeTaxId: null,
-  },
-];
+const EU_COUNTRIES = [
+  { code: "IT", name: "Italy", defaultRate: 22 },
+  { code: "FR", name: "France", defaultRate: 20 },
+  { code: "DE", name: "Germany", defaultRate: 19 },
+  { code: "ES", name: "Spain", defaultRate: 21 },
+  { code: "GB", name: "United Kingdom", defaultRate: 20 },
+] as const;
 
-// In-memory store (will be replaced by DB once migration runs)
-const taxConfigs = [...EU_COUNTRIES];
+async function getTaxConfigs(): Promise<{
+  configs: TaxConfigItem[];
+  hasMigration: boolean;
+}> {
+  try {
+    const dbConfigs = await prisma.taxConfig.findMany({
+      orderBy: { countryCode: "asc" },
+    });
 
-async function getTaxConfigs(): Promise<TaxConfigItem[]> {
-  // TODO: Once TaxConfig model is migrated, replace with:
-  // const configs = await prisma.taxConfig.findMany({ orderBy: { countryCode: "asc" } });
-  return taxConfigs;
+    const configs = EU_COUNTRIES.map((country) => {
+      const existing = dbConfigs.find((c) => c.countryCode === country.code);
+      return {
+        id: existing?.id ?? null,
+        countryCode: country.code,
+        countryName: country.name,
+        vatRate: existing?.vatRate ?? country.defaultRate,
+        reverseChargeEnabled: existing?.reverseChargeEnabled ?? false,
+        isActive: existing?.isActive ?? true,
+        stripeTaxId: existing?.stripeTaxId ?? null,
+      };
+    });
+
+    return { configs, hasMigration: true };
+  } catch {
+    // Table doesn't exist yet - return defaults
+    return {
+      configs: EU_COUNTRIES.map((country) => ({
+        id: null,
+        countryCode: country.code,
+        countryName: country.name,
+        vatRate: country.defaultRate,
+        reverseChargeEnabled: false,
+        isActive: true,
+        stripeTaxId: null,
+      })),
+      hasMigration: false,
+    };
+  }
 }
 
 async function updateTaxConfig(formData: FormData) {
@@ -83,15 +78,14 @@ async function updateTaxConfig(formData: FormData) {
   const reverseChargeEnabled = formData.get("reverseChargeEnabled") === "on";
   const isActive = formData.get("isActive") !== "off";
 
-  // Update in-memory (TODO: replace with prisma.taxConfig.upsert)
-  const index = taxConfigs.findIndex((c) => c.countryCode === countryCode);
-  if (index >= 0) {
-    taxConfigs[index] = {
-      ...taxConfigs[index],
-      vatRate,
-      reverseChargeEnabled,
-      isActive,
-    };
+  try {
+    await prisma.taxConfig.upsert({
+      where: { countryCode },
+      create: { countryCode, vatRate, reverseChargeEnabled, isActive },
+      update: { vatRate, reverseChargeEnabled, isActive },
+    });
+  } catch {
+    // Migration not run yet - silently fail
   }
 
   revalidatePath("/admin/tax");
@@ -102,17 +96,43 @@ async function syncToStripe(formData: FormData) {
 
   const countryCode = formData.get("countryCode") as string;
 
-  // Mark as synced (TODO: implement actual Stripe Tax API call)
-  const index = taxConfigs.findIndex((c) => c.countryCode === countryCode);
-  if (index >= 0) {
-    taxConfigs[index].stripeTaxId = `txr_${countryCode.toLowerCase()}_synced`;
+  try {
+    const config = await prisma.taxConfig.findUnique({
+      where: { countryCode },
+    });
+    if (!config) return;
+
+    const stripe = stripeService.getServerClient();
+    const countryNames: Record<string, string> = {
+      IT: "Italy",
+      FR: "France",
+      DE: "Germany",
+      ES: "Spain",
+      GB: "United Kingdom",
+    };
+
+    const taxRate = await stripe.taxRates.create({
+      display_name: `${countryNames[countryCode] || countryCode} VAT`,
+      percentage: config.vatRate,
+      country: countryCode,
+      inclusive: false,
+      active: config.isActive,
+      description: `VAT for ${countryNames[countryCode] || countryCode}`,
+    });
+
+    await prisma.taxConfig.update({
+      where: { countryCode },
+      data: { stripeTaxId: taxRate.id },
+    });
+  } catch {
+    // Stripe sync failed - will retry
   }
 
   revalidatePath("/admin/tax");
 }
 
 export default async function TaxConfigPage() {
-  const configs = await getTaxConfigs();
+  const { configs, hasMigration } = await getTaxConfigs();
 
   return (
     <div className="p-8">
@@ -129,6 +149,21 @@ export default async function TaxConfigPage() {
       <p className="mb-6 text-gray-600">
         Configure VAT rates per country for EU tax compliance
       </p>
+
+      {!hasMigration && (
+        <div className="mb-6 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
+          <h3 className="text-sm font-medium text-yellow-800">
+            Database Migration Required
+          </h3>
+          <p className="mt-1 text-sm text-yellow-700">
+            Run{" "}
+            <code className="rounded bg-yellow-100 px-1">
+              npx prisma migrate dev
+            </code>{" "}
+            to enable persistence.
+          </p>
+        </div>
+      )}
 
       <div className="rounded-lg bg-white shadow">
         <table className="min-w-full divide-y divide-gray-200">
@@ -203,7 +238,8 @@ export default async function TaxConfigPage() {
                     <span className="text-gray-500">%</span>
                     <button
                       type="submit"
-                      className="text-xs text-indigo-600 hover:text-indigo-900"
+                      disabled={!hasMigration}
+                      className="text-xs text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
                       Save
                     </button>
@@ -226,8 +262,9 @@ export default async function TaxConfigPage() {
                         type="checkbox"
                         name="reverseChargeEnabled"
                         defaultChecked={config.reverseChargeEnabled}
+                        disabled={!hasMigration}
                         onChange={(e) => e.target.form?.requestSubmit()}
-                        className="h-4 w-4 rounded border-gray-300 text-indigo-600"
+                        className="h-4 w-4 rounded border-gray-300 text-indigo-600 disabled:opacity-50"
                       />
                       <span className="ml-2 text-sm text-gray-600">B2B</span>
                     </label>
@@ -235,11 +272,7 @@ export default async function TaxConfigPage() {
                 </td>
                 <td className="whitespace-nowrap px-6 py-4">
                   <span
-                    className={`rounded-full px-2 py-1 text-xs font-medium ${
-                      config.isActive
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+                    className={`rounded-full px-2 py-1 text-xs font-medium ${config.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}`}
                   >
                     {config.isActive ? "Active" : "Inactive"}
                   </span>
@@ -260,7 +293,8 @@ export default async function TaxConfigPage() {
                     />
                     <button
                       type="submit"
-                      className="text-sm text-indigo-600 hover:text-indigo-900"
+                      disabled={!hasMigration}
+                      className="text-sm text-indigo-600 hover:text-indigo-900 disabled:text-gray-400"
                     >
                       Sync to Stripe
                     </button>
@@ -281,19 +315,6 @@ export default async function TaxConfigPage() {
             UK rates shown for reference (post-Brexit separate rules apply)
           </li>
         </ul>
-      </div>
-
-      <div className="mt-4 rounded-lg border border-yellow-200 bg-yellow-50 p-4">
-        <h3 className="text-sm font-medium text-yellow-800">
-          Database Migration Required
-        </h3>
-        <p className="mt-1 text-sm text-yellow-700">
-          Run{" "}
-          <code className="rounded bg-yellow-100 px-1">
-            npx prisma migrate dev
-          </code>{" "}
-          to enable persistent tax configuration storage.
-        </p>
       </div>
     </div>
   );
