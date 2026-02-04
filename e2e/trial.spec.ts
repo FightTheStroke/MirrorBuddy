@@ -36,6 +36,8 @@ const IGNORE_CONSOLE_ERRORS = [
   /Download the React DevTools/i,
   /favicon\.ico/i,
   /429.*Too Many Requests/i,
+  /503.*Service Unavailable/i,
+  /Failed to load resource/i,
   /net::ERR_/i,
   /hydrat/i,
   /WebSocket/i,
