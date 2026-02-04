@@ -1,0 +1,51 @@
+{
+  "pricing": {
+    "title": "Pricing",
+    "subtitle": "Choose the perfect plan for you",
+    "tiers": {
+      "trial": {
+        "name": "Trial",
+        "description": "Free trial with limited features",
+        "price": "Free",
+        "features": [
+          "5 chat messages per day",
+          "3 voice minutes per day",
+          "1 Maestro available",
+          "Basic tools"
+        ],
+        "cta": "Start now"
+      },
+      "base": {
+        "name": "Base",
+        "description": "Free plan with standard features",
+        "price": "Free",
+        "features": [
+          "10 chat messages per day",
+          "5 voice minutes per day",
+          "3 Maestros available",
+          "All tools",
+          "Mind maps and quizzes"
+        ],
+        "cta": "Sign up free"
+      },
+      "pro": {
+        "name": "Pro",
+        "description": "Premium plan with everything unlocked",
+        "price": "€9.99",
+        "period": "/month",
+        "features": [
+          "Unlimited chat",
+          "Unlimited voice",
+          "All 26 Maestros",
+          "All tools",
+          "Parent dashboard",
+          "Priority support",
+          "Advanced analytics"
+        ],
+        "cta": "Upgrade to Pro"
+      }
+    },
+    "loading": "Loading...",
+    "error": "Error loading prices"
+  }
+}
