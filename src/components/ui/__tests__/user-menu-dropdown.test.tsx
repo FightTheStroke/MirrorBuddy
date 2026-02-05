@@ -237,6 +237,11 @@ describe("UserMenuDropdown", () => {
         expect(menuItem?.className).toContain("opacity-50");
         expect(menuItem?.className).toContain("cursor-not-allowed");
       });
+
+      // Wait for the delayed response to fully resolve (prevents leaking into next test)
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/login");
+      });
     });
 
     it("prevents multiple logout requests when clicked multiple times", async () => {
@@ -264,6 +269,11 @@ describe("UserMenuDropdown", () => {
       await waitFor(() => {
         // Should only be called once
         expect(mockCsrfFetch).toHaveBeenCalledTimes(1);
+      });
+
+      // Wait for the delayed response to fully resolve (prevents leaking into next test)
+      await waitFor(() => {
+        expect(mockPush).toHaveBeenCalledWith("/login");
       });
     });
 

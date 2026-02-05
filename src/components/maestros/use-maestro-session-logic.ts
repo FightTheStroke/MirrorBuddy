@@ -71,6 +71,15 @@ export function useMaestroSessionLogic({
     onQuestionAsked,
   });
 
+  const handleRequestPhoto = useCallback(() => {
+    setWebcamRequest({
+      purpose: "homework",
+      instructions: "Mostra il tuo compito",
+      callId: `cam-${Date.now()}`,
+    });
+    setShowWebcam(true);
+  }, []);
+
   // Track if we've auto-triggered the requested tool
   const hasAutoTriggeredRef = useRef(false);
 
@@ -141,41 +150,32 @@ export function useMaestroSessionLogic({
 
   // Auto-trigger tool request when requestedToolType is present (from URL param)
   useEffect(() => {
-    // Only auto-trigger once, and only if we have a requestedToolType
     if (!requestedToolType || hasAutoTriggeredRef.current) return;
-
-    // Mark as triggered to prevent duplicate calls
     hasAutoTriggeredRef.current = true;
 
-    // Use requestTool to set the input with the appropriate prompt
-    const toolsWithAutoTrigger: ToolType[] = [
-      "mindmap",
-      "quiz",
-      "flashcard",
-      "demo",
-      "search",
-      "summary",
-      "diagram",
-      "timeline",
-    ];
-
-    if (toolsWithAutoTrigger.includes(requestedToolType)) {
-      // Delay to ensure chatHandlers are ready
-      setTimeout(() => {
-        chatHandlers.requestTool(
-          requestedToolType as
-            | "mindmap"
-            | "quiz"
-            | "flashcards"
-            | "demo"
-            | "search"
-            | "summary"
-            | "diagram"
-            | "timeline",
-        );
-      }, 100);
+    // Webcam: open camera UI directly instead of setting text input
+    if (requestedToolType === "webcam") {
+      setTimeout(() => handleRequestPhoto(), 300);
+      return;
     }
-  }, [requestedToolType, chatHandlers]);
+
+    const autoSubmitPrompts: Partial<Record<ToolType, string>> = {
+      mindmap: "Crea una mappa mentale sull'argomento di cui stiamo parlando",
+      quiz: "Crea un quiz per verificare la mia comprensione",
+      flashcard: "Crea delle flashcard per aiutarmi a memorizzare",
+      demo: "Crea una demo interattiva per spiegarmi meglio il concetto",
+      search: "Cerca informazioni utili sull'argomento",
+      summary: "Fammi un riassunto strutturato dell'argomento",
+      diagram: "Crea un diagramma per visualizzare il concetto",
+      timeline: "Crea una linea temporale degli eventi",
+    };
+
+    const prompt = autoSubmitPrompts[requestedToolType];
+    if (prompt) {
+      // Auto-submit: send the prompt directly (bypasses input state timing)
+      setTimeout(() => chatHandlers.handleSubmit(undefined, prompt), 100);
+    }
+  }, [requestedToolType, chatHandlers, handleRequestPhoto]);
 
   // Tools are now displayed inline in the chat instead of opening in fullscreen
   // Removed auto-switch to focus mode - tools remain integrated in the chat interface
@@ -243,15 +243,6 @@ export function useMaestroSessionLogic({
     questionCount.current = 0;
     setSessionEnded(false);
   }, [chatHandlers]);
-
-  const handleRequestPhoto = useCallback(() => {
-    setWebcamRequest({
-      purpose: "homework",
-      instructions: "Mostra il tuo compito",
-      callId: `cam-${Date.now()}`,
-    });
-    setShowWebcam(true);
-  }, []);
 
   // Load a specific conversation by ID from the server
   const loadConversation = useCallback(async (conversationId: string) => {
