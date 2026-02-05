@@ -1,11 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Card } from "@/components/ui/card";
-import { WebcamCapture } from "@/components/tools/webcam-capture";
-import { SessionGradeDisplay } from "./session-grade";
 import { useVoiceSession } from "@/lib/hooks/use-voice-session";
 import { usePermissions } from "@/lib/hooks/use-permissions";
 import { useProgressStore } from "@/lib/stores";
@@ -18,6 +16,7 @@ import {
   SessionTranscript,
   SessionTools,
   SessionControls,
+  SessionOverlays,
   useSessionEffects,
   useConnection,
   useSessionHandlers,
@@ -40,7 +39,7 @@ export function VoiceSession({
   const [showGrade, setShowGrade] = useState(false);
   const [finalSessionDuration, setFinalSessionDuration] = useState(0);
   const [finalQuestionCount, setFinalQuestionCount] = useState(0);
-  const [_sessionSummary, setSessionSummary] = useState<string | null>(null);
+  const [, setSessionSummary] = useState<string | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
 
   const {
@@ -69,6 +68,13 @@ export function VoiceSession({
     clearToolCalls,
     sendWebcamResult,
     sessionId: voiceSessionId,
+    videoEnabled,
+    toggleVideo,
+    videoStream,
+    videoFramesSent,
+    videoElapsedSeconds,
+    videoMaxSeconds,
+    videoLimitReached,
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
@@ -84,7 +90,6 @@ export function VoiceSession({
     },
   });
 
-  // Session effects (conversation, ambient audio, timer, focus mode)
   const { sessionStartTime, questionCount, conversationIdRef } =
     useSessionEffects({
       maestro,
@@ -94,8 +99,7 @@ export function VoiceSession({
       onSetElapsedSeconds: setElapsedSeconds,
     });
 
-  // Connection management
-  const { connectionInfo: _connectionInfo, configError } = useConnection({
+  const { configError } = useConnection({
     maestro,
     connect,
     isConnected,
@@ -105,7 +109,6 @@ export function VoiceSession({
     onPermissionError: setPermissionError,
   });
 
-  // Event handlers
   const {
     handleWebcamCapture,
     handleWebcamClose,
@@ -133,18 +136,10 @@ export function VoiceSession({
     setWebcamRequest,
   });
 
-  const xpProgress = calculateXpProgress(xp, level);
-  const xpEarned = calculateSessionXP(currentSession, transcript.length);
-
-  // Escape key handler
   useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        handleClose();
-      }
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    const onEsc = (e: KeyboardEvent) => e.key === "Escape" && handleClose();
+    window.addEventListener("keydown", onEsc);
+    return () => window.removeEventListener("keydown", onEsc);
   }, [handleClose]);
 
   const stateText = getStateText(
@@ -157,13 +152,6 @@ export function VoiceSession({
     maestro.displayName,
   );
 
-  const handleTriggerTool = useCallback(
-    (toolName: string) =>
-      triggerManualTool(toolName, setWebcamRequest, setShowWebcam),
-    [triggerManualTool],
-  );
-
-  // Show permission error
   if (permissionError) {
     return (
       <PermissionErrorView
@@ -178,7 +166,6 @@ export function VoiceSession({
     );
   }
 
-  // Show configuration error
   if (configError) {
     return (
       <ConfigErrorView
@@ -205,7 +192,7 @@ export function VoiceSession({
               elapsedSeconds={elapsedSeconds}
               level={level}
               xp={xp}
-              xpProgress={xpProgress}
+              xpProgress={calculateXpProgress(xp, level)}
               onClose={handleClose}
             />
 
@@ -226,13 +213,18 @@ export function VoiceSession({
               toolCalls={toolCalls}
               sessionId={voiceSessionId}
               onClearToolCalls={clearToolCalls}
-              onTriggerTool={handleTriggerTool}
+              onTriggerTool={(name: string) =>
+                triggerManualTool(name, setWebcamRequest, setShowWebcam)
+              }
             />
 
             <SessionControls
               isMuted={isMuted}
               isSpeaking={isSpeaking}
+              videoEnabled={videoEnabled}
+              videoLimitReached={videoLimitReached}
               onToggleMute={toggleMute}
+              onToggleVideo={toggleVideo}
               onCancelResponse={cancelResponse}
               onSendText={sendText}
               onSwitchToChat={handleSwitchToChat}
@@ -241,28 +233,24 @@ export function VoiceSession({
           </Card>
         </motion.div>
 
-        <AnimatePresence>
-          {showWebcam && webcamRequest && (
-            <WebcamCapture
-              purpose={webcamRequest.purpose}
-              instructions={webcamRequest.instructions}
-              onCapture={(data) => handleWebcamCapture(webcamRequest, data)}
-              onClose={() => handleWebcamClose(webcamRequest)}
-            />
-          )}
-        </AnimatePresence>
-
-        <AnimatePresence>
-          {showGrade && (
-            <SessionGradeDisplay
-              maestro={maestro}
-              sessionDuration={finalSessionDuration}
-              questionsAsked={finalQuestionCount}
-              xpEarned={xpEarned}
-              onClose={handleGradeClose}
-            />
-          )}
-        </AnimatePresence>
+        <SessionOverlays
+          videoEnabled={videoEnabled}
+          videoStream={videoStream}
+          videoElapsedSeconds={videoElapsedSeconds}
+          videoFramesSent={videoFramesSent}
+          videoMaxSeconds={videoMaxSeconds}
+          onVideoStop={toggleVideo}
+          showWebcam={showWebcam}
+          webcamRequest={webcamRequest}
+          onWebcamCapture={handleWebcamCapture}
+          onWebcamClose={handleWebcamClose}
+          showGrade={showGrade}
+          maestro={maestro}
+          sessionDuration={finalSessionDuration}
+          questionsAsked={finalQuestionCount}
+          xpEarned={calculateSessionXP(currentSession, transcript.length)}
+          onGradeClose={handleGradeClose}
+        />
       </div>
     </ErrorBoundary>
   );

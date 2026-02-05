@@ -290,7 +290,18 @@
         "sendMessageAriaLabel": "Enviar mensaje",
         "sendMessageTooltip": "Enviar el mensaje",
         "switchToChatAriaLabel": "Cambiar a chat",
-        "switchToChatTooltip": "Volver al chat de texto"
+        "switchToChatTooltip": "Volver al chat de texto",
+        "videoTooltip": {
+          "on": "Desactivar video",
+          "off": "Activar video",
+          "limitReached": "Límite de video alcanzado para este mes"
+        },
+        "videoAriaLabel": {
+          "on": "Video activo, clic para desactivar",
+          "off": "Video desactivado, clic para activar"
+        },
+        "videoStopAriaLabel": "Detener video",
+        "videoFramesLabel": "fotogramas enviados"
       },
       "rating": {
         "close": "Cerrar",

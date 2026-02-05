@@ -13,6 +13,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import {
+  canStartSession,
   startSession,
   addFrames,
   endSession,
@@ -60,12 +61,16 @@ export const POST = pipe(
 
   switch (data.action) {
     case "start": {
-      const result = await startSession(ctx.userId!, data.voiceSessionId);
-      if (!result) {
+      const eligibility = await canStartSession(ctx.userId!);
+      if (!eligibility.allowed) {
         return NextResponse.json(
-          { error: "Cannot start video vision session" },
+          { error: eligibility.reason || "video_vision_denied" },
           { status: 403 },
         );
+      }
+      const result = await startSession(ctx.userId!, data.voiceSessionId);
+      if (!result) {
+        return NextResponse.json({ error: "internal_error" }, { status: 500 });
       }
       return NextResponse.json(result, { status: 201 });
     }

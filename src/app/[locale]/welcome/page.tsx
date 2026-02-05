@@ -69,6 +69,9 @@ function WelcomeContent() {
     toggleVideo: async () => {},
     videoStream: null,
     videoFramesSent: 0,
+    videoElapsedSeconds: 0,
+    videoMaxSeconds: 0,
+    videoLimitReached: false,
   };
 
   useEffect(() => {

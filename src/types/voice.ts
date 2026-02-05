@@ -43,6 +43,12 @@ export interface VoiceSessionHandle {
   videoStream: MediaStream | null;
   /** Number of video frames sent during current session */
   videoFramesSent: number;
+  /** Elapsed seconds since video capture started */
+  videoElapsedSeconds: number;
+  /** Maximum allowed seconds for this capture session */
+  videoMaxSeconds: number;
+  /** Whether the user has reached their video vision limit */
+  videoLimitReached: boolean;
 }
 
 export type EmotionType =

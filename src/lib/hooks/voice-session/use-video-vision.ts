@@ -5,7 +5,7 @@
 
 "use client";
 
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth/csrf-client";
 import { useVideoCapture } from "./video-capture";
@@ -20,9 +20,12 @@ interface VideoVisionRefs {
 
 export interface VideoVisionState {
   videoEnabled: boolean;
+  videoLimitReached: boolean;
   toggleVideo: () => Promise<void>;
   videoStream: MediaStream | null;
   videoFramesSent: number;
+  videoElapsedSeconds: number;
+  videoMaxSeconds: number;
 }
 
 /**
@@ -30,6 +33,7 @@ export interface VideoVisionState {
  * Manages the full lifecycle: start → capture frames → end.
  */
 export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
+  const [limitReached, setLimitReached] = useState(false);
   const sendVideoFrame = useSendVideoFrame(vrefs.webrtcDataChannelRef);
 
   const endUsageSession = useCallback(
@@ -84,7 +88,18 @@ export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
         }),
       });
       if (!res.ok) {
-        logger.warn("[VideoVision] Start denied", { status: res.status });
+        const err = await res.json().catch(() => ({ error: "unknown" }));
+        const reason = err.error as string;
+        logger.warn("[VideoVision] Start denied", {
+          status: res.status,
+          reason,
+        });
+        if (
+          reason === "monthly_limit_reached" ||
+          reason === "video_vision_disabled"
+        ) {
+          setLimitReached(true);
+        }
         return;
       }
       const data = await res.json();
@@ -100,8 +115,11 @@ export function useVideoVision(vrefs: VideoVisionRefs): VideoVisionState {
 
   return {
     videoEnabled: capture.isCapturing,
+    videoLimitReached: limitReached,
     toggleVideo,
     videoStream: capture.videoStream,
     videoFramesSent: capture.framesSent,
+    videoElapsedSeconds: capture.elapsedSeconds,
+    videoMaxSeconds: vrefs.videoMaxSecondsRef.current,
   };
 }

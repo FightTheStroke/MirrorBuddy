@@ -14,6 +14,8 @@ import {
   VolumeX,
   Send,
   MessageSquare,
+  Video,
+  VideoOff,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -22,7 +24,10 @@ import { cn } from "@/lib/utils";
 interface SessionControlsProps {
   isMuted: boolean;
   isSpeaking: boolean;
+  videoEnabled: boolean;
+  videoLimitReached: boolean;
   onToggleMute: () => void;
+  onToggleVideo: () => void;
   onCancelResponse: () => void;
   onSendText: (text: string) => void;
   onSwitchToChat?: () => void;
@@ -32,7 +37,10 @@ interface SessionControlsProps {
 export function SessionControls({
   isMuted,
   isSpeaking,
+  videoEnabled,
+  videoLimitReached,
   onToggleMute,
+  onToggleVideo,
   onCancelResponse,
   onSendText,
   onSwitchToChat,
@@ -90,6 +98,37 @@ export function SessionControls({
             <MicOff className="h-6 w-6" />
           ) : (
             <Mic className="h-6 w-6" />
+          )}
+        </Button>
+
+        <Button
+          variant="ghost"
+          size="icon-lg"
+          onClick={onToggleVideo}
+          disabled={videoLimitReached && !videoEnabled}
+          title={
+            videoLimitReached && !videoEnabled
+              ? t("videoTooltip.limitReached")
+              : videoEnabled
+                ? t("videoTooltip.on")
+                : t("videoTooltip.off")
+          }
+          aria-label={
+            videoEnabled ? t("videoAriaLabel.on") : t("videoAriaLabel.off")
+          }
+          className={cn(
+            "rounded-full transition-colors",
+            videoLimitReached && !videoEnabled
+              ? "bg-slate-800 text-slate-500 cursor-not-allowed"
+              : videoEnabled
+                ? "bg-blue-500/20 text-blue-400 hover:bg-blue-500/30"
+                : "bg-slate-700 text-white hover:bg-slate-600",
+          )}
+        >
+          {videoEnabled ? (
+            <Video className="h-5 w-5" />
+          ) : (
+            <VideoOff className="h-5 w-5" />
           )}
         </Button>
 

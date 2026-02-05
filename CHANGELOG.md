@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Video Vision (ADR 0122)**: Real-time video vision for Pro-tier voice sessions — periodic webcam frame capture sent via WebRTC data channel to Azure OpenAI Realtime API as `input_image` content
+  - Tier schema: `videoVisionSecondsPerSession` and `videoVisionMinutesMonthly` limits per tier with admin override support
+  - Consumption tracking: `VideoVisionUsage` Prisma model with per-session and monthly usage enforcement
+  - Video capture hook with motion detection, auto-stop timer, and camera stream management
+  - PiP camera preview with countdown timer and frame counter
+  - Session controls with video toggle button (disabled state when limit reached)
+  - API routes: `POST /api/video-vision/usage` (start/frames/end), `GET /api/video-vision/limits`
+  - Cost tracking integration via `VIDEO_VISION_PER_FRAME` pricing constant
+  - i18n: Video control translations in all 5 locales
 - **Admin Console**: ServiceHealth now includes `configured` field to distinguish between unconfigured and failing services
 - **UserMenuDropdown**: New dropdown component with profile, change password, settings, and logout actions
 - **i18n**: User menu translations in all 5 locales (it/en/fr/de/es)
