@@ -6,12 +6,15 @@
  */
 
 import { prisma } from "@/lib/db";
+import { getAllExternalServiceUsage } from "@/lib/metrics/external-service-metrics";
 import type {
   OpsDashboardResponse,
   OnlineUsersMetric,
   RequestMetrics,
   VoiceMetrics,
   DatabaseMetrics,
+  ServiceHealthItem,
+  RecentIncident,
 } from "./ops-dashboard-types";
 
 // Cache for 30 seconds
@@ -29,11 +32,20 @@ export async function getOpsDashboardData(): Promise<OpsDashboardResponse> {
   }
 
   // Fetch all metrics in parallel
-  const [onlineUsers, requests, voice, database] = await Promise.all([
+  const [
+    onlineUsers,
+    requests,
+    voice,
+    database,
+    serviceHealth,
+    recentIncidents,
+  ] = await Promise.all([
     getOnlineUsers(),
     getRequestMetrics(),
     getVoiceMetrics(),
     getDatabaseMetrics(),
+    getServiceHealth(),
+    getRecentIncidents(),
   ]);
 
   const data: OpsDashboardResponse = {
@@ -41,6 +53,8 @@ export async function getOpsDashboardData(): Promise<OpsDashboardResponse> {
     requests,
     voice,
     database,
+    serviceHealth,
+    recentIncidents,
     timestamp: new Date().toISOString(),
   };
 
@@ -129,6 +143,71 @@ async function getVoiceMetrics(): Promise<VoiceMetrics> {
     totalMinutesToday: 0,
     avgDuration: 0,
   };
+}
+
+/**
+ * Get external service health (quota usage)
+ */
+async function getServiceHealth(): Promise<ServiceHealthItem[]> {
+  try {
+    const usage = await getAllExternalServiceUsage();
+    return usage.map((u) => ({
+      service: u.service,
+      metric: u.metric,
+      usagePercent: u.usagePercent,
+      status: u.status,
+      period: u.period,
+    }));
+  } catch (_error) {
+    return [];
+  }
+}
+
+/**
+ * Get recent incidents from telemetry (last 24h)
+ */
+async function getRecentIncidents(): Promise<RecentIncident[]> {
+  try {
+    const dayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const events = await prisma.telemetryEvent.findMany({
+      where: {
+        timestamp: { gte: dayAgo },
+        category: {
+          in: ["safety_incident", "external_api", "circuit_breaker"],
+        },
+      },
+      orderBy: { timestamp: "desc" },
+      take: 20,
+      select: {
+        eventId: true,
+        timestamp: true,
+        category: true,
+        action: true,
+        label: true,
+      },
+    });
+
+    return events.map((e) => ({
+      id: e.eventId,
+      timestamp: e.timestamp.toISOString(),
+      category: e.category,
+      action: e.action,
+      label: e.label || "",
+      severity: getSeverity(e.category, e.action),
+    }));
+  } catch (_error) {
+    return [];
+  }
+}
+
+function getSeverity(
+  category: string,
+  action: string,
+): "info" | "warning" | "critical" {
+  if (category === "safety_incident") return "critical";
+  if (category === "circuit_breaker") return "warning";
+  if (action.includes("error") || action.includes("fail")) return "warning";
+  return "info";
 }
 
 /**

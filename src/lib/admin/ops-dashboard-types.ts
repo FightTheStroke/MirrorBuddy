@@ -63,6 +63,29 @@ export interface DatabaseMetrics {
 }
 
 /**
+ * Service health status from external service metrics
+ */
+export interface ServiceHealthItem {
+  service: string;
+  metric: string;
+  usagePercent: number;
+  status: "ok" | "warning" | "critical" | "exceeded";
+  period: string;
+}
+
+/**
+ * Recent incident from telemetry
+ */
+export interface RecentIncident {
+  id: string;
+  timestamp: string;
+  category: string;
+  action: string;
+  label: string;
+  severity: "info" | "warning" | "critical";
+}
+
+/**
  * Admin API response for ops dashboard
  */
 export interface OpsDashboardResponse {
@@ -70,5 +93,7 @@ export interface OpsDashboardResponse {
   requests: RequestMetrics;
   voice: VoiceMetrics;
   database: DatabaseMetrics;
+  serviceHealth: ServiceHealthItem[];
+  recentIncidents: RecentIncident[];
   timestamp: string; // ISO datetime
 }

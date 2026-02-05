@@ -11,6 +11,9 @@ import { Loader2, AlertCircle } from "lucide-react";
 import type { OpsDashboardResponse } from "@/lib/admin/ops-dashboard-types";
 import { OnlineUsersCard, RequestMetricsCard } from "./components";
 import { VoiceMetricsCard, DatabaseMetricsCard } from "./components-extended";
+import { CostOverviewCard } from "./cost-card";
+import { ServiceHealthCard } from "./service-health-card";
+import { IncidentsCard } from "./incidents-card";
 
 export const dynamic = "force-dynamic";
 
@@ -87,12 +90,20 @@ export default function OpsDashboardPage() {
       )}
 
       {!loading && !error && data && (
-        <div className="grid gap-6 md:grid-cols-2">
-          <OnlineUsersCard metrics={data.onlineUsers} />
-          <RequestMetricsCard metrics={data.requests} />
-          <VoiceMetricsCard metrics={data.voice} />
-          <DatabaseMetricsCard metrics={data.database} />
-        </div>
+        <>
+          <div className="grid gap-6 md:grid-cols-2">
+            <OnlineUsersCard metrics={data.onlineUsers} />
+            <RequestMetricsCard metrics={data.requests} />
+            <VoiceMetricsCard metrics={data.voice} />
+            <DatabaseMetricsCard metrics={data.database} />
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            <CostOverviewCard />
+            <ServiceHealthCard items={data.serviceHealth} />
+            <IncidentsCard incidents={data.recentIncidents} />
+          </div>
+        </>
       )}
 
       {!loading && !error && !data && (
