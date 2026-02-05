@@ -5,14 +5,12 @@
 import * as Sentry from "@sentry/nextjs";
 
 // STRICT: Only enable Sentry on Vercel production deployments by default
-// VERCEL_ENV === "production" is the ONLY reliable way to detect production
-// - VERCEL === "1" is true for ALL Vercel deployments (preview + production)
-// - NODE_ENV can be "production" locally or in preview builds
-const isVercelProduction = process.env.VERCEL_ENV === "production";
+// MUST use NEXT_PUBLIC_ prefix — non-prefixed env vars are NOT available in client bundles
+// NEXT_PUBLIC_VERCEL_ENV is auto-provided by Vercel for Next.js projects
+const isVercelProduction = process.env.NEXT_PUBLIC_VERCEL_ENV === "production";
 
-// Optional debug escape hatch:
-// Set SENTRY_FORCE_ENABLE=true in Preview/local to test Sentry
-const isForceEnabled = process.env.SENTRY_FORCE_ENABLE === "true";
+// Optional debug escape hatch for Preview/local testing
+const isForceEnabled = process.env.NEXT_PUBLIC_SENTRY_FORCE_ENABLE === "true";
 
 // Only initialize if DSN is present (support both public and server-side names)
 const dsn =
@@ -30,7 +28,7 @@ if (!dsn && isVercelProduction) {
   );
 } else if (dsn && !isVercelProduction && !isForceEnabled) {
   console.log(
-    `[Sentry] DSN present but environment is not Vercel production (VERCEL_ENV=${process.env.VERCEL_ENV || "undefined"}) - error tracking disabled`,
+    `[Sentry] DSN present but environment is not Vercel production (NEXT_PUBLIC_VERCEL_ENV=${process.env.NEXT_PUBLIC_VERCEL_ENV || "undefined"}) - error tracking disabled`,
   );
 } else if (dsn && isForceEnabled) {
   console.log(
@@ -112,7 +110,7 @@ if (dsn) {
       // unless SENTRY_FORCE_ENABLE is explicitly set for debugging
       if (!isVercelProduction && !isForceEnabled) {
         console.warn(
-          `[Sentry] Blocked error from non-production environment: ${process.env.VERCEL_ENV || "local"}`,
+          `[Sentry] Blocked error from non-production environment: ${process.env.NEXT_PUBLIC_VERCEL_ENV || "local"}`,
         );
         return null; // Drop the event
       }
