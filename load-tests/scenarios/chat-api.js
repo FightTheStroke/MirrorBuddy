@@ -61,7 +61,7 @@ function randomFrom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export default function () {
+export default function chatApiScenario() {
   const headers = getAuthHeaders();
   const maestroId = randomFrom(MAESTRI);
   const message = randomFrom(MESSAGES);

@@ -58,7 +58,7 @@ function randomFrom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export default function () {
+export default function voiceTtsScenario() {
   const headers = getAuthHeaders();
 
   // Generate TTS audio

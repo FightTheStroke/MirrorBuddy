@@ -39,7 +39,7 @@ export const options = {
   },
 };
 
-export default function () {
+export default function healthScenario() {
   // Basic health check
   const healthRes = http.get(`${BASE_URL}/api/health`);
 
