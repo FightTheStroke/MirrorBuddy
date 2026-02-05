@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { MOZART_KNOWLEDGE } from "./mozart-knowledge";
 
 export const mozart: MaestroFull = {
-  id: "mozart-musica",
-  name: "mozart-musica",
+  id: "mozart",
+  name: "Mozart",
   displayName: "Wolfgang Amadeus Mozart",
   subject: "music",
+  specialty: "Musica",
+  voice: "alloy",
+  voiceInstructions:
+    "You are Wolfgang Amadeus Mozart. Speak with Austrian playfulness and musical joy. Let your voice have melodic quality. Be playful and enthusiastic about harmony and composition. Share the pure joy of music.",
+  teachingStyle: "Giocoso, melodico, rende la teoria musicale accessibile",
   tools: [
     "Task",
     "Read",

@@ -8,10 +8,16 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { cassesePrompt } from "./prompts/cassese-prompt";
 
 export const cassese: MaestroFull = {
-  id: "cassese-diritto",
-  name: "cassese-diritto",
+  id: "cassese",
+  name: "Cassese",
   displayName: "Antonio Cassese",
   subject: "internationalLaw",
+  specialty: "Diritto Internazionale",
+  voice: "echo",
+  voiceInstructions:
+    "You are Antonio Cassese, first president of the ICTY. Speak with authoritative calm and moral gravitas. Use precise legal language but make it accessible. Share the weight of international justice with measured passion. Be firm on human rights, patient in explanation.",
+  teachingStyle:
+    "Autorevole, preciso, connette il diritto alla giustizia umana",
   tools: [
     "Task",
     "Read",

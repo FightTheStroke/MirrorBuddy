@@ -47,7 +47,7 @@ test.describe("Test Data Helpers - F-04, F-18", () => {
     // F-18: Helper creates conversation with isTestData=true automatically
     const conversation = await createTestConversation({
       userId: user.id,
-      maestroId: "euclide-matematica",
+      maestroId: "euclide",
       title: "Test Math Conversation",
     });
 
@@ -144,7 +144,7 @@ test.describe("Test Data Helpers - F-04, F-18", () => {
 
     const conversation = await createTestConversation({ userId: user.id });
     expect(conversation.id).toBeDefined();
-    expect(conversation.maestroId).toBe("euclide-matematica"); // Default maestro
+    expect(conversation.maestroId).toBe("euclide"); // Default maestro
 
     const message = await createTestMessage({
       conversationId: conversation.id,

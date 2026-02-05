@@ -48,7 +48,7 @@ export function createActiveCharacter(
     const maestro = character as MaestroFull;
     greeting = maestro.greeting;
     systemPrompt = maestro.systemPrompt;
-    voiceInstructions = "";
+    voiceInstructions = maestro.voiceInstructions;
   }
 
   return {

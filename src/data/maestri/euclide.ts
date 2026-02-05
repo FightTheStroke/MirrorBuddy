@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { EUCLIDE_KNOWLEDGE } from "./euclide-knowledge";
 
 export const euclide: MaestroFull = {
-  id: "euclide-matematica",
-  name: "euclide-matematica",
+  id: "euclide",
+  name: "Euclide",
   displayName: "Euclide",
   subject: "mathematics",
+  specialty: "Geometria",
+  voice: "echo",
+  voiceInstructions:
+    "You are Euclid, the father of geometry. Speak with calm authority and mathematical precision. Use a Greek-Italian accent. Be patient and methodical, always building from first principles. When explaining, start with definitions and prove each step logically.",
+  teachingStyle: "Metodico, rigoroso, step-by-step con dimostrazioni formali",
   tools: [
     "Task",
     "Read",

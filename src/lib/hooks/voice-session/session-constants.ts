@@ -7,11 +7,11 @@
  * Full language names for voice instructions
  */
 export const LANGUAGE_NAMES: Record<string, string> = {
-  it: 'Italian (Italiano)',
-  en: 'English',
-  es: 'Spanish (Español)',
-  fr: 'French (Français)',
-  de: 'German (Deutsch)',
+  it: "Italian (Italiano)",
+  en: "English",
+  es: "Spanish (Español)",
+  fr: "French (Français)",
+  de: "German (Deutsch)",
 };
 
 /**
@@ -19,11 +19,11 @@ export const LANGUAGE_NAMES: Record<string, string> = {
  * Azure Realtime API expects ISO codes, not full names
  */
 export const TRANSCRIPTION_LANGUAGES: Record<string, string> = {
-  it: 'it',
-  en: 'en',
-  es: 'es',
-  fr: 'fr',
-  de: 'de',
+  it: "it",
+  en: "en",
+  es: "es",
+  fr: "fr",
+  de: "de",
 };
 
 /**
@@ -31,11 +31,11 @@ export const TRANSCRIPTION_LANGUAGES: Record<string, string> = {
  * Keywords help Whisper with domain-specific vocabulary
  */
 export const TRANSCRIPTION_PROMPTS: Record<string, string> = {
-  it: 'MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze, inglese, arte, musica, lezione, compiti, esercizio, spiegazione, domanda, risposta, bravo, corretto, sbagliato, aiuto, grazie, sì, no, non capisco, ripeti',
-  en: 'MirrorBuddy, teacher, math, English, history, geography, science, art, music, lesson, homework, exercise, explanation, question, answer, correct, wrong, help, thank you, yes, no, I don\'t understand, repeat',
-  es: 'MirrorBuddy, maestro, matemáticas, español, historia, geografía, ciencias, arte, música, lección, deberes, ejercicio, explicación, pregunta, respuesta, correcto, incorrecto, ayuda, gracias, sí, no, no entiendo, repite',
-  fr: 'MirrorBuddy, professeur, mathématiques, français, histoire, géographie, sciences, art, musique, leçon, devoirs, exercice, explication, question, réponse, correct, incorrect, aide, merci, oui, non, je ne comprends pas, répète',
-  de: 'MirrorBuddy, Lehrer, Mathematik, Deutsch, Geschichte, Geographie, Wissenschaft, Kunst, Musik, Lektion, Hausaufgaben, Übung, Erklärung, Frage, Antwort, richtig, falsch, Hilfe, danke, ja, nein, ich verstehe nicht, wiederhole',
+  it: "MirrorBuddy, maestro, matematica, italiano, storia, geografia, scienze, inglese, arte, musica, lezione, compiti, esercizio, spiegazione, domanda, risposta, bravo, corretto, sbagliato, aiuto, grazie, sì, no, non capisco, ripeti",
+  en: "MirrorBuddy, teacher, math, English, history, geography, science, art, music, lesson, homework, exercise, explanation, question, answer, correct, wrong, help, thank you, yes, no, I don't understand, repeat",
+  es: "MirrorBuddy, maestro, matemáticas, español, historia, geografía, ciencias, arte, música, lección, deberes, ejercicio, explicación, pregunta, respuesta, correcto, incorrecto, ayuda, gracias, sí, no, no entiendo, repite",
+  fr: "MirrorBuddy, professeur, mathématiques, français, histoire, géographie, sciences, art, musique, leçon, devoirs, exercice, explication, question, réponse, correct, incorrect, aide, merci, oui, non, je ne comprends pas, répète",
+  de: "MirrorBuddy, Lehrer, Mathematik, Deutsch, Geschichte, Geographie, Wissenschaft, Kunst, Musik, Lektion, Hausaufgaben, Übung, Erklärung, Frage, Antwort, richtig, falsch, Hilfe, danke, ja, nein, ich verstehe nicht, wiederhole",
 };
 
 /**
@@ -44,15 +44,17 @@ export const TRANSCRIPTION_PROMPTS: Record<string, string> = {
 export const BILINGUAL_PROMPTS: Record<string, string> = {
   en: `${TRANSCRIPTION_PROMPTS.it}, ${TRANSCRIPTION_PROMPTS.en}, pronunciation, repeat after me, say it, how do you say, what does mean, grammar, vocabulary, phrase, sentence, dialogue, conversation`,
   es: `${TRANSCRIPTION_PROMPTS.it}, ${TRANSCRIPTION_PROMPTS.es}, pronunciación, repite conmigo, cómo se dice, qué significa, gramática, vocabulario, frase, oración, diálogo, conversación, La Casa de Papel, Money Heist, Bella Ciao`,
+  fr: `${TRANSCRIPTION_PROMPTS.it}, ${TRANSCRIPTION_PROMPTS.fr}, prononciation, répétez après moi, comment dit-on, que veut dire, grammaire, vocabulaire, phrase, dialogue, conversation, Molière, comédie, théâtre`,
+  de: `${TRANSCRIPTION_PROMPTS.it}, ${TRANSCRIPTION_PROMPTS.de}, Aussprache, wiederholen Sie, wie sagt man, was bedeutet, Grammatik, Wortschatz, Satz, Dialog, Gespräch, Goethe, Faust, Dichtung`,
 };
 
 /**
  * Random greeting prompts for session start
  */
 export const GREETING_PROMPTS = [
-  'Saluta lo studente con calore e presentati. Sii coinvolgente ed entusiasta. Poi chiedi cosa vorrebbe imparare oggi.',
-  'Dai il benvenuto allo studente con la tua personalità caratteristica. Condividi qualcosa di interessante sulla tua materia per suscitare curiosità.',
-  'Inizia la lezione presentandoti nel tuo stile unico. Fallo entusiasmare per imparare!',
+  "Saluta lo studente con calore e presentati. Sii coinvolgente ed entusiasta. Poi chiedi cosa vorrebbe imparare oggi.",
+  "Dai il benvenuto allo studente con la tua personalità caratteristica. Condividi qualcosa di interessante sulla tua materia per suscitare curiosità.",
+  "Inizia la lezione presentandoti nel tuo stile unico. Fallo entusiasmare per imparare!",
 ];
 
 /**
@@ -75,14 +77,21 @@ export function getRandomGreetingPrompt(studentName: string | null): string {
 export function buildLanguageInstruction(
   isLanguageTeacher: boolean,
   targetLanguage: string | null,
-  userLanguage: string
+  userLanguage: string,
 ): string {
-  const langName = LANGUAGE_NAMES[userLanguage] || 'Italian';
+  const langName = LANGUAGE_NAMES[userLanguage] || "Italian";
   const langUpper = langName.toUpperCase();
 
   if (isLanguageTeacher && targetLanguage) {
-    const teachingLang = targetLanguage === 'en' ? 'ENGLISH' : 'SPANISH';
-    const teachingLangLower = targetLanguage === 'en' ? 'English' : 'Spanish';
+    const TEACHING_LANG_MAP: Record<string, [string, string]> = {
+      en: ["ENGLISH", "English"],
+      es: ["SPANISH", "Spanish"],
+      fr: ["FRENCH", "French"],
+      de: ["GERMAN", "German"],
+    };
+    const [teachingLang, teachingLangLower] = TEACHING_LANG_MAP[
+      targetLanguage
+    ] || ["ENGLISH", "English"];
     return `
 # STRICT BILINGUAL LANGUAGE TEACHING MODE
 You are teaching ${teachingLang} to an Italian student.

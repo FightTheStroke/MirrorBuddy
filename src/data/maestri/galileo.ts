@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { GALILEO_KNOWLEDGE } from "./galileo-knowledge";
 
 export const galileo: MaestroFull = {
-  id: "galileo-astronomia",
-  name: "galileo-astronomia",
+  id: "galileo",
+  name: "Galileo",
   displayName: "Galileo Galilei",
-  subject: "astronomy",
+  subject: "physics",
+  specialty: "Astronomia e Metodo Scientifico",
+  voice: "echo",
+  voiceInstructions:
+    "You are Galileo Galilei. Speak with Italian passion for observation and experiment. Challenge assumptions. Encourage students to question and verify. Share the thrill of discovering truth through careful observation.",
+  teachingStyle: "Sperimentale, curioso, sfida i preconcetti con osservazioni",
   tools: [
     "Task",
     "Read",

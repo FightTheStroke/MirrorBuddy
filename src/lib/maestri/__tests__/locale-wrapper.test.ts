@@ -13,10 +13,14 @@ import type { SupportedLanguage } from "@/app/api/chat/types";
 
 // Mock maestri for testing
 const mockFormalMaestro: MaestroFull = {
-  id: "euclide-matematica",
-  name: "euclide-matematica",
+  id: "euclide",
+  name: "Euclide",
   displayName: "Euclide",
   subject: "mathematics",
+  specialty: "Matematica e Geometria",
+  voice: "echo",
+  voiceInstructions: "",
+  teachingStyle: "formal",
   tools: [],
   systemPrompt: "You are Euclide, the mathematics professor.",
   avatar: "/maestri/euclide.webp",
@@ -25,10 +29,14 @@ const mockFormalMaestro: MaestroFull = {
 };
 
 const mockInformalMaestro: MaestroFull = {
-  id: "feynman-physics",
-  name: "feynman-physics",
+  id: "feynman",
+  name: "Richard Feynman",
   displayName: "Richard Feynman",
   subject: "physics",
+  specialty: "Fisica e Meccanica Quantistica",
+  voice: "ash",
+  voiceInstructions: "",
+  teachingStyle: "informal",
   tools: [],
   systemPrompt: "You are Feynman, the physics professor.",
   avatar: "/maestri/feynman.webp",
@@ -114,20 +122,20 @@ describe("getLocalizedSystemPrompt", () => {
 
 describe("getMaestroFormalityLevel", () => {
   it("should return formal for historical professors", () => {
-    expect(getMaestroFormalityLevel("euclide-matematica")).toBe("formal");
-    expect(getMaestroFormalityLevel("galileo-astronomia")).toBe("formal");
-    expect(getMaestroFormalityLevel("socrate-filosofia")).toBe("formal");
-    expect(getMaestroFormalityLevel("manzoni-italiano")).toBe("formal");
+    expect(getMaestroFormalityLevel("euclide")).toBe("formal");
+    expect(getMaestroFormalityLevel("galileo")).toBe("formal");
+    expect(getMaestroFormalityLevel("socrate")).toBe("formal");
+    expect(getMaestroFormalityLevel("manzoni")).toBe("formal");
   });
 
   it("should return informal for modern professors", () => {
-    expect(getMaestroFormalityLevel("feynman-physics")).toBe("informal");
-    expect(getMaestroFormalityLevel("chris-education")).toBe("informal");
+    expect(getMaestroFormalityLevel("feynman")).toBe("informal");
+    expect(getMaestroFormalityLevel("chris")).toBe("informal");
   });
 
   it("should handle case-insensitive matching", () => {
-    expect(getMaestroFormalityLevel("EUCLIDE-matematica")).toBe("formal");
-    expect(getMaestroFormalityLevel("Feynman-Physics")).toBe("informal");
+    expect(getMaestroFormalityLevel("EUCLIDE")).toBe("formal");
+    expect(getMaestroFormalityLevel("Feynman")).toBe("informal");
   });
 });
 

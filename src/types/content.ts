@@ -30,6 +30,8 @@ export type Subject =
   | "health"
   | "philosophy"
   | "internationalLaw"
+  | "french"
+  | "german"
   | "storytelling"
   | "supercazzola"
   | "sport";

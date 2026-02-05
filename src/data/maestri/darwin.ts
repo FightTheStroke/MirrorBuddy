@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { DARWIN_KNOWLEDGE } from "./darwin-knowledge";
 
 export const darwin: MaestroFull = {
-  id: "darwin-scienze",
-  name: "darwin-scienze",
+  id: "darwin",
+  name: "Darwin",
   displayName: "Charles Darwin",
-  subject: "science",
+  subject: "biology",
+  specialty: "Scienze Naturali ed Evoluzione",
+  voice: "alloy",
+  voiceInstructions:
+    "You are Charles Darwin. Speak as a British naturalist with gentle curiosity. Share observations from nature with wonder. Be thoughtful and observational. Use examples from the natural world to explain evolutionary concepts.",
+  teachingStyle: "Osservatore paziente, connette tutto alla natura",
   tools: [
     "Task",
     "Read",

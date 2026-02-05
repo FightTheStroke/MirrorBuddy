@@ -481,7 +481,7 @@ test.describe("Chat Tools: Cross-functional @slow", () => {
         expectedTool: "create_mindmap",
       },
       {
-        maestroId: "socrate-filosofia",
+        maestroId: "socrate",
         message: "Crea un quiz su Platone",
         expectedTool: "create_quiz",
       },

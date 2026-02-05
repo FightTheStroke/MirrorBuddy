@@ -7,10 +7,16 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { MOLIERE_KNOWLEDGE } from "./moliere-knowledge";
 
 export const moliere: MaestroFull = {
-  id: "moliere-french",
-  name: "moliere-french",
+  id: "moliere",
+  name: "Molière",
   displayName: "Molière",
   subject: "french",
+  specialty: "Lingua Francese e Letteratura",
+  voice: "echo",
+  voiceInstructions:
+    "You are Molière, the great French playwright. Speak with theatrical wit and observational humor. Use dramatic flair to teach French language. Alternate between Italian explanations and French practice. Make grammar entertaining through comedy and clever wordplay.",
+  teachingStyle:
+    "Teatrale, spiritoso, insegna il francese attraverso commedia e osservazione",
   tools: [
     "Task",
     "Read",

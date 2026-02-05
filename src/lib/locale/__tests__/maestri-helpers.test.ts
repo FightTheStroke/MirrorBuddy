@@ -31,7 +31,7 @@ describe("maestri-helpers", () => {
 
     it("should include Manzoni for Italian", () => {
       const languageMaestri = getLanguageMaestri();
-      const manzoni = languageMaestri.find((m) => m.id === "manzoni-italiano");
+      const manzoni = languageMaestri.find((m) => m.id === "manzoni");
 
       expect(manzoni).toBeDefined();
       expect(manzoni?.subject).toBe("italian");
@@ -39,9 +39,7 @@ describe("maestri-helpers", () => {
 
     it("should include Shakespeare for English", () => {
       const languageMaestri = getLanguageMaestri();
-      const shakespeare = languageMaestri.find(
-        (m) => m.id === "shakespeare-inglese",
-      );
+      const shakespeare = languageMaestri.find((m) => m.id === "shakespeare");
 
       expect(shakespeare).toBeDefined();
       expect(shakespeare?.subject).toBe("english");
@@ -49,7 +47,7 @@ describe("maestri-helpers", () => {
 
     it("should include Molière for French", () => {
       const languageMaestri = getLanguageMaestri();
-      const moliere = languageMaestri.find((m) => m.id === "moliere-french");
+      const moliere = languageMaestri.find((m) => m.id === "moliere");
 
       expect(moliere).toBeDefined();
       expect(moliere?.subject).toBe("french");
@@ -57,7 +55,7 @@ describe("maestri-helpers", () => {
 
     it("should include Goethe for German", () => {
       const languageMaestri = getLanguageMaestri();
-      const goethe = languageMaestri.find((m) => m.id === "goethe-german");
+      const goethe = languageMaestri.find((m) => m.id === "goethe");
 
       expect(goethe).toBeDefined();
       expect(goethe?.subject).toBe("german");
@@ -71,12 +69,8 @@ describe("maestri-helpers", () => {
 
       expect(spanishMaestri.length).toBeGreaterThanOrEqual(2);
 
-      const cervantes = spanishMaestri.find(
-        (m) => m.id === "cervantes-spanish",
-      );
-      const alexPina = spanishMaestri.find(
-        (m) => m.id === "alex-pina-spagnolo",
-      );
+      const cervantes = spanishMaestri.find((m) => m.id === "cervantes");
+      const alexPina = spanishMaestri.find((m) => m.id === "alex-pina");
 
       expect(cervantes).toBeDefined();
       expect(alexPina).toBeDefined();
@@ -87,7 +81,7 @@ describe("maestri-helpers", () => {
 
       // These are non-language maestri
       const nonLanguageIds = [
-        "euclide-matematica",
+        "euclide",
         "galileo",
         "curie",
         "darwin",
@@ -139,12 +133,12 @@ describe("maestri-helpers", () => {
       const options = getLanguageMaestroOptions();
 
       const expectedIds = [
-        "manzoni-italiano",
-        "shakespeare-inglese",
-        "moliere-french",
-        "goethe-german",
-        "cervantes-spanish",
-        "alex-pina-spagnolo",
+        "manzoni",
+        "shakespeare",
+        "moliere",
+        "goethe",
+        "cervantes",
+        "alex-pina",
       ];
 
       expectedIds.forEach((expectedId) => {
@@ -157,12 +151,12 @@ describe("maestri-helpers", () => {
   describe("isValidLanguageMaestro", () => {
     it("should return true for valid language maestri", () => {
       const validIds = [
-        "manzoni-italiano",
-        "shakespeare-inglese",
-        "moliere-french",
-        "goethe-german",
-        "cervantes-spanish",
-        "alex-pina-spagnolo",
+        "manzoni",
+        "shakespeare",
+        "moliere",
+        "goethe",
+        "cervantes",
+        "alex-pina",
       ];
 
       validIds.forEach((id) => {
@@ -172,7 +166,7 @@ describe("maestri-helpers", () => {
 
     it("should return false for non-language maestri", () => {
       const invalidIds = [
-        "euclide-matematica",
+        "euclide",
         "galileo",
         "curie",
         "darwin",

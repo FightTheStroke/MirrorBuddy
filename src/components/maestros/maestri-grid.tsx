@@ -52,6 +52,8 @@ const subjectLucideIcons: Record<Subject, LucideIcon> = {
   health: Heart,
   philosophy: Lightbulb,
   internationalLaw: Globe2,
+  french: Languages,
+  german: Languages,
   storytelling: Mic,
   supercazzola: Drama,
   sport: Waves,

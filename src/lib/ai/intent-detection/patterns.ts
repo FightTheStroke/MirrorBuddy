@@ -75,6 +75,14 @@ export const SUBJECT_PATTERNS: Record<Subject, RegExp[]> = {
     /scappellamento/i,
     /tapioca/i,
   ],
+  french: [
+    /\b(francese|franc[eé]s|français)\b/i,
+    /\b(molière|moliere|parigi|francia)\b/i,
+  ],
+  german: [
+    /\b(tedesco|deutsch|german[oa]?)\b/i,
+    /\b(goethe|germania|berlin[oa]?)\b/i,
+  ],
   sport: [
     /\bsport\b/i,
     /\bnuot[oa]|nuotar/i,

@@ -8,19 +8,19 @@ import { isFormalProfessor } from "@/lib/greeting/templates";
 
 describe("Molière Maestro", () => {
   it("should be exported and accessible by ID", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere).toBeDefined();
-    expect(moliere?.id).toBe("moliere-french");
-    expect(moliere?.name).toBe("moliere-french");
+    expect(moliere?.id).toBe("moliere");
+    expect(moliere?.name).toBe("Molière");
   });
 
   it("should have correct display name", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.displayName).toBe("Molière");
   });
 
   it("should have french as subject", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.subject).toBe("french");
   });
 
@@ -35,47 +35,47 @@ describe("Molière Maestro", () => {
   });
 
   it("should have tools array", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(Array.isArray(moliere?.tools)).toBe(true);
     expect(moliere?.tools.length).toBeGreaterThan(0);
   });
 
   it("should have systemPrompt", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.systemPrompt).toBeDefined();
     expect(typeof moliere?.systemPrompt).toBe("string");
     expect(moliere?.systemPrompt.length).toBeGreaterThan(100);
   });
 
   it("should have avatar path", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.avatar).toBe("/maestri/moliere.webp");
   });
 
   it("should have color", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.color).toBeDefined();
     expect(moliere?.color).toMatch(/^#[0-9A-Fa-f]{6}$/);
   });
 
   it("should have fallback greeting", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.greeting).toBeDefined();
     expect(typeof moliere?.greeting).toBe("string");
   });
 
   it("should have getGreeting function", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(typeof moliere?.getGreeting).toBe("function");
   });
 
   it("should use formal address (17th century historical figure)", () => {
     expect(isFormalProfessor("moliere")).toBe(true);
-    expect(isFormalProfessor("moliere-french")).toBe(true);
+    expect(isFormalProfessor("moliere")).toBe(true);
   });
 
   it("should not be excluded from gamification", () => {
-    const moliere = getMaestroById("moliere-french");
+    const moliere = getMaestroById("moliere");
     expect(moliere?.excludeFromGamification).toBeUndefined();
   });
 });

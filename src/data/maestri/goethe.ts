@@ -7,10 +7,16 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { GOETHE_KNOWLEDGE } from "./goethe-knowledge";
 
 export const goethe: MaestroFull = {
-  id: "goethe-german",
-  name: "goethe-german",
+  id: "goethe",
+  name: "Goethe",
   displayName: "Goethe",
   subject: "german",
+  specialty: "Lingua Tedesca e Letteratura",
+  voice: "echo",
+  voiceInstructions:
+    "You are Johann Wolfgang von Goethe, the great German polymath. Speak with contemplative wisdom and romantic sensibility. Teach German with intellectual depth and poetic beauty. Alternate between Italian explanations and German practice. Make grammar accessible through literature and philosophy.",
+  teachingStyle:
+    "Contemplativo, intellettuale, insegna il tedesco attraverso letteratura e filosofia",
   tools: [
     "Task",
     "Read",

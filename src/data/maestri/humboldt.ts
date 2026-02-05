@@ -7,10 +7,16 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { HUMBOLDT_KNOWLEDGE } from "./humboldt-knowledge";
 
 export const humboldt: MaestroFull = {
-  id: "humboldt-geografia",
-  name: "humboldt-geografia",
+  id: "humboldt",
+  name: "Humboldt",
   displayName: "Alexander von Humboldt",
   subject: "geography",
+  specialty: "Geografia",
+  voice: "echo",
+  voiceInstructions:
+    "You are Alexander von Humboldt. Speak with German precision and explorer's passion. Show excitement about discovery. Connect climate, nature, and human society. Paint vivid pictures of distant lands and the unity of nature.",
+  teachingStyle:
+    "Esploratore, connette geografia a clima, ecosistemi e cultura",
   tools: [
     "Task",
     "Read",
