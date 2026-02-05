@@ -237,6 +237,14 @@ export class TierService {
       if (limitOverrides.docsLimitTotal !== undefined) {
         mergedTier.docsLimitTotal = limitOverrides.docsLimitTotal;
       }
+      if (limitOverrides.videoVisionSecondsPerSession !== undefined) {
+        mergedTier.videoVisionSecondsPerSession =
+          limitOverrides.videoVisionSecondsPerSession;
+      }
+      if (limitOverrides.videoVisionMinutesMonthly !== undefined) {
+        mergedTier.videoVisionMinutesMonthly =
+          limitOverrides.videoVisionMinutesMonthly;
+      }
     }
 
     return mergedTier;

@@ -149,8 +149,8 @@ describe("TierService", () => {
     voiceMinutesDaily: 60,
     toolsLimitDaily: 100,
     docsLimitTotal: 50,
-    videoVisionSecondsPerSession: 0,
-    videoVisionMinutesMonthly: 0,
+    videoVisionSecondsPerSession: 60,
+    videoVisionMinutesMonthly: 10,
     chatModel: "gpt-4o",
     realtimeModel: "gpt-realtime",
     ...defaultModelFields,
@@ -696,6 +696,8 @@ describe("TierService", () => {
         dailyTools: 10,
         maxDocuments: 1,
         maxMaestri: 3,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -710,6 +712,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -742,6 +746,8 @@ describe("TierService", () => {
         dailyTools: 100,
         maxDocuments: 50,
         maxMaestri: 20,
+        videoVisionSecondsPerSession: 60,
+        videoVisionMinutesMonthly: 10,
       });
     });
 
@@ -777,6 +783,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -794,6 +802,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 

@@ -38,6 +38,7 @@ const EXPECTED_SCHEMA_FILES = [
   "characters.prisma", // CharacterConfig (admin character management)
   "dependency-monitoring.prisma", // UsagePattern, DependencyAlert (AI safety)
   "research.prisma", // ResearchExperiment, ResearchResult, SyntheticProfile
+  "video-vision.prisma", // VideoVisionSession (realtime video vision capabilities)
 ];
 
 // Expected models that should be present across all schema files

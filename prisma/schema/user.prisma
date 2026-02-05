@@ -99,6 +99,9 @@ model User {
   // Dependency Monitoring (Amodei 2026)
   usagePatterns    UsagePattern[]
   dependencyAlerts DependencyAlert[]
+
+  // Video Vision Usage Tracking (ADR 0122)
+  videoVisionUsages VideoVisionUsage[] @relation("VideoVisionUsages")
 }
 
 model Profile {

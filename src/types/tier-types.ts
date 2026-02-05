@@ -49,7 +49,8 @@ export type UsageType =
   | "tool_uses"
   | "document_uploads"
   | "monthly_api_calls"
-  | "storage_gb";
+  | "storage_gb"
+  | "video_vision_seconds";
 
 /**
  * Tier limits configuration
