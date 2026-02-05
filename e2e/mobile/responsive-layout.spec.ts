@@ -24,6 +24,8 @@ test.describe("Mobile Responsive Layout", () => {
     await expect(header).toBeVisible();
 
     // Header should not exceed viewport width
+    // Re-wait after hydration may cause brief remount
+    await header.waitFor({ state: "visible", timeout: 5000 });
     const box = await header.boundingBox();
     expect(box).not.toBeNull();
     const viewportWidth = await mobile.getViewportWidth();
@@ -142,7 +144,8 @@ test.describe("Mobile Responsive Layout", () => {
     const main = page.locator('main, [role="main"]').first();
     await expect(main).toBeVisible();
 
-    // Main should have content
+    // Re-wait after hydration may cause brief remount
+    await main.waitFor({ state: "visible", timeout: 5000 });
     const box = await main.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThan(0);

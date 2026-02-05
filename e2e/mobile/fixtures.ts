@@ -175,6 +175,8 @@ export const test = base.extend<{ mobile: MobileTestHelpers }>({
 
     const helpers: MobileTestHelpers = {
       verifyTouchTarget: async (locator: Locator) => {
+        // Re-wait for element to ensure hydration is complete
+        await locator.waitFor({ state: "visible", timeout: 5000 });
         const box = await locator.boundingBox();
         if (!box) {
           throw new Error("Element not found or not visible");
