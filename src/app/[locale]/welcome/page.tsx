@@ -72,6 +72,11 @@ function WelcomeContent() {
     videoElapsedSeconds: 0,
     videoMaxSeconds: 0,
     videoLimitReached: false,
+    cameraMode: "off",
+    cycleCameraMode: async () => {},
+    takeSnapshot: async () => {},
+    toggleCameraFacing: () => {},
+    cameraFacing: "user",
   };
 
   useEffect(() => {

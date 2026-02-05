@@ -18,6 +18,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - API routes: `POST /api/video-vision/usage` (start/frames/end), `GET /api/video-vision/limits`
   - Cost tracking integration via `VIDEO_VISION_PER_FRAME` pricing constant
   - i18n: Video control translations in all 5 locales
+- **Unified Camera Selector (ADR 0126)**: Runtime switching between camera modes during voice sessions
+  - Three modes: off → video (continuous context) → photo (snapshot with AI response) → off
+  - Photo mode: single snapshot triggers `response.create` so AI describes what it sees
+  - Mobile camera flip: front/rear camera switching via `toggleCameraFacing()`
+  - `CameraModeSelector` component with WCAG 2.1 AA accessibility (aria-labels, screen reader announcements)
+  - `useUnifiedCamera` hook replaces `useVideoVision` with backward compatibility
+  - i18n: Camera mode translations in all 5 locales
 - **Admin Console**: ServiceHealth now includes `configured` field to distinguish between unconfigured and failing services
 - **UserMenuDropdown**: New dropdown component with profile, change password, settings, and logout actions
 - **i18n**: User menu translations in all 5 locales (it/en/fr/de/es)

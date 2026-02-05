@@ -426,6 +426,20 @@
         "visualTitle": "Visuelle Anpassungen",
         "visualWCAGCompliance": "WCAG-Konformität"
       }
+    },
+    "camera": {
+      "cameraOff": "Kamera aus",
+      "cameraOffAriaLabel": "Kamera aus, klicken zum Aktivieren",
+      "videoMode": "Videomodus (kontinuierlicher Kontext)",
+      "videoModeAriaLabel": "Videomodus aktiv, klicken für Fotomodus",
+      "photoMode": "Fotomodus (Einzelaufnahme)",
+      "photoModeAriaLabel": "Fotomodus aktiv, klicken zum Ausschalten",
+      "limitReached": "Kameralimit für diesen Monat erreicht",
+      "flipCamera": "Kamera wechseln",
+      "switchToFrontCamera": "Zur Frontkamera wechseln",
+      "switchToBackCamera": "Zur Rückkamera wechseln",
+      "takeSnapshot": "Foto aufnehmen",
+      "takeSnapshotAriaLabel": "Foto aufnehmen, um es dem Tutor zu zeigen"
     }
   }
 }

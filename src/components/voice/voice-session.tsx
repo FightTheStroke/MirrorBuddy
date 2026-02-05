@@ -75,6 +75,11 @@ export function VoiceSession({
     videoElapsedSeconds,
     videoMaxSeconds,
     videoLimitReached,
+    cameraMode,
+    cycleCameraMode,
+    takeSnapshot,
+    toggleCameraFacing,
+    cameraFacing,
   } = useVoiceSession({
     onError: (error) => {
       const message = error instanceof Error ? error.message : String(error);
@@ -221,10 +226,13 @@ export function VoiceSession({
             <SessionControls
               isMuted={isMuted}
               isSpeaking={isSpeaking}
-              videoEnabled={videoEnabled}
-              videoLimitReached={videoLimitReached}
+              cameraMode={cameraMode}
+              cameraFacing={cameraFacing}
+              cameraLimitReached={videoLimitReached}
               onToggleMute={toggleMute}
-              onToggleVideo={toggleVideo}
+              onCycleCameraMode={cycleCameraMode}
+              onToggleCameraFacing={toggleCameraFacing}
+              onTakeSnapshot={takeSnapshot}
               onCancelResponse={cancelResponse}
               onSendText={sendText}
               onSwitchToChat={handleSwitchToChat}

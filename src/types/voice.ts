@@ -20,6 +20,14 @@ export type VoiceConnectionState =
   | "error";
 
 /**
+ * Unified camera mode for voice sessions (ADR 0126).
+ * - 'off': Camera disabled
+ * - 'video': Continuous frame capture as passive context (no AI response triggered)
+ * - 'photo': Single snapshot mode (AI responds to what it sees)
+ */
+export type CameraMode = "off" | "video" | "photo";
+
+/**
  * Handle returned by useVoiceSession hook.
  * Used to pass voice session state between components without re-creating connections.
  */
@@ -49,6 +57,16 @@ export interface VoiceSessionHandle {
   videoMaxSeconds: number;
   /** Whether the user has reached their video vision limit */
   videoLimitReached: boolean;
+  /** Current unified camera mode (ADR 0126) */
+  cameraMode: CameraMode;
+  /** Cycle through camera modes: off → video → photo → off */
+  cycleCameraMode: () => Promise<void>;
+  /** Take a single snapshot (photo mode) - AI will respond to what it sees */
+  takeSnapshot: () => Promise<void>;
+  /** Switch camera between front and back (mobile) */
+  toggleCameraFacing: () => void;
+  /** Current camera facing mode */
+  cameraFacing: "user" | "environment";
 }
 
 export type EmotionType =

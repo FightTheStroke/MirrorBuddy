@@ -426,6 +426,20 @@
         "visualTitle": "Visual Title",
         "visualWCAGCompliance": "Visual W C A G Compliance"
       }
+    },
+    "camera": {
+      "cameraOff": "Caméra désactivée",
+      "cameraOffAriaLabel": "Caméra désactivée, cliquez pour activer",
+      "videoMode": "Mode vidéo (contexte continu)",
+      "videoModeAriaLabel": "Mode vidéo actif, cliquez pour passer en photo",
+      "photoMode": "Mode photo (prise unique)",
+      "photoModeAriaLabel": "Mode photo actif, cliquez pour désactiver",
+      "limitReached": "Limite caméra atteinte pour ce mois",
+      "flipCamera": "Changer de caméra",
+      "switchToFrontCamera": "Passer à la caméra frontale",
+      "switchToBackCamera": "Passer à la caméra arrière",
+      "takeSnapshot": "Prendre une photo",
+      "takeSnapshotAriaLabel": "Prendre une photo pour la montrer au tuteur"
     }
   }
 }

@@ -426,6 +426,20 @@
         "visualTitle": "Título Visual",
         "visualWCAGCompliance": "Cumplimiento WCAG Visual"
       }
+    },
+    "camera": {
+      "cameraOff": "Cámara apagada",
+      "cameraOffAriaLabel": "Cámara apagada, haz clic para activar",
+      "videoMode": "Modo video (contexto continuo)",
+      "videoModeAriaLabel": "Modo video activo, haz clic para cambiar a foto",
+      "photoMode": "Modo foto (toma única)",
+      "photoModeAriaLabel": "Modo foto activo, haz clic para apagar",
+      "limitReached": "Límite de cámara alcanzado este mes",
+      "flipCamera": "Cambiar cámara",
+      "switchToFrontCamera": "Cambiar a cámara frontal",
+      "switchToBackCamera": "Cambiar a cámara trasera",
+      "takeSnapshot": "Tomar foto",
+      "takeSnapshotAriaLabel": "Tomar una foto para mostrar al tutor"
     }
   }
 }

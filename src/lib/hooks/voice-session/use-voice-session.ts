@@ -24,7 +24,7 @@ import {
   useCancelResponse,
   useSendWebcamResult,
 } from "./actions";
-import { useVideoVision } from "./use-video-vision";
+import { useUnifiedCamera } from "./use-unified-camera";
 import {
   useVoiceSessionRefs,
   useConnectionState,
@@ -240,8 +240,8 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
   };
 
-  // Video vision (ADR 0122) - extracted to use-video-vision.ts
-  const videoVision = useVideoVision({
+  // Unified camera (ADR 0126) - video + photo modes
+  const unifiedCamera = useUnifiedCamera({
     webrtcDataChannelRef: refs.webrtcDataChannelRef,
     sessionIdRef: refs.sessionIdRef,
     videoUsageIdRef: refs.videoUsageIdRef,
@@ -276,6 +276,6 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
     sendWebcamResult: useSendWebcamResult(refs.webrtcDataChannelRef),
-    ...videoVision,
+    ...unifiedCamera,
   };
 }
