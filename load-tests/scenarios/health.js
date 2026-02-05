@@ -6,8 +6,8 @@
  * and verify infrastructure is handling concurrent connections.
  *
  * Usage:
- *   k6 run --env BASE_URL=https://staging.mirrorbuddy.app scenarios/health.js
- *   k6 run --env BASE_URL=https://staging.mirrorbuddy.app -e PROFILE=smoke scenarios/health.js
+ *   k6 run scenarios/health.js
+ *   k6 run --env BASE_URL=https://mirrorbuddy-git-BRANCH.vercel.app scenarios/health.js
  *
  * Plan 102 - W2-Scalability [T2-01]
  */

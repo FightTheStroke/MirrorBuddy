@@ -26,24 +26,26 @@ brew install k6
 ## Usage
 
 ```bash
-# Smoke test (quick)
-k6 run --env BASE_URL=https://staging.mirrorbuddy.app \
-       --env PROFILE=smoke \
-       scenarios/health.js
+# Local smoke test (quick)
+k6 run --env PROFILE=smoke scenarios/health.js
 
-# Baseline (requires auth for chat/tools)
-k6 run --env BASE_URL=https://staging.mirrorbuddy.app \
+# Against Vercel Preview (replace with actual preview URL)
+k6 run --env BASE_URL=https://mirrorbuddy-git-BRANCH.vercel.app \
        --env AUTH_COOKIE=your-signed-cookie \
        scenarios/chat-api.js
 
 # All scenarios in sequence
 for scenario in health chat-api voice-tts tools-api; do
-  k6 run --env BASE_URL=https://staging.mirrorbuddy.app \
+  k6 run --env BASE_URL=https://mirrorbuddy-git-BRANCH.vercel.app \
          --env AUTH_COOKIE=your-signed-cookie \
          scenarios/${scenario}.js \
          --out json=results/${scenario}.json
 done
 ```
+
+> **Note**: MirrorBuddy does not have a dedicated staging URL. Staging uses
+> Vercel Preview deployments with dynamic URLs per branch/PR (see ADR 0073).
+> Default BASE_URL is `http://localhost:3000` for local testing.
 
 ## Thresholds (SLI/SLO aligned)
 

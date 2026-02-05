@@ -1,7 +1,7 @@
 # High Load Test Results (5K/10K VUs)
 
 > Date: YYYY-MM-DD
-> Environment: staging.mirrorbuddy.app
+> Environment: [Vercel Preview URL or localhost:3000]
 > Prerequisite: baseline-YYYY-MM-DD.md completed
 
 ## Test Matrix

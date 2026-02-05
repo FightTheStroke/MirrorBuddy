@@ -1,7 +1,7 @@
 # Baseline Load Test Results
 
 > Date: YYYY-MM-DD
-> Environment: staging.mirrorbuddy.app
+> Environment: [Vercel Preview URL or localhost:3000]
 > k6 version: X.X.X
 > Operator: [name]
 

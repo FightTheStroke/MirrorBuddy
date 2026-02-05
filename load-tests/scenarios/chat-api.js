@@ -5,7 +5,7 @@
  * Simulates realistic user behavior: create conversation, send message, wait, repeat.
  *
  * Usage:
- *   k6 run --env BASE_URL=https://staging.mirrorbuddy.app \
+ *   k6 run --env BASE_URL=https://mirrorbuddy-git-BRANCH.vercel.app \
  *          --env AUTH_COOKIE=signed-user-id \
  *          scenarios/chat-api.js
  *

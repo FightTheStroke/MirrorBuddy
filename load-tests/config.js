@@ -1,13 +1,13 @@
 /**
  * Shared k6 Load Test Configuration
  *
- * Usage: k6 run --env BASE_URL=https://staging.mirrorbuddy.app scenarios/chat-api.js
+ * Usage: k6 run --env BASE_URL=https://mirrorbuddy-git-BRANCH.vercel.app scenarios/chat-api.js
  *
  * Plan 102 - W2-Scalability [T2-01]
  */
 
 // Base URL defaults to staging
-export const BASE_URL = __ENV.BASE_URL || "https://staging.mirrorbuddy.app";
+export const BASE_URL = __ENV.BASE_URL || "http://localhost:3000";
 
 // Authentication cookie for authenticated endpoints
 export const AUTH_COOKIE = __ENV.AUTH_COOKIE || "";
