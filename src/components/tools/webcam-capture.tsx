@@ -114,7 +114,7 @@ export function WebcamCapture({
         getCameraIcon={getCameraIcon}
       />
 
-      <div className="flex-1 relative min-h-0 sm:min-h-[300px] md:min-h-[400px] lg:min-h-[500px]">
+      <div className="flex-1 relative min-h-0 overflow-hidden">
         <WebcamPreview
           videoRef={videoRef}
           canvasRef={canvasRef}

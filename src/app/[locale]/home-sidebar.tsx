@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/i18n/navigation";
-import { ChevronUp, ChevronDown, LogIn, UserPlus, Shield } from "lucide-react";
+import { Menu, X, LogIn, UserPlus, Shield } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
@@ -91,9 +91,14 @@ export function HomeSidebar({
           >
             <LogoBrain alt={t("sidebar.appName")} size={36} priority />
             {open && (
-              <span className="font-bold text-lg text-slate-900 dark:text-white">
-                {t("sidebar.appName")}
-              </span>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-slate-900 dark:text-white">
+                  {t("sidebar.appName")}
+                </span>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 font-mono -mt-1">
+                  v{process.env.APP_VERSION}
+                </span>
+              </div>
             )}
           </button>
           <Button
@@ -103,11 +108,7 @@ export function HomeSidebar({
             className="text-slate-500"
             aria-label={open ? t("sidebar.closeMenu") : t("header.openMenu")}
           >
-            {open ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
-            )}
+            {open ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </Button>
         </div>
 

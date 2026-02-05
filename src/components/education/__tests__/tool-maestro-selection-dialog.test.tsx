@@ -180,7 +180,7 @@ describe("ToolMaestroSelectionDialog", () => {
       expect(screen.getByText(/Quiz/)).toBeInTheDocument();
     });
 
-    it("renders subject selection buttons", () => {
+    it("renders professor selection cards", () => {
       render(
         <ToolMaestroSelectionDialog
           isOpen={true}
@@ -189,9 +189,9 @@ describe("ToolMaestroSelectionDialog", () => {
           onClose={mockOnClose}
         />,
       );
-      // Subjects are mock data - check for presence of subject buttons
-      const buttons = screen.getAllByRole("button");
-      expect(buttons.length).toBeGreaterThan(1); // At least close + subjects
+      // Check for presence of professor names from mock data
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
+      expect(screen.getByText("Feynman")).toBeInTheDocument();
     });
   });
 
@@ -271,7 +271,7 @@ describe("ToolMaestroSelectionDialog", () => {
       });
     });
 
-    it("all subject buttons are keyboard accessible", () => {
+    it("all professor cards are keyboard accessible", () => {
       render(
         <ToolMaestroSelectionDialog
           isOpen={true}
@@ -289,7 +289,7 @@ describe("ToolMaestroSelectionDialog", () => {
   });
 
   describe("Step Flow", () => {
-    it("starts at subject step", () => {
+    it("shows professors directly without subject step", () => {
       render(
         <ToolMaestroSelectionDialog
           isOpen={true}
@@ -298,12 +298,30 @@ describe("ToolMaestroSelectionDialog", () => {
           onClose={mockOnClose}
         />,
       );
-      // Check for subject selection title pattern
+      // Check for title with professor selection
       const titleElement = document.getElementById("dialog-title");
       expect(titleElement).toBeInTheDocument();
+      // Should show professors immediately
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
+      expect(screen.getByText("Feynman")).toBeInTheDocument();
     });
 
-    it("calls onConfirm immediately when subject has single maestro", async () => {
+    it("shows all professors immediately on open", () => {
+      render(
+        <ToolMaestroSelectionDialog
+          isOpen={true}
+          toolType="mindmap"
+          onConfirm={mockOnConfirm}
+          onClose={mockOnClose}
+        />,
+      );
+
+      // Should show all maestri immediately without subject selection
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
+      expect(screen.getByText("Feynman")).toBeInTheDocument();
+    });
+
+    it("calls onConfirm when professor is selected", async () => {
       const user = userEvent.setup();
       render(
         <ToolMaestroSelectionDialog
@@ -314,29 +332,19 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Click Mathematics subject button (mock data - first subject)
-      const buttons = screen.getAllByRole("button");
-      // Find the first subject button (not the close button)
-      const subjectButton = buttons.find(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButton) {
-        await user.click(subjectButton);
-      }
+      // Click a professor directly
+      await user.click(screen.getByText("Euclide"));
 
       // Should call onConfirm with chat mode
       await waitFor(() => {
         expect(mockOnConfirm).toHaveBeenCalledWith(
-          expect.objectContaining({ id: expect.any(String) }),
+          expect.objectContaining({ id: "euclide" }),
           "chat",
         );
       });
     });
 
-    it("advances to maestro step when subject has no specific maestro", async () => {
-      const user = userEvent.setup();
+    it("shows all professors directly without subject step", () => {
       render(
         <ToolMaestroSelectionDialog
           isOpen={true}
@@ -346,27 +354,12 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Click History subject (third button, which has no maestro in our mock)
-      const buttons = screen.getAllByRole("button");
-      const subjectButtons = buttons.filter(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButtons.length > 2) {
-        await user.click(subjectButtons[2]); // History
-      }
-
-      // Should show all maestri
-      await waitFor(() => {
-        // Check for maestro display names
-        expect(screen.getByText("Euclide")).toBeInTheDocument();
-        expect(screen.getByText("Feynman")).toBeInTheDocument();
-      });
+      // Should show professors immediately
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
+      expect(screen.getByText("Feynman")).toBeInTheDocument();
     });
 
-    it("shows back button on maestro step", async () => {
-      const user = userEvent.setup();
+    it("does not show back button since there is no subject step", () => {
       render(
         <ToolMaestroSelectionDialog
           isOpen={true}
@@ -376,59 +369,15 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Click History subject
-      const buttons = screen.getAllByRole("button");
-      const subjectButtons = buttons.filter(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButtons.length > 2) {
-        await user.click(subjectButtons[2]);
-      }
-
-      await waitFor(() => {
-        expect(
-          screen.getByText(getTranslation("education.toolSelection.back")),
-        ).toBeInTheDocument();
-      });
-    });
-
-    it("goes back to subject step when clicking back button", async () => {
-      const user = userEvent.setup();
-      render(
-        <ToolMaestroSelectionDialog
-          isOpen={true}
-          toolType="mindmap"
-          onConfirm={mockOnConfirm}
-          onClose={mockOnClose}
-        />,
-      );
-
-      // Click History subject
-      const buttons = screen.getAllByRole("button");
-      const subjectButtons = buttons.filter(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButtons.length > 2) {
-        await user.click(subjectButtons[2]);
-      }
-      await user.click(
-        screen.getByText(getTranslation("education.toolSelection.back")),
-      );
-
-      await waitFor(() => {
-        // Check we're back at subject step
-        const titleElement = document.getElementById("dialog-title");
-        expect(titleElement).toBeInTheDocument();
-      });
+      // Back button should not be present
+      expect(
+        screen.queryByText(getTranslation("education.toolSelection.back")),
+      ).not.toBeInTheDocument();
     });
   });
 
   describe("Direct Confirmation (No Mode Selection)", () => {
-    it("calls onConfirm immediately when maestro selected", async () => {
+    it("calls onConfirm immediately when professor selected", async () => {
       const user = userEvent.setup();
       render(
         <ToolMaestroSelectionDialog
@@ -439,22 +388,7 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Select a subject with no maestro to get to maestro step
-      const buttons = screen.getAllByRole("button");
-      const subjectButtons = buttons.filter(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButtons.length > 2) {
-        await user.click(subjectButtons[2]); // History
-      }
-
-      // Select a maestro
-      await waitFor(() => {
-        expect(screen.getByText("Euclide")).toBeInTheDocument();
-      });
-
+      // Professors are shown immediately, select one
       await user.click(screen.getByText("Euclide"));
 
       await waitFor(() => {
@@ -476,16 +410,8 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Select first subject with single maestro
-      const buttons = screen.getAllByRole("button");
-      const subjectButton = buttons.find(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButton) {
-        await user.click(subjectButton);
-      }
+      // Select professor directly
+      await user.click(screen.getByText("Feynman"));
 
       await waitFor(() => {
         // Should be called with 'chat' mode directly
@@ -535,7 +461,7 @@ describe("ToolMaestroSelectionDialog", () => {
       expect(mockOnClose).toHaveBeenCalled();
     });
 
-    it("resets state when closed via close button", async () => {
+    it("shows professors again when reopened after closing", async () => {
       const user = userEvent.setup();
       const { rerender } = render(
         <ToolMaestroSelectionDialog
@@ -546,22 +472,10 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Go to maestro step - click History subject
-      const buttons = screen.getAllByRole("button");
-      const subjectButtons = buttons.filter(
-        (btn) =>
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("chiudi") &&
-          !btn.getAttribute("aria-label")?.toLowerCase().includes("close"),
-      );
-      if (subjectButtons.length > 2) {
-        await user.click(subjectButtons[2]);
-      }
-      // Verify we're on maestro step
-      await waitFor(() => {
-        expect(screen.getByText("Euclide")).toBeInTheDocument();
-      });
+      // Verify professors are shown
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
 
-      // Close via close button (which calls handleClose that resets state)
+      // Close via close button
       await user.click(
         screen.getByRole("button", {
           name: getTranslation("education.toolSelection.close"),
@@ -587,9 +501,9 @@ describe("ToolMaestroSelectionDialog", () => {
         />,
       );
 
-      // Should be back at subject step since handleClose reset state
-      const titleElement = document.getElementById("dialog-title");
-      expect(titleElement).toBeInTheDocument();
+      // Should show professors again
+      expect(screen.getByText("Euclide")).toBeInTheDocument();
+      expect(screen.getByText("Feynman")).toBeInTheDocument();
     });
   });
 });

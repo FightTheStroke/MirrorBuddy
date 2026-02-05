@@ -3,9 +3,16 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Eye, EyeOff, LogIn, UserPlus } from "lucide-react";
+import { Eye, EyeOff, UserPlus } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { LogoBrain } from "@/components/branding/logo-brain";
 
 interface LoginResponse {
   user?: {
@@ -54,7 +61,7 @@ export function LoginClient() {
       } else {
         // Use redirect from API if available, otherwise go to main maestri page
         const redirectTo = data.redirect || `/${locale}`;
-        router.push(redirectTo);
+        router.replace(redirectTo);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : t("connectionError"));
@@ -65,109 +72,120 @@ export function LoginClient() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-50 dark:from-slate-900 dark:to-slate-800 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-xl p-8 space-y-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
-              <LogIn className="w-8 h-8 text-blue-600 dark:text-blue-400" />
-            </div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-              MirrorBuddy
-            </h1>
-            <p className="text-slate-600 dark:text-slate-300 mt-2">
-              {t("signInToAccount")}
-            </p>
-          </div>
-
-          {error && (
-            <div
-              className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
-              role="alert"
-              aria-live="polite"
-            >
-              <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
-              >
-                Email *
-              </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={isLoading}
-                aria-required="true"
-                required
-                autoComplete="email"
-                className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                placeholder={t("yourEmail")}
+        <Card variant="elevated" className="shadow-xl">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex justify-center">
+              <LogoBrain
+                alt="MirrorBuddy Logo"
+                size={64}
+                priority
+                wrapperClassName="bg-blue-100 dark:bg-blue-900/30 rounded-full p-2"
               />
             </div>
-
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                MirrorBuddy
+              </h1>
+              <p className="text-slate-600 dark:text-slate-300 mt-2">
+                {t("signInToAccount")}
+              </p>
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-6">
+            {error && (
+              <div
+                className="flex items-start gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg"
+                role="alert"
+                aria-live="polite"
               >
-                Password *
-              </label>
-              <div className="relative">
+                <p className="text-sm text-red-600 dark:text-red-400">
+                  {error}
+                </p>
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                >
+                  Email *
+                </label>
                 <input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={isLoading}
                   aria-required="true"
                   required
-                  className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-                  placeholder={t("yourPassword")}
+                  autoComplete="email"
+                  className="w-full px-4 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                  placeholder={t("yourEmail")}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
-                  aria-label={
-                    showPassword ? t("hidePassword") : t("showPassword")
-                  }
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4" />
-                  ) : (
-                    <Eye className="w-4 h-4" />
-                  )}
-                </button>
               </div>
-            </div>
 
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full"
-              aria-busy={isLoading}
-            >
-              {isLoading ? t("signingIn") : t("login")}
-            </Button>
-          </form>
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1"
+                >
+                  Password *
+                </label>
+                <div className="relative">
+                  <input
+                    id="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={isLoading}
+                    aria-required="true"
+                    required
+                    className="w-full px-4 py-2 pr-10 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+                    placeholder={t("yourPassword")}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    aria-label={
+                      showPassword ? t("hidePassword") : t("showPassword")
+                    }
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
 
-          <div className="pt-4 border-t border-slate-200 dark:border-slate-700">
-            <p className="text-sm text-slate-600 dark:text-slate-400 text-center mb-3">
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full"
+                aria-busy={isLoading}
+              >
+                {isLoading ? t("signingIn") : t("login")}
+              </Button>
+            </form>
+          </CardContent>
+
+          <CardFooter className="flex-col space-y-3 border-t border-slate-200 dark:border-slate-700">
+            <p className="text-sm text-slate-600 dark:text-slate-400 text-center">
               {t("noAccount")}
             </p>
-            <Link href="/invite/request" className="block">
+            <Link href="/invite/request" className="w-full">
               <Button variant="outline" className="w-full">
                 <UserPlus className="w-4 h-4 mr-2" />
                 {t("requestBetaAccess")}
               </Button>
             </Link>
-          </div>
-        </div>
+          </CardFooter>
+        </Card>
       </div>
     </div>
   );

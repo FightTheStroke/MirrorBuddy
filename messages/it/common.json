@@ -157,6 +157,14 @@
       "accessibility": {
         "skipToContent": "Vai al contenuto"
       }
+    },
+    "userMenu": {
+      "greeting": "Ciao",
+      "profile": "Profilo",
+      "changePassword": "Cambia Password",
+      "settings": "Impostazioni",
+      "logout": "Esci",
+      "logoutConfirm": "Sei sicuro di voler uscire?"
     }
   }
 }

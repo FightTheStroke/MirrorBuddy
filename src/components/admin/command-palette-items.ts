@@ -25,6 +25,7 @@ import {
   UserCheck,
   UserX,
   RefreshCw,
+  BookOpen,
 } from "lucide-react";
 
 export interface CommandItem {
@@ -87,6 +88,14 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
       icon: Palette,
       href: "/admin/characters",
       keywords: ["maestri", "coaches", "buddies"],
+    },
+    {
+      id: "nav-knowledge",
+      label: "Knowledge",
+      section: "navigation",
+      icon: BookOpen,
+      href: "/admin/knowledge",
+      keywords: ["rag", "maestri", "embeddings"],
     },
     {
       id: "nav-locales",

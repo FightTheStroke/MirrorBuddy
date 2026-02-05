@@ -78,6 +78,14 @@ vi.mock("@/components/tools", () => ({
   ToolsDropdown: () => <div data-testid="tools-dropdown">Tools</div>,
 }));
 
+vi.mock("@/components/ui/user-menu-dropdown", () => ({
+  UserMenuDropdown: ({ userName }: { userName?: string }) => (
+    <div data-testid="user-menu-dropdown">
+      {userName && <span data-testid="greeting">Hello {userName}</span>}
+    </div>
+  ),
+}));
+
 describe("HomeHeader - User Greeting F-08", () => {
   const mockT = vi.fn((key: string) => {
     const translations: Record<string, string> = {
@@ -112,37 +120,34 @@ describe("HomeHeader - User Greeting F-08", () => {
     questionsAsked: 10,
   };
 
-  it("renders greeting with userName", () => {
+  it("renders greeting with userName via UserMenuDropdown", () => {
     render(<HomeHeader {...defaultProps} userName="Marco" />);
 
-    // Check that greeting is displayed (using mocked translation "Hello")
+    // Greeting is now in UserMenuDropdown component
+    expect(screen.getByTestId("user-menu-dropdown")).toBeInTheDocument();
     expect(screen.getByText(/Hello/i)).toBeInTheDocument();
     expect(screen.getByText(/Marco/i)).toBeInTheDocument();
   });
 
-  it("uses translation for greeting text", () => {
+  it("uses translation for header text", () => {
     render(<HomeHeader {...defaultProps} userName="Sofia" />);
 
     // Verify that useTranslations was called with "home"
     expect(useTranslations).toHaveBeenCalledWith("home");
 
-    // Verify that translation function was called for greeting
-    expect(mockT).toHaveBeenCalledWith("header.greeting");
+    // Header translations are used for stats and level info
+    expect(mockT).toHaveBeenCalledWith("mirrorBucksShort");
   });
 
-  it("displays greeting before level badge", () => {
-    const { container } = render(
-      <HomeHeader {...defaultProps} userName="Lucia" />,
-    );
+  it("displays UserMenuDropdown in right section with other controls", () => {
+    render(<HomeHeader {...defaultProps} userName="Lucia" />);
 
-    // Get the left section (first div inside header)
-    const leftSection = container.querySelector("header > div:first-child");
-    expect(leftSection).toBeInTheDocument();
+    // UserMenuDropdown should be present
+    expect(screen.getByTestId("user-menu-dropdown")).toBeInTheDocument();
 
-    // Greeting should appear in the left section
-    const greetingText = leftSection?.textContent;
-    expect(greetingText).toContain("Hello");
-    expect(greetingText).toContain("Lucia");
+    // Should also have tools and notifications in right section
+    expect(screen.getByTestId("tools-dropdown")).toBeInTheDocument();
+    expect(screen.getByTestId("notification-bell")).toBeInTheDocument();
   });
 
   it("still renders level badge and progress when userName is provided", () => {
@@ -158,21 +163,24 @@ describe("HomeHeader - User Greeting F-08", () => {
     // Should not crash if userName is not provided
     const { container } = render(<HomeHeader {...defaultProps} />);
     expect(container.querySelector("header")).toBeInTheDocument();
+    // UserMenuDropdown should still render (without userName)
+    expect(screen.getByTestId("user-menu-dropdown")).toBeInTheDocument();
   });
 
   describe("Accessibility - F-14", () => {
     it("menu button has accessible aria-label", () => {
-      const { container } = render(<HomeHeader {...defaultProps} />);
+      const { container } = render(
+        <HomeHeader {...defaultProps} onMenuClick={vi.fn()} />,
+      );
       // Menu button is only visible on mobile (lg:hidden)
-      const menuButton = container.querySelector("button[aria-label]");
+      const menuButton = container.querySelector(
+        'button[aria-label="Open menu"]',
+      );
       expect(menuButton).toBeInTheDocument();
       expect(menuButton).toHaveAttribute("aria-label", "Open menu");
     });
 
     it("stats have accessible title attributes for screen readers", () => {
-      render(<HomeHeader {...defaultProps} />);
-
-      // Find elements with title attributes
       const { container } = render(<HomeHeader {...defaultProps} />);
       const elementsWithTitle = container.querySelectorAll("[title]");
 
@@ -181,8 +189,12 @@ describe("HomeHeader - User Greeting F-08", () => {
     });
 
     it("menu button is keyboard focusable", () => {
-      const { container } = render(<HomeHeader {...defaultProps} />);
-      const menuButton = container.querySelector("button[aria-label]");
+      const { container } = render(
+        <HomeHeader {...defaultProps} onMenuClick={vi.fn()} />,
+      );
+      const menuButton = container.querySelector(
+        'button[aria-label="Open menu"]',
+      );
       expect(menuButton).toBeInTheDocument();
 
       if (menuButton) {

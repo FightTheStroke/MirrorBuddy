@@ -20,6 +20,7 @@ import {
 } from "@/components/character";
 import { useSettingsStore } from "@/lib/stores";
 import type { SupportedLanguage } from "@/types";
+import { SharedChatLayout } from "@/components/chat/shared-chat-layout";
 
 interface CharacterChatViewProps {
   characterId:
@@ -130,30 +131,17 @@ export function CharacterChatView({
 
   return (
     <div className="flex flex-col lg:flex-row gap-0 md:gap-4 h-full lg:h-[calc(100vh-8rem)]">
-      {/* Main Chat Area - F-23: Mobile 65% viewport allocation */}
-      <div className="flex flex-col min-w-0 flex-1">
-        {/* Header - Compact on mobile (≤60px) - xs: breakpoint */}
-        <div className="flex-shrink-0 xs:max-h-[60px] overflow-hidden">
+      {/* Main Chat Area using SharedChatLayout */}
+      <SharedChatLayout
+        header={
           <CharacterHeader
             character={unifiedCharacter}
             voiceState={voiceState}
             ttsEnabled={ttsEnabled}
             actions={headerActions}
           />
-        </div>
-
-        {/* Messages Area - 65% viewport on mobile (F-23) */}
-        <div className="flex-1 overflow-y-auto xs:min-h-[65vh]">
-          <MessagesList
-            messages={messages}
-            character={character}
-            isLoading={isLoading}
-          />
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Chat Input - Auto-height on mobile (flex-shrink-0 prevents squashing) */}
-        <div className="flex-shrink-0">
+        }
+        footer={
           <ChatInput
             input={input}
             onInputChange={setInput}
@@ -165,9 +153,47 @@ export function CharacterChatView({
             onToolRequest={handleToolRequest}
             activeTool={activeTool}
           />
-        </div>
-      </div>
+        }
+        rightPanel={
+          <AnimatePresence>
+            {isVoiceActive ? (
+              <CharacterVoicePanel
+                character={unifiedCharacter}
+                voiceState={voiceState}
+                ttsEnabled={ttsEnabled}
+                actions={headerActions}
+              />
+            ) : isHistoryOpen ? (
+              <ConversationSidebar
+                open={isHistoryOpen}
+                onOpenChange={setIsHistoryOpen}
+                characterId={characterId}
+                characterType={characterType}
+                characterColor={character.themeColor}
+                onSelectConversation={(conversationId) => {
+                  loadConversation(conversationId);
+                  setIsHistoryOpen(false);
+                }}
+                onNewConversation={() => {
+                  clearChat();
+                  setIsHistoryOpen(false);
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+        }
+        showRightPanel={isVoiceActive || isHistoryOpen}
+        className="flex-1"
+      >
+        <MessagesList
+          messages={messages}
+          character={character}
+          isLoading={isLoading}
+        />
+        <div ref={messagesEndRef} />
+      </SharedChatLayout>
 
+      {/* Tool Panel - separate column on desktop */}
       {hasActiveTool && (
         <div className="w-full lg:w-[400px] h-full flex-shrink-0 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
           <ToolPanel
@@ -185,34 +211,6 @@ export function CharacterChatView({
           />
         </div>
       )}
-
-      {/* Right Panel: Voice OR History (mutually exclusive, same position) */}
-      <AnimatePresence>
-        {isVoiceActive ? (
-          <CharacterVoicePanel
-            character={unifiedCharacter}
-            voiceState={voiceState}
-            ttsEnabled={ttsEnabled}
-            actions={headerActions}
-          />
-        ) : isHistoryOpen ? (
-          <ConversationSidebar
-            open={isHistoryOpen}
-            onOpenChange={setIsHistoryOpen}
-            characterId={characterId}
-            characterType={characterType}
-            characterColor={character.themeColor}
-            onSelectConversation={(conversationId) => {
-              loadConversation(conversationId);
-              setIsHistoryOpen(false);
-            }}
-            onNewConversation={() => {
-              clearChat();
-              setIsHistoryOpen(false);
-            }}
-          />
-        ) : null}
-      </AnimatePresence>
     </div>
   );
 }

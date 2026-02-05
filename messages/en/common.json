@@ -157,6 +157,14 @@
         "skipToContent": "Skip to content"
       }
     },
-    "tools": "Tools"
+    "tools": "Tools",
+    "userMenu": {
+      "greeting": "Hi",
+      "profile": "Profile",
+      "changePassword": "Change Password",
+      "settings": "Settings",
+      "logout": "Log Out",
+      "logoutConfirm": "Are you sure you want to log out?"
+    }
   }
 }

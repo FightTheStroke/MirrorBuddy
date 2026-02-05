@@ -119,6 +119,9 @@ function StoreInitializer() {
 const PUBLIC_PATHS = [
   "/welcome",
   "/landing",
+  "/login",
+  "/change-password",
+  "/invite",
   "/privacy",
   "/cookies",
   "/terms",
