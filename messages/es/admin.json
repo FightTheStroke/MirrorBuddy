@@ -544,6 +544,16 @@
       "csv": "CSV",
       "json": "JSON",
       "reportPdf": "Informe PDF"
+    },
+    "serviceStatus": {
+      "notConfigured": "No configurado",
+      "setupRequired": "Configuración requerida",
+      "na": "N/D",
+      "insufficientData": "Datos insuficientes",
+      "basedOnConfigured": "Basado en {count} servicios configurados",
+      "unreachable": "Inaccesible",
+      "encryptionNotConfigured": "Clave de cifrado no configurada",
+      "connectionError": "Error de conexión"
     }
   }
 }

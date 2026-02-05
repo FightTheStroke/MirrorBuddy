@@ -171,15 +171,9 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
         },
         {
           id: "business-kpi",
-          label: "Business KPI",
+          label: "KPIs",
           href: "/admin/mission-control/business-kpi",
           icon: TrendingUp,
-        },
-        {
-          id: "grafana",
-          label: "Grafana",
-          href: "/admin/mission-control/grafana",
-          icon: BarChart3,
         },
         {
           id: "stripe",

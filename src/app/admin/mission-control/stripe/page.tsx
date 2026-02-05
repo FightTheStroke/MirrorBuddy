@@ -5,7 +5,14 @@ export const dynamic = "force-dynamic";
 
 import { useState, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
-import { Loader2, RefreshCw, AlertCircle, AlertTriangle } from "lucide-react";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from "@/components/ui/card";
+import { Loader2, RefreshCw, AlertCircle, Settings } from "lucide-react";
 import type { StripeAdminResponse } from "@/lib/admin/stripe-admin-types";
 import {
   RevenueMetrics,
@@ -86,52 +93,83 @@ export default function StripeAdminPage() {
         </Button>
       </div>
 
-      {/* Configuration Warning */}
-      {data && !data.configured && (
-        <div className="p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg flex items-start gap-3">
-          <AlertTriangle className="h-5 w-5 text-amber-600 dark:text-amber-400 mt-0.5 flex-shrink-0" />
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-amber-900 dark:text-amber-200 mb-1">
-              Stripe Not Configured
-            </p>
-            <p className="text-sm text-amber-700 dark:text-amber-300 mb-2">
-              The data below is demo/placeholder data. To enable real Stripe
-              integration:
-            </p>
-            <ol className="text-sm text-amber-700 dark:text-amber-300 list-decimal list-inside space-y-1">
-              <li>Install Stripe SDK: npm install stripe</li>
-              <li>Add STRIPE_SECRET_KEY to environment variables</li>
-              <li>Update stripe-admin-service.ts with real API calls</li>
-            </ol>
-          </div>
-        </div>
-      )}
+      {/* Not Configured State */}
+      {data && !data.configured ? (
+        <Card className="border-slate-200 dark:border-slate-700">
+          <CardHeader className="text-center pb-4">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-slate-100 dark:bg-slate-800">
+              <Settings className="h-6 w-6 text-slate-600 dark:text-slate-400" />
+            </div>
+            <CardTitle className="text-2xl">
+              Stripe Integration Not Active
+            </CardTitle>
+            <CardDescription className="text-base mt-2">
+              Revenue data will appear here when Stripe is connected.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg bg-slate-50 dark:bg-slate-900 p-6">
+              <h3 className="font-semibold text-slate-900 dark:text-white mb-3">
+                Setup Steps
+              </h3>
+              <ol className="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                <li className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-semibold text-xs flex-shrink-0">
+                    1
+                  </span>
+                  <span>
+                    Add{" "}
+                    <code className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-xs">
+                      STRIPE_SECRET_KEY
+                    </code>{" "}
+                    environment variable
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 font-semibold text-xs flex-shrink-0">
+                    2
+                  </span>
+                  <span>
+                    Update{" "}
+                    <code className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 font-mono text-xs">
+                      stripe-admin-service.ts
+                    </code>{" "}
+                    with real API calls
+                  </span>
+                </li>
+              </ol>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          {/* Error Alert */}
+          {error && (
+            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-500" />
+              <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
+            </div>
+          )}
 
-      {/* Error Alert */}
-      {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg flex items-center gap-3">
-          <AlertCircle className="h-5 w-5 text-red-500" />
-          <p className="text-sm text-red-700 dark:text-red-300">{error}</p>
-        </div>
-      )}
+          {/* Revenue Metrics */}
+          {data?.revenue && (
+            <RevenueMetrics
+              mrr={data.revenue.mrr}
+              arr={data.revenue.arr}
+              activeSubscriptions={data.revenue.activeSubscriptions}
+              totalRevenue={data.revenue.totalRevenue}
+              currency={data.revenue.currency}
+            />
+          )}
 
-      {/* Revenue Metrics */}
-      {data?.revenue && (
-        <RevenueMetrics
-          mrr={data.revenue.mrr}
-          arr={data.revenue.arr}
-          activeSubscriptions={data.revenue.activeSubscriptions}
-          totalRevenue={data.revenue.totalRevenue}
-          currency={data.revenue.currency}
-        />
-      )}
+          {/* Products Table */}
+          {data?.products && <ProductsTable products={data.products} />}
 
-      {/* Products Table */}
-      {data?.products && <ProductsTable products={data.products} />}
-
-      {/* Subscriptions Table */}
-      {data?.subscriptions && (
-        <SubscriptionsTable subscriptions={data.subscriptions} />
+          {/* Subscriptions Table */}
+          {data?.subscriptions && (
+            <SubscriptionsTable subscriptions={data.subscriptions} />
+          )}
+        </>
       )}
     </div>
   );

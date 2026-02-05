@@ -26,7 +26,8 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
     }).format(value);
   };
 
-  const isPositiveGrowth = revenue.growthRate >= 0;
+  const isPositiveGrowth =
+    revenue.growthRate !== null && revenue.growthRate >= 0;
 
   return (
     <Card>
@@ -73,17 +74,26 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
             <div className="text-sm font-medium text-muted-foreground">
               Growth Rate
             </div>
-            <div
-              className={`flex items-center gap-1 text-sm font-medium ${
-                isPositiveGrowth ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              <span>
-                {isPositiveGrowth ? "+" : ""}
-                {revenue.growthRate.toFixed(1)}%
-              </span>
-              <TrendingUp className="h-4 w-4" />
-            </div>
+            {revenue.growthRate === null ? (
+              <div
+                className="text-sm font-medium text-muted-foreground"
+                title="Insufficient historical data"
+              >
+                N/A
+              </div>
+            ) : (
+              <div
+                className={`flex items-center gap-1 text-sm font-medium ${
+                  isPositiveGrowth ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                <span>
+                  {isPositiveGrowth ? "+" : ""}
+                  {revenue.growthRate.toFixed(1)}%
+                </span>
+                <TrendingUp className="h-4 w-4" />
+              </div>
+            )}
           </div>
         </div>
 
@@ -92,9 +102,18 @@ export function RevenueCard({ revenue }: RevenueCardProps) {
             <div className="text-sm font-medium text-muted-foreground">
               Total Revenue
             </div>
-            <div className="text-lg font-bold">
-              {formatCurrency(revenue.totalRevenue)}
-            </div>
+            {revenue.totalRevenue === null ? (
+              <div
+                className="text-lg font-medium text-muted-foreground"
+                title="Requires Stripe integration"
+              >
+                N/A
+              </div>
+            ) : (
+              <div className="text-lg font-bold">
+                {formatCurrency(revenue.totalRevenue)}
+              </div>
+            )}
           </div>
           <div className="text-xs text-muted-foreground mt-1">
             All-time revenue

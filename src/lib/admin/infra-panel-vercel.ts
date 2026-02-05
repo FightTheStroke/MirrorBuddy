@@ -1,6 +1,6 @@
 /**
  * Vercel Metrics Provider
- * Fetches deployment and usage metrics from Vercel API
+ * Fetches deployment metrics from Vercel API
  */
 
 import { logger } from "@/lib/logger";
@@ -14,42 +14,14 @@ function isVercelConfigured(): boolean {
 }
 
 /**
- * Get mock Vercel metrics for demo
- */
-function getMockVercelMetrics(): VercelMetrics {
-  return {
-    deployments: [
-      {
-        id: "dpl_demo_001",
-        state: "READY",
-        createdAt: Date.now() - 3600000, // 1 hour ago
-        url: "mirrorbuddy-prod.vercel.app",
-      },
-      {
-        id: "dpl_demo_002",
-        state: "READY",
-        createdAt: Date.now() - 7200000, // 2 hours ago
-        url: "mirrorbuddy-preview-abc123.vercel.app",
-      },
-    ],
-    bandwidthUsed: 5_368_709_120, // 5 GB
-    bandwidthLimit: 107_374_182_400, // 100 GB
-    buildsUsed: 45,
-    buildsLimit: 6000,
-    functionsUsed: 1200,
-    functionsLimit: 100000,
-    status: "healthy",
-  };
-}
-
-/**
  * Get Vercel metrics from API
+ * Returns null if not configured or if API call fails
  */
-export async function getVercelMetrics(): Promise<VercelMetrics> {
+export async function getVercelMetrics(): Promise<VercelMetrics | null> {
   try {
     if (!isVercelConfigured()) {
-      logger.warn("Vercel not configured, returning mock data");
-      return getMockVercelMetrics();
+      logger.info("Vercel not configured (missing VERCEL_TOKEN)");
+      return null;
     }
 
     const token = process.env.VERCEL_TOKEN!;
@@ -67,7 +39,10 @@ export async function getVercelMetrics(): Promise<VercelMetrics> {
     });
 
     if (!deploymentsResponse.ok) {
-      throw new Error("Failed to fetch Vercel deployments");
+      logger.error("Failed to fetch Vercel deployments", {
+        status: deploymentsResponse.status,
+      });
+      return null;
     }
 
     const deploymentsData = await deploymentsResponse.json();
@@ -80,23 +55,19 @@ export async function getVercelMetrics(): Promise<VercelMetrics> {
       }),
     );
 
-    // For now, return mock usage data until we implement usage API
-    logger.info(
-      "Vercel configured but usage API not implemented, using mock usage data",
-    );
-
+    // Return only deployment data (usage API not implemented)
     return {
       deployments,
-      bandwidthUsed: 5_368_709_120,
-      bandwidthLimit: 107_374_182_400,
-      buildsUsed: 45,
-      buildsLimit: 6000,
-      functionsUsed: 1200,
-      functionsLimit: 100000,
+      bandwidthUsed: 0,
+      bandwidthLimit: 0,
+      buildsUsed: 0,
+      buildsLimit: 0,
+      functionsUsed: 0,
+      functionsLimit: 0,
       status: "healthy",
     };
   } catch (error) {
     logger.error("Error fetching Vercel metrics", { error: String(error) });
-    return getMockVercelMetrics();
+    return null;
   }
 }

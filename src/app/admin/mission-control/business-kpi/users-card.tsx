@@ -110,9 +110,18 @@ export function UsersCard({ users }: UsersCardProps) {
             <div className="text-sm font-medium text-muted-foreground">
               Churn Rate
             </div>
-            <div className="text-sm font-medium text-red-600">
-              {formatPercentage(users.churnRate)}
-            </div>
+            {users.churnRate === null ? (
+              <div
+                className="text-sm font-medium text-muted-foreground"
+                title="Insufficient historical data"
+              >
+                N/A
+              </div>
+            ) : (
+              <div className="text-sm font-medium text-red-600">
+                {formatPercentage(users.churnRate)}
+              </div>
+            )}
           </div>
 
           <div className="flex items-center justify-between">

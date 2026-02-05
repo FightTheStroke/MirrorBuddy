@@ -23,47 +23,74 @@ export const GET = pipe(
   withSentry("/api/admin/key-vault"),
   withAdmin,
 )(async (_ctx) => {
-  // Fetch all secrets from database
-  const secrets = await prisma.secretVault.findMany({
-    orderBy: { updatedAt: "desc" },
-  });
+  try {
+    // Fetch all secrets from database
+    const secrets = await prisma.secretVault.findMany({
+      orderBy: { updatedAt: "desc" },
+    });
 
-  // Decrypt and mask values
-  const maskedSecrets: MaskedSecretVaultEntry[] = secrets.map((secret) => {
-    try {
-      const decrypted = decryptSecret(
-        secret.encrypted,
-        secret.iv,
-        secret.authTag,
+    // Decrypt and mask values
+    const maskedSecrets: MaskedSecretVaultEntry[] = secrets.map((secret) => {
+      try {
+        const decrypted = decryptSecret(
+          secret.encrypted,
+          secret.iv,
+          secret.authTag,
+        );
+        const masked = maskValue(decrypted);
+
+        return {
+          id: secret.id,
+          service: secret.service,
+          keyName: secret.keyName,
+          maskedValue: masked,
+          status: secret.status as "active" | "expired" | "rotated",
+          lastUsed: secret.lastUsed,
+          createdAt: secret.createdAt,
+          updatedAt: secret.updatedAt,
+        };
+      } catch (_error) {
+        // If decryption fails, show error state
+        return {
+          id: secret.id,
+          service: secret.service,
+          keyName: secret.keyName,
+          maskedValue: "ERROR: Cannot decrypt",
+          status: "expired" as const,
+          lastUsed: secret.lastUsed,
+          createdAt: secret.createdAt,
+          updatedAt: secret.updatedAt,
+        };
+      }
+    });
+
+    return NextResponse.json({ secrets: maskedSecrets });
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
+    if (
+      errorMessage.includes("TOKEN_ENCRYPTION_KEY") ||
+      errorMessage.includes("32 char")
+    ) {
+      return NextResponse.json(
+        {
+          error: "encryption_not_configured",
+          message:
+            "TOKEN_ENCRYPTION_KEY environment variable is not set or too short (min 32 chars)",
+        },
+        { status: 503 },
       );
-      const masked = maskValue(decrypted);
-
-      return {
-        id: secret.id,
-        service: secret.service,
-        keyName: secret.keyName,
-        maskedValue: masked,
-        status: secret.status as "active" | "expired" | "rotated",
-        lastUsed: secret.lastUsed,
-        createdAt: secret.createdAt,
-        updatedAt: secret.updatedAt,
-      };
-    } catch (_error) {
-      // If decryption fails, show error state
-      return {
-        id: secret.id,
-        service: secret.service,
-        keyName: secret.keyName,
-        maskedValue: "ERROR: Cannot decrypt",
-        status: "expired" as const,
-        lastUsed: secret.lastUsed,
-        createdAt: secret.createdAt,
-        updatedAt: secret.updatedAt,
-      };
     }
-  });
 
-  return NextResponse.json({ secrets: maskedSecrets });
+    return NextResponse.json(
+      {
+        error: "internal_error",
+        message: "Database connection error",
+      },
+      { status: 500 },
+    );
+  }
 });
 
 /**

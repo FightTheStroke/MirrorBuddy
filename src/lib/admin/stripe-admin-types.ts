@@ -94,7 +94,7 @@ export interface StripeAdminResponse {
   configured: boolean;
   products: StripeProduct[];
   subscriptions: StripeSubscription[];
-  revenue: StripeRevenue;
+  revenue: StripeRevenue | null;
   refunds: StripeRefund[];
   error?: string;
 }

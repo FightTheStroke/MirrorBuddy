@@ -185,7 +185,7 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
     },
     {
       id: "nav-kpi",
-      label: "Business KPI",
+      label: "KPIs",
       section: "navigation",
       icon: TrendingUp,
       href: "/admin/mission-control/business-kpi",

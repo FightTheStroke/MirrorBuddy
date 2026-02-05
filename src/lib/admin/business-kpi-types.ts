@@ -5,8 +5,8 @@
 export interface RevenueMetrics {
   mrr: number;
   arr: number;
-  growthRate: number;
-  totalRevenue: number;
+  growthRate: number | null;
+  totalRevenue: number | null;
   currency: string;
   isEstimated?: boolean;
 }
@@ -16,7 +16,7 @@ export interface UserMetrics {
   activeUsers: number;
   trialUsers: number;
   paidUsers: number;
-  churnRate: number;
+  churnRate: number | null;
   trialConversionRate: number;
   isEstimated?: boolean;
 }
@@ -25,14 +25,14 @@ export interface CountryMetric {
   country: string;
   countryCode: string;
   users: number;
-  revenue: number;
+  revenue: number | null;
 }
 
 export interface MaestroMetric {
   name: string;
   subject: string;
   sessions: number;
-  avgDuration: number;
+  avgDuration: number | null;
 }
 
 export interface BusinessKPIResponse {

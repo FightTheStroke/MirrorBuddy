@@ -7,13 +7,68 @@
 
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, AlertCircle, RefreshCw } from "lucide-react";
+import { Loader2, AlertCircle, RefreshCw, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { InfraMetrics } from "@/lib/admin/infra-panel-types";
 import { VercelCard } from "./components";
 import { SupabaseCard, RedisCard } from "./service-cards";
 
 export const dynamic = "force-dynamic";
+
+/**
+ * Not Configured Card Component
+ */
+function NotConfiguredCard({
+  serviceName,
+  envVars,
+  isError = false,
+}: {
+  serviceName: string;
+  envVars: { name: string; optional?: boolean }[];
+  isError?: boolean;
+}) {
+  return (
+    <div className="space-y-3 rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-900 dark:bg-yellow-950">
+      <div className="flex items-start gap-2">
+        <AlertTriangle className="mt-0.5 h-5 w-5 text-yellow-600 dark:text-yellow-500" />
+        <div className="flex-1">
+          <h3 className="font-semibold text-yellow-900 dark:text-yellow-100">
+            {isError
+              ? `${serviceName} Connection Error`
+              : `${serviceName} Not Configured`}
+          </h3>
+          {!isError && (
+            <>
+              <p className="mt-1 text-sm text-yellow-800 dark:text-yellow-200">
+                Required environment variables:
+              </p>
+              <ul className="mt-2 space-y-1 text-sm">
+                {envVars.map((envVar) => (
+                  <li
+                    key={envVar.name}
+                    className="font-mono text-yellow-900 dark:text-yellow-100"
+                  >
+                    • {envVar.name}
+                    {envVar.optional && (
+                      <span className="ml-2 text-xs text-yellow-700 dark:text-yellow-300">
+                        (optional)
+                      </span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {isError && (
+            <p className="mt-1 text-sm text-yellow-800 dark:text-yellow-200">
+              Database connection failed. Check logs for details.
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function InfrastructurePage() {
   const [metrics, setMetrics] = useState<InfraMetrics | null>(null);
@@ -104,9 +159,13 @@ export default function InfrastructurePage() {
               {metrics.vercel ? (
                 <VercelCard metrics={metrics.vercel} />
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  No data available
-                </div>
+                <NotConfiguredCard
+                  serviceName="Vercel"
+                  envVars={[
+                    { name: "VERCEL_TOKEN" },
+                    { name: "VERCEL_TEAM_ID", optional: true },
+                  ]}
+                />
               )}
             </CardContent>
           </Card>
@@ -120,9 +179,11 @@ export default function InfrastructurePage() {
               {metrics.supabase ? (
                 <SupabaseCard metrics={metrics.supabase} />
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  No data available
-                </div>
+                <NotConfiguredCard
+                  serviceName="Supabase"
+                  envVars={[]}
+                  isError={true}
+                />
               )}
             </CardContent>
           </Card>
@@ -136,9 +197,13 @@ export default function InfrastructurePage() {
               {metrics.redis ? (
                 <RedisCard metrics={metrics.redis} />
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  No data available
-                </div>
+                <NotConfiguredCard
+                  serviceName="Redis"
+                  envVars={[
+                    { name: "KV_REST_API_URL" },
+                    { name: "KV_REST_API_TOKEN" },
+                  ]}
+                />
               )}
             </CardContent>
           </Card>
