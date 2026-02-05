@@ -1,4 +1,4 @@
-# ADR 0120: k6 Load Testing Framework
+# ADR 0124: k6 Load Testing Framework
 
 ## Status
 

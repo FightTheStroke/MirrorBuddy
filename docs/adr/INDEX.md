@@ -13,6 +13,7 @@
 | 0016 | Component Modularization & Infrastructure Hardening | Modular components, cleaner boundaries           |
 | 0028 | PostgreSQL with pgvector Migration                  | Vector search for RAG, production-grade DB       |
 | 0045 | Domain Boundaries and Module Organization           | Clear separation of concerns                     |
+| 0117 | Technical Debt Cleanup (Plan 112)                   | Systematic debt reduction strategy               |
 
 ## UI & Layout
 
@@ -102,12 +103,12 @@
 | 0099 | Vercel Deployment Checks Gate                      | 14-check CI gate before deploy   |
 | 0102 | Incremental E2E Execution and Release Flow         | Fast/full release gates          |
 | 0103 | E2E Test Stability Requirements and CI Enforcement | Mobile timeout fixes             |
+| 0124 | k6 Load Testing Framework                          | Scalability testing with k6      |
 
 ## Deployment & Infrastructure
 
 | #    | Decision                                                  | Impact                                 |
 | ---- | --------------------------------------------------------- | -------------------------------------- |
-| 0028 | PostgreSQL with pgvector Migration                        | Production-grade database              |
 | 0044 | Performance Optimizations                                 | Bundle splitting, lazy loading         |
 | 0046 | Production Hardening (Plan 46)                            | Pre-production checklist               |
 | 0052 | Vercel Deployment Configuration                           | CI-controlled deployments              |
@@ -119,7 +120,10 @@
 | 0078 | Vercel Runtime Constraints                                | Edge function limits                   |
 | 0079 | Web Vitals Analytics and Legal Documentation Architecture | Performance monitoring                 |
 | 0105 | Prisma Race Condition Prevention                          | Transaction-based updates              |
-| 0106 | Documentation AI-Ready Architecture                       | 3-tier docs, 96% token reduction       |
+| 0107 | Composable API Handler Pipeline                           | Standard API route handler chain       |
+| 0113 | Composable API Handler Pattern (pipe middleware)          | withCSRF/withAdmin/withSentry pipeline |
+| 0114 | Query Raw Elimination                                     | Prisma typed queries only              |
+| 0116 | Documentation AI-Ready Architecture                       | 3-tier docs, 96% token reduction       |
 
 ## Features & Tools
 
@@ -141,11 +145,13 @@
 | 0043 | Brave Search API Integration                           | Web search capability            |
 | 0060 | Instant Accessibility Feature                          | Floating a11y quick panel        |
 | 0061 | Admin Section Redesign                                 | Improved admin UX                |
+| 0106 | Admin Panel Redesign                                   | Server components, audit service |
 | 0068 | Conversion Funnel Dashboard                            | Trial-to-paid analytics          |
 | 0092 | Hreflang SEO Tags for Multi-Locale Pages               | SEO for 5 languages              |
 | 0095 | Localized Open Graph Metadata for Social Media Sharing | Language-specific OG tags        |
 | 0118 | Webcam Fullscreen Architecture                         | Fullscreen overlay, dual-flow    |
 | 0122 | Realtime Video Vision (Pro-Only)                       | Periodic frames to Realtime API  |
+| 0125 | Research & Benchmarking Lab                            | Admin research tools dashboard   |
 
 ## Tier & Business
 
@@ -154,7 +160,7 @@
 | 0056 | Trial Mode Architecture               | Anonymous trial access                              |
 | 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
 | 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
-| 0115 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
+| 0119 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
 
 ## Consortium & Grants
 
@@ -176,6 +182,6 @@
 
 ---
 
-**Total Active ADRs**: 96
+**Total Active ADRs**: 105
 **Archived ADRs**: 7
 **Last Updated**: 2026-02-05

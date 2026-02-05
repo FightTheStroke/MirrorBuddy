@@ -1,4 +1,4 @@
-# ADR 0121: Research & Benchmarking Lab
+# ADR 0125: Research & Benchmarking Lab
 
 **Status**: Accepted
 **Date**: 2026-02-05
