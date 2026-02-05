@@ -16,6 +16,8 @@ describe("LimitsSection", () => {
     voiceMinutesDaily: 5,
     toolsLimitDaily: 10,
     docsLimitTotal: 1,
+    videoVisionSecondsPerSession: 0,
+    videoVisionMinutesMonthly: 0,
   };
 
   beforeEach(() => {

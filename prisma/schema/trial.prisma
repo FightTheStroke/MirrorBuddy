@@ -11,6 +11,7 @@ model TrialSession {
   docsUsed         Int       @default(0)
   voiceSecondsUsed Int       @default(0) // Total voice seconds (max 300 = 5 min)
   toolsUsed        Int       @default(0) // Total tool calls (max 10)
+  videoVisionSecondsUsed Int @default(0) // Total video vision seconds (ADR 0122)
   assignedMaestri  String    @default("[]") // JSON array of 3 maestro IDs
   assignedCoach    String? // Single coach ID
   abuseScore       Int       @default(0)
