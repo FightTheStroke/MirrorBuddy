@@ -41,18 +41,20 @@ function WelcomeContent() {
   } = useOnboardingStore();
 
   const { existingUserData, hasCheckedExistingData } = useExistingUserData();
+
+  const [showLandingPage, setShowLandingPage] = useState(true);
+
+  // Defer voice connection check until onboarding starts (not needed for landing page)
   const {
     connectionInfo,
     hasCheckedAzure,
     useWebSpeechFallback,
     setUseWebSpeechFallback,
-  } = useVoiceConnection();
+  } = useVoiceConnection(!showLandingPage);
   const { voiceSession, handleAzureUnavailable } = useWelcomeVoice(
     existingUserData,
     connectionInfo,
   );
-
-  const [showLandingPage, setShowLandingPage] = useState(true);
 
   const voiceSessionHandle: VoiceSessionHandle = {
     isConnected: voiceSession.isConnected,
@@ -110,10 +112,7 @@ function WelcomeContent() {
 
   const onboardingMelissa = createOnboardingMelissa(existingUserData);
 
-  if (!hasCheckedExistingData) {
-    return <LoadingState />;
-  }
-
+  // Show landing page immediately without waiting for API checks
   if (showLandingPage) {
     return (
       <LandingPage
@@ -121,6 +120,11 @@ function WelcomeContent() {
         onStartOnboarding={handleStartOnboarding}
       />
     );
+  }
+
+  // Only block on existing data check during onboarding flow
+  if (!hasCheckedExistingData) {
+    return <LoadingState />;
   }
 
   return (

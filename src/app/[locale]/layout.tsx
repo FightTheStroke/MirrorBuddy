@@ -102,8 +102,7 @@ export async function generateStaticParams() {
   }));
 }
 
-/**
- * Force dynamic rendering for all localized pages
- * This prevents SSR issues with useTranslations and browser-only hooks
- */
-export const dynamic = "force-dynamic";
+// Note: force-dynamic removed for performance. Individual pages that need
+// dynamic rendering (e.g., server components reading cookies/headers) should
+// declare `export const dynamic = "force-dynamic"` locally.
+// Client components ("use client") do not need this directive.

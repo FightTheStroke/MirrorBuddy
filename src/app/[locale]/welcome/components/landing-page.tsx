@@ -7,14 +7,16 @@ import { csrfFetch } from "@/lib/auth/csrf-client";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { useRouter } from "@/i18n/navigation";
 import { HeroSection } from "./hero-section";
-import { MaestriShowcaseSection } from "./maestri-showcase-section";
-import { SupportSection } from "./support-section";
-import { FeaturesSection } from "./features-section";
-import { ComplianceSection } from "./compliance-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
-import { TierComparisonSection } from "./tier-comparison-section";
 import { LanguageSwitcher } from "./language-switcher";
+import {
+  LazyTierComparisonSection,
+  LazyMaestriShowcaseSection,
+  LazySupportSection,
+  LazyFeaturesSection,
+  LazyComplianceSection,
+} from "./lazy";
 import { trackWelcomeVisit, trackTrialStartClick } from "@/lib/funnel/client";
 import type { ExistingUserData } from "../types";
 
@@ -128,19 +130,19 @@ export function LandingPage({
           />
 
           {/* Tier comparison cards */}
-          <TierComparisonSection />
+          <LazyTierComparisonSection />
 
           {/* Professors carousel */}
-          <MaestriShowcaseSection />
+          <LazyMaestriShowcaseSection />
 
           {/* Coaches & Buddies carousel */}
-          <SupportSection />
+          <LazySupportSection />
 
           {/* Platform features */}
-          <FeaturesSection />
+          <LazyFeaturesSection />
 
           {/* Compliance & Transparency */}
-          <ComplianceSection />
+          <LazyComplianceSection />
         </motion.div>
 
         {/* Welcome Footer with consent, legal, badges */}

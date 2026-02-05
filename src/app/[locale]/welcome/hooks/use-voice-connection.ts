@@ -2,13 +2,15 @@ import { useState, useEffect } from "react";
 import { logger } from "@/lib/logger";
 import type { VoiceConnectionInfo } from "../types";
 
-export function useVoiceConnection() {
+export function useVoiceConnection(enabled = true) {
   const [connectionInfo, setConnectionInfo] =
     useState<VoiceConnectionInfo | null>(null);
   const [hasCheckedAzure, setHasCheckedAzure] = useState(false);
   const [useWebSpeechFallback, setUseWebSpeechFallback] = useState(false);
 
   useEffect(() => {
+    if (!enabled) return;
+
     async function fetchConnectionInfo() {
       try {
         // Check for sessionStorage availability (SSR guard)
@@ -70,7 +72,7 @@ export function useVoiceConnection() {
       }
     }
     fetchConnectionInfo();
-  }, []);
+  }, [enabled]);
 
   return {
     connectionInfo,

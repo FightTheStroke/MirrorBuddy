@@ -25,11 +25,7 @@ import { getUserIdFromCookie } from "@/lib/auth/client-auth";
 import { cn } from "@/lib/utils";
 import type { Maestro, ToolType } from "@/types";
 import { MaestriGrid } from "@/components/maestros/maestri-grid";
-import { MaestroSession } from "@/components/maestros/maestro-session";
 import { LazyCalendarView, LazyGenitoriView } from "@/components/education";
-import { ZainoView } from "@/app/[locale]/supporti/components/zaino-view";
-import { AstuccioView } from "@/app/[locale]/astuccio/components/astuccio-view";
-import { CharacterChatView } from "@/components/conversation";
 import { LazySettingsView } from "@/components/settings";
 import { LazyProgressView } from "@/components/progress";
 import { TrialHomeBanner, TrialUsageDashboard } from "@/components/trial";
@@ -37,6 +33,13 @@ import { HomeHeader } from "./home-header";
 import { HomeSidebar } from "./home-sidebar";
 import { COACH_INFO, BUDDY_INFO } from "./home-constants";
 import type { View, MaestroSessionMode } from "./types";
+import {
+  LazyMaestroSession,
+  LazyCharacterChatView,
+  LazyAstuccioView,
+  LazyZainoView,
+  HomeShellSkeleton,
+} from "./home-lazy";
 
 const MB_PER_LEVEL = 1000;
 
@@ -142,14 +145,7 @@ export default function Home() {
   };
 
   if (!isHydrated || !hasCompletedOnboarding) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-950">
-        <h1 className="sr-only">{t("appTitle")}</h1>
-        <main className="flex items-center justify-center min-h-screen">
-          <div className="animate-pulse text-slate-400">{t("loading")}</div>
-        </main>
-      </div>
-    );
+    return <HomeShellSkeleton title={t("appTitle")} />;
   }
 
   const mbInLevel = seasonMirrorBucks % MB_PER_LEVEL;
@@ -256,13 +252,13 @@ export default function Home() {
             transition={{ duration: 0.3 }}
           >
             {currentView === "coach" && (
-              <CharacterChatView
+              <LazyCharacterChatView
                 characterId={selectedCoach}
                 characterType="coach"
               />
             )}
             {currentView === "buddy" && (
-              <CharacterChatView
+              <LazyCharacterChatView
                 characterId={selectedBuddy}
                 characterType="buddy"
               />
@@ -278,7 +274,7 @@ export default function Home() {
               />
             )}
             {currentView === "maestro-session" && selectedMaestro && (
-              <MaestroSession
+              <LazyMaestroSession
                 key={`maestro-${selectedMaestro.id}-${maestroSessionKey}`}
                 maestro={selectedMaestro}
                 onClose={() => {
@@ -290,9 +286,9 @@ export default function Home() {
               />
             )}
             {currentView === "astuccio" && (
-              <AstuccioView onToolRequest={handleToolRequest} />
+              <LazyAstuccioView onToolRequest={handleToolRequest} />
             )}
-            {currentView === "supporti" && <ZainoView />}
+            {currentView === "supporti" && <LazyZainoView />}
             {currentView === "calendar" && <LazyCalendarView />}
             {currentView === "progress" && <LazyProgressView />}
             {currentView === "genitori" && <LazyGenitoriView />}
