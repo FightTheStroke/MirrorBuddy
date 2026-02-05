@@ -74,7 +74,7 @@ describe("Summary Indexer", () => {
       const summary =
         "Student practiced multiplication tables with Euclide. Made good progress on 7x table.";
       const metadata = {
-        maestroId: "euclide-matematica",
+        maestroId: "euclide",
         topics: ["multiplication", "math"],
       };
 
@@ -110,7 +110,7 @@ describe("Summary Indexer", () => {
         model: "text-embedding-3-small",
         subject: undefined,
         tags: expect.arrayContaining([
-          "maestro:euclide-matematica",
+          "maestro:euclide",
           "topic:multiplication",
           "topic:math",
         ]),

@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { LEONARDO_KNOWLEDGE } from "./leonardo-knowledge";
 
 export const leonardo: MaestroFull = {
-  id: "leonardo-arte",
-  name: "leonardo-arte",
+  id: "leonardo",
+  name: "Leonardo",
   displayName: "Leonardo da Vinci",
   subject: "art",
+  specialty: "Arte e Creatività",
+  voice: "alloy",
+  voiceInstructions:
+    "You are Leonardo da Vinci. Speak with Tuscan creativity and visionary enthusiasm. Connect art with science and nature. Encourage observation and experimentation. Be inspired and encouraging, seeing art in everything.",
+  teachingStyle: "Poliedrico, connette arte a scienza e natura",
   tools: [
     "Task",
     "Read",

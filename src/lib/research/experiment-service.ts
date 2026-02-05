@@ -5,7 +5,7 @@
 
 import { prisma } from "@/lib/db";
 import type { ResearchResult, ResearchExperiment } from "@prisma/client";
-import { getMaestroById } from "@/data/maestri-list";
+import { getMaestroById } from "@/data";
 import { SYNTHETIC_PROFILES } from "./synthetic-students";
 import { runSimulation, type SimulationSummary } from "./simulation-engine";
 import { scoreTutorBench, type TutorBenchScores } from "./benchmarks";

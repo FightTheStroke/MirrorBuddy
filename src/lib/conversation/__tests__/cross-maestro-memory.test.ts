@@ -52,7 +52,7 @@ import { getMaestroById } from "@/data/maestri";
 
 describe("loadCrossMaestroLearnings", () => {
   const testUserId = "test-user-cross-maestro";
-  const currentMaestroId = "euclide-matematica";
+  const currentMaestroId = "euclide";
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -128,7 +128,7 @@ describe("loadCrossMaestroLearnings", () => {
 
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "curie-chimica",
+        maestroId: "curie",
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
@@ -140,7 +140,7 @@ describe("loadCrossMaestroLearnings", () => {
         updatedAt: curieDate,
       },
       {
-        maestroId: "galileo-fisica",
+        maestroId: "galileo",
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
@@ -155,10 +155,10 @@ describe("loadCrossMaestroLearnings", () => {
 
     // Mock maestro lookups
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "curie-chimica") {
+      if (id === "curie") {
         return { displayName: "Marie Curie", subject: "chemistry" } as any;
       }
-      if (id === "galileo-fisica") {
+      if (id === "galileo") {
         return { displayName: "Galileo Galilei", subject: "physics" } as any;
       }
       return undefined;
@@ -172,13 +172,13 @@ describe("loadCrossMaestroLearnings", () => {
     expect(result).toHaveLength(2);
 
     // Should be sorted by date (most recent first)
-    expect(result[0].maestroId).toBe("curie-chimica");
+    expect(result[0].maestroId).toBe("curie");
     expect(result[0].subject).toBe("chemistry");
     expect(result[0].learnings).toHaveLength(2);
     expect(result[0].learnings).toContain("Chemical bonds form between atoms");
     expect(result[0].date).toEqual(curieDate);
 
-    expect(result[1].maestroId).toBe("galileo-fisica");
+    expect(result[1].maestroId).toBe("galileo");
     expect(result[1].subject).toBe("physics");
     expect(result[1].learnings).toHaveLength(2);
     expect(result[1].learnings).toContain("Newton's laws of motion");
@@ -198,7 +198,7 @@ describe("loadCrossMaestroLearnings", () => {
     // The query already filters out currentMaestroId via WHERE maestroId != currentMaestroId
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo-fisica",
+        maestroId: "galileo",
         keyFacts: JSON.stringify({
           decisions: [],
           preferences: [],
@@ -209,7 +209,7 @@ describe("loadCrossMaestroLearnings", () => {
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo-fisica") {
+      if (id === "galileo") {
         return { displayName: "Galileo", subject: "physics" } as any;
       }
       return undefined;
@@ -221,7 +221,7 @@ describe("loadCrossMaestroLearnings", () => {
     );
 
     expect(result).toHaveLength(1);
-    expect(result[0].maestroId).toBe("galileo-fisica");
+    expect(result[0].maestroId).toBe("galileo");
     expect(result[0].maestroId).not.toBe(currentMaestroId);
 
     // Verify prisma was called with correct filter
@@ -247,28 +247,28 @@ describe("loadCrossMaestroLearnings", () => {
     // Mock conversations with different subjects
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo-fisica",
+        maestroId: "galileo",
         keyFacts: JSON.stringify({ learned: ["Physics concept"] }),
         updatedAt: new Date(),
       },
       {
-        maestroId: "curie-chimica",
+        maestroId: "curie",
         keyFacts: JSON.stringify({ learned: ["Chemistry concept"] }),
         updatedAt: new Date(),
       },
       {
-        maestroId: "manzoni-italiano",
+        maestroId: "manzoni",
         keyFacts: JSON.stringify({ learned: ["Italian concept"] }),
         updatedAt: new Date(),
       },
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo-fisica")
+      if (id === "galileo")
         return { displayName: "Galileo", subject: "physics" } as any;
-      if (id === "curie-chimica")
+      if (id === "curie")
         return { displayName: "Curie", subject: "chemistry" } as any;
-      if (id === "manzoni-italiano")
+      if (id === "manzoni")
         return { displayName: "Manzoni", subject: "italian" } as any;
       return undefined;
     });
@@ -297,7 +297,7 @@ describe("loadCrossMaestroLearnings", () => {
     } as any);
 
     // Mock 5 conversations, but limit should return only 3
-    const maestros = ["galileo-fisica", "curie-chimica", "manzoni-italiano"];
+    const maestros = ["galileo", "curie", "manzoni"];
 
     vi.mocked(prisma.conversation.findMany).mockResolvedValue(
       maestros.map((id, i) => ({
@@ -340,7 +340,7 @@ describe("loadCrossMaestroLearnings", () => {
     // Mock conversations: one with empty learnings, one with null keyFacts
     vi.mocked(prisma.conversation.findMany).mockResolvedValue([
       {
-        maestroId: "galileo-fisica",
+        maestroId: "galileo",
         keyFacts: JSON.stringify({
           decisions: ["Some decision"],
           preferences: ["Some preference"],
@@ -349,16 +349,16 @@ describe("loadCrossMaestroLearnings", () => {
         updatedAt: new Date(),
       },
       {
-        maestroId: "curie-chimica",
+        maestroId: "curie",
         keyFacts: null, // Null keyFacts
         updatedAt: new Date(),
       },
     ] as any);
 
     vi.mocked(getMaestroById).mockImplementation((id: string) => {
-      if (id === "galileo-fisica")
+      if (id === "galileo")
         return { displayName: "Galileo", subject: "physics" } as any;
-      if (id === "curie-chimica")
+      if (id === "curie")
         return { displayName: "Curie", subject: "chemistry" } as any;
       return undefined;
     });

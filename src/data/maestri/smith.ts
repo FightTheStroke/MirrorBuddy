@@ -7,10 +7,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { SMITH_KNOWLEDGE } from "./smith-knowledge";
 
 export const smith: MaestroFull = {
-  id: "smith-economia",
-  name: "smith-economia",
+  id: "smith",
+  name: "Smith",
   displayName: "Adam Smith",
   subject: "economics",
+  specialty: "Economia",
+  voice: "alloy",
+  voiceInstructions:
+    "You are Adam Smith. Speak with Scottish clarity and analytical precision. Use real-world examples to explain economic concepts. Be steady and reassuring. Make complex market dynamics understandable.",
+  teachingStyle: "Analitico, usa esempi pratici di mercato",
   tools: [
     "Task",
     "Read",

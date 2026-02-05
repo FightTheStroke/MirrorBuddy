@@ -9,7 +9,7 @@
  * - Conversation continuity
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from "vitest";
 import {
   routeToCharacter,
   quickRoute,
@@ -17,26 +17,26 @@ import {
   getCharacterGreeting,
   suggestCharacterSwitch,
   type RoutingContext,
-} from '../character-router';
-import type { ExtendedStudentProfile } from '@/types';
+} from "../character-router";
+import type { ExtendedStudentProfile } from "@/types";
 
-describe('Character Router', () => {
+describe("Character Router", () => {
   // Default student profile for tests
   let defaultProfile: ExtendedStudentProfile;
 
   beforeEach(() => {
     defaultProfile = {
-      name: 'Test Student',
+      name: "Test Student",
       age: 14,
       schoolYear: 2,
-      schoolLevel: 'superiore',
-      fontSize: 'medium',
+      schoolLevel: "superiore",
+      fontSize: "medium",
       highContrast: false,
       dyslexiaFont: false,
       voiceEnabled: false,
       simplifiedLanguage: false,
       adhdMode: false,
-      learningDifferences: ['dyslexia'],
+      learningDifferences: ["dyslexia"],
     };
   });
 
@@ -44,61 +44,61 @@ describe('Character Router', () => {
   // ACADEMIC ROUTING
   // =========================================================================
 
-  describe('Academic Help Routing', () => {
-    it('should route math questions to math Maestro', () => {
+  describe("Academic Help Routing", () => {
+    it("should route math questions to math Maestro", () => {
       const context: RoutingContext = {
-        message: 'Non capisco le equazioni di secondo grado',
+        message: "Non capisco le equazioni di secondo grado",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
-      expect(result.intent.subject).toBe('mathematics');
+      expect(result.characterType).toBe("maestro");
+      expect(result.intent.subject).toBe("mathematics");
     });
 
-    it('should route physics questions to physics Maestro', () => {
+    it("should route physics questions to physics Maestro", () => {
       const context: RoutingContext = {
-        message: 'Spiegami le leggi di Newton',
+        message: "Spiegami le leggi di Newton",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
-      expect(result.intent.subject).toBe('physics');
+      expect(result.characterType).toBe("maestro");
+      expect(result.intent.subject).toBe("physics");
     });
 
-    it('should route history questions to history Maestro', () => {
+    it("should route history questions to history Maestro", () => {
       const context: RoutingContext = {
-        message: 'Parlami del Risorgimento italiano',
+        message: "Parlami del Risorgimento italiano",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
-      expect(result.intent.subject).toBe('history');
+      expect(result.characterType).toBe("maestro");
+      expect(result.intent.subject).toBe("history");
     });
 
-    it('should include alternatives when emotional indicators present', () => {
+    it("should include alternatives when emotional indicators present", () => {
       const context: RoutingContext = {
-        message: 'Non capisco la matematica, sono frustrato!',
+        message: "Non capisco la matematica, sono frustrato!",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
+      expect(result.characterType).toBe("maestro");
       expect(result.alternatives).toBeDefined();
       expect(result.alternatives!.length).toBeGreaterThan(0);
     });
 
-    it('should fallback to coach when no subject detected', () => {
+    it("should fallback to coach when no subject detected", () => {
       const context: RoutingContext = {
-        message: 'Mi aiuti con i compiti?',
+        message: "Mi aiuti con i compiti?",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
       // Generic academic help without subject goes to coach
-      expect(['coach', 'maestro']).toContain(result.characterType);
+      expect(["coach", "maestro"]).toContain(result.characterType);
     });
   });
 
@@ -106,37 +106,37 @@ describe('Character Router', () => {
   // METHOD HELP ROUTING
   // =========================================================================
 
-  describe('Method Help Routing', () => {
-    it('should route study method questions to Coach', () => {
+  describe("Method Help Routing", () => {
+    it("should route study method questions to Coach", () => {
       // Pattern: metodo di studio|come mi organizzo
       const context: RoutingContext = {
-        message: 'Mi serve un metodo di studio',
+        message: "Mi serve un metodo di studio",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
-      expect(result.intent.type).toBe('method_help');
+      expect(result.characterType).toBe("coach");
+      expect(result.intent.type).toBe("method_help");
     });
 
-    it('should route concentration questions to Coach', () => {
+    it("should route concentration questions to Coach", () => {
       const context: RoutingContext = {
-        message: 'Non riesco a concentrarmi quando studio',
+        message: "Non riesco a concentrarmi quando studio",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
+      expect(result.characterType).toBe("coach");
     });
 
-    it('should route organization questions to Coach', () => {
+    it("should route organization questions to Coach", () => {
       const context: RoutingContext = {
-        message: 'Come mi organizzo per gli esami?',
+        message: "Come mi organizzo per gli esami?",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
+      expect(result.characterType).toBe("coach");
     });
   });
 
@@ -144,36 +144,36 @@ describe('Character Router', () => {
   // EMOTIONAL SUPPORT ROUTING
   // =========================================================================
 
-  describe('Emotional Support Routing', () => {
-    it('should route emotional support needs to Buddy', () => {
+  describe("Emotional Support Routing", () => {
+    it("should route emotional support needs to Buddy", () => {
       const context: RoutingContext = {
-        message: 'Mi sento solo e triste',
+        message: "Mi sento solo e triste",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
-      expect(result.intent.type).toBe('emotional_support');
+      expect(result.characterType).toBe("buddy");
+      expect(result.intent.type).toBe("emotional_support");
     });
 
-    it('should route loneliness to Buddy', () => {
+    it("should route loneliness to Buddy", () => {
       const context: RoutingContext = {
-        message: 'Nessuno mi capisce, mi sento escluso',
+        message: "Nessuno mi capisce, mi sento escluso",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
+      expect(result.characterType).toBe("buddy");
     });
 
-    it('should include Coach as alternative for emotional support', () => {
+    it("should include Coach as alternative for emotional support", () => {
       const context: RoutingContext = {
-        message: 'Sono molto ansioso per la scuola',
+        message: "Sono molto ansioso per la scuola",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
+      expect(result.characterType).toBe("buddy");
       expect(result.alternatives).toBeDefined();
     });
   });
@@ -182,43 +182,43 @@ describe('Character Router', () => {
   // CRISIS ROUTING
   // =========================================================================
 
-  describe('Crisis Routing', () => {
-    it('should route crisis to Buddy with high priority', () => {
+  describe("Crisis Routing", () => {
+    it("should route crisis to Buddy with high priority", () => {
       // Pattern: voglio morire|non voglio vivere (without "più")
       const context: RoutingContext = {
-        message: 'Voglio morire',
+        message: "Voglio morire",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
-      expect(result.intent.type).toBe('crisis');
+      expect(result.characterType).toBe("buddy");
+      expect(result.intent.type).toBe("crisis");
       expect(result.intent.confidence).toBe(1.0);
     });
 
-    it('should prioritize crisis over academic content', () => {
+    it("should prioritize crisis over academic content", () => {
       // Pattern: voglio morire|non voglio vivere
       const context: RoutingContext = {
-        message: 'Non voglio vivere, odio la matematica',
+        message: "Non voglio vivere, odio la matematica",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
-      expect(result.intent.type).toBe('crisis');
+      expect(result.characterType).toBe("buddy");
+      expect(result.intent.type).toBe("crisis");
     });
 
-    it('should override continuity preference for crisis', () => {
+    it("should override continuity preference for crisis", () => {
       const context: RoutingContext = {
-        message: 'Voglio morire',
+        message: "Voglio morire",
         studentProfile: defaultProfile,
-        currentCharacter: { type: 'maestro', id: 'euclide-matematica' },
+        currentCharacter: { type: "maestro", id: "euclide" },
         preferContinuity: true,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
-      expect(result.intent.type).toBe('crisis');
+      expect(result.characterType).toBe("buddy");
+      expect(result.intent.type).toBe("crisis");
     });
   });
 
@@ -226,27 +226,27 @@ describe('Character Router', () => {
   // TOOL REQUEST ROUTING
   // =========================================================================
 
-  describe('Tool Request Routing', () => {
-    it('should route tool requests with subject to Maestro', () => {
+  describe("Tool Request Routing", () => {
+    it("should route tool requests with subject to Maestro", () => {
       const context: RoutingContext = {
-        message: 'Creami una mappa mentale sulla storia',
+        message: "Creami una mappa mentale sulla storia",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
-      expect(result.intent.type).toBe('tool_request');
+      expect(result.characterType).toBe("maestro");
+      expect(result.intent.type).toBe("tool_request");
     });
 
-    it('should route tool requests without subject to Coach', () => {
+    it("should route tool requests without subject to Coach", () => {
       const context: RoutingContext = {
-        message: 'Vorrei creare delle flashcard',
+        message: "Vorrei creare delle flashcard",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
       // Without subject, might go to coach
-      expect(['coach', 'maestro']).toContain(result.characterType);
+      expect(["coach", "maestro"]).toContain(result.characterType);
     });
   });
 
@@ -254,49 +254,49 @@ describe('Character Router', () => {
   // STUDENT PREFERENCES
   // =========================================================================
 
-  describe('Student Preferences', () => {
-    it('should respect preferred Coach', () => {
+  describe("Student Preferences", () => {
+    it("should respect preferred Coach", () => {
       const profileWithPreference: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredCoach: 'roberto',
+        preferredCoach: "roberto",
       };
 
       const context: RoutingContext = {
-        message: 'Come mi organizzo?',
+        message: "Come mi organizzo?",
         studentProfile: profileWithPreference,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
-      expect((result.character as { id: string }).id).toBe('roberto');
+      expect(result.characterType).toBe("coach");
+      expect((result.character as { id: string }).id).toBe("roberto");
     });
 
-    it('should respect preferred Buddy', () => {
+    it("should respect preferred Buddy", () => {
       const profileWithPreference: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredBuddy: 'noemi',
+        preferredBuddy: "noemi",
       };
 
       const context: RoutingContext = {
-        message: 'Mi sento solo',
+        message: "Mi sento solo",
         studentProfile: profileWithPreference,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('buddy');
-      expect((result.character as { id: string }).id).toBe('noemi');
+      expect(result.characterType).toBe("buddy");
+      expect((result.character as { id: string }).id).toBe("noemi");
     });
 
-    it('should use default Coach when no preference', () => {
+    it("should use default Coach when no preference", () => {
       const context: RoutingContext = {
-        message: 'Come studio?',
+        message: "Come studio?",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
+      expect(result.characterType).toBe("coach");
       // Default is Melissa
-      expect((result.character as { id: string }).id).toBe('melissa');
+      expect((result.character as { id: string }).id).toBe("melissa");
     });
   });
 
@@ -304,31 +304,31 @@ describe('Character Router', () => {
   // CONVERSATION CONTINUITY
   // =========================================================================
 
-  describe('Conversation Continuity', () => {
-    it('should maintain character when preferContinuity is true and confidence is low', () => {
+  describe("Conversation Continuity", () => {
+    it("should maintain character when preferContinuity is true and confidence is low", () => {
       const context: RoutingContext = {
-        message: 'Ok, capisco',
+        message: "Ok, capisco",
         studentProfile: defaultProfile,
-        currentCharacter: { type: 'maestro', id: 'euclide-matematica' },
+        currentCharacter: { type: "maestro", id: "euclide" },
         preferContinuity: true,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('maestro');
-      expect(result.reason).toContain('Continuing');
+      expect(result.characterType).toBe("maestro");
+      expect(result.reason).toContain("Continuing");
     });
 
-    it('should switch character for high-confidence new intent', () => {
+    it("should switch character for high-confidence new intent", () => {
       const context: RoutingContext = {
-        message: 'Mi sento molto solo e triste, nessuno mi capisce',
+        message: "Mi sento molto solo e triste, nessuno mi capisce",
         studentProfile: defaultProfile,
-        currentCharacter: { type: 'maestro', id: 'euclide-matematica' },
+        currentCharacter: { type: "maestro", id: "euclide" },
         preferContinuity: true,
       };
 
       const result = routeToCharacter(context);
       // Should switch to buddy despite continuity preference
-      expect(result.characterType).toBe('buddy');
+      expect(result.characterType).toBe("buddy");
     });
   });
 
@@ -336,17 +336,17 @@ describe('Character Router', () => {
   // QUICK ROUTE
   // =========================================================================
 
-  describe('Quick Route', () => {
-    it('should work with just a message', () => {
+  describe("Quick Route", () => {
+    it("should work with just a message", () => {
       // Pattern: matematica|equazion|algebra|calcol|derivat|integral
-      const result = quickRoute('Spiegami la matematica');
-      expect(result.characterType).toBe('maestro');
-      expect(result.intent.subject).toBe('mathematics');
+      const result = quickRoute("Spiegami la matematica");
+      expect(result.characterType).toBe("maestro");
+      expect(result.intent.subject).toBe("mathematics");
     });
 
-    it('should route general chat to coach', () => {
-      const result = quickRoute('Ciao');
-      expect(result.characterType).toBe('coach');
+    it("should route general chat to coach", () => {
+      const result = quickRoute("Ciao");
+      expect(result.characterType).toBe("coach");
     });
   });
 
@@ -354,19 +354,19 @@ describe('Character Router', () => {
   // BUDDY FOR STUDENT
   // =========================================================================
 
-  describe('getBuddyForStudent', () => {
-    it('should return Mario by default', () => {
+  describe("getBuddyForStudent", () => {
+    it("should return Mario by default", () => {
       const buddy = getBuddyForStudent(defaultProfile);
-      expect(buddy.id).toBe('mario');
+      expect(buddy.id).toBe("mario");
     });
 
-    it('should return Noemi when preferred', () => {
+    it("should return Noemi when preferred", () => {
       const profileWithNoemi: ExtendedStudentProfile = {
         ...defaultProfile,
-        preferredBuddy: 'noemi',
+        preferredBuddy: "noemi",
       };
       const buddy = getBuddyForStudent(profileWithNoemi);
-      expect(buddy.id).toBe('noemi');
+      expect(buddy.id).toBe("noemi");
     });
   });
 
@@ -374,23 +374,23 @@ describe('Character Router', () => {
   // CHARACTER GREETING
   // =========================================================================
 
-  describe('getCharacterGreeting', () => {
-    it('should return greeting for Maestro', () => {
-      const result = quickRoute('Spiegami la storia');
+  describe("getCharacterGreeting", () => {
+    it("should return greeting for Maestro", () => {
+      const result = quickRoute("Spiegami la storia");
       const greeting = getCharacterGreeting(result, defaultProfile);
       expect(greeting).toBeDefined();
       expect(greeting.length).toBeGreaterThan(0);
     });
 
-    it('should return greeting for Coach', () => {
-      const result = quickRoute('Come studio?');
+    it("should return greeting for Coach", () => {
+      const result = quickRoute("Come studio?");
       const greeting = getCharacterGreeting(result, defaultProfile);
       expect(greeting).toBeDefined();
       expect(greeting.length).toBeGreaterThan(0);
     });
 
-    it('should return personalized greeting for Buddy', () => {
-      const result = quickRoute('Mi sento solo');
+    it("should return personalized greeting for Buddy", () => {
+      const result = quickRoute("Mi sento solo");
       const greeting = getCharacterGreeting(result, defaultProfile);
       expect(greeting).toBeDefined();
       // Buddy greetings are personalized based on profile
@@ -402,29 +402,29 @@ describe('Character Router', () => {
   // SUGGEST CHARACTER SWITCH
   // =========================================================================
 
-  describe('suggestCharacterSwitch', () => {
-    it('should suggest Coach with personalized message', () => {
+  describe("suggestCharacterSwitch", () => {
+    it("should suggest Coach with personalized message", () => {
       const suggestion = suggestCharacterSwitch(
-        'maestro',
-        'coach',
+        "maestro",
+        "coach",
         defaultProfile,
-        'Per organizzarti meglio'
+        "Per organizzarti meglio",
       );
 
       expect(suggestion.character).toBeDefined();
-      expect(suggestion.message).toContain('Per organizzarti meglio');
+      expect(suggestion.message).toContain("Per organizzarti meglio");
     });
 
-    it('should suggest Buddy with personalized message', () => {
+    it("should suggest Buddy with personalized message", () => {
       const suggestion = suggestCharacterSwitch(
-        'maestro',
-        'buddy',
+        "maestro",
+        "buddy",
         defaultProfile,
-        'Se vuoi parlare'
+        "Se vuoi parlare",
       );
 
       expect(suggestion.character).toBeDefined();
-      expect(suggestion.message).toContain('ti capisce');
+      expect(suggestion.message).toContain("ti capisce");
     });
   });
 
@@ -432,21 +432,21 @@ describe('Character Router', () => {
   // EDGE CASES
   // =========================================================================
 
-  describe('Edge Cases', () => {
-    it('should handle empty message', () => {
+  describe("Edge Cases", () => {
+    it("should handle empty message", () => {
       const context: RoutingContext = {
-        message: '',
+        message: "",
         studentProfile: defaultProfile,
       };
 
       const result = routeToCharacter(context);
-      expect(result.characterType).toBe('coach');
-      expect(result.intent.type).toBe('general_chat');
+      expect(result.characterType).toBe("coach");
+      expect(result.intent.type).toBe("general_chat");
     });
 
-    it('should handle unknown subject gracefully', () => {
+    it("should handle unknown subject gracefully", () => {
       const context: RoutingContext = {
-        message: 'Spiegami qualcosa',
+        message: "Spiegami qualcosa",
         studentProfile: defaultProfile,
       };
 
@@ -454,15 +454,8 @@ describe('Character Router', () => {
       expect(result.character).toBeDefined();
     });
 
-    it('should always return a valid character', () => {
-      const messages = [
-        '',
-        '   ',
-        'asdfghjkl',
-        '12345',
-        'Come?',
-        'Perché?',
-      ];
+    it("should always return a valid character", () => {
+      const messages = ["", "   ", "asdfghjkl", "12345", "Come?", "Perché?"];
 
       for (const msg of messages) {
         const result = quickRoute(msg);

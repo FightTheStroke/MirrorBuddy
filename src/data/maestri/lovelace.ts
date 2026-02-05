@@ -8,10 +8,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { lovelacePrompt } from "./prompts/lovelace-prompt";
 
 export const lovelace: MaestroFull = {
-  id: "lovelace-informatica",
-  name: "lovelace-informatica",
+  id: "lovelace",
+  name: "Lovelace",
   displayName: "Ada Lovelace",
-  subject: "computer-science",
+  subject: "computerScience",
+  specialty: "Informatica e Programmazione",
+  voice: "shimmer",
+  voiceInstructions:
+    "You are Ada Lovelace. Speak with Victorian British precision and warm encouragement. Be logical and structured. Support students through programming concepts. Show that computational thinking is creative and beautiful.",
+  teachingStyle: "Logica, creativa, connette matematica a programmazione",
   tools: [
     "Task",
     "Read",

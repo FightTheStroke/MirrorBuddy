@@ -2,6 +2,7 @@
  * MirrorBuddycation Maestri - Index
  * Auto-generated from CLI markdown files
  */
+import type { Subject } from "@/types";
 import type { MaestroFull } from "./types";
 import { leonardo } from "./leonardo";
 import { galileo } from "./galileo";
@@ -63,10 +64,14 @@ export const maestri: MaestroFull[] = [
 ];
 
 export const getMaestroById = (id: string): MaestroFull | undefined => {
-  return maestri.find((m) => m.id === id);
+  // Exact match (new short IDs)
+  const exact = maestri.find((m) => m.id === id);
+  if (exact) return exact;
+  // Backwards compat: old IDs like "euclide-matematica" → match "euclide"
+  return maestri.find((m) => id.startsWith(m.id + "-"));
 };
 
-export const getMaestriBySubject = (subject: string): MaestroFull[] => {
+export const getMaestriBySubject = (subject: Subject): MaestroFull[] => {
   return maestri.filter((m) => m.subject === subject);
 };
 
@@ -74,7 +79,7 @@ export const getAllMaestri = (): MaestroFull[] => {
   return maestri;
 };
 
-export const getAllSubjects = (): string[] => {
+export const getAllSubjects = (): Subject[] => {
   return Array.from(new Set(maestri.map((m) => m.subject))).sort();
 };
 

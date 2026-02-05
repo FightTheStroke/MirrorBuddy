@@ -23,8 +23,14 @@ export const GET = pipe(withSentry("/api/maestri"))(async (ctx) => {
     () =>
       maestri.map((m) => ({
         id: m.id,
+        name: m.name,
         displayName: m.displayName,
         subject: m.subject,
+        specialty: m.specialty,
+        voice: m.voice,
+        voiceInstructions: m.voiceInstructions,
+        teachingStyle: m.teachingStyle,
+        systemPrompt: m.systemPrompt,
         greeting: generateMaestroGreeting(m.id, m.displayName, lang),
       })),
     { ttl: CACHE_TTL.MAESTRI },

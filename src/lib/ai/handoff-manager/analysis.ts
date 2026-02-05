@@ -2,16 +2,13 @@
  * Handoff analysis logic
  */
 
-import type {
-  ExtendedStudentProfile,
-  CharacterType,
-} from '@/types';
-import type { MaestroFull } from '@/data/maestri';
-import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
-import { detectIntent } from './intent-detection';
-import type { HandoffContext, HandoffAnalysis } from './types';
-import { INTENT_HANDOFF_MAP, HANDOFF_SIGNAL_PATTERNS } from './patterns';
-import { getMaestriBySubject } from '@/data/maestri';
+import type { ExtendedStudentProfile, CharacterType, Subject } from "@/types";
+import type { MaestroFull } from "@/data/maestri";
+import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
+import { detectIntent } from "./intent-detection";
+import type { HandoffContext, HandoffAnalysis } from "./types";
+import { INTENT_HANDOFF_MAP, HANDOFF_SIGNAL_PATTERNS } from "./patterns";
+import { getMaestriBySubject } from "@/data/maestri";
 
 /**
  * Analyzes whether a handoff should occur
@@ -27,21 +24,25 @@ export function analyzeHandoff(context: HandoffContext): HandoffAnalysis {
   }
 
   const intent = detectIntent(message);
-  const intentMismatch = checkIntentMismatch(intent.type, activeCharacter.type, studentProfile);
+  const intentMismatch = checkIntentMismatch(
+    intent.type,
+    activeCharacter.type,
+    studentProfile,
+  );
   if (intentMismatch.shouldHandoff) {
     return intentMismatch;
   }
 
-  const crisisCheck = detectCrisisSignals(message, aiResponse || '');
+  const crisisCheck = detectCrisisSignals(message, aiResponse || "");
   if (crisisCheck.shouldHandoff) {
     return crisisCheck;
   }
 
-  if (activeCharacter.type === 'maestro' && intent.subject) {
+  if (activeCharacter.type === "maestro" && intent.subject) {
     const subjectChange = checkSubjectChange(
       activeCharacter.character as MaestroFull,
       intent.subject,
-      studentProfile
+      studentProfile,
     );
     if (subjectChange.shouldHandoff) {
       return subjectChange;
@@ -51,45 +52,48 @@ export function analyzeHandoff(context: HandoffContext): HandoffAnalysis {
   return {
     shouldHandoff: false,
     confidence: 0.9,
-    reason: 'Current character is appropriate for this conversation',
+    reason: "Current character is appropriate for this conversation",
   };
 }
 
 /**
  * Detects explicit handoff suggestions in AI response
  */
-function detectExplicitHandoff(response: string, currentCharacter: ActiveCharacter): HandoffAnalysis {
+function detectExplicitHandoff(
+  response: string,
+  currentCharacter: ActiveCharacter,
+): HandoffAnalysis {
   for (const pattern of HANDOFF_SIGNAL_PATTERNS.maestro_suggestion) {
-    if (pattern.test(response) && currentCharacter.type !== 'maestro') {
+    if (pattern.test(response) && currentCharacter.type !== "maestro") {
       return {
         shouldHandoff: true,
         confidence: 0.85,
-        reason: 'AI suggested a subject expert',
+        reason: "AI suggested a subject expert",
       };
     }
   }
 
   for (const pattern of HANDOFF_SIGNAL_PATTERNS.buddy_suggestion) {
-    if (pattern.test(response) && currentCharacter.type !== 'buddy') {
+    if (pattern.test(response) && currentCharacter.type !== "buddy") {
       return {
         shouldHandoff: true,
         confidence: 0.8,
-        reason: 'AI detected emotional need and suggested peer support',
+        reason: "AI detected emotional need and suggested peer support",
       };
     }
   }
 
   for (const pattern of HANDOFF_SIGNAL_PATTERNS.coach_suggestion) {
-    if (pattern.test(response) && currentCharacter.type !== 'coach') {
+    if (pattern.test(response) && currentCharacter.type !== "coach") {
       return {
         shouldHandoff: true,
         confidence: 0.8,
-        reason: 'AI suggested organization/method support',
+        reason: "AI suggested organization/method support",
       };
     }
   }
 
-  return { shouldHandoff: false, confidence: 0, reason: '' };
+  return { shouldHandoff: false, confidence: 0, reason: "" };
 }
 
 /**
@@ -98,12 +102,13 @@ function detectExplicitHandoff(response: string, currentCharacter: ActiveCharact
 function checkIntentMismatch(
   intentType: string,
   currentType: CharacterType,
-  _profile: ExtendedStudentProfile
+  _profile: ExtendedStudentProfile,
 ): HandoffAnalysis {
-  const suggestedType = INTENT_HANDOFF_MAP[intentType as keyof typeof INTENT_HANDOFF_MAP];
+  const suggestedType =
+    INTENT_HANDOFF_MAP[intentType as keyof typeof INTENT_HANDOFF_MAP];
 
   if (!suggestedType || suggestedType === currentType) {
-    return { shouldHandoff: false, confidence: 0, reason: '' };
+    return { shouldHandoff: false, confidence: 0, reason: "" };
   }
 
   return {
@@ -116,7 +121,10 @@ function checkIntentMismatch(
 /**
  * Detects crisis signals requiring immediate support
  */
-function detectCrisisSignals(message: string, response: string): HandoffAnalysis {
+function detectCrisisSignals(
+  message: string,
+  response: string,
+): HandoffAnalysis {
   const combined = `${message} ${response}`.toLowerCase();
 
   for (const pattern of HANDOFF_SIGNAL_PATTERNS.crisis_signals) {
@@ -124,12 +132,12 @@ function detectCrisisSignals(message: string, response: string): HandoffAnalysis
       return {
         shouldHandoff: true,
         confidence: 0.95,
-        reason: 'Crisis signals detected - immediate peer support recommended',
+        reason: "Crisis signals detected - immediate peer support recommended",
       };
     }
   }
 
-  return { shouldHandoff: false, confidence: 0, reason: '' };
+  return { shouldHandoff: false, confidence: 0, reason: "" };
 }
 
 /**
@@ -138,15 +146,15 @@ function detectCrisisSignals(message: string, response: string): HandoffAnalysis
 function checkSubjectChange(
   currentMaestro: MaestroFull,
   newSubject: string,
-  _profile: ExtendedStudentProfile
+  _profile: ExtendedStudentProfile,
 ): HandoffAnalysis {
   const currentSubject = currentMaestro.subject;
 
   if (currentSubject === newSubject) {
-    return { shouldHandoff: false, confidence: 0, reason: '' };
+    return { shouldHandoff: false, confidence: 0, reason: "" };
   }
 
-  const newMaestri = getMaestriBySubject(newSubject);
+  const newMaestri = getMaestriBySubject(newSubject as Subject);
   if (newMaestri.length > 0) {
     return {
       shouldHandoff: true,
@@ -155,7 +163,7 @@ function checkSubjectChange(
     };
   }
 
-  return { shouldHandoff: false, confidence: 0, reason: '' };
+  return { shouldHandoff: false, confidence: 0, reason: "" };
 }
 
 /**
@@ -165,8 +173,8 @@ export function mightNeedHandoff(message: string): boolean {
   const intent = detectIntent(message);
 
   if (intent.confidence > 0.7) {
-    if (intent.type === 'crisis') return true;
-    if (intent.type === 'emotional_support') return true;
+    if (intent.type === "crisis") return true;
+    if (intent.type === "emotional_support") return true;
     if (intent.subject) return true;
   }
 

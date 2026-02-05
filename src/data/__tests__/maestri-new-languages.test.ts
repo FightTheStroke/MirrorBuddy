@@ -38,8 +38,8 @@ const mockStudent: ExtendedStudentProfile = {
 describe("New Language Maestri Configuration", () => {
   describe("Molière - French", () => {
     it("should have correct ID and metadata", () => {
-      expect(moliere.id).toBe("moliere-french");
-      expect(moliere.name).toBe("moliere-french");
+      expect(moliere.id).toBe("moliere");
+      expect(moliere.name).toBe("Molière");
       expect(moliere.displayName).toBe("Molière");
       expect(moliere.subject).toBe("french");
     });
@@ -58,9 +58,6 @@ describe("New Language Maestri Configuration", () => {
       // Should contain knowledge base content (substituted via template literal)
       expect(moliere.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
-
-    // Voice configuration is not part of MaestroFull type
-    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(moliere.tools)).toBe(true);
@@ -87,10 +84,10 @@ describe("New Language Maestri Configuration", () => {
     });
 
     it("should be retrievable from maestri index", () => {
-      const found = getMaestroById("moliere-french");
+      const found = getMaestroById("moliere");
       expect(found).toBeDefined();
-      expect(found?.displayName).toBe("Molière");
-      expect(found?.id).toBe("moliere-french");
+      expect(found?.name).toBe("Molière");
+      expect(found?.id).toBe("moliere");
     });
 
     it("should have proper historical context in systemPrompt", () => {
@@ -120,8 +117,8 @@ describe("New Language Maestri Configuration", () => {
 
   describe("Goethe - German", () => {
     it("should have correct ID and metadata", () => {
-      expect(goethe.id).toBe("goethe-german");
-      expect(goethe.name).toBe("goethe-german");
+      expect(goethe.id).toBe("goethe");
+      expect(goethe.name).toBe("Goethe");
       expect(goethe.displayName).toBe("Goethe");
       expect(goethe.subject).toBe("german");
     });
@@ -140,9 +137,6 @@ describe("New Language Maestri Configuration", () => {
       // Should contain knowledge base content (substituted via template literal)
       expect(goethe.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
-
-    // Voice configuration is not part of MaestroFull type
-    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(goethe.tools)).toBe(true);
@@ -169,10 +163,10 @@ describe("New Language Maestri Configuration", () => {
     });
 
     it("should be retrievable from maestri index", () => {
-      const found = getMaestroById("goethe-german");
+      const found = getMaestroById("goethe");
       expect(found).toBeDefined();
-      expect(found?.displayName).toBe("Goethe");
-      expect(found?.id).toBe("goethe-german");
+      expect(found?.name).toBe("Goethe");
+      expect(found?.id).toBe("goethe");
     });
 
     it("should have proper historical context in systemPrompt", () => {
@@ -202,8 +196,8 @@ describe("New Language Maestri Configuration", () => {
 
   describe("Cervantes - Spanish", () => {
     it("should have correct ID and metadata", () => {
-      expect(cervantes.id).toBe("cervantes-spanish");
-      expect(cervantes.name).toBe("cervantes-spanish");
+      expect(cervantes.id).toBe("cervantes");
+      expect(cervantes.name).toBe("Cervantes");
       expect(cervantes.displayName).toBe("Cervantes");
       expect(cervantes.subject).toBe("spanish");
     });
@@ -222,9 +216,6 @@ describe("New Language Maestri Configuration", () => {
       // Should contain knowledge base content (substituted via template literal)
       expect(cervantes.systemPrompt).toContain("## KNOWLEDGE BASE");
     });
-
-    // Voice configuration is not part of MaestroFull type
-    // Voice settings are handled separately in the voice system
 
     it("should have complete tools array", () => {
       expect(Array.isArray(cervantes.tools)).toBe(true);
@@ -251,10 +242,10 @@ describe("New Language Maestri Configuration", () => {
     });
 
     it("should be retrievable from maestri index", () => {
-      const found = getMaestroById("cervantes-spanish");
+      const found = getMaestroById("cervantes");
       expect(found).toBeDefined();
-      expect(found?.displayName).toBe("Cervantes");
-      expect(found?.id).toBe("cervantes-spanish");
+      expect(found?.name).toBe("Cervantes");
+      expect(found?.id).toBe("cervantes");
     });
 
     it("should have proper historical context in systemPrompt", () => {
@@ -287,15 +278,15 @@ describe("New Language Maestri Configuration", () => {
       const allMaestri = getAllMaestri();
       const ids = allMaestri.map((m) => m.id);
 
-      expect(ids).toContain("moliere-french");
-      expect(ids).toContain("goethe-german");
-      expect(ids).toContain("cervantes-spanish");
+      expect(ids).toContain("moliere");
+      expect(ids).toContain("goethe");
+      expect(ids).toContain("cervantes");
     });
 
     it("each maestro should be retrievable by ID", () => {
-      const moliereFetch = getMaestroById("moliere-french");
-      const goetheFetch = getMaestroById("goethe-german");
-      const cervantesFetch = getMaestroById("cervantes-spanish");
+      const moliereFetch = getMaestroById("moliere");
+      const goetheFetch = getMaestroById("goethe");
+      const cervantesFetch = getMaestroById("cervantes");
 
       expect(moliereFetch).toEqual(moliere);
       expect(goetheFetch).toEqual(goethe);

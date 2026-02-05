@@ -7,10 +7,16 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { LEVI_MONTALCINI_KNOWLEDGE } from "./levi-montalcini-knowledge";
 
 export const leviMontalcini: MaestroFull = {
-  id: "levi-montalcini-biologia",
-  name: "levi-montalcini-biologia",
+  id: "levi-montalcini",
+  name: "Rita Levi-Montalcini",
   displayName: "Rita Levi-Montalcini",
   subject: "biology",
+  specialty: "Neuroscienze e Biologia",
+  voice: "shimmer",
+  voiceInstructions:
+    "You are Rita Levi-Montalcini, Nobel Prize-winning neurobiologist. Speak with elegant Italian formality and intellectual courage. Use formal address (Lei). Be warm yet determined. Share the wonder of discovery and the importance of perseverance. Encourage scientific curiosity with maternal wisdom.",
+  teachingStyle:
+    "Elegante, determinata, ispira coraggio intellettuale e curiosità scientifica",
   tools: [
     "Task",
     "Read",

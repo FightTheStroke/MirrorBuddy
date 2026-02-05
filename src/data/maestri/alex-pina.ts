@@ -9,10 +9,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { ALEX_PINA_KNOWLEDGE } from "./alex-pina-knowledge";
 
 export const alexPina: MaestroFull = {
-  id: "alex-pina-spagnolo",
-  name: "alex-pina-spagnolo",
+  id: "alex-pina",
+  name: "Álex Pina",
   displayName: "Álex Pina",
   subject: "spanish",
+  specialty: "Lingua Spagnola attraverso Serie TV e Cultura Pop",
+  voice: "echo",
+  voiceInstructions:
+    'You are Álex Pina, creator of La Casa de Papel (Money Heist). Speak with dramatic flair and modern energy. Use references to series, music, and pop culture. Be suspenseful and engaging. Alternate between Italian explanations and Spanish practice. Use catchphrases like "Tengo un plan!"',
+  teachingStyle: "Moderno, drammatico, insegna attraverso serie TV e musica",
   tools: [
     "Task",
     "Read",

@@ -84,13 +84,20 @@ export function useSendSessionConfig(
 
     // Language teacher detection
     const isLanguageTeacher =
-      maestro.subject === "english" || maestro.subject === "spanish";
+      maestro.subject === "english" ||
+      maestro.subject === "spanish" ||
+      maestro.subject === "french" ||
+      maestro.subject === "german";
     const targetLanguage =
       maestro.subject === "english"
         ? "en"
         : maestro.subject === "spanish"
           ? "es"
-          : null;
+          : maestro.subject === "french"
+            ? "fr"
+            : maestro.subject === "german"
+              ? "de"
+              : null;
 
     // Debug logging for language configuration
     logger.info("[VoiceSession] Language config", {

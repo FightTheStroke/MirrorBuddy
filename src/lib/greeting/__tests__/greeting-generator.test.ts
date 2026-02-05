@@ -103,11 +103,7 @@ describe("greeting-generator main functions", () => {
     });
 
     it("should handle character IDs with subject suffixes", () => {
-      const characterIds = [
-        "euclide-matematica",
-        "shakespeare-inglese",
-        "galileo-fisica",
-      ];
+      const characterIds = ["euclide", "shakespeare", "galileo"];
       characterIds.forEach((id) => {
         const greeting = generateMaestroGreeting(id, "Test", "en");
         expect(greeting).toBeTruthy();
@@ -376,7 +372,7 @@ describe("greeting-generator main functions", () => {
 
     it("should handle maestri with subject-based variations", () => {
       const variations = [
-        "euclide-matematica",
+        "euclide",
         "euclide",
         "EUCLIDE",
         "Euclide-matematica",

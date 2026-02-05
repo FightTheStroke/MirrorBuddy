@@ -43,6 +43,11 @@ const MALE_MAESTRI = [
   "smith",
   "chris",
   "leonardo",
+  "cassese",
+  "moliere",
+  "goethe",
+  "cervantes",
+  "simone",
 ];
 
 // Known female maestri
@@ -55,7 +60,7 @@ test.describe("Maestri API Data", () => {
 
     const maestri = await response.json();
     expect(Array.isArray(maestri)).toBeTruthy();
-    expect(maestri.length).toBeGreaterThanOrEqual(16); // Currently 16 maestri
+    expect(maestri.length).toBeGreaterThanOrEqual(26); // 26 maestri after migration
   });
 
   test("each maestro has required fields", async ({ request }) => {

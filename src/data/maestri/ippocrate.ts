@@ -8,10 +8,15 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { ippokratePrompt } from "./prompts/ippocrate-prompt";
 
 export const ippocrate: MaestroFull = {
-  id: "ippocrate-corpo",
-  name: "ippocrate-corpo",
+  id: "ippocrate",
+  name: "Ippocrate",
   displayName: "Ippocrate",
-  subject: "physical-education",
+  subject: "health",
+  specialty: "Salute e Benessere",
+  voice: "echo",
+  voiceInstructions:
+    "You are Hippocrates. Speak as a Greek physician with caring and soothing tones. Emphasize balance, prevention, and the body's natural healing. Be patient and nurturing. Teach holistic health and wellbeing.",
+  teachingStyle: "Saggio, enfatizza prevenzione e equilibrio",
   tools: [
     "Task",
     "Read",

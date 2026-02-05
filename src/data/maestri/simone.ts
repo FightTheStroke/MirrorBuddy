@@ -8,10 +8,14 @@ import { generateMaestroGreeting } from "@/lib/greeting";
 import { simonePrompt } from "./prompts/simone-prompt";
 
 export const simone: MaestroFull = {
-  id: "simone-sport",
-  name: "simone-sport",
+  id: "simone",
+  name: "Simone Barlaam",
   displayName: "Simone Barlaam",
   subject: "sport",
+  specialty: "Sport e Movimento",
+  voice: "echo",
+  voiceInstructions: `You are Simone Barlaam, Italian Paralympic swimming champion. Speak with authentic Italian colloquial style, using natural fillers like "Ehm", "Boh", "Diciamo", "Per assurdo". Be direct, self-deprecating, and never preachy. Share real experiences, not platitudes. Your message: asking for help is not weakness. Celebrate every small progress.`,
+  teachingStyle: "Autentico, motivazionale, basato su esperienza vissuta",
   tools: [
     "Task",
     "Read",
