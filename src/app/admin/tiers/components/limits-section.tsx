@@ -10,6 +10,8 @@ interface LimitsSectionProps {
     voiceMinutesDaily: number;
     toolsLimitDaily: number;
     docsLimitTotal: number;
+    videoVisionSecondsPerSession: number;
+    videoVisionMinutesMonthly: number;
   };
   onChange: (data: Partial<LimitsSectionProps["formData"]>) => void;
 }
@@ -20,6 +22,16 @@ const LIMITS = {
   voiceMinutesDaily: { min: 0, max: 1440, label: "Minuti Voce" },
   toolsLimitDaily: { min: 0, max: 500, label: "Strumenti" },
   docsLimitTotal: { min: 0, max: 10000, label: "Documenti" },
+  videoVisionSecondsPerSession: {
+    min: 0,
+    max: 300,
+    label: "Video Vision/Session (s)",
+  },
+  videoVisionMinutesMonthly: {
+    min: 0,
+    max: 60,
+    label: "Video Vision/Month (min)",
+  },
 } as const;
 
 interface FieldError {
@@ -140,6 +152,18 @@ export function LimitsSection({ formData, onChange }: LimitsSectionProps) {
         {renderField("toolsLimitDaily", t("toolsDaily"), t("toolsHelp"))}
 
         {renderField("docsLimitTotal", t("docsTotal"), t("docsHelp"))}
+
+        {renderField(
+          "videoVisionSecondsPerSession",
+          t("videoVisionSecondsPerSession"),
+          t("videoVisionSecondsHelp"),
+        )}
+
+        {renderField(
+          "videoVisionMinutesMonthly",
+          t("videoVisionMinutesMonthly"),
+          t("videoVisionMinutesHelp"),
+        )}
       </div>
     </div>
   );

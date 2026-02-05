@@ -34,6 +34,10 @@ model TierDefinition {
   toolsLimitDaily     Int      @default(10)
   docsLimitTotal      Int      @default(1)
 
+  // Video vision limits (ADR 0122)
+  videoVisionSecondsPerSession Int @default(0) // Max seconds per capture session (0 = disabled)
+  videoVisionMinutesMonthly    Int @default(0) // Max minutes per month (0 = disabled)
+
   // Per-feature model selection (ADR 0072)
   // Main conversation and voice
   chatModel           String   @default("gpt-4o-mini")

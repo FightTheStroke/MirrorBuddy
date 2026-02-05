@@ -29,6 +29,8 @@ interface TierFormData {
   voiceMinutesDaily: number;
   toolsLimitDaily: number;
   docsLimitTotal: number;
+  videoVisionSecondsPerSession: number;
+  videoVisionMinutesMonthly: number;
   chatModel: string;
   realtimeModel: string;
   pdfModel: string;
@@ -69,6 +71,8 @@ export function TierForm({ tier }: TierFormProps) {
     voiceMinutesDaily: tier?.voiceMinutesDaily || 5,
     toolsLimitDaily: tier?.toolsLimitDaily || 10,
     docsLimitTotal: tier?.docsLimitTotal || 1,
+    videoVisionSecondsPerSession: tier?.videoVisionSecondsPerSession || 0,
+    videoVisionMinutesMonthly: tier?.videoVisionMinutesMonthly || 0,
     chatModel: tier?.chatModel || "gpt-4o-mini",
     realtimeModel: tier?.realtimeModel || "gpt-realtime-mini",
     pdfModel: tier?.pdfModel || "gpt-4o-mini",
@@ -164,6 +168,8 @@ export function TierForm({ tier }: TierFormProps) {
           voiceMinutesDaily: formData.voiceMinutesDaily,
           toolsLimitDaily: formData.toolsLimitDaily,
           docsLimitTotal: formData.docsLimitTotal,
+          videoVisionSecondsPerSession: formData.videoVisionSecondsPerSession,
+          videoVisionMinutesMonthly: formData.videoVisionMinutesMonthly,
         }}
         onChange={updateFormData}
       />

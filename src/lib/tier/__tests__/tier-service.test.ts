@@ -75,6 +75,8 @@ describe("TierService", () => {
     voiceMinutesDaily: 5,
     toolsLimitDaily: 10,
     docsLimitTotal: 1,
+    videoVisionSecondsPerSession: 0,
+    videoVisionMinutesMonthly: 0,
     chatModel: "gpt-4o-mini",
     realtimeModel: "gpt-realtime-mini",
     ...defaultModelFields,
@@ -110,6 +112,8 @@ describe("TierService", () => {
     voiceMinutesDaily: 15,
     toolsLimitDaily: 30,
     docsLimitTotal: 5,
+    videoVisionSecondsPerSession: 0,
+    videoVisionMinutesMonthly: 0,
     chatModel: "gpt-4o-mini",
     realtimeModel: "gpt-realtime-mini",
     ...defaultModelFields,
@@ -145,6 +149,8 @@ describe("TierService", () => {
     voiceMinutesDaily: 60,
     toolsLimitDaily: 100,
     docsLimitTotal: 50,
+    videoVisionSecondsPerSession: 60,
+    videoVisionMinutesMonthly: 10,
     chatModel: "gpt-4o",
     realtimeModel: "gpt-realtime",
     ...defaultModelFields,
@@ -690,6 +696,8 @@ describe("TierService", () => {
         dailyTools: 10,
         maxDocuments: 1,
         maxMaestri: 3,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -704,6 +712,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -736,6 +746,8 @@ describe("TierService", () => {
         dailyTools: 100,
         maxDocuments: 50,
         maxMaestri: 20,
+        videoVisionSecondsPerSession: 60,
+        videoVisionMinutesMonthly: 10,
       });
     });
 
@@ -771,6 +783,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 
@@ -788,6 +802,8 @@ describe("TierService", () => {
         dailyTools: 30,
         maxDocuments: 5,
         maxMaestri: 10,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       });
     });
 

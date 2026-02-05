@@ -290,7 +290,18 @@
         "sendMessageAriaLabel": "Send message",
         "sendMessageTooltip": "Send the message",
         "switchToChatAriaLabel": "Switch to chat",
-        "switchToChatTooltip": "Return to text chat"
+        "switchToChatTooltip": "Return to text chat",
+        "videoTooltip": {
+          "on": "Disable video",
+          "off": "Enable video",
+          "limitReached": "Video limit reached for this month"
+        },
+        "videoAriaLabel": {
+          "on": "Video active, click to disable",
+          "off": "Video disabled, click to enable"
+        },
+        "videoStopAriaLabel": "Stop video",
+        "videoFramesLabel": "frames sent"
       },
       "rating": {
         "close": "Close",
@@ -415,6 +426,20 @@
         "visualTitle": "Visual Title",
         "visualWCAGCompliance": "Visual W C A G Compliance"
       }
+    },
+    "camera": {
+      "cameraOff": "Camera off",
+      "cameraOffAriaLabel": "Camera off, click to enable",
+      "videoMode": "Video mode (continuous context)",
+      "videoModeAriaLabel": "Video mode active, click to switch to photo",
+      "photoMode": "Photo mode (single shot)",
+      "photoModeAriaLabel": "Photo mode active, click to turn off",
+      "limitReached": "Camera limit reached for this month",
+      "flipCamera": "Flip camera",
+      "switchToFrontCamera": "Switch to front camera",
+      "switchToBackCamera": "Switch to back camera",
+      "takeSnapshot": "Take photo",
+      "takeSnapshotAriaLabel": "Take a photo to show the tutor"
     }
   }
 }

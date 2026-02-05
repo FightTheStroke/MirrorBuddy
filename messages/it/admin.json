@@ -168,6 +168,10 @@
         "toolsDaily": "Strumenti Giornalieri",
         "toolsHelp": "Numero massimo di strumenti utilizzabili al giorno",
         "update": "Aggiorna Tier",
+        "videoVisionMinutesHelp": "Minuti totali di video vision al mese (0 = disabilitato)",
+        "videoVisionMinutesMonthly": "Video Vision Mensile (min)",
+        "videoVisionSecondsHelp": "Secondi massimi per sessione di video vision (0 = disabilitato)",
+        "videoVisionSecondsPerSession": "Video Vision per Sessione (s)",
         "voiceMinutesDaily": "Minuti Voce Giornalieri",
         "voiceMinutesHelp": "Minuti di utilizzo voce al giorno"
       },

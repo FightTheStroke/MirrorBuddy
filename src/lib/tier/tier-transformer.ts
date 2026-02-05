@@ -27,6 +27,8 @@ export function transformTier(prismaTier: {
   voiceMinutesDaily: number;
   toolsLimitDaily: number;
   docsLimitTotal: number;
+  videoVisionSecondsPerSession: number;
+  videoVisionMinutesMonthly: number;
   // Per-feature models (ADR 0073)
   chatModel: string;
   realtimeModel: string;
@@ -69,6 +71,8 @@ export function transformTier(prismaTier: {
 
   return {
     ...prismaTier,
+    videoVisionSecondsPerSession: prismaTier.videoVisionSecondsPerSession ?? 0,
+    videoVisionMinutesMonthly: prismaTier.videoVisionMinutesMonthly ?? 0,
     featureConfigs: prismaTier.featureConfigs as never,
     features: prismaTier.features as never,
     availableMaestri: Array.isArray(prismaTier.availableMaestri)

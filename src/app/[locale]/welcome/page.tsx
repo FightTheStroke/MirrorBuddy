@@ -65,6 +65,18 @@ function WelcomeContent() {
     connect: voiceSession.connect,
     disconnect: voiceSession.disconnect,
     toggleMute: voiceSession.toggleMute,
+    videoEnabled: false,
+    toggleVideo: async () => {},
+    videoStream: null,
+    videoFramesSent: 0,
+    videoElapsedSeconds: 0,
+    videoMaxSeconds: 0,
+    videoLimitReached: false,
+    cameraMode: "off",
+    cycleCameraMode: async () => {},
+    takeSnapshot: async () => {},
+    toggleCameraFacing: () => {},
+    cameraFacing: "user",
   };
 
   useEffect(() => {

@@ -52,6 +52,8 @@ export default async function EditTierPage({ params }: EditTierPageProps) {
     voiceMinutesDaily: tier.voiceMinutesDaily,
     toolsLimitDaily: tier.toolsLimitDaily,
     docsLimitTotal: tier.docsLimitTotal,
+    videoVisionSecondsPerSession: tier.videoVisionSecondsPerSession,
+    videoVisionMinutesMonthly: tier.videoVisionMinutesMonthly,
     chatModel: tier.chatModel,
     realtimeModel: tier.realtimeModel,
     pdfModel: tier.pdfModel,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { User, Key, Settings, LogOut } from "lucide-react";
@@ -20,23 +20,24 @@ export function UserMenuDropdown({
   const t = useTranslations("common");
   const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const logoutGuardRef = useRef(false);
 
   const handleLogout = async () => {
-    if (isLoggingOut) return;
-
+    if (logoutGuardRef.current) return;
+    logoutGuardRef.current = true;
     setIsLoggingOut(true);
     try {
       const response = await csrfFetch("/api/auth/logout", {
         method: "POST",
       });
-
       if (response.ok) {
         router.push("/login");
-      } else {
-        setIsLoggingOut(false);
       }
     } catch {
+      // Network error — don't redirect
+    } finally {
       setIsLoggingOut(false);
+      logoutGuardRef.current = false;
     }
   };
 

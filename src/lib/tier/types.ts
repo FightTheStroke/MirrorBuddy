@@ -93,6 +93,10 @@ export interface TierDefinition {
   toolsLimitDaily: number;
   docsLimitTotal: number;
 
+  // Video vision limits (ADR 0122)
+  videoVisionSecondsPerSession: number;
+  videoVisionMinutesMonthly: number;
+
   // Per-feature model selection (ADR 0073)
   chatModel: string;
   realtimeModel: string;
@@ -256,6 +260,8 @@ export interface EffectiveSubscriptionLimits {
   voiceMinutesDaily: number;
   toolsLimitDaily: number;
   docsLimitTotal: number;
+  videoVisionSecondsPerSession: number;
+  videoVisionMinutesMonthly: number;
   chatModel: string;
   realtimeModel: string;
 }
@@ -322,4 +328,6 @@ export interface TierLimits {
   maxDocuments: number;
   maxMaestri: number;
   monthlyAiCalls?: number;
+  videoVisionSecondsPerSession: number;
+  videoVisionMinutesMonthly: number;
 }

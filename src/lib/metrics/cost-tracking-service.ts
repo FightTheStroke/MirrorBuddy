@@ -28,6 +28,8 @@ const PRICING = {
   VOICE_REALTIME_PER_MIN: 0.04,
   // Embeddings: text-embedding-3-small $0.02/1M ≈ €0.00002/1K
   EMBEDDINGS_PER_1K_TOKENS: 0.00002,
+  // Video vision: ~$0.067 per frame (640x360 JPEG via gpt-realtime input_image)
+  VIDEO_VISION_PER_FRAME: 0.067,
 } as const;
 
 // Budget thresholds from V1Plan
@@ -44,6 +46,7 @@ export interface CostBreakdown {
   textCost: number;
   voiceCost: number;
   embeddingsCost: number;
+  videoVisionCost: number;
   totalCost: number;
 }
 
@@ -59,6 +62,7 @@ export interface UsageData {
   tokensOut: number;
   voiceMinutes: number; // Realtime API handles audio I/O with single per-minute rate
   embeddingTokens: number;
+  videoVisionFrames: number; // Video vision frames sent via data channel (ADR 0122)
 }
 
 export type CostStatus = "ok" | "warning" | "exceeded";
@@ -72,6 +76,7 @@ export function calculateCost(usage: Partial<UsageData>): CostBreakdown {
   const tokensOut = usage.tokensOut || 0;
   const voiceMinutes = usage.voiceMinutes || 0;
   const embeddingTokens = usage.embeddingTokens || 0;
+  const videoVisionFrames = usage.videoVisionFrames || 0;
 
   // Text cost: based on REAL token counts from Azure API
   const textCost = ((tokensIn + tokensOut) / 1000) * PRICING.TEXT_PER_1K_TOKENS;
@@ -83,11 +88,15 @@ export function calculateCost(usage: Partial<UsageData>): CostBreakdown {
   const embeddingsCost =
     (embeddingTokens / 1000) * PRICING.EMBEDDINGS_PER_1K_TOKENS;
 
+  // Video vision cost: per-frame cost for webcam capture (ADR 0122)
+  const videoVisionCost = videoVisionFrames * PRICING.VIDEO_VISION_PER_FRAME;
+
   return {
     textCost: round(textCost),
     voiceCost: round(voiceCost),
     embeddingsCost: round(embeddingsCost),
-    totalCost: round(textCost + voiceCost + embeddingsCost),
+    videoVisionCost: round(videoVisionCost),
+    totalCost: round(textCost + voiceCost + embeddingsCost + videoVisionCost),
   };
 }
 

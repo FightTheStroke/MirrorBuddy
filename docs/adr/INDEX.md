@@ -152,6 +152,7 @@
 | 0118 | Webcam Fullscreen Architecture                         | Fullscreen overlay, dual-flow    |
 | 0122 | Realtime Video Vision (Pro-Only)                       | Periodic frames to Realtime API  |
 | 0125 | Research & Benchmarking Lab                            | Admin research tools dashboard   |
+| 0126 | Unified Camera Architecture                            | Video/photo mode selector        |
 
 ## Tier & Business
 

@@ -27,6 +27,8 @@ export function createFallbackTier(code: TierCode): TierDefinition {
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
+      videoVisionSecondsPerSession: 0,
+      videoVisionMinutesMonthly: 0,
       // Per-feature models (ADR 0073) - cost-effective for trial
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime-mini",
@@ -75,6 +77,8 @@ export function createFallbackTier(code: TierCode): TierDefinition {
     voiceMinutesDaily: 15,
     toolsLimitDaily: 30,
     docsLimitTotal: 5,
+    videoVisionSecondsPerSession: 0,
+    videoVisionMinutesMonthly: 0,
     // Per-feature models (ADR 0073) - education-optimized for registered users
     chatModel: "gpt-5.2-edu",
     realtimeModel: "gpt-realtime",

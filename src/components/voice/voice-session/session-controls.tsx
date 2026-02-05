@@ -18,11 +18,19 @@ import {
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { CameraModeSelector } from "../camera-mode-selector";
+import type { CameraMode } from "@/types/voice";
 
 interface SessionControlsProps {
   isMuted: boolean;
   isSpeaking: boolean;
+  cameraMode: CameraMode;
+  cameraFacing: "user" | "environment";
+  cameraLimitReached: boolean;
   onToggleMute: () => void;
+  onCycleCameraMode: () => void;
+  onToggleCameraFacing: () => void;
+  onTakeSnapshot: () => void;
   onCancelResponse: () => void;
   onSendText: (text: string) => void;
   onSwitchToChat?: () => void;
@@ -32,7 +40,13 @@ interface SessionControlsProps {
 export function SessionControls({
   isMuted,
   isSpeaking,
+  cameraMode,
+  cameraFacing,
+  cameraLimitReached,
   onToggleMute,
+  onCycleCameraMode,
+  onToggleCameraFacing,
+  onTakeSnapshot,
   onCancelResponse,
   onSendText,
   onSwitchToChat,
@@ -92,6 +106,15 @@ export function SessionControls({
             <Mic className="h-6 w-6" />
           )}
         </Button>
+
+        <CameraModeSelector
+          cameraMode={cameraMode}
+          cameraFacing={cameraFacing}
+          limitReached={cameraLimitReached}
+          onCycleMode={onCycleCameraMode}
+          onToggleFacing={onToggleCameraFacing}
+          onTakeSnapshot={onTakeSnapshot}
+        />
 
         {isSpeaking && (
           <Button

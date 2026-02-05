@@ -196,6 +196,8 @@ describe("Admin Form Inputs - Mobile Responsiveness (F-47)", () => {
         voiceMinutesDaily: 5,
         toolsLimitDaily: 10,
         docsLimitTotal: 1,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       };
 
       const { container } = render(
@@ -215,6 +217,8 @@ describe("Admin Form Inputs - Mobile Responsiveness (F-47)", () => {
         voiceMinutesDaily: 5,
         toolsLimitDaily: 10,
         docsLimitTotal: 1,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       };
 
       render(<LimitsSection formData={formData} onChange={mockOnChange} />);
@@ -232,6 +236,8 @@ describe("Admin Form Inputs - Mobile Responsiveness (F-47)", () => {
         voiceMinutesDaily: 5,
         toolsLimitDaily: 10,
         docsLimitTotal: 1,
+        videoVisionSecondsPerSession: 0,
+        videoVisionMinutesMonthly: 0,
       };
 
       const { container } = render(

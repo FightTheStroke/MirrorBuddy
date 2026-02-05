@@ -290,7 +290,18 @@
         "sendMessageAriaLabel": "Invia messaggio",
         "sendMessageTooltip": "Invia il messaggio",
         "switchToChatAriaLabel": "Passa alla chat",
-        "switchToChatTooltip": "Torna alla chat testuale"
+        "switchToChatTooltip": "Torna alla chat testuale",
+        "videoTooltip": {
+          "on": "Disattiva video",
+          "off": "Attiva video",
+          "limitReached": "Limite video raggiunto per questo mese"
+        },
+        "videoAriaLabel": {
+          "on": "Video attivo, clicca per disattivare",
+          "off": "Video disattivato, clicca per attivare"
+        },
+        "videoStopAriaLabel": "Ferma video",
+        "videoFramesLabel": "frame inviati"
       },
       "rating": {
         "close": "Chiudi",
@@ -415,6 +426,20 @@
         "visualTitle": "Visual Title",
         "visualWCAGCompliance": "Visual W C A G Compliance"
       }
+    },
+    "camera": {
+      "cameraOff": "Camera spenta",
+      "cameraOffAriaLabel": "Camera spenta, clicca per attivare",
+      "videoMode": "Modalità video (contesto continuo)",
+      "videoModeAriaLabel": "Modalità video attiva, clicca per passare a foto",
+      "photoMode": "Modalità foto (scatto singolo)",
+      "photoModeAriaLabel": "Modalità foto attiva, clicca per spegnere",
+      "limitReached": "Limite camera raggiunto per questo mese",
+      "flipCamera": "Cambia camera",
+      "switchToFrontCamera": "Passa alla camera frontale",
+      "switchToBackCamera": "Passa alla camera posteriore",
+      "takeSnapshot": "Scatta foto",
+      "takeSnapshotAriaLabel": "Scatta una foto per farla vedere al tutor"
     }
   }
 }

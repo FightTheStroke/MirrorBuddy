@@ -16,6 +16,8 @@ describe("LimitsSection", () => {
     voiceMinutesDaily: 5,
     toolsLimitDaily: 10,
     docsLimitTotal: 1,
+    videoVisionSecondsPerSession: 0,
+    videoVisionMinutesMonthly: 0,
   };
 
   beforeEach(() => {
@@ -30,7 +32,7 @@ describe("LimitsSection", () => {
       expect(screen.getByText("Limiti")).toBeInTheDocument();
     });
 
-    it("renders all 4 limit input fields", () => {
+    it("renders all 6 limit input fields", () => {
       render(
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
@@ -45,6 +47,12 @@ describe("LimitsSection", () => {
         screen.getByLabelText(/Strumenti Giornalieri/i),
       ).toBeInTheDocument();
       expect(screen.getByLabelText(/Documenti Totali/i)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Video Vision per Sessione/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(/Video Vision Mensile/i),
+      ).toBeInTheDocument();
     });
 
     it("renders help text for each field", () => {
@@ -52,11 +60,11 @@ describe("LimitsSection", () => {
         <LimitsSection formData={defaultFormData} onChange={mockOnChange} />,
       );
 
-      // Check that help text descriptions are rendered (4 fields = 4 help texts)
+      // Check that help text descriptions are rendered (6 fields = 6 help texts)
       // We check for the actual translated content from messages/it/admin.json
       // These are loaded by vitest setup.ts which mocks next-intl with real translations
       const helpTexts = document.querySelectorAll(".text-xs.text-slate-600");
-      expect(helpTexts.length).toBe(4);
+      expect(helpTexts.length).toBe(6);
 
       // Verify each help text has content (non-empty)
       helpTexts.forEach((el) => {
@@ -209,7 +217,7 @@ describe("LimitsSection", () => {
       );
 
       const inputs = screen.getAllByRole("spinbutton") as HTMLInputElement[];
-      expect(inputs.length).toBe(4);
+      expect(inputs.length).toBe(6);
       inputs.forEach((input) => {
         expect(input).toHaveAttribute("type", "number");
       });

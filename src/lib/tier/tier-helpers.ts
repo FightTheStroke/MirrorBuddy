@@ -54,6 +54,8 @@ export function extractTierLimits(tier: TierDefinition): TierLimits {
     dailyTools: tier.toolsLimitDaily,
     maxDocuments: tier.docsLimitTotal,
     maxMaestri: (tier.features as { maestriLimit?: number })?.maestriLimit ?? 3,
+    videoVisionSecondsPerSession: tier.videoVisionSecondsPerSession,
+    videoVisionMinutesMonthly: tier.videoVisionMinutesMonthly,
   };
 }
 

@@ -31,6 +31,8 @@ async function main() {
       voiceMinutesDaily: 5,
       toolsLimitDaily: 10,
       docsLimitTotal: 1,
+      videoVisionSecondsPerSession: 0,
+      videoVisionMinutesMonthly: 0,
       // Per-feature models (ADR 0073) - cost-effective for trial
       chatModel: "gpt-4o-mini",
       realtimeModel: "gpt-realtime-mini",
@@ -91,6 +93,8 @@ async function main() {
       voiceMinutesDaily: 30,
       toolsLimitDaily: 30,
       docsLimitTotal: 5,
+      videoVisionSecondsPerSession: 0,
+      videoVisionMinutesMonthly: 0,
       // Per-feature models (ADR 0073) - education-optimized for registered
       chatModel: "gpt-5.2-edu",
       realtimeModel: "gpt-realtime",
@@ -186,6 +190,8 @@ async function main() {
       voiceMinutesDaily: 999999,
       toolsLimitDaily: 999999,
       docsLimitTotal: 999999,
+      videoVisionSecondsPerSession: 60,
+      videoVisionMinutesMonthly: 10,
       // Per-feature models (ADR 0073) - best quality for Pro tier
       chatModel: "gpt-5.2-chat",
       realtimeModel: "gpt-realtime",
@@ -230,6 +236,7 @@ async function main() {
         prioritySupport: true,
         advancedAnalytics: true,
         unlimitedStorage: true,
+        video_vision: true,
       },
       availableMaestri: [
         "leonardo-art",

@@ -2,18 +2,30 @@
 // VOICE SESSION TYPES
 // ============================================================================
 
-import type { Maestro } from './content';
+import type { Maestro } from "./content";
 
 export type VoiceSessionState =
-  | 'idle'
-  | 'connecting'
-  | 'connected'
-  | 'listening'
-  | 'processing'
-  | 'speaking'
-  | 'error';
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "listening"
+  | "processing"
+  | "speaking"
+  | "error";
 
-export type VoiceConnectionState = 'idle' | 'connecting' | 'connected' | 'error';
+export type VoiceConnectionState =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "error";
+
+/**
+ * Unified camera mode for voice sessions (ADR 0126).
+ * - 'off': Camera disabled
+ * - 'video': Continuous frame capture as passive context (no AI response triggered)
+ * - 'photo': Single snapshot mode (AI responds to what it sees)
+ */
+export type CameraMode = "off" | "video" | "photo";
 
 /**
  * Handle returned by useVoiceSession hook.
@@ -25,21 +37,48 @@ export interface VoiceSessionHandle {
   isSpeaking: boolean;
   isMuted: boolean;
   connectionState: VoiceConnectionState;
-  connect: (maestro: Maestro, connectionInfo: { provider: 'azure'; proxyPort?: number }) => Promise<void>;
+  connect: (
+    maestro: Maestro,
+    connectionInfo: { provider: "azure"; proxyPort?: number },
+  ) => Promise<void>;
   disconnect: () => void;
   toggleMute: () => void;
+  /** Whether video vision capture is active (ADR 0122) */
+  videoEnabled: boolean;
+  /** Toggle video vision capture on/off */
+  toggleVideo: () => Promise<void>;
+  /** Active camera stream for video preview (null when inactive) */
+  videoStream: MediaStream | null;
+  /** Number of video frames sent during current session */
+  videoFramesSent: number;
+  /** Elapsed seconds since video capture started */
+  videoElapsedSeconds: number;
+  /** Maximum allowed seconds for this capture session */
+  videoMaxSeconds: number;
+  /** Whether the user has reached their video vision limit */
+  videoLimitReached: boolean;
+  /** Current unified camera mode (ADR 0126) */
+  cameraMode: CameraMode;
+  /** Cycle through camera modes: off → video → photo → off */
+  cycleCameraMode: () => Promise<void>;
+  /** Take a single snapshot (photo mode) - AI will respond to what it sees */
+  takeSnapshot: () => Promise<void>;
+  /** Switch camera between front and back (mobile) */
+  toggleCameraFacing: () => void;
+  /** Current camera facing mode */
+  cameraFacing: "user" | "environment";
 }
 
 export type EmotionType =
-  | 'neutral'
-  | 'joy'
-  | 'excitement'
-  | 'curiosity'
-  | 'confusion'
-  | 'frustration'
-  | 'anxiety'
-  | 'boredom'
-  | 'distraction';
+  | "neutral"
+  | "joy"
+  | "excitement"
+  | "curiosity"
+  | "confusion"
+  | "frustration"
+  | "anxiety"
+  | "boredom"
+  | "distraction";
 
 export interface Emotion {
   type: EmotionType;
@@ -49,7 +88,7 @@ export interface Emotion {
 
 export interface TranscriptEntry {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
   emotion?: Emotion;
@@ -69,7 +108,7 @@ export interface EphemeralTokenResponse {
   /** Token expiration timestamp (Unix seconds) */
   expiresAt: number;
   /** Provider (always 'azure' for now) */
-  provider: 'azure';
+  provider: "azure";
 }
 
 /**

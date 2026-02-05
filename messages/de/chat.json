@@ -290,7 +290,18 @@
         "sendMessageAriaLabel": "Nachricht senden",
         "sendMessageTooltip": "Nachricht senden",
         "switchToChatAriaLabel": "Zum Chat wechseln",
-        "switchToChatTooltip": "Zurück zum Textchat"
+        "switchToChatTooltip": "Zurück zum Textchat",
+        "videoTooltip": {
+          "on": "Video deaktivieren",
+          "off": "Video aktivieren",
+          "limitReached": "Videolimit für diesen Monat erreicht"
+        },
+        "videoAriaLabel": {
+          "on": "Video aktiv, klicken zum Deaktivieren",
+          "off": "Video deaktiviert, klicken zum Aktivieren"
+        },
+        "videoStopAriaLabel": "Video stoppen",
+        "videoFramesLabel": "Bilder gesendet"
       },
       "rating": {
         "close": "Schließen",
@@ -415,6 +426,20 @@
         "visualTitle": "Visuelle Anpassungen",
         "visualWCAGCompliance": "WCAG-Konformität"
       }
+    },
+    "camera": {
+      "cameraOff": "Kamera aus",
+      "cameraOffAriaLabel": "Kamera aus, klicken zum Aktivieren",
+      "videoMode": "Videomodus (kontinuierlicher Kontext)",
+      "videoModeAriaLabel": "Videomodus aktiv, klicken für Fotomodus",
+      "photoMode": "Fotomodus (Einzelaufnahme)",
+      "photoModeAriaLabel": "Fotomodus aktiv, klicken zum Ausschalten",
+      "limitReached": "Kameralimit für diesen Monat erreicht",
+      "flipCamera": "Kamera wechseln",
+      "switchToFrontCamera": "Zur Frontkamera wechseln",
+      "switchToBackCamera": "Zur Rückkamera wechseln",
+      "takeSnapshot": "Foto aufnehmen",
+      "takeSnapshotAriaLabel": "Foto aufnehmen, um es dem Tutor zu zeigen"
     }
   }
 }
