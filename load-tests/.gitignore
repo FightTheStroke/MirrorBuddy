@@ -1,0 +1,5 @@
+# k6 raw output (large JSON files)
+results/*.json
+
+# k6 binary artifacts
+*.har
