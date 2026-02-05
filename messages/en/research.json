@@ -1,0 +1,31 @@
+{
+  "research": {
+    "title": "Research Lab",
+    "description": "TutorBench experiments — synthetic students vs maestri",
+    "experiments": "Experiments",
+    "createExperiment": "Create experiment",
+    "hypothesis": "Hypothesis",
+    "runSimulation": "Run simulation",
+    "running": "Running...",
+    "benchmarks": "Benchmarks",
+    "heatmap": "Score heatmap",
+    "scores": "Scores",
+    "scaffolding": "Scaffolding",
+    "hinting": "Hinting",
+    "adaptation": "Adaptation",
+    "misconceptionHandling": "Misconception handling",
+    "syntheticProfiles": "Synthetic profiles",
+    "results": "Results",
+    "compare": "Compare",
+    "noResults": "No results available",
+    "noExperiments": "No experiments yet. Create one via API.",
+    "status": "Status",
+    "turns": "Turns",
+    "actions": "Actions",
+    "maestro": "Maestro",
+    "average": "Average",
+    "draft": "Draft",
+    "completed": "Completed",
+    "failed": "Failed"
+  }
+}

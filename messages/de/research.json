@@ -1,0 +1,31 @@
+{
+  "research": {
+    "title": "Forschungslabor",
+    "description": "TutorBench-Experimente — synthetische Schüler vs. Maestri",
+    "experiments": "Experimente",
+    "createExperiment": "Experiment erstellen",
+    "hypothesis": "Hypothese",
+    "runSimulation": "Simulation starten",
+    "running": "Läuft...",
+    "benchmarks": "Benchmarks",
+    "heatmap": "Bewertungskarte",
+    "scores": "Bewertungen",
+    "scaffolding": "Scaffolding",
+    "hinting": "Hinweise",
+    "adaptation": "Anpassung",
+    "misconceptionHandling": "Fehlerbehandlung",
+    "syntheticProfiles": "Synthetische Profile",
+    "results": "Ergebnisse",
+    "compare": "Vergleichen",
+    "noResults": "Keine Ergebnisse verfügbar",
+    "noExperiments": "Keine Experimente. Erstellen Sie eines über die API.",
+    "status": "Status",
+    "turns": "Runden",
+    "actions": "Aktionen",
+    "maestro": "Maestro",
+    "average": "Durchschnitt",
+    "draft": "Entwurf",
+    "completed": "Abgeschlossen",
+    "failed": "Fehlgeschlagen"
+  }
+}

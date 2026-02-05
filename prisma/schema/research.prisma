@@ -1,0 +1,85 @@
+// ============================================================================
+// RESEARCH DOMAIN
+// Experiment tracking, synthetic student profiles, and benchmark results
+// ============================================================================
+
+model SyntheticProfile {
+  id   String @id @default(cuid())
+  name String @unique
+
+  // Student characteristics
+  dsaProfile     String // dyslexia | adhd | asd | mixed
+  age            Int
+  schoolYear     Int
+  learningStyle  String // visual | auditory | kinesthetic | mixed
+  challengeAreas Json // string[] - specific difficulty areas
+  responsePatterns Json // behavioral patterns for message generation
+
+  // Metadata
+  description String?
+  isActive    Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  experiments ResearchExperiment[]
+
+  @@index([dsaProfile])
+}
+
+model ResearchExperiment {
+  id   String @id @default(cuid())
+  name String
+
+  // Experiment design
+  hypothesis         String
+  status             String @default("draft") // draft | running | completed | failed
+  maestroId          String
+  syntheticProfileId String
+  syntheticProfile   SyntheticProfile @relation(fields: [syntheticProfileId], references: [id])
+  turns              Int    @default(10)
+  config             Json?  // additional experiment parameters
+
+  // Execution
+  startedAt   DateTime?
+  completedAt DateTime?
+  errorLog    String?
+
+  // Aggregated scores (filled on completion)
+  scoreScaffolding         Float?
+  scoreHinting             Float?
+  scoreAdaptation          Float?
+  scoreMisconceptionHandling Float?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  results ResearchResult[]
+
+  @@index([status])
+  @@index([maestroId])
+  @@index([syntheticProfileId])
+}
+
+model ResearchResult {
+  id           String             @id @default(cuid())
+  experimentId String
+  experiment   ResearchExperiment @relation(fields: [experimentId], references: [id], onDelete: Cascade)
+
+  // Per-turn data
+  turn            Int
+  studentMessage  String
+  maestroResponse String
+
+  // Per-turn metrics
+  responseTimeMs     Int?
+  tokensUsed         Int?
+  scaffoldingDetected Boolean @default(false)
+  adaptationDetected  Boolean @default(false)
+  metrics            Json?   // additional structured metrics
+
+  createdAt DateTime @default(now())
+
+  @@index([experimentId])
+  @@index([experimentId, turn])
+}

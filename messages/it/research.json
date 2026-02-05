@@ -1,0 +1,31 @@
+{
+  "research": {
+    "title": "Research Lab",
+    "description": "Esperimenti TutorBench — studenti sintetici vs maestri",
+    "experiments": "Esperimenti",
+    "createExperiment": "Crea esperimento",
+    "hypothesis": "Ipotesi",
+    "runSimulation": "Esegui simulazione",
+    "running": "In esecuzione...",
+    "benchmarks": "Benchmark",
+    "heatmap": "Mappa dei punteggi",
+    "scores": "Punteggi",
+    "scaffolding": "Scaffolding",
+    "hinting": "Hinting",
+    "adaptation": "Adattamento",
+    "misconceptionHandling": "Gestione misconcezioni",
+    "syntheticProfiles": "Profili sintetici",
+    "results": "Risultati",
+    "compare": "Confronta",
+    "noResults": "Nessun risultato disponibile",
+    "noExperiments": "Nessun esperimento. Creane uno via API.",
+    "status": "Stato",
+    "turns": "Turni",
+    "actions": "Azioni",
+    "maestro": "Maestro",
+    "average": "Media",
+    "draft": "Bozza",
+    "completed": "Completato",
+    "failed": "Fallito"
+  }
+}

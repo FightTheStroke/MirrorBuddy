@@ -22,6 +22,7 @@ import {
   Palette,
   FunnelIcon as Funnel,
   BookOpen,
+  FlaskConical,
 } from "lucide-react";
 
 export interface NavItem {
@@ -197,6 +198,12 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           label: "AI Email",
           href: "/admin/mission-control/ai-email",
           icon: Mail,
+        },
+        {
+          id: "research-lab",
+          label: "Research Lab",
+          href: "/admin/research",
+          icon: FlaskConical,
         },
       ],
     },

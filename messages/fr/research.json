@@ -1,0 +1,31 @@
+{
+  "research": {
+    "title": "Laboratoire de recherche",
+    "description": "Expériences TutorBench — étudiants synthétiques vs maestri",
+    "experiments": "Expériences",
+    "createExperiment": "Créer une expérience",
+    "hypothesis": "Hypothèse",
+    "runSimulation": "Lancer la simulation",
+    "running": "En cours...",
+    "benchmarks": "Benchmarks",
+    "heatmap": "Carte de scores",
+    "scores": "Scores",
+    "scaffolding": "Étayage",
+    "hinting": "Indices",
+    "adaptation": "Adaptation",
+    "misconceptionHandling": "Gestion des erreurs",
+    "syntheticProfiles": "Profils synthétiques",
+    "results": "Résultats",
+    "compare": "Comparer",
+    "noResults": "Aucun résultat disponible",
+    "noExperiments": "Aucune expérience. Créez-en une via l'API.",
+    "status": "Statut",
+    "turns": "Tours",
+    "actions": "Actions",
+    "maestro": "Maestro",
+    "average": "Moyenne",
+    "draft": "Brouillon",
+    "completed": "Terminé",
+    "failed": "Échoué"
+  }
+}

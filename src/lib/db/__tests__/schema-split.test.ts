@@ -37,6 +37,7 @@ const EXPECTED_SCHEMA_FILES = [
   "vault.prisma", // SecretVault (encrypted API key storage)
   "characters.prisma", // CharacterConfig (admin character management)
   "dependency-monitoring.prisma", // UsagePattern, DependencyAlert (AI safety)
+  "research.prisma", // ResearchExperiment, ResearchResult, SyntheticProfile
 ];
 
 // Expected models that should be present across all schema files
@@ -121,6 +122,10 @@ const EXPECTED_MODELS = [
   // dependency-monitoring.prisma
   "UsagePattern",
   "DependencyAlert",
+  // research.prisma
+  "SyntheticProfile",
+  "ResearchExperiment",
+  "ResearchResult",
 ];
 
 describe("Prisma Schema Split", () => {
