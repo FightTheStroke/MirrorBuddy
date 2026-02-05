@@ -11,6 +11,7 @@
 import { getCostStats } from "@/lib/metrics/cost-tracking-service";
 import { getAllExternalServiceUsage } from "@/lib/metrics/external-service-metrics";
 import type { ExternalServiceUsage } from "@/lib/metrics/external-service-metrics";
+import { sendAlertEmails } from "./alert-email";
 
 export interface ServiceCostSummary {
   service: string;
@@ -115,6 +116,11 @@ export async function getCostDashboardData(): Promise<CostDashboardData> {
     quotas,
     timestamp: new Date().toISOString(),
   };
+
+  // Fire-and-forget: send email alerts for any breaches
+  if (alerts.length > 0) {
+    void sendAlertEmails(alerts);
+  }
 
   cached = data;
   cacheTime = now;
