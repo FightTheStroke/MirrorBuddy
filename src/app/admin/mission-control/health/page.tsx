@@ -10,7 +10,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Loader2, Activity, AlertCircle, RefreshCw } from "lucide-react";
 import { StatusBadge, StatusIcon } from "./status-utils";
-import type { HealthAggregatorResponse } from "@/lib/admin/health-aggregator-types";
+import type {
+  HealthAggregatorResponse,
+  ServiceHealth,
+} from "@/lib/admin/health-aggregator-types";
 
 export const dynamic = "force-dynamic";
 
@@ -99,6 +102,10 @@ export default function ServiceHealthPage() {
                 className="text-lg px-4 py-2"
               />
             </div>
+            <p className="mt-2 text-sm text-muted-foreground">
+              Based on {healthData.configuredCount} configured{" "}
+              {healthData.configuredCount === 1 ? "service" : "services"}
+            </p>
           </CardContent>
         </Card>
       )}
@@ -116,9 +123,18 @@ export default function ServiceHealthPage() {
         </div>
       )}
 
-      {!loading && !error && healthData && (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {healthData.services.map((service) => (
+      {!loading &&
+        !error &&
+        healthData &&
+        (() => {
+          const configuredServices = healthData.services.filter(
+            (s) => s.configured,
+          );
+          const unconfiguredServices = healthData.services.filter(
+            (s) => !s.configured,
+          );
+
+          const renderServiceCard = (service: ServiceHealth) => (
             <Card key={service.name}>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center justify-between text-base">
@@ -164,9 +180,70 @@ export default function ServiceHealthPage() {
                 </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          );
+
+          if (configuredServices.length === 0) {
+            return (
+              <div className="rounded-lg border border-dashed p-8 text-center">
+                <h3 className="text-lg font-semibold mb-2">
+                  No services configured yet
+                </h3>
+                <p className="text-muted-foreground">
+                  Configure your services to start monitoring their health
+                  status.
+                </p>
+              </div>
+            );
+          }
+
+          return (
+            <div className="space-y-6">
+              {configuredServices.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">
+                    Configured Services
+                  </h2>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {configuredServices.map(renderServiceCard)}
+                  </div>
+                </div>
+              )}
+
+              {unconfiguredServices.length > 0 && (
+                <div>
+                  <h2 className="text-xl font-semibold mb-4">Not Configured</h2>
+                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                    {unconfiguredServices.map((service) => (
+                      <Card key={service.name} className="opacity-60">
+                        <CardHeader className="pb-3">
+                          <CardTitle className="flex items-center justify-between text-base">
+                            <span>{service.name}</span>
+                            <StatusIcon status="unknown" />
+                          </CardTitle>
+                        </CardHeader>
+                        <CardContent className="space-y-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-sm text-muted-foreground">
+                              Status:
+                            </span>
+                            <span className="text-sm text-muted-foreground">
+                              Not Configured
+                            </span>
+                          </div>
+                          {service.details && (
+                            <p className="text-sm text-muted-foreground">
+                              {service.details}
+                            </p>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
     </div>
   );
 }

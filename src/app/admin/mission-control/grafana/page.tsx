@@ -132,6 +132,50 @@ GRAFANA_CLOUD_API_KEY=...`}
     );
   }
 
+  if (state.config?.configured && !state.config?.reachable) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <Card className="border-yellow-200 bg-yellow-50">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-yellow-900">
+              <AlertCircle className="w-5 h-5" />
+              Grafana Configured but Unreachable
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="text-yellow-800 space-y-4">
+            <p>
+              Grafana Cloud is configured but currently unreachable. This could
+              be due to:
+            </p>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Network connectivity issues</li>
+              <li>Grafana Cloud service temporarily unavailable</li>
+              <li>Invalid credentials or expired API key</li>
+              <li>Firewall or proxy blocking requests</li>
+            </ul>
+            <div className="pt-2">
+              <Button
+                onClick={handleRefresh}
+                variant="outline"
+                size="sm"
+                className="gap-2"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Retry Connection
+              </Button>
+            </div>
+            <p className="text-sm">
+              Configuration:{" "}
+              <code className="bg-yellow-100 px-2 py-1 rounded">
+                {state.config.orgSlug}.grafana.net
+              </code>
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">

@@ -1,61 +1,22 @@
 /**
- * Infrastructure Health Checks
- * Database, Redis/KV, and Vercel connectivity checks
+ * External Service Health Checks
+ * Azure OpenAI, Resend, and Sentry connectivity checks
  */
 
-import { prisma } from "@/lib/db";
 import type { ServiceHealth } from "./health-aggregator-types";
 import { fetchWithTimeout, buildHealthResponse } from "./health-checks-utils";
 
-// Re-export external checks for backwards compatibility
-export {
-  checkAzureOpenAI,
-  checkResend,
-  checkSentry,
-} from "./health-checks-external";
-
 /**
- * Check Database connectivity
+ * Check Azure OpenAI availability
  */
-export async function checkDatabase(): Promise<ServiceHealth> {
-  const start = Date.now();
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    const responseTimeMs = Date.now() - start;
-    const status = responseTimeMs < 1000 ? "healthy" : "degraded";
-    const details =
-      status === "healthy" ? "Connected" : `Slow (${responseTimeMs}ms)`;
-    return buildHealthResponse(
-      "Database",
-      status,
-      true,
-      responseTimeMs,
-      details,
-    );
-  } catch (error) {
-    const details =
-      error instanceof Error ? error.message : "Connection failed";
-    return buildHealthResponse(
-      "Database",
-      "down",
-      true,
-      Date.now() - start,
-      details,
-    );
-  }
-}
+export async function checkAzureOpenAI(): Promise<ServiceHealth> {
+  const endpoint = process.env.AZURE_OPENAI_ENDPOINT;
+  const apiKey = process.env.AZURE_OPENAI_API_KEY;
+  const configured = !!endpoint;
 
-/**
- * Check Redis/KV connectivity
- */
-export async function checkRedis(): Promise<ServiceHealth> {
-  const kvUrl = process.env.KV_REST_API_URL;
-  const kvToken = process.env.KV_REST_API_TOKEN;
-  const configured = !!kvUrl;
-
-  if (!kvUrl || !kvToken) {
+  if (!endpoint || !apiKey) {
     return buildHealthResponse(
-      "Redis/KV",
+      "Azure OpenAI",
       "unknown",
       configured,
       undefined,
@@ -65,14 +26,58 @@ export async function checkRedis(): Promise<ServiceHealth> {
 
   const start = Date.now();
   try {
-    const response = await fetchWithTimeout(`${kvUrl}/ping`, {
-      Authorization: `Bearer ${kvToken}`,
+    const url = `${endpoint}/openai/models?api-version=2024-02-01`;
+    const response = await fetchWithTimeout(url, { "api-key": apiKey });
+    const responseTimeMs = Date.now() - start;
+    const status = response.ok ? "healthy" : "degraded";
+    const details = response.ok ? "Connected" : `HTTP ${response.status}`;
+    return buildHealthResponse(
+      "Azure OpenAI",
+      status,
+      configured,
+      responseTimeMs,
+      details,
+    );
+  } catch (error) {
+    const details =
+      error instanceof Error ? error.message : "Connection failed";
+    return buildHealthResponse(
+      "Azure OpenAI",
+      "down",
+      configured,
+      Date.now() - start,
+      details,
+    );
+  }
+}
+
+/**
+ * Check Resend email service
+ */
+export async function checkResend(): Promise<ServiceHealth> {
+  const apiKey = process.env.RESEND_API_KEY;
+  const configured = !!apiKey;
+
+  if (!apiKey) {
+    return buildHealthResponse(
+      "Resend",
+      "unknown",
+      configured,
+      undefined,
+      "Not configured",
+    );
+  }
+
+  const start = Date.now();
+  try {
+    const response = await fetchWithTimeout("https://api.resend.com/domains", {
+      Authorization: `Bearer ${apiKey}`,
     });
     const responseTimeMs = Date.now() - start;
     const status = response.ok ? "healthy" : "degraded";
     const details = response.ok ? "Connected" : `HTTP ${response.status}`;
     return buildHealthResponse(
-      "Redis/KV",
+      "Resend",
       status,
       configured,
       responseTimeMs,
@@ -82,7 +87,7 @@ export async function checkRedis(): Promise<ServiceHealth> {
     const details =
       error instanceof Error ? error.message : "Connection failed";
     return buildHealthResponse(
-      "Redis/KV",
+      "Resend",
       "down",
       configured,
       Date.now() - start,
@@ -92,15 +97,17 @@ export async function checkRedis(): Promise<ServiceHealth> {
 }
 
 /**
- * Check Vercel API
+ * Check Sentry error tracking
  */
-export async function checkVercel(): Promise<ServiceHealth> {
-  const token = process.env.VERCEL_TOKEN;
-  const configured = !!token;
+export async function checkSentry(): Promise<ServiceHealth> {
+  const authToken = process.env.SENTRY_AUTH_TOKEN;
+  const org = process.env.SENTRY_ORG;
+  const project = process.env.SENTRY_PROJECT;
+  const configured = !!(authToken && org && project);
 
-  if (!token) {
+  if (!configured) {
     return buildHealthResponse(
-      "Vercel",
+      "Sentry",
       "unknown",
       configured,
       undefined,
@@ -110,15 +117,15 @@ export async function checkVercel(): Promise<ServiceHealth> {
 
   const start = Date.now();
   try {
-    const response = await fetchWithTimeout(
-      "https://api.vercel.com/v9/projects",
-      { Authorization: `Bearer ${token}` },
-    );
+    const url = `https://sentry.io/api/0/projects/${org}/${project}/`;
+    const response = await fetchWithTimeout(url, {
+      Authorization: `Bearer ${authToken}`,
+    });
     const responseTimeMs = Date.now() - start;
     const status = response.ok ? "healthy" : "degraded";
     const details = response.ok ? "Connected" : `HTTP ${response.status}`;
     return buildHealthResponse(
-      "Vercel",
+      "Sentry",
       status,
       configured,
       responseTimeMs,
@@ -128,7 +135,7 @@ export async function checkVercel(): Promise<ServiceHealth> {
     const details =
       error instanceof Error ? error.message : "Connection failed";
     return buildHealthResponse(
-      "Vercel",
+      "Sentry",
       "down",
       configured,
       Date.now() - start,

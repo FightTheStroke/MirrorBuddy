@@ -92,7 +92,16 @@ export function CountriesTable({ countries }: CountriesTableProps) {
                     {formatNumber(country.users)}
                   </td>
                   <td className="text-right font-medium">
-                    {formatCurrency(country.revenue)}
+                    {country.revenue === null ? (
+                      <span
+                        className="text-muted-foreground"
+                        title="Requires Stripe integration"
+                      >
+                        N/A
+                      </span>
+                    ) : (
+                      formatCurrency(country.revenue)
+                    )}
                   </td>
                 </tr>
               ))}
@@ -162,7 +171,16 @@ export function MaestriTable({ maestri }: MaestriTableProps) {
                     {formatNumber(maestro.sessions)}
                   </td>
                   <td className="text-right font-medium">
-                    {formatDuration(maestro.avgDuration)}
+                    {maestro.avgDuration === null ? (
+                      <span
+                        className="text-muted-foreground"
+                        title="Session duration not tracked"
+                      >
+                        N/A
+                      </span>
+                    ) : (
+                      formatDuration(maestro.avgDuration)
+                    )}
                   </td>
                 </tr>
               ))}

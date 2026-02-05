@@ -17,6 +17,7 @@ export async function getGrafanaConfig(): Promise<GrafanaConfig> {
     );
     return {
       configured: false,
+      reachable: false,
       dashboardUrl: null,
       orgSlug: null,
     };
@@ -25,18 +26,38 @@ export async function getGrafanaConfig(): Promise<GrafanaConfig> {
   const orgSlug = extractOrgSlug(prometheusUrl);
   const dashboardUrl = buildDashboardUrl(orgSlug);
 
+  const reachable = await checkGrafanaConnectivity(orgSlug);
+
   return {
     configured: true,
+    reachable,
     dashboardUrl,
     orgSlug,
   };
 }
 
 /**
+ * Check if Grafana is reachable by making a lightweight API call
+ */
+async function checkGrafanaConnectivity(orgSlug: string): Promise<boolean> {
+  try {
+    const healthUrl = `https://${orgSlug}.grafana.net/api/health`;
+    const response = await fetch(healthUrl, {
+      method: "GET",
+      signal: AbortSignal.timeout(5000),
+    });
+    return response.ok;
+  } catch (error) {
+    logger.warn("Grafana connectivity check failed", { error });
+    return false;
+  }
+}
+
+/**
  * Extract organization slug from Prometheus URL
  */
 function extractOrgSlug(url: string): string {
-  const match = url.match(/https:\/\/([^.]+)-/);
+  const match = url.match(/https:\/\/([^.]+)\.grafana\.net/);
   return match ? match[1] : "mirrorbuddy";
 }
 

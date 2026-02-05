@@ -5,6 +5,7 @@
 
 export interface GrafanaConfig {
   configured: boolean;
+  reachable: boolean;
   dashboardUrl: string | null;
   orgSlug: string | null;
 }

@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Admin Console**: ServiceHealth now includes `configured` field to distinguish between unconfigured and failing services
 - **UserMenuDropdown**: New dropdown component with profile, change password, settings, and logout actions
 - **i18n**: User menu translations in all 5 locales (it/en/fr/de/es)
 - **SharedChatLayout**: ChatGPT-style fixed layout component with slot-based architecture (header/footer/children/rightPanel)
@@ -19,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- **Admin Sidebar - Mission Control**: Consolidated navigation by removing redundant Grafana entry (metrics now in Health page)
+- **Admin Sidebar - Mission Control**: Renamed "Business KPI" to "KPIs" for conciseness
+- **Admin Command Palette**: Synced with sidebar changes (removed Grafana, renamed KPIs)
 - **Header layout**: Moved "Ciao [nome]" greeting to right side of header with UserMenuDropdown
 - **Sidebar icon**: Replaced chevron toggle with hamburger menu icon for better mobile UX
 - **Sidebar footer**: Added version number display at bottom of sidebar
@@ -35,12 +39,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Health Check Infrastructure**: Azure OpenAI endpoint corrected from `/deployments` to `/models` for proper service validation
+- **Health Check Infrastructure**: Sentry check now uses actual API validation instead of configuration-only check
+- **Health Check Infrastructure**: Overall status calculation now ignores unconfigured services (configured:false)
+- **Health Check Page**: Split display into configured/unconfigured sections for clearer service status visibility
+- **Grafana Service**: Fixed connection check to handle HTTPS certificate validation properly
+- **Key Vault Service**: Enhanced error handling for missing environment variables with explicit error messages
+- **i18n Keys**: Added missing `admin.missionControl.grafana` namespace keys for all 5 locales
 - **Login redirect loop**: router.replace prevents users from returning to login after successful authentication
 - **Auth bypass**: PUBLIC_PATHS properly configured for public authentication pages
 - **Admin dashboard**: Verified all data sources are from real database queries (no placeholder/fake data)
 - **Admin navigation**: Resolved linking issues in admin panel
 - **Session persistence**: Verified database-first storage strategy (Zustand + REST) for cross-device sync
 - **Accessibility**: Ensured WCAG 2.1 AA compliance across all new and modified components
+
+### Removed
+
+- **Admin Console Mock Data Cleanup**: Removed all mock/placeholder data from admin infrastructure panels
+  - Stripe service: `configured: false` now returns empty response instead of mock data
+  - Infrastructure panels: Return `null` instead of mock fallbacks for Stripe, Grafana, and Key Vault
+  - Business KPI service: Removed hardcoded estimates (`growthRate`, `churnRate`, `totalRevenue`, `avgDuration` all now `null` when data insufficient)
+  - Deleted `business-kpi-mock-data.ts` file
+  - UI updated to show "N/A" with explanatory tooltips for null values instead of displaying fake data
 
 ## [0.12.0] - 2026-02-04
 

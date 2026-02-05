@@ -11,11 +11,6 @@ import type {
   CountryMetric,
   MaestroMetric,
 } from "./business-kpi-types";
-import {
-  getMockCountries,
-  getMockMaestri,
-  getMockKPIs,
-} from "./business-kpi-mock-data";
 
 interface CachedKPIs {
   data: BusinessKPIResponse;
@@ -24,6 +19,13 @@ interface CachedKPIs {
 
 let cache: CachedKPIs | null = null;
 const CACHE_TTL = 30000;
+
+/**
+ * Clear cache (for testing)
+ */
+export function clearCache(): void {
+  cache = null;
+}
 
 export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
   if (cache && Date.now() - cache.timestamp < CACHE_TTL) {
@@ -54,11 +56,29 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
     logger.info("Business KPIs computed successfully", { isEstimated });
     return data;
   } catch (error) {
-    logger.error("Failed to compute business KPIs, using mock data", {
-      error,
-    });
-    const mockData = getMockKPIs();
-    return { ...mockData, isEstimated: true };
+    logger.error("Failed to compute business KPIs", { error });
+    return {
+      revenue: {
+        mrr: 0,
+        arr: 0,
+        growthRate: null,
+        totalRevenue: null,
+        currency: "EUR",
+        isEstimated: true,
+      },
+      users: {
+        totalUsers: 0,
+        activeUsers: 0,
+        trialUsers: 0,
+        paidUsers: 0,
+        churnRate: null,
+        trialConversionRate: 0,
+        isEstimated: true,
+      },
+      topCountries: [],
+      topMaestri: [],
+      isEstimated: true,
+    };
   }
 }
 
@@ -74,25 +94,22 @@ async function getRevenueMetrics(): Promise<RevenueMetrics> {
       0,
     );
     const arr = mrr * 12;
-    // Growth rate is estimated until we have historical data
-    const growthRate = 8.5;
-    const totalRevenue = arr * 1.2;
 
     return {
       mrr,
       arr,
-      growthRate,
-      totalRevenue,
+      growthRate: null, // Requires historical data to compute
+      totalRevenue: null, // Requires Stripe integration for real revenue tracking
       currency: "EUR",
-      isEstimated: true, // growthRate and totalRevenue are estimated
+      isEstimated: true,
     };
   } catch (error) {
-    logger.warn("Using mock revenue metrics", { error });
+    logger.warn("Failed to fetch revenue metrics", { error });
     return {
-      mrr: 2450,
-      arr: 29400,
-      growthRate: 8.5,
-      totalRevenue: 35280,
+      mrr: 0,
+      arr: 0,
+      growthRate: null,
+      totalRevenue: null,
       currency: "EUR",
       isEstimated: true,
     };
@@ -117,8 +134,6 @@ async function getUserMetrics(): Promise<UserMetrics> {
       }),
     ]);
 
-    // Churn rate requires historical data - estimated for now
-    const churnRate = 3.2;
     const trialConversionRate =
       trialUsers > 0 ? (paidUsers / trialUsers) * 100 : 0;
 
@@ -127,19 +142,19 @@ async function getUserMetrics(): Promise<UserMetrics> {
       activeUsers,
       trialUsers,
       paidUsers,
-      churnRate,
+      churnRate: null, // Requires historical data to compute
       trialConversionRate,
-      isEstimated: true, // churnRate is estimated
+      isEstimated: true,
     };
   } catch (error) {
-    logger.warn("Using mock user metrics", { error });
+    logger.warn("Failed to fetch user metrics", { error });
     return {
-      totalUsers: 1247,
-      activeUsers: 892,
-      trialUsers: 523,
-      paidUsers: 245,
-      churnRate: 3.2,
-      trialConversionRate: 46.8,
+      totalUsers: 0,
+      activeUsers: 0,
+      trialUsers: 0,
+      paidUsers: 0,
+      churnRate: null,
+      trialConversionRate: 0,
       isEstimated: true,
     };
   }
@@ -172,12 +187,12 @@ async function getTopCountries(): Promise<CountryMetric[]> {
         country: info.country,
         countryCode: info.countryCode,
         users: s._count,
-        revenue: s._count * 9.99,
+        revenue: null, // Requires Stripe integration for per-user revenue tracking
       };
     });
   } catch (error) {
-    logger.warn("Using mock country metrics", { error });
-    return getMockCountries();
+    logger.warn("Failed to fetch country metrics", { error });
+    return [];
   }
 }
 
@@ -194,10 +209,10 @@ async function getTopMaestri(): Promise<MaestroMetric[]> {
       name: s.maestroId || "Unknown",
       subject: "Various",
       sessions: s._count,
-      avgDuration: 15.5,
+      avgDuration: null, // Session duration not currently tracked
     }));
   } catch (error) {
-    logger.warn("Using mock maestri metrics", { error });
-    return getMockMaestri();
+    logger.warn("Failed to fetch maestri metrics", { error });
+    return [];
   }
 }

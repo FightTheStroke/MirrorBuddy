@@ -17,10 +17,16 @@ import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
 
 export const dynamic = "force-dynamic";
 
+interface StructuredError {
+  error: string;
+  message: string;
+}
+
 export default function KeyVaultPage() {
   const [secrets, setSecrets] = useState<MaskedSecretVaultEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [errorType, setErrorType] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingSecret, setEditingSecret] =
     useState<MaskedSecretVaultEntry | null>(null);
@@ -31,14 +37,25 @@ export default function KeyVaultPage() {
     try {
       setLoading(true);
       setError(null);
+      setErrorType(null);
       const response = await fetch("/api/admin/key-vault");
+
       if (!response.ok) {
-        throw new Error("Failed to fetch secrets");
+        const data = (await response.json()) as StructuredError;
+        if (data.error && data.message) {
+          setError(data.message);
+          setErrorType(data.error);
+        } else {
+          throw new Error("Failed to fetch secrets");
+        }
+        return;
       }
+
       const data = await response.json();
       setSecrets(data.secrets);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to fetch secrets");
+      setErrorType("unknown");
     } finally {
       setLoading(false);
     }
@@ -92,7 +109,43 @@ export default function KeyVaultPage() {
             </div>
           )}
 
-          {error && (
+          {error && errorType === "encryption_not_configured" && (
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 rounded-lg bg-blue-50 p-4 text-blue-900 border border-blue-200">
+                <AlertCircle className="h-5 w-5" />
+                <div>
+                  <p className="font-semibold">Encryption Not Configured</p>
+                  <p className="text-sm mt-1">{error}</p>
+                </div>
+              </div>
+              <div className="text-sm text-muted-foreground space-y-2">
+                <p className="font-medium">Setup instructions:</p>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Generate a secure 32-character encryption key</li>
+                  <li>
+                    Add{" "}
+                    <code className="bg-muted px-1 rounded">
+                      TOKEN_ENCRYPTION_KEY
+                    </code>{" "}
+                    to Vercel environment variables
+                  </li>
+                  <li>Redeploy the application</li>
+                </ol>
+              </div>
+            </div>
+          )}
+
+          {error && errorType === "internal_error" && (
+            <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-4 text-destructive border border-destructive/20">
+              <AlertCircle className="h-5 w-5" />
+              <div>
+                <p className="font-semibold">Database Connection Error</p>
+                <p className="text-sm mt-1">{error}</p>
+              </div>
+            </div>
+          )}
+
+          {error && errorType === "unknown" && (
             <div className="flex items-center gap-2 rounded-lg bg-destructive/10 p-4 text-destructive">
               <AlertCircle className="h-5 w-5" />
               <p>{error}</p>

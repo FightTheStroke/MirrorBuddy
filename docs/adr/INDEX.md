@@ -89,6 +89,7 @@
 | 0065 | Service Limits Monitoring and Observability         | External service quota monitoring |
 | 0070 | Sentry Error Tracking Integration                   | Error tracking and alerting       |
 | 0076 | Centralized Logging with Sentry Integration         | Structured logging                |
+| 0121 | Admin Console Data Integrity                        | No mock data, honest health       |
 
 ## Testing & CI
 
@@ -175,6 +176,6 @@
 
 ---
 
-**Total Active ADRs**: 95
+**Total Active ADRs**: 96
 **Archived ADRs**: 7
 **Last Updated**: 2026-02-05

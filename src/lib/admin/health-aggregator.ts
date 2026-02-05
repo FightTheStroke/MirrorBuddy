@@ -28,26 +28,35 @@ let cache: CachedHealth | null = null;
 
 /**
  * Determine overall status from individual service statuses
+ * Only considers configured services in the calculation
  */
 function getOverallStatus(services: ServiceHealth[]): ServiceStatus {
-  const statuses = services.map((s) => s.status);
+  // Filter to only configured services
+  const configuredServices = services.filter((s) => s.configured);
 
-  // If any service is down, overall is down
+  // If no services are configured, status is unknown
+  if (configuredServices.length === 0) {
+    return "unknown";
+  }
+
+  const statuses = configuredServices.map((s) => s.status);
+
+  // If any configured service is down, overall is down
   if (statuses.includes("down")) {
     return "down";
   }
 
-  // If any service is degraded, overall is degraded
+  // If any configured service is degraded, overall is degraded
   if (statuses.includes("degraded")) {
     return "degraded";
   }
 
-  // If any service is unknown, overall is degraded (not fully healthy)
+  // If any configured service is unknown, overall is degraded (not fully healthy)
   if (statuses.includes("unknown")) {
     return "degraded";
   }
 
-  // All services healthy
+  // All configured services healthy
   return "healthy";
 }
 
@@ -90,15 +99,22 @@ export async function aggregateHealth(): Promise<HealthAggregatorResponse> {
     return {
       name: serviceNames[index] || "Unknown",
       status: "down" as const,
+      configured: false,
       lastChecked: new Date(),
       details: "Health check failed",
     };
   });
 
+  // Calculate configured and unconfigured counts
+  const configuredCount = services.filter((s) => s.configured).length;
+  const unconfiguredCount = services.filter((s) => !s.configured).length;
+
   const response: HealthAggregatorResponse = {
     services,
     overallStatus: getOverallStatus(services),
     checkedAt: new Date(),
+    configuredCount,
+    unconfiguredCount,
   };
 
   // Update cache

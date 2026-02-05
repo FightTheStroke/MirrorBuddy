@@ -8,22 +8,10 @@ import { logger } from "@/lib/logger";
 import type { SupabaseMetrics } from "./infra-panel-types";
 
 /**
- * Get mock Supabase metrics for demo
- */
-function getMockSupabaseMetrics(): SupabaseMetrics {
-  return {
-    databaseSize: 52_428_800, // 50 MB
-    connections: 12,
-    storageUsed: 104_857_600, // 100 MB
-    rowCount: 5420,
-    status: "healthy",
-  };
-}
-
-/**
  * Get Supabase metrics from database
+ * Returns null if database queries fail
  */
-export async function getSupabaseMetrics(): Promise<SupabaseMetrics> {
+export async function getSupabaseMetrics(): Promise<SupabaseMetrics | null> {
   try {
     // Get database size
     const sizeResult = await prisma.$queryRaw<{ size: bigint }[]>`
@@ -53,6 +41,6 @@ export async function getSupabaseMetrics(): Promise<SupabaseMetrics> {
     };
   } catch (error) {
     logger.error("Error fetching Supabase metrics", { error: String(error) });
-    return getMockSupabaseMetrics();
+    return null;
   }
 }

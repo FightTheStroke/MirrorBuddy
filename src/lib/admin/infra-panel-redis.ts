@@ -14,20 +14,6 @@ function isRedisConfigured(): boolean {
 }
 
 /**
- * Get mock Redis metrics for demo
- */
-function getMockRedisMetrics(): RedisMetrics {
-  return {
-    memoryUsed: 10_485_760, // 10 MB
-    memoryMax: 104_857_600, // 100 MB
-    keysCount: 1234,
-    hitRate: 94.5,
-    commands: 45678,
-    status: "healthy",
-  };
-}
-
-/**
  * Parse Redis INFO response
  */
 function parseRedisInfo(info: string): Partial<RedisMetrics> {
@@ -63,12 +49,15 @@ function parseRedisInfo(info: string): Partial<RedisMetrics> {
 
 /**
  * Get Redis metrics from REST API
+ * Returns null if not configured or if API call fails
  */
-export async function getRedisMetrics(): Promise<RedisMetrics> {
+export async function getRedisMetrics(): Promise<RedisMetrics | null> {
   try {
     if (!isRedisConfigured()) {
-      logger.warn("Redis not configured, returning mock data");
-      return getMockRedisMetrics();
+      logger.info(
+        "Redis not configured (missing KV_REST_API_URL or KV_REST_API_TOKEN)",
+      );
+      return null;
     }
 
     const url = process.env.KV_REST_API_URL!;
@@ -83,7 +72,8 @@ export async function getRedisMetrics(): Promise<RedisMetrics> {
     });
 
     if (!response.ok) {
-      throw new Error("Failed to fetch Redis INFO");
+      logger.error("Failed to fetch Redis INFO", { status: response.status });
+      return null;
     }
 
     const data = await response.json();
@@ -110,6 +100,6 @@ export async function getRedisMetrics(): Promise<RedisMetrics> {
     };
   } catch (error) {
     logger.error("Error fetching Redis metrics", { error: String(error) });
-    return getMockRedisMetrics();
+    return null;
   }
 }
