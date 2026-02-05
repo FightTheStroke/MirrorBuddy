@@ -21,6 +21,7 @@ import {
   Sliders,
   Palette,
   FunnelIcon as Funnel,
+  BookOpen,
 } from "lucide-react";
 
 export interface NavItem {
@@ -82,6 +83,12 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           label: "Characters",
           href: "/admin/characters",
           icon: Palette,
+        },
+        {
+          id: "knowledge",
+          label: "Knowledge",
+          href: "/admin/knowledge",
+          icon: BookOpen,
         },
         {
           id: "locales",

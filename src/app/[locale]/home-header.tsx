@@ -16,6 +16,7 @@ import {
 import { cn } from "@/lib/utils";
 import { NotificationBell } from "@/components/notifications/notification-bell";
 import { ToolsDropdown } from "@/components/tools";
+import { UserMenuDropdown } from "@/components/ui/user-menu-dropdown";
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -76,16 +77,6 @@ export function HomeHeader({
         >
           <Menu className="h-5 w-5" />
         </button>
-        {userName && (
-          <div className="hidden sm:flex items-baseline gap-1 mr-2">
-            <span className="text-sm text-slate-600 dark:text-slate-400">
-              {t("header.greeting")}
-            </span>
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">
-              {userName}
-            </span>
-          </div>
-        )}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
           <Coins className="w-4 h-4 text-white" />
         </div>
@@ -192,13 +183,11 @@ export function HomeHeader({
         )}
       </div>
 
-      {/* Right section: tools dropdown + notifications + version */}
+      {/* Right section: tools dropdown + notifications + user menu */}
       <div className="hidden lg:flex items-center gap-3">
         <ToolsDropdown />
         <NotificationBell />
-        <span className="text-xs text-slate-400 dark:text-slate-500 font-mono">
-          v{process.env.APP_VERSION}
-        </span>
+        <UserMenuDropdown userName={userName} />
       </div>
     </header>
   );

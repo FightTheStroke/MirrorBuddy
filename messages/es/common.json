@@ -157,6 +157,14 @@
         "skipToContent": "Ir al contenido"
       }
     },
-    "tools": "Herramientas"
+    "tools": "Herramientas",
+    "userMenu": {
+      "greeting": "Hola",
+      "profile": "Perfil",
+      "changePassword": "Cambiar Contraseña",
+      "settings": "Ajustes",
+      "logout": "Cerrar sesión",
+      "logoutConfirm": "¿Estás seguro de que quieres cerrar sesión?"
+    }
   }
 }

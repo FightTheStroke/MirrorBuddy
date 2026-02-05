@@ -71,6 +71,9 @@ export function useMaestroSessionLogic({
     onQuestionAsked,
   });
 
+  // Track if we've auto-triggered the requested tool
+  const hasAutoTriggeredRef = useRef(false);
+
   // Initialize session with contextual greeting based on requested tool
   useEffect(() => {
     const initialMessages: ChatMessage[] = [];
@@ -135,6 +138,44 @@ export function useMaestroSessionLogic({
       if (timeoutRef) clearTimeout(timeoutRef);
     };
   }, [maestro.id, requestedToolType]);
+
+  // Auto-trigger tool request when requestedToolType is present (from URL param)
+  useEffect(() => {
+    // Only auto-trigger once, and only if we have a requestedToolType
+    if (!requestedToolType || hasAutoTriggeredRef.current) return;
+
+    // Mark as triggered to prevent duplicate calls
+    hasAutoTriggeredRef.current = true;
+
+    // Use requestTool to set the input with the appropriate prompt
+    const toolsWithAutoTrigger: ToolType[] = [
+      "mindmap",
+      "quiz",
+      "flashcard",
+      "demo",
+      "search",
+      "summary",
+      "diagram",
+      "timeline",
+    ];
+
+    if (toolsWithAutoTrigger.includes(requestedToolType)) {
+      // Delay to ensure chatHandlers are ready
+      setTimeout(() => {
+        chatHandlers.requestTool(
+          requestedToolType as
+            | "mindmap"
+            | "quiz"
+            | "flashcards"
+            | "demo"
+            | "search"
+            | "summary"
+            | "diagram"
+            | "timeline",
+        );
+      }, 100);
+    }
+  }, [requestedToolType, chatHandlers]);
 
   // Tools are now displayed inline in the chat instead of opening in fullscreen
   // Removed auto-switch to focus mode - tools remain integrated in the chat interface

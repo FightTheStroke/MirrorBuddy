@@ -4,6 +4,7 @@ import { useReducer, useCallback } from "react";
 import { Pencil, PencilRuler, FolderUp, Globe } from "lucide-react";
 import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
+import { useRouter, useParams } from "next/navigation";
 import { nanoid } from "nanoid";
 import { toast } from "@/components/ui/toast";
 import { logger } from "@/lib/logger";
@@ -118,9 +119,14 @@ interface AstuccioViewProps {
   onToolRequest?: (toolType: ToolType, maestro: Maestro) => void;
 }
 
-export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
+export function AstuccioView({
+  onToolRequest: _onToolRequest,
+}: AstuccioViewProps) {
   const t = useTranslations("tools.astuccio");
   const tTools = useTranslations("tools");
+  const router = useRouter();
+  const params = useParams();
+  const locale = params.locale as string;
   const [state, dispatch] = useReducer(astuccioReducer, initialState);
 
   const getToolI18nKey = useCallback((toolType: ToolType) => {
@@ -142,12 +148,14 @@ export function AstuccioView({ onToolRequest }: AstuccioViewProps) {
 
   const handleMaestroConfirm = useCallback(
     (maestro: Maestro, _mode: "voice" | "chat") => {
-      if (state.selectedToolType && onToolRequest) {
-        onToolRequest(state.selectedToolType, maestro);
+      if (state.selectedToolType) {
+        router.push(
+          `/${locale}/maestri/${maestro.id}?tool=${state.selectedToolType}`,
+        );
       }
       dispatch({ type: "CONFIRM_MAESTRO" });
     },
-    [state.selectedToolType, onToolRequest],
+    [state.selectedToolType, router, locale],
   );
 
   const handleDialogClose = useCallback(() => {

@@ -139,6 +139,7 @@
       "loading": "Loading...",
       "titleWelcome": "Welcome to MirrorBuddy",
       "subtitleWelcome": "Before you start, accept our terms",
+      "bannerDescription": "We use essential cookies for functionality and optional analytics.",
       "titleUpdated": "Updated Terms",
       "subtitleUpdated": "Our terms have been updated",
       "reconsentNotice": {
@@ -181,7 +182,8 @@
       "screenReader": {
         "required": "You must accept the Terms of Service to continue",
         "submitting": "Consent saving in progress..."
-      }
+      },
+      "bannerDescription": "[TRANSLATE] Utilizziamo cookie essenziali per il funzionamento e analytics opzionali."
     }
   }
 }

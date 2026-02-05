@@ -234,12 +234,12 @@ export default function Home() {
 
       <div
         className={cn(
-          "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-20 pb-6",
+          "flex gap-6 transition-all duration-300 px-4 sm:px-6 lg:px-8 pt-14 pb-6",
           sidebarOpen ? "lg:ml-64" : "lg:ml-20",
         )}
         ref={mainContentRef}
       >
-        <main className="min-h-screen flex-1">
+        <main className="flex-1">
           {/* Trial mode banner */}
           {trialStatus.isTrialMode && !trialStatus.isLoading && (
             <TrialHomeBanner

@@ -32,6 +32,7 @@ import {
   type HeaderActions,
 } from "@/components/character";
 import { ConversationSidebar } from "@/components/conversation/conversation-drawer";
+import { SharedChatLayout } from "@/components/chat/shared-chat-layout";
 
 interface MaestroSessionProps {
   maestro: Maestro;
@@ -181,46 +182,31 @@ export function MaestroSession({
         </div>
       )}
 
-      {/* Normal chat view */}
-      <div
-        className={cn(
-          "flex flex-col lg:flex-row gap-4 h-full lg:h-[calc(100vh-8rem)]",
-          isToolFullscreen && "opacity-0 pointer-events-none",
-        )}
-      >
-        {/* Main Chat Area */}
-        <div className="flex-1 flex flex-col min-w-0 min-h-0 w-full sm:w-auto">
-          {/* Header always visible */}
+      {/* Normal chat view using SharedChatLayout */}
+      <SharedChatLayout
+        className={cn(isToolFullscreen && "opacity-0 pointer-events-none")}
+        header={
           <CharacterHeader
             character={unifiedCharacter}
             voiceState={voiceState}
             ttsEnabled={ttsEnabled}
             actions={headerActions}
           />
-
-          <MaestroSessionWebcam
-            showWebcam={showWebcam}
-            webcamRequest={webcamRequest}
-            onCapture={handleWebcamCapture}
-            onClose={() => {
-              setShowWebcam(false);
-              setWebcamRequest(null);
-            }}
-          />
-
-          <MaestroSessionMessages
-            messages={messages}
-            toolCalls={toolCalls}
-            maestro={maestro}
-            isLoading={isLoading}
-            ttsEnabled={ttsEnabled}
-            speak={speak}
-            voiceSessionId={voiceSessionId}
-            messagesEndRef={messagesEndRef}
-            fullscreenToolId={fullscreenToolId}
-            onToggleToolFullscreen={handleToggleToolFullscreen}
-          />
-
+        }
+        toolPanel={
+          showWebcam ? (
+            <MaestroSessionWebcam
+              showWebcam={showWebcam}
+              webcamRequest={webcamRequest}
+              onCapture={handleWebcamCapture}
+              onClose={() => {
+                setShowWebcam(false);
+                setWebcamRequest(null);
+              }}
+            />
+          ) : undefined
+        }
+        footer={
           <MaestroSessionInput
             maestro={maestro}
             input={input}
@@ -236,36 +222,51 @@ export function MaestroSession({
             onRequestPhoto={handleRequestPhoto}
             onEndSession={handleEndSession}
           />
-        </div>
-
-        {/* Right Panel: Voice OR History (mutually exclusive, same position) */}
-        <AnimatePresence>
-          {isVoiceActive ? (
-            <CharacterVoicePanel
-              character={unifiedCharacter}
-              voiceState={voiceState}
-              ttsEnabled={ttsEnabled}
-              actions={headerActions}
-            />
-          ) : isHistoryOpen ? (
-            <ConversationSidebar
-              open={isHistoryOpen}
-              onOpenChange={setIsHistoryOpen}
-              characterId={maestro.id}
-              characterType="maestro"
-              characterColor={maestro.color}
-              onSelectConversation={(conversationId) => {
-                loadConversation(conversationId);
-                setIsHistoryOpen(false);
-              }}
-              onNewConversation={() => {
-                clearChat();
-                setIsHistoryOpen(false);
-              }}
-            />
-          ) : null}
-        </AnimatePresence>
-      </div>
+        }
+        rightPanel={
+          <AnimatePresence>
+            {isVoiceActive ? (
+              <CharacterVoicePanel
+                character={unifiedCharacter}
+                voiceState={voiceState}
+                ttsEnabled={ttsEnabled}
+                actions={headerActions}
+              />
+            ) : isHistoryOpen ? (
+              <ConversationSidebar
+                open={isHistoryOpen}
+                onOpenChange={setIsHistoryOpen}
+                characterId={maestro.id}
+                characterType="maestro"
+                characterColor={maestro.color}
+                onSelectConversation={(conversationId) => {
+                  loadConversation(conversationId);
+                  setIsHistoryOpen(false);
+                }}
+                onNewConversation={() => {
+                  clearChat();
+                  setIsHistoryOpen(false);
+                }}
+              />
+            ) : null}
+          </AnimatePresence>
+        }
+        showRightPanel={isVoiceActive || isHistoryOpen}
+      >
+        {/* Messages area - scrollable */}
+        <MaestroSessionMessages
+          messages={messages}
+          toolCalls={toolCalls}
+          maestro={maestro}
+          isLoading={isLoading}
+          ttsEnabled={ttsEnabled}
+          speak={speak}
+          voiceSessionId={voiceSessionId}
+          messagesEndRef={messagesEndRef}
+          fullscreenToolId={fullscreenToolId}
+          onToggleToolFullscreen={handleToggleToolFullscreen}
+        />
+      </SharedChatLayout>
     </ErrorBoundary>
   );
 }

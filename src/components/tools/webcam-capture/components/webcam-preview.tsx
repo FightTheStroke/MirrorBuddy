@@ -62,7 +62,7 @@ export function WebcamPreview({
   };
 
   return (
-    <div className="relative aspect-video bg-black">
+    <div className="relative w-full h-full bg-black">
       {/* Screen reader status announcements */}
       <div
         role="status"

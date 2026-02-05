@@ -14,6 +14,12 @@
 | 0028 | PostgreSQL with pgvector Migration                  | Vector search for RAG, production-grade DB       |
 | 0045 | Domain Boundaries and Module Organization           | Clear separation of concerns                     |
 
+## UI & Layout
+
+| #    | Decision                  | Impact                                                  |
+| ---- | ------------------------- | ------------------------------------------------------- |
+| 0120 | UI Layout Standardization | Slot-based chat layout, h-dvh viewport, mobile-first UX |
+
 ## Internationalization (9 ADRs)
 
 | #    | Decision                                  | Impact                                    |

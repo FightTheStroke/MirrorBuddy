@@ -34,6 +34,55 @@ const defaultProps = {
 };
 
 describe("WebcamControls - Button Sizes", () => {
+  describe("Basic rendering", () => {
+    it("capture button renders and is visible", () => {
+      // Arrange & Act
+      render(<WebcamControls {...defaultProps} />);
+      const takePhotoText = getTranslation("tools.webcam.takePhoto");
+      const captureButton = screen.getByRole("button", { name: takePhotoText });
+
+      // Assert
+      expect(captureButton).toBeInTheDocument();
+      expect(captureButton).toBeVisible();
+    });
+  });
+
+  describe("Button states", () => {
+    it("capture button is disabled when loading", () => {
+      // Arrange & Act
+      render(<WebcamControls {...defaultProps} isLoading={true} />);
+      const inProgressText = getTranslation("tools.webcam.inProgress");
+      const captureButton = screen.getByRole("button", {
+        name: inProgressText,
+      });
+
+      // Assert
+      expect(captureButton).toBeDisabled();
+    });
+
+    it("capture button is disabled when there's an error", () => {
+      // Arrange & Act
+      render(<WebcamControls {...defaultProps} error="Camera error" />);
+      const takePhotoText = getTranslation("tools.webcam.takePhoto");
+      const captureButton = screen.getByRole("button", { name: takePhotoText });
+
+      // Assert
+      expect(captureButton).toBeDisabled();
+    });
+
+    it("capture button is disabled when countdown is active", () => {
+      // Arrange & Act
+      render(<WebcamControls {...defaultProps} countdown={3} />);
+      const inProgressText = getTranslation("tools.webcam.inProgress");
+      const captureButton = screen.getByRole("button", {
+        name: inProgressText,
+      });
+
+      // Assert
+      expect(captureButton).toBeDisabled();
+    });
+  });
+
   describe("F-01: Large capture button (minimum 60px)", () => {
     it("capture button has h-16 class (64px)", () => {
       render(<WebcamControls {...defaultProps} />);

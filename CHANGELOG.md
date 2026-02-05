@@ -7,6 +7,41 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **UserMenuDropdown**: New dropdown component with profile, change password, settings, and logout actions
+- **i18n**: User menu translations in all 5 locales (it/en/fr/de/es)
+- **SharedChatLayout**: ChatGPT-style fixed layout component with slot-based architecture (header/footer/children/rightPanel)
+- **MobileVoiceOverlay**: Bottom-sheet component for mobile voice panel integration
+- **Layout slots**: h-dvh with h-screen fallback for full viewport height
+- **URL query params**: Tool activation via `?tool=` parameter for direct navigation
+- **Unit tests**: Added comprehensive test coverage for SharedChatLayout, UserMenuDropdown, and WebcamCaptureControls components
+
+### Changed
+
+- **Header layout**: Moved "Ciao [nome]" greeting to right side of header with UserMenuDropdown
+- **Sidebar icon**: Replaced chevron toggle with hamburger menu icon for better mobile UX
+- **Sidebar footer**: Added version number display at bottom of sidebar
+- **MaestroSession**: Refactored to use SharedChatLayout for consistent chat experience
+- **CharacterChatView**: Refactored to use SharedChatLayout for unified interface
+- **Home page layout**: Adjusted padding (pt-14) and removed min-h-screen constraint
+- **Webcam controls**: Switched from aspect-video to w-full h-full to keep capture button visible within viewport
+- **ToolMaestroSelectionDialog**: Simplified flow by showing professor cards directly (removed subject selection step)
+- **Astuccio navigation**: Direct maestro page navigation with tool activation via URL params
+- **Login redirect**: Changed from router.push to router.replace to prevent back-button loop
+- **UnifiedConsentWall**: Redesigned as slim bottom banner with one-click acceptance (GDPR compliant, user-friendly)
+- **Login page**: Restyled with LogoBrain, Card component, and gradient background for modern aesthetic
+- **PUBLIC_PATHS**: Updated to include /login, /change-password, /invite for proper auth bypass
+
+### Fixed
+
+- **Login redirect loop**: router.replace prevents users from returning to login after successful authentication
+- **Auth bypass**: PUBLIC_PATHS properly configured for public authentication pages
+- **Admin dashboard**: Verified all data sources are from real database queries (no placeholder/fake data)
+- **Admin navigation**: Resolved linking issues in admin panel
+- **Session persistence**: Verified database-first storage strategy (Zustand + REST) for cross-device sync
+- **Accessibility**: Ensured WCAG 2.1 AA compliance across all new and modified components
+
 ## [0.12.0] - 2026-02-04
 
 ### Safety (ADR 0115 - Amodei 2026)
