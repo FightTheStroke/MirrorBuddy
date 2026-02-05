@@ -143,6 +143,8 @@
 | 0068 | Conversion Funnel Dashboard                            | Trial-to-paid analytics          |
 | 0092 | Hreflang SEO Tags for Multi-Locale Pages               | SEO for 5 languages              |
 | 0095 | Localized Open Graph Metadata for Social Media Sharing | Language-specific OG tags        |
+| 0118 | Webcam Fullscreen Architecture                         | Fullscreen overlay, dual-flow    |
+| 0122 | Realtime Video Vision (Pro-Only)                       | Periodic frames to Realtime API  |
 
 ## Tier & Business
 
@@ -152,6 +154,12 @@
 | 0057 | Beta Invite System and Data Migration | Invite-based beta access                            |
 | 0071 | Tier Subscription System              | Trial/Base/Pro tiers                                |
 | 0115 | Stripe Payment Integration            | Checkout, webhooks, dunning, VAT, revenue dashboard |
+
+## Consortium & Grants
+
+| #    | Decision                                 | Impact                                                        |
+| ---- | ---------------------------------------- | ------------------------------------------------------------- |
+| 0123 | Consortium & Grant Application Readiness | Gap analysis: DPO, insurance, ethics, IP register, governance |
 
 ## Archived
 
@@ -167,6 +175,6 @@
 
 ---
 
-**Total Active ADRs**: 92
+**Total Active ADRs**: 95
 **Archived ADRs**: 7
-**Last Updated**: 2026-01-31
+**Last Updated**: 2026-02-05
