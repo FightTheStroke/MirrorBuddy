@@ -59,6 +59,7 @@ prisma/dev.db-journal
 *.log
 /logs/
 .claude/settings.local.json
+.claude/plans/
 
 # E2E test auth state
 e2e/.auth/
