@@ -61,6 +61,52 @@ vi.mock("next/image", () => ({
   ),
 }));
 
+// Mock Next.js navigation hooks
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+    forward: vi.fn(),
+    refresh: vi.fn(),
+    prefetch: vi.fn(),
+  }),
+  useParams: () => ({
+    locale: "it",
+  }),
+  useSearchParams: () => ({
+    get: vi.fn(),
+  }),
+  usePathname: () => "/astuccio",
+}));
+
+// Mock i18n navigation
+vi.mock("@/i18n/navigation", () => ({
+  useRouter: () => ({
+    push: vi.fn(),
+    replace: vi.fn(),
+    back: vi.fn(),
+  }),
+  Link: ({ children, href, ...props }: any) => (
+    <a href={href} {...props}>
+      {children}
+    </a>
+  ),
+}));
+
+// Mock next-intl
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => {
+    const translations: Record<string, string> = {
+      title: "Il tuo Astuccio",
+      "webcamStandalone.label": "Scatta Foto",
+      "webcamStandalone.description": "Capture photo",
+      purpose: "archive",
+    };
+    return translations[key] || key;
+  },
+}));
+
 // Mock dialog component
 vi.mock("@/components/education/tool-maestro-selection-dialog", () => ({
   ToolMaestroSelectionDialog: () => <div data-testid="maestro-dialog" />,

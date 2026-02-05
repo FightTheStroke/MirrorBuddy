@@ -51,9 +51,9 @@ describe("WebcamControls - Button Sizes", () => {
     it("capture button is disabled when loading", () => {
       // Arrange & Act
       render(<WebcamControls {...defaultProps} isLoading={true} />);
-      const inProgressText = getTranslation("tools.webcam.inProgress");
+      const takePhotoText = getTranslation("tools.webcam.takePhoto");
       const captureButton = screen.getByRole("button", {
-        name: inProgressText,
+        name: takePhotoText,
       });
 
       // Assert
