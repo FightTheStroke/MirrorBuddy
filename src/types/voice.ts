@@ -2,18 +2,22 @@
 // VOICE SESSION TYPES
 // ============================================================================
 
-import type { Maestro } from './content';
+import type { Maestro } from "./content";
 
 export type VoiceSessionState =
-  | 'idle'
-  | 'connecting'
-  | 'connected'
-  | 'listening'
-  | 'processing'
-  | 'speaking'
-  | 'error';
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "listening"
+  | "processing"
+  | "speaking"
+  | "error";
 
-export type VoiceConnectionState = 'idle' | 'connecting' | 'connected' | 'error';
+export type VoiceConnectionState =
+  | "idle"
+  | "connecting"
+  | "connected"
+  | "error";
 
 /**
  * Handle returned by useVoiceSession hook.
@@ -25,21 +29,32 @@ export interface VoiceSessionHandle {
   isSpeaking: boolean;
   isMuted: boolean;
   connectionState: VoiceConnectionState;
-  connect: (maestro: Maestro, connectionInfo: { provider: 'azure'; proxyPort?: number }) => Promise<void>;
+  connect: (
+    maestro: Maestro,
+    connectionInfo: { provider: "azure"; proxyPort?: number },
+  ) => Promise<void>;
   disconnect: () => void;
   toggleMute: () => void;
+  /** Whether video vision capture is active (ADR 0122) */
+  videoEnabled: boolean;
+  /** Toggle video vision capture on/off */
+  toggleVideo: () => Promise<void>;
+  /** Active camera stream for video preview (null when inactive) */
+  videoStream: MediaStream | null;
+  /** Number of video frames sent during current session */
+  videoFramesSent: number;
 }
 
 export type EmotionType =
-  | 'neutral'
-  | 'joy'
-  | 'excitement'
-  | 'curiosity'
-  | 'confusion'
-  | 'frustration'
-  | 'anxiety'
-  | 'boredom'
-  | 'distraction';
+  | "neutral"
+  | "joy"
+  | "excitement"
+  | "curiosity"
+  | "confusion"
+  | "frustration"
+  | "anxiety"
+  | "boredom"
+  | "distraction";
 
 export interface Emotion {
   type: EmotionType;
@@ -49,7 +64,7 @@ export interface Emotion {
 
 export interface TranscriptEntry {
   id: string;
-  role: 'user' | 'assistant';
+  role: "user" | "assistant";
   content: string;
   timestamp: Date;
   emotion?: Emotion;
@@ -69,7 +84,7 @@ export interface EphemeralTokenResponse {
   /** Token expiration timestamp (Unix seconds) */
   expiresAt: number;
   /** Provider (always 'azure' for now) */
-  provider: 'azure';
+  provider: "azure";
 }
 
 /**

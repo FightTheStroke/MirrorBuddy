@@ -124,6 +124,38 @@ export function useCancelResponse(
 }
 
 /**
+ * Send video frame to Azure Realtime API via data channel (ADR 0122).
+ * Sends as conversation.item.create with input_image — no response.create
+ * triggered, the frame serves as visual context for subsequent interactions.
+ */
+export function useSendVideoFrame(
+  webrtcDataChannelRef: React.MutableRefObject<RTCDataChannel | null>,
+) {
+  return useCallback(
+    (base64ImageData: string) => {
+      const sent = sendViaWebRTC(webrtcDataChannelRef, {
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [
+            {
+              type: "input_image",
+              image_url: `data:image/jpeg;base64,${base64ImageData}`,
+            },
+          ],
+        },
+      });
+      if (!sent) {
+        logger.warn("[VoiceSession] Video frame send failed - DC not ready");
+      }
+      return sent;
+    },
+    [webrtcDataChannelRef],
+  );
+}
+
+/**
  * Send webcam capture result back to Azure
  */
 export function useSendWebcamResult(

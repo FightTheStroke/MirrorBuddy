@@ -49,6 +49,10 @@ export interface VoiceSessionRefs {
     role: "user" | "assistant";
     content: string;
   }> | null>;
+  /** Active video vision usage record ID (ADR 0122) */
+  videoUsageIdRef: React.MutableRefObject<string | null>;
+  /** Max seconds allowed for current video session */
+  videoMaxSecondsRef: React.MutableRefObject<number>;
 }
 
 export function useVoiceSessionRefs(): VoiceSessionRefs {
@@ -94,6 +98,8 @@ export function useVoiceSessionRefs(): VoiceSessionRefs {
       role: "user" | "assistant";
       content: string;
     }> | null>(null),
+    videoUsageIdRef: useRef<string | null>(null),
+    videoMaxSecondsRef: useRef<number>(60),
   };
 }
 

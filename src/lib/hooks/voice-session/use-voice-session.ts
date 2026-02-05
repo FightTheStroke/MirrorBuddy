@@ -24,6 +24,7 @@ import {
   useCancelResponse,
   useSendWebcamResult,
 } from "./actions";
+import { useVideoVision } from "./use-video-vision";
 import {
   useVoiceSessionRefs,
   useConnectionState,
@@ -239,6 +240,14 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     webrtcAudioElementRef: refs.webrtcAudioElementRef,
   };
 
+  // Video vision (ADR 0122) - extracted to use-video-vision.ts
+  const videoVision = useVideoVision({
+    webrtcDataChannelRef: refs.webrtcDataChannelRef,
+    sessionIdRef: refs.sessionIdRef,
+    videoUsageIdRef: refs.videoUsageIdRef,
+    videoMaxSecondsRef: refs.videoMaxSecondsRef,
+  });
+
   return {
     isConnected: store.isConnected,
     isListening: store.isListening,
@@ -267,5 +276,6 @@ export function useVoiceSession(options: UseVoiceSessionOptions = {}) {
     clearTranscript: store.clearTranscript,
     clearToolCalls: store.clearToolCalls,
     sendWebcamResult: useSendWebcamResult(refs.webrtcDataChannelRef),
+    ...videoVision,
   };
 }

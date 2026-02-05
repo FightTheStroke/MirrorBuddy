@@ -65,6 +65,10 @@ function WelcomeContent() {
     connect: voiceSession.connect,
     disconnect: voiceSession.disconnect,
     toggleMute: voiceSession.toggleMute,
+    videoEnabled: false,
+    toggleVideo: async () => {},
+    videoStream: null,
+    videoFramesSent: 0,
   };
 
   useEffect(() => {
