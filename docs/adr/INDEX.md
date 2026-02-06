@@ -105,6 +105,10 @@
 | 0102 | Incremental E2E Execution and Release Flow         | Fast/full release gates          |
 | 0103 | E2E Test Stability Requirements and CI Enforcement | Mobile timeout fixes             |
 | 0124 | k6 Load Testing Framework                          | Scalability testing with k6      |
+| 0128 | Capacitor Mobile Architecture                      | Native iOS/Android via WebView   |
+| 0129 | Enterprise SSO Architecture                        | OIDC+PKCE for Google/Microsoft   |
+| 0130 | Multi-Provider AI Router                           | Azure/Claude/Ollama failover     |
+| 0131 | SOC 2 Type II Readiness Framework                  | Audit logging, policies, vendor  |
 
 ## Deployment & Infrastructure
 
@@ -184,6 +188,6 @@
 
 ---
 
-**Total Active ADRs**: 106
+**Total Active ADRs**: 110
 **Archived ADRs**: 7
 **Last Updated**: 2026-02-06

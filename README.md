@@ -132,6 +132,11 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 - **⏱️ Pomodoro Timer** — ADHD-friendly focus sessions
 - **📊 Progress Tracking** — Subject mastery, session history, analytics
 - **♿ Accessibility** — WCAG 2.1 AA, 7 specialized profiles for neurodiversity
+- **📱 Mobile App** — Native iOS/Android via Capacitor (same codebase)
+- **🔐 Enterprise SSO** — Google Workspace + Microsoft 365 OIDC with PKCE
+- **🤖 Multi-AI** — Azure OpenAI primary, Claude fallback, Ollama local dev
+- **🛡️ SOC 2 Ready** — Audit logging, access control, vendor risk assessment
+- **🏫 School Plans** — Registration, admin dashboard, SSO config, bulk invite
 
 **→ See detailed feature documentation in [docs/claude/](docs/claude/)**
 

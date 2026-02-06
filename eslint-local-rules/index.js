@@ -15,6 +15,8 @@ import requireCompleteLoggerMock from "./require-complete-logger-mock.js";
 import noPlaintextPiiStorage from "./no-plaintext-pii-storage.js";
 import requireEmailHashLookup from "./require-email-hash-lookup.js";
 import noDirectEmbedding from "./no-direct-embedding.js";
+import noDirectAiProvider from "./no-direct-ai-provider.js";
+import requireNativeBridge from "./require-native-bridge.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -277,6 +279,8 @@ const rules = {
   "no-plaintext-pii-storage": noPlaintextPiiStorage,
   "require-email-hash-lookup": requireEmailHashLookup,
   "no-direct-embedding": noDirectEmbedding,
+  "no-direct-ai-provider": noDirectAiProvider,
+  "require-native-bridge": requireNativeBridge,
 };
 
 const localRules = {
