@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W3: Multi-Provider AI (Claude Fallback)
+
+- Added: AIProviderInterface abstraction for multi-provider support
+- Added: AzureOpenAIProvider adapter wrapping existing azure.ts functions
+- Added: ClaudeProvider using @anthropic-ai/sdk with message/tool call mapping
+- Added: AI provider router with automatic failover (Azure -> Claude -> Ollama)
+- Added: Per-provider health tracking and /api/health/ai-providers endpoint
+- Added: AI provider metrics (success rate, latency, token usage, failover events)
+- Changed: AIProvider type extended to include 'claude' alongside 'azure' | 'ollama'
+
 ### W2: Enterprise SSO (Google Workspace + Microsoft 365)
 
 - Added: OIDC provider abstraction with PKCE (RFC 7636) support

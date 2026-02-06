@@ -16,3 +16,14 @@
 - Pattern: Shared sso-callback-handler.ts for user creation/linking across providers
 - Insight: Google edu scopes require separate verification via Google Cloud Console
 - Insight: Azure AD "common" endpoint supports both personal and organizational accounts
+
+## W3: Multi-Provider AI (Claude Fallback)
+
+- Decision: Class-based AIProviderInterface over extending existing function pattern for cleaner abstraction
+- Decision: AzureOpenAIProvider wraps existing azure.ts functions (no breaking changes)
+- Decision: Claude does NOT support voice/realtime — voice stays Azure-only
+- Pattern: Router with failover order (Azure -> Claude -> Ollama) and per-provider circuit breaker
+- Pattern: Message/tool call mapping from OpenAI format to Claude Messages API format
+- Pattern: Health status tracked in-memory with configurable check interval
+- Insight: Anthropic SDK @anthropic-ai/sdk ^0.73.0 was already a dependency in package.json
+- Insight: Claude tool_use blocks map cleanly to OpenAI function calling format

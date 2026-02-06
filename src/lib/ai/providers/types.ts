@@ -3,7 +3,7 @@
  * @brief Types and interfaces for AI providers
  */
 
-export type AIProvider = 'azure' | 'ollama';
+export type AIProvider = "azure" | "ollama" | "claude";
 
 export interface ProviderConfig {
   provider: AIProvider;
@@ -14,7 +14,7 @@ export interface ProviderConfig {
 
 export interface ToolCall {
   id: string;
-  type: 'function';
+  type: "function";
   function: {
     name: string;
     arguments: string; // JSON string
@@ -31,7 +31,7 @@ export interface ChatCompletionResult {
     total_tokens: number;
   };
   tool_calls?: ToolCall[];
-  finish_reason?: 'stop' | 'tool_calls' | 'length' | 'content_filter';
+  finish_reason?: "stop" | "tool_calls" | "length" | "content_filter";
   /** True if Azure content filter blocked the response */
   contentFiltered?: boolean;
   /** Which content filter categories were triggered */
@@ -42,11 +42,10 @@ export interface ChatCompletionResult {
  * OpenAI-compatible tool definition
  */
 export interface ToolDefinition {
-  type: 'function';
+  type: "function";
   function: {
     name: string;
     description: string;
     parameters: Record<string, unknown>;
   };
 }
-
