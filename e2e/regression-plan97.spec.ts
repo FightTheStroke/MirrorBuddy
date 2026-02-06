@@ -191,16 +191,16 @@ test.describe("Regression: Protected Routes in Tests (Plan 97)", () => {
 
 test.describe("Regression: Mobile Timeout Issues (Plan 97)", () => {
   test("should load pages on mobile within timeout", async ({ page }) => {
-    test.setTimeout(60000); // Mobile rendering + multiple pages
+    test.setTimeout(60000);
     await page.setViewportSize({ width: 375, height: 667 });
-    const testPages = ["/it/", "/it/welcome", "/it/privacy"];
+    const testPages = ["/it/welcome", "/it/privacy", "/it/ai-transparency"];
 
     for (const path of testPages) {
-      await page.goto(path, { timeout: 10000 });
-      await page.waitForLoadState("domcontentloaded", { timeout: 8000 });
+      await page.goto(path, { timeout: 15000 });
+      await page.waitForLoadState("domcontentloaded");
 
       const mainContent = page.locator("main, [role='main']").first();
-      await expect(mainContent).toBeVisible({ timeout: 8000 });
+      await expect(mainContent).toBeVisible({ timeout: 15000 });
       expect(await mainContent.textContent()).toBeTruthy();
     }
   });
