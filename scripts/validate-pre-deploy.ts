@@ -42,10 +42,17 @@ function validateSentryDSN(dsn: string | undefined): void {
   }
 
   // Validate basic Sentry DSN structure without complex regex
+  let hasSentry = false;
+  try {
+    const hostname = new URL(dsn).hostname;
+    hasSentry = hostname === "sentry.io" || hostname.endsWith(".sentry.io");
+  } catch {
+    // Invalid URL — hasSentry stays false
+  }
   const checks = {
     https: dsn.startsWith("https://"),
     hasAt: dsn.includes("@"),
-    hasSentry: dsn.includes("sentry.io"),
+    hasSentry,
     endsWithId: /\/\d+$/.test(dsn),
   };
   const isValid = Object.values(checks).every(Boolean);

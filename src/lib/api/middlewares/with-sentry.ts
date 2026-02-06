@@ -49,11 +49,10 @@ export function withSentry(routeName: string): Middleware {
         userId: ctx.userId,
       });
 
-      // Return 500 response
+      // Return 500 response (no internal details — error already in Sentry + logger)
       return new Response(
         JSON.stringify({
           error: "Internal server error",
-          message: errorMessage,
         }),
         {
           status: 500,

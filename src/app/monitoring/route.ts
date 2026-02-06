@@ -32,6 +32,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid project" }, { status: 403 });
     }
 
+    // Validate host to prevent SSRF — must match configured DSN host
+    const allowedDsn = process.env.NEXT_PUBLIC_SENTRY_DSN;
+    const allowedHost = allowedDsn ? new URL(allowedDsn).host : null;
+    if (!allowedHost || dsn.host !== allowedHost) {
+      return NextResponse.json({ error: "Invalid DSN" }, { status: 403 });
+    }
+
     // Forward to Sentry
     const sentryUrl = `https://${dsn.host}/api/${projectId}/envelope/`;
     const response = await fetch(sentryUrl, {
