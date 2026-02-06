@@ -26,7 +26,7 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
         aria-label={`${t("betaBadge")} - ${t("betaSubtitle")}`}
       >
         <div className="relative">
-          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900 transform rotate-[-12deg] hover:rotate-[-8deg] transition-transform duration-300">
+          <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-pink-500 text-white px-6 py-4 rounded-2xl shadow-2xl border-4 border-white dark:border-gray-900">
             <div className="flex flex-col items-center gap-1">
               <span className="text-xs font-bold tracking-wider uppercase">
                 {t("betaBadge")}
