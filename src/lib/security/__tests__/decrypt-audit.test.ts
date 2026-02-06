@@ -8,11 +8,16 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+// Define mock functions via vi.hoisted to avoid Prisma deep-typing issues
+const { mockCreate } = vi.hoisted(() => ({
+  mockCreate: vi.fn(),
+}));
+
 // Mock Prisma client BEFORE imports
 vi.mock("@/lib/db", () => ({
   prisma: {
     complianceAuditEntry: {
-      create: vi.fn(),
+      create: mockCreate,
     },
   },
 }));
@@ -39,10 +44,6 @@ import {
   logBulkDecryptAccess,
   type DecryptAuditContext,
 } from "../decrypt-audit";
-import { prisma } from "@/lib/db";
-
-// Get reference to mocked prisma
-const mockPrisma = vi.mocked(prisma);
 
 describe("Decrypt Audit Logging", () => {
   beforeEach(() => {
@@ -60,14 +61,14 @@ describe("Decrypt Audit Logging", () => {
         context: { endpoint: "/api/users/profile" },
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       // Wait for async fire-and-forget to complete
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalledWith({
+      expect(mockCreate).toHaveBeenCalledWith({
         data: expect.objectContaining({
           userId: "user-123",
           adminId: "admin-456",
@@ -86,13 +87,13 @@ describe("Decrypt Audit Logging", () => {
         field: "name",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalledWith({
+      expect(mockCreate).toHaveBeenCalledWith({
         data: expect.objectContaining({
           userId: null,
           adminId: null,
@@ -115,13 +116,13 @@ describe("Decrypt Audit Logging", () => {
         },
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       const details = JSON.parse(call[0].data.details);
 
       expect(details).toMatchObject({
@@ -140,7 +141,7 @@ describe("Decrypt Audit Logging", () => {
         field: "email",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockImplementation(
+      mockCreate.mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 1000)),
       );
 
@@ -158,9 +159,7 @@ describe("Decrypt Audit Logging", () => {
         field: "email",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockRejectedValue(
-        new Error("Database connection failed"),
-      );
+      mockCreate.mockRejectedValue(new Error("Database connection failed"));
 
       // Should not throw
       expect(() => logDecryptAccess(context)).not.toThrow();
@@ -169,7 +168,7 @@ describe("Decrypt Audit Logging", () => {
       await new Promise((resolve) => setTimeout(resolve, 10));
 
       // Should have attempted to create entry
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalled();
+      expect(mockCreate).toHaveBeenCalled();
     });
 
     it("should use userId as accessor when adminId not present", async () => {
@@ -179,13 +178,13 @@ describe("Decrypt Audit Logging", () => {
         userId: "user-789",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe("user-789");
@@ -199,13 +198,13 @@ describe("Decrypt Audit Logging", () => {
         adminId: "admin-456",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe("admin-456");
@@ -217,20 +216,20 @@ describe("Decrypt Audit Logging", () => {
         field: "email",
       };
 
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess(context);
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       const details = JSON.parse(call[0].data.details);
 
       expect(details.accessor).toBe("system");
     });
 
     it("should handle multiple concurrent log calls", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess({ model: "User", field: "email" });
       logDecryptAccess({ model: "Profile", field: "name" });
@@ -239,9 +238,7 @@ describe("Decrypt Audit Logging", () => {
       // Wait for all microtasks and dynamic imports to complete
       await vi.waitFor(
         () => {
-          expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalledTimes(
-            3,
-          );
+          expect(mockCreate).toHaveBeenCalledTimes(3);
         },
         { timeout: 1000 },
       );
@@ -250,13 +247,13 @@ describe("Decrypt Audit Logging", () => {
 
   describe("logBulkDecryptAccess", () => {
     it("should log bulk operation with count", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logBulkDecryptAccess("User", "email", 50, "user-123");
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       const details = JSON.parse(call[0].data.details);
 
       expect(details.bulkOperation).toBe(true);
@@ -265,33 +262,33 @@ describe("Decrypt Audit Logging", () => {
     });
 
     it("should include adminId for admin bulk operations", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logBulkDecryptAccess("User", "email", 100, undefined, "admin-789");
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
 
       expect(call[0].data.adminId).toBe("admin-789");
       expect(call[0].data.userId).toBeNull();
     });
 
     it("should handle both userId and adminId", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logBulkDecryptAccess("User", "email", 25, "user-123", "admin-456");
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
 
       expect(call[0].data.userId).toBe("user-123");
       expect(call[0].data.adminId).toBe("admin-456");
     });
 
     it("should fire-and-forget without blocking", () => {
-      mockPrisma.complianceAuditEntry.create.mockImplementation(
+      mockCreate.mockImplementation(
         () => new Promise((resolve) => setTimeout(resolve, 1000)),
       );
 
@@ -305,7 +302,7 @@ describe("Decrypt Audit Logging", () => {
 
   describe("Edge Cases", () => {
     it("should handle very long context objects", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       const largeContext: Record<string, unknown> = {};
       for (let i = 0; i < 100; i++) {
@@ -320,11 +317,11 @@ describe("Decrypt Audit Logging", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalled();
+      expect(mockCreate).toHaveBeenCalled();
     });
 
     it("should handle special characters in model and field names", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess({
         model: "User_Profile_v2",
@@ -333,14 +330,14 @@ describe("Decrypt Audit Logging", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      const call = mockPrisma.complianceAuditEntry.create.mock.calls[0];
+      const call = mockCreate.mock.calls[0];
       expect(call[0].data.description).toBe(
         "PII field decrypted: User_Profile_v2.email_address",
       );
     });
 
     it("should handle null values in context", async () => {
-      mockPrisma.complianceAuditEntry.create.mockResolvedValue({});
+      mockCreate.mockResolvedValue({});
 
       logDecryptAccess({
         model: "User",
@@ -350,7 +347,7 @@ describe("Decrypt Audit Logging", () => {
 
       await new Promise((resolve) => setTimeout(resolve, 10));
 
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalled();
+      expect(mockCreate).toHaveBeenCalled();
     });
   });
 });

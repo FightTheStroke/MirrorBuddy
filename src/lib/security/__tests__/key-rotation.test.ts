@@ -8,18 +8,35 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+// Define mock functions via vi.hoisted to avoid Prisma deep-typing issues
+const {
+  mockGoogleCount,
+  mockGoogleFindMany,
+  mockGoogleUpdate,
+  mockUserCount,
+  mockUserFindMany,
+  mockUserUpdate,
+} = vi.hoisted(() => ({
+  mockGoogleCount: vi.fn(),
+  mockGoogleFindMany: vi.fn(),
+  mockGoogleUpdate: vi.fn(),
+  mockUserCount: vi.fn(),
+  mockUserFindMany: vi.fn(),
+  mockUserUpdate: vi.fn(),
+}));
+
 // Mock Prisma client BEFORE imports
 vi.mock("@/lib/db", () => ({
   prisma: {
     googleAccount: {
-      count: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
+      count: mockGoogleCount,
+      findMany: mockGoogleFindMany,
+      update: mockGoogleUpdate,
     },
     user: {
-      count: vi.fn(),
-      findMany: vi.fn(),
-      update: vi.fn(),
+      count: mockUserCount,
+      findMany: mockUserFindMany,
+      update: mockUserUpdate,
     },
   },
 }));
@@ -50,10 +67,6 @@ import {
   encryptTokenWithKey,
   encryptPIIWithKey,
 } from "../key-rotation-helpers";
-import { prisma } from "@/lib/db";
-
-// Get reference to mocked prisma
-const mockPrisma = vi.mocked(prisma);
 
 describe("Key Rotation Service", () => {
   const oldTokenKey =
@@ -78,8 +91,8 @@ describe("Key Rotation Service", () => {
         oldTokenKey,
       );
 
-      mockPrisma.googleAccount.count.mockResolvedValue(2);
-      mockPrisma.googleAccount.findMany.mockResolvedValue([
+      mockGoogleCount.mockResolvedValue(2);
+      mockGoogleFindMany.mockResolvedValue([
         {
           id: "int1",
           accessToken: mockAccessToken,
@@ -87,7 +100,7 @@ describe("Key Rotation Service", () => {
         },
         { id: "int2", accessToken: mockAccessToken, refreshToken: null },
       ]);
-      mockPrisma.googleAccount.update.mockResolvedValue({});
+      mockGoogleUpdate.mockResolvedValue({});
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
 
@@ -96,28 +109,28 @@ describe("Key Rotation Service", () => {
       expect(result.succeeded).toBe(2);
       expect(result.failed).toBe(0);
       expect(result.phase).toBe("complete");
-      expect(mockPrisma.googleAccount.update).toHaveBeenCalledTimes(2);
+      expect(mockGoogleUpdate).toHaveBeenCalledTimes(2);
     });
 
     it("should handle empty database", async () => {
-      mockPrisma.googleAccount.count.mockResolvedValue(0);
+      mockGoogleCount.mockResolvedValue(0);
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
 
       expect(result.total).toBe(0);
       expect(result.processed).toBe(0);
       expect(result.phase).toBe("complete");
-      expect(mockPrisma.googleAccount.findMany).not.toHaveBeenCalled();
+      expect(mockGoogleFindMany).not.toHaveBeenCalled();
     });
 
     it("should call progress callback with updates", async () => {
       const mockToken = await encryptTokenWithKey("token123", oldTokenKey);
 
-      mockPrisma.googleAccount.count.mockResolvedValue(1);
-      mockPrisma.googleAccount.findMany.mockResolvedValue([
+      mockGoogleCount.mockResolvedValue(1);
+      mockGoogleFindMany.mockResolvedValue([
         { id: "int1", accessToken: mockToken, refreshToken: null },
       ]);
-      mockPrisma.googleAccount.update.mockResolvedValue({});
+      mockGoogleUpdate.mockResolvedValue({});
 
       const progressCallback = vi.fn();
 
@@ -136,8 +149,8 @@ describe("Key Rotation Service", () => {
     it("should support dry-run mode without writing to database", async () => {
       const mockToken = await encryptTokenWithKey("token123", oldTokenKey);
 
-      mockPrisma.googleAccount.count.mockResolvedValue(1);
-      mockPrisma.googleAccount.findMany.mockResolvedValue([
+      mockGoogleCount.mockResolvedValue(1);
+      mockGoogleFindMany.mockResolvedValue([
         { id: "int1", accessToken: mockToken, refreshToken: null },
       ]);
 
@@ -146,12 +159,12 @@ describe("Key Rotation Service", () => {
       });
 
       expect(result.succeeded).toBe(1);
-      expect(mockPrisma.googleAccount.update).not.toHaveBeenCalled();
+      expect(mockGoogleUpdate).not.toHaveBeenCalled();
     });
 
     it("should handle decryption failures gracefully", async () => {
-      mockPrisma.googleAccount.count.mockResolvedValue(2);
-      mockPrisma.googleAccount.findMany.mockResolvedValue([
+      mockGoogleCount.mockResolvedValue(2);
+      mockGoogleFindMany.mockResolvedValue([
         {
           id: "int1",
           // Note: unencrypted data (no "enc:v1:" prefix) is passed through as-is for backward compatibility
@@ -164,7 +177,7 @@ describe("Key Rotation Service", () => {
           refreshToken: null,
         },
       ]);
-      mockPrisma.googleAccount.update.mockResolvedValue({});
+      mockGoogleUpdate.mockResolvedValue({});
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey);
 
@@ -178,8 +191,8 @@ describe("Key Rotation Service", () => {
     it("should batch process records", async () => {
       const mockToken = await encryptTokenWithKey("token123", oldTokenKey);
 
-      mockPrisma.googleAccount.count.mockResolvedValue(250);
-      mockPrisma.googleAccount.findMany
+      mockGoogleCount.mockResolvedValue(250);
+      mockGoogleFindMany
         .mockResolvedValueOnce(
           Array(100).fill({
             id: "int1",
@@ -201,7 +214,7 @@ describe("Key Rotation Service", () => {
             refreshToken: null,
           }),
         );
-      mockPrisma.googleAccount.update.mockResolvedValue({});
+      mockGoogleUpdate.mockResolvedValue({});
 
       const result = await rotateTokenEncryptionKey(oldTokenKey, newTokenKey, {
         batchSize: 100,
@@ -209,7 +222,7 @@ describe("Key Rotation Service", () => {
 
       expect(result.total).toBe(250);
       expect(result.processed).toBe(250);
-      expect(mockPrisma.googleAccount.findMany).toHaveBeenCalledTimes(3);
+      expect(mockGoogleFindMany).toHaveBeenCalledTimes(3);
     }, 15000); // 15 second timeout for crypto operations on 250 records
   });
 
@@ -217,12 +230,12 @@ describe("Key Rotation Service", () => {
     it("should rotate User PII successfully", async () => {
       const mockEmail = await encryptPIIWithKey("user@example.com", oldPIIKey);
 
-      mockPrisma.user.count.mockResolvedValue(2);
-      mockPrisma.user.findMany.mockResolvedValue([
+      mockUserCount.mockResolvedValue(2);
+      mockUserFindMany.mockResolvedValue([
         { id: "user1", email: mockEmail },
         { id: "user2", email: mockEmail },
       ]);
-      mockPrisma.user.update.mockResolvedValue({});
+      mockUserUpdate.mockResolvedValue({});
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
@@ -231,21 +244,19 @@ describe("Key Rotation Service", () => {
       expect(result.succeeded).toBe(2);
       expect(result.failed).toBe(0);
       expect(result.phase).toBe("complete");
-      expect(mockPrisma.user.update).toHaveBeenCalledTimes(2);
+      expect(mockUserUpdate).toHaveBeenCalledTimes(2);
     });
 
     it("should update emailHash when rotating PII", async () => {
       const mockEmail = await encryptPIIWithKey("test@example.com", oldPIIKey);
 
-      mockPrisma.user.count.mockResolvedValue(1);
-      mockPrisma.user.findMany.mockResolvedValue([
-        { id: "user1", email: mockEmail },
-      ]);
-      mockPrisma.user.update.mockResolvedValue({});
+      mockUserCount.mockResolvedValue(1);
+      mockUserFindMany.mockResolvedValue([{ id: "user1", email: mockEmail }]);
+      mockUserUpdate.mockResolvedValue({});
 
       await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
-      expect(mockPrisma.user.update).toHaveBeenCalledWith({
+      expect(mockUserUpdate).toHaveBeenCalledWith({
         where: { id: "user1" },
         data: expect.objectContaining({
           email: expect.stringMatching(/^pii:v1:/),
@@ -255,42 +266,36 @@ describe("Key Rotation Service", () => {
     });
 
     it("should skip users with null email", async () => {
-      mockPrisma.user.count.mockResolvedValue(1);
-      mockPrisma.user.findMany.mockResolvedValue([
-        { id: "user1", email: null },
-      ]);
+      mockUserCount.mockResolvedValue(1);
+      mockUserFindMany.mockResolvedValue([{ id: "user1", email: null }]);
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey);
 
       expect(result.processed).toBe(1);
       expect(result.succeeded).toBe(0);
-      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+      expect(mockUserUpdate).not.toHaveBeenCalled();
     });
 
     it("should support dry-run mode", async () => {
       const mockEmail = await encryptPIIWithKey("user@example.com", oldPIIKey);
 
-      mockPrisma.user.count.mockResolvedValue(1);
-      mockPrisma.user.findMany.mockResolvedValue([
-        { id: "user1", email: mockEmail },
-      ]);
+      mockUserCount.mockResolvedValue(1);
+      mockUserFindMany.mockResolvedValue([{ id: "user1", email: mockEmail }]);
 
       const result = await rotatePIIEncryptionKey(oldPIIKey, newPIIKey, {
         dryRun: true,
       });
 
       expect(result.succeeded).toBe(1);
-      expect(mockPrisma.user.update).not.toHaveBeenCalled();
+      expect(mockUserUpdate).not.toHaveBeenCalled();
     });
 
     it("should call progress callback", async () => {
       const mockEmail = await encryptPIIWithKey("user@example.com", oldPIIKey);
 
-      mockPrisma.user.count.mockResolvedValue(1);
-      mockPrisma.user.findMany.mockResolvedValue([
-        { id: "user1", email: mockEmail },
-      ]);
-      mockPrisma.user.update.mockResolvedValue({});
+      mockUserCount.mockResolvedValue(1);
+      mockUserFindMany.mockResolvedValue([{ id: "user1", email: mockEmail }]);
+      mockUserUpdate.mockResolvedValue({});
 
       const progressCallback = vi.fn();
 
