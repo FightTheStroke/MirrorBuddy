@@ -18,6 +18,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ESLint rule `require-email-hash-lookup` — blocks `{ email: value }` in User/GoogleAccount `where` clauses, enforces `emailHash` usage to prevent PII lookup bugs
 - PII middleware upsert test suite (`pii-middleware-upsert.test.ts`)
 
+### W1: Mobile (Capacitor Native Shell)
+
+- Added: Capacitor native shell for iOS and Android (appId: org.fightthestroke.mirrorbuddy)
+- Added: Native push notifications via @capacitor/push-notifications with web fallback
+- Added: Media bridge (camera/mic) with native Capacitor + browser API fallback
+- Added: App icons (1024x1024 iOS, adaptive Android) and splash screens
+- Added: Build scripts: build:mobile, open:ios, open:android
+
 ### Security
 
 **PII Detection and Protection (Plan 124)**

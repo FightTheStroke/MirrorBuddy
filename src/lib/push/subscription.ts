@@ -1,6 +1,7 @@
 // ============================================================================
 // PUSH SUBSCRIPTION MANAGEMENT (ADR-0014)
 // Client-side subscription lifecycle management
+// Supports both native (Capacitor) and web push notifications
 // ============================================================================
 
 import {
@@ -8,9 +9,14 @@ import {
   urlBase64ToUint8Array,
   isPushSupported,
   getPushCapabilityStatus,
-} from './vapid';
-import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+} from "./vapid";
+import {
+  isCapacitorEnvironment,
+  requestPushPermission as requestCapacitorPermission,
+  registerForPush as registerCapacitorPush,
+} from "./capacitor-push";
+import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 export interface PushSubscriptionJSON {
   endpoint: string;
@@ -26,18 +32,20 @@ export interface PushSubscriptionJSON {
  */
 export async function registerServiceWorker(): Promise<ServiceWorkerRegistration | null> {
   if (!isPushSupported()) {
-    logger.warn('[Push] Service workers not supported');
+    logger.warn("[Push] Service workers not supported");
     return null;
   }
 
   try {
-    const registration = await navigator.serviceWorker.register('/sw.js', {
-      scope: '/',
+    const registration = await navigator.serviceWorker.register("/sw.js", {
+      scope: "/",
     });
-    logger.debug('[Push] Service worker registered', { scope: registration.scope });
+    logger.debug("[Push] Service worker registered", {
+      scope: registration.scope,
+    });
     return registration;
   } catch (error) {
-    logger.error('[Push] Service worker registration failed', undefined, error);
+    logger.error("[Push] Service worker registration failed", undefined, error);
     return null;
   }
 }
@@ -74,24 +82,41 @@ export async function getExistingSubscription(): Promise<PushSubscription | null
  * Returns the subscription if successful, null otherwise.
  */
 export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
-  // Check capability
-  const status = getPushCapabilityStatus();
-  if (status !== 'supported') {
-    logger.warn('[Push] Cannot subscribe', { status });
+  // Native Capacitor path: use APNs/FCM directly
+  if (isCapacitorEnvironment()) {
+    const permission = await requestCapacitorPermission();
+    if (permission !== "granted") {
+      logger.info("[Push] Native permission denied");
+      return null;
+    }
+    const result = await registerCapacitorPush();
+    if (result && result.platform === "native") {
+      logger.info("[Push] Native push registered", {
+        token: result.token.slice(0, 20) + "...",
+      });
+      // Native tokens are stored server-side via a different mechanism
+      return null;
+    }
+    logger.warn("[Push] Native push registration returned unexpected result");
     return null;
   }
 
-  // Get VAPID key
+  // Web push path
+  const status = getPushCapabilityStatus();
+  if (status !== "supported") {
+    logger.warn("[Push] Cannot subscribe", { status });
+    return null;
+  }
+
   const vapidPublicKey = getVapidPublicKey();
   if (!vapidPublicKey) {
-    logger.error('[Push] VAPID public key not configured');
+    logger.error("[Push] VAPID public key not configured");
     return null;
   }
 
-  // Request permission
   const permission = await Notification.requestPermission();
-  if (permission !== 'granted') {
-    logger.info('[Push] Permission denied');
+  if (permission !== "granted") {
+    logger.info("[Push] Permission denied");
     return null;
   }
 
@@ -101,7 +126,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
     registration = await registerServiceWorker();
   }
   if (!registration) {
-    logger.error('[Push] No service worker registration');
+    logger.error("[Push] No service worker registration");
     return null;
   }
 
@@ -114,18 +139,18 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
     });
 
     const json = subscription.toJSON() as PushSubscriptionJSON;
-    logger.info('[Push] Subscribed', { endpoint: json.endpoint.slice(0, 50) });
+    logger.info("[Push] Subscribed", { endpoint: json.endpoint.slice(0, 50) });
 
     // Save to server
     const saved = await saveSubscriptionToServer(json);
     if (!saved) {
-      logger.warn('[Push] Failed to save subscription to server');
+      logger.warn("[Push] Failed to save subscription to server");
       // Still return the subscription - it might work next time
     }
 
     return json;
   } catch (error) {
-    logger.error('[Push] Subscription failed', undefined, error);
+    logger.error("[Push] Subscription failed", undefined, error);
     return null;
   }
 }
@@ -136,7 +161,7 @@ export async function subscribeToPush(): Promise<PushSubscriptionJSON | null> {
 export async function unsubscribeFromPush(): Promise<boolean> {
   const subscription = await getExistingSubscription();
   if (!subscription) {
-    logger.debug('[Push] No subscription to unsubscribe');
+    logger.debug("[Push] No subscription to unsubscribe");
     return true;
   }
 
@@ -147,10 +172,10 @@ export async function unsubscribeFromPush(): Promise<boolean> {
     // Remove from server
     await removeSubscriptionFromServer(subscription.endpoint);
 
-    logger.info('[Push] Unsubscribed');
+    logger.info("[Push] Unsubscribed");
     return true;
   } catch (error) {
-    logger.error('[Push] Unsubscribe failed', undefined, error);
+    logger.error("[Push] Unsubscribe failed", undefined, error);
     return false;
   }
 }
@@ -158,10 +183,12 @@ export async function unsubscribeFromPush(): Promise<boolean> {
 /**
  * Save push subscription to server.
  */
-async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Promise<boolean> {
+async function saveSubscriptionToServer(
+  subscription: PushSubscriptionJSON,
+): Promise<boolean> {
   try {
-    const response = await csrfFetch('/api/push/subscribe', {
-      method: 'POST',
+    const response = await csrfFetch("/api/push/subscribe", {
+      method: "POST",
       body: JSON.stringify({
         endpoint: subscription.endpoint,
         p256dh: subscription.keys.p256dh,
@@ -171,13 +198,13 @@ async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Pro
     });
 
     if (!response.ok) {
-      logger.error('[Push] Server save failed', { status: response.status });
+      logger.error("[Push] Server save failed", { status: response.status });
       return false;
     }
 
     return true;
   } catch (error) {
-    logger.error('[Push] Server save error', undefined, error);
+    logger.error("[Push] Server save error", undefined, error);
     return false;
   }
 }
@@ -185,16 +212,18 @@ async function saveSubscriptionToServer(subscription: PushSubscriptionJSON): Pro
 /**
  * Remove push subscription from server.
  */
-async function removeSubscriptionFromServer(endpoint: string): Promise<boolean> {
+async function removeSubscriptionFromServer(
+  endpoint: string,
+): Promise<boolean> {
   try {
-    const response = await csrfFetch('/api/push/subscribe', {
-      method: 'DELETE',
+    const response = await csrfFetch("/api/push/subscribe", {
+      method: "DELETE",
       body: JSON.stringify({ endpoint }),
     });
 
     return response.ok;
   } catch (error) {
-    logger.error('[Push] Server delete error', undefined, error);
+    logger.error("[Push] Server delete error", undefined, error);
     return false;
   }
 }

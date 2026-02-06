@@ -2,6 +2,7 @@
  * Input Section Component
  *
  * Camera-first input for homework assistant
+ * Uses media-bridge for native camera support via Capacitor
  */
 
 import { useRef } from "react";
@@ -13,6 +14,7 @@ import {
   SUBJECTS,
   getValidationError,
 } from "../homework-assistant-mobile-helpers";
+import { capturePhoto, isNativePlatform } from "@/lib/native/media-bridge";
 
 interface InputSectionProps {
   onFileSelect: (file: File) => void;
@@ -54,12 +56,50 @@ export function InputSection({
     handleFileSelect(event.target.files?.[0] || null);
   };
 
-  const handleCameraClick = () => {
-    cameraInputRef.current?.click();
+  const handleCameraClick = async () => {
+    // Use media bridge on native platforms, fallback to file input on web
+    if (isNativePlatform()) {
+      try {
+        const photo = await capturePhoto({ source: "camera", quality: 90 });
+        // Convert base64 to File object
+        const blob = await fetch(
+          `data:image/${photo.format};base64,${photo.base64}`,
+        ).then((r) => r.blob());
+        const file = new File([blob], `homework.${photo.format}`, {
+          type: `image/${photo.format}`,
+        });
+        handleFileSelect(file);
+      } catch (error) {
+        onError?.(
+          error instanceof Error ? error.message : "Failed to capture photo",
+        );
+      }
+    } else {
+      cameraInputRef.current?.click();
+    }
   };
 
-  const handleGalleryClick = () => {
-    galleryInputRef.current?.click();
+  const handleGalleryClick = async () => {
+    // Use media bridge on native platforms, fallback to file input on web
+    if (isNativePlatform()) {
+      try {
+        const photo = await capturePhoto({ source: "gallery", quality: 90 });
+        // Convert base64 to File object
+        const blob = await fetch(
+          `data:image/${photo.format};base64,${photo.base64}`,
+        ).then((r) => r.blob());
+        const file = new File([blob], `homework.${photo.format}`, {
+          type: `image/${photo.format}`,
+        });
+        handleFileSelect(file);
+      } catch (error) {
+        onError?.(
+          error instanceof Error ? error.message : "Failed to select photo",
+        );
+      }
+    } else {
+      galleryInputRef.current?.click();
+    }
   };
 
   return (

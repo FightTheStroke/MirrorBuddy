@@ -1,6 +1,8 @@
 // ============================================================================
 // AUDIO CAPTURE
 // Microphone capture and input level monitoring (WebRTC only)
+// Note: Uses standard getUserMedia API, compatible with media-bridge abstraction
+// For microphone permission checks, see @/lib/native/media-bridge
 // ============================================================================
 
 "use client";
@@ -58,7 +60,9 @@ export function useStartAudioCapture(
             await context.resume();
             logger.debug("[VoiceSession] AudioContext resumed after creation");
           } catch (err) {
-            logger.warn("[VoiceSession] Failed to resume AudioContext", { err });
+            logger.warn("[VoiceSession] Failed to resume AudioContext", {
+              err,
+            });
           }
         }
       } catch (error) {

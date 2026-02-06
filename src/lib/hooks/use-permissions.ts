@@ -1,14 +1,21 @@
 // ============================================================================
 // PERMISSIONS HOOK
 // Handles microphone and camera permissions with caching and better UX
+// Uses media-bridge for native platform support
 // ============================================================================
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
+import {
+  checkCameraPermission as checkCameraNative,
+  checkMicrophonePermission as checkMicrophoneNative,
+  requestCameraPermission as requestCameraNative,
+  isNativePlatform,
+} from "@/lib/native/media-bridge";
 
-type PermissionName = 'microphone' | 'camera';
-type PermissionState = 'granted' | 'denied' | 'prompt' | 'unknown';
+type PermissionName = "microphone" | "camera";
+type PermissionState = "granted" | "denied" | "prompt" | "unknown";
 
 interface PermissionsState {
   microphone: PermissionState;
@@ -24,11 +31,11 @@ interface UsePermissionsReturn {
 }
 
 // Cache key for localStorage
-const PERMISSIONS_CACHE_KEY = 'mirrorbuddy-permissions-cache';
+const PERMISSIONS_CACHE_KEY = "mirrorbuddy-permissions-cache";
 
 // Get cached permissions from localStorage
 function getCachedPermissions(): Partial<PermissionsState> {
-  if (typeof window === 'undefined') return {};
+  if (typeof window === "undefined") return {};
   try {
     const cached = localStorage.getItem(PERMISSIONS_CACHE_KEY);
     return cached ? JSON.parse(cached) : {};
@@ -39,12 +46,12 @@ function getCachedPermissions(): Partial<PermissionsState> {
 
 // Save permissions to localStorage
 function setCachedPermissions(permissions: Partial<PermissionsState>) {
-  if (typeof window === 'undefined') return;
+  if (typeof window === "undefined") return;
   try {
     const current = getCachedPermissions();
     localStorage.setItem(
       PERMISSIONS_CACHE_KEY,
-      JSON.stringify({ ...current, ...permissions })
+      JSON.stringify({ ...current, ...permissions }),
     );
   } catch {
     // Ignore storage errors
@@ -53,39 +60,53 @@ function setCachedPermissions(permissions: Partial<PermissionsState>) {
 
 export function usePermissions(): UsePermissionsReturn {
   const [permissions, setPermissions] = useState<PermissionsState>({
-    microphone: 'unknown',
-    camera: 'unknown',
+    microphone: "unknown",
+    camera: "unknown",
   });
   const [isLoading, setIsLoading] = useState(true);
 
-  // Check permission state using Permissions API
-  const checkPermissionState = useCallback(async (name: PermissionName): Promise<PermissionState> => {
-    // Check if Permissions API is available
-    if (!navigator.permissions) {
-      // Fallback to cached value or 'prompt'
-      const cached = getCachedPermissions();
-      return cached[name] || 'prompt';
-    }
+  // Check permission state using Permissions API or media bridge
+  const checkPermissionState = useCallback(
+    async (name: PermissionName): Promise<PermissionState> => {
+      // Use media bridge on native platforms
+      if (isNativePlatform()) {
+        if (name === "camera") {
+          return checkCameraNative();
+        } else {
+          return checkMicrophoneNative();
+        }
+      }
 
-    try {
-      // Map our names to browser permission names
-      const browserName = name === 'microphone' ? 'microphone' : 'camera';
-      const status = await navigator.permissions.query({ name: browserName as PermissionName });
-      return status.state as PermissionState;
-    } catch {
-      // Permissions API might not support this permission
-      const cached = getCachedPermissions();
-      return cached[name] || 'prompt';
-    }
-  }, []);
+      // Web: use Permissions API
+      if (!navigator.permissions) {
+        // Fallback to cached value or 'prompt'
+        const cached = getCachedPermissions();
+        return cached[name] || "prompt";
+      }
+
+      try {
+        // Map our names to browser permission names
+        const browserName = name === "microphone" ? "microphone" : "camera";
+        const status = await navigator.permissions.query({
+          name: browserName as PermissionName,
+        });
+        return status.state as PermissionState;
+      } catch {
+        // Permissions API might not support this permission
+        const cached = getCachedPermissions();
+        return cached[name] || "prompt";
+      }
+    },
+    [],
+  );
 
   // Check all permissions
   const checkPermissions = useCallback(async () => {
     setIsLoading(true);
     try {
       const [micState, camState] = await Promise.all([
-        checkPermissionState('microphone'),
-        checkPermissionState('camera'),
+        checkPermissionState("microphone"),
+        checkPermissionState("camera"),
       ]);
 
       const newPermissions = {
@@ -105,17 +126,18 @@ export function usePermissions(): UsePermissionsReturn {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       // Stop all tracks immediately - we just needed to request permission
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
 
-      setPermissions(prev => ({ ...prev, microphone: 'granted' }));
-      setCachedPermissions({ microphone: 'granted' });
+      setPermissions((prev) => ({ ...prev, microphone: "granted" }));
+      setCachedPermissions({ microphone: "granted" });
       return true;
     } catch (error) {
-      const state = error instanceof DOMException && error.name === 'NotAllowedError'
-        ? 'denied'
-        : 'prompt';
+      const state =
+        error instanceof DOMException && error.name === "NotAllowedError"
+          ? "denied"
+          : "prompt";
 
-      setPermissions(prev => ({ ...prev, microphone: state }));
+      setPermissions((prev) => ({ ...prev, microphone: state }));
       setCachedPermissions({ microphone: state });
       return false;
     }
@@ -124,19 +146,30 @@ export function usePermissions(): UsePermissionsReturn {
   // Request camera permission
   const requestCamera = useCallback(async (): Promise<boolean> => {
     try {
+      // Use media bridge on native platforms
+      if (isNativePlatform()) {
+        const state = await requestCameraNative();
+        const granted = state === "granted";
+        setPermissions((prev) => ({ ...prev, camera: state }));
+        setCachedPermissions({ camera: state });
+        return granted;
+      }
+
+      // Web: use getUserMedia
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       // Stop all tracks immediately - we just needed to request permission
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
 
-      setPermissions(prev => ({ ...prev, camera: 'granted' }));
-      setCachedPermissions({ camera: 'granted' });
+      setPermissions((prev) => ({ ...prev, camera: "granted" }));
+      setCachedPermissions({ camera: "granted" });
       return true;
     } catch (error) {
-      const state = error instanceof DOMException && error.name === 'NotAllowedError'
-        ? 'denied'
-        : 'prompt';
+      const state =
+        error instanceof DOMException && error.name === "NotAllowedError"
+          ? "denied"
+          : "prompt";
 
-      setPermissions(prev => ({ ...prev, camera: state }));
+      setPermissions((prev) => ({ ...prev, camera: state }));
       setCachedPermissions({ camera: state });
       return false;
     }
@@ -153,16 +186,18 @@ export function usePermissions(): UsePermissionsReturn {
 
     const setupListener = async (name: PermissionName) => {
       try {
-        const browserName = name === 'microphone' ? 'microphone' : 'camera';
-        const status = await navigator.permissions.query({ name: browserName as PermissionName });
+        const browserName = name === "microphone" ? "microphone" : "camera";
+        const status = await navigator.permissions.query({
+          name: browserName as PermissionName,
+        });
 
         const handleChange = () => {
-          setPermissions(prev => ({ ...prev, [name]: status.state }));
+          setPermissions((prev) => ({ ...prev, [name]: status.state }));
           setCachedPermissions({ [name]: status.state });
         };
 
-        status.addEventListener('change', handleChange);
-        return () => status.removeEventListener('change', handleChange);
+        status.addEventListener("change", handleChange);
+        return () => status.removeEventListener("change", handleChange);
       } catch {
         return undefined;
       }
@@ -170,15 +205,14 @@ export function usePermissions(): UsePermissionsReturn {
 
     const cleanups: Array<(() => void) | undefined> = [];
 
-    Promise.all([
-      setupListener('microphone'),
-      setupListener('camera'),
-    ]).then(results => {
-      cleanups.push(...results);
-    });
+    Promise.all([setupListener("microphone"), setupListener("camera")]).then(
+      (results) => {
+        cleanups.push(...results);
+      },
+    );
 
     return () => {
-      cleanups.forEach(cleanup => cleanup?.());
+      cleanups.forEach((cleanup) => cleanup?.());
     };
   }, []);
 
