@@ -53,8 +53,8 @@ async function initializeAzureClient(): Promise<boolean> {
     const identityPath: string = "@azure/identity";
 
     const [secretsModule, identityModule] = await Promise.all([
-      import(secretsPath).catch(() => null),
-      import(identityPath).catch(() => null),
+      import(/* webpackIgnore: true */ secretsPath).catch(() => null),
+      import(/* webpackIgnore: true */ identityPath).catch(() => null),
     ]);
 
     if (!secretsModule || !identityModule) {
