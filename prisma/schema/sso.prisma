@@ -1,0 +1,40 @@
+// ============================================================================
+// SSO DOMAIN
+// School Single Sign-On configuration and session tracking
+// Plan 125: Technical Perfection - Enterprise SSO (F-04, F-05, F-06)
+// ============================================================================
+
+// SSO provider configuration per school
+model SchoolSSOConfig {
+  id           String   @id @default(cuid())
+  schoolId     String
+  provider     String   @db.VarChar(50) // "google" | "microsoft"
+  tenantId     String?  @db.VarChar(255) // Azure AD tenant ID
+  domain       String   @db.VarChar(255) // e.g., school.edu
+  clientId     String   @db.VarChar(255)
+  clientSecret String   @db.VarChar(512) // encrypted with AES-256-GCM
+  scopes       String[] @default([])
+  enabled      Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@unique([schoolId, provider])
+  @@index([domain])
+  @@map("school_sso_configs")
+}
+
+// SSO login session tracking for PKCE state management
+model SSOSession {
+  id           String   @id @default(cuid())
+  state        String   @unique @db.VarChar(255)
+  codeVerifier String   @db.VarChar(255)
+  nonce        String   @db.VarChar(255)
+  provider     String   @db.VarChar(50) // "google" | "microsoft"
+  redirectUri  String   @db.VarChar(2048)
+  expiresAt    DateTime
+  createdAt    DateTime @default(now())
+
+  @@index([state])
+  @@index([expiresAt])
+  @@map("sso_sessions")
+}

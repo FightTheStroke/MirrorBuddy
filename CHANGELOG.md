@@ -7,16 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Fixed
+### W2: Enterprise SSO (Google Workspace + Microsoft 365)
 
-- **Direct invite broken** — email duplicate check used plaintext against PII-encrypted DB, causing silent failures. Now uses `emailHash` with legacy fallback
-- **Generic "Internal server error" on all API failures** — `withSentry` middleware swallowed `ApiError` instances, bypassing `pipe()` error handling. Now re-throws `ApiError` so routes can return specific status codes and messages
-- **PII middleware missing `upsert` handler** — Prisma upsert operations on PII models (User, Profile, GoogleAccount) bypassed encryption. Added `upsert` interceptor
-
-### Added
-
-- ESLint rule `require-email-hash-lookup` — blocks `{ email: value }` in User/GoogleAccount `where` clauses, enforces `emailHash` usage to prevent PII lookup bugs
-- PII middleware upsert test suite (`pii-middleware-upsert.test.ts`)
+- Added: OIDC provider abstraction with PKCE (RFC 7636) support
+- Added: GoogleWorkspaceProvider with edu-specific scopes (classroom, directory)
+- Added: Microsoft365Provider with Azure AD OIDC and edu tenant detection
+- Added: SSO callback routes for Google and Microsoft OAuth flows
+- Added: Prisma SchoolSSOConfig model for per-school SSO configuration
+- Added: School admin SSO configuration UI component
+- Added: Bulk student provisioning via directory sync and CSV import
+- Added: SSO session management with database-backed PKCE state
 
 ### W1: Mobile (Capacitor Native Shell)
 
