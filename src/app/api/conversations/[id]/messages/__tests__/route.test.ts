@@ -55,7 +55,7 @@ vi.mock("@/lib/security/csrf", () => ({
 vi.mock("@/lib/auth/session-auth", () => ({
   validateAuth: vi.fn().mockResolvedValue({
     userId: "user-123",
-    isValid: true,
+    authenticated: true,
   }),
 }));
 
@@ -121,7 +121,7 @@ describe("POST /api/conversations/[id]/messages", () => {
     expect(response.status).toBe(200);
 
     // Verify anonymization was called with the original content
-    expect(mockAnonymize).toHaveBeenCalledWith(originalContent, undefined);
+    expect(mockAnonymize).toHaveBeenCalledWith(originalContent);
 
     // Verify the stored message has anonymized content
     expect(mockPrismaTransaction).toHaveBeenCalled();

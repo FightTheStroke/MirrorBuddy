@@ -7,10 +7,19 @@
  * @module security/decrypt-audit
  */
 
-import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 
 const log = logger.child({ module: "decrypt-audit" });
+
+// Lazy-load prisma to avoid circular dependency
+let prismaPromise: Promise<typeof import("@/lib/db")> | null = null;
+async function getPrisma() {
+  if (!prismaPromise) {
+    prismaPromise = import("@/lib/db");
+  }
+  const dbModule = await prismaPromise;
+  return dbModule.prisma;
+}
 
 export interface DecryptAuditContext {
   /**
@@ -58,6 +67,7 @@ export function logDecryptAccess(auditContext: DecryptAuditContext): void {
   // Fire-and-forget: execute async but don't await
   void (async () => {
     try {
+      const prisma = await getPrisma();
       await prisma.complianceAuditEntry.create({
         data: {
           userId: userId || null,
@@ -69,7 +79,7 @@ export function logDecryptAccess(auditContext: DecryptAuditContext): void {
             model,
             field,
             accessedAt: new Date().toISOString(),
-            accessor: userId || adminId || "system",
+            accessor: adminId || userId || "system",
             ...(context || {}),
           }),
           ipAddress: ipAddress || null,

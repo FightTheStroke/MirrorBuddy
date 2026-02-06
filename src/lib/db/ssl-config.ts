@@ -58,6 +58,10 @@ export function loadSupabaseCertificate(): string | undefined {
  */
 export function isLocalDatabase(url?: string): boolean {
   if (!url) return true; // Default to local if not specified
+
+  // Early check for IPv6 localhost (URL constructor doesn't parse this well)
+  if (url.includes("[::1]")) return true;
+
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.toLowerCase();

@@ -9,12 +9,17 @@ import {
   decryptCookieValue,
   readCookieValue,
   signCookieValue,
+  _resetSecretCache,
 } from "../cookie-signing";
+import { clearAllCachedSecrets } from "@/lib/security/azure-key-vault";
 
 describe("Cookie Encryption", () => {
   const originalEnv = process.env.SESSION_SECRET;
 
   beforeEach(() => {
+    // Reset secret caches to ensure fresh reads from process.env
+    _resetSecretCache();
+    clearAllCachedSecrets();
     // Set a valid SESSION_SECRET for tests
     process.env.SESSION_SECRET = "0".repeat(64); // 64-char hex string
   });
@@ -22,6 +27,9 @@ describe("Cookie Encryption", () => {
   afterEach(() => {
     // Restore original environment
     process.env.SESSION_SECRET = originalEnv;
+    // Reset caches after tests
+    _resetSecretCache();
+    clearAllCachedSecrets();
   });
 
   describe("encryptCookieValue", () => {
@@ -64,6 +72,8 @@ describe("Cookie Encryption", () => {
     });
 
     it("should throw error if SESSION_SECRET is missing", async () => {
+      _resetSecretCache();
+      clearAllCachedSecrets();
       delete process.env.SESSION_SECRET;
 
       await expect(() => encryptCookieValue("test")).rejects.toThrow(
@@ -72,6 +82,8 @@ describe("Cookie Encryption", () => {
     });
 
     it("should throw error if SESSION_SECRET is too short", async () => {
+      _resetSecretCache();
+      clearAllCachedSecrets();
       process.env.SESSION_SECRET = "short";
 
       await expect(() => encryptCookieValue("test")).rejects.toThrow(
@@ -137,6 +149,8 @@ describe("Cookie Encryption", () => {
       const encrypted = await encryptCookieValue("test-value");
 
       // Change the secret
+      _resetSecretCache();
+      clearAllCachedSecrets();
       process.env.SESSION_SECRET = "1".repeat(64);
 
       await expect(() => decryptCookieValue(encrypted)).rejects.toThrow();
@@ -144,6 +158,8 @@ describe("Cookie Encryption", () => {
 
     it("should throw error if SESSION_SECRET is missing", async () => {
       const encrypted = await encryptCookieValue("test-value");
+      _resetSecretCache();
+      clearAllCachedSecrets();
       delete process.env.SESSION_SECRET;
 
       await expect(() => decryptCookieValue(encrypted)).rejects.toThrow(

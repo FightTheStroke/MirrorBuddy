@@ -32,6 +32,15 @@ let PII_KEY: string | undefined;
 let keyPromise: Promise<string> | null = null;
 
 /**
+ * Reset cached encryption key (test use only)
+ * @internal
+ */
+export function _resetPIIKeyCache(): void {
+  PII_KEY = undefined;
+  keyPromise = null;
+}
+
+/**
  * Get PII encryption key from Azure Key Vault (with env var fallback)
  * Tries PII_ENCRYPTION_KEY first, then falls back to ENCRYPTION_KEY
  * Uses caching to avoid repeated fetches
@@ -92,7 +101,8 @@ export async function encryptPII(plaintext: string): Promise<string> {
   if (!plaintext) return plaintext;
 
   // In production, encryption is mandatory
-  if (!isPIIEncryptionConfigured()) {
+  const isConfigured = await isPIIEncryptionConfigured();
+  if (!isConfigured) {
     if (process.env.NODE_ENV === "production") {
       logger.error(
         "[PII-Encryption] PII_ENCRYPTION_KEY not set in production!",
@@ -142,13 +152,23 @@ export async function encryptPII(plaintext: string): Promise<string> {
 export async function decryptPII(encrypted: string): Promise<string> {
   if (!encrypted) return encrypted;
 
-  // Check if this is an encrypted value
-  if (!encrypted.startsWith("pii:v1:")) {
-    // Return as-is (legacy unencrypted or dev mode)
+  // Check if this is encrypted PII data
+  if (encrypted.startsWith("pii:")) {
+    // Check version - only v1 is supported
+    if (!encrypted.startsWith("pii:v1:")) {
+      const version = encrypted.match(/^pii:(v\d+):/)?.[1] || "unknown";
+      logger.error(`[PII-Encryption] Unsupported PII version: ${version}`);
+      throw new Error(
+        `PII decryption failed - unsupported version: ${version}`,
+      );
+    }
+  } else {
+    // Not encrypted (legacy unencrypted or dev mode)
     return encrypted;
   }
 
-  if (!isPIIEncryptionConfigured()) {
+  const isConfigured = await isPIIEncryptionConfigured();
+  if (!isConfigured) {
     if (process.env.NODE_ENV === "production") {
       logger.error("[PII-Encryption] Cannot decrypt: key not configured");
       throw new Error("PII encryption key not configured");

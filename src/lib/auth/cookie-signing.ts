@@ -65,6 +65,15 @@ let SESSION_SECRET: string | undefined;
 let secretPromise: Promise<string> | null = null;
 
 /**
+ * Reset the cached session secret (test-only utility)
+ * Forces the next call to re-read from process.env or Azure Key Vault
+ */
+export function _resetSecretCache(): void {
+  SESSION_SECRET = undefined;
+  secretPromise = null;
+}
+
+/**
  * Get SESSION_SECRET from Azure Key Vault (with env var fallback)
  * Uses caching to avoid repeated fetches
  * @throws {CookieSigningError} If SESSION_SECRET is not configured

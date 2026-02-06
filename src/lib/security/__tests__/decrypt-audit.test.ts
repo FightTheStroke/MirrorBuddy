@@ -9,26 +9,28 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // Mock Prisma client BEFORE imports
-const mockPrisma = {
-  complianceAuditEntry: {
-    create: vi.fn(),
-  },
-};
-
 vi.mock("@/lib/db", () => ({
-  prisma: mockPrisma,
+  prisma: {
+    complianceAuditEntry: {
+      create: vi.fn(),
+    },
+  },
 }));
 
 // Mock logger
-const mockLogger = {
-  child: vi.fn().mockReturnValue({
-    debug: vi.fn(),
-    error: vi.fn(),
-  }),
-};
-
 vi.mock("@/lib/logger", () => ({
-  logger: mockLogger,
+  logger: {
+    info: vi.fn(),
+    warn: vi.fn(),
+    error: vi.fn(),
+    debug: vi.fn(),
+    child: () => ({
+      info: vi.fn(),
+      warn: vi.fn(),
+      error: vi.fn(),
+      debug: vi.fn(),
+    }),
+  },
 }));
 
 // Now import after mocks are set up
@@ -37,6 +39,10 @@ import {
   logBulkDecryptAccess,
   type DecryptAuditContext,
 } from "../decrypt-audit";
+import { prisma } from "@/lib/db";
+
+// Get reference to mocked prisma
+const mockPrisma = vi.mocked(prisma);
 
 describe("Decrypt Audit Logging", () => {
   beforeEach(() => {
@@ -230,9 +236,15 @@ describe("Decrypt Audit Logging", () => {
       logDecryptAccess({ model: "Profile", field: "name" });
       logDecryptAccess({ model: "User", field: "phone" });
 
-      await new Promise((resolve) => setTimeout(resolve, 10));
-
-      expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalledTimes(3);
+      // Wait for all microtasks and dynamic imports to complete
+      await vi.waitFor(
+        () => {
+          expect(mockPrisma.complianceAuditEntry.create).toHaveBeenCalledTimes(
+            3,
+          );
+        },
+        { timeout: 1000 },
+      );
     });
   });
 
