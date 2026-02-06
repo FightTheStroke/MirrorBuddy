@@ -1,0 +1,22 @@
+// ============================================================================
+// AUDIT LOG MODEL
+// SOC 2 compliant audit trail for admin actions
+// Created for F-11: SOC 2 Type II Readiness
+// ============================================================================
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String   @db.VarChar(100)
+  actorId    String   @db.VarChar(255)
+  targetId   String?  @db.VarChar(255)
+  targetType String?  @db.VarChar(100)
+  metadata   String?  @db.Text
+  ipAddress  String?  @db.VarChar(45)
+  createdAt  DateTime @default(now())
+
+  @@index([action])
+  @@index([actorId])
+  @@index([targetId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W5: SOC 2 Type II Readiness
+
+- Added: Access control policy with RBAC matrix, session management, provisioning rules
+- Added: Change management policy with CI/CD gates, approval workflows, rollback procedures
+- Added: Incident response SOP with S0-S3 severity levels, escalation matrix, post-mortem template
+- Added: Vendor risk assessment for all 7 sub-processors (Azure, Supabase, Vercel, Upstash, Resend, Sentry, Stripe)
+- Added: AuditLog Prisma model with indexed action, actor, target, and timestamp fields
+- Added: Structured audit logging (recordAuditEvent, queryAuditLogs) with SOC 2 CC6.1 compliance
+- Added: Admin audit log viewer component with action filtering and pagination
+
 ### W4: Load Testing & Performance Optimization
 
 - Added: k6 smoke test result template (load-tests/results/smoke-local.md)

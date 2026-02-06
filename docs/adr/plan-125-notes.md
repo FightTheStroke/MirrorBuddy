@@ -35,3 +35,14 @@
 - Pattern: Cache is transparent — falls through silently if Redis unavailable
 - Insight: k6 test execution requires running server; templates prepared for manual execution
 - Insight: Supabase connection pool max_connections adjustable via dashboard (not code)
+
+## W5: SOC 2 Type II Readiness
+
+- Decision: Four separate policy documents (access control, change management, incident response, vendor risk) rather than single monolith
+- Decision: AuditLog as separate Prisma model (prisma/schema/audit.prisma) with multi-file schema
+- Decision: Audit metadata stored as JSON text column, not separate fields, for flexibility
+- Pattern: recordAuditEvent() is fire-and-forget with error swallowing to avoid blocking business logic
+- Pattern: queryAuditLogs() with Prisma dynamic where clause and configurable page size (max 200)
+- Pattern: AuditAction as union type prevents typos in event names at compile time
+- Insight: IP address column sized at VarChar(45) to support both IPv4 and IPv6
+- Insight: SOC 2 CC6.1 requires 365-day retention — audit_logs table has no auto-purge
