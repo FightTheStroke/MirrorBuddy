@@ -271,7 +271,7 @@ describe("POST /api/cron/rotate-ip-salt", () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Internal server error");
-    expect(data.message).toBe("Crypto error");
+    expect(data.message).toBeUndefined();
 
     spy.mockRestore();
   });

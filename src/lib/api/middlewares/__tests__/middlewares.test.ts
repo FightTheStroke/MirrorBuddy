@@ -290,7 +290,7 @@ describe("Middleware modules", () => {
 
       const data = await response.json();
       expect(data.error).toBe("Internal server error");
-      expect(data.message).toBe("Test error");
+      expect(data.message).toBeUndefined();
     });
   });
 

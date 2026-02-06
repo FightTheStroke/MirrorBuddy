@@ -165,7 +165,7 @@ describe("POST /api/cron/hierarchical-summary", () => {
 
     expect(response.status).toBe(500);
     expect(data.error).toBe("Internal server error");
-    expect(data.message).toBe("Database connection failed");
+    expect(data.message).toBeUndefined();
   });
 
   it("should return 200 status for successful execution", async () => {
