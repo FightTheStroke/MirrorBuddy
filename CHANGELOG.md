@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W4: Load Testing & Performance Optimization
+
+- Added: k6 smoke test result template (load-tests/results/smoke-local.md)
+- Added: k6 baseline test result template (load-tests/results/baseline-preview.md)
+- Added: Redis cache layer for hot paths (src/lib/cache/redis-cache.ts)
+- Added: cacheGetOrFetch pattern with configurable TTL and prefix system
+- Added: Before/after comparison template (load-tests/results/baseline-after-fixes.md)
+
 ### W3: Multi-Provider AI (Claude Fallback)
 
 - Added: AIProviderInterface abstraction for multi-provider support

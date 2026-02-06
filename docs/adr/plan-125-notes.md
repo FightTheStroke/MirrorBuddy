@@ -27,3 +27,11 @@
 - Pattern: Health status tracked in-memory with configurable check interval
 - Insight: Anthropic SDK @anthropic-ai/sdk ^0.73.0 was already a dependency in package.json
 - Insight: Claude tool_use blocks map cleanly to OpenAI function calling format
+
+## W4: Load Testing & Performance Optimization
+
+- Decision: Upstash Redis (existing dependency) for cache layer, no new infra needed
+- Pattern: cacheGetOrFetch() with prefix system (maestro, tier, school) and configurable TTL
+- Pattern: Cache is transparent — falls through silently if Redis unavailable
+- Insight: k6 test execution requires running server; templates prepared for manual execution
+- Insight: Supabase connection pool max_connections adjustable via dashboard (not code)
