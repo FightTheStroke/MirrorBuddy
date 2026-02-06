@@ -64,19 +64,20 @@
 
 ## Security & Auth
 
-| #    | Decision                                      | Impact                            |
-| ---- | --------------------------------------------- | --------------------------------- |
-| 0004 | Safety Guardrails for Child Protection        | Content filtering, bias detection |
-| 0055 | Internal Auth System for Beta Access          | Session-based auth                |
-| 0062 | AI Compliance Framework                       | EU AI Act compliance              |
-| 0072 | Secrets Scan Pre-Commit Hook                  | Prevent secret leaks              |
-| 0074 | Contact Form Security and Validation Patterns | Input validation standards        |
-| 0075 | Cookie Handling Standards                     | httpOnly, signed cookies          |
-| 0077 | Security Hardening (Plan 17)                  | Comprehensive security measures   |
-| 0080 | Security Audit Hardening                      | Post-audit security fixes         |
-| 0098 | Trial Security Implementation                 | Secure anonymous trial access     |
-| 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance          |
-| 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety |
+| #    | Decision                                      | Impact                                                                                          |
+| ---- | --------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| 0004 | Safety Guardrails for Child Protection        | Content filtering, bias detection                                                               |
+| 0055 | Internal Auth System for Beta Access          | Session-based auth                                                                              |
+| 0062 | AI Compliance Framework                       | EU AI Act compliance                                                                            |
+| 0072 | Secrets Scan Pre-Commit Hook                  | Prevent secret leaks                                                                            |
+| 0074 | Contact Form Security and Validation Patterns | Input validation standards                                                                      |
+| 0075 | Cookie Handling Standards                     | httpOnly, signed cookies                                                                        |
+| 0077 | Security Hardening (Plan 17)                  | Comprehensive security measures                                                                 |
+| 0080 | Security Audit Hardening                      | Post-audit security fixes                                                                       |
+| 0098 | Trial Security Implementation                 | Secure anonymous trial access                                                                   |
+| 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance                                                                        |
+| 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety                                                               |
+| 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
 
 ## Observability & Operations
 
@@ -183,6 +184,6 @@
 
 ---
 
-**Total Active ADRs**: 105
+**Total Active ADRs**: 106
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-05
+**Last Updated**: 2026-02-06

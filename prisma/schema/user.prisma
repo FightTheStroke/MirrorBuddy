@@ -18,6 +18,7 @@ model User {
   // Plan 052: Internal auth (username/password)
   username           String? @unique // null for legacy/cookie-only users
   email              String? @unique // for password reset notifications
+  emailHash          String? // deterministic hash for encrypted email lookups
   passwordHash       String? // bcrypt hash, null for legacy users
   mustChangePassword Boolean @default(false)
   disabled           Boolean @default(false)
@@ -102,6 +103,8 @@ model User {
 
   // Video Vision Usage Tracking (ADR 0122)
   videoVisionUsages VideoVisionUsage[] @relation("VideoVisionUsages")
+
+  @@index([emailHash])
 }
 
 model Profile {
@@ -171,6 +174,7 @@ model GoogleAccount {
   // Google profile info
   googleId    String  @unique
   email       String
+  emailHash   String? // deterministic hash for encrypted email lookups
   displayName String?
   avatarUrl   String?
 
@@ -192,6 +196,7 @@ model GoogleAccount {
 
   @@index([userId])
   @@index([googleId])
+  @@index([emailHash])
 }
 
 model AccessibilitySettings {

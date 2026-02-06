@@ -6,10 +6,10 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Hoist all mocks to ensure they're available during module mocking
-const { mockGenerateEmbedding, mockStoreEmbedding, mockPrisma } = vi.hoisted(
-  () => {
+const { mockGeneratePrivacyAwareEmbedding, mockStoreEmbedding, mockPrisma } =
+  vi.hoisted(() => {
     return {
-      mockGenerateEmbedding: vi.fn(),
+      mockGeneratePrivacyAwareEmbedding: vi.fn(),
       mockStoreEmbedding: vi.fn(),
       mockPrisma: {
         contentEmbedding: {
@@ -18,8 +18,7 @@ const { mockGenerateEmbedding, mockStoreEmbedding, mockPrisma } = vi.hoisted(
         },
       },
     };
-  },
-);
+  });
 
 // Mock logger
 vi.mock("@/lib/logger", () => ({
@@ -39,7 +38,12 @@ vi.mock("@/lib/logger", () => ({
 
 // Mock embedding service
 vi.mock("../embedding-service", () => ({
-  generateEmbedding: mockGenerateEmbedding,
+  generateEmbedding: mockGeneratePrivacyAwareEmbedding,
+}));
+
+// Mock privacy-aware embedding service
+vi.mock("../privacy-aware-embedding", () => ({
+  generatePrivacyAwareEmbedding: mockGeneratePrivacyAwareEmbedding,
 }));
 
 // Mock vector store
@@ -79,7 +83,7 @@ describe("Summary Indexer", () => {
       };
 
       const mockVector = Array(1536).fill(0.1);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 20 },
@@ -96,8 +100,8 @@ describe("Summary Indexer", () => {
 
       await indexConversationSummary(conversationId, userId, summary, metadata);
 
-      // Should generate embedding
-      expect(mockGenerateEmbedding).toHaveBeenCalledWith(summary);
+      // Should generate privacy-aware embedding
+      expect(mockGeneratePrivacyAwareEmbedding).toHaveBeenCalledWith(summary);
 
       // Should store with correct structure
       expect(mockStoreEmbedding).toHaveBeenCalledWith({
@@ -131,7 +135,7 @@ describe("Summary Indexer", () => {
       });
 
       const mockVector = Array(1536).fill(0.2);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 15 },
@@ -170,7 +174,7 @@ describe("Summary Indexer", () => {
     });
 
     it("should handle errors from embedding service", async () => {
-      mockGenerateEmbedding.mockRejectedValueOnce(
+      mockGeneratePrivacyAwareEmbedding.mockRejectedValueOnce(
         new Error("Azure embedding API unavailable"),
       );
 
@@ -186,7 +190,7 @@ describe("Summary Indexer", () => {
         indexConversationSummary("conv-123", "user-456", ""),
       ).rejects.toThrow("Summary text cannot be empty");
 
-      expect(mockGenerateEmbedding).not.toHaveBeenCalled();
+      expect(mockGeneratePrivacyAwareEmbedding).not.toHaveBeenCalled();
     });
 
     it("should index without optional metadata", async () => {
@@ -195,7 +199,7 @@ describe("Summary Indexer", () => {
       const summary = "Simple summary without metadata";
 
       const mockVector = Array(1536).fill(0.3);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 10 },
@@ -225,7 +229,7 @@ describe("Summary Indexer", () => {
       };
 
       const mockVector = Array(1536).fill(0.4);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 25 },
@@ -254,7 +258,7 @@ describe("Summary Indexer", () => {
 
     it("should handle storing embedding error", async () => {
       const mockVector = Array(1536).fill(0.5);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 15 },
@@ -268,7 +272,7 @@ describe("Summary Indexer", () => {
         indexConversationSummary("conv-123", "user-456", "Test summary"),
       ).rejects.toThrow("Database connection failed");
 
-      expect(mockGenerateEmbedding).toHaveBeenCalled();
+      expect(mockGeneratePrivacyAwareEmbedding).toHaveBeenCalled();
       expect(mockStoreEmbedding).toHaveBeenCalled();
     });
 
@@ -279,7 +283,7 @@ describe("Summary Indexer", () => {
       };
 
       const mockVector = Array(1536).fill(0.6);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 18 },
@@ -312,7 +316,7 @@ describe("Summary Indexer", () => {
       };
 
       const mockVector = Array(1536).fill(0.7);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 12 },
@@ -339,13 +343,13 @@ describe("Summary Indexer", () => {
         indexConversationSummary("conv-123", "user-456", "   \t\n   "),
       ).rejects.toThrow("Summary text cannot be empty");
 
-      expect(mockGenerateEmbedding).not.toHaveBeenCalled();
+      expect(mockGeneratePrivacyAwareEmbedding).not.toHaveBeenCalled();
       expect(mockStoreEmbedding).not.toHaveBeenCalled();
     });
 
     it("should preserve embedding model name", async () => {
       const mockVector = Array(1536).fill(0.8);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-large",
         usage: { tokens: 30 },
@@ -366,7 +370,7 @@ describe("Summary Indexer", () => {
       const metadata = { maestroId: "lovelace" };
 
       const mockVector = Array(1536).fill(0.9);
-      mockGenerateEmbedding.mockResolvedValueOnce({
+      mockGeneratePrivacyAwareEmbedding.mockResolvedValueOnce({
         vector: mockVector,
         model: "text-embedding-3-small",
         usage: { tokens: 20 },

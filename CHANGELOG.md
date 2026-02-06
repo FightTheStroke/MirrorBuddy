@@ -7,6 +7,43 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Security
+
+**PII Detection and Protection (Plan 124)**
+
+- Multi-locale PII pattern registry with locale-aware detection for 5 languages (it/en/fr/de/es)
+- Locale-specific patterns: phone numbers (Italian +39, French +33, German +49, Spanish +34, UK/US), fiscal IDs (Codice Fiscale, INSEE, Steuer-ID, NIF/NIE/CIF), addresses with Unicode diacritic support
+- Unicode-aware person name recognition using `\p{Lu}\p{Ll}+` property escapes for international names with diacritics and hyphenated surnames
+- Privacy-aware embedding pipeline with automatic PII anonymization before vector storage
+- RAG indexing integration across all paths: retrieval-service, summary-indexer, tool-rag-indexer, tool-embedding
+- Message anonymization in conversation POST handler with dual-layer defense (embedding + storage)
+
+**Encryption at Rest (Plan 124)**
+
+- AES-256-GCM encryption for PII fields (email, name, displayName, parentEmail) via Prisma middleware
+- Extended encryption scope to StudyKit.originalText (student content) and HtmlSnippet.content (study materials)
+- Deterministic email indexing via SHA-256 emailHash field for encrypted lookups
+- Data migration script (`migrate-encrypt-pii.ts`) with dry-run mode and batch processing
+- Environment variable `PII_ENCRYPTION_KEY` with secure fallback to `NEXTAUTH_SECRET`
+
+**Key Management (Plan 124)**
+
+- Cryptographic key rotation infrastructure with versioned keys and re-encryption support
+- Key rotation CLI (`rotate-keys.ts`) with dry-run mode, batch processing, and rollback
+- Azure Key Vault integration with graceful degradation to environment variables
+- Dynamic Azure SDK import for optional dependency in local development
+- Secret caching with 5-minute TTL to minimize API calls
+- Decrypt audit logging via `PII_DECRYPT_ACCESS` events for GDPR Article 30 compliance
+- Integration points: encryption.ts, pii-encryption.ts, cookie-signing.ts
+- Backup verification script (`verify-encryption-backup.ts`) for encryption integrity validation
+
+**Transport Security (Plan 124)**
+
+- HSTS header with max-age=31536000 (1 year), includeSubDomains, and preload directive
+- SSL strict mode with certificate validation (rejectUnauthorized=true) for production database connections
+- AES-256-GCM cookie encryption using SESSION_SECRET-derived key
+- Legacy cookie fallback for zero-downtime migration from plain-text to encrypted cookies
+
 ### Added
 
 - **Video Vision (ADR 0122)**: Real-time video vision for Pro-tier voice sessions — periodic webcam frame capture sent via WebRTC data channel to Azure OpenAI Realtime API as `input_image` content

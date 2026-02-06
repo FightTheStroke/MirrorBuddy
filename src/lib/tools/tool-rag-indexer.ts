@@ -5,11 +5,12 @@
 // F-03: Conversazione considera contenuti generati per retrieval semantico
 // ============================================================================
 
-import { logger } from '@/lib/logger';
-import { generateEmbedding, isEmbeddingConfigured } from '@/lib/rag/embedding-service';
-import { storeEmbedding } from '@/lib/rag/vector-store';
-import type { StoredToolOutput } from './tool-output-types';
-import type { ToolType } from '@/types/tools/tool-types';
+import { logger } from "@/lib/logger";
+import { isEmbeddingConfigured } from "@/lib/rag/embedding-service";
+import { generatePrivacyAwareEmbedding } from "@/lib/rag/privacy-aware-embedding";
+import { storeEmbedding } from "@/lib/rag/vector-store";
+import type { StoredToolOutput } from "./tool-output-types";
+import type { ToolType } from "@/types/tools/tool-types";
 
 /**
  * Extract searchable text content from tool output data
@@ -17,14 +18,14 @@ import type { ToolType } from '@/types/tools/tool-types';
  */
 export function extractSearchableText(
   toolType: ToolType,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
 ): string {
   try {
     switch (toolType) {
-      case 'mindmap':
+      case "mindmap":
         return (data.markdown as string) || JSON.stringify(data);
 
-      case 'quiz': {
+      case "quiz": {
         const questions = data.questions as Array<{
           question?: string;
           answers?: Array<{ text?: string }>;
@@ -33,49 +34,67 @@ export function extractSearchableText(
         if (Array.isArray(questions)) {
           return questions
             .map((q) =>
-              [q.question, ...(q.answers?.map((a) => a.text) || []), q.explanation]
+              [
+                q.question,
+                ...(q.answers?.map((a) => a.text) || []),
+                q.explanation,
+              ]
                 .filter(Boolean)
-                .join(' ')
+                .join(" "),
             )
-            .join('\n');
+            .join("\n");
         }
         break;
       }
 
-      case 'flashcard': {
+      case "flashcard": {
         const cards = data.cards as Array<{ front?: string; back?: string }>;
         if (Array.isArray(cards)) {
-          return cards.map((c) => `${c.front || ''} ${c.back || ''}`).join('\n');
+          return cards
+            .map((c) => `${c.front || ""} ${c.back || ""}`)
+            .join("\n");
         }
         break;
       }
 
-      case 'summary':
-        return [data.summary, data.content].filter(Boolean).join('\n');
+      case "summary":
+        return [data.summary, data.content].filter(Boolean).join("\n");
 
-      case 'timeline': {
-        const events = data.events as Array<{ title?: string; description?: string }>;
+      case "timeline": {
+        const events = data.events as Array<{
+          title?: string;
+          description?: string;
+        }>;
         if (Array.isArray(events)) {
-          return events.map((e) => `${e.title || ''} ${e.description || ''}`).join('\n');
+          return events
+            .map((e) => `${e.title || ""} ${e.description || ""}`)
+            .join("\n");
         }
         break;
       }
 
-      case 'diagram':
-        return [data.mermaid, data.description].filter(Boolean).join('\n');
+      case "diagram":
+        return [data.mermaid, data.description].filter(Boolean).join("\n");
 
-      case 'formula':
-        return [data.latex, data.explanation].filter(Boolean).join('\n');
+      case "formula":
+        return [data.latex, data.explanation].filter(Boolean).join("\n");
 
-      case 'homework': {
+      case "homework": {
         const hints = (data.hints as string[]) || [];
-        return [data.question, data.solution, ...hints].filter(Boolean).join('\n');
+        return [data.question, data.solution, ...hints]
+          .filter(Boolean)
+          .join("\n");
       }
 
-      case 'study-kit': {
-        const materials = data.materials as Array<{ title?: string; summary?: string }>;
+      case "study-kit": {
+        const materials = data.materials as Array<{
+          title?: string;
+          summary?: string;
+        }>;
         if (Array.isArray(materials)) {
-          return materials.map((m) => `${m.title || ''} ${m.summary || ''}`).join('\n');
+          return materials
+            .map((m) => `${m.title || ""} ${m.summary || ""}`)
+            .join("\n");
         }
         break;
       }
@@ -85,7 +104,7 @@ export function extractSearchableText(
     const text = JSON.stringify(data);
     return text.length > 10000 ? text.substring(0, 10000) : text;
   } catch (error) {
-    logger.error('Failed to extract searchable text', { toolType }, error);
+    logger.error("Failed to extract searchable text", { toolType }, error);
     return JSON.stringify(data).substring(0, 1000);
   }
 }
@@ -102,13 +121,16 @@ export function extractSearchableText(
 export async function indexToolOutput(
   toolOutput: StoredToolOutput,
   userId: string,
-  conversationId?: string
+  conversationId?: string,
 ): Promise<string | null> {
   // Skip if embedding service not configured
   if (!isEmbeddingConfigured()) {
-    logger.debug('[ToolRAG] Embedding service not configured, skipping indexing', {
-      toolOutputId: toolOutput.id,
-    });
+    logger.debug(
+      "[ToolRAG] Embedding service not configured, skipping indexing",
+      {
+        toolOutputId: toolOutput.id,
+      },
+    );
     return null;
   }
 
@@ -116,30 +138,33 @@ export async function indexToolOutput(
     // Extract searchable text from tool data
     const searchableText = extractSearchableText(
       toolOutput.toolType as ToolType,
-      toolOutput.data
+      toolOutput.data,
     );
 
     if (!searchableText || searchableText.trim().length === 0) {
-      logger.warn('[ToolRAG] No searchable text extracted from tool output', {
+      logger.warn("[ToolRAG] No searchable text extracted from tool output", {
         toolOutputId: toolOutput.id,
         toolType: toolOutput.toolType,
       });
       return null;
     }
 
-    // Generate embedding
-    logger.debug('[ToolRAG] Generating embedding for tool output', {
-      toolOutputId: toolOutput.id,
-      toolType: toolOutput.toolType,
-      textLength: searchableText.length,
-    });
+    // Generate embedding with privacy protection (anonymizes PII before embedding)
+    logger.debug(
+      "[ToolRAG] Generating privacy-aware embedding for tool output",
+      {
+        toolOutputId: toolOutput.id,
+        toolType: toolOutput.toolType,
+        textLength: searchableText.length,
+      },
+    );
 
-    const embedding = await generateEmbedding(searchableText);
+    const embedding = await generatePrivacyAwareEmbedding(searchableText);
 
     // Store in vector database
     const stored = await storeEmbedding({
       userId,
-      sourceType: 'tool',
+      sourceType: "tool",
       sourceId: toolOutput.id,
       content: searchableText,
       vector: embedding.vector,
@@ -147,7 +172,7 @@ export async function indexToolOutput(
       tags: [toolOutput.toolType, conversationId].filter(Boolean) as string[],
     });
 
-    logger.info('[ToolRAG] Tool output indexed successfully', {
+    logger.info("[ToolRAG] Tool output indexed successfully", {
       toolOutputId: toolOutput.id,
       embeddingId: stored.id,
       toolType: toolOutput.toolType,
@@ -156,10 +181,14 @@ export async function indexToolOutput(
 
     return stored.id;
   } catch (error) {
-    logger.error('[ToolRAG] Failed to index tool output', {
-      toolOutputId: toolOutput.id,
-      toolType: toolOutput.toolType,
-    }, error);
+    logger.error(
+      "[ToolRAG] Failed to index tool output",
+      {
+        toolOutputId: toolOutput.id,
+        toolType: toolOutput.toolType,
+      },
+      error,
+    );
     return null;
   }
 }
@@ -176,28 +205,32 @@ export async function indexToolOutput(
 export async function batchIndexToolOutputs(
   toolOutputs: StoredToolOutput[],
   userId: string,
-  conversationId?: string
+  conversationId?: string,
 ): Promise<Array<string | null>> {
   if (!isEmbeddingConfigured()) {
-    logger.debug('[ToolRAG] Embedding service not configured, skipping batch indexing');
+    logger.debug(
+      "[ToolRAG] Embedding service not configured, skipping batch indexing",
+    );
     return toolOutputs.map(() => null);
   }
 
-  logger.info('[ToolRAG] Starting batch indexing', {
+  logger.info("[ToolRAG] Starting batch indexing", {
     count: toolOutputs.length,
     userId,
   });
 
   const results = await Promise.allSettled(
-    toolOutputs.map((output) => indexToolOutput(output, userId, conversationId))
+    toolOutputs.map((output) =>
+      indexToolOutput(output, userId, conversationId),
+    ),
   );
 
   const embeddingIds = results.map((result) =>
-    result.status === 'fulfilled' ? result.value : null
+    result.status === "fulfilled" ? result.value : null,
   );
 
   const successCount = embeddingIds.filter((id) => id !== null).length;
-  logger.info('[ToolRAG] Batch indexing completed', {
+  logger.info("[ToolRAG] Batch indexing completed", {
     total: toolOutputs.length,
     success: successCount,
     failed: toolOutputs.length - successCount,

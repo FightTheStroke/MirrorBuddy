@@ -15,6 +15,7 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
+import { hashPII } from "@/lib/security/pii-encryption";
 
 export const DELETE = pipe(
   withSentry("/api/admin/cleanup-users"),
@@ -26,9 +27,14 @@ export const DELETE = pipe(
   // Get protected emails from environment variable
   const protectedEmails = getProtectedUsers();
 
+  // Hash protected emails for lookup
+  const protectedEmailHashes = await Promise.all(
+    protectedEmails.map((email) => hashPII(email)),
+  );
+
   // Find protected users
   const protectedUsers = await prisma.user.findMany({
-    where: { email: { in: protectedEmails } },
+    where: { emailHash: { in: protectedEmailHashes } },
     select: { id: true, email: true },
   });
 
@@ -108,6 +114,7 @@ export const DELETE = pipe(
     .map((u: { email: string | null }) => u.email)
     .filter((e): e is string => e !== null);
 
+  // Delete InviteRequests for test emails (uses plain email field)
   const inviteResult = await prisma.inviteRequest.deleteMany({
     where: { email: { in: testEmails } },
   });

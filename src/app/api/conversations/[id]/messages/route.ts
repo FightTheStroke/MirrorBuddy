@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { ToolCall, ToolCallRef } from "@/types/tools";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
+import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
 
 /**
  * Convert full ToolCall to lightweight ToolCallRef for DB storage.
@@ -96,13 +97,20 @@ export const POST = pipe(
     toolCallsForStorage = JSON.stringify(refs);
   }
 
+  // Anonymize user messages before storage for privacy protection
+  // Assistant messages are not anonymized to preserve response quality
+  const contentToStore =
+    data.role === "user"
+      ? anonymizeConversationMessage(data.content)
+      : data.content;
+
   // Create message and update conversation
   const [message] = await prisma.$transaction([
     prisma.message.create({
       data: {
         conversationId,
         role: data.role,
-        content: data.content,
+        content: contentToStore,
         toolCalls: toolCallsForStorage,
         tokenCount: data.tokenCount,
       },

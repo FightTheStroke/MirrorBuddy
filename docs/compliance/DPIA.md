@@ -55,7 +55,15 @@ This DPIA assesses high-risk data processing activities under GDPR Article 35, i
 - Age-gating: Topic access restricted by age via `src/lib/safety/age-gating.ts`
 - Audit logging: All access logged without PII via `src/lib/safety/audit/audit-trail-service.ts`
 
-**Storage**: PostgreSQL encrypted at rest (AES-256), TLS 1.3 in transit. User-only access + admin auth via `ADMIN_EMAIL`.
+**Storage**: Multi-layered encryption architecture (ADR 0126):
+
+- **Database-level encryption**: PostgreSQL encrypted at rest (AES-256), TLS 1.3 in transit
+- **Application-level PII encryption**: AES-256-GCM for email, name, and user-generated content (`src/lib/security/pii-encryption.ts`)
+- **Cookie encryption**: Session cookies encrypted with AES-256-GCM (`src/lib/auth/cookie-encryption.ts`)
+- **Privacy-aware RAG**: PII anonymization before embedding generation and vector storage (`src/lib/privacy/privacy-aware-embedding.ts`)
+- **Key management**: Versioned key rotation with Azure Key Vault integration and environment variable fallback
+- **Audit trail**: All PII decryption operations logged to AuditLog table (30-day retention)
+- **Access control**: User-only access + admin auth via `ADMIN_EMAIL`
 
 **Deletion**: `POST /api/privacy/delete-my-data` cascade deletes profile, conversations, preferences (30-day grace period). Parental delete via Parent Mode.
 
@@ -84,6 +92,7 @@ See `docs/compliance/DPIA-risks.md` for detailed 12-risk matrix with likelihood�
 Per GDPR Article 35(7), this assessment evaluates risks arising from data processing by third-party processors. See `docs/compliance/DPIA-SERVICES.md` for detailed risk analysis.
 
 **Summary**: All 5 primary processors (Supabase, Azure OpenAI, Vercel, Resend, Upstash Redis) assessed with residual risk ratings:
+
 - **EU-only processors** (Supabase, Azure OpenAI): 🟢 NEGLIGIBLE risk
 - **Extra-EU with SCCs** (Vercel, Resend): 🟡 LOW risk (mitigated via Standard Contractual Clauses + technical safeguards)
 - **Pseudonymized data** (Upstash Redis): 🟢 VERY LOW risk (hashed IDs, 1-hour TTL)
@@ -102,9 +111,15 @@ Per GDPR Article 35(7), this assessment evaluates risks arising from data proces
 
 - **5-Layer Safety Defense** (`src/lib/safety/`): Jailbreak detection, content filtering, output sanitization, age-gating, audit trail
 - **Dual Consent**: Student + parent email verification
-- **Encryption**: TLS 1.3 + AES-256
+- **Multi-Layered Encryption** (ADR 0126):
+  - TLS 1.3 in transit with HSTS preload directive
+  - AES-256 database-level encryption at rest
+  - AES-256-GCM application-level PII encryption (email, name, user content)
+  - AES-256-GCM session cookie encryption
+  - Privacy-aware RAG with pre-embedding PII anonymization
+  - Azure Key Vault for encryption key management with versioned key rotation
 - **Access Control**: Session-based auth; users access own data only
-- **Audit Trail**: All access logged (PII-redacted, 90-day retention)
+- **Audit Trail**: All access logged (PII-redacted, 90-day retention); PII decryption operations logged separately
 - **Accessibility**: 7 DSA profiles; character intensity dial (ADR 0031); 90-day cookie storage
 
 ### Planned (Q1 2026)

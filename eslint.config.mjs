@@ -260,6 +260,21 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // TF-03: Block direct imports of generateEmbedding - enforce privacy-aware wrapper
+  // Prevents PII leakage into vector embeddings by requiring use of privacy-aware-embedding.ts
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "src/lib/rag/embedding-service.ts", // Source of truth
+      "src/lib/rag/privacy-aware-embedding.ts", // Needs to import embedding-service
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-direct-embedding": "error",
+    },
+  },
   // ADR 0005, 0034: EventSource must be closed in cleanup
   // Warns about EventSource usage to remind developers about .close() in useEffect cleanup
   {
@@ -371,6 +386,18 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "local-rules/no-prisma-race-condition": "warn",
+    },
+  },
+  // TF-04: Detect raw Prisma queries that bypass PII encryption middleware
+  // Flags $queryRaw/$executeRaw that reference PII fields (email, name, parentEmail, etc.)
+  {
+    files: ["src/**/*.ts"],
+    ignores: [
+      "src/**/*.test.ts",
+      "src/**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-plaintext-pii-storage": "error",
     },
   },
   // ADR 0059: Require E2E specs to use fixtures instead of raw @playwright/test

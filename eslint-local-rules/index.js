@@ -12,6 +12,8 @@ import requireCsrfMutatingRoutes from "./require-csrf-mutating-routes.js";
 import requirePipeHandler from "./require-pipe-handler.js";
 import noHardcodedStringsInTests from "./no-hardcoded-strings-in-tests.js";
 import requireCompleteLoggerMock from "./require-complete-logger-mock.js";
+import noPlaintextPiiStorage from "./no-plaintext-pii-storage.js";
+import noDirectEmbedding from "./no-direct-embedding.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -271,6 +273,8 @@ const rules = {
   "require-pipe-handler": requirePipeHandler,
   "no-hardcoded-strings-in-tests": noHardcodedStringsInTests,
   "require-complete-logger-mock": requireCompleteLoggerMock,
+  "no-plaintext-pii-storage": noPlaintextPiiStorage,
+  "no-direct-embedding": noDirectEmbedding,
 };
 
 const localRules = {

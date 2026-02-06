@@ -5,7 +5,7 @@
  */
 
 import { prisma } from "@/lib/db";
-import { generateEmbedding } from "./embedding-service";
+import { generatePrivacyAwareEmbedding } from "./privacy-aware-embedding";
 import { storeEmbedding } from "./vector-store";
 import { logger } from "@/lib/logger";
 
@@ -64,8 +64,8 @@ export async function indexConversationSummary(
     });
   }
 
-  // Generate embedding
-  const embeddingResult = await generateEmbedding(summary);
+  // Generate privacy-aware embedding (anonymizes PII before embedding)
+  const embeddingResult = await generatePrivacyAwareEmbedding(summary);
 
   // Format metadata as tags
   const tags: string[] = [];

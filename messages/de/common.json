@@ -1,5 +1,6 @@
 {
   "common": {
+    "loading": "Laden...",
     "error": "Fehler",
     "success": "Erfolgreich",
     "warning": "Warnung",
@@ -101,7 +102,6 @@
     },
     "create": "Erstellen",
     "update": "Aktualisieren",
-    "loading": "Laden...",
     "skipToMainContent": "Zum Hauptinhalt springen",
     "skipLinkFocused": "Fokus zum Hauptinhalt bewegt",
     "accessibility": {

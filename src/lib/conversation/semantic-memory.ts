@@ -10,7 +10,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { generateEmbedding } from "@/lib/rag/embedding-service";
+import { generatePrivacyAwareEmbedding } from "@/lib/rag/privacy-aware-embedding";
 import { searchSimilar } from "@/lib/rag/vector-store";
 import { getTierMemoryLimits } from "./tier-memory-config";
 import type { TierName } from "@/types/tier-types";
@@ -100,7 +100,7 @@ export async function searchRelevantSummaries(
     });
 
     // Generate embedding for the query
-    const embeddingResult = await generateEmbedding(query);
+    const embeddingResult = await generatePrivacyAwareEmbedding(query);
 
     // Search for similar conversation summaries
     const results = await searchSimilar({

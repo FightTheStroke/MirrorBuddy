@@ -21,6 +21,16 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+// Mock anonymization service
+vi.mock("@/lib/privacy/anonymization-service", () => ({
+  anonymizeConversationMessage: vi.fn((content: string) => {
+    // Simple mock: replace emails and phone numbers with placeholders
+    return content
+      .replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, "[EMAIL]")
+      .replace(/\b\d{3}[-.]?\d{3}[-.]?\d{4}\b/g, "[PHONE]");
+  }),
+}));
+
 // Mock prisma - use vi.hoisted to ensure mockPrisma is available during mock hoisting
 const { mockPrisma } = vi.hoisted(() => {
   return {
@@ -47,6 +57,7 @@ import {
   type VectorSearchResult,
   type StoreEmbeddingInput,
 } from "../vector-store";
+import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
 
 describe("Vector Store Service", () => {
   beforeEach(() => {
@@ -111,6 +122,44 @@ describe("Vector Store Service", () => {
       await expect(storeEmbedding(input)).rejects.toThrow(
         "Invalid vector dimensions",
       );
+    });
+
+    it("should anonymize content containing PII before storing", async () => {
+      const input: StoreEmbeddingInput = {
+        userId: "user-123",
+        sourceType: "message",
+        sourceId: "msg-456",
+        chunkIndex: 0,
+        content: "My email is john.doe@example.com and phone is 555-123-4567",
+        vector: Array(1536).fill(0.1),
+        model: "text-embedding-3-small",
+      };
+
+      mockPrisma.contentEmbedding.create.mockResolvedValueOnce({
+        id: "emb-789",
+        userId: input.userId,
+        sourceType: input.sourceType,
+        sourceId: input.sourceId,
+        chunkIndex: 0,
+        content: "My email is [EMAIL] and phone is [PHONE]",
+        vector: JSON.stringify(input.vector),
+        dimensions: 1536,
+        tokenCount: 10,
+        model: input.model,
+        subject: null,
+        tags: "[]",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      await storeEmbedding(input);
+
+      expect(anonymizeConversationMessage).toHaveBeenCalledWith(input.content);
+      expect(mockPrisma.contentEmbedding.create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          content: "My email is [EMAIL] and phone is [PHONE]",
+        }),
+      });
     });
   });
 

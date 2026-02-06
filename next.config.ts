@@ -153,6 +153,11 @@ const nextConfig: NextConfig = {
             key: "X-XSS-Protection",
             value: "1; mode=block",
           },
+          {
+            // Enforce HTTPS with HSTS
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
           // Content-Security-Policy moved to src/proxy.ts (nonce-based)
           // See F-03: CSP proxy for XSS protection
         ],

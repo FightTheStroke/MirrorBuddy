@@ -5,27 +5,38 @@
  * @module rag/retrieval-service
  */
 
-import { logger } from '@/lib/logger';
-import { generateEmbedding, isEmbeddingConfigured } from './embedding-service';
-import { searchSimilar, storeEmbedding, type VectorSearchResult } from './vector-store';
-import { chunkText } from './semantic-chunker';
+import { logger } from "@/lib/logger";
+import { isEmbeddingConfigured } from "./embedding-service";
+import { generatePrivacyAwareEmbedding } from "./privacy-aware-embedding";
+import {
+  searchSimilar,
+  storeEmbedding,
+  type VectorSearchResult,
+} from "./vector-store";
+import { chunkText } from "./semantic-chunker";
 import type {
   RetrievalResult,
   FindSimilarOptions,
   FindRelatedOptions,
   IndexMaterialInput,
   IndexResult,
-} from './retrieval-types';
+} from "./retrieval-types";
 
 // Re-export types
-export type { RetrievalResult, FindSimilarOptions, FindRelatedOptions, IndexMaterialInput, IndexResult } from './retrieval-types';
+export type {
+  RetrievalResult,
+  FindSimilarOptions,
+  FindRelatedOptions,
+  IndexMaterialInput,
+  IndexResult,
+} from "./retrieval-types";
 
 /**
  * Find materials similar to a query or embedding
  * Searches only 'material' type embeddings
  */
 export async function findSimilarMaterials(
-  options: FindSimilarOptions
+  options: FindSimilarOptions,
 ): Promise<RetrievalResult[]> {
   const {
     userId,
@@ -39,15 +50,15 @@ export async function findSimilarMaterials(
 
   // Early exit if embedding service not configured and no pre-computed embedding
   if (!embedding && !isEmbeddingConfigured()) {
-    logger.debug('[Retrieval] Embedding service not configured, skipping RAG');
+    logger.debug("[Retrieval] Embedding service not configured, skipping RAG");
     return [];
   }
 
   if (!query && !embedding) {
-    throw new Error('Either query or embedding must be provided');
+    throw new Error("Either query or embedding must be provided");
   }
 
-  logger.debug('[Retrieval] Finding similar materials', {
+  logger.debug("[Retrieval] Finding similar materials", {
     userId,
     hasQuery: !!query,
     hasEmbedding: !!embedding,
@@ -61,7 +72,7 @@ export async function findSimilarMaterials(
   if (embedding) {
     searchVector = embedding;
   } else {
-    const result = await generateEmbedding(query!);
+    const result = await generatePrivacyAwareEmbedding(query!);
     searchVector = result.vector;
   }
 
@@ -71,7 +82,7 @@ export async function findSimilarMaterials(
     vector: searchVector,
     limit: limit + excludeSourceIds.length, // Fetch extra to account for exclusions
     minSimilarity,
-    sourceType: 'material',
+    sourceType: "material",
     subject,
   });
 
@@ -88,7 +99,7 @@ export async function findSimilarMaterials(
  * Useful for suggesting review of previously studied concepts
  */
 export async function findRelatedConcepts(
-  options: FindRelatedOptions
+  options: FindRelatedOptions,
 ): Promise<RetrievalResult[]> {
   const {
     userId,
@@ -104,15 +115,15 @@ export async function findRelatedConcepts(
 
   // Early exit if embedding service not configured and no pre-computed embedding
   if (!embedding && !isEmbeddingConfigured()) {
-    logger.debug('[Retrieval] Embedding service not configured, skipping RAG');
+    logger.debug("[Retrieval] Embedding service not configured, skipping RAG");
     return [];
   }
 
   if (!query && !embedding) {
-    throw new Error('Either query or embedding must be provided');
+    throw new Error("Either query or embedding must be provided");
   }
 
-  logger.debug('[Retrieval] Finding related concepts', {
+  logger.debug("[Retrieval] Finding related concepts", {
     userId,
     hasQuery: !!query,
     includeFlashcards,
@@ -125,7 +136,7 @@ export async function findRelatedConcepts(
   if (embedding) {
     searchVector = embedding;
   } else {
-    const result = await generateEmbedding(query!);
+    const result = await generatePrivacyAwareEmbedding(query!);
     searchVector = result.vector;
   }
 
@@ -138,7 +149,7 @@ export async function findRelatedConcepts(
       vector: searchVector,
       limit,
       minSimilarity,
-      sourceType: 'flashcard',
+      sourceType: "flashcard",
       subject,
     });
     allResults.push(...flashcardResults);
@@ -150,14 +161,16 @@ export async function findRelatedConcepts(
       vector: searchVector,
       limit,
       minSimilarity,
-      sourceType: 'studykit',
+      sourceType: "studykit",
       subject,
     });
     allResults.push(...studykitResults);
   }
 
   // Filter excluded source IDs
-  const filtered = allResults.filter((r) => !excludeSourceIds.includes(r.sourceId));
+  const filtered = allResults.filter(
+    (r) => !excludeSourceIds.includes(r.sourceId),
+  );
 
   // Sort by similarity and limit
   filtered.sort((a, b) => b.similarity - a.similarity);
@@ -170,12 +183,16 @@ export async function findRelatedConcepts(
  * Index material content for later retrieval
  * Chunks content and stores embeddings
  */
-export async function indexMaterial(input: IndexMaterialInput): Promise<IndexResult> {
+export async function indexMaterial(
+  input: IndexMaterialInput,
+): Promise<IndexResult> {
   const { userId, sourceType, sourceId, content, subject, tags } = input;
 
   // Early exit if embedding service not configured
   if (!isEmbeddingConfigured()) {
-    logger.debug('[Retrieval] Embedding service not configured, skipping indexing');
+    logger.debug(
+      "[Retrieval] Embedding service not configured, skipping indexing",
+    );
     return {
       chunksIndexed: 0,
       totalTokens: 0,
@@ -183,7 +200,7 @@ export async function indexMaterial(input: IndexMaterialInput): Promise<IndexRes
     };
   }
 
-  logger.debug('[Retrieval] Indexing material', {
+  logger.debug("[Retrieval] Indexing material", {
     userId,
     sourceType,
     sourceId,
@@ -214,7 +231,9 @@ export async function indexMaterial(input: IndexMaterialInput): Promise<IndexRes
     const chunk = chunks[i];
 
     try {
-      const embeddingResult = await generateEmbedding(chunk.content);
+      const embeddingResult = await generatePrivacyAwareEmbedding(
+        chunk.content,
+      );
       totalTokens += embeddingResult.usage.tokens;
 
       const stored = await storeEmbedding({
@@ -231,16 +250,16 @@ export async function indexMaterial(input: IndexMaterialInput): Promise<IndexRes
 
       embeddingIds.push(stored.id);
     } catch (error) {
-      logger.error('[Retrieval] Failed to index chunk', {
+      logger.error("[Retrieval] Failed to index chunk", {
         sourceId,
         chunkIndex: i,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       // Continue with other chunks
     }
   }
 
-  logger.info('[Retrieval] Material indexed', {
+  logger.info("[Retrieval] Material indexed", {
     sourceId,
     chunksIndexed: embeddingIds.length,
     totalTokens,

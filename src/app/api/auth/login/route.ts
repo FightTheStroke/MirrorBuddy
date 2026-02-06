@@ -9,6 +9,7 @@ import {
 } from "@/lib/auth/cookie-constants";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
+import { hashPII } from "@/lib/security/pii-encryption";
 
 const log = logger.child({ module: "auth/login" });
 
@@ -44,10 +45,11 @@ export const POST = pipe(
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  // Try email first, then username
+  // Try email first (by hash), then username
+  const identifierHash = await hashPII(identifier);
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ email: identifier }, { username: identifier }],
+      OR: [{ emailHash: identifierHash }, { username: identifier }],
     },
     select: {
       id: true,

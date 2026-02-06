@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
+import { hashPII } from "@/lib/security/pii-encryption";
 
 const GRACE_PERIOD_DAYS = 30;
 
@@ -307,8 +308,9 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
   }
 
   if (payload.user.email) {
-    const emailOwner = await prisma.user.findUnique({
-      where: { email: payload.user.email as string },
+    const emailHashValue = await hashPII(payload.user.email as string);
+    const emailOwner = await prisma.user.findFirst({
+      where: { emailHash: emailHashValue },
       select: { id: true },
     });
     if (emailOwner) {

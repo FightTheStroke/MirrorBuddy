@@ -8,7 +8,7 @@
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
-import { generateEmbedding } from "./embedding-service";
+import { generatePrivacyAwareEmbedding } from "./privacy-aware-embedding";
 import { searchSimilar, type VectorSearchResult } from "./vector-store";
 import { cosineSimilarity } from "./embedding-service";
 import { rerank } from "./reranker";
@@ -198,7 +198,7 @@ export async function hybridSearch(
   const [semanticResults, keywordResults] = await Promise.all([
     // Semantic search
     (async () => {
-      const embeddingResult = await generateEmbedding(query);
+      const embeddingResult = await generatePrivacyAwareEmbedding(query);
       return searchSimilar({
         userId,
         vector: embeddingResult.vector,
@@ -320,8 +320,8 @@ export async function textSimilarity(
   text2: string,
 ): Promise<number> {
   const [embedding1, embedding2] = await Promise.all([
-    generateEmbedding(text1),
-    generateEmbedding(text2),
+    generatePrivacyAwareEmbedding(text1),
+    generatePrivacyAwareEmbedding(text2),
   ]);
 
   return cosineSimilarity(embedding1.vector, embedding2.vector);

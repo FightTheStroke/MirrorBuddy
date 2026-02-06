@@ -16,6 +16,7 @@ import {
   nativeVectorSearch,
   updateNativeVector,
 } from "./pgvector-utils";
+import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
 
 /** Expected embedding dimensions */
 const EXPECTED_DIMENSIONS = 1536;
@@ -79,6 +80,7 @@ export interface DeleteOptions {
 /**
  * Store an embedding in the database
  * Also updates native vector column when pgvector is available
+ * Content is anonymized to ensure COPPA/GDPR compliance
  */
 export async function storeEmbedding(input: StoreEmbeddingInput) {
   if (input.vector.length !== EXPECTED_DIMENSIONS) {
@@ -93,17 +95,20 @@ export async function storeEmbedding(input: StoreEmbeddingInput) {
     chunkIndex: input.chunkIndex ?? 0,
   });
 
+  // Anonymize content before storing to ensure no PII in vector DB
+  const anonymizedContent = anonymizeConversationMessage(input.content);
+
   const embedding = await prisma.contentEmbedding.create({
     data: {
       userId: input.userId,
       sourceType: input.sourceType,
       sourceId: input.sourceId,
       chunkIndex: input.chunkIndex ?? 0,
-      content: input.content,
+      content: anonymizedContent,
       vector: JSON.stringify(input.vector),
       model: input.model ?? "text-embedding-3-small",
       dimensions: input.vector.length,
-      tokenCount: Math.ceil(input.content.length / 4),
+      tokenCount: Math.ceil(anonymizedContent.length / 4),
       subject: input.subject,
       tags: JSON.stringify(input.tags ?? []),
     },

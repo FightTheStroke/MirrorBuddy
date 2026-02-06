@@ -10,6 +10,7 @@
 import { createCipheriv, createDecipheriv, randomBytes, scrypt } from "crypto";
 import { promisify } from "util";
 import { logger } from "@/lib/logger";
+import { getSecret } from "@/lib/security/azure-key-vault";
 
 const scryptAsync = promisify(scrypt);
 
@@ -20,24 +21,51 @@ const AUTH_TAG_LENGTH = 16; // 128 bits
 const SALT_LENGTH = 16;
 const KEY_LENGTH = 32; // 256 bits
 
-// Get encryption key from environment (required in production)
-const ENCRYPTION_KEY = process.env.TOKEN_ENCRYPTION_KEY;
+// Cached encryption key (fetched from Azure Key Vault or environment)
+let ENCRYPTION_KEY: string | undefined;
+let keyPromise: Promise<string> | null = null;
+
+/**
+ * Get encryption key from Azure Key Vault (with env var fallback)
+ * Uses caching to avoid repeated fetches
+ */
+async function getEncryptionKey(): Promise<string> {
+  if (ENCRYPTION_KEY) {
+    return ENCRYPTION_KEY;
+  }
+
+  if (!keyPromise) {
+    keyPromise = getSecret("TOKEN_ENCRYPTION_KEY").then((key) => {
+      ENCRYPTION_KEY = key;
+      return key;
+    });
+  }
+
+  return keyPromise;
+}
 
 /**
  * Check if encryption is properly configured
+ * Now async to support Azure Key Vault
  */
-export function isEncryptionConfigured(): boolean {
-  return Boolean(ENCRYPTION_KEY && ENCRYPTION_KEY.length >= 32);
+export async function isEncryptionConfigured(): Promise<boolean> {
+  try {
+    const key = await getEncryptionKey();
+    return Boolean(key && key.length >= 32);
+  } catch {
+    return false;
+  }
 }
 
 /**
  * Derive a key from the master key and salt using scrypt
  */
 async function deriveKey(salt: Buffer): Promise<Buffer> {
-  if (!ENCRYPTION_KEY) {
+  const key = await getEncryptionKey();
+  if (!key) {
     throw new Error("TOKEN_ENCRYPTION_KEY not configured");
   }
-  return (await scryptAsync(ENCRYPTION_KEY, salt, KEY_LENGTH)) as Buffer;
+  return (await scryptAsync(key, salt, KEY_LENGTH)) as Buffer;
 }
 
 /**
@@ -159,16 +187,23 @@ export async function rotateEncryptionKey(
   newKey: string,
   encryptedValue: string,
 ): Promise<string> {
-  // Temporarily use old key for decryption
-  const originalKey = process.env.TOKEN_ENCRYPTION_KEY;
+  // Save current cached key
+  const originalKey = ENCRYPTION_KEY;
+  const originalPromise = keyPromise;
+
   try {
-    // This is a simplified example - real implementation would need
-    // to handle the key swap more carefully
-    process.env.TOKEN_ENCRYPTION_KEY = oldKey;
+    // Temporarily use old key for decryption
+    ENCRYPTION_KEY = oldKey;
+    keyPromise = null;
     const plaintext = await decryptToken(encryptedValue);
-    process.env.TOKEN_ENCRYPTION_KEY = newKey;
+
+    // Use new key for encryption
+    ENCRYPTION_KEY = newKey;
+    keyPromise = null;
     return await encryptToken(plaintext);
   } finally {
-    process.env.TOKEN_ENCRYPTION_KEY = originalKey;
+    // Restore original state
+    ENCRYPTION_KEY = originalKey;
+    keyPromise = originalPromise;
   }
 }

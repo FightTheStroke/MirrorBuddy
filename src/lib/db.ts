@@ -7,10 +7,16 @@
 import "server-only";
 import { PrismaClient } from "@prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { Pool, PoolConfig } from "pg";
+import { Pool } from "pg";
 import { logger } from "@/lib/logger";
 import { isSupabaseUrl } from "@/lib/utils/url-validation";
 import { isStagingMode } from "@/lib/environment/staging-detector";
+import { createPIIMiddleware } from "@/lib/db/pii-middleware";
+import {
+  loadSupabaseCertificate,
+  buildSslConfig,
+  cleanConnectionString,
+} from "@/lib/db/ssl-config";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -76,152 +82,14 @@ const connectionString = isE2E
     : process.env.DATABASE_URL ||
       "postgresql://postgres:postgres@localhost:5432/mirrorbuddy";
 
-// Configure SSL for Supabase connection (ADR 0067)
-// ROOT CAUSE SOLUTION: Use full Supabase certificate chain
-// Contains: Supabase Intermediate 2021 CA + Supabase Root 2021 CA
-// Both certificates are required for proper SSL verification
-// Without the full chain, verification fails with "unable to get issuer certificate"
-
-import fs from "fs";
-import path from "path";
-
-function loadSupabaseCertificate(): string | undefined {
-  // Priority 1: Load full certificate chain from repository
-  // Contains Supabase Intermediate 2021 CA + Supabase Root 2021 CA
-  // Both certificates are required for successful verification
-  const certPath = path.join(process.cwd(), "config", "supabase-chain.pem");
-
-  if (fs.existsSync(certPath)) {
-    try {
-      const cert = fs.readFileSync(certPath, "utf-8");
-      const certCount = (cert.match(/BEGIN CERTIFICATE/g) || []).length;
-      logger.info("[SSL] Loaded certificate chain from repository", {
-        path: certPath,
-        certificates: certCount,
-        size: cert.length,
-      });
-      return cert;
-    } catch (error) {
-      logger.warn("[SSL] Failed to read certificate file", {
-        path: certPath,
-        error: String(error),
-      });
-    }
-  }
-
-  // Priority 2: Fallback to environment variable (for backwards compatibility)
-  const envCert = process.env.SUPABASE_CA_CERT;
-  if (envCert) {
-    logger.info("[SSL] Using certificate from environment variable");
-    // Certificate in env var uses '|' as newline separator
-    return envCert.split("|").join("\n");
-  }
-
-  logger.warn("[SSL] No certificate found in repository or environment");
-  return undefined;
-}
-
+// Load Supabase certificate chain (ADR 0067)
 const supabaseCaCert = loadSupabaseCertificate();
-
-/**
- * Check if the database URL points to a local database (no SSL needed)
- */
-function isLocalDatabase(url?: string): boolean {
-  if (!url) return true; // Default to local if not specified
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    return (
-      host === "localhost" ||
-      host === "127.0.0.1" ||
-      host === "::1" ||
-      host.endsWith(".local")
-    );
-  } catch {
-    return false;
-  }
-}
-
-// Build SSL configuration
-function buildSslConfig(): PoolConfig["ssl"] {
-  // E2E Tests: NO SSL (local PostgreSQL in CI doesn't support SSL)
-  if (isE2E) {
-    return undefined;
-  }
-
-  // Local databases: NO SSL (localhost, 127.0.0.1, etc.)
-  // This allows running production builds locally for testing
-  if (isLocalDatabase(connectionString)) {
-    return undefined;
-  }
-
-  // Production with remote DB: SSL configuration with Supabase certificate chain (ADR 0067)
-  if (isProduction) {
-    // If certificate chain is available, enable full SSL verification
-    if (supabaseCaCert) {
-      const certContent =
-        typeof supabaseCaCert === "string" ? supabaseCaCert : "";
-
-      // Verify we have the full chain (intermediate + root)
-      const certCount = (certContent.match(/BEGIN CERTIFICATE/g) || []).length;
-
-      if (certCount >= 2) {
-        logger.info("[SSL] Certificate chain loaded, enabling TLS encryption", {
-          certificates: certCount,
-          mode: "require",
-          adr: "0067",
-        });
-        // Note: rejectUnauthorized: false because Supabase uses their own CA
-        // which is not in system trust store. Traffic is still TLS encrypted.
-        return {
-          rejectUnauthorized: false,
-          ca: certContent,
-        };
-      } else {
-        logger.warn("[SSL] Incomplete certificate chain", {
-          certificates: certCount,
-          expected: ">=2 (intermediate + root)",
-          action: "Run: npm run extract-cert to regenerate certificate chain",
-        });
-      }
-    }
-
-    // Fallback: Disable strict SSL verification
-    // Connection is still encrypted with TLS, but server certificate is not verified
-    logger.warn(
-      "[SSL] No certificate chain available, disabling strict verification",
-      {
-        mode: "require-without-verify",
-        security: "TLS encryption active, but server not authenticated",
-        action: "Add certificate chain to config/supabase-chain.pem",
-        adr: "0067",
-      },
-    );
-
-    return {
-      rejectUnauthorized: false,
-    };
-  }
-
-  // Local development: no SSL needed (connecting to localhost)
-  return undefined;
-}
-
-// Create pg Pool with SSL configuration
-// Remove sslmode parameter from connection string - we manage SSL explicitly via ssl option
-function cleanConnectionString(url: string): string {
-  // Remove sslmode=value (and its delimiter)
-  let cleaned = url.replace(/([?&])sslmode=[^&]*/g, "$1");
-  // Clean up any trailing ? or & or double delimiters
-  cleaned = cleaned.replace(/[?&]$/, "").replace(/[?&]{2,}/g, "?");
-  return cleaned;
-}
 
 // Connection pool configuration optimized for Vercel serverless (ADR 0065)
 // Serverless functions are stateless and short-lived, so we minimize idle connections
 const pool = new Pool({
   connectionString: cleanConnectionString(connectionString),
-  ssl: buildSslConfig(),
+  ssl: buildSslConfig(connectionString, isE2E, isProduction, supabaseCaCert),
   max: 5, // Maximum 5 concurrent connections per serverless instance
   min: 0, // No idle connections (serverless cold start every time)
   idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
@@ -302,10 +170,19 @@ const stagingExtension = basePrisma.$extends({
   },
 });
 
+// ============================================================================
+// PII ENCRYPTION MIDDLEWARE (using Prisma Client Extensions)
+// Auto-encrypt/decrypt PII fields (email, names) in database operations
+// Applied after staging extension to ensure proper chaining
+// ============================================================================
+
+const piiMiddleware = createPIIMiddleware();
+const piiExtension = stagingExtension.$extends(piiMiddleware);
+
 // Export the extended client (or base client if already initialized)
 // Type assertion is safe because $extends preserves the PrismaClient interface
 export const prisma =
-  globalForPrisma.prisma ?? (stagingExtension as unknown as PrismaClient);
+  globalForPrisma.prisma ?? (piiExtension as unknown as PrismaClient);
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

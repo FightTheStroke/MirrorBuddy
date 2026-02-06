@@ -1,24 +1,75 @@
 /**
  * Privacy-Aware Embedding Service
- * Part of Ethical Design Hardening (F-04)
+ * Part of Ethical Design Hardening (F-01)
  *
  * Wraps the embedding service to anonymize content before
  * generating embeddings, ensuring PII is not embedded in vectors.
  */
 
-import { logger } from '@/lib/logger';
+import { logger } from "@/lib/logger";
 import {
   anonymizeContent,
   containsSensitivePII,
-  AnonymizationOptions,
-} from '@/lib/privacy';
+  type AnonymizationOptions,
+} from "@/lib/privacy";
 import {
   generateEmbedding,
   generateEmbeddings,
-  EmbeddingResult,
-} from './embedding-service';
+  type EmbeddingResult,
+} from "./embedding-service";
 
-const log = logger.child({ module: 'privacy-embedding' });
+const log = logger.child({ module: "privacy-embedding" });
+
+/**
+ * Default anonymization options for embeddings
+ * - Anonymize names, emails, phones (high PII risk)
+ * - Keep dates and generic IDs (lower risk, may be educational context)
+ */
+const DEFAULT_EMBEDDING_ANONYMIZATION_OPTIONS: Partial<AnonymizationOptions> = {
+  anonymizeNames: true,
+  anonymizeEmails: true,
+  anonymizePhones: true,
+  anonymizeDates: false, // Educational dates may be contextually important
+  anonymizeIds: false, // Generic IDs usually not sensitive in educational context
+};
+
+/**
+ * Generate embedding with privacy protection (drop-in replacement for generateEmbedding)
+ * Anonymizes PII from text before sending to embedding service
+ *
+ * @param text - Text to embed
+ * @param options - Anonymization options (defaults to privacy-preserving settings)
+ * @returns Embedding result with vector generated from anonymized text
+ *
+ * @example
+ * ```typescript
+ * const result = await generatePrivacyAwareEmbedding(
+ *   "John studied with Maria at john@example.com"
+ * );
+ * // Embedding is generated from: "[NAME] studied with [NAME] at [EMAIL]"
+ * ```
+ */
+export async function generatePrivacyAwareEmbedding(
+  text: string,
+  options: Partial<AnonymizationOptions> = DEFAULT_EMBEDDING_ANONYMIZATION_OPTIONS,
+): Promise<EmbeddingResult> {
+  // Anonymize PII before embedding
+  const anonymizationResult = anonymizeContent(text, options);
+
+  if (anonymizationResult.totalReplacements > 0) {
+    log.debug("Anonymized content before embedding", {
+      originalLength: text.length,
+      anonymizedLength: anonymizationResult.content.length,
+      piiTypesFound: anonymizationResult.piiTypesFound,
+      totalReplacements: anonymizationResult.totalReplacements,
+    });
+  }
+
+  // Generate embedding on anonymized text
+  const embeddingResult = await generateEmbedding(anonymizationResult.content);
+
+  return embeddingResult;
+}
 
 /**
  * Extended embedding result with privacy metadata
@@ -33,7 +84,7 @@ export interface PrivacyAwareEmbeddingResult extends EmbeddingResult {
 }
 
 /**
- * Options for privacy-aware embedding
+ * Options for privacy-aware embedding with metadata
  */
 export interface PrivacyEmbeddingOptions {
   /** Force anonymization even if no sensitive PII detected */
@@ -45,15 +96,15 @@ export interface PrivacyEmbeddingOptions {
 }
 
 /**
- * Generate embedding with automatic PII anonymization
+ * Generate embedding with automatic PII anonymization and metadata
  *
  * @param text - Text to embed
  * @param options - Privacy options
  * @returns Embedding result with privacy metadata
  */
-export async function generatePrivacyAwareEmbedding(
+export async function generatePrivacyAwareEmbeddingWithMetadata(
   text: string,
-  options: PrivacyEmbeddingOptions = {}
+  options: PrivacyEmbeddingOptions = {},
 ): Promise<PrivacyAwareEmbeddingResult> {
   const {
     forceAnonymization = false,
@@ -73,7 +124,7 @@ export async function generatePrivacyAwareEmbedding(
     piiRemoved = result.piiTypesFound;
 
     if (result.totalReplacements > 0) {
-      log.debug('Anonymized content before embedding', {
+      log.debug("Anonymized content before embedding", {
         replacements: result.totalReplacements,
         piiTypes: piiRemoved,
       });
@@ -100,7 +151,7 @@ export async function generatePrivacyAwareEmbedding(
  */
 export async function generatePrivacyAwareEmbeddings(
   texts: string[],
-  options: PrivacyEmbeddingOptions = {}
+  options: PrivacyEmbeddingOptions = {},
 ): Promise<PrivacyAwareEmbeddingResult[]> {
   const {
     forceAnonymization = false,
@@ -160,14 +211,14 @@ export function requiresAnonymization(text: string): {
     const result = anonymizeContent(text);
     return {
       required: true,
-      reason: 'Content contains sensitive PII combination',
+      reason: "Content contains sensitive PII combination",
       piiTypes: result.piiTypesFound,
     };
   }
 
   return {
     required: false,
-    reason: 'No sensitive PII detected',
+    reason: "No sensitive PII detected",
     piiTypes: [],
   };
 }
@@ -178,9 +229,9 @@ export function requiresAnonymization(text: string): {
  */
 export function anonymizeConversationForRAG(
   conversation: {
-    role: 'user' | 'assistant';
+    role: "user" | "assistant";
     content: string;
-  }[]
+  }[],
 ): {
   anonymizedConversation: typeof conversation;
   totalPIIRemoved: number;
@@ -189,7 +240,7 @@ export function anonymizeConversationForRAG(
 
   const anonymizedConversation = conversation.map((message) => {
     // Only anonymize user messages (assistant messages shouldn't contain PII)
-    if (message.role === 'user') {
+    if (message.role === "user") {
       const result = anonymizeContent(message.content);
       totalPIIRemoved += result.totalReplacements;
       return {
