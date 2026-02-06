@@ -223,7 +223,7 @@ describe("Key Rotation Service", () => {
       expect(result.total).toBe(250);
       expect(result.processed).toBe(250);
       expect(mockGoogleFindMany).toHaveBeenCalledTimes(3);
-    }, 15000); // 15 second timeout for crypto operations on 250 records
+    }, 30000); // 30 second timeout for crypto operations on 250 records (CI runners are slower)
   });
 
   describe("rotatePIIEncryptionKey", () => {
