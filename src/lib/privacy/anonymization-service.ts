@@ -52,26 +52,36 @@ export function anonymizeContent(
 
   // Process names
   if (opts.anonymizeNames) {
-    PII_PATTERNS.name.lastIndex = 0;
-    const matches = result.match(PII_PATTERNS.name) || [];
+    // Create global version of name pattern for matching all occurrences
+    const globalNamePattern = new RegExp(
+      PII_PATTERNS.name.source,
+      PII_PATTERNS.name.flags.includes("g")
+        ? PII_PATTERNS.name.flags
+        : PII_PATTERNS.name.flags + "g",
+    );
+    const matches = result.match(globalNamePattern) || [];
     if (matches.length > 0) {
       piiTypesFound.push("name");
       totalReplacements += matches.length;
-      result = result.replace(PII_PATTERNS.name, PLACEHOLDERS.name);
+      result = result.replace(globalNamePattern, PLACEHOLDERS.name);
     }
-    PII_PATTERNS.name.lastIndex = 0;
   }
 
   // Process emails
   if (opts.anonymizeEmails) {
-    EMAIL_PATTERN.lastIndex = 0;
-    const matches = result.match(EMAIL_PATTERN) || [];
+    // Create global version of email pattern
+    const globalEmailPattern = new RegExp(
+      EMAIL_PATTERN.source,
+      EMAIL_PATTERN.flags.includes("g")
+        ? EMAIL_PATTERN.flags
+        : EMAIL_PATTERN.flags + "g",
+    );
+    const matches = result.match(globalEmailPattern) || [];
     if (matches.length > 0) {
       piiTypesFound.push("email");
       totalReplacements += matches.length;
-      result = result.replace(EMAIL_PATTERN, PLACEHOLDERS.email);
+      result = result.replace(globalEmailPattern, PLACEHOLDERS.email);
     }
-    EMAIL_PATTERN.lastIndex = 0;
   }
 
   // Process phones
@@ -90,14 +100,19 @@ export function anonymizeContent(
 
   // Process dates
   if (opts.anonymizeDates) {
-    DATE_PATTERN.lastIndex = 0;
-    const matches = result.match(DATE_PATTERN) || [];
+    // Create global version of date pattern
+    const globalDatePattern = new RegExp(
+      DATE_PATTERN.source,
+      DATE_PATTERN.flags.includes("g")
+        ? DATE_PATTERN.flags
+        : DATE_PATTERN.flags + "g",
+    );
+    const matches = result.match(globalDatePattern) || [];
     if (matches.length > 0) {
       piiTypesFound.push("date");
       totalReplacements += matches.length;
-      result = result.replace(DATE_PATTERN, PLACEHOLDERS.date);
+      result = result.replace(globalDatePattern, PLACEHOLDERS.date);
     }
-    DATE_PATTERN.lastIndex = 0;
   }
 
   // Process IDs
@@ -115,14 +130,18 @@ export function anonymizeContent(
     }
 
     // Generic IDs
-    GENERIC_ID_PATTERN.lastIndex = 0;
-    const idMatches = result.match(GENERIC_ID_PATTERN) || [];
+    const globalGenericIdPattern = new RegExp(
+      GENERIC_ID_PATTERN.source,
+      GENERIC_ID_PATTERN.flags.includes("g")
+        ? GENERIC_ID_PATTERN.flags
+        : GENERIC_ID_PATTERN.flags + "g",
+    );
+    const idMatches = result.match(globalGenericIdPattern) || [];
     if (idMatches.length > 0) {
       if (!piiTypesFound.includes("id")) piiTypesFound.push("id");
       totalReplacements += idMatches.length;
-      result = result.replace(GENERIC_ID_PATTERN, PLACEHOLDERS.id);
+      result = result.replace(globalGenericIdPattern, PLACEHOLDERS.id);
     }
-    GENERIC_ID_PATTERN.lastIndex = 0;
   }
 
   // Always anonymize addresses
@@ -140,14 +159,17 @@ export function anonymizeContent(
   // Custom patterns
   if (opts.customPatterns) {
     for (const pattern of opts.customPatterns) {
-      pattern.lastIndex = 0;
-      const matches = result.match(pattern) || [];
+      // Create global version of custom pattern
+      const globalCustomPattern = new RegExp(
+        pattern.source,
+        pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+      );
+      const matches = result.match(globalCustomPattern) || [];
       if (matches.length > 0) {
         if (!piiTypesFound.includes("custom")) piiTypesFound.push("custom");
         totalReplacements += matches.length;
-        result = result.replace(pattern, PLACEHOLDERS.custom);
+        result = result.replace(globalCustomPattern, PLACEHOLDERS.custom);
       }
-      pattern.lastIndex = 0;
     }
   }
 
@@ -179,8 +201,12 @@ export function pseudonymizeContent(
   ];
 
   for (const pattern of allPatterns) {
-    pattern.lastIndex = 0;
-    const matches = content.match(pattern) || [];
+    // Create global version of pattern for matching all occurrences
+    const globalPattern = new RegExp(
+      pattern.source,
+      pattern.flags.includes("g") ? pattern.flags : pattern.flags + "g",
+    );
+    const matches = content.match(globalPattern) || [];
     for (const match of matches) {
       if (!mapping.has(match)) {
         const pseudonym = generatePseudonym(match, salt);
@@ -192,7 +218,6 @@ export function pseudonymizeContent(
       );
       replacementCount++;
     }
-    pattern.lastIndex = 0;
   }
 
   return {

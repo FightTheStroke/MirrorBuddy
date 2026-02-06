@@ -93,7 +93,8 @@ describe("Retrieval Service", () => {
       expect(results).toHaveLength(2);
       expect(results[0].similarity).toBe(0.92);
       expect(results[0].sourceId).toBe("mat-1");
-      expect(generateEmbedding).toHaveBeenCalledWith("Roman Empire history");
+      // "Roman Empire" is anonymized to [NOME] before embedding (name pattern match)
+      expect(generateEmbedding).toHaveBeenCalledWith("[NOME] history");
     });
 
     it("should filter by subject when provided", async () => {

@@ -6,13 +6,34 @@
  * @vitest-environment node
  */
 
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
-import { encryptPII, decryptPII, hashPII } from "../pii-encryption";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+
+// Mock azure-key-vault BEFORE importing pii-encryption to avoid caching issues
+vi.mock("@/lib/security/azure-key-vault", () => ({
+  getSecret: vi.fn((keyName: string) => {
+    // Check env vars at call time, not import time
+    const value = process.env[keyName];
+    if (value) {
+      return Promise.resolve(value);
+    }
+    return Promise.reject(new Error(`Secret ${keyName} not found`));
+  }),
+}));
+
+import {
+  encryptPII,
+  decryptPII,
+  hashPII,
+  _resetPIIKeyCache,
+} from "../pii-encryption";
 
 describe("PII Encryption", () => {
   const originalEnv = process.env.PII_ENCRYPTION_KEY;
 
   beforeEach(() => {
+    // Clear cache before each test to ensure clean state
+    _resetPIIKeyCache();
+
     // Set a test encryption key
     process.env.PII_ENCRYPTION_KEY =
       "test-key-for-pii-encryption-at-least-32-chars-long";
@@ -151,22 +172,16 @@ describe("PII Encryption", () => {
       delete process.env.PII_ENCRYPTION_KEY;
       delete process.env.ENCRYPTION_KEY;
 
-      const originalNodeEnv = process.env.NODE_ENV;
-      // Use Object.defineProperty to override read-only NODE_ENV
-      Object.defineProperty(process.env, "NODE_ENV", {
-        value: "production",
-        configurable: true,
-        writable: true,
-      });
+      // Clear cache after deleting env vars
+      _resetPIIKeyCache();
+
+      // Use vi.stubEnv to mock NODE_ENV
+      vi.stubEnv("NODE_ENV", "production");
 
       await expect(encryptPII("test")).rejects.toThrow(/key not configured/i);
 
       // Restore
-      Object.defineProperty(process.env, "NODE_ENV", {
-        value: originalNodeEnv,
-        configurable: true,
-        writable: true,
-      });
+      vi.unstubAllEnvs();
     });
   });
 

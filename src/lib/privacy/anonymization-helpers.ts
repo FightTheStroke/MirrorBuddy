@@ -15,14 +15,14 @@ const PII_PATTERNS = getCombinedPatterns();
 
 // Email pattern - not locale-specific
 export const EMAIL_PATTERN =
-  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/gi;
+  /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/i;
 
 // Date pattern - various formats
 export const DATE_PATTERN =
-  /\b(?:\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})\b/g;
+  /\b(?:\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{2,4}|\d{4}[\/\-\.]\d{1,2}[\/\-\.]\d{1,2})\b/;
 
 // Generic numeric IDs (6+ digits)
-export const GENERIC_ID_PATTERN = /\b[A-Z]{0,3}[0-9]{6,}\b/g;
+export const GENERIC_ID_PATTERN = /\b[A-Z]{0,3}[0-9]{6,}\b/;
 
 // Placeholder templates
 export const PLACEHOLDERS: Record<PIIType, string> = {
@@ -39,14 +39,7 @@ export const PLACEHOLDERS: Record<PIIType, string> = {
  * Test content against an array of patterns
  */
 export function testPatterns(content: string, patterns: RegExp[]): boolean {
-  for (const pattern of patterns) {
-    pattern.lastIndex = 0; // Reset global flag index
-    if (pattern.test(content)) {
-      pattern.lastIndex = 0; // Reset again after test
-      return true;
-    }
-  }
-  return false;
+  return patterns.some((pattern) => pattern.test(content));
 }
 
 /**
@@ -61,11 +54,15 @@ export function replaceWithPatterns(
   let count = 0;
 
   for (const pattern of patterns) {
-    pattern.lastIndex = 0;
-    const matches = result.match(pattern) || [];
+    // Create a global variant for matching and replacing
+    const flags = pattern.flags.includes("g")
+      ? pattern.flags
+      : pattern.flags + "g";
+    // eslint-disable-next-line security/detect-non-literal-regexp
+    const globalPattern = new RegExp(pattern.source, flags);
+    const matches = result.match(globalPattern) || [];
     count += matches.length;
-    result = result.replace(pattern, placeholder);
-    pattern.lastIndex = 0;
+    result = result.replace(globalPattern, placeholder);
   }
 
   return { result, count };
@@ -116,30 +113,22 @@ export function detectPII(content: string): PIIType[] {
   const found: PIIType[] = [];
 
   // Test name pattern
-  PII_PATTERNS.name.lastIndex = 0;
   if (PII_PATTERNS.name.test(content)) found.push("name");
-  PII_PATTERNS.name.lastIndex = 0;
 
   // Test email pattern
-  EMAIL_PATTERN.lastIndex = 0;
   if (EMAIL_PATTERN.test(content)) found.push("email");
-  EMAIL_PATTERN.lastIndex = 0;
 
   // Test phone patterns (array)
   if (testPatterns(content, PII_PATTERNS.phone)) found.push("phone");
 
   // Test date pattern
-  DATE_PATTERN.lastIndex = 0;
   if (DATE_PATTERN.test(content)) found.push("date");
-  DATE_PATTERN.lastIndex = 0;
 
   // Test fiscal ID patterns (array)
   if (testPatterns(content, PII_PATTERNS.fiscalId)) found.push("id");
 
   // Test generic ID pattern
-  GENERIC_ID_PATTERN.lastIndex = 0;
   if (GENERIC_ID_PATTERN.test(content)) found.push("id");
-  GENERIC_ID_PATTERN.lastIndex = 0;
 
   // Test address patterns (array)
   if (testPatterns(content, PII_PATTERNS.address)) found.push("address");

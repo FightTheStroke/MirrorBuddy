@@ -13,19 +13,7 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-// Mock crypto
-vi.mock("crypto", () => ({
-  default: {
-    randomBytes: vi.fn(() => ({
-      toString: vi.fn((encoding: string) => {
-        if (encoding === "hex") {
-          return "abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890";
-        }
-        return "mock-salt";
-      }),
-    })),
-  },
-}));
+// Note: crypto mock removed - will use vi.spyOn instead in tests
 
 // Mock Redis
 vi.mock("@upstash/redis", () => ({
@@ -76,7 +64,6 @@ import { Resend } from "resend";
 import { logger } from "@/lib/logger";
 
 // Type assertions for mocked functions
-const mockCryptoRandomBytes = crypto.randomBytes as Mock;
 const _mockRedisFromEnv = Redis.fromEnv as Mock;
 const _mockResendConstructor = Resend as unknown as Mock;
 const mockLoggerInfo = logger.info as Mock;
@@ -142,6 +129,8 @@ describe("POST /api/cron/rotate-ip-salt", () => {
   });
 
   it("should generate a 32-byte hex salt", async () => {
+    const spy = vi.spyOn(crypto, "randomBytes");
+
     const request = new NextRequest(
       "http://localhost:3000/api/cron/rotate-ip-salt",
       {
@@ -157,7 +146,9 @@ describe("POST /api/cron/rotate-ip-salt", () => {
 
     expect(response.status).toBe(200);
     // Verify crypto.randomBytes was called with 32
-    expect(mockCryptoRandomBytes).toHaveBeenCalledWith(32);
+    expect(spy).toHaveBeenCalledWith(32);
+
+    spy.mockRestore();
   });
 
   it("should store salt in Redis under mirrorbuddy:ip-salt:pending key", async () => {
@@ -261,7 +252,7 @@ describe("POST /api/cron/rotate-ip-salt", () => {
   });
 
   it("should return 500 error if salt generation fails", async () => {
-    mockCryptoRandomBytes.mockImplementationOnce(() => {
+    const spy = vi.spyOn(crypto, "randomBytes").mockImplementationOnce(() => {
       throw new Error("Crypto error");
     });
 
@@ -281,6 +272,8 @@ describe("POST /api/cron/rotate-ip-salt", () => {
     expect(response.status).toBe(500);
     expect(data.error).toBe("Internal server error");
     expect(data.message).toBe("Crypto error");
+
+    spy.mockRestore();
   });
 
   it("should return success when all operations complete", async () => {

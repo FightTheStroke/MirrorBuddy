@@ -6,6 +6,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as piiEncryption from "@/lib/security/pii-encryption";
+import { Prisma } from "@prisma/client";
 import { createPIIMiddleware } from "../pii-middleware";
 
 // Mock the encryption module
@@ -21,6 +22,15 @@ vi.mock("@/lib/security/pii-encryption", () => ({
   hashPII: vi.fn((text: string) => Promise.resolve(`hash_${text}`)),
   isPIIEncryptionConfigured: vi.fn(() => true),
 }));
+
+// Mock decrypt-audit to avoid circular dependency
+vi.mock("@/lib/security/decrypt-audit", () => ({
+  logDecryptAccess: vi.fn(),
+  logBulkDecryptAccess: vi.fn(),
+}));
+
+// Mock Prisma.defineExtension to return the config directly for testing
+vi.spyOn(Prisma, "defineExtension").mockImplementation((config: any) => config);
 
 describe("PII Encryption on Update", () => {
   beforeEach(() => {
