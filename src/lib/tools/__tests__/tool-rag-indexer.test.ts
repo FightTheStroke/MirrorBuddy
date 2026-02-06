@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { indexToolOutput } from "./tool-rag-indexer";
-import type { StoredToolOutput } from "./tool-output-types";
+import { indexToolOutput } from "../tool-rag-indexer";
+import type { StoredToolOutput } from "../tool-output-types";
 
 // Mock dependencies
 vi.mock("@/lib/rag/privacy-aware-embedding", () => ({
