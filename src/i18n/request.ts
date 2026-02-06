@@ -18,6 +18,8 @@ const NAMESPACES = [
   "errors",
   "welcome",
   "metadata",
+  "pricing",
+  "marketing",
 ] as const;
 
 async function loadNamespace(

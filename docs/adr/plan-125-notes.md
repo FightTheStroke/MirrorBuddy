@@ -46,3 +46,15 @@
 - Pattern: AuditAction as union type prevents typos in event names at compile time
 - Insight: IP address column sized at VarChar(45) to support both IPv4 and IPv6
 - Insight: SOC 2 CC6.1 requires 365-day retention — audit_logs table has no auto-purge
+
+## W6: GTM Ready (Landing Page, Schools, Admin)
+
+- Decision: Marketing pages in (marketing) route group under [locale] for clean URL structure
+- Decision: School registration uses existing ContactRequest model (type="schools") instead of new model
+- Decision: School admin dashboard at /admin/school (non-localized) matching existing admin convention
+- Pattern: Separate translation namespace "marketing" to avoid collision with existing welcome translations
+- Pattern: JSON-LD structured data as server component (MarketingStructuredData) avoiding client-side injection
+- Pattern: FAQ accordion with local state per item, no shared state or external accordion library
+- Pattern: SchoolRegistrationForm uses csrfFetch for CSRF-protected POST to /api/schools/register
+- Insight: Existing pricing.json translations cover trial/base/pro; school tier added via marketing namespace
+- Insight: E2E tests must import from ../fixtures/base-fixtures per ESLint rule require-e2e-fixtures

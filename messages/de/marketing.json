@@ -1,0 +1,109 @@
+{
+  "marketing": {
+    "hero": {
+      "headline": "Lerne mit den Grossten Lehrern der Geschichte",
+      "subtitle": "KI-gestutztes Tutoring, das sich an jeden Lernstil anpasst. Sprachgesprache mit 26 historischen Professoren.",
+      "cta": "Kostenlos Starten",
+      "schoolCta": "Kontakt fur Schulen"
+    },
+    "features": {
+      "heading": "Warum MirrorBuddy",
+      "subtitle": "Von Anfang an fur inklusive Bildung entwickelt",
+      "maestri": {
+        "title": "26 KI-Professoren",
+        "description": "Von Euklid bis Feynman, von Marie Curie bis Leonardo. Jeder mit einzigartiger Personlichkeit."
+      },
+      "dsa": {
+        "title": "7 LRS-Profile",
+        "description": "Legasthenie, Dyskalkulie, ADHS und mehr. Lesbare Schriften, Mindmaps, Sprachsynthese."
+      },
+      "languages": {
+        "title": "5 Sprachen",
+        "description": "Italienisch, Englisch, Franzosisch, Deutsch, Spanisch. Vollstandige Lokalisierung."
+      },
+      "voice": {
+        "title": "Sprachlernen",
+        "description": "Naturliche Sprachgesprache mit KI-Professoren."
+      },
+      "tools": {
+        "title": "Lernwerkzeuge",
+        "description": "Mindmaps, adaptive Quiz, Karteikarten, Fortschrittsverfolgung."
+      },
+      "privacy": {
+        "title": "Datenschutz Zuerst",
+        "description": "DSGVO-konform, COPPA-bereit, SOC 2 ausgerichtet. Daten in der EU."
+      }
+    },
+    "pricing": {
+      "heading": "Einfache, Transparente Preise",
+      "subtitle": "Kostenlos starten",
+      "school": {
+        "name": "Schule",
+        "description": "Fur Schulen",
+        "price": "Individuell",
+        "features": [
+          "Unbegrenzte Schuler",
+          "SSO-Integration",
+          "Admin-Dashboard",
+          "Nutzungsanalyse",
+          "Prioritatssupport",
+          "Individuelles Branding"
+        ],
+        "cta": "Kontaktieren Sie uns"
+      }
+    },
+    "social": {
+      "heading": "Vertraut von",
+      "ted": "Vorgestellt bei TEDx",
+      "microsoft": "Gebaut auf Microsoft Azure",
+      "fightTheStroke": "Partner von FightTheStroke",
+      "schools": "In Schulen eingesetzt"
+    },
+    "faq": {
+      "heading": "Haufig Gestellte Fragen",
+      "items": [
+        {
+          "q": "Ist MirrorBuddy sicher fur Kinder?",
+          "a": "Ja. COPPA-konform, DSGVO-ausgerichtet, KI-Gesprache werden moderiert."
+        },
+        {
+          "q": "Funktioniert es bei Lernschwierigkeiten?",
+          "a": "MirrorBuddy wurde fur inklusive Bildung entwickelt. 7 LRS-Profile mit adaptiven Oberflachen."
+        },
+        {
+          "q": "Welche Facher werden abgedeckt?",
+          "a": "Mathematik, Physik, Chemie, Biologie, Geschichte, Literatur, Philosophie, Kunst, Musik und mehr."
+        },
+        {
+          "q": "Konnen Schulen MirrorBuddy nutzen?",
+          "a": "Ja. Schulplane mit SSO, Admin-Dashboards und Analysen."
+        },
+        {
+          "q": "Sind meine Daten sicher?",
+          "a": "Daten in der EU (Frankfurt). Verschlusselung, SOC 2-Praktiken. Kein Datenverkauf."
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Bereit, das Lernen zu Verandern?",
+      "subtitle": "Schliessen Sie sich Tausenden von Schulern an.",
+      "primary": "Kostenlos Starten",
+      "secondary": "Demo Buchen"
+    },
+    "footer": {
+      "product": "Produkt",
+      "company": "Unternehmen",
+      "legal": "Rechtliches",
+      "features": "Funktionen",
+      "pricing": "Preise",
+      "schools": "Fur Schulen",
+      "about": "Uber Uns",
+      "blog": "Blog",
+      "contact": "Kontakt",
+      "privacy": "Datenschutz",
+      "terms": "Nutzungsbedingungen",
+      "cookies": "Cookie-Richtlinie",
+      "copyright": "MirrorBuddy. Alle Rechte vorbehalten."
+    }
+  }
+}

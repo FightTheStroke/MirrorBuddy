@@ -1,0 +1,109 @@
+{
+  "marketing": {
+    "hero": {
+      "headline": "Impara con i Grandi Maestri della Storia",
+      "subtitle": "Tutoring AI che si adatta a ogni stile di apprendimento. Conversazioni vocali con 26 professori storici, progettato per studenti con e senza difficolta di apprendimento.",
+      "cta": "Inizia Gratis",
+      "schoolCta": "Contatta per le Scuole"
+    },
+    "features": {
+      "heading": "Perche MirrorBuddy",
+      "subtitle": "Costruito per l'educazione inclusiva fin dal primo giorno",
+      "maestri": {
+        "title": "26 Professori AI",
+        "description": "Da Euclide a Feynman, da Marie Curie a Leonardo. Ognuno con personalita e competenze uniche."
+      },
+      "dsa": {
+        "title": "7 Profili DSA",
+        "description": "Dislessia, discalculia, ADHD e altro. Font leggibili, mappe mentali, sintesi vocale integrati."
+      },
+      "languages": {
+        "title": "5 Lingue",
+        "description": "Italiano, inglese, francese, tedesco, spagnolo. Localizzazione completa inclusa interazione vocale."
+      },
+      "voice": {
+        "title": "Apprendimento Vocale",
+        "description": "Conversazioni vocali naturali con i professori AI. Fai domande, ricevi spiegazioni, pratica la pronuncia."
+      },
+      "tools": {
+        "title": "Strumenti Didattici",
+        "description": "Mappe mentali, quiz adattivi, flashcard, monitoraggio progressi. Tutto cio di cui uno studente ha bisogno."
+      },
+      "privacy": {
+        "title": "Privacy al Primo Posto",
+        "description": "Conforme GDPR, pronto COPPA, allineato SOC 2. Dati in UE. Nessun dato venduto, mai."
+      }
+    },
+    "pricing": {
+      "heading": "Prezzi Semplici e Trasparenti",
+      "subtitle": "Inizia gratis, aggiorna quando vuoi",
+      "school": {
+        "name": "Scuola",
+        "description": "Per scuole e istituzioni",
+        "price": "Personalizzato",
+        "features": [
+          "Studenti illimitati",
+          "Integrazione SSO",
+          "Dashboard admin",
+          "Analisi utilizzo",
+          "Supporto prioritario",
+          "Branding personalizzato"
+        ],
+        "cta": "Contattaci"
+      }
+    },
+    "social": {
+      "heading": "Scelto Da",
+      "ted": "Presentato al TEDx",
+      "microsoft": "Costruito su Microsoft Azure",
+      "fightTheStroke": "Partner di FightTheStroke",
+      "schools": "Utilizzato nelle scuole italiane"
+    },
+    "faq": {
+      "heading": "Domande Frequenti",
+      "items": [
+        {
+          "q": "MirrorBuddy e sicuro per i bambini?",
+          "a": "Si. Siamo conformi COPPA, allineati GDPR, e tutte le conversazioni AI sono moderate. I controlli parentali sono integrati."
+        },
+        {
+          "q": "Funziona con le difficolta di apprendimento?",
+          "a": "MirrorBuddy e stato progettato fin dall'inizio per l'educazione inclusiva. Supportiamo 7 profili DSA con interfacce adattive, font leggibili, mappe mentali e sintesi vocale."
+        },
+        {
+          "q": "Quali materie sono coperte?",
+          "a": "Matematica, fisica, chimica, biologia, storia, letteratura, filosofia, arte, musica e altro. Ogni materia ha professori AI dedicati."
+        },
+        {
+          "q": "Le scuole possono usare MirrorBuddy?",
+          "a": "Si. Offriamo piani scuola con integrazione SSO, dashboard admin, analisi utilizzo e provisioning studenti in blocco. Contattaci per un programma pilota."
+        },
+        {
+          "q": "I miei dati sono al sicuro?",
+          "a": "Tutti i dati sono ospitati in UE (Francoforte). Usiamo crittografia a riposo e in transito e seguiamo le pratiche di sicurezza SOC 2. Non vendiamo mai i dati degli utenti."
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Pronto a Trasformare l'Apprendimento?",
+      "subtitle": "Unisciti a migliaia di studenti che imparano con i grandi maestri della storia.",
+      "primary": "Inizia Gratis",
+      "secondary": "Prenota una Demo per la Scuola"
+    },
+    "footer": {
+      "product": "Prodotto",
+      "company": "Azienda",
+      "legal": "Legale",
+      "features": "Funzionalita",
+      "pricing": "Prezzi",
+      "schools": "Per le Scuole",
+      "about": "Chi Siamo",
+      "blog": "Blog",
+      "contact": "Contatti",
+      "privacy": "Privacy Policy",
+      "terms": "Termini di Servizio",
+      "cookies": "Cookie Policy",
+      "copyright": "MirrorBuddy. Tutti i diritti riservati."
+    }
+  }
+}

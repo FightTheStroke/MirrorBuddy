@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W6: GTM Ready (Landing Page, Schools, Admin)
+
+- Added: Public marketing landing page with hero, features grid (6 cards), 4-tier pricing, social proof, FAQ accordion, CTA
+- Added: Marketing translations for all 5 locales (it, en, fr, de, es)
+- Added: SoftwareApplication and FAQPage JSON-LD structured data schemas
+- Added: Marketing structured data component injecting 3 JSON-LD schemas
+- Added: /schools route with school pilot registration form (school name, VAT, contact, tier)
+- Added: School registration API (POST /api/schools/register) creating ContactRequest + Resend email
+- Added: School admin dashboard at /admin/school with stats cards, subscription info, requests table
+- Added: Admin API routes for school stats and registration requests
+- Added: E2E tests for landing page (5 locales, pricing, CTA, FAQ), school registration, school admin
+- Changed: Sitemap updated with /schools and /accessibility routes
+- Changed: i18n NAMESPACES extended with pricing and marketing
+
 ### W5: SOC 2 Type II Readiness
 
 - Added: Access control policy with RBAC matrix, session management, provisioning rules

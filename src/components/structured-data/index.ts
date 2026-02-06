@@ -13,3 +13,7 @@ export type {
   OrganizationSchema,
   EducationalOrganizationSchema,
 } from "./json-ld-organization";
+export { generateSoftwareApplicationSchema } from "./json-ld-software-app";
+export type { SoftwareApplicationSchema } from "./json-ld-software-app";
+export { generateFaqPageSchema } from "./json-ld-faq";
+export type { FaqPageSchema } from "./json-ld-faq";

@@ -16,6 +16,12 @@ const localeRoutes = [
   },
   { path: "/privacy", changeFrequency: "monthly" as const, priority: 0.6 },
   { path: "/terms", changeFrequency: "monthly" as const, priority: 0.6 },
+  { path: "/schools", changeFrequency: "monthly" as const, priority: 0.8 },
+  {
+    path: "/accessibility",
+    changeFrequency: "monthly" as const,
+    priority: 0.6,
+  },
 ];
 
 /**

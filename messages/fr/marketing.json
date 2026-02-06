@@ -1,0 +1,109 @@
+{
+  "marketing": {
+    "hero": {
+      "headline": "Apprenez avec les Plus Grands Maitres de l'Histoire",
+      "subtitle": "Tutorat IA qui s'adapte a chaque style d'apprentissage. Conversations vocales avec 26 professeurs historiques.",
+      "cta": "Essai Gratuit",
+      "schoolCta": "Contact pour les Ecoles"
+    },
+    "features": {
+      "heading": "Pourquoi MirrorBuddy",
+      "subtitle": "Concu pour l'education inclusive des le premier jour",
+      "maestri": {
+        "title": "26 Professeurs IA",
+        "description": "D'Euclide a Feynman, de Marie Curie a Leonard. Chacun avec une personnalite et une expertise uniques."
+      },
+      "dsa": {
+        "title": "7 Profils DYS",
+        "description": "Dyslexie, dyscalculie, TDAH et plus. Polices lisibles, cartes mentales, synthese vocale integres."
+      },
+      "languages": {
+        "title": "5 Langues",
+        "description": "Italien, anglais, francais, allemand, espagnol. Localisation complete incluant l'interaction vocale."
+      },
+      "voice": {
+        "title": "Apprentissage Vocal",
+        "description": "Conversations vocales naturelles avec les professeurs IA."
+      },
+      "tools": {
+        "title": "Outils Pedagogiques",
+        "description": "Cartes mentales, quiz adaptatifs, flashcards, suivi des progres."
+      },
+      "privacy": {
+        "title": "Vie Privee d'Abord",
+        "description": "Conforme RGPD, pret COPPA, aligne SOC 2. Donnees en UE."
+      }
+    },
+    "pricing": {
+      "heading": "Tarifs Simples et Transparents",
+      "subtitle": "Commencez gratuitement",
+      "school": {
+        "name": "Ecole",
+        "description": "Pour les ecoles",
+        "price": "Sur mesure",
+        "features": [
+          "Etudiants illimites",
+          "Integration SSO",
+          "Tableau de bord admin",
+          "Analytique",
+          "Support prioritaire",
+          "Branding personnalise"
+        ],
+        "cta": "Contactez-nous"
+      }
+    },
+    "social": {
+      "heading": "Ils nous font confiance",
+      "ted": "Presente au TEDx",
+      "microsoft": "Construit sur Microsoft Azure",
+      "fightTheStroke": "Partenaire de FightTheStroke",
+      "schools": "Utilise dans les ecoles"
+    },
+    "faq": {
+      "heading": "Questions Frequentes",
+      "items": [
+        {
+          "q": "MirrorBuddy est-il sur pour les enfants?",
+          "a": "Oui. Conforme COPPA, aligne RGPD, conversations IA moderees. Controles parentaux integres."
+        },
+        {
+          "q": "Fonctionne-t-il avec les troubles d'apprentissage?",
+          "a": "MirrorBuddy a ete concu pour l'education inclusive. 7 profils DYS avec interfaces adaptatives."
+        },
+        {
+          "q": "Quelles matieres sont couvertes?",
+          "a": "Mathematiques, physique, chimie, biologie, histoire, litterature, philosophie, art, musique et plus."
+        },
+        {
+          "q": "Les ecoles peuvent-elles utiliser MirrorBuddy?",
+          "a": "Oui. Plans scolaires avec SSO, tableaux de bord admin et analytique."
+        },
+        {
+          "q": "Mes donnees sont-elles en securite?",
+          "a": "Donnees hebergees en UE (Francfort). Chiffrement, pratiques SOC 2. Aucune vente de donnees."
+        }
+      ]
+    },
+    "cta": {
+      "heading": "Pret a Transformer l'Apprentissage?",
+      "subtitle": "Rejoignez des milliers d'etudiants.",
+      "primary": "Essai Gratuit",
+      "secondary": "Reserver une Demo"
+    },
+    "footer": {
+      "product": "Produit",
+      "company": "Entreprise",
+      "legal": "Legal",
+      "features": "Fonctionnalites",
+      "pricing": "Tarifs",
+      "schools": "Pour les Ecoles",
+      "about": "A Propos",
+      "blog": "Blog",
+      "contact": "Contact",
+      "privacy": "Politique de Confidentialite",
+      "terms": "Conditions d'Utilisation",
+      "cookies": "Politique de Cookies",
+      "copyright": "MirrorBuddy. Tous droits reserves."
+    }
+  }
+}
