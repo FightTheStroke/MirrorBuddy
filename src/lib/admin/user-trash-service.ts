@@ -310,7 +310,12 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
   if (payload.user.email) {
     const emailHashValue = await hashPII(payload.user.email as string);
     const emailOwner = await prisma.user.findFirst({
-      where: { emailHash: emailHashValue },
+      where: {
+        OR: [
+          { emailHash: emailHashValue },
+          { email: payload.user.email as string },
+        ],
+      },
       select: { id: true },
     });
     if (emailOwner) {

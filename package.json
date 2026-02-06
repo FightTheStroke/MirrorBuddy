@@ -76,7 +76,7 @@
     "seed:tiers": "tsx prisma/seed-tiers.ts",
     "sim:nightly": "npx tsx scripts/nightly-sim-runner.ts",
     "sim:quick": "npx tsx scripts/nightly-sim-runner.ts --models 3b --dry-run",
-    "vercel-build": "prisma generate && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
+    "vercel-build": "prisma generate && prisma migrate deploy && npm run build && npm run seed:admin || echo 'Admin seed skipped'"
   },
   "overrides": {
     "hono": "4.11.7",

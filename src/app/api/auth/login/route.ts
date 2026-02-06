@@ -45,11 +45,15 @@ export const POST = pipe(
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  // Try email first (by hash), then username
+  // Try email hash (PII-encrypted users), plain email (legacy), or username
   const identifierHash = await hashPII(identifier);
   const user = await prisma.user.findFirst({
     where: {
-      OR: [{ emailHash: identifierHash }, { username: identifier }],
+      OR: [
+        { emailHash: identifierHash },
+        { email: identifier },
+        { username: identifier },
+      ],
     },
     select: {
       id: true,

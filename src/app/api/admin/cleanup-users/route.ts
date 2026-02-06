@@ -32,9 +32,14 @@ export const DELETE = pipe(
     protectedEmails.map((email) => hashPII(email)),
   );
 
-  // Find protected users
+  // Find protected users (search by hash and plain email for backward compat)
   const protectedUsers = await prisma.user.findMany({
-    where: { emailHash: { in: protectedEmailHashes } },
+    where: {
+      OR: [
+        { emailHash: { in: protectedEmailHashes } },
+        { email: { in: protectedEmails } },
+      ],
+    },
     select: { id: true, email: true },
   });
 
