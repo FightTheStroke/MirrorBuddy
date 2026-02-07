@@ -8,6 +8,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+import { hashPII } from "@/lib/security/pii-encryption";
 
 interface DirectorySyncRequest {
   schoolId: string;
@@ -82,8 +83,9 @@ export const POST = pipe(
     let skipped = 0;
 
     for (const student of syncRequest.students) {
-      const existing = await prisma.user.findUnique({
-        where: { email: student.email },
+      const emailHash = await hashPII(student.email);
+      const existing = await prisma.user.findFirst({
+        where: { emailHash },
       });
 
       if (existing) {
