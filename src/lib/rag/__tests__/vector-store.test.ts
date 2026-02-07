@@ -57,7 +57,7 @@ import {
   type VectorSearchResult,
   type StoreEmbeddingInput,
 } from "../vector-store";
-import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
+import { anonymizeConversationMessage } from "@/lib/privacy";
 
 describe("Vector Store Service", () => {
   beforeEach(() => {

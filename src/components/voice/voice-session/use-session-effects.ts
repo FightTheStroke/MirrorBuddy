@@ -6,7 +6,7 @@ import { csrfFetch } from "@/lib/auth";
 import {
   buildSignalsFromText,
   sendAdaptiveSignals,
-} from "@/lib/education/adaptive-difficulty-client";
+} from "@/lib/education";
 import type { AdaptiveSignalInput, Maestro, ToolCall } from "@/types";
 
 interface UseSessionEffectsProps {

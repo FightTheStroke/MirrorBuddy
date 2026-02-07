@@ -14,7 +14,7 @@ import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 import type {
   SafetyEventType,
   EventSeverity,
-} from "@/lib/safety/monitoring/types";
+} from "@/lib/safety";
 
 interface SafetyEventBody {
   type: SafetyEventType;

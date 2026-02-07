@@ -7,7 +7,7 @@ import { AccessibilityContent } from "./content";
 import {
   getCookieConsentConfigFromLocale,
   type CookieConsentConfig,
-} from "@/lib/compliance/cookie-consent-config";
+} from "@/lib/compliance";
 
 export const ACCESSIBILITY_VERSION = "1.0";
 

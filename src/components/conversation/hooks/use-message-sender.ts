@@ -8,7 +8,7 @@ import { useCallback, useRef, useEffect } from 'react';
 import { analyzeHandoff } from '@/lib/ai';
 import { useMethodProgressStore } from '@/lib/stores/method-progress-store';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
-import { buildSignalsFromText, sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
+import { buildSignalsFromText, sendAdaptiveSignals } from '@/lib/education';
 import { csrfFetch } from '@/lib/auth';
 import { getOrCreateUserId } from '../utils/conversation-helpers';
 import type { ExtendedStudentProfile, Subject } from '@/types';

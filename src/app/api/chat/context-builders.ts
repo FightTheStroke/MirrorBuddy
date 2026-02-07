@@ -15,7 +15,7 @@ import { getMaestroById } from "@/data/maestri";
 import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
-} from "@/lib/education/adaptive-difficulty";
+} from "@/lib/education";
 import { getLanguageInstruction } from "@/lib/i18n/language-instructions";
 import type { SupportedLanguage } from "./types";
 

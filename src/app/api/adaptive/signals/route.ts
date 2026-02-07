@@ -4,7 +4,7 @@ import { AdaptiveSignalsPayloadSchema } from "@/lib/validation/schemas/adaptive"
 import {
   normalizeAdaptiveDifficultyMode,
   recordAdaptiveSignalsBatch,
-} from "@/lib/education/adaptive-difficulty";
+} from "@/lib/education";
 import type { AdaptiveSignalInput } from "@/types/adaptive-difficulty";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 

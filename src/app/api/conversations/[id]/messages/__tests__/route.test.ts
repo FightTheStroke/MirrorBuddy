@@ -60,7 +60,7 @@ vi.mock("@/lib/auth/session-auth", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
+import { anonymizeConversationMessage } from "@/lib/privacy";
 
 const mockPrismaFindFirst = prisma.conversation.findFirst as ReturnType<
   typeof vi.fn

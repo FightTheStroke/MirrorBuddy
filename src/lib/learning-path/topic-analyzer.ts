@@ -4,10 +4,9 @@
 // Plan 8 MVP - Wave 1: Pedagogical Analysis [F-06, F-07, F-09]
 // ============================================================================
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import { logger } from "@/lib/logger";
 import { tierService } from "@/lib/tier";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 
 /**
  * Represents a topic identified in the document

@@ -13,7 +13,7 @@ import type {
 } from '@/types';
 import { getUserId } from '../utils/user-id';
 import { fsrs5Schedule } from '../utils/fsrs';
-import { sendAdaptiveSignals } from '@/lib/education/adaptive-difficulty-client';
+import { sendAdaptiveSignals } from '@/lib/education';
 import { csrfFetch } from '@/lib/auth';
 
 interface UseFlashcardsViewOptions {

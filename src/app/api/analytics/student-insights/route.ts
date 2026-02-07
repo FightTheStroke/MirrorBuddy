@@ -8,7 +8,7 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import { tierService } from "@/lib/tier";
-import { generateRecommendations } from "@/lib/education/recommendation-engine";
+import { generateRecommendations } from "@/lib/education";
 import { logger } from "@/lib/logger";
 
 export const dynamic = "force-dynamic";

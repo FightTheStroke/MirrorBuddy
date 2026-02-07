@@ -6,7 +6,7 @@
 import type { SupportTeacher } from "@/types";
 import type { GreetingContext } from "@/types/greeting";
 import { generateCoachGreeting } from "@/lib/greeting";
-import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { injectSafetyGuardrails } from "@/lib/safety";
 import {
   COMMON_TOOLS_SECTION,
   COMMON_DONT_DO,

@@ -10,7 +10,7 @@ import { extractTextFromPDF } from "../study-kit-extraction";
 import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
-} from "@/lib/education/adaptive-difficulty";
+} from "@/lib/education";
 import { tierService } from "@/lib/tier";
 import type { FeatureAIConfig } from "@/lib/tier";
 import { generateSummary } from "./summary";

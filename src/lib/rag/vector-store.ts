@@ -16,7 +16,7 @@ import {
   nativeVectorSearch,
   updateNativeVector,
 } from "./pgvector-utils";
-import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
+import { anonymizeConversationMessage } from "@/lib/privacy";
 
 /** Expected embedding dimensions */
 const EXPECTED_DIMENSIONS = 1536;

@@ -14,11 +14,11 @@ import { pipe, withSentry, withAdmin } from "@/lib/api/middlewares";
 import {
   getComplianceEntries,
   getComplianceStatistics,
-} from "@/lib/safety/audit/compliance-audit-service";
+} from "@/lib/safety";
 import {
   getRecentEscalations,
   getUnresolvedEscalations,
-} from "@/lib/safety/escalation/escalation-service";
+} from "@/lib/safety";
 
 export interface SafetyDashboardResponse {
   overview: {

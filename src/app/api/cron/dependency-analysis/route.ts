@@ -10,7 +10,7 @@
 import { pipe, withSentry, withCron } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { runDependencyAnalysis } from "@/lib/safety/dependency";
+import { runDependencyAnalysis } from "@/lib/safety";
 
 const log = logger.child({ module: "cron-dependency-analysis" });
 

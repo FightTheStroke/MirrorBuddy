@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import type { CookieConsentConfig } from "@/lib/compliance/cookie-consent-config";
+import type { CookieConsentConfig } from "@/lib/compliance";
 
 interface AccessibilityContentProps {
   config: CookieConsentConfig;

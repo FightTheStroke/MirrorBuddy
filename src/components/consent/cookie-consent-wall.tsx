@@ -17,7 +17,7 @@ import {
 import {
   getCookieConsentConfigFromLocale,
   type CookieConsentConfig,
-} from "@/lib/compliance/cookie-consent-config";
+} from "@/lib/compliance";
 import { CookiePreferencesModal } from "./cookie-preferences-modal";
 
 interface CookieConsentWallProps {
