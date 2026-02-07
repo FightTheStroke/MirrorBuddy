@@ -9,6 +9,7 @@
 
 import { create } from "zustand";
 import { csrfFetch } from "@/lib/auth/csrf-client";
+import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
 import {
   type OnboardingStep,
   type OnboardingData,
@@ -161,7 +162,7 @@ export const useOnboardingStore = create<OnboardingState>()((set, get) => ({
       "mirrorbuddy-accessibility",
       "mirrorbuddy-notifications",
       "mirrorbuddy-pomodoro",
-      "mirrorbuddy-user-id",
+      AUTH_COOKIE_NAME,
     ];
 
     storeKeys.forEach((key) => {

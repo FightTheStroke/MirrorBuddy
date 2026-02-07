@@ -32,11 +32,8 @@ test.describe("CSRF Protection", () => {
     expect(body.error).toContain("CSRF");
   });
 
-  // FIXME: adminRequest doesn't persist csrf-token cookie set by /api/session
-  // This test requires cookie persistence between requests which adminRequest doesn't support
-  test.skip("POST with valid CSRF token succeeds", async ({ adminRequest }) => {
-    // First, get a CSRF token from /api/session (sets the csrf-token cookie)
-    // adminRequest includes auth cookies for authenticated endpoints
+  test("POST with valid CSRF token succeeds", async ({ adminRequest }) => {
+    // Get a CSRF token from /api/session (sets the csrf-token cookie)
     const sessionResponse = await adminRequest.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();
 
@@ -44,7 +41,22 @@ test.describe("CSRF Protection", () => {
     expect(sessionData.csrfToken).toBeDefined();
     const csrfToken = sessionData.csrfToken;
 
-    // Now make a POST request with the CSRF token
+    // Extract csrf-token cookie from Set-Cookie header (adminRequest doesn't auto-persist)
+    const setCookieHeaders = sessionResponse
+      .headersArray()
+      .filter((h) => h.name.toLowerCase() === "set-cookie");
+    const csrfCookie = setCookieHeaders
+      .map((h) => h.value)
+      .find((v) => v.startsWith("csrf-token="));
+    const csrfCookieValue = csrfCookie?.split(";")[0] || "";
+
+    // Build combined cookie header: original auth cookies + csrf-token from session
+    const originalCookie = sessionResponse.request().headers()["cookie"] || "";
+    const combinedCookies = originalCookie
+      ? `${originalCookie}; ${csrfCookieValue}`
+      : csrfCookieValue;
+
+    // POST with CSRF token header and csrf-token cookie
     const response = await adminRequest.post("/api/tools/events", {
       data: {
         sessionId: `voice-test-session-${Date.now()}`,
@@ -55,12 +67,11 @@ test.describe("CSRF Protection", () => {
       },
       headers: {
         "x-csrf-token": csrfToken,
+        Cookie: combinedCookies,
       },
     });
 
-    // Should succeed (200 OK)
     const body = await response.json();
-    console.log("Response status:", response.status(), "body:", body);
     expect(
       response.ok(),
       `Expected 200 OK but got ${response.status()}: ${JSON.stringify(body)}`,
@@ -105,16 +116,32 @@ test.describe("CSRF Protection", () => {
 });
 
 test.describe("CSRF with Tools Integration", () => {
-  // FIXME: adminRequest doesn't persist csrf-token cookie between requests
-  test.skip("Tool creation flow with proper CSRF", async ({ adminRequest }) => {
-    // Get CSRF token from /api/session (adminRequest includes auth cookies)
+  test("Tool creation flow with proper CSRF", async ({ adminRequest }) => {
+    // Get CSRF token and cookie from /api/session
     const sessionResponse = await adminRequest.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();
 
     const { csrfToken } = await sessionResponse.json();
     expect(csrfToken).toBeDefined();
 
+    // Extract csrf-token cookie from Set-Cookie header
+    const setCookieHeaders = sessionResponse
+      .headersArray()
+      .filter((h) => h.name.toLowerCase() === "set-cookie");
+    const csrfCookie = setCookieHeaders
+      .map((h) => h.value)
+      .find((v) => v.startsWith("csrf-token="));
+    const csrfCookieValue = csrfCookie?.split(";")[0] || "";
+    const originalCookie = sessionResponse.request().headers()["cookie"] || "";
+    const combinedCookies = originalCookie
+      ? `${originalCookie}; ${csrfCookieValue}`
+      : csrfCookieValue;
+
     const sessionId = `voice-csrf-flow-${Date.now()}`;
+    const csrfHeaders = {
+      "x-csrf-token": csrfToken,
+      Cookie: combinedCookies,
+    };
 
     // Step 1: Create tool event (simulates voice command)
     const createResponse = await adminRequest.post("/api/tools/events", {
@@ -128,7 +155,7 @@ test.describe("CSRF with Tools Integration", () => {
           subject: "mathematics",
         },
       },
-      headers: { "x-csrf-token": csrfToken },
+      headers: csrfHeaders,
     });
     expect(createResponse.ok()).toBeTruthy();
 
@@ -141,7 +168,7 @@ test.describe("CSRF with Tools Integration", () => {
         toolType: "mindmap",
         data: { progress: 50 },
       },
-      headers: { "x-csrf-token": csrfToken },
+      headers: csrfHeaders,
     });
     expect(updateResponse.ok()).toBeTruthy();
 
@@ -156,7 +183,7 @@ test.describe("CSRF with Tools Integration", () => {
           content: { centralTopic: "Test", nodes: [] },
         },
       },
-      headers: { "x-csrf-token": csrfToken },
+      headers: csrfHeaders,
     });
     expect(completeResponse.ok()).toBeTruthy();
   });

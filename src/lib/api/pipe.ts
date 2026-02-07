@@ -178,10 +178,11 @@ export function pipe(...middlewares: Middleware[]) {
         // Log error with context
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        logger.error(`API Error: ${routeInfo.method} ${routeInfo.path}`, {
-          error: errorMessage,
-          statusCode,
-        });
+        logger.error(
+          `API Error: ${routeInfo.method} ${routeInfo.path}`,
+          { statusCode },
+          error,
+        );
 
         // Build error response
         const response: Record<string, unknown> = {

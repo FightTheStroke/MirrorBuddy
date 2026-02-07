@@ -163,7 +163,7 @@ export function useStudentSummarySync({
     });
     if (summaryId) params.set("summaryId", summaryId);
 
-    // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: eventSourceRef.current?.close() in useEffect return (line 235)
+    // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: eventSourceRef.current?.close() in useEffect return (line 235)
     const eventSource = new EventSource(`/api/tools/stream?${params}`);
     eventSourceRef.current = eventSource;
 

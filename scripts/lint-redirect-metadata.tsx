@@ -32,9 +32,10 @@ async function main() {
   for (const file of pages) {
     const content = await fs.readFile(file, "utf8");
     const hasRedirect = /\bredirect\s*\(/.test(content);
-    const hasMetadata = /export\s+(const|async function)\s+metadata\b/.test(
-      content,
-    );
+    const hasMetadata =
+      /export\s+(const\s+metadata|async\s+function\s+generateMetadata)\b/.test(
+        content,
+      );
     const hasReturn = /\breturn\b/.test(content);
 
     if (hasRedirect && !hasMetadata && !hasReturn) {

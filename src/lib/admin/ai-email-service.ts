@@ -45,7 +45,7 @@ async function fetchAzureOpenAIMetrics(): Promise<AzureOpenAIMetrics | null> {
       model: "gpt-4o",
     };
   } catch (error) {
-    logger.error("Failed to fetch Azure OpenAI metrics", { error });
+    logger.error("Failed to fetch Azure OpenAI metrics", undefined, error);
     return null;
   }
 }
@@ -73,7 +73,7 @@ async function fetchSentryMetrics(): Promise<SentryMetrics | null> {
       eventsLimit: 5000,
     };
   } catch (error) {
-    logger.error("Failed to fetch Sentry metrics", { error });
+    logger.error("Failed to fetch Sentry metrics", undefined, error);
     return null;
   }
 }
@@ -103,7 +103,7 @@ async function fetchResendMetrics(): Promise<ResendMetrics | null> {
       lastSentAt: new Date(Date.now() - 3600000).toISOString(),
     };
   } catch (error) {
-    logger.error("Failed to fetch Resend metrics", { error });
+    logger.error("Failed to fetch Resend metrics", undefined, error);
     return null;
   }
 }

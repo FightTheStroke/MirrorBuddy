@@ -297,9 +297,8 @@ describe("pipe() - Composable API handler pipeline", () => {
 
       expect(logger.error).toHaveBeenCalledWith(
         expect.stringContaining("API Error"),
-        expect.objectContaining({
-          error: "Test failure",
-        }),
+        expect.objectContaining({ statusCode: 500 }),
+        expect.any(Error),
       );
     });
   });

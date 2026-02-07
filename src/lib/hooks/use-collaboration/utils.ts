@@ -37,7 +37,7 @@ export function setupSSEConnection(
   eventHandler: (event: CollabSSEEvent, roomId: string) => void,
   setState: React.Dispatch<React.SetStateAction<CollaborationState>>,
 ): EventSource {
-  // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: caller (main.ts) stores ref and closes in useEffect cleanup (line 52-56)
+  // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: caller (main.ts) stores ref and closes in useEffect cleanup (line 52-56)
   const es = new EventSource(
     `/api/collab/sse?roomId=${roomId}&userId=${userId}`,
   );

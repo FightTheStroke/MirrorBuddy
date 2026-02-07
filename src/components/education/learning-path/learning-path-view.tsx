@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { BookOpen, Clock, PlayCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { logger } from "@/lib/logger";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
@@ -74,7 +75,7 @@ export function LearningPathView({
 
   const handleStartTopic = async (topicId: string) => {
     try {
-      await fetch(`/api/learning-path/${pathId}/topics/${topicId}`, {
+      await csrfFetch(`/api/learning-path/${pathId}/topics/${topicId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: "in_progress" }),

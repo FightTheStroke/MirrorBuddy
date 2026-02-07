@@ -84,6 +84,7 @@ const eslintConfig = defineConfig([
     "playwright-report/**",
     "test-results/**",
     // Git worktree directories (local only)
+    "feat/**",
     "feature/**",
   ]),
   // Custom rules
@@ -98,15 +99,8 @@ const eslintConfig = defineConfig([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
-      // Prevent logger.error('msg', { error }) - Error objects don't serialize in JSON
-      // CORRECT: logger.error('msg', context, error) or logger.error('msg', undefined, error)
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "CallExpression[callee.object.name='logger'][callee.property.name='error'] > ObjectExpression > Property[key.name='error'][value.type='Identifier']",
-          message: "Don't pass Error in context object - it serializes to {}. Use: logger.error('msg', context, error) or logger.error('msg', undefined, error)",
-        },
-      ],
+      // ADR 0076: Prevent logger.error('msg', { error }) - Error objects serialize to {}
+      "local-rules/no-logger-error-context": "error",
     },
   },
   // ADR 0075: Block hardcoded cookie names - use constants from cookie-constants.ts
@@ -121,40 +115,11 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "Literal[value='mirrorbuddy-user-id']",
-          message: "Use AUTH_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='mirrorbuddy-user-id-client']",
-          message: "Use AUTH_COOKIE_CLIENT from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='mirrorbuddy-admin']",
-          message: "Use ADMIN_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='mirrorbuddy-simulated-tier']",
-          message: "Use SIMULATED_TIER_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='csrf-token']",
-          message: "Use CSRF_TOKEN_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='convergio-user-id']",
-          message: "Use LEGACY_AUTH_COOKIE from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-        {
-          selector: "Literal[value='mirrorbuddy-visitor-id']",
-          message: "Use VISITOR_COOKIE_NAME from '@/lib/auth/cookie-constants' instead of hardcoded cookie name. See ADR 0075.",
-        },
-      ],
+      "local-rules/no-hardcoded-cookies": "error",
     },
   },
   // CSRF Protection: Enforce csrfFetch for client-side POST/PUT/DELETE requests
+  // Case-insensitive matching (catches 'post', 'POST', 'Post', etc.)
   // Only applies to client-side code (components, hooks, stores, client utils)
   // Excludes: API routes, AI providers, server utilities, scripts
   // See ADR 0078 for full documentation (formerly ADR 0053)
@@ -181,21 +146,7 @@ const eslintConfig = defineConfig([
       "src/lib/safety/server-*.ts",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        {
-          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='POST'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for POST requests. Plain fetch fails with 403 in production. See ADR 0078.",
-        },
-        {
-          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='PUT'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for PUT requests. Plain fetch fails with 403 in production. See ADR 0078.",
-        },
-        {
-          selector: "CallExpression[callee.name='fetch']:has(ObjectExpression > Property[key.name='method'][value.value='DELETE'])",
-          message: "Use csrfFetch from '@/lib/auth/csrf-client' for DELETE requests. Plain fetch fails with 403 in production. See ADR 0078.",
-        },
-      ],
+      "local-rules/require-csrf-fetch": "error",
     },
   },
   // Test files - allow any and Function for mocking
@@ -241,23 +192,20 @@ const eslintConfig = defineConfig([
       "src/lib/consent/**/*.ts", // GDPR consent management
       "src/lib/storage/**/*.ts", // Legacy cleanup and migrations
       "src/lib/trial/**/*.ts", // Trial visitor tracking (ADR 0056)
+      "src/components/trial/**/*.tsx", // Trial UI email capture (ADR 0056)
       "src/lib/accessibility/**/*.ts", // Device-specific a11y settings
       "src/app/cookies/**/*.tsx", // Cookie documentation page
       "src/components/pwa/**/*.tsx", // PWA install banner dismissal
       "src/lib/hooks/use-permissions.ts", // Browser permission caches
+      "src/lib/hooks/voice-session/transport-cache.ts", // WebRTC probe cache (device-specific)
+      "src/hooks/use-staging-data-filter.ts", // Dev tool: staging data toggle
       // Test files
       "**/*.test.ts",
       "**/*.test.tsx",
       "**/__tests__/**",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "warn",
-        {
-          selector: "CallExpression[callee.object.name='localStorage'][callee.property.name='setItem']",
-          message: "localStorage.setItem is restricted per ADR 0015. Use database API for user data. Allowed: consent, trial tracking, a11y settings only.",
-        },
-      ],
+      "local-rules/no-direct-localstorage": "warn",
     },
   },
   // TF-03: Block direct imports of generateEmbedding - enforce privacy-aware wrapper
@@ -288,13 +236,7 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "no-restricted-syntax": [
-        "warn",
-        {
-          selector: "NewExpression[callee.name='EventSource']",
-          message: "EventSource instances must call .close() in useEffect cleanup to prevent memory leaks. See ADR 0005, 0034.",
-        },
-      ],
+      "local-rules/require-eventsource-cleanup": "warn",
     },
   },
   // ADR 0075: Prefer validateAuth() over direct AUTH cookie reads in API routes

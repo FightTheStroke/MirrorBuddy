@@ -253,18 +253,22 @@ jobs:
             exit 1
           fi
 
-      - name: Regression Gate - Skipped test monitoring
+      - name: Regression Gate - Skipped test monitoring (BLOCKING)
         run: |
           echo "Monitoring skipped tests to prevent regression debt..."
-          BASELINE=5  # Update when intentionally fixing/adding skips
+          BASELINE=3  # Reduced baseline after fixing skipped tests
 
-          # Count skipped tests from coverage output
-          SKIPPED=$(grep -r "skip\|pending" coverage/ 2>/dev/null | wc -l || echo "0")
+          # Count describe.skip/it.skip/test.skip in source (more reliable than coverage grep)
+          SKIPPED=$(grep -rE '\b(describe|it|test)\.skip\b' src/ --include='*.test.ts' --include='*.test.tsx' | wc -l | tr -d ' ')
+
+          echo "Skipped unit tests found: $SKIPPED (baseline: $BASELINE)"
 
           if [ "$SKIPPED" -gt "$BASELINE" ]; then
-            echo "::warning::Skipped tests ($SKIPPED) above baseline ($BASELINE)"
-            echo "Consider fixing flaky tests before merging"
+            echo "::error::BLOCKING: Skipped tests ($SKIPPED) above baseline ($BASELINE)"
+            echo "Fix or remove skipped tests before merging."
+            exit 1
           fi
+          echo "Skip gate passed: $SKIPPED <= $BASELINE"
 
       - name: Upload coverage report
         if: always()
@@ -794,7 +798,6 @@ jobs:
   # Runs on push (full mobile matrix). PRs use mobile-smoke for fast feedback.
   mobile-e2e:
     name: Mobile E2E Tests
-    continue-on-error: true
     runs-on: ubuntu-latest
     needs: [build]
     if: github.event_name != 'pull_request'
@@ -1006,6 +1009,186 @@ jobs:
           path: test-results/
           retention-days: 7
 
+  # Lane 6c: Security E2E Tests - CSRF, cookie signing, authorization
+  # BLOCKING: Ensures security controls are not regressed
+  security-e2e:
+    name: Security E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build]
+    if: github.event_name != 'pull_request'
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Security E2E tests
+        run: npm run test:e2e:security -- --reporter=list
+        env:
+          CI: true
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          OLLAMA_URL: http://localhost:11434
+
+      - name: Upload security test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-e2e-report
+          path: test-results/
+          retention-days: 7
+
+  # Lane 6d: Compliance E2E Tests - AI Act, GDPR, COPPA, data privacy
+  # BLOCKING: Ensures regulatory compliance controls are not regressed
+  compliance-e2e:
+    name: Compliance E2E Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [build]
+    if: github.event_name != 'pull_request'
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: ${{ secrets.TEST_DB_PASSWORD }}
+          POSTGRES_DB: mirrorbuddy_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - name: Setup database
+        run: |
+          npx prisma generate
+          npx prisma migrate deploy
+          npx prisma db seed
+        env:
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-output
+          path: .next
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      - name: Install Playwright deps (if cached)
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
+      - name: Run Compliance E2E tests
+        run: npm run test:e2e:compliance -- --reporter=list
+        env:
+          CI: true
+          TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
+          SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          OLLAMA_URL: http://localhost:11434
+
+      - name: Upload compliance test report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: compliance-e2e-report
+          path: test-results/
+          retention-days: 7
+
   # Lane 7: Docker Build Test (runs in parallel)
   docker:
     name: Docker Build
@@ -1208,6 +1391,9 @@ jobs:
       - smoke-tests
       - accessibility-tests
       - e2e-tests
+      - security-e2e
+      - compliance-e2e
+      - mobile-e2e
       - docker
       - performance
       - sentry-config
@@ -1227,6 +1413,9 @@ jobs:
           needs.smoke-tests.result != 'success' ||
           needs.accessibility-tests.result != 'success' ||
           needs.e2e-tests.result != 'success' ||
+          needs.security-e2e.result != 'success' ||
+          needs.compliance-e2e.result != 'success' ||
+          needs.mobile-e2e.result != 'success' ||
           needs.docker.result != 'success' ||
           needs.performance.result != 'success'
         run: |
@@ -1245,6 +1434,9 @@ jobs:
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
           echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
           echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
+          echo "  security-e2e: ${{ needs.security-e2e.result }}"
+          echo "  compliance-e2e: ${{ needs.compliance-e2e.result }}"
+          echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           exit 1
@@ -1263,29 +1455,32 @@ jobs:
           needs.smoke-tests.result == 'success' &&
           needs.accessibility-tests.result == 'success' &&
           needs.e2e-tests.result == 'success' &&
+          needs.security-e2e.result == 'success' &&
+          needs.compliance-e2e.result == 'success' &&
+          needs.mobile-e2e.result == 'success' &&
           needs.docker.result == 'success' &&
           needs.performance.result == 'success'
         run: |
-          echo "✅ All blocking checks passed - Safe to deploy to production"
+          echo "All blocking checks passed - Safe to deploy to production"
           echo ""
-          echo "Verified jobs (blocking):"
-          echo "  ✓ build"
-          echo "  ✓ secret-scanning"
-          echo "  ✓ debt-check"
-          echo "  ✓ security"
-          echo "  ✓ llm-safety-tests"
-          echo "  ✓ unit-tests"
-          echo "  ✓ docs"
-          echo "  ✓ migrations"
-          echo "  ✓ quality"
-          echo "  ✓ smoke-tests"
-          echo "  ✓ accessibility-tests"
-          echo "  ✓ e2e-tests"
-          echo "  ✓ docker"
-          echo "  ✓ performance"
-          echo ""
-          echo "Non-blocking jobs (run independently):"
-          echo "  mobile-e2e: runs separately, does not block deploy"
+          echo "Verified jobs (all blocking):"
+          echo "  build"
+          echo "  secret-scanning"
+          echo "  debt-check"
+          echo "  security"
+          echo "  llm-safety-tests"
+          echo "  unit-tests"
+          echo "  docs"
+          echo "  migrations"
+          echo "  quality"
+          echo "  smoke-tests"
+          echo "  accessibility-tests"
+          echo "  e2e-tests"
+          echo "  security-e2e"
+          echo "  compliance-e2e"
+          echo "  mobile-e2e"
+          echo "  docker"
+          echo "  performance"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 

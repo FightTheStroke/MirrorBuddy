@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useTranslations, useLocale } from "next-intl";
 import { motion } from "framer-motion";
 import { ErrorBoundary } from "@/components/error-boundary";
 import {
@@ -35,6 +35,7 @@ export type { QuizViewProps } from "./quiz-view/types";
 export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
   const _router = useRouter();
   const t = useTranslations("education");
+  const locale = useLocale();
   const { trackEvent } = useTelemetryStore();
   const [selectedQuiz, setSelectedQuiz] = useState<QuizType | null>(null);
   const [completedQuizzes, setCompletedQuizzes] = useState<string[]>([]);
@@ -243,7 +244,7 @@ export function QuizView({ initialMaestroId, initialMode }: QuizViewProps) {
                           </p>
                           <p className="text-xs text-slate-400 mt-1">
                             {t("quiz.created", {
-                              date: saved.createdAt.toLocaleDateString("it-IT"),
+                              date: saved.createdAt.toLocaleDateString(locale),
                             })}
                           </p>
                         </CardHeader>

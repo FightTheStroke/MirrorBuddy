@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, X } from "lucide-react";
+import { csrfFetch } from "@/lib/auth/csrf-client";
 
 interface EmailCapturePromptProps {
   sessionId: string;
@@ -77,7 +78,7 @@ export function EmailCapturePrompt({
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/trial/email", {
+      const response = await csrfFetch("/api/trial/email", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ sessionId, email }),

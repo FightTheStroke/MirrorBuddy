@@ -17,6 +17,11 @@ import requireEmailHashLookup from "./require-email-hash-lookup.js";
 import noDirectEmbedding from "./no-direct-embedding.js";
 import noDirectAiProvider from "./no-direct-ai-provider.js";
 import requireNativeBridge from "./require-native-bridge.js";
+import noLoggerErrorContext from "./no-logger-error-context.js";
+import noHardcodedCookies from "./no-hardcoded-cookies.js";
+import requireCsrfFetch from "./require-csrf-fetch.js";
+import noDirectLocalstorage from "./no-direct-localstorage.js";
+import requireEventsourceCleanup from "./require-eventsource-cleanup.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -281,6 +286,11 @@ const rules = {
   "no-direct-embedding": noDirectEmbedding,
   "no-direct-ai-provider": noDirectAiProvider,
   "require-native-bridge": requireNativeBridge,
+  "no-logger-error-context": noLoggerErrorContext,
+  "no-hardcoded-cookies": noHardcodedCookies,
+  "require-csrf-fetch": requireCsrfFetch,
+  "no-direct-localstorage": noDirectLocalstorage,
+  "require-eventsource-cleanup": requireEventsourceCleanup,
 };
 
 const localRules = {

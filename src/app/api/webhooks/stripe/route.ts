@@ -32,10 +32,11 @@ export const POST = pipe(withSentry("/api/webhooks/stripe"))(async (ctx) => {
   try {
     event = await stripeService.constructWebhookEvent(body, signature);
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    logger.error("Stripe webhook signature verification failed", {
-      error: message,
-    });
+    logger.error(
+      "Stripe webhook signature verification failed",
+      undefined,
+      error,
+    );
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
@@ -71,8 +72,7 @@ export const POST = pipe(withSentry("/api/webhooks/stripe"))(async (ctx) => {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    logger.error("Webhook handler error", { type: event.type, error: message });
+    logger.error("Webhook handler error", { type: event.type }, error);
     return NextResponse.json({ error: "Handler failed" }, { status: 500 });
   }
 });
