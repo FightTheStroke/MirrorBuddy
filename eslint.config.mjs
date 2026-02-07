@@ -405,6 +405,39 @@ const eslintConfig = defineConfig([
       "local-rules/require-complete-logger-mock": "error",
     },
   },
+  // Module Boundaries: enforce barrel-export-only imports for protected domains
+  // Cross-module deep imports (e.g., @/lib/safety/jailbreak-detector/patterns)
+  // must use the barrel export (@/lib/safety) instead.
+  // Intra-module deep imports remain allowed.
+  // Set to "off" in default lint (existing violations). Use `npm run lint:boundaries`
+  // to see current violations. Escalate to "warn"/"error" after fixing them.
+  {
+    files: ["src/**/*.ts", "src/**/*.tsx"],
+    ignores: [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/enforce-module-boundaries": [
+        "off",
+        {
+          protectedModules: [
+            "safety",
+            "privacy",
+            "ai",
+            "education",
+            "rag",
+            "accessibility",
+            "tier",
+            "auth",
+            "security",
+            "compliance",
+          ],
+        },
+      ],
+    },
+  },
 ]);
 
 export default eslintConfig;
