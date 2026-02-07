@@ -18,6 +18,7 @@ import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { initializeTelemetry } from "@/lib/telemetry";
 import { ActivityTracker } from "@/lib/telemetry/use-activity-tracker";
 import { migrateSessionStorageKey } from "@/lib/storage/migrate-session-key";
+import { registerOfflineServiceWorker } from "@/lib/pwa/offline-sw-registration";
 
 // Debug logger - captures all browser errors to file (dev only)
 import "@/lib/client-error-logger";
@@ -74,6 +75,11 @@ function StoreInitializer() {
       .catch(() => {
         // Silent fail - conversations will start fresh
       });
+
+    // Register service worker for offline support (separate from push notifications)
+    registerOfflineServiceWorker().catch(() => {
+      // Silent fail - offline caching won't work but app still functional
+    });
 
     // Initialize telemetry
     const cleanupTelemetry = initializeTelemetry();

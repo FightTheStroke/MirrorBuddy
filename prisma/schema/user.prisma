@@ -104,6 +104,9 @@ model User {
   // Video Vision Usage Tracking (ADR 0122)
   videoVisionUsages VideoVisionUsage[] @relation("VideoVisionUsages")
 
+  // Password Reset Tokens (Plan 125)
+  passwordResetTokens PasswordResetToken[]
+
   @@index([emailHash])
 }
 
@@ -287,4 +290,18 @@ model PomodoroStats {
   updatedAt DateTime @updatedAt
 
   @@index([userId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([token])
+  @@index([userId])
+  @@index([expiresAt])
 }

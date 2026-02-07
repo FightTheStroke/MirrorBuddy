@@ -7,6 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W3-Gamification-Security
+
+#### Added
+
+- **Gamification Achievements Page**: Achievements grid display with filtering and sorting capabilities
+- **Streak Display with Calendar Heatmap**: Visual streak tracker showing activity calendar with color intensity representing contribution levels
+- **XP/Level Progress Bar**: User level progression display with visual bar indicating next level threshold
+- **i18n Support**: Gamification achievements UI translated to all 5 locales (it, en, fr, de, es)
+- **Achievement Notifications**: Toast notification component for achievement unlock events with animations
+- **Gamification Check API**: `/api/gamification/check` endpoint for real-time achievement verification and unlock detection
+- **useAchievementChecker Hook**: React hook for client-side achievement checking logic and state management
+- **Achievements i18n Namespace**: Translation namespace for all achievement-related strings across all 5 languages
+- **HTML Sanitization Layer**: DOMPurify + isomorphic-dompurify integration for secure AI response rendering
+- **Sanitization Wrapper**: `sanitize.ts` utility module providing type-safe HTML sanitization with configurable allowlist
+
+#### Changed
+
+- **Mobile Bottom Navigation**: Added trophy icon link to achievements section for quick access to gamification features
+
+#### Security
+
+- **AI Response Sanitization**: All AI-generated HTML content now passed through DOMPurify sanitizer to prevent injection attacks
+- **Isomorphic Sanitization**: Sanitization works in both browser and Node.js environments for consistent security posture
+
 ### W2-User-Features
 
 - Added: Self-service password reset flow with forgot-password and reset-password pages
