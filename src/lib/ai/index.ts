@@ -49,6 +49,8 @@ export {
 export {
   chatCompletion,
   getActiveProvider,
+  getRealtimeProvider,
+  isAzureConfigured,
   azureStreamingCompletion,
   type AIProvider,
   type ChatCompletionResult,

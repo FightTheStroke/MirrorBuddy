@@ -25,7 +25,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/privacy/anonymization-service", () => ({
+vi.mock("@/lib/privacy", () => ({
   anonymizeConversationMessage: vi.fn(),
 }));
 

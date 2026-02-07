@@ -22,7 +22,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock anonymization service
-vi.mock("@/lib/privacy/anonymization-service", () => ({
+vi.mock("@/lib/privacy", () => ({
   anonymizeConversationMessage: vi.fn((content: string) => {
     // Simple mock: replace emails and phone numbers with placeholders
     return content
