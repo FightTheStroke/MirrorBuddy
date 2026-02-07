@@ -327,6 +327,8 @@ jobs:
 
       - name: Run unit tests with coverage
         run: npm run test:unit -- --coverage
+        env:
+          NEXT_PUBLIC_SITE_URL: https://mirrorbuddy.org
 
       - name: Check coverage thresholds
         run: |
