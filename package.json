@@ -72,6 +72,7 @@
     "i18n:check": "npx tsx scripts/i18n-check.ts",
     "debt:check": "npx tsx scripts/debt-check.ts",
     "sentry:verify": "bash ./scripts/verify-sentry-config.sh",
+    "sentry:smoke": "bash ./scripts/sentry-smoke-test.sh",
     "cursor:env:template": "tsx scripts/print-cursor-env-template.ts",
     "cursor:env:verify": "tsx scripts/cursor-env-verify.ts",
     "secrets:sync": "bash ./scripts/sync-github-secrets-from-env.sh",
