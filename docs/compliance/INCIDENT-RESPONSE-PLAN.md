@@ -250,6 +250,66 @@ See **INCIDENT-RESPONSE-APPENDICES.md** for:
 | **Distribution**     | All staff (onboarding + annual refresher) |
 | **Training**         | Quarterly incident response drills        |
 
+## 11. Mobile-Specific Incident Procedures
+
+### App Store Takedown Prevention & Response
+
+**Triggers**: Crash loops, privacy violations, explicit content, inaccurate metadata
+
+**Immediate Response** (P1 escalation):
+
+1. **Detection**: Monitor crash report metrics via Sentry + App Store Connect
+2. **Assessment**: Verify app functionality on target iOS/Android versions
+3. **Communication**: Notify App Store/Play Store review team within 4 hours
+4. **Fix Timeline**: Deploy patch within 24 hours
+5. **Resubmission**: Expedited review request with incident summary
+
+**Preventive Controls**:
+
+- Pre-release testing on 5+ iOS/Android versions
+- Monitor app store reviews for crash complaints
+- Automated crash threshold alerts (>2% crash-free session rate)
+
+### Mobile Crash Reporting Integration
+
+**Platform**: Sentry Mobile SDK captures:
+
+- App version + build number
+- Device type, OS version, memory
+- Crash stack traces + breadcrumbs
+- User session context (anonymized)
+
+**Response SLA**:
+
+- P0 (crash-free session rate <95%): 15 min response
+- P1 (crash-free session rate 95-98%): 1 hour response
+- P2 (isolated crashes): 4 hours response
+
+**Investigation Checklist**:
+
+- [ ] Crash reproducible on specific OS version?
+- [ ] Affects release build + debug build?
+- [ ] Related to app version or device-specific issue?
+- [ ] Requires immediate patch or can wait for next release?
+
+### Push Notification Failures
+
+**Failure Scenarios**: Token expiry, APNs/FCM outage, invalid certificate, rate limiting
+
+**Detection**:
+
+- Monitor APNs/FCM delivery rate (must be >95%)
+- Alert if >5% of push tokens invalid in 24h window
+
+**Response**:
+
+1. Verify APNs/FCM service status (Apple/Google dashboards)
+2. Check certificate expiry: `security find-certificate -c MirrorBuddy`
+3. Validate token refresh logic (tokens expire every 60+ days)
+4. If >10% failure: trigger user notification via in-app alert instead
+
+**Escalation**: P1 if notification system down >30 min
+
 ---
 
 **Related Documents**:

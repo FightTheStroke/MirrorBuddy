@@ -137,6 +137,11 @@ Watch their story: [TED Talk - In our baby's illness, a life lesson](https://www
 - **🤖 Multi-AI** — Azure OpenAI primary, Claude fallback, Ollama local dev
 - **🛡️ SOC 2 Ready** — Audit logging, access control, vendor risk assessment
 - **🏫 School Plans** — Registration, admin dashboard, SSO config, bulk invite
+- **🔑 Password Reset** — Self-service password recovery with secure tokens
+- **📴 Offline Support** — PWA with native Service Worker, cache-first strategy
+- **🎖️ Achievements** — Unlock badges, streak tracking, gamified progress
+- **📱 Mobile Build** — Capacitor-based iOS/Android with CI validation
+- **✅ CI Hardening** — E2E and accessibility tests blocking deployments
 
 **→ See detailed feature documentation in [docs/claude/](docs/claude/)**
 
@@ -218,6 +223,37 @@ Open http://localhost:3000 and start learning.
 
 **→ See full setup guide: [SETUP.md](SETUP.md)**
 **→ Having issues? Check: [TROUBLESHOOTING.md](TROUBLESHOOTING.md)**
+
+---
+
+## Mobile Apps
+
+MirrorBuddy ships as native iOS and Android apps using Capacitor, sharing the same codebase as the web platform.
+
+**Supported Platforms:**
+
+- **iOS 14+** — iPhone, iPad
+- **Android 8+** — Phones, tablets
+
+**Building Mobile Apps:**
+
+```bash
+# Install Capacitor
+npm install @capacitor/cli @capacitor/core
+
+# Add iOS/Android platforms
+npx cap add ios
+npx cap add android
+
+# Build for mobile
+npm run build:mobile
+
+# Open native IDE to build & deploy
+npx cap open ios   # Opens Xcode
+npx cap open android  # Opens Android Studio
+```
+
+**→ Complete mobile build guide: [docs/mobile/BUILD-GUIDE.md](docs/mobile/BUILD-GUIDE.md)**
 
 ---
 

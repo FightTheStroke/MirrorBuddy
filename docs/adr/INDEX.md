@@ -78,6 +78,7 @@
 | 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance                                                                        |
 | 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety                                                               |
 | 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
+| 0132 | Self-Service Password Reset Flow              | Time-limited tokens, secure recovery, rate limiting                                             |
 
 ## Observability & Operations
 
@@ -132,32 +133,34 @@
 
 ## Features & Tools
 
-| #    | Decision                                               | Impact                           |
-| ---- | ------------------------------------------------------ | -------------------------------- |
-| 0001 | Materials Storage Strategy                             | File upload and storage          |
-| 0002 | Use MarkMap for Mind Map Rendering                     | Interactive mindmaps             |
-| 0008 | Parent Dashboard GDPR Consent Model                    | GDPR-compliant parent access     |
-| 0009 | Tool Execution Architecture                            | Plugin-based tool system         |
-| 0019 | Session Summaries & Unified Archive                    | Auto-generated session summaries |
-| 0020 | Mindmap Data Structure and Rendering Fix               | Stable mindmap rendering         |
-| 0022 | Knowledge Hub Architecture                             | Centralized learning resources   |
-| 0026 | Maestro-Agent Communication for Demo Generation        | AI-generated demos               |
-| 0033 | RAG Semantic Search Architecture                       | Vector search for knowledge      |
-| 0034 | Chat Streaming Architecture                            | Streaming chat responses         |
-| 0036 | Per-Character Conversation History Sidebar             | Character-specific sidebar       |
-| 0037 | Tool Plugin Architecture                               | Extensible tool system           |
-| 0040 | Google Drive Integration                               | Import from Google Drive         |
-| 0043 | Brave Search API Integration                           | Web search capability            |
-| 0060 | Instant Accessibility Feature                          | Floating a11y quick panel        |
-| 0061 | Admin Section Redesign                                 | Improved admin UX                |
-| 0106 | Admin Panel Redesign                                   | Server components, audit service |
-| 0068 | Conversion Funnel Dashboard                            | Trial-to-paid analytics          |
-| 0092 | Hreflang SEO Tags for Multi-Locale Pages               | SEO for 5 languages              |
-| 0095 | Localized Open Graph Metadata for Social Media Sharing | Language-specific OG tags        |
-| 0118 | Webcam Fullscreen Architecture                         | Fullscreen overlay, dual-flow    |
-| 0122 | Realtime Video Vision (Pro-Only)                       | Periodic frames to Realtime API  |
-| 0125 | Research & Benchmarking Lab                            | Admin research tools dashboard   |
-| 0126 | Unified Camera Architecture                            | Video/photo mode selector        |
+| #    | Decision                                               | Impact                                       |
+| ---- | ------------------------------------------------------ | -------------------------------------------- |
+| 0001 | Materials Storage Strategy                             | File upload and storage                      |
+| 0002 | Use MarkMap for Mind Map Rendering                     | Interactive mindmaps                         |
+| 0008 | Parent Dashboard GDPR Consent Model                    | GDPR-compliant parent access                 |
+| 0009 | Tool Execution Architecture                            | Plugin-based tool system                     |
+| 0019 | Session Summaries & Unified Archive                    | Auto-generated session summaries             |
+| 0020 | Mindmap Data Structure and Rendering Fix               | Stable mindmap rendering                     |
+| 0022 | Knowledge Hub Architecture                             | Centralized learning resources               |
+| 0026 | Maestro-Agent Communication for Demo Generation        | AI-generated demos                           |
+| 0033 | RAG Semantic Search Architecture                       | Vector search for knowledge                  |
+| 0034 | Chat Streaming Architecture                            | Streaming chat responses                     |
+| 0036 | Per-Character Conversation History Sidebar             | Character-specific sidebar                   |
+| 0037 | Tool Plugin Architecture                               | Extensible tool system                       |
+| 0040 | Google Drive Integration                               | Import from Google Drive                     |
+| 0043 | Brave Search API Integration                           | Web search capability                        |
+| 0060 | Instant Accessibility Feature                          | Floating a11y quick panel                    |
+| 0061 | Admin Section Redesign                                 | Improved admin UX                            |
+| 0106 | Admin Panel Redesign                                   | Server components, audit service             |
+| 0068 | Conversion Funnel Dashboard                            | Trial-to-paid analytics                      |
+| 0092 | Hreflang SEO Tags for Multi-Locale Pages               | SEO for 5 languages                          |
+| 0095 | Localized Open Graph Metadata for Social Media Sharing | Language-specific OG tags                    |
+| 0118 | Webcam Fullscreen Architecture                         | Fullscreen overlay, dual-flow                |
+| 0122 | Realtime Video Vision (Pro-Only)                       | Periodic frames to Realtime API              |
+| 0125 | Research & Benchmarking Lab                            | Admin research tools dashboard               |
+| 0126 | Unified Camera Architecture                            | Video/photo mode selector                    |
+| 0133 | PWA Offline Strategy                                   | Native Service Worker, offline-first caching |
+| 0134 | Gamification UI - Surface Backend Achievements         | Achievements page, streaks, XP progress      |
 
 ## Tier & Business
 
@@ -188,6 +191,6 @@
 
 ---
 
-**Total Active ADRs**: 110
+**Total Active ADRs**: 113
 **Archived ADRs**: 7
-**Last Updated**: 2026-02-06
+**Last Updated**: 2026-02-07

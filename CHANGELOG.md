@@ -7,17 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### W4-CI-Hardening
+## [0.14.0] - 2026-02-07
 
-#### Changed
-
-- **E2E Tests Blocking**: Removed `continue-on-error` from e2e workflow, added `nick-fields/retry@v3` with 3 retries for flaky tests, screenshot upload on failure for debugging
-- **Accessibility Tests Blocking**: Removed `continue-on-error` from accessibility workflow, WCAG 2.1 AA violations now gate deployment
-- **Mobile Build Job (PR-only)**: Added non-blocking CI job validating Next.js static export + Capacitor copy pipeline with Java 17, runs only on PRs for early validation feedback
-
-### W3-Gamification-Security
-
-#### Added
+### Added
 
 - **Gamification Achievements Page**: Achievements grid display with filtering and sorting capabilities
 - **Streak Display with Calendar Heatmap**: Visual streak tracker showing activity calendar with color intensity representing contribution levels
@@ -29,36 +21,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Achievements i18n Namespace**: Translation namespace for all achievement-related strings across all 5 languages
 - **HTML Sanitization Layer**: DOMPurify + isomorphic-dompurify integration for secure AI response rendering
 - **Sanitization Wrapper**: `sanitize.ts` utility module providing type-safe HTML sanitization with configurable allowlist
+- Self-service password reset flow with forgot-password and reset-password pages
+- Password reset API routes for token generation and validation
+- PasswordResetToken Prisma model with expiration tracking
+- i18n keys for password reset in all 5 locales (en, it, fr, de, es)
+- Password reset email template with locale-specific support
+- PWA offline support using Workbox-style caching strategies
+- NetworkFirst caching for pages, CacheFirst for static assets, NetworkOnly for API calls
+- offline.html fallback page for network errors
+- Service Worker registration in app providers
+- Mobile build scripts (build:mobile:web, build:mobile:ios, build:mobile:android, cap:sync, cap:copy)
+- Fastlane configuration for iOS TestFlight and Android Play Store internal testing
+- App store metadata templates (iOS and Android descriptions in 5 languages, screenshot dimensions guide)
+- Comprehensive mobile build guide (docs/mobile/BUILD-GUIDE.md)
 
-#### Changed
+### Changed
 
+- **E2E Tests Blocking**: Removed `continue-on-error` from e2e workflow, added `nick-fields/retry@v3` with 3 retries for flaky tests, screenshot upload on failure for debugging
+- **Accessibility Tests Blocking**: Removed `continue-on-error` from accessibility workflow, WCAG 2.1 AA violations now gate deployment
+- **Mobile Build Job (PR-only)**: Added non-blocking CI job validating Next.js static export + Capacitor copy pipeline with Java 17, runs only on PRs for early validation feedback
 - **Mobile Bottom Navigation**: Added trophy icon link to achievements section for quick access to gamification features
 
-#### Security
+### Fixed
+
+- Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
+- manifest.json lang changed from 'it' to 'en', added related_applications for iOS/Android stores
+
+### Security
 
 - **AI Response Sanitization**: All AI-generated HTML content now passed through DOMPurify sanitizer to prevent injection attacks
 - **Isomorphic Sanitization**: Sanitization works in both browser and Node.js environments for consistent security posture
-
-### W2-User-Features
-
-- Added: Self-service password reset flow with forgot-password and reset-password pages
-- Added: Password reset API routes for token generation and validation
-- Added: PasswordResetToken Prisma model with expiration tracking
-- Added: i18n keys for password reset in all 5 locales (en, it, fr, de, es)
-- Added: Password reset email template with locale-specific support
-- Added: PWA offline support using Workbox-style caching strategies
-- Added: NetworkFirst caching for pages, CacheFirst for static assets, NetworkOnly for API calls
-- Added: offline.html fallback page for network errors
-- Added: Service Worker registration in app providers
-
-### W1-Mobile-Build
-
-- Fixed: Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
-- Added: Mobile build scripts (build:mobile:web, build:mobile:ios, build:mobile:android, cap:sync, cap:copy)
-- Added: Fastlane configuration for iOS TestFlight and Android Play Store internal testing
-- Fixed: manifest.json lang changed from 'it' to 'en', added related_applications for iOS/Android stores
-- Added: App store metadata templates (iOS and Android descriptions in 5 languages, screenshot dimensions guide)
-- Added: Comprehensive mobile build guide (docs/mobile/BUILD-GUIDE.md)
 
 ## [0.13.0] - 2026-02-06
 
