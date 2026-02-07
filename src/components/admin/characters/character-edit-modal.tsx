@@ -7,7 +7,7 @@ import { Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 
 interface CharacterData {

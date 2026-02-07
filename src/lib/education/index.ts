@@ -34,3 +34,34 @@ export {
   type DifficultyAdjustment,
   type QuizAnalysis,
 } from './adaptive-quiz';
+
+// Adaptive Difficulty - Signals, profiles, context building
+export {
+  loadAdaptiveProfile,
+  saveAdaptiveProfile,
+  recordAdaptiveSignal,
+  getAdaptiveContextForUser,
+  recordAdaptiveSignalsBatch,
+  isAdaptiveDifficultyMode,
+  normalizeAdaptiveDifficultyMode,
+  calculateAdaptiveContext,
+  buildAdaptiveInstruction,
+  createDefaultAdaptiveProfile,
+  parseAdaptiveProfile,
+} from './adaptive-difficulty';
+
+export {
+  sendAdaptiveSignals,
+  buildSignalsFromText,
+} from './adaptive-difficulty-client';
+
+// Recommendation Engine
+export {
+  generateRecommendations,
+  type LearningRecommendation,
+} from './recommendation-engine';
+
+// Accessibility - Dyscalculia support
+export {
+  formatNumberColored,
+} from './accessibility/dyscalculia';

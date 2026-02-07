@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { NextRequest } from "next/server";
 import { POST } from "../route";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { validateAdminAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 
 // Mock Sentry

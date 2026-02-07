@@ -5,7 +5,7 @@
 import { logger } from "@/lib/logger";
 import type { MindmapData } from "@/lib/tools/mindmap-export/index";
 import type { RoomParticipant } from "@/lib/collab/mindmap-room";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 /**
  * Create a new collaboration room

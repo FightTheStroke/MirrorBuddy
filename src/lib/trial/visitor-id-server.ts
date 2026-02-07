@@ -9,7 +9,7 @@ import { cookies } from "next/headers";
 import {
   VISITOR_COOKIE_NAME,
   validateVisitorId,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 
 /**
  * Get visitor ID from server component context

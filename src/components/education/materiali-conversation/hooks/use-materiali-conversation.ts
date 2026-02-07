@@ -7,7 +7,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
 import { useTTS } from "@/components/accessibility";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { fileToBase64 } from "../utils/file-utils";
 import type { ConversationMessage, Attachment, Character } from "../types";
 

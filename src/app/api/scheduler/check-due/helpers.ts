@@ -2,7 +2,7 @@
  * Scheduler check-due helpers
  */
 
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import {
   MELISSA_VOICE_TEMPLATES,
   type NotificationPreferences,

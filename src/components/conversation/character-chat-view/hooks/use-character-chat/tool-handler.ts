@@ -2,7 +2,7 @@
  * Tool request handling logic
  */
 
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 import type { ToolType, ToolState } from "@/types/tools";

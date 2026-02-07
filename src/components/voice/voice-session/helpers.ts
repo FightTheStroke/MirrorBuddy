@@ -1,4 +1,4 @@
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 
 // Get userId from cookie
 export function getUserId(): string | null {

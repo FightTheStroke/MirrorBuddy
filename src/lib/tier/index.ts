@@ -1,3 +1,8 @@
+/**
+ * @module tier
+ * Tier management and feature configuration for MirrorBuddy
+ */
+
 export type {
   TierDefinition,
   TierFeatures,
@@ -31,3 +36,9 @@ export {
   getModelFromTier,
   getFeatureAIConfig,
 } from "./tier-helpers";
+
+export { assignBaseTierToNewUser } from "./registration-helper";
+export {
+  getLimitsAndUsage,
+  incrementVideoVisionUsage,
+} from "./video-vision-usage-service";

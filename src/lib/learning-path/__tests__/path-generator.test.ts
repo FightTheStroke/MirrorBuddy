@@ -61,7 +61,7 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion } from "@/lib/ai";
 import { prisma } from "@/lib/db";
 
 const mockChatCompletion = vi.mocked(chatCompletion);

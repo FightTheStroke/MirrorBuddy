@@ -7,7 +7,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AlertCircle, Edit, Trash2, Plus } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
 import {
   Dialog,

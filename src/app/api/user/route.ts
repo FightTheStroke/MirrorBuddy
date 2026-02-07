@@ -7,14 +7,14 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { signCookieValue } from "@/lib/auth/cookie-signing";
+import { validateAuth } from "@/lib/auth";
+import { signCookieValue } from "@/lib/auth";
 import {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
-import { assignBaseTierToNewUser } from "@/lib/tier/registration-helper";
+import { assignBaseTierToNewUser } from "@/lib/tier";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 export const GET = pipe(withSentry("/api/user"))(async () => {

@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Eye, EyeOff, Lock, CheckCircle, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 type FormState = "idle" | "submitting" | "success" | "error";
 

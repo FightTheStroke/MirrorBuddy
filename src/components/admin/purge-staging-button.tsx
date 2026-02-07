@@ -13,7 +13,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { Trash2, Loader2, AlertTriangle } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 interface StagingDataCounts {
   users: number;

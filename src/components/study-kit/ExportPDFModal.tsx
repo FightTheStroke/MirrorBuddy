@@ -12,7 +12,7 @@ import { X, Download, Loader2, FileText, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import toast from "@/components/ui/toast";
 import { DSA_PROFILES, type DSAProfile } from "./dsa-profiles";
 import type { StudyKit } from "@/types/study-kit";

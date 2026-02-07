@@ -6,7 +6,7 @@ import { MAESTRI_XP } from "@/lib/constants/xp-rewards";
 import { useMaestroVoiceConnection } from "./use-maestro-voice-connection";
 import { useMaestroChatHandlers } from "./use-maestro-chat-handlers";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { Maestro, ChatMessage, ToolCall, ToolType } from "@/types";
 
 interface UseMaestroSessionLogicProps {

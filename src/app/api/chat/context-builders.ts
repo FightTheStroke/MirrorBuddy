@@ -9,7 +9,7 @@ import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
 import {
   findSimilarMaterials,
   findRelatedConcepts,
-} from "@/lib/rag/retrieval-service";
+} from "@/lib/rag";
 import { buildToolContext } from "@/lib/tools/tool-context-builder";
 import { getMaestroById } from "@/data/maestri";
 import {

@@ -1,4 +1,5 @@
 /**
+ * @module ai
  * AI Module - Barrel Export
  * F-08: Feature modules con boundaries chiari
  */
@@ -6,6 +7,7 @@
 // Character routing
 export {
   routeToCharacter,
+  getBuddyForStudent,
   type RoutingResult,
   type RoutingContext,
 } from "./character-router";
@@ -42,6 +44,28 @@ export {
   getProviderCheckStatus,
 } from "./provider-check";
 
+// Providers - core functions and types
+export {
+  chatCompletion,
+  getActiveProvider,
+  azureStreamingCompletion,
+  type AIProvider,
+  type ChatCompletionResult,
+  type ToolDefinition,
+  type StreamChunk,
+  type StreamChunkType,
+  type StreamingOptions,
+} from "./providers";
+
+// Provider types
+export type { AIProviderType } from "./providers/provider-interface";
+
+// Deployment mapping
+export { getDeploymentForModel } from "./providers/deployment-mapping";
+
+// Router
+export { aiRouter } from "./providers/router";
+
 // Summarization
 export {
   generateConversationSummary,
@@ -50,3 +74,9 @@ export {
   extractLearnings,
   generateConversationTitle,
 } from "./summarize";
+
+// Transparency
+export {
+  assessResponseTransparency,
+  type TransparencyContext,
+} from "./transparency";

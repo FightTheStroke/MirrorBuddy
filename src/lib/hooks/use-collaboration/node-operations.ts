@@ -3,7 +3,7 @@
  */
 
 import type { MindmapNode } from "@/lib/tools/mindmap-export/index";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 /**
  * Add a node to the mindmap

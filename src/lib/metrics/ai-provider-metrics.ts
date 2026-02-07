@@ -6,7 +6,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import type { AIProviderType } from "@/lib/ai/providers/provider-interface";
+import type { AIProviderType } from "@/lib/ai";
 
 interface ProviderMetricsBucket {
   provider: AIProviderType;

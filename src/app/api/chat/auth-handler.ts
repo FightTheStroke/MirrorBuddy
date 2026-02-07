@@ -5,7 +5,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
 
 /**

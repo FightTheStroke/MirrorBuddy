@@ -7,7 +7,7 @@
 
 import { create } from 'zustand';
 import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 
 export interface GamificationState {
   // Core progression

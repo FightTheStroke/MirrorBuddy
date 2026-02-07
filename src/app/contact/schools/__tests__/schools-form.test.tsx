@@ -58,7 +58,7 @@ vi.mock("next-intl", () => ({
   useMessages: () => ({}),
 }));
 
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 const mockCsrfFetch = csrfFetch as any;
 

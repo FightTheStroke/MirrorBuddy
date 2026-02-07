@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Send, Loader2, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 const SECTORS = [

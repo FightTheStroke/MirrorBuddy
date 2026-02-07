@@ -40,7 +40,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { validateAdminAuth } from "@/lib/auth";
 import { GET } from "../route";
 
 describe("Trial Analytics API", () => {

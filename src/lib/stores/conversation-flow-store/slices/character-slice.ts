@@ -24,8 +24,8 @@ import {
 import { getBuddyForStudent } from "@/lib/ai/character-router";
 import { getBuddyById, type BuddyId } from "@/data/buddy-profiles";
 import { getMaestroById } from "@/data/maestri";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { getUserIdFromCookie } from "@/lib/auth";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { MIN_MESSAGES_FOR_SUMMARY } from "../persistence";
 import {

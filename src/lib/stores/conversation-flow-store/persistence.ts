@@ -9,7 +9,7 @@
  */
 
 import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 import type { CharacterType } from '@/types';
 import type { ConversationSummary } from './types';
 

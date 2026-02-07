@@ -9,7 +9,7 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TierLimitConfig } from "@/lib/admin/control-panel-types";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 interface TierLimitsProps {

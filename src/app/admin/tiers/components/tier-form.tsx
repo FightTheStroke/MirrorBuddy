@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/components/ui/toast";
 import { Save, X } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { clientLogger } from "@/lib/logger/client";
 import { BasicInfoSection } from "./basic-info-section";
 import { LimitsSection } from "./limits-section";

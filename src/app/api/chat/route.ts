@@ -10,9 +10,9 @@ import {
   chatCompletion,
   getActiveProvider,
   type AIProvider,
-} from "@/lib/ai/providers";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
-import { tierService } from "@/lib/tier/tier-service";
+  getDeploymentForModel,
+} from "@/lib/ai";
+import { tierService } from "@/lib/tier";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,
@@ -29,7 +29,7 @@ import { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
 import {
   assessResponseTransparency,
   type TransparencyContext,
-} from "@/lib/ai/transparency";
+} from "@/lib/ai";
 import { recordContentFiltered } from "@/lib/safety/audit";
 import { normalizeUnicode } from "@/lib/safety/versioning";
 

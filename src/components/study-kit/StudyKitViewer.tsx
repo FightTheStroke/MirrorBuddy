@@ -18,7 +18,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
 import { sanitize } from "@/lib/sanitize";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { StudyKit } from "@/types/study-kit";
 import type { QuizResult } from "@/types/index";
 

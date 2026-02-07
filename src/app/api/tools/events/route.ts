@@ -19,14 +19,14 @@ import {
 import {
   validateAuth,
   validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+} from "@/lib/auth";
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 
 // Validate tool event type
 const VALID_EVENT_TYPES: ToolEventType[] = [

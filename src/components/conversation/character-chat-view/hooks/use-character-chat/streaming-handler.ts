@@ -8,7 +8,7 @@
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { ChatUsage } from "./message-handler";
 
 /** Streaming result with REAL usage data from API */

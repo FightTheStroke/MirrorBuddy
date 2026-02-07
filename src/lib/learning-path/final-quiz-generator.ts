@@ -6,7 +6,7 @@
 
 import { chatCompletion } from "@/lib/ai/providers";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import type { QuizData, QuizQuestion } from "@/types/tools";
 

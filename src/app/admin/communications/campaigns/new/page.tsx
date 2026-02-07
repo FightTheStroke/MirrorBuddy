@@ -1,7 +1,7 @@
 // Mark as dynamic to avoid static generation issues with i18n
 export const dynamic = "force-dynamic";
 
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { validateAdminAuth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { listTemplates } from "@/lib/email/template-service";
 import { getResendLimits } from "@/lib/observability/resend-limits";

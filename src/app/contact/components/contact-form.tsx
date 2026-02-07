@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ContactFormFields } from "./contact-form-fields";
 import { ContactFormMessages } from "./contact-form-messages";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 interface FormErrors {
   name?: string;

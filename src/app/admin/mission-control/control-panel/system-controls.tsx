@@ -13,7 +13,7 @@ import {
   MaintenanceModeState,
   GlobalKillSwitchState,
 } from "@/lib/admin/control-panel-types";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 interface SystemControlsProps {

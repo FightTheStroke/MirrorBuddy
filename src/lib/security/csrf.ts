@@ -3,7 +3,7 @@ import { NextRequest } from "next/server";
 import {
   CSRF_TOKEN_COOKIE,
   CSRF_TOKEN_HEADER,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 
 /**
  * CSRF Protection Utilities

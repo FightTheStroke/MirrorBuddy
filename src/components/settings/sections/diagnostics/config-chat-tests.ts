@@ -1,5 +1,5 @@
 import type { DiagnosticResult } from "./types";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 export async function runConfigCheck(): Promise<DiagnosticResult> {
   try {

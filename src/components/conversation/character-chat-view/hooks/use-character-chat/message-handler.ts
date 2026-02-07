@@ -3,7 +3,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { Message } from "./types";
 import type { CharacterInfo } from "../../utils/character-utils";
 import type { ToolState, ToolType, ToolCallRef } from "@/types/tools";

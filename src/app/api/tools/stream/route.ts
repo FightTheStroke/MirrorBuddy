@@ -11,7 +11,7 @@ import { prisma } from "@/lib/db";
 import {
   validateAuth,
   validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+} from "@/lib/auth";
 import {
   registerClient,
   unregisterClient,
@@ -21,7 +21,7 @@ import {
   getTotalClientCount,
 } from "@/lib/realtime/tool-events";
 import { getCorsHeaders } from "@/lib/security/cors-config";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Generate unique client ID

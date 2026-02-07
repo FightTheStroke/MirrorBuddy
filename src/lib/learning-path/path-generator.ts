@@ -7,7 +7,7 @@
 import { prisma } from "@/lib/db";
 import { chatCompletion } from "@/lib/ai/providers";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import type { TopicAnalysisResult, IdentifiedTopic } from "./topic-analyzer";
 import type { TopicWithRelations } from "./material-linker";

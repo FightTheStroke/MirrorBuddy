@@ -13,8 +13,8 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { csrfFetch } from "@/lib/auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 import {
   getUnifiedConsent,
   saveUnifiedConsent,

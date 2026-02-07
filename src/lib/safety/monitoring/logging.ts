@@ -6,7 +6,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { SafetyEvent, SafetyEventType, EventSeverity } from "./types";
 import { anonymizeId, isViolationType, generateEventId } from "./utils";
 import { checkViolationPattern } from "./violation-tracker";

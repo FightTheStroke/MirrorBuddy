@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { parse, serialize } from "cookie";
 import crypto from "crypto";
 import { logger } from "@/lib/logger";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 
 const log = logger.child({ module: "trial/middleware" });
 

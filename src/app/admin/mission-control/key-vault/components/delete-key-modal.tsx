@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertCircle } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
 
 interface DeleteKeyModalProps {

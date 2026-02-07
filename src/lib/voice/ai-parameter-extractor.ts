@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { logger } from "@/lib/logger";
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion } from "@/lib/ai";
 import type { ToolParameterSchema } from "./tool-parameter-schemas";
 import type { ExtractedParameters } from "./voice-parameter-extractor";
 

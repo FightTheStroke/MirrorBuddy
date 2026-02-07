@@ -16,7 +16,7 @@ import {
   registerForPush as registerCapacitorPush,
 } from "./capacitor-push";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 export interface PushSubscriptionJSON {
   endpoint: string;

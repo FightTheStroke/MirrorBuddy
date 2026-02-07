@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { extractToolParameters } from "../voice-parameter-extractor";
-import * as aiProviders from "@/lib/ai/providers";
+import * as aiProviders from "@/lib/ai";
 
 // Mock the AI provider
 vi.mock("@/lib/ai/providers", () => ({

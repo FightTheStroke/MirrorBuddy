@@ -7,7 +7,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 interface AuditLogEntry {
   id: string;

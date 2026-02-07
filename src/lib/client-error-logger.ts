@@ -14,7 +14,7 @@
  *   import '@/lib/client-error-logger';
  */
 
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 type LogLevel = "error" | "warn" | "info" | "debug";
 type ConsoleMethod = (...args: unknown[]) => void;

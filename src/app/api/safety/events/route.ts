@@ -9,7 +9,7 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 import type {
   SafetyEventType,

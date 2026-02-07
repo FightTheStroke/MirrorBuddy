@@ -5,7 +5,7 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
 import { filterInput } from "@/lib/safety";
 import { loadPreviousContext } from "@/lib/conversation/memory-loader";
@@ -13,8 +13,8 @@ import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
 import {
   findSimilarMaterials,
   findRelatedConcepts,
-} from "@/lib/rag/retrieval-service";
-import type { AIProvider } from "@/lib/ai/providers";
+} from "@/lib/rag";
+import type { AIProvider } from "@/lib/ai";
 
 import type { ChatRequest } from "../types";
 

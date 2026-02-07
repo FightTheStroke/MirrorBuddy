@@ -5,7 +5,7 @@
 
 import { cookies, headers } from "next/headers";
 import { logger } from "@/lib/logger";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 import {
   getOrCreateTrialSession,
   getTrialSessionById,

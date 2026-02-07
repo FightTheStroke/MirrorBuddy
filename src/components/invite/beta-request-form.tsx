@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Send, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 interface BetaRequestFormProps {

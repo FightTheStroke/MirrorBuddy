@@ -24,7 +24,7 @@ vi.mock("@/lib/db", () => ({
 // Import after mocks
 import { setSentryTierContext } from "../sentry-tier-context";
 import * as Sentry from "@sentry/nextjs";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import { prisma } from "@/lib/db";
 
 // Default per-feature model fields (ADR 0073)

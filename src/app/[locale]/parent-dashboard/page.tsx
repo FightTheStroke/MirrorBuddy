@@ -8,7 +8,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { getTranslations } from "next-intl/server";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import { ParentDashboard } from "@/components/profile/parent-dashboard";
 import { ParentDashboardClient } from "./parent-dashboard-client";
 import type { StudentInsights } from "@/types";

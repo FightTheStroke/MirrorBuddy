@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Check, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 interface BulkActionBarProps {

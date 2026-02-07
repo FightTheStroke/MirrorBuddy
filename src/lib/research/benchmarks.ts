@@ -4,7 +4,7 @@
  * based on recorded maestro-student conversations.
  */
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion } from "@/lib/ai";
 
 export interface TutorBenchScores {
   scaffolding: number; // 0-100

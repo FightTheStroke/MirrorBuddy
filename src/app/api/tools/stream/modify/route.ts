@@ -19,14 +19,14 @@ import { prisma } from "@/lib/db";
 import {
   validateAuth,
   validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+} from "@/lib/auth";
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 
 interface ModifyRequest {
   sessionId: string;
