@@ -58,3 +58,21 @@
 - `sync_code_signing(type: "appstore")` placed before `build_app` ensures profiles are always fresh
 - `match_nuke` lane allows emergency certificate reset without manual Apple Developer Portal access
 - Script uses `set -euo pipefail` per coding standards, with `trap cleanup EXIT`
+
+## WF-Documentation
+
+### Completed Tasks
+
+- **TF-01**: Created `docs/adr/0135-ios-release-pipeline.md` (247 lines) - ADR documenting Fastlane+Match, TestFlight, agent integration
+- **TF-02**: Updated `CLAUDE.md` with `ios-release` docs reference and `ios:check` command
+- **TF-03**: Reorganized `CHANGELOG.md` with cohesive "iOS Release Pipeline" section
+
+### Decisions
+
+- ADR 0135 covers architecture, env vars, distribution channels, and agent integration in one document
+- CHANGELOG consolidated 8 individual entries into 4 logical sub-groups (Documentation, Configuration, Automation, Agent Integration)
+
+### Observations
+
+- P2 review comment from Codex resolved: `check_match_certificates()` enhanced with keychain identity validation on macOS
+- CI failures (Unit Tests, Smoke Tests) pre-existing on main (parse5/jsdom standalone), not introduced by this plan
