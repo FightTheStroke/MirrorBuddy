@@ -23,6 +23,81 @@ env:
   NODE_VERSION: "20"
 
 jobs:
+  # =========================================================================
+  # CHANGE DETECTION - Determines which areas are affected by this PR/push
+  # Used to skip expensive jobs when changes don't affect their area.
+  # On push to main, all downstream jobs run unconditionally.
+  # See: docs/ci/affected-ci.md
+  # =========================================================================
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      src: ${{ steps.filter.outputs.src }}
+      ui: ${{ steps.filter.outputs.ui }}
+      mobile: ${{ steps.filter.outputs.mobile }}
+      prisma: ${{ steps.filter.outputs.prisma }}
+      i18n: ${{ steps.filter.outputs.i18n }}
+      safety: ${{ steps.filter.outputs.safety }}
+      config: ${{ steps.filter.outputs.config }}
+      docs: ${{ steps.filter.outputs.docs }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            src:
+              - 'src/**'
+              - 'public/**'
+            ui:
+              - 'src/app/**'
+              - 'src/components/**'
+              - 'src/styles/**'
+              - 'public/**'
+              - 'messages/**'
+            mobile:
+              - 'ios/**'
+              - 'android/**'
+              - 'capacitor.config.ts'
+              - 'src/lib/native/**'
+              - 'src/components/mobile/**'
+            prisma:
+              - 'prisma/**'
+            i18n:
+              - 'messages/**'
+              - 'src/i18n/**'
+              - 'src/lib/i18n/**'
+            safety:
+              - 'src/lib/safety/**'
+              - 'src/lib/ai/**'
+              - 'src/lib/privacy/**'
+              - 'src/data/maestri/**'
+            config:
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig*.json'
+              - 'eslint.config.mjs'
+              - 'eslint-local-rules/**'
+              - 'next.config.ts'
+              - 'vitest.config.ts'
+              - 'playwright.config*.ts'
+              - '.github/**'
+            docs:
+              - 'docs/**'
+              - '*.md'
+      - name: Log detected changes
+        run: |
+          echo "Affected areas:"
+          echo "  src=${{ steps.filter.outputs.src }}"
+          echo "  ui=${{ steps.filter.outputs.ui }}"
+          echo "  mobile=${{ steps.filter.outputs.mobile }}"
+          echo "  prisma=${{ steps.filter.outputs.prisma }}"
+          echo "  i18n=${{ steps.filter.outputs.i18n }}"
+          echo "  safety=${{ steps.filter.outputs.safety }}"
+          echo "  config=${{ steps.filter.outputs.config }}"
+          echo "  docs=${{ steps.filter.outputs.docs }}"
+
   # Lane 1: Build Validation (produces artifacts for other jobs)
   build:
     name: Build & Lint
@@ -112,9 +187,15 @@ jobs:
           extra_args: --only-verified
 
   # Lane 2a-bis: Technical Debt Check
+  # Conditional: skipped on PR when only docs/ci changed (no src or config)
   debt-check:
     name: Technical Debt Audit
     runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: >
+      github.event_name != 'pull_request' ||
+      needs.detect-changes.outputs.src == 'true' ||
+      needs.detect-changes.outputs.config == 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -291,10 +372,15 @@ jobs:
             [ -f "$f" ] && echo "OK: $f" || { echo "MISSING: $f"; exit 1; }
           done
 
-  # Lane 4b: Migration Consistency (fast, runs in parallel)
+  # Lane 4b: Migration Consistency
+  # Conditional: skipped on PR when no prisma/ files changed
   migrations:
     name: Migration Check
     runs-on: ubuntu-latest
+    needs: [detect-changes]
+    if: >
+      github.event_name != 'pull_request' ||
+      needs.detect-changes.outputs.prisma == 'true'
     steps:
       - uses: actions/checkout@v4
 
@@ -381,6 +467,18 @@ jobs:
           else
             echo "No circular imports detected"
           fi
+
+      - name: Check module boundary violations
+        run: |
+          BASELINE=465
+          COUNT=$(npx eslint --no-cache --rule 'local-rules/enforce-module-boundaries: [warn, {protectedModules: [safety, privacy, ai, education, rag, accessibility, tier, auth, security, compliance]}]' src/ 2>&1 | grep -c "enforce-module-boundaries" || echo "0")
+          echo "Module boundary violations: $COUNT (baseline: $BASELINE)"
+          if [ "$COUNT" -gt "$BASELINE" ]; then
+            echo "BLOCKING: New module boundary violations! ($COUNT > $BASELINE)"
+            echo "Use barrel exports (@/lib/module) instead of deep imports."
+            exit 1
+          fi
+          echo "Boundary gate passed: $COUNT <= $BASELINE"
 
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
@@ -534,12 +632,13 @@ jobs:
           retention-days: 7
 
   # Lane 5.5: Accessibility Tests - WCAG 2.1 AA compliance
-  # BLOCKING: Gates deployment - ensures WCAG 2.1 AA compliance
+  # BLOCKING: Gates deployment AND PR merge - ensures WCAG 2.1 AA compliance
+  # Smart mode: full E2E suite when UI changes, unit test baseline otherwise
   accessibility-tests:
     name: Accessibility Tests
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    needs: [build]
+    needs: [build, detect-changes]
 
     services:
       postgres:
@@ -605,8 +704,15 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      - name: Run Accessibility Tests
-        run: npx playwright test --project=a11y --reporter=list
+      - name: Run Accessibility Tests (smart)
+        run: |
+          if [ "${{ needs.detect-changes.outputs.ui }}" = "true" ] || [ "${{ github.event_name }}" != "pull_request" ]; then
+            echo "Running FULL a11y E2E suite (UI changes detected or push event)"
+            npx playwright test --project=a11y --reporter=list
+          else
+            echo "Running a11y unit test baseline (no UI changes)"
+            npm run test:unit -- accessibility --reporter=verbose
+          fi
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -625,11 +731,14 @@ jobs:
 
   # Lane 6a: Mobile Smoke - Fast PR feedback
   # Runs the smallest supported viewport to catch obvious mobile regressions early.
+  # Conditional: skipped when no UI or mobile files changed
   mobile-smoke:
     name: Mobile Smoke (PR)
     runs-on: ubuntu-latest
-    needs: [build]
-    if: github.event_name == 'pull_request'
+    needs: [build, detect-changes]
+    if: >
+      github.event_name == 'pull_request' &&
+      (needs.detect-changes.outputs.ui == 'true' || needs.detect-changes.outputs.mobile == 'true')
 
     services:
       postgres:
@@ -721,10 +830,14 @@ jobs:
   # Lane 6a-bis: Mobile Build Pipeline - Capacitor build validation (PR only, informational)
   # Validates that the mobile build pipeline (Next.js export + Capacitor copy) works correctly
   # Non-blocking: provides early feedback but does not gate PR merges
+  # Conditional: skipped when no mobile or src files changed
   mobile-build:
     name: Mobile Build Validation
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
+    needs: [detect-changes]
+    if: >
+      github.event_name == 'pull_request' &&
+      (needs.detect-changes.outputs.mobile == 'true' || needs.detect-changes.outputs.src == 'true')
     steps:
       - uses: actions/checkout@v4
 
@@ -1307,11 +1420,14 @@ jobs:
 
   # ==========================================================================
   # PR GATE - Single status check for PRs (fast feedback)
+  # Required jobs must succeed. Conditional jobs may be skipped (not failed).
+  # accessibility-tests is ALWAYS required (WCAG 2.1 AA blocking).
   # ==========================================================================
   pr-gate:
-    name: "✅ PR Gate"
+    name: "PR Gate"
     runs-on: ubuntu-latest
     needs:
+      - detect-changes
       - build
       - secret-scanning
       - debt-check
@@ -1322,54 +1438,63 @@ jobs:
       - migrations
       - quality
       - smoke-tests
+      - accessibility-tests
       - mobile-smoke
     if: always() && github.event_name == 'pull_request'
     steps:
       - name: Check all PR jobs passed
         if: |
+          needs.detect-changes.result != 'success' ||
           needs.build.result != 'success' ||
           needs.secret-scanning.result != 'success' ||
-          needs.debt-check.result != 'success' ||
           needs.security.result != 'success' ||
           needs.llm-safety-tests.result != 'success' ||
           needs.unit-tests.result != 'success' ||
           needs.docs.result != 'success' ||
-          needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
-          needs.mobile-smoke.result != 'success'
+          needs.accessibility-tests.result != 'success' ||
+          (needs.debt-check.result != 'success' && needs.debt-check.result != 'skipped') ||
+          (needs.migrations.result != 'success' && needs.migrations.result != 'skipped') ||
+          (needs.mobile-smoke.result != 'success' && needs.mobile-smoke.result != 'skipped')
         run: |
           echo "::error::PR BLOCKED - One or more checks failed"
           echo ""
-          echo "Job results:"
+          echo "Required jobs:"
+          echo "  detect-changes: ${{ needs.detect-changes.result }}"
           echo "  build: ${{ needs.build.result }}"
           echo "  secret-scanning: ${{ needs.secret-scanning.result }}"
-          echo "  debt-check: ${{ needs.debt-check.result }}"
           echo "  security: ${{ needs.security.result }}"
           echo "  llm-safety-tests: ${{ needs.llm-safety-tests.result }}"
           echo "  unit-tests: ${{ needs.unit-tests.result }}"
           echo "  docs: ${{ needs.docs.result }}"
-          echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
+          echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
+          echo ""
+          echo "Conditional jobs (skipped is OK):"
+          echo "  debt-check: ${{ needs.debt-check.result }}"
+          echo "  migrations: ${{ needs.migrations.result }}"
           echo "  mobile-smoke: ${{ needs.mobile-smoke.result }}"
           exit 1
 
       - name: PR approved
         if: |
+          needs.detect-changes.result == 'success' &&
           needs.build.result == 'success' &&
           needs.secret-scanning.result == 'success' &&
-          needs.debt-check.result == 'success' &&
           needs.security.result == 'success' &&
           needs.llm-safety-tests.result == 'success' &&
           needs.unit-tests.result == 'success' &&
           needs.docs.result == 'success' &&
-          needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
-          needs.mobile-smoke.result == 'success'
+          needs.accessibility-tests.result == 'success' &&
+          (needs.debt-check.result == 'success' || needs.debt-check.result == 'skipped') &&
+          (needs.migrations.result == 'success' || needs.migrations.result == 'skipped') &&
+          (needs.mobile-smoke.result == 'success' || needs.mobile-smoke.result == 'skipped')
         run: |
-          echo "✅ PR gate passed - Safe to merge"
+          echo "PR gate passed - Safe to merge"
 
   # ==========================================================================
   # DEPLOYMENT GATE - Single status check for Vercel
