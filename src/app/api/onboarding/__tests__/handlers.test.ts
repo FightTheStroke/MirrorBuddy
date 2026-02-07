@@ -60,7 +60,7 @@ vi.mock("@/lib/helpers/publish-admin-counts", () => ({
   calculateAndPublishAdminCounts: vi.fn(() => Promise.resolve()),
 }));
 
-vi.mock("@/lib/compliance/coppa-service", () => ({
+vi.mock("@/lib/compliance", () => ({
   COPPA_AGE_THRESHOLD: 13,
   requestParentalConsent: vi.fn(() =>
     Promise.resolve({
