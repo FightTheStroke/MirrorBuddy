@@ -5,7 +5,7 @@ import {
   AUTH_COOKIE_CLIENT,
   VISITOR_COOKIE_NAME,
   SIMULATED_TIER_COOKIE,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/auth/logout" });

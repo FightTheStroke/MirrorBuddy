@@ -2,7 +2,7 @@
  * Utility functions for tool canvas
  */
 
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 
 /**
  * Get user ID from cookie (secure, server-set authentication)

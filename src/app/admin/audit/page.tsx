@@ -4,7 +4,7 @@
  */
 
 import { getTranslations } from "next-intl/server";
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { validateAdminAuth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AuditLogView } from "@/components/admin/audit/audit-log-view";
 

@@ -9,7 +9,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type {
   GoogleConnectionStatus,
   DriveFileUI,

@@ -6,7 +6,7 @@
 
 import { chatCompletion, getActiveProvider } from "./providers";
 import { getDeploymentForModel } from "./providers/deployment-mapping";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import { logger } from "@/lib/logger";
 
 interface Message {

@@ -5,9 +5,9 @@
 // ============================================================================
 
 import { NextResponse } from "next/server";
-import { Microsoft365Provider } from "@/lib/auth/sso/microsoft365";
-import { consumeSSOSession } from "@/lib/auth/sso/sso-session";
-import { handleSSOCallback } from "@/lib/auth/sso/sso-callback-handler";
+import { Microsoft365Provider } from "@/lib/auth";
+import { consumeSSOSession } from "@/lib/auth";
+import { handleSSOCallback } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 

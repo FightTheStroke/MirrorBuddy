@@ -26,7 +26,7 @@ import {
   browserPrefsToSettings,
 } from "./browser-detection";
 import { trackProfileActivation, trackReset } from "./a11y-telemetry";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 export type {
   AccessibilitySettings,

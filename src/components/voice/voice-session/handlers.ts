@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { getUserId } from "./helpers";
 import type { WebcamRequest } from "./types";
 import type { StudySession } from "@/lib/stores/progress-store";

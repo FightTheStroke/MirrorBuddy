@@ -8,8 +8,8 @@
  */
 
 import { create } from "zustand";
-import { csrfFetch } from "@/lib/auth/csrf-client";
-import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { csrfFetch } from "@/lib/auth";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import {
   type OnboardingStep,
   type OnboardingData,

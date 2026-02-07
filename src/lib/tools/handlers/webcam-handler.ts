@@ -7,7 +7,7 @@
 import { registerToolHandler } from "../tool-executor";
 import { nanoid } from "nanoid";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import type {
   ToolExecutionResult,
   WebcamData,

@@ -11,8 +11,8 @@ import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
 } from "@/lib/education/adaptive-difficulty";
-import { tierService } from "@/lib/tier/tier-service";
-import type { FeatureAIConfig } from "@/lib/tier/types";
+import { tierService } from "@/lib/tier";
+import type { FeatureAIConfig } from "@/lib/tier";
 import { generateSummary } from "./summary";
 import { generateMindmap } from "./mindmap";
 import { generateDemo } from "./demo";

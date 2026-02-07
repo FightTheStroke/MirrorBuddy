@@ -19,7 +19,7 @@ import { metricsStore } from "@/lib/observability/metrics-store";
 import {
   AUTH_COOKIE_NAME,
   VISITOR_COOKIE_NAME,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 import { routing } from "@/i18n/routing";
 import {
   detectLocaleFromRequest,

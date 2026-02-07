@@ -5,7 +5,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type {
   ToolEventType as RealtimeToolEventTypeAlias,
   ToolType as RealtimeToolType,

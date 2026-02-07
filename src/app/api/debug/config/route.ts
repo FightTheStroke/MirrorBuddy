@@ -8,7 +8,7 @@ import {
   isAzureConfigured,
   getActiveProvider,
   getRealtimeProvider,
-} from "@/lib/ai/providers";
+} from "@/lib/ai";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 export const GET = pipe(withSentry("/api/debug/config"))(async () => {

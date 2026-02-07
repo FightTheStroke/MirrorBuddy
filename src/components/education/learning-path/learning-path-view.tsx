@@ -12,7 +12,7 @@ import { motion } from "framer-motion";
 import { useTranslations } from "next-intl";
 import { BookOpen, Clock, PlayCircle, ArrowLeft, Loader2 } from "lucide-react";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";

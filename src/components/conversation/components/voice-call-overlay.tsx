@@ -6,7 +6,7 @@ import { Mic, MicOff, PhoneOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
 import { useVoiceSession } from "@/lib/hooks/use-voice-session";
 import { CharacterAvatar } from "./character-avatar";

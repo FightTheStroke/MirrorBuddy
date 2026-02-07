@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useSettingsStore } from "@/lib/stores";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type {
   DetailedProviderStatus,
   CostSummary,

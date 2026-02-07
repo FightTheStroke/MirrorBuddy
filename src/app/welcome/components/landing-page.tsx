@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { useOnboardingStore } from "@/lib/stores/onboarding-store";
 import { useRouter } from "next/navigation";
 import { HeroSection } from "./hero-section";

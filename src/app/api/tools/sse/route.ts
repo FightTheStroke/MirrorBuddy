@@ -16,7 +16,7 @@ import { logger } from "@/lib/logger";
 import {
   validateAuth,
   validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+} from "@/lib/auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

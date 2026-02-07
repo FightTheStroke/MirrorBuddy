@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { csrfFetch } from "@/lib/auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 
 export function MobileLogoutButton() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);

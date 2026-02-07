@@ -13,7 +13,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import type { TierName } from "@/types/tier-types";
 
 // Re-export types and functions from sub-modules

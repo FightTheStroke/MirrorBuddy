@@ -11,7 +11,7 @@ import type {
   CustomReminder,
   NotificationPreferences,
 } from '@/lib/scheduler/types';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 
 /**
  * Fetch user's complete schedule

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 export function useUserActions() {
   const [isLoading, setIsLoading] = useState<string | null>(null);

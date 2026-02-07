@@ -6,7 +6,7 @@
 "use client";
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 type TTSVoice = "alloy" | "echo" | "fable" | "onyx" | "nova" | "shimmer";
 

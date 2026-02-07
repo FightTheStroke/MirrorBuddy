@@ -13,7 +13,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import type { TierName } from "@/types/tier-types";
-import { SIMULATED_TIER_COOKIE } from "@/lib/auth/cookie-constants";
+import { SIMULATED_TIER_COOKIE } from "@/lib/auth";
 const COOKIE_MAX_AGE = 60 * 60 * 24; // 24 hours
 
 /**

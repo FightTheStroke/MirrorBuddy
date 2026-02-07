@@ -2,7 +2,7 @@
 
 import { useMemo, useCallback, useEffect, useState } from 'react';
 import { Quiz } from '@/components/education/quiz';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 import { useProgressStore } from '@/lib/stores';
 import toast from '@/components/ui/toast';
 import type { Question, QuizRequest, Quiz as QuizType, QuizResult } from '@/types';

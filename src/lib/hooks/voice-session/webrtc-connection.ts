@@ -6,7 +6,7 @@
 "use client";
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { getConnectionTimeout } from "./constants";
 import type {
   WebRTCConnectionConfig,

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { verifyPassword } from "@/lib/auth/password";
-import { signCookieValue } from "@/lib/auth/cookie-signing";
+import { verifyPassword } from "@/lib/auth";
+import { signCookieValue } from "@/lib/auth";
 import {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 import { hashPII } from "@/lib/security/pii-encryption";

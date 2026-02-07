@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
 import type { EmailTemplate } from "@/lib/email/template-service";
 import type { ResendLimits } from "@/lib/observability/resend-limits";

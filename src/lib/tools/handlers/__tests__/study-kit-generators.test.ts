@@ -63,7 +63,7 @@ vi.mock("@/lib/education/adaptive-difficulty", () => ({
   buildAdaptiveInstruction: vi.fn(() => ""),
 }));
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion } from "@/lib/ai";
 import { extractTextFromPDF } from "../study-kit-extraction";
 
 const mockChatCompletion = vi.mocked(chatCompletion);

@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Pencil, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 
 interface CharacterData {

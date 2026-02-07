@@ -1,4 +1,4 @@
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 import type { Middleware } from "./types";
 
 /**

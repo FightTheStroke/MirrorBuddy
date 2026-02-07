@@ -15,7 +15,7 @@ import {
   AUTH_COOKIE_CLIENT,
   A11Y_COOKIE,
   ADMIN_COOKIE_NAME,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 
 export function CookiesContent() {
   const t = useTranslations("compliance.legal.cookies");

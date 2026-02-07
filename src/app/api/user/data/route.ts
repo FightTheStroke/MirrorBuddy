@@ -13,7 +13,7 @@ import {
   logDeletionAudit,
 } from "@/app/api/privacy/delete-my-data/helpers";
 import { cookies } from "next/headers";
-import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 
 /**
  * GET /api/user/data - Export all user data (GDPR portability)

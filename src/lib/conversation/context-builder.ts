@@ -7,7 +7,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier";
 import { loadEnhancedContext, type ConversationMemory } from "./memory-loader";
 import {
   loadCrossMaestroLearnings,

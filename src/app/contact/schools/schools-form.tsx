@@ -12,7 +12,7 @@ import {
   Headphones,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import {
   type FormData,
   ROLES,

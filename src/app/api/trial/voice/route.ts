@@ -14,8 +14,8 @@ import {
   addVoiceSeconds,
   TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { validateAuth } from "@/lib/auth";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth";
 import { isSessionBlocked } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
 import { pipe, withSentry } from "@/lib/api/middlewares";

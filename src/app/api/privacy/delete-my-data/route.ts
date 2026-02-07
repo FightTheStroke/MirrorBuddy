@@ -10,7 +10,7 @@ import { NextResponse } from "next/server";
 import { cookies as getCookies } from "next/headers";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
-import { AUTH_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { AUTH_COOKIE_NAME } from "@/lib/auth";
 import {
   executeUserDataDeletion,
   getUserDataSummary,

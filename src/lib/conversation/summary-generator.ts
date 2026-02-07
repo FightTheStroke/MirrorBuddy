@@ -11,7 +11,7 @@ import {
   extractKeyFacts,
   extractTopics,
   extractLearnings,
-} from '@/lib/ai/summarize';
+} from '@/lib/ai';
 import type { Message, ConversationSummaryResult } from './summary-types';
 import { saveLearnings } from './learning-persistence';
 

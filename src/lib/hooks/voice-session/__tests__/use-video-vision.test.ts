@@ -36,7 +36,7 @@ vi.mock("../actions", () => ({
   useSendVideoFrame: () => vi.fn(),
 }));
 
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 function createMockRefs() {
   return {

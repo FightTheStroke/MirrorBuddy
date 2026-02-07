@@ -6,7 +6,7 @@
 import type { ConsentStatus } from './types';
 import type { StudentInsights } from '@/types';
 import { DEMO_USER_ID } from './constants';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 
 export async function fetchConsentStatus(): Promise<ConsentStatus | null> {
   try {

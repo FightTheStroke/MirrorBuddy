@@ -2,7 +2,7 @@
  * Scheduler API helpers
  */
 
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth";
 
 /**
  * Get userId from validated authentication

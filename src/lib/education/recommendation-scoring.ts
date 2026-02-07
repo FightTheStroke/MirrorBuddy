@@ -7,9 +7,8 @@
  * Plan 104 - Wave 4: Pro Features [T4-05]
  */
 
-import { tierService } from "@/lib/tier/tier-service";
-import { chatCompletion } from "@/lib/ai/providers";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
+import { tierService } from "@/lib/tier";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import type { StudentInsights } from "./recommendation-insights";
 
 /**

@@ -16,8 +16,8 @@ import { LiveSummary } from "./live-summary";
 import { StudentSummaryEditor } from "./student-summary-editor";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { getUserIdFromCookie } from "@/lib/auth";
+import { csrfFetch } from "@/lib/auth";
 import type { ToolState, SummaryData, StudentSummaryData } from "@/types/tools";
 import type {
   QuizRequest,
