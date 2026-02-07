@@ -57,8 +57,10 @@ export async function getLocalizedOGMetadata(
     };
   } = {},
 ): Promise<Metadata> {
-  // Get site URL from environment or use default
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    throw new Error("NEXT_PUBLIC_SITE_URL is required for OG metadata");
+  }
 
   // Use provided values or fall back to defaults
   const defaultMetadata =

@@ -243,14 +243,14 @@ docs-archive/compliance-countries/
 
 ## Compliance Status Summary
 
-| Category                 | Status                | Coverage                  |
-| ------------------------ | --------------------- | ------------------------- |
-| **GDPR/Data Protection** | ✅ Complete           | 5/5 countries             |
-| **Cookie Consent**       | ✅ Complete           | 5/5 countries             |
-| **Accessibility**        | ✅ Complete           | 5/5 countries             |
-| **AI Act Compliance**    | In Progress (Q2 2026) | 5/5 countries             |
-| **Regulatory Contacts**  | ✅ Complete           | 5/5 countries             |
-| **Documentation**        | Partial               | AI Act assessment pending |
+| Category                 | Status                | Coverage                                                        |
+| ------------------------ | --------------------- | --------------------------------------------------------------- |
+| **GDPR/Data Protection** | ✅ Complete           | 5/5 countries                                                   |
+| **Cookie Consent**       | ✅ Complete           | 5/5 countries                                                   |
+| **Accessibility**        | ✅ Complete           | 5/5 countries                                                   |
+| **AI Act Compliance**    | In Progress (Q2 2026) | 5/5 countries                                                   |
+| **Regulatory Contacts**  | ✅ Complete           | 5/5 countries                                                   |
+| **Documentation**        | In Progress           | DPIA, Model Card, AI Policy complete; AI Act conformity Q2 2026 |
 
 ---
 

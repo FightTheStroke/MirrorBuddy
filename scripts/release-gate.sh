@@ -86,8 +86,10 @@ npm run test
 
 echo ""
 echo -e "${BLUE}[PHASE 5] Legal review compliance check...${NC}"
-legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1 || true)
+set +e
+legal_output=$(npx tsx scripts/compliance-audit-source-verification.ts 2>&1)
 legal_exit=$?
+set -e
 if [ $legal_exit -ne 0 ]; then
 	echo -e "${RED}✗ BLOCKED: Legal review compliance check failed${NC}"
 	echo "$legal_output" | tail -30

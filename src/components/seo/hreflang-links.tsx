@@ -21,8 +21,12 @@ interface HreflangLinksProps {
  */
 export function HreflangLinks({
   locales = ["it", "en", "fr", "de", "es"] as const,
-  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org",
+  baseUrl,
 }: HreflangLinksProps) {
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
+  if (!resolvedBaseUrl) {
+    throw new Error("NEXT_PUBLIC_SITE_URL is required for hreflang links");
+  }
   const rawPathname = usePathname();
 
   // Strip locale prefix from pathname since usePathname() returns /it/welcome
@@ -40,7 +44,7 @@ export function HreflangLinks({
   })();
 
   useEffect(() => {
-    const tags = generateHreflangTags(baseUrl, pathname, locales);
+    const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
     // Remove existing hreflang tags
     const existingTags = document.querySelectorAll(
@@ -70,7 +74,7 @@ export function HreflangLinks({
         });
       });
     };
-  }, [pathname, baseUrl, locales]);
+  }, [pathname, resolvedBaseUrl, locales]);
 
   // Component doesn't render anything, it manipulates the DOM directly
   return null;
