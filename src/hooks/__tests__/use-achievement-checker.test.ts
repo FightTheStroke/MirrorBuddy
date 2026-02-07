@@ -9,7 +9,7 @@ import { useAchievementChecker } from "../use-achievement-checker";
 
 describe("useAchievementChecker", () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ shouldAdvanceTime: true });
     global.fetch = vi.fn();
   });
 
@@ -31,7 +31,7 @@ describe("useAchievementChecker", () => {
       ],
     };
 
-    (global.fetch as any).mockResolvedValueOnce({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,
     });
@@ -51,18 +51,19 @@ describe("useAchievementChecker", () => {
       newAchievements: [],
     };
 
-    (global.fetch as any).mockResolvedValue({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
     });
 
     renderHook(() => useAchievementChecker());
 
-    // Initial call
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
     // Advance timer by polling interval (30 seconds)
-    vi.advanceTimersByTime(30000);
+    await vi.advanceTimersByTimeAsync(30000);
 
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledTimes(2);
@@ -70,7 +71,9 @@ describe("useAchievementChecker", () => {
   });
 
   it("handles fetch errors gracefully", async () => {
-    (global.fetch as any).mockRejectedValueOnce(new Error("Network error"));
+    (global.fetch as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+      new Error("Network error"),
+    );
 
     const { result } = renderHook(() => useAchievementChecker());
 
@@ -87,7 +90,7 @@ describe("useAchievementChecker", () => {
       newAchievements: [],
     };
 
-    (global.fetch as any).mockResolvedValue({
+    (global.fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
       ok: true,
       json: async () => mockResponse,
     });
@@ -97,16 +100,16 @@ describe("useAchievementChecker", () => {
       { initialProps: { enabled: true } },
     );
 
-    expect(global.fetch).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+    });
 
     // Disable polling
     rerender({ enabled: false });
 
     // Advance timer - should not trigger new fetch
-    vi.advanceTimersByTime(30000);
+    await vi.advanceTimersByTimeAsync(30000);
 
-    await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledTimes(1); // Still 1, not 2
-    });
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 });

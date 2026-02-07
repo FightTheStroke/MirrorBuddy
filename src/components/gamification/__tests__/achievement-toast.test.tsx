@@ -35,11 +35,11 @@ describe("AchievementToast", () => {
     expect(toast).toBeInTheDocument();
   });
 
-  it("renders with hidden state", () => {
+  it("renders nothing when hidden", () => {
     const { container } = render(
       <AchievementToast achievement={mockAchievement} visible={false} />,
     );
     const toast = container.querySelector('[role="status"]');
-    expect(toast).toHaveClass("hidden");
+    expect(toast).toBeNull();
   });
 });

@@ -40,10 +40,10 @@ describe("AchievementsGrid", () => {
 
   it("shows locked state for locked achievements", () => {
     render(<AchievementsGrid achievements={mockAchievements} />);
-    const lockedAchievement = screen
+    const lockedCard = screen
       .getByText("First Conversation")
-      .closest("div");
-    expect(lockedAchievement).toHaveClass("opacity-50");
+      .closest('[role="article"]');
+    expect(lockedCard).toHaveClass("opacity-50");
   });
 
   it("shows unlocked state for unlocked achievements", () => {

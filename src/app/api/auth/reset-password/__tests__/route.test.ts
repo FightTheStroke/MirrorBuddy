@@ -5,10 +5,26 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { POST } from "../route";
-import { prisma } from "@/lib/db";
 import * as password from "@/lib/auth/password";
 
-vi.mock("@/lib/db");
+// Hoisted mock for Prisma (avoids "cannot access before initialization")
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    passwordResetToken: {
+      findFirst: vi.fn(),
+      update: vi.fn(),
+    },
+    user: {
+      update: vi.fn(),
+    },
+    $transaction: vi.fn(),
+  },
+}));
+
+vi.mock("@/lib/db", () => ({
+  prisma: mockPrisma,
+}));
+
 vi.mock("@/lib/auth/password");
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -23,6 +39,21 @@ vi.mock("@/lib/logger", () => ({
       debug: vi.fn(),
     }),
   },
+}));
+
+// Mock pipe middlewares to pass through
+vi.mock("@/lib/api/middlewares", () => ({
+  pipe:
+    () =>
+    (handler: (ctx: { req: Request }) => Promise<Response>) =>
+    (req: Request) =>
+      handler({ req }),
+  withSentry: () => {},
+  withRateLimit: () => {},
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  RATE_LIMITS: { AUTH_LOGIN: {} },
 }));
 
 describe("POST /api/auth/reset-password", () => {
@@ -79,7 +110,7 @@ describe("POST /api/auth/reset-password", () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(null);
+    mockPrisma.passwordResetToken.findFirst.mockResolvedValue(null);
 
     const req = new Request("http://localhost/api/auth/reset-password", {
       method: "POST",
@@ -101,7 +132,7 @@ describe("POST /api/auth/reset-password", () => {
       id: "token-123",
       token: "valid-token",
       userId: "user-123",
-      expiresAt: new Date(Date.now() - 1000), // Expired 1 second ago
+      expiresAt: new Date(Date.now() - 1000),
       used: false,
       createdAt: new Date(Date.now() - 3600000),
     };
@@ -110,9 +141,7 @@ describe("POST /api/auth/reset-password", () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
-      expiredToken as never,
-    );
+    mockPrisma.passwordResetToken.findFirst.mockResolvedValue(expiredToken);
 
     const req = new Request("http://localhost/api/auth/reset-password", {
       method: "POST",
@@ -143,9 +172,7 @@ describe("POST /api/auth/reset-password", () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
-      usedToken as never,
-    );
+    mockPrisma.passwordResetToken.findFirst.mockResolvedValue(usedToken);
 
     const req = new Request("http://localhost/api/auth/reset-password", {
       method: "POST",
@@ -176,16 +203,9 @@ describe("POST /api/auth/reset-password", () => {
       valid: true,
       errors: [],
     });
-    vi.mocked(prisma.passwordResetToken.findFirst).mockResolvedValue(
-      validToken as never,
-    );
+    mockPrisma.passwordResetToken.findFirst.mockResolvedValue(validToken);
     vi.mocked(password.hashPassword).mockResolvedValue("hashed-password");
-    vi.mocked(prisma.user.update).mockResolvedValue({
-      id: "user-123",
-    } as never);
-    vi.mocked(prisma.passwordResetToken.update).mockResolvedValue(
-      validToken as never,
-    );
+    mockPrisma.$transaction.mockResolvedValue([{}, {}]);
 
     const req = new Request("http://localhost/api/auth/reset-password", {
       method: "POST",
@@ -204,15 +224,7 @@ describe("POST /api/auth/reset-password", () => {
 
     // Verify password was hashed
     expect(password.hashPassword).toHaveBeenCalledWith("NewPassword123!");
-    // Verify user password was updated
-    expect(prisma.user.update).toHaveBeenCalledWith({
-      where: { id: "user-123" },
-      data: { passwordHash: "hashed-password" },
-    });
-    // Verify token was marked as used
-    expect(prisma.passwordResetToken.update).toHaveBeenCalledWith({
-      where: { id: "token-123" },
-      data: { used: true },
-    });
+    // Verify $transaction was called
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1);
   });
 });

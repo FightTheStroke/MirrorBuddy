@@ -5,11 +5,35 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { POST } from "../route";
-import { prisma } from "@/lib/db";
 import * as email from "@/lib/email";
 
-vi.mock("@/lib/db");
+// Hoisted mock for Prisma
+const { mockPrisma } = vi.hoisted(() => ({
+  mockPrisma: {
+    user: {
+      findFirst: vi.fn(),
+    },
+    passwordResetToken: {
+      create: vi.fn(),
+      count: vi.fn(),
+    },
+  },
+}));
+
+vi.mock("@/lib/db", () => ({
+  prisma: mockPrisma,
+}));
+
 vi.mock("@/lib/email");
+vi.mock("@/lib/security/pii-encryption", () => ({
+  hashPII: vi.fn().mockResolvedValue("mocked-hash"),
+}));
+vi.mock("@/lib/email/templates/password-reset-template", () => ({
+  getPasswordResetEmail: vi.fn().mockReturnValue({
+    subject: "password reset",
+    html: "<p>Reset</p>",
+  }),
+}));
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),
@@ -23,6 +47,21 @@ vi.mock("@/lib/logger", () => ({
       debug: vi.fn(),
     }),
   },
+}));
+
+// Mock pipe middlewares to pass through
+vi.mock("@/lib/api/middlewares", () => ({
+  pipe:
+    () =>
+    (handler: (ctx: { req: Request }) => Promise<Response>) =>
+    (req: Request) =>
+      handler({ req }),
+  withSentry: () => {},
+  withRateLimit: () => {},
+}));
+
+vi.mock("@/lib/rate-limit", () => ({
+  RATE_LIMITS: { AUTH_LOGIN: {} },
 }));
 
 describe("POST /api/auth/forgot-password", () => {
@@ -57,7 +96,7 @@ describe("POST /api/auth/forgot-password", () => {
   });
 
   it("should return 200 even if user does not exist (security)", async () => {
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(null);
+    mockPrisma.user.findFirst.mockResolvedValue(null);
 
     const req = new Request("http://localhost/api/auth/forgot-password", {
       method: "POST",
@@ -76,19 +115,20 @@ describe("POST /api/auth/forgot-password", () => {
   it("should generate token and send email for existing user", async () => {
     const mockUser = {
       id: "user-123",
-      email: "test@example.com",
       emailHash: "hash123",
+      settings: { language: "en" },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as never);
-    vi.mocked(prisma.passwordResetToken.create).mockResolvedValue({
+    mockPrisma.user.findFirst.mockResolvedValue(mockUser);
+    mockPrisma.passwordResetToken.count.mockResolvedValue(0);
+    mockPrisma.passwordResetToken.create.mockResolvedValue({
       id: "token-123",
       token: "random-token",
       userId: "user-123",
       expiresAt: new Date(Date.now() + 3600000),
       used: false,
       createdAt: new Date(),
-    } as never);
+    });
     vi.mocked(email.sendEmail).mockResolvedValue({
       success: true,
       messageId: "msg-123",
@@ -104,12 +144,12 @@ describe("POST /api/auth/forgot-password", () => {
     expect(response.status).toBe(200);
 
     // Verify token was created
-    expect(prisma.passwordResetToken.create).toHaveBeenCalled();
+    expect(mockPrisma.passwordResetToken.create).toHaveBeenCalled();
     // Verify email was sent
     expect(email.sendEmail).toHaveBeenCalledWith(
       expect.objectContaining({
         to: "test@example.com",
-        subject: expect.stringContaining("password reset"),
+        subject: "password reset",
       }),
     );
   });
@@ -117,12 +157,12 @@ describe("POST /api/auth/forgot-password", () => {
   it("should respect rate limit per email", async () => {
     const mockUser = {
       id: "user-123",
-      email: "test@example.com",
       emailHash: "hash123",
+      settings: { language: "en" },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as never);
-    vi.mocked(prisma.passwordResetToken.count).mockResolvedValue(3);
+    mockPrisma.user.findFirst.mockResolvedValue(mockUser);
+    mockPrisma.passwordResetToken.count.mockResolvedValue(3);
 
     const req = new Request("http://localhost/api/auth/forgot-password", {
       method: "POST",
@@ -139,19 +179,20 @@ describe("POST /api/auth/forgot-password", () => {
   it("should handle email service failure gracefully", async () => {
     const mockUser = {
       id: "user-123",
-      email: "test@example.com",
       emailHash: "hash123",
+      settings: { language: "en" },
     };
 
-    vi.mocked(prisma.user.findFirst).mockResolvedValue(mockUser as never);
-    vi.mocked(prisma.passwordResetToken.create).mockResolvedValue({
+    mockPrisma.user.findFirst.mockResolvedValue(mockUser);
+    mockPrisma.passwordResetToken.count.mockResolvedValue(0);
+    mockPrisma.passwordResetToken.create.mockResolvedValue({
       id: "token-123",
       token: "random-token",
       userId: "user-123",
       expiresAt: new Date(Date.now() + 3600000),
       used: false,
       createdAt: new Date(),
-    } as never);
+    });
     vi.mocked(email.sendEmail).mockResolvedValue({
       success: false,
       error: "Email service unavailable",

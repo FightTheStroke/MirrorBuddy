@@ -12,6 +12,8 @@ describe("Sitemap Generation (F-77)", () => {
     "/ai-transparency",
     "/privacy",
     "/terms",
+    "/schools",
+    "/accessibility",
   ];
   const BASE_URL = "https://mirrorbuddy.app";
 
@@ -21,8 +23,8 @@ describe("Sitemap Generation (F-77)", () => {
     const sitemap = sitemapModule.default();
 
     // Should have entries for all locales + default
-    // (5 locales * 6 pages) + (1 default * 6 pages) = 36 entries
-    expect(sitemap).toHaveLength(36);
+    // (5 locales * 8 pages) + (1 default * 8 pages) = 48 entries
+    expect(sitemap).toHaveLength(48);
   });
 
   it("should include all 5 locales in sitemap URLs", async () => {

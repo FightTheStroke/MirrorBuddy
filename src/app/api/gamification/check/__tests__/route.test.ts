@@ -28,6 +28,17 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+// Mock pipe middlewares to pass through with auth context
+vi.mock("@/lib/api/middlewares", () => ({
+  pipe:
+    () =>
+    (handler: (ctx: { req: Request; userId: string }) => Promise<Response>) =>
+    (ctx: { req: Request; userId: string }) =>
+      handler(ctx),
+  withSentry: () => {},
+  withAuth: {},
+}));
+
 // Mock gamification DB functions
 const mockCheckAchievements = vi.fn();
 const mockGetOrCreateGamification = vi.fn();

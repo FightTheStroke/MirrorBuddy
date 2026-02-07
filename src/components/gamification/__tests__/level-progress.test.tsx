@@ -9,7 +9,8 @@ import { LevelProgress } from "../level-progress";
 describe("LevelProgress", () => {
   it("renders level and progress information", () => {
     render(<LevelProgress level={5} currentXP={250} xpToNextLevel={500} />);
-    expect(screen.getByText(/Level 5/i)).toBeInTheDocument();
+    // Italian translation: "Livello {level}"
+    expect(screen.getByText(/Livello 5/i)).toBeInTheDocument();
   });
 
   it("shows correct progress percentage", () => {
@@ -22,11 +23,13 @@ describe("LevelProgress", () => {
 
   it("displays XP remaining to next level", () => {
     render(<LevelProgress level={3} currentXP={100} xpToNextLevel={200} />);
-    expect(screen.getByText(/100.*Level 4/i)).toBeInTheDocument();
+    // Italian translation: "{amount} MB per Livello {next}"
+    expect(screen.getByText(/100 MB per Livello 4/i)).toBeInTheDocument();
   });
 
   it("shows max level state when at level 100", () => {
     render(<LevelProgress level={100} currentXP={0} xpToNextLevel={0} />);
-    expect(screen.getByText(/Max/i)).toBeInTheDocument();
+    // Italian translation: "Livello Massimo"
+    expect(screen.getByText(/Livello Massimo/i)).toBeInTheDocument();
   });
 });

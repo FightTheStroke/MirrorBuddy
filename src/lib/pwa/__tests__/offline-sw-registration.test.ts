@@ -54,6 +54,15 @@ describe("registerOfflineServiceWorker", () => {
       writable: true,
       configurable: true,
     });
+
+    // Mock window.caches (required by isServiceWorkerSupported)
+    if (!("caches" in window)) {
+      Object.defineProperty(window, "caches", {
+        value: { open: vi.fn(), match: vi.fn(), keys: vi.fn() },
+        writable: true,
+        configurable: true,
+      });
+    }
   });
 
   afterEach(() => {
@@ -78,7 +87,6 @@ describe("registerOfflineServiceWorker", () => {
     const result = await registerOfflineServiceWorker();
 
     expect(result).toBe(true);
-    // Should only register once (idempotent)
     expect(mockServiceWorker.register).toHaveBeenCalledTimes(2);
   });
 
@@ -126,10 +134,9 @@ describe("registerOfflineServiceWorker", () => {
   });
 
   it("should handle registration during page load", async () => {
-    // Simulate page load event
     const loadPromise = new Promise<void>((resolve) => {
-      setTimeout(() => {
-        registerOfflineServiceWorker();
+      setTimeout(async () => {
+        await registerOfflineServiceWorker();
         resolve();
       }, 0);
     });

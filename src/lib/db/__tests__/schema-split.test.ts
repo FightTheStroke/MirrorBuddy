@@ -39,6 +39,8 @@ const EXPECTED_SCHEMA_FILES = [
   "dependency-monitoring.prisma", // UsagePattern, DependencyAlert (AI safety)
   "research.prisma", // ResearchExperiment, ResearchResult, SyntheticProfile
   "video-vision.prisma", // VideoVisionSession (realtime video vision capabilities)
+  "sso.prisma", // Enterprise SSO (OIDC providers, sessions)
+  "audit.prisma", // Audit log entries
 ];
 
 // Expected models that should be present across all schema files
