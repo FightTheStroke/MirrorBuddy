@@ -41,6 +41,7 @@ const EXPECTED_SCHEMA_FILES = [
   "video-vision.prisma", // VideoVisionSession (realtime video vision capabilities)
   "sso.prisma", // Enterprise SSO (OIDC providers, sessions)
   "audit.prisma", // Audit log entries
+  "communications.prisma", // EmailTemplate, EmailCampaign, EmailRecipient, EmailPreference, EmailEvent
 ];
 
 // Expected models that should be present across all schema files
@@ -129,6 +130,12 @@ const EXPECTED_MODELS = [
   "SyntheticProfile",
   "ResearchExperiment",
   "ResearchResult",
+  // communications.prisma
+  "EmailTemplate",
+  "EmailCampaign",
+  "EmailRecipient",
+  "EmailPreference",
+  "EmailEvent",
 ];
 
 describe("Prisma Schema Split", () => {

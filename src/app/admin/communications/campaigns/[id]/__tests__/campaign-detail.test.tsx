@@ -159,8 +159,9 @@ describe("CampaignDetail", () => {
       <CampaignDetail campaign={mockCampaign} recipients={mockRecipients} />,
     );
 
-    const statusBadge = screen.getByText("sent");
-    expect(statusBadge).toBeInTheDocument();
+    // "sent" appears in both campaign status and recipient status
+    const sentBadges = screen.getAllByText("sent");
+    expect(sentBadges.length).toBeGreaterThanOrEqual(1);
   });
 
   it("displays filters applied to campaign", () => {

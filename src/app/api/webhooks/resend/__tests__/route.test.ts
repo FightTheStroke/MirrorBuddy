@@ -14,9 +14,9 @@ const { mockVerify } = vi.hoisted(() => ({
   mockVerify: vi.fn(),
 }));
 vi.mock("svix", () => ({
-  Webhook: vi.fn(() => ({
-    verify: mockVerify,
-  })),
+  Webhook: vi.fn(function (this: any) {
+    this.verify = mockVerify;
+  }),
 }));
 
 // Mock logger

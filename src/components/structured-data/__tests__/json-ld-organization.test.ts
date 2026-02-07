@@ -3,7 +3,7 @@
  * Tests for structured data component and generation logic
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   generateOrganizationSchema,
   generateEducationalOrganizationSchema,
@@ -11,6 +11,9 @@ import {
 import type { Locale } from "@/i18n/config";
 
 describe("JSON-LD Organization Schema", () => {
+  beforeEach(() => {
+    vi.stubEnv("NEXT_PUBLIC_SITE_URL", "https://mirrorbuddy.org");
+  });
   describe("generateOrganizationSchema", () => {
     it("should generate valid Organization schema with required fields", () => {
       const schema = generateOrganizationSchema("it");

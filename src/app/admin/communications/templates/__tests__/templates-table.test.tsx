@@ -18,6 +18,16 @@ vi.mock("next/navigation", () => ({
   usePathname: () => "/admin/communications/templates",
 }));
 
+vi.mock("next/link", () => ({
+  default: ({
+    children,
+    href,
+  }: {
+    children: React.ReactNode;
+    href: string;
+  }) => <a href={href}>{children}</a>,
+}));
+
 const templates = [
   {
     id: "tpl-1",
@@ -124,7 +134,9 @@ describe("TemplatesTable", () => {
     const deleteButtons = screen.getAllByLabelText(/delete template/i);
     fireEvent.click(deleteButtons[0]);
 
-    const confirmButton = await screen.findByText(/delete/i);
+    const confirmButton = await screen.findByRole("button", {
+      name: /^Delete$/,
+    });
     fireEvent.click(confirmButton);
 
     await waitFor(() => {
@@ -138,9 +150,10 @@ describe("TemplatesTable", () => {
   it("shows edit link for each template", () => {
     render(<TemplatesTable templates={templates} />);
 
-    const editLinks = screen.getAllByLabelText(/edit template/i);
-    expect(editLinks.length).toBe(3);
-    expect(editLinks[0].closest("a")).toHaveAttribute(
+    const editButtons = screen.getAllByLabelText(/edit template/i);
+    expect(editButtons.length).toBe(3);
+    const link = editButtons[0].querySelector("a");
+    expect(link).toHaveAttribute(
       "href",
       "/admin/communications/templates/tpl-1/edit",
     );

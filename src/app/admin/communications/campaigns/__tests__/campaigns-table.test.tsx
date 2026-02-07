@@ -118,8 +118,9 @@ describe("CampaignsTable", () => {
 
     expect(screen.getByText("Welcome Email")).toBeInTheDocument();
     expect(screen.getByText("Newsletter")).toBeInTheDocument();
-    expect(screen.getByText("sent")).toBeInTheDocument();
-    expect(screen.getByText("draft")).toBeInTheDocument();
+    // "sent" and "draft" appear in both tab triggers and status badges
+    expect(screen.getAllByText("sent").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("draft").length).toBeGreaterThanOrEqual(1);
   });
 
   it("displays sent/total count for campaigns", () => {
@@ -150,9 +151,10 @@ describe("CampaignsTable", () => {
     render(<CampaignsTable campaigns={mockCampaigns} />);
 
     expect(screen.getByText("All")).toBeInTheDocument();
-    expect(screen.getByText("draft")).toBeInTheDocument();
+    // "draft", "sent" appear in both tabs and status badges
+    expect(screen.getAllByText("draft").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("sending")).toBeInTheDocument();
-    expect(screen.getByText("sent")).toBeInTheDocument();
+    expect(screen.getAllByText("sent").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText("failed")).toBeInTheDocument();
   });
 

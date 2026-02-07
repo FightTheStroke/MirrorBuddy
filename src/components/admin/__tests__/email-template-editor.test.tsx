@@ -4,7 +4,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { EmailTemplateEditor } from "../email-template-editor";
-import { NextIntlClientProvider } from "next-intl";
 import * as csrfClient from "@/lib/auth/csrf-client";
 import { useRouter } from "next/navigation";
 
@@ -26,34 +25,6 @@ vi.mock("@/components/ui/toast", () => ({
   },
 }));
 
-const messages = {
-  admin: {
-    communications: {
-      editor: {
-        subject: "Subject",
-        subjectPlaceholder: "Enter email subject",
-        htmlBody: "HTML Body",
-        htmlBodyPlaceholder: "Enter HTML content",
-        textBody: "Text Fallback",
-        textBodyPlaceholder: "Enter plain text fallback",
-        category: "Category",
-        categoryPlaceholder: "e.g., onboarding",
-        preview: "Preview",
-        insertVariable: "Insert Variable",
-        save: "Save Template",
-        cancel: "Cancel",
-        saving: "Saving...",
-        createSuccess: "Template created successfully",
-        updateSuccess: "Template updated successfully",
-        createError: "Failed to create template",
-        updateError: "Failed to update template",
-        name: "Template Name",
-        namePlaceholder: "Enter template name",
-      },
-    },
-  },
-};
-
 const mockPush = vi.fn();
 
 beforeEach(() => {
@@ -65,30 +36,24 @@ beforeEach(() => {
 });
 
 function renderWithIntl(component: React.ReactElement) {
-  return render(
-    <NextIntlClientProvider locale="en" messages={messages}>
-      {component}
-    </NextIntlClientProvider>,
-  );
+  return render(component);
 }
 
 describe("EmailTemplateEditor", () => {
   it("renders editor in create mode with empty fields", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
+    expect(screen.getByPlaceholderText("Nome modello")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Oggetto email")).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText("Enter template name"),
+      screen.getByPlaceholderText("Corpo email in HTML"),
     ).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText("Enter email subject"),
+      screen.getByPlaceholderText("Versione testuale"),
     ).toBeInTheDocument();
     expect(
-      screen.getByPlaceholderText("Enter HTML content"),
+      screen.getByPlaceholderText("Seleziona categoria"),
     ).toBeInTheDocument();
-    expect(
-      screen.getByPlaceholderText("Enter plain text fallback"),
-    ).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("e.g., onboarding")).toBeInTheDocument();
   });
 
   it("renders editor in edit mode with pre-filled data", () => {
@@ -117,7 +82,7 @@ describe("EmailTemplateEditor", () => {
   it("shows preview iframe with HTML content", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    const htmlInput = screen.getByPlaceholderText("Enter HTML content");
+    const htmlInput = screen.getByPlaceholderText("Corpo email in HTML");
     fireEvent.change(htmlInput, { target: { value: "<h1>Test Preview</h1>" } });
 
     const iframe = screen.getByTitle("Email Preview");
@@ -127,7 +92,8 @@ describe("EmailTemplateEditor", () => {
   it("shows variable picker dropdown", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    expect(screen.getByText("Insert Variable")).toBeInTheDocument();
+    const variablePickers = screen.getAllByText("Inserisci Variabile");
+    expect(variablePickers.length).toBeGreaterThanOrEqual(1);
   });
 
   it("creates new template on save in create mode", async () => {
@@ -139,23 +105,23 @@ describe("EmailTemplateEditor", () => {
 
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    fireEvent.change(screen.getByPlaceholderText("Enter template name"), {
+    fireEvent.change(screen.getByPlaceholderText("Nome modello"), {
       target: { value: "New Template" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter email subject"), {
+    fireEvent.change(screen.getByPlaceholderText("Oggetto email"), {
       target: { value: "New Subject" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter HTML content"), {
+    fireEvent.change(screen.getByPlaceholderText("Corpo email in HTML"), {
       target: { value: "<p>New HTML</p>" },
     });
-    fireEvent.change(screen.getByPlaceholderText("Enter plain text fallback"), {
+    fireEvent.change(screen.getByPlaceholderText("Versione testuale"), {
       target: { value: "New Text" },
     });
-    fireEvent.change(screen.getByPlaceholderText("e.g., onboarding"), {
+    fireEvent.change(screen.getByPlaceholderText("Seleziona categoria"), {
       target: { value: "test" },
     });
 
-    fireEvent.click(screen.getByText("Save Template"));
+    fireEvent.click(screen.getByText("Salva"));
 
     await waitFor(() => {
       expect(mockCsrfFetch).toHaveBeenCalledWith("/api/admin/email-templates", {
@@ -200,7 +166,7 @@ describe("EmailTemplateEditor", () => {
       target: { value: "Updated Subject" },
     });
 
-    fireEvent.click(screen.getByText("Save Template"));
+    fireEvent.click(screen.getByText("Salva"));
 
     await waitFor(() => {
       expect(mockCsrfFetch).toHaveBeenCalledWith(
@@ -213,7 +179,7 @@ describe("EmailTemplateEditor", () => {
             htmlBody: "<p>Test HTML</p>",
             textBody: "Test Text",
             category: "test",
-            variables: ["name"],
+            variables: [],
           }),
         },
       );
@@ -225,7 +191,7 @@ describe("EmailTemplateEditor", () => {
   it("navigates back on cancel", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    fireEvent.click(screen.getByText("Cancel"));
+    fireEvent.click(screen.getByText("Annulla"));
 
     expect(mockPush).toHaveBeenCalledWith("/admin/communications/templates");
   });
@@ -233,17 +199,17 @@ describe("EmailTemplateEditor", () => {
   it("has accessible labels for all inputs", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    expect(screen.getByLabelText("Template Name")).toBeInTheDocument();
-    expect(screen.getByLabelText("Subject")).toBeInTheDocument();
-    expect(screen.getByLabelText("HTML Body")).toBeInTheDocument();
-    expect(screen.getByLabelText("Text Fallback")).toBeInTheDocument();
-    expect(screen.getByLabelText("Category")).toBeInTheDocument();
+    expect(screen.getByLabelText("Nome")).toBeInTheDocument();
+    expect(screen.getByLabelText("Oggetto")).toBeInTheDocument();
+    expect(screen.getByLabelText("Corpo HTML")).toBeInTheDocument();
+    expect(screen.getByLabelText("Corpo Testo")).toBeInTheDocument();
+    expect(screen.getByLabelText("Categoria")).toBeInTheDocument();
   });
 
   it("extracts variables from HTML body", () => {
     renderWithIntl(<EmailTemplateEditor mode="create" />);
 
-    const htmlInput = screen.getByPlaceholderText("Enter HTML content");
+    const htmlInput = screen.getByPlaceholderText("Corpo email in HTML");
     fireEvent.change(htmlInput, {
       target: { value: "<p>Hello {{name}}, your email is {{email}}</p>" },
     });

@@ -3,33 +3,19 @@
  */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
 import { EmailOpenChart } from "../email-open-chart";
 import type { TimelineDataPoint } from "@/lib/email/stats-service";
 
-const messages = {
-  admin: {
-    communications: {
-      stats: {
-        noTimelineData: "No timeline data available",
-        openTimeline: "Open Timeline",
-      },
-    },
-  },
-};
-
 describe("EmailOpenChart", () => {
   const renderComponent = (timeline: TimelineDataPoint[]) => {
-    return render(
-      <NextIntlClientProvider locale="en" messages={messages}>
-        <EmailOpenChart timeline={timeline} />
-      </NextIntlClientProvider>,
-    );
+    return render(<EmailOpenChart timeline={timeline} />);
   };
 
   it("should display message when timeline is empty", () => {
     renderComponent([]);
-    expect(screen.getByText("No timeline data available")).toBeInTheDocument();
+    expect(
+      screen.getByText("Nessun dato timeline disponibile"),
+    ).toBeInTheDocument();
   });
 
   it("should render chart title with data", () => {
@@ -38,7 +24,7 @@ describe("EmailOpenChart", () => {
       { hour: "2024-01-15T11:00", count: 10 },
     ];
     renderComponent(timeline);
-    expect(screen.getByText("Open Timeline")).toBeInTheDocument();
+    expect(screen.getByText("Timeline Aperture")).toBeInTheDocument();
   });
 
   it("should render all timeline data points", () => {

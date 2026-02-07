@@ -14,16 +14,6 @@ import {
   type EmailPreferences,
 } from "../preference-service";
 
-// Mock crypto module (default export required for Node crypto compatibility)
-vi.mock("crypto", async (importOriginal) => {
-  const actual = await importOriginal<typeof import("crypto")>();
-  return {
-    ...actual,
-    default: actual,
-    randomUUID: vi.fn(),
-  };
-});
-
 // Mock Prisma client
 vi.mock("@/lib/db", () => ({
   prisma: {
@@ -53,7 +43,6 @@ vi.mock("@/lib/logger", () => ({
 
 // Get mocked functions from Prisma mock
 const { prisma } = await vi.importMock<typeof import("@/lib/db")>("@/lib/db");
-const { randomUUID } = await vi.importMock<typeof import("crypto")>("crypto");
 const mockFindUnique = vi.mocked(prisma.emailPreference.findUnique);
 const mockCreate = vi.mocked(prisma.emailPreference.create);
 const mockUpdate = vi.mocked(prisma.emailPreference.update);
@@ -64,9 +53,7 @@ describe("Email Preference Service", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(randomUUID).mockReturnValue(
-      mockToken as ReturnType<typeof randomUUID>,
-    );
+    vi.spyOn(crypto, "randomUUID").mockReturnValue(mockToken);
   });
 
   describe("createDefaultPreferences", () => {
@@ -96,7 +83,7 @@ describe("Email Preference Service", () => {
           unsubscribeToken: mockToken,
         },
       });
-      expect(randomUUID).toHaveBeenCalledOnce();
+      expect(crypto.randomUUID).toHaveBeenCalledOnce();
     });
 
     it("should create preferences with overrides", async () => {

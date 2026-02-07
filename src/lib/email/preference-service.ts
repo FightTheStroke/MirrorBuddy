@@ -14,7 +14,6 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { randomUUID } from "crypto";
 
 /**
  * Email category types
@@ -132,7 +131,7 @@ export async function createDefaultPreferences(
         productUpdates: overrides?.productUpdates ?? true,
         educationalNewsletter: overrides?.educationalNewsletter ?? true,
         announcements: overrides?.announcements ?? true,
-        unsubscribeToken: randomUUID(),
+        unsubscribeToken: crypto.randomUUID(),
       },
     });
 

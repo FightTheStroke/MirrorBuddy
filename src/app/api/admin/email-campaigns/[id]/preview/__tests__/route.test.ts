@@ -11,6 +11,18 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
+vi.mock("@/lib/auth/session-auth", () => ({
+  validateAdminAuth: vi.fn().mockResolvedValue({
+    authenticated: true,
+    userId: "admin-1",
+    isAdmin: true,
+  }),
+}));
+
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),

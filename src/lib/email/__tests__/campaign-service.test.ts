@@ -410,7 +410,7 @@ describe("getRecipientPreview", () => {
 
 describe("sendCampaign", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "https://test.com");
   });
 

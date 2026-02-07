@@ -4,22 +4,8 @@
  */
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { NextIntlClientProvider } from "next-intl";
 import { EmailStatsCards } from "../email-stats-cards";
 import type { GlobalStats } from "@/lib/email/stats-service";
-
-const messages = {
-  admin: {
-    communications: {
-      stats: {
-        totalSent: "Total Sent",
-        avgOpenRate: "Avg Open Rate",
-        avgDeliveryRate: "Avg Delivery Rate",
-        avgBounceRate: "Avg Bounce Rate",
-      },
-    },
-  },
-};
 
 const mockStats: GlobalStats = {
   totalCampaigns: 5,
@@ -35,19 +21,15 @@ const mockStats: GlobalStats = {
 
 describe("EmailStatsCards", () => {
   const renderComponent = (stats: GlobalStats) => {
-    return render(
-      <NextIntlClientProvider locale="en" messages={messages}>
-        <EmailStatsCards stats={stats} />
-      </NextIntlClientProvider>,
-    );
+    return render(<EmailStatsCards stats={stats} />);
   };
 
   it("should render all four stat cards", () => {
     renderComponent(mockStats);
-    expect(screen.getByText("Total Sent")).toBeInTheDocument();
-    expect(screen.getByText("Avg Open Rate")).toBeInTheDocument();
-    expect(screen.getByText("Avg Delivery Rate")).toBeInTheDocument();
-    expect(screen.getByText("Avg Bounce Rate")).toBeInTheDocument();
+    expect(screen.getByText("Email Inviate")).toBeInTheDocument();
+    expect(screen.getByText("Tasso Apertura Medio")).toBeInTheDocument();
+    expect(screen.getByText("Tasso Consegna Medio")).toBeInTheDocument();
+    expect(screen.getByText("Tasso Rimbalzo Medio")).toBeInTheDocument();
   });
 
   it("should display sent count formatted with locale", () => {

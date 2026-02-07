@@ -135,7 +135,7 @@ describe("CampaignComposer", () => {
     await waitFor(() => {
       expect(screen.getByText(/previewRecipients/i)).toBeInTheDocument();
       expect(screen.getByText("42")).toBeInTheDocument();
-      expect(screen.getByText("test1@example.com")).toBeInTheDocument();
+      expect(screen.getByText(/test1@example\.com/)).toBeInTheDocument();
     });
   });
 
@@ -195,8 +195,8 @@ describe("CampaignComposer", () => {
 
     await waitFor(() => {
       expect(screen.getByText(/confirmSend/i)).toBeInTheDocument();
-      expect(screen.getByText("20")).toBeInTheDocument(); // used today
-      expect(screen.getByText("100")).toBeInTheDocument(); // daily limit
+      // Quota line: "dailyQuota: 20 / 100 (20.0%)"
+      expect(screen.getByText(/20\s*\/\s*100/)).toBeInTheDocument();
     });
   });
 });
