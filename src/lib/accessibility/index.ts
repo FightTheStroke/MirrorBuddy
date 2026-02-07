@@ -1,3 +1,9 @@
+/**
+ * @module accessibility
+ * Accessibility Module - Barrel Export
+ * F-08: Feature modules con boundaries chiari
+ */
+
 export {
   useAccessibilityStore,
   defaultAccessibilitySettings,

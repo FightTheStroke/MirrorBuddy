@@ -1,6 +1,6 @@
 import { Trophy, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { Milestone } from "../types";
 import { METRIC_COLORS } from "../constants";
 

@@ -5,7 +5,7 @@ import { useMethodProgressStore } from "@/lib/stores/method-progress-store";
 import { useTranslations } from "next-intl";
 import { Trophy } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import {
   Card,
   CardContent,

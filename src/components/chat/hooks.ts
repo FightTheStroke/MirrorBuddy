@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { useConversationStore } from "@/lib/stores";
 import { useSettingsStore } from "@/lib/stores/settings-store";
 import { useTTS } from "@/components/accessibility";

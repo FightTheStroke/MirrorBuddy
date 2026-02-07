@@ -3,10 +3,10 @@
  * @brief Motor settings component
  */
 
-import { Hand } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { Toggle } from './toggle';
+import { Hand } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { Toggle } from "./toggle";
 
 export function MotorSettings() {
   const { settings, updateSettings } = useAccessibilityStore();
@@ -30,28 +30,28 @@ export function MotorSettings() {
 
       <div
         className={cn(
-          'p-4 rounded-lg',
+          "p-4 rounded-lg",
           settings.highContrast
-            ? 'bg-gray-900 border border-gray-700'
-            : 'bg-blue-50 dark:bg-blue-900/20'
+            ? "bg-gray-900 border border-gray-700"
+            : "bg-blue-50 dark:bg-blue-900/20",
         )}
       >
         <h4
           className={cn(
-            'font-medium mb-3',
+            "font-medium mb-3",
             settings.highContrast
-              ? 'text-yellow-400'
-              : 'text-blue-700 dark:text-blue-300'
+              ? "text-yellow-400"
+              : "text-blue-700 dark:text-blue-300",
           )}
         >
           Scorciatoie da tastiera
         </h4>
         <ul className="space-y-2 text-sm">
           {[
-            { key: 'Tab', desc: 'Naviga tra gli elementi' },
-            { key: '↑↓', desc: 'Seleziona opzioni' },
-            { key: 'Enter', desc: 'Attiva pulsanti' },
-            { key: 'Esc', desc: 'Chiudi dialoghi' },
+            { key: "Tab", desc: "Naviga tra gli elementi" },
+            { key: "↑↓", desc: "Seleziona opzioni" },
+            { key: "Enter", desc: "Attiva pulsanti" },
+            { key: "Esc", desc: "Chiudi dialoghi" },
           ].map((item) => (
             <li key={item.key} className="flex items-center gap-2">
               <kbd className="px-2 py-1 bg-slate-200 dark:bg-slate-700 rounded">
@@ -65,4 +65,3 @@ export function MotorSettings() {
     </div>
   );
 }
-

@@ -6,7 +6,7 @@ import { useSettingsStore } from "./settings-store";
 import { useProgressStore } from "./progress-store";
 import { useConversationStore } from "./conversation-store";
 import { useLearningsStore } from "./learnings-store";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 
 /**
  * Initialize all stores by loading data from server

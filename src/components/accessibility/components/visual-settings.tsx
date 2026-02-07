@@ -3,10 +3,10 @@
  * @brief Visual settings component
  */
 
-import { Eye } from 'lucide-react';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { Toggle } from './toggle';
-import { Slider } from './slider';
+import { Eye } from "lucide-react";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { Toggle } from "./toggle";
+import { Slider } from "./slider";
 
 export function VisualSettings() {
   const { settings, updateSettings } = useAccessibilityStore();
@@ -54,4 +54,3 @@ export function VisualSettings() {
     </div>
   );
 }
-

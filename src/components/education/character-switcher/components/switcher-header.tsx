@@ -1,9 +1,9 @@
-import { Search, X, Heart, Users, GraduationCap } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { ROLE_INFO } from '../constants';
-import type { CharacterRole } from '../types';
+import { Search, X, Heart, Users, GraduationCap } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { ROLE_INFO } from "../constants";
+import type { CharacterRole } from "../types";
 
 const ICON_MAP = {
   Heart,
@@ -14,8 +14,8 @@ const ICON_MAP = {
 interface SwitcherHeaderProps {
   searchQuery: string;
   onSearchChange: (value: string) => void;
-  selectedRole: CharacterRole | 'all';
-  onRoleChange: (role: CharacterRole | 'all') => void;
+  selectedRole: CharacterRole | "all";
+  onRoleChange: (role: CharacterRole | "all") => void;
   onClose: () => void;
 }
 
@@ -31,29 +31,24 @@ export function SwitcherHeader({
   return (
     <div
       className={cn(
-        'sticky top-0 z-10 px-4 py-3 border-b',
+        "sticky top-0 z-10 px-4 py-3 border-b",
         settings.highContrast
-          ? 'border-yellow-400 bg-black'
-          : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900'
+          ? "border-yellow-400 bg-black"
+          : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900",
       )}
     >
       <div className="flex items-center justify-between mb-3">
         <h2
           className={cn(
-            'text-lg font-semibold',
+            "text-lg font-semibold",
             settings.highContrast
-              ? 'text-yellow-400'
-              : 'text-slate-900 dark:text-white'
+              ? "text-yellow-400"
+              : "text-slate-900 dark:text-white",
           )}
         >
           Scegli con chi studiare
         </h2>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onClose}
-          aria-label="Chiudi"
-        >
+        <Button variant="ghost" size="sm" onClick={onClose} aria-label="Chiudi">
           <X className="w-5 h-5" />
         </Button>
       </div>
@@ -61,8 +56,8 @@ export function SwitcherHeader({
       <div className="relative">
         <Search
           className={cn(
-            'absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4',
-            settings.highContrast ? 'text-yellow-400' : 'text-slate-400'
+            "absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4",
+            settings.highContrast ? "text-yellow-400" : "text-slate-400",
           )}
         />
         <input
@@ -71,26 +66,26 @@ export function SwitcherHeader({
           onChange={(e) => onSearchChange(e.target.value)}
           placeholder="Cerca..."
           className={cn(
-            'w-full pl-9 pr-4 py-2 rounded-lg text-sm',
+            "w-full pl-9 pr-4 py-2 rounded-lg text-sm",
             settings.highContrast
-              ? 'bg-gray-900 text-white border border-yellow-400'
-              : 'bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700'
+              ? "bg-gray-900 text-white border border-yellow-400"
+              : "bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700",
           )}
         />
       </div>
 
       <div className="flex gap-2 mt-3">
         <button
-          onClick={() => onRoleChange('all')}
+          onClick={() => onRoleChange("all")}
           className={cn(
-            'px-3 py-1.5 rounded-full text-sm font-medium transition-colors',
-            selectedRole === 'all'
+            "px-3 py-1.5 rounded-full text-sm font-medium transition-colors",
+            selectedRole === "all"
               ? settings.highContrast
-                ? 'bg-yellow-400 text-black'
-                : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                ? "bg-yellow-400 text-black"
+                : "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
               : settings.highContrast
-                ? 'bg-gray-800 text-white'
-                : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                ? "bg-gray-800 text-white"
+                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
           )}
         >
           Tutti
@@ -102,14 +97,14 @@ export function SwitcherHeader({
               key={role}
               onClick={() => onRoleChange(role as CharacterRole)}
               className={cn(
-                'px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5',
+                "px-3 py-1.5 rounded-full text-sm font-medium transition-colors flex items-center gap-1.5",
                 selectedRole === role
                   ? settings.highContrast
-                    ? 'bg-yellow-400 text-black'
-                    : 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
+                    ? "bg-yellow-400 text-black"
+                    : "bg-slate-900 dark:bg-white text-white dark:text-slate-900"
                   : settings.highContrast
-                    ? 'bg-gray-800 text-white'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+                    ? "bg-gray-800 text-white"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
               )}
             >
               <Icon className="w-4 h-4" />
@@ -121,4 +116,3 @@ export function SwitcherHeader({
     </div>
   );
 }
-

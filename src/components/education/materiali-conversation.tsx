@@ -2,7 +2,7 @@
 
 import { motion as _motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { useMaterialiConversation } from "./materiali-conversation/hooks/use-materiali-conversation";
 import { ConversationHeader } from "./materiali-conversation/components/conversation-header";
 import { MessagesList } from "./materiali-conversation/components/messages-list";

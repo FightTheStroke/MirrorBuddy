@@ -1,14 +1,14 @@
-import { useEffect, useCallback, useState, type RefObject } from 'react';
-import type { Markmap } from 'markmap-view';
-import { logger } from '@/lib/logger';
-import type { AccessibilitySettings } from '@/lib/accessibility/accessibility-store';
-import type { MindmapNode } from '../types';
-import { nodesToMarkdown } from '../utils';
+import { useEffect, useCallback, useState, type RefObject } from "react";
+import type { Markmap } from "markmap-view";
+import { logger } from "@/lib/logger";
+import type { AccessibilitySettings } from "@/lib/accessibility";
+import type { MindmapNode } from "../types";
+import { nodesToMarkdown } from "../utils";
 import {
   convertParentIdToChildren,
   detectNodeFormat,
   type FlatNode,
-} from '@/lib/tools/mindmap-utils';
+} from "@/lib/tools/mindmap-utils";
 
 interface UseMarkmapRenderProps {
   svgRef: RefObject<SVGSVGElement | null> | RefObject<SVGSVGElement>;
@@ -45,7 +45,7 @@ export function useMarkmapRender({
       // Detect node format and convert if needed
       const format = detectNodeFormat(nodes);
 
-      if (format === 'parentId') {
+      if (format === "parentId") {
         // Convert parentId format to children format for rendering
         const treeNodes = convertParentIdToChildren(nodes as FlatNode[]);
         return nodesToMarkdown(treeNodes, title);
@@ -64,11 +64,11 @@ export function useMarkmapRender({
       const describeNode = (node: MindmapNode): string => {
         let desc = node.label;
         if (node.children && node.children.length > 0) {
-          desc += ': ' + node.children.map(c => describeNode(c)).join(', ');
+          desc += ": " + node.children.map((c) => describeNode(c)).join(", ");
         }
         return desc;
       };
-      return `${title} con i seguenti rami: ${nodes.map(n => describeNode(n)).join('; ')}`;
+      return `${title} con i seguenti rami: ${nodes.map((n) => describeNode(n)).join("; ")}`;
     }
     return `Mappa mentale: ${title}`;
   }, [nodes, title]);
@@ -106,17 +106,17 @@ export function useMarkmapRender({
         }
 
         // Now clear SVG content
-        svgRef.current.innerHTML = '';
+        svgRef.current.innerHTML = "";
 
         // Check if cancelled after async operations
         if (cancelled) return;
 
         // Set explicit dimensions on SVG to prevent SVGLength error
-        svgRef.current.setAttribute('width', String(rect.width));
-        svgRef.current.setAttribute('height', String(rect.height - 60)); // Account for toolbar
+        svgRef.current.setAttribute("width", String(rect.width));
+        svgRef.current.setAttribute("height", String(rect.height - 60)); // Account for toolbar
 
         // Lazy-load markmap-lib
-        const { Transformer } = await import('markmap-lib');
+        const { Transformer } = await import("markmap-lib");
         if (cancelled) return;
 
         const transformer = new Transformer();
@@ -126,110 +126,146 @@ export function useMarkmapRender({
         const { root } = transformer.transform(content);
 
         // Determine font family based on accessibility settings
-        const fontFamily = settings.dyslexiaFont || accessibilityMode
-          ? 'OpenDyslexic, Comic Sans MS, sans-serif'
-          : 'Arial, Helvetica, sans-serif';
+        const fontFamily =
+          settings.dyslexiaFont || accessibilityMode
+            ? "OpenDyslexic, Comic Sans MS, sans-serif"
+            : "Arial, Helvetica, sans-serif";
 
         // Determine colors based on accessibility settings
         const isHighContrast = settings.highContrast || accessibilityMode;
 
         // Lazy-load markmap-view
-        const { Markmap: MarkmapClass } = await import('markmap-view');
+        const { Markmap: MarkmapClass } = await import("markmap-view");
         if (cancelled) return;
 
-        markmapRef.current = MarkmapClass.create(svgRef.current, {
-          autoFit: true,
-          duration: 300,
-          maxWidth: 280,
-          paddingX: 16,
-          spacingVertical: 8,
-          spacingHorizontal: 100,
-          initialExpandLevel: 3, // Start with first 3 levels expanded, rest collapsed
-          zoom: true, // Enable zoom/pan
-          pan: true,  // Enable panning
-          color: (node) => {
-            if (isHighContrast) {
-              // High contrast colors
-              const colors = ['#ffff00', '#00ffff', '#ff00ff', '#00ff00', '#ff8000'];
-              return colors[node.state?.depth % colors.length] || '#ffffff';
-            }
-            // Normal theme colors
-            const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
-            return colors[node.state?.depth % colors.length] || '#64748b';
+        markmapRef.current = MarkmapClass.create(
+          svgRef.current,
+          {
+            autoFit: true,
+            duration: 300,
+            maxWidth: 280,
+            paddingX: 16,
+            spacingVertical: 8,
+            spacingHorizontal: 100,
+            initialExpandLevel: 3, // Start with first 3 levels expanded, rest collapsed
+            zoom: true, // Enable zoom/pan
+            pan: true, // Enable panning
+            color: (node) => {
+              if (isHighContrast) {
+                // High contrast colors
+                const colors = [
+                  "#ffff00",
+                  "#00ffff",
+                  "#ff00ff",
+                  "#00ff00",
+                  "#ff8000",
+                ];
+                return colors[node.state?.depth % colors.length] || "#ffffff";
+              }
+              // Normal theme colors
+              const colors = [
+                "#3b82f6",
+                "#10b981",
+                "#f59e0b",
+                "#ef4444",
+                "#8b5cf6",
+                "#ec4899",
+              ];
+              return colors[node.state?.depth % colors.length] || "#64748b";
+            },
           },
-        }, root);
+          root,
+        );
 
         // Apply custom styles after render
         setTimeout(() => {
           if (svgRef.current) {
             // Apply font to all text elements
-            const textElements = svgRef.current.querySelectorAll('text, foreignObject');
+            const textElements = svgRef.current.querySelectorAll(
+              "text, foreignObject",
+            );
             textElements.forEach((el) => {
               if (el instanceof SVGElement || el instanceof HTMLElement) {
                 el.style.fontFamily = fontFamily;
                 if (settings.largeText) {
-                  el.style.fontSize = '16px';
+                  el.style.fontSize = "16px";
                 }
               }
             });
 
             // C-20 FIX: Style expand/collapse circles for better visibility and ensure they're clickable
-            const circles = svgRef.current.querySelectorAll('circle');
+            const circles = svgRef.current.querySelectorAll("circle");
             circles.forEach((circle) => {
               if (circle instanceof SVGCircleElement) {
-                circle.style.cursor = 'pointer';
-                circle.style.pointerEvents = 'auto';
+                circle.style.cursor = "pointer";
+                circle.style.pointerEvents = "auto";
                 // Make circles larger and more visible
-                const r = parseFloat(circle.getAttribute('r') || '4');
+                const r = parseFloat(circle.getAttribute("r") || "4");
                 if (r < 6) {
-                  circle.setAttribute('r', '6');
+                  circle.setAttribute("r", "6");
                 }
                 // Ensure stroke is visible
-                if (!circle.getAttribute('stroke')) {
-                  circle.setAttribute('stroke', isHighContrast ? '#ffffff' : '#475569');
-                  circle.setAttribute('stroke-width', '2');
+                if (!circle.getAttribute("stroke")) {
+                  circle.setAttribute(
+                    "stroke",
+                    isHighContrast ? "#ffffff" : "#475569",
+                  );
+                  circle.setAttribute("stroke-width", "2");
                 }
               }
             });
 
             // C-20 FIX: Ensure all g elements (node groups) have pointer-events enabled
-            const nodeGroups = svgRef.current.querySelectorAll('g.markmap-node');
+            const nodeGroups =
+              svgRef.current.querySelectorAll("g.markmap-node");
             nodeGroups.forEach((g) => {
               if (g instanceof SVGGElement) {
-                g.style.pointerEvents = 'auto';
-                g.style.cursor = 'pointer';
+                g.style.pointerEvents = "auto";
+                g.style.cursor = "pointer";
               }
             });
 
             // High contrast background
             if (isHighContrast) {
-              const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-              rect.setAttribute('width', '100%');
-              rect.setAttribute('height', '100%');
-              rect.setAttribute('fill', '#000000');
+              const rect = document.createElementNS(
+                "http://www.w3.org/2000/svg",
+                "rect",
+              );
+              rect.setAttribute("width", "100%");
+              rect.setAttribute("height", "100%");
+              rect.setAttribute("fill", "#000000");
               svgRef.current.insertBefore(rect, svgRef.current.firstChild);
             }
           }
         }, 100);
 
         // Add ARIA attributes
-        svgRef.current.setAttribute('role', 'img');
-        svgRef.current.setAttribute('aria-label', `Mappa mentale: ${title}`);
+        svgRef.current.setAttribute("role", "img");
+        svgRef.current.setAttribute("aria-label", `Mappa mentale: ${title}`);
 
         // Add title and desc for screen readers
-        const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+        const titleEl = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "title",
+        );
         titleEl.textContent = `Mappa mentale: ${title}`;
         svgRef.current.insertBefore(titleEl, svgRef.current.firstChild);
 
-        const descEl = document.createElementNS('http://www.w3.org/2000/svg', 'desc');
+        const descEl = document.createElementNS(
+          "http://www.w3.org/2000/svg",
+          "desc",
+        );
         descEl.textContent = generateTextDescription();
-        svgRef.current.insertBefore(descEl, svgRef.current.firstChild?.nextSibling || null);
+        svgRef.current.insertBefore(
+          descEl,
+          svgRef.current.firstChild?.nextSibling || null,
+        );
 
         setRendered(true);
       } catch (err) {
         const errorMsg = err instanceof Error ? err.message : String(err);
         setError(errorMsg);
-        logger.error('MarkMap render error', { error: String(err) });
+        logger.error("MarkMap render error", { error: String(err) });
       }
     };
 
@@ -243,7 +279,7 @@ export function useMarkmapRender({
         markmapRef.current = null;
       }
       if (svgElement) {
-        svgElement.innerHTML = '';
+        svgElement.innerHTML = "";
       }
     };
   }, [

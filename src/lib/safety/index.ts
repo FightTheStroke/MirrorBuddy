@@ -101,14 +101,10 @@ export type {
   EscalationConfig,
 } from "./escalation/types";
 
-export type {
-  SafetyEventRow,
-  SafetyEventFilters,
-} from "./monitoring/types";
 export {
   getSafetyEventsFromDb,
-  getSafetyMetricsFromDb,
-  getSafetyEventById,
+  getSafetyStatsFromDb,
+  resolveSafetyEvent,
 } from "./monitoring/db-queries";
 
 // ============================================================================
@@ -125,20 +121,27 @@ export { normalizeUnicode } from "./versioning";
 
 export { recordContentFiltered } from "./audit";
 
-export type {
-  ComplianceAuditEvent,
-  ComplianceAuditSummary,
-} from "./audit/compliance-audit-service";
 export {
-  logComplianceEvent,
-  getComplianceAuditSummary,
+  recordComplianceEvent,
+  recordComplianceContentFiltered,
+  recordComplianceCrisisDetected,
+  recordComplianceJailbreakAttempt,
+  recordComplianceGuardrailTriggered,
+  getComplianceEntries,
+  getComplianceStatistics,
+  exportComplianceAudit,
+  clearComplianceBuffer,
 } from "./audit/compliance-audit-service";
 
-export type {
-  EscalationOutcome,
-  EscalationResponse,
-} from "./escalation/escalation-service";
 export {
+  initializeEscalationService,
   escalateCrisisDetected,
-  escalateJailbreakAttempt,
+  escalateRepeatedJailbreak,
+  escalateSevereContentFilter,
+  resolveEscalation,
+  clearSessionEscalations,
+  getEscalationConfig,
+  getRecentEscalations,
+  getUnresolvedEscalations,
+  clearEscalationBuffer,
 } from "./escalation/escalation-service";

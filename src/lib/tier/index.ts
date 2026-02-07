@@ -41,4 +41,8 @@ export { assignBaseTierToNewUser } from "./registration-helper";
 export {
   getLimitsAndUsage,
   incrementVideoVisionUsage,
+  canStartSession,
+  startSession,
+  addFrames,
+  endSession,
 } from "./video-vision-usage-service";

@@ -21,7 +21,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { PlayCircle, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { HTMLPreview } from "@/components/education/html-preview";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { generateAccessibilityCSS, buildDemoCode } from "./demo-utils";
 import type { BaseRendererProps } from "./types";
 

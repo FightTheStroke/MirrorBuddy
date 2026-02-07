@@ -17,17 +17,11 @@ export {
   decryptToken,
   isEncryptionConfigured,
 } from "./encryption";
+export { encryptPII, decryptPII, hashPII } from "./pii-encryption";
+export { getSecret, clearAllCachedSecrets } from "./azure-key-vault";
 export {
-  encryptPII,
-  decryptPII,
-  hashPII,
-} from "./pii-encryption";
-export {
-  getSecret,
-  clearAllCachedSecrets,
-} from "./azure-key-vault";
-export {
-  recordDecryptEvent,
+  logDecryptAccess,
+  logBulkDecryptAccess,
   getDecryptAuditLog,
   exportDecryptAudit,
 } from "./decrypt-audit";
