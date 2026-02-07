@@ -14,7 +14,9 @@
  * This avoids version conflicts with root jsdom@27's dependencies.
  */
 
-/* eslint-disable @typescript-eslint/no-require-imports */
+// Build script: all fs paths are constructed from process.cwd() + known constants.
+// No user input is involved, so security/detect-non-literal-fs-filename is a false positive.
+/* eslint-disable @typescript-eslint/no-require-imports, security/detect-non-literal-fs-filename */
 const fs = require("fs");
 const path = require("path");
 /* eslint-enable @typescript-eslint/no-require-imports */
