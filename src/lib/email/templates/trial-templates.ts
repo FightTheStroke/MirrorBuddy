@@ -21,6 +21,7 @@ export interface TrialEmailVerificationData {
   verificationCode: string;
   verificationUrl: string;
   expiresAt: Date;
+  locale?: string;
 }
 
 export function getTrialEmailVerificationTemplate(
@@ -31,13 +32,16 @@ export function getTrialEmailVerificationTemplate(
   text: string;
   to: string;
 } {
-  const expiresFormatted = data.expiresAt.toLocaleDateString("it-IT", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+  const expiresFormatted = data.expiresAt.toLocaleDateString(
+    data.locale || "it-IT",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    },
+  );
 
   return {
     to: data.email,
