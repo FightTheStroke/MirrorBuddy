@@ -1,9 +1,10 @@
 /**
- * Compliance Module
- * COPPA, GDPR, Cookie Consent compliance utilities
+ * Compliance Module (Client-safe)
+ * Cookie Consent and Data Retention configuration.
+ * For server-only COPPA functions, import from '@/lib/compliance/server'.
  */
 
-// Cookie consent config
+// Cookie consent config (client-safe)
 export {
   localeToCountry,
   getCookieConsentConfig,
@@ -13,19 +14,7 @@ export {
 
 export type { CountryCode } from "./cookie-consent-config";
 
-// COPPA service
-export {
-  COPPA_AGE_THRESHOLD,
-  checkCoppaStatus,
-  requestParentalConsent,
-  verifyParentalConsent,
-  denyParentalConsentByCode,
-  denyParentalConsent,
-  canAccessFullFeatures,
-  type CoppaStatus,
-} from "./coppa-service";
-
-// Data retention config
+// Data retention config (client-safe - pure constants)
 export {
   ITALY_RETENTION,
   UK_RETENTION,

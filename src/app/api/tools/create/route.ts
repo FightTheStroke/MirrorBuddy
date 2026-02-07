@@ -14,8 +14,8 @@ import {
   completeToolState,
 } from "@/lib/realtime/tool-state";
 import { broadcastToolEvent, type ToolType } from "@/lib/realtime/tool-events";
-import { validateSessionOwnership } from "@/lib/auth";
-import { canAccessFullFeatures } from "@/lib/compliance";
+import { validateSessionOwnership } from "@/lib/auth/server";
+import { canAccessFullFeatures } from "@/lib/compliance/server";
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,

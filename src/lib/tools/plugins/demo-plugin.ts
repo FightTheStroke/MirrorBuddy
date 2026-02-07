@@ -8,10 +8,10 @@
 import { z } from "zod";
 import { ToolPlugin, ToolCategory, Permission } from "../plugin/types";
 import { nanoid } from "nanoid";
-import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai/server";
 import { logger } from "@/lib/logger";
 import { sanitizeHtml } from "../handlers/demo-handler";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 import type { ToolContext, ToolResult } from "@/types/tools";
 
 /**

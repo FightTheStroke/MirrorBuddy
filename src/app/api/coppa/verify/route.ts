@@ -14,7 +14,7 @@ import {
   verifyParentalConsent,
   denyParentalConsentByCode,
   checkCoppaStatus,
-} from "@/lib/compliance";
+} from "@/lib/compliance/server";
 import {
   checkRateLimitAsync,
   getClientIdentifier,

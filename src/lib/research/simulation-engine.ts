@@ -5,7 +5,7 @@
  */
 
 import { prisma } from "@/lib/db";
-import { chatCompletion } from "@/lib/ai";
+import { chatCompletion } from "@/lib/ai/server";
 import {
   type SyntheticStudentProfile,
   buildStudentSystemPrompt,

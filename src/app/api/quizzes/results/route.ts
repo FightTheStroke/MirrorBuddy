@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { QuizResult } from "@prisma/client";
-import { recordAdaptiveSignal } from "@/lib/education";
+import { recordAdaptiveSignal } from "@/lib/education/server";
 import type { AdaptiveSignalSource } from "@/types";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { extractParametersWithAI } from "../ai-parameter-extractor";
 import { TOOL_SCHEMAS } from "../tool-parameter-schemas";
-import * as aiProviders from "@/lib/ai";
+import * as aiProviders from "@/lib/ai/server";
 
 // Mock the AI provider
 vi.mock("@/lib/ai/providers", () => ({

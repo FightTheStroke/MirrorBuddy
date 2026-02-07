@@ -12,7 +12,7 @@ import {
   extractKeyFacts,
   extractTopics,
   extractLearnings,
-} from "@/lib/ai";
+} from "@/lib/ai/server";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 
 // Minimum messages before summarization

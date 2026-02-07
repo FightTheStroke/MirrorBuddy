@@ -10,7 +10,7 @@ import {
   getSafetyEventsFromDb,
   getSafetyStatsFromDb,
   resolveSafetyEvent,
-} from "@/lib/safety";
+} from "@/lib/safety/server";
 import { pipe, withSentry, withAdmin, withCSRF } from "@/lib/api/middlewares";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
 

@@ -1,7 +1,7 @@
 // Mark as dynamic to avoid static generation issues with i18n
 export const dynamic = "force-dynamic";
 
-import { validateAdminAuth } from "@/lib/auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
 import { UsersTable } from "./users-table";

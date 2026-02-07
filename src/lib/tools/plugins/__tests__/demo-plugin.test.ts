@@ -63,7 +63,7 @@ vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
 }));
 
 import { demoPlugin } from "../demo-plugin";
-import { chatCompletion } from "@/lib/ai";
+import { chatCompletion } from "@/lib/ai/server";
 
 // Extract schema for testing - matches OpenAI function definition
 const DemoInputSchema = z.object({

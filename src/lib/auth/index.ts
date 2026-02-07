@@ -1,43 +1,18 @@
 /**
- * @module Auth
+ * @module Auth (Client)
  *
- * Authentication and authorization utilities for MirrorBuddy.
- *
- * This module provides a unified interface for all auth-related functionality.
- * External modules MUST import from '@/lib/auth' (this barrel) and NOT from sub-paths.
+ * Client-safe authentication utilities for MirrorBuddy.
+ * For server-only auth functions (validateAuth, signCookieValue, etc.),
+ * import from '@/lib/auth/server' instead.
  */
 
-// Session authentication
-export {
-  validateAuth,
-  validateSessionOwnership,
-  validateAdminAuth,
-  requireAuthenticatedUser,
-  type AuthResult,
-  type AdminAuthResult,
-} from './session-auth';
-
-// Cookie signing
-export { signCookieValue, verifyCookieValue, isSignedCookie } from './cookie-signing';
-
-// Admin authorization
-export { requireAdmin, isAdmin } from './require-admin';
-
 // Client-side auth
-export { getUserIdFromCookie, isAuthenticated } from './client-auth';
+export { getUserIdFromCookie, isAuthenticated } from "./client-auth";
 
-// CSRF protection
-export { csrfFetch, getCSRFToken, clearCSRFToken } from './csrf-client';
+// CSRF protection (client)
+export { csrfFetch, getCSRFToken, clearCSRFToken } from "./csrf-client";
 
-// Password utilities
-export {
-  hashPassword,
-  verifyPassword,
-  generateRandomPassword,
-  validatePasswordStrength,
-} from './password';
-
-// Cookie constants
+// Cookie constants (shared between client and server)
 export {
   AUTH_COOKIE_NAME,
   AUTH_COOKIE_CLIENT,
@@ -56,14 +31,4 @@ export {
   VISITOR_MAX_AGE,
   isValidVisitorId,
   validateVisitorId,
-} from './cookie-constants';
-
-// SSO providers
-export { GoogleWorkspaceProvider, GOOGLE_EDU_SCOPES, type GoogleUserInfo } from './sso/google-workspace';
-export { Microsoft365Provider, MICROSOFT_EDU_SCOPES, type MicrosoftUserInfo } from './sso/microsoft365';
-
-// SSO session management
-export { createSSOSession, consumeSSOSession, type SSOSessionData } from './sso/sso-session';
-
-// SSO callback handling
-export { handleSSOCallback, type SSOCallbackResult } from './sso/sso-callback-handler';
+} from "./cookie-constants";

@@ -2,19 +2,16 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth";
+import { validateAuth } from "@/lib/auth/server";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import {
-  AUTH_COOKIE_NAME,
-  AUTH_COOKIE_CLIENT,
-} from "@/lib/auth";
+import { AUTH_COOKIE_NAME, AUTH_COOKIE_CLIENT } from "@/lib/auth/server";
 import { calculateAndPublishAdminCounts } from "@/lib/helpers/publish-admin-counts";
 import {
   COPPA_AGE_THRESHOLD,
   requestParentalConsent,
   checkCoppaStatus,
-} from "@/lib/compliance";
-import { assignBaseTierToNewUser } from "@/lib/tier";
+} from "@/lib/compliance/server";
+import { assignBaseTierToNewUser } from "@/lib/tier/server";
 
 import { PostBodySchema, emptyResponse } from "./types";
 import { buildExistingData, buildEffectiveState } from "./helpers";

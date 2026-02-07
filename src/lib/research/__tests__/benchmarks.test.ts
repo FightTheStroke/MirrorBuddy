@@ -6,7 +6,7 @@ vi.mock("@/lib/ai/providers", () => ({
 }));
 
 import { scoreTutorBench } from "../benchmarks";
-import { chatCompletion } from "@/lib/ai";
+import { chatCompletion } from "@/lib/ai/server";
 
 const mockChatCompletion = vi.mocked(chatCompletion);
 

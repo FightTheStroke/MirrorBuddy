@@ -5,8 +5,12 @@
 // Supports per-feature AI config (ADR 0073)
 // ============================================================================
 
-import { chatCompletion, getActiveProvider, getDeploymentForModel } from "@/lib/ai";
-import { tierService } from "@/lib/tier";
+import {
+  chatCompletion,
+  getActiveProvider,
+  getDeploymentForModel,
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
 import type { ParentNote as PrismaParentNote } from "@prisma/client";

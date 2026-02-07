@@ -7,8 +7,8 @@ import {
   TRIAL_LIMITS,
 } from "@/lib/trial/trial-service";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth";
+import { validateAuth } from "@/lib/auth/server";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
 import { checkAbuse, incrementAbuseScore } from "@/lib/trial/anti-abuse";
 import { prisma } from "@/lib/db";
 

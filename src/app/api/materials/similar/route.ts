@@ -7,7 +7,7 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { searchSimilar } from "@/lib/rag";
+import { searchSimilar } from "@/lib/rag/server";
 
 interface SimilarMaterial {
   id: string;

@@ -6,7 +6,7 @@
 
 import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
-import { getActiveProvider } from "@/lib/ai";
+import { getActiveProvider } from "@/lib/ai/server";
 import { logger } from "@/lib/logger";
 import {
   checkRateLimit,

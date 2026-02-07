@@ -17,7 +17,7 @@ import {
   startSession,
   addFrames,
   endSession,
-} from "@/lib/tier";
+} from "@/lib/tier/server";
 
 const StartSchema = z.object({
   action: z.literal("start"),

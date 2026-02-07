@@ -4,7 +4,7 @@
  * Supports per-feature model selection (ADR 0073)
  */
 
-import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai/server";
 import { logger } from "@/lib/logger";
 import type { DemoData } from "@/types/tools";
 

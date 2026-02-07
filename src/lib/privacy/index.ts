@@ -1,11 +1,13 @@
 /**
- * Privacy Module
+ * Privacy Module - CLIENT-SAFE
  * Part of Ethical Design Hardening
  *
- * Provides anonymization, pseudonymization, and data retention
- * utilities for GDPR compliance and privacy-by-design.
+ * Provides anonymization, pseudonymization utilities
+ * for GDPR compliance and privacy-by-design.
+ *
+ * For server-only symbols (data-retention-service),
+ * import from "@/lib/privacy/server".
  */
 
-export * from './types';
-export * from './anonymization-service';
-export * from './data-retention-service';
+export * from "./types";
+export * from "./anonymization-service";

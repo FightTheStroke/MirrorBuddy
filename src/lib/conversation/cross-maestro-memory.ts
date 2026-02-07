@@ -10,7 +10,7 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 import { getTierMemoryLimits } from "./tier-memory-config";
 import { getMaestroById } from "@/data/maestri";
 import type { TierName } from "@/types/tier-types";

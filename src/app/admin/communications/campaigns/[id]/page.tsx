@@ -1,7 +1,7 @@
 // Mark as dynamic to avoid static generation issues with i18n
 export const dynamic = "force-dynamic";
 
-import { validateAdminAuth } from "@/lib/auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect, notFound } from "next/navigation";
 import { CampaignDetail } from "./campaign-detail";
 

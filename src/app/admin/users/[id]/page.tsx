@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 
-import { validateAdminAuth } from "@/lib/auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect, notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { UserDetailClient } from "./user-detail-client";

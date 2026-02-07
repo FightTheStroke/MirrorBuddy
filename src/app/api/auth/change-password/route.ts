@@ -11,7 +11,7 @@ import {
   hashPassword,
   verifyPassword,
   validatePasswordStrength,
-} from "@/lib/auth";
+} from "@/lib/auth/server";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import {
   pipe,

@@ -10,7 +10,7 @@
  */
 
 import { logger } from "@/lib/logger";
-import { generatePrivacyAwareEmbedding, searchSimilar } from "@/lib/rag";
+import { generatePrivacyAwareEmbedding, searchSimilar } from "@/lib/rag/server";
 import { getTierMemoryLimits } from "./tier-memory-config";
 import type { TierName } from "@/types/tier-types";
 

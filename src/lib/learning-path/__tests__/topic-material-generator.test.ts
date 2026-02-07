@@ -50,7 +50,7 @@ vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
   getDeploymentForModel: vi.fn((model: string) => model),
 }));
 
-import { chatCompletion } from "@/lib/ai";
+import { chatCompletion } from "@/lib/ai/server";
 
 const mockChatCompletion = vi.mocked(chatCompletion);
 

@@ -28,20 +28,9 @@ export {
   isSubscriptionExpired,
 } from "./types";
 
-export { TierService, tierService } from "./tier-service";
-
 export type { FeatureModelType } from "./tier-helpers";
 export {
   getModelForFeature,
   getModelFromTier,
   getFeatureAIConfig,
 } from "./tier-helpers";
-
-export { assignBaseTierToNewUser } from "./registration-helper";
-export {
-  getLimitsAndUsage,
-  canStartSession,
-  startSession,
-  addFrames,
-  endSession,
-} from "./video-vision-usage-service";

@@ -2,7 +2,7 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 
 /**
  * GET /api/admin/tiers/[id]

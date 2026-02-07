@@ -4,7 +4,7 @@
  * Supports per-feature model selection (ADR 0073)
  */
 
-import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai/server";
 import type { QuizData } from "@/types/tools";
 
 /** Options for quiz generation (ADR 0073 - per-feature AI config) */

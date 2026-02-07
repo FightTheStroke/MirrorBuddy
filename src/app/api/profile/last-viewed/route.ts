@@ -5,7 +5,7 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth";
+import { validateAuth } from "@/lib/auth/server";
 import { prisma } from "@/lib/db";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 

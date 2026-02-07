@@ -6,8 +6,12 @@
 // ============================================================================
 
 import "server-only";
-import { chatCompletion, getActiveProvider, getDeploymentForModel } from "@/lib/ai";
-import { tierService } from "@/lib/tier";
+import {
+  chatCompletion,
+  getActiveProvider,
+  getDeploymentForModel,
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { logger } from "@/lib/logger";
 import { getLastConversationSummary } from "./summary-generator";
 

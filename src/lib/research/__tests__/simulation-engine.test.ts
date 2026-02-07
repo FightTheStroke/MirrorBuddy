@@ -18,7 +18,7 @@ vi.mock("@/lib/ai/providers", () => ({
 
 import { runSimulation, type SimulationConfig } from "../simulation-engine";
 import { SYNTHETIC_PROFILES } from "../synthetic-students";
-import { chatCompletion } from "@/lib/ai";
+import { chatCompletion } from "@/lib/ai/server";
 import { prisma } from "@/lib/db";
 
 const mockChatCompletion = vi.mocked(chatCompletion);

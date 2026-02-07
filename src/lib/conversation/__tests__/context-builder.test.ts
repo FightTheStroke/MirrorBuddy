@@ -5,7 +5,7 @@ import {
 } from "../context-builder";
 import * as memoryLoader from "../memory-loader";
 import * as crossMaestroMemory from "../cross-maestro-memory";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 
 vi.mock("@/lib/tier/tier-service");
 vi.mock("../memory-loader");

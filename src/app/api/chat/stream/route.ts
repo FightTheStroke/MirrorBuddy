@@ -13,8 +13,8 @@ import {
   azureStreamingCompletion,
   getActiveProvider,
   getDeploymentForModel,
-} from "@/lib/ai";
-import { tierService } from "@/lib/tier";
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,
