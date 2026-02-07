@@ -1,11 +1,13 @@
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import Error from "./error";
+import ErrorPage from "./error";
 
 describe("Error Component", () => {
   const mockReset = vi.fn();
-  const mockError = new Error("Test error message");
+  const mockError = Object.assign(new globalThis.Error("Test error message"), {
+    digest: undefined,
+  }) as globalThis.Error & { digest?: string };
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -20,7 +22,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Something went wrong")).toBeInTheDocument();
       expect(
@@ -36,7 +38,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Qualcosa è andato storto")).toBeInTheDocument();
       expect(
@@ -52,7 +54,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(
         screen.getByText("Quelque chose s'est mal passé"),
@@ -70,7 +72,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Etwas ist schief gelaufen")).toBeInTheDocument();
       expect(
@@ -86,7 +88,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Algo salió mal")).toBeInTheDocument();
       expect(
@@ -102,7 +104,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Something went wrong")).toBeInTheDocument();
       expect(
@@ -116,7 +118,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     });
@@ -127,7 +129,7 @@ describe("Error Component", () => {
         configurable: true,
       });
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Something went wrong")).toBeInTheDocument();
     });
@@ -136,7 +138,7 @@ describe("Error Component", () => {
   describe("Error boundary functionality", () => {
     it("should call reset function when Try Again button is clicked", async () => {
       const user = userEvent.setup();
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       const retryButton = screen.getByRole("button", {
         name: /try again|riprova/i,
@@ -148,7 +150,7 @@ describe("Error Component", () => {
 
     it("should call window.history.back when Go Back button is clicked", async () => {
       const user = userEvent.setup();
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       const backButton = screen.getByRole("button", {
         name: /go back|torna indietro/i,
@@ -159,28 +161,26 @@ describe("Error Component", () => {
     });
 
     it("should display error message in development mode", () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = "development";
+      vi.stubEnv("NODE_ENV", "development");
 
-      render(<Error error={mockError} reset={mockReset} />);
+      render(<ErrorPage error={mockError} reset={mockReset} />);
 
       expect(screen.getByText("Test error message")).toBeInTheDocument();
 
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
 
     it("should display error digest if provided", () => {
-      const originalEnv = process.env.NODE_ENV;
-      process.env.NODE_ENV = "development";
+      vi.stubEnv("NODE_ENV", "development");
       const errorWithDigest = Object.assign(new Error("Test error"), {
         digest: "abc123",
       });
 
-      render(<Error error={errorWithDigest} reset={mockReset} />);
+      render(<ErrorPage error={errorWithDigest} reset={mockReset} />);
 
       expect(screen.getByText(/Digest: abc123/)).toBeInTheDocument();
 
-      process.env.NODE_ENV = originalEnv;
+      vi.unstubAllEnvs();
     });
   });
 });

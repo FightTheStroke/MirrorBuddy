@@ -58,15 +58,12 @@ export const POST = pipe(
     "If an account exists with this email, you will receive a password reset link";
 
   try {
-    // Find user by email (try both emailHash and plain email for legacy)
+    // Find user by emailHash (PII-encrypted lookup)
     const emailHash = await hashPII(normalizedEmail);
     const user = await prisma.user.findFirst({
-      where: {
-        OR: [{ emailHash }, { email: normalizedEmail }],
-      },
+      where: { emailHash },
       select: {
         id: true,
-        email: true,
         emailHash: true,
         settings: { select: { language: true } },
       },
@@ -112,18 +109,18 @@ export const POST = pipe(
       },
     });
 
-    // Generate reset URL
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/${locale}/reset-password?token=${token}`;
-
     // Get user's locale (default to 'en')
     const locale = user.settings?.language || "en";
+
+    // Generate reset URL
+    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/${locale}/reset-password?token=${token}`;
 
     // Generate email content
     const { subject, html } = getPasswordResetEmail(resetUrl, locale);
 
-    // Send email
+    // Send email (use normalized input email since DB email is encrypted)
     const emailResult = await sendEmail({
-      to: user.email || normalizedEmail,
+      to: normalizedEmail,
       subject,
       html,
     });
