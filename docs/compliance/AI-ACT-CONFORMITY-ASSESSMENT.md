@@ -215,13 +215,13 @@ MirrorBuddy qualifies under Annex III, Point 3(b):
 
 ## Approval & Sign-Off
 
-| Role                         | Name             | Date | Status  |
-| ---------------------------- | ---------------- | ---- | ------- |
-| **CEO / Product Owner**      | [To be assigned] | --   | Pending |
-| **Chief Compliance Officer** | [To be assigned] | --   | Pending |
-| **AI Risk Lead**             | [To be assigned] | --   | Pending |
-| **Legal Counsel**            | [To be assigned] | --   | Pending |
-| **CISO / Security Lead**     | [To be assigned] | --   | Pending |
+| Role                         | Name                       | Date       | Status |
+| ---------------------------- | -------------------------- | ---------- | ------ |
+| **CEO / Product Owner**      | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **Chief Compliance Officer** | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **AI Risk Lead**             | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **Legal Counsel**            | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **CISO / Security Lead**     | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
 
 **Final Certification**: Pending notified body assessment (Q2 2026).
 

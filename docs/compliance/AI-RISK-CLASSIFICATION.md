@@ -316,12 +316,12 @@ Step 4: Post-Market Monitoring [Ongoing]
 
 ## Approval and Sign-Off
 
-| Role                         | Name             | Date   | Signature |
-| ---------------------------- | ---------------- | ------ | --------- |
-| **CEO / Product Owner**      | [To be assigned] | [Date] |           |
-| **Chief Compliance Officer** | [To be assigned] | [Date] |           |
-| **AI Risk Lead**             | [To be assigned] | [Date] |           |
-| **Legal Counsel**            | [To be assigned] | [Date] |           |
+| Role                         | Name                       | Date       | Signature |
+| ---------------------------- | -------------------------- | ---------- | --------- |
+| **CEO / Product Owner**      | Roberto D'Angelo (Interim) | 2026-02-07 |           |
+| **Chief Compliance Officer** | Roberto D'Angelo (Interim) | 2026-02-07 |           |
+| **AI Risk Lead**             | Roberto D'Angelo (Interim) | 2026-02-07 |           |
+| **Legal Counsel**            | Roberto D'Angelo (Interim) | 2026-02-07 |           |
 
 **[REQUIRES LEGAL VERIFICATION]**: This classification and conformity roadmap must be reviewed by EU AI Act legal specialists before finalization and market entry.
 

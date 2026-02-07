@@ -22,7 +22,7 @@ const eslintConfig = defineConfig([
       "security/detect-non-literal-fs-filename": "warn",
       "security/detect-non-literal-require": "warn",
       "security/detect-object-injection": "off", // Too many false positives on obj[key]
-      "security/detect-possible-timing-attacks": "warn",
+      "security/detect-possible-timing-attacks": "error",
       "security/detect-unsafe-regex": "warn",
       "security/detect-child-process": "warn",
       "security/detect-non-literal-regexp": "warn",
@@ -205,7 +205,7 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "local-rules/no-direct-localstorage": "warn",
+      "local-rules/no-direct-localstorage": "error",
     },
   },
   // TF-03: Block direct imports of generateEmbedding - enforce privacy-aware wrapper
@@ -236,7 +236,7 @@ const eslintConfig = defineConfig([
       "**/__tests__/**",
     ],
     rules: {
-      "local-rules/require-eventsource-cleanup": "warn",
+      "local-rules/require-eventsource-cleanup": "error",
     },
   },
   // ADR 0075: Prefer validateAuth() over direct AUTH cookie reads in API routes
@@ -327,7 +327,7 @@ const eslintConfig = defineConfig([
       "src/**/__tests__/**",
     ],
     rules: {
-      "local-rules/no-prisma-race-condition": "warn",
+      "local-rules/no-prisma-race-condition": "error",
     },
   },
   // TF-04: Detect raw Prisma queries that bypass PII encryption middleware
@@ -394,7 +394,7 @@ const eslintConfig = defineConfig([
       "src/app/api/webhooks/**/*.ts",
     ],
     rules: {
-      "local-rules/require-csrf-mutating-routes": "warn",
+      "local-rules/require-csrf-mutating-routes": "error",
     },
   },
   // Require complete logger mock in test files

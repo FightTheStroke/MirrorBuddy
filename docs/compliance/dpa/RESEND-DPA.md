@@ -23,22 +23,24 @@ Resend is MirrorBuddy's transactional email processor for critical communication
 
 ### 1.1 Parties
 
-| Role | Entity | Responsibility |
-|------|--------|----------------|
-| **Data Controller** | MirrorBuddy | Determines purposes and means of processing |
-| **Data Processor** | Resend (Zernonia Inc.) | Processes email data on behalf of MirrorBuddy |
+| Role                | Entity                 | Responsibility                                |
+| ------------------- | ---------------------- | --------------------------------------------- |
+| **Data Controller** | MirrorBuddy            | Determines purposes and means of processing   |
+| **Data Processor**  | Resend (Zernonia Inc.) | Processes email data on behalf of MirrorBuddy |
 
 ### 1.2 Processing Activities
 
 **Purpose**: Transactional email delivery for MirrorBuddy application
 
 **Data Categories Processed**:
+
 - Email addresses (recipients, senders)
 - Email content (subject, body, attachments)
 - Email metadata (timestamps, delivery status, open/click tracking)
 - Technical data (IP addresses for delivery, user agents)
 
 **Data Subjects**:
+
 - MirrorBuddy users (students, parents)
 - Admin users
 - System-generated communications
@@ -48,6 +50,7 @@ Resend is MirrorBuddy's transactional email processor for critical communication
 ### 1.3 Processor Obligations (GDPR Article 28)
 
 Resend commits to:
+
 - Process data only on documented instructions from MirrorBuddy
 - Ensure confidentiality of personnel handling data
 - Implement appropriate technical and organizational measures (see Section 4)
@@ -65,20 +68,20 @@ Resend engages the following sub-processors for email infrastructure and operati
 
 ### 2.1 Infrastructure Sub-Processors
 
-| Sub-Processor | Service | Location | Purpose |
-|---------------|---------|----------|---------|
-| **Amazon Web Services (AWS)** | Cloud Infrastructure | US (us-east-1, us-west-2) | Email sending infrastructure, storage |
-| **Cloudflare** | CDN & DDoS Protection | Global (distributed) | API delivery, security |
-| **Stripe** | Payment Processing | US, Ireland | Billing (for paid plans only) |
-| **Vercel** | Application Hosting | Global (distributed) | Dashboard and API hosting |
+| Sub-Processor                 | Service               | Location                  | Purpose                               |
+| ----------------------------- | --------------------- | ------------------------- | ------------------------------------- |
+| **Amazon Web Services (AWS)** | Cloud Infrastructure  | US (us-east-1, us-west-2) | Email sending infrastructure, storage |
+| **Cloudflare**                | CDN & DDoS Protection | Global (distributed)      | API delivery, security                |
+| **Stripe**                    | Payment Processing    | US, Ireland               | Billing (for paid plans only)         |
+| **Vercel**                    | Application Hosting   | Global (distributed)      | Dashboard and API hosting             |
 
 ### 2.2 Operational Sub-Processors
 
-| Sub-Processor | Service | Location | Purpose |
-|---------------|---------|----------|---------|
-| **PostHog** | Analytics | US | Product analytics (anonymized usage data) |
-| **Sentry** | Error Monitoring | US | Error tracking and debugging |
-| **Linear** | Support Ticketing | US | Customer support and issue tracking |
+| Sub-Processor | Service           | Location | Purpose                                   |
+| ------------- | ----------------- | -------- | ----------------------------------------- |
+| **PostHog**   | Analytics         | US       | Product analytics (anonymized usage data) |
+| **Sentry**    | Error Monitoring  | US       | Error tracking and debugging              |
+| **Linear**    | Support Ticketing | US       | Customer support and issue tracking       |
 
 ### 2.3 Sub-Processor Data Flow
 
@@ -105,24 +108,26 @@ Email Recipients (Students, Parents, Admins)
 **Legal Basis**: Commission Implementing Decision (EU) 2021/914 (New SCCs, effective June 27, 2021)
 
 **Transfer Scenario**:
+
 - MirrorBuddy (Italy/EU) → Resend (US)
 - Data transferred: Email addresses, message content, metadata
 - Resend's AWS infrastructure primarily in US-EAST-1 (Virginia) and US-WEST-2 (Oregon)
 
 ### 3.2 SCC Compliance
 
-| SCC Requirement | Resend Implementation |
-|-----------------|----------------------|
-| **Clause 8.1 (Instructions)** | Processing only per API instructions |
-| **Clause 8.2 (Purpose Limitation)** | Email delivery only, no secondary use |
-| **Clause 8.3 (Transparency)** | Sub-processor list published |
-| **Clause 8.5 (Security)** | TLS 1.3, encryption at rest, access controls |
-| **Clause 8.6 (Sensitive Data)** | No special category data processed |
-| **Clause 8.9 (Redress)** | Support channels, SLA for paid plans |
+| SCC Requirement                     | Resend Implementation                        |
+| ----------------------------------- | -------------------------------------------- |
+| **Clause 8.1 (Instructions)**       | Processing only per API instructions         |
+| **Clause 8.2 (Purpose Limitation)** | Email delivery only, no secondary use        |
+| **Clause 8.3 (Transparency)**       | Sub-processor list published                 |
+| **Clause 8.5 (Security)**           | TLS 1.3, encryption at rest, access controls |
+| **Clause 8.6 (Sensitive Data)**     | No special category data processed           |
+| **Clause 8.9 (Redress)**            | Support channels, SLA for paid plans         |
 
 ### 3.3 Additional Safeguards (Schrems II Compliance)
 
 **Supplementary Measures** (beyond SCCs):
+
 - Encryption in transit (TLS 1.3) and at rest (AES-256)
 - Logical data segregation per customer account
 - No government access to data (Resend policy: disclose only with legal notice)
@@ -130,6 +135,7 @@ Email Recipients (Students, Parents, Admins)
 - Right to object to transfers (Controller can request EU-only processing with additional configuration)
 
 **FISA 702 / Cloud Act Risk Assessment**: LOW
+
 - Resend is not a telecommunications provider (exempt from bulk surveillance)
 - Email content encrypted in transit and at rest
 - Resend policy: challenge overly broad government requests
@@ -140,24 +146,24 @@ Email Recipients (Students, Parents, Admins)
 
 ### 4.1 Technical Measures
 
-| Measure | Implementation |
-|---------|----------------|
-| **Encryption in Transit** | TLS 1.3 for all API and SMTP connections |
-| **Encryption at Rest** | AES-256 encryption for stored emails (AWS S3 SSE) |
-| **Access Control** | API key authentication, rate limiting (1 RPS free tier) |
-| **Network Security** | AWS security groups, Cloudflare DDoS protection |
-| **Audit Logging** | API request logs (retained 30 days) |
-| **Vulnerability Management** | Regular security patches, bug bounty program |
+| Measure                      | Implementation                                          |
+| ---------------------------- | ------------------------------------------------------- |
+| **Encryption in Transit**    | TLS 1.3 for all API and SMTP connections                |
+| **Encryption at Rest**       | AES-256 encryption for stored emails (AWS S3 SSE)       |
+| **Access Control**           | API key authentication, rate limiting (1 RPS free tier) |
+| **Network Security**         | AWS security groups, Cloudflare DDoS protection         |
+| **Audit Logging**            | API request logs (retained 30 days)                     |
+| **Vulnerability Management** | Regular security patches, bug bounty program            |
 
 ### 4.2 Organizational Measures
 
-| Measure | Implementation |
-|---------|----------------|
-| **Confidentiality** | Employee NDAs, access based on role |
-| **Training** | Annual security and privacy training for staff |
+| Measure               | Implementation                                       |
+| --------------------- | ---------------------------------------------------- |
+| **Confidentiality**   | Employee NDAs, access based on role                  |
+| **Training**          | Annual security and privacy training for staff       |
 | **Incident Response** | 24/7 monitoring, breach notification within 72 hours |
-| **Data Minimization** | Emails auto-deleted after 90 days (configurable) |
-| **Vendor Management** | Sub-processor due diligence and contracts |
+| **Data Minimization** | Emails auto-deleted after 90 days (configurable)     |
+| **Vendor Management** | Sub-processor due diligence and contracts            |
 
 ### 4.3 Certifications & Compliance
 
@@ -172,16 +178,17 @@ Email Recipients (Students, Parents, Admins)
 
 Resend assists MirrorBuddy with GDPR data subject rights requests:
 
-| Right | Resend Support Mechanism |
-|-------|-------------------------|
-| **Access (Art 15)** | API logs available via dashboard, email content if within retention period |
-| **Rectification (Art 16)** | Not applicable (emails are immutable once sent) |
-| **Erasure (Art 17)** | Manual deletion via dashboard, API for automated deletion |
-| **Restriction (Art 18)** | API rate limiting, account suspension on request |
-| **Portability (Art 20)** | Export via API (JSON format) |
-| **Object (Art 21)** | Opt-out via unsubscribe (not applicable for transactional emails) |
+| Right                      | Resend Support Mechanism                                                   |
+| -------------------------- | -------------------------------------------------------------------------- |
+| **Access (Art 15)**        | API logs available via dashboard, email content if within retention period |
+| **Rectification (Art 16)** | Not applicable (emails are immutable once sent)                            |
+| **Erasure (Art 17)**       | Manual deletion via dashboard, API for automated deletion                  |
+| **Restriction (Art 18)**   | API rate limiting, account suspension on request                           |
+| **Portability (Art 20)**   | Export via API (JSON format)                                               |
+| **Object (Art 21)**        | Opt-out via unsubscribe (not applicable for transactional emails)          |
 
 **MirrorBuddy Implementation**:
+
 - User deletion request (`POST /api/privacy/delete-my-data`) triggers cascade deletion
 - Email records deleted from MirrorBuddy DB immediately (30-day grace period)
 - Resend logs auto-expire after 90 days (no manual deletion needed)
@@ -192,13 +199,13 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 
 ### 6.1 Resend Retention Policy
 
-| Data Type | Retention Period | Deletion Method |
-|-----------|-----------------|----------------|
-| **Email Content** | 30 days (default) | Automatic purge after expiry |
-| **Email Logs** | 90 days | Automatic purge after expiry |
-| **Bounce/Complaint Data** | 90 days | Automatic purge after expiry |
-| **API Logs** | 30 days | Automatic purge after expiry |
-| **Account Data** | Until account deletion | Manual deletion by Controller |
+| Data Type                 | Retention Period       | Deletion Method               |
+| ------------------------- | ---------------------- | ----------------------------- |
+| **Email Content**         | 30 days (default)      | Automatic purge after expiry  |
+| **Email Logs**            | 90 days                | Automatic purge after expiry  |
+| **Bounce/Complaint Data** | 90 days                | Automatic purge after expiry  |
+| **API Logs**              | 30 days                | Automatic purge after expiry  |
+| **Account Data**          | Until account deletion | Manual deletion by Controller |
 
 ### 6.2 MirrorBuddy Data Lifecycle
 
@@ -216,13 +223,14 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 
 ### 7.1 Email Types & Data Minimization
 
-| Email Type | Data Sent to Resend | PII Level |
-|------------|---------------------|-----------|
-| **Beta Invite Notification** | Admin email, invite request details | Low (admin only) |
-| **Approval Email** | User email, credentials (temporary link) | Medium (user email + token) |
-| **Password Reset** | User email, reset token (single-use) | Medium (user email + token) |
+| Email Type                   | Data Sent to Resend                      | PII Level                   |
+| ---------------------------- | ---------------------------------------- | --------------------------- |
+| **Beta Invite Notification** | Admin email, invite request details      | Low (admin only)            |
+| **Approval Email**           | User email, credentials (temporary link) | Medium (user email + token) |
+| **Password Reset**           | User email, reset token (single-use)     | Medium (user email + token) |
 
 **Data Minimization Practices**:
+
 - No user names in email content (use generic "Dear User")
 - No PII in subject lines (generic subjects like "MirrorBuddy Account Information")
 - Tokens are single-use and expire after 24 hours
@@ -247,6 +255,7 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 **Notification Method**: Email to designated contact (admin email) + dashboard alert
 
 **Information Provided**:
+
 - Nature of breach (unauthorized access, data exposure, etc.)
 - Categories and approximate number of data subjects affected
 - Likely consequences of the breach
@@ -255,6 +264,7 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 ### 8.2 MirrorBuddy Response
 
 **Internal Process**:
+
 1. Receive breach notification from Resend
 2. Assess impact (which users affected, what data exposed)
 3. Notify supervisory authority within **72 hours** (GDPR Article 33) if high risk
@@ -262,6 +272,7 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 5. Document breach in incident log (`/admin/safety`)
 
 **High Risk Criteria** (triggers user notification):
+
 - Password reset tokens exposed (risk of account takeover)
 - Email addresses + personal context exposed (risk of phishing)
 - Large-scale breach (>100 users affected)
@@ -282,16 +293,19 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 ### 9.2 Recommended Actions
 
 **Immediate**:
+
 - [x] Document DPA in `docs/compliance/dpa/RESEND-DPA.md` (this document)
 - [ ] Download official DPA PDF from Resend website for archival (if available)
 - [ ] Verify sender domain DNS records (SPF, DKIM, DMARC) are correctly configured
 
 **Quarterly**:
+
 - [ ] Review Resend sub-processor list for updates (check https://resend.com/legal/subprocessors)
 - [ ] Monitor Resend status page for security incidents (https://status.resend.com)
 - [ ] Test email delivery and bounce handling
 
 **Annual**:
+
 - [ ] Review DPA for changes (compare to archived version)
 - [ ] Reassess risk of US data transfers (Schrems II compliance)
 - [ ] Verify Resend certifications (SOC 2, ISO 27001) are current
@@ -302,20 +316,20 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 
 ### 10.1 Resend Contact Information
 
-| Purpose | Contact |
-|---------|---------|
-| **Privacy Inquiries** | privacy@resend.com |
-| **Security Issues** | security@resend.com |
-| **Support** | support@resend.com |
-| **DPA Questions** | dpa@resend.com (or privacy@resend.com) |
+| Purpose               | Contact                                |
+| --------------------- | -------------------------------------- |
+| **Privacy Inquiries** | privacy@resend.com                     |
+| **Security Issues**   | security@resend.com                    |
+| **Support**           | support@resend.com                     |
+| **DPA Questions**     | dpa@resend.com (or privacy@resend.com) |
 
 ### 10.2 MirrorBuddy DPA Management
 
-| Role | Responsibility |
-|------|---------------|
-| **DPO (Data Protection Officer)** | [To be assigned] |
-| **Technical Lead** | Review API integration, security configuration |
-| **Compliance Officer** | Annual DPA review, sub-processor monitoring |
+| Role                              | Responsibility                                 |
+| --------------------------------- | ---------------------------------------------- |
+| **DPO (Data Protection Officer)** | Roberto D'Angelo (Interim)                     |
+| **Technical Lead**                | Review API integration, security configuration |
+| **Compliance Officer**            | Annual DPA review, sub-processor monitoring    |
 
 ---
 
@@ -343,20 +357,20 @@ Resend assists MirrorBuddy with GDPR data subject rights requests:
 
 ## 12. Related Documentation
 
-| Document | Path | Purpose |
-|----------|------|---------|
-| **Service Audit** | `docs/operations/SERVICE-AUDIT-RESEND.md` | Operational limits, usage, monitoring |
-| **DPIA** | `docs/compliance/DPIA.md` | Overall data protection impact assessment |
-| **GDPR Compliance** | `docs/compliance/GDPR.md` | General GDPR framework |
-| **Email Implementation** | `src/lib/email/index.ts` | Technical integration code |
+| Document                 | Path                                      | Purpose                                   |
+| ------------------------ | ----------------------------------------- | ----------------------------------------- |
+| **Service Audit**        | `docs/operations/SERVICE-AUDIT-RESEND.md` | Operational limits, usage, monitoring     |
+| **DPIA**                 | `docs/compliance/DPIA.md`                 | Overall data protection impact assessment |
+| **GDPR Compliance**      | `docs/compliance/GDPR.md`                 | General GDPR framework                    |
+| **Email Implementation** | `src/lib/email/index.ts`                  | Technical integration code                |
 
 ---
 
 ## 13. Change Log
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0 | 21 January 2026 | Initial DPA documentation (T4-03) |
+| Version | Date            | Changes                           |
+| ------- | --------------- | --------------------------------- |
+| 1.0     | 21 January 2026 | Initial DPA documentation (T4-03) |
 
 ---
 

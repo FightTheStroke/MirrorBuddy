@@ -240,11 +240,11 @@ For accessibility issues or requests:
 
 ## Approval & Review
 
-| Role               | Name             | Date         | Signature |
-| ------------------ | ---------------- | ------------ | --------- |
-| Compliance Officer | [To be assigned] | January 2026 |           |
-| Product Manager    | [To be assigned] | January 2026 |           |
-| QA Lead            | [To be assigned] | January 2026 |           |
+| Role               | Name                       | Date         | Signature |
+| ------------------ | -------------------------- | ------------ | --------- |
+| Compliance Officer | Roberto D'Angelo (Interim) | January 2026 |           |
+| Product Manager    | Roberto D'Angelo (Interim) | January 2026 |           |
+| QA Lead            | Roberto D'Angelo (Interim) | January 2026 |           |
 
 ---
 

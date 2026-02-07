@@ -7,8 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **ESLint Hardening**: Promoted 5 security/compliance rules from `warn` to `error`: `require-csrf-mutating-routes`, `no-prisma-race-condition`, `detect-possible-timing-attacks`, `require-eventsource-cleanup`, `no-direct-localstorage`
+- **Compliance Matrix**: Updated country documentation paths to `docs-archive/compliance-countries/`, corrected AI Act status to "In Progress (Q2 2026)", documentation status to "Partial"
+- **Compliance Docs**: Replaced placeholder names/emails across all compliance documents with Roberto D'Angelo / FightTheStroke contacts
+
 ### Added
 
+- **Release Evidence Pack**: `scripts/release-evidence-pack.sh` collects lint, typecheck, unit tests, SBOM, npm audit, and CHANGELOG into a single audit trail document (`npm run release:evidence`)
+- **CI Evidence Pack Job**: Automatically generates evidence pack on tagged releases (v\*) with 365-day artifact retention
 - **iOS Release Pipeline**: Complete infrastructure for iOS app releases via TestFlight and App Store Connect
   - Documentation: `docs/claude/ios-release.md` guide covering prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
   - Configuration: Matchfile for certificate management (readonly mode for CI safety), Fastfile match integration (`sync_code_signing` before builds, `match_nuke` for certificate reset), environment variables (APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD)
