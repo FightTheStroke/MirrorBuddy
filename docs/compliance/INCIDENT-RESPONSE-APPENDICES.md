@@ -109,7 +109,7 @@ Thank you for your patience.
 **Email to: [DPA jurisdiction]**
 
 ```
-Subject: Data Breach Notification - [Company] Case #[INCIDENT_ID]
+Subject: Data Breach Notification - FightTheStroke Case #[INCIDENT_ID]
 
 Dear Data Protection Authority,
 
@@ -132,15 +132,15 @@ MEASURES TAKEN:
 - Prevention: [corrective measures]
 
 CONTACT:
-Name: [DPO name]
-Email: [dpo@company.com]
+Name: Roberto D'Angelo
+Email: roberdan@fightthestroke.org
 Phone: [number]
 
 Documentation: Attached
 Incident Report: Available upon request
 
 Best regards,
-[Company] Data Protection Officer
+FightTheStroke Data Protection Officer
 ```
 
 ### User Notification (Email Template)

@@ -415,8 +415,8 @@ Users can:
 | Role                              | Responsibility                      | Contact                       |
 | --------------------------------- | ----------------------------------- | ----------------------------- |
 | **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight | [To be assigned in CLAUDE.md] |
-| **Compliance Officer**            | Annual review, DPA management       | [To be assigned]              |
-| **Technical Lead**                | Service configuration, encryption   | [To be assigned]              |
+| **Compliance Officer**            | Annual review, DPA management       | Roberto D'Angelo (Interim)    |
+| **Technical Lead**                | Service configuration, encryption   | Roberto D'Angelo (Interim)    |
 
 ---
 

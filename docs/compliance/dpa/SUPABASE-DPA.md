@@ -13,6 +13,7 @@
 Supabase is our primary data processor for PostgreSQL database hosting and backend services. This document verifies GDPR compliance, Standard Contractual Clauses (SCC), sub-processor disclosure, and data residency.
 
 **Key Points**:
+
 - ✅ GDPR-compliant DPA available
 - ✅ EU data residency (Frankfurt region)
 - ✅ Standard Contractual Clauses (SCC) for EU-US transfers
@@ -26,6 +27,7 @@ Supabase is our primary data processor for PostgreSQL database hosting and backe
 ### 1.1 Availability
 
 Supabase provides a standard Data Processing Addendum (DPA) that covers:
+
 - GDPR Article 28 requirements
 - Data processor obligations
 - Sub-processor management
@@ -34,25 +36,27 @@ Supabase provides a standard Data Processing Addendum (DPA) that covers:
 - Data breach notification (Article 33)
 
 **Access**:
+
 - Available at: https://supabase.com/legal/dpa
 - Available upon request to enterprise@supabase.com
 - Automatically applies to all paid plans
 
 ### 1.2 Key Terms
 
-| Term | Value |
-|------|-------|
-| **Data Controller** | MirrorBuddy (client) |
-| **Data Processor** | Supabase Inc. |
-| **Processing Purpose** | Database hosting, backend services |
-| **Data Categories** | User profiles, session data, educational content |
-| **Data Subjects** | Students (including minors), parents, educators |
-| **Retention Period** | As specified by controller (MirrorBuddy) |
-| **Data Location** | EU (Frankfurt, Germany) - configurable |
+| Term                   | Value                                            |
+| ---------------------- | ------------------------------------------------ |
+| **Data Controller**    | MirrorBuddy (client)                             |
+| **Data Processor**     | Supabase Inc.                                    |
+| **Processing Purpose** | Database hosting, backend services               |
+| **Data Categories**    | User profiles, session data, educational content |
+| **Data Subjects**      | Students (including minors), parents, educators  |
+| **Retention Period**   | As specified by controller (MirrorBuddy)         |
+| **Data Location**      | EU (Frankfurt, Germany) - configurable           |
 
 ### 1.3 Security Measures (Article 32)
 
 Supabase implements:
+
 - **Encryption**: TLS 1.3 in transit, AES-256 at rest
 - **Access Control**: Row-level security (RLS), IAM policies
 - **Certifications**: SOC 2 Type II, ISO 27001 (in progress)
@@ -68,20 +72,20 @@ Supabase discloses the following sub-processors (as of January 2026):
 
 ### 2.1 Infrastructure Providers
 
-| Sub-Processor | Service | Data Location | Purpose | SCC |
-|---------------|---------|---------------|---------|-----|
-| **Amazon Web Services (AWS)** | Cloud Infrastructure | EU (Frankfurt) | Database hosting, storage | ✅ Yes |
-| **Fly.io** | Edge Compute | Global (EU nodes) | Edge functions, real-time | ✅ Yes |
-| **Cloudflare** | CDN & DDoS Protection | Global (EU PoP) | Traffic routing, security | ✅ Yes |
-| **Google Cloud Platform** | Analytics, Logging | EU (Belgium) | Observability stack | ✅ Yes |
+| Sub-Processor                 | Service               | Data Location     | Purpose                   | SCC    |
+| ----------------------------- | --------------------- | ----------------- | ------------------------- | ------ |
+| **Amazon Web Services (AWS)** | Cloud Infrastructure  | EU (Frankfurt)    | Database hosting, storage | ✅ Yes |
+| **Fly.io**                    | Edge Compute          | Global (EU nodes) | Edge functions, real-time | ✅ Yes |
+| **Cloudflare**                | CDN & DDoS Protection | Global (EU PoP)   | Traffic routing, security | ✅ Yes |
+| **Google Cloud Platform**     | Analytics, Logging    | EU (Belgium)      | Observability stack       | ✅ Yes |
 
 ### 2.2 Operational Sub-Processors
 
-| Sub-Processor | Service | Purpose | Data Access |
-|---------------|---------|---------|-------------|
-| **Stripe** | Payment Processing | Billing (if applicable) | Payment metadata only |
-| **SendGrid** | Email Delivery | Transactional emails | Email addresses only |
-| **PagerDuty** | Incident Management | On-call alerting | Incident metadata only |
+| Sub-Processor | Service             | Purpose                 | Data Access            |
+| ------------- | ------------------- | ----------------------- | ---------------------- |
+| **Stripe**    | Payment Processing  | Billing (if applicable) | Payment metadata only  |
+| **SendGrid**  | Email Delivery      | Transactional emails    | Email addresses only   |
+| **PagerDuty** | Incident Management | On-call alerting        | Incident metadata only |
 
 ### 2.3 Sub-Processor Management
 
@@ -97,6 +101,7 @@ Supabase discloses the following sub-processors (as of January 2026):
 ### 3.1 Primary Data Location
 
 **MirrorBuddy Configuration**:
+
 - **Region**: `eu-central-1` (Frankfurt, Germany)
 - **Provider**: AWS EU data centers
 - **Jurisdiction**: EU (GDPR applies)
@@ -104,15 +109,16 @@ Supabase discloses the following sub-processors (as of January 2026):
 
 ### 3.2 Cross-Border Transfers
 
-| Scenario | Mechanism | Risk |
-|----------|-----------|------|
-| **EU to EU** | No transfer (same jurisdiction) | ✅ Low |
-| **EU to US (AWS)** | Standard Contractual Clauses (SCC) | ⚠️ Mitigated |
-| **EU to US (Support)** | SCC + additional safeguards | ⚠️ Mitigated |
+| Scenario               | Mechanism                          | Risk         |
+| ---------------------- | ---------------------------------- | ------------ |
+| **EU to EU**           | No transfer (same jurisdiction)    | ✅ Low       |
+| **EU to US (AWS)**     | Standard Contractual Clauses (SCC) | ⚠️ Mitigated |
+| **EU to US (Support)** | SCC + additional safeguards        | ⚠️ Mitigated |
 
 ### 3.3 Standard Contractual Clauses (SCC)
 
 Supabase implements:
+
 - **EU Commission SCCs**: Module 2 (Controller-to-Processor) and Module 3 (Processor-to-Sub-Processor)
 - **Transfer Impact Assessment (TIA)**: Conducted for US-based sub-processors
 - **Additional Safeguards**: Encryption, access controls, US government request resistance
@@ -126,14 +132,14 @@ Supabase implements:
 
 Supabase supports GDPR data subject rights through:
 
-| Right | Mechanism |
-|-------|-----------|
-| **Access (Art. 15)** | API for data export, dashboard queries |
-| **Rectification (Art. 16)** | Direct database updates via API |
-| **Erasure (Art. 17)** | Hard delete with `DELETE CASCADE` |
-| **Portability (Art. 20)** | JSON export via API |
-| **Restriction (Art. 18)** | Row-level security policies |
-| **Objection (Art. 21)** | Manual processing flag support |
+| Right                       | Mechanism                              |
+| --------------------------- | -------------------------------------- |
+| **Access (Art. 15)**        | API for data export, dashboard queries |
+| **Rectification (Art. 16)** | Direct database updates via API        |
+| **Erasure (Art. 17)**       | Hard delete with `DELETE CASCADE`      |
+| **Portability (Art. 20)**   | JSON export via API                    |
+| **Restriction (Art. 18)**   | Row-level security policies            |
+| **Objection (Art. 21)**     | Manual processing flag support         |
 
 **Implementation**: MirrorBuddy's `/api/privacy/export-data` and user dashboard
 
@@ -176,13 +182,13 @@ Supabase supports GDPR data subject rights through:
 
 ### 7.1 Retention Policies
 
-| Data Type | Retention Period | Basis |
-|-----------|------------------|-------|
-| **User Accounts** | Until account deletion | User consent |
-| **Session Data** | 30 days after session end | Legitimate interest (analytics) |
-| **Conversation History** | User-controlled (delete anytime) | User consent |
-| **Audit Logs** | 90 days | Legal obligation (GDPR Art. 30) |
-| **Backups** | 30 days (rolling) | Business continuity |
+| Data Type                | Retention Period                 | Basis                           |
+| ------------------------ | -------------------------------- | ------------------------------- |
+| **User Accounts**        | Until account deletion           | User consent                    |
+| **Session Data**         | 30 days after session end        | Legitimate interest (analytics) |
+| **Conversation History** | User-controlled (delete anytime) | User consent                    |
+| **Audit Logs**           | 90 days                          | Legal obligation (GDPR Art. 30) |
+| **Backups**              | 30 days (rolling)                | Business continuity             |
 
 ### 7.2 Deletion Process
 
@@ -197,12 +203,12 @@ Supabase supports GDPR data subject rights through:
 
 ## 8. Security Certifications
 
-| Certification | Status | Audit Date | Next Review |
-|---------------|--------|------------|-------------|
-| **SOC 2 Type II** | ✅ Active | 2025-Q4 | 2026-Q4 |
-| **ISO 27001** | 🔄 In Progress | 2026-Q2 (expected) | TBD |
-| **GDPR Compliance** | ✅ Active | Ongoing | Continuous |
-| **PCI DSS** | N/A | Not applicable | (No card storage) |
+| Certification       | Status         | Audit Date         | Next Review       |
+| ------------------- | -------------- | ------------------ | ----------------- |
+| **SOC 2 Type II**   | ✅ Active      | 2025-Q4            | 2026-Q4           |
+| **ISO 27001**       | 🔄 In Progress | 2026-Q2 (expected) | TBD               |
+| **GDPR Compliance** | ✅ Active      | Ongoing            | Continuous        |
+| **PCI DSS**         | N/A            | Not applicable     | (No card storage) |
 
 **Documentation**: Available in Supabase Trust Center
 
@@ -257,6 +263,7 @@ if (process.env.SUPABASE_CA_CERT) {
 ### 10.3 Row-Level Security (RLS)
 
 All tables enforce RLS policies:
+
 ```sql
 -- Example: Users can only access their own data
 CREATE POLICY "Users view own data"
@@ -269,16 +276,16 @@ CREATE POLICY "Users view own data"
 
 ## 11. Compliance Checklist
 
-| Requirement | Status | Evidence |
-|-------------|--------|----------|
-| ✅ DPA signed | Active | This document |
-| ✅ EU data residency | Frankfurt | Database config |
-| ✅ SCC for US transfers | Active | DPA Annex II |
-| ✅ Sub-processors disclosed | Listed | Section 2 |
-| ✅ Data breach notification | 72h SLA | DPA clause |
-| ✅ Audit rights | SOC 2 available | Section 6 |
-| ✅ Data deletion support | API implemented | `/api/privacy/delete-account` |
-| ✅ Encryption at rest/transit | AES-256/TLS 1.3 | Section 1.3 |
+| Requirement                   | Status          | Evidence                      |
+| ----------------------------- | --------------- | ----------------------------- |
+| ✅ DPA signed                 | Active          | This document                 |
+| ✅ EU data residency          | Frankfurt       | Database config               |
+| ✅ SCC for US transfers       | Active          | DPA Annex II                  |
+| ✅ Sub-processors disclosed   | Listed          | Section 2                     |
+| ✅ Data breach notification   | 72h SLA         | DPA clause                    |
+| ✅ Audit rights               | SOC 2 available | Section 6                     |
+| ✅ Data deletion support      | API implemented | `/api/privacy/delete-account` |
+| ✅ Encryption at rest/transit | AES-256/TLS 1.3 | Section 1.3                   |
 
 ---
 
@@ -293,8 +300,8 @@ CREATE POLICY "Users view own data"
 
 ### MirrorBuddy Internal
 
-- **DPO**: [To be assigned]
-- **Security Lead**: [To be assigned]
+- **DPO**: Roberto D'Angelo (Interim)
+- **Security Lead**: Roberto D'Angelo (Interim)
 - **Escalation Path**: See `docs/operations/RUNBOOK.md`
 
 ---

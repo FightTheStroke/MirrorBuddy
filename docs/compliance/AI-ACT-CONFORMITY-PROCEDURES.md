@@ -127,13 +127,13 @@
 
 ## Approval Sign-Off for Procedures
 
-| Role                     | Name             | Date | Status  |
-| ------------------------ | ---------------- | ---- | ------- |
-| **Compliance Officer**   | [To be assigned] | --   | Pending |
-| **Legal Counsel**        | [To be assigned] | --   | Pending |
-| **CISO / Security Lead** | [To be assigned] | --   | Pending |
-| **Product Manager**      | [To be assigned] | --   | Pending |
-| **CEO / Product Owner**  | [To be assigned] | --   | Pending |
+| Role                     | Name                       | Date       | Status |
+| ------------------------ | -------------------------- | ---------- | ------ |
+| **Compliance Officer**   | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **Legal Counsel**        | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **CISO / Security Lead** | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **Product Manager**      | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
+| **CEO / Product Owner**  | Roberto D'Angelo (Interim) | 2026-02-07 | Active |
 
 ---
 
