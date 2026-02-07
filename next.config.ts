@@ -62,13 +62,15 @@ const nextConfig: NextConfig = {
   },
 
   // Ensure standalone output includes transitive deps needed at runtime
-  // isomorphic-dompurify -> jsdom -> undici (not auto-traced by Next.js)
+  // isomorphic-dompurify -> jsdom@28 -> undici@7.21 (nested, has wrap-handler.js)
+  // Root undici@6.23 (from cheerio) lacks wrap-handler.js — must include nested version
   outputFileTracingIncludes: {
     "/**": [
-      "./node_modules/undici/**",
       "./node_modules/jsdom/**",
       "./node_modules/isomorphic-dompurify/**",
       "./node_modules/parse5/**",
+      "./node_modules/undici/**",
+      "./node_modules/isomorphic-dompurify/node_modules/**",
     ],
   },
 
