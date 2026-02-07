@@ -26,8 +26,10 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-const mockSendCampaign = vi.fn();
-const mockLogAdminAction = vi.fn();
+const { mockSendCampaign, mockLogAdminAction } = vi.hoisted(() => ({
+  mockSendCampaign: vi.fn(),
+  mockLogAdminAction: vi.fn(),
+}));
 
 vi.mock("@/lib/email/campaign-service", () => ({
   sendCampaign: (...args: unknown[]) => mockSendCampaign(...args),

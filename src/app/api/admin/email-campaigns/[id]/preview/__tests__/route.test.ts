@@ -26,7 +26,9 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-const mockGetRecipientPreview = vi.fn();
+const { mockGetRecipientPreview } = vi.hoisted(() => ({
+  mockGetRecipientPreview: vi.fn(),
+}));
 
 vi.mock("@/lib/email/campaign-service", () => ({
   getRecipientPreview: (...args: unknown[]) => mockGetRecipientPreview(...args),

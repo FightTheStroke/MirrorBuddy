@@ -10,7 +10,9 @@ import { prisma } from "@/lib/db";
 import { EmailRecipientStatus } from "@prisma/client";
 
 // Mock svix Webhook class
-const mockVerify = vi.fn();
+const { mockVerify } = vi.hoisted(() => ({
+  mockVerify: vi.fn(),
+}));
 vi.mock("svix", () => ({
   Webhook: vi.fn(() => ({
     verify: mockVerify,

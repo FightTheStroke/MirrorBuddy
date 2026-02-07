@@ -6,7 +6,9 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { TemplatesTable } from "../templates-table";
 
-const mockCsrfFetch = vi.fn();
+const { mockCsrfFetch } = vi.hoisted(() => ({
+  mockCsrfFetch: vi.fn(),
+}));
 vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));

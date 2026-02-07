@@ -13,23 +13,24 @@ vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
 }));
 
+// Hoist mock variables before vi.mock calls (Vitest hoists vi.mock to top of file)
+const { mockCsrfFetch, mockToast, mockPush } = vi.hoisted(() => ({
+  mockCsrfFetch: vi.fn(),
+  mockToast: { success: vi.fn(), error: vi.fn() },
+  mockPush: vi.fn(),
+}));
+
 // Mock csrfFetch
-const mockCsrfFetch = vi.fn();
 vi.mock("@/lib/auth/csrf-client", () => ({
   csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
 }));
 
 // Mock toast
-const mockToast = {
-  success: vi.fn(),
-  error: vi.fn(),
-};
 vi.mock("@/components/ui/toast", () => ({
   toast: mockToast,
 }));
 
 // Mock router
-const mockPush = vi.fn();
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
 }));

@@ -14,11 +14,12 @@ import {
   type EmailPreferences,
 } from "../preference-service";
 
-// Mock crypto module
+// Mock crypto module (default export required for Node crypto compatibility)
 vi.mock("crypto", async (importOriginal) => {
   const actual = await importOriginal<typeof import("crypto")>();
   return {
     ...actual,
+    default: actual,
     randomUUID: vi.fn(),
   };
 });

@@ -26,9 +26,25 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-const mockListCampaigns = vi.fn();
-const mockCreateCampaign = vi.fn();
-const mockLogAdminAction = vi.fn();
+// Mock auth and CSRF
+vi.mock("@/lib/auth/session-auth", () => ({
+  validateAdminAuth: vi.fn().mockResolvedValue({
+    authenticated: true,
+    isAdmin: true,
+    userId: "admin-123",
+  }),
+}));
+
+vi.mock("@/lib/security/csrf", () => ({
+  requireCSRF: vi.fn().mockReturnValue(true),
+}));
+
+const { mockListCampaigns, mockCreateCampaign, mockLogAdminAction } =
+  vi.hoisted(() => ({
+    mockListCampaigns: vi.fn(),
+    mockCreateCampaign: vi.fn(),
+    mockLogAdminAction: vi.fn(),
+  }));
 
 vi.mock("@/lib/email/campaign-service", () => ({
   listCampaigns: (...args: unknown[]) => mockListCampaigns(...args),

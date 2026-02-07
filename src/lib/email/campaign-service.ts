@@ -344,6 +344,19 @@ export async function sendCampaign(campaignId: string): Promise<void> {
     const { renderTemplate } = await import("./template-service");
     const { sendEmail } = await import("./index");
 
+    // Validate template category maps to a known preference key
+    const validCategories = [
+      "productUpdates",
+      "educationalNewsletter",
+      "announcements",
+    ];
+    const emailCategory = validCategories.includes(campaign.template.category)
+      ? (campaign.template.category as
+          | "productUpdates"
+          | "educationalNewsletter"
+          | "announcements")
+      : "announcements"; // Fallback to announcements for unmapped categories
+
     // Process recipients sequentially
     let sentCount = 0;
     let failedCount = 0;
@@ -374,23 +387,14 @@ export async function sendCampaign(campaignId: string): Promise<void> {
           continue;
         }
 
-        // Get user preferences
-        const preferences = await getPreferences(recipient.id);
-
-        // Check if can send to this user for this category
-        const canSend = await canSendTo(
-          recipient.id,
-          campaign.template.category as
-            | "productUpdates"
-            | "educationalNewsletter"
-            | "announcements",
-        );
+        // Check if can send to this user (creates default prefs if missing)
+        const canSend = await canSendTo(recipient.id, emailCategory);
 
         if (!canSend) {
           logger.info("User has opted out, skipping", {
             campaignId,
             userId: recipient.id,
-            category: campaign.template.category,
+            category: emailCategory,
           });
 
           await prisma.emailRecipient.create({
@@ -406,9 +410,10 @@ export async function sendCampaign(campaignId: string): Promise<void> {
           continue;
         }
 
-        // Build unsubscribe URL from preferences token
+        // Re-fetch preferences to get valid token (canSendTo may have created defaults)
+        const preferences = await getPreferences(recipient.id);
         const unsubscribeToken = preferences?.unsubscribeToken || "no-token";
-        const unsubscribeUrl = `${appUrl}/unsubscribe?token=${unsubscribeToken}&category=${campaign.template.category}`;
+        const unsubscribeUrl = `${appUrl}/unsubscribe?token=${unsubscribeToken}&category=${emailCategory}`;
 
         // Prepare template variables
         const variables: Record<string, string> = {
