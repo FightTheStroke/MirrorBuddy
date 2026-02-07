@@ -63,7 +63,8 @@ const nextConfig: NextConfig = {
 
   // Ensure standalone output includes transitive deps needed at runtime
   // isomorphic-dompurify -> jsdom@28 -> undici@7.21 (nested, has wrap-handler.js)
-  // Root undici@6.23 (from cheerio) lacks wrap-handler.js — DO NOT include it
+  // Root undici@6.23 (from cheerio) lacks wrap-handler.js
+  // postbuild script (fix-standalone-undici.js) copies undici@7.21 to Turbopack externals
   outputFileTracingIncludes: {
     "/**": [
       "./node_modules/jsdom/**",
@@ -71,10 +72,6 @@ const nextConfig: NextConfig = {
       "./node_modules/isomorphic-dompurify/node_modules/**",
       "./node_modules/parse5/**",
     ],
-  },
-  // Exclude root undici@6.23 — jsdom@28 needs undici@7.21 (nested under isomorphic-dompurify)
-  outputFileTracingExcludes: {
-    "/**": ["./node_modules/undici/**"],
   },
 
   // Image optimization settings
