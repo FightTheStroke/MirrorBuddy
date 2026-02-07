@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### W1-Mobile-Build
+
+- Fixed: Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
+- Added: Mobile build scripts (build:mobile:web, build:mobile:ios, build:mobile:android, cap:sync, cap:copy)
+- Added: Fastlane configuration for iOS TestFlight and Android Play Store internal testing
+- Fixed: manifest.json lang changed from 'it' to 'en', added related_applications for iOS/Android stores
+- Added: App store metadata templates (iOS and Android descriptions in 5 languages, screenshot dimensions guide)
+- Added: Comprehensive mobile build guide (docs/mobile/BUILD-GUIDE.md)
+
 ## [0.13.0] - 2026-02-06
 
 ### W6: GTM Ready (Landing Page, Schools, Admin)

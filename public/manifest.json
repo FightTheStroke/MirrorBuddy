@@ -37,5 +37,17 @@
     }
   ],
   "categories": ["education", "productivity"],
-  "lang": "it"
+  "lang": "en",
+  "related_applications": [
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/org.fightthestroke.mirrorbuddy"
+    },
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=org.fightthestroke.mirrorbuddy",
+      "id": "org.fightthestroke.mirrorbuddy"
+    }
+  ],
+  "prefer_related_applications": false
 }

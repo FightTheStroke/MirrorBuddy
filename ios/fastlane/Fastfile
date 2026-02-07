@@ -1,0 +1,138 @@
+# Fastlane Fastfile - iOS Configuration
+# MirrorBuddy - La Scuola Che Vorrei
+#
+# This file contains the fastlane.tools configuration for iOS builds
+# You can find the documentation at https://docs.fastlane.tools
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Push a new beta build to TestFlight"
+  lane :beta do
+    # Ensure we have the latest code
+    ensure_git_status_clean
+
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "App/App.xcodeproj"
+    )
+
+    # Build the app
+    build_app(
+      workspace: "App/App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "org.fightthestroke.mirrorbuddy" => "match AppStore org.fightthestroke.mirrorbuddy"
+        }
+      }
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      changelog: "Bug fixes and improvements"
+    )
+
+    # Commit version bump
+    commit_version_bump(
+      message: "Bump iOS build number [skip ci]",
+      xcodeproj: "App/App.xcodeproj",
+      force: true
+    )
+
+    # Add a git tag for this build
+    add_git_tag(
+      grouping: "ios-beta",
+      build_number: get_build_number(xcodeproj: "App/App.xcodeproj")
+    )
+
+    # Push to git
+    push_to_git_remote(
+      tags: true
+    )
+  end
+
+  desc "Push a new release build to TestFlight for external testing"
+  lane :release do
+    # Ensure we have the latest code
+    ensure_git_status_clean
+
+    # Increment version number
+    increment_version_number(
+      xcodeproj: "App/App.xcodeproj",
+      bump_type: "patch"
+    )
+
+    # Increment build number
+    increment_build_number(
+      xcodeproj: "App/App.xcodeproj"
+    )
+
+    # Build the app
+    build_app(
+      workspace: "App/App.xcworkspace",
+      scheme: "App",
+      export_method: "app-store",
+      export_options: {
+        provisioningProfiles: {
+          "org.fightthestroke.mirrorbuddy" => "match AppStore org.fightthestroke.mirrorbuddy"
+        }
+      }
+    )
+
+    # Upload to TestFlight for external testing
+    upload_to_testflight(
+      skip_waiting_for_build_processing: false,
+      skip_submission: false,
+      distribute_external: true,
+      notify_external_testers: true,
+      changelog: "New release ready for testing"
+    )
+
+    # Commit version bump
+    commit_version_bump(
+      message: "Bump iOS version and build number [skip ci]",
+      xcodeproj: "App/App.xcodeproj",
+      force: true
+    )
+
+    # Add a git tag for this release
+    add_git_tag(
+      grouping: "ios-release",
+      build_number: get_build_number(xcodeproj: "App/App.xcodeproj")
+    )
+
+    # Push to git
+    push_to_git_remote(
+      tags: true
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    run_tests(
+      workspace: "App/App.xcworkspace",
+      scheme: "App",
+      devices: ["iPhone 15"]
+    )
+  end
+
+  desc "Take screenshots"
+  lane :screenshots do
+    capture_screenshots(
+      workspace: "App/App.xcworkspace",
+      scheme: "App"
+    )
+  end
+
+  # Error handling
+  error do |lane, exception|
+    # Slack or other notification service can be added here
+    UI.error("Error in lane #{lane}: #{exception.message}")
+  end
+end

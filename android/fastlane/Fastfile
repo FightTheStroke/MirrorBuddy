@@ -1,0 +1,137 @@
+# Fastlane Fastfile - Android Configuration
+# MirrorBuddy - La Scuola Che Vorrei
+#
+# This file contains the fastlane.tools configuration for Android builds
+# You can find the documentation at https://docs.fastlane.tools
+
+default_platform(:android)
+
+platform :android do
+  desc "Deploy a new beta version to Google Play Internal Testing"
+  lane :beta do
+    # Ensure we have the latest code
+    ensure_git_status_clean
+
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "app/build.gradle"
+    )
+
+    # Build the release APK/AAB
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+
+    # Upload to Google Play Internal Testing
+    upload_to_play_store(
+      track: "internal",
+      release_status: "draft",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+
+    # Commit version bump
+    git_commit(
+      path: ["app/build.gradle"],
+      message: "Bump Android version code [skip ci]"
+    )
+
+    # Add a git tag for this build
+    add_git_tag(
+      grouping: "android-beta",
+      build_number: get_version_code(gradle_file_path: "app/build.gradle")
+    )
+
+    # Push to git
+    push_to_git_remote(
+      tags: true
+    )
+  end
+
+  desc "Deploy a new release version to Google Play Beta Testing"
+  lane :release do
+    # Ensure we have the latest code
+    ensure_git_status_clean
+
+    # Increment version name (e.g., 1.0.0 -> 1.0.1)
+    increment_version_name(
+      gradle_file_path: "app/build.gradle",
+      bump_type: "patch"
+    )
+
+    # Increment version code
+    increment_version_code(
+      gradle_file_path: "app/build.gradle"
+    )
+
+    # Build the release AAB
+    gradle(
+      task: "bundle",
+      build_type: "Release",
+      properties: {
+        "android.injected.signing.store.file" => ENV["ANDROID_KEYSTORE_FILE"],
+        "android.injected.signing.store.password" => ENV["ANDROID_KEYSTORE_PASSWORD"],
+        "android.injected.signing.key.alias" => ENV["ANDROID_KEY_ALIAS"],
+        "android.injected.signing.key.password" => ENV["ANDROID_KEY_PASSWORD"]
+      }
+    )
+
+    # Upload to Google Play Beta Testing
+    upload_to_play_store(
+      track: "beta",
+      release_status: "completed",
+      aab: lane_context[SharedValues::GRADLE_AAB_OUTPUT_PATH],
+      skip_upload_metadata: false,
+      skip_upload_images: false,
+      skip_upload_screenshots: false
+    )
+
+    # Commit version bump
+    git_commit(
+      path: ["app/build.gradle"],
+      message: "Bump Android version name and code [skip ci]"
+    )
+
+    # Add a git tag for this release
+    add_git_tag(
+      grouping: "android-release",
+      build_number: get_version_code(gradle_file_path: "app/build.gradle")
+    )
+
+    # Push to git
+    push_to_git_remote(
+      tags: true
+    )
+  end
+
+  desc "Run tests"
+  lane :test do
+    gradle(
+      task: "test",
+      build_type: "Debug"
+    )
+  end
+
+  desc "Build debug APK"
+  lane :debug do
+    gradle(
+      task: "assemble",
+      build_type: "Debug"
+    )
+  end
+
+  # Error handling
+  error do |lane, exception|
+    # Slack or other notification service can be added here
+    UI.error("Error in lane #{lane}: #{exception.message}")
+  end
+end

@@ -29,7 +29,12 @@
     "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "start": "node .next/standalone/server.js",
-    "build:mobile": "next build && npx cap copy && npx cap sync",
+    "build:mobile:web": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build --config-file next.config.mobile.ts",
+    "build:mobile": "npm run build:mobile:web && npx cap copy && npx cap sync",
+    "build:mobile:ios": "./scripts/mobile-build.sh ios",
+    "build:mobile:android": "./scripts/mobile-build.sh android",
+    "cap:sync": "npx cap sync",
+    "cap:copy": "npx cap copy",
     "open:ios": "npx cap open ios",
     "open:android": "npx cap open android",
     "lint": "tsx scripts/lint-redirect-metadata.tsx && eslint",
@@ -88,6 +93,7 @@
     "lodash-es": "4.17.23"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.73.0",
     "@azure/monitor-opentelemetry-exporter": "^1.0.0-beta.32",
     "@capacitor/camera": "^8.0.0",
     "@opentelemetry/api": "^1.9.0",

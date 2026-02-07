@@ -1,0 +1,8 @@
+# Fastlane Appfile - Android Configuration
+# MirrorBuddy - La Scuola Che Vorrei
+
+json_key_file(ENV["GOOGLE_PLAY_JSON_KEY_FILE"]) # Path to the json secret file
+package_name("org.fightthestroke.mirrorbuddy") # e.g. com.example.app
+
+# For more information about the Appfile, see:
+# https://docs.fastlane.tools/advanced/#appfile
