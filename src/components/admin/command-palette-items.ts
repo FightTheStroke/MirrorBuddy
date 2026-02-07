@@ -20,6 +20,7 @@ import {
   CreditCard,
   Key,
   Mail,
+  Send,
   FunnelIcon as Funnel,
   Search,
   UserCheck,
@@ -212,6 +213,30 @@ export function getCommandItems(t: (key: string) => string): CommandItem[] {
       section: "navigation",
       icon: Mail,
       href: "/admin/mission-control/ai-email",
+    },
+    {
+      id: "nav-templates",
+      label: "Templates",
+      section: "navigation",
+      icon: Mail,
+      href: "/admin/communications/templates",
+      keywords: ["email", "communications"],
+    },
+    {
+      id: "nav-campaigns",
+      label: "Campaigns",
+      section: "navigation",
+      icon: Send,
+      href: "/admin/communications/campaigns",
+      keywords: ["email", "communications", "send"],
+    },
+    {
+      id: "nav-stats",
+      label: "Statistics",
+      section: "navigation",
+      icon: BarChart3,
+      href: "/admin/communications/stats",
+      keywords: ["email", "communications", "analytics"],
     },
     // Quick actions
     {

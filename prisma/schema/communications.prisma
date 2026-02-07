@@ -1,0 +1,149 @@
+// ============================================================================
+// EMAIL COMMUNICATIONS DOMAIN
+// Email templates, campaigns, preferences, and event tracking
+// ============================================================================
+
+// Email campaign status lifecycle
+enum EmailCampaignStatus {
+  DRAFT
+  SENDING
+  SENT
+  FAILED
+}
+
+// Email recipient status tracking
+enum EmailRecipientStatus {
+  PENDING
+  SENT
+  DELIVERED
+  OPENED
+  BOUNCED
+  FAILED
+}
+
+// Email delivery and engagement events
+enum EmailEventType {
+  DELIVERED
+  OPENED
+  BOUNCED
+  COMPLAINED
+}
+
+// Email template with variable substitution support
+model EmailTemplate {
+  id       String  @id @default(cuid())
+  name     String  @unique
+  subject  String
+  htmlBody String
+  textBody String
+  category String
+
+  // JSON array of variable names used in template (e.g., ["firstName", "unsubscribeUrl"])
+  variables Json    @default("[]")
+
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  campaigns EmailCampaign[]
+
+  @@index([category])
+  @@index([isActive])
+  @@map("email_templates")
+}
+
+// Email campaign management
+model EmailCampaign {
+  id         String               @id @default(cuid())
+  name       String
+  templateId String
+  template   EmailTemplate        @relation(fields: [templateId], references: [id], onDelete: Restrict)
+
+  // JSON filter criteria for recipient selection (e.g., {"tier": "pro", "locale": "it"})
+  filters Json                  @default("{}")
+
+  status      EmailCampaignStatus @default(DRAFT)
+  sentCount   Int                 @default(0)
+  failedCount Int                 @default(0)
+
+  createdAt DateTime  @default(now())
+  sentAt    DateTime?
+
+  adminId String
+
+  recipients EmailRecipient[]
+
+  @@index([status])
+  @@index([adminId])
+  @@index([createdAt])
+  @@map("email_campaigns")
+}
+
+// Individual email recipient tracking
+model EmailRecipient {
+  id         String               @id @default(cuid())
+  campaignId String
+  campaign   EmailCampaign        @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  userId String?
+  email  String
+
+  status EmailRecipientStatus @default(PENDING)
+
+  // Resend.com message ID for webhook correlation
+  resendMessageId String?
+
+  sentAt      DateTime?
+  deliveredAt DateTime?
+  openedAt    DateTime?
+  bouncedAt   DateTime?
+
+  events EmailEvent[]
+
+  @@index([campaignId])
+  @@index([userId])
+  @@index([status])
+  @@index([resendMessageId])
+  @@map("email_recipients")
+}
+
+// User email preferences (opt-in/opt-out)
+model EmailPreference {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Preference categories
+  productUpdates        Boolean @default(true)
+  educationalNewsletter Boolean @default(true)
+  announcements         Boolean @default(true)
+
+  // Secure unsubscribe token
+  unsubscribeToken String   @unique @default(cuid())
+
+  consentedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+  @@index([unsubscribeToken])
+  @@map("email_preferences")
+}
+
+// Email delivery events from Resend webhooks
+model EmailEvent {
+  id          String         @id @default(cuid())
+  recipientId String
+  recipient   EmailRecipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  eventType EmailEventType
+
+  // Full webhook payload from Resend
+  payload Json @default("{}")
+
+  receivedAt DateTime @default(now())
+
+  @@index([recipientId])
+  @@index([eventType])
+  @@index([receivedAt])
+  @@map("email_events")
+}

@@ -1,0 +1,37 @@
+{
+  "email": {
+    "unsubscribe": {
+      "title": "Gestisci le tue preferenze email",
+      "description": "Personalizza le comunicazioni che desideri ricevere da MirrorBuddy",
+      "loading": "Caricamento preferenze...",
+      "invalidToken": "Token non valido o scaduto",
+      "invalidTokenDescription": "Il link che hai utilizzato non è valido o è scaduto. Se hai bisogno di aiuto, contattaci.",
+      "categories": {
+        "productUpdates": {
+          "label": "Aggiornamenti prodotto",
+          "description": "Novità, funzionalità e miglioramenti della piattaforma"
+        },
+        "educationalNewsletter": {
+          "label": "Newsletter educativa",
+          "description": "Contenuti didattici, risorse e consigli per l'apprendimento"
+        },
+        "announcements": {
+          "label": "Annunci importanti",
+          "description": "Comunicazioni critiche sul servizio e sulla sicurezza"
+        }
+      },
+      "saveButton": "Salva preferenze",
+      "saving": "Salvataggio...",
+      "successTitle": "Preferenze salvate",
+      "successMessage": "Le tue preferenze email sono state aggiornate con successo",
+      "errorTitle": "Errore",
+      "errorMessage": "Non è stato possibile salvare le preferenze. Riprova più tardi.",
+      "backToHome": "Torna alla home",
+      "footer": {
+        "privacy": "Rispettiamo la tua privacy e i tuoi dati secondo GDPR.",
+        "contact": "Hai domande? Contattaci all'indirizzo",
+        "resubscribe": "Puoi modificare queste preferenze in qualsiasi momento usando il link nelle nostre email."
+      }
+    }
+  }
+}
