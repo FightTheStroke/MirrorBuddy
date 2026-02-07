@@ -66,8 +66,8 @@ vi.mock("@/lib/security/csrf", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { verifyPassword } from "@/lib/auth";
-import { signCookieValue } from "@/lib/auth";
+import { verifyPassword } from "@/lib/auth/server";
+import { signCookieValue } from "@/lib/auth/server";
 
 const mockPrismaFindFirst = prisma.user.findFirst as ReturnType<typeof vi.fn>;
 const mockVerifyPassword = verifyPassword as ReturnType<typeof vi.fn>;

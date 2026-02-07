@@ -5,8 +5,8 @@
  */
 
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth";
-import { canAccessFullFeatures } from "@/lib/compliance";
+import { validateAuth } from "@/lib/auth/server";
+import { canAccessFullFeatures } from "@/lib/compliance/server";
 
 /**
  * Extract userId from validated authentication

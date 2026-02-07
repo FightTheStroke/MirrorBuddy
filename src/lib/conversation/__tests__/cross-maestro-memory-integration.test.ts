@@ -57,7 +57,7 @@ vi.mock("@/lib/safety/safety-prompts", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 import { getTierMemoryLimits } from "../tier-memory-config";
 import { getMaestroById } from "@/data/maestri";
 

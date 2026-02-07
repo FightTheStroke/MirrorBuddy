@@ -1,4 +1,4 @@
-import { validateAdminAuth } from "@/lib/auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { LocaleForm } from "@/components/admin/locale-form";

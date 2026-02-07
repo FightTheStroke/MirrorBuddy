@@ -3,10 +3,10 @@
  * Track and check if concepts have been seen before
  */
 
-import { logger } from '@/lib/logger';
-import { hybridSearch } from '@/lib/rag';
-import type { Subject } from '@/types';
-import type { SeenConcept } from './types';
+import { logger } from "@/lib/logger";
+import { hybridSearch } from "@/lib/rag/server";
+import type { Subject } from "@/types";
+import type { SeenConcept } from "./types";
 
 /**
  * Check if concepts have been seen before
@@ -15,7 +15,7 @@ import type { SeenConcept } from './types';
 export async function checkSeenConcepts(
   userId: string,
   concepts: string[],
-  subject: Subject
+  subject: Subject,
 ): Promise<Map<string, SeenConcept | null>> {
   const results = new Map<string, SeenConcept | null>();
 
@@ -44,7 +44,7 @@ export async function checkSeenConcepts(
         results.set(concept, null);
       }
     } catch (error) {
-      logger.error('[AdaptiveQuiz] Error checking seen concept', {
+      logger.error("[AdaptiveQuiz] Error checking seen concept", {
         concept,
         error: String(error),
       });
@@ -52,7 +52,7 @@ export async function checkSeenConcepts(
     }
   }
 
-  logger.debug('[AdaptiveQuiz] Checked seen concepts', {
+  logger.debug("[AdaptiveQuiz] Checked seen concepts", {
     total: concepts.length,
     seen: [...results.values()].filter((v) => v !== null).length,
   });

@@ -14,7 +14,7 @@
 
 import { logger } from "@/lib/logger";
 // eslint-disable-next-line local-rules/enforce-dependency-direction -- Pro tier gating (ADR 0065)
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 import type { TierName } from "@/types/tier-types";
 
 // Re-export types and functions from sub-modules

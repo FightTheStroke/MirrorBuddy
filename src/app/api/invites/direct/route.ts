@@ -17,7 +17,7 @@ import {
   ApiError,
 } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { hashPassword, generateRandomPassword } from "@/lib/auth";
+import { hashPassword, generateRandomPassword } from "@/lib/auth/server";
 import { hashPII } from "@/lib/security";
 import { sendEmail } from "@/lib/email";
 import { getApprovalTemplate } from "@/lib/email/templates/invite-templates";

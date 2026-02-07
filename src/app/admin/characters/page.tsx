@@ -4,7 +4,7 @@
  */
 
 import { getTranslations } from "next-intl/server";
-import { validateAdminAuth } from "@/lib/auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { CharacterGrid } from "@/components/admin/characters/character-grid";
 

@@ -45,40 +45,10 @@ export {
   getProviderCheckStatus,
 } from "./provider-check";
 
-// Providers - core functions and types
-export {
-  chatCompletion,
-  getActiveProvider,
-  getRealtimeProvider,
-  isAzureConfigured,
-  azureStreamingCompletion,
-  type AIProvider,
-  type ChatCompletionResult,
-  type ToolDefinition,
-  type StreamChunk,
-  type StreamChunkType,
-  type StreamingOptions,
-} from "./providers";
-
-// Provider types
+// Provider types (client-safe type-only exports)
 export type { AIProviderType } from "./providers/provider-interface";
 
-// Deployment mapping
-export { getDeploymentForModel } from "./providers/deployment-mapping";
-
-// Router
-export { aiRouter } from "./providers/router";
-
-// Summarization
-export {
-  generateConversationSummary,
-  extractKeyFacts,
-  extractTopics,
-  extractLearnings,
-  generateConversationTitle,
-} from "./summarize";
-
-// Transparency
+// Transparency (client-safe)
 export {
   assessResponseTransparency,
   type TransparencyContext,

@@ -9,8 +9,14 @@ import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { chatCompletion, getActiveProvider, getDeploymentForModel, generateParentModePrompt, getParentModeGreeting } from "@/lib/ai";
-import { tierService } from "@/lib/tier";
+import {
+  chatCompletion,
+  getActiveProvider,
+  getDeploymentForModel,
+  generateParentModePrompt,
+  getParentModeGreeting,
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { filterInput, sanitizeOutput } from "@/lib/safety";
 import {
   checkRateLimit,

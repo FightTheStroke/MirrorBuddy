@@ -51,7 +51,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 import { cookies, headers } from "next/headers";
-import { validateAuth } from "@/lib/auth";
+import { validateAuth } from "@/lib/auth/server";
 import { requireCSRF } from "@/lib/security";
 import {
   getOrCreateTrialSession,

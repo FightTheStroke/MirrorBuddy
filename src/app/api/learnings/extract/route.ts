@@ -5,7 +5,7 @@
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
-import { extractLearnings } from "@/lib/ai";
+import { extractLearnings } from "@/lib/ai/server";
 import type { Message, Prisma } from "@prisma/client";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 

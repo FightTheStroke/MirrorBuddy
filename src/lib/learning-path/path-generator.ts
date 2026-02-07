@@ -5,9 +5,9 @@
 // ============================================================================
 
 import { prisma } from "@/lib/db";
-import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai/server";
 import { logger } from "@/lib/logger";
-import { tierService } from "@/lib/tier";
+import { tierService } from "@/lib/tier/server";
 import type { TopicAnalysisResult, IdentifiedTopic } from "./topic-analyzer";
 import type { TopicWithRelations } from "./material-linker";
 

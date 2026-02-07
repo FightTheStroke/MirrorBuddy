@@ -3,11 +3,11 @@
  * Analyze quiz results and generate review suggestions
  */
 
-import { logger } from '@/lib/logger';
-import { hybridSearch } from '@/lib/rag';
-import type { Quiz, QuizResult, Subject } from '@/types';
-import type { QuizAnalysis, ReviewSuggestion } from './types';
-import { REVIEW_THRESHOLD, MASTERY_THRESHOLD } from './types';
+import { logger } from "@/lib/logger";
+import { hybridSearch } from "@/lib/rag/server";
+import type { Quiz, QuizResult, Subject } from "@/types";
+import type { QuizAnalysis, ReviewSuggestion } from "./types";
+import { REVIEW_THRESHOLD, MASTERY_THRESHOLD } from "./types";
 
 /**
  * Analyze quiz results to identify weak areas
@@ -15,19 +15,29 @@ import { REVIEW_THRESHOLD, MASTERY_THRESHOLD } from './types';
 export function analyzeQuizPerformance(
   quiz: Quiz,
   result: QuizResult,
-  questionResults: Array<{ questionId: string; correct: boolean; timeSpent: number }>
+  questionResults: Array<{
+    questionId: string;
+    correct: boolean;
+    timeSpent: number;
+  }>,
 ): QuizAnalysis {
   const score = result.score;
   const needsReview = score < REVIEW_THRESHOLD;
 
   // Group by topic
-  const topicPerformance = new Map<string, { correct: number; total: number }>();
+  const topicPerformance = new Map<
+    string,
+    { correct: number; total: number }
+  >();
 
   for (const qr of questionResults) {
     const question = quiz.questions.find((q) => q.id === qr.questionId);
     if (!question) continue;
 
-    const current = topicPerformance.get(question.topic) ?? { correct: 0, total: 0 };
+    const current = topicPerformance.get(question.topic) ?? {
+      correct: 0,
+      total: 0,
+    };
     current.total++;
     if (qr.correct) current.correct++;
     topicPerformance.set(question.topic, current);
@@ -49,23 +59,25 @@ export function analyzeQuizPerformance(
   // Calculate average time per question
   const averageTimePerQuestion =
     questionResults.length > 0
-      ? questionResults.reduce((sum, qr) => sum + qr.timeSpent, 0) / questionResults.length
+      ? questionResults.reduce((sum, qr) => sum + qr.timeSpent, 0) /
+        questionResults.length
       : 0;
 
   // Determine if difficulty is appropriate
   const avgDifficulty =
-    quiz.questions.reduce((sum, q) => sum + q.difficulty, 0) / quiz.questions.length;
-  let difficultyVsPerformance: 'too_easy' | 'appropriate' | 'too_hard';
+    quiz.questions.reduce((sum, q) => sum + q.difficulty, 0) /
+    quiz.questions.length;
+  let difficultyVsPerformance: "too_easy" | "appropriate" | "too_hard";
 
   if (score >= MASTERY_THRESHOLD && avgDifficulty < 3) {
-    difficultyVsPerformance = 'too_easy';
+    difficultyVsPerformance = "too_easy";
   } else if (score < REVIEW_THRESHOLD && avgDifficulty > 3) {
-    difficultyVsPerformance = 'too_hard';
+    difficultyVsPerformance = "too_hard";
   } else {
-    difficultyVsPerformance = 'appropriate';
+    difficultyVsPerformance = "appropriate";
   }
 
-  logger.debug('[AdaptiveQuiz] Performance analyzed', {
+  logger.debug("[AdaptiveQuiz] Performance analyzed", {
     score,
     needsReview,
     weakTopics: weakTopics.length,
@@ -90,7 +102,7 @@ export function analyzeQuizPerformance(
 export async function generateReviewSuggestions(
   userId: string,
   analysis: QuizAnalysis,
-  subject: Subject
+  subject: Subject,
 ): Promise<ReviewSuggestion[]> {
   if (!analysis.needsReview || analysis.weakTopics.length === 0) {
     return [];
@@ -105,15 +117,16 @@ export async function generateReviewSuggestions(
         userId,
         query: topic,
         limit: 5,
-        sourceType: 'material',
+        sourceType: "material",
         subject: subject.toLowerCase(),
         minScore: 0.4,
       });
 
       const materials = searchResults.map((r) => ({
         id: r.sourceId,
-        title: r.content.substring(0, 50) + (r.content.length > 50 ? '...' : ''),
-        type: r.sourceType as 'material' | 'flashcard' | 'studykit',
+        title:
+          r.content.substring(0, 50) + (r.content.length > 50 ? "..." : ""),
+        type: r.sourceType as "material" | "flashcard" | "studykit",
         relevance: r.combinedScore,
       }));
 
@@ -125,7 +138,7 @@ export async function generateReviewSuggestions(
         priority: materials.length > 0 ? 1 : 2,
       });
     } catch (error) {
-      logger.error('[AdaptiveQuiz] Error generating review suggestion', {
+      logger.error("[AdaptiveQuiz] Error generating review suggestion", {
         topic,
         error: String(error),
       });
@@ -144,7 +157,7 @@ export async function generateReviewSuggestions(
   // Sort by priority
   suggestions.sort((a, b) => a.priority - b.priority);
 
-  logger.info('[AdaptiveQuiz] Generated review suggestions', {
+  logger.info("[AdaptiveQuiz] Generated review suggestions", {
     userId,
     count: suggestions.length,
     topics: suggestions.map((s) => s.topic),

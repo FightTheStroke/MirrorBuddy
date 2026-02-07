@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { POST } from "../route";
-import * as password from "@/lib/auth";
+import * as password from "@/lib/auth/server";
 
 // Hoisted mock for Prisma (avoids "cannot access before initialization")
 const { mockPrisma } = vi.hoisted(() => ({

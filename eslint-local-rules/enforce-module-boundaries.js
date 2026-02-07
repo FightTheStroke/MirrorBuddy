@@ -68,6 +68,9 @@ const enforceModuleBoundaries = {
         // Allow @/lib/{module}/index explicitly
         if (subPath === "index" || subPath === "index.ts") return;
 
+        // Allow @/lib/{module}/server for server-only barrel exports
+        if (subPath === "server" || subPath === "server.ts") return;
+
         // Allow intra-module imports (file is inside the same module)
         const filename = context.getFilename();
         const moduleDir = `/lib/${moduleName}/`;

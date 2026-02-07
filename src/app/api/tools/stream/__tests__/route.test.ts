@@ -53,7 +53,7 @@ vi.mock("@/lib/realtime/tool-events", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { isSignedCookie, verifyCookieValue } from "@/lib/auth";
+import { isSignedCookie, verifyCookieValue } from "@/lib/auth/server";
 
 const mockPrismaUser = prisma.user.findUnique as ReturnType<typeof vi.fn>;
 const mockPrismaConversation = prisma.conversation.findFirst as ReturnType<

@@ -15,9 +15,9 @@ import {
   getOrCreateTrialSession,
   getTrialStatus,
 } from "@/lib/trial/trial-service";
-import { validateAuth } from "@/lib/auth";
+import { validateAuth } from "@/lib/auth/server";
 import { logger } from "@/lib/logger";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/user/usage" });

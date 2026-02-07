@@ -7,12 +7,10 @@
 import { logger } from "@/lib/logger";
 import type { StudyKit } from "@/types/study-kit";
 import { extractTextFromPDF } from "../study-kit-extraction";
-import {
-  buildAdaptiveInstruction,
-  getAdaptiveContextForUser,
-} from "@/lib/education";
-import { tierService } from "@/lib/tier";
-import type { FeatureAIConfig } from "@/lib/tier";
+import { buildAdaptiveInstruction } from "@/lib/education";
+import { getAdaptiveContextForUser } from "@/lib/education/server";
+import { tierService } from "@/lib/tier/server";
+import type { FeatureAIConfig } from "@/lib/tier/server";
 import { generateSummary } from "./summary";
 import { generateMindmap } from "./mindmap";
 import { generateDemo } from "./demo";

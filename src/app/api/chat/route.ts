@@ -11,8 +11,8 @@ import {
   getActiveProvider,
   type AIProvider,
   getDeploymentForModel,
-} from "@/lib/ai";
-import { tierService } from "@/lib/tier";
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,
@@ -22,14 +22,14 @@ import {
 } from "@/lib/rate-limit";
 import { filterInput, sanitizeOutput } from "@/lib/safety";
 import { checkSTEMSafety } from "@/lib/safety";
-import { recordMessage, recordSessionStart } from "@/lib/safety";
+import { recordMessage, recordSessionStart } from "@/lib/safety/server";
 import { analyzeIndependence } from "@/lib/gamification/independence-tracker";
 import { awardPoints } from "@/lib/gamification/db";
 import { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
 import {
   assessResponseTransparency,
   type TransparencyContext,
-} from "@/lib/ai";
+} from "@/lib/ai/server";
 import { recordContentFiltered } from "@/lib/safety";
 import { normalizeUnicode } from "@/lib/safety";
 

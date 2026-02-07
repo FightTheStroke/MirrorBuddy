@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { generateRandomPassword, hashPassword } from "@/lib/auth";
+import { generateRandomPassword, hashPassword } from "@/lib/auth/server";
 import { sendEmail } from "@/lib/email";
 
 export const POST = pipe(

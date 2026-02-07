@@ -8,7 +8,7 @@
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { generateSearchableText } from "@/lib/search/searchable-text";
-import { indexMaterial } from "@/lib/rag";
+import { indexMaterial } from "@/lib/rag/server";
 import type { ToolType } from "@/types/tools";
 
 interface StudyKitData {

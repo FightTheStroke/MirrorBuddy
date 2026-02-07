@@ -101,21 +101,10 @@ export type {
   EscalationConfig,
 } from "./escalation/types";
 
-export {
-  getSafetyEventsFromDb,
-  getSafetyStatsFromDb,
-  resolveSafetyEvent,
-} from "./monitoring/db-queries";
-
 // ============================================================================
 // AMODEI SAFETY ENHANCEMENTS (Reference: "The Adolescence of Technology" 2026)
 // ============================================================================
 export { checkSTEMSafety, isSTEMProfessor } from "./stem-safety";
-export {
-  recordSessionStart,
-  recordMessage,
-  runDependencyAnalysis,
-} from "./dependency";
 
 export { normalizeUnicode } from "./versioning";
 
@@ -133,15 +122,4 @@ export {
   clearComplianceBuffer,
 } from "./audit/compliance-audit-service";
 
-export {
-  initializeEscalationService,
-  escalateCrisisDetected,
-  escalateRepeatedJailbreak,
-  escalateSevereContentFilter,
-  resolveEscalation,
-  clearSessionEscalations,
-  getEscalationConfig,
-  getRecentEscalations,
-  getUnresolvedEscalations,
-  clearEscalationBuffer,
-} from "./escalation/escalation-service";
+// escalation-service exports moved to ./server.ts (chains to @/lib/email → prisma)
