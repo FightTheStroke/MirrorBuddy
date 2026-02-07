@@ -1,10 +1,10 @@
 /**
  * BottomNav Component - Mobile Bottom Navigation Bar
  *
- * Requirement: F-10 - Mobile navigation with 5 items
+ * Requirement: F-10 - Mobile navigation with 6 items
  * - Fixed bottom navigation bar visible only on mobile (<640px)
- * - 5 navigation items: Home, Chat, Tools (Astuccio), Settings, Profile
- * - Icons from lucide-react (Home, MessageSquare, Briefcase, Settings, User)
+ * - 6 navigation items: Home, Chat, Tools (Astuccio), Achievements, Settings, Profile
+ * - Icons from lucide-react (Home, MessageSquare, Briefcase, Trophy, Settings, User)
  * - Active state indicator based on current pathname
  * - Touch targets 44px minimum (accessibility)
  * - Safe area bottom padding for iOS
@@ -12,7 +12,14 @@
 
 "use client";
 
-import { Home, MessageSquare, Briefcase, Settings, User } from "lucide-react";
+import {
+  Home,
+  MessageSquare,
+  Briefcase,
+  Trophy,
+  Settings,
+  User,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -21,6 +28,7 @@ const NAV_ITEMS = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/chat", icon: MessageSquare, label: "Chat" },
   { href: "/astuccio", icon: Briefcase, label: "Tools" },
+  { href: "/achievements", icon: Trophy, label: "Achievements" },
   { href: "/settings", icon: Settings, label: "Settings" },
   { href: "/profile", icon: User, label: "Profile" },
 ] as const;

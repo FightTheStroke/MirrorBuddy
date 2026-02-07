@@ -22,19 +22,20 @@ describe("BottomNav", () => {
   });
 
   describe("Structure and Visibility", () => {
-    it("renders navigation with all 5 items", () => {
+    it("renders navigation with all 6 items including achievements", () => {
       vi.mocked(usePathname).mockReturnValue("/");
       const { container } = render(<BottomNav />);
 
-      // All 5 navigation items should be present (structure-based assertion)
+      // All 6 navigation items should be present (structure-based assertion)
       const links = container.querySelectorAll("a");
-      expect(links.length).toBe(5);
+      expect(links.length).toBe(6);
 
       // Verify expected hrefs are present (i18n-agnostic)
       const hrefs = Array.from(links).map((a) => a.getAttribute("href"));
       expect(hrefs).toContain("/");
       expect(hrefs).toContain("/chat");
       expect(hrefs).toContain("/astuccio");
+      expect(hrefs).toContain("/achievements");
       expect(hrefs).toContain("/settings");
       expect(hrefs).toContain("/profile");
     });
@@ -87,6 +88,7 @@ describe("BottomNav", () => {
       expect(linkMap.get("/")).toBeTruthy();
       expect(linkMap.get("/chat")).toBeTruthy();
       expect(linkMap.get("/astuccio")).toBeTruthy();
+      expect(linkMap.get("/achievements")).toBeTruthy();
       expect(linkMap.get("/settings")).toBeTruthy();
       expect(linkMap.get("/profile")).toBeTruthy();
     });
@@ -97,7 +99,7 @@ describe("BottomNav", () => {
 
       // Each link should have an SVG icon (lucide-react renders as SVG)
       const links = container.querySelectorAll("a");
-      expect(links.length).toBe(5);
+      expect(links.length).toBe(6);
       links.forEach((link) => {
         const svg = link.querySelector("svg");
         expect(svg).toBeInTheDocument();
@@ -137,6 +139,16 @@ describe("BottomNav", () => {
 
       const settingsLink = container.querySelector('a[href="/settings"]');
       expect(settingsLink?.className).toMatch(/text-primary/);
+    });
+
+    it("marks achievements as active when on achievements page", () => {
+      vi.mocked(usePathname).mockReturnValue("/achievements");
+      const { container } = render(<BottomNav />);
+
+      const achievementsLink = container.querySelector(
+        'a[href="/achievements"]',
+      );
+      expect(achievementsLink?.className).toMatch(/text-primary/);
     });
 
     it("marks non-active items with muted color", () => {

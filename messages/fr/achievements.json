@@ -1,0 +1,49 @@
+{
+  "achievements": {
+    "title": "Succès",
+    "description": "Suivez votre parcours d'apprentissage et débloquez des récompenses",
+    "unlockedCount": "{count} / {total} débloqués",
+    "categories": {
+      "all": "Tous",
+      "onboarding": "Premiers Pas",
+      "streak": "Séries",
+      "xp": "Niveaux",
+      "study": "Étude",
+      "mastery": "Maîtrise",
+      "exploration": "Exploration",
+      "time": "Temps",
+      "social": "Social",
+      "independence": "Indépendance"
+    },
+    "locked": "Verrouillé",
+    "unlocked": "Débloqué",
+    "reward": "+{amount} MB",
+    "streak": {
+      "title": "Série d'Étude",
+      "current": "Série Actuelle",
+      "longest": "Meilleure Série",
+      "days": "{count} jours",
+      "keepItUp": "Étudiez aujourd'hui pour maintenir votre série!",
+      "weekStreak": "Fantastique! Une semaine d'étude!",
+      "goodJob": "Excellent travail aujourd'hui!",
+      "calendar": "Calendrier d'Étude",
+      "unlocked": "Étudié",
+      "locked": "Pas étudié"
+    },
+    "level": {
+      "title": "Progression de Niveau",
+      "current": "Niveau {level}",
+      "max": "Niveau Maximum",
+      "toNext": "{amount} MB pour Niveau {next}",
+      "progress": "Progression"
+    },
+    "stats": {
+      "title": "Statistiques d'Étude",
+      "totalTime": "Temps Total d'Étude",
+      "minutes": "{count} minutes",
+      "hours": "{count} heures",
+      "thisWeek": "Cette Semaine",
+      "sessions": "{count} sessions"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "achievements": {
+    "title": "Obiettivi",
+    "description": "Traccia il tuo percorso di apprendimento e sblocca ricompense",
+    "unlockedCount": "{count} / {total} sbloccati",
+    "categories": {
+      "all": "Tutti",
+      "onboarding": "Primi Passi",
+      "streak": "Serie",
+      "xp": "Livelli",
+      "study": "Studio",
+      "mastery": "Maestria",
+      "exploration": "Esplorazione",
+      "time": "Tempo",
+      "social": "Sociale",
+      "independence": "Indipendenza"
+    },
+    "locked": "Bloccato",
+    "unlocked": "Sbloccato",
+    "reward": "+{amount} MB",
+    "streak": {
+      "title": "Serie di Studio",
+      "current": "Serie Attuale",
+      "longest": "Serie Massima",
+      "days": "{count} giorni",
+      "keepItUp": "Studia oggi per mantenere la serie!",
+      "weekStreak": "Fantastico! Una settimana di studio!",
+      "goodJob": "Ottimo lavoro oggi!",
+      "calendar": "Calendario Studio",
+      "unlocked": "Studiato",
+      "locked": "Non studiato"
+    },
+    "level": {
+      "title": "Progresso Livello",
+      "current": "Livello {level}",
+      "max": "Livello Massimo",
+      "toNext": "{amount} MB per Livello {next}",
+      "progress": "Progresso"
+    },
+    "stats": {
+      "title": "Statistiche Studio",
+      "totalTime": "Tempo Totale Studio",
+      "minutes": "{count} minuti",
+      "hours": "{count} ore",
+      "thisWeek": "Questa Settimana",
+      "sessions": "{count} sessioni"
+    }
+  }
+}

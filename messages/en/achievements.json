@@ -1,0 +1,49 @@
+{
+  "achievements": {
+    "title": "Achievements",
+    "description": "Track your learning journey and unlock rewards",
+    "unlockedCount": "{count} / {total} unlocked",
+    "categories": {
+      "all": "All",
+      "onboarding": "Getting Started",
+      "streak": "Streaks",
+      "xp": "Levels",
+      "study": "Study",
+      "mastery": "Mastery",
+      "exploration": "Exploration",
+      "time": "Time-Based",
+      "social": "Social",
+      "independence": "Independence"
+    },
+    "locked": "Locked",
+    "unlocked": "Unlocked",
+    "reward": "+{amount} MB",
+    "streak": {
+      "title": "Study Streak",
+      "current": "Current Streak",
+      "longest": "Longest Streak",
+      "days": "{count} days",
+      "keepItUp": "Study today to keep your streak!",
+      "weekStreak": "Fantastic! A week of study!",
+      "goodJob": "Great work today!",
+      "calendar": "Study Calendar",
+      "unlocked": "Studied",
+      "locked": "Not studied"
+    },
+    "level": {
+      "title": "Level Progress",
+      "current": "Level {level}",
+      "max": "Max Level",
+      "toNext": "{amount} MB to Level {next}",
+      "progress": "Progress"
+    },
+    "stats": {
+      "title": "Study Statistics",
+      "totalTime": "Total Study Time",
+      "minutes": "{count} minutes",
+      "hours": "{count} hours",
+      "thisWeek": "This Week",
+      "sessions": "{count} sessions"
+    }
+  }
+}

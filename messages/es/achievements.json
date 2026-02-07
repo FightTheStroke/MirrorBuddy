@@ -1,0 +1,49 @@
+{
+  "achievements": {
+    "title": "Logros",
+    "description": "Sigue tu viaje de aprendizaje y desbloquea recompensas",
+    "unlockedCount": "{count} / {total} desbloqueados",
+    "categories": {
+      "all": "Todos",
+      "onboarding": "Primeros Pasos",
+      "streak": "Rachas",
+      "xp": "Niveles",
+      "study": "Estudio",
+      "mastery": "Maestría",
+      "exploration": "Exploración",
+      "time": "Tiempo",
+      "social": "Social",
+      "independence": "Independencia"
+    },
+    "locked": "Bloqueado",
+    "unlocked": "Desbloqueado",
+    "reward": "+{amount} MB",
+    "streak": {
+      "title": "Racha de Estudio",
+      "current": "Racha Actual",
+      "longest": "Racha Más Larga",
+      "days": "{count} días",
+      "keepItUp": "¡Estudia hoy para mantener tu racha!",
+      "weekStreak": "¡Fantástico! ¡Una semana de estudio!",
+      "goodJob": "¡Excelente trabajo hoy!",
+      "calendar": "Calendario de Estudio",
+      "unlocked": "Estudiado",
+      "locked": "No estudiado"
+    },
+    "level": {
+      "title": "Progreso de Nivel",
+      "current": "Nivel {level}",
+      "max": "Nivel Máximo",
+      "toNext": "{amount} MB para Nivel {next}",
+      "progress": "Progreso"
+    },
+    "stats": {
+      "title": "Estadísticas de Estudio",
+      "totalTime": "Tiempo Total de Estudio",
+      "minutes": "{count} minutos",
+      "hours": "{count} horas",
+      "thisWeek": "Esta Semana",
+      "sessions": "{count} sesiones"
+    }
+  }
+}

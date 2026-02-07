@@ -1,0 +1,49 @@
+{
+  "achievements": {
+    "title": "Erfolge",
+    "description": "Verfolgen Sie Ihren Lernweg und schalten Sie Belohnungen frei",
+    "unlockedCount": "{count} / {total} freigeschaltet",
+    "categories": {
+      "all": "Alle",
+      "onboarding": "Erste Schritte",
+      "streak": "Serien",
+      "xp": "Stufen",
+      "study": "Studium",
+      "mastery": "Meisterschaft",
+      "exploration": "Erkundung",
+      "time": "Zeit",
+      "social": "Sozial",
+      "independence": "Unabhängigkeit"
+    },
+    "locked": "Gesperrt",
+    "unlocked": "Freigeschaltet",
+    "reward": "+{amount} MB",
+    "streak": {
+      "title": "Lernserie",
+      "current": "Aktuelle Serie",
+      "longest": "Längste Serie",
+      "days": "{count} Tage",
+      "keepItUp": "Lernen Sie heute, um Ihre Serie zu behalten!",
+      "weekStreak": "Fantastisch! Eine Woche Lernen!",
+      "goodJob": "Großartige Arbeit heute!",
+      "calendar": "Lernkalender",
+      "unlocked": "Gelernt",
+      "locked": "Nicht gelernt"
+    },
+    "level": {
+      "title": "Stufenfortschritt",
+      "current": "Stufe {level}",
+      "max": "Maximale Stufe",
+      "toNext": "{amount} MB bis Stufe {next}",
+      "progress": "Fortschritt"
+    },
+    "stats": {
+      "title": "Lernstatistiken",
+      "totalTime": "Gesamte Lernzeit",
+      "minutes": "{count} Minuten",
+      "hours": "{count} Stunden",
+      "thisWeek": "Diese Woche",
+      "sessions": "{count} Sitzungen"
+    }
+  }
+}
