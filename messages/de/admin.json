@@ -591,7 +591,29 @@
         "noCampaigns": "Keine Kampagnen gefunden",
         "confirmSend": "Sind Sie sicher, dass Sie diese Kampagne senden möchten?",
         "quotaWarning": "Warnung: Tägliches Kontingent fast erreicht",
-        "name": "[TRANSLATE] Nome"
+        "name": "[TRANSLATE] Nome",
+        "selectTemplate": "[TRANSLATE] Seleziona modello",
+        "configureFilters": "[TRANSLATE] Configura filtri",
+        "previewRecipients": "[TRANSLATE] Anteprima destinatari",
+        "tiers": "[TRANSLATE] Livelli",
+        "role": "[TRANSLATE] Ruolo",
+        "allRoles": "[TRANSLATE] Tutti i ruoli",
+        "includeDisabled": "[TRANSLATE] Includi disabilitati",
+        "includeTestData": "[TRANSLATE] Includi dati di test",
+        "back": "[TRANSLATE] Indietro",
+        "next": "[TRANSLATE] Avanti",
+        "previewError": "[TRANSLATE] Errore nel caricamento anteprima",
+        "sendSuccess": "[TRANSLATE] Campagna inviata con successo",
+        "sendError": "[TRANSLATE] Errore nell'invio della campagna",
+        "recipientsMatched": "[TRANSLATE] Destinatari corrispondenti",
+        "dailyAvailable": "[TRANSLATE] Disponibili oggi",
+        "monthlyAvailable": "[TRANSLATE] Disponibili questo mese",
+        "sampleRecipients": "[TRANSLATE] Destinatari di esempio",
+        "quotaUsage": "[TRANSLATE] Utilizzo quota",
+        "dailyQuota": "[TRANSLATE] Quota giornaliera",
+        "monthlyQuota": "[TRANSLATE] Quota mensile",
+        "campaignSummary": "[TRANSLATE] Riepilogo campagna",
+        "template": "[TRANSLATE] Modello"
       },
       "stats": {
         "title": "E-Mail-Statistiken",
@@ -628,7 +650,23 @@
         "insertVariable": "Variable Einfügen",
         "selectCategory": "Kategorie Auswählen",
         "save": "Speichern",
-        "cancel": "Abbrechen"
+        "cancel": "Abbrechen",
+        "name": "[TRANSLATE] Nome",
+        "namePlaceholder": "[TRANSLATE] Nome modello",
+        "category": "[TRANSLATE] Categoria",
+        "categoryPlaceholder": "[TRANSLATE] Seleziona categoria",
+        "subject": "[TRANSLATE] Oggetto",
+        "subjectPlaceholder": "[TRANSLATE] Oggetto email",
+        "htmlBody": "[TRANSLATE] Corpo HTML",
+        "htmlBodyPlaceholder": "[TRANSLATE] Corpo email in HTML",
+        "textBody": "[TRANSLATE] Corpo Testo",
+        "textBodyPlaceholder": "[TRANSLATE] Versione testuale",
+        "preview": "[TRANSLATE] Anteprima",
+        "saving": "[TRANSLATE] Salvataggio...",
+        "createSuccess": "[TRANSLATE] Modello creato con successo",
+        "updateSuccess": "[TRANSLATE] Modello aggiornato con successo",
+        "createError": "[TRANSLATE] Errore nella creazione del modello",
+        "updateError": "[TRANSLATE] Errore nell'aggiornamento del modello"
       },
       "variables": {
         "name": "Name",
@@ -662,8 +700,13 @@
         "noResults": "Keine Ergebnisse",
         "loading": "Laden...",
         "error": "Fehler",
-        "success": "Erfolg"
+        "success": "Erfolg",
+        "close": "[TRANSLATE] Chiudi"
       }
+    },
+    "common": {
+      "back": "[TRANSLATE] Indietro",
+      "close": "[TRANSLATE] Chiudi"
     }
   }
 }

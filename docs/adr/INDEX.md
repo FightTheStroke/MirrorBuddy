@@ -192,13 +192,6 @@
 
 ---
 
-<<<<<<< Updated upstream
-**Total Active ADRs**: 113
-||||||| Stash base
-**Total Active ADRs**: 106
-=======
-**Total Active ADRs**: 107
-
-> > > > > > > Stashed changes
-> > > > > > > **Archived ADRs**: 7
-> > > > > > > **Last Updated**: 2026-02-07
+**Total Active ADRs**: 114
+**Archived ADRs**: 7
+**Last Updated**: 2026-02-07

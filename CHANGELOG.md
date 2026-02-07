@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-**Email Communications System**
+#### Email Communications System (Templates, Campaigns, Tracking)
 
 - Communications database schema with 5 Prisma models: `EmailCampaign`, `EmailRecipient`, `EmailPreference`, `EmailEvent`, `EmailUnsubscribe`
 - Three enums: `EmailStatus` (PENDING/SENT/FAILED/CANCELLED), `EmailEventType` (SENT/DELIVERED/OPENED/CLICKED/BOUNCED/COMPLAINED/UNSUBSCRIBED), `EmailPreferenceCategory` (MARKETING/PRODUCT_UPDATES/TRANSACTIONAL/SECURITY/EDUCATIONAL_CONTENT)
@@ -37,41 +37,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Resend webhook endpoint (`POST /api/webhooks/resend`) with svix signature verification
 - Email event tracking system with 4 event types: delivered, opened, bounced, complained
 - EmailEvent model with recipient status updates (delivered → DELIVERED, opened → OPENED, bounced/complained → FAILED)
-- Email statistics service (`src/lib/email/stats-service.ts`) with campaign stats and global stats
-- Admin email statistics API (`GET /api/admin/email-stats`) with quota widget data
-- Admin statistics page (`/admin/email-stats`) with Tailwind CSS bar charts (no external dependencies)
-- Open rate timeline calculation using Prisma groupBy for efficient aggregation
-- i18n support for communications UI in all 5 locales (it/en/fr/de/es)
-
-**Event Tracking & Webhooks (W4-Tracking)**
-
-- Resend webhook endpoint (`POST /api/webhooks/resend`) with svix signature verification for webhook security
-- EmailEvent model for tracking 4 event types: delivered, opened, bounced, complained
-- Webhook event processing with automatic EmailRecipient status updates (delivered/opened/failed)
-- Email statistics service (`src/lib/email/stats-service.ts`) with four calculation methods:
+- Email statistics service (`src/lib/email/stats-service.ts`) with campaign stats and global stats:
   - `getCampaignStats()` - Stats for single campaign (sent, delivered, opened, bounce rate, open rate)
   - `getGlobalStats()` - Aggregated stats across all campaigns
   - `getRecentCampaignStats()` - Last 10 campaigns with key metrics
   - `getOpenTimeline()` - Hourly open rate aggregation for charting
-- Admin email statistics API routes:
-  - `GET /api/admin/email-stats` - Global stats with quota widget data (Resend 100/day free tier limit)
-  - `GET /api/admin/email-stats/[campaignId]` - Detailed stats for specific campaign
-- Admin statistics page (`/admin/email-stats`) with:
+- Admin email statistics API (`GET /api/admin/email-stats`) with quota widget data (Resend 100/day free tier limit)
+- Admin statistics page (`/admin/email-stats`) with Tailwind CSS bar charts (no external dependencies):
   - Global stats cards (sent, delivered, opened rates, daily quota usage)
   - Campaigns table with sortable columns and status filters
-  - Open rate timeline chart using pure Tailwind CSS (no Chart.js dependency)
+  - Open rate timeline chart using pure Tailwind CSS
   - Quota progress bar with color coding (green/yellow/red)
-- Unit tests: 10 test cases covering webhook verification, event processing, stats calculations, and edge cases
-- Webhook idempotency handling for Resend retries (no explicit deduplication yet)
-
-**Campaign Management (W3-Campaigns)**
-
-- Admin API routes for email campaigns (`/api/admin/email-campaigns/`):
+- Campaign management API routes for email campaigns (`/api/admin/email-campaigns/`):
   - `GET /api/admin/email-campaigns` - List campaigns with pagination, status filter, and search
   - `POST /api/admin/email-campaigns` - Create new campaign (draft state)
   - `GET /api/admin/email-campaigns/[id]` - Fetch campaign details with preview data
   - `POST /api/admin/email-campaigns/[id]/preview` - Preview campaign with sample recipients
   - `POST /api/admin/email-campaigns/[id]/send` - Validate quota and send campaign (batch operation)
+  - `GET /api/admin/email-stats/[campaignId]` - Detailed stats for specific campaign
 - Campaign composer page (`/admin/campaigns/composer`) with 4-step wizard:
   - Step 1: Select template with live preview
   - Step 2: Define recipient filters (tier, locale, activity status)
@@ -88,39 +71,55 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Status filter tabs: All, Sent, Delivered, Opened, Failed
   - Export recipients to CSV
   - Recipient count by status
-- i18n: Campaign UI translations for all 5 locales (it/en/fr/de/es)
+- Webhook idempotency handling for Resend retries (no explicit deduplication yet)
+- Unit tests: 10 test cases covering webhook verification, event processing, stats calculations, and edge cases
+- i18n support for communications UI in all 5 locales (it/en/fr/de/es)
+
+#### Gamification & Achievement System
+
+- **Achievements Page**: Achievements grid display with filtering and sorting capabilities
+- **Streak Display with Calendar Heatmap**: Visual streak tracker showing activity calendar with color intensity representing contribution levels
+- **XP/Level Progress Bar**: User level progression display with visual bar indicating next level threshold
+- **Achievement Notifications**: Toast notification component for achievement unlock events with animations
+- **Gamification Check API**: `/api/gamification/check` endpoint for real-time achievement verification and unlock detection
+- **useAchievementChecker Hook**: React hook for client-side achievement checking logic and state management
+- **Achievements i18n Namespace**: Translation namespace for all achievement-related strings across all 5 languages
+- **i18n Support**: Gamification achievements UI translated to all 5 locales (it, en, fr, de, es)
+
+#### Security & HTML Sanitization
+
+- **HTML Sanitization Layer**: DOMPurify + isomorphic-dompurify integration for secure AI response rendering
+- **Sanitization Wrapper**: `sanitize.ts` utility module providing type-safe HTML sanitization with configurable allowlist
+
+#### Password Reset & Authentication
+
+- Self-service password reset flow with forgot-password and reset-password pages
+- Password reset API routes for token generation and validation
+- PasswordResetToken Prisma model with expiration tracking
+- i18n keys for password reset in all 5 locales (en, it, fr, de, es)
+- Password reset email template with locale-specific support
+
+#### PWA & Offline Support
+
+- PWA offline support using Workbox-style caching strategies
+- NetworkFirst caching for pages, CacheFirst for static assets, NetworkOnly for API calls
+- offline.html fallback page for network errors
+- Service Worker registration in app providers
+
+#### Mobile Deployment
+
+- Mobile build scripts (build:mobile:web, build:mobile:ios, build:mobile:android, cap:sync, cap:copy)
+- Fastlane configuration for iOS TestFlight and Android Play Store internal testing
+- App store metadata templates (iOS and Android descriptions in 5 languages, screenshot dimensions guide)
+- Comprehensive mobile build guide (docs/mobile/BUILD-GUIDE.md)
 
 ### Fixed
 
 - **Direct invite broken** — email duplicate check used plaintext against PII-encrypted DB, causing silent failures. Now uses `emailHash` with legacy fallback
 - **Generic "Internal server error" on all API failures** — `withSentry` middleware swallowed `ApiError` instances, bypassing `pipe()` error handling. Now re-throws `ApiError` so routes can return specific status codes and messages
 - **PII middleware missing `upsert` handler** — Prisma upsert operations on PII models (User, Profile, GoogleAccount) bypassed encryption. Added `upsert` interceptor
-
-### Added
-
-- **Gamification Achievements Page**: Achievements grid display with filtering and sorting capabilities
-- **Streak Display with Calendar Heatmap**: Visual streak tracker showing activity calendar with color intensity representing contribution levels
-- **XP/Level Progress Bar**: User level progression display with visual bar indicating next level threshold
-- **i18n Support**: Gamification achievements UI translated to all 5 locales (it, en, fr, de, es)
-- **Achievement Notifications**: Toast notification component for achievement unlock events with animations
-- **Gamification Check API**: `/api/gamification/check` endpoint for real-time achievement verification and unlock detection
-- **useAchievementChecker Hook**: React hook for client-side achievement checking logic and state management
-- **Achievements i18n Namespace**: Translation namespace for all achievement-related strings across all 5 languages
-- **HTML Sanitization Layer**: DOMPurify + isomorphic-dompurify integration for secure AI response rendering
-- **Sanitization Wrapper**: `sanitize.ts` utility module providing type-safe HTML sanitization with configurable allowlist
-- Self-service password reset flow with forgot-password and reset-password pages
-- Password reset API routes for token generation and validation
-- PasswordResetToken Prisma model with expiration tracking
-- i18n keys for password reset in all 5 locales (en, it, fr, de, es)
-- Password reset email template with locale-specific support
-- PWA offline support using Workbox-style caching strategies
-- NetworkFirst caching for pages, CacheFirst for static assets, NetworkOnly for API calls
-- offline.html fallback page for network errors
-- Service Worker registration in app providers
-- Mobile build scripts (build:mobile:web, build:mobile:ios, build:mobile:android, cap:sync, cap:copy)
-- Fastlane configuration for iOS TestFlight and Android Play Store internal testing
-- App store metadata templates (iOS and Android descriptions in 5 languages, screenshot dimensions guide)
-- Comprehensive mobile build guide (docs/mobile/BUILD-GUIDE.md)
+- Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
+- manifest.json lang changed from 'it' to 'en', added related_applications for iOS/Android stores
 
 ### Changed
 
@@ -128,11 +127,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Accessibility Tests Blocking**: Removed `continue-on-error` from accessibility workflow, WCAG 2.1 AA violations now gate deployment
 - **Mobile Build Job (PR-only)**: Added non-blocking CI job validating Next.js static export + Capacitor copy pipeline with Java 17, runs only on PRs for early validation feedback
 - **Mobile Bottom Navigation**: Added trophy icon link to achievements section for quick access to gamification features
-
-### Fixed
-
-- Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
-- manifest.json lang changed from 'it' to 'en', added related_applications for iOS/Android stores
 
 ### Security
 

@@ -700,8 +700,13 @@
         "noResults": "No results",
         "loading": "Loading...",
         "error": "Error",
-        "success": "Success"
+        "success": "Success",
+        "close": "[TRANSLATE] Chiudi"
       }
+    },
+    "common": {
+      "back": "[TRANSLATE] Indietro",
+      "close": "[TRANSLATE] Chiudi"
     }
   }
 }
