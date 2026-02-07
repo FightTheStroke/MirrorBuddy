@@ -62,9 +62,9 @@ const nextConfig: NextConfig = {
   },
 
   // Ensure standalone output includes transitive deps needed at runtime
-  // isomorphic-dompurify -> jsdom@28 -> undici@7.21 (nested, has wrap-handler.js)
-  // Root undici@6.23 (from cheerio) lacks wrap-handler.js
-  // postbuild script (fix-standalone-undici.js) copies undici@7.21 to Turbopack externals
+  // isomorphic-dompurify -> jsdom@28 has nested deps (undici@7, whatwg-mimetype@5, etc.)
+  // that differ from root versions. Postbuild script (fix-standalone-jsdom-deps.js)
+  // bundles them into jsdom@28's own node_modules/ to avoid version conflicts
   outputFileTracingIncludes: {
     "/**": [
       "./node_modules/jsdom/**",
