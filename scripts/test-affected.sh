@@ -39,6 +39,7 @@ HAS_UI=false
 HAS_MOBILE=false
 HAS_PRISMA=false
 HAS_SAFETY=false
+HAS_E2E=false
 HAS_CONFIG=false
 
 while IFS= read -r file; do
@@ -51,14 +52,17 @@ while IFS= read -r file; do
 		HAS_MOBILE=true
 		HAS_SRC=true
 		;;
-	src/lib/safety/* | src/lib/ai/* | src/lib/privacy/* | src/data/maestri/*)
+	src/lib/safety/* | src/lib/ai/* | src/lib/privacy/* | src/lib/compliance/* | src/data/maestri/*)
 		HAS_SAFETY=true
 		HAS_SRC=true
+		;;
+	e2e/* | playwright.config*.ts)
+		HAS_E2E=true
 		;;
 	prisma/*)
 		HAS_PRISMA=true
 		;;
-	package.json | package-lock.json | tsconfig*.json | eslint.config.mjs | next.config.ts | vitest.config.ts)
+	package.json | package-lock.json | tsconfig*.json | eslint.config.mjs | eslint-local-rules/* | next.config.ts | vitest.config.ts)
 		HAS_CONFIG=true
 		;;
 	src/*)
@@ -73,6 +77,7 @@ echo "  ui:     $HAS_UI"
 echo "  mobile: $HAS_MOBILE"
 echo "  prisma: $HAS_PRISMA"
 echo "  safety: $HAS_SAFETY"
+echo "  e2e:    $HAS_E2E"
 echo "  config: $HAS_CONFIG"
 echo ""
 
@@ -127,6 +132,10 @@ fi
 
 if $RUN_ALL || $HAS_MOBILE; then
 	echo "  [INFO] Mobile changes detected — run: npm run build:mobile:web"
+fi
+
+if $RUN_ALL || $HAS_E2E; then
+	echo "  [INFO] E2E test files changed — consider running: npm run test:e2e"
 fi
 
 # ==========================================================

@@ -23,6 +23,7 @@ import requireCsrfFetch from "./require-csrf-fetch.js";
 import noDirectLocalstorage from "./no-direct-localstorage.js";
 import requireEventsourceCleanup from "./require-eventsource-cleanup.js";
 import enforceModuleBoundaries from "./enforce-module-boundaries.js";
+import enforceDependencyDirection from "./enforce-dependency-direction.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
@@ -293,6 +294,7 @@ const rules = {
   "no-direct-localstorage": noDirectLocalstorage,
   "require-eventsource-cleanup": requireEventsourceCleanup,
   "enforce-module-boundaries": enforceModuleBoundaries,
+  "enforce-dependency-direction": enforceDependencyDirection,
 };
 
 const localRules = {

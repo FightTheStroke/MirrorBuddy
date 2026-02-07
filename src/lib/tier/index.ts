@@ -40,7 +40,6 @@ export {
 export { assignBaseTierToNewUser } from "./registration-helper";
 export {
   getLimitsAndUsage,
-  incrementVideoVisionUsage,
   canStartSession,
   startSession,
   addFrames,

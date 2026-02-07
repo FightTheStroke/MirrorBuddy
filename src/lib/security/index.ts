@@ -19,10 +19,5 @@ export {
 } from "./encryption";
 export { encryptPII, decryptPII, hashPII } from "./pii-encryption";
 export { getSecret, clearAllCachedSecrets } from "./azure-key-vault";
-export {
-  logDecryptAccess,
-  logBulkDecryptAccess,
-  getDecryptAuditLog,
-  exportDecryptAudit,
-} from "./decrypt-audit";
+export { logDecryptAccess, logBulkDecryptAccess } from "./decrypt-audit";
 export { getCorsHeaders } from "./cors-config";

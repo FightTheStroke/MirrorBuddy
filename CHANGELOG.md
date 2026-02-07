@@ -15,6 +15,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Module Boundaries Enforcement**: Strengthened codebase modularity with ESLint-enforced boundaries
+  - `enforce-module-boundaries` rule escalated from `warn` to `error` (all 465 violations resolved)
+  - `enforce-dependency-direction` rule added to enforce 3-layer architecture (CORE/FEATURE/CROSS-CUTTING)
+  - 10 protected modules with complete barrel exports and JSDoc: `safety`, `security`, `privacy`, `ai`, `education`, `rag`, `auth`, `tier`, `accessibility`, `compliance`
+  - New `compliance/index.ts` barrel export for audit logging and policy enforcement
+  - Dependency matrix documented in ADR 0045 with 3 accepted exceptions
+  - CI improvements: affected-based E2E detection, smart a11y test parallelization, PR gate enhancements
 - **Release Evidence Pack**: `scripts/release-evidence-pack.sh` collects lint, typecheck, unit tests, SBOM, npm audit, and CHANGELOG into a single audit trail document (`npm run release:evidence`)
 - **CI Evidence Pack Job**: Automatically generates evidence pack on tagged releases (v\*) with 365-day artifact retention
 - **iOS Release Pipeline**: Complete infrastructure for iOS app releases via TestFlight and App Store Connect

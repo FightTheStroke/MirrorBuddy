@@ -9,16 +9,17 @@ A `detect-changes` job runs first using
 [dorny/paths-filter](https://github.com/dorny/paths-filter) to classify
 the changed files into areas:
 
-| Area     | Paths                                                                          |
-| -------- | ------------------------------------------------------------------------------ |
-| `src`    | `src/**`, `public/**`                                                          |
-| `ui`     | `src/app/**`, `src/components/**`, `src/styles/**`, `public/**`, `messages/**` |
-| `mobile` | `ios/**`, `android/**`, `capacitor.config.ts`, `src/lib/native/**`             |
-| `prisma` | `prisma/**`                                                                    |
-| `i18n`   | `messages/**`, `src/i18n/**`, `src/lib/i18n/**`                                |
-| `safety` | `src/lib/safety/**`, `src/lib/ai/**`, `src/lib/privacy/**`                     |
-| `config` | `package.json`, `tsconfig*`, `eslint.config.mjs`, `.github/**`, etc.           |
-| `docs`   | `docs/**`, `*.md`                                                              |
+| Area     | Paths                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------- |
+| `src`    | `src/**`, `public/**`                                                                        |
+| `ui`     | `src/app/**`, `src/components/**`, `src/styles/**`, `public/**`, `messages/**`               |
+| `mobile` | `ios/**`, `android/**`, `capacitor.config.ts`, `src/lib/native/**`                           |
+| `prisma` | `prisma/**`                                                                                  |
+| `i18n`   | `messages/**`, `src/i18n/**`, `src/lib/i18n/**`                                              |
+| `safety` | `src/lib/safety/**`, `src/lib/ai/**`, `src/lib/privacy/**`, `src/lib/compliance/**`          |
+| `e2e`    | `e2e/**`, `playwright.config*.ts`                                                            |
+| `config` | `package.json`, `tsconfig*`, `eslint.config.mjs`, `eslint-local-rules/**`, `.github/**` etc. |
+| `docs`   | `docs/**`, `*.md`                                                                            |
 
 ## What Always Runs on PR (Blocking)
 
@@ -96,8 +97,8 @@ Locally, simulate with:
 ## Module Boundaries (ESLint)
 
 Protected domain modules enforce barrel-export-only imports via the
-`enforce-module-boundaries` ESLint rule. Cross-module deep imports are warnings
-(will be escalated to errors after fixing existing violations).
+`enforce-module-boundaries` ESLint rule. Cross-module deep imports are **errors**
+(escalated from warnings in Plan 136). **Current baseline: 0 violations.**
 
 Protected modules: `safety`, `privacy`, `ai`, `education`, `rag`,
 `accessibility`, `tier`, `auth`, `security`, `compliance`.
@@ -108,12 +109,47 @@ Example:
 // OK - barrel import
 import { detectJailbreak } from "@/lib/safety";
 
-// WARNING - deep import from outside the module
+// ERROR - deep import from outside the module
 import { patterns } from "@/lib/safety/jailbreak-detector/patterns";
 ```
 
 Intra-module deep imports are allowed (code within `src/lib/safety/` can
 import its own internals freely).
+
+### Dependency Direction Rule
+
+The `enforce-dependency-direction` rule enforces architectural layer boundaries
+to prevent circular dependencies and maintain clean architecture:
+
+**Direction: Core → Features → UI**
+
+```typescript
+// ❌ BLOCKED - Core importing from Features
+// src/lib/ai/index.ts
+import { analyzeContent } from "@/app/api/analyze"; // ERROR
+
+// ✅ ALLOWED - Features importing from Core
+// src/app/api/analyze/route.ts
+import { generateResponse } from "@/lib/ai"; // OK
+
+// ❌ BLOCKED - Core importing from UI
+// src/lib/tier/index.ts
+import { Button } from "@/components/ui/button"; // ERROR
+
+// ✅ ALLOWED - UI importing from Core
+// src/components/dashboard.tsx
+import { tierService } from "@/lib/tier"; // OK
+```
+
+**Layer rules:**
+
+- **Core** (`src/lib/`, `src/types/`, `src/data/`): Cannot import from
+  Features or UI
+- **Features** (`src/app/api/`): Can import from Core, cannot import from UI
+- **UI** (`src/app/`, `src/components/`): Can import from Core and Features
+
+**Exception:** Test files (`*.test.ts`, `*.test.tsx`, `__tests__/`) are exempt
+from both rules.
 
 ## Local Testing
 

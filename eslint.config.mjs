@@ -409,8 +409,8 @@ const eslintConfig = defineConfig([
   // Cross-module deep imports (e.g., @/lib/safety/jailbreak-detector/patterns)
   // must use the barrel export (@/lib/safety) instead.
   // Intra-module deep imports remain allowed.
-  // Set to "off" in default lint (existing violations). Use `npm run lint:boundaries`
-  // to see current violations. Escalate to "warn"/"error" after fixing them.
+  // All 465 violations fixed (Plan 136). Enforced as error to prevent regressions.
+  // Use `npm run lint:boundaries` to check violations locally.
   {
     files: ["src/**/*.ts", "src/**/*.tsx"],
     ignores: [
@@ -420,7 +420,7 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "local-rules/enforce-module-boundaries": [
-        "off",
+        "error",
         {
           protectedModules: [
             "safety",
@@ -436,6 +436,21 @@ const eslintConfig = defineConfig([
           ],
         },
       ],
+    },
+  },
+  // ADR 0045: Enforce dependency direction between protected modules
+  // CORE (safety, security, privacy) → no imports from FEATURE or CROSS
+  // FEATURE (ai, education, rag) → may import CORE only
+  // CROSS (auth, tier, accessibility, compliance) → may import CORE and FEATURE
+  // Auth is universal: any module may import from auth.
+  {
+    files: ["src/lib/**/*.ts"],
+    ignores: [
+      "**/*.test.ts",
+      "**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/enforce-dependency-direction": "warn",
     },
   },
 ]);
