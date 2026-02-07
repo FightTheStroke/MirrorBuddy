@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **iOS Release Documentation**: Complete iOS release guide (`docs/claude/ios-release.md`) with prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
 - **Fastlane Matchfile**: Certificate management configuration (`ios/fastlane/Matchfile`) with readonly mode for CI safety
 - **iOS Environment Variables**: APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD in `.env.example`
+- **iOS Release Checks Agent**: `ios-release-checks.md` module with 8 automated validation checks (build, sync, certificates, version, provisioning, Xcode, CocoaPods, compilation)
+- **Release Manager v4.0.0**: `app-release-manager.md` updated with iOS detection in Phase 0, Task O for iOS release checks, execution module with iOS report template
 
 ## [0.14.0] - 2026-02-07
 
