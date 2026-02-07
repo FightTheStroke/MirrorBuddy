@@ -139,7 +139,7 @@ In case of data breach:
 ## Contact
 
 **Data Controller**: MirrorBuddy Team
-**DPO Contact**: [To be designated]
+**DPO Contact**: Roberto D'Angelo (Interim) — privacy@mirrorbuddy.org
 
 ## Compliance Tests
 
@@ -154,4 +154,4 @@ Run with: `npm run test -- --grep gdpr`
 - [GDPR Full Text](https://gdpr.eu/tag/gdpr/)
 - [Italian DPA Guidelines](https://www.garanteprivacy.it/)
 - [ADR-0045: Domain Boundaries](../adr/0045-domain-boundaries.md)
-- [Privacy Module](../../src/lib/privacy/README.md)
+- [Privacy Module](../../src/lib/privacy/index.ts)

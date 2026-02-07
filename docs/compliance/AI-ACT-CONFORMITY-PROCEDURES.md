@@ -117,11 +117,13 @@
 **Function**: High-risk AI system registry
 **Action**: Register CAR + DoC within 30 days of issuance
 
-### EU Notified Body (TBD)
+### EU Notified Body
 
+**Status**: Pending — selection in progress for Q2 2026 engagement
 **Role**: Independent conformity assessment authority
-**Timeline**: Engagement Q2 2026
+**Timeline**: Selection Q2 2026, engagement Q3 2026
 **Reporting**: Quarterly reports during Year 1, annual thereafter
+**Note**: MirrorBuddy is classified as limited-risk under EU AI Act Art. 52 (transparency obligations). Notified body engagement is precautionary, not mandatory.
 
 ---
 

@@ -29,9 +29,13 @@ interface HreflangTagsProps {
 export function HreflangTags({
   pathname,
   locales = ["it", "en", "fr", "de", "es"] as const,
-  baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org",
+  baseUrl,
 }: HreflangTagsProps) {
-  const tags = generateHreflangTags(baseUrl, pathname, locales);
+  const resolvedBaseUrl = baseUrl ?? process.env.NEXT_PUBLIC_SITE_URL;
+  if (!resolvedBaseUrl) {
+    throw new Error("NEXT_PUBLIC_SITE_URL is required for hreflang tags");
+  }
+  const tags = generateHreflangTags(resolvedBaseUrl, pathname, locales);
 
   return (
     <>

@@ -140,6 +140,8 @@ jobs:
           NEXT_TELEMETRY_DISABLED: 1
           # Required for provider check during build - ensures correct page rendering
           OLLAMA_URL: http://localhost:11434
+          # Required for canonical URL generation (no fallback — throws if missing)
+          NEXT_PUBLIC_SITE_URL: https://mirrorbuddy.org
 
       # Share build output with E2E and Performance jobs
       - name: Verify and prepare build output
@@ -1543,7 +1545,8 @@ jobs:
           needs.compliance-e2e.result != 'success' ||
           needs.mobile-e2e.result != 'success' ||
           needs.docker.result != 'success' ||
-          needs.performance.result != 'success'
+          needs.performance.result != 'success' ||
+          needs.sentry-config.result != 'success'
         run: |
           echo "::error::DEPLOYMENT BLOCKED - One or more checks failed"
           echo ""
@@ -1565,6 +1568,7 @@ jobs:
           echo "  mobile-e2e: ${{ needs.mobile-e2e.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
+          echo "  sentry-config: ${{ needs.sentry-config.result }}"
           exit 1
 
       - name: Deployment approved
@@ -1585,7 +1589,8 @@ jobs:
           needs.compliance-e2e.result == 'success' &&
           needs.mobile-e2e.result == 'success' &&
           needs.docker.result == 'success' &&
-          needs.performance.result == 'success'
+          needs.performance.result == 'success' &&
+          needs.sentry-config.result == 'success'
         run: |
           echo "All blocking checks passed - Safe to deploy to production"
           echo ""
@@ -1607,6 +1612,7 @@ jobs:
           echo "  mobile-e2e"
           echo "  docker"
           echo "  performance"
+          echo "  sentry-config"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 
