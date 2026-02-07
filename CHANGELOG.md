@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W2-User-Features
+
+- Added: Self-service password reset flow with forgot-password and reset-password pages
+- Added: Password reset API routes for token generation and validation
+- Added: PasswordResetToken Prisma model with expiration tracking
+- Added: i18n keys for password reset in all 5 locales (en, it, fr, de, es)
+- Added: Password reset email template with locale-specific support
+- Added: PWA offline support using Workbox-style caching strategies
+- Added: NetworkFirst caching for pages, CacheFirst for static assets, NetworkOnly for API calls
+- Added: offline.html fallback page for network errors
+- Added: Service Worker registration in app providers
+
 ### W1-Mobile-Build
 
 - Fixed: Capacitor webDir configuration — created next.config.mobile.ts with output:'export' for static builds compatible with Capacitor
