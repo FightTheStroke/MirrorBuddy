@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/lib/stores";
 import { clientLogger } from "@/lib/logger/client";
 import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { MobileLogoutButton } from "./sections/mobile-logout-button";
 import {
   SettingsSectionsMobile,
   type SettingsSection,
@@ -74,6 +75,12 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
 
   // Build sections array for SettingsSectionsMobile
   const sections: SettingsSection[] = [
+    {
+      id: "account",
+      title: "Account",
+      icon: "🔑",
+      content: <MobileLogoutButton />,
+    },
     {
       id: "profile",
       title: "Profilo",
