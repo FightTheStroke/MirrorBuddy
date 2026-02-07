@@ -9,14 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **iOS Release Documentation**: Complete iOS release guide (`docs/claude/ios-release.md`) with prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
-- **Fastlane Matchfile**: Certificate management configuration (`ios/fastlane/Matchfile`) with readonly mode for CI safety
-- **iOS Environment Variables**: APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD in `.env.example`
-- **iOS Release Checks Agent**: `ios-release-checks.md` module with 8 automated validation checks (build, sync, certificates, version, provisioning, Xcode, CocoaPods, compilation)
-- **Release Manager v4.0.0**: `app-release-manager.md` updated with iOS detection in Phase 0, Task O for iOS release checks, execution module with iOS report template
-- **iOS Release Check Script**: `scripts/ios-release-check.sh` with 8 automated checks (build, sync, match, version, provisioning, Xcode, CocoaPods, compile), JSON output, Linux-safe skip for macOS-only checks
-- **Fastfile Match Integration**: Added `sync_code_signing` before `build_app` in beta/release lanes, `match_nuke` lane for certificate reset
-- **ios:check npm Script**: `npm run ios:check` shortcut for standalone iOS release validation
+- **iOS Release Pipeline**: Complete infrastructure for iOS app releases via TestFlight and App Store Connect
+  - Documentation: `docs/claude/ios-release.md` guide covering prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
+  - Configuration: Matchfile for certificate management (readonly mode for CI safety), Fastfile match integration (`sync_code_signing` before builds, `match_nuke` for certificate reset), environment variables (APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD)
+  - Automation: `scripts/ios-release-check.sh` with 8 automated checks (build, sync, match, version, provisioning, Xcode, CocoaPods, compile), JSON output, Linux-safe skip for macOS-only checks, `npm run ios:check` script
+  - Agent Integration: `ios-release-checks.md` module for app-release-manager v4.0.0 with iOS detection in Phase 0, Task O for release validation, execution module with iOS report template
 
 ## [0.14.0] - 2026-02-07
 
