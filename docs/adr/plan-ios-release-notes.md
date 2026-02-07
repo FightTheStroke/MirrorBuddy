@@ -37,3 +37,24 @@
 
 - Agent files live in `~/.claude/agents/` (outside repo), so they won't appear in git status
 - Original app-release-manager.md was 266 lines (over limit); trimmed to 146 by condensing descriptions
+
+## W3-Automation
+
+### Completed Tasks
+
+- **T3-01**: Created `scripts/ios-release-check.sh` (197 lines) - 8 automated checks with JSON output, Linux-safe skip for macOS-only checks (5-8)
+- **T3-02**: Updated `ios/fastlane/Fastfile` - added `sync_code_signing` in beta/release lanes, added `match_nuke` lane
+- **T3-03**: Added `ios:check` npm script to `package.json` pointing to `scripts/ios-release-check.sh`
+
+### Decisions
+
+- Checks 1-4 are blocking (run on all platforms): mobile web build, cap sync, match env vars, Info.plist version
+- Checks 5-8 are macOS-only: provisioning profiles, Xcode CLI, CocoaPods, iOS compile — SKIP on Linux
+- JSON output format for machine-readable CI integration: `{timestamp, checks[], summary, result}`
+- Exit 0 on all blocking pass, exit 1 on any blocking fail (skip does not fail)
+
+### Observations
+
+- `sync_code_signing(type: "appstore")` placed before `build_app` ensures profiles are always fresh
+- `match_nuke` lane allows emergency certificate reset without manual Apple Developer Portal access
+- Script uses `set -euo pipefail` per coding standards, with `trap cleanup EXIT`
