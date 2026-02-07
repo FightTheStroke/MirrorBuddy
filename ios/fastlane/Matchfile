@@ -1,0 +1,23 @@
+# Fastlane Matchfile - Certificate Management
+# MirrorBuddy - La Scuola Che Vorrei
+
+# Git repository URL for storing certificates and provisioning profiles
+git_url(ENV["MATCH_GIT_URL"])
+
+# Distribution type: appstore, adhoc, development, or enterprise
+type("appstore")
+
+# App bundle identifier
+app_identifier("com.mirror-labs.MirrorBuddy")
+
+# Apple Developer Team ID
+team_id(ENV["TEAM_ID"])
+
+# Apple ID (email)
+username(ENV["APPLE_ID"])
+
+# Read-only mode for CI (avoids accidental certificate regeneration)
+readonly(true)
+
+# For more information about Match, see:
+# https://docs.fastlane.tools/actions/match/

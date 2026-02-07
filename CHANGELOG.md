@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **iOS Release Documentation**: Complete iOS release guide (`docs/claude/ios-release.md`) with prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
+- **Fastlane Matchfile**: Certificate management configuration (`ios/fastlane/Matchfile`) with readonly mode for CI safety
+- **iOS Environment Variables**: APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD in `.env.example`
+
 ## [0.14.0] - 2026-02-07
 
 ### Added
