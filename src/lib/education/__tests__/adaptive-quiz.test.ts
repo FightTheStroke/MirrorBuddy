@@ -26,9 +26,13 @@ const { mockHybridSearch } = vi.hoisted(() => ({
   mockHybridSearch: vi.fn(),
 }));
 
-vi.mock("@/lib/rag", () => ({
-  hybridSearch: mockHybridSearch,
-}));
+vi.mock("@/lib/rag/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rag/server")>();
+  return {
+    ...actual,
+    hybridSearch: mockHybridSearch,
+  };
+});
 
 import {
   analyzeQuizPerformance,

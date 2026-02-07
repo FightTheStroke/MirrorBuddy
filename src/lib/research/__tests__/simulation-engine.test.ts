@@ -12,9 +12,13 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+  };
+});
 
 import { runSimulation, type SimulationConfig } from "../simulation-engine";
 import { SYNTHETIC_PROFILES } from "../synthetic-students";

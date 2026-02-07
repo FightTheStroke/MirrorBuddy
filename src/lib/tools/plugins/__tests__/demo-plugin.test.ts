@@ -18,14 +18,18 @@ vi.mock("nanoid", () => ({
   nanoid: vi.fn(() => "demo-test-id"),
 }));
 
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(() =>
-    Promise.resolve({
-      content:
-        '{"html":"<div>Demo</div>","css":".demo{color:red;}","js":"console.log(1);"}',
-    }),
-  ),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(() =>
+      Promise.resolve({
+        content:
+          '{"html":"<div>Demo</div>","css":".demo{color:red;}","js":"console.log(1);"}',
+      }),
+    ),
+  };
+});
 
 vi.mock("../handlers/demo-handler", () => ({
   sanitizeHtml: vi.fn((html: string) => Promise.resolve(html)),
@@ -46,17 +50,21 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getFeatureAIConfigForUser: vi.fn(() =>
-      Promise.resolve({
-        model: "gpt-4o",
-        temperature: 0.8,
-        maxTokens: 4000,
-      }),
-    ),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getFeatureAIConfigForUser: vi.fn(() =>
+        Promise.resolve({
+          model: "gpt-4o",
+          temperature: 0.8,
+          maxTokens: 4000,
+        }),
+      ),
+    },
+  };
+});
 
 vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
   getDeploymentForModel: vi.fn((model: string) => model),

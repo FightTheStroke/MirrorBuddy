@@ -17,11 +17,15 @@ vi.mock("nanoid", () => ({
 }));
 
 // Mock dyscalculia accessibility helpers
-vi.mock("@/lib/education/accessibility/dyscalculia", () => ({
-  formatNumberColored: vi.fn(
-    (num: number) => `<span class="colored">${num}</span>`,
-  ),
-}));
+vi.mock("@/lib/education", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/education")>();
+  return {
+    ...actual,
+    formatNumberColored: vi.fn(
+      (num: number) => `<span class="colored">${num}</span>`,
+    ),
+  };
+});
 
 // Mock logger
 vi.mock("@/lib/logger", () => ({

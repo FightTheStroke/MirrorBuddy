@@ -52,9 +52,15 @@ vi.mock("@/data/maestri", () => ({
   getMaestroById: vi.fn(),
 }));
 
-vi.mock("@/lib/safety/safety-prompts", () => ({
-  injectSafetyGuardrails: vi.fn((prompt, _options) => `[SAFE] ${prompt}`),
-}));
+vi.mock("@/lib/safety", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/safety")>();
+  return {
+    ...actual,
+    injectSafetyGuardrails: vi.fn(
+      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
+    ),
+  };
+});
 
 import { prisma } from "@/lib/db";
 import { tierService } from "@/lib/tier/server";

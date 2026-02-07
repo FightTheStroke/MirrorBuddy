@@ -121,32 +121,35 @@ import its own internals freely).
 The `enforce-dependency-direction` rule enforces architectural layer boundaries
 to prevent circular dependencies and maintain clean architecture:
 
-**Direction: Core → Features → UI**
+**Direction between protected modules in `src/lib/`:**
+
+The rule enforces dependency direction **within** `src/lib/` protected modules only.
+It does NOT enforce boundaries between `src/lib/`, `src/app/`, and `src/components/`
+(those are consumers and can freely import from `src/lib/`).
+
+**Module tiers:**
+
+- **CORE** (safety, security, privacy): Cannot import from FEATURE or CROSS modules
+- **FEATURE** (ai, education, rag): May import from CORE only
+- **CROSS** (auth, tier, accessibility, compliance): May import from CORE and FEATURE
+- **Auth exception**: Any module may import from auth (universal dependency)
 
 ```typescript
-// ❌ BLOCKED - Core importing from Features
-// src/lib/ai/index.ts
-import { analyzeContent } from "@/app/api/analyze"; // ERROR
+// ❌ BLOCKED - FEATURE importing from CROSS
+// src/lib/ai/summarize.ts
+import { tierService } from "@/lib/tier/server"; // ERROR (ai is FEATURE, tier is CROSS)
 
-// ✅ ALLOWED - Features importing from Core
-// src/app/api/analyze/route.ts
-import { generateResponse } from "@/lib/ai"; // OK
+// ✅ ALLOWED - CROSS importing from CORE
+// src/lib/compliance/coppa-service.ts
+import { filterInput } from "@/lib/safety"; // OK (compliance is CROSS, safety is CORE)
 
-// ❌ BLOCKED - Core importing from UI
-// src/lib/tier/index.ts
-import { Button } from "@/components/ui/button"; // ERROR
-
-// ✅ ALLOWED - UI importing from Core
-// src/components/dashboard.tsx
-import { tierService } from "@/lib/tier"; // OK
+// ✅ ALLOWED - Any module importing from auth
+// src/lib/ai/providers.ts
+import { validateAuth } from "@/lib/auth/server"; // OK (auth is universal)
 ```
 
-**Layer rules:**
-
-- **Core** (`src/lib/`, `src/types/`, `src/data/`): Cannot import from
-  Features or UI
-- **Features** (`src/app/api/`): Can import from Core, cannot import from UI
-- **UI** (`src/app/`, `src/components/`): Can import from Core and Features
+**Current status:** `warn` level (with `--max-warnings 0` in CI, effectively blocking).
+Will escalate to `error` when all violations are resolved.
 
 **Exception:** Test files (`*.test.ts`, `*.test.tsx`, `__tests__/`) are exempt
 from both rules.

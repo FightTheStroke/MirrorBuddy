@@ -4,9 +4,13 @@ import { TOOL_SCHEMAS } from "../tool-parameter-schemas";
 import * as aiProviders from "@/lib/ai/server";
 
 // Mock the AI provider
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+  };
+});
 
 describe("ai-parameter-extractor", () => {
   beforeEach(() => {

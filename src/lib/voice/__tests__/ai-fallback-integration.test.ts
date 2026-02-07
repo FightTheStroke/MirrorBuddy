@@ -2,10 +2,14 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { extractToolParameters } from "../voice-parameter-extractor";
 import * as aiProviders from "@/lib/ai/server";
 
-// Mock the AI provider
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+// Mock the AI server module (chatCompletion is re-exported from providers)
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+  };
+});
 
 describe("AI fallback integration", () => {
   beforeEach(() => {

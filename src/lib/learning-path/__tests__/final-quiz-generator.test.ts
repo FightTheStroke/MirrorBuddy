@@ -30,18 +30,26 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock AI provider
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+  };
+});
 
 // Mock tier service (ADR 0073)
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getFeatureAIConfigForUser: vi.fn(() =>
-      Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 2000 }),
-    ),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getFeatureAIConfigForUser: vi.fn(() =>
+        Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 2000 }),
+      ),
+    },
+  };
+});
 
 // Mock deployment mapping
 vi.mock("@/lib/ai/providers/deployment-mapping", () => ({

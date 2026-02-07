@@ -90,14 +90,42 @@ All exceptions are documented with `// eslint-disable-next-line @typescript-esli
    - `enforce-module-boundaries` (error level) — Blocks imports from protected modules without barrel export
    - `enforce-dependency-direction` (warn level) — Validates layer-based dependency flow per matrix above
 
+### Client/Server Barrel Split
+
+Next.js Turbopack cannot tree-shake barrel re-exports. If a barrel (`index.ts`) re-exports
+both client-safe and server-only code (prisma, `next/headers`, `server-only`), any client
+component importing from that barrel causes a build failure.
+
+**Solution**: Each module with server-only code has two barrels:
+
+| File        | Contains                            | Consumers                           |
+| ----------- | ----------------------------------- | ----------------------------------- |
+| `index.ts`  | Client-safe exports only            | Client components, stores, hooks    |
+| `server.ts` | Re-exports from index + server-only | API routes, server components, cron |
+
+**Modules with server.ts** (8 of 10):
+`auth`, `tier`, `ai`, `safety`, `compliance`, `education`, `rag`, `privacy`
+
+**Modules without server.ts** (2 of 10):
+`security`, `accessibility` — no server-only dependencies
+
+```typescript
+// server.ts pattern:
+export * from "./index"; // all client-safe exports
+export { validateAuth } from "./session-auth"; // server-only
+```
+
 ### Import Rules
 
 ```typescript
-// GOOD: Import from barrel
-import { detectHarm } from "@/lib/safety";
+// GOOD: Client component imports from barrel
+import { csrfFetch } from "@/lib/auth";
 
-// BAD: Import internal module
-import { detectHarm } from "@/lib/safety/harm-detection";
+// GOOD: API route imports from server barrel
+import { validateAuth } from "@/lib/auth/server";
+
+// BAD: Import internal module directly
+import { validateAuth } from "@/lib/auth/session-auth";
 ```
 
 ### CI Enforcement
