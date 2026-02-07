@@ -228,7 +228,7 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Screen reader compatibility statement
 - [ ] Known limitations (if any)
 - [ ] Feedback form for accessibility issues
-- [ ] Contact: accessibilita@fightthestroke.org
+- [ ] Contact: roberdan@fightthestroke.org
 - [ ] BfDI contact information
 - [ ] Last update date
 

@@ -48,6 +48,20 @@ echo "$debt_output" | tail -10
 echo -e "${GREEN}✓ Technical debt check passed${NC}"
 
 echo ""
+echo -e "${BLUE}[PHASE 1.5] Vercel EU region pinning...${NC}"
+if [ ! -f "vercel.json" ]; then
+	echo -e "${RED}✗ BLOCKED: vercel.json not found${NC}"
+	exit 1
+fi
+
+if ! rg -q '"regions"\s*:\s*\[[^]]*"fra1"' vercel.json; then
+	echo -e "${RED}✗ BLOCKED: vercel.json must pin Vercel compute to EU region (fra1)${NC}"
+	echo "Expected: \"regions\": [\"fra1\"]"
+	exit 1
+fi
+echo -e "${GREEN}✓ Vercel EU region pinning passed${NC}"
+
+echo ""
 echo -e "${BLUE}[PHASE 2] TypeScript rigor...${NC}"
 check_ts_rigor
 if [ "$_EXIT" -ne 0 ]; then

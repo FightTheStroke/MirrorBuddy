@@ -336,7 +336,7 @@ IP_HASH_SALT=your-secret-32-char-salt-here-change-monthly
 # Existing vars (required for cron jobs)
 CRON_SECRET=your-cron-secret
 RESEND_API_KEY=re_xxxx
-ADMIN_EMAIL=admin@mirrorbuddy.it
+ADMIN_EMAIL=roberdan@fightthestroke.org
 UPSTASH_REDIS_REST_URL=https://...
 UPSTASH_REDIS_REST_TOKEN=xxxx
 ```

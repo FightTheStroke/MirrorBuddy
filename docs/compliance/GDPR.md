@@ -139,7 +139,7 @@ In case of data breach:
 ## Contact
 
 **Data Controller**: MirrorBuddy Team
-**DPO Contact**: Roberto D'Angelo (Interim) — privacy@mirrorbuddy.org
+**DPO Contact**: Roberto D'Angelo (Interim) — roberdan@fightthestroke.org
 
 ## Compliance Tests
 

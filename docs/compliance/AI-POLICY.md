@@ -90,7 +90,7 @@ Users have the right to:
 
 To report concerns about AI use in MirrorBuddy:
 
-- **Email**: info@fightthestroke.org
+- **Email**: roberdan@fightthestroke.org
 - **Online Form**: www.mirrorbuddy.it/privacy/ai-complaint
 - **Supervisor**: Data Protection Authority (www.garanteprivacy.it)
 - **Appeal**: Right to appeal to the national AI oversight authority (AGID)

@@ -70,7 +70,7 @@ MirrorBuddy complies with:
 
 For compliance inquiries or questions:
 
-**Email**: info@fightthestroke.org
+**Email**: roberdan@fightthestroke.org
 
 **Website**: https://www.fightthestroke.org
 

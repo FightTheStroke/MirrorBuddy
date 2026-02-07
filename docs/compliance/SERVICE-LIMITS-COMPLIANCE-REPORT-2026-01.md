@@ -47,13 +47,13 @@ This comprehensive audit establishes baseline monitoring, compliance verificatio
 
 ### 1.1 Primary Services (High PII Processing)
 
-| Service           | Purpose             | Region                      | Transfer Type     | DPA Status    | Risk Level  |
-| ----------------- | ------------------- | --------------------------- | ----------------- | ------------- | ----------- |
-| **Supabase**      | PostgreSQL database | 🇪🇺 EU (Frankfurt)           | EU-only           | ✅ Active     | 🟢 LOW      |
-| **Azure OpenAI**  | AI chat + voice     | 🇪🇺 EU (West Europe, Sweden) | EU-only           | ✅ Active     | 🟢 LOW      |
-| **Vercel**        | Hosting platform    | 🇺🇸 US (AWS us-east-1)       | EU → US (SCC)     | ✅ Active     | 🟡 LOW      |
-| **Resend**        | Transactional email | 🇺🇸 US (AWS)                 | EU → US (SCC)     | ✅ Active     | 🟡 LOW      |
-| **Upstash Redis** | Rate limiting       | 🌍 Global                   | EU → Global (SCC) | ✅ Via Vercel | 🟢 VERY LOW |
+| Service           | Purpose             | Region                               | Transfer Type                  | DPA Status    | Risk Level  |
+| ----------------- | ------------------- | ------------------------------------ | ------------------------------ | ------------- | ----------- |
+| **Supabase**      | PostgreSQL database | 🇪🇺 EU (Frankfurt)                    | EU-only                        | ✅ Active     | 🟢 LOW      |
+| **Azure OpenAI**  | AI chat + voice     | 🇪🇺 EU (West Europe, Sweden)          | EU-only                        | ✅ Active     | 🟢 LOW      |
+| **Vercel**        | Hosting platform    | 🇪🇺 EU (`fra1`) + vendor global infra | EU → EU/Global (SCC as needed) | ✅ Active     | 🟡 LOW      |
+| **Resend**        | Transactional email | 🇺🇸 US (AWS)                          | EU → US (SCC)                  | ✅ Active     | 🟡 LOW      |
+| **Upstash Redis** | Rate limiting       | 🌍 Global                            | EU → Global (SCC)              | ✅ Via Vercel | 🟢 VERY LOW |
 
 ### 1.2 Ancillary Services (Minimal/No PII)
 
@@ -68,7 +68,7 @@ This comprehensive audit establishes baseline monitoring, compliance verificatio
 
 - **Total services**: 9
 - **EU-only**: 3 (Supabase, Azure OpenAI, Ollama)
-- **Extra-EU with SCCs**: 3 (Vercel, Resend, Upstash)
+- **Extra-EU with SCCs**: 2 direct services (Resend, Upstash) + vendor sub-processors where applicable
 - **Minimal PII**: 3 (Brave, Google OAuth, Grafana)
 - **Local-only**: 1 (Ollama)
 
@@ -211,11 +211,11 @@ All DPAs include:
 
 **Status**: ✅ **ALL EXTRA-EU TRANSFERS PROTECTED**
 
-| Transfer Route        | SCC Type                        | SCC Version | Status   |
-| --------------------- | ------------------------------- | ----------- | -------- |
-| EU → US (Vercel)      | Module 2 (Controller-Processor) | EU 2021/914 | ✅ Valid |
-| EU → US (Resend)      | Module 2 (Controller-Processor) | EU 2021/914 | ✅ Valid |
-| EU → Global (Upstash) | Module 2 (inherited via Vercel) | EU 2021/914 | ✅ Valid |
+| Transfer Route                                | SCC Type                        | SCC Version | Status   |
+| --------------------------------------------- | ------------------------------- | ----------- | -------- |
+| EU → EU/Global (Vercel vendor sub-processors) | Module 2 (Controller-Processor) | EU 2021/914 | ✅ Valid |
+| EU → US (Resend)                              | Module 2 (Controller-Processor) | EU 2021/914 | ✅ Valid |
+| EU → Global (Upstash)                         | Module 2 (inherited via Vercel) | EU 2021/914 | ✅ Valid |
 
 **Total Extra-EU Transfers**: 3
 **SCCs Required**: 3
@@ -579,14 +579,14 @@ Articles verified: 44 (General principle), 45 (Adequacy), 46 (SCCs), 28 (Process
 
 ### 9.3 Future Enhancements (Q2-Q3 2026)
 
-| Priority | Enhancement                                        | Rationale                 | Effort | Impact            |
-| -------- | -------------------------------------------------- | ------------------------- | ------ | ----------------- |
-| P2       | Consider EU-only Redis (Upstash EU)                | Reduce extra-EU transfers | Low    | Minimal           |
-| P2       | Explore EU email provider (Postmark EU)            | Keep all PII in EU        | Medium | Minimal           |
-| P3       | Add Vercel EU regions (when available)             | Eliminate US hosting      | TBD    | Depends on Vercel |
-| P3       | Automate DPA monitoring with renewal alerts        | Operational efficiency    | Medium | HIGH              |
-| P3       | Implement sub-processor change notification system | Compliance automation     | Medium | MEDIUM            |
-| P3       | Create internal audit checklist for new services   | Process improvement       | Low    | MEDIUM            |
+| Priority | Enhancement                                        | Rationale                 | Effort            | Impact                                                        |
+| -------- | -------------------------------------------------- | ------------------------- | ----------------- | ------------------------------------------------------------- |
+| P2       | Consider EU-only Redis (Upstash EU)                | Reduce extra-EU transfers | Low               | Minimal                                                       |
+| P2       | Explore EU email provider (Postmark EU)            | Keep all PII in EU        | Medium            | Minimal                                                       |
+| P3       | Pin Vercel compute to EU region (`fra1`)           | Reduce extra-EU compute   | Done (2026-02-07) | Residual SCC posture still required for vendor sub-processors |
+| P3       | Automate DPA monitoring with renewal alerts        | Operational efficiency    | Medium            | HIGH                                                          |
+| P3       | Implement sub-processor change notification system | Compliance automation     | Medium            | MEDIUM                                                        |
+| P3       | Create internal audit checklist for new services   | Process improvement       | Low               | MEDIUM                                                        |
 
 **Note**: Priority 2-3 items are **optional optimizations**, not compliance requirements. MirrorBuddy is already fully GDPR-compliant with current setup.
 
@@ -666,12 +666,12 @@ MirrorBuddy can demonstrate to:
 
 ### Appendix B: Contact Information
 
-| Role                              | Responsibility                                   | Contact                       |
-| --------------------------------- | ------------------------------------------------ | ----------------------------- |
-| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight, user rights | [To be assigned in CLAUDE.md] |
-| **Compliance Officer**            | Bi-annual DPA reviews, audit scheduling          | [To be assigned in CLAUDE.md] |
-| **Technical Lead**                | Service configuration, monitoring, alerting      | [To be assigned in CLAUDE.md] |
-| **Legal Counsel**                 | SCC validity, regulatory changes                 | [To be assigned in CLAUDE.md] |
+| Role                              | Responsibility                                   | Contact                                                  |
+| --------------------------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight, user rights | Roberto D'Angelo (Interim) — roberdan@fightthestroke.org |
+| **Compliance Officer**            | Bi-annual DPA reviews, audit scheduling          | Roberto D'Angelo (Interim)                               |
+| **Technical Lead**                | Service configuration, monitoring, alerting      | Roberto D'Angelo (Interim)                               |
+| **Legal Counsel**                 | SCC validity, regulatory changes                 | External legal counsel (retained)                        |
 
 ### Appendix C: Regulatory References
 

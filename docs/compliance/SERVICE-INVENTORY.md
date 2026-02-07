@@ -132,10 +132,10 @@ Voice usage (40 users, 5 min/session, 2 sessions/day):
 | **Bandwidth Limit**      | 100 GB/mo, €0.15 per additional GB                 |
 | **Function Invocations** | 2,000,000/mo, €0.50 per 1M additional              |
 | **Concurrent Functions** | 1,000 (soft limit)                                 |
-| **Data Location**        | 🇺🇸 US (AWS us-east-1 primary), global CDN          |
+| **Data Location**        | 🇪🇺 EU (`fra1` pinned) + vendor global infra        |
 | **Compliance Status**    | ✅ GDPR-Compliant (SCC protected)                  |
 | **DPA Present**          | ✅ Yes - `docs/compliance/dpa/VERCEL-DPA.md`       |
-| **SCC Required**         | ✅ Yes (EU → US transfer)                          |
+| **SCC Required**         | ✅ Yes (where vendor sub-processors are extra-EU)  |
 | **Data Processed**       | Application code, logs, analytics, session cookies |
 | **Annual Cost**          | €240 (base) + overages                             |
 | **Upgrade Path**         | Pro (€65/mo) → Enterprise (custom)                 |
@@ -496,7 +496,7 @@ GRAFANA CLOUD
 | ----------------- | ----------------- | ------------------------- | ------------- |
 | **Supabase**      | None (EU-only)    | N/A                       | 🟢 Zero       |
 | **Azure OpenAI**  | None (EU-only)    | N/A                       | 🟢 Zero       |
-| **Vercel**        | EU → US           | SCC Module 2              | 🟡 Low        |
+| **Vercel**        | EU → EU/Global    | SCC Module 2              | 🟡 Low        |
 | **Resend**        | EU → US           | SCC Module 2              | 🟡 Low        |
 | **Upstash**       | EU → Global       | SCC Module 2 (via Vercel) | 🟢 Very Low   |
 | **Google OAuth**  | Global            | Standard Google SCCs      | 🟡 Low        |

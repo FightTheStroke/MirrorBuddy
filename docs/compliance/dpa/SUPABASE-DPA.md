@@ -206,7 +206,7 @@ Supabase supports GDPR data subject rights through:
 | Certification       | Status         | Audit Date         | Next Review       |
 | ------------------- | -------------- | ------------------ | ----------------- |
 | **SOC 2 Type II**   | ✅ Active      | 2025-Q4            | 2026-Q4           |
-| **ISO 27001**       | 🔄 In Progress | 2026-Q2 (expected) | TBD               |
+| **ISO 27001**       | 🔄 In Progress | 2026-Q2 (expected) | 2026-Q4 (target)  |
 | **GDPR Compliance** | ✅ Active      | Ongoing            | Continuous        |
 | **PCI DSS**         | N/A            | Not applicable     | (No card storage) |
 

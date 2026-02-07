@@ -134,4 +134,4 @@ A: Only Azure OpenAI (Microsoft) processes texts to generate responses. Microsof
 **Language**: English
 **Target Audience**: Parents, students, educators
 
-For questions about privacy: info@fightthestroke.org
+For questions about privacy: roberdan@fightthestroke.org

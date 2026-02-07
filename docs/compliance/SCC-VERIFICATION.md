@@ -26,11 +26,11 @@ This document verifies that all extra-EU transfers in MirrorBuddy are protected 
 
 ### 1.1 Summary Table
 
-| Service           | Transfer Route                    | Data Transferred                     | SCC Module            | Status       |
-| ----------------- | --------------------------------- | ------------------------------------ | --------------------- | ------------ |
-| **Vercel**        | EU → US (AWS us-east-1)           | Application hosting, logs, analytics | Module 2 (C2P)        | ✅ Compliant |
-| **Resend**        | EU → US (AWS us-east-1/us-west-2) | Email addresses, message content     | Module 2 (C2P)        | ✅ Compliant |
-| **Upstash Redis** | EU → Global (multi-region)        | User ID hashes, rate limit counters  | Module 2 (via Vercel) | ✅ Compliant |
+| Service           | Transfer Route                           | Data Transferred                     | SCC Module            | Status       |
+| ----------------- | ---------------------------------------- | ------------------------------------ | --------------------- | ------------ |
+| **Vercel**        | EU → EU (`fra1`) + vendor sub-processors | Application hosting, logs, analytics | Module 2 (C2P)        | ✅ Compliant |
+| **Resend**        | EU → US (AWS us-east-1/us-west-2)        | Email addresses, message content     | Module 2 (C2P)        | ✅ Compliant |
+| **Upstash Redis** | EU → Global (multi-region)               | User ID hashes, rate limit counters  | Module 2 (via Vercel) | ✅ Compliant |
 
 **Legend**: C2P = Controller-to-Processor
 
@@ -88,9 +88,9 @@ This document verifies that all extra-EU transfers in MirrorBuddy are protected 
 | **Service Provider**      | Vercel Inc. (US)                                                                 |
 | **Data Controller**       | MirrorBuddy                                                                      |
 | **Data Processor**        | Vercel                                                                           |
-| **Transfer Route**        | EU → US (AWS us-east-1)                                                          |
+| **Transfer Route**        | EU → EU (`fra1`) with SCC coverage for applicable vendor sub-processors          |
 | **Data Categories**       | Application code, deployment logs, analytics, session cookies, user interactions |
-| **Primary Data Location** | United States (AWS us-east-1)                                                    |
+| **Primary Data Location** | EU (`fra1`) runtime with vendor-managed global infrastructure as documented      |
 
 #### SCC Details
 
@@ -328,7 +328,7 @@ All extra-EU transfers include **supplementary measures** beyond SCCs to protect
 
 **Medium-Term (Q2-Q3 2026)**:
 
-- [ ] Evaluate EU-only hosting option for Vercel (Enterprise plan, AWS eu-west-1)
+- [x] Pin Vercel runtime to EU region (`fra1`) in `vercel.json`
 - [ ] Consider EU-based email provider as Resend alternative (if available)
 - [ ] Review Upstash data residency options (EU-only Redis instance)
 
@@ -439,11 +439,11 @@ All SCCs must include three annexes per EU 2021/914:
 
 ### 9.2 MirrorBuddy Internal
 
-| Role                              | Responsibility                                 | Contact                       |
-| --------------------------------- | ---------------------------------------------- | ----------------------------- |
-| **Data Protection Officer (DPO)** | GDPR compliance, SCC oversight                 | [To be assigned in CLAUDE.md] |
-| **Compliance Officer**            | Annual DPA review, sub-processor monitoring    | Roberto D'Angelo (Interim)    |
-| **Technical Lead**                | Service configuration, encryption verification | Roberto D'Angelo (Interim)    |
+| Role                              | Responsibility                                 | Contact                                                  |
+| --------------------------------- | ---------------------------------------------- | -------------------------------------------------------- |
+| **Data Protection Officer (DPO)** | GDPR compliance, SCC oversight                 | Roberto D'Angelo (Interim) — roberdan@fightthestroke.org |
+| **Compliance Officer**            | Annual DPA review, sub-processor monitoring    | Roberto D'Angelo (Interim)                               |
+| **Technical Lead**                | Service configuration, encryption verification | Roberto D'Angelo (Interim)                               |
 
 ---
 

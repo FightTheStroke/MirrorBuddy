@@ -15,7 +15,7 @@ This document maps **all data flows** in MirrorBuddy, identifies EU vs extra-EU 
 **Compliance Status**: ✅ ALL TRANSFERS COMPLIANT
 
 - **EU-only transfers**: 2 services (Supabase database, Azure OpenAI)
-- **Extra-EU transfers with SCCs**: 3 services (Resend, Vercel, Upstash Redis)
+- **Extra-EU transfers with SCCs**: 2 direct services (Resend, Upstash) + vendor sub-processors where applicable
 - **Local-only processing**: 1 service (Ollama fallback)
 - **Non-compliant transfers**: **ZERO**
 
@@ -27,7 +27,7 @@ This document maps **all data flows** in MirrorBuddy, identifies EU vs extra-EU 
 
 ```mermaid
 flowchart TB
-    User[MirrorBuddy User<br/>Italy/EU] -->|HTTPS/TLS 1.3| Vercel[Vercel Hosting<br/>US - AWS us-east-1<br/>✅ SCC Protected]
+    User[MirrorBuddy User<br/>Italy/EU] -->|HTTPS/TLS 1.3| Vercel[Vercel Hosting<br/>EU - fra1 (pinned)<br/>✅ SCC Protected where needed]
 
     Vercel -->|PostgreSQL<br/>TLS 1.3| Supabase[Supabase Database<br/>EU - Frankfurt<br/>✅ EU-only]
 
@@ -71,14 +71,14 @@ flowchart TB
 
 ### 2.1 Primary Data Flows
 
-| #   | Service                   | Purpose        | Data Sent                                             | Region                               | Transfer Type  | Protection Mechanism               | Compliance   |
-| --- | ------------------------- | -------------- | ----------------------------------------------------- | ------------------------------------ | -------------- | ---------------------------------- | ------------ |
-| 1   | **Supabase**              | Database       | User profiles, conversations, preferences, audit logs | 🇪🇺 **EU** (Frankfurt, Germany)       | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 2   | **Azure OpenAI Chat**     | AI tutoring    | Conversation messages, context, maestro prompts       | 🇪🇺 **EU** (West Europe)              | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 3   | **Azure OpenAI Realtime** | Voice features | Audio stream, transcription, conversation             | 🇪🇺 **EU** (Sweden Central)           | EU-only        | N/A (no transfer)                  | ✅ Compliant |
-| 4   | **Vercel**                | Hosting        | Application code, logs, analytics, session cookies    | 🇺🇸 **US** (AWS us-east-1)            | EU → US        | Standard Contractual Clauses (SCC) | ✅ Compliant |
-| 5   | **Resend**                | Email          | Email addresses, message content, delivery metadata   | 🇺🇸 **US** (AWS us-east-1, us-west-2) | EU → US        | Standard Contractual Clauses (SCC) | ✅ Compliant |
-| 6   | **Upstash Redis**         | Rate limiting  | User ID hashes, request counts, timestamps            | 🌍 **Global** (Multi-region)         | EU → US/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| #   | Service                   | Purpose        | Data Sent                                             | Region                                   | Transfer Type  | Protection Mechanism               | Compliance   |
+| --- | ------------------------- | -------------- | ----------------------------------------------------- | ---------------------------------------- | -------------- | ---------------------------------- | ------------ |
+| 1   | **Supabase**              | Database       | User profiles, conversations, preferences, audit logs | 🇪🇺 **EU** (Frankfurt, Germany)           | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 2   | **Azure OpenAI Chat**     | AI tutoring    | Conversation messages, context, maestro prompts       | 🇪🇺 **EU** (West Europe)                  | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 3   | **Azure OpenAI Realtime** | Voice features | Audio stream, transcription, conversation             | 🇪🇺 **EU** (Sweden Central)               | EU-only        | N/A (no transfer)                  | ✅ Compliant |
+| 4   | **Vercel**                | Hosting        | Application code, logs, analytics, session cookies    | 🇪🇺 **EU** (`fra1`) + vendor global infra | EU → EU/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| 5   | **Resend**                | Email          | Email addresses, message content, delivery metadata   | 🇺🇸 **US** (AWS us-east-1, us-west-2)     | EU → US        | Standard Contractual Clauses (SCC) | ✅ Compliant |
+| 6   | **Upstash Redis**         | Rate limiting  | User ID hashes, request counts, timestamps            | 🌍 **Global** (Multi-region)             | EU → US/Global | Standard Contractual Clauses (SCC) | ✅ Compliant |
 
 ### 2.2 Ancillary Data Flows (Minimal PII)
 
@@ -119,8 +119,8 @@ flowchart TB
 | -------------------------- | -------------------------------------------------------------------------------- |
 | **Service**                | Vercel (Hosting Platform)                                                        |
 | **Data Controller**        | MirrorBuddy                                                                      |
-| **Data Processor**         | Vercel Inc. (US)                                                                 |
-| **Transfer Route**         | EU (User) → US (Vercel AWS us-east-1)                                            |
+| **Data Processor**         | Vercel Inc. (EU region pin `fra1`, with global vendor sub-processors)            |
+| **Transfer Route**         | EU (User) → EU (`fra1`) with SCC coverage for applicable vendor sub-processors   |
 | **Data Transferred**       | Application code, deployment logs, analytics, session cookies, user interactions |
 | **Legal Mechanism**        | EU Standard Contractual Clauses (2021) - Module 2 (Controller-to-Processor)      |
 | **DPA**                    | https://vercel.com/legal/dpa                                                     |
@@ -246,14 +246,14 @@ flowchart TB
 
 ### 5.1 Risk Matrix
 
-| Transfer             | Data Sensitivity                  | Volume | Frequency  | SCC Protection | Risk Level        | Mitigation                            |
-| -------------------- | --------------------------------- | ------ | ---------- | -------------- | ----------------- | ------------------------------------- |
-| **Vercel (US)**      | Medium (app data, logs)           | High   | Continuous | ✅ Yes         | 🟡 **LOW**        | SCCs + encryption + audit logs        |
-| **Resend (US)**      | Medium (email addresses, content) | Low    | Occasional | ✅ Yes         | 🟡 **LOW**        | SCCs + 24h token expiry + no tracking |
-| **Upstash (Global)** | Low (hashed IDs, counts)          | High   | Continuous | ✅ Yes         | 🟢 **VERY LOW**   | SCCs + hashed data + short TTL        |
-| **Brave Search**     | None (anonymous)                  | Medium | Frequent   | N/A            | 🟢 **NEGLIGIBLE** | No PII sent                           |
-| **Google OAuth**     | Low (OAuth tokens)                | Low    | Occasional | ✅ Yes         | 🟢 **VERY LOW**   | User consent + read-only + revocable  |
-| **Grafana (US/EU)**  | None (metrics)                    | Low    | Periodic   | ✅ Optional    | 🟢 **NEGLIGIBLE** | No PII sent                           |
+| Transfer               | Data Sensitivity                  | Volume | Frequency  | SCC Protection | Risk Level        | Mitigation                                     |
+| ---------------------- | --------------------------------- | ------ | ---------- | -------------- | ----------------- | ---------------------------------------------- |
+| **Vercel (EU pinned)** | Medium (app data, logs)           | High   | Continuous | ✅ Yes         | 🟡 **LOW**        | EU region pin + SCCs + encryption + audit logs |
+| **Resend (US)**        | Medium (email addresses, content) | Low    | Occasional | ✅ Yes         | 🟡 **LOW**        | SCCs + 24h token expiry + no tracking          |
+| **Upstash (Global)**   | Low (hashed IDs, counts)          | High   | Continuous | ✅ Yes         | 🟢 **VERY LOW**   | SCCs + hashed data + short TTL                 |
+| **Brave Search**       | None (anonymous)                  | Medium | Frequent   | N/A            | 🟢 **NEGLIGIBLE** | No PII sent                                    |
+| **Google OAuth**       | Low (OAuth tokens)                | Low    | Occasional | ✅ Yes         | 🟢 **VERY LOW**   | User consent + read-only + revocable           |
+| **Grafana (US/EU)**    | None (metrics)                    | Low    | Periodic   | ✅ Optional    | 🟢 **NEGLIGIBLE** | No PII sent                                    |
 
 ### 5.2 Overall Risk Assessment
 
@@ -272,7 +272,7 @@ flowchart TB
 ### 6.1 User Registration Flow
 
 ```
-1. User registers → Vercel (US) → Supabase (EU)
+1. User registers → Vercel (EU `fra1`) → Supabase (EU)
    - SCC protected: Vercel
    - EU-only storage: Supabase
    - PII: Email, display name, age range
@@ -281,7 +281,7 @@ flowchart TB
 ### 6.2 AI Chat Flow
 
 ```
-2. User sends message → Vercel (US) → Azure OpenAI (EU West Europe)
+2. User sends message → Vercel (EU `fra1`) → Azure OpenAI (EU West Europe)
    - SCC protected: Vercel
    - EU-only processing: Azure OpenAI
    - PII: Conversation content, user context
@@ -290,7 +290,7 @@ flowchart TB
 ### 6.3 Voice Chat Flow
 
 ```
-3. User starts voice session → Vercel (US) → Azure OpenAI Realtime (EU Sweden Central)
+3. User starts voice session → Vercel (EU `fra1`) → Azure OpenAI Realtime (EU Sweden Central)
    - SCC protected: Vercel
    - EU-only processing: Azure OpenAI Realtime
    - PII: Audio stream, transcription
@@ -299,7 +299,7 @@ flowchart TB
 ### 6.4 Email Notification Flow
 
 ```
-4. Admin approves invite → Vercel (US) → Resend (US) → User email
+4. Admin approves invite → Vercel (EU `fra1`) → Resend (US) → User email
    - SCC protected: Vercel, Resend
    - PII: Email address, temporary credentials
    - Mitigation: 24h token expiry, no tracking, auto-delete after 90 days
@@ -308,7 +308,7 @@ flowchart TB
 ### 6.5 Rate Limiting Flow
 
 ```
-5. User makes API request → Vercel (US) → Upstash Redis (Global)
+5. User makes API request → Vercel (EU `fra1`) → Upstash Redis (Global)
    - SCC protected: Vercel, Upstash
    - PII: Hashed user ID (anonymized), request count
    - Mitigation: Short TTL, no reversible identifiers
@@ -412,11 +412,11 @@ Users can:
 
 ## 11. Contact & Escalation
 
-| Role                              | Responsibility                      | Contact                       |
-| --------------------------------- | ----------------------------------- | ----------------------------- |
-| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight | [To be assigned in CLAUDE.md] |
-| **Compliance Officer**            | Annual review, DPA management       | Roberto D'Angelo (Interim)    |
-| **Technical Lead**                | Service configuration, encryption   | Roberto D'Angelo (Interim)    |
+| Role                              | Responsibility                      | Contact                                                  |
+| --------------------------------- | ----------------------------------- | -------------------------------------------------------- |
+| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight | Roberto D'Angelo (Interim) — roberdan@fightthestroke.org |
+| **Compliance Officer**            | Annual review, DPA management       | Roberto D'Angelo (Interim)                               |
+| **Technical Lead**                | Service configuration, encryption   | Roberto D'Angelo (Interim)                               |
 
 ---
 

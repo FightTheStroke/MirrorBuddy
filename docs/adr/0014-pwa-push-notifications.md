@@ -1,9 +1,11 @@
 # ADR 0014: PWA Push Notifications
 
 ## Status
+
 Accepted
 
 ## Date
+
 2025-12-31
 
 ## Context
@@ -54,18 +56,19 @@ Implement **optional PWA Push Notifications** as an enhancement layer on top of 
 
 ### Platform Support Matrix
 
-| Platform | Push Support | Notes |
-|----------|--------------|-------|
-| Chrome/Edge (Desktop) | Full | Standard Push API |
-| Firefox (Desktop) | Full | Standard Push API |
-| Safari 16+ (macOS) | Full | Standard Push API |
-| Chrome (Android) | Full | Works in browser |
-| Safari (iOS) 16.4+ | PWA Only | Must "Add to Home Screen" |
-| Safari (iOS) < 16.4 | None | In-app only |
+| Platform              | Push Support | Notes                     |
+| --------------------- | ------------ | ------------------------- |
+| Chrome/Edge (Desktop) | Full         | Standard Push API         |
+| Firefox (Desktop)     | Full         | Standard Push API         |
+| Safari 16+ (macOS)    | Full         | Standard Push API         |
+| Chrome (Android)      | Full         | Works in browser          |
+| Safari (iOS) 16.4+    | PWA Only     | Must "Add to Home Screen" |
+| Safari (iOS) < 16.4   | None         | In-app only               |
 
 ### VAPID Keys
 
 We use VAPID (Voluntary Application Server Identification) for push authentication:
+
 - Generated once, stored in environment variables
 - No third-party push service required
 - All data stays on our servers (GDPR compliant)
@@ -77,7 +80,7 @@ npx web-push generate-vapid-keys
 # Environment variables
 NEXT_PUBLIC_VAPID_PUBLIC_KEY=BL...
 VAPID_PRIVATE_KEY=...
-VAPID_SUBJECT=mailto:support@mirrorbuddy.org
+VAPID_SUBJECT=mailto:roberdan@fightthestroke.org
 ```
 
 ### Database Model
@@ -113,11 +116,9 @@ The push notification toggle in Settings must be:
 
 ```typescript
 // Pseudo-code for toggle visibility
-const showPushToggle = 'PushManager' in window;
-const canEnablePush = showPushToggle && (
-  !isIOSSafari || isInstalledAsPWA
-);
-const pushBlocked = Notification.permission === 'denied';
+const showPushToggle = "PushManager" in window;
+const canEnablePush = showPushToggle && (!isIOSSafari || isInstalledAsPWA);
+const pushBlocked = Notification.permission === "denied";
 ```
 
 #### iOS Install Banner
@@ -193,16 +194,16 @@ Trigger Event (flashcard due, streak risk, etc.)
 
 ### Files to Create/Modify
 
-| File | Purpose |
-|------|---------|
-| `public/sw.js` | Service Worker for push handling |
-| `src/lib/push/vapid.ts` | VAPID key management |
-| `src/lib/push/subscription.ts` | Subscription management |
-| `src/app/api/push/subscribe/route.ts` | Save subscription |
-| `src/app/api/push/send/route.ts` | Send push (internal) |
-| `src/components/pwa/ios-install-banner.tsx` | iOS install prompt |
-| `src/lib/hooks/use-push-notifications.ts` | Client hook |
-| `prisma/schema.prisma` | Add PushSubscription model |
+| File                                        | Purpose                          |
+| ------------------------------------------- | -------------------------------- |
+| `public/sw.js`                              | Service Worker for push handling |
+| `src/lib/push/vapid.ts`                     | VAPID key management             |
+| `src/lib/push/subscription.ts`              | Subscription management          |
+| `src/app/api/push/subscribe/route.ts`       | Save subscription                |
+| `src/app/api/push/send/route.ts`            | Send push (internal)             |
+| `src/components/pwa/ios-install-banner.tsx` | iOS install prompt               |
+| `src/lib/hooks/use-push-notifications.ts`   | Client hook                      |
+| `prisma/schema.prisma`                      | Add PushSubscription model       |
 
 ### Environment Variables
 

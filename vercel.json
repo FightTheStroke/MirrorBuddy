@@ -1,4 +1,6 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["fra1"],
   "ignoreCommand": "echo 'Build skipped - CI will deploy after checks pass' && exit 0",
   "crons": [
     {

@@ -172,7 +172,7 @@ YOUR ACTIONS (OPTIONAL):
 - Monitor for suspicious emails
 
 SUPPORT:
-Email: security@mirrorbuddy.com
+Email: roberdan@fightthestroke.org
 Phone: [SUPPORT_NUMBER]
 FAQ: [LINK_TO_FAQ]
 

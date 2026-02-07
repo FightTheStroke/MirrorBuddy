@@ -6,7 +6,7 @@
 > All diagrams are in Mermaid format for easy maintenance and version control.
 
 **Version**: 0.12.0
-**Last Verified**: 2026-01-26
+**Last Verified**: 2026-02-07
 **Update Policy**: This file is verified and updated during each release via `/release`
 
 ---
@@ -198,7 +198,7 @@ graph LR
     end
 
     subgraph Infrastructure["Infrastructure"]
-        Vercel[Vercel Edge]
+        Vercel[Vercel Node.js\nRegion: fra1 (EU)]
         Supabase[Supabase PostgreSQL]
         Upstash[Upstash Redis]
     end
@@ -2939,7 +2939,7 @@ sequenceDiagram
     participant Git as GitHub
     participant Hook as Pre-push Hook
     participant CI as GitHub Actions
-    participant Vercel as Vercel
+    participant Vercel as Vercel (fra1 EU)
 
     Dev->>Hook: git push
     Hook->>Hook: pre-push-vercel.sh
@@ -2956,9 +2956,9 @@ sequenceDiagram
         CI->>CI: E2E Tests
     end
 
-    CI-->>Git: All green
-
-    Git->>Vercel: Auto-deploy trigger
+    CI->>CI: Deployment Gate (blocking)
+    CI-->>Git: All green + gate passed
+    CI->>Vercel: Deploy via CLI (auto-deploy disabled)
     Vercel->>Vercel: prisma generate
     Vercel->>Vercel: npm run build
     Vercel->>Vercel: seed admin
@@ -3152,6 +3152,31 @@ graph TB
     end
 ```
 
+### 25.3 Latest ADR Coverage
+
+```mermaid
+graph TB
+    subgraph Latest_ADRs["Latest ADRs"]
+        ADR0120[0120 UI Layout Standardization]
+        ADR0121[0121 Admin Console Data Integrity]
+        ADR0122[0122 Realtime Video Vision]
+        ADR0123[0123 Consortium Grant Readiness]
+        ADR0124[0124 k6 Load Testing Framework]
+        ADR0125[0125 Research Benchmarking Lab]
+        ADR0126[0126 Unified Camera Architecture]
+        ADR0127[0127 Security Encryption Hardening]
+        ADR0128[0128 Capacitor Mobile Architecture]
+        ADR0129[0129 Enterprise SSO Architecture]
+        ADR0130[0130 Multi-Provider AI Router]
+        ADR0131[0131 SOC 2 Type II Readiness]
+        ADR0132[0132 Self-Service Password Reset]
+        ADR0133[0133 PWA Offline Strategy]
+        ADR0134[0134 Gamification UI]
+        ADR0135[0135 iOS Release Pipeline]
+        ADR0136[0136 Compliance Absolute Charter]
+    end
+```
+
 ## Quick Reference
 
 | Category   | Key Files                                                     | ADRs                   |
@@ -3174,6 +3199,6 @@ graph TB
 ---
 
 _Version: 0.12.0_
-_Last updated: 26 January 2026_
+_Last updated: 07 February 2026_
 _Generated from codebase analysis and ADR documentation_
 _Updated on each release via `/release` command_

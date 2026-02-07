@@ -6,6 +6,8 @@
  */
 
 import { config } from "dotenv";
+import fs from "fs";
+import path from "path";
 
 config();
 
@@ -175,6 +177,87 @@ function validateOptionalEnvVars(): void {
   }
 }
 
+function validateVercelRegionCompliance(): void {
+  const vercelConfigPath = path.join(process.cwd(), "vercel.json");
+  if (!fs.existsSync(vercelConfigPath)) {
+    addResult(
+      "Vercel",
+      "Region Pinning",
+      "FAIL",
+      "vercel.json not found - cannot verify EU region pinning",
+      true,
+    );
+    return;
+  }
+
+  let parsed: unknown;
+  try {
+    const raw = fs.readFileSync(vercelConfigPath, "utf8");
+    parsed = JSON.parse(raw);
+  } catch (error) {
+    addResult(
+      "Vercel",
+      "Region Pinning",
+      "FAIL",
+      `vercel.json is invalid JSON (${String(error)})`,
+      true,
+    );
+    return;
+  }
+
+  if (
+    !parsed ||
+    typeof parsed !== "object" ||
+    !("regions" in parsed) ||
+    !Array.isArray((parsed as { regions?: unknown[] }).regions)
+  ) {
+    addResult(
+      "Vercel",
+      "Region Pinning",
+      "FAIL",
+      'Missing "regions" in vercel.json (required for EU compute pinning)',
+      true,
+    );
+    return;
+  }
+
+  const regions = (parsed as { regions: unknown[] }).regions.filter(
+    (value): value is string => typeof value === "string",
+  );
+  if (regions.length === 0) {
+    addResult(
+      "Vercel",
+      "Region Pinning",
+      "FAIL",
+      '"regions" is empty in vercel.json',
+      true,
+    );
+    return;
+  }
+
+  // EU-only regions accepted for strict compliance posture.
+  const euRegions = new Set(["fra1", "cdg1", "arn1", "dub1"]);
+  const invalid = regions.filter((region) => !euRegions.has(region));
+  if (invalid.length > 0) {
+    addResult(
+      "Vercel",
+      "Region Pinning",
+      "FAIL",
+      `Non-EU or unsupported region(s) in vercel.json: ${invalid.join(", ")}`,
+      true,
+    );
+    return;
+  }
+
+  addResult(
+    "Vercel",
+    "Region Pinning",
+    "PASS",
+    `EU regions pinned in vercel.json: ${regions.join(", ")}`,
+    false,
+  );
+}
+
 function printResults(): void {
   console.log("\n🔍 Pre-Deploy Validation\n");
   console.log("=".repeat(70));
@@ -243,6 +326,9 @@ async function main(): Promise<void> {
 
   // Validate Vercel token
   validateVercelToken(process.env.VERCEL_TOKEN?.trim());
+
+  // Validate Vercel region compliance
+  validateVercelRegionCompliance();
 
   // Validate critical environment variables
   validateCriticalEnvVars();

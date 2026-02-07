@@ -333,15 +333,15 @@ connect-src 'self' https://api.openai.com;
 
 ### Security Team
 
-- **Security Inquiries**: security@mirrorbuddy.it
-- **Privacy/DPO**: privacy@mirrorbuddy.it
+- **Security Inquiries**: roberdan@fightthestroke.org
+- **Privacy/DPO**: roberdan@fightthestroke.org
 - **AI Complaints**: www.mirrorbuddy.it/privacy/ai-complaint
 
 ### Responsible Disclosure
 
 We welcome security researchers to report vulnerabilities responsibly:
 
-1. Email: security@mirrorbuddy.it
+1. Email: roberdan@fightthestroke.org
 2. Include: Description, steps to reproduce, impact assessment
 3. Response: Acknowledgment within 48 hours
 4. Reward: Recognition in security hall of fame

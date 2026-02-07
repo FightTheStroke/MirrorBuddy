@@ -149,7 +149,7 @@
 
 - **Always supervised**: Teachers/parents should review key interactions
 - **Not conclusive**: Use as learning aid, not authoritative answer source
-- **Regular feedback**: Report issues via compliance@mirrorbuddy.it
+- **Regular feedback**: Report issues via roberdan@fightthestroke.org
 - **Consent required**: Parental/student consent mandatory before use
 
 **For Regulators & Authorities**:

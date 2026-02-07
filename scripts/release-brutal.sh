@@ -63,6 +63,14 @@ else
 	pass "vercel-env"
 fi
 
+if [ ! -f "vercel.json" ]; then
+	fail "vercel-region" "vercel.json not found"
+elif rg -q '"regions"\s*:\s*\[[^]]*"fra1"' vercel.json; then
+	pass "vercel-region"
+else
+	fail "vercel-region" "vercel.json must include EU pinning: \"regions\": [\"fra1\"]"
+fi
+
 ./scripts/verify-sentry-config.sh >/tmp/release-sentry-config.log 2>&1 && pass "sentry-config" || fail "sentry-config" "\`\`\`\n$(tail -20 /tmp/release-sentry-config.log)\n\`\`\`"
 
 # =============================================================================

@@ -91,7 +91,7 @@ affected your account data.
 **What we're doing**: [Actions]
 **What you can do**: [Recommendations]
 
-For questions: privacy@mirrorbuddy.com
+For questions: roberdan@fightthestroke.org
 ```
 
 ## 4. Investigation Checklist

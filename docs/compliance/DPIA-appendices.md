@@ -157,7 +157,7 @@ STEP 5: DATA SUBJECT ACCESS
 | 20      | Right to portability                                                        | Planned (T1-04) - Export as JSON/CSV                                                                         |
 | 32      | Security of processing                                                      | Encryption (TLS 1.3 + AES-256), access controls, audit logging                                               |
 | 35      | DPIA requirement                                                            | This document (Sections 1-11)                                                                                |
-| 37      | DPO designation                                                             | Recommended role (DPO contact TBD)                                                                           |
+| 37      | DPO designation                                                             | Interim DPO designated: Roberto D'Angelo (roberdan@fightthestroke.org)                                       |
 
 ### AI Act 2024/1689 (EU)
 
@@ -178,12 +178,12 @@ STEP 5: DATA SUBJECT ACCESS
 
 ### COPPA Rule (16 CFR 312, USA)
 
-| Section  | Requirement                      | MirrorBuddy Implementation                           |
-| -------- | -------------------------------- | ---------------------------------------------------- |
-| 312.2    | Children's online privacy notice | Privacy notice provided before registration          |
-| 312.5(b) | Verifiable parental consent      | Email verification with 6-char code (48-hour expiry) |
-| 312.5(c) | Denial of services               | Cannot access if under-13 without parental consent   |
-| 312.7    | Parental request methods         | Email + in-app settings + phone (TBD)                |
+| Section  | Requirement                      | MirrorBuddy Implementation                                    |
+| -------- | -------------------------------- | ------------------------------------------------------------- |
+| 312.2    | Children's online privacy notice | Privacy notice provided before registration                   |
+| 312.5(b) | Verifiable parental consent      | Email verification with 6-char code (48-hour expiry)          |
+| 312.5(c) | Denial of services               | Cannot access if under-13 without parental consent            |
+| 312.7    | Parental request methods         | Email + in-app settings (phone support not currently offered) |
 
 ### WCAG 2.1 (Accessibility)
 
@@ -213,13 +213,13 @@ STEP 5: DATA SUBJECT ACCESS
 
 ## APPENDIX E: Contact Information
 
-| Role               | Contact                       | Function                      |
-| ------------------ | ----------------------------- | ----------------------------- |
-| Data Controller    | MirrorBuddy Team              | Responsible for DPIA accuracy |
-| DPO (Recommended)  | [TBD]                         | Oversee GDPR compliance       |
-| Privacy Team       | privacy@mirrorbuddy.app       | Data subject requests         |
-| Security Team      | security@mirrorbuddy.app      | Breach reporting              |
-| Accessibility Lead | accessibility@mirrorbuddy.app | DSA profile support           |
+| Role               | Contact                                                  | Function                      |
+| ------------------ | -------------------------------------------------------- | ----------------------------- |
+| Data Controller    | MirrorBuddy Team                                         | Responsible for DPIA accuracy |
+| DPO (Interim)      | Roberto D'Angelo (Interim) — roberdan@fightthestroke.org | Oversee GDPR compliance       |
+| Privacy Team       | roberdan@fightthestroke.org                              | Data subject requests         |
+| Security Team      | roberdan@fightthestroke.org                              | Breach reporting              |
+| Accessibility Lead | roberdan@fightthestroke.org                              | DSA profile support           |
 
 ---
 

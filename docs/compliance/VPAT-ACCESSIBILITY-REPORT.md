@@ -232,7 +232,7 @@ MirrorBuddy meets the following Section 508 technical standards:
 
 For accessibility issues or requests:
 
-- **Email**: accessibility@mirrorbuddy.example
+- **Email**: roberdan@fightthestroke.org
 - **Report Bug**: https://github.com/fightthestroke/mirrorbuddy/issues/new?labels=a11y
 - **Feedback Form**: /accessibility/feedback (authenticated users)
 

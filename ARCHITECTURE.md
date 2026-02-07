@@ -1,7 +1,7 @@
 # MirrorBuddy Architecture
 
 > Technical overview of the MirrorBuddy platform architecture
-> Last updated: 24 Gennaio 2026, 15:30 CET
+> Last updated: 07 February 2026, 22:20 CET
 
 ---
 
@@ -99,6 +99,12 @@ Azure OpenAI primary (chat + voice + embeddings), Ollama fallback (text-only).
 ### Data Flow
 
 User Action → UI Component → Zustand Store (optimistic) → API Route → AI Provider/Database → Response → Zustand Store (final) → UI re-render
+
+### Deployment Residency
+
+- **Vercel runtime**: Node.js compute pinned to EU region `fra1` in `vercel.json`
+- **Deploy policy**: GitHub Actions `deployment-gate` must pass before production deploy
+- **Residual transfer posture**: SCC/DPA controls still required for external vendor sub-processors
 
 ---
 
@@ -327,4 +333,4 @@ WCAG 2.1 AA compliant with 7 profiles (`src/lib/accessibility/profiles.ts`):
 
 ---
 
-**See also:** [SETUP.md](SETUP.md) | [FEATURES.md](FEATURES.md) | [CONTRIBUTING.md](CONTRIBUTING.md) | [`docs/AZURE_REALTIME_API.md`](docs/AZURE_REALTIME_API.md) for voice integration
+**See also:** [SETUP.md](SETUP.md) | [README.md](README.md) | [CONTRIBUTING.md](CONTRIBUTING.md) | [`docs/technical/AZURE_REALTIME_API.md`](docs/technical/AZURE_REALTIME_API.md) for voice integration

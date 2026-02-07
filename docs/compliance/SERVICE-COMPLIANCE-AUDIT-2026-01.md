@@ -47,13 +47,13 @@ This comprehensive audit assesses GDPR and COPPA compliance for all third-party 
 
 ### 1.1 Primary Services (High PII Processing)
 
-| Service           | Purpose             | Data Processed                                         | Region                              | Transfer Type     | DPA Status    | Risk Level  |
-| ----------------- | ------------------- | ------------------------------------------------------ | ----------------------------------- | ----------------- | ------------- | ----------- |
-| **Supabase**      | PostgreSQL database | User profiles, conversations, preferences, audit logs  | 🇪🇺 EU (Frankfurt)                   | EU-only           | ✅ Active     | 🟢 LOW      |
-| **Azure OpenAI**  | AI chat + voice     | Conversation messages, audio streams, maestro context  | 🇪🇺 EU (West Europe, Sweden Central) | EU-only           | ✅ Active     | 🟢 LOW      |
-| **Vercel**        | Hosting platform    | Application code, logs, analytics, session cookies     | 🇺🇸 US (AWS us-east-1)               | EU → US (SCC)     | ✅ Active     | 🟡 LOW      |
-| **Resend**        | Transactional email | Email addresses, invite content, temporary credentials | 🇺🇸 US (AWS us-east-1/us-west-2)     | EU → US (SCC)     | ✅ Active     | 🟡 LOW      |
-| **Upstash Redis** | Rate limiting       | Hashed user IDs, request counts, timestamps            | 🌍 Global (multi-region)            | EU → Global (SCC) | ✅ Via Vercel | 🟢 VERY LOW |
+| Service           | Purpose             | Data Processed                                         | Region                               | Transfer Type                  | DPA Status    | Risk Level  |
+| ----------------- | ------------------- | ------------------------------------------------------ | ------------------------------------ | ------------------------------ | ------------- | ----------- |
+| **Supabase**      | PostgreSQL database | User profiles, conversations, preferences, audit logs  | 🇪🇺 EU (Frankfurt)                    | EU-only                        | ✅ Active     | 🟢 LOW      |
+| **Azure OpenAI**  | AI chat + voice     | Conversation messages, audio streams, maestro context  | 🇪🇺 EU (West Europe, Sweden Central)  | EU-only                        | ✅ Active     | 🟢 LOW      |
+| **Vercel**        | Hosting platform    | Application code, logs, analytics, session cookies     | 🇪🇺 EU (`fra1`) + vendor global infra | EU → EU/Global (SCC as needed) | ✅ Active     | 🟡 LOW      |
+| **Resend**        | Transactional email | Email addresses, invite content, temporary credentials | 🇺🇸 US (AWS us-east-1/us-west-2)      | EU → US (SCC)                  | ✅ Active     | 🟡 LOW      |
+| **Upstash Redis** | Rate limiting       | Hashed user IDs, request counts, timestamps            | 🌍 Global (multi-region)             | EU → Global (SCC)              | ✅ Via Vercel | 🟢 VERY LOW |
 
 ### 1.2 Ancillary Services (Minimal/No PII)
 
@@ -118,7 +118,8 @@ All data processors handling PII have executed DPAs compliant with GDPR Article 
 | 🇪🇺 **EU (Frankfurt)**        | Supabase              | User profiles, conversations, preferences, audit logs | ✅ EU-only        |
 | 🇪🇺 **EU (West Europe)**      | Azure OpenAI Chat     | AI conversation processing                            | ✅ EU-only        |
 | 🇪🇺 **EU (Sweden Central)**   | Azure OpenAI Realtime | Voice + audio processing                              | ✅ EU-only        |
-| 🇺🇸 **US (AWS us-east-1)**    | Vercel, Resend        | Hosting, email delivery                               | ✅ SCC protected  |
+| 🇺🇸 **US (AWS us-east-1)**    | Resend                | Email delivery                                        | ✅ SCC protected  |
+| 🇪🇺 **EU (`fra1`)**           | Vercel                | Hosting runtime                                       | ✅ Region pinned  |
 | 🌍 **Global (multi-region)** | Upstash Redis         | Rate limiting (hashed IDs only)                       | ✅ SCC protected  |
 | 💻 **Local (Italy)**         | Ollama                | AI fallback (localhost)                               | ✅ No transfer    |
 
@@ -127,7 +128,7 @@ All data processors handling PII have executed DPAs compliant with GDPR Article 
 ```
 User (Italy/EU)
     ↓ HTTPS/TLS 1.3
-Vercel (US) [SCC Protected]
+Vercel (EU `fra1` pinned) [SCC Protected where needed]
     ↓
     ├─→ Supabase (EU) ✅ EU-only
     ├─→ Azure OpenAI (EU) ✅ EU-only
@@ -144,11 +145,11 @@ Vercel (US) [SCC Protected]
 
 ### 4.1 SCC Compliance Status
 
-| Service     | Transfer Route    | SCC Type                         | SCC Version | Verification Date | Status   |
-| ----------- | ----------------- | -------------------------------- | ----------- | ----------------- | -------- |
-| **Vercel**  | EU → US (AWS)     | Module 2 (Controller-Processor)  | EU 2021/914 | 21 Jan 2026       | ✅ Valid |
-| **Resend**  | EU → US (AWS SES) | Module 2 (Controller-Processor)  | EU 2021/914 | 21 Jan 2026       | ✅ Valid |
-| **Upstash** | EU → Global       | Module 2 (inherited from Vercel) | EU 2021/914 | 21 Jan 2026       | ✅ Valid |
+| Service     | Transfer Route                         | SCC Type                         | SCC Version | Verification Date | Status   |
+| ----------- | -------------------------------------- | -------------------------------- | ----------- | ----------------- | -------- |
+| **Vercel**  | EU → EU/Global (vendor sub-processors) | Module 2 (Controller-Processor)  | EU 2021/914 | 07 Feb 2026       | ✅ Valid |
+| **Resend**  | EU → US (AWS SES)                      | Module 2 (Controller-Processor)  | EU 2021/914 | 21 Jan 2026       | ✅ Valid |
+| **Upstash** | EU → Global                            | Module 2 (inherited from Vercel) | EU 2021/914 | 21 Jan 2026       | ✅ Valid |
 
 **Total Extra-EU Transfers**: 3
 **SCCs Required**: 3
@@ -190,11 +191,11 @@ Following **CJEU Case C-311/18 (Schrems II)** and **EDPB Recommendations 01/2020
 
 Per **EDPB Recommendations 01/2020**, MirrorBuddy has conducted Transfer Impact Assessments for all extra-EU transfers:
 
-| Service     | TIA Status   | Key Risks Identified                             | Mitigation Measures                             | Residual Risk |
-| ----------- | ------------ | ------------------------------------------------ | ----------------------------------------------- | ------------- |
-| **Vercel**  | ✅ Conducted | US CLOUD Act, government access                  | SCCs + TLS 1.3 + encryption + access logs       | 🟡 LOW        |
-| **Resend**  | ✅ Conducted | US CLOUD Act, email metadata exposure            | SCCs + 24h expiry + no tracking + 90-day delete | 🟡 LOW        |
-| **Upstash** | ✅ Conducted | Global multi-region, potential government access | SCCs + hashed IDs + short TTL + no PII          | 🟢 VERY LOW   |
+| Service     | TIA Status   | Key Risks Identified                                    | Mitigation Measures                                         | Residual Risk |
+| ----------- | ------------ | ------------------------------------------------------- | ----------------------------------------------------------- | ------------- |
+| **Vercel**  | ✅ Conducted | Vendor sub-processor access and jurisdictional exposure | EU pin (`fra1`) + SCCs + TLS 1.3 + encryption + access logs | 🟡 LOW        |
+| **Resend**  | ✅ Conducted | US CLOUD Act, email metadata exposure                   | SCCs + 24h expiry + no tracking + 90-day delete             | 🟡 LOW        |
+| **Upstash** | ✅ Conducted | Global multi-region, potential government access        | SCCs + hashed IDs + short TTL + no PII                      | 🟢 VERY LOW   |
 
 **Conclusion**: All extra-EU transfers assessed and approved with mitigation measures.
 
@@ -234,15 +235,15 @@ Per **EDPB Recommendations 01/2020**, MirrorBuddy has conducted Transfer Impact 
 
 #### Resend Sub-Processors
 
-| Sub-Processor | Service            | Region                    | DPA/SCC Status           |
-| ------------- | ------------------ | ------------------------- | ------------------------ |
-| AWS SES       | Email delivery     | US (us-east-1, us-west-2) | ✅ AWS DPA + SCCs        |
-| Cloudflare    | CDN + security     | Global                    | ✅ Cloudflare DPA + SCCs |
-| Stripe        | Payment processing | US                        | ✅ Stripe DPA + SCCs     |
-| Vercel        | Dashboard hosting  | US                        | ✅ Vercel DPA + SCCs     |
-| PostHog       | Product analytics  | US/EU                     | ✅ PostHog DPA + SCCs    |
-| Sentry        | Error monitoring   | US                        | ✅ Sentry DPA + SCCs     |
-| Linear        | Issue tracking     | US                        | ✅ Linear DPA + SCCs     |
+| Sub-Processor | Service            | Region                            | DPA/SCC Status           |
+| ------------- | ------------------ | --------------------------------- | ------------------------ |
+| AWS SES       | Email delivery     | US (us-east-1, us-west-2)         | ✅ AWS DPA + SCCs        |
+| Cloudflare    | CDN + security     | Global                            | ✅ Cloudflare DPA + SCCs |
+| Stripe        | Payment processing | US                                | ✅ Stripe DPA + SCCs     |
+| Vercel        | Dashboard hosting  | EU (`fra1`) + vendor global infra | ✅ Vercel DPA + SCCs     |
+| PostHog       | Product analytics  | US/EU                             | ✅ PostHog DPA + SCCs    |
+| Sentry        | Error monitoring   | US                                | ✅ Sentry DPA + SCCs     |
+| Linear        | Issue tracking     | US                                | ✅ Linear DPA + SCCs     |
 
 **Evidence**: `docs/compliance/dpa/RESEND-DPA.md` Section 4
 
@@ -271,12 +272,12 @@ Per **EDPB Recommendations 01/2020**, MirrorBuddy has conducted Transfer Impact 
 
 ### 7.1 Current Risks (as of 21 Jan 2026)
 
-| Risk ID  | Risk Description                              | Likelihood | Impact | Risk Level      | Mitigation Status                              |
-| -------- | --------------------------------------------- | ---------- | ------ | --------------- | ---------------------------------------------- |
-| **R-01** | Vercel hosts in US (CLOUD Act exposure)       | Medium     | Medium | 🟡 **LOW**      | ✅ Mitigated (SCCs + encryption + audit logs)  |
-| **R-02** | Resend sends emails via US (AWS SES)          | Low        | Medium | 🟡 **LOW**      | ✅ Mitigated (SCCs + 24h expiry + no tracking) |
-| **R-03** | Upstash Redis multi-region (potential access) | Low        | Low    | 🟢 **VERY LOW** | ✅ Mitigated (hashed IDs + short TTL)          |
-| **R-04** | Sub-processor changes without notice          | Low        | Medium | 🟡 **LOW**      | ✅ Mitigated (quarterly DPA reviews scheduled) |
+| Risk ID  | Risk Description                                         | Likelihood | Impact | Risk Level      | Mitigation Status                                             |
+| -------- | -------------------------------------------------------- | ---------- | ------ | --------------- | ------------------------------------------------------------- |
+| **R-01** | Vercel vendor sub-processors may involve extra-EU access | Medium     | Medium | 🟡 **LOW**      | ✅ Mitigated (EU region pin + SCCs + encryption + audit logs) |
+| **R-02** | Resend sends emails via US (AWS SES)                     | Low        | Medium | 🟡 **LOW**      | ✅ Mitigated (SCCs + 24h expiry + no tracking)                |
+| **R-03** | Upstash Redis multi-region (potential access)            | Low        | Low    | 🟢 **VERY LOW** | ✅ Mitigated (hashed IDs + short TTL)                         |
+| **R-04** | Sub-processor changes without notice                     | Low        | Medium | 🟡 **LOW**      | ✅ Mitigated (quarterly DPA reviews scheduled)                |
 
 ### 7.2 Residual Risk Assessment
 
@@ -416,11 +417,11 @@ All identified risks have been mitigated with technical and contractual safeguar
 
 ### 10.2 Future Optimizations (Optional, Q2-Q3 2026)
 
-| Action                                            | Priority | Rationale                         | Effort | Impact                             |
-| ------------------------------------------------- | -------- | --------------------------------- | ------ | ---------------------------------- |
-| **Consider EU-only Redis** (Upstash EU)           | P3       | Reduce extra-EU transfers further | Low    | Minimal (already SCC-compliant)    |
-| **Explore EU email provider** (e.g., Postmark EU) | P3       | Keep all PII in EU                | Medium | Minimal (Resend already compliant) |
-| **Add Vercel EU regions** (when available)        | P3       | Eliminate US hosting dependency   | TBD    | Depends on Vercel roadmap          |
+| Action                                            | Priority | Rationale                         | Effort            | Impact                                                        |
+| ------------------------------------------------- | -------- | --------------------------------- | ----------------- | ------------------------------------------------------------- |
+| **Consider EU-only Redis** (Upstash EU)           | P3       | Reduce extra-EU transfers further | Low               | Minimal (already SCC-compliant)                               |
+| **Explore EU email provider** (e.g., Postmark EU) | P3       | Keep all PII in EU                | Medium            | Minimal (Resend already compliant)                            |
+| **Pin Vercel compute to EU region (`fra1`)**      | P3       | Reduce extra-EU compute exposure  | Done (2026-02-07) | Residual SCC posture still required for vendor sub-processors |
 
 **Note**: These are **optional optimizations**, not compliance requirements. MirrorBuddy is already fully GDPR-compliant with current setup.
 
@@ -540,12 +541,12 @@ MirrorBuddy can demonstrate to:
 
 ## 14. Contact Information
 
-| Role                              | Responsibility                                   | Contact                       |
-| --------------------------------- | ------------------------------------------------ | ----------------------------- |
-| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight, user rights | [To be assigned in CLAUDE.md] |
-| **Compliance Officer**            | Bi-annual DPA reviews, audit scheduling          | [To be assigned in CLAUDE.md] |
-| **Technical Lead**                | Service configuration, encryption, monitoring    | [To be assigned in CLAUDE.md] |
-| **Legal Counsel**                 | SCC validity, regulatory changes                 | [To be assigned in CLAUDE.md] |
+| Role                              | Responsibility                                   | Contact                                                  |
+| --------------------------------- | ------------------------------------------------ | -------------------------------------------------------- |
+| **Data Protection Officer (DPO)** | GDPR compliance, transfer oversight, user rights | Roberto D'Angelo (Interim) — roberdan@fightthestroke.org |
+| **Compliance Officer**            | Bi-annual DPA reviews, audit scheduling          | Roberto D'Angelo (Interim)                               |
+| **Technical Lead**                | Service configuration, encryption, monitoring    | Roberto D'Angelo (Interim)                               |
+| **Legal Counsel**                 | SCC validity, regulatory changes                 | External legal counsel (retained)                        |
 
 ---
 

@@ -473,7 +473,7 @@ All F-xx functional requirements for Plan 64 (Service Limits & Compliance Audit)
 **Evidence**:
 
 - Task T7-06: Create ADR for Service Limits Monitoring system
-- File: `docs/adr/00XX-service-limits-monitoring-system.md` (TBD)
+- File: `docs/adr/0065-service-limits-monitoring-and-observability.md`
 - Context: Need to monitor external service limits proactively
 - Decision: Implement multi-source metrics aggregation with Grafana Cloud alerting
 - Consequences: Real-time visibility, automated escalation, cost control

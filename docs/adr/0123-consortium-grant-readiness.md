@@ -46,7 +46,7 @@ Create the following documents and processes to close the identified gaps, organ
 **Action**: Draft a DPO appointment letter specifying:
 
 - Named individual and qualifications
-- Contact details (currently `privacy@mirrorbuddy.it`)
+- Contact details (currently `roberdan@fightthestroke.org`)
 - Communication to the Italian Garante per la Protezione dei Dati Personali
 - Published on public privacy page
 
