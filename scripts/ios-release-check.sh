@@ -44,7 +44,15 @@ check_capacitor_sync() {
 check_match_certificates() {
   [[ -z "${MATCH_GIT_URL:-}" ]] && echo "MATCH_GIT_URL not set" && return 1
   [[ -z "${MATCH_PASSWORD:-}" ]] && echo "MATCH_PASSWORD not set" && return 1
-  echo "MATCH_GIT_URL and MATCH_PASSWORD configured"; return 0
+  if $IS_MACOS; then
+    local identities
+    identities=$(security find-identity -v -p codesigning 2>/dev/null | grep -c "valid identities found" || echo "0")
+    local count
+    count=$(security find-identity -v -p codesigning 2>/dev/null | head -n -1 | grep -c ")" || echo "0")
+    [[ "$count" -eq 0 ]] && echo "ENV vars set but no signing identities in keychain" && return 1
+    echo "ENV vars set + $count signing identity(ies) in keychain"; return 0
+  fi
+  echo "MATCH_GIT_URL and MATCH_PASSWORD configured (identity check skipped - not macOS)"; return 0
 }
 
 check_info_plist_version() {
