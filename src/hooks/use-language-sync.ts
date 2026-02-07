@@ -98,7 +98,7 @@ export function useLanguageSync() {
           isLoading: false,
         });
       } catch (error) {
-        logger.error("Language sync initialization failed", { error });
+        logger.error("Language sync initialization failed", undefined, error);
         // Fallback to default
         setState({
           currentLanguage: defaultLocale,
@@ -137,10 +137,11 @@ export function useLanguageSync() {
 
         logger.debug("Language changed", { language: newLanguage });
       } catch (error) {
-        logger.error("Language change failed", {
+        logger.error(
+          "Language change failed",
+          { language: newLanguage },
           error,
-          language: newLanguage,
-        });
+        );
       }
     },
     [updateAppearance, syncToServer],

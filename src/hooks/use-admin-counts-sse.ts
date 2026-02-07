@@ -97,7 +97,7 @@ export function useAdminCountsSSE(): UseAdminCountsSSEResult {
         setStatus("reconnecting"); // F-22: Show "Reconnecting..." during disconnect
       }
 
-      // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: close() called in onerror (line 126) and useEffect return (line 154)
+      // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: close() called in onerror (line 126) and useEffect return (line 154)
       eventSource = new EventSource("/api/admin/counts/stream");
 
       /**

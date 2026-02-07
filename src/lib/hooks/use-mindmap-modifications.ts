@@ -158,7 +158,7 @@ export function useMindmapModifications({
     }
 
     const url = `/api/tools/stream?sessionId=${encodeURIComponent(sessionId)}`;
-    // eslint-disable-next-line no-restricted-syntax -- Cleanup verified: eventSourceRef.current.close() in useEffect return (line 208)
+    // eslint-disable-next-line local-rules/require-eventsource-cleanup -- Cleanup verified: eventSourceRef.current.close() in useEffect return (line 208)
     const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 

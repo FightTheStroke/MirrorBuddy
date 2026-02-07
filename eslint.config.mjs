@@ -192,10 +192,13 @@ const eslintConfig = defineConfig([
       "src/lib/consent/**/*.ts", // GDPR consent management
       "src/lib/storage/**/*.ts", // Legacy cleanup and migrations
       "src/lib/trial/**/*.ts", // Trial visitor tracking (ADR 0056)
+      "src/components/trial/**/*.tsx", // Trial UI email capture (ADR 0056)
       "src/lib/accessibility/**/*.ts", // Device-specific a11y settings
       "src/app/cookies/**/*.tsx", // Cookie documentation page
       "src/components/pwa/**/*.tsx", // PWA install banner dismissal
       "src/lib/hooks/use-permissions.ts", // Browser permission caches
+      "src/lib/hooks/voice-session/transport-cache.ts", // WebRTC probe cache (device-specific)
+      "src/hooks/use-staging-data-filter.ts", // Dev tool: staging data toggle
       // Test files
       "**/*.test.ts",
       "**/*.test.tsx",

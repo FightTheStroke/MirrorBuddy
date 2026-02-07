@@ -18,7 +18,7 @@ export function useUserActions() {
       setError(null);
       try {
         if (action === "toggle") {
-          await fetch(`/api/admin/users/${userId}`, {
+          await csrfFetch(`/api/admin/users/${userId}`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ disabled: !currentDisabled }),
