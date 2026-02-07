@@ -529,11 +529,9 @@ jobs:
           retention-days: 7
 
   # Lane 5.5: Accessibility Tests - WCAG 2.1 AA compliance
-  # NON-BLOCKING: Does not gate deployment (flaky in CI due to SSR hydration timing)
-  # Re-enable as blocking once CI stability is confirmed
+  # BLOCKING: Gates deployment - ensures WCAG 2.1 AA compliance
   accessibility-tests:
     name: Accessibility Tests
-    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [build]
@@ -715,6 +713,81 @@ jobs:
           path: test-results/
           retention-days: 7
 
+  # Lane 6a-bis: Mobile Build Pipeline - Capacitor build validation (PR only, informational)
+  # Validates that the mobile build pipeline (Next.js export + Capacitor copy) works correctly
+  # Non-blocking: provides early feedback but does not gate PR merges
+  mobile-build:
+    name: Mobile Build Validation
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        id: npm-cache
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.npm-cache.outputs.cache-hit != 'true'
+        run: npm ci
+
+      - run: npx prisma generate
+
+      - name: Build mobile web assets
+        run: npm run build:mobile:web
+        env:
+          NEXT_TELEMETRY_DISABLED: 1
+          # Required for provider check during build
+          OLLAMA_URL: http://localhost:11434
+
+      - name: Copy web assets to native
+        run: npx cap copy
+
+      - name: Verify mobile build output
+        run: |
+          echo "Verifying mobile build output directories..."
+
+          # Check Next.js export output
+          if [ -d "out" ]; then
+            echo "✓ Next.js export directory exists: out/"
+            du -sh out/
+          else
+            echo "ERROR: out/ directory not found"
+            exit 1
+          fi
+
+          # Check Capacitor directories
+          if [ -d "ios/App/public" ]; then
+            echo "✓ iOS web assets copied: ios/App/public/"
+            du -sh ios/App/public/
+          else
+            echo "WARNING: ios/App/public/ not found (iOS platform may not be configured)"
+          fi
+
+          if [ -d "android/app/src/main/assets/public" ]; then
+            echo "✓ Android web assets copied: android/app/src/main/assets/public/"
+            du -sh android/app/src/main/assets/public/
+          else
+            echo "WARNING: android/app/src/main/assets/public/ not found (Android platform may not be configured)"
+          fi
+
+          echo "Mobile build validation completed successfully"
+
   # Lane 6a: Mobile E2E Tests - Critical responsive design validation
   # Runs on 3 core devices: iPhone SE (smallest), Pixel 7 (Android), iPad Mini (tablet)
   # Ensures mobile-first design is not broken by new features
@@ -835,11 +908,10 @@ jobs:
           exit 1
 
   # Lane 6b: E2E Tests - Full end-to-end test suite
-  # NON-BLOCKING: Does not gate deployment (flaky in CI due to SSR hydration timing)
-  # Re-enable as blocking once CI stability is confirmed
+  # BLOCKING: Gates deployment - ensures critical user flows work end-to-end
+  # Includes retry logic (2 retries) to handle transient CI issues
   e2e-tests:
     name: E2E Tests
-    continue-on-error: true
     runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [build]
@@ -909,8 +981,13 @@ jobs:
         if: steps.playwright-cache.outputs.cache-hit == 'true'
         run: npx playwright install-deps chromium
 
-      - name: Run E2E tests
-        run: npx playwright test --project=chromium --reporter=list
+      - name: Run E2E tests (with retries)
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 20
+          max_attempts: 3
+          retry_on: error
+          command: npx playwright test --project=chromium --reporter=list
         env:
           CI: true
           TEST_DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
@@ -921,13 +998,13 @@ jobs:
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
-      - name: Upload Playwright report
-        if: always()
+      - name: Upload test screenshots on failure
+        if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: playwright-report
+          name: e2e-test-failures
           path: test-results/
-          retention-days: 30
+          retention-days: 7
 
   # Lane 7: Docker Build Test (runs in parallel)
   docker:
@@ -1129,6 +1206,8 @@ jobs:
       - migrations
       - quality
       - smoke-tests
+      - accessibility-tests
+      - e2e-tests
       - docker
       - performance
       - sentry-config
@@ -1146,6 +1225,8 @@ jobs:
           needs.migrations.result != 'success' ||
           needs.quality.result != 'success' ||
           needs.smoke-tests.result != 'success' ||
+          needs.accessibility-tests.result != 'success' ||
+          needs.e2e-tests.result != 'success' ||
           needs.docker.result != 'success' ||
           needs.performance.result != 'success'
         run: |
@@ -1162,6 +1243,8 @@ jobs:
           echo "  migrations: ${{ needs.migrations.result }}"
           echo "  quality: ${{ needs.quality.result }}"
           echo "  smoke-tests: ${{ needs.smoke-tests.result }}"
+          echo "  accessibility-tests: ${{ needs.accessibility-tests.result }}"
+          echo "  e2e-tests: ${{ needs.e2e-tests.result }}"
           echo "  docker: ${{ needs.docker.result }}"
           echo "  performance: ${{ needs.performance.result }}"
           exit 1
@@ -1178,6 +1261,8 @@ jobs:
           needs.migrations.result == 'success' &&
           needs.quality.result == 'success' &&
           needs.smoke-tests.result == 'success' &&
+          needs.accessibility-tests.result == 'success' &&
+          needs.e2e-tests.result == 'success' &&
           needs.docker.result == 'success' &&
           needs.performance.result == 'success'
         run: |
@@ -1194,13 +1279,13 @@ jobs:
           echo "  ✓ migrations"
           echo "  ✓ quality"
           echo "  ✓ smoke-tests"
+          echo "  ✓ accessibility-tests"
+          echo "  ✓ e2e-tests"
           echo "  ✓ docker"
           echo "  ✓ performance"
           echo ""
           echo "Non-blocking jobs (run independently):"
-          echo "  e2e-tests: runs separately, does not block deploy"
           echo "  mobile-e2e: runs separately, does not block deploy"
-          echo "  accessibility-tests: runs separately, does not block deploy"
           echo ""
           echo "Triggering Vercel deployment via CLI..."
 
