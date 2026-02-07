@@ -9,8 +9,10 @@
  * Fix: copy the correct undici version next to the Turbopack external jsdom modules.
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require("fs");
 const path = require("path");
+/* eslint-enable @typescript-eslint/no-require-imports */
 
 const TURBOPACK_EXTERNALS = path.join(
   process.cwd(),
