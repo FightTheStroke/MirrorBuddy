@@ -32,7 +32,12 @@ const appDescriptions: Record<Locale, string> = {
 export function generateSoftwareApplicationSchema(
   locale: Locale,
 ): SoftwareApplicationSchema {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!siteUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL environment variable is required for structured data",
+    );
+  }
 
   return {
     "@context": "https://schema.org",

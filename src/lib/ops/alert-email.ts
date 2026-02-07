@@ -88,7 +88,7 @@ function buildAlertHtml(alert: CostAlert): string {
       <p>${alert.message}</p>
       <p style="color: #666; font-size: 0.9em;">
         Time: ${new Date().toISOString()}<br/>
-        Dashboard: <a href="${process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.org"}/admin/mission-control/ops-dashboard">View Ops Dashboard</a>
+        Dashboard: <a href="${process.env.NEXT_PUBLIC_APP_URL || ""}/admin/mission-control/ops-dashboard">View Ops Dashboard</a>
       </p>
     </div>
     <p style="font-size: 0.8em; color: #999;">

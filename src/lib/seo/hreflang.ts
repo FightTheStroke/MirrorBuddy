@@ -7,7 +7,7 @@ import type { HreflangTag, AlternateUrl } from "./hreflang.types";
 
 /**
  * Build alternate URLs for all locales
- * @param baseUrl The base URL (e.g., https://mirrorbuddy.org)
+ * @param baseUrl The base URL (e.g., https://your-domain.com)
  * @param pathname The page path (e.g., /welcome)
  * @param locales Array of supported locales
  * @returns Object mapping locale codes to full URLs
@@ -50,7 +50,7 @@ export function buildAlternateUrls(
 
 /**
  * Generate hreflang link tags for a page
- * @param baseUrl The base URL (e.g., https://mirrorbuddy.org)
+ * @param baseUrl The base URL (e.g., https://your-domain.com)
  * @param pathname The page path (e.g., /welcome)
  * @param locales Array of supported locales
  * @returns Array of HreflangTag objects suitable for next/head metadata

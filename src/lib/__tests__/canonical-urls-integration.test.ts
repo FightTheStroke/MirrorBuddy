@@ -13,7 +13,7 @@ import type { Locale } from "@/i18n/config";
 import type { Metadata } from "next";
 
 describe("canonical-urls integration", () => {
-  const testBaseUrl = "https://test.mirrorbuddy.org";
+  const testBaseUrl = "https://test.example.com";
 
   beforeAll(() => {
     process.env.NEXT_PUBLIC_SITE_URL = testBaseUrl;

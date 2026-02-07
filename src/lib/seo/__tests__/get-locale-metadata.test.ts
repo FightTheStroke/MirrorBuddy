@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import {
   getLocaleMetadata,
   extractPathnameWithoutLocale,
@@ -6,7 +6,16 @@ import {
 import type { Locale } from "../hreflang.types";
 
 describe("getLocaleMetadata", () => {
+  const testBaseUrl = "https://test.example.com";
   const locales: readonly Locale[] = ["it", "en", "fr", "de", "es"];
+
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SITE_URL = testBaseUrl;
+  });
+
+  afterAll(() => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+  });
 
   it("should return metadata with alternates", () => {
     const metadata = getLocaleMetadata("/welcome", locales);
@@ -31,20 +40,25 @@ describe("getLocaleMetadata", () => {
   it("should set canonical to x-default URL", () => {
     const metadata = getLocaleMetadata("/welcome", locales);
     const canonical = metadata.alternates?.canonical;
-    expect(canonical).toBe("https://mirrorbuddy.org/it/welcome");
+    expect(canonical).toBe(`${testBaseUrl}/it/welcome`);
   });
 
   it("should handle root path", () => {
     const metadata = getLocaleMetadata("/", locales);
     const canonical = metadata.alternates?.canonical;
-    expect(canonical).toBe("https://mirrorbuddy.org/it");
+    expect(canonical).toBe(`${testBaseUrl}/it`);
   });
 
-  it("should use NEXT_PUBLIC_SITE_URL from env if available", () => {
-    // This test would require mocking process.env
-    // For now, just verify the function accepts the expected locales
-    const metadata = getLocaleMetadata("/home", locales);
-    expect(metadata.alternates?.canonical).toBeDefined();
+  it("should throw when NEXT_PUBLIC_SITE_URL is not set", () => {
+    const original = process.env.NEXT_PUBLIC_SITE_URL;
+    try {
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+      expect(() => getLocaleMetadata("/home", locales)).toThrow(
+        "NEXT_PUBLIC_SITE_URL environment variable is required",
+      );
+    } finally {
+      process.env.NEXT_PUBLIC_SITE_URL = original;
+    }
   });
 });
 

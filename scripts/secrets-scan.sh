@@ -114,17 +114,9 @@ GRAFANA_MATCHES=$(rg -n 'mirrorbuddy\.grafana\.net' \
 	src/ 2>/dev/null | rg -v '^\s*//' | head -3)
 [ -n "$GRAFANA_MATCHES" ] && add_warning "Grafana URL" "Hardcoded Grafana dashboard URL" "$GRAFANA_MATCHES"
 
-# mirrorbuddy.org in fallbacks
-# IGNORED: admin-notifier.ts - intentional fallback when env var missing
-# IGNORED: alert-email.ts - intentional fallback for ops dashboard link
-# IGNORED: seo/ - SEO modules legitimately reference production domain
-# IGNORED: canonical-urls tests - test assertions for SEO behavior
+# mirrorbuddy.org in fallbacks (hardcoded URLs removed; env vars required)
 PROD_MATCHES=$(rg -n 'mirrorbuddy\.org' \
 	-g '!.env.example' -g '!docs/**' -g '!*.md' -g '!node_modules/**' \
-	-g '!src/lib/safety/escalation/admin-notifier.ts' \
-	-g '!src/lib/ops/alert-email.ts' \
-	-g '!src/lib/seo/**' \
-	-g '!src/lib/__tests__/canonical-urls*.test.ts' \
 	src/lib/ src/app/api/ 2>/dev/null | rg -v 'example\.com|mailto:' | head -3)
 [ -n "$PROD_MATCHES" ] && add_warning "Production URL" "Hardcoded mirrorbuddy.org in lib/api" "$PROD_MATCHES"
 

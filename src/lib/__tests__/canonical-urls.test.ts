@@ -8,7 +8,7 @@ import { generateCanonicalUrl, getCanonicalMetadata } from "../canonical-urls";
 import type { Locale } from "@/i18n/config";
 
 describe("canonical-urls", () => {
-  const testBaseUrl = "https://test.mirrorbuddy.org";
+  const testBaseUrl = "https://test.example.com";
 
   beforeAll(() => {
     process.env.NEXT_PUBLIC_SITE_URL = testBaseUrl;

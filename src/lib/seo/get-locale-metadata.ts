@@ -36,7 +36,12 @@ export function getLocaleMetadata(
   pathname: string,
   locales: readonly Locale[] = SUPPORTED_LOCALES,
 ): Pick<Metadata, "alternates"> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (!baseUrl) {
+    throw new Error(
+      "NEXT_PUBLIC_SITE_URL environment variable is required for locale metadata",
+    );
+  }
 
   const hreflangTags = generateHreflangTags(baseUrl, pathname, locales);
 

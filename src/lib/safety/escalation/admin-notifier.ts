@@ -60,7 +60,7 @@ function buildEmailHtml(
   trigger: EscalationTrigger,
 ): string {
   const { prefix, description } = getTriggerDetails(trigger);
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://mirrorbuddy.org";
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "";
   const timestamp = event.timestamp.toISOString();
 
   const contentSnippet = event.metadata.contentSnippet
