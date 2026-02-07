@@ -1,7 +1,7 @@
 import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: "org.fightthestroke.mirrorbuddy",
+  appId: "com.mirror-labs.MirrorBuddy",
   appName: "MirrorBuddy",
   webDir: "out",
   server: {

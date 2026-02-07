@@ -1,7 +1,7 @@
 # Fastlane Appfile - iOS Configuration
 # MirrorBuddy - La Scuola Che Vorrei
 
-app_identifier("org.fightthestroke.mirrorbuddy")
+app_identifier("com.mirror-labs.MirrorBuddy")
 apple_id(ENV["APPLE_ID"]) # Your Apple ID email
 itc_team_id(ENV["ITC_TEAM_ID"]) # App Store Connect Team ID
 team_id(ENV["TEAM_ID"]) # Developer Portal Team ID

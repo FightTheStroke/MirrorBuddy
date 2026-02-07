@@ -39,7 +39,7 @@ describe("Web App Manifest (T1-03)", () => {
       (app: any) => app.platform === "itunes",
     );
     expect(iosApp).toBeDefined();
-    expect(iosApp.url).toContain("org.fightthestroke.mirrorbuddy");
+    expect(iosApp.url).toContain("com.mirror-labs.MirrorBuddy");
 
     // Check for Android app
     const androidApp = manifest.related_applications.find(

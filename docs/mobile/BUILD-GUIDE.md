@@ -1,6 +1,6 @@
 # MirrorBuddy Mobile Build Guide
 
-**App ID**: `org.fightthestroke.mirrorbuddy` | **Framework**: Next.js + Capacitor 8.x
+**App ID (iOS)**: `com.mirror-labs.MirrorBuddy` | **App ID (Android)**: `org.fightthestroke.mirrorbuddy` | **Framework**: Next.js + Capacitor 8.x
 
 ## 1. Prerequisites
 
@@ -52,7 +52,7 @@ npx cap open android  # In Android Studio: select emulator, click Run (Shift+F10
 **Signing Setup**:
 
 1. Enroll at [developer.apple.com](https://developer.apple.com), add certificates in Xcode (Preferences > Accounts)
-2. Register `org.fightthestroke.mirrorbuddy` in Apple Developer Portal, enable Push Notifications
+2. Register `com.mirror-labs.MirrorBuddy` in Apple Developer Portal, enable Push Notifications
 3. Create Distribution profile, download and install (.mobileprovision)
 
 **Manual Archive**:
@@ -110,7 +110,7 @@ fastlane release  # Production
 
 1. Visit [console.firebase.google.com](https://console.firebase.google.com), create "MirrorBuddy"
 2. Add Android app (`org.fightthestroke.mirrorbuddy`), download `google-services.json` to `android/app/`
-3. Add iOS app (`org.fightthestroke.mirrorbuddy`), download `GoogleService-Info.plist` to `ios/App/App/`
+3. Add iOS app (`com.mirror-labs.MirrorBuddy`), download `GoogleService-Info.plist` to `ios/App/App/`
 
 **APNs Certificate (iOS)**: Create in Apple Developer Portal, download .p12, upload to Firebase Console (Project Settings > Cloud Messaging > iOS app)
 

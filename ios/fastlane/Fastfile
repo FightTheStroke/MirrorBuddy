@@ -24,7 +24,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "org.fightthestroke.mirrorbuddy" => "match AppStore org.fightthestroke.mirrorbuddy"
+          "com.mirror-labs.MirrorBuddy" => "match AppStore com.mirror-labs.MirrorBuddy"
         }
       }
     )
@@ -80,7 +80,7 @@ platform :ios do
       export_method: "app-store",
       export_options: {
         provisioningProfiles: {
-          "org.fightthestroke.mirrorbuddy" => "match AppStore org.fightthestroke.mirrorbuddy"
+          "com.mirror-labs.MirrorBuddy" => "match AppStore com.mirror-labs.MirrorBuddy"
         }
       }
     )

@@ -52,7 +52,7 @@ describe("Capacitor Initialization", () => {
 
     it("should have correct appId in config", () => {
       const configContent = readFileSync(capacitorConfigPath, "utf-8");
-      expect(configContent).toContain("org.fightthestroke.mirrorbuddy");
+      expect(configContent).toContain("com.mirror-labs.MirrorBuddy");
     });
 
     it("should have correct appName in config", () => {

@@ -87,7 +87,7 @@ describe("Mobile Build Configuration", () => {
 
     it("should have correct app_identifier in Appfile", () => {
       const content = readFileSync(iosAppfilePath, "utf-8");
-      expect(content).toContain("org.fightthestroke.mirrorbuddy");
+      expect(content).toContain("com.mirror-labs.MirrorBuddy");
     });
 
     it("should have beta lane in Fastfile", () => {
