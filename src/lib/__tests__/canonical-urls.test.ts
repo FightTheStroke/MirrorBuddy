@@ -3,13 +3,22 @@
  * Ensures each localized page has correct canonical URLs pointing to its own locale version
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { generateCanonicalUrl, getCanonicalMetadata } from "../canonical-urls";
 import type { Locale } from "@/i18n/config";
 
 describe("canonical-urls", () => {
-  // Test base URL from environment
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mirrorbuddy.org";
+  const testBaseUrl = "https://test.mirrorbuddy.org";
+
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SITE_URL = testBaseUrl;
+  });
+
+  afterAll(() => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+  });
+
+  const baseUrl = testBaseUrl;
 
   describe("generateCanonicalUrl", () => {
     it("generates canonical URL for root path with locale", () => {

@@ -3,7 +3,7 @@
  * Tests the full flow from page generation to metadata output
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { generateCanonicalUrl } from "../canonical-urls";
 import {
   mergeCanonicalMetadata,
@@ -13,6 +13,16 @@ import type { Locale } from "@/i18n/config";
 import type { Metadata } from "next";
 
 describe("canonical-urls integration", () => {
+  const testBaseUrl = "https://test.mirrorbuddy.org";
+
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SITE_URL = testBaseUrl;
+  });
+
+  afterAll(() => {
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+  });
+
   describe("metadata integration", () => {
     it("merges canonical into existing metadata", () => {
       const baseMetadata: Metadata = {
@@ -195,14 +205,15 @@ describe("canonical-urls integration", () => {
       }
     });
 
-    it("falls back to default domain when env var not set", () => {
+    it("throws when NEXT_PUBLIC_SITE_URL is not set", () => {
       const originalEnv = process.env.NEXT_PUBLIC_SITE_URL;
 
       try {
         delete process.env.NEXT_PUBLIC_SITE_URL;
 
-        const canonical = generateCanonicalUrl("it", "/maestri");
-        expect(canonical).toContain("mirrorbuddy.org");
+        expect(() => generateCanonicalUrl("it", "/maestri")).toThrow(
+          "NEXT_PUBLIC_SITE_URL environment variable is required",
+        );
       } finally {
         process.env.NEXT_PUBLIC_SITE_URL = originalEnv;
       }
