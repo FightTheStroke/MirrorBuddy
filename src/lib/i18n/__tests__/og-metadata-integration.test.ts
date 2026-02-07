@@ -2,11 +2,24 @@
  * Integration tests for OG metadata with layout usage
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import { getLocalizedOGMetadata } from "../get-og-metadata";
 import type { Locale } from "@/i18n/config";
 
 describe("og-metadata-integration", () => {
+  const originalSiteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+
+  beforeAll(() => {
+    process.env.NEXT_PUBLIC_SITE_URL = "https://mirrorbuddy.org";
+  });
+
+  afterAll(() => {
+    if (originalSiteUrl !== undefined) {
+      process.env.NEXT_PUBLIC_SITE_URL = originalSiteUrl;
+    } else {
+      delete process.env.NEXT_PUBLIC_SITE_URL;
+    }
+  });
   describe("getLocalizedOGMetadata", () => {
     it("should generate metadata for homepage (it locale)", async () => {
       const metadata = await getLocalizedOGMetadata("it", {
