@@ -438,6 +438,37 @@ const eslintConfig = defineConfig([
       ],
     },
   },
+  // ADR 0045: Enforce barrel paths in test mocks and dynamic imports
+  // vi.mock("@/lib/auth/session-auth") must use barrel "@/lib/auth/server"
+  // await import("@/lib/auth/session-auth") must also use barrel paths
+  // "warn" during baseline reduction; escalate to "error" when violations reach 0.
+  {
+    files: [
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**/*.ts",
+      "**/__tests__/**/*.tsx",
+    ],
+    rules: {
+      "local-rules/enforce-module-boundaries": [
+        "warn",
+        {
+          protectedModules: [
+            "safety",
+            "privacy",
+            "ai",
+            "education",
+            "rag",
+            "accessibility",
+            "tier",
+            "auth",
+            "security",
+            "compliance",
+          ],
+        },
+      ],
+    },
+  },
   // ADR 0045: Enforce dependency direction between protected modules
   // CORE (safety, security, privacy) → no imports from FEATURE or CROSS
   // FEATURE (ai, education, rag) → may import CORE only

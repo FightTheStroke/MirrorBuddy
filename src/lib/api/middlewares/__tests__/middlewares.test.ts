@@ -8,14 +8,22 @@ import { NextRequest } from "next/server";
 import type { MiddlewareContext } from "../types";
 
 // Mock dependencies
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn(),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    requireCSRF: vi.fn(),
+  };
+});
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn(),
-  validateAdminAuth: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn(),
+    validateAdminAuth: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimitAsync: vi.fn(),
@@ -69,7 +77,7 @@ describe("Middleware modules", () => {
 
   describe("F-03: withCSRF", () => {
     it("should call next() if CSRF token is valid", async () => {
-      const { requireCSRF } = await import("@/lib/security/csrf");
+      const { requireCSRF } = await import("@/lib/security");
       const { withCSRF } = await import("../with-csrf");
 
       vi.mocked(requireCSRF).mockReturnValue(true);
@@ -82,7 +90,7 @@ describe("Middleware modules", () => {
     });
 
     it("should return 403 if CSRF token is invalid", async () => {
-      const { requireCSRF } = await import("@/lib/security/csrf");
+      const { requireCSRF } = await import("@/lib/security");
       const { withCSRF } = await import("../with-csrf");
 
       vi.mocked(requireCSRF).mockReturnValue(false);
@@ -100,7 +108,7 @@ describe("Middleware modules", () => {
 
   describe("F-04: withAuth", () => {
     it("should inject userId into context and call next() if authenticated", async () => {
-      const { validateAuth } = await import("@/lib/auth/session-auth");
+      const { validateAuth } = await import("@/lib/auth/server");
       const { withAuth } = await import("../with-auth");
 
       vi.mocked(validateAuth).mockResolvedValue({
@@ -117,7 +125,7 @@ describe("Middleware modules", () => {
     });
 
     it("should return 401 if not authenticated", async () => {
-      const { validateAuth } = await import("@/lib/auth/session-auth");
+      const { validateAuth } = await import("@/lib/auth/server");
       const { withAuth } = await import("../with-auth");
 
       vi.mocked(validateAuth).mockResolvedValue({
@@ -139,7 +147,7 @@ describe("Middleware modules", () => {
 
   describe("F-04: withAdmin", () => {
     it("should inject userId and isAdmin into context if admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       const { withAdmin } = await import("../with-admin");
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
@@ -158,7 +166,7 @@ describe("Middleware modules", () => {
     });
 
     it("should return 401 if not authenticated", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       const { withAdmin } = await import("../with-admin");
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
@@ -175,7 +183,7 @@ describe("Middleware modules", () => {
     });
 
     it("should return 403 if authenticated but not admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       const { withAdmin } = await import("../with-admin");
 
       vi.mocked(validateAdminAuth).mockResolvedValue({
