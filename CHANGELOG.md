@@ -11,6 +11,93 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+**Email Communications System**
+
+- Communications database schema with 5 Prisma models: `EmailCampaign`, `EmailRecipient`, `EmailPreference`, `EmailEvent`, `EmailUnsubscribe`
+- Three enums: `EmailStatus` (PENDING/SENT/FAILED/CANCELLED), `EmailEventType` (SENT/DELIVERED/OPENED/CLICKED/BOUNCED/COMPLAINED/UNSUBSCRIBED), `EmailPreferenceCategory` (MARKETING/PRODUCT_UPDATES/TRANSACTIONAL/SECURITY/EDUCATIONAL_CONTENT)
+- Email preference service (`src/lib/email/email-preference-service.ts`) with GDPR-compliant opt-in defaults
+- Admin email test endpoint (`POST /api/admin/email-test`) with audit logging and CSRF protection
+- Public unsubscribe API endpoints (no authentication required):
+  - `GET /api/email/unsubscribe` - Email-based token unsubscribe (one-click)
+  - `GET /api/email/preferences` - Fetch current preferences
+  - `POST /api/email/preferences` - Update preference categories
+- Unsubscribe page (`/unsubscribe`) with preference toggles for 5 categories
+- Prisma migration `20260207000000_communications_system` for production deployment
+- Email template service (`src/lib/email/template-service.ts`) with CRUD operations and variable rendering
+- Template variable system with `{{variable}}` syntax and XSS-safe HTML escaping
+- Supported template variables: `{{userName}}`, `{{userEmail}}`, `{{unsubscribeUrl}}`, `{{preferencesUrl}}`, `{{companyName}}`
+- Admin template API routes with CSRF protection and audit logging:
+  - `GET /api/admin/email-templates` - List all templates with pagination and search
+  - `POST /api/admin/email-templates` - Create new template
+  - `PUT /api/admin/email-templates/[id]` - Update existing template
+  - `DELETE /api/admin/email-templates/[id]` - Delete template
+- Admin templates list page (`/admin/email-templates`) with search, category filter, and CSV export
+- Template editor with live preview, variable picker, and HTML/plain text tabs
+- Communications section added to admin sidebar navigation and command palette (Cmd+K)
+- Resend webhook endpoint (`POST /api/webhooks/resend`) with svix signature verification
+- Email event tracking system with 4 event types: delivered, opened, bounced, complained
+- EmailEvent model with recipient status updates (delivered → DELIVERED, opened → OPENED, bounced/complained → FAILED)
+- Email statistics service (`src/lib/email/stats-service.ts`) with campaign stats and global stats
+- Admin email statistics API (`GET /api/admin/email-stats`) with quota widget data
+- Admin statistics page (`/admin/email-stats`) with Tailwind CSS bar charts (no external dependencies)
+- Open rate timeline calculation using Prisma groupBy for efficient aggregation
+- i18n support for communications UI in all 5 locales (it/en/fr/de/es)
+
+**Event Tracking & Webhooks (W4-Tracking)**
+
+- Resend webhook endpoint (`POST /api/webhooks/resend`) with svix signature verification for webhook security
+- EmailEvent model for tracking 4 event types: delivered, opened, bounced, complained
+- Webhook event processing with automatic EmailRecipient status updates (delivered/opened/failed)
+- Email statistics service (`src/lib/email/stats-service.ts`) with four calculation methods:
+  - `getCampaignStats()` - Stats for single campaign (sent, delivered, opened, bounce rate, open rate)
+  - `getGlobalStats()` - Aggregated stats across all campaigns
+  - `getRecentCampaignStats()` - Last 10 campaigns with key metrics
+  - `getOpenTimeline()` - Hourly open rate aggregation for charting
+- Admin email statistics API routes:
+  - `GET /api/admin/email-stats` - Global stats with quota widget data (Resend 100/day free tier limit)
+  - `GET /api/admin/email-stats/[campaignId]` - Detailed stats for specific campaign
+- Admin statistics page (`/admin/email-stats`) with:
+  - Global stats cards (sent, delivered, opened rates, daily quota usage)
+  - Campaigns table with sortable columns and status filters
+  - Open rate timeline chart using pure Tailwind CSS (no Chart.js dependency)
+  - Quota progress bar with color coding (green/yellow/red)
+- Unit tests: 10 test cases covering webhook verification, event processing, stats calculations, and edge cases
+- Webhook idempotency handling for Resend retries (no explicit deduplication yet)
+
+**Campaign Management (W3-Campaigns)**
+
+- Admin API routes for email campaigns (`/api/admin/email-campaigns/`):
+  - `GET /api/admin/email-campaigns` - List campaigns with pagination, status filter, and search
+  - `POST /api/admin/email-campaigns` - Create new campaign (draft state)
+  - `GET /api/admin/email-campaigns/[id]` - Fetch campaign details with preview data
+  - `POST /api/admin/email-campaigns/[id]/preview` - Preview campaign with sample recipients
+  - `POST /api/admin/email-campaigns/[id]/send` - Validate quota and send campaign (batch operation)
+- Campaign composer page (`/admin/campaigns/composer`) with 4-step wizard:
+  - Step 1: Select template with live preview
+  - Step 2: Define recipient filters (tier, locale, activity status)
+  - Step 3: Preview recipients matching criteria with pagination
+  - Step 4: Quota check before send (daily limit: 100 emails/day for free tier)
+- Campaign composer validation: Template required, recipients > 0, quota check before send, unsaved draft warning
+- Campaign list page (`/admin/campaigns`) with status badges (DRAFT/PENDING/SENT/FAILED/CANCELLED):
+  - Filter tabs: All, Active, Completed, Failed
+  - Search by campaign name
+  - Quick actions: Edit, Preview, Delete (with confirmation)
+  - Pagination (20 items/page)
+- Campaign detail page with recipient list (`/admin/campaigns/[id]/recipients`):
+  - Recipient table: email, status, delivery timestamp, open timestamp, last event
+  - Status filter tabs: All, Sent, Delivered, Opened, Failed
+  - Export recipients to CSV
+  - Recipient count by status
+- i18n: Campaign UI translations for all 5 locales (it/en/fr/de/es)
+
+### Fixed
+
+- **Direct invite broken** — email duplicate check used plaintext against PII-encrypted DB, causing silent failures. Now uses `emailHash` with legacy fallback
+- **Generic "Internal server error" on all API failures** — `withSentry` middleware swallowed `ApiError` instances, bypassing `pipe()` error handling. Now re-throws `ApiError` so routes can return specific status codes and messages
+- **PII middleware missing `upsert` handler** — Prisma upsert operations on PII models (User, Profile, GoogleAccount) bypassed encryption. Added `upsert` interceptor
+
+### Added
+
 - **Gamification Achievements Page**: Achievements grid display with filtering and sorting capabilities
 - **Streak Display with Calendar Heatmap**: Visual streak tracker showing activity calendar with color intensity representing contribution levels
 - **XP/Level Progress Bar**: User level progression display with visual bar indicating next level threshold

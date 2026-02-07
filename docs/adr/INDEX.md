@@ -78,6 +78,7 @@
 | 0100 | Multi-Country Compliance Architecture         | EU, Italy, US compliance                                                                        |
 | 0115 | Amodei Safety Enhancements                    | Dependency detection, STEM safety                                                               |
 | 0127 | Security & Encryption Hardening               | AES-256-GCM PII encryption, privacy-aware RAG, cookie encryption, key rotation, Azure Key Vault |
+| 0128 | Email Communications System                   | Templates, campaigns, tracking, GDPR-compliant preferences, Resend webhooks                     |
 | 0132 | Self-Service Password Reset Flow              | Time-limited tokens, secure recovery, rate limiting                                             |
 
 ## Observability & Operations
@@ -191,6 +192,13 @@
 
 ---
 
+<<<<<<< Updated upstream
 **Total Active ADRs**: 113
-**Archived ADRs**: 7
-**Last Updated**: 2026-02-07
+||||||| Stash base
+**Total Active ADRs**: 106
+=======
+**Total Active ADRs**: 107
+
+> > > > > > > Stashed changes
+> > > > > > > **Archived ADRs**: 7
+> > > > > > > **Last Updated**: 2026-02-07

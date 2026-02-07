@@ -132,6 +132,10 @@ function getBreadcrumbLabel(
     "/admin/tiers/definitions": "tierDefinitions",
     "/admin/characters": "characters.title",
     "/admin/audit": "audit.title",
+    "/admin/communications": "communications.title",
+    "/admin/communications/templates": "communications.templates",
+    "/admin/communications/campaigns": "communications.campaigns",
+    "/admin/communications/stats": "communications.stats",
   };
 
   // Try to get translated label
@@ -169,6 +173,10 @@ function humanizeSegment(segment: string): string {
     create: "Create",
     view: "View",
     delete: "Delete",
+    communications: "Communications",
+    templates: "Templates",
+    campaigns: "Campaigns",
+    stats: "Statistics",
   };
 
   if (commonSegments[segment.toLowerCase()]) {
