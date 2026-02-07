@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### W4-CI-Hardening
+
+#### Changed
+
+- **E2E Tests Blocking**: Removed `continue-on-error` from e2e workflow, added `nick-fields/retry@v3` with 3 retries for flaky tests, screenshot upload on failure for debugging
+- **Accessibility Tests Blocking**: Removed `continue-on-error` from accessibility workflow, WCAG 2.1 AA violations now gate deployment
+- **Mobile Build Job (PR-only)**: Added non-blocking CI job validating Next.js static export + Capacitor copy pipeline with Java 17, runs only on PRs for early validation feedback
+
 ### W3-Gamification-Security
 
 #### Added

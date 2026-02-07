@@ -46,3 +46,14 @@
 - **Badge Support**: Unachieved count badge on trophy icon (red dot) to prompt engagement
 - **Navigation Flow**: Tapping trophy navigates to `/achievements` with smooth page transition
 - **Responsive**: Trophy icon maintains consistent spacing with other nav items across device sizes
+
+## W4-CI-Hardening
+
+### E2E & Accessibility Testing Strategy
+
+- **Decision**: E2E and accessibility tests are now hard gates for deployment (blocking), not warnings
+- **Pattern**: Used `nick-fields/retry@v3` for flaky e2e tests, allowing 3 retry attempts before deployment failure
+- **Pattern**: Screenshot upload on e2e failure provides diagnostic artifact for failed runs without manual debugging
+- **Outcome**: WCAG violations no longer deployable; ensures all releases meet accessibility standards
+- **Mobile Build Validation**: PR-only non-blocking job allows early discovery of mobile build failures without blocking deployment pipeline
+- **Learning**: Separating blocking (e2e, a11y) from informational (mobile) jobs enables progressive quality gating while maintaining fast feedback loop
