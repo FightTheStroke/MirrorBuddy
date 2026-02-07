@@ -1,23 +1,23 @@
-import type { AccessibilitySettings } from '@/lib/accessibility/accessibility-store';
+import type { AccessibilitySettings } from "@/lib/accessibility";
 import type {
   MindmapNode,
   FlashcardItem,
   SummaryData,
   QuizData,
   TimelineData,
-} from '@/types/tools';
+} from "@/types/tools";
 
 export type PrintableContentType =
-  | 'mindmap'
-  | 'flashcard'
-  | 'summary'
-  | 'quiz'
-  | 'diagram'
-  | 'timeline'
-  | 'search'
-  | 'demo'
-  | 'formula'
-  | 'chart';
+  | "mindmap"
+  | "flashcard"
+  | "summary"
+  | "quiz"
+  | "diagram"
+  | "timeline"
+  | "search"
+  | "demo"
+  | "formula"
+  | "chart";
 
 export interface PrintOptions {
   title: string;
@@ -35,4 +35,3 @@ export interface DiagramPrintData {
 }
 
 export type { MindmapNode, FlashcardItem, SummaryData, QuizData, TimelineData };
-

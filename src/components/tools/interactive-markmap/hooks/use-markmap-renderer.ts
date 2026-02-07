@@ -7,7 +7,7 @@
 import { useEffect, useState, RefObject, MutableRefObject } from "react";
 import type { Markmap } from "markmap-view";
 import { logger } from "@/lib/logger";
-import type { AccessibilitySettings } from "@/lib/accessibility/accessibility-store";
+import type { AccessibilitySettings } from "@/lib/accessibility";
 import type { MindmapNode } from "../types";
 import { nodesToMarkdown } from "../helpers";
 

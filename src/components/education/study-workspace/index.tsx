@@ -1,20 +1,20 @@
-'use client';
+"use client";
 // ============================================================================
 // STUDY WORKSPACE (I-06)
 // Integrates MaterialiConversation with ToolCanvas for real-time tool building
 // Main container for the conversation-first study experience
 // ============================================================================
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { MaterialiConversation } from '../materiali-conversation';
-import { CharacterSwitcher, SUPPORT_CHARACTERS } from '../character-switcher';
-import { LazyVoiceSession } from '@/components/voice/lazy';
-import { useStudyWorkspace } from './use-study-workspace';
-import { StudyWorkspaceToolbar } from './toolbar';
-import { ToolCanvasPlaceholder } from './tool-canvas-placeholder';
-import type { StudyWorkspaceProps } from './types';
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { MaterialiConversation } from "../materiali-conversation";
+import { CharacterSwitcher, SUPPORT_CHARACTERS } from "../character-switcher";
+import { LazyVoiceSession } from "@/components/voice/lazy";
+import { useStudyWorkspace } from "./use-study-workspace";
+import { StudyWorkspaceToolbar } from "./toolbar";
+import { ToolCanvasPlaceholder } from "./tool-canvas-placeholder";
+import type { StudyWorkspaceProps } from "./types";
 
 export function StudyWorkspace({
   sessionId,
@@ -48,9 +48,9 @@ export function StudyWorkspace({
   return (
     <div
       className={cn(
-        'flex flex-col h-full',
-        settings.highContrast ? 'bg-black' : 'bg-slate-50 dark:bg-slate-950',
-        className
+        "flex flex-col h-full",
+        settings.highContrast ? "bg-black" : "bg-slate-50 dark:bg-slate-950",
+        className,
       )}
     >
       {/* Toolbar */}
@@ -64,16 +64,17 @@ export function StudyWorkspace({
       <div className="flex-1 flex overflow-hidden">
         {/* Conversation panel */}
         <AnimatePresence mode="wait">
-          {viewMode !== 'canvas' && (
+          {viewMode !== "canvas" && (
             <motion.div
               key="conversation"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
               className={cn(
-                'h-full overflow-hidden',
+                "h-full overflow-hidden",
                 layoutClasses.conversation,
-                viewMode === 'split' && 'border-r border-slate-200 dark:border-slate-800'
+                viewMode === "split" &&
+                  "border-r border-slate-200 dark:border-slate-800",
               )}
             >
               <MaterialiConversation
@@ -88,13 +89,13 @@ export function StudyWorkspace({
 
         {/* Tool canvas panel */}
         <AnimatePresence mode="wait">
-          {viewMode !== 'conversation' && (
+          {viewMode !== "conversation" && (
             <motion.div
               key="canvas"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
-              className={cn('h-full overflow-hidden', layoutClasses.canvas)}
+              className={cn("h-full overflow-hidden", layoutClasses.canvas)}
             >
               <ToolCanvasPlaceholder
                 sessionId={sessionId}

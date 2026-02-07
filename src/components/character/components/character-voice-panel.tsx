@@ -20,7 +20,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { AudioDeviceSelector } from "@/components/conversation/components/audio-device-selector";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { UnifiedCharacter, VoiceState, HeaderActions } from "../types";
 import { createVerticalGradientStyle } from "../utils/gradient-utils";
 import { AuraRings } from "./aura-rings";

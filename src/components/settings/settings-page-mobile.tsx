@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useSettingsStore } from "@/lib/stores";
 import { clientLogger } from "@/lib/logger/client";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { MobileLogoutButton } from "./sections/mobile-logout-button";
 import {
   SettingsSectionsMobile,

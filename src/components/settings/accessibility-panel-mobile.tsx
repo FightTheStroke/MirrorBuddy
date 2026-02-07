@@ -2,7 +2,7 @@
 
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { ProfileCardsSection } from "./accessibility-panel-mobile/profile-cards-section";
 import { SettingsTogglesSection } from "./accessibility-panel-mobile/settings-toggles-section";
 import { TextPreviewSection } from "./accessibility-panel-mobile/text-preview-section";

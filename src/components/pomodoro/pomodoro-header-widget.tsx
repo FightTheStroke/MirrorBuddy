@@ -1,24 +1,40 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, X, Coffee, Brain, Timer } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { usePomodoroStore } from '@/lib/stores/pomodoro-store';
-import { useProgressStore } from '@/lib/stores';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { useAmbientAudioStore } from '@/lib/stores/ambient-audio-store';
-import toast from '@/components/ui/toast';
-import { cn } from '@/lib/utils';
-import { POMODORO_XP } from '@/lib/constants/xp-rewards';
-import { formatTime, requestNotificationPermission } from './pomodoro-utils';
+import { useEffect, useRef, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, Pause, X, Coffee, Brain, Timer } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { usePomodoroStore } from "@/lib/stores/pomodoro-store";
+import { useProgressStore } from "@/lib/stores";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { useAmbientAudioStore } from "@/lib/stores/ambient-audio-store";
+import toast from "@/components/ui/toast";
+import { cn } from "@/lib/utils";
+import { POMODORO_XP } from "@/lib/constants/xp-rewards";
+import { formatTime, requestNotificationPermission } from "./pomodoro-utils";
 
 // Phase config with icons
 const PHASE_CONFIG_WITH_ICONS = {
-  idle: { color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: <Timer className="w-3.5 h-3.5" /> },
-  focus: { color: 'text-red-400', bgColor: 'bg-red-500/20', icon: <Brain className="w-3.5 h-3.5" /> },
-  shortBreak: { color: 'text-green-400', bgColor: 'bg-green-500/20', icon: <Coffee className="w-3.5 h-3.5" /> },
-  longBreak: { color: 'text-blue-400', bgColor: 'bg-blue-500/20', icon: <Coffee className="w-3.5 h-3.5" /> },
+  idle: {
+    color: "text-slate-400",
+    bgColor: "bg-slate-500/20",
+    icon: <Timer className="w-3.5 h-3.5" />,
+  },
+  focus: {
+    color: "text-red-400",
+    bgColor: "bg-red-500/20",
+    icon: <Brain className="w-3.5 h-3.5" />,
+  },
+  shortBreak: {
+    color: "text-green-400",
+    bgColor: "bg-green-500/20",
+    icon: <Coffee className="w-3.5 h-3.5" />,
+  },
+  longBreak: {
+    color: "text-blue-400",
+    bgColor: "bg-blue-500/20",
+    icon: <Coffee className="w-3.5 h-3.5" />,
+  },
 };
 
 function showNotification(title: string, body: string) {
@@ -26,11 +42,11 @@ function showNotification(title: string, body: string) {
   const { breakReminders } = useAccessibilityStore.getState().settings;
   if (!breakReminders) return;
 
-  if (Notification.permission === 'granted') {
+  if (Notification.permission === "granted") {
     new Notification(title, {
       body,
-      icon: '/icons/icon-192.png',
-      tag: 'pomodoro',
+      icon: "/icons/icon-192.png",
+      tag: "pomodoro",
       requireInteraction: true,
     });
   }
@@ -61,17 +77,21 @@ export function PomodoroHeaderWidget() {
   // Ambient audio integration (ADR-0018)
   useEffect(() => {
     const ambientStore = useAmbientAudioStore.getState();
-    const { autoStartWithPomodoro, pauseDuringBreak, pomodoroPreset } = ambientStore;
+    const { autoStartWithPomodoro, pauseDuringBreak, pomodoroPreset } =
+      ambientStore;
 
-    if (phase === 'focus' && isRunning && autoStartWithPomodoro) {
+    if (phase === "focus" && isRunning && autoStartWithPomodoro) {
       // Start ambient audio when focus phase begins
-      if (ambientStore.playbackState !== 'playing') {
+      if (ambientStore.playbackState !== "playing") {
         ambientStore.applyPreset(pomodoroPreset);
         ambientStore.play();
       }
-    } else if ((phase === 'shortBreak' || phase === 'longBreak') && pauseDuringBreak) {
+    } else if (
+      (phase === "shortBreak" || phase === "longBreak") &&
+      pauseDuringBreak
+    ) {
       // Pause during breaks if setting enabled
-      if (ambientStore.playbackState === 'playing') {
+      if (ambientStore.playbackState === "playing") {
         ambientStore.pause();
       }
     }
@@ -93,14 +113,16 @@ export function PomodoroHeaderWidget() {
 
       if (currentTime <= 1) {
         // Phase complete
-        const wasFocus = currentPhase === 'focus';
+        const wasFocus = currentPhase === "focus";
         const currentCompleted = usePomodoroStore.getState().completedPomodoros;
-        const currentTodayPomodoros = usePomodoroStore.getState().todayPomodoros;
+        const currentTodayPomodoros =
+          usePomodoroStore.getState().todayPomodoros;
 
         if (wasFocus) {
           incrementPomodoros();
           const newCompleted = currentCompleted + 1;
-          const isLongBreak = newCompleted % settings.pomodorosUntilLongBreak === 0;
+          const isLongBreak =
+            newCompleted % settings.pomodorosUntilLongBreak === 0;
 
           // Calculate XP reward
           let xpEarned = POMODORO_XP.SINGLE;
@@ -122,35 +144,41 @@ export function PomodoroHeaderWidget() {
           addXP(xpEarned);
           updateStreak(settings.focusMinutes);
 
-          const nextPhase = isLongBreak ? 'longBreak' : 'shortBreak';
-          const nextTime = isLongBreak ? settings.longBreakMinutes * 60 : settings.shortBreakMinutes * 60;
+          const nextPhase = isLongBreak ? "longBreak" : "shortBreak";
+          const nextTime = isLongBreak
+            ? settings.longBreakMinutes * 60
+            : settings.shortBreakMinutes * 60;
 
           setPhase(nextPhase);
           setTimeRemaining(nextTime);
           setIsRunning(false);
 
           // Notification with XP info
-          const bonusText = bonuses.length > 0 ? ` (${bonuses.join(', ')})` : '';
+          const bonusText =
+            bonuses.length > 0 ? ` (${bonuses.join(", ")})` : "";
           const notificationBody = isLongBreak
             ? `Ottimo lavoro! Fai una pausa lunga di ${settings.longBreakMinutes} minuti.${bonusText}`
             : `Bravo! Fai una pausa di ${settings.shortBreakMinutes} minuti.${bonusText}`;
 
           // Browser notification (if permitted)
-          showNotification(`Pomodoro completato! +${xpEarned} XP`, notificationBody);
+          showNotification(
+            `Pomodoro completato! +${xpEarned} XP`,
+            notificationBody,
+          );
 
           // Toast notification (always visible)
           toast.success(
             `Pomodoro completato! +${xpEarned} XP`,
             notificationBody,
-            { duration: 6000 }
+            { duration: 6000 },
           );
         } else {
           // Break ended
-          setPhase('focus');
+          setPhase("focus");
           setTimeRemaining(settings.focusMinutes * 60);
           setIsRunning(false);
 
-          showNotification('Pausa finita!', 'Pronto per un altro pomodoro?');
+          showNotification("Pausa finita!", "Pronto per un altro pomodoro?");
         }
       } else {
         setTimeRemaining(currentTime - 1);
@@ -162,10 +190,19 @@ export function PomodoroHeaderWidget() {
         clearInterval(intervalRef.current);
       }
     };
-  }, [isRunning, settings, setPhase, setTimeRemaining, setIsRunning, incrementPomodoros, addXP, updateStreak]);
+  }, [
+    isRunning,
+    settings,
+    setPhase,
+    setTimeRemaining,
+    setIsRunning,
+    incrementPomodoros,
+    addXP,
+    updateStreak,
+  ]);
 
   const handleStart = useCallback(() => {
-    setPhase('focus');
+    setPhase("focus");
     setTimeRemaining(settings.focusMinutes * 60);
     setIsRunning(true);
   }, [settings.focusMinutes, setPhase, setTimeRemaining, setIsRunning]);
@@ -181,7 +218,7 @@ export function PomodoroHeaderWidget() {
   const phaseConfig = PHASE_CONFIG_WITH_ICONS[phase];
 
   // Don't show if idle
-  if (phase === 'idle') {
+  if (phase === "idle") {
     return (
       <Button
         variant="ghost"
@@ -204,34 +241,38 @@ export function PomodoroHeaderWidget() {
         animate={{ opacity: 1, scale: 1 }}
         exit={{ opacity: 0, scale: 0.9 }}
         className={cn(
-          'flex items-center gap-2 px-2.5 py-1.5 rounded-full border',
+          "flex items-center gap-2 px-2.5 py-1.5 rounded-full border",
           phaseConfig.bgColor,
-          phase === 'focus' ? 'border-red-500/30' :
-          phase === 'shortBreak' ? 'border-green-500/30' :
-          'border-blue-500/30'
+          phase === "focus"
+            ? "border-red-500/30"
+            : phase === "shortBreak"
+              ? "border-green-500/30"
+              : "border-blue-500/30",
         )}
       >
         {/* Phase icon */}
         <span className={phaseConfig.color}>{phaseConfig.icon}</span>
 
         {/* Time */}
-        <span className={cn('font-mono font-bold text-sm', phaseConfig.color)}>
+        <span className={cn("font-mono font-bold text-sm", phaseConfig.color)}>
           {formatTime(timeRemaining)}
         </span>
 
         {/* Pomodoro count */}
         <div className="flex gap-0.5">
-          {Array.from({ length: settings.pomodorosUntilLongBreak }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'w-1.5 h-1.5 rounded-full',
-                i < completedPomodoros % settings.pomodorosUntilLongBreak
-                  ? 'bg-red-500'
-                  : 'bg-white/20'
-              )}
-            />
-          ))}
+          {Array.from({ length: settings.pomodorosUntilLongBreak }).map(
+            (_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "w-1.5 h-1.5 rounded-full",
+                  i < completedPomodoros % settings.pomodorosUntilLongBreak
+                    ? "bg-red-500"
+                    : "bg-white/20",
+                )}
+              />
+            ),
+          )}
         </div>
 
         {/* Controls */}
@@ -241,13 +282,17 @@ export function PomodoroHeaderWidget() {
             size="icon"
             onClick={handleToggle}
             className={cn(
-              'h-6 w-6',
+              "h-6 w-6",
               isRunning
-                ? 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/20'
-                : 'text-green-400 hover:text-green-300 hover:bg-green-500/20'
+                ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/20"
+                : "text-green-400 hover:text-green-300 hover:bg-green-500/20",
             )}
           >
-            {isRunning ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
+            {isRunning ? (
+              <Pause className="w-3.5 h-3.5" />
+            ) : (
+              <Play className="w-3.5 h-3.5" />
+            )}
           </Button>
           <Button
             variant="ghost"

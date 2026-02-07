@@ -23,7 +23,7 @@ vi.mock("@/lib/stores", () => ({
   }),
 }));
 
-vi.mock("@/lib/accessibility/accessibility-store", () => ({
+vi.mock("@/lib/accessibility", () => ({
   useAccessibilityStore: () => ({
     settings: { dyslexiaMode: false },
     updateSettings: vi.fn(),

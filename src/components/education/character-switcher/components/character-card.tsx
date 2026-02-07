@@ -1,9 +1,9 @@
-import Image from 'next/image';
-import { ChevronRight, Heart, Users, GraduationCap } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { ROLE_INFO } from '../constants';
-import type { Character } from '../types';
+import Image from "next/image";
+import { ChevronRight, Heart, Users, GraduationCap } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { ROLE_INFO } from "../constants";
+import type { Character } from "../types";
 
 const ICON_MAP = {
   Heart,
@@ -17,7 +17,11 @@ interface CharacterCardProps {
   onClick: () => void;
 }
 
-export function CharacterCard({ character, isSelected, onClick }: CharacterCardProps) {
+export function CharacterCard({
+  character,
+  isSelected,
+  onClick,
+}: CharacterCardProps) {
   const { settings } = useAccessibilityStore();
   const roleInfo = ROLE_INFO[character.role];
   const Icon = ICON_MAP[roleInfo.iconName];
@@ -26,16 +30,16 @@ export function CharacterCard({ character, isSelected, onClick }: CharacterCardP
     <button
       onClick={onClick}
       className={cn(
-        'relative p-3 rounded-xl text-left transition-all group',
+        "relative p-3 rounded-xl text-left transition-all group",
         isSelected
-          ? 'ring-2 ring-offset-2'
+          ? "ring-2 ring-offset-2"
           : settings.highContrast
-            ? 'bg-gray-800 hover:bg-gray-700 border border-gray-600'
-            : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
+            ? "bg-gray-800 hover:bg-gray-700 border border-gray-600"
+            : "bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700",
       )}
       style={
         isSelected
-          ? ({ '--tw-ring-color': character.color } as React.CSSProperties)
+          ? ({ "--tw-ring-color": character.color } as React.CSSProperties)
           : undefined
       }
     >
@@ -66,20 +70,17 @@ export function CharacterCard({ character, isSelected, onClick }: CharacterCardP
           <div className="flex items-center gap-1">
             <span
               className={cn(
-                'font-medium text-sm truncate',
+                "font-medium text-sm truncate",
                 settings.highContrast
-                  ? 'text-white'
-                  : 'text-slate-900 dark:text-white'
+                  ? "text-white"
+                  : "text-slate-900 dark:text-white",
               )}
             >
               {character.name}
             </span>
           </div>
           <span
-            className={cn(
-              'text-xs flex items-center gap-1',
-              roleInfo.color
-            )}
+            className={cn("text-xs flex items-center gap-1", roleInfo.color)}
           >
             <Icon className="w-4 h-4" />
             {roleInfo.label}
@@ -87,8 +88,8 @@ export function CharacterCard({ character, isSelected, onClick }: CharacterCardP
           {character.specialty && (
             <p
               className={cn(
-                'text-xs mt-1 line-clamp-1',
-                settings.highContrast ? 'text-gray-400' : 'text-slate-500'
+                "text-xs mt-1 line-clamp-1",
+                settings.highContrast ? "text-gray-400" : "text-slate-500",
               )}
             >
               {character.specialty}
@@ -98,12 +99,11 @@ export function CharacterCard({ character, isSelected, onClick }: CharacterCardP
 
         <ChevronRight
           className={cn(
-            'w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0',
-            settings.highContrast ? 'text-yellow-400' : 'text-slate-400'
+            "w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0",
+            settings.highContrast ? "text-yellow-400" : "text-slate-400",
           )}
         />
       </div>
     </button>
   );
 }
-

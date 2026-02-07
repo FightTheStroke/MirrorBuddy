@@ -4,7 +4,7 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from "react";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { useTTS } from "@/components/accessibility";
 import { logger } from "@/lib/logger";
 import { csrfFetch } from "@/lib/auth";

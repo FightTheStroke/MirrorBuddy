@@ -15,7 +15,7 @@ import {
   Minimize,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { MarkMapRendererProps } from "./types";
 import { useZoom, useFullscreen, useExport, useMarkmapRender } from "./hooks";
 

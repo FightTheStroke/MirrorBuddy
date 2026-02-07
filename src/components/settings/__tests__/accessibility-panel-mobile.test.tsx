@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { AccessibilityPanelMobile } from "@/components/settings/accessibility-panel-mobile";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { getTranslation } from "@/test/i18n-helpers";
 
 const stripMotionProps = (props: Record<string, unknown>) => {
@@ -37,7 +37,7 @@ vi.mock("framer-motion", () => ({
 }));
 
 // Mock useAccessibilityStore
-vi.mock("@/lib/accessibility/accessibility-store", () => ({
+vi.mock("@/lib/accessibility", () => ({
   useAccessibilityStore: vi.fn(),
 }));
 

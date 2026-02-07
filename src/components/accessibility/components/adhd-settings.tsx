@@ -5,7 +5,7 @@
 
 import { Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { Toggle } from "./toggle";
 
 export function ADHDSettings() {
