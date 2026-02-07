@@ -164,6 +164,7 @@ describe("Capacitor Push - Registration", () => {
   });
 
   it("should handle native registration timeout", async () => {
+    vi.useFakeTimers();
     mockCapacitor.isNativePlatform.mockReturnValue(true);
 
     // Don't trigger any callbacks - let it timeout
@@ -171,9 +172,15 @@ describe("Capacitor Push - Registration", () => {
       // No callback triggered
     });
 
-    const result = await registerForPush();
+    const resultPromise = registerForPush();
 
+    // Advance past the 10000ms timeout in source
+    await vi.advanceTimersByTimeAsync(10001);
+
+    const result = await resultPromise;
     expect(result).toBeNull();
+
+    vi.useRealTimers();
   });
 
   it("should handle native registration error", async () => {

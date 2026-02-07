@@ -3,6 +3,7 @@ import packageJson from "./package.json";
 import bundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import createNextIntlPlugin from "next-intl/plugin";
+import mobileConfig from "./next.config.mobile";
 
 // Bundle analyzer configuration (enabled via ANALYZE=true)
 const withBundleAnalyzer = bundleAnalyzer({
@@ -67,6 +68,7 @@ const nextConfig: NextConfig = {
       "./node_modules/undici/**",
       "./node_modules/jsdom/**",
       "./node_modules/isomorphic-dompurify/**",
+      "./node_modules/parse5/**",
     ],
   },
 
@@ -271,6 +273,14 @@ const sentryConfig = {
 // Set DISABLE_SENTRY_BUILD=true to skip Sentry instrumentation
 // Note: Order matters - withNextIntl must wrap the final config for i18n to work
 const config = withNextIntl(withBundleAnalyzer(nextConfig));
-export default process.env.DISABLE_SENTRY_BUILD === "true"
-  ? config
-  : withSentryConfig(config, sentryConfig);
+
+// Mobile builds use dedicated static-export config (no Sentry, no server features)
+// Activated via MOBILE_BUILD=1 env var in build:mobile:web script
+const finalConfig =
+  process.env.MOBILE_BUILD === "1"
+    ? mobileConfig
+    : process.env.DISABLE_SENTRY_BUILD === "true"
+      ? config
+      : withSentryConfig(config, sentryConfig);
+
+export default finalConfig;

@@ -122,25 +122,56 @@ describe("media-bridge — camera", () => {
     it("falls back to file input on web", async () => {
       mockCapacitor.isNativePlatform.mockReturnValue(false);
 
-      const mockFileReader = {
-        readAsDataURL: vi.fn(),
-        result: "data:image/jpeg;base64,mock-base64",
-        onload: null as ((e: ProgressEvent<FileReader>) => void) | null,
-        onerror: null as ((e: ProgressEvent<FileReader>) => void) | null,
+      const mockFile = new File(["test"], "photo.jpeg", {
+        type: "image/jpeg",
+      });
+
+      // Mock document.createElement to intercept <input> creation
+      let inputOnchange: ((e: Event) => void) | null = null;
+      const mockInput = {
+        type: "",
+        accept: "",
+        capture: "",
+        set onchange(fn: ((e: Event) => void) | null) {
+          inputOnchange = fn;
+        },
+        get onchange() {
+          return inputOnchange;
+        },
+        onerror: null as (() => void) | null,
+        click: vi.fn(() => {
+          // Simulate user selecting a file after click
+          setTimeout(() => {
+            if (inputOnchange) {
+              inputOnchange({
+                target: { files: [mockFile] },
+              } as unknown as Event);
+            }
+          }, 0);
+        }),
       };
 
-      global.FileReader = vi.fn(() => mockFileReader) as never;
+      const origCreate = document.createElement.bind(document);
+      vi.spyOn(document, "createElement").mockImplementation(((tag: string) => {
+        if (tag === "input") return mockInput;
+        return origCreate(tag);
+      }) as typeof document.createElement);
 
-      const resultPromise = capturePhoto({ source: "camera" });
-
-      setTimeout(() => {
-        if (mockFileReader.onload) {
-          mockFileReader.onload({} as ProgressEvent<FileReader>);
+      // Mock FileReader as a class so `new FileReader()` works
+      global.FileReader = class {
+        result = "data:image/jpeg;base64,mock-base64";
+        onload: (() => void) | null = null;
+        onerror: (() => void) | null = null;
+        readAsDataURL() {
+          setTimeout(() => {
+            if (this.onload) this.onload();
+          }, 0);
         }
-      }, 10);
+      } as unknown as typeof FileReader;
 
-      const result = await resultPromise;
+      const result = await capturePhoto({ source: "camera" });
 
+      expect(mockInput.click).toHaveBeenCalled();
       expect(result.base64).toBe("mock-base64");
       expect(result.format).toBe("jpeg");
     });

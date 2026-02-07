@@ -29,7 +29,7 @@
     "reboot": "lsof -ti:3000 | xargs kill -9 2>/dev/null; next dev",
     "build": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "start": "node .next/standalone/server.js",
-    "build:mobile:web": "BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build --config-file next.config.mobile.ts",
+    "build:mobile:web": "MOBILE_BUILD=1 BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ) next build",
     "build:mobile": "npm run build:mobile:web && npx cap copy && npx cap sync",
     "build:mobile:ios": "./scripts/mobile-build.sh ios",
     "build:mobile:android": "./scripts/mobile-build.sh android",
