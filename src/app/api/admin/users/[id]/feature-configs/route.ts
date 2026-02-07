@@ -8,8 +8,8 @@
 
 import { NextResponse } from "next/server";
 import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
-import { tierService } from "@/lib/tier/tier-service";
-import type { FeatureType, UserFeatureConfigInput } from "@/lib/tier/types";
+import { tierService } from "@/lib/tier/server";
+import type { FeatureType, UserFeatureConfigInput } from "@/lib/tier/server";
 
 const VALID_FEATURES: FeatureType[] = [
   "chat",

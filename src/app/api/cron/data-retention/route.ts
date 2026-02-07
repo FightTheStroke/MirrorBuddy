@@ -17,7 +17,7 @@ import {
   markExpiredDataForDeletion,
   executeScheduledDeletions,
   applyDefaultRetentionSystemWide,
-} from "@/lib/privacy/data-retention-service";
+} from "@/lib/privacy/server";
 import { purgeExpiredUserBackups } from "@/lib/admin/user-trash-service";
 import {
   cleanupExpiredTrialSessions,

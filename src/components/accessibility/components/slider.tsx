@@ -3,8 +3,8 @@
  * @brief Slider component for accessibility settings
  */
 
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
 
 interface SliderProps {
   label: string;
@@ -23,7 +23,7 @@ export function Slider({
   min,
   max,
   step,
-  unit = '',
+  unit = "",
 }: SliderProps) {
   const { settings } = useAccessibilityStore();
 
@@ -51,20 +51,20 @@ export function Slider({
   return (
     <div
       className={cn(
-        'p-4 rounded-lg',
+        "p-4 rounded-lg",
         settings.highContrast
-          ? 'bg-gray-900 border border-gray-700'
-          : 'bg-slate-50 dark:bg-slate-800/50'
+          ? "bg-gray-900 border border-gray-700"
+          : "bg-slate-50 dark:bg-slate-800/50",
       )}
     >
       <div className="flex items-center justify-between mb-3">
         <span
           className={cn(
-            'font-medium',
+            "font-medium",
             settings.highContrast
-              ? 'text-white'
-              : 'text-slate-900 dark:text-white',
-            settings.dyslexiaFont && 'tracking-wide'
+              ? "text-white"
+              : "text-slate-900 dark:text-white",
+            settings.dyslexiaFont && "tracking-wide",
           )}
           style={{ fontSize: `${14 * (settings.largeText ? 1.2 : 1)}px` }}
         >
@@ -78,10 +78,10 @@ export function Slider({
           onClick={handleDecrease}
           disabled={!canDecrease}
           className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all',
+            "w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all",
             settings.highContrast
-              ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30'
-              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30'
+              ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30"
+              : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30",
           )}
           aria-label="Diminuisci"
         >
@@ -90,8 +90,8 @@ export function Slider({
 
         <span
           className={cn(
-            'font-mono text-2xl min-w-[80px] text-center',
-            settings.highContrast ? 'text-yellow-400' : 'text-blue-500'
+            "font-mono text-2xl min-w-[80px] text-center",
+            settings.highContrast ? "text-yellow-400" : "text-blue-500",
           )}
         >
           {value.toFixed(1)}
@@ -103,10 +103,10 @@ export function Slider({
           onClick={handleIncrease}
           disabled={!canIncrease}
           className={cn(
-            'w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all',
+            "w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold transition-all",
             settings.highContrast
-              ? 'bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30'
-              : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30'
+              ? "bg-gray-700 text-yellow-400 hover:bg-gray-600 disabled:opacity-30"
+              : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-300 dark:hover:bg-slate-600 disabled:opacity-30",
           )}
           aria-label="Aumenta"
         >
@@ -121,14 +121,14 @@ export function Slider({
             type="button"
             onClick={() => onChange(v)}
             className={cn(
-              'w-2 h-2 rounded-full transition-all',
+              "w-2 h-2 rounded-full transition-all",
               i === currentIndex
                 ? settings.highContrast
-                  ? 'bg-yellow-400 w-3'
-                  : 'bg-accent-themed w-3'
+                  ? "bg-yellow-400 w-3"
+                  : "bg-accent-themed w-3"
                 : settings.highContrast
-                  ? 'bg-gray-600'
-                  : 'bg-slate-300 dark:bg-slate-600'
+                  ? "bg-gray-600"
+                  : "bg-slate-300 dark:bg-slate-600",
             )}
             aria-label={`${v}${unit}`}
           />
@@ -137,4 +137,3 @@ export function Slider({
     </div>
   );
 }
-

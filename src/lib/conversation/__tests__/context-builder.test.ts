@@ -5,9 +5,17 @@ import {
 } from "../context-builder";
 import * as memoryLoader from "../memory-loader";
 import * as crossMaestroMemory from "../cross-maestro-memory";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier/server";
 
-vi.mock("@/lib/tier/tier-service");
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getEffectiveTier: vi.fn(),
+    },
+  };
+});
 vi.mock("../memory-loader");
 vi.mock("../cross-maestro-memory");
 

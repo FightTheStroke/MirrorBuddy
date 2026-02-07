@@ -1,10 +1,8 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { AdaptiveSignalsPayloadSchema } from "@/lib/validation/schemas/adaptive";
-import {
-  normalizeAdaptiveDifficultyMode,
-  recordAdaptiveSignalsBatch,
-} from "@/lib/education/adaptive-difficulty";
+import { normalizeAdaptiveDifficultyMode } from "@/lib/education";
+import { recordAdaptiveSignalsBatch } from "@/lib/education/server";
 import type { AdaptiveSignalInput } from "@/types/adaptive-difficulty";
 import { pipe, withSentry, withCSRF, withAuth } from "@/lib/api/middlewares";
 

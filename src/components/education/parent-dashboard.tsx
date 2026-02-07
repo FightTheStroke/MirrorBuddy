@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 import { Star, Sprout, Lightbulb, Brain } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { StudentInsights } from "@/types";
 import { EmptyInsightsState } from "./parent-dashboard/components/empty-state";

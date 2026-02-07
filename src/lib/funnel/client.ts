@@ -8,7 +8,7 @@
 import { type FunnelStage } from "./constants";
 import { getVisitorIdFromClient } from "@/lib/trial/visitor-id";
 import { hasAnalyticsConsent } from "@/lib/consent/consent-storage";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { clientLogger } from "@/lib/logger/client";
 
 export { type FunnelStage };

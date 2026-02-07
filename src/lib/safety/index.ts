@@ -1,4 +1,5 @@
 /**
+ * @module safety
  * MirrorBuddy Safety Module
  *
  * Central export for all child-safety guardrails.
@@ -18,6 +19,11 @@ export {
   CRISIS_RESPONSE,
   type SafetyInjectionOptions,
 } from "./safety-prompts-core";
+
+export {
+  injectSafetyGuardrails as injectSafetyGuardrails_legacy,
+  hasSafetyGuardrails as hasSafetyGuardrails_legacy,
+} from "./safety-prompts";
 
 export { IT_CONTENT_PATTERNS } from "./safety-patterns";
 
@@ -87,17 +93,6 @@ export {
   type SafetyMetrics,
 } from "./monitoring";
 
-// ============================================================================
-// SERVER-ONLY MODULES - Import directly when needed (not via barrel export)
-// ============================================================================
-// Human Escalation (F-06 - AI Act Article 14):
-//   import { escalateCrisisDetected, ... } from '@/lib/safety/escalation';
-//
-// DB queries:
-//   import { getSafetyEventsFromDb, ... } from '@/lib/safety/monitoring/db-queries';
-// ============================================================================
-
-// Re-export types only (no runtime code)
 export type {
   EscalationEvent,
   EscalationTrigger,
@@ -109,9 +104,22 @@ export type {
 // ============================================================================
 // AMODEI SAFETY ENHANCEMENTS (Reference: "The Adolescence of Technology" 2026)
 // ============================================================================
-// STEM Safety - Block dangerous chemistry/physics/biology queries:
-//   import { checkSTEMSafety, isSTEMProfessor } from '@/lib/safety/stem-safety';
-//
-// Dependency Detection - Track usage patterns and emotional dependency:
-//   import { recordSessionStart, recordMessage, runDependencyAnalysis } from '@/lib/safety/dependency';
-// ============================================================================
+export { checkSTEMSafety, isSTEMProfessor } from "./stem-safety";
+
+export { normalizeUnicode } from "./versioning";
+
+export { recordContentFiltered } from "./audit";
+
+export {
+  recordComplianceEvent,
+  recordComplianceContentFiltered,
+  recordComplianceCrisisDetected,
+  recordComplianceJailbreakAttempt,
+  recordComplianceGuardrailTriggered,
+  getComplianceEntries,
+  getComplianceStatistics,
+  exportComplianceAudit,
+  clearComplianceBuffer,
+} from "./audit/compliance-audit-service";
+
+// escalation-service exports moved to ./server.ts (chains to @/lib/email → prisma)

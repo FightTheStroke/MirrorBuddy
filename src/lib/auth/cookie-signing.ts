@@ -16,7 +16,7 @@ import {
   randomBytes,
   createHash,
 } from "crypto";
-import { getSecret } from "@/lib/security/azure-key-vault";
+import { getSecret } from "@/lib/security";
 
 /**
  * Error thrown when cookie signing/verification operations fail

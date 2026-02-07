@@ -5,7 +5,7 @@ import { sendEmail } from "@/lib/email";
 import { getPasswordResetEmail } from "@/lib/email/templates/password-reset-template";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 import { RATE_LIMITS } from "@/lib/rate-limit";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 import crypto from "crypto";
 
 const log = logger.child({ module: "auth/forgot-password" });

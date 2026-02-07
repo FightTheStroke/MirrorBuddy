@@ -6,7 +6,7 @@
 import { logger } from '@/lib/logger';
 import type { ToolType } from '@/types/tools';
 import type { SavedMaterial } from '../types';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 
 export async function fetchMaterials(
   toolType: ToolType,

@@ -1,7 +1,7 @@
 import type { ActiveCharacter } from "@/lib/stores/conversation-flow-store";
 import type { Maestro, MaestroVoice, Subject } from "@/types";
 import { CHARACTER_AVATARS } from "./constants";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 
 // Get userId from cookie
 export function getUserId(): string | null {

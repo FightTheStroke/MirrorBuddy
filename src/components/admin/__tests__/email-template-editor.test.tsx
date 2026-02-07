@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { EmailTemplateEditor } from "../email-template-editor";
-import * as csrfClient from "@/lib/auth/csrf-client";
+import * as csrfClient from "@/lib/auth";
 import { useRouter } from "next/navigation";
 
 // Mock next/navigation

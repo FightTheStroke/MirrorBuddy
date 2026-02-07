@@ -21,7 +21,7 @@ import { useConversationFlowStore } from "@/lib/stores/conversation-flow-store";
 import { useParentInsightsIndicator } from "@/lib/hooks/use-parent-insights-indicator";
 import { useTrialStatus } from "@/lib/hooks/use-trial-status";
 import { useTrialToasts } from "@/lib/hooks/use-trial-toasts";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 import { cn } from "@/lib/utils";
 import type { Maestro, ToolType } from "@/types";
 import { MaestriGrid } from "@/components/maestros/maestri-grid";

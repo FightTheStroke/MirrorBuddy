@@ -3,10 +3,10 @@
  * @brief Dyslexia settings component
  */
 
-import { TextIcon, Volume2 } from 'lucide-react';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import { Toggle } from './toggle';
-import { Slider } from './slider';
+import { TextIcon, Volume2 } from "lucide-react";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import { Toggle } from "./toggle";
+import { Slider } from "./slider";
 
 export function DyslexiaSettings() {
   const { settings, updateSettings } = useAccessibilityStore();
@@ -90,4 +90,3 @@ export function DyslexiaSettings() {
     </div>
   );
 }
-

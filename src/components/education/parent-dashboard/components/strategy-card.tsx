@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 import { Lightbulb } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { LearningStrategy } from "@/types";
 
 interface StrategyCardProps {

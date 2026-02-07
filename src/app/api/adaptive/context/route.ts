@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { AdaptiveContextQuerySchema } from "@/lib/validation/schemas/adaptive";
-import {
-  buildAdaptiveInstruction,
-  getAdaptiveContextForUser,
-} from "@/lib/education/adaptive-difficulty";
+import { buildAdaptiveInstruction } from "@/lib/education";
+import { getAdaptiveContextForUser } from "@/lib/education/server";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
 export const GET = pipe(

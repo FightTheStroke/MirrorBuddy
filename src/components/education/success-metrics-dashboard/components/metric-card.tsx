@@ -8,7 +8,7 @@ import {
   CardDescription,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type { SuccessMetric } from "../types";
 import { METRIC_ICONS, METRIC_COLORS } from "../constants";
 

@@ -7,13 +7,17 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { searchRelevantSummaries } from "../semantic-memory";
-import * as embeddingService from "@/lib/rag/embedding-service";
-import * as vectorStore from "@/lib/rag/vector-store";
 import * as tierMemoryConfig from "../tier-memory-config";
 
 // Mock dependencies
-vi.mock("@/lib/rag/embedding-service");
-vi.mock("@/lib/rag/vector-store");
+vi.mock("@/lib/rag/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rag/server")>();
+  return {
+    ...actual,
+    generatePrivacyAwareEmbedding: vi.fn(),
+    searchSimilar: vi.fn(),
+  };
+});
 vi.mock("../tier-memory-config");
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -29,6 +33,9 @@ vi.mock("@/lib/logger", () => ({
     }),
   },
 }));
+
+import { generatePrivacyAwareEmbedding, searchSimilar } from "@/lib/rag/server";
+import type { VectorSearchResult } from "@/lib/rag/vector-store";
 
 describe("searchRelevantSummaries", () => {
   const mockUserId = "user-123";
@@ -54,13 +61,13 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
-    const mockSearchResults: vectorStore.VectorSearchResult[] = [
+    const mockSearchResults: VectorSearchResult[] = [
       {
         id: "emb-1",
         sourceType: "conversation_summary",
@@ -83,7 +90,7 @@ describe("searchRelevantSummaries", () => {
       },
     ];
 
-    vi.mocked(vectorStore.searchSimilar).mockResolvedValue(mockSearchResults);
+    vi.mocked(searchSimilar).mockResolvedValue(mockSearchResults);
 
     // Act
     const results = await searchRelevantSummaries(mockUserId, mockQuery, "pro");
@@ -103,10 +110,10 @@ describe("searchRelevantSummaries", () => {
     });
 
     // Verify embedding was generated
-    expect(embeddingService.generateEmbedding).toHaveBeenCalledWith(mockQuery);
+    expect(generatePrivacyAwareEmbedding).toHaveBeenCalledWith(mockQuery);
 
     // Verify vector search was called correctly
-    expect(vectorStore.searchSimilar).toHaveBeenCalledWith({
+    expect(searchSimilar).toHaveBeenCalledWith({
       userId: mockUserId,
       vector: mockVector,
       limit: 10,
@@ -126,13 +133,13 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
-    vi.mocked(vectorStore.searchSimilar).mockResolvedValue([]);
+    vi.mocked(searchSimilar).mockResolvedValue([]);
 
     // Act
     const results = await searchRelevantSummaries(mockUserId, mockQuery, "pro");
@@ -162,8 +169,8 @@ describe("searchRelevantSummaries", () => {
 
     // Assert
     expect(results).toEqual([]);
-    expect(embeddingService.generateEmbedding).not.toHaveBeenCalled();
-    expect(vectorStore.searchSimilar).not.toHaveBeenCalled();
+    expect(generatePrivacyAwareEmbedding).not.toHaveBeenCalled();
+    expect(searchSimilar).not.toHaveBeenCalled();
   });
 
   it("should respect custom limit parameter", async () => {
@@ -177,19 +184,19 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
-    vi.mocked(vectorStore.searchSimilar).mockResolvedValue([]);
+    vi.mocked(searchSimilar).mockResolvedValue([]);
 
     // Act
     await searchRelevantSummaries(mockUserId, mockQuery, "pro", 5);
 
     // Assert
-    expect(vectorStore.searchSimilar).toHaveBeenCalledWith({
+    expect(searchSimilar).toHaveBeenCalledWith({
       userId: mockUserId,
       vector: mockVector,
       limit: 5,
@@ -209,7 +216,7 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockRejectedValue(
+    vi.mocked(generatePrivacyAwareEmbedding).mockRejectedValue(
       new Error("Embedding service failed"),
     );
 
@@ -238,7 +245,7 @@ describe("searchRelevantSummaries", () => {
     // Assert
     expect(results1).toEqual([]);
     expect(results2).toEqual([]);
-    expect(embeddingService.generateEmbedding).not.toHaveBeenCalled();
+    expect(generatePrivacyAwareEmbedding).not.toHaveBeenCalled();
   });
 
   it("should return results sorted by relevance score (highest first)", async () => {
@@ -252,14 +259,14 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
     // Intentionally unsorted results from vector store
-    const mockSearchResults: vectorStore.VectorSearchResult[] = [
+    const mockSearchResults: VectorSearchResult[] = [
       {
         id: "emb-1",
         sourceType: "conversation_summary",
@@ -292,7 +299,7 @@ describe("searchRelevantSummaries", () => {
       },
     ];
 
-    vi.mocked(vectorStore.searchSimilar).mockResolvedValue(mockSearchResults);
+    vi.mocked(searchSimilar).mockResolvedValue(mockSearchResults);
 
     // Act
     const results = await searchRelevantSummaries(mockUserId, mockQuery, "pro");
@@ -315,13 +322,13 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
-    vi.mocked(vectorStore.searchSimilar).mockRejectedValue(
+    vi.mocked(searchSimilar).mockRejectedValue(
       new Error("Vector store connection failed"),
     );
 
@@ -343,13 +350,13 @@ describe("searchRelevantSummaries", () => {
       crossMaestroEnabled: true,
     });
 
-    vi.mocked(embeddingService.generateEmbedding).mockResolvedValue({
+    vi.mocked(generatePrivacyAwareEmbedding).mockResolvedValue({
       vector: mockVector,
       model: "text-embedding-3-small",
       usage: { tokens: 10 },
     });
 
-    const mockSearchResults: vectorStore.VectorSearchResult[] = [
+    const mockSearchResults: VectorSearchResult[] = [
       {
         id: "emb-1",
         sourceType: "conversation_summary",
@@ -362,7 +369,7 @@ describe("searchRelevantSummaries", () => {
       },
     ];
 
-    vi.mocked(vectorStore.searchSimilar).mockResolvedValue(mockSearchResults);
+    vi.mocked(searchSimilar).mockResolvedValue(mockSearchResults);
 
     // Act
     const results = await searchRelevantSummaries(mockUserId, mockQuery, "pro");

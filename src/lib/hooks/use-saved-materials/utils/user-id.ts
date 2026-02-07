@@ -3,7 +3,7 @@
  * @brief User ID utility
  */
 
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 
 export function getUserId(): string {
   if (typeof window === "undefined") return "default-user";

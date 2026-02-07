@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, AlertCircle } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { MaskedSecretVaultEntry } from "@/lib/admin/key-vault-types";
 
 interface EditKeyModalProps {

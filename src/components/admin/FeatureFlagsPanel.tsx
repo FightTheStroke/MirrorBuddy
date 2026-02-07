@@ -10,7 +10,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { FeatureFlag, KnownFeatureFlag } from "@/lib/feature-flags/types";
 
 interface DegradationState {

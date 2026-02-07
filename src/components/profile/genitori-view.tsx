@@ -25,7 +25,7 @@ import type {
   ObservationCategory,
   ParentDashboardActivity,
 } from "@/types";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type {
   ProfileMeta,
   PageState,

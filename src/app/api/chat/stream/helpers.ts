@@ -5,16 +5,13 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
+import { validateAuth } from "@/lib/auth/server";
+import { canAccessFullFeatures } from "@/lib/compliance/server";
 import { filterInput } from "@/lib/safety";
 import { loadPreviousContext } from "@/lib/conversation/memory-loader";
 import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
-import {
-  findSimilarMaterials,
-  findRelatedConcepts,
-} from "@/lib/rag/retrieval-service";
-import type { AIProvider } from "@/lib/ai/providers";
+import { findSimilarMaterials, findRelatedConcepts } from "@/lib/rag/server";
+import type { AIProvider } from "@/lib/ai/server";
 
 import type { ChatRequest } from "../types";
 

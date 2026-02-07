@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { logger } from "@/lib/logger";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
+import { getUserIdFromCookie } from "@/lib/auth";
 import type { ToolType } from "@/types/tools";
 
 // ============================================================================

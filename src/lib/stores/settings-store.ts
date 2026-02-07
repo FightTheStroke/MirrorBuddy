@@ -5,7 +5,7 @@
 import { create } from "zustand";
 import { logger } from "@/lib/logger";
 import type { Theme, AIProvider } from "@/types";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import {
   type TeachingStyle,
   type LearningDifference,

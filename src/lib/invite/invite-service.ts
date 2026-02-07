@@ -10,7 +10,7 @@
 
 import { prisma } from "@/lib/db";
 import { sendEmail, isEmailConfigured } from "@/lib/email";
-import { hashPassword, generateRandomPassword } from "@/lib/auth/password";
+import { hashPassword, generateRandomPassword } from "@/lib/auth/server";
 import { logger } from "@/lib/logger";
 import {
   getAdminNotificationTemplate,

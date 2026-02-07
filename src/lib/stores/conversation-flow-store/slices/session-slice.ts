@@ -21,7 +21,7 @@ import { getDefaultSupportTeacher, getSupportTeacherById, type CoachId } from '@
 import { getBuddyById, type BuddyId } from '@/data/buddy-profiles';
 import { getMaestroById } from '@/data/maestri';
 import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 import { inactivityMonitor } from '@/lib/conversation/inactivity-monitor';
 import { loadConversationSummariesFromDB } from '../persistence';
 import { createActiveCharacter, saveCurrentConversation, loadConversationMessages } from '../helpers';

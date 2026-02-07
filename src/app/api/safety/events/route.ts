@@ -9,12 +9,9 @@
 import { NextResponse } from "next/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth/server";
 import { triggerAdminCountsUpdate } from "@/lib/helpers/publish-admin-counts";
-import type {
-  SafetyEventType,
-  EventSeverity,
-} from "@/lib/safety/monitoring/types";
+import type { SafetyEventType, EventSeverity } from "@/lib/safety";
 
 interface SafetyEventBody {
   type: SafetyEventType;

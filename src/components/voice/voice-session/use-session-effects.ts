@@ -2,11 +2,11 @@ import { useEffect, useRef } from "react";
 import { useProgressStore, useUIStore } from "@/lib/stores";
 import { useAmbientAudioStore } from "@/lib/stores/ambient-audio-store";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import {
   buildSignalsFromText,
   sendAdaptiveSignals,
-} from "@/lib/education/adaptive-difficulty-client";
+} from "@/lib/education";
 import type { AdaptiveSignalInput, Maestro, ToolCall } from "@/types";
 
 interface UseSessionEffectsProps {

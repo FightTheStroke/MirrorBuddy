@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { ToolCall } from "@/types";
 import { ToolResultDisplay } from "@/components/tools";
 import { useChatSession } from "./hooks";

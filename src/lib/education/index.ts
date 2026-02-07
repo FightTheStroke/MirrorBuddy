@@ -3,8 +3,8 @@
  * @brief Education library exports
  */
 
-export * from './accessibility';
-export { default as accessibility } from './accessibility';
+export * from "./accessibility";
+export { default as accessibility } from "./accessibility";
 
 // FSRS - Free Spaced Repetition Scheduler
 export {
@@ -20,17 +20,40 @@ export {
   type FSRSCard,
   type Quality,
   type FSRSStats,
-} from './fsrs';
+} from "./fsrs";
 
-// Adaptive Quiz - Review suggestions, seen concepts, difficulty adjustment
+// Adaptive Quiz - ONLY client-safe exports (difficulty calculation)
+// Import from sub-modules to avoid pulling in adaptive-quiz.ts which re-exports server functions
 export {
-  analyzeQuizPerformance,
-  generateReviewSuggestions,
-  checkSeenConcepts,
   calculateDifficultyAdjustment,
   selectQuestionsForDifficulty,
-  type ReviewSuggestion,
-  type SeenConcept,
-  type DifficultyAdjustment,
-  type QuizAnalysis,
-} from './adaptive-quiz';
+} from "./adaptive-quiz/difficulty";
+
+export type {
+  ReviewSuggestion,
+  SeenConcept,
+  DifficultyAdjustment,
+  QuizAnalysis,
+} from "./adaptive-quiz/types";
+
+// Adaptive Difficulty - ONLY client-safe exports (no DB access)
+// Import from sub-modules to avoid pulling in adaptive-difficulty.ts which has DB imports
+export {
+  isAdaptiveDifficultyMode,
+  normalizeAdaptiveDifficultyMode,
+  calculateAdaptiveContext,
+  buildAdaptiveInstruction,
+} from "./adaptive-difficulty-core";
+
+export {
+  createDefaultAdaptiveProfile,
+  parseAdaptiveProfile,
+} from "./adaptive-difficulty-profile";
+
+export {
+  sendAdaptiveSignals,
+  buildSignalsFromText,
+} from "./adaptive-difficulty-client";
+
+// Accessibility - Dyscalculia support
+export { formatNumberColored } from "./accessibility/dyscalculia";

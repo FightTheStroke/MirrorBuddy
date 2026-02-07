@@ -38,11 +38,15 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getEffectiveTier: vi.fn(),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getEffectiveTier: vi.fn(),
+    },
+  };
+});
 
 vi.mock("../tier-memory-config", () => ({
   getTierMemoryLimits: vi.fn(),
@@ -52,12 +56,18 @@ vi.mock("@/data/maestri", () => ({
   getMaestroById: vi.fn(),
 }));
 
-vi.mock("@/lib/safety/safety-prompts", () => ({
-  injectSafetyGuardrails: vi.fn((prompt, _options) => `[SAFE] ${prompt}`),
-}));
+vi.mock("@/lib/safety", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/safety")>();
+  return {
+    ...actual,
+    injectSafetyGuardrails: vi.fn(
+      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
+    ),
+  };
+});
 
 import { prisma } from "@/lib/db";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier/server";
 import { getTierMemoryLimits } from "../tier-memory-config";
 import { getMaestroById } from "@/data/maestri";
 

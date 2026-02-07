@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { hashPassword, validatePasswordStrength } from "@/lib/auth/password";
+import { hashPassword, validatePasswordStrength } from "@/lib/auth/server";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 

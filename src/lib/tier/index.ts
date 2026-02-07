@@ -1,3 +1,8 @@
+/**
+ * @module tier
+ * Tier management and feature configuration for MirrorBuddy
+ */
+
 export type {
   TierDefinition,
   TierFeatures,
@@ -22,8 +27,6 @@ export {
   isSubscriptionActive,
   isSubscriptionExpired,
 } from "./types";
-
-export { TierService, tierService } from "./tier-service";
 
 export type { FeatureModelType } from "./tier-helpers";
 export {

@@ -4,7 +4,7 @@ import { Clock, TrendingUp, Users } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 
 interface StatsOverviewProps {
   hours: number;

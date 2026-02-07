@@ -6,16 +6,11 @@
 import { logger } from "@/lib/logger";
 import { loadPreviousContext } from "@/lib/conversation/memory-loader";
 import { enhanceSystemPrompt } from "@/lib/conversation/prompt-enhancer";
-import {
-  findSimilarMaterials,
-  findRelatedConcepts,
-} from "@/lib/rag/retrieval-service";
+import { findSimilarMaterials, findRelatedConcepts } from "@/lib/rag/server";
 import { buildToolContext } from "@/lib/tools/tool-context-builder";
 import { getMaestroById } from "@/data/maestri";
-import {
-  buildAdaptiveInstruction,
-  getAdaptiveContextForUser,
-} from "@/lib/education/adaptive-difficulty";
+import { buildAdaptiveInstruction } from "@/lib/education";
+import { getAdaptiveContextForUser } from "@/lib/education/server";
 import { getLanguageInstruction } from "@/lib/i18n/language-instructions";
 import type { SupportedLanguage } from "./types";
 

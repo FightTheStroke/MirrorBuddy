@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
 import { EffectiveLimitsDisplay } from "./effective-limits-display";
 import { LimitOverridesSection } from "./limit-overrides-section";

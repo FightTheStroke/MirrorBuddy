@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,

@@ -1,7 +1,8 @@
 /**
+ * @module security
  * Security utilities and middleware
  */
-export { generateNonce, CSP_NONCE_HEADER } from "./csp-nonce";
+export { generateNonce, getNonce, CSP_NONCE_HEADER } from "./csp-nonce";
 export {
   generateCSRFToken,
   validateCSRFToken,
@@ -16,3 +17,7 @@ export {
   decryptToken,
   isEncryptionConfigured,
 } from "./encryption";
+export { encryptPII, decryptPII, hashPII } from "./pii-encryption";
+export { getSecret, clearAllCachedSecrets } from "./azure-key-vault";
+export { logDecryptAccess, logBulkDecryptAccess } from "./decrypt-audit";
+export { getCorsHeaders } from "./cors-config";

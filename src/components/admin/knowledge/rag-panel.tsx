@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Database, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { toast } from "@/components/ui/toast";
 
 interface EmbeddingStats {

@@ -26,7 +26,7 @@ import {
 import { useTierFeatures } from "@/hooks/useTierFeatures";
 import { AnalyticsScoreCard } from "./components/analytics-score-card";
 import { AnalyticsListCard } from "./components/analytics-list-card";
-import type { LearningRecommendation } from "@/lib/education/recommendation-engine";
+import type { LearningRecommendation } from "@/lib/education/server";
 
 export default function StudentAnalyticsPage() {
   const t = useTranslations("analytics");

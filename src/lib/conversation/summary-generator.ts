@@ -4,16 +4,16 @@
 // Part of Session Summary & Unified Archive feature
 // ============================================================================
 
-import { prisma } from '@/lib/db';
-import { logger } from '@/lib/logger';
+import { prisma } from "@/lib/db";
+import { logger } from "@/lib/logger";
 import {
   generateConversationSummary,
   extractKeyFacts,
   extractTopics,
   extractLearnings,
-} from '@/lib/ai/summarize';
-import type { Message, ConversationSummaryResult } from './summary-types';
-import { saveLearnings } from './learning-persistence';
+} from "@/lib/ai/server";
+import type { Message, ConversationSummaryResult } from "./summary-types";
+import { saveLearnings } from "./learning-persistence";
 
 export type { ConversationSummaryResult, Message };
 
@@ -22,7 +22,7 @@ export type { ConversationSummaryResult, Message };
  * Called on explicit close or inactivity timeout
  */
 export async function endConversationWithSummary(
-  conversationId: string
+  conversationId: string,
 ): Promise<ConversationSummaryResult | null> {
   try {
     // Fetch conversation with messages
@@ -30,19 +30,19 @@ export async function endConversationWithSummary(
       where: { id: conversationId },
       include: {
         messages: {
-          orderBy: { createdAt: 'asc' },
+          orderBy: { createdAt: "asc" },
           take: 100, // Limit for summarization
         },
       },
     });
 
     if (!conversation) {
-      logger.warn('Conversation not found for summary', { conversationId });
+      logger.warn("Conversation not found for summary", { conversationId });
       return null;
     }
 
     if (!conversation.isActive) {
-      logger.debug('Conversation already closed', { conversationId });
+      logger.debug("Conversation already closed", { conversationId });
       return null;
     }
 
@@ -54,7 +54,7 @@ export async function endConversationWithSummary(
 
     if (messages.length === 0) {
       // No messages at all - just mark as inactive
-      logger.debug('Skipping summary for empty conversation', {
+      logger.debug("Skipping summary for empty conversation", {
         conversationId,
         messageCount: 0,
       });
@@ -65,7 +65,7 @@ export async function endConversationWithSummary(
       });
 
       return {
-        summary: '',
+        summary: "",
         keyFacts: { decisions: [], preferences: [], learned: [] },
         topics: [],
         learningsCount: 0,
@@ -77,11 +77,11 @@ export async function endConversationWithSummary(
       const singleMessage = messages[0];
       const truncatedContent = singleMessage.content.substring(0, 200);
       const simpleSummary =
-        singleMessage.role === 'user'
-          ? `Lo studente ha chiesto: "${truncatedContent}${singleMessage.content.length > 200 ? '...' : ''}"`
-          : `Il maestro ha risposto: "${truncatedContent}${singleMessage.content.length > 200 ? '...' : ''}"`;
+        singleMessage.role === "user"
+          ? `Lo studente ha chiesto: "${truncatedContent}${singleMessage.content.length > 200 ? "..." : ""}"`
+          : `Il maestro ha risposto: "${truncatedContent}${singleMessage.content.length > 200 ? "..." : ""}"`;
 
-      logger.info('Generating simple summary for single-message conversation', {
+      logger.info("Generating simple summary for single-message conversation", {
         conversationId,
         messageRole: singleMessage.role,
       });
@@ -91,7 +91,11 @@ export async function endConversationWithSummary(
         data: {
           isActive: false,
           summary: simpleSummary,
-          keyFacts: JSON.stringify({ decisions: [], preferences: [], learned: [] }),
+          keyFacts: JSON.stringify({
+            decisions: [],
+            preferences: [],
+            learned: [],
+          }),
           topics: JSON.stringify([]),
         },
       });
@@ -134,11 +138,11 @@ export async function endConversationWithSummary(
         conversation.userId,
         conversation.maestroId,
         learnings,
-        user?.profile?.schoolLevel
+        user?.profile?.schoolLevel,
       );
     }
 
-    logger.info('Conversation summary generated', {
+    logger.info("Conversation summary generated", {
       conversationId,
       summaryLength: summary.length,
       topicsCount: topics.length,
@@ -152,7 +156,7 @@ export async function endConversationWithSummary(
       learningsCount: learnings.length,
     };
   } catch (error) {
-    logger.error('Failed to generate conversation summary', {
+    logger.error("Failed to generate conversation summary", {
       conversationId,
       error: String(error),
     });
@@ -166,7 +170,7 @@ export async function endConversationWithSummary(
  */
 export async function getLastConversationSummary(
   userId: string,
-  characterId: string
+  characterId: string,
 ): Promise<{
   summary: string;
   topics: string[];
@@ -179,7 +183,7 @@ export async function getLastConversationSummary(
       isActive: false,
       summary: { not: null },
     },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { updatedAt: "desc" },
   });
 
   if (!conversation || !conversation.summary) {
@@ -198,7 +202,7 @@ export async function getLastConversationSummary(
  */
 export async function getRecentSummaries(
   userId: string,
-  limit: number = 5
+  limit: number = 5,
 ): Promise<
   Array<{
     id: string;
@@ -214,7 +218,7 @@ export async function getRecentSummaries(
       isActive: false,
       summary: { not: null },
     },
-    orderBy: { updatedAt: 'desc' },
+    orderBy: { updatedAt: "desc" },
     take: limit,
     select: {
       id: true,
@@ -228,7 +232,7 @@ export async function getRecentSummaries(
   return conversations.map((c) => ({
     id: c.id,
     maestroId: c.maestroId,
-    summary: c.summary ?? '',
+    summary: c.summary ?? "",
     topics: JSON.parse(c.topics) as string[],
     updatedAt: c.updatedAt,
   }));

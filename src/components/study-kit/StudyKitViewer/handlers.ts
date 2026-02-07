@@ -5,7 +5,7 @@
 
 import toast from "@/components/ui/toast";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import type { StudyKit } from "@/types/study-kit";
 
 interface DeleteHandlerParams {

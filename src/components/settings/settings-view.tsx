@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AccessibilitySettings } from "@/components/accessibility/accessibility-settings";
 import { useSettingsStore } from "@/lib/stores";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import { TelemetryDashboard } from "@/components/telemetry";
 import { OnboardingSettings } from "@/components/settings/onboarding-settings";
 import { cn } from "@/lib/utils";

@@ -8,23 +8,28 @@ import { indexToolOutput } from "../tool-rag-indexer";
 import type { StoredToolOutput } from "../tool-output-types";
 
 // Mock dependencies
-vi.mock("@/lib/rag/privacy-aware-embedding", () => ({
-  generatePrivacyAwareEmbedding: vi.fn().mockResolvedValue({
-    vector: new Array(1536).fill(0.1),
-    model: "text-embedding-ada-002",
-    usage: { tokens: 100 },
-  }),
-}));
+vi.mock("@/lib/rag", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rag")>();
+  return {
+    ...actual,
+    isEmbeddingConfigured: vi.fn().mockReturnValue(true),
+  };
+});
 
-vi.mock("@/lib/rag/embedding-service", () => ({
-  isEmbeddingConfigured: vi.fn().mockReturnValue(true),
-}));
-
-vi.mock("@/lib/rag/vector-store", () => ({
-  storeEmbedding: vi.fn().mockResolvedValue({
-    id: "emb_123",
-  }),
-}));
+vi.mock("@/lib/rag/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rag/server")>();
+  return {
+    ...actual,
+    generatePrivacyAwareEmbedding: vi.fn().mockResolvedValue({
+      vector: new Array(1536).fill(0.1),
+      model: "text-embedding-ada-002",
+      usage: { tokens: 100 },
+    }),
+    storeEmbedding: vi.fn().mockResolvedValue({
+      id: "emb_123",
+    }),
+  };
+});
 
 vi.mock("@/lib/logger", () => ({
   logger: {
@@ -41,15 +46,14 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
+import { generatePrivacyAwareEmbedding } from "@/lib/rag/server";
+
 describe("Tool RAG Indexer - Privacy Integration", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   it("should use generatePrivacyAwareEmbedding instead of generateEmbedding", async () => {
-    const { generatePrivacyAwareEmbedding } =
-      await import("@/lib/rag/privacy-aware-embedding");
-
     const toolOutput: StoredToolOutput = {
       id: "tool_123",
       conversationId: "conv_789",
@@ -72,9 +76,6 @@ describe("Tool RAG Indexer - Privacy Integration", () => {
   });
 
   it("should anonymize PII in quiz tool outputs before embedding", async () => {
-    const { generatePrivacyAwareEmbedding } =
-      await import("@/lib/rag/privacy-aware-embedding");
-
     const toolOutput: StoredToolOutput = {
       id: "tool_quiz_1",
       conversationId: "conv_123",
@@ -105,9 +106,6 @@ describe("Tool RAG Indexer - Privacy Integration", () => {
   });
 
   it("should anonymize PII in flashcard tool outputs before embedding", async () => {
-    const { generatePrivacyAwareEmbedding } =
-      await import("@/lib/rag/privacy-aware-embedding");
-
     const toolOutput: StoredToolOutput = {
       id: "tool_flash_1",
       conversationId: "conv_456",
@@ -134,9 +132,6 @@ describe("Tool RAG Indexer - Privacy Integration", () => {
   });
 
   it("should handle mindmap tool outputs with privacy", async () => {
-    const { generatePrivacyAwareEmbedding } =
-      await import("@/lib/rag/privacy-aware-embedding");
-
     const toolOutput: StoredToolOutput = {
       id: "tool_mindmap_1",
       conversationId: "conv_789",

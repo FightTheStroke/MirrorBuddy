@@ -4,7 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { BulkTierChangeModal } from "../bulk-tier-change-modal";
-import * as csrfClient from "@/lib/auth/csrf-client";
+import * as csrfClient from "@/lib/auth";
 
 // Mock csrf-client
 vi.mock("@/lib/auth/csrf-client", () => ({

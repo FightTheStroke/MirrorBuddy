@@ -23,12 +23,12 @@
  */
 
 import { NextResponse } from "next/server";
-import { validateAuth } from "@/lib/auth/session-auth";
-import { tierService } from "@/lib/tier/tier-service";
-import { isAdmin } from "@/lib/auth/require-admin";
+import { validateAuth } from "@/lib/auth/server";
+import { tierService } from "@/lib/tier/server";
+import { isAdmin } from "@/lib/auth/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { SIMULATED_TIER_COOKIE } from "@/lib/auth/cookie-constants";
+import { SIMULATED_TIER_COOKIE } from "@/lib/auth/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import type { MiddlewareContext } from "@/lib/api/middlewares";
 

@@ -15,7 +15,7 @@ import { pipe, withSentry } from "@/lib/api/middlewares";
 import {
   AUTH_COOKIE_NAME,
   VISITOR_COOKIE_NAME,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 
 // eslint-disable-next-line local-rules/require-csrf-mutating-routes -- public telemetry endpoint, accepts anonymous users
 export const POST = pipe(withSentry("/api/telemetry/activity"))(async (ctx) => {

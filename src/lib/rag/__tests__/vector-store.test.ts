@@ -22,7 +22,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock anonymization service
-vi.mock("@/lib/privacy/anonymization-service", () => ({
+vi.mock("@/lib/privacy", () => ({
   anonymizeConversationMessage: vi.fn((content: string) => {
     // Simple mock: replace emails and phone numbers with placeholders
     return content
@@ -57,7 +57,7 @@ import {
   type VectorSearchResult,
   type StoreEmbeddingInput,
 } from "../vector-store";
-import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
+import { anonymizeConversationMessage } from "@/lib/privacy";
 
 describe("Vector Store Service", () => {
   beforeEach(() => {

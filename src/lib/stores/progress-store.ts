@@ -7,7 +7,7 @@ import { logger } from "@/lib/logger";
 import { getCurrentSeason } from "@/lib/gamification/seasons";
 import type { ProgressState, StudySession } from "./progress-store-types";
 import { createProgressActions } from "./progress-store-actions";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 // Re-export types for convenience
 export type { StudySession, SessionGrade } from "./progress-store-types";

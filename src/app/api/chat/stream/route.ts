@@ -12,9 +12,9 @@ import { NextResponse } from "next/server";
 import {
   azureStreamingCompletion,
   getActiveProvider,
-} from "@/lib/ai/providers";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
-import { tierService } from "@/lib/tier/tier-service";
+  getDeploymentForModel,
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,

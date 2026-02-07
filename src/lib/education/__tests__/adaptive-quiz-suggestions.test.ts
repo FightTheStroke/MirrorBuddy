@@ -39,9 +39,13 @@ vi.mock("@/lib/logger", () => ({
 
 // Mock hybridSearch
 const mockHybridSearch = vi.fn();
-vi.mock("@/lib/rag", () => ({
-  hybridSearch: (...args: unknown[]) => mockHybridSearch(...args),
-}));
+vi.mock("@/lib/rag/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/rag/server")>();
+  return {
+    ...actual,
+    hybridSearch: (...args: unknown[]) => mockHybridSearch(...args),
+  };
+});
 
 // Import after mocks
 import {

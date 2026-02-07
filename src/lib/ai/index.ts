@@ -1,4 +1,5 @@
 /**
+ * @module ai
  * AI Module - Barrel Export
  * F-08: Feature modules con boundaries chiari
  */
@@ -6,6 +7,8 @@
 // Character routing
 export {
   routeToCharacter,
+  getBuddyForStudent,
+  quickRoute,
   type RoutingResult,
   type RoutingContext,
 } from "./character-router";
@@ -42,11 +45,11 @@ export {
   getProviderCheckStatus,
 } from "./provider-check";
 
-// Summarization
+// Provider types (client-safe type-only exports)
+export type { AIProviderType } from "./providers/provider-interface";
+
+// Transparency (client-safe)
 export {
-  generateConversationSummary,
-  extractKeyFacts,
-  extractTopics,
-  extractLearnings,
-  generateConversationTitle,
-} from "./summarize";
+  assessResponseTransparency,
+  type TransparencyContext,
+} from "./transparency";

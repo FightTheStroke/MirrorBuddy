@@ -10,9 +10,9 @@ import {
   chatCompletion,
   getActiveProvider,
   type AIProvider,
-} from "@/lib/ai/providers";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
-import { tierService } from "@/lib/tier/tier-service";
+  getDeploymentForModel,
+} from "@/lib/ai/server";
+import { tierService } from "@/lib/tier/server";
 import { getRequestLogger, getRequestId } from "@/lib/tracing";
 import {
   checkRateLimitAsync,
@@ -21,17 +21,17 @@ import {
   rateLimitResponse,
 } from "@/lib/rate-limit";
 import { filterInput, sanitizeOutput } from "@/lib/safety";
-import { checkSTEMSafety } from "@/lib/safety/stem-safety";
-import { recordMessage, recordSessionStart } from "@/lib/safety/dependency";
+import { checkSTEMSafety } from "@/lib/safety";
+import { recordMessage, recordSessionStart } from "@/lib/safety/server";
 import { analyzeIndependence } from "@/lib/gamification/independence-tracker";
 import { awardPoints } from "@/lib/gamification/db";
 import { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
 import {
   assessResponseTransparency,
   type TransparencyContext,
-} from "@/lib/ai/transparency";
-import { recordContentFiltered } from "@/lib/safety/audit";
-import { normalizeUnicode } from "@/lib/safety/versioning";
+} from "@/lib/ai/server";
+import { recordContentFiltered } from "@/lib/safety";
+import { normalizeUnicode } from "@/lib/safety";
 
 // Import handlers to register them
 import "@/lib/tools/handlers";

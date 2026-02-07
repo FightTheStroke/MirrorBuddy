@@ -10,7 +10,7 @@
 
 import { useCallback, useRef, useEffect } from "react";
 import { getUserId } from "@/lib/hooks/use-saved-materials/utils/user-id";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 interface TurnMetrics {
   latencyMs: number;

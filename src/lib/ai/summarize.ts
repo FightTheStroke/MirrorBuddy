@@ -6,7 +6,8 @@
 
 import { chatCompletion, getActiveProvider } from "./providers";
 import { getDeploymentForModel } from "./providers/deployment-mapping";
-import { tierService } from "@/lib/tier/tier-service";
+// eslint-disable-next-line local-rules/enforce-dependency-direction -- tier check needed for model selection
+import { tierService } from "@/lib/tier/server";
 import { logger } from "@/lib/logger";
 
 interface Message {

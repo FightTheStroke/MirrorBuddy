@@ -7,7 +7,7 @@ import { useRef, useCallback } from "react";
 import type { Dispatch, SetStateAction } from "react";
 import type { CollaborationState } from "./types";
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 
 /**
  * Hook for cursor update function with throttling

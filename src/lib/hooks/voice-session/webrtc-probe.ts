@@ -6,7 +6,7 @@
 "use client";
 
 import { logger } from "@/lib/logger";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { ICE_SERVERS } from "./webrtc-types";
 import type { ProbeResult } from "./transport-types";
 

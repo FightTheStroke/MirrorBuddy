@@ -10,7 +10,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { validateAuth } from "@/lib/auth/session-auth";
+import { validateAuth } from "@/lib/auth/server";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
 
 const log = logger.child({ module: "api/user/consent" });

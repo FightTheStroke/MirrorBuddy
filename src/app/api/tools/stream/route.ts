@@ -8,10 +8,7 @@ import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { logger } from "@/lib/logger";
 import { prisma } from "@/lib/db";
-import {
-  validateAuth,
-  validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+import { validateAuth, validateSessionOwnership } from "@/lib/auth/server";
 import {
   registerClient,
   unregisterClient,
@@ -20,8 +17,8 @@ import {
   getSessionClientCount,
   getTotalClientCount,
 } from "@/lib/realtime/tool-events";
-import { getCorsHeaders } from "@/lib/security/cors-config";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { getCorsHeaders } from "@/lib/security";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 // Generate unique client ID

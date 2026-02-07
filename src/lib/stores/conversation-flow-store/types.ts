@@ -9,7 +9,7 @@ import type { CharacterType, ExtendedStudentProfile } from '@/types';
 import type { MaestroFull } from '@/data/maestri';
 import type { SupportTeacher } from '@/types';
 import type { BuddyProfile } from '@/types';
-import type { RoutingResult } from '@/lib/ai/character-router';
+import type { RoutingResult } from '@/lib/ai';
 
 // ============================================================================
 // ACTIVE CHARACTER

@@ -13,10 +13,10 @@ import { NextRequest } from "next/server";
 import {
   VISITOR_COOKIE_NAME,
   validateVisitorId,
-} from "@/lib/auth/cookie-constants";
+} from "@/lib/auth";
 
 // Re-export for backward compatibility
-export { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+export { VISITOR_COOKIE_NAME } from "@/lib/auth";
 
 /**
  * Get visitor ID from NextRequest (App Router API routes)

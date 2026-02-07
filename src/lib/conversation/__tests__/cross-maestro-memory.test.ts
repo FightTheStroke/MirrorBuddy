@@ -46,7 +46,7 @@ vi.mock("@/data/maestri", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { tierService } from "@/lib/tier/tier-service";
+import { tierService } from "@/lib/tier/server";
 import { getTierMemoryLimits } from "../tier-memory-config";
 import { getMaestroById } from "@/data/maestri";
 

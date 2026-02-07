@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Trash2, Lock, Unlock, X, RefreshCw, Loader2 } from "lucide-react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { BulkTierChangeModal } from "@/components/admin/bulk-tier-change-modal";
 
 interface Tier {

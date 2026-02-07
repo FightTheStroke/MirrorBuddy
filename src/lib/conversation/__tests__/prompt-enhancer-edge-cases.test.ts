@@ -15,9 +15,15 @@ import type { TierMemoryLimits } from "../tier-memory-config";
 import type { CrossMaestroLearning } from "../cross-maestro-memory";
 
 // Mock safety guardrails
-vi.mock("@/lib/safety/safety-prompts", () => ({
-  injectSafetyGuardrails: vi.fn((prompt, _options) => `[SAFE] ${prompt}`),
-}));
+vi.mock("@/lib/safety", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/safety")>();
+  return {
+    ...actual,
+    injectSafetyGuardrails: vi.fn(
+      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
+    ),
+  };
+});
 
 describe("Prompt Enhancer Edge Cases", () => {
   const basePrompt = "Base prompt";

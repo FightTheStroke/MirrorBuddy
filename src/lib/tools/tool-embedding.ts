@@ -5,8 +5,8 @@
 
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
-import { isEmbeddingConfigured } from "@/lib/rag/embedding-service";
-import { generatePrivacyAwareEmbedding } from "@/lib/rag/privacy-aware-embedding";
+import { isEmbeddingConfigured } from "@/lib/rag";
+import { generatePrivacyAwareEmbedding } from "@/lib/rag/server";
 
 /**
  * Generate embedding for a material asynchronously

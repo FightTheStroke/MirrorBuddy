@@ -9,16 +9,17 @@ A `detect-changes` job runs first using
 [dorny/paths-filter](https://github.com/dorny/paths-filter) to classify
 the changed files into areas:
 
-| Area     | Paths                                                                          |
-| -------- | ------------------------------------------------------------------------------ |
-| `src`    | `src/**`, `public/**`                                                          |
-| `ui`     | `src/app/**`, `src/components/**`, `src/styles/**`, `public/**`, `messages/**` |
-| `mobile` | `ios/**`, `android/**`, `capacitor.config.ts`, `src/lib/native/**`             |
-| `prisma` | `prisma/**`                                                                    |
-| `i18n`   | `messages/**`, `src/i18n/**`, `src/lib/i18n/**`                                |
-| `safety` | `src/lib/safety/**`, `src/lib/ai/**`, `src/lib/privacy/**`                     |
-| `config` | `package.json`, `tsconfig*`, `eslint.config.mjs`, `.github/**`, etc.           |
-| `docs`   | `docs/**`, `*.md`                                                              |
+| Area     | Paths                                                                                        |
+| -------- | -------------------------------------------------------------------------------------------- |
+| `src`    | `src/**`, `public/**`                                                                        |
+| `ui`     | `src/app/**`, `src/components/**`, `src/styles/**`, `public/**`, `messages/**`               |
+| `mobile` | `ios/**`, `android/**`, `capacitor.config.ts`, `src/lib/native/**`                           |
+| `prisma` | `prisma/**`                                                                                  |
+| `i18n`   | `messages/**`, `src/i18n/**`, `src/lib/i18n/**`                                              |
+| `safety` | `src/lib/safety/**`, `src/lib/ai/**`, `src/lib/privacy/**`, `src/lib/compliance/**`          |
+| `e2e`    | `e2e/**`, `playwright.config*.ts`                                                            |
+| `config` | `package.json`, `tsconfig*`, `eslint.config.mjs`, `eslint-local-rules/**`, `.github/**` etc. |
+| `docs`   | `docs/**`, `*.md`                                                                            |
 
 ## What Always Runs on PR (Blocking)
 
@@ -96,8 +97,8 @@ Locally, simulate with:
 ## Module Boundaries (ESLint)
 
 Protected domain modules enforce barrel-export-only imports via the
-`enforce-module-boundaries` ESLint rule. Cross-module deep imports are warnings
-(will be escalated to errors after fixing existing violations).
+`enforce-module-boundaries` ESLint rule. Cross-module deep imports are **errors**
+(escalated from warnings in Plan 136). **Current baseline: 0 violations.**
 
 Protected modules: `safety`, `privacy`, `ai`, `education`, `rag`,
 `accessibility`, `tier`, `auth`, `security`, `compliance`.
@@ -108,12 +109,50 @@ Example:
 // OK - barrel import
 import { detectJailbreak } from "@/lib/safety";
 
-// WARNING - deep import from outside the module
+// ERROR - deep import from outside the module
 import { patterns } from "@/lib/safety/jailbreak-detector/patterns";
 ```
 
 Intra-module deep imports are allowed (code within `src/lib/safety/` can
 import its own internals freely).
+
+### Dependency Direction Rule
+
+The `enforce-dependency-direction` rule enforces architectural layer boundaries
+to prevent circular dependencies and maintain clean architecture:
+
+**Direction between protected modules in `src/lib/`:**
+
+The rule enforces dependency direction **within** `src/lib/` protected modules only.
+It does NOT enforce boundaries between `src/lib/`, `src/app/`, and `src/components/`
+(those are consumers and can freely import from `src/lib/`).
+
+**Module tiers:**
+
+- **CORE** (safety, security, privacy): Cannot import from FEATURE or CROSS modules
+- **FEATURE** (ai, education, rag): May import from CORE only
+- **CROSS** (auth, tier, accessibility, compliance): May import from CORE and FEATURE
+- **Auth exception**: Any module may import from auth (universal dependency)
+
+```typescript
+// ❌ BLOCKED - FEATURE importing from CROSS
+// src/lib/ai/summarize.ts
+import { tierService } from "@/lib/tier/server"; // ERROR (ai is FEATURE, tier is CROSS)
+
+// ✅ ALLOWED - CROSS importing from CORE
+// src/lib/compliance/coppa-service.ts
+import { filterInput } from "@/lib/safety"; // OK (compliance is CROSS, safety is CORE)
+
+// ✅ ALLOWED - Any module importing from auth
+// src/lib/ai/providers.ts
+import { validateAuth } from "@/lib/auth/server"; // OK (auth is universal)
+```
+
+**Current status:** `warn` level (with `--max-warnings 0` in CI, effectively blocking).
+Will escalate to `error` when all violations are resolved.
+
+**Exception:** Test files (`*.test.ts`, `*.test.tsx`, `__tests__/`) are exempt
+from both rules.
 
 ## Local Testing
 

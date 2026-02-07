@@ -8,7 +8,7 @@ import { Loader2, RefreshCw, UserPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { ExportDropdown } from "@/components/admin/export-dropdown";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import {
   InvitesTable,
   type InviteRequest,

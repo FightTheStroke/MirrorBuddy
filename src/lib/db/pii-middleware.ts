@@ -9,11 +9,11 @@
  * @module db/pii-middleware
  */
 
-import { encryptPII, decryptPII, hashPII } from "@/lib/security/pii-encryption";
+import { encryptPII, decryptPII, hashPII } from "@/lib/security";
 import {
   logDecryptAccess,
   logBulkDecryptAccess,
-} from "@/lib/security/decrypt-audit";
+} from "@/lib/security";
 import { Prisma } from "@prisma/client";
 
 /**

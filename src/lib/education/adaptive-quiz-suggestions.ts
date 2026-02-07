@@ -5,13 +5,10 @@
  * Plan 9 - Wave 4 [F-18, F-19]
  */
 
-import { logger } from '@/lib/logger';
-import { hybridSearch } from '@/lib/rag';
-import type { Subject } from '@/types';
-import {
-  REVIEW_THRESHOLD,
-  type QuizAnalysis,
-} from './adaptive-quiz-analysis';
+import { logger } from "@/lib/logger";
+import { hybridSearch } from "@/lib/rag/server";
+import type { Subject } from "@/types";
+import { REVIEW_THRESHOLD, type QuizAnalysis } from "./adaptive-quiz-analysis";
 
 /**
  * Review suggestion for low-performing topics
@@ -25,7 +22,7 @@ export interface ReviewSuggestion {
   materials: Array<{
     id: string;
     title: string;
-    type: 'material' | 'flashcard' | 'studykit';
+    type: "material" | "flashcard" | "studykit";
     relevance: number;
   }>;
   /** Priority (1 = highest) */
@@ -51,7 +48,7 @@ export interface SeenConcept {
 export async function generateReviewSuggestions(
   userId: string,
   analysis: QuizAnalysis,
-  subject: Subject
+  subject: Subject,
 ): Promise<ReviewSuggestion[]> {
   if (!analysis.needsReview || analysis.weakTopics.length === 0) {
     return [];
@@ -66,15 +63,16 @@ export async function generateReviewSuggestions(
         userId,
         query: topic,
         limit: 5,
-        sourceType: 'material',
+        sourceType: "material",
         subject: subject.toLowerCase(),
         minScore: 0.4,
       });
 
       const materials = searchResults.map((r) => ({
         id: r.sourceId,
-        title: r.content.substring(0, 50) + (r.content.length > 50 ? '...' : ''),
-        type: r.sourceType as 'material' | 'flashcard' | 'studykit',
+        title:
+          r.content.substring(0, 50) + (r.content.length > 50 ? "..." : ""),
+        type: r.sourceType as "material" | "flashcard" | "studykit",
         relevance: r.combinedScore,
       }));
 
@@ -86,7 +84,7 @@ export async function generateReviewSuggestions(
         priority: materials.length > 0 ? 1 : 2,
       });
     } catch (error) {
-      logger.error('[AdaptiveQuiz] Error generating review suggestion', {
+      logger.error("[AdaptiveQuiz] Error generating review suggestion", {
         topic,
         error: String(error),
       });
@@ -105,7 +103,7 @@ export async function generateReviewSuggestions(
   // Sort by priority
   suggestions.sort((a, b) => a.priority - b.priority);
 
-  logger.info('[AdaptiveQuiz] Generated review suggestions', {
+  logger.info("[AdaptiveQuiz] Generated review suggestions", {
     userId,
     count: suggestions.length,
     topics: suggestions.map((s) => s.topic),
@@ -121,7 +119,7 @@ export async function generateReviewSuggestions(
 export async function checkSeenConcepts(
   userId: string,
   concepts: string[],
-  subject: Subject
+  subject: Subject,
 ): Promise<Map<string, SeenConcept | null>> {
   const results = new Map<string, SeenConcept | null>();
 
@@ -150,7 +148,7 @@ export async function checkSeenConcepts(
         results.set(concept, null);
       }
     } catch (error) {
-      logger.error('[AdaptiveQuiz] Error checking seen concept', {
+      logger.error("[AdaptiveQuiz] Error checking seen concept", {
         concept,
         error: String(error),
       });
@@ -158,7 +156,7 @@ export async function checkSeenConcepts(
     }
   }
 
-  logger.debug('[AdaptiveQuiz] Checked seen concepts', {
+  logger.debug("[AdaptiveQuiz] Checked seen concepts", {
     total: concepts.length,
     seen: [...results.values()].filter((v) => v !== null).length,
   });

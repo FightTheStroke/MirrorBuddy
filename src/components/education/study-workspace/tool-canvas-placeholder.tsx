@@ -1,13 +1,13 @@
-'use client';
+"use client";
 /**
  * Tool Canvas Placeholder
  * Placeholder component for the ToolCanvas until RT-03 is integrated
  */
 
-import { motion } from 'framer-motion';
-import { cn } from '@/lib/utils';
-import { useAccessibilityStore } from '@/lib/accessibility/accessibility-store';
-import type { ToolCanvasPlaceholderProps } from './types';
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useAccessibilityStore } from "@/lib/accessibility";
+import type { ToolCanvasPlaceholderProps } from "./types";
 
 export function ToolCanvasPlaceholder({
   sessionId: _sessionId,
@@ -22,15 +22,15 @@ export function ToolCanvasPlaceholder({
   return (
     <div
       className={cn(
-        'h-full flex items-center justify-center',
-        settings.highContrast ? 'bg-black' : 'bg-slate-900'
+        "h-full flex items-center justify-center",
+        settings.highContrast ? "bg-black" : "bg-slate-900",
       )}
     >
       <div className="text-center space-y-4 p-8">
         <div
           className={cn(
-            'w-16 h-16 rounded-2xl flex items-center justify-center mx-auto',
-            settings.highContrast ? 'bg-yellow-400/20' : 'bg-slate-800'
+            "w-16 h-16 rounded-2xl flex items-center justify-center mx-auto",
+            settings.highContrast ? "bg-yellow-400/20" : "bg-slate-800",
           )}
         >
           {isActive ? (
@@ -42,38 +42,39 @@ export function ToolCanvasPlaceholder({
               transition={{
                 duration: 2,
                 repeat: Infinity,
-                ease: 'easeInOut',
+                ease: "easeInOut",
               }}
               className={cn(
-                'w-8 h-8 rounded-lg',
-                settings.highContrast ? 'bg-yellow-400' : 'bg-accent-themed'
+                "w-8 h-8 rounded-lg",
+                settings.highContrast ? "bg-yellow-400" : "bg-accent-themed",
               )}
             />
           ) : (
             <div
               className={cn(
-                'w-8 h-8 rounded-lg',
-                settings.highContrast ? 'bg-gray-600' : 'bg-slate-700'
+                "w-8 h-8 rounded-lg",
+                settings.highContrast ? "bg-gray-600" : "bg-slate-700",
               )}
             />
           )}
         </div>
         <p
           className={cn(
-            settings.highContrast ? 'text-gray-400' : 'text-slate-400'
+            settings.highContrast ? "text-gray-400" : "text-slate-400",
           )}
         >
           {isActive
             ? `${maestroName} sta costruendo uno strumento...`
-            : 'In attesa che venga creato uno strumento'}
+            : "In attesa che venga creato uno strumento"}
         </p>
         <p
           className={cn(
-            'text-xs',
-            settings.highContrast ? 'text-gray-600' : 'text-slate-600'
+            "text-xs",
+            settings.highContrast ? "text-gray-600" : "text-slate-600",
           )}
         >
-          Il canvas mostra mappe mentali, quiz, flashcard e altri strumenti in tempo reale
+          Il canvas mostra mappe mentali, quiz, flashcard e altri strumenti in
+          tempo reale
         </p>
       </div>
     </div>

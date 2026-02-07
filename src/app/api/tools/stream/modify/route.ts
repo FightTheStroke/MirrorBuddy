@@ -16,17 +16,14 @@ import {
 } from "@/lib/realtime/tool-events";
 import { nanoid } from "nanoid";
 import { prisma } from "@/lib/db";
-import {
-  validateAuth,
-  validateSessionOwnership,
-} from "@/lib/auth/session-auth";
+import { validateAuth, validateSessionOwnership } from "@/lib/auth/server";
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,
   rateLimitResponse,
   RATE_LIMITS,
 } from "@/lib/rate-limit";
-import { VISITOR_COOKIE_NAME } from "@/lib/auth/cookie-constants";
+import { VISITOR_COOKIE_NAME } from "@/lib/auth/server";
 
 interface ModifyRequest {
   sessionId: string;

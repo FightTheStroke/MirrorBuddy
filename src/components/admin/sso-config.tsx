@@ -7,7 +7,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { csrfFetch } from "@/lib/auth";
 import { logger } from "@/lib/logger";
 
 interface SSOProviderConfig {

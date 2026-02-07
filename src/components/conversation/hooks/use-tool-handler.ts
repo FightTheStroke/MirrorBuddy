@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { logger } from '@/lib/logger';
-import { csrfFetch } from '@/lib/auth/csrf-client';
+import { csrfFetch } from '@/lib/auth';
 import { getMaestroById } from '@/data/maestri';
 import type { MaestroFull } from '@/data/maestri';
 import type { ToolType, ToolState } from '@/types/tools';

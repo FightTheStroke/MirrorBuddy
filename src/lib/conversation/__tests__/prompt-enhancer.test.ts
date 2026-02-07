@@ -14,9 +14,15 @@ import type { TierMemoryLimits } from "../tier-memory-config";
 // CrossMaestroLearning type used internally by promptCrossMaestroSection
 
 // Mock the safety guardrails
-vi.mock("@/lib/safety/safety-prompts", () => ({
-  injectSafetyGuardrails: vi.fn((prompt, _options) => `[SAFE] ${prompt}`),
-}));
+vi.mock("@/lib/safety", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/safety")>();
+  return {
+    ...actual,
+    injectSafetyGuardrails: vi.fn(
+      (prompt: string, _options: unknown) => `[SAFE] ${prompt}`,
+    ),
+  };
+});
 
 describe("prompt-enhancer", () => {
   const basePrompt = "Sei Melissa, una professoressa di matematica.";

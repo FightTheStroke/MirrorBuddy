@@ -12,7 +12,7 @@ import {
   extractBasePrompt,
 } from "../prompt-enhancer";
 import { formatRelativeDate, type ConversationMemory } from "../memory-loader";
-import { hasSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { hasSafetyGuardrails } from "@/lib/safety";
 
 describe("Memory Integration Flow", () => {
   describe("Full Memory Pipeline", () => {

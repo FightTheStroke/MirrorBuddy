@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import type { ToolCall, ToolCallRef } from "@/types/tools";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
-import { anonymizeConversationMessage } from "@/lib/privacy/anonymization-service";
+import { anonymizeConversationMessage } from "@/lib/privacy";
 
 /**
  * Convert full ToolCall to lightweight ToolCallRef for DB storage.

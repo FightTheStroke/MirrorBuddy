@@ -5,9 +5,9 @@
 // ============================================================================
 
 import { NextResponse } from "next/server";
-import { GoogleWorkspaceProvider } from "@/lib/auth/sso/google-workspace";
-import { consumeSSOSession } from "@/lib/auth/sso/sso-session";
-import { handleSSOCallback } from "@/lib/auth/sso/sso-callback-handler";
+import { GoogleWorkspaceProvider } from "@/lib/auth/server";
+import { consumeSSOSession } from "@/lib/auth/server";
+import { handleSSOCallback } from "@/lib/auth/server";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 

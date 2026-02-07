@@ -1,7 +1,7 @@
 // Mark as dynamic to avoid static generation issues with admin auth
 export const dynamic = "force-dynamic";
 
-import { validateAdminAuth } from "@/lib/auth/session-auth";
+import { validateAdminAuth } from "@/lib/auth/server";
 import { redirect } from "next/navigation";
 import { EmailTemplateEditor } from "@/components/admin/email-template-editor";
 

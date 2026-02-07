@@ -14,7 +14,7 @@ import { useTranslations } from "next-intl";
 import { motion } from "framer-motion";
 import type { Markmap } from "markmap-view";
 import { cn } from "@/lib/utils";
-import { useAccessibilityStore } from "@/lib/accessibility/accessibility-store";
+import { useAccessibilityStore } from "@/lib/accessibility";
 import type {
   InteractiveMarkMapRendererProps,
   InteractiveMarkMapHandle,

@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import type { A11yProfileId } from "@/lib/accessibility/accessibility-store";
+import type { A11yProfileId } from "@/lib/accessibility";
 
 export interface ProfileConfig {
   id: Exclude<A11yProfileId, null>;

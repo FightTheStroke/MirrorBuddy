@@ -4,8 +4,8 @@
  */
 
 import { logger } from "@/lib/logger";
-import { getUserIdFromCookie } from "@/lib/auth/client-auth";
-import { csrfFetch } from "@/lib/auth/csrf-client";
+import { getUserIdFromCookie } from "@/lib/auth";
+import { csrfFetch } from "@/lib/auth";
 
 /**
  * Get userId from cookie (client-side)

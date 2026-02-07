@@ -6,9 +6,11 @@
 // ============================================================================
 
 import { logger } from "@/lib/logger";
-import { isEmbeddingConfigured } from "@/lib/rag/embedding-service";
-import { generatePrivacyAwareEmbedding } from "@/lib/rag/privacy-aware-embedding";
-import { storeEmbedding } from "@/lib/rag/vector-store";
+import { isEmbeddingConfigured } from "@/lib/rag";
+import {
+  generatePrivacyAwareEmbedding,
+  storeEmbedding,
+} from "@/lib/rag/server";
 import type { StoredToolOutput } from "./tool-output-types";
 import type { ToolType } from "@/types/tools/tool-types";
 
