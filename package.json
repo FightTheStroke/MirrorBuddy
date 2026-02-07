@@ -37,6 +37,7 @@
     "cap:copy": "npx cap copy",
     "open:ios": "npx cap open ios",
     "open:android": "npx cap open android",
+    "ios:check": "./scripts/ios-release-check.sh",
     "lint": "tsx scripts/lint-redirect-metadata.tsx && eslint --max-warnings 0",
     "typecheck": "tsc --noEmit",
     "typecheck:scripts": "tsc --noEmit --project tsconfig.scripts.json",

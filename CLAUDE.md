@@ -16,6 +16,7 @@ npm run test             # Playwright E2E
 npm run test:unit        # Vitest unit tests
 npm run release:fast     # Fast gate: lint+typecheck+unit+smoke(+build)
 npm run release:gate     # Full 10/10 release gate
+npm run ios:check        # iOS release readiness verification
 npx prisma generate      # After schema changes
 npx prisma migrate dev --name xyz  # Create migration (local only)
 ./scripts/sync-databases.sh  # Sync prod + test DBs after migrations
@@ -42,7 +43,7 @@ npx prisma migrate dev --name xyz  # Create migration (local only)
 **Characters**: coaches | buddies | adding-maestri | safety
 **Features**: voice-api | ambient-audio | onboarding | pomodoro | notifications | parent-dashboard | session-summaries | summary-tool | pdf-generator | gamification | validation
 **Compliance**: accessibility
-**Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations | staging
+**Infra**: tier | mobile-readiness | vercel-deployment | cookies | operations | staging | ios-release
 **Beta**: trial-mode | google-drive
 **Setup**: `docs/setup/` — database.md | docker.md
 

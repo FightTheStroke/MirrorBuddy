@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **iOS Release Pipeline**: Complete infrastructure for iOS app releases via TestFlight and App Store Connect
+  - Documentation: `docs/claude/ios-release.md` guide covering prerequisites, Fastlane Match setup, build pipeline, TestFlight upload, troubleshooting, and CI integration
+  - Configuration: Matchfile for certificate management (readonly mode for CI safety), Fastfile match integration (`sync_code_signing` before builds, `match_nuke` for certificate reset), environment variables (APPLE_ID, TEAM_ID, ITC_TEAM_ID, FASTLANE_USER, MATCH_GIT_URL, MATCH_PASSWORD)
+  - Automation: `scripts/ios-release-check.sh` with 8 automated checks (build, sync, match, version, provisioning, Xcode, CocoaPods, compile), JSON output, Linux-safe skip for macOS-only checks, `npm run ios:check` script
+  - Agent Integration: `ios-release-checks.md` module for app-release-manager v4.0.0 with iOS detection in Phase 0, Task O for release validation, execution module with iOS report template
+
 ## [0.14.0] - 2026-02-07
 
 ### Added

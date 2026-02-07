@@ -17,6 +17,9 @@ platform :ios do
       xcodeproj: "App/App.xcodeproj"
     )
 
+    # Sync code signing
+    sync_code_signing(type: "appstore")
+
     # Build the app
     build_app(
       workspace: "App/App.xcworkspace",
@@ -73,6 +76,9 @@ platform :ios do
       xcodeproj: "App/App.xcodeproj"
     )
 
+    # Sync code signing
+    sync_code_signing(type: "appstore")
+
     # Build the app
     build_app(
       workspace: "App/App.xcworkspace",
@@ -128,6 +134,12 @@ platform :ios do
       workspace: "App/App.xcworkspace",
       scheme: "App"
     )
+  end
+
+  desc "Nuke and regenerate certificates (use with caution)"
+  lane :match_nuke do
+    match_nuke(type: "appstore")
+    match(type: "appstore", force: true)
   end
 
   # Error handling
