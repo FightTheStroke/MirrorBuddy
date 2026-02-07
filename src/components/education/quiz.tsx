@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useState, useCallback, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, XCircle, Lightbulb, ArrowRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { cn } from '@/lib/utils';
-import type { Quiz as QuizType, QuizResult } from '@/types';
-import { QuizHeader } from './quiz/quiz-header';
-import { QuizCompletion } from './quiz/quiz-completion';
+import { useState, useCallback, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { CheckCircle, XCircle, Lightbulb, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
+import type { Quiz as QuizType, QuizResult } from "@/types";
+import { QuizHeader } from "./quiz/quiz-header";
+import { QuizCompletion } from "./quiz/quiz-completion";
 
 interface QuizProps {
   quiz: QuizType;
@@ -30,32 +30,52 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
     startTimeRef.current = Date.now();
   }, []);
 
-  const currentQuestion = quiz.questions[currentIndex];
-  const progress = ((currentIndex + (showResult ? 1 : 0)) / quiz.questions.length) * 100;
+  // Guard: empty questions array (corrupted/incomplete quiz data)
+  if (quiz.questions.length === 0) {
+    return (
+      <QuizCompletion
+        score={0}
+        correctCount={0}
+        totalQuestions={0}
+        masteryThreshold={quiz.masteryThreshold}
+        onRetry={onClose}
+        onClose={onClose}
+      />
+    );
+  }
 
-  const handleSelectAnswer = useCallback((index: number) => {
-    if (showResult) return;
-    setSelectedAnswer(index);
-  }, [showResult]);
+  const currentQuestion = quiz.questions[currentIndex];
+  const progress =
+    ((currentIndex + (showResult ? 1 : 0)) / quiz.questions.length) * 100;
+
+  const handleSelectAnswer = useCallback(
+    (index: number) => {
+      if (showResult) return;
+      setSelectedAnswer(index);
+    },
+    [showResult],
+  );
 
   const handleSubmit = useCallback(() => {
     if (selectedAnswer === null) return;
     setShowResult(true);
     if (selectedAnswer === currentQuestion.correctAnswer) {
-      setCorrectCount(prev => prev + 1);
+      setCorrectCount((prev) => prev + 1);
     }
   }, [selectedAnswer, currentQuestion.correctAnswer]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < quiz.questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
+      setCurrentIndex((prev) => prev + 1);
       setSelectedAnswer(null);
       setShowResult(false);
       setShowHint(false);
     } else {
       const timeSpent = Math.round((Date.now() - startTimeRef.current) / 1000);
       const score = Math.round((correctCount / quiz.questions.length) * 100);
-      const xpEarned = Math.round(quiz.xpReward * (score / 100) * (1 - hintsUsed * 0.1));
+      const xpEarned = Math.round(
+        quiz.xpReward * (score / 100) * (1 - hintsUsed * 0.1),
+      );
       const result: QuizResult = {
         quizId: quiz.id,
         score,
@@ -74,7 +94,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   const handleShowHint = useCallback(() => {
     if (!showHint && currentQuestion.hints.length > 0) {
       setShowHint(true);
-      setHintsUsed(prev => prev + 1);
+      setHintsUsed((prev) => prev + 1);
     }
   }, [showHint, currentQuestion.hints.length]);
 
@@ -112,7 +132,9 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.2 }}
           >
-            <h3 className="text-xl font-semibold mb-6">{currentQuestion.text}</h3>
+            <h3 className="text-xl font-semibold mb-6">
+              {currentQuestion.text}
+            </h3>
 
             {/* Answer options */}
             <div className="space-y-3 mb-6">
@@ -122,17 +144,17 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
                   onClick={() => handleSelectAnswer(index)}
                   disabled={showResult}
                   className={cn(
-                    'w-full p-4 text-left rounded-xl border-2 transition-all',
+                    "w-full p-4 text-left rounded-xl border-2 transition-all",
                     selectedAnswer === index
                       ? showResult
                         ? isCorrect
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                          : 'border-red-500 bg-red-50 dark:bg-red-900/20'
-                        : 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                          ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                          : "border-red-500 bg-red-50 dark:bg-red-900/20"
+                        : "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
                       : showResult && index === currentQuestion.correctAnswer
-                        ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600',
-                    showResult && 'cursor-default'
+                        ? "border-green-500 bg-green-50 dark:bg-green-900/20"
+                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
+                    showResult && "cursor-default",
                   )}
                   whileHover={!showResult ? { scale: 1.01 } : {}}
                   whileTap={!showResult ? { scale: 0.99 } : {}}
@@ -156,12 +178,14 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
                 {showHint ? (
                   <motion.div
                     initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
+                    animate={{ opacity: 1, height: "auto" }}
                     className="p-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800"
                   >
                     <div className="flex items-start gap-3">
                       <Lightbulb className="w-5 h-5 text-amber-500 mt-0.5" />
-                      <p className="text-amber-800 dark:text-amber-200">{currentQuestion.hints[0]}</p>
+                      <p className="text-amber-800 dark:text-amber-200">
+                        {currentQuestion.hints[0]}
+                      </p>
                     </div>
                   </motion.div>
                 ) : (
@@ -203,7 +227,7 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
                       <ArrowRight className="w-4 h-4 ml-2" />
                     </>
                   ) : (
-                    'Vedi risultati'
+                    "Vedi risultati"
                   )}
                 </Button>
               )}

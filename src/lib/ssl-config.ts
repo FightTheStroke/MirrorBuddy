@@ -101,11 +101,10 @@ export function buildSSLConfig(): SSLConfig | undefined {
     const certCount = (cert.match(/BEGIN CERTIFICATE/g) || []).length;
     if (certCount >= 2) {
       log.info(`Certificate chain valid (${certCount} certs)`);
-      // Note: rejectUnauthorized: false because Supabase uses their own CA
-      // which is not in system trust store. Traffic is still TLS encrypted.
-      // The ca option is provided for reference but pg driver may not use it
-      // correctly with sslmode in connection string.
-      return { rejectUnauthorized: false, ca: cert };
+      // With the full CA chain provided via `ca`, Node.js validates against it
+      // even though Supabase's CA is not in the system trust store.
+      // Matches runtime behavior in src/lib/db/ssl-config.ts.
+      return { rejectUnauthorized: true, ca: cert };
     }
     log.warn(`Incomplete chain (${certCount} certs), expected >=2`);
   }

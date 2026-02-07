@@ -181,12 +181,15 @@ MIIDdzCCAl+gAwIBAgIEAgAAuTANBgkqhkiG9w0BAQUFADBaMQswCQYDVQQGEwJJ
     it("should remove sslmode parameter in the middle", () => {
       const input =
         "postgresql://user:pass@host:5432/db?key1=value1&sslmode=require&key2=value2";
-      // The regex replaces &sslmode=require with &, leaving & delimiter
-      // This is acceptable as connection strings tolerate this format
       const result = cleanConnectionString(input);
       expect(result).not.toContain("sslmode");
       expect(result).toContain("key1=value1");
       expect(result).toContain("key2=value2");
+      // Verify the URL is well-formed (no double ? or missing &)
+      const queryPart = result.split("?")[1];
+      expect(queryPart).toBeDefined();
+      expect(queryPart).not.toContain("?");
+      expect(queryPart).not.toContain("&&");
     });
 
     it("should handle URL without sslmode", () => {
