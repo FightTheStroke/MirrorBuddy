@@ -13,7 +13,7 @@ import {
   COPPA_AGE_THRESHOLD,
   requestParentalConsent,
   checkCoppaStatus,
-} from "@/lib/compliance/coppa-service";
+} from "@/lib/compliance";
 import { assignBaseTierToNewUser } from "@/lib/tier";
 
 import { PostBodySchema, emptyResponse } from "./types";

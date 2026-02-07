@@ -4,10 +4,9 @@
 // F-02: All tools available during conversations
 // ============================================================================
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import { logger } from "@/lib/logger";
 import { tierService } from "@/lib/tier";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 
 /**
  * Technical agent that generates SPECTACULAR HTML/CSS/JS from description

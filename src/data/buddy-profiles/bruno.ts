@@ -5,7 +5,7 @@
 
 import type { BuddyProfile, ExtendedStudentProfile } from "@/types";
 import type { GreetingContext } from "@/types/greeting";
-import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
+import { injectSafetyGuardrails } from "@/lib/safety";
 import { generateGreeting } from "@/lib/greeting";
 import { describeLearningDifferences, generatePersonalTips } from "./shared";
 

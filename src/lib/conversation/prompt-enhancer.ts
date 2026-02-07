@@ -10,8 +10,8 @@
 
 import type { ConversationMemory } from "./memory-loader";
 import { formatRelativeDate } from "./memory-loader";
-import { injectSafetyGuardrails } from "@/lib/safety/safety-prompts";
-import type { SafetyInjectionOptions } from "@/lib/safety/safety-prompts";
+import { injectSafetyGuardrails } from "@/lib/safety";
+import type { SafetyInjectionOptions } from "@/lib/safety";
 import type { TierMemoryLimits } from "./tier-memory-config";
 import type { CrossMaestroLearning } from "./cross-maestro-memory";
 

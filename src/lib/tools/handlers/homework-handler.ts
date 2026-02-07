@@ -6,10 +6,9 @@
 
 import { registerToolHandler } from "../tool-executor";
 import { nanoid } from "nanoid";
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import { logger } from "@/lib/logger";
 import { tierService } from "@/lib/tier";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import type { ToolExecutionResult, ToolContext } from "@/types/tools";
 import { extractTextFromPDF } from "./study-kit-handler";
 

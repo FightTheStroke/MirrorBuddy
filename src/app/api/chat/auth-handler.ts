@@ -6,7 +6,7 @@
 
 import { logger } from "@/lib/logger";
 import { validateAuth } from "@/lib/auth";
-import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
+import { canAccessFullFeatures } from "@/lib/compliance";
 
 /**
  * Extract userId from validated authentication

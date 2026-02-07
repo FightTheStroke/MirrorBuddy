@@ -4,10 +4,9 @@
 // Plan 8 MVP - Wave 2: Learning Path Generation [F-12]
 // ============================================================================
 
-import { chatCompletion } from "@/lib/ai/providers";
+import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import { logger } from "@/lib/logger";
 import { tierService } from "@/lib/tier";
-import { getDeploymentForModel } from "@/lib/ai/providers/deployment-mapping";
 import type { FlashcardData, QuizData, MindmapData } from "@/types/tools";
 
 /**

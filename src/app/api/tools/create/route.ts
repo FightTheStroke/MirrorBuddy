@@ -15,7 +15,7 @@ import {
 } from "@/lib/realtime/tool-state";
 import { broadcastToolEvent, type ToolType } from "@/lib/realtime/tool-events";
 import { validateSessionOwnership } from "@/lib/auth";
-import { canAccessFullFeatures } from "@/lib/compliance/coppa-service";
+import { canAccessFullFeatures } from "@/lib/compliance";
 import {
   checkRateLimitAsync,
   getRateLimitIdentifier,

@@ -12,7 +12,7 @@ import {
   checkCoppaStatus,
   requestParentalConsent,
   COPPA_AGE_THRESHOLD,
-} from "@/lib/compliance/coppa-service";
+} from "@/lib/compliance";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withAuth, withCSRF } from "@/lib/api/middlewares";
 

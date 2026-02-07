@@ -7,7 +7,7 @@
 import { registerToolHandler } from '../tool-executor';
 import { create, all } from 'mathjs';
 import { nanoid } from 'nanoid';
-import { formatNumberColored } from '@/lib/education/accessibility/dyscalculia';
+import { formatNumberColored } from '@/lib/education';
 import type {
   CalculatorRequest,
   CalculatorData,

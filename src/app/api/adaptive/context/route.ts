@@ -3,7 +3,7 @@ import { AdaptiveContextQuerySchema } from "@/lib/validation/schemas/adaptive";
 import {
   buildAdaptiveInstruction,
   getAdaptiveContextForUser,
-} from "@/lib/education/adaptive-difficulty";
+} from "@/lib/education";
 import { pipe, withSentry, withAuth } from "@/lib/api/middlewares";
 
 export const GET = pipe(
