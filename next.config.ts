@@ -60,6 +60,16 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  // Ensure standalone output includes transitive deps needed at runtime
+  // isomorphic-dompurify -> jsdom -> undici (not auto-traced by Next.js)
+  outputFileTracingIncludes: {
+    "/**": [
+      "./node_modules/undici/**",
+      "./node_modules/jsdom/**",
+      "./node_modules/isomorphic-dompurify/**",
+    ],
+  },
+
   // Image optimization settings
   images: {
     // E2E/test runs must not depend on native image tooling (sharp).

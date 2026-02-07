@@ -11,10 +11,12 @@ import {
 } from "../media-bridge";
 
 // Mock Capacitor
-const mockCapacitor = {
-  getPlatform: vi.fn(),
-  isNativePlatform: vi.fn(),
-};
+const { mockCapacitor } = vi.hoisted(() => ({
+  mockCapacitor: {
+    getPlatform: vi.fn(),
+    isNativePlatform: vi.fn(),
+  },
+}));
 
 vi.mock("@capacitor/core", () => ({
   Capacitor: mockCapacitor,

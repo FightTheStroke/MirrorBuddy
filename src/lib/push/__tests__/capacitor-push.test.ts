@@ -11,23 +11,23 @@ import {
   unregisterFromPush,
 } from "../capacitor-push";
 
-// Mock @capacitor/core
-const mockCapacitor = {
-  isNativePlatform: vi.fn(() => false),
-  getPlatform: vi.fn(() => "web"),
-};
+// Mock @capacitor/core and @capacitor/push-notifications
+const { mockCapacitor, mockPushNotifications } = vi.hoisted(() => ({
+  mockCapacitor: {
+    isNativePlatform: vi.fn(() => false),
+    getPlatform: vi.fn(() => "web"),
+  },
+  mockPushNotifications: {
+    requestPermissions: vi.fn(),
+    register: vi.fn(),
+    addListener: vi.fn(),
+    removeAllListeners: vi.fn(),
+  },
+}));
 
 vi.mock("@capacitor/core", () => ({
   Capacitor: mockCapacitor,
 }));
-
-// Mock @capacitor/push-notifications
-const mockPushNotifications = {
-  requestPermissions: vi.fn(),
-  register: vi.fn(),
-  addListener: vi.fn(),
-  removeAllListeners: vi.fn(),
-};
 
 vi.mock("@capacitor/push-notifications", () => ({
   PushNotifications: mockPushNotifications,
