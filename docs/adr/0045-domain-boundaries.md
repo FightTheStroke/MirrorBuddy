@@ -16,26 +16,79 @@ for MirrorBuddy to support the 7→10 production hardening initiative.
 
 MirrorBuddy is organized into the following domains under `src/lib/`:
 
-| Domain            | Path                     | Responsibility                                      | CODEOWNERS |
-| ----------------- | ------------------------ | --------------------------------------------------- | ---------- |
-| **Safety**        | `src/lib/safety/`        | Content filtering, PII detection, harm prevention   | @roberdan  |
-| **Security**      | `src/lib/security/`      | CSP nonce, authentication, encryption               | @roberdan  |
-| **Privacy**       | `src/lib/privacy/`       | GDPR compliance, data retention, anonymization      | @roberdan  |
-| **AI**            | `src/lib/ai/`            | Character routing, intent detection, summarization  | @roberdan  |
-| **Education**     | `src/lib/education/`     | FSRS, adaptive difficulty, learning algorithms      | @roberdan  |
-| **RAG**           | `src/lib/rag/`           | Embeddings, semantic search, vector store           | @roberdan  |
-| **Accessibility** | `src/lib/accessibility/` | 7 DSA profiles, WCAG compliance                     | @roberdan  |
-| **PDF Generator** | `src/lib/pdf-generator/` | Accessible PDF export, dyslexia-friendly formatting | @roberdan  |
-| **Tools**         | `src/lib/tools/`         | Plugin system, tool registry, orchestration         | @roberdan  |
+| Domain            | Path                     | Responsibility                                     | CODEOWNERS |
+| ----------------- | ------------------------ | -------------------------------------------------- | ---------- |
+| **Safety**        | `src/lib/safety/`        | Content filtering, PII detection, harm prevention  | @roberdan  |
+| **Security**      | `src/lib/security/`      | CSP nonce, authentication, encryption              | @roberdan  |
+| **Privacy**       | `src/lib/privacy/`       | GDPR compliance, data retention, anonymization     | @roberdan  |
+| **AI**            | `src/lib/ai/`            | Character routing, intent detection, summarization | @roberdan  |
+| **Education**     | `src/lib/education/`     | FSRS, adaptive difficulty, learning algorithms     | @roberdan  |
+| **RAG**           | `src/lib/rag/`           | Embeddings, semantic search, vector store          | @roberdan  |
+| **Auth**          | `src/lib/auth/`          | Session validation, admin checks, CSRF protection  | @roberdan  |
+| **Tier**          | `src/lib/tier/`          | Trial/Base/Pro feature gating, quota enforcement   | @roberdan  |
+| **Accessibility** | `src/lib/accessibility/` | 7 DSA profiles, WCAG compliance                    | @roberdan  |
+| **Compliance**    | `src/lib/compliance/`    | Audit logging, policy enforcement, risk management | @roberdan  |
+
+### Protected Modules (10 total)
+
+The following modules are protected by ESLint rules enforcing module boundaries and dependency direction:
+
+**CORE Layer** (no dependencies on other lib modules):
+
+- `safety` — Content filtering, PII detection, harm prevention
+- `security` — CSP nonce, authentication primitives, encryption
+- `privacy` — GDPR compliance, data retention, anonymization
+
+**FEATURE Layer** (may depend on CORE + FEATURE):
+
+- `ai` — Character routing, intent detection, summarization
+- `education` — FSRS, adaptive difficulty, learning algorithms
+- `rag` — Embeddings, semantic search, vector store
+
+**CROSS-CUTTING Layer** (may depend on CORE + FEATURE + CROSS):
+
+- `auth` — Session validation, admin checks, CSRF (universal access, no restrictions)
+- `tier` — Trial/Base/Pro feature gating, quota enforcement
+- `accessibility` — 7 DSA profiles, WCAG compliance
+- `compliance` — Audit logging, policy enforcement, risk management
+
+### Dependency Matrix
+
+| From ↓ / To →     | safety | security | privacy | ai  | education | rag | auth | tier | a11y | compliance |
+| ----------------- | ------ | -------- | ------- | --- | --------- | --- | ---- | ---- | ---- | ---------- |
+| **safety**        | —      | ✗        | ✗       | ✗   | ✗         | ✗   | ✗    | ✗    | ✗    | ✗          |
+| **security**      | ✗      | —        | ✗       | ✗   | ✗         | ✗   | ✗    | ✗    | ✗    | ✗          |
+| **privacy**       | ✗      | ✗        | —       | ✗   | ✗         | ✗   | ✗    | ✗    | ✗    | ✗          |
+| **ai**            | ✓      | ✓        | ✓       | —   | ✗         | ✓   | ✓    | ✓\*  | ✗    | ✗          |
+| **education**     | ✓      | ✓        | ✓       | ✗   | —         | ✗   | ✓    | ✓\*  | ✗    | ✗          |
+| **rag**           | ✓      | ✓        | ✓       | ✗   | ✗         | —   | ✓    | ✗    | ✗    | ✗          |
+| **auth**          | ✓      | ✓        | ✓       | ✓   | ✓         | ✓   | —    | ✓    | ✓    | ✓          |
+| **tier**          | ✓      | ✓        | ✓       | ✗   | ✗         | ✗   | ✓    | —    | ✗    | ✗          |
+| **accessibility** | ✓      | ✓        | ✓       | ✓   | ✓         | ✓   | ✓    | ✓    | —    | ✓          |
+| **compliance**    | ✓      | ✓        | ✓       | ✓   | ✓         | ✓   | ✓    | ✓    | ✓    | —          |
+
+✓ = Allowed | ✗ = Blocked | \* = Accepted exception (documented with eslint-disable)
+
+**Accepted Exceptions** (3 total):
+
+1. `ai → tier` — Character availability gating (src/lib/ai/maestri-registry.ts)
+2. `education → tier` — FSRS quota enforcement (src/lib/education/fsrs.ts)
+3. `education → tier` — Pomodoro tracking limits (src/lib/education/pomodoro-service.ts)
+
+All exceptions are documented with `// eslint-disable-next-line @typescript-eslint/no-restricted-imports` and rationale comments.
 
 ### Boundary Rules
 
-1. **Barrel Exports**: Each domain MUST have an `index.ts` that exports only public API
-2. **No Circular Imports**: Cross-domain imports must be one-directional
+1. **Barrel Exports**: Each protected module MUST have an `index.ts` with JSDoc describing public API
+2. **No Circular Imports**: Cross-domain imports must be one-directional (enforced by madge)
 3. **Dependency Direction**:
-   - Core domains (safety, security, privacy) → No external lib dependencies
-   - Feature domains (ai, education, rag) → May depend on core domains
-   - UI domains (tools, pdf-generator) → May depend on feature domains
+   - CORE (safety, security, privacy) → No dependencies on other lib modules
+   - FEATURE (ai, education, rag) → May depend on CORE + FEATURE modules
+   - CROSS (auth, tier, accessibility, compliance) → May depend on CORE + FEATURE + CROSS modules
+   - `auth` is universal: all modules may import from auth without restriction
+4. **ESLint Enforcement**:
+   - `enforce-module-boundaries` (error level) — Blocks imports from protected modules without barrel export
+   - `enforce-dependency-direction` (warn level) — Validates layer-based dependency flow per matrix above
 
 ### Import Rules
 
@@ -49,7 +102,15 @@ import { detectHarm } from "@/lib/safety/harm-detection";
 
 ### CI Enforcement
 
-Circular imports are detected in CI via `madge` (see `.github/workflows/ci.yml`).
+Module boundaries are enforced through multiple mechanisms:
+
+1. **ESLint Rules** (configured in `eslint.config.mjs`):
+   - `enforce-module-boundaries` (error level) — Prevents direct imports from protected module internals. All 465 original violations were fixed in Plan 136.
+   - `enforce-dependency-direction` (warn level) — Validates layer-based dependency flow per the matrix above.
+
+2. **Circular Import Detection**: Madge scans for circular dependencies in CI (see `.github/workflows/ci.yml`).
+
+3. **Pre-commit Hooks**: ESLint runs on staged files, blocking commits with boundary violations.
 
 ## Consequences
 
@@ -71,4 +132,6 @@ Circular imports are detected in CI via `madge` (see `.github/workflows/ci.yml`)
 - F-08: Feature modules con boundaries chiari
 - F-09: CODEOWNERS per ownership chiara
 - F-11: Domain boundaries, no circular imports
+- Plan 136: Module Boundaries Enforcement (465→0 violations)
+- ESLint Rules: `enforce-module-boundaries` (error), `enforce-dependency-direction` (warn)
 - Microsoft ISE Engineering Fundamentals: https://microsoft.github.io/code-with-engineering-playbook/

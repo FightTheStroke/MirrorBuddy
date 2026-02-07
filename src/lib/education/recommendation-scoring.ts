@@ -7,6 +7,7 @@
  * Plan 104 - Wave 4: Pro Features [T4-05]
  */
 
+// eslint-disable-next-line local-rules/enforce-dependency-direction -- Pro tier gating (ADR 0065)
 import { tierService } from "@/lib/tier";
 import { chatCompletion, getDeploymentForModel } from "@/lib/ai";
 import type { StudentInsights } from "./recommendation-insights";

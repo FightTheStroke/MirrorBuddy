@@ -41,6 +41,7 @@ jobs:
       safety: ${{ steps.filter.outputs.safety }}
       config: ${{ steps.filter.outputs.config }}
       docs: ${{ steps.filter.outputs.docs }}
+      e2e: ${{ steps.filter.outputs.e2e }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -72,7 +73,11 @@ jobs:
               - 'src/lib/safety/**'
               - 'src/lib/ai/**'
               - 'src/lib/privacy/**'
+              - 'src/lib/compliance/**'
               - 'src/data/maestri/**'
+            e2e:
+              - 'e2e/**'
+              - 'playwright.config*.ts'
             config:
               - 'package.json'
               - 'package-lock.json'
@@ -95,6 +100,7 @@ jobs:
           echo "  prisma=${{ steps.filter.outputs.prisma }}"
           echo "  i18n=${{ steps.filter.outputs.i18n }}"
           echo "  safety=${{ steps.filter.outputs.safety }}"
+          echo "  e2e=${{ steps.filter.outputs.e2e }}"
           echo "  config=${{ steps.filter.outputs.config }}"
           echo "  docs=${{ steps.filter.outputs.docs }}"
 
@@ -470,15 +476,10 @@ jobs:
 
       - name: Check module boundary violations
         run: |
-          BASELINE=465
-          COUNT=$(npx eslint --no-cache --rule 'local-rules/enforce-module-boundaries: [warn, {protectedModules: [safety, privacy, ai, education, rag, accessibility, tier, auth, security, compliance]}]' src/ 2>&1 | grep -c "enforce-module-boundaries" || echo "0")
-          echo "Module boundary violations: $COUNT (baseline: $BASELINE)"
-          if [ "$COUNT" -gt "$BASELINE" ]; then
-            echo "BLOCKING: New module boundary violations! ($COUNT > $BASELINE)"
-            echo "Use barrel exports (@/lib/module) instead of deep imports."
-            exit 1
-          fi
-          echo "Boundary gate passed: $COUNT <= $BASELINE"
+          # enforce-module-boundaries is "error" in eslint.config.mjs (Plan 136)
+          # Lint step catches violations. This provides focused report.
+          echo "Module boundary rule enforced at error level in ESLint config."
+          echo "Any violations fail the lint step. Zero violations baseline."
 
   # Lane 5c: Sentry Production Configuration (runs on push only, uses Vercel CLI)
   sentry-config:
