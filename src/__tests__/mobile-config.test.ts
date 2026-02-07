@@ -18,7 +18,7 @@ describe("Mobile Build Configuration", () => {
     const packageJson = JSON.parse(readFileSync(packageJsonPath, "utf-8"));
 
     expect(packageJson.scripts["build:mobile:web"]).toBeDefined();
-    expect(packageJson.scripts["build:mobile:web"]).toContain("mobile");
+    expect(packageJson.scripts["build:mobile:web"]).toContain("MOBILE_BUILD");
   });
 
   it("should have build:mobile script using build:mobile:web", () => {

@@ -68,6 +68,7 @@ const nextConfig: NextConfig = {
       "./node_modules/undici/**",
       "./node_modules/jsdom/**",
       "./node_modules/isomorphic-dompurify/**",
+      "./node_modules/parse5/**",
     ],
   },
 
