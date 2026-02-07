@@ -18,7 +18,7 @@ import {
 } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { hashPassword, generateRandomPassword } from "@/lib/auth";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 import { sendEmail } from "@/lib/email";
 import { getApprovalTemplate } from "@/lib/email/templates/invite-templates";
 import { logger } from "@/lib/logger";

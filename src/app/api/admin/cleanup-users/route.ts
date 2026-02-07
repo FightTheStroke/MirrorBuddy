@@ -15,7 +15,7 @@ import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { getProtectedUsers } from "@/lib/test-isolation/protected-users";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 
 export const DELETE = pipe(
   withSentry("/api/admin/cleanup-users"),

@@ -5,7 +5,7 @@
 // ============================================================================
 
 import { NextResponse } from "next/server";
-import { generateCSRFToken, CSRF_TOKEN_COOKIE } from "@/lib/security/csrf";
+import { generateCSRFToken, CSRF_TOKEN_COOKIE } from "@/lib/security";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 
 interface SessionResponse {

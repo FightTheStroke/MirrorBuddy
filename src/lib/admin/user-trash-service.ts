@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 import { logger } from "@/lib/logger";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 
 const GRACE_PERIOD_DAYS = 30;
 

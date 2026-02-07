@@ -8,6 +8,7 @@
 export {
   routeToCharacter,
   getBuddyForStudent,
+  quickRoute,
   type RoutingResult,
   type RoutingContext,
 } from "./character-router";

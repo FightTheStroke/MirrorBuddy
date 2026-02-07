@@ -5,7 +5,7 @@
  */
 
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import * as piiEncryption from "@/lib/security/pii-encryption";
+import * as piiEncryption from "@/lib/security";
 import { Prisma } from "@prisma/client";
 import { createPIIMiddleware } from "../pii-middleware";
 

@@ -8,7 +8,7 @@ import { validateAuth } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import { pipe, withSentry } from "@/lib/api/middlewares";
 import type { TelemetryCategory } from "@/lib/telemetry/types";
-import { getCorsHeaders } from "@/lib/security/cors-config";
+import { getCorsHeaders } from "@/lib/security";
 
 // Handle CORS preflight
 // F-04: Get CORS headers based on request origin (no wildcard in production)

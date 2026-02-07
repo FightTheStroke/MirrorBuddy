@@ -8,7 +8,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { logger } from "@/lib/logger";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 
 interface DirectorySyncRequest {
   schoolId: string;

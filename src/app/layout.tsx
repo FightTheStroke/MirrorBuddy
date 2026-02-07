@@ -7,7 +7,7 @@ import { getMessages } from "next-intl/server";
 // Only render Analytics on Vercel (VERCEL env var is set by Vercel)
 const isVercel = process.env.VERCEL === "1";
 import { Providers } from "@/components/providers";
-import { getNonce } from "@/lib/security/csp-nonce";
+import { getNonce } from "@/lib/security";
 import { getRootOGMetadata } from "@/lib/i18n/get-og-metadata";
 import { headers } from "next/headers";
 import {

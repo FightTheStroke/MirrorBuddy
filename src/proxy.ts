@@ -14,7 +14,7 @@
 
 import { NextResponse, NextRequest } from "next/server";
 import createIntlMiddleware from "next-intl/middleware";
-import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security/csp-nonce";
+import { generateNonce, CSP_NONCE_HEADER } from "@/lib/security";
 import { metricsStore } from "@/lib/observability/metrics-store";
 import {
   AUTH_COOKIE_NAME,

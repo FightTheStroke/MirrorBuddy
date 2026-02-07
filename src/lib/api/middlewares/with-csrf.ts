@@ -1,4 +1,4 @@
-import { requireCSRF } from "@/lib/security/csrf";
+import { requireCSRF } from "@/lib/security";
 import type { Middleware } from "./types";
 
 /**
