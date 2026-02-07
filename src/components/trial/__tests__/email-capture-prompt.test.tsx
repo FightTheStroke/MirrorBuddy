@@ -15,8 +15,11 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { EmailCapturePrompt } from "../email-capture-prompt";
 import { getTranslation } from "@/test/i18n-helpers";
 
-// Mock fetch
-global.fetch = vi.fn();
+// Mock csrfFetch (component uses csrfFetch, not global.fetch)
+const mockCsrfFetch = vi.fn();
+vi.mock("@/lib/auth/csrf-client", () => ({
+  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+}));
 
 // Mock localStorage
 const localStorageMock: Storage = {
@@ -50,10 +53,10 @@ describe("EmailCapturePrompt", () => {
   });
 
   it("submits email successfully", async () => {
-    vi.mocked(global.fetch).mockResolvedValue({
+    mockCsrfFetch.mockResolvedValue({
       ok: true,
       json: async () => ({ success: true, email: "user@example.com" }),
-    } as Response);
+    });
 
     render(<EmailCapturePrompt sessionId="test-session" messageCount={5} />);
 
@@ -67,7 +70,7 @@ describe("EmailCapturePrompt", () => {
     fireEvent.click(submitButton);
 
     await waitFor(() => {
-      expect(global.fetch).toHaveBeenCalledWith("/api/trial/email", {
+      expect(mockCsrfFetch).toHaveBeenCalledWith("/api/trial/email", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -96,8 +99,8 @@ describe("EmailCapturePrompt", () => {
     // Wait a bit for async validation
     await waitFor(
       () => {
-        // Should not have called fetch with invalid email
-        expect(global.fetch).not.toHaveBeenCalled();
+        // Should not have called csrfFetch with invalid email
+        expect(mockCsrfFetch).not.toHaveBeenCalled();
       },
       { timeout: 1500 },
     );

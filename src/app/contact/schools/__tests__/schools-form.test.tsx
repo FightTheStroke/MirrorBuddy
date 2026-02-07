@@ -14,46 +14,48 @@ vi.mock("@/lib/auth/csrf-client", () => ({
 }));
 
 // Mock next-intl - return the key if translation not found
+const mockTranslations: Record<string, string> = {
+  title: "Contattaci - Scuole",
+  nameLabel: "Nome",
+  emailLabel: "Email",
+  roleLabel: "Ruolo",
+  schoolNameLabel: "Nome Scuola",
+  schoolTypeLabel: "Tipo Scuola",
+  studentCountLabel: "Numero Studenti",
+  specificNeedsLabel: "Esigenze Specifiche",
+  messagePlaceholder: "Messaggio",
+  submitButtonDefault: "Invia Richiesta",
+  submitButtonLoading: "Invio in corso...",
+  successTitle: "Richiesta Inviata",
+  successMessage: "La tua richiesta è stata inviata con successo.",
+  errorMessage: "Errore durante l'invio",
+  errorDefault: "Errore durante l'invio",
+  errorConnection: "Errore di connessione",
+  solutions: "Soluzioni",
+  "features.curriculum": "Personalizzazione curricolare e didattica innovativa",
+  "features.management": "Gestione classi e monitoraggio progressi",
+  "features.reporting": "Reportistica dettagliata per docenti",
+  "features.support": "Supporto tecnico dedicato",
+  "options.roles.dirigente": "Dirigente Scolastico",
+  "options.roles.docente": "Docente",
+  "options.roles.segreteria": "Segreteria",
+  "options.roles.altro": "Altro",
+  "options.schoolTypes.primaria": "Primaria",
+  "options.schoolTypes.secondariaI": "Secondaria I Grado",
+  "options.schoolTypes.secondariaII": "Secondaria II Grado",
+  "options.schoolTypes.universita": "Università",
+  "options.studentCounts.lessThan100": "Meno di 100",
+  "options.studentCounts.100to500": "100-500",
+  "options.studentCounts.500to1000": "500-1000",
+  "options.studentCounts.moreThan1000": "Più di 1000",
+};
+
 vi.mock("next-intl", () => ({
-  useTranslations: () => (key: string) => {
-    const translations: Record<string, string> = {
-      title: "Contattaci - Scuole",
-      nameLabel: "Nome",
-      emailLabel: "Email",
-      roleLabel: "Ruolo",
-      schoolNameLabel: "Nome Scuola",
-      schoolTypeLabel: "Tipo Scuola",
-      studentCountLabel: "Numero Studenti",
-      specificNeedsLabel: "Esigenze Specifiche",
-      messagePlaceholder: "Messaggio",
-      submitButtonDefault: "Invia Richiesta",
-      submitButtonLoading: "Invio in corso...",
-      successTitle: "Richiesta Inviata",
-      successMessage: "La tua richiesta è stata inviata con successo.",
-      errorMessage: "Errore durante l'invio",
-      errorDefault: "Errore durante l'invio",
-      errorConnection: "Errore di connessione",
-      solutions: "Soluzioni",
-      "features.curriculum":
-        "Personalizzazione curricolare e didattica innovativa",
-      "features.management": "Gestione classi e monitoraggio progressi",
-      "features.reporting": "Reportistica dettagliata per docenti",
-      "features.support": "Supporto tecnico dedicato",
-      "options.roles.dirigente": "Dirigente Scolastico",
-      "options.roles.docente": "Docente",
-      "options.roles.segreteria": "Segreteria",
-      "options.roles.altro": "Altro",
-      "options.schoolTypes.primaria": "Primaria",
-      "options.schoolTypes.secondariaI": "Secondaria I Grado",
-      "options.schoolTypes.secondariaII": "Secondaria II Grado",
-      "options.schoolTypes.universita": "Università",
-      "options.studentCounts.lessThan100": "Meno di 100",
-      "options.studentCounts.100to500": "100-500",
-      "options.studentCounts.500to1000": "500-1000",
-      "options.studentCounts.moreThan1000": "Più di 1000",
-    };
-    return translations[key] || key;
-  },
+  useTranslations: () => (key: string) => mockTranslations[key] || key,
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) =>
+    children,
+  useLocale: () => "it",
+  useMessages: () => ({}),
 }));
 
 import { csrfFetch } from "@/lib/auth/csrf-client";
@@ -208,10 +210,7 @@ describe("SchoolsContactForm", () => {
       );
     });
 
-    // ENGINEERING JUSTIFICATION: Test skipped due to i18n mock limitations.
-    // next-intl requires NextIntlClientProvider wrapping, which conflicts with
-    // success message rendering. Fix requires refactoring test setup utils.
-    it.skip("shows success message after successful submission", async () => {
+    it("shows success message after successful submission", async () => {
       const user = userEvent.setup();
       mockCsrfFetch.mockResolvedValueOnce({
         ok: true,
@@ -239,7 +238,7 @@ describe("SchoolsContactForm", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText(/richiesta inviata|inviata con successo/i),
+          screen.getByRole("heading", { name: /richiesta inviata/i }),
         ).toBeInTheDocument();
       });
     });

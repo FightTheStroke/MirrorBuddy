@@ -45,12 +45,11 @@ export function withSentry(routeName: string): Middleware {
         },
       });
 
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error(`API Error: ${ctx.req.method} ${routeName}`, {
-        error: errorMessage,
-        userId: ctx.userId,
-      });
+      logger.error(
+        `API Error: ${ctx.req.method} ${routeName}`,
+        { userId: ctx.userId },
+        error,
+      );
 
       return new Response(
         JSON.stringify({

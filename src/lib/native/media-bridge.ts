@@ -77,7 +77,7 @@ export async function capturePhoto(
         format: photo.format || "jpeg",
       };
     } catch (error) {
-      logger.error("[MediaBridge] Capacitor camera error", { error });
+      logger.error("[MediaBridge] Capacitor camera error", undefined, error);
       throw error;
     }
   } else {
@@ -182,7 +182,7 @@ export async function requestMicrophoneStream(
 
     return stream;
   } catch (error) {
-    logger.error("[MediaBridge] Microphone access error", { error });
+    logger.error("[MediaBridge] Microphone access error", undefined, error);
     throw error;
   }
 }
@@ -210,7 +210,11 @@ export async function checkCameraPermission(): Promise<PermissionStatus> {
       const permissions = await Camera.checkPermissions();
       return permissions.camera === "granted" ? "granted" : "denied";
     } catch (error) {
-      logger.error("[MediaBridge] Camera permission check error", { error });
+      logger.error(
+        "[MediaBridge] Camera permission check error",
+        undefined,
+        error,
+      );
       return "denied";
     }
   } else {
@@ -251,7 +255,11 @@ export async function requestCameraPermission(): Promise<PermissionStatus> {
       const permissions = await Camera.requestPermissions();
       return permissions.camera === "granted" ? "granted" : "denied";
     } catch (error) {
-      logger.error("[MediaBridge] Camera permission request error", { error });
+      logger.error(
+        "[MediaBridge] Camera permission request error",
+        undefined,
+        error,
+      );
       return "denied";
     }
   }

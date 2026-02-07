@@ -13,7 +13,6 @@
 import { describe, it, expect } from "vitest";
 import fs from "fs";
 import path from "path";
-import { execSync } from "child_process";
 
 describe("Localize Skill", () => {
   const projectRoot = process.cwd();
@@ -50,53 +49,6 @@ describe("Localize Skill", () => {
     it("should include optional file path argument", () => {
       const content = fs.readFileSync(skillPath, "utf-8");
       expect(content).toMatch(/\[file\s+path\]|\{file\}/i);
-    });
-  });
-
-  // Skipped: execSync tests are flaky when running in parallel with vitest
-  // These tests spawn npm processes which conflict with vitest's test isolation
-  // Run manually with: npm run i18n:check
-  describe.skip("i18n-check Script", () => {
-    it("should execute successfully", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-      expect(result).toBeDefined();
-    });
-
-    it("should report on all locales (it, en, fr, de, es)", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-      // Script now uses namespace structure, reports locale names
-      expect(result).toMatch(/it:/);
-      expect(result).toMatch(/en:/);
-      expect(result).toMatch(/fr:/);
-      expect(result).toMatch(/de:/);
-      expect(result).toMatch(/es:/);
-    });
-
-    it("should show key counts for each locale", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-      // Should have patterns like "✓ locale.json: N/M keys"
-      expect(result).toMatch(/\d+\/\d+\s+keys/);
-    });
-
-    it("should report pass/fail status", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-      expect(result).toMatch(/Result:\s+(PASS|FAIL)/);
     });
   });
 
@@ -260,50 +212,6 @@ describe("Localize Skill", () => {
       expect(content).toMatch(/\/localize/);
       // Should show both: full check and file-specific check
       expect(content).toContain("Quick Start");
-    });
-  });
-
-  // Skipped: execSync tests are flaky when running in parallel with vitest
-  // These tests spawn npm processes which conflict with vitest's test isolation
-  // Run manually with: npm run i18n:check
-  describe.skip("Output Format", () => {
-    it("should produce clear pass/fail report", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-
-      // Should have clear status indicators
-      expect(result).toMatch(/Result:\s+(PASS|FAIL)/);
-      // Should use check mark (✓) or x mark (✗)
-      expect(result).toMatch(/[✓✗]/);
-    });
-
-    it("should report missing keys per locale", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-
-      // If there are missing keys, they should be reported
-      if (result.includes("Missing:")) {
-        expect(result).toMatch(/Missing:/);
-      }
-    });
-
-    it("should show key count statistics", () => {
-      const result = execSync("npm run i18n:check 2>&1", {
-        cwd: projectRoot,
-        encoding: "utf-8",
-        stdio: "pipe",
-      });
-
-      // Should show reference locale info
-      expect(result).toMatch(/Reference locale:/);
-      // Should show key counts like "keys)"
-      expect(result).toMatch(/\(\d+\s+keys\)/);
     });
   });
 });

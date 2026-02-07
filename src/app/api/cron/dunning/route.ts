@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";
-    logger.error("Dunning cron failed", { error: message });
+    logger.error("Dunning cron failed", { message }, error);
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

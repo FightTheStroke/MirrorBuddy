@@ -167,15 +167,12 @@ export default defineConfig({
     },
     {
       // Cookie-signing tests need to run without storage state to test fresh cookies
-      // DISABLED: Requires specific session management setup not available in standard runs
       name: "cookie-signing",
       use: {
         ...devices["Desktop Chrome"],
         storageState: undefined, // Don't use storage state - start fresh
       },
       testMatch: "**/cookie-signing.spec.ts",
-      // Skip always - requires special session management setup
-      testIgnore: "**/*",
     },
     // Mobile viewport projects for responsive design testing (ADR 0064)
     // CI STRATEGY: Run 3 core devices in CI (iPhone SE, Pixel 7, iPad Mini) for coverage

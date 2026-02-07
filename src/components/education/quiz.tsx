@@ -30,23 +30,8 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
     startTimeRef.current = Date.now();
   }, []);
 
-  // Guard: empty questions array (corrupted/incomplete quiz data)
-  if (quiz.questions.length === 0) {
-    return (
-      <QuizCompletion
-        score={0}
-        correctCount={0}
-        totalQuestions={0}
-        masteryThreshold={quiz.masteryThreshold}
-        onRetry={onClose}
-        onClose={onClose}
-      />
-    );
-  }
-
-  const currentQuestion = quiz.questions[currentIndex];
-  const progress =
-    ((currentIndex + (showResult ? 1 : 0)) / quiz.questions.length) * 100;
+  // Access current question safely (empty array handled after hooks)
+  const currentQuestion = quiz.questions[currentIndex] ?? null;
 
   const handleSelectAnswer = useCallback(
     (index: number) => {
@@ -57,12 +42,12 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   );
 
   const handleSubmit = useCallback(() => {
-    if (selectedAnswer === null) return;
+    if (selectedAnswer === null || !currentQuestion) return;
     setShowResult(true);
     if (selectedAnswer === currentQuestion.correctAnswer) {
       setCorrectCount((prev) => prev + 1);
     }
-  }, [selectedAnswer, currentQuestion.correctAnswer]);
+  }, [selectedAnswer, currentQuestion]);
 
   const handleNext = useCallback(() => {
     if (currentIndex < quiz.questions.length - 1) {
@@ -92,12 +77,29 @@ export function Quiz({ quiz, onComplete, onClose }: QuizProps) {
   }, [currentIndex, quiz, correctCount, hintsUsed, onComplete]);
 
   const handleShowHint = useCallback(() => {
+    if (!currentQuestion) return;
     if (!showHint && currentQuestion.hints.length > 0) {
       setShowHint(true);
       setHintsUsed((prev) => prev + 1);
     }
-  }, [showHint, currentQuestion.hints.length]);
+  }, [showHint, currentQuestion]);
 
+  // Guard: empty questions array (corrupted/incomplete quiz data)
+  if (!currentQuestion) {
+    return (
+      <QuizCompletion
+        score={0}
+        correctCount={0}
+        totalQuestions={0}
+        masteryThreshold={quiz.masteryThreshold}
+        onRetry={onClose}
+        onClose={onClose}
+      />
+    );
+  }
+
+  const progress =
+    ((currentIndex + (showResult ? 1 : 0)) / quiz.questions.length) * 100;
   const isCorrect = selectedAnswer === currentQuestion.correctAnswer;
 
   if (isComplete) {

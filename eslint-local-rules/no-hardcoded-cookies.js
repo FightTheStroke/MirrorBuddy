@@ -41,14 +41,13 @@ const noHardcodedCookies = {
     return {
       Literal(node) {
         if (typeof node.value !== "string") return;
+        if (!Object.hasOwn(COOKIE_NAMES, node.value)) return;
         const suggestion = COOKIE_NAMES[node.value];
-        if (suggestion) {
-          context.report({
-            node,
-            messageId: "hardcodedCookie",
-            data: { suggestion },
-          });
-        }
+        context.report({
+          node,
+          messageId: "hardcodedCookie",
+          data: { suggestion },
+        });
       },
     };
   },

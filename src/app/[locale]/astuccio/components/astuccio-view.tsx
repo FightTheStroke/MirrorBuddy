@@ -189,7 +189,7 @@ export function AstuccioView({
           toast.error(t("webcamStandalone.saveError"));
         }
       } catch (error) {
-        logger.error("Error saving webcam capture", { error });
+        logger.error("Error saving webcam capture", undefined, error);
         toast.error(t("webcamStandalone.saveError"));
       }
     },

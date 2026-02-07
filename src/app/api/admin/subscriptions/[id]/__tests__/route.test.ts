@@ -305,51 +305,6 @@ describe("PUT /api/admin/subscriptions/[id]", () => {
     expect(response.status).toBe(200);
     expect(data.expiresAt).toBeDefined();
   });
-
-  // SKIPPED: Audit log creation removed in pipe() migration - replaced with telemetry
-  it.skip("creates audit log on update", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({
-      authenticated: true,
-      isAdmin: true,
-      userId: "admin-123",
-    });
-
-    mockUserSubscriptionFindUnique.mockResolvedValueOnce({
-      id: "sub-123",
-      userId: "user-1",
-      tierId: "tier-1",
-      status: "ACTIVE",
-    });
-
-    mockUserSubscriptionUpdate.mockResolvedValueOnce({
-      id: "sub-123",
-      userId: "user-1",
-      tierId: "tier-1",
-      status: "PAUSED",
-    });
-
-    mockTierAuditLogCreate.mockResolvedValueOnce({ id: "audit-123" });
-
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/subscriptions/sub-123",
-      {
-        method: "PUT",
-        body: JSON.stringify({ status: "PAUSED", notes: "Testing" }),
-      },
-    );
-
-    await PUT(request, { params: Promise.resolve({ id: "sub-123" }) });
-
-    expect(prisma.tierAuditLog.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          userId: "user-1",
-          adminId: "admin-123",
-          action: "SUBSCRIPTION_UPDATE",
-        }),
-      }),
-    );
-  });
 });
 
 describe("DELETE /api/admin/subscriptions/[id]", () => {
@@ -433,48 +388,6 @@ describe("DELETE /api/admin/subscriptions/[id]", () => {
     expect(prisma.userSubscription.delete).toHaveBeenCalledWith({
       where: { id: "sub-123" },
     });
-  });
-
-  // SKIPPED: Audit log creation removed in pipe() migration - replaced with telemetry
-  it.skip("creates audit log on deletion", async () => {
-    mockValidateAdminAuth.mockResolvedValueOnce({
-      authenticated: true,
-      isAdmin: true,
-      userId: "admin-123",
-    });
-
-    mockUserSubscriptionFindUnique.mockResolvedValueOnce({
-      id: "sub-123",
-      userId: "user-1",
-      tierId: "tier-1",
-      status: "ACTIVE",
-    });
-
-    mockUserSubscriptionDelete.mockResolvedValueOnce({
-      id: "sub-123",
-      userId: "user-1",
-      tierId: "tier-1",
-      status: "ACTIVE",
-    });
-
-    mockTierAuditLogCreate.mockResolvedValueOnce({ id: "audit-123" });
-
-    const request = new NextRequest(
-      "http://localhost:3000/api/admin/subscriptions/sub-123",
-      { method: "DELETE" },
-    );
-
-    await DELETE(request, { params: Promise.resolve({ id: "sub-123" }) });
-
-    expect(prisma.tierAuditLog.create).toHaveBeenCalledWith(
-      expect.objectContaining({
-        data: expect.objectContaining({
-          userId: "user-1",
-          adminId: "admin-123",
-          action: "SUBSCRIPTION_DELETE",
-        }),
-      }),
-    );
   });
 
   it("handles database error on deletion", async () => {

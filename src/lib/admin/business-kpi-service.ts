@@ -56,7 +56,7 @@ export async function getBusinessKPIs(): Promise<BusinessKPIResponse> {
     logger.info("Business KPIs computed successfully", { isEstimated });
     return data;
   } catch (error) {
-    logger.error("Failed to compute business KPIs", { error });
+    logger.error("Failed to compute business KPIs", undefined, error);
     return {
       revenue: {
         mrr: 0,
