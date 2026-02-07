@@ -68,6 +68,7 @@ export const POST = pipe(
         id: true,
         email: true,
         emailHash: true,
+        settings: { select: { language: true } },
       },
     });
 
@@ -112,10 +113,10 @@ export const POST = pipe(
     });
 
     // Generate reset URL
-    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/en/reset-password?token=${token}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL || "http://localhost:3000"}/${locale}/reset-password?token=${token}`;
 
     // Get user's locale (default to 'en')
-    const locale = "en"; // TODO: Get from user preferences when available
+    const locale = user.settings?.language || "en";
 
     // Generate email content
     const { subject, html } = getPasswordResetEmail(resetUrl, locale);
