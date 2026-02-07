@@ -313,7 +313,7 @@ export async function restoreUserFromBackup(userId: string, adminId: string) {
       where: {
         OR: [
           { emailHash: emailHashValue },
-          { email: payload.user.email as string },
+          { email: payload.user.email as string }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
         ],
       },
       select: { id: true },

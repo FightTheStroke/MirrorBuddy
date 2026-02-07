@@ -9,9 +9,16 @@
  */
 
 import { NextResponse } from "next/server";
-import { pipe, withSentry, withCSRF, withAdmin } from "@/lib/api/middlewares";
+import {
+  pipe,
+  withSentry,
+  withCSRF,
+  withAdmin,
+  ApiError,
+} from "@/lib/api/middlewares";
 import { prisma } from "@/lib/db";
 import { hashPassword, generateRandomPassword } from "@/lib/auth/password";
+import { hashPII } from "@/lib/security/pii-encryption";
 import { sendEmail } from "@/lib/email";
 import { getApprovalTemplate } from "@/lib/email/templates/invite-templates";
 import { logger } from "@/lib/logger";
@@ -65,18 +72,21 @@ export const POST = pipe(
 
   const email = rawEmail;
 
-  // Check for existing user
+  // Check for existing user by emailHash (PII-encrypted) or legacy plain email
+  const emailHash = await hashPII(email);
   const existingUser = await prisma.user.findFirst({
     where: {
-      OR: [{ email }, { googleAccount: { email } }],
+      OR: [
+        { emailHash },
+        { email }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat for pre-PII users
+        { googleAccount: { emailHash } },
+        { googleAccount: { email } }, // eslint-disable-line local-rules/require-email-hash-lookup -- backward-compat
+      ],
     },
   });
 
   if (existingUser) {
-    return NextResponse.json(
-      { error: "A user with this email already exists" },
-      { status: 409 },
-    );
+    throw new ApiError("A user with this email already exists", 409);
   }
 
   // Generate credentials
@@ -86,8 +96,9 @@ export const POST = pipe(
   const displayName = body.name?.trim() || email.split("@")[0];
 
   // Create user + invite record in transaction
-  const user = await prisma.$transaction(
-    async (tx: Prisma.TransactionClient) => {
+  let user: { id: string };
+  try {
+    user = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
       const newUser = await tx.user.create({
         data: {
           username,
@@ -131,10 +142,28 @@ export const POST = pipe(
       });
 
       return newUser;
-    },
-  );
+    });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
 
-  // Send welcome email
+    // Prisma unique constraint violation
+    if (msg.includes("Unique constraint") || msg.includes("P2002")) {
+      throw new ApiError(
+        `User creation failed: duplicate username or email`,
+        409,
+      );
+    }
+
+    // Prisma foreign key constraint
+    if (msg.includes("Foreign key") || msg.includes("P2003")) {
+      throw new ApiError("User creation failed: invalid reference", 422);
+    }
+
+    // Re-throw unknown DB errors (withSentry will capture to Sentry)
+    throw err;
+  }
+
+  // Send welcome email (non-blocking — user was created successfully)
   const template = getApprovalTemplate({
     name: displayName,
     email,
@@ -143,7 +172,7 @@ export const POST = pipe(
     loginUrl: `${APP_URL}/auth/login`,
   });
 
-  await sendEmail({
+  const emailResult = await sendEmail({
     to: template.to,
     subject: template.subject,
     html: template.html,
@@ -155,6 +184,7 @@ export const POST = pipe(
     username,
     email,
     adminUserId,
+    emailSent: emailResult.success,
   });
 
   return NextResponse.json({
@@ -162,5 +192,6 @@ export const POST = pipe(
     userId: user.id,
     username,
     email,
+    emailSent: emailResult.success,
   });
 });

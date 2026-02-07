@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Direct invite broken** — email duplicate check used plaintext against PII-encrypted DB, causing silent failures. Now uses `emailHash` with legacy fallback
+- **Generic "Internal server error" on all API failures** — `withSentry` middleware swallowed `ApiError` instances, bypassing `pipe()` error handling. Now re-throws `ApiError` so routes can return specific status codes and messages
+- **PII middleware missing `upsert` handler** — Prisma upsert operations on PII models (User, Profile, GoogleAccount) bypassed encryption. Added `upsert` interceptor
+
+### Added
+
+- ESLint rule `require-email-hash-lookup` — blocks `{ email: value }` in User/GoogleAccount `where` clauses, enforces `emailHash` usage to prevent PII lookup bugs
+- PII middleware upsert test suite (`pii-middleware-upsert.test.ts`)
+
 ### Security
 
 **PII Detection and Protection (Plan 124)**

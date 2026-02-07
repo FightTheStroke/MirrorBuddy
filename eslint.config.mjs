@@ -400,6 +400,22 @@ const eslintConfig = defineConfig([
       "local-rules/no-plaintext-pii-storage": "error",
     },
   },
+  // PII: Require emailHash (not plain email) in User/GoogleAccount find queries
+  // Plain email is PII-encrypted; plaintext lookups will never match
+  {
+    files: ["src/**/*.ts"],
+    ignores: [
+      "src/**/*.test.ts",
+      "src/**/__tests__/**",
+      "src/lib/db/**/*.ts", // PII middleware itself
+      "src/lib/auth/**/*.ts", // Auth implementation (has legacy fallbacks)
+      "src/app/api/auth/**/*.ts", // Auth routes (emailHash + email fallback)
+      "src/lib/security/key-rotation.ts", // Needs { email: { not: null } } filter
+    ],
+    rules: {
+      "local-rules/require-email-hash-lookup": "error",
+    },
+  },
   // ADR 0059: Require E2E specs to use fixtures instead of raw @playwright/test
   // Fixtures provide /api/tos mock and wall bypasses. Without them, TosGateProvider
   // blocks all pointer events, causing systematic test failures.

@@ -230,6 +230,26 @@ export function createPIIMiddleware() {
           return query(args);
         },
 
+        // Intercept upsert operations (encrypt both create and update data)
+        async upsert({ model, operation: _operation, args, query }) {
+          if (hasPIIFields(model)) {
+            if (args.create) {
+              args.create = await encryptPIIFields(
+                model,
+                args.create as Record<string, unknown>,
+              );
+            }
+            if (args.update) {
+              args.update = await encryptPIIFields(
+                model,
+                args.update as Record<string, unknown>,
+              );
+            }
+          }
+          const result = await query(args);
+          return decryptPIIFields(model, result);
+        },
+
         // Intercept findUnique operations
         async findUnique({ model, operation: _operation, args, query }) {
           const result = await query(args);
