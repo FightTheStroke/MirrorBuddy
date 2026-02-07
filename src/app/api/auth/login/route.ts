@@ -9,7 +9,7 @@ import {
 } from "@/lib/auth";
 import { RATE_LIMITS } from "@/lib/rate-limit";
 import { pipe, withSentry, withRateLimit } from "@/lib/api/middlewares";
-import { hashPII } from "@/lib/security/pii-encryption";
+import { hashPII } from "@/lib/security";
 
 const log = logger.child({ module: "auth/login" });
 

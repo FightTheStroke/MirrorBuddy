@@ -11,7 +11,7 @@ import {
   signCookieValue,
   _resetSecretCache,
 } from "../cookie-signing";
-import { clearAllCachedSecrets } from "@/lib/security/azure-key-vault";
+import { clearAllCachedSecrets } from "@/lib/security";
 
 describe("Cookie Encryption", () => {
   const originalEnv = process.env.SESSION_SECRET;

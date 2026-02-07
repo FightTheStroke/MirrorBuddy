@@ -15,13 +15,13 @@ import type { SupportTeacher, BuddyProfile } from "@/types";
 import type { ConversationFlowState, ActiveCharacter } from "../types";
 import {
   routeToCharacter,
+  getBuddyForStudent,
   type RoutingResult,
-} from "@/lib/ai/character-router";
+} from "@/lib/ai";
 import {
   getDefaultSupportTeacher,
   getSupportTeacherById,
 } from "@/data/support-teachers";
-import { getBuddyForStudent } from "@/lib/ai/character-router";
 import { getBuddyById, type BuddyId } from "@/data/buddy-profiles";
 import { getMaestroById } from "@/data/maestri";
 import { getUserIdFromCookie } from "@/lib/auth";
