@@ -121,10 +121,47 @@ function validateVercelToken(token: string | undefined): void {
 
 function validateCriticalEnvVars(): void {
   const critical = [
+    // Core
     { name: "DATABASE_URL", sensitive: true },
+    { name: "DIRECT_URL", sensitive: true },
     { name: "SESSION_SECRET", sensitive: true },
     { name: "ADMIN_EMAIL", sensitive: false },
+    { name: "ADMIN_PASSWORD", sensitive: true },
     { name: "CRON_SECRET", sensitive: true },
+    { name: "TOKEN_ENCRYPTION_KEY", sensitive: true },
+    { name: "IP_HASH_SALT", sensitive: true },
+    // Azure AI
+    { name: "AZURE_OPENAI_API_KEY", sensitive: true },
+    { name: "AZURE_OPENAI_ENDPOINT", sensitive: false },
+    { name: "AZURE_OPENAI_CHAT_DEPLOYMENT", sensitive: false },
+    { name: "AZURE_OPENAI_EMBEDDING_DEPLOYMENT", sensitive: false },
+    { name: "AZURE_OPENAI_REALTIME_ENDPOINT", sensitive: false },
+    { name: "AZURE_OPENAI_REALTIME_API_KEY", sensitive: true },
+    { name: "AZURE_OPENAI_REALTIME_DEPLOYMENT", sensitive: false },
+    { name: "AZURE_OPENAI_TTS_DEPLOYMENT", sensitive: false },
+    // Email
+    { name: "RESEND_API_KEY", sensitive: true },
+    { name: "FROM_EMAIL", sensitive: false },
+    { name: "SUPPORT_EMAIL", sensitive: false },
+    // Auth
+    { name: "GOOGLE_CLIENT_ID", sensitive: false },
+    { name: "GOOGLE_CLIENT_SECRET", sensitive: true },
+    { name: "NEXT_PUBLIC_GOOGLE_CLIENT_ID", sensitive: false },
+    { name: "NEXTAUTH_URL", sensitive: false },
+    // Push notifications
+    { name: "NEXT_PUBLIC_VAPID_PUBLIC_KEY", sensitive: false },
+    { name: "VAPID_PRIVATE_KEY", sensitive: true },
+    { name: "VAPID_SUBJECT", sensitive: false },
+    // Rate limiting
+    { name: "UPSTASH_REDIS_REST_URL", sensitive: false },
+    { name: "UPSTASH_REDIS_REST_TOKEN", sensitive: true },
+    // Supabase
+    { name: "NEXT_PUBLIC_SUPABASE_URL", sensitive: false },
+    { name: "NEXT_PUBLIC_SUPABASE_ANON_KEY", sensitive: false },
+    { name: "SUPABASE_SERVICE_ROLE_KEY", sensitive: true },
+    // Misc
+    { name: "PROTECTED_USERS", sensitive: false },
+    { name: "TRIAL_BUDGET_LIMIT_EUR", sensitive: false },
   ];
 
   for (const envVar of critical) {
@@ -155,10 +192,19 @@ function validateCriticalEnvVars(): void {
 function validateOptionalEnvVars(): void {
   const optional = [
     { name: "NEXT_PUBLIC_SENTRY_DSN", category: "Sentry" },
-    { name: "VERCEL_TOKEN", category: "Vercel" },
     { name: "SENTRY_AUTH_TOKEN", category: "Sentry" },
     { name: "SENTRY_ORG", category: "Sentry" },
     { name: "SENTRY_PROJECT", category: "Sentry" },
+    { name: "GRAFANA_CLOUD_PROMETHEUS_URL", category: "Observability" },
+    { name: "GRAFANA_CLOUD_PROMETHEUS_USER", category: "Observability" },
+    { name: "GRAFANA_CLOUD_API_KEY", category: "Observability" },
+    { name: "GRAFANA_CLOUD_PUSH_INTERVAL", category: "Observability" },
+    { name: "LIVEKIT_URL", category: "LiveKit" },
+    { name: "LIVEKIT_API_KEY", category: "LiveKit" },
+    { name: "LIVEKIT_API_SECRET", category: "LiveKit" },
+    { name: "NEXT_PUBLIC_LIVEKIT_URL", category: "LiveKit" },
+    { name: "NEXT_PUBLIC_SITE_URL", category: "SEO" },
+    { name: "NEXT_PUBLIC_APP_URL", category: "App" },
   ];
 
   for (const envVar of optional) {

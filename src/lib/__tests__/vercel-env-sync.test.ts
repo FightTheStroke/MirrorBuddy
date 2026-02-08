@@ -51,14 +51,6 @@ function parseRequiredVarsFromBash(filePath: string): string[] {
   return blockMatches.map((m) => m.replace(/"/g, ""));
 }
 
-function parseCriticalVarsFromTs(filePath: string): string[] {
-  const content = readFileSync(resolve(ROOT, filePath), "utf-8");
-  const criticalBlock = content.match(/const critical = \[([\s\S]*?)\];/);
-  if (!criticalBlock) return [];
-  const names = criticalBlock[1].match(/name:\s*"([A-Z_]+)"/g) || [];
-  return names.map((m) => m.replace(/name:\s*"|"/g, ""));
-}
-
 describe("Vercel environment variable alignment", () => {
   const envVars = parseEnvVarNames(".env");
   const productionVars = envVars.filter((v) => !ALLOW_EMPTY.has(v));
@@ -83,20 +75,39 @@ describe("Vercel environment variable alignment", () => {
     }
   });
 
-  it("validate-pre-deploy.ts critical vars should be subset of pre-push vars", () => {
-    const criticalVars = parseCriticalVarsFromTs(
-      "scripts/validate-pre-deploy.ts",
-    );
-    const requiredVars = new Set(
-      parseRequiredVarsFromBash("scripts/pre-push-vercel.sh"),
+  it("validate-pre-deploy.ts critical+optional should cover all pre-push vars", () => {
+    const content = readFileSync(
+      resolve(ROOT, "scripts/validate-pre-deploy.ts"),
+      "utf-8",
     );
 
-    const missing = criticalVars.filter((v) => !requiredVars.has(v));
+    // Parse both critical and optional lists
+    const criticalBlock = content.match(/const critical = \[([\s\S]*?)\];/);
+    const optionalBlock = content.match(/const optional = \[([\s\S]*?)\];/);
+
+    const criticalNames = criticalBlock
+      ? (criticalBlock[1].match(/name:\s*"([A-Z_]+)"/g) || []).map((m) =>
+          m.replace(/name:\s*"|"/g, ""),
+        )
+      : [];
+    const optionalNames = optionalBlock
+      ? (optionalBlock[1].match(/name:\s*"([A-Z_]+)"/g) || []).map((m) =>
+          m.replace(/name:\s*"|"/g, ""),
+        )
+      : [];
+
+    const allDeployVars = new Set([...criticalNames, ...optionalNames]);
+    const requiredVars = parseRequiredVarsFromBash(
+      "scripts/pre-push-vercel.sh",
+    );
+
+    const missing = requiredVars.filter((v) => !allDeployVars.has(v));
 
     if (missing.length > 0) {
       throw new Error(
-        `validate-pre-deploy.ts has critical vars not in pre-push:\n` +
-          missing.map((v) => `  - ${v}`).join("\n"),
+        `validate-pre-deploy.ts is missing ${missing.length} vars from pre-push:\n` +
+          missing.map((v) => `  - ${v}`).join("\n") +
+          "\n\nAdd to critical[] or optional[] in scripts/validate-pre-deploy.ts",
       );
     }
   });
