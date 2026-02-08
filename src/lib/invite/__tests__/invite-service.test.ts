@@ -41,10 +41,14 @@ vi.mock("@/lib/email", () => ({
 }));
 
 // Mock password
-vi.mock("@/lib/auth/password", () => ({
-  hashPassword: vi.fn().mockResolvedValue("hashed-password"),
-  generateRandomPassword: vi.fn().mockReturnValue("temp-pass-123"),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    hashPassword: vi.fn().mockResolvedValue("hashed-password"),
+    generateRandomPassword: vi.fn().mockReturnValue("temp-pass-123"),
+  };
+});
 
 // Mock logger
 vi.mock("@/lib/logger", () => ({

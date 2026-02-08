@@ -13,9 +13,10 @@ vi.mock("next/navigation", () => ({
 }));
 
 // Mock csrf-client
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: vi.fn(),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return { ...actual, csrfFetch: vi.fn() };
+});
 
 // Mock toast
 vi.mock("@/components/ui/toast", () => ({

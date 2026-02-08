@@ -25,9 +25,10 @@ vi.mock("@/lib/db", () => ({
 }));
 
 vi.mock("@/lib/email");
-vi.mock("@/lib/security/pii-encryption", () => ({
-  hashPII: vi.fn().mockResolvedValue("mocked-hash"),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return { ...actual, hashPII: vi.fn().mockResolvedValue("mocked-hash") };
+});
 vi.mock("@/lib/email/templates/password-reset-template", () => ({
   getPasswordResetEmail: vi.fn().mockReturnValue({
     subject: "password reset",

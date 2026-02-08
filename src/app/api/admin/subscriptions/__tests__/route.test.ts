@@ -34,9 +34,13 @@ const mockUserSubscriptionFindMany = prisma.userSubscription
 
 // Mock dependencies
 const mockValidateAdminAuth = vi.fn();
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: () => mockValidateAdminAuth(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: () => mockValidateAdminAuth(),
+  };
+});
 
 vi.mock("@/lib/db", () => ({
   prisma: {

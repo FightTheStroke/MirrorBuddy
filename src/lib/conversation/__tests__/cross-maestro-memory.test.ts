@@ -31,11 +31,15 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getEffectiveTier: vi.fn(),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getEffectiveTier: vi.fn(),
+    },
+  };
+});
 
 vi.mock("../tier-memory-config", () => ({
   getTierMemoryLimits: vi.fn(),

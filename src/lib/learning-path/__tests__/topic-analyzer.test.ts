@@ -52,9 +52,6 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
 });
 
 // Mock deployment mapping
-vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
-  getDeploymentForModel: vi.fn((model: string) => model),
-}));
 
 import { chatCompletion } from "@/lib/ai/server";
 const mockChatCompletion = vi.mocked(chatCompletion);

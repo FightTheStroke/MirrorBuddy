@@ -7,9 +7,10 @@ import { BulkTierChangeModal } from "../bulk-tier-change-modal";
 import * as csrfClient from "@/lib/auth";
 
 // Mock csrf-client
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: vi.fn(),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return { ...actual, csrfFetch: vi.fn() };
+});
 
 // Mock toast
 vi.mock("@/components/ui/toast", () => ({

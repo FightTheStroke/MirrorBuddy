@@ -33,9 +33,13 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock AI provider
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+  };
+});
 
 // Mock study-kit-handler
 vi.mock("./study-kit-handler", () => ({

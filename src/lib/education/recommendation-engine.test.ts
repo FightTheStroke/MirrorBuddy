@@ -33,20 +33,25 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn(),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn(),
+    getDeploymentForModel: vi.fn().mockReturnValue("gpt-4o-mini"),
+  };
+});
 
-vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
-  getDeploymentForModel: vi.fn().mockReturnValue("gpt-4o-mini"),
-}));
-
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getEffectiveTier: vi.fn(),
-    getFeatureAIConfigForUser: vi.fn(),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getEffectiveTier: vi.fn(),
+      getFeatureAIConfigForUser: vi.fn(),
+    },
+  };
+});
 
 vi.mock("@/lib/conversation/semantic-memory", () => ({
   searchRelevantSummaries: vi.fn(),
@@ -59,7 +64,7 @@ describe("recommendation-engine", () => {
 
   describe("generateRecommendations", () => {
     it("should return empty for non-Pro users", async () => {
-      const { tierService } = await import("@/lib/tier/tier-service");
+      const { tierService } = await import("@/lib/tier/server");
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
         id: "tier-base",
         code: "base",
@@ -80,9 +85,9 @@ describe("recommendation-engine", () => {
     });
 
     it("should generate recommendations for Pro users with data", async () => {
-      const { tierService } = await import("@/lib/tier/tier-service");
+      const { tierService } = await import("@/lib/tier/server");
       const { prisma } = await import("@/lib/db");
-      const { chatCompletion } = await import("@/lib/ai/providers");
+      const { chatCompletion } = await import("@/lib/ai/server");
 
       vi.mocked(tierService.getEffectiveTier).mockResolvedValue({
         id: "tier-pro",

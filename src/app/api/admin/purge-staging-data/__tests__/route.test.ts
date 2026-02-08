@@ -10,13 +10,17 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: vi.fn().mockResolvedValue({
-    authenticated: true,
-    isAdmin: true,
-    userId: "admin-1",
-  }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    }),
+  };
+});
 
 // Create a mock transaction object that mirrors prisma structure
 const mockTx = {
@@ -127,9 +131,13 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    requireCSRF: vi.fn().mockReturnValue(true),
+  };
+});
 
 import { GET, DELETE } from "../route";
 
@@ -164,7 +172,7 @@ describe("admin purge-staging-data API", () => {
     });
 
     it("returns 401 if not authenticated", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: false,
         isAdmin: false,
@@ -183,7 +191,7 @@ describe("admin purge-staging-data API", () => {
     });
 
     it("returns 403 if not admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: true,
         isAdmin: false,
@@ -235,7 +243,7 @@ describe("admin purge-staging-data API", () => {
     });
 
     it("returns 401 if not authenticated", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: false,
         isAdmin: false,
@@ -254,7 +262,7 @@ describe("admin purge-staging-data API", () => {
     });
 
     it("returns 403 if not admin", async () => {
-      const { validateAdminAuth } = await import("@/lib/auth/session-auth");
+      const { validateAdminAuth } = await import("@/lib/auth/server");
       vi.mocked(validateAdminAuth).mockResolvedValueOnce({
         authenticated: true,
         isAdmin: false,

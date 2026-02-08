@@ -25,7 +25,7 @@ vi.mock("@/lib/db", () => ({
   prisma: mockPrisma,
 }));
 
-vi.mock("@/lib/auth/password");
+vi.mock("@/lib/auth/server");
 vi.mock("@/lib/logger", () => ({
   logger: {
     info: vi.fn(),

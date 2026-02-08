@@ -11,13 +11,17 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: vi.fn().mockResolvedValue({
-    authenticated: true,
-    userId: "admin-1",
-    isAdmin: true,
-  }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      userId: "admin-1",
+      isAdmin: true,
+    }),
+  };
+});
 
 vi.mock("@/lib/logger", () => ({
   logger: {

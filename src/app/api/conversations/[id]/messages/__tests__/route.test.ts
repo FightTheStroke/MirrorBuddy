@@ -48,16 +48,24 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    requireCSRF: vi.fn().mockReturnValue(true),
+  };
+});
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn().mockResolvedValue({
-    userId: "user-123",
-    authenticated: true,
-  }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn().mockResolvedValue({
+      userId: "user-123",
+      authenticated: true,
+    }),
+  };
+});
 
 import { prisma } from "@/lib/db";
 import { anonymizeConversationMessage } from "@/lib/privacy";

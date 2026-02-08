@@ -55,25 +55,30 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: mockChatCompletion,
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: mockChatCompletion,
+    getDeploymentForModel: vi.fn((model: string) => model),
+  };
+});
 
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getFeatureAIConfigForUser: vi.fn(() =>
-      Promise.resolve({
-        model: "gpt-4o",
-        temperature: 0.3,
-        maxTokens: 1500,
-      }),
-    ),
-  },
-}));
-
-vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
-  getDeploymentForModel: vi.fn((model: string) => model),
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getFeatureAIConfigForUser: vi.fn(() =>
+        Promise.resolve({
+          model: "gpt-4o",
+          temperature: 0.3,
+          maxTokens: 1500,
+        }),
+      ),
+    },
+  };
+});
 
 import {
   isLatex,

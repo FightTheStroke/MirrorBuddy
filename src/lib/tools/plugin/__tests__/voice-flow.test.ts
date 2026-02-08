@@ -14,14 +14,18 @@ import type { ToolResult } from "@/types/tools";
 import { z } from "zod";
 
 // Mock AI providers to prevent real API calls during tests
-vi.mock("@/lib/ai/providers", () => ({
-  chatCompletion: vi.fn().mockResolvedValue({
-    content: JSON.stringify({ topic: "test", questionCount: 5 }),
-    provider: "azure",
-    model: "gpt-4o-mini",
-    usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
-  }),
-}));
+vi.mock("@/lib/ai/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/ai/server")>();
+  return {
+    ...actual,
+    chatCompletion: vi.fn().mockResolvedValue({
+      content: JSON.stringify({ topic: "test", questionCount: 5 }),
+      provider: "azure",
+      model: "gpt-4o-mini",
+      usage: { prompt_tokens: 100, completion_tokens: 50, total_tokens: 150 },
+    }),
+  };
+});
 
 // Mock ToolResult for successful execution
 const createMockResult = (

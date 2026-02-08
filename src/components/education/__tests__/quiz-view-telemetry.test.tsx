@@ -49,9 +49,10 @@ vi.mock("@/lib/hooks/use-saved-materials", () => ({
 }));
 
 // Mock CSRF
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: vi.fn().mockResolvedValue({ ok: true }),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return { ...actual, csrfFetch: vi.fn().mockResolvedValue({ ok: true }) };
+});
 
 // Mock framer-motion
 vi.mock("framer-motion", () => ({

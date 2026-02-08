@@ -8,18 +8,24 @@ import { describe, it, expect, vi } from "vitest";
 import { createPIIMiddleware, PII_FIELD_MAP } from "../pii-middleware";
 
 // Mock the encryption module
-vi.mock("@/lib/security/pii-encryption", () => ({
-  encryptPII: vi.fn((text: string) =>
-    Promise.resolve(`pii:v1:encrypted_${text}`),
-  ),
-  decryptPII: vi.fn((text: string) =>
-    Promise.resolve(
-      text.startsWith("pii:v1:") ? text.replace("pii:v1:encrypted_", "") : text,
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    encryptPII: vi.fn((text: string) =>
+      Promise.resolve(`pii:v1:encrypted_${text}`),
     ),
-  ),
-  hashPII: vi.fn((text: string) => Promise.resolve(`hash_${text}`)),
-  isPIIEncryptionConfigured: vi.fn(() => true),
-}));
+    decryptPII: vi.fn((text: string) =>
+      Promise.resolve(
+        text.startsWith("pii:v1:")
+          ? text.replace("pii:v1:encrypted_", "")
+          : text,
+      ),
+    ),
+    hashPII: vi.fn((text: string) => Promise.resolve(`hash_${text}`)),
+    isPIIEncryptionConfigured: vi.fn(() => true),
+  };
+});
 
 describe("PII Middleware Configuration", () => {
   it("exports createPIIMiddleware function", () => {

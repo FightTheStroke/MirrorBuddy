@@ -21,19 +21,27 @@ vi.mock("@/lib/db", () => ({
   isDatabaseNotInitialized: vi.fn(() => false),
 }));
 
-vi.mock("@/lib/tier/registration-helper", () => ({
-  assignBaseTierToNewUser: (userId: string) =>
-    mockAssignBaseTierToNewUser(userId),
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    assignBaseTierToNewUser: (userId: string) =>
+      mockAssignBaseTierToNewUser(userId),
+  };
+});
 
 // Mock dependencies
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn(),
-}));
-
-vi.mock("@/lib/auth/cookie-signing", () => ({
-  signCookieValue: vi.fn(() => ({ signed: "signed-value", raw: "raw-value" })),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn(),
+    signCookieValue: vi.fn(() => ({
+      signed: "signed-value",
+      raw: "raw-value",
+    })),
+  };
+});
 
 vi.mock("next/headers", () => ({
   cookies: vi.fn(() =>
@@ -68,7 +76,7 @@ describe("GET /api/user - Base tier assignment on registration", () => {
   });
 
   it("should create UserSubscription with Base tier when new user registers", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,
@@ -101,7 +109,7 @@ describe("GET /api/user - Base tier assignment on registration", () => {
   });
 
   it("should not create duplicate subscription if user already has one", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
 
     const mockUser = {
       id: "user-existing",
@@ -128,7 +136,7 @@ describe("GET /api/user - Base tier assignment on registration", () => {
   });
 
   it("should handle missing Base tier gracefully", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,

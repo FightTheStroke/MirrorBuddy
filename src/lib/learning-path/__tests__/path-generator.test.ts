@@ -50,9 +50,6 @@ vi.mock("@/lib/tier/server", async (importOriginal) => {
 });
 
 // Mock deployment mapping
-vi.mock("@/lib/ai/providers/deployment-mapping", () => ({
-  getDeploymentForModel: vi.fn((model: string) => model),
-}));
 
 // Mock prisma
 vi.mock("@/lib/db", () => ({

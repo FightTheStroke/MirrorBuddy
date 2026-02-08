@@ -38,10 +38,16 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/auth/cookie-signing", () => ({
-  isSignedCookie: vi.fn(),
-  verifyCookieValue: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn(),
+    validateSessionOwnership: vi.fn(),
+    isSignedCookie: vi.fn(),
+    verifyCookieValue: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/realtime/tool-events", () => ({
   registerClient: vi.fn(),
@@ -53,17 +59,15 @@ vi.mock("@/lib/realtime/tool-events", () => ({
 }));
 
 import { prisma } from "@/lib/db";
-import { isSignedCookie, verifyCookieValue } from "@/lib/auth/server";
+import { validateAuth, validateSessionOwnership } from "@/lib/auth/server";
 
-const mockPrismaUser = prisma.user.findUnique as ReturnType<typeof vi.fn>;
-const mockPrismaConversation = prisma.conversation.findFirst as ReturnType<
-  typeof vi.fn
->;
 const mockPrismaTrial = prisma.trialSession.findFirst as ReturnType<
   typeof vi.fn
 >;
-const mockSignedCookie = isSignedCookie as ReturnType<typeof vi.fn>;
-const mockVerifyCookie = verifyCookieValue as ReturnType<typeof vi.fn>;
+const mockValidateAuth = validateAuth as ReturnType<typeof vi.fn>;
+const mockValidateSessionOwnership = validateSessionOwnership as ReturnType<
+  typeof vi.fn
+>;
 
 describe("GET /api/tools/stream", () => {
   beforeEach(() => {
@@ -92,7 +96,10 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("returns 401 for unauthenticated user with no trial session", async () => {
-    mockSignedCookie.mockReturnValue(false);
+    mockValidateAuth.mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
 
     const req = new NextRequest(
       "http://localhost:3000/api/tools/stream?sessionId=valid-session-123",
@@ -105,13 +112,11 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("returns 403 for authenticated user accessing another user's session", async () => {
-    mockCookies.get.mockImplementation((name: string) =>
-      name === "mirrorbuddy-user-id" ? { value: "s:user-123.sig" } : undefined,
-    );
-    mockSignedCookie.mockReturnValue(true);
-    mockVerifyCookie.mockReturnValue({ valid: true, value: "user-123" });
-    mockPrismaUser.mockResolvedValue({ id: "user-123" });
-    mockPrismaConversation.mockResolvedValue(null);
+    mockValidateAuth.mockResolvedValue({
+      authenticated: true,
+      userId: "user-123",
+    });
+    mockValidateSessionOwnership.mockResolvedValue(false);
 
     const req = new NextRequest(
       "http://localhost:3000/api/tools/stream?sessionId=other-user-session",
@@ -124,10 +129,13 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("returns 403 for trial user accessing another trial user's session", async () => {
+    mockValidateAuth.mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
     mockCookies.get.mockImplementation((name: string) =>
       name === "mirrorbuddy-visitor-id" ? { value: "visitor-123" } : undefined,
     );
-    mockSignedCookie.mockReturnValue(false);
     mockPrismaTrial.mockResolvedValue(null);
 
     const req = new NextRequest(
@@ -141,13 +149,11 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("allows authenticated user to connect to their own session", async () => {
-    mockCookies.get.mockImplementation((name: string) =>
-      name === "mirrorbuddy-user-id" ? { value: "s:user-123.sig" } : undefined,
-    );
-    mockSignedCookie.mockReturnValue(true);
-    mockVerifyCookie.mockReturnValue({ valid: true, value: "user-123" });
-    mockPrismaUser.mockResolvedValue({ id: "user-123" });
-    mockPrismaConversation.mockResolvedValue({ id: "session-abc" });
+    mockValidateAuth.mockResolvedValue({
+      authenticated: true,
+      userId: "user-123",
+    });
+    mockValidateSessionOwnership.mockResolvedValue(true);
 
     const req = new NextRequest(
       "http://localhost:3000/api/tools/stream?sessionId=session-abc",
@@ -159,10 +165,13 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("allows trial user to connect to their own trial session", async () => {
+    mockValidateAuth.mockResolvedValue({
+      authenticated: false,
+      userId: null,
+    });
     mockCookies.get.mockImplementation((name: string) =>
       name === "mirrorbuddy-visitor-id" ? { value: "visitor-123" } : undefined,
     );
-    mockSignedCookie.mockReturnValue(false);
     mockPrismaTrial.mockResolvedValue({
       id: "trial-session-xyz",
       visitorId: "visitor-123",
@@ -178,12 +187,11 @@ describe("GET /api/tools/stream", () => {
   });
 
   it("allows authenticated user to connect to voice session", async () => {
-    mockCookies.get.mockImplementation((name: string) =>
-      name === "mirrorbuddy-user-id" ? { value: "s:user-123.sig" } : undefined,
-    );
-    mockSignedCookie.mockReturnValue(true);
-    mockVerifyCookie.mockReturnValue({ valid: true, value: "user-123" });
-    mockPrismaUser.mockResolvedValue({ id: "user-123" });
+    mockValidateAuth.mockResolvedValue({
+      authenticated: true,
+      userId: "user-123",
+    });
+    mockValidateSessionOwnership.mockResolvedValue(true);
 
     const req = new NextRequest(
       "http://localhost:3000/api/tools/stream?sessionId=voice-galileo-1234567890",
@@ -192,6 +200,5 @@ describe("GET /api/tools/stream", () => {
 
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toBe("text/event-stream");
-    expect(mockPrismaConversation).not.toHaveBeenCalled();
   });
 });

@@ -6,9 +6,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock csrfFetch before importing the module
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 // Mock logger
 vi.mock("@/lib/logger", () => ({

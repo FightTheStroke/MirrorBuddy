@@ -19,9 +19,10 @@ export const mockLocaleConfigDelete = prisma.localeConfig
 export const mockValidateAdminAuth = vi.fn();
 
 // Mock dependencies
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: () => mockValidateAdminAuth(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return { ...actual, validateAdminAuth: () => mockValidateAdminAuth() };
+});
 
 vi.mock("@/lib/db", () => ({
   prisma: {

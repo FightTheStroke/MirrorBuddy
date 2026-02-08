@@ -26,7 +26,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock dependencies
-vi.mock("@/lib/auth/session-auth");
+vi.mock("@/lib/auth/server");
 vi.mock("@/lib/db", () => ({
   prisma: {
     user: {
@@ -44,9 +44,10 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return { ...actual, requireCSRF: vi.fn().mockReturnValue(true) };
+});
 
 describe("POST /api/admin/users/bulk/tier", () => {
   beforeEach(() => {

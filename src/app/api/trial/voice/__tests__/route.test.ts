@@ -18,13 +18,21 @@ vi.mock("next/headers", () => ({
   headers: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn(),
+  };
+});
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn(),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    requireCSRF: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/trial/trial-service", () => ({
   getOrCreateTrialSession: vi.fn(),

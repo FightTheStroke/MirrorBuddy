@@ -34,14 +34,18 @@ vi.mock("@/lib/email/stats-service", () => ({
   getOpenTimeline: (...args: unknown[]) => mockGetOpenTimeline(...args),
 }));
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: () =>
-    Promise.resolve({
-      authenticated: true,
-      userId: "admin-user-123",
-      isAdmin: true,
-    }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: () =>
+      Promise.resolve({
+        authenticated: true,
+        userId: "admin-user-123",
+        isAdmin: true,
+      }),
+  };
+});
 
 describe("GET /api/admin/email-stats/[campaignId]", () => {
   beforeEach(() => {

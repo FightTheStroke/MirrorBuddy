@@ -9,9 +9,10 @@ import userEvent from "@testing-library/user-event";
 import { SchoolsContactForm } from "../schools-form";
 
 // Mock csrfFetch
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: vi.fn(),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return { ...actual, csrfFetch: vi.fn() };
+});
 
 // Mock next-intl - return the key if translation not found
 const mockTranslations: Record<string, string> = {

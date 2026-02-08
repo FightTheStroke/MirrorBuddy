@@ -34,13 +34,17 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock tier service (ADR 0073)
-vi.mock("@/lib/tier/tier-service", () => ({
-  tierService: {
-    getFeatureAIConfigForUser: vi.fn(() =>
-      Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 1500 }),
-    ),
-  },
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    tierService: {
+      getFeatureAIConfigForUser: vi.fn(() =>
+        Promise.resolve({ model: "gpt-4o", temperature: 0.7, maxTokens: 1500 }),
+      ),
+    },
+  };
+});
 
 // Mock deployment mapping
 vi.mock("../providers/deployment-mapping", () => ({

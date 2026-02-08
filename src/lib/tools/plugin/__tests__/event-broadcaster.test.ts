@@ -32,9 +32,13 @@ vi.mock("@/lib/logger", () => ({
 
 // Mock csrfFetch for SSE fallback (the code uses csrfFetch, not raw fetch)
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 describe("ToolEventBroadcaster", () => {
   let mockSender: ToolDataChannelSender;

@@ -27,17 +27,22 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 // Mock auth and CSRF
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: vi.fn().mockResolvedValue({
-    authenticated: true,
-    isAdmin: true,
-    userId: "admin-123",
-  }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-123",
+    }),
+  };
+});
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return { ...actual, requireCSRF: vi.fn().mockReturnValue(true) };
+});
 
 const { mockListCampaigns, mockCreateCampaign, mockLogAdminAction } =
   vi.hoisted(() => ({

@@ -30,9 +30,10 @@ vi.mock("@/lib/rate-limit", () => ({
   RATE_LIMITS: { CONTACT_FORM: { maxRequests: 5, windowMs: 3600000 } },
 }));
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return { ...actual, requireCSRF: vi.fn().mockReturnValue(true) };
+});
 
 const mockPrisma = prisma as unknown as {
   contactRequest: { create: ReturnType<typeof vi.fn> };

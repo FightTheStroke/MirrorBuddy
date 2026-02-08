@@ -10,9 +10,13 @@ import { NextRequest } from "next/server";
 import { GET } from "../route";
 
 // Mock the auth module
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAuth: vi.fn(),
+  };
+});
 
 // Mock the helpers
 vi.mock("../helpers", async (importOriginal) => {
@@ -42,7 +46,7 @@ describe("GDPR Data Export API", () => {
   });
 
   it("should return 401 if user is not authenticated", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     vi.mocked(validateAuth).mockResolvedValue({
       authenticated: false,
       userId: null,
@@ -63,7 +67,7 @@ describe("GDPR Data Export API", () => {
   });
 
   it("should return 429 if user has exported recently (rate limit)", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     const { canUserExport } = await import("../helpers");
 
     vi.mocked(validateAuth).mockResolvedValue({
@@ -87,7 +91,7 @@ describe("GDPR Data Export API", () => {
   });
 
   it("should export user data successfully", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     const { canUserExport, exportUserData, getExportStats, logExportAudit } =
       await import("../helpers");
 
@@ -162,7 +166,7 @@ describe("GDPR Data Export API", () => {
   });
 
   it("should include download headers in response", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     const { canUserExport, exportUserData, getExportStats, logExportAudit } =
       await import("../helpers");
 
@@ -200,7 +204,7 @@ describe("GDPR Data Export API", () => {
   });
 
   it("should return 500 on database errors", async () => {
-    const { validateAuth } = await import("@/lib/auth/session-auth");
+    const { validateAuth } = await import("@/lib/auth/server");
     const { canUserExport } = await import("../helpers");
 
     vi.mocked(validateAuth).mockResolvedValue({

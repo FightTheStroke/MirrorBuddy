@@ -35,7 +35,7 @@ vi.mock("@/lib/logger", () => ({
 }));
 
 import { generatePrivacyAwareEmbedding, searchSimilar } from "@/lib/rag/server";
-import type { VectorSearchResult } from "@/lib/rag/vector-store";
+import type { VectorSearchResult } from "@/lib/rag/server";
 
 describe("searchRelevantSummaries", () => {
   const mockUserId = "user-123";

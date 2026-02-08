@@ -20,9 +20,13 @@ vi.mock("@/lib/db", () => ({
 }));
 
 // Mock auth middleware
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/logger", () => ({
   logger: {

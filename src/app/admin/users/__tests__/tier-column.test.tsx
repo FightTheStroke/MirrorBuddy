@@ -7,9 +7,13 @@ import { render, screen } from "@testing-library/react";
 import { UsersTable } from "../users-table";
 
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),

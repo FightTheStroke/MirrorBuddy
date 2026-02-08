@@ -10,17 +10,25 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAdminAuth: vi.fn().mockResolvedValue({
-    authenticated: true,
-    isAdmin: true,
-    userId: "admin-1",
-  }),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    validateAdminAuth: vi.fn().mockResolvedValue({
+      authenticated: true,
+      isAdmin: true,
+      userId: "admin-1",
+    }),
+  };
+});
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    requireCSRF: vi.fn().mockReturnValue(true),
+  };
+});
 
 const restoreUserFromBackup = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/lib/admin/user-trash-service", () => ({

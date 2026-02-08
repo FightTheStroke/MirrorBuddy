@@ -27,9 +27,10 @@ vi.mock("next-intl", () => ({
 }));
 
 // Mock auth validation
-vi.mock("@/lib/auth/session-auth", () => ({
-  validateAuth: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return { ...actual, validateAuth: vi.fn() };
+});
 
 // Mock ParentDashboard component
 vi.mock("@/components/profile/parent-dashboard", () => ({
@@ -48,7 +49,7 @@ describe("Parent Dashboard Page", () => {
 
   describe("Authentication", () => {
     it("redirects to login if user is not authenticated", async () => {
-      const { validateAuth } = await import("@/lib/auth/session-auth");
+      const { validateAuth } = await import("@/lib/auth/server");
       vi.mocked(validateAuth).mockResolvedValue({
         authenticated: false,
         userId: null,

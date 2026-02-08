@@ -93,9 +93,13 @@ vi.mock("@/lib/logger", () => ({
   },
 }));
 
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: vi.fn(() => Promise.resolve({ ok: true, json: () => ({}) })),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: vi.fn(() => Promise.resolve({ ok: true, json: () => ({}) })),
+  };
+});
 
 // Mock child components
 vi.mock("../character-avatar", () => ({

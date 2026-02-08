@@ -26,18 +26,22 @@ vi.mock("@/lib/db", () => ({
 }));
 
 // Mock TierService to avoid actual DB calls
-vi.mock("@/lib/tier/tier-service", () => ({
-  TierService: vi.fn().mockImplementation(function MockTierService() {
-    return {
-      getLimitsForUser: vi.fn().mockResolvedValue({
-        dailyMessages: 10,
-        dailyVoiceMinutes: 5,
-        dailyTools: 10,
-        maxDocuments: 1,
-      }),
-    };
-  }),
-}));
+vi.mock("@/lib/tier/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/tier/server")>();
+  return {
+    ...actual,
+    TierService: vi.fn().mockImplementation(function MockTierService() {
+      return {
+        getLimitsForUser: vi.fn().mockResolvedValue({
+          dailyMessages: 10,
+          dailyVoiceMinutes: 5,
+          dailyTools: 10,
+          maxDocuments: 1,
+        }),
+      };
+    }),
+  };
+});
 
 import { prisma } from "@/lib/db";
 import {

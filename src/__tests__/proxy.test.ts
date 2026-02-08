@@ -26,10 +26,14 @@ vi.mock("@/i18n/routing", () => ({
   },
 }));
 
-vi.mock("@/lib/security/csp-nonce", () => ({
-  generateNonce: vi.fn(() => "test-nonce"),
-  CSP_NONCE_HEADER: "x-csp-nonce",
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return {
+    ...actual,
+    generateNonce: vi.fn(() => "test-nonce"),
+    CSP_NONCE_HEADER: "x-csp-nonce",
+  };
+});
 
 vi.mock("@/lib/observability/metrics-store", () => ({
   metricsStore: {
@@ -38,10 +42,14 @@ vi.mock("@/lib/observability/metrics-store", () => ({
   },
 }));
 
-vi.mock("@/lib/auth/cookie-constants", () => ({
-  AUTH_COOKIE_NAME: "mirrorbuddy-user-id",
-  VISITOR_COOKIE_NAME: "mirrorbuddy-visitor-id",
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    AUTH_COOKIE_NAME: "mirrorbuddy-user-id",
+    VISITOR_COOKIE_NAME: "mirrorbuddy-visitor-id",
+  };
+});
 
 // We'll need to export buildCSPHeader from proxy.ts for testing
 import { buildCSPHeader } from "../proxy";

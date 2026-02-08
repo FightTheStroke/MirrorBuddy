@@ -2,22 +2,26 @@
  * Unit tests for robust-sync utility (F-14)
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 // Mock csrfFetch before importing the module
 const mockCsrfFetch = vi.fn();
-vi.mock('@/lib/auth/csrf-client', () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 import {
   fetchWithBackoff,
   syncWithETag,
   loadWithETag,
   initialSyncState,
-} from '../robust-sync';
+} from "../robust-sync";
 
-describe('fetchWithBackoff', () => {
+describe("fetchWithBackoff", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     mockCsrfFetch.mockReset();
@@ -28,24 +32,27 @@ describe('fetchWithBackoff', () => {
     vi.restoreAllMocks();
   });
 
-  it('returns success result on 200 response', async () => {
+  it("returns success result on 200 response", async () => {
     const mockResponse = {
       ok: true,
       status: 200,
-      headers: new Headers({ 'etag': '"abc123"', 'content-type': 'application/json' }),
-      json: vi.fn().mockResolvedValue({ test: 'data' }),
+      headers: new Headers({
+        etag: '"abc123"',
+        "content-type": "application/json",
+      }),
+      json: vi.fn().mockResolvedValue({ test: "data" }),
     };
     mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
-    const result = await fetchWithBackoff('/api/test', { method: 'GET' });
+    const result = await fetchWithBackoff("/api/test", { method: "GET" });
 
     expect(result.success).toBe(true);
     expect(result.status).toBe(200);
     expect(result.etag).toBe('"abc123"');
-    expect(result.data).toEqual({ test: 'data' });
+    expect(result.data).toEqual({ test: "data" });
   });
 
-  it('returns conflict on 412 response', async () => {
+  it("returns conflict on 412 response", async () => {
     const mockResponse = {
       ok: false,
       status: 412,
@@ -53,30 +60,30 @@ describe('fetchWithBackoff', () => {
     };
     mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
-    const result = await fetchWithBackoff('/api/test', { method: 'PUT' });
+    const result = await fetchWithBackoff("/api/test", { method: "PUT" });
 
     expect(result.success).toBe(false);
     expect(result.status).toBe(412);
     expect(result.conflict).toBe(true);
   });
 
-  it('does not retry on 4xx errors (except 429)', async () => {
+  it("does not retry on 4xx errors (except 429)", async () => {
     const mockResponse = {
       ok: false,
       status: 400,
       headers: new Headers(),
-      text: vi.fn().mockResolvedValue('Bad Request'),
+      text: vi.fn().mockResolvedValue("Bad Request"),
     };
     mockCsrfFetch.mockResolvedValue(mockResponse);
 
-    const result = await fetchWithBackoff('/api/test', { method: 'GET' });
+    const result = await fetchWithBackoff("/api/test", { method: "GET" });
 
     expect(result.success).toBe(false);
     expect(result.status).toBe(400);
     expect(mockCsrfFetch).toHaveBeenCalledTimes(1); // No retries
   });
 
-  it('retries on 500 errors with exponential backoff', async () => {
+  it("retries on 500 errors with exponential backoff", async () => {
     const mockErrorResponse = {
       ok: false,
       status: 500,
@@ -85,7 +92,7 @@ describe('fetchWithBackoff', () => {
     const mockSuccessResponse = {
       ok: true,
       status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
+      headers: new Headers({ "content-type": "application/json" }),
       json: vi.fn().mockResolvedValue({ success: true }),
     };
 
@@ -93,7 +100,11 @@ describe('fetchWithBackoff', () => {
       .mockResolvedValueOnce(mockErrorResponse)
       .mockResolvedValueOnce(mockSuccessResponse);
 
-    const resultPromise = fetchWithBackoff('/api/test', { method: 'GET' }, { maxRetries: 3 });
+    const resultPromise = fetchWithBackoff(
+      "/api/test",
+      { method: "GET" },
+      { maxRetries: 3 },
+    );
 
     // Fast-forward through backoff delay
     await vi.runAllTimersAsync();
@@ -105,7 +116,7 @@ describe('fetchWithBackoff', () => {
   });
 });
 
-describe('syncWithETag', () => {
+describe("syncWithETag", () => {
   beforeEach(() => {
     mockCsrfFetch.mockReset();
   });
@@ -114,45 +125,49 @@ describe('syncWithETag', () => {
     vi.restoreAllMocks();
   });
 
-  it('adds If-Match header when etag is provided', async () => {
+  it("adds If-Match header when etag is provided", async () => {
     const mockResponse = {
       ok: true,
       status: 200,
-      headers: new Headers({ 'etag': '"newetag"', 'content-type': 'application/json' }),
+      headers: new Headers({
+        etag: '"newetag"',
+        "content-type": "application/json",
+      }),
       json: vi.fn().mockResolvedValue({ updated: true }),
     };
     mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
-    await syncWithETag('/api/test', { data: 'test' }, { etag: '"oldetag"' });
+    await syncWithETag("/api/test", { data: "test" }, { etag: '"oldetag"' });
 
     expect(mockCsrfFetch).toHaveBeenCalledWith(
-      '/api/test',
+      "/api/test",
       expect.objectContaining({
-        method: 'PUT',
+        method: "PUT",
         headers: expect.objectContaining({
-          'If-Match': '"oldetag"',
+          "If-Match": '"oldetag"',
         }),
-      })
+      }),
     );
   });
 
-  it('does not add If-Match header when etag is empty', async () => {
+  it("does not add If-Match header when etag is empty", async () => {
     const mockResponse = {
       ok: true,
       status: 200,
-      headers: new Headers({ 'content-type': 'application/json' }),
+      headers: new Headers({ "content-type": "application/json" }),
       json: vi.fn().mockResolvedValue({ updated: true }),
     };
     mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
-    await syncWithETag('/api/test', { data: 'test' });
+    await syncWithETag("/api/test", { data: "test" });
 
-    const calledHeaders = (mockCsrfFetch.mock.calls[0][1] as RequestInit).headers as Record<string, string>;
-    expect(calledHeaders['If-Match']).toBeUndefined();
+    const calledHeaders = (mockCsrfFetch.mock.calls[0][1] as RequestInit)
+      .headers as Record<string, string>;
+    expect(calledHeaders["If-Match"]).toBeUndefined();
   });
 });
 
-describe('loadWithETag', () => {
+describe("loadWithETag", () => {
   beforeEach(() => {
     mockCsrfFetch.mockReset();
   });
@@ -161,16 +176,19 @@ describe('loadWithETag', () => {
     vi.restoreAllMocks();
   });
 
-  it('extracts ETag from response headers', async () => {
+  it("extracts ETag from response headers", async () => {
     const mockResponse = {
       ok: true,
       status: 200,
-      headers: new Headers({ 'etag': '"version123"', 'content-type': 'application/json' }),
+      headers: new Headers({
+        etag: '"version123"',
+        "content-type": "application/json",
+      }),
       json: vi.fn().mockResolvedValue({ id: 1 }),
     };
     mockCsrfFetch.mockResolvedValueOnce(mockResponse);
 
-    const result = await loadWithETag('/api/test');
+    const result = await loadWithETag("/api/test");
 
     expect(result.success).toBe(true);
     expect(result.etag).toBe('"version123"');
@@ -178,8 +196,8 @@ describe('loadWithETag', () => {
   });
 });
 
-describe('initialSyncState', () => {
-  it('has correct default values', () => {
+describe("initialSyncState", () => {
+  it("has correct default values", () => {
     expect(initialSyncState).toEqual({
       etag: null,
       lastSyncedAt: null,

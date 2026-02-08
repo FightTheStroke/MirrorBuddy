@@ -26,13 +26,14 @@ vi.mock("@/lib/db", () => ({
   },
 }));
 
-vi.mock("@/lib/auth/password", () => ({
-  verifyPassword: vi.fn(),
-}));
-
-vi.mock("@/lib/auth/cookie-signing", () => ({
-  signCookieValue: vi.fn(),
-}));
+vi.mock("@/lib/auth/server", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth/server")>();
+  return {
+    ...actual,
+    verifyPassword: vi.fn(),
+    signCookieValue: vi.fn(),
+  };
+});
 
 vi.mock("@/lib/rate-limit", () => ({
   checkRateLimitAsync: vi.fn().mockResolvedValue({ success: true }),
@@ -61,9 +62,10 @@ vi.mock("@sentry/nextjs", () => ({
   captureException: vi.fn(),
 }));
 
-vi.mock("@/lib/security/csrf", () => ({
-  requireCSRF: vi.fn().mockReturnValue(true),
-}));
+vi.mock("@/lib/security", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/security")>();
+  return { ...actual, requireCSRF: vi.fn().mockReturnValue(true) };
+});
 
 import { prisma } from "@/lib/db";
 import { verifyPassword } from "@/lib/auth/server";

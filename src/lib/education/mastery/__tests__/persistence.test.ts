@@ -30,9 +30,13 @@ vi.mock("@/lib/logger", () => ({
 
 // Mock csrfFetch - used for mutations (PUT/POST/DELETE)
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 const createProgress = (overrides: Partial<TopicProgress>): TopicProgress => ({
   topicId: "test-topic",

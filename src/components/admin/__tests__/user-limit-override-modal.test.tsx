@@ -7,9 +7,13 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import { UserLimitOverrideModal } from "../user-limit-override-modal";
 
 const mockCsrfFetch = vi.fn();
-vi.mock("@/lib/auth/csrf-client", () => ({
-  csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
-}));
+vi.mock("@/lib/auth", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("@/lib/auth")>();
+  return {
+    ...actual,
+    csrfFetch: (...args: unknown[]) => mockCsrfFetch(...args),
+  };
+});
 
 vi.mock("@/components/ui/toast", () => ({
   toast: {
