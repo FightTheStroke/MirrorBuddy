@@ -1,0 +1,23 @@
+# Build output
+.next/
+out/
+build/
+coverage/
+
+# Generated files
+prisma/generated/
+next-env.d.ts
+playwright-report/
+test-results/
+
+# Package manager
+node_modules/
+package-lock.json
+
+# Git worktrees
+feat/
+feature/
+
+# Misc
+*.min.js
+*.min.css

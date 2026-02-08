@@ -192,6 +192,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-formatter-compact": "^9.0.1",
     "eslint-plugin-security": "^3.0.1",
     "husky": "^9.1.7",

@@ -26,6 +26,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 cd "$PROJECT_DIR"
 
+# Build lock: prevents parallel next build conflicts across agents/terminals
+# shellcheck source=lib/build-lock.sh
+source "$SCRIPT_DIR/lib/build-lock.sh"
+
 MODE="${1:---default}"
 ERRORS=0
 WARNINGS=0
@@ -115,6 +119,7 @@ run_typecheck() {
 }
 
 run_build() {
+	acquire_build_lock
 	local tmp
 	tmp=$(mktemp)
 	if npm run build >"$tmp" 2>&1; then
@@ -138,6 +143,7 @@ run_build() {
 		result_details "$d"
 	fi
 	rm -f "$tmp"
+	release_build_lock
 }
 
 run_unit() {

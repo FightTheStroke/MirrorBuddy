@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+set -o pipefail
+
 # === CRITICAL GATES: Typecheck + Unit Tests ===
 # These MUST pass before pushing. Catches broken imports, type errors, and test failures
 # that would otherwise only be caught on CI (wasting time and blocking deploys).
@@ -11,7 +14,7 @@ npm run typecheck || {
 
 echo "Running unit tests..."
 npm run test:unit -- --reporter=dot 2>&1 | tail -5
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
+if [ $? -ne 0 ]; then
   echo "Unit tests failed. Fix failing tests before pushing."
   echo "  Run: npm run test:unit"
   exit 1

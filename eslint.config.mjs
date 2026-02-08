@@ -1,6 +1,7 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import prettierConfig from "eslint-config-prettier";
 import security from "eslint-plugin-security";
 import jsxA11y from "eslint-plugin-jsx-a11y";
 import localRules from "./eslint-local-rules/index.js";
@@ -8,6 +9,8 @@ import localRules from "./eslint-local-rules/index.js";
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
+  // Disable ESLint rules that conflict with Prettier formatting
+  prettierConfig,
   // Security plugin - detect common security issues
   {
     plugins: {
@@ -278,6 +281,18 @@ const eslintConfig = defineConfig([
     ],
     rules: {
       "local-rules/no-hardcoded-italian": "error",
+    },
+  },
+  // i18n: Detect ALL hardcoded literal strings in JSX (language-agnostic)
+  // Complements no-hardcoded-italian (Italian-specific) with broader coverage
+  {
+    files: ["src/**/*.tsx"],
+    ignores: [
+      "src/**/*.test.tsx",
+      "src/**/__tests__/**",
+    ],
+    rules: {
+      "local-rules/no-literal-strings-in-jsx": "warn",
     },
   },
   // ADR 0083: Prevent next-intl hooks in files outside LocaleProvider context

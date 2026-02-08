@@ -15,6 +15,10 @@
 
 set -euo pipefail
 
+SCRIPT_DIR_PPV="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/build-lock.sh
+source "$SCRIPT_DIR_PPV/lib/build-lock.sh"
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -31,25 +35,6 @@ echo "=========================================="
 echo ""
 
 START_TIME=$(date +%s)
-
-# =============================================================================
-# PHASE 0: .next/lock GUARD
-# Prevents "Unable to acquire lock at .next/lock" when next dev/build is running
-# =============================================================================
-if [ -f ".next/lock" ]; then
-	# Check for active Next.js processes (build or dev)
-	NEXT_PIDS=$(pgrep -f 'next (build|dev)' 2>/dev/null || true)
-	if [ -n "$NEXT_PIDS" ]; then
-		echo -e "${RED}✗ Active Next.js process detected (PIDs: ${NEXT_PIDS//$'\n'/, })${NC}"
-		echo -e "${YELLOW}  .next/lock is held by a running next build or next dev.${NC}"
-		echo -e "${YELLOW}  Stop the process first:  kill ${NEXT_PIDS//$'\n'/ }${NC}"
-		echo -e "${YELLOW}  Or wait for it to finish, then push again.${NC}"
-		exit 1
-	else
-		echo -e "${YELLOW}⚠ Stale .next/lock found (no active Next.js process). Removing...${NC}"
-		rm -f ".next/lock"
-	fi
-fi
 
 # =============================================================================
 # PHASE 1/5: MIGRATION & PROXY CONSISTENCY
@@ -105,13 +90,17 @@ echo -e "${GREEN}✓ Prisma generated fresh${NC}"
 # =============================================================================
 echo -e "${BLUE}[3/5] Production build (fresh Prisma)...${NC}"
 
+acquire_build_lock
+
 # Disable Sentry wrapper locally (Sentry+Turbopack bug with Next.js 16)
 # Sentry works fine on Vercel where Turbopack behaves differently
 if ! DISABLE_SENTRY_BUILD=true npm run build >"$TEMP_DIR/build.log" 2>&1; then
+	release_build_lock
 	echo -e "${RED}✗ Build failed${NC}"
 	cat "$TEMP_DIR/build.log"
 	exit 1
 fi
+release_build_lock
 echo -e "${GREEN}✓ Build passed${NC}"
 
 # =============================================================================
