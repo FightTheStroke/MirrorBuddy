@@ -307,13 +307,39 @@
       "openSource": {
         "ariaLabel": "Open Source",
         "label": "Codice Aperto"
-      }
+      },
+      "ariaLabel": "Footer con informazioni legali e consenso cookie",
+      "legalLinksAriaLabel": "Link legali"
     },
     "principles": {
       "howItWorks": "Come funziona?",
       "howItWorksDesc": "Ogni Professore è esperto nella sua materia. Quando hai bisogno di aiuto con matematica, chiedi a Euclide. Per l'inglese, c'è Shakespeare! Io ti aiuterò a scegliere il Professore giusto per ogni situazione.",
       "welcomeToSchool": "Benvenuto nella Scuola Che Vorrei, {name}!",
-      "whatMakesUsSpecial": "Ecco cosa ci rende speciali"
+      "whatMakesUsSpecial": "Ecco cosa ci rende speciali",
+      "items": {
+        "learnYourWay": {
+          "title": "Impara a modo tuo",
+          "description": "Ognuno ha il suo modo di imparare. Qui rispettiamo il tuo ritmo e il tuo stile."
+        },
+        "maestriCount": {
+          "title": "26 Maestri al tuo fianco",
+          "description": "Da Leonardo a Marie Curie, i più grandi geni della storia ti spiegheranno ogni materia."
+        },
+        "neverAlone": {
+          "title": "Mai da solo",
+          "description": "Coach, compagni virtuali e strumenti pensati per te. Insieme si impara meglio!"
+        },
+        "funLearning": {
+          "title": "Divertiti imparando",
+          "description": "Quiz, flashcard, mappe mentali e XP da guadagnare. Studiare diventa un'avventura!"
+        }
+      },
+      "melissaQuote": "Ricorda, {name}: non esiste un modo sbagliato di imparare. Io sono qui per aiutarti a trovare il tuo!",
+      "melissaName": "— Melissa",
+      "backButton": "Indietro",
+      "nextButton": "Avanti",
+      "enableVoice": "Attiva voce",
+      "disableVoice": "Disattiva voce"
     },
     "ready": {
       "chooseProfessor": "Scegli un Professore",
@@ -324,7 +350,12 @@
       "earnXpDescription": "ogni lezione ti fa salire di livello!",
       "backButton": "Indietro",
       "startButton": "Iniziamo!",
-      "replayModeMessage": "Fine del tutorial. Clicca \"{action}\" per tornare all'app."
+      "replayModeMessage": "Fine del tutorial. Clicca \"{action}\" per tornare all'app.",
+      "perfectName": "Perfetto, {name}!",
+      "readyToStart": "Sei pronto per iniziare la tua avventura!",
+      "preparedForYou": "Ho preparato tutto per te! Ricorda:",
+      "enableVoice": "Attiva voce",
+      "disableVoice": "Disattiva voce"
     },
     "trialLimits": {
       "title": "Limiti della prova gratuita",
@@ -374,7 +405,30 @@
       "welcomeIntro": "Benvenuto nella Scuola Che Vorrei! Sono qui per aiutarti a studiare nel modo che funziona meglio per te.",
       "whatIsYourName": "Come ti chiami?",
       "years": "Anni",
-      "yourSupportTeacher": "La tua insegnante di sostegno"
+      "yourSupportTeacher": "La tua insegnante di sostegno",
+      "nameRequired": "Per favore, dimmi come ti chiami!",
+      "nameTooShort": "Il nome deve avere almeno 2 caratteri",
+      "nameCaptured": "Nome catturato",
+      "continueButton": "Continua",
+      "backButton": "Indietro",
+      "skipButton": "Salta",
+      "nextButton": "Avanti",
+      "ageQuestion": "Quanti anni hai?",
+      "schoolQuestion": "Che scuola fai?",
+      "replayModeInfo": "Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.",
+      "schoolYearsElementary": "6-10 anni",
+      "schoolYearsMiddle": "11-13 anni",
+      "schoolYearsHigh": "14-19 anni",
+      "differences": {
+        "dyslexia": "Dislessia",
+        "dyscalculia": "Discalculia",
+        "dysgraphia": "Disgrafia",
+        "adhd": "ADHD",
+        "autism": "Autismo",
+        "cerebralPalsy": "Paralisi Cerebrale",
+        "visualImpairment": "Difficoltà Visive",
+        "auditoryProcessing": "Difficoltà Uditive"
+      }
     },
     "onboarding": {
       "transcript": {
@@ -406,7 +460,10 @@
         "microphoneMuted": "Microfono disattivato",
         "speakWithMelissa": "Parla con Melissa",
         "speaking": "Sta parlando",
-        "you": "Tu"
+        "you": "Tu",
+        "checking": "Verifica...",
+        "fallbackTooltip": "Modalità Fallback: Azure non disponibile. Uso Web Speech API del browser per la voce.",
+        "azureTooltip": "Azure OpenAI Realtime API: Conversazione vocale bidirezionale in tempo reale con Melissa."
       },
       "ageYears": "anni"
     },
@@ -483,6 +540,75 @@
       "heading": "Studenti con DSA stanno imparando meglio",
       "tagline": "Le famiglie scelgono MirrorBuddy per supporto inclusivo e divertente",
       "testimonialPrompt": "Leggi le storie di successo dei nostri studenti"
+    },
+    "guides": {
+      "heading": "Incontra i tuoi",
+      "headingHighlight": "Compagni di Viaggio",
+      "subtitle": "Coach, Buddies e Maestri pronti ad aiutarti in ogni momento",
+      "teamTitle": "Un intero team al tuo servizio!",
+      "coachCount": "5 Coaches",
+      "coachDesc": "per il metodo di studio",
+      "buddyCount": "5 Buddies",
+      "buddyDesc": "per il supporto emotivo",
+      "maestriCount": "26 Maestri",
+      "maestriDesc": "esperti di materia",
+      "teaser": "Galileo, Darwin, Manzoni, Erodoto, Mozart, Socrate, Feynman e tanti altri ti aspettano!",
+      "categoryCoach": "Coach",
+      "categoryBuddy": "Buddy",
+      "categoryMaestro": "Maestro",
+      "items": {
+        "melissa": {
+          "role": "Learning Coach",
+          "description": "Ti guida nel tuo metodo di studio personalizzato"
+        },
+        "enea": {
+          "role": "Peer Buddy",
+          "description": "Compagno allegro che sa tirare su il morale"
+        },
+        "euclide": {
+          "role": "Maestro di Matematica",
+          "description": "Esperto di algebra, geometria e aritmetica"
+        },
+        "curie": {
+          "role": "Maestra di Chimica",
+          "description": "Pioniera della scienza, due premi Nobel!"
+        },
+        "leonardo": {
+          "role": "Maestro di Arte",
+          "description": "Genio del Rinascimento, artista e inventore"
+        },
+        "shakespeare": {
+          "role": "Maestro di Inglese",
+          "description": "Il più grande drammaturgo di tutti i tempi"
+        },
+        "feynman": {
+          "role": "Maestro di Fisica",
+          "description": "Premio Nobel, spiega la fisica con passione"
+        },
+        "erodoto": {
+          "role": "Maestro di Storia",
+          "description": "Il padre della storia, racconta il passato"
+        }
+      }
+    },
+    "maestriStep": {
+      "heading": "I tuoi Professori, {name}!",
+      "subtitle": "{count} grandi geni pronti ad aiutarti",
+      "scrollLeft": "Scorri a sinistra",
+      "scrollRight": "Scorri a destra",
+      "carouselLabel": "Carosello professori - usa le frecce per navigare",
+      "backButton": "Indietro",
+      "nextButton": "Avanti",
+      "enableVoice": "Attiva voce",
+      "disableVoice": "Disattiva voce",
+      "howItWorks": "Come funziona?",
+      "howItWorksDesc": "Ogni Professore è esperto nella sua materia. Quando hai bisogno di aiuto con matematica, chiedi a Euclide. Per l'inglese, c'è Shakespeare! Io ti aiuterò a scegliere il Professore giusto per ogni situazione."
+    },
+    "progressIndicator": {
+      "updatingProfile": "Aggiornamento profilo di {name}",
+      "welcomeTitle": "Benvenuto in MirrorBuddy",
+      "skipButton": "Salta",
+      "resetTooltip": "Ricomincia da capo (cancella tutti i dati)"
     },
     "rodariStory": {
       "sectionLabel": "La nostra ispirazione",

@@ -56,6 +56,16 @@ export function InfoStepForm({
   onContinue,
 }: InfoStepFormProps) {
   const t = useTranslations("welcome.welcomeForm");
+  const diffsMap = t.raw("differences") as Record<string, string>;
+
+  const getSchoolLabel = (id: string) => {
+    const map: Record<string, string> = {
+      elementare: t("schoolElementary"),
+      media: t("schoolMiddle"),
+      superiore: t("schoolHigh"),
+    };
+    return map[id] ?? id;
+  };
 
   return (
     <Card className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm border-0 shadow-2xl">
@@ -83,7 +93,7 @@ export function InfoStepForm({
           <button
             onClick={onMuteToggle}
             className="p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors"
-            aria-label={isVoiceMuted ? "Attiva voce" : "Disattiva voce"}
+            aria-label={isVoiceMuted ? t("enableVoice") : t("disableVoice")}
           >
             {isVoiceMuted ? (
               <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
@@ -110,7 +120,7 @@ export function InfoStepForm({
             className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             <User className="w-4 h-4" />
-            Quanti anni hai?
+            {t("ageQuestion")}
           </div>
           <div
             className="flex gap-2 flex-wrap"
@@ -146,7 +156,7 @@ export function InfoStepForm({
             className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-300"
           >
             <GraduationCap className="w-4 h-4" />
-            Che scuola fai?
+            {t("schoolQuestion")}
           </div>
           <div
             className="grid grid-cols-3 gap-3"
@@ -165,10 +175,10 @@ export function InfoStepForm({
                 )}
               >
                 <div className="font-medium text-gray-800 dark:text-gray-200">
-                  {level.label}
+                  {getSchoolLabel(level.id)}
                 </div>
                 <div className="text-xs text-gray-500 dark:text-gray-400">
-                  {level.years}
+                  {t(level.yearsKey)}
                 </div>
               </button>
             ))}
@@ -203,7 +213,7 @@ export function InfoStepForm({
               >
                 <span className="text-xl">{diff.icon}</span>
                 <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {diff.label}
+                  {diffsMap[diff.id] ?? diff.id}
                 </span>
               </button>
             ))}
@@ -224,7 +234,7 @@ export function InfoStepForm({
             className="flex-1"
           >
             <ArrowLeft className="mr-2 w-4 h-4" />
-            Indietro
+            {t("backButton")}
           </Button>
           <Button
             onClick={onSkip}
@@ -233,14 +243,14 @@ export function InfoStepForm({
             className="text-gray-500"
           >
             <SkipForward className="mr-2 w-4 h-4" />
-            Salta
+            {t("skipButton")}
           </Button>
           <Button
             onClick={onContinue}
             size="lg"
             className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
           >
-            Avanti
+            {t("nextButton")}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>
