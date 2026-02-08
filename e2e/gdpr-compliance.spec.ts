@@ -4,6 +4,13 @@
 // ============================================================================
 
 import { test, expect } from "./fixtures/base-fixtures";
+import type { APIRequestContext } from "@playwright/test";
+
+async function getCsrfToken(request: APIRequestContext): Promise<string> {
+  const res = await request.get("/api/session");
+  const data = await res.json();
+  return data.csrfToken;
+}
 
 test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
   test("GET /api/privacy/delete-my-data - returns data summary for authenticated user", async ({
@@ -11,10 +18,12 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
   }) => {
     // Ensure user exists
     await request.get("/api/user");
+    const csrfToken = await getCsrfToken(request);
 
     // Create some data to be counted
     await request.post("/api/conversations", {
       data: { maestroId: "gdpr-test-maestro" },
+      headers: { "x-csrf-token": csrfToken },
     });
 
     const response = await request.get("/api/privacy/delete-my-data");
@@ -40,9 +49,11 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
     request,
   }) => {
     await request.get("/api/user");
+    const csrfToken = await getCsrfToken(request);
 
     const response = await request.post("/api/privacy/delete-my-data", {
       data: { confirmDeletion: false },
+      headers: { "x-csrf-token": csrfToken },
     });
     expect(response.status()).toBe(400);
 
@@ -57,13 +68,16 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
     const userResponse = await request.get("/api/user");
     const user = await userResponse.json();
     expect(user.id).toBeDefined();
+    const csrfToken = await getCsrfToken(request);
 
     // Create some data
     await request.post("/api/conversations", {
       data: { maestroId: "gdpr-delete-test" },
+      headers: { "x-csrf-token": csrfToken },
     });
     await request.put("/api/user/settings", {
       data: { theme: "dark" },
+      headers: { "x-csrf-token": csrfToken },
     });
     await request.post("/api/learnings", {
       data: {
@@ -71,6 +85,7 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
         insight: "Test learning",
         confidence: 0.5,
       },
+      headers: { "x-csrf-token": csrfToken },
     });
 
     // Verify data exists (conversation creation above may return error in some envs)
@@ -81,6 +96,7 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
       // Retry creation once
       await request.post("/api/conversations", {
         data: { maestroId: "gdpr-delete-retry" },
+        headers: { "x-csrf-token": csrfToken },
       });
     }
 
@@ -90,6 +106,7 @@ test.describe("GDPR Compliance: User Data Deletion (Art. 17)", () => {
         confirmDeletion: true,
         reason: "E2E test cleanup",
       },
+      headers: { "x-csrf-token": csrfToken },
     });
     expect(deleteResponse.ok()).toBeTruthy();
 
@@ -124,10 +141,12 @@ test.describe("GDPR Compliance: Data Retention Policy", () => {
 
   test("Conversations can be soft-deleted", async ({ request }) => {
     await request.get("/api/user");
+    const csrfToken = await getCsrfToken(request);
 
     // Create conversation
     const createResponse = await request.post("/api/conversations", {
       data: { maestroId: "retention-test-maestro" },
+      headers: { "x-csrf-token": csrfToken },
     });
     const conv = await createResponse.json();
     expect(conv.id).toBeDefined();
@@ -135,6 +154,7 @@ test.describe("GDPR Compliance: Data Retention Policy", () => {
     // Delete conversation
     const deleteResponse = await request.delete(
       `/api/conversations/${conv.id}`,
+      { headers: { "x-csrf-token": csrfToken } },
     );
     expect(deleteResponse.ok()).toBeTruthy();
 
