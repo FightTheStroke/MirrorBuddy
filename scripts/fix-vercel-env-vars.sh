@@ -162,6 +162,29 @@ done <"$ENV_FILE"
 # Cleanup temp file
 rm -f /tmp/vercel_var_tmp.txt
 
+# Check for new vars not yet in pre-push REQUIRED_VARS
+PREPUSH="scripts/pre-push-vercel.sh"
+NEW_VARS=""
+if [ -f "$PREPUSH" ]; then
+	while IFS= read -r line; do
+		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+		vn="${line%%=*}"
+		if is_skipped "$vn"; then continue; fi
+		if ! grep -q "\"$vn\"" "$PREPUSH" 2>/dev/null; then
+			NEW_VARS="$NEW_VARS $vn"
+		fi
+	done <"$ENV_FILE"
+
+	if [ -n "$NEW_VARS" ]; then
+		echo ""
+		echo "WARNING: New vars in $ENV_FILE not in pre-push REQUIRED_VARS:"
+		for v in $NEW_VARS; do
+			echo "  - $v"
+		done
+		echo "Add them to REQUIRED_VARS in $PREPUSH and run unit tests."
+	fi
+fi
+
 echo ""
 echo "==================================="
 echo "Synced: $SYNCED | Skipped (dev-only): $SKIPPED"
