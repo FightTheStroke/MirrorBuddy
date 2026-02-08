@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.15.0] - 2026-02-08
+
 ### Changed
 
 - **ESLint Hardening**: Promoted 5 security/compliance rules from `warn` to `error`: `require-csrf-mutating-routes`, `no-prisma-race-condition`, `detect-possible-timing-attacks`, `require-eventsource-cleanup`, `no-direct-localstorage`
