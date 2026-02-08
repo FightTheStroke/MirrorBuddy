@@ -10,6 +10,7 @@ import { HeroSection } from "./hero-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
 import { LanguageSwitcher } from "./language-switcher";
+import { RodariStorySection } from "./rodari-story-section";
 import {
   LazyTierComparisonSection,
   LazyMaestriShowcaseSection,
@@ -147,6 +148,9 @@ export function LandingPage({
 
         {/* Welcome Footer with consent, legal, badges */}
         <WelcomeFooter />
+
+        {/* Rodari story - literary inspiration */}
+        <RodariStorySection />
 
         {/* Decorative blurs */}
         <div

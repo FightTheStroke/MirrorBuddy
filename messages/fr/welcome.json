@@ -425,6 +425,18 @@
       "heading": "Les élèves avec des troubles de l'apprentissage apprennent mieux",
       "tagline": "Les familles choisissent MirrorBuddy pour un support inclusif et amusant",
       "testimonialPrompt": "Lis les histoires de réussite de nos élèves"
+    },
+    "rodariStory": {
+      "sectionLabel": "Notre inspiration",
+      "storyTitle": "La machine à faire les devoirs",
+      "author": "de Gianni Rodari",
+      "p1": "Un jour, un drôle de type frappa à notre porte : un petit bonhomme bizarre, je vous dis, à peine plus grand que deux allumettes. Il portait sur l'épaule un sac plus grand que lui.",
+      "p2": "« J'ai des machines à vendre » dit-il. « Faites voir » dit papa. « Voilà, celle-ci est une machine à faire les devoirs. On appuie sur le bouton rouge pour les problèmes, le bouton jaune pour les rédactions, le bouton vert pour apprendre la géographie : la machine fait tout toute seule en une minute. »",
+      "p3": "« Achète-la-moi, papa ! » dis-je. « D'accord, combien voulez-vous ? » « Je ne veux pas d'argent » dit le petit homme. « Mais vous ne travaillez tout de même pas pour rien ! » « Non, mais en échange de la machine, je veux le cerveau de votre enfant. » « Vous êtes fou ! » s'exclama papa. « Écoutez, monsieur » dit le petit homme en souriant. « Si la machine fait ses devoirs, à quoi lui sert son cerveau ? » « Achète-moi la machine, papa ! » implorai-je. « Qu'est-ce que j'en fais d'un cerveau ? » Papa me regarda un moment puis dit : « D'accord, prenez son cerveau. »",
+      "p4": "Le petit homme prit mon cerveau et le mit dans un petit sac. Comme j'étais léger, sans cerveau ! Si léger que je me mis à voler dans la pièce, et si papa ne m'avait pas attrapé à temps, je serais passé par la fenêtre.",
+      "p5": "« Il faudra le garder en cage » dit le petit homme. « Mais pourquoi ? » demanda papa. « Il n'a plus de cerveau, voilà pourquoi. Si vous le laissez se promener, il s'envolera dans les bois comme un petit oiseau, et en quelques jours il mourra de faim ! » Papa m'enferma dans une cage, comme un canari. La cage était petite, étroite, je ne pouvais pas bouger. Les barreaux me serraient tellement que... finalement je me réveillai effrayé. Heureusement, ce n'était qu'un rêve !",
+      "p6": "Je vous assure que je me suis immédiatement mis à faire mes devoirs.",
+      "connection": "MirrorBuddy ne fait pas tes devoirs à ta place. Il t'aide à comprendre comment les faire."
     }
   }
 }

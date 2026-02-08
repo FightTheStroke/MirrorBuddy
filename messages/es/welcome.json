@@ -425,6 +425,18 @@
       "heading": "Estudiantes con dificultades de aprendizaje están aprendiendo mejor",
       "tagline": "Las familias eligen MirrorBuddy por su apoyo inclusivo y divertido",
       "testimonialPrompt": "Lee las historias de éxito de nuestros estudiantes"
+    },
+    "rodariStory": {
+      "sectionLabel": "Nuestra inspiración",
+      "storyTitle": "La máquina de hacer los deberes",
+      "author": "de Gianni Rodari",
+      "p1": "Un día llamó a nuestra puerta un tipo extraño: un hombrecillo gracioso, os digo, apenas más alto que dos cerillas. Llevaba al hombro una bolsa más grande que él.",
+      "p2": "«Tengo aquí unas máquinas para vender» dijo. «A ver» dijo papá. «Miren, esta es una máquina para hacer los deberes. Se aprieta el botoncito rojo para los problemas de matemáticas, el botoncito amarillo para las redacciones, el botoncito verde para aprender geografía: la máquina lo hace todo sola en un minuto.»",
+      "p3": "«¡Cómpramela, papá!» dije yo. «Está bien, ¿cuánto quiere?» «No quiero dinero» dijo el hombrecillo. «¡Pero no trabajará usted por nada!» «No, pero a cambio de la máquina quiero el cerebro de su niño.» «¡Está usted loco!» exclamó papá. «Escuche, señor» dijo el hombrecillo, sonriendo. «Si los deberes se los hace la máquina, ¿para qué necesita el cerebro?» «¡Cómprame la máquina, papá!» supliqué. «¿Qué hago yo con un cerebro?» Papá me miró un momento y luego dijo: «Está bien, llévese su cerebro.»",
+      "p4": "El hombrecillo me quitó el cerebro y se lo metió en un bolsito. ¡Qué ligero estaba yo, sin cerebro! Tan ligero que me puse a volar por la habitación, y si papá no me hubiera agarrado a tiempo habría volado por la ventana.",
+      "p5": "«Habrá que tenerlo en una jaula» dijo el hombrecillo. «¿Pero por qué?» preguntó papá. «Ya no tiene cerebro, por eso. Si lo dejan andar por ahí, volará al bosque como un pajarillo, ¡y en pocos días morirá de hambre!» Papá me encerró en una jaula, como a un canario. La jaula era pequeña, estrecha, no podía moverme. Los barrotes me apretaban tanto que... al final me desperté asustado. ¡Menos mal que había sido solo un sueño!",
+      "p6": "Os aseguro que me puse inmediatamente a hacer los deberes.",
+      "connection": "MirrorBuddy no hace los deberes por ti. Te ayuda a entender cómo hacerlos."
     }
   }
 }
