@@ -149,6 +149,11 @@ export default defineConfig({
         "**/admin-tiers.spec.ts", // Requires tier seeding (Plan 073)
         "**/analytics-responsive-grid.spec.ts", // Requires parent dashboard auth
         "**/parent-dashboard-*.spec.ts", // Requires parent dashboard auth
+        "**/csrf-protection.spec.ts", // Runs in Security E2E CI job
+        "**/compliance.spec.ts", // Runs in Compliance E2E CI job
+        "**/legal-data-privacy.spec.ts", // Runs in Compliance E2E CI job
+        "**/full-app-smoke.spec.ts", // Runs in Smoke Tests CI job
+        "**/smoke/**", // Runs in Smoke Tests CI job
         "**/debug-endpoints-security.spec.ts", // Tests dev-only debug endpoints
         "**/legal-ai-act.spec.ts", // Requires /ai-transparency page setup
         "**/mobile/**", // Mobile tests run in dedicated projects
