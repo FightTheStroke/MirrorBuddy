@@ -10,6 +10,14 @@
 import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("Debug Endpoints: Development Access", () => {
+  // Debug endpoints return 404/403 in production mode (CI uses `next start`)
+  test.beforeEach(() => {
+    test.skip(
+      !!process.env.CI,
+      "Debug endpoints only available in development mode",
+    );
+  });
+
   test("GET /api/debug/config - returns diagnostic info in development", async ({
     request,
   }) => {
@@ -71,6 +79,14 @@ test.describe("Debug Endpoints: Development Access", () => {
 });
 
 test.describe("Debug Endpoints: Security Implementation", () => {
+  // Debug endpoints return 404/403 in production mode (CI uses `next start`)
+  test.beforeEach(() => {
+    test.skip(
+      !!process.env.CI,
+      "Debug endpoints only available in development mode",
+    );
+  });
+
   test("endpoints have production protection code in place", async ({
     request,
   }) => {

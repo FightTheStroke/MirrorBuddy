@@ -33,6 +33,9 @@ test.describe("CSRF Protection", () => {
   });
 
   test("POST with valid CSRF token succeeds", async ({ adminRequest }) => {
+    // Ensure admin user exists in database (auto-created on first /api/user call)
+    await adminRequest.get("/api/user");
+
     // Get a CSRF token from /api/session (sets the csrf-token cookie)
     const sessionResponse = await adminRequest.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();
@@ -117,6 +120,9 @@ test.describe("CSRF Protection", () => {
 
 test.describe("CSRF with Tools Integration", () => {
   test("Tool creation flow with proper CSRF", async ({ adminRequest }) => {
+    // Ensure admin user exists in database (auto-created on first /api/user call)
+    await adminRequest.get("/api/user");
+
     // Get CSRF token and cookie from /api/session
     const sessionResponse = await adminRequest.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();

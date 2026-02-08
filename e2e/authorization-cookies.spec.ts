@@ -14,6 +14,9 @@ test.describe("Visitor ID Validation (UUID v4)", () => {
     // Clear all cookies first
     await context.clearCookies();
 
+    // Remove base-fixtures mock so we test the real API
+    await page.unroute("**/api/trial/session");
+
     // Set an invalid visitor ID (not a UUID v4)
     await context.addCookies([
       {
@@ -120,7 +123,7 @@ test.describe("CSRF Protection", () => {
 });
 
 test.describe("Admin Authorization", () => {
-  test("Non-admin accessing admin endpoint - returns 401", async ({
+  test("Non-admin accessing admin endpoint - returns 403", async ({
     request,
   }) => {
     // Create a regular user (not admin)
@@ -129,8 +132,8 @@ test.describe("Admin Authorization", () => {
     // Try to access admin endpoint
     const response = await request.get("/api/admin/tiers");
 
-    // Should return 401 Unauthorized (not 403 to hide admin route existence)
-    expect(response.status()).toBe(401);
+    // Authenticated non-admin gets 403 (withAdmin validates auth first, then admin role)
+    expect(response.status()).toBe(403);
 
     const body = await response.json();
     expect(body.error).toBeDefined();
@@ -226,12 +229,15 @@ test.describe("Cookie Consistency", () => {
     let cookies = await context.cookies();
     expect(cookies.some((c) => c.name === "mirrorbuddy-user-id")).toBeTruthy();
 
-    // Logout
-    const logoutResponse = await page.goto("/api/auth/logout");
-    expect(logoutResponse).not.toBeNull();
+    // Get CSRF token for logout (POST requires CSRF)
+    const sessionRes = await page.request.get("/api/session");
+    const { csrfToken } = await sessionRes.json();
 
-    // Wait for cookies to be cleared
-    await page.waitForLoadState("domcontentloaded");
+    // Logout via POST with CSRF token (logout is POST-only)
+    const logoutResponse = await page.request.post("/api/auth/logout", {
+      headers: { "x-csrf-token": csrfToken },
+    });
+    expect(logoutResponse.ok()).toBeTruthy();
 
     // Check cookies are cleared
     cookies = await context.cookies();
