@@ -46,7 +46,8 @@
         "searchAriaLabel": "Professor oder Fach suchen",
         "searchPlaceholder": "Professor oder Fach suchen...",
         "title": "Professoren"
-      }
+      },
+      "arialabelcancellaRicerca": "[TRANSLATE] aria-label=\"Cancella ricerca\""
     },
     "supporti": {
       "allSupports": "All Supports",
@@ -96,7 +97,8 @@
       "voiceSearch": {
         "start": "Start",
         "stop": "Stop"
-      }
+      },
+      "perMateria": "[TRANSLATE] Per Materia"
     },
     "knowledgeHub": {
       "errorMessageDefault": "Error message default",
@@ -246,7 +248,8 @@
       "arialabelscaricaPdf": "[TRANSLATE] aria-label=\"Scarica PDF\"",
       "apri": "[TRANSLATE] Apri",
       "nessunaDomandaDisponibile": "[TRANSLATE] Nessuna domanda disponibile",
-      "arialabelmesePrecedente": "[TRANSLATE] aria-label=\"Mese precedente\""
+      "arialabelmesePrecedente": "[TRANSLATE] aria-label=\"Mese precedente\"",
+      "arialabelcartaPrecedente": "[TRANSLATE] aria-label=\"Carta precedente\""
     },
     "quiz": {
       "comingSoon": "Coming Soon",
@@ -863,6 +866,13 @@
     },
     "typing": {
       "iniziaGioco": "[TRANSLATE] Inizia Gioco"
+    },
+    "emptyState": {
+      "nessunaMetricaDisponibile": "[TRANSLATE] Nessuna metrica disponibile"
+    },
+    "maestroSelectionPanel": {
+      "tornaAllaSelezioneMateria": "[TRANSLATE] Torna alla selezione materia",
+      "continuaSenzaMaestro": "[TRANSLATE] Continua senza Maestro"
     }
   }
 }
