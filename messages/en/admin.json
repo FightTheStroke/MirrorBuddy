@@ -422,7 +422,8 @@
       "analytics": "Analytics",
       "logs": "Logs",
       "auditLog": "Audit Log",
-      "serviceLimits": "Service Limits"
+      "serviceLimits": "Service Limits",
+      "safety": "Safety"
     },
     "header": {
       "title": "Admin Panel",

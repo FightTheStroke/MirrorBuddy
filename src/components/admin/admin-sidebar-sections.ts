@@ -156,7 +156,12 @@ export function createNavSections(t: (key: string) => string): NavSection[] {
           href: "/admin/service-limits",
           icon: Activity,
         },
-        { id: "safety", label: "Safety", href: "/admin/safety", icon: Shield },
+        {
+          id: "safety",
+          label: t("sidebar.safety"),
+          href: "/admin/safety",
+          icon: Shield,
+        },
         { id: "tos", label: t("terms"), href: "/admin/tos", icon: FileText },
         {
           id: "settings",

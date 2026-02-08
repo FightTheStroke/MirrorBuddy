@@ -227,7 +227,7 @@ export const useTypingStore = create<TypingState>()((set, get) => ({
 
     try {
       const lessonsObj = Object.fromEntries(progress.lessons);
-      const { csrfFetch } = await import("@/lib/auth/csrf-client");
+      const { csrfFetch } = await import("@/lib/auth");
       const response = await csrfFetch("/api/typing", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

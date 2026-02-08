@@ -422,7 +422,8 @@
       "analytics": "Análisis",
       "logs": "Registros",
       "auditLog": "Registro de Auditoría",
-      "serviceLimits": "Límites de Servicio"
+      "serviceLimits": "Límites de Servicio",
+      "safety": "Seguridad"
     },
     "header": {
       "title": "Panel de administración",

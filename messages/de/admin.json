@@ -422,7 +422,8 @@
       "analytics": "Analytik",
       "logs": "Protokolle",
       "auditLog": "Prüfprotokoll",
-      "serviceLimits": "Dienstgrenzen"
+      "serviceLimits": "Dienstgrenzen",
+      "safety": "Sicherheit"
     },
     "header": {
       "title": "Admin-Panel",

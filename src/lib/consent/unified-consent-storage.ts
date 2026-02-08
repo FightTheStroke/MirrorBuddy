@@ -137,7 +137,7 @@ export async function syncUnifiedConsentToServer(
 ): Promise<void> {
   try {
     // Dynamic import to avoid SSR issues
-    const { csrfFetch } = await import("@/lib/auth/csrf-client");
+    const { csrfFetch } = await import("@/lib/auth");
 
     // Sync TOS acceptance (requires CSRF token)
     await csrfFetch("/api/tos", {

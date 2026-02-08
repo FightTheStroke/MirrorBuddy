@@ -100,7 +100,7 @@ export const POST = pipe(
     );
 
     try {
-      const { signCookieValue } = await import("@/lib/auth/cookie-signing");
+      const { signCookieValue } = await import("@/lib/auth/server");
       const signedCookie = signCookieValue(user.id);
       const cookieStore = await cookies();
       // Server-side auth cookie (httpOnly, signed)

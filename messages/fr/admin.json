@@ -422,7 +422,8 @@
       "analytics": "Analytique",
       "logs": "Journaux",
       "auditLog": "Journal d'Audit",
-      "serviceLimits": "Limites de Service"
+      "serviceLimits": "Limites de Service",
+      "safety": "Sécurité"
     },
     "header": {
       "title": "Panneau d'administration",

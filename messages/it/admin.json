@@ -426,7 +426,8 @@
       "analytics": "Analytics",
       "logs": "Log",
       "auditLog": "Registro Audit",
-      "serviceLimits": "Limiti Servizi"
+      "serviceLimits": "Limiti Servizi",
+      "safety": "Sicurezza"
     },
     "header": {
       "title": "Pannello Amministrazione",

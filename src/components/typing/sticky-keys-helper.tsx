@@ -25,7 +25,7 @@ export function useStickyKeys() {
 
       if (platform === "macos") {
         try {
-          const { csrfFetch } = await import("@/lib/auth/csrf-client");
+          const { csrfFetch } = await import("@/lib/auth");
           const response = await csrfFetch("/api/accessibility/sticky-keys");
           if (response.ok) {
             const data = await response.json();
@@ -51,7 +51,7 @@ export function useStickyKeys() {
   const enableStickyKeys = useCallback(async () => {
     if (status.platform === "macos") {
       try {
-        const { csrfFetch } = await import("@/lib/auth/csrf-client");
+        const { csrfFetch } = await import("@/lib/auth");
         const response = await csrfFetch("/api/accessibility/sticky-keys", {
           method: "POST",
           headers: { "Content-Type": "application/json" },

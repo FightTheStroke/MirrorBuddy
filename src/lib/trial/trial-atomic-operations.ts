@@ -34,7 +34,7 @@ export async function getTierLimitsForTrial(): Promise<{
   }
 
   try {
-    const { TierService } = await import("@/lib/tier/tier-service");
+    const { TierService } = await import("@/lib/tier/server");
     const tierService = new TierService();
     const limits = await tierService.getLimitsForUser(null); // null = anonymous/trial user
 

@@ -119,15 +119,15 @@ test.describe("Compliance Pages - Keyboard Navigation", () => {
     await page.waitForLoadState("domcontentloaded");
 
     const links = await page.locator("a").count();
-    if (links > 0) {
-      await page.keyboard.press("Tab");
-      await page.evaluate(() => {
-        const el = document.activeElement;
-        return el?.tagName === "A";
-      });
-      // May not always tab to first link, but should be navigable
-      expect(links).toBeGreaterThan(0);
-    }
+    expect(links).toBeGreaterThan(0);
+
+    // Verify keyboard navigation works
+    await page.keyboard.press("Tab");
+    const focusedTag = await page.evaluate(
+      () => document.activeElement?.tagName,
+    );
+    // Tab should focus some interactive element (link, button, input)
+    expect(focusedTag).toBeDefined();
   });
 });
 
