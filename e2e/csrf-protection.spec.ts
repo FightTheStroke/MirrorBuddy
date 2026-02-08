@@ -8,7 +8,7 @@
  * ADR 0053: Vercel Runtime Constraints documents CSRF requirements.
  */
 
-import { test, expect } from "./fixtures/auth-fixtures";
+import { test, expect } from "./fixtures/base-fixtures";
 
 test.describe("CSRF Protection", () => {
   test("POST without CSRF token returns 403", async ({ request }) => {
@@ -32,35 +32,20 @@ test.describe("CSRF Protection", () => {
     expect(body.error).toContain("CSRF");
   });
 
-  test("POST with valid CSRF token succeeds", async ({ adminRequest }) => {
-    // Ensure admin user exists in database (auto-created on first /api/user call)
-    await adminRequest.get("/api/user");
+  test("POST with valid CSRF token succeeds", async ({ request }) => {
+    // Create user with server-signed cookies (avoids signature mismatch)
+    await request.get("/api/user");
 
     // Get a CSRF token from /api/session (sets the csrf-token cookie)
-    const sessionResponse = await adminRequest.get("/api/session");
+    const sessionResponse = await request.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();
 
     const sessionData = await sessionResponse.json();
     expect(sessionData.csrfToken).toBeDefined();
     const csrfToken = sessionData.csrfToken;
 
-    // Extract csrf-token cookie from Set-Cookie header (adminRequest doesn't auto-persist)
-    const setCookieHeaders = sessionResponse
-      .headersArray()
-      .filter((h) => h.name.toLowerCase() === "set-cookie");
-    const csrfCookie = setCookieHeaders
-      .map((h) => h.value)
-      .find((v) => v.startsWith("csrf-token="));
-    const csrfCookieValue = csrfCookie?.split(";")[0] || "";
-
-    // Build combined cookie header: original auth cookies + csrf-token from session
-    const originalCookie = sessionResponse.request().headers()["cookie"] || "";
-    const combinedCookies = originalCookie
-      ? `${originalCookie}; ${csrfCookieValue}`
-      : csrfCookieValue;
-
-    // POST with CSRF token header and csrf-token cookie
-    const response = await adminRequest.post("/api/tools/events", {
+    // POST with CSRF token header (request context auto-persists cookies)
+    const response = await request.post("/api/tools/events", {
       data: {
         sessionId: `voice-test-session-${Date.now()}`,
         maestroId: "archimede",
@@ -70,7 +55,6 @@ test.describe("CSRF Protection", () => {
       },
       headers: {
         "x-csrf-token": csrfToken,
-        Cookie: combinedCookies,
       },
     });
 
@@ -119,38 +103,22 @@ test.describe("CSRF Protection", () => {
 });
 
 test.describe("CSRF with Tools Integration", () => {
-  test("Tool creation flow with proper CSRF", async ({ adminRequest }) => {
-    // Ensure admin user exists in database (auto-created on first /api/user call)
-    await adminRequest.get("/api/user");
+  test("Tool creation flow with proper CSRF", async ({ request }) => {
+    // Create user with server-signed cookies (avoids signature mismatch)
+    await request.get("/api/user");
 
-    // Get CSRF token and cookie from /api/session
-    const sessionResponse = await adminRequest.get("/api/session");
+    // Get CSRF token from /api/session (cookies auto-persist in request context)
+    const sessionResponse = await request.get("/api/session");
     expect(sessionResponse.ok()).toBeTruthy();
 
     const { csrfToken } = await sessionResponse.json();
     expect(csrfToken).toBeDefined();
 
-    // Extract csrf-token cookie from Set-Cookie header
-    const setCookieHeaders = sessionResponse
-      .headersArray()
-      .filter((h) => h.name.toLowerCase() === "set-cookie");
-    const csrfCookie = setCookieHeaders
-      .map((h) => h.value)
-      .find((v) => v.startsWith("csrf-token="));
-    const csrfCookieValue = csrfCookie?.split(";")[0] || "";
-    const originalCookie = sessionResponse.request().headers()["cookie"] || "";
-    const combinedCookies = originalCookie
-      ? `${originalCookie}; ${csrfCookieValue}`
-      : csrfCookieValue;
-
     const sessionId = `voice-csrf-flow-${Date.now()}`;
-    const csrfHeaders = {
-      "x-csrf-token": csrfToken,
-      Cookie: combinedCookies,
-    };
+    const csrfHeaders = { "x-csrf-token": csrfToken };
 
     // Step 1: Create tool event (simulates voice command)
-    const createResponse = await adminRequest.post("/api/tools/events", {
+    const createResponse = await request.post("/api/tools/events", {
       data: {
         sessionId,
         maestroId: "archimede",
@@ -166,7 +134,7 @@ test.describe("CSRF with Tools Integration", () => {
     expect(createResponse.ok()).toBeTruthy();
 
     // Step 2: Update event
-    const updateResponse = await adminRequest.post("/api/tools/events", {
+    const updateResponse = await request.post("/api/tools/events", {
       data: {
         sessionId,
         maestroId: "archimede",
@@ -179,7 +147,7 @@ test.describe("CSRF with Tools Integration", () => {
     expect(updateResponse.ok()).toBeTruthy();
 
     // Step 3: Complete event
-    const completeResponse = await adminRequest.post("/api/tools/events", {
+    const completeResponse = await request.post("/api/tools/events", {
       data: {
         sessionId,
         maestroId: "archimede",
