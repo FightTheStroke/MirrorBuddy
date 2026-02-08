@@ -120,48 +120,14 @@ function validateVercelToken(token: string | undefined): void {
 }
 
 function validateCriticalEnvVars(): void {
+  // Critical = vars available as GitHub secrets in CI (blocks deployment)
+  // Remaining production vars are checked by pre-push hook (Phase 4/5)
+  // and alignment test (vercel-env-sync.test.ts) — see ADR 0138
   const critical = [
-    // Core
     { name: "DATABASE_URL", sensitive: true },
-    { name: "DIRECT_URL", sensitive: true },
     { name: "SESSION_SECRET", sensitive: true },
     { name: "ADMIN_EMAIL", sensitive: false },
-    { name: "ADMIN_PASSWORD", sensitive: true },
     { name: "CRON_SECRET", sensitive: true },
-    { name: "TOKEN_ENCRYPTION_KEY", sensitive: true },
-    { name: "IP_HASH_SALT", sensitive: true },
-    // Azure AI
-    { name: "AZURE_OPENAI_API_KEY", sensitive: true },
-    { name: "AZURE_OPENAI_ENDPOINT", sensitive: false },
-    { name: "AZURE_OPENAI_CHAT_DEPLOYMENT", sensitive: false },
-    { name: "AZURE_OPENAI_EMBEDDING_DEPLOYMENT", sensitive: false },
-    { name: "AZURE_OPENAI_REALTIME_ENDPOINT", sensitive: false },
-    { name: "AZURE_OPENAI_REALTIME_API_KEY", sensitive: true },
-    { name: "AZURE_OPENAI_REALTIME_DEPLOYMENT", sensitive: false },
-    { name: "AZURE_OPENAI_TTS_DEPLOYMENT", sensitive: false },
-    // Email
-    { name: "RESEND_API_KEY", sensitive: true },
-    { name: "FROM_EMAIL", sensitive: false },
-    { name: "SUPPORT_EMAIL", sensitive: false },
-    // Auth
-    { name: "GOOGLE_CLIENT_ID", sensitive: false },
-    { name: "GOOGLE_CLIENT_SECRET", sensitive: true },
-    { name: "NEXT_PUBLIC_GOOGLE_CLIENT_ID", sensitive: false },
-    { name: "NEXTAUTH_URL", sensitive: false },
-    // Push notifications
-    { name: "NEXT_PUBLIC_VAPID_PUBLIC_KEY", sensitive: false },
-    { name: "VAPID_PRIVATE_KEY", sensitive: true },
-    { name: "VAPID_SUBJECT", sensitive: false },
-    // Rate limiting
-    { name: "UPSTASH_REDIS_REST_URL", sensitive: false },
-    { name: "UPSTASH_REDIS_REST_TOKEN", sensitive: true },
-    // Supabase
-    { name: "NEXT_PUBLIC_SUPABASE_URL", sensitive: false },
-    { name: "NEXT_PUBLIC_SUPABASE_ANON_KEY", sensitive: false },
-    { name: "SUPABASE_SERVICE_ROLE_KEY", sensitive: true },
-    // Misc
-    { name: "PROTECTED_USERS", sensitive: false },
-    { name: "TRIAL_BUDGET_LIMIT_EUR", sensitive: false },
   ];
 
   for (const envVar of critical) {
@@ -190,7 +156,47 @@ function validateCriticalEnvVars(): void {
 }
 
 function validateOptionalEnvVars(): void {
+  // Optional in CI (not available as GitHub secrets) but verified by
+  // pre-push hook Phase 4/5 and alignment test — see ADR 0138
   const optional = [
+    // Core (verified locally by pre-push)
+    { name: "DIRECT_URL", category: "Core" },
+    { name: "ADMIN_PASSWORD", category: "Core" },
+    { name: "TOKEN_ENCRYPTION_KEY", category: "Core" },
+    { name: "IP_HASH_SALT", category: "Core" },
+    // Azure AI
+    { name: "AZURE_OPENAI_API_KEY", category: "Azure AI" },
+    { name: "AZURE_OPENAI_ENDPOINT", category: "Azure AI" },
+    { name: "AZURE_OPENAI_CHAT_DEPLOYMENT", category: "Azure AI" },
+    { name: "AZURE_OPENAI_EMBEDDING_DEPLOYMENT", category: "Azure AI" },
+    { name: "AZURE_OPENAI_REALTIME_ENDPOINT", category: "Azure AI" },
+    { name: "AZURE_OPENAI_REALTIME_API_KEY", category: "Azure AI" },
+    { name: "AZURE_OPENAI_REALTIME_DEPLOYMENT", category: "Azure AI" },
+    { name: "AZURE_OPENAI_TTS_DEPLOYMENT", category: "Azure AI" },
+    // Email
+    { name: "RESEND_API_KEY", category: "Email" },
+    { name: "FROM_EMAIL", category: "Email" },
+    { name: "SUPPORT_EMAIL", category: "Email" },
+    // Auth
+    { name: "GOOGLE_CLIENT_ID", category: "Auth" },
+    { name: "GOOGLE_CLIENT_SECRET", category: "Auth" },
+    { name: "NEXT_PUBLIC_GOOGLE_CLIENT_ID", category: "Auth" },
+    { name: "NEXTAUTH_URL", category: "Auth" },
+    // Push notifications
+    { name: "NEXT_PUBLIC_VAPID_PUBLIC_KEY", category: "Push" },
+    { name: "VAPID_PRIVATE_KEY", category: "Push" },
+    { name: "VAPID_SUBJECT", category: "Push" },
+    // Rate limiting
+    { name: "UPSTASH_REDIS_REST_URL", category: "Rate Limiting" },
+    { name: "UPSTASH_REDIS_REST_TOKEN", category: "Rate Limiting" },
+    // Supabase
+    { name: "NEXT_PUBLIC_SUPABASE_URL", category: "Supabase" },
+    { name: "NEXT_PUBLIC_SUPABASE_ANON_KEY", category: "Supabase" },
+    { name: "SUPABASE_SERVICE_ROLE_KEY", category: "Supabase" },
+    // Misc
+    { name: "PROTECTED_USERS", category: "Misc" },
+    { name: "TRIAL_BUDGET_LIMIT_EUR", category: "Misc" },
+    // Observability
     { name: "NEXT_PUBLIC_SENTRY_DSN", category: "Sentry" },
     { name: "SENTRY_AUTH_TOKEN", category: "Sentry" },
     { name: "SENTRY_ORG", category: "Sentry" },
@@ -199,10 +205,12 @@ function validateOptionalEnvVars(): void {
     { name: "GRAFANA_CLOUD_PROMETHEUS_USER", category: "Observability" },
     { name: "GRAFANA_CLOUD_API_KEY", category: "Observability" },
     { name: "GRAFANA_CLOUD_PUSH_INTERVAL", category: "Observability" },
+    // LiveKit
     { name: "LIVEKIT_URL", category: "LiveKit" },
     { name: "LIVEKIT_API_KEY", category: "LiveKit" },
     { name: "LIVEKIT_API_SECRET", category: "LiveKit" },
     { name: "NEXT_PUBLIC_LIVEKIT_URL", category: "LiveKit" },
+    // Public URLs
     { name: "NEXT_PUBLIC_SITE_URL", category: "SEO" },
     { name: "NEXT_PUBLIC_APP_URL", category: "App" },
   ];
