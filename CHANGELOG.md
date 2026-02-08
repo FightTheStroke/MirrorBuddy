@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Missing Prisma Migrations**: Added migration for 9 models (CharacterConfig, ToolOutput, HierarchicalSummary, PasswordResetToken, ContactRequest, AdminAuditLog, AuditLog, SchoolSSOConfig, SSOSession) and CharacterType enum that had no corresponding database tables, causing 500 errors on all related API routes (ADR 0137)
+- **Admin Breadcrumb i18n**: Fixed `/admin/locales` breadcrumb mapping from non-existent `sidebar.locales` to correct `sidebar.localization` key
+
+### Added
+
+- **Schema Drift Detection**: Database-free script (`check-schema-drift.sh`) that verifies every Prisma model/enum has a matching migration. Enforced at three layers: pre-push hook, CI Lane 4b, and `ci-summary.sh --migrations` (ADR 0137)
+
 ## [0.15.0] - 2026-02-08
 
 ### Changed
