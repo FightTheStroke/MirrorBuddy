@@ -608,7 +608,10 @@
       "updatingProfile": "Aggiornamento profilo di {name}",
       "welcomeTitle": "Benvenuto in MirrorBuddy",
       "skipButton": "Salta",
-      "resetTooltip": "Ricomincia da capo (cancella tutti i dati)"
+      "resetTooltip": "Ricomincia da capo (cancella tutti i dati)",
+      "checking": "Verifica...",
+      "fallbackTooltip": "Voce sintetica del browser (Azure non disponibile)",
+      "azureTooltip": "Voce Azure Realtime ad alta qualita'"
     },
     "rodariStory": {
       "sectionLabel": "La nostra ispirazione",

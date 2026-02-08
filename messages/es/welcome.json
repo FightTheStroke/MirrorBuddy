@@ -307,13 +307,39 @@
       "openSource": {
         "ariaLabel": "Open Source",
         "label": "Open Source"
-      }
+      },
+      "ariaLabel": "Pie de página con información legal y consentimiento de cookies",
+      "legalLinksAriaLabel": "Enlaces legales"
     },
     "principles": {
       "howItWorks": "¿Cómo funciona?",
       "howItWorksDesc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pregunta a Euclides. Para inglés, ¡está Shakespeare! Yo te ayudaré a elegir al Profesor adecuado para cada situación.",
       "welcomeToSchool": "¡Bienvenido a La escuela que quiero, {name}!",
-      "whatMakesUsSpecial": "Esto es lo que nos hace especiales"
+      "whatMakesUsSpecial": "Esto es lo que nos hace especiales",
+      "items": {
+        "learnYourWay": {
+          "title": "Aprende a tu manera",
+          "description": "Cada uno tiene su forma de aprender. Aquí respetamos tu ritmo y tu estilo."
+        },
+        "maestriCount": {
+          "title": "26 Maestros a tu lado",
+          "description": "De Leonardo a Marie Curie, los más grandes genios de la historia te enseñarán cada materia."
+        },
+        "neverAlone": {
+          "title": "Nunca solo",
+          "description": "Coaches, compañeros virtuales y herramientas pensadas para ti. ¡Juntos se aprende mejor!"
+        },
+        "funLearning": {
+          "title": "Diviértete aprendiendo",
+          "description": "Quizzes, flashcards, mapas mentales y XP por ganar. ¡Estudiar se convierte en una aventura!"
+        }
+      },
+      "melissaQuote": "Recuerda, {name}: no hay una forma incorrecta de aprender. ¡Estoy aquí para ayudarte a encontrar la tuya!",
+      "melissaName": "— Melissa",
+      "backButton": "Atrás",
+      "nextButton": "Siguiente",
+      "enableVoice": "Activar voz",
+      "disableVoice": "Desactivar voz"
     },
     "ready": {
       "chooseProfessor": "Elige un Profesor",
@@ -324,7 +350,12 @@
       "earnXpDescription": "¡cada lección te hace subir de nivel!",
       "backButton": "Atrás",
       "startButton": "¡Empecemos!",
-      "replayModeMessage": "Fin del tutorial. Haz clic en \"{action}\" para volver a la aplicación."
+      "replayModeMessage": "Fin del tutorial. Haz clic en \"{action}\" para volver a la aplicación.",
+      "perfectName": "¡Perfecto, {name}!",
+      "readyToStart": "¡Estás listo para comenzar tu aventura!",
+      "preparedForYou": "¡He preparado todo para ti! Recuerda:",
+      "enableVoice": "Activar voz",
+      "disableVoice": "Desactivar voz"
     },
     "trialLimits": {
       "title": "Límites de la prueba gratuita",
@@ -374,7 +405,30 @@
       "welcomeIntro": "¡Bienvenido a La escuela que quiero! Estoy aquí para ayudarte a estudiar de la forma que mejor te funcione.",
       "whatIsYourName": "¿Cómo te llamas?",
       "years": "Años",
-      "yourSupportTeacher": "Tu profesora de apoyo"
+      "yourSupportTeacher": "Tu profesora de apoyo",
+      "nameRequired": "¡Por favor, dime cómo te llamas!",
+      "nameTooShort": "El nombre debe tener al menos 2 caracteres",
+      "nameCaptured": "Nombre capturado",
+      "continueButton": "Continuar",
+      "backButton": "Atrás",
+      "skipButton": "Saltar",
+      "nextButton": "Siguiente",
+      "ageQuestion": "¿Cuántos años tienes?",
+      "schoolQuestion": "¿A qué escuela vas?",
+      "replayModeInfo": "Estás revisando el tutorial. Tus datos existentes no se modificarán.",
+      "schoolYearsElementary": "6-10 años",
+      "schoolYearsMiddle": "11-13 años",
+      "schoolYearsHigh": "14-19 años",
+      "differences": {
+        "dyslexia": "Dislexia",
+        "dyscalculia": "Discalculia",
+        "dysgraphia": "Disgrafía",
+        "adhd": "TDAH",
+        "autism": "Autismo",
+        "cerebralPalsy": "Parálisis cerebral",
+        "visualImpairment": "Discapacidad visual",
+        "auditoryProcessing": "Discapacidad auditiva"
+      }
     },
     "onboarding": {
       "transcript": {
@@ -406,7 +460,10 @@
         "microphoneMuted": "Micrófono silenciado",
         "speakWithMelissa": "Hablar con Melissa",
         "speaking": "Hablando",
-        "you": "Tú"
+        "you": "Tú",
+        "checking": "Verificando...",
+        "fallbackTooltip": "Modo de respaldo: Azure no disponible. Usando la API Web Speech del navegador para la voz.",
+        "azureTooltip": "Azure OpenAI Realtime API: Conversación de voz bidireccional en tiempo real con Melissa."
       },
       "ageYears": "años"
     },
@@ -495,6 +552,78 @@
       "p5": "«Habrá que tenerlo en una jaula» dijo el hombrecillo. «¿Pero por qué?» preguntó papá. «Ya no tiene cerebro, por eso. Si lo dejan andar por ahí, volará al bosque como un pajarillo, ¡y en pocos días morirá de hambre!» Papá me encerró en una jaula, como a un canario. La jaula era pequeña, estrecha, no podía moverme. Los barrotes me apretaban tanto que... al final me desperté asustado. ¡Menos mal que había sido solo un sueño!",
       "p6": "Os aseguro que me puse inmediatamente a hacer los deberes.",
       "connection": "MirrorBuddy no hace los deberes por ti. Te ayuda a entender cómo hacerlos."
+    },
+    "guides": {
+      "heading": "Conoce a tus",
+      "headingHighlight": "Compañeros de Viaje",
+      "subtitle": "Coaches, Buddies y Maestros listos para ayudarte en cada momento",
+      "teamTitle": "¡Un equipo entero a tu servicio!",
+      "coachCount": "5 Coaches",
+      "coachDesc": "para métodos de estudio",
+      "buddyCount": "5 Buddies",
+      "buddyDesc": "para apoyo emocional",
+      "maestriCount": "26 Maestros",
+      "maestriDesc": "expertos en materias",
+      "teaser": "¡Galileo, Darwin, Manzoni, Heródoto, Mozart, Sócrates, Feynman y muchos más te esperan!",
+      "categoryCoach": "Coach",
+      "categoryBuddy": "Buddy",
+      "categoryMaestro": "Maestro",
+      "items": {
+        "melissa": {
+          "role": "Coach de aprendizaje",
+          "description": "Te guía en tu método de estudio personalizado"
+        },
+        "enea": {
+          "role": "Peer Buddy",
+          "description": "Compañero alegre que sabe levantar el ánimo"
+        },
+        "euclide": {
+          "role": "Maestro de Matemáticas",
+          "description": "Experto en álgebra, geometría y aritmética"
+        },
+        "curie": {
+          "role": "Maestra de Química",
+          "description": "Pionera de la ciencia, ¡dos premios Nobel!"
+        },
+        "leonardo": {
+          "role": "Maestro de Arte",
+          "description": "Genio del Renacimiento, artista e inventor"
+        },
+        "shakespeare": {
+          "role": "Maestro de Inglés",
+          "description": "El mayor dramaturgo de todos los tiempos"
+        },
+        "feynman": {
+          "role": "Maestro de Física",
+          "description": "Premio Nobel, explica la física con pasión"
+        },
+        "erodoto": {
+          "role": "Maestro de Historia",
+          "description": "El padre de la historia, cuenta el pasado"
+        }
+      }
+    },
+    "maestriStep": {
+      "heading": "¡Tus Profesores, {name}!",
+      "subtitle": "{count} grandes genios listos para ayudarte",
+      "scrollLeft": "Desplazar a la izquierda",
+      "scrollRight": "Desplazar a la derecha",
+      "carouselLabel": "Carrusel de profesores - usa las flechas para navegar",
+      "backButton": "Atrás",
+      "nextButton": "Siguiente",
+      "enableVoice": "Activar voz",
+      "disableVoice": "Desactivar voz",
+      "howItWorks": "¿Cómo funciona?",
+      "howItWorksDesc": "Cada Profesor es experto en su materia. Cuando necesites ayuda con matemáticas, pregunta a Euclides. ¡Para inglés, está Shakespeare! Te ayudaré a elegir el Profesor adecuado para cada situación."
+    },
+    "progressIndicator": {
+      "updatingProfile": "Actualizando perfil de {name}",
+      "welcomeTitle": "Bienvenido a MirrorBuddy",
+      "skipButton": "Saltar",
+      "resetTooltip": "Empezar de nuevo (borrar todos los datos)",
+      "checking": "Verificando...",
+      "fallbackTooltip": "Voz sintética del navegador (Azure no disponible)",
+      "azureTooltip": "Voz Azure Realtime de alta calidad"
     }
   }
 }

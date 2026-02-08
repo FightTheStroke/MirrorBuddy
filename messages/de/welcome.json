@@ -307,13 +307,39 @@
       "openSource": {
         "ariaLabel": "Open Source",
         "label": "Open Source"
-      }
+      },
+      "ariaLabel": "Fußzeile mit rechtlichen Informationen und Cookie-Einwilligung",
+      "legalLinksAriaLabel": "Rechtliche Links"
     },
     "principles": {
       "howItWorks": "Wie funktioniert es?",
       "howItWorksDesc": "Jeder Professor ist ein Experte auf seinem Gebiet. Wenn du Hilfe in Mathe brauchst, frag Euklid. Für Englisch ist Shakespeare da! Ich helfe dir, für jede Situation den richtigen Professor zu wählen.",
       "welcomeToSchool": "Willkommen in der Schule, die ich will, {name}!",
-      "whatMakesUsSpecial": "Das macht uns besonders"
+      "whatMakesUsSpecial": "Das macht uns besonders",
+      "items": {
+        "learnYourWay": {
+          "title": "Lerne auf deine Art",
+          "description": "Jeder hat seine eigene Art zu lernen. Hier respektieren wir dein Tempo und deinen Stil."
+        },
+        "maestriCount": {
+          "title": "26 Meister an deiner Seite",
+          "description": "Von Leonardo bis Marie Curie, die größten Genies der Geschichte erklären dir jedes Fach."
+        },
+        "neverAlone": {
+          "title": "Nie allein",
+          "description": "Coaches, virtuelle Begleiter und Werkzeuge, die für dich gemacht sind. Zusammen lernt man besser!"
+        },
+        "funLearning": {
+          "title": "Spaß beim Lernen",
+          "description": "Quizze, Lernkarten, Mindmaps und XP zum Sammeln. Lernen wird zum Abenteuer!"
+        }
+      },
+      "melissaQuote": "Denk daran, {name}: Es gibt keine falsche Art zu lernen. Ich bin hier, um dir zu helfen, deine zu finden!",
+      "melissaName": "— Melissa",
+      "backButton": "Zurück",
+      "nextButton": "Weiter",
+      "enableVoice": "Stimme aktivieren",
+      "disableVoice": "Stimme deaktivieren"
     },
     "ready": {
       "chooseProfessor": "Wähle einen Professor",
@@ -324,7 +350,12 @@
       "earnXpDescription": "jede Lektion bringt dich ein Level weiter!",
       "backButton": "Zurück",
       "startButton": "Lass uns anfangen!",
-      "replayModeMessage": "Ende des Tutorials. Klicke auf \"{action}\", um zur App zurückzukehren."
+      "replayModeMessage": "Ende des Tutorials. Klicke auf \"{action}\", um zur App zurückzukehren.",
+      "perfectName": "Perfekt, {name}!",
+      "readyToStart": "Du bist bereit, dein Abenteuer zu beginnen!",
+      "preparedForYou": "Ich habe alles für dich vorbereitet! Denk daran:",
+      "enableVoice": "Stimme aktivieren",
+      "disableVoice": "Stimme deaktivieren"
     },
     "trialLimits": {
       "title": "Grenzen der kostenlosen Testversion",
@@ -374,7 +405,30 @@
       "welcomeIntro": "Willkommen in der Schule, die ich will! Ich bin hier, um dir zu helfen, so zu lernen, wie es für dich am besten funktioniert.",
       "whatIsYourName": "Wie heißt du?",
       "years": "Jahre",
-      "yourSupportTeacher": "Deine Förderlehrerin"
+      "yourSupportTeacher": "Deine Förderlehrerin",
+      "nameRequired": "Bitte sag mir, wie du heißt!",
+      "nameTooShort": "Der Name muss mindestens 2 Zeichen haben",
+      "nameCaptured": "Name erfasst",
+      "continueButton": "Weiter",
+      "backButton": "Zurück",
+      "skipButton": "Überspringen",
+      "nextButton": "Weiter",
+      "ageQuestion": "Wie alt bist du?",
+      "schoolQuestion": "Welche Schule besuchst du?",
+      "replayModeInfo": "Du siehst dir das Tutorial noch einmal an. Deine bestehenden Daten werden nicht verändert.",
+      "schoolYearsElementary": "6-10 Jahre",
+      "schoolYearsMiddle": "11-13 Jahre",
+      "schoolYearsHigh": "14-19 Jahre",
+      "differences": {
+        "dyslexia": "Legasthenie",
+        "dyscalculia": "Dyskalkulie",
+        "dysgraphia": "Dysgraphie",
+        "adhd": "ADHS",
+        "autism": "Autismus",
+        "cerebralPalsy": "Zerebralparese",
+        "visualImpairment": "Sehbehinderung",
+        "auditoryProcessing": "Hörbehinderung"
+      }
     },
     "onboarding": {
       "transcript": {
@@ -406,7 +460,10 @@
         "microphoneMuted": "Mikrofon deaktiviert",
         "speakWithMelissa": "Sprich mit Melissa",
         "speaking": "Spricht",
-        "you": "Du"
+        "you": "Du",
+        "checking": "Prüfe...",
+        "fallbackTooltip": "Fallback-Modus: Azure nicht verfügbar. Browser Web Speech API wird für Sprache verwendet.",
+        "azureTooltip": "Azure OpenAI Realtime API: Bidirektionale Echtzeit-Sprachkonversation mit Melissa."
       },
       "ageYears": "Jahre"
     },
@@ -495,6 +552,78 @@
       "p5": "«Man muss ihn in einen Käfig sperren» sagte das Männchen. «Aber warum?» fragte der Vater. «Er hat kein Gehirn mehr, darum. Wenn Ihr ihn frei herumlaufen lasst, wird er in die Wälder fliegen wie ein Vögelchen, und in wenigen Tagen wird er verhungern!» Der Vater sperrte mich in einen Käfig, wie einen Kanarienvogel. Der Käfig war klein, eng, ich konnte mich nicht bewegen. Die Stäbe drückten mich so sehr, dass... schließlich wachte ich erschrocken auf. Zum Glück war es nur ein Traum gewesen!",
       "p6": "Ich versichere euch, dass ich mich sofort an die Hausaufgaben gemacht habe.",
       "connection": "MirrorBuddy macht deine Hausaufgaben nicht für dich. Es hilft dir zu verstehen, wie du sie selbst machen kannst."
+    },
+    "guides": {
+      "heading": "Triff deine",
+      "headingHighlight": "Reisebegleiter",
+      "subtitle": "Coaches, Buddies und Meister, die dir jederzeit helfen",
+      "teamTitle": "Ein ganzes Team für dich!",
+      "coachCount": "5 Coaches",
+      "coachDesc": "für Lernmethoden",
+      "buddyCount": "5 Buddies",
+      "buddyDesc": "für emotionale Unterstützung",
+      "maestriCount": "26 Meister",
+      "maestriDesc": "Fachexperten",
+      "teaser": "Galileo, Darwin, Manzoni, Herodot, Mozart, Sokrates, Feynman und viele mehr warten auf dich!",
+      "categoryCoach": "Coach",
+      "categoryBuddy": "Buddy",
+      "categoryMaestro": "Meister",
+      "items": {
+        "melissa": {
+          "role": "Lern-Coach",
+          "description": "Begleitet dich bei deiner persönlichen Lernmethode"
+        },
+        "enea": {
+          "role": "Peer Buddy",
+          "description": "Fröhlicher Begleiter, der dich aufmuntern kann"
+        },
+        "euclide": {
+          "role": "Mathematik-Meister",
+          "description": "Experte für Algebra, Geometrie und Arithmetik"
+        },
+        "curie": {
+          "role": "Chemie-Meisterin",
+          "description": "Pionierin der Wissenschaft, zwei Nobelpreise!"
+        },
+        "leonardo": {
+          "role": "Kunst-Meister",
+          "description": "Renaissance-Genie, Künstler und Erfinder"
+        },
+        "shakespeare": {
+          "role": "Englisch-Meister",
+          "description": "Der größte Dramatiker aller Zeiten"
+        },
+        "feynman": {
+          "role": "Physik-Meister",
+          "description": "Nobelpreisträger, erklärt Physik mit Leidenschaft"
+        },
+        "erodoto": {
+          "role": "Geschichte-Meister",
+          "description": "Der Vater der Geschichte, erzählt die Vergangenheit"
+        }
+      }
+    },
+    "maestriStep": {
+      "heading": "Deine Professoren, {name}!",
+      "subtitle": "{count} große Genies bereit, dir zu helfen",
+      "scrollLeft": "Nach links scrollen",
+      "scrollRight": "Nach rechts scrollen",
+      "carouselLabel": "Professorenkarussell - Pfeiltasten zum Navigieren",
+      "backButton": "Zurück",
+      "nextButton": "Weiter",
+      "enableVoice": "Stimme aktivieren",
+      "disableVoice": "Stimme deaktivieren",
+      "howItWorks": "Wie funktioniert es?",
+      "howItWorksDesc": "Jeder Professor ist Experte auf seinem Gebiet. Wenn du Hilfe in Mathe brauchst, frag Euklid. Für Englisch gibt es Shakespeare! Ich helfe dir, den richtigen Professor für jede Situation zu wählen."
+    },
+    "progressIndicator": {
+      "updatingProfile": "Profil von {name} wird aktualisiert",
+      "welcomeTitle": "Willkommen bei MirrorBuddy",
+      "skipButton": "Überspringen",
+      "resetTooltip": "Neu beginnen (alle Daten löschen)",
+      "checking": "Überprüfung...",
+      "fallbackTooltip": "Browser-Sprachsynthese (Azure nicht verfügbar)",
+      "azureTooltip": "Hochwertige Azure Realtime-Stimme"
     }
   }
 }

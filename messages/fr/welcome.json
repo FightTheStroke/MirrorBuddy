@@ -193,7 +193,7 @@
       "introDisclaimer": "Ils ne te disent pas quoi penser. Ils t'aident à trouver ta propre façon de le faire.",
       "scrollLeft": "Défiler à gauche",
       "scrollRight": "Défiler à droite",
-      "carouselLabel": "Carrousel des coachs et amis - utilisez les fl\u00e8ches pour naviguer"
+      "carouselLabel": "Carrousel des coachs et amis - utilisez les flèches pour naviguer"
     },
     "features": {
       "heading": "Outils pour chaque",
@@ -232,7 +232,7 @@
         "description": "Tout en un seul endroit"
       },
       "introLine1": "Chaque outil a un seul objectif :",
-      "introLine2": "rendre l'\u00e9tude plus claire, \u00e9tape par \u00e9tape."
+      "introLine2": "rendre l'étude plus claire, étape par étape."
     },
     "compliance": {
       "heading": "Conformité, confidentialité et transparence",
@@ -307,13 +307,39 @@
       "openSource": {
         "ariaLabel": "Open Source",
         "label": "Open Source"
-      }
+      },
+      "ariaLabel": "Pied de page avec informations légales et consentement aux cookies",
+      "legalLinksAriaLabel": "Liens légaux"
     },
     "principles": {
       "howItWorks": "Comment ça marche ?",
       "howItWorksDesc": "Chaque Professeur est expert dans sa matière. Quand tu as besoin d'aide en maths, demande à Euclide. Pour l'anglais, il y a Shakespeare ! Je t'aiderai à choisir le bon Professeur pour chaque situation.",
       "welcomeToSchool": "Bienvenue dans L'école que je veux, {name} !",
-      "whatMakesUsSpecial": "Voici ce qui nous rend spéciaux"
+      "whatMakesUsSpecial": "Voici ce qui nous rend spéciaux",
+      "items": {
+        "learnYourWay": {
+          "title": "Apprends à ta manière",
+          "description": "Chacun a sa façon d'apprendre. Ici, nous respectons ton rythme et ton style."
+        },
+        "maestriCount": {
+          "title": "26 Maîtres à tes côtés",
+          "description": "De Léonard à Marie Curie, les plus grands génies de l'histoire t'enseigneront chaque matière."
+        },
+        "neverAlone": {
+          "title": "Jamais seul",
+          "description": "Coaches, compagnons virtuels et outils pensés pour toi. Ensemble, on apprend mieux !"
+        },
+        "funLearning": {
+          "title": "Amuse-toi en apprenant",
+          "description": "Quiz, flashcards, cartes mentales et XP à gagner. Étudier devient une aventure !"
+        }
+      },
+      "melissaQuote": "Souviens-toi, {name} : il n'y a pas de mauvaise façon d'apprendre. Je suis là pour t'aider à trouver la tienne !",
+      "melissaName": "— Melissa",
+      "backButton": "Retour",
+      "nextButton": "Suivant",
+      "enableVoice": "Activer la voix",
+      "disableVoice": "Désactiver la voix"
     },
     "ready": {
       "chooseProfessor": "Choisis un Professeur",
@@ -324,7 +350,12 @@
       "earnXpDescription": "chaque leçon te fait monter de niveau !",
       "backButton": "Retour",
       "startButton": "C'est parti !",
-      "replayModeMessage": "Fin du tutorial. Clique sur \"{action}\" pour revenir à l'application."
+      "replayModeMessage": "Fin du tutorial. Clique sur \"{action}\" pour revenir à l'application.",
+      "perfectName": "Parfait, {name} !",
+      "readyToStart": "Tu es prêt à commencer ton aventure !",
+      "preparedForYou": "J'ai tout préparé pour toi ! Souviens-toi :",
+      "enableVoice": "Activer la voix",
+      "disableVoice": "Désactiver la voix"
     },
     "trialLimits": {
       "title": "Limites de l'essai gratuit",
@@ -374,7 +405,30 @@
       "welcomeIntro": "Bienvenue dans L'école que je veux ! Je suis là pour t'aider à étudier de la manière qui te convient le mieux.",
       "whatIsYourName": "Comment t'appelles-tu ?",
       "years": "Ans",
-      "yourSupportTeacher": "Ton enseignante de soutien"
+      "yourSupportTeacher": "Ton enseignante de soutien",
+      "nameRequired": "S'il te plaît, dis-moi comment tu t'appelles !",
+      "nameTooShort": "Le nom doit comporter au moins 2 caractères",
+      "nameCaptured": "Nom enregistré",
+      "continueButton": "Continuer",
+      "backButton": "Retour",
+      "skipButton": "Passer",
+      "nextButton": "Suivant",
+      "ageQuestion": "Quel âge as-tu ?",
+      "schoolQuestion": "Quelle école fréquentes-tu ?",
+      "replayModeInfo": "Tu revois le tutoriel. Tes données existantes ne seront pas modifiées.",
+      "schoolYearsElementary": "6-10 ans",
+      "schoolYearsMiddle": "11-13 ans",
+      "schoolYearsHigh": "14-19 ans",
+      "differences": {
+        "dyslexia": "Dyslexie",
+        "dyscalculia": "Dyscalculie",
+        "dysgraphia": "Dysgraphie",
+        "adhd": "TDAH",
+        "autism": "Autisme",
+        "cerebralPalsy": "Paralysie cérébrale",
+        "visualImpairment": "Déficience visuelle",
+        "auditoryProcessing": "Déficience auditive"
+      }
     },
     "onboarding": {
       "transcript": {
@@ -406,7 +460,10 @@
         "microphoneMuted": "Microphone désactivé",
         "speakWithMelissa": "Parle avec Melissa",
         "speaking": "En train de parler",
-        "you": "Toi"
+        "you": "Toi",
+        "checking": "Vérification...",
+        "fallbackTooltip": "Mode de secours : Azure indisponible. Utilisation de l'API Web Speech du navigateur pour la voix.",
+        "azureTooltip": "Azure OpenAI Realtime API : Conversation vocale bidirectionnelle en temps réel avec Melissa."
       },
       "ageYears": "ans"
     },
@@ -495,6 +552,78 @@
       "p5": "« Il faudra le garder en cage » dit le petit homme. « Mais pourquoi ? » demanda papa. « Il n'a plus de cerveau, voilà pourquoi. Si vous le laissez se promener, il s'envolera dans les bois comme un petit oiseau, et en quelques jours il mourra de faim ! » Papa m'enferma dans une cage, comme un canari. La cage était petite, étroite, je ne pouvais pas bouger. Les barreaux me serraient tellement que... finalement je me réveillai effrayé. Heureusement, ce n'était qu'un rêve !",
       "p6": "Je vous assure que je me suis immédiatement mis à faire mes devoirs.",
       "connection": "MirrorBuddy ne fait pas tes devoirs à ta place. Il t'aide à comprendre comment les faire."
+    },
+    "guides": {
+      "heading": "Rencontre tes",
+      "headingHighlight": "Compagnons de Voyage",
+      "subtitle": "Coaches, Buddies et Maîtres prêts à t'aider à chaque instant",
+      "teamTitle": "Une équipe entière à ton service !",
+      "coachCount": "5 Coaches",
+      "coachDesc": "pour les méthodes d'étude",
+      "buddyCount": "5 Buddies",
+      "buddyDesc": "pour le soutien émotionnel",
+      "maestriCount": "26 Maîtres",
+      "maestriDesc": "experts en matières",
+      "teaser": "Galilée, Darwin, Manzoni, Hérodote, Mozart, Socrate, Feynman et bien d'autres t'attendent !",
+      "categoryCoach": "Coach",
+      "categoryBuddy": "Buddy",
+      "categoryMaestro": "Maître",
+      "items": {
+        "melissa": {
+          "role": "Coach d'apprentissage",
+          "description": "Te guide dans ta méthode d'étude personnalisée"
+        },
+        "enea": {
+          "role": "Buddy",
+          "description": "Compagnon joyeux qui sait remonter le moral"
+        },
+        "euclide": {
+          "role": "Maître de Mathématiques",
+          "description": "Expert en algèbre, géométrie et arithmétique"
+        },
+        "curie": {
+          "role": "Maître de Chimie",
+          "description": "Pionnière de la science, deux prix Nobel !"
+        },
+        "leonardo": {
+          "role": "Maître d'Art",
+          "description": "Génie de la Renaissance, artiste et inventeur"
+        },
+        "shakespeare": {
+          "role": "Maître d'Anglais",
+          "description": "Le plus grand dramaturge de tous les temps"
+        },
+        "feynman": {
+          "role": "Maître de Physique",
+          "description": "Prix Nobel, explique la physique avec passion"
+        },
+        "erodoto": {
+          "role": "Maître d'Histoire",
+          "description": "Le père de l'histoire, raconte le passé"
+        }
+      }
+    },
+    "maestriStep": {
+      "heading": "Tes Professeurs, {name} !",
+      "subtitle": "{count} grands génies prêts à t'aider",
+      "scrollLeft": "Défiler à gauche",
+      "scrollRight": "Défiler à droite",
+      "carouselLabel": "Carrousel des professeurs - utilisez les flèches pour naviguer",
+      "backButton": "Retour",
+      "nextButton": "Suivant",
+      "enableVoice": "Activer la voix",
+      "disableVoice": "Désactiver la voix",
+      "howItWorks": "Comment ça marche ?",
+      "howItWorksDesc": "Chaque Professeur est expert dans sa matière. Quand tu as besoin d'aide en maths, demande à Euclide. Pour l'anglais, il y a Shakespeare ! Je t'aiderai à choisir le bon Professeur pour chaque situation."
+    },
+    "progressIndicator": {
+      "updatingProfile": "Mise à jour du profil de {name}",
+      "welcomeTitle": "Bienvenue sur MirrorBuddy",
+      "skipButton": "Passer",
+      "resetTooltip": "Recommencer (supprimer toutes les données)",
+      "checking": "Vérification...",
+      "fallbackTooltip": "Voix synthétique du navigateur (Azure indisponible)",
+      "azureTooltip": "Voix Azure Realtime haute qualité"
     }
   }
 }

@@ -27,26 +27,33 @@ import enforceDependencyDirection from "./enforce-dependency-direction.js";
 
 // Common Italian words and patterns for detection
 const ITALIAN_COMMON_WORDS = [
+  // Greetings & common
   "ciao",
   "salve",
   "benvenuto",
   "benvenuta",
+  "bentornato",
+  "arrivederci",
+  "buongiorno",
+  "buonasera",
+  // Auth & navigation
   "accedi",
   "esci",
   "uscire",
+  "registrati",
   "profilo",
   "impostazioni",
   "aiuto",
   "chi siamo",
   "contatti",
   "condizioni",
+  // Feedback
   "grazie",
   "prego",
   "errore",
   "attenzione",
   "successo",
-  "sì",
-  "si",
+  // Actions
   "annulla",
   "conferma",
   "salva",
@@ -57,10 +64,65 @@ const ITALIAN_COMMON_WORDS = [
   "nuovo",
   "ricerca",
   "risultati",
+  // State
   "nessun",
   "vuoto",
   "caricamento",
   "in corso",
+  "verifica",
+  // Navigation buttons
+  "indietro",
+  "avanti",
+  "continua",
+  "salta",
+  "inizia",
+  "prossimo",
+  "precedente",
+  "scorri",
+  // Common UI
+  "seleziona",
+  "scegli",
+  "invia",
+  "apri",
+  "chiudi",
+  "aggiungi",
+  "rimuovi",
+  "aggiorna",
+  "cancella",
+  // Onboarding / education
+  "professori",
+  "maestri",
+  "studente",
+  "scuola",
+  "materia",
+  "impara",
+  "studia",
+  "lezione",
+  "compiti",
+  // Descriptions
+  "tuoi",
+  "nostri",
+  "tuo",
+  "tua",
+  "suoi",
+  "sua",
+  "pronti",
+  "pronto",
+  "pronta",
+  "insieme",
+  // Modal / dialog
+  "confermare",
+  "annullare",
+  "procedere",
+  "ricomincia",
+  "ripristina",
+  // Adjectives
+  "personalizzato",
+  "adattivo",
+  "interattivo",
+  "disponibile",
+  "completo",
+  "gratuito",
 ];
 
 // Pattern to detect Italian text (accented characters common in Italian)
@@ -246,25 +308,39 @@ const noHardcodedItalian = {
     fixable: undefined,
   },
   create(context) {
+    const checkText = (node, text) => {
+      if (!text || !text.trim()) return;
+      if (!/[a-zàèéìòùù]/i.test(text)) return;
+      if (containsItalian(text)) {
+        context.report({ node, messageId: "hardcodedItalian" });
+      }
+    };
+
+    // Attributes that commonly contain user-visible text
+    const TEXT_ATTRIBUTES = ["aria-label", "title", "alt", "placeholder"];
+
     return {
       JSXText(node) {
-        const text = node.value;
+        checkText(node, node.value);
+      },
+      JSXAttribute(node) {
+        // Check string literals in aria-label, title, alt, placeholder
+        const attrName =
+          node.name.type === "JSXNamespacedName"
+            ? `${node.name.namespace.name}:${node.name.name.name}`
+            : node.name.type === "JSXIdentifier"
+              ? node.name.name
+              : null;
 
-        // Skip empty text or whitespace-only text
-        if (!text || !text.trim()) {
-          return;
-        }
+        if (!attrName || !TEXT_ATTRIBUTES.includes(attrName)) return;
+        if (!node.value) return;
 
-        // Skip if text contains only numbers or special characters
-        if (!/[a-zàèéìòùù]/i.test(text)) {
-          return;
-        }
-
-        if (containsItalian(text)) {
-          context.report({
-            node,
-            messageId: "hardcodedItalian",
-          });
+        // Only check string literals, not expressions like {t("key")}
+        if (
+          node.value.type === "Literal" &&
+          typeof node.value.value === "string"
+        ) {
+          checkText(node, node.value.value);
         }
       },
     };

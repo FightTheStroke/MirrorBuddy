@@ -187,7 +187,7 @@
       "buddyLabel": "Buddy",
       "coach": "Coach - They teach you study methods",
       "buddy": "Buddy - They support you emotionally",
-      "scrollHint": "\u2190 Scroll to see all \u2192",
+      "scrollHint": "← Scroll to see all →",
       "introLine1": "Coaches for study methods.",
       "introLine2": "Buddies for emotional support.",
       "introDisclaimer": "They don't tell you what to think. They help you find your own way to do it.",
@@ -307,13 +307,39 @@
       "openSource": {
         "ariaLabel": "Open Source",
         "label": "Open Source"
-      }
+      },
+      "ariaLabel": "Footer with legal information and cookie consent",
+      "legalLinksAriaLabel": "Legal links"
     },
     "principles": {
       "howItWorks": "How it works?",
       "howItWorksDesc": "Each Professor is an expert in their field. When you need help with math, ask Euclid. For English, there's Shakespeare! I'll help you choose the right Professor for every situation.",
       "welcomeToSchool": "Welcome to The School I Want, {name}!",
-      "whatMakesUsSpecial": "Here is what makes us special"
+      "whatMakesUsSpecial": "Here is what makes us special",
+      "items": {
+        "learnYourWay": {
+          "title": "Learn your way",
+          "description": "Everyone has their own way of learning. Here we respect your pace and your style."
+        },
+        "maestriCount": {
+          "title": "26 Maestri by your side",
+          "description": "From Leonardo to Marie Curie, the greatest geniuses in history will teach you every subject."
+        },
+        "neverAlone": {
+          "title": "Never alone",
+          "description": "Coaches, virtual companions and tools designed for you. Learning together is better!"
+        },
+        "funLearning": {
+          "title": "Have fun learning",
+          "description": "Quizzes, flashcards, mind maps and XP to earn. Studying becomes an adventure!"
+        }
+      },
+      "melissaQuote": "Remember, {name}: there is no wrong way to learn. I'm here to help you find yours!",
+      "melissaName": "— Melissa",
+      "backButton": "Back",
+      "nextButton": "Next",
+      "enableVoice": "Enable voice",
+      "disableVoice": "Disable voice"
     },
     "ready": {
       "chooseProfessor": "Choose a Professor",
@@ -324,7 +350,12 @@
       "earnXpDescription": "every lesson levels you up!",
       "backButton": "Back",
       "startButton": "Let's start!",
-      "replayModeMessage": "End of tutorial. Click \"{action}\" to return to the app."
+      "replayModeMessage": "End of tutorial. Click \"{action}\" to return to the app.",
+      "perfectName": "Perfect, {name}!",
+      "readyToStart": "You're ready to start your adventure!",
+      "preparedForYou": "I've prepared everything for you! Remember:",
+      "enableVoice": "Enable voice",
+      "disableVoice": "Disable voice"
     },
     "trialLimits": {
       "title": "Free trial limits",
@@ -374,7 +405,30 @@
       "welcomeIntro": "Welcome to The School I Want! I'm here to help you study in the way that works best for you.",
       "whatIsYourName": "What is your name?",
       "years": "Years",
-      "yourSupportTeacher": "Your support teacher"
+      "yourSupportTeacher": "Your support teacher",
+      "nameRequired": "Please tell me your name!",
+      "nameTooShort": "Name must be at least 2 characters",
+      "nameCaptured": "Name captured",
+      "continueButton": "Continue",
+      "backButton": "Back",
+      "skipButton": "Skip",
+      "nextButton": "Next",
+      "ageQuestion": "How old are you?",
+      "schoolQuestion": "What school do you go to?",
+      "replayModeInfo": "You are reviewing the tutorial. Your existing data will not be modified.",
+      "schoolYearsElementary": "6-10 years",
+      "schoolYearsMiddle": "11-13 years",
+      "schoolYearsHigh": "14-19 years",
+      "differences": {
+        "dyslexia": "Dyslexia",
+        "dyscalculia": "Dyscalculia",
+        "dysgraphia": "Dysgraphia",
+        "adhd": "ADHD",
+        "autism": "Autism",
+        "cerebralPalsy": "Cerebral Palsy",
+        "visualImpairment": "Visual Impairment",
+        "auditoryProcessing": "Auditory Processing"
+      }
     },
     "onboarding": {
       "transcript": {
@@ -406,7 +460,10 @@
         "microphoneMuted": "Microphone muted",
         "speakWithMelissa": "Speak with Melissa",
         "speaking": "Speaking",
-        "you": "You"
+        "you": "You",
+        "checking": "Checking...",
+        "fallbackTooltip": "Fallback Mode: Azure unavailable. Using browser Web Speech API for voice.",
+        "azureTooltip": "Azure OpenAI Realtime API: Real-time bidirectional voice conversation with Melissa."
       },
       "ageYears": "years"
     },
@@ -495,6 +552,78 @@
       "p5": "'You'll have to keep him in a cage,' said the little man. 'But why?' asked my father. 'He has no brain anymore, that's why. If you let him go outside, he'll fly into the woods like a little bird, and in a few days he'll die of hunger!' My father shut me in a cage, like a canary. The cage was small, tight, I couldn't move. The bars squeezed me so much that... in the end I woke up frightened. Thank goodness it had only been a dream!",
       "p6": "I assure you I immediately got down to doing my homework.",
       "connection": "MirrorBuddy doesn't do your homework for you. It helps you understand how to do it."
+    },
+    "guides": {
+      "heading": "Meet your",
+      "headingHighlight": "Travel Companions",
+      "subtitle": "Coaches, Buddies and Maestri ready to help you at every moment",
+      "teamTitle": "An entire team at your service!",
+      "coachCount": "5 Coaches",
+      "coachDesc": "for study methods",
+      "buddyCount": "5 Buddies",
+      "buddyDesc": "for emotional support",
+      "maestriCount": "26 Maestri",
+      "maestriDesc": "subject experts",
+      "teaser": "Galileo, Darwin, Manzoni, Herodotus, Mozart, Socrates, Feynman and many more are waiting for you!",
+      "categoryCoach": "Coach",
+      "categoryBuddy": "Buddy",
+      "categoryMaestro": "Maestro",
+      "items": {
+        "melissa": {
+          "role": "Learning Coach",
+          "description": "Guides you through your personalized study method"
+        },
+        "enea": {
+          "role": "Peer Buddy",
+          "description": "Cheerful companion who knows how to lift your spirits"
+        },
+        "euclide": {
+          "role": "Math Maestro",
+          "description": "Expert in algebra, geometry and arithmetic"
+        },
+        "curie": {
+          "role": "Chemistry Maestro",
+          "description": "Pioneer of science, two Nobel Prizes!"
+        },
+        "leonardo": {
+          "role": "Art Maestro",
+          "description": "Renaissance genius, artist and inventor"
+        },
+        "shakespeare": {
+          "role": "English Maestro",
+          "description": "The greatest playwright of all time"
+        },
+        "feynman": {
+          "role": "Physics Maestro",
+          "description": "Nobel Prize winner, explains physics with passion"
+        },
+        "erodoto": {
+          "role": "History Maestro",
+          "description": "The father of history, tells the past"
+        }
+      }
+    },
+    "maestriStep": {
+      "heading": "Your Professors, {name}!",
+      "subtitle": "{count} great geniuses ready to help you",
+      "scrollLeft": "Scroll left",
+      "scrollRight": "Scroll right",
+      "carouselLabel": "Professors carousel - use arrows to navigate",
+      "backButton": "Back",
+      "nextButton": "Next",
+      "enableVoice": "Enable voice",
+      "disableVoice": "Disable voice",
+      "howItWorks": "How does it work?",
+      "howItWorksDesc": "Each Professor is an expert in their field. When you need help with math, ask Euclid. For English, there's Shakespeare! I'll help you choose the right Professor for every situation."
+    },
+    "progressIndicator": {
+      "updatingProfile": "Updating profile for {name}",
+      "welcomeTitle": "Welcome to MirrorBuddy",
+      "skipButton": "Skip",
+      "resetTooltip": "Start over (delete all data)",
+      "checking": "Checking...",
+      "fallbackTooltip": "Browser synthetic voice (Azure unavailable)",
+      "azureTooltip": "High-quality Azure Realtime voice"
     }
   }
 }
