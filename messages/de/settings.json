@@ -567,6 +567,10 @@
       "title": "Account",
       "description": "Gestisci le impostazioni del tuo account"
     },
+    "toolsSection": {
+      "title": "Werkzeuge",
+      "subtitle": "Schnellzugriff auf alle Lernwerkzeuge"
+    },
     "sections": {
       "profile": "Profilo",
       "accessibility": "Accessibilità",

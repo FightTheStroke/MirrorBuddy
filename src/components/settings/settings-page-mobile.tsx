@@ -27,6 +27,7 @@ import {
   AmbientAudioSettings,
   AIProviderSettings,
   DiagnosticsTab,
+  MobileToolsSection,
 } from "./sections";
 
 import { GoogleAccountCard } from "@/components/google-drive";
@@ -39,7 +40,7 @@ interface SettingsPageMobileProps {
 }
 
 export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
-  const t = useTranslations("common");
+  const tSettings = useTranslations("settings");
   const [isSaving, setIsSaving] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -80,6 +81,12 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
       title: "Account",
       icon: "🔑",
       content: <MobileLogoutButton />,
+    },
+    {
+      id: "tools",
+      title: tSettings("toolsSection.title"),
+      icon: "🧰",
+      content: <MobileToolsSection />,
     },
     {
       id: "profile",
@@ -218,7 +225,7 @@ export function SettingsPageMobile({ onBack }: SettingsPageMobileProps) {
         </Button>
 
         <h1 className="text-lg font-semibold text-center flex-1">
-          {t("settings")}
+          {tSettings("title")}
         </h1>
 
         <Button
