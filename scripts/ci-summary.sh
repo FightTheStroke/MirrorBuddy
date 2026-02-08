@@ -83,7 +83,7 @@ run_lint() {
 			result "[WARN] Lint ($wc warnings)"
 			local d
 			d=$(strip_ansi "$tmp" | grep " warning " |
-				sed 's/.*warning  //' | sort | uniq -c | sort -rn | head -5)
+				sed 's/.*warning  //' | sort | uniq -c | sort -rn | head -5 || true)
 			result_details "$d"
 		else
 			result "[PASS] Lint"
@@ -94,7 +94,7 @@ run_lint() {
 		ERRORS=$((ERRORS + 1))
 		result "[FAIL] Lint ($ec errors)"
 		local d
-		d=$(strip_ansi "$tmp" | grep " error " | head -10)
+		d=$(strip_ansi "$tmp" | grep " error " | head -10 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
@@ -112,7 +112,7 @@ run_typecheck() {
 		result "[FAIL] Typecheck ($ec errors)"
 		local d
 		d=$(strip_ansi "$tmp" | grep "error TS" |
-			sed 's/.*\(error TS[0-9]*:.*\)/\1/' | sort | uniq -c | sort -rn | head -10)
+			sed 's/.*\(error TS[0-9]*:.*\)/\1/' | sort | uniq -c | sort -rn | head -10 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
@@ -129,7 +129,7 @@ run_build() {
 			WARNINGS=$((WARNINGS + wc))
 			result "[WARN] Build ($wc warnings)"
 			local d
-			d=$(strip_ansi "$tmp" | grep -iE "^warn" | head -5)
+			d=$(strip_ansi "$tmp" | grep -iE "^warn" | head -5 || true)
 			result_details "$d"
 		else
 			result "[PASS] Build"
@@ -139,7 +139,7 @@ run_build() {
 		result "[FAIL] Build"
 		local d
 		d=$(strip_ansi "$tmp" |
-			grep -iE "^error|Error:|Type error|Module not found" | head -10)
+			grep -iE "^error|Error:|Type error|Module not found" | head -10 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
