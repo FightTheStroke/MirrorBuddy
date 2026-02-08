@@ -7,6 +7,9 @@ import { logger } from "@/lib/logger";
 import { executeToolCall } from "@/lib/tools/tool-executor";
 import { saveTool } from "@/lib/tools/tool-persistence";
 import { functionNameToToolType } from "@/types/tools";
+import type { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
+import { normalizeCharacterTools } from "@/lib/tools/constants";
+import { functionNameToToolType as fnToToolType } from "@/lib/tools/constants";
 
 interface ToolCall {
   id: string;
@@ -130,6 +133,35 @@ export async function processToolCalls(
   });
 
   return toolCallRefs;
+}
+
+/**
+ * Filter tool definitions to only include tools available for a character.
+ * Uses normalizeCharacterTools() from constants.ts (single source of truth)
+ * to convert character tool names to ToolType values.
+ */
+export function filterToolDefinitions(
+  allDefinitions: typeof CHAT_TOOL_DEFINITIONS,
+  characterToolNames: string[],
+): (typeof CHAT_TOOL_DEFINITIONS)[number][] {
+  if (!characterToolNames || characterToolNames.length === 0) {
+    return [...allDefinitions];
+  }
+
+  const normalizedTypes = normalizeCharacterTools(characterToolNames);
+
+  // If no character tool maps to a known ToolType (e.g., all are non-AI
+  // tools like Task/Read/Write), return empty to prevent irrelevant calls
+  if (normalizedTypes.length === 0) {
+    return [];
+  }
+
+  const allowedSet = new Set<string>(normalizedTypes);
+
+  return allDefinitions.filter((def) => {
+    const toolType = fnToToolType(def.function.name);
+    return toolType ? allowedSet.has(toolType) : false;
+  });
 }
 
 /**

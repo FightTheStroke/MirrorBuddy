@@ -181,7 +181,7 @@ async function fetchCountsFromDatabase(): Promise<AdminCounts> {
       prisma.user.count({ where: { isTestData: false } }),
       prisma.userActivity.groupBy({
         by: ["identifier"],
-        where: { timestamp: { gte: yesterday } },
+        where: { timestamp: { gte: yesterday }, isTestData: false },
       }),
       prisma.safetyEvent
         .count({

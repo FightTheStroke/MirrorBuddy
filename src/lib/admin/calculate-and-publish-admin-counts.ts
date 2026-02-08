@@ -47,11 +47,12 @@ async function calculateAdminCounts(): Promise<AdminCounts> {
         where: { isTestData: false },
       }),
 
-      // Active users in last 24h (F-06: exclude test data at query level if possible)
+      // Active users in last 24h (F-06: exclude test data)
       prisma.userActivity.groupBy({
         by: ["identifier"],
         where: {
           timestamp: { gte: yesterday },
+          isTestData: false,
         },
       }),
 

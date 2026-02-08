@@ -123,12 +123,12 @@ export async function calculateAndPublishAdminCounts(
         where: { isTestData: false },
       }),
 
-      // Active users in last 24h (distinct user identifiers from UserActivity)
-      // Note: UserActivity doesn't have isTestData field, filtered at application level instead
+      // Active users in last 24h (F-06: exclude test data)
       prisma.userActivity.groupBy({
         by: ["identifier"],
         where: {
           timestamp: { gte: yesterday },
+          isTestData: false,
         },
       }),
 

@@ -26,6 +26,9 @@ import { recordMessage, recordSessionStart } from "@/lib/safety/server";
 import { analyzeIndependence } from "@/lib/gamification/independence-tracker";
 import { awardPoints } from "@/lib/gamification/db";
 import { CHAT_TOOL_DEFINITIONS } from "@/types/tools";
+import { getMaestroById } from "@/data/maestri";
+import { getSupportTeacherById } from "@/data/support-teachers";
+import { getBuddyById } from "@/data/buddy-profiles";
 import {
   assessResponseTransparency,
   type TransparencyContext,
@@ -50,7 +53,11 @@ import {
   updateBudget,
 } from "./budget-handler";
 import { buildAllContexts } from "./context-builders";
-import { processToolCalls, buildToolChoice } from "./tool-handler";
+import {
+  processToolCalls,
+  buildToolChoice,
+  filterToolDefinitions,
+} from "./tool-handler";
 import {
   checkTrialForAnonymous,
   incrementTrialUsage,
@@ -60,6 +67,26 @@ import {
 import { incrementTrialBudgetWithPublish } from "@/lib/trial/trial-budget-service";
 import { TOKEN_COST_PER_UNIT } from "./stream/helpers";
 import { pipe, withSentry, withCSRF } from "@/lib/api/middlewares";
+
+/**
+ * Look up a character's allowed tools array by maestroId.
+ * Returns empty array if character not found (allows all tools via
+ * filterToolDefinitions fallback).
+ */
+function getCharacterTools(maestroId: string): string[] {
+  const maestro = getMaestroById(maestroId);
+  if (maestro) return maestro.tools;
+
+  const coach = getSupportTeacherById(
+    maestroId as Parameters<typeof getSupportTeacherById>[0],
+  );
+  if (coach) return coach.tools;
+
+  const buddy = getBuddyById(maestroId as Parameters<typeof getBuddyById>[0]);
+  if (buddy) return buddy.tools;
+
+  return [];
+}
 
 export const POST = pipe(
   withSentry("/api/chat"),
@@ -345,12 +372,16 @@ export const POST = pipe(
 
       const toolChoice = buildToolChoice(enableTools, requestedTool);
 
+      // Filter tool definitions based on character's allowed tools
+      const characterTools = getCharacterTools(maestroId);
+      const filteredTools = enableTools
+        ? filterToolDefinitions(CHAT_TOOL_DEFINITIONS, characterTools)
+        : undefined;
+
       const result = await chatCompletion(messages, enhancedSystemPrompt, {
-        tools: enableTools
-          ? ([
-              ...CHAT_TOOL_DEFINITIONS,
-            ] as (typeof CHAT_TOOL_DEFINITIONS)[number][])
-          : undefined,
+        tools: filteredTools as
+          | (typeof CHAT_TOOL_DEFINITIONS)[number][]
+          | undefined,
         tool_choice: toolChoice,
         providerPreference,
         model: deploymentName, // Tier-based model routing

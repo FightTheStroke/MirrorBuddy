@@ -128,8 +128,7 @@ export async function getResendLimits(): Promise<ResendLimits> {
 
     return limits;
   } catch (error) {
-    const errorMsg =
-      error instanceof Error ? error.message : "Unknown error";
+    const errorMsg = error instanceof Error ? error.message : "Unknown error";
     logger.error("Failed to fetch Resend limits", undefined, error as Error);
     return createEmptyLimits(errorMsg);
   }
@@ -149,11 +148,7 @@ async function queryResendEmailStats(
   apiKey: string,
 ): Promise<{ dailyCount: number; monthlyCount: number }> {
   const now = new Date();
-  const startOfDay = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-  );
+  const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   try {
@@ -221,8 +216,18 @@ function calculatePercent(used: number, limit: number): number {
  */
 function createEmptyLimits(error: string): ResendLimits {
   return {
-    emailsToday: { used: 0, limit: 0, percent: 0, status: "ok" },
-    emailsMonth: { used: 0, limit: 0, percent: 0, status: "ok" },
+    emailsToday: {
+      used: 0,
+      limit: RESEND_FREE_LIMITS.EMAILS_PER_DAY,
+      percent: 0,
+      status: "ok",
+    },
+    emailsMonth: {
+      used: 0,
+      limit: RESEND_FREE_LIMITS.EMAILS_PER_MONTH,
+      percent: 0,
+      status: "ok",
+    },
     timestamp: Date.now(),
     error,
   };

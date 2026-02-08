@@ -8,6 +8,7 @@
  * the deployment validation scripts.
  */
 
+import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { resolve } from "path";
 

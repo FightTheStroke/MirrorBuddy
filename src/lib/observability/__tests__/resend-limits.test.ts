@@ -30,9 +30,9 @@ describe("Resend Limits API", () => {
 
     expect(limits.error).toBe("RESEND_API_KEY not configured");
     expect(limits.emailsToday.used).toBe(0);
-    expect(limits.emailsToday.limit).toBe(0);
+    expect(limits.emailsToday.limit).toBe(100); // Free tier fallback
     expect(limits.emailsMonth.used).toBe(0);
-    expect(limits.emailsMonth.limit).toBe(0);
+    expect(limits.emailsMonth.limit).toBe(3000); // Free tier fallback
 
     process.env.RESEND_API_KEY = originalKey;
   });

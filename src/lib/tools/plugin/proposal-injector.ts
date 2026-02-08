@@ -4,9 +4,9 @@
  * Generates contextual instructions for maestro system prompt (F-01)
  */
 
-import { getMaestroById } from '@/data/maestri';
-import { TOOL_CONFIG } from '@/lib/tools/constants';
-import { CATEGORY_LABELS_IT } from './constants';
+import { getMaestroById } from "@/data/maestri";
+import { TOOL_CONFIG, normalizeCharacterToolName } from "@/lib/tools/constants";
+import { CATEGORY_LABELS_IT } from "./constants";
 
 /**
  * Context information for tool proposal decision-making
@@ -16,8 +16,13 @@ export interface ToolContext {
   topic?: string;
   subject?: string;
   keywords?: string[];
-  sessionPhase?: 'greeting' | 'exploration' | 'practice' | 'assessment' | 'reflection';
-  complexity?: 'beginner' | 'intermediate' | 'advanced';
+  sessionPhase?:
+    | "greeting"
+    | "exploration"
+    | "practice"
+    | "assessment"
+    | "reflection";
+  complexity?: "beginner" | "intermediate" | "advanced";
 }
 
 /**
@@ -46,7 +51,10 @@ export class ProposalInjector {
    * @param context - Conversation and session context
    * @returns Array of available tool proposals, sorted by relevance
    */
-  getAvailableProposals(maestroId: string, context: ToolContext): ToolProposal[] {
+  getAvailableProposals(
+    maestroId: string,
+    context: ToolContext,
+  ): ToolProposal[] {
     const maestro = getMaestroById(maestroId);
     if (!maestro) {
       return [];
@@ -60,9 +68,10 @@ export class ProposalInjector {
 
     const proposals: ToolProposal[] = [];
 
-    // Map each available tool to a proposal
+    // Map each available tool to a proposal (normalize PascalCase -> ToolType)
     for (const toolId of availableToolIds) {
-      const tool = TOOL_CONFIG[toolId];
+      const normalizedId = normalizeCharacterToolName(toolId);
+      const tool = normalizedId ? TOOL_CONFIG[normalizedId] : undefined;
       if (!tool) continue;
 
       // Calculate relevance based on context
@@ -94,32 +103,32 @@ export class ProposalInjector {
     const proposals = this.getAvailableProposals(maestroId, context);
 
     if (proposals.length === 0) {
-      return '';
+      return "";
     }
 
     // Sort by category for better organization
     const byCategory = this.groupByCategory(proposals);
     const instructionLines: string[] = [];
 
-    instructionLines.push('## Available Tools');
+    instructionLines.push("## Available Tools");
     instructionLines.push(
-      'Quando appropriato nel contesto della conversazione, puoi proporre questi strumenti:'
+      "Quando appropriato nel contesto della conversazione, puoi proporre questi strumenti:",
     );
-    instructionLines.push('');
+    instructionLines.push("");
 
     for (const [category, tools] of Object.entries(byCategory)) {
       instructionLines.push(`### ${this.categoryLabel(category)}`);
       for (const tool of tools) {
         instructionLines.push(`- **${tool.toolName}**: ${tool.proposal}`);
       }
-      instructionLines.push('');
+      instructionLines.push("");
     }
 
     instructionLines.push(
-      'Suggerisci questi strumenti solo quando sono veramente utili per il tema in discussione.'
+      "Suggerisci questi strumenti solo quando sono veramente utili per il tema in discussione.",
     );
 
-    return instructionLines.join('\n');
+    return instructionLines.join("\n");
   }
 
   /**
@@ -134,13 +143,13 @@ export class ProposalInjector {
     let relevance = 0.5; // Base relevance
 
     // Boost for session phase
-    if (context.sessionPhase === 'practice' && toolId === 'quiz') {
+    if (context.sessionPhase === "practice" && toolId === "quiz") {
       relevance = 0.9;
-    } else if (context.sessionPhase === 'practice' && toolId === 'flashcard') {
+    } else if (context.sessionPhase === "practice" && toolId === "flashcard") {
       relevance = 0.85;
-    } else if (context.sessionPhase === 'exploration' && toolId === 'mindmap') {
+    } else if (context.sessionPhase === "exploration" && toolId === "mindmap") {
       relevance = 0.8;
-    } else if (context.sessionPhase === 'assessment' && toolId === 'quiz') {
+    } else if (context.sessionPhase === "assessment" && toolId === "quiz") {
       relevance = 0.9;
     }
 
@@ -148,7 +157,9 @@ export class ProposalInjector {
     if (context.keywords && context.keywords.length > 0) {
       const toolLower = toolId.toLowerCase();
       const hasMatch = context.keywords.some(
-        kw => toolLower.includes(kw.toLowerCase()) || kw.toLowerCase().includes(toolLower)
+        (kw) =>
+          toolLower.includes(kw.toLowerCase()) ||
+          kw.toLowerCase().includes(toolLower),
       );
       if (hasMatch) {
         relevance = Math.max(relevance, 0.75);
@@ -156,8 +167,8 @@ export class ProposalInjector {
     }
 
     // Complexity adjustment
-    if (context.complexity === 'advanced') {
-      if (toolId === 'diagram' || toolId === 'mindmap') {
+    if (context.complexity === "advanced") {
+      if (toolId === "diagram" || toolId === "mindmap") {
         relevance = Math.max(relevance, 0.75);
       }
     }
@@ -174,27 +185,27 @@ export class ProposalInjector {
    * @returns Proposal description text
    */
   private generateProposal(toolName: string, context: ToolContext): string {
-    const subject = context.subject || 'l\'argomento';
-    const topic = context.topic || 'il concetto';
+    const subject = context.subject || "l'argomento";
+    const topic = context.topic || "il concetto";
 
     // Tailor proposal based on tool type
-    if (toolName.toLowerCase().includes('quiz')) {
+    if (toolName.toLowerCase().includes("quiz")) {
       return `Testa la comprensione con domande su ${topic}`;
-    } else if (toolName.toLowerCase().includes('flashcard')) {
+    } else if (toolName.toLowerCase().includes("flashcard")) {
       return `Memorizza i concetti chiave con flashcard su ${topic}`;
-    } else if (toolName.toLowerCase().includes('mappa')) {
+    } else if (toolName.toLowerCase().includes("mappa")) {
       return `Visualizza i collegamenti tra concetti di ${subject}`;
-    } else if (toolName.toLowerCase().includes('riassunto')) {
+    } else if (toolName.toLowerCase().includes("riassunto")) {
       return `Genera un riassunto strutturato di ${topic}`;
-    } else if (toolName.toLowerCase().includes('diagramma')) {
+    } else if (toolName.toLowerCase().includes("diagramma")) {
       return `Crea un diagramma per visualizzare ${topic}`;
-    } else if (toolName.toLowerCase().includes('timeline')) {
+    } else if (toolName.toLowerCase().includes("timeline")) {
       return `Organizza gli eventi in una sequenza temporale`;
-    } else if (toolName.toLowerCase().includes('formula')) {
+    } else if (toolName.toLowerCase().includes("formula")) {
       return `Comprendi le formule matematiche di ${topic}`;
-    } else if (toolName.toLowerCase().includes('grafico')) {
+    } else if (toolName.toLowerCase().includes("grafico")) {
       return `Visualizza i dati con grafici e statistiche`;
-    } else if (toolName.toLowerCase().includes('ricerca')) {
+    } else if (toolName.toLowerCase().includes("ricerca")) {
       return `Approfondisci ${topic} con ricerche sul web`;
     }
 
@@ -207,11 +218,13 @@ export class ProposalInjector {
    * @param proposals - Array of tool proposals
    * @returns Object with categories as keys, proposals as values
    */
-  private groupByCategory(proposals: ToolProposal[]): Record<string, ToolProposal[]> {
+  private groupByCategory(
+    proposals: ToolProposal[],
+  ): Record<string, ToolProposal[]> {
     const grouped: Record<string, ToolProposal[]> = {};
 
     for (const proposal of proposals) {
-      const category = proposal.category || 'other';
+      const category = proposal.category || "other";
       if (!grouped[category]) {
         grouped[category] = [];
       }

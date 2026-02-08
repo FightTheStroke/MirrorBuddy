@@ -9,11 +9,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- **Campaigns Page Crash**: Server component fetched its own API route without forwarding cookies, causing 401/500 errors. Replaced with direct `listCampaigns()` service call
+- **Resend Email Quota Fallback**: `createEmptyLimits()` returned `limit: 0` on API errors, blocking all email sends. Now returns free tier limits (100/day, 3000/month) as safe fallback
+- **Tool Definition Filtering**: Chat API passed ALL AI tool definitions to every character regardless of their allowed tools. Added `filterToolDefinitions()` with centralized `normalizeCharacterToolName()` mapping (ADR 0139)
+- **Coach/Buddy Layout Overflow**: `CharacterChatView` used `h-screen` which ignored parent's `pt-14` padding, pushing footer 56px below viewport. Fixed with `h-[calc(100dvh-5rem)]` + `h-full` override
+- **Admin Metrics Test Data**: `activeUsers24h` query did not filter `isTestData: false` on `UserActivity`, inflating metrics with test data. Fixed in all 4 query locations
+- **ProposalInjector PascalCase Lookup**: Tool name lookup silently failed on PascalCase names (e.g., `MindMap`) against lowercase `TOOL_CONFIG` keys. Now uses centralized `normalizeCharacterToolName()`
 - **Missing Prisma Migrations**: Added migration for 9 models (CharacterConfig, ToolOutput, HierarchicalSummary, PasswordResetToken, ContactRequest, AdminAuditLog, AuditLog, SchoolSSOConfig, SSOSession) and CharacterType enum that had no corresponding database tables, causing 500 errors on all related API routes (ADR 0137)
 - **Admin Breadcrumb i18n**: Fixed `/admin/locales` breadcrumb mapping from non-existent `sidebar.locales` to correct `sidebar.localization` key
 
 ### Added
 
+- **Centralized Tool Name Normalization**: `normalizeCharacterToolName()` and `normalizeCharacterTools()` in `src/lib/tools/constants.ts` as single source of truth for character-tool-name-to-ToolType mapping (ADR 0139)
+- **Regression Tests**: 4 test suites preventing recurrence of production bugs: campaigns page source analysis, resend limits fallback values, tool definition filtering, admin counts isTestData filter
 - **Schema Drift Detection**: Database-free script (`check-schema-drift.sh`) that verifies every Prisma model/enum has a matching migration. Enforced at three layers: pre-push hook, CI Lane 4b, and `ci-summary.sh --migrations` (ADR 0137)
 
 ## [0.15.0] - 2026-02-08

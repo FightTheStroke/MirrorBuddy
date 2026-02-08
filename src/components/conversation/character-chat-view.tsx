@@ -130,7 +130,7 @@ export function CharacterChatView({
   const hasActiveTool = activeTool && activeTool.status !== "error";
 
   return (
-    <div className="flex flex-col lg:flex-row gap-0 md:gap-4 h-full lg:h-[calc(100vh-8rem)]">
+    <div className="flex flex-col lg:flex-row gap-0 md:gap-4 h-[calc(100dvh-5rem)]">
       {/* Main Chat Area using SharedChatLayout */}
       <SharedChatLayout
         header={
@@ -183,7 +183,7 @@ export function CharacterChatView({
           </AnimatePresence>
         }
         showRightPanel={isVoiceActive || isHistoryOpen}
-        className="flex-1"
+        className="flex-1 h-full"
       >
         <MessagesList
           messages={messages}
