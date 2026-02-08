@@ -64,10 +64,12 @@ async function initializeAzureClient(): Promise<boolean> {
       return false;
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { SecretClient } = secretsModule as any;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { DefaultAzureCredential } = identityModule as any;
+    const { SecretClient } = secretsModule as {
+      SecretClient: new (url: string, credential: unknown) => SecretClientType;
+    };
+    const { DefaultAzureCredential } = identityModule as {
+      DefaultAzureCredential: new () => unknown;
+    };
 
     const credential = new DefaultAzureCredential();
     secretClient = new SecretClient(vaultUrl, credential);
