@@ -9,10 +9,11 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "fs";
+import { readFileSync, existsSync } from "fs";
 import { resolve } from "path";
 
 const ROOT = resolve(__dirname, "../../..");
+const HAS_ENV_FILE = existsSync(resolve(ROOT, ".env"));
 
 /** Variables that are dev/test/iOS-only and should NOT be on Vercel */
 const DEV_ONLY_VARS = new Set([
@@ -52,8 +53,8 @@ function parseRequiredVarsFromBash(filePath: string): string[] {
   return blockMatches.map((m) => m.replace(/"/g, ""));
 }
 
-describe("Vercel environment variable alignment", () => {
-  const envVars = parseEnvVarNames(".env");
+describe.skipIf(!HAS_ENV_FILE)("Vercel environment variable alignment", () => {
+  const envVars = HAS_ENV_FILE ? parseEnvVarNames(".env") : [];
   const productionVars = envVars.filter((v) => !ALLOW_EMPTY.has(v));
 
   it("should have production vars in .env", () => {
