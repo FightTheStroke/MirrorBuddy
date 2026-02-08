@@ -861,6 +861,26 @@
             "userIdClient": {
               "duration": "Duration",
               "purpose": "Purpose"
+            },
+            "theme": {
+              "duration": "1 year",
+              "purpose": "Stores user theme preference (light/dark mode) for visual accessibility"
+            },
+            "consent": {
+              "duration": "1 year",
+              "purpose": "Records user consent for cookies and data processing as required by GDPR Art. 7"
+            },
+            "visitorId": {
+              "duration": "30 days",
+              "purpose": "Anonymous visitor tracking for Trial tier users. HTTP-only cookie for security. No personally identifiable information stored."
+            },
+            "csrfToken": {
+              "duration": "Session (expires when browser closes)",
+              "purpose": "Cross-Site Request Forgery (CSRF) protection token. HTTP-only cookie for security. Required for secure form submissions."
+            },
+            "simulatedTier": {
+              "duration": "Session (expires when browser closes)",
+              "purpose": "Admin testing cookie to simulate different subscription tiers (Trial/Base/Pro). HTTP-only cookie. Used only by authorized administrators for quality assurance."
             }
           }
         },
@@ -1212,6 +1232,46 @@
           },
           "learnMoreHeading": "Want to Know More?",
           "learnMoreText": "for complete information about our AI architecture, bias testing, and how we use conversational data."
+        },
+        "tierSystem": {
+          "title": "Service Tiers and Data Collection",
+          "intro": "MirrorBuddy offers three service tiers with different levels of access and data collection. Understanding which tier you are using helps you understand what personal data we collect and how we use it.",
+          "trial": {
+            "title": "Trial Tier (Anonymous Access)",
+            "description": "Trial users can access MirrorBuddy without creating an account. This tier provides limited access with minimal data collection. You can use up to 10 chat messages per month and 5 minutes of voice interaction. Only 3 maestri (AI teachers) are available. We collect only a visitor-id cookie (anonymous, 30-day expiry) to track usage limits. No email, name, or personal profile data is collected. No login required. No payment information collected."
+          },
+          "base": {
+            "title": "Base Tier (Free Registered Account)",
+            "description": "Base tier users must create a free registered account with email and name. This tier provides full access to core educational features with unlimited chat messages and unlimited voice interaction time. Access to 25 maestri (AI teachers). We collect and store: email address (for login and notifications), name (for personalized greetings), conversation history (to continue learning sessions), flashcard data and learning progress (for spaced repetition algorithm), user preferences and accessibility settings. No payment information collected for this tier."
+          },
+          "pro": {
+            "title": "Pro Tier (Paid Subscription)",
+            "description": "Pro tier users have a paid subscription at €9.99/month processed via Stripe. This tier provides premium access with all features: unlimited chat messages, unlimited voice interaction, access to all 26 maestri (AI teachers) including exclusive premium teachers, priority support and advanced features. We collect all Base tier data plus: payment information processed by Stripe (not stored directly by MirrorBuddy), billing address and invoice history (for accounting and tax compliance), subscription status and renewal dates. Payment data is handled by Stripe under their own Data Processing Agreement (DPA) compliant with GDPR."
+          },
+          "dataNote": "Your subscription tier determines what personal data we collect. You can view and control your data at any time in your privacy settings. Upgrading or downgrading your tier changes your data collection profile accordingly. When you downgrade from Pro to Base or delete your account, payment data retention follows our standard retention policy (billing records retained for 7 years for tax compliance, then permanently deleted)."
+        },
+        "vendorsAndProcessors": {
+          "title": "AI Service Providers and Data Processors",
+          "intro": "MirrorBuddy uses the following certified artificial intelligence service providers to process conversational data:",
+          "vendors": {
+            "anthropic": {
+              "name": "Anthropic (Claude AI)",
+              "dataProcessed": "Educational conversation text, lesson context, student questions and answers",
+              "legalBasis": "Contractual necessity (Art. 6.1.b GDPR) - processing necessary to provide personalized educational service",
+              "dpaStatus": "Standard Contractual Clauses (SCC) approved by the European Commission for extra-EU transfers",
+              "dataLocation": "United States (USA) with SCC safeguards compliant with GDPR Art. 46"
+            },
+            "azureRealtimeVoice": {
+              "name": "Microsoft Azure Realtime Voice API",
+              "dataProcessed": "Voice audio data streamed in real-time for text-to-speech and speech-to-text conversion. Audio is processed ephemerally without persistent storage.",
+              "legalBasis": "Contractual necessity (Art. 6.1.b GDPR) - processing necessary to provide voice interaction features within educational service",
+              "dpaStatus": "Microsoft Data Processing Agreement (DPA) with Standard Contractual Clauses (SCC) for extra-EU transfers",
+              "dataLocation": "EU (West Europe region) with SCC safeguards for cross-border data flows compliant with GDPR Art. 46",
+              "note": "Real-time processing only. No voice recordings are stored on Microsoft servers. No personally identifiable information (PII) is extracted from voice data. Audio streams are discarded immediately after processing."
+            }
+          },
+          "note": "All AI providers have signed Data Processing Agreements (DPA) compliant with GDPR Art. 28 and implement appropriate technical and organizational security measures according to GDPR Art. 32.",
+          "contactForDpa": "You can request a copy of our DPA agreements by contacting roberdan@fightthestroke.org"
         }
       },
       "terms": {
@@ -1588,6 +1648,12 @@
     "technicalDocuments": "Technical Documentation",
     "technicalDescription": "Technical documentation available on GitHub for developers and reviewers.",
     "questionsTitle": "Questions about Compliance?",
-    "questionsDescription": "For any questions about our regulatory compliance or to exercise your rights, contact us."
+    "questionsDescription": "For any questions about our regulatory compliance or to exercise your rights, contact us.",
+    "aiDisclosure": {
+      "label": "AI",
+      "fullLabel": "AI Response",
+      "ariaLabel": "AI-generated response",
+      "tooltip": "This response is generated by artificial intelligence. Always verify important information."
+    }
   }
 }

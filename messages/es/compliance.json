@@ -768,6 +768,26 @@
             "userIdClient": {
               "duration": "Duración",
               "purpose": "Propósito"
+            },
+            "theme": {
+              "duration": "1 año",
+              "purpose": "Almacena la preferencia de tema del usuario (modo claro/oscuro) para accesibilidad visual"
+            },
+            "consent": {
+              "duration": "1 año",
+              "purpose": "Registra el consentimiento del usuario para cookies y tratamiento de datos según lo exigido por el RGPD Art. 7"
+            },
+            "visitorId": {
+              "duration": "30 días",
+              "purpose": "Seguimiento anónimo de visitantes para usuarios Trial. Cookie HTTP-only por seguridad. No se almacena información personal identificable."
+            },
+            "csrfToken": {
+              "duration": "Sesión (caduca al cerrar el navegador)",
+              "purpose": "Token de protección contra Cross-Site Request Forgery (CSRF). Cookie HTTP-only por seguridad. Requerido para envíos seguros de formularios."
+            },
+            "simulatedTier": {
+              "duration": "Sesión (caduca al cerrar el navegador)",
+              "purpose": "Cookie de prueba administrativa para simular diferentes niveles de suscripción (Trial/Base/Pro). Cookie HTTP-only. Usado solo por administradores autorizados para control de calidad."
             }
           }
         },
@@ -1119,6 +1139,46 @@
           },
           "learnMoreHeading": "¿Quiere saber más?",
           "learnMoreText": "para información completa sobre nuestra arquitectura de IA, pruebas de sesgo y cómo usamos los datos conversacionales."
+        },
+        "vendorsAndProcessors": {
+          "title": "Proveedores de Servicios de IA y Encargados del Tratamiento",
+          "intro": "MirrorBuddy utiliza los siguientes proveedores certificados de servicios de inteligencia artificial para procesar los datos conversacionales:",
+          "vendors": {
+            "anthropic": {
+              "name": "Anthropic (Claude AI)",
+              "dataProcessed": "Texto de las conversaciones educativas, contexto de las lecciones, preguntas y respuestas de los estudiantes",
+              "legalBasis": "Necesidad contractual (Art. 6.1.b RGPD) - tratamiento necesario para proporcionar el servicio educativo personalizado",
+              "dpaStatus": "Cláusulas Contractuales Tipo (CCT) aprobadas por la Comisión Europea para transferencias fuera de la UE",
+              "dataLocation": "Estados Unidos (EE.UU.) con garantías CCT conformes al RGPD Art. 46"
+            },
+            "azureRealtimeVoice": {
+              "name": "Microsoft Azure Realtime Voice API",
+              "dataProcessed": "Datos de audio vocal transmitidos en tiempo real para conversión texto-a-voz y voz-a-texto. El audio se procesa de forma efímera sin almacenamiento persistente.",
+              "legalBasis": "Necesidad contractual (Art. 6.1.b RGPD) - tratamiento necesario para proporcionar las funcionalidades de interacción vocal en el servicio educativo",
+              "dpaStatus": "Acuerdo de Tratamiento de Datos (DPA) de Microsoft con Cláusulas Contractuales Tipo (CCT) para transferencias fuera de la UE",
+              "dataLocation": "UE (región West Europe) con garantías CCT para flujos de datos transfronterizos conformes al RGPD Art. 46",
+              "note": "Solo procesamiento en tiempo real. No se conservan grabaciones de voz en los servidores de Microsoft. No se extrae información personal identificable (PII) de los datos de voz. Los flujos de audio se eliminan inmediatamente después del procesamiento."
+            }
+          },
+          "note": "Todos los proveedores de IA han firmado Acuerdos de Tratamiento de Datos (DPA) conformes al RGPD Art. 28 e implementan medidas de seguridad técnicas y organizativas apropiadas conforme al RGPD Art. 32.",
+          "contactForDpa": "Puede solicitar una copia de nuestros acuerdos DPA contactando a roberdan@fightthestroke.org"
+        },
+        "tierSystem": {
+          "title": "Niveles de Servicio y Recopilación de Datos",
+          "intro": "MirrorBuddy ofrece tres niveles de servicio con diferentes grados de acceso y recopilación de datos. Comprender qué nivel utiliza le ayuda a entender qué datos personales recopilamos y cómo los usamos.",
+          "trial": {
+            "title": "Nivel Trial (Acceso Anónimo)",
+            "description": "Los usuarios Trial pueden acceder a MirrorBuddy sin crear una cuenta. Este nivel proporciona acceso limitado con recopilación mínima de datos. Puede usar hasta 10 mensajes de chat al mes y 5 minutos de interacción de voz. Solo 3 maestri (profesores IA) están disponibles. Solo recopilamos una cookie visitor-id (anónima, caducidad 30 días) para rastrear los límites de uso. No se recopilan email, nombre ni datos de perfil personal. No requiere inicio de sesión. No se recopila información de pago."
+          },
+          "base": {
+            "title": "Nivel Base (Cuenta Registrada Gratuita)",
+            "description": "Los usuarios del nivel Base deben crear una cuenta registrada gratuita con email y nombre. Este nivel proporciona acceso completo a las funciones educativas principales con mensajes de chat ilimitados y tiempo de interacción vocal ilimitado. Acceso a 25 maestri (profesores IA). Recopilamos y conservamos: dirección de email (para inicio de sesión y notificaciones), nombre (para saludos personalizados), historial de conversaciones (para continuar las sesiones de aprendizaje), datos de flashcards y progreso de aprendizaje (para algoritmo de repetición espaciada), preferencias de usuario y configuraciones de accesibilidad. No se recopila información de pago para este nivel."
+          },
+          "pro": {
+            "title": "Nivel Pro (Suscripción de Pago)",
+            "description": "Los usuarios del nivel Pro tienen una suscripción de pago de 9,99 €/mes procesada a través de Stripe. Este nivel proporciona acceso premium con todas las funciones: mensajes de chat ilimitados, interacción vocal ilimitada, acceso a los 26 maestri (profesores IA) incluyendo profesores premium exclusivos, soporte prioritario y funciones avanzadas. Recopilamos todos los datos del nivel Base más: información de pago procesada por Stripe (no almacenada directamente por MirrorBuddy), dirección de facturación e historial de facturas (para contabilidad y cumplimiento fiscal), estado de suscripción y fechas de renovación. Los datos de pago son gestionados por Stripe según su Acuerdo de Tratamiento de Datos (DPA) conforme al RGPD."
+          },
+          "dataNote": "Su nivel de suscripción determina qué datos personales recopilamos. Puede consultar y controlar sus datos en cualquier momento en su configuración de privacidad. Actualizar o degradar su nivel cambia correspondientemente su perfil de recopilación de datos. Cuando degrada de Pro a Base o elimina su cuenta, la retención de datos de pago sigue nuestra política de retención estándar (registros de facturación conservados durante 7 años para cumplimiento fiscal, luego eliminados definitivamente)."
         }
       },
       "terms": {
@@ -1388,6 +1448,12 @@
     "technicalDocuments": "Documentación Técnica",
     "technicalDescription": "Documentación técnica disponible en GitHub para desarrolladores y revisores.",
     "questionsTitle": "¿Preguntas sobre el Cumplimiento?",
-    "questionsDescription": "Para cualquier pregunta sobre nuestro cumplimiento normativo o para ejercer sus derechos, contáctenos."
+    "questionsDescription": "Para cualquier pregunta sobre nuestro cumplimiento normativo o para ejercer sus derechos, contáctenos.",
+    "aiDisclosure": {
+      "label": "AI",
+      "fullLabel": "Respuesta IA",
+      "ariaLabel": "Respuesta generada por inteligencia artificial",
+      "tooltip": "Esta respuesta es generada por inteligencia artificial. Siempre verifica la información importante."
+    }
   }
 }

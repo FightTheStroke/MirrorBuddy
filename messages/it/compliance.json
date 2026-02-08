@@ -861,6 +861,26 @@
             "userIdClient": {
               "duration": "Duration",
               "purpose": "Purpose"
+            },
+            "theme": {
+              "duration": "1 anno",
+              "purpose": "Memorizza la preferenza del tema utente (modalità chiara/scura) per l'accessibilità visiva"
+            },
+            "consent": {
+              "duration": "1 anno",
+              "purpose": "Registra il consenso dell'utente per i cookie e l'elaborazione dei dati come richiesto da GDPR Art. 7"
+            },
+            "visitorId": {
+              "duration": "30 giorni",
+              "purpose": "Tracciamento anonimo dei visitatori per utenti Trial. Cookie HTTP-only per sicurezza. Nessuna informazione personalmente identificabile memorizzata."
+            },
+            "csrfToken": {
+              "duration": "Sessione (scade alla chiusura del browser)",
+              "purpose": "Token di protezione Cross-Site Request Forgery (CSRF). Cookie HTTP-only per sicurezza. Richiesto per invii sicuri dei moduli."
+            },
+            "simulatedTier": {
+              "duration": "Sessione (scade alla chiusura del browser)",
+              "purpose": "Cookie di test amministrativo per simulare diversi livelli di abbonamento (Trial/Base/Pro). Cookie HTTP-only. Utilizzato solo dagli amministratori autorizzati per controllo qualità."
             }
           }
         },
@@ -1212,6 +1232,46 @@
           },
           "learnMoreHeading": "Vuoi Sapere di Più?",
           "learnMoreText": "per informazioni complete sulla nostra architettura di IA, bias testing, e come usiamo i dati conversazionali."
+        },
+        "tierSystem": {
+          "title": "Livelli di Servizio e Raccolta Dati",
+          "intro": "MirrorBuddy offre tre livelli di servizio con diversi gradi di accesso e raccolta dati. Comprendere quale livello stai utilizzando ti aiuta a capire quali dati personali raccogliamo e come li utilizziamo.",
+          "trial": {
+            "title": "Livello Trial (Accesso Anonimo)",
+            "description": "Gli utenti Trial possono accedere a MirrorBuddy senza creare un account. Questo livello fornisce accesso limitato con raccolta dati minima. Puoi utilizzare fino a 10 messaggi di chat al mese e 5 minuti di interazione vocale. Sono disponibili solo 3 maestri (insegnanti AI). Raccogliamo solo un cookie visitor-id (anonimo, scadenza 30 giorni) per tracciare i limiti di utilizzo. Non vengono raccolti email, nome o dati di profilo personali. Nessun login richiesto. Nessuna informazione di pagamento raccolta."
+          },
+          "base": {
+            "title": "Livello Base (Account Registrato Gratuito)",
+            "description": "Gli utenti del livello Base devono creare un account registrato gratuito con email e nome. Questo livello fornisce accesso completo alle funzionalità educative principali con messaggi di chat illimitati e tempo di interazione vocale illimitato. Accesso a 25 maestri (insegnanti AI). Raccogliamo e conserviamo: indirizzo email (per login e notifiche), nome (per saluti personalizzati), cronologia delle conversazioni (per continuare le sessioni di apprendimento), dati delle flashcard e progressi di apprendimento (per algoritmo di ripetizione dilazionata), preferenze utente e impostazioni di accessibilità. Nessuna informazione di pagamento raccolta per questo livello."
+          },
+          "pro": {
+            "title": "Livello Pro (Abbonamento a Pagamento)",
+            "description": "Gli utenti del livello Pro hanno un abbonamento a pagamento a €9,99/mese elaborato tramite Stripe. Questo livello fornisce accesso premium con tutte le funzionalità: messaggi di chat illimitati, interazione vocale illimitata, accesso a tutti i 26 maestri (insegnanti AI) inclusi maestri premium esclusivi, supporto prioritario e funzionalità avanzate. Raccogliamo tutti i dati del livello Base più: informazioni di pagamento elaborate da Stripe (non memorizzate direttamente da MirrorBuddy), indirizzo di fatturazione e cronologia fatture (per contabilità e conformità fiscale), stato dell'abbonamento e date di rinnovo. I dati di pagamento sono gestiti da Stripe secondo il loro Data Processing Agreement (DPA) conforme a GDPR."
+          },
+          "dataNote": "Il tuo livello di abbonamento determina quali dati personali raccogliamo. Puoi visualizzare e controllare i tuoi dati in qualsiasi momento nelle impostazioni sulla privacy. L'aggiornamento o il downgrade del tuo livello modifica di conseguenza il tuo profilo di raccolta dati. Quando passi da Pro a Base o elimini il tuo account, la conservazione dei dati di pagamento segue la nostra policy di conservazione standard (registri di fatturazione conservati per 7 anni per conformità fiscale, poi eliminati permanentemente)."
+        },
+        "vendorsAndProcessors": {
+          "title": "Fornitori di Servizi AI e Processori di Dati",
+          "intro": "MirrorBuddy utilizza i seguenti fornitori certificati di servizi di intelligenza artificiale per elaborare i dati conversazionali:",
+          "vendors": {
+            "anthropic": {
+              "name": "Anthropic (Claude AI)",
+              "dataProcessed": "Testo delle conversazioni educative, contesto delle lezioni, domande e risposte degli studenti",
+              "legalBasis": "Necessità contrattuale (Art. 6.1.b GDPR) - elaborazione necessaria per fornire il servizio educativo personalizzato",
+              "dpaStatus": "Clausole Contrattuali Standard (Standard Contractual Clauses - SCC) approvate dalla Commissione Europea per trasferimenti extra-UE",
+              "dataLocation": "Stati Uniti (USA) con garanzie SCC conformi a GDPR Art. 46"
+            },
+            "azureRealtimeVoice": {
+              "name": "Microsoft Azure Realtime Voice API",
+              "dataProcessed": "Dati audio vocali trasmessi in tempo reale per conversione text-to-speech e speech-to-text. L'audio viene elaborato in modo effimero senza memorizzazione persistente.",
+              "legalBasis": "Necessità contrattuale (Art. 6.1.b GDPR) - elaborazione necessaria per fornire funzionalità di interazione vocale all'interno del servizio educativo",
+              "dpaStatus": "Accordo di elaborazione dati (Data Processing Agreement - DPA) Microsoft con Clausole Contrattuali Standard (SCC) per trasferimenti extra-UE",
+              "dataLocation": "UE (regione West Europe) con garanzie SCC per flussi di dati transfrontalieri conformi a GDPR Art. 46",
+              "note": "Elaborazione solo in tempo reale. Nessuna registrazione vocale viene conservata sui server Microsoft. Nessuna informazione personalmente identificabile (PII) viene estratta dai dati vocali. I flussi audio vengono eliminati immediatamente dopo l'elaborazione."
+            }
+          },
+          "note": "Tutti i fornitori di IA hanno sottoscritto accordi DPA (Data Processing Agreement) conformi a GDPR Art. 28 e implementano misure di sicurezza tecniche e organizzative appropriate secondo GDPR Art. 32.",
+          "contactForDpa": "Puoi richiedere una copia dei nostri accordi DPA contattando roberdan@fightthestroke.org"
         }
       },
       "terms": {
@@ -1588,6 +1648,12 @@
     "technicalDocuments": "Documentazione Tecnica",
     "technicalDescription": "Documentazione tecnica disponibile su GitHub per sviluppatori e revisori.",
     "questionsTitle": "Domande sulla Conformità?",
-    "questionsDescription": "Per qualsiasi domanda sulla nostra conformità normativa o per esercitare i tuoi diritti, contattaci."
+    "questionsDescription": "Per qualsiasi domanda sulla nostra conformità normativa o per esercitare i tuoi diritti, contattaci.",
+    "aiDisclosure": {
+      "label": "AI",
+      "fullLabel": "Risposta AI",
+      "ariaLabel": "Risposta generata da intelligenza artificiale",
+      "tooltip": "Questa risposta è generata da un'intelligenza artificiale. Verifica sempre le informazioni importanti."
+    }
   }
 }

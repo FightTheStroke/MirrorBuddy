@@ -8,6 +8,9 @@
 // Re-export all client-safe exports
 export * from "./index";
 
+// Server-only exports - Audit trail (uses Prisma)
+export { recordContentFiltered } from "./audit/server";
+
 // Server-only exports - DB queries (monitoring)
 export {
   getSafetyEventsFromDb,

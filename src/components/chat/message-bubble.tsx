@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Copy, Check, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { ChatMessage, Maestro } from "@/types";
+import { AIDisclosureBadge } from "./ai-disclosure-badge";
 
 interface MessageBubbleProps {
   message: ChatMessage;
@@ -67,6 +68,13 @@ export function MessageBubble({
         style={{ lineHeight: lineSpacing }}
       >
         <p className="whitespace-pre-wrap">{message.content}</p>
+
+        {/* AI Disclosure Badge for assistant messages */}
+        {message.role === "assistant" && (
+          <div className="mt-2">
+            <AIDisclosureBadge variant="compact" />
+          </div>
+        )}
 
         {/* Copy button */}
         <button

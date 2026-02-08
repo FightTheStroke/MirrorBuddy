@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Compliance Audit Remediation (Plan 138)
+
+#### W1: Critical Disclosure Fixes
+
+- **Added**: Claude/Anthropic AI provider disclosed in privacy policy (all 5 locales)
+- **Added**: Azure Realtime Voice documented as separate data processor (all 5 locales)
+- **Added**: All 9 cookies fully documented in privacy policy (was 4/9)
+- **Added**: Tier system (Trial/Base/Pro) data collection explained in privacy policy
+- **Changed**: AI disclosure badge wired into chat message bubbles
+- **Changed**: Safety audit trail now persists to PostgreSQL via ComplianceAuditEntry
+- **Added**: Unit tests for audit trail DB persistence (8 tests)
+
 ### Fixed
 
 - **Campaigns Page Crash**: Server component fetched its own API route without forwarding cookies, causing 401/500 errors. Replaced with direct `listCampaigns()` service call

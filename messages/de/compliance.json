@@ -768,6 +768,26 @@
             "userIdClient": {
               "duration": "Dauer",
               "purpose": "Zweck"
+            },
+            "theme": {
+              "duration": "1 Jahr",
+              "purpose": "Speichert die Theme-Einstellung des Benutzers (Hell-/Dunkelmodus) für visuelle Barrierefreiheit"
+            },
+            "consent": {
+              "duration": "1 Jahr",
+              "purpose": "Zeichnet die Einwilligung des Benutzers für Cookies und Datenverarbeitung auf, wie nach DSGVO Art. 7 erforderlich"
+            },
+            "visitorId": {
+              "duration": "30 Tage",
+              "purpose": "Anonyme Besucherverfolgung für Trial-Nutzer. HTTP-only-Cookie für Sicherheit. Keine personenbezogenen Daten gespeichert."
+            },
+            "csrfToken": {
+              "duration": "Sitzung (verfällt beim Schließen des Browsers)",
+              "purpose": "Cross-Site Request Forgery (CSRF) Schutz-Token. HTTP-only-Cookie für Sicherheit. Erforderlich für sichere Formularübermittlungen."
+            },
+            "simulatedTier": {
+              "duration": "Sitzung (verfällt beim Schließen des Browsers)",
+              "purpose": "Admin-Test-Cookie zur Simulation verschiedener Abonnementstufen (Trial/Base/Pro). HTTP-only-Cookie. Nur von autorisierten Administratoren für Qualitätssicherung verwendet."
             }
           }
         },
@@ -1119,6 +1139,46 @@
           },
           "learnMoreHeading": "Möchten Sie mehr erfahren?",
           "learnMoreText": "für vollständige Informationen über unsere KI-Architektur, Bias-Tests und wie wir Konversationsdaten verwenden."
+        },
+        "vendorsAndProcessors": {
+          "title": "KI-Dienstleister und Auftragsverarbeiter",
+          "intro": "MirrorBuddy nutzt die folgenden zertifizierten Anbieter von Diensten der künstlichen Intelligenz zur Verarbeitung von Konversationsdaten:",
+          "vendors": {
+            "anthropic": {
+              "name": "Anthropic (Claude AI)",
+              "dataProcessed": "Text der Bildungsgespräche, Unterrichtskontext, Fragen und Antworten der Schüler",
+              "legalBasis": "Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b DSGVO) - Verarbeitung notwendig zur Erbringung des personalisierten Bildungsdienstes",
+              "dpaStatus": "Standardvertragsklauseln (SCC), genehmigt von der Europäischen Kommission für Übermittlungen außerhalb der EU",
+              "dataLocation": "Vereinigte Staaten (USA) mit SCC-Garantien gemäß DSGVO Art. 46"
+            },
+            "azureRealtimeVoice": {
+              "name": "Microsoft Azure Realtime Voice API",
+              "dataProcessed": "Sprachaudiodaten, die in Echtzeit für Text-zu-Sprache und Sprache-zu-Text übertragen werden. Audio wird ephemer verarbeitet, ohne dauerhafte Speicherung.",
+              "legalBasis": "Vertragliche Notwendigkeit (Art. 6 Abs. 1 lit. b DSGVO) - Verarbeitung notwendig für Sprachinteraktionsfunktionen im Bildungsdienst",
+              "dpaStatus": "Microsoft-Auftragsverarbeitungsvertrag (DPA) mit Standardvertragsklauseln (SCC) für Übermittlungen außerhalb der EU",
+              "dataLocation": "EU (Region West Europe) mit SCC-Garantien für grenzüberschreitende Datenflüsse gemäß DSGVO Art. 46",
+              "note": "Nur Echtzeitverarbeitung. Keine Sprachaufnahmen werden auf Microsoft-Servern gespeichert. Keine personenbezogenen Daten (PII) werden aus Sprachdaten extrahiert. Audiostreams werden unmittelbar nach Verarbeitung gelöscht."
+            }
+          },
+          "note": "Alle KI-Anbieter haben Auftragsverarbeitungsverträge (DPA) gemäß DSGVO Art. 28 unterzeichnet und setzen angemessene technische und organisatorische Sicherheitsmaßnahmen gemäß DSGVO Art. 32 um.",
+          "contactForDpa": "Sie können eine Kopie unserer DPA-Vereinbarungen anfordern, indem Sie roberdan@fightthestroke.org kontaktieren"
+        },
+        "tierSystem": {
+          "title": "Servicestufen und Datenerhebung",
+          "intro": "MirrorBuddy bietet drei Servicestufen mit unterschiedlichen Zugangs- und Datenerhebungsgraden. Das Verständnis Ihrer Servicestufe hilft Ihnen zu verstehen, welche personenbezogenen Daten wir erheben und wie wir sie verwenden.",
+          "trial": {
+            "title": "Trial-Stufe (Anonymer Zugang)",
+            "description": "Trial-Nutzer können MirrorBuddy ohne Kontoerstellung nutzen. Diese Stufe bietet eingeschränkten Zugang mit minimaler Datenerhebung. Sie können bis zu 10 Chat-Nachrichten pro Monat und 5 Minuten Sprachinteraktion nutzen. Nur 3 Maestri (KI-Lehrer) sind verfügbar. Wir erheben nur ein visitor-id-Cookie (anonym, Ablauf 30 Tage) zur Verfolgung der Nutzungslimits. Keine E-Mail-, Namens- oder persönlichen Profildaten werden erhoben. Keine Anmeldung erforderlich. Keine Zahlungsinformationen erhoben."
+          },
+          "base": {
+            "title": "Base-Stufe (Kostenloses registriertes Konto)",
+            "description": "Nutzer der Base-Stufe müssen ein kostenloses registriertes Konto mit E-Mail und Name erstellen. Diese Stufe bietet vollen Zugang zu den Kernbildungsfunktionen mit unbegrenzten Chat-Nachrichten und unbegrenzter Sprachinteraktion. Zugang zu 25 Maestri (KI-Lehrer). Wir erheben und speichern: E-Mail-Adresse (für Anmeldung und Benachrichtigungen), Name (für personalisierte Begrüßungen), Gesprächsverlauf (für Fortsetzung der Lernsitzungen), Flashcard-Daten und Lernfortschritt (für Spaced-Repetition-Algorithmus), Nutzereinstellungen und Barrierefreiheitsoptionen. Keine Zahlungsinformationen für diese Stufe erhoben."
+          },
+          "pro": {
+            "title": "Pro-Stufe (Kostenpflichtiges Abonnement)",
+            "description": "Nutzer der Pro-Stufe haben ein kostenpflichtiges Abonnement für 9,99 €/Monat, abgewickelt über Stripe. Diese Stufe bietet Premium-Zugang mit allen Funktionen: unbegrenzte Chat-Nachrichten, unbegrenzte Sprachinteraktion, Zugang zu allen 26 Maestri (KI-Lehrer) einschließlich exklusiver Premium-Lehrer, vorrangiger Support und erweiterte Funktionen. Wir erheben alle Daten der Base-Stufe plus: Zahlungsinformationen, verarbeitet durch Stripe (nicht direkt von MirrorBuddy gespeichert), Rechnungsadresse und Rechnungsverlauf (für Buchführung und steuerliche Compliance), Abonnementstatus und Verlängerungsdaten. Zahlungsdaten werden von Stripe gemäß deren DSGVO-konformem Auftragsverarbeitungsvertrag (DPA) verwaltet."
+          },
+          "dataNote": "Ihre Abonnementstufe bestimmt, welche personenbezogenen Daten wir erheben. Sie können Ihre Daten jederzeit in Ihren Datenschutzeinstellungen einsehen und kontrollieren. Ein Upgrade oder Downgrade Ihrer Stufe ändert entsprechend Ihr Datenerhebungsprofil. Wenn Sie von Pro auf Base herabstufen oder Ihr Konto löschen, folgt die Aufbewahrung der Zahlungsdaten unserer Standard-Aufbewahrungsrichtlinie (Rechnungsunterlagen 7 Jahre für steuerliche Compliance aufbewahrt, dann endgültig gelöscht)."
         }
       },
       "terms": {
@@ -1388,6 +1448,12 @@
     "technicalDocuments": "Technische Dokumentation",
     "technicalDescription": "Technische Dokumentation auf GitHub für Entwickler und Prüfer verfügbar.",
     "questionsTitle": "Fragen zur Compliance?",
-    "questionsDescription": "Bei Fragen zu unserer regulatorischen Compliance oder zur Ausübung Ihrer Rechte kontaktieren Sie uns."
+    "questionsDescription": "Bei Fragen zu unserer regulatorischen Compliance oder zur Ausübung Ihrer Rechte kontaktieren Sie uns.",
+    "aiDisclosure": {
+      "label": "AI",
+      "fullLabel": "KI-Antwort",
+      "ariaLabel": "Von künstlicher Intelligenz generierte Antwort",
+      "tooltip": "Diese Antwort wird von künstlicher Intelligenz generiert. Überprüfen Sie immer wichtige Informationen."
+    }
   }
 }

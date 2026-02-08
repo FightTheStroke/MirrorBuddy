@@ -108,7 +108,7 @@ export { checkSTEMSafety, isSTEMProfessor } from "./stem-safety";
 
 export { normalizeUnicode } from "./versioning";
 
-export { recordContentFiltered } from "./audit";
+// recordContentFiltered moved to ./server.ts (requires Prisma)
 
 export {
   recordComplianceEvent,
