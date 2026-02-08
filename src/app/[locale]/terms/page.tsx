@@ -40,6 +40,8 @@ export default function TermsPage() {
               <span>{t("version", { version: TOS_VERSION })}</span>
               <span>•</span>
               <span>{t("lastUpdated", { lastUpdated: TOS_LAST_UPDATED })}</span>
+              <span>•</span>
+              <span>{t("jurisdictions")}</span>
             </div>
           </div>
 

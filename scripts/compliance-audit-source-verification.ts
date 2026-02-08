@@ -61,7 +61,7 @@ const authorityContacts: Record<
   },
   spain: {
     name: "AEPD (Agencia Española de Protección de Datos)",
-    email: "info@aepd.es",
+    email: "consultas@aepd.es",
     website: "https://www.aepd.es",
   },
   france: {

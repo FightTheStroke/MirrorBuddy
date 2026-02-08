@@ -1,14 +1,16 @@
 # Legal Review Checklist by Country
 
 **Plan**: 90 - Multi-Language-Compliance (T6-05)
-**Status**: Complete
-**Last Updated**: 27 January 2026
+**Status**: In Progress
+**Last Updated**: 8 February 2026
 
 ---
 
 ## Overview
 
 This checklist provides country-specific legal review requirements for MirrorBuddy's compliance across 5 countries (Italy, Spain, France, Germany, UK).
+
+**Legend**: [x] = done and verified | [ ] = not yet done | [~] = partial (see notes)
 
 ---
 
@@ -21,15 +23,15 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **DSAR Response Time**: 30 days
 - [x] **Authority**: Garante per la Protezione dei Dati Personali
 - [x] **Contact**: garante@gpdp.it
-- [x] **Documentation**: `docs/compliance/countries/italy/data-protection.md`
+- [ ] **Documentation**: `docs/compliance/countries/italy/data-protection.md` — NOT YET CREATED
 
 ### Cookie Consent
 
 - [x] **Regulation**: GDPR Article 7
 - [x] **Language**: Italian required
-- [x] **Reject All**: Must be prominent
-- [x] **Cookie Wall**: Prohibited
-- [x] **Documentation**: `docs/compliance/countries/italy/cookie-compliance.md`
+- [x] **Reject All**: Must be prominent — implemented via geo-based config
+- [x] **Cookie Wall**: Prohibited — verified in implementation
+- [ ] **Documentation**: `docs/compliance/countries/italy/cookie-compliance.md` — NOT YET CREATED
 - [x] **Implementation**: Geo-based cookie consent with Italian text
 
 ### Accessibility
@@ -39,7 +41,7 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Language**: Italian required
 - [x] **Authority**: AGID (Agenzia per l'Italia Digitale)
 - [x] **Documentation**: `docs/compliance/countries/italy/accessibility-compliance.md`
-- [x] **Implementation**: Accessibility statement in Italian
+- [ ] **Implementation**: Accessibility statement in Italian — NOT YET CREATED
 
 ### AI Act Compliance
 
@@ -47,9 +49,9 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Authority**: AgID
 - [x] **High-Risk Classification**: Verified
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
-- [x] **Contacts**: `docs/compliance/countries/italy/ai-regulatory-contacts.md`
+- [ ] **Contacts**: `docs/compliance/countries/italy/ai-regulatory-contacts.md` — NOT YET CREATED
 
-**Status**: ✅ **COMPLETE**
+**Status**: 🟡 **PARTIAL** — missing data-protection doc, cookie doc, accessibility statement, AI contacts
 
 ---
 
@@ -59,17 +61,17 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 - [x] **Data Protection Law**: LOPDGDD (Ley Orgánica 3/2018) compliance verified
 - [x] **Age of Consent**: 14 years (under 14 requires parental consent)
-- [x] **DSAR Response Time**: 10 days (stricter than GDPR)
+- [x] **DSAR Response Time**: 10 days (stricter than GDPR 30 days)
 - [x] **Authority**: AEPD (Agencia Española de Protección de Datos)
-- [x] **Contact**: info@aepd.es
-- [x] **Documentation**: `docs/compliance/countries/spain/data-protection.md`
+- [x] **Contact**: consultas@aepd.es
+- [ ] **Documentation**: `docs/compliance/countries/spain/data-protection.md` — NOT YET CREATED
 
 ### Cookie Consent
 
 - [x] **Regulation**: LOPDGDD Article 22
 - [x] **Language**: Spanish required
-- [x] **Reject All**: Must be prominent ("Rechazar Todo")
-- [x] **Cookie Wall**: Prohibited
+- [x] **Reject All**: Must be prominent ("Rechazar Todo") — implemented
+- [x] **Cookie Wall**: Prohibited — verified
 - [x] **Documentation**: `docs/compliance/countries/spain/cookie-compliance.md`
 - [x] **Implementation**: Geo-based cookie consent with Spanish text
 
@@ -78,19 +80,19 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Regulation**: Real Decreto 1112/2018
 - [x] **Standard**: WCAG 2.1 Level AA
 - [x] **Language**: Spanish required
-- [x] **Authority**: AEPD
+- [x] **Authority**: Ministerio de Asuntos Económicos y Transformación Digital + Observatorio de Accesibilidad Web (OAW)
 - [x] **Documentation**: `docs/compliance/countries/spain/accessibility-compliance.md`
-- [x] **Implementation**: Accessibility statement in Spanish
+- [ ] **Implementation**: Accessibility statement in Spanish — NOT YET CREATED
 
 ### AI Act Compliance
 
 - [x] **National Implementation**: EU AI Act (direct application)
-- [x] **Authority**: AEPD
+- [x] **Authority**: AESIA (Agencia Española de Supervisión de la Inteligencia Artificial)
 - [x] **High-Risk Classification**: Verified
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
-- [x] **Contacts**: `docs/compliance/countries/spain/ai-regulatory-contacts.md`
+- [ ] **Contacts**: `docs/compliance/countries/spain/ai-regulatory-contacts.md` — NOT YET CREATED
 
-**Status**: ✅ **COMPLETE**
+**Status**: 🟡 **PARTIAL** — missing data-protection doc, accessibility statement, AI contacts
 
 ---
 
@@ -103,14 +105,14 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **DSAR Response Time**: 30 days
 - [x] **Authority**: CNIL (Commission Nationale de l'Informatique et des Libertés)
 - [x] **Contact**: contact@cnil.fr
-- [x] **Documentation**: `docs/compliance/countries/france/data-protection.md`
+- [ ] **Documentation**: `docs/compliance/countries/france/data-protection.md` — NOT YET CREATED
 
 ### Cookie Consent
 
 - [x] **Regulation**: Law 78-17 Article 82 + CNIL Deliberation 2020-091
 - [x] **Language**: French required
-- [x] **Reject All**: Must be prominent ("Tout Refuser")
-- [x] **Cookie Wall**: Prohibited
+- [x] **Reject All**: Must be prominent ("Tout Refuser") — implemented
+- [x] **Cookie Wall**: Prohibited — verified
 - [x] **Documentation**: `docs/compliance/countries/france/cookie-compliance.md`
 - [x] **Implementation**: Geo-based cookie consent with French text
 
@@ -119,19 +121,19 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Regulation**: RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité)
 - [x] **Standard**: WCAG 2.1 Level AA
 - [x] **Language**: French required
-- [x] **Authority**: CNIL/DINUM
+- [x] **Authority**: DINUM (Direction Interministérielle du Numérique) + Défenseur des droits
 - [x] **Documentation**: `docs/compliance/countries/france/accessibility-compliance.md`
-- [x] **Implementation**: Accessibility statement in French
+- [ ] **Implementation**: Accessibility statement in French — NOT YET CREATED
 
 ### AI Act Compliance
 
 - [x] **National Implementation**: EU AI Act (direct application)
-- [x] **Authority**: CNIL
+- [x] **Authority**: CNIL (data protection) + Ministry of Economy (AI oversight)
 - [x] **High-Risk Classification**: Verified
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
-- [x] **Contacts**: `docs/compliance/countries/france/ai-regulatory-contacts.md`
+- [ ] **Contacts**: `docs/compliance/countries/france/ai-regulatory-contacts.md` — NOT YET CREATED
 
-**Status**: ✅ **COMPLETE**
+**Status**: 🟡 **PARTIAL** — missing data-protection doc, accessibility statement, AI contacts
 
 ---
 
@@ -142,17 +144,17 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Data Protection Law**: BDSG (Bundesdatenschutzgesetz) compliance verified
 - [x] **Age of Consent**: 16 years (under 16 requires parental consent)
 - [x] **DSAR Response Time**: 30 days
-- [x] **Authority**: BfDI (Bundesdatenschutzbeauftragte)
+- [x] **Authority**: BfDI (Bundesbeauftragter für den Datenschutz und die Informationsfreiheit)
 - [x] **Contact**: poststelle@bfdi.bund.de
-- [x] **Documentation**: `docs/compliance/countries/germany/data-protection.md`
+- [ ] **Documentation**: `docs/compliance/countries/germany/data-protection.md` — NOT YET CREATED
 
 ### Cookie Consent
 
 - [x] **Regulation**: TTDSG (Telekommunikation-Telemedien-Datenschutz-Gesetz) Article 3
 - [x] **Language**: German required
-- [x] **Reject All**: Must be prominent ("Alle Ablehnen")
-- [x] **Cookie Wall**: Prohibited
-- [x] **Documentation**: `docs/compliance/countries/germany/cookie-compliance.md`
+- [x] **Reject All**: Must be prominent ("Alle Ablehnen") — implemented
+- [x] **Cookie Wall**: Prohibited — verified
+- [ ] **Documentation**: `docs/compliance/countries/germany/cookie-compliance.md` — NOT YET CREATED
 - [x] **Implementation**: Geo-based cookie consent with German text
 
 ### Accessibility
@@ -160,60 +162,60 @@ This checklist provides country-specific legal review requirements for MirrorBud
 - [x] **Regulation**: BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung)
 - [x] **Standard**: WCAG 2.1 Level AA
 - [x] **Language**: German required
-- [x] **Authority**: BfDI
+- [x] **Authority**: BFIT-Bund (Bundesfachstelle Barrierefreiheit) + Schlichtungsstelle BGG
 - [x] **Documentation**: `docs/compliance/countries/germany/accessibility-compliance.md`
-- [x] **Implementation**: Accessibility statement in German
+- [ ] **Implementation**: Accessibility statement in German — NOT YET CREATED
 
 ### AI Act Compliance
 
 - [x] **National Implementation**: EU AI Act (direct application)
-- [x] **Authority**: BfDI
+- [x] **Authority**: BfDI (data protection aspects)
 - [x] **High-Risk Classification**: Verified
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
-- [x] **Contacts**: `docs/compliance/countries/germany/ai-regulatory-contacts.md`
+- [ ] **Contacts**: `docs/compliance/countries/germany/ai-regulatory-contacts.md` — NOT YET CREATED
 
-**Status**: ✅ **COMPLETE**
+**Status**: 🟡 **PARTIAL** — missing data-protection doc, cookie doc, accessibility statement, AI contacts
 
 ---
 
 ## UK
 
-### GDPR/Data Protection
+### Data Protection
 
 - [x] **Data Protection Law**: UK GDPR + Data Protection Act 2018 compliance verified
-- [x] **Age of Consent**: 13 years (COPPA equivalent, under 13 requires parental consent)
+- [x] **Age of Consent**: 13 years (under 13 requires parental consent)
 - [x] **DSAR Response Time**: 30 days
 - [x] **Authority**: ICO (Information Commissioner's Office)
 - [x] **Contact**: casework@ico.org.uk
-- [x] **Documentation**: `docs/compliance/countries/uk/data-protection.md`
+- [ ] **Documentation**: `docs/compliance/countries/uk/data-protection.md` — NOT YET CREATED
 
 ### Cookie Consent
 
-- [x] **Regulation**: UK GDPR + ICO Guidelines
+- [x] **Regulation**: UK GDPR + ICO Guidelines (PECR)
 - [x] **Language**: English required
-- [x] **Reject All**: Must be prominent ("Reject All")
-- [x] **Cookie Wall**: Prohibited
-- [x] **Documentation**: `docs/compliance/countries/uk/cookie-compliance.md`
+- [x] **Reject All**: Must be prominent ("Reject All") — implemented
+- [x] **Cookie Wall**: Prohibited — verified
+- [ ] **Documentation**: `docs/compliance/countries/uk/cookie-compliance.md` — NOT YET CREATED
 - [x] **Implementation**: Geo-based cookie consent with English text
 
 ### Accessibility
 
-- [x] **Regulation**: Public Sector Bodies (Websites and Mobile Applications) (No. 2) Accessibility Regulations 2018
+- [x] **Regulation**: Public Sector Bodies Accessibility Regulations 2018
 - [x] **Standard**: WCAG 2.1 Level AA (GOV.UK Design System)
 - [x] **Language**: English required
 - [x] **Authority**: EHRC (Equality and Human Rights Commission) + ICO
 - [x] **Documentation**: `docs/compliance/countries/uk/accessibility-compliance.md`
-- [x] **Implementation**: Accessibility statement in English
+- [ ] **Implementation**: Accessibility statement in English — NOT YET CREATED
 
-### AI Act Compliance
+### AI Compliance
 
-- [x] **National Implementation**: UK AI Act (pending, currently EU AI Act applies)
-- [x] **Authority**: ICO
-- [x] **High-Risk Classification**: Verified
+- [~] **National Framework**: UK has no AI-specific legislation yet; ICO and AI Safety Institute provide guidance
+- [x] **Authority**: ICO (data protection) + AI Safety Institute (safety evaluations)
+- [x] **High-Risk Classification**: Verified under EU AI Act framework (voluntary alignment)
 - [x] **Documentation**: `docs/compliance/AI-RISK-CLASSIFICATION.md`
-- [x] **Contacts**: `docs/compliance/countries/uk/ai-regulatory-contacts.md`
+- [ ] **Contacts**: `docs/compliance/countries/uk/ai-regulatory-contacts.md` — NOT YET CREATED
 
-**Status**: ✅ **COMPLETE**
+**Status**: 🟡 **PARTIAL** — missing data-protection doc, cookie doc, accessibility statement, AI contacts
 
 ---
 
@@ -221,25 +223,38 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 ### Common Requirements (All Countries)
 
-- [x] **Privacy Policy**: Localized for all languages
-- [x] **Cookie Policy**: Localized for all languages
-- [x] **Accessibility Statement**: Localized for all languages
-- [x] **AI Transparency Policy**: Localized for all languages
+- [x] **Privacy Policy**: Localized for all 5 languages
+- [x] **Cookie Policy**: Localized for all 5 languages
+- [ ] **Accessibility Statement**: NOT YET CREATED for any language
+- [x] **AI Transparency Policy**: Localized for all 5 languages
 - [x] **DPIA**: Complete and up-to-date
 - [x] **Data Flow Mapping**: Complete
-- [x] **DPAs**: All processors have executed DPAs
-- [x] **SCCs**: All extra-EU transfers protected
+- [ ] **DPAs**: Processor agreements — NOT YET VERIFIED
+- [x] **SCCs**: All extra-EU transfers protected (Vercel EU region pinned)
 
 ### Implementation Status
 
 | Requirement                 | Italy | Spain | France | Germany | UK  |
 | --------------------------- | ----- | ----- | ------ | ------- | --- |
-| **Data Protection Docs**    | ✅    | ✅    | ✅     | ✅      | ✅  |
-| **Cookie Consent**          | ✅    | ✅    | ✅     | ✅      | ✅  |
-| **Accessibility Statement** | ✅    | ✅    | ✅     | ✅      | ✅  |
+| **Data Protection Docs**    | ❌    | ❌    | ❌     | ❌      | ❌  |
+| **Cookie Consent (code)**   | ✅    | ✅    | ✅     | ✅      | ✅  |
+| **Cookie Compliance Doc**   | ❌    | ✅    | ✅     | ❌      | ❌  |
+| **Accessibility Doc**       | ✅    | ✅    | ✅     | ✅      | ✅  |
+| **Accessibility Statement** | ❌    | ❌    | ❌     | ❌      | ❌  |
 | **AI Compliance Docs**      | ✅    | ✅    | ✅     | ✅      | ✅  |
-| **Regulatory Contacts**     | ✅    | ✅    | ✅     | ✅      | ✅  |
+| **AI Regulatory Contacts**  | ❌    | ❌    | ❌     | ❌      | ❌  |
 | **Localized Content**       | ✅    | ✅    | ✅     | ✅      | ✅  |
+
+---
+
+## Still To Do
+
+1. **Data protection docs** for all 5 countries (country-specific GDPR implementation details)
+2. **Cookie compliance docs** for Italy, Germany, UK
+3. **Accessibility statements** for all 5 languages (public-facing, linked from footer)
+4. **AI regulatory contacts** for all 5 countries
+5. **DPA verification** with all processors (Vercel, Supabase, Azure, Resend, Upstash)
+6. **Legal expert review** of all documentation before production launch
 
 ---
 
@@ -276,14 +291,6 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 ## Quick Reference
 
-### Find Checklist by Country
-
-**Italy**: See "Italy" section above
-**Spain**: See "Spain" section above
-**France**: See "France" section above
-**Germany**: See "Germany" section above
-**UK**: See "UK" section above
-
 ### Find Documentation
 
 **Compliance Matrix**: `docs/compliance/COMPLIANCE-MATRIX.md`
@@ -292,7 +299,7 @@ This checklist provides country-specific legal review requirements for MirrorBud
 
 ---
 
-**Document Version**: 1.0
-**Last Updated**: 2026-01-27
-**Status**: Complete
-**Next Review**: 2026-04-27 (quarterly)
+**Document Version**: 2.0
+**Last Updated**: 2026-02-08
+**Status**: In Progress
+**Next Review**: 2026-05-08 (quarterly)

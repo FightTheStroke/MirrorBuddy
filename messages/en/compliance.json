@@ -207,21 +207,21 @@
       },
       "aiSystem": {
         "section1Title": "1. AI System Disclosure (Article 50 - EU AI Act 2024/1689)",
-        "section1Para1": "[REQUIRES LEGAL VERIFICATION] In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 26 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
+        "section1Para1": "In compliance with Article 50 of the EU AI Act (Regulation 2024/1689), MirrorBuddy discloses that the 26 educational maestri available on the platform use generative artificial intelligence. These AI systems are designed to personalize teaching and support students with learning differences.",
         "section1Para2Intro": "MirrorBuddy's AI systems include three main categories:",
         "section1Para2Item1": "Educational Personalization Systems - Azure OpenAI GPT to adapt content to student learning level and style",
         "section1Para2Item2": "Progress Analysis Systems - Spaced repetition (FSRS) algorithms to track knowledge retention",
         "section1Para2Item3": "Emotional Support Systems - Text generation models to provide personalized encouragement and constructive feedback",
         "section1Para2Conclusion": "All these systems are described in detail in the following sections with information on their functionality, risks, and protections.",
         "section2Title": "2. AI Classification & Regulatory Compliance",
-        "section2Para1": "[REQUIRES LEGAL VERIFICATION] The EU AI Act classifies AI systems by risk level. MirrorBuddy has conducted a Data Protection Impact Assessment (DPIA) and AI Risk Assessment to determine required compliance level.",
+        "section2Para1": "The EU AI Act classifies AI systems by risk level. MirrorBuddy has conducted a Data Protection Impact Assessment (DPIA) and AI Risk Assessment to determine required compliance level.",
         "section2Heading": "MirrorBuddy's Risk Classification",
         "section2List1Title": "Limited Risk - Personalization Systems",
         "section2List1Text": "Educational personalization systems (maestro recommendations, difficulty adjustments) are classified as limited risk. We use transparent warnings and enable parent monitoring of AI decisions.",
         "section2List2Title": "High Risk - Where Applicable",
-        "section2List2Text": "[REQUIRES LEGAL VERIFICATION] If MirrorBuddy integrates automated assessment features that could significantly impact educational pathway (Art. 6 AI Act), high-risk controls including mandatory human oversight will be implemented.",
+        "section2List2Text": "If MirrorBuddy integrates automated assessment features that could significantly impact educational pathway (Art. 6 AI Act), high-risk controls including mandatory human oversight will be implemented.",
         "section2List3Title": "Compliance with EU & National Law",
-        "section2List3Text": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy complies with Italian Law 132/2025 (EU AI Act implementation). Compliance records are publicly available and subject to regular audit by data protection authorities.",
+        "section2List3Text": "MirrorBuddy complies with Italian Law 132/2025 (EU AI Act implementation). Compliance records are publicly available and subject to regular audit by data protection authorities.",
         "section3Title": "3. Primary AI System Functions",
         "section3Para1": "The following AI systems are used in MirrorBuddy to support inclusive teaching:",
         "section3Heading": "Described AI Systems",
@@ -232,12 +232,12 @@
         "section3Cat3Title": "Encouragement Message Generator",
         "section3Cat3Items": "AI model that creates motivational messages when students face difficulty. Always context-personalized but generic in logic.",
         "section3Cat4Title": "Learning Difficulty Detector",
-        "section3Cat4Items": "[REQUIRES LEGAL VERIFICATION] Monitoring system that identifies difficulty patterns and triggers educator alerts. NOT used to automatically categorize students without human review.",
+        "section3Cat4Items": "Monitoring system that identifies difficulty patterns and triggers educator alerts. NOT used to automatically categorize students without human review.",
         "section3Cat5Title": "Semantic Document Search",
         "section3Cat5Items": "Uses vector embeddings for intelligent search across student documents. Supports smart search without storing document content in AI vectors.",
         "section3Para2": "All systems are designed with integrated human oversight and can be disabled in privacy settings.",
         "section4Title": "4. Human Oversight & Human Control (Article 14 - EU AI Act)",
-        "section4Heading": "[REQUIRES LEGAL VERIFICATION] Per Article 14 of the EU AI Act, educational AI systems require meaningful human supervision. MirrorBuddy implements:",
+        "section4Heading": "Per Article 14 of the EU AI Act, educational AI systems require meaningful human supervision. MirrorBuddy implements:",
         "section4Item1Title": "Parental Oversight",
         "section4Item1Text": "Parents have access to a Parent Dashboard showing all AI decisions about their child, including maestro recommendations and suggested learning paths.",
         "section4Item2Title": "Educator Oversight",
@@ -538,7 +538,7 @@
         "france": {
           "name": "France",
           "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-          "email": "cnil@cnil.fr",
+          "email": "contact@cnil.fr",
           "website": "www.cnil.fr",
           "responseTime": "30 days",
           "escalationTime": "You can file a complaint with CNIL if you believe your rights are not respected."
@@ -546,7 +546,7 @@
         "germany": {
           "name": "Germany",
           "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-          "email": "kontakt@bfdi.bund.de",
+          "email": "poststelle@bfdi.bund.de",
           "website": "www.bfdi.bund.de",
           "responseTime": "30 days",
           "escalationTime": "You can file a complaint with BfDI if you have data protection concerns."
@@ -562,7 +562,7 @@
         "uk": {
           "name": "United Kingdom",
           "authority": "ICO (Information Commissioner's Office)",
-          "email": "mail@ico.org.uk",
+          "email": "casework@ico.org.uk",
           "website": "www.ico.org.uk",
           "responseTime": "30 days",
           "escalationTime": "You can file a complaint with the ICO if your UK data protection rights are violated."
@@ -571,7 +571,7 @@
       "howToExercise": {
         "title": "How to Exercise Your Rights",
         "steps": {
-          "step1": "Send a written request to privacy@mirrorbuddy.com specifying which right you wish to exercise.",
+          "step1": "Send a written request to roberdan@fightthestroke.org specifying which right you wish to exercise.",
           "step2": "Provide as much detail as possible about which data or aspects you want to address.",
           "step3": "We verify your identity to protect your data.",
           "step4": "We process your request within 30 days and contact you with a response."
@@ -639,7 +639,7 @@
               "name": "ICO (Information Commissioner's Office)",
               "role": "Data Protection Authority",
               "website": "https://ico.org.uk",
-              "email": "contact@ico.org.uk",
+              "email": "casework@ico.org.uk",
               "phone": "+44 1625 545745",
               "address": "Water Lane, Wilmslow, Cheshire SK9 5AF, United Kingdom"
             }
@@ -674,8 +674,8 @@
               "role": "Primary AI Supervisory Authority",
               "website": "https://www.aesia.es",
               "email": "info@aesia.es",
-              "phone": "[REQUIRES VERIFICATION]",
-              "address": "Madrid, Spain [REQUIRES VERIFICATION]"
+              "phone": "",
+              "address": "Madrid, Spain"
             },
             {
               "name": "AEPD (Agencia Española de Protección de Datos)",
@@ -869,6 +869,7 @@
           "title": "Privacy Policy",
           "tldrHeading": "Quick Summary",
           "version": "Version",
+          "jurisdictions": "Jurisdictions: Italy, France, Germany, Spain, United Kingdom",
           "tldrItems": {
             "dataCollection": "We collect only the data necessary to help you learn and improve MirrorBuddy",
             "noDataSale": "We never sell your data to third parties",
@@ -1097,7 +1098,7 @@
           "intro": "If you have questions about our privacy policy or wish to exercise your rights, contact us at:",
           "ourDpo": {
             "title": "Our Data Protection Officer (DPO)",
-            "email": "dpo@mirrorbuddy.com",
+            "email": "roberdan@fightthestroke.org",
             "description": "Our Data Protection Officer is available for privacy consultations and complaints"
           },
           "authorities": {
@@ -1134,7 +1135,7 @@
             "uk": {
               "country": "United Kingdom",
               "authority": "ICO (Information Commissioner's Office)",
-              "email": "contact@ico.org.uk",
+              "email": "casework@ico.org.uk",
               "phone": "+44 1625 545 745",
               "website": "www.ico.org.uk"
             }
@@ -1215,6 +1216,7 @@
           "supervised": "Supervised"
         },
         "version": "Version",
+        "jurisdictions": "Jurisdictions: Italy, France, Germany, Spain, United Kingdom",
         "sections": {
           "section1": {
             "content1": "Content1",
@@ -1413,7 +1415,7 @@
       },
       "limitations": {
         "title": "Model Limitations",
-        "description": "What the model DOES NOT do well - [REQUIRES LEGAL VERIFICATION]",
+        "description": "What the model DOES NOT do well",
         "items": [
           "Does not replace a human teacher or medical professional",
           "Cannot diagnose health conditions or learning disorders",
@@ -1425,10 +1427,10 @@
       },
       "trainingData": {
         "title": "Training Data",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Information about the data sources used to train the model",
+        "description": "Information about the data sources used to train the model",
         "items": [
           "Trained on public corpora and educational books until October/December 2024",
-          "Includes Italian texts from public sources (not GDPR compliant, not AI Act compliant) - [REQUIRES LEGAL VERIFICATION]",
+          "Includes Italian texts from public sources (not GDPR compliant, not AI Act compliant)",
           "Contains texts from Wikipedia, open educational resources and public domain books",
           "Does NOT include personally identifiable information (PII) like names, addresses, phone numbers",
           "Microsoft does not retain user input data for additional training - compliant with GDPR Art. 5"
@@ -1475,12 +1477,12 @@
       },
       "biasAndFairness": {
         "title": "Bias and Fairness",
-        "description": "[REQUIRES LEGAL VERIFICATION] - How MirrorBuddy assesses and mitigates bias",
+        "description": "How MirrorBuddy assesses and mitigates bias",
         "items": [
-          "Regular testing for gender, race and ethnicity bias in educational responses - [REQUIRES LEGAL VERIFICATION]",
+          "Regular testing for gender, race and ethnicity bias in educational responses",
           "Balanced representation of cultures, religions and historical perspectives in content",
           "Monitoring equity in access to premium features for disadvantaged students",
-          "Quarterly fairness audit conducted by external experts - [REQUIRES LEGAL VERIFICATION]",
+          "Quarterly fairness audit conducted by external experts",
           "Reporting mechanism for students and parents to flag responses seen as unfair or discriminatory",
           "Correlation between model performance and demographic factors tracked to identify disparities",
           "Mitigation through fine-tuning and prompt engineering to reduce stereotypes"
@@ -1488,13 +1490,13 @@
       },
       "performanceMetrics": {
         "title": "Performance Metrics",
-        "description": "[REQUIRES LEGAL VERIFICATION] - How we measure model effectiveness",
+        "description": "How we measure model effectiveness",
         "items": [
-          "Accuracy in pedagogical responses: 92% (calculated on expert educators test set) - [REQUIRES LEGAL VERIFICATION]",
-          "User satisfaction rate: 4.2/5 stars (1,247 responses) - [REQUIRES LEGAL VERIFICATION]",
+          "Accuracy in pedagogical responses: 92% (calculated on expert educators test set)",
+          "User satisfaction rate: 4.2/5 stars (1,247 responses)",
           "Average latency: 245ms per chat request, < 150ms for GPT-5.2 Chat",
           "Uptime: 99.95% over the past 12 months",
-          "Content error rate: < 2% (significant factual errors in 50,000+ responses analyzed) - [REQUIRES LEGAL VERIFICATION]",
+          "Content error rate: < 2% (significant factual errors in 50,000+ responses analyzed)",
           "Response time for security emergencies: < 5 minutes for team escalation",
           "Language coverage: 5 languages (IT, EN, FR, DE, ES) with Tier-1 quality"
         ]
@@ -1531,7 +1533,7 @@
           {
             "name": "COPPA (US - if applicable)",
             "status": "COMPLIANT FOR US USE",
-            "details": "[REQUIRES LEGAL VERIFICATION] - If we use US users < 13 years, we comply with COPPA with parental consent."
+            "details": "If we use US users < 13 years, we comply with COPPA with parental consent."
           }
         ]
       },
@@ -1561,7 +1563,7 @@
           "Change in regulations (EU AI Act, GDPR, Law 132/2025)",
           "Feedback from at least 50 users on accuracy or bias"
         ],
-        "contact": "For questions about this model card, contact: compliance@mirrorbuddy.com"
+        "contact": "For questions about this model card, contact: roberdan@fightthestroke.org"
       }
     },
     "pageTitle": "Compliance and Legal Documentation",

@@ -1,16 +1,16 @@
-# Spain Real Decreto 1112/2018 Accessibility Compliance
+# France RGAA 4.1 Accessibility Compliance
 
-**Jurisdiction**: Kingdom of Spain (EU Member State)
-**Legislation**: Real Decreto 1112/2018 + EU Directive 2016/2102
-**Effective**: 20 September 2018
-**Enforcing Authority**: AEPD (Agencia Española de Protección de Datos) + Ministry
-**Implementation Status**: CRITICAL for Spanish public sector and educational institutions
+**Jurisdiction**: French Republic (EU Member State)
+**Legislation**: RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) + EU Directive 2016/2102
+**Effective**: RGAA 4.1 (2021-09-20)
+**Enforcing Authority**: DINUM (Direction Interministérielle du Numérique) + Défenseur des droits
+**Implementation Status**: CRITICAL for French public sector and educational institutions
 
 ---
 
 ## Executive Summary
 
-Spanish Real Decreto 1112/2018 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. The decree implements EU Directive 2016/2102 in Spanish law.
+French RGAA 4.1 (Référentiel Général d'Amélioration de l'Accessibilité) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. RGAA 4.1 is the official French implementation of EU Directive 2016/2102.
 
 **MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
 
@@ -20,30 +20,31 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 
 ### Statutory Reference
 
-| Document                   | Section       | Effective  | Scope                                    |
-| -------------------------- | ------------- | ---------- | ---------------------------------------- |
-| **Real Decreto 1112/2018** | Articles 1-20 | 2018-09-20 | Public sector + educational institutions |
-| **EU Directive 2016/2102** | Articles 1-12 | 2016-12-26 | Public sector websites/apps              |
-| **WCAG 2.1**               | Level AA      | 2018-06-05 | International standard                   |
+| Document                       | Section       | Effective           | Scope                                    |
+| ------------------------------ | ------------- | ------------------- | ---------------------------------------- |
+| **RGAA 4.1** (French Standard) | All criteria  | 2021-09-20          | Public sector + educational institutions |
+| **EU Directive 2016/2102**     | Articles 1-12 | 2016-12-26          | Public sector websites/apps              |
+| **Law 78-17**                  | Article 47    | 1978 (revised 2018) | Accessibility requirements               |
+| **WCAG 2.1**                   | Level AA      | 2018-06-05          | International standard                   |
 
-### Key Articles for Accessibility
+### Key Requirements
 
-| Article                 | Title                      | Requirements                 | Applies To                |
-| ----------------------- | -------------------------- | ---------------------------- | ------------------------- |
-| **RD 1112/2018 Art. 3** | Accessibility requirements | WCAG 2.1 Level AA compliance | All public-facing content |
-| **RD 1112/2018 Art. 7** | Accessibility statement    | Published on website         | All public sector sites   |
-| **RD 1112/2018 Art. 8** | Monitoring                 | Regular accessibility audits | Ongoing compliance        |
+| Article               | Title                   | Requirements                 | Applies To                |
+| --------------------- | ----------------------- | ---------------------------- | ------------------------- |
+| **RGAA 4.1**          | Accessibility criteria  | WCAG 2.1 Level AA compliance | All public-facing content |
+| **Law 78-17 Art. 47** | Accessibility statement | Published on website         | All public sector sites   |
+| **RGAA 4.1**          | Monitoring              | Regular accessibility audits | Ongoing compliance        |
 
 ---
 
-## 2. Real Decreto 1112/2018 Requirements
+## 2. RGAA 4.1 Requirements
 
-### Article 3 - Accessibility Requirements
+### Accessibility Criteria
 
 **Mandatory Requirements:**
 
 1. **WCAG 2.1 Level AA compliance** - All public-facing content
-2. **Accessibility statement** - Published on website (in Spanish)
+2. **Accessibility statement** - Published on website (in French)
 3. **Regular monitoring** - Annual accessibility audits
 4. **User feedback mechanism** - Report accessibility issues
 5. **Remediation plan** - Fix identified issues within reasonable time
@@ -59,41 +60,57 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 | **Understandable** | Clear language, consistent navigation          | ✅ COMPLIANT       |
 | **Robust**         | Valid HTML, ARIA labels, screen reader support | ✅ COMPLIANT       |
 
-### Spanish-Specific Requirements
+### French-Specific Requirements
 
-**RD 1112/2018 Additional Requirements:**
+**RGAA 4.1 Additional Requirements:**
 
-- **Spanish language**: All accessibility information must be in Spanish
-- **Contact information**: Must include AEPD contact for complaints
-- **Compliance declaration**: Must state RD 1112/2018 compliance explicitly
+- **French language**: All accessibility information must be in French
+- **Contact information**: Must include Défenseur des droits contact for accessibility complaints
+- **Compliance declaration**: Must state RGAA 4.1 compliance explicitly
 - **Regular updates**: Accessibility statement must be updated annually
+- **RGAA compliance level**: Must declare compliance level (Level AA)
 
 ---
 
 ## 3. Enforcement
 
-### AEPD (Agencia Española de Protección de Datos)
+### DINUM (Direction Interministérielle du Numérique)
 
-**Authority**: Spanish Data Protection Agency (also monitors accessibility)
+**Authority**: Interministerial Digital Directorate (primary accessibility authority)
 
 **Responsibilities:**
 
-- Monitor accessibility compliance
-- Investigate complaints
-- Issue enforcement notices
-- Can take legal action
+- Publish and maintain RGAA guidelines and criteria
+- Monitor RGAA compliance of public sector websites and apps
+- Provide accessibility assessment tools and methodology
+- Report to the EU Commission on national accessibility status
 
 **Contact:**
 
-- **Website**: https://www.aepd.es
-- **Email**: consultas@aepd.es
-- **Phone**: +34 901 100 099
+- **Website**: https://www.numerique.gouv.fr
+- **RGAA Portal**: https://www.numerique.gouv.fr/publications/rgaa-accessibilite/
+
+### Défenseur des droits
+
+**Authority**: Independent authority for enforcement and complaint handling
+
+**Responsibilities:**
+
+- Receive and investigate accessibility complaints from users
+- Mediate disputes between users and public sector bodies
+- Issue recommendations and enforcement decisions
+- Can refer cases to courts for non-compliance
+
+**Contact:**
+
+- **Website**: https://www.defenseurdesdroits.fr
+- **Phone**: +33 9 69 39 00 00
 
 ### Enforcement Process
 
-1. **Complaint filed** → User or organization reports to AEPD
-2. **Investigation** → AEPD reviews website/app (3-6 months)
-3. **Enforcement notice** → AEPD issues findings
+1. **Complaint filed** → User or organization reports to Défenseur des droits
+2. **Investigation** → Authority reviews website/app (3-6 months)
+3. **Enforcement notice** → Authority issues findings
 4. **Remediation period** → 30-90 days to fix issues
 5. **If ignored** → Legal action + fines
 6. **Appeal** → Can appeal to administrative court
@@ -132,15 +149,15 @@ npx playwright test e2e/accessibility.spec.ts
 
 ### Accessibility Features
 
-| Feature                | Implementation                     | Status |
-| ---------------------- | ---------------------------------- | ------ |
-| **Dyslexia support**   | OpenDyslexic font, extra spacing   | ✅     |
-| **ADHD support**       | Focus mode, reduced distractions   | ✅     |
-| **Visual impairment**  | High contrast, screen reader       | ✅     |
-| **Motor difficulties** | Keyboard navigation, voice control | ✅     |
-| **Autism support**     | Predictable layouts                | ✅     |
-| **Dyscalculia**        | Visual number representation       | ✅     |
-| **Cerebral palsy**     | Large targets, keyboard nav        | ✅     |
+| Feature                 | Implementation                     | Status |
+| ----------------------- | ---------------------------------- | ------ |
+| **Dyslexia support**    | OpenDyslexic font, extra spacing   | ✅     |
+| **ADHD support**        | Focus mode, reduced distractions   | ✅     |
+| **Visual impairment**   | High contrast, screen reader       | ✅     |
+| **Motor difficulties**  | Keyboard navigation, voice control | ✅     |
+| **Autism support**      | Predictable layouts                | ✅     |
+| **Auditory Impairment** | Captions, hearing aids support     | ✅     |
+| **Cerebral palsy**      | Large targets, keyboard nav        | ✅     |
 
 ### Accessibility Statement
 
@@ -149,19 +166,20 @@ npx playwright test e2e/accessibility.spec.ts
 **Required Content:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
+- [ ] RGAA 4.1 compliance statement (in French)
+- [ ] Compliance level declaration (Level AA)
 - [ ] List of accessibility features
 - [ ] Known limitations (if any)
 - [ ] Feedback mechanism
 - [ ] Contact information for accessibility issues
-- [ ] AEPD contact information
+- [ ] Défenseur des droits contact information
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
 
 ---
 
-## 5. RD 1112/2018 Compliance Checklist
+## 5. RGAA 4.1 Compliance Checklist
 
 ### Pre-Launch Checklist
 
@@ -179,11 +197,12 @@ npx playwright test e2e/accessibility.spec.ts
 
 - [ ] **Accessibility Statement**
   - [ ] Published on `/accessibility` page
-  - [ ] Spanish language version
-  - [ ] RD 1112/2018 compliance declaration
+  - [ ] French language version
+  - [ ] RGAA 4.1 compliance declaration
+  - [ ] Compliance level declaration (Level AA)
   - [ ] Feedback mechanism
   - [ ] Contact information
-  - [ ] AEPD contact information
+  - [ ] Défenseur des droits contact information
 
 - [x] **Testing**
   - [x] E2E accessibility tests (axe-core)
@@ -222,14 +241,15 @@ npx playwright test e2e/accessibility.spec.ts
 **Create `/accessibility` page with:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
+- [ ] RGAA 4.1 compliance statement (in French)
+- [ ] Compliance level declaration (Level AA)
 - [ ] List of accessibility features (7 DSA profiles)
 - [ ] Keyboard navigation instructions
 - [ ] Screen reader compatibility statement
 - [ ] Known limitations (if any)
 - [ ] Feedback form for accessibility issues
-- [ ] Contact: roberdan@fightthestroke.org
-- [ ] AEPD contact information
+- [ ] Contact: accessibilita@fightthestroke.org
+- [ ] Défenseur des droits contact information
 - [ ] Last update date
 
 ### Phase 2: User Feedback Mechanism (Week 1)
@@ -254,13 +274,14 @@ npx playwright test e2e/accessibility.spec.ts
 
 ## 7. References & Official Sources
 
-### Spanish Official Sources
+### French Official Sources
 
-| Source                            | URL                                                   | Purpose                 |
-| --------------------------------- | ----------------------------------------------------- | ----------------------- |
-| **AEPD**                          | https://www.aepd.es                                   | Official regulator      |
-| **RD 1112/2018 Text**             | https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699 | Spanish law             |
-| **AEPD Accessibility Guidelines** | https://www.aepd.es/es/orientaciones                  | Official interpretation |
+| Source                   | URL                                                                             | Purpose                  |
+| ------------------------ | ------------------------------------------------------------------------------- | ------------------------ |
+| **DINUM**                | https://www.numerique.gouv.fr                                                   | RGAA authority (primary) |
+| **Défenseur des droits** | https://www.defenseurdesdroits.fr                                               | Enforcement / complaints |
+| **RGAA 4.1 Portal**      | https://www.numerique.gouv.fr/publications/rgaa-accessibilite/                  | Official standard        |
+| **RGAA 4.1 Criteria**    | https://www.numerique.gouv.fr/publications/rgaa-accessibilite/methode/criteres/ | Detailed criteria        |
 
 ### International References
 
@@ -286,10 +307,10 @@ npx playwright test e2e/accessibility.spec.ts
 
 **Remaining Tasks:**
 
-- [ ] Create accessibility statement page (`/accessibility`) in Spanish
+- [ ] Create accessibility statement page (`/accessibility`) in French
 - [ ] Implement user feedback mechanism
 - [ ] Schedule annual accessibility audit
-- [ ] Localize accessibility statement (Spanish)
+- [ ] Localize accessibility statement (French)
 
 **Overall Status**: ✅ **COMPLIANT** (pending accessibility statement creation)
 
@@ -300,4 +321,4 @@ npx playwright test e2e/accessibility.spec.ts
 **Status**: Verification Complete
 **Compliance Owner**: Development/QA Team
 **Next Review**: 2026-04-27 (quarterly)
-**Reference**: Real Decreto 1112/2018, EU Directive 2016/2102, WCAG 2.1, AEPD Guidelines
+**Reference**: RGAA 4.1, Law 78-17, EU Directive 2016/2102, WCAG 2.1, DINUM Guidelines

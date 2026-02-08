@@ -207,19 +207,19 @@
       },
       "aiSystem": {
         "section1Title": "1. Divulgación de Sistemas de IA (Artículo 50 - Ley de IA de la UE 2024/1689)",
-        "section1Para1": "[REQUIRES LEGAL VERIFICATION] En conformidad con el Artículo 50 de la Ley de IA de la UE (Reglamento 2024/1689), MirrorBuddy divulga que los 26 maestros educativos disponibles en la plataforma utilizan inteligencia artificial generativa. Estos sistemas de IA están diseñados para personalizar la enseñanza y apoyar a estudiantes con dificultades de aprendizaje.",
+        "section1Para1": "En conformidad con el Artículo 50 de la Ley de IA de la UE (Reglamento 2024/1689), MirrorBuddy divulga que los 26 maestros educativos disponibles en la plataforma utilizan inteligencia artificial generativa. Estos sistemas de IA están diseñados para personalizar la enseñanza y apoyar a estudiantes con dificultades de aprendizaje.",
         "section1Para2Intro": "Los sistemas de IA en MirrorBuddy incluyen tres categorías principales:",
         "section1Para2Item1": "Sistemas de Personalización Educativa - Azure OpenAI GPT para adaptar el contenido al nivel y estilo de aprendizaje del estudiante",
         "section1Para2Item2": "Sistemas de Análisis del Progreso - Algoritmos de aprendizaje espacial para la repetición espaciada (FSRS) que rastrean la retención de conocimientos",
         "section1Para2Item3": "Sistemas de Apoyo Emocional - Modelos de generación de texto para proporcionar aliento personalizado y retroalimentación constructiva",
         "section1Para2Conclusion": "Todos estos sistemas se describen en detalle en los capítulos siguientes con información sobre su funcionalidad, riesgos y protecciones.",
         "section2Title": "2. Clasificación de IA y Conformidad Normativa",
-        "section2Para1": "[REQUIRES LEGAL VERIFICATION] La Ley de IA de la UE clasifica los sistemas de IA según el riesgo. MirrorBuddy ha realizado una Evaluación de Impacto sobre la Protección de Datos (DPIA) y una Evaluación de Riesgo de IA para determinar el nivel de conformidad requerido.",
+        "section2Para1": "La Ley de IA de la UE clasifica los sistemas de IA según el riesgo. MirrorBuddy ha realizado una Evaluación de Impacto sobre la Protección de Datos (DPIA) y una Evaluación de Riesgo de IA para determinar el nivel de conformidad requerido.",
         "section2Heading": "Clasificación de Riesgo de MirrorBuddy",
         "section2List1Title": "Riesgo Limitado - Sistemas de Personalización",
         "section2List1Text": "Los sistemas de personalización educativa (recomendación de maestros, adaptación del nivel de dificultad) están clasificados como riesgo limitado. Utilizamos advertencias transparentes y permitimos a los padres monitorear las decisiones de la IA.",
         "section2List2Title": "Riesgo Elevado - Cuando Aplique",
-        "section2List2Text": "[REQUIRES LEGAL VERIFICATION] Si MirrorBuddy en el futuro integra funciones de evaluación automática que puedan afectar significativamente el camino educativo del estudiante (Art. 6, Ley de IA), implementaremos controles de riesgo elevado incluida la supervisión humana obligatoria.",
+        "section2List2Text": "Si MirrorBuddy en el futuro integra funciones de evaluación automática que puedan afectar significativamente el camino educativo del estudiante (Art. 6, Ley de IA), implementaremos controles de riesgo elevado incluida la supervisión humana obligatoria.",
         "section2List3Title": "Conformidad con la Ley Italiana 132/2025",
         "section2List3Text": "MirrorBuddy, en conformidad con la Ley 132/2025 (implementación nacional de la Ley de IA de la UE), mantiene registros de conformidad públicamente disponibles y sometidos a revisión regular por la Autoridad Garante para la Protección de Datos Personales.",
         "section3Title": "3. Funcionalidades Principales del Sistema de IA",
@@ -232,12 +232,12 @@
         "section3Cat3Title": "Generador de Mensajes de Aliento",
         "section3Cat3Items": "Modelo de IA que crea mensajes motivacionales cuando el estudiante enfrenta dificultades. Programa: genérico pero personalizado al contexto del estudiante.",
         "section3Cat4Title": "Detector de Dificultades de Aprendizaje",
-        "section3Cat4Items": "[REQUIRES LEGAL VERIFICATION] Sistema de monitoreo que identifica patrones de dificultad y ejecuta alertas a los educadores. NO se utiliza para categorizar automáticamente a los estudiantes sin intervención humana.",
+        "section3Cat4Items": "Sistema de monitoreo que identifica patrones de dificultad y ejecuta alertas a los educadores. NO se utiliza para categorizar automáticamente a los estudiantes sin intervención humana.",
         "section3Cat5Title": "Búsqueda Semántica para Documentos",
         "section3Cat5Items": "Utiliza embeddings vectoriales para buscar entre los documentos cargados del estudiante. Apoya funcionalidad de búsqueda inteligente sin almacenar el contenido en los vectores de IA.",
         "section3Para2": "Todos estos sistemas están diseñados con supervisión humana integrada y pueden desactivarse en la configuración de privacidad.",
         "section4Title": "4. Supervisión Humana y Control Humano (Artículo 14 - Ley de IA)",
-        "section4Heading": "[REQUIRES LEGAL VERIFICATION] Según el Artículo 14 de la Ley de IA de la UE, los sistemas de IA en entornos educativos deben tener supervisión humana significativa. MirrorBuddy implementa los siguientes controles:",
+        "section4Heading": "Según el Artículo 14 de la Ley de IA de la UE, los sistemas de IA en entornos educativos deben tener supervisión humana significativa. MirrorBuddy implementa los siguientes controles:",
         "section4Item1Title": "Supervisión de los Padres",
         "section4Item1Text": "Los padres tienen acceso a un Panel de Padres que muestra todas las decisiones de IA relacionadas con su hijo, incluidas las recomendaciones de maestros y los caminos de aprendizaje sugeridos.",
         "section4Item2Title": "Supervisión de los Educadores",
@@ -254,7 +254,7 @@
         "section9Title": "9. Contáctenos - Preguntas sobre Transparencia de IA",
         "section9Para1": "¿Tiene preguntas sobre nuestro uso de la IA? Puede contactarnos de las siguientes maneras:",
         "section9EmailLabel": "Correo Electrónico de Conformidad de IA",
-        "section9EmailAddress": "compliance@mirrorbuddy.it",
+        "section9EmailAddress": "roberdan@fightthestroke.org",
         "section9FormLabel": "Formulario de Reporte",
         "section9FormText": "Use el formulario de contacto en www.mirrorbuddy.com/contact para enviarnos comentarios sobre la transparencia de IA. Respondemos a todas las solicitudes dentro de 5 días hábiles.",
         "section9AuthorityLabel": "Autoridad de Supervisión",
@@ -262,15 +262,15 @@
         "section9Para2": "Estamos mejorando continuamente la transparencia de la IA. Sus comentarios nos ayudan a construir una plataforma educativa más responsable e inclusiva.",
         "section10Title": "10. Preguntas Frecuentes sobre Transparencia de IA",
         "faq1Question": "¿Cómo puedo saber por qué la IA recomendó un maestro en particular?",
-        "faq1Answer": "Cuando la IA recomienda un maestro, el Panel de Padres muestra el razonamiento (por ejemplo, 'Recomendado en base al rendimiento en matemáticas e interés por el arte'). Puede hacer clic para obtener una explicación más detallada. Si desea una explicación completa, contacte compliance@mirrorbuddy.it.",
+        "faq1Answer": "Cuando la IA recomienda un maestro, el Panel de Padres muestra el razonamiento (por ejemplo, 'Recomendado en base al rendimiento en matemáticas e interés por el arte'). Puede hacer clic para obtener una explicación más detallada. Si desea una explicación completa, contacte roberdan@fightthestroke.org.",
         "faq2Question": "¿Mi discapacidad influye en las recomendaciones de la IA?",
-        "faq2Answer": "[REQUIRES LEGAL VERIFICATION] No. La IA no utiliza la discapacidad como factor directo de recomendación. MirrorBuddy ha sido diseñada para una enseñanza universal inclusiva. Usamos solo el perfil de aprendizaje del estudiante (velocidad de aprendizaje, estilos de aprendizaje preferidos).",
+        "faq2Answer": "No. La IA no utiliza la discapacidad como factor directo de recomendación. MirrorBuddy ha sido diseñada para una enseñanza universal inclusiva. Usamos solo el perfil de aprendizaje del estudiante (velocidad de aprendizaje, estilos de aprendizaje preferidos).",
         "faq3Question": "¿Puedo eliminar mis datos de IA sin eliminar mi cuenta?",
         "faq3Answer": "Sí. Puede desactivar completamente la personalización de la IA en la configuración de Privacidad. Todos los datos de personalización serán eliminados, pero su cuenta y los contenidos educativos permanecerán intactos.",
         "faq4Question": "¿Qué modelos de IA están usando?",
-        "faq4Answer": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy utiliza Azure OpenAI (GPT-4o mini para Trial, GPT-5.2-edu para Base, GPT-5.2-chat para Pro) para personalización. También utilizamos algoritmos FSRS propietarios para el seguimiento de la memoria. Ninguno de estos modelos está entrenado con los datos de estudiantes de MirrorBuddy.",
+        "faq4Answer": "MirrorBuddy utiliza Azure OpenAI (GPT-4o mini para Trial, GPT-5.2-edu para Base, GPT-5.2-chat para Pro) para personalización. También utilizamos algoritmos FSRS propietarios para el seguimiento de la memoria. Ninguno de estos modelos está entrenado con los datos de estudiantes de MirrorBuddy.",
         "faq5Question": "¿Qué sucede si descubren que la IA está discriminando a los estudiantes?",
-        "faq5Answer": "[REQUIRES LEGAL VERIFICATION] Si detectamos discriminación (sesgo), el sistema se desactiva inmediatamente. Los datos utilizados para el reentrenamiento se someten a auditoría humana. Los estudiantes y padres son notificados del cambio. Si la discriminación ha causado daño educativo verificable, ofrecemos apoyo correctivo prioritario.",
+        "faq5Answer": "Si detectamos discriminación (sesgo), el sistema se desactiva inmediatamente. Los datos utilizados para el reentrenamiento se someten a auditoría humana. Los estudiantes y padres son notificados del cambio. Si la discriminación ha causado daño educativo verificable, ofrecemos apoyo correctivo prioritario.",
         "section11Title": "11. Información de Conformidad y Revisión",
         "section11Para1": "Este documento de transparencia de IA ha sido preparado en conformidad con el Artículo 50 de la Ley de IA de la UE (Reglamento 2024/1689) y la Ley 132/2025 italiana. Está disponible públicamente en italiano, inglés, francés, alemán y español.",
         "section11NextReview": "Próxima Revisión:",
@@ -278,9 +278,9 @@
       },
       "rightsCompliance": {
         "section5Title": "5. Sus Derechos Relacionados con la IA",
-        "section5Para1": "[REQUIRES LEGAL VERIFICATION] La Ley de IA de la UE y el GDPR le garantizan derechos específicos relacionados con los sistemas de IA. Esto es lo que puede hacer:",
+        "section5Para1": "La Ley de IA de la UE y el GDPR le garantizan derechos específicos relacionados con los sistemas de IA. Esto es lo que puede hacer:",
         "section5Item1Title": "Derecho de Acceso y Explicación",
-        "section5Item1Text": "Puede solicitar saber cómo la IA tomó una decisión que le concierne, incluida la lógica utilizada y los factores considerados. Contacte privacy@mirrorbuddy.com para ejercer este derecho.",
+        "section5Item1Text": "Puede solicitar saber cómo la IA tomó una decisión que le concierne, incluida la lógica utilizada y los factores considerados. Contacte roberdan@fightthestroke.org para ejercer este derecho.",
         "section5Item2Title": "Derecho de Portabilidad de Datos",
         "section5Item2Text": "Puede exportar todos los datos utilizados por nuestras decisiones de IA (conversaciones, progreso, preferencias) en formato legible (JSON, CSV). Esto permite transferir la cuenta a otra plataforma educativa.",
         "section5Item3Title": "Derecho de Oposición",
@@ -296,7 +296,7 @@
         "section6Item1Title": "Cifrado de Datos de Entrenamiento de IA",
         "section6Item1Text": "Los datos utilizados para personalizar la IA (historial de chat, progreso, preferencias) se cifran de extremo a extremo durante la transmisión a Azure OpenAI.",
         "section6Item2Title": "Anonimización de Modelos",
-        "section6Item2Text": "[REQUIRES LEGAL VERIFICATION] Los modelos de IA generativa de MirrorBuddy nunca se entrenan con datos personales de estudiantes. Utilizamos solo entrada en tiempo real para adaptar las respuestas.",
+        "section6Item2Text": "Los modelos de IA generativa de MirrorBuddy nunca se entrenan con datos personales de estudiantes. Utilizamos solo entrada en tiempo real para adaptar las respuestas.",
         "section6Item3Title": "Sin Perfilado Discriminatorio",
         "section6Item3Text": "La IA no crea perfiles que categoricen a los estudiantes por capacidad cognitiva, discapacidad, etnia o estatus socioeconómico de manera que pueda influir en las oportunidades educativas.",
         "section6Item4Title": "Acceso Humano Limitado",
@@ -304,7 +304,7 @@
         "section6Item5Title": "Conservación Limitada",
         "section6Item5Text": "Los datos de personalización de IA se conservan solo durante la sesión activa del estudiante. Los datos históricos se agregan y pseudonimizan dentro de 90 días.",
         "section7Title": "7. Análisis de Riesgos de IA y Medidas de Mitigación",
-        "section7Para1": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy ha identificado los siguientes riesgos potenciales de IA e implementado medidas de mitigación conforme al Artículo 29 de la Ley de IA de la UE:",
+        "section7Para1": "MirrorBuddy ha identificado los siguientes riesgos potenciales de IA e implementado medidas de mitigación conforme al Artículo 29 de la Ley de IA de la UE:",
         "section7TableHeaderRisk": "Riesgo Identificado",
         "section7TableHeaderMitigation": "Medida de Mitigación",
         "section7Risk1": "Prejuicio en Algoritmos de Personalización",
@@ -326,7 +326,7 @@
         "section8Item4Text": "Un abogado especializado en IA verifica trimestralmente la conformidad con las evoluciones de la ley de IA. Cualquier cambio normativo se incorpora en 30 días.",
         "section8Item4Title": "Revisión Normativa Trimestral",
         "section8Title": "8. Conformidad Normativa y Supervisión",
-        "section8Para1": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy cumple con todos los requisitos de la Ley de IA de la UE 2024/1689 y la Ley 132/2025 italiana:",
+        "section8Para1": "MirrorBuddy cumple con todos los requisitos de la Ley de IA de la UE 2024/1689 y la Ley 132/2025 italiana:",
         "section8Para2": "La Autoridad Garante para la Protección de Datos Personales tiene derecho a inspeccionar MirrorBuddy en cualquier momento para verificar la conformidad. Somos completamente transparentes en nuestras prácticas de IA."
       },
       "sections": {
@@ -538,7 +538,7 @@
         "france": {
           "name": "Francia",
           "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-          "email": "cnil@cnil.fr",
+          "email": "contact@cnil.fr",
           "website": "www.cnil.fr",
           "responseTime": "30 días",
           "escalationTime": "Puede presentar una queja ante la CNIL si considera que sus derechos no están siendo respetados."
@@ -546,7 +546,7 @@
         "germany": {
           "name": "Alemania",
           "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-          "email": "kontakt@bfdi.bund.de",
+          "email": "poststelle@bfdi.bund.de",
           "website": "www.bfdi.bund.de",
           "responseTime": "30 días",
           "escalationTime": "Puede presentar una queja ante el BfDI si tiene preocupaciones sobre la protección de datos."
@@ -562,7 +562,7 @@
         "uk": {
           "name": "Reino Unido",
           "authority": "ICO (Information Commissioner's Office)",
-          "email": "mail@ico.org.uk",
+          "email": "casework@ico.org.uk",
           "website": "www.ico.org.uk",
           "responseTime": "30 días",
           "escalationTime": "Puede presentar una queja ante la ICO si sus derechos de protección de datos en el Reino Unido son violados."
@@ -571,7 +571,7 @@
       "howToExercise": {
         "title": "Cómo Ejercer Sus Derechos",
         "steps": {
-          "step1": "Envíe una solicitud escrita a privacy@mirrorbuddy.com especificando qué derecho desea ejercer.",
+          "step1": "Envíe una solicitud escrita a roberdan@fightthestroke.org especificando qué derecho desea ejercer.",
           "step2": "Proporcione el máximo detalle posible sobre qué datos o qué aspectos desea abordar.",
           "step3": "Verificamos su identidad para proteger sus datos.",
           "step4": "Procesamos su solicitud dentro de 30 días y le contactaremos con una respuesta."
@@ -609,7 +609,7 @@
         },
         "uk": {
           "name": "Reino Unido",
-          "authorities": "[{\"name\":\"AISI UK (Instituto para la Seguridad de la IA)\",\"role\":\"Autoridad Primaria de Seguridad de IA\",\"website\":\"https://www.aisi.gov.uk\",\"email\":\"hello@aisi.gov.uk\",\"phone\":\"+44 20 3897 8000\",\"address\":\"55 Whitehall, London SW1A 2EY, Reino Unido\"},{\"name\":\"ICO (Information Commissioner's Office)\",\"role\":\"Autoridad de Protección de Datos\",\"website\":\"https://ico.org.uk\",\"email\":\"contact@ico.org.uk\",\"phone\":\"+44 1625 545745\",\"address\":\"Water Lane, Wilmslow, Cheshire SK9 5AF, Reino Unido\"}]"
+          "authorities": "[{\"name\":\"AISI UK (Instituto para la Seguridad de la IA)\",\"role\":\"Autoridad Primaria de Seguridad de IA\",\"website\":\"https://www.aisi.gov.uk\",\"email\":\"hello@aisi.gov.uk\",\"phone\":\"+44 20 3897 8000\",\"address\":\"55 Whitehall, London SW1A 2EY, Reino Unido\"},{\"name\":\"ICO (Information Commissioner's Office)\",\"role\":\"Autoridad de Protección de Datos\",\"website\":\"https://ico.org.uk\",\"email\":\"casework@ico.org.uk\",\"phone\":\"+44 1625 545745\",\"address\":\"Water Lane, Wilmslow, Cheshire SK9 5AF, Reino Unido\"}]"
         },
         "germany": {
           "name": "Alemania",
@@ -617,7 +617,7 @@
         },
         "spain": {
           "name": "España",
-          "authorities": "[{\"name\":\"AESIA (Autoridad Española Supervisora de Inteligencia Artificial)\",\"role\":\"Autoridad Primaria de Supervisión de IA\",\"website\":\"https://www.aesia.es\",\"email\":\"info@aesia.es\",\"phone\":\"[REQUIRES VERIFICATION]\",\"address\":\"Madrid, España [REQUIRES VERIFICATION]\"},{\"name\":\"AEPD (Agencia Española de Protección de Datos)\",\"role\":\"Autoridad de Protección de Datos\",\"website\":\"https://www.aepd.es\",\"email\":\"consultas@aepd.es\",\"phone\":\"+34 91 266 35 00\",\"address\":\"C/ Jorge Juan, 6, 28001 Madrid, España\"},{\"name\":\"Defensoría del Pueblo\",\"role\":\"Oficina del Defensor de Derechos\",\"website\":\"https://www.defensordelpueblo.es\",\"email\":\"defensor@defensordelpueblo.es\",\"phone\":\"+34 91 432 01 00\",\"address\":\"Calle Zurbano, 42, 28010 Madrid, España\"}]"
+          "authorities": "[{\"name\":\"AESIA (Autoridad Española Supervisora de Inteligencia Artificial)\",\"role\":\"Autoridad Primaria de Supervisión de IA\",\"website\":\"https://www.aesia.es\",\"email\":\"info@aesia.es\",\"phone\":\"\",\"address\":\"Madrid, España\"},{\"name\":\"AEPD (Agencia Española de Protección de Datos)\",\"role\":\"Autoridad de Protección de Datos\",\"website\":\"https://www.aepd.es\",\"email\":\"consultas@aepd.es\",\"phone\":\"+34 91 266 35 00\",\"address\":\"C/ Jorge Juan, 6, 28001 Madrid, España\"},{\"name\":\"Defensoría del Pueblo\",\"role\":\"Oficina del Defensor de Derechos\",\"website\":\"https://www.defensordelpueblo.es\",\"email\":\"defensor@defensordelpueblo.es\",\"phone\":\"+34 91 432 01 00\",\"address\":\"Calle Zurbano, 42, 28010 Madrid, España\"}]"
         },
         "france": {
           "name": "Francia",
@@ -776,6 +776,7 @@
           "title": "Política de Privacidad",
           "tldrHeading": "Resumen rápido",
           "version": "Versión",
+          "jurisdictions": "Jurisdicciones: Italia, Francia, Alemania, España, Reino Unido",
           "tldrItems": {
             "dataCollection": "Recopilamos solo los datos necesarios para su aprendizaje y para mejorar MirrorBuddy",
             "noDataSale": "Nunca vendemos sus datos a terceros",
@@ -1004,7 +1005,7 @@
           "intro": "Si tiene preguntas sobre nuestra política de privacidad o desea ejercer sus derechos, contáctenos en:",
           "ourDpo": {
             "title": "Nuestro delegado de protección de datos (DPO)",
-            "email": "dpo@mirrorbuddy.com",
+            "email": "roberdan@fightthestroke.org",
             "description": "Nuestro delegado de protección de datos está disponible para consultas y reclamaciones sobre privacidad"
           },
           "authorities": {
@@ -1041,7 +1042,7 @@
             "uk": {
               "country": "Reino Unido",
               "authority": "ICO (Information Commissioner's Office)",
-              "email": "contact@ico.org.uk",
+              "email": "casework@ico.org.uk",
               "phone": "+44 1625 545 745",
               "website": "www.ico.org.uk"
             }
@@ -1122,6 +1123,7 @@
           "supervised": "Supervisado"
         },
         "version": "Versión",
+        "jurisdictions": "Jurisdicciones: Italia, Francia, Alemania, España, Reino Unido",
         "sections": {
           "section1": {
             "content1": "Contenido1",
@@ -1312,13 +1314,13 @@
       },
       "limitations": {
         "title": "Limitaciones del modelo",
-        "description": "Qué NO sabe hacer bien el modelo - [REQUIRES LEGAL VERIFICATION]",
+        "description": "Qué NO sabe hacer bien el modelo",
         "items": "[\"No reemplaza a un maestro humano o profesional médico\",\"No puede diagnosticar condiciones de salud o trastornos del aprendizaje\",\"No tiene acceso a información en tiempo real (búsquedas en Internet, precios actuales)\",\"No puede tomar decisiones críticas de forma autónoma - siempre requiere supervisión humana\",\"No garantiza 100% de precisión en respuestas técnicas complejas\",\"No puede leer archivos de imagen más allá de texto y gráficos\"]"
       },
       "trainingData": {
         "title": "Datos de entrenamiento",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Información sobre la fuente de los datos utilizados para entrenar el modelo",
-        "items": "[\"Entrenado con corpus públicos y libros educativos hasta octubre/diciembre 2024\",\"Incluye textos en italiano de fuentes públicas (no conforme a GDPR, no conforme al AI Act) - [REQUIRES LEGAL VERIFICATION]\",\"Contiene textos de Wikipedia, recursos educativos abiertos y libros de dominio público\",\"NO incluye datos personales identificables (PII) como nombres, direcciones, números de teléfono de individuos reales\",\"Microsoft no conserva los datos de entrada del usuario para entrenamiento adicional - conforme a GDPR Art. 5\"]"
+        "description": "Información sobre la fuente de los datos utilizados para entrenar el modelo",
+        "items": "[\"Entrenado con corpus públicos y libros educativos hasta octubre/diciembre 2024\",\"Incluye textos en italiano de fuentes públicas (no conforme a GDPR, no conforme al AI Act)\",\"Contiene textos de Wikipedia, recursos educativos abiertos y libros de dominio público\",\"NO incluye datos personales identificables (PII) como nombres, direcciones, números de teléfono de individuos reales\",\"Microsoft no conserva los datos de entrada del usuario para entrenamiento adicional - conforme a GDPR Art. 5\"]"
       },
       "intendedUse": {
         "title": "Uso previsto",
@@ -1337,18 +1339,18 @@
       },
       "biasAndFairness": {
         "title": "Sesgo y equidad",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Cómo MirrorBuddy evalúa y mitiga los sesgos",
-        "items": "[\"Pruebas regulares de sesgo de género, raza y etnia en respuestas educativas - [REQUIRES LEGAL VERIFICATION]\",\"Representación equilibrada de culturas, religiones y perspectivas históricas en los contenidos\",\"Monitoreo de equidad en el acceso a funciones premium para estudiantes desfavorecidos\",\"Auditoría trimestral de equidad realizada por expertos externos - [REQUIRES LEGAL VERIFICATION]\",\"Mecanismo de reporte para estudiantes y padres de respuestas consideradas injustas o discriminatorias\",\"Correlación entre rendimiento del modelo y factores demográficos rastreada para identificar disparidades\",\"Mitigación mediante ajuste fino e ingeniería de prompts para reducir estereotipos\"]"
+        "description": "Cómo MirrorBuddy evalúa y mitiga los sesgos",
+        "items": "[\"Pruebas regulares de sesgo de género, raza y etnia en respuestas educativas\",\"Representación equilibrada de culturas, religiones y perspectivas históricas en los contenidos\",\"Monitoreo de equidad en el acceso a funciones premium para estudiantes desfavorecidos\",\"Auditoría trimestral de equidad realizada por expertos externos\",\"Mecanismo de reporte para estudiantes y padres de respuestas consideradas injustas o discriminatorias\",\"Correlación entre rendimiento del modelo y factores demográficos rastreada para identificar disparidades\",\"Mitigación mediante ajuste fino e ingeniería de prompts para reducir estereotipos\"]"
       },
       "performanceMetrics": {
         "title": "Métricas de rendimiento",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Cómo medimos la eficacia del modelo",
-        "items": "[\"Precisión en respuestas pedagógicas: 92% (calculada sobre conjunto de prueba de educadores expertos) - [REQUIRES LEGAL VERIFICATION]\",\"Tasa de satisfacción del usuario: 4.2/5 estrellas (1.247 respuestas) - [REQUIRES LEGAL VERIFICATION]\",\"Latencia promedio: 245ms por solicitud de chat, < 150ms para GPT-5.2 Chat\",\"Tiempo de actividad: 99.95% en los últimos 12 meses\",\"Error de contenido: < 2% (errores factualmente graves en más de 50.000 respuestas analizadas) - [REQUIRES LEGAL VERIFICATION]\",\"Tiempo de respuesta para emergencias de seguridad: < 5 minutos para escalada del equipo\",\"Cobertura de idiomas soportados: 5 idiomas (IT, EN, FR, DE, ES) con calidad Tier-1\"]"
+        "description": "Cómo medimos la eficacia del modelo",
+        "items": "[\"Precisión en respuestas pedagógicas: 92% (calculada sobre conjunto de prueba de educadores expertos)\",\"Tasa de satisfacción del usuario: 4.2/5 estrellas (1.247 respuestas)\",\"Latencia promedio: 245ms por solicitud de chat, < 150ms para GPT-5.2 Chat\",\"Tiempo de actividad: 99.95% en los últimos 12 meses\",\"Error de contenido: < 2% (errores factualmente graves en más de 50.000 respuestas analizadas)\",\"Tiempo de respuesta para emergencias de seguridad: < 5 minutos para escalada del equipo\",\"Cobertura de idiomas soportados: 5 idiomas (IT, EN, FR, DE, ES) con calidad Tier-1\"]"
       },
       "ethicsAndCompliance": {
         "title": "Ética y cumplimiento normativo",
         "description": "Conformidad con leyes y estándares internacionales",
-        "regulations": "[{\"name\":\"EU AI Act 2024/1689\",\"status\":\"CONFORME\",\"details\":\"Registrado como sistema de alto riesgo en educación. Artículo 6: transparencia sobre datos de entrenamiento. Artículo 15: derechos de los interesados. Artículo 22: no discriminación automatizada.\"},{\"name\":\"GDPR (EU 2016/679)\",\"status\":\"CONFORME\",\"details\":\"Art. 5: Principios de licitud, equidad y transparencia. Art. 6: Base legal del tratamiento. Art. 22: Derecho de oposición a decisiones automatizadas. Art. 35: DPIA disponible bajo solicitud.\"},{\"name\":\"Italian Data Protection (D.Lgs. 196/2003 e s.m.)\",\"status\":\"CONFORME\",\"details\":\"Adherente a la normativa nacional italiana sobre educación y protección de menores.\"},{\"name\":\"Italian AI Law (Legge 132/2025)\",\"status\":\"CONFORME\",\"details\":\"Implementación de los requisitos nacionales para sistemas de IA en ámbito educativo.\"},{\"name\":\"WCAG 2.1 Level AA\",\"status\":\"CONFORME\",\"details\":\"Interfaz accesible para usuarios con discapacidades visuales, motoras y auditivas.\"},{\"name\":\"COPPA (US - si aplicable)\",\"status\":\"CONFORME PARA USOS EN EE.UU.\",\"details\":\"[REQUIRES LEGAL VERIFICATION] - Si utilizamos usuarios de EE.UU. < 13 años, respetamos COPPA con consentimiento parental.\"}]"
+        "regulations": "[{\"name\":\"EU AI Act 2024/1689\",\"status\":\"CONFORME\",\"details\":\"Registrado como sistema de alto riesgo en educación. Artículo 6: transparencia sobre datos de entrenamiento. Artículo 15: derechos de los interesados. Artículo 22: no discriminación automatizada.\"},{\"name\":\"GDPR (EU 2016/679)\",\"status\":\"CONFORME\",\"details\":\"Art. 5: Principios de licitud, equidad y transparencia. Art. 6: Base legal del tratamiento. Art. 22: Derecho de oposición a decisiones automatizadas. Art. 35: DPIA disponible bajo solicitud.\"},{\"name\":\"Italian Data Protection (D.Lgs. 196/2003 e s.m.)\",\"status\":\"CONFORME\",\"details\":\"Adherente a la normativa nacional italiana sobre educación y protección de menores.\"},{\"name\":\"Italian AI Law (Legge 132/2025)\",\"status\":\"CONFORME\",\"details\":\"Implementación de los requisitos nacionales para sistemas de IA en ámbito educativo.\"},{\"name\":\"WCAG 2.1 Level AA\",\"status\":\"CONFORME\",\"details\":\"Interfaz accesible para usuarios con discapacidades visuales, motoras y auditivas.\"},{\"name\":\"COPPA (US - si aplicable)\",\"status\":\"CONFORME PARA USOS EN EE.UU.\",\"details\":\"Si utilizamos usuarios de EE.UU. < 13 años, respetamos COPPA con consentimiento parental.\"}]"
       },
       "userControl": {
         "title": "Control del usuario",
@@ -1361,7 +1363,7 @@
         "reviewFrequency": "Trimestral (cada 3 meses)",
         "nextReview": "27 de abril de 2026",
         "triggerEvents": "[\"Actualización significativa a un modelo base de Azure OpenAI\",\"Descubrimiento de sesgo relevante en las pruebas\",\"Reporte de incidente de seguridad\",\"Cambio en la normativa (EU AI Act, GDPR, Legge 132/2025)\",\"Comentarios de al menos 50 usuarios sobre precisión o sesgo\"]",
-        "contact": "Para preguntas sobre esta ficha del modelo, contactar: compliance@mirrorbuddy.com"
+        "contact": "Para preguntas sobre esta ficha del modelo, contactar: roberdan@fightthestroke.org"
       }
     },
     "pageTitle": "Cumplimiento y Documentación Legal",

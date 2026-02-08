@@ -48,6 +48,8 @@ export default function PrivacyPage() {
               <span>
                 {t("lastUpdated")} {LAST_UPDATED}
               </span>
+              <span>•</span>
+              <span>{t("jurisdictions")}</span>
             </div>
           </div>
 

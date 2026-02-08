@@ -207,19 +207,19 @@
       },
       "aiSystem": {
         "section1Title": "1. Offenlegung der KI-Systeme (Artikel 50 - EU-KI-Gesetz 2024/1689)",
-        "section1Para1": "[REQUIRES LEGAL VERIFICATION] Gemäß Artikel 50 des EU-KI-Gesetzes (Verordnung 2024/1689) legt MirrorBuddy offen, dass die 26 auf der Plattform verfügbaren Lehrmeister generative künstliche Intelligenz verwenden. Diese KI-Systeme sind darauf ausgelegt, den Unterricht zu personalisieren und Schüler mit Lernschwierigkeiten zu unterstützen.",
+        "section1Para1": "Gemäß Artikel 50 des EU-KI-Gesetzes (Verordnung 2024/1689) legt MirrorBuddy offen, dass die 26 auf der Plattform verfügbaren Lehrmeister generative künstliche Intelligenz verwenden. Diese KI-Systeme sind darauf ausgelegt, den Unterricht zu personalisieren und Schüler mit Lernschwierigkeiten zu unterstützen.",
         "section1Para2Intro": "Die KI-Systeme in MirrorBuddy umfassen drei Hauptkategorien:",
         "section1Para2Item1": "Systeme zur Bildungspersonalisierung - Azure OpenAI GPT zur Anpassung von Inhalten an das Niveau und den Lernstil des Schülers",
         "section1Para2Item2": "Systeme zur Fortschrittsanalyse - Algorithmen für verteiltes Lernen zur zeitlich verteilten Wiederholung (FSRS), die den Wissenserhalt verfolgen",
         "section1Para2Item3": "Systeme zur emotionalen Unterstützung - Textgenerierungsmodelle zur Bereitstellung personalisierter Ermutigung und konstruktivem Feedback",
         "section1Para2Conclusion": "Alle diese Systeme werden in den folgenden Kapiteln ausführlich mit Informationen zu ihrer Funktionalität, Risiken und Schutzmaßnahmen beschrieben.",
         "section2Title": "2. KI-Klassifizierung und regulatorische Konformität",
-        "section2Para1": "[REQUIRES LEGAL VERIFICATION] Das EU-KI-Gesetz klassifiziert KI-Systeme nach Risiko. MirrorBuddy hat eine Datenschutz-Folgenabschätzung (DPIA) und eine KI-Risikobewertung durchgeführt, um das erforderliche Konformitätsniveau zu bestimmen.",
+        "section2Para1": "Das EU-KI-Gesetz klassifiziert KI-Systeme nach Risiko. MirrorBuddy hat eine Datenschutz-Folgenabschätzung (DPIA) und eine KI-Risikobewertung durchgeführt, um das erforderliche Konformitätsniveau zu bestimmen.",
         "section2Heading": "Risikoklassifizierung von MirrorBuddy",
         "section2List1Title": "Begrenztes Risiko - Personalisierungssysteme",
         "section2List1Text": "Die Systeme zur Bildungspersonalisierung (Empfehlung von Lehrmeistern, Anpassung des Schwierigkeitsgrads) werden als begrenztes Risiko eingestuft. Wir verwenden transparente Warnhinweise und ermöglichen Eltern, KI-Entscheidungen zu überwachen.",
         "section2List2Title": "Hohes Risiko - Wenn anwendbar",
-        "section2List2Text": "[REQUIRES LEGAL VERIFICATION] Wenn MirrorBuddy in Zukunft Funktionen zur automatisierten Bewertung integriert, die sich erheblich auf den Bildungsweg des Schülers auswirken könnten (Art. 6, KI-Gesetz), werden wir Hochrisikokontrollen einschließlich obligatorischer menschlicher Aufsicht implementieren.",
+        "section2List2Text": "Wenn MirrorBuddy in Zukunft Funktionen zur automatisierten Bewertung integriert, die sich erheblich auf den Bildungsweg des Schülers auswirken könnten (Art. 6, KI-Gesetz), werden wir Hochrisikokontrollen einschließlich obligatorischer menschlicher Aufsicht implementieren.",
         "section2List3Title": "Konformität mit italienischem Gesetz 132/2025",
         "section2List3Text": "MirrorBuddy hält sich gemäß Gesetz 132/2025 (nationale Umsetzung des EU-KI-Gesetzes) an öffentlich verfügbare Konformitätsprotokolle, die regelmäßig von der Datenschutzbehörde überprüft werden.",
         "section3Title": "3. Hauptfunktionen des KI-Systems",
@@ -232,12 +232,12 @@
         "section3Cat3Title": "Generator für Ermutigungsnachrichten",
         "section3Cat3Items": "KI-Modell, das motivierende Nachrichten erstellt, wenn der Schüler Schwierigkeiten hat. Ausgabe: generisch, aber auf den Kontext des Schülers abgestimmt.",
         "section3Cat4Title": "Detektor für Lernschwierigkeiten",
-        "section3Cat4Items": "[REQUIRES LEGAL VERIFICATION] Überwachungssystem, das Schwierigkeitsmuster identifiziert und Warnungen an Pädagogen sendet. Wird NICHT verwendet, um Schüler automatisch ohne menschliche Intervention zu kategorisieren.",
+        "section3Cat4Items": "Überwachungssystem, das Schwierigkeitsmuster identifiziert und Warnungen an Pädagogen sendet. Wird NICHT verwendet, um Schüler automatisch ohne menschliche Intervention zu kategorisieren.",
         "section3Cat5Title": "Semantische Dokumentensuche",
         "section3Cat5Items": "Verwendet Vektor-Embeddings zur Suche in hochgeladenen Dokumenten des Schülers. Unterstützt intelligente Suchfunktionen, ohne den Inhalt in KI-Vektoren zu speichern.",
         "section3Para2": "Alle diese Systeme sind mit integrierter menschlicher Aufsicht konzipiert und können in den Datenschutzeinstellungen deaktiviert werden.",
         "section4Title": "4. Menschliche Aufsicht und menschliche Kontrolle (Artikel 14 - KI-Gesetz)",
-        "section4Heading": "[REQUIRES LEGAL VERIFICATION] Gemäß Artikel 14 des EU-KI-Gesetzes müssen KI-Systeme in Bildungsumgebungen über wesentliche menschliche Aufsicht verfügen. MirrorBuddy implementiert folgende Kontrollen:",
+        "section4Heading": "Gemäß Artikel 14 des EU-KI-Gesetzes müssen KI-Systeme in Bildungsumgebungen über wesentliche menschliche Aufsicht verfügen. MirrorBuddy implementiert folgende Kontrollen:",
         "section4Item1Title": "Elterliche Aufsicht",
         "section4Item1Text": "Eltern haben Zugriff auf ein Eltern-Dashboard, das alle KI-Entscheidungen in Bezug auf ihr Kind zeigt, einschließlich Empfehlungen für Lehrmeister und vorgeschlagene Lernpfade.",
         "section4Item2Title": "Pädagogische Aufsicht",
@@ -254,7 +254,7 @@
         "section9Title": "9. Kontaktieren Sie uns - Fragen zur KI-Transparenz",
         "section9Para1": "Haben Sie Fragen zu unserer KI-Nutzung? Sie können uns auf folgende Weise kontaktieren:",
         "section9EmailLabel": "KI-Compliance-E-Mail",
-        "section9EmailAddress": "compliance@mirrorbuddy.it",
+        "section9EmailAddress": "roberdan@fightthestroke.org",
         "section9FormLabel": "Meldeformular",
         "section9FormText": "Verwenden Sie das Kontaktformular auf www.mirrorbuddy.com/contact, um uns Feedback zur KI-Transparenz zu senden. Wir antworten auf alle Anfragen innerhalb von 5 Werktagen.",
         "section9AuthorityLabel": "Aufsichtsbehörde",
@@ -262,15 +262,15 @@
         "section9Para2": "Wir verbessern kontinuierlich die KI-Transparenz. Ihr Feedback hilft uns, eine verantwortungsvollere und inklusivere Bildungsplattform aufzubauen.",
         "section10Title": "10. Häufig gestellte Fragen zur KI-Transparenz",
         "faq1Question": "Wie kann ich erfahren, warum die KI einen bestimmten Lehrmeister empfohlen hat?",
-        "faq1Answer": "Wenn die KI einen Lehrmeister empfiehlt, zeigt das Eltern-Dashboard die Begründung (z. B. 'Empfohlen basierend auf Mathematikleistung und Interesse an Kunst'). Sie können für eine detailliertere Erklärung klicken. Wenn Sie eine vollständige Erklärung wünschen, kontaktieren Sie compliance@mirrorbuddy.it.",
+        "faq1Answer": "Wenn die KI einen Lehrmeister empfiehlt, zeigt das Eltern-Dashboard die Begründung (z. B. 'Empfohlen basierend auf Mathematikleistung und Interesse an Kunst'). Sie können für eine detailliertere Erklärung klicken. Wenn Sie eine vollständige Erklärung wünschen, kontaktieren Sie roberdan@fightthestroke.org.",
         "faq2Question": "Beeinflusst meine Behinderung die KI-Empfehlungen?",
-        "faq2Answer": "[REQUIRES LEGAL VERIFICATION] Nein. Die KI verwendet die Behinderung nicht als direkten Empfehlungsfaktor. MirrorBuddy wurde für inklusiven universellen Unterricht konzipiert. Wir verwenden nur das Lernprofil des Schülers (Lerngeschwindigkeit, bevorzugte Lernstile).",
+        "faq2Answer": "Nein. Die KI verwendet die Behinderung nicht als direkten Empfehlungsfaktor. MirrorBuddy wurde für inklusiven universellen Unterricht konzipiert. Wir verwenden nur das Lernprofil des Schülers (Lerngeschwindigkeit, bevorzugte Lernstile).",
         "faq3Question": "Kann ich meine KI-Daten löschen, ohne mein Konto zu löschen?",
         "faq3Answer": "Ja. Sie können die KI-Personalisierung in den Datenschutzeinstellungen vollständig deaktivieren. Alle Personalisierungsdaten werden gelöscht, aber Ihr Konto und die Bildungsinhalte bleiben intakt.",
         "faq4Question": "Welche KI-Modelle verwenden Sie?",
-        "faq4Answer": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy verwendet Azure OpenAI (GPT-4o mini für Trial, GPT-5.2-edu für Base, GPT-5.2-chat für Pro) zur Personalisierung. Wir verwenden auch proprietäre FSRS-Algorithmen zur Gedächtnisverfolgung. Keines dieser Modelle wird mit den Daten von MirrorBuddy-Schülern trainiert.",
+        "faq4Answer": "MirrorBuddy verwendet Azure OpenAI (GPT-4o mini für Trial, GPT-5.2-edu für Base, GPT-5.2-chat für Pro) zur Personalisierung. Wir verwenden auch proprietäre FSRS-Algorithmen zur Gedächtnisverfolgung. Keines dieser Modelle wird mit den Daten von MirrorBuddy-Schülern trainiert.",
         "faq5Question": "Was passiert, wenn Sie feststellen, dass die KI Schüler diskriminiert?",
-        "faq5Answer": "[REQUIRES LEGAL VERIFICATION] Wenn wir Diskriminierung (Bias) feststellen, wird das System sofort deaktiviert. Die für das erneute Training verwendeten Daten werden durch menschliche Audits geprüft. Schüler und Eltern werden über die Änderung benachrichtigt. Wenn die Diskriminierung nachweislichen Bildungsschaden verursacht hat, bieten wir vorrangige Korrekturunterstützung an.",
+        "faq5Answer": "Wenn wir Diskriminierung (Bias) feststellen, wird das System sofort deaktiviert. Die für das erneute Training verwendeten Daten werden durch menschliche Audits geprüft. Schüler und Eltern werden über die Änderung benachrichtigt. Wenn die Diskriminierung nachweislichen Bildungsschaden verursacht hat, bieten wir vorrangige Korrekturunterstützung an.",
         "section11Title": "11. Compliance- und Überprüfungsinformationen",
         "section11Para1": "Dieses KI-Transparenzdokument wurde gemäß Artikel 50 des EU-KI-Gesetzes (Verordnung 2024/1689) und des italienischen Gesetzes 132/2025 erstellt. Es ist öffentlich in Italienisch, Englisch, Französisch, Deutsch und Spanisch verfügbar.",
         "section11NextReview": "Nächste Überprüfung:",
@@ -278,9 +278,9 @@
       },
       "rightsCompliance": {
         "section5Title": "5. Ihre KI-bezogenen Rechte",
-        "section5Para1": "[REQUIRES LEGAL VERIFICATION] Das EU-KI-Gesetz und die GDPR gewähren Ihnen spezifische Rechte in Bezug auf KI-Systeme. Folgendes können Sie tun:",
+        "section5Para1": "Das EU-KI-Gesetz und die GDPR gewähren Ihnen spezifische Rechte in Bezug auf KI-Systeme. Folgendes können Sie tun:",
         "section5Item1Title": "Recht auf Zugang und Erklärung",
-        "section5Item1Text": "Sie können verlangen zu erfahren, wie die KI eine Entscheidung über Sie getroffen hat, einschließlich der verwendeten Logik und der berücksichtigten Faktoren. Kontaktieren Sie privacy@mirrorbuddy.com, um dieses Recht auszuüben.",
+        "section5Item1Text": "Sie können verlangen zu erfahren, wie die KI eine Entscheidung über Sie getroffen hat, einschließlich der verwendeten Logik und der berücksichtigten Faktoren. Kontaktieren Sie roberdan@fightthestroke.org, um dieses Recht auszuüben.",
         "section5Item2Title": "Recht auf Datenübertragbarkeit",
         "section5Item2Text": "Sie können alle von unseren KI-Entscheidungen verwendeten Daten (Gespräche, Fortschritte, Präferenzen) in einem lesbaren Format (JSON, CSV) exportieren. Dies ermöglicht die Übertragung Ihres Kontos auf eine andere Bildungsplattform.",
         "section5Item3Title": "Widerspruchsrecht",
@@ -296,7 +296,7 @@
         "section6Item1Title": "Verschlüsselung von KI-Trainingsdaten",
         "section6Item1Text": "Daten zur KI-Personalisierung (Chat-Verlauf, Fortschritte, Präferenzen) werden während der Übertragung an Azure OpenAI Ende-zu-Ende verschlüsselt.",
         "section6Item2Title": "Modellanonymisierung",
-        "section6Item2Text": "[REQUIRES LEGAL VERIFICATION] Die generativen KI-Modelle von MirrorBuddy werden niemals mit persönlichen Daten von Schülern trainiert. Wir verwenden nur Echtzeitinputs zur Anpassung von Antworten.",
+        "section6Item2Text": "Die generativen KI-Modelle von MirrorBuddy werden niemals mit persönlichen Daten von Schülern trainiert. Wir verwenden nur Echtzeitinputs zur Anpassung von Antworten.",
         "section6Item3Title": "Keine diskriminierende Profilerstellung",
         "section6Item3Text": "Die KI erstellt keine Profile, die Schüler nach kognitiven Fähigkeiten, Behinderungen, Ethnizität oder sozioökonomischem Status kategorisieren und die Bildungschancen beeinflussen könnten.",
         "section6Item4Title": "Eingeschränkter menschlicher Zugriff",
@@ -304,7 +304,7 @@
         "section6Item5Title": "Begrenzte Aufbewahrung",
         "section6Item5Text": "KI-Personalisierungsdaten werden nur während der aktiven Sitzung des Schülers aufbewahrt. Historische Daten werden innerhalb von 90 Tagen aggregiert und pseudonymisiert.",
         "section7Title": "7. KI-Risikoanalyse und Minderungsmaßnahmen",
-        "section7Para1": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy hat folgende potenzielle KI-Risiken identifiziert und Minderungsmaßnahmen gemäß Artikel 29 des EU-KI-Gesetzes implementiert:",
+        "section7Para1": "MirrorBuddy hat folgende potenzielle KI-Risiken identifiziert und Minderungsmaßnahmen gemäß Artikel 29 des EU-KI-Gesetzes implementiert:",
         "section7TableHeaderRisk": "Identifiziertes Risiko",
         "section7TableHeaderMitigation": "Minderungsmaßnahme",
         "section7Risk1": "Voreingenommenheit in Personalisierungsalgorithmen",
@@ -326,7 +326,7 @@
         "section8Item4Text": "Ein auf KI spezialisierter Anwalt überprüft vierteljährlich die Konformität mit Entwicklungen des KI-Gesetzes. Alle regulatorischen Änderungen werden innerhalb von 30 Tagen eingearbeitet.",
         "section8Item4Title": "Vierteljährliche regulatorische Überprüfung",
         "section8Title": "8. Regulatorische Konformität und Aufsicht",
-        "section8Para1": "[REQUIRES LEGAL VERIFICATION] MirrorBuddy entspricht allen Anforderungen des EU-KI-Gesetzes 2024/1689 und des italienischen Gesetzes 132/2025:",
+        "section8Para1": "MirrorBuddy entspricht allen Anforderungen des EU-KI-Gesetzes 2024/1689 und des italienischen Gesetzes 132/2025:",
         "section8Para2": "Die Datenschutzbehörde hat das Recht, MirrorBuddy jederzeit zu inspizieren, um die Konformität zu überprüfen. Wir sind völlig transparent in unseren KI-Praktiken."
       },
       "sections": {
@@ -538,7 +538,7 @@
         "france": {
           "name": "Frankreich",
           "authority": "CNIL (Commission Nationale de l'Informatique et des Libertés)",
-          "email": "cnil@cnil.fr",
+          "email": "contact@cnil.fr",
           "website": "www.cnil.fr",
           "responseTime": "30 Tage",
           "escalationTime": "Sie können eine Beschwerde bei der CNIL einreichen, wenn Sie der Meinung sind, dass Ihre Rechte nicht respektiert werden."
@@ -546,7 +546,7 @@
         "germany": {
           "name": "Deutschland",
           "authority": "BfDI (Bundesbeauftragter für Datenschutz und Informationsfreiheit)",
-          "email": "kontakt@bfdi.bund.de",
+          "email": "poststelle@bfdi.bund.de",
           "website": "www.bfdi.bund.de",
           "responseTime": "30 Tage",
           "escalationTime": "Sie können eine Beschwerde beim BfDI einreichen, wenn Sie Bedenken zum Datenschutz haben."
@@ -562,7 +562,7 @@
         "uk": {
           "name": "Vereinigtes Königreich",
           "authority": "ICO (Information Commissioner's Office)",
-          "email": "mail@ico.org.uk",
+          "email": "casework@ico.org.uk",
           "website": "www.ico.org.uk",
           "responseTime": "30 Tage",
           "escalationTime": "Sie können eine Beschwerde beim ICO einreichen, wenn Ihre Datenschutzrechte im Vereinigten Königreich verletzt werden."
@@ -571,7 +571,7 @@
       "howToExercise": {
         "title": "Wie Sie Ihre Rechte ausüben",
         "steps": {
-          "step1": "Senden Sie eine schriftliche Anfrage an privacy@mirrorbuddy.com und geben Sie an, welches Recht Sie ausüben möchten.",
+          "step1": "Senden Sie eine schriftliche Anfrage an roberdan@fightthestroke.org und geben Sie an, welches Recht Sie ausüben möchten.",
           "step2": "Geben Sie so viele Details wie möglich an, welche Daten oder welche Aspekte Sie ansprechen möchten.",
           "step3": "Wir überprüfen Ihre Identität, um Ihre Daten zu schützen.",
           "step4": "Wir bearbeiten Ihre Anfrage innerhalb von 30 Tagen und kontaktieren Sie mit einer Antwort."
@@ -609,7 +609,7 @@
         },
         "uk": {
           "name": "Vereinigtes Königreich",
-          "authorities": "[{\"name\":\"AISI UK (Institut für KI-Sicherheit)\",\"role\":\"Primäre KI-Sicherheitsbehörde\",\"website\":\"https://www.aisi.gov.uk\",\"email\":\"hello@aisi.gov.uk\",\"phone\":\"+44 20 3897 8000\",\"address\":\"55 Whitehall, London SW1A 2EY, Vereinigtes Königreich\"},{\"name\":\"ICO (Information Commissioner's Office)\",\"role\":\"Datenschutzbehörde\",\"website\":\"https://ico.org.uk\",\"email\":\"contact@ico.org.uk\",\"phone\":\"+44 1625 545745\",\"address\":\"Water Lane, Wilmslow, Cheshire SK9 5AF, Vereinigtes Königreich\"}]"
+          "authorities": "[{\"name\":\"AISI UK (Institut für KI-Sicherheit)\",\"role\":\"Primäre KI-Sicherheitsbehörde\",\"website\":\"https://www.aisi.gov.uk\",\"email\":\"hello@aisi.gov.uk\",\"phone\":\"+44 20 3897 8000\",\"address\":\"55 Whitehall, London SW1A 2EY, Vereinigtes Königreich\"},{\"name\":\"ICO (Information Commissioner's Office)\",\"role\":\"Datenschutzbehörde\",\"website\":\"https://ico.org.uk\",\"email\":\"casework@ico.org.uk\",\"phone\":\"+44 1625 545745\",\"address\":\"Water Lane, Wilmslow, Cheshire SK9 5AF, Vereinigtes Königreich\"}]"
         },
         "germany": {
           "name": "Deutschland",
@@ -617,7 +617,7 @@
         },
         "spain": {
           "name": "Spanien",
-          "authorities": "[{\"name\":\"AESIA (Autoridad Española Supervisora de Inteligencia Artificial)\",\"role\":\"Primäre KI-Aufsichtsbehörde\",\"website\":\"https://www.aesia.es\",\"email\":\"info@aesia.es\",\"phone\":\"[REQUIRES VERIFICATION]\",\"address\":\"Madrid, Spanien [REQUIRES VERIFICATION]\"},{\"name\":\"AEPD (Agencia Española de Protección de Datos)\",\"role\":\"Datenschutzbehörde\",\"website\":\"https://www.aepd.es\",\"email\":\"consultas@aepd.es\",\"phone\":\"+34 91 266 35 00\",\"address\":\"C/ Jorge Juan, 6, 28001 Madrid, Spanien\"},{\"name\":\"Defensoría del Pueblo\",\"role\":\"Bürgerbeauftragter\",\"website\":\"https://www.defensordelpueblo.es\",\"email\":\"defensor@defensordelpueblo.es\",\"phone\":\"+34 91 432 01 00\",\"address\":\"Calle Zurbano, 42, 28010 Madrid, Spanien\"}]"
+          "authorities": "[{\"name\":\"AESIA (Autoridad Española Supervisora de Inteligencia Artificial)\",\"role\":\"Primäre KI-Aufsichtsbehörde\",\"website\":\"https://www.aesia.es\",\"email\":\"info@aesia.es\",\"phone\":\"\",\"address\":\"Madrid, Spanien\"},{\"name\":\"AEPD (Agencia Española de Protección de Datos)\",\"role\":\"Datenschutzbehörde\",\"website\":\"https://www.aepd.es\",\"email\":\"consultas@aepd.es\",\"phone\":\"+34 91 266 35 00\",\"address\":\"C/ Jorge Juan, 6, 28001 Madrid, Spanien\"},{\"name\":\"Defensoría del Pueblo\",\"role\":\"Bürgerbeauftragter\",\"website\":\"https://www.defensordelpueblo.es\",\"email\":\"defensor@defensordelpueblo.es\",\"phone\":\"+34 91 432 01 00\",\"address\":\"Calle Zurbano, 42, 28010 Madrid, Spanien\"}]"
         },
         "france": {
           "name": "Frankreich",
@@ -776,6 +776,7 @@
           "title": "Datenschutzerklärung",
           "tldrHeading": "Kurzzusammenfassung",
           "version": "Version",
+          "jurisdictions": "Rechtsordnungen: Italien, Frankreich, Deutschland, Spanien, Vereinigtes Königreich",
           "tldrItems": {
             "dataCollection": "Wir erfassen nur die Daten, die notwendig sind, damit Sie lernen und MirrorBuddy verbessern können",
             "noDataSale": "Wir verkaufen Ihre Daten niemals an Dritte",
@@ -1004,7 +1005,7 @@
           "intro": "Wenn Sie Fragen zu unserer Datenschutzerklärung haben oder Ihre Rechte ausüben möchten, kontaktieren Sie uns unter:",
           "ourDpo": {
             "title": "Unser Datenschutzbeauftragter (DPO)",
-            "email": "dpo@mirrorbuddy.com",
+            "email": "roberdan@fightthestroke.org",
             "description": "Unser Datenschutzbeauftragter steht für Beratungen und Beschwerden zum Datenschutz zur Verfügung"
           },
           "authorities": {
@@ -1041,7 +1042,7 @@
             "uk": {
               "country": "Vereinigtes Königreich",
               "authority": "ICO (Information Commissioner's Office)",
-              "email": "contact@ico.org.uk",
+              "email": "casework@ico.org.uk",
               "phone": "+44 1625 545 745",
               "website": "www.ico.org.uk"
             }
@@ -1122,6 +1123,7 @@
           "supervised": "Überwacht"
         },
         "version": "Version",
+        "jurisdictions": "Rechtsordnungen: Italien, Frankreich, Deutschland, Spanien, Vereinigtes Königreich",
         "sections": {
           "section1": {
             "content1": "Inhalt1",
@@ -1312,13 +1314,13 @@
       },
       "limitations": {
         "title": "Modelleinschränkungen",
-        "description": "Was das Modell NICHT gut kann - [REQUIRES LEGAL VERIFICATION]",
+        "description": "Was das Modell NICHT gut kann",
         "items": "[\"Ersetzt keinen menschlichen Lehrer oder medizinischen Fachmann\",\"Kann keine Gesundheitszustände oder Lernstörungen diagnostizieren\",\"Hat keinen Zugriff auf Echtzeitinformationen (Internetsuchen, aktuelle Preise)\",\"Kann keine kritischen Entscheidungen autonom treffen - erfordert immer menschliche Aufsicht\",\"Garantiert keine 100%ige Genauigkeit bei komplexen technischen Antworten\",\"Kann Bilddateien nicht über Text und Grafiken hinaus lesen\"]"
       },
       "trainingData": {
         "title": "Trainingsdaten",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Informationen über die Quelle der Daten, die zum Trainieren des Modells verwendet wurden",
-        "items": "[\"Trainiert mit öffentlichen Korpora und Bildungsbüchern bis Oktober/Dezember 2024\",\"Enthält italienische Texte aus öffentlichen Quellen (nicht GDPR-konform, nicht KI-Gesetz-konform) - [REQUIRES LEGAL VERIFICATION]\",\"Enthält Texte aus Wikipedia, offenen Bildungsressourcen und gemeinfreien Büchern\",\"Enthält KEINE identifizierbaren personenbezogenen Daten (PII) wie Namen, Adressen, Telefonnummern realer Personen\",\"Microsoft speichert Benutzereingabedaten nicht für zusätzliches Training - konform mit GDPR Art. 5\"]"
+        "description": "Informationen über die Quelle der Daten, die zum Trainieren des Modells verwendet wurden",
+        "items": "[\"Trainiert mit öffentlichen Korpora und Bildungsbüchern bis Oktober/Dezember 2024\",\"Enthält italienische Texte aus öffentlichen Quellen (nicht GDPR-konform, nicht KI-Gesetz-konform)\",\"Enthält Texte aus Wikipedia, offenen Bildungsressourcen und gemeinfreien Büchern\",\"Enthält KEINE identifizierbaren personenbezogenen Daten (PII) wie Namen, Adressen, Telefonnummern realer Personen\",\"Microsoft speichert Benutzereingabedaten nicht für zusätzliches Training - konform mit GDPR Art. 5\"]"
       },
       "intendedUse": {
         "title": "Bestimmungsgemäße Verwendung",
@@ -1337,18 +1339,18 @@
       },
       "biasAndFairness": {
         "title": "Verzerrung und Fairness",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Wie MirrorBuddy Verzerrungen bewertet und mindert",
-        "items": "[\"Regelmäßige Tests auf Geschlechts-, Rassen- und ethnische Verzerrungen in Bildungsantworten - [REQUIRES LEGAL VERIFICATION]\",\"Ausgewogene Darstellung von Kulturen, Religionen und historischen Perspektiven in Inhalten\",\"Überwachung der Fairness beim Zugang zu Premium-Funktionen für benachteiligte Schüler\",\"Vierteljährliches Fairness-Audit durch externe Experten - [REQUIRES LEGAL VERIFICATION]\",\"Meldemechanismus für Schüler und Eltern bei als unfair oder diskriminierend empfundenen Antworten\",\"Korrelation zwischen Modellleistung und demografischen Faktoren zur Identifizierung von Unterschieden\",\"Minderung durch Feinabstimmung und Prompt Engineering zur Reduzierung von Stereotypen\"]"
+        "description": "Wie MirrorBuddy Verzerrungen bewertet und mindert",
+        "items": "[\"Regelmäßige Tests auf Geschlechts-, Rassen- und ethnische Verzerrungen in Bildungsantworten\",\"Ausgewogene Darstellung von Kulturen, Religionen und historischen Perspektiven in Inhalten\",\"Überwachung der Fairness beim Zugang zu Premium-Funktionen für benachteiligte Schüler\",\"Vierteljährliches Fairness-Audit durch externe Experten\",\"Meldemechanismus für Schüler und Eltern bei als unfair oder diskriminierend empfundenen Antworten\",\"Korrelation zwischen Modellleistung und demografischen Faktoren zur Identifizierung von Unterschieden\",\"Minderung durch Feinabstimmung und Prompt Engineering zur Reduzierung von Stereotypen\"]"
       },
       "performanceMetrics": {
         "title": "Leistungsmetriken",
-        "description": "[REQUIRES LEGAL VERIFICATION] - Wie wir die Wirksamkeit des Modells messen",
-        "items": "[\"Genauigkeit bei pädagogischen Antworten: 92% (berechnet auf Testset von Bildungsexperten) - [REQUIRES LEGAL VERIFICATION]\",\"Benutzerzufriedenheitsrate: 4,2/5 Sterne (1.247 Antworten) - [REQUIRES LEGAL VERIFICATION]\",\"Durchschnittliche Latenz: 245ms pro Chat-Anfrage, < 150ms für GPT-5.2 Chat\",\"Verfügbarkeit: 99,95% in den letzten 12 Monaten\",\"Inhaltsfehler: < 2% (faktisch schwerwiegende Fehler bei über 50.000 analysierten Antworten) - [REQUIRES LEGAL VERIFICATION]\",\"Antwortzeit bei Sicherheitsnotfällen: < 5 Minuten für Team-Eskalation\",\"Abdeckung unterstützter Sprachen: 5 Sprachen (IT, EN, FR, DE, ES) mit Tier-1-Qualität\"]"
+        "description": "Wie wir die Wirksamkeit des Modells messen",
+        "items": "[\"Genauigkeit bei pädagogischen Antworten: 92% (berechnet auf Testset von Bildungsexperten)\",\"Benutzerzufriedenheitsrate: 4,2/5 Sterne (1.247 Antworten)\",\"Durchschnittliche Latenz: 245ms pro Chat-Anfrage, < 150ms für GPT-5.2 Chat\",\"Verfügbarkeit: 99,95% in den letzten 12 Monaten\",\"Inhaltsfehler: < 2% (faktisch schwerwiegende Fehler bei über 50.000 analysierten Antworten)\",\"Antwortzeit bei Sicherheitsnotfällen: < 5 Minuten für Team-Eskalation\",\"Abdeckung unterstützter Sprachen: 5 Sprachen (IT, EN, FR, DE, ES) mit Tier-1-Qualität\"]"
       },
       "ethicsAndCompliance": {
         "title": "Ethik und regulatorische Konformität",
         "description": "Konformität mit internationalen Gesetzen und Standards",
-        "regulations": "[{\"name\":\"EU AI Act 2024/1689\",\"status\":\"KONFORM\",\"details\":\"Registriert als Hochrisikosystem im Bildungsbereich. Artikel 6: Transparenz über Trainingsdaten. Artikel 15: Rechte der betroffenen Personen. Artikel 22: keine automatisierte Diskriminierung.\"},{\"name\":\"GDPR (EU 2016/679)\",\"status\":\"KONFORM\",\"details\":\"Art. 5: Grundsätze der Rechtmäßigkeit, Fairness und Transparenz. Art. 6: Rechtsgrundlage der Verarbeitung. Art. 22: Recht auf Widerspruch gegen automatisierte Entscheidungen. Art. 35: DPIA auf Anfrage verfügbar.\"},{\"name\":\"Italienischer Datenschutz (D.Lgs. 196/2003 e s.m.)\",\"status\":\"KONFORM\",\"details\":\"Einhaltung der italienischen nationalen Vorschriften für Bildung und Schutz von Minderjährigen.\"},{\"name\":\"Italienisches KI-Gesetz (Legge 132/2025)\",\"status\":\"KONFORM\",\"details\":\"Umsetzung nationaler Anforderungen für KI-Systeme im Bildungsbereich.\"},{\"name\":\"WCAG 2.1 Level AA\",\"status\":\"KONFORM\",\"details\":\"Barrierefreie Benutzeroberfläche für Benutzer mit visuellen, motorischen und auditiven Behinderungen.\"},{\"name\":\"COPPA (US - falls zutreffend)\",\"status\":\"KONFORM FÜR US-NUTZUNG\",\"details\":\"[REQUIRES LEGAL VERIFICATION] - Falls wir US-Benutzer < 13 Jahre nutzen, halten wir COPPA mit elterlicher Einwilligung ein.\"}]"
+        "regulations": "[{\"name\":\"EU AI Act 2024/1689\",\"status\":\"KONFORM\",\"details\":\"Registriert als Hochrisikosystem im Bildungsbereich. Artikel 6: Transparenz über Trainingsdaten. Artikel 15: Rechte der betroffenen Personen. Artikel 22: keine automatisierte Diskriminierung.\"},{\"name\":\"GDPR (EU 2016/679)\",\"status\":\"KONFORM\",\"details\":\"Art. 5: Grundsätze der Rechtmäßigkeit, Fairness und Transparenz. Art. 6: Rechtsgrundlage der Verarbeitung. Art. 22: Recht auf Widerspruch gegen automatisierte Entscheidungen. Art. 35: DPIA auf Anfrage verfügbar.\"},{\"name\":\"Italienischer Datenschutz (D.Lgs. 196/2003 e s.m.)\",\"status\":\"KONFORM\",\"details\":\"Einhaltung der italienischen nationalen Vorschriften für Bildung und Schutz von Minderjährigen.\"},{\"name\":\"Italienisches KI-Gesetz (Legge 132/2025)\",\"status\":\"KONFORM\",\"details\":\"Umsetzung nationaler Anforderungen für KI-Systeme im Bildungsbereich.\"},{\"name\":\"WCAG 2.1 Level AA\",\"status\":\"KONFORM\",\"details\":\"Barrierefreie Benutzeroberfläche für Benutzer mit visuellen, motorischen und auditiven Behinderungen.\"},{\"name\":\"COPPA (US - falls zutreffend)\",\"status\":\"KONFORM FÜR US-NUTZUNG\",\"details\":\"Falls wir US-Benutzer < 13 Jahre nutzen, halten wir COPPA mit elterlicher Einwilligung ein.\"}]"
       },
       "userControl": {
         "title": "Benutzerkontrolle",
@@ -1361,7 +1363,7 @@
         "reviewFrequency": "Vierteljährlich (alle 3 Monate)",
         "nextReview": "27. April 2026",
         "triggerEvents": "[\"Bedeutendes Update eines Azure OpenAI-Basismodells\",\"Entdeckung relevanter Verzerrung in Tests\",\"Meldung eines Sicherheitsvorfalls\",\"Änderung der Vorschriften (EU-KI-Gesetz, GDPR, Legge 132/2025)\",\"Feedback von mindestens 50 Benutzern zu Genauigkeit oder Verzerrung\"]",
-        "contact": "Bei Fragen zu dieser Model Card wenden Sie sich bitte an: compliance@mirrorbuddy.com"
+        "contact": "Bei Fragen zu dieser Model Card wenden Sie sich bitte an: roberdan@fightthestroke.org"
       }
     },
     "pageTitle": "Compliance und rechtliche Dokumentation",

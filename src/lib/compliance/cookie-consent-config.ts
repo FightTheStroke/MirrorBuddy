@@ -87,7 +87,7 @@ export function getCookieConsentConfig(
       authority: {
         name: "AEPD (Agencia Española de Protección de Datos)",
         website: "https://www.aepd.es",
-        email: "info@aepd.es",
+        email: "consultas@aepd.es",
       },
     },
     FR: {

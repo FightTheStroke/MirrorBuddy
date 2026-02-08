@@ -1,16 +1,16 @@
-# Spain Real Decreto 1112/2018 Accessibility Compliance
+# Italy AGID Accessibility Compliance (L.4/2004)
 
-**Jurisdiction**: Kingdom of Spain (EU Member State)
-**Legislation**: Real Decreto 1112/2018 + EU Directive 2016/2102
-**Effective**: 20 September 2018
-**Enforcing Authority**: AEPD (Agencia Española de Protección de Datos) + Ministry
-**Implementation Status**: CRITICAL for Spanish public sector and educational institutions
+**Jurisdiction**: Italian Republic (EU Member State)
+**Legislation**: Law 4/2004 (Legge Stanca) + EU Directive 2016/2102
+**Effective**: Law 4/2004 (2004-01-09), EU Directive 2016-12-26
+**Enforcing Authority**: AGID (Agenzia per l'Italia Digitale)
+**Implementation Status**: CRITICAL for Italian public sector and educational institutions
 
 ---
 
 ## Executive Summary
 
-Spanish Real Decreto 1112/2018 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. The decree implements EU Directive 2016/2102 in Spanish law.
+Italian Law 4/2004 (Legge Stanca) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. AGID enforces compliance through audits and can issue fines for non-compliance.
 
 **MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
 
@@ -20,30 +20,43 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 
 ### Statutory Reference
 
-| Document                   | Section       | Effective  | Scope                                    |
-| -------------------------- | ------------- | ---------- | ---------------------------------------- |
-| **Real Decreto 1112/2018** | Articles 1-20 | 2018-09-20 | Public sector + educational institutions |
-| **EU Directive 2016/2102** | Articles 1-12 | 2016-12-26 | Public sector websites/apps              |
-| **WCAG 2.1**               | Level AA      | 2018-06-05 | International standard                   |
+| Document                     | Section          | Effective  | Scope                                    |
+| ---------------------------- | ---------------- | ---------- | ---------------------------------------- |
+| **Law 4/2004** (Italian Law) | Articles 1-12    | 2004-01-09 | Public sector + educational institutions |
+| **EU Directive 2016/2102**   | Articles 1-12    | 2016-12-26 | Public sector websites/apps              |
+| **AGID Guidelines**          | Circular 61/2013 | 2013-12-12 | Technical implementation                 |
+| **WCAG 2.1**                 | Level AA         | 2018-06-05 | International standard                   |
 
 ### Key Articles for Accessibility
 
-| Article                 | Title                      | Requirements                 | Applies To                |
-| ----------------------- | -------------------------- | ---------------------------- | ------------------------- |
-| **RD 1112/2018 Art. 3** | Accessibility requirements | WCAG 2.1 Level AA compliance | All public-facing content |
-| **RD 1112/2018 Art. 7** | Accessibility statement    | Published on website         | All public sector sites   |
-| **RD 1112/2018 Art. 8** | Monitoring                 | Regular accessibility audits | Ongoing compliance        |
+| Article                    | Title                       | Requirements                             | Applies To                |
+| -------------------------- | --------------------------- | ---------------------------------------- | ------------------------- |
+| **Law 4/2004 Art. 1**      | Scope                       | Public sector + educational institutions | MirrorBuddy (educational) |
+| **Law 4/2004 Art. 3**      | Accessibility requirements  | WCAG compliance mandatory                | All public-facing content |
+| **EU Directive 2016/2102** | Public sector accessibility | WCAG 2.1 Level AA                        | Public sector websites    |
+| **AGID Circular 61/2013**  | Technical guidelines        | Implementation details                   | Technical teams           |
 
 ---
 
-## 2. Real Decreto 1112/2018 Requirements
+## 2. Law 4/2004 Requirements
+
+### Article 1 - Scope
+
+**Applies to:**
+
+- Public administration websites
+- Educational institutions (schools, universities)
+- Public service providers
+- Platforms serving public sector users
+
+**MirrorBuddy Classification**: Educational platform serving students (including public schools) → **IN SCOPE**
 
 ### Article 3 - Accessibility Requirements
 
 **Mandatory Requirements:**
 
 1. **WCAG 2.1 Level AA compliance** - All public-facing content
-2. **Accessibility statement** - Published on website (in Spanish)
+2. **Accessibility statement** - Published on website
 3. **Regular monitoring** - Annual accessibility audits
 4. **User feedback mechanism** - Report accessibility issues
 5. **Remediation plan** - Fix identified issues within reasonable time
@@ -59,43 +72,34 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 | **Understandable** | Clear language, consistent navigation          | ✅ COMPLIANT       |
 | **Robust**         | Valid HTML, ARIA labels, screen reader support | ✅ COMPLIANT       |
 
-### Spanish-Specific Requirements
-
-**RD 1112/2018 Additional Requirements:**
-
-- **Spanish language**: All accessibility information must be in Spanish
-- **Contact information**: Must include AEPD contact for complaints
-- **Compliance declaration**: Must state RD 1112/2018 compliance explicitly
-- **Regular updates**: Accessibility statement must be updated annually
-
 ---
 
-## 3. Enforcement
+## 3. AGID Enforcement
 
-### AEPD (Agencia Española de Protección de Datos)
+### AGID (Agenzia per l'Italia Digitale)
 
-**Authority**: Spanish Data Protection Agency (also monitors accessibility)
+**Authority**: National digital authority under Ministry of Innovation
 
 **Responsibilities:**
 
 - Monitor accessibility compliance
-- Investigate complaints
-- Issue enforcement notices
-- Can take legal action
+- Conduct audits
+- Issue fines for non-compliance
+- Publish accessibility guidelines
 
 **Contact:**
 
-- **Website**: https://www.aepd.es
-- **Email**: consultas@aepd.es
-- **Phone**: +34 901 100 099
+- **Website**: https://www.agid.gov.it
+- **Email**: protocollo@agid.gov.it
+- **Accessibility Contact**: accessibilita@agid.gov.it
 
 ### Enforcement Process
 
-1. **Complaint filed** → User or organization reports to AEPD
-2. **Investigation** → AEPD reviews website/app (3-6 months)
-3. **Enforcement notice** → AEPD issues findings
+1. **Complaint filed** → User or organization reports to AGID
+2. **Investigation** → AGID reviews website/app (3-6 months)
+3. **Audit report** → AGID issues findings
 4. **Remediation period** → 30-90 days to fix issues
-5. **If ignored** → Legal action + fines
+5. **If ignored** → Fine issued + public notice
 6. **Appeal** → Can appeal to administrative court
 
 ### Penalties
@@ -132,15 +136,15 @@ npx playwright test e2e/accessibility.spec.ts
 
 ### Accessibility Features
 
-| Feature                | Implementation                     | Status |
-| ---------------------- | ---------------------------------- | ------ |
-| **Dyslexia support**   | OpenDyslexic font, extra spacing   | ✅     |
-| **ADHD support**       | Focus mode, reduced distractions   | ✅     |
-| **Visual impairment**  | High contrast, screen reader       | ✅     |
-| **Motor difficulties** | Keyboard navigation, voice control | ✅     |
-| **Autism support**     | Predictable layouts                | ✅     |
-| **Dyscalculia**        | Visual number representation       | ✅     |
-| **Cerebral palsy**     | Large targets, keyboard nav        | ✅     |
+| Feature                 | Implementation                     | Status |
+| ----------------------- | ---------------------------------- | ------ |
+| **Dyslexia support**    | OpenDyslexic font, extra spacing   | ✅     |
+| **ADHD support**        | Focus mode, reduced distractions   | ✅     |
+| **Visual impairment**   | High contrast, screen reader       | ✅     |
+| **Motor difficulties**  | Keyboard navigation, voice control | ✅     |
+| **Autism support**      | Predictable layouts                | ✅     |
+| **Auditory Impairment** | Captions, hearing aids support     | ✅     |
+| **Cerebral palsy**      | Large targets, keyboard nav        | ✅     |
 
 ### Accessibility Statement
 
@@ -149,19 +153,17 @@ npx playwright test e2e/accessibility.spec.ts
 **Required Content:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
 - [ ] List of accessibility features
 - [ ] Known limitations (if any)
 - [ ] Feedback mechanism
 - [ ] Contact information for accessibility issues
-- [ ] AEPD contact information
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
 
 ---
 
-## 5. RD 1112/2018 Compliance Checklist
+## 5. AGID Compliance Checklist
 
 ### Pre-Launch Checklist
 
@@ -179,11 +181,9 @@ npx playwright test e2e/accessibility.spec.ts
 
 - [ ] **Accessibility Statement**
   - [ ] Published on `/accessibility` page
-  - [ ] Spanish language version
-  - [ ] RD 1112/2018 compliance declaration
+  - [ ] Italian language version
   - [ ] Feedback mechanism
   - [ ] Contact information
-  - [ ] AEPD contact information
 
 - [x] **Testing**
   - [x] E2E accessibility tests (axe-core)
@@ -222,14 +222,12 @@ npx playwright test e2e/accessibility.spec.ts
 **Create `/accessibility` page with:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
 - [ ] List of accessibility features (7 DSA profiles)
 - [ ] Keyboard navigation instructions
 - [ ] Screen reader compatibility statement
 - [ ] Known limitations (if any)
 - [ ] Feedback form for accessibility issues
-- [ ] Contact: roberdan@fightthestroke.org
-- [ ] AEPD contact information
+- [ ] Contact: accessibilita@fightthestroke.org
 - [ ] Last update date
 
 ### Phase 2: User Feedback Mechanism (Week 1)
@@ -254,13 +252,14 @@ npx playwright test e2e/accessibility.spec.ts
 
 ## 7. References & Official Sources
 
-### Spanish Official Sources
+### Italian Official Sources
 
-| Source                            | URL                                                   | Purpose                 |
-| --------------------------------- | ----------------------------------------------------- | ----------------------- |
-| **AEPD**                          | https://www.aepd.es                                   | Official regulator      |
-| **RD 1112/2018 Text**             | https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699 | Spanish law             |
-| **AEPD Accessibility Guidelines** | https://www.aepd.es/es/orientaciones                  | Official interpretation |
+| Source                            | URL                                                                                          | Purpose                 |
+| --------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------- |
+| **AGID**                          | https://www.agid.gov.it                                                                      | Official regulator      |
+| **Law 4/2004 Text**               | https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:legge:2004;4                            | Italian law             |
+| **AGID Accessibility Guidelines** | https://www.agid.gov.it/it/design-servizi/accessibilita                                      | Official interpretation |
+| **AGID Circular 61/2013**         | https://www.agid.gov.it/sites/default/files/repository_files/circolari/circolare_61_2013.pdf | Technical guidelines    |
 
 ### International References
 
@@ -286,10 +285,10 @@ npx playwright test e2e/accessibility.spec.ts
 
 **Remaining Tasks:**
 
-- [ ] Create accessibility statement page (`/accessibility`) in Spanish
+- [ ] Create accessibility statement page (`/accessibility`)
 - [ ] Implement user feedback mechanism
 - [ ] Schedule annual accessibility audit
-- [ ] Localize accessibility statement (Spanish)
+- [ ] Localize accessibility statement (Italian)
 
 **Overall Status**: ✅ **COMPLIANT** (pending accessibility statement creation)
 
@@ -300,4 +299,4 @@ npx playwright test e2e/accessibility.spec.ts
 **Status**: Verification Complete
 **Compliance Owner**: Development/QA Team
 **Next Review**: 2026-04-27 (quarterly)
-**Reference**: Real Decreto 1112/2018, EU Directive 2016/2102, WCAG 2.1, AEPD Guidelines
+**Reference**: Law 4/2004, EU Directive 2016/2102, WCAG 2.1, AGID Guidelines

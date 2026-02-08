@@ -38,7 +38,7 @@
 - **Official Name**: Information Commissioner's Office
 - **Role**: Enforces UK GDPR and Data Protection Act 2018 with AI oversight
 - **Website**: https://ico.org.uk
-- **Email**: contact@ico.org.uk
+- **Email**: casework@ico.org.uk
 - **Phone**: +44 1625 545745
 - **Address**: Water Lane, Wilmslow, Cheshire SK9 5AF, United Kingdom
 - **AI Guidance**: https://ico.org.uk/for-organisations/ai-and-data-protection/
@@ -142,7 +142,7 @@ UK is developing statutory AI regulation framework. Current status:
 | **Question Type**          | **Primary Contact**         | **Secondary** |
 | -------------------------- | --------------------------- | ------------- |
 | AI safety/risk assessment  | AISI UK (hello@aisi.gov.uk) | DSIT          |
-| Data protection (GDPR/DPA) | ICO (contact@ico.org.uk)    | -             |
+| Data protection (GDPR/DPA) | ICO (casework@ico.org.uk)   | -             |
 | Educational AI guidance    | AISI UK + ICO               | DSIT          |
 | Children's data protection | ICO                         | AISI UK       |
 | Bias/discrimination in AI  | ICO + AISI UK               | -             |

@@ -1,16 +1,16 @@
-# Spain Real Decreto 1112/2018 Accessibility Compliance
+# Germany BITV 2.0 Accessibility Compliance
 
-**Jurisdiction**: Kingdom of Spain (EU Member State)
-**Legislation**: Real Decreto 1112/2018 + EU Directive 2016/2102
-**Effective**: 20 September 2018
-**Enforcing Authority**: AEPD (Agencia Española de Protección de Datos) + Ministry
-**Implementation Status**: CRITICAL for Spanish public sector and educational institutions
+**Jurisdiction**: Federal Republic of Germany (EU Member State)
+**Legislation**: BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung)
+**Effective**: 01 May 2019 (BITV 2.0)
+**Enforcing Authority**: BFIT-Bund (Überwachungsstelle des Bundes für Barrierefreiheit von Informationstechnik) + Schlichtungsstelle nach dem BGG
+**Implementation Status**: CRITICAL for German public sector and educational institutions
 
 ---
 
 ## Executive Summary
 
-Spanish Real Decreto 1112/2018 requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. The decree implements EU Directive 2016/2102 in Spanish law.
+German BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung) requires public sector websites and educational platforms to comply with WCAG 2.1 Level AA accessibility standards. BITV 2.0 implements EU Directive 2016/2102 in German law.
 
 **MirrorBuddy Status**: ✅ **COMPLIANT** - WCAG 2.1 AA verified with 7 DSA profiles
 
@@ -22,28 +22,28 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 
 | Document                   | Section       | Effective  | Scope                                    |
 | -------------------------- | ------------- | ---------- | ---------------------------------------- |
-| **Real Decreto 1112/2018** | Articles 1-20 | 2018-09-20 | Public sector + educational institutions |
+| **BITV 2.0** (German Law)  | Articles 1-12 | 2019-05-01 | Public sector + educational institutions |
 | **EU Directive 2016/2102** | Articles 1-12 | 2016-12-26 | Public sector websites/apps              |
 | **WCAG 2.1**               | Level AA      | 2018-06-05 | International standard                   |
 
 ### Key Articles for Accessibility
 
-| Article                 | Title                      | Requirements                 | Applies To                |
-| ----------------------- | -------------------------- | ---------------------------- | ------------------------- |
-| **RD 1112/2018 Art. 3** | Accessibility requirements | WCAG 2.1 Level AA compliance | All public-facing content |
-| **RD 1112/2018 Art. 7** | Accessibility statement    | Published on website         | All public sector sites   |
-| **RD 1112/2018 Art. 8** | Monitoring                 | Regular accessibility audits | Ongoing compliance        |
+| Article          | Title                      | Requirements                 | Applies To                |
+| ---------------- | -------------------------- | ---------------------------- | ------------------------- |
+| **BITV 2.0 § 3** | Accessibility requirements | WCAG 2.1 Level AA compliance | All public-facing content |
+| **BITV 2.0 § 4** | Accessibility statement    | Published on website         | All public sector sites   |
+| **BITV 2.0 § 5** | Monitoring                 | Regular accessibility audits | Ongoing compliance        |
 
 ---
 
-## 2. Real Decreto 1112/2018 Requirements
+## 2. BITV 2.0 Requirements
 
-### Article 3 - Accessibility Requirements
+### § 3 - Accessibility Requirements
 
 **Mandatory Requirements:**
 
 1. **WCAG 2.1 Level AA compliance** - All public-facing content
-2. **Accessibility statement** - Published on website (in Spanish)
+2. **Accessibility statement** - Published on website (in German)
 3. **Regular monitoring** - Annual accessibility audits
 4. **User feedback mechanism** - Report accessibility issues
 5. **Remediation plan** - Fix identified issues within reasonable time
@@ -59,41 +59,56 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 | **Understandable** | Clear language, consistent navigation          | ✅ COMPLIANT       |
 | **Robust**         | Valid HTML, ARIA labels, screen reader support | ✅ COMPLIANT       |
 
-### Spanish-Specific Requirements
+### German-Specific Requirements
 
-**RD 1112/2018 Additional Requirements:**
+**BITV 2.0 Additional Requirements:**
 
-- **Spanish language**: All accessibility information must be in Spanish
-- **Contact information**: Must include AEPD contact for complaints
-- **Compliance declaration**: Must state RD 1112/2018 compliance explicitly
+- **German language**: All accessibility information must be in German
+- **Contact information**: Must include Schlichtungsstelle nach dem BGG contact for complaints
+- **Compliance declaration**: Must state BITV 2.0 compliance explicitly
 - **Regular updates**: Accessibility statement must be updated annually
 
 ---
 
 ## 3. Enforcement
 
-### AEPD (Agencia Española de Protección de Datos)
+### BFIT-Bund (Überwachungsstelle des Bundes für Barrierefreiheit von Informationstechnik)
 
-**Authority**: Spanish Data Protection Agency (also monitors accessibility)
+**Authority**: Federal Accessibility Monitoring Body
 
 **Responsibilities:**
 
-- Monitor accessibility compliance
-- Investigate complaints
-- Issue enforcement notices
-- Can take legal action
+- Monitor accessibility compliance of federal websites and apps
+- Conduct periodic accessibility assessments
+- Publish monitoring reports to the EU Commission
+- Provide guidance on BITV 2.0 implementation
 
 **Contact:**
 
-- **Website**: https://www.aepd.es
-- **Email**: consultas@aepd.es
-- **Phone**: +34 901 100 099
+- **Website**: https://www.bfit-bund.de
+- **Email**: info@bfit-bund.de
+
+### Schlichtungsstelle nach dem BGG
+
+**Authority**: Arbitration Body under the Federal Disability Equality Act (BGG)
+
+**Responsibilities:**
+
+- Handle accessibility complaints from users
+- Mediate disputes between users and public sector bodies
+- Issue recommendations for remediation
+
+**Contact:**
+
+- **Website**: https://www.schlichtungsstelle-bgg.de
+- **Email**: info@schlichtungsstelle-bgg.de
+- **Phone**: +49 (0)30 18 527-2805
 
 ### Enforcement Process
 
-1. **Complaint filed** → User or organization reports to AEPD
-2. **Investigation** → AEPD reviews website/app (3-6 months)
-3. **Enforcement notice** → AEPD issues findings
+1. **Complaint filed** → User reports to Schlichtungsstelle nach dem BGG
+2. **Investigation** → BFIT-Bund reviews website/app accessibility (3-6 months)
+3. **Enforcement notice** → Authority issues findings
 4. **Remediation period** → 30-90 days to fix issues
 5. **If ignored** → Legal action + fines
 6. **Appeal** → Can appeal to administrative court
@@ -132,15 +147,15 @@ npx playwright test e2e/accessibility.spec.ts
 
 ### Accessibility Features
 
-| Feature                | Implementation                     | Status |
-| ---------------------- | ---------------------------------- | ------ |
-| **Dyslexia support**   | OpenDyslexic font, extra spacing   | ✅     |
-| **ADHD support**       | Focus mode, reduced distractions   | ✅     |
-| **Visual impairment**  | High contrast, screen reader       | ✅     |
-| **Motor difficulties** | Keyboard navigation, voice control | ✅     |
-| **Autism support**     | Predictable layouts                | ✅     |
-| **Dyscalculia**        | Visual number representation       | ✅     |
-| **Cerebral palsy**     | Large targets, keyboard nav        | ✅     |
+| Feature                 | Implementation                     | Status |
+| ----------------------- | ---------------------------------- | ------ |
+| **Dyslexia support**    | OpenDyslexic font, extra spacing   | ✅     |
+| **ADHD support**        | Focus mode, reduced distractions   | ✅     |
+| **Visual impairment**   | High contrast, screen reader       | ✅     |
+| **Motor difficulties**  | Keyboard navigation, voice control | ✅     |
+| **Autism support**      | Predictable layouts                | ✅     |
+| **Auditory Impairment** | Captions, hearing aids support     | ✅     |
+| **Cerebral palsy**      | Large targets, keyboard nav        | ✅     |
 
 ### Accessibility Statement
 
@@ -149,19 +164,19 @@ npx playwright test e2e/accessibility.spec.ts
 **Required Content:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
+- [ ] BITV 2.0 compliance statement (in German)
 - [ ] List of accessibility features
 - [ ] Known limitations (if any)
 - [ ] Feedback mechanism
 - [ ] Contact information for accessibility issues
-- [ ] AEPD contact information
+- [ ] Schlichtungsstelle nach dem BGG contact information
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
 
 ---
 
-## 5. RD 1112/2018 Compliance Checklist
+## 5. BITV 2.0 Compliance Checklist
 
 ### Pre-Launch Checklist
 
@@ -179,11 +194,11 @@ npx playwright test e2e/accessibility.spec.ts
 
 - [ ] **Accessibility Statement**
   - [ ] Published on `/accessibility` page
-  - [ ] Spanish language version
-  - [ ] RD 1112/2018 compliance declaration
+  - [ ] German language version
+  - [ ] BITV 2.0 compliance declaration
   - [ ] Feedback mechanism
   - [ ] Contact information
-  - [ ] AEPD contact information
+  - [ ] Schlichtungsstelle nach dem BGG contact information
 
 - [x] **Testing**
   - [x] E2E accessibility tests (axe-core)
@@ -222,14 +237,14 @@ npx playwright test e2e/accessibility.spec.ts
 **Create `/accessibility` page with:**
 
 - [ ] WCAG 2.1 Level AA compliance declaration
-- [ ] RD 1112/2018 compliance statement (in Spanish)
+- [ ] BITV 2.0 compliance statement (in German)
 - [ ] List of accessibility features (7 DSA profiles)
 - [ ] Keyboard navigation instructions
 - [ ] Screen reader compatibility statement
 - [ ] Known limitations (if any)
 - [ ] Feedback form for accessibility issues
-- [ ] Contact: roberdan@fightthestroke.org
-- [ ] AEPD contact information
+- [ ] Contact: accessibilita@fightthestroke.org
+- [ ] Schlichtungsstelle nach dem BGG contact information
 - [ ] Last update date
 
 ### Phase 2: User Feedback Mechanism (Week 1)
@@ -254,13 +269,13 @@ npx playwright test e2e/accessibility.spec.ts
 
 ## 7. References & Official Sources
 
-### Spanish Official Sources
+### German Official Sources
 
-| Source                            | URL                                                   | Purpose                 |
-| --------------------------------- | ----------------------------------------------------- | ----------------------- |
-| **AEPD**                          | https://www.aepd.es                                   | Official regulator      |
-| **RD 1112/2018 Text**             | https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699 | Spanish law             |
-| **AEPD Accessibility Guidelines** | https://www.aepd.es/es/orientaciones                  | Official interpretation |
+| Source                     | URL                                          | Purpose                       |
+| -------------------------- | -------------------------------------------- | ----------------------------- |
+| **BFIT-Bund**              | https://www.bfit-bund.de                     | Accessibility monitoring body |
+| **Schlichtungsstelle BGG** | https://www.schlichtungsstelle-bgg.de        | Dispute resolution            |
+| **BITV 2.0 Text**          | https://www.gesetze-im-internet.de/bitv_2_0/ | German law                    |
 
 ### International References
 
@@ -286,10 +301,10 @@ npx playwright test e2e/accessibility.spec.ts
 
 **Remaining Tasks:**
 
-- [ ] Create accessibility statement page (`/accessibility`) in Spanish
+- [ ] Create accessibility statement page (`/accessibility`) in German
 - [ ] Implement user feedback mechanism
 - [ ] Schedule annual accessibility audit
-- [ ] Localize accessibility statement (Spanish)
+- [ ] Localize accessibility statement (German)
 
 **Overall Status**: ✅ **COMPLIANT** (pending accessibility statement creation)
 
@@ -300,4 +315,4 @@ npx playwright test e2e/accessibility.spec.ts
 **Status**: Verification Complete
 **Compliance Owner**: Development/QA Team
 **Next Review**: 2026-04-27 (quarterly)
-**Reference**: Real Decreto 1112/2018, EU Directive 2016/2102, WCAG 2.1, AEPD Guidelines
+**Reference**: BITV 2.0, EU Directive 2016/2102, WCAG 2.1, BFIT-Bund Guidelines

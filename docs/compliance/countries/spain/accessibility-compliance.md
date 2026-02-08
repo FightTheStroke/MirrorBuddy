@@ -3,7 +3,7 @@
 **Jurisdiction**: Kingdom of Spain (EU Member State)
 **Legislation**: Real Decreto 1112/2018 + EU Directive 2016/2102
 **Effective**: 20 September 2018
-**Enforcing Authority**: AEPD (Agencia Española de Protección de Datos) + Ministry
+**Enforcing Authority**: Ministerio de Asuntos Económicos y Transformación Digital + Observatorio de Accesibilidad Web (OAW)
 **Implementation Status**: CRITICAL for Spanish public sector and educational institutions
 
 ---
@@ -64,7 +64,7 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 **RD 1112/2018 Additional Requirements:**
 
 - **Spanish language**: All accessibility information must be in Spanish
-- **Contact information**: Must include AEPD contact for complaints
+- **Contact information**: Must include OAW/Ministry contact for accessibility complaints
 - **Compliance declaration**: Must state RD 1112/2018 compliance explicitly
 - **Regular updates**: Accessibility statement must be updated annually
 
@@ -72,28 +72,41 @@ Spanish Real Decreto 1112/2018 requires public sector websites and educational p
 
 ## 3. Enforcement
 
-### AEPD (Agencia Española de Protección de Datos)
+### Ministerio de Asuntos Económicos y Transformación Digital
 
-**Authority**: Spanish Data Protection Agency (also monitors accessibility)
+**Authority**: Ministry responsible for digital accessibility enforcement
 
 **Responsibilities:**
 
-- Monitor accessibility compliance
-- Investigate complaints
-- Issue enforcement notices
-- Can take legal action
+- Oversee accessibility compliance for public sector websites and apps
+- Coordinate monitoring activities across Spain
+- Issue enforcement notices for non-compliance
+- Report to the EU Commission on accessibility status
 
 **Contact:**
 
-- **Website**: https://www.aepd.es
-- **Email**: consultas@aepd.es
-- **Phone**: +34 901 100 099
+- **Website**: https://www.mineco.gob.es
+
+### Observatorio de Accesibilidad Web (OAW)
+
+**Authority**: Web Accessibility Observatory (under the Ministry)
+
+**Responsibilities:**
+
+- Monitor accessibility compliance of public websites and apps
+- Conduct periodic automated and manual accessibility assessments
+- Publish monitoring reports
+- Provide technical guidance on accessibility standards
+
+**Contact:**
+
+- **Website**: https://administracionelectronica.gob.es/pae_Home/pae_Estrategias/pae_Accesibilidad.html
 
 ### Enforcement Process
 
-1. **Complaint filed** → User or organization reports to AEPD
-2. **Investigation** → AEPD reviews website/app (3-6 months)
-3. **Enforcement notice** → AEPD issues findings
+1. **Complaint filed** → User or organization reports to the Ministry / OAW
+2. **Investigation** → OAW reviews website/app accessibility (3-6 months)
+3. **Enforcement notice** → Ministry issues findings
 4. **Remediation period** → 30-90 days to fix issues
 5. **If ignored** → Legal action + fines
 6. **Appeal** → Can appeal to administrative court
@@ -132,15 +145,15 @@ npx playwright test e2e/accessibility.spec.ts
 
 ### Accessibility Features
 
-| Feature                | Implementation                     | Status |
-| ---------------------- | ---------------------------------- | ------ |
-| **Dyslexia support**   | OpenDyslexic font, extra spacing   | ✅     |
-| **ADHD support**       | Focus mode, reduced distractions   | ✅     |
-| **Visual impairment**  | High contrast, screen reader       | ✅     |
-| **Motor difficulties** | Keyboard navigation, voice control | ✅     |
-| **Autism support**     | Predictable layouts                | ✅     |
-| **Dyscalculia**        | Visual number representation       | ✅     |
-| **Cerebral palsy**     | Large targets, keyboard nav        | ✅     |
+| Feature                 | Implementation                     | Status |
+| ----------------------- | ---------------------------------- | ------ |
+| **Dyslexia support**    | OpenDyslexic font, extra spacing   | ✅     |
+| **ADHD support**        | Focus mode, reduced distractions   | ✅     |
+| **Visual impairment**   | High contrast, screen reader       | ✅     |
+| **Motor difficulties**  | Keyboard navigation, voice control | ✅     |
+| **Autism support**      | Predictable layouts                | ✅     |
+| **Auditory Impairment** | Captions, hearing aids support     | ✅     |
+| **Cerebral palsy**      | Large targets, keyboard nav        | ✅     |
 
 ### Accessibility Statement
 
@@ -154,7 +167,7 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Known limitations (if any)
 - [ ] Feedback mechanism
 - [ ] Contact information for accessibility issues
-- [ ] AEPD contact information
+- [ ] OAW / Ministry contact information
 - [ ] Last update date
 
 **Status**: ⚠️ **TO BE CREATED** (Task T5-06: Localize accessibility statement)
@@ -183,7 +196,7 @@ npx playwright test e2e/accessibility.spec.ts
   - [ ] RD 1112/2018 compliance declaration
   - [ ] Feedback mechanism
   - [ ] Contact information
-  - [ ] AEPD contact information
+  - [ ] OAW / Ministry contact information
 
 - [x] **Testing**
   - [x] E2E accessibility tests (axe-core)
@@ -228,8 +241,8 @@ npx playwright test e2e/accessibility.spec.ts
 - [ ] Screen reader compatibility statement
 - [ ] Known limitations (if any)
 - [ ] Feedback form for accessibility issues
-- [ ] Contact: roberdan@fightthestroke.org
-- [ ] AEPD contact information
+- [ ] Contact: accessibilita@fightthestroke.org
+- [ ] OAW / Ministry contact information
 - [ ] Last update date
 
 ### Phase 2: User Feedback Mechanism (Week 1)
@@ -256,11 +269,11 @@ npx playwright test e2e/accessibility.spec.ts
 
 ### Spanish Official Sources
 
-| Source                            | URL                                                   | Purpose                 |
-| --------------------------------- | ----------------------------------------------------- | ----------------------- |
-| **AEPD**                          | https://www.aepd.es                                   | Official regulator      |
-| **RD 1112/2018 Text**             | https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699 | Spanish law             |
-| **AEPD Accessibility Guidelines** | https://www.aepd.es/es/orientaciones                  | Official interpretation |
+| Source                   | URL                                                                                      | Purpose                   |
+| ------------------------ | ---------------------------------------------------------------------------------------- | ------------------------- |
+| **Ministerio (Digital)** | https://www.mineco.gob.es                                                                | Enforcing authority       |
+| **OAW**                  | https://administracionelectronica.gob.es/pae_Home/pae_Estrategias/pae_Accesibilidad.html | Accessibility observatory |
+| **RD 1112/2018 Text**    | https://www.boe.es/buscar/act.php?id=BOE-A-2018-12699                                    | Spanish law               |
 
 ### International References
 
@@ -300,4 +313,4 @@ npx playwright test e2e/accessibility.spec.ts
 **Status**: Verification Complete
 **Compliance Owner**: Development/QA Team
 **Next Review**: 2026-04-27 (quarterly)
-**Reference**: Real Decreto 1112/2018, EU Directive 2016/2102, WCAG 2.1, AEPD Guidelines
+**Reference**: Real Decreto 1112/2018, EU Directive 2016/2102, WCAG 2.1, OAW Guidelines
