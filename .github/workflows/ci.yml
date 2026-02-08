@@ -625,6 +625,7 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
@@ -724,6 +725,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
@@ -821,6 +823,7 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
@@ -997,6 +1000,7 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
@@ -1117,6 +1121,7 @@ jobs:
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           # Must match playwright.config.ts webServer.env and global-setup.ts E2E_SESSION_SECRET
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           # Bypass provider check redirect to /landing (no Azure keys in CI)
           OLLAMA_URL: http://localhost:11434
 
@@ -1208,6 +1213,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           OLLAMA_URL: http://localhost:11434
 
       - name: Upload security test report
@@ -1298,6 +1304,7 @@ jobs:
           DATABASE_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           DIRECT_URL: postgresql://postgres:${{ secrets.TEST_DB_PASSWORD }}@localhost:5432/mirrorbuddy_test
           SESSION_SECRET: e2e-test-session-secret-32-characters-min
+          PII_ENCRYPTION_KEY: e2e-test-pii-encryption-key-at-least-32-chars
           OLLAMA_URL: http://localhost:11434
 
       - name: Upload compliance test report
