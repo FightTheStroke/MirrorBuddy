@@ -151,7 +151,7 @@ run_unit() {
 	tmp=$(mktemp)
 	if npm run test:unit >"$tmp" 2>&1; then
 		local s
-		s=$(strip_ansi "$tmp" | grep -E "Test(s| Files).*passed" | tail -1)
+		s=$(strip_ansi "$tmp" | grep -E "Test(s| Files).*passed" | tail -1 || true)
 		result "[PASS] Unit${s:+ ($s)}"
 	else
 		ERRORS=$((ERRORS + 1))
@@ -162,7 +162,7 @@ run_unit() {
 		local d
 		d=$(strip_ansi "$tmp" |
 			grep -E "^ *FAIL |^ *× |AssertionError|Expected.*Received" |
-			grep -v "act()" | grep -v "HTMLMediaElement" | head -15)
+			grep -v "act()" | grep -v "HTMLMediaElement" | head -15 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
@@ -177,7 +177,7 @@ run_i18n() {
 		ERRORS=$((ERRORS + 1))
 		result "[FAIL] i18n"
 		local d
-		d=$(strip_ansi "$tmp" | grep -iE "missing|mismatch|error" | head -10)
+		d=$(strip_ansi "$tmp" | grep -iE "missing|mismatch|error" | head -10 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
@@ -189,19 +189,19 @@ run_e2e() {
 	local args="${1:-}"
 	if E2E_TESTS=1 npx playwright test $args >"$tmp" 2>&1; then
 		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1)
+		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1 || true)
 		result "[PASS] E2E${s:+ ($s)}"
 	else
 		ERRORS=$((ERRORS + 1))
 		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
+		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1 || true)
 		result "[FAIL] E2E${s:+ ($s)}"
 		local d
 		d=$(parse_pw_json "test-results/pw-results.json")
 		if [[ -z "$d" ]]; then
 			d=$(strip_ansi "$tmp" |
 				grep -E "^\s+[0-9]+\)|Error:|expect\(|Timeout|\.spec\.ts:" |
-				sed 's/^\s*//' | head -15)
+				sed 's/^\s*//' | head -15 || true)
 		fi
 		result_details "$d"
 	fi
@@ -213,19 +213,19 @@ run_a11y() {
 	tmp=$(mktemp)
 	if E2E_TESTS=1 npx playwright test --project=a11y >"$tmp" 2>&1; then
 		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1)
+		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ passed" | tail -1 || true)
 		result "[PASS] A11y${s:+ ($s)}"
 	else
 		ERRORS=$((ERRORS + 1))
 		local s
-		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1)
+		s=$(strip_ansi "$tmp" | grep -E "[0-9]+ (passed|failed)" | tail -1 || true)
 		result "[FAIL] A11y${s:+ ($s)}"
 		local d
 		d=$(parse_pw_json "test-results/pw-results.json")
 		if [[ -z "$d" ]]; then
 			d=$(strip_ansi "$tmp" |
 				grep -E "^\s+[0-9]+\)|violation|critical|serious|moderate|\[wcag" |
-				sed 's/^\s*//' | head -15)
+				sed 's/^\s*//' | head -15 || true)
 		fi
 		result_details "$d"
 	fi
@@ -285,7 +285,7 @@ run_migrations() {
 		ERRORS=$((ERRORS + 1))
 		result "[FAIL] Migrations"
 		local d
-		d=$(grep "MISSING:" "$tmp" | head -10)
+		d=$(grep "MISSING:" "$tmp" | head -10 || true)
 		result_details "$d"
 	fi
 	rm -f "$tmp"
