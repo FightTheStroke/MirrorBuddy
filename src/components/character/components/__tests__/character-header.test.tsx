@@ -3,21 +3,21 @@
  * @brief Unit tests for CharacterHeader component mobile responsiveness (F-21)
  */
 
-import { render, screen } from "@testing-library/react";
-import { describe, it, expect, beforeEach, vi } from "vitest";
-import type { UnifiedCharacter, VoiceState, HeaderActions } from "../../types";
-import { CharacterHeader } from "../character-header";
+import { render, screen } from '@testing-library/react';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import type { UnifiedCharacter, VoiceState, HeaderActions } from '../../types';
+import { CharacterHeader } from '../character-header';
 
-describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
+describe('CharacterHeader - F-21 Mobile Responsiveness', () => {
   const mockCharacter: UnifiedCharacter = {
-    id: "test-char",
-    name: "Test Maestro",
-    badge: "Professore",
-    specialty: "Mathematics",
-    greeting: "Buongiorno! Welcome to mathematics learning.",
-    avatar: "/maestri/test.png",
-    color: "#FF6B6B",
-    type: "maestro",
+    id: 'test-char',
+    name: 'Test Maestro',
+    badge: 'Professore',
+    specialty: 'Mathematics',
+    greeting: 'Buongiorno! Welcome to mathematics learning.',
+    avatar: '/maestri/test.png',
+    color: '#FF6B6B',
+    type: 'maestro',
   };
 
   const mockVoiceState: VoiceState = {
@@ -28,7 +28,7 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
     isMuted: false,
     inputLevel: 0,
     outputLevel: 0,
-    connectionState: "disconnected",
+    connectionState: 'disconnected',
     configError: null,
   };
 
@@ -44,8 +44,8 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
     vi.clearAllMocks();
   });
 
-  describe("Accessibility", () => {
-    it("should render with proper ARIA labels on all buttons", () => {
+  describe('Accessibility', () => {
+    it('should render with proper ARIA labels on all buttons', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -56,15 +56,13 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
       );
 
       // Close button
-      expect(screen.getByLabelText("Chiudi")).toBeInTheDocument();
+      expect(screen.getByLabelText('Chiudi')).toBeInTheDocument();
 
       // History button
-      expect(
-        screen.getByLabelText("Storico conversazioni"),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Storico conversazioni')).toBeInTheDocument();
     });
 
-    it("should have phone button with proper aria-label", () => {
+    it('should have phone button with proper aria-label', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -74,15 +72,15 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const phoneButton = screen.getByLabelText("Avvia chiamata vocale");
+      const phoneButton = screen.getByLabelText('Chiama a voce');
       expect(phoneButton).toBeInTheDocument();
       expect(phoneButton).not.toBeDisabled();
     });
 
-    it("should disable phone button when voiceConfigError exists", () => {
+    it('should disable phone button when voiceConfigError exists', () => {
       const voiceStateWithError: VoiceState = {
         ...mockVoiceState,
-        configError: "Microphone not available",
+        configError: 'Microphone not available',
       };
 
       render(
@@ -99,8 +97,8 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
     });
   });
 
-  describe("Content Structure", () => {
-    it("should display character name", () => {
+  describe('Content Structure', () => {
+    it('should display character name', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -110,10 +108,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      expect(screen.getByText("Test Maestro")).toBeInTheDocument();
+      expect(screen.getByText('Test Maestro')).toBeInTheDocument();
     });
 
-    it("should display character specialty/badge", () => {
+    it('should display character specialty/badge', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -123,10 +121,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      expect(screen.getByText("Professore")).toBeInTheDocument();
+      expect(screen.getByText('Professore')).toBeInTheDocument();
     });
 
-    it("should display greeting text", () => {
+    it('should display greeting text', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -136,9 +134,7 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      expect(
-        screen.getByText(/Welcome to mathematics learning/),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Welcome to mathematics learning/)).toBeInTheDocument();
     });
 
     it('should show "In chiamata vocale" when voice is active', () => {
@@ -150,7 +146,7 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         isMuted: false,
         inputLevel: 0,
         outputLevel: 0,
-        connectionState: "connected",
+        connectionState: 'connected',
         configError: null,
       };
 
@@ -163,12 +159,12 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      expect(screen.getByText("In chiamata vocale")).toBeInTheDocument();
+      expect(screen.getByText('In chiamata vocale')).toBeInTheDocument();
     });
   });
 
-  describe("Voice Features", () => {
-    it("should hide phone button when in active call", () => {
+  describe('Voice Features', () => {
+    it('should hide phone button when in active call', () => {
       const activeVoiceState: VoiceState = {
         isActive: true,
         isConnected: true,
@@ -177,7 +173,7 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         isMuted: false,
         inputLevel: 0,
         outputLevel: 0,
-        connectionState: "connected",
+        connectionState: 'connected',
         configError: null,
       };
 
@@ -191,12 +187,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
       );
 
       // Phone button should not be present in the document
-      expect(
-        screen.queryByLabelText("Avvia chiamata vocale"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Chiama a voce')).not.toBeInTheDocument();
     });
 
-    it("should render TTS button when enabled", () => {
+    it('should render TTS button when enabled', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -207,12 +201,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
       );
 
       // TTS button (hidden on sm, so test existence)
-      expect(
-        screen.getByLabelText("Disattiva lettura vocale"),
-      ).toBeInTheDocument();
+      expect(screen.getByLabelText('Disattiva lettura vocale')).toBeInTheDocument();
     });
 
-    it("should disable TTS button when disabled", () => {
+    it('should disable TTS button when disabled', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -222,13 +214,13 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const ttsButton = screen.getByLabelText("Lettura vocale disattivata");
+      const ttsButton = screen.getByLabelText('Lettura vocale disattivata');
       expect(ttsButton).toBeDisabled();
     });
   });
 
-  describe("Button Actions", () => {
-    it("should call onClose when close button is clicked", () => {
+  describe('Button Actions', () => {
+    it('should call onClose when close button is clicked', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -238,13 +230,13 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const closeButton = screen.getByLabelText("Chiudi");
+      const closeButton = screen.getByLabelText('Chiudi');
       closeButton.click();
 
       expect(mockActions.onClose).toHaveBeenCalledTimes(1);
     });
 
-    it("should call onVoiceCall when phone button is clicked", () => {
+    it('should call onVoiceCall when phone button is clicked', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -254,13 +246,13 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const phoneButton = screen.getByLabelText("Avvia chiamata vocale");
+      const phoneButton = screen.getByLabelText('Chiama a voce');
       phoneButton.click();
 
       expect(mockActions.onVoiceCall).toHaveBeenCalledTimes(1);
     });
 
-    it("should call onOpenHistory when history button is clicked", () => {
+    it('should call onOpenHistory when history button is clicked', () => {
       render(
         <CharacterHeader
           character={mockCharacter}
@@ -270,13 +262,13 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const historyButton = screen.getByLabelText("Storico conversazioni");
+      const historyButton = screen.getByLabelText('Storico conversazioni');
       historyButton.click();
 
       expect(mockActions.onOpenHistory).toHaveBeenCalledTimes(1);
     });
 
-    it("should not render history button when onOpenHistory is undefined", () => {
+    it('should not render history button when onOpenHistory is undefined', () => {
       const actionsWithoutHistory: HeaderActions = {
         ...mockActions,
         onOpenHistory: undefined,
@@ -291,14 +283,12 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      expect(
-        screen.queryByLabelText("Storico conversazioni"),
-      ).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Storico conversazioni')).not.toBeInTheDocument();
     });
   });
 
-  describe("Responsive Design", () => {
-    it("should render with proper gap classes for responsive spacing", () => {
+  describe('Responsive Design', () => {
+    it('should render with proper gap classes for responsive spacing', () => {
       const { container: testContainer } = render(
         <CharacterHeader
           character={mockCharacter}
@@ -311,10 +301,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
       const header = testContainer.firstChild;
       expect(header).toBeInTheDocument();
       // Verify classes include responsive gap
-      expect((header as HTMLElement).className).toContain("gap-");
+      expect((header as HTMLElement).className).toContain('gap-');
     });
 
-    it("should render avatar image with responsive sizing classes", () => {
+    it('should render avatar image with responsive sizing classes', () => {
       const { container } = render(
         <CharacterHeader
           character={mockCharacter}
@@ -324,12 +314,12 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const avatar = container.querySelector("img");
+      const avatar = container.querySelector('img');
       expect(avatar).toBeInTheDocument();
-      expect(avatar?.alt).toBe("Test Maestro");
+      expect(avatar?.alt).toBe('Test Maestro');
     });
 
-    it("should have button elements with responsive sizing", () => {
+    it('should have button elements with responsive sizing', () => {
       const { container } = render(
         <CharacterHeader
           character={mockCharacter}
@@ -339,19 +329,19 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const buttons = container.querySelectorAll("button");
+      const buttons = container.querySelectorAll('button');
       expect(buttons.length).toBeGreaterThan(0);
 
       // Verify buttons have responsive sizing classes
       buttons.forEach((button) => {
-        expect(button.className).toContain("h-8");
-        expect(button.className).toContain("w-8");
+        expect(button.className).toContain('h-8');
+        expect(button.className).toContain('w-8');
       });
     });
   });
 
-  describe("Status Indicator", () => {
-    it("should show green status indicator when voice is active and connected", () => {
+  describe('Status Indicator', () => {
+    it('should show green status indicator when voice is active and connected', () => {
       const activeVoiceState: VoiceState = {
         isActive: true,
         isConnected: true,
@@ -360,7 +350,7 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         isMuted: false,
         inputLevel: 0,
         outputLevel: 0,
-        connectionState: "connected",
+        connectionState: 'connected',
         configError: null,
       };
 
@@ -374,11 +364,11 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
       );
 
       // Status indicator should be present
-      const statusIndicator = container.querySelector(".bg-green-400");
+      const statusIndicator = container.querySelector('.bg-green-400');
       expect(statusIndicator).toBeInTheDocument();
     });
 
-    it("should have correct status indicator styling", () => {
+    it('should have correct status indicator styling', () => {
       const { container } = render(
         <CharacterHeader
           character={mockCharacter}
@@ -388,12 +378,10 @@ describe("CharacterHeader - F-21 Mobile Responsiveness", () => {
         />,
       );
 
-      const statusIndicator = container.querySelector(
-        'span[class*="absolute"]',
-      );
+      const statusIndicator = container.querySelector('span[class*="absolute"]');
       expect(statusIndicator).toBeInTheDocument();
-      expect(statusIndicator?.className).toContain("rounded-full");
-      expect(statusIndicator?.className).toContain("border");
+      expect(statusIndicator?.className).toContain('rounded-full');
+      expect(statusIndicator?.className).toContain('border');
     });
   });
 });

@@ -7,27 +7,27 @@
  * Updated for namespace-based structure (ADR 0082)
  */
 
-import { readFileSync, readdirSync } from "fs";
-import { resolve } from "path";
-import { describe, it, expect, beforeAll } from "vitest";
+import { readFileSync, readdirSync } from 'fs';
+import { resolve } from 'path';
+import { describe, it, expect, beforeAll } from 'vitest';
 
 type MessageFile = Record<string, any>;
 
 function getMessageFile(locale: string): MessageFile {
   // Load all namespace files and merge them
-  const localeDir = resolve(process.cwd(), "messages", locale);
-  const files = readdirSync(localeDir).filter((f) => f.endsWith(".json"));
+  const localeDir = resolve(process.cwd(), 'messages', locale);
+  const files = readdirSync(localeDir).filter((f) => f.endsWith('.json'));
 
   const merged: MessageFile = {};
   for (const file of files) {
-    const content = readFileSync(resolve(localeDir, file), "utf-8");
+    const content = readFileSync(resolve(localeDir, file), 'utf-8');
     Object.assign(merged, JSON.parse(content));
   }
   return merged;
 }
 
-describe("voice-panel i18n", () => {
-  const locales = ["it", "en", "fr", "de", "es"];
+describe('voice-panel i18n', () => {
+  const locales = ['it', 'en', 'fr', 'de', 'es'];
   const messages: Record<string, MessageFile> = {};
 
   beforeAll(() => {
@@ -36,46 +36,45 @@ describe("voice-panel i18n", () => {
     });
   });
 
-  describe("voice namespace exists", () => {
+  describe('voice namespace exists', () => {
     locales.forEach((locale) => {
       it(`should have voice namespace in ${locale}`, () => {
-        expect(messages[locale]).toHaveProperty("voice");
-        expect(typeof messages[locale].voice).toBe("object");
+        expect(messages[locale]).toHaveProperty('chat');
+        expect(messages[locale].chat).toHaveProperty('voice');
+        expect(typeof messages[locale].chat.voice).toBe('object');
       });
     });
   });
 
-  describe("all voice keys match across locales", () => {
-    it("should have identical key structure in all locales", () => {
-      const itKeys = Object.keys(messages.it.voice || {}).sort();
+  describe('all voice keys match across locales', () => {
+    it('should have identical key structure in all locales', () => {
+      const itKeys = Object.keys(messages.it.chat?.voice || {}).sort();
 
       locales.slice(1).forEach((locale) => {
-        const localeKeys = Object.keys(messages[locale].voice || {}).sort();
-        expect(localeKeys, `${locale} has different keys than Italian`).toEqual(
-          itKeys,
-        );
+        const localeKeys = Object.keys(messages[locale].chat?.voice || {}).sort();
+        expect(localeKeys, `${locale} has different keys than Italian`).toEqual(itKeys);
       });
     });
   });
 
-  describe("voice.panel keys", () => {
+  describe('voice.panel keys', () => {
     const requiredKeys = [
-      "voice.panel.connecting",
-      "voice.panel.speaking",
-      "voice.panel.listening",
-      "voice.panel.connected",
-      "voice.panel.startingCall",
-      "voice.panel.mutedLabel",
-      "voice.panel.unmuteLabel",
-      "voice.panel.muteLabel",
-      "voice.panel.microphoneDisabled",
-      "voice.panel.speakNow",
+      'chat.voice.panel.connecting',
+      'chat.voice.panel.speaking',
+      'chat.voice.panel.listening',
+      'chat.voice.panel.connected',
+      'chat.voice.panel.startingCall',
+      'chat.voice.panel.mutedLabel',
+      'chat.voice.panel.unmuteLabel',
+      'chat.voice.panel.muteLabel',
+      'chat.voice.panel.microphoneDisabled',
+      'chat.voice.panel.speakNow',
     ];
 
     requiredKeys.forEach((key) => {
       locales.forEach((locale) => {
         it(`should have ${key} in ${locale}`, () => {
-          const keys = key.split(".");
+          const keys = key.split('.');
           let value: any = messages[locale];
 
           for (const k of keys) {
@@ -83,35 +82,35 @@ describe("voice-panel i18n", () => {
             value = value[k];
           }
 
-          expect(typeof value).toBe("string");
+          expect(typeof value).toBe('string');
           expect(value).toBeTruthy();
         });
       });
     });
   });
 
-  describe("session-controls keys", () => {
+  describe('session-controls keys', () => {
     const requiredKeys = [
-      "session.controls.muteTooltip.muted",
-      "session.controls.muteTooltip.unmuted",
-      "session.controls.muteAriaLabel.muted",
-      "session.controls.muteAriaLabel.unmuted",
-      "session.controls.cancelResponseTooltip",
-      "session.controls.cancelResponseAriaLabel",
-      "session.controls.sendMessageTooltip",
-      "session.controls.sendMessageAriaLabel",
-      "session.controls.switchToChatTooltip",
-      "session.controls.switchToChatAriaLabel",
-      "session.controls.endSessionTooltip",
-      "session.controls.endSessionAriaLabel",
-      "session.controls.inputPlaceholder",
-      "session.controls.sendButton",
+      'chat.session.controls.muteTooltip.muted',
+      'chat.session.controls.muteTooltip.unmuted',
+      'chat.session.controls.muteAriaLabel.muted',
+      'chat.session.controls.muteAriaLabel.unmuted',
+      'chat.session.controls.cancelResponseTooltip',
+      'chat.session.controls.cancelResponseAriaLabel',
+      'chat.session.controls.sendMessageTooltip',
+      'chat.session.controls.sendMessageAriaLabel',
+      'chat.session.controls.switchToChatTooltip',
+      'chat.session.controls.switchToChatAriaLabel',
+      'chat.session.controls.endSessionTooltip',
+      'chat.session.controls.endSessionAriaLabel',
+      'chat.session.controls.inputPlaceholder',
+      'chat.session.controls.sendButton',
     ];
 
     requiredKeys.forEach((key) => {
       locales.forEach((locale) => {
         it(`should have ${key} in ${locale}`, () => {
-          const keys = key.split(".");
+          const keys = key.split('.');
           let value: any = messages[locale];
 
           for (const k of keys) {
@@ -119,37 +118,37 @@ describe("voice-panel i18n", () => {
             value = value[k];
           }
 
-          expect(typeof value).toBe("string");
+          expect(typeof value).toBe('string');
           expect(value).toBeTruthy();
         });
       });
     });
   });
 
-  describe("onboarding keys", () => {
+  describe('onboarding keys', () => {
     const requiredKeys = [
-      "onboarding.transcript.conversationTitle",
-      "onboarding.transcript.messageSingular",
-      "onboarding.transcript.messagePlural",
-      "onboarding.transcript.noConversation",
-      "onboarding.transcript.userLabel",
-      "onboarding.transcript.conversationActive",
-      "voice.microphoneUnauthorized",
-      "voice.connectionError",
-      "onboarding.checklist.nameLabel",
-      "onboarding.checklist.ageLabel",
-      "onboarding.checklist.schoolLabel",
-      "onboarding.checklist.schoolElementary",
-      "onboarding.checklist.schoolMiddle",
-      "onboarding.checklist.schoolHigh",
-      "onboarding.checklist.differencesLabel",
-      "onboarding.checklist.differencesCount",
+      'welcome.onboarding.transcript.conversationTitle',
+      'welcome.onboarding.transcript.messageSingular',
+      'welcome.onboarding.transcript.messagePlural',
+      'welcome.onboarding.transcript.noConversation',
+      'welcome.onboarding.transcript.userLabel',
+      'welcome.onboarding.transcript.conversationActive',
+      'chat.voice.microphoneUnauthorized',
+      'chat.voice.connectionError',
+      'welcome.onboarding.checklist.nameLabel',
+      'welcome.onboarding.checklist.ageLabel',
+      'welcome.onboarding.checklist.schoolLabel',
+      'welcome.onboarding.checklist.schoolElementary',
+      'welcome.onboarding.checklist.schoolMiddle',
+      'welcome.onboarding.checklist.schoolHigh',
+      'welcome.onboarding.checklist.differencesLabel',
+      'welcome.onboarding.checklist.differencesCount',
     ];
 
     requiredKeys.forEach((key) => {
       locales.forEach((locale) => {
         it(`should have ${key} in ${locale}`, () => {
-          const keys = key.split(".");
+          const keys = key.split('.');
           let value: any = messages[locale];
 
           for (const k of keys) {
@@ -157,7 +156,7 @@ describe("voice-panel i18n", () => {
             value = value[k];
           }
 
-          expect(typeof value).toBe("string");
+          expect(typeof value).toBe('string');
           expect(value).toBeTruthy();
         });
       });
