@@ -52,9 +52,9 @@ if [ -f ".next/lock" ]; then
 fi
 
 # =============================================================================
-# PHASE 1/4: MIGRATION & PROXY CONSISTENCY
+# PHASE 1/5: MIGRATION & PROXY CONSISTENCY
 # =============================================================================
-echo -e "${BLUE}[1/4] Checking migration & proxy consistency...${NC}"
+echo -e "${BLUE}[1/5] Checking migration & proxy consistency...${NC}"
 
 # Verify all migrations are named correctly (with timestamp)
 INVALID_MIGRATIONS=$(ls prisma/migrations 2>/dev/null | grep -v "^[0-9]\{14\}_" | grep -v "migration_lock.toml" | grep -v ".DS_Store" || true)
@@ -85,9 +85,9 @@ fi
 echo -e "${GREEN}✓ Proxy architecture OK${NC}"
 
 # =============================================================================
-# PHASE 2/4: FRESH PRISMA (simulates Vercel)
+# PHASE 2/5: FRESH PRISMA (simulates Vercel)
 # =============================================================================
-echo -e "${BLUE}[2/4] Simulating Vercel fresh Prisma...${NC}"
+echo -e "${BLUE}[2/5] Simulating Vercel fresh Prisma...${NC}"
 
 # Delete cached Prisma client to simulate Vercel's fresh build
 rm -rf node_modules/.prisma 2>/dev/null || true
@@ -101,9 +101,9 @@ fi
 echo -e "${GREEN}✓ Prisma generated fresh${NC}"
 
 # =============================================================================
-# PHASE 3/4: PRODUCTION BUILD
+# PHASE 3/5: PRODUCTION BUILD
 # =============================================================================
-echo -e "${BLUE}[3/4] Production build (fresh Prisma)...${NC}"
+echo -e "${BLUE}[3/5] Production build (fresh Prisma)...${NC}"
 
 # Disable Sentry wrapper locally (Sentry+Turbopack bug with Next.js 16)
 # Sentry works fine on Vercel where Turbopack behaves differently
@@ -115,77 +115,81 @@ fi
 echo -e "${GREEN}✓ Build passed${NC}"
 
 # =============================================================================
-# PHASE 4/4: VERCEL ENV VARS CHECK
+# PHASE 4/5: .env ↔ REQUIRED_VARS ALIGNMENT (ADR 0138)
 # =============================================================================
-echo -e "${BLUE}[4/4] Vercel environment variables...${NC}"
+echo -e "${BLUE}[4/5] Env var alignment (.env vs REQUIRED_VARS)...${NC}"
 
-# Skip Vercel env check in worktrees (not linked to Vercel project)
+# Required env vars for production (single source of truth — ADR 0138)
+REQUIRED_VARS=(
+	# Core
+	"DATABASE_URL" "DIRECT_URL" "SESSION_SECRET"
+	"ADMIN_EMAIL" "ADMIN_PASSWORD" "CRON_SECRET"
+	"TOKEN_ENCRYPTION_KEY" "IP_HASH_SALT"
+	# Azure AI
+	"AZURE_OPENAI_API_KEY" "AZURE_OPENAI_ENDPOINT"
+	"AZURE_OPENAI_CHAT_DEPLOYMENT" "AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
+	"AZURE_OPENAI_REALTIME_ENDPOINT" "AZURE_OPENAI_REALTIME_API_KEY"
+	"AZURE_OPENAI_REALTIME_DEPLOYMENT" "AZURE_OPENAI_TTS_DEPLOYMENT"
+	# Email
+	"RESEND_API_KEY" "FROM_EMAIL" "SUPPORT_EMAIL"
+	# Auth & OAuth
+	"GOOGLE_CLIENT_ID" "GOOGLE_CLIENT_SECRET"
+	"NEXT_PUBLIC_GOOGLE_CLIENT_ID" "NEXTAUTH_URL"
+	# Push notifications
+	"NEXT_PUBLIC_VAPID_PUBLIC_KEY" "VAPID_PRIVATE_KEY" "VAPID_SUBJECT"
+	# Rate limiting
+	"UPSTASH_REDIS_REST_URL" "UPSTASH_REDIS_REST_TOKEN"
+	# Supabase
+	"NEXT_PUBLIC_SUPABASE_URL" "NEXT_PUBLIC_SUPABASE_ANON_KEY" "SUPABASE_SERVICE_ROLE_KEY"
+	# Observability
+	"NEXT_PUBLIC_SENTRY_DSN" "SENTRY_AUTH_TOKEN" "SENTRY_ORG" "SENTRY_PROJECT"
+	"GRAFANA_CLOUD_PROMETHEUS_URL" "GRAFANA_CLOUD_PROMETHEUS_USER"
+	"GRAFANA_CLOUD_API_KEY" "GRAFANA_CLOUD_PUSH_INTERVAL"
+	# LiveKit
+	"LIVEKIT_URL" "LIVEKIT_API_KEY" "LIVEKIT_API_SECRET" "NEXT_PUBLIC_LIVEKIT_URL"
+	# Misc
+	"PROTECTED_USERS" "TRIAL_BUDGET_LIMIT_EUR"
+	# Public URLs
+	"NEXT_PUBLIC_SITE_URL" "NEXT_PUBLIC_APP_URL"
+)
+
+# Dev-only vars to skip (must match fix-vercel-env-vars.sh SKIP_VARS)
+SKIP_PATTERNS="DEV_DATABASE_URL|TEST_DATABASE_URL|TEST_DIRECT_URL|OLLAMA_URL|OLLAMA_MODEL|NODE_TLS_REJECT_UNAUTHORIZED|VERCEL_TOKEN|APPLE_ID|TEAM_ID|ITC_TEAM_ID|FASTLANE_USER|MATCH_GIT_URL|MATCH_PASSWORD"
+
+# Check .env vars are all in REQUIRED_VARS (runs ALWAYS, no Vercel CLI needed)
+if [ -f ".env" ]; then
+	REQUIRED_SET=$(printf '%s\n' "${REQUIRED_VARS[@]}")
+	UNREGISTERED=""
+
+	while IFS= read -r line; do
+		[[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+		vn="${line%%=*}"
+		if echo "$vn" | grep -qE "^($SKIP_PATTERNS)$"; then continue; fi
+		vv="${line#*=}"
+		if [ -z "$vv" ]; then continue; fi
+		if ! echo "$REQUIRED_SET" | grep -q "^${vn}$"; then
+			UNREGISTERED="$UNREGISTERED $vn"
+		fi
+	done <.env
+
+	if [ -n "$UNREGISTERED" ]; then
+		echo -e "${RED}✗ .env has vars not in REQUIRED_VARS:${NC}$UNREGISTERED"
+		echo -e "${YELLOW}Add them to REQUIRED_VARS in this script (see ADR 0138)${NC}"
+		exit 1
+	fi
+	echo -e "${GREEN}✓ .env aligned with REQUIRED_VARS${NC}"
+else
+	echo -e "${YELLOW}⚠ .env not found, skipping alignment check${NC}"
+fi
+
+# =============================================================================
+# PHASE 5/5: VERCEL REMOTE ENV VARS
+# =============================================================================
+echo -e "${BLUE}[5/5] Vercel remote env vars...${NC}"
+
 if [ "${SKIP_VERCEL_ENV_CHECK:-}" = "1" ]; then
 	echo -e "${YELLOW}⚠ Vercel env check skipped (SKIP_VERCEL_ENV_CHECK=1)${NC}"
-# Check if vercel CLI is available
 elif command -v vercel &>/dev/null; then
-	# Required env vars for production (must match fix-vercel-env-vars.sh)
-	REQUIRED_VARS=(
-		# Core
-		"DATABASE_URL"
-		"DIRECT_URL"
-		"SESSION_SECRET"
-		"ADMIN_EMAIL"
-		"ADMIN_PASSWORD"
-		"CRON_SECRET"
-		"TOKEN_ENCRYPTION_KEY"
-		"IP_HASH_SALT"
-		# Azure AI
-		"AZURE_OPENAI_API_KEY"
-		"AZURE_OPENAI_ENDPOINT"
-		"AZURE_OPENAI_CHAT_DEPLOYMENT"
-		"AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
-		"AZURE_OPENAI_REALTIME_ENDPOINT"
-		"AZURE_OPENAI_REALTIME_API_KEY"
-		"AZURE_OPENAI_REALTIME_DEPLOYMENT"
-		"AZURE_OPENAI_TTS_DEPLOYMENT"
-		# Email
-		"RESEND_API_KEY"
-		"FROM_EMAIL"
-		"SUPPORT_EMAIL"
-		# Auth & OAuth
-		"GOOGLE_CLIENT_ID"
-		"GOOGLE_CLIENT_SECRET"
-		"NEXT_PUBLIC_GOOGLE_CLIENT_ID"
-		"NEXTAUTH_URL"
-		# Push notifications
-		"NEXT_PUBLIC_VAPID_PUBLIC_KEY"
-		"VAPID_PRIVATE_KEY"
-		"VAPID_SUBJECT"
-		# Rate limiting
-		"UPSTASH_REDIS_REST_URL"
-		"UPSTASH_REDIS_REST_TOKEN"
-		# Supabase
-		"NEXT_PUBLIC_SUPABASE_URL"
-		"NEXT_PUBLIC_SUPABASE_ANON_KEY"
-		"SUPABASE_SERVICE_ROLE_KEY"
-		# Observability
-		"NEXT_PUBLIC_SENTRY_DSN"
-		"SENTRY_AUTH_TOKEN"
-		"SENTRY_ORG"
-		"SENTRY_PROJECT"
-		"GRAFANA_CLOUD_PROMETHEUS_URL"
-		"GRAFANA_CLOUD_PROMETHEUS_USER"
-		"GRAFANA_CLOUD_API_KEY"
-		"GRAFANA_CLOUD_PUSH_INTERVAL"
-		# LiveKit
-		"LIVEKIT_URL"
-		"LIVEKIT_API_KEY"
-		"LIVEKIT_API_SECRET"
-		"NEXT_PUBLIC_LIVEKIT_URL"
-		# Misc
-		"PROTECTED_USERS"
-		"TRIAL_BUDGET_LIMIT_EUR"
-		# Public URLs
-		"NEXT_PUBLIC_SITE_URL"
-		"NEXT_PUBLIC_APP_URL"
-	)
-
 	VERCEL_VARS=$(vercel env ls 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
 	MISSING_VARS=""
 
@@ -197,7 +201,7 @@ elif command -v vercel &>/dev/null; then
 
 	if [ -n "$MISSING_VARS" ]; then
 		echo -e "${RED}✗ Missing Vercel env vars:${NC}$MISSING_VARS"
-		echo -e "${YELLOW}Add with: vercel env add <name> production${NC}"
+		echo -e "${YELLOW}Fix: ./scripts/fix-vercel-env-vars.sh${NC}"
 		exit 1
 	fi
 	echo -e "${GREEN}✓ Vercel env vars OK${NC}"
@@ -209,13 +213,13 @@ elif command -v vercel &>/dev/null; then
 		if [ -n "$CORRUPTED_VARS" ]; then
 			echo -e "${RED}✗ Env vars with literal \\n (corrupted):${NC}"
 			echo "$CORRUPTED_VARS"
-			echo -e "${YELLOW}Fix: vercel env rm <name> production && printf '%s' 'value' | vercel env add <name> production${NC}"
+			echo -e "${YELLOW}Fix: ./scripts/fix-vercel-env-vars.sh${NC}"
 			exit 1
 		fi
 		echo -e "${GREEN}✓ No corrupted env vars${NC}"
 	fi
 else
-	echo -e "${YELLOW}⚠ Vercel CLI not found, skipping env check${NC}"
+	echo -e "${YELLOW}⚠ Vercel CLI not found, skipping remote check${NC}"
 fi
 
 # =============================================================================
