@@ -418,6 +418,9 @@ jobs:
           done
           echo "All migrations have migration.sql files"
 
+      - name: Schema drift detection
+        run: ./scripts/check-schema-drift.sh
+
   # Lane 5: Code Quality (fast, runs in parallel)
   quality:
     name: Code Quality

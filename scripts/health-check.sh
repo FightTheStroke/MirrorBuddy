@@ -6,10 +6,11 @@ set -euo pipefail
 #
 # Usage:
 #   ./scripts/health-check.sh              # Full triage (~15 lines)
-#   ./scripts/health-check.sh --drill ci   # Drill into CI details
-#   ./scripts/health-check.sh --drill debt # Drill into debt details
-#   ./scripts/health-check.sh --drill i18n # Drill into i18n details
-#   ./scripts/health-check.sh --drill comp # Drill into compliance details
+#   ./scripts/health-check.sh --drill ci         # Drill into CI details
+#   ./scripts/health-check.sh --drill debt       # Drill into debt details
+#   ./scripts/health-check.sh --drill i18n       # Drill into i18n details
+#   ./scripts/health-check.sh --drill comp       # Drill into compliance details
+#   ./scripts/health-check.sh --drill migrations # Drill into schema drift details
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
@@ -25,8 +26,9 @@ if [[ "$MODE" == "--drill" ]]; then
 	debt) npx tsx scripts/debt-check.ts ;;
 	i18n) npx tsx scripts/i18n-sync-namespaces.ts ;;
 	comp) npx tsx scripts/compliance-check.ts ;;
+	migrations) ./scripts/check-schema-drift.sh ;;
 	*)
-		echo "Usage: --drill [ci|debt|i18n|comp]"
+		echo "Usage: --drill [ci|debt|i18n|comp|migrations]"
 		exit 1
 		;;
 	esac

@@ -66,6 +66,16 @@ if [ -n "$INVALID_MIGRATIONS" ]; then
 fi
 echo -e "${GREEN}✓ Migration naming OK${NC}"
 
+# Schema drift: every model/enum in prisma/schema/ must have a migration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+if ! "$SCRIPT_DIR/check-schema-drift.sh" >"$TEMP_DIR/drift.log" 2>&1; then
+	echo -e "${RED}✗ Schema drift detected - models without migrations${NC}"
+	grep "MISSING:" "$TEMP_DIR/drift.log" | head -10
+	echo -e "${YELLOW}Fix: npx prisma migrate dev --name <name> --create-only${NC}"
+	exit 1
+fi
+echo -e "${GREEN}✓ Schema drift OK${NC}"
+
 # Check for duplicate proxy.ts files (Next.js 16 requirement - ADR 0066)
 if [ -f "./proxy.ts" ]; then
 	echo -e "${RED}✗ Root /proxy.ts found - FORBIDDEN when app is in /src/${NC}"

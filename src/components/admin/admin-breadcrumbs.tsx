@@ -124,7 +124,7 @@ function getBreadcrumbLabel(
     "/admin/tos": "terms",
     "/admin/settings": "sidebar.settings",
     "/admin/tiers": "sidebar.tiers",
-    "/admin/locales": "sidebar.locales",
+    "/admin/locales": "sidebar.localization",
     "/admin/safety": "sidebar.safety",
     "/admin/risk-register": "sidebar.riskRegister",
     "/admin/service-limits": "sidebar.serviceLimits",

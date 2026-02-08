@@ -16,6 +16,7 @@ set -euo pipefail
 #   ./scripts/ci-summary.sh --i18n          # i18n check only
 #   ./scripts/ci-summary.sh --unsafe-queries# unsafe query check only
 #   ./scripts/ci-summary.sh --links         # markdown link check only
+#   ./scripts/ci-summary.sh --migrations    # schema drift check only
 #   ./scripts/ci-summary.sh --e2e           # E2E tests (requires running app)
 #   ./scripts/ci-summary.sh --a11y          # Accessibility tests (requires running app)
 #
@@ -267,6 +268,23 @@ run_link_check() {
 	fi
 }
 
+run_migrations() {
+	local tmp
+	tmp=$(mktemp)
+	if "$SCRIPT_DIR/check-schema-drift.sh" >"$tmp" 2>&1; then
+		local s
+		s=$(grep -oE 'all [0-9]+ models' "$tmp" || true)
+		result "[PASS] Migrations${s:+ ($s)}"
+	else
+		ERRORS=$((ERRORS + 1))
+		result "[FAIL] Migrations"
+		local d
+		d=$(grep "MISSING:" "$tmp" | head -10)
+		result_details "$d"
+	fi
+	rm -f "$tmp"
+}
+
 # --- Main ---
 echo "=== CI Summary ==="
 
@@ -278,6 +296,7 @@ case "$MODE" in
 --i18n) run_i18n ;;
 --unsafe-queries) run_unsafe_query_check ;;
 --links) run_link_check ;;
+--migrations) run_migrations ;;
 --e2e) run_e2e "${2:-}" ;;
 --a11y) run_a11y ;;
 --quick)
@@ -298,6 +317,7 @@ case "$MODE" in
 	run_unsafe_query_check
 	run_unit
 	run_i18n
+	run_migrations
 	run_link_check
 	run_e2e
 	run_a11y
