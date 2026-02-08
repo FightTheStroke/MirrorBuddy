@@ -67,8 +67,9 @@ Before modifying CSP: `npm run test:unit -- csp-validation`.
 ./scripts/ci-summary.sh --lint   # lint only
 ./scripts/ci-summary.sh --types  # typecheck only
 ./scripts/ci-summary.sh --build  # build only
-./scripts/ci-summary.sh --unit   # unit tests only
-./scripts/health-check.sh        # full triage (~6 lines output)
+./scripts/ci-summary.sh --unit       # unit tests only
+./scripts/ci-summary.sh --migrations # schema drift check
+./scripts/health-check.sh            # full triage (~6 lines output)
 ```
 
 ### Release Gates
