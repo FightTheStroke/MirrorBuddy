@@ -6,6 +6,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Check } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { TYPE_FILTERS, CHIP_COLORS, DATE_FILTERS } from '../constants';
 import { SUBJECT_LABELS } from '@/components/education/archive';
@@ -36,13 +37,14 @@ export function FilterChips({
   getSubjectFilterCount,
   getDateFilterCount,
 }: FilterChipsProps) {
+  const t = useTranslations('education.supporti.filters');
   const [showSubjects, setShowSubjects] = useState(true);
   const { showMoreTypes, setShowMoreTypes, dropdownPosition, moreTypesRef } = useFilterDropdown();
 
-  const visibleTypes = TYPE_FILTERS.slice(0, 5).filter(f => getTypeFilterCount(f.id) > 0);
+  const visibleTypes = TYPE_FILTERS.slice(0, 5).filter((f) => getTypeFilterCount(f.id) > 0);
   const moreTypes = TYPE_FILTERS.slice(5)
-    .filter(f => getTypeFilterCount(f.id) > 0)
-    .map(f => ({ ...f, count: getTypeFilterCount(f.id) }));
+    .filter((f) => getTypeFilterCount(f.id) > 0)
+    .map((f) => ({ ...f, count: getTypeFilterCount(f.id) }));
 
   return (
     <div className="space-y-6">
@@ -53,7 +55,8 @@ export function FilterChips({
         <div className="flex flex-wrap gap-2">
           {visibleTypes.map((filter) => {
             const count = getTypeFilterCount(filter.id);
-            const isActive = typeFilter === filter.id || (filter.id === 'all' && typeFilter === 'all');
+            const isActive =
+              typeFilter === filter.id || (filter.id === 'all' && typeFilter === 'all');
             const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
             const Icon = filter.icon;
 
@@ -63,14 +66,17 @@ export function FilterChips({
                 onClick={() => onTypeFilterChange(filter.id)}
                 className={cn(
                   'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
-                  isActive
-                    ? colors.activeBg
-                    : cn(colors.bg, colors.text, colors.border)
+                  isActive ? colors.activeBg : cn(colors.bg, colors.text, colors.border),
                 )}
               >
                 <Icon className="w-4 h-4" />
                 <span>{filter.label}</span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600')}>
+                <span
+                  className={cn(
+                    'text-xs px-1.5 py-0.5 rounded',
+                    isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600',
+                  )}
+                >
                   {count}
                 </span>
               </button>
@@ -84,11 +90,15 @@ export function FilterChips({
                 className={cn(
                   'flex items-center gap-1 px-3 py-2 rounded-lg border text-sm transition-all',
                   'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700',
-                  showMoreTypes && 'ring-2 ring-primary'
+                  showMoreTypes && 'ring-2 ring-primary',
                 )}
               >
                 Altro
-                {showMoreTypes ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                {showMoreTypes ? (
+                  <ChevronUp className="w-4 h-4" />
+                ) : (
+                  <ChevronDown className="w-4 h-4" />
+                )}
               </button>
 
               <AnimatePresence>
@@ -120,7 +130,7 @@ export function FilterChips({
                             'w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors',
                             isActive
                               ? colors.activeBg
-                              : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200'
+                              : 'hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200',
                           )}
                         >
                           <Icon className="w-4 h-4 flex-shrink-0" />
@@ -145,7 +155,8 @@ export function FilterChips({
         <div className="flex flex-wrap gap-2">
           {DATE_FILTERS.map((filter) => {
             const count = getDateFilterCount(filter.id);
-            const isActive = dateFilter === filter.id || (filter.id === 'all' && dateFilter === 'all');
+            const isActive =
+              dateFilter === filter.id || (filter.id === 'all' && dateFilter === 'all');
             const colors = CHIP_COLORS[filter.color] || CHIP_COLORS.slate;
 
             return (
@@ -156,11 +167,16 @@ export function FilterChips({
                   'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
                   isActive
                     ? colors.activeBg
-                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700',
                 )}
               >
                 <span>{filter.label}</span>
-                <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600')}>
+                <span
+                  className={cn(
+                    'text-xs px-1.5 py-0.5 rounded',
+                    isActive ? 'bg-white/20' : 'bg-slate-200 dark:bg-slate-600',
+                  )}
+                >
                   {count}
                 </span>
               </button>
@@ -175,7 +191,7 @@ export function FilterChips({
             onClick={() => setShowSubjects(!showSubjects)}
             className="flex items-center gap-2 mb-3 text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider hover:text-slate-700 dark:hover:text-slate-200 transition-colors"
           >
-            Materia
+            {t('subjectLabel')}
             {showSubjects ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
 
@@ -195,7 +211,7 @@ export function FilterChips({
                       'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
                       !subjectFilter
                         ? 'bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400'
-                        : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700'
+                        : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
                     )}
                   >
                     <span>Tutte</span>
@@ -212,14 +228,19 @@ export function FilterChips({
                           'flex items-center gap-2 px-3 py-2 rounded-lg border text-sm transition-all',
                           isActive
                             ? 'bg-emerald-500 dark:bg-emerald-400 text-white dark:text-emerald-950 border-emerald-500 dark:border-emerald-400'
-                            : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700'
+                            : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-700',
                         )}
                       >
                         <span className="w-5 h-5 rounded-full bg-emerald-200 dark:bg-emerald-600 flex items-center justify-center text-xs font-bold">
                           {subject.charAt(0).toUpperCase()}
                         </span>
                         <span>{SUBJECT_LABELS[subject] || subject}</span>
-                        <span className={cn('text-xs px-1.5 py-0.5 rounded', isActive ? 'bg-white/20' : 'bg-emerald-200 dark:bg-emerald-600')}>
+                        <span
+                          className={cn(
+                            'text-xs px-1.5 py-0.5 rounded',
+                            isActive ? 'bg-white/20' : 'bg-emerald-200 dark:bg-emerald-600',
+                          )}
+                        >
                           {count}
                         </span>
                       </button>

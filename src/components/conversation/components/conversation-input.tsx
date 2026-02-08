@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { ToolButtons } from '../tool-buttons';
 import type { ToolType } from '@/types/tools';
 import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
+import { useTranslations } from 'next-intl';
 
 interface ConversationInputProps {
   inputValue: string;
@@ -36,6 +37,8 @@ export function ConversationInput({
   activeToolId,
   inputRef,
 }: ConversationInputProps) {
+  const t = useTranslations('chat');
+
   return (
     <div className="p-4 border-t border-slate-200 dark:border-slate-700">
       <div className="mb-2">
@@ -52,8 +55,8 @@ export function ConversationInput({
           value={inputValue}
           onChange={(e) => onInputChange(e.target.value)}
           onKeyDown={onKeyPress}
-          placeholder={`Scrivi a ${activeCharacter.name}...`}
-          aria-label={`Scrivi un messaggio a ${activeCharacter.name}`}
+          placeholder={t('conversationInput.placeholderTemplate', { name: activeCharacter.name })}
+          aria-label={t('conversationInput.ariaLabelTemplate', { name: activeCharacter.name })}
           className="flex-1 px-4 py-3 bg-slate-100 dark:bg-slate-800 rounded-xl border-0 focus:ring-2 focus:ring-accent-themed outline-none text-slate-900 dark:text-white placeholder:text-slate-500"
           disabled={isLoading}
         />
@@ -61,7 +64,11 @@ export function ConversationInput({
           variant="ghost"
           size="icon"
           onClick={onMuteToggle}
-          aria-label={isMuted ? 'Attiva audio' : 'Disattiva audio'}
+          aria-label={
+            isMuted
+              ? t('conversationInput.enableAudioAriaLabel')
+              : t('conversationInput.disableAudioAriaLabel')
+          }
           aria-pressed={isMuted}
         >
           {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -70,7 +77,11 @@ export function ConversationInput({
           variant="ghost"
           size="icon"
           onClick={onVoiceToggle}
-          aria-label={mode === 'voice' ? 'Passa al testo' : 'Passa alla voce'}
+          aria-label={
+            mode === 'voice'
+              ? t('conversationInput.switchToTextAriaLabel')
+              : t('conversationInput.switchToVoiceAriaLabel')
+          }
           aria-pressed={mode === 'voice'}
           className={cn(mode === 'voice' && 'bg-red-100 text-red-600')}
         >
@@ -80,7 +91,7 @@ export function ConversationInput({
           size="icon"
           onClick={onSend}
           disabled={!inputValue.trim() || isLoading}
-          aria-label="Invia messaggio"
+          aria-label={t('conversationInput.sendMessageAriaLabel')}
           className="bg-accent-themed hover:bg-accent-themed/90"
         >
           <Send className="w-5 h-5" aria-hidden="true" />
@@ -89,4 +100,3 @@ export function ConversationInput({
     </div>
   );
 }
-

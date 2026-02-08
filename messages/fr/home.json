@@ -1,6 +1,6 @@
 {
   "home": {
-    "appTitle": "MirrorBuddy - L'\u00c9cole que je veux",
+    "appTitle": "MirrorBuddy - L'École que je veux",
     "loading": "Chargement...",
     "seasonDefault": "Saison actuelle",
     "mirrorBucksShort": "MB",
@@ -21,7 +21,8 @@
       "studyTime": "Temps d'étude",
       "questionsAsked": "Questions posées",
       "trialClickToRequest": "Cliquez pour demander l'accès",
-      "trial": "Essai"
+      "trial": "Essai",
+      "requestFullAccess": "[TRANSLATE] Clicca per richiedere accesso completo"
     },
     "sidebar": {
       "backToHome": "Retour à l'accueil",

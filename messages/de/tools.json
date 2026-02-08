@@ -193,7 +193,11 @@
       "titlePlaceholder": "Titel eingeben",
       "unsaved": "Nicht gespeichert",
       "word": "Wort",
-      "words": "Wörter"
+      "words": "Wörter",
+      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
+      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
+      "deleteSection": "[TRANSLATE] Elimina sezione",
+      "editTitle": "[TRANSLATE] Modifica titolo"
     },
     "diagram": {
       "label": "Diagramm",
@@ -352,7 +356,13 @@
     "flashcards": {
       "ratingQuestion": "Bewertungsfrage",
       "label": "Lernkarte",
-      "description": "Lernkarten für das Studium erstellen"
+      "description": "Lernkarten für das Studium erstellen",
+      "completed": "[TRANSLATE] Completato!",
+      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
+      "continue": "[TRANSLATE] Continua",
+      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
     },
     "loading": {
       "cancelled": "Abgebrochen",
@@ -399,6 +409,11 @@
       "zoomOut": {
         "ariaLabel": "Verkleinern",
         "title": "Verkleinern"
+      },
+      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "undo": {
+        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
+        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
       }
     },
     "print": {
@@ -467,7 +482,8 @@
       "capabilityPdf": "PDFs von Drive hochladen, um Lernmaterialien zu generieren",
       "capabilityHomework": "Dokumente für den Hausaufgaben-Assistenten importieren",
       "capabilityDocuments": "Auf Ihre Dokumente zugreifen, ohne sie herunterladen zu müssen",
-      "privacyNotice": "MirrorBuddy greift nur mit Ihrer Genehmigung auf Dateien zu. Wir speichern Ihre Drive-Dateien nicht."
+      "privacyNotice": "MirrorBuddy greift nur mit Ihrer Genehmigung auf Dateien zu. Wir speichern Ihre Drive-Dateien nicht.",
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
     },
     "astuccio": {
       "title": "Federmäppchen",
@@ -551,6 +567,9 @@
       "saveError": "Fehler beim Speichern des Fotos",
       "purpose": "Ein Foto aufnehmen",
       "instructions": "Rahmen Sie das Dokument oder die Tafel ein und fotografieren Sie"
+    },
+    "pomodoro": {
+      "iniziaFocus": "[TRANSLATE] Inizia Focus"
     }
   }
 }

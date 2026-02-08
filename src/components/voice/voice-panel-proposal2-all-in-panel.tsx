@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { AudioDeviceSelector } from '@/components/conversation/components/audio-device-selector';
 import { cn } from '@/lib/utils';
 import { VisualizerBar } from './voice-panel-proposal2/visualizer-bar';
+import { useTranslations } from 'next-intl';
 
 const VISUALIZER_BAR_OFFSETS = [8, 12, 6, 14, 10];
 
@@ -56,21 +57,20 @@ export function VoicePanelProposal2({
   onClearChat,
   onClose,
 }: VoicePanelProposal2Props) {
+  const t = useTranslations('voice');
   const backgroundStyle = isHexColor(character.color)
     ? { background: `linear-gradient(to bottom, ${character.color}, ${character.color}dd)` }
     : undefined;
 
-  const backgroundClass = !isHexColor(character.color)
-    ? `bg-gradient-to-b ${character.color}`
-    : '';
+  const backgroundClass = !isHexColor(character.color) ? `bg-gradient-to-b ${character.color}` : '';
 
   const getStatusText = () => {
     if (configError) return configError;
-    if (connectionState === 'connecting') return 'Connessione...';
-    if (isConnected && isSpeaking) return `${character.name} sta parlando...`;
-    if (isConnected && isListening) return 'In ascolto...';
-    if (isConnected) return 'Connesso';
-    return 'Avvio chiamata...';
+    if (connectionState === 'connecting') return t('voicePanel.connecting');
+    if (isConnected && isSpeaking) return t('voicePanel.speaking', { name: character.name });
+    if (isConnected && isListening) return t('voicePanel.listening');
+    if (isConnected) return t('voicePanel.connected');
+    return t('voicePanel.startingCall');
   };
 
   return (
@@ -79,8 +79,8 @@ export function VoicePanelProposal2({
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 20 }}
       className={cn(
-        "w-64 flex flex-col items-center justify-between gap-4 p-4 rounded-2xl",
-        backgroundClass
+        'w-64 flex flex-col items-center justify-between gap-4 p-4 rounded-2xl',
+        backgroundClass,
       )}
       style={backgroundStyle}
     >
@@ -100,7 +100,7 @@ export function VoicePanelProposal2({
               className={cn(
                 'rounded-full border-4 object-cover transition-colors duration-300',
                 isConnected ? 'border-white' : 'border-white/50',
-                isSpeaking && 'border-white shadow-lg shadow-white/30'
+                isSpeaking && 'border-white shadow-lg shadow-white/30',
               )}
             />
           ) : (
@@ -115,13 +115,8 @@ export function VoicePanelProposal2({
 
         <div className="text-center">
           <h3 className="text-lg font-semibold text-white">{character.name}</h3>
-          {character.specialty && (
-            <p className="text-xs text-white/70">{character.specialty}</p>
-          )}
-          <p className={cn(
-            "text-xs mt-1",
-            configError ? "text-red-200" : "text-white/60"
-          )}>
+          {character.specialty && <p className="text-xs text-white/70">{character.specialty}</p>}
+          <p className={cn('text-xs mt-1', configError ? 'text-red-200' : 'text-white/60')}>
             {getStatusText()}
           </p>
         </div>
@@ -157,12 +152,14 @@ export function VoicePanelProposal2({
               variant="ghost"
               size="icon"
               onClick={onToggleMute}
-              aria-label={isMuted ? 'Attiva microfono' : 'Disattiva microfono'}
+              aria-label={
+                isMuted ? t('voicePanel.microphoneEnabled') : t('voicePanel.microphoneDisabled')
+              }
               className={cn(
                 'rounded-full w-12 h-12 transition-colors',
                 isMuted
                   ? 'bg-white/20 text-white hover:bg-white/30'
-                  : 'bg-white/30 text-white hover:bg-white/40'
+                  : 'bg-white/30 text-white hover:bg-white/40',
               )}
             >
               {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
@@ -187,7 +184,7 @@ export function VoicePanelProposal2({
             onClick={ttsEnabled ? onStopTTS : undefined}
             disabled={!ttsEnabled}
             className="rounded-full w-10 h-10 text-white hover:bg-white/20"
-            aria-label={ttsEnabled ? 'Disattiva lettura vocale' : 'Lettura vocale disattivata'}
+            aria-label={ttsEnabled ? t('voicePanel.ttsEnabled') : t('voicePanel.ttsDisabled')}
           >
             {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
           </Button>
@@ -197,7 +194,7 @@ export function VoicePanelProposal2({
             size="icon"
             onClick={onClearChat}
             className="rounded-full w-10 h-10 text-white hover:bg-white/20"
-            aria-label="Nuova conversazione"
+            aria-label={t('voicePanel.newConversation')}
           >
             <RotateCcw className="w-4 h-4" />
           </Button>
@@ -207,7 +204,7 @@ export function VoicePanelProposal2({
             size="icon"
             onClick={onClose}
             className="rounded-full w-10 h-10 text-white hover:bg-white/20"
-            aria-label="Chiudi"
+            aria-label={t('voicePanel.close')}
           >
             <X className="w-4 h-4" />
           </Button>
@@ -216,12 +213,8 @@ export function VoicePanelProposal2({
 
       {/* Bottom: Status text */}
       {isConnected && (
-        <p
-          className="text-xs text-white/60 text-center"
-          aria-live="polite"
-          role="status"
-        >
-          {isMuted ? 'Microfono disattivato' : 'Parla ora...'}
+        <p className="text-xs text-white/60 text-center" aria-live="polite" role="status">
+          {isMuted ? t('voicePanel.microphoneMutedStatus') : t('voicePanel.speakNowStatus')}
         </p>
       )}
     </motion.div>

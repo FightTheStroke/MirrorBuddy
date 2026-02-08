@@ -21,7 +21,8 @@
       "studyTime": "Lernzeit",
       "questionsAsked": "Gestellte Fragen",
       "trialClickToRequest": "Klicken Sie, um Zugang anzufordern",
-      "trial": "Testversion"
+      "trial": "Testversion",
+      "requestFullAccess": "[TRANSLATE] Clicca per richiedere accesso completo"
     },
     "sidebar": {
       "backToHome": "Zurück zur Startseite",

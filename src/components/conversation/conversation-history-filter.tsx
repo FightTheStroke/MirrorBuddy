@@ -1,5 +1,6 @@
 import { Filter, X } from 'lucide-react';
 import type { MaestroFull } from '@/data/maestri';
+import { useTranslations } from 'next-intl';
 
 interface ConversationHistoryFilterProps {
   maestri: MaestroFull[];
@@ -20,6 +21,8 @@ export function ConversationHistoryFilter({
   onClearFilter,
   getMaestroName,
 }: ConversationHistoryFilterProps) {
+  const t = useTranslations('chat');
+
   return (
     <div className="relative">
       <button
@@ -32,7 +35,7 @@ export function ConversationHistoryFilter({
       >
         <Filter className="w-4 h-4" />
         <span className="text-sm">
-          {selectedMaestro ? getMaestroName(selectedMaestro) : 'Filtra'}
+          {selectedMaestro ? getMaestroName(selectedMaestro) : t('conversationFilter.filter')}
         </span>
         {selectedMaestro && (
           <X
@@ -52,9 +55,9 @@ export function ConversationHistoryFilter({
               onClick={() => onSelectMaestro('')}
               className="w-full text-left px-3 py-2 rounded hover:bg-gray-100 text-sm"
             >
-              Tutti i maestri
+              {t('conversationFilter.allMaestri')}
             </button>
-            {maestri.map(maestro => (
+            {maestri.map((maestro) => (
               <button
                 key={maestro.id}
                 onClick={() => onSelectMaestro(maestro.id)}

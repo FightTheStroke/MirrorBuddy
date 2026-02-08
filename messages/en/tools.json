@@ -193,7 +193,11 @@
       "titlePlaceholder": "Title Placeholder",
       "unsaved": "Unsaved",
       "word": "Word",
-      "words": "Words"
+      "words": "Words",
+      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
+      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
+      "deleteSection": "[TRANSLATE] Elimina sezione",
+      "editTitle": "[TRANSLATE] Modifica titolo"
     },
     "diagram": {
       "label": "Diagram",
@@ -352,7 +356,13 @@
     "flashcards": {
       "ratingQuestion": "Rating Question",
       "label": "Flashcard",
-      "description": "Crea flashcard per lo studio"
+      "description": "Crea flashcard per lo studio",
+      "completed": "[TRANSLATE] Completato!",
+      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
+      "continue": "[TRANSLATE] Continua",
+      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
     },
     "loading": {
       "cancelled": "Cancelled",
@@ -399,6 +409,11 @@
       "zoomOut": {
         "ariaLabel": "Aria Label",
         "title": "Titolo"
+      },
+      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "undo": {
+        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
+        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
       }
     },
     "print": {
@@ -467,7 +482,8 @@
       "capabilityPdf": "Upload PDFs from Drive to generate study materials",
       "capabilityHomework": "Import documents for homework assistant",
       "capabilityDocuments": "Access your documents without having to download them",
-      "privacyNotice": "MirrorBuddy only accesses files with your authorization. We do not store your Drive files."
+      "privacyNotice": "MirrorBuddy only accesses files with your authorization. We do not store your Drive files.",
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
     },
     "astuccio": {
       "title": "Pencil Case",
@@ -551,6 +567,9 @@
       "saveError": "Error saving photo",
       "purpose": "Take a photo",
       "instructions": "Frame the document or whiteboard and snap"
+    },
+    "pomodoro": {
+      "iniziaFocus": "[TRANSLATE] Inizia Focus"
     }
   }
 }

@@ -1,21 +1,15 @@
-"use client";
+'use client';
 
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  ArrowRight,
-  ArrowLeft,
-  SkipForward,
-  Check,
-  Circle,
-} from "lucide-react";
-import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
-import { VoiceOnboardingPanel } from "@/components/onboarding/voice-onboarding-panel";
-import { LEARNING_DIFFERENCES } from "./info-step-data";
-import type { Maestro, VoiceSessionHandle } from "@/types";
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ArrowLeft, SkipForward, Check, Circle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { VoiceOnboardingPanel } from '@/components/onboarding/voice-onboarding-panel';
+import { LEARNING_DIFFERENCES } from './info-step-data';
+import type { Maestro, VoiceSessionHandle } from '@/types';
 
 interface VoiceConnectionInfo {
-  provider: "azure";
+  provider: 'azure';
   proxyPort: number;
   configured: boolean;
 }
@@ -23,14 +17,14 @@ interface VoiceConnectionInfo {
 interface ExistingUserData {
   name: string;
   age?: number;
-  schoolLevel?: "elementare" | "media" | "superiore";
+  schoolLevel?: 'elementare' | 'media' | 'superiore';
   learningDifferences?: string[];
 }
 
 interface InfoStepVoiceProps {
   data: {
     age?: number;
-    schoolLevel?: "elementare" | "media" | "superiore";
+    schoolLevel?: 'elementare' | 'media' | 'superiore';
     learningDifferences?: string[];
     name: string;
   };
@@ -61,7 +55,7 @@ export function InfoStepVoice({
   onContinue,
   onSkip,
 }: InfoStepVoiceProps) {
-  const t = useTranslations("welcome.welcomeForm");
+  const t = useTranslations('welcome.welcomeForm');
 
   // Check if we have enough data to show continue button
   const hasData =
@@ -71,12 +65,12 @@ export function InfoStepVoice({
 
   // Get readable label for school level
   const getSchoolLevelLabel = (level?: string) => {
-    if (!level) return "...";
-    return level === "elementare"
-      ? t("schoolElementary")
-      : level === "media"
-        ? t("schoolMiddle")
-        : t("schoolHigh");
+    if (!level) return '...';
+    return level === 'elementare'
+      ? t('schoolElementary')
+      : level === 'media'
+        ? t('schoolMiddle')
+        : t('schoolHigh');
   };
 
   return (
@@ -107,9 +101,7 @@ export function InfoStepVoice({
             exit={{ opacity: 0, y: -20 }}
             className="mt-4 p-4 bg-white/90 dark:bg-gray-800/90 rounded-2xl shadow-lg space-y-3"
           >
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
-              {t("collectedData")}
-            </h3>
+            <h3 className="font-semibold text-gray-800 dark:text-gray-200">{t('collectedData')}</h3>
 
             <div className="space-y-2">
               {/* Age */}
@@ -119,14 +111,8 @@ export function InfoStepVoice({
                 ) : (
                   <Circle className="w-4 h-4 text-gray-300" />
                 )}
-                <span
-                  className={
-                    data.age
-                      ? "text-gray-800 dark:text-gray-200"
-                      : "text-gray-400"
-                  }
-                >
-                  {t("age")}: {data.age ? `${data.age} ${t("years")}` : "..."}
+                <span className={data.age ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'}>
+                  {t('age')}: {data.age ? `${data.age} ${t('years')}` : '...'}
                 </span>
               </div>
 
@@ -139,19 +125,16 @@ export function InfoStepVoice({
                 )}
                 <span
                   className={
-                    data.schoolLevel
-                      ? "text-gray-800 dark:text-gray-200"
-                      : "text-gray-400"
+                    data.schoolLevel ? 'text-gray-800 dark:text-gray-200' : 'text-gray-400'
                   }
                 >
-                  {t("school")}: {getSchoolLevelLabel(data.schoolLevel)}
+                  {t('school')}: {getSchoolLevelLabel(data.schoolLevel)}
                 </span>
               </div>
 
               {/* Differences */}
               <div className="flex items-center gap-2 text-sm">
-                {data.learningDifferences &&
-                data.learningDifferences.length > 0 ? (
+                {data.learningDifferences && data.learningDifferences.length > 0 ? (
                   <Check className="w-4 h-4 text-green-500" />
                 ) : (
                   <Circle className="w-4 h-4 text-gray-300" />
@@ -159,20 +142,16 @@ export function InfoStepVoice({
                 <span
                   className={
                     data.learningDifferences?.length
-                      ? "text-gray-800 dark:text-gray-200"
-                      : "text-gray-400"
+                      ? 'text-gray-800 dark:text-gray-200'
+                      : 'text-gray-400'
                   }
                 >
-                  {t("learningDifferences")}:{" "}
+                  {t('learningDifferences')}:{' '}
                   {data.learningDifferences?.length
                     ? data.learningDifferences
-                        .map(
-                          (d) =>
-                            LEARNING_DIFFERENCES.find((ld) => ld.id === d)
-                              ?.label,
-                        )
-                        .join(", ")
-                    : t("optional")}
+                        .map((d) => LEARNING_DIFFERENCES.find((ld) => ld.id === d)?.label)
+                        .join(', ')
+                    : t('optional')}
                 </span>
               </div>
             </div>
@@ -180,13 +159,13 @@ export function InfoStepVoice({
             <div className="flex gap-2 pt-2">
               <Button onClick={onBack} variant="outline" className="flex-1">
                 <ArrowLeft className="mr-2 w-4 h-4" />
-                Indietro
+                {t('backButton')}
               </Button>
               <Button
                 onClick={onContinue}
                 className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
               >
-                Continua
+                {t('continueButton')}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </div>
@@ -199,18 +178,18 @@ export function InfoStepVoice({
         <div className="mt-4 flex gap-2">
           <Button onClick={onBack} variant="outline" className="flex-1">
             <ArrowLeft className="mr-2 w-4 h-4" />
-            Indietro
+            {t('backButton')}
           </Button>
           <Button onClick={onSkip} variant="ghost" className="text-gray-500">
             <SkipForward className="mr-2 w-4 h-4" />
-            Salta
+            {t('skipButton')}
           </Button>
         </div>
       )}
 
       {isReplayMode && (
         <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-4">
-          {t("replayModeMessage")}
+          {t('replayModeMessage')}
         </p>
       )}
     </motion.div>

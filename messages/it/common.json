@@ -165,6 +165,32 @@
       "settings": "Impostazioni",
       "logout": "Esci",
       "logoutConfirm": "Sei sicuro di voler uscire?"
+    },
+    "notifications": {
+      "cancellaTutteLeNotifiche": "Cancella tutte le notifiche",
+      "arialabelchiudi": "aria-label=\"Chiudi\"",
+      "arialabeleliminaNotifica": "aria-label=\"Elimina notifica\""
+    },
+    "pwa": {
+      "selezionaQuotaggiungiAllaSchermata": "Seleziona &quot;Aggiungi alla schermata Home&quot;",
+      "arialabelchiudi": "aria-label=\"Chiudi\""
+    },
+    "tier": {
+      "allMaestri": "All Maestri"
+    },
+    "trial": {
+      "continuaConLaProva": "Continua con la prova limitata",
+      "tuttiI17Maestri": "Tutti i 17 Maestri e 5 Coach",
+      "chatIllimitateConI": "Chat illimitate con i Maestri",
+      "registratiPerAccessoIllimitato": "Registrati per accesso illimitato",
+      "3Maestri": "3 Maestri",
+      "vuoiLaposaccessoCompletoRichiedi": "Vuoi l&apos;accesso completo? Richiedi la beta",
+      "saltaIntroduzione": "Salta introduzione",
+      "avanti": "Avanti",
+      "accessoCompletoATutti": "Accesso completo a tutti i Maestri e strumenti"
+    },
+    "toast": {
+      "arialabelchiudiNotifica": "aria-label=\"Chiudi notifica\""
     }
   }
 }

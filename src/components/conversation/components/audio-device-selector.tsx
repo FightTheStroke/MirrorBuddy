@@ -1,11 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Settings2, Mic, Volume2, ChevronDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { useAudioDevices } from "@/lib/hooks/use-audio-devices";
-import { useSettingsStore } from "@/lib/stores";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { Settings2, Mic, Volume2, ChevronDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useAudioDevices } from '@/lib/hooks/use-audio-devices';
+import { useSettingsStore } from '@/lib/stores';
+import { cn } from '@/lib/utils';
+import { useTranslations } from 'next-intl';
 
 interface AudioDeviceSelectorProps {
   /** Compact mode for overlay (default) vs expanded mode */
@@ -17,31 +18,26 @@ interface AudioDeviceSelectorProps {
  * Compact audio device selector for voice call overlays.
  * Allows quick switching of microphone and speaker during a call.
  */
-export function AudioDeviceSelector({
-  compact = true,
-  className,
-}: AudioDeviceSelectorProps) {
+export function AudioDeviceSelector({ compact = true, className }: AudioDeviceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { microphones, speakers, hasPermission, requestPermission } =
-    useAudioDevices();
-  const {
-    preferredMicrophoneId,
-    preferredOutputId,
-    setPreferredMicrophone,
-    setPreferredOutput,
-  } = useSettingsStore();
+  const { microphones, speakers, hasPermission, requestPermission } = useAudioDevices();
+  const { preferredMicrophoneId, preferredOutputId, setPreferredMicrophone, setPreferredOutput } =
+    useSettingsStore();
+  const t = useTranslations('chat');
 
   // Find current device names
   const currentMic =
     microphones.find((m) => m.deviceId === preferredMicrophoneId)?.label ||
-    (preferredMicrophoneId ? "Microfono selezionato" : "Predefinito");
+    (preferredMicrophoneId
+      ? t('audioDevices.microphoneSelected')
+      : t('audioDevices.defaultDevice'));
   const currentSpeaker =
     speakers.find((s) => s.deviceId === preferredOutputId)?.label ||
-    (preferredOutputId ? "Altoparlante selezionato" : "Predefinito");
+    (preferredOutputId ? t('audioDevices.speakerSelected') : t('audioDevices.defaultDevice'));
 
   if (compact) {
     return (
-      <div className={cn("relative", className)}>
+      <div className={cn('relative', className)}>
         <Button
           variant="ghost"
           size="sm"
@@ -53,14 +49,11 @@ export function AudioDeviceSelector({
             }
           }}
           className="text-slate-300 hover:text-white hover:bg-slate-700/50"
-          aria-label="Impostazioni audio"
+          aria-label={t('audioDevices.audioSettings')}
         >
           <Settings2 className="w-4 h-4" />
           <ChevronDown
-            className={cn(
-              "w-3 h-3 ml-1 transition-transform",
-              isOpen && "rotate-180",
-            )}
+            className={cn('w-3 h-3 ml-1 transition-transform', isOpen && 'rotate-180')}
           />
         </Button>
 
@@ -74,7 +67,7 @@ export function AudioDeviceSelector({
                   className="flex items-center gap-1.5 text-xs font-medium text-slate-400"
                 >
                   <Mic className="w-3 h-3" />
-                  Microfono
+                  {t('audioDevices.microphone')}
                 </label>
                 <select
                   id="overlay-microphone"
@@ -82,7 +75,7 @@ export function AudioDeviceSelector({
                   onChange={(e) => setPreferredMicrophone(e.target.value)}
                   className="w-full px-2 py-1.5 text-xs rounded border border-slate-600 bg-slate-700 text-white"
                 >
-                  <option value="">Predefinito di sistema</option>
+                  <option value="">{t('audioDevices.systemDefault')}</option>
                   {microphones.map((mic) => (
                     <option key={mic.deviceId} value={mic.deviceId}>
                       {mic.label}
@@ -98,7 +91,7 @@ export function AudioDeviceSelector({
                   className="flex items-center gap-1.5 text-xs font-medium text-slate-400"
                 >
                   <Volume2 className="w-3 h-3" />
-                  Altoparlanti
+                  {t('audioDevices.speakers')}
                 </label>
                 <select
                   id="overlay-speaker"
@@ -106,7 +99,7 @@ export function AudioDeviceSelector({
                   onChange={(e) => setPreferredOutput(e.target.value)}
                   className="w-full px-2 py-1.5 text-xs rounded border border-slate-600 bg-slate-700 text-white"
                 >
-                  <option value="">Predefinito di sistema</option>
+                  <option value="">{t('audioDevices.systemDefault')}</option>
                   {speakers.map((speaker) => (
                     <option key={speaker.deviceId} value={speaker.deviceId}>
                       {speaker.label}
@@ -116,7 +109,7 @@ export function AudioDeviceSelector({
               </div>
 
               <p className="text-[10px] text-slate-500 text-center">
-                Cambio dispositivo applicato al prossimo avvio
+                {t('audioDevices.deviceChangeHint')}
               </p>
             </div>
           </div>
@@ -127,7 +120,7 @@ export function AudioDeviceSelector({
 
   // Expanded mode (not used yet, but available)
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className={cn('space-y-2', className)}>
       <div className="flex items-center gap-2 text-sm text-slate-300">
         <Mic className="w-4 h-4" />
         <span className="truncate">{currentMic}</span>

@@ -1,10 +1,11 @@
-"use client";
+'use client';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, useCallback } from "react";
-import { csrfFetch } from "@/lib/auth";
-import BenchmarkHeatmap from "./benchmark-heatmap";
+import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { csrfFetch } from '@/lib/auth';
+import BenchmarkHeatmap from './benchmark-heatmap';
 
 interface Experiment {
   id: string;
@@ -29,6 +30,7 @@ interface ExperimentList {
 }
 
 export default function ResearchLabPage() {
+  const t = useTranslations('admin');
   const [data, setData] = useState<ExperimentList | null>(null);
   const [loading, setLoading] = useState(true);
   const [running, setRunning] = useState<string | null>(null);
@@ -36,13 +38,13 @@ export default function ResearchLabPage() {
 
   const fetchExperiments = useCallback(async () => {
     try {
-      const res = await fetch("/api/admin/research/experiments");
-      if (!res.ok) throw new Error("Failed to fetch experiments");
+      const res = await fetch('/api/admin/research/experiments');
+      if (!res.ok) throw new Error('Failed to fetch experiments');
       const json = await res.json();
       setData(json);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unknown error");
+      setError(err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setLoading(false);
     }
@@ -58,11 +60,11 @@ export default function ResearchLabPage() {
     setRunning(id);
     try {
       await csrfFetch(`/api/admin/research/experiments/${id}/run`, {
-        method: "POST",
+        method: 'POST',
       });
       await fetchExperiments();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Run failed");
+      setError(err instanceof Error ? err.message : 'Run failed');
     } finally {
       setRunning(null);
     }
@@ -70,12 +72,10 @@ export default function ResearchLabPage() {
 
   const statusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      draft: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300",
-      running:
-        "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-      completed:
-        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300",
-      failed: "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300",
+      draft: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+      running: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
+      completed: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300',
+      failed: 'bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300',
     };
     return (
       <span
@@ -89,9 +89,7 @@ export default function ResearchLabPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <div className="text-sm text-muted-foreground">
-          Loading Research Lab...
-        </div>
+        <div className="text-sm text-muted-foreground">{t('research.loading')}</div>
       </div>
     );
   }
@@ -99,10 +97,8 @@ export default function ResearchLabPage() {
   return (
     <div className="space-y-6 p-6">
       <div>
-        <h1 className="text-2xl font-bold">Research Lab</h1>
-        <p className="text-sm text-muted-foreground">
-          TutorBench experiments — synthetic students vs maestri
-        </p>
+        <h1 className="text-2xl font-bold">{t('research.title')}</h1>
+        <p className="text-sm text-muted-foreground">{t('research.description')}</p>
       </div>
 
       {error && (
@@ -113,61 +109,52 @@ export default function ResearchLabPage() {
 
       {/* Benchmark Heatmap */}
       <section>
-        <h2 className="mb-3 text-lg font-semibold">Benchmark Scores</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t('research.benchmarkScores')}</h2>
         <BenchmarkHeatmap experiments={data?.items ?? []} />
       </section>
 
       {/* Experiments Table */}
       <section>
         <h2 className="mb-3 text-lg font-semibold">
-          Experiments ({data?.total ?? 0})
+          {t('research.experiments', { count: data?.total ?? 0 })}
         </h2>
         <div className="overflow-x-auto rounded-lg border">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b bg-muted/50">
-                <th className="px-3 py-2 text-left font-medium">Name</th>
-                <th className="px-3 py-2 text-left font-medium">Maestro</th>
-                <th className="px-3 py-2 text-left font-medium">Hypothesis</th>
-                <th className="px-3 py-2 text-center font-medium">Status</th>
-                <th className="px-3 py-2 text-center font-medium">Turns</th>
-                <th className="px-3 py-2 text-center font-medium">Actions</th>
+                <th className="px-3 py-2 text-left font-medium">{t('research.name')}</th>
+                <th className="px-3 py-2 text-left font-medium">{t('research.maestro')}</th>
+                <th className="px-3 py-2 text-left font-medium">{t('research.hypothesis')}</th>
+                <th className="px-3 py-2 text-center font-medium">{t('research.status')}</th>
+                <th className="px-3 py-2 text-center font-medium">{t('research.turns')}</th>
+                <th className="px-3 py-2 text-center font-medium">{t('research.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {(data?.items ?? []).length === 0 ? (
                 <tr>
-                  <td
-                    colSpan={6}
-                    className="px-3 py-8 text-center text-muted-foreground"
-                  >
-                    No experiments yet. Create one via API.
+                  <td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">
+                    {t('research.noExperiments')}
                   </td>
                 </tr>
               ) : (
                 data?.items.map((exp) => (
                   <tr key={exp.id} className="border-b last:border-0">
                     <td className="px-3 py-2 font-medium">{exp.name}</td>
-                    <td className="px-3 py-2 text-muted-foreground">
-                      {exp.maestroId}
-                    </td>
+                    <td className="px-3 py-2 text-muted-foreground">{exp.maestroId}</td>
                     <td className="max-w-[200px] truncate px-3 py-2 text-muted-foreground">
                       {exp.hypothesis}
                     </td>
+                    <td className="px-3 py-2 text-center">{statusBadge(exp.status)}</td>
+                    <td className="px-3 py-2 text-center">{exp.turnsCompleted}</td>
                     <td className="px-3 py-2 text-center">
-                      {statusBadge(exp.status)}
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      {exp.turnsCompleted}
-                    </td>
-                    <td className="px-3 py-2 text-center">
-                      {exp.status === "draft" && (
+                      {exp.status === 'draft' && (
                         <button
                           onClick={() => handleRunExperiment(exp.id)}
                           disabled={running === exp.id}
                           className="rounded bg-blue-600 px-3 py-1 text-xs font-medium text-white hover:bg-blue-700 disabled:opacity-50"
                         >
-                          {running === exp.id ? "Running..." : "Run"}
+                          {running === exp.id ? t('research.running') : t('research.run')}
                         </button>
                       )}
                     </td>

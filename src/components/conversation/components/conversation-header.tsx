@@ -7,6 +7,7 @@ import type { ActiveCharacter } from '@/lib/stores/conversation-flow-store';
 import { CharacterAvatar } from './character-avatar';
 import { CharacterRoleBadge } from './character-role-badge';
 import { CHARACTER_DESCRIPTIONS } from './constants';
+import { useTranslations } from 'next-intl';
 
 interface ConversationHeaderProps {
   currentCharacter: ActiveCharacter | null;
@@ -30,6 +31,8 @@ export function ConversationHeader({
   isVoiceActive,
   onVoiceCall,
 }: ConversationHeaderProps) {
+  const t = useTranslations('chat');
+
   if (!currentCharacter) return null;
 
   return (
@@ -38,7 +41,12 @@ export function ConversationHeader({
       style={{ backgroundColor: `${currentCharacter.color}10` }}
     >
       {canGoBack && (
-        <Button variant="ghost" size="icon-sm" onClick={onGoBack} aria-label="Torna indietro">
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={onGoBack}
+          aria-label={t('conversationHeader.backAriaLabel')}
+        >
           <ArrowLeft className="w-4 h-4" />
         </Button>
       )}
@@ -51,7 +59,8 @@ export function ConversationHeader({
           <CharacterRoleBadge type={currentCharacter.type} />
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
-          {CHARACTER_DESCRIPTIONS[currentCharacter.id] || 'Sono qui per aiutarti'}
+          {CHARACTER_DESCRIPTIONS[currentCharacter.id] ||
+            t('conversationHeader.defaultDescription')}
         </p>
       </div>
 
@@ -61,17 +70,14 @@ export function ConversationHeader({
           variant={isVoiceActive ? 'destructive' : 'outline'}
           size="icon"
           onClick={onVoiceCall}
-          aria-label={isVoiceActive ? 'Termina chiamata' : 'Chiama a voce'}
-          className={cn(
-            'relative',
-            isVoiceActive && 'animate-pulse'
-          )}
+          aria-label={
+            isVoiceActive
+              ? t('conversationHeader.endCallAriaLabel')
+              : t('conversationHeader.startCallAriaLabel')
+          }
+          className={cn('relative', isVoiceActive && 'animate-pulse')}
         >
-          {isVoiceActive ? (
-            <PhoneOff className="w-4 h-4" />
-          ) : (
-            <Phone className="w-4 h-4" />
-          )}
+          {isVoiceActive ? <PhoneOff className="w-4 h-4" /> : <Phone className="w-4 h-4" />}
         </Button>
       )}
 
@@ -81,11 +87,9 @@ export function ConversationHeader({
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToCoach}
-          aria-label="Parla con il Coach"
+          aria-label={t('conversationHeader.switchToCoachAriaLabel')}
           disabled={currentCharacter.type === 'coach'}
-          className={cn(
-            currentCharacter.type === 'coach' && 'opacity-50'
-          )}
+          className={cn(currentCharacter.type === 'coach' && 'opacity-50')}
         >
           <Users className="w-4 h-4" />
         </Button>
@@ -93,11 +97,9 @@ export function ConversationHeader({
           variant="ghost"
           size="icon-sm"
           onClick={onSwitchToBuddy}
-          aria-label="Parla con un amico"
+          aria-label={t('conversationHeader.switchToBuddyAriaLabel')}
           disabled={currentCharacter.type === 'buddy'}
-          className={cn(
-            currentCharacter.type === 'buddy' && 'opacity-50'
-          )}
+          className={cn(currentCharacter.type === 'buddy' && 'opacity-50')}
         >
           <MessageCircle className="w-4 h-4" />
         </Button>

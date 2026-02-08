@@ -1,4 +1,5 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 
 interface PaginationData {
   page: number;
@@ -18,6 +19,8 @@ export function ConversationHistoryPagination({
   pagination,
   onPageChange,
 }: ConversationHistoryPaginationProps) {
+  const t = useTranslations('chat');
+
   if (pagination.totalPages <= 1) {
     return null;
   }
@@ -26,9 +29,14 @@ export function ConversationHistoryPagination({
     <div className="border-t p-4">
       <div className="flex items-center justify-between">
         <div className="text-sm text-gray-600">
-          Pagina {pagination.page} di {pagination.totalPages}
+          {t('conversationPagination.page')} {pagination.page} {t('conversationPagination.of')}{' '}
+          {pagination.totalPages}
           <span className="text-gray-400 ml-2">
-            ({pagination.total} {pagination.total === 1 ? 'conversazione' : 'conversazioni'})
+            ({pagination.total}{' '}
+            {pagination.total === 1
+              ? t('conversationPagination.conversation')
+              : t('conversationPagination.conversations')}
+            )
           </span>
         </div>
 
@@ -37,7 +45,7 @@ export function ConversationHistoryPagination({
             onClick={() => onPageChange(pagination.page - 1)}
             disabled={!pagination.hasPrevPage}
             className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-            aria-label="Pagina precedente"
+            aria-label={t('conversationPagination.previousPageAriaLabel')}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
@@ -46,7 +54,7 @@ export function ConversationHistoryPagination({
             onClick={() => onPageChange(pagination.page + 1)}
             disabled={!pagination.hasNextPage}
             className="p-2 rounded-lg border border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 transition-colors"
-            aria-label="Pagina successiva"
+            aria-label={t('conversationPagination.nextPageAriaLabel')}
           >
             <ChevronRight className="w-4 h-4" />
           </button>

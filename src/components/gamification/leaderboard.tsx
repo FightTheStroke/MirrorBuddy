@@ -7,6 +7,7 @@
 'use client';
 
 import { useMemo, useState, memo } from 'react';
+import { useTranslations } from 'next-intl';
 import { useProgressStore } from '@/lib/stores/progress-store';
 import { cn } from '@/lib/utils';
 
@@ -28,7 +29,12 @@ interface LeaderboardEntry {
 
 const PERIODS: TimePeriod[] = ['today', 'week', 'season', 'year'];
 
-export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week', className = '' }: LeaderboardProps) {
+export function Leaderboard({
+  showPeriodSelector = true,
+  defaultPeriod = 'week',
+  className = '',
+}: LeaderboardProps) {
+  const t = useTranslations('education.gamification.leaderboard');
   const [period, setPeriod] = useState<TimePeriod>(defaultPeriod);
   const seasonMirrorBucks = useProgressStore((state) => state.seasonMirrorBucks);
   const mirrorBucks = useProgressStore((state) => state.mirrorBucks);
@@ -64,7 +70,12 @@ export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week',
       sessions.reduce((sum, s) => sum + (s.durationMinutes || 0), 0);
 
     // Get data based on period
-    let currentMB = 0, currentMin = 0, prevMB = 0, prevMin = 0, currentLvl = 1, prevLvl = 1;
+    let currentMB = 0,
+      currentMin = 0,
+      prevMB = 0,
+      prevMin = 0,
+      currentLvl = 1,
+      prevLvl = 1;
 
     switch (period) {
       case 'today':
@@ -121,12 +132,21 @@ export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week',
     };
 
     return [current, comparison];
-  }, [period, seasonMirrorBucks, mirrorBucks, seasonLevel, allTimeLevel, totalStudyMinutes, seasonHistory, sessionHistory]);
+  }, [
+    period,
+    seasonMirrorBucks,
+    mirrorBucks,
+    seasonLevel,
+    allTimeLevel,
+    totalStudyMinutes,
+    seasonHistory,
+    sessionHistory,
+  ]);
 
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">I tuoi Progressi</h3>
+        <h3 className="text-lg font-semibold">{t('title')}</h3>
       </div>
 
       {/* Period selector tabs */}
@@ -140,7 +160,7 @@ export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week',
                 'flex-1 min-w-[60px] rounded-md px-2 sm:px-3 py-1.5 text-xs font-medium transition-all whitespace-nowrap',
                 period === p
                   ? 'bg-background text-foreground shadow-sm'
-                  : 'text-muted-foreground hover:text-foreground'
+                  : 'text-muted-foreground hover:text-foreground',
               )}
             >
               {getPeriodLabel(p, 'tab')}
@@ -162,7 +182,7 @@ export function Leaderboard({ showPeriodSelector = true, defaultPeriod = 'week',
 
       {entries[0].change !== undefined && (
         <div className="rounded-lg bg-muted/50 p-3 text-center">
-          <p className="text-sm text-muted-foreground">Differenza dalla stagione precedente</p>
+          <p className="text-sm text-muted-foreground">{t('previousSeasonDifference')}</p>
           <p
             className={`text-2xl font-bold ${
               entries[0].change >= 0 ? 'text-green-500' : 'text-red-500'
@@ -183,13 +203,15 @@ interface LeaderboardRowProps {
   isCurrentPeriod: boolean;
 }
 
-const LeaderboardRow = memo(function LeaderboardRow({ entry, rank, isCurrentPeriod }: LeaderboardRowProps) {
+const LeaderboardRow = memo(function LeaderboardRow({
+  entry,
+  rank,
+  isCurrentPeriod,
+}: LeaderboardRowProps) {
   return (
     <div
       className={`flex items-center gap-2 sm:gap-3 rounded-lg border p-2 sm:p-3 transition-all ${
-        isCurrentPeriod
-          ? 'border-blue-500/50 bg-blue-500/10'
-          : 'border-muted bg-muted/30'
+        isCurrentPeriod ? 'border-blue-500/50 bg-blue-500/10' : 'border-muted bg-muted/30'
       }`}
     >
       <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted text-xs sm:text-sm font-semibold flex-shrink-0">
@@ -213,12 +235,25 @@ const LeaderboardRow = memo(function LeaderboardRow({ entry, rank, isCurrentPeri
   );
 });
 
-function getPeriodLabel(period: TimePeriod, type: 'current' | 'previous' | 'title' | 'tab'): string {
+function getPeriodLabel(
+  period: TimePeriod,
+  type: 'current' | 'previous' | 'title' | 'tab',
+): string {
   const labels: Record<TimePeriod, Record<typeof type, string>> = {
     today: { current: 'Oggi', previous: 'Ieri', title: 'Oggi', tab: 'Oggi' },
-    week: { current: 'Questa Settimana', previous: 'Settimana Scorsa', title: 'Settimana', tab: 'Settimana' },
-    season: { current: 'Stagione Corrente', previous: 'Stagione Precedente', title: 'Stagione', tab: 'Stagione' },
-    year: { current: 'Quest\'Anno', previous: 'Anno Scorso', title: 'Anno', tab: 'Anno' },
+    week: {
+      current: 'Questa Settimana',
+      previous: 'Settimana Scorsa',
+      title: 'Settimana',
+      tab: 'Settimana',
+    },
+    season: {
+      current: 'Stagione Corrente',
+      previous: 'Stagione Precedente',
+      title: 'Stagione',
+      tab: 'Stagione',
+    },
+    year: { current: "Quest'Anno", previous: 'Anno Scorso', title: 'Anno', tab: 'Anno' },
   };
   return labels[period][type];
 }

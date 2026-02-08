@@ -70,6 +70,9 @@
     "success": "Erfolgreich",
     "title": "Titel",
     "warning": "Warnung",
-    "yes": "Ja"
+    "yes": "Ja",
+    "parentAccess": {
+      "arialabelaccediAllaSezioneGenitori": "[TRANSLATE] aria-label=\"Accedi alla sezione genitori\""
+    }
   }
 }

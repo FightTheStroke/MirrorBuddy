@@ -41,7 +41,21 @@
         "title": "Utilisation des Maestri",
         "description": "Graphique d'utilisation des maestri",
         "loading": "Chargement...",
-        "noData": "Aucune donnée"
+        "noData": "Aucune donnée",
+        "top5Of": "[TRANSLATE] Top 5 di",
+        "totalSessions": "[TRANSLATE] sessioni totali",
+        "chartAriaLabel": "[TRANSLATE] Grafico utilizzo maestri",
+        "tableAriaLabel": "[TRANSLATE] Statistiche utilizzo maestri",
+        "sessions": "[TRANSLATE] Sessioni",
+        "sessionsLabel": "[TRANSLATE] sessioni",
+        "totalHours": "[TRANSLATE] h totali",
+        "tableHeaders": {
+          "maestro": "[TRANSLATE] Maestro",
+          "sessions": "[TRANSLATE] Sessioni",
+          "percentage": "[TRANSLATE] Percentuale",
+          "totalHours": "[TRANSLATE] Ore totali"
+        },
+        "noSessions": "[TRANSLATE] Nessuna sessione registrata"
       },
       "betaRequests": "Demandes Beta",
       "pendingApproval": "En attente d'approbation",
@@ -210,7 +224,14 @@
         "totalMessagesCol": "Messages totaux",
         "totalUsers": "Utilisateurs totaux",
         "totalUsersCol": "Utilisateurs totaux"
-      }
+      },
+      "buddiesAvailable": "[TRANSLATE] Buddy Disponibili",
+      "coachesAvailable": "[TRANSLATE] Coach Disponibili",
+      "maestriAvailable": "[TRANSLATE] Maestri Disponibili",
+      "toolsAvailable": "[TRANSLATE] Tool Disponibili",
+      "selectedCount": "[TRANSLATE] {selected} / {total} selezionati",
+      "selectAll": "[TRANSLATE] Seleziona tutti",
+      "deselectAll": "[TRANSLATE] Deseleziona tutti"
     },
     "users": {
       "confirmDelete": "Confirm delete",
@@ -258,7 +279,41 @@
         "emailRequired": "L'e-mail est obligatoire",
         "nameOptional": "Nom (optionnel)"
       },
-      "pageTitle": "Gestion des utilisateurs"
+      "pageTitle": "Gestion des utilisateurs",
+      "backToUsers": "[TRANSLATE] Torna agli Utenti",
+      "user": "[TRANSLATE] Utente",
+      "disabled": "[TRANSLATE] Disabilitato",
+      "active": "[TRANSLATE] Attivo",
+      "conversations": "[TRANSLATE] Conversazioni",
+      "last30Days": "[TRANSLATE] {count} ultimi 30 giorni",
+      "voiceMinutes": "[TRANSLATE] Minuti Voce",
+      "totalUsage": "[TRANSLATE] Utilizzo totale",
+      "flashcards": "[TRANSLATE] Flashcard",
+      "reviews": "[TRANSLATE] {count} revisioni",
+      "materials": "[TRANSLATE] Materiali",
+      "uploadedFiles": "[TRANSLATE] File caricati",
+      "userInfo": "[TRANSLATE] Info Utente",
+      "accountDetails": "[TRANSLATE] Dettagli account",
+      "username": "[TRANSLATE] Username",
+      "email": "[TRANSLATE] Email",
+      "created": "[TRANSLATE] Creato",
+      "lastActivity": "[TRANSLATE] Ultima Attività",
+      "role": "[TRANSLATE] Ruolo",
+      "topMaestri": "[TRANSLATE] Top Maestri",
+      "mostUsedTutors": "[TRANSLATE] Tutor AI più utilizzati",
+      "noConversationsYet": "[TRANSLATE] Nessuna conversazione ancora",
+      "sessions": "[TRANSLATE] {count} sessioni",
+      "settings": "[TRANSLATE] Impostazioni",
+      "userPreferences": "[TRANSLATE] Preferenze utente",
+      "language": "[TRANSLATE] Lingua",
+      "theme": "[TRANSLATE] Tema",
+      "accessibility": "[TRANSLATE] Accessibilità",
+      "activitySummary": "[TRANSLATE] Riepilogo Attività",
+      "engagementMetrics": "[TRANSLATE] Metriche di coinvolgimento",
+      "totalMessages": "[TRANSLATE] Messaggi Totali",
+      "avgMessagesPerConversation": "[TRANSLATE] Media Messaggi/Conversazione",
+      "flashcardReviewRate": "[TRANSLATE] Tasso Revisione Flashcard",
+      "restore": "[TRANSLATE] Ripristina"
     },
     "analytics": {
       "actionIrreversible": "Action Irreversible",
@@ -365,7 +420,17 @@
         "placeholder": "Placeholder",
         "reasonLabel": "Reason label",
         "title": "Titre"
-      }
+      },
+      "noRequestsFound": "[TRANSLATE] Nessuna richiesta trovata",
+      "selectAll": "[TRANSLATE] Seleziona tutti",
+      "request": "[TRANSLATE] Richiesta",
+      "status": "[TRANSLATE] Stato",
+      "motivation": "[TRANSLATE] Motivazione",
+      "directAdminInvite": "[TRANSLATE] Invito diretto admin",
+      "username": "[TRANSLATE] Username",
+      "statusPending": "[TRANSLATE] In attesa",
+      "statusApproved": "[TRANSLATE] Approvata",
+      "statusRejected": "[TRANSLATE] Rifiutata"
     },
     "locales": {
       "actions": "Actions",
@@ -480,6 +545,9 @@
       "total": "Total",
       "maestroUsageChart": {
         "title": "Titre"
+      },
+      "timeStudyChart": {
+        "chartAriaLabel": "[TRANSLATE] Grafico tempo di studio per materia"
       }
     },
     "dashboardTitle": "Tableau de bord",
@@ -708,6 +776,45 @@
     "common": {
       "back": "[TRANSLATE] Indietro",
       "close": "[TRANSLATE] Chiudi"
+    },
+    "businessKpi": {
+      "topCountries": "[TRANSLATE] Top Paesi",
+      "usersAndRevenueByCountry": "[TRANSLATE] Utenti e ricavi per paese",
+      "country": "[TRANSLATE] Paese",
+      "users": "[TRANSLATE] Utenti",
+      "revenue": "[TRANSLATE] Ricavi",
+      "notAvailable": "[TRANSLATE] N/D",
+      "requiresStripe": "[TRANSLATE] Richiede integrazione Stripe",
+      "noCountryData": "[TRANSLATE] Nessun dato paese disponibile",
+      "topMaestri": "[TRANSLATE] Top Maestri",
+      "mostPopularTeachers": "[TRANSLATE] Insegnanti AI più popolari",
+      "maestro": "[TRANSLATE] Maestro",
+      "sessions": "[TRANSLATE] Sessioni",
+      "avgDuration": "[TRANSLATE] Durata Media",
+      "durationNotTracked": "[TRANSLATE] Durata sessione non tracciata",
+      "noMaestriData": "[TRANSLATE] Nessun dato maestri disponibile"
+    },
+    "research": {
+      "loading": "[TRANSLATE] Caricamento Research Lab...",
+      "title": "[TRANSLATE] Research Lab",
+      "description": "[TRANSLATE] Esperimenti TutorBench — studenti sintetici vs maestri",
+      "benchmarkScores": "[TRANSLATE] Punteggi Benchmark",
+      "experiments": "[TRANSLATE] Esperimenti ({count})",
+      "name": "[TRANSLATE] Nome",
+      "maestro": "[TRANSLATE] Maestro",
+      "hypothesis": "[TRANSLATE] Ipotesi",
+      "status": "[TRANSLATE] Stato",
+      "turns": "[TRANSLATE] Turni",
+      "actions": "[TRANSLATE] Azioni",
+      "noExperiments": "[TRANSLATE] Nessun esperimento ancora. Creane uno via API.",
+      "running": "[TRANSLATE] In esecuzione...",
+      "run": "[TRANSLATE] Esegui"
+    },
+    "mobileNav": {
+      "openMenu": "[TRANSLATE] Apri menu di navigazione",
+      "menu": "[TRANSLATE] Menu",
+      "closeMenu": "[TRANSLATE] Chiudi menu",
+      "returnToApp": "[TRANSLATE] Torna all'app"
     }
   }
 }

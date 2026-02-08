@@ -3,6 +3,7 @@
  */
 
 import { Filter, Search, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import {
   Select,
   SelectContent,
@@ -38,6 +39,7 @@ export function TeacherDiaryFilters({
   maestriOptions,
   subjectsOptions,
 }: TeacherDiaryFiltersProps) {
+  const t = useTranslations('settings.parentDashboard');
   return (
     <div className="mt-2 space-y-4">
       {/* Search input */}
@@ -47,14 +49,14 @@ export function TeacherDiaryFilters({
           type="text"
           value={searchQuery}
           onChange={(e) => onSearchChange(e.target.value)}
-          placeholder="Cerca nelle osservazioni..."
+          placeholder={t('searchPlaceholder')}
           className="w-full pl-10 pr-10 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
         />
         {searchQuery && (
           <button
             onClick={() => onSearchChange('')}
             className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700"
-            aria-label="Cancella ricerca"
+            aria-label={t('clearSearchAriaLabel')}
           >
             <X className="h-4 w-4 text-slate-400" />
           </button>
@@ -65,19 +67,17 @@ export function TeacherDiaryFilters({
       <div>
         <div className="flex items-center gap-2 mb-3">
           <Filter className="h-4 w-4 text-slate-500" />
-          <span className="text-sm text-slate-600 dark:text-slate-400">
-            Filtri:
-          </span>
+          <span className="text-sm text-slate-600 dark:text-slate-400">{t('filters')}</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {/* Maestro filter */}
           <Select value={selectedMaestro} onValueChange={onMaestroChange}>
             <SelectTrigger className="w-full h-9">
-              <SelectValue placeholder="Tutti i Professori" />
+              <SelectValue placeholder={t('allTeachers')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tutti i Professori</SelectItem>
+              <SelectItem value="all">{t('allTeachers')}</SelectItem>
               {maestriOptions.map((m) => (
                 <SelectItem key={m.id} value={m.id}>
                   {m.name}
@@ -89,10 +89,10 @@ export function TeacherDiaryFilters({
           {/* Subject filter */}
           <Select value={selectedSubject} onValueChange={onSubjectChange}>
             <SelectTrigger className="w-full h-9">
-              <SelectValue placeholder="Tutte le materie" />
+              <SelectValue placeholder={t('allSubjects')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Tutte le materie</SelectItem>
+              <SelectItem value="all">{t('allSubjects')}</SelectItem>
               {subjectsOptions.map((s) => (
                 <SelectItem key={s} value={s}>
                   {SUBJECT_NAMES[s] || getMaestroSubject(s) || s}

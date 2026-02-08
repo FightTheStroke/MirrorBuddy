@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { getAllMaestri, SUBJECT_NAMES } from "@/data/maestri";
+import { useTranslations } from 'next-intl';
+import { getAllMaestri, SUBJECT_NAMES } from '@/data/maestri';
 
 interface MaestriSectionProps {
   formData: {
@@ -10,6 +11,7 @@ interface MaestriSectionProps {
 }
 
 export function MaestriSection({ formData, onChange }: MaestriSectionProps) {
+  const t = useTranslations('admin');
   const maestri = getAllMaestri();
 
   // Group by subject
@@ -48,11 +50,9 @@ export function MaestriSection({ formData, onChange }: MaestriSectionProps) {
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Maestri Disponibili
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('tiers.maestriAvailable')}</h2>
           <p className="text-sm text-muted-foreground">
-            {selectedCount} / {maestri.length} selezionati
+            {t('tiers.selectedCount', { selected: selectedCount, total: maestri.length })}
           </p>
         </div>
         <div className="flex gap-2">
@@ -61,7 +61,7 @@ export function MaestriSection({ formData, onChange }: MaestriSectionProps) {
             onClick={selectAll}
             className="text-xs text-primary hover:underline"
           >
-            Seleziona tutti
+            {t('tiers.selectAll')}
           </button>
           <span className="text-slate-300">|</span>
           <button
@@ -69,7 +69,7 @@ export function MaestriSection({ formData, onChange }: MaestriSectionProps) {
             onClick={selectNone}
             className="text-xs text-primary hover:underline"
           >
-            Deseleziona tutti
+            {t('tiers.deselectAll')}
           </button>
         </div>
       </div>
@@ -88,16 +88,14 @@ export function MaestriSection({ formData, onChange }: MaestriSectionProps) {
                     key={maestro.id}
                     className={`flex items-center gap-2 p-2 rounded-lg border cursor-pointer transition-colors ${
                       isEnabled(maestro.id)
-                        ? "border-primary bg-primary/5"
-                        : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                        ? 'border-primary bg-primary/5'
+                        : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isEnabled(maestro.id)}
-                      onChange={(e) =>
-                        handleToggle(maestro.id, e.target.checked)
-                      }
+                      onChange={(e) => handleToggle(maestro.id, e.target.checked)}
                       className="w-4 h-4 text-primary border-slate-300 rounded focus:ring-2 focus:ring-primary"
                     />
                     <span className="text-sm">{maestro.displayName}</span>

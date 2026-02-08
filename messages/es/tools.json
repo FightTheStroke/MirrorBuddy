@@ -193,7 +193,11 @@
       "titlePlaceholder": "Título del resumen",
       "unsaved": "No guardado",
       "word": "Palabra",
-      "words": "Palabras"
+      "words": "Palabras",
+      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
+      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
+      "deleteSection": "[TRANSLATE] Elimina sezione",
+      "editTitle": "[TRANSLATE] Modifica titolo"
     },
     "diagram": {
       "label": "Diagramma",
@@ -352,7 +356,13 @@
     "flashcards": {
       "ratingQuestion": "Pregunta de calificación",
       "label": "Tarjeta",
-      "description": "Estudia con tarjetas para memorizar mejor"
+      "description": "Estudia con tarjetas para memorizar mejor",
+      "completed": "[TRANSLATE] Completato!",
+      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
+      "continue": "[TRANSLATE] Continua",
+      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
     },
     "loading": {
       "cancelled": "Cancelado",
@@ -399,6 +409,11 @@
       "zoomOut": {
         "ariaLabel": "Alejar",
         "title": "Alejar"
+      },
+      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "undo": {
+        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
+        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
       }
     },
     "print": {
@@ -467,7 +482,8 @@
       "capabilityPdf": "Cargar PDFs desde Drive para generar materiales de estudio",
       "capabilityHomework": "Importar documentos para el asistente de tareas",
       "capabilityDocuments": "Acceder a tus documentos sin tener que descargarlos",
-      "privacyNotice": "MirrorBuddy accede a los archivos solo con tu autorización. No almacenamos tus archivos de Drive."
+      "privacyNotice": "MirrorBuddy accede a los archivos solo con tu autorización. No almacenamos tus archivos de Drive.",
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
     },
     "astuccio": {
       "title": "Estuche de herramientas",
@@ -551,6 +567,9 @@
       "saveError": "Error al guardar la foto",
       "purpose": "Tomar una foto",
       "instructions": "Encuadra el documento o la pizarra y toma la foto"
+    },
+    "pomodoro": {
+      "iniziaFocus": "[TRANSLATE] Inizia Focus"
     }
   }
 }

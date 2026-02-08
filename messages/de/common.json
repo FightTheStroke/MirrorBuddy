@@ -165,6 +165,32 @@
       "settings": "Einstellungen",
       "logout": "Abmelden",
       "logoutConfirm": "Sind Sie sicher, dass Sie sich abmelden möchten?"
+    },
+    "notifications": {
+      "cancellaTutteLeNotifiche": "[TRANSLATE] Cancella tutte le notifiche",
+      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\"",
+      "arialabeleliminaNotifica": "[TRANSLATE] aria-label=\"Elimina notifica\""
+    },
+    "pwa": {
+      "selezionaQuotaggiungiAllaSchermata": "[TRANSLATE] Seleziona &quot;Aggiungi alla schermata Home&quot;",
+      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
+    },
+    "tier": {
+      "allMaestri": "[TRANSLATE] All Maestri"
+    },
+    "trial": {
+      "continuaConLaProva": "[TRANSLATE] Continua con la prova limitata",
+      "tuttiI17Maestri": "[TRANSLATE] Tutti i 17 Maestri e 5 Coach",
+      "chatIllimitateConI": "[TRANSLATE] Chat illimitate con i Maestri",
+      "registratiPerAccessoIllimitato": "[TRANSLATE] Registrati per accesso illimitato",
+      "3Maestri": "[TRANSLATE] 3 Maestri",
+      "vuoiLaposaccessoCompletoRichiedi": "[TRANSLATE] Vuoi l&apos;accesso completo? Richiedi la beta",
+      "saltaIntroduzione": "[TRANSLATE] Salta introduzione",
+      "avanti": "[TRANSLATE] Avanti",
+      "accessoCompletoATutti": "[TRANSLATE] Accesso completo a tutti i Maestri e strumenti"
+    },
+    "toast": {
+      "arialabelchiudiNotifica": "[TRANSLATE] aria-label=\"Chiudi notifica\""
     }
   }
 }

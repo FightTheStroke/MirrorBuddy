@@ -3,20 +3,21 @@
  * @brief Search and controls bar component
  */
 
-import { motion } from "framer-motion";
-import { Search, X, Grid, List } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { motion } from 'framer-motion';
+import { Search, X, Grid, List } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
-import { SORT_OPTIONS } from "@/components/education/archive";
-import type { SortBy, ViewMode } from "@/components/education/archive";
+} from '@/components/ui/select';
+import { cn } from '@/lib/utils';
+import { SORT_OPTIONS } from '@/components/education/archive';
+import type { SortBy, ViewMode } from '@/components/education/archive';
 
 interface SearchControlsProps {
   searchQuery: string;
@@ -41,6 +42,8 @@ export function SearchControls({
   filteredCount,
   onClearFilters,
 }: SearchControlsProps) {
+  const t = useTranslations('education.supporti.search');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
@@ -53,17 +56,17 @@ export function SearchControls({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Cerca nei tuoi materiali..."
+            placeholder={t('placeholder')}
             value={searchQuery}
             onChange={(e) => onSearchChange(e.target.value)}
             className="pl-10 h-11 text-base"
-            aria-label="Cerca materiali"
+            aria-label={t('label')}
           />
           {searchQuery && (
             <button
-              onClick={() => onSearchChange("")}
+              onClick={() => onSearchChange('')}
               className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded"
-              aria-label="Cancella ricerca"
+              aria-label={t('clearAriaLabel')}
             >
               <X className="w-4 h-4 text-muted-foreground" />
             </button>
@@ -72,25 +75,17 @@ export function SearchControls({
 
         <div className="flex items-center gap-2">
           <span className="text-sm text-muted-foreground">
-            {filteredCount} {filteredCount === 1 ? "risultato" : "risultati"}
+            {filteredCount} {filteredCount === 1 ? 'risultato' : 'risultati'}
           </span>
           {hasActiveFilters && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={onClearFilters}
-              className="ml-2"
-            >
+            <Button variant="outline" size="sm" onClick={onClearFilters} className="ml-2">
               Resetta filtri
             </Button>
           )}
         </div>
 
         <Select value={sortBy} onValueChange={(v) => onSortChange(v as SortBy)}>
-          <SelectTrigger
-            className="w-full sm:w-[160px] h-11"
-            aria-label="Ordina per"
-          >
+          <SelectTrigger className="w-[160px] h-11" aria-label="Ordina per">
             <SelectValue placeholder="Ordina per" />
           </SelectTrigger>
           <SelectContent>
@@ -107,12 +102,12 @@ export function SearchControls({
             variant="ghost"
             size="icon"
             className={cn(
-              "rounded-r-none h-11 w-11",
-              viewMode === "grid" && "bg-slate-100 dark:bg-slate-700",
+              'rounded-r-none h-11 w-11',
+              viewMode === 'grid' && 'bg-slate-100 dark:bg-slate-700',
             )}
-            onClick={() => onViewModeChange("grid")}
+            onClick={() => onViewModeChange('grid')}
             aria-label="Vista griglia"
-            aria-pressed={viewMode === "grid"}
+            aria-pressed={viewMode === 'grid'}
           >
             <Grid className="w-5 h-5" />
           </Button>
@@ -120,12 +115,12 @@ export function SearchControls({
             variant="ghost"
             size="icon"
             className={cn(
-              "rounded-l-none h-11 w-11",
-              viewMode === "list" && "bg-slate-100 dark:bg-slate-700",
+              'rounded-l-none h-11 w-11',
+              viewMode === 'list' && 'bg-slate-100 dark:bg-slate-700',
             )}
-            onClick={() => onViewModeChange("list")}
+            onClick={() => onViewModeChange('list')}
             aria-label="Vista lista"
-            aria-pressed={viewMode === "list"}
+            aria-pressed={viewMode === 'list'}
           >
             <List className="w-5 h-5" />
           </Button>

@@ -182,9 +182,13 @@
     "summary": {
       "label": "Riassunto",
       "description": "Genera riassunti automatici dei contenuti",
+      "addKeyPoint": "Aggiungi punto",
       "cancel": "Annulla",
       "convertToMindmap": "Converti in Mappa Mentale",
+      "deleteKeyPoint": "Elimina punto",
+      "deleteSection": "Elimina sezione",
       "edit": "Modifica",
+      "editTitle": "Modifica titolo",
       "exportPdf": "Esporta PDF",
       "generateFlashcards": "Genera Flashcard",
       "hide": "Nascondi",
@@ -361,7 +365,13 @@
     "flashcards": {
       "ratingQuestion": "Quanto ricordi questa carta?",
       "label": "Flashcard",
-      "description": "Studia con flashcard per memorizzare meglio"
+      "description": "Studia con flashcard per memorizzare meglio",
+      "completed": "Completato!",
+      "reviewedAllCards": "Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "Carte riviste: {count}",
+      "continue": "Continua",
+      "swipeHint": "Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "Premi o scorri per valutare"
     },
     "loading": {
       "cancelled": "Annullato",
@@ -374,16 +384,16 @@
     },
     "markmap": {
       "accessibility": {
-        "ariaLabel": "Etichetta aria",
-        "title": "Titolo"
+        "ariaLabel": "Attiva/disattiva modalita accessibilita",
+        "title": "Modalita accessibilita"
       },
       "download": {
-        "ariaLabel": "Etichetta aria",
-        "title": "Titolo"
+        "ariaLabel": "Scarica mappa come Markdown",
+        "title": "Scarica Markdown"
       },
       "error": "Errore",
       "fullscreen": {
-        "ariaLabelEnter": "Entra a schermo intero",
+        "ariaLabelEnter": "Schermo intero",
         "ariaLabelExit": "Esci da schermo intero",
         "enter": "Entra",
         "exit": "Esci"
@@ -392,22 +402,27 @@
       "interactiveMindmapDescription": "Descrizione mappa mentale interattiva",
       "interactiveRenderMessage": "Messaggio rendering interattivo",
       "mindmapDescription": "Descrizione mappa mentale",
+      "nodesCount": "({count} nodi)",
       "print": {
-        "ariaLabel": "Etichetta aria",
-        "title": "Titolo"
+        "ariaLabel": "Stampa mappa mentale",
+        "title": "Stampa"
       },
       "resetView": {
-        "ariaLabel": "Reimposta vista",
-        "title": "Titolo"
+        "ariaLabel": "Ripristina vista",
+        "title": "Ripristina vista"
       },
       "successMessage": "Messaggio di successo",
+      "undo": {
+        "ariaLabel": "Annulla ultima modifica",
+        "title": "Annulla (Ctrl+Z)"
+      },
       "zoomIn": {
-        "ariaLabel": "Ingrandisci",
-        "title": "Titolo"
+        "ariaLabel": "Aumenta zoom",
+        "title": "Aumenta zoom"
       },
       "zoomOut": {
-        "ariaLabel": "Rimpicciolisci",
-        "title": "Titolo"
+        "ariaLabel": "Riduci zoom",
+        "title": "Riduci zoom"
       }
     },
     "print": {
@@ -476,7 +491,8 @@
       "capabilityPdf": "Caricare PDF da Drive per generare materiali di studio",
       "capabilityHomework": "Importare documenti per l'assistente compiti",
       "capabilityDocuments": "Accedere ai tuoi documenti senza doverli scaricare",
-      "privacyNotice": "MirrorBuddy accede ai file solo con la tua autorizzazione. Non memorizziamo i tuoi file su Drive."
+      "privacyNotice": "MirrorBuddy accede ai file solo con la tua autorizzazione. Non memorizziamo i tuoi file su Drive.",
+      "selezionaDaGoogleDrive": "Seleziona da Google Drive"
     },
     "astuccio": {
       "title": "Astuccio",
@@ -551,6 +567,9 @@
         "printPdf": "Stampa PDF",
         "downloadHtml": "Scarica HTML"
       }
+    },
+    "pomodoro": {
+      "iniziaFocus": "Inizia Focus"
     }
   }
 }

@@ -1,23 +1,15 @@
-"use client";
+'use client';
 
-import { motion } from "framer-motion";
-import Link from "next/link";
-import { useTranslations } from "next-intl";
-import {
-  Flame,
-  Coins,
-  BookOpen,
-  Clock,
-  Star,
-  Menu,
-  MessageCircle,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
-import { NotificationBell } from "@/components/notifications/notification-bell";
-import { ToolsDropdown } from "@/components/tools";
-import { TierBadge } from "@/components/tier/TierBadge";
-import { TrialHeaderDropdown } from "@/components/trial";
-import type { TierName } from "@/types/tier-types";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Flame, Coins, BookOpen, Clock, Star, Menu, MessageCircle } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { NotificationBell } from '@/components/notifications/notification-bell';
+import { ToolsDropdown } from '@/components/tools';
+import { TierBadge } from '@/components/tier/TierBadge';
+import { TrialHeaderDropdown } from '@/components/trial';
+import type { TierName } from '@/types/tier-types';
 
 interface TrialStatus {
   isTrialMode: boolean;
@@ -61,7 +53,7 @@ export function HomeHeader({
   userTier,
   isSimulatedTier,
 }: HomeHeaderProps) {
-  const t = useTranslations("home");
+  const t = useTranslations('home');
   const hours = Math.floor(totalStudyMinutes / 60);
   const minutes = totalStudyMinutes % 60;
   const studyTimeStr = hours > 0 ? `${hours}h${minutes}m` : `${minutes}m`;
@@ -69,8 +61,8 @@ export function HomeHeader({
   return (
     <header
       className={cn(
-        "fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300",
-        sidebarOpen ? "lg:left-64" : "lg:left-20",
+        'fixed top-0 left-0 right-0 h-14 z-50 flex items-center justify-between px-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-700/50 transition-all duration-300',
+        sidebarOpen ? 'lg:left-64' : 'lg:left-20',
       )}
     >
       {/* Greeting + Level + MirrorBucks Progress */}
@@ -78,18 +70,16 @@ export function HomeHeader({
         <button
           onClick={onMenuClick}
           className="lg:hidden flex items-center justify-center h-11 w-11 rounded-md text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
-          aria-label="Apri menu"
+          aria-label={t('header.openMenu')}
         >
           <Menu className="h-5 w-5" />
         </button>
         {userName && (
           <div className="hidden sm:flex items-baseline gap-1 mr-2">
             <span className="text-sm text-slate-600 dark:text-slate-400">
-              {t("header.greeting")}
+              {t('header.greeting')}
             </span>
-            <span className="text-sm font-semibold text-slate-900 dark:text-white">
-              {userName}
-            </span>
+            <span className="text-sm font-semibold text-slate-900 dark:text-white">{userName}</span>
           </div>
         )}
         <div className="w-8 h-8 rounded-full bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center flex-shrink-0 shadow-lg">
@@ -97,9 +87,7 @@ export function HomeHeader({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 text-sm">
-            <span className="font-bold text-slate-900 dark:text-white">
-              Lv.{seasonLevel}
-            </span>
+            <span className="font-bold text-slate-900 dark:text-white">Lv.{seasonLevel}</span>
             <span className="text-xs text-amber-600 dark:text-amber-400 font-medium">
               {seasonName}
             </span>
@@ -124,9 +112,7 @@ export function HomeHeader({
         {streak.current > 0 && (
           <div className="flex items-center gap-1" title="Streak">
             <Flame className="w-4 h-4 text-orange-500" />
-            <span className="font-semibold text-orange-500 text-xs">
-              {streak.current}
-            </span>
+            <span className="font-semibold text-orange-500 text-xs">{streak.current}</span>
           </div>
         )}
 
@@ -135,12 +121,12 @@ export function HomeHeader({
           <Link
             href="/invite/request"
             className={cn(
-              "flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-colors",
+              'flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium transition-colors',
               trialStatus.chatsRemaining <= 3
-                ? "bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300"
-                : "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300",
+                ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300'
+                : 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300',
             )}
-            title="Clicca per richiedere accesso completo"
+            title={t('header.requestFullAccess')}
           >
             <MessageCircle className="w-3 h-3" />
             <span className="font-semibold">
@@ -157,50 +143,39 @@ export function HomeHeader({
       <div className="hidden md:flex items-center gap-4 text-sm">
         <div className="flex items-center gap-1.5" title="Streak">
           <Flame
-            className={cn(
-              "w-4 h-4",
-              streak.current > 0 ? "text-orange-500" : "text-slate-400",
-            )}
+            className={cn('w-4 h-4', streak.current > 0 ? 'text-orange-500' : 'text-slate-400')}
           />
           <span
             className={cn(
-              "font-semibold",
-              streak.current > 0 ? "text-orange-500" : "text-slate-500",
+              'font-semibold',
+              streak.current > 0 ? 'text-orange-500' : 'text-slate-500',
             )}
           >
             {streak.current}
           </span>
         </div>
 
-        <div
-          className="flex items-center gap-1.5"
-          title="Sessioni questa settimana"
-        >
+        <div className="flex items-center gap-1.5" title={t('header.sessionsThisWeek')}>
           <BookOpen className="w-4 h-4 text-accent-themed" />
           <span className="font-semibold text-slate-700 dark:text-slate-300">
             {sessionsThisWeek}
           </span>
         </div>
 
-        <div className="flex items-center gap-1.5" title="Tempo di studio">
+        <div className="flex items-center gap-1.5" title={t('header.studyTime')}>
           <Clock className="w-4 h-4 text-green-500" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300">
-            {studyTimeStr}
-          </span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">{studyTimeStr}</span>
         </div>
 
-        <div className="flex items-center gap-1.5" title="Domande fatte">
+        <div className="flex items-center gap-1.5" title={t('header.questionsAsked')}>
           <Star className="w-4 h-4 text-purple-500" />
-          <span className="font-semibold text-slate-700 dark:text-slate-300">
-            {questionsAsked}
-          </span>
+          <span className="font-semibold text-slate-700 dark:text-slate-300">{questionsAsked}</span>
         </div>
 
         {/* Streak bonus badge */}
         {streak.current >= 3 && (
           <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 text-xs font-medium">
-            <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}%
-            MB
+            <Flame className="w-3 h-3" />+{Math.min(streak.current * 10, 50)}% MB
           </div>
         )}
 
@@ -218,11 +193,9 @@ export function HomeHeader({
       <div className="hidden lg:flex items-center gap-3">
         {userTier && !trialStatus?.isTrialMode && (
           <div className="flex items-center gap-1">
-            <TierBadge tier={userTier} showIcon={userTier === "pro"} />
+            <TierBadge tier={userTier} showIcon={userTier === 'pro'} />
             {isSimulatedTier && (
-              <span className="text-[10px] text-amber-500 font-medium">
-                (SIM)
-              </span>
+              <span className="text-[10px] text-amber-500 font-medium">(SIM)</span>
             )}
           </div>
         )}

@@ -236,6 +236,7 @@
       "motorTimeoutLabel": "Motor Timeout Label",
       "motorTitle": "Motor Title",
       "panelTitle": "Accessibilità",
+      "categoriesAriaLabel": "Categorie accessibilità",
       "pomodoroDesc": "Pomodoro Desc",
       "pomodoroTimer": "Pomodoro Timer",
       "presetADHD": "Preset A D H D",
@@ -494,7 +495,8 @@
       "troubleshooting": "Troubleshooting",
       "voiceNotWorking": "Voice Not Working",
       "voiceNotWorkingDescription": "Voice Not Working Description",
-      "voiceTest": "Voice Test"
+      "voiceTest": "Voice Test",
+      "titleaggiornaListaWebcam": "title=\"Aggiorna lista webcam\""
     },
     "aiProvider": {
       "active": "Attivo",
@@ -516,7 +518,11 @@
       "webSearchActive": "Web Search Active",
       "webSearchLimited": "Web Search Limited",
       "webSearchTitle": "Web Search Title",
-      "wikipediaSource": "Wikipedia Source"
+      "wikipediaSource": "Wikipedia Source",
+      "webSearchBraveConfigured": "Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
+      "webSearchGetApiKey": "Ottieni una API key gratuita su",
+      "webSearchAddKey": "e aggiungi: BRAVE_SEARCH_API_KEY",
+      "webSearchWebsite": "brave.com/search/api"
     },
     "onboarding": {
       "confirmDialog": {
@@ -850,6 +856,163 @@
         "topic": "Topic",
         "topicPlaceholder": "Topic Placeholder"
       }
+    },
+    "parentDashboard": {
+      "strengthsPoints": "Punti di forza",
+      "strengthsTitle": "Punti di Forza",
+      "showLess": "Mostra meno",
+      "showAll": "Mostra tutti",
+      "observingMessage": "I Professori stanno ancora osservando. Torna presto!",
+      "growthAreasTitle": "Aree di Crescita",
+      "growthAreasSubtitle": "Aree dove {name} puo migliorare con il giusto supporto",
+      "focusRecommended": "Focus consigliato:",
+      "noGrowthAreas": "Nessuna area di crescita identificata ancora.",
+      "learningStyleTitle": "Stile di Apprendimento",
+      "preferredChannel": "Canale Preferito",
+      "optimalDuration": "Durata Ottimale",
+      "optimalDurationMinutes": "{minutes} minuti",
+      "bestMoment": "Momento Migliore",
+      "motivators": "Cosa lo motiva",
+      "suggestedStrategies": "Strategie Suggerite",
+      "quiz": "Quiz",
+      "quizCompleted": "Quiz completati",
+      "quizAverage": "Media",
+      "quizRecord": "Record",
+      "quizBySubject": "Per materia",
+      "streak": "Streak",
+      "streakDays": "giorni",
+      "streakRecord": "record",
+      "streakDailyGoal": "Obiettivo giornaliero",
+      "streakLast30Days": "Ultimi 30 giorni",
+      "teacherObservations": "Osservazioni dei Professori",
+      "loadingObservations": "Caricamento osservazioni",
+      "noObservationsYet": "Nessuna osservazione ancora disponibile.",
+      "observationsAfterSessions": "Le osservazioni dei maestri appariranno qui dopo alcune sessioni di studio.",
+      "diaryTitle": "Diario dei Professori",
+      "diarySubtitle": "Osservazioni e suggerimenti dei Professori su {name}",
+      "searchPlaceholder": "Cerca nelle osservazioni...",
+      "clearSearch": "Cancella ricerca",
+      "filters": "Filtri:",
+      "allTeachers": "Tutti i Professori",
+      "allSubjects": "Tutte le materie",
+      "periodAll": "Tutto",
+      "periodWeek": "Ultima settimana",
+      "periodMonth": "Ultimo mese",
+      "period3Months": "Ultimi 3 mesi",
+      "noObservationsFiltered": "Nessuna osservazione ancora",
+      "observationsStart": "I Professori inizieranno a scrivere le loro osservazioni dopo le prime conversazioni con {name}.",
+      "observationsCount": "{count} osservazioni",
+      "progressTitle": "Progressi nel Tempo",
+      "progressSubtitle": "Andamento delle osservazioni dei Professori su {name}",
+      "progressEmptyMessage": "I progressi verranno visualizzati dopo le prime sessioni con i Professori.",
+      "strengthsLabel": "Punti di Forza",
+      "activityLabel": "Attivita",
+      "trendLabel": "Tendenza",
+      "trendPositive": "Positiva",
+      "trendGrowing": "In crescita",
+      "trendIncreasing": "In aumento",
+      "trendDecreasing": "In calo",
+      "trendStable": "Stabile",
+      "trendMoreActive": "Piu attivo",
+      "trendLessActive": "Meno attivo",
+      "trendConstant": "Costante",
+      "trendMoreStrengths": "Piu punti di forza che aree di crescita",
+      "trendFocusGrowth": "Focus su aree di miglioramento",
+      "strengthsLegend": "Punti di forza",
+      "growthAreasLegend": "Aree di crescita",
+      "lastWeeks": "Ultime {count} settimane",
+      "totalObservations": "Totale osservazioni nel periodo:",
+      "streakActivityAriaLabel": "Streak e calendario attività",
+      "calendarActivityAriaLabel": "Calendario attività",
+      "observationsTeacherAriaLabel": "Osservazioni dei professori",
+      "progressTimelineTitle": "Progressi nel Tempo",
+      "progressTimelineEmptyDesc": "I progressi verranno visualizzati dopo le prime sessioni con i Professori.",
+      "clearSearchAriaLabel": "Cancella ricerca",
+      "noObservationsEmpty": "Nessuna osservazione ancora"
+    },
+    "aiProviderSettings": {
+      "webSearchBraveConfigured": "Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
+      "webSearchGetApiKey": "Ottieni una API key gratuita su",
+      "webSearchAddKey": "e aggiungi: BRAVE_SEARCH_API_KEY",
+      "webSearchWebsite": "brave.com/search/api",
+      "saving": "Salvataggio...",
+      "configurationSaved": "Configurazione Salvata",
+      "saveConfiguration": "Salva Configurazione",
+      "savedLocallyMessage": "Configurazione salvata localmente. Per attivare i costi, aggiungi anche le variabili nel file .env del server.",
+      "envVariablesRequired": "Variabili .env richieste:",
+      "saveAvailabilityBudget": "Salva Budget Disponibilità",
+      "totalCostMonthly": "Costo Totale (Mensile)",
+      "costsTitle": "Costi Azure OpenAI",
+      "costManagementNotConfigured": "Cost Management non configurato",
+      "costManagementInstructions": "Per visualizzare i costi Azure, configura un Service Principal con ruolo \"Cost Management Reader\":",
+      "showConfigForm": "Mostra form di configurazione",
+      "costsLast30Days": "Ultimi 30 giorni",
+      "costsEndOfMonth": "Stima fine mese",
+      "costsUnavailable": "Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi.",
+      "cameraPreviewMessage": "Clicca \"Testa\" per vedere l'anteprima",
+      "cameraLive": "LIVE",
+      "cameraDefaultSystem": "Predefinito di sistema",
+      "cameraWebcam": "Webcam",
+      "cameraRefreshDevices": "Aggiorna dispositivi",
+      "cameraTest": "Testa",
+      "cameraStop": "Stop",
+      "microphoneNoDeviceSelected": "Nessun dispositivo selezionato",
+      "cameraTestClickMessage": "Clicca \"Testa\" per vedere l'anteprima",
+      "diagnosticsPreviewTitle": "Anteprima",
+      "characterMaxSelectInfo": "Puoi selezionare fino a 3 personaggi come preferiti",
+      "characterMaxSelectWarning": "Hai raggiunto il limite di 3 personaggi preferiti",
+      "privacyDeleteAllData": "Elimina tutti i dati",
+      "privacyDeleteAnytime": "Puoi eliminare i tuoi dati in qualsiasi momento",
+      "privacyNoDataShared": "I tuoi dati non vengono condivisi con terze parti",
+      "privacyConversationsNotRecorded": "Le conversazioni non vengono registrate permanentemente",
+      "privacyDataStoredLocally": "I dati sono archiviati localmente nel tuo browser",
+      "settingsMobileAriaLabel": "Impostazioni",
+      "costsSection": {
+        "tokenToEurRate": "1M token = € {rate}"
+      },
+      "cameraPreview": {
+        "stopPreview": "Ferma anteprima"
+      },
+      "microphoneSelector": {
+        "testMicrophone": "Testa microfono"
+      },
+      "characterSettings": {
+        "appearance": "Aspetto",
+        "voice": "Voce",
+        "personality": "Personalità",
+        "preferredSettings": "Impostazioni preferite",
+        "resetToDefault": "Ripristina predefiniti",
+        "max3Characters": "Massimo 3 personaggi"
+      },
+      "diagnosticCards": {
+        "speaking": "In ascolto..."
+      },
+      "waveformVisualization": {
+        "noActivity": "Nessuna attività"
+      },
+      "webcamPreview": {
+        "stopCamera": "Ferma fotocamera"
+      },
+      "settingsPageMobile": {
+        "openSettings": "Apri impostazioni"
+      }
+    },
+    "costsSection": {
+      "impossibileRecuperareIDati": "Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi."
+    },
+    "audioSettings": {
+      "titleaggiornaDispositivi": "title=\"Aggiorna dispositivi\""
+    },
+    "characterSettings": {
+      "ilCoachTiInsegna": "Il coach ti insegna il metodo, il buddy ti supporta emotivamente,\n              e i Professori ti spiegano le materie. Insieme formano il tuo team\n              di apprendimento personalizzato!",
+      "scegliIColoriDei": "Scegli i colori dei bordi per riconoscere coach e buddy negli avatar",
+      "ilBuddyEUn": "Il buddy e un amico della tua eta che capisce le tue difficolta e ti\n            supporta",
+      "ilTuoMirrorbuddy": "Il Tuo MirrorBuddy",
+      "ilCoachTiAiuta": "Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare\n            autonomo",
+      "ilTuoCoachDi": "Il Tuo Coach di Apprendimento"
+    },
+    "settingsPageMobile": {
+      "arialabelindietro": "aria-label=\"Indietro\""
     }
   }
 }

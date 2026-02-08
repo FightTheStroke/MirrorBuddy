@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useTranslations } from 'next-intl';
+import { useState } from 'react';
 import {
   Star,
   TrendingUp,
@@ -18,21 +18,21 @@ import {
   Sun,
   Sunset,
   Moon,
-} from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { StudentInsights } from "@/types";
-import { CATEGORY_LABELS } from "./parent-dashboard/constants";
-import { ObservationCard } from "./parent-dashboard/observation-card";
-import { StrategyCard } from "./parent-dashboard/strategy-card";
+} from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { StudentInsights } from '@/types';
+import { CATEGORY_LABELS } from './parent-dashboard/constants';
+import { ObservationCard } from './parent-dashboard/observation-card';
+import { StrategyCard } from './parent-dashboard/strategy-card';
 
 interface ParentDashboardProps {
   insights: StudentInsights;
 }
 
 export function ParentDashboard({ insights }: ParentDashboardProps) {
-  const t = useTranslations("education.parentDashboard");
+  const t = useTranslations('settings.parentDashboard');
   const [expandedStrengths, setExpandedStrengths] = useState(false);
   const [expandedGrowth, setExpandedGrowth] = useState(false);
 
@@ -40,31 +40,31 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
   const CHANNEL_CONFIG = {
     visual: {
       icon: Eye,
-      label: t("learningChannelVisual"),
-      color: "text-blue-500",
+      label: t('learningChannelVisual'),
+      color: 'text-blue-500',
     },
     auditory: {
       icon: Ear,
-      label: t("learningChannelAuditory"),
-      color: "text-purple-500",
+      label: t('learningChannelAuditory'),
+      color: 'text-purple-500',
     },
     kinesthetic: {
       icon: Hand,
-      label: t("learningChannelKinesthetic"),
-      color: "text-green-500",
+      label: t('learningChannelKinesthetic'),
+      color: 'text-green-500',
     },
     reading_writing: {
       icon: FileText,
-      label: t("learningChannelReadingWriting"),
-      color: "text-orange-500",
+      label: t('learningChannelReadingWriting'),
+      color: 'text-orange-500',
     },
   };
 
   // Time of day icons (dynamic with translations)
   const TIME_CONFIG = {
-    morning: { icon: Sun, label: t("timeOfDayMorning") },
-    afternoon: { icon: Sunset, label: t("timeOfDayAfternoon") },
-    evening: { icon: Moon, label: t("timeOfDayEvening") },
+    morning: { icon: Sun, label: t('timeOfDayMorning') },
+    afternoon: { icon: Sunset, label: t('timeOfDayAfternoon') },
+    evening: { icon: Moon, label: t('timeOfDayEvening') },
   };
 
   const channel = CHANNEL_CONFIG[insights.learningStyle.preferredChannel];
@@ -76,14 +76,14 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
       <div className="flex items-start justify-between">
         <div>
           <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
-            {t("profileTitle", { name: insights.studentName })}
+            {t('profileTitle', { name: insights.studentName })}
           </h1>
           <p className="text-slate-600 dark:text-slate-400 mt-1">
-            {t("lastUpdated", {
-              date: insights.lastUpdated.toLocaleDateString("it-IT", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
+            {t('lastUpdated', {
+              date: insights.lastUpdated.toLocaleDateString('it-IT', {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
               }),
             })}
           </p>
@@ -95,22 +95,16 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
         <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-800">
           <CardContent className="p-4">
             <Clock className="h-5 w-5 text-blue-500 mb-2" />
-            <p className="text-2xl font-bold text-blue-600">
-              {insights.totalMinutes}
-            </p>
-            <p className="text-xs text-blue-600/80">{t("studyMinutes")}</p>
+            <p className="text-2xl font-bold text-blue-600">{insights.totalMinutes}</p>
+            <p className="text-xs text-blue-600/80">{t('studyMinutes')}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-800">
           <CardContent className="p-4">
             <BookOpen className="h-5 w-5 text-green-500 mb-2" />
-            <p className="text-2xl font-bold text-green-600">
-              {insights.totalSessions}
-            </p>
-            <p className="text-xs text-green-600/80">
-              {t("completedSessions")}
-            </p>
+            <p className="text-2xl font-bold text-green-600">{insights.totalSessions}</p>
+            <p className="text-xs text-green-600/80">{t('completedSessions')}</p>
           </CardContent>
         </Card>
 
@@ -120,17 +114,15 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
             <p className="text-2xl font-bold text-purple-600">
               {insights.maestriInteracted.length}
             </p>
-            <p className="text-xs text-purple-600/80">{t("maestriMet")}</p>
+            <p className="text-xs text-purple-600/80">{t('maestriMet')}</p>
           </CardContent>
         </Card>
 
         <Card className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200 dark:border-amber-800">
           <CardContent className="p-4">
             <Star className="h-5 w-5 text-amber-500 mb-2" />
-            <p className="text-2xl font-bold text-amber-600">
-              {insights.strengths.length}
-            </p>
-            <p className="text-xs text-amber-600/80">Punti di forza</p>
+            <p className="text-2xl font-bold text-amber-600">{insights.strengths.length}</p>
+            <p className="text-xs text-amber-600/80">{t('strengthsPoints')}</p>
           </CardContent>
         </Card>
       </div>
@@ -141,16 +133,14 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Star className="h-5 w-5 text-amber-500" />
-              Punti di Forza
+              {t('strengthsTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {insights.strengths
-                .slice(0, expandedStrengths ? undefined : 3)
-                .map((obs) => (
-                  <ObservationCard key={obs.id} observation={obs} isStrength />
-                ))}
+              {insights.strengths.slice(0, expandedStrengths ? undefined : 3).map((obs) => (
+                <ObservationCard key={obs.id} observation={obs} isStrength />
+              ))}
               {insights.strengths.length > 3 && (
                 <Button
                   variant="ghost"
@@ -161,20 +151,18 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
                   {expandedStrengths ? (
                     <>
                       <ChevronUp className="h-4 w-4 mr-2" />
-                      Mostra meno
+                      {t('showLess')}
                     </>
                   ) : (
                     <>
                       <ChevronDown className="h-4 w-4 mr-2" />
-                      Mostra tutti ({insights.strengths.length})
+                      {t('showAll', { count: insights.strengths.length })}
                     </>
                   )}
                 </Button>
               )}
               {insights.strengths.length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-4">
-                  I Professori stanno ancora osservando. Torna presto!
-                </p>
+                <p className="text-sm text-slate-500 text-center py-4">{t('observingMessage')}</p>
               )}
             </div>
           </CardContent>
@@ -185,12 +173,11 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <TrendingUp className="h-5 w-5 text-blue-500" />
-              Aree di Crescita
+              {t('growthAreasTitle')}
             </CardTitle>
             {insights.growthAreas.length > 0 && (
               <p className="text-sm text-slate-500 mt-1">
-                Aree dove {insights.studentName.split(" ")[0]} puo migliorare
-                con il giusto supporto
+                {t('growthAreasSubtitle', { name: insights.studentName.split(' ')[0] })}
               </p>
             )}
           </CardHeader>
@@ -201,28 +188,26 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
                 <div className="flex items-center gap-2 text-sm">
                   <Lightbulb className="h-4 w-4 text-blue-500" />
                   <span className="font-medium text-blue-900 dark:text-blue-100">
-                    Focus consigliato:
+                    {t('focusRecommended')}
                   </span>
                   <span className="text-blue-700 dark:text-blue-300">
                     {insights.growthAreas.length === 1
                       ? CATEGORY_LABELS[insights.growthAreas[0].category]
-                      : `${CATEGORY_LABELS[insights.growthAreas[0].category]} e ${CATEGORY_LABELS[insights.growthAreas[1]?.category] || "altro"}`}
+                      : `${CATEGORY_LABELS[insights.growthAreas[0].category]} e ${CATEGORY_LABELS[insights.growthAreas[1]?.category] || 'altro'}`}
                   </span>
                 </div>
               </div>
             )}
             <div className="space-y-3">
-              {insights.growthAreas
-                .slice(0, expandedGrowth ? undefined : 3)
-                .map((obs, idx) => (
-                  <ObservationCard
-                    key={obs.id}
-                    observation={obs}
-                    isStrength={false}
-                    showPriority={idx < 2}
-                    priorityLevel={idx === 0 ? "high" : "medium"}
-                  />
-                ))}
+              {insights.growthAreas.slice(0, expandedGrowth ? undefined : 3).map((obs, idx) => (
+                <ObservationCard
+                  key={obs.id}
+                  observation={obs}
+                  isStrength={false}
+                  showPriority={idx < 2}
+                  priorityLevel={idx === 0 ? 'high' : 'medium'}
+                />
+              ))}
               {insights.growthAreas.length > 3 && (
                 <Button
                   variant="ghost"
@@ -233,20 +218,18 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
                   {expandedGrowth ? (
                     <>
                       <ChevronUp className="h-4 w-4 mr-2" />
-                      Mostra meno
+                      {t('showLess')}
                     </>
                   ) : (
                     <>
                       <ChevronDown className="h-4 w-4 mr-2" />
-                      Mostra tutte ({insights.growthAreas.length})
+                      {t('showAll', { count: insights.growthAreas.length })}
                     </>
                   )}
                 </Button>
               )}
               {insights.growthAreas.length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-4">
-                  Nessuna area di crescita identificata ancora.
-                </p>
+                <p className="text-sm text-slate-500 text-center py-4">{t('noGrowthAreas')}</p>
               )}
             </div>
           </CardContent>
@@ -258,23 +241,18 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center gap-2 text-lg">
             <Lightbulb className="h-5 w-5 text-yellow-500" />
-            Stile di Apprendimento
+            {t('learningStyleTitle')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Preferred Channel */}
             <div className="flex items-center gap-4">
-              <div
-                className={cn(
-                  "p-3 rounded-xl bg-slate-100 dark:bg-slate-800",
-                  channel.color,
-                )}
-              >
+              <div className={cn('p-3 rounded-xl bg-slate-100 dark:bg-slate-800', channel.color)}>
                 <channel.icon className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Canale Preferito</p>
+                <p className="text-sm text-slate-500">{t('preferredChannel')}</p>
                 <p className="font-semibold">{channel.label}</p>
               </div>
             </div>
@@ -285,9 +263,11 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
                 <Clock className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Durata Ottimale</p>
+                <p className="text-sm text-slate-500">{t('optimalDuration')}</p>
                 <p className="font-semibold">
-                  {insights.learningStyle.optimalSessionDuration} minuti
+                  {t('optimalDurationMinutes', {
+                    minutes: insights.learningStyle.optimalSessionDuration,
+                  })}
                 </p>
               </div>
             </div>
@@ -298,7 +278,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
                 <timeOfDay.icon className="h-6 w-6" />
               </div>
               <div>
-                <p className="text-sm text-slate-500">Momento Migliore</p>
+                <p className="text-sm text-slate-500">{t('bestMoment')}</p>
                 <p className="font-semibold">{timeOfDay.label}</p>
               </div>
             </div>
@@ -307,7 +287,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           {/* Motivators */}
           {insights.learningStyle.motivators.length > 0 && (
             <div className="mt-6">
-              <p className="text-sm text-slate-500 mb-2">Cosa lo motiva</p>
+              <p className="text-sm text-slate-500 mb-2">{t('motivators')}</p>
               <div className="flex flex-wrap gap-2">
                 {insights.learningStyle.motivators.map((motivator, i) => (
                   <span
@@ -329,7 +309,7 @@ export function ParentDashboard({ insights }: ParentDashboardProps) {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-lg">
               <Lightbulb className="h-5 w-5 text-blue-500" />
-              Strategie Suggerite
+              {t('suggestedStrategies')}
             </CardTitle>
           </CardHeader>
           <CardContent>

@@ -24,7 +24,17 @@
         },
         "submitting": "Invio in corso...",
         "successDescription": "Il nostro team enterprise ti contatterà entro 24 ore lavorative.",
-        "successTitle": "Richiesta inviata"
+        "successTitle": "Richiesta inviata",
+        "form": {
+          "namePlaceholder": "Il tuo nome completo",
+          "emailPlaceholder": "la-tua@azienda.com",
+          "rolePlaceholder": "es. Director, Manager, CTO",
+          "companyPlaceholder": "Nome della vostra azienda",
+          "messagePlaceholder": "Condividi i tuoi requisiti specifici...",
+          "sectorPlaceholder": "Seleziona un settore",
+          "employeeCountPlaceholder": "Seleziona una fascia",
+          "submitButton": "Invia Richiesta Enterprise"
+        }
       },
       "form": {
         "emailInvalid": "L'email non è valida",
@@ -182,28 +192,31 @@
     },
     "aiTransparency": {
       "contact": {
-        "text": "Hai domande su come utilizziamo l'IA? Contattaci a"
+        "text": "Domande sull'IA in MirrorBuddy? Scrivici:",
+        "emailAriaLabel": "Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
       },
       "page": {
         "backButton": "Torna alla home",
+        "backButtonAriaLabel": "Torna alla home page di MirrorBuddy",
         "lastUpdated": "Ultimo aggiornamento: {date}",
+        "navAriaLabel": "Navigazione pagina",
         "title": "Trasparenza sull'Intelligenza Artificiale",
         "version": "Versione {version}"
       },
       "relatedDocs": {
         "heading": "Documenti Correlati",
-        "privacy": "Informativa sulla Privacy",
-        "privacyDescription": "Scopri come proteggiamo i tuoi dati personali",
-        "terms": "Termini e Condizioni",
-        "termsDescription": "Leggi i nostri termini d'uso e limitazioni di responsabilità"
+        "privacy": "Privacy Policy",
+        "privacyDescription": "Come proteggiamo i tuoi dati",
+        "terms": "Termini di Servizio",
+        "termsDescription": "Le regole d'uso di MirrorBuddy"
       },
       "tldr": {
-        "heading": "Riassunto Rapido (TL;DR)",
-        "point1": "MirrorBuddy utilizza intelligenza artificiale per personalizzare l'insegnamento e supportare l'apprendimento inclusivo",
-        "point2": "Tutte le decisioni di IA significative sono soggette a supervisione umana secondo la Legge sull'IA dell'UE",
-        "point3": "Hai il diritto di richiedere una spiegazione di come l'IA ha influenzato le tue esperienze educative",
-        "point4": "I tuoi dati sono protetti e non vengono utilizzati per discriminare o profilare senza il tuo consenso",
-        "point5": "Puoi disabilitare l'IA personalizzata in qualsiasi momento e continuare a usare l'app"
+        "heading": "In breve (TL;DR)",
+        "point1": "MirrorBuddy usa IA (Azure OpenAI) per insegnare, non per decidere",
+        "point2": "I 26 Maestri IA hanno conoscenze verificate e controllate",
+        "point3": "Gli insegnanti vedono sempre tutte le chat e possono intervenire",
+        "point4": "Puoi rifiutare l'IA quando vuoi, senza conseguenze",
+        "point5": "Rispettiamo il GDPR e la legge italiana sulla privacy"
       },
       "aiSystem": {
         "section1Title": "1. Divulgazione dei Sistemi di IA (Articolo 50 - Legge sull'IA dell'UE 2024/1689)",
@@ -1016,7 +1029,8 @@
             "export": "Puoi ricevere i tuoi dati in un formato strutturato (JSON, CSV)",
             "oppose": "Puoi opporti al trattamento dei tuoi dati per determinati scopi"
           },
-          "exerciseRights": "Per esercitare i tuoi diritti, contattaci a:"
+          "exerciseRights": "Per esercitare i tuoi diritti, contattaci a:",
+          "emailAriaLabel": "Invia email a info@fightthestroke.org per esercitare i tuoi diritti sulla privacy"
         },
         "section11": {
           "title": "Cookie e Analitiche",
@@ -1140,7 +1154,8 @@
               "website": "www.ico.org.uk"
             }
           },
-          "closing": "Apprezziamo la tua fiducia nella protezione della tua privacy e rimaniamo a tua disposizione per qualsiasi domanda."
+          "closing": "Apprezziamo la tua fiducia nella protezione della tua privacy e rimaniamo a tua disposizione per qualsiasi domanda.",
+          "contactEmailAriaLabel": "Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
         },
         "section16": {
           "title": "16. Sistemi di Intelligenza Artificiale e Diritti dell'Utente",

@@ -1,6 +1,7 @@
-"use client";
+'use client';
 
-import { getAllSupportTeachers } from "@/data/support-teachers";
+import { useTranslations } from 'next-intl';
+import { getAllSupportTeachers } from '@/data/support-teachers';
 
 interface CoachesSectionProps {
   formData: {
@@ -10,6 +11,7 @@ interface CoachesSectionProps {
 }
 
 export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
+  const t = useTranslations('admin');
   const coaches = getAllSupportTeachers();
 
   const handleToggle = (coachId: string, enabled: boolean) => {
@@ -37,11 +39,9 @@ export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Coach Disponibili
-          </h2>
+          <h2 className="text-lg font-semibold text-foreground">{t('tiers.coachesAvailable')}</h2>
           <p className="text-sm text-muted-foreground">
-            {selectedCount} / {coaches.length} selezionati
+            {t('tiers.selectedCount', { selected: selectedCount, total: coaches.length })}
           </p>
         </div>
         <div className="flex gap-2">
@@ -50,7 +50,7 @@ export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
             onClick={selectAll}
             className="text-xs text-primary hover:underline"
           >
-            Seleziona tutti
+            {t('tiers.selectAll')}
           </button>
           <span className="text-slate-300">|</span>
           <button
@@ -58,7 +58,7 @@ export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
             onClick={selectNone}
             className="text-xs text-primary hover:underline"
           >
-            Deseleziona tutti
+            {t('tiers.deselectAll')}
           </button>
         </div>
       </div>
@@ -70,8 +70,8 @@ export function CoachesSection({ formData, onChange }: CoachesSectionProps) {
             htmlFor={`coach-${coach.id}`}
             className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
               isEnabled(coach.id)
-                ? "border-primary bg-primary/5"
-                : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                ? 'border-primary bg-primary/5'
+                : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800/50'
             }`}
           >
             <span className="sr-only">{coach.name}</span>

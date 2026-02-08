@@ -1,7 +1,8 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard,
   UserPlus,
@@ -15,11 +16,11 @@ import {
   Layers,
   ScrollText,
   X,
-} from "lucide-react";
-import type { LucideIcon } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { useEffect } from 'react';
 
 interface NavItem {
   id: string;
@@ -27,7 +28,7 @@ interface NavItem {
   href: string;
   icon: LucideIcon;
   badge?: number;
-  badgeColor?: "amber" | "red" | "blue";
+  badgeColor?: 'amber' | 'red' | 'blue';
 }
 
 interface MobileAdminNavProps {
@@ -40,57 +41,57 @@ interface MobileAdminNavProps {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    id: "dashboard",
-    label: "Dashboard",
-    href: "/admin",
+    id: 'dashboard',
+    label: 'Dashboard',
+    href: '/admin',
     icon: LayoutDashboard,
   },
   {
-    id: "invites",
-    label: "Richieste Beta",
-    href: "/admin/invites",
+    id: 'invites',
+    label: 'Richieste Beta',
+    href: '/admin/invites',
     icon: UserPlus,
   },
   {
-    id: "users",
-    label: "Utenti",
-    href: "/admin/users",
+    id: 'users',
+    label: 'Utenti',
+    href: '/admin/users',
     icon: Users,
   },
   {
-    id: "tiers",
-    label: "Piani",
-    href: "/admin/tiers",
+    id: 'tiers',
+    label: 'Piani',
+    href: '/admin/tiers',
     icon: Layers,
   },
   {
-    id: "audit-log",
-    label: "Audit Log",
-    href: "/admin/audit",
+    id: 'audit-log',
+    label: 'Audit Log',
+    href: '/admin/audit',
     icon: ScrollText,
   },
   {
-    id: "analytics",
-    label: "Analytics",
-    href: "/admin/analytics",
+    id: 'analytics',
+    label: 'Analytics',
+    href: '/admin/analytics',
     icon: BarChart3,
   },
   {
-    id: "service-limits",
-    label: "Service Limits",
-    href: "/admin/service-limits",
+    id: 'service-limits',
+    label: 'Service Limits',
+    href: '/admin/service-limits',
     icon: Activity,
   },
   {
-    id: "tos",
-    label: "Termini Servizio",
-    href: "/admin/tos",
+    id: 'tos',
+    label: 'Termini Servizio',
+    href: '/admin/tos',
     icon: FileText,
   },
   {
-    id: "settings",
-    label: "Impostazioni",
-    href: "/admin/settings",
+    id: 'settings',
+    label: 'Impostazioni',
+    href: '/admin/settings',
     icon: Settings,
   },
 ];
@@ -102,23 +103,24 @@ export function MobileAdminNav({
   pendingInvites = 0,
   systemAlerts = 0,
 }: MobileAdminNavProps) {
+  const t = useTranslations('admin');
   const pathname = usePathname();
 
   const getNavItems = (): NavItem[] => {
     return NAV_ITEMS.map((item) => {
-      if (item.id === "invites" && pendingInvites > 0) {
-        return { ...item, badge: pendingInvites, badgeColor: "amber" as const };
+      if (item.id === 'invites' && pendingInvites > 0) {
+        return { ...item, badge: pendingInvites, badgeColor: 'amber' as const };
       }
-      if (item.id === "dashboard" && systemAlerts > 0) {
-        return { ...item, badge: systemAlerts, badgeColor: "red" as const };
+      if (item.id === 'dashboard' && systemAlerts > 0) {
+        return { ...item, badge: systemAlerts, badgeColor: 'red' as const };
       }
       return item;
     });
   };
 
   const isActive = (href: string) => {
-    if (href === "/admin") {
-      return pathname === "/admin";
+    if (href === '/admin') {
+      return pathname === '/admin';
     }
     return pathname.startsWith(href);
   };
@@ -134,14 +136,14 @@ export function MobileAdminNav({
   // Handle escape key
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
+      if (e.key === 'Escape' && isOpen) {
         onClose();
       }
     };
 
     if (isOpen) {
-      document.addEventListener("keydown", handleEscape);
-      return () => document.removeEventListener("keydown", handleEscape);
+      document.addEventListener('keydown', handleEscape);
+      return () => document.removeEventListener('keydown', handleEscape);
     }
   }, [isOpen, onClose]);
 
@@ -153,7 +155,7 @@ export function MobileAdminNav({
         size="icon"
         onClick={onOpen}
         className="fixed top-14 right-4 z-50 h-11 w-11 text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-        aria-label="Apri menu di navigazione"
+        aria-label={t('mobileNav.openMenu')}
       >
         {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
       </Button>
@@ -170,33 +172,30 @@ export function MobileAdminNav({
       {/* Drawer */}
       <aside
         className={cn(
-          "fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r",
-          "border-slate-200 dark:border-slate-800 z-40 transition-all duration-300",
-          "w-72 max-w-[85vw]",
-          isOpen ? "translate-x-0" : "-translate-x-full",
+          'fixed top-0 left-0 h-full bg-white dark:bg-slate-900 border-r',
+          'border-slate-200 dark:border-slate-800 z-40 transition-all duration-300',
+          'w-72 max-w-[85vw]',
+          isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
         {/* Header */}
         <div className="h-14 flex items-center justify-between px-4 border-b border-slate-200 dark:border-slate-800">
           <span className="font-bold text-lg text-slate-900 dark:text-white">
-            Menu
+            {t('mobileNav.menu')}
           </span>
           <Button
             variant="ghost"
             size="icon-sm"
             onClick={onClose}
             className="text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-            aria-label="Chiudi menu"
+            aria-label={t('mobileNav.closeMenu')}
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
         {/* Navigation */}
-        <nav
-          className="p-4 space-y-1 overflow-y-auto"
-          style={{ maxHeight: "calc(100vh - 120px)" }}
-        >
+        <nav className="p-4 space-y-1 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 120px)' }}>
           {getNavItems().map((item) => {
             const active = isActive(item.href);
             return (
@@ -205,11 +204,10 @@ export function MobileAdminNav({
                 href={item.href}
                 onClick={handleNavItemClick}
                 className={cn(
-                  "flex items-center gap-3 rounded-xl transition-all relative px-4 py-3",
-                  active &&
-                    "bg-slate-900 dark:bg-white text-white dark:text-slate-900",
+                  'flex items-center gap-3 rounded-xl transition-all relative px-4 py-3',
+                  active && 'bg-slate-900 dark:bg-white text-white dark:text-slate-900',
                   !active &&
-                    "text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800",
+                    'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800',
                 )}
               >
                 <item.icon className="h-5 w-5 shrink-0" />
@@ -217,13 +215,13 @@ export function MobileAdminNav({
                 {item.badge && item.badge > 0 && (
                   <span
                     className={cn(
-                      "absolute text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center right-3",
-                      item.badgeColor === "amber" && "bg-amber-500 text-white",
-                      item.badgeColor === "red" && "bg-red-500 text-white",
-                      item.badgeColor === "blue" && "bg-blue-600 text-white",
+                      'absolute text-xs font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center right-3',
+                      item.badgeColor === 'amber' && 'bg-amber-500 text-white',
+                      item.badgeColor === 'red' && 'bg-red-500 text-white',
+                      item.badgeColor === 'blue' && 'bg-blue-600 text-white',
                     )}
                   >
-                    {item.badge > 99 ? "99+" : item.badge}
+                    {item.badge > 99 ? '99+' : item.badge}
                   </span>
                 )}
               </Link>
@@ -236,18 +234,18 @@ export function MobileAdminNav({
           <Link href="/">
             <button
               className={cn(
-                "w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl",
-                "bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50",
-                "border border-indigo-200 dark:border-indigo-700",
-                "text-indigo-700 dark:text-indigo-300",
-                "text-sm font-medium transition-all duration-200",
-                "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2",
+                'w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl',
+                'bg-indigo-100 dark:bg-indigo-900/40 hover:bg-indigo-200 dark:hover:bg-indigo-800/50',
+                'border border-indigo-200 dark:border-indigo-700',
+                'text-indigo-700 dark:text-indigo-300',
+                'text-sm font-medium transition-all duration-200',
+                'focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2',
               )}
-              aria-label="Torna all'app"
+              aria-label={t('mobileNav.returnToApp')}
               onClick={handleNavItemClick}
             >
               <Home className="w-4 h-4" />
-              <span>Torna all&apos;app</span>
+              <span>{t('mobileNav.returnToApp')}</span>
             </button>
           </Link>
         </div>

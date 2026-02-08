@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
 /**
  * @file character-header.tsx
  * @brief Unified header component for all character types (Maestri, Coach, Buddy)
  */
 
-import Image from "next/image";
-import { motion } from "framer-motion";
-import { X, Phone, Volume2, VolumeX, History } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { UnifiedCharacter, VoiceState, HeaderActions } from "../types";
-import { createGradientStyle } from "../utils/gradient-utils";
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { X, Phone, Volume2, VolumeX, History } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { UnifiedCharacter, VoiceState, HeaderActions } from '../types';
+import { createGradientStyle } from '../utils/gradient-utils';
 
 interface CharacterHeaderProps {
   character: UnifiedCharacter;
@@ -26,6 +27,7 @@ export function CharacterHeader({
   ttsEnabled,
   actions,
 }: CharacterHeaderProps) {
+  const t = useTranslations('chat.header');
   const gradientStyle = createGradientStyle(character.color);
   const { isActive, isConnected, configError } = voiceState;
 
@@ -39,7 +41,7 @@ export function CharacterHeader({
         className="relative flex-shrink-0"
         initial={{ scale: 0, rotate: -180 }}
         animate={{ scale: 1, rotate: 0 }}
-        transition={{ type: "spring", stiffness: 200, damping: 15 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 15 }}
       >
         <Image
           src={character.avatar}
@@ -50,8 +52,8 @@ export function CharacterHeader({
         />
         <motion.span
           className={cn(
-            "absolute bottom-0 right-0 w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 border-2 border-white rounded-full bg-green-400",
-            isActive && isConnected && "animate-pulse",
+            'absolute bottom-0 right-0 w-2 h-2 xs:w-2.5 xs:h-2.5 sm:w-3 sm:h-3 border-2 border-white rounded-full bg-green-400',
+            isActive && isConnected && 'animate-pulse',
           )}
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
@@ -63,9 +65,7 @@ export function CharacterHeader({
       <div className="flex-1 min-w-0">
         {/* Name + Badge inline on mobile */}
         <div className="flex items-center gap-1 flex-wrap">
-          <h2 className="text-sm xs:text-base sm:text-xl font-bold truncate">
-            {character.name}
-          </h2>
+          <h2 className="text-sm xs:text-base sm:text-xl font-bold truncate">{character.name}</h2>
           <span className="text-xs px-1 xs:px-1.5 sm:px-2 py-0.5 rounded-full font-medium bg-white/20 whitespace-nowrap flex-shrink-0">
             {character.badge}
           </span>
@@ -73,7 +73,7 @@ export function CharacterHeader({
 
         {/* Specialty / Voice status - single line */}
         <p className="text-xs xs:text-xs sm:text-sm text-white/80 truncate leading-tight">
-          {isActive && isConnected ? "In chiamata vocale" : character.specialty}
+          {isActive && isConnected ? t('inVoiceCall') : character.specialty}
         </p>
 
         {/* Greeting - hidden on mobile, single line on sm+ */}
@@ -92,14 +92,12 @@ export function CharacterHeader({
             onClick={actions.onVoiceCall}
             disabled={!!configError}
             aria-label={
-              configError
-                ? `Voce non disponibile: ${configError}`
-                : "Avvia chiamata vocale"
+              configError ? `${t('voiceUnavailable')}: ${configError}` : t('startVoiceCall')
             }
             title={configError ? configError : undefined}
             className={cn(
-              "text-white hover:bg-white/20 transition-all h-8 w-8 xs:h-9 xs:w-9 sm:h-10 sm:w-10 rounded-lg",
-              configError && "opacity-50 cursor-not-allowed",
+              'text-white hover:bg-white/20 transition-all h-8 w-8 xs:h-9 xs:w-9 sm:h-10 sm:w-10 rounded-lg',
+              configError && 'opacity-50 cursor-not-allowed',
             )}
           >
             <Phone className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
@@ -113,11 +111,7 @@ export function CharacterHeader({
           onClick={ttsEnabled ? actions.onStopTTS : undefined}
           disabled={!ttsEnabled}
           className="hidden xs:flex text-white hover:bg-white/20 h-8 w-8 xs:h-9 xs:w-9 sm:h-10 sm:w-10 rounded-lg"
-          aria-label={
-            ttsEnabled
-              ? "Disattiva lettura vocale"
-              : "Lettura vocale disattivata"
-          }
+          aria-label={ttsEnabled ? t('disableTTS') : t('ttsDisabled')}
         >
           {ttsEnabled ? (
             <Volume2 className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -133,7 +127,7 @@ export function CharacterHeader({
             size="icon"
             onClick={actions.onOpenHistory}
             className="text-white hover:bg-white/20 h-8 w-8 xs:h-9 xs:w-9 sm:h-10 sm:w-10 rounded-lg"
-            aria-label="Storico conversazioni"
+            aria-label={t('conversationHistory')}
           >
             <History className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
           </Button>
@@ -145,7 +139,7 @@ export function CharacterHeader({
           size="icon"
           onClick={actions.onClose}
           className="text-white hover:bg-white/20 h-8 w-8 xs:h-9 xs:w-9 sm:h-10 sm:w-10 rounded-lg"
-          aria-label="Chiudi"
+          aria-label={t('close')}
         >
           <X className="w-4 h-4 xs:w-4 xs:h-4 sm:w-5 sm:h-5" />
         </Button>
