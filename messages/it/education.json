@@ -46,7 +46,8 @@
         "searchAriaLabel": "Cerca professore o materia",
         "searchPlaceholder": "Cerca professore o materia...",
         "title": "Professori"
-      }
+      },
+      "arialabelcancellaRicerca": "aria-label=\"Cancella ricerca\""
     },
     "gamification": {
       "leaderboard": {
@@ -174,7 +175,8 @@
       "voiceSearch": {
         "start": "Start",
         "stop": "Stop"
-      }
+      },
+      "perMateria": "Per Materia"
     },
     "knowledgeHub": {
       "errorMessageDefault": "Error message default",
@@ -324,7 +326,8 @@
       "arialabelscaricaPdf": "aria-label=\"Scarica PDF\"",
       "apri": "Apri",
       "nessunaDomandaDisponibile": "Nessuna domanda disponibile",
-      "arialabelmesePrecedente": "aria-label=\"Mese precedente\""
+      "arialabelmesePrecedente": "aria-label=\"Mese precedente\"",
+      "arialabelcartaPrecedente": "aria-label=\"Carta precedente\""
     },
     "quiz": {
       "comingSoon": "Coming Soon",
@@ -820,6 +823,13 @@
     },
     "typing": {
       "iniziaGioco": "Inizia Gioco"
+    },
+    "emptyState": {
+      "nessunaMetricaDisponibile": "Nessuna metrica disponibile"
+    },
+    "maestroSelectionPanel": {
+      "tornaAllaSelezioneMateria": "Torna alla selezione materia",
+      "continuaSenzaMaestro": "Continua senza Maestro"
     }
   }
 }

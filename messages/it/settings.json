@@ -496,7 +496,9 @@
       "voiceNotWorking": "Voice Not Working",
       "voiceNotWorkingDescription": "Voice Not Working Description",
       "voiceTest": "Voice Test",
-      "titleaggiornaListaWebcam": "title=\"Aggiorna lista webcam\""
+      "titleaggiornaListaWebcam": "title=\"Aggiorna lista webcam\"",
+      "vaiNellaSezioneChat": "Vai nella sezione Chat e parla con il tuo Coach preferito.",
+      "titleaggiornaListaMicrofoni": "title=\"Aggiorna lista microfoni\""
     },
     "aiProvider": {
       "active": "Attivo",
@@ -1013,6 +1015,12 @@
     },
     "settingsPageMobile": {
       "arialabelindietro": "aria-label=\"Indietro\""
+    },
+    "privacySettings": {
+      "inviaDatiAnonimi": "Invia dati anonimi",
+      "iTuoiDatiSono": "I tuoi dati sono al sicuro. MirrorBuddy e progettato pensando alla\n            privacy dei bambini e rispetta le normative COPPA e GDPR.",
+      "statoDeiTuoiConsensi": "Stato dei tuoi consensi e termini accettati.",
+      "seiConnessoAlTuo": "Sei connesso al tuo account MirrorBuddy."
     }
   }
 }
