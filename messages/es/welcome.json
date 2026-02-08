@@ -13,7 +13,7 @@
       "tagline": "Tu escuela a medida, con los maestros de la historia",
       "taglineWith": "con los Grandes Profesores",
       "taglineAbilities": "sean cuales sean tus habilidades",
-      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 22 Profesores históricos te acompañan personalmente.",
+      "description": "Estudia matemáticas <strong>con Euclides</strong>, física <strong>con Feynman</strong>, química <strong>con Marie Curie</strong>. 26 Profesores históricos te acompañan personalmente.",
       "accessibility": {
         "title": "Accesibilidad a tu medida",
         "subtitle": "Soporte dedicado para dificultades de aprendizaje",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "ACCESO COMPLETO",
         "title": "¿Tienes una cuenta?",
-        "feature1": "22 Profesores IA",
+        "feature1": "26 Profesores IA",
         "feature2": "Todas las herramientas",
         "feature3": "Progreso guardado",
         "cta": "Iniciar sesión"
@@ -91,7 +91,7 @@
           "price": "A solicitud",
           "badge": "Recomendado",
           "features": {
-            "maestri": "22 Profesores",
+            "maestri": "26 Profesores",
             "messagesUnlimited": "Mensajes ilimitados",
             "voiceUnlimited": "Voz ilimitada",
             "allTools": "Todas las herramientas"
@@ -150,11 +150,41 @@
       "disclaimer": "Los profesores IA se crean con fines educativos y demostrativos. En el futuro, cada estudiante podrá crear sus propios profesores personalizados.",
       "disclaimerLink": "Descubre más",
       "introText": "Inspirado en las grandes mentes de la historia, diseñado para ayudarte a entender.",
-      "educationalDisclaimer": "Los profesores IA son herramientas educativas inspiradas en figuras históricas. No sustituyen a los profesores reales."
+      "educationalDisclaimer": "Los profesores IA son herramientas educativas inspiradas en figuras históricas. No sustituyen a los profesores reales.",
+      "subjects": {
+        "mathematics": "Matemáticas",
+        "physics": "Física",
+        "chemistry": "Química",
+        "biology": "Biología",
+        "history": "Historia",
+        "geography": "Geografía",
+        "astronomy": "Astronomía",
+        "italian": "Italiano",
+        "english": "Inglés",
+        "spanish": "Español",
+        "french": "Francés",
+        "german": "Alemán",
+        "art": "Arte",
+        "music": "Música",
+        "civics": "Educación Cívica",
+        "civicEducation": "Educación Cívica",
+        "economics": "Economía",
+        "computerScience": "Informática",
+        "health": "Salud",
+        "philosophy": "Filosofía",
+        "internationalLaw": "Derecho Internacional",
+        "physicalEducation": "Educación Física",
+        "storytelling": "Storytelling",
+        "supercazzola": "Supercazzola",
+        "sport": "Deporte"
+      }
     },
     "support": {
-      "heading": "Siempre a tu lado",
+      "heading": "Siempre a tu",
+      "headingHighlight": "lado",
       "subtitle": "Entrenadores para el método de estudio y Compañeros para el apoyo emocional",
+      "coachLabel": "Coach",
+      "buddyLabel": "Buddy",
       "coach": "Entrenador - Te enseñan métodos de estudio",
       "buddy": "Compañero - Te apoyan emocionalmente",
       "scrollHint": "← Desplaza para ver todos →",
@@ -166,14 +196,41 @@
       "carouselLabel": "Carrusel de entrenadores y compañeros - usa las flechas para navegar"
     },
     "features": {
-      "heading": "Herramientas para cada estilo de aprendizaje",
+      "heading": "Herramientas para cada",
+      "headingHighlight": "estilo de aprendizaje",
       "subtitle": "Una plataforma completa y accesible diseñada para ti",
-      "voiceConversation": "Conversación por Voz - Habla con tus Profesores en tiempo real",
-      "mindMaps": "Mapas Mentales - Visualiza y organiza conceptos",
-      "flashcards": "Tarjetas FSRS - Memoriza con repetición espaciada",
-      "interactiveQuizzes": "Cuestionarios Interactivos - Verifica tus conocimientos",
-      "gamification": "Gamificación - Gana XP y desbloquea logros",
-      "adaptiveLearning": "Aprendizaje Adaptativo - Se adapta a tu estilo y ritmo",
+      "voiceConversation": {
+        "label": "Conversación por Voz",
+        "description": "Habla con tus Profesores en tiempo real"
+      },
+      "mindMaps": {
+        "label": "Mapas Mentales",
+        "description": "Visualiza y organiza conceptos"
+      },
+      "flashcards": {
+        "label": "Tarjetas FSRS",
+        "description": "Memoriza con repetición espaciada"
+      },
+      "interactiveQuizzes": {
+        "label": "Cuestionarios Interactivos",
+        "description": "Verifica tus conocimientos"
+      },
+      "gamification": {
+        "label": "Gamificación",
+        "description": "Gana XP y desbloquea logros"
+      },
+      "adaptiveLearning": {
+        "label": "Aprendizaje Adaptativo",
+        "description": "Se adapta a tu estilo y ritmo"
+      },
+      "totalAccessibility": {
+        "label": "Accesibilidad Total",
+        "description": "Diseñado para DEA, TDAH y todos"
+      },
+      "integratedPlatform": {
+        "label": "Plataforma Integrada",
+        "description": "Todo en un solo lugar"
+      },
       "introLine1": "Cada herramienta tiene un solo objetivo:",
       "introLine2": "hacer el estudio más claro, paso a paso."
     },
@@ -370,7 +427,7 @@
       "title": "Por qué elegir MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "22 Profesores IA",
+          "title": "26 Profesores IA",
           "description": "De Euclides a Darwin, aprende de mentes extraordinarias de la historia"
         },
         "accessibility": {
@@ -388,7 +445,8 @@
       }
     },
     "accessibilityFirstSection": {
-      "heading": "Diseñado específicamente para quienes tienen dificultades de aprendizaje",
+      "heading": "Accesible para",
+      "headingHighlight": "todos",
       "subheading": "7 perfiles de accesibilidad, todos configurables al 100%",
       "profiles": {
         "dyslexia": {

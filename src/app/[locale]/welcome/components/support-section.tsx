@@ -4,6 +4,8 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Lightbulb, Heart } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 interface SupportMember {
   id: string;
   name: string;
@@ -21,6 +23,7 @@ interface SupportMember {
  * Coaches help with study methods, Buddies provide peer emotional support.
  */
 export function SupportSection() {
+  const t = useTranslations("welcome.support");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [supportMembers, setSupportMembers] = useState<SupportMember[]>([]);
@@ -70,38 +73,29 @@ export function SupportSection() {
     });
   }, []);
 
-  // Card width (w-44 = 176px) + gap (16px) = 192px per card
   const CARD_WIDTH = 192;
-  const SCROLL_INTERVAL = 3000; // 3 seconds
+  const SCROLL_INTERVAL = 3000;
 
   const scroll = useCallback((direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = CARD_WIDTH;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
+        left: direction === "left" ? -CARD_WIDTH : CARD_WIDTH,
         behavior: "smooth",
       });
     }
   }, []);
 
-  // Auto-scroll functionality
   useEffect(() => {
     if (isPaused || !scrollRef.current) return;
-
     const interval = setInterval(() => {
       if (!scrollRef.current) return;
-
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      const maxScroll = scrollWidth - clientWidth;
-
-      // If at the end, reset to start
-      if (scrollLeft >= maxScroll - 10) {
+      if (scrollLeft >= scrollWidth - clientWidth - 10) {
         scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
       } else {
         scroll("right");
       }
     }, SCROLL_INTERVAL);
-
     return () => clearInterval(interval);
   }, [isPaused, scroll]);
 
@@ -113,7 +107,6 @@ export function SupportSection() {
       className="w-full max-w-6xl mx-auto px-4 mb-12"
       aria-labelledby="support-heading"
     >
-      {/* Section Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -124,32 +117,29 @@ export function SupportSection() {
           id="support-heading"
           className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          Sempre al tuo{" "}
+          {t("heading")}{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-orange-500">
-            fianco
+            {t("headingHighlight")}
           </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Coach per il metodo di studio e Buddy per il supporto emotivo
+          {t("subtitle")}
         </p>
       </motion.div>
 
-      {/* Carousel Container */}
       <div
         className="relative overflow-hidden"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Left Arrow */}
         <button
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -ml-2"
-          aria-label="Scorri a sinistra"
+          aria-label={t("scrollLeft")}
         >
           <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
-        {/* Scrollable Container - Fixed width to show exactly 5 cards */}
         <div
           className="overflow-hidden mx-auto"
           style={{ width: "min(100%, 960px)" }}
@@ -159,7 +149,7 @@ export function SupportSection() {
             className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             role="region"
-            aria-label="Carosello coach e buddy - usa le frecce per navigare"
+            aria-label={t("carouselLabel")}
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
             tabIndex={0}
           >
@@ -189,10 +179,9 @@ export function SupportSection() {
                     }`}
                   >
                     <RoleIcon className="w-3 h-3" aria-hidden="true" />
-                    {isCoach ? "Coach" : "Buddy"}
+                    {isCoach ? t("coachLabel") : t("buddyLabel")}
                   </div>
 
-                  {/* Avatar */}
                   <div
                     className="w-16 h-16 mx-auto mb-3 rounded-full p-0.5"
                     style={{
@@ -202,7 +191,7 @@ export function SupportSection() {
                     <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                       <Image
                         src={member.avatar}
-                        alt={`${member.name} - ${isCoach ? "Coach" : "Buddy"}`}
+                        alt={`${member.name} - ${isCoach ? t("coachLabel") : t("buddyLabel")}`}
                         width={64}
                         height={64}
                         className="w-full h-full object-cover"
@@ -210,7 +199,6 @@ export function SupportSection() {
                     </div>
                   </div>
 
-                  {/* Info */}
                   <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">
                     {member.name}
                   </h3>
@@ -223,19 +211,17 @@ export function SupportSection() {
           </div>
         </div>
 
-        {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -mr-2"
-          aria-label="Scorri a destra"
+          aria-label={t("scrollRight")}
         >
           <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
       </div>
 
-      {/* Scroll hint for mobile */}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
-        ← Scorri per vedere tutti →
+        {t("scrollHint")}
       </p>
     </motion.section>
   );

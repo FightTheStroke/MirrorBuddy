@@ -13,7 +13,7 @@
       "tagline": "La tua scuola su misura, con i maestri della storia",
       "taglineWith": "con i Grandi Professori",
       "taglineAbilities": "qualunque siano le tue abilità",
-      "description": "Studia matematica <strong>con Euclide</strong>, fisica <strong>con Feynman</strong>, chimica <strong>con Marie Curie</strong>. 22 Professori storici ti accompagnano personalmente.",
+      "description": "Studia matematica <strong>con Euclide</strong>, fisica <strong>con Feynman</strong>, chimica <strong>con Marie Curie</strong>. 26 Professori storici ti accompagnano personalmente.",
       "accessibility": {
         "introLine1": "Ogni persona impara in modo diverso.",
         "introLine2": "MirrorBuddy si adatta — non costringe.",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "ACCESSO COMPLETO",
         "title": "Hai un account?",
-        "feature1": "22 Professori AI",
+        "feature1": "26 Professori AI",
         "feature2": "Tutti gli strumenti",
         "feature3": "Progressi salvati",
         "cta": "Accedi"
@@ -91,7 +91,7 @@
           "price": "Su richiesta",
           "badge": "Consigliato",
           "features": {
-            "maestri": "22 Professori",
+            "maestri": "26 Professori",
             "messagesUnlimited": "Messaggi illimitati",
             "voiceUnlimited": "Voce illimitata",
             "allTools": "Tutti gli strumenti"
@@ -150,11 +150,41 @@
       "disclaimer": "I professori AI sono creati per scopi educativi e dimostrativi. In futuro, ogni studente potrà creare i propri professori personalizzati.",
       "disclaimerLink": "Scopri di più",
       "introText": "Ispirato alle grandi menti della storia, progettato per aiutarti a capire.",
-      "educationalDisclaimer": "I professori AI sono strumenti educativi ispirati a figure storiche. Non sostituiscono insegnanti reali."
+      "educationalDisclaimer": "I professori AI sono strumenti educativi ispirati a figure storiche. Non sostituiscono insegnanti reali.",
+      "subjects": {
+        "mathematics": "Matematica",
+        "physics": "Fisica",
+        "chemistry": "Chimica",
+        "biology": "Biologia",
+        "history": "Storia",
+        "geography": "Geografia",
+        "astronomy": "Astronomia",
+        "italian": "Italiano",
+        "english": "Inglese",
+        "spanish": "Spagnolo",
+        "french": "Francese",
+        "german": "Tedesco",
+        "art": "Arte",
+        "music": "Musica",
+        "civics": "Educazione Civica",
+        "civicEducation": "Educazione Civica",
+        "economics": "Economia",
+        "computerScience": "Informatica",
+        "health": "Salute",
+        "philosophy": "Filosofia",
+        "internationalLaw": "Diritto Internazionale",
+        "physicalEducation": "Educazione Fisica",
+        "storytelling": "Storytelling",
+        "supercazzola": "Supercazzola",
+        "sport": "Sport"
+      }
     },
     "support": {
-      "heading": "Sempre al tuo fianco",
+      "heading": "Sempre al tuo",
+      "headingHighlight": "fianco",
       "subtitle": "Coach per il metodo di studio e Amici per il supporto emotivo",
+      "coachLabel": "Coach",
+      "buddyLabel": "Buddy",
       "coach": "Coach - Ti insegnano il metodo di studio",
       "buddy": "Amico - Ti supportano emotivamente",
       "scrollHint": "\u2190 Scorri per vedere tutti \u2192",
@@ -166,14 +196,41 @@
       "carouselLabel": "Carosello coach e buddies - usa le frecce per navigare"
     },
     "features": {
-      "heading": "Strumenti per ogni stile di apprendimento",
+      "heading": "Strumenti per ogni",
+      "headingHighlight": "stile di apprendimento",
       "subtitle": "Una piattaforma completa e accessibile progettata per te",
-      "voiceConversation": "Conversazione Vocale - Parla con i tuoi Professori in tempo reale",
-      "mindMaps": "Mappe Mentali - Visualizza e organizza i concetti",
-      "flashcards": "Flashcard FSRS - Memorizza con la ripetizione spaziata",
-      "interactiveQuizzes": "Quiz Interattivi - Verifica le tue conoscenze",
-      "gamification": "Gamification - Guadagna XP e sblocca obiettivi",
-      "adaptiveLearning": "Apprendimento Adattivo - Si adatta al tuo stile e ritmo",
+      "voiceConversation": {
+        "label": "Conversazione Vocale",
+        "description": "Parla con i tuoi Professori in tempo reale"
+      },
+      "mindMaps": {
+        "label": "Mappe Mentali",
+        "description": "Visualizza e organizza i concetti"
+      },
+      "flashcards": {
+        "label": "Flashcard FSRS",
+        "description": "Memorizza con la ripetizione spaziata"
+      },
+      "interactiveQuizzes": {
+        "label": "Quiz Interattivi",
+        "description": "Verifica le tue conoscenze"
+      },
+      "gamification": {
+        "label": "Gamification",
+        "description": "Guadagna XP e sblocca obiettivi"
+      },
+      "adaptiveLearning": {
+        "label": "Apprendimento Adattivo",
+        "description": "Si adatta al tuo stile e ritmo"
+      },
+      "totalAccessibility": {
+        "label": "Accessibilità Totale",
+        "description": "Progettato per DSA, ADHD e tutti"
+      },
+      "integratedPlatform": {
+        "label": "Piattaforma Integrata",
+        "description": "Tutto in un unico posto"
+      },
       "introLine1": "Ogni strumento ha un solo obiettivo:",
       "introLine2": "rendere lo studio pi\u00f9 chiaro, passo dopo passo."
     },
@@ -370,7 +427,7 @@
       "title": "Perché scegliere MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "22 Professori AI",
+          "title": "26 Professori AI",
           "description": "Da Euclide a Darwin, impara da menti straordinarie della storia"
         },
         "accessibility": {
@@ -388,7 +445,8 @@
       }
     },
     "accessibilityFirstSection": {
-      "heading": "Progettato specificamente per chi ha difficoltà di apprendimento",
+      "heading": "Accessibile per",
+      "headingHighlight": "tutti",
       "subheading": "7 profili di accessibilità, tutti configurabili al 100%",
       "profiles": {
         "dyslexia": {

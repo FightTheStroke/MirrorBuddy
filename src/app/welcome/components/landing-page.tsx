@@ -10,9 +10,9 @@ import { HeroSection } from "./hero-section";
 import { QuickStart } from "./quick-start";
 import { WelcomeFooter } from "./welcome-footer";
 import {
-  LazyTierComparisonSection,
   LazyMaestriShowcaseSection,
   LazySupportSection,
+  LazyAccessibilitySection,
   LazyFeaturesSection,
   LazyComplianceSection,
 } from "./lazy";
@@ -123,14 +123,14 @@ export function LandingPage({
             }
           />
 
-          {/* Tier comparison cards - lazy loaded */}
-          <LazyTierComparisonSection />
-
           {/* Professors carousel - lazy loaded */}
           <LazyMaestriShowcaseSection />
 
           {/* Coaches & Buddies carousel - lazy loaded */}
           <LazySupportSection />
+
+          {/* Accessibility profiles - lazy loaded */}
+          <LazyAccessibilitySection />
 
           {/* Platform features - lazy loaded */}
           <LazyFeaturesSection />

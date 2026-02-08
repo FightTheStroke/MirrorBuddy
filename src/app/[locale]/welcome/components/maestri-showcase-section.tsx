@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { Link } from "@/i18n/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+
 interface MaestroCard {
   id: string;
   name: string;
@@ -24,10 +26,11 @@ interface MaestroCard {
  * Auto-scrolls to show all professors.
  */
 export function MaestriShowcaseSection() {
+  const t = useTranslations("welcome.maestri");
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isPaused, setIsPaused] = useState(false);
   const [displayedMaestri, setDisplayedMaestri] = useState<MaestroCard[]>([]);
-  const [subjectNames, setSubjectNames] = useState<Record<string, string>>({});
+  const subjectsMap = t.raw("subjects") as Record<string, string>;
 
   // Lazy-load maestri to avoid pulling in heavy systemPrompt chain at compile time
   useEffect(() => {
@@ -44,44 +47,39 @@ export function MaestriShowcaseSection() {
           }),
         ),
       );
-      setSubjectNames(mod.SUBJECT_NAMES ?? {});
     });
   }, []);
 
-  // Card width (w-44 = 176px) + gap (16px) = 192px per card
   const CARD_WIDTH = 192;
-  const SCROLL_INTERVAL = 3000; // 3 seconds
+  const SCROLL_INTERVAL = 3000;
 
   const scroll = useCallback((direction: "left" | "right") => {
     if (scrollRef.current) {
-      const scrollAmount = CARD_WIDTH;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
+        left: direction === "left" ? -CARD_WIDTH : CARD_WIDTH,
         behavior: "smooth",
       });
     }
   }, []);
 
-  // Auto-scroll functionality
   useEffect(() => {
     if (isPaused || !scrollRef.current) return;
-
     const interval = setInterval(() => {
       if (!scrollRef.current) return;
-
       const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-      const maxScroll = scrollWidth - clientWidth;
-
-      // If at the end, reset to start
-      if (scrollLeft >= maxScroll - 10) {
+      if (scrollLeft >= scrollWidth - clientWidth - 10) {
         scrollRef.current.scrollTo({ left: 0, behavior: "smooth" });
       } else {
         scroll("right");
       }
     }, SCROLL_INTERVAL);
-
     return () => clearInterval(interval);
   }, [isPaused, scroll]);
+
+  const getSubjectName = (subject: string): string => {
+    const key = subject.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
+    return subjectsMap[key] ?? subject;
+  };
 
   return (
     <motion.section
@@ -91,7 +89,6 @@ export function MaestriShowcaseSection() {
       className="w-full max-w-6xl mx-auto px-4 mb-16 mt-8"
       aria-labelledby="maestri-heading"
     >
-      {/* Section Header - Clean, no badge */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -102,34 +99,29 @@ export function MaestriShowcaseSection() {
           id="maestri-heading"
           className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          I tuoi{" "}
+          {t("heading")}{" "}
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600">
-            Professori
+            {t("headingHighlight")}
           </span>
         </h2>
-
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          {displayedMaestri.length} menti straordinarie della storia diventano i
-          tuoi professori personali.
+          {t("subtitle", { count: displayedMaestri.length })}
         </p>
       </motion.div>
 
-      {/* Carousel Container */}
       <div
         className="relative overflow-hidden"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {/* Left Arrow */}
         <button
           onClick={() => scroll("left")}
           className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -ml-2"
-          aria-label="Scorri a sinistra"
+          aria-label={t("scrollLeft")}
         >
           <ChevronLeft className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
 
-        {/* Scrollable Container - Fixed width to show exactly 5 cards */}
         <div
           className="overflow-hidden mx-auto"
           style={{ width: "min(100%, 960px)" }}
@@ -139,7 +131,7 @@ export function MaestriShowcaseSection() {
             className="flex gap-4 overflow-x-auto scrollbar-hide py-4 px-2 scroll-smooth"
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
             role="region"
-            aria-label="Carosello professori - usa le frecce per navigare"
+            aria-label={t("carouselLabel")}
             // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- WCAG: scrollable regions need tabIndex for keyboard access
             tabIndex={0}
           >
@@ -156,7 +148,6 @@ export function MaestriShowcaseSection() {
                 }}
                 className="flex-shrink-0 w-44 bg-white dark:bg-gray-800 rounded-xl p-4 text-center shadow-md border border-gray-100 dark:border-gray-700 hover:shadow-lg hover:border-purple-300 dark:hover:border-purple-600 transition-all"
               >
-                {/* Avatar */}
                 <div
                   className="w-16 h-16 mx-auto mb-3 rounded-full p-0.5"
                   style={{
@@ -166,50 +157,44 @@ export function MaestriShowcaseSection() {
                   <div className="w-full h-full rounded-full bg-white dark:bg-gray-900 overflow-hidden">
                     <Image
                       src={maestro.avatar}
-                      alt={`${maestro.displayName} - Professore di ${subjectNames[maestro.subject] || maestro.subject}`}
+                      alt={`${maestro.displayName} - ${getSubjectName(maestro.subject)}`}
                       width={64}
                       height={64}
                       className="w-full h-full object-cover"
                     />
                   </div>
                 </div>
-
-                {/* Info */}
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1 leading-tight">
                   {maestro.displayName}
                 </h3>
                 <p className="text-xs font-medium text-blue-600 dark:text-blue-400">
-                  {subjectNames[maestro.subject] || maestro.subject}
+                  {getSubjectName(maestro.subject)}
                 </p>
               </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
           className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-lg flex items-center justify-center hover:bg-white dark:hover:bg-gray-700 transition-colors -mr-2"
-          aria-label="Scorri a destra"
+          aria-label={t("scrollRight")}
         >
           <ChevronRight className="w-6 h-6 text-gray-700 dark:text-gray-300" />
         </button>
       </div>
 
-      {/* Scroll hint for mobile */}
       <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-3 md:hidden">
-        ← Scorri per vedere i professori →
+        {t("scrollHint")}
       </p>
 
-      {/* Disclaimer */}
       <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-4 max-w-2xl mx-auto">
-        I professori AI sono creati a scopo educativo e dimostrativo. In futuro
-        ogni studente potra creare i propri professori personalizzati.{" "}
+        {t("disclaimer")}{" "}
         <Link
           href="/ai-transparency"
           className="underline hover:text-gray-600 dark:hover:text-gray-400"
         >
-          Scopri di piu
+          {t("disclaimerLink")}
         </Link>
       </p>
     </motion.section>

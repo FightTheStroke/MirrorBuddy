@@ -7,22 +7,11 @@
 import dynamic from "next/dynamic";
 import {
   MaestriShowcaseSkeleton,
-  TierComparisonSkeleton,
   SupportSkeleton,
+  AccessibilitySkeleton,
   FeaturesSkeleton,
   ComplianceSkeleton,
 } from "./welcome-skeletons";
-
-export const LazyTierComparisonSection = dynamic(
-  () =>
-    import("./tier-comparison-section").then((m) => ({
-      default: m.TierComparisonSection,
-    })),
-  {
-    loading: () => <TierComparisonSkeleton />,
-    ssr: false,
-  },
-);
 
 export const LazyMaestriShowcaseSection = dynamic(
   () =>
@@ -42,6 +31,17 @@ export const LazySupportSection = dynamic(
     })),
   {
     loading: () => <SupportSkeleton />,
+    ssr: false,
+  },
+);
+
+export const LazyAccessibilitySection = dynamic(
+  () =>
+    import("./accessibility-section").then((m) => ({
+      default: m.AccessibilitySection,
+    })),
+  {
+    loading: () => <AccessibilitySkeleton />,
     ssr: false,
   },
 );

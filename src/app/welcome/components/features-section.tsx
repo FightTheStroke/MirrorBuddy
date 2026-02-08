@@ -67,7 +67,10 @@ export function FeaturesSection() {
           id="features-heading"
           className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          {t("heading")}
+          {t("heading")}{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
+            {t("headingHighlight")}
+          </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400">
           {t("subtitle")}

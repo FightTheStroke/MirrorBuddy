@@ -99,65 +99,9 @@ export function HeroSection({ userName, isReturningUser }: HeroSectionProps) {
             >
               {t("primarySubtitle")}
             </motion.p>
-            <AccessibilityFeatures t={t} />
           </>
         )}
       </div>
     </div>
-  );
-}
-
-interface AccessibilityFeaturesProps {
-  t: ReturnType<typeof useTranslations>;
-}
-
-function AccessibilityFeatures({ t }: AccessibilityFeaturesProps) {
-  // Accessibility features - 4 key capabilities in grid
-  const ACCESSIBILITY_FEATURES = [
-    { icon: "📖", label: t("readableFonts") },
-    { icon: "🗺️", label: t("mindMaps") },
-    { icon: "🔊", label: t("textToSpeech") },
-    { icon: "🎯", label: t("adaptiveQuizzes") },
-  ];
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.4 }}
-      className="max-w-3xl mx-auto"
-    >
-      <div className="relative overflow-hidden p-8 bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/30 dark:via-purple-900/30 dark:to-pink-900/30 rounded-3xl border-2 border-indigo-200 dark:border-indigo-800 shadow-xl">
-        <div className="absolute top-0 right-0 w-32 h-32 bg-purple-200/30 dark:bg-purple-600/20 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-40 h-40 bg-pink-200/30 dark:bg-pink-600/20 rounded-full blur-3xl" />
-        <div className="relative z-10">
-          <p className="text-center text-base text-gray-700 dark:text-gray-200 mb-2 font-medium">
-            {t("accessibility.introLine1")}
-          </p>
-          <p className="text-center text-base text-gray-700 dark:text-gray-200 mb-4 font-medium">
-            {t("accessibility.introLine2")}
-          </p>
-          <h3 className="flex items-center justify-center gap-2 mb-4 text-xl font-bold text-gray-900 dark:text-white">
-            <span aria-hidden="true">♿</span>
-            {t("accessibility.title")}
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {ACCESSIBILITY_FEATURES.map((feature, idx) => (
-              <div
-                key={idx}
-                className="flex flex-col items-center gap-2 p-3 bg-white/70 dark:bg-gray-800/70 rounded-xl backdrop-blur-sm"
-              >
-                <span className="text-2xl" aria-hidden="true">
-                  {feature.icon}
-                </span>
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                  {feature.label}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </motion.div>
   );
 }

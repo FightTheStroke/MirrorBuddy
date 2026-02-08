@@ -13,7 +13,7 @@
       "tagline": "Deine maßgeschneiderte Schule mit den Meistern der Geschichte",
       "taglineWith": "mit den großen Professoren",
       "taglineAbilities": "unabhängig von deinen Fähigkeiten",
-      "description": "Lerne Mathe <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 22 historische Professoren begleiten dich persönlich.",
+      "description": "Lerne Mathe <strong>mit Euklid</strong>, Physik <strong>mit Feynman</strong>, Chemie <strong>mit Marie Curie</strong>. 26 historische Professoren begleiten dich persönlich.",
       "accessibility": {
         "title": "Maßgeschneiderte Barrierefreiheit für dich",
         "subtitle": "Gezielte Unterstützung bei Lernschwierigkeiten",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "VOLLZUGANG",
         "title": "Hast du ein Konto?",
-        "feature1": "22 KI-Professoren",
+        "feature1": "26 KI-Professoren",
         "feature2": "Alle Werkzeuge",
         "feature3": "Gespeicherte Fortschritte",
         "cta": "Anmelden"
@@ -91,7 +91,7 @@
           "price": "Auf Anfrage",
           "badge": "Empfohlen",
           "features": {
-            "maestri": "22 Professoren",
+            "maestri": "26 Professoren",
             "messagesUnlimited": "Unbegrenzte Nachrichten",
             "voiceUnlimited": "Unbegrenzte Sprache",
             "allTools": "Alle Werkzeuge"
@@ -150,11 +150,41 @@
       "disclaimer": "KI-Professoren werden zu pädagogischen und demonstrativen Zwecken erstellt. In Zukunft wird jeder Student in der Lage sein, seine eigenen personalisierten Professoren zu erstellen.",
       "disclaimerLink": "Mehr erfahren",
       "introText": "Inspiriert von den großen Köpfen der Geschichte, entwickelt um dir beim Verstehen zu helfen.",
-      "educationalDisclaimer": "Die KI-Professoren sind Lernwerkzeuge, die von historischen Persönlichkeiten inspiriert sind. Sie ersetzen keine echten Lehrer."
+      "educationalDisclaimer": "Die KI-Professoren sind Lernwerkzeuge, die von historischen Persönlichkeiten inspiriert sind. Sie ersetzen keine echten Lehrer.",
+      "subjects": {
+        "mathematics": "Mathematik",
+        "physics": "Physik",
+        "chemistry": "Chemie",
+        "biology": "Biologie",
+        "history": "Geschichte",
+        "geography": "Geographie",
+        "astronomy": "Astronomie",
+        "italian": "Italienisch",
+        "english": "Englisch",
+        "spanish": "Spanisch",
+        "french": "Französisch",
+        "german": "Deutsch",
+        "art": "Kunst",
+        "music": "Musik",
+        "civics": "Gemeinschaftskunde",
+        "civicEducation": "Gemeinschaftskunde",
+        "economics": "Wirtschaft",
+        "computerScience": "Informatik",
+        "health": "Gesundheit",
+        "philosophy": "Philosophie",
+        "internationalLaw": "Internationales Recht",
+        "physicalEducation": "Sportunterricht",
+        "storytelling": "Storytelling",
+        "supercazzola": "Supercazzola",
+        "sport": "Sport"
+      }
     },
     "support": {
-      "heading": "Immer an deiner Seite",
+      "heading": "Immer an deiner",
+      "headingHighlight": "Seite",
       "subtitle": "Coaches für Lernmethoden und Buddies für emotionale Unterstützung",
+      "coachLabel": "Coach",
+      "buddyLabel": "Buddy",
       "coach": "Coach - Lehrt dir Lernmethoden",
       "buddy": "Buddy - Unterstützt dich emotional",
       "scrollHint": "← Scrollen Sie, um alle zu sehen →",
@@ -166,14 +196,41 @@
       "carouselLabel": "Coaches- und Buddies-Karussell - verwenden Sie die Pfeile zur Navigation"
     },
     "features": {
-      "heading": "Werkzeuge für jeden Lernstil",
+      "heading": "Werkzeuge für jeden",
+      "headingHighlight": "Lernstil",
       "subtitle": "Eine umfassende und barrierefreie Plattform für dich entwickelt",
-      "voiceConversation": "Sprachunterhaltung - Sprich in Echtzeit mit deinen Professoren",
-      "mindMaps": "Mindmaps - Visualisiere und organisiere Konzepte",
-      "flashcards": "FSRS-Karteikarten - Lerne mit verteilter Wiederholung",
-      "interactiveQuizzes": "Interaktive Quiz - Teste dein Wissen",
-      "gamification": "Gamification - Verdiene XP und schalte Ziele frei",
-      "adaptiveLearning": "Adaptives Lernen - Passt sich deinem Stil und Tempo an",
+      "voiceConversation": {
+        "label": "Sprachunterhaltung",
+        "description": "Sprich in Echtzeit mit deinen Professoren"
+      },
+      "mindMaps": {
+        "label": "Mindmaps",
+        "description": "Visualisiere und organisiere Konzepte"
+      },
+      "flashcards": {
+        "label": "FSRS-Karteikarten",
+        "description": "Lerne mit verteilter Wiederholung"
+      },
+      "interactiveQuizzes": {
+        "label": "Interaktive Quiz",
+        "description": "Teste dein Wissen"
+      },
+      "gamification": {
+        "label": "Gamification",
+        "description": "Verdiene XP und schalte Ziele frei"
+      },
+      "adaptiveLearning": {
+        "label": "Adaptives Lernen",
+        "description": "Passt sich deinem Stil und Tempo an"
+      },
+      "totalAccessibility": {
+        "label": "Volle Barrierefreiheit",
+        "description": "Entwickelt für LRS, ADHS und alle"
+      },
+      "integratedPlatform": {
+        "label": "Integrierte Plattform",
+        "description": "Alles an einem Ort"
+      },
       "introLine1": "Jedes Werkzeug hat ein einziges Ziel:",
       "introLine2": "das Lernen klarer zu machen, Schritt für Schritt."
     },
@@ -370,7 +427,7 @@
       "title": "Warum MirrorBuddy wählen",
       "items": {
         "maestri": {
-          "title": "22 KI-Professoren",
+          "title": "26 KI-Professoren",
           "description": "Von Euklid bis Darwin, lerne von außergewöhnlichen Köpfen der Geschichte"
         },
         "accessibility": {
@@ -388,7 +445,8 @@
       }
     },
     "accessibilityFirstSection": {
-      "heading": "Speziell entwickelt für Menschen mit Lernschwierigkeiten",
+      "heading": "Zugänglich für",
+      "headingHighlight": "alle",
       "subheading": "7 Barrierefreiheitsprofile, alle 100% konfigurierbar",
       "profiles": {
         "dyslexia": {

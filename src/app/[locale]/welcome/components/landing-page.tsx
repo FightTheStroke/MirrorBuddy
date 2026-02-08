@@ -12,9 +12,9 @@ import { WelcomeFooter } from "./welcome-footer";
 import { LanguageSwitcher } from "./language-switcher";
 import { RodariStorySection } from "./rodari-story-section";
 import {
-  LazyTierComparisonSection,
   LazyMaestriShowcaseSection,
   LazySupportSection,
+  LazyAccessibilitySection,
   LazyFeaturesSection,
   LazyComplianceSection,
 } from "./lazy";
@@ -130,14 +130,14 @@ export function LandingPage({
             }
           />
 
-          {/* Tier comparison cards */}
-          <LazyTierComparisonSection />
-
           {/* Professors carousel */}
           <LazyMaestriShowcaseSection />
 
           {/* Coaches & Buddies carousel */}
           <LazySupportSection />
+
+          {/* Accessibility profiles */}
+          <LazyAccessibilitySection />
 
           {/* Platform features */}
           <LazyFeaturesSection />

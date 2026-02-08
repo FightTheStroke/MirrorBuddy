@@ -11,66 +11,40 @@ import {
   Brain,
   Target,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import type { LucideIcon } from "lucide-react";
 
-interface Feature {
-  icon: LucideIcon;
-  label: string;
-  description: string;
-}
-
-const FEATURES: Feature[] = [
-  {
-    icon: Mic,
-    label: "Conversazione Vocale",
-    description: "Parla con i tuoi Maestri in tempo reale",
-  },
-  {
-    icon: Map,
-    label: "Mappe Mentali",
-    description: "Visualizza e organizza i concetti",
-  },
-  {
-    icon: BookOpen,
-    label: "Flashcard FSRS",
-    description: "Memorizza con la ripetizione spaziata",
-  },
-  {
-    icon: Sparkles,
-    label: "Quiz Interattivi",
-    description: "Metti alla prova le tue conoscenze",
-  },
-  {
-    icon: Gamepad2,
-    label: "Gamification",
-    description: "Guadagna XP e sblocca traguardi",
-  },
-  {
-    icon: Brain,
-    label: "Apprendimento Adattivo",
-    description: "Si adatta al tuo stile e ritmo",
-  },
-  {
-    icon: Target,
-    label: "Accessibilità Totale",
-    description: "Progettato per DSA, ADHD e tutti",
-  },
-  {
-    icon: GraduationCap,
-    label: "Piattaforma Integrata",
-    description: "Tutto in un unico posto",
-  },
+const FEATURE_ICONS: LucideIcon[] = [
+  Mic,
+  Map,
+  BookOpen,
+  Sparkles,
+  Gamepad2,
+  Brain,
+  Target,
+  GraduationCap,
 ];
+
+const FEATURE_KEYS = [
+  "voiceConversation",
+  "mindMaps",
+  "flashcards",
+  "interactiveQuizzes",
+  "gamification",
+  "adaptiveLearning",
+  "totalAccessibility",
+  "integratedPlatform",
+] as const;
 
 /**
  * Features Section for MirrorBuddy Welcome Page
  *
  * TERTIARY SECTION: Displays platform tools and accessibility features.
  * This is the integrated platform that supports learning with Maestri.
- *
- * Part of Wave 3: Welcome Experience Enhancement
  */
 export function FeaturesSection() {
+  const t = useTranslations("welcome.features");
+
   return (
     <motion.section
       initial={{ opacity: 0, y: 20 }}
@@ -89,19 +63,22 @@ export function FeaturesSection() {
           id="features-heading"
           className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-3"
         >
-          Strumenti per ogni stile di apprendimento
+          {t("heading")}{" "}
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 via-purple-500 to-blue-500">
+            {t("headingHighlight")}
+          </span>
         </h2>
         <p className="text-base text-gray-600 dark:text-gray-400">
-          Una piattaforma completa, accessibile e progettata per te
+          {t("subtitle")}
         </p>
       </motion.div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {FEATURES.map((feature, i) => {
-          const Icon = feature.icon;
+        {FEATURE_KEYS.map((key, i) => {
+          const Icon = FEATURE_ICONS[i];
           return (
             <motion.div
-              key={feature.label}
+              key={key}
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 1.2 + i * 0.05 }}
@@ -114,10 +91,10 @@ export function FeaturesSection() {
                 />
               </div>
               <h3 className="text-sm font-semibold text-gray-800 dark:text-gray-200 mb-1">
-                {feature.label}
+                {t(`${key}.label`)}
               </h3>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {feature.description}
+                {t(`${key}.description`)}
               </p>
             </motion.div>
           );

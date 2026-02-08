@@ -13,7 +13,7 @@
       "tagline": "Your tailored school, with history's masters",
       "taglineWith": "with the Great Professors",
       "taglineAbilities": "whatever your abilities",
-      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 22 historic Professors accompany you personally.",
+      "description": "Study math <strong>with Euclid</strong>, physics <strong>with Feynman</strong>, chemistry <strong>with Marie Curie</strong>. 26 historic Professors accompany you personally.",
       "accessibility": {
         "title": "Tailored accessibility for you",
         "subtitle": "Dedicated support for learning differences",
@@ -40,7 +40,7 @@
       "betaAccess": {
         "badge": "FULL ACCESS",
         "title": "Have an account?",
-        "feature1": "22 AI Professors",
+        "feature1": "26 AI Professors",
         "feature2": "All tools",
         "feature3": "Saved progress",
         "cta": "Log in"
@@ -91,7 +91,7 @@
           "price": "On request",
           "badge": "Recommended",
           "features": {
-            "maestri": "22 Professors",
+            "maestri": "26 Professors",
             "messagesUnlimited": "Unlimited messages",
             "voiceUnlimited": "Unlimited voice",
             "allTools": "All tools"
@@ -150,11 +150,41 @@
       "disclaimer": "AI professors are created for educational and demonstrative purposes. In the future, each student will be able to create their own personalized professors.",
       "disclaimerLink": "Learn more",
       "introText": "Inspired by the great minds of history, designed to help you understand.",
-      "educationalDisclaimer": "AI professors are educational tools inspired by historical figures. They do not replace real teachers."
+      "educationalDisclaimer": "AI professors are educational tools inspired by historical figures. They do not replace real teachers.",
+      "subjects": {
+        "mathematics": "Mathematics",
+        "physics": "Physics",
+        "chemistry": "Chemistry",
+        "biology": "Biology",
+        "history": "History",
+        "geography": "Geography",
+        "astronomy": "Astronomy",
+        "italian": "Italian",
+        "english": "English",
+        "spanish": "Spanish",
+        "french": "French",
+        "german": "German",
+        "art": "Art",
+        "music": "Music",
+        "civics": "Civic Education",
+        "civicEducation": "Civic Education",
+        "economics": "Economics",
+        "computerScience": "Computer Science",
+        "health": "Health",
+        "philosophy": "Philosophy",
+        "internationalLaw": "International Law",
+        "physicalEducation": "Physical Education",
+        "storytelling": "Storytelling",
+        "supercazzola": "Supercazzola",
+        "sport": "Sport"
+      }
     },
     "support": {
-      "heading": "Always by your side",
+      "heading": "Always by your",
+      "headingHighlight": "side",
       "subtitle": "Coaches for study methods and Buddies for emotional support",
+      "coachLabel": "Coach",
+      "buddyLabel": "Buddy",
       "coach": "Coach - They teach you study methods",
       "buddy": "Buddy - They support you emotionally",
       "scrollHint": "\u2190 Scroll to see all \u2192",
@@ -166,14 +196,41 @@
       "carouselLabel": "Coaches and buddies carousel - use arrows to navigate"
     },
     "features": {
-      "heading": "Tools for every learning style",
+      "heading": "Tools for every",
+      "headingHighlight": "learning style",
       "subtitle": "A complete and accessible platform designed for you",
-      "voiceConversation": "Voice Conversation - Speak with your Professors in real-time",
-      "mindMaps": "Mind Maps - Visualize and organize concepts",
-      "flashcards": "FSRS Flashcards - Memorize with spaced repetition",
-      "interactiveQuizzes": "Interactive Quizzes - Test your knowledge",
-      "gamification": "Gamification - Earn XP and unlock achievements",
-      "adaptiveLearning": "Adaptive Learning - Adapts to your style and pace",
+      "voiceConversation": {
+        "label": "Voice Conversation",
+        "description": "Speak with your Professors in real-time"
+      },
+      "mindMaps": {
+        "label": "Mind Maps",
+        "description": "Visualize and organize concepts"
+      },
+      "flashcards": {
+        "label": "FSRS Flashcards",
+        "description": "Memorize with spaced repetition"
+      },
+      "interactiveQuizzes": {
+        "label": "Interactive Quizzes",
+        "description": "Test your knowledge"
+      },
+      "gamification": {
+        "label": "Gamification",
+        "description": "Earn XP and unlock achievements"
+      },
+      "adaptiveLearning": {
+        "label": "Adaptive Learning",
+        "description": "Adapts to your style and pace"
+      },
+      "totalAccessibility": {
+        "label": "Total Accessibility",
+        "description": "Designed for SLD, ADHD and everyone"
+      },
+      "integratedPlatform": {
+        "label": "Integrated Platform",
+        "description": "Everything in one place"
+      },
       "introLine1": "Every tool has a single goal:",
       "introLine2": "making studying clearer, step by step."
     },
@@ -370,7 +427,7 @@
       "title": "Why choose MirrorBuddy",
       "items": {
         "maestri": {
-          "title": "22 AI Professors",
+          "title": "26 AI Professors",
           "description": "From Euclid to Darwin, learn from extraordinary minds of history"
         },
         "accessibility": {
@@ -388,7 +445,8 @@
       }
     },
     "accessibilityFirstSection": {
-      "heading": "Designed specifically for those with learning differences",
+      "heading": "Accessible for",
+      "headingHighlight": "everyone",
       "subheading": "7 accessibility profiles, all 100% configurable",
       "profiles": {
         "dyslexia": {
