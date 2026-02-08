@@ -114,16 +114,50 @@ if [ "${SKIP_VERCEL_ENV_CHECK:-}" = "1" ]; then
 	echo -e "${YELLOW}⚠ Vercel env check skipped (SKIP_VERCEL_ENV_CHECK=1)${NC}"
 # Check if vercel CLI is available
 elif command -v vercel &>/dev/null; then
-	# Required env vars for production
+	# Required env vars for production (must match fix-vercel-env-vars.sh)
 	REQUIRED_VARS=(
+		# Core
 		"DATABASE_URL"
+		"DIRECT_URL"
+		"SESSION_SECRET"
 		"ADMIN_EMAIL"
 		"ADMIN_PASSWORD"
-		"SESSION_SECRET"
 		"CRON_SECRET"
-		"SUPABASE_CA_CERT"
+		"TOKEN_ENCRYPTION_KEY"
+		"IP_HASH_SALT"
+		# Azure AI
 		"AZURE_OPENAI_API_KEY"
+		"AZURE_OPENAI_ENDPOINT"
+		"AZURE_OPENAI_CHAT_DEPLOYMENT"
+		"AZURE_OPENAI_EMBEDDING_DEPLOYMENT"
+		"AZURE_OPENAI_REALTIME_ENDPOINT"
+		"AZURE_OPENAI_REALTIME_API_KEY"
+		"AZURE_OPENAI_REALTIME_DEPLOYMENT"
+		"AZURE_OPENAI_TTS_DEPLOYMENT"
+		# Email
+		"RESEND_API_KEY"
+		"FROM_EMAIL"
+		# Auth & OAuth
+		"GOOGLE_CLIENT_ID"
+		"GOOGLE_CLIENT_SECRET"
+		"NEXTAUTH_URL"
+		# Push notifications
+		"NEXT_PUBLIC_VAPID_PUBLIC_KEY"
+		"VAPID_PRIVATE_KEY"
+		"VAPID_SUBJECT"
+		# Rate limiting
+		"UPSTASH_REDIS_REST_URL"
+		"UPSTASH_REDIS_REST_TOKEN"
+		# Supabase
+		"NEXT_PUBLIC_SUPABASE_URL"
+		"NEXT_PUBLIC_SUPABASE_ANON_KEY"
+		"SUPABASE_SERVICE_ROLE_KEY"
+		# Observability
+		"NEXT_PUBLIC_SENTRY_DSN"
+		"SENTRY_AUTH_TOKEN"
+		# Public URLs
 		"NEXT_PUBLIC_SITE_URL"
+		"NEXT_PUBLIC_APP_URL"
 	)
 
 	VERCEL_VARS=$(vercel env ls 2>/dev/null | awk '{print $1}' | tail -n +3 || echo "")
