@@ -46,6 +46,7 @@ vi.mock("@/components/settings/sections", () => ({
   AmbientAudioSettings: () => <div>Ambient Audio Settings</div>,
   AIProviderSettings: () => <div>AI Provider Settings</div>,
   DiagnosticsTab: () => <div>Diagnostics Tab</div>,
+  MobileToolsSection: () => <div data-testid="tools-section">Mobile Tools</div>,
 }));
 
 vi.mock("@/components/google-drive", () => ({
@@ -133,8 +134,8 @@ describe("SettingsPageMobile", () => {
     render(<SettingsPageMobile onBack={vi.fn()} />);
 
     const sectionButtons = screen.getAllByRole("button");
-    // Should have back button + 12 section headers
-    expect(sectionButtons.length).toBeGreaterThanOrEqual(13);
+    // Should have back button + save button + 14 section headers
+    expect(sectionButtons.length).toBeGreaterThanOrEqual(14);
   });
 
   it("has full-width responsive layout", () => {
