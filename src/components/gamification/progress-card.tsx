@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Flame, Trophy, BookOpen, Zap } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -12,7 +13,8 @@ interface ProgressCardProps {
 }
 
 export function ProgressCard({ progress, className }: ProgressCardProps) {
-  const xpProgress = (progress.xp % progress.xpToNextLevel) / progress.xpToNextLevel * 100;
+  const t = useTranslations('education.gamification.progressCard');
+  const xpProgress = ((progress.xp % progress.xpToNextLevel) / progress.xpToNextLevel) * 100;
 
   return (
     <Card className={cn('overflow-hidden', className)}>
@@ -24,21 +26,25 @@ export function ProgressCard({ progress, className }: ProgressCardProps) {
               <span className="text-xl font-bold text-white">{progress.level}</span>
             </div>
             <div>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Livello</p>
-              <p className="font-semibold">Studente {getLevelTitle(progress.level)}</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400">{t('level')}</p>
+              <p className="font-semibold">
+                {t('student')} {getLevelTitle(progress.level)}
+              </p>
             </div>
           </div>
           <div className="text-right">
             <p className="text-2xl font-bold text-purple-600">{progress.xp.toLocaleString()}</p>
-            <p className="text-xs text-slate-500">XP totali</p>
+            <p className="text-xs text-slate-500">{t('totalXp')}</p>
           </div>
         </div>
 
         {/* XP Progress bar */}
         <div className="mb-6">
           <div className="flex justify-between text-xs text-slate-500 mb-1">
-            <span>Prossimo livello</span>
-            <span>{progress.xpToNextLevel - (progress.xp % progress.xpToNextLevel)} XP rimanenti</span>
+            <span>{t('nextLevel')}</span>
+            <span>
+              {progress.xpToNextLevel - (progress.xp % progress.xpToNextLevel)} {t('xpRemaining')}
+            </span>
           </div>
           <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
             <motion.div
@@ -60,7 +66,7 @@ export function ProgressCard({ progress, className }: ProgressCardProps) {
           />
           <StatItem
             icon={<Trophy className="w-5 h-5 text-amber-500" />}
-            value={progress.achievements.filter(a => a.unlockedAt).length}
+            value={progress.achievements.filter((a) => a.unlockedAt).length}
             label="Trofei"
           />
           <StatItem
@@ -88,10 +94,12 @@ interface StatItemProps {
 
 function StatItem({ icon, value, label, highlight }: StatItemProps) {
   return (
-    <div className={cn(
-      'text-center p-3 rounded-xl',
-      highlight ? 'bg-orange-50 dark:bg-orange-900/20' : 'bg-slate-50 dark:bg-slate-800/50'
-    )}>
+    <div
+      className={cn(
+        'text-center p-3 rounded-xl',
+        highlight ? 'bg-orange-50 dark:bg-orange-900/20' : 'bg-slate-50 dark:bg-slate-800/50',
+      )}
+    >
       <div className="flex justify-center mb-1">{icon}</div>
       <p className="text-lg font-bold">{value}</p>
       <p className="text-xs text-slate-500">{label}</p>

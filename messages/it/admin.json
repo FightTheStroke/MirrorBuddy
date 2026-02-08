@@ -43,7 +43,20 @@
       "total": "Total",
       "maestroUsageChart": {
         "title": "Uso Maestri",
-        "description": "Grafico utilizzo maestri",
+        "top5Of": "Top 5 di",
+        "totalSessions": "sessioni totali",
+        "chartAriaLabel": "Grafico utilizzo maestri",
+        "tableAriaLabel": "Statistiche utilizzo maestri",
+        "sessions": "Sessioni",
+        "sessionsLabel": "sessioni",
+        "totalHours": "h totali",
+        "tableHeaders": {
+          "maestro": "Maestro",
+          "sessions": "Sessioni",
+          "percentage": "Percentuale",
+          "totalHours": "Ore totali"
+        },
+        "noSessions": "Nessuna sessione registrata",
         "loading": "Caricamento...",
         "noData": "Nessun dato"
       },
@@ -464,6 +477,9 @@
       "maestroUsageChart": {
         "title": "Utilizzo per maestro"
       },
+      "timeStudyChart": {
+        "chartAriaLabel": "Grafico tempo di studio per materia"
+      },
       "monthlyForecast": "Previsione mensile",
       "noCostData": "Nessun dato sui costi disponibile",
       "noDataAvailable": "Nessun dato disponibile",
@@ -708,6 +724,103 @@
         "error": "Errore",
         "success": "Successo"
       }
+    },
+    "businessKpi": {
+      "topCountries": "Top Paesi",
+      "usersAndRevenueByCountry": "Utenti e ricavi per paese",
+      "country": "Paese",
+      "users": "Utenti",
+      "revenue": "Ricavi",
+      "notAvailable": "N/D",
+      "requiresStripe": "Richiede integrazione Stripe",
+      "noCountryData": "Nessun dato paese disponibile",
+      "topMaestri": "Top Maestri",
+      "mostPopularTeachers": "Insegnanti AI più popolari",
+      "maestro": "Maestro",
+      "sessions": "Sessioni",
+      "avgDuration": "Durata Media",
+      "durationNotTracked": "Durata sessione non tracciata",
+      "noMaestriData": "Nessun dato maestri disponibile"
+    },
+    "research": {
+      "loading": "Caricamento Research Lab...",
+      "title": "Research Lab",
+      "description": "Esperimenti TutorBench — studenti sintetici vs maestri",
+      "benchmarkScores": "Punteggi Benchmark",
+      "experiments": "Esperimenti ({count})",
+      "name": "Nome",
+      "maestro": "Maestro",
+      "hypothesis": "Ipotesi",
+      "status": "Stato",
+      "turns": "Turni",
+      "actions": "Azioni",
+      "noExperiments": "Nessun esperimento ancora. Creane uno via API.",
+      "running": "In esecuzione...",
+      "run": "Esegui"
+    },
+    "tiers": {
+      "buddiesAvailable": "Buddy Disponibili",
+      "coachesAvailable": "Coach Disponibili",
+      "maestriAvailable": "Maestri Disponibili",
+      "toolsAvailable": "Tool Disponibili",
+      "selectedCount": "{selected} / {total} selezionati",
+      "selectAll": "Seleziona tutti",
+      "deselectAll": "Deseleziona tutti"
+    },
+    "users": {
+      "backToUsers": "Torna agli Utenti",
+      "user": "Utente",
+      "disabled": "Disabilitato",
+      "active": "Attivo",
+      "conversations": "Conversazioni",
+      "last30Days": "{count} ultimi 30 giorni",
+      "voiceMinutes": "Minuti Voce",
+      "totalUsage": "Utilizzo totale",
+      "flashcards": "Flashcard",
+      "reviews": "{count} revisioni",
+      "materials": "Materiali",
+      "uploadedFiles": "File caricati",
+      "userInfo": "Info Utente",
+      "accountDetails": "Dettagli account",
+      "username": "Username",
+      "email": "Email",
+      "created": "Creato",
+      "lastActivity": "Ultima Attività",
+      "role": "Ruolo",
+      "topMaestri": "Top Maestri",
+      "mostUsedTutors": "Tutor AI più utilizzati",
+      "noConversationsYet": "Nessuna conversazione ancora",
+      "sessions": "{count} sessioni",
+      "settings": "Impostazioni",
+      "userPreferences": "Preferenze utente",
+      "language": "Lingua",
+      "theme": "Tema",
+      "accessibility": "Accessibilità",
+      "activitySummary": "Riepilogo Attività",
+      "engagementMetrics": "Metriche di coinvolgimento",
+      "totalMessages": "Messaggi Totali",
+      "avgMessagesPerConversation": "Media Messaggi/Conversazione",
+      "flashcardReviewRate": "Tasso Revisione Flashcard",
+      "restore": "Ripristina"
+    },
+    "invites": {
+      "noRequestsFound": "Nessuna richiesta trovata",
+      "selectAll": "Seleziona tutti",
+      "request": "Richiesta",
+      "status": "Stato",
+      "motivation": "Motivazione",
+      "directAdminInvite": "Invito diretto admin",
+      "username": "Username",
+      "rejectionReason": "Motivo rifiuto",
+      "statusPending": "In attesa",
+      "statusApproved": "Approvata",
+      "statusRejected": "Rifiutata"
+    },
+    "mobileNav": {
+      "openMenu": "Apri menu di navigazione",
+      "menu": "Menu",
+      "closeMenu": "Chiudi menu",
+      "returnToApp": "Torna all'app"
     }
   }
 }

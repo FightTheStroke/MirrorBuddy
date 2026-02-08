@@ -193,7 +193,11 @@
       "titlePlaceholder": "Title Placeholder",
       "unsaved": "Unsaved",
       "word": "Word",
-      "words": "Words"
+      "words": "Words",
+      "addKeyPoint": "[TRANSLATE] Aggiungi punto",
+      "deleteKeyPoint": "[TRANSLATE] Elimina punto",
+      "deleteSection": "[TRANSLATE] Elimina sezione",
+      "editTitle": "[TRANSLATE] Modifica titolo"
     },
     "diagram": {
       "label": "Diagramme",
@@ -352,7 +356,13 @@
     "flashcards": {
       "ratingQuestion": "Rating Question",
       "label": "Flashcard",
-      "description": "Crea flashcard per lo studio"
+      "description": "Crea flashcard per lo studio",
+      "completed": "[TRANSLATE] Completato!",
+      "reviewedAllCards": "[TRANSLATE] Hai rivisto tutte le carte di oggi.",
+      "cardsReviewedCount": "[TRANSLATE] Carte riviste: {count}",
+      "continue": "[TRANSLATE] Continua",
+      "swipeHint": "[TRANSLATE] Scorri sinistra per difficile, destra per facile",
+      "navigationHint": "[TRANSLATE] Premi o scorri per valutare"
     },
     "loading": {
       "cancelled": "Cancelled",
@@ -399,6 +409,11 @@
       "zoomOut": {
         "ariaLabel": "Aria Label",
         "title": "Titolo"
+      },
+      "nodesCount": "[TRANSLATE] ({count} nodi)",
+      "undo": {
+        "ariaLabel": "[TRANSLATE] Annulla ultima modifica",
+        "title": "[TRANSLATE] Annulla (Ctrl+Z)"
       }
     },
     "print": {
@@ -467,7 +482,8 @@
       "capabilityPdf": "Charger des PDF depuis Drive pour générer du matériel d'étude",
       "capabilityHomework": "Importer des documents pour l'assistant aux devoirs",
       "capabilityDocuments": "Accéder à vos documents sans avoir à les télécharger",
-      "privacyNotice": "MirrorBuddy accède aux fichiers uniquement avec votre autorisation. Nous ne stockons pas vos fichiers Drive."
+      "privacyNotice": "MirrorBuddy accède aux fichiers uniquement avec votre autorisation. Nous ne stockons pas vos fichiers Drive.",
+      "selezionaDaGoogleDrive": "[TRANSLATE] Seleziona da Google Drive"
     },
     "astuccio": {
       "title": "Trousse",
@@ -551,6 +567,9 @@
       "saveError": "Erreur lors de l'enregistrement de la photo",
       "purpose": "Prendre une photo",
       "instructions": "Cadrez le document ou le tableau et prenez la photo"
+    },
+    "pomodoro": {
+      "iniziaFocus": "[TRANSLATE] Inizia Focus"
     }
   }
 }

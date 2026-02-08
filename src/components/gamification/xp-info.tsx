@@ -1,6 +1,7 @@
 'use client';
 
 import { Brain, MessageCircle, Clock, CreditCard, Target, Trophy } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { POMODORO_XP, MAESTRI_XP, FLASHCARD_XP } from '@/lib/constants/xp-rewards';
 
@@ -14,13 +15,12 @@ interface XPInfoProps {
  * Displays clear, visual breakdown of all XP earning opportunities
  */
 export function XPInfo({ className }: XPInfoProps) {
+  const t = useTranslations('education.gamification.xpInfo');
   return (
     <div className={cn('space-y-4', className)}>
       <div className="flex items-center gap-2 mb-4">
         <Trophy className="w-5 h-5 text-purple-500" />
-        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
-          Come guadagnare XP
-        </h3>
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{t('title')}</h3>
       </div>
 
       <div className="space-y-3">
@@ -29,12 +29,16 @@ export function XPInfo({ className }: XPInfoProps) {
           <Brain className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
-              Sessioni con i Maestri
+              {t('maestriTitle')}
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• {MAESTRI_XP.PER_MINUTE} XP al minuto di conversazione</li>
-              <li>• {MAESTRI_XP.PER_QUESTION} XP per ogni domanda che fai</li>
-              <li>• Massimo {MAESTRI_XP.MAX_PER_SESSION} XP per sessione</li>
+              <li>
+                • {MAESTRI_XP.PER_MINUTE} {t('maestriPerMinute')}
+              </li>
+              <li>
+                • {MAESTRI_XP.PER_QUESTION} {t('maestriPerQuestion')}
+              </li>
+              <li>• {t('maestriMaxPerSession', { max: MAESTRI_XP.MAX_PER_SESSION })}</li>
             </ul>
           </div>
         </div>
@@ -44,14 +48,22 @@ export function XPInfo({ className }: XPInfoProps) {
           <CreditCard className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
-              Flashcards
+              {t('flashcardsTitle')}
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• {FLASHCARD_XP.AGAIN} XP per &ldquo;Ancora&rdquo; (ripeti)</li>
-              <li>• {FLASHCARD_XP.HARD} XP per &ldquo;Difficile&rdquo;</li>
-              <li>• {FLASHCARD_XP.GOOD} XP per &ldquo;Bene&rdquo;</li>
-              <li>• {FLASHCARD_XP.EASY} XP per &ldquo;Facile&rdquo;</li>
-              <li>• Bonus XP per completare mazzi interi</li>
+              <li>
+                • {FLASHCARD_XP.AGAIN} {t('flashcardAgain')}
+              </li>
+              <li>
+                • {FLASHCARD_XP.HARD} {t('flashcardHard')}
+              </li>
+              <li>
+                • {FLASHCARD_XP.GOOD} {t('flashcardGood')}
+              </li>
+              <li>
+                • {FLASHCARD_XP.EASY} {t('flashcardEasy')}
+              </li>
+              <li>• {t('flashcardBonusDecks')}</li>
             </ul>
           </div>
         </div>
@@ -61,12 +73,18 @@ export function XPInfo({ className }: XPInfoProps) {
           <Clock className="w-5 h-5 text-red-600 dark:text-red-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
-              Timer Pomodoro
+              {t('pomodoroTitle')}
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• {POMODORO_XP.SINGLE} XP per pomodoro completato</li>
-              <li>• +{POMODORO_XP.FIRST_OF_DAY} XP primo pomodoro del giorno</li>
-              <li>• +{POMODORO_XP.CYCLE_BONUS} XP bonus ogni 4 pomodoro (ciclo completo)</li>
+              <li>
+                • {POMODORO_XP.SINGLE} {t('pomodoroSingle')}
+              </li>
+              <li>
+                • +{POMODORO_XP.FIRST_OF_DAY} {t('pomodoroFirst')}
+              </li>
+              <li>
+                • +{POMODORO_XP.CYCLE_BONUS} {t('pomodoroCycleBonus')}
+              </li>
             </ul>
           </div>
         </div>
@@ -76,11 +94,11 @@ export function XPInfo({ className }: XPInfoProps) {
           <Target className="w-5 h-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-slate-900 dark:text-slate-100 mb-1">
-              Quiz
+              {t('quizTitle')}
             </h4>
             <ul className="text-sm text-slate-600 dark:text-slate-400 space-y-0.5">
-              <li>• XP basati sul punteggio ottenuto</li>
-              <li>• Bonus per maestria raggiunta (70%+)</li>
+              <li>• {t('quizScoreBased')}</li>
+              <li>• {t('quizMasteryBonus')}</li>
             </ul>
           </div>
         </div>
@@ -91,8 +109,7 @@ export function XPInfo({ className }: XPInfoProps) {
         <div className="flex items-start gap-2">
           <MessageCircle className="w-4 h-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
           <p className="text-sm text-yellow-800 dark:text-yellow-200">
-            <strong>Suggerimento:</strong> I Maestri ti ricorderanno quando guadagni XP durante le conversazioni!
-            Fai domande e partecipa attivamente per massimizzare i tuoi punti.
+            <strong>{t('tipLabel')}</strong> {t('tipMessage')}
           </p>
         </div>
       </div>

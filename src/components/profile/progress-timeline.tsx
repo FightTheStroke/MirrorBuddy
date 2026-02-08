@@ -2,20 +2,12 @@
 
 import { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import {
-  TrendingUp,
-  Calendar,
-  Star,
-  Target,
-  Activity,
-} from 'lucide-react';
+import { TrendingUp, Calendar, Star, Target, Activity } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { DiaryEntry } from './teacher-diary';
-import {
-  calculateWeeklyData,
-  calculateImprovements,
-} from './progress-timeline-utils';
+import { calculateWeeklyData, calculateImprovements } from './progress-timeline-utils';
 
 interface ProgressTimelineProps {
   entries: DiaryEntry[];
@@ -31,6 +23,7 @@ interface ProgressTimelineProps {
  * - Key milestones and improvements
  */
 export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps) {
+  const t = useTranslations('settings.parentDashboard');
   // Group entries by week
   const weeklyData = useMemo(() => calculateWeeklyData(entries), [entries]);
 
@@ -38,7 +31,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
   const improvements = useMemo(() => calculateImprovements(weeklyData), [weeklyData]);
 
   // Get max value for chart scaling
-  const maxValue = Math.max(...weeklyData.map(w => w.total), 1);
+  const maxValue = Math.max(...weeklyData.map((w) => w.total), 1);
 
   if (entries.length === 0) {
     return (
@@ -46,11 +39,9 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
         <CardContent className="p-8 text-center">
           <Activity className="h-12 w-12 text-slate-300 mx-auto mb-4" />
           <h3 className="font-semibold text-slate-700 dark:text-slate-300 mb-2">
-            Progressi nel Tempo
+            {t('progressTimelineTitle')}
           </h3>
-          <p className="text-sm text-slate-500">
-            I progressi verranno visualizzati dopo le prime sessioni con i Professori.
-          </p>
+          <p className="text-sm text-slate-500">{t('progressTimelineEmptyDesc')}</p>
         </CardContent>
       </Card>
     );
@@ -61,79 +52,113 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-lg">
           <TrendingUp className="h-5 w-5 text-green-500" />
-          Progressi nel Tempo
+          {t('progressTitle')}
         </CardTitle>
-        <CardDescription>
-          Andamento delle osservazioni dei Professori su {studentName}
-        </CardDescription>
+        <CardDescription>{t('progressSubtitle', { name: studentName })}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Improvements Summary */}
         {improvements && (
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className={cn(
-              'p-4 rounded-xl border',
-              improvements.strengthsTrend > 0
-                ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-            )}>
+            <div
+              className={cn(
+                'p-4 rounded-xl border',
+                improvements.strengthsTrend > 0
+                  ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700',
+              )}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <Star className={cn('h-4 w-4', improvements.strengthsTrend > 0 ? 'text-green-500' : 'text-slate-400')} />
+                <Star
+                  className={cn(
+                    'h-4 w-4',
+                    improvements.strengthsTrend > 0 ? 'text-green-500' : 'text-slate-400',
+                  )}
+                />
                 <span className="text-sm font-medium">Punti di Forza</span>
               </div>
-              <p className={cn(
-                'text-lg font-bold',
-                improvements.strengthsTrend > 0 ? 'text-green-600' : 'text-slate-600'
-              )}>
-                {improvements.strengthsTrend > 0 ? '+' : ''}{improvements.strengthsTrend.toFixed(1)} /settimana
+              <p
+                className={cn(
+                  'text-lg font-bold',
+                  improvements.strengthsTrend > 0 ? 'text-green-600' : 'text-slate-600',
+                )}
+              >
+                {improvements.strengthsTrend > 0 ? '+' : ''}
+                {improvements.strengthsTrend.toFixed(1)} /settimana
               </p>
               <p className="text-xs text-slate-500 mt-1">
-                {improvements.strengthsTrend > 0 ? 'In aumento' : improvements.strengthsTrend < 0 ? 'In calo' : 'Stabile'}
+                {improvements.strengthsTrend > 0
+                  ? 'In aumento'
+                  : improvements.strengthsTrend < 0
+                    ? 'In calo'
+                    : 'Stabile'}
               </p>
             </div>
 
-            <div className={cn(
-              'p-4 rounded-xl border',
-              improvements.activityTrend > 0
-                ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
-                : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-            )}>
+            <div
+              className={cn(
+                'p-4 rounded-xl border',
+                improvements.activityTrend > 0
+                  ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700',
+              )}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <Activity className={cn('h-4 w-4', improvements.activityTrend > 0 ? 'text-blue-500' : 'text-slate-400')} />
+                <Activity
+                  className={cn(
+                    'h-4 w-4',
+                    improvements.activityTrend > 0 ? 'text-blue-500' : 'text-slate-400',
+                  )}
+                />
                 <span className="text-sm font-medium">Attivita</span>
               </div>
-              <p className={cn(
-                'text-lg font-bold',
-                improvements.activityTrend > 0 ? 'text-blue-600' : 'text-slate-600'
-              )}>
-                {improvements.activityTrend > 0 ? '+' : ''}{improvements.activityTrend.toFixed(1)} /settimana
+              <p
+                className={cn(
+                  'text-lg font-bold',
+                  improvements.activityTrend > 0 ? 'text-blue-600' : 'text-slate-600',
+                )}
+              >
+                {improvements.activityTrend > 0 ? '+' : ''}
+                {improvements.activityTrend.toFixed(1)} /settimana
               </p>
               <p className="text-xs text-slate-500 mt-1">
-                {improvements.activityTrend > 0 ? 'Piu attivo' : improvements.activityTrend < 0 ? 'Meno attivo' : 'Costante'}
+                {improvements.activityTrend > 0
+                  ? 'Piu attivo'
+                  : improvements.activityTrend < 0
+                    ? 'Meno attivo'
+                    : 'Costante'}
               </p>
             </div>
 
-            <div className={cn(
-              'p-4 rounded-xl border',
-              improvements.moreStrengthsThanGrowth
-                ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
-                : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700'
-            )}>
+            <div
+              className={cn(
+                'p-4 rounded-xl border',
+                improvements.moreStrengthsThanGrowth
+                  ? 'bg-amber-50 dark:bg-amber-900/20 border-amber-200 dark:border-amber-800'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700',
+              )}
+            >
               <div className="flex items-center gap-2 mb-1">
-                <Target className={cn('h-4 w-4', improvements.moreStrengthsThanGrowth ? 'text-amber-500' : 'text-slate-400')} />
+                <Target
+                  className={cn(
+                    'h-4 w-4',
+                    improvements.moreStrengthsThanGrowth ? 'text-amber-500' : 'text-slate-400',
+                  )}
+                />
                 <span className="text-sm font-medium">Tendenza</span>
               </div>
-              <p className={cn(
-                'text-lg font-bold',
-                improvements.moreStrengthsThanGrowth ? 'text-amber-600' : 'text-slate-600'
-              )}>
+              <p
+                className={cn(
+                  'text-lg font-bold',
+                  improvements.moreStrengthsThanGrowth ? 'text-amber-600' : 'text-slate-600',
+                )}
+              >
                 {improvements.moreStrengthsThanGrowth ? 'Positiva' : 'In crescita'}
               </p>
               <p className="text-xs text-slate-500 mt-1">
                 {improvements.moreStrengthsThanGrowth
                   ? 'Piu punti di forza che aree di crescita'
-                  : 'Focus su aree di miglioramento'
-                }
+                  : 'Focus su aree di miglioramento'}
               </p>
             </div>
           </div>
@@ -160,10 +185,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
 
           <div className="flex items-end gap-2 h-32">
             {weeklyData.map((week, idx) => (
-              <div
-                key={week.weekLabel}
-                className="flex-1 flex flex-col items-center gap-1"
-              >
+              <div key={week.weekLabel} className="flex-1 flex flex-col items-center gap-1">
                 <div className="w-full flex flex-col gap-0.5" style={{ height: '100px' }}>
                   <motion.div
                     initial={{ height: 0 }}
@@ -180,9 +202,7 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
                     title={`${week.growthAreas} aree di crescita`}
                   />
                 </div>
-                <span className="text-xs text-slate-500 whitespace-nowrap">
-                  {week.weekLabel}
-                </span>
+                <span className="text-xs text-slate-500 whitespace-nowrap">{week.weekLabel}</span>
               </div>
             ))}
           </div>
@@ -195,7 +215,8 @@ export function ProgressTimeline({ entries, studentName }: ProgressTimelineProps
               Totale osservazioni nel periodo:
             </span>
             <span className="font-semibold text-slate-900 dark:text-white">
-              {entries.length} ({entries.filter(e => e.isStrength).length} punti di forza, {entries.filter(e => !e.isStrength).length} aree di crescita)
+              {entries.length} ({entries.filter((e) => e.isStrength).length} punti di forza,{' '}
+              {entries.filter((e) => !e.isStrength).length} aree di crescita)
             </span>
           </div>
         </div>

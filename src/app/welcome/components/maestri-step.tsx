@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { useTranslations } from "next-intl";
+import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import {
   ArrowRight,
   ArrowLeft,
@@ -12,26 +12,16 @@ import {
   GraduationCap,
   Volume2,
   VolumeX,
-} from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { useOnboardingStore } from "@/lib/stores/onboarding-store";
-import { maestri } from "@/data";
-import { cn } from "@/lib/utils";
-import {
-  useOnboardingTTS,
-  ONBOARDING_SCRIPTS,
-} from "@/lib/hooks/use-onboarding-tts";
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { useOnboardingStore } from '@/lib/stores/onboarding-store';
+import { maestri } from '@/data';
+import { cn } from '@/lib/utils';
+import { useOnboardingTTS, ONBOARDING_SCRIPTS } from '@/lib/hooks/use-onboarding-tts';
 
 // Featured maestri to highlight (first shown in carousel)
-const FEATURED_IDS = [
-  "euclide",
-  "leonardo",
-  "curie",
-  "shakespeare",
-  "feynman",
-  "darwin",
-];
+const FEATURED_IDS = ['euclide', 'leonardo', 'curie', 'shakespeare', 'feynman', 'darwin'];
 
 interface MaestriStepProps {
   useWebSpeechFallback?: boolean;
@@ -45,9 +35,8 @@ interface MaestriStepProps {
  * Highlights a few featured ones and allows scrolling through all.
  */
 export function MaestriStep(_props: MaestriStepProps) {
-  const t = useTranslations("welcome.principles");
-  const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } =
-    useOnboardingStore();
+  const t = useTranslations('welcome.maestriStep');
+  const { data, nextStep, prevStep, isVoiceMuted, setVoiceMuted } = useOnboardingStore();
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
@@ -97,18 +86,18 @@ export function MaestriStep(_props: MaestriStepProps) {
   useEffect(() => {
     const ref = scrollRef.current;
     if (ref) {
-      ref.addEventListener("scroll", updateScrollButtons);
+      ref.addEventListener('scroll', updateScrollButtons);
       updateScrollButtons();
-      return () => ref.removeEventListener("scroll", updateScrollButtons);
+      return () => ref.removeEventListener('scroll', updateScrollButtons);
     }
   }, []);
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
       const scrollAmount = 300;
       scrollRef.current.scrollBy({
-        left: direction === "left" ? -scrollAmount : scrollAmount,
-        behavior: "smooth",
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
       });
     }
   };
@@ -129,28 +118,28 @@ export function MaestriStep(_props: MaestriStepProps) {
           </div>
           <div className="flex-1">
             <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100">
-              I tuoi Professori, {data.name}!
+              {t('heading', { name: data.name })}
             </h2>
             <p className="text-gray-500 dark:text-gray-400 text-sm">
-              {maestri.length} grandi geni pronti ad aiutarti
+              {t('subtitle', { count: maestri.length })}
             </p>
           </div>
           {/* Voice toggle */}
           <button
             onClick={toggleMute}
             className={cn(
-              "p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors",
+              'p-2 rounded-full bg-pink-100 dark:bg-pink-900/30 hover:bg-pink-200 dark:hover:bg-pink-900/50 transition-colors',
             )}
-            aria-label={isVoiceMuted ? "Attiva voce" : "Disattiva voce"}
-            title={isVoiceMuted ? "Attiva voce" : "Disattiva voce"}
+            aria-label={isVoiceMuted ? t('enableVoice') : t('disableVoice')}
+            title={isVoiceMuted ? t('enableVoice') : t('disableVoice')}
           >
             {isVoiceMuted ? (
               <VolumeX className="w-5 h-5 text-pink-600 dark:text-pink-400" />
             ) : (
               <Volume2
                 className={cn(
-                  "w-5 h-5 text-pink-600 dark:text-pink-400",
-                  isPlaying && "animate-pulse",
+                  'w-5 h-5 text-pink-600 dark:text-pink-400',
+                  isPlaying && 'animate-pulse',
                 )}
               />
             )}
@@ -161,28 +150,28 @@ export function MaestriStep(_props: MaestriStepProps) {
         <div className="relative">
           {/* Scroll buttons */}
           <button
-            onClick={() => scroll("left")}
+            onClick={() => scroll('left')}
             disabled={!canScrollLeft}
             className={cn(
-              "absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10",
-              "w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-lg",
-              "flex items-center justify-center transition-opacity",
-              canScrollLeft ? "opacity-100" : "opacity-0 pointer-events-none",
+              'absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 z-10',
+              'w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-lg',
+              'flex items-center justify-center transition-opacity',
+              canScrollLeft ? 'opacity-100' : 'opacity-0 pointer-events-none',
             )}
-            aria-label="Scorri a sinistra"
+            aria-label={t('scrollLeft')}
           >
             <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
           <button
-            onClick={() => scroll("right")}
+            onClick={() => scroll('right')}
             disabled={!canScrollRight}
             className={cn(
-              "absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10",
-              "w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-lg",
-              "flex items-center justify-center transition-opacity",
-              canScrollRight ? "opacity-100" : "opacity-0 pointer-events-none",
+              'absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 z-10',
+              'w-10 h-10 rounded-full bg-white dark:bg-gray-700 shadow-lg',
+              'flex items-center justify-center transition-opacity',
+              canScrollRight ? 'opacity-100' : 'opacity-0 pointer-events-none',
             )}
-            aria-label="Scorri a destra"
+            aria-label={t('scrollRight')}
           >
             <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
@@ -191,9 +180,9 @@ export function MaestriStep(_props: MaestriStepProps) {
           <div
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto scrollbar-hide pb-2 -mx-2 px-2"
-            style={{ scrollSnapType: "x mandatory" }}
+            style={{ scrollSnapType: 'x mandatory' }}
             role="region"
-            aria-label="Carosello professori - usa le frecce per navigare"
+            aria-label={t('carouselLabel')}
           >
             {sortedMaestri.map((maestro, index) => (
               <motion.div
@@ -202,14 +191,12 @@ export function MaestriStep(_props: MaestriStepProps) {
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: Math.min(index * 0.05, 0.3) }}
                 className="flex-shrink-0 w-36"
-                style={{ scrollSnapAlign: "start" }}
+                style={{ scrollSnapAlign: 'start' }}
               >
                 <div
                   className="p-3 rounded-xl border-2 border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 hover:border-pink-300 dark:hover:border-pink-700 transition-all"
                   style={{
-                    borderColor: FEATURED_IDS.includes(maestro.id)
-                      ? maestro.color
-                      : undefined,
+                    borderColor: FEATURED_IDS.includes(maestro.id) ? maestro.color : undefined,
                   }}
                 >
                   {/* Avatar */}
@@ -259,7 +246,7 @@ export function MaestriStep(_props: MaestriStepProps) {
           className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/30 dark:to-purple-950/30 p-4 rounded-xl border border-blue-100 dark:border-blue-900/50"
         >
           <p className="text-gray-700 dark:text-gray-300 text-sm">
-            <strong>{t("howItWorks")}</strong> {t("howItWorksDesc")}
+            <strong>{t('howItWorks')}</strong> {t('howItWorksDesc')}
           </p>
         </motion.div>
 
@@ -270,21 +257,16 @@ export function MaestriStep(_props: MaestriStepProps) {
           transition={{ delay: 0.6 }}
           className="flex gap-3 pt-2"
         >
-          <Button
-            onClick={handlePrev}
-            variant="outline"
-            size="lg"
-            className="flex-1"
-          >
+          <Button onClick={handlePrev} variant="outline" size="lg" className="flex-1">
             <ArrowLeft className="mr-2 w-4 h-4" />
-            Indietro
+            {t('backButton')}
           </Button>
           <Button
             onClick={handleNext}
             size="lg"
             className="flex-1 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
           >
-            Avanti
+            {t('nextButton')}
             <ArrowRight className="ml-2 w-4 h-4" />
           </Button>
         </motion.div>

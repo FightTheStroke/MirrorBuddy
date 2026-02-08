@@ -46,6 +46,85 @@
         "searchAriaLabel": "Cerca professore o materia",
         "searchPlaceholder": "Cerca professore o materia...",
         "title": "Professori"
+      },
+      "arialabelcancellaRicerca": "aria-label=\"Cancella ricerca\""
+    },
+    "gamification": {
+      "leaderboard": {
+        "title": "I tuoi Progressi",
+        "previousSeasonDifference": "Differenza dalla stagione precedente"
+      },
+      "progressCard": {
+        "level": "Livello",
+        "student": "Studente",
+        "totalXp": "XP totali",
+        "nextLevel": "Prossimo livello",
+        "xpRemaining": "XP rimanenti"
+      },
+      "streakDisplay": {
+        "currentStreak": "Serie attuale",
+        "bestStreak": "Record personale",
+        "consecutiveDays": "giorni consecutivi",
+        "record": "record",
+        "studyTodayToMaintain": "per mantenere la tua serie!",
+        "studyToday": "Studia oggi",
+        "weekOfStudy": "Fantastico! Una settimana di studio!",
+        "greatJobToday": "Ottimo lavoro oggi!"
+      },
+      "xpInfo": {
+        "title": "Come guadagnare XP",
+        "maestriTitle": "Sessioni con i Maestri",
+        "maestriPerMinute": "XP al minuto di conversazione",
+        "maestriPerQuestion": "XP per ogni domanda che fai",
+        "maestriMaxPerSession": "Massimo {max} XP per sessione",
+        "flashcardsTitle": "Flashcards",
+        "flashcardAgain": "XP per \"Ancora\" (ripeti)",
+        "flashcardHard": "XP per \"Difficile\"",
+        "flashcardGood": "XP per \"Bene\"",
+        "flashcardEasy": "XP per \"Facile\"",
+        "flashcardBonusDecks": "Bonus XP per completare mazzi interi",
+        "pomodoroTitle": "Timer Pomodoro",
+        "pomodoroSingle": "XP per pomodoro completato",
+        "pomodoroFirst": "XP primo pomodoro del giorno",
+        "pomodoroCycleBonus": "XP bonus ogni 4 pomodoro (ciclo completo)",
+        "quizTitle": "Quiz",
+        "quizScoreBased": "XP basati sul punteggio ottenuto",
+        "quizMasteryBonus": "Bonus per maestria raggiunta (70%+)",
+        "tipLabel": "Suggerimento:",
+        "tipMessage": "I Maestri ti ricorderanno quando guadagni XP durante le conversazioni! Fai domande e partecipa attivamente per massimizzare i tuoi punti.",
+        "learning": {
+          "title": "Imparare",
+          "items": [
+            "Chattare con i Maestri: +10 XP per messaggio",
+            "Completare esercizi: +50 XP",
+            "Rispondere correttamente ai quiz: +20 XP per risposta"
+          ]
+        },
+        "currency": {
+          "title": "MirrorBucks",
+          "items": [
+            "Completare sessioni di studio: +100 MB",
+            "Streak giornalieri: bonus crescenti",
+            "Sbloccare traguardi: fino a +500 MB"
+          ]
+        },
+        "streak": {
+          "title": "Streak",
+          "items": [
+            "Studiare almeno 10 minuti al giorno",
+            "Più giorni consecutivi = più bonus",
+            "Non perdere la serie!"
+          ]
+        },
+        "goals": {
+          "title": "Obiettivi",
+          "items": [
+            "Obiettivi giornalieri: +50 XP",
+            "Obiettivi settimanali: +200 XP",
+            "Obiettivi mensili: +1000 XP"
+          ]
+        },
+        "tip": "Consiglio: Studia un po' ogni giorno per mantenere il tuo streak e guadagnare più XP!"
       }
     },
     "supporti": {
@@ -59,9 +138,18 @@
         "startCreating": "Start Creating"
       },
       "errorTitle": "Error Title",
-      "favorites": "Favorites",
+      "favorites": "Preferiti",
       "filters": {
-        "reset": "Reimposta"
+        "reset": "Reimposta",
+        "subjectLabel": "Materia",
+        "subjectAriaLabel": "Filtra per materia",
+        "subjectPlaceholder": "Tutte le materie",
+        "allSubjects": "Tutte le materie",
+        "maestroLabel": "Maestro",
+        "maestroAriaLabel": "Filtra per maestro",
+        "maestroPlaceholder": "Tutti i maestri",
+        "allMaestri": "Tutti i maestri",
+        "clearAdvancedFilters": "Rimuovi filtri avanzati"
       },
       "loadingMaterials": "Loading Materials",
       "pageTitle": "Page Title",
@@ -72,8 +160,9 @@
       },
       "search": {
         "clear": "Cancella",
-        "label": "Label",
-        "placeholder": "Placeholder"
+        "label": "Cerca materiali",
+        "placeholder": "Cerca nei tuoi materiali...",
+        "clearAriaLabel": "Cancella ricerca"
       },
       "sort": {
         "label": "Label",
@@ -86,7 +175,8 @@
       "voiceSearch": {
         "start": "Start",
         "stop": "Stop"
-      }
+      },
+      "perMateria": "Per Materia"
     },
     "knowledgeHub": {
       "errorMessageDefault": "Error message default",
@@ -100,6 +190,40 @@
       },
       "galleryView": {
         "noMaterials": "No materials"
+      },
+      "demoRenderer": {
+        "closeDemo": "Chiudi demo"
+      },
+      "flashcardRenderer": {
+        "showAnswer": "Mostra risposta",
+        "showQuestion": "Mostra domanda",
+        "hideAnswer": "Nascondi Risposta",
+        "noFlashcardsAvailable": "Nessuna flashcard disponibile"
+      },
+      "imageRenderer": {
+        "imageAlt": "Immagine contenuto",
+        "downloadImage": "Scarica immagine",
+        "fullscreen": "Schermo intero"
+      },
+      "pdfRenderer": {
+        "openPdf": "Apri PDF in una nuova scheda",
+        "downloadPdf": "Scarica PDF"
+      },
+      "quizRenderer": {
+        "startQuiz": "Inizia Quiz"
+      },
+      "calendarView": {
+        "loadingEvents": "Caricamento eventi..."
+      },
+      "conversationInput": {
+        "typePlaceholder": "Scrivi un messaggio..."
+      },
+      "maestroSelectionPanel": {
+        "selectMaestro": "Seleziona un Maestro",
+        "noMaestrosAvailable": "Nessun Maestro disponibile"
+      },
+      "emptyState": {
+        "noDataYet": "Nessun dato ancora"
       },
       "header": {
         "filter": {
@@ -116,6 +240,13 @@
       "homework": {
         "defaultTitle": "Default title",
         "noTasks": "No tasks"
+      },
+      "materialCard": {
+        "dragToReorder": "Trascina per riordinare. Usa frecce su/giù per spostare."
+      },
+      "previewPanel": {
+        "title": "Anteprima",
+        "closeAriaLabel": "Chiudi anteprima"
       },
       "materialMenu": {
         "addTags": "Add tags",
@@ -188,7 +319,15 @@
         "timeline": "Timeline",
         "typing": "Typing",
         "webcam": "Webcam"
-      }
+      },
+      "arialabelchiudi": "aria-label=\"Chiudi\"",
+      "arialabelscarica": "aria-label=\"Scarica\"",
+      "nessunaImmagineDisponibile": "Nessuna immagine disponibile",
+      "arialabelscaricaPdf": "aria-label=\"Scarica PDF\"",
+      "apri": "Apri",
+      "nessunaDomandaDisponibile": "Nessuna domanda disponibile",
+      "arialabelmesePrecedente": "aria-label=\"Mese precedente\"",
+      "arialabelcartaPrecedente": "aria-label=\"Carta precedente\""
     },
     "quiz": {
       "comingSoon": "Coming Soon",
@@ -205,7 +344,8 @@
       "startButton": "Start button",
       "subtitle": "Sottotitolo",
       "title": "Titolo",
-      "yourQuizzes": "Your Quizzes"
+      "yourQuizzes": "Your Quizzes",
+      "verifica": "Verifica"
     },
     "quizReview": {
       "failedSuggestions": "Failed Suggestions",
@@ -251,32 +391,41 @@
       "sortLabel": "Sort Label",
       "startConversation": "Start Conversation",
       "subtitle": "Sottotitolo",
-      "title": "Titolo"
+      "title": "Titolo",
+      "filters": {
+        "ariaLabelFilterByType": "Filtra per tipo",
+        "label": "Filtri:",
+        "ariaLabelFilterBySubject": "Filtra per materia",
+        "allSubjects": "Tutte le materie",
+        "dateFrom": "Data da",
+        "dateTo": "Data a",
+        "clearFilters": "Pulisci filtri"
+      },
+      "preview": {
+        "closePreview": "Chiudi anteprima",
+        "close": "Chiudi",
+        "open": "Apri",
+        "noQuestionsAvailable": "Nessuna domanda disponibile",
+        "noFlashcardsAvailable": "Nessuna flashcard disponibile",
+        "noPreviewAvailable": "Anteprima non disponibile per questo tipo di contenuto"
+      },
+      "grid": {
+        "removeFromBookmarks": "Rimuovi dai preferiti",
+        "addToBookmarks": "Aggiungi ai preferiti",
+        "delete": "Elimina"
+      },
+      "list": {
+        "removeFromBookmarks": "Rimuovi dai preferiti",
+        "addToBookmarks": "Aggiungi ai preferiti",
+        "open": "Apri",
+        "delete": "Elimina"
+      }
+    },
+    "materialViewer": {
+      "noContent": "No Content"
     },
     "calendar": {
-      "addButton": "Add Button",
-      "cancelButton": "Cancel Button",
-      "dateLabel": "Date Label",
-      "daysUntil": "Days Until",
-      "editEvent": "Edit Event",
-      "emptyState": "Empty State",
-      "emptyStateSubtitle": "Empty State Subtitle",
-      "newEvent": "New Event",
-      "notesLabel": "Notes Label",
-      "notesPlaceholder": "Notes Placeholder",
-      "priorityHigh": "Priority High",
-      "priorityLabel": "Priority Label",
-      "priorityLow": "Priority Low",
-      "priorityMedium": "Priority Medium",
-      "saveButton": "Save Button",
-      "subjectLabel": "Subject Label",
-      "title": "Titolo",
-      "titleLabel": "Title Label",
-      "titlePlaceholder": "Title Placeholder",
-      "today": "Oggi",
-      "tomorrow": "Tomorrow",
-      "typeLabel": "Type Label",
-      "upcomingEvents": "Upcoming Events"
+      "maestriSuggestions": "Maestri Consigliati"
     },
     "calendarGrid": {
       "ariaLabelNextMonth": "Aria label next month",
@@ -295,7 +444,9 @@
     },
     "characterSwitcher": {
       "noCharactersFound": "No Characters Found",
-      "recent": "Recent"
+      "recent": "Recent",
+      "chooseStudyPartner": "Scegli con chi studiare",
+      "close": "Chiudi"
     },
     "emptyMetrics": {
       "description": "Descrizione"
@@ -317,28 +468,16 @@
       "tapToFlip": "Tap To Flip"
     },
     "flashcards": {
-      "addCardButton": "Add Card Button",
-      "cancelButton": "Cancel Button",
-      "cardBackPlaceholder": "Card Back Placeholder",
-      "cardFrontPlaceholder": "Card Front Placeholder",
-      "cardsLabel": "Cards Label",
-      "createDeckButton": "Create Deck Button",
-      "createWithProfessor": "Create With Professor",
-      "deckNameLabel": "Deck Name Label",
-      "deckNamePlaceholder": "Deck Name Placeholder",
-      "editDeckTitle": "Edit Deck Title",
-      "emptyState": "Empty State",
-      "emptyStateDescription": "Empty State Description",
-      "fsrsDescription": "Fsrs Description",
-      "loading": "Caricamento...",
-      "manualMode": "Manual Mode",
-      "newDeckTitle": "New Deck Title",
-      "saveButton": "Save Button",
-      "subjectLabel": "Subject Label",
-      "title": "Titolo"
+      "studyButton": "Studia ({count} carte)"
     },
     "htmlSnippetsView": {
-      "loading": "Caricamento..."
+      "title": "Demo Interattive",
+      "subtitle": "Esempi HTML creati dai Professori",
+      "allSubjects": "Tutti",
+      "emptyState": "Nessuna demo salvata",
+      "noResults": "Nessun risultato",
+      "emptyStateDescription": "Chiedi a un Professore di creare una demo interattiva!",
+      "noResultsDescription": "Prova a modificare i filtri di ricerca"
     },
     "learningPath": {
       "back": "Indietro",
@@ -377,10 +516,8 @@
       "visualTitle": "Visual title"
     },
     "maestroSelectionStep": {
-      "noSpecificProfessor": "No Specific Professor"
-    },
-    "materialViewer": {
-      "noContent": "No Content"
+      "noSpecificProfessor": "No Specific Professor",
+      "chooseProfessorFor": "Scegli il Professore per"
     },
     "mindmaps": {
       "addSubtopic": "Add Subtopic",
@@ -622,7 +759,77 @@
         "saving": "Salvataggio...",
         "save": "Salva",
         "add": "Aggiungi"
-      }
+      },
+      "cliccaQuotaggiungiquotPerCreare": "Clicca &quot;Aggiungi&quot; per creare il tuo piano di studio!",
+      "arialabelelimina": "aria-label=\"Elimina\"",
+      "arialabelmodifica": "aria-label=\"Modifica\"",
+      "aggiungi": "Aggiungi"
+    },
+    "subjectSelection": {
+      "question": "Di quale materia vuoi fare {tool}?"
+    },
+    "htmlPreview": {
+      "saved": "Salvato",
+      "saveDemo": "Salva demo",
+      "exitFullscreen": "Esci da schermo intero",
+      "fullscreen": "Schermo intero",
+      "closeDemo": "Chiudi demo"
+    },
+    "studyKit": {
+      "tabSummary": "Riassunto",
+      "tabMindmap": "Mappa",
+      "tabDemo": "Demo",
+      "tabQuiz": "Quiz",
+      "summaryNotAvailable": "Riassunto non disponibile",
+      "mindmapNotAvailable": "Mappa mentale non disponibile",
+      "demoNotAvailable": "Demo interattiva non disponibile",
+      "quizNotAvailable": "Quiz non disponibile",
+      "interactiveDemo": "Demo Interattiva",
+      "interactiveSimulation": "Simulazione interattiva",
+      "launchDemo": "Avvia Demo Interattiva",
+      "demoModal": {
+        "close": "Chiudi"
+      },
+      "header": {
+        "quiz": "Quiz",
+        "questions": "domande",
+        "demo": "Demo"
+      },
+      "uploadArea": {
+        "dragDropHere": "Trascina qui i file",
+        "or": "oppure",
+        "browse": "sfoglia",
+        "supportedFormats": "Formati supportati: PDF"
+      },
+      "uploadForm": {
+        "selectMaestroPlaceholder": "Seleziona un Maestro..."
+      },
+      "arialabelchiudiDemo": "aria-label=\"Chiudi demo\"",
+      "arialabeleliminaStudyKit": "aria-label=\"Elimina Study Kit\"",
+      "titlescaricaPdfAccessibilePer": "title=\"Scarica PDF accessibile per DSA\"",
+      "arialabelscaricaPdfAccessibile": "aria-label=\"Scarica PDF accessibile\"",
+      "selezionaPdf": "Seleziona PDF",
+      "rimuovi": "Rimuovi",
+      "arialabelrimuoviFile": "aria-label=\"Rimuovi file\"",
+      "arialabelcaricaFilePdf": "aria-label=\"Carica file PDF\"",
+      "materiaOpzionale": "Materia (opzionale)"
+    },
+    "conversationInput": {
+      "arialabelinviaMessaggio": "aria-label=\"Invia messaggio\""
+    },
+    "progressView": {
+      "iniziaUnaSessioneDi": "Inizia una sessione di studio per vedere la tua cronologia!",
+      "alProssimoLivello": "% al prossimo livello"
+    },
+    "typing": {
+      "iniziaGioco": "Inizia Gioco"
+    },
+    "emptyState": {
+      "nessunaMetricaDisponibile": "Nessuna metrica disponibile"
+    },
+    "maestroSelectionPanel": {
+      "tornaAllaSelezioneMateria": "Torna alla selezione materia",
+      "continuaSenzaMaestro": "Continua senza Maestro"
     }
   }
 }

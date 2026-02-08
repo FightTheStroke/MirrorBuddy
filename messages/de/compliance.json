@@ -24,7 +24,17 @@
         },
         "submitting": "Wird gesendet...",
         "successDescription": "Unser Enterprise-Team wird Sie innerhalb von 24 Arbeitsstunden kontaktieren.",
-        "successTitle": "Anfrage gesendet"
+        "successTitle": "Anfrage gesendet",
+        "form": {
+          "namePlaceholder": "[TRANSLATE] Il tuo nome completo",
+          "emailPlaceholder": "[TRANSLATE] la-tua@azienda.com",
+          "rolePlaceholder": "[TRANSLATE] es. Director, Manager, CTO",
+          "companyPlaceholder": "[TRANSLATE] Nome della vostra azienda",
+          "messagePlaceholder": "[TRANSLATE] Condividi i tuoi requisiti specifici...",
+          "sectorPlaceholder": "[TRANSLATE] Seleziona un settore",
+          "employeeCountPlaceholder": "[TRANSLATE] Seleziona una fascia",
+          "submitButton": "[TRANSLATE] Invia Richiesta Enterprise"
+        }
       },
       "form": {
         "emailInvalid": "Die E-Mail ist ungültig",
@@ -182,13 +192,16 @@
     },
     "aiTransparency": {
       "contact": {
-        "text": "Haben Sie Fragen zur Nutzung unserer KI? Kontaktieren Sie uns unter"
+        "text": "Haben Sie Fragen zur Nutzung unserer KI? Kontaktieren Sie uns unter",
+        "emailAriaLabel": "[TRANSLATE] Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
       },
       "page": {
         "backButton": "Zurück zur Startseite",
         "lastUpdated": "Zuletzt aktualisiert: {date}",
         "title": "Transparenz über Künstliche Intelligenz",
-        "version": "Version {version}"
+        "version": "Version {version}",
+        "backButtonAriaLabel": "[TRANSLATE] Torna alla home page di MirrorBuddy",
+        "navAriaLabel": "[TRANSLATE] Navigazione pagina"
       },
       "relatedDocs": {
         "heading": "Verwandte Dokumente",
@@ -923,7 +936,8 @@
             "export": "Sie können Ihre Daten in einem strukturierten Format (JSON, CSV) erhalten",
             "oppose": "Sie können der Verarbeitung Ihrer Daten für bestimmte Zwecke widersprechen"
           },
-          "exerciseRights": "Um Ihre Rechte auszuüben, kontaktieren Sie uns unter:"
+          "exerciseRights": "Um Ihre Rechte auszuüben, kontaktieren Sie uns unter:",
+          "emailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per esercitare i tuoi diritti sulla privacy"
         },
         "section11": {
           "title": "Cookies und Analytics",
@@ -1047,7 +1061,8 @@
               "website": "www.ico.org.uk"
             }
           },
-          "closing": "Wir schätzen Ihr Vertrauen in den Schutz Ihrer Privatsphäre und stehen Ihnen für alle Fragen zur Verfügung."
+          "closing": "Wir schätzen Ihr Vertrauen in den Schutz Ihrer Privatsphäre und stehen Ihnen für alle Fragen zur Verfügung.",
+          "contactEmailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
         },
         "section16": {
           "title": "16. Künstliche Intelligenz-Systeme und Benutzerrechte",

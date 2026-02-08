@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useCallback } from "react";
-import { ChevronDown, BookOpen, Wrench, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
+import { ChevronDown, BookOpen, Wrench, Loader2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface MaestroInfo {
   id: string;
@@ -12,8 +13,9 @@ interface MaestroInfo {
 }
 
 export function KnowledgeViewer({ maestri }: { maestri: MaestroInfo[] }) {
+  const t = useTranslations('admin');
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [content, setContent] = useState<Record<string, string>>({});
   const [loadingId, setLoadingId] = useState<string | null>(null);
 
@@ -48,23 +50,20 @@ export function KnowledgeViewer({ maestri }: { maestri: MaestroInfo[] }) {
   const filtered = maestri.filter((m) => {
     if (!search) return true;
     const q = search.toLowerCase();
-    return (
-      m.displayName.toLowerCase().includes(q) ||
-      m.subject.toLowerCase().includes(q)
-    );
+    return m.displayName.toLowerCase().includes(q) || m.subject.toLowerCase().includes(q);
   });
 
   return (
     <div className="space-y-4">
       <input
         type="text"
-        placeholder="Search maestri..."
+        placeholder={t('knowledge.searchPlaceholder')}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
         className="w-full px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
       />
       <p className="text-xs text-slate-500">
-        {filtered.length} / {maestri.length} maestri
+        {t('knowledge.count', { filtered: filtered.length, total: maestri.length })}
       </p>
 
       <div className="space-y-2">
@@ -93,8 +92,8 @@ export function KnowledgeViewer({ maestri }: { maestri: MaestroInfo[] }) {
                 </span>
                 <ChevronDown
                   className={cn(
-                    "h-4 w-4 text-slate-400 transition-transform",
-                    expandedId === m.id && "rotate-180",
+                    'h-4 w-4 text-slate-400 transition-transform',
+                    expandedId === m.id && 'rotate-180',
                   )}
                 />
               </div>
@@ -107,7 +106,7 @@ export function KnowledgeViewer({ maestri }: { maestri: MaestroInfo[] }) {
                   </div>
                 ) : (
                   <pre className="text-xs text-slate-700 dark:text-slate-300 whitespace-pre-wrap font-mono leading-relaxed max-h-96 overflow-y-auto">
-                    {content[m.id] ?? "Content not available"}
+                    {content[m.id] ?? t('knowledge.contentUnavailable')}
                   </pre>
                 )}
               </div>
@@ -116,7 +115,7 @@ export function KnowledgeViewer({ maestri }: { maestri: MaestroInfo[] }) {
         ))}
         {filtered.length === 0 && (
           <p className="text-sm text-slate-500 text-center py-8">
-            No maestri found matching &ldquo;{search}&rdquo;
+            {t('knowledge.noResults', { search })}
           </p>
         )}
       </div>

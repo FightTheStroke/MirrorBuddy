@@ -318,7 +318,8 @@
       "infoMessage": "Info message",
       "screenReaderOnly": "Screen reader only",
       "newWindow": "opens in new window",
-      "externalLink": "external link"
+      "externalLink": "external link",
+      "categoriesAriaLabel": "[TRANSLATE] Categorie accessibilità"
     },
     "notifications": {
       "title": "Notifications",
@@ -494,7 +495,10 @@
       "troubleshooting": "Troubleshooting",
       "voiceNotWorking": "Voice Not Working",
       "voiceNotWorkingDescription": "Voice Not Working Description",
-      "voiceTest": "Voice Test"
+      "voiceTest": "Voice Test",
+      "titleaggiornaListaWebcam": "[TRANSLATE] title=\"Aggiorna lista webcam\"",
+      "vaiNellaSezioneChat": "[TRANSLATE] Vai nella sezione Chat e parla con il tuo Coach preferito.",
+      "titleaggiornaListaMicrofoni": "[TRANSLATE] title=\"Aggiorna lista microfoni\""
     },
     "aiProvider": {
       "active": "Attivo",
@@ -516,7 +520,11 @@
       "webSearchActive": "Web Search Active",
       "webSearchLimited": "Web Search Limited",
       "webSearchTitle": "Web Search Title",
-      "wikipediaSource": "Wikipedia Source"
+      "wikipediaSource": "Wikipedia Source",
+      "webSearchBraveConfigured": "[TRANSLATE] Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
+      "webSearchGetApiKey": "[TRANSLATE] Ottieni una API key gratuita su",
+      "webSearchAddKey": "[TRANSLATE] e aggiungi: BRAVE_SEARCH_API_KEY",
+      "webSearchWebsite": "[TRANSLATE] brave.com/search/api"
     },
     "onboarding": {
       "confirmDialog": {
@@ -850,6 +858,169 @@
         "topic": "Topic",
         "topicPlaceholder": "Topic Placeholder"
       }
+    },
+    "parentDashboard": {
+      "strengthsPoints": "[TRANSLATE] Punti di forza",
+      "strengthsTitle": "[TRANSLATE] Punti di Forza",
+      "showLess": "[TRANSLATE] Mostra meno",
+      "showAll": "[TRANSLATE] Mostra tutti",
+      "observingMessage": "[TRANSLATE] I Professori stanno ancora osservando. Torna presto!",
+      "growthAreasTitle": "[TRANSLATE] Aree di Crescita",
+      "growthAreasSubtitle": "[TRANSLATE] Aree dove {name} puo migliorare con il giusto supporto",
+      "focusRecommended": "[TRANSLATE] Focus consigliato:",
+      "noGrowthAreas": "[TRANSLATE] Nessuna area di crescita identificata ancora.",
+      "learningStyleTitle": "[TRANSLATE] Stile di Apprendimento",
+      "preferredChannel": "[TRANSLATE] Canale Preferito",
+      "optimalDuration": "[TRANSLATE] Durata Ottimale",
+      "optimalDurationMinutes": "[TRANSLATE] {minutes} minuti",
+      "bestMoment": "[TRANSLATE] Momento Migliore",
+      "motivators": "[TRANSLATE] Cosa lo motiva",
+      "suggestedStrategies": "[TRANSLATE] Strategie Suggerite",
+      "quiz": "[TRANSLATE] Quiz",
+      "quizCompleted": "[TRANSLATE] Quiz completati",
+      "quizAverage": "[TRANSLATE] Media",
+      "quizRecord": "[TRANSLATE] Record",
+      "quizBySubject": "[TRANSLATE] Per materia",
+      "streak": "[TRANSLATE] Streak",
+      "streakDays": "[TRANSLATE] giorni",
+      "streakRecord": "[TRANSLATE] record",
+      "streakDailyGoal": "[TRANSLATE] Obiettivo giornaliero",
+      "streakLast30Days": "[TRANSLATE] Ultimi 30 giorni",
+      "teacherObservations": "[TRANSLATE] Osservazioni dei Professori",
+      "loadingObservations": "[TRANSLATE] Caricamento osservazioni",
+      "noObservationsYet": "[TRANSLATE] Nessuna osservazione ancora disponibile.",
+      "observationsAfterSessions": "[TRANSLATE] Le osservazioni dei maestri appariranno qui dopo alcune sessioni di studio.",
+      "diaryTitle": "[TRANSLATE] Diario dei Professori",
+      "diarySubtitle": "[TRANSLATE] Osservazioni e suggerimenti dei Professori su {name}",
+      "searchPlaceholder": "[TRANSLATE] Cerca nelle osservazioni...",
+      "clearSearch": "[TRANSLATE] Cancella ricerca",
+      "filters": "[TRANSLATE] Filtri:",
+      "allTeachers": "[TRANSLATE] Tutti i Professori",
+      "allSubjects": "[TRANSLATE] Tutte le materie",
+      "periodAll": "[TRANSLATE] Tutto",
+      "periodWeek": "[TRANSLATE] Ultima settimana",
+      "periodMonth": "[TRANSLATE] Ultimo mese",
+      "period3Months": "[TRANSLATE] Ultimi 3 mesi",
+      "noObservationsFiltered": "[TRANSLATE] Nessuna osservazione ancora",
+      "observationsStart": "[TRANSLATE] I Professori inizieranno a scrivere le loro osservazioni dopo le prime conversazioni con {name}.",
+      "observationsCount": "[TRANSLATE] {count} osservazioni",
+      "progressTitle": "[TRANSLATE] Progressi nel Tempo",
+      "progressSubtitle": "[TRANSLATE] Andamento delle osservazioni dei Professori su {name}",
+      "progressEmptyMessage": "[TRANSLATE] I progressi verranno visualizzati dopo le prime sessioni con i Professori.",
+      "strengthsLabel": "[TRANSLATE] Punti di Forza",
+      "activityLabel": "[TRANSLATE] Attivita",
+      "trendLabel": "[TRANSLATE] Tendenza",
+      "trendPositive": "[TRANSLATE] Positiva",
+      "trendGrowing": "[TRANSLATE] In crescita",
+      "trendIncreasing": "[TRANSLATE] In aumento",
+      "trendDecreasing": "[TRANSLATE] In calo",
+      "trendStable": "[TRANSLATE] Stabile",
+      "trendMoreActive": "[TRANSLATE] Piu attivo",
+      "trendLessActive": "[TRANSLATE] Meno attivo",
+      "trendConstant": "[TRANSLATE] Costante",
+      "trendMoreStrengths": "[TRANSLATE] Piu punti di forza che aree di crescita",
+      "trendFocusGrowth": "[TRANSLATE] Focus su aree di miglioramento",
+      "strengthsLegend": "[TRANSLATE] Punti di forza",
+      "growthAreasLegend": "[TRANSLATE] Aree di crescita",
+      "lastWeeks": "[TRANSLATE] Ultime {count} settimane",
+      "totalObservations": "[TRANSLATE] Totale osservazioni nel periodo:",
+      "streakActivityAriaLabel": "[TRANSLATE] Streak e calendario attività",
+      "calendarActivityAriaLabel": "[TRANSLATE] Calendario attività",
+      "observationsTeacherAriaLabel": "[TRANSLATE] Osservazioni dei professori",
+      "progressTimelineTitle": "[TRANSLATE] Progressi nel Tempo",
+      "progressTimelineEmptyDesc": "[TRANSLATE] I progressi verranno visualizzati dopo le prime sessioni con i Professori.",
+      "clearSearchAriaLabel": "[TRANSLATE] Cancella ricerca",
+      "noObservationsEmpty": "[TRANSLATE] Nessuna osservazione ancora"
+    },
+    "aiProviderSettings": {
+      "webSearchBraveConfigured": "[TRANSLATE] Brave Search API configurata. I maestri possono accedere a notizie e informazioni in tempo reale.",
+      "webSearchGetApiKey": "[TRANSLATE] Ottieni una API key gratuita su",
+      "webSearchAddKey": "[TRANSLATE] e aggiungi: BRAVE_SEARCH_API_KEY",
+      "webSearchWebsite": "[TRANSLATE] brave.com/search/api",
+      "saving": "[TRANSLATE] Salvataggio...",
+      "configurationSaved": "[TRANSLATE] Configurazione Salvata",
+      "saveConfiguration": "[TRANSLATE] Salva Configurazione",
+      "savedLocallyMessage": "[TRANSLATE] Configurazione salvata localmente. Per attivare i costi, aggiungi anche le variabili nel file .env del server.",
+      "envVariablesRequired": "[TRANSLATE] Variabili .env richieste:",
+      "saveAvailabilityBudget": "[TRANSLATE] Salva Budget Disponibilità",
+      "totalCostMonthly": "[TRANSLATE] Costo Totale (Mensile)",
+      "costsTitle": "[TRANSLATE] Costi Azure OpenAI",
+      "costManagementNotConfigured": "[TRANSLATE] Cost Management non configurato",
+      "costManagementInstructions": "[TRANSLATE] Per visualizzare i costi Azure, configura un Service Principal con ruolo \"Cost Management Reader\":",
+      "showConfigForm": "[TRANSLATE] Mostra form di configurazione",
+      "costsLast30Days": "[TRANSLATE] Ultimi 30 giorni",
+      "costsEndOfMonth": "[TRANSLATE] Stima fine mese",
+      "costsUnavailable": "[TRANSLATE] Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi.",
+      "cameraPreviewMessage": "[TRANSLATE] Clicca \"Testa\" per vedere l'anteprima",
+      "cameraLive": "[TRANSLATE] LIVE",
+      "cameraDefaultSystem": "[TRANSLATE] Predefinito di sistema",
+      "cameraWebcam": "[TRANSLATE] Webcam",
+      "cameraRefreshDevices": "[TRANSLATE] Aggiorna dispositivi",
+      "cameraTest": "[TRANSLATE] Testa",
+      "cameraStop": "[TRANSLATE] Stop",
+      "microphoneNoDeviceSelected": "[TRANSLATE] Nessun dispositivo selezionato",
+      "cameraTestClickMessage": "[TRANSLATE] Clicca \"Testa\" per vedere l'anteprima",
+      "diagnosticsPreviewTitle": "[TRANSLATE] Anteprima",
+      "characterMaxSelectInfo": "[TRANSLATE] Puoi selezionare fino a 3 personaggi come preferiti",
+      "characterMaxSelectWarning": "[TRANSLATE] Hai raggiunto il limite di 3 personaggi preferiti",
+      "privacyDeleteAllData": "[TRANSLATE] Elimina tutti i dati",
+      "privacyDeleteAnytime": "[TRANSLATE] Puoi eliminare i tuoi dati in qualsiasi momento",
+      "privacyNoDataShared": "[TRANSLATE] I tuoi dati non vengono condivisi con terze parti",
+      "privacyConversationsNotRecorded": "[TRANSLATE] Le conversazioni non vengono registrate permanentemente",
+      "privacyDataStoredLocally": "[TRANSLATE] I dati sono archiviati localmente nel tuo browser",
+      "settingsMobileAriaLabel": "[TRANSLATE] Impostazioni",
+      "costsSection": {
+        "tokenToEurRate": "[TRANSLATE] 1M token = € {rate}"
+      },
+      "cameraPreview": {
+        "stopPreview": "[TRANSLATE] Ferma anteprima"
+      },
+      "microphoneSelector": {
+        "testMicrophone": "[TRANSLATE] Testa microfono"
+      },
+      "characterSettings": {
+        "appearance": "[TRANSLATE] Aspetto",
+        "voice": "[TRANSLATE] Voce",
+        "personality": "[TRANSLATE] Personalità",
+        "preferredSettings": "[TRANSLATE] Impostazioni preferite",
+        "resetToDefault": "[TRANSLATE] Ripristina predefiniti",
+        "max3Characters": "[TRANSLATE] Massimo 3 personaggi"
+      },
+      "diagnosticCards": {
+        "speaking": "[TRANSLATE] In ascolto..."
+      },
+      "waveformVisualization": {
+        "noActivity": "[TRANSLATE] Nessuna attività"
+      },
+      "webcamPreview": {
+        "stopCamera": "[TRANSLATE] Ferma fotocamera"
+      },
+      "settingsPageMobile": {
+        "openSettings": "[TRANSLATE] Apri impostazioni"
+      }
+    },
+    "costsSection": {
+      "impossibileRecuperareIDati": "[TRANSLATE] Impossibile recuperare i dati sui costi Azure. Verifica la connessione o riprova piu tardi."
+    },
+    "audioSettings": {
+      "titleaggiornaDispositivi": "[TRANSLATE] title=\"Aggiorna dispositivi\""
+    },
+    "characterSettings": {
+      "ilCoachTiInsegna": "[TRANSLATE] Il coach ti insegna il metodo, il buddy ti supporta emotivamente,\n              e i Professori ti spiegano le materie. Insieme formano il tuo team\n              di apprendimento personalizzato!",
+      "scegliIColoriDei": "[TRANSLATE] Scegli i colori dei bordi per riconoscere coach e buddy negli avatar",
+      "ilBuddyEUn": "[TRANSLATE] Il buddy e un amico della tua eta che capisce le tue difficolta e ti\n            supporta",
+      "ilTuoMirrorbuddy": "[TRANSLATE] Il Tuo MirrorBuddy",
+      "ilCoachTiAiuta": "[TRANSLATE] Il coach ti aiuta a sviluppare il tuo metodo di studio e diventare\n            autonomo",
+      "ilTuoCoachDi": "[TRANSLATE] Il Tuo Coach di Apprendimento"
+    },
+    "settingsPageMobile": {
+      "arialabelindietro": "[TRANSLATE] aria-label=\"Indietro\""
+    },
+    "privacySettings": {
+      "inviaDatiAnonimi": "[TRANSLATE] Invia dati anonimi",
+      "iTuoiDatiSono": "[TRANSLATE] I tuoi dati sono al sicuro. MirrorBuddy e progettato pensando alla\n            privacy dei bambini e rispetta le normative COPPA e GDPR.",
+      "statoDeiTuoiConsensi": "[TRANSLATE] Stato dei tuoi consensi e termini accettati.",
+      "seiConnessoAlTuo": "[TRANSLATE] Sei connesso al tuo account MirrorBuddy."
     }
   }
 }

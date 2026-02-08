@@ -1,20 +1,21 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { X, Sparkles } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { GradeDisplay } from "./components/grade-display";
-import { useProgressStore, type SessionGrade } from "@/lib/stores";
-import { logger } from "@/lib/logger";
+import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
+import Image from 'next/image';
+import { X, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { GradeDisplay } from './components/grade-display';
+import { useProgressStore, type SessionGrade } from '@/lib/stores';
+import { logger } from '@/lib/logger';
 import {
   generateFeedback,
   generateStrengths,
   generateAreasToImprove,
-} from "./helpers/grade-helpers";
-import type { Maestro } from "@/types";
+} from './helpers/grade-helpers';
+import type { Maestro } from '@/types';
+import { useTranslations } from 'next-intl';
 
 interface SessionGradeProps {
   maestro: Maestro;
@@ -36,6 +37,7 @@ export function SessionGradeDisplay({
   const [isGenerating, setIsGenerating] = useState(true);
   const [grade, setGrade] = useState<SessionGrade | null>(null);
   const { gradeCurrentSession } = useProgressStore();
+  const t = useTranslations('voice');
 
   // Generate grade on mount
   useEffect(() => {
@@ -63,29 +65,22 @@ export function SessionGradeDisplay({
 
           const autoGrade: SessionGrade = {
             score: Math.round(baseScore),
-            feedback: generateFeedback(
-              baseScore,
-              questionsAsked,
-              sessionDuration,
-            ),
+            feedback: generateFeedback(baseScore, questionsAsked, sessionDuration),
             strengths: generateStrengths(questionsAsked, sessionDuration),
-            areasToImprove: generateAreasToImprove(
-              questionsAsked,
-              sessionDuration,
-            ),
+            areasToImprove: generateAreasToImprove(questionsAsked, sessionDuration),
           };
 
           setGrade(autoGrade);
           gradeCurrentSession(autoGrade);
         }
       } catch (error) {
-        logger.error("Failed to generate grade", { error: String(error) });
+        logger.error('Failed to generate grade', { error: String(error) });
         // Fallback grade
         setGrade({
           score: 7,
-          feedback: "Buona sessione di studio!",
-          strengths: ["Impegno costante"],
-          areasToImprove: ["Continua così!"],
+          feedback: t('sessionGrade.goodSession'),
+          strengths: [t('sessionGrade.commitment')],
+          areasToImprove: [t('sessionGrade.keepGoing')],
         });
       } finally {
         setIsGenerating(false);
@@ -98,12 +93,12 @@ export function SessionGradeDisplay({
   // Handle Escape key to close modal
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+      if (e.key === 'Escape') {
         onClose();
       }
     };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
   }, [onClose]);
 
   return (
@@ -132,11 +127,9 @@ export function SessionGradeDisplay({
                   />
                 </div>
                 <div>
-                  <h2 className="text-xl font-semibold">
-                    Valutazione Sessione
-                  </h2>
+                  <h2 className="text-xl font-semibold">{t('sessionGrade.title')}</h2>
                   <p className="text-sm text-slate-400">
-                    da {maestro.displayName}
+                    {t('sessionGrade.by')} {maestro.displayName}
                   </p>
                 </div>
               </div>
@@ -145,7 +138,7 @@ export function SessionGradeDisplay({
                 size="icon"
                 onClick={onClose}
                 className="text-slate-400 hover:text-white hover:bg-slate-700"
-                aria-label="Chiudi valutazione"
+                aria-label={t('sessionGrade.closeAriaLabel')}
               >
                 <X className="h-5 w-5" />
               </Button>
@@ -158,11 +151,11 @@ export function SessionGradeDisplay({
               <div className="flex flex-col items-center gap-4 py-8">
                 <motion.div
                   animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                  transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
                 >
                   <Sparkles className="w-12 h-12 text-amber-400" />
                 </motion.div>
-                <p className="text-slate-400">Il maestro sta valutando...</p>
+                <p className="text-slate-400">{t('sessionGrade.evaluating')}</p>
               </div>
             ) : (
               grade && (
@@ -183,7 +176,7 @@ export function SessionGradeDisplay({
               className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
               disabled={isGenerating}
             >
-              Chiudi
+              {t('sessionGrade.close')}
             </Button>
           </div>
         </Card>

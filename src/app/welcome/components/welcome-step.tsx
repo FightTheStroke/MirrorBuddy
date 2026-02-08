@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -54,14 +55,8 @@ export function WelcomeStep({
   connectionInfo,
   onboardingMelissa,
 }: WelcomeStepProps) {
-  const {
-    data,
-    updateData,
-    nextStep,
-    isReplayMode,
-    isVoiceMuted,
-    setVoiceMuted,
-  } = useOnboardingStore();
+  const { data, updateData, nextStep, isReplayMode, isVoiceMuted, setVoiceMuted } =
+    useOnboardingStore();
 
   const [name, setName] = useState(data.name || '');
   const [error, setError] = useState('');
@@ -93,21 +88,22 @@ export function WelcomeStep({
     setVoiceMuted(!isVoiceMuted);
   };
 
+  const t = useTranslations('welcome.welcomeForm');
+
   const handleContinue = () => {
     const trimmedName = name.trim();
     if (!trimmedName) {
-      setError('Per favore, dimmi come ti chiami!');
+      setError(t('nameRequired'));
       return;
     }
     if (trimmedName.length < 2) {
-      setError('Il nome deve avere almeno 2 caratteri');
+      setError(t('nameTooShort'));
       return;
     }
     stop();
     updateData({ name: trimmedName });
     nextStep();
   };
-
 
   // ========== VOICE MODE: Melissa auto-starts (default when Azure available) ==========
   if (!useWebSpeechFallback) {
@@ -144,8 +140,10 @@ export function WelcomeStep({
                   <Check className="w-5 h-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Nome catturato</p>
-                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">{data.name}</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">{t('nameCaptured')}</p>
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                    {data.name}
+                  </p>
                 </div>
               </div>
 
@@ -153,7 +151,7 @@ export function WelcomeStep({
                 onClick={handleContinue}
                 className="w-full mt-4 bg-gradient-to-r from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white"
               >
-                Continua
+                {t('continueButton')}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
             </motion.div>
@@ -162,7 +160,7 @@ export function WelcomeStep({
 
         {isReplayMode && (
           <p className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4">
-            Stai rivedendo il tutorial. I tuoi dati esistenti non verranno modificati.
+            {t('replayModeInfo')}
           </p>
         )}
       </motion.div>

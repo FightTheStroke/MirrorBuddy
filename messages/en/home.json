@@ -21,7 +21,8 @@
       "studyTime": "Study time",
       "questionsAsked": "Questions asked",
       "trialClickToRequest": "Click to request access",
-      "trial": "Trial"
+      "trial": "Trial",
+      "requestFullAccess": "[TRANSLATE] Clicca per richiedere accesso completo"
     },
     "sidebar": {
       "backToHome": "Back to Home",

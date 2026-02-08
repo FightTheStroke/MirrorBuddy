@@ -4,10 +4,10 @@
  * Shows: name, % sessions, total time
  */
 
-"use client";
+'use client';
 
-import { useMemo } from "react";
-import { useTranslations } from "next-intl";
+import { useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   BarChart,
   Bar,
@@ -17,29 +17,23 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
-} from "recharts";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import type { StudySession } from "@/lib/stores/progress-store";
-import { maestri } from "@/data/maestri";
+} from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
+import type { StudySession } from '@/lib/stores/progress-store';
+import { maestri } from '@/data/maestri';
 
 interface MaestroUsageChartProps {
   sessions: StudySession[];
   className?: string;
 }
 
-const COLORS = ["#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#ec4899"];
+const COLORS = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ec4899'];
 
-export function MaestroUsageChart({
-  sessions,
-  className,
-}: MaestroUsageChartProps) {
-  const t = useTranslations("admin.dashboard.maestroUsageChart");
+export function MaestroUsageChart({ sessions, className }: MaestroUsageChartProps) {
+  const t = useTranslations('admin.dashboard.maestroUsageChart');
   const maestroStats = useMemo(() => {
-    const stats = new Map<
-      string,
-      { count: number; totalMinutes: number; name: string }
-    >();
+    const stats = new Map<string, { count: number; totalMinutes: number; name: string }>();
 
     sessions.forEach((session) => {
       const maestro = maestri.find((m) => m.id === session.maestroId);
@@ -61,10 +55,7 @@ export function MaestroUsageChart({
         id,
         name: data.name,
         sessions: data.count,
-        percentage:
-          totalSessions > 0
-            ? Math.round((data.count / totalSessions) * 100)
-            : 0,
+        percentage: totalSessions > 0 ? Math.round((data.count / totalSessions) * 100) : 0,
         minutes: data.totalMinutes,
         hours: Math.round((data.totalMinutes / 60) * 10) / 10,
       }))
@@ -77,11 +68,11 @@ export function MaestroUsageChart({
   const totalSessions = sessions.length;
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn('overflow-hidden', className)}>
       <CardHeader>
-        <CardTitle>{t("title")}</CardTitle>
+        <CardTitle>{t('title')}</CardTitle>
         <p className="text-sm text-slate-500 dark:text-slate-400">
-          Top 5 su {totalSessions} sessioni totali
+          {t('top5Of')} {totalSessions} {t('totalSessions')}
         </p>
       </CardHeader>
 
@@ -93,39 +84,27 @@ export function MaestroUsageChart({
                 data={maestroStats}
                 layout="vertical"
                 margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
-                aria-label="Grafico utilizzo maestri"
+                aria-label={t('chartAriaLabel')}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis type="number" stroke="#94a3b8" fontSize={12} />
-                <YAxis
-                  type="category"
-                  dataKey="name"
-                  stroke="#94a3b8"
-                  fontSize={12}
-                  width={80}
-                />
+                <YAxis type="category" dataKey="name" stroke="#94a3b8" fontSize={12} width={80} />
                 <Tooltip
                   contentStyle={{
-                    backgroundColor: "#1e293b",
-                    border: "none",
-                    borderRadius: "8px",
-                    color: "#fff",
+                    backgroundColor: '#1e293b',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
                   }}
-                  formatter={(
-                    value: number | undefined,
-                    name: string | undefined,
-                  ) => {
-                    if (name === "sessions")
-                      return [`${value || 0} sessioni`, "Sessioni"];
-                    return [value || 0, name || ""];
+                  formatter={(value: number | undefined, name: string | undefined) => {
+                    if (name === 'sessions')
+                      return [`${value || 0} ${t('sessionsLabel')}`, t('sessions')];
+                    return [value || 0, name || ''];
                   }}
                 />
                 <Bar dataKey="sessions" radius={[0, 8, 8, 0]}>
                   {maestroStats.map((_, index) => (
-                    <Cell
-                      key={`cell-${index}`}
-                      fill={COLORS[index % COLORS.length]}
-                    />
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                   ))}
                 </Bar>
               </BarChart>
@@ -147,24 +126,26 @@ export function MaestroUsageChart({
                     <span className="font-medium text-sm">{stat.name}</span>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-slate-500">
-                    <span>{stat.percentage}% sessioni</span>
-                    <span>{stat.hours}h totali</span>
+                    <span>
+                      {stat.percentage}% {t('sessionsLabel')}
+                    </span>
+                    <span>
+                      {stat.hours}
+                      {t('totalHours')}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
 
             {/* Accessible table for screen readers */}
-            <table
-              className="sr-only"
-              aria-label="Statistiche utilizzo maestri"
-            >
+            <table className="sr-only" aria-label={t('tableAriaLabel')}>
               <thead>
                 <tr>
-                  <th>Maestro</th>
-                  <th>Sessioni</th>
-                  <th>Percentuale</th>
-                  <th>Ore totali</th>
+                  <th>{t('tableHeaders.maestro')}</th>
+                  <th>{t('tableHeaders.sessions')}</th>
+                  <th>{t('tableHeaders.percentage')}</th>
+                  <th>{t('tableHeaders.totalHours')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -181,7 +162,7 @@ export function MaestroUsageChart({
           </>
         ) : (
           <div className="flex items-center justify-center h-[300px] text-slate-500">
-            Nessuna sessione registrata
+            {t('noSessions')}
           </div>
         )}
       </CardContent>

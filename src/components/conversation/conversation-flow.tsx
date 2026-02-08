@@ -28,6 +28,7 @@ import { useMessageSending } from './hooks/use-message-sending';
 import { useToolHandler } from './hooks/use-tool-handler';
 import { useConversationHandlers } from './hooks/use-conversation-handlers';
 import { ConversationContent } from './components/conversation-content';
+import { useTranslations } from 'next-intl';
 
 export { CharacterCard } from './components';
 
@@ -38,6 +39,7 @@ export function ConversationFlow() {
   const [voiceSessionId, setVoiceSessionId] = useState<string | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const t = useTranslations('chat');
 
   const { studentProfile } = useSettingsStore();
   useUIStore(); // Keep store import for potential future use
@@ -69,7 +71,7 @@ export function ConversationFlow() {
       preferredCoach: studentProfile.preferredCoach,
       preferredBuddy: studentProfile.preferredBuddy,
     }),
-    [studentProfile]
+    [studentProfile],
   );
 
   const [isLoading, setIsLoading] = useState(false);
@@ -160,17 +162,19 @@ export function ConversationFlow() {
     return (
       <div className="flex items-center justify-center h-full">
         <Button onClick={() => startConversation(extendedProfile)}>
-          Inizia una conversazione
+          {t('conversationFlow.startConversation')}
         </Button>
       </div>
     );
   }
 
   return (
-    <div className={cn(
-      "relative h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden",
-      isVoiceActive ? "flex flex-col lg:flex-row" : "flex flex-col"
-    )}>
+    <div
+      className={cn(
+        'relative h-[calc(100vh-200px)] max-h-[700px] bg-white dark:bg-slate-900 rounded-2xl shadow-xl overflow-hidden',
+        isVoiceActive ? 'flex flex-col lg:flex-row' : 'flex flex-col',
+      )}
+    >
       <ConversationContent
         activeCharacter={activeCharacter}
         characterHistory={characterHistory}

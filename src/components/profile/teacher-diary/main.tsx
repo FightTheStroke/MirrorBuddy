@@ -8,13 +8,9 @@
 
 import { useState } from 'react';
 import { BookOpen, Calendar, MessageCircle } from 'lucide-react';
+import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import {
-  useUniqueMaestri,
-  useUniqueSubjects,
-  useFilteredEntries,
-  useGroupedByDate,
-} from './hooks';
+import { useUniqueMaestri, useUniqueSubjects, useFilteredEntries, useGroupedByDate } from './hooks';
 import { TeacherDiaryFilters } from './filters';
 import { DiaryEntryCard } from './diary-entry-card';
 import type { TeacherDiaryProps } from './types';
@@ -25,6 +21,7 @@ export function TeacherDiary({
   isLoading,
   onTalkToMaestro,
 }: TeacherDiaryProps) {
+  const t = useTranslations('settings.parentDashboard');
   const [selectedMaestro, setSelectedMaestro] = useState<string>('all');
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
   const [selectedPeriod, setSelectedPeriod] = useState<string>('all');
@@ -68,10 +65,10 @@ export function TeacherDiary({
         <CardHeader className="pb-2">
           <CardTitle className="flex items-center gap-3 text-xl">
             <BookOpen className="h-6 w-6 text-indigo-500" />
-            Diario dei Professori
+            {t('diaryTitle')}
           </CardTitle>
           <p className="text-slate-600 dark:text-slate-400 text-sm">
-            Osservazioni e suggerimenti dei Professori su {studentName}
+            {t('diarySubtitle', { name: studentName })}
           </p>
         </CardHeader>
         <CardContent>
@@ -96,11 +93,10 @@ export function TeacherDiary({
           <CardContent className="p-8 text-center">
             <MessageCircle className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <h3 className="font-semibold text-slate-700 dark:text-slate-300 mb-2">
-              Nessuna osservazione ancora
+              {t('noObservationsEmpty')}
             </h3>
             <p className="text-sm text-slate-500">
-              I Professori inizieranno a scrivere le loro osservazioni dopo le
-              prime conversazioni con {studentName}.
+              {t('observationsStart', { name: studentName })}
             </p>
           </CardContent>
         </Card>
@@ -122,11 +118,7 @@ export function TeacherDiary({
                     key={entry.id}
                     entry={entry}
                     isExpanded={expandedEntry === entry.id}
-                    onToggle={() =>
-                      setExpandedEntry(
-                        expandedEntry === entry.id ? null : entry.id
-                      )
-                    }
+                    onToggle={() => setExpandedEntry(expandedEntry === entry.id ? null : entry.id)}
                     onTalkToMaestro={onTalkToMaestro}
                     delay={idx * 0.05}
                   />

@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import { useTranslations } from "next-intl";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
-import { AITransparencyContent } from "./content";
+import { useTranslations } from 'next-intl';
+import Link from 'next/link';
+import { ArrowLeft } from 'lucide-react';
+import { AITransparencyContent } from './content';
 
-const AI_TRANSPARENCY_VERSION = "1.0";
-const LAST_UPDATED = "20 Gennaio 2026";
+const AI_TRANSPARENCY_VERSION = '1.0';
+const LAST_UPDATED = '20 Gennaio 2026';
 
 export function AITransparencyClient() {
-  const t = useTranslations("compliance.aiTransparency");
+  const t = useTranslations('compliance.aiTransparency');
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-gray-900 dark:to-gray-800">
@@ -25,7 +25,7 @@ export function AITransparencyClient() {
             aria-label="Torna alla home page di MirrorBuddy"
           >
             <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            {t("page.backButton")}
+            {t('page.backButton')}
           </Link>
         </div>
       </nav>
@@ -36,14 +36,12 @@ export function AITransparencyClient() {
           {/* Title */}
           <div className="mb-8 pb-8 border-b border-slate-200 dark:border-gray-700">
             <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-white mb-4">
-              {t("page.title")}
+              {t('page.title')}
             </h1>
             <div className="flex flex-wrap gap-4 text-sm text-slate-600 dark:text-gray-400">
-              <span>
-                {t("page.version", { version: AI_TRANSPARENCY_VERSION })}
-              </span>
+              <span>{t('page.version', { version: AI_TRANSPARENCY_VERSION })}</span>
               <span>•</span>
-              <span>{t("page.lastUpdated", { date: LAST_UPDATED })}</span>
+              <span>{t('page.lastUpdated', { date: LAST_UPDATED })}</span>
             </div>
           </div>
 
@@ -56,38 +54,38 @@ export function AITransparencyClient() {
               id="tldr-heading"
               className="text-2xl font-bold text-slate-900 dark:text-white mb-4"
             >
-              {t("tldr.heading")}
+              {t('tldr.heading')}
             </h2>
             <ul className="space-y-2 text-slate-700 dark:text-gray-300 leading-relaxed">
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldr.point1")}</span>
+                <span>{t('tldr.point1')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldr.point2")}</span>
+                <span>{t('tldr.point2')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldr.point3")}</span>
+                <span>{t('tldr.point3')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldr.point4")}</span>
+                <span>{t('tldr.point4')}</span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="text-blue-500 mt-1" aria-hidden="true">
                   ✓
                 </span>
-                <span>{t("tldr.point5")}</span>
+                <span>{t('tldr.point5')}</span>
               </li>
             </ul>
           </section>
@@ -98,7 +96,7 @@ export function AITransparencyClient() {
           {/* Links Section */}
           <section className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
             <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4">
-              {t("relatedDocs.heading")}
+              {t('relatedDocs.heading')}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Link
@@ -106,10 +104,10 @@ export function AITransparencyClient() {
                 className="block p-4 rounded-lg border border-slate-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
-                  {t("relatedDocs.privacy")}
+                  {t('relatedDocs.privacy')}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-gray-400">
-                  {t("relatedDocs.privacyDescription")}
+                  {t('relatedDocs.privacyDescription')}
                 </p>
               </Link>
               <Link
@@ -117,10 +115,10 @@ export function AITransparencyClient() {
                 className="block p-4 rounded-lg border border-slate-200 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
               >
                 <h3 className="font-semibold text-slate-900 dark:text-white mb-1">
-                  {t("relatedDocs.terms")}
+                  {t('relatedDocs.terms')}
                 </h3>
                 <p className="text-sm text-slate-600 dark:text-gray-400">
-                  {t("relatedDocs.termsDescription")}
+                  {t('relatedDocs.termsDescription')}
                 </p>
               </Link>
             </div>
@@ -129,11 +127,11 @@ export function AITransparencyClient() {
           {/* Footer */}
           <footer className="mt-12 pt-8 border-t border-slate-200 dark:border-gray-700">
             <p className="text-slate-600 dark:text-gray-400 text-center">
-              {t("contact.text")}{" "}
+              {t('contact.text')}{' '}
               <a
                 href="mailto:compliance@mirrorbuddy.it"
                 className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 underline"
-                aria-label="Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
+                aria-label={t('contact.emailAriaLabel')}
               >
                 compliance@mirrorbuddy.it
               </a>

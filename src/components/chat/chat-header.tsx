@@ -1,9 +1,10 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { Volume2, VolumeX, Mic, RotateCcw, X } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Maestro } from "@/types";
+import Image from 'next/image';
+import { Volume2, VolumeX, Mic, RotateCcw, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import type { Maestro } from '@/types';
+import { useTranslations } from 'next-intl';
 
 interface ChatHeaderProps {
   maestro: Maestro;
@@ -24,13 +25,13 @@ export function ChatHeader({
   onClearChat,
   onSwitchToVoice,
 }: ChatHeaderProps) {
+  const t = useTranslations('chat');
+
   return (
     <header
       className={cn(
-        "flex items-center justify-between px-4 py-3 border-b",
-        highContrast
-          ? "border-yellow-400 bg-black"
-          : "border-slate-200 dark:border-slate-700",
+        'flex items-center justify-between px-4 py-3 border-b',
+        highContrast ? 'border-yellow-400 bg-black' : 'border-slate-200 dark:border-slate-700',
       )}
       style={{ backgroundColor: `${maestro.color}10` }}
     >
@@ -51,21 +52,14 @@ export function ChatHeader({
           <h2
             id="chat-title"
             className={cn(
-              "font-semibold",
-              highContrast
-                ? "text-yellow-400"
-                : "text-slate-900 dark:text-white",
-              dyslexiaFont && "tracking-wide",
+              'font-semibold',
+              highContrast ? 'text-yellow-400' : 'text-slate-900 dark:text-white',
+              dyslexiaFont && 'tracking-wide',
             )}
           >
             {maestro.displayName}
           </h2>
-          <p
-            className={cn(
-              "text-xs",
-              highContrast ? "text-gray-400" : "text-slate-500",
-            )}
-          >
+          <p className={cn('text-xs', highContrast ? 'text-gray-400' : 'text-slate-500')}>
             {maestro.specialty}
           </p>
         </div>
@@ -76,18 +70,14 @@ export function ChatHeader({
         <button
           onClick={() => (ttsEnabled ? null : null)}
           className={cn(
-            "p-2 rounded-lg transition-colors",
+            'p-2 rounded-lg transition-colors',
             highContrast
-              ? "bg-yellow-400 text-black hover:bg-yellow-300"
-              : "bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700",
+              ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+              : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700',
           )}
-          title={ttsEnabled ? "TTS attivo" : "TTS disattivo"}
+          title={ttsEnabled ? t('chatHeader.ttsActive') : t('chatHeader.ttsInactive')}
         >
-          {ttsEnabled ? (
-            <Volume2 className="w-4 h-4" />
-          ) : (
-            <VolumeX className="w-4 h-4" />
-          )}
+          {ttsEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
         </button>
 
         {/* Switch to voice */}
@@ -95,12 +85,12 @@ export function ChatHeader({
           <button
             onClick={onSwitchToVoice}
             className={cn(
-              "p-2 rounded-lg transition-colors",
+              'p-2 rounded-lg transition-colors',
               highContrast
-                ? "bg-yellow-400 text-black hover:bg-yellow-300"
-                : "bg-accent-themed text-white hover:brightness-110",
+                ? 'bg-yellow-400 text-black hover:bg-yellow-300'
+                : 'bg-accent-themed text-white hover:brightness-110',
             )}
-            title="Passa alla modalità voce"
+            title={t('chatHeader.switchToVoiceMode')}
           >
             <Mic className="w-4 h-4" />
           </button>
@@ -110,12 +100,12 @@ export function ChatHeader({
         <button
           onClick={onClearChat}
           className={cn(
-            "p-2 rounded-lg transition-colors",
+            'p-2 rounded-lg transition-colors',
             highContrast
-              ? "text-yellow-400 hover:bg-yellow-400/20"
-              : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800",
+              ? 'text-yellow-400 hover:bg-yellow-400/20'
+              : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800',
           )}
-          title="Nuova conversazione"
+          title={t('chatHeader.newConversation')}
         >
           <RotateCcw className="w-4 h-4" />
         </button>
@@ -124,12 +114,12 @@ export function ChatHeader({
         <button
           onClick={onClose}
           className={cn(
-            "p-2 rounded-lg transition-colors",
+            'p-2 rounded-lg transition-colors',
             highContrast
-              ? "text-yellow-400 hover:bg-yellow-400/20"
-              : "text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800",
+              ? 'text-yellow-400 hover:bg-yellow-400/20'
+              : 'text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800',
           )}
-          title="Chiudi"
+          title={t('chatHeader.close')}
         >
           <X className="w-4 h-4" />
         </button>

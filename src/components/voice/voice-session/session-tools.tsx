@@ -6,6 +6,7 @@ import { Camera, Brain, BookOpen, Search, Network } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ToolResultDisplay } from '@/components/tools';
 import type { ToolCall } from '@/types';
+import { useTranslations } from 'next-intl';
 
 interface SessionToolsProps {
   toolCalls: ToolCall[];
@@ -20,6 +21,8 @@ export function SessionTools({
   onClearToolCalls,
   onTriggerTool,
 }: SessionToolsProps) {
+  const t = useTranslations('voice');
+
   // Memoized handlers to prevent re-renders
   const handleWebcam = useCallback(() => onTriggerTool('capture_homework'), [onTriggerTool]);
   const handleMindmap = useCallback(() => onTriggerTool('mindmap'), [onTriggerTool]);
@@ -33,12 +36,12 @@ export function SessionTools({
         <div className="px-6 pb-4">
           <div className="space-y-3 p-4 bg-slate-800/30 rounded-xl border border-slate-700/50">
             <div className="flex items-center justify-between">
-              <h4 className="text-sm font-medium text-slate-400">Strumenti utilizzati</h4>
+              <h4 className="text-sm font-medium text-slate-400">{t('sessionTools.toolsUsed')}</h4>
               <button
                 onClick={onClearToolCalls}
                 className="text-xs text-slate-500 hover:text-slate-300"
               >
-                Cancella
+                {t('sessionTools.clear')}
               </button>
             </div>
             <AnimatePresence>
@@ -64,50 +67,50 @@ export function SessionTools({
             size="sm"
             onClick={handleWebcam}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-            title="Mostra compiti via webcam"
+            title={t('sessionTools.webcamTitle')}
           >
             <Camera className="h-4 w-4 mr-2" />
-            <span className="text-xs">Webcam</span>
+            <span className="text-xs">{t('sessionTools.webcamLabel')}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleMindmap}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-            title="Crea mappa mentale"
+            title={t('sessionTools.mindmapTitle')}
           >
             <Network className="h-4 w-4 mr-2" />
-            <span className="text-xs">Mappa</span>
+            <span className="text-xs">{t('sessionTools.mindmapLabel')}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleQuiz}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-            title="Crea quiz"
+            title={t('sessionTools.quizTitle')}
           >
             <Brain className="h-4 w-4 mr-2" />
-            <span className="text-xs">Quiz</span>
+            <span className="text-xs">{t('sessionTools.quizLabel')}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleFlashcard}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-            title="Crea flashcard"
+            title={t('sessionTools.flashcardTitle')}
           >
             <BookOpen className="h-4 w-4 mr-2" />
-            <span className="text-xs">Flashcard</span>
+            <span className="text-xs">{t('sessionTools.flashcardLabel')}</span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={handleSearch}
             className="rounded-full bg-slate-700/50 text-slate-300 hover:bg-slate-600/50 hover:text-white"
-            title="Cerca sul web"
+            title={t('sessionTools.searchTitle')}
           >
             <Search className="h-4 w-4 mr-2" />
-            <span className="text-xs">Cerca</span>
+            <span className="text-xs">{t('sessionTools.searchLabel')}</span>
           </Button>
         </div>
       </div>

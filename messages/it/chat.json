@@ -18,7 +18,13 @@
       "endCall": "Termina chiamata",
       "startVoiceCall": "Chiama a voce",
       "talkToCoach": "Parla con il Coach",
-      "talkToBuddy": "Parla con un amico"
+      "talkToBuddy": "Parla con un amico",
+      "inVoiceCall": "In chiamata vocale",
+      "voiceUnavailable": "Voce non disponibile",
+      "disableTTS": "Disattiva lettura vocale",
+      "ttsDisabled": "Lettura vocale disattivata",
+      "conversationHistory": "Storico conversazioni",
+      "close": "Chiudi"
     },
     "message": {
       "thinking": "{name} sta pensando..."
@@ -78,7 +84,13 @@
         "speakNow": "Parla ora",
         "speaking": "Sta parlando",
         "startingCall": "Avvio chiamata...",
-        "unmuteLabel": "Attiva audio"
+        "unmuteLabel": "Attiva audio",
+        "newConversation": "Nuova conversazione",
+        "closeEsc": "Chiudi (Esc)",
+        "stopTTS": "Ferma lettura vocale",
+        "enableTTS": "Attiva lettura vocale",
+        "endCall": "Termina chiamata",
+        "startCall": "Avvia chiamata"
       },
       "connectionError": "Errore di connessione vocale",
       "microphoneUnauthorized": "Microfono non autorizzato. Abilita il microfono nelle impostazioni del browser.",
@@ -440,6 +452,69 @@
       "switchToBackCamera": "Passa alla camera posteriore",
       "takeSnapshot": "Scatta foto",
       "takeSnapshotAriaLabel": "Scatta una foto per farla vedere al tutor"
+    },
+    "footer": {
+      "messageAriaLabel": "Messaggio",
+      "sendMessageAriaLabel": "Invia messaggio",
+      "keyboardHint": "Premi Invio per inviare, Shift+Invio per andare a capo"
+    },
+    "chatHeader": {
+      "ttsActive": "TTS attivo",
+      "ttsInactive": "TTS disattivo",
+      "switchToVoiceMode": "Passa alla modalità voce",
+      "newConversation": "Nuova conversazione",
+      "close": "Chiudi"
+    },
+    "audioDevices": {
+      "audioSettings": "Impostazioni audio",
+      "microphoneSelected": "Microfono selezionato",
+      "speakerSelected": "Altoparlante selezionato",
+      "defaultDevice": "Predefinito",
+      "microphone": "Microfono",
+      "speakers": "Altoparlanti",
+      "systemDefault": "Predefinito di sistema",
+      "deviceChangeHint": "Cambio dispositivo applicato al prossimo avvio"
+    },
+    "conversationHeader": {
+      "backAriaLabel": "Torna indietro",
+      "defaultDescription": "Sono qui per aiutarti",
+      "endCallAriaLabel": "Termina chiamata",
+      "startCallAriaLabel": "Chiama a voce",
+      "switchToCoachAriaLabel": "Parla con il Coach",
+      "switchToBuddyAriaLabel": "Parla con un amico"
+    },
+    "conversationInput": {
+      "placeholderTemplate": "Scrivi a {name}...",
+      "ariaLabelTemplate": "Scrivi un messaggio a {name}",
+      "enableAudioAriaLabel": "Attiva audio",
+      "disableAudioAriaLabel": "Disattiva audio",
+      "switchToTextAriaLabel": "Passa al testo",
+      "switchToVoiceAriaLabel": "Passa alla voce",
+      "sendMessageAriaLabel": "Invia messaggio"
+    },
+    "conversationFlow": {
+      "startConversation": "Inizia una conversazione"
+    },
+    "conversationFilter": {
+      "filter": "Filtra",
+      "allMaestri": "Tutti i maestri"
+    },
+    "conversationPagination": {
+      "page": "Pagina",
+      "of": "di",
+      "conversation": "conversazione",
+      "conversations": "conversazioni",
+      "previousPageAriaLabel": "Pagina precedente",
+      "nextPageAriaLabel": "Pagina successiva"
+    },
+    "chatDrawer": {
+      "hideChat": "Nascondi chat",
+      "showChat": "Mostra chat",
+      "startConversation": "Inizia una conversazione col Professore..."
+    },
+    "maestros": {
+      "arialabelchiudiEsc": "aria-label=\"Chiudi (Esc)\"",
+      "arialabelchiudi": "aria-label=\"Chiudi\""
     }
   }
 }

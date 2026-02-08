@@ -3,17 +3,18 @@
  * @brief Advanced filters panel component
  */
 
-import { motion } from "framer-motion";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { motion } from 'framer-motion';
+import { X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { SUBJECT_LABELS } from "@/components/education/archive";
+} from '@/components/ui/select';
+import { SUBJECT_LABELS } from '@/components/education/archive';
 
 interface AdvancedFiltersProps {
   subjectFilter: string | null;
@@ -37,10 +38,12 @@ export function AdvancedFilters({
   onNavigate,
   hasAdvancedFilters,
 }: AdvancedFiltersProps) {
+  const t = useTranslations('education.supporti.filters');
+
   return (
     <motion.div
       initial={{ height: 0, opacity: 0 }}
-      animate={{ height: "auto", opacity: 1 }}
+      animate={{ height: 'auto', opacity: 1 }}
       exit={{ height: 0, opacity: 0 }}
       transition={{ duration: 0.2 }}
       className="overflow-hidden"
@@ -52,23 +55,21 @@ export function AdvancedFilters({
               htmlFor="filter-subject-supporti"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block"
             >
-              Materia
+              {t('subjectLabel')}
             </label>
             <Select
-              value={subjectFilter || "all"}
-              onValueChange={(v) =>
-                onNavigate({ subject: v === "all" ? null : v })
-              }
+              value={subjectFilter || 'all'}
+              onValueChange={(v) => onNavigate({ subject: v === 'all' ? null : v })}
             >
               <SelectTrigger
                 id="filter-subject-supporti"
                 className="h-11"
-                aria-label="Filtra per materia"
+                aria-label={t('subjectAriaLabel')}
               >
-                <SelectValue placeholder="Tutte le materie" />
+                <SelectValue placeholder={t('subjectPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tutte le materie</SelectItem>
+                <SelectItem value="all">{t('allSubjects')}</SelectItem>
                 {subjects.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {SUBJECT_LABELS[subject] || subject}
@@ -86,23 +87,21 @@ export function AdvancedFilters({
               htmlFor="filter-maestro-supporti"
               className="text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 block"
             >
-              Maestro
+              {t('maestroLabel')}
             </label>
             <Select
-              value={maestroFilter || "all"}
-              onValueChange={(v) =>
-                onNavigate({ maestro: v === "all" ? null : v })
-              }
+              value={maestroFilter || 'all'}
+              onValueChange={(v) => onNavigate({ maestro: v === 'all' ? null : v })}
             >
               <SelectTrigger
                 id="filter-maestro-supporti"
                 className="h-11"
-                aria-label="Filtra per maestro"
+                aria-label={t('maestroAriaLabel')}
               >
-                <SelectValue placeholder="Tutti i maestri" />
+                <SelectValue placeholder={t('maestroPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tutti i maestri</SelectItem>
+                <SelectItem value="all">{t('allMaestri')}</SelectItem>
                 {allMaestri
                   .filter((m) => counts.byMaestro[m.id] > 0)
                   .map((maestro) => (
@@ -126,7 +125,7 @@ export function AdvancedFilters({
             className="mt-4 text-muted-foreground"
           >
             <X className="w-4 h-4 mr-2" />
-            Rimuovi filtri avanzati
+            {t('clearAdvancedFilters')}
           </Button>
         )}
       </div>

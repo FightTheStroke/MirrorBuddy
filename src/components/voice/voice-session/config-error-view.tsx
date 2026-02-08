@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { ConnectionError } from './types';
+import { useTranslations } from 'next-intl';
 
 interface ConfigErrorViewProps {
   error: ConnectionError;
@@ -13,11 +14,9 @@ interface ConfigErrorViewProps {
   onClose: () => void;
 }
 
-export function ConfigErrorView({
-  error,
-  onSwitchToChat,
-  onClose,
-}: ConfigErrorViewProps) {
+export function ConfigErrorView({ error, onSwitchToChat, onClose }: ConfigErrorViewProps) {
+  const t = useTranslations('voice');
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
       <motion.div
@@ -32,8 +31,8 @@ export function ConfigErrorView({
                 <PhoneOff className="w-6 h-6 text-red-400" />
               </div>
               <div>
-                <h2 className="text-xl font-semibold">Azure OpenAI Non Configurato</h2>
-                <p className="text-sm text-red-300">La voce richiede Azure OpenAI Realtime</p>
+                <h2 className="text-xl font-semibold">{t('configError.title')}</h2>
+                <p className="text-sm text-red-300">{t('configError.subtitle')}</p>
               </div>
             </div>
 
@@ -41,10 +40,12 @@ export function ConfigErrorView({
               <p className="text-sm text-red-200 mb-2">{error.message}</p>
               {error.missingVariables && (
                 <div className="mt-2">
-                  <p className="text-xs text-red-300 mb-1">Variabili mancanti:</p>
+                  <p className="text-xs text-red-300 mb-1">{t('configError.missingVariables')}</p>
                   <ul className="text-xs text-red-400 space-y-1">
                     {error.missingVariables.map((v) => (
-                      <li key={v} className="font-mono">- {v}</li>
+                      <li key={v} className="font-mono">
+                        - {v}
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -53,10 +54,11 @@ export function ConfigErrorView({
 
             <div className="space-y-2">
               <p className="text-sm text-slate-300">
-                Configura le variabili di ambiente nel file <code className="text-xs bg-slate-800 px-1 rounded">.env.local</code>:
+                {t('configError.instructions')}{' '}
+                <code className="text-xs bg-slate-800 px-1 rounded">.env.local</code>:
               </p>
               <pre className="text-xs bg-slate-900 p-3 rounded-lg overflow-x-auto">
-{`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
+                {`AZURE_OPENAI_REALTIME_ENDPOINT=https://your-resource.openai.azure.com
 AZURE_OPENAI_REALTIME_API_KEY=your-api-key
 AZURE_OPENAI_REALTIME_DEPLOYMENT=gpt-4o-realtime-preview
 AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
@@ -65,22 +67,16 @@ AZURE_OPENAI_REALTIME_API_VERSION=2024-10-01-preview`}
 
             <div className="flex gap-2 mt-4">
               {onSwitchToChat && (
-                <Button
-                  onClick={onSwitchToChat}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700"
-                >
+                <Button onClick={onSwitchToChat} className="flex-1 bg-blue-600 hover:bg-blue-700">
                   <MessageSquare className="w-4 h-4 mr-2" />
-                  Usa Chat Testuale
+                  {t('configError.useChatButton')}
                 </Button>
               )}
               <Button
                 onClick={onClose}
-                className={cn(
-                  'bg-red-600 hover:bg-red-700',
-                  onSwitchToChat ? 'flex-1' : 'w-full'
-                )}
+                className={cn('bg-red-600 hover:bg-red-700', onSwitchToChat ? 'flex-1' : 'w-full')}
               >
-                Chiudi
+                {t('configError.closeButton')}
               </Button>
             </div>
           </div>

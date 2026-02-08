@@ -1,8 +1,9 @@
-"use client";
+'use client';
 
-import { MessageSquareText, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { TeacherDiary, type DiaryEntry } from "../teacher-diary";
+import { MessageSquareText, Loader2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { cn } from '@/lib/utils';
+import { TeacherDiary, type DiaryEntry } from '../teacher-diary';
 
 interface TeacherObservationsSectionProps {
   entries: DiaryEntry[];
@@ -26,38 +27,34 @@ export function TeacherObservationsSection({
   className,
   onTalkToMaestro,
 }: TeacherObservationsSectionProps) {
+  const t = useTranslations('settings.parentDashboard');
   if (isLoading) {
     return (
       <section
-        className={cn("space-y-4", className)}
-        aria-label="Osservazioni dei professori"
+        className={cn('space-y-4', className)}
+        aria-label={t('observationsTeacherAriaLabel')}
       >
         <div className="flex items-center gap-2">
           <MessageSquareText
-            className={cn(
-              "w-5 h-5",
-              highContrast ? "text-yellow-400" : "text-primary",
-            )}
+            className={cn('w-5 h-5', highContrast ? 'text-yellow-400' : 'text-primary')}
             aria-hidden="true"
           />
           <h2
             className={cn(
-              "text-lg font-semibold",
-              highContrast
-                ? "text-yellow-400"
-                : "text-slate-900 dark:text-white",
+              'text-lg font-semibold',
+              highContrast ? 'text-yellow-400' : 'text-slate-900 dark:text-white',
             )}
           >
-            Osservazioni dei Professori
+            {t('teacherObservations')}
           </h2>
         </div>
         <div className="flex items-center justify-center py-12">
           <Loader2
             className={cn(
-              "w-8 h-8 animate-spin",
-              highContrast ? "text-yellow-400" : "text-primary",
+              'w-8 h-8 animate-spin',
+              highContrast ? 'text-yellow-400' : 'text-primary',
             )}
-            aria-label="Caricamento osservazioni"
+            aria-label={t('loadingObservations')}
           />
         </div>
       </section>
@@ -67,56 +64,44 @@ export function TeacherObservationsSection({
   if (entries.length === 0) {
     return (
       <section
-        className={cn("space-y-4", className)}
-        aria-label="Osservazioni dei professori"
+        className={cn('space-y-4', className)}
+        aria-label={t('observationsTeacherAriaLabel')}
       >
         <div className="flex items-center gap-2">
           <MessageSquareText
-            className={cn(
-              "w-5 h-5",
-              highContrast ? "text-yellow-400" : "text-primary",
-            )}
+            className={cn('w-5 h-5', highContrast ? 'text-yellow-400' : 'text-primary')}
             aria-hidden="true"
           />
           <h2
             className={cn(
-              "text-lg font-semibold",
-              highContrast
-                ? "text-yellow-400"
-                : "text-slate-900 dark:text-white",
+              'text-lg font-semibold',
+              highContrast ? 'text-yellow-400' : 'text-slate-900 dark:text-white',
             )}
           >
-            Osservazioni dei Professori
+            {t('teacherObservations')}
           </h2>
         </div>
         <div
           className={cn(
-            "p-6 rounded-xl text-center",
-            highContrast
-              ? "bg-black border border-yellow-400"
-              : "bg-slate-50 dark:bg-slate-800/50",
+            'p-6 rounded-xl text-center',
+            highContrast ? 'bg-black border border-yellow-400' : 'bg-slate-50 dark:bg-slate-800/50',
           )}
         >
           <p
             className={cn(
-              "text-sm mb-2",
-              highContrast
-                ? "text-yellow-200"
-                : "text-slate-600 dark:text-slate-400",
+              'text-sm mb-2',
+              highContrast ? 'text-yellow-200' : 'text-slate-600 dark:text-slate-400',
             )}
           >
-            Nessuna osservazione ancora disponibile.
+            {t('noObservationsYet')}
           </p>
           <p
             className={cn(
-              "text-xs",
-              highContrast
-                ? "text-yellow-200/70"
-                : "text-slate-500 dark:text-slate-500",
+              'text-xs',
+              highContrast ? 'text-yellow-200/70' : 'text-slate-500 dark:text-slate-500',
             )}
           >
-            Le osservazioni dei maestri appariranno qui dopo alcune sessioni di
-            studio.
+            {t('observationsAfterSessions')}
           </p>
         </div>
       </section>
@@ -124,7 +109,7 @@ export function TeacherObservationsSection({
   }
 
   return (
-    <section className={className} aria-label="Osservazioni dei professori">
+    <section className={className} aria-label={t('observationsTeacherAriaLabel')}>
       <TeacherDiary
         entries={entries}
         studentName={studentName}

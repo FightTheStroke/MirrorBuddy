@@ -24,7 +24,17 @@
         },
         "submitting": "Enviando...",
         "successDescription": "Nuestro equipo enterprise le contactará dentro de 24 horas hábiles.",
-        "successTitle": "Solicitud enviada"
+        "successTitle": "Solicitud enviada",
+        "form": {
+          "namePlaceholder": "[TRANSLATE] Il tuo nome completo",
+          "emailPlaceholder": "[TRANSLATE] la-tua@azienda.com",
+          "rolePlaceholder": "[TRANSLATE] es. Director, Manager, CTO",
+          "companyPlaceholder": "[TRANSLATE] Nome della vostra azienda",
+          "messagePlaceholder": "[TRANSLATE] Condividi i tuoi requisiti specifici...",
+          "sectorPlaceholder": "[TRANSLATE] Seleziona un settore",
+          "employeeCountPlaceholder": "[TRANSLATE] Seleziona una fascia",
+          "submitButton": "[TRANSLATE] Invia Richiesta Enterprise"
+        }
       },
       "form": {
         "emailInvalid": "El correo electrónico no es válido",
@@ -182,13 +192,16 @@
     },
     "aiTransparency": {
       "contact": {
-        "text": "¿Tiene preguntas sobre cómo utilizamos la IA? Contáctenos en"
+        "text": "¿Tiene preguntas sobre cómo utilizamos la IA? Contáctenos en",
+        "emailAriaLabel": "[TRANSLATE] Invia email a compliance@mirrorbuddy.it per domande sulla trasparenza IA"
       },
       "page": {
         "backButton": "Volver al inicio",
         "lastUpdated": "Última actualización: {date}",
         "title": "Transparencia sobre Inteligencia Artificial",
-        "version": "Versión {version}"
+        "version": "Versión {version}",
+        "backButtonAriaLabel": "[TRANSLATE] Torna alla home page di MirrorBuddy",
+        "navAriaLabel": "[TRANSLATE] Navigazione pagina"
       },
       "relatedDocs": {
         "heading": "Documentos Relacionados",
@@ -923,7 +936,8 @@
             "export": "Puede recibir sus datos en un formato estructurado (JSON, CSV)",
             "oppose": "Puede oponerse al tratamiento de sus datos para determinados fines"
           },
-          "exerciseRights": "Para ejercer sus derechos, contáctenos en:"
+          "exerciseRights": "Para ejercer sus derechos, contáctenos en:",
+          "emailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per esercitare i tuoi diritti sulla privacy"
         },
         "section11": {
           "title": "Cookies y análisis",
@@ -1047,7 +1061,8 @@
               "website": "www.ico.org.uk"
             }
           },
-          "closing": "Apreciamos su confianza en la protección de su privacidad y estamos a su disposición para cualquier pregunta."
+          "closing": "Apreciamos su confianza en la protección de su privacidad y estamos a su disposición para cualquier pregunta.",
+          "contactEmailAriaLabel": "[TRANSLATE] Invia email a info@fightthestroke.org per domande sulla Privacy Policy"
         },
         "section16": {
           "title": "16. Sistemas de inteligencia artificial y derechos del usuario",

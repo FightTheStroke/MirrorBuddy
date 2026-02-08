@@ -18,7 +18,13 @@
       "endCall": "Terminar llamada",
       "startVoiceCall": "Llamar por voz",
       "talkToCoach": "Hablar con el Entrenador",
-      "talkToBuddy": "Hablar con un amigo"
+      "talkToBuddy": "Hablar con un amigo",
+      "inVoiceCall": "[TRANSLATE] In chiamata vocale",
+      "voiceUnavailable": "[TRANSLATE] Voce non disponibile",
+      "disableTTS": "[TRANSLATE] Disattiva lettura vocale",
+      "ttsDisabled": "[TRANSLATE] Lettura vocale disattivata",
+      "conversationHistory": "[TRANSLATE] Storico conversazioni",
+      "close": "[TRANSLATE] Chiudi"
     },
     "message": {
       "thinking": "{name} está pensando..."
@@ -84,7 +90,13 @@
         "speakNow": "Habla ahora",
         "speaking": "Hablando",
         "startingCall": "Iniciando llamada...",
-        "unmuteLabel": "Activar sonido"
+        "unmuteLabel": "Activar sonido",
+        "newConversation": "[TRANSLATE] Nuova conversazione",
+        "closeEsc": "[TRANSLATE] Chiudi (Esc)",
+        "stopTTS": "[TRANSLATE] Ferma lettura vocale",
+        "enableTTS": "[TRANSLATE] Attiva lettura vocale",
+        "endCall": "[TRANSLATE] Termina chiamata",
+        "startCall": "[TRANSLATE] Avvia chiamata"
       },
       "microphoneUnauthorized": "Micrófono no autorizado. Habilita el micrófono en la configuración del navegador.",
       "permission": {
@@ -440,6 +452,69 @@
       "switchToBackCamera": "Cambiar a cámara trasera",
       "takeSnapshot": "Tomar foto",
       "takeSnapshotAriaLabel": "Tomar una foto para mostrar al tutor"
+    },
+    "footer": {
+      "messageAriaLabel": "[TRANSLATE] Messaggio",
+      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio",
+      "keyboardHint": "[TRANSLATE] Premi Invio per inviare, Shift+Invio per andare a capo"
+    },
+    "chatHeader": {
+      "ttsActive": "[TRANSLATE] TTS attivo",
+      "ttsInactive": "[TRANSLATE] TTS disattivo",
+      "switchToVoiceMode": "[TRANSLATE] Passa alla modalità voce",
+      "newConversation": "[TRANSLATE] Nuova conversazione",
+      "close": "[TRANSLATE] Chiudi"
+    },
+    "audioDevices": {
+      "audioSettings": "[TRANSLATE] Impostazioni audio",
+      "microphoneSelected": "[TRANSLATE] Microfono selezionato",
+      "speakerSelected": "[TRANSLATE] Altoparlante selezionato",
+      "defaultDevice": "[TRANSLATE] Predefinito",
+      "microphone": "[TRANSLATE] Microfono",
+      "speakers": "[TRANSLATE] Altoparlanti",
+      "systemDefault": "[TRANSLATE] Predefinito di sistema",
+      "deviceChangeHint": "[TRANSLATE] Cambio dispositivo applicato al prossimo avvio"
+    },
+    "conversationHeader": {
+      "backAriaLabel": "[TRANSLATE] Torna indietro",
+      "defaultDescription": "[TRANSLATE] Sono qui per aiutarti",
+      "endCallAriaLabel": "[TRANSLATE] Termina chiamata",
+      "startCallAriaLabel": "[TRANSLATE] Chiama a voce",
+      "switchToCoachAriaLabel": "[TRANSLATE] Parla con il Coach",
+      "switchToBuddyAriaLabel": "[TRANSLATE] Parla con un amico"
+    },
+    "conversationInput": {
+      "placeholderTemplate": "[TRANSLATE] Scrivi a {name}...",
+      "ariaLabelTemplate": "[TRANSLATE] Scrivi un messaggio a {name}",
+      "enableAudioAriaLabel": "[TRANSLATE] Attiva audio",
+      "disableAudioAriaLabel": "[TRANSLATE] Disattiva audio",
+      "switchToTextAriaLabel": "[TRANSLATE] Passa al testo",
+      "switchToVoiceAriaLabel": "[TRANSLATE] Passa alla voce",
+      "sendMessageAriaLabel": "[TRANSLATE] Invia messaggio"
+    },
+    "conversationFlow": {
+      "startConversation": "[TRANSLATE] Inizia una conversazione"
+    },
+    "conversationFilter": {
+      "filter": "[TRANSLATE] Filtra",
+      "allMaestri": "[TRANSLATE] Tutti i maestri"
+    },
+    "conversationPagination": {
+      "page": "[TRANSLATE] Pagina",
+      "of": "[TRANSLATE] di",
+      "conversation": "[TRANSLATE] conversazione",
+      "conversations": "[TRANSLATE] conversazioni",
+      "previousPageAriaLabel": "[TRANSLATE] Pagina precedente",
+      "nextPageAriaLabel": "[TRANSLATE] Pagina successiva"
+    },
+    "chatDrawer": {
+      "hideChat": "[TRANSLATE] Nascondi chat",
+      "showChat": "[TRANSLATE] Mostra chat",
+      "startConversation": "[TRANSLATE] Inizia una conversazione col Professore..."
+    },
+    "maestros": {
+      "arialabelchiudiEsc": "[TRANSLATE] aria-label=\"Chiudi (Esc)\"",
+      "arialabelchiudi": "[TRANSLATE] aria-label=\"Chiudi\""
     }
   }
 }

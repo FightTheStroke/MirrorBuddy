@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Title Editor Component
@@ -7,10 +7,11 @@
  * Shows either static title or editable input.
  */
 
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import { Edit2, Check, X } from "lucide-react";
-import type { EditState } from "../types";
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { Edit2, Check, X } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import type { EditState } from '../types';
 
 interface TitleEditorProps {
   title: string;
@@ -37,6 +38,8 @@ export function TitleEditor({
   onEditValueChange,
   onKeyDown,
 }: TitleEditorProps) {
+  const t = useTranslations('tools.summary');
+
   return (
     <div className="flex items-center gap-2 group">
       {isEditing ? (
@@ -49,22 +52,12 @@ export function TitleEditor({
             onKeyDown={onKeyDown}
             onBlur={onSaveEdit}
             className="flex-1 px-3 py-2 text-xl font-bold rounded-md border border-primary bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-primary"
-            aria-label="Titolo del riassunto"
+            aria-label={t('titlePlaceholder')}
           />
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onSaveEdit}
-            aria-label="Salva"
-          >
+          <Button variant="ghost" size="icon" onClick={onSaveEdit} aria-label={t('save')}>
             <Check className="w-4 h-4 text-green-600" />
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onCancelEdit}
-            aria-label="Annulla"
-          >
+          <Button variant="ghost" size="icon" onClick={onCancelEdit} aria-label={t('cancel')}>
             <X className="w-4 h-4 text-red-600" />
           </Button>
         </div>
@@ -73,17 +66,16 @@ export function TitleEditor({
           {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- Heading used for semantic structure, made interactive for inline editing UX */}
           <h2
             className={cn(
-              "flex-1 text-xl font-bold text-slate-900 dark:text-white",
-              !readOnly &&
-                "cursor-pointer hover:text-primary transition-colors",
+              'flex-1 text-xl font-bold text-slate-900 dark:text-white',
+              !readOnly && 'cursor-pointer hover:text-primary transition-colors',
             )}
-            role={!readOnly ? "button" : undefined}
+            role={!readOnly ? 'button' : undefined}
             tabIndex={!readOnly ? 0 : undefined}
-            onClick={() => !readOnly && onStartEdit({ type: "title" }, title)}
+            onClick={() => !readOnly && onStartEdit({ type: 'title' }, title)}
             onKeyDown={(e) => {
-              if (!readOnly && (e.key === "Enter" || e.key === " ")) {
+              if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
                 e.preventDefault();
-                onStartEdit({ type: "title" }, title);
+                onStartEdit({ type: 'title' }, title);
               }
             }}
           >
@@ -94,8 +86,8 @@ export function TitleEditor({
               variant="ghost"
               size="icon"
               className="opacity-0 group-hover:opacity-100 transition-opacity"
-              onClick={() => onStartEdit({ type: "title" }, title)}
-              aria-label="Modifica titolo"
+              onClick={() => onStartEdit({ type: 'title' }, title)}
+              aria-label={t('editTitle')}
             >
               <Edit2 className="w-4 h-4" />
             </Button>

@@ -8,7 +8,17 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { useTranslations } from 'next-intl';
+import {
+  AreaChart,
+  Area,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
+} from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import type { StudySession } from '@/lib/stores/progress-store';
@@ -39,6 +49,7 @@ const SUBJECT_COLORS: Record<string, string> = {
 };
 
 export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
+  const t = useTranslations('admin.dashboard.timeStudyChart');
   const [period, setPeriod] = useState<TimePeriod>('week');
 
   const chartData = useMemo(() => {
@@ -61,7 +72,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
     }
 
     const filteredSessions = sessions.filter(
-      (s) => s.endedAt && new Date(s.startedAt) >= startDate
+      (s) => s.endedAt && new Date(s.startedAt) >= startDate,
     );
 
     const dataByDate = new Map<string, Record<string, number>>();
@@ -120,7 +131,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                   'px-3 py-1 text-xs font-medium rounded-md transition-colors',
                   period === p
                     ? 'bg-purple-500 text-white'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700',
                 )}
                 aria-pressed={period === p}
               >
@@ -141,7 +152,7 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
         {chartData.length > 0 ? (
           <>
             <ResponsiveContainer width="100%" height={300}>
-              <AreaChart data={chartData} aria-label="Grafico tempo di studio per materia">
+              <AreaChart data={chartData} aria-label={t('chartAriaLabel')}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="date"
@@ -152,7 +163,11 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                     return date.toLocaleDateString('it-IT', { day: '2-digit', month: '2-digit' });
                   }}
                 />
-                <YAxis stroke="#94a3b8" fontSize={12} label={{ value: 'Minuti', angle: -90, position: 'insideLeft' }} />
+                <YAxis
+                  stroke="#94a3b8"
+                  fontSize={12}
+                  label={{ value: 'Minuti', angle: -90, position: 'insideLeft' }}
+                />
                 <Tooltip
                   contentStyle={{
                     backgroundColor: '#1e293b',
@@ -199,7 +214,9 @@ export function TimeStudyChart({ sessions, className }: TimeStudyChartProps) {
                   <tr key={point.date}>
                     <td>{point.date}</td>
                     {subjects.map((subject) => (
-                      <td key={subject}>{(point as Record<string, string | number>)[subject] || 0} minuti</td>
+                      <td key={subject}>
+                        {(point as Record<string, string | number>)[subject] || 0} minuti
+                      </td>
                     ))}
                     <td>{point.total} minuti</td>
                   </tr>

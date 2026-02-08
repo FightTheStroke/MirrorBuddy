@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 /**
  * Section Header Component
@@ -9,10 +9,11 @@
  * - Delete button
  */
 
-import { GripVertical, ChevronDown, ChevronRight, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
-import type { EditState } from "../types";
+import { GripVertical, ChevronDown, ChevronRight, Trash2 } from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import type { EditState } from '../types';
 
 interface SectionHeaderProps {
   sectionIndex: number;
@@ -45,38 +46,32 @@ export function SectionHeader({
   onDeleteSection,
   onKeyDown,
 }: SectionHeaderProps) {
+  const t = useTranslations('tools.summary');
   const isSectionTitleEditing =
-    editState?.type === "section-title" &&
-    editState.sectionIndex === sectionIndex;
+    editState?.type === 'section-title' && editState.sectionIndex === sectionIndex;
 
   return (
     <div
       role="button"
       tabIndex={0}
       className={cn(
-        "flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800/50",
-        "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors",
+        'flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800/50',
+        'cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors',
       )}
       onClick={onToggle}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") {
+        if (e.key === 'Enter' || e.key === ' ') {
           e.preventDefault();
           onToggle();
         }
       }}
     >
-      {!readOnly && (
-        <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />
-      )}
+      {!readOnly && <GripVertical className="w-4 h-4 text-slate-400 shrink-0" />}
       <button
         className="p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700"
-        aria-label={isExpanded ? "Comprimi sezione" : "Espandi sezione"}
+        aria-label={isExpanded ? 'Comprimi sezione' : 'Espandi sezione'}
       >
-        {isExpanded ? (
-          <ChevronDown className="w-4 h-4" />
-        ) : (
-          <ChevronRight className="w-4 h-4" />
-        )}
+        {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
       </button>
 
       {/* Section Title Edit/Display */}
@@ -94,23 +89,23 @@ export function SectionHeader({
         />
       ) : (
         <span
-          role={!readOnly ? "button" : undefined}
+          role={!readOnly ? 'button' : undefined}
           tabIndex={!readOnly ? 0 : undefined}
           className={cn(
-            "flex-1 font-semibold text-slate-900 dark:text-white",
-            !readOnly && "hover:text-primary",
+            'flex-1 font-semibold text-slate-900 dark:text-white',
+            !readOnly && 'hover:text-primary',
           )}
           onClick={(e) => {
             if (!readOnly) {
               e.stopPropagation();
-              onStartEdit({ type: "section-title", sectionIndex }, title);
+              onStartEdit({ type: 'section-title', sectionIndex }, title);
             }
           }}
           onKeyDown={(e) => {
-            if (!readOnly && (e.key === "Enter" || e.key === " ")) {
+            if (!readOnly && (e.key === 'Enter' || e.key === ' ')) {
               e.preventDefault();
               e.stopPropagation();
-              onStartEdit({ type: "section-title", sectionIndex }, title);
+              onStartEdit({ type: 'section-title', sectionIndex }, title);
             }
           }}
         >
@@ -127,7 +122,7 @@ export function SectionHeader({
             e.stopPropagation();
             onDeleteSection();
           }}
-          aria-label="Elimina sezione"
+          aria-label={t('deleteSection')}
         >
           <Trash2 className="w-4 h-4 text-destructive" />
         </Button>

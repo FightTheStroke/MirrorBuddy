@@ -1,17 +1,18 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { User, Mail, FileText, ChevronDown, ChevronUp } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { StatusBadge } from "@/components/ui/status-badge";
-import { cn } from "@/lib/utils";
+import { useState } from 'react';
+import { useTranslations } from 'next-intl';
+import { User, Mail, FileText, ChevronDown, ChevronUp } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { StatusBadge } from '@/components/ui/status-badge';
+import { cn } from '@/lib/utils';
 
 export interface InviteRequest {
   id: string;
   email: string;
   name: string;
   motivation: string;
-  status: "PENDING" | "APPROVED" | "REJECTED";
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
   trialSessionId: string | null;
   createdAt: string;
   reviewedAt: string | null;
@@ -33,14 +34,13 @@ export function InvitesTable({
   onSelectionChange,
   showCheckboxes = true,
 }: InvitesTableProps) {
+  const t = useTranslations('admin');
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
-  const pendingInvites = invites.filter((i) => i.status === "PENDING");
+  const pendingInvites = invites.filter((i) => i.status === 'PENDING');
   const allSelected =
-    pendingInvites.length > 0 &&
-    pendingInvites.every((i) => selectedIds.has(i.id));
-  const someSelected =
-    pendingInvites.some((i) => selectedIds.has(i.id)) && !allSelected;
+    pendingInvites.length > 0 && pendingInvites.every((i) => selectedIds.has(i.id));
+  const someSelected = pendingInvites.some((i) => selectedIds.has(i.id)) && !allSelected;
 
   const handleSelectAll = () => {
     if (allSelected) {
@@ -61,12 +61,12 @@ export function InvitesTable({
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("it-IT", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+    return new Date(dateString).toLocaleDateString('it-IT', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -74,9 +74,7 @@ export function InvitesTable({
     return (
       <div className="text-center py-12 bg-white dark:bg-slate-800 rounded-xl">
         <Mail className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-        <p className="text-slate-600 dark:text-slate-400">
-          Nessuna richiesta trovata
-        </p>
+        <p className="text-slate-600 dark:text-slate-400">{t('invites.noRequestsFound')}</p>
       </div>
     );
   }
@@ -91,12 +89,12 @@ export function InvitesTable({
               checked={allSelected}
               indeterminate={someSelected}
               onCheckedChange={handleSelectAll}
-              aria-label="Seleziona tutti"
+              aria-label={t('invites.selectAll')}
             />
           </div>
         )}
-        <div className={cn(!showCheckboxes && "col-span-2")}>Richiesta</div>
-        <div>Stato</div>
+        <div className={cn(!showCheckboxes && 'col-span-2')}>{t('invites.request')}</div>
+        <div>{t('invites.status')}</div>
       </div>
 
       {/* Table body */}
@@ -108,10 +106,8 @@ export function InvitesTable({
             isSelected={selectedIds.has(invite.id)}
             isExpanded={expandedId === invite.id}
             onToggleSelect={() => handleSelectOne(invite.id)}
-            onToggleExpand={() =>
-              setExpandedId(expandedId === invite.id ? null : invite.id)
-            }
-            showCheckbox={showCheckboxes && invite.status === "PENDING"}
+            onToggleExpand={() => setExpandedId(expandedId === invite.id ? null : invite.id)}
+            showCheckbox={showCheckboxes && invite.status === 'PENDING'}
             formatDate={formatDate}
           />
         ))}
@@ -140,12 +136,7 @@ function InviteRow({
   formatDate,
 }: InviteRowProps) {
   return (
-    <div
-      className={cn(
-        "transition-colors",
-        isSelected && "bg-indigo-50 dark:bg-indigo-900/20",
-      )}
-    >
+    <div className={cn('transition-colors', isSelected && 'bg-indigo-50 dark:bg-indigo-900/20')}>
       <div className="grid grid-cols-[auto_1fr_auto] gap-4 px-4 py-3 items-center">
         {/* Checkbox column */}
         <div className="flex items-center">
@@ -161,10 +152,7 @@ function InviteRow({
         </div>
 
         {/* Main content */}
-        <button
-          onClick={onToggleExpand}
-          className="flex items-start gap-3 text-left min-w-0"
-        >
+        <button onClick={onToggleExpand} className="flex items-start gap-3 text-left min-w-0">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <User className="w-4 h-4 text-slate-400 shrink-0" />
@@ -193,52 +181,62 @@ function InviteRow({
       {/* Expanded content */}
       {isExpanded && (
         <div className="px-4 pb-4 pl-12">
-          <div className="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3">
-            <div className="flex items-start gap-2 mb-2">
-              <FileText className="w-4 h-4 text-slate-400 mt-0.5" />
-              <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                Motivazione
-              </span>
-            </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap ml-6">
-              {invite.motivation}
-            </p>
-
-            {invite.isDirect && (
-              <p className="mt-3 ml-6 text-sm text-indigo-600 dark:text-indigo-400">
-                Invito diretto admin
-              </p>
-            )}
-
-            {invite.generatedUsername && (
-              <p className="mt-3 ml-6 text-sm text-green-600 dark:text-green-400">
-                Username: {invite.generatedUsername}
-              </p>
-            )}
-
-            {invite.rejectionReason && (
-              <p className="mt-3 ml-6 text-sm text-red-600 dark:text-red-400">
-                Motivo rifiuto: {invite.rejectionReason}
-              </p>
-            )}
-          </div>
+          <InviteDetails invite={invite} />
         </div>
       )}
     </div>
   );
 }
 
-function InviteStatusBadge({ status }: { status: InviteRequest["status"] }) {
+function InviteDetails({ invite }: { invite: InviteRequest }) {
+  const t = useTranslations('admin');
+
+  return (
+    <div className="bg-slate-50 dark:bg-slate-700/30 rounded-lg p-3">
+      <div className="flex items-start gap-2 mb-2">
+        <FileText className="w-4 h-4 text-slate-400 mt-0.5" />
+        <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          {t('invites.motivation')}
+        </span>
+      </div>
+      <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap ml-6">
+        {invite.motivation}
+      </p>
+
+      {invite.isDirect && (
+        <p className="mt-3 ml-6 text-sm text-indigo-600 dark:text-indigo-400">
+          {t('invites.directAdminInvite')}
+        </p>
+      )}
+
+      {invite.generatedUsername && (
+        <p className="mt-3 ml-6 text-sm text-green-600 dark:text-green-400">
+          {t('invites.username')}: {invite.generatedUsername}
+        </p>
+      )}
+
+      {invite.rejectionReason && (
+        <p className="mt-3 ml-6 text-sm text-red-600 dark:text-red-400">
+          {t('invites.rejectionReason')}: {invite.rejectionReason}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function InviteStatusBadge({ status }: { status: InviteRequest['status'] }) {
+  const t = useTranslations('admin');
+
   const labels = {
-    PENDING: "In attesa",
-    APPROVED: "Approvata",
-    REJECTED: "Rifiutata",
+    PENDING: t('invites.statusPending'),
+    APPROVED: t('invites.statusApproved'),
+    REJECTED: t('invites.statusRejected'),
   };
 
   const variants = {
-    PENDING: "pending" as const,
-    APPROVED: "approved" as const,
-    REJECTED: "rejected" as const,
+    PENDING: 'pending' as const,
+    APPROVED: 'approved' as const,
+    REJECTED: 'rejected' as const,
   };
 
   return <StatusBadge variant={variants[status]}>{labels[status]}</StatusBadge>;
