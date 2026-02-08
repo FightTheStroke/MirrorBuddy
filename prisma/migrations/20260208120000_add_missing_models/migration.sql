@@ -1,8 +1,12 @@
--- CreateEnum
-CREATE TYPE "CharacterType" AS ENUM ('MAESTRO', 'COACH', 'BUDDY');
+-- CreateEnum (idempotent: some tables may exist from db push)
+DO $$ BEGIN
+    CREATE TYPE "CharacterType" AS ENUM ('MAESTRO', 'COACH', 'BUDDY');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateTable: CharacterConfig
-CREATE TABLE "CharacterConfig" (
+CREATE TABLE IF NOT EXISTS "CharacterConfig" (
     "id" TEXT NOT NULL,
     "characterId" TEXT NOT NULL,
     "type" "CharacterType" NOT NULL,
@@ -17,7 +21,7 @@ CREATE TABLE "CharacterConfig" (
 );
 
 -- CreateTable: ToolOutput
-CREATE TABLE "ToolOutput" (
+CREATE TABLE IF NOT EXISTS "ToolOutput" (
     "id" TEXT NOT NULL,
     "conversationId" TEXT NOT NULL,
     "toolType" TEXT NOT NULL,
@@ -29,7 +33,7 @@ CREATE TABLE "ToolOutput" (
 );
 
 -- CreateTable: HierarchicalSummary
-CREATE TABLE "HierarchicalSummary" (
+CREATE TABLE IF NOT EXISTS "HierarchicalSummary" (
     "id" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
     "type" TEXT NOT NULL,
@@ -46,7 +50,7 @@ CREATE TABLE "HierarchicalSummary" (
 );
 
 -- CreateTable: PasswordResetToken
-CREATE TABLE "PasswordResetToken" (
+CREATE TABLE IF NOT EXISTS "PasswordResetToken" (
     "id" TEXT NOT NULL,
     "token" TEXT NOT NULL,
     "userId" TEXT NOT NULL,
@@ -58,7 +62,7 @@ CREATE TABLE "PasswordResetToken" (
 );
 
 -- CreateTable: ContactRequest
-CREATE TABLE "ContactRequest" (
+CREATE TABLE IF NOT EXISTS "ContactRequest" (
     "id" TEXT NOT NULL,
     "type" VARCHAR(50) NOT NULL,
     "name" VARCHAR(255) NOT NULL,
@@ -73,7 +77,7 @@ CREATE TABLE "ContactRequest" (
 );
 
 -- CreateTable: AdminAuditLog
-CREATE TABLE "AdminAuditLog" (
+CREATE TABLE IF NOT EXISTS "AdminAuditLog" (
     "id" TEXT NOT NULL,
     "action" TEXT NOT NULL,
     "entityType" TEXT NOT NULL,
@@ -87,7 +91,7 @@ CREATE TABLE "AdminAuditLog" (
 );
 
 -- CreateTable: AuditLog (@@map: audit_logs)
-CREATE TABLE "audit_logs" (
+CREATE TABLE IF NOT EXISTS "audit_logs" (
     "id" TEXT NOT NULL,
     "action" VARCHAR(100) NOT NULL,
     "actorId" VARCHAR(255) NOT NULL,
@@ -101,7 +105,7 @@ CREATE TABLE "audit_logs" (
 );
 
 -- CreateTable: SchoolSSOConfig (@@map: school_sso_configs)
-CREATE TABLE "school_sso_configs" (
+CREATE TABLE IF NOT EXISTS "school_sso_configs" (
     "id" TEXT NOT NULL,
     "schoolId" TEXT NOT NULL,
     "provider" VARCHAR(50) NOT NULL,
@@ -118,7 +122,7 @@ CREATE TABLE "school_sso_configs" (
 );
 
 -- CreateTable: SSOSession (@@map: sso_sessions)
-CREATE TABLE "sso_sessions" (
+CREATE TABLE IF NOT EXISTS "sso_sessions" (
     "id" TEXT NOT NULL,
     "state" VARCHAR(255) NOT NULL,
     "codeVerifier" VARCHAR(255) NOT NULL,
@@ -131,58 +135,57 @@ CREATE TABLE "sso_sessions" (
     CONSTRAINT "sso_sessions_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex: CharacterConfig
-CREATE UNIQUE INDEX "CharacterConfig_characterId_key" ON "CharacterConfig"("characterId");
-CREATE INDEX "CharacterConfig_type_idx" ON "CharacterConfig"("type");
-CREATE INDEX "CharacterConfig_isEnabled_idx" ON "CharacterConfig"("isEnabled");
-CREATE INDEX "CharacterConfig_characterId_idx" ON "CharacterConfig"("characterId");
+-- CreateIndex (all IF NOT EXISTS for idempotency)
+CREATE UNIQUE INDEX IF NOT EXISTS "CharacterConfig_characterId_key" ON "CharacterConfig"("characterId");
+CREATE INDEX IF NOT EXISTS "CharacterConfig_type_idx" ON "CharacterConfig"("type");
+CREATE INDEX IF NOT EXISTS "CharacterConfig_isEnabled_idx" ON "CharacterConfig"("isEnabled");
+CREATE INDEX IF NOT EXISTS "CharacterConfig_characterId_idx" ON "CharacterConfig"("characterId");
 
--- CreateIndex: ToolOutput
-CREATE INDEX "ToolOutput_conversationId_idx" ON "ToolOutput"("conversationId");
-CREATE INDEX "ToolOutput_toolType_idx" ON "ToolOutput"("toolType");
-CREATE INDEX "ToolOutput_createdAt_idx" ON "ToolOutput"("createdAt");
+CREATE INDEX IF NOT EXISTS "ToolOutput_conversationId_idx" ON "ToolOutput"("conversationId");
+CREATE INDEX IF NOT EXISTS "ToolOutput_toolType_idx" ON "ToolOutput"("toolType");
+CREATE INDEX IF NOT EXISTS "ToolOutput_createdAt_idx" ON "ToolOutput"("createdAt");
 
--- CreateIndex: HierarchicalSummary
-CREATE INDEX "HierarchicalSummary_userId_type_idx" ON "HierarchicalSummary"("userId", "type");
-CREATE INDEX "HierarchicalSummary_userId_startDate_endDate_idx" ON "HierarchicalSummary"("userId", "startDate", "endDate");
+CREATE INDEX IF NOT EXISTS "HierarchicalSummary_userId_type_idx" ON "HierarchicalSummary"("userId", "type");
+CREATE INDEX IF NOT EXISTS "HierarchicalSummary_userId_startDate_endDate_idx" ON "HierarchicalSummary"("userId", "startDate", "endDate");
 
--- CreateIndex: PasswordResetToken
-CREATE UNIQUE INDEX "PasswordResetToken_token_key" ON "PasswordResetToken"("token");
-CREATE INDEX "PasswordResetToken_token_idx" ON "PasswordResetToken"("token");
-CREATE INDEX "PasswordResetToken_userId_idx" ON "PasswordResetToken"("userId");
-CREATE INDEX "PasswordResetToken_expiresAt_idx" ON "PasswordResetToken"("expiresAt");
+CREATE UNIQUE INDEX IF NOT EXISTS "PasswordResetToken_token_key" ON "PasswordResetToken"("token");
+CREATE INDEX IF NOT EXISTS "PasswordResetToken_token_idx" ON "PasswordResetToken"("token");
+CREATE INDEX IF NOT EXISTS "PasswordResetToken_userId_idx" ON "PasswordResetToken"("userId");
+CREATE INDEX IF NOT EXISTS "PasswordResetToken_expiresAt_idx" ON "PasswordResetToken"("expiresAt");
 
--- CreateIndex: ContactRequest
-CREATE INDEX "ContactRequest_type_idx" ON "ContactRequest"("type");
-CREATE INDEX "ContactRequest_status_idx" ON "ContactRequest"("status");
-CREATE INDEX "ContactRequest_type_status_idx" ON "ContactRequest"("type", "status");
-CREATE INDEX "ContactRequest_email_idx" ON "ContactRequest"("email");
+CREATE INDEX IF NOT EXISTS "ContactRequest_type_idx" ON "ContactRequest"("type");
+CREATE INDEX IF NOT EXISTS "ContactRequest_status_idx" ON "ContactRequest"("status");
+CREATE INDEX IF NOT EXISTS "ContactRequest_type_status_idx" ON "ContactRequest"("type", "status");
+CREATE INDEX IF NOT EXISTS "ContactRequest_email_idx" ON "ContactRequest"("email");
 
--- CreateIndex: AdminAuditLog
-CREATE INDEX "AdminAuditLog_action_idx" ON "AdminAuditLog"("action");
-CREATE INDEX "AdminAuditLog_entityType_idx" ON "AdminAuditLog"("entityType");
-CREATE INDEX "AdminAuditLog_adminId_idx" ON "AdminAuditLog"("adminId");
-CREATE INDEX "AdminAuditLog_createdAt_idx" ON "AdminAuditLog"("createdAt");
-CREATE INDEX "AdminAuditLog_adminId_createdAt_idx" ON "AdminAuditLog"("adminId", "createdAt");
-CREATE INDEX "AdminAuditLog_entityType_entityId_idx" ON "AdminAuditLog"("entityType", "entityId");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_action_idx" ON "AdminAuditLog"("action");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_entityType_idx" ON "AdminAuditLog"("entityType");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_adminId_idx" ON "AdminAuditLog"("adminId");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_createdAt_idx" ON "AdminAuditLog"("createdAt");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_adminId_createdAt_idx" ON "AdminAuditLog"("adminId", "createdAt");
+CREATE INDEX IF NOT EXISTS "AdminAuditLog_entityType_entityId_idx" ON "AdminAuditLog"("entityType", "entityId");
 
--- CreateIndex: AuditLog (audit_logs)
-CREATE INDEX "audit_logs_action_idx" ON "audit_logs"("action");
-CREATE INDEX "audit_logs_actorId_idx" ON "audit_logs"("actorId");
-CREATE INDEX "audit_logs_targetId_idx" ON "audit_logs"("targetId");
-CREATE INDEX "audit_logs_createdAt_idx" ON "audit_logs"("createdAt");
+CREATE INDEX IF NOT EXISTS "audit_logs_action_idx" ON "audit_logs"("action");
+CREATE INDEX IF NOT EXISTS "audit_logs_actorId_idx" ON "audit_logs"("actorId");
+CREATE INDEX IF NOT EXISTS "audit_logs_targetId_idx" ON "audit_logs"("targetId");
+CREATE INDEX IF NOT EXISTS "audit_logs_createdAt_idx" ON "audit_logs"("createdAt");
 
--- CreateIndex: SchoolSSOConfig (school_sso_configs)
-CREATE UNIQUE INDEX "school_sso_configs_schoolId_provider_key" ON "school_sso_configs"("schoolId", "provider");
-CREATE INDEX "school_sso_configs_domain_idx" ON "school_sso_configs"("domain");
+CREATE UNIQUE INDEX IF NOT EXISTS "school_sso_configs_schoolId_provider_key" ON "school_sso_configs"("schoolId", "provider");
+CREATE INDEX IF NOT EXISTS "school_sso_configs_domain_idx" ON "school_sso_configs"("domain");
 
--- CreateIndex: SSOSession (sso_sessions)
-CREATE UNIQUE INDEX "sso_sessions_state_key" ON "sso_sessions"("state");
-CREATE INDEX "sso_sessions_state_idx" ON "sso_sessions"("state");
-CREATE INDEX "sso_sessions_expiresAt_idx" ON "sso_sessions"("expiresAt");
+CREATE UNIQUE INDEX IF NOT EXISTS "sso_sessions_state_key" ON "sso_sessions"("state");
+CREATE INDEX IF NOT EXISTS "sso_sessions_state_idx" ON "sso_sessions"("state");
+CREATE INDEX IF NOT EXISTS "sso_sessions_expiresAt_idx" ON "sso_sessions"("expiresAt");
 
--- AddForeignKey: ToolOutput -> Conversation
-ALTER TABLE "ToolOutput" ADD CONSTRAINT "ToolOutput_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+-- AddForeignKey (idempotent: skip if already exists)
+DO $$ BEGIN
+    ALTER TABLE "ToolOutput" ADD CONSTRAINT "ToolOutput_conversationId_fkey" FOREIGN KEY ("conversationId") REFERENCES "Conversation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
--- AddForeignKey: PasswordResetToken -> User
-ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+    ALTER TABLE "PasswordResetToken" ADD CONSTRAINT "PasswordResetToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
